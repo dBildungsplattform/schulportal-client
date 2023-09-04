@@ -3,13 +3,15 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "vite",
     "build": "run-p type-check build-only",
-    "preview": "vite preview",
     "build-only": "vite build",
-    "type-check": "vue-tsc --noEmit -p tsconfig.app.json --composite false",
+    "coverage": "vitest run --coverage",
+    "dev": "vite",
+    "format": "prettier --write src/",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
-    "format": "prettier --write src/"
+    "preview": "vite preview",
+    "test": "vitest",
+    "type-check": "vue-tsc --noEmit -p tsconfig.app.json --composite false"
   },
   "dependencies": {
     "pinia": "^2.1.6",
@@ -24,6 +26,7 @@
     "@tsconfig/node18": "^18.2.0",
     "@types/node": "^18.17.5",
     "@vitejs/plugin-vue": "^4.3.1",
+    "@vitest/coverage-v8": "^0.34.3",
     "@vue/eslint-config-prettier": "^8.0.0",
     "@vue/eslint-config-typescript": "^11.0.3",
     "@vue/tsconfig": "^0.2.0",
@@ -33,6 +36,7 @@
     "prettier": "^3.0.0",
     "typescript": "~5.1.6",
     "vite": "^4.4.9",
+    "vitest": "^0.34.3",
     "vue-tsc": "^1.8.8"
   }
 }
