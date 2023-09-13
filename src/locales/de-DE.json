@@ -1,6 +1,12 @@
 {
+  "login": {
+    "button": "Anmelden",
+    "password": "Passwort",
+    "username": "Benutzername"
+  },
   "nav": {
+    "about": "Über uns",
     "home": "Start",
-    "about": "Über uns"
+    "login": "Anmelden"
   }
 }
