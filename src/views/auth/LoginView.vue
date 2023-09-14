@@ -1,4 +1,5 @@
 <script setup lang="ts">
+  import { getToken } from '@/services/auth/KeycloakService'
     const userName = ''
     const password = ''
 
@@ -20,6 +21,7 @@
       ></v-text-field>
 
       <v-btn
+        @click.stop="getToken"
         block
         class="mt-2"
         :text="$t('login.button')"
