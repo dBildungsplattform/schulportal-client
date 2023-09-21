@@ -1,8 +1,8 @@
 <script setup lang="ts">
-  import { getToken } from '@/services/auth/KeycloakService'
-    const userName = ''
-    const password = ''
-
+  import { getToken } from '@/services/auth/AuthService'
+  import { ref } from 'vue'
+  const userName = ref('')
+  const password = ref('')
 </script>
 
 <template>
@@ -21,7 +21,7 @@
       ></v-text-field>
 
       <v-btn
-        @click.stop="getToken"
+        @click.stop="getToken(userName, password)"
         block
         class="mt-2"
         :text="$t('login.button')"
