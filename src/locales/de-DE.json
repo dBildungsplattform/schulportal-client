@@ -5,7 +5,7 @@
     "username": "Benutzername"
   },
   "nav": {
-    "about": "Über uns",
+    "dashboard": "Dashboard",
     "home": "Start",
     "login": "Anmelden"
   }
