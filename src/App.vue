@@ -1,16 +1,15 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
+import { RouterView } from 'vue-router'
+import TheHeader from '@/components/nav/TheHeader.vue'
 </script>
 
 <template>
-  <header>
-    <nav>
-      <RouterLink to="/">{{ $t("nav.home") }}</RouterLink>
-      <RouterLink to="/about">{{ $t("nav.about") }}</RouterLink>
-      <RouterLink to="/login">{{ $t("nav.login") }}</RouterLink>
-    </nav>
-  </header>
-  <RouterView />
+  <v-layout>
+    <TheHeader></TheHeader>
+    <v-main>
+      <RouterView />
+    </v-main>
+  </v-layout>
 </template>
 
 <style scoped>
