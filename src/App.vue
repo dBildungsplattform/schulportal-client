@@ -1,6 +1,21 @@
-<script setup lang="ts">
-import { RouterView } from 'vue-router'
-import TheHeader from '@/components/nav/TheHeader.vue'
+<script lang="ts">
+  import { defineComponent } from 'vue'
+  import { RouterView } from 'vue-router'
+  import TheHeader from '@/components/nav/TheHeader.vue'
+  import TheSecret from "@/components/TheSecret.vue"
+
+    export default defineComponent({
+      name: 'App',
+      components: {
+        RouterView,
+        TheHeader,
+        TheSecret
+      },
+      created () {
+        // Should work referencing custom property on 'this' in typescript
+        console.log('App created', this.$keycloak)
+      }
+    })
 </script>
 
 <template>
@@ -8,6 +23,7 @@ import TheHeader from '@/components/nav/TheHeader.vue'
     <TheHeader></TheHeader>
     <v-main>
       <RouterView />
+      <TheSecret />
     </v-main>
   </v-layout>
 </template>
