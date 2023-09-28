@@ -5,8 +5,9 @@
     "username": "Benutzername"
   },
   "nav": {
-    "dashboard": "Dashboard",
-    "home": "Start",
-    "login": "Anmelden"
+    "home": "Home",
+    "landing": "Start",
+    "login": "Anmelden",
+    "logout": "Abmelden"
   }
 }
