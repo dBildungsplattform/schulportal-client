@@ -6,11 +6,11 @@ export const useAuthStore = defineStore({
   id: 'auth',
   state: () => ({
     /* initialize state from local storage to enable user to stay logged in */
-    user: JSON.parse(localStorage.getItem('user')),
-    returnUrl: null
+    user: JSON.parse(localStorage.getItem('user') || '{}'),
+    returnUrl: ''
   }),
   actions: {
-    async login(username, password) {
+    async login(username: string, password: string) {
       const user = await ApiService().post('/login', { username, password })
 
       /* update state */
