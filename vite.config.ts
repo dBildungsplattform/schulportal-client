@@ -14,7 +14,16 @@ export default defineConfig({
     }
   },
   server: {
-    port: 8099
+    port: 8099,
+    proxy: {
+      '/api': {
+        target: 'http://localhost:9090/',
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/api/, '')
+      }
+  
+    }
   },
   test: {
     //

@@ -20,7 +20,7 @@ import axios from 'axios'
 // })
 
 export default () => axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL: '/api',
   withCredentials: false,
   headers: {
     Accept: 'application/x-www-form-urlencoded',
