@@ -6,7 +6,7 @@ export const useAuthStore = defineStore({
   id: 'auth',
   state: () => ({
     /* initialize state from local storage to enable user to stay logged in */
-    user: JSON.parse(localStorage.getItem('user') || '{}'),
+    user: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user') || '{}') : null,
     returnUrl: ''
   }),
   actions: {
@@ -23,7 +23,7 @@ export const useAuthStore = defineStore({
       router.push(this.returnUrl || '/home')
     },
     logout() {
-      this.user = null;
+      this.user = null
       localStorage.removeItem('user')
       router.push('/login')
     }
