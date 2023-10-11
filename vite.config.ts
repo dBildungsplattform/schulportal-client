@@ -25,6 +25,14 @@ export default defineConfig({
     }
   },
   test: {
-    //
+    server: {
+      deps: {
+        inline: ['vuetify'],
+      }
+    },
+    environment: 'jsdom',
+    globals: true,
+    include: ['**/specs/**/*.spec.ts'],
+    setupFiles: 'vitest.setup.ts'
   }
 })
