@@ -24,6 +24,7 @@
           block
           class="mt-2"
           :text="$t('login.button')"
+          data-testid="login-button"
         ></v-btn>
       </v-form>
     </v-sheet>
