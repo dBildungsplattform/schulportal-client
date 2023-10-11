@@ -20,11 +20,11 @@ import axios from 'axios'
 // })
 
 export default () => axios.create({
-  baseURL: '/api/frontend',
+  baseURL: '/api',
   withCredentials: false,
   headers: {
-    Accept: 'application/x-www-form-urlencoded',
-    'Content-Type': 'application/x-www-form-urlencoded',
+    Accept: 'application/json',
+    'Content-Type': 'application/json',
     // Authorization: `Bearer ${token}`
   }
 })
