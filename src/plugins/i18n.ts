@@ -3,7 +3,7 @@ import * as deDE from '../locales/de-DE.json'
 
 function loadLocaleMessages() {
   const messages = {
-    "de": deDE
+    de: deDE
   }
 
   return messages

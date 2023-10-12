@@ -15,16 +15,17 @@ import axios from 'axios'
 //       return axios(error.config)
 //     }
 //   }
-  
+
 //   return error
 // })
 
-export default () => axios.create({
-  baseURL: '/api',
-  withCredentials: false,
-  headers: {
-    Accept: 'application/json',
-    'Content-Type': 'application/json',
-    // Authorization: `Bearer ${token}`
-  }
-})
+export default () =>
+  axios.create({
+    baseURL: '/api',
+    withCredentials: false,
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json'
+      // Authorization: `Bearer ${token}`
+    }
+  })

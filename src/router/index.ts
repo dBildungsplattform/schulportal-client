@@ -11,7 +11,7 @@ router.beforeEach(async (to /*, from */) => {
   const auth = useAuthStore()
 
   if (to.meta.requiresAuth && !auth.user) {
-    auth.returnUrl = to.fullPath;
+    auth.returnUrl = to.fullPath
     return '/login'
   }
 })

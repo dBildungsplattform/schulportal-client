@@ -7,7 +7,10 @@
 
 <template>
   <div class="login">
-    <v-sheet max-width="300" class="mx-auto">
+    <v-sheet
+      max-width="300"
+      class="mx-auto"
+    >
       <v-form @submit.prevent="$emit('on-submit', userName, password)">
         <v-text-field
           v-model="userName"
