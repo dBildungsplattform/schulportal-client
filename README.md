@@ -18,8 +18,27 @@ npm run dev
 npm run build
 ```
 
-### Linten
+### ESLint ausführen
 
 ```sh
 npm run lint
+```
+
+## dBildungs-IAM Keycloak starten
+
+```sh
+# Repo klonen
+git clone git@github.com:dBildungsplattform/dbildungs-iam-keycloak.git
+
+# In Ordner wechseln
+cd dbildungs-iam-keycloak
+
+# docker-compose.yml aus dem Keycloak Setup in Confluence verwenden
+
+# Start
+docker compose up
+
+# Start im Hintergrund
+docker compose up -d
+
 ```

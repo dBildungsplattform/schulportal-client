@@ -1,0 +1,13 @@
+{
+  "login": {
+    "button": "Anmelden",
+    "password": "Passwort",
+    "username": "Benutzername"
+  },
+  "nav": {
+    "home": "Home",
+    "landing": "Start",
+    "login": "Anmelden",
+    "logout": "Abmelden"
+  }
+}
