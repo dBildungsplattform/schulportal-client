@@ -27,7 +27,7 @@ jobs:
           else
             echo "branch=${GITHUB_REF#refs/heads/}" >> $GITHUB_OUTPUT
             echo "sha=${{ github.sha }}" >> $GITHUB_OUTPUT
-            echo "tag=${{ github.ref_name },,}" >> $GITHUB_OUTPUT
+            echo "tag=${GITHUB_REF_NAME,,}" >> $GITHUB_OUTPUT
           fi
 
   build_and_push:
