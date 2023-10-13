@@ -2,6 +2,8 @@ import 'vuetify/styles'
 import { createVuetify, type VuetifyOptions } from 'vuetify'
 import '@mdi/font/css/materialdesignicons.css'
 import { aliases, mdi } from 'vuetify/iconsets/mdi'
+import * as components from 'vuetify/components'
+import * as directives from 'vuetify/directives'
 
 const shTheme = {
   dark: false,
@@ -20,6 +22,8 @@ const shTheme = {
 }
 
 const vuetifyConfig: VuetifyOptions = {
+  components,
+  directives,
   icons: {
     defaultSet: 'mdi',
     aliases,
