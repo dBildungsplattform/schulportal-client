@@ -14,6 +14,7 @@ jobs:
     outputs:
       branch: ${{ steps.extract_branch_meta.outputs.branch }}
       sha: ${{ steps.extract_branch_meta.outputs.sha }}
+      tag: ${{ steps.extract_branch_meta.outputs.tag }}
     steps:
       - name: Extract branch meta
         shell: bash
