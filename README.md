@@ -42,3 +42,8 @@ docker compose up
 docker compose up -d
 
 ```
+
+### Package (Docker Image erzeugen)
+Tags, die in das Repo gepusht werden erzeugen ein docker package:
+
+ghcr.io/dbildungsplattform/dbildungs-iam-server:*tag*
