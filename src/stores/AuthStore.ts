@@ -3,7 +3,7 @@ import router from '@/router'
 import ApiService from '@/services/ApiService'
 
 export const useAuthStore = defineStore({
-  id: 'auth',
+  id: 'authStore',
   state: () => ({
     /* initialize state from local storage to enable user to stay logged in */
     user: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user') || '{}') : null,
@@ -15,6 +15,8 @@ export const useAuthStore = defineStore({
 
       /* update state */
       this.user = user
+
+      this.user.providers = [1, 3, 5]
 
       /* store token in local storage to keep user logged in between page refreshes */
       localStorage.setItem('user', JSON.stringify(user))
