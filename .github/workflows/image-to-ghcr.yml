@@ -2,8 +2,8 @@ name: Image to GHCR
 
 on:
   push:
-    branches-ignore:
-      - dependabot/**
+    tags:
+      - '**'
 
 permissions:
   contents: read
