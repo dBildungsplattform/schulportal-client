@@ -18,3 +18,5 @@ RUN npm run build
 FROM $BASE_IMAGE as deployment
 
 COPY --from=scaffold /app/dist/ /usr/share/nginx/html/
+RUN rm /etc/nginx/conf.d/default.conf
+COPY nginx-vue.conf /etc/nginx/conf.d/
