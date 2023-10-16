@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-// import ApiService from '@/services/ApiService'
+import ApiService from '@/services/ApiService'
 
 type Provider = {
   id: number
@@ -13,25 +13,12 @@ export const useProviderStore = defineStore({
     allProviders: [] as Provider[]
   }),
   actions: {
-    async getAllProviders() {
-      // this.allProviders = await ApiService().get('/providers')
-      this.allProviders = [
-        {
-          id: 1,
-          name: 'Spongebob',
-          url: 'https://de.wikipedia.org/wiki/SpongeBob_Schwammkopf'
-        },
-        {
-          id: 2,
-          name: 'Futurama',
-          url: 'https://de.wikipedia.org/wiki/Futurama'
-        },
-        {
-          id: 3,
-          name: 'Die Simpsons',
-          url: 'https://de.wikipedia.org/wiki/Die_Simpsons'
-        }
-      ]
+    async getAllProviders(personId: string) {
+      ApiService()
+        .get('/provider', { params: { personId } })
+        .then((response) => {
+          this.allProviders = response.data
+        })
     }
   }
 })
