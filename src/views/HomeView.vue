@@ -17,21 +17,21 @@
         sm="6"
         md="4"
       >
-          <v-card
-            :href="provider.url"
-            target="_blank"
-            variant="outlined"
-            :data-testid="`provider-card-${provider.id}`"
-            :title="provider.name"
-          >
-            <template #prepend>
-              <!-- this slot is a placeholder for the provider image -->
-              <v-icon>mdi-home</v-icon>
-            </template>
-            <template #append>
-              <v-icon @click.prevent>mdi-heart-outline</v-icon>
-            </template>
-          </v-card>
+        <v-card
+          :href="provider.url"
+          target="_blank"
+          variant="outlined"
+          :data-testid="`provider-card-${provider.id}`"
+          :title="provider.name"
+        >
+          <template #prepend>
+            <!-- this slot is a placeholder for the provider image -->
+            <v-icon>mdi-home</v-icon>
+          </template>
+          <template #append>
+            <v-icon @click.prevent>mdi-heart-outline</v-icon>
+          </template>
+        </v-card>
       </v-col>
     </v-row>
   </div>
