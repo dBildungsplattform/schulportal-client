@@ -14,6 +14,8 @@
         v-for="provider in providers"
         :key="provider.id"
         cols="12"
+        sm="6"
+        md="4"
       >
         <a :href="provider.url">
           <v-card
@@ -26,6 +28,4 @@
   </div>
 </template>
 
-<style>
-  
-</style>
+<style></style>

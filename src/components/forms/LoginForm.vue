@@ -15,11 +15,13 @@
         <v-text-field
           v-model="userName"
           :label="$t('login.username')"
+          data-testid="username-input"
         ></v-text-field>
         <v-text-field
           v-model="password"
           type="password"
           :label="$t('login.password')"
+          data-testid="password-input"
         ></v-text-field>
 
         <v-btn
