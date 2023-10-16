@@ -42,3 +42,8 @@ docker compose up
 docker compose up -d
 
 ```
+
+### Package (Create Docker Image )
+If you push a tag upstream a container will be created for you. (Check Github under Packages)
+
+ghcr.io/dbildungsplattform/schulportal-client:*tag*
