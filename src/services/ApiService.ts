@@ -21,7 +21,7 @@ import axios from 'axios'
 
 export default () =>
   axios.create({
-    baseURL: '/api',
+    baseURL: '/api/frontend',
     withCredentials: false,
     headers: {
       Accept: 'application/json',
