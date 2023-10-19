@@ -3,8 +3,6 @@ import axios from 'axios'
 
 // KEEP COMMENTS FOR REFRESH LOGIC
 
-// const token = localStorage.getItem('access_token')
-
 // axios.interceptors.response.use((response) => response, async (error) => {
 //   if (error.response.status === 401) {
 //     const { status, data } = await axios.post('refresh', {}, {})
@@ -26,6 +24,5 @@ export default () =>
     headers: {
       Accept: 'application/json',
       'Content-Type': 'application/json'
-      // Authorization: `Bearer ${token}`
     }
   })

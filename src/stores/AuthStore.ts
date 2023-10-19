@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import router from '@/router'
 import ApiService from '@/services/ApiService'
+import axios from 'axios'
 
 export const useAuthStore = defineStore({
   id: 'authStore',
@@ -20,6 +21,9 @@ export const useAuthStore = defineStore({
 
       /* store token in local storage to keep user logged in between page refreshes */
       localStorage.setItem('user', JSON.stringify(user))
+
+      const token = user?.data?.access_token
+      axios.defaults.headers.common = {'Authorization': `Bearer ${token}`}
 
       /* redirect to previous url or default to dashboard */
       router.push(this.returnUrl || '/home')
