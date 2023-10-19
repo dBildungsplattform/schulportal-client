@@ -2,8 +2,7 @@
   import { useProviderStore } from '@/stores/ProviderStore'
 
   const providerStore = useProviderStore()
-  // TODO: replace hardcoded personId with currentPersonId
-  providerStore.getAllProviders('1')
+  providerStore.getAllProviders()
 </script>
 
 <template>
