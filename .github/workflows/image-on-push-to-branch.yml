@@ -5,6 +5,10 @@ on:
     branches-ignore:
       - 'main'
 
+concurrency:
+  group: environment-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   codeql_analyze:
     uses: dBildungsplattform/dbp-github-workflows/.github/workflows/check-codeql.yaml@1.1.0
@@ -28,7 +32,7 @@ jobs:
     secrets: inherit
 
   build_and_push:
-    if: ${{ !failure() }}
+    if: ${{ success() }}
     needs:
       - codeql_analyze
       - nest_lint
