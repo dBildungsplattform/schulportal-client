@@ -23,7 +23,7 @@ export const useAuthStore = defineStore({
       localStorage.setItem('user', JSON.stringify(user))
 
       const token = user?.data?.access_token
-      axios.defaults.headers.common = {'Authorization': `Bearer ${token}`}
+      axios.defaults.headers.common = { Authorization: `Bearer ${token}` }
 
       /* redirect to previous url or default to dashboard */
       router.push(this.returnUrl || '/home')
