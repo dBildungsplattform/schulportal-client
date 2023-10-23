@@ -2,7 +2,7 @@
 import axios from 'axios'
 
 const axiosApiInstance = axios.create({
-  baseURL: '/api',
+  baseURL: '/api/frontend',
   withCredentials: false,
   headers: {
     Accept: 'application/json',
