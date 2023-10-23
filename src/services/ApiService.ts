@@ -1,28 +1,22 @@
 /* this is used as a base class for all API based services */
 import axios from 'axios'
 
-// KEEP COMMENTS FOR REFRESH LOGIC
+const axiosApiInstance = axios.create({
+  baseURL: '/api',
+  withCredentials: false,
+  headers: {
+    Accept: 'application/json',
+    'Content-Type': 'application/json'
+  }
+})
 
-// axios.interceptors.response.use((response) => response, async (error) => {
-//   if (error.response.status === 401) {
-//     const { status, data } = await axios.post('refresh', {}, {})
+axiosApiInstance.interceptors.request.use((config) => {
+  const user = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user') || '{}') : null
+  const token = user?.data?.access_token
+  config.headers.Authorization = `Bearer ${token}`
+   
+  return config
+})
 
-//     if (status === 200) {
-//       axios.defaults.headers.common['Authorization'] = `Bearer ${data.token}`
+export default axiosApiInstance
 
-//       return axios(error.config)
-//     }
-//   }
-
-//   return error
-// })
-
-export default () =>
-  axios.create({
-    baseURL: '/api',
-    withCredentials: false,
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json'
-    }
-  })

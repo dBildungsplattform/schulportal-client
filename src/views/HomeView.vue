@@ -7,12 +7,12 @@
 
 <template>
   <div class="home">
-    <h1>This is gonna be the home page</h1>
+    <h1>{{ $t('home.allProviders') }}</h1>
     <v-row>
       <v-col
         v-for="provider in providerStore.allProviders"
-        :key="provider.id"
         cols="12"
+        :key="provider.id"
         sm="6"
         md="4"
       >
@@ -25,10 +25,13 @@
         >
           <template #prepend>
             <!-- this slot is a placeholder for the provider image -->
-            <v-icon>mdi-home</v-icon>
+            <v-icon icon="mdi-home"></v-icon>
           </template>
           <template #append>
-            <v-icon @click.prevent>mdi-heart-outline</v-icon>
+            <v-icon
+              @click.prevent
+              icon="mdi-heart-outline"
+            ></v-icon>
           </template>
         </v-card>
       </v-col>

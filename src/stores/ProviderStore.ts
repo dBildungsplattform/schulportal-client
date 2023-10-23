@@ -14,9 +14,9 @@ export const useProviderStore = defineStore({
   }),
   actions: {
     async getAllProviders() {
-      ApiService()
+      ApiService
         .get('/provider')
-        .then((response) => {
+        .then((response: { data: Provider[] }) => {
           this.allProviders = response.data
         })
     }

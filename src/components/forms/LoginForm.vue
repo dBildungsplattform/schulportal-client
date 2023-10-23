@@ -78,8 +78,6 @@
 <style>
   .login-form {
     border-color: #535353 !important;
-    margin-bottom: 510px;
-    margin-top: 320px;
     padding: 33px 20px 24px;
   }
 </style>
