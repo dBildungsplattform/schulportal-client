@@ -19,4 +19,3 @@ axiosApiInstance.interceptors.request.use((config) => {
 })
 
 export default axiosApiInstance
-
