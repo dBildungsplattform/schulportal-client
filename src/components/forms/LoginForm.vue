@@ -1,6 +1,10 @@
 <script setup lang="ts">
   import { ref } from 'vue'
 
+  defineProps<{
+    errorCode?: string
+  }>()
+
   const userName = ref('')
   const password = ref('')
 </script>
@@ -13,6 +17,24 @@
     rounded="lg"
   >
     <h2 class="h3 mb-4">{{ $t('login.header') }}</h2>
+    <div v-if="errorCode">
+      <v-row
+        align="center"
+        class="mb-1 text-error"
+      >
+        <v-col
+          class="mr-3"
+          cols="1"
+        >
+          <v-icon icon="mdi-alert-circle-outline"></v-icon>
+        </v-col>
+        <v-col>
+          <p class="text-caption text-left">
+            {{ $t(`login.errors.${errorCode}`) }}
+          </p>
+        </v-col>
+      </v-row>
+    </div>
     <v-form @submit.prevent="$emit('on-submit', userName, password)">
       <v-text-field
         base-color="#535353"
