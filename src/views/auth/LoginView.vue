@@ -9,7 +9,7 @@
     const authStore = useAuthStore()
     return authStore.login(userName, password).catch((error) => {
       console.log(error?.response?.data.code)
-      errorCode.value = error?.response?.data.code
+      errorCode.value = error?.response?.data.code || 'UNSPECIFIED_ERROR'
     })
   }
 </script>

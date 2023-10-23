@@ -5,6 +5,7 @@
   "login": {
     "button": "Anmelden",
     "errors": {
+      "UNSPECIFIED_ERROR": "Es ist ein Fehler aufgetreten.",
       "USER_AUTHENTICATION_FAILED_ERROR": "Ihr Benutzername oder Ihr Passwort war falsch. Versuchen Sie es erneut oder wenden Sie sich an Ihre schulischen Administratorinnen und Administratoren."
     },
     "forgotPassword": "Passwort vergessen? \n Wenden Sie sich bitte an Ihre schulischen Administratorinnen und Administratoren.",
