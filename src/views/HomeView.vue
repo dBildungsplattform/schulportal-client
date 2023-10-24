@@ -3,12 +3,28 @@
 
   const providerStore = useProviderStore()
   providerStore.getAllProviders()
+
+  const errorCode = providerStore.errorCode
 </script>
 
 <template>
   <div class="home">
     <h1>{{ $t('home.allProviders') }}</h1>
-    <v-row>
+
+    <v-progress-circular
+      v-if="providerStore.loading"
+      indeterminate
+    ></v-progress-circular>
+
+    <p
+      v-if="errorCode"
+      class="text-caption text-left"
+      data-testid="error-text"
+    >
+      {{ $t(`errors.${errorCode}`) }}
+    </p>
+
+    <v-row v-else>
       <v-col
         v-for="provider in providerStore.allProviders"
         cols="12"

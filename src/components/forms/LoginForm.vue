@@ -3,6 +3,7 @@
 
   defineProps<{
     errorCode?: string
+    loading?: boolean
   }>()
 
   const userName = ref('')
@@ -29,8 +30,11 @@
           <v-icon icon="mdi-alert-circle-outline"></v-icon>
         </v-col>
         <v-col>
-          <p class="text-caption text-left">
-            {{ $t(`login.errors.${errorCode}`) }}
+          <p
+            class="text-caption text-left"
+            data-testid="error-text"
+          >
+            {{ $t(`errors.${errorCode}`) }}
           </p>
         </v-col>
       </v-row>
@@ -65,6 +69,7 @@
         block
         class="mt-2"
         data-testid="login-button"
+        :loading="loading"
         rounded="xs"
         size="large"
         :text="$t('login.button')"

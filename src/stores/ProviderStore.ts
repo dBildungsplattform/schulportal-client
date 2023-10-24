@@ -10,15 +10,21 @@ type Provider = {
 export const useProviderStore = defineStore({
   id: 'providerStore',
   state: () => ({
-    allProviders: [] as Provider[]
+    allProviders: [] as Provider[],
+    errorCode: '' as string,
+    loading: false as boolean
   }),
   actions: {
     async getAllProviders() {
-      ApiService
-        .get('/provider')
-        .then((response: { data: Provider[] }) => {
-          this.allProviders = response.data
-        })
+      this.loading = true
+      try {
+        const { data } = await ApiService.get<Provider[]>('/provider')
+        this.allProviders = data
+        this.loading = false
+      } catch (error: any) {
+        this.errorCode = error.response.data.code || 'UNSPECIFIED_ERROR'
+        this.loading = false
+      }
     }
   }
 })
