@@ -1,6 +1,16 @@
 {
+  "errors": {
+    "KEYCLOAK_CLIENT_ERROR": "Die Anmeldung ist momentan nicht möglich.",
+    "UNSPECIFIED_ERROR": "Es ist ein Fehler aufgetreten.",
+    "USER_AUTHENTICATION_FAILED_ERROR": "Ihr Benutzername oder Ihr Passwort war falsch. Versuchen Sie es erneut oder wenden Sie sich an Ihre schulischen Administratorinnen und Administratoren."
+  },
+  "home": {
+    "allProviders": "Alle Angebote"
+  },
   "login": {
     "button": "Anmelden",
+    "forgotPassword": "Passwort vergessen? \n Wenden Sie sich bitte an Ihre schulischen Administratorinnen und Administratoren.",
+    "header": "Anmeldung im Schulportal SH",
     "password": "Passwort",
     "username": "Benutzername"
   },

@@ -7,7 +7,9 @@
   <v-layout>
     <TheHeader></TheHeader>
     <v-main>
-      <RouterView />
+      <v-container>
+        <RouterView />
+      </v-container>
     </v-main>
   </v-layout>
 </template>

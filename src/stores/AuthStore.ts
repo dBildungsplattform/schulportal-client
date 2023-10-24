@@ -3,24 +3,34 @@ import router from '@/router'
 import ApiService from '@/services/ApiService'
 
 export const useAuthStore = defineStore({
-  id: 'auth',
+  id: 'authStore',
   state: () => ({
     /* initialize state from local storage to enable user to stay logged in */
-    user: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user') || '{}') : null,
-    returnUrl: ''
+    errorCode: '' as string,
+    loading: false as boolean,
+    returnUrl: '',
+    user: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user') || '{}') : null
   }),
   actions: {
     async login(username: string, password: string) {
-      const user = await ApiService().post('/login', { username, password })
+      this.loading = true
+      try {
+        const user = await ApiService.post('/login', { username, password })
 
-      /* update state */
-      this.user = user
+        /* update state */
+        this.user = user
 
-      /* store token in local storage to keep user logged in between page refreshes */
-      localStorage.setItem('user', JSON.stringify(user))
+        /* store token in local storage to keep user logged in between page refreshes */
+        localStorage.setItem('user', JSON.stringify(user))
 
-      /* redirect to previous url or default to dashboard */
-      router.push(this.returnUrl || '/home')
+        /* redirect to previous url or default to dashboard */
+        router.push(this.returnUrl || '/home')
+
+        this.loading = false
+      } catch (error: any) {
+        this.errorCode = error.response.data.code || 'UNSPECIFIED_ERROR'
+        this.loading = false
+      }
     },
     logout() {
       this.user = null
