@@ -1,5 +1,6 @@
 <script setup lang="ts">
   import { useProviderStore } from '@/stores/ProviderStore'
+  import ProviderCard from '@/components/cards/ProviderCard.vue'
 
   const providerStore = useProviderStore()
   providerStore.getAllProviders()
@@ -32,24 +33,14 @@
         sm="6"
         md="4"
       >
-        <v-card
+        <ProviderCard
           :href="provider.url"
-          target="_blank"
-          variant="outlined"
-          :data-testid="`provider-card-${provider.id}`"
+          :newTab="true"
+          :testId="`provider-card-${provider.id}`"
           :title="provider.name"
+          variant="outlined"
         >
-          <template #prepend>
-            <!-- this slot is a placeholder for the provider image -->
-            <v-icon icon="mdi-home"></v-icon>
-          </template>
-          <template #append>
-            <v-icon
-              @click.prevent
-              icon="mdi-heart-outline"
-            ></v-icon>
-          </template>
-        </v-card>
+        </ProviderCard>
       </v-col>
     </v-row>
   </div>
