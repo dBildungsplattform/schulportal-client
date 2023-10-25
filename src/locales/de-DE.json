@@ -26,5 +26,8 @@
     "landing": "Start",
     "login": "Anmelden",
     "logout": "Abmelden"
+  },
+  "user": {
+    "name": "Name"
   }
 }

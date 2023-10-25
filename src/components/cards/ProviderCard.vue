@@ -5,7 +5,7 @@
     testId?: string
     title?: string
     to?: string
-    variant?: NonNullable<"flat" | "text" | "elevated" | "tonal" | "outlined" | "plain">
+    variant?: NonNullable<'flat' | 'text' | 'elevated' | 'tonal' | 'outlined' | 'plain'>
   }>()
 </script>
 
