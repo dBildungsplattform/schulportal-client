@@ -1,9 +1,11 @@
 {
+  "action": "Aktion",
   "admin": {
     "user": {
       "management": "Benutzerverwaltung"
     }
   },
+  "close": "Schließen",
   "errors": {
     "KEYCLOAK_CLIENT_ERROR": "Die Anmeldung ist momentan nicht möglich.",
     "UNSPECIFIED_ERROR": "Es ist ein Fehler aufgetreten.",
