@@ -50,8 +50,8 @@
         md="4"
       >
         <ProviderCard
-          :to="'/admin/users'"
           :testId="'provider-card-admin'"
+          :to="'/admin/users'"
           :title="$t('nav.admin')"
           variant="outlined"
         >

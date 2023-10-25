@@ -5,11 +5,10 @@ type Person = {
   person: {
     id: string
     name: {
-      vorname: string
       familienname: string
+      vorname: string
     }
   }
-  personenkontext: any
 }
 
 export const usePersonStore = defineStore({

@@ -11,9 +11,9 @@
 
 <template>
   <LoginForm
-    @on-submit="login"
-    :loading="authStore.loading"
     :errorCode="authStore.errorCode"
+    :loading="authStore.loading"
+    @on-submit="login"
   ></LoginForm>
 </template>
 

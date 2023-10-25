@@ -11,6 +11,14 @@ const routes = [
     }
   },
   {
+    path: '/admin/users',
+    name: 'user-management',
+    component: () => import('../views/admin/UserManagementView.vue'),
+    meta: {
+      requiresAuth: false
+    }
+  },
+  {
     path: '/home',
     name: 'home',
     component: () => import('../views/HomeView.vue'),
@@ -22,14 +30,6 @@ const routes = [
     path: '/login',
     name: 'login',
     component: () => import('../views/auth/LoginView.vue'),
-    meta: {
-      requiresAuth: false
-    }
-  },
-  {
-    path: '/admin/users',
-    name: 'user-management',
-    component: () => import('../views/admin/UserManagementView.vue'),
     meta: {
       requiresAuth: false
     }

@@ -3,11 +3,11 @@ import axios from 'axios'
 
 const axiosApiInstance = axios.create({
   baseURL: '/api/frontend',
-  withCredentials: false,
   headers: {
     Accept: 'application/json',
     'Content-Type': 'application/json'
-  }
+  },
+  withCredentials: false
 })
 
 axiosApiInstance.interceptors.request.use((config) => {
@@ -16,7 +16,7 @@ axiosApiInstance.interceptors.request.use((config) => {
     : null
   const token = user?.data?.access_token
   config.headers.Authorization = `Bearer ${token}`
-   
+
   return config
 })
 
