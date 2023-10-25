@@ -1,10 +1,16 @@
 {
+  "admin": {
+    "user": {
+      "management": "Benutzerverwaltung"
+    }
+  },
   "errors": {
     "KEYCLOAK_CLIENT_ERROR": "Die Anmeldung ist momentan nicht möglich.",
     "UNSPECIFIED_ERROR": "Es ist ein Fehler aufgetreten.",
     "USER_AUTHENTICATION_FAILED_ERROR": "Ihr Benutzername oder Ihr Passwort war falsch. Versuchen Sie es erneut oder wenden Sie sich an Ihre schulischen Administratorinnen und Administratoren."
   },
   "home": {
+    "administration": "Verwaltung",
     "allProviders": "Alle Angebote"
   },
   "login": {
@@ -15,6 +21,7 @@
     "username": "Benutzername"
   },
   "nav": {
+    "admin": "Schulportal-Administration",
     "home": "Home",
     "landing": "Start",
     "login": "Anmelden",
