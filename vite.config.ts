@@ -33,6 +33,9 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     include: ['**/specs/**/*.spec.ts'],
-    setupFiles: 'vitest.setup.ts'
+    setupFiles: 'vitest.setup.ts',
+    coverage: {
+      reporter: ['text', 'lcov', 'html']
+    }
   }
 })
