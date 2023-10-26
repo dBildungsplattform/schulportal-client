@@ -2,15 +2,19 @@
   import LoginForm from '@/components/forms/LoginForm.vue'
   import { useAuthStore } from '@/stores/AuthStore'
 
+  const authStore = useAuthStore()
+
   function login(userName: string, password: string) {
-    const authStore = useAuthStore()
-    return authStore.login(userName, password).catch((error) => console.log(error))
+    authStore.login(userName, password)
   }
 </script>
 
 <template>
-  <h1>This is a login page</h1>
-  <LoginForm @on-submit="login"></LoginForm>
+  <LoginForm
+    @on-submit="login"
+    :loading="authStore.loading"
+    :errorCode="authStore.errorCode"
+  ></LoginForm>
 </template>
 
 <style></style>
