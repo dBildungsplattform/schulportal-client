@@ -22,11 +22,10 @@ jobs:
       node_version: '18'
     permissions:
       contents: read
-  nest_test_and_sonarcloud:
+  tests_and_sonarcloud:
     uses: dBildungsplattform/dbp-github-workflows/.github/workflows/check-nest-test-sonarcloud.yaml@DBP-332-sonarcloud
     with:
       node_version: '18'
-      deploy_stage: 'dev'
     permissions:
       contents: read
     secrets: inherit
@@ -36,7 +35,7 @@ jobs:
     needs:
       - codeql_analyze
       - nest_lint
-      - nest_test_and_sonarcloud
+      - tests_and_sonarcloud
     permissions:
       packages: write
       security-events: write
