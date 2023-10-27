@@ -67,7 +67,7 @@
 
       <v-btn
         block
-        class="mt-2"
+        class="mt-2 primary"
         data-testid="login-button"
         :loading="loading"
         rounded="xs"

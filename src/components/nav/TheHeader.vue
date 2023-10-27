@@ -23,8 +23,9 @@
     >
     <v-spacer></v-spacer>
     <v-btn
-      v-if="auth.user"
+      class="secondary"
       @click.stop="auth.logout"
+      v-if="auth.user"
     >
       {{ $t('nav.logout') }}
     </v-btn>
