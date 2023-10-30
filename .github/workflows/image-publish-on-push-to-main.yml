@@ -2,8 +2,6 @@ name: "Publish image to GHCR on push to main (Merge)"
 
 on:
   push:
-    branches:
-      - main
 
 concurrency:
   group: schulportal-client-main
@@ -26,6 +24,6 @@ jobs:
     with:
       image_name: "schulportal-client"
       run_trivy_scan: true
-      tag_generation: "commit_hash"
-      add_latest_tag: true
+      tag_generation: ${{ github.ref_name == 'main' && 'commit_hash' || 'ticket_from_branch' }}
+      add_latest_tag: ${{ github.ref_name == 'main' }}
       container_registry: "ghcr.io"

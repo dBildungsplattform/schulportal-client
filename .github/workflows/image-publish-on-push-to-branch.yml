@@ -1,15 +1,15 @@
-name: "Publish image to GHCR on push to branch"
+# name: "Publish image to GHCR on push to branch"
 
-on:
-  push:
-    branches-ignore:
-      - 'main'
+# on:
+#   push:
+#     branches-ignore:
+#       - 'main'
 
-concurrency:
-  group: schulportal-client-${{ github.ref_name }}
-  cancel-in-progress: true
+# concurrency:
+#   group: schulportal-client-${{ github.ref_name }}
+#   cancel-in-progress: true
 
-jobs:
+# jobs:
   # codeql_analyze:
   #   uses: dBildungsplattform/dbp-github-workflows/.github/workflows/check-codeql.yaml@2.0.0
   #   permissions:
@@ -30,20 +30,20 @@ jobs:
   #     contents: read
   #   secrets: inherit
 
-  build_and_push:
-    # if: ${{ success() }}
-    # needs:
-    #   - codeql_analyze
-    #   - nest_lint
-    #   - tests_and_sonarcloud
-    permissions:
-      packages: write
-      security-events: write
-      contents: read
-    uses: dBildungsplattform/dbp-github-workflows/.github/workflows/image-publish-trivy.yaml@DBP-340-trivy
-    with:
-      image_name: "schulportal-client"
-      run_trivy_scan: true
-      tag_generation: "ticket_from_branch"
-      add_latest_tag: false
-      container_registry: "ghcr.io"
+  # build_and_push:
+  #   # if: ${{ success() }}
+  #   # needs:
+  #   #   - codeql_analyze
+  #   #   - nest_lint
+  #   #   - tests_and_sonarcloud
+  #   permissions:
+  #     packages: write
+  #     security-events: write
+  #     contents: read
+  #   uses: dBildungsplattform/dbp-github-workflows/.github/workflows/image-publish-trivy.yaml@DBP-340-trivy
+  #   with:
+  #     image_name: "schulportal-client"
+  #     run_trivy_scan: true
+  #     tag_generation: "ticket_from_branch"
+  #     add_latest_tag: false
+  #     container_registry: "ghcr.io"
