@@ -1,0 +1,66 @@
+name: "Image and Trivy related tasks on push and scheduled"
+
+# All triggers have to be in one file, so that the trivy results can be compared to identify introduced vulnerabilities
+# See DBP-340
+on:
+  push:
+  schedule:
+    - cron:  '0 2 * * *'
+
+concurrency:
+  group: schulportal-client-${{ github.event_name }}-${{ github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  codeql_analyze:
+    name: "CodeQL"
+    if: ${{ github.event_name == 'push' }}
+    uses: dBildungsplattform/dbp-github-workflows/.github/workflows/check-codeql.yaml@2.0.0
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+  nest_lint:
+    name: "Linting"
+    if: ${{ github.event_name == 'push' }}
+    uses: dBildungsplattform/dbp-github-workflows/.github/workflows/check-nest-lint.yaml@2.0.0
+    with:
+      node_version: '18'
+    permissions:
+      contents: read
+
+  tests_and_sonarcloud:
+    name: "Tests and Sonarcloud"
+    if: ${{ github.event_name == 'push' }}
+    uses: dBildungsplattform/dbp-github-workflows/.github/workflows/check-nest-test-sonarcloud.yaml@2.0.0
+    with:
+      node_version: '18'
+    permissions:
+      contents: read
+    secrets: inherit
+
+  build_image_on_push:
+    name: "Publish image and scan with trivy"
+    if: ${{ github.event_name == 'push' }}
+    permissions:
+      packages: write
+      security-events: write
+      contents: read
+    uses: dBildungsplattform/dbp-github-workflows/.github/workflows/image-publish-trivy.yaml@2.0.0
+    with:
+      image_name: "schulportal-client"
+      run_trivy_scan: true
+      tag_generation: ${{ github.ref_name == 'main' && 'commit_hash' || 'ticket_from_branch' }}
+      add_latest_tag: ${{ github.ref_name == 'main' }}
+      container_registry: "ghcr.io"
+
+  scheduled_trivy_scan:
+    name: "Scheduled trivy scan of latest image"
+    if: ${{ github.event_name == 'schedule' }}
+    permissions:
+      packages: read
+      security-events: write
+    uses: dBildungsplattform/dbp-github-workflows/.github/workflows/check-trivy.yaml@2.0.0
+    with:
+      image_ref: 'ghcr.io/${{ github.repository_owner }}/schulportal-client:latest'
