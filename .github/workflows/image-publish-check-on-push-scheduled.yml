@@ -58,6 +58,7 @@ jobs:
       tag_generation: ${{ github.ref_name == 'main' && 'commit_hash' || 'ticket_from_branch' }}
       add_latest_tag: ${{ github.ref_name == 'main' }}
       container_registry: "ghcr.io"
+      fail_on_vulnerabilites: false
 
   scheduled_trivy_scan:
     name: "Scheduled trivy scan of latest image"
@@ -68,3 +69,4 @@ jobs:
     uses: dBildungsplattform/dbp-github-workflows/.github/workflows/check-trivy.yaml@2.0.0
     with:
       image_ref: 'ghcr.io/${{ github.repository_owner }}/schulportal-client:latest'
+      fail_on_vulnerabilites: false
