@@ -1,4 +1,4 @@
-name: "Image and Trivy related tasks on push and scheduled"
+name: "Publish image to GHCR on push and (scheduled) trivy"
 
 # All triggers have to be in one file, so that the trivy results can be compared to identify introduced vulnerabilities
 # See DBP-340
