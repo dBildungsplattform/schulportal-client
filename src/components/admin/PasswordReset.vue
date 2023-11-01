@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import { ref } from 'vue'
-  
+
   defineProps<{
     item?: any
     password?: string
@@ -33,11 +33,11 @@
     min-width="320px"
     persistent
     width="50%"
-    >
+  >
     <template v-slot:activator="{ props }">
       <v-icon
         class="me-2"
-        data-testid="user-actions-icon"
+        data-testid="open-password-reset-dialog-icon"
         icon="mdi-key-variant"
         size="small"
         v-bind="props"
@@ -123,6 +123,4 @@
   </v-dialog>
 </template>
 
-<style>
-
-</style>
+<style></style>
