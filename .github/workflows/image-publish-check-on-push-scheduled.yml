@@ -6,6 +6,7 @@ on:
   push:
   schedule:
     - cron:  '0 2 * * *'
+  pull_request:
 
 concurrency:
   group: schulportal-client-${{ github.event_name }}-${{ github.ref_name }}
@@ -14,7 +15,7 @@ concurrency:
 jobs:
   codeql_analyze:
     name: "CodeQL"
-    if: ${{ github.event_name == 'push' }}
+    if: ${{ github.event_name != 'scheduled' }}
     uses: dBildungsplattform/dbp-github-workflows/.github/workflows/check-codeql.yaml@2.0.0
     permissions:
       actions: read
@@ -23,7 +24,7 @@ jobs:
 
   nest_lint:
     name: "Linting"
-    if: ${{ github.event_name == 'push' }}
+    if: ${{ github.event_name != 'scheduled' }}
     uses: dBildungsplattform/dbp-github-workflows/.github/workflows/check-nest-lint.yaml@2.0.0
     with:
       node_version: '18'
@@ -32,7 +33,7 @@ jobs:
 
   tests_and_sonarcloud:
     name: "Tests and Sonarcloud"
-    if: ${{ github.event_name == 'push' }}
+    if: ${{ github.event_name != 'scheduled' }}
     uses: dBildungsplattform/dbp-github-workflows/.github/workflows/check-nest-test-sonarcloud.yaml@2.0.0
     with:
       node_version: '18'
@@ -42,7 +43,7 @@ jobs:
 
   build_image_on_push:
     name: "Publish image and scan with trivy"
-    if: ${{ github.event_name == 'push' }}
+    if: ${{ github.event_name != 'scheduled' }}
     needs:
       - codeql_analyze
       - nest_lint
