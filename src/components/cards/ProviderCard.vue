@@ -11,7 +11,7 @@
 
 <template>
   <v-card
-    :data-testid="testId"
+    :data-testid="testId || 'provider-card'"
     :href="href"
     :rel="newTab ? 'noreferrer' : ''"
     :target="newTab ? '_blank' : '_self'"
