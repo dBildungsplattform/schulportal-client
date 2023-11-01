@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest'
 import { mount } from '@vue/test-utils'
-import LoginForm from '../../components/forms/LoginForm.vue'
+import LoginForm from '../../../../components/forms/LoginForm.vue'
 
 document.body.innerHTML = `
   <div>
