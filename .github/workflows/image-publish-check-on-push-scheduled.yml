@@ -59,7 +59,7 @@ jobs:
       add_latest_tag: ${{ github.ref_name == 'main' }}
       container_registry: "ghcr.io"
       fail_on_vulnerabilites: true
-      vulnerability_location: "Dockerfile"
+      report_location: "Dockerfile"
 
   scheduled_trivy_scan:
     name: "Scheduled trivy scan of latest image"
@@ -71,4 +71,4 @@ jobs:
     with:
       image_ref: 'ghcr.io/${{ github.repository_owner }}/schulportal-client:latest'
       fail_on_vulnerabilites: false
-      vulnerability_location: "Dockerfile"
+      report_location: "Dockerfile"
