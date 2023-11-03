@@ -3,11 +3,14 @@ import { fileURLToPath, URL } from 'node:url'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vuetify from 'vite-plugin-vuetify'
+import basicSsl from '@vitejs/plugin-basic-ssl'
+
 
 export default defineConfig({
   plugins: [
     vue(),
-    vuetify()
+    vuetify(),
+    basicSsl()
   ],
   resolve: {
     alias: {
@@ -18,7 +21,7 @@ export default defineConfig({
     port: 8099,
     proxy: {
       '/api': {
-        target: 'http://localhost:9090/',
+        target: 'http://localhost:9091/',
         changeOrigin: true,
         secure: false
       }
