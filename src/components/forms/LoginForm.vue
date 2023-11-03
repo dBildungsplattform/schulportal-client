@@ -39,7 +39,7 @@
         </v-col>
       </v-row>
     </div>
-    <v-form @submit.prevent="$emit('on-submit', userName, password)">
+    <v-form @submit.prevent="$emit('onSubmit', userName, password)">
       <v-text-field
         base-color="#535353"
         class="mb-4"

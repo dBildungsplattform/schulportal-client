@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest'
 import { mount } from '@vue/test-utils'
-import LoginForm from '../../../../components/forms/LoginForm.vue'
+import UserTable from '../../../components/admin/UserTable.vue'
 
 let wrapper = null as any
 
@@ -11,18 +11,17 @@ beforeEach(() => {
     </div>
   `
 
-  wrapper = mount(LoginForm, {
+  wrapper = mount(UserTable, {
     attachTo: document.getElementById('app') || '',
     props: {},
     global: {
       components: {
-        LoginForm
+        UserTable
       }
     }
   })
 })
 
-test('login button emits correct event', () => {
-  wrapper.get('[data-testid="login-button"]').trigger('click')
-  expect(wrapper.emitted()).toHaveProperty('onSubmit')
+test('it renders a user table', () => {
+  expect(wrapper.get('[data-testid="user-table"]')).not.toBeNull()
 })

@@ -13,7 +13,7 @@
   <LoginForm
     :errorCode="authStore.errorCode"
     :loading="authStore.loading"
-    @on-submit="login"
+    @onSubmit="login"
   ></LoginForm>
 </template>
 

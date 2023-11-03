@@ -8,7 +8,7 @@
 
   const passwordCopied = ref(false)
   const showPassword = ref(false)
-  const emit = defineEmits(['on-clear-password', 'on-copy-to-clipboard', 'on-reset-password'])
+  const emit = defineEmits(['onClearPassword', 'onResetPassword'])
 
   function copyToClipboard(text: string) {
     navigator.clipboard.writeText(text).then(
@@ -24,7 +24,7 @@
   async function closeUserEditDialog(isActive: any) {
     isActive.value = false
     showPassword.value = false
-    emit('on-clear-password')
+    emit('onClearPassword')
   }
 </script>
 
@@ -85,7 +85,7 @@
               cols="12"
             >
               <v-btn
-                @click.stop="$emit('on-reset-password', item.raw.person.id)"
+                @click.stop="$emit('onResetPassword', item.raw.person.id)"
                 class="primary"
                 data-testid="password-reset-button"
                 :disabled="!!password"

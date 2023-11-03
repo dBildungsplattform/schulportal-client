@@ -3,13 +3,13 @@
   import { usePersonStore } from '@/stores/PersonStore'
   import { ref } from 'vue'
   import { useI18n } from 'vue-i18n'
-  import PasswordReset from '@/components/admin/PasswordReset.vue'
+  import UserTable from '@/components/admin/UserTable.vue'
 
   const personStore = usePersonStore()
   const authStore = useAuthStore()
   personStore.getAllPersons()
 
-  /* this block is necessary to match data table header types to shut up typescript */
+  /* this block is necessary to introduce a table header type to shut up typescript when defining table headers */
   import type { VDataTable } from 'vuetify/lib/labs/components.mjs'
   type UnwrapReadonlyArrayType<A> = A extends Readonly<Array<infer I>>
     ? UnwrapReadonlyArrayType<I>
@@ -22,37 +22,29 @@
     { title: t('user.name'), key: 'person.name', align: 'start' },
     { title: t('action'), key: 'actions', sortable: false }
   ] as ReadonlyDataTableHeader[]
-  const itemsPerPage = 25 as number
+  const itemsPerPage = ref(25)
   const password = ref('')
 
   async function resetPassword(userId: string) {
     password.value = await authStore.resetPassword(userId)
+  }
+
+  function updateItemsPerPage(newValue: number) {
+    itemsPerPage.value = newValue
   }
 </script>
 
 <template>
   <div class="admin">
     <h2>{{ $t('admin.user.management') }}</h2>
-    <v-data-table
-      class="elevation-1"
-      data-testid="user-table"
+    <UserTable
       :headers="headers"
       :items="personStore.allPersons"
-      v-model:items-per-page="itemsPerPage"
-    >
-      <template #[`item.person.name`]="{ item }"
-        >{{ item.raw.person.name.vorname }} {{ item.raw.person.name.familienname }}</template
-      >
-      <template #[`item.actions`]="{ item }">
-        <PasswordReset
-          :item="item"
-          @on-clear-password="password = ''"
-          @on-reset-password="resetPassword"
-          :password="password"
-        >
-        </PasswordReset>
-      </template>
-    </v-data-table>
+      @onClearPassword="password = ''"
+      @onItemsPerPageUpdate="updateItemsPerPage"
+      @onResetPassword="resetPassword"
+      :password="password"
+    ></UserTable>
   </div>
 </template>
 

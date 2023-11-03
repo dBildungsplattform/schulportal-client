@@ -35,7 +35,7 @@ beforeEach(async () => {
   })
 })
 
-test('opens the dialog', async () => {
+test('it opens the dialog', async () => {
   wrapper.get('[data-testid="open-password-reset-dialog-icon"]').trigger('click')
   await document.querySelector('[data-testid="warning-header"]')
   expect(document.querySelector('[data-testid="warning-header"]')).not.toBeNull()
@@ -57,14 +57,14 @@ test('reset button emits correct event', async () => {
   // expect(dialog.emitted()).toHaveProperty('on-submit')
 })
 
-test.skip('shows and hides password', async () => {
+test.skip('it shows and hides password', async () => {
   wrapper.get('[data-testid="open-password-reset-dialog-icon"]').trigger('click')
   await document.querySelector('[data-testid="password-output-field"] mdi-eye')
   console.log()
   expect(document.querySelector('[data-testid="password-output-field"] mdi-eye')).not.toBeNull()
 })
 
-test.skip('copies password to clipboard', async () => {
+test.skip('it copies password to clipboard', async () => {
   wrapper.get('[data-testid="open-password-reset-dialog-icon"]').trigger('click')
   await document.querySelector('[data-testid="password-output-field"] mdi-content-copy')
   expect(
