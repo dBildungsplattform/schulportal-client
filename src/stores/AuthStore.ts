@@ -28,7 +28,7 @@ export const useAuthStore = defineStore({
 
         this.loading = false
       } catch (error: any) {
-        this.errorCode = error.response.data.code || 'UNSPECIFIED_ERROR'
+        this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR'
         this.loading = false
       }
     },
@@ -46,7 +46,7 @@ export const useAuthStore = defineStore({
         this.loading = false
         return data
       } catch (error: any) {
-        this.errorCode = error.response.data.code || 'UNSPECIFIED_ERROR'
+        this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR'
         this.loading = false
       }
     }
