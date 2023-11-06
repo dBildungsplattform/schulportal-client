@@ -15,7 +15,7 @@ jobs:
   codeql_analyze:
     name: "CodeQL"
     if: ${{ github.event_name == 'push' }}
-    uses: dBildungsplattform/dbp-github-workflows/.github/workflows/check-codeql.yaml@2.0.0
+    uses: dBildungsplattform/dbp-github-workflows/.github/workflows/check-codeql.yaml@2.1.0
     permissions:
       actions: read
       contents: read
@@ -24,7 +24,7 @@ jobs:
   nest_lint:
     name: "Linting"
     if: ${{ github.event_name == 'push' }}
-    uses: dBildungsplattform/dbp-github-workflows/.github/workflows/check-nest-lint.yaml@2.0.0
+    uses: dBildungsplattform/dbp-github-workflows/.github/workflows/check-nest-lint.yaml@2.1.0
     with:
       node_version: '18'
     permissions:
@@ -33,7 +33,7 @@ jobs:
   tests_and_sonarcloud:
     name: "Tests and Sonarcloud"
     if: ${{ github.event_name == 'push' }}
-    uses: dBildungsplattform/dbp-github-workflows/.github/workflows/check-nest-test-sonarcloud.yaml@2.0.0
+    uses: dBildungsplattform/dbp-github-workflows/.github/workflows/check-nest-test-sonarcloud.yaml@2.1.0
     with:
       node_version: '18'
     permissions:
@@ -51,13 +51,15 @@ jobs:
       packages: write
       security-events: write
       contents: read
-    uses: dBildungsplattform/dbp-github-workflows/.github/workflows/image-publish-trivy.yaml@2.0.0
+    uses: dBildungsplattform/dbp-github-workflows/.github/workflows/image-publish-trivy.yaml@2.1.0
     with:
       image_name: "schulportal-client"
       run_trivy_scan: true
       tag_generation: ${{ github.ref_name == 'main' && 'commit_hash' || 'ticket_from_branch' }}
       add_latest_tag: ${{ github.ref_name == 'main' }}
       container_registry: "ghcr.io"
+      fail_on_vulnerabilites: true
+      report_location: "Dockerfile"
 
   scheduled_trivy_scan:
     name: "Scheduled trivy scan of latest image"
@@ -65,6 +67,8 @@ jobs:
     permissions:
       packages: read
       security-events: write
-    uses: dBildungsplattform/dbp-github-workflows/.github/workflows/check-trivy.yaml@2.0.0
+    uses: dBildungsplattform/dbp-github-workflows/.github/workflows/check-trivy.yaml@2.1.0
     with:
       image_ref: 'ghcr.io/${{ github.repository_owner }}/schulportal-client:latest'
+      fail_on_vulnerabilites: false
+      report_location: "Dockerfile"
