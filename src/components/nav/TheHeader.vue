@@ -1,7 +1,8 @@
 <script setup lang="ts">
-  import { RouterLink } from 'vue-router'
+  import { RouterLink, useRoute } from 'vue-router'
   import { useAuthStore } from '@/stores/AuthStore'
 
+  const route = useRoute()
   const auth = useAuthStore()
 </script>
 
@@ -12,22 +13,21 @@
     <v-spacer></v-spacer>
     <RouterLink
       to="/home"
-      v-if="auth.user"
+      v-if="auth.isAuthed"
       >{{ $t('nav.home') }}</RouterLink
     >
     <v-spacer></v-spacer>
-    <RouterLink
-      to="/login"
-      v-if="!auth.user"
-      >{{ $t('nav.login') }}</RouterLink
+    <v-btn
+      v-if="!auth.isAuthed"
+      @click.stop="() => auth.login(route.fullPath)"
+      >{{ $t('nav.login') }}</v-btn
     >
     <v-spacer></v-spacer>
     <v-btn
-      v-if="auth.user"
+      v-if="auth.isAuthed"
       @click.stop="auth.logout"
+      >{{ $t('nav.logout') }}</v-btn
     >
-      {{ $t('nav.logout') }}
-    </v-btn>
     <v-spacer></v-spacer>
   </v-app-bar>
 </template>
