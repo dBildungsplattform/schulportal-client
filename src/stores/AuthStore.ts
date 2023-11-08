@@ -42,7 +42,7 @@ export const useAuthStore = defineStore({
     async resetPassword(userId: string) {
       this.loading = true
       try {
-        const { data } = await ApiService.patch('/person/' + userId + '/password')
+        const { data } = await ApiService.patch(`/person/${userId}/password`)
         this.loading = false
         return data
       } catch (error: any) {
