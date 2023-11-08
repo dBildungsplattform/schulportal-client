@@ -2,8 +2,8 @@
   import { ref } from 'vue'
 
   defineProps<{
-    errorCode?: string
-    loading?: boolean
+    errorCode: string
+    loading: boolean
   }>()
 
   const userName = ref('')

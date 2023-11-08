@@ -15,7 +15,7 @@ describe('Auth Store', () => {
 
   test('it logs in and writes access token to local storage', async () => {
     expect(localStorage.getItem('user')).toBe(null)
-    
+
     const authStore = useAuthStore()
     await authStore.login('username', 'password')
 
@@ -25,7 +25,7 @@ describe('Auth Store', () => {
 
   test('it fails to log in with false credentials', async () => {
     expect(localStorage.getItem('user')).toBe(null)
-    
+
     const authStore = useAuthStore()
     await authStore.login('username', '')
 
@@ -40,7 +40,7 @@ describe('Auth Store', () => {
     expect(localStorage.getItem('user')).toBe(null)
   })
 
-  test('it resets a user\'s password', async () => {
+  test("it resets a user's password", async () => {
     const authStore = useAuthStore()
     await authStore.resetPassword('1').then((response) => {
       expect(response).toBe('qwertzuiop')

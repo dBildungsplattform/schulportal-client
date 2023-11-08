@@ -1,9 +1,17 @@
 <script setup lang="ts">
-  import { ref } from 'vue'
+  import { ref, type Ref } from 'vue'
+
+  type Person = {
+    id: string
+    name: {
+      familienname: string
+      vorname: string
+    }
+  }
 
   defineProps<{
-    item?: any
-    password?: string
+    person: Person
+    password: string
   }>()
 
   const passwordCopied = ref(false)
@@ -21,7 +29,7 @@
     )
   }
 
-  async function closeUserEditDialog(isActive: any) {
+  async function closeUserEditDialog(isActive: Ref<boolean>) {
     isActive.value = false
     showPassword.value = false
     emit('onClearPassword')
@@ -58,10 +66,10 @@
                 tag="p"
               >
                 <template v-slot:firstname>
-                  <b>{{ item.raw.person.name.vorname }}</b>
+                  <b>{{ person.name.vorname }}</b>
                 </template>
                 <template v-slot:lastname>
-                  <b>{{ item.raw.person.name.familienname }}</b>
+                  <b>{{ person.name.familienname }}</b>
                 </template>
               </i18n-t>
             </v-col>
@@ -85,7 +93,7 @@
               cols="12"
             >
               <v-btn
-                @click.stop="$emit('onResetPassword', item.raw.person.id)"
+                @click.stop="$emit('onResetPassword', person.id)"
                 class="primary"
                 data-testid="password-reset-button"
                 :disabled="!!password"

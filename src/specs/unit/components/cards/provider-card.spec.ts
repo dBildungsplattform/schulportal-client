@@ -36,7 +36,9 @@ beforeEach(() => {
 
 test('it renders a provider card', () => {
   expect(wrapper.get('[data-testid="test-provider-card"]')).not.toBeNull()
-  expect(wrapper.get('[data-testid="test-provider-card"]').text()).toContain('My provider card brings all the boys to the yard')
+  expect(wrapper.get('[data-testid="test-provider-card"]').text()).toContain(
+    'My provider card brings all the boys to the yard'
+  )
 })
 
 test.skip('it redirects to an external url', () => {
