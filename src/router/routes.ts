@@ -1,11 +1,11 @@
 /* landing is the only route we won't lazy-load, all other routes are loaded when visited */
-import LandingView from '../views/LandingView.vue'
+import type { RouteRecordRaw } from 'vue-router'
 
-const routes = [
+const routes: readonly RouteRecordRaw[] = [
   {
     path: '/',
     name: 'landing',
-    component: LandingView,
+    component: import('../views/LandingView.vue'),
     meta: {
       requiresAuth: false
     }
