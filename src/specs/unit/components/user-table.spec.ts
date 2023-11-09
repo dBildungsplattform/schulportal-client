@@ -13,7 +13,15 @@ beforeEach(() => {
 
   wrapper = mount(UserTable, {
     attachTo: document.getElementById('app') || '',
-    props: {},
+    props: {
+      headers: [
+        { title: 'Username', key: 'person.name', align: 'start' },
+        { title: 'Action', key: 'actions', sortable: false }
+      ],
+      items: [],
+      loading: false,
+      password: 'qwertzuiop'
+    },
     global: {
       components: {
         UserTable
