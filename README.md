@@ -47,3 +47,12 @@ docker compose up -d
 If you push a tag upstream a container will be created for you. (Check Github under Packages)
 
 ghcr.io/dbildungsplattform/schulportal-client:*tag*
+
+### Docker images for Backend and BFF
+If you just want to test the client and have no inclination to run the backend for yourself where's a package available
+at: ghcr.io/dbildungsplattform/dbildungs-iam-server:*branchname*
+
+If you run it without any parameters it will give you the **backend**
+For the frontend you have to supply the command:
+`node dist/src/backend-for-frontend/main.js`
+
