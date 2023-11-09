@@ -10,9 +10,10 @@ const router = createRouter({
 router.beforeEach(async (to /*, from */) => {
   const auth = useAuthStore()
 
-  if (to.meta.requiresAuth && !auth.user) {
-    auth.returnUrl = to.fullPath
-    return '/login'
+  await auth.initializeAuthStatus()
+
+  if (to.meta.requiresAuth && !auth.isAuthed) {
+    auth.login(to.fullPath)
   }
 })
 

@@ -1,12 +1,10 @@
 <script setup lang="ts">
-  import { useAuthStore } from '@/stores/AuthStore'
   import { usePersonStore } from '@/stores/PersonStore'
   import { ref } from 'vue'
   import { useI18n } from 'vue-i18n'
   import UserTable from '@/components/admin/UserTable.vue'
 
   const personStore = usePersonStore()
-  const authStore = useAuthStore()
   personStore.getAllPersons()
 
   /* this block is necessary to introduce a table header type to shut up typescript when defining table headers */
@@ -26,7 +24,7 @@
   const password = ref('')
 
   async function resetPassword(userId: string) {
-    password.value = await authStore.resetPassword(userId)
+    password.value = await personStore.resetPassword(userId)
   }
 
   function updateItemsPerPage(newValue: number) {
@@ -40,6 +38,7 @@
     <UserTable
       :headers="headers"
       :items="personStore.allPersons"
+      :loading="personStore.loading"
       @onClearPassword="password = ''"
       @onItemsPerPageUpdate="updateItemsPerPage"
       @onResetPassword="resetPassword"

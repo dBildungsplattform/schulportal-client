@@ -29,6 +29,18 @@ export const usePersonStore = defineStore({
         this.errorCode = error.response.data.code || 'UNSPECIFIED_ERROR'
         this.loading = false
       }
+    },
+
+    async resetPassword(userId: string) {
+      this.loading = true
+      try {
+        const { data } = await ApiService.patch(`/person/${userId}/password`)
+        this.loading = false
+        return data
+      } catch (error: any) {
+        this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR'
+        this.loading = false
+      }
     }
   }
 })

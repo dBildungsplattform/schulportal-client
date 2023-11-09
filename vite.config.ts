@@ -18,7 +18,7 @@ export default defineConfig({
     port: 8099,
     proxy: {
       '/api': {
-        target: 'http://localhost:9090/',
+        target: 'http://localhost:9091/',
         changeOrigin: true,
         secure: false
       }
@@ -33,6 +33,9 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     include: ['**/specs/**/*.spec.ts'],
-    setupFiles: 'vitest.setup.ts'
+    setupFiles: 'vitest.setup.ts',
+    coverage: {
+      reporter: ['text', 'lcov', 'html']
+    }
   }
 })
