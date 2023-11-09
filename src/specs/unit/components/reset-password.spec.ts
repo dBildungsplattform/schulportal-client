@@ -15,15 +15,12 @@ beforeEach(async () => {
   wrapper = mount(PasswordReset, {
     attachTo: document.getElementById('app') || '',
     props: {
-      item: {
-        raw: {
-          person: {
-            id: '2',
-            name: {
-              vorname: 'Albert',
-              familienname: 'Test'
-            }
-          }
+      password: 'qwertzuiop',
+      person: {
+        id: '2',
+        name: {
+          vorname: 'Albert',
+          familienname: 'Test'
         }
       }
     },
@@ -60,7 +57,6 @@ test('reset button emits correct event', async () => {
 test.skip('it shows and hides password', async () => {
   wrapper.get('[data-testid="open-password-reset-dialog-icon"]').trigger('click')
   await document.querySelector('[data-testid="password-output-field"] mdi-eye')
-  console.log()
   expect(document.querySelector('[data-testid="password-output-field"] mdi-eye')).not.toBeNull()
 })
 
