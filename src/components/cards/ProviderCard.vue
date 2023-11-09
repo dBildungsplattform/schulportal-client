@@ -1,6 +1,6 @@
 <script setup lang="ts">
   defineProps<{
-    href: string
+    href?: string
     newTab?: boolean
     testId: string
     title: string
@@ -12,7 +12,7 @@
 <template>
   <v-card
     :data-testid="testId || 'provider-card'"
-    :href="href"
+    :href="href ? href : ''"
     :rel="newTab ? 'noreferrer' : ''"
     :target="newTab ? '_blank' : '_self'"
     :title="title"

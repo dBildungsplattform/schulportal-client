@@ -20,8 +20,9 @@
     { title: t('user.name'), key: 'person.name', align: 'start' },
     { title: t('action'), key: 'actions', sortable: false }
   ] as ReadonlyDataTableHeader[]
-  const itemsPerPage = ref(25)
   const password = ref('')
+  
+  let itemsPerPage = ref(25)
 
   async function resetPassword(userId: string) {
     password.value = await personStore.resetPassword(userId)
@@ -37,7 +38,7 @@
     <h2>{{ $t('admin.user.management') }}</h2>
     <UserTable
       :headers="headers"
-      :items="personStore.allPersons"
+      :items="personStore.allPersons || []"
       :loading="personStore.loading"
       @onClearPassword="password = ''"
       @onItemsPerPageUpdate="updateItemsPerPage"

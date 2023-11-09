@@ -16,7 +16,7 @@
     password: string
   }>()
 
-  const itemsPerPage = 25 as number
+  let itemsPerPage = 25 as number
 </script>
 
 <template>
