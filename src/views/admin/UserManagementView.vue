@@ -1,25 +1,10 @@
 <script setup lang="ts">
   import { usePersonStore } from '@/stores/PersonStore'
   import { ref } from 'vue'
-  import { useI18n } from 'vue-i18n'
   import UserTable from '@/components/admin/UserTable.vue'
 
   const personStore = usePersonStore()
-  personStore.getAllPersons()
-
-  /* this block is necessary to introduce a table header type to shut up typescript when defining table headers */
-  import type { VDataTable } from 'vuetify/lib/labs/components.mjs'
-  type UnwrapReadonlyArrayType<A> = A extends Readonly<Array<infer I>>
-    ? UnwrapReadonlyArrayType<I>
-    : A
-  type DT = InstanceType<typeof VDataTable>
-  type ReadonlyDataTableHeader = UnwrapReadonlyArrayType<DT['headers']>
-
-  const { t } = useI18n({ useScope: 'global' })
-  const headers = [
-    { title: t('user.name'), key: 'person.name', align: 'start' },
-    { title: t('action'), key: 'actions', sortable: false }
-  ] as ReadonlyDataTableHeader[]
+  
   const password = ref('')
   
   let itemsPerPage = ref(25)
@@ -37,13 +22,14 @@
   <div class="admin">
     <h2>{{ $t('admin.user.management') }}</h2>
     <UserTable
-      :headers="headers"
       :items="personStore.allPersons || []"
       :loading="personStore.loading"
       @onClearPassword="password = ''"
       @onItemsPerPageUpdate="updateItemsPerPage"
       @onResetPassword="resetPassword"
+      @onUpdateTable="personStore.getAllPersons()"
       :password="password"
+      :totalItems="personStore.allPersons.length"
     ></UserTable>
   </div>
 </template>

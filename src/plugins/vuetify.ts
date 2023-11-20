@@ -4,7 +4,6 @@ import '@mdi/font/css/materialdesignicons.css'
 import { aliases, mdi } from 'vuetify/iconsets/mdi'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
-import { VDataTable } from 'vuetify/labs/VDataTable'
 
 const shTheme = {
   dark: false,
@@ -23,7 +22,7 @@ const shTheme = {
 }
 
 const vuetifyConfig: VuetifyOptions = {
-  components: { ...components, VDataTable },
+  components,
   directives,
   icons: {
     defaultSet: 'mdi',

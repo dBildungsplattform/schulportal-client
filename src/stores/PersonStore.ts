@@ -11,13 +11,21 @@ type Person = {
   }
 }
 
+type State = {
+  allPersons: Person[],
+  errorCode: string,
+  loading: boolean
+}
+
 export const usePersonStore = defineStore({
   id: 'personStore',
-  state: () => ({
-    allPersons: [] as Person[],
-    errorCode: '' as string,
-    loading: false as boolean
-  }),
+  state: (): State => {
+    return {
+      allPersons: [],
+      errorCode: '',
+      loading: false
+    }
+  },
   actions: {
     async getAllPersons() {
       this.loading = true
