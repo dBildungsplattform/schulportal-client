@@ -19,8 +19,6 @@
     { title: t('user.name'), key: 'person.name', align: 'start' },
     { title: t('action'), key: 'actions', sortable: false }
   ]
-
-  let itemsPerPage: number = 25
 </script>
 
 <template>
@@ -30,8 +28,6 @@
     :headers="headers"
     :items="items"
     :items-length="totalItems"
-    v-model:items-per-page="itemsPerPage"
-    :update:itemsPerPage="$emit('onItemsPerPageUpdate', itemsPerPage)"
     @update:options="$emit('onTableUpdate')"
   >
     <template #[`item.person.name`]="{ item }"

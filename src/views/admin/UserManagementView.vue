@@ -6,15 +6,9 @@
   const personStore = usePersonStore()
   
   const password = ref('')
-  
-  let itemsPerPage = ref(25)
 
   async function resetPassword(userId: string) {
     password.value = await personStore.resetPassword(userId)
-  }
-
-  function updateItemsPerPage(newValue: number) {
-    itemsPerPage.value = newValue
   }
 </script>
 
@@ -25,7 +19,6 @@
       :items="personStore.allPersons || []"
       :loading="personStore.loading"
       @onClearPassword="password = ''"
-      @onItemsPerPageUpdate="updateItemsPerPage"
       @onResetPassword="resetPassword"
       @onUpdateTable="personStore.getAllPersons()"
       :password="password"
