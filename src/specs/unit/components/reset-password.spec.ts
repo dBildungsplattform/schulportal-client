@@ -55,12 +55,14 @@ describe('reset password', () => {
     // expect(dialog.emitted()).toHaveProperty('on-submit')
   })
 
+  // skip because v-dialog does not work in test env. see lines 42-47
   test.skip('it shows and hides password', async () => {
     wrapper.get('[data-testid="open-password-reset-dialog-icon"]').trigger('click')
     await document.querySelector('[data-testid="password-output-field"] mdi-eye')
     expect(document.querySelector('[data-testid="password-output-field"] mdi-eye')).not.toBeNull()
   })
 
+  // skip because v-dialog does not work in test env. see lines 42-47
   test.skip('it copies password to clipboard', async () => {
     wrapper.get('[data-testid="open-password-reset-dialog-icon"]').trigger('click')
     await document.querySelector('[data-testid="password-output-field"] mdi-content-copy')

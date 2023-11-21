@@ -7,7 +7,9 @@ import requestHandlers from './src/specs/request-handlers'
 
 global.ResizeObserver = require('resize-observer-polyfill')
 
-const i18n = createI18n({})
+const i18n = createI18n({
+  legacy: false
+})
 
 // TODO: how to fix i18n warnings for not found messages?
 // the following statement throws an error

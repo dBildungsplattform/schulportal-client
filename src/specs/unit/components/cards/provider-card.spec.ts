@@ -42,6 +42,7 @@ describe('provider card', () => {
     )
   })
 
+  // TODO: investigate why spy is not called
   test.skip('it redirects to an external url', () => {
     wrapper.get('[data-testid="test-provider-card"]').trigger('click')
     expect(window.location.assign).toHaveBeenCalledWith('https://de.wikipedia.org/wiki/Milchshake')
