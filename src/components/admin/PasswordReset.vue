@@ -16,6 +16,7 @@
 
   const passwordCopied = ref(false)
   const showPassword = ref(false)
+  const errorMessage = ref('string')
   const emit = defineEmits(['onClearPassword', 'onResetPassword'])
 
   function copyToClipboard(text: string) {
@@ -24,7 +25,7 @@
         passwordCopied.value = true
       },
       (error) => {
-        console.log(error)
+        errorMessage.value = error
       }
     )
   }
@@ -72,6 +73,19 @@
                   <b>{{ person.name.familienname }}</b>
                 </template>
               </i18n-t>
+            </v-col>
+          </v-row>
+          <v-row v-if="errorMessage" class="text-caption text-error">
+            <v-col
+              class="text-right"
+              cols="1"
+            >
+              <v-icon icon="mdi-alert"></v-icon>
+            </v-col>
+            <v-col>
+              <p data-testid="error-text">
+                {{ errorMessage }}
+              </p>
             </v-col>
           </v-row>
           <v-row class="text-caption text-error">
