@@ -30,7 +30,7 @@ export const usePersonStore = defineStore({
     async getAllPersons() {
       this.loading = true
       try {
-        const { data } = await ApiService.get('/person')
+        const { data } = await ApiService.get('/personen')
         this.allPersons = data
         this.loading = false
       } catch (error: any) {
@@ -42,7 +42,7 @@ export const usePersonStore = defineStore({
     async resetPassword(userId: string) {
       this.loading = true
       try {
-        const { data } = await ApiService.patch(`/person/${userId}/password`)
+        const { data } = await ApiService.patch(`/personen/${userId}/password`)
         this.loading = false
         return data
       } catch (error: any) {
