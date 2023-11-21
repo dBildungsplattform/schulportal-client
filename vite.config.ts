@@ -5,10 +5,7 @@ import vue from '@vitejs/plugin-vue'
 import vuetify from 'vite-plugin-vuetify'
 
 export default defineConfig({
-  plugins: [
-    vue(),
-    vuetify()
-  ],
+  plugins: [vue(), vuetify()],
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
@@ -27,7 +24,7 @@ export default defineConfig({
   test: {
     server: {
       deps: {
-        inline: ['vuetify'],
+        inline: ['vuetify']
       }
     },
     environment: 'jsdom',

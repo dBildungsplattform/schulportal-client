@@ -7,13 +7,21 @@ type Provider = {
   url: string
 }
 
+type State = {
+  allProviders: Provider[]
+  errorCode: string
+  loading: boolean
+}
+
 export const useProviderStore = defineStore({
   id: 'providerStore',
-  state: () => ({
-    allProviders: [] as Provider[],
-    errorCode: '' as string,
-    loading: false as boolean
-  }),
+  state: (): State => {
+    return {
+      allProviders: [],
+      errorCode: '',
+      loading: false
+    }
+  },
   actions: {
     async getAllProviders() {
       this.loading = true

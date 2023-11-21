@@ -12,7 +12,4 @@ const i18n = createI18n({})
 
 const vuetify = createVuetify({})
 
-config.global.plugins = [
-  i18n,
-  vuetify
-]
+config.global.plugins = [i18n, vuetify]
