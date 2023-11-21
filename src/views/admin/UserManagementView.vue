@@ -1,15 +1,18 @@
 <script setup lang="ts">
   import { usePersonStore } from '@/stores/PersonStore'
-  import { ref } from 'vue'
+  import { onMounted, ref } from 'vue'
   import UserTable from '@/components/admin/UserTable.vue'
 
   const personStore = usePersonStore()
-  
   const password = ref('')
 
   async function resetPassword(userId: string) {
     password.value = await personStore.resetPassword(userId)
   }
+
+  onMounted(async () => {
+    await personStore.getAllPersons()
+  })
 </script>
 
 <template>
