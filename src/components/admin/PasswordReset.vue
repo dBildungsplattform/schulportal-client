@@ -76,7 +76,10 @@
               </i18n-t>
             </v-col>
           </v-row>
-          <v-row v-if="errorMessage || errorCode" class="text-caption text-error">
+          <v-row
+            v-if="errorMessage || errorCode"
+            class="text-caption text-error"
+          >
             <v-col
               class="text-right"
               cols="1"

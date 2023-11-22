@@ -12,8 +12,8 @@ type Person = {
 }
 
 type State = {
-  allPersons: Person[],
-  errorCode: string,
+  allPersons: Person[]
+  errorCode: string
   loading: boolean
 }
 

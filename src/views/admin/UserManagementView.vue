@@ -4,16 +4,19 @@
   import UserTable from '@/components/admin/UserTable.vue'
 
   const personStore = usePersonStore()
-  
+
   const password = ref('')
   const errorCode = ref('')
 
   function resetPassword(userId: string) {
-    personStore.resetPassword(userId).then((newPassword) => {
-      password.value = newPassword ||''
-    }).catch((error) => {
-      errorCode.value = error.message
-    }) || ''
+    personStore
+      .resetPassword(userId)
+      .then((newPassword) => {
+        password.value = newPassword || ''
+      })
+      .catch((error) => {
+        errorCode.value = error.message
+      }) || ''
   }
 
   onMounted(async () => {

@@ -15,6 +15,7 @@ beforeEach(async () => {
   wrapper = mount(PasswordReset, {
     attachTo: document.getElementById('app') || '',
     props: {
+      errorCode: '',
       password: 'qwertzuiop',
       person: {
         id: '2',

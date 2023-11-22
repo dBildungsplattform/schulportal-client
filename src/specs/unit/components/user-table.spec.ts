@@ -14,6 +14,7 @@ beforeEach(() => {
   wrapper = mount(UserTable, {
     attachTo: document.getElementById('app') || '',
     props: {
+      errorCode: '',
       items: [],
       loading: false,
       password: 'qwertzuiop',
