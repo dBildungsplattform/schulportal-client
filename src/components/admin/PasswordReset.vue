@@ -10,13 +10,14 @@
   }
 
   defineProps<{
+    errorCode: string
     person: Person
     password: string
   }>()
 
   const passwordCopied = ref(false)
   const showPassword = ref(false)
-  const errorMessage = ref('string')
+  const errorMessage = ref('')
   const emit = defineEmits(['onClearPassword', 'onResetPassword'])
 
   function copyToClipboard(text: string) {
@@ -75,7 +76,7 @@
               </i18n-t>
             </v-col>
           </v-row>
-          <v-row v-if="errorMessage" class="text-caption text-error">
+          <v-row v-if="errorMessage || errorCode" class="text-caption text-error">
             <v-col
               class="text-right"
               cols="1"
@@ -84,7 +85,7 @@
             </v-col>
             <v-col>
               <p data-testid="error-text">
-                {{ errorMessage }}
+                {{ errorMessage || errorCode }}
               </p>
             </v-col>
           </v-row>

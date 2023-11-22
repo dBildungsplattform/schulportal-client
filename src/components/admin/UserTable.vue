@@ -7,6 +7,7 @@
   type ReadonlyHeaders = InstanceType<typeof VDataTableServer>['headers']
 
   defineProps<{
+    errorCode: string
     items: any[]
     loading: boolean
     password: string
@@ -31,13 +32,14 @@
     @update:options="$emit('onTableUpdate')"
   >
     <template #[`item.person.name`]="{ item }"
-      >{{ item.raw.person.name.vorname }} {{ item.raw.person.name.familienname }}</template
+      >{{ item.person.name.vorname }} {{ item.person.name.familienname }}</template
     >
     <template #[`item.actions`]="{ item }">
       <PasswordReset
-        :person="item.raw.person"
+        :errorCode="errorCode"
+        :person="item.person"
         @onClearPassword="$emit('onClearPassword')"
-        @onResetPassword="$emit('onResetPassword', item.raw.person.id)"
+        @onResetPassword="$emit('onResetPassword', item.person.id)"
         :password="password"
       >
       </PasswordReset>
