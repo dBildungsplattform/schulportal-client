@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest'
-import { mount } from '@vue/test-utils'
+import { VueWrapper, mount } from '@vue/test-utils'
 import LoginForm from '../../components/forms/LoginForm.vue'
 
 document.body.innerHTML = `
@@ -9,7 +9,7 @@ document.body.innerHTML = `
 `
 
 test('login button emits correct event', () => {
-  const wrapper = mount(LoginForm, {
+  const wrapper: VueWrapper = mount(LoginForm, {
     attachTo: document.getElementById('app') || '',
     props: {},
     global: {

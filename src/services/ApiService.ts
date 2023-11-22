@@ -1,9 +1,10 @@
 /* this is used as a base class for all API based services */
 import router from '@/router'
-import { useAuthStore } from '@/stores/AuthStore'
-import axios, { AxiosError, HttpStatusCode } from 'axios'
+import { useAuthStore, type AuthStore } from '@/stores/AuthStore'
+import axios, { AxiosError, HttpStatusCode, type AxiosResponse, type AxiosInstance } from 'axios'
+import type { RouteLocationNormalizedLoaded } from 'vue-router'
 
-const axiosApiInstance = axios.create({
+const axiosApiInstance: AxiosInstance = axios.create({
   baseURL: '/api/frontend',
   withCredentials: false,
   headers: {
@@ -13,11 +14,11 @@ const axiosApiInstance = axios.create({
 })
 
 axiosApiInstance.interceptors.response.use(
-  (res) => res,
-  async (error) => {
+  (res: AxiosResponse) => res,
+  async (error: unknown) => {
     if (error instanceof AxiosError && error.response?.status === HttpStatusCode.Unauthorized) {
-      const authStore = useAuthStore()
-      const route = router.currentRoute.value
+      const authStore: AuthStore = useAuthStore()
+      const route: RouteLocationNormalizedLoaded = router.currentRoute.value
 
       return authStore.login(route.fullPath)
     }

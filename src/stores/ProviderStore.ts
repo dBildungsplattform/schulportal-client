@@ -1,5 +1,6 @@
-import { defineStore } from 'pinia'
+import { defineStore, type Store, type StoreDefinition } from 'pinia'
 import ApiService from '@/services/ApiService'
+import { AxiosError } from 'axios'
 
 type Provider = {
   id: number
@@ -7,15 +8,25 @@ type Provider = {
   url: string
 }
 
-type State = {
+type ProviderState = {
   allProviders: Provider[]
   errorCode: string
   loading: boolean
 }
 
-export const useProviderStore = defineStore({
+type ProviderGetters = {}
+type ProviderActions = { getAllProviders: () => Promise<void> }
+
+export type ProviderStore = Store<'providerStore', ProviderState, ProviderGetters, ProviderActions>
+
+export const useProviderStore: StoreDefinition<
+  'providerStore',
+  ProviderState,
+  ProviderGetters,
+  ProviderActions
+> = defineStore({
   id: 'providerStore',
-  state: (): State => {
+  state: (): ProviderState => {
     return {
       allProviders: [],
       errorCode: '',
@@ -29,8 +40,11 @@ export const useProviderStore = defineStore({
         const { data } = await ApiService.get<Provider[]>('/provider')
         this.allProviders = data
         this.loading = false
-      } catch (error: any) {
-        this.errorCode = error.response.data.code || 'UNSPECIFIED_ERROR'
+      } catch (error: unknown) {
+        this.errorCode = 'UNSPECIFIED_ERROR'
+        if (error instanceof AxiosError) {
+          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR'
+        }
         this.loading = false
       }
     }

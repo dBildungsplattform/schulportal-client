@@ -1,4 +1,5 @@
 <script setup lang="ts">
+  import type { Ref } from 'vue'
   import { ref } from 'vue'
 
   defineProps<{
@@ -6,8 +7,8 @@
     loading?: boolean
   }>()
 
-  const userName = ref('')
-  const password = ref('')
+  const userName: Ref<string> = ref('')
+  const password: Ref<string> = ref('')
 </script>
 
 <template>

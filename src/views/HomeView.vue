@@ -1,10 +1,10 @@
 <script setup lang="ts">
-  import { useProviderStore } from '@/stores/ProviderStore'
+  import { useProviderStore, type ProviderStore } from '@/stores/ProviderStore'
 
-  const providerStore = useProviderStore()
+  const providerStore: ProviderStore = useProviderStore()
   providerStore.getAllProviders()
 
-  const errorCode = providerStore.errorCode
+  const errorCode: string = providerStore.errorCode
 </script>
 
 <template>
