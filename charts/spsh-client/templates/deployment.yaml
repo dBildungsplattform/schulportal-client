@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "spsh-client.name" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "spsh-client.name" . }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "spsh-client.name" . }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "spsh-client.name" . }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Chart.AppVersion }}"
+          imagePullPolicy: Always
+          securityContext:
+            allowPrivilegeEscalation: false
+      restartPolicy: Always
+
