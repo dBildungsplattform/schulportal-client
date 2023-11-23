@@ -55,7 +55,7 @@ jobs:
     uses: dBildungsplattform/dbp-github-workflows/.github/workflows/image-publish-trivy.yaml@2.1.0
     with:
       image_name: "schulportal-client"
-      run_trivy_scan: false
+      run_trivy_scan: true
       tag_generation: ${{ github.ref_name == 'main' && 'commit_hash' || 'ticket_from_branch' }}
       add_latest_tag: ${{ github.ref_name == 'main' }}
       container_registry: "ghcr.io"
