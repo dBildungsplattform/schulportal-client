@@ -17,10 +17,16 @@ module.exports = {
     parser: '@typescript-eslint/parser',
     project: ['./tsconfig.json', './tsconfig.app.json', './tsconfig.node.json']
   },
+  settings: {
+    'import/resolver': {
+      typescript: {
+        project: ['./tsconfig.json', './tsconfig.app.json', './tsconfig.node.json']
+      }
+    },
+  },
   ignorePatterns: ['.eslintrc.cjs', '.prettierrc.cjs', 'dist/*'],
   rules: {
     'prettier/prettier': ['warn'],
-    'import/extensions': ['error', 'ignorePackages'],
     'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
     'import/no-cycle': ['error'],
     'no-void': ['error', { allowAsStatement: true }],

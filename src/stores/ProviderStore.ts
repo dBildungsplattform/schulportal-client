@@ -37,7 +37,7 @@ export const useProviderStore: StoreDefinition<
     async getAllProviders() {
       this.loading = true
       try {
-        const { data } = await ApiService.get<Provider[]>('/provider')
+        const { data }: { data: Provider[] } = await ApiService.get<Provider[]>('/provider')
         this.allProviders = data
         this.loading = false
       } catch (error: unknown) {

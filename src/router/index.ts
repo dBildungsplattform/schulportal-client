@@ -1,4 +1,9 @@
-import { createRouter, createWebHistory, type Router } from 'vue-router'
+import {
+  createRouter,
+  createWebHistory,
+  type RouteLocationNormalized,
+  type Router
+} from 'vue-router'
 import { useAuthStore, type AuthStore } from '@/stores/AuthStore'
 import routes from './routes'
 
@@ -7,7 +12,7 @@ const router: Router = createRouter({
   routes
 })
 
-router.beforeEach(async (to /*, from */) => {
+router.beforeEach(async (to: RouteLocationNormalized /*, from */) => {
   const auth: AuthStore = useAuthStore()
 
   await auth.initializeAuthStatus()
