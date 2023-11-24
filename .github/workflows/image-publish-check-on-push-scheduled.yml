@@ -118,7 +118,7 @@ jobs:
       branch: ${{ needs.branch_meta.outputs.branch }}
 
   deploy:
-    if: ${{ github.event_name == 'push' && !startsWith(github.ref_name,'dependabot/') }}
+    if: ${{ github.event_name == 'push' && !startsWith(github.ref_name,'dependabot/') && (success() || failure()) }}
     needs:
       - branch_meta
       - create_branch_identifier
