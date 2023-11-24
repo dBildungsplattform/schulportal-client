@@ -19,14 +19,14 @@
     <v-spacer></v-spacer>
     <v-btn
       v-if="!auth.isAuthed"
-      @click.stop="() => auth.login(route.fullPath)"
+      :href="`/api/frontend/login?redirectUrl=${route.fullPath}`"
       >{{ $t('nav.login') }}</v-btn
     >
     <v-spacer></v-spacer>
     <v-btn
       v-if="auth.isAuthed"
       class="secondary"
-      @click.stop="auth.logout"
+      href="/api/frontend/logout"
       >{{ $t('nav.logout') }}</v-btn
     >
     <v-spacer></v-spacer>

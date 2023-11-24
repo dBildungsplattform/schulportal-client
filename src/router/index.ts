@@ -7,13 +7,13 @@ const router = createRouter({
   routes
 })
 
-router.beforeEach(async (to /*, from */) => {
+router.beforeEach(async (to /*, from*/) => {
   const auth = useAuthStore()
 
   await auth.initializeAuthStatus()
 
   if (to.meta.requiresAuth && !auth.isAuthed) {
-    auth.login(to.fullPath)
+    window.location.href = `/api/frontend/login?redirectUrl=${to.fullPath}`
   }
 })
 
