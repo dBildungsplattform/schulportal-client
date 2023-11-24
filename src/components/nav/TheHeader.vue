@@ -25,6 +25,7 @@
     <v-spacer></v-spacer>
     <v-btn
       v-if="auth.isAuthed"
+      class="secondary"
       @click.stop="auth.logout"
       >{{ $t('nav.logout') }}</v-btn
     >
