@@ -5,11 +5,11 @@ import axios, { AxiosError, HttpStatusCode } from 'axios'
 
 const axiosApiInstance = axios.create({
   baseURL: '/api/frontend',
-  withCredentials: false,
   headers: {
     Accept: 'application/json',
     'Content-Type': 'application/json'
-  }
+  },
+  withCredentials: false
 })
 
 axiosApiInstance.interceptors.response.use(

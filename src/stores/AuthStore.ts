@@ -12,6 +12,7 @@ export const useAuthStore = defineStore({
       const loginUrl = ApiService.getUri({ url: '/login', params: { redirectUrl: returnUrl } })
       window.location.href = loginUrl
     },
+
     logout() {
       const logoutUrl = ApiService.getUri({ url: '/logout' })
       window.location.href = logoutUrl
