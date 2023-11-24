@@ -1,5 +1,11 @@
 import { defineStore } from 'pinia'
-import ApiService from '@/services/ApiService'
+import {
+  FrontendApiFactory,
+  type FrontendApiInterface
+} from '../api-client/openapi-generator-cli/generated/api.js'
+import axiosApiInstance from '@/services/ApiService'
+
+const frontendApi: FrontendApiInterface = FrontendApiFactory(undefined, '', axiosApiInstance)
 
 type Person = {
   person: {
@@ -30,7 +36,7 @@ export const usePersonStore = defineStore({
     async getAllPersons() {
       this.loading = true
       try {
-        const { data } = await ApiService.get('/personen')
+        const { data } = await frontendApi.frontendControllerPersons()
         this.allPersons = data
         this.loading = false
       } catch (error: any) {
@@ -42,7 +48,7 @@ export const usePersonStore = defineStore({
     async resetPassword(userId: string) {
       this.loading = true
       try {
-        const { data } = await ApiService.patch(`/personen/${userId}/password`)
+        const { data } = await frontendApi.frontendControllerPasswordReset(userId)
         this.loading = false
         return data
       } catch (error: any) {

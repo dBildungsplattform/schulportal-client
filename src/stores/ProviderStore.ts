@@ -1,5 +1,11 @@
 import { defineStore } from 'pinia'
-import ApiService from '@/services/ApiService'
+import {
+  FrontendApiFactory,
+  type FrontendApiInterface
+} from '../api-client/openapi-generator-cli/generated/api.js'
+import axiosApiInstance from '@/services/ApiService'
+
+const frontendApi: FrontendApiInterface = FrontendApiFactory(undefined, '', axiosApiInstance)
 
 type Provider = {
   id: number
@@ -7,18 +13,26 @@ type Provider = {
   url: string
 }
 
+type State = {
+  allProviders: Provider[]
+  errorCode: string
+  loading: boolean
+}
+
 export const useProviderStore = defineStore({
   id: 'providerStore',
-  state: () => ({
-    allProviders: [] as Provider[],
-    errorCode: '' as string,
-    loading: false as boolean
-  }),
+  state: (): State => {
+    return {
+      allProviders: [],
+      errorCode: '',
+      loading: false
+    }
+  },
   actions: {
     async getAllProviders() {
       this.loading = true
       try {
-        const { data } = await ApiService.get<Provider[]>('/provider')
+        const { data } = await frontendApi.frontendControllerProvider()
         this.allProviders = data
         this.loading = false
       } catch (error: any) {
