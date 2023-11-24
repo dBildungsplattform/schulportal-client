@@ -86,16 +86,18 @@ jobs:
     runs-on: ubuntu-latest
     outputs: 
       SELECT_HELM_VERION_GENERATION: ${{ steps.select_generation.outputs.SELECT_HELM_VERION_GENERATION }}
+      SELECT_IMAGE_TAG_GENERATION: ${{ steps.select_generation.outputs.SELECT_IMAGE_TAG_GENERATION }}
     steps:
       - id: select_generation
         shell: bash
         run: |
           if ${{ github.ref_name == 'main' }}; then
               echo "SELECT_HELM_VERION_GENERATION=short_hash" >> "$GITHUB_OUTPUT"
+              echo "SELECT_IMAGE_TAG_GENERATION=commit_hash" >> "$GITHUB_OUTPUT"
           else
               echo "SELECT_HELM_VERION_GENERATION=ticket_from_branch_short_hash" >> "$GITHUB_OUTPUT"
+              echo "SELECT_IMAGE_TAG_GENERATION=ticket_from_branch" >> "$GITHUB_OUTPUT"
           fi
-
   release_helm:
     uses: dBildungsplattform/dbp-github-workflows/.github/workflows/chart-release.yaml@1.3.1
     needs: 
