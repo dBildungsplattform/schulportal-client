@@ -99,7 +99,7 @@ jobs:
               echo "SELECT_IMAGE_TAG_GENERATION=ticket_from_branch" >> "$GITHUB_OUTPUT"
           fi
   release_helm:
-    uses: dBildungsplattform/dbp-github-workflows/.github/workflows/chart-release.yaml@2.1.1
+    uses: dBildungsplattform/dbp-github-workflows/.github/workflows/chart-release.yaml@3.0.1
     needs: 
       - select_helm_version_generation
     secrets: inherit
