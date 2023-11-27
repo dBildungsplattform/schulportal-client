@@ -1,4 +1,4 @@
-ARG BASE_IMAGE_BUILDER=node:20.5.1-alpine3.17
+ARG BASE_IMAGE_BUILDER=node:20.9.0-alpine3.18
 ARG BASE_IMAGE=nginx:1.25-alpine
 FROM $BASE_IMAGE_BUILDER as scaffold
 

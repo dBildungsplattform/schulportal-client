@@ -6,11 +6,11 @@ import type { RouteLocationNormalizedLoaded } from 'vue-router'
 
 const axiosApiInstance: AxiosInstance = axios.create({
   baseURL: '/api/frontend',
-  withCredentials: false,
   headers: {
     Accept: 'application/json',
     'Content-Type': 'application/json'
-  }
+  },
+  withCredentials: false
 })
 
 axiosApiInstance.interceptors.response.use(

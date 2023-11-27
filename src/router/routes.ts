@@ -11,6 +11,14 @@ const routes: readonly RouteRecordRaw[] = [
     }
   },
   {
+    path: '/admin/users',
+    name: 'user-management',
+    component: () => import('../views/admin/UserManagementView.vue'),
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
     path: '/home',
     name: 'home',
     component: () => import('../views/HomeView.vue'),

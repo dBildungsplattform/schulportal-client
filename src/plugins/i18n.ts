@@ -11,6 +11,7 @@ function loadLocaleMessages(): { [x: string]: DefaultLocaleMessageSchema } {
 
 export default createI18n({
   fallbackLocale: 'de',
+  legacy: false,
   locale: 'de',
   messages: loadLocaleMessages()
 })

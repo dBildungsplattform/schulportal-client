@@ -1,10 +1,22 @@
 {
+  "action": "Aktion",
+  "admin": {
+    "user": {
+      "management": "Benutzerverwaltung",
+      "resetPasswordDialogHeader": "{'Sind Sie sicher, dass Sie das Passwort für'} {firstname} {lastname} {'zurücksetzen möchten?'}",
+      "resetPasswordDialogWarning": "Bitte teilen Sie dem Benutzer das temporäre Passwort mit. Nach dem Schließen des Dialogs wird es aus Sicherheitsgründen nicht mehr angezeigt.",
+      "resetPassword": "Passwort zurücksetzen"
+    }
+  },
+  "cancel": "Abbrechen",
+  "close": "Schließen",
   "errors": {
     "KEYCLOAK_CLIENT_ERROR": "Die Anmeldung ist momentan nicht möglich.",
     "UNSPECIFIED_ERROR": "Es ist ein Fehler aufgetreten.",
     "USER_AUTHENTICATION_FAILED_ERROR": "Ihr Benutzername oder Ihr Passwort war falsch. Versuchen Sie es erneut oder wenden Sie sich an Ihre schulischen Administratorinnen und Administratoren."
   },
   "home": {
+    "administration": "Verwaltung",
     "allProviders": "Alle Angebote"
   },
   "login": {
@@ -15,9 +27,13 @@
     "username": "Benutzername"
   },
   "nav": {
+    "admin": "Schulportal-Administration",
     "home": "Home",
     "landing": "Start",
     "login": "Anmelden",
     "logout": "Abmelden"
+  },
+  "user": {
+    "name": "Name"
   }
 }
