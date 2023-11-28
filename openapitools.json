@@ -3,18 +3,18 @@
 	"spaces": 2,
 	"generator-cli": {
 		"version": "5.1.0",
-        "storageDir": "./src/api-client/openapi-generator-cli/storageDir",
-        "generators": {
-            "bff": {
-                "generatorName": "typescript-axios",
-                "output": "#{cwd}/src/api-client/openapi-generator-cli/generated",
-                "inputSpec": "#{cwd}/open-api.json",
-                "additionalProperties": {
-                    "supportsES6": "true",
-                    "npmVersion": "6.9.0",
-                    "withInterfaces": true
-                }
-            }
+      "storageDir": "./src/api-client/openapi-generator-cli/storageDir",
+      "generators": {
+        "bff": {
+          "generatorName": "typescript-axios",
+          "output": "#{cwd}/src/api-client/openapi-generator-cli/generated",
+          "inputSpec": "#{cwd}/openapispec.json",
+          "additionalProperties": {
+            "supportsES6": "true",
+            "npmVersion": "6.9.0",
+            "withInterfaces": true
+          }
         }
+      }
 	}
 }

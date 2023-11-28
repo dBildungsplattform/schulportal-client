@@ -24,24 +24,13 @@ npm run build
 npm run lint
 ```
 
-## dBildungs-IAM Keycloak starten
+## Backend lokal starten
 
-```sh
-# Repo klonen
-git clone git@github.com:dBildungsplattform/dbildungs-iam-keycloak.git
+## API lokal generieren
+1. Java Runtime Environment lokal installieren
+2. `npm run generate-client` ausführen
+3. api.ts wird generiert und beinhaltet alle Controller für die spezifizierten Endpunkte
 
-# In Ordner wechseln
-cd dbildungs-iam-keycloak
-
-# docker-compose.yml aus dem Keycloak Setup in Confluence verwenden
-
-# Start
-docker compose up
-
-# Start im Hintergrund
-docker compose up -d
-
-```
 
 ### Package (Create Docker Image )
 If you push a tag upstream a container will be created for you. (Check Github under Packages)
