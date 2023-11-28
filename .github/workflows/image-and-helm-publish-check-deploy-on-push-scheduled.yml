@@ -121,7 +121,6 @@ jobs:
 
   deploy:
     if: ${{ github.event_name == 'push' && !startsWith(github.ref_name,'dependabot/') && (success() || failure()) }}
-    #if: ${{ github.event_name == 'push' && !startsWith(github.ref_name,'dependabot/') }}
     needs:
       - branch_meta
       - create_branch_identifier
