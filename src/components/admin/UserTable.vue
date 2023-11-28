@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import PasswordReset from '@/components/admin/PasswordReset.vue'
-  import { useI18n } from 'vue-i18n'
+  import { Composer, useI18n } from 'vue-i18n'
+  import { Person } from '@/stores/PersonStore'
 
   /* this block is necessary to introduce a table header type to shut up typescript when defining table headers */
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs'
@@ -8,13 +9,13 @@
 
   defineProps<{
     errorCode: string
-    items: any[]
+    items: Person[]
     loading: boolean
     password: string
     totalItems: number
   }>()
 
-  const { t } = useI18n({ useScope: 'global' })
+  const { t }: Composer = useI18n({ useScope: 'global' })
 
   const headers: ReadonlyHeaders = [
     { title: t('user.name'), key: 'person.name', align: 'start' },

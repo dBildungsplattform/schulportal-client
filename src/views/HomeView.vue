@@ -4,7 +4,6 @@
 
   const providerStore: ProviderStore = useProviderStore()
   providerStore.getAllProviders()
-
 </script>
 
 <template>

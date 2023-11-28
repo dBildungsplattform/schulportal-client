@@ -15,12 +15,15 @@
     password: string
   }>()
 
-  const passwordCopied = ref(false)
-  const showPassword = ref(false)
-  const errorMessage = ref('')
-  const emit = defineEmits(['onClearPassword', 'onResetPassword'])
+  const passwordCopied: Ref<boolean> = ref(false)
+  const showPassword: Ref<boolean> = ref(false)
+  const errorMessage: Ref<string> = ref('')
+  const emit: (event: 'onClearPassword' | 'onResetPassword') => void = defineEmits([
+    'onClearPassword',
+    'onResetPassword'
+  ])
 
-  function copyToClipboard(text: string) {
+  function copyToClipboard(text: string): void {
     navigator.clipboard.writeText(text).then(
       () => {
         passwordCopied.value = true
@@ -31,7 +34,7 @@
     )
   }
 
-  async function closeUserEditDialog(isActive: Ref<boolean>) {
+  async function closeUserEditDialog(isActive: Ref<boolean>): Promise<void> {
     isActive.value = false
     showPassword.value = false
     emit('onClearPassword')

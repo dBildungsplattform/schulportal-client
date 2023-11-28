@@ -5,13 +5,8 @@ import vue from '@vitejs/plugin-vue'
 import vuetify from 'vite-plugin-vuetify'
 import basicSsl from '@vitejs/plugin-basic-ssl'
 
-
 export default defineConfig({
-  plugins: [
-    vue(),
-    vuetify(),
-    basicSsl()
-  ],
+  plugins: [vue(), vuetify(), basicSsl()],
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
@@ -24,7 +19,7 @@ export default defineConfig({
         target: 'http://localhost:9091/',
         changeOrigin: true,
         secure: false,
-        xfwd: true,
+        xfwd: true
       }
     }
   },

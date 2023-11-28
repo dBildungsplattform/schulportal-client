@@ -27,7 +27,7 @@ module.exports = {
   ignorePatterns: ['.eslintrc.cjs', '.prettierrc.cjs', 'dist/*'],
   rules: {
     'prettier/prettier': ['warn'],
-    'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
+    'import/no-extraneous-dependencies': ['error', { devDependencies: false }],
     'import/no-cycle': ['error'],
     'no-void': ['error', { allowAsStatement: true }],
     'no-console': ['warn'],
@@ -61,5 +61,15 @@ module.exports = {
         allowSingleExtends: true
       }
     ]
-  }
+  },
+  overrides: [
+    {
+      files: [
+        '**/*.spec.ts', './vitest.setup.ts', './vite.config.ts', './src/specs/**'
+      ],
+      rules: {
+        'import/no-extraneous-dependencies': ['error', {devDependencies: true}],
+      }
+    }
+  ],
 }
