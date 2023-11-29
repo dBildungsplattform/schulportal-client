@@ -105,6 +105,7 @@ jobs:
     secrets: inherit
     with:
       chart_name: spsh-client
+      tag_generation: ${{ needs.select_helm_version_generation.outputs.SELECT_IMAGE_TAG_GENERATION  }}
       version_generation: ${{ needs.select_helm_version_generation.outputs.SELECT_HELM_VERION_GENERATION  }}
   
   branch_meta:

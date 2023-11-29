@@ -2,4 +2,5 @@ replicaCount: 1
 frontendHostname: "helm.dev.spsh.dbildungsplattform.de"
 nameOverride: ""
 image:
-  repository: ghcr.io/dbildungsplattform/schulportal-client:{{ .Chart.AppVersion }}
+  repository: ghcr.io/dbildungsplattform/schulportal-client
+  tag: ""
