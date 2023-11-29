@@ -1,5 +1,8 @@
 <script setup lang="ts">
   import { ref, type Ref } from 'vue'
+  import { type Composer, useI18n } from 'vue-i18n'
+
+  const { t }: Composer = useI18n({ useScope: 'global' })
 
   type Person = {
     id: string
@@ -18,6 +21,7 @@
   const passwordCopied: Ref<boolean> = ref(false)
   const showPassword: Ref<boolean> = ref(false)
   const errorMessage: Ref<string> = ref('')
+  const copyToClipboardError: Ref<string> = ref('')
   const emit: (event: 'onClearPassword' | 'onResetPassword') => void = defineEmits([
     'onClearPassword',
     'onResetPassword'
@@ -27,9 +31,12 @@
     navigator.clipboard.writeText(text).then(
       () => {
         passwordCopied.value = true
+        copyToClipboardError.value = ''
       },
-      (error) => {
-        errorMessage.value = error
+      (error: unknown) => {
+        // eslint-disable-next-line no-console
+        console.log(error)
+        copyToClipboardError.value = t('admin.user.copyPasswordError')
       }
     )
   }
@@ -134,6 +141,7 @@
                 readonly
                 :type="showPassword ? 'text' : 'password'"
                 :value="password"
+                :error-messages="copyToClipboardError"
               ></v-text-field>
             </v-col>
           </v-row>

@@ -22,7 +22,23 @@ const vuetify = createVuetify({})
 const server: SetupServer = setupServer(...requestHandlers)
 
 /* Start mock server before all tests */
-beforeAll(() => server.listen({ onUnhandledRequest: 'error' }))
+beforeAll(() => {
+  server.listen({ onUnhandledRequest: 'error' })
+  // @ts-ignore:
+  global.ResizeObserver = class ResizeObserver {
+    public observe(): void {
+      // do nothing
+    }
+
+    public unobserve(): void {
+      // do nothing
+    }
+
+    public disconnect(): void {
+      // do nothing
+    }
+  }
+})
 
 /* Close mock server after all tests */
 afterAll(() => server.close())
