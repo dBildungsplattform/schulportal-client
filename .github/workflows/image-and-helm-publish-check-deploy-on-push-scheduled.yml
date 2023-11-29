@@ -97,7 +97,7 @@ jobs:
           fi
 
   release_helm:
-    uses: dBildungsplattform/dbp-github-workflows/.github/workflows/chart-release.yaml@8943a4ba8f20ccc5d1d54569ebfe7c83c7ad1e75 #chart release with timestamp
+    uses: dBildungsplattform/dbp-github-workflows/.github/workflows/chart-release.yaml@3.1.0
     needs: 
       - select_helm_version_generation
     secrets: inherit
