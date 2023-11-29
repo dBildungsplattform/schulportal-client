@@ -9,7 +9,7 @@ spec:
     app.kubernetes.io/name: {{ include "spsh-client.name" . }}
   ports:
     - protocol: TCP
-      port: 80
-      targetPort: 80
+      port: {{ .Values.commonPortNumber }}
+      targetPort: {{ .Values.commonPortNumber }}
   type: NodePort
 

@@ -14,5 +14,5 @@ spec:
               service:
                 name: {{ include "spsh-client.name" . }}-service
                 port:
-                  number: 80
+                  number: {{ .Values.commonPortNumber }}
 

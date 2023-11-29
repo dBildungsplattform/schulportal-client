@@ -4,3 +4,4 @@ nameOverride: ""
 image:
   repository: ghcr.io/dbildungsplattform/schulportal-client
   tag: ""
+commonPortNumber: 80
