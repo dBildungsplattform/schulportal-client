@@ -8,17 +8,15 @@ import axiosApiInstance from '@/services/ApiService'
 const frontendApi: FrontendApiInterface = FrontendApiFactory(undefined, '', axiosApiInstance)
 
 type Person = {
-  person: {
-    id: string
-    name: {
-      familienname: string
-      vorname: string
-    }
+  id: string
+  name: {
+    familienname: string
+    vorname: string
   }
 }
 
 type State = {
-  allPersons: Person[]
+  allPersons: Array<Person>
   errorCode: string
   loading: boolean
 }
@@ -37,6 +35,7 @@ export const usePersonStore = defineStore({
       this.loading = true
       try {
         const { data } = await frontendApi.frontendControllerPersons()
+        debugger
         this.allPersons = data
         this.loading = false
       } catch (error: any) {
