@@ -35,7 +35,6 @@ export const usePersonStore = defineStore({
       this.loading = true
       try {
         const { data } = await frontendApi.frontendControllerPersons()
-        debugger
         this.allPersons = data
         this.loading = false
       } catch (error: any) {
