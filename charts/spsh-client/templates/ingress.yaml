@@ -1,18 +1,17 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ include "spsh-client.name" . }}-ingress
+  name: spsh-client-ingress
 spec:
   ingressClassName: nginx
   rules:
-    - host: {{ .Values.frontendHostname }}
+    - host: {{.Values.frontendHostname}}
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: {{ include "spsh-client.name" . }}-service
+                name: spsh-client-service
                 port:
-                  number: {{ .Values.commonPortNumber }}
-
+                  number: 80
