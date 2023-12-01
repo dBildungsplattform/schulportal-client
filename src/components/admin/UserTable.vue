@@ -3,7 +3,9 @@
   import { Composer, useI18n } from 'vue-i18n'
   import { Person } from '@/stores/PersonStore'
 
-  /* this block is necessary to introduce a table header type to shut up typescript when defining table headers */
+  /* this block is necessary to introduce a table header type for defining table headers
+      watch source for updates: https://stackoverflow.com/a/75993081/4790594
+   */
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs'
   type ReadonlyHeaders = InstanceType<typeof VDataTableServer>['headers']
 

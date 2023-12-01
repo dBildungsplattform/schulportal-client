@@ -5,7 +5,7 @@ const routes: readonly RouteRecordRaw[] = [
   {
     path: '/',
     name: 'landing',
-    component: import('../views/LandingView.vue'),
+    component: () => import('../views/LandingView.vue'),
     meta: {
       requiresAuth: false
     }
