@@ -23,7 +23,7 @@ axiosApiInstance.interceptors.response.use(
       return authStore.login(route.fullPath)
     }
 
-    return Promise.reject(error);
+    return Promise.reject(error)
   }
 )
 

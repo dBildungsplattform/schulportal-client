@@ -2,7 +2,7 @@ import { defineStore, type Store, type StoreDefinition } from 'pinia'
 import ApiService from '@/services/ApiService'
 import { isAxiosError } from 'axios'
 
-type Provider = {
+export type Provider = {
   id: number
   name: string
   url: string
