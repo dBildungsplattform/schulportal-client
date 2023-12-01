@@ -52,7 +52,7 @@ jobs:
       packages: write
       security-events: write
       contents: read
-    uses: dBildungsplattform/dbp-github-workflows/.github/workflows/image-publish-trivy.yaml@DBP-352-input-naming-improvement
+    uses: dBildungsplattform/dbp-github-workflows/.github/workflows/image-publish-trivy.yaml@4.0.0
     with:
       image_name: "schulportal-client"
       run_trivy_scan: true
@@ -99,7 +99,7 @@ jobs:
             echo "SELECT_IMAGE_TAG_GENERATION=ticket_from_branch" >> "$GITHUB_OUTPUT"
           fi
   release_helm:
-    uses: dBildungsplattform/dbp-github-workflows/.github/workflows/chart-release.yaml@DBP-352-input-naming-improvement
+    uses: dBildungsplattform/dbp-github-workflows/.github/workflows/chart-release.yaml@4.0.0
     needs: 
       - select_helm_version_generation_and_image_tag_generation
     secrets: inherit
