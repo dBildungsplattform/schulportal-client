@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import {
   FrontendApiFactory,
   type FrontendApiInterface
-} from '../api-client/openapi-generator-cli/generated/api.js'
+} from '../api-client/generated/api'
 import axiosApiInstance from '@/services/ApiService'
 
 const frontendApi: FrontendApiInterface = FrontendApiFactory(undefined, '', axiosApiInstance)

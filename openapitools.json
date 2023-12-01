@@ -3,11 +3,11 @@
 	"spaces": 2,
 	"generator-cli": {
 		"version": "5.1.0",
-      "storageDir": "./src/api-client/openapi-generator-cli/storageDir",
+      "storageDir": "./src/api-client/storageDir",
       "generators": {
         "bff": {
           "generatorName": "typescript-axios",
-          "output": "#{cwd}/src/api-client/openapi-generator-cli/generated",
+          "output": "#{cwd}/src/api-client/generated",
           "inputSpec": "#{cwd}/openapispec.json",
           "additionalProperties": {
             "supportsES6": "true",
