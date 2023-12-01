@@ -5,7 +5,7 @@ metadata:
   labels:
     app: spsh-client
 spec:
-  replicas: {{.Values.replicaCount }}
+  replicas: 1
   selector:
     matchLabels:
       app: spsh-client
