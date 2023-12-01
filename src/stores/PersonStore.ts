@@ -1,6 +1,6 @@
 import { defineStore, type Store, type StoreDefinition } from 'pinia'
 import ApiService from '@/services/ApiService'
-import { AxiosError } from 'axios'
+import { isAxiosError } from 'axios'
 
 export type Person = {
   person: {
@@ -49,7 +49,7 @@ export const usePersonStore: StoreDefinition<
         this.loading = false
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR'
-        if (error instanceof AxiosError) {
+        if (isAxiosError(error)) {
           this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR'
         }
         this.loading = false
@@ -64,7 +64,7 @@ export const usePersonStore: StoreDefinition<
         return data
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR'
-        if (error instanceof AxiosError) {
+        if (isAxiosError(error)) {
           this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR'
         }
         this.loading = false
