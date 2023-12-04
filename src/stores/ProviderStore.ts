@@ -5,7 +5,7 @@ import axiosApiInstance from '@/services/ApiService'
 const frontendApi: FrontendApiInterface = FrontendApiFactory(undefined, '', axiosApiInstance)
 
 type Provider = {
-  id: number
+  id: string
   name: string
   url: string
 }

@@ -12,8 +12,17 @@ type Person = {
   }
 }
 
+type Personenkontext = {
+  id: string
+}
+
+type PersonenDatensatz = {
+  person: Person
+  personenkontexte: Array<Personenkontext>
+}
+
 type State = {
-  allPersons: Array<Person>
+  allPersons: Array<PersonenDatensatz>
   errorCode: string
   loading: boolean
 }
@@ -31,8 +40,10 @@ export const usePersonStore = defineStore({
     async getAllPersons() {
       this.loading = true
       try {
-        const { data } = await frontendApi.frontendControllerPersons()
-        this.allPersons = data
+        const {
+          data: { items }
+        } = await frontendApi.frontendControllerPersons()
+        this.allPersons = items
         this.loading = false
       } catch (error: any) {
         this.errorCode = error.response.data.code || 'UNSPECIFIED_ERROR'
