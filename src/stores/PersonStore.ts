@@ -1,7 +1,8 @@
-import { defineStore } from 'pinia'
+import { defineStore, type Store, type StoreDefinition } from 'pinia'
 import ApiService from '@/services/ApiService'
+import { isAxiosError } from 'axios'
 
-type Person = {
+export type Person = {
   person: {
     id: string
     name: {
@@ -11,15 +12,28 @@ type Person = {
   }
 }
 
-type State = {
+type PersonState = {
   allPersons: Person[]
   errorCode: string
   loading: boolean
 }
 
-export const usePersonStore = defineStore({
+type PersonGetters = {}
+type PersonActions = {
+  getAllPersons: () => Promise<void>
+  resetPassword: (userId: string) => Promise<string>
+}
+
+export type PersonStore = Store<'personStore', PersonState, PersonGetters, PersonActions>
+
+export const usePersonStore: StoreDefinition<
+  'personStore',
+  PersonState,
+  PersonGetters,
+  PersonActions
+> = defineStore({
   id: 'personStore',
-  state: (): State => {
+  state: (): PersonState => {
     return {
       allPersons: [],
       errorCode: '',
@@ -30,24 +44,31 @@ export const usePersonStore = defineStore({
     async getAllPersons() {
       this.loading = true
       try {
-        const { data } = await ApiService.get('/personen')
+        const { data }: { data: Person[] } = await ApiService.get('/personen')
         this.allPersons = data
         this.loading = false
-      } catch (error: any) {
-        this.errorCode = error.response.data.code || 'UNSPECIFIED_ERROR'
+      } catch (error: unknown) {
+        this.errorCode = 'UNSPECIFIED_ERROR'
+        if (isAxiosError(error)) {
+          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR'
+        }
         this.loading = false
       }
     },
 
-    async resetPassword(userId: string) {
+    async resetPassword(userId: string): Promise<string> {
       this.loading = true
       try {
-        const { data } = await ApiService.patch(`/personen/${userId}/password`)
+        const { data }: { data: string } = await ApiService.patch(`/personen/${userId}/password`)
         this.loading = false
         return data
-      } catch (error: any) {
-        this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR'
+      } catch (error: unknown) {
+        this.errorCode = 'UNSPECIFIED_ERROR'
+        if (isAxiosError(error)) {
+          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR'
+        }
         this.loading = false
+        return this.errorCode
       }
     }
   }

@@ -1,9 +1,9 @@
 import { expect, test } from 'vitest'
-import { mount } from '@vue/test-utils'
+import { VueWrapper, mount } from '@vue/test-utils'
 import PasswordReset from '../../../components/admin/PasswordReset.vue'
 // import { VDialog } from 'vuetify/lib/components/index.mjs'
 
-let wrapper = null as any
+let wrapper: VueWrapper | null = null
 
 beforeEach(async () => {
   document.body.innerHTML = `
@@ -35,7 +35,7 @@ beforeEach(async () => {
 
 describe('reset password', () => {
   test('it opens the dialog', async () => {
-    wrapper.get('[data-testid="open-password-reset-dialog-icon"]').trigger('click')
+    wrapper?.get('[data-testid="open-password-reset-dialog-icon"]').trigger('click')
     await document.querySelector('[data-testid="warning-header"]')
     expect(document.querySelector('[data-testid="warning-header"]')).not.toBeNull()
   })
@@ -48,7 +48,7 @@ describe('reset password', () => {
   // But I haven't found a way to trigger events with the querySelector and emit them to the wrapper to assert them.
 
   test('reset button emits correct event', async () => {
-    wrapper.get('[data-testid="open-password-reset-dialog-icon"]').trigger('click')
+    wrapper?.get('[data-testid="open-password-reset-dialog-icon"]').trigger('click')
     await document.querySelector('[data-testid="password-reset-button"]')
     expect(document.querySelector('[data-testid="password-reset-button"]')).not.toBeNull()
     // const dialog = wrapper.findComponent(VDialog)
@@ -58,14 +58,14 @@ describe('reset password', () => {
 
   // skip because v-dialog does not work in test env. see lines 42-47
   test.skip('it shows and hides password', async () => {
-    wrapper.get('[data-testid="open-password-reset-dialog-icon"]').trigger('click')
+    wrapper?.get('[data-testid="open-password-reset-dialog-icon"]').trigger('click')
     await document.querySelector('[data-testid="password-output-field"] mdi-eye')
     expect(document.querySelector('[data-testid="password-output-field"] mdi-eye')).not.toBeNull()
   })
 
   // skip because v-dialog does not work in test env. see lines 42-47
   test.skip('it copies password to clipboard', async () => {
-    wrapper.get('[data-testid="open-password-reset-dialog-icon"]').trigger('click')
+    wrapper?.get('[data-testid="open-password-reset-dialog-icon"]').trigger('click')
     await document.querySelector('[data-testid="password-output-field"] mdi-content-copy')
     expect(
       document.querySelector('[data-testid="password-output-field"] mdi-content-copy')
@@ -74,5 +74,5 @@ describe('reset password', () => {
 })
 
 afterEach(() => {
-  wrapper.unmount()
+  wrapper?.unmount()
 })
