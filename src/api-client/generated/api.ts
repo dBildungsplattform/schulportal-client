@@ -12,8 +12,9 @@
  * Do not edit the class manually.
  */
 
-import { Configuration } from './configuration'
-import globalAxios, { AxiosPromise, AxiosInstance } from 'axios'
+import type { Configuration } from './configuration'
+import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios'
+import globalAxios from 'axios'
 // Some imports not used depending on template conditions
 // @ts-ignore
 import {
@@ -28,9 +29,147 @@ import {
   toPathString,
   createRequestFunction
 } from './common'
+import type { RequestArgs } from './base'
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from './base'
+import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError } from './base'
 
+/**
+ *
+ * @export
+ * @interface CreatePersonBodyParams
+ */
+export interface CreatePersonBodyParams {
+  /**
+   *
+   * @type {string}
+   * @memberof CreatePersonBodyParams
+   */
+  username: string
+  /**
+   *
+   * @type {string}
+   * @memberof CreatePersonBodyParams
+   */
+  email?: string
+  /**
+   *
+   * @type {string}
+   * @memberof CreatePersonBodyParams
+   */
+  referrer?: string
+  /**
+   *
+   * @type {string}
+   * @memberof CreatePersonBodyParams
+   */
+  mandant: string
+  /**
+   *
+   * @type {string}
+   * @memberof CreatePersonBodyParams
+   */
+  stammorganisation?: string
+  /**
+   *
+   * @type {PersonNameParams}
+   * @memberof CreatePersonBodyParams
+   */
+  name: PersonNameParams
+  /**
+   *
+   * @type {PersonBirthParams}
+   * @memberof CreatePersonBodyParams
+   */
+  geburt?: PersonBirthParams
+  /**
+   *
+   * @type {string}
+   * @memberof CreatePersonBodyParams
+   */
+  geschlecht?: CreatePersonBodyParamsGeschlechtEnum
+  /**
+   *
+   * @type {string}
+   * @memberof CreatePersonBodyParams
+   */
+  lokalisierung?: string
+  /**
+   *
+   * @type {string}
+   * @memberof CreatePersonBodyParams
+   */
+  vertrauensstufe?: CreatePersonBodyParamsVertrauensstufeEnum
+  /**
+   *
+   * @type {boolean}
+   * @memberof CreatePersonBodyParams
+   */
+  auskunftssperre?: boolean
+}
+
+export const CreatePersonBodyParamsGeschlechtEnum = {
+  M: 'm',
+  W: 'w',
+  D: 'd',
+  X: 'x'
+} as const
+
+export type CreatePersonBodyParamsGeschlechtEnum =
+  (typeof CreatePersonBodyParamsGeschlechtEnum)[keyof typeof CreatePersonBodyParamsGeschlechtEnum]
+export const CreatePersonBodyParamsVertrauensstufeEnum = {
+  Kein: 'KEIN',
+  Unbe: 'UNBE',
+  Teil: 'TEIL',
+  Voll: 'VOLL'
+} as const
+
+export type CreatePersonBodyParamsVertrauensstufeEnum =
+  (typeof CreatePersonBodyParamsVertrauensstufeEnum)[keyof typeof CreatePersonBodyParamsVertrauensstufeEnum]
+
+/**
+ *
+ * @export
+ * @interface FrontendControllerPersons200Response
+ */
+export interface FrontendControllerPersons200Response {
+  /**
+   *
+   * @type {number}
+   * @memberof FrontendControllerPersons200Response
+   */
+  offset: number
+  /**
+   *
+   * @type {number}
+   * @memberof FrontendControllerPersons200Response
+   */
+  limit: number
+  /**
+   *
+   * @type {number}
+   * @memberof FrontendControllerPersons200Response
+   */
+  total: number
+  /**
+   *
+   * @type {Array<PersonendatensatzResponse>}
+   * @memberof FrontendControllerPersons200Response
+   */
+  items: Array<PersonendatensatzResponse>
+}
+/**
+ *
+ * @export
+ * @interface FrontendControllerPersons200ResponseAllOf
+ */
+export interface FrontendControllerPersons200ResponseAllOf {
+  /**
+   *
+   * @type {Array<PersonendatensatzResponse>}
+   * @memberof FrontendControllerPersons200ResponseAllOf
+   */
+  items?: Array<PersonendatensatzResponse>
+}
 /**
  *
  * @export
@@ -43,6 +182,31 @@ export interface LoeschungResponse {
    * @memberof LoeschungResponse
    */
   zeitpunkt: string
+}
+/**
+ *
+ * @export
+ * @interface PaginatedResponseDto
+ */
+export interface PaginatedResponseDto {
+  /**
+   *
+   * @type {number}
+   * @memberof PaginatedResponseDto
+   */
+  offset: number
+  /**
+   *
+   * @type {number}
+   * @memberof PaginatedResponseDto
+   */
+  limit: number
+  /**
+   *
+   * @type {number}
+   * @memberof PaginatedResponseDto
+   */
+  total: number
 }
 /**
  *
@@ -196,18 +360,23 @@ export interface PersonResponse {
    * @memberof PersonResponse
    */
   revision: string
+  /**
+   * Initiales Benutzerpasswort, muss nach der ersten Anmeldung geändert werden
+   * @type {string}
+   * @memberof PersonResponse
+   */
+  startpasswort: string
 }
 
-/**
- * @export
- * @enum {string}
- */
-export enum PersonResponseVertrauensstufeEnum {
-  Kein = 'KEIN',
-  Unbe = 'UNBE',
-  Teil = 'TEIL',
-  Voll = 'VOLL'
-}
+export const PersonResponseVertrauensstufeEnum = {
+  Kein: 'KEIN',
+  Unbe: 'UNBE',
+  Teil: 'TEIL',
+  Voll: 'VOLL'
+} as const
+
+export type PersonResponseVertrauensstufeEnum =
+  (typeof PersonResponseVertrauensstufeEnum)[keyof typeof PersonResponseVertrauensstufeEnum]
 
 /**
  *
@@ -295,6 +464,146 @@ export interface PersonenkontextResponse {
    */
   revision: string
 }
+/**
+ *
+ * @export
+ * @interface ServiceProviderInfoResponse
+ */
+export interface ServiceProviderInfoResponse {
+  /**
+   *
+   * @type {string}
+   * @memberof ServiceProviderInfoResponse
+   */
+  id: string
+  /**
+   *
+   * @type {string}
+   * @memberof ServiceProviderInfoResponse
+   */
+  name: string
+  /**
+   *
+   * @type {string}
+   * @memberof ServiceProviderInfoResponse
+   */
+  url: string
+}
+/**
+ *
+ * @export
+ * @interface UserinfoResponse
+ */
+export interface UserinfoResponse {
+  /**
+   *
+   * @type {string}
+   * @memberof UserinfoResponse
+   */
+  sub: string
+  /**
+   *
+   * @type {string}
+   * @memberof UserinfoResponse
+   */
+  name: string | null
+  /**
+   *
+   * @type {string}
+   * @memberof UserinfoResponse
+   */
+  given_name: string | null
+  /**
+   *
+   * @type {string}
+   * @memberof UserinfoResponse
+   */
+  family_name: string | null
+  /**
+   *
+   * @type {string}
+   * @memberof UserinfoResponse
+   */
+  middle_name: string | null
+  /**
+   *
+   * @type {string}
+   * @memberof UserinfoResponse
+   */
+  nickname: string | null
+  /**
+   *
+   * @type {string}
+   * @memberof UserinfoResponse
+   */
+  preferred_username: string | null
+  /**
+   *
+   * @type {string}
+   * @memberof UserinfoResponse
+   */
+  profile: string | null
+  /**
+   *
+   * @type {string}
+   * @memberof UserinfoResponse
+   */
+  picture: string | null
+  /**
+   *
+   * @type {string}
+   * @memberof UserinfoResponse
+   */
+  website: string | null
+  /**
+   *
+   * @type {string}
+   * @memberof UserinfoResponse
+   */
+  email: string | null
+  /**
+   *
+   * @type {boolean}
+   * @memberof UserinfoResponse
+   */
+  email_verified: boolean | null
+  /**
+   *
+   * @type {string}
+   * @memberof UserinfoResponse
+   */
+  gender: string | null
+  /**
+   *
+   * @type {string}
+   * @memberof UserinfoResponse
+   */
+  birthdate: string | null
+  /**
+   *
+   * @type {string}
+   * @memberof UserinfoResponse
+   */
+  zoneinfo: string | null
+  /**
+   *
+   * @type {string}
+   * @memberof UserinfoResponse
+   */
+  locale: string | null
+  /**
+   *
+   * @type {string}
+   * @memberof UserinfoResponse
+   */
+  phone_number: string | null
+  /**
+   *
+   * @type {number}
+   * @memberof UserinfoResponse
+   */
+  updated_at: number | null
+}
 
 /**
  * FrontendApi - axios parameter creator
@@ -304,11 +613,60 @@ export const FrontendApiAxiosParamCreator = function (configuration?: Configurat
   return {
     /**
      *
+     * @summary Creates a new person.
+     * @param {CreatePersonBodyParams} createPersonBodyParams
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    frontendControllerCreatePerson: async (
+      createPersonBodyParams: CreatePersonBodyParams,
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
+      // verify required parameter 'createPersonBodyParams' is not null or undefined
+      assertParamExists(
+        'frontendControllerCreatePerson',
+        'createPersonBodyParams',
+        createPersonBodyParams
+      )
+      const localVarPath = `/api/frontend/personen`
+      // use dummy base URL string because the URL constructor only accepts absolute URLs.
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
+      let baseOptions
+      if (configuration) {
+        baseOptions = configuration.baseOptions
+      }
+
+      const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options }
+      const localVarHeaderParameter = {} as any
+      const localVarQueryParameter = {} as any
+
+      localVarHeaderParameter['Content-Type'] = 'application/json'
+
+      setSearchParams(localVarUrlObj, localVarQueryParameter)
+      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers
+      }
+      localVarRequestOptions.data = serializeDataIfNeeded(
+        createPersonBodyParams,
+        localVarRequestOptions,
+        configuration
+      )
+
+      return {
+        url: toPathString(localVarUrlObj),
+        options: localVarRequestOptions
+      }
+    },
+    /**
+     *
      * @summary Info about logged in user.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    frontendControllerInfo: async (options: any = {}): Promise<RequestArgs> => {
+    frontendControllerInfo: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
       const localVarPath = `/api/frontend/logininfo`
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
       const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
@@ -321,7 +679,7 @@ export const FrontendApiAxiosParamCreator = function (configuration?: Configurat
       const localVarHeaderParameter = {} as any
       const localVarQueryParameter = {} as any
 
-      setSearchParams(localVarUrlObj, localVarQueryParameter, options.query)
+      setSearchParams(localVarUrlObj, localVarQueryParameter)
       let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
       localVarRequestOptions.headers = {
         ...localVarHeaderParameter,
@@ -343,7 +701,7 @@ export const FrontendApiAxiosParamCreator = function (configuration?: Configurat
      */
     frontendControllerLogin: async (
       redirectUrl?: string,
-      options: any = {}
+      options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
       const localVarPath = `/api/frontend/login`
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -361,7 +719,7 @@ export const FrontendApiAxiosParamCreator = function (configuration?: Configurat
         localVarQueryParameter['redirectUrl'] = redirectUrl
       }
 
-      setSearchParams(localVarUrlObj, localVarQueryParameter, options.query)
+      setSearchParams(localVarUrlObj, localVarQueryParameter)
       let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
       localVarRequestOptions.headers = {
         ...localVarHeaderParameter,
@@ -380,7 +738,7 @@ export const FrontendApiAxiosParamCreator = function (configuration?: Configurat
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    frontendControllerLogout: async (options: any = {}): Promise<RequestArgs> => {
+    frontendControllerLogout: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
       const localVarPath = `/api/frontend/logout`
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
       const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
@@ -393,7 +751,7 @@ export const FrontendApiAxiosParamCreator = function (configuration?: Configurat
       const localVarHeaderParameter = {} as any
       const localVarQueryParameter = {} as any
 
-      setSearchParams(localVarUrlObj, localVarQueryParameter, options.query)
+      setSearchParams(localVarUrlObj, localVarQueryParameter)
       let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
       localVarRequestOptions.headers = {
         ...localVarHeaderParameter,
@@ -408,13 +766,14 @@ export const FrontendApiAxiosParamCreator = function (configuration?: Configurat
     },
     /**
      *
+     * @summary Resets the users password.
      * @param {string} personId The id for the account.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     frontendControllerPasswordReset: async (
       personId: string,
-      options: any = {}
+      options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
       // verify required parameter 'personId' is not null or undefined
       assertParamExists('frontendControllerPasswordReset', 'personId', personId)
@@ -433,7 +792,7 @@ export const FrontendApiAxiosParamCreator = function (configuration?: Configurat
       const localVarHeaderParameter = {} as any
       const localVarQueryParameter = {} as any
 
-      setSearchParams(localVarUrlObj, localVarQueryParameter, options.query)
+      setSearchParams(localVarUrlObj, localVarQueryParameter)
       let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
       localVarRequestOptions.headers = {
         ...localVarHeaderParameter,
@@ -448,10 +807,25 @@ export const FrontendApiAxiosParamCreator = function (configuration?: Configurat
     },
     /**
      *
+     * @summary Lists personen.
+     * @param {number} [offset] The offset of the paginated list.
+     * @param {number} [limit] The requested limit for the page size.
+     * @param {string} [referrer]
+     * @param {string} [familienname]
+     * @param {string} [vorname]
+     * @param {'ja' | 'nein'} [sichtfreigabe]
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    frontendControllerPersons: async (options: any = {}): Promise<RequestArgs> => {
+    frontendControllerPersons: async (
+      offset?: number,
+      limit?: number,
+      referrer?: string,
+      familienname?: string,
+      vorname?: string,
+      sichtfreigabe?: 'ja' | 'nein',
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
       const localVarPath = `/api/frontend/personen`
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
       const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
@@ -464,7 +838,31 @@ export const FrontendApiAxiosParamCreator = function (configuration?: Configurat
       const localVarHeaderParameter = {} as any
       const localVarQueryParameter = {} as any
 
-      setSearchParams(localVarUrlObj, localVarQueryParameter, options.query)
+      if (offset !== undefined) {
+        localVarQueryParameter['offset'] = offset
+      }
+
+      if (limit !== undefined) {
+        localVarQueryParameter['limit'] = limit
+      }
+
+      if (referrer !== undefined) {
+        localVarQueryParameter['referrer'] = referrer
+      }
+
+      if (familienname !== undefined) {
+        localVarQueryParameter['familienname'] = familienname
+      }
+
+      if (vorname !== undefined) {
+        localVarQueryParameter['vorname'] = vorname
+      }
+
+      if (sichtfreigabe !== undefined) {
+        localVarQueryParameter['sichtfreigabe'] = sichtfreigabe
+      }
+
+      setSearchParams(localVarUrlObj, localVarQueryParameter)
       let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
       localVarRequestOptions.headers = {
         ...localVarHeaderParameter,
@@ -479,10 +877,11 @@ export const FrontendApiAxiosParamCreator = function (configuration?: Configurat
     },
     /**
      *
+     * @summary Providers the user has access to.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    frontendControllerProvider: async (options: any = {}): Promise<RequestArgs> => {
+    frontendControllerProvider: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
       const localVarPath = `/api/frontend/provider`
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
       const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
@@ -495,7 +894,7 @@ export const FrontendApiAxiosParamCreator = function (configuration?: Configurat
       const localVarHeaderParameter = {} as any
       const localVarQueryParameter = {} as any
 
-      setSearchParams(localVarUrlObj, localVarQueryParameter, options.query)
+      setSearchParams(localVarUrlObj, localVarQueryParameter)
       let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
       localVarRequestOptions.headers = {
         ...localVarHeaderParameter,
@@ -520,13 +919,32 @@ export const FrontendApiFp = function (configuration?: Configuration) {
   return {
     /**
      *
+     * @summary Creates a new person.
+     * @param {CreatePersonBodyParams} createPersonBodyParams
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async frontendControllerCreatePerson(
+      createPersonBodyParams: CreatePersonBodyParams,
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonendatensatzResponse>
+    > {
+      const localVarAxiosArgs = await localVarAxiosParamCreator.frontendControllerCreatePerson(
+        createPersonBodyParams,
+        options
+      )
+      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
+    },
+    /**
+     *
      * @summary Info about logged in user.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     async frontendControllerInfo(
-      options?: any
-    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+      options?: AxiosRequestConfig
+    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UserinfoResponse>> {
       const localVarAxiosArgs = await localVarAxiosParamCreator.frontendControllerInfo(options)
       return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
     },
@@ -539,7 +957,7 @@ export const FrontendApiFp = function (configuration?: Configuration) {
      */
     async frontendControllerLogin(
       redirectUrl?: string,
-      options?: any
+      options?: AxiosRequestConfig
     ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
       const localVarAxiosArgs = await localVarAxiosParamCreator.frontendControllerLogin(
         redirectUrl,
@@ -554,21 +972,22 @@ export const FrontendApiFp = function (configuration?: Configuration) {
      * @throws {RequiredError}
      */
     async frontendControllerLogout(
-      options?: any
+      options?: AxiosRequestConfig
     ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
       const localVarAxiosArgs = await localVarAxiosParamCreator.frontendControllerLogout(options)
       return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
     },
     /**
      *
+     * @summary Resets the users password.
      * @param {string} personId The id for the account.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     async frontendControllerPasswordReset(
       personId: string,
-      options?: any
-    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+      options?: AxiosRequestConfig
+    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
       const localVarAxiosArgs = await localVarAxiosParamCreator.frontendControllerPasswordReset(
         personId,
         options
@@ -577,25 +996,52 @@ export const FrontendApiFp = function (configuration?: Configuration) {
     },
     /**
      *
+     * @summary Lists personen.
+     * @param {number} [offset] The offset of the paginated list.
+     * @param {number} [limit] The requested limit for the page size.
+     * @param {string} [referrer]
+     * @param {string} [familienname]
+     * @param {string} [vorname]
+     * @param {'ja' | 'nein'} [sichtfreigabe]
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     async frontendControllerPersons(
-      options?: any
+      offset?: number,
+      limit?: number,
+      referrer?: string,
+      familienname?: string,
+      vorname?: string,
+      sichtfreigabe?: 'ja' | 'nein',
+      options?: AxiosRequestConfig
     ): Promise<
-      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonendatensatzResponse>
+      (
+        axios?: AxiosInstance,
+        basePath?: string
+      ) => AxiosPromise<FrontendControllerPersons200Response>
     > {
-      const localVarAxiosArgs = await localVarAxiosParamCreator.frontendControllerPersons(options)
+      const localVarAxiosArgs = await localVarAxiosParamCreator.frontendControllerPersons(
+        offset,
+        limit,
+        referrer,
+        familienname,
+        vorname,
+        sichtfreigabe,
+        options
+      )
       return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
     },
     /**
      *
+     * @summary Providers the user has access to.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     async frontendControllerProvider(
-      options?: any
-    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<ServiceProviderInfoResponse>>
+    > {
       const localVarAxiosArgs = await localVarAxiosParamCreator.frontendControllerProvider(options)
       return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
     }
@@ -615,11 +1061,26 @@ export const FrontendApiFactory = function (
   return {
     /**
      *
+     * @summary Creates a new person.
+     * @param {CreatePersonBodyParams} createPersonBodyParams
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    frontendControllerCreatePerson(
+      createPersonBodyParams: CreatePersonBodyParams,
+      options?: any
+    ): AxiosPromise<PersonendatensatzResponse> {
+      return localVarFp
+        .frontendControllerCreatePerson(createPersonBodyParams, options)
+        .then((request) => request(axios, basePath))
+    },
+    /**
+     *
      * @summary Info about logged in user.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    frontendControllerInfo(options?: any): AxiosPromise<void> {
+    frontendControllerInfo(options?: any): AxiosPromise<UserinfoResponse> {
       return localVarFp.frontendControllerInfo(options).then((request) => request(axios, basePath))
     },
     /**
@@ -647,31 +1108,56 @@ export const FrontendApiFactory = function (
     },
     /**
      *
+     * @summary Resets the users password.
      * @param {string} personId The id for the account.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    frontendControllerPasswordReset(personId: string, options?: any): AxiosPromise<void> {
+    frontendControllerPasswordReset(personId: string, options?: any): AxiosPromise<string> {
       return localVarFp
         .frontendControllerPasswordReset(personId, options)
         .then((request) => request(axios, basePath))
     },
     /**
      *
+     * @summary Lists personen.
+     * @param {number} [offset] The offset of the paginated list.
+     * @param {number} [limit] The requested limit for the page size.
+     * @param {string} [referrer]
+     * @param {string} [familienname]
+     * @param {string} [vorname]
+     * @param {'ja' | 'nein'} [sichtfreigabe]
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    frontendControllerPersons(options?: any): AxiosPromise<PersonendatensatzResponse> {
+    frontendControllerPersons(
+      offset?: number,
+      limit?: number,
+      referrer?: string,
+      familienname?: string,
+      vorname?: string,
+      sichtfreigabe?: 'ja' | 'nein',
+      options?: any
+    ): AxiosPromise<FrontendControllerPersons200Response> {
       return localVarFp
-        .frontendControllerPersons(options)
+        .frontendControllerPersons(
+          offset,
+          limit,
+          referrer,
+          familienname,
+          vorname,
+          sichtfreigabe,
+          options
+        )
         .then((request) => request(axios, basePath))
     },
     /**
      *
+     * @summary Providers the user has access to.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    frontendControllerProvider(options?: any): AxiosPromise<void> {
+    frontendControllerProvider(options?: any): AxiosPromise<Array<ServiceProviderInfoResponse>> {
       return localVarFp
         .frontendControllerProvider(options)
         .then((request) => request(axios, basePath))
@@ -687,12 +1173,25 @@ export const FrontendApiFactory = function (
 export interface FrontendApiInterface {
   /**
    *
+   * @summary Creates a new person.
+   * @param {CreatePersonBodyParams} createPersonBodyParams
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   * @memberof FrontendApiInterface
+   */
+  frontendControllerCreatePerson(
+    createPersonBodyParams: CreatePersonBodyParams,
+    options?: AxiosRequestConfig
+  ): AxiosPromise<PersonendatensatzResponse>
+
+  /**
+   *
    * @summary Info about logged in user.
    * @param {*} [options] Override http request option.
    * @throws {RequiredError}
    * @memberof FrontendApiInterface
    */
-  frontendControllerInfo(options?: any): AxiosPromise<void>
+  frontendControllerInfo(options?: AxiosRequestConfig): AxiosPromise<UserinfoResponse>
 
   /**
    *
@@ -702,7 +1201,7 @@ export interface FrontendApiInterface {
    * @throws {RequiredError}
    * @memberof FrontendApiInterface
    */
-  frontendControllerLogin(redirectUrl?: string, options?: any): AxiosPromise<void>
+  frontendControllerLogin(redirectUrl?: string, options?: AxiosRequestConfig): AxiosPromise<void>
 
   /**
    *
@@ -711,32 +1210,54 @@ export interface FrontendApiInterface {
    * @throws {RequiredError}
    * @memberof FrontendApiInterface
    */
-  frontendControllerLogout(options?: any): AxiosPromise<void>
+  frontendControllerLogout(options?: AxiosRequestConfig): AxiosPromise<void>
 
   /**
    *
+   * @summary Resets the users password.
    * @param {string} personId The id for the account.
    * @param {*} [options] Override http request option.
    * @throws {RequiredError}
    * @memberof FrontendApiInterface
    */
-  frontendControllerPasswordReset(personId: string, options?: any): AxiosPromise<void>
+  frontendControllerPasswordReset(
+    personId: string,
+    options?: AxiosRequestConfig
+  ): AxiosPromise<string>
 
   /**
    *
+   * @summary Lists personen.
+   * @param {number} [offset] The offset of the paginated list.
+   * @param {number} [limit] The requested limit for the page size.
+   * @param {string} [referrer]
+   * @param {string} [familienname]
+   * @param {string} [vorname]
+   * @param {'ja' | 'nein'} [sichtfreigabe]
    * @param {*} [options] Override http request option.
    * @throws {RequiredError}
    * @memberof FrontendApiInterface
    */
-  frontendControllerPersons(options?: any): AxiosPromise<PersonendatensatzResponse>
+  frontendControllerPersons(
+    offset?: number,
+    limit?: number,
+    referrer?: string,
+    familienname?: string,
+    vorname?: string,
+    sichtfreigabe?: 'ja' | 'nein',
+    options?: AxiosRequestConfig
+  ): AxiosPromise<FrontendControllerPersons200Response>
 
   /**
    *
+   * @summary Providers the user has access to.
    * @param {*} [options] Override http request option.
    * @throws {RequiredError}
    * @memberof FrontendApiInterface
    */
-  frontendControllerProvider(options?: any): AxiosPromise<void>
+  frontendControllerProvider(
+    options?: AxiosRequestConfig
+  ): AxiosPromise<Array<ServiceProviderInfoResponse>>
 }
 
 /**
@@ -748,12 +1269,29 @@ export interface FrontendApiInterface {
 export class FrontendApi extends BaseAPI implements FrontendApiInterface {
   /**
    *
+   * @summary Creates a new person.
+   * @param {CreatePersonBodyParams} createPersonBodyParams
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   * @memberof FrontendApi
+   */
+  public frontendControllerCreatePerson(
+    createPersonBodyParams: CreatePersonBodyParams,
+    options?: AxiosRequestConfig
+  ) {
+    return FrontendApiFp(this.configuration)
+      .frontendControllerCreatePerson(createPersonBodyParams, options)
+      .then((request) => request(this.axios, this.basePath))
+  }
+
+  /**
+   *
    * @summary Info about logged in user.
    * @param {*} [options] Override http request option.
    * @throws {RequiredError}
    * @memberof FrontendApi
    */
-  public frontendControllerInfo(options?: any) {
+  public frontendControllerInfo(options?: AxiosRequestConfig) {
     return FrontendApiFp(this.configuration)
       .frontendControllerInfo(options)
       .then((request) => request(this.axios, this.basePath))
@@ -767,7 +1305,7 @@ export class FrontendApi extends BaseAPI implements FrontendApiInterface {
    * @throws {RequiredError}
    * @memberof FrontendApi
    */
-  public frontendControllerLogin(redirectUrl?: string, options?: any) {
+  public frontendControllerLogin(redirectUrl?: string, options?: AxiosRequestConfig) {
     return FrontendApiFp(this.configuration)
       .frontendControllerLogin(redirectUrl, options)
       .then((request) => request(this.axios, this.basePath))
@@ -780,7 +1318,7 @@ export class FrontendApi extends BaseAPI implements FrontendApiInterface {
    * @throws {RequiredError}
    * @memberof FrontendApi
    */
-  public frontendControllerLogout(options?: any) {
+  public frontendControllerLogout(options?: AxiosRequestConfig) {
     return FrontendApiFp(this.configuration)
       .frontendControllerLogout(options)
       .then((request) => request(this.axios, this.basePath))
@@ -788,12 +1326,13 @@ export class FrontendApi extends BaseAPI implements FrontendApiInterface {
 
   /**
    *
+   * @summary Resets the users password.
    * @param {string} personId The id for the account.
    * @param {*} [options] Override http request option.
    * @throws {RequiredError}
    * @memberof FrontendApi
    */
-  public frontendControllerPasswordReset(personId: string, options?: any) {
+  public frontendControllerPasswordReset(personId: string, options?: AxiosRequestConfig) {
     return FrontendApiFp(this.configuration)
       .frontendControllerPasswordReset(personId, options)
       .then((request) => request(this.axios, this.basePath))
@@ -801,23 +1340,47 @@ export class FrontendApi extends BaseAPI implements FrontendApiInterface {
 
   /**
    *
+   * @summary Lists personen.
+   * @param {number} [offset] The offset of the paginated list.
+   * @param {number} [limit] The requested limit for the page size.
+   * @param {string} [referrer]
+   * @param {string} [familienname]
+   * @param {string} [vorname]
+   * @param {'ja' | 'nein'} [sichtfreigabe]
    * @param {*} [options] Override http request option.
    * @throws {RequiredError}
    * @memberof FrontendApi
    */
-  public frontendControllerPersons(options?: any) {
+  public frontendControllerPersons(
+    offset?: number,
+    limit?: number,
+    referrer?: string,
+    familienname?: string,
+    vorname?: string,
+    sichtfreigabe?: 'ja' | 'nein',
+    options?: AxiosRequestConfig
+  ) {
     return FrontendApiFp(this.configuration)
-      .frontendControllerPersons(options)
+      .frontendControllerPersons(
+        offset,
+        limit,
+        referrer,
+        familienname,
+        vorname,
+        sichtfreigabe,
+        options
+      )
       .then((request) => request(this.axios, this.basePath))
   }
 
   /**
    *
+   * @summary Providers the user has access to.
    * @param {*} [options] Override http request option.
    * @throws {RequiredError}
    * @memberof FrontendApi
    */
-  public frontendControllerProvider(options?: any) {
+  public frontendControllerProvider(options?: AxiosRequestConfig) {
     return FrontendApiFp(this.configuration)
       .frontendControllerProvider(options)
       .then((request) => request(this.axios, this.basePath))

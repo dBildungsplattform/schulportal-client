@@ -8,7 +8,7 @@
     "coverage": "vitest run --coverage",
     "dev": "vite",
     "format": "prettier --write src/",
-    "generate-client": "openapi-generator-cli generate --generator-key bff",
+    "generate-client": "openapi-generator-cli generate --generator-key bff --openapi-normalizer REFACTOR_ALLOF_WITH_PROPERTIES_ONLY=true",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
     "preview": "vite preview",
     "test": "vitest",
