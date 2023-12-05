@@ -63,7 +63,8 @@ export const usePersonStore: StoreDefinition<
     async getAllPersons() {
       this.loading = true
       try {
-        const { data }: { data: FrontendControllerPersons200Response } = await frontendApi.frontendControllerPersons()
+        const { data }: { data: FrontendControllerPersons200Response } =
+          await frontendApi.frontendControllerPersons()
         this.allPersons = data.items
         this.totalPersons = data.total
         this.loading = false

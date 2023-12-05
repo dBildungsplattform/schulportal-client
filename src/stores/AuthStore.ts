@@ -29,8 +29,11 @@ export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, 
         if (this.authInitialized) return
 
         try {
-          const loginInfoResponse = await frontendApi.frontendControllerInfo({ validateStatus: null })
-          this.isAuthed = loginInfoResponse.status >= 200 && loginInfoResponse.status < 400
+          const { status: loginStatus }: { status: number } =
+            await frontendApi.frontendControllerInfo({
+              validateStatus: null
+            })
+          this.isAuthed = loginStatus >= 200 && loginStatus < 400
         } catch {
           this.isAuthed = false
         }

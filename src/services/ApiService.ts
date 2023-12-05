@@ -17,7 +17,6 @@ axiosApiInstance.interceptors.response.use(
   async (error: unknown) => {
     if (error instanceof AxiosError && error.response?.status === HttpStatusCode.Unauthorized) {
       const route: RouteLocationNormalizedLoaded = router.currentRoute.value
-
       return `/api/frontend/login?redirectUrl=${route.fullPath}`
     }
 
