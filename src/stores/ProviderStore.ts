@@ -1,24 +1,35 @@
-import { defineStore } from 'pinia'
+import { defineStore, type Store, type StoreDefinition } from 'pinia'
+import { isAxiosError } from 'axios'
 import { FrontendApiFactory, type FrontendApiInterface } from '../api-client/generated/api'
 import axiosApiInstance from '@/services/ApiService'
 
 const frontendApi: FrontendApiInterface = FrontendApiFactory(undefined, '', axiosApiInstance)
 
-type Provider = {
+export type Provider = {
   id: string
   name: string
   url: string
 }
 
-type State = {
+type ProviderState = {
   allProviders: Provider[]
   errorCode: string
   loading: boolean
 }
 
-export const useProviderStore = defineStore({
+type ProviderGetters = {}
+type ProviderActions = { getAllProviders: () => Promise<void> }
+
+export type ProviderStore = Store<'providerStore', ProviderState, ProviderGetters, ProviderActions>
+
+export const useProviderStore: StoreDefinition<
+  'providerStore',
+  ProviderState,
+  ProviderGetters,
+  ProviderActions
+> = defineStore({
   id: 'providerStore',
-  state: (): State => {
+  state: (): ProviderState => {
     return {
       allProviders: [],
       errorCode: '',
@@ -29,11 +40,14 @@ export const useProviderStore = defineStore({
     async getAllProviders() {
       this.loading = true
       try {
-        const { data } = await frontendApi.frontendControllerProvider()
+        const { data }: { data: Provider[] } = await frontendApi.frontendControllerProvider()
         this.allProviders = data
         this.loading = false
-      } catch (error: any) {
-        this.errorCode = error.response.data.code || 'UNSPECIFIED_ERROR'
+      } catch (error: unknown) {
+        this.errorCode = 'UNSPECIFIED_ERROR'
+        if (isAxiosError(error)) {
+          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR'
+        }
         this.loading = false
       }
     }

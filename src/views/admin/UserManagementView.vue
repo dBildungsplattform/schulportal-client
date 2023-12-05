@@ -1,22 +1,22 @@
 <script setup lang="ts">
-  import { usePersonStore } from '@/stores/PersonStore'
-  import { onMounted, ref } from 'vue'
+  import { usePersonStore, type PersonStore } from '@/stores/PersonStore'
+  import { onMounted, type Ref, ref } from 'vue'
   import UserTable from '@/components/admin/UserTable.vue'
 
-  const personStore = usePersonStore()
+  const personStore: PersonStore = usePersonStore()
 
-  const password = ref('')
-  const errorCode = ref('')
+  const password: Ref<string> = ref('')
+  const errorCode: Ref<string> = ref('')
 
-  function resetPassword(userId: string) {
+  function resetPassword(userId: string): void {
     personStore
       .resetPassword(userId)
-      .then((newPassword) => {
+      .then((newPassword?: string) => {
         password.value = newPassword || ''
       })
-      .catch((error) => {
-        errorCode.value = error.message
-      }) || ''
+      .catch((error: string) => {
+        errorCode.value = error
+      })
   }
 
   onMounted(async () => {
@@ -35,7 +35,7 @@
       @onResetPassword="resetPassword"
       @onUpdateTable="personStore.getAllPersons()"
       :password="password"
-      :totalItems="personStore.allPersons.length"
+      :totalItems="personStore.totalPersons"
     ></UserTable>
   </div>
 </template>

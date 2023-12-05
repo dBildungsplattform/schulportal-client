@@ -1,8 +1,8 @@
 <script setup lang="ts">
-  import { useProviderStore } from '@/stores/ProviderStore'
+  import { useProviderStore, type ProviderStore } from '@/stores/ProviderStore'
   import ProviderCard from '@/components/cards/ProviderCard.vue'
 
-  const providerStore = useProviderStore()
+  const providerStore: ProviderStore = useProviderStore()
   providerStore.getAllProviders()
 </script>
 
