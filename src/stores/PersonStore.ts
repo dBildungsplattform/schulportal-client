@@ -1,6 +1,10 @@
 import { defineStore, type Store, type StoreDefinition } from 'pinia'
 import { isAxiosError } from 'axios'
-import { FrontendApiFactory, type FrontendApiInterface } from '../api-client/generated/api'
+import {
+  FrontendApiFactory,
+  type FrontendApiInterface,
+  type FrontendControllerPersons200Response
+} from '../api-client/generated/api'
 import axiosApiInstance from '@/services/ApiService'
 
 const frontendApi: FrontendApiInterface = FrontendApiFactory(undefined, '', axiosApiInstance)
@@ -35,13 +39,6 @@ type PersonActions = {
   resetPassword: (userId: string) => Promise<string>
 }
 
-type FrontendControllerPersons200Response = {
-  offset: number
-  limit: number
-  total: number
-  items: Array<Personendatensatz>
-}
-
 export type PersonStore = Store<'personStore', PersonState, PersonGetters, PersonActions>
 
 export const usePersonStore: StoreDefinition<
@@ -65,7 +62,7 @@ export const usePersonStore: StoreDefinition<
       try {
         const { data }: { data: FrontendControllerPersons200Response } =
           await frontendApi.frontendControllerPersons()
-        this.allPersons = data.items
+        this.allPersons = data.items || []
         this.totalPersons = data.total
         this.loading = false
       } catch (error: unknown) {
