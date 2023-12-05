@@ -100,6 +100,7 @@ jobs:
           fi
   release_helm:
     uses: dBildungsplattform/dbp-github-workflows/.github/workflows/chart-release.yaml@4.0.0
+
     needs: 
       - select_helm_version_generation_and_image_tag_generation
     secrets: inherit

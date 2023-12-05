@@ -1,9 +1,10 @@
 import { expect, test } from 'vitest'
-import { mount } from '@vue/test-utils'
+import { VueWrapper, mount } from '@vue/test-utils'
 import ProviderCard from '../../../../components/cards/ProviderCard.vue'
 
-const assign = window.location.assign
-let wrapper = null as any
+// eslint-disable-next-line @typescript-eslint/unbound-method
+const assign: (url: string | URL) => void = window.location.assign
+let wrapper: VueWrapper | null = null
 
 beforeAll(() => {
   Object.defineProperty(window, 'location', {
@@ -36,15 +37,16 @@ beforeEach(() => {
 
 describe('provider card', () => {
   test('it renders a provider card', () => {
-    expect(wrapper.get('[data-testid="test-provider-card"]')).not.toBeNull()
-    expect(wrapper.get('[data-testid="test-provider-card"]').text()).toContain(
+    expect(wrapper?.get('[data-testid="test-provider-card"]')).not.toBeNull()
+    expect(wrapper?.get('[data-testid="test-provider-card"]').text()).toContain(
       'My provider card brings all the boys to the yard'
     )
   })
 
   // TODO: investigate why spy is not called
   test.skip('it redirects to an external url', () => {
-    wrapper.get('[data-testid="test-provider-card"]').trigger('click')
+    wrapper?.get('[data-testid="test-provider-card"]').trigger('click')
+    // eslint-disable-next-line @typescript-eslint/unbound-method
     expect(window.location.assign).toHaveBeenCalledWith('https://de.wikipedia.org/wiki/Milchshake')
   })
 })

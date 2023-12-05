@@ -1,8 +1,8 @@
 import { expect, test } from 'vitest'
-import { mount } from '@vue/test-utils'
+import { VueWrapper, mount } from '@vue/test-utils'
 import UserTable from '../../../components/admin/UserTable.vue'
 
-let wrapper = null as any
+let wrapper: VueWrapper | null = null
 
 beforeEach(() => {
   document.body.innerHTML = `
@@ -30,6 +30,6 @@ beforeEach(() => {
 
 describe('user table', () => {
   test('it renders a user table', () => {
-    expect(wrapper.get('[data-testid="user-table"]')).not.toBeNull()
+    expect(wrapper?.get('[data-testid="user-table"]')).not.toBeNull()
   })
 })

@@ -1,5 +1,8 @@
 <script setup lang="ts">
   import { ref, type Ref } from 'vue'
+  import { type Composer, useI18n } from 'vue-i18n'
+
+  const { t }: Composer = useI18n({ useScope: 'global' })
 
   type Person = {
     id: string
@@ -15,23 +18,30 @@
     password: string
   }>()
 
-  const passwordCopied = ref(false)
-  const showPassword = ref(false)
-  const errorMessage = ref('')
-  const emit = defineEmits(['onClearPassword', 'onResetPassword'])
+  const passwordCopied: Ref<boolean> = ref(false)
+  const showPassword: Ref<boolean> = ref(false)
+  const errorMessage: Ref<string> = ref('')
+  const copyToClipboardError: Ref<string> = ref('')
+  const emit: (event: 'onClearPassword' | 'onResetPassword') => void = defineEmits([
+    'onClearPassword',
+    'onResetPassword'
+  ])
 
-  function copyToClipboard(text: string) {
+  function copyToClipboard(text: string): void {
     navigator.clipboard.writeText(text).then(
       () => {
         passwordCopied.value = true
+        copyToClipboardError.value = ''
       },
-      (error) => {
-        errorMessage.value = error
+      (error: unknown) => {
+        // eslint-disable-next-line no-console
+        console.log(error)
+        copyToClipboardError.value = t('admin.user.copyPasswordError')
       }
     )
   }
 
-  async function closeUserEditDialog(isActive: Ref<boolean>) {
+  async function closeUserEditDialog(isActive: Ref<boolean>): Promise<void> {
     isActive.value = false
     showPassword.value = false
     emit('onClearPassword')
@@ -131,6 +141,7 @@
                 readonly
                 :type="showPassword ? 'text' : 'password'"
                 :value="password"
+                :error-messages="copyToClipboardError"
               ></v-text-field>
             </v-col>
           </v-row>
