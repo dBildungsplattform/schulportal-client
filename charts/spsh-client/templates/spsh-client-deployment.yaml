@@ -4,6 +4,8 @@ metadata:
   name: spsh-client
   labels:
     app: spsh-client
+    app.kubernetes.io/name: {{.Chart.Name}}
+    app.kubernetes.io/version: {{.Chart.Version}}
 spec:
   replicas: 1
   selector:
