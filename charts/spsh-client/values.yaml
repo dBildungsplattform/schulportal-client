@@ -1,2 +1,1 @@
 spshClientImage: "ghcr.io/dbildungsplattform/schulportal-client:latest"
-frontendHostname: "helm.dev.spsh.dbildungsplattform.de"

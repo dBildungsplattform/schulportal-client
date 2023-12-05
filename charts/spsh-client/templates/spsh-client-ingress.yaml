@@ -8,7 +8,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: {{.Values.frontendHostname}}
+    - host: {{required "A frontend hostname (frontendHostname) must be given on deployment" .Values.frontendHostname}}
       http:
         paths:
           - path: /
