@@ -8,7 +8,7 @@
         "bff": {
           "generatorName": "typescript-axios",
           "output": "#{cwd}/src/api-client/generated",
-          "inputSpec": "#{cwd}/openapispec.json",
+          "inputSpec": "#{cwd}/src/api-client/openapispec.json",
           "additionalProperties": {
             "supportsES6": "true",
             "npmVersion": "6.9.0",
