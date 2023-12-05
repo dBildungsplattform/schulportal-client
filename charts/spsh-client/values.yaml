@@ -1,1 +1,3 @@
-spshClientImage: "ghcr.io/dbildungsplattform/schulportal-client:latest"
+image:
+  repository: ghcr.io/dbildungsplattform/schulportal-client
+  tag: ""
