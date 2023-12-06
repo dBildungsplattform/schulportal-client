@@ -43,7 +43,16 @@ docker compose up -d
 
 ```
 
-### Package (Create Docker Image )
-If you push a tag upstream a container will be created for you. (Check Github under Packages)
+### Package (Automatisch erzeugtes Image)
+Bei jedem Push wird ein Image im Github angelegt
 
 ghcr.io/dbildungsplattform/schulportal-client:*tag*
+
+### Backend laufen lassen
+Falls ihr nicht am Backend entwickelt aber es dennoch braucht tut bitte folgendes:
+
+1. dbiam-server auschecken (https://github.com/dBildungsplattform/dbildungs-iam-server)
+2. Im Server findet ihr ein compose file. Wenn ihr es ohne profile ausführt, bekommt ihr lediglich Keycloak/Redis/Datenbank
+3. Führt ihr jedoch mit Profil "full-backend" aus (docker compose up --profile full-backend) wird für euch auch das Backend/BFF gestartet und ausgeführt
+
+Resultat: Das BFF hört auf localhost:9091
