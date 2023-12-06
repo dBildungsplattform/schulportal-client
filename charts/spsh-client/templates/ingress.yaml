@@ -15,4 +15,3 @@ spec:
                 name: spsh-client-service
                 port:
                   number: 80
-                
