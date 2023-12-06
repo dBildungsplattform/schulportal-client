@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import { usePersonStore, type PersonStore } from '@/stores/PersonStore'
-  import { onMounted, Ref, ref } from 'vue'
+  import { onMounted, type Ref, ref } from 'vue'
   import UserTable from '@/components/admin/UserTable.vue'
 
   const personStore: PersonStore = usePersonStore()
@@ -26,7 +26,7 @@
 
 <template>
   <div class="admin">
-    <h2>{{ $t('admin.user.management') }}</h2>
+    <h1 class="text-center headline">{{ $t('admin.headline') }}</h1>
     <UserTable
       :errorCode="errorCode"
       :items="personStore.allPersons || []"

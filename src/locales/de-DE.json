@@ -1,6 +1,7 @@
 {
   "action": "Aktion",
   "admin": {
+    "headline": "Administrationsbereich",
     "user": {
       "copyPasswordError": "Passwort konnte nicht in die Zwischzenablage kopiert werden",
       "management": "Benutzerverwaltung",
@@ -35,6 +36,9 @@
     "logout": "Abmelden"
   },
   "user": {
-    "name": "Name"
+    "email": "E-Mail",
+    "firstName": "Vorname",
+    "lastName": "Nachname",
+    "userName": "Benutzername"
   }
 }

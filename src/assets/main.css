@@ -1,7 +1,25 @@
 @import './base.css';
+@import './user-table.css';
 
 #app {
   font-weight: normal;
+}
+
+.card-headline {
+  font-size: 25px;
+  font-weight: bold;
+  margin-left: 23px;
+  margin-top: 6px;
+}
+
+.headline {
+  font-size: 30px;
+  font-weight: bold;
+}
+
+.layout-card {
+  box-shadow: 0px 3px 6px #001E4980;
+border-radius: 5px;
 }
 
 .v-field--variant-outlined .v-field__outline {
@@ -17,3 +35,4 @@ p {
   /* text-wrap needs to be placed after white-space to overwrite wrapping behaviour */
   text-wrap: pretty;
 }
+
