@@ -9,7 +9,7 @@ import axiosApiInstance from '@/services/ApiService'
 
 const frontendApi: FrontendApiInterface = FrontendApiFactory(undefined, '', axiosApiInstance)
 
-export type Person = {
+type Person = {
   id: string
   name: {
     familienname: string

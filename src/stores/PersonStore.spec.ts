@@ -1,5 +1,8 @@
-import type { FrontendControllerPersons200Response, PersonendatensatzResponse } from '@/api-client/generated'
-import { usePersonStore, type PersonStore, type Person } from './PersonStore'
+import type {
+  FrontendControllerPersons200Response,
+  PersonendatensatzResponse
+} from '@/api-client/generated'
+import { usePersonStore, type PersonStore } from './PersonStore'
 import ApiService from '@/services/ApiService'
 import MockAdapter from 'axios-mock-adapter'
 import { setActivePinia, createPinia } from 'pinia'
@@ -48,7 +51,7 @@ describe('PersonStore', () => {
         limit: 2,
         total: 2,
         items: mockPersons
-      };
+      }
 
       mockadapter.onGet('/api/frontend/personen').replyOnce(200, mockResponse)
       const getAllPersonPromise: Promise<void> = personStore.getAllPersons()
