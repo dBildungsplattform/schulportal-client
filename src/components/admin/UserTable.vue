@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import PasswordReset from '@/components/admin/PasswordReset.vue'
-  import { Composer, useI18n } from 'vue-i18n'
-  import { Person } from '@/stores/PersonStore'
+  import { type Composer, useI18n } from 'vue-i18n'
+  import { type Personendatensatz } from '@/stores/PersonStore'
 
   /* this block is necessary to introduce a table header type for defining table headers
       watch source for updates: https://stackoverflow.com/a/75993081/4790594
@@ -11,7 +11,7 @@
 
   defineProps<{
     errorCode: string
-    items: Person[]
+    items: Personendatensatz[]
     loading: boolean
     password: string
     totalItems: number

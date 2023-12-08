@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import { usePersonStore, type PersonStore } from '@/stores/PersonStore'
-  import { onMounted, Ref, ref } from 'vue'
+  import { onMounted, type Ref, ref } from 'vue'
   import UserTable from '@/components/admin/UserTable.vue'
 
   const personStore: PersonStore = usePersonStore()
@@ -35,7 +35,7 @@
       @onResetPassword="resetPassword"
       @onUpdateTable="personStore.getAllPersons()"
       :password="password"
-      :totalItems="personStore.allPersons.length"
+      :totalItems="personStore.totalPersons"
     ></UserTable>
   </div>
 </template>
