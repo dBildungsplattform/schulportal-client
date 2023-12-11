@@ -23,12 +23,8 @@
   const headers: ReadonlyHeaders = [
     { title: t('user.lastName'), key: 'person.name.familienname', align: 'start' },
     { title: t('user.firstName'), key: 'person.name.vorname', align: 'start' },
-    { title: t('user.userName'), key: 'person.username', align: 'start' },
-    { title: t('user.email'), key: 'person.email', align: 'start' },
     { title: t('action'), key: 'actions', sortable: false }
   ]
-
-  const selected: Array<Person> = []
 </script>
 
 <template>
@@ -43,9 +39,9 @@
       :items="items"
       :items-length="totalItems"
       item-value="person.id"
-      @update:options="$emit('onTableUpdate')"
+      select-strategy="page"
       show-select
-      v-model="selected"
+      @update:options="$emit('onTableUpdate')"
     >
       <template #[`item.actions`]="{ item }">
         <PasswordReset
