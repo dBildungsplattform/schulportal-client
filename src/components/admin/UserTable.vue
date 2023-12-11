@@ -2,7 +2,7 @@
   import LayoutCard from '@/components/cards/LayoutCard.vue'
   import PasswordReset from '@/components/admin/PasswordReset.vue'
   import { type Composer, useI18n } from 'vue-i18n'
-  import type { Person } from '@/stores/PersonStore';
+  import type { Person } from '@/stores/PersonStore'
 
   /* this block is necessary to introduce a table header type for defining table headers
       watch source for updates: https://stackoverflow.com/a/75993081/4790594
@@ -28,9 +28,7 @@
 </script>
 
 <template>
-  <LayoutCard
-    :header="$t('admin.user.management')"  
-  >
+  <LayoutCard :header="$t('admin.user.management')">
     <v-data-table-server
       class="user-table"
       data-testid="user-table"

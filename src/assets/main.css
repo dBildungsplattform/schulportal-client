@@ -18,8 +18,8 @@
 }
 
 .layout-card {
-  box-shadow: 0px 3px 6px #001E4980;
-border-radius: 5px;
+  box-shadow: 0px 3px 6px #001e4980;
+  border-radius: 5px;
 }
 
 .v-field--variant-outlined .v-field__outline {
@@ -35,4 +35,3 @@ p {
   /* text-wrap needs to be placed after white-space to overwrite wrapping behaviour */
   text-wrap: pretty;
 }
-
