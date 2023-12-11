@@ -21,7 +21,7 @@ import globalAxios from 'axios';
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from './common';
 import type { RequestArgs } from './base';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError, operationServerMap } from './base';
+import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError } from './base';
 
 /**
  * 
@@ -142,6 +142,19 @@ export interface FrontendControllerPersons200Response {
      * 
      * @type {Array<PersonendatensatzResponse>}
      * @memberof FrontendControllerPersons200Response
+     */
+    'items'?: Array<PersonendatensatzResponse>;
+}
+/**
+ * 
+ * @export
+ * @interface FrontendControllerPersons200ResponseAllOf
+ */
+export interface FrontendControllerPersons200ResponseAllOf {
+    /**
+     * 
+     * @type {Array<PersonendatensatzResponse>}
+     * @memberof FrontendControllerPersons200ResponseAllOf
      */
     'items'?: Array<PersonendatensatzResponse>;
 }
@@ -755,14 +768,14 @@ export const FrontendApiAxiosParamCreator = function (configuration?: Configurat
          * @summary Lists personen.
          * @param {number} [offset] The offset of the paginated list.
          * @param {number} [limit] The requested limit for the page size.
-         * @param {string | null} [referrer] 
-         * @param {string | null} [familienname] 
-         * @param {string | null} [vorname] 
-         * @param {FrontendControllerPersonsSichtfreigabeEnum} [sichtfreigabe] 
+         * @param {string} [referrer] 
+         * @param {string} [familienname] 
+         * @param {string} [vorname] 
+         * @param {'ja' | 'nein'} [sichtfreigabe] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        frontendControllerPersons: async (offset?: number, limit?: number, referrer?: string | null, familienname?: string | null, vorname?: string | null, sichtfreigabe?: FrontendControllerPersonsSichtfreigabeEnum, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        frontendControllerPersons: async (offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/frontend/personen`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -859,9 +872,7 @@ export const FrontendApiFp = function(configuration?: Configuration) {
          */
         async frontendControllerCreatePerson(createPersonBodyParams: CreatePersonBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonendatensatzResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.frontendControllerCreatePerson(createPersonBodyParams, options);
-            const index = configuration?.serverIndex ?? 0;
-            const operationBasePath = operationServerMap['FrontendApi.frontendControllerCreatePerson']?.[index]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, operationBasePath || basePath);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
          * 
@@ -871,9 +882,7 @@ export const FrontendApiFp = function(configuration?: Configuration) {
          */
         async frontendControllerInfo(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UserinfoResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.frontendControllerInfo(options);
-            const index = configuration?.serverIndex ?? 0;
-            const operationBasePath = operationServerMap['FrontendApi.frontendControllerInfo']?.[index]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, operationBasePath || basePath);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
          * 
@@ -884,9 +893,7 @@ export const FrontendApiFp = function(configuration?: Configuration) {
          */
         async frontendControllerLogin(redirectUrl?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.frontendControllerLogin(redirectUrl, options);
-            const index = configuration?.serverIndex ?? 0;
-            const operationBasePath = operationServerMap['FrontendApi.frontendControllerLogin']?.[index]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, operationBasePath || basePath);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
          * 
@@ -896,9 +903,7 @@ export const FrontendApiFp = function(configuration?: Configuration) {
          */
         async frontendControllerLogout(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.frontendControllerLogout(options);
-            const index = configuration?.serverIndex ?? 0;
-            const operationBasePath = operationServerMap['FrontendApi.frontendControllerLogout']?.[index]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, operationBasePath || basePath);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
          * 
@@ -909,27 +914,23 @@ export const FrontendApiFp = function(configuration?: Configuration) {
          */
         async frontendControllerPasswordReset(personId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.frontendControllerPasswordReset(personId, options);
-            const index = configuration?.serverIndex ?? 0;
-            const operationBasePath = operationServerMap['FrontendApi.frontendControllerPasswordReset']?.[index]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, operationBasePath || basePath);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
          * 
          * @summary Lists personen.
          * @param {number} [offset] The offset of the paginated list.
          * @param {number} [limit] The requested limit for the page size.
-         * @param {string | null} [referrer] 
-         * @param {string | null} [familienname] 
-         * @param {string | null} [vorname] 
-         * @param {FrontendControllerPersonsSichtfreigabeEnum} [sichtfreigabe] 
+         * @param {string} [referrer] 
+         * @param {string} [familienname] 
+         * @param {string} [vorname] 
+         * @param {'ja' | 'nein'} [sichtfreigabe] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async frontendControllerPersons(offset?: number, limit?: number, referrer?: string | null, familienname?: string | null, vorname?: string | null, sichtfreigabe?: FrontendControllerPersonsSichtfreigabeEnum, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<FrontendControllerPersons200Response>> {
+        async frontendControllerPersons(offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<FrontendControllerPersons200Response>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.frontendControllerPersons(offset, limit, referrer, familienname, vorname, sichtfreigabe, options);
-            const index = configuration?.serverIndex ?? 0;
-            const operationBasePath = operationServerMap['FrontendApi.frontendControllerPersons']?.[index]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, operationBasePath || basePath);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
          * 
@@ -939,9 +940,7 @@ export const FrontendApiFp = function(configuration?: Configuration) {
          */
         async frontendControllerProvider(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<ServiceProviderInfoResponse>>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.frontendControllerProvider(options);
-            const index = configuration?.serverIndex ?? 0;
-            const operationBasePath = operationServerMap['FrontendApi.frontendControllerProvider']?.[index]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, operationBasePath || basePath);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
 };
@@ -1006,14 +1005,14 @@ export const FrontendApiFactory = function (configuration?: Configuration, baseP
          * @summary Lists personen.
          * @param {number} [offset] The offset of the paginated list.
          * @param {number} [limit] The requested limit for the page size.
-         * @param {string | null} [referrer] 
-         * @param {string | null} [familienname] 
-         * @param {string | null} [vorname] 
-         * @param {FrontendControllerPersonsSichtfreigabeEnum} [sichtfreigabe] 
+         * @param {string} [referrer] 
+         * @param {string} [familienname] 
+         * @param {string} [vorname] 
+         * @param {'ja' | 'nein'} [sichtfreigabe] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        frontendControllerPersons(offset?: number, limit?: number, referrer?: string | null, familienname?: string | null, vorname?: string | null, sichtfreigabe?: FrontendControllerPersonsSichtfreigabeEnum, options?: any): AxiosPromise<FrontendControllerPersons200Response> {
+        frontendControllerPersons(offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', options?: any): AxiosPromise<FrontendControllerPersons200Response> {
             return localVarFp.frontendControllerPersons(offset, limit, referrer, familienname, vorname, sichtfreigabe, options).then((request) => request(axios, basePath));
         },
         /**
@@ -1087,15 +1086,15 @@ export interface FrontendApiInterface {
      * @summary Lists personen.
      * @param {number} [offset] The offset of the paginated list.
      * @param {number} [limit] The requested limit for the page size.
-     * @param {string | null} [referrer] 
-     * @param {string | null} [familienname] 
-     * @param {string | null} [vorname] 
-     * @param {FrontendControllerPersonsSichtfreigabeEnum} [sichtfreigabe] 
+     * @param {string} [referrer] 
+     * @param {string} [familienname] 
+     * @param {string} [vorname] 
+     * @param {'ja' | 'nein'} [sichtfreigabe] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof FrontendApiInterface
      */
-    frontendControllerPersons(offset?: number, limit?: number, referrer?: string | null, familienname?: string | null, vorname?: string | null, sichtfreigabe?: FrontendControllerPersonsSichtfreigabeEnum, options?: AxiosRequestConfig): AxiosPromise<FrontendControllerPersons200Response>;
+    frontendControllerPersons(offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', options?: AxiosRequestConfig): AxiosPromise<FrontendControllerPersons200Response>;
 
     /**
      * 
@@ -1178,15 +1177,15 @@ export class FrontendApi extends BaseAPI implements FrontendApiInterface {
      * @summary Lists personen.
      * @param {number} [offset] The offset of the paginated list.
      * @param {number} [limit] The requested limit for the page size.
-     * @param {string | null} [referrer] 
-     * @param {string | null} [familienname] 
-     * @param {string | null} [vorname] 
-     * @param {FrontendControllerPersonsSichtfreigabeEnum} [sichtfreigabe] 
+     * @param {string} [referrer] 
+     * @param {string} [familienname] 
+     * @param {string} [vorname] 
+     * @param {'ja' | 'nein'} [sichtfreigabe] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof FrontendApi
      */
-    public frontendControllerPersons(offset?: number, limit?: number, referrer?: string | null, familienname?: string | null, vorname?: string | null, sichtfreigabe?: FrontendControllerPersonsSichtfreigabeEnum, options?: AxiosRequestConfig) {
+    public frontendControllerPersons(offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', options?: AxiosRequestConfig) {
         return FrontendApiFp(this.configuration).frontendControllerPersons(offset, limit, referrer, familienname, vorname, sichtfreigabe, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -1201,14 +1200,5 @@ export class FrontendApi extends BaseAPI implements FrontendApiInterface {
         return FrontendApiFp(this.configuration).frontendControllerProvider(options).then((request) => request(this.axios, this.basePath));
     }
 }
-
-/**
- * @export
- */
-export const FrontendControllerPersonsSichtfreigabeEnum = {
-    Ja: 'ja',
-    Nein: 'nein'
-} as const;
-export type FrontendControllerPersonsSichtfreigabeEnum = typeof FrontendControllerPersonsSichtfreigabeEnum[keyof typeof FrontendControllerPersonsSichtfreigabeEnum];
 
 
