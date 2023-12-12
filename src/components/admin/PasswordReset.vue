@@ -1,16 +1,9 @@
 <script setup lang="ts">
   import { ref, type Ref } from 'vue'
+  import { type Person } from '@/stores/PersonStore'
   import { type Composer, useI18n } from 'vue-i18n'
 
   const { t }: Composer = useI18n({ useScope: 'global' })
-
-  type Person = {
-    id: string
-    name: {
-      familienname: string
-      vorname: string
-    }
-  }
 
   defineProps<{
     errorCode: string
@@ -55,14 +48,13 @@
     width="50%"
   >
     <template v-slot:activator="{ props }">
-      <v-icon
-        class="me-2"
+      <v-btn
+        class="primary button"
         data-testid="open-password-reset-dialog-icon"
-        icon="mdi-key-variant"
-        size="small"
         v-bind="props"
       >
-      </v-icon>
+        {{ $t("admin.user.changePassword") }}
+      </v-btn>
     </template>
 
     <template v-slot:default="{ isActive }">
@@ -78,10 +70,10 @@
                 tag="p"
               >
                 <template v-slot:firstname>
-                  <b>{{ person.name.vorname }}</b>
+                  <b>{{ person.person.name.vorname }}</b>
                 </template>
                 <template v-slot:lastname>
-                  <b>{{ person.name.familienname }}</b>
+                  <b>{{ person.person.name.familienname }}</b>
                 </template>
               </i18n-t>
             </v-col>
@@ -122,7 +114,7 @@
             >
               <v-btn
                 @click.stop="$emit('onResetPassword', person.id)"
-                class="primary"
+                class="primary button"
                 data-testid="password-reset-button"
                 :disabled="!!password"
                 >{{ $t('admin.user.resetPassword') }}</v-btn
@@ -150,7 +142,7 @@
           <v-btn
             block
             @click.stop="closeUserEditDialog(isActive)"
-            class="secondary"
+            class="secondary button"
             data-testid="close-user-edit-dialog-button"
             >{{ !!password ? $t('close') : $t('cancel') }}</v-btn
           >

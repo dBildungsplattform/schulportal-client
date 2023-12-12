@@ -21,7 +21,8 @@ type PersonState = {
 type PersonGetters = {}
 type PersonActions = {
   getAllPersons: () => Promise<void>
-  resetPassword: (userId: string) => Promise<string>
+  getPersonById: (personId: string) => Promise<Person>
+  resetPassword: (personId: string) => Promise<string>
 }
 
 export type PersonStore = Store<'personStore', PersonState, PersonGetters, PersonActions>
@@ -56,10 +57,27 @@ export const usePersonStore: StoreDefinition<
       }
     },
 
-    async resetPassword(userId: string): Promise<string> {
+    async getPersonById(personId: string) {
       this.loading = true
       try {
-        const { data }: { data: string } = await ApiService.patch(`/personen/${userId}/password`)
+        await this.getAllPersons()
+        const currentPerson: Person = this.allPersons.find((person: Person) => person.person.id = personId)
+        this.loading = false
+        return currentPerson
+      } catch (error) {
+        this.errorCode = 'UNSPECIFIED_ERROR'
+        if (isAxiosError(error)) {
+          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR'
+        }
+        this.loading = false
+        return
+      }
+    },
+
+    async resetPassword(personId: string): Promise<string> {
+      this.loading = true
+      try {
+        const { data }: { data: string } = await ApiService.patch(`/personen/${personId}/password`)
         this.loading = false
         return data
       } catch (error: unknown) {
