@@ -1,4 +1,8 @@
-import { usePersonStore, type PersonStore, type Person } from './PersonStore'
+import type {
+  FrontendControllerPersons200Response,
+  PersonendatensatzResponse
+} from '@/api-client/generated'
+import { usePersonStore, type PersonStore } from './PersonStore'
 import ApiService from '@/services/ApiService'
 import MockAdapter from 'axios-mock-adapter'
 import { setActivePinia, createPinia } from 'pinia'
@@ -21,7 +25,7 @@ describe('PersonStore', () => {
 
   describe('getAllPersons', () => {
     it('should load Persons and update state', async () => {
-      const mockResponse: Person[] = [
+      const mockPersons: PersonendatensatzResponse[] = [
         {
           person: {
             id: '1234',
@@ -40,18 +44,25 @@ describe('PersonStore', () => {
             }
           }
         }
-      ]
+      ] as PersonendatensatzResponse[]
 
-      mockadapter.onGet('/personen').replyOnce(200, mockResponse)
+      const mockResponse: FrontendControllerPersons200Response = {
+        offset: 0,
+        limit: 2,
+        total: 2,
+        items: mockPersons
+      }
+
+      mockadapter.onGet('/api/frontend/personen').replyOnce(200, mockResponse)
       const getAllPersonPromise: Promise<void> = personStore.getAllPersons()
       expect(personStore.loading).toBe(true)
       await getAllPersonPromise
-      expect(personStore.allPersons).toEqual([...mockResponse])
+      expect(personStore.allPersons).toEqual([...mockPersons])
       expect(personStore.loading).toBe(false)
     })
 
     it('should handle string error', async () => {
-      mockadapter.onGet('/personen').replyOnce(500, 'some mock server error')
+      mockadapter.onGet('/api/frontend/personen').replyOnce(500, 'some mock server error')
       const getAllPersonPromise: Promise<void> = personStore.getAllPersons()
       expect(personStore.loading).toBe(true)
       await getAllPersonPromise
@@ -61,7 +72,7 @@ describe('PersonStore', () => {
     })
 
     it('should handle error code', async () => {
-      mockadapter.onGet('/personen').replyOnce(500, { code: 'some mock server error' })
+      mockadapter.onGet('/api/frontend/personen').replyOnce(500, { code: 'some mock server error' })
       const getAllPersonPromise: Promise<void> = personStore.getAllPersons()
       expect(personStore.loading).toBe(true)
       await getAllPersonPromise
@@ -72,11 +83,11 @@ describe('PersonStore', () => {
   })
 
   describe('resetPassword', () => {
-    it('should load Persons and update state', async () => {
+    it('should reset and return password', async () => {
       const userId: string = '2345'
       const mockResponse: string = 'fakePassword'
 
-      mockadapter.onPatch(`/personen/${userId}/password`).replyOnce(200, mockResponse)
+      mockadapter.onPatch(`/api/frontend/personen/${userId}/password`).replyOnce(200, mockResponse)
       const resetPasswordPromise: Promise<string> = personStore.resetPassword(userId)
       expect(personStore.loading).toBe(true)
       const generatedPassword: string = await resetPasswordPromise
@@ -87,7 +98,7 @@ describe('PersonStore', () => {
     it('should handle string error', async () => {
       const userId: string = '2345'
 
-      mockadapter.onPatch(`/personen/${userId}/password`).replyOnce(500, 'some error')
+      mockadapter.onPatch(`/api/frontend/personen/${userId}/password`).replyOnce(500, 'some error')
       const resetPasswordPromise: Promise<string> = personStore.resetPassword(userId)
       expect(personStore.loading).toBe(true)
       await resetPasswordPromise
@@ -100,7 +111,7 @@ describe('PersonStore', () => {
       const userId: string = '2345'
 
       mockadapter
-        .onPatch(`/personen/${userId}/password`)
+        .onPatch(`/api/frontend/personen/${userId}/password`)
         .replyOnce(500, { code: 'some mock server error' })
       const resetPasswordPromise: Promise<string> = personStore.resetPassword(userId)
       expect(personStore.loading).toBe(true)

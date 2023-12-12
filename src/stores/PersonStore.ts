@@ -1,21 +1,36 @@
 import { defineStore, type Store, type StoreDefinition } from 'pinia'
-import ApiService from '@/services/ApiService'
 import { isAxiosError } from 'axios'
+import {
+  FrontendApiFactory,
+  type FrontendApiInterface,
+  type FrontendControllerPersons200Response
+} from '../api-client/generated/api'
+import axiosApiInstance from '@/services/ApiService'
 
-export type Person = {
-  person: {
-    id: string
-    name: {
-      familienname: string
-      vorname: string
-    }
+const frontendApi: FrontendApiInterface = FrontendApiFactory(undefined, '', axiosApiInstance)
+
+type Person = {
+  id: string
+  name: {
+    familienname: string
+    vorname: string
   }
 }
 
+type Personenkontext = {
+  id: string
+}
+
+export type Personendatensatz = {
+  person: Person
+  personenkontexte: Array<Personenkontext>
+}
+
 type PersonState = {
-  allPersons: Person[]
+  allPersons: Array<Personendatensatz>
   errorCode: string
   loading: boolean
+  totalPersons: number
 }
 
 type PersonGetters = {}
@@ -37,15 +52,18 @@ export const usePersonStore: StoreDefinition<
     return {
       allPersons: [],
       errorCode: '',
-      loading: false
+      loading: false,
+      totalPersons: 0
     }
   },
   actions: {
     async getAllPersons() {
       this.loading = true
       try {
-        const { data }: { data: Person[] } = await ApiService.get('/personen')
-        this.allPersons = data
+        const { data }: { data: FrontendControllerPersons200Response } =
+          await frontendApi.frontendControllerPersons()
+        this.allPersons = data.items || []
+        this.totalPersons = data.total
         this.loading = false
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR'
@@ -59,7 +77,7 @@ export const usePersonStore: StoreDefinition<
     async resetPassword(userId: string): Promise<string> {
       this.loading = true
       try {
-        const { data }: { data: string } = await ApiService.patch(`/personen/${userId}/password`)
+        const { data }: { data: string } = await frontendApi.frontendControllerPasswordReset(userId)
         this.loading = false
         return data
       } catch (error: unknown) {

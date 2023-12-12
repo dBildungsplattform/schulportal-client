@@ -35,7 +35,7 @@
       @onResetPassword="resetPassword"
       @onUpdateTable="personStore.getAllPersons()"
       :password="password"
-      :totalItems="personStore.allPersons.length"
+      :totalItems="personStore.totalPersons"
     ></UserTable>
   </div>
 </template>

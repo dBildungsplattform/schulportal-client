@@ -18,7 +18,7 @@ router.beforeEach(async (to: RouteLocationNormalized /*, from */) => {
   await auth.initializeAuthStatus()
 
   if (to.meta['requiresAuth'] && !auth.isAuthed) {
-    auth.login(to.fullPath)
+    window.location.href = `/api/frontend/login?redirectUrl=${to.fullPath}`
   }
 })
 
