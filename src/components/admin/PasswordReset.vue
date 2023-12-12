@@ -2,6 +2,7 @@
   import { ref, type Ref } from 'vue'
   import { type Person } from '@/stores/PersonStore'
   import { type Composer, useI18n } from 'vue-i18n'
+  import LayoutCard from '@/components/cards/LayoutCard.vue'
 
   const { t }: Composer = useI18n({ useScope: 'global' })
 
@@ -58,7 +59,7 @@
     </template>
 
     <template v-slot:default="{ isActive }">
-      <v-card class="pa-6">
+      <LayoutCard :header="$t('admin.user.resetPassword')">
         <v-card-text>
           <v-row>
             <v-col cols="12">
@@ -112,13 +113,6 @@
               class="text-center"
               cols="12"
             >
-              <v-btn
-                @click.stop="$emit('onResetPassword', person.id)"
-                class="primary button"
-                data-testid="password-reset-button"
-                :disabled="!!password"
-                >{{ $t('admin.user.resetPassword') }}</v-btn
-              >
             </v-col>
             <v-col cols="12">
               <v-text-field
@@ -138,16 +132,24 @@
             </v-col>
           </v-row>
         </v-card-text>
-        <v-card-actions>
+        <v-card-actions class="justify-center">
           <v-btn
-            block
             @click.stop="closeUserEditDialog(isActive)"
             class="secondary button"
-            data-testid="close-user-edit-dialog-button"
-            >{{ !!password ? $t('close') : $t('cancel') }}</v-btn
+            data-testid="close-password-reset-dialog-button"
           >
+            {{ !!password ? $t('close') : $t('cancel') }}
+          </v-btn>
+          <v-btn
+            @click.stop="$emit('onResetPassword', person.id)"
+            class="primary button"
+            data-testid="password-reset-button"
+            :disabled="!!password"
+          >
+            {{ $t('admin.user.resetPassword') }}
+          </v-btn>
         </v-card-actions>
-      </v-card>
+      </LayoutCard>
     </template>
   </v-dialog>
 </template>
