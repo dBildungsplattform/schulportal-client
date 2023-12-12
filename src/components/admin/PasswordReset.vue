@@ -102,7 +102,9 @@
               </p>
             </v-col>
           </v-row>
-          <v-row class="text-caption text-error">
+          <v-row
+              v-if="!errorMessage && !errorCode"
+              class="text-caption text-error">
             <v-col
               class="text-right"
               cols="1"
@@ -124,7 +126,7 @@
                 @click.stop="$emit('onResetPassword', person.id)"
                 class="primary"
                 data-testid="password-reset-button"
-                :disabled="!!password"
+                :disabled="!!password || !!errorMessage || !!errorCode"
                 >{{ $t('admin.user.resetPassword') }}</v-btn
               >
             </v-col>
