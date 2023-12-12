@@ -6,6 +6,7 @@ import { usePersonStore, type PersonStore } from './PersonStore'
 import ApiService from '@/services/ApiService'
 import MockAdapter from 'axios-mock-adapter'
 import { setActivePinia, createPinia } from 'pinia'
+import { rejects } from 'assert'
 
 const mockadapter: MockAdapter = new MockAdapter(ApiService)
 
@@ -101,7 +102,7 @@ describe('PersonStore', () => {
       mockadapter.onPatch(`/api/frontend/personen/${userId}/password`).replyOnce(500, 'some error')
       const resetPasswordPromise: Promise<string> = personStore.resetPassword(userId)
       expect(personStore.loading).toBe(true)
-      await resetPasswordPromise
+      await rejects(resetPasswordPromise)
       expect(personStore.allPersons).toEqual([])
       expect(personStore.errorCode).toEqual('UNSPECIFIED_ERROR')
       expect(personStore.loading).toBe(false)
@@ -115,7 +116,7 @@ describe('PersonStore', () => {
         .replyOnce(500, { code: 'some mock server error' })
       const resetPasswordPromise: Promise<string> = personStore.resetPassword(userId)
       expect(personStore.loading).toBe(true)
-      await resetPasswordPromise
+      await rejects(resetPasswordPromise)
       expect(personStore.allPersons).toEqual([])
       expect(personStore.errorCode).toEqual('some mock server error')
       expect(personStore.loading).toBe(false)
