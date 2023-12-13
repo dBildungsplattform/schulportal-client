@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import LayoutCard from '@/components/cards/LayoutCard.vue'
   import { type Composer, useI18n } from 'vue-i18n'
-  import { type Person } from '@/stores/PersonStore'
+  import { type Personendatensatz } from '@/stores/PersonStore'
   import router from '@/router'
 
   /* this block is necessary to introduce a table header type for defining table headers
@@ -11,7 +11,7 @@
   type ReadonlyHeaders = InstanceType<typeof VDataTableServer>['headers']
 
   defineProps<{
-    items: Person[]
+    items: Personendatensatz[]
     loading: boolean
     totalItems: number
   }>()
@@ -23,7 +23,7 @@
     { title: t('user.firstName'), key: 'person.name.vorname', align: 'start' }
   ]
 
-  function handleRowClick($event: PointerEvent, { item }: { item: Person }): void {
+  function handleRowClick($event: PointerEvent, { item }: { item: Personendatensatz }): void {
     console.log($event)
     router.push({ name: 'user-details', params: { id: item.person.id } })
   }

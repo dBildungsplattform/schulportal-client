@@ -1,6 +1,6 @@
 import { defineStore, type Store, type StoreDefinition } from 'pinia'
-import ApiService from '@/services/ApiService'
-import type { AxiosResponse } from 'axios'
+import { FrontendApiFactory, type FrontendApiInterface } from '../api-client/generated/api'
+import axiosApiInstance from '@/services/ApiService'
 
 type AuthState = {
   authInitialized: boolean
@@ -8,14 +8,14 @@ type AuthState = {
 }
 
 type AuthActions = {
-  login: (returnUrl: string) => void
-  logout: () => void
   initializeAuthStatus: () => Promise<void>
 }
 
 type AuthGetters = {}
 
 export type AuthStore = Store<'authStore', AuthState, AuthGetters, AuthActions>
+
+const frontendApi: FrontendApiInterface = FrontendApiFactory(undefined, '', axiosApiInstance)
 
 export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, AuthActions> =
   defineStore({
@@ -25,23 +25,18 @@ export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, 
       isAuthed: false as boolean
     }),
     actions: {
-      login(returnUrl?: string) {
-        const loginUrl: string = ApiService.getUri({
-          url: '/login',
-          params: { redirectUrl: returnUrl }
-        })
-        window.location.href = loginUrl
-      },
-      logout() {
-        const logoutUrl: string = ApiService.getUri({ url: '/logout' })
-        window.location.href = logoutUrl
-      },
       async initializeAuthStatus() {
         if (this.authInitialized) return
 
-        this.isAuthed = await ApiService.get('/logininfo', { validateStatus: null })
-          .then((res: AxiosResponse) => res.status >= 200 && res.status < 400)
-          .catch(() => false)
+        try {
+          const { status: loginStatus }: { status: number } =
+            await frontendApi.frontendControllerInfo({
+              validateStatus: null
+            })
+          this.isAuthed = loginStatus >= 200 && loginStatus < 400
+        } catch {
+          this.isAuthed = false
+        }
 
         this.authInitialized = true
       }

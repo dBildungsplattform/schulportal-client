@@ -22,11 +22,11 @@ describe('providerStore', () => {
   describe('getAllProviders', () => {
     it('should load providers and update state', async () => {
       const mockResponse: Provider[] = [
-        { id: 1234, name: 'itslearning mock', url: 'example.org/itslearning' },
-        { id: 5678, name: 'administration mock', url: '/admin' }
+        { id: '1234', name: 'itslearning mock', url: 'example.org/itslearning' },
+        { id: '5678', name: 'administration mock', url: '/admin' }
       ]
 
-      mockadapter.onGet('/provider').replyOnce(200, mockResponse)
+      mockadapter.onGet('/api/frontend/provider').replyOnce(200, mockResponse)
       const getAllProvidersPromise: Promise<void> = providerStore.getAllProviders()
       expect(providerStore.loading).toBe(true)
       await getAllProvidersPromise
@@ -35,7 +35,7 @@ describe('providerStore', () => {
     })
 
     it('should handle string error', async () => {
-      mockadapter.onGet('/provider').replyOnce(500, 'some mock server error')
+      mockadapter.onGet('/api/frontend/provider').replyOnce(500, 'some mock server error')
       const getAllProvidersPromise: Promise<void> = providerStore.getAllProviders()
       expect(providerStore.loading).toBe(true)
       await getAllProvidersPromise
@@ -45,7 +45,7 @@ describe('providerStore', () => {
     })
 
     it('should handle error code', async () => {
-      mockadapter.onGet('/provider').replyOnce(500, { code: 'some mock server error' })
+      mockadapter.onGet('/api/frontend/provider').replyOnce(500, { code: 'some mock server error' })
       const getAllProvidersPromise: Promise<void> = providerStore.getAllProviders()
       expect(providerStore.loading).toBe(true)
       await getAllProvidersPromise

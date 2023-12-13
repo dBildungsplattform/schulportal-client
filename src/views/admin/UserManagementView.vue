@@ -17,7 +17,7 @@
       :items="personStore.allPersons || []"
       :loading="personStore.loading"
       @onUpdateTable="personStore.getAllPersons()"
-      :totalItems="personStore.allPersons.length"
+      :totalItems="personStore.totalPersons"
     ></UserTable>
   </div>
 </template>
