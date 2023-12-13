@@ -1,14 +1,14 @@
 <script setup lang="ts">
   import { onMounted, type Ref, ref } from 'vue'
-  import { useRoute } from 'vue-router'
-  import { usePersonStore, type Person, type PersonStore } from '@/stores/PersonStore'
+  import { type RouteLocationNormalizedLoaded, useRoute } from 'vue-router'
+  import { usePersonStore, type Personendatensatz, type PersonStore } from '@/stores/PersonStore'
   import PasswordReset from '@/components/admin/PasswordReset.vue'
   import LayoutCard from '@/components/cards/LayoutCard.vue'
 
-  const route = useRoute()
+  const route: RouteLocationNormalizedLoaded = useRoute()
   const currentPersonId: string = route.params['id']
   const personStore: PersonStore = usePersonStore()
-  const currentPerson: Ref<Person> = ref({})
+  const currentPerson: Ref<Personendatensatz> = ref({})
 
   const password: Ref<string> = ref('')
   const errorCode: Ref<string> = ref('')
@@ -27,7 +27,6 @@
   onMounted(async () => {
     currentPerson.value = await personStore.getPersonById(currentPersonId)
   })
-
 </script>
 
 <template>
@@ -40,20 +39,13 @@
       <div class="personal-info">
         <h3 class="text-h5">{{ $t('admin.user.personalInfo') }}</h3>
         <div v-if="currentPerson.person">
-          {{ $t("user.firstName") }}
+          {{ $t('user.firstName') }}
           {{ currentPerson.person.name.vorname }}
-          {{ $t("user.lastName") }}
+          {{ $t('user.lastName') }}
           {{ currentPerson.person.name.familienname }}
-        <v-btn
-          class="secondary button"
-        >
-          {{ $t("edit") }}
-        </v-btn>
         </div>
         <div v-else>
-          <v-progress-circular
-            indeterminate
-          ></v-progress-circular>
+          <v-progress-circular indeterminate></v-progress-circular>
         </div>
       </div>
       <v-divider
@@ -72,18 +64,8 @@
         >
         </PasswordReset>
       </div>
-      <v-divider
-        class="border-opacity-100 rounded my-6"
-        color="#E5EAEF"
-        thickness="6"
-      ></v-divider>
-      <div class="user-status">
-        <h3 class="text-h5">{{ $t('admin.user.status') }}</h3>
-      </div>
     </LayoutCard>
   </div>
 </template>
 
-<style>
-
-</style>
+<style></style>

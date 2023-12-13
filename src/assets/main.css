@@ -9,8 +9,6 @@
 .layout-card-headline {
   font-size: 24px;
   font-weight: bold;
-  margin-left: 23px;
-  margin-top: 6px;
 }
 
 .headline {
@@ -21,6 +19,16 @@
 .layout-card {
   box-shadow: 0px 3px 6px #001e4980;
   border-radius: 5px;
+}
+
+.text-body {
+  font-size: 16px;
+  font-weight: normal;
+
+  &.bold,
+  &.bold * {
+    font-weight: bold;
+  }
 }
 
 .v-field--variant-outlined .v-field__outline {

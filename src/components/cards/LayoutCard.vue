@@ -1,13 +1,34 @@
 <script setup lang="ts">
   defineProps<{
+    closable?: boolean
     header: string
     padding?: string
+    showCloseText?: boolean
   }>()
 </script>
 
 <template>
   <v-card class="layout-card">
-    <h2 class="text-left layout-card-headline my-2">{{ header }}</h2>
+    <v-row
+      align="center"
+      class="ml-6 my-1"
+    >
+      <v-col>
+        <h2 class="text-left layout-card-headline">{{ header }}</h2>
+      </v-col>
+      <v-spacer v-if="closable"></v-spacer>
+      <v-col
+        v-if="closable"
+        class="text-right mr-6"
+      >
+        <span v-if="showCloseText">{{ $t('close') }}</span>
+        <v-icon
+          @click.stop="$emit('onCloseClicked')"
+          icon="mdi-close"
+          size="x-large"
+        ></v-icon>
+      </v-col>
+    </v-row>
     <v-divider
       class="border-opacity-100 rounded"
       color="#1EAE9C"

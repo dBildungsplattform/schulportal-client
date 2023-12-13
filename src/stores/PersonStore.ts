@@ -79,7 +79,9 @@ export const usePersonStore: StoreDefinition<
       this.loading = true
       try {
         await this.getAllPersons()
-        const currentPerson: Person = this.allPersons.find((person: Person) => person.person.id = personId)
+        const currentPerson: Person = this.allPersons.find(
+          (person: Person) => (person.person.id = personId)
+        )
         this.loading = false
         return currentPerson
       } catch (error) {
@@ -95,7 +97,8 @@ export const usePersonStore: StoreDefinition<
     async resetPassword(personId: string): Promise<string> {
       this.loading = true
       try {
-        const { data }: { data: string } = await frontendApi.frontendControllerPasswordReset(personId)
+        const { data }: { data: string } =
+          await frontendApi.frontendControllerPasswordReset(personId)
         this.loading = false
         return data
       } catch (error: unknown) {

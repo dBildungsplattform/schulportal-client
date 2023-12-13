@@ -8,8 +8,8 @@
       "edit": "Benutzer bearbeiten",
       "management": "Benutzerverwaltung",
       "personalInfo": "Persönliche Informationen",
-      "resetPasswordDialogHeader": "{'Sind Sie sicher, dass Sie das Passwort für'} {firstname} {lastname} {'zurücksetzen möchten?'}",
-      "resetPasswordDialogWarning": "Bitte teilen Sie dem Benutzer das temporäre Passwort mit. Nach dem Schließen des Dialogs wird es aus Sicherheitsgründen nicht mehr angezeigt.",
+      "resetPasswordConfirmation": "{'Sind Sie sicher, dass Sie das Passwort für'} {firstname} {lastname} {'zurücksetzen möchten?'}",
+      "resetPasswordInformation": "Bitte teilen Sie dem Benutzer das temporäre Passwort mit. Nach dem Schließen des Dialogs wird es aus Sicherheitsgründen nicht mehr angezeigt.",
       "resetPassword": "Passwort zurücksetzen",
       "status": "Status"
     }

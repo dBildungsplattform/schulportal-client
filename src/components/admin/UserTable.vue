@@ -23,8 +23,7 @@
     { title: t('user.firstName'), key: 'person.name.vorname', align: 'start' }
   ]
 
-  function handleRowClick($event: PointerEvent, { item }: { item: Personendatensatz }): void {
-    console.log($event)
+  function handleRowClick(_$event: PointerEvent, { item }: { item: Personendatensatz }): void {
     router.push({ name: 'user-details', params: { id: item.person.id } })
   }
 </script>
