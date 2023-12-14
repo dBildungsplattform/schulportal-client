@@ -2,7 +2,7 @@
   import LayoutCard from '@/components/cards/LayoutCard.vue'
   import { type Composer, useI18n } from 'vue-i18n'
   import { type Personendatensatz } from '@/stores/PersonStore'
-  import router from '@/router'
+  import { type Router, useRouter } from 'vue-router'
 
   /* this block is necessary to introduce a table header type for defining table headers
       watch source for updates: https://stackoverflow.com/a/75993081/4790594
@@ -17,6 +17,7 @@
   }>()
 
   const { t }: Composer = useI18n({ useScope: 'global' })
+  const router: Router = useRouter()
 
   const headers: ReadonlyHeaders = [
     { title: t('user.lastName'), key: 'person.name.familienname', align: 'start' },

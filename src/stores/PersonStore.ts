@@ -63,7 +63,7 @@ export const usePersonStore: StoreDefinition<
       try {
         const { data }: { data: FrontendControllerPersons200Response } =
           await frontendApi.frontendControllerPersons()
-        this.allPersons = data.items || []
+        this.allPersons = data.items
         this.totalPersons = data.total
         this.loading = false
       } catch (error: unknown) {
@@ -78,7 +78,8 @@ export const usePersonStore: StoreDefinition<
     async getPersonById(personId: string) {
       this.loading = true
       try {
-        const { data }: { data: Personendatensatz } = await frontendApi.frontendControllerPersonById(personId)
+        const { data }: { data: Personendatensatz } =
+          await frontendApi.frontendControllerPersonById(personId)
         this.loading = false
         return data
       } catch (error) {
