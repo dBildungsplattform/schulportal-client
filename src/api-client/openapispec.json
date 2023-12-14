@@ -126,6 +126,7 @@
                   "allOf": [
                     { "$ref": "#/components/schemas/PaginatedResponseDto" },
                     {
+                      "required": ["items"],
                       "properties": {
                         "items": {
                           "type": "array",
@@ -164,6 +165,34 @@
             }
           },
           "401": { "description": "User is not logged in." }
+        },
+        "tags": ["frontend"]
+      }
+    },
+    "/api/frontend/personen/{personId}": {
+      "get": {
+        "operationId": "FrontendController_personById",
+        "summary": "Get person by personId.",
+        "parameters": [
+          {
+            "name": "personId",
+            "required": true,
+            "in": "path",
+            "description": "The id for the account.",
+            "schema": { "nullable": false, "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Person as PersonendatensatzResponse",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PersonendatensatzResponse" }
+              }
+            }
+          },
+          "401": { "description": "User is not logged in." },
+          "404": { "description": "The requested person does not exist." }
         },
         "tags": ["frontend"]
       }

@@ -155,7 +155,7 @@ export interface FrontendControllerPersons200Response {
    * @type {Array<PersonendatensatzResponse>}
    * @memberof FrontendControllerPersons200Response
    */
-  items?: Array<PersonendatensatzResponse>
+  items: Array<PersonendatensatzResponse>
 }
 /**
  *
@@ -168,7 +168,7 @@ export interface FrontendControllerPersons200ResponseAllOf {
    * @type {Array<PersonendatensatzResponse>}
    * @memberof FrontendControllerPersons200ResponseAllOf
    */
-  items?: Array<PersonendatensatzResponse>
+  items: Array<PersonendatensatzResponse>
 }
 /**
  *
@@ -807,6 +807,47 @@ export const FrontendApiAxiosParamCreator = function (configuration?: Configurat
     },
     /**
      *
+     * @summary Get person by personId.
+     * @param {string} personId The id for the account.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    frontendControllerPersonById: async (
+      personId: string,
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
+      // verify required parameter 'personId' is not null or undefined
+      assertParamExists('frontendControllerPersonById', 'personId', personId)
+      const localVarPath = `/api/frontend/personen/{personId}`.replace(
+        `{${'personId'}}`,
+        encodeURIComponent(String(personId))
+      )
+      // use dummy base URL string because the URL constructor only accepts absolute URLs.
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
+      let baseOptions
+      if (configuration) {
+        baseOptions = configuration.baseOptions
+      }
+
+      const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options }
+      const localVarHeaderParameter = {} as any
+      const localVarQueryParameter = {} as any
+
+      setSearchParams(localVarUrlObj, localVarQueryParameter)
+      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers
+      }
+
+      return {
+        url: toPathString(localVarUrlObj),
+        options: localVarRequestOptions
+      }
+    },
+    /**
+     *
      * @summary Lists personen.
      * @param {number} [offset] The offset of the paginated list.
      * @param {number} [limit] The requested limit for the page size.
@@ -996,6 +1037,25 @@ export const FrontendApiFp = function (configuration?: Configuration) {
     },
     /**
      *
+     * @summary Get person by personId.
+     * @param {string} personId The id for the account.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async frontendControllerPersonById(
+      personId: string,
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonendatensatzResponse>
+    > {
+      const localVarAxiosArgs = await localVarAxiosParamCreator.frontendControllerPersonById(
+        personId,
+        options
+      )
+      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
+    },
+    /**
+     *
      * @summary Lists personen.
      * @param {number} [offset] The offset of the paginated list.
      * @param {number} [limit] The requested limit for the page size.
@@ -1120,6 +1180,21 @@ export const FrontendApiFactory = function (
     },
     /**
      *
+     * @summary Get person by personId.
+     * @param {string} personId The id for the account.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    frontendControllerPersonById(
+      personId: string,
+      options?: any
+    ): AxiosPromise<PersonendatensatzResponse> {
+      return localVarFp
+        .frontendControllerPersonById(personId, options)
+        .then((request) => request(axios, basePath))
+    },
+    /**
+     *
      * @summary Lists personen.
      * @param {number} [offset] The offset of the paginated list.
      * @param {number} [limit] The requested limit for the page size.
@@ -1224,6 +1299,19 @@ export interface FrontendApiInterface {
     personId: string,
     options?: AxiosRequestConfig
   ): AxiosPromise<string>
+
+  /**
+   *
+   * @summary Get person by personId.
+   * @param {string} personId The id for the account.
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   * @memberof FrontendApiInterface
+   */
+  frontendControllerPersonById(
+    personId: string,
+    options?: AxiosRequestConfig
+  ): AxiosPromise<PersonendatensatzResponse>
 
   /**
    *
@@ -1335,6 +1423,20 @@ export class FrontendApi extends BaseAPI implements FrontendApiInterface {
   public frontendControllerPasswordReset(personId: string, options?: AxiosRequestConfig) {
     return FrontendApiFp(this.configuration)
       .frontendControllerPasswordReset(personId, options)
+      .then((request) => request(this.axios, this.basePath))
+  }
+
+  /**
+   *
+   * @summary Get person by personId.
+   * @param {string} personId The id for the account.
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   * @memberof FrontendApi
+   */
+  public frontendControllerPersonById(personId: string, options?: AxiosRequestConfig) {
+    return FrontendApiFp(this.configuration)
+      .frontendControllerPersonById(personId, options)
       .then((request) => request(this.axios, this.basePath))
   }
 

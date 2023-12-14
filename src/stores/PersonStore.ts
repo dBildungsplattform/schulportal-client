@@ -78,12 +78,9 @@ export const usePersonStore: StoreDefinition<
     async getPersonById(personId: string) {
       this.loading = true
       try {
-        await this.getAllPersons()
-        const currentPerson: Person = this.allPersons.find(
-          (person: Person) => (person.person.id = personId)
-        )
+        const { data }: { data: Personendatensatz } = await frontendApi.frontendControllerPersonById(personId)
         this.loading = false
-        return currentPerson
+        return data
       } catch (error) {
         this.errorCode = 'UNSPECIFIED_ERROR'
         if (isAxiosError(error)) {
