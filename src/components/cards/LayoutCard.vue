@@ -21,7 +21,12 @@
         v-if="closable"
         class="text-right mr-6"
       >
-        <span v-if="showCloseText">{{ $t('close') }}</span>
+        <span
+          v-if="showCloseText"
+          @click.stop="$emit('onCloseClicked')"
+          style="cursor: pointer"
+          >{{ $t('close') }}</span
+        >
         <v-icon
           @click.stop="$emit('onCloseClicked')"
           icon="mdi-close"

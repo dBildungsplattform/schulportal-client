@@ -1,17 +1,22 @@
 <script setup lang="ts">
   import { onMounted, type Ref, ref } from 'vue'
-  import { type RouteLocationNormalizedLoaded, useRoute } from 'vue-router'
+  import { type Router, type RouteLocationNormalizedLoaded, useRoute, useRouter } from 'vue-router'
   import { usePersonStore, type Personendatensatz, type PersonStore } from '@/stores/PersonStore'
   import PasswordReset from '@/components/admin/PasswordReset.vue'
   import LayoutCard from '@/components/cards/LayoutCard.vue'
 
   const route: RouteLocationNormalizedLoaded = useRoute()
+  const router: Router = useRouter()
   const currentPersonId: string = route.params['id']
   const personStore: PersonStore = usePersonStore()
   const currentPerson: Ref<Personendatensatz> = ref({})
 
   const password: Ref<string> = ref('')
   const errorCode: Ref<string> = ref('')
+
+  function navigateToUserTable(): void {
+    router.push({ name: 'user-management' })
+  }
 
   function resetPassword(personId: string): void {
     personStore
@@ -33,37 +38,60 @@
   <div class="admin">
     <h1 class="text-center headline">{{ $t('admin.headline') }}</h1>
     <LayoutCard
+      :closable="true"
       :header="$t('admin.user.edit')"
+      @onCloseClicked="navigateToUserTable"
       padding="22px 100px 22px 50px"
+      :showCloseText="true"
     >
-      <div class="personal-info">
-        <h3 class="text-h5">{{ $t('admin.user.personalInfo') }}</h3>
+      <v-container class="personal-info">
+        <h3 class="medium-headline">{{ $t('admin.user.personalInfo') }}</h3>
         <div v-if="currentPerson.person">
-          {{ $t('user.firstName') }}
-          {{ currentPerson.person.name.vorname }}
-          {{ $t('user.lastName') }}
-          {{ currentPerson.person.name.familienname }}
+          <v-row>
+            <v-col
+              class="text-right"
+              cols="3"
+            >
+              <span class="small-headline"> {{ $t('user.firstName') }}: </span>
+            </v-col>
+            <v-col cols="9">
+              {{ currentPerson.person.name.vorname }}
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col
+              class="text-right"
+              cols="3"
+            >
+              <span class="small-headline"> {{ $t('user.lastName') }}: </span>
+            </v-col>
+            <v-col cols="9">
+              {{ currentPerson.person.name.familienname }}
+            </v-col>
+          </v-row>
         </div>
         <div v-else>
           <v-progress-circular indeterminate></v-progress-circular>
         </div>
-      </div>
+      </v-container>
       <v-divider
         class="border-opacity-100 rounded my-6"
         color="#E5EAEF"
         thickness="6"
       ></v-divider>
-      <div class="password-reset">
-        <h3 class="text-h5">{{ $t('user.password') }}</h3>
-        <PasswordReset
-          :errorCode="errorCode"
-          :person="currentPerson"
-          @onClearPassword="password = ''"
-          @onResetPassword="resetPassword(currentPersonId)"
-          :password="password"
-        >
-        </PasswordReset>
-      </div>
+      <v-container class="password-reset">
+        <h3 class="medium-headline">{{ $t('user.password') }}</h3>
+        <v-row justify="end">
+          <PasswordReset
+            :errorCode="errorCode"
+            :person="currentPerson"
+            @onClearPassword="password = ''"
+            @onResetPassword="resetPassword(currentPersonId)"
+            :password="password"
+          >
+          </PasswordReset>
+        </v-row>
+      </v-container>
     </LayoutCard>
   </div>
 </template>
