@@ -105,7 +105,7 @@
             </v-row>
             <v-row class="text-body bold px-16">
               <v-col>
-                <p data-testid="info-text">
+                <p data-testid="password-reset-info-text">
                   {{ resetPasswordInformationMessage }}
                 </p>
               </v-col>
@@ -138,7 +138,7 @@
             {{ !!password ? $t('close') : $t('cancel') }}
           </v-btn>
           <v-btn
-            @click.stop="$emit('onResetPassword', person.id)"
+            @click.stop="$emit('onResetPassword', person.person.id)"
             class="primary small button"
             data-testid="password-reset-button"
             :disabled="!!password"

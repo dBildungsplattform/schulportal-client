@@ -18,11 +18,14 @@ beforeEach(async () => {
       errorCode: '',
       password: 'qwertzuiop',
       person: {
-        id: '2',
-        name: {
-          vorname: 'Albert',
-          familienname: 'Test'
-        }
+        person: {
+          id: '2',
+          name: {
+            vorname: 'Albert',
+            familienname: 'Test'
+          }
+        },
+        personenkontexte: []
       }
     },
     global: {
@@ -36,8 +39,8 @@ beforeEach(async () => {
 describe('reset password', () => {
   test('it opens the dialog', async () => {
     wrapper?.get('[data-testid="open-password-reset-dialog-icon"]').trigger('click')
-    await document.querySelector('[data-testid="warning-header"]')
-    expect(document.querySelector('[data-testid="warning-header"]')).not.toBeNull()
+    await document.querySelector('[data-testid="password-reset-info-text"]')
+    expect(document.querySelector('[data-testid="password-reset-info-text"]')).not.toBeNull()
   })
 
   // TODO:
