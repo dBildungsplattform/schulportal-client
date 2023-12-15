@@ -6,9 +6,15 @@
   font-weight: normal;
 }
 
-.layout-card-headline {
-  font-size: 24px;
-  font-weight: bold;
+.layout-card {
+  .layout-card-headline {
+    font-size: 24px;
+    font-weight: bold;
+  }
+
+  .padded {
+    padding: 22px 100px 22px 50px;
+  }
 }
 
 .headline {
@@ -24,6 +30,10 @@
 .medium-headline {
   font-size: 20px;
   font-weight: bold;
+}
+
+.pointer {
+  cursor: pointer;
 }
 
 .small-headline {

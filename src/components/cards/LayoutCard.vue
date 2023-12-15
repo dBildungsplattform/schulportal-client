@@ -2,7 +2,7 @@
   defineProps<{
     closable?: boolean
     header: string
-    padding?: string
+    padded?: boolean
     showCloseText?: boolean
   }>()
 </script>
@@ -23,8 +23,8 @@
       >
         <span
           v-if="showCloseText"
+          class="pointer"
           @click.stop="$emit('onCloseClicked')"
-          style="cursor: pointer"
           >{{ $t('close') }}</span
         >
         <v-icon
@@ -39,7 +39,7 @@
       color="#1EAE9C"
       thickness="5px"
     ></v-divider>
-    <div :style="`padding: ${padding}`">
+    <div :class="{ padded }">
       <slot />
     </div>
   </v-card>
