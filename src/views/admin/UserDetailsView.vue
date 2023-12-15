@@ -9,7 +9,7 @@
   const router: Router = useRouter()
   const currentPersonId: string = route.params['id']
   const personStore: PersonStore = usePersonStore()
-  const currentPerson: Ref<Personendatensatz> = ref({})
+  const currentPerson: Ref<Personendatensatz | null> = ref(null)
 
   const password: Ref<string> = ref('')
   const errorCode: Ref<string> = ref('')
@@ -41,12 +41,12 @@
       :closable="true"
       :header="$t('admin.user.edit')"
       @onCloseClicked="navigateToUserTable"
-      padding="22px 100px 22px 50px"
+      :padded="true"
       :showCloseText="true"
     >
       <v-container class="personal-info">
         <h3 class="medium-headline">{{ $t('admin.user.personalInfo') }}</h3>
-        <div v-if="currentPerson.person">
+        <div v-if="currentPerson?.person">
           <v-row>
             <v-col
               class="text-right"
@@ -82,14 +82,19 @@
       <v-container class="password-reset">
         <h3 class="medium-headline">{{ $t('user.password') }}</h3>
         <v-row justify="end">
-          <PasswordReset
-            :errorCode="errorCode"
-            :person="currentPerson"
-            @onClearPassword="password = ''"
-            @onResetPassword="resetPassword(currentPersonId)"
-            :password="password"
-          >
-          </PasswordReset>
+          <div v-if="currentPerson">
+            <PasswordReset
+              :errorCode="errorCode"
+              :person="currentPerson"
+              @onClearPassword="password = ''"
+              @onResetPassword="resetPassword(currentPersonId)"
+              :password="password"
+            >
+            </PasswordReset>
+          </div>
+          <div v-else>
+            <v-progress-circular indeterminate></v-progress-circular>
+          </div>
         </v-row>
       </v-container>
     </LayoutCard>

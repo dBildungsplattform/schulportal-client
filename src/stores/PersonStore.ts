@@ -36,7 +36,7 @@ type PersonState = {
 type PersonGetters = {}
 type PersonActions = {
   getAllPersons: () => Promise<void>
-  getPersonById: (personId: string) => Promise<Person>
+  getPersonById: (personId: string) => Promise<Personendatensatz>
   resetPassword: (personId: string) => Promise<string>
 }
 
@@ -75,7 +75,7 @@ export const usePersonStore: StoreDefinition<
       }
     },
 
-    async getPersonById(personId: string) {
+    async getPersonById(personId: string): Promise<Personendatensatz> {
       this.loading = true
       try {
         const { data }: { data: Personendatensatz } =
@@ -88,7 +88,7 @@ export const usePersonStore: StoreDefinition<
           this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR'
         }
         this.loading = false
-        return
+        return Promise.reject(this.errorCode)
       }
     },
 
