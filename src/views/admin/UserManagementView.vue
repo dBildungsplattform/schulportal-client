@@ -26,7 +26,7 @@
 
 <template>
   <div class="admin">
-    <h2>{{ $t('admin.user.management') }}</h2>
+    <h1 class="text-center headline">{{ $t('admin.headline') }}</h1>
     <UserTable
       :errorCode="errorCode"
       :items="personStore.allPersons || []"
