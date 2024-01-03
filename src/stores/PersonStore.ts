@@ -86,7 +86,7 @@ export const usePersonStore: StoreDefinition<
           this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR'
         }
         this.loading = false
-        return this.errorCode
+        return Promise.reject(this.errorCode)
       }
     }
   }
