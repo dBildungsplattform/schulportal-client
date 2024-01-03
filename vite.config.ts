@@ -49,6 +49,7 @@ export default defineConfig({
       }
     },
     headers: {
+      // only for local development productive CSP is defined in nginx-vue.conf. Nonce is static, not safe for production.
       'Content-Security-Policy':
         "default-src 'self'; script-src 'self' 'nonce-CSPN0NCEPLAC3H0LDER'; style-src 'self' 'nonce-CSPN0NCEPLAC3H0LDER'; font-src 'self'; img-src 'self'; frame-src 'self';"
     }
