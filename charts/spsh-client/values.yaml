@@ -1,4 +1,4 @@
 frontendHostname: "helm.dev.spsh.dbildungsplattform.de"
 image:
   repository: ghcr.io/dbildungsplattform/schulportal-client
-  tag: ""
+  tag: "SPSH-242"

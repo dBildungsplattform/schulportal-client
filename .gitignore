@@ -1,6 +1,6 @@
 # API client generated files
 # TODO: remove the following comment when SPSH-242 is done
-# src/api-client/generated
+src/api-client/generated
 src/api-client/storageDir
 
 # Logs
