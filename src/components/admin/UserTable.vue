@@ -1,4 +1,5 @@
 <script setup lang="ts">
+  import LayoutCard from '@/components/cards/LayoutCard.vue'
   import PasswordReset from '@/components/admin/PasswordReset.vue'
   import { type Composer, useI18n } from 'vue-i18n'
   import { type Personendatensatz } from '@/stores/PersonStore'
@@ -20,34 +21,38 @@
   const { t }: Composer = useI18n({ useScope: 'global' })
 
   const headers: ReadonlyHeaders = [
-    { title: t('user.name'), key: 'person.name', align: 'start' },
+    { title: t('user.lastName'), key: 'person.name.familienname', align: 'start' },
+    { title: t('user.firstName'), key: 'person.name.vorname', align: 'start' },
     { title: t('action'), key: 'actions', sortable: false }
   ]
 </script>
 
 <template>
-  <v-data-table-server
-    class="elevation-1"
-    data-testid="user-table"
-    :headers="headers"
-    :items="items"
-    :items-length="totalItems"
-    @update:options="$emit('onTableUpdate')"
-  >
-    <template #[`item.person.name`]="{ item }"
-      >{{ item.person.name.vorname }} {{ item.person.name.familienname }}</template
+  <LayoutCard :header="$t('admin.user.management')">
+    <v-data-table-server
+      class="user-table"
+      data-testid="user-table"
+      density="compact"
+      :headers="headers"
+      :items="items"
+      :items-length="totalItems"
+      item-value="person.id"
+      select-strategy="page"
+      show-select
+      @update:options="$emit('onTableUpdate')"
     >
-    <template #[`item.actions`]="{ item }">
-      <PasswordReset
-        :errorCode="errorCode"
-        :person="item.person"
-        @onClearPassword="$emit('onClearPassword')"
-        @onResetPassword="$emit('onResetPassword', item.person.id)"
-        :password="password"
-      >
-      </PasswordReset>
-    </template>
-  </v-data-table-server>
+      <template #[`item.actions`]="{ item }">
+        <PasswordReset
+          :errorCode="errorCode"
+          :person="item.person"
+          @onClearPassword="$emit('onClearPassword')"
+          @onResetPassword="$emit('onResetPassword', item.person.id)"
+          :password="password"
+        >
+        </PasswordReset>
+      </template>
+    </v-data-table-server>
+  </LayoutCard>
 </template>
 
 <style></style>
