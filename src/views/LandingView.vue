@@ -1,6 +1,5 @@
 <script setup lang="ts">
-  import TheFooter from '@/components/footer/TheFooter.vue'
-  import LoginCard from '@/components/cards/LoginCard.vue'
+  import LoginCard from '@/components/cards/TheLoginCard.vue'
 </script>
 
 <template>
@@ -18,8 +17,6 @@
       </v-col>
     </v-row>
   </v-container>
-
-  <TheFooter />
 </template>
 
 <style></style>
