@@ -33,7 +33,8 @@
     "home": "Home",
     "landing": "Start",
     "login": "Anmelden",
-    "logout": "Abmelden"
+    "logout": "Abmelden",
+    "help": "Hilfe"
   },
   "user": {
     "email": "E-Mail",

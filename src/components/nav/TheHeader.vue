@@ -7,28 +7,43 @@
 </script>
 
 <template>
-  <v-app-bar :elevation="2">
+  <v-app-bar
+    :elevation="2"
+    color="#02093B"
+    height="40"
+  >
+    <!-- Logo and title -->
+    <v-toolbar-title class="d-flex align-center"> SCHULPORTAL SH </v-toolbar-title>
     <v-spacer></v-spacer>
-    <RouterLink to="/">{{ $t('nav.landing') }}</RouterLink>
+
+    <v-btn> {{ $t('nav.help') }}</v-btn>
+  </v-app-bar>
+
+  <v-app-bar
+    color="#ECEFF1"
+    height="30"
+  >
     <v-spacer></v-spacer>
-    <RouterLink
-      to="/home"
-      v-if="auth.isAuthed"
-      >{{ $t('nav.home') }}</RouterLink
-    >
-    <v-spacer></v-spacer>
+
     <v-btn
       v-if="!auth.isAuthed"
       :href="`/api/frontend/login?redirectUrl=${route.fullPath}`"
-      >{{ $t('nav.login') }}</v-btn
     >
-    <v-spacer></v-spacer>
+      <template #prepend>
+        <v-icon>mdi-login</v-icon>
+      </template>
+      {{ $t('nav.login') }}
+    </v-btn>
+
     <v-btn
-      v-if="auth.isAuthed"
+      v-else
       class="secondary"
       href="/api/frontend/logout"
-      >{{ $t('nav.logout') }}</v-btn
     >
-    <v-spacer></v-spacer>
+      <template #prepend>
+        <v-icon>mdi-logout</v-icon>
+      </template>
+      {{ $t('nav.logout') }}
+    </v-btn>
   </v-app-bar>
 </template>
