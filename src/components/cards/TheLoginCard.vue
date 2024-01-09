@@ -35,7 +35,7 @@
       >
         <v-col cols="auto">
           <!-- Subtitle/welcome message -->
-          <v-card-text class="v-card-text">Willkommen im Schulportal SH.</v-card-text>
+          <v-card-text class="v-card-text"> {{ $t('login.title') }}</v-card-text>
         </v-col>
       </v-row>
 
@@ -52,7 +52,7 @@
             color="#001E49"
             :href="`/api/frontend/login?redirectUrl=${route.fullPath}`"
           >
-            {{ $t('nav.login') }}
+            {{ $t('login.button') }}
           </v-btn>
         </v-col>
       </v-row>

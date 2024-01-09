@@ -22,6 +22,7 @@
     "allProviders": "Alle Angebote"
   },
   "login": {
+    "title": "Willkommen im Schulportal SH.",
     "button": "Anmelden",
     "forgotPassword": "Passwort vergessen? \n Wenden Sie sich bitte an Ihre schulischen Administratorinnen und Administratoren.",
     "header": "Anmeldung im Schulportal SH",

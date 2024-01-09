@@ -21,8 +21,7 @@
           class="mr-2"
         >
           <v-img
-            alt="Vue logo"
-            class="logo"
+            alt="SchulPortalLogo"
             :src="SchulPortalLogo"
             :width="30"
             :height="30"
