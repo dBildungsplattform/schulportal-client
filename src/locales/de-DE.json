@@ -4,6 +4,7 @@
     "headline": "Administrationsbereich",
     "user": {
       "copyPasswordError": "Passwort konnte nicht in die Zwischzenablage kopiert werden",
+      "copyPasswordSuccess": "Passwort in Zwischenablage kopiert",
       "management": "Benutzerverwaltung",
       "resetPasswordDialogHeader": "Sind Sie sicher, dass Sie das Passwort für {firstname} {lastname} zurücksetzen möchten?",
       "resetPasswordDialogWarning": "Bitte teilen Sie dem Benutzer das temporäre Passwort mit. Nach dem Schließen des Dialogs wird es aus Sicherheitsgründen nicht mehr angezeigt.",
