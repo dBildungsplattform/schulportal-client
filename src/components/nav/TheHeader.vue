@@ -1,8 +1,8 @@
 <script setup lang="ts">
   import { type RouteLocationNormalizedLoaded, useRoute } from 'vue-router'
   import { useAuthStore, type AuthStore } from '@/stores/AuthStore'
-  import SchulPortalLogo from "@/assets/logos/Schulportal_SH_Bildmarke_RGB_Anwendung_HG_Blau.svg"
-  
+  import SchulPortalLogo from '@/assets/logos/Schulportal_SH_Bildmarke_RGB_Anwendung_HG_Blau.svg'
+
   const route: RouteLocationNormalizedLoaded = useRoute()
   const auth: AuthStore = useAuthStore()
 </script>
@@ -13,27 +13,36 @@
     color="#001E49"
     height="40"
   >
-
-  
     <!-- Logo and title -->
     <v-toolbar-title class="toolbar">
       <v-row no-gutters>
-        <v-col cols="auto" class="mr-2">
-          <v-img alt="Vue logo" class="logo" :src="SchulPortalLogo" :width="30" :height="30"/> 
+        <v-col
+          cols="auto"
+          class="mr-2"
+        >
+          <v-img
+            alt="Vue logo"
+            class="logo"
+            :src="SchulPortalLogo"
+            :width="30"
+            :height="30"
+          />
         </v-col>
 
         <v-col cols="auto">SCHULPORTAL SH</v-col>
       </v-row>
-      
     </v-toolbar-title>
     <v-spacer></v-spacer>
 
-    <v-btn :href='"https://medienberatung.iqsh.de/schulportal-sh.html"'> {{ $t('nav.help') }}</v-btn>
+    <v-btn :href="'https://medienberatung.iqsh.de/schulportal-sh.html'">
+      {{ $t('nav.help') }}</v-btn
+    >
   </v-app-bar>
 
   <v-app-bar
     color="#E5EAEF"
     height="30"
+    :elevation="0"
   >
     <v-spacer></v-spacer>
 
@@ -60,10 +69,9 @@
   </v-app-bar>
 </template>
 
-<style scoped> 
-
-.toolbar {
-  font-family: Tahoma, Geneva, sans-serif;
-  font-weight: bold;
-}
+<style scoped>
+  .toolbar {
+    font-family: Tahoma, Geneva, sans-serif;
+    font-weight: bold;
+  }
 </style>
