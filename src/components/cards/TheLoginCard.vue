@@ -26,7 +26,7 @@
           />
         </v-col>
 
-        <v-card-title class="v-card-title">SCHULPORTAL SH </v-card-title>
+        <v-card-title class="v-card-title">SCHULPORTAL <span class="normal-weight">SH</span></v-card-title> 
       </v-row>
 
       <v-row
@@ -47,13 +47,18 @@
           md="6"
           class="d-flex justify-center"
         >
+        <v-hover>
+          <template v-slot:default="{ isHovering, props }">
           <v-btn
+            v-bind="props"
             class="login-button"
-            color="#001E49"
+            :color="isHovering ? '#325E91' : '#001E49'"
             :href="`/api/frontend/login?redirectUrl=${route.fullPath}`"
           >
             {{ $t('login.button') }}
           </v-btn>
+        </template>
+        </v-hover>
         </v-col>
       </v-row>
     </v-card>
@@ -63,6 +68,7 @@
 <style scoped>
   .login-button {
     width: 15rem;
+    text-transform: none;
   }
   .login-card {
     padding: 6.25rem 0; /* Top and bottom padding */
@@ -70,9 +76,8 @@
 
   .v-card-title {
     text-align: center;
-    font-weight: bold;
+    font-weight: bolder;
     font-size: 2rem;
-    font-family: Tahoma, Geneva, sans-serif;
     color: #001e49;
     margin-bottom: 1rem;
     margin-left: -1rem;
@@ -80,7 +85,7 @@
   .v-card-text {
     text-align: center;
     font-size: 1rem;
-    font-weight: bold;
+    font-weight: bolder;
     color: #001e49;
   }
 </style>

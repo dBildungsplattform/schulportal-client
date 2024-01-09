@@ -14,7 +14,7 @@
     height="40"
   >
     <!-- Logo and title -->
-    <v-toolbar-title class="toolbar">
+    <v-toolbar-title>
       <v-row no-gutters>
         <v-col
           cols="auto"
@@ -28,7 +28,7 @@
           />
         </v-col>
 
-        <v-col cols="auto">SCHULPORTAL SH</v-col>
+        <v-col cols="auto" class="toolbar">SCHULPORTAL <span class="normal-weight">SH</span></v-col>
       </v-row>
     </v-toolbar-title>
     <v-spacer></v-spacer>
@@ -70,7 +70,13 @@
 
 <style scoped>
   .toolbar {
-    font-family: Tahoma, Geneva, sans-serif;
-    font-weight: bold;
+    font-weight: 600;
+  }
+  .v-btn {
+    text-transform: none;
+    
+  }
+  .v-btn:hover {
+    text-decoration: underline;    
   }
 </style>
