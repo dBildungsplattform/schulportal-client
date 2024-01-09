@@ -139,21 +139,21 @@
                 :type="showPassword ? 'text' : 'password'"
                 :value="password"
               >
-              <template v-slot:append-inner>        
-                <v-icon
-                  @click.stop="showPassword = !showPassword"
-                  data-testid="show-password-icon"
-                  :icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-                ></v-icon> 
-              </template>
-              <template v-slot:append>        
-                <v-icon
-                  @click.stop="copyToClipboard(password)"
-                  data-testid="copy-password-icon"
-                  icon="mdi-content-copy"
-                ></v-icon> 
-              </template>
-            </v-text-field>
+                <template v-slot:append-inner>
+                  <v-icon
+                    @click.stop="showPassword = !showPassword"
+                    data-testid="show-password-icon"
+                    :icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+                  ></v-icon>
+                </template>
+                <template v-slot:append>
+                  <v-icon
+                    @click.stop="copyToClipboard(password)"
+                    data-testid="copy-password-icon"
+                    icon="mdi-content-copy"
+                  ></v-icon>
+                </template>
+              </v-text-field>
             </v-col>
           </v-row>
         </v-card-text>
