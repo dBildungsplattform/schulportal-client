@@ -5,7 +5,7 @@
     "user": {
       "copyPasswordError": "Passwort konnte nicht in die Zwischzenablage kopiert werden",
       "management": "Benutzerverwaltung",
-      "resetPasswordDialogHeader": "{'Sind Sie sicher, dass Sie das Passwort für'} {firstname} {lastname} {'zurücksetzen möchten?'}",
+      "resetPasswordDialogHeader": "Sind Sie sicher, dass Sie das Passwort für {firstname} {lastname} zurücksetzen möchten?",
       "resetPasswordDialogWarning": "Bitte teilen Sie dem Benutzer das temporäre Passwort mit. Nach dem Schließen des Dialogs wird es aus Sicherheitsgründen nicht mehr angezeigt.",
       "resetPassword": "Passwort zurücksetzen"
     }
@@ -21,6 +21,7 @@
     "administration": "Verwaltung",
     "allProviders": "Alle Angebote"
   },
+  "itemsPerPage": "Einträge pro Seite",
   "login": {
     "button": "Anmelden",
     "forgotPassword": "Passwort vergessen? \n Wenden Sie sich bitte an Ihre schulischen Administratorinnen und Administratoren.",
@@ -34,6 +35,10 @@
     "landing": "Start",
     "login": "Anmelden",
     "logout": "Abmelden"
+  },
+  "pagination": {
+    "all": "Alle",
+    "pageText": "{interval} von {total} Einträgen"
   },
   "user": {
     "email": "E-Mail",

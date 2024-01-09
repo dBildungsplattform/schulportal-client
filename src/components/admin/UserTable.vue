@@ -1,4 +1,5 @@
 <script setup lang="ts">
+  import { computed } from 'vue'
   import LayoutCard from '@/components/cards/LayoutCard.vue'
   import PasswordReset from '@/components/admin/PasswordReset.vue'
   import { type Composer, useI18n } from 'vue-i18n'
@@ -10,13 +11,15 @@
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs'
   type ReadonlyHeaders = InstanceType<typeof VDataTableServer>['headers']
 
-  defineProps<{
+  type Props = {
     errorCode: string
     items: Personendatensatz[]
     loading: boolean
     password: string
     totalItems: number
-  }>()
+  }
+
+  const props: Props = defineProps<Props>()
 
   const { t }: Composer = useI18n({ useScope: 'global' })
 
@@ -25,6 +28,19 @@
     { title: t('user.firstName'), key: 'person.name.vorname', align: 'start' },
     { title: t('action'), key: 'actions', sortable: false }
   ]
+
+  // TODO: these two values will come from the API in the future
+  const itemsPerPage: number = 25
+  const page: number = 1
+
+  const pageText = computed(() => {
+    const total = props.items.length
+    const startInterval = (page - 1) * itemsPerPage + 1
+    const endInterval = Math.min(page * itemsPerPage, total)
+    const interval = `${startInterval} - ${endInterval}`
+
+    return t('pagination.pageText', { interval: interval, total: total })
+  })
 </script>
 
 <template>
@@ -36,7 +52,10 @@
       :headers="headers"
       :items="items"
       :items-length="totalItems"
+      :items-per-page-options="[{ value: -1, title: $t('pagination.all')}]"
+      :items-per-page-text="$t('itemsPerPage')"
       item-value="person.id"
+      :page-text="pageText"
       select-strategy="page"
       show-select
       @update:options="$emit('onTableUpdate')"
