@@ -28,7 +28,13 @@
           />
         </v-col>
 
-        <v-col cols="auto" class="toolbar">SCHULPORTAL <span class="normal-weight">SH</span></v-col>
+        <!-- Hide this column on small screens and below -->
+        <v-col
+          cols="auto"
+          class="toolbar hidden-sm-and-down"
+        >
+          SCHULPORTAL <span class="normal-weight">SH</span>
+        </v-col>
       </v-row>
     </v-toolbar-title>
     <v-spacer></v-spacer>
@@ -47,6 +53,7 @@
 
     <v-btn
       v-if="!auth.isAuthed"
+      color="#001E49"
       :href="`/api/frontend/login?redirectUrl=${route.fullPath}`"
     >
       <template #prepend>
@@ -57,7 +64,7 @@
 
     <v-btn
       v-else
-      class="secondary"
+      color="#001E49"
       href="/api/frontend/logout"
     >
       <template #prepend>
@@ -74,9 +81,8 @@
   }
   .v-btn {
     text-transform: none;
-    
   }
   .v-btn:hover {
-    text-decoration: underline;    
+    text-decoration: underline;
   }
 </style>
