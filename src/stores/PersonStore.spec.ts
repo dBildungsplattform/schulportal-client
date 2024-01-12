@@ -109,9 +109,7 @@ describe('PersonStore', () => {
       mockadapter.onGet('/api/frontend/personen/2345').replyOnce(500, 'some mock server error')
       const getPersonByIdPromise: Promise<Personendatensatz> = personStore.getPersonById('2345')
       expect(personStore.loading).toBe(true)
-      const currentPerson: Personendatensatz = await getPersonByIdPromise
-      expect(currentPerson).toBeUndefined()
-      console.log(personStore.errorCode)
+      await rejects(getPersonByIdPromise)
       expect(personStore.errorCode).toEqual('UNSPECIFIED_ERROR')
       expect(personStore.loading).toBe(false)
     })
@@ -122,8 +120,7 @@ describe('PersonStore', () => {
         .replyOnce(500, { code: 'some mock server error' })
       const getPersonByIdPromise: Promise<Personendatensatz> = personStore.getPersonById('2345')
       expect(personStore.loading).toBe(true)
-      const currentPerson: Personendatensatz = await getPersonByIdPromise
-      expect(currentPerson).toBeUndefined()
+      await rejects(getPersonByIdPromise)
       expect(personStore.errorCode).toEqual('some mock server error')
       expect(personStore.loading).toBe(false)
     })
