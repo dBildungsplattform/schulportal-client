@@ -1,15 +1,20 @@
 @import './base.css';
+@import './button.css';
 @import './user-table.css';
 
 #app {
   font-weight: normal;
 }
 
-.card-headline {
-  font-size: 25px;
-  font-weight: bold;
-  margin-left: 23px;
-  margin-top: 6px;
+.layout-card {
+  .layout-card-headline {
+    font-size: 24px;
+    font-weight: bold;
+  }
+
+  .padded {
+    padding: 22px 100px 22px 50px;
+  }
 }
 
 .headline {
@@ -20,6 +25,30 @@
 .layout-card {
   box-shadow: 0px 3px 6px #001e4980;
   border-radius: 5px;
+}
+
+.medium-headline {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.small-headline {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.text-body {
+  font-size: 16px;
+  font-weight: normal;
+
+  &.bold,
+  &.bold * {
+    font-weight: bold;
+  }
 }
 
 .v-field--variant-outlined .v-field__outline {

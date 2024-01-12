@@ -3,16 +3,21 @@
   "admin": {
     "headline": "Administrationsbereich",
     "user": {
-      "copyPasswordError": "Passwort konnte nicht in die Zwischzenablage kopiert werden",
+      "changePassword": "Passwort ändern",
+      "copyPasswordError": "Passwort konnte nicht in die Zwischenablage kopiert werden",
       "copyPasswordSuccess": "Passwort in Zwischenablage kopiert",
+      "edit": "Benutzer bearbeiten",
       "management": "Benutzerverwaltung",
-      "resetPasswordDialogHeader": "Sind Sie sicher, dass Sie das Passwort für {firstname} {lastname} zurücksetzen möchten?",
-      "resetPasswordDialogWarning": "Bitte teilen Sie dem Benutzer das temporäre Passwort mit. Nach dem Schließen des Dialogs wird es aus Sicherheitsgründen nicht mehr angezeigt.",
-      "resetPassword": "Passwort zurücksetzen"
+      "personalInfo": "Persönliche Informationen",
+      "resetPasswordConfirmation": "Sind Sie sicher, dass Sie das Passwort für {firstname} {lastname} zurücksetzen möchten?",
+      "resetPasswordInformation": "Bitte teilen Sie dem Benutzer das temporäre Passwort mit. Nach dem Schließen des Dialogs wird es aus Sicherheitsgründen nicht mehr angezeigt.",
+      "resetPassword": "Passwort zurücksetzen",
+      "status": "Status"
     }
   },
   "cancel": "Abbrechen",
   "close": "Schließen",
+  "edit": "Bearbeiten",
   "errors": {
     "KEYCLOAK_CLIENT_ERROR": "Die Anmeldung ist momentan nicht möglich.",
     "UNSPECIFIED_ERROR": "Es ist ein Fehler aufgetreten.",
@@ -45,6 +50,7 @@
     "email": "E-Mail",
     "firstName": "Vorname",
     "lastName": "Nachname",
+    "password": "Passwort",
     "userName": "Benutzername"
   }
 }
