@@ -6,7 +6,14 @@ import vuetify from 'vite-plugin-vuetify'
 import basicSsl from '@vitejs/plugin-basic-ssl'
 
 export default defineConfig({
-  plugins: [vue(), vuetify(), basicSsl()],
+  plugins: [
+    vue(),
+    vuetify({
+      styles: {
+        configFile: 'src/styles/settings.scss'
+      }
+    }),
+    basicSsl()],
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))

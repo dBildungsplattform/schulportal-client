@@ -1,6 +1,8 @@
-@import './base.css';
-@import './button.css';
-@import './user-table.css';
+@use './settings';
+
+@import './base.scss';
+@import './button.scss';
+@import './user-table.scss';
 
 #app {
   font-weight: normal;

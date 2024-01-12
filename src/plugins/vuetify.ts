@@ -1,7 +1,7 @@
-import 'vuetify/styles'
 import { createVuetify, type ThemeDefinition, type VuetifyOptions } from 'vuetify'
 import '@mdi/font/css/materialdesignicons.css'
 import { aliases, mdi } from 'vuetify/iconsets/mdi'
+import '@/styles/main.scss'
 
 const shTheme: ThemeDefinition = {
   dark: false,

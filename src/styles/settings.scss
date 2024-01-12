@@ -1,0 +1,5 @@
+@use 'vuetify/settings' with (
+  $button-background: #001E49 // $primaryColor
+);
+
+@import './variables.scss';
