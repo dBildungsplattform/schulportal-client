@@ -4,7 +4,7 @@
 
   const { t }: Composer = useI18n({ useScope: 'global' })
 
-  type Person = {
+  type Personendatensatz = {
     id: string
     name: {
       familienname: string
@@ -14,7 +14,7 @@
 
   defineProps<{
     errorCode: string
-    person: Person
+    person: Personendatensatz
     password: string
   }>()
 
@@ -131,18 +131,29 @@
             <v-col cols="12">
               <v-text-field
                 v-if="password"
-                append-icon="mdi-content-copy"
-                :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-                @click:append="copyToClipboard(password)"
-                @click:appendInner="showPassword = !showPassword"
                 data-testid="password-output-field"
-                :hint="passwordCopied ? 'Passwort in Zwischenablage kopiert' : ''"
+                :error-messages="copyToClipboardError"
+                :hint="passwordCopied ? $t('admin.user.copyPasswordSuccess') : ''"
                 :persistent-hint="passwordCopied"
                 readonly
                 :type="showPassword ? 'text' : 'password'"
                 :value="password"
-                :error-messages="copyToClipboardError"
-              ></v-text-field>
+              >
+                <template v-slot:append-inner>
+                  <v-icon
+                    @click.stop="showPassword = !showPassword"
+                    data-testid="show-password-icon"
+                    :icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+                  ></v-icon>
+                </template>
+                <template v-slot:append>
+                  <v-icon
+                    @click.stop="copyToClipboard(password)"
+                    data-testid="copy-password-icon"
+                    icon="mdi-content-copy"
+                  ></v-icon>
+                </template>
+              </v-text-field>
             </v-col>
           </v-row>
         </v-card-text>
