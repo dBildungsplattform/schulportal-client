@@ -12,11 +12,7 @@
     password: string
   }
 
-  const props: Props = defineProps<{
-    errorCode: string
-    person: Personendatensatz
-    password: string
-  }>()
+  const props: Props = defineProps<Props>()
 
   const emit: (event: 'onClearPassword' | 'onResetPassword') => void = defineEmits([
     'onClearPassword',
