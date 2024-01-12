@@ -7,7 +7,7 @@
 
   const route: RouteLocationNormalizedLoaded = useRoute()
   const router: Router = useRouter()
-  const currentPersonId: string = route.params['id']
+  const currentPersonId: string = route.params['id'] as string
   const personStore: PersonStore = usePersonStore()
   const currentPerson: Ref<Personendatensatz | null> = ref(null)
 
