@@ -12,12 +12,13 @@
     password: string
   }
 
-  const props: Props = defineProps<Props>()
-
-  const emit = defineEmits<{
+  type Emits = {
     (event: 'onClearPassword'): void
     (event: 'onResetPassword', id: string): void
-  }>()
+  }
+
+  const props: Props = defineProps<Props>()
+  const emit: Emits = defineEmits<Emits>()
 
   const passwordCopied: Ref<boolean> = ref(false)
   const showPassword: Ref<boolean> = ref(false)
