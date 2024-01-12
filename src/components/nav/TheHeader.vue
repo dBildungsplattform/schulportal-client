@@ -31,16 +31,22 @@
         <!-- Hide this column on small screens and below -->
         <v-col
           cols="auto"
-          class="toolbar hidden-sm-and-down"
+          class="hidden-sm-and-down"
         >
-          SCHULPORTAL <span class="normal-weight">SH</span>
+          <div class="nav-title">SCHULPORTAL <span class="normal-weight">SH</span></div>
         </v-col>
       </v-row>
     </v-toolbar-title>
     <v-spacer></v-spacer>
 
+    <!-- The link should be centralized somewhere else?-->
     <v-btn :href="'https://medienberatung.iqsh.de/schulportal-sh.html'">
-      {{ $t('nav.help') }}</v-btn
+      <v-icon
+        left
+        class="hidden-md-and-up"
+        >mdi-help</v-icon
+      >
+      <span class="hidden-sm-and-down">{{ $t('nav.help') }}</span></v-btn
     >
   </v-app-bar>
 
@@ -59,11 +65,11 @@
       <template #prepend>
         <v-icon>mdi-login</v-icon>
       </template>
-      {{ $t('nav.login') }}
+      <span class="hidden-sm-and-down">{{ $t('nav.login') }}</span>
     </v-btn>
 
     <v-btn
-      v-else
+      v-if="auth.isAuthed"
       color="#001E49"
       href="/api/frontend/logout"
     >
@@ -76,7 +82,7 @@
 </template>
 
 <style scoped>
-  .toolbar {
+  .nav-title {
     font-weight: 600;
   }
   .v-btn {

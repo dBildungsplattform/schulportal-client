@@ -25,8 +25,11 @@
             :height="50"
           />
         </v-col>
-
-        <v-card-title class="v-card-title">SCHULPORTAL <span class="normal-weight">SH</span></v-card-title> 
+        <v-col cols="auto">
+          <v-card-title class="v-card-title"
+            >SCHULPORTAL <span class="normal-weight">SH</span></v-card-title
+          >
+        </v-col>
       </v-row>
 
       <v-row
@@ -43,22 +46,22 @@
       <v-row justify="center">
         <v-col
           cols="12"
-          sm="8"
-          md="6"
+          md="8"
+          sm="6"
           class="d-flex justify-center"
         >
-        <v-hover>
-          <template v-slot:default="{ isHovering, props }">
-          <v-btn
-            v-bind="props"
-            class="login-button"
-            :color="isHovering ? '#325E91' : '#001E49'"
-            :href="`/api/frontend/login?redirectUrl=${route.fullPath}`"
-          >
-            {{ $t('login.button') }}
-          </v-btn>
-        </template>
-        </v-hover>
+          <v-hover>
+            <template v-slot:default="{ isHovering, props }">
+              <v-btn
+                v-bind="props"
+                class="login-button"
+                :color="isHovering ? '#325E91' : '#001E49'"
+                :href="`/api/frontend/login?redirectUrl=${route.fullPath}`"
+              >
+                {{ $t('login.button') }}
+              </v-btn>
+            </template>
+          </v-hover>
         </v-col>
       </v-row>
     </v-card>
@@ -67,7 +70,8 @@
 
 <style scoped>
   .login-button {
-    width: 15rem;
+    max-width: 15rem; /* Max width instead of fixed width */
+    width: 100%; /* Full width, capped by max-width */
     text-transform: none;
   }
   .login-card {
