@@ -5,11 +5,12 @@
     "user": {
       "changePassword": "Passwort ändern",
       "copyPasswordError": "Passwort konnte nicht in die Zwischenablage kopiert werden",
+      "copyPasswordSuccess": "Passwort in Zwischenablage kopiert",
       "edit": "Benutzer bearbeiten",
       "management": "Benutzerverwaltung",
       "personalInfo": "Persönliche Informationen",
-      "resetPasswordConfirmation": "{'Sind Sie sicher, dass Sie das Passwort für'} {firstname} {lastname} {'zurücksetzen möchten?'}",
-      "resetPasswordInformation": "Bitte teilen Sie dem Benutzer das temporäre Passwort mit. Nach dem Schließen des Dialogs wird es aus Sicherheitsgründen nicht mehr angezeigt.",
+      "resetPasswordDialogHeader": "Sind Sie sicher, dass Sie das Passwort für {firstname} {lastname} zurücksetzen möchten?",
+      "resetPasswordDialogWarning": "Bitte teilen Sie dem Benutzer das temporäre Passwort mit. Nach dem Schließen des Dialogs wird es aus Sicherheitsgründen nicht mehr angezeigt.",
       "resetPassword": "Passwort zurücksetzen",
       "status": "Status"
     }
@@ -26,6 +27,7 @@
     "administration": "Verwaltung",
     "allProviders": "Alle Angebote"
   },
+  "itemsPerPage": "Einträge pro Seite",
   "login": {
     "button": "Anmelden",
     "forgotPassword": "Passwort vergessen? \n Wenden Sie sich bitte an Ihre schulischen Administratorinnen und Administratoren.",
@@ -39,6 +41,10 @@
     "landing": "Start",
     "login": "Anmelden",
     "logout": "Abmelden"
+  },
+  "pagination": {
+    "all": "Alle",
+    "pageText": "{interval} von {total} Einträgen"
   },
   "user": {
     "email": "E-Mail",

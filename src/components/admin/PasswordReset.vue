@@ -92,7 +92,7 @@
                 class="text-right"
                 cols="1"
               >
-                <v-icon icon="mdi-alert"></v-icon>
+              <v-icon icon="mdi-alert"></v-icon>
               </v-col>
               <v-col>
                 <p data-testid="error-text">
@@ -102,26 +102,50 @@
             </v-row>
             <v-row class="text-body bold px-16">
               <v-col>
-                <p data-testid="password-reset-info-text">
-                  {{ resetPasswordInformationMessage }}
-                </p>
-              </v-col>
+                  <p data-testid="password-reset-info-text">
+                    {{ resetPasswordInformationMessage }}
+                  </p>
+                </v-col>
             </v-row>
-            <v-row v-if="password">
+            <v-row>
+              <v-col
+                class="text-center"
+                cols="12"
+              >
+                <v-btn
+                  @click.stop="$emit('onResetPassword', person.person.id)"
+                  class="primary"
+                  data-testid="password-reset-button"
+                  :disabled="!!password"
+                  >{{ $t('admin.user.resetPassword') }}</v-btn
+                >
+              </v-col>
               <v-col cols="12">
                 <v-text-field
-                  append-icon="mdi-content-copy"
-                  :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-                  @click:append="copyToClipboard(password)"
-                  @click:appendInner="showPassword = !showPassword"
+                  v-if="password"
                   data-testid="password-output-field"
-                  :hint="passwordCopied ? 'Passwort in Zwischenablage kopiert' : ''"
+                  :error-messages="copyToClipboardError"
+                  :hint="passwordCopied ? $t('admin.user.copyPasswordSuccess') : ''"
                   :persistent-hint="passwordCopied"
                   readonly
                   :type="showPassword ? 'text' : 'password'"
                   :value="password"
-                  :error-messages="copyToClipboardError"
-                ></v-text-field>
+                >
+                  <template v-slot:append-inner>
+                    <v-icon
+                      @click.stop="showPassword = !showPassword"
+                      data-testid="show-password-icon"
+                      :icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+                    ></v-icon>
+                  </template>
+                  <template v-slot:append>
+                    <v-icon
+                      @click.stop="copyToClipboard(password)"
+                      data-testid="copy-password-icon"
+                      icon="mdi-content-copy"
+                    ></v-icon>
+                  </template>
+                </v-text-field>
               </v-col>
             </v-row>
           </v-container>
