@@ -14,10 +14,10 @@
 
   const props: Props = defineProps<Props>()
 
-  const emit: (event: 'onClearPassword' | 'onResetPassword') => void = defineEmits([
-    'onClearPassword',
-    'onResetPassword'
-  ])
+  const emit = defineEmits<{
+    (event: 'onClearPassword'): void
+    (event: 'onResetPassword', id: string): void
+  }>()
 
   const passwordCopied: Ref<boolean> = ref(false)
   const showPassword: Ref<boolean> = ref(false)
