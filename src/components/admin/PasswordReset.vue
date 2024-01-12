@@ -92,7 +92,7 @@
                 class="text-right"
                 cols="1"
               >
-              <v-icon icon="mdi-alert"></v-icon>
+                <v-icon icon="mdi-alert"></v-icon>
               </v-col>
               <v-col>
                 <p data-testid="error-text">
@@ -102,24 +102,12 @@
             </v-row>
             <v-row class="text-body bold px-16">
               <v-col>
-                  <p data-testid="password-reset-info-text">
-                    {{ resetPasswordInformationMessage }}
-                  </p>
-                </v-col>
+                <p data-testid="password-reset-info-text">
+                  {{ resetPasswordInformationMessage }}
+                </p>
+              </v-col>
             </v-row>
             <v-row>
-              <v-col
-                class="text-center"
-                cols="12"
-              >
-                <v-btn
-                  @click.stop="$emit('onResetPassword', person.person.id)"
-                  class="primary"
-                  data-testid="password-reset-button"
-                  :disabled="!!password"
-                  >{{ $t('admin.user.resetPassword') }}</v-btn
-                >
-              </v-col>
               <v-col cols="12">
                 <v-text-field
                   v-if="password"

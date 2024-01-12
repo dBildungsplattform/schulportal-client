@@ -1,7 +1,6 @@
 <script setup lang="ts">
   import { computed, type ComputedRef } from 'vue'
   import LayoutCard from '@/components/cards/LayoutCard.vue'
-  import PasswordReset from '@/components/admin/PasswordReset.vue'
   import { type Composer, useI18n } from 'vue-i18n'
   import { type Personendatensatz } from '@/stores/PersonStore'
   import { type Router, useRouter } from 'vue-router'
@@ -13,7 +12,6 @@
   type ReadonlyHeaders = InstanceType<typeof VDataTableServer>['headers']
 
   type Props = {
-    errorCode: string
     items: Personendatensatz[]
     loading: boolean
     totalItems: number
@@ -26,7 +24,7 @@
 
   const headers: ReadonlyHeaders = [
     { title: t('user.lastName'), key: 'person.name.familienname', align: 'start' },
-    { title: t('user.firstName'), key: 'person.name.vorname', align: 'start' },
+    { title: t('user.firstName'), key: 'person.name.vorname', align: 'start' }
   ]
 
   function handleRowClick(_$event: PointerEvent, { item }: { item: Personendatensatz }): void {
