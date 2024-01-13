@@ -65,13 +65,13 @@
           </v-btn>
         </v-col>
       </v-row>
+      <v-bottom-navigation
+        class="bottom-navigation"
+        :elevation="1"
+        height="22"
+      >
+      </v-bottom-navigation>
     </v-container>
-    <v-bottom-navigation
-      class="bottom-navigation"
-      :elevation="1"
-      height="22"
-    >
-    </v-bottom-navigation>
   </v-footer>
 </template>
 
@@ -87,6 +87,33 @@
       100% 100%;
   }
 
+  @media (max-width: 1280px) {
+    .footer {
+      background-size:
+        200% 70%,
+        100% 100%;
+    }
+  }
+
+  @media (max-width: 960px) {
+    .footer {
+      background-size:
+        200% 20%,
+        100% 100%;
+    }
+  }
+
+  @media (max-width: 680px) {
+    .footer {
+      background-size:
+        200% 0%,
+        100% 100%;
+    }
+  }
+  .footer {
+    min-height: 200px; /* Avoid footer shrinking vertically on smaller screen sizes*/
+  }
+
   .v-btn {
     text-transform: none;
   }
@@ -96,7 +123,7 @@
 
   .footer-links-col {
     display: flex;
-    align-items: flex-end; /* Aligns the logos to the right */
+    align-items: flex-end; /* Aligns the links to the start of the flex container */
   }
 
   .sponsor-logos-col {
@@ -109,10 +136,11 @@
     position: relative;
   }
 
+  /* The line between the 2 logos */
   .sponsor-logos-div::before {
     content: '';
     position: absolute;
-    left: 50%; /* Adjust this value to move the line between the logos */
+    left: 50%;
     top: 0;
     bottom: 0;
     width: 2px;
@@ -129,7 +157,7 @@
 
   @media (max-width: 1280px) {
     .sponsor-logo {
-      width: 150px; /* Adjust the width of the logos */
+      width: 150px;
     }
     .sponsor-logos-col,
     .footer-links-col {
