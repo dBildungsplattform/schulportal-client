@@ -48,7 +48,6 @@
           cols="12"
           md="8"
           sm="6"
-          xs="4"
           class="d-flex justify-center"
         >
           <v-hover>
@@ -74,7 +73,22 @@
     max-width: 15rem; /* Max width instead of fixed width */
     width: 100%; /* Full width, capped by max-width */
     text-transform: none;
+    transition: transform 0.3s ease-in-out;
+    /* Set the origin of transformation to the left edge */
+    transform-origin: left center;
   }
+
+  @media (max-width: 600px) {
+    .login-button {
+      max-width: 70%;
+    }
+
+    .login-button:hover {
+      /* Hover state with horizontal shrink */
+      transform: scaleX(0.95);
+    }
+  }
+
   .login-card {
     padding: 6.25rem 0; /* Top and bottom padding */
   }
@@ -93,6 +107,4 @@
     font-weight: bolder;
     color: #001e49;
   }
-
-
 </style>
