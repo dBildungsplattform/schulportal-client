@@ -85,33 +85,58 @@
     background-size:
       200% 100%,
       100% 100%;
-  }
 
-  @media (max-width: 1280px) {
-    .footer {
-      background-size:
-        200% 70%,
-        100% 100%;
-    }
+    min-height: 200px; /* Avoid footer shrinking vertically on smaller screen sizes*/
+    align-items: flex-end;
   }
 
   @media (max-width: 960px) {
     .footer {
+      min-height: 280px;
       background-size:
-        200% 20%,
+        200% 50%,
         100% 100%;
     }
   }
 
-  @media (max-width: 680px) {
+  @media (max-width: 690px) {
     .footer {
+      min-height: 340px;
       background-size:
-        200% 0%,
+        200% 45%,
         100% 100%;
     }
   }
-  .footer {
-    min-height: 200px; /* Avoid footer shrinking vertically on smaller screen sizes*/
+
+  @media (max-width: 510px) {
+    .footer {
+      min-height: 320px;
+      background-size:
+        200% 40%,
+        100% 100%;
+    }
+  }
+
+  @media (max-width: 416px) {
+    .footer {
+      min-height: 350px;
+      background-size:
+        200% 40%,
+        100% 100%;
+    }
+  }
+
+  @media (max-width: 348px) {
+    .footer {
+      min-height: 380px;
+      background-size:
+        200% 30%,
+        100% 100%;
+    }
+  }
+
+  .v-container {
+    padding-bottom: 40px;
   }
 
   .v-btn {
@@ -133,7 +158,10 @@
 
   .sponsor-logos-div {
     display: flex;
+    justify-content: center;
+    /* flex-wrap: wrap; */
     position: relative;
+    overflow: hidden;
   }
 
   /* The line between the 2 logos */
