@@ -3,8 +3,18 @@
   import SH_LOGO from '@/assets/logos/landesdachmarke_01_KORR.svg'
   import DIGITAL_PAKT from '@/assets/logos/digitalPakt.svg'
 
-  // Define the footer links
-  const footerLinks = ref([
+  // Define the interface for footer links
+  interface FooterLink {
+    text: string
+  }
+
+  // Define the interface for sponsors
+  interface Sponsor {
+    src: string
+    alt: string
+  }
+
+  const footerLinks = ref<FooterLink[]>([
     { text: 'Kontakt' },
     { text: 'Hilfe' },
     { text: 'Impressum' },
@@ -13,10 +23,11 @@
   ])
 
   // Define the sponsor logos and their sources
-  const sponsors = ref([
+  const sponsors = ref<Sponsor[]>([
     { src: DIGITAL_PAKT, alt: 'DigitalPakt Schule' },
     { src: SH_LOGO, alt: 'Schleswig-Holstein' }
   ])
+  
 </script>
 
 <template>
@@ -40,7 +51,6 @@
               :key="sponsor.alt"
               :src="sponsor.src"
               :alt="sponsor.alt"
-           
               contain
               class="sponsor-logo"
             />
@@ -194,7 +204,6 @@
   }
 
   @media (max-width: 1280px) {
-    
     .sponsor-logos-col,
     .footer-links-col {
       flex-wrap: wrap; /* Allow the items to wrap if needed */
