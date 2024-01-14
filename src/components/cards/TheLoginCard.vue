@@ -107,4 +107,14 @@
     font-weight: bolder;
     color: #001e49;
   }
+
+  @media (max-width: 600px) {
+    .v-card-title {
+      font-size: 1.5rem;
+    }
+
+    .v-card-text {
+      font-size: 1.1rem;
+    }
+  }
 </style>
