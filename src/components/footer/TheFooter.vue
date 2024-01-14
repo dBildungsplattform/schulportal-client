@@ -3,13 +3,13 @@
   import SH_LOGO from '@/assets/logos/landesdachmarke_01_KORR.svg'
   import DIGITAL_PAKT from '@/assets/logos/digitalPakt.svg'
 
-  // Define the footer links and their navigation routes
+  // Define the footer links
   const footerLinks = ref([
-    { text: 'Kontakt', route: '/contact' },
-    { text: 'Hilfe', route: '/help' },
-    { text: 'Impressum', route: '/legal-notice' },
-    { text: 'Datenschutzerklärung', route: '/privacy-policy' },
-    { text: 'Barrierefreiheit', route: '/accessibility' }
+    { text: 'Kontakt' },
+    { text: 'Hilfe' },
+    { text: 'Impressum' },
+    { text: 'Datenschutzerklärung' },
+    { text: 'Barrierefreiheit' }
   ])
 
   // Define the sponsor logos and their sources
@@ -90,11 +90,20 @@
     align-items: flex-end;
   }
 
+  @media (max-width: 1280px) {
+    .footer {
+      min-height: 280px;
+      background-size:
+        200% 100%,
+        100% 100%;
+    }
+  }
+
   @media (max-width: 960px) {
     .footer {
       min-height: 280px;
       background-size:
-        200% 50%,
+        200% 30%,
         100% 100%;
     }
   }
@@ -193,4 +202,6 @@
       justify-content: center; /* Center the items if they wrap */
     }
   }
+
+
 </style>
