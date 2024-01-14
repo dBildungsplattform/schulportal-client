@@ -48,6 +48,7 @@
           cols="12"
           md="8"
           sm="6"
+          xs="4"
           class="d-flex justify-center"
         >
           <v-hover>

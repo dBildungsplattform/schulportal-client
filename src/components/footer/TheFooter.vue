@@ -40,7 +40,7 @@
               :key="sponsor.alt"
               :src="sponsor.src"
               :alt="sponsor.alt"
-              width="200"
+           
               contain
               class="sponsor-logo"
             />
@@ -185,6 +185,7 @@
     transform: translateX(-50%);
   }
   .sponsor-logo {
+    width: 200px;
     height: auto; /* Maintain aspect ratio */
     margin: 0 10px; /* Adds some space between logos */
   }
@@ -193,9 +194,7 @@
   }
 
   @media (max-width: 1280px) {
-    .sponsor-logo {
-      width: 150px;
-    }
+    
     .sponsor-logos-col,
     .footer-links-col {
       flex-wrap: wrap; /* Allow the items to wrap if needed */
@@ -203,5 +202,9 @@
     }
   }
 
-
+  @media (max-width: 600px) {
+    .sponsor-logo {
+      width: 160px; /* Set the width to 100px or less */
+    }
+  }
 </style>
