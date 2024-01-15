@@ -2,8 +2,15 @@
  * COLOR DEFINITIONS *
  *********************/
 $darkBlue: #001E49;
+$lightBlue: #325E91;
 
 /***************
  * COLOR USAGE *
  ***************/
 $primaryColor: $darkBlue;
+
+/*****************
+ * BUTTON STYLES *
+ *****************/
+$primaryButtonColor: $primaryColor;
+$secondaryButtonColor: $lightBlue;

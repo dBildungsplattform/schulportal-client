@@ -1,3 +1,5 @@
+@import '../variables.scss';
+
 .v-btn.button {
   border-radius: 5px;
   font-size: 20px;
@@ -16,13 +18,13 @@
 }
 
 .primary.button {
-  background: #001e49;
-  border: 2px solid #001e49;
+  background: $primaryButtonColor;
+  border: 2px solid $primaryButtonColor;
   color: #fff;
 }
 
 .secondary.button {
   background: #fff;
-  border: 2px solid #001e49;
-  color: #001e49;
+  border: 2px solid $primaryButtonColor;
+  color: $primaryButtonColor;
 }

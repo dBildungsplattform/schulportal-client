@@ -2,8 +2,8 @@
 @use 'vuetify';
 
 @import './base.scss';
-@import './button.scss';
-@import './user-table.scss';
+@import './components/button.scss';
+@import './components/user-table.scss';
 
 #app {
   font-weight: normal;
