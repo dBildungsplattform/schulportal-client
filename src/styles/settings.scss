@@ -1,5 +1,3 @@
-@use 'vuetify/settings' with (
-  $button-background: #001E49 // $primaryColor
-);
-
-@import './variables.scss';
+@use 'vuetify/settings' /* with (
+  $example-variable: value
+) */;
