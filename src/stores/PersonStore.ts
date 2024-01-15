@@ -36,7 +36,8 @@ type PersonState = {
 type PersonGetters = {}
 type PersonActions = {
   getAllPersons: () => Promise<void>
-  resetPassword: (userId: string) => Promise<string>
+  getPersonById: (personId: string) => Promise<Personendatensatz>
+  resetPassword: (personId: string) => Promise<string>
 }
 
 export type PersonStore = Store<'personStore', PersonState, PersonGetters, PersonActions>
@@ -62,7 +63,7 @@ export const usePersonStore: StoreDefinition<
       try {
         const { data }: { data: FrontendControllerPersons200Response } =
           await frontendApi.frontendControllerPersons()
-        this.allPersons = data.items || []
+        this.allPersons = data.items
         this.totalPersons = data.total
         this.loading = false
       } catch (error: unknown) {
@@ -74,10 +75,28 @@ export const usePersonStore: StoreDefinition<
       }
     },
 
-    async resetPassword(userId: string): Promise<string> {
+    async getPersonById(personId: string): Promise<Personendatensatz> {
       this.loading = true
       try {
-        const { data }: { data: string } = await frontendApi.frontendControllerPasswordReset(userId)
+        const { data }: { data: Personendatensatz } =
+          await frontendApi.frontendControllerPersonById(personId)
+        this.loading = false
+        return data
+      } catch (error) {
+        this.errorCode = 'UNSPECIFIED_ERROR'
+        if (isAxiosError(error)) {
+          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR'
+        }
+        this.loading = false
+        return Promise.reject(this.errorCode)
+      }
+    },
+
+    async resetPassword(personId: string): Promise<string> {
+      this.loading = true
+      try {
+        const { data }: { data: string } =
+          await frontendApi.frontendControllerPasswordReset(personId)
         this.loading = false
         return data
       } catch (error: unknown) {
