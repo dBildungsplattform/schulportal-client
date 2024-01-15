@@ -3,19 +3,17 @@
   import SH_LOGO from '@/assets/logos/landesdachmarke_01_KORR.svg'
   import DIGITAL_PAKT from '@/assets/logos/digitalPakt.svg'
 
-  // Define the interface for footer links
-  interface FooterLink {
+  type FooterLink = {
     text: string
     href: string
   }
 
-  // Define the interface for sponsors
-  interface Sponsor {
+  type Sponsor = {
     src: string
     alt: string
+    href: string
   }
 
-  // Add explicit type annotation here
   const footerLinks: Ref<FooterLink[]> = ref([
     { text: 'Kontakt', href: 'https://www.secure-lernnetz.de/helpdesk/' },
     { text: 'Hilfe', href: '#' },
@@ -24,10 +22,17 @@
     { text: 'Barrierefreiheit', href: '#' }
   ])
 
-  // And here as well
   const sponsors: Ref<Sponsor[]> = ref([
-    { src: DIGITAL_PAKT, alt: 'DigitalPakt Schule' },
-    { src: SH_LOGO, alt: 'Schleswig-Holstein' }
+    {
+      src: DIGITAL_PAKT,
+      alt: 'DigitalPakt Schule',
+      href: 'https://www.digitalpaktschule.de/de/schleswig-holstein-1800.html'
+    },
+    {
+      src: SH_LOGO,
+      alt: 'Schleswig-Holstein',
+      href: 'https://www.schleswig-holstein.de/DE/landesportal/landesportal_node.html'
+    }
   ])
 </script>
 
@@ -52,7 +57,7 @@
               <a
                 v-if="sponsor.src === DIGITAL_PAKT"
                 :key="sponsor.alt"
-                href="https://www.digitalpaktschule.de/de/schleswig-holstein-1800.html"
+                :href="sponsor.href"
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -67,7 +72,7 @@
               <a
                 v-if="sponsor.src === SH_LOGO"
                 :key="sponsor.alt"
-                href="https://www.schleswig-holstein.de/DE/landesportal/landesportal_node.html"
+                :href="sponsor.href"
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -212,7 +217,6 @@
   .sponsor-logos-div {
     display: flex;
     justify-content: center;
-    /* flex-wrap: wrap; */
     position: relative;
     overflow: hidden;
   }
