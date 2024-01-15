@@ -39,15 +39,21 @@
     </v-toolbar-title>
     <v-spacer></v-spacer>
 
-    <!-- The link should be centralized somewhere else?-->
-    <v-btn :href="'https://medienberatung.iqsh.de/schulportal-sh.html'">
-      <v-icon
-        left
-        class="hidden-md-and-up"
-        >mdi-help</v-icon
+    <v-toolbar-items>
+      <v-btn
+        data-testid="help-button"
+        :href="'https://medienberatung.iqsh.de/schulportal-sh.html'"
+        target="_blank"
+        rel="noopener noreferrer"
       >
-      <span class="hidden-sm-and-down">{{ $t('nav.help') }}</span></v-btn
-    >
+        <v-icon
+          left
+          class="hidden-md-and-up"
+          >mdi-help</v-icon
+        >
+        <span class="hidden-sm-and-down">{{ $t('nav.help') }}</span></v-btn
+      >
+    </v-toolbar-items>
   </v-app-bar>
 
   <v-app-bar
@@ -57,27 +63,31 @@
   >
     <v-spacer></v-spacer>
 
-    <v-btn
-      v-if="!auth.isAuthed"
-      color="#001E49"
-      :href="`/api/frontend/login?redirectUrl=${route.fullPath}`"
-    >
-      <template #prepend>
-        <v-icon>mdi-login</v-icon>
-      </template>
-      <span class="hidden-sm-and-down">{{ $t('nav.login') }}</span>
-    </v-btn>
+    <v-toolbar-items>
+      <v-btn
+        data-testid="nav-login-button"
+        v-if="!auth.isAuthed"
+        color="#001E49"
+        :href="`/api/frontend/login?redirectUrl=${route.fullPath}`"
+      >
+        <template #prepend>
+          <v-icon>mdi-login</v-icon>
+        </template>
+        <span class="hidden-sm-and-down">{{ $t('nav.login') }}</span>
+      </v-btn>
 
-    <v-btn
-      v-if="auth.isAuthed"
-      color="#001E49"
-      href="/api/frontend/logout"
-    >
-      <template #prepend>
-        <v-icon>mdi-logout</v-icon>
-      </template>
-      {{ $t('nav.logout') }}
-    </v-btn>
+      <v-btn
+        data-testid="nav-logout-button"
+        v-if="auth.isAuthed"
+        color="#001E49"
+        href="/api/frontend/logout"
+      >
+        <template #prepend>
+          <v-icon>mdi-logout</v-icon>
+        </template>
+        {{ $t('nav.logout') }}
+      </v-btn>
+    </v-toolbar-items>
   </v-app-bar>
 </template>
 

@@ -1,11 +1,12 @@
 <script setup lang="ts">
-  import { ref } from 'vue'
+  import { ref, type Ref } from 'vue'
   import SH_LOGO from '@/assets/logos/landesdachmarke_01_KORR.svg'
   import DIGITAL_PAKT from '@/assets/logos/digitalPakt.svg'
 
   // Define the interface for footer links
   interface FooterLink {
     text: string
+    href: string
   }
 
   // Define the interface for sponsors
@@ -14,20 +15,20 @@
     alt: string
   }
 
-  const footerLinks = ref<FooterLink[]>([
-    { text: 'Kontakt' },
-    { text: 'Hilfe' },
-    { text: 'Impressum' },
-    { text: 'Datenschutzerklärung' },
-    { text: 'Barrierefreiheit' }
+  // Add explicit type annotation here
+  const footerLinks: Ref<FooterLink[]> = ref([
+    { text: 'Kontakt', href: 'https://www.secure-lernnetz.de/helpdesk/' },
+    { text: 'Hilfe', href: '#' },
+    { text: 'Impressum', href: '#' },
+    { text: 'Datenschutzerklärung', href: '#' },
+    { text: 'Barrierefreiheit', href: '#' }
   ])
 
-  // Define the sponsor logos and their sources
-  const sponsors = ref<Sponsor[]>([
+  // And here as well
+  const sponsors: Ref<Sponsor[]> = ref([
     { src: DIGITAL_PAKT, alt: 'DigitalPakt Schule' },
     { src: SH_LOGO, alt: 'Schleswig-Holstein' }
   ])
-  
 </script>
 
 <template>
@@ -53,8 +54,9 @@
                 :key="sponsor.alt"
                 href="https://www.digitalpaktschule.de/de/schleswig-holstein-1800.html"
                 target="_blank"
+                rel="noopener noreferrer"
               >
-               <v-img
+                <v-img
                   :src="sponsor.src"
                   :alt="sponsor.alt"
                   width="200"
@@ -62,16 +64,21 @@
                   class="sponsor-logo"
                 />
               </a>
-
-              <!-- Logo without clickable link -->
-              <v-img
-                v-else
-                :src="sponsor.src"
-                :alt="sponsor.alt"
-                width="200"
-                contain
-                class="sponsor-logo"
-              />
+              <a
+                v-if="sponsor.src === SH_LOGO"
+                :key="sponsor.alt"
+                href="https://www.schleswig-holstein.de/DE/landesportal/landesportal_node.html"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <v-img
+                  :src="sponsor.src"
+                  :alt="sponsor.alt"
+                  width="200"
+                  contain
+                  class="sponsor-logo"
+                />
+              </a>
             </template>
           </div>
         </v-col>
@@ -90,7 +97,12 @@
             variant="text"
             color="#001E49"
           >
-            {{ link.text }}
+            <a
+              :href="link.href"
+              target="_blank"
+              rel="noopener noreferrer"
+              >{{ link.text }}</a
+            >
           </v-btn>
         </v-col>
       </v-row>
@@ -105,6 +117,9 @@
 </template>
 
 <style scoped>
+  a {
+    color: #001e49;
+  }
   .footer {
     background-image: linear-gradient(to bottom right, #ffffff 25%, transparent 25%),
       linear-gradient(180deg, rgba(229, 234, 239, 1) 100%, transparent 100%);

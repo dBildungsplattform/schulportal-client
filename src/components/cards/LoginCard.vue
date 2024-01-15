@@ -53,6 +53,7 @@
           <v-hover>
             <template v-slot:default="{ isHovering, props }">
               <v-btn
+                data-testid="login-button"
                 v-bind="props"
                 class="login-button"
                 :color="isHovering ? '#325E91' : '#001E49'"
