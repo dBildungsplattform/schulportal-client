@@ -46,14 +46,33 @@
           class="sponsor-logos-col"
         >
           <div class="sponsor-logos-div">
-            <v-img
-              v-for="sponsor in sponsors"
-              :key="sponsor.alt"
-              :src="sponsor.src"
-              :alt="sponsor.alt"
-              contain
-              class="sponsor-logo"
-            />
+            <template v-for="sponsor in sponsors">
+              <!-- Logo with clickable link -->
+              <a
+                v-if="sponsor.src === DIGITAL_PAKT"
+                :key="sponsor.alt"
+                href="https://www.digitalpaktschule.de/de/schleswig-holstein-1800.html"
+                target="_blank"
+              >
+               <v-img
+                  :src="sponsor.src"
+                  :alt="sponsor.alt"
+                  width="200"
+                  contain
+                  class="sponsor-logo"
+                />
+              </a>
+
+              <!-- Logo without clickable link -->
+              <v-img
+                v-else
+                :src="sponsor.src"
+                :alt="sponsor.alt"
+                width="200"
+                contain
+                class="sponsor-logo"
+              />
+            </template>
           </div>
         </v-col>
 
