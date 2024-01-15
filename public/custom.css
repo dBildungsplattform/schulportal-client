@@ -39,8 +39,12 @@ li {
 }
 
 .Schulportal-Logo {
-    float: right;
-    right: 0;
-    top: 0;
+    
     width: 250px;
+}
+
+.Schulportal-Logo-Div {
+
+    display: flex;
+    justify-content: flex-end;
 }
