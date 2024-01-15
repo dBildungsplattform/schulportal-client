@@ -39,7 +39,7 @@ li {
 }
 
 .Schulportal-Logo {
-    position: absolute;
+    float: right;
     right: 0;
     top: 0;
     width: 250px;
