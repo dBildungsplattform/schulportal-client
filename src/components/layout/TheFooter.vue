@@ -16,10 +16,10 @@
 
   const footerLinks: Ref<FooterLink[]> = ref([
     { text: 'Kontakt', href: 'https://www.secure-lernnetz.de/helpdesk/' },
-    { text: 'Hilfe', href: '#' },
-    { text: 'Impressum', href: '#' },
-    { text: 'Datenschutzerklärung', href: '#' },
-    { text: 'Barrierefreiheit', href: '#' }
+    { text: 'Hilfe', href: 'https://medienberatung.iqsh.de/schulportal-sh.html' },
+    { text: 'Impressum', href: 'impressum_datenschutzerklaerung.html' },
+    { text: 'Datenschutzerklärung', href: 'impressum_datenschutzerklaerung.html#privacy_policy' },
+    { text: 'Barrierefreiheit', href: 'impressum_datenschutzerklaerung.html#accessibility' }
   ])
 
   const sponsors: Ref<Sponsor[]> = ref([
