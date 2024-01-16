@@ -2,7 +2,7 @@ import type {
   FrontendControllerPersons200Response,
   PersonendatensatzResponse
 } from '@/api-client/generated'
-import { usePersonStore, type PersonStore } from './PersonStore'
+import { usePersonStore, type PersonStore, type Personendatensatz } from './PersonStore'
 import ApiService from '@/services/ApiService'
 import MockAdapter from 'axios-mock-adapter'
 import { setActivePinia, createPinia } from 'pinia'
@@ -78,6 +78,49 @@ describe('PersonStore', () => {
       expect(personStore.loading).toBe(true)
       await getAllPersonPromise
       expect(personStore.allPersons).toEqual([])
+      expect(personStore.errorCode).toEqual('some mock server error')
+      expect(personStore.loading).toBe(false)
+    })
+  })
+
+  describe('getPersonById', () => {
+    it('should load Person and update state', async () => {
+      const mockPerson: PersonendatensatzResponse = {
+        person: {
+          id: '1234',
+          name: {
+            familienname: 'Vimes',
+            vorname: 'Samuel'
+          }
+        }
+      } as PersonendatensatzResponse
+
+      const mockResponse: PersonendatensatzResponse = mockPerson
+
+      mockadapter.onGet('/api/frontend/personen/1234').replyOnce(200, mockResponse)
+      const getPersonByIdPromise: Promise<Personendatensatz> = personStore.getPersonById('1234')
+      expect(personStore.loading).toBe(true)
+      const currentPerson: Personendatensatz = await getPersonByIdPromise
+      expect(currentPerson).toEqual(mockPerson)
+      expect(personStore.loading).toBe(false)
+    })
+
+    it('should handle string error', async () => {
+      mockadapter.onGet('/api/frontend/personen/2345').replyOnce(500, 'some mock server error')
+      const getPersonByIdPromise: Promise<Personendatensatz> = personStore.getPersonById('2345')
+      expect(personStore.loading).toBe(true)
+      await rejects(getPersonByIdPromise)
+      expect(personStore.errorCode).toEqual('UNSPECIFIED_ERROR')
+      expect(personStore.loading).toBe(false)
+    })
+
+    it('should handle error code', async () => {
+      mockadapter
+        .onGet('/api/frontend/personen/2345')
+        .replyOnce(500, { code: 'some mock server error' })
+      const getPersonByIdPromise: Promise<Personendatensatz> = personStore.getPersonById('2345')
+      expect(personStore.loading).toBe(true)
+      await rejects(getPersonByIdPromise)
       expect(personStore.errorCode).toEqual('some mock server error')
       expect(personStore.loading).toBe(false)
     })
