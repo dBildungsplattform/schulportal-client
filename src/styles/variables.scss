@@ -1,16 +1,47 @@
 /*********************
  * COLOR DEFINITIONS *
  *********************/
+$cyan: #1EAE9C;
 $darkBlue: #001E49;
+$grey: #A4ADB6;
 $lightBlue: #325E91;
+$lightCyan: #4DC7BC;
+$lightGrey: #E5EAEF;
+$lightRed: #EEABC3;
+$red: #D4004B;
+$white: #FFFFFF;
+
+/***********************
+ * GENERAL COLOR USAGE *
+ ***********************/
+$backgroundColor: $white;
+$primaryColor: $darkBlue;
 
 /***************
- * COLOR USAGE *
+ * FONT STYLES *
  ***************/
-$primaryColor: $darkBlue;
+$bodyFontColor: $primaryColor;
+$bigBodyFontSize: 20px;
+$mediumBodyFontSize: 18px;
+$smallBodyFontSize: 16px;
 
 /*****************
  * BUTTON STYLES *
  *****************/
-$primaryButtonColor: $primaryColor;
-$secondaryButtonColor: $lightBlue;
+$bigButtonFontSize: $bigBodyFontSize;
+$mediumButtonFontSize: $mediumBodyFontSize;
+$smallButtonFontSize: $smallBodyFontSize;
+$disabledPrimaryButtonBackgroundColor: $grey;
+$disabledPrimaryButtonColor: $white;
+$disabledPrimaryButtonBorderColor: $grey;
+$disabledSecondaryButtonBackgroundColor: $grey;
+$disabledSecondaryButtonColor: $grey;
+$primaryButtonBackgroundColor: $primaryColor;
+$primaryButtonBorderColor: $primaryColor;
+$primaryButtonColor: $white;
+$primaryButtonHoverBackgroundColor: $lightBlue;
+$secondaryButtonBackgroundColor: $white;
+$secondaryButtonColor: $primaryColor;
+$secondaryButtonBorderColor: $primaryColor;
+$secondaryButtonBorderSize: 2px;
+$secondaryButtonHoverBorderSize: 4px;

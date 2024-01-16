@@ -1,30 +1,44 @@
-@import '../variables.scss';
-
 .v-btn.button {
-  border-radius: 5px;
   font-size: 20px;
-  height: 50px;
   text-transform: none;
   width: 340px;
-
-  &.small {
-    font-size: 16px;
-    width: 250px;
-  }
 
   .v-btn__content {
     font-weight: bold;
   }
-}
 
-.primary.button {
-  background: $primaryButtonColor;
-  border: 2px solid $primaryButtonColor;
-  color: #fff;
-}
+  &.primary {
+    background: $primaryButtonBackgroundColor;
+    border: 2px solid $primaryButtonBorderColor;
+    color: $primaryButtonColor;
+  
+    &:hover {
+      background: $primaryButtonHoverBackgroundColor;
+    }
+  }
 
-.secondary.button {
-  background: #fff;
-  border: 2px solid $primaryButtonColor;
-  color: $primaryButtonColor;
+  &.secondary {
+    background: $secondaryButtonBackgroundColor;
+    border: $secondaryButtonBorderSize solid $secondaryButtonBorderColor;
+    color: $secondaryButtonColor;
+  
+    &:hover {
+      border: $secondaryButtonHoverBorderSize solid $secondaryButtonBorderColor;
+    }
+  }
+
+  /* small */
+  @media only screen and (max-width: 600px) {
+    font-size: $smallButtonFontSize;
+  }
+  
+  /* medium */
+  @media only screen and (min-width: 601px) and (max-width: 1280px) {
+    font-size: $mediumButtonFontSize;
+  }
+  
+  /* big */
+  @media only screen and (min-width: 1281px) {
+    font-size: $bigButtonFontSize;
+  }
 }

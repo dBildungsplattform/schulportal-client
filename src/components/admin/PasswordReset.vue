@@ -141,14 +141,14 @@
         <v-card-actions class="justify-center">
           <v-btn
             @click.stop="closePasswordResetDialog(isActive)"
-            class="secondary small button"
+            class="secondary button"
             data-testid="close-password-reset-dialog-button"
           >
             {{ !!password ? $t('close') : $t('cancel') }}
           </v-btn>
           <v-btn
             @click.stop="$emit('onResetPassword', person.person.id)"
-            class="primary small button"
+            class="primary button"
             data-testid="password-reset-button"
             :disabled="!!password"
           >
