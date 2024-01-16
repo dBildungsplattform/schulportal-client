@@ -52,26 +52,9 @@
           class="sponsor-logos-col"
         >
           <div class="sponsor-logos-div">
-            <template v-for="sponsor in sponsors">
+            <template v-for="sponsor in sponsors" :key="sponsor.alt">
               <!-- Logo with clickable link -->
               <a
-                v-if="sponsor.src === DIGITAL_PAKT"
-                :key="sponsor.alt"
-                :href="sponsor.href"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <v-img
-                  :src="sponsor.src"
-                  :alt="sponsor.alt"
-                  width="200"
-                  contain
-                  class="sponsor-logo"
-                />
-              </a>
-              <a
-                v-if="sponsor.src === SH_LOGO"
-                :key="sponsor.alt"
                 :href="sponsor.href"
                 target="_blank"
                 rel="noopener noreferrer"
