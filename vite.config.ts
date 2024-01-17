@@ -13,7 +13,8 @@ export default defineConfig({
         configFile: 'src/styles/settings.scss'
       }
     }),
-    basicSsl()],
+    basicSsl()
+  ],
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))

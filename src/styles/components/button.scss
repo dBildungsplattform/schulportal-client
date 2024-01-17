@@ -10,7 +10,7 @@
     background: $primaryButtonBackgroundColor;
     border: $primaryButtonBorderSize solid $primaryButtonBorderColor;
     color: $primaryButtonColor;
-  
+
     &:hover {
       background: $primaryButtonHoverBackgroundColor;
     }
@@ -20,7 +20,7 @@
     background: $secondaryButtonBackgroundColor;
     border: $secondaryButtonBorderSize solid $secondaryButtonBorderColor;
     color: $secondaryButtonColor;
-  
+
     &:hover {
       border: $secondaryButtonHoverBorderSize solid $secondaryButtonBorderColor;
     }
@@ -30,12 +30,12 @@
   @media only screen and (max-width: 600px) {
     font-size: $smallButtonFontSize;
   }
-  
+
   /* medium screen */
   @media only screen and (min-width: 601px) and (max-width: 1280px) {
     font-size: $mediumButtonFontSize;
   }
-  
+
   /* big screen */
   @media only screen and (min-width: 1281px) {
     font-size: $bigButtonFontSize;

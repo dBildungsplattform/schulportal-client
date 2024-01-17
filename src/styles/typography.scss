@@ -1,4 +1,7 @@
-.headline-1, .headline-2, .subtitle-1, .subtitle-2 {
+.headline-1,
+.headline-2,
+.subtitle-1,
+.subtitle-2 {
   font-weight: bold;
 }
 
@@ -43,15 +46,15 @@
     .headline-1 {
       font-size: $mediumHeadline1FontSize;
     }
-  
+
     .headline-2 {
       font-size: $mediumHeadline2FontSize;
     }
-  
+
     .subtitle-1 {
       font-size: $mediumSubtitle1FontSize;
     }
-  
+
     .subtitle-2 {
       font-size: $mediumSubtitle2FontSize;
     }

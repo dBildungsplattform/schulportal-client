@@ -66,7 +66,6 @@
 </template>
 
 <style scoped>
-
   @media (max-width: 600px) {
     .login-button {
       max-width: 70%;

@@ -55,7 +55,10 @@
           class="sponsor-logos-col"
         >
           <div class="sponsor-logos-div">
-            <template v-for="sponsor in sponsors" :key="sponsor.alt">
+            <template
+              v-for="sponsor in sponsors"
+              :key="sponsor.alt"
+            >
               <!-- Logo with clickable link -->
               <a
                 :href="sponsor.href"

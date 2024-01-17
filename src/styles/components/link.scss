@@ -1,11 +1,13 @@
 a {
   text-decoration: none;
 
-  &.primary, &.primary:active {
+  &.primary,
+  &.primary:active {
     color: $primaryColor;
   }
 
-  &.secondary, &.secondary:active {
+  &.secondary,
+  &.secondary:active {
     color: $white;
   }
 

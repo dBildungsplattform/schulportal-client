@@ -35,11 +35,11 @@
           class="hidden-md-and-up"
         >
           <v-img
-              alt="SchulPortalLogoBlau"
-              :src="SchulPortalLogoBlau"
-              :width="33"
-              :height="33"
-            />
+            alt="SchulPortalLogoBlau"
+            :src="SchulPortalLogoBlau"
+            :width="33"
+            :height="33"
+          />
         </v-col>
       </v-row>
     </v-toolbar-title>
@@ -54,7 +54,10 @@
           rel="noopener noreferrer"
           target="_blank"
         >
-          <v-icon class="hidden-md-and-up mr-2" icon="mdi-help-circle-outline"></v-icon>
+          <v-icon
+            class="hidden-md-and-up mr-2"
+            icon="mdi-help-circle-outline"
+          ></v-icon>
           <span class="hidden-sm-and-down">{{ $t('nav.help') }}</span>
         </a>
       </v-col>
@@ -75,21 +78,26 @@
           data-testid="nav-login-button"
           :href="`/api/frontend/login?redirectUrl=${route.fullPath}`"
         >
-          <v-icon class="mr-2" icon="mdi-login"></v-icon>
+          <v-icon
+            class="mr-2"
+            icon="mdi-login"
+          ></v-icon>
           <span class="hidden-sm-and-down">{{ $t('nav.login') }}</span>
         </a>
       </v-col>
     </v-toolbar-items>
-    
+
     <v-toolbar-items v-if="auth.isAuthed">
       <v-col class="align-self-center mr-2">
         <a
-          
           class="primary"
           data-testid="nav-logout-button"
           href="/api/frontend/logout"
         >
-          <v-icon class="mr-2" icon="mdi-logout"></v-icon>
+          <v-icon
+            class="mr-2"
+            icon="mdi-logout"
+          ></v-icon>
           <span class="hidden-sm-and-down">{{ $t('nav.logout') }}</span>
         </a>
       </v-col>
