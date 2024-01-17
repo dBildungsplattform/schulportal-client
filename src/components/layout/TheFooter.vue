@@ -2,6 +2,9 @@
   import { ref, type Ref } from 'vue'
   import SH_LOGO from '@/assets/logos/landesdachmarke_01_KORR.svg'
   import DIGITAL_PAKT from '@/assets/logos/digitalPakt.svg'
+  import { type Composer, useI18n } from 'vue-i18n'
+
+  const { t }: Composer = useI18n({ useScope: 'global' })
 
   type FooterLink = {
     text: string
@@ -15,11 +18,11 @@
   }
 
   const footerLinks: Ref<FooterLink[]> = ref([
-    { text: 'Kontakt', href: 'https://www.secure-lernnetz.de/helpdesk/' },
-    { text: 'Hilfe', href: '#' },
-    { text: 'Impressum', href: '#' },
-    { text: 'Datenschutzerklärung', href: '#' },
-    { text: 'Barrierefreiheit', href: '#' }
+    { text: t('footer.contact'), href: 'https://www.secure-lernnetz.de/helpdesk/' },
+    { text: t('footer.help'), href: '#' },
+    { text: t('footer.legalNotice'), href: '#' },
+    { text: t('footer.privacyPolicy'), href: '#' },
+    { text: t('footer.accessibility'), href: '#' }
   ])
 
   const sponsors: Ref<Sponsor[]> = ref([
@@ -62,7 +65,7 @@
                 <v-img
                   :src="sponsor.src"
                   :alt="sponsor.alt"
-                  width="200"
+                  width="250"
                   contain
                   class="sponsor-logo"
                 />
@@ -76,28 +79,22 @@
           cols="12"
           md="6"
           order-md="1"
-          class="footer-links-col"
+          class="footer-links-col justify-space-between"
         >
-          <v-btn
+          <a
             v-for="link in footerLinks"
             :key="link.text"
-            small
-            variant="text"
-            color="#001E49"
+            :href="link.href"
+            rel="noopener noreferrer"
+            target="_blank"
+            >{{ link.text }}</a
           >
-            <a
-              :href="link.href"
-              target="_blank"
-              rel="noopener noreferrer"
-              >{{ link.text }}</a
-            >
-          </v-btn>
         </v-col>
       </v-row>
       <v-bottom-navigation
         class="bottom-navigation"
         :elevation="1"
-        height="22"
+        height="40"
       >
       </v-bottom-navigation>
     </v-container>
@@ -216,7 +213,6 @@
     transform: translateX(-50%);
   }
   .sponsor-logo {
-    width: 200px;
     height: auto; /* Maintain aspect ratio */
     margin: 0 10px; /* Adds some space between logos */
   }
