@@ -26,17 +26,17 @@
     }
   }
 
-  /* small */
+  /* small screen */
   @media only screen and (max-width: 600px) {
     font-size: $smallButtonFontSize;
   }
   
-  /* medium */
+  /* medium screen */
   @media only screen and (min-width: 601px) and (max-width: 1280px) {
     font-size: $mediumButtonFontSize;
   }
   
-  /* big */
+  /* big screen */
   @media only screen and (min-width: 1281px) {
     font-size: $bigButtonFontSize;
   }

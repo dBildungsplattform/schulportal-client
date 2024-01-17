@@ -1,3 +1,4 @@
 @use 'vuetify/settings' with (
+  /* override global vuetify variables */
   $button-height: 50px
 );

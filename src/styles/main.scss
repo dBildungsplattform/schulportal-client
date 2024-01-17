@@ -2,6 +2,7 @@
 @use 'vuetify';
 
 @import './variables.scss';
+@import './typography.scss';
 @import './components/button.scss';
 @import './components/link.scss';
 @import './components/user-table.scss';
@@ -39,16 +40,6 @@ body {
   }
 }
 
-.headline-1 {
-  font-size: 30px;
-  font-weight: bold;
-}
-
-.headline-2 {
-  font-size: 24px;
-  font-weight: bold;
-}
-
 .layout-card {
   box-shadow: 0px 3px 6px #001e4980;
   border-radius: 5px;
@@ -56,26 +47,6 @@ body {
 
 .pointer {
   cursor: pointer;
-}
-
-.subtitle-1 {
-  font-size: 20px;
-  font-weight: bold;
-}
-
-.subtitle-2 {
-  font-size: 16px;
-  font-weight: bold;
-}
-
-.text-body {
-  font-size: 16px;
-  font-weight: normal;
-
-  &.bold,
-  &.bold * {
-    font-weight: bold;
-  }
 }
 
 .v-field--variant-outlined .v-field__outline {
@@ -88,23 +59,17 @@ p {
   text-wrap: pretty;
 }
 
-/* small */
+/* small screen */
 @media only screen and (max-width: 600px) {
-  body {
-    font-size: 16px;
-  }
+  
 }
 
-/* medium */
+/* medium screen */
 @media only screen and (min-width: 601px) and (max-width: 1280px) {
-  body {
-    font-size: 18px;
-  }
+  
 }
 
-/* big */
+/* big screen */
 @media only screen and (min-width: 1281px) {
-  body {
-    font-size: 20px;
-  }
+  
 }

@@ -94,7 +94,7 @@
       <v-bottom-navigation
         class="bottom-navigation"
         :elevation="1"
-        height="40"
+        height="22"
       >
       </v-bottom-navigation>
     </v-container>
