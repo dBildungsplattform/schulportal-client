@@ -11,7 +11,7 @@
   <v-app-bar
     :elevation="2"
     color="#001E49"
-    height="40"
+    height="60"
   >
     <!-- Logo and title -->
     <v-toolbar-title>
@@ -40,53 +40,53 @@
     <v-spacer></v-spacer>
 
     <v-toolbar-items>
-      <v-btn
-        data-testid="help-button"
-        :href="'https://medienberatung.iqsh.de/schulportal-sh.html'"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        <v-icon
-          left
-          class="hidden-md-and-up"
-          >mdi-help</v-icon
+      <v-col class="align-self-center mr-2">
+        <a
+          class="secondary"
+          data-testid="help-button"
+          href="https://medienberatung.iqsh.de/schulportal-sh.html"
+          rel="noopener noreferrer"
+          target="_blank"
         >
-        <span class="hidden-sm-and-down">{{ $t('nav.help') }}</span></v-btn
-      >
+          <v-icon class="hidden-md-and-up" icon="mdi-help-circle-outline"></v-icon>
+          <span class="hidden-sm-and-down">{{ $t('nav.help') }}</span>
+        </a>
+      </v-col>
     </v-toolbar-items>
   </v-app-bar>
 
   <v-app-bar
     color="#E5EAEF"
-    height="30"
+    height="40"
     :elevation="0"
   >
     <v-spacer></v-spacer>
 
-    <v-toolbar-items>
-      <v-btn
-        data-testid="nav-login-button"
-        v-if="!auth.isAuthed"
-        color="#001E49"
-        :href="`/api/frontend/login?redirectUrl=${route.fullPath}`"
-      >
-        <template #prepend>
-          <v-icon>mdi-login</v-icon>
-        </template>
-        <span class="hidden-sm-and-down">{{ $t('nav.login') }}</span>
-      </v-btn>
-
-      <v-btn
-        data-testid="nav-logout-button"
-        v-if="auth.isAuthed"
-        color="#001E49"
-        href="/api/frontend/logout"
-      >
-        <template #prepend>
-          <v-icon>mdi-logout</v-icon>
-        </template>
-        {{ $t('nav.logout') }}
-      </v-btn>
+    <v-toolbar-items v-if="!auth.isAuthed">
+      <v-col class="align-self-center mr-2">
+        <a
+          class="primary"
+          data-testid="nav-login-button"
+          :href="`/api/frontend/login?redirectUrl=${route.fullPath}`"
+        >
+          <v-icon icon="mdi-login"></v-icon>
+          <span class="hidden-sm-and-down">{{ $t('nav.login') }}</span>
+        </a>
+      </v-col>
+    </v-toolbar-items>
+    
+    <v-toolbar-items v-if="auth.isAuthed">
+      <v-col class="align-self-center mr-2">
+        <a
+          
+          class="primary"
+          data-testid="nav-logout-button"
+          href="/api/frontend/logout"
+        >
+          <v-icon icon="mdi-logout"></v-icon>
+          <span class="hidden-sm-and-down">{{ $t('nav.logout') }}</span>
+        </a>
+      </v-col>
     </v-toolbar-items>
   </v-app-bar>
 </template>

@@ -3,6 +3,7 @@
 
 @import './variables.scss';
 @import './components/button.scss';
+@import './components/link.scss';
 @import './components/user-table.scss';
 
 body {
@@ -24,7 +25,6 @@ body {
   background: $backgroundColor;
   color: $bodyFontColor;
   font-family: Arial, sans-serif;
-  font-size: 16px;
   font-weight: normal;
 }
 
@@ -77,10 +77,6 @@ body {
   --v-field-border-opacity: 1;
 }
 
-a {
-  text-decoration: none;
-}
-
 p {
   white-space: pre;
   /* text-wrap needs to be placed after white-space to overwrite wrapping behaviour */
@@ -89,15 +85,21 @@ p {
 
 /* small */
 @media only screen and (max-width: 600px) {
-  // add general responsive styles here
+  body {
+    font-size: 16px;
+  }
 }
 
 /* medium */
 @media only screen and (min-width: 601px) and (max-width: 1280px) {
-  // add general responsive styles here
+  body {
+    font-size: 18px;
+  }
 }
 
 /* big */
 @media only screen and (min-width: 1281px) {
-  // add general responsive styles here
+  body {
+    font-size: 20px;
+  }
 }

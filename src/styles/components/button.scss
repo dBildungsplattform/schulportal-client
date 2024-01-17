@@ -1,5 +1,4 @@
-.v-btn.button {
-  font-size: 20px;
+.v-btn {
   text-transform: none;
   width: 340px;
 
@@ -9,7 +8,7 @@
 
   &.primary {
     background: $primaryButtonBackgroundColor;
-    border: 2px solid $primaryButtonBorderColor;
+    border: $primaryButtonBorderSize solid $primaryButtonBorderColor;
     color: $primaryButtonColor;
   
     &:hover {
