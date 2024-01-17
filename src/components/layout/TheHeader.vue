@@ -1,7 +1,8 @@
 <script setup lang="ts">
   import { type RouteLocationNormalizedLoaded, useRoute } from 'vue-router'
   import { useAuthStore, type AuthStore } from '@/stores/AuthStore'
-  import SchulPortalLogo from '@/assets/logos/Schulportal_SH_Bildmarke_RGB_Anwendung_HG_Blau.svg'
+  import SchulPortalLogoBlau from '@/assets/logos/Schulportal_SH_Bildmarke_RGB_Anwendung_HG_Blau.svg'
+  import SchulPortalWortLogoBlau from '@/assets/logos/Schulportal_SH_Wort_Bildmarke_RGB_Anwendung_HG_Blau.svg'
 
   const route: RouteLocationNormalizedLoaded = useRoute()
   const auth: AuthStore = useAuthStore()
@@ -17,23 +18,28 @@
     <v-toolbar-title>
       <v-row no-gutters>
         <v-col
+          class="hidden-sm-and-down"
           cols="auto"
-          class="mr-2"
         >
           <v-img
-            alt="SchulPortalLogo"
-            :src="SchulPortalLogo"
-            :width="30"
-            :height="30"
+            alt="SchulPortalWortLogoBlau"
+            :src="SchulPortalWortLogoBlau"
+            :width="354"
+            :height="60"
           />
         </v-col>
 
         <!-- Hide this column on small screens and below -->
         <v-col
           cols="auto"
-          class="hidden-sm-and-down"
+          class="hidden-md-and-up"
         >
-          <div class="nav-title">SCHULPORTAL <span class="normal-weight">SH</span></div>
+          <v-img
+              alt="SchulPortalLogoBlau"
+              :src="SchulPortalLogoBlau"
+              :width="33"
+              :height="33"
+            />
         </v-col>
       </v-row>
     </v-toolbar-title>
@@ -48,7 +54,7 @@
           rel="noopener noreferrer"
           target="_blank"
         >
-          <v-icon class="hidden-md-and-up" icon="mdi-help-circle-outline"></v-icon>
+          <v-icon class="hidden-md-and-up mr-2" icon="mdi-help-circle-outline"></v-icon>
           <span class="hidden-sm-and-down">{{ $t('nav.help') }}</span>
         </a>
       </v-col>
@@ -69,7 +75,7 @@
           data-testid="nav-login-button"
           :href="`/api/frontend/login?redirectUrl=${route.fullPath}`"
         >
-          <v-icon icon="mdi-login"></v-icon>
+          <v-icon class="mr-2" icon="mdi-login"></v-icon>
           <span class="hidden-sm-and-down">{{ $t('nav.login') }}</span>
         </a>
       </v-col>
@@ -83,7 +89,7 @@
           data-testid="nav-logout-button"
           href="/api/frontend/logout"
         >
-          <v-icon icon="mdi-logout"></v-icon>
+          <v-icon class="mr-2" icon="mdi-logout"></v-icon>
           <span class="hidden-sm-and-down">{{ $t('nav.logout') }}</span>
         </a>
       </v-col>

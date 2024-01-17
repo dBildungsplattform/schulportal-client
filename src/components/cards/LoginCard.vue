@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import SchulPortalLogo from '@/assets/logos/Schulportal_SH_Bildmarke_RGB_Anwendung_HG_Blau.svg'
+  import SchulPortalWortLogoWeiss from '@/assets/logos/Schulportal_SH_Wort_Bildmarke_RGB_Anwendung_HG_Weiss.svg'
   import { type RouteLocationNormalizedLoaded, useRoute } from 'vue-router'
 
   const route: RouteLocationNormalizedLoaded = useRoute()
@@ -13,6 +13,7 @@
     >
       <!-- Main title -->
       <v-row
+        class="mb-9"
         justify="center"
         no-gutters
       >
@@ -20,25 +21,20 @@
           <v-img
             alt="Schulportal logo"
             class="logo"
-            :src="SchulPortalLogo"
-            :width="50"
-            :height="50"
+            :src="SchulPortalWortLogoWeiss"
+            :width="598"
           />
-        </v-col>
-        <v-col cols="auto">
-          <v-card-title class="v-card-title"
-            >SCHULPORTAL <span class="normal-weight">SH</span></v-card-title
-          >
         </v-col>
       </v-row>
 
       <v-row
+        class="mb-12"
         justify="center"
         no-gutters
       >
         <v-col cols="auto">
           <!-- Subtitle/welcome message -->
-          <v-card-text class="v-card-text"> {{ $t('login.title') }}</v-card-text>
+          <span class="headline-2"> {{ $t('login.title') }}</span>
         </v-col>
       </v-row>
 
@@ -70,14 +66,6 @@
 </template>
 
 <style scoped>
-  .login-button {
-    max-width: 15rem; /* Max width instead of fixed width */
-    width: 100%; /* Full width, capped by max-width */
-    text-transform: none;
-    transition: transform 0.3s ease-in-out;
-    /* Set the origin of transformation to the left edge */
-    transform-origin: left center;
-  }
 
   @media (max-width: 600px) {
     .login-button {
@@ -94,28 +82,9 @@
     padding: 6.25rem 0; /* Top and bottom padding */
   }
 
-  .v-card-title {
-    text-align: center;
-    font-weight: bolder;
-    font-size: 2rem;
-    color: #001e49;
-    margin-bottom: 1rem;
-    margin-left: -1rem;
-  }
-  .v-card-text {
-    text-align: center;
-    font-size: 1rem;
-    font-weight: bolder;
-    color: #001e49;
-  }
-
   @media (max-width: 600px) {
-    .v-card-title {
+    .landing-header {
       font-size: 1.5rem;
-    }
-
-    .v-card-text {
-      font-size: 1.1rem;
     }
   }
 </style>
