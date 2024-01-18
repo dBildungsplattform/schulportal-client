@@ -1,8 +1,6 @@
 <script setup lang="ts">
   import { type RouteLocationNormalizedLoaded, useRoute } from 'vue-router'
   import { useAuthStore, type AuthStore } from '@/stores/AuthStore'
-  import SchulPortalLogoBlau from '@/assets/logos/Schulportal_SH_Bildmarke_RGB_Anwendung_HG_Blau.svg'
-  import SchulPortalWortLogoBlau from '@/assets/logos/Schulportal_SH_Wort_Bildmarke_RGB_Anwendung_HG_Blau.svg'
 
   const route: RouteLocationNormalizedLoaded = useRoute()
   const auth: AuthStore = useAuthStore()
@@ -21,11 +19,11 @@
           class="hidden-sm-and-down"
           cols="auto"
         >
-          <v-img
-            alt="SchulPortalWortLogoBlau"
-            :src="SchulPortalWortLogoBlau"
-            :width="354"
-            :height="60"
+          <img
+            alt="Logo Schulportal"
+            src="@/assets/logos/Schulportal_SH_Wort_Bildmarke_RGB_Anwendung_HG_Blau.svg"
+            width="354"
+            height="60"
           />
         </v-col>
 
@@ -34,11 +32,11 @@
           cols="auto"
           class="hidden-md-and-up"
         >
-          <v-img
-            alt="SchulPortalLogoBlau"
-            :src="SchulPortalLogoBlau"
-            :width="33"
-            :height="33"
+          <img
+            alt="Logo Schulportal"
+            src="@/assets/logos/Schulportal_SH_Bildmarke_RGB_Anwendung_HG_Blau.svg"
+            width="33"
+            height="33"
           />
         </v-col>
       </v-row>

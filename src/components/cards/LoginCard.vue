@@ -1,5 +1,4 @@
 <script setup lang="ts">
-  import SchulPortalWortLogoWeiss from '@/assets/logos/Schulportal_SH_Wort_Bildmarke_RGB_Anwendung_HG_Weiss.svg'
   import { type RouteLocationNormalizedLoaded, useRoute } from 'vue-router'
 
   const route: RouteLocationNormalizedLoaded = useRoute()
@@ -18,11 +17,11 @@
         no-gutters
       >
         <v-col cols="auto">
-          <v-img
-            alt="Schulportal logo"
+          <img
+            alt="Logo Schulportal"
             class="logo"
-            :src="SchulPortalWortLogoWeiss"
-            :width="598"
+            src="@/assets/logos/Schulportal_SH_Wort_Bildmarke_RGB_Anwendung_HG_Weiss.svg"
+            width="598"
           />
         </v-col>
       </v-row>

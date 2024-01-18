@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import { ref, type Ref } from 'vue'
   import SH_LOGO from '@/assets/logos/landesdachmarke_01_KORR.svg'
-  import DIGITAL_PAKT from '@/assets/logos/digitalPakt.svg'
+  import DIGITAL_PAKT_LOGO from '@/assets/logos/digitalPakt.svg'
   import { type Composer, useI18n } from 'vue-i18n'
 
   const { t }: Composer = useI18n({ useScope: 'global' })
@@ -27,13 +27,13 @@
 
   const sponsors: Ref<Sponsor[]> = ref([
     {
-      src: DIGITAL_PAKT,
-      alt: 'DigitalPakt Schule',
+      src: DIGITAL_PAKT_LOGO,
+      alt: 'Logo DigitalPakt Schule',
       href: 'https://www.digitalpaktschule.de/de/schleswig-holstein-1800.html'
     },
     {
       src: SH_LOGO,
-      alt: 'Schleswig-Holstein',
+      alt: 'Logo Schleswig-Holstein',
       href: 'https://www.schleswig-holstein.de/DE/landesportal/landesportal_node.html'
     }
   ])
