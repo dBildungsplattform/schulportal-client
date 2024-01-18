@@ -26,9 +26,9 @@ const routes: readonly RouteRecordRaw[] = [
     }
   },
   {
-    path: '/home',
-    name: 'home',
-    component: () => import('../views/HomeView.vue'),
+    path: '/start',
+    name: 'start',
+    component: () => import('../views/StartView.vue'),
     meta: {
       requiresAuth: true
     }
