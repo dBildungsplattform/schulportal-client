@@ -1,17 +1,20 @@
 <script setup lang="ts">
   import { RouterView } from 'vue-router'
-  import TheHeader from '@/components/nav/TheHeader.vue'
+  import TheHeader from '@/components/layout/TheHeader.vue'
+  import TheFooter from '@/components/layout/TheFooter.vue'
 </script>
 
 <template>
-  <v-layout>
+  <v-app>
     <TheHeader></TheHeader>
     <v-main>
+      <!-- Main content goes here -->
       <v-container>
-        <RouterView />
+        <router-view />
       </v-container>
     </v-main>
-  </v-layout>
+    <TheFooter></TheFooter>
+  </v-app>
 </template>
 
 <style scoped>
