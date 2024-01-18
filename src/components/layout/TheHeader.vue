@@ -68,7 +68,7 @@
         data-testid="nav-login-button"
         v-if="!auth.isAuthed"
         color="#001E49"
-        :href="`/api/frontend/login?redirectUrl=${route.fullPath}`"
+        :href="`/api/auth/login?redirectUrl=${route.fullPath}`"
       >
         <template #prepend>
           <v-icon>mdi-login</v-icon>
@@ -80,7 +80,7 @@
         data-testid="nav-logout-button"
         v-if="auth.isAuthed"
         color="#001E49"
-        href="/api/frontend/logout"
+        href="/api/auth/logout"
       >
         <template #prepend>
           <v-icon>mdi-logout</v-icon>

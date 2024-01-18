@@ -57,7 +57,7 @@
                 v-bind="props"
                 class="login-button"
                 :color="isHovering ? '#325E91' : '#001E49'"
-                :href="`/api/frontend/login?redirectUrl=${route.fullPath}`"
+                :href="`/api/auth/login?redirectUrl=${route.fullPath}`"
               >
                 {{ $t('login.button') }}
               </v-btn>

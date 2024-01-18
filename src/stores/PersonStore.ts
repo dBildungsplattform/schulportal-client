@@ -1,13 +1,13 @@
 import { defineStore, type Store, type StoreDefinition } from 'pinia'
 import { isAxiosError } from 'axios'
 import {
-  FrontendApiFactory,
-  type FrontendApiInterface,
-  type FrontendControllerPersons200Response
+  PersonenApiFactory,
+  type PersonenApiInterface,
+  type PersonendatensatzResponse
 } from '../api-client/generated/api'
 import axiosApiInstance from '@/services/ApiService'
 
-const frontendApi: FrontendApiInterface = FrontendApiFactory(undefined, '', axiosApiInstance)
+const personenApi: PersonenApiInterface = PersonenApiFactory(undefined, '', axiosApiInstance)
 
 type Person = {
   id: string
@@ -61,8 +61,8 @@ export const usePersonStore: StoreDefinition<
     async getAllPersons() {
       this.loading = true
       try {
-        const { data }: { data: FrontendControllerPersons200Response } =
-          await frontendApi.frontendControllerPersons()
+        const { data }: { data: PersonendatensatzResponse[] } =
+          await personenApi.personControllerFindPersons()
         this.allPersons = data.items
         this.totalPersons = data.total
         this.loading = false
@@ -79,7 +79,7 @@ export const usePersonStore: StoreDefinition<
       this.loading = true
       try {
         const { data }: { data: Personendatensatz } =
-          await frontendApi.frontendControllerPersonById(personId)
+          await personenApi.personControllerFindPersonById(personId)
         this.loading = false
         return data
       } catch (error) {
@@ -96,7 +96,7 @@ export const usePersonStore: StoreDefinition<
       this.loading = true
       try {
         const { data }: { data: string } =
-          await frontendApi.frontendControllerPasswordReset(personId)
+          (await personenApi.personControllerResetPasswordByPersonId(personId)) as any
         this.loading = false
         return data
       } catch (error: unknown) {
