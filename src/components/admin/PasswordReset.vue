@@ -55,6 +55,7 @@
 
   async function closePasswordResetDialog(isActive: Ref<boolean>): Promise<void> {
     isActive.value = false
+    passwordCopied.value = false
     showPassword.value = false
     emit('onClearPassword')
   }
