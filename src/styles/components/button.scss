@@ -11,6 +11,7 @@
     border: $primaryButtonBorderSize solid $primaryButtonBorderColor;
     color: $primaryButtonColor;
 
+    &:focus,
     &:hover {
       background: $primaryButtonHoverBackgroundColor;
     }
@@ -21,6 +22,7 @@
     border: $secondaryButtonBorderSize solid $secondaryButtonBorderColor;
     color: $secondaryButtonColor;
 
+    &:focus,
     &:hover {
       border: $secondaryButtonHoverBorderSize solid $secondaryButtonBorderColor;
     }

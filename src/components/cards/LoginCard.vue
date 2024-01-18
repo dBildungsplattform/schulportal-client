@@ -46,19 +46,13 @@
           sm="6"
           class="d-flex justify-center"
         >
-          <v-hover>
-            <template v-slot:default="{ isHovering, props }">
               <v-btn
                 data-testid="login-button"
-                v-bind="props"
-                class="login-button"
-                :color="isHovering ? '#325E91' : '#001E49'"
+            class="primary"
                 :href="`/api/frontend/login?redirectUrl=${route.fullPath}`"
               >
                 {{ $t('login.button') }}
               </v-btn>
-            </template>
-          </v-hover>
         </v-col>
       </v-row>
     </v-card>

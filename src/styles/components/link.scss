@@ -11,7 +11,17 @@ a {
     color: $white;
   }
 
+  &:focus,
   &:hover {
     text-decoration: underline;
+  }
+}
+
+:not(.v-btn) {
+  a {
+    &:focus,
+    &:hover {
+      text-decoration: none;
+    }
   }
 }
