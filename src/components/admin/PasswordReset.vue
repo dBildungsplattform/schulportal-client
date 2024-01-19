@@ -65,7 +65,6 @@
   <v-dialog
     min-width="320px"
     persistent
-    width="50%"
   >
     <template v-slot:activator="{ props }">
       <v-btn

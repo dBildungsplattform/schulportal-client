@@ -45,13 +45,13 @@
           sm="6"
           class="d-flex justify-center"
         >
-              <v-btn
-                data-testid="login-button"
+          <v-btn
+            data-testid="login-button"
             class="primary"
-                :href="`/api/frontend/login?redirectUrl=${route.fullPath}`"
-              >
-                {{ $t('login.button') }}
-              </v-btn>
+            :href="`/api/frontend/login?redirectUrl=${route.fullPath}`"
+          >
+            {{ $t('login.button') }}
+          </v-btn>
         </v-col>
       </v-row>
     </v-card>

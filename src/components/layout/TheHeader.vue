@@ -18,7 +18,7 @@
           class="hidden-sm-and-down"
           cols="auto"
         >
-          <router-link :to="auth.isAuthed ? '/start' : '/'">          
+          <router-link :to="auth.isAuthed ? '/start' : '/'">
             <img
               alt="Logo Schulportal"
               src="@/assets/logos/Schulportal_SH_Wort_Bildmarke_RGB_Anwendung_HG_Blau.svg"
