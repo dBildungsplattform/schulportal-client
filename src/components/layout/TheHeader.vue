@@ -9,7 +9,6 @@
 
 <template>
   <v-app-bar
-    :elevation="2"
     color="#001E49"
     height="40"
   >
@@ -20,12 +19,15 @@
           cols="auto"
           class="mr-2"
         >
-          <v-img
-            alt="SchulPortalLogo"
-            :src="SchulPortalLogo"
-            :width="30"
-            :height="30"
-          />
+          <!-- Conditional rendering of logo link -->
+          <router-link :to="auth.isAuthed ? '/start' : '/'">
+            <v-img
+              alt="SchulPortalLogo"
+              :src="SchulPortalLogo"
+              :width="30"
+              :height="30"
+            />
+          </router-link>
         </v-col>
 
         <!-- Hide this column on small screens and below -->
@@ -73,6 +75,7 @@
         <template #prepend>
           <v-icon>mdi-login</v-icon>
         </template>
+        <!-- Hide this on small screens and below -->
         <span class="hidden-sm-and-down">{{ $t('nav.login') }}</span>
       </v-btn>
 
