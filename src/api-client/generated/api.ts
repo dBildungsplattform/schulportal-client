@@ -1830,7 +1830,7 @@ export const PersonenApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async personControllerResetPasswordByPersonId(personId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+        async personControllerResetPasswordByPersonId(personId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.personControllerResetPasswordByPersonId(personId, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -1918,7 +1918,7 @@ export const PersonenApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        personControllerResetPasswordByPersonId(personId: string, options?: any): AxiosPromise<void> {
+        personControllerResetPasswordByPersonId(personId: string, options?: any): AxiosPromise<string> {
             return localVarFp.personControllerResetPasswordByPersonId(personId, options).then((request) => request(axios, basePath));
         },
         /**
@@ -2004,7 +2004,7 @@ export interface PersonenApiInterface {
      * @throws {RequiredError}
      * @memberof PersonenApiInterface
      */
-    personControllerResetPasswordByPersonId(personId: string, options?: AxiosRequestConfig): AxiosPromise<void>;
+    personControllerResetPasswordByPersonId(personId: string, options?: AxiosRequestConfig): AxiosPromise<string>;
 
     /**
      * 

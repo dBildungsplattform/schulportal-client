@@ -495,7 +495,14 @@
         ],
         "responses": {
           "202": {
-            "description": "Password for person was successfully reset."
+            "description": "Password for person was successfully reset.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           },
           "404": {
             "description": "The person does not exist."

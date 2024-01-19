@@ -1,5 +1,5 @@
 import { defineStore, type Store, type StoreDefinition } from 'pinia'
-import { isAxiosError } from 'axios'
+import { isAxiosError, type AxiosResponse } from 'axios'
 import {
   PersonenApiFactory,
   type PersonenApiInterface,
@@ -61,10 +61,11 @@ export const usePersonStore: StoreDefinition<
     async getAllPersons() {
       this.loading = true
       try {
-        const { data }: { data: PersonendatensatzResponse[] } =
+        const { data, headers }: AxiosResponse<PersonendatensatzResponse[]> =
           await personenApi.personControllerFindPersons()
-        this.allPersons = data.items
-        this.totalPersons = data.total
+
+        this.allPersons = data
+        this.totalPersons = headers['X-Paging-Total'] | 1
         this.loading = false
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR'
@@ -96,7 +97,7 @@ export const usePersonStore: StoreDefinition<
       this.loading = true
       try {
         const { data }: { data: string } =
-          (await personenApi.personControllerResetPasswordByPersonId(personId)) as any
+          await personenApi.personControllerResetPasswordByPersonId(personId)
         this.loading = false
         return data
       } catch (error: unknown) {
