@@ -1,5 +1,5 @@
 import type {
-  FrontendControllerPersons200Response,
+  PersonFrontendControllerFindPersons200Response,
   PersonendatensatzResponse
 } from '@/api-client/generated'
 import { usePersonStore, type PersonStore, type Personendatensatz } from './PersonStore'
@@ -47,7 +47,7 @@ describe('PersonStore', () => {
         }
       ] as PersonendatensatzResponse[]
 
-      const mockResponse: FrontendControllerPersons200Response = {
+      const mockResponse: PersonFrontendControllerFindPersons200Response = {
         offset: 0,
         limit: 2,
         total: 2,
