@@ -739,6 +739,113 @@
         ]
       }
     },
+    "/api/personen-frontend": {
+      "get": {
+        "operationId": "PersonFrontendController_findPersons",
+        "parameters": [
+          {
+            "name": "offset",
+            "required": false,
+            "in": "query",
+            "description": "The offset of the paginated list.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "The requested limit for the page size.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "referrer",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
+          },
+          {
+            "name": "familienname",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
+          },
+          {
+            "name": "vorname",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
+          },
+          {
+            "name": "sichtfreigabe",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "nullable": true,
+              "default": "nein",
+              "enum": [
+                "ja",
+                "nein"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The persons were successfully returned. WARNING: This endpoint returns all persons as default when no paging parameters were set.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/RawPagedResponse"
+                    },
+                    {
+                      "required": [
+                        "items"
+                      ],
+                      "properties": {
+                        "items": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/PersonendatensatzResponse"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authorized to get persons."
+          },
+          "403": {
+            "description": "Insufficient permissions to get persons."
+          },
+          "500": {
+            "description": "Internal server error while getting all persons."
+          }
+        },
+        "tags": [
+          "personen-frontend"
+        ]
+      }
+    },
     "/api/organisationen": {
       "post": {
         "operationId": "OrganisationController_createOrganisation",
@@ -1467,6 +1574,32 @@
         },
         "required": [
           "revision"
+        ]
+      },
+      "RawPagedResponse": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "number"
+          },
+          "offset": {
+            "type": "number"
+          },
+          "limit": {
+            "type": "number"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "total",
+          "offset",
+          "limit",
+          "items"
         ]
       },
       "CreateOrganisationBodyParams": {
