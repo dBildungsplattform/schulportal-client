@@ -30,7 +30,7 @@
     "legalNotice": "Impressum",
     "privacyPolicy": "Datenschutzerklärung"
   },
-  "home": {
+  "start": {
     "administration": "Verwaltung",
     "allProviders": "Alle Angebote"
   },
@@ -45,8 +45,6 @@
   },
   "nav": {
     "admin": "Schulportal-Administration",
-    "home": "Home",
-    "landing": "Start",
     "login": "Anmelden",
     "logout": "Abmelden",
     "help": "Hilfe"

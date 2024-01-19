@@ -8,7 +8,6 @@
 
 <template>
   <v-app-bar
-    :elevation="2"
     color="#001E49"
     height="60"
   >
@@ -19,12 +18,14 @@
           class="hidden-sm-and-down"
           cols="auto"
         >
-          <img
-            alt="Logo Schulportal"
-            src="@/assets/logos/Schulportal_SH_Wort_Bildmarke_RGB_Anwendung_HG_Blau.svg"
-            width="354"
-            height="60"
-          />
+          <router-link :to="auth.isAuthed ? '/start' : '/'">          
+            <img
+              alt="Logo Schulportal"
+              src="@/assets/logos/Schulportal_SH_Wort_Bildmarke_RGB_Anwendung_HG_Blau.svg"
+              width="354"
+              height="60"
+            />
+          </router-link>
         </v-col>
 
         <!-- Hide this column on small screens and below -->
@@ -80,6 +81,7 @@
             class="mr-2"
             icon="mdi-login"
           ></v-icon>
+          <!-- Hide this on small screens and below -->
           <span class="hidden-sm-and-down">{{ $t('nav.login') }}</span>
         </a>
       </v-col>
