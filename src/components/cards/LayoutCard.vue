@@ -11,9 +11,10 @@
   <v-card class="layout-card">
     <v-row
       align="center"
-      class="ml-6 my-1"
+      class="ml-md-6 ml-1 my-1"
     >
-      <v-col>
+  
+      <v-col cols="auto">
         <h2 class="text-left layout-card-headline">{{ header }}</h2>
       </v-col>
       <v-spacer v-if="closable"></v-spacer>
@@ -23,7 +24,7 @@
       >
         <span
           v-if="showCloseText"
-          class="pointer"
+          class="pointer hidden-sm-and-down"
           @click.stop="$emit('onCloseClicked')"
           >{{ $t('close') }}</span
         >

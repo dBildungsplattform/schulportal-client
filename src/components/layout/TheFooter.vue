@@ -52,7 +52,10 @@
           class="sponsor-logos-col"
         >
           <div class="sponsor-logos-div">
-            <template v-for="sponsor in sponsors" :key="sponsor.alt">
+            <template
+              v-for="sponsor in sponsors"
+              :key="sponsor.alt"
+            >
               <!-- Logo with clickable link -->
               <a
                 :href="sponsor.href"
@@ -234,7 +237,22 @@
 
   @media (max-width: 600px) {
     .sponsor-logo {
+      width: 100%;
       width: 160px; /* Set the width to 100px or less */
+    }
+  }
+
+  @media (max-width: 500px) {
+    .sponsor-logo {
+      width: 100%;
+      max-width: 160px; 
+    }
+  }
+  
+  @media (max-width: 380px) {
+    .sponsor-logo {
+      width: 100%; 
+      max-width: 145px;
     }
   }
 </style>
