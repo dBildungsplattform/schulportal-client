@@ -14,7 +14,7 @@ const routes: readonly RouteRecordRaw[] = [
     name: 'user-management',
     component: () => import('../views/admin/UserManagementView.vue'),
     meta: {
-      requiresAuth: true
+      requiresAuth: false
     }
   },
   {
@@ -22,7 +22,7 @@ const routes: readonly RouteRecordRaw[] = [
     name: 'user-details',
     component: () => import('../views/admin/UserDetailsView.vue'),
     meta: {
-      requiresAuth: true
+      requiresAuth: false
     }
   },
   {
@@ -30,7 +30,7 @@ const routes: readonly RouteRecordRaw[] = [
     name: 'start',
     component: () => import('../views/StartView.vue'),
     meta: {
-      requiresAuth: true
+      requiresAuth: false
     }
   }
 ]
