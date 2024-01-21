@@ -43,7 +43,6 @@
       // Add more contexts if needed
     ]
   }
-
 </script>
 
 <template>
@@ -92,25 +91,42 @@
         thickness="6"
       ></v-divider>
       <v-container class="password-reset">
-        <h3 class="medium-headline">{{ $t('user.password') }}</h3>
+        <v-row>
+          <v-col>
+            <h3 class="medium-headline">{{ $t('user.password') }}</h3>
+          </v-col></v-row
+        >
         <v-row justify="end">
-          <div v-if="currentPerson">
-            <PasswordReset
-              :errorCode="errorCode"
-              :person="currentPerson"
-              @onClearPassword="password = ''"
-              @onResetPassword="resetPassword(currentPersonId)"
-              :password="password"
-            >
-            </PasswordReset>
-          </div>
-          <div v-else>
-            <v-progress-circular indeterminate></v-progress-circular>
-          </div>
+          <v-col
+            v-col
+            cols="12"
+            md="auto"
+            class="password-reset-col"
+            v-if="currentPerson"
+          >
+            <div class="password-reset-container">
+              <PasswordReset
+                :errorCode="errorCode"
+                :person="currentPerson"
+                @onClearPassword="password = ''"
+                @onResetPassword="resetPassword(currentPersonId)"
+                :password="password"
+              >
+              </PasswordReset>
+            </div>
+          </v-col>
+          <v-col v-else> <v-progress-circular indeterminate></v-progress-circular></v-col>
         </v-row>
       </v-container>
     </LayoutCard>
   </div>
 </template>
 
-<style></style>
+<style>
+  @media (min-width: 601px) {
+    .password-reset-container {
+      padding-right: 40px; /* Adjust the padding value as needed */
+    }
+  }
+
+</style>

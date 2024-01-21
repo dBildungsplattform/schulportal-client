@@ -39,7 +39,7 @@
       color="#1EAE9C"
       thickness="5px"
     ></v-divider>
-    <div :class="{ padded }">
+    <div>
       <slot />
     </div>
   </v-card>
