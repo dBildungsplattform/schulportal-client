@@ -170,11 +170,10 @@
     background-color: #325e91 !important; /* Change the color on hover */
   }
 
-    @media (max-width: 600px) {
-    .reset-button:hover {
+  @media (max-width: 600px) {
+    .reset-pw-button:hover {
       /* Hover state with horizontal shrink */
       transform: scaleX(0.95);
     }
   }
-
 </style>
