@@ -17,11 +17,10 @@ a {
   }
 }
 
-:not(.v-btn) {
-  a {
-    &:focus,
-    &:hover {
-      text-decoration: none;
-    }
+.v-btn a,
+a.v-btn {
+  &:focus,
+  &:hover {
+    text-decoration: none;
   }
 }
