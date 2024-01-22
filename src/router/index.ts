@@ -24,10 +24,10 @@ router.beforeEach(async (to: RouteLocationNormalized /*, from */) => {
 
   if (to.meta['requiresAuth'] && !auth.isAuthed) {
     window.location.href = `/api/auth/login?redirectUrl=${to.fullPath}`
-    return false;
+    return false
   }
 
-  return true;
+  return true
 })
 
 export default router
