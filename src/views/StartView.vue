@@ -8,7 +8,7 @@
 
 <template>
   <div class="home">
-    <h2 class="text-h4">{{ $t('home.allProviders') }}</h2>
+    <h2 class="text-h4">{{ $t('start.allProviders') }}</h2>
 
     <v-progress-circular
       v-if="providerStore.loading"
@@ -42,7 +42,7 @@
       </v-col>
     </v-row>
 
-    <h2 class="text-h4">{{ $t('home.administration') }}</h2>
+    <h2 class="text-h4">{{ $t('start.administration') }}</h2>
     <v-row>
       <v-col
         cols="12"
