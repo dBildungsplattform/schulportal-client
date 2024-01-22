@@ -36,3 +36,12 @@ npm run lint
 If you push a tag upstream a container will be created for you. (Check Github under Packages)
 
 ghcr.io/dbildungsplattform/schulportal-client:*tag*
+
+
+## Checking for CSP issues
+
+Using `npm run dev` is quite different from the productive deployment. Locally no restrictive CSP can be applied, because it would block any convenient feature for development. <br>
+Thus to figure out CSP issues you need to run `npm run build` and `npm run preview`. Vite will start a local file server that serves files very similar to a prod environment.
+
+Note: Even with the vite preview the nonce placeholder will not be replaced by an actual nonce.
+To be even more similar to prod you need to create and run a docker image with the provided Dockerfile. Than the client will be served by nginx and the nonce will be generated.
