@@ -6,10 +6,7 @@ import vuetify from 'vite-plugin-vuetify'
 import basicSsl from '@vitejs/plugin-basic-ssl'
 
 export default defineConfig({
-  plugins: [
-    vue(),
-    vuetify(), basicSsl()
-  ],
+  plugins: [vue(), vuetify(), basicSsl()],
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
@@ -39,26 +36,33 @@ export default defineConfig({
     coverage: {
       reporter: ['text', 'lcov', 'html'],
       include: ['src/**'],
-      exclude: ['src/api-client/**', 'src/plugins/**', 'src/services/**', 'src/router/**', 'src/App.vue', 'src/main.ts' ],
+      exclude: [
+        'src/api-client/**',
+        'src/plugins/**',
+        'src/services/**',
+        'src/router/**',
+        'src/App.vue',
+        'src/main.ts'
+      ],
       thresholds: {
         'src/stores/**.ts': {
           statements: 100,
           functions: 100,
           branches: 100,
-          lines: 100,
+          lines: 100
         },
         'src/components/**.vue': {
           statements: 80,
           functions: 80,
           branches: 80,
-          lines: 80,
+          lines: 80
         },
         'src/views/**.vue': {
           statements: 80,
           functions: 80,
           branches: 80,
-          lines: 80,
-        },
+          lines: 80
+        }
       }
     }
   }
