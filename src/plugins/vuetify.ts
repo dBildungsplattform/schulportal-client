@@ -3,6 +3,9 @@ import { createVuetify, type ThemeDefinition, type VuetifyOptions } from 'vuetif
 import '@mdi/font/css/materialdesignicons.css'
 import { aliases, mdi } from 'vuetify/iconsets/mdi'
 
+// eslint-disable-next-line no-var
+declare var cspNonce: string
+
 const shTheme: ThemeDefinition = {
   dark: false,
   colors: {
@@ -28,6 +31,7 @@ const vuetifyConfig: VuetifyOptions = {
     }
   },
   theme: {
+    cspNonce,
     defaultTheme: 'shTheme',
     themes: {
       shTheme
