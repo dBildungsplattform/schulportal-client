@@ -45,14 +45,14 @@
       :showCloseText="true"
     >
       <v-container class="personal-info">
-        <h3 class="medium-headline">{{ $t('admin.user.personalInfo') }}</h3>
+        <h3 class="subtitle-1">{{ $t('admin.user.personalInfo') }}</h3>
         <div v-if="currentPerson?.person">
           <v-row>
             <v-col
               class="text-right"
               cols="3"
             >
-              <span class="small-headline"> {{ $t('user.firstName') }}: </span>
+              <span class="subtitle-2"> {{ $t('user.firstName') }}: </span>
             </v-col>
             <v-col cols="9">
               {{ currentPerson.person.name.vorname }}
@@ -63,7 +63,7 @@
               class="text-right"
               cols="3"
             >
-              <span class="small-headline"> {{ $t('user.lastName') }}: </span>
+              <span class="subtitle-2"> {{ $t('user.lastName') }}: </span>
             </v-col>
             <v-col cols="9">
               {{ currentPerson.person.name.familienname }}
@@ -80,7 +80,7 @@
         thickness="6"
       ></v-divider>
       <v-container class="password-reset">
-        <h3 class="medium-headline">{{ $t('user.password') }}</h3>
+        <h3 class="subtitle-1">{{ $t('user.password') }}</h3>
         <v-row justify="end">
           <div v-if="currentPerson">
             <PasswordReset

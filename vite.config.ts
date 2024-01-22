@@ -14,7 +14,11 @@ export default defineConfig({
       jitCompilation: true
     }),
     vue(),
-    vuetify(),
+    vuetify({
+      styles: {
+        configFile: 'src/styles/settings.scss'
+      }
+    }),
     basicSsl()
   ],
   resolve: {
@@ -31,7 +35,7 @@ export default defineConfig({
         secure: false,
         xfwd: true
       }
-    },
+    }
   },
   test: {
     server: {

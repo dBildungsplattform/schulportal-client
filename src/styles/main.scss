@@ -1,0 +1,60 @@
+@use './settings';
+@use 'vuetify';
+
+@import './variables.scss';
+@import './typography.scss';
+@import './components/button.scss';
+@import './components/link.scss';
+@import './components/user-table.scss';
+
+body {
+  min-height: 100vh;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  font-weight: normal;
+}
+
+#app {
+  background: $backgroundColor;
+  color: $bodyFontColor;
+  font-family: Arial, sans-serif;
+  font-weight: normal;
+}
+
+.layout-card {
+  .layout-card-headline {
+    font-size: 24px;
+    font-weight: bold;
+  }
+
+  .padded {
+    padding: 22px 100px 22px 50px;
+  }
+}
+
+.layout-card {
+  box-shadow: 0px 3px 6px #001e4980;
+  border-radius: 5px;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.v-field--variant-outlined .v-field__outline {
+  --v-field-border-opacity: 1;
+}
+
+p {
+  white-space: pre;
+  /* text-wrap needs to be placed after white-space to overwrite wrapping behaviour */
+  text-wrap: pretty;
+}

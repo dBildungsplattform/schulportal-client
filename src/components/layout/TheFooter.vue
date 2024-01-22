@@ -1,7 +1,10 @@
 <script setup lang="ts">
   import { ref, type Ref } from 'vue'
   import SH_LOGO from '@/assets/logos/landesdachmarke_01_KORR.svg'
-  import DIGITAL_PAKT from '@/assets/logos/digitalPakt.svg'
+  import DIGITAL_PAKT_LOGO from '@/assets/logos/digitalPakt.svg'
+  import { type Composer, useI18n } from 'vue-i18n'
+
+  const { t }: Composer = useI18n({ useScope: 'global' })
 
   type FooterLink = {
     text: string
@@ -15,22 +18,25 @@
   }
 
   const footerLinks: Ref<FooterLink[]> = ref([
-    { text: 'Kontakt', href: 'https://www.secure-lernnetz.de/helpdesk/' },
-    { text: 'Hilfe', href: 'https://medienberatung.iqsh.de/schulportal-sh.html' },
-    { text: 'Impressum', href: 'impressum_datenschutzerklaerung.html' },
-    { text: 'Datenschutzerklärung', href: 'impressum_datenschutzerklaerung.html#privacy_policy' },
-    { text: 'Barrierefreiheit', href: 'impressum_datenschutzerklaerung.html#accessibility' }
+    { text: t('footer.contact'), href: 'https://www.secure-lernnetz.de/helpdesk/' },
+    { text: t('footer.help'), href: 'https://medienberatung.iqsh.de/schulportal-sh.html' },
+    { text: t('footer.legalNotice'), href: 'impressum_datenschutzerklaerung.html' },
+    {
+      text: t('footer.privacyPolicy'),
+      href: 'impressum_datenschutzerklaerung.html#privacy_policy'
+    },
+    { text: t('footer.accessibility'), href: 'impressum_datenschutzerklaerung.html#accessibility' }
   ])
 
   const sponsors: Ref<Sponsor[]> = ref([
     {
-      src: DIGITAL_PAKT,
-      alt: 'DigitalPakt Schule',
+      src: DIGITAL_PAKT_LOGO,
+      alt: 'Logo DigitalPakt Schule',
       href: 'https://www.digitalpaktschule.de/de/schleswig-holstein-1800.html'
     },
     {
       src: SH_LOGO,
-      alt: 'Schleswig-Holstein',
+      alt: 'Logo Schleswig-Holstein',
       href: 'https://www.schleswig-holstein.de/DE/landesportal/landesportal_node.html'
     }
   ])
@@ -52,7 +58,10 @@
           class="sponsor-logos-col"
         >
           <div class="sponsor-logos-div">
-            <template v-for="sponsor in sponsors" :key="sponsor.alt">
+            <template
+              v-for="sponsor in sponsors"
+              :key="sponsor.alt"
+            >
               <!-- Logo with clickable link -->
               <a
                 :href="sponsor.href"
@@ -62,7 +71,7 @@
                 <v-img
                   :src="sponsor.src"
                   :alt="sponsor.alt"
-                  width="200"
+                  width="250"
                   contain
                   class="sponsor-logo"
                 />
@@ -76,22 +85,16 @@
           cols="12"
           md="6"
           order-md="1"
-          class="footer-links-col"
+          class="footer-links-col justify-space-between"
         >
-          <v-btn
+          <a
             v-for="link in footerLinks"
             :key="link.text"
-            small
-            variant="text"
-            color="#001E49"
+            :href="link.href"
+            rel="noopener noreferrer"
+            target="_blank"
+            >{{ link.text }}</a
           >
-            <a
-              :href="link.href"
-              target="_blank"
-              rel="noopener noreferrer"
-              >{{ link.text }}</a
-            >
-          </v-btn>
         </v-col>
       </v-row>
       <v-bottom-navigation
@@ -216,7 +219,6 @@
     transform: translateX(-50%);
   }
   .sponsor-logo {
-    width: 200px;
     height: auto; /* Maintain aspect ratio */
     margin: 0 10px; /* Adds some space between logos */
   }
