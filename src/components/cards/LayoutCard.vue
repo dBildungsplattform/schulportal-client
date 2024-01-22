@@ -26,6 +26,7 @@
           v-if="showCloseText"
           class="pointer hidden-sm-and-down"
           @click.stop="$emit('onCloseClicked')"
+          tabindex="0"
           >{{ $t('close') }}</span
         >
         <v-icon

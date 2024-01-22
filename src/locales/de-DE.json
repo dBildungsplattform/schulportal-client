@@ -23,6 +23,13 @@
     "UNSPECIFIED_ERROR": "Es ist ein Fehler aufgetreten.",
     "USER_AUTHENTICATION_FAILED_ERROR": "Ihr Benutzername oder Ihr Passwort war falsch. Versuchen Sie es erneut oder wenden Sie sich an Ihre schulischen Administratorinnen und Administratoren."
   },
+  "footer": {
+    "accessibility": "Barrierefreiheit",
+    "contact": "Kontakt",
+    "help": "Hilfe",
+    "legalNotice": "Impressum",
+    "privacyPolicy": "Datenschutzerklärung"
+  },
   "start": {
     "administration": "Verwaltung",
     "allProviders": "Alle Angebote"

@@ -48,7 +48,7 @@
       <v-container class="personal-info">
         <v-row class="ml-md-16">
           <v-col>
-            <h3 class="medium-headline">{{ $t('admin.user.personalInfo') }}</h3></v-col
+            <h3 class="subtitle-1">{{ $t('admin.user.personalInfo') }}</h3></v-col
           >
         </v-row>
         <div v-if="currentPerson?.person">
@@ -59,7 +59,7 @@
               class="text-right"
               cols="auto"
             >
-              <span class="small-headline"> {{ $t('user.firstName') }}: </span>
+              <span class="subtitle-2"> {{ $t('user.firstName') }}: </span>
             </v-col>
             <v-col cols="auto">
               {{ currentPerson.person.name.vorname }}
@@ -72,7 +72,7 @@
               class="text-right"
               cols="auto"
             >
-              <span class="small-headline"> {{ $t('user.lastName') }}: </span>
+              <span class="subtitle-2"> {{ $t('user.lastName') }}: </span>
             </v-col>
             <v-col cols="auto">
               {{ currentPerson.person.name.familienname }}
@@ -91,7 +91,7 @@
       <v-container class="password-reset">
         <v-row class="ml-md-16">
           <v-col>
-            <h3 class="medium-headline">{{ $t('user.password') }}</h3>
+            <h3 class="subtitle-1">{{ $t('user.password') }}</h3>
           </v-col></v-row
         >
         <v-row
