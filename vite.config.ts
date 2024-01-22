@@ -35,7 +35,7 @@ export default defineConfig({
         secure: false,
         xfwd: true
       }
-    },
+    }
   },
   test: {
     server: {

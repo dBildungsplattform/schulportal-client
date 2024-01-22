@@ -21,7 +21,7 @@
 
 /* small screen */
 @media only screen and (max-width: 600px) {
-// @media #{map-get($display-breakpoints, 'xs')} {
+  // @media #{map-get($display-breakpoints, 'xs')} {
   body {
     font-size: $smallBodyFontSize;
   }
@@ -45,7 +45,7 @@
 
 /* medium screen */
 @media only screen and (min-width: 601px) and (max-width: 1280px) {
-// @media #{map-get($display-breakpoints, 'sm-and-up')} {
+  // @media #{map-get($display-breakpoints, 'sm-and-up')} {
   body {
     font-size: $mediumBodyFontSize;
 
@@ -69,7 +69,7 @@
 
 /* big screen */
 @media only screen and (min-width: 1281px) {
-// @media #{map-get($display-breakpoints, 'lg-and-up')} {
+  // @media #{map-get($display-breakpoints, 'lg-and-up')} {
 
   body {
     font-size: $bigBodyFontSize;
