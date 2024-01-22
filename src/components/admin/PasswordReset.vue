@@ -68,7 +68,7 @@
   >
     <template v-slot:activator="{ props }">
       <v-btn
-        class="reset-pw-button primary button"
+        class="primary button"
         data-testid="open-password-reset-dialog-icon"
         v-bind="props"
       >
@@ -160,19 +160,4 @@
   </v-dialog>
 </template>
 
-<style>
-  .reset-pw-button {
-    transition: transform 0.3s ease-in-out;
-    transform-origin: left center;
-  }
-  .reset-pw-button:hover {
-    background-color: #325e91 !important; /* Change the color on hover */
-  }
-
-  @media (max-width: 600px) {
-    .reset-pw-button:hover {
-      /* Hover state with horizontal shrink */
-      transform: scaleX(0.95);
-    }
-  }
-</style>
+<style></style>
