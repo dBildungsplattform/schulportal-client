@@ -5,14 +5,18 @@
   import PasswordReset from '@/components/admin/PasswordReset.vue'
   import LayoutCard from '@/components/cards/LayoutCard.vue'
 
+  import { AxiosError, HttpStatusCode} from 'axios'
+
   const route: RouteLocationNormalizedLoaded = useRoute()
   const router: Router = useRouter()
   const currentPersonId: string = route.params['id'] as string
   const personStore: PersonStore = usePersonStore()
   const currentPerson: Ref<Personendatensatz | null> = ref(null)
+  const errorMessage: Ref<string> = ref('')
 
   const password: Ref<string> = ref('')
   const errorCode: Ref<string> = ref('')
+    
 
   function navigateToUserTable(): void {
     router.push({ name: 'user-management' })
@@ -30,8 +34,12 @@
   }
 
   onMounted(async () => {
-    currentPerson.value = await personStore.getPersonById(currentPersonId)
-  })
+  try {
+    currentPerson.value = await personStore.getPersonById(currentPersonId);
+  } catch (error: unknown) {
+      errorMessage.value = "Server error occurred"; // Specific message for server error
+    }
+});
 </script>
 
 <template>
@@ -70,10 +78,15 @@
             </v-col>
           </v-row>
         </div>
-        <div v-else>
-          <v-progress-circular indeterminate></v-progress-circular>
-        </div>
       </v-container>
+       <!-- Vuetify Alert for 404 Error -->
+    <v-alert
+      v-if="errorMessage"
+      type="error"
+      outlined
+    >
+      {{ errorMessage }}
+    </v-alert>
       <v-divider
         class="border-opacity-100 rounded my-6"
         color="#E5EAEF"
