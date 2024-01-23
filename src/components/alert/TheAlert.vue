@@ -3,7 +3,7 @@
 const props = defineProps<{
   showAlert: boolean;
   title: string;
-  message: string;
+  text: string;
   showButton: boolean;
   buttonText: string;
   buttonClass: string;
@@ -17,7 +17,7 @@ const props = defineProps<{
 <template>
   <v-container v-if="props.showAlert" class="personal-info">
     <v-slide-y-transition>
-        <v-alert :type="props.type" variant="outlined" :closable="props.closable" style="border-width: 3px;">
+        <v-alert :type="props.type" variant="outlined" :closable="props.closable">
         <v-row>
             <v-col cols="auto" style="color: #001e49;">
             <strong>{{ props.title }}</strong>
@@ -25,7 +25,7 @@ const props = defineProps<{
         </v-row>
         <v-row>
             <v-col cols="auto" style="color: #001e49;">
-            {{ props.message }}
+            {{ props.text }}
             </v-col>
         </v-row>
         <v-row v-if="props.showButton" justify="center">
@@ -41,4 +41,8 @@ const props = defineProps<{
 </template>
 
 <style scoped>
+
+.v-alert {
+  border-width: 3px;
+}
 </style>

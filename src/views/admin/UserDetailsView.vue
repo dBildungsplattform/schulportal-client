@@ -65,7 +65,7 @@
             :title="errorMessage"
             :type="'error'"
             :closable="false"
-            :message="$t('admin.user.userDataLoadingError')"
+            :text="$t('admin.user.userDataLoadingError')"
             :showButton="true"
             :buttonText="$t('admin.user.backToList')"
             buttonClass="primary"
