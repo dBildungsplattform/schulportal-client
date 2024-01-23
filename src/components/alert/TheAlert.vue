@@ -1,5 +1,6 @@
 <script setup lang="ts">
-  const props = defineProps<{
+
+  defineProps<{
     showAlert: boolean
     title: string
     text: string
@@ -14,21 +15,21 @@
 
 <template>
   <v-container
-    v-if="props.showAlert"
+    v-if="showAlert"
     class="personal-info"
   >
     <v-slide-y-transition>
       <v-alert
-        :type="props.type"
+        :type="type"
         variant="outlined"
-        :closable="props.closable"
+        :closable="closable"
       >
         <v-row>
           <v-col
             cols="auto"
             style="color: #001e49"
           >
-            <strong>{{ props.title }}</strong>
+            <strong>{{ title }}</strong>
           </v-col>
         </v-row>
         <v-row>
@@ -36,19 +37,19 @@
             cols="auto"
             style="color: #001e49"
           >
-            {{ props.text }}
+            {{ text }}
           </v-col>
         </v-row>
         <v-row
-          v-if="props.showButton"
+          v-if="showButton"
           justify="center"
         >
           <v-col cols="auto">
             <v-btn
-              :class="props.buttonClass"
-              @click="props.buttonAction"
+              :class="buttonClass"
+              @click="buttonAction"
             >
-              {{ props.buttonText }}
+              {{ buttonText }}
             </v-btn>
           </v-col>
         </v-row>
