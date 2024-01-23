@@ -7,13 +7,23 @@ import basicSsl from '@vitejs/plugin-basic-ssl'
 import VueI18nPlugin from '@intlify/unplugin-vue-i18n/vite'
 
 export default defineConfig({
+  define: {
+    /* disable hydration mismatch details in production build */
+    __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: 'false'
+  },
   plugins: [
     VueI18nPlugin({
       /* we have to enable jit compilation to use i18n interpolation without violating the CSP
          https://github.com/intlify/vue-i18n-next/issues/1059#issuecomment-1646097462 */
       jitCompilation: true
     }),
-    vue(),
+    vue({
+      template: {
+        compilerOptions: {
+          isCustomElement: (tag) => ['component'].includes(tag)
+        }
+      }
+    }),
     vuetify({
       styles: {
         configFile: 'src/styles/settings.scss'

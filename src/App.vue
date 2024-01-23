@@ -1,17 +1,33 @@
 <script setup lang="ts">
-  import { RouterView } from 'vue-router'
+  import { provide, shallowRef, type ShallowRef } from 'vue'
+  import { RouterView, type RouteLocationNormalized } from 'vue-router'
+  import router from './router'
+  import layouts from './layouts'
   import TheHeader from '@/components/layout/TheHeader.vue'
   import TheFooter from '@/components/layout/TheFooter.vue'
+  // import AdminMenuBar from '@/components/layout/AdminMenuBar.vue'
+
+  const currentLayout: ShallowRef = shallowRef('div')
+
+  router.afterEach((to: RouteLocationNormalized) => {
+    const layoutIndex: string = to.meta['layout'] as string
+    if (layouts.hasOwnProperty(layoutIndex)) {
+      currentLayout.value = layouts[layoutIndex] || 'div'
+    }
+  })
+
+  provide('app:layout', currentLayout)
 </script>
 
 <template>
   <v-app>
     <TheHeader></TheHeader>
+    <!-- <AdminMenuBar></AdminMenuBar> -->
     <v-main>
-      <!-- Main content goes here -->
-      <v-container>
+      <component :is="currentLayout || 'div'">
         <router-view />
-      </v-container>
+      </component>
+      {{ currentLayout }}
     </v-main>
     <TheFooter></TheFooter>
   </v-app>

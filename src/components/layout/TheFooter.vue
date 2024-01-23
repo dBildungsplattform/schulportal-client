@@ -45,7 +45,6 @@
 <template>
   <v-footer
     class="footer"
-    padless
     height="10"
   >
     <v-container>
