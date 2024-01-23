@@ -11,19 +11,22 @@
   <v-card class="layout-card">
     <v-row
       align="center"
-      class="ml-5 mt-0"
+      class="ml-md-6 ml-1 my-1"
     >
-      <v-col>
-        <h2 class="text-left layout-card-headline">{{ header }}</h2>
+  
+      <v-col cols="auto">
+        <h2 class="text-left headline-2">{{ header }}</h2>
       </v-col>
       <v-spacer v-if="closable"></v-spacer>
       <v-col
+        cols="2"
+        cols-md="auto"
         v-if="closable"
         class="text-right mr-6"
       >
         <span
           v-if="showCloseText"
-          class="pointer"
+          class="pointer hidden-sm-and-down"
           @click.stop="$emit('onCloseClicked')"
           tabindex="0"
           >{{ $t('close') }}</span
@@ -40,7 +43,7 @@
       color="#1EAE9C"
       thickness="5px"
     ></v-divider>
-    <div :class="{ padded }">
+    <div>
       <slot />
     </div>
   </v-card>
