@@ -4,8 +4,7 @@
   import { usePersonStore, type Personendatensatz, type PersonStore } from '@/stores/PersonStore'
   import PasswordReset from '@/components/admin/PasswordReset.vue'
   import LayoutCard from '@/components/cards/LayoutCard.vue'
-
-  import { AxiosError, HttpStatusCode} from 'axios'
+import { useI18n } from 'vue-i18n'
 
   const route: RouteLocationNormalizedLoaded = useRoute()
   const router: Router = useRouter()
@@ -13,6 +12,10 @@
   const personStore: PersonStore = usePersonStore()
   const currentPerson: Ref<Personendatensatz | null> = ref(null)
   const errorMessage: Ref<string> = ref('')
+  const isLoading: Ref<boolean> = ref(false);
+  const { t } = useI18n();
+
+    
 
   const password: Ref<string> = ref('')
   const errorCode: Ref<string> = ref('')
@@ -21,6 +24,7 @@
   function navigateToUserTable(): void {
     router.push({ name: 'user-management' })
   }
+  
 
   function resetPassword(personId: string): void {
     personStore
@@ -34,12 +38,16 @@
   }
 
   onMounted(async () => {
+  isLoading.value = true
   try {
     currentPerson.value = await personStore.getPersonById(currentPersonId);
+    isLoading.value = false
   } catch (error: unknown) {
-      errorMessage.value = "Server error occurred"; // Specific message for server error
-    }
+    isLoading.value = false
+    errorMessage.value = t('errors.USER_LOADING_ERROR');
+  }
 });
+
 </script>
 
 <template>
@@ -52,8 +60,28 @@
       :padded="true"
       :showCloseText="true"
     >
+
+          <!-- Error Message Display -->
+      <v-container v-if="errorMessage" class="personal-info">
+        <v-alert type="error" variant="outlined">
+          <v-row>
+            <v-col>
+          {{ errorMessage }}</v-col>
+        </v-row>
+          <v-row justify="center">
+            <v-col cols="auto">
+            <v-btn class="primary" @click="navigateToUserTable">
+              {{ $t('admin.user.backToList') }}
+            </v-btn>
+          </v-col>
+          </v-row>
+        </v-alert>
+      </v-container>
+    <template v-else>
       <v-container class="personal-info">
-        <h3 class="subtitle-1">{{ $t('admin.user.personalInfo') }}</h3>
+         <!-- Conditional Header inside the v-container -->
+         <h3 v-if="!errorMessage" class="subtitle-1">{{ $t('admin.user.personalInfo') }}</h3>
+
         <div v-if="currentPerson?.person">
           <v-row>
             <v-col
@@ -78,15 +106,10 @@
             </v-col>
           </v-row>
         </div>
+        <div v-else-if="isLoading">
+          <v-progress-circular indeterminate></v-progress-circular>
+        </div>
       </v-container>
-       <!-- Vuetify Alert for 404 Error -->
-    <v-alert
-      v-if="errorMessage"
-      type="error"
-      outlined
-    >
-      {{ errorMessage }}
-    </v-alert>
       <v-divider
         class="border-opacity-100 rounded my-6"
         color="#E5EAEF"
@@ -105,11 +128,12 @@
             >
             </PasswordReset>
           </div>
-          <div v-else>
-            <v-progress-circular indeterminate></v-progress-circular>
-          </div>
+          <div v-else-if="isLoading">
+      <v-progress-circular indeterminate></v-progress-circular>
+    </div>
         </v-row>
       </v-container>
+    </template>
     </LayoutCard>
   </div>
 </template>

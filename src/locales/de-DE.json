@@ -12,7 +12,8 @@
       "resetPasswordConfirmation": "Sind Sie sicher, dass Sie das Passwort für {firstname} {lastname} zurücksetzen möchten?",
       "resetPasswordInformation": "Bitte teilen Sie dem Benutzer das temporäre Passwort mit. Nach dem Schließen des Dialogs wird es aus Sicherheitsgründen nicht mehr angezeigt.",
       "resetPassword": "Passwort zurücksetzen",
-      "status": "Status"
+      "status": "Status",
+      "backToList": "Zurück zur Liste"
     }
   },
   "cancel": "Abbrechen",
@@ -21,7 +22,8 @@
   "errors": {
     "KEYCLOAK_CLIENT_ERROR": "Die Anmeldung ist momentan nicht möglich.",
     "UNSPECIFIED_ERROR": "Es ist ein Fehler aufgetreten.",
-    "USER_AUTHENTICATION_FAILED_ERROR": "Ihr Benutzername oder Ihr Passwort war falsch. Versuchen Sie es erneut oder wenden Sie sich an Ihre schulischen Administratorinnen und Administratoren."
+    "USER_AUTHENTICATION_FAILED_ERROR": "Ihr Benutzername oder Ihr Passwort war falsch. Versuchen Sie es erneut oder wenden Sie sich an Ihre schulischen Administratorinnen und Administratoren.",
+    "USER_LOADING_ERROR": "Fehler beim Laden des Benutzers"
   },
   "footer": {
     "accessibility": "Barrierefreiheit",
