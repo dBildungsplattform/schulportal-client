@@ -99,7 +99,6 @@
           class="mr-lg-10"
         >
           <v-col
-            v-col
             cols="12"
             md="auto"
             v-if="currentPerson"
