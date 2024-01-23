@@ -45,10 +45,39 @@ export default defineConfig({
     },
     environment: 'jsdom',
     globals: true,
-    include: ['**/*.spec.ts'],
+    include: ['src/**/*.spec.ts'],
     setupFiles: 'vitest.setup.ts',
     coverage: {
-      reporter: ['text', 'lcov', 'html']
+      reporter: ['text', 'lcov', 'html'],
+      include: ['src/**'],
+      exclude: [
+        'src/api-client/**',
+        'src/plugins/**',
+        'src/services/**',
+        'src/router/**',
+        'src/App.vue',
+        'src/main.ts'
+      ],
+      thresholds: {
+        'src/stores/**.ts': {
+          statements: 100,
+          functions: 100,
+          branches: 100,
+          lines: 100
+        },
+        'src/components/**.vue': {
+          statements: 80,
+          functions: 80,
+          branches: 80,
+          lines: 80
+        },
+        'src/views/**.vue': {
+          statements: 80,
+          functions: 80,
+          branches: 80,
+          lines: 80
+        }
+      }
     }
   },
   preview: {
