@@ -37,7 +37,7 @@
 
 <template>
   <div class="admin">
-    <h1 class="text-center headline">{{ $t('admin.headline') }}</h1>
+    <h1 class="text-center headline-1">{{ $t('admin.headline') }}</h1>
     <LayoutCard
       :closable="true"
       :header="$t('admin.user.edit')"
