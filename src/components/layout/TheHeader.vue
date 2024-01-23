@@ -105,14 +105,4 @@
   </v-app-bar>
 </template>
 
-<style scoped>
-  .nav-title {
-    font-weight: 600;
-  }
-  .v-btn {
-    text-transform: none;
-  }
-  .v-btn:hover {
-    text-decoration: underline;
-  }
-</style>
+<style scoped></style>

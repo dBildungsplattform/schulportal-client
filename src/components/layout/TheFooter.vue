@@ -89,6 +89,7 @@
         >
           <a
             v-for="link in footerLinks"
+            class="primary"
             :key="link.text"
             :href="link.href"
             rel="noopener noreferrer"
@@ -108,9 +109,7 @@
 </template>
 
 <style scoped>
-  a {
-    color: #001e49;
-  }
+
   .footer {
     background-image: linear-gradient(to bottom right, #ffffff 25%, transparent 25%),
       linear-gradient(180deg, rgba(229, 234, 239, 1) 100%, transparent 100%);
@@ -181,13 +180,6 @@
 
   .v-container {
     padding-bottom: 40px;
-  }
-
-  .v-btn {
-    text-transform: none;
-  }
-  .v-btn:hover {
-    text-decoration: underline;
   }
 
   .footer-links-col {
