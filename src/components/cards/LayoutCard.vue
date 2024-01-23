@@ -15,10 +15,12 @@
     >
   
       <v-col cols="auto">
-        <h2 class="text-left layout-card-headline">{{ header }}</h2>
+        <h2 class="text-left headline-2">{{ header }}</h2>
       </v-col>
       <v-spacer v-if="closable"></v-spacer>
       <v-col
+        cols="2"
+        cols-md="auto"
         v-if="closable"
         class="text-right mr-6"
       >

@@ -237,7 +237,7 @@
   @media (max-width: 600px) {
     .sponsor-logo {
       width: 100%;
-      width: 160px; /* Set the width to 100px or less */
+      max-width: 160px; /* Set the width to 100px or less */
     }
   }
 
