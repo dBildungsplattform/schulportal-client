@@ -4,7 +4,8 @@
   import { usePersonStore, type Personendatensatz, type PersonStore } from '@/stores/PersonStore'
   import PasswordReset from '@/components/admin/PasswordReset.vue'
   import LayoutCard from '@/components/cards/LayoutCard.vue'
-import { useI18n } from 'vue-i18n'
+  import { useI18n } from 'vue-i18n'
+  import TheAlert from '@/components/alert/TheAlert.vue'
 
   const route: RouteLocationNormalizedLoaded = useRoute()
   const router: Router = useRouter()
@@ -41,10 +42,9 @@ import { useI18n } from 'vue-i18n'
     isLoading.value = false
   } catch (error: unknown) {
     isLoading.value = false
-    errorMessage.value = t('errors.USER_LOADING_ERROR');
+    errorMessage.value = t('errors.USER_DATA_LOADING_ERROR');
   }
 });
-  
 </script>
 
 <template>
@@ -60,20 +60,19 @@ import { useI18n } from 'vue-i18n'
 
       <!-- Error Message Display -->
       <v-container v-if="errorMessage" class="personal-info">
-        <v-alert type="error" variant="outlined">
-          <v-row>
-            <v-col>
-          {{ errorMessage }}</v-col>
-        </v-row>
-          <v-row justify="center">
-            <v-col cols="auto">
-            <v-btn class="primary" @click="navigateToUserTable">
-              {{ $t('admin.user.backToList') }}
-            </v-btn>
-          </v-col>
-          </v-row>
-        </v-alert>
+        <TheAlert
+            :showAlert="!!errorMessage"
+            :title="errorMessage"
+            :type="'error'"
+            :closable="false"
+            :message="$t('admin.user.userDataLoadingError')"
+            :showButton="true"
+            :buttonText="$t('admin.user.backToList')"
+            buttonClass="primary"
+            :buttonAction="navigateToUserTable"
+          />
       </v-container>
+
 
       <template v-else>
       <v-container class="personal-info">

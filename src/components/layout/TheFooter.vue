@@ -71,7 +71,7 @@
                 <v-img
                   :src="sponsor.src"
                   :alt="sponsor.alt"
-                  width="250"
+                  width="220"
                   contain
                   class="sponsor-logo"
                 />
@@ -117,7 +117,7 @@
     background-repeat: no-repeat, no-repeat;
 
     background-size:
-      200% 100%,
+      200% 75%,
       100% 100%;
 
     min-height: 200px; /* Avoid footer shrinking vertically on smaller screen sizes*/
@@ -128,7 +128,7 @@
     .footer {
       min-height: 280px;
       background-size:
-        200% 100%,
+        200% 75%,
         100% 100%;
     }
   }
@@ -137,7 +137,7 @@
     .footer {
       min-height: 280px;
       background-size:
-        200% 30%,
+        200% 50%,
         100% 100%;
     }
   }
@@ -164,7 +164,7 @@
     .footer {
       min-height: 350px;
       background-size:
-        200% 40%,
+        200% 30%,
         100% 100%;
     }
   }
