@@ -10,6 +10,8 @@
     background: $primaryButtonBackgroundColor;
     border: $primaryButtonBorderSize solid $primaryButtonBorderColor;
     color: $primaryButtonColor;
+    transition: $primaryButtonTransition;
+    transform-origin: $primaryButtontransformOrigin;
 
     &:focus,
     &:hover {
@@ -31,6 +33,12 @@
   /* small screen */
   @media only screen and (max-width: 600px) {
     font-size: $smallButtonFontSize;
+
+    &:focus,
+    &:hover {
+      transform: $smallButtonTransformScale
+    }
+   
   }
 
   /* medium screen */
