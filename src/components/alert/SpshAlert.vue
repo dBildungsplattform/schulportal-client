@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
   defineProps<{
     modelValue: boolean
     title: string
@@ -12,12 +11,16 @@
     closable?: boolean
   }>()
 
-const emit = defineEmits(['update:modelValue']);
+  type Emits = {
+    (event: 'update:modelValue', value: boolean): void
+  }
+  const emit: Emits = defineEmits<{
+    (event: 'update:modelValue', value: boolean): void
+  }>()
 
-const closeAlert = () => {
-    emit('update:modelValue', false); // Emit the event to update modelValue
-};
-
+  const closeAlert = (): void => {
+    emit('update:modelValue', false) // Emit the event to update modelValue
+  }
 </script>
 
 <template>

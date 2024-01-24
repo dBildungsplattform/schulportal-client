@@ -33,11 +33,9 @@
       })
   }
 
-  const handleAlertClose = (isAlertVisible:Boolean) => {
-    if (!isAlertVisible) {
-        errorMessage.value = '';
-    }
-};
+  const handleAlertClose = (): void => {
+    errorMessage.value = ''
+  }
 
   onMounted(async () => {
     try {
@@ -81,9 +79,7 @@
         <v-container class="personal-info">
           <v-row class="ml-md-16">
             <v-col>
-              <h3
-                class="subtitle-1"
-              >
+              <h3 class="subtitle-1">
                 {{ $t('admin.user.personalInfo') }}
               </h3></v-col
             >
