@@ -12,7 +12,7 @@
     >
       <!-- Main title -->
       <v-row
-        class="mb-9"
+        class="mb-2"
         justify="center"
         no-gutters
       >
@@ -27,7 +27,7 @@
       </v-row>
 
       <v-row
-        class="mb-12"
+        class="mb-7"
         justify="center"
         no-gutters
       >
@@ -74,9 +74,40 @@
     padding: 6.25rem 0; /* Top and bottom padding */
   }
 
-  @media (max-width: 600px) {
-    .landing-header {
-      font-size: 1.5rem;
+
+  @media (max-width: 670px) {
+    .logo {
+      max-width: 380px;
     }
   }
+
+  @media (max-width: 430px) {
+    .logo {
+      max-width: 320px;
+    }
+
+    .headline-2{
+      font-size: 18px;
+
+    }
+  }
+
+  @media (max-width: 400px) {
+    .logo {
+      max-width: 270px;
+    }
+
+    .headline-2{
+      font-size: 17px;
+
+    }
+  }
+
+  @media (max-width: 300px) {
+    .logo {
+      max-width: 250px;
+    }
+  }
+
+
 </style>
