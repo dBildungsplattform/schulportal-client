@@ -59,17 +59,6 @@
 </template>
 
 <style scoped>
-  @media (max-width: 600px) {
-    .login-button {
-      max-width: 70%;
-    }
-
-    .login-button:hover {
-      /* Hover state with horizontal shrink */
-      transform: scaleX(0.95);
-    }
-  }
-
   .login-card {
     padding: 6.25rem 0; /* Top and bottom padding */
   }
@@ -77,14 +66,12 @@
 
   @media (max-width: 670px) {
     .logo {
+      width: 100%;
       max-width: 380px;
     }
   }
 
   @media (max-width: 430px) {
-    .logo {
-      max-width: 320px;
-    }
 
     .headline-2{
       font-size: 18px;
@@ -93,9 +80,6 @@
   }
 
   @media (max-width: 400px) {
-    .logo {
-      max-width: 270px;
-    }
 
     .headline-2{
       font-size: 17px;
@@ -103,9 +87,11 @@
     }
   }
 
-  @media (max-width: 300px) {
-    .logo {
-      max-width: 250px;
+  @media (max-width: 350px) {
+
+    .headline-2{
+      font-size: 14px;
+
     }
   }
 
