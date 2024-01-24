@@ -11,7 +11,11 @@ FROM $BASE_IMAGE_BUILDER as build
 #To maintain stability, we install OpenJDK without running apk upgrade. 
 #This limits the changes in Docker image to just adding OpenJDK, rather than potentially updating all packages.
 
-RUN apk add openjdk17-jre
+#SPSH-242-generate-api-client-in-ci
+#RUN apk update \
+# && apk add openjdk17-jre
+#latest version : 17.01-2024
+RUN apk add openjdk17-jre=17.0.10_p7-r0
 
 WORKDIR /app
 COPY tsconfig*.json ./
