@@ -244,13 +244,13 @@
   @media (max-width: 500px) {
     .sponsor-logo {
       width: 100%;
-      max-width: 160px; 
+      max-width: 160px;
     }
   }
-  
+
   @media (max-width: 380px) {
     .sponsor-logo {
-      width: 100%; 
+      width: 100%;
       max-width: 145px;
     }
   }
