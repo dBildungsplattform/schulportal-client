@@ -4,7 +4,7 @@
   import { usePersonStore, type Personendatensatz, type PersonStore } from '@/stores/PersonStore'
   import PasswordReset from '@/components/admin/PasswordReset.vue'
   import LayoutCard from '@/components/cards/LayoutCard.vue'
-  import TheAlert from '@/components/alert/TheAlert.vue'
+  import SpshAlert from '@/components/alert/SpshAlert.vue'
   import { type Composer, useI18n } from 'vue-i18n'
 
   const route: RouteLocationNormalizedLoaded = useRoute()
@@ -13,12 +13,10 @@
   const personStore: PersonStore = usePersonStore()
   const currentPerson: Ref<Personendatensatz | null> = ref(null)
   const errorMessage: Ref<string> = ref('')
-  const isLoading: Ref<boolean> = ref(false)
 
   const { t }: Composer = useI18n({ useScope: 'global' })
 
   const password: Ref<string> = ref('')
-  const errorCode: Ref<string> = ref('')
 
   function navigateToUserTable(): void {
     router.push({ name: 'user-management' })
@@ -31,18 +29,15 @@
         password.value = newPassword || ''
       })
       .catch((error: string) => {
-        errorCode.value = error
+        personStore.errorCode = error
       })
   }
 
   onMounted(async () => {
-    isLoading.value = true
     try {
       currentPerson.value = await personStore.getPersonById(currentPersonId)
-      isLoading.value = false
     } catch (error: unknown) {
-      isLoading.value = false
-      errorMessage.value = t('errors.USER_DATA_LOADING_ERROR')
+      errorMessage.value = t('admin.user.userDataLoadingErrorTitle')
     }
   })
 </script>
@@ -62,12 +57,12 @@
         v-if="errorMessage"
         class="personal-info"
       >
-        <TheAlert
-          :showAlert="!!errorMessage"
+        <SpshAlert
+          :modelValue="!!errorMessage"
           :title="errorMessage"
           :type="'error'"
           :closable="false"
-          :text="$t('admin.user.userDataLoadingError')"
+          :text="$t('admin.user.userDataLoadingErrorText')"
           :showButton="true"
           :buttonText="$t('admin.user.backToList')"
           buttonClass="primary"
@@ -80,7 +75,6 @@
           <v-row class="ml-md-16">
             <v-col>
               <h3
-                v-if="!errorMessage"
                 class="subtitle-1"
               >
                 {{ $t('admin.user.personalInfo') }}
@@ -115,7 +109,7 @@
               </v-col>
             </v-row>
           </div>
-          <div v-else-if="isLoading">
+          <div v-else-if="personStore.loading">
             <v-progress-circular indeterminate></v-progress-circular>
           </div>
         </v-container>
@@ -141,7 +135,7 @@
             >
               <div>
                 <PasswordReset
-                  :errorCode="errorCode"
+                  :errorCode="personStore.errorCode"
                   :person="currentPerson"
                   @onClearPassword="password = ''"
                   @onResetPassword="resetPassword(currentPersonId)"
@@ -150,7 +144,7 @@
                 </PasswordReset>
               </div>
             </v-col>
-            <v-col v-else-if="isLoading">
+            <v-col v-else-if="personStore.loading">
               <v-progress-circular indeterminate></v-progress-circular
             ></v-col>
           </v-row>

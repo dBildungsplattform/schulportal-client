@@ -1,13 +1,13 @@
 <script setup lang="ts">
 
   defineProps<{
-    showAlert: boolean
+    modelValue: boolean
     title: string
     text: string
     showButton: boolean
-    buttonText: string
-    buttonClass: string
-    buttonAction: Function
+    buttonText?: string
+    buttonClass?: string
+    buttonAction?: Function
     type: 'error' | 'success' | 'warning' | 'info' | undefined
     closable?: boolean
   }>()
@@ -15,7 +15,7 @@
 
 <template>
   <v-container
-    v-if="showAlert"
+    v-if="modelValue"
     class="personal-info"
   >
     <v-slide-y-transition>
