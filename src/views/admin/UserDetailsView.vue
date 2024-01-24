@@ -65,7 +65,7 @@
           :model-value="!!errorMessage"
           :title="errorMessage"
           :type="'error'"
-          :closable="true"
+          :closable="false"
           :text="$t('admin.user.userDataLoadingErrorText')"
           :showButton="true"
           :buttonText="$t('admin.user.backToList')"

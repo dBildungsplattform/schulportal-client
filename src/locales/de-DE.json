@@ -14,7 +14,7 @@
       "resetPassword": "Passwort zurücksetzen",
       "status": "Status",
       "userDataLoadingErrorTitle": "Fehler beim Laden des Benutzers",
-      "userDataLoadingErrorText": "Es konnten keine Benutzerdaten geladen werden",
+      "userDataLoadingErrorText": "Es konnten keine Benutzerdaten geladen werden.",
       "backToList": "Zurück zur Liste"
     }
   },
