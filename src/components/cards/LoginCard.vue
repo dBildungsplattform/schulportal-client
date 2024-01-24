@@ -70,7 +70,7 @@
       max-width: 380px;
     }
   }
-
+/* Headline-2 styles overriding SASS styles on very small screens for better result*/
   @media (max-width: 430px) {
 
     .headline-2{
