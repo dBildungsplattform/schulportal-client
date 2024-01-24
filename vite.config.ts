@@ -7,6 +7,10 @@ import basicSsl from '@vitejs/plugin-basic-ssl'
 import VueI18nPlugin from '@intlify/unplugin-vue-i18n/vite'
 
 export default defineConfig({
+  build: {
+    // Disable inlining of assets
+    assetsInlineLimit: 0
+  },
   plugins: [
     VueI18nPlugin({
       /* we have to enable jit compilation to use i18n interpolation without violating the CSP
