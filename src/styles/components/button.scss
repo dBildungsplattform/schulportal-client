@@ -6,6 +6,18 @@
     font-weight: bold;
   }
 
+  &.v-btn--variant-text {
+    .v-btn__content {
+      letter-spacing: normal;
+      font-weight: normal;
+    }
+
+    &:focus,
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
   &.primary {
     background: $primaryButtonBackgroundColor;
     border: $primaryButtonBorderSize solid $primaryButtonBorderColor;
