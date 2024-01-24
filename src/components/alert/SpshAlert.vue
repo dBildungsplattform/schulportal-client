@@ -11,6 +11,13 @@
     type: 'error' | 'success' | 'warning' | 'info' | undefined
     closable?: boolean
   }>()
+
+const emit = defineEmits(['update:modelValue']);
+
+const closeAlert = () => {
+    emit('update:modelValue', false); // Emit the event to update modelValue
+};
+
 </script>
 
 <template>
@@ -23,6 +30,7 @@
         :type="type"
         variant="outlined"
         :closable="closable"
+        @click:close="closeAlert"
       >
         <v-row>
           <v-col

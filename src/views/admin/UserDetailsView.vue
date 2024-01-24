@@ -33,6 +33,12 @@
       })
   }
 
+  const handleAlertClose = (isAlertVisible:Boolean) => {
+    if (!isAlertVisible) {
+        errorMessage.value = '';
+    }
+};
+
   onMounted(async () => {
     try {
       currentPerson.value = await personStore.getPersonById(currentPersonId)
@@ -58,15 +64,16 @@
         class="personal-info"
       >
         <SpshAlert
-          :modelValue="!!errorMessage"
+          :model-value="!!errorMessage"
           :title="errorMessage"
           :type="'error'"
-          :closable="false"
+          :closable="true"
           :text="$t('admin.user.userDataLoadingErrorText')"
           :showButton="true"
           :buttonText="$t('admin.user.backToList')"
           buttonClass="primary"
           :buttonAction="navigateToUserTable"
+          @update:modelValue="handleAlertClose"
         />
       </v-container>
 
