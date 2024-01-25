@@ -21,13 +21,7 @@ export default defineConfig({
          https://github.com/intlify/vue-i18n-next/issues/1059#issuecomment-1646097462 */
       jitCompilation: true
     }),
-    vue({
-      template: {
-        compilerOptions: {
-          isCustomElement: (tag) => ['component'].includes(tag)
-        }
-      }
-    }),
+    vue(),
     vuetify({
       styles: {
         configFile: 'src/styles/settings.scss'

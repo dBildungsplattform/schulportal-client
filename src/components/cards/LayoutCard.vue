@@ -13,7 +13,6 @@
       align="center"
       class="ml-md-6 ml-1 my-1"
     >
-  
       <v-col cols="auto">
         <h2 class="text-left headline-2">{{ header }}</h2>
       </v-col>

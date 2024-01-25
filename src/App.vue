@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import { ref, type Ref } from 'vue'
-  import { RouterView } from 'vue-router'
+  import { RouterView, type RouteLocationNormalized } from 'vue-router'
   import router from './router'
   import AdminLayout from '@/layouts/AdminLayout.vue'
   import DefaultLayout from '@/layouts/DefaultLayout.vue'
@@ -8,7 +8,7 @@
 
   const isAdminRoute: Ref<boolean> = ref(false)
 
-  router.afterEach((to) => {
+  router.afterEach((to: RouteLocationNormalized) => {
     isAdminRoute.value = to.meta['layout'] === 'AdminLayout'
   })
 </script>

@@ -9,6 +9,4 @@
   <TheFooter></TheFooter>
 </template>
 
-<style>
-
-</style>
+<style></style>
