@@ -1,5 +1,5 @@
 import { defineStore, type Store, type StoreDefinition } from 'pinia'
-import { FrontendApiFactory, type FrontendApiInterface } from '../api-client/generated/api'
+import { AuthApiFactory, type AuthApiInterface } from '../api-client/generated/api'
 import axiosApiInstance from '@/services/ApiService'
 
 type AuthState = {
@@ -15,7 +15,7 @@ type AuthGetters = {}
 
 export type AuthStore = Store<'authStore', AuthState, AuthGetters, AuthActions>
 
-const frontendApi: FrontendApiInterface = FrontendApiFactory(undefined, '', axiosApiInstance)
+const authApi: AuthApiInterface = AuthApiFactory(undefined, '', axiosApiInstance)
 
 export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, AuthActions> =
   defineStore({
@@ -30,7 +30,7 @@ export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, 
 
         try {
           const { status: loginStatus }: { status: number } =
-            await frontendApi.frontendControllerInfo({
+            await authApi.authenticationControllerInfo({
               validateStatus: null
             })
           this.isAuthed = loginStatus >= 200 && loginStatus < 400

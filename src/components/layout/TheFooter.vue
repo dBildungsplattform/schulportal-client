@@ -235,7 +235,22 @@
 
   @media (max-width: 600px) {
     .sponsor-logo {
-      width: 160px; /* Set the width to 100px or less */
+      width: 100%;
+      max-width: 160px; /* Set the width to 100px or less */
+    }
+  }
+
+  @media (max-width: 500px) {
+    .sponsor-logo {
+      width: 100%;
+      max-width: 160px; 
+    }
+  }
+  
+  @media (max-width: 380px) {
+    .sponsor-logo {
+      width: 100%; 
+      max-width: 145px;
     }
   }
 </style>

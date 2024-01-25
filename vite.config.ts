@@ -7,6 +7,10 @@ import basicSsl from '@vitejs/plugin-basic-ssl'
 import VueI18nPlugin from '@intlify/unplugin-vue-i18n/vite'
 
 export default defineConfig({
+  build: {
+    // Disable inlining of assets
+    assetsInlineLimit: 0
+  },
   define: {
     /* disable hydration mismatch details in production build */
     __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: 'false'
@@ -40,7 +44,7 @@ export default defineConfig({
     port: 8099,
     proxy: {
       '/api': {
-        target: 'http://localhost:9091/',
+        target: 'http://localhost:9090/',
         changeOrigin: true,
         secure: false,
         xfwd: true
@@ -55,10 +59,39 @@ export default defineConfig({
     },
     environment: 'jsdom',
     globals: true,
-    include: ['**/*.spec.ts'],
+    include: ['src/**/*.spec.ts'],
     setupFiles: 'vitest.setup.ts',
     coverage: {
-      reporter: ['text', 'lcov', 'html']
+      reporter: ['text', 'lcov', 'html'],
+      include: ['src/**'],
+      exclude: [
+        'src/api-client/**',
+        'src/plugins/**',
+        'src/services/**',
+        'src/router/**',
+        'src/App.vue',
+        'src/main.ts'
+      ],
+      thresholds: {
+        'src/stores/**.ts': {
+          statements: 100,
+          functions: 100,
+          branches: 100,
+          lines: 100
+        },
+        'src/components/**.vue': {
+          statements: 80,
+          functions: 80,
+          branches: 80,
+          lines: 80
+        },
+        'src/views/**.vue': {
+          statements: 80,
+          functions: 80,
+          branches: 80,
+          lines: 80
+        }
+      }
     }
   },
   preview: {
