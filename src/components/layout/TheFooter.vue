@@ -256,6 +256,12 @@
     }
   }
 
+  @media (max-width: 290px) {
+    .sponsor-logo {
+      max-width: 96px;
+    }
+  }
+
   @media (min-width: 960px) and (max-width: 1280px) {
     .footer-links-col a {
         margin-right: 77px; 
