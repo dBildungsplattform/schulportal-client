@@ -111,6 +111,8 @@
     color: #001e49;
   }
   .footer {
+    align-items: flex-end;
+    bottom: 0;
     background-image: linear-gradient(to bottom right, #ffffff 25%, transparent 25%),
       linear-gradient(180deg, rgba(229, 234, 239, 1) 100%, transparent 100%);
 
@@ -121,7 +123,8 @@
       100% 100%;
 
     min-height: 200px; /* Avoid footer shrinking vertically on smaller screen sizes*/
-    align-items: flex-end;
+    position: absolute;
+    width: -webkit-fill-available;
   }
 
   @media (max-width: 1280px) {

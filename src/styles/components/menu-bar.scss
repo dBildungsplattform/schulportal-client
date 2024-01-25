@@ -5,13 +5,39 @@
   margin-top: 10px;
   min-width: 320px;
 
-  .menu-bar-title .v-list-item-title {
-    font-size: 25px;
-    font-weight: bold;
-    text-transform: uppercase;
+  .v-list-item {
+    padding: 20px;
+
+    .v-list-item__prepend {
+      display: block;
+      margin-right: 10px;
+    }
   }
 
-  .menu-bar-back .v-list-item-title {
-    font-size: 20px;
+  .menu-bar-title {
+    .v-list-item-title {
+      font-size: 25px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+  }
+
+  .menu-bar-main-item {
+    padding-bottom: 5px;
+  }
+
+  .menu-bar-sub-item {
+    padding-left: 32px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+  }
+
+  .v-divider {
+    color: $primaryColor;
+    opacity: 1;
+  }
+
+  .v-icon {
+    opacity: 1;
   }
 }
