@@ -6,11 +6,18 @@
   min-width: 320px;
 
   .v-list-item {
-    padding: 20px;
+    padding: 15px 20px;
 
     .v-list-item__prepend {
       display: block;
       margin-right: 10px;
+    }
+
+    &.v-list-item--active {
+      background-color: $menuBarActiveItemColor;
+      .v-list-item-title {
+        font-weight: bold;
+      }
     }
   }
 
@@ -24,6 +31,9 @@
 
   .menu-bar-main-item {
     padding-bottom: 5px;
+    .v-list-item-title {
+      line-height: 1.7rem;
+    }
   }
 
   .menu-bar-sub-item {
