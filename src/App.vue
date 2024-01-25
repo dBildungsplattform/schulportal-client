@@ -1,35 +1,30 @@
 <script setup lang="ts">
-  import { provide, shallowRef, type ShallowRef } from 'vue'
-  import { RouterView, type RouteLocationNormalized } from 'vue-router'
+  import { ref, type Ref } from 'vue'
+  import { RouterView } from 'vue-router'
   import router from './router'
-  import layouts from './layouts'
+  import AdminLayout from '@/layouts/AdminLayout.vue'
+  import DefaultLayout from '@/layouts/DefaultLayout.vue'
   import TheHeader from '@/components/layout/TheHeader.vue'
-  import TheFooter from '@/components/layout/TheFooter.vue'
-  // import AdminMenuBar from '@/components/layout/AdminMenuBar.vue'
 
-  const currentLayout: ShallowRef = shallowRef('div')
+  const isAdminRoute: Ref<boolean> = ref(false)
 
-  router.afterEach((to: RouteLocationNormalized) => {
-    const layoutIndex: string = to.meta['layout'] as string
-    if (layouts.hasOwnProperty(layoutIndex)) {
-      currentLayout.value = layouts[layoutIndex] || 'div'
-    }
+  router.afterEach((to) => {
+    isAdminRoute.value = to.meta['layout'] === 'AdminLayout'
   })
-
-  provide('app:layout', currentLayout)
 </script>
 
 <template>
   <v-app>
     <TheHeader></TheHeader>
-    <!-- <AdminMenuBar></AdminMenuBar> -->
     <v-main>
-      <component :is="currentLayout || 'div'">
+      <!-- TODO: Can we change the conditional layouts into a dynamic component? -->
+      <AdminLayout v-if="isAdminRoute">
         <router-view />
-      </component>
-      {{ currentLayout }}
+      </AdminLayout>
+      <DefaultLayout v-else>
+        <router-view />
+      </DefaultLayout>
     </v-main>
-    <TheFooter></TheFooter>
   </v-app>
 </template>
 
