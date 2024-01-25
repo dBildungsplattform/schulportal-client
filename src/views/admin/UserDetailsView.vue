@@ -57,7 +57,7 @@
             <v-col cols="2"></v-col>
             <v-col
               class="text-right"
-              cols="auto"
+              cols="1"
             >
               <span class="subtitle-2"> {{ $t('user.firstName') }}: </span>
             </v-col>
@@ -70,7 +70,7 @@
             <v-col cols="2"></v-col>
             <v-col
               class="text-right"
-              cols="auto"
+              cols="1"
             >
               <span class="subtitle-2"> {{ $t('user.lastName') }}: </span>
             </v-col>
