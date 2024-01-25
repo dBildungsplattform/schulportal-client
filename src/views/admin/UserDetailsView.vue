@@ -9,7 +9,8 @@
   const router: Router = useRouter()
   const currentPersonId: string = route.params['id'] as string
   const personStore: PersonStore = usePersonStore()
-
+  const currentPerson: Ref<Personendatensatz | null> = ref(null)
+    
   const password: Ref<string> = ref('')
   const errorCode: Ref<string> = ref('')
 
@@ -28,21 +29,10 @@
       })
   }
 
-  const currentPerson = {
-    person: {
-      id: '1',
-      name: {
-        familienname: 'Mustermann',
-        vorname: 'Max'
-      }
-    },
-    personenkontexte: [
-      {
-        id: 'context1'
-      }
-      // Add more contexts if needed
-    ]
-  }
+  onMounted(async () => {
+    currentPerson.value = await personStore.getPersonById(currentPersonId)
+  })
+
 </script>
 
 <template>
