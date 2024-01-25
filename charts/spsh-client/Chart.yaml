@@ -2,5 +2,5 @@ apiVersion: v2
 name: spsh-client
 description: Helm-Chart für den Schulportal-SH Client
 type: application
-version: 0.1.0
+version: 0.1.1
 appVersion: ""

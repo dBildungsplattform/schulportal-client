@@ -1,25 +1,27 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: spsh-client
+  name: {{ include "spsh-client.deploymentName" . }}
   labels:
-    app: spsh-client
+    app: {{ template "spsh-client.name" . }}
 spec:
-  replicas: 1
+  replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app: spsh-client
+      app: {{ template "spsh-client.name" . }}
   template:
     metadata:
-      name: spsh-client
       labels:
-        app: spsh-client
+        app: {{ template "spsh-client.name" . }}
     spec:
       containers:
-        - name: spsh-client
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: Always
+        - name: {{ template "spsh-client.name" . }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ default "Always" .Values.image.pullPolicy | quote }}
+          ports:
+            - name: http
+              containerPort: {{ default 80 .Values.service.port }}
+              protocol: TCP 
           securityContext:
-            allowPrivilegeEscalation: false
-      restartPolicy: Always
-      
+            allowPrivilegeEscalation: {{ default false .Values.allowPrivilegeEscalation }}
+      restartPolicy: {{ .Values.restartPolicy  }}
