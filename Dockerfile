@@ -5,16 +5,15 @@ ARG BASE_IMAGE=nginx:1.25-alpine
 # Build Stage
 FROM $BASE_IMAGE_BUILDER as build
 
-# This comment based on Branch  SPSH-242-generate-api-client-in-ci ( can be removed after review)
-# OpenJDK 17,is a specific requirement for running the OpenAPI code generator
-# Avoiding apk upgrade in Build Stage:
-#To maintain stability, we install OpenJDK without running apk upgrade. 
-#This limits the changes in Docker image to just adding OpenJDK, rather than potentially updating all packages.
 
-#SPSH-242-generate-api-client-in-ci
+# OpenJDK 17,is a specific requirement for running the OpenAPI code generator(SPSH-242-generate-api-client-in-ci)
+# Avoiding apk update  in Build Stage:
 #RUN apk update \
 # && apk add openjdk17-jre
-#latest version : 17.01-2024
+#To maintain stability, we install OpenJDK without running apk update. This limits the changes in Docker image to just adding OpenJDK, rather than potentially updating all packages.
+#Pin the OpenJDK 17 JRE version to the latest deployed version
+#https://pkgs.alpinelinux.org/package/edge/community/x86_64/openjdk17-jre-headless
+
 RUN apk add openjdk17-jre=17.0.10_p7-r0
 
 WORKDIR /app
