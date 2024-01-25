@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import { onMounted, type Ref, ref } from 'vue'
   import { type Router, type RouteLocationNormalizedLoaded, useRoute, useRouter } from 'vue-router'
-  import { usePersonStore, type Personendatensatz, type PersonStore } from '@/stores/PersonStore'
+  import { usePersonStore, type PersonStore } from '@/stores/PersonStore'
   import PasswordReset from '@/components/admin/PasswordReset.vue'
   import LayoutCard from '@/components/cards/LayoutCard.vue'
   import SpshAlert from '@/components/alert/SpshAlert.vue'
@@ -11,8 +11,6 @@
   const router: Router = useRouter()
   const currentPersonId: string = route.params['id'] as string
   const personStore: PersonStore = usePersonStore()
-  const currentPerson: Ref<Personendatensatz | null> = ref(null)
-  const errorMessage: Ref<string> = ref('')
 
   const { t }: Composer = useI18n({ useScope: 'global' })
 
@@ -34,15 +32,11 @@
   }
 
   const handleAlertClose = (): void => {
-    errorMessage.value = ''
+    personStore.errorCode = ''
   }
 
   onMounted(async () => {
-    try {
-      currentPerson.value = await personStore.getPersonById(currentPersonId)
-    } catch (error: unknown) {
-      errorMessage.value = t('admin.user.userDataLoadingErrorTitle')
-    }
+    await personStore.getPersonById(currentPersonId)
   })
 </script>
 
@@ -57,13 +51,9 @@
       :showCloseText="true"
     >
       <!-- Error Message Display -->
-      <v-container
-        v-if="errorMessage"
-        class="personal-info"
-      >
         <SpshAlert
-          :model-value="!!errorMessage"
-          :title="errorMessage"
+          :model-value="!!personStore.errorCode"
+          :title="t('admin.user.userDataLoadingErrorTitle')"
           :type="'error'"
           :closable="false"
           :text="$t('admin.user.userDataLoadingErrorText')"
@@ -73,9 +63,8 @@
           :buttonAction="navigateToUserTable"
           @update:modelValue="handleAlertClose"
         />
-      </v-container>
 
-      <template v-else>
+      <template v-if="!personStore.errorCode">
         <v-container class="personal-info">
           <v-row class="ml-md-16">
             <v-col>
@@ -84,7 +73,7 @@
               </h3></v-col
             >
           </v-row>
-          <div v-if="currentPerson?.person">
+          <div v-if="personStore.currentPerson?.person">
             <v-row>
               <!-- Spacer column -->
               <v-col cols="2"></v-col>
@@ -95,7 +84,7 @@
                 <span class="subtitle-2"> {{ $t('user.firstName') }}: </span>
               </v-col>
               <v-col cols="auto">
-                {{ currentPerson.person.name.vorname }}
+                {{ personStore.currentPerson.person.name.vorname }}
               </v-col>
             </v-row>
             <v-row>
@@ -108,7 +97,7 @@
                 <span class="subtitle-2"> {{ $t('user.lastName') }}: </span>
               </v-col>
               <v-col cols="auto">
-                {{ currentPerson.person.name.familienname }}
+                {{ personStore.currentPerson.person.name.familienname }}
               </v-col>
             </v-row>
           </div>
@@ -134,12 +123,12 @@
             <v-col
               cols="12"
               md="auto"
-              v-if="currentPerson"
+              v-if="personStore.currentPerson"
             >
               <div>
                 <PasswordReset
                   :errorCode="personStore.errorCode"
-                  :person="currentPerson"
+                  :person="personStore.currentPerson"
                   @onClearPassword="password = ''"
                   @onResetPassword="resetPassword(currentPersonId)"
                   :password="password"

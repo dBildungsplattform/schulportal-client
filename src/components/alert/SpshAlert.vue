@@ -24,12 +24,10 @@
 </script>
 
 <template>
-  <v-container
-    v-if="modelValue"
-    class="personal-info"
-  >
+  <v-container>
     <v-slide-y-transition>
       <v-alert
+        v-if="modelValue"
         :type="type"
         variant="outlined"
         :closable="closable"
