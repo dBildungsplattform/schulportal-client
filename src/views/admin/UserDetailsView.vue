@@ -9,8 +9,7 @@
   const router: Router = useRouter()
   const currentPersonId: string = route.params['id'] as string
   const personStore: PersonStore = usePersonStore()
-  const currentPerson: Ref<Personendatensatz | null> = ref(null)
-    
+
   const password: Ref<string> = ref('')
   const errorCode: Ref<string> = ref('')
 
@@ -29,15 +28,31 @@
       })
   }
 
-  onMounted(async () => {
-    currentPerson.value = await personStore.getPersonById(currentPersonId)
-  })
-  
+  const currentPerson = {
+    person: {
+      id: '1',
+      name: {
+        familienname: 'Mustermann',
+        vorname: 'Max'
+      }
+    },
+    personenkontexte: [
+      {
+        id: 'context1'
+      }
+      // Add more contexts if needed
+    ]
+  }
 </script>
 
 <template>
   <div class="admin">
-    <h1 class="text-center headline-1">{{ $t('admin.headline') }}</h1>
+    <v-row>
+      <v-col cols="12">
+        <h1 class="text-center headline-1">{{ $t('admin.headline') }}</h1></v-col
+      ></v-row
+    >
+
     <LayoutCard
       :closable="true"
       :header="$t('admin.user.edit')"
@@ -54,10 +69,12 @@
         <div v-if="currentPerson?.person">
           <v-row>
             <!-- Spacer column -->
-            <v-col cols="2"></v-col>
+            <v-col cols="1"></v-col>
             <v-col
               class="text-right"
-              cols="1"
+              md="2"
+              sm="3"
+              cols="5"
             >
               <span class="subtitle-2"> {{ $t('user.firstName') }}: </span>
             </v-col>
@@ -67,10 +84,12 @@
           </v-row>
           <v-row>
             <!-- Spacer column -->
-            <v-col cols="2"></v-col>
+            <v-col cols="1"></v-col>
             <v-col
               class="text-right"
-              cols="1"
+              md="2"
+              sm="3"
+              cols="5"
             >
               <span class="subtitle-2"> {{ $t('user.lastName') }}: </span>
             </v-col>
