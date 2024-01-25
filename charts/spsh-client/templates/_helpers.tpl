@@ -7,26 +7,7 @@ Expand the name of the chart.
 {{- end -}}
 
 {{/*
-Create a default fully qualified app name.
-*/}}
-{{- define "spsh-client.fullname" -}}
-{{- if .Values.fullnameOverride -}}
-{{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" -}}
-{{- else -}}
-{{- $name := default .Chart.Name .Values.nameOverride -}}
-{{- printf "%s" $name | trunc 63 | trimSuffix "-" -}}
-{{- end -}}
-{{- end -}}
-
-{{/*
-Create chart name and version as used by the chart label.
-*/}}
-{{- define "spsh-client.chart" -}}
-{{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
-{{- end -}}
-
-{{/*
-Create specific names based on resource kind, excluding the release name.
+Create specific names based on resource kind
 */}}
 {{- define "spsh-client.deploymentName" -}}
 {{- printf "%s-deployment" (include "spsh-client.name" .) | trunc 63 | trimSuffix "-" -}}
