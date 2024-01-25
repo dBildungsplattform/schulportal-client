@@ -12,7 +12,7 @@
     >
       <!-- Main title -->
       <v-row
-        class="mb-2"
+        class="mb-5"
         justify="center"
         no-gutters
       >
