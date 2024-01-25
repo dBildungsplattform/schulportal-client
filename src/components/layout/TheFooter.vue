@@ -53,9 +53,9 @@
         <!-- Sponsor Logos -->
         <v-col
           cols="12"
-          md="6"
-          order-md="2"
-          class="sponsor-logos-col"
+          lg="7"
+          order-lg="2"
+          class="sponsor-logos-col justify-end"
         >
           <div class="sponsor-logos-div">
             <template
@@ -71,7 +71,7 @@
                 <v-img
                   :src="sponsor.src"
                   :alt="sponsor.alt"
-                  width="250"
+                  width="220"
                   contain
                   class="sponsor-logo"
                 />
@@ -83,12 +83,13 @@
         <!-- Footer Links -->
         <v-col
           cols="12"
-          md="6"
-          order-md="1"
+          lg="5"
+          order-lg="1"
           class="footer-links-col justify-space-between"
         >
           <a
             v-for="link in footerLinks"
+            class="primary"
             :key="link.text"
             :href="link.href"
             rel="noopener noreferrer"
@@ -108,9 +109,6 @@
 </template>
 
 <style scoped>
-  a {
-    color: #001e49;
-  }
   .footer {
     background-image: linear-gradient(to bottom right, #ffffff 25%, transparent 25%),
       linear-gradient(180deg, rgba(229, 234, 239, 1) 100%, transparent 100%);
@@ -118,10 +116,10 @@
     background-repeat: no-repeat, no-repeat;
 
     background-size:
-      200% 100%,
+      200% 80%,
       100% 100%;
 
-    min-height: 200px; /* Avoid footer shrinking vertically on smaller screen sizes*/
+    min-height: 240px; /* Avoid footer shrinking vertically on smaller screen sizes*/
     align-items: flex-end;
   }
 
@@ -129,7 +127,7 @@
     .footer {
       min-height: 280px;
       background-size:
-        200% 100%,
+        200% 75%,
         100% 100%;
     }
   }
@@ -138,18 +136,21 @@
     .footer {
       min-height: 280px;
       background-size:
-        200% 30%,
+        200% 45%,
         100% 100%;
     }
   }
 
   @media (max-width: 690px) {
     .footer {
-      min-height: 340px;
+      min-height: 300px;
       background-size:
-        200% 45%,
+        200% 40%,
         100% 100%;
-    }
+    } 
+  .footer-links-col a {
+    margin-right: 10px;
+  }
   }
 
   @media (max-width: 510px) {
@@ -161,18 +162,18 @@
     }
   }
 
-  @media (max-width: 416px) {
+  @media (max-width: 430px) {
     .footer {
-      min-height: 350px;
+      min-height: 300px;
       background-size:
-        200% 40%,
+        200% 30%,
         100% 100%;
     }
   }
 
-  @media (max-width: 348px) {
+  @media (max-width: 390px) {
     .footer {
-      min-height: 380px;
+      min-height: 260px;
       background-size:
         200% 30%,
         100% 100%;
@@ -182,14 +183,6 @@
   .v-container {
     padding-bottom: 40px;
   }
-
-  .v-btn {
-    text-transform: none;
-  }
-  .v-btn:hover {
-    text-decoration: underline;
-  }
-
   .footer-links-col {
     display: flex;
     align-items: flex-end; /* Aligns the links to the start of the flex container */
@@ -226,32 +219,41 @@
     background-color: #001e49;
   }
 
-  @media (max-width: 1280px) {
-    .sponsor-logos-col,
-    .footer-links-col {
+
+  .sponsor-logos-col,
+  .footer-links-col {
       flex-wrap: wrap; /* Allow the items to wrap if needed */
       justify-content: center; /* Center the items if they wrap */
-    }
-  }
-
-  @media (max-width: 600px) {
-    .sponsor-logo {
-      width: 100%;
-      max-width: 160px; /* Set the width to 100px or less */
-    }
-  }
-
-  @media (max-width: 500px) {
-    .sponsor-logo {
-      width: 100%;
-      max-width: 160px; 
-    }
-  }
+ }
   
-  @media (max-width: 380px) {
+  @media (max-width: 540px) {
     .sponsor-logo {
-      width: 100%; 
-      max-width: 145px;
+      max-width: 200px;
     }
   }
+
+  @media (max-width: 490px) {
+    .sponsor-logo {
+      max-width: 180px;
+    }
+  }
+
+  @media (max-width: 450px) {
+    .sponsor-logo {
+      max-width: 160px;
+    }
+  }
+
+  @media (max-width: 400px) {
+    .sponsor-logo {
+      max-width: 140px;
+    }
+  }
+
+  @media (max-width: 370px) {
+    .sponsor-logo {
+      max-width: 130px;
+    }
+  }
+
 </style>
