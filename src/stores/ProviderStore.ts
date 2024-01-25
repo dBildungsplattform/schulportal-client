@@ -1,9 +1,9 @@
 import { defineStore, type Store, type StoreDefinition } from 'pinia'
 import { isAxiosError } from 'axios'
-import { FrontendApiFactory, type FrontendApiInterface } from '../api-client/generated/api'
+import { ProviderApiFactory, type ProviderApiInterface } from '../api-client/generated/api'
 import axiosApiInstance from '@/services/ApiService'
 
-const frontendApi: FrontendApiInterface = FrontendApiFactory(undefined, '', axiosApiInstance)
+const providerApi: ProviderApiInterface = ProviderApiFactory(undefined, '', axiosApiInstance)
 
 export type Provider = {
   id: string
@@ -40,7 +40,8 @@ export const useProviderStore: StoreDefinition<
     async getAllProviders() {
       this.loading = true
       try {
-        const { data }: { data: Provider[] } = await frontendApi.frontendControllerProvider()
+        const { data }: { data: Provider[] } =
+          await providerApi.providerControllerGetServiceProvidersByPersonId()
         this.allProviders = data
         this.loading = false
       } catch (error: unknown) {

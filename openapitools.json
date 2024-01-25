@@ -5,7 +5,7 @@
 		"version": "6.6.0",
       "storageDir": "./src/api-client/storageDir",
       "generators": {
-        "bff": {
+        "backend": {
           "generatorName": "typescript-axios",
           "output": "#{cwd}/src/api-client/generated",
           "inputSpec": "#{cwd}/src/api-client/openapispec.json",
