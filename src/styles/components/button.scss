@@ -36,9 +36,8 @@
 
     &:focus,
     &:hover {
-      transform: $smallButtonTransformScale
+      transform: $smallButtonTransformScale;
     }
-   
   }
 
   /* medium screen */
