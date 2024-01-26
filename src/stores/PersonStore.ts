@@ -38,6 +38,7 @@ type PersonState = {
   errorCode: string
   loading: boolean
   totalPersons: number
+  currentPerson: Personendatensatz | null;
 }
 
 type PersonGetters = {}
@@ -61,7 +62,8 @@ export const usePersonStore: StoreDefinition<
       allPersons: [],
       errorCode: '',
       loading: false,
-      totalPersons: 0
+      totalPersons: 0,
+      currentPerson: null
     }
   },
   actions: {
@@ -89,6 +91,7 @@ export const usePersonStore: StoreDefinition<
         const { data }: { data: Personendatensatz } =
           await personenApi.personControllerFindPersonById(personId)
         this.loading = false
+        this.currentPerson = data
         return data
       } catch (error) {
         this.errorCode = 'UNSPECIFIED_ERROR'
