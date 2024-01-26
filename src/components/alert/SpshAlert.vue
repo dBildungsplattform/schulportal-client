@@ -55,7 +55,7 @@
         >
           <v-col cols="auto">
             <v-btn
-              :class="buttonClass"
+              class="primary"
               @click="buttonAction"
               data-testid="alert-button"
             >
