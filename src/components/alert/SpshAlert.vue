@@ -57,6 +57,7 @@
             <v-btn
               :class="buttonClass"
               @click="buttonAction"
+              data-testid="alert-button"
             >
               {{ buttonText }}
             </v-btn>
