@@ -27,7 +27,7 @@
   <v-container>
     <v-slide-y-transition>
       <v-alert
-        v-if="modelValue"
+        :model-value="modelValue"
         :type="type"
         variant="outlined"
         :closable="closable"

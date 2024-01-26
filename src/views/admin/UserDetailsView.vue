@@ -26,9 +26,6 @@
       .then((newPassword?: string) => {
         password.value = newPassword || ''
       })
-      .catch((error: string) => {
-        personStore.errorCode = error
-      })
   }
 
   const handleAlertClose = (): void => {
