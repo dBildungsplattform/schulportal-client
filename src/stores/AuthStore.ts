@@ -44,7 +44,9 @@ export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, 
 
       async logout(): Promise<void> {
         try {
-          await authApi.logout()
+          await authApi.authenticationControllerLogout({
+              validateStatus: null,
+          })
         } catch {
   
         }

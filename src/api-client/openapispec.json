@@ -26,7 +26,7 @@
       }
     },
     "/api/auth/logout": {
-      "get": {
+      "post": {
         "operationId": "AuthenticationController_logout",
         "summary": "Used to log out the current user.",
         "parameters": [],
@@ -596,6 +596,54 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "Request has wrong format."
+          },
+          "401": {
+            "description": "Request is not authorized."
+          },
+          "403": {
+            "description": "Insufficient permissions to perform operation."
+          },
+          "404": {
+            "description": "The personenkontext was not found."
+          },
+          "500": {
+            "description": "An internal server error occurred."
+          }
+        },
+        "tags": [
+          "personenkontexte"
+        ]
+      },
+      "delete": {
+        "operationId": "PersonenkontextController_deletePersonenkontextById",
+        "parameters": [
+          {
+            "name": "personenkontextId",
+            "required": true,
+            "in": "path",
+            "description": "The id for the personenkontext.",
+            "schema": {
+              "nullable": false,
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeleteRevisionBodyParams"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "The personenkontext was successfully deleted."
           },
           "400": {
             "description": "Request has wrong format."
@@ -1570,6 +1618,19 @@
           "revision": {
             "type": "string",
             "description": "The revision of the personenkontext."
+          }
+        },
+        "required": [
+          "revision"
+        ]
+      },
+      "DeleteRevisionBodyParams": {
+        "type": "object",
+        "properties": {
+          "revision": {
+            "type": "string",
+            "description": "The revision of a personenkontext.",
+            "nullable": false
           }
         },
         "required": [

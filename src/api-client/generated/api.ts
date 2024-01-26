@@ -255,6 +255,19 @@ export interface CreateRolleBodyParams {
 /**
  * 
  * @export
+ * @interface DeleteRevisionBodyParams
+ */
+export interface DeleteRevisionBodyParams {
+    /**
+     * The revision of a personenkontext.
+     * @type {string}
+     * @memberof DeleteRevisionBodyParams
+     */
+    'revision': string;
+}
+/**
+ * 
+ * @export
  * @interface LoeschungResponse
  */
 export interface LoeschungResponse {
@@ -1043,7 +1056,7 @@ export const AuthApiAxiosParamCreator = function (configuration?: Configuration)
                 baseOptions = configuration.baseOptions;
             }
 
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
@@ -2365,6 +2378,45 @@ export const PersonenkontexteApiAxiosParamCreator = function (configuration?: Co
         /**
          * 
          * @param {string} personenkontextId The id for the personenkontext.
+         * @param {DeleteRevisionBodyParams} deleteRevisionBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        personenkontextControllerDeletePersonenkontextById: async (personenkontextId: string, deleteRevisionBodyParams: DeleteRevisionBodyParams, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'personenkontextId' is not null or undefined
+            assertParamExists('personenkontextControllerDeletePersonenkontextById', 'personenkontextId', personenkontextId)
+            // verify required parameter 'deleteRevisionBodyParams' is not null or undefined
+            assertParamExists('personenkontextControllerDeletePersonenkontextById', 'deleteRevisionBodyParams', deleteRevisionBodyParams)
+            const localVarPath = `/api/personenkontexte/{personenkontextId}`
+                .replace(`{${"personenkontextId"}}`, encodeURIComponent(String(personenkontextId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(deleteRevisionBodyParams, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {string} personenkontextId The id for the personenkontext.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -2506,6 +2558,17 @@ export const PersonenkontexteApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @param {string} personenkontextId The id for the personenkontext.
+         * @param {DeleteRevisionBodyParams} deleteRevisionBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async personenkontextControllerDeletePersonenkontextById(personenkontextId: string, deleteRevisionBodyParams: DeleteRevisionBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.personenkontextControllerDeletePersonenkontextById(personenkontextId, deleteRevisionBodyParams, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @param {string} personenkontextId The id for the personenkontext.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -2552,6 +2615,16 @@ export const PersonenkontexteApiFactory = function (configuration?: Configuratio
         /**
          * 
          * @param {string} personenkontextId The id for the personenkontext.
+         * @param {DeleteRevisionBodyParams} deleteRevisionBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        personenkontextControllerDeletePersonenkontextById(personenkontextId: string, deleteRevisionBodyParams: DeleteRevisionBodyParams, options?: any): AxiosPromise<void> {
+            return localVarFp.personenkontextControllerDeletePersonenkontextById(personenkontextId, deleteRevisionBodyParams, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {string} personenkontextId The id for the personenkontext.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -2594,6 +2667,16 @@ export interface PersonenkontexteApiInterface {
     /**
      * 
      * @param {string} personenkontextId The id for the personenkontext.
+     * @param {DeleteRevisionBodyParams} deleteRevisionBodyParams 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PersonenkontexteApiInterface
+     */
+    personenkontextControllerDeletePersonenkontextById(personenkontextId: string, deleteRevisionBodyParams: DeleteRevisionBodyParams, options?: AxiosRequestConfig): AxiosPromise<void>;
+
+    /**
+     * 
+     * @param {string} personenkontextId The id for the personenkontext.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PersonenkontexteApiInterface
@@ -2633,6 +2716,18 @@ export interface PersonenkontexteApiInterface {
  * @extends {BaseAPI}
  */
 export class PersonenkontexteApi extends BaseAPI implements PersonenkontexteApiInterface {
+    /**
+     * 
+     * @param {string} personenkontextId The id for the personenkontext.
+     * @param {DeleteRevisionBodyParams} deleteRevisionBodyParams 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PersonenkontexteApi
+     */
+    public personenkontextControllerDeletePersonenkontextById(personenkontextId: string, deleteRevisionBodyParams: DeleteRevisionBodyParams, options?: AxiosRequestConfig) {
+        return PersonenkontexteApiFp(this.configuration).personenkontextControllerDeletePersonenkontextById(personenkontextId, deleteRevisionBodyParams, options).then((request) => request(this.axios, this.basePath));
+    }
+
     /**
      * 
      * @param {string} personenkontextId The id for the personenkontext.

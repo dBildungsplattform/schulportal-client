@@ -25,9 +25,11 @@ npm run lint
 ```
 
 ## Backend lokal starten
+1. API Spezifikation des Backend aufrufen (http://localhost:9090/docs-json), **NICHT /docs**
+2. Inhalt kopieren und als neuen Inhalt der Datei *src/api-client/openapispec.json* einfügen
 
 ## API lokal generieren
-1. Java Runtime Environment lokal installieren
+1. Java Runtime Environment lokal installieren falls nicht vorhanden
 2. `npm run generate-client` ausführen
 3. api.ts wird generiert und beinhaltet alle Controller für die spezifizierten Endpunkte
 
