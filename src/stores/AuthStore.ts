@@ -9,6 +9,7 @@ type AuthState = {
 
 type AuthActions = {
   initializeAuthStatus: () => Promise<void>
+  logout: () => Promise<void>
 }
 
 type AuthGetters = {}
@@ -39,6 +40,14 @@ export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, 
         }
 
         this.authInitialized = true
-      }
+      },
+
+      async logout(): Promise<void> {
+        try {
+          await authApi.logout()
+        } catch {
+  
+        }
+      },
     }
   })

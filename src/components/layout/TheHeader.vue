@@ -4,6 +4,10 @@
 
   const route: RouteLocationNormalizedLoaded = useRoute()
   const auth: AuthStore = useAuthStore()
+
+  function logout(): void {
+    auth.logout()
+  }
 </script>
 
 <template>
@@ -89,17 +93,18 @@
 
     <v-toolbar-items v-if="auth.isAuthed">
       <v-col class="align-self-center mr-2">
-        <a
-          class="primary"
+        <v-btn
+          @click.stop="logout()"
           data-testid="nav-logout-button"
-          href="/api/auth/logout"
+          :ripple="false"
+          variant="text"
         >
           <v-icon
             class="mr-2"
             icon="mdi-logout"
           ></v-icon>
           <span class="hidden-sm-and-down">{{ $t('nav.logout') }}</span>
-        </a>
+      </v-btn>
       </v-col>
     </v-toolbar-items>
   </v-app-bar>
