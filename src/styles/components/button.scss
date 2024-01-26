@@ -14,7 +14,9 @@
 
     &:focus,
     &:hover {
-      text-decoration: underline;
+      .v-btn__content {
+        text-decoration: underline;
+      }
     }
   }
 
