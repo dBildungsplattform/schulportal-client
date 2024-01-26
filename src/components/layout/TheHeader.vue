@@ -75,7 +75,7 @@
         <a
           class="primary"
           data-testid="nav-login-button"
-          :href="`/api/frontend/login?redirectUrl=${route.fullPath}`"
+          :href="`/api/auth/login?redirectUrl=${route.fullPath}`"
         >
           <v-icon
             class="mr-2"
@@ -92,7 +92,7 @@
         <a
           class="primary"
           data-testid="nav-logout-button"
-          href="/api/frontend/logout"
+          href="/api/auth/logout"
         >
           <v-icon
             class="mr-2"
@@ -105,14 +105,4 @@
   </v-app-bar>
 </template>
 
-<style scoped>
-  .nav-title {
-    font-weight: 600;
-  }
-  .v-btn {
-    text-transform: none;
-  }
-  .v-btn:hover {
-    text-decoration: underline;
-  }
-</style>
+<style scoped></style>

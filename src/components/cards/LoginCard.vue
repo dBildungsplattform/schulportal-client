@@ -48,7 +48,7 @@
           <v-btn
             data-testid="login-button"
             class="primary"
-            :href="`/api/frontend/login?redirectUrl=${route.fullPath}`"
+            :href="`/api/auth/login?redirectUrl=${route.fullPath}`"
           >
             {{ $t('login.button') }}
           </v-btn>
@@ -59,24 +59,9 @@
 </template>
 
 <style scoped>
-  @media (max-width: 600px) {
-    .login-button {
-      max-width: 70%;
-    }
-
-    .login-button:hover {
-      /* Hover state with horizontal shrink */
-      transform: scaleX(0.95);
-    }
-  }
 
   .login-card {
     padding: 6.25rem 0; /* Top and bottom padding */
   }
-
-  @media (max-width: 600px) {
-    .landing-header {
-      font-size: 1.5rem;
-    }
-  }
+  
 </style>

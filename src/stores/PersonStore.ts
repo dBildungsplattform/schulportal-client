@@ -1,13 +1,20 @@
 import { defineStore, type Store, type StoreDefinition } from 'pinia'
-import { isAxiosError } from 'axios'
+import { isAxiosError, type AxiosResponse } from 'axios'
 import {
-  FrontendApiFactory,
-  type FrontendApiInterface,
-  type FrontendControllerPersons200Response
+  PersonenApiFactory,
+  PersonenFrontendApiFactory,
+  type PersonenApiInterface,
+  type PersonenFrontendApiInterface,
+  type PersonFrontendControllerFindPersons200Response
 } from '../api-client/generated/api'
 import axiosApiInstance from '@/services/ApiService'
 
-const frontendApi: FrontendApiInterface = FrontendApiFactory(undefined, '', axiosApiInstance)
+const personenApi: PersonenApiInterface = PersonenApiFactory(undefined, '', axiosApiInstance)
+const personenFrontendApi: PersonenFrontendApiInterface = PersonenFrontendApiFactory(
+  undefined,
+  '',
+  axiosApiInstance
+)
 
 type Person = {
   id: string
@@ -31,6 +38,7 @@ type PersonState = {
   errorCode: string
   loading: boolean
   totalPersons: number
+  currentPerson: Personendatensatz | null;
 }
 
 type PersonGetters = {}
@@ -54,15 +62,17 @@ export const usePersonStore: StoreDefinition<
       allPersons: [],
       errorCode: '',
       loading: false,
-      totalPersons: 0
+      totalPersons: 0,
+      currentPerson: null
     }
   },
   actions: {
     async getAllPersons() {
       this.loading = true
       try {
-        const { data }: { data: FrontendControllerPersons200Response } =
-          await frontendApi.frontendControllerPersons()
+        const { data }: AxiosResponse<PersonFrontendControllerFindPersons200Response> =
+          await personenFrontendApi.personFrontendControllerFindPersons()
+
         this.allPersons = data.items
         this.totalPersons = data.total
         this.loading = false
@@ -79,8 +89,9 @@ export const usePersonStore: StoreDefinition<
       this.loading = true
       try {
         const { data }: { data: Personendatensatz } =
-          await frontendApi.frontendControllerPersonById(personId)
+          await personenApi.personControllerFindPersonById(personId)
         this.loading = false
+        this.currentPerson = data
         return data
       } catch (error) {
         this.errorCode = 'UNSPECIFIED_ERROR'
@@ -96,7 +107,7 @@ export const usePersonStore: StoreDefinition<
       this.loading = true
       try {
         const { data }: { data: string } =
-          await frontendApi.frontendControllerPasswordReset(personId)
+          await personenApi.personControllerResetPasswordByPersonId(personId)
         this.loading = false
         return data
       } catch (error: unknown) {
