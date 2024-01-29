@@ -93,6 +93,35 @@
       :title="$t('admin.user.showAll')"
       to="/admin/users"
     ></v-list-item>
+    <v-list-item
+      class="menu-bar-sub-item caption"
+      prepend-icon="mdi-plus-circle-outline"
+      :title="$t('admin.user.addNew')"
+    ></v-list-item>
+
+    <!-- Klassenverwaltung -->
+    <v-list-item
+      class="menu-bar-main-item headline-2"
+      :title="$t('admin.class.management')"
+    ></v-list-item>
+
+    <!-- Rollenverwaltung -->
+    <v-list-item
+      class="menu-bar-main-item headline-2"
+      :title="$t('admin.role.management')"
+    ></v-list-item>
+
+    <!-- Schulverwaltung -->
+    <v-list-item
+      class="menu-bar-main-item headline-2"
+      :title="$t('admin.school.management')"
+    ></v-list-item>
+
+    <!-- Schulträgerverwaltung -->
+    <v-list-item
+      class="menu-bar-main-item headline-2"
+      :title="$t('admin.schoolBoard.management')"
+    ></v-list-item>
   </v-navigation-drawer>
 </template>
 

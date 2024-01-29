@@ -2,7 +2,20 @@
   "action": "Aktion",
   "admin": {
     "headline": "Administrationsbereich",
+    "class": {
+      "management": "Klassenverwaltung"
+    },
+    "role": {
+      "management": "Rollenverwaltung"
+    },
+    "school": {
+      "management": "Schulverwaltung"
+    },
+    "schoolBoard": {
+      "management": "Schulträgerverwaltung"
+    },
     "user": {
+      "addNew": "Neue Benutzer anlegen",
       "changePassword": "Passwort ändern",
       "copyPasswordError": "Passwort konnte nicht in die Zwischenablage kopiert werden",
       "copyPasswordSuccess": "Passwort in Zwischenablage kopiert",
