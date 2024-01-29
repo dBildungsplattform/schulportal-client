@@ -1,15 +1,14 @@
 <script setup lang="ts">
-  import { type Ref, ref } from 'vue'
+  import { type Ref, ref, type ComputedRef } from 'vue'
   import { onMounted } from 'vue'
   import { useDisplay } from 'vuetify'
 
   const menuDrawer: Ref<boolean> = ref(true)
-  const { mobile } = useDisplay()
+  const { mobile }: { mobile: ComputedRef<boolean> } = useDisplay()
 
   onMounted(() => {
     menuDrawer.value = !mobile.value
   })
-
 </script>
 
 <template>
@@ -25,7 +24,7 @@
       size="x-large"
     ></v-icon>
   </v-btn>
-  <v-btn 
+  <v-btn
     class="hidden-lg-and-up"
     density="compact"
     icon
@@ -38,7 +37,7 @@
       size="x-large"
     ></v-icon>
   </v-btn>
-  
+
   <v-navigation-drawer
     class="menu-bar"
     floating
