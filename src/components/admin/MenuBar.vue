@@ -1,16 +1,70 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+  import { type Ref, ref } from 'vue'
+  import { onMounted } from 'vue'
+  import { useDisplay } from 'vuetify'
+
+  const menuDrawer: Ref<boolean> = ref(true)
+  const { mobile } = useDisplay()
+
+  onMounted(() => {
+    menuDrawer.value = !mobile.value
+  })
+
+</script>
 
 <template>
+  <v-btn
+    class="hidden-lg-and-up"
+    density="compact"
+    icon
+    variant="text"
+  >
+    <v-icon
+      @click.stop="menuDrawer = !menuDrawer"
+      icon="mdi-menu"
+      size="x-large"
+    ></v-icon>
+  </v-btn>
+  <v-btn 
+    class="hidden-lg-and-up"
+    density="compact"
+    icon
+    to="/start"
+    variant="text"
+  >
+    <v-icon
+      class="hidden lg-and-up"
+      icon="mdi-home"
+      size="x-large"
+    ></v-icon>
+  </v-btn>
+  
   <v-navigation-drawer
-    class="hidden-md-and-down menu-bar"
+    class="menu-bar"
     floating
     order="1"
+    v-model="menuDrawer"
   >
     <!-- Title -->
     <v-list-item
       class="menu-bar-title"
       :title="$t('nav.navigation')"
-    ></v-list-item>
+    >
+      <v-btn
+        class="hidden-lg-and-up primary menu-bar-close-button"
+        density="compact"
+        icon
+        position="absolute"
+        rounded="sm e-lg"
+        variant="text"
+      >
+        <v-icon
+          @click.stop="menuDrawer = !menuDrawer"
+          icon="mdi-menu-open"
+          size="x-large"
+        ></v-icon>
+      </v-btn>
+    </v-list-item>
     <v-divider></v-divider>
 
     <!-- Back to start page -->

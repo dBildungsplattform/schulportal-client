@@ -29,6 +29,12 @@
     }
   }
 
+  .menu-bar-close-button {
+    box-shadow: 0px 3px 6px #00000029;
+    right: -25px;
+    top: 5px;    
+  }
+
   .menu-bar-main-item {
     padding-bottom: 5px;
     .v-list-item-title {
