@@ -39,10 +39,10 @@
   <div class="admin">
     <v-row>
       <v-col cols="12">
-        <h1 class="text-center headline-1">{{ $t('admin.headline') }}</h1></v-col
-      ></v-row
+        <h1 class="text-center headline-1">{{ $t('admin.headline') }}</h1>
+      </v-col>
+    </v-row
     >
-
     <LayoutCard
       :closable="true"
       :header="$t('admin.user.edit')"
@@ -101,8 +101,8 @@
         <v-row class="ml-md-16">
           <v-col>
             <h3 class="subtitle-1">{{ $t('user.password') }}</h3>
-          </v-col></v-row
-        >
+          </v-col>
+        </v-row>
         <v-row
           justify="end"
           class="mr-lg-10"
