@@ -45,6 +45,7 @@
 <template>
   <v-footer
     class="footer"
+    data-testid="footer"
     height="10"
   >
     <v-container>

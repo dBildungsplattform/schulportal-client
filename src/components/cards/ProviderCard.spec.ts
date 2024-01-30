@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest'
 import { VueWrapper, mount } from '@vue/test-utils'
-import ProviderCard from '../../../../components/cards/ProviderCard.vue'
+import ProviderCard from './ProviderCard.vue'
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const assign: (url: string | URL) => void = window.location.assign

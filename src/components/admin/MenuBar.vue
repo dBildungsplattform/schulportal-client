@@ -14,6 +14,7 @@
 <template>
   <v-btn
     class="hidden-lg-and-up"
+    data-testid="open-mobile-menu-button"
     density="compact"
     icon
     variant="text"
@@ -26,6 +27,7 @@
   </v-btn>
   <v-btn
     class="hidden-lg-and-up"
+    data-testid="mobile-back-to-start-link"
     density="compact"
     icon
     to="/start"
@@ -47,10 +49,12 @@
     <!-- Title -->
     <v-list-item
       class="menu-bar-title"
+      data-testid="menu-bar-title"
       :title="$t('nav.navigation')"
     >
       <v-btn
         class="hidden-lg-and-up primary menu-bar-close-button"
+        data-testid="close-mobile-menu-button"
         density="compact"
         icon
         position="absolute"
@@ -69,6 +73,7 @@
     <!-- Back to start page -->
     <v-list-item
       class="menu-bar-back caption"
+      data-testid="back-to-start-link"
       :title="$t('nav.backToStart')"
       to="/start"
     >
@@ -88,12 +93,14 @@
     ></v-list-item>
     <v-list-item
       class="menu-bar-sub-item caption"
+      data-testid="user-management-menu-item"
       prepend-icon="mdi-format-list-bulleted"
       :title="$t('admin.user.showAll')"
       to="/admin/users"
     ></v-list-item>
     <v-list-item
       class="menu-bar-sub-item caption"
+      data-testid="user-creation-menu-item"
       prepend-icon="mdi-plus-circle-outline"
       :title="$t('admin.user.addNew')"
     ></v-list-item>

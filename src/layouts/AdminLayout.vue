@@ -19,4 +19,10 @@
       max-width: 1200px - $menuBarMinWidth;
     }
   }
+
+  @media (min-width: 1600px) {
+    .v-container {
+      max-width: 1200px;
+    }
+  }
 </style>

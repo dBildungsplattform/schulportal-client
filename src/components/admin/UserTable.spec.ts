@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest'
 import { VueWrapper, mount } from '@vue/test-utils'
-import UserTable from '../../../components/admin/UserTable.vue'
+import UserTable from './UserTable.vue'
 
 let wrapper: VueWrapper | null = null
 

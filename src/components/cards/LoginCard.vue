@@ -8,6 +8,7 @@
   <v-container fluid>
     <v-card
       class="login-card"
+      data-testid="login-card"
       flat
     >
       <!-- Main title -->
