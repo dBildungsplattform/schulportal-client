@@ -23,18 +23,16 @@
         v-if="closable"
         class="text-right mr-6"
       >
-        <span
+        <v-btn
           v-if="showCloseText"
-          class="pointer hidden-sm-and-down"
+          append-icon="mdi-close"
+          class="hidden-sm-and-down"
           @click.stop="$emit('onCloseClicked')"
-          tabindex="0"
-          >{{ $t('close') }}</span
+          :ripple="false"
+          variant="text"
         >
-        <v-icon
-          @click.stop="$emit('onCloseClicked')"
-          icon="mdi-close"
-          size="x-large"
-        ></v-icon>
+          {{ $t('close') }}
+        </v-btn>
       </v-col>
     </v-row>
     <v-divider

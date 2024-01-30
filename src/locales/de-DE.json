@@ -16,6 +16,7 @@
     },
     "user": {
       "addNew": "Neue Benutzer anlegen",
+      "backToList": "Zurück zur Liste",
       "changePassword": "Passwort ändern",
       "copyPasswordError": "Passwort konnte nicht in die Zwischenablage kopiert werden",
       "copyPasswordSuccess": "Passwort in Zwischenablage kopiert",
@@ -26,7 +27,9 @@
       "resetPasswordInformation": "Bitte teilen Sie dem Benutzer das temporäre Passwort mit. Nach dem Schließen des Dialogs wird es aus Sicherheitsgründen nicht mehr angezeigt.",
       "resetPassword": "Passwort zurücksetzen",
       "showAll": "Alle Benutzer anzeigen",
-      "status": "Status"
+      "status": "Status",
+      "userDataLoadingErrorTitle": "Fehler beim Laden des Benutzers",
+      "userDataLoadingErrorText": "Es konnten keine Benutzerdaten geladen werden."
     }
   },
   "cancel": "Abbrechen",

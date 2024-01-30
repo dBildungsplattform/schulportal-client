@@ -1,18 +1,19 @@
 <script setup lang="ts">
   import { onMounted, type Ref, ref } from 'vue'
   import { type Router, type RouteLocationNormalizedLoaded, useRoute, useRouter } from 'vue-router'
-  import { usePersonStore, type Personendatensatz, type PersonStore } from '@/stores/PersonStore'
+  import { usePersonStore, type PersonStore } from '@/stores/PersonStore'
   import PasswordReset from '@/components/admin/PasswordReset.vue'
   import LayoutCard from '@/components/cards/LayoutCard.vue'
+  import SpshAlert from '@/components/alert/SpshAlert.vue'
+  import { type Composer, useI18n } from 'vue-i18n'
 
   const route: RouteLocationNormalizedLoaded = useRoute()
   const router: Router = useRouter()
   const currentPersonId: string = route.params['id'] as string
   const personStore: PersonStore = usePersonStore()
-  const currentPerson: Ref<Personendatensatz | null> = ref(null)
+  const { t }: Composer = useI18n({ useScope: 'global' })
 
   const password: Ref<string> = ref('')
-  const errorCode: Ref<string> = ref('')
 
   function navigateToUserTable(): void {
     router.push({ name: 'user-management' })
@@ -24,13 +25,14 @@
       .then((newPassword?: string) => {
         password.value = newPassword || ''
       })
-      .catch((error: string) => {
-        errorCode.value = error
-      })
+  }
+
+  const handleAlertClose = (): void => {
+    personStore.errorCode = ''
   }
 
   onMounted(async () => {
-    currentPerson.value = await personStore.getPersonById(currentPersonId)
+    await personStore.getPersonById(currentPersonId)
   })
 </script>
 
@@ -44,78 +46,98 @@
       :padded="true"
       :showCloseText="true"
     >
-      <v-container class="personal-info">
-        <v-row class="ml-md-16">
-          <v-col>
-            <h3 class="subtitle-1">{{ $t('admin.user.personalInfo') }}</h3></v-col
-          >
-        </v-row>
-        <div v-if="currentPerson?.person">
-          <v-row>
-            <!-- Spacer column -->
-            <v-col cols="2"></v-col>
-            <v-col
-              class="text-right"
-              cols="auto"
+      <!-- Error Message Display -->
+        <SpshAlert
+          :model-value="!!personStore.errorCode"
+          :title="t('admin.user.userDataLoadingErrorTitle')"
+          :type="'error'"
+          :closable="false"
+          :text="$t('admin.user.userDataLoadingErrorText')"
+          :showButton="true"
+          :buttonText="$t('admin.user.backToList')"
+          buttonClass="primary"
+          :buttonAction="navigateToUserTable"
+          @update:modelValue="handleAlertClose"
+        />
+
+      <template v-if="!personStore.errorCode">
+        <v-container class="personal-info">
+          <v-row class="ml-md-16">
+            <v-col>
+              <h3 class="subtitle-1">
+                {{ $t('admin.user.personalInfo') }}
+              </h3></v-col
             >
-              <span class="subtitle-2"> {{ $t('user.firstName') }}: </span>
-            </v-col>
-            <v-col cols="auto">
-              {{ currentPerson.person.name.vorname }}
-            </v-col>
           </v-row>
-          <v-row>
-            <!-- Spacer column -->
-            <v-col cols="2"></v-col>
-            <v-col
-              class="text-right"
-              cols="auto"
-            >
-              <span class="subtitle-2"> {{ $t('user.lastName') }}: </span>
-            </v-col>
-            <v-col cols="auto">
-              {{ currentPerson.person.name.familienname }}
-            </v-col>
-          </v-row>
-        </div>
-        <div v-else>
-          <v-progress-circular indeterminate></v-progress-circular>
-        </div>
-      </v-container>
-      <v-divider
-        class="border-opacity-100 rounded my-6 mx-4"
-        color="#E5EAEF"
-        thickness="6"
-      ></v-divider>
-      <v-container class="password-reset">
-        <v-row class="ml-md-16">
-          <v-col>
-            <h3 class="subtitle-1">{{ $t('user.password') }}</h3>
-          </v-col></v-row
-        >
-        <v-row
-          justify="end"
-          class="mr-lg-10"
-        >
-          <v-col
-            cols="12"
-            md="auto"
-            v-if="currentPerson"
-          >
-            <div>
-              <PasswordReset
-                :errorCode="errorCode"
-                :person="currentPerson"
-                @onClearPassword="password = ''"
-                @onResetPassword="resetPassword(currentPersonId)"
-                :password="password"
+          <div v-if="personStore.currentPerson?.person">
+            <v-row>
+              <!-- Spacer column -->
+              <v-col cols="2"></v-col>
+              <v-col
+                class="text-right"
+                cols="auto"
               >
-              </PasswordReset>
-            </div>
-          </v-col>
-          <v-col v-else> <v-progress-circular indeterminate></v-progress-circular></v-col>
-        </v-row>
-      </v-container>
+                <span class="subtitle-2"> {{ $t('user.firstName') }}: </span>
+              </v-col>
+              <v-col cols="auto">
+                {{ personStore.currentPerson.person.name.vorname }}
+              </v-col>
+            </v-row>
+            <v-row>
+              <!-- Spacer column -->
+              <v-col cols="2"></v-col>
+              <v-col
+                class="text-right"
+                cols="auto"
+              >
+                <span class="subtitle-2"> {{ $t('user.lastName') }}: </span>
+              </v-col>
+              <v-col cols="auto">
+                {{ personStore.currentPerson.person.name.familienname }}
+              </v-col>
+            </v-row>
+          </div>
+          <div v-else-if="personStore.loading">
+            <v-progress-circular indeterminate></v-progress-circular>
+          </div>
+        </v-container>
+        <v-divider
+          class="border-opacity-100 rounded my-6 mx-4"
+          color="#E5EAEF"
+          thickness="6"
+        ></v-divider>
+        <v-container class="password-reset">
+          <v-row class="ml-md-16">
+            <v-col>
+              <h3 class="subtitle-1">{{ $t('user.password') }}</h3>
+            </v-col></v-row
+          >
+          <v-row
+            justify="end"
+            class="mr-lg-10"
+          >
+            <v-col
+              cols="12"
+              md="auto"
+              v-if="personStore.currentPerson"
+            >
+              <div>
+                <PasswordReset
+                  :errorCode="personStore.errorCode"
+                  :person="personStore.currentPerson"
+                  @onClearPassword="password = ''"
+                  @onResetPassword="resetPassword(currentPersonId)"
+                  :password="password"
+                >
+                </PasswordReset>
+              </div>
+            </v-col>
+            <v-col v-else-if="personStore.loading">
+              <v-progress-circular indeterminate></v-progress-circular
+            ></v-col>
+          </v-row>
+        </v-container>
+      </template>
     </LayoutCard>
   </div>
 </template>

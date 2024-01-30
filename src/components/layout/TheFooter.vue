@@ -20,12 +20,12 @@
   const footerLinks: Ref<FooterLink[]> = ref([
     { text: t('footer.contact'), href: 'https://www.secure-lernnetz.de/helpdesk/' },
     { text: t('footer.help'), href: 'https://medienberatung.iqsh.de/schulportal-sh.html' },
-    { text: t('footer.legalNotice'), href: 'impressum_datenschutzerklaerung.html' },
+    { text: t('footer.legalNotice'), href: '/impressum_datenschutzerklaerung.html' },
     {
       text: t('footer.privacyPolicy'),
-      href: 'impressum_datenschutzerklaerung.html#privacy_policy'
+      href: '/impressum_datenschutzerklaerung.html#privacy_policy'
     },
-    { text: t('footer.accessibility'), href: 'impressum_datenschutzerklaerung.html#accessibility' }
+    { text: t('footer.accessibility'), href: '/impressum_datenschutzerklaerung.html#accessibility' }
   ])
 
   const sponsors: Ref<Sponsor[]> = ref([
@@ -70,7 +70,7 @@
                 <v-img
                   :src="sponsor.src"
                   :alt="sponsor.alt"
-                  width="250"
+                  width="220"
                   contain
                   class="sponsor-logo"
                 />
@@ -88,6 +88,7 @@
         >
           <a
             v-for="link in footerLinks"
+            class="primary"
             :key="link.text"
             :href="link.href"
             rel="noopener noreferrer"
@@ -107,9 +108,7 @@
 </template>
 
 <style scoped>
-  a {
-    color: #001e49;
-  }
+
   .footer {
     align-items: flex-end;
     bottom: 0;
@@ -119,7 +118,7 @@
     background-repeat: no-repeat, no-repeat;
 
     background-size:
-      200% 100%,
+      200% 75%,
       100% 100%;
 
     min-height: 200px; /* Avoid footer shrinking vertically on smaller screen sizes*/
@@ -131,7 +130,7 @@
     .footer {
       min-height: 280px;
       background-size:
-        200% 100%,
+        200% 75%,
         100% 100%;
     }
   }
@@ -140,7 +139,7 @@
     .footer {
       min-height: 280px;
       background-size:
-        200% 30%,
+        200% 50%,
         100% 100%;
     }
   }
@@ -167,7 +166,7 @@
     .footer {
       min-height: 350px;
       background-size:
-        200% 40%,
+        200% 30%,
         100% 100%;
     }
   }
@@ -183,13 +182,6 @@
 
   .v-container {
     padding-bottom: 40px;
-  }
-
-  .v-btn {
-    text-transform: none;
-  }
-  .v-btn:hover {
-    text-decoration: underline;
   }
 
   .footer-links-col {
