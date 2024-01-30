@@ -70,30 +70,5 @@
       max-width: 380px;
     }
   }
-/* Headline-2 styles overriding SASS styles on very small screens for better result*/
-  @media (max-width: 430px) {
-
-    .headline-2{
-      font-size: 18px;
-
-    }
-  }
-
-  @media (max-width: 400px) {
-
-    .headline-2{
-      font-size: 17px;
-
-    }
-  }
-
-  @media (max-width: 350px) {
-
-    .headline-2{
-      font-size: 14px;
-
-    }
-  }
-
 
 </style>
