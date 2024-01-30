@@ -1,28 +1,40 @@
 import { expect, test } from 'vitest'
 import { VueWrapper, mount } from '@vue/test-utils'
+// import { VuetifyLayoutKey } from "vuetify/lib/composables/index.mjs"
 import MenuBar from './MenuBar.vue'
+
+
+const VuetifyLayoutKey = Symbol.for('vuetify:layout')
+
 
 let wrapper: VueWrapper | null = null
 
 beforeEach(() => {
   document.body.innerHTML = `
-    <div>
-      <div id="app"></div>
-    </div>
+  <v-app><v-layout><menu-bar></menu-bar></v-layout></v-app>
   `
 
   wrapper = mount(MenuBar, {
-    attachTo: document.getElementById('app') || '',
     global: {
       components: {
         MenuBar
+      },
+      provide: {
+        [VuetifyLayoutKey]: {
+          mainStyles: { value: "" },
+          register: () => ({
+            layoutItemStyles: { value: { top: 0 } },
+            layoutItemScrimStyles: { value: { top: 0 } },
+          }),
+          unregister: () => ({}),
+        }
       }
     }
   })
 })
 
 describe('MenuBar', () => {
-  test.skip('it renders the menu bar', () => {
+  test('it renders the menu bar', () => {
     expect(wrapper?.find('[data-testid="menu-bar-title"]').isVisible()).toBe(true)
   })
 
