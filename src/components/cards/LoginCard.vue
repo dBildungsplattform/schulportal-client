@@ -13,7 +13,7 @@
     >
       <!-- Main title -->
       <v-row
-        class="mb-9"
+        class="mb-5"
         justify="center"
         no-gutters
       >
@@ -29,7 +29,7 @@
       </v-row>
 
       <v-row
-        class="mb-12"
+        class="mb-7"
         justify="center"
         no-gutters
       >

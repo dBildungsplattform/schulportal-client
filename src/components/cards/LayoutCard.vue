@@ -24,14 +24,17 @@
         class="text-right mr-6"
       >
         <v-btn
-          v-if="showCloseText"
           append-icon="mdi-close"
-          class="hidden-sm-and-down"
           @click.stop="$emit('onCloseClicked')"
           :ripple="false"
           variant="text"
         >
-          {{ $t('close') }}
+          <span
+            v-if="showCloseText"
+            class="hidden-sm-and-down"
+          >
+            {{ $t('close') }}
+          </span>
         </v-btn>
       </v-col>
     </v-row>
