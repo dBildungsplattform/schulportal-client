@@ -29,7 +29,12 @@
           :ripple="false"
           variant="text"
         >
-          <span class="hidden-sm-and-down">{{ $t('close') }}</span>
+          <span
+            v-if="showCloseText"
+            class="hidden-sm-and-down"
+          >
+            {{ $t('close') }}
+          </span>
         </v-btn>
       </v-col>
     </v-row>
