@@ -33,12 +33,14 @@
           cols="auto"
           class="hidden-md-and-up"
         >
-          <img
-            alt="Logo Schulportal"
-            src="@/assets/logos/Schulportal_SH_Bildmarke_RGB_Anwendung_HG_Blau.svg"
-            width="33"
-            height="33"
-          />
+          <router-link :to="auth.isAuthed ? '/start' : '/'">
+            <img
+              alt="Logo Schulportal"
+              src="@/assets/logos/Schulportal_SH_Bildmarke_RGB_Anwendung_HG_Blau.svg"
+              width="33"
+              height="33"
+            />
+          </router-link>
         </v-col>
       </v-row>
     </v-toolbar-title>
