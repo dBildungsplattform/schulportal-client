@@ -112,14 +112,14 @@
   .footer {
     align-items: flex-end;
     background-image: linear-gradient(to bottom right, #ffffff 25%, transparent 25%),
-    linear-gradient(180deg, rgba(229, 234, 239, 1) 100%, transparent 100%);
-    
+      linear-gradient(180deg, rgba(229, 234, 239, 1) 100%, transparent 100%);
+
     background-repeat: no-repeat, no-repeat;
-    
+
     background-size:
-    200% 80%,
-    100% 100%;
-    
+      200% 80%,
+      100% 100%;
+
     bottom: 0;
     min-height: 240px; /* Avoid footer shrinking vertically on smaller screen sizes*/
     position: absolute;
