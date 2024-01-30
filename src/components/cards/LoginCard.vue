@@ -59,16 +59,9 @@
 </template>
 
 <style scoped>
+
   .login-card {
     padding: 6.25rem 0; /* Top and bottom padding */
   }
-
-
-  @media (max-width: 670px) {
-    .logo {
-      width: 100%;
-      max-width: 380px;
-    }
-  }
-
+  
 </style>

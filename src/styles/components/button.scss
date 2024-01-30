@@ -6,6 +6,20 @@
     font-weight: bold;
   }
 
+  &.v-btn--variant-text {
+    .v-btn__content {
+      letter-spacing: normal;
+      font-weight: normal;
+    }
+
+    &:focus,
+    &:hover {
+      .v-btn__content {
+        text-decoration: underline;
+      }
+    }
+  }
+
   &.primary {
     background: $primaryButtonBackgroundColor;
     border: $primaryButtonBorderSize solid $primaryButtonBorderColor;
@@ -36,9 +50,8 @@
 
     &:focus,
     &:hover {
-      transform: $smallButtonTransformScale
+      transform: $smallButtonTransformScale;
     }
-   
   }
 
   /* medium screen */
