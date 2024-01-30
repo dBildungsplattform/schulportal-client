@@ -21,11 +21,9 @@
   }
 
   function resetPassword(personId: string): void {
-    personStore
-      .resetPassword(personId)
-      .then((newPassword?: string) => {
-        password.value = newPassword || ''
-      })
+    personStore.resetPassword(personId).then((newPassword?: string) => {
+      password.value = newPassword || ''
+    })
   }
 
   const handleAlertClose = (): void => {
@@ -39,7 +37,11 @@
 
 <template>
   <div class="admin">
-    <h1 class="text-center headline-1">{{ $t('admin.headline') }}</h1>
+    <v-row>
+      <v-col cols="12">
+        <h1 class="text-center headline-1">{{ $t('admin.headline') }}</h1>
+      </v-col>
+    </v-row>
     <LayoutCard
       :closable="true"
       :header="$t('admin.user.edit')"
@@ -48,18 +50,18 @@
       :showCloseText="true"
     >
       <!-- Error Message Display -->
-        <SpshAlert
-          :model-value="!!personStore.errorCode"
-          :title="t('admin.user.userDataLoadingErrorTitle')"
-          :type="'error'"
-          :closable="false"
-          :text="$t('admin.user.userDataLoadingErrorText')"
-          :showButton="true"
-          :buttonText="$t('admin.user.backToList')"
-          buttonClass="primary"
-          :buttonAction="navigateToUserTable"
-          @update:modelValue="handleAlertClose"
-        />
+      <SpshAlert
+        :model-value="!!personStore.errorCode"
+        :title="t('admin.user.userDataLoadingErrorTitle')"
+        :type="'error'"
+        :closable="false"
+        :text="$t('admin.user.userDataLoadingErrorText')"
+        :showButton="true"
+        :buttonText="$t('admin.user.backToList')"
+        buttonClass="primary"
+        :buttonAction="navigateToUserTable"
+        @update:modelValue="handleAlertClose"
+      />
 
       <template v-if="!personStore.errorCode">
         <v-container class="personal-info">
@@ -73,10 +75,12 @@
           <div v-if="personStore.currentPerson?.person">
             <v-row>
               <!-- Spacer column -->
-              <v-col cols="2"></v-col>
+              <v-col cols="1"></v-col>
               <v-col
                 class="text-right"
-                cols="auto"
+                md="2"
+                sm="3"
+                cols="5"
               >
                 <span class="subtitle-2"> {{ $t('user.firstName') }}: </span>
               </v-col>
@@ -86,10 +90,12 @@
             </v-row>
             <v-row>
               <!-- Spacer column -->
-              <v-col cols="2"></v-col>
+              <v-col cols="1"></v-col>
               <v-col
                 class="text-right"
-                cols="auto"
+                md="2"
+                sm="3"
+                cols="5"
               >
                 <span class="subtitle-2"> {{ $t('user.lastName') }}: </span>
               </v-col>
