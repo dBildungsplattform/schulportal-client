@@ -21,7 +21,7 @@
             alt="Logo Schulportal"
             class="logo"
             src="@/assets/logos/Schulportal_SH_Wort_Bildmarke_RGB_Anwendung_HG_Weiss.svg"
-            width="598"
+            width="540"
           />
         </v-col>
       </v-row>
@@ -63,5 +63,12 @@
   .login-card {
     padding: 6.25rem 0; /* Top and bottom padding */
   }
-  
+
+  @media (max-width: 680px) {
+    .logo {
+      width: 100%;
+      max-width: 380px;
+    }
+  }
+
 </style>
