@@ -16,7 +16,7 @@
 
   @media (min-width: 1280px) {
     .v-container {
-      max-width: 1200px - $menuBarMinWidth;
+      max-width: 1200px - 320px;
     }
   }
 

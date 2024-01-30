@@ -45,29 +45,29 @@
     floating
     order="1"
     v-model="menuDrawer"
+    width="320"
   >
+    <v-btn
+      class="hidden-lg-and-up primary menu-bar-close-button"
+      data-testid="close-mobile-menu-button"
+      density="compact"
+      icon
+      position="absolute"
+      rounded="sm e-lg"
+      variant="text"
+    >
+      <v-icon
+        @click.stop="menuDrawer = !menuDrawer"
+        icon="mdi-menu-open"
+        size="x-large"
+      ></v-icon>
+    </v-btn>
     <!-- Title -->
     <v-list-item
       class="menu-bar-title"
       data-testid="menu-bar-title"
       :title="$t('nav.navigation')"
-    >
-      <v-btn
-        class="hidden-lg-and-up primary menu-bar-close-button"
-        data-testid="close-mobile-menu-button"
-        density="compact"
-        icon
-        position="absolute"
-        rounded="sm e-lg"
-        variant="text"
-      >
-        <v-icon
-          @click.stop="menuDrawer = !menuDrawer"
-          icon="mdi-menu-open"
-          size="x-large"
-        ></v-icon>
-      </v-btn>
-    </v-list-item>
+    ></v-list-item>
     <v-divider></v-divider>
 
     <!-- Back to start page -->
