@@ -26,6 +26,14 @@ const routes: readonly RouteRecordRaw[] = [
     }
   },
   {
+    path: '/admin/create-role',
+    name: 'create-role',
+    component: () => import('../views/admin/UserRoleCreateView.vue'),
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
     path: '/start',
     name: 'start',
     component: () => import('../views/StartView.vue'),
@@ -33,6 +41,7 @@ const routes: readonly RouteRecordRaw[] = [
       requiresAuth: true
     }
   }
+  
 ]
 
 export default routes
