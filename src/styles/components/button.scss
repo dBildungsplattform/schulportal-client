@@ -1,5 +1,4 @@
 .v-btn {
-  text-transform: none;
   width: 340px;
 
   .v-btn__content {
@@ -8,7 +7,6 @@
 
   &.v-btn--variant-text {
     .v-btn__content {
-      letter-spacing: normal;
       font-weight: normal;
     }
 
