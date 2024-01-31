@@ -71,5 +71,4 @@
       max-width: 380px;
     }
   }
-
 </style>
