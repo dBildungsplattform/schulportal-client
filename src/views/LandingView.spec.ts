@@ -16,13 +16,18 @@ beforeEach(() => {
     global: {
       components: {
         LandingView
+      },
+      mocks: {
+        route: {
+          fullPath: 'full/path'
+        }
       }
     }
   })
 })
 
 describe('LandingView', () => {
-  test.skip('it renders the login card', () => {
+  test('it renders the login card', () => {
     expect(wrapper?.find('[data-testid="login-card"]').isVisible()).toBe(true)
   })
 })
