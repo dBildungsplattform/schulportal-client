@@ -13,7 +13,6 @@
       align="center"
       class="ml-md-6 ml-1 my-1"
     >
-  
       <v-col cols="auto">
         <h2 class="text-left headline-2">{{ header }}</h2>
       </v-col>
@@ -24,18 +23,19 @@
         v-if="closable"
         class="text-right mr-6"
       >
-        <span
-          v-if="showCloseText"
-          class="pointer hidden-sm-and-down"
+        <v-btn
+          append-icon="mdi-close"
           @click.stop="$emit('onCloseClicked')"
-          tabindex="0"
-          >{{ $t('close') }}</span
+          :ripple="false"
+          variant="text"
         >
-        <v-icon
-          @click.stop="$emit('onCloseClicked')"
-          icon="mdi-close"
-          size="x-large"
-        ></v-icon>
+          <span
+            v-if="showCloseText"
+            class="hidden-sm-and-down"
+          >
+            {{ $t('close') }}
+          </span>
+        </v-btn>
       </v-col>
     </v-row>
     <v-divider

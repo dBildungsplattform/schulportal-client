@@ -12,7 +12,7 @@
     >
       <!-- Main title -->
       <v-row
-        class="mb-9"
+        class="mb-5"
         justify="center"
         no-gutters
       >
@@ -21,13 +21,13 @@
             alt="Logo Schulportal"
             class="logo"
             src="@/assets/logos/Schulportal_SH_Wort_Bildmarke_RGB_Anwendung_HG_Weiss.svg"
-            width="598"
+            width="540"
           />
         </v-col>
       </v-row>
 
       <v-row
-        class="mb-12"
+        class="mb-7"
         justify="center"
         no-gutters
       >
@@ -48,7 +48,7 @@
           <v-btn
             data-testid="login-button"
             class="primary"
-            :href="`/api/frontend/login?redirectUrl=${route.fullPath}`"
+            :href="`/api/auth/login?redirectUrl=${route.fullPath}`"
           >
             {{ $t('login.button') }}
           </v-btn>
@@ -59,24 +59,16 @@
 </template>
 
 <style scoped>
-  @media (max-width: 600px) {
-    .login-button {
-      max-width: 70%;
-    }
-
-    .login-button:hover {
-      /* Hover state with horizontal shrink */
-      transform: scaleX(0.95);
-    }
-  }
 
   .login-card {
     padding: 6.25rem 0; /* Top and bottom padding */
   }
 
-  @media (max-width: 600px) {
-    .landing-header {
-      font-size: 1.5rem;
+  @media (max-width: 680px) {
+    .logo {
+      width: 100%;
+      max-width: 380px;
     }
   }
+
 </style>
