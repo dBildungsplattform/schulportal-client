@@ -21,8 +21,13 @@ beforeEach(() => {
   })
 })
 
+// We are currently skipping these tests, because rendering fails due to a missing
+// vuetify layout that needs to be injected and cannot be provided inside the test environment.
+// Providing it manually is hacky, since the needed layout cannot be imported from vuetify.
+// Hopefully this will be fixed in an upcoming vuetify release.
+
 describe('DefaultLayout', () => {
-  test.skip('it renders the footer on the default layout', () => {
+  test('it renders the footer on the default layout', () => {
     expect(wrapper?.find('[data-testid="footer"]').isVisible()).toBe(true)
   })
 })
