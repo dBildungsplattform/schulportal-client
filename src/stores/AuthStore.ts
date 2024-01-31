@@ -3,7 +3,6 @@ import { AuthApiFactory, type AuthApiInterface } from '../api-client/generated/a
 import axiosApiInstance from '@/services/ApiService'
 
 type AuthState = {
-  authInitialized: boolean
   isAuthed: boolean
 }
 
@@ -21,13 +20,10 @@ export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, 
   defineStore({
     id: 'authStore',
     state: (): AuthState => ({
-      authInitialized: false as boolean,
       isAuthed: false as boolean
     }),
     actions: {
       async initializeAuthStatus() {
-        if (this.authInitialized) return
-
         try {
           const { status: loginStatus }: { status: number } =
             await authApi.authenticationControllerInfo({
@@ -37,8 +33,6 @@ export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, 
         } catch {
           this.isAuthed = false
         }
-
-        this.authInitialized = true
       }
     }
   })
