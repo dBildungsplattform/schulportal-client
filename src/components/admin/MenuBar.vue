@@ -116,7 +116,19 @@
       class="menu-bar-main-item headline-2"
       :title="$t('admin.role.management')"
     ></v-list-item>
-
+    <v-list-item
+      class="menu-bar-sub-item caption"
+      data-testid="role-management-menu-item"
+      prepend-icon="mdi-format-list-bulleted"
+      :title="$t('admin.role.showAll')"
+    ></v-list-item>
+    <v-list-item
+      class="menu-bar-sub-item caption"
+      data-testid="role-creation-menu-item"
+      prepend-icon="mdi-plus-circle-outline"
+      :title="$t('admin.role.addNew')"
+      to="/admin/create-role"
+    ></v-list-item>
     <!-- Schulverwaltung -->
     <v-list-item
       class="menu-bar-main-item headline-2"

@@ -1710,11 +1710,31 @@
           },
           "administeredBySchulstrukturknoten": {
             "type": "string"
+          },
+          "rollenart": {
+            "type": "string",
+            "enum": [
+              "LERN",
+              "LEHR",
+              "EXTERN",
+              "ORGADMIN",
+              "LEIT",
+              "SYSADMIN"
+            ]
+          },
+          "merkmale": {
+            "type": "string",
+            "enum": [
+              "BEFRISTUNG_PFLICHT",
+              "KOPERS_PFLICHT"
+            ]
           }
         },
         "required": [
           "name",
-          "administeredBySchulstrukturknoten"
+          "administeredBySchulstrukturknoten",
+          "rollenart",
+          "merkmale"
         ]
       },
       "RolleResponse": {
@@ -1736,6 +1756,24 @@
           },
           "administeredBySchulstrukturknoten": {
             "type": "string"
+          },
+          "rollenart": {
+            "type": "string",
+            "enum": [
+              "LERN",
+              "LEHR",
+              "EXTERN",
+              "ORGADMIN",
+              "LEIT",
+              "SYSADMIN"
+            ]
+          },
+          "merkmale": {
+            "type": "string",
+            "enum": [
+              "BEFRISTUNG_PFLICHT",
+              "KOPERS_PFLICHT"
+            ]
           }
         },
         "required": [
@@ -1743,7 +1781,9 @@
           "createdAt",
           "updatedAt",
           "name",
-          "administeredBySchulstrukturknoten"
+          "administeredBySchulstrukturknoten",
+          "rollenart",
+          "merkmale"
         ]
       }
     }

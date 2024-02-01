@@ -15,13 +15,8 @@
     'Secondary Education',
     'Higher Education'
   ]
-  const roleTypes: SelectionArray = ['Type 1', 'Type 2', 'Type 3']
-  const roleNames: SelectionArray = ['Role 1', 'Role 2', 'Role 3']
-  const characteristics: SelectionArray = [
-    'Characteristic 1',
-    'Characteristic 2',
-    'Characteristic 3'
-  ]
+  const roleTypes: SelectionArray = ['LERN', 'LEHR', 'EXTERN', 'ORGADMIN', 'LEIT', 'SYSADMIN']
+  const characteristics: SelectionArray = ['BEFRISTUNG_PFLICHT', 'KOPERS_PFLICHT']
 </script>
 
 <template>
@@ -54,7 +49,7 @@
         <v-row>
           <v-col cols="2"></v-col>
           <v-col>
-            <h3 class="subtitle-1">1. {{ $t('admin.role.chooseSchoolStructureNode') }}</h3>
+            <h3 class="subtitle-2">1. {{ $t('admin.role.chooseSchoolStructureNode') }}</h3>
           </v-col>
         </v-row>
         <v-row>
@@ -64,7 +59,7 @@
             cols="3"
             class="text-right"
           >
-            <h3>
+            <h3 class="text-body">
               {{ $t('admin.role.chooseSchoolStructureNode') + '*' }}
             </h3></v-col
           >
@@ -74,7 +69,7 @@
               v-model="selectedStructureNode"
               :label="$t('admin.role.chooseSchoolStructureNode')"
               variant="outlined"
-              density="comfortable"
+              density="compact"
             ></v-select>
           </v-col>
         </v-row>
@@ -82,7 +77,7 @@
         <v-row>
           <v-col cols="2"></v-col>
           <v-col>
-            <h3 class="subtitle-1">2. {{ $t('admin.role.chooseRoleType') }}</h3>
+            <h3 class="subtitle-2">2. {{ $t('admin.role.chooseRoleType') }}</h3>
           </v-col>
         </v-row>
         <v-row>
@@ -92,7 +87,7 @@
             cols="3"
             class="text-right"
           >
-            <h3>
+            <h3 class="text-body">
               {{ $t('admin.role.chooseRoleType') + '*' }}
             </h3></v-col
           >
@@ -102,7 +97,7 @@
               v-model="selectedRoleType"
               :label="$t('admin.role.chooseRoleType')"
               variant="outlined"
-              density="comfortable"
+              density="compact"
             ></v-select>
           </v-col>
         </v-row>
@@ -110,7 +105,7 @@
         <v-row>
           <v-col cols="2"></v-col>
           <v-col>
-            <h3 class="subtitle-1">3. {{ $t('admin.role.enterRoleName') }}</h3>
+            <h3 class="subtitle-2">3. {{ $t('admin.role.enterRoleName') }}</h3>
           </v-col>
         </v-row>
         <v-row>
@@ -120,17 +115,16 @@
             cols="3"
             class="text-right"
           >
-            <h3>
+            <h3 class="text-body">
               {{ $t('admin.role.enterRoleName') + '*' }}
             </h3></v-col
           >
           <v-col cols="auto">
             <v-text-field
-              :items="roleNames"
               v-model="selectedRoleName"
               :label="$t('admin.role.enterRoleName')"
               variant="outlined"
-              density="comfortable"
+              density="compact"
             ></v-text-field>
           </v-col>
         </v-row>
@@ -138,7 +132,7 @@
         <v-row>
           <v-col cols="2"></v-col>
           <v-col>
-            <h3 class="subtitle-1">4. {{ $t('admin.role.chooseCharacteristics') }}</h3>
+            <h3 class="subtitle-2">4. {{ $t('admin.role.chooseCharacteristics') }}</h3>
           </v-col>
         </v-row>
         <v-row>
@@ -148,7 +142,7 @@
             cols="3"
             class="text-right"
           >
-            <h3>
+            <h3 class="text-body">
               {{ $t('admin.role.chooseCharacteristics') + '*' }}
             </h3></v-col
           >
@@ -159,8 +153,26 @@
               v-model="selectedCharacteristics"
               :label="$t('admin.role.chooseCharacteristics')"
               variant="outlined"
-              density="comfortable"
+              density="compact"
             ></v-select>
+          </v-col>
+        </v-row>
+        <v-divider
+          class="border-opacity-100 rounded my-6"
+          color="#E5EAEF"
+          thickness="6"
+        ></v-divider>
+        <v-row justify="end">
+          <v-col
+            cols="12"
+            md="auto"
+          >
+            <v-btn
+              class="primary button"
+              data-testid="open-password-reset-dialog-icon"
+            >
+              {{ $t('admin.role.addNewRoleButton') }}
+            </v-btn>
           </v-col>
         </v-row>
       </v-container>

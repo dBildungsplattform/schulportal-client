@@ -251,7 +251,37 @@ export interface CreateRolleBodyParams {
      * @memberof CreateRolleBodyParams
      */
     'administeredBySchulstrukturknoten': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateRolleBodyParams
+     */
+    'rollenart': CreateRolleBodyParamsRollenartEnum;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateRolleBodyParams
+     */
+    'merkmale': CreateRolleBodyParamsMerkmaleEnum;
 }
+
+export const CreateRolleBodyParamsRollenartEnum = {
+    Lern: 'LERN',
+    Lehr: 'LEHR',
+    Extern: 'EXTERN',
+    Orgadmin: 'ORGADMIN',
+    Leit: 'LEIT',
+    Sysadmin: 'SYSADMIN'
+} as const;
+
+export type CreateRolleBodyParamsRollenartEnum = typeof CreateRolleBodyParamsRollenartEnum[keyof typeof CreateRolleBodyParamsRollenartEnum];
+export const CreateRolleBodyParamsMerkmaleEnum = {
+    BefristungPflicht: 'BEFRISTUNG_PFLICHT',
+    KopersPflicht: 'KOPERS_PFLICHT'
+} as const;
+
+export type CreateRolleBodyParamsMerkmaleEnum = typeof CreateRolleBodyParamsMerkmaleEnum[keyof typeof CreateRolleBodyParamsMerkmaleEnum];
+
 /**
  * 
  * @export
@@ -684,7 +714,37 @@ export interface RolleResponse {
      * @memberof RolleResponse
      */
     'administeredBySchulstrukturknoten': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RolleResponse
+     */
+    'rollenart': RolleResponseRollenartEnum;
+    /**
+     * 
+     * @type {string}
+     * @memberof RolleResponse
+     */
+    'merkmale': RolleResponseMerkmaleEnum;
 }
+
+export const RolleResponseRollenartEnum = {
+    Lern: 'LERN',
+    Lehr: 'LEHR',
+    Extern: 'EXTERN',
+    Orgadmin: 'ORGADMIN',
+    Leit: 'LEIT',
+    Sysadmin: 'SYSADMIN'
+} as const;
+
+export type RolleResponseRollenartEnum = typeof RolleResponseRollenartEnum[keyof typeof RolleResponseRollenartEnum];
+export const RolleResponseMerkmaleEnum = {
+    BefristungPflicht: 'BEFRISTUNG_PFLICHT',
+    KopersPflicht: 'KOPERS_PFLICHT'
+} as const;
+
+export type RolleResponseMerkmaleEnum = typeof RolleResponseMerkmaleEnum[keyof typeof RolleResponseMerkmaleEnum];
+
 /**
  * 
  * @export

@@ -8,12 +8,15 @@
     },
     "role": {
       "management": "Rollenverwaltung",
+      "addNew": "Neue Rolle anlegen",
       "addNewRole": "Neue Rolle hinzufügen",
+      "addNewRoleButton": "Rolle anlegen",
       "chooseSchoolStructureNode": "Schulstrukturknoten auswählen",
       "chooseRoleType": "Rollenart auswählen",
       "enterRoleName": "Rollenname eingeben",
       "chooseCharacteristics": "Merkmale auswählen",
-      "userDataLoadingErrorText": "Es konnten keine Benutzerdaten geladen werden."
+      "userDataLoadingErrorText": "Es konnten keine Benutzerdaten geladen werden.",
+      "showAll": "Alle Rollen anzeigen"
     },
     "school": {
       "management": "Schulverwaltung"
@@ -69,7 +72,7 @@
   },
   "nav": {
     "admin": "Schulportal-Administration",
-    "backToStart": "zurück zur Startseite",
+    "backToStart": "Zurück zur Startseite",
     "login": "Anmelden",
     "logout": "Abmelden",
     "navigation": "Navigation",
