@@ -26,6 +26,14 @@ const routes: readonly RouteRecordRaw[] = [
     }
   },
   {
+    path: '/admin/users/new',
+    name: 'user-creation',
+    component: () => import('../views/admin/UserCreationView.vue'),
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
     path: '/start',
     name: 'start',
     component: () => import('../views/StartView.vue'),

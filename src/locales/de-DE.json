@@ -6,6 +6,7 @@
       "changePassword": "Passwort ändern",
       "copyPasswordError": "Passwort konnte nicht in die Zwischenablage kopiert werden",
       "copyPasswordSuccess": "Passwort in Zwischenablage kopiert",
+      "create": "Neuen Benutzer anlegen",
       "edit": "Benutzer bearbeiten",
       "management": "Benutzerverwaltung",
       "personalInfo": "Persönliche Informationen",
