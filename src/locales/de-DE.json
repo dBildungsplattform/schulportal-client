@@ -2,6 +2,7 @@
   "action": "Aktion",
   "admin": {
     "headline": "Administrationsbereich",
+    "mandatoryFieldsNotice": "Mit * markierte Felder sind Pflichtangaben.",
     "user": {
       "changePassword": "Passwort ändern",
       "copyPasswordError": "Passwort konnte nicht in die Zwischenablage kopiert werden",
@@ -16,6 +17,13 @@
       "userDataLoadingErrorTitle": "Fehler beim Laden des Benutzers",
       "userDataLoadingErrorText": "Es konnten keine Benutzerdaten geladen werden.",
       "backToList": "Zurück zur Liste"
+    },
+    "role": {
+      "addNewRole": "Neue Rolle hinzufügen",
+      "chooseSchoolStructureNode": "Schulstrukturknoten auswählen",
+      "chooseRoleType": "Rollenart auswählen",
+      "enterRoleName": "Rollenname eingeben",
+      "chooseCharacteristics": "Merkmale auswählen"
     }
   },
   "cancel": "Abbrechen",
