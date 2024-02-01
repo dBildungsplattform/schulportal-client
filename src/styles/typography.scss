@@ -3,6 +3,10 @@
 .subtitle-1,
 .subtitle-2 {
   font-weight: bold;
+
+  .v-list-item-title {
+    font-weight: bold;
+  }
 }
 
 .text-body {
@@ -26,20 +30,52 @@
     font-size: $smallBodyFontSize;
   }
 
+  .body-2 {
+    font-size: $smallBody2FontSize;
+
+    .v-list-item-title {
+      font-size: $smallBody2FontSize;
+    }
+  }
+
+  .caption {
+    font-size: $smallCaptionFontSize;
+
+    .v-list-item-title {
+      font-size: $smallCaptionFontSize;
+    }
+  }
+
   .headline-1 {
     font-size: $smallHeadline1FontSize;
+
+    .v-list-item-title {
+      font-size: $smallHeadline1FontSize;
+    }
   }
 
   .headline-2 {
     font-size: $smallHeadline2FontSize;
+
+    .v-list-item-title {
+      font-size: $smallHeadline2FontSize;
+    }
   }
 
   .subtitle-1 {
     font-size: $smallSubtitle1FontSize;
+
+    .v-list-item-title {
+      font-size: $smallSubtitle1FontSize;
+    }
   }
 
   .subtitle-2 {
     font-size: $smallSubtitle2FontSize;
+
+    .v-list-item-title {
+      font-size: $smallSubtitle2FontSize;
+    }
   }
 }
 
@@ -48,20 +84,52 @@
   // @media #{map-get($display-breakpoints, 'sm-and-up')} {
   body {
     font-size: $mediumBodyFontSize;
+  }
 
-    .headline-1 {
+  .body-2 {
+    font-size: $mediumBody2FontSize;
+
+    .v-list-item-title {
+      font-size: $mediumBody2FontSize;
+    }
+  }
+
+  .caption {
+    font-size: $mediumCaptionFontSize;
+
+    .v-list-item-title {
+      font-size: $mediumCaptionFontSize;
+    }
+  }
+
+  .headline-1 {
+    font-size: $mediumHeadline1FontSize;
+
+    .v-list-item-title {
       font-size: $mediumHeadline1FontSize;
     }
+  }
 
-    .headline-2 {
+  .headline-2 {
+    font-size: $mediumHeadline2FontSize;
+
+    .v-list-item-title {
       font-size: $mediumHeadline2FontSize;
     }
+  }
 
-    .subtitle-1 {
+  .subtitle-1 {
+    font-size: $mediumSubtitle1FontSize;
+
+    .v-list-item-title {
       font-size: $mediumSubtitle1FontSize;
     }
+  }
 
-    .subtitle-2 {
+  .subtitle-2 {
+    font-size: $mediumSubtitle2FontSize;
+
+    .v-list-item-title {
       font-size: $mediumSubtitle2FontSize;
     }
   }
@@ -75,19 +143,51 @@
     font-size: $bigBodyFontSize;
   }
 
+  .body-2 {
+    font-size: $bigBody2FontSize;
+
+    .v-list-item-title {
+      font-size: $bigBody2FontSize;
+    }
+  }
+
+  .caption {
+    font-size: $bigCaptionFontSize;
+
+    .v-list-item-title {
+      font-size: $bigCaptionFontSize;
+    }
+  }
+
   .headline-1 {
     font-size: $bigHeadline1FontSize;
+
+    .v-list-item-title {
+      font-size: $bigHeadline1FontSize;
+    }
   }
 
   .headline-2 {
     font-size: $bigHeadline2FontSize;
+
+    .v-list-item-title {
+      font-size: $bigHeadline2FontSize;
+    }
   }
 
   .subtitle-1 {
     font-size: $bigSubtitle1FontSize;
+
+    .v-list-item-title {
+      font-size: $bigSubtitle1FontSize;
+    }
   }
 
   .subtitle-2 {
     font-size: $bigSubtitle2FontSize;
+
+    .v-list-item-title {
+      font-size: $bigSubtitle2FontSize;
+    }
   }
 }

@@ -9,6 +9,7 @@
 <template>
   <v-app-bar
     color="#001E49"
+    data-testid="header"
     height="60"
   >
     <!-- Logo and title -->

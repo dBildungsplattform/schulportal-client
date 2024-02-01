@@ -8,6 +8,7 @@
   <v-container fluid>
     <v-card
       class="login-card"
+      data-testid="login-card"
       flat
     >
       <!-- Main title -->
@@ -18,6 +19,7 @@
       >
         <v-col cols="auto">
           <img
+            aria-hidden="true"
             alt="Logo Schulportal"
             class="logo"
             src="@/assets/logos/Schulportal_SH_Wort_Bildmarke_RGB_Anwendung_HG_Weiss.svg"
@@ -33,7 +35,7 @@
       >
         <v-col cols="auto">
           <!-- Subtitle/welcome message -->
-          <span class="headline-2"> {{ $t('login.title') }}</span>
+          <h1 class="headline-2">{{ $t('login.title') }}</h1>
         </v-col>
       </v-row>
 
@@ -59,7 +61,6 @@
 </template>
 
 <style scoped>
-
   .login-card {
     padding: 6.25rem 0; /* Top and bottom padding */
   }
@@ -70,5 +71,4 @@
       max-width: 380px;
     }
   }
-
 </style>

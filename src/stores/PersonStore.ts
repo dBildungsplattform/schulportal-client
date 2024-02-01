@@ -38,7 +38,7 @@ type PersonState = {
   errorCode: string
   loading: boolean
   totalPersons: number
-  currentPerson: Personendatensatz | null;
+  currentPerson: Personendatensatz | null
 }
 
 type PersonGetters = {}

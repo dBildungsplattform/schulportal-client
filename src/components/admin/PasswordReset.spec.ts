@@ -1,11 +1,11 @@
 import { expect, test } from 'vitest'
 import { VueWrapper, mount } from '@vue/test-utils'
-import PasswordReset from '../../../components/admin/PasswordReset.vue'
+import PasswordReset from './PasswordReset.vue'
 // import { VDialog } from 'vuetify/lib/components/index.mjs'
 
 let wrapper: VueWrapper | null = null
 
-beforeEach(async () => {
+beforeEach(() => {
   document.body.innerHTML = `
     <div>
       <div id="app"></div>

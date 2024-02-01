@@ -3,7 +3,27 @@
   "admin": {
     "headline": "Administrationsbereich",
     "mandatoryFieldsNotice": "Mit * markierte Felder sind Pflichtangaben.",
+    "class": {
+      "management": "Klassenverwaltung"
+    },
+    "role": {
+      "management": "Rollenverwaltung",
+      "addNewRole": "Neue Rolle hinzufügen",
+      "chooseSchoolStructureNode": "Schulstrukturknoten auswählen",
+      "chooseRoleType": "Rollenart auswählen",
+      "enterRoleName": "Rollenname eingeben",
+      "chooseCharacteristics": "Merkmale auswählen",
+      "userDataLoadingErrorText": "Es konnten keine Benutzerdaten geladen werden."
+    },
+    "school": {
+      "management": "Schulverwaltung"
+    },
+    "schoolBoard": {
+      "management": "Schulträgerverwaltung"
+    },
     "user": {
+      "addNew": "Neue Benutzer anlegen",
+      "backToList": "Zurück zur Liste",
       "changePassword": "Passwort ändern",
       "copyPasswordError": "Passwort konnte nicht in die Zwischenablage kopiert werden",
       "copyPasswordSuccess": "Passwort in Zwischenablage kopiert",
@@ -13,17 +33,10 @@
       "resetPasswordConfirmation": "Sind Sie sicher, dass Sie das Passwort für {firstname} {lastname} zurücksetzen möchten?",
       "resetPasswordInformation": "Bitte teilen Sie dem Benutzer das temporäre Passwort mit. Nach dem Schließen des Dialogs wird es aus Sicherheitsgründen nicht mehr angezeigt.",
       "resetPassword": "Passwort zurücksetzen",
+      "showAll": "Alle Benutzer anzeigen",
       "status": "Status",
       "userDataLoadingErrorTitle": "Fehler beim Laden des Benutzers",
-      "userDataLoadingErrorText": "Es konnten keine Benutzerdaten geladen werden.",
-      "backToList": "Zurück zur Liste"
-    },
-    "role": {
-      "addNewRole": "Neue Rolle hinzufügen",
-      "chooseSchoolStructureNode": "Schulstrukturknoten auswählen",
-      "chooseRoleType": "Rollenart auswählen",
-      "enterRoleName": "Rollenname eingeben",
-      "chooseCharacteristics": "Merkmale auswählen"
+      "userDataLoadingErrorText": "Es konnten keine Benutzerdaten geladen werden."
     }
   },
   "cancel": "Abbrechen",
@@ -56,8 +69,10 @@
   },
   "nav": {
     "admin": "Schulportal-Administration",
+    "backToStart": "zurück zur Startseite",
     "login": "Anmelden",
     "logout": "Abmelden",
+    "navigation": "Navigation",
     "help": "Hilfe"
   },
   "pagination": {
