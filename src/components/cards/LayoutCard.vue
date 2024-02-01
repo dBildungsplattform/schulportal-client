@@ -11,27 +11,31 @@
   <v-card class="layout-card">
     <v-row
       align="center"
-      class="ml-6 my-1"
+      class="ml-md-6 ml-1 my-1"
     >
-      <v-col>
-        <h2 class="text-left layout-card-headline">{{ header }}</h2>
+      <v-col cols="auto">
+        <h2 class="text-left headline-2">{{ header }}</h2>
       </v-col>
       <v-spacer v-if="closable"></v-spacer>
       <v-col
+        cols="2"
+        cols-md="auto"
         v-if="closable"
         class="text-right mr-6"
       >
-        <span
-          v-if="showCloseText"
-          class="pointer"
+        <v-btn
+          append-icon="mdi-close"
           @click.stop="$emit('onCloseClicked')"
-          >{{ $t('close') }}</span
+          :ripple="false"
+          variant="text"
         >
-        <v-icon
-          @click.stop="$emit('onCloseClicked')"
-          icon="mdi-close"
-          size="x-large"
-        ></v-icon>
+          <span
+            v-if="showCloseText"
+            class="hidden-sm-and-down"
+          >
+            {{ $t('close') }}
+          </span>
+        </v-btn>
       </v-col>
     </v-row>
     <v-divider
@@ -39,7 +43,7 @@
       color="#1EAE9C"
       thickness="5px"
     ></v-divider>
-    <div :class="{ padded }">
+    <div>
       <slot />
     </div>
   </v-card>

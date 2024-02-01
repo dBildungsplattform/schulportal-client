@@ -1,5 +1,4 @@
 <script setup lang="ts">
-  import SchulPortalLogo from '@/assets/logos/Schulportal_SH_Bildmarke_RGB_Anwendung_HG_Blau.svg'
   import { type RouteLocationNormalizedLoaded, useRoute } from 'vue-router'
 
   const route: RouteLocationNormalizedLoaded = useRoute()
@@ -9,36 +8,34 @@
   <v-container fluid>
     <v-card
       class="login-card"
+      data-testid="login-card"
       flat
     >
       <!-- Main title -->
       <v-row
+        class="mb-5"
         justify="center"
         no-gutters
       >
         <v-col cols="auto">
-          <v-img
-            alt="Schulportal logo"
+          <img
+            aria-hidden="true"
+            alt="Logo Schulportal"
             class="logo"
-            :src="SchulPortalLogo"
-            :width="50"
-            :height="50"
+            src="@/assets/logos/Schulportal_SH_Wort_Bildmarke_RGB_Anwendung_HG_Weiss.svg"
+            width="540"
           />
-        </v-col>
-        <v-col cols="auto">
-          <v-card-title class="v-card-title"
-            >SCHULPORTAL <span class="normal-weight">SH</span></v-card-title
-          >
         </v-col>
       </v-row>
 
       <v-row
+        class="mb-7"
         justify="center"
         no-gutters
       >
         <v-col cols="auto">
           <!-- Subtitle/welcome message -->
-          <v-card-text class="v-card-text"> {{ $t('login.title') }}</v-card-text>
+          <h1 class="headline-2">{{ $t('login.title') }}</h1>
         </v-col>
       </v-row>
 
@@ -50,19 +47,13 @@
           sm="6"
           class="d-flex justify-center"
         >
-          <v-hover>
-            <template v-slot:default="{ isHovering, props }">
-              <v-btn
-                data-testid="login-button"
-                v-bind="props"
-                class="login-button"
-                :color="isHovering ? '#325E91' : '#001E49'"
-                :href="`/api/frontend/login?redirectUrl=${route.fullPath}`"
-              >
-                {{ $t('login.button') }}
-              </v-btn>
-            </template>
-          </v-hover>
+          <v-btn
+            data-testid="login-button"
+            class="primary"
+            :href="`/api/auth/login?redirectUrl=${route.fullPath}`"
+          >
+            {{ $t('login.button') }}
+          </v-btn>
         </v-col>
       </v-row>
     </v-card>
@@ -70,52 +61,14 @@
 </template>
 
 <style scoped>
-  .login-button {
-    max-width: 15rem; /* Max width instead of fixed width */
-    width: 100%; /* Full width, capped by max-width */
-    text-transform: none;
-    transition: transform 0.3s ease-in-out;
-    /* Set the origin of transformation to the left edge */
-    transform-origin: left center;
-  }
-
-  @media (max-width: 600px) {
-    .login-button {
-      max-width: 70%;
-    }
-
-    .login-button:hover {
-      /* Hover state with horizontal shrink */
-      transform: scaleX(0.95);
-    }
-  }
-
   .login-card {
     padding: 6.25rem 0; /* Top and bottom padding */
   }
 
-  .v-card-title {
-    text-align: center;
-    font-weight: bolder;
-    font-size: 2rem;
-    color: #001e49;
-    margin-bottom: 1rem;
-    margin-left: -1rem;
-  }
-  .v-card-text {
-    text-align: center;
-    font-size: 1rem;
-    font-weight: bolder;
-    color: #001e49;
-  }
-
-  @media (max-width: 600px) {
-    .v-card-title {
-      font-size: 1.5rem;
-    }
-
-    .v-card-text {
-      font-size: 1.1rem;
+  @media (max-width: 680px) {
+    .logo {
+      width: 100%;
+      max-width: 380px;
     }
   }
 </style>

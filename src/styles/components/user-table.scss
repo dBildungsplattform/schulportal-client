@@ -6,7 +6,7 @@
   }
 
   .v-data-table__thead {
-    background-color: #e5eaef;
+    background-color: $lightGrey;
     font-size: 15px;
     padding-bottom: 10px;
     padding-top: 15px;
@@ -26,7 +26,7 @@
       padding-top: 13px;
     }
     .v-data-table__td {
-      border-bottom: 1px solid #e5eaef;
+      border-bottom: 1px solid $lightGrey;
     }
   }
 

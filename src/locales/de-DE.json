@@ -2,7 +2,21 @@
   "action": "Aktion",
   "admin": {
     "headline": "Administrationsbereich",
+    "class": {
+      "management": "Klassenverwaltung"
+    },
+    "role": {
+      "management": "Rollenverwaltung"
+    },
+    "school": {
+      "management": "Schulverwaltung"
+    },
+    "schoolBoard": {
+      "management": "Schulträgerverwaltung"
+    },
     "user": {
+      "addNew": "Neue Benutzer anlegen",
+      "backToList": "Zurück zur Liste",
       "changePassword": "Passwort ändern",
       "copyPasswordError": "Passwort konnte nicht in die Zwischenablage kopiert werden",
       "copyPasswordSuccess": "Passwort in Zwischenablage kopiert",
@@ -12,7 +26,10 @@
       "resetPasswordConfirmation": "Sind Sie sicher, dass Sie das Passwort für {firstname} {lastname} zurücksetzen möchten?",
       "resetPasswordInformation": "Bitte teilen Sie dem Benutzer das temporäre Passwort mit. Nach dem Schließen des Dialogs wird es aus Sicherheitsgründen nicht mehr angezeigt.",
       "resetPassword": "Passwort zurücksetzen",
-      "status": "Status"
+      "showAll": "Alle Benutzer anzeigen",
+      "status": "Status",
+      "userDataLoadingErrorTitle": "Fehler beim Laden des Benutzers",
+      "userDataLoadingErrorText": "Es konnten keine Benutzerdaten geladen werden."
     }
   },
   "cancel": "Abbrechen",
@@ -22,6 +39,13 @@
     "KEYCLOAK_CLIENT_ERROR": "Die Anmeldung ist momentan nicht möglich.",
     "UNSPECIFIED_ERROR": "Es ist ein Fehler aufgetreten.",
     "USER_AUTHENTICATION_FAILED_ERROR": "Ihr Benutzername oder Ihr Passwort war falsch. Versuchen Sie es erneut oder wenden Sie sich an Ihre schulischen Administratorinnen und Administratoren."
+  },
+  "footer": {
+    "accessibility": "Barrierefreiheit",
+    "contact": "Kontakt",
+    "help": "Hilfe",
+    "legalNotice": "Impressum",
+    "privacyPolicy": "Datenschutzerklärung"
   },
   "start": {
     "administration": "Verwaltung",
@@ -38,8 +62,10 @@
   },
   "nav": {
     "admin": "Schulportal-Administration",
+    "backToStart": "zurück zur Startseite",
     "login": "Anmelden",
     "logout": "Abmelden",
+    "navigation": "Navigation",
     "help": "Hilfe"
   },
   "pagination": {
