@@ -45,3 +45,13 @@ Thus to figure out CSP issues you need to run `npm run build` and `npm run previ
 
 Note: Even with the vite preview the nonce placeholder will not be replaced by an actual nonce.
 To be even more similar to prod you need to create and run a docker image with the provided Dockerfile. Than the client will be served by nginx and the nonce will be generated.
+
+## Locally building and running the client as docker container
+
+If you need to fix problems that occur in the cluster, but not with `npm run preview`, it is probably a problem with the build or nginx config. 
+
+To run that locally use the following commands:
+```
+docker build -t spsh-client .
+docker run -p 8099:80 spsh-client
+```
