@@ -1,13 +1,20 @@
 import { defineStore, type Store, type StoreDefinition } from 'pinia'
-import { isAxiosError } from 'axios'
+import { isAxiosError, type AxiosResponse } from 'axios'
 import {
-  FrontendApiFactory,
-  type FrontendApiInterface,
-  type FrontendControllerPersons200Response
+  PersonenApiFactory,
+  PersonenFrontendApiFactory,
+  type PersonenApiInterface,
+  type PersonenFrontendApiInterface,
+  type PersonFrontendControllerFindPersons200Response
 } from '../api-client/generated/api'
 import axiosApiInstance from '@/services/ApiService'
 
-const frontendApi: FrontendApiInterface = FrontendApiFactory(undefined, '', axiosApiInstance)
+const personenApi: PersonenApiInterface = PersonenApiFactory(undefined, '', axiosApiInstance)
+const personenFrontendApi: PersonenFrontendApiInterface = PersonenFrontendApiFactory(
+  undefined,
+  '',
+  axiosApiInstance
+)
 
 type Person = {
   id: string
@@ -31,12 +38,14 @@ type PersonState = {
   errorCode: string
   loading: boolean
   totalPersons: number
+  currentPerson: Personendatensatz | null
 }
 
 type PersonGetters = {}
 type PersonActions = {
   getAllPersons: () => Promise<void>
-  resetPassword: (userId: string) => Promise<string>
+  getPersonById: (personId: string) => Promise<Personendatensatz>
+  resetPassword: (personId: string) => Promise<string>
 }
 
 export type PersonStore = Store<'personStore', PersonState, PersonGetters, PersonActions>
@@ -53,16 +62,18 @@ export const usePersonStore: StoreDefinition<
       allPersons: [],
       errorCode: '',
       loading: false,
-      totalPersons: 0
+      totalPersons: 0,
+      currentPerson: null
     }
   },
   actions: {
     async getAllPersons() {
       this.loading = true
       try {
-        const { data }: { data: FrontendControllerPersons200Response } =
-          await frontendApi.frontendControllerPersons()
-        this.allPersons = data.items || []
+        const { data }: AxiosResponse<PersonFrontendControllerFindPersons200Response> =
+          await personenFrontendApi.personFrontendControllerFindPersons()
+
+        this.allPersons = data.items
         this.totalPersons = data.total
         this.loading = false
       } catch (error: unknown) {
@@ -74,10 +85,29 @@ export const usePersonStore: StoreDefinition<
       }
     },
 
-    async resetPassword(userId: string): Promise<string> {
+    async getPersonById(personId: string): Promise<Personendatensatz> {
       this.loading = true
       try {
-        const { data }: { data: string } = await frontendApi.frontendControllerPasswordReset(userId)
+        const { data }: { data: Personendatensatz } =
+          await personenApi.personControllerFindPersonById(personId)
+        this.loading = false
+        this.currentPerson = data
+        return data
+      } catch (error) {
+        this.errorCode = 'UNSPECIFIED_ERROR'
+        if (isAxiosError(error)) {
+          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR'
+        }
+        this.loading = false
+        return Promise.reject(this.errorCode)
+      }
+    },
+
+    async resetPassword(personId: string): Promise<string> {
+      this.loading = true
+      try {
+        const { data }: { data: string } =
+          await personenApi.personControllerResetPasswordByPersonId(personId)
         this.loading = false
         return data
       } catch (error: unknown) {

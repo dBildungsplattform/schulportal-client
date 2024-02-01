@@ -1,26 +1,59 @@
 {
   "action": "Aktion",
   "admin": {
+    "headline": "Administrationsbereich",
+    "class": {
+      "management": "Klassenverwaltung"
+    },
+    "role": {
+      "management": "Rollenverwaltung"
+    },
+    "school": {
+      "management": "Schulverwaltung"
+    },
+    "schoolBoard": {
+      "management": "Schulträgerverwaltung"
+    },
     "user": {
-      "copyPasswordError": "Passwort konnte nicht in die Zwischzenablage kopiert werden",
+      "addNew": "Neue Benutzer anlegen",
+      "backToList": "Zurück zur Liste",
+      "changePassword": "Passwort ändern",
+      "copyPasswordError": "Passwort konnte nicht in die Zwischenablage kopiert werden",
+      "copyPasswordSuccess": "Passwort in Zwischenablage kopiert",
+      "edit": "Benutzer bearbeiten",
       "management": "Benutzerverwaltung",
-      "resetPasswordDialogHeader": "{'Sind Sie sicher, dass Sie das Passwort für'} {firstname} {lastname} {'zurücksetzen möchten?'}",
-      "resetPasswordDialogWarning": "Bitte teilen Sie dem Benutzer das temporäre Passwort mit. Nach dem Schließen des Dialogs wird es aus Sicherheitsgründen nicht mehr angezeigt.",
-      "resetPassword": "Passwort zurücksetzen"
+      "personalInfo": "Persönliche Informationen",
+      "resetPasswordConfirmation": "Sind Sie sicher, dass Sie das Passwort für {firstname} {lastname} zurücksetzen möchten?",
+      "resetPasswordInformation": "Bitte teilen Sie dem Benutzer das temporäre Passwort mit. Nach dem Schließen des Dialogs wird es aus Sicherheitsgründen nicht mehr angezeigt.",
+      "resetPassword": "Passwort zurücksetzen",
+      "showAll": "Alle Benutzer anzeigen",
+      "status": "Status",
+      "userDataLoadingErrorTitle": "Fehler beim Laden des Benutzers",
+      "userDataLoadingErrorText": "Es konnten keine Benutzerdaten geladen werden."
     }
   },
   "cancel": "Abbrechen",
   "close": "Schließen",
+  "edit": "Bearbeiten",
   "errors": {
     "KEYCLOAK_CLIENT_ERROR": "Die Anmeldung ist momentan nicht möglich.",
     "UNSPECIFIED_ERROR": "Es ist ein Fehler aufgetreten.",
     "USER_AUTHENTICATION_FAILED_ERROR": "Ihr Benutzername oder Ihr Passwort war falsch. Versuchen Sie es erneut oder wenden Sie sich an Ihre schulischen Administratorinnen und Administratoren."
   },
-  "home": {
+  "footer": {
+    "accessibility": "Barrierefreiheit",
+    "contact": "Kontakt",
+    "help": "Hilfe",
+    "legalNotice": "Impressum",
+    "privacyPolicy": "Datenschutzerklärung"
+  },
+  "start": {
     "administration": "Verwaltung",
     "allProviders": "Alle Angebote"
   },
+  "itemsPerPage": "Einträge pro Seite",
   "login": {
+    "title": "Willkommen im Schulportal SH.",
     "button": "Anmelden",
     "forgotPassword": "Passwort vergessen? \n Wenden Sie sich bitte an Ihre schulischen Administratorinnen und Administratoren.",
     "header": "Anmeldung im Schulportal SH",
@@ -29,12 +62,21 @@
   },
   "nav": {
     "admin": "Schulportal-Administration",
-    "home": "Home",
-    "landing": "Start",
+    "backToStart": "zurück zur Startseite",
     "login": "Anmelden",
-    "logout": "Abmelden"
+    "logout": "Abmelden",
+    "navigation": "Navigation",
+    "help": "Hilfe"
+  },
+  "pagination": {
+    "all": "Alle",
+    "pageText": "{interval} von {total} Einträgen"
   },
   "user": {
-    "name": "Name"
+    "email": "E-Mail",
+    "firstName": "Vorname",
+    "lastName": "Nachname",
+    "password": "Passwort",
+    "userName": "Benutzername"
   }
 }

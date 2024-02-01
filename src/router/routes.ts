@@ -1,4 +1,3 @@
-/* landing is the only route we won't lazy-load, all other routes are loaded when visited */
 import type { RouteRecordRaw } from 'vue-router'
 
 const routes: readonly RouteRecordRaw[] = [
@@ -7,6 +6,7 @@ const routes: readonly RouteRecordRaw[] = [
     name: 'landing',
     component: () => import('../views/LandingView.vue'),
     meta: {
+      layout: 'DefaultLayout',
       requiresAuth: false
     }
   },
@@ -15,14 +15,25 @@ const routes: readonly RouteRecordRaw[] = [
     name: 'user-management',
     component: () => import('../views/admin/UserManagementView.vue'),
     meta: {
+      layout: 'AdminLayout',
       requiresAuth: true
     }
   },
   {
-    path: '/home',
-    name: 'home',
-    component: () => import('../views/HomeView.vue'),
+    path: '/admin/users/:id',
+    name: 'user-details',
+    component: () => import('../views/admin/UserDetailsView.vue'),
     meta: {
+      layout: 'AdminLayout',
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/start',
+    name: 'start',
+    component: () => import('../views/StartView.vue'),
+    meta: {
+      layout: 'DefaultLayout',
       requiresAuth: true
     }
   }
