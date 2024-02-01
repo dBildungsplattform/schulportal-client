@@ -88,7 +88,7 @@ export default defineConfig({
     port: 8099,
     proxy: {
       '/api': {
-        target: 'http://localhost:9091/',
+        target: 'http://localhost:9090/',
         changeOrigin: true,
         secure: false,
         xfwd: true
