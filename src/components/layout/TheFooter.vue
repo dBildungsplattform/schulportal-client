@@ -45,7 +45,7 @@
 <template>
   <v-footer
     class="footer"
-    padless
+    data-testid="footer"
     height="10"
   >
     <v-container>
@@ -110,6 +110,7 @@
 
 <style scoped>
   .footer {
+    align-items: flex-end;
     background-image: linear-gradient(to bottom right, #ffffff 25%, transparent 25%),
       linear-gradient(180deg, rgba(229, 234, 239, 1) 100%, transparent 100%);
 
@@ -119,8 +120,10 @@
       200% 80%,
       100% 100%;
 
+    bottom: 0;
     min-height: 240px; /* Avoid footer shrinking vertically on smaller screen sizes*/
-    align-items: flex-end;
+    position: absolute;
+    width: -webkit-fill-available;
   }
 
   @media (max-width: 1280px) {

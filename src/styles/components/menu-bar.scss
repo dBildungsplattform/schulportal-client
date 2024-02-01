@@ -1,0 +1,58 @@
+.menu-bar {
+  background-color: $menuBarBackgroundColor;
+  box-shadow: 0px 3px 6px #001e4940;
+  color: $bodyFontColor;
+  margin-top: 10px;
+
+  .v-list-item {
+    padding: 15px 20px;
+
+    .v-list-item__prepend {
+      display: block;
+      margin-right: 10px;
+    }
+
+    &.v-list-item--active {
+      background-color: $menuBarActiveItemColor;
+      .v-list-item-title {
+        font-weight: bold;
+      }
+    }
+  }
+
+  .menu-bar-title {
+    .v-list-item-title {
+      font-size: 25px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+  }
+
+  .menu-bar-close-button {
+    box-shadow: 0px 3px 6px #00000029;
+    right: -25px;
+    top: 5px;
+  }
+
+  .menu-bar-main-item {
+    padding-bottom: 5px;
+    .v-list-item-title {
+      line-height: 1.7rem;
+    }
+  }
+
+  .menu-bar-sub-item {
+    padding-left: 32px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+  }
+
+  .v-divider {
+    color: $primaryColor;
+    opacity: 1;
+  }
+
+  .v-icon {
+    opacity: 1;
+  }
+}

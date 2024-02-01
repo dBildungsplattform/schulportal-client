@@ -6,6 +6,7 @@ const routes: readonly RouteRecordRaw[] = [
     name: 'landing',
     component: () => import('../views/LandingView.vue'),
     meta: {
+      layout: 'DefaultLayout',
       requiresAuth: false
     }
   },
@@ -14,6 +15,7 @@ const routes: readonly RouteRecordRaw[] = [
     name: 'user-management',
     component: () => import('../views/admin/UserManagementView.vue'),
     meta: {
+      layout: 'AdminLayout',
       requiresAuth: true
     }
   },
@@ -22,6 +24,7 @@ const routes: readonly RouteRecordRaw[] = [
     name: 'user-details',
     component: () => import('../views/admin/UserDetailsView.vue'),
     meta: {
+      layout: 'AdminLayout',
       requiresAuth: true
     }
   },
@@ -38,6 +41,7 @@ const routes: readonly RouteRecordRaw[] = [
     name: 'start',
     component: () => import('../views/StartView.vue'),
     meta: {
+      layout: 'DefaultLayout',
       requiresAuth: true
     }
   }
