@@ -103,6 +103,7 @@
       data-testid="user-creation-menu-item"
       prepend-icon="mdi-plus-circle-outline"
       :title="$t('admin.user.addNew')"
+      to="/admin/users/new"
     ></v-list-item>
 
     <!-- Klassenverwaltung -->

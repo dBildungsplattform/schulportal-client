@@ -13,7 +13,6 @@
 <template>
   <div class="admin">
     <h1 class="text-center headline">{{ $t('admin.headline') }}</h1>
-    <RouterLink to="/admin/users/new">Neue Benutzer anlegen</RouterLink>
     <UserTable
       :items="personStore.allPersons || []"
       :loading="personStore.loading"
