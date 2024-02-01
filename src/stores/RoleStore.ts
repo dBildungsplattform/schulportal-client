@@ -54,9 +54,10 @@ export const useRoleStore: StoreDefinition<'roleStore', RoleState, RoleGetters, 
       ): Promise<RolleResponse> {
         this.loading = true
         try {
-          // Ensure that rollenArt and merkmale arguments match the enum values
-          const rollenArtValue = CreateRolleBodyParamsRollenartEnum[rollenArt]
-          const merkmaleValue = CreateRolleBodyParamsMerkmaleEnum[merkmale]
+          const rollenArtValue: CreateRolleBodyParamsRollenartEnum =
+            CreateRolleBodyParamsRollenartEnum[rollenArt]
+          const merkmaleValue: CreateRolleBodyParamsMerkmaleEnum =
+            CreateRolleBodyParamsMerkmaleEnum[merkmale]
 
           // Construct the body params object
           const createRolleBodyParams: CreateRolleBodyParams = {

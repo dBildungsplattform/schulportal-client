@@ -102,79 +102,81 @@
           </v-col>
         </v-row>
         <!-- Enter Role name -->
-        <v-row>
-          <v-col cols="2"></v-col>
-          <v-col>
-            <h3 class="subtitle-2">3. {{ $t('admin.role.enterRoleName') }}</h3>
-          </v-col>
-        </v-row>
-        <v-row>
-          <!-- Spacer column -->
-          <v-col cols="3"></v-col>
-          <v-col
-            cols="3"
-            class="text-right"
-          >
-            <h3 class="text-body">
-              {{ $t('admin.role.enterRoleName') + '*' }}
-            </h3></v-col
-          >
-          <v-col cols="auto">
-            <v-text-field
-              v-model="selectedRoleName"
-              :label="$t('admin.role.enterRoleName')"
-              variant="outlined"
-              density="compact"
-            ></v-text-field>
-          </v-col>
-        </v-row>
-        <!-- Choose characteristics -->
-        <v-row>
-          <v-col cols="2"></v-col>
-          <v-col>
-            <h3 class="subtitle-2">4. {{ $t('admin.role.chooseCharacteristics') }}</h3>
-          </v-col>
-        </v-row>
-        <v-row>
-          <!-- Spacer column -->
-          <v-col cols="3"></v-col>
-          <v-col
-            cols="3"
-            class="text-right"
-          >
-            <h3 class="text-body">
-              {{ $t('admin.role.chooseCharacteristics') + '*' }}
-            </h3></v-col
-          >
-          <v-col cols="auto">
-            <v-select
-              required
-              :items="characteristics"
-              v-model="selectedCharacteristics"
-              :label="$t('admin.role.chooseCharacteristics')"
-              variant="outlined"
-              density="compact"
-            ></v-select>
-          </v-col>
-        </v-row>
-        <v-divider
-          class="border-opacity-100 rounded my-6"
-          color="#E5EAEF"
-          thickness="6"
-        ></v-divider>
-        <v-row justify="end">
-          <v-col
-            cols="12"
-            md="auto"
-          >
-            <v-btn
-              class="primary button"
-              data-testid="open-password-reset-dialog-icon"
+        <template v-if="selectedRoleType">
+          <v-row>
+            <v-col cols="2"></v-col>
+            <v-col>
+              <h3 class="subtitle-2">3. {{ $t('admin.role.enterRoleName') }}</h3>
+            </v-col>
+          </v-row>
+          <v-row>
+            <!-- Spacer column -->
+            <v-col cols="3"></v-col>
+            <v-col
+              cols="3"
+              class="text-right"
             >
-              {{ $t('admin.role.addNewRoleButton') }}
-            </v-btn>
-          </v-col>
-        </v-row>
+              <h3 class="text-body">
+                {{ $t('admin.role.enterRoleName') + '*' }}
+              </h3></v-col
+            >
+            <v-col cols="auto">
+              <v-text-field
+                v-model="selectedRoleName"
+                :label="$t('admin.role.enterRoleName')"
+                variant="outlined"
+                density="compact"
+              ></v-text-field>
+            </v-col>
+          </v-row>
+          <!-- Choose characteristics -->
+          <v-row>
+            <v-col cols="2"></v-col>
+            <v-col>
+              <h3 class="subtitle-2">4. {{ $t('admin.role.chooseCharacteristics') }}</h3>
+            </v-col>
+          </v-row>
+          <v-row>
+            <!-- Spacer column -->
+            <v-col cols="3"></v-col>
+            <v-col
+              cols="3"
+              class="text-right"
+            >
+              <h3 class="text-body">
+                {{ $t('admin.role.chooseCharacteristics') + '*' }}
+              </h3></v-col
+            >
+            <v-col cols="auto">
+              <v-select
+                required
+                :items="characteristics"
+                v-model="selectedCharacteristics"
+                :label="$t('admin.role.chooseCharacteristics')"
+                variant="outlined"
+                density="compact"
+              ></v-select>
+            </v-col>
+          </v-row>
+          <v-divider
+            class="border-opacity-100 rounded my-6"
+            color="#E5EAEF"
+            thickness="6"
+          ></v-divider>
+          <v-row justify="end">
+            <v-col
+              cols="12"
+              md="auto"
+            >
+              <v-btn
+                class="primary button"
+                data-testid="open-password-reset-dialog-icon"
+              >
+                {{ $t('admin.role.addNewRoleButton') }}
+              </v-btn>
+            </v-col>
+          </v-row>
+        </template>
       </v-container>
     </LayoutCard>
   </div>
