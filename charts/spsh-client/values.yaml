@@ -15,4 +15,5 @@ service:
 
 ingress:
   enabled: true
+  className: nginx
 frontendHostname: "helm.dev.spsh.dbildungsplattform.de"
