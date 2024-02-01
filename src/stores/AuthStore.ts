@@ -1,29 +1,38 @@
-import { defineStore } from 'pinia'
-import ApiService from '@/services/ApiService'
+import { defineStore, type Store, type StoreDefinition } from 'pinia'
+import { AuthApiFactory, type AuthApiInterface } from '../api-client/generated/api'
+import axiosApiInstance from '@/services/ApiService'
 
-export const useAuthStore = defineStore({
-  id: 'authStore',
-  state: () => ({
-    authInitialized: false as boolean,
-    isAuthed: false as boolean
-  }),
-  actions: {
-    login(returnUrl?: string) {
-      const loginUrl = ApiService.getUri({ url: '/login', params: { redirectUrl: returnUrl } })
-      window.location.href = loginUrl
-    },
-    logout() {
-      const logoutUrl = ApiService.getUri({ url: '/logout' })
-      window.location.href = logoutUrl
-    },
-    async initializeAuthStatus() {
-      if (this.authInitialized) return
+type AuthState = {
+  isAuthed: boolean
+}
 
-      this.isAuthed = await ApiService.get('/logininfo', { validateStatus: null })
-        .then((res) => res.status >= 200 && res.status < 400)
-        .catch(() => false)
+type AuthActions = {
+  initializeAuthStatus: () => Promise<void>
+}
 
-      this.authInitialized = true
+type AuthGetters = {}
+
+export type AuthStore = Store<'authStore', AuthState, AuthGetters, AuthActions>
+
+const authApi: AuthApiInterface = AuthApiFactory(undefined, '', axiosApiInstance)
+
+export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, AuthActions> =
+  defineStore({
+    id: 'authStore',
+    state: (): AuthState => ({
+      isAuthed: false as boolean
+    }),
+    actions: {
+      async initializeAuthStatus() {
+        try {
+          const { status: loginStatus }: { status: number } =
+            await authApi.authenticationControllerInfo({
+              validateStatus: null
+            })
+          this.isAuthed = loginStatus >= 200 && loginStatus < 400
+        } catch {
+          this.isAuthed = false
+        }
+      }
     }
-  }
-})
+  })

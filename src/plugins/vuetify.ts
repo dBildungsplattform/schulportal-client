@@ -1,11 +1,12 @@
-import 'vuetify/styles'
-import { createVuetify, type VuetifyOptions } from 'vuetify'
+import { createVuetify, type ThemeDefinition, type VuetifyOptions } from 'vuetify'
 import '@mdi/font/css/materialdesignicons.css'
 import { aliases, mdi } from 'vuetify/iconsets/mdi'
-import * as components from 'vuetify/components'
-import * as directives from 'vuetify/directives'
+import '@/styles/main.scss'
 
-const shTheme = {
+// eslint-disable-next-line no-var
+declare var cspNonce: string
+
+const shTheme: ThemeDefinition = {
   dark: false,
   colors: {
     background: '#FFFFFF',
@@ -22,8 +23,6 @@ const shTheme = {
 }
 
 const vuetifyConfig: VuetifyOptions = {
-  components,
-  directives,
   icons: {
     defaultSet: 'mdi',
     aliases,
@@ -32,6 +31,7 @@ const vuetifyConfig: VuetifyOptions = {
     }
   },
   theme: {
+    cspNonce,
     defaultTheme: 'shTheme',
     themes: {
       shTheme

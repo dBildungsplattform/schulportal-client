@@ -1,8 +1,8 @@
-import { createI18n } from 'vue-i18n'
+import { createI18n, type DefaultLocaleMessageSchema } from 'vue-i18n'
 import * as deDE from '../locales/de-DE.json'
 
-function loadLocaleMessages() {
-  const messages = {
+function loadLocaleMessages(): { [x: string]: DefaultLocaleMessageSchema } {
+  const messages: { [x: string]: DefaultLocaleMessageSchema } = {
     de: deDE
   }
 
@@ -11,6 +11,7 @@ function loadLocaleMessages() {
 
 export default createI18n({
   fallbackLocale: 'de',
+  legacy: false,
   locale: 'de',
   messages: loadLocaleMessages()
 })

@@ -1,9 +1,21 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+  import LoginCard from '@/components/cards/LoginCard.vue'
+</script>
 
 <template>
-  <div class="start">
-    <h1>This is gonna be a landing page</h1>
-  </div>
+  <v-container
+    fill-height
+    fluid
+  >
+    <v-row justify="center">
+      <v-col
+        cols="12"
+        md="8"
+      >
+        <LoginCard />
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <style></style>

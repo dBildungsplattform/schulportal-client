@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spsh-client
+  labels:
+    app: spsh-client
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: spsh-client
+  template:
+    metadata:
+      name: spsh-client
+      labels:
+        app: spsh-client
+    spec:
+      containers:
+        - name: spsh-client
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: Always
+          securityContext:
+            allowPrivilegeEscalation: false
+      restartPolicy: Always
+      
