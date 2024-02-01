@@ -6,6 +6,7 @@ metadata:
   labels:
     app: {{ template "spsh-client.name" . }}
 spec:
+  ingressClassName: nginx
   rules:
     - host: {{.Values.frontendHostname}}
       http:
