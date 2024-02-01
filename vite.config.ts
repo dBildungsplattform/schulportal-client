@@ -11,6 +11,10 @@ export default defineConfig({
     // Disable inlining of assets
     assetsInlineLimit: 0
   },
+  define: {
+    /* disable hydration mismatch details in production build */
+    __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: 'false'
+  },
   plugins: [
     VueI18nPlugin({
       /* we have to enable jit compilation to use i18n interpolation without violating the CSP

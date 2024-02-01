@@ -1,4 +1,4 @@
-import SpshAlert from '@/components/alert/SpshAlert.vue'
+import SpshAlert from './SpshAlert.vue'
 import { expect, test } from 'vitest'
 import { VueWrapper, mount } from '@vue/test-utils'
 import { nextTick } from 'vue'

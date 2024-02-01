@@ -11,7 +11,6 @@
   const router: Router = useRouter()
   const currentPersonId: string = route.params['id'] as string
   const personStore: PersonStore = usePersonStore()
-
   const { t }: Composer = useI18n({ useScope: 'global' })
 
   const password: Ref<string> = ref('')
