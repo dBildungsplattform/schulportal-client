@@ -33,6 +33,7 @@ const routes: readonly RouteRecordRaw[] = [
     name: 'user-creation',
     component: () => import('../views/admin/UserCreationView.vue'),
     meta: {
+      layout: 'AdminLayout',
       requiresAuth: true
     }
   },

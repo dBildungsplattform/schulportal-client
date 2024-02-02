@@ -6,7 +6,9 @@
       "management": "Klassenverwaltung"
     },
     "role": {
-      "management": "Rollenverwaltung"
+      "selectRole": "Rolle auswählen",
+      "management": "Rollenverwaltung",
+      "noRolesFound": "Keine Rollen gefunden"
     },
     "school": {
       "management": "Schulverwaltung"
@@ -61,6 +63,7 @@
     "password": "Passwort",
     "username": "Benutzername"
   },
+  "mandatoryFields": "Mit * markierte Felder sind Pflichtangaben.",
   "nav": {
     "admin": "Schulportal-Administration",
     "backToStart": "zurück zur Startseite",
