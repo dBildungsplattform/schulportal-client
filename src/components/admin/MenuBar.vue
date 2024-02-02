@@ -102,7 +102,7 @@
       class="menu-bar-sub-item caption"
       data-testid="user-creation-menu-item"
       prepend-icon="mdi-plus-circle-outline"
-      :title="$t('admin.user.addNew')"
+      :title="$t('admin.user.createNew')"
       to="/admin/users/new"
     ></v-list-item>
 

@@ -5,24 +5,32 @@
     "class": {
       "management": "Klassenverwaltung"
     },
+    "koPers": {
+      "koPersNumber": "KoPers-Nr",
+      "noKoPersNumber": "Keine KoPers-Nr vorhanden"
+    },
     "role": {
       "selectRole": "Rolle auswählen",
       "management": "Rollenverwaltung",
       "noRolesFound": "Keine Rollen gefunden"
     },
     "school": {
-      "management": "Schulverwaltung"
+      "assign": "Schule zuordnen",
+      "management": "Schulverwaltung",
+      "noSchoolsFound": "Keine Schulen gefunden"
     },
     "schoolBoard": {
       "management": "Schulträgerverwaltung"
     },
     "user": {
-      "addNew": "Neue Benutzer anlegen",
+      "addNew": "Neuen Benutzer hinzufügen",
       "backToList": "Zurück zur Liste",
       "changePassword": "Passwort ändern",
       "copyPasswordError": "Passwort konnte nicht in die Zwischenablage kopiert werden",
       "copyPasswordSuccess": "Passwort in Zwischenablage kopiert",
-      "create": "Neuen Benutzer anlegen",
+      "create": "Benutzer anlegen",
+      "createNew": "Neue Benutzer anlegen",
+      "discard": "Benutzer verwerfen",
       "edit": "Benutzer bearbeiten",
       "management": "Benutzerverwaltung",
       "personalInfo": "Persönliche Informationen",
