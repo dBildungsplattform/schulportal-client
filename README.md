@@ -46,12 +46,35 @@ Thus to figure out CSP issues you need to run `npm run build` and `npm run previ
 Note: Even with the vite preview the nonce placeholder will not be replaced by an actual nonce.
 To be even more similar to prod you need to create and run a docker image with the provided Dockerfile. Than the client will be served by nginx and the nonce will be generated.
 
-## Locally building and running the client as docker container
+### Package (Docker-Image)
+Wenn ihr einen Tag pusht wird von GitHub für euch ein Docker-Image generiert. Schaut dazu im GitHub unter "packages"
+nach. Wichtig ist, dass euer Branch dafür mit einer JIRA-Issue ID beginnt. 
 
-If you need to fix problems that occur in the cluster, but not with `npm run preview`, it is probably a problem with the build or nginx config. 
+ghcr.io/dbildungsplattform/schulportal-client:*tag*
 
-To run that locally use the following commands:
-```
-docker build -t spsh-client .
-docker run -p 8099:80 spsh-client
-```
+### Docker images für das Backend und BFF
+Wenn ihr nur den Client testen wollt und dafür ein Docker-Image braucht für das Backend und BFF
+liegen diese
+hier: ghcr.io/dbildungsplattform/dbildungs-iam-server:*branchname oder latest für main*
+
+Wenn man das Backend-Image ohne Parameter aufruft, bekommt man das Backend. Für BFF braucht man noch einen Aufrufparameter:
+`node dist/src/backend-for-frontend/main.js`
+
+## Beispiel
+Die folgenden Beispiele gehen davon aus, dass ihr eine Docker-CLI habt. Andere OCI-Runtimes sollten funktionieren.
+Ihr müsst eure Parameter entsprechend anpassen.
+
+Ihr müsst zusätzlich noch ein Volume einhängen mit Konfigurationsdateien und Umgebungsvariablen setzen,
+damit sie gezogen werden. (HINWEIS: Die Konfiguration ist WIP, das wird noch vereinfacht)
+Backend: `docker run --rm -eDEPLOY_STAGE=dev -eNODE_ENV=dev --volume="$(PWD)/config:/app/config" <IMAGE-NAME>`
+BFF: `docker run --rm -eDEPLOY_STAGE=dev -eNODE_ENV=dev --volume="$(PWD)/config:/app/config" <IMAGE-NAME> node dist/src/backend-for-frontend/main.js`
+
+| Parameter                            | Erklärung                                                                    |
+|--------------------------------------|------------------------------------------------------------------------------|
+| run --rm                             | Container entfernen, nachdem er beendet wurde                                |
+| -eDEPLOY_STAGE=dev                   | Umgebungsvariable für die Stage                                              |
+| -eNODE_ENV=dev                       | Umgebungsvariable für die Nodeumgebung                                       |
+| --volume="$(PWD)/config:/app/config" | Verzeichnis mit Konfigurationsdateien an die richtige Stelle im Container    |
+|                                      | `$(PWD)` ist das aktuelle Verzeichnis, der Pfad muss für Docker absolut sein |
+| <IMAGE-NAME>                         | Name des Images, das wir laufen lassen wollen                                |
+| docker build -t <IMAGE-NAME> .       | Baut ein lokal image anhand des Dockerfile                                   |
