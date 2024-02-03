@@ -8,15 +8,18 @@
     },
     "role": {
       "management": "Rollenverwaltung",
-      "addNew": "Neue Rolle anlegen",
-      "addNewRole": "Neue Rolle hinzufügen",
-      "addNewRoleButton": "Rolle anlegen",
+      "createNew": "Neue Rolle anlegen",
+      "create": "Rolle anlegen",
+      "addNew": "Neue Rolle hinzufügen",
       "chooseSchoolStructureNode": "Schulstrukturknoten auswählen",
       "chooseRoleType": "Rollenart auswählen",
       "enterRoleName": "Rollenname eingeben",
       "chooseCharacteristics": "Merkmale auswählen",
       "userDataLoadingErrorText": "Es konnten keine Benutzerdaten geladen werden.",
-      "showAll": "Alle Rollen anzeigen"
+      "showAll": "Alle Rollen anzeigen",
+      "discard": "Rolle verwerfen",
+      "roleCreateErrorTitle": "Fehler beim Anlegen der Rolle",
+      "roleCreateErrorText": "Die Rolle konnte nicht angelegt werden."
     },
     "school": {
       "management": "Schulverwaltung"

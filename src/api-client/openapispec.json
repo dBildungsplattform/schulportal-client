@@ -1723,11 +1723,10 @@
             ]
           },
           "merkmale": {
-            "type": "string",
-            "enum": [
-              "BEFRISTUNG_PFLICHT",
-              "KOPERS_PFLICHT"
-            ]
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         },
         "required": [

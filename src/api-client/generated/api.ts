@@ -259,10 +259,10 @@ export interface CreateRolleBodyParams {
     'rollenart': CreateRolleBodyParamsRollenartEnum;
     /**
      * 
-     * @type {string}
+     * @type {Array<string>}
      * @memberof CreateRolleBodyParams
      */
-    'merkmale': CreateRolleBodyParamsMerkmaleEnum;
+    'merkmale': Array<string>;
 }
 
 export const CreateRolleBodyParamsRollenartEnum = {
@@ -275,12 +275,6 @@ export const CreateRolleBodyParamsRollenartEnum = {
 } as const;
 
 export type CreateRolleBodyParamsRollenartEnum = typeof CreateRolleBodyParamsRollenartEnum[keyof typeof CreateRolleBodyParamsRollenartEnum];
-export const CreateRolleBodyParamsMerkmaleEnum = {
-    BefristungPflicht: 'BEFRISTUNG_PFLICHT',
-    KopersPflicht: 'KOPERS_PFLICHT'
-} as const;
-
-export type CreateRolleBodyParamsMerkmaleEnum = typeof CreateRolleBodyParamsMerkmaleEnum[keyof typeof CreateRolleBodyParamsMerkmaleEnum];
 
 /**
  * 

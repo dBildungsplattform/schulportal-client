@@ -1,7 +1,6 @@
 import { defineStore, type Store, type StoreDefinition } from 'pinia'
 import { isAxiosError } from 'axios'
 import {
-  CreateRolleBodyParamsMerkmaleEnum,
   CreateRolleBodyParamsRollenartEnum,
   RolleApiFactory,
   type CreateRolleBodyParams,
@@ -20,6 +19,7 @@ export type Role = {
 }
 
 type RoleState = {
+  createdRole: RolleResponse | null
   errorCode: string
   loading: boolean
 }
@@ -30,17 +30,18 @@ type RoleActions = {
     rollenName: string,
     schulStrukturKnoten: string,
     rollenArt: keyof typeof CreateRolleBodyParamsRollenartEnum,
-    merkmale: keyof typeof CreateRolleBodyParamsMerkmaleEnum
+    merkmale: Array<string>
   ) => Promise<RolleResponse>
 }
 
-export type RoleStore = Store<'roleState', RoleState, RoleGetters, RoleActions>
+export type RoleStore = Store<'roleStore', RoleState, RoleGetters, RoleActions>
 
 export const useRoleStore: StoreDefinition<'roleStore', RoleState, RoleGetters, RoleActions> =
   defineStore({
     id: 'roleStore',
     state: (): RoleState => {
       return {
+        createdRole: null,
         errorCode: '',
         loading: false
       }
@@ -50,25 +51,24 @@ export const useRoleStore: StoreDefinition<'roleStore', RoleState, RoleGetters, 
         rollenName: string,
         schulStrukturKnoten: string,
         rollenArt: keyof typeof CreateRolleBodyParamsRollenartEnum,
-        merkmale: keyof typeof CreateRolleBodyParamsMerkmaleEnum
+        merkmale: Array<string>
       ): Promise<RolleResponse> {
         this.loading = true
         try {
           const rollenArtValue: CreateRolleBodyParamsRollenartEnum =
             CreateRolleBodyParamsRollenartEnum[rollenArt]
-          const merkmaleValue: CreateRolleBodyParamsMerkmaleEnum =
-            CreateRolleBodyParamsMerkmaleEnum[merkmale]
 
           // Construct the body params object
           const createRolleBodyParams: CreateRolleBodyParams = {
             name: rollenName,
             administeredBySchulstrukturknoten: schulStrukturKnoten,
             rollenart: rollenArtValue,
-            merkmale: merkmaleValue
+            merkmale: merkmale
           }
           const { data }: { data: RolleResponse } =
             await roleApi.rolleControllerCreateRolle(createRolleBodyParams)
           this.loading = false
+          this.createdRole = data
           return data
         } catch (error) {
           this.errorCode = 'UNSPECIFIED_ERROR'
