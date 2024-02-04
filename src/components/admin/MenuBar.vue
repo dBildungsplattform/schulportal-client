@@ -126,7 +126,7 @@
       class="menu-bar-sub-item caption"
       data-testid="role-creation-menu-item"
       prepend-icon="mdi-plus-circle-outline"
-      :title="$t('admin.role.addNew')"
+      :title="$t('admin.role.createNew')"
       to="/admin/role/new"
     ></v-list-item>
     <!-- Schulverwaltung -->

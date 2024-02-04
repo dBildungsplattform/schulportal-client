@@ -122,7 +122,7 @@
 
     bottom: 0;
     min-height: 240px; /* Avoid footer shrinking vertically on smaller screen sizes*/
-    position: absolute;
+    position: relative;
     width: -webkit-fill-available;
   }
 

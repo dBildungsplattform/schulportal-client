@@ -2,13 +2,11 @@
   import LayoutCard from '@/components/cards/LayoutCard.vue'
   import { ref, type Ref } from 'vue'
   import { useRoleStore, type RoleStore } from '@/stores/RoleStore'
-  import type { CreateRolleBodyParamsRollenartEnum, RolleResponse } from '@/api-client/generated'
+  import type { CreateRolleBodyParamsRollenartEnum } from '@/api-client/generated'
   import { useI18n, type Composer } from 'vue-i18n'
   import SpshAlert from '@/components/alert/SpshAlert.vue'
 
   const { t }: Composer = useI18n({ useScope: 'global' })
-
-  const isRoleCreated: Ref<boolean> = ref(false)
 
   type Selection = string | null
   type SelectionArray = string[] | null
@@ -37,7 +35,6 @@
         selectedRoleType.value as keyof typeof CreateRolleBodyParamsRollenartEnum,
         selectedCharacteristics.value
       )
-      isRoleCreated.value = true
     }
   }
 </script>
@@ -66,8 +63,8 @@
         :buttonText="$t('admin.user.backToList')"
         buttonClass="primary"
       />
-      <!-- Result template on success after submit  -->
-      <template v-if="isRoleCreated">
+      <!-- Result template on success after submit (No errorCode and present value in createdRole)  -->
+      <template v-if="!!roleStore.createdRole && !roleStore.errorCode">
         <v-row justify="center">
           <v-col
             class="subtitle-1"
@@ -111,9 +108,10 @@
           <v-col class="text-body">hamid</v-col></v-row
         >
       </template>
+      <!-- The form to create a new role -->
       <template v-if="!roleStore.errorCode">
-        <v-form @submit.prevent="submitForm">
-          <v-container class="new-role">
+        <v-container class="new-role">
+          <v-form @submit.prevent="submitForm">
             <v-row>
               <v-col cols="1"></v-col>
               <v-col cols="auto">
@@ -148,10 +146,12 @@
                 <v-select
                   :items="structureNodes"
                   v-model="selectedStructureNode"
-                  :label="$t('admin.role.chooseSchoolStructureNode')"
                   variant="outlined"
                   density="compact"
-                ></v-select>
+                  single-line
+                  :placeholder="$t('admin.role.chooseSchoolStructureNode')"
+                >
+                </v-select>
               </v-col>
             </v-row>
             <!-- Choose Role type -->
@@ -176,9 +176,10 @@
                 <v-select
                   :items="roleTypes"
                   v-model="selectedRoleType"
-                  :label="$t('admin.role.chooseRoleType')"
+                  :placeholder="$t('admin.role.chooseRoleType')"
                   variant="outlined"
                   density="compact"
+                  single-line
                 ></v-select>
               </v-col>
             </v-row>
@@ -204,9 +205,10 @@
                 <v-col cols="auto">
                   <v-text-field
                     v-model="selectedRoleName"
-                    :label="$t('admin.role.enterRoleName')"
+                    :placeholder="$t('admin.role.enterRoleName')"
                     variant="outlined"
                     density="compact"
+                    single-line
                   ></v-text-field>
                 </v-col>
               </v-row>
@@ -233,10 +235,11 @@
                     required
                     :items="characteristics"
                     v-model="selectedCharacteristics"
-                    :label="$t('admin.role.chooseCharacteristics')"
+                    :placeholder="$t('admin.role.chooseCharacteristics')"
                     variant="outlined"
                     density="compact"
                     multiple
+                    single-line
                   ></v-select>
                 </v-col>
               </v-row>
@@ -266,8 +269,8 @@
                 </v-col>
               </v-row>
             </template>
-          </v-container>
-        </v-form>
+          </v-form>
+        </v-container>
       </template>
     </LayoutCard>
   </div>
