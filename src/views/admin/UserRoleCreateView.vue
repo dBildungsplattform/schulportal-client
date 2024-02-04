@@ -46,8 +46,8 @@
   }
   // Rule for validating the role name. Maybe enhance a validation framework like VeeValidate instead?
   const roleNameRules: Array<(v: string) => boolean | string> = [
-    (v: string): boolean | string => v.length <= 3 || t('admin.role.rule.roleNameLength') 
-  ] 
+    (v: string): boolean | string => v.length <= 3 || t('admin.role.rule.roleNameLength')
+  ]
 </script>
 
 <template>
@@ -74,7 +74,7 @@
         :buttonText="$t('admin.user.backToList')"
         buttonClass="primary"
       />
-      <!-- Result template on success after submit (No errorCode and present value in createdRole)  -->
+      <!-- Result template on success after submit (Present value in createdRole and no errorCode)  -->
       <template v-if="roleStore.createdRole && !roleStore.errorCode">
         <v-container class="new-role-success">
           <v-row justify="center">
@@ -156,7 +156,7 @@
           </v-row>
         </v-container>
       </template>
-      <!-- The form to create a new role -->
+      <!-- The form to create a new role (No created role yet and no errorCode) -->
       <template v-if="!roleStore.createdRole && !roleStore.errorCode">
         <v-container class="new-role">
           <v-form @submit.prevent="submitForm">
@@ -174,17 +174,25 @@
             </v-row>
             <!-- Choose school structure node -->
             <v-row>
-              <v-col cols="2"></v-col>
+              <!-- This column will be hidden on xs screens and visible on sm and larger screens -->
+              <v-col
+                cols="2"
+                class="d-none d-md-flex"
+              ></v-col>
               <v-col>
                 <h3 class="subtitle-2">1. {{ $t('admin.role.chooseSchoolStructureNode') }}</h3>
               </v-col>
             </v-row>
             <v-row>
               <!-- Spacer column -->
-              <v-col cols="3"></v-col>
               <v-col
                 cols="3"
-                class="text-right"
+                class="d-none d-md-flex"
+              ></v-col>
+              <v-col
+                cols="12"
+                md="3"
+                class="d-md-text-right"
               >
                 <label class="text-body">
                   {{ $t('admin.role.chooseSchoolStructureNode') + '*' }}
@@ -204,17 +212,24 @@
             </v-row>
             <!-- Choose Role type -->
             <v-row>
-              <v-col cols="2"></v-col>
+              <v-col
+                cols="2"
+                class="d-none d-md-flex"
+              ></v-col>
               <v-col>
                 <h3 class="subtitle-2">2. {{ $t('admin.role.chooseRoleType') }}</h3>
               </v-col>
             </v-row>
             <v-row>
               <!-- Spacer column -->
-              <v-col cols="3"></v-col>
               <v-col
                 cols="3"
-                class="text-right"
+                class="d-none d-md-flex"
+              ></v-col>
+              <v-col
+                cols="12"
+                md="3"
+                class="d-md-text-right"
               >
                 <label class="text-body">
                   {{ $t('admin.role.chooseRoleType') + '*' }}
@@ -233,17 +248,24 @@
             <!-- Enter Role name -->
             <template v-if="selectedRoleType">
               <v-row>
-                <v-col cols="2"></v-col>
+                <v-col
+                  cols="2"
+                  class="d-none d-md-flex"
+                ></v-col>
                 <v-col>
                   <label class="subtitle-2">3. {{ $t('admin.role.enterRoleName') }}</label>
                 </v-col>
               </v-row>
               <v-row>
                 <!-- Spacer column -->
-                <v-col cols="3"></v-col>
                 <v-col
                   cols="3"
-                  class="text-right"
+                  class="d-none d-md-flex"
+                ></v-col>
+                <v-col
+                  cols="12"
+                  md="3"
+                  class="d-md-text-right"
                 >
                   <label class="text-body">
                     {{ $t('admin.role.enterRoleName') + '*' }}
@@ -268,10 +290,14 @@
               </v-row>
               <v-row>
                 <!-- Spacer column -->
-                <v-col cols="3"></v-col>
                 <v-col
                   cols="3"
-                  class="text-right"
+                  class="d-none d-md-flex"
+                ></v-col>
+                <v-col
+                  cols="12"
+                  md="3"
+                  class="d-md-text-right"
                 >
                   <h3 class="text-body">
                     {{ $t('admin.role.chooseCharacteristics') + '*' }}
