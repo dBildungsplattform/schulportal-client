@@ -1,8 +1,9 @@
 <script setup lang="ts">
-  import { ref, type Ref } from 'vue'
+  import { type ComputedRef, ref, type Ref } from 'vue'
   import SH_LOGO from '@/assets/logos/landesdachmarke_01_KORR.svg'
   import DIGITAL_PAKT_LOGO from '@/assets/logos/digitalPakt.svg'
   import { type Composer, useI18n } from 'vue-i18n'
+  import { useDisplay } from 'vuetify'
 
   const { t }: Composer = useI18n({ useScope: 'global' })
 
@@ -40,10 +41,14 @@
       href: 'https://www.schleswig-holstein.de/DE/landesportal/landesportal_node.html'
     }
   ])
+
+  const { mobile }: { mobile: ComputedRef<boolean> } = useDisplay()
 </script>
 
 <template>
   <v-footer
+    absolute
+    :app="mobile"
     class="footer"
     data-testid="footer"
     height="10"
@@ -99,9 +104,10 @@
         </v-col>
       </v-row>
       <v-bottom-navigation
-        class="bottom-navigation"
+        bg-color="#001e49"
         :elevation="1"
         height="22"
+        order="-1"
       >
       </v-bottom-navigation>
     </v-container>
@@ -217,9 +223,6 @@
   .sponsor-logo {
     height: auto; /* Maintain aspect ratio */
     margin: 0 10px; /* Adds some space between logos */
-  }
-  .bottom-navigation {
-    background-color: #001e49;
   }
 
   .sponsor-logos-col,
