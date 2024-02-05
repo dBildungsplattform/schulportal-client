@@ -381,7 +381,8 @@
               <v-row justify="end">
                 <v-col
                   cols="12"
-                  md="auto"
+                  sm="6"
+                  md="4"
                 >
                   <v-btn
                     class="secondary"
@@ -392,7 +393,8 @@
                 </v-col>
                 <v-col
                   cols="12"
-                  md="auto"
+                  sm="6"
+                  md="4"
                 >
                   <v-btn
                     type="submit"
