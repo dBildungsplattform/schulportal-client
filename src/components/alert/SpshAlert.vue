@@ -35,16 +35,16 @@
       >
         <v-row>
           <v-col
+            class="primary-text-color"
             cols="auto"
-            style="color: #001e49"
           >
             <strong>{{ title }}</strong>
           </v-col>
         </v-row>
         <v-row>
           <v-col
+            class="primary-text-color"
             cols="auto"
-            style="color: #001e49"
           >
             {{ text }}
           </v-col>

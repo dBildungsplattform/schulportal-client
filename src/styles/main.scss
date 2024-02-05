@@ -47,6 +47,10 @@ label.v-label {
   opacity: 1;
 }
 
+.primary-text-color {
+  color: $primaryColor;
+}
+
 .no-kopers-checkbox label.v-label {
   text-wrap: nowrap;
 }
