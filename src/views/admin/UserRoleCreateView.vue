@@ -25,6 +25,8 @@
   const roleStore: RoleStore = useRoleStore()
 
   const submitForm = async (): Promise<void> => {
+
+    
     if (
       selectedRoleName.value &&
       selectedStructureNode.value &&
@@ -46,7 +48,8 @@
   }
   // Rule for validating the role name. Maybe enhance a validation framework like VeeValidate instead?
   const roleNameRules: Array<(v: string) => boolean | string> = [
-    (v: string): boolean | string => v.length <= 200 || t('admin.role.rule.roleNameLength')
+    (v: string): boolean | string => v.length <= 200 || t('admin.role.rule.roleNameLength'),
+    (v: string): boolean | string => !!v.length || t('admin.role.rule.roleNameRequired')
   ]
 </script>
 
@@ -211,7 +214,15 @@
                   :placeholder="$t('admin.role.chooseSchoolStructureNode')"
                   :bg-color="selectedStructureNode ? '#4dc7bc' : ''"
                   clearable
+                  required
                 >
+                  <template v-slot:item="{ props, item }">
+                    <v-list-item
+                      v-bind="props"
+                      :title="item.title"
+                      style="color: #001e49"
+                    ></v-list-item>
+                  </template>
                 </v-select>
               </v-col>
             </v-row>
@@ -249,10 +260,19 @@
                   density="compact"
                   :bg-color="selectedRoleType ? '#4dc7bc' : ''"
                   clearable
+                  required
                 >
+                  <template v-slot:item="{ props, item }">
+                    <v-list-item
+                      v-bind="props"
+                      :title="item.title"
+                      style="color: #001e49"
+                    ></v-list-item>
+                  </template>
                 </v-select>
               </v-col>
             </v-row>
+
             <!-- Enter Role name -->
             <template v-if="selectedRoleType">
               <v-row>
@@ -286,6 +306,7 @@
                     variant="outlined"
                     density="compact"
                     :rules="roleNameRules"
+                    required
                   ></v-text-field>
                 </v-col>
               </v-row>
@@ -321,6 +342,14 @@
                     multiple
                     :bg-color="selectedCharacteristics ? '#4dc7bc' : ''"
                     clearable
+                    required
+                  >
+                    <template v-slot:item="{ props, item }">
+                      <v-list-item
+                        v-bind="props"
+                        :title="item.title"
+                        style="color: #001e49"
+                      ></v-list-item> </template
                   ></v-select>
                 </v-col>
               </v-row>

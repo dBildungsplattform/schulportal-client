@@ -29,7 +29,8 @@
       "followingRoleCreated" : "Folgende Daten wurden gespeichert:",
       "roleAddedSuccessfully": "Die Rolle wurde erfolgreich hinzugefügt.",
         "rule": {
-          "roleNameLength": "Der Rollenname darf nicht länger als 200 Zeichen sein."
+          "roleNameLength": "Der Rollenname darf nicht länger als 200 Zeichen sein.",
+          "roleNameRequired": "Der Rollenname ist erforderlich."
         }
     },
     "school": {
