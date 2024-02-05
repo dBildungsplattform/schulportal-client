@@ -210,6 +210,7 @@
                   single-line
                   :placeholder="$t('admin.role.chooseSchoolStructureNode')"
                   :bg-color="selectedStructureNode ? '#4dc7bc' : ''"
+                  clearable
                 >
                 </v-select>
               </v-col>
@@ -247,8 +248,8 @@
                   variant="outlined"
                   density="compact"
                   :bg-color="selectedRoleType ? '#4dc7bc' : ''"
+                  clearable
                 >
-
                 </v-select>
               </v-col>
             </v-row>
@@ -319,6 +320,7 @@
                     density="compact"
                     multiple
                     :bg-color="selectedCharacteristics ? '#4dc7bc' : ''"
+                    clearable
                   ></v-select>
                 </v-col>
               </v-row>
