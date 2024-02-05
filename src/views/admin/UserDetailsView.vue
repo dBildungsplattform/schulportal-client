@@ -81,7 +81,7 @@
                 sm="3"
                 cols="5"
               >
-                <span class="subtitle-2"> {{ $t('user.firstName') }}: </span>
+                <span class="subtitle-2"> {{ $t('person.firstName') }}: </span>
               </v-col>
               <v-col cols="auto">
                 {{ personStore.currentPerson.person.name.vorname }}
@@ -96,7 +96,7 @@
                 sm="3"
                 cols="5"
               >
-                <span class="subtitle-2"> {{ $t('user.lastName') }}: </span>
+                <span class="subtitle-2"> {{ $t('person.lastName') }}: </span>
               </v-col>
               <v-col cols="auto">
                 {{ personStore.currentPerson.person.name.familienname }}
@@ -115,7 +115,7 @@
         <v-container class="password-reset">
           <v-row class="ml-md-16">
             <v-col>
-              <h3 class="subtitle-1">{{ $t('user.password') }}</h3>
+              <h3 class="subtitle-1">{{ $t('person.password') }}</h3>
             </v-col></v-row
           >
           <v-row

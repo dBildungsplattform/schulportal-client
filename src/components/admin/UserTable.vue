@@ -23,8 +23,8 @@
   const router: Router = useRouter()
 
   const headers: ReadonlyHeaders = [
-    { title: t('user.lastName'), key: 'person.name.familienname', align: 'start' },
-    { title: t('user.firstName'), key: 'person.name.vorname', align: 'start' }
+    { title: t('person.lastName'), key: 'person.name.familienname', align: 'start' },
+    { title: t('person.firstName'), key: 'person.name.vorname', align: 'start' }
   ]
 
   function handleRowClick(_$event: PointerEvent, { item }: { item: Personendatensatz }): void {

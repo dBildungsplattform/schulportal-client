@@ -99,7 +99,7 @@
               cols="12"
               sm="4"
             >
-              <label>{{ $t('user.firstName') }}</label>
+              <label>{{ $t('person.firstName') }}</label>
             </v-col>
             <v-col
               class="py-0"
@@ -115,7 +115,7 @@
               cols="12"
               sm="4"
             >
-              <label>{{ $t('user.lastName') }}</label>
+              <label>{{ $t('person.lastName') }}</label>
             </v-col>
             <v-col
               class="py-0"

@@ -60,7 +60,7 @@
   },
   "start": {
     "administration": "Verwaltung",
-    "allProviders": "Alle Angebote"
+    "allServiceProviders": "Alle Angebote"
   },
   "itemsPerPage": "Einträge pro Seite",
   "login": {
@@ -84,7 +84,7 @@
     "all": "Alle",
     "pageText": "{interval} von {total} Einträgen"
   },
-  "user": {
+  "person": {
     "email": "E-Mail",
     "firstName": "Vorname",
     "lastName": "Nachname",
