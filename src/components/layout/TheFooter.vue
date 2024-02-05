@@ -51,7 +51,6 @@
     :app="mobile"
     class="footer"
     data-testid="footer"
-    height="10"
   >
     <v-container>
       <v-row>
