@@ -46,7 +46,7 @@
   }
   // Rule for validating the role name. Maybe enhance a validation framework like VeeValidate instead?
   const roleNameRules: Array<(v: string) => boolean | string> = [
-    (v: string): boolean | string => v.length <= 3 || t('admin.role.rule.roleNameLength')
+    (v: string): boolean | string => v.length <= 200 || t('admin.role.rule.roleNameLength')
   ]
 </script>
 
@@ -161,7 +161,10 @@
         <v-container class="new-role">
           <v-form @submit.prevent="submitForm">
             <v-row>
-              <v-col cols="1"></v-col>
+              <v-col
+                class="d-none d-md-flex"
+                cols="1"
+              ></v-col>
               <v-col cols="auto">
                 <v-icon
                   small
@@ -192,7 +195,7 @@
               <v-col
                 cols="12"
                 md="3"
-                class="d-md-text-right"
+                class="md-text-right"
               >
                 <label class="text-body">
                   {{ $t('admin.role.chooseSchoolStructureNode') + '*' }}
@@ -229,7 +232,7 @@
               <v-col
                 cols="12"
                 md="3"
-                class="d-md-text-right"
+                class="md-text-right"
               >
                 <label class="text-body">
                   {{ $t('admin.role.chooseRoleType') + '*' }}
@@ -265,7 +268,7 @@
                 <v-col
                   cols="12"
                   md="3"
-                  class="d-md-text-right"
+                  class="md-text-right"
                 >
                   <label class="text-body">
                     {{ $t('admin.role.enterRoleName') + '*' }}
@@ -297,7 +300,7 @@
                 <v-col
                   cols="12"
                   md="3"
-                  class="d-md-text-right"
+                  class="md-text-right"
                 >
                   <h3 class="text-body">
                     {{ $t('admin.role.chooseCharacteristics') + '*' }}
@@ -358,5 +361,11 @@
 
   .v-text-field {
     width: 300px;
+  }
+
+  @media (min-width: 960px) {
+    .md-text-right {
+      text-align: right;
+    }
   }
 </style>

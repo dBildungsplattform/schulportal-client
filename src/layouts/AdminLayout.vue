@@ -26,4 +26,10 @@
       max-width: 1200px;
     }
   }
+
+  @media (max-width: 1280px) {
+    .v-container {
+      margin-bottom: 300px; 
+    }
+  }
 </style>
