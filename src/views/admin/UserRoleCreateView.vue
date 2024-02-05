@@ -25,8 +25,6 @@
   const roleStore: RoleStore = useRoleStore()
 
   const submitForm = async (): Promise<void> => {
-
-    
     if (
       selectedRoleName.value &&
       selectedStructureNode.value &&
@@ -392,11 +390,11 @@
 
 <style>
   .v-select {
-    width: 300px;
+    width: 310px;  
   }
 
   .v-text-field {
-    width: 300px;
+    width: 310px;
   }
 
   @media (min-width: 960px) {

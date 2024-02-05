@@ -70,7 +70,7 @@ export const useRoleStore: StoreDefinition<'roleStore', RoleState, RoleGetters, 
           this.loading = false
           this.createdRole = data
           return data
-        } catch (error) {
+        } catch (error: unknown) {
           this.errorCode = 'UNSPECIFIED_ERROR'
           if (isAxiosError(error)) {
             this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR'
