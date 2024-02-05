@@ -6,6 +6,9 @@
   import { useI18n, type Composer } from 'vue-i18n'
   import SpshAlert from '@/components/alert/SpshAlert.vue'
   import { type Router, useRouter } from 'vue-router'
+  import { useDisplay } from 'vuetify'
+
+  const { smAndDown }: { smAndDown: Ref<boolean> } = useDisplay()
 
   const { t }: Composer = useI18n({ useScope: 'global' })
   const router: Router = useRouter()
@@ -196,13 +199,17 @@
               <v-col
                 cols="12"
                 md="3"
-                class="md-text-right"
+                class="md-text-right py-0"
               >
                 <label class="text-body">
                   {{ $t('admin.role.chooseSchoolStructureNode') + '*' }}
                 </label></v-col
               >
-              <v-col cols="auto">
+              <v-col
+                cols="12"
+                md="auto"
+                class="py-0"
+              >
                 <v-select
                   :items="structureNodes"
                   v-model="selectedStructureNode"
@@ -243,13 +250,17 @@
               <v-col
                 cols="12"
                 md="3"
-                class="md-text-right"
+                class="md-text-right py-0"
               >
                 <label class="text-body">
                   {{ $t('admin.role.chooseRoleType') + '*' }}
                 </label></v-col
               >
-              <v-col cols="auto">
+              <v-col
+                cols="12"
+                md="auto"
+                class="py-0"
+              >
                 <v-select
                   :items="roleTypes"
                   v-model="selectedRoleType"
@@ -291,13 +302,17 @@
                 <v-col
                   cols="12"
                   md="3"
-                  class="md-text-right"
+                  class="md-text-right py-0"
                 >
                   <label class="text-body">
                     {{ $t('admin.role.enterRoleName') + '*' }}
                   </label></v-col
                 >
-                <v-col cols="auto">
+                <v-col
+                  cols="12"
+                  md="auto"
+                  class="py-0"
+                >
                   <v-text-field
                     v-model="selectedRoleName"
                     :placeholder="$t('admin.role.enterRoleName')"
@@ -310,7 +325,10 @@
               </v-row>
               <!-- Choose characteristics -->
               <v-row>
-                <v-col cols="2"></v-col>
+                <v-col
+                  class="d-none d-md-flex"
+                  cols="2"
+                ></v-col>
                 <v-col>
                   <label class="subtitle-2">4. {{ $t('admin.role.chooseCharacteristics') }}</label>
                 </v-col>
@@ -324,13 +342,17 @@
                 <v-col
                   cols="12"
                   md="3"
-                  class="md-text-right"
+                  class="md-text-right py-0"
                 >
                   <h3 class="text-body">
                     {{ $t('admin.role.chooseCharacteristics') + '*' }}
                   </h3></v-col
                 >
-                <v-col cols="auto">
+                <v-col
+                  cols="12"
+                  md="auto"
+                  class="py-0"
+                >
                   <v-select
                     :items="characteristics"
                     v-model="selectedCharacteristics"
@@ -364,6 +386,7 @@
                   <v-btn
                     class="secondary"
                     data-testid="discard-role-button"
+                    :block="smAndDown"
                     >{{ $t('admin.role.discard') }}</v-btn
                   >
                 </v-col>
@@ -375,6 +398,7 @@
                     type="submit"
                     class="primary button"
                     data-testid="create-role-button"
+                    :block="smAndDown"
                   >
                     {{ $t('admin.role.create') }}
                   </v-btn>
@@ -389,17 +413,16 @@
 </template>
 
 <style>
-  .v-select {
-    width: 310px;  
-  }
-
-  .v-text-field {
-    width: 310px;
-  }
-
   @media (min-width: 960px) {
     .md-text-right {
       text-align: right;
+    }
+    .v-select {
+      width: 310px;
+    }
+
+    .v-text-field {
+      width: 310px;
     }
   }
 </style>
