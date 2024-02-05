@@ -28,9 +28,7 @@
           :ripple="false"
           variant="text"
         >
-          <span
-            v-if="showCloseText"
-          >
+          <span v-if="showCloseText">
             {{ $t('close') }}
           </span>
           <template #append>

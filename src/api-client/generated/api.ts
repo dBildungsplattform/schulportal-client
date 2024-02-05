@@ -12,16 +12,15 @@
  * Do not edit the class manually.
  */
 
-
-import type { Configuration } from './configuration';
-import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
-import globalAxios from 'axios';
+import type { Configuration } from './configuration'
+import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios'
+import globalAxios from 'axios'
 // Some imports not used depending on template conditions
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from './common';
 import type { RequestArgs } from './base';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError } from './base';
+import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError } from './base'
 
 /**
  * 
@@ -34,37 +33,37 @@ export interface CreateOrganisationBodyParams {
      * @type {string}
      * @memberof CreateOrganisationBodyParams
      */
-    'kennung': string;
+  kennung: string
     /**
      * 
      * @type {string}
      * @memberof CreateOrganisationBodyParams
      */
-    'name': string;
+  name: string
     /**
      * 
      * @type {string}
      * @memberof CreateOrganisationBodyParams
      */
-    'namensergaenzung': string;
+  namensergaenzung: string
     /**
      * 
      * @type {string}
      * @memberof CreateOrganisationBodyParams
      */
-    'kuerzel': string;
+  kuerzel: string
     /**
      * 
      * @type {string}
      * @memberof CreateOrganisationBodyParams
      */
-    'typ': CreateOrganisationBodyParamsTypEnum;
+  typ: CreateOrganisationBodyParamsTypEnum
     /**
      * 
      * @type {string}
      * @memberof CreateOrganisationBodyParams
      */
-    'traegerschaft'?: CreateOrganisationBodyParamsTraegerschaftEnum;
+  traegerschaft?: CreateOrganisationBodyParamsTraegerschaftEnum
 }
 
 export const CreateOrganisationBodyParamsTypEnum = {
@@ -72,9 +71,10 @@ export const CreateOrganisationBodyParamsTypEnum = {
     Anbieter: 'ANBIETER',
     SonstigeOrganisationEinrichtung: 'SONSTIGE ORGANISATION / EINRICHTUNG',
     Unbestaetigt: 'UNBESTAETIGT'
-} as const;
+} as const
 
-export type CreateOrganisationBodyParamsTypEnum = typeof CreateOrganisationBodyParamsTypEnum[keyof typeof CreateOrganisationBodyParamsTypEnum];
+export type CreateOrganisationBodyParamsTypEnum =
+  (typeof CreateOrganisationBodyParamsTypEnum)[keyof typeof CreateOrganisationBodyParamsTypEnum]
 export const CreateOrganisationBodyParamsTraegerschaftEnum = {
     _01: '01',
     _02: '02',
@@ -82,9 +82,10 @@ export const CreateOrganisationBodyParamsTraegerschaftEnum = {
     _04: '04',
     _05: '05',
     _06: '06'
-} as const;
+} as const
 
-export type CreateOrganisationBodyParamsTraegerschaftEnum = typeof CreateOrganisationBodyParamsTraegerschaftEnum[keyof typeof CreateOrganisationBodyParamsTraegerschaftEnum];
+export type CreateOrganisationBodyParamsTraegerschaftEnum =
+  (typeof CreateOrganisationBodyParamsTraegerschaftEnum)[keyof typeof CreateOrganisationBodyParamsTraegerschaftEnum]
 
 /**
  * 
@@ -97,61 +98,61 @@ export interface CreatePersonBodyParams {
      * @type {string}
      * @memberof CreatePersonBodyParams
      */
-    'email'?: string;
+  email?: string
     /**
      * 
      * @type {string}
      * @memberof CreatePersonBodyParams
      */
-    'referrer'?: string;
+  referrer?: string
     /**
      * 
      * @type {string}
      * @memberof CreatePersonBodyParams
      */
-    'mandant': string;
+  mandant: string
     /**
      * 
      * @type {string}
      * @memberof CreatePersonBodyParams
      */
-    'stammorganisation'?: string;
+  stammorganisation?: string
     /**
      * 
      * @type {PersonNameParams}
      * @memberof CreatePersonBodyParams
      */
-    'name': PersonNameParams;
+  name: PersonNameParams
     /**
      * 
      * @type {PersonBirthParams}
      * @memberof CreatePersonBodyParams
      */
-    'geburt'?: PersonBirthParams;
+  geburt?: PersonBirthParams
     /**
      * 
      * @type {string}
      * @memberof CreatePersonBodyParams
      */
-    'geschlecht'?: CreatePersonBodyParamsGeschlechtEnum;
+  geschlecht?: CreatePersonBodyParamsGeschlechtEnum
     /**
      * 
      * @type {string}
      * @memberof CreatePersonBodyParams
      */
-    'lokalisierung'?: string;
+  lokalisierung?: string
     /**
      * 
      * @type {string}
      * @memberof CreatePersonBodyParams
      */
-    'vertrauensstufe'?: CreatePersonBodyParamsVertrauensstufeEnum;
+  vertrauensstufe?: CreatePersonBodyParamsVertrauensstufeEnum
     /**
      * 
      * @type {boolean}
      * @memberof CreatePersonBodyParams
      */
-    'auskunftssperre'?: boolean;
+  auskunftssperre?: boolean
 }
 
 export const CreatePersonBodyParamsGeschlechtEnum = {
@@ -159,17 +160,19 @@ export const CreatePersonBodyParamsGeschlechtEnum = {
     W: 'w',
     D: 'd',
     X: 'x'
-} as const;
+} as const
 
-export type CreatePersonBodyParamsGeschlechtEnum = typeof CreatePersonBodyParamsGeschlechtEnum[keyof typeof CreatePersonBodyParamsGeschlechtEnum];
+export type CreatePersonBodyParamsGeschlechtEnum =
+  (typeof CreatePersonBodyParamsGeschlechtEnum)[keyof typeof CreatePersonBodyParamsGeschlechtEnum]
 export const CreatePersonBodyParamsVertrauensstufeEnum = {
     Kein: 'KEIN',
     Unbe: 'UNBE',
     Teil: 'TEIL',
     Voll: 'VOLL'
-} as const;
+} as const
 
-export type CreatePersonBodyParamsVertrauensstufeEnum = typeof CreatePersonBodyParamsVertrauensstufeEnum[keyof typeof CreatePersonBodyParamsVertrauensstufeEnum];
+export type CreatePersonBodyParamsVertrauensstufeEnum =
+  (typeof CreatePersonBodyParamsVertrauensstufeEnum)[keyof typeof CreatePersonBodyParamsVertrauensstufeEnum]
 
 /**
  * 
@@ -182,25 +185,25 @@ export interface CreatePersonenkontextBodyParams {
      * @type {string}
      * @memberof CreatePersonenkontextBodyParams
      */
-    'referrer'?: string;
+  referrer?: string
     /**
      * 
      * @type {string}
      * @memberof CreatePersonenkontextBodyParams
      */
-    'rolle': CreatePersonenkontextBodyParamsRolleEnum;
+  rolle: CreatePersonenkontextBodyParamsRolleEnum
     /**
      * 
      * @type {string}
      * @memberof CreatePersonenkontextBodyParams
      */
-    'personenstatus'?: CreatePersonenkontextBodyParamsPersonenstatusEnum;
+  personenstatus?: CreatePersonenkontextBodyParamsPersonenstatusEnum
     /**
      * 
      * @type {string}
      * @memberof CreatePersonenkontextBodyParams
      */
-    'jahrgangsstufe'?: CreatePersonenkontextBodyParamsJahrgangsstufeEnum;
+  jahrgangsstufe?: CreatePersonenkontextBodyParamsJahrgangsstufeEnum
 }
 
 export const CreatePersonenkontextBodyParamsRolleEnum = {
@@ -210,14 +213,16 @@ export const CreatePersonenkontextBodyParamsRolleEnum = {
     Orgadmin: 'ORGADMIN',
     Leit: 'LEIT',
     Sysadmin: 'SYSADMIN'
-} as const;
+} as const
 
-export type CreatePersonenkontextBodyParamsRolleEnum = typeof CreatePersonenkontextBodyParamsRolleEnum[keyof typeof CreatePersonenkontextBodyParamsRolleEnum];
+export type CreatePersonenkontextBodyParamsRolleEnum =
+  (typeof CreatePersonenkontextBodyParamsRolleEnum)[keyof typeof CreatePersonenkontextBodyParamsRolleEnum]
 export const CreatePersonenkontextBodyParamsPersonenstatusEnum = {
     Aktiv: 'AKTIV'
-} as const;
+} as const
 
-export type CreatePersonenkontextBodyParamsPersonenstatusEnum = typeof CreatePersonenkontextBodyParamsPersonenstatusEnum[keyof typeof CreatePersonenkontextBodyParamsPersonenstatusEnum];
+export type CreatePersonenkontextBodyParamsPersonenstatusEnum =
+  (typeof CreatePersonenkontextBodyParamsPersonenstatusEnum)[keyof typeof CreatePersonenkontextBodyParamsPersonenstatusEnum]
 export const CreatePersonenkontextBodyParamsJahrgangsstufeEnum = {
     _01: '01',
     _02: '02',
@@ -229,9 +234,10 @@ export const CreatePersonenkontextBodyParamsJahrgangsstufeEnum = {
     _08: '08',
     _09: '09',
     _10: '10'
-} as const;
+} as const
 
-export type CreatePersonenkontextBodyParamsJahrgangsstufeEnum = typeof CreatePersonenkontextBodyParamsJahrgangsstufeEnum[keyof typeof CreatePersonenkontextBodyParamsJahrgangsstufeEnum];
+export type CreatePersonenkontextBodyParamsJahrgangsstufeEnum =
+  (typeof CreatePersonenkontextBodyParamsJahrgangsstufeEnum)[keyof typeof CreatePersonenkontextBodyParamsJahrgangsstufeEnum]
 
 /**
  * 
@@ -244,13 +250,26 @@ export interface CreateRolleBodyParams {
      * @type {string}
      * @memberof CreateRolleBodyParams
      */
-    'name': string;
+  name: string
     /**
      * 
      * @type {string}
      * @memberof CreateRolleBodyParams
      */
-    'administeredBySchulstrukturknoten': string;
+  administeredBySchulstrukturknoten: string
+}
+/**
+ *
+ * @export
+ * @interface DeleteRevisionBodyParams
+ */
+export interface DeleteRevisionBodyParams {
+  /**
+   * The revision of a personenkontext.
+   * @type {string}
+   * @memberof DeleteRevisionBodyParams
+   */
+  revision: string
 }
 /**
  * 
@@ -263,7 +282,7 @@ export interface LoeschungResponse {
      * @type {string}
      * @memberof LoeschungResponse
      */
-    'zeitpunkt': string;
+  zeitpunkt: string
 }
 /**
  * 
@@ -276,37 +295,37 @@ export interface OrganisationResponse {
      * @type {string}
      * @memberof OrganisationResponse
      */
-    'id': string;
+  id: string
     /**
      * 
      * @type {string}
      * @memberof OrganisationResponse
      */
-    'kennung': string;
+  kennung: string
     /**
      * 
      * @type {string}
      * @memberof OrganisationResponse
      */
-    'name': string;
+  name: string
     /**
      * 
      * @type {string}
      * @memberof OrganisationResponse
      */
-    'namensergaenzung': string;
+  namensergaenzung: string
     /**
      * 
      * @type {string}
      * @memberof OrganisationResponse
      */
-    'kuerzel': string;
+  kuerzel: string
     /**
      * 
      * @type {string}
      * @memberof OrganisationResponse
      */
-    'typ': OrganisationResponseTypEnum;
+  typ: OrganisationResponseTypEnum
 }
 
 export const OrganisationResponseTypEnum = {
@@ -314,9 +333,10 @@ export const OrganisationResponseTypEnum = {
     Anbieter: 'ANBIETER',
     SonstigeOrganisationEinrichtung: 'SONSTIGE ORGANISATION / EINRICHTUNG',
     Unbestaetigt: 'UNBESTAETIGT'
-} as const;
+} as const
 
-export type OrganisationResponseTypEnum = typeof OrganisationResponseTypEnum[keyof typeof OrganisationResponseTypEnum];
+export type OrganisationResponseTypEnum =
+  (typeof OrganisationResponseTypEnum)[keyof typeof OrganisationResponseTypEnum]
 
 /**
  * 
@@ -329,13 +349,13 @@ export interface PersonBirthParams {
      * @type {string}
      * @memberof PersonBirthParams
      */
-    'datum'?: string;
+  datum?: string
     /**
      * 
      * @type {string}
      * @memberof PersonBirthParams
      */
-    'geburtsort'?: string;
+  geburtsort?: string
 }
 /**
  * 
@@ -348,25 +368,25 @@ export interface PersonFrontendControllerFindPersons200Response {
      * @type {number}
      * @memberof PersonFrontendControllerFindPersons200Response
      */
-    'total': number;
+  total: number
     /**
      * 
      * @type {number}
      * @memberof PersonFrontendControllerFindPersons200Response
      */
-    'offset': number;
+  offset: number
     /**
      * 
      * @type {number}
      * @memberof PersonFrontendControllerFindPersons200Response
      */
-    'limit': number;
+  limit: number
     /**
      * 
      * @type {Array<PersonendatensatzResponse>}
      * @memberof PersonFrontendControllerFindPersons200Response
      */
-    'items': Array<PersonendatensatzResponse>;
+  items: Array<PersonendatensatzResponse>
 }
 /**
  * 
@@ -379,7 +399,7 @@ export interface PersonFrontendControllerFindPersons200ResponseAllOf {
      * @type {Array<PersonendatensatzResponse>}
      * @memberof PersonFrontendControllerFindPersons200ResponseAllOf
      */
-    'items': Array<PersonendatensatzResponse>;
+  items: Array<PersonendatensatzResponse>
 }
 /**
  * 
@@ -392,61 +412,61 @@ export interface PersonNameParams {
      * @type {string}
      * @memberof PersonNameParams
      */
-    'familienname': string;
+  familienname: string
     /**
      * 
      * @type {string}
      * @memberof PersonNameParams
      */
-    'vorname': string;
+  vorname: string
     /**
      * 
      * @type {string}
      * @memberof PersonNameParams
      */
-    'initialenfamilienname'?: string;
+  initialenfamilienname?: string
     /**
      * 
      * @type {string}
      * @memberof PersonNameParams
      */
-    'initialenvorname'?: string;
+  initialenvorname?: string
     /**
      * 
      * @type {string}
      * @memberof PersonNameParams
      */
-    'rufname'?: string;
+  rufname?: string
     /**
      * 
      * @type {string}
      * @memberof PersonNameParams
      */
-    'titel'?: string;
+  titel?: string
     /**
      * 
      * @type {Array<string>}
      * @memberof PersonNameParams
      */
-    'anrede'?: Array<string>;
+  anrede?: Array<string>
     /**
      * 
      * @type {Array<string>}
      * @memberof PersonNameParams
      */
-    'namenssuffix'?: Array<string>;
+  namenssuffix?: Array<string>
     /**
      * 
      * @type {Array<string>}
      * @memberof PersonNameParams
      */
-    'namenspraefix'?: Array<string>;
+  namenspraefix?: Array<string>
     /**
      * 
      * @type {string}
      * @memberof PersonNameParams
      */
-    'sortierindex'?: string;
+  sortierindex?: string
 }
 /**
  * 
@@ -459,67 +479,67 @@ export interface PersonResponse {
      * @type {string}
      * @memberof PersonResponse
      */
-    'id': string;
+  id: string
     /**
      * 
      * @type {string}
      * @memberof PersonResponse
      */
-    'referrer': string;
+  referrer: string
     /**
      * 
      * @type {string}
      * @memberof PersonResponse
      */
-    'mandant': string;
+  mandant: string
     /**
      * 
      * @type {PersonNameParams}
      * @memberof PersonResponse
      */
-    'name': PersonNameParams;
+  name: PersonNameParams
     /**
      * 
      * @type {PersonBirthParams}
      * @memberof PersonResponse
      */
-    'geburt': PersonBirthParams;
+  geburt: PersonBirthParams
     /**
      * 
      * @type {string}
      * @memberof PersonResponse
      */
-    'stammorganisation': string;
+  stammorganisation: string
     /**
      * 
      * @type {string}
      * @memberof PersonResponse
      */
-    'geschlecht': string;
+  geschlecht: string
     /**
      * 
      * @type {string}
      * @memberof PersonResponse
      */
-    'lokalisierung': string;
+  lokalisierung: string
     /**
      * 
      * @type {string}
      * @memberof PersonResponse
      */
-    'vertrauensstufe': PersonResponseVertrauensstufeEnum;
+  vertrauensstufe: PersonResponseVertrauensstufeEnum
     /**
      * 
      * @type {string}
      * @memberof PersonResponse
      */
-    'revision': string;
+  revision: string
     /**
      * Initiales Benutzerpasswort, muss nach der ersten Anmeldung geändert werden
      * @type {string}
      * @memberof PersonResponse
      */
-    'startpasswort': string;
+  startpasswort: string
 }
 
 export const PersonResponseVertrauensstufeEnum = {
@@ -527,9 +547,10 @@ export const PersonResponseVertrauensstufeEnum = {
     Unbe: 'UNBE',
     Teil: 'TEIL',
     Voll: 'VOLL'
-} as const;
+} as const
 
-export type PersonResponseVertrauensstufeEnum = typeof PersonResponseVertrauensstufeEnum[keyof typeof PersonResponseVertrauensstufeEnum];
+export type PersonResponseVertrauensstufeEnum =
+  (typeof PersonResponseVertrauensstufeEnum)[keyof typeof PersonResponseVertrauensstufeEnum]
 
 /**
  * 
@@ -542,13 +563,13 @@ export interface PersonendatensatzResponse {
      * @type {PersonResponse}
      * @memberof PersonendatensatzResponse
      */
-    'person': PersonResponse;
+  person: PersonResponse
     /**
      * 
      * @type {Array<PersonenkontextResponse>}
      * @memberof PersonendatensatzResponse
      */
-    'personenkontexte': Array<PersonenkontextResponse>;
+  personenkontexte: Array<PersonenkontextResponse>
 }
 /**
  * 
@@ -561,61 +582,61 @@ export interface PersonenkontextResponse {
      * @type {string}
      * @memberof PersonenkontextResponse
      */
-    'id': string;
+  id: string
     /**
      * 
      * @type {string}
      * @memberof PersonenkontextResponse
      */
-    'referrer': string;
+  referrer: string
     /**
      * 
      * @type {string}
      * @memberof PersonenkontextResponse
      */
-    'mandant': string;
+  mandant: string
     /**
      * 
      * @type {object}
      * @memberof PersonenkontextResponse
      */
-    'organisation': object;
+  organisation: object
     /**
      * 
      * @type {string}
      * @memberof PersonenkontextResponse
      */
-    'rolle': string;
+  rolle: string
     /**
      * 
      * @type {string}
      * @memberof PersonenkontextResponse
      */
-    'personenstatus': string;
+  personenstatus: string
     /**
      * 
      * @type {string}
      * @memberof PersonenkontextResponse
      */
-    'jahrgangsstufe': string;
+  jahrgangsstufe: string
     /**
      * 
      * @type {string}
      * @memberof PersonenkontextResponse
      */
-    'sichtfreigabe': string;
+  sichtfreigabe: string
     /**
      * 
      * @type {LoeschungResponse}
      * @memberof PersonenkontextResponse
      */
-    'loeschung': LoeschungResponse;
+  loeschung: LoeschungResponse
     /**
      * 
      * @type {string}
      * @memberof PersonenkontextResponse
      */
-    'revision': string;
+  revision: string
 }
 /**
  * 
@@ -628,25 +649,25 @@ export interface RawPagedResponse {
      * @type {number}
      * @memberof RawPagedResponse
      */
-    'total': number;
+  total: number
     /**
      * 
      * @type {number}
      * @memberof RawPagedResponse
      */
-    'offset': number;
+  offset: number
     /**
      * 
      * @type {number}
      * @memberof RawPagedResponse
      */
-    'limit': number;
+  limit: number
     /**
      * 
      * @type {Array<string>}
      * @memberof RawPagedResponse
      */
-    'items': Array<string>;
+  items: Array<string>
 }
 /**
  * 
@@ -659,31 +680,31 @@ export interface RolleResponse {
      * @type {string}
      * @memberof RolleResponse
      */
-    'id': string;
+  id: string
     /**
      * 
      * @type {string}
      * @memberof RolleResponse
      */
-    'createdAt': string;
+  createdAt: string
     /**
      * 
      * @type {string}
      * @memberof RolleResponse
      */
-    'updatedAt': string;
+  updatedAt: string
     /**
      * 
      * @type {string}
      * @memberof RolleResponse
      */
-    'name': string;
+  name: string
     /**
      * 
      * @type {string}
      * @memberof RolleResponse
      */
-    'administeredBySchulstrukturknoten': string;
+  administeredBySchulstrukturknoten: string
 }
 /**
  * 
@@ -696,19 +717,19 @@ export interface ServiceProviderInfoResponse {
      * @type {string}
      * @memberof ServiceProviderInfoResponse
      */
-    'id': string;
+  id: string
     /**
      * 
      * @type {string}
      * @memberof ServiceProviderInfoResponse
      */
-    'name': string;
+  name: string
     /**
      * 
      * @type {string}
      * @memberof ServiceProviderInfoResponse
      */
-    'url': string;
+  url: string
 }
 /**
  * 
@@ -721,55 +742,55 @@ export interface UpdatePersonBodyParams {
      * @type {string}
      * @memberof UpdatePersonBodyParams
      */
-    'referrer'?: string;
+  referrer?: string
     /**
      * 
      * @type {string}
      * @memberof UpdatePersonBodyParams
      */
-    'stammorganisation'?: string;
+  stammorganisation?: string
     /**
      * 
      * @type {PersonNameParams}
      * @memberof UpdatePersonBodyParams
      */
-    'name': PersonNameParams;
+  name: PersonNameParams
     /**
      * 
      * @type {PersonBirthParams}
      * @memberof UpdatePersonBodyParams
      */
-    'geburt'?: PersonBirthParams;
+  geburt?: PersonBirthParams
     /**
      * 
      * @type {string}
      * @memberof UpdatePersonBodyParams
      */
-    'geschlecht'?: UpdatePersonBodyParamsGeschlechtEnum;
+  geschlecht?: UpdatePersonBodyParamsGeschlechtEnum
     /**
      * 
      * @type {string}
      * @memberof UpdatePersonBodyParams
      */
-    'lokalisierung'?: string;
+  lokalisierung?: string
     /**
      * 
      * @type {string}
      * @memberof UpdatePersonBodyParams
      */
-    'vertrauensstufe'?: UpdatePersonBodyParamsVertrauensstufeEnum;
+  vertrauensstufe?: UpdatePersonBodyParamsVertrauensstufeEnum
     /**
      * 
      * @type {boolean}
      * @memberof UpdatePersonBodyParams
      */
-    'auskunftssperre'?: boolean;
+  auskunftssperre?: boolean
     /**
      * 
      * @type {string}
      * @memberof UpdatePersonBodyParams
      */
-    'revision': string;
+  revision: string
 }
 
 export const UpdatePersonBodyParamsGeschlechtEnum = {
@@ -777,17 +798,19 @@ export const UpdatePersonBodyParamsGeschlechtEnum = {
     W: 'w',
     D: 'd',
     X: 'x'
-} as const;
+} as const
 
-export type UpdatePersonBodyParamsGeschlechtEnum = typeof UpdatePersonBodyParamsGeschlechtEnum[keyof typeof UpdatePersonBodyParamsGeschlechtEnum];
+export type UpdatePersonBodyParamsGeschlechtEnum =
+  (typeof UpdatePersonBodyParamsGeschlechtEnum)[keyof typeof UpdatePersonBodyParamsGeschlechtEnum]
 export const UpdatePersonBodyParamsVertrauensstufeEnum = {
     Kein: 'KEIN',
     Unbe: 'UNBE',
     Teil: 'TEIL',
     Voll: 'VOLL'
-} as const;
+} as const
 
-export type UpdatePersonBodyParamsVertrauensstufeEnum = typeof UpdatePersonBodyParamsVertrauensstufeEnum[keyof typeof UpdatePersonBodyParamsVertrauensstufeEnum];
+export type UpdatePersonBodyParamsVertrauensstufeEnum =
+  (typeof UpdatePersonBodyParamsVertrauensstufeEnum)[keyof typeof UpdatePersonBodyParamsVertrauensstufeEnum]
 
 /**
  * 
@@ -800,32 +823,33 @@ export interface UpdatePersonenkontextBodyParams {
      * @type {string}
      * @memberof UpdatePersonenkontextBodyParams
      */
-    'referrer'?: string;
+  referrer?: string
     /**
      * The new personenstatus of the personenkontext.
      * @type {string}
      * @memberof UpdatePersonenkontextBodyParams
      */
-    'personenstatus'?: UpdatePersonenkontextBodyParamsPersonenstatusEnum;
+  personenstatus?: UpdatePersonenkontextBodyParamsPersonenstatusEnum
     /**
      * The new jahrgangsstufe of the personenkontext.
      * @type {string}
      * @memberof UpdatePersonenkontextBodyParams
      */
-    'jahrgangsstufe'?: UpdatePersonenkontextBodyParamsJahrgangsstufeEnum;
+  jahrgangsstufe?: UpdatePersonenkontextBodyParamsJahrgangsstufeEnum
     /**
      * The revision of the personenkontext.
      * @type {string}
      * @memberof UpdatePersonenkontextBodyParams
      */
-    'revision': string;
+  revision: string
 }
 
 export const UpdatePersonenkontextBodyParamsPersonenstatusEnum = {
     Aktiv: 'AKTIV'
-} as const;
+} as const
 
-export type UpdatePersonenkontextBodyParamsPersonenstatusEnum = typeof UpdatePersonenkontextBodyParamsPersonenstatusEnum[keyof typeof UpdatePersonenkontextBodyParamsPersonenstatusEnum];
+export type UpdatePersonenkontextBodyParamsPersonenstatusEnum =
+  (typeof UpdatePersonenkontextBodyParamsPersonenstatusEnum)[keyof typeof UpdatePersonenkontextBodyParamsPersonenstatusEnum]
 export const UpdatePersonenkontextBodyParamsJahrgangsstufeEnum = {
     _01: '01',
     _02: '02',
@@ -837,9 +861,10 @@ export const UpdatePersonenkontextBodyParamsJahrgangsstufeEnum = {
     _08: '08',
     _09: '09',
     _10: '10'
-} as const;
+} as const
 
-export type UpdatePersonenkontextBodyParamsJahrgangsstufeEnum = typeof UpdatePersonenkontextBodyParamsJahrgangsstufeEnum[keyof typeof UpdatePersonenkontextBodyParamsJahrgangsstufeEnum];
+export type UpdatePersonenkontextBodyParamsJahrgangsstufeEnum =
+  (typeof UpdatePersonenkontextBodyParamsJahrgangsstufeEnum)[keyof typeof UpdatePersonenkontextBodyParamsJahrgangsstufeEnum]
 
 /**
  * 
@@ -852,109 +877,109 @@ export interface UserinfoResponse {
      * @type {string}
      * @memberof UserinfoResponse
      */
-    'sub': string;
+  sub: string
     /**
      * 
      * @type {string}
      * @memberof UserinfoResponse
      */
-    'name': string | null;
+  name: string | null
     /**
      * 
      * @type {string}
      * @memberof UserinfoResponse
      */
-    'given_name': string | null;
+  given_name: string | null
     /**
      * 
      * @type {string}
      * @memberof UserinfoResponse
      */
-    'family_name': string | null;
+  family_name: string | null
     /**
      * 
      * @type {string}
      * @memberof UserinfoResponse
      */
-    'middle_name': string | null;
+  middle_name: string | null
     /**
      * 
      * @type {string}
      * @memberof UserinfoResponse
      */
-    'nickname': string | null;
+  nickname: string | null
     /**
      * 
      * @type {string}
      * @memberof UserinfoResponse
      */
-    'preferred_username': string | null;
+  preferred_username: string | null
     /**
      * 
      * @type {string}
      * @memberof UserinfoResponse
      */
-    'profile': string | null;
+  profile: string | null
     /**
      * 
      * @type {string}
      * @memberof UserinfoResponse
      */
-    'picture': string | null;
+  picture: string | null
     /**
      * 
      * @type {string}
      * @memberof UserinfoResponse
      */
-    'website': string | null;
+  website: string | null
     /**
      * 
      * @type {string}
      * @memberof UserinfoResponse
      */
-    'email': string | null;
+  email: string | null
     /**
      * 
      * @type {boolean}
      * @memberof UserinfoResponse
      */
-    'email_verified': boolean | null;
+  email_verified: boolean | null
     /**
      * 
      * @type {string}
      * @memberof UserinfoResponse
      */
-    'gender': string | null;
+  gender: string | null
     /**
      * 
      * @type {string}
      * @memberof UserinfoResponse
      */
-    'birthdate': string | null;
+  birthdate: string | null
     /**
      * 
      * @type {string}
      * @memberof UserinfoResponse
      */
-    'zoneinfo': string | null;
+  zoneinfo: string | null
     /**
      * 
      * @type {string}
      * @memberof UserinfoResponse
      */
-    'locale': string | null;
+  locale: string | null
     /**
      * 
      * @type {string}
      * @memberof UserinfoResponse
      */
-    'phone_number': string | null;
+  phone_number: string | null
     /**
      * 
      * @type {number}
      * @memberof UserinfoResponse
      */
-    'updated_at': number | null;
+  updated_at: number | null
 }
 
 /**
@@ -969,29 +994,33 @@ export const AuthApiAxiosParamCreator = function (configuration?: Configuration)
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        authenticationControllerInfo: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/auth/logininfo`;
+    authenticationControllerInfo: async (
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
+      const localVarPath = `/api/auth/logininfo`
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
+      let baseOptions
             if (configuration) {
-                baseOptions = configuration.baseOptions;
+        baseOptions = configuration.baseOptions
             }
 
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
+      const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options }
+      const localVarHeaderParameter = {} as any
+      const localVarQueryParameter = {} as any
     
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+      setSearchParams(localVarUrlObj, localVarQueryParameter)
+      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers
+      }
 
             return {
                 url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
+        options: localVarRequestOptions
+      }
         },
         /**
          * 
@@ -1000,33 +1029,38 @@ export const AuthApiAxiosParamCreator = function (configuration?: Configuration)
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        authenticationControllerLogin: async (redirectUrl?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/auth/login`;
+    authenticationControllerLogin: async (
+      redirectUrl?: string,
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
+      const localVarPath = `/api/auth/login`
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
+      let baseOptions
             if (configuration) {
-                baseOptions = configuration.baseOptions;
+        baseOptions = configuration.baseOptions
             }
 
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
+      const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options }
+      const localVarHeaderParameter = {} as any
+      const localVarQueryParameter = {} as any
 
             if (redirectUrl !== undefined) {
-                localVarQueryParameter['redirectUrl'] = redirectUrl;
-            }
-
-
+        localVarQueryParameter['redirectUrl'] = redirectUrl
+      }
     
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+      setSearchParams(localVarUrlObj, localVarQueryParameter)
+      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers
+      }
 
             return {
                 url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
+        options: localVarRequestOptions
+      }
         },
         /**
          * 
@@ -1034,38 +1068,42 @@ export const AuthApiAxiosParamCreator = function (configuration?: Configuration)
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        authenticationControllerLogout: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/auth/logout`;
+    authenticationControllerLogout: async (
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
+      const localVarPath = `/api/auth/logout`
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
+      let baseOptions
             if (configuration) {
-                baseOptions = configuration.baseOptions;
+        baseOptions = configuration.baseOptions
             }
 
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
+      const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options }
+      const localVarHeaderParameter = {} as any
+      const localVarQueryParameter = {} as any
     
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+      setSearchParams(localVarUrlObj, localVarQueryParameter)
+      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers
+      }
 
             return {
                 url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
+        options: localVarRequestOptions
     }
-};
+    }
+  }
+}
 
 /**
  * AuthApi - functional programming interface
  * @export
  */
-export const AuthApiFp = function(configuration?: Configuration) {
+export const AuthApiFp = function (configuration?: Configuration) {
     const localVarAxiosParamCreator = AuthApiAxiosParamCreator(configuration)
     return {
         /**
@@ -1074,9 +1112,12 @@ export const AuthApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async authenticationControllerInfo(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UserinfoResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.authenticationControllerInfo(options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+    async authenticationControllerInfo(
+      options?: AxiosRequestConfig
+    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UserinfoResponse>> {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.authenticationControllerInfo(options)
+      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
         },
         /**
          * 
@@ -1085,9 +1126,15 @@ export const AuthApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async authenticationControllerLogin(redirectUrl?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.authenticationControllerLogin(redirectUrl, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+    async authenticationControllerLogin(
+      redirectUrl?: string,
+      options?: AxiosRequestConfig
+    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+      const localVarAxiosArgs = await localVarAxiosParamCreator.authenticationControllerLogin(
+        redirectUrl,
+        options
+      )
+      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
         },
         /**
          * 
@@ -1095,18 +1142,25 @@ export const AuthApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async authenticationControllerLogout(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.authenticationControllerLogout(options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
+    async authenticationControllerLogout(
+      options?: AxiosRequestConfig
+    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.authenticationControllerLogout(options)
+      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
     }
-};
+    }
+}
 
 /**
  * AuthApi - factory interface
  * @export
  */
-export const AuthApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+export const AuthApiFactory = function (
+  configuration?: Configuration,
+  basePath?: string,
+  axios?: AxiosInstance
+) {
     const localVarFp = AuthApiFp(configuration)
     return {
         /**
@@ -1116,7 +1170,9 @@ export const AuthApiFactory = function (configuration?: Configuration, basePath?
          * @throws {RequiredError}
          */
         authenticationControllerInfo(options?: any): AxiosPromise<UserinfoResponse> {
-            return localVarFp.authenticationControllerInfo(options).then((request) => request(axios, basePath));
+      return localVarFp
+        .authenticationControllerInfo(options)
+        .then((request) => request(axios, basePath))
         },
         /**
          * 
@@ -1126,7 +1182,9 @@ export const AuthApiFactory = function (configuration?: Configuration, basePath?
          * @throws {RequiredError}
          */
         authenticationControllerLogin(redirectUrl?: string, options?: any): AxiosPromise<void> {
-            return localVarFp.authenticationControllerLogin(redirectUrl, options).then((request) => request(axios, basePath));
+      return localVarFp
+        .authenticationControllerLogin(redirectUrl, options)
+        .then((request) => request(axios, basePath))
         },
         /**
          * 
@@ -1135,10 +1193,12 @@ export const AuthApiFactory = function (configuration?: Configuration, basePath?
          * @throws {RequiredError}
          */
         authenticationControllerLogout(options?: any): AxiosPromise<void> {
-            return localVarFp.authenticationControllerLogout(options).then((request) => request(axios, basePath));
-        },
-    };
-};
+      return localVarFp
+        .authenticationControllerLogout(options)
+        .then((request) => request(axios, basePath))
+    }
+  }
+}
 
 /**
  * AuthApi - interface
@@ -1153,7 +1213,7 @@ export interface AuthApiInterface {
      * @throws {RequiredError}
      * @memberof AuthApiInterface
      */
-    authenticationControllerInfo(options?: AxiosRequestConfig): AxiosPromise<UserinfoResponse>;
+  authenticationControllerInfo(options?: AxiosRequestConfig): AxiosPromise<UserinfoResponse>
 
     /**
      * 
@@ -1163,7 +1223,10 @@ export interface AuthApiInterface {
      * @throws {RequiredError}
      * @memberof AuthApiInterface
      */
-    authenticationControllerLogin(redirectUrl?: string, options?: AxiosRequestConfig): AxiosPromise<void>;
+  authenticationControllerLogin(
+    redirectUrl?: string,
+    options?: AxiosRequestConfig
+  ): AxiosPromise<void>
 
     /**
      * 
@@ -1172,8 +1235,7 @@ export interface AuthApiInterface {
      * @throws {RequiredError}
      * @memberof AuthApiInterface
      */
-    authenticationControllerLogout(options?: AxiosRequestConfig): AxiosPromise<void>;
-
+  authenticationControllerLogout(options?: AxiosRequestConfig): AxiosPromise<void>
 }
 
 /**
@@ -1191,7 +1253,9 @@ export class AuthApi extends BaseAPI implements AuthApiInterface {
      * @memberof AuthApi
      */
     public authenticationControllerInfo(options?: AxiosRequestConfig) {
-        return AuthApiFp(this.configuration).authenticationControllerInfo(options).then((request) => request(this.axios, this.basePath));
+    return AuthApiFp(this.configuration)
+      .authenticationControllerInfo(options)
+      .then((request) => request(this.axios, this.basePath))
     }
 
     /**
@@ -1203,7 +1267,9 @@ export class AuthApi extends BaseAPI implements AuthApiInterface {
      * @memberof AuthApi
      */
     public authenticationControllerLogin(redirectUrl?: string, options?: AxiosRequestConfig) {
-        return AuthApiFp(this.configuration).authenticationControllerLogin(redirectUrl, options).then((request) => request(this.axios, this.basePath));
+    return AuthApiFp(this.configuration)
+      .authenticationControllerLogin(redirectUrl, options)
+      .then((request) => request(this.axios, this.basePath))
     }
 
     /**
@@ -1214,10 +1280,11 @@ export class AuthApi extends BaseAPI implements AuthApiInterface {
      * @memberof AuthApi
      */
     public authenticationControllerLogout(options?: AxiosRequestConfig) {
-        return AuthApiFp(this.configuration).authenticationControllerLogout(options).then((request) => request(this.axios, this.basePath));
+    return AuthApiFp(this.configuration)
+      .authenticationControllerLogout(options)
+      .then((request) => request(this.axios, this.basePath))
     }
 }
-
 
 /**
  * OrganisationenApi - axios parameter creator
@@ -1231,34 +1298,47 @@ export const OrganisationenApiAxiosParamCreator = function (configuration?: Conf
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        organisationControllerCreateOrganisation: async (createOrganisationBodyParams: CreateOrganisationBodyParams, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+    organisationControllerCreateOrganisation: async (
+      createOrganisationBodyParams: CreateOrganisationBodyParams,
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
             // verify required parameter 'createOrganisationBodyParams' is not null or undefined
-            assertParamExists('organisationControllerCreateOrganisation', 'createOrganisationBodyParams', createOrganisationBodyParams)
-            const localVarPath = `/api/organisationen`;
+      assertParamExists(
+        'organisationControllerCreateOrganisation',
+        'createOrganisationBodyParams',
+        createOrganisationBodyParams
+      )
+      const localVarPath = `/api/organisationen`
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
+      let baseOptions
             if (configuration) {
-                baseOptions = configuration.baseOptions;
+        baseOptions = configuration.baseOptions
             }
 
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
+      const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options }
+      const localVarHeaderParameter = {} as any
+      const localVarQueryParameter = {} as any
     
-            localVarHeaderParameter['Content-Type'] = 'application/json';
+      localVarHeaderParameter['Content-Type'] = 'application/json'
 
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(createOrganisationBodyParams, localVarRequestOptions, configuration)
+      setSearchParams(localVarUrlObj, localVarQueryParameter)
+      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers
+      }
+      localVarRequestOptions.data = serializeDataIfNeeded(
+        createOrganisationBodyParams,
+        localVarRequestOptions,
+        configuration
+      )
 
             return {
                 url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
+        options: localVarRequestOptions
+      }
         },
         /**
          * 
@@ -1266,32 +1346,43 @@ export const OrganisationenApiAxiosParamCreator = function (configuration?: Conf
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        organisationControllerFindOrganisationById: async (organisationId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+    organisationControllerFindOrganisationById: async (
+      organisationId: string,
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
             // verify required parameter 'organisationId' is not null or undefined
-            assertParamExists('organisationControllerFindOrganisationById', 'organisationId', organisationId)
-            const localVarPath = `/api/organisationen/{organisationId}`
-                .replace(`{${"organisationId"}}`, encodeURIComponent(String(organisationId)));
+      assertParamExists(
+        'organisationControllerFindOrganisationById',
+        'organisationId',
+        organisationId
+      )
+      const localVarPath = `/api/organisationen/{organisationId}`.replace(
+        `{${'organisationId'}}`,
+        encodeURIComponent(String(organisationId))
+      )
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
+      let baseOptions
             if (configuration) {
-                baseOptions = configuration.baseOptions;
+        baseOptions = configuration.baseOptions
             }
 
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
+      const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options }
+      const localVarHeaderParameter = {} as any
+      const localVarQueryParameter = {} as any
     
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+      setSearchParams(localVarUrlObj, localVarQueryParameter)
+      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers
+      }
 
             return {
                 url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
+        options: localVarRequestOptions
+      }
         },
         /**
          * 
@@ -1303,58 +1394,67 @@ export const OrganisationenApiAxiosParamCreator = function (configuration?: Conf
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        organisationControllerFindOrganizations: async (offset?: number, limit?: number, kennung?: string, name?: string, typ?: 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/organisationen`;
+    organisationControllerFindOrganizations: async (
+      offset?: number,
+      limit?: number,
+      kennung?: string,
+      name?: string,
+      typ?: 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT',
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
+      const localVarPath = `/api/organisationen`
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
+      let baseOptions
             if (configuration) {
-                baseOptions = configuration.baseOptions;
+        baseOptions = configuration.baseOptions
             }
 
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
+      const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options }
+      const localVarHeaderParameter = {} as any
+      const localVarQueryParameter = {} as any
 
             if (offset !== undefined) {
-                localVarQueryParameter['offset'] = offset;
+        localVarQueryParameter['offset'] = offset
             }
 
             if (limit !== undefined) {
-                localVarQueryParameter['limit'] = limit;
+        localVarQueryParameter['limit'] = limit
             }
 
             if (kennung !== undefined) {
-                localVarQueryParameter['kennung'] = kennung;
+        localVarQueryParameter['kennung'] = kennung
             }
 
             if (name !== undefined) {
-                localVarQueryParameter['name'] = name;
+        localVarQueryParameter['name'] = name
             }
 
             if (typ !== undefined) {
-                localVarQueryParameter['typ'] = typ;
-            }
-
-
+        localVarQueryParameter['typ'] = typ
+      }
     
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+      setSearchParams(localVarUrlObj, localVarQueryParameter)
+      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers
+      }
 
             return {
                 url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
+        options: localVarRequestOptions
     }
-};
+    }
+  }
+}
 
 /**
  * OrganisationenApi - functional programming interface
  * @export
  */
-export const OrganisationenApiFp = function(configuration?: Configuration) {
+export const OrganisationenApiFp = function (configuration?: Configuration) {
     const localVarAxiosParamCreator = OrganisationenApiAxiosParamCreator(configuration)
     return {
         /**
@@ -1363,9 +1463,16 @@ export const OrganisationenApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async organisationControllerCreateOrganisation(createOrganisationBodyParams: CreateOrganisationBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.organisationControllerCreateOrganisation(createOrganisationBodyParams, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+    async organisationControllerCreateOrganisation(
+      createOrganisationBodyParams: CreateOrganisationBodyParams,
+      options?: AxiosRequestConfig
+    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.organisationControllerCreateOrganisation(
+          createOrganisationBodyParams,
+          options
+        )
+      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
         },
         /**
          * 
@@ -1373,9 +1480,16 @@ export const OrganisationenApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async organisationControllerFindOrganisationById(organisationId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.organisationControllerFindOrganisationById(organisationId, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+    async organisationControllerFindOrganisationById(
+      organisationId: string,
+      options?: AxiosRequestConfig
+    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.organisationControllerFindOrganisationById(
+          organisationId,
+          options
+        )
+      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
         },
         /**
          * 
@@ -1387,18 +1501,39 @@ export const OrganisationenApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, typ?: 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<OrganisationResponse>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.organisationControllerFindOrganizations(offset, limit, kennung, name, typ, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
+    async organisationControllerFindOrganizations(
+      offset?: number,
+      limit?: number,
+      kennung?: string,
+      name?: string,
+      typ?: 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT',
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<OrganisationResponse>>
+    > {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.organisationControllerFindOrganizations(
+          offset,
+          limit,
+          kennung,
+          name,
+          typ,
+          options
+        )
+      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
     }
-};
+    }
+}
 
 /**
  * OrganisationenApi - factory interface
  * @export
  */
-export const OrganisationenApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+export const OrganisationenApiFactory = function (
+  configuration?: Configuration,
+  basePath?: string,
+  axios?: AxiosInstance
+) {
     const localVarFp = OrganisationenApiFp(configuration)
     return {
         /**
@@ -1407,8 +1542,13 @@ export const OrganisationenApiFactory = function (configuration?: Configuration,
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        organisationControllerCreateOrganisation(createOrganisationBodyParams: CreateOrganisationBodyParams, options?: any): AxiosPromise<void> {
-            return localVarFp.organisationControllerCreateOrganisation(createOrganisationBodyParams, options).then((request) => request(axios, basePath));
+    organisationControllerCreateOrganisation(
+      createOrganisationBodyParams: CreateOrganisationBodyParams,
+      options?: any
+    ): AxiosPromise<void> {
+      return localVarFp
+        .organisationControllerCreateOrganisation(createOrganisationBodyParams, options)
+        .then((request) => request(axios, basePath))
         },
         /**
          * 
@@ -1416,8 +1556,13 @@ export const OrganisationenApiFactory = function (configuration?: Configuration,
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        organisationControllerFindOrganisationById(organisationId: string, options?: any): AxiosPromise<void> {
-            return localVarFp.organisationControllerFindOrganisationById(organisationId, options).then((request) => request(axios, basePath));
+    organisationControllerFindOrganisationById(
+      organisationId: string,
+      options?: any
+    ): AxiosPromise<void> {
+      return localVarFp
+        .organisationControllerFindOrganisationById(organisationId, options)
+        .then((request) => request(axios, basePath))
         },
         /**
          * 
@@ -1429,11 +1574,20 @@ export const OrganisationenApiFactory = function (configuration?: Configuration,
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, typ?: 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', options?: any): AxiosPromise<Array<OrganisationResponse>> {
-            return localVarFp.organisationControllerFindOrganizations(offset, limit, kennung, name, typ, options).then((request) => request(axios, basePath));
-        },
-    };
-};
+    organisationControllerFindOrganizations(
+      offset?: number,
+      limit?: number,
+      kennung?: string,
+      name?: string,
+      typ?: 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT',
+      options?: any
+    ): AxiosPromise<Array<OrganisationResponse>> {
+      return localVarFp
+        .organisationControllerFindOrganizations(offset, limit, kennung, name, typ, options)
+        .then((request) => request(axios, basePath))
+    }
+  }
+}
 
 /**
  * OrganisationenApi - interface
@@ -1448,7 +1602,10 @@ export interface OrganisationenApiInterface {
      * @throws {RequiredError}
      * @memberof OrganisationenApiInterface
      */
-    organisationControllerCreateOrganisation(createOrganisationBodyParams: CreateOrganisationBodyParams, options?: AxiosRequestConfig): AxiosPromise<void>;
+  organisationControllerCreateOrganisation(
+    createOrganisationBodyParams: CreateOrganisationBodyParams,
+    options?: AxiosRequestConfig
+  ): AxiosPromise<void>
 
     /**
      * 
@@ -1457,7 +1614,10 @@ export interface OrganisationenApiInterface {
      * @throws {RequiredError}
      * @memberof OrganisationenApiInterface
      */
-    organisationControllerFindOrganisationById(organisationId: string, options?: AxiosRequestConfig): AxiosPromise<void>;
+  organisationControllerFindOrganisationById(
+    organisationId: string,
+    options?: AxiosRequestConfig
+  ): AxiosPromise<void>
 
     /**
      * 
@@ -1470,8 +1630,14 @@ export interface OrganisationenApiInterface {
      * @throws {RequiredError}
      * @memberof OrganisationenApiInterface
      */
-    organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, typ?: 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', options?: AxiosRequestConfig): AxiosPromise<Array<OrganisationResponse>>;
-
+  organisationControllerFindOrganizations(
+    offset?: number,
+    limit?: number,
+    kennung?: string,
+    name?: string,
+    typ?: 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT',
+    options?: AxiosRequestConfig
+  ): AxiosPromise<Array<OrganisationResponse>>
 }
 
 /**
@@ -1488,8 +1654,13 @@ export class OrganisationenApi extends BaseAPI implements OrganisationenApiInter
      * @throws {RequiredError}
      * @memberof OrganisationenApi
      */
-    public organisationControllerCreateOrganisation(createOrganisationBodyParams: CreateOrganisationBodyParams, options?: AxiosRequestConfig) {
-        return OrganisationenApiFp(this.configuration).organisationControllerCreateOrganisation(createOrganisationBodyParams, options).then((request) => request(this.axios, this.basePath));
+  public organisationControllerCreateOrganisation(
+    createOrganisationBodyParams: CreateOrganisationBodyParams,
+    options?: AxiosRequestConfig
+  ) {
+    return OrganisationenApiFp(this.configuration)
+      .organisationControllerCreateOrganisation(createOrganisationBodyParams, options)
+      .then((request) => request(this.axios, this.basePath))
     }
 
     /**
@@ -1499,8 +1670,13 @@ export class OrganisationenApi extends BaseAPI implements OrganisationenApiInter
      * @throws {RequiredError}
      * @memberof OrganisationenApi
      */
-    public organisationControllerFindOrganisationById(organisationId: string, options?: AxiosRequestConfig) {
-        return OrganisationenApiFp(this.configuration).organisationControllerFindOrganisationById(organisationId, options).then((request) => request(this.axios, this.basePath));
+  public organisationControllerFindOrganisationById(
+    organisationId: string,
+    options?: AxiosRequestConfig
+  ) {
+    return OrganisationenApiFp(this.configuration)
+      .organisationControllerFindOrganisationById(organisationId, options)
+      .then((request) => request(this.axios, this.basePath))
     }
 
     /**
@@ -1514,11 +1690,19 @@ export class OrganisationenApi extends BaseAPI implements OrganisationenApiInter
      * @throws {RequiredError}
      * @memberof OrganisationenApi
      */
-    public organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, typ?: 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', options?: AxiosRequestConfig) {
-        return OrganisationenApiFp(this.configuration).organisationControllerFindOrganizations(offset, limit, kennung, name, typ, options).then((request) => request(this.axios, this.basePath));
+  public organisationControllerFindOrganizations(
+    offset?: number,
+    limit?: number,
+    kennung?: string,
+    name?: string,
+    typ?: 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT',
+    options?: AxiosRequestConfig
+  ) {
+    return OrganisationenApiFp(this.configuration)
+      .organisationControllerFindOrganizations(offset, limit, kennung, name, typ, options)
+      .then((request) => request(this.axios, this.basePath))
     }
 }
-
 
 /**
  * PersonenApi - axios parameter creator
@@ -1532,34 +1716,47 @@ export const PersonenApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        personControllerCreatePerson: async (createPersonBodyParams: CreatePersonBodyParams, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+    personControllerCreatePerson: async (
+      createPersonBodyParams: CreatePersonBodyParams,
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
             // verify required parameter 'createPersonBodyParams' is not null or undefined
-            assertParamExists('personControllerCreatePerson', 'createPersonBodyParams', createPersonBodyParams)
-            const localVarPath = `/api/personen`;
+      assertParamExists(
+        'personControllerCreatePerson',
+        'createPersonBodyParams',
+        createPersonBodyParams
+      )
+      const localVarPath = `/api/personen`
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
+      let baseOptions
             if (configuration) {
-                baseOptions = configuration.baseOptions;
+        baseOptions = configuration.baseOptions
             }
 
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
+      const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options }
+      const localVarHeaderParameter = {} as any
+      const localVarQueryParameter = {} as any
     
-            localVarHeaderParameter['Content-Type'] = 'application/json';
+      localVarHeaderParameter['Content-Type'] = 'application/json'
 
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(createPersonBodyParams, localVarRequestOptions, configuration)
+      setSearchParams(localVarUrlObj, localVarQueryParameter)
+      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers
+      }
+      localVarRequestOptions.data = serializeDataIfNeeded(
+        createPersonBodyParams,
+        localVarRequestOptions,
+        configuration
+      )
 
             return {
                 url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
+        options: localVarRequestOptions
+      }
         },
         /**
          * 
@@ -1568,37 +1765,53 @@ export const PersonenApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        personControllerCreatePersonenkontext: async (personId: string, createPersonenkontextBodyParams: CreatePersonenkontextBodyParams, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+    personControllerCreatePersonenkontext: async (
+      personId: string,
+      createPersonenkontextBodyParams: CreatePersonenkontextBodyParams,
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
             // verify required parameter 'personId' is not null or undefined
             assertParamExists('personControllerCreatePersonenkontext', 'personId', personId)
             // verify required parameter 'createPersonenkontextBodyParams' is not null or undefined
-            assertParamExists('personControllerCreatePersonenkontext', 'createPersonenkontextBodyParams', createPersonenkontextBodyParams)
-            const localVarPath = `/api/personen/{personId}/personenkontexte`
-                .replace(`{${"personId"}}`, encodeURIComponent(String(personId)));
+      assertParamExists(
+        'personControllerCreatePersonenkontext',
+        'createPersonenkontextBodyParams',
+        createPersonenkontextBodyParams
+      )
+      const localVarPath = `/api/personen/{personId}/personenkontexte`.replace(
+        `{${'personId'}}`,
+        encodeURIComponent(String(personId))
+      )
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
+      let baseOptions
             if (configuration) {
-                baseOptions = configuration.baseOptions;
+        baseOptions = configuration.baseOptions
             }
 
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
+      const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options }
+      const localVarHeaderParameter = {} as any
+      const localVarQueryParameter = {} as any
     
-            localVarHeaderParameter['Content-Type'] = 'application/json';
+      localVarHeaderParameter['Content-Type'] = 'application/json'
 
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(createPersonenkontextBodyParams, localVarRequestOptions, configuration)
+      setSearchParams(localVarUrlObj, localVarQueryParameter)
+      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers
+      }
+      localVarRequestOptions.data = serializeDataIfNeeded(
+        createPersonenkontextBodyParams,
+        localVarRequestOptions,
+        configuration
+      )
 
             return {
                 url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
+        options: localVarRequestOptions
+      }
         },
         /**
          * 
@@ -1606,32 +1819,39 @@ export const PersonenApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        personControllerFindPersonById: async (personId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+    personControllerFindPersonById: async (
+      personId: string,
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
             // verify required parameter 'personId' is not null or undefined
             assertParamExists('personControllerFindPersonById', 'personId', personId)
-            const localVarPath = `/api/personen/{personId}`
-                .replace(`{${"personId"}}`, encodeURIComponent(String(personId)));
+      const localVarPath = `/api/personen/{personId}`.replace(
+        `{${'personId'}}`,
+        encodeURIComponent(String(personId))
+      )
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
+      let baseOptions
             if (configuration) {
-                baseOptions = configuration.baseOptions;
+        baseOptions = configuration.baseOptions
             }
 
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
+      const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options }
+      const localVarHeaderParameter = {} as any
+      const localVarQueryParameter = {} as any
     
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+      setSearchParams(localVarUrlObj, localVarQueryParameter)
+      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers
+      }
 
             return {
                 url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
+        options: localVarRequestOptions
+      }
         },
         /**
          * 
@@ -1645,56 +1865,69 @@ export const PersonenApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        personControllerFindPersonenkontexte: async (personId: string, offset?: number, limit?: number, referrer?: string, rolle?: 'LERN' | 'LEHR' | 'EXTERN' | 'ORGADMIN' | 'LEIT' | 'SYSADMIN', personenstatus?: 'AKTIV', sichtfreigabe?: 'ja' | 'nein', options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+    personControllerFindPersonenkontexte: async (
+      personId: string,
+      offset?: number,
+      limit?: number,
+      referrer?: string,
+      rolle?: 'LERN' | 'LEHR' | 'EXTERN' | 'ORGADMIN' | 'LEIT' | 'SYSADMIN',
+      personenstatus?: 'AKTIV',
+      sichtfreigabe?: 'ja' | 'nein',
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
             // verify required parameter 'personId' is not null or undefined
             assertParamExists('personControllerFindPersonenkontexte', 'personId', personId)
-            const localVarPath = `/api/personen/{personId}/personenkontexte`
-                .replace(`{${"personId"}}`, encodeURIComponent(String(personId)));
+      const localVarPath = `/api/personen/{personId}/personenkontexte`.replace(
+        `{${'personId'}}`,
+        encodeURIComponent(String(personId))
+      )
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
+      let baseOptions
             if (configuration) {
-                baseOptions = configuration.baseOptions;
+        baseOptions = configuration.baseOptions
             }
 
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
+      const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options }
+      const localVarHeaderParameter = {} as any
+      const localVarQueryParameter = {} as any
 
             if (offset !== undefined) {
-                localVarQueryParameter['offset'] = offset;
+        localVarQueryParameter['offset'] = offset
             }
 
             if (limit !== undefined) {
-                localVarQueryParameter['limit'] = limit;
+        localVarQueryParameter['limit'] = limit
             }
 
             if (referrer !== undefined) {
-                localVarQueryParameter['referrer'] = referrer;
+        localVarQueryParameter['referrer'] = referrer
             }
 
             if (rolle !== undefined) {
-                localVarQueryParameter['rolle'] = rolle;
+        localVarQueryParameter['rolle'] = rolle
             }
 
             if (personenstatus !== undefined) {
-                localVarQueryParameter['personenstatus'] = personenstatus;
+        localVarQueryParameter['personenstatus'] = personenstatus
             }
 
             if (sichtfreigabe !== undefined) {
-                localVarQueryParameter['sichtfreigabe'] = sichtfreigabe;
-            }
-
-
+        localVarQueryParameter['sichtfreigabe'] = sichtfreigabe
+      }
     
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+      setSearchParams(localVarUrlObj, localVarQueryParameter)
+      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers
+      }
 
             return {
                 url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
+        options: localVarRequestOptions
+      }
         },
         /**
          * 
@@ -1707,53 +1940,63 @@ export const PersonenApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        personControllerFindPersons: async (offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/personen`;
+    personControllerFindPersons: async (
+      offset?: number,
+      limit?: number,
+      referrer?: string,
+      familienname?: string,
+      vorname?: string,
+      sichtfreigabe?: 'ja' | 'nein',
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
+      const localVarPath = `/api/personen`
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
+      let baseOptions
             if (configuration) {
-                baseOptions = configuration.baseOptions;
+        baseOptions = configuration.baseOptions
             }
 
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
+      const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options }
+      const localVarHeaderParameter = {} as any
+      const localVarQueryParameter = {} as any
 
             if (offset !== undefined) {
-                localVarQueryParameter['offset'] = offset;
+        localVarQueryParameter['offset'] = offset
             }
 
             if (limit !== undefined) {
-                localVarQueryParameter['limit'] = limit;
+        localVarQueryParameter['limit'] = limit
             }
 
             if (referrer !== undefined) {
-                localVarQueryParameter['referrer'] = referrer;
+        localVarQueryParameter['referrer'] = referrer
             }
 
             if (familienname !== undefined) {
-                localVarQueryParameter['familienname'] = familienname;
+        localVarQueryParameter['familienname'] = familienname
             }
 
             if (vorname !== undefined) {
-                localVarQueryParameter['vorname'] = vorname;
+        localVarQueryParameter['vorname'] = vorname
             }
 
             if (sichtfreigabe !== undefined) {
-                localVarQueryParameter['sichtfreigabe'] = sichtfreigabe;
-            }
-
-
+        localVarQueryParameter['sichtfreigabe'] = sichtfreigabe
+      }
     
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+      setSearchParams(localVarUrlObj, localVarQueryParameter)
+      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers
+      }
 
             return {
                 url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
+        options: localVarRequestOptions
+      }
         },
         /**
          * 
@@ -1761,32 +2004,39 @@ export const PersonenApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        personControllerResetPasswordByPersonId: async (personId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+    personControllerResetPasswordByPersonId: async (
+      personId: string,
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
             // verify required parameter 'personId' is not null or undefined
             assertParamExists('personControllerResetPasswordByPersonId', 'personId', personId)
-            const localVarPath = `/api/personen/{personId}/password`
-                .replace(`{${"personId"}}`, encodeURIComponent(String(personId)));
+      const localVarPath = `/api/personen/{personId}/password`.replace(
+        `{${'personId'}}`,
+        encodeURIComponent(String(personId))
+      )
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
+      let baseOptions
             if (configuration) {
-                baseOptions = configuration.baseOptions;
+        baseOptions = configuration.baseOptions
             }
 
-            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
+      const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options }
+      const localVarHeaderParameter = {} as any
+      const localVarQueryParameter = {} as any
     
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+      setSearchParams(localVarUrlObj, localVarQueryParameter)
+      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers
+      }
 
             return {
                 url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
+        options: localVarRequestOptions
+      }
         },
         /**
          * 
@@ -1795,46 +2045,62 @@ export const PersonenApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        personControllerUpdatePerson: async (personId: string, updatePersonBodyParams: UpdatePersonBodyParams, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+    personControllerUpdatePerson: async (
+      personId: string,
+      updatePersonBodyParams: UpdatePersonBodyParams,
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
             // verify required parameter 'personId' is not null or undefined
             assertParamExists('personControllerUpdatePerson', 'personId', personId)
             // verify required parameter 'updatePersonBodyParams' is not null or undefined
-            assertParamExists('personControllerUpdatePerson', 'updatePersonBodyParams', updatePersonBodyParams)
-            const localVarPath = `/api/personen/{personId}`
-                .replace(`{${"personId"}}`, encodeURIComponent(String(personId)));
+      assertParamExists(
+        'personControllerUpdatePerson',
+        'updatePersonBodyParams',
+        updatePersonBodyParams
+      )
+      const localVarPath = `/api/personen/{personId}`.replace(
+        `{${'personId'}}`,
+        encodeURIComponent(String(personId))
+      )
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
+      let baseOptions
             if (configuration) {
-                baseOptions = configuration.baseOptions;
+        baseOptions = configuration.baseOptions
             }
 
-            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
+      const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options }
+      const localVarHeaderParameter = {} as any
+      const localVarQueryParameter = {} as any
     
-            localVarHeaderParameter['Content-Type'] = 'application/json';
+      localVarHeaderParameter['Content-Type'] = 'application/json'
 
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(updatePersonBodyParams, localVarRequestOptions, configuration)
+      setSearchParams(localVarUrlObj, localVarQueryParameter)
+      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers
+      }
+      localVarRequestOptions.data = serializeDataIfNeeded(
+        updatePersonBodyParams,
+        localVarRequestOptions,
+        configuration
+      )
 
             return {
                 url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
+        options: localVarRequestOptions
     }
-};
+    }
+  }
+}
 
 /**
  * PersonenApi - functional programming interface
  * @export
  */
-export const PersonenApiFp = function(configuration?: Configuration) {
+export const PersonenApiFp = function (configuration?: Configuration) {
     const localVarAxiosParamCreator = PersonenApiAxiosParamCreator(configuration)
     return {
         /**
@@ -1843,9 +2109,17 @@ export const PersonenApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async personControllerCreatePerson(createPersonBodyParams: CreatePersonBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonendatensatzResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.personControllerCreatePerson(createPersonBodyParams, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+    async personControllerCreatePerson(
+      createPersonBodyParams: CreatePersonBodyParams,
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonendatensatzResponse>
+    > {
+      const localVarAxiosArgs = await localVarAxiosParamCreator.personControllerCreatePerson(
+        createPersonBodyParams,
+        options
+      )
+      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
         },
         /**
          * 
@@ -1854,9 +2128,18 @@ export const PersonenApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async personControllerCreatePersonenkontext(personId: string, createPersonenkontextBodyParams: CreatePersonenkontextBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.personControllerCreatePersonenkontext(personId, createPersonenkontextBodyParams, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+    async personControllerCreatePersonenkontext(
+      personId: string,
+      createPersonenkontextBodyParams: CreatePersonenkontextBodyParams,
+      options?: AxiosRequestConfig
+    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.personControllerCreatePersonenkontext(
+          personId,
+          createPersonenkontextBodyParams,
+          options
+        )
+      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
         },
         /**
          * 
@@ -1864,9 +2147,17 @@ export const PersonenApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async personControllerFindPersonById(personId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonendatensatzResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.personControllerFindPersonById(personId, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+    async personControllerFindPersonById(
+      personId: string,
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonendatensatzResponse>
+    > {
+      const localVarAxiosArgs = await localVarAxiosParamCreator.personControllerFindPersonById(
+        personId,
+        options
+      )
+      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
         },
         /**
          * 
@@ -1880,9 +2171,28 @@ export const PersonenApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async personControllerFindPersonenkontexte(personId: string, offset?: number, limit?: number, referrer?: string, rolle?: 'LERN' | 'LEHR' | 'EXTERN' | 'ORGADMIN' | 'LEIT' | 'SYSADMIN', personenstatus?: 'AKTIV', sichtfreigabe?: 'ja' | 'nein', options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.personControllerFindPersonenkontexte(personId, offset, limit, referrer, rolle, personenstatus, sichtfreigabe, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+    async personControllerFindPersonenkontexte(
+      personId: string,
+      offset?: number,
+      limit?: number,
+      referrer?: string,
+      rolle?: 'LERN' | 'LEHR' | 'EXTERN' | 'ORGADMIN' | 'LEIT' | 'SYSADMIN',
+      personenstatus?: 'AKTIV',
+      sichtfreigabe?: 'ja' | 'nein',
+      options?: AxiosRequestConfig
+    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.personControllerFindPersonenkontexte(
+          personId,
+          offset,
+          limit,
+          referrer,
+          rolle,
+          personenstatus,
+          sichtfreigabe,
+          options
+        )
+      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
         },
         /**
          * 
@@ -1895,9 +2205,27 @@ export const PersonenApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async personControllerFindPersons(offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<PersonendatensatzResponse>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.personControllerFindPersons(offset, limit, referrer, familienname, vorname, sichtfreigabe, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+    async personControllerFindPersons(
+      offset?: number,
+      limit?: number,
+      referrer?: string,
+      familienname?: string,
+      vorname?: string,
+      sichtfreigabe?: 'ja' | 'nein',
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<PersonendatensatzResponse>>
+    > {
+      const localVarAxiosArgs = await localVarAxiosParamCreator.personControllerFindPersons(
+        offset,
+        limit,
+        referrer,
+        familienname,
+        vorname,
+        sichtfreigabe,
+        options
+      )
+      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
         },
         /**
          * 
@@ -1905,9 +2233,13 @@ export const PersonenApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async personControllerResetPasswordByPersonId(personId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.personControllerResetPasswordByPersonId(personId, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+    async personControllerResetPasswordByPersonId(
+      personId: string,
+      options?: AxiosRequestConfig
+    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.personControllerResetPasswordByPersonId(personId, options)
+      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
         },
         /**
          * 
@@ -1916,18 +2248,32 @@ export const PersonenApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async personControllerUpdatePerson(personId: string, updatePersonBodyParams: UpdatePersonBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonendatensatzResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.personControllerUpdatePerson(personId, updatePersonBodyParams, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
+    async personControllerUpdatePerson(
+      personId: string,
+      updatePersonBodyParams: UpdatePersonBodyParams,
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonendatensatzResponse>
+    > {
+      const localVarAxiosArgs = await localVarAxiosParamCreator.personControllerUpdatePerson(
+        personId,
+        updatePersonBodyParams,
+        options
+      )
+      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
     }
-};
+    }
+}
 
 /**
  * PersonenApi - factory interface
  * @export
  */
-export const PersonenApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+export const PersonenApiFactory = function (
+  configuration?: Configuration,
+  basePath?: string,
+  axios?: AxiosInstance
+) {
     const localVarFp = PersonenApiFp(configuration)
     return {
         /**
@@ -1936,8 +2282,13 @@ export const PersonenApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        personControllerCreatePerson(createPersonBodyParams: CreatePersonBodyParams, options?: any): AxiosPromise<PersonendatensatzResponse> {
-            return localVarFp.personControllerCreatePerson(createPersonBodyParams, options).then((request) => request(axios, basePath));
+    personControllerCreatePerson(
+      createPersonBodyParams: CreatePersonBodyParams,
+      options?: any
+    ): AxiosPromise<PersonendatensatzResponse> {
+      return localVarFp
+        .personControllerCreatePerson(createPersonBodyParams, options)
+        .then((request) => request(axios, basePath))
         },
         /**
          * 
@@ -1946,8 +2297,14 @@ export const PersonenApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        personControllerCreatePersonenkontext(personId: string, createPersonenkontextBodyParams: CreatePersonenkontextBodyParams, options?: any): AxiosPromise<void> {
-            return localVarFp.personControllerCreatePersonenkontext(personId, createPersonenkontextBodyParams, options).then((request) => request(axios, basePath));
+    personControllerCreatePersonenkontext(
+      personId: string,
+      createPersonenkontextBodyParams: CreatePersonenkontextBodyParams,
+      options?: any
+    ): AxiosPromise<void> {
+      return localVarFp
+        .personControllerCreatePersonenkontext(personId, createPersonenkontextBodyParams, options)
+        .then((request) => request(axios, basePath))
         },
         /**
          * 
@@ -1955,8 +2312,13 @@ export const PersonenApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        personControllerFindPersonById(personId: string, options?: any): AxiosPromise<PersonendatensatzResponse> {
-            return localVarFp.personControllerFindPersonById(personId, options).then((request) => request(axios, basePath));
+    personControllerFindPersonById(
+      personId: string,
+      options?: any
+    ): AxiosPromise<PersonendatensatzResponse> {
+      return localVarFp
+        .personControllerFindPersonById(personId, options)
+        .then((request) => request(axios, basePath))
         },
         /**
          * 
@@ -1970,8 +2332,28 @@ export const PersonenApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        personControllerFindPersonenkontexte(personId: string, offset?: number, limit?: number, referrer?: string, rolle?: 'LERN' | 'LEHR' | 'EXTERN' | 'ORGADMIN' | 'LEIT' | 'SYSADMIN', personenstatus?: 'AKTIV', sichtfreigabe?: 'ja' | 'nein', options?: any): AxiosPromise<void> {
-            return localVarFp.personControllerFindPersonenkontexte(personId, offset, limit, referrer, rolle, personenstatus, sichtfreigabe, options).then((request) => request(axios, basePath));
+    personControllerFindPersonenkontexte(
+      personId: string,
+      offset?: number,
+      limit?: number,
+      referrer?: string,
+      rolle?: 'LERN' | 'LEHR' | 'EXTERN' | 'ORGADMIN' | 'LEIT' | 'SYSADMIN',
+      personenstatus?: 'AKTIV',
+      sichtfreigabe?: 'ja' | 'nein',
+      options?: any
+    ): AxiosPromise<void> {
+      return localVarFp
+        .personControllerFindPersonenkontexte(
+          personId,
+          offset,
+          limit,
+          referrer,
+          rolle,
+          personenstatus,
+          sichtfreigabe,
+          options
+        )
+        .then((request) => request(axios, basePath))
         },
         /**
          * 
@@ -1984,8 +2366,26 @@ export const PersonenApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        personControllerFindPersons(offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', options?: any): AxiosPromise<Array<PersonendatensatzResponse>> {
-            return localVarFp.personControllerFindPersons(offset, limit, referrer, familienname, vorname, sichtfreigabe, options).then((request) => request(axios, basePath));
+    personControllerFindPersons(
+      offset?: number,
+      limit?: number,
+      referrer?: string,
+      familienname?: string,
+      vorname?: string,
+      sichtfreigabe?: 'ja' | 'nein',
+      options?: any
+    ): AxiosPromise<Array<PersonendatensatzResponse>> {
+      return localVarFp
+        .personControllerFindPersons(
+          offset,
+          limit,
+          referrer,
+          familienname,
+          vorname,
+          sichtfreigabe,
+          options
+        )
+        .then((request) => request(axios, basePath))
         },
         /**
          * 
@@ -1994,7 +2394,9 @@ export const PersonenApiFactory = function (configuration?: Configuration, baseP
          * @throws {RequiredError}
          */
         personControllerResetPasswordByPersonId(personId: string, options?: any): AxiosPromise<string> {
-            return localVarFp.personControllerResetPasswordByPersonId(personId, options).then((request) => request(axios, basePath));
+      return localVarFp
+        .personControllerResetPasswordByPersonId(personId, options)
+        .then((request) => request(axios, basePath))
         },
         /**
          * 
@@ -2003,11 +2405,17 @@ export const PersonenApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        personControllerUpdatePerson(personId: string, updatePersonBodyParams: UpdatePersonBodyParams, options?: any): AxiosPromise<PersonendatensatzResponse> {
-            return localVarFp.personControllerUpdatePerson(personId, updatePersonBodyParams, options).then((request) => request(axios, basePath));
-        },
-    };
-};
+    personControllerUpdatePerson(
+      personId: string,
+      updatePersonBodyParams: UpdatePersonBodyParams,
+      options?: any
+    ): AxiosPromise<PersonendatensatzResponse> {
+      return localVarFp
+        .personControllerUpdatePerson(personId, updatePersonBodyParams, options)
+        .then((request) => request(axios, basePath))
+    }
+  }
+}
 
 /**
  * PersonenApi - interface
@@ -2022,7 +2430,10 @@ export interface PersonenApiInterface {
      * @throws {RequiredError}
      * @memberof PersonenApiInterface
      */
-    personControllerCreatePerson(createPersonBodyParams: CreatePersonBodyParams, options?: AxiosRequestConfig): AxiosPromise<PersonendatensatzResponse>;
+  personControllerCreatePerson(
+    createPersonBodyParams: CreatePersonBodyParams,
+    options?: AxiosRequestConfig
+  ): AxiosPromise<PersonendatensatzResponse>
 
     /**
      * 
@@ -2032,7 +2443,11 @@ export interface PersonenApiInterface {
      * @throws {RequiredError}
      * @memberof PersonenApiInterface
      */
-    personControllerCreatePersonenkontext(personId: string, createPersonenkontextBodyParams: CreatePersonenkontextBodyParams, options?: AxiosRequestConfig): AxiosPromise<void>;
+  personControllerCreatePersonenkontext(
+    personId: string,
+    createPersonenkontextBodyParams: CreatePersonenkontextBodyParams,
+    options?: AxiosRequestConfig
+  ): AxiosPromise<void>
 
     /**
      * 
@@ -2041,7 +2456,10 @@ export interface PersonenApiInterface {
      * @throws {RequiredError}
      * @memberof PersonenApiInterface
      */
-    personControllerFindPersonById(personId: string, options?: AxiosRequestConfig): AxiosPromise<PersonendatensatzResponse>;
+  personControllerFindPersonById(
+    personId: string,
+    options?: AxiosRequestConfig
+  ): AxiosPromise<PersonendatensatzResponse>
 
     /**
      * 
@@ -2056,7 +2474,16 @@ export interface PersonenApiInterface {
      * @throws {RequiredError}
      * @memberof PersonenApiInterface
      */
-    personControllerFindPersonenkontexte(personId: string, offset?: number, limit?: number, referrer?: string, rolle?: 'LERN' | 'LEHR' | 'EXTERN' | 'ORGADMIN' | 'LEIT' | 'SYSADMIN', personenstatus?: 'AKTIV', sichtfreigabe?: 'ja' | 'nein', options?: AxiosRequestConfig): AxiosPromise<void>;
+  personControllerFindPersonenkontexte(
+    personId: string,
+    offset?: number,
+    limit?: number,
+    referrer?: string,
+    rolle?: 'LERN' | 'LEHR' | 'EXTERN' | 'ORGADMIN' | 'LEIT' | 'SYSADMIN',
+    personenstatus?: 'AKTIV',
+    sichtfreigabe?: 'ja' | 'nein',
+    options?: AxiosRequestConfig
+  ): AxiosPromise<void>
 
     /**
      * 
@@ -2070,7 +2497,15 @@ export interface PersonenApiInterface {
      * @throws {RequiredError}
      * @memberof PersonenApiInterface
      */
-    personControllerFindPersons(offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', options?: AxiosRequestConfig): AxiosPromise<Array<PersonendatensatzResponse>>;
+  personControllerFindPersons(
+    offset?: number,
+    limit?: number,
+    referrer?: string,
+    familienname?: string,
+    vorname?: string,
+    sichtfreigabe?: 'ja' | 'nein',
+    options?: AxiosRequestConfig
+  ): AxiosPromise<Array<PersonendatensatzResponse>>
 
     /**
      * 
@@ -2079,7 +2514,10 @@ export interface PersonenApiInterface {
      * @throws {RequiredError}
      * @memberof PersonenApiInterface
      */
-    personControllerResetPasswordByPersonId(personId: string, options?: AxiosRequestConfig): AxiosPromise<string>;
+  personControllerResetPasswordByPersonId(
+    personId: string,
+    options?: AxiosRequestConfig
+  ): AxiosPromise<string>
 
     /**
      * 
@@ -2089,8 +2527,11 @@ export interface PersonenApiInterface {
      * @throws {RequiredError}
      * @memberof PersonenApiInterface
      */
-    personControllerUpdatePerson(personId: string, updatePersonBodyParams: UpdatePersonBodyParams, options?: AxiosRequestConfig): AxiosPromise<PersonendatensatzResponse>;
-
+  personControllerUpdatePerson(
+    personId: string,
+    updatePersonBodyParams: UpdatePersonBodyParams,
+    options?: AxiosRequestConfig
+  ): AxiosPromise<PersonendatensatzResponse>
 }
 
 /**
@@ -2107,8 +2548,13 @@ export class PersonenApi extends BaseAPI implements PersonenApiInterface {
      * @throws {RequiredError}
      * @memberof PersonenApi
      */
-    public personControllerCreatePerson(createPersonBodyParams: CreatePersonBodyParams, options?: AxiosRequestConfig) {
-        return PersonenApiFp(this.configuration).personControllerCreatePerson(createPersonBodyParams, options).then((request) => request(this.axios, this.basePath));
+  public personControllerCreatePerson(
+    createPersonBodyParams: CreatePersonBodyParams,
+    options?: AxiosRequestConfig
+  ) {
+    return PersonenApiFp(this.configuration)
+      .personControllerCreatePerson(createPersonBodyParams, options)
+      .then((request) => request(this.axios, this.basePath))
     }
 
     /**
@@ -2119,8 +2565,14 @@ export class PersonenApi extends BaseAPI implements PersonenApiInterface {
      * @throws {RequiredError}
      * @memberof PersonenApi
      */
-    public personControllerCreatePersonenkontext(personId: string, createPersonenkontextBodyParams: CreatePersonenkontextBodyParams, options?: AxiosRequestConfig) {
-        return PersonenApiFp(this.configuration).personControllerCreatePersonenkontext(personId, createPersonenkontextBodyParams, options).then((request) => request(this.axios, this.basePath));
+  public personControllerCreatePersonenkontext(
+    personId: string,
+    createPersonenkontextBodyParams: CreatePersonenkontextBodyParams,
+    options?: AxiosRequestConfig
+  ) {
+    return PersonenApiFp(this.configuration)
+      .personControllerCreatePersonenkontext(personId, createPersonenkontextBodyParams, options)
+      .then((request) => request(this.axios, this.basePath))
     }
 
     /**
@@ -2131,7 +2583,9 @@ export class PersonenApi extends BaseAPI implements PersonenApiInterface {
      * @memberof PersonenApi
      */
     public personControllerFindPersonById(personId: string, options?: AxiosRequestConfig) {
-        return PersonenApiFp(this.configuration).personControllerFindPersonById(personId, options).then((request) => request(this.axios, this.basePath));
+    return PersonenApiFp(this.configuration)
+      .personControllerFindPersonById(personId, options)
+      .then((request) => request(this.axios, this.basePath))
     }
 
     /**
@@ -2147,8 +2601,28 @@ export class PersonenApi extends BaseAPI implements PersonenApiInterface {
      * @throws {RequiredError}
      * @memberof PersonenApi
      */
-    public personControllerFindPersonenkontexte(personId: string, offset?: number, limit?: number, referrer?: string, rolle?: 'LERN' | 'LEHR' | 'EXTERN' | 'ORGADMIN' | 'LEIT' | 'SYSADMIN', personenstatus?: 'AKTIV', sichtfreigabe?: 'ja' | 'nein', options?: AxiosRequestConfig) {
-        return PersonenApiFp(this.configuration).personControllerFindPersonenkontexte(personId, offset, limit, referrer, rolle, personenstatus, sichtfreigabe, options).then((request) => request(this.axios, this.basePath));
+  public personControllerFindPersonenkontexte(
+    personId: string,
+    offset?: number,
+    limit?: number,
+    referrer?: string,
+    rolle?: 'LERN' | 'LEHR' | 'EXTERN' | 'ORGADMIN' | 'LEIT' | 'SYSADMIN',
+    personenstatus?: 'AKTIV',
+    sichtfreigabe?: 'ja' | 'nein',
+    options?: AxiosRequestConfig
+  ) {
+    return PersonenApiFp(this.configuration)
+      .personControllerFindPersonenkontexte(
+        personId,
+        offset,
+        limit,
+        referrer,
+        rolle,
+        personenstatus,
+        sichtfreigabe,
+        options
+      )
+      .then((request) => request(this.axios, this.basePath))
     }
 
     /**
@@ -2163,8 +2637,26 @@ export class PersonenApi extends BaseAPI implements PersonenApiInterface {
      * @throws {RequiredError}
      * @memberof PersonenApi
      */
-    public personControllerFindPersons(offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', options?: AxiosRequestConfig) {
-        return PersonenApiFp(this.configuration).personControllerFindPersons(offset, limit, referrer, familienname, vorname, sichtfreigabe, options).then((request) => request(this.axios, this.basePath));
+  public personControllerFindPersons(
+    offset?: number,
+    limit?: number,
+    referrer?: string,
+    familienname?: string,
+    vorname?: string,
+    sichtfreigabe?: 'ja' | 'nein',
+    options?: AxiosRequestConfig
+  ) {
+    return PersonenApiFp(this.configuration)
+      .personControllerFindPersons(
+        offset,
+        limit,
+        referrer,
+        familienname,
+        vorname,
+        sichtfreigabe,
+        options
+      )
+      .then((request) => request(this.axios, this.basePath))
     }
 
     /**
@@ -2175,7 +2667,9 @@ export class PersonenApi extends BaseAPI implements PersonenApiInterface {
      * @memberof PersonenApi
      */
     public personControllerResetPasswordByPersonId(personId: string, options?: AxiosRequestConfig) {
-        return PersonenApiFp(this.configuration).personControllerResetPasswordByPersonId(personId, options).then((request) => request(this.axios, this.basePath));
+    return PersonenApiFp(this.configuration)
+      .personControllerResetPasswordByPersonId(personId, options)
+      .then((request) => request(this.axios, this.basePath))
     }
 
     /**
@@ -2186,11 +2680,16 @@ export class PersonenApi extends BaseAPI implements PersonenApiInterface {
      * @throws {RequiredError}
      * @memberof PersonenApi
      */
-    public personControllerUpdatePerson(personId: string, updatePersonBodyParams: UpdatePersonBodyParams, options?: AxiosRequestConfig) {
-        return PersonenApiFp(this.configuration).personControllerUpdatePerson(personId, updatePersonBodyParams, options).then((request) => request(this.axios, this.basePath));
+  public personControllerUpdatePerson(
+    personId: string,
+    updatePersonBodyParams: UpdatePersonBodyParams,
+    options?: AxiosRequestConfig
+  ) {
+    return PersonenApiFp(this.configuration)
+      .personControllerUpdatePerson(personId, updatePersonBodyParams, options)
+      .then((request) => request(this.axios, this.basePath))
     }
 }
-
 
 /**
  * PersonenFrontendApi - axios parameter creator
@@ -2209,62 +2708,72 @@ export const PersonenFrontendApiAxiosParamCreator = function (configuration?: Co
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        personFrontendControllerFindPersons: async (offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/personen-frontend`;
+    personFrontendControllerFindPersons: async (
+      offset?: number,
+      limit?: number,
+      referrer?: string,
+      familienname?: string,
+      vorname?: string,
+      sichtfreigabe?: 'ja' | 'nein',
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
+      const localVarPath = `/api/personen-frontend`
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
+      let baseOptions
             if (configuration) {
-                baseOptions = configuration.baseOptions;
+        baseOptions = configuration.baseOptions
             }
 
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
+      const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options }
+      const localVarHeaderParameter = {} as any
+      const localVarQueryParameter = {} as any
 
             if (offset !== undefined) {
-                localVarQueryParameter['offset'] = offset;
+        localVarQueryParameter['offset'] = offset
             }
 
             if (limit !== undefined) {
-                localVarQueryParameter['limit'] = limit;
+        localVarQueryParameter['limit'] = limit
             }
 
             if (referrer !== undefined) {
-                localVarQueryParameter['referrer'] = referrer;
+        localVarQueryParameter['referrer'] = referrer
             }
 
             if (familienname !== undefined) {
-                localVarQueryParameter['familienname'] = familienname;
+        localVarQueryParameter['familienname'] = familienname
             }
 
             if (vorname !== undefined) {
-                localVarQueryParameter['vorname'] = vorname;
+        localVarQueryParameter['vorname'] = vorname
             }
 
             if (sichtfreigabe !== undefined) {
-                localVarQueryParameter['sichtfreigabe'] = sichtfreigabe;
-            }
-
-
+        localVarQueryParameter['sichtfreigabe'] = sichtfreigabe
+      }
     
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+      setSearchParams(localVarUrlObj, localVarQueryParameter)
+      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers
+      }
 
             return {
                 url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
+        options: localVarRequestOptions
     }
-};
+    }
+  }
+}
 
 /**
  * PersonenFrontendApi - functional programming interface
  * @export
  */
-export const PersonenFrontendApiFp = function(configuration?: Configuration) {
+export const PersonenFrontendApiFp = function (configuration?: Configuration) {
     const localVarAxiosParamCreator = PersonenFrontendApiAxiosParamCreator(configuration)
     return {
         /**
@@ -2278,18 +2787,43 @@ export const PersonenFrontendApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async personFrontendControllerFindPersons(offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonFrontendControllerFindPersons200Response>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.personFrontendControllerFindPersons(offset, limit, referrer, familienname, vorname, sichtfreigabe, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
+    async personFrontendControllerFindPersons(
+      offset?: number,
+      limit?: number,
+      referrer?: string,
+      familienname?: string,
+      vorname?: string,
+      sichtfreigabe?: 'ja' | 'nein',
+      options?: AxiosRequestConfig
+    ): Promise<
+      (
+        axios?: AxiosInstance,
+        basePath?: string
+      ) => AxiosPromise<PersonFrontendControllerFindPersons200Response>
+    > {
+      const localVarAxiosArgs = await localVarAxiosParamCreator.personFrontendControllerFindPersons(
+        offset,
+        limit,
+        referrer,
+        familienname,
+        vorname,
+        sichtfreigabe,
+        options
+      )
+      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
     }
-};
+    }
+}
 
 /**
  * PersonenFrontendApi - factory interface
  * @export
  */
-export const PersonenFrontendApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+export const PersonenFrontendApiFactory = function (
+  configuration?: Configuration,
+  basePath?: string,
+  axios?: AxiosInstance
+) {
     const localVarFp = PersonenFrontendApiFp(configuration)
     return {
         /**
@@ -2303,11 +2837,29 @@ export const PersonenFrontendApiFactory = function (configuration?: Configuratio
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        personFrontendControllerFindPersons(offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', options?: any): AxiosPromise<PersonFrontendControllerFindPersons200Response> {
-            return localVarFp.personFrontendControllerFindPersons(offset, limit, referrer, familienname, vorname, sichtfreigabe, options).then((request) => request(axios, basePath));
-        },
-    };
-};
+    personFrontendControllerFindPersons(
+      offset?: number,
+      limit?: number,
+      referrer?: string,
+      familienname?: string,
+      vorname?: string,
+      sichtfreigabe?: 'ja' | 'nein',
+      options?: any
+    ): AxiosPromise<PersonFrontendControllerFindPersons200Response> {
+      return localVarFp
+        .personFrontendControllerFindPersons(
+          offset,
+          limit,
+          referrer,
+          familienname,
+          vorname,
+          sichtfreigabe,
+          options
+        )
+        .then((request) => request(axios, basePath))
+    }
+  }
+}
 
 /**
  * PersonenFrontendApi - interface
@@ -2327,8 +2879,15 @@ export interface PersonenFrontendApiInterface {
      * @throws {RequiredError}
      * @memberof PersonenFrontendApiInterface
      */
-    personFrontendControllerFindPersons(offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', options?: AxiosRequestConfig): AxiosPromise<PersonFrontendControllerFindPersons200Response>;
-
+  personFrontendControllerFindPersons(
+    offset?: number,
+    limit?: number,
+    referrer?: string,
+    familienname?: string,
+    vorname?: string,
+    sichtfreigabe?: 'ja' | 'nein',
+    options?: AxiosRequestConfig
+  ): AxiosPromise<PersonFrontendControllerFindPersons200Response>
 }
 
 /**
@@ -2350,11 +2909,28 @@ export class PersonenFrontendApi extends BaseAPI implements PersonenFrontendApiI
      * @throws {RequiredError}
      * @memberof PersonenFrontendApi
      */
-    public personFrontendControllerFindPersons(offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', options?: AxiosRequestConfig) {
-        return PersonenFrontendApiFp(this.configuration).personFrontendControllerFindPersons(offset, limit, referrer, familienname, vorname, sichtfreigabe, options).then((request) => request(this.axios, this.basePath));
+  public personFrontendControllerFindPersons(
+    offset?: number,
+    limit?: number,
+    referrer?: string,
+    familienname?: string,
+    vorname?: string,
+    sichtfreigabe?: 'ja' | 'nein',
+    options?: AxiosRequestConfig
+  ) {
+    return PersonenFrontendApiFp(this.configuration)
+      .personFrontendControllerFindPersons(
+        offset,
+        limit,
+        referrer,
+        familienname,
+        vorname,
+        sichtfreigabe,
+        options
+      )
+      .then((request) => request(this.axios, this.basePath))
     }
 }
-
 
 /**
  * PersonenkontexteApi - axios parameter creator
@@ -2365,35 +2941,105 @@ export const PersonenkontexteApiAxiosParamCreator = function (configuration?: Co
         /**
          * 
          * @param {string} personenkontextId The id for the personenkontext.
+     * @param {DeleteRevisionBodyParams} deleteRevisionBodyParams
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        personenkontextControllerFindPersonenkontextById: async (personenkontextId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+    personenkontextControllerDeletePersonenkontextById: async (
+      personenkontextId: string,
+      deleteRevisionBodyParams: DeleteRevisionBodyParams,
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
             // verify required parameter 'personenkontextId' is not null or undefined
-            assertParamExists('personenkontextControllerFindPersonenkontextById', 'personenkontextId', personenkontextId)
-            const localVarPath = `/api/personenkontexte/{personenkontextId}`
-                .replace(`{${"personenkontextId"}}`, encodeURIComponent(String(personenkontextId)));
+      assertParamExists(
+        'personenkontextControllerDeletePersonenkontextById',
+        'personenkontextId',
+        personenkontextId
+      )
+      // verify required parameter 'deleteRevisionBodyParams' is not null or undefined
+      assertParamExists(
+        'personenkontextControllerDeletePersonenkontextById',
+        'deleteRevisionBodyParams',
+        deleteRevisionBodyParams
+      )
+      const localVarPath = `/api/personenkontexte/{personenkontextId}`.replace(
+        `{${'personenkontextId'}}`,
+        encodeURIComponent(String(personenkontextId))
+      )
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
+      let baseOptions
             if (configuration) {
-                baseOptions = configuration.baseOptions;
+        baseOptions = configuration.baseOptions
             }
 
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
+      const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options }
+      const localVarHeaderParameter = {} as any
+      const localVarQueryParameter = {} as any
 
-
+      localVarHeaderParameter['Content-Type'] = 'application/json'
     
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+      setSearchParams(localVarUrlObj, localVarQueryParameter)
+      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers
+      }
+      localVarRequestOptions.data = serializeDataIfNeeded(
+        deleteRevisionBodyParams,
+        localVarRequestOptions,
+        configuration
+      )
+
+      return {
+        url: toPathString(localVarUrlObj),
+        options: localVarRequestOptions
+      }
+    },
+    /**
+     *
+     * @param {string} personenkontextId The id for the personenkontext.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    personenkontextControllerFindPersonenkontextById: async (
+      personenkontextId: string,
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
+      // verify required parameter 'personenkontextId' is not null or undefined
+      assertParamExists(
+        'personenkontextControllerFindPersonenkontextById',
+        'personenkontextId',
+        personenkontextId
+      )
+      const localVarPath = `/api/personenkontexte/{personenkontextId}`.replace(
+        `{${'personenkontextId'}}`,
+        encodeURIComponent(String(personenkontextId))
+      )
+      // use dummy base URL string because the URL constructor only accepts absolute URLs.
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
+      let baseOptions
+      if (configuration) {
+        baseOptions = configuration.baseOptions
+      }
+
+      const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options }
+      const localVarHeaderParameter = {} as any
+      const localVarQueryParameter = {} as any
+
+      setSearchParams(localVarUrlObj, localVarQueryParameter)
+      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers
+      }
 
             return {
                 url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
+        options: localVarRequestOptions
+      }
         },
         /**
          * 
@@ -2406,53 +3052,63 @@ export const PersonenkontexteApiAxiosParamCreator = function (configuration?: Co
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        personenkontextControllerFindPersonenkontexte: async (offset?: number, limit?: number, referrer?: string, rolle?: 'LERN' | 'LEHR' | 'EXTERN' | 'ORGADMIN' | 'LEIT' | 'SYSADMIN', personenstatus?: 'AKTIV', sichtfreigabe?: 'ja' | 'nein', options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/personenkontexte`;
+    personenkontextControllerFindPersonenkontexte: async (
+      offset?: number,
+      limit?: number,
+      referrer?: string,
+      rolle?: 'LERN' | 'LEHR' | 'EXTERN' | 'ORGADMIN' | 'LEIT' | 'SYSADMIN',
+      personenstatus?: 'AKTIV',
+      sichtfreigabe?: 'ja' | 'nein',
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
+      const localVarPath = `/api/personenkontexte`
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
+      let baseOptions
             if (configuration) {
-                baseOptions = configuration.baseOptions;
+        baseOptions = configuration.baseOptions
             }
 
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
+      const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options }
+      const localVarHeaderParameter = {} as any
+      const localVarQueryParameter = {} as any
 
             if (offset !== undefined) {
-                localVarQueryParameter['offset'] = offset;
+        localVarQueryParameter['offset'] = offset
             }
 
             if (limit !== undefined) {
-                localVarQueryParameter['limit'] = limit;
+        localVarQueryParameter['limit'] = limit
             }
 
             if (referrer !== undefined) {
-                localVarQueryParameter['referrer'] = referrer;
+        localVarQueryParameter['referrer'] = referrer
             }
 
             if (rolle !== undefined) {
-                localVarQueryParameter['rolle'] = rolle;
+        localVarQueryParameter['rolle'] = rolle
             }
 
             if (personenstatus !== undefined) {
-                localVarQueryParameter['personenstatus'] = personenstatus;
+        localVarQueryParameter['personenstatus'] = personenstatus
             }
 
             if (sichtfreigabe !== undefined) {
-                localVarQueryParameter['sichtfreigabe'] = sichtfreigabe;
-            }
-
-
+        localVarQueryParameter['sichtfreigabe'] = sichtfreigabe
+      }
     
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+      setSearchParams(localVarUrlObj, localVarQueryParameter)
+      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers
+      }
 
             return {
                 url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
+        options: localVarRequestOptions
+      }
         },
         /**
          * 
@@ -2461,57 +3117,106 @@ export const PersonenkontexteApiAxiosParamCreator = function (configuration?: Co
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        personenkontextControllerUpdatePersonenkontextWithId: async (personenkontextId: string, updatePersonenkontextBodyParams: UpdatePersonenkontextBodyParams, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+    personenkontextControllerUpdatePersonenkontextWithId: async (
+      personenkontextId: string,
+      updatePersonenkontextBodyParams: UpdatePersonenkontextBodyParams,
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
             // verify required parameter 'personenkontextId' is not null or undefined
-            assertParamExists('personenkontextControllerUpdatePersonenkontextWithId', 'personenkontextId', personenkontextId)
+      assertParamExists(
+        'personenkontextControllerUpdatePersonenkontextWithId',
+        'personenkontextId',
+        personenkontextId
+      )
             // verify required parameter 'updatePersonenkontextBodyParams' is not null or undefined
-            assertParamExists('personenkontextControllerUpdatePersonenkontextWithId', 'updatePersonenkontextBodyParams', updatePersonenkontextBodyParams)
-            const localVarPath = `/api/personenkontexte/{personenkontextId}`
-                .replace(`{${"personenkontextId"}}`, encodeURIComponent(String(personenkontextId)));
+      assertParamExists(
+        'personenkontextControllerUpdatePersonenkontextWithId',
+        'updatePersonenkontextBodyParams',
+        updatePersonenkontextBodyParams
+      )
+      const localVarPath = `/api/personenkontexte/{personenkontextId}`.replace(
+        `{${'personenkontextId'}}`,
+        encodeURIComponent(String(personenkontextId))
+      )
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
+      let baseOptions
             if (configuration) {
-                baseOptions = configuration.baseOptions;
+        baseOptions = configuration.baseOptions
             }
 
-            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
+      const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options }
+      const localVarHeaderParameter = {} as any
+      const localVarQueryParameter = {} as any
     
-            localVarHeaderParameter['Content-Type'] = 'application/json';
+      localVarHeaderParameter['Content-Type'] = 'application/json'
 
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(updatePersonenkontextBodyParams, localVarRequestOptions, configuration)
+      setSearchParams(localVarUrlObj, localVarQueryParameter)
+      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers
+      }
+      localVarRequestOptions.data = serializeDataIfNeeded(
+        updatePersonenkontextBodyParams,
+        localVarRequestOptions,
+        configuration
+      )
 
             return {
                 url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
+        options: localVarRequestOptions
     }
-};
+    }
+  }
+}
 
 /**
  * PersonenkontexteApi - functional programming interface
  * @export
  */
-export const PersonenkontexteApiFp = function(configuration?: Configuration) {
+export const PersonenkontexteApiFp = function (configuration?: Configuration) {
     const localVarAxiosParamCreator = PersonenkontexteApiAxiosParamCreator(configuration)
     return {
         /**
          * 
          * @param {string} personenkontextId The id for the personenkontext.
+     * @param {DeleteRevisionBodyParams} deleteRevisionBodyParams
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async personenkontextControllerFindPersonenkontextById(personenkontextId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonendatensatzResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.personenkontextControllerFindPersonenkontextById(personenkontextId, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+    async personenkontextControllerDeletePersonenkontextById(
+      personenkontextId: string,
+      deleteRevisionBodyParams: DeleteRevisionBodyParams,
+      options?: AxiosRequestConfig
+    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.personenkontextControllerDeletePersonenkontextById(
+          personenkontextId,
+          deleteRevisionBodyParams,
+          options
+        )
+      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
+    },
+    /**
+     *
+     * @param {string} personenkontextId The id for the personenkontext.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async personenkontextControllerFindPersonenkontextById(
+      personenkontextId: string,
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonendatensatzResponse>
+    > {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.personenkontextControllerFindPersonenkontextById(
+          personenkontextId,
+          options
+        )
+      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
         },
         /**
          * 
@@ -2524,9 +3229,28 @@ export const PersonenkontexteApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async personenkontextControllerFindPersonenkontexte(offset?: number, limit?: number, referrer?: string, rolle?: 'LERN' | 'LEHR' | 'EXTERN' | 'ORGADMIN' | 'LEIT' | 'SYSADMIN', personenstatus?: 'AKTIV', sichtfreigabe?: 'ja' | 'nein', options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<PersonendatensatzResponse>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.personenkontextControllerFindPersonenkontexte(offset, limit, referrer, rolle, personenstatus, sichtfreigabe, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+    async personenkontextControllerFindPersonenkontexte(
+      offset?: number,
+      limit?: number,
+      referrer?: string,
+      rolle?: 'LERN' | 'LEHR' | 'EXTERN' | 'ORGADMIN' | 'LEIT' | 'SYSADMIN',
+      personenstatus?: 'AKTIV',
+      sichtfreigabe?: 'ja' | 'nein',
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<PersonendatensatzResponse>>
+    > {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.personenkontextControllerFindPersonenkontexte(
+          offset,
+          limit,
+          referrer,
+          rolle,
+          personenstatus,
+          sichtfreigabe,
+          options
+        )
+      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
         },
         /**
          * 
@@ -2535,28 +3259,68 @@ export const PersonenkontexteApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async personenkontextControllerUpdatePersonenkontextWithId(personenkontextId: string, updatePersonenkontextBodyParams: UpdatePersonenkontextBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonenkontextResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.personenkontextControllerUpdatePersonenkontextWithId(personenkontextId, updatePersonenkontextBodyParams, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
+    async personenkontextControllerUpdatePersonenkontextWithId(
+      personenkontextId: string,
+      updatePersonenkontextBodyParams: UpdatePersonenkontextBodyParams,
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonenkontextResponse>
+    > {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.personenkontextControllerUpdatePersonenkontextWithId(
+          personenkontextId,
+          updatePersonenkontextBodyParams,
+          options
+        )
+      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
     }
-};
+    }
+}
 
 /**
  * PersonenkontexteApi - factory interface
  * @export
  */
-export const PersonenkontexteApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+export const PersonenkontexteApiFactory = function (
+  configuration?: Configuration,
+  basePath?: string,
+  axios?: AxiosInstance
+) {
     const localVarFp = PersonenkontexteApiFp(configuration)
     return {
         /**
          * 
          * @param {string} personenkontextId The id for the personenkontext.
+     * @param {DeleteRevisionBodyParams} deleteRevisionBodyParams
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        personenkontextControllerFindPersonenkontextById(personenkontextId: string, options?: any): AxiosPromise<PersonendatensatzResponse> {
-            return localVarFp.personenkontextControllerFindPersonenkontextById(personenkontextId, options).then((request) => request(axios, basePath));
+    personenkontextControllerDeletePersonenkontextById(
+      personenkontextId: string,
+      deleteRevisionBodyParams: DeleteRevisionBodyParams,
+      options?: any
+    ): AxiosPromise<void> {
+      return localVarFp
+        .personenkontextControllerDeletePersonenkontextById(
+          personenkontextId,
+          deleteRevisionBodyParams,
+          options
+        )
+        .then((request) => request(axios, basePath))
+    },
+    /**
+     *
+     * @param {string} personenkontextId The id for the personenkontext.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    personenkontextControllerFindPersonenkontextById(
+      personenkontextId: string,
+      options?: any
+    ): AxiosPromise<PersonendatensatzResponse> {
+      return localVarFp
+        .personenkontextControllerFindPersonenkontextById(personenkontextId, options)
+        .then((request) => request(axios, basePath))
         },
         /**
          * 
@@ -2569,8 +3333,26 @@ export const PersonenkontexteApiFactory = function (configuration?: Configuratio
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        personenkontextControllerFindPersonenkontexte(offset?: number, limit?: number, referrer?: string, rolle?: 'LERN' | 'LEHR' | 'EXTERN' | 'ORGADMIN' | 'LEIT' | 'SYSADMIN', personenstatus?: 'AKTIV', sichtfreigabe?: 'ja' | 'nein', options?: any): AxiosPromise<Array<PersonendatensatzResponse>> {
-            return localVarFp.personenkontextControllerFindPersonenkontexte(offset, limit, referrer, rolle, personenstatus, sichtfreigabe, options).then((request) => request(axios, basePath));
+    personenkontextControllerFindPersonenkontexte(
+      offset?: number,
+      limit?: number,
+      referrer?: string,
+      rolle?: 'LERN' | 'LEHR' | 'EXTERN' | 'ORGADMIN' | 'LEIT' | 'SYSADMIN',
+      personenstatus?: 'AKTIV',
+      sichtfreigabe?: 'ja' | 'nein',
+      options?: any
+    ): AxiosPromise<Array<PersonendatensatzResponse>> {
+      return localVarFp
+        .personenkontextControllerFindPersonenkontexte(
+          offset,
+          limit,
+          referrer,
+          rolle,
+          personenstatus,
+          sichtfreigabe,
+          options
+        )
+        .then((request) => request(axios, basePath))
         },
         /**
          * 
@@ -2579,11 +3361,21 @@ export const PersonenkontexteApiFactory = function (configuration?: Configuratio
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        personenkontextControllerUpdatePersonenkontextWithId(personenkontextId: string, updatePersonenkontextBodyParams: UpdatePersonenkontextBodyParams, options?: any): AxiosPromise<PersonenkontextResponse> {
-            return localVarFp.personenkontextControllerUpdatePersonenkontextWithId(personenkontextId, updatePersonenkontextBodyParams, options).then((request) => request(axios, basePath));
-        },
-    };
-};
+    personenkontextControllerUpdatePersonenkontextWithId(
+      personenkontextId: string,
+      updatePersonenkontextBodyParams: UpdatePersonenkontextBodyParams,
+      options?: any
+    ): AxiosPromise<PersonenkontextResponse> {
+      return localVarFp
+        .personenkontextControllerUpdatePersonenkontextWithId(
+          personenkontextId,
+          updatePersonenkontextBodyParams,
+          options
+        )
+        .then((request) => request(axios, basePath))
+    }
+  }
+}
 
 /**
  * PersonenkontexteApi - interface
@@ -2594,11 +3386,28 @@ export interface PersonenkontexteApiInterface {
     /**
      * 
      * @param {string} personenkontextId The id for the personenkontext.
+   * @param {DeleteRevisionBodyParams} deleteRevisionBodyParams
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PersonenkontexteApiInterface
      */
-    personenkontextControllerFindPersonenkontextById(personenkontextId: string, options?: AxiosRequestConfig): AxiosPromise<PersonendatensatzResponse>;
+  personenkontextControllerDeletePersonenkontextById(
+    personenkontextId: string,
+    deleteRevisionBodyParams: DeleteRevisionBodyParams,
+    options?: AxiosRequestConfig
+  ): AxiosPromise<void>
+
+  /**
+   *
+   * @param {string} personenkontextId The id for the personenkontext.
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   * @memberof PersonenkontexteApiInterface
+   */
+  personenkontextControllerFindPersonenkontextById(
+    personenkontextId: string,
+    options?: AxiosRequestConfig
+  ): AxiosPromise<PersonendatensatzResponse>
 
     /**
      * 
@@ -2612,7 +3421,15 @@ export interface PersonenkontexteApiInterface {
      * @throws {RequiredError}
      * @memberof PersonenkontexteApiInterface
      */
-    personenkontextControllerFindPersonenkontexte(offset?: number, limit?: number, referrer?: string, rolle?: 'LERN' | 'LEHR' | 'EXTERN' | 'ORGADMIN' | 'LEIT' | 'SYSADMIN', personenstatus?: 'AKTIV', sichtfreigabe?: 'ja' | 'nein', options?: AxiosRequestConfig): AxiosPromise<Array<PersonendatensatzResponse>>;
+  personenkontextControllerFindPersonenkontexte(
+    offset?: number,
+    limit?: number,
+    referrer?: string,
+    rolle?: 'LERN' | 'LEHR' | 'EXTERN' | 'ORGADMIN' | 'LEIT' | 'SYSADMIN',
+    personenstatus?: 'AKTIV',
+    sichtfreigabe?: 'ja' | 'nein',
+    options?: AxiosRequestConfig
+  ): AxiosPromise<Array<PersonendatensatzResponse>>
 
     /**
      * 
@@ -2622,8 +3439,11 @@ export interface PersonenkontexteApiInterface {
      * @throws {RequiredError}
      * @memberof PersonenkontexteApiInterface
      */
-    personenkontextControllerUpdatePersonenkontextWithId(personenkontextId: string, updatePersonenkontextBodyParams: UpdatePersonenkontextBodyParams, options?: AxiosRequestConfig): AxiosPromise<PersonenkontextResponse>;
-
+  personenkontextControllerUpdatePersonenkontextWithId(
+    personenkontextId: string,
+    updatePersonenkontextBodyParams: UpdatePersonenkontextBodyParams,
+    options?: AxiosRequestConfig
+  ): AxiosPromise<PersonenkontextResponse>
 }
 
 /**
@@ -2636,12 +3456,39 @@ export class PersonenkontexteApi extends BaseAPI implements PersonenkontexteApiI
     /**
      * 
      * @param {string} personenkontextId The id for the personenkontext.
+   * @param {DeleteRevisionBodyParams} deleteRevisionBodyParams
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PersonenkontexteApi
      */
-    public personenkontextControllerFindPersonenkontextById(personenkontextId: string, options?: AxiosRequestConfig) {
-        return PersonenkontexteApiFp(this.configuration).personenkontextControllerFindPersonenkontextById(personenkontextId, options).then((request) => request(this.axios, this.basePath));
+  public personenkontextControllerDeletePersonenkontextById(
+    personenkontextId: string,
+    deleteRevisionBodyParams: DeleteRevisionBodyParams,
+    options?: AxiosRequestConfig
+  ) {
+    return PersonenkontexteApiFp(this.configuration)
+      .personenkontextControllerDeletePersonenkontextById(
+        personenkontextId,
+        deleteRevisionBodyParams,
+        options
+      )
+      .then((request) => request(this.axios, this.basePath))
+  }
+
+  /**
+   *
+   * @param {string} personenkontextId The id for the personenkontext.
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   * @memberof PersonenkontexteApi
+   */
+  public personenkontextControllerFindPersonenkontextById(
+    personenkontextId: string,
+    options?: AxiosRequestConfig
+  ) {
+    return PersonenkontexteApiFp(this.configuration)
+      .personenkontextControllerFindPersonenkontextById(personenkontextId, options)
+      .then((request) => request(this.axios, this.basePath))
     }
 
     /**
@@ -2656,8 +3503,26 @@ export class PersonenkontexteApi extends BaseAPI implements PersonenkontexteApiI
      * @throws {RequiredError}
      * @memberof PersonenkontexteApi
      */
-    public personenkontextControllerFindPersonenkontexte(offset?: number, limit?: number, referrer?: string, rolle?: 'LERN' | 'LEHR' | 'EXTERN' | 'ORGADMIN' | 'LEIT' | 'SYSADMIN', personenstatus?: 'AKTIV', sichtfreigabe?: 'ja' | 'nein', options?: AxiosRequestConfig) {
-        return PersonenkontexteApiFp(this.configuration).personenkontextControllerFindPersonenkontexte(offset, limit, referrer, rolle, personenstatus, sichtfreigabe, options).then((request) => request(this.axios, this.basePath));
+  public personenkontextControllerFindPersonenkontexte(
+    offset?: number,
+    limit?: number,
+    referrer?: string,
+    rolle?: 'LERN' | 'LEHR' | 'EXTERN' | 'ORGADMIN' | 'LEIT' | 'SYSADMIN',
+    personenstatus?: 'AKTIV',
+    sichtfreigabe?: 'ja' | 'nein',
+    options?: AxiosRequestConfig
+  ) {
+    return PersonenkontexteApiFp(this.configuration)
+      .personenkontextControllerFindPersonenkontexte(
+        offset,
+        limit,
+        referrer,
+        rolle,
+        personenstatus,
+        sichtfreigabe,
+        options
+      )
+      .then((request) => request(this.axios, this.basePath))
     }
 
     /**
@@ -2668,11 +3533,20 @@ export class PersonenkontexteApi extends BaseAPI implements PersonenkontexteApiI
      * @throws {RequiredError}
      * @memberof PersonenkontexteApi
      */
-    public personenkontextControllerUpdatePersonenkontextWithId(personenkontextId: string, updatePersonenkontextBodyParams: UpdatePersonenkontextBodyParams, options?: AxiosRequestConfig) {
-        return PersonenkontexteApiFp(this.configuration).personenkontextControllerUpdatePersonenkontextWithId(personenkontextId, updatePersonenkontextBodyParams, options).then((request) => request(this.axios, this.basePath));
+  public personenkontextControllerUpdatePersonenkontextWithId(
+    personenkontextId: string,
+    updatePersonenkontextBodyParams: UpdatePersonenkontextBodyParams,
+    options?: AxiosRequestConfig
+  ) {
+    return PersonenkontexteApiFp(this.configuration)
+      .personenkontextControllerUpdatePersonenkontextWithId(
+        personenkontextId,
+        updatePersonenkontextBodyParams,
+        options
+      )
+      .then((request) => request(this.axios, this.basePath))
     }
 }
-
 
 /**
  * ProviderApi - axios parameter creator
@@ -2685,38 +3559,42 @@ export const ProviderApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        providerControllerGetServiceProvidersByPersonId: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/provider`;
+    providerControllerGetServiceProvidersByPersonId: async (
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
+      const localVarPath = `/api/provider`
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
+      let baseOptions
             if (configuration) {
-                baseOptions = configuration.baseOptions;
+        baseOptions = configuration.baseOptions
             }
 
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
+      const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options }
+      const localVarHeaderParameter = {} as any
+      const localVarQueryParameter = {} as any
     
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+      setSearchParams(localVarUrlObj, localVarQueryParameter)
+      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers
+      }
 
             return {
                 url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
+        options: localVarRequestOptions
     }
-};
+    }
+  }
+}
 
 /**
  * ProviderApi - functional programming interface
  * @export
  */
-export const ProviderApiFp = function(configuration?: Configuration) {
+export const ProviderApiFp = function (configuration?: Configuration) {
     const localVarAxiosParamCreator = ProviderApiAxiosParamCreator(configuration)
     return {
         /**
@@ -2724,18 +3602,27 @@ export const ProviderApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async providerControllerGetServiceProvidersByPersonId(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<ServiceProviderInfoResponse>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.providerControllerGetServiceProvidersByPersonId(options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
+    async providerControllerGetServiceProvidersByPersonId(
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<ServiceProviderInfoResponse>>
+    > {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.providerControllerGetServiceProvidersByPersonId(options)
+      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
     }
-};
+    }
+}
 
 /**
  * ProviderApi - factory interface
  * @export
  */
-export const ProviderApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+export const ProviderApiFactory = function (
+  configuration?: Configuration,
+  basePath?: string,
+  axios?: AxiosInstance
+) {
     const localVarFp = ProviderApiFp(configuration)
     return {
         /**
@@ -2743,11 +3630,15 @@ export const ProviderApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        providerControllerGetServiceProvidersByPersonId(options?: any): AxiosPromise<Array<ServiceProviderInfoResponse>> {
-            return localVarFp.providerControllerGetServiceProvidersByPersonId(options).then((request) => request(axios, basePath));
-        },
-    };
-};
+    providerControllerGetServiceProvidersByPersonId(
+      options?: any
+    ): AxiosPromise<Array<ServiceProviderInfoResponse>> {
+      return localVarFp
+        .providerControllerGetServiceProvidersByPersonId(options)
+        .then((request) => request(axios, basePath))
+    }
+  }
+}
 
 /**
  * ProviderApi - interface
@@ -2761,8 +3652,9 @@ export interface ProviderApiInterface {
      * @throws {RequiredError}
      * @memberof ProviderApiInterface
      */
-    providerControllerGetServiceProvidersByPersonId(options?: AxiosRequestConfig): AxiosPromise<Array<ServiceProviderInfoResponse>>;
-
+  providerControllerGetServiceProvidersByPersonId(
+    options?: AxiosRequestConfig
+  ): AxiosPromise<Array<ServiceProviderInfoResponse>>
 }
 
 /**
@@ -2779,10 +3671,11 @@ export class ProviderApi extends BaseAPI implements ProviderApiInterface {
      * @memberof ProviderApi
      */
     public providerControllerGetServiceProvidersByPersonId(options?: AxiosRequestConfig) {
-        return ProviderApiFp(this.configuration).providerControllerGetServiceProvidersByPersonId(options).then((request) => request(this.axios, this.basePath));
+    return ProviderApiFp(this.configuration)
+      .providerControllerGetServiceProvidersByPersonId(options)
+      .then((request) => request(this.axios, this.basePath))
     }
 }
-
 
 /**
  * RolleApi - axios parameter creator
@@ -2797,43 +3690,56 @@ export const RolleApiAxiosParamCreator = function (configuration?: Configuration
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        rolleControllerCreateRolle: async (createRolleBodyParams: CreateRolleBodyParams, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+    rolleControllerCreateRolle: async (
+      createRolleBodyParams: CreateRolleBodyParams,
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
             // verify required parameter 'createRolleBodyParams' is not null or undefined
-            assertParamExists('rolleControllerCreateRolle', 'createRolleBodyParams', createRolleBodyParams)
-            const localVarPath = `/api/rolle`;
+      assertParamExists(
+        'rolleControllerCreateRolle',
+        'createRolleBodyParams',
+        createRolleBodyParams
+      )
+      const localVarPath = `/api/rolle`
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
+      let baseOptions
             if (configuration) {
-                baseOptions = configuration.baseOptions;
+        baseOptions = configuration.baseOptions
             }
 
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
+      const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options }
+      const localVarHeaderParameter = {} as any
+      const localVarQueryParameter = {} as any
     
-            localVarHeaderParameter['Content-Type'] = 'application/json';
+      localVarHeaderParameter['Content-Type'] = 'application/json'
 
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(createRolleBodyParams, localVarRequestOptions, configuration)
+      setSearchParams(localVarUrlObj, localVarQueryParameter)
+      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers
+      }
+      localVarRequestOptions.data = serializeDataIfNeeded(
+        createRolleBodyParams,
+        localVarRequestOptions,
+        configuration
+      )
 
             return {
                 url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
+        options: localVarRequestOptions
     }
-};
+    }
+  }
+}
 
 /**
  * RolleApi - functional programming interface
  * @export
  */
-export const RolleApiFp = function(configuration?: Configuration) {
+export const RolleApiFp = function (configuration?: Configuration) {
     const localVarAxiosParamCreator = RolleApiAxiosParamCreator(configuration)
     return {
         /**
@@ -2843,18 +3749,28 @@ export const RolleApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async rolleControllerCreateRolle(createRolleBodyParams: CreateRolleBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RolleResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.rolleControllerCreateRolle(createRolleBodyParams, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
+    async rolleControllerCreateRolle(
+      createRolleBodyParams: CreateRolleBodyParams,
+      options?: AxiosRequestConfig
+    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RolleResponse>> {
+      const localVarAxiosArgs = await localVarAxiosParamCreator.rolleControllerCreateRolle(
+        createRolleBodyParams,
+        options
+      )
+      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
     }
-};
+    }
+}
 
 /**
  * RolleApi - factory interface
  * @export
  */
-export const RolleApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+export const RolleApiFactory = function (
+  configuration?: Configuration,
+  basePath?: string,
+  axios?: AxiosInstance
+) {
     const localVarFp = RolleApiFp(configuration)
     return {
         /**
@@ -2864,11 +3780,16 @@ export const RolleApiFactory = function (configuration?: Configuration, basePath
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        rolleControllerCreateRolle(createRolleBodyParams: CreateRolleBodyParams, options?: any): AxiosPromise<RolleResponse> {
-            return localVarFp.rolleControllerCreateRolle(createRolleBodyParams, options).then((request) => request(axios, basePath));
-        },
-    };
-};
+    rolleControllerCreateRolle(
+      createRolleBodyParams: CreateRolleBodyParams,
+      options?: any
+    ): AxiosPromise<RolleResponse> {
+      return localVarFp
+        .rolleControllerCreateRolle(createRolleBodyParams, options)
+        .then((request) => request(axios, basePath))
+    }
+  }
+}
 
 /**
  * RolleApi - interface
@@ -2884,8 +3805,10 @@ export interface RolleApiInterface {
      * @throws {RequiredError}
      * @memberof RolleApiInterface
      */
-    rolleControllerCreateRolle(createRolleBodyParams: CreateRolleBodyParams, options?: AxiosRequestConfig): AxiosPromise<RolleResponse>;
-
+  rolleControllerCreateRolle(
+    createRolleBodyParams: CreateRolleBodyParams,
+    options?: AxiosRequestConfig
+  ): AxiosPromise<RolleResponse>
 }
 
 /**
@@ -2903,9 +3826,12 @@ export class RolleApi extends BaseAPI implements RolleApiInterface {
      * @throws {RequiredError}
      * @memberof RolleApi
      */
-    public rolleControllerCreateRolle(createRolleBodyParams: CreateRolleBodyParams, options?: AxiosRequestConfig) {
-        return RolleApiFp(this.configuration).rolleControllerCreateRolle(createRolleBodyParams, options).then((request) => request(this.axios, this.basePath));
+  public rolleControllerCreateRolle(
+    createRolleBodyParams: CreateRolleBodyParams,
+    options?: AxiosRequestConfig
+  ) {
+    return RolleApiFp(this.configuration)
+      .rolleControllerCreateRolle(createRolleBodyParams, options)
+      .then((request) => request(this.axios, this.basePath))
     }
 }
-
-
