@@ -9,6 +9,7 @@
 <template>
   <v-app-bar
     color="#001E49"
+    data-testid="header"
     height="60"
   >
     <!-- Logo and title -->
@@ -33,12 +34,14 @@
           cols="auto"
           class="hidden-md-and-up"
         >
-          <img
-            alt="Logo Schulportal"
-            src="@/assets/logos/Schulportal_SH_Bildmarke_RGB_Anwendung_HG_Blau.svg"
-            width="33"
-            height="33"
-          />
+          <router-link :to="auth.isAuthed ? '/start' : '/'">
+            <img
+              alt="Logo Schulportal"
+              src="@/assets/logos/Schulportal_SH_Bildmarke_RGB_Anwendung_HG_Blau.svg"
+              width="33"
+              height="33"
+            />
+          </router-link>
         </v-col>
       </v-row>
     </v-toolbar-title>
@@ -75,7 +78,7 @@
         <a
           class="primary"
           data-testid="nav-login-button"
-          :href="`/api/frontend/login?redirectUrl=${route.fullPath}`"
+          :href="`/api/auth/login?redirectUrl=${route.fullPath}`"
         >
           <v-icon
             class="mr-2"
@@ -92,7 +95,7 @@
         <a
           class="primary"
           data-testid="nav-logout-button"
-          href="/api/frontend/logout"
+          href="/api/auth/logout"
         >
           <v-icon
             class="mr-2"
@@ -105,14 +108,4 @@
   </v-app-bar>
 </template>
 
-<style scoped>
-  .nav-title {
-    font-weight: 600;
-  }
-  .v-btn {
-    text-transform: none;
-  }
-  .v-btn:hover {
-    text-decoration: underline;
-  }
-</style>
+<style scoped></style>

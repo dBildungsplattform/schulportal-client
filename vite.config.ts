@@ -11,6 +11,10 @@ export default defineConfig({
     // Disable inlining of assets
     assetsInlineLimit: 0
   },
+  define: {
+    /* disable hydration mismatch details in production build */
+    __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: 'false'
+  },
   plugins: [
     VueI18nPlugin({
       /* we have to enable jit compilation to use i18n interpolation without violating the CSP
@@ -34,7 +38,7 @@ export default defineConfig({
     port: 8099,
     proxy: {
       '/api': {
-        target: 'http://localhost:9091/',
+        target: 'http://localhost:9090/',
         changeOrigin: true,
         secure: false,
         xfwd: true
@@ -88,7 +92,7 @@ export default defineConfig({
     port: 8099,
     proxy: {
       '/api': {
-        target: 'http://localhost:9091/',
+        target: 'http://localhost:9090/',
         changeOrigin: true,
         secure: false,
         xfwd: true
@@ -98,7 +102,7 @@ export default defineConfig({
       // Only for local development productive CSP is defined in nginx-vue.conf. Nonce is static, not safe for production.
       // This does not apply for 'npm run dev', but only to 'npm run preview'. CSP can not be applied for 'npm run dev', because it is missing the build step and thus has many inline JS/CSS
       'Content-Security-Policy':
-        "default-src 'self'; script-src 'self' 'nonce-CSPN0NCEPLAC3H0LDER'; style-src 'self' 'nonce-CSPN0NCEPLAC3H0LDER'; font-src 'self'; img-src 'self'; frame-src 'self';"
+        "default-src 'self'; script-src 'self' 'nonce-CSPN0NCEPLAC3H0LDER'; style-src 'self' 'nonce-CSPN0NCEPLAC3H0LDER'; font-src 'self'; img-src 'self'; frame-src 'self'; base-uri 'self'; object-src 'none';"
     }
   }
 })

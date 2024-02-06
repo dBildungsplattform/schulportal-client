@@ -1,9 +1,24 @@
 .v-btn {
-  text-transform: none;
   width: 340px;
 
   .v-btn__content {
     font-weight: bold;
+  }
+
+  &.v-btn--variant-text {
+    .v-btn__content {
+      font-weight: normal;
+    }
+
+    &:focus,
+    &:hover {
+      .v-btn__content {
+        text-decoration: underline;
+      }
+      .v-btn__overlay {
+        opacity: 0;
+      }
+    }
   }
 
   &.primary {
@@ -36,9 +51,8 @@
 
     &:focus,
     &:hover {
-      transform: $smallButtonTransformScale
+      transform: $smallButtonTransformScale;
     }
-   
   }
 
   /* medium screen */
