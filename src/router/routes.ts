@@ -29,8 +29,8 @@ const routes: readonly RouteRecordRaw[] = [
   },
   {
     path: '/admin/role/new',
-    name: 'create-role',
-    component: () => import('../views/admin/UserRoleCreateView.vue'),
+    name: 'create-rolle',
+    component: () => import('../views/admin/RoleCreationView.vue'),
     meta: {
       layout: 'AdminLayout',
       requiresAuth: true

@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import LayoutCard from '@/components/cards/LayoutCard.vue'
   import { ref, type Ref } from 'vue'
-  import { useRoleStore, type RoleStore } from '@/stores/RoleStore'
+  import { useRolleStore, type RolleStore } from '@/stores/RolleStore'
   import type { CreateRolleBodyParamsRollenartEnum } from '@/api-client/generated'
   import { useI18n, type Composer } from 'vue-i18n'
   import SpshAlert from '@/components/alert/SpshAlert.vue'
@@ -16,36 +16,36 @@
   type Selection = string | null
   type SelectionArray = string[] | null
 
-  const selectedStructureNode: Ref<Selection> = ref(null)
-  const selectedRoleType: Ref<Selection> = ref(null)
-  const selectedRoleName: Ref<Selection> = ref(null)
-  const selectedCharacteristics: Ref<SelectionArray> = ref(null)
+  const selectedSchulstrukturKnoten: Ref<Selection> = ref(null)
+  const selectedRollenArt: Ref<Selection> = ref(null)
+  const selectedRollenName: Ref<Selection> = ref(null)
+  const selectedMerkmale: Ref<SelectionArray> = ref(null)
 
-  const structureNodes: string[] = ['d3aa88e2-c754-41e0-8ba6-4198a34aa0a2']
-  const roleTypes: string[] = ['Lern', 'Lehr', 'Extern', 'Orgadmin', 'Leit', 'Sysadmin']
-  const characteristics: string[] = ['BEFRISTUNG_PFLICHT', 'KOPERS_PFLICHT']
+  const schulstrukturKnoten: string[] = ['d3aa88e2-c754-41e0-8ba6-4198a34aa0a2']
+  const rollenArten: string[] = ['Lern', 'Lehr', 'Extern', 'Orgadmin', 'Leit', 'Sysadmin']
+  const merkmale: string[] = ['BEFRISTUNG_PFLICHT', 'KOPERS_PFLICHT']
 
-  const roleStore: RoleStore = useRoleStore()
+  const rolleStore: RolleStore = useRolleStore()
 
   const submitForm = async (): Promise<void> => {
     if (
-      selectedRoleName.value &&
-      selectedStructureNode.value &&
-      selectedRoleType.value &&
-      selectedCharacteristics.value
+      selectedRollenName.value &&
+      selectedSchulstrukturKnoten.value &&
+      selectedRollenArt.value &&
+      selectedMerkmale.value
     ) {
-      await roleStore.createRole(
-        selectedRoleName.value,
-        selectedStructureNode.value,
-        selectedRoleType.value as keyof typeof CreateRolleBodyParamsRollenartEnum,
-        selectedCharacteristics.value
+      await rolleStore.createRolle(
+        selectedRollenName.value,
+        selectedSchulstrukturKnoten.value,
+        selectedRollenArt.value as keyof typeof CreateRolleBodyParamsRollenartEnum,
+        selectedMerkmale.value
       )
     }
   }
 
   const handleCreateAnotherRole = (): void => {
-    roleStore.createdRole = null
-    router.push({ name: 'create-role' })
+    rolleStore.createdRolle = null
+    router.push({ name: 'create-rolle' })
   }
   // Rule for validating the role name. Maybe enhance a validation framework like VeeValidate instead?
   const roleNameRules: Array<(v: string) => boolean | string> = [
@@ -69,7 +69,7 @@
     >
       <!-- Error Message Display if error on submit -->
       <SpshAlert
-        :model-value="!!roleStore.errorCode"
+        :model-value="!!rolleStore.errorCode"
         :title="t('admin.role.roleCreateErrorTitle')"
         :type="'error'"
         :closable="false"
@@ -79,7 +79,7 @@
         buttonClass="primary"
       />
       <!-- Result template on success after submit (Present value in createdRole and no errorCode)  -->
-      <template v-if="roleStore.createdRole && !roleStore.errorCode">
+      <template v-if="rolleStore.createdRolle && !rolleStore.errorCode">
         <v-container class="new-role-success">
           <v-row justify="center">
             <v-col
@@ -112,22 +112,22 @@
               {{ $t('admin.role.schoolStructureNode') }}:
             </v-col>
             <v-col class="text-body">
-              {{ roleStore.createdRole.administeredBySchulstrukturknoten }}</v-col
+              {{ rolleStore.createdRolle.administeredBySchulstrukturknoten }}</v-col
             >
           </v-row>
           <v-row>
             <v-col class="text-body bold text-right"> {{ $t('admin.role.roleType') }}: </v-col>
-            <v-col class="text-body"> {{ roleStore.createdRole.rollenart }}</v-col>
+            <v-col class="text-body"> {{ rolleStore.createdRolle.rollenart }}</v-col>
           </v-row>
           <v-row>
             <v-col class="text-body bold text-right"> {{ $t('admin.role.roleName') }}:</v-col>
-            <v-col class="text-body"> {{ roleStore.createdRole.name }} </v-col>
+            <v-col class="text-body"> {{ rolleStore.createdRolle.name }} </v-col>
           </v-row>
           <v-row>
             <v-col class="text-body bold text-right">
               {{ $t('admin.role.characteristics') }}:</v-col
             >
-            <v-col class="text-body"> {{ roleStore.createdRole.merkmale }}</v-col></v-row
+            <v-col class="text-body"> {{ rolleStore.createdRolle.merkmale }}</v-col></v-row
           >
           <v-divider
             class="border-opacity-100 rounded my-6"
@@ -161,7 +161,7 @@
         </v-container>
       </template>
       <!-- The form to create a new role (No created role yet and no errorCode) -->
-      <template v-if="!roleStore.createdRole && !roleStore.errorCode">
+      <template v-if="!rolleStore.createdRolle && !rolleStore.errorCode">
         <v-container class="new-role">
           <v-form @submit.prevent="submitForm">
             <v-row>
@@ -179,7 +179,7 @@
                 <span class="subtitle-2">{{ $t('admin.mandatoryFieldsNotice') }}</span>
               </v-col>
             </v-row>
-            <!-- Choose school structure node -->
+            <!-- select school structure node -->
             <v-row>
               <!-- This column will be hidden on xs screens and visible on sm and larger screens -->
               <v-col
@@ -187,7 +187,7 @@
                 class="d-none d-md-flex"
               ></v-col>
               <v-col>
-                <h3 class="subtitle-2">1. {{ $t('admin.role.chooseSchoolStructureNode') }}</h3>
+                <h3 class="subtitle-2">1. {{ $t('admin.role.selectSchoolStructureNode') }}</h3>
               </v-col>
             </v-row>
             <v-row>
@@ -202,7 +202,7 @@
                 class="md-text-right py-0"
               >
                 <label class="text-body">
-                  {{ $t('admin.role.chooseSchoolStructureNode') + '*' }}
+                  {{ $t('admin.role.selectSchoolStructureNode') + '*' }}
                 </label></v-col
               >
               <v-col
@@ -211,13 +211,13 @@
                 class="py-0"
               >
                 <v-select
-                  :items="structureNodes"
-                  v-model="selectedStructureNode"
+                  :items="schulstrukturKnoten"
+                  v-model="selectedSchulstrukturKnoten"
                   variant="outlined"
                   density="compact"
                   single-line
-                  :placeholder="$t('admin.role.chooseSchoolStructureNode')"
-                  :bg-color="selectedStructureNode ? '#4dc7bc' : ''"
+                  :placeholder="$t('admin.role.selectSchoolStructureNode')"
+                  :bg-color="selectedSchulstrukturKnoten ? '#4dc7bc' : ''"
                   clearable
                   required
                 >
@@ -231,14 +231,14 @@
                 </v-select>
               </v-col>
             </v-row>
-            <!-- Choose Role type -->
+            <!-- select Role type -->
             <v-row>
               <v-col
                 cols="2"
                 class="d-none d-md-flex"
               ></v-col>
               <v-col>
-                <h3 class="subtitle-2">2. {{ $t('admin.role.chooseRoleType') }}</h3>
+                <h3 class="subtitle-2">2. {{ $t('admin.role.selectRoleType') }}</h3>
               </v-col>
             </v-row>
             <v-row>
@@ -253,7 +253,7 @@
                 class="md-text-right py-0"
               >
                 <label class="text-body">
-                  {{ $t('admin.role.chooseRoleType') + '*' }}
+                  {{ $t('admin.role.selectRoleType') + '*' }}
                 </label></v-col
               >
               <v-col
@@ -262,12 +262,12 @@
                 class="py-0"
               >
                 <v-select
-                  :items="roleTypes"
-                  v-model="selectedRoleType"
-                  :placeholder="$t('admin.role.chooseRoleType')"
+                  :items="rollenArten"
+                  v-model="selectedRollenArt"
+                  :placeholder="$t('admin.role.selectRoleType')"
                   variant="outlined"
                   density="compact"
-                  :bg-color="selectedRoleType ? '#4dc7bc' : ''"
+                  :bg-color="selectedRollenArt ? '#4dc7bc' : ''"
                   clearable
                   required
                 >
@@ -283,7 +283,7 @@
             </v-row>
 
             <!-- Enter Role name -->
-            <template v-if="selectedRoleType">
+            <template v-if="selectedRollenArt">
               <v-row>
                 <v-col
                   cols="2"
@@ -314,7 +314,7 @@
                   class="py-0"
                 >
                   <v-text-field
-                    v-model="selectedRoleName"
+                    v-model="selectedRollenName"
                     :placeholder="$t('admin.role.enterRoleName')"
                     variant="outlined"
                     density="compact"
@@ -323,14 +323,14 @@
                   ></v-text-field>
                 </v-col>
               </v-row>
-              <!-- Choose characteristics -->
+              <!-- select characteristics -->
               <v-row>
                 <v-col
                   class="d-none d-md-flex"
                   cols="2"
                 ></v-col>
                 <v-col>
-                  <label class="subtitle-2">4. {{ $t('admin.role.chooseCharacteristics') }}</label>
+                  <label class="subtitle-2">4. {{ $t('admin.role.selectCharacteristics') }}</label>
                 </v-col>
               </v-row>
               <v-row>
@@ -345,7 +345,7 @@
                   class="md-text-right py-0"
                 >
                   <h3 class="text-body">
-                    {{ $t('admin.role.chooseCharacteristics') + '*' }}
+                    {{ $t('admin.role.selectCharacteristics') + '*' }}
                   </h3></v-col
                 >
                 <v-col
@@ -354,13 +354,13 @@
                   class="py-0"
                 >
                   <v-select
-                    :items="characteristics"
-                    v-model="selectedCharacteristics"
-                    :placeholder="$t('admin.role.chooseCharacteristics')"
+                    :items="merkmale"
+                    v-model="selectedMerkmale"
+                    :placeholder="$t('admin.role.selectCharacteristics')"
                     variant="outlined"
                     density="compact"
                     multiple
-                    :bg-color="selectedCharacteristics ? '#4dc7bc' : ''"
+                    :bg-color="selectedMerkmale ? '#4dc7bc' : ''"
                     clearable
                     required
                   >
@@ -428,3 +428,4 @@
     }
   }
 </style>
+@/stores/RolleStore

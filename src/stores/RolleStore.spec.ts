@@ -1,27 +1,27 @@
 import ApiService from '@/services/ApiService'
 import MockAdapter from 'axios-mock-adapter'
 import { setActivePinia, createPinia } from 'pinia'
-import { useRoleStore, type RoleStore } from './RoleStore'
+import { useRolleStore, type RolleStore } from './RolleStore'
 import { type RolleResponse } from '../api-client/generated/api'
 import { rejects } from 'assert'
 
 const mockadapter: MockAdapter = new MockAdapter(ApiService)
 
-describe('roleStore', () => {
-  let roleStore: RoleStore
+describe('rolleStore', () => {
+  let rolleStore: RolleStore
   beforeEach(() => {
     setActivePinia(createPinia())
-    roleStore = useRoleStore()
+    rolleStore = useRolleStore()
     mockadapter.reset()
   })
 
   it('should initalize state correctly', () => {
-    expect(roleStore.createdRole).toEqual(null)
-    expect(roleStore.errorCode).toEqual('')
-    expect(roleStore.loading).toBeFalsy()
+    expect(rolleStore.createdRolle).toEqual(null)
+    expect(rolleStore.errorCode).toEqual('')
+    expect(rolleStore.loading).toBeFalsy()
   })
 
-  describe('createRole', () => {
+  describe('createRolle', () => {
     it('should create role and update state', async () => {
       const mockResponse: RolleResponse[] = [
         {
@@ -36,43 +36,43 @@ describe('roleStore', () => {
       ]
 
       mockadapter.onPost('/api/rolle').replyOnce(200, mockResponse)
-      const createRolePromise: Promise<RolleResponse> = roleStore.createRole(
+      const createRollePromise: Promise<RolleResponse> = rolleStore.createRolle(
         'Lehrer',
         '1234',
         'Lern',
         ['KOPERS_PFLICHT']
       )
-      expect(roleStore.loading).toBe(true)
-      await createRolePromise
-      expect(roleStore.createdRole).toEqual([...mockResponse])
-      expect(roleStore.loading).toBe(false)
+      expect(rolleStore.loading).toBe(true)
+      await createRollePromise
+      expect(rolleStore.createdRolle).toEqual([...mockResponse])
+      expect(rolleStore.loading).toBe(false)
     })
 
     it('should handle string error', async () => {
       mockadapter.onPost('/api/rolle').replyOnce(500, 'some mock server error')
-      const createRolePromise: Promise<RolleResponse> = roleStore.createRole(
+      const createRollePromise: Promise<RolleResponse> = rolleStore.createRolle(
         'Lehrer',
         '1234',
         'Lern',
         ['KOPERS_PFLICHT']
       )
-      expect(roleStore.loading).toBe(true)
-      await rejects(createRolePromise)
-      expect(roleStore.errorCode).toEqual('UNSPECIFIED_ERROR')
-      expect(roleStore.createdRole).toEqual(null)
+      expect(rolleStore.loading).toBe(true)
+      await rejects(createRollePromise)
+      expect(rolleStore.errorCode).toEqual('UNSPECIFIED_ERROR')
+      expect(rolleStore.createdRolle).toEqual(null)
     })
     it('should handle error code', async () => {
       mockadapter.onPost('/api/rolle').replyOnce(500, { code: 'some mock server error' })
-      const createRolePromise: Promise<RolleResponse> = roleStore.createRole(
+      const createRollePromise: Promise<RolleResponse> = rolleStore.createRolle(
         'Lehrer',
         '1234',
         'Lern',
         ['KOPERS_PFLICHT']
       )
-      expect(roleStore.loading).toBe(true)
-      await expect(createRolePromise).rejects.toEqual('some mock server error')
-      expect(roleStore.errorCode).toEqual('some mock server error')
-      expect(roleStore.createdRole).toEqual(null)
+      expect(rolleStore.loading).toBe(true)
+      await expect(createRollePromise).rejects.toEqual('some mock server error')
+      expect(rolleStore.errorCode).toEqual('some mock server error')
+      expect(rolleStore.createdRolle).toEqual(null)
     })
   })
 })

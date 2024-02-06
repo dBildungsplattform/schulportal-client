@@ -9,24 +9,24 @@ import {
 } from '../api-client/generated/api'
 import axiosApiInstance from '@/services/ApiService'
 
-const roleApi: RolleApiInterface = RolleApiFactory(undefined, '', axiosApiInstance)
+const rolleApi: RolleApiInterface = RolleApiFactory(undefined, '', axiosApiInstance)
 
-export type Role = {
+export type Rolle = {
   schulStrukturKnoten: string
   rollenArt: string
   rollenName: string
   merkmale: Array<string>
 }
 
-type RoleState = {
-  createdRole: RolleResponse | null
+type RolleState = {
+  createdRolle: RolleResponse | null
   errorCode: string
   loading: boolean
 }
 
-type RoleGetters = {}
-type RoleActions = {
-  createRole: (
+type RolleGetters = {}
+type RolleActions = {
+  createRolle: (
     rollenName: string,
     schulStrukturKnoten: string,
     rollenArt: keyof typeof CreateRolleBodyParamsRollenartEnum,
@@ -34,20 +34,20 @@ type RoleActions = {
   ) => Promise<RolleResponse>
 }
 
-export type RoleStore = Store<'roleStore', RoleState, RoleGetters, RoleActions>
+export type RolleStore = Store<'rolleStore', RolleState, RolleGetters, RolleActions>
 
-export const useRoleStore: StoreDefinition<'roleStore', RoleState, RoleGetters, RoleActions> =
+export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGetters, RolleActions> =
   defineStore({
-    id: 'roleStore',
-    state: (): RoleState => {
+    id: 'rolleStore',
+    state: (): RolleState => {
       return {
-        createdRole: null,
+        createdRolle: null,
         errorCode: '',
         loading: false
       }
     },
     actions: {
-      async createRole(
+      async createRolle(
         rollenName: string,
         schulStrukturKnoten: string,
         rollenArt: keyof typeof CreateRolleBodyParamsRollenartEnum,
@@ -66,9 +66,9 @@ export const useRoleStore: StoreDefinition<'roleStore', RoleState, RoleGetters, 
             merkmale: merkmale
           }
           const { data }: { data: RolleResponse } =
-            await roleApi.rolleControllerCreateRolle(createRolleBodyParams)
+            await rolleApi.rolleControllerCreateRolle(createRolleBodyParams)
           this.loading = false
-          this.createdRole = data
+          this.createdRolle = data
           return data
         } catch (error: unknown) {
           this.errorCode = 'UNSPECIFIED_ERROR'
