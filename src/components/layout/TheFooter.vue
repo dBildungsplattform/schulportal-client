@@ -9,6 +9,7 @@
   type FooterLink = {
     text: string
     href: string
+    external: boolean
   }
 
   type Sponsor = {
@@ -18,14 +19,27 @@
   }
 
   const footerLinks: Ref<FooterLink[]> = ref([
-    { text: t('footer.contact'), href: 'https://www.secure-lernnetz.de/helpdesk/' },
-    { text: t('footer.help'), href: 'https://medienberatung.iqsh.de/schulportal-sh.html' },
-    { text: t('footer.legalNotice'), href: '/impressum_datenschutzerklaerung.html' },
+    { text: t('footer.contact'), href: 'https://www.secure-lernnetz.de/helpdesk/', external: true },
+    {
+      text: t('footer.help'),
+      href: 'https://medienberatung.iqsh.de/schulportal-sh.html',
+      external: true
+    },
+    {
+      text: t('footer.legalNotice'),
+      href: '/impressum_datenschutzerklaerung.html',
+      external: false
+    },
     {
       text: t('footer.privacyPolicy'),
-      href: '/impressum_datenschutzerklaerung.html#privacy_policy'
+      href: '/impressum_datenschutzerklaerung.html#privacy_policy',
+      external: false
     },
-    { text: t('footer.accessibility'), href: '/impressum_datenschutzerklaerung.html#accessibility' }
+    {
+      text: t('footer.accessibility'),
+      href: '/impressum_datenschutzerklaerung.html#accessibility',
+      external: false
+    }
   ])
 
   const sponsors: Ref<Sponsor[]> = ref([
@@ -93,7 +107,7 @@
             :key="link.text"
             :href="link.href"
             rel="noopener noreferrer"
-            target="_blank"
+            :target="link.external ? '_blank' : '_self'"
             >{{ link.text }}</a
           >
         </v-col>
