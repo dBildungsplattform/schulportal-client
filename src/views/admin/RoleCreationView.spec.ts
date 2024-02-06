@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest'
 import { VueWrapper, mount } from '@vue/test-utils'
-import UserRoleCreateView from './UserRoleCreateView.vue'
+import RoleCreationView from './RoleCreationView.vue'
 import { setActivePinia, createPinia } from 'pinia'
 
 let wrapper: VueWrapper | null = null
@@ -13,11 +13,11 @@ beforeEach(() => {
     </div>
   `
 
-  wrapper = mount(UserRoleCreateView, {
+  wrapper = mount(RoleCreationView, {
     attachTo: document.getElementById('app') || '',
     global: {
       components: {
-        UserRoleCreateView
+        RoleCreationView
       },
       mocks: {
         route: {
