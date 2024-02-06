@@ -46,7 +46,6 @@ Thus to figure out CSP issues you need to run `npm run build` and `npm run previ
 Note: Even with the vite preview the nonce placeholder will not be replaced by an actual nonce.
 To be even more similar to prod you need to create and run a docker image with the provided Dockerfile. Than the client will be served by nginx and the nonce will be generated.
 
-
 ### Package (Docker-Image)
 Wenn ihr einen Tag pusht wird von GitHub für euch ein Docker-Image generiert. Schaut dazu im GitHub unter "packages"
 nach. Wichtig ist, dass euer Branch dafür mit einer JIRA-Issue ID beginnt. 
@@ -78,3 +77,4 @@ BFF: `docker run --rm -eDEPLOY_STAGE=dev -eNODE_ENV=dev --volume="$(PWD)/config:
 | --volume="$(PWD)/config:/app/config" | Verzeichnis mit Konfigurationsdateien an die richtige Stelle im Container    |
 |                                      | `$(PWD)` ist das aktuelle Verzeichnis, der Pfad muss für Docker absolut sein |
 | <IMAGE-NAME>                         | Name des Images, das wir laufen lassen wollen                                |
+| docker build -t <IMAGE-NAME> .       | Baut ein lokal image anhand des Dockerfile                                   |
