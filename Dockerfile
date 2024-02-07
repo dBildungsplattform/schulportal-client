@@ -14,6 +14,7 @@ COPY vite*.ts ./
 COPY index.html ./
 COPY env*.ts ./
 COPY src/ src/
+COPY public/ public/
 
 RUN npm install
 RUN npm run build
