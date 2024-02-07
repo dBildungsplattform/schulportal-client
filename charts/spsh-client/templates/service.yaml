@@ -1,12 +1,14 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: spsh-client-service
+  name: {{ include "spsh-client.serviceName" . }}
+  labels:
+    app: {{ template "spsh-client.name" . }}
 spec:
-  selector:
-    app: spsh-client
+  type: {{ .Values.service.type }}
   ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 80
-  type: NodePort
+    - port: {{ .Values.service.port }}
+      targetPort: {{ .Values.service.targetPort }}
+      protocol: TCP
+  selector:
+    app: {{ template "spsh-client.name" . }}

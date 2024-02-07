@@ -1,9 +1,12 @@
+{{- if .Values.ingress.enabled -}}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: spsh-client-ingress
+  name: {{ include "spsh-client.ingressName" . }}
+  labels:
+    app: {{ template "spsh-client.name" . }}
 spec:
-  ingressClassName: nginx
+  ingressClassName: {{ .Values.ingress.className | quote }}
   rules:
     - host: {{.Values.frontendHostname}}
       http:
@@ -12,6 +15,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: spsh-client-service
+                name: {{ include "spsh-client.serviceName" . }}
                 port:
-                  number: 80
+                  number: {{ .Values.service.port }}
+{{- end }}
