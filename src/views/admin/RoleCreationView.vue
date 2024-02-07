@@ -21,7 +21,7 @@
   const selectedRollenName: Ref<Selection> = ref(null)
   const selectedMerkmale: Ref<SelectionArray> = ref(null)
 
-  const schulstrukturKnoten: string[] = ['d3aa88e2-c754-41e0-8ba6-4198a34aa0a2']
+  const schulstrukturKnoten: string[] = ['cef7240e-fd08-4961-927e-c9ea0c5a37c5']
   const rollenArten: string[] = ['Lern', 'Lehr', 'Extern', 'Orgadmin', 'Leit', 'Sysadmin']
   const merkmale: string[] = ['BEFRISTUNG_PFLICHT', 'KOPERS_PFLICHT']
 
@@ -45,6 +45,10 @@
 
   const handleCreateAnotherRole = (): void => {
     rolleStore.createdRolle = null
+    selectedSchulstrukturKnoten.value = null
+    selectedRollenArt.value = null
+    selectedRollenName.value = null
+    selectedMerkmale.value = null
     router.push({ name: 'create-rolle' })
   }
   // Rule for validating the role name. Maybe enhance a validation framework like VeeValidate instead?
