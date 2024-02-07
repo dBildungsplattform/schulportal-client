@@ -3,7 +3,9 @@ import { isAxiosError, type AxiosResponse } from 'axios'
 import {
   PersonenApiFactory,
   PersonenFrontendApiFactory,
+  type CreatePersonBodyParams,
   type PersonenApiInterface,
+  type PersonendatensatzResponse,
   type PersonenFrontendApiInterface,
   type PersonFrontendControllerFindPersons200Response
 } from '../api-client/generated/api'
@@ -24,6 +26,8 @@ type Person = {
   }
 }
 
+export type CreatedPerson = CreatePersonBodyParams
+
 type Personenkontext = {
   id: string
 }
@@ -43,6 +47,7 @@ type PersonState = {
 
 type PersonGetters = {}
 type PersonActions = {
+  createPerson: (person: CreatePersonBodyParams) => Promise<PersonendatensatzResponse>
   getAllPersons: () => Promise<void>
   getPersonById: (personId: string) => Promise<Personendatensatz>
   resetPassword: (personId: string) => Promise<string>
@@ -67,6 +72,22 @@ export const usePersonStore: StoreDefinition<
     }
   },
   actions: {
+    async createPerson(person: CreatePersonBodyParams): Promise<PersonendatensatzResponse> {
+      this.loading = true
+      try {
+        const { data }: { data: PersonendatensatzResponse } =
+          await personenApi.personControllerCreatePerson(person)
+        this.loading = false
+        return data
+      } catch (error: unknown) {
+        this.errorCode = 'UNSPECIFIED_ERROR'
+        if (isAxiosError(error)) {
+          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR'
+        }
+        this.loading = false
+        return Promise.reject(this.errorCode)
+      }
+    },
     async getAllPersons() {
       this.loading = true
       try {

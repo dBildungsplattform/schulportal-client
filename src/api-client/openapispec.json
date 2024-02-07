@@ -756,9 +756,9 @@
             }
           },
           "400": { "description": "The input was not valid." },
-          "401": { "description": "Not authorized to create the roll." },
+          "401": { "description": "Not authorized to create the rolle." },
           "403": { "description": "Insufficient permissions to create the rolle." },
-          "500": { "description": "Internal serve rerror while creating the person." }
+          "500": { "description": "Internal server error while creating the person." }
         },
         "tags": ["rolle"]
       }
@@ -845,7 +845,6 @@
         "properties": {
           "email": { "type": "string" },
           "referrer": { "type": "string" },
-          "mandant": { "type": "string" },
           "stammorganisation": { "type": "string" },
           "name": { "$ref": "#/components/schemas/PersonNameParams" },
           "geburt": { "$ref": "#/components/schemas/PersonBirthParams" },
@@ -854,7 +853,7 @@
           "vertrauensstufe": { "type": "string", "enum": ["KEIN", "UNBE", "TEIL", "VOLL"] },
           "auskunftssperre": { "type": "boolean" }
         },
-        "required": ["mandant", "name"]
+        "required": ["name"]
       },
       "PersonResponse": {
         "type": "object",
@@ -1048,9 +1047,18 @@
         "type": "object",
         "properties": {
           "name": { "type": "string" },
-          "administeredBySchulstrukturknoten": { "type": "string" }
+          "administeredBySchulstrukturknoten": { "type": "string" },
+          "rollenart": {
+            "type": "string",
+            "enum": ["LERN", "LEHR", "EXTERN", "ORGADMIN", "LEIT", "SYSADMIN"]
+          },
+          "merkmale": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": { "type": "string", "enum": ["BEFRISTUNG_PFLICHT", "KOPERS_PFLICHT"] }
+          }
         },
-        "required": ["name", "administeredBySchulstrukturknoten"]
+        "required": ["name", "administeredBySchulstrukturknoten", "rollenart", "merkmale"]
       },
       "RolleResponse": {
         "type": "object",
@@ -1059,9 +1067,26 @@
           "createdAt": { "format": "date-time", "type": "string" },
           "updatedAt": { "format": "date-time", "type": "string" },
           "name": { "type": "string" },
-          "administeredBySchulstrukturknoten": { "type": "string" }
+          "administeredBySchulstrukturknoten": { "type": "string" },
+          "rollenart": {
+            "type": "string",
+            "enum": ["LERN", "LEHR", "EXTERN", "ORGADMIN", "LEIT", "SYSADMIN"]
+          },
+          "merkmale": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": { "type": "string", "enum": ["BEFRISTUNG_PFLICHT", "KOPERS_PFLICHT"] }
+          }
         },
-        "required": ["id", "createdAt", "updatedAt", "name", "administeredBySchulstrukturknoten"]
+        "required": [
+          "id",
+          "createdAt",
+          "updatedAt",
+          "name",
+          "administeredBySchulstrukturknoten",
+          "rollenart",
+          "merkmale"
+        ]
       }
     }
   }

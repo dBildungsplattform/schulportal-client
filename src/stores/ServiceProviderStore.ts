@@ -20,7 +20,12 @@ type ServiceProviderState = {
 type ServiceProviderGetters = {}
 type ServiceProviderActions = { getAllServiceProviders: () => Promise<void> }
 
-export type ServiceProviderStore = Store<'serviceProviderStore', ServiceProviderState, ServiceProviderGetters, ServiceProviderActions>
+export type ServiceProviderStore = Store<
+  'serviceProviderStore',
+  ServiceProviderState,
+  ServiceProviderGetters,
+  ServiceProviderActions
+>
 
 export const useServiceProviderStore: StoreDefinition<
   'serviceProviderStore',

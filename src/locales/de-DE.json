@@ -2,6 +2,7 @@
   "action": "Aktion",
   "admin": {
     "headline": "Administrationsbereich",
+    "mandatoryFieldsNotice": "Mit * markierte Felder sind Pflichtangaben.",
     "class": {
       "management": "Klassenverwaltung"
     },
@@ -73,7 +74,6 @@
     "password": "Passwort",
     "username": "Benutzername"
   },
-  "mandatoryFields": "Mit * markierte Felder sind Pflichtangaben.",
   "nav": {
     "admin": "Schulportal-Administration",
     "backToStart": "zurück zur Startseite",
