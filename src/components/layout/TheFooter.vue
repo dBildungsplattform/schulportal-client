@@ -236,7 +236,7 @@
     bottom: 0;
     left: 0;
     width: 100%;
-    height: 20px; 
+    height: 22px; 
     background-color: #001e49;
     z-index: 1000; 
   }
