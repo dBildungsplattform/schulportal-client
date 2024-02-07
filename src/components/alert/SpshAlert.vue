@@ -5,7 +5,6 @@
     text: string
     showButton: boolean
     buttonText?: string
-    buttonClass?: string
     buttonAction?: Function
     type: 'error' | 'success' | 'warning' | 'info' | undefined
     closable?: boolean
@@ -24,7 +23,7 @@
 </script>
 
 <template>
-  <v-container>
+  <v-container v-if="modelValue">
     <v-slide-y-transition>
       <v-alert
         :model-value="modelValue"
@@ -56,7 +55,7 @@
           <v-col cols="auto">
             <v-btn
               class="primary"
-              @click="buttonAction"
+              @click="closeAlert"
               data-testid="alert-button"
             >
               {{ buttonText }}

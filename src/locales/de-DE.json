@@ -30,17 +30,19 @@
       "copyPasswordSuccess": "Passwort in Zwischenablage kopiert",
       "create": "Benutzer anlegen",
       "createNew": "Neue Benutzer anlegen",
+      "creationErrorText": "",
+      "creationErrorTitle": "Fehler beim Anlegen des Benutzers",
       "discard": "Benutzer verwerfen",
       "edit": "Benutzer bearbeiten",
+      "loadingErrorText": "Es konnten keine Benutzerdaten geladen werden.",
+      "loadingErrorTitle": "Fehler beim Laden des Benutzers",
       "management": "Benutzerverwaltung",
       "personalInfo": "Persönliche Informationen",
       "resetPasswordConfirmation": "Sind Sie sicher, dass Sie das Passwort für {firstname} {lastname} zurücksetzen möchten?",
       "resetPasswordInformation": "Bitte teilen Sie dem Benutzer das temporäre Passwort mit. Nach dem Schließen des Dialogs wird es aus Sicherheitsgründen nicht mehr angezeigt.",
       "resetPassword": "Passwort zurücksetzen",
       "showAll": "Alle Benutzer anzeigen",
-      "status": "Status",
-      "userDataLoadingErrorTitle": "Fehler beim Laden des Benutzers",
-      "userDataLoadingErrorText": "Es konnten keine Benutzerdaten geladen werden."
+      "status": "Status"
     }
   },
   "cancel": "Abbrechen",

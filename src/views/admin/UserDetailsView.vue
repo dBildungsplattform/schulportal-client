@@ -5,13 +5,11 @@
   import PasswordReset from '@/components/admin/PasswordReset.vue'
   import LayoutCard from '@/components/cards/LayoutCard.vue'
   import SpshAlert from '@/components/alert/SpshAlert.vue'
-  import { type Composer, useI18n } from 'vue-i18n'
 
   const route: RouteLocationNormalizedLoaded = useRoute()
   const router: Router = useRouter()
   const currentPersonId: string = route.params['id'] as string
   const personStore: PersonStore = usePersonStore()
-  const { t }: Composer = useI18n({ useScope: 'global' })
 
   const password: Ref<string> = ref('')
 
@@ -27,9 +25,11 @@
 
   const handleAlertClose = (): void => {
     personStore.errorCode = ''
+    navigateToUserTable()
   }
 
   onMounted(async () => {
+    personStore.errorCode = ''
     await personStore.getPersonById(currentPersonId)
   })
 </script>
@@ -51,14 +51,12 @@
       <!-- Error Message Display -->
       <SpshAlert
         :model-value="!!personStore.errorCode"
-        :title="t('admin.user.userDataLoadingErrorTitle')"
+        :title="$t('admin.user.loadingErrorTitle')"
         :type="'error'"
         :closable="false"
-        :text="$t('admin.user.userDataLoadingErrorText')"
+        :text="$t('admin.user.loadingErrorText')"
         :showButton="true"
         :buttonText="$t('admin.user.backToList')"
-        buttonClass="primary"
-        :buttonAction="navigateToUserTable"
         @update:modelValue="handleAlertClose"
       />
 
