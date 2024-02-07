@@ -116,7 +116,7 @@
           >
         </v-col>
       </v-row>
-      <div class="bottom-navigation"></div>
+      <div class="bottom-decoration"></div>
     </v-container>
   </v-footer>
 </template>
@@ -231,7 +231,7 @@
     height: auto; /* Maintain aspect ratio */
     margin: 0 10px; /* Adds some space between logos */
   }
-  .bottom-navigation {
+  .bottom-decoration {
     position: fixed;
     bottom: 0;
     left: 0;
