@@ -7,29 +7,29 @@
     "class": {
       "management": "Klassenverwaltung"
     },
-    "role": {
+    "rolle": {
       "management": "Rollenverwaltung",
       "createNew": "Neue Rolle anlegen",
       "create": "Rolle anlegen",
       "addNew": "Neue Rolle hinzufügen",
-      "selectSchoolStructureNode": "Schulstrukturknoten auswählen",
-      "selectRoleType": "Rollenart auswählen",
-      "enterRoleName": "Rollenname eingeben",
-      "selectCharacteristics": "Merkmale auswählen",
+      "selectSchulstrukturKnoten": "Schulstrukturknoten auswählen",
+      "selectRollenart": "Rollenart auswählen",
+      "enterRollenname": "Rollenname eingeben",
+      "selectMerkmale": "Merkmale auswählen",
       "userDataLoadingErrorText": "Es konnten keine Benutzerdaten geladen werden.",
       "showAll": "Alle Rollen anzeigen",
       "discard": "Rolle verwerfen",
-      "roleCreateErrorTitle": "Fehler beim Anlegen der Rolle",
-      "roleCreateErrorText": "Die Rolle konnte nicht angelegt werden.",
+      "rolleCreateErrorTitle": "Fehler beim Anlegen der Rolle",
+      "rolleCreateErrorText": "Die Rolle konnte nicht angelegt werden.",
       "createAnother": "Weitere Rolle anlegen",
-      "schoolStructureNode": "Schulstrukturknoten",
-      "roleType": "Rollenart",
-      "roleName": "Rollenname",
-      "characteristics": "Merkmale",
-      "roleAddedSuccessfully": "Die Rolle wurde erfolgreich hinzugefügt.",
+      "schulstrukurKnoten": "Schulstrukturknoten",
+      "rollenart": "Rollenart",
+      "rollenname": "Rollenname",
+      "merkmale": "Merkmale",
+      "rolleAddedSuccessfully": "Die Rolle wurde erfolgreich hinzugefügt.",
         "rule": {
-          "roleNameLength": "Der Rollenname darf nicht länger als 200 Zeichen sein.",
-          "roleNameRequired": "Der Rollenname ist erforderlich."
+          "rolleNameLength": "Der Rollenname darf nicht länger als 200 Zeichen sein.",
+          "rolleNameRequired": "Der Rollenname ist erforderlich."
         }
     },
     "school": {

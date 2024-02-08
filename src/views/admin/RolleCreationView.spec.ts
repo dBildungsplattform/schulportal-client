@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest'
 import { VueWrapper, mount } from '@vue/test-utils'
-import RoleCreationView from './RoleCreationView.vue'
+import RolleCreationView from './RolleCreationView.vue'
 import { setActivePinia, createPinia } from 'pinia'
 
 let wrapper: VueWrapper | null = null
@@ -13,11 +13,11 @@ beforeEach(() => {
     </div>
   `
 
-  wrapper = mount(RoleCreationView, {
+  wrapper = mount(RolleCreationView, {
     attachTo: document.getElementById('app') || '',
     global: {
       components: {
-        RoleCreationView
+        RolleCreationView
       },
       mocks: {
         route: {
@@ -28,7 +28,7 @@ beforeEach(() => {
   })
 })
 
-describe('UserRoleCreateView', () => {
+describe('RolleCreationView', () => {
   test('it renders the role form', () => {
     expect(wrapper?.find('.v-form').isVisible()).toBe(true)
   })

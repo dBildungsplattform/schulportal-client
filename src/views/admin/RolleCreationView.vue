@@ -46,16 +46,16 @@
     selectedMerkmale.value = null
     router.push({ name: 'create-rolle' })
   }
-  // Rule for validating the role name. Maybe enhance a validation framework like VeeValidate instead?
+  // Rule for validating the rolle name. Maybe enhance a validation framework like VeeValidate instead?
   const rolleNameRules: Array<(v: string | null | undefined) => boolean | string> = [
     (v: string | null | undefined): boolean | string => {
       // First, check for null or undefined values and return a required field message.
       if (v == null || v.trim().length === 0) {
-        return t('admin.role.rule.roleNameRequired')
+        return t('admin.rolle.rule.rolleNameRequired')
       }
       // Next, check for the length constraint.
       if (v.length > 200) {
-        return t('admin.role.rule.roleNameLength')
+        return t('admin.rolle.rule.rolleNameLength')
       }
       // If none of the above conditions are met, the input is valid.
       return true
@@ -72,30 +72,30 @@
     </v-row>
     <LayoutCard
       :closable="true"
-      :header="$t('admin.role.addNew')"
+      :header="$t('admin.rolle.addNew')"
       :padded="true"
       :showCloseText="true"
     >
       <!-- Error Message Display if error on submit -->
       <SpshAlert
         :model-value="!!rolleStore.errorCode"
-        :title="t('admin.role.roleCreateErrorTitle')"
+        :title="t('admin.rolle.rolleCreateErrorTitle')"
         :type="'error'"
         :closable="false"
-        :text="$t('admin.role.roleCreateErrorText')"
+        :text="$t('admin.rolle.rolleCreateErrorText')"
         :showButton="true"
         :buttonText="$t('admin.user.backToList')"
         buttonClass="primary"
       />
-      <!-- Result template on success after submit (Present value in createdRole and no errorCode)  -->
+      <!-- Result template on success after submit (Present value in createdRolle and no errorCode)  -->
       <template v-if="rolleStore.createdRolle && !rolleStore.errorCode">
-        <v-container class="new-role-success">
+        <v-container class="new-rolle-success">
           <v-row justify="center">
             <v-col
               class="subtitle-1"
               cols="auto"
             >
-              {{ $t('admin.role.roleAddedSuccessfully') }}
+              {{ $t('admin.rolle.rolleAddedSuccessfully') }}
             </v-col>
           </v-row>
           <v-row justify="center">
@@ -118,24 +118,22 @@
           </v-row>
           <v-row>
             <v-col class="text-body bold text-right">
-              {{ $t('admin.role.schoolStructureNode') }}:
+              {{ $t('admin.rolle.schulstrukurKnoten') }}:
             </v-col>
             <v-col class="text-body">
               {{ rolleStore.createdRolle.administeredBySchulstrukturknoten }}</v-col
             >
           </v-row>
           <v-row>
-            <v-col class="text-body bold text-right"> {{ $t('admin.role.roleType') }}: </v-col>
+            <v-col class="text-body bold text-right"> {{ $t('admin.rolle.rollenart') }}: </v-col>
             <v-col class="text-body"> {{ rolleStore.createdRolle.rollenart }}</v-col>
           </v-row>
           <v-row>
-            <v-col class="text-body bold text-right"> {{ $t('admin.role.roleName') }}:</v-col>
+            <v-col class="text-body bold text-right"> {{ $t('admin.rolle.rollenname') }}:</v-col>
             <v-col class="text-body"> {{ rolleStore.createdRolle.name }} </v-col>
           </v-row>
           <v-row>
-            <v-col class="text-body bold text-right">
-              {{ $t('admin.role.characteristics') }}:</v-col
-            >
+            <v-col class="text-body bold text-right"> {{ $t('admin.rolle.merkmale') }}:</v-col>
             <v-col class="text-body"> {{ rolleStore.createdRolle.merkmale }}</v-col></v-row
           >
           <v-divider
@@ -161,11 +159,11 @@
             >
               <v-btn
                 class="primary button"
-                data-testid="create-another-role-button"
+                data-testid="create-another-rolle-button"
                 @click="handleCreateAnotherRolle"
                 :block="smAndDown"
               >
-                {{ $t('admin.role.createAnother') }}
+                {{ $t('admin.rolle.createAnother') }}
               </v-btn>
             </v-col>
           </v-row>
@@ -173,7 +171,7 @@
       </template>
       <!-- The form to create a new role (No created role yet and no errorCode) -->
       <template v-if="!rolleStore.createdRolle && !rolleStore.errorCode">
-        <v-container class="new-role">
+        <v-container class="new-rolle">
           <v-form @submit.prevent="submitForm">
             <v-row>
               <v-col
@@ -198,7 +196,7 @@
                 class="d-none d-md-flex"
               ></v-col>
               <v-col>
-                <h3 class="subtitle-2">1. {{ $t('admin.role.selectSchoolStructureNode') }}</h3>
+                <h3 class="subtitle-2">1. {{ $t('admin.rolle.selectSchulstrukturKnoten') }}</h3>
               </v-col>
             </v-row>
             <v-row>
@@ -213,7 +211,7 @@
                 class="md-text-right py-0"
               >
                 <label class="text-body">
-                  {{ $t('admin.role.selectSchoolStructureNode') + '*' }}
+                  {{ $t('admin.rolle.selectSchulstrukturKnoten') + '*' }}
                 </label></v-col
               >
               <v-col
@@ -227,7 +225,7 @@
                   variant="outlined"
                   density="compact"
                   single-line
-                  :placeholder="$t('admin.role.selectSchoolStructureNode')"
+                  :placeholder="$t('admin.rolle.selectSchulstrukturKnoten')"
                   :bg-color="selectedSchulstrukturKnoten ? '#4dc7bc' : ''"
                   clearable
                   required
@@ -249,7 +247,7 @@
                 class="d-none d-md-flex"
               ></v-col>
               <v-col>
-                <h3 class="subtitle-2">2. {{ $t('admin.role.selectRoleType') }}</h3>
+                <h3 class="subtitle-2">2. {{ $t('admin.rolle.selectRollenart') }}</h3>
               </v-col>
             </v-row>
             <v-row>
@@ -264,7 +262,7 @@
                 class="md-text-right py-0"
               >
                 <label class="text-body">
-                  {{ $t('admin.role.selectRoleType') + '*' }}
+                  {{ $t('admin.rolle.selectRollenart') + '*' }}
                 </label></v-col
               >
               <v-col
@@ -275,7 +273,7 @@
                 <v-select
                   :items="rollenArten"
                   v-model="selectedRollenArt"
-                  :placeholder="$t('admin.role.selectRoleType')"
+                  :placeholder="$t('admin.rolle.selectRollenart')"
                   variant="outlined"
                   density="compact"
                   :bg-color="selectedRollenArt ? '#4dc7bc' : ''"
@@ -301,7 +299,7 @@
                   class="d-none d-md-flex"
                 ></v-col>
                 <v-col>
-                  <label class="subtitle-2">3. {{ $t('admin.role.enterRoleName') }}</label>
+                  <label class="subtitle-2">3. {{ $t('admin.rolle.enterRollenname') }}</label>
                 </v-col>
               </v-row>
               <v-row>
@@ -316,7 +314,7 @@
                   class="md-text-right py-0"
                 >
                   <label class="text-body">
-                    {{ $t('admin.role.enterRoleName') + '*' }}
+                    {{ $t('admin.rolle.enterRollenname') + '*' }}
                   </label></v-col
                 >
                 <v-col
@@ -326,7 +324,7 @@
                 >
                   <v-text-field
                     v-model="selectedRollenName"
-                    :placeholder="$t('admin.role.enterRoleName')"
+                    :placeholder="$t('admin.rolle.enterRollenname')"
                     variant="outlined"
                     density="compact"
                     :rules="rolleNameRules"
@@ -341,7 +339,7 @@
                   cols="2"
                 ></v-col>
                 <v-col>
-                  <label class="subtitle-2">4. {{ $t('admin.role.selectCharacteristics') }}</label>
+                  <label class="subtitle-2">4. {{ $t('admin.rolle.selectMerkmale') }}</label>
                 </v-col>
               </v-row>
               <v-row>
@@ -356,7 +354,7 @@
                   class="md-text-right py-0"
                 >
                   <h3 class="text-body">
-                    {{ $t('admin.role.selectCharacteristics') + '*' }}
+                    {{ $t('admin.rolle.selectMerkmale') + '*' }}
                   </h3></v-col
                 >
                 <v-col
@@ -367,7 +365,7 @@
                   <v-select
                     :items="merkmale"
                     v-model="selectedMerkmale"
-                    :placeholder="$t('admin.role.selectCharacteristics')"
+                    :placeholder="$t('admin.rolle.selectMerkmale')"
                     variant="outlined"
                     density="compact"
                     multiple
@@ -396,9 +394,9 @@
                 >
                   <v-btn
                     class="secondary"
-                    data-testid="discard-role-button"
+                    data-testid="discard-rolle-button"
                     :block="smAndDown"
-                    >{{ $t('admin.role.discard') }}</v-btn
+                    >{{ $t('admin.rolle.discard') }}</v-btn
                   >
                 </v-col>
                 <v-col
@@ -409,10 +407,10 @@
                   <v-btn
                     type="submit"
                     class="primary button"
-                    data-testid="create-role-button"
+                    data-testid="create-rolle-button"
                     :block="smAndDown"
                   >
-                    {{ $t('admin.role.create') }}
+                    {{ $t('admin.rolle.create') }}
                   </v-btn>
                 </v-col>
               </v-row>

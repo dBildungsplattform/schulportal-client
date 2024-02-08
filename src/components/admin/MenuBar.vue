@@ -114,19 +114,19 @@
     <!-- Rollenverwaltung -->
     <v-list-item
       class="menu-bar-main-item headline-2"
-      :title="$t('admin.role.management')"
+      :title="$t('admin.rolle.management')"
     ></v-list-item>
     <v-list-item
       class="menu-bar-sub-item caption"
-      data-testid="role-management-menu-item"
+      data-testid="rolle-management-menu-item"
       prepend-icon="mdi-format-list-bulleted"
-      :title="$t('admin.role.showAll')"
+      :title="$t('admin.rolle.showAll')"
     ></v-list-item>
     <v-list-item
       class="menu-bar-sub-item caption"
-      data-testid="role-creation-menu-item"
+      data-testid="rolle-creation-menu-item"
       prepend-icon="mdi-plus-circle-outline"
-      :title="$t('admin.role.createNew')"
+      :title="$t('admin.rolle.createNew')"
       to="/admin/rolle/new"
     ></v-list-item>
     <!-- Schulverwaltung -->
