@@ -354,7 +354,7 @@
                   class="md-text-right py-0"
                 >
                   <h3 class="text-body">
-                    {{ $t('admin.rolle.selectMerkmale') + '*' }}
+                    {{ $t('admin.rolle.selectMerkmale') }}
                   </h3></v-col
                 >
                 <v-col
