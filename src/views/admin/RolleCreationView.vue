@@ -18,6 +18,7 @@
 
   type Selection = string | null
   type SelectionArray = string[] | null
+  type merkmaleEnumKeys = ('BefristungPflicht' | 'KopersPflicht')[]
 
   const selectedSchulstrukturKnoten: Ref<Selection> = ref(null)
   const selectedRollenArt: Ref<Selection> = ref(null)
@@ -31,9 +32,7 @@
   const rolleStore: RolleStore = useRolleStore()
 
   // The mapping function from UI input to enum key
-  function mapMerkmaleToEnumKeys(
-    selectedMerkmaleInput: SelectionArray
-  ): ('BefristungPflicht' | 'KopersPflicht')[] {
+  function mapMerkmaleToEnumKeys(selectedMerkmaleInput: SelectionArray): merkmaleEnumKeys {
     return selectedMerkmaleInput
       ? merkmale
           .map((merkmal: string) => {
@@ -56,8 +55,9 @@
   const submitForm = async (): Promise<void> => {
     if (selectedRollenName.value && selectedSchulstrukturKnoten.value && selectedRollenArt.value) {
       // Direct mapping to string literals expected by the createRolle method
-      const merkmaleAsStringLiterals: ('BefristungPflicht' | 'KopersPflicht')[] =
-        mapMerkmaleToEnumKeys(selectedMerkmale.value)
+      const merkmaleAsStringLiterals: merkmaleEnumKeys = mapMerkmaleToEnumKeys(
+        selectedMerkmale.value
+      )
 
       await rolleStore.createRolle(
         selectedRollenName.value,
