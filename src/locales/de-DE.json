@@ -3,6 +3,7 @@
   "admin": {
     "headline": "Administrationsbereich",
     "mandatoryFieldsNotice": "Mit * markierte Felder sind Pflichtangaben.",
+    "followingDataCreated" : "Folgende Daten wurden gespeichert:",
     "class": {
       "management": "Klassenverwaltung"
     },
@@ -21,12 +22,10 @@
       "roleCreateErrorTitle": "Fehler beim Anlegen der Rolle",
       "roleCreateErrorText": "Die Rolle konnte nicht angelegt werden.",
       "createAnother": "Weitere Rolle anlegen",
-      "backToList": "Zurück zur Ergebnisliste",
       "schoolStructureNode": "Schulstrukturknoten",
       "roleType": "Rollenart",
       "roleName": "Rollenname",
       "characteristics": "Merkmale",
-      "followingRoleCreated" : "Folgende Daten wurden gespeichert:",
       "roleAddedSuccessfully": "Die Rolle wurde erfolgreich hinzugefügt.",
         "rule": {
           "roleNameLength": "Der Rollenname darf nicht länger als 200 Zeichen sein.",
@@ -91,7 +90,8 @@
     "login": "Anmelden",
     "logout": "Abmelden",
     "navigation": "Navigation",
-    "help": "Hilfe"
+    "help": "Hilfe",
+    "backToList": "Zurück zur Ergebnisliste"
   },
   "pagination": {
     "all": "Alle",

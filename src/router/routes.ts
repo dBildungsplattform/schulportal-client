@@ -24,11 +24,12 @@ const routes: readonly RouteRecordRaw[] = [
     name: 'user-details',
     component: () => import('../views/admin/UserDetailsView.vue'),
     meta: {
+      layout: 'AdminLayout',
       requiresAuth: true
     }
   },
   {
-    path: '/admin/role/new',
+    path: '/admin/rolle/new',
     name: 'create-rolle',
     component: () => import('../views/admin/RoleCreationView.vue'),
     meta: {

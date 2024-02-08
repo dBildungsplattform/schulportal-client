@@ -28,22 +28,17 @@
   const rolleStore: RolleStore = useRolleStore()
 
   const submitForm = async (): Promise<void> => {
-    if (
-      selectedRollenName.value &&
-      selectedSchulstrukturKnoten.value &&
-      selectedRollenArt.value &&
-      selectedMerkmale.value
-    ) {
+    if (selectedRollenName.value && selectedSchulstrukturKnoten.value && selectedRollenArt.value) {
       await rolleStore.createRolle(
         selectedRollenName.value,
         selectedSchulstrukturKnoten.value,
         selectedRollenArt.value as keyof typeof CreateRolleBodyParamsRollenartEnum,
-        selectedMerkmale.value
+        selectedMerkmale.value || []
       )
     }
   }
 
-  const handleCreateAnotherRole = (): void => {
+  const handleCreateAnotherRolle = (): void => {
     rolleStore.createdRolle = null
     selectedSchulstrukturKnoten.value = null
     selectedRollenArt.value = null
@@ -52,9 +47,19 @@
     router.push({ name: 'create-rolle' })
   }
   // Rule for validating the role name. Maybe enhance a validation framework like VeeValidate instead?
-  const roleNameRules: Array<(v: string) => boolean | string> = [
-    (v: string): boolean | string => v.length <= 200 || t('admin.role.rule.roleNameLength'),
-    (v: string): boolean | string => !!v.length || t('admin.role.rule.roleNameRequired')
+  const rolleNameRules: Array<(v: string | null | undefined) => boolean | string> = [
+    (v: string | null | undefined): boolean | string => {
+      // First, check for null or undefined values and return a required field message.
+      if (v == null || v.trim().length === 0) {
+        return t('admin.role.rule.roleNameRequired')
+      }
+      // Next, check for the length constraint.
+      if (v.length > 200) {
+        return t('admin.role.rule.roleNameLength')
+      }
+      // If none of the above conditions are met, the input is valid.
+      return true
+    }
   ]
 </script>
 
@@ -108,7 +113,7 @@
               class="subtitle-2"
               cols="auto"
             >
-              {{ $t('admin.role.followingRoleCreated') }}
+              {{ $t('admin.followingDataCreated') }}
             </v-col>
           </v-row>
           <v-row>
@@ -146,7 +151,8 @@
               <v-btn
                 class="secondary"
                 data-testid="back-to-list-button"
-                >{{ $t('admin.role.backToList') }}</v-btn
+                :block="smAndDown"
+                >{{ $t('nav.backToList') }}</v-btn
               >
             </v-col>
             <v-col
@@ -156,7 +162,8 @@
               <v-btn
                 class="primary button"
                 data-testid="create-another-role-button"
-                @click="handleCreateAnotherRole"
+                @click="handleCreateAnotherRolle"
+                :block="smAndDown"
               >
                 {{ $t('admin.role.createAnother') }}
               </v-btn>
@@ -322,7 +329,7 @@
                     :placeholder="$t('admin.role.enterRoleName')"
                     variant="outlined"
                     density="compact"
-                    :rules="roleNameRules"
+                    :rules="rolleNameRules"
                     required
                   ></v-text-field>
                 </v-col>
@@ -364,9 +371,8 @@
                     variant="outlined"
                     density="compact"
                     multiple
-                    :bg-color="selectedMerkmale ? '#4dc7bc' : ''"
+                    :bg-color="selectedMerkmale && selectedMerkmale.length > 0 ? '#4dc7bc' : ''"
                     clearable
-                    required
                   >
                     <template v-slot:item="{ props, item }">
                       <v-list-item
@@ -432,4 +438,3 @@
     }
   }
 </style>
-@/stores/RolleStore
