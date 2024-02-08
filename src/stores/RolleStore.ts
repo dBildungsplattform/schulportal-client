@@ -2,6 +2,7 @@ import { defineStore, type Store, type StoreDefinition } from 'pinia'
 import { isAxiosError } from 'axios'
 import {
   CreateRolleBodyParamsRollenartEnum,
+  CreateRolleBodyParamsMerkmaleEnum,
   RolleApiFactory,
   type CreateRolleBodyParams,
   type RolleApiInterface,
@@ -30,11 +31,12 @@ type RolleActions = {
     rollenName: string,
     schulStrukturKnoten: string,
     rollenArt: keyof typeof CreateRolleBodyParamsRollenartEnum,
-    merkmale: Array<string>
+    merkmale: Array<keyof typeof CreateRolleBodyParamsMerkmaleEnum>
   ) => Promise<RolleResponse>
 }
 
 export { CreateRolleBodyParamsRollenartEnum }
+export { CreateRolleBodyParamsMerkmaleEnum }
 
 export type RolleStore = Store<'rolleStore', RolleState, RolleGetters, RolleActions>
 
@@ -53,19 +55,21 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
         rollenName: string,
         schulStrukturKnoten: string,
         rollenArt: keyof typeof CreateRolleBodyParamsRollenartEnum,
-        merkmale: Array<string>
+        merkmale: Array<keyof typeof CreateRolleBodyParamsMerkmaleEnum>
       ): Promise<RolleResponse> {
         this.loading = true
         try {
           const rollenArtValue: CreateRolleBodyParamsRollenartEnum =
             CreateRolleBodyParamsRollenartEnum[rollenArt]
-
+          const merkmaleValues: CreateRolleBodyParamsMerkmaleEnum[] = merkmale.map(
+            (key) => CreateRolleBodyParamsMerkmaleEnum[key]
+          )
           // Construct the body params object
           const createRolleBodyParams: CreateRolleBodyParams = {
             name: rollenName,
             administeredBySchulstrukturknoten: schulStrukturKnoten,
             rollenart: rollenArtValue,
-            merkmale: merkmale
+            merkmale: merkmaleValues
           }
           const { data }: { data: RolleResponse } =
             await rolleApi.rolleControllerCreateRolle(createRolleBodyParams)

@@ -26,17 +26,38 @@
 
   const schulstrukturKnoten: string[] = ['cef7240e-fd08-4961-927e-c9ea0c5a37c5']
   const rollenArten: string[] = ['Lern', 'Lehr', 'Extern', 'Orgadmin', 'Leit', 'Sysadmin']
-  const merkmale: string[] = ['BEFRISTUNG_PFLICHT', 'KOPERS_PFLICHT']
+  const merkmale: string[] = ['Befristung ist Pflichtangabe', 'KoPers-Nr. ist Pflichtangabe']
 
   const rolleStore: RolleStore = useRolleStore()
 
   const submitForm = async (): Promise<void> => {
     if (selectedRollenName.value && selectedSchulstrukturKnoten.value && selectedRollenArt.value) {
+      // Direct mapping to string literals expected by the createRolle method
+      const merkmaleAsStringLiterals: ('BefristungPflicht' | 'KopersPflicht')[] =
+        selectedMerkmale.value
+          ? selectedMerkmale.value
+              .map((merkmal: string) => {
+                switch (merkmal) {
+                  case 'Befristung ist Pflichtangabe':
+                    return 'BefristungPflicht'
+                  case 'KoPers-Nr. ist Pflichtangabe':
+                    return 'KopersPflicht'
+                  default:
+                    return null
+                }
+              })
+              .filter(
+                (
+                  item: 'BefristungPflicht' | 'KopersPflicht' | null
+                ): item is 'BefristungPflicht' | 'KopersPflicht' => item !== null
+              )
+          : []
+
       await rolleStore.createRolle(
         selectedRollenName.value,
         selectedSchulstrukturKnoten.value,
         selectedRollenArt.value as keyof typeof CreateRolleBodyParamsRollenartEnum,
-        selectedMerkmale.value || []
+        merkmaleAsStringLiterals
       )
     }
   }

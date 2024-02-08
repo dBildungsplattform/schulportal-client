@@ -1725,9 +1725,14 @@
           "merkmale": {
             "type": "array",
             "items": {
-              "type": "string"
+              "type": "string",
+              "enum": [
+               "BEFRISTUNG_PFLICHT",
+               "KOPERS_PFLICHT"
+             ]
+           }
             }
-          }
+            
         },
         "required": [
           "name",
