@@ -30,28 +30,34 @@
 
   const rolleStore: RolleStore = useRolleStore()
 
+  // The mapping function from UI input to enum key
+  function mapMerkmaleToEnumKeys(
+    selectedMerkmaleInput: SelectionArray
+  ): ('BefristungPflicht' | 'KopersPflicht')[] {
+    return selectedMerkmaleInput
+      ? merkmale
+          .map((merkmal: string) => {
+            switch (merkmal) {
+              case 'Befristung ist Pflichtangabe':
+                return 'BefristungPflicht'
+              case 'KoPers-Nr. ist Pflichtangabe':
+                return 'KopersPflicht'
+              default:
+                return null
+            }
+          })
+          .filter(
+            (
+              item: 'BefristungPflicht' | 'KopersPflicht' | null
+            ): item is 'BefristungPflicht' | 'KopersPflicht' => item !== null
+          )
+      : []
+  }
   const submitForm = async (): Promise<void> => {
     if (selectedRollenName.value && selectedSchulstrukturKnoten.value && selectedRollenArt.value) {
       // Direct mapping to string literals expected by the createRolle method
       const merkmaleAsStringLiterals: ('BefristungPflicht' | 'KopersPflicht')[] =
-        selectedMerkmale.value
-          ? selectedMerkmale.value
-              .map((merkmal: string) => {
-                switch (merkmal) {
-                  case 'Befristung ist Pflichtangabe':
-                    return 'BefristungPflicht'
-                  case 'KoPers-Nr. ist Pflichtangabe':
-                    return 'KopersPflicht'
-                  default:
-                    return null
-                }
-              })
-              .filter(
-                (
-                  item: 'BefristungPflicht' | 'KopersPflicht' | null
-                ): item is 'BefristungPflicht' | 'KopersPflicht' => item !== null
-              )
-          : []
+        mapMerkmaleToEnumKeys(selectedMerkmale.value)
 
       await rolleStore.createRolle(
         selectedRollenName.value,
