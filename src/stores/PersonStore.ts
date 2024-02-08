@@ -39,6 +39,7 @@ export type Personendatensatz = {
 
 type PersonState = {
   allPersons: Array<Personendatensatz>
+  createdPerson: PersonendatensatzResponse | null
   errorCode: string
   loading: boolean
   totalPersons: number
@@ -65,6 +66,7 @@ export const usePersonStore: StoreDefinition<
   state: (): PersonState => {
     return {
       allPersons: [],
+      createdPerson: null,
       errorCode: '',
       loading: false,
       totalPersons: 0,
@@ -78,6 +80,7 @@ export const usePersonStore: StoreDefinition<
         const { data }: { data: PersonendatensatzResponse } =
           await personenApi.personControllerCreatePerson(person)
         this.loading = false
+        this.createdPerson = data
         return data
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR'

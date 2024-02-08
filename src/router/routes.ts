@@ -30,7 +30,7 @@ const routes: readonly RouteRecordRaw[] = [
   },
   {
     path: '/admin/users/new',
-    name: 'user-creation',
+    name: 'create-person',
     component: () => import('../views/admin/UserCreationView.vue'),
     meta: {
       layout: 'AdminLayout',

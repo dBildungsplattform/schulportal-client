@@ -1,6 +1,7 @@
 {
   "action": "Aktion",
   "admin": {
+    "followingDataCreated": "Folgende Daten wurden gespeichert:",
     "headline": "Administrationsbereich",
     "mandatoryFieldsNotice": "Mit * markierte Felder sind Pflichtangaben.",
     "class": {
@@ -10,26 +11,27 @@
       "koPersNumber": "KoPers-Nr",
       "noKoPersNumber": "Keine KoPers-Nr vorhanden"
     },
-    "role": {
-      "selectRole": "Rolle auswählen",
+    "rolle": {
+      "selectRolle": "Rolle auswählen",
       "management": "Rollenverwaltung",
-      "noRolesFound": "Keine Rollen gefunden"
+      "noRollenFound": "Keine Rollen gefunden"
     },
     "school": {
       "assign": "Schule zuordnen",
       "management": "Schulverwaltung",
       "noSchoolsFound": "Keine Schulen gefunden"
     },
-    "schoolBoard": {
+    "schulTraeger": {
       "management": "Schulträgerverwaltung"
     },
-    "user": {
+    "person": {
+      "addedSuccessfully": "{firstname} {lastname} wurde erfolgreich hinzugefügt.",
       "addNew": "Neuen Benutzer hinzufügen",
-      "backToList": "Zurück zur Liste",
       "changePassword": "Passwort ändern",
       "copyPasswordError": "Passwort konnte nicht in die Zwischenablage kopiert werden",
       "copyPasswordSuccess": "Passwort in Zwischenablage kopiert",
       "create": "Benutzer anlegen",
+      "createAnother": "Weiteren Benutzer anlegen",
       "createNew": "Neue Benutzer anlegen",
       "creationErrorText": "",
       "creationErrorTitle": "Fehler beim Anlegen des Benutzers",
@@ -43,6 +45,7 @@
       "resetPasswordInformation": "Bitte teilen Sie dem Benutzer das temporäre Passwort mit. Nach dem Schließen des Dialogs wird es aus Sicherheitsgründen nicht mehr angezeigt.",
       "resetPassword": "Passwort zurücksetzen",
       "showAll": "Alle Benutzer anzeigen",
+      "startPassword": "Einstiegs-Passwort",
       "status": "Status"
     }
   },
@@ -76,6 +79,7 @@
   },
   "nav": {
     "admin": "Schulportal-Administration",
+    "backToList": "zurück zur Ergebnisliste",
     "backToStart": "zurück zur Startseite",
     "login": "Anmelden",
     "logout": "Abmelden",

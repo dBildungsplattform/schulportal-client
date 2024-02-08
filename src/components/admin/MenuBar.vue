@@ -89,20 +89,20 @@
     <!-- User menu -->
     <v-list-item
       class="menu-bar-main-item headline-2"
-      :title="$t('admin.user.management')"
+      :title="$t('admin.person.management')"
     ></v-list-item>
     <v-list-item
       class="menu-bar-sub-item caption"
       data-testid="user-management-menu-item"
       prepend-icon="mdi-format-list-bulleted"
-      :title="$t('admin.user.showAll')"
+      :title="$t('admin.person.showAll')"
       to="/admin/users"
     ></v-list-item>
     <v-list-item
       class="menu-bar-sub-item caption"
       data-testid="user-creation-menu-item"
       prepend-icon="mdi-plus-circle-outline"
-      :title="$t('admin.user.createNew')"
+      :title="$t('admin.person.createNew')"
       to="/admin/users/new"
     ></v-list-item>
 
@@ -115,7 +115,7 @@
     <!-- Rollenverwaltung -->
     <v-list-item
       class="menu-bar-main-item headline-2"
-      :title="$t('admin.role.management')"
+      :title="$t('admin.rolle.management')"
     ></v-list-item>
 
     <!-- Schulverwaltung -->
@@ -127,7 +127,7 @@
     <!-- Schulträgerverwaltung -->
     <v-list-item
       class="menu-bar-main-item headline-2"
-      :title="$t('admin.schoolBoard.management')"
+      :title="$t('admin.schulTraeger.management')"
     ></v-list-item>
   </v-navigation-drawer>
 </template>

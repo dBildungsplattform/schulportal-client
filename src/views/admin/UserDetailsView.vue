@@ -43,7 +43,7 @@
     </v-row>
     <LayoutCard
       :closable="true"
-      :header="$t('admin.user.edit')"
+      :header="$t('admin.person.edit')"
       @onCloseClicked="navigateToUserTable"
       :padded="true"
       :showCloseText="true"
@@ -51,12 +51,12 @@
       <!-- Error Message Display -->
       <SpshAlert
         :model-value="!!personStore.errorCode"
-        :title="$t('admin.user.loadingErrorTitle')"
+        :title="$t('admin.person.loadingErrorTitle')"
         :type="'error'"
         :closable="false"
-        :text="$t('admin.user.loadingErrorText')"
+        :text="$t('admin.person.loadingErrorText')"
         :showButton="true"
-        :buttonText="$t('admin.user.backToList')"
+        :buttonText="$t('nav.backToList')"
         @update:modelValue="handleAlertClose"
       />
 
@@ -65,7 +65,7 @@
           <v-row class="ml-md-16">
             <v-col>
               <h3 class="subtitle-1">
-                {{ $t('admin.user.personalInfo') }}
+                {{ $t('admin.person.personalInfo') }}
               </h3></v-col
             >
           </v-row>

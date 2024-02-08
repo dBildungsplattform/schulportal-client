@@ -46,7 +46,7 @@
 </script>
 
 <template>
-  <LayoutCard :header="$t('admin.user.management')">
+  <LayoutCard :header="$t('admin.person.management')">
     <v-data-table-server
       class="user-table"
       @click:row="handleRowClick"
