@@ -34,6 +34,8 @@ type RolleActions = {
   ) => Promise<RolleResponse>
 }
 
+export { CreateRolleBodyParamsRollenartEnum }
+
 export type RolleStore = Store<'rolleStore', RolleState, RolleGetters, RolleActions>
 
 export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGetters, RolleActions> =

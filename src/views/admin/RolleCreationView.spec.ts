@@ -30,6 +30,6 @@ beforeEach(() => {
 
 describe('RolleCreationView', () => {
   test('it renders the role form', () => {
-    expect(wrapper?.find('.v-form').isVisible()).toBe(true)
+    expect(wrapper?.find('[data-testid="schulstruktur-knoten-select"]').isVisible()).toBe(true)
   })
 })

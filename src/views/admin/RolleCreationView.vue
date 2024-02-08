@@ -1,8 +1,11 @@
 <script setup lang="ts">
   import LayoutCard from '@/components/cards/LayoutCard.vue'
   import { ref, type Ref } from 'vue'
-  import { useRolleStore, type RolleStore } from '@/stores/RolleStore'
-  import type { CreateRolleBodyParamsRollenartEnum } from '@/api-client/generated'
+  import {
+    useRolleStore,
+    type RolleStore,
+    type CreateRolleBodyParamsRollenartEnum
+  } from '@/stores/RolleStore'
   import { useI18n, type Composer } from 'vue-i18n'
   import SpshAlert from '@/components/alert/SpshAlert.vue'
   import { type Router, useRouter } from 'vue-router'
@@ -220,6 +223,7 @@
                 class="py-0"
               >
                 <v-select
+                  data-testid="schulstruktur-knoten-select"
                   :items="schulstrukturKnoten"
                   v-model="selectedSchulstrukturKnoten"
                   variant="outlined"
@@ -234,7 +238,7 @@
                     <v-list-item
                       v-bind="props"
                       :title="item.title"
-                      style="color: #001e49"
+                      class="select-item-text"
                     ></v-list-item>
                   </template>
                 </v-select>
@@ -271,6 +275,7 @@
                 class="py-0"
               >
                 <v-select
+                  data-testid="rollenart-select"
                   :items="rollenArten"
                   v-model="selectedRollenArt"
                   :placeholder="$t('admin.rolle.selectRollenart')"
@@ -284,7 +289,7 @@
                     <v-list-item
                       v-bind="props"
                       :title="item.title"
-                      style="color: #001e49"
+                      class="select-item-text"
                     ></v-list-item>
                   </template>
                 </v-select>
@@ -323,6 +328,7 @@
                   class="py-0"
                 >
                   <v-text-field
+                    data-testid="rollen-name-input"
                     v-model="selectedRollenName"
                     :placeholder="$t('admin.rolle.enterRollenname')"
                     variant="outlined"
@@ -363,6 +369,7 @@
                   class="py-0"
                 >
                   <v-select
+                    data-testid="merkmale-select"
                     :items="merkmale"
                     v-model="selectedMerkmale"
                     :placeholder="$t('admin.rolle.selectMerkmale')"
@@ -376,7 +383,7 @@
                       <v-list-item
                         v-bind="props"
                         :title="item.title"
-                        style="color: #001e49"
+                        class="select-item-text"
                       ></v-list-item> </template
                   ></v-select>
                 </v-col>
@@ -434,5 +441,9 @@
     .v-text-field {
       width: 310px;
     }
+  }
+
+  .select-item-text {
+    color: #001e49;
   }
 </style>

@@ -26,7 +26,7 @@ describe('rolleStore', () => {
       const mockResponse: RolleResponse[] = [
         {
           administeredBySchulstrukturknoten: '1234',
-          rollenart: 'LERN',
+          rollenart: 'LEHR',
           name: 'Lehrer',
           merkmale: 'KOPERS_PFLICHT',
           createdAt: '2022',
@@ -39,7 +39,7 @@ describe('rolleStore', () => {
       const createRollePromise: Promise<RolleResponse> = rolleStore.createRolle(
         'Lehrer',
         '1234',
-        'Lern',
+        'Lehr',
         ['KOPERS_PFLICHT']
       )
       expect(rolleStore.loading).toBe(true)
@@ -53,26 +53,28 @@ describe('rolleStore', () => {
       const createRollePromise: Promise<RolleResponse> = rolleStore.createRolle(
         'Lehrer',
         '1234',
-        'Lern',
+        'Lehr',
         ['KOPERS_PFLICHT']
       )
       expect(rolleStore.loading).toBe(true)
       await rejects(createRollePromise)
       expect(rolleStore.errorCode).toEqual('UNSPECIFIED_ERROR')
       expect(rolleStore.createdRolle).toEqual(null)
+      expect(rolleStore.loading).toBe(false)
     })
     it('should handle error code', async () => {
       mockadapter.onPost('/api/rolle').replyOnce(500, { code: 'some mock server error' })
       const createRollePromise: Promise<RolleResponse> = rolleStore.createRolle(
         'Lehrer',
         '1234',
-        'Lern',
+        'Lehr',
         ['KOPERS_PFLICHT']
       )
       expect(rolleStore.loading).toBe(true)
       await expect(createRollePromise).rejects.toEqual('some mock server error')
       expect(rolleStore.errorCode).toEqual('some mock server error')
       expect(rolleStore.createdRolle).toEqual(null)
+      expect(rolleStore.loading).toBe(false)
     })
   })
 })
