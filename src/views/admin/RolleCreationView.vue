@@ -118,7 +118,7 @@
           </v-row>
           <v-row>
             <v-col class="text-body bold text-right">
-              {{ $t('admin.rolle.schulstrukurKnoten') }}:
+              {{ $t('admin.rolle.schulstrukurknoten') }}:
             </v-col>
             <v-col class="text-body">
               {{ rolleStore.createdRolle.administeredBySchulstrukturknoten }}</v-col

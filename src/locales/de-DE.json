@@ -22,7 +22,7 @@
       "rolleCreateErrorTitle": "Fehler beim Anlegen der Rolle",
       "rolleCreateErrorText": "Die Rolle konnte nicht angelegt werden.",
       "createAnother": "Weitere Rolle anlegen",
-      "schulstrukurKnoten": "Schulstrukturknoten",
+      "schulstrukurknoten": "Schulstrukturknoten",
       "rollenart": "Rollenart",
       "rollenname": "Rollenname",
       "merkmale": "Merkmale",
