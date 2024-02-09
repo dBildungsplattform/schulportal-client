@@ -3,7 +3,7 @@
     modelValue: boolean
     title: string
     text: string
-    showButton: boolean
+    showButton?: boolean
     buttonText?: string
     buttonAction?: Function
     type: 'error' | 'success' | 'warning' | 'info' | undefined
@@ -37,7 +37,7 @@
             class="primary-text-color"
             cols="auto"
           >
-            <strong>{{ title }}</strong>
+            <strong data-testid="alert-title">{{ title }}</strong>
           </v-col>
         </v-row>
         <v-row>
@@ -45,7 +45,7 @@
             class="primary-text-color"
             cols="auto"
           >
-            {{ text }}
+            <span data-testid="alert-text">{{ text }}</span>
           </v-col>
         </v-row>
         <v-row

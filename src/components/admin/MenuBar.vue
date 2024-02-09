@@ -13,19 +13,21 @@
 
 <template>
   <v-btn
+    :aria-label="$t('nav.openMobileMenu')"
     class="hidden-lg-and-up"
+    @click.stop="menuDrawer = !menuDrawer"
     data-testid="open-mobile-menu-button"
     density="compact"
     icon
     variant="text"
   >
     <v-icon
-      @click.stop="menuDrawer = !menuDrawer"
       icon="mdi-menu"
       size="x-large"
     ></v-icon>
   </v-btn>
   <v-btn
+    :aria-label="$t('nav.backToStart')"
     class="hidden-lg-and-up"
     data-testid="mobile-back-to-start-link"
     density="compact"
@@ -48,7 +50,9 @@
     width="320"
   >
     <v-btn
+      :aria-label="$t('nav.closeMobileMenu')"
       class="hidden-lg-and-up primary menu-bar-close-button"
+      @click.stop="menuDrawer = !menuDrawer"
       data-testid="close-mobile-menu-button"
       density="compact"
       icon
@@ -57,11 +61,11 @@
       variant="text"
     >
       <v-icon
-        @click.stop="menuDrawer = !menuDrawer"
         icon="mdi-menu-open"
         size="x-large"
       ></v-icon>
     </v-btn>
+
     <!-- Title -->
     <v-list-item
       class="menu-bar-title"

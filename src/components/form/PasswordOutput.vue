@@ -31,6 +31,7 @@
 <template>
   <v-text-field
     v-if="password"
+    :aria-label="$t('admin.person.generatedPassword')"
     data-testid="password-output-field"
     :error-messages="copyToClipboardError"
     :hint="passwordCopied ? $t('admin.person.copyPasswordSuccess') : ''"
@@ -43,15 +44,21 @@
     <template v-slot:append-inner>
       <v-icon
         @click.stop="showPassword = !showPassword"
+        @keyup.enter="showPassword = !showPassword"
+        @keyup.space="showPassword = !showPassword"
         data-testid="show-password-icon"
         :icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+        tabindex="0"
       ></v-icon>
     </template>
     <template v-slot:append>
       <v-icon
         @click.stop="copyToClipboard(password)"
+        @keyup.enter="copyToClipboard(password)"
+        @keyup.space="copyToClipboard(password)"
         data-testid="copy-password-icon"
         icon="mdi-content-copy"
+        tabindex="0"
       ></v-icon>
     </template>
   </v-text-field>

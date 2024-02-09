@@ -37,6 +37,7 @@
       "creationErrorTitle": "Fehler beim Anlegen des Benutzers",
       "discard": "Benutzer verwerfen",
       "edit": "Benutzer bearbeiten",
+      "generatedPassword": "Generiertes Passwort",
       "loadingErrorText": "Es konnten keine Benutzerdaten geladen werden.",
       "loadingErrorTitle": "Fehler beim Laden des Benutzers",
       "management": "Benutzerverwaltung",
@@ -81,9 +82,11 @@
     "admin": "Schulportal-Administration",
     "backToList": "zurück zur Ergebnisliste",
     "backToStart": "zurück zur Startseite",
+    "closeMobileMenu": "Mobiles Menü schließen",
     "login": "Anmelden",
     "logout": "Abmelden",
     "navigation": "Navigation",
+    "openMobileMenu": "Mobiles Menü öffnen",
     "help": "Hilfe"
   },
   "pagination": {

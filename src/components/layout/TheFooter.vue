@@ -137,8 +137,8 @@
     min-height: 240px; /* Avoid footer shrinking vertically on smaller screen sizes*/
     position: absolute;
     width: 100%;
-    width: -moz-available;          /* WebKit-based browsers will ignore this. */
-    width: -webkit-fill-available;  /* Mozilla-based browsers will ignore this. */
+    width: -moz-available; /* WebKit-based browsers will ignore this. */
+    width: -webkit-fill-available; /* Mozilla-based browsers will ignore this. */
   }
 
   @media (max-width: 1280px) {

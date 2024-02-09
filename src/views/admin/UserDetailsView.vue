@@ -13,7 +13,7 @@
 
   const password: Ref<string> = ref('')
 
-  function navigateToUserTable(): void {
+  function navigateToPersonTable(): void {
     router.push({ name: 'user-management' })
   }
 
@@ -25,7 +25,7 @@
 
   const handleAlertClose = (): void => {
     personStore.errorCode = ''
-    navigateToUserTable()
+    navigateToPersonTable()
   }
 
   onMounted(async () => {
@@ -44,7 +44,7 @@
     <LayoutCard
       :closable="true"
       :header="$t('admin.person.edit')"
-      @onCloseClicked="navigateToUserTable"
+      @onCloseClicked="navigateToPersonTable"
       :padded="true"
       :showCloseText="true"
     >

@@ -17,7 +17,7 @@
   const selectedVorname: Ref<string> = ref('')
   const selectedFamilienname: Ref<string> = ref('')
 
-  function navigateToUserTable(): void {
+  function navigateToPersonTable(): void {
     router.push({ name: 'user-management' })
   }
 
@@ -33,7 +33,7 @@
 
   const handleAlertClose = (): void => {
     personStore.errorCode = ''
-    navigateToUserTable()
+    navigateToPersonTable()
   }
 
   const handleCreateAnotherPerson = (): void => {
@@ -69,7 +69,7 @@
   <LayoutCard
     :closable="true"
     :header="$t('admin.person.addNew')"
-    @onCloseClicked="navigateToUserTable"
+    @onCloseClicked="navigateToPersonTable"
     :padded="true"
     :showCloseText="true"
   >
@@ -80,20 +80,18 @@
       :type="'error'"
       :closable="false"
       :text="$t('admin.person.creationErrorText')"
-      :showButton="true"
-      :buttonText="$t('nav.backToList')"
-      :buttonAction="navigateToUserTable"
       @update:modelValue="handleAlertClose"
     />
 
-    <!-- The form to create a new Person (No created Person yet and no errorCode)  -->
-    <template v-if="!personStore.createdPerson && !personStore.errorCode">
+    <!-- The form to create a new Person  -->
+    <template v-if="!personStore.createdPerson">
       <v-form @submit.prevent>
         <v-container class="px-3 px-sm-16">
           <v-row class="align-center flex-nowrap mx-auto py-6">
             <v-icon
+              aria-hidden="true"
               class="mr-2"
-              icon="mdi-information-outline"
+              icon="mdi-alert-circle-outline"
               size="small"
             ></v-icon>
             <label class="subtitle-2">{{ $t('admin.mandatoryFieldsNotice') }}</label>
@@ -117,6 +115,7 @@
                 sm="8"
               >
                 <v-select
+                  data-testid="rolle-select"
                   id="rolle-select"
                   :items="rollen"
                   item-title="name"
@@ -142,6 +141,7 @@
                 >
                   <v-checkbox
                     class="no-kopers-checkbox"
+                    data-testid="no-kopers-checkbox"
                     hide-details
                     :label="$t('admin.koPers.noKoPersNumber')"
                     v-model="noKoPersNumber"
@@ -165,6 +165,7 @@
                 >
                   <v-text-field
                     id="kopers-number"
+                    data-testid="kopers-number-input"
                     :disabled="noKoPersNumber"
                     v-model="koPersNumber"
                     variant="outlined"
@@ -190,6 +191,7 @@
                   sm="8"
                 >
                   <v-text-field
+                    data-testid="vorname-input"
                     id="vorname-input"
                     variant="outlined"
                     v-model="selectedVorname"
@@ -210,6 +212,7 @@
                   sm="8"
                 >
                   <v-text-field
+                    data-testid="nachname-input"
                     id="nachname-input"
                     variant="outlined"
                     v-model="selectedFamilienname"
@@ -235,6 +238,7 @@
                   sm="8"
                 >
                   <v-select
+                    data-testid="schule-select"
                     id="schule-select"
                     :items="schulen"
                     :no-data-text="$t('admin.school.noSchoolsFound')"
@@ -260,7 +264,8 @@
             <v-btn
               :block="smAndDown"
               class="secondary"
-              @click.stop="navigateToUserTable"
+              @click.stop="navigateToPersonTable"
+              data-testid="discard-person-button"
               >{{ $t('admin.person.discard') }}</v-btn
             >
           </v-col>
@@ -273,6 +278,7 @@
               :block="smAndDown"
               class="primary"
               @click.stop="createPerson()"
+              data-testid="create-person-button"
               type="submit"
               >{{ $t('admin.person.create') }}</v-btn
             >
@@ -281,8 +287,8 @@
       </v-form>
     </template>
 
-    <!-- Result template on success after submit (Present value in createdPerson and no errorCode)  -->
-    <template v-if="personStore.createdPerson && !personStore.errorCode">
+    <!-- Result template on success after submit  -->
+    <template v-if="personStore.createdPerson">
       <v-container class="new-role-success">
         <v-row justify="center">
           <v-col
@@ -300,10 +306,11 @@
         <v-row justify="center">
           <v-col cols="auto">
             <v-icon
-              small
+              aria-hidden="true"
               color="#1EAE9C"
+              icon="mdi-check-circle"
+              small
             >
-              mdi-check-circle
             </v-icon>
           </v-col>
         </v-row>
@@ -349,6 +356,7 @@
           >
             <v-btn
               class="secondary"
+              @click.stop="navigateToPersonTable"
               data-testid="back-to-list-button"
               >{{ $t('nav.backToList') }}</v-btn
             >
@@ -359,8 +367,8 @@
           >
             <v-btn
               class="primary button"
-              data-testid="create-another-person-button"
               @click="handleCreateAnotherPerson"
+              data-testid="create-another-person-button"
             >
               {{ $t('admin.person.createAnother') }}
             </v-btn>
