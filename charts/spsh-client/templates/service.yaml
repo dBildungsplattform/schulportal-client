@@ -1,14 +1,15 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "spsh-client.serviceName" . }}
-  labels:
-    app: {{ template "spsh-client.name" . }}
+  name: {{ template "common.names.releasename" . }}
+  namespace: {{ .Values.namespace }}
+  labels: 
+    app.kubernetes.io/name: {{ .Values.commonLabels.name }}
 spec:
-  type: {{ .Values.service.type }}
-  ports:
-    - port: {{ .Values.service.port }}
-      targetPort: {{ .Values.service.targetPort }}
-      protocol: TCP
   selector:
-    app: {{ template "spsh-client.name" . }}
+    app.kubernetes.io/layer: {{ .Values.selector.layer }}
+  type: {{ .Values.servicetype }}
+  
+  {{- if .Values.enabledserviceport }}
+  ports: {{- toYaml .Values.ports | nindent 6 }}
+  {{- end }}

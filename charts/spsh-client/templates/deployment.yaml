@@ -1,27 +1,49 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "spsh-client.deploymentName" . }}
+  name: {{ template "common.names.releasename" . }}
+  namespace: {{ .Values.namespace }}
   labels:
-    app: {{ template "spsh-client.name" . }}
+    app.kubernetes.io/name: {{ .Values.commonLabels.name }}
 spec:
-  replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app: {{ template "spsh-client.name" . }}
+      app.kubernetes.io/layer: {{ .Values.selector.layer }}
+  replicas: {{ .Values.replicaCount }}
   template:
     metadata:
       labels:
-        app: {{ template "spsh-client.name" . }}
+        app.kubernetes.io/name: {{ .Values.commonLabels.name }}
+        app.kubernetes.io/layer: {{ .Values.selector.layer }} 
     spec:
+      automountServiceAccountToken: {{ .Values.automountServiceAccountToken }} 
       containers:
-        - name: {{ template "spsh-client.name" . }}
+        - name: {{ .Values.commonLabels.name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ default "Always" .Values.image.pullPolicy | quote }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }} 
+
+          {{- if .Values.enabledcontainerSecurityContext }}
+          securityContext: {{- toYaml .Values.containerSecurityContext | nindent 12 }}
+          {{- end }}
+          {{- if .Values.volumePermissions.resources }}
+          resources: {{- toYaml .Values.volumePermissions.resources | nindent 12 }}
+          {{- end }}
+          {{- if .Values.enabledreadinessProbe }}
+          readinessProbe: {{- toYaml .Values.readinessProbe | nindent 12 }}
+          {{- end }}
+
           ports:
-            - name: http
-              containerPort: {{ default 80 .Values.service.port }}
-              protocol: TCP 
-          securityContext:
-            allowPrivilegeEscalation: {{ default false .Values.allowPrivilegeEscalation }}
-      restartPolicy: {{ .Values.restartPolicy  }}
+            - name: {{ .Values.serviceName }} 
+              containerPort:  {{ .Values.containerPorts.http }}
+          {{- if .Values.enabledStartupProbe }}
+          startupProbe: {{- toYaml .Values.startupProbe | nindent 12 }}
+          {{- end }}
+
+          {{- if .Values.enabledlivenessProbe }}
+          livenessProbe: {{- toYaml .Values.livenessProbe | nindent 12 }}
+          {{- end }}
+
+          {{- if .Values.enabledreadinessProbe }}
+          readinessProbe: {{- toYaml .Values.readinessProbe | nindent 12 }}
+          {{- end }} 
+      restartPolicy: {{ default "Always" .Values.restartPolicy }}
