@@ -4,6 +4,10 @@
   import { onMounted, type Ref, ref } from 'vue'
   import { type Router, useRouter } from 'vue-router'
   import { useDisplay } from 'vuetify'
+  import { type Composer, useI18n } from 'vue-i18n'
+  import { type FieldContext, useField, useForm } from 'vee-validate'
+  import { object, string } from 'yup'
+  import { toTypedSchema } from '@vee-validate/yup'
   import SpshAlert from '@/components/alert/SpshAlert.vue'
   import LayoutCard from '@/components/cards/LayoutCard.vue'
   import PasswordOutput from '@/components/form/PasswordOutput.vue'
@@ -11,11 +15,28 @@
   const router: Router = useRouter()
   const personStore: PersonStore = usePersonStore()
   const { smAndDown }: { smAndDown: Ref<boolean> } = useDisplay()
+  const { t }: Composer = useI18n({ useScope: 'global' })
+
+  type PersonCreationForm = {
+    selectedVorname: string
+    selectedFamilienname: string
+  }
+
+  const { handleSubmit }: { handleSubmit: HandleSubmitFactory<PersonCreationForm> } =
+    useForm<PersonCreationForm>({
+      validationSchema: toTypedSchema(
+        object({
+          selectedVorname: string().required(t('admin.person.rules.vorname')),
+          selectedFamilienname: string().required(t('admin.person.rules.familienname'))
+        })
+      )
+    })
+
   const noKoPersNumber: Ref<boolean> = ref(false)
   const koPersNumber: Ref<string> = ref('')
   const selectedRolle: Ref<string> = ref('')
-  const selectedVorname: Ref<string> = ref('')
-  const selectedFamilienname: Ref<string> = ref('')
+  const selectedVorname: FieldContext<unknown> = useField('selectedVorname')
+  const selectedFamilienname: FieldContext<unknown> = useField('selectedFamilienname')
 
   function navigateToPersonTable(): void {
     router.push({ name: 'user-management' })
@@ -24,12 +45,16 @@
   function createPerson(): void {
     const unpersistedPerson: CreatedPerson = {
       name: {
-        familienname: selectedFamilienname.value,
-        vorname: selectedVorname.value
+        familienname: selectedFamilienname.value.value as string,
+        vorname: selectedVorname.value.value as string
       }
     }
     personStore.createPerson(unpersistedPerson)
   }
+
+  const onSubmit: (e?: Event | undefined) => Promise<void | undefined> = handleSubmit(() => {
+    createPerson()
+  })
 
   const handleAlertClose = (): void => {
     personStore.errorCode = ''
@@ -41,8 +66,8 @@
     selectedRolle.value = ''
     noKoPersNumber.value = false
     koPersNumber.value = ''
-    selectedVorname.value = ''
-    selectedFamilienname.value = ''
+    selectedVorname.value.value = ''
+    selectedFamilienname.value.value = ''
     router.push({ name: 'create-person' })
   }
 
@@ -85,7 +110,7 @@
 
     <!-- The form to create a new Person  -->
     <template v-if="!personStore.createdPerson">
-      <v-form @submit.prevent>
+      <v-form @submit.prevent="onSubmit">
         <v-container class="px-3 px-sm-16">
           <v-row class="align-center flex-nowrap mx-auto py-6">
             <v-icon
@@ -192,9 +217,10 @@
                 >
                   <v-text-field
                     data-testid="vorname-input"
+                    :error-messages="selectedVorname.errorMessage.value"
                     id="vorname-input"
                     variant="outlined"
-                    v-model="selectedVorname"
+                    v-model="selectedVorname.value.value"
                   ></v-text-field>
                 </v-col>
               </v-row>
@@ -204,7 +230,7 @@
                   cols="12"
                   sm="4"
                 >
-                  <label for="nachname-input">{{ $t('person.lastName') }}</label>
+                  <label for="familienname-input">{{ $t('person.lastName') }}</label>
                 </v-col>
                 <v-col
                   class="py-0"
@@ -212,10 +238,11 @@
                   sm="8"
                 >
                   <v-text-field
-                    data-testid="nachname-input"
-                    id="nachname-input"
+                    data-testid="familienname-input"
+                    :error-messages="selectedFamilienname.errorMessage.value"
+                    id="familienname-input"
                     variant="outlined"
-                    v-model="selectedFamilienname"
+                    v-model="selectedFamilienname.value.value"
                   ></v-text-field>
                 </v-col>
               </v-row>
@@ -277,7 +304,6 @@
             <v-btn
               :block="smAndDown"
               class="primary"
-              @click.stop="createPerson()"
               data-testid="create-person-button"
               type="submit"
               >{{ $t('admin.person.create') }}</v-btn
@@ -358,8 +384,9 @@
               class="secondary"
               @click.stop="navigateToPersonTable"
               data-testid="back-to-list-button"
-              >{{ $t('nav.backToList') }}</v-btn
             >
+              {{ $t('nav.backToList') }}
+            </v-btn>
           </v-col>
           <v-col
             cols="12"
