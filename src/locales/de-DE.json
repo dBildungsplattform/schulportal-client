@@ -31,7 +31,7 @@
           "rolleNameLength": "Der Rollenname darf nicht länger als 200 Zeichen sein.",
           "rolleNameRequired": "Der Rollenname ist erforderlich."
         },
-        "mappingBackendToUI": {
+        "mappingFrontBackEnd": {
           "rollenarten": {
             "LERN": "Lern",
             "LEHR": "Lehr",
@@ -43,13 +43,6 @@
           "merkmale": {
             "BEFRISTUNG_PFLICHT": "Befristung ist Pflichtangabe",
             "KOPERS_PFLICHT": "KoPers-Nr. ist Pflichtangabe"
-           
-          }
-        },
-        "mappingUIToEnumKey": {
-          "merkmale": {
-            "Befristung ist Pflichtangabe": "BefristungPflicht",
-            "KoPers-Nr. ist Pflichtangabe": "KopersPflicht"
           }
         }
     },

@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import LayoutCard from '@/components/cards/LayoutCard.vue'
-  import { ref, type Ref } from 'vue'
+  import { ref, type Ref, computed } from 'vue'
   import {
     useRolleStore,
     type RolleStore,
@@ -33,6 +33,7 @@
   const selectedMerkmale: Ref<SelectionArray> = ref(null)
 
   const schulstrukturKnoten: string[] = ['cef7240e-fd08-4961-927e-c9ea0c5a37c5']
+
   const rollenarten: string[] = [
     t('admin.rolle.mappingBackendToUI.rollenarten.LERN'),
     t('admin.rolle.mappingBackendToUI.rollenarten.LEHR'),
@@ -46,22 +47,35 @@
     t('admin.rolle.mappingBackendToUI.merkmale.KOPERS_PFLICHT')
   ]
 
-  // Mapping for Merkmale from the backend response to UI
-  const merkmaleMapping: Record<string, keyof typeof RolleResponseMerkmaleEnum | undefined> = {
-    'Befristung ist Pflichtangabe': 'BefristungPflicht',
-    'KoPers-Nr. ist Pflichtangabe': 'KopersPflicht'
-  }
-  // Function to map selected Merkmale input to enum keys
+  // Function to map selected Merkmale input to enum keys statically
   function mapMerkmaleToEnumKeys(
     selectedMerkmaleInput: string[] | null
   ): (keyof typeof RolleResponseMerkmaleEnum)[] {
-    return (
-      selectedMerkmaleInput?.map(
-        (merkmal: string) => merkmaleMapping[merkmal] as keyof typeof RolleResponseMerkmaleEnum
-      ) || []
-    )
+    if (!selectedMerkmaleInput) return []
+
+    // Define a static mapping based on i18n keys and corresponding enum keys since i18n doesn't support retrieving a whole object
+    const mapping: {
+      [x: string]: string
+    } = {
+      [t('admin.rolle.mappingFrontBackEnd.merkmale.BEFRISTUNG_PFLICHT')]: 'BefristungPflicht',
+      [t('admin.rolle.mappingFrontBackEnd.merkmale.KOPERS_PFLICHT')]: 'KopersPflicht'
+    }
+
+    return selectedMerkmaleInput.map((merkmal: string) => mapping[merkmal]).filter(Boolean)
   }
 
+  // Mapping for Merkmale from Backend response to UI
+  const translatedMerkmale: string = computed(() => {
+    if (
+      Array.isArray(rolleStore.createdRolle.merkmale) &&
+      rolleStore.createdRolle.merkmale.length
+    ) {
+      return rolleStore.createdRolle.merkmale
+        .map((merkmal: string) => t(`admin.rolle.mappingBackendToUI.merkmale.${merkmal}`))
+        .join(', ')
+    }
+    return ''
+  })
   const submitForm = async (): Promise<void> => {
     if (selectedRollenName.value && selectedSchulstrukturKnoten.value && selectedRollenArt.value) {
       // Direct mapping to string literals expected by the createRolle method
@@ -179,11 +193,7 @@
           </v-row>
           <v-row>
             <v-col class="text-body bold text-right"> {{ $t('admin.rolle.merkmale') }}:</v-col>
-            <v-col class="text-body">
-              {{
-                $t(`admin.rolle.mappingBackendToUI.merkmale.${rolleStore.createdRolle.merkmale}`)
-              }}</v-col
-            ></v-row
+            <v-col class="text-body"> {{ translatedMerkmale }}</v-col></v-row
           >
           <v-divider
             class="border-opacity-100 rounded my-6"
