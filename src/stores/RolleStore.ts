@@ -4,6 +4,7 @@ import {
   CreateRolleBodyParamsRollenartEnum,
   CreateRolleBodyParamsMerkmaleEnum,
   RolleApiFactory,
+  RolleResponseRollenartEnum,
   RolleResponseMerkmaleEnum,
   type CreateRolleBodyParams,
   type RolleApiInterface,
@@ -31,14 +32,15 @@ type RolleActions = {
   createRolle: (
     rollenName: string,
     schulStrukturKnoten: string,
-    rollenArt: keyof typeof CreateRolleBodyParamsRollenartEnum,
-    merkmale: Array<keyof typeof CreateRolleBodyParamsMerkmaleEnum>
+    rollenArt: CreateRolleBodyParamsRollenartEnum,
+    merkmale: CreateRolleBodyParamsMerkmaleEnum[]
   ) => Promise<RolleResponse>
 }
 
 export { CreateRolleBodyParamsRollenartEnum }
 export { CreateRolleBodyParamsMerkmaleEnum }
 export { RolleResponseMerkmaleEnum }
+export { RolleResponseRollenartEnum }
 
 export type RolleStore = Store<'rolleStore', RolleState, RolleGetters, RolleActions>
 
@@ -56,16 +58,13 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
       async createRolle(
         rollenName: string,
         schulStrukturKnoten: string,
-        rollenArt: keyof typeof CreateRolleBodyParamsRollenartEnum,
-        merkmale: Array<keyof typeof CreateRolleBodyParamsMerkmaleEnum>
+        rollenArt: CreateRolleBodyParamsRollenartEnum,
+        merkmale: CreateRolleBodyParamsMerkmaleEnum[]
       ): Promise<RolleResponse> {
         this.loading = true
         try {
-          const rollenArtValue: CreateRolleBodyParamsRollenartEnum =
-            CreateRolleBodyParamsRollenartEnum[rollenArt]
-          const merkmaleValues: CreateRolleBodyParamsMerkmaleEnum[] = merkmale.map(
-            (key: 'BefristungPflicht' | 'KopersPflicht') => CreateRolleBodyParamsMerkmaleEnum[key]
-          )
+          const rollenArtValue: CreateRolleBodyParamsRollenartEnum = rollenArt
+          const merkmaleValues: CreateRolleBodyParamsMerkmaleEnum[] = merkmale
           // Construct the body params object
           const createRolleBodyParams: CreateRolleBodyParams = {
             name: rollenName,

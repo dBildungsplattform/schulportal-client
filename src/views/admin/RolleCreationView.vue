@@ -1,11 +1,13 @@
 <script setup lang="ts">
   import LayoutCard from '@/components/cards/LayoutCard.vue'
-  import { ref, type Ref, computed, type ComputedRef } from 'vue'
+  import { ref, type Ref, onMounted, computed } from 'vue'
   import {
     useRolleStore,
     type RolleStore,
-    type CreateRolleBodyParamsRollenartEnum,
-    type RolleResponseMerkmaleEnum
+    RolleResponseMerkmaleEnum,
+    RolleResponseRollenartEnum,
+    CreateRolleBodyParamsRollenartEnum,
+    CreateRolleBodyParamsMerkmaleEnum
   } from '@/stores/RolleStore'
   import { useI18n, type Composer } from 'vue-i18n'
   import SpshAlert from '@/components/alert/SpshAlert.vue'
@@ -21,11 +23,11 @@
   type Selection = string | null
   type SelectionArray = string[] | null
 
-  // This captures the keys from RolleResponseMerkmaleEnum directly
-  type MerkmaleKeys = keyof typeof RolleResponseMerkmaleEnum
+  type TranslatedRollenArt = { value: RolleResponseRollenartEnum; title: string }
+  const translatedRollenart: Ref<TranslatedRollenArt[]> = ref([])
 
-  // Denotes an array of those keys
-  type MerkmaleEnumKeys = MerkmaleKeys[]
+  type TranslatedMerkmal = { value: RolleResponseMerkmaleEnum; title: string }
+  const translatedMerkmale: Ref<TranslatedMerkmal[]> = ref([])
 
   const selectedSchulstrukturKnoten: Ref<Selection> = ref(null)
   const selectedRollenArt: Ref<Selection> = ref(null)
@@ -33,79 +35,6 @@
   const selectedMerkmale: Ref<SelectionArray> = ref(null)
 
   const schulstrukturKnoten: string[] = ['cef7240e-fd08-4961-927e-c9ea0c5a37c5']
-
-  const rollenarten: string[] = [
-    t('admin.rolle.mappingFrontBackEnd.rollenarten.LERN'),
-    t('admin.rolle.mappingFrontBackEnd.rollenarten.LEHR'),
-    t('admin.rolle.mappingFrontBackEnd.rollenarten.EXTERN'),
-    t('admin.rolle.mappingFrontBackEnd.rollenarten.ORGADMIN'),
-    t('admin.rolle.mappingFrontBackEnd.rollenarten.LEIT'),
-    t('admin.rolle.mappingFrontBackEnd.rollenarten.SYSADMIN')
-  ]
-  const merkmale: string[] = [
-    t('admin.rolle.mappingFrontBackEnd.merkmale.BEFRISTUNG_PFLICHT'),
-    t('admin.rolle.mappingFrontBackEnd.merkmale.KOPERS_PFLICHT')
-  ]
-
-  // Function to map selected Merkmale input to enum keys statically
-  function mapMerkmaleToEnumKeys(
-    selectedMerkmaleInput: string[] | null
-  ): (keyof typeof RolleResponseMerkmaleEnum)[] {
-    if (!selectedMerkmaleInput) return []
-
-    // Define a static mapping based on i18n keys and corresponding enum keys since i18n doesn't support retrieving a whole object
-    const mapping: {
-      [x: string]: string
-    } = {
-      [t('admin.rolle.mappingFrontBackEnd.merkmale.BEFRISTUNG_PFLICHT')]: 'BefristungPflicht',
-      [t('admin.rolle.mappingFrontBackEnd.merkmale.KOPERS_PFLICHT')]: 'KopersPflicht'
-    }
-
-    return selectedMerkmaleInput
-      .map((merkmal: string) => mapping[merkmal])
-      .filter((key: string | undefined): key is MerkmaleKeys => key !== undefined)
-  }
-
-  // Mapping for Merkmale from Backend response to UI
-  const translatedMerkmale: ComputedRef<string> = computed(() => {
-    if (
-      rolleStore.createdRolle && // Ensure createdRolle is not null
-      Array.isArray(rolleStore.createdRolle.merkmale) &&
-      rolleStore.createdRolle.merkmale.length
-    ) {
-      return rolleStore.createdRolle.merkmale
-        .map((merkmal: string) => t(`admin.rolle.mappingFrontBackEnd.merkmale.${merkmal}`))
-        .join(', ')
-    }
-    return ''
-  })
-  const submitForm = async (): Promise<void> => {
-    if (selectedRollenName.value && selectedSchulstrukturKnoten.value && selectedRollenArt.value) {
-      // Direct mapping to string literals expected by the createRolle method
-      const merkmaleAsStringLiterals: MerkmaleEnumKeys = mapMerkmaleToEnumKeys(
-        selectedMerkmale.value
-      )
-
-      await rolleStore.createRolle(
-        selectedRollenName.value,
-        selectedSchulstrukturKnoten.value,
-        selectedRollenArt.value as keyof typeof CreateRolleBodyParamsRollenartEnum,
-        merkmaleAsStringLiterals
-      )
-    }
-  }
-  const handleCreateAnotherRolle = (): void => {
-    rolleStore.createdRolle = null
-    selectedSchulstrukturKnoten.value = null
-    selectedRollenArt.value = null
-    selectedRollenName.value = null
-    selectedMerkmale.value = null
-    router.push({ name: 'create-rolle' })
-  }
-
-  function navigateBackToRolleForm(): void {
-    rolleStore.errorCode = ''
-  }
 
   // Rule for validating the rolle name. Maybe enhance a validation framework like VeeValidate instead?
   const rolleNameRules: Array<(v: string | null | undefined) => boolean | string> = [
@@ -122,6 +51,59 @@
       return true
     }
   ]
+  const submitForm = async (): Promise<void> => {
+    if (selectedRollenName.value && selectedSchulstrukturKnoten.value && selectedRollenArt.value) {
+      const merkmaleToSubmit: string[] = selectedMerkmale.value?.map((m: string) => m) || []
+      await rolleStore.createRolle(
+        selectedRollenName.value,
+        selectedSchulstrukturKnoten.value,
+        selectedRollenArt.value as CreateRolleBodyParamsRollenartEnum,
+        merkmaleToSubmit as CreateRolleBodyParamsMerkmaleEnum[] | []
+      )
+    }
+  }
+  const handleCreateAnotherRolle = (): void => {
+    rolleStore.createdRolle = null
+    selectedSchulstrukturKnoten.value = null
+    selectedRollenArt.value = null
+    selectedRollenName.value = null
+    selectedMerkmale.value = null
+    router.push({ name: 'create-rolle' })
+  }
+
+  function navigateBackToRolleForm(): void {
+    rolleStore.errorCode = ''
+  }
+
+  const translatedCreatedRolleMerkmale: ComputedRef<RolleResponseMerkmaleEnum> = computed(() => {
+    if (!rolleStore.createdRolle?.merkmale) return ''
+
+    // Translate each merkmal and join with a comma
+    return rolleStore.createdRolle.merkmale
+      .map((merkmalKey: string) => t(`admin.rolle.mappingFrontBackEnd.merkmale.${merkmalKey}`))
+      .join(', ')
+  })
+
+  onMounted(() => {
+    // Iterate over the enum values
+    Object.values(RolleResponseRollenartEnum).forEach((enumValue: RolleResponseRollenartEnum) => {
+      // Use the enum value to construct the i18n path
+      const i18nPath: string = `admin.rolle.mappingFrontBackEnd.rollenarten.${enumValue}`
+      // Push the mapped object into the array
+      translatedRollenart.value.push({
+        value: enumValue, // Keep the enum value for internal use
+        title: t(i18nPath) // Get the localized title
+      })
+    })
+
+    Object.values(RolleResponseMerkmaleEnum).forEach((enumValue: RolleResponseMerkmaleEnum) => {
+      const i18nPath: string = `admin.rolle.mappingFrontBackEnd.merkmale.${enumValue}`
+      translatedMerkmale.value.push({
+        value: enumValue,
+        title: t(i18nPath)
+      })
+    })
+  })
 </script>
 
 <template>
@@ -202,7 +184,7 @@
           </v-row>
           <v-row>
             <v-col class="text-body bold text-right"> {{ $t('admin.rolle.merkmale') }}:</v-col>
-            <v-col class="text-body"> {{ translatedMerkmale }}</v-col></v-row
+            <v-col class="text-body"> {{ translatedCreatedRolleMerkmale }}</v-col></v-row
           >
           <v-divider
             class="border-opacity-100 rounded my-6"
@@ -341,8 +323,10 @@
               >
                 <v-select
                   data-testid="rollenart-select"
-                  :items="rollenarten"
+                  :items="translatedRollenart"
                   v-model="selectedRollenArt"
+                  item-value="value"
+                  item-text="title"
                   :placeholder="$t('admin.rolle.selectRollenart')"
                   variant="outlined"
                   density="compact"
@@ -435,8 +419,10 @@
                 >
                   <v-select
                     data-testid="merkmale-select"
-                    :items="merkmale"
+                    :items="translatedMerkmale"
                     v-model="selectedMerkmale"
+                    item-value="value"
+                    item-text="title"
                     :placeholder="$t('admin.rolle.selectMerkmale')"
                     variant="outlined"
                     density="compact"
