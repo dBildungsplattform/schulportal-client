@@ -103,8 +103,8 @@
     router.push({ name: 'create-rolle' })
   }
 
-  function navigateToRolleForm(): void {
-    router.push({ name: 'create-rolle' })
+  function navigateBackToRolleForm(): void {
+    rolleStore.errorCode = ''
   }
 
   // Rule for validating the rolle name. Maybe enhance a validation framework like VeeValidate instead?
@@ -146,7 +146,7 @@
         :text="$t('admin.rolle.rolleCreateErrorText')"
         :showButton="true"
         :buttonText="$t('admin.rolle.backToCreateRole')"
-        :buttonAction="navigateToRolleForm"
+        :buttonAction="navigateBackToRolleForm"
         buttonClass="primary"
       />
       <!-- Result template on success after submit (Present value in createdRolle and no errorCode)  -->
