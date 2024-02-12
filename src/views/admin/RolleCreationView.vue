@@ -11,13 +11,6 @@
   import SpshAlert from '@/components/alert/SpshAlert.vue'
   import { type Router, useRouter } from 'vue-router'
   import { useDisplay } from 'vuetify'
-  import {
-    rollenArten,
-    merkmale,
-    mapMerkmaleToEnumKeys,
-    mapEnumKeysToDisplayText,
-    mapRollenArtToUserFormat
-  } from '@/utils/RolleUtils'
 
   const { smAndDown }: { smAndDown: Ref<boolean> } = useDisplay()
   const rolleStore: RolleStore = useRolleStore()
@@ -40,6 +33,34 @@
   const selectedMerkmale: Ref<SelectionArray> = ref(null)
 
   const schulstrukturKnoten: string[] = ['cef7240e-fd08-4961-927e-c9ea0c5a37c5']
+  const rollenarten: string[] = [
+    t('admin.rolle.mappingBackendToUI.rollenarten.LERN'),
+    t('admin.rolle.mappingBackendToUI.rollenarten.LEHR'),
+    t('admin.rolle.mappingBackendToUI.rollenarten.EXTERN'),
+    t('admin.rolle.mappingBackendToUI.rollenarten.ORGADMIN'),
+    t('admin.rolle.mappingBackendToUI.rollenarten.LEIT'),
+    t('admin.rolle.mappingBackendToUI.rollenarten.SYSADMIN')
+  ]
+  const merkmale: string[] = [
+    t('admin.rolle.mappingBackendToUI.merkmale.BEFRISTUNG_PFLICHT'),
+    t('admin.rolle.mappingBackendToUI.merkmale.KOPERS_PFLICHT')
+  ]
+
+  // Mapping for Merkmale from the backend response to UI
+  const merkmaleMapping: Record<string, keyof typeof RolleResponseMerkmaleEnum | undefined> = {
+    'Befristung ist Pflichtangabe': 'BefristungPflicht',
+    'KoPers-Nr. ist Pflichtangabe': 'KopersPflicht'
+  }
+  // Function to map selected Merkmale input to enum keys
+  function mapMerkmaleToEnumKeys(
+    selectedMerkmaleInput: string[] | null
+  ): (keyof typeof RolleResponseMerkmaleEnum)[] {
+    return (
+      selectedMerkmaleInput?.map(
+        (merkmal: string) => merkmaleMapping[merkmal] as keyof typeof RolleResponseMerkmaleEnum
+      ) || []
+    )
+  }
 
   const submitForm = async (): Promise<void> => {
     if (selectedRollenName.value && selectedSchulstrukturKnoten.value && selectedRollenArt.value) {
@@ -145,24 +166,23 @@
           <v-row>
             <v-col class="text-body bold text-right"> {{ $t('admin.rolle.rollenart') }}: </v-col>
             <v-col class="text-body">
-              {{ mapRollenArtToUserFormat(rolleStore.createdRolle.rollenart) }}</v-col
+              {{
+                $t(
+                  `admin.rolle.mappingBackendToUI.rollenarten.${rolleStore.createdRolle.rollenart}`
+                )
+              }}</v-col
             >
           </v-row>
           <v-row>
             <v-col class="text-body bold text-right"> {{ $t('admin.rolle.rollenname') }}:</v-col>
-            <v-col class="text-body"> {{ rolleStore.createdRolle.name }} </v-col>
+            <v-col class="text-body">{{ rolleStore.createdRolle.name }} </v-col>
           </v-row>
           <v-row>
             <v-col class="text-body bold text-right"> {{ $t('admin.rolle.merkmale') }}:</v-col>
             <v-col class="text-body">
-              <div
-                v-for="(merkmal, index) in mapEnumKeysToDisplayText(
-                  rolleStore.createdRolle.merkmale
-                )"
-                :key="index"
-              >
-                {{ merkmal }}
-              </div></v-col
+              {{
+                $t(`admin.rolle.mappingBackendToUI.merkmale.${rolleStore.createdRolle.merkmale}`)
+              }}</v-col
             ></v-row
           >
           <v-divider
@@ -302,7 +322,7 @@
               >
                 <v-select
                   data-testid="rollenart-select"
-                  :items="rollenArten"
+                  :items="rollenarten"
                   v-model="selectedRollenArt"
                   :placeholder="$t('admin.rolle.selectRollenart')"
                   variant="outlined"

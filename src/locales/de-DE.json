@@ -30,6 +30,27 @@
         "rule": {
           "rolleNameLength": "Der Rollenname darf nicht länger als 200 Zeichen sein.",
           "rolleNameRequired": "Der Rollenname ist erforderlich."
+        },
+        "mappingBackendToUI": {
+          "rollenarten": {
+            "LERN": "Lern",
+            "LEHR": "Lehr",
+            "EXTERN": "Extern",
+            "ORGADMIN": "Orgadmin",
+            "LEIT": "Leit",
+            "SYSADMIN": "Sysadmin"
+          },
+          "merkmale": {
+            "BEFRISTUNG_PFLICHT": "Befristung ist Pflichtangabe",
+            "KOPERS_PFLICHT": "KoPers-Nr. ist Pflichtangabe"
+           
+          }
+        },
+        "mappingUIToEnumKey": {
+          "merkmale": {
+            "Befristung ist Pflichtangabe": "BefristungPflicht",
+            "KoPers-Nr. ist Pflichtangabe": "KopersPflicht"
+          }
         }
     },
     "school": {
