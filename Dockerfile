@@ -4,9 +4,11 @@ ARG BASE_IMAGE=nginx:1.25-alpine
 
 # Build Stage
 FROM $BASE_IMAGE_BUILDER as build
-
+RUN apk update && \
+    apk upgrade && \ 
+    && apk add --no-cache libexpat
 RUN apk add openjdk17-jre=17.0.10_p7-r0
-RUN apk update && apk add --no-cache libexpat
+
 
 WORKDIR /app
 COPY tsconfig*.json ./
