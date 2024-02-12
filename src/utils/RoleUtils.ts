@@ -31,13 +31,9 @@ export function mapMerkmaleToEnumKeys(
   selectedMerkmaleInput: string[] | null
 ): (keyof typeof RolleResponseMerkmaleEnum)[] {
   return (
-    selectedMerkmaleInput
-      ?.map((merkmal: string) => merkmaleMapping[merkmal])
-      .filter(
-        (
-          item: 'BefristungPflicht' | 'KopersPflicht' | undefined
-        ): item is keyof typeof RolleResponseMerkmaleEnum => item !== undefined
-      ) || []
+    selectedMerkmaleInput?.map(
+      (merkmal: string) => merkmaleMapping[merkmal] as keyof typeof RolleResponseMerkmaleEnum
+    ) || []
   )
 }
 
