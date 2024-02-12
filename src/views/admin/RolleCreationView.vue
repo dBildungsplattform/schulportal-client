@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import LayoutCard from '@/components/cards/LayoutCard.vue'
-  import { ref, type Ref, computed } from 'vue'
+  import { ref, type Ref, computed, type ComputedRef } from 'vue'
   import {
     useRolleStore,
     type RolleStore,
@@ -35,16 +35,16 @@
   const schulstrukturKnoten: string[] = ['cef7240e-fd08-4961-927e-c9ea0c5a37c5']
 
   const rollenarten: string[] = [
-    t('admin.rolle.mappingBackendToUI.rollenarten.LERN'),
-    t('admin.rolle.mappingBackendToUI.rollenarten.LEHR'),
-    t('admin.rolle.mappingBackendToUI.rollenarten.EXTERN'),
-    t('admin.rolle.mappingBackendToUI.rollenarten.ORGADMIN'),
-    t('admin.rolle.mappingBackendToUI.rollenarten.LEIT'),
-    t('admin.rolle.mappingBackendToUI.rollenarten.SYSADMIN')
+    t('admin.rolle.mappingFrontBackEnd.rollenarten.LERN'),
+    t('admin.rolle.mappingFrontBackEnd.rollenarten.LEHR'),
+    t('admin.rolle.mappingFrontBackEnd.rollenarten.EXTERN'),
+    t('admin.rolle.mappingFrontBackEnd.rollenarten.ORGADMIN'),
+    t('admin.rolle.mappingFrontBackEnd.rollenarten.LEIT'),
+    t('admin.rolle.mappingFrontBackEnd.rollenarten.SYSADMIN')
   ]
   const merkmale: string[] = [
-    t('admin.rolle.mappingBackendToUI.merkmale.BEFRISTUNG_PFLICHT'),
-    t('admin.rolle.mappingBackendToUI.merkmale.KOPERS_PFLICHT')
+    t('admin.rolle.mappingFrontBackEnd.merkmale.BEFRISTUNG_PFLICHT'),
+    t('admin.rolle.mappingFrontBackEnd.merkmale.KOPERS_PFLICHT')
   ]
 
   // Function to map selected Merkmale input to enum keys statically
@@ -61,17 +61,20 @@
       [t('admin.rolle.mappingFrontBackEnd.merkmale.KOPERS_PFLICHT')]: 'KopersPflicht'
     }
 
-    return selectedMerkmaleInput.map((merkmal: string) => mapping[merkmal]).filter(Boolean)
+    return selectedMerkmaleInput
+      .map((merkmal: string) => mapping[merkmal])
+      .filter((key: string | undefined): key is MerkmaleKeys => key !== undefined)
   }
 
   // Mapping for Merkmale from Backend response to UI
-  const translatedMerkmale: string = computed(() => {
+  const translatedMerkmale: ComputedRef<string> = computed(() => {
     if (
+      rolleStore.createdRolle && // Ensure createdRolle is not null
       Array.isArray(rolleStore.createdRolle.merkmale) &&
       rolleStore.createdRolle.merkmale.length
     ) {
       return rolleStore.createdRolle.merkmale
-        .map((merkmal: string) => t(`admin.rolle.mappingBackendToUI.merkmale.${merkmal}`))
+        .map((merkmal: string) => t(`admin.rolle.mappingFrontBackEnd.merkmale.${merkmal}`))
         .join(', ')
     }
     return ''
