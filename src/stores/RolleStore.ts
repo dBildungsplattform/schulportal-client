@@ -4,6 +4,7 @@ import {
   CreateRolleBodyParamsRollenartEnum,
   CreateRolleBodyParamsMerkmaleEnum,
   RolleApiFactory,
+  RolleResponseMerkmaleEnum,
   type CreateRolleBodyParams,
   type RolleApiInterface,
   type RolleResponse
@@ -37,6 +38,7 @@ type RolleActions = {
 
 export { CreateRolleBodyParamsRollenartEnum }
 export { CreateRolleBodyParamsMerkmaleEnum }
+export { RolleResponseMerkmaleEnum }
 
 export type RolleStore = Store<'rolleStore', RolleState, RolleGetters, RolleActions>
 
@@ -62,7 +64,7 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
           const rollenArtValue: CreateRolleBodyParamsRollenartEnum =
             CreateRolleBodyParamsRollenartEnum[rollenArt]
           const merkmaleValues: CreateRolleBodyParamsMerkmaleEnum[] = merkmale.map(
-            (key) => CreateRolleBodyParamsMerkmaleEnum[key]
+            (key: 'BefristungPflicht' | 'KopersPflicht') => CreateRolleBodyParamsMerkmaleEnum[key]
           )
           // Construct the body params object
           const createRolleBodyParams: CreateRolleBodyParams = {

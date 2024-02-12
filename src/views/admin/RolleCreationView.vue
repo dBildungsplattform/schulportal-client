@@ -4,21 +4,35 @@
   import {
     useRolleStore,
     type RolleStore,
-    type CreateRolleBodyParamsRollenartEnum
+    type CreateRolleBodyParamsRollenartEnum,
+    type RolleResponseMerkmaleEnum
   } from '@/stores/RolleStore'
   import { useI18n, type Composer } from 'vue-i18n'
   import SpshAlert from '@/components/alert/SpshAlert.vue'
   import { type Router, useRouter } from 'vue-router'
   import { useDisplay } from 'vuetify'
+  import {
+    rollenArten,
+    merkmale,
+    mapMerkmaleToEnumKeys,
+    mapEnumKeysToDisplayText,
+    mapRollenArtToUserFormat
+  } from '@/utils/RoleUtils'
 
   const { smAndDown }: { smAndDown: Ref<boolean> } = useDisplay()
+  const rolleStore: RolleStore = useRolleStore()
 
   const { t }: Composer = useI18n({ useScope: 'global' })
   const router: Router = useRouter()
 
   type Selection = string | null
   type SelectionArray = string[] | null
-  type MerkmaleEnumKeys = ('BefristungPflicht' | 'KopersPflicht')[]
+
+  // This captures the keys from RolleResponseMerkmaleEnum directly
+  type MerkmaleKeys = keyof typeof RolleResponseMerkmaleEnum
+
+  // Denotes an array of those keys
+  type MerkmaleEnumKeys = MerkmaleKeys[]
 
   const selectedSchulstrukturKnoten: Ref<Selection> = ref(null)
   const selectedRollenArt: Ref<Selection> = ref(null)
@@ -26,32 +40,7 @@
   const selectedMerkmale: Ref<SelectionArray> = ref(null)
 
   const schulstrukturKnoten: string[] = ['cef7240e-fd08-4961-927e-c9ea0c5a37c5']
-  const rollenArten: string[] = ['Lern', 'Lehr', 'Extern', 'Orgadmin', 'Leit', 'Sysadmin']
-  const merkmale: string[] = ['Befristung ist Pflichtangabe', 'KoPers-Nr. ist Pflichtangabe']
 
-  const rolleStore: RolleStore = useRolleStore()
-
-  // The mapping function from UI input to enum key
-  function mapMerkmaleToEnumKeys(selectedMerkmaleInput: SelectionArray): MerkmaleEnumKeys {
-    return selectedMerkmaleInput
-      ? merkmale
-          .map((merkmal: string) => {
-            switch (merkmal) {
-              case 'Befristung ist Pflichtangabe':
-                return 'BefristungPflicht'
-              case 'KoPers-Nr. ist Pflichtangabe':
-                return 'KopersPflicht'
-              default:
-                return null
-            }
-          })
-          .filter(
-            (
-              item: 'BefristungPflicht' | 'KopersPflicht' | null
-            ): item is 'BefristungPflicht' | 'KopersPflicht' => item !== null
-          )
-      : []
-  }
   const submitForm = async (): Promise<void> => {
     if (selectedRollenName.value && selectedSchulstrukturKnoten.value && selectedRollenArt.value) {
       // Direct mapping to string literals expected by the createRolle method
@@ -67,7 +56,6 @@
       )
     }
   }
-
   const handleCreateAnotherRolle = (): void => {
     rolleStore.createdRolle = null
     selectedSchulstrukturKnoten.value = null
@@ -133,8 +121,8 @@
               <v-icon
                 small
                 color="#1EAE9C"
+                icon="mdi-check-circle"
               >
-                mdi-check-circle
               </v-icon>
             </v-col>
           </v-row>
@@ -156,7 +144,9 @@
           </v-row>
           <v-row>
             <v-col class="text-body bold text-right"> {{ $t('admin.rolle.rollenart') }}: </v-col>
-            <v-col class="text-body"> {{ rolleStore.createdRolle.rollenart }}</v-col>
+            <v-col class="text-body">
+              {{ mapRollenArtToUserFormat(rolleStore.createdRolle.rollenart) }}</v-col
+            >
           </v-row>
           <v-row>
             <v-col class="text-body bold text-right"> {{ $t('admin.rolle.rollenname') }}:</v-col>
@@ -164,7 +154,16 @@
           </v-row>
           <v-row>
             <v-col class="text-body bold text-right"> {{ $t('admin.rolle.merkmale') }}:</v-col>
-            <v-col class="text-body"> {{ rolleStore.createdRolle.merkmale }}</v-col></v-row
+            <v-col class="text-body">
+              <div
+                v-for="(merkmal, index) in mapEnumKeysToDisplayText(
+                  rolleStore.createdRolle.merkmale
+                )"
+                :key="index"
+              >
+                {{ merkmal }}
+              </div></v-col
+            ></v-row
           >
           <v-divider
             class="border-opacity-100 rounded my-6"
@@ -212,8 +211,8 @@
                 <v-icon
                   small
                   class="mr-2"
+                  icon="mdi-alert-circle-outline"
                 >
-                  mdi-alert-circle-outline
                 </v-icon>
                 <span class="subtitle-2">{{ $t('admin.mandatoryFieldsNotice') }}</span>
               </v-col>
@@ -324,7 +323,7 @@
             </v-row>
 
             <!-- Enter Role name -->
-            <template v-if="selectedRollenArt">
+            <template v-if="selectedRollenArt && selectedSchulstrukturKnoten">
               <v-row>
                 <v-col
                   cols="2"
@@ -474,3 +473,4 @@
     color: #001e49;
   }
 </style>
+@/utils/RoleUtils
