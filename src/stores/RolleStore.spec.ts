@@ -39,8 +39,8 @@ describe('rolleStore', () => {
       const createRollePromise: Promise<RolleResponse> = rolleStore.createRolle(
         'Lehrer',
         '1234',
-        'Lehr',
-        ['KopersPflicht']
+        'LEHR',
+        ['KOPERS_PFLICHT']
       )
       expect(rolleStore.loading).toBe(true)
       await createRollePromise
@@ -53,8 +53,8 @@ describe('rolleStore', () => {
       const createRollePromise: Promise<RolleResponse> = rolleStore.createRolle(
         'Lehrer',
         '1234',
-        'Lehr',
-        ['KopersPflicht']
+        'LEHR',
+        ['KOPERS_PFLICHT']
       )
       expect(rolleStore.loading).toBe(true)
       await rejects(createRollePromise)
@@ -67,8 +67,8 @@ describe('rolleStore', () => {
       const createRollePromise: Promise<RolleResponse> = rolleStore.createRolle(
         'Lehrer',
         '1234',
-        'Lehr',
-        ['KopersPflicht']
+        'LEHR',
+        ['KOPERS_PFLICHT']
       )
       expect(rolleStore.loading).toBe(true)
       await expect(createRollePromise).rejects.toEqual('some mock server error')
