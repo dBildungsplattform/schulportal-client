@@ -17,7 +17,7 @@
     mapMerkmaleToEnumKeys,
     mapEnumKeysToDisplayText,
     mapRollenArtToUserFormat
-  } from '@/utils/RoleUtils'
+  } from '@/utils/RolleUtils'
 
   const { smAndDown }: { smAndDown: Ref<boolean> } = useDisplay()
   const rolleStore: RolleStore = useRolleStore()
