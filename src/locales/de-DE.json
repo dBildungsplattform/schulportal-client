@@ -8,6 +8,7 @@
       "management": "Klassenverwaltung"
     },
     "rolle": {
+      "backToCreateRole": "Zurück zur Rollenanlage",
       "management": "Rollenverwaltung",
       "createNew": "Neue Rolle anlegen",
       "create": "Rolle anlegen",

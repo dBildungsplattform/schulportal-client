@@ -102,6 +102,11 @@
     selectedMerkmale.value = null
     router.push({ name: 'create-rolle' })
   }
+
+  function navigateToRolleForm(): void {
+    router.push({ name: 'create-rolle' })
+  }
+
   // Rule for validating the rolle name. Maybe enhance a validation framework like VeeValidate instead?
   const rolleNameRules: Array<(v: string | null | undefined) => boolean | string> = [
     (v: string | null | undefined): boolean | string => {
@@ -140,7 +145,8 @@
         :closable="false"
         :text="$t('admin.rolle.rolleCreateErrorText')"
         :showButton="true"
-        :buttonText="$t('admin.user.backToList')"
+        :buttonText="$t('admin.rolle.backToCreateRole')"
+        :buttonAction="navigateToRolleForm"
         buttonClass="primary"
       />
       <!-- Result template on success after submit (Present value in createdRolle and no errorCode)  -->
@@ -185,7 +191,7 @@
             <v-col class="text-body">
               {{
                 $t(
-                  `admin.rolle.mappingBackendToUI.rollenarten.${rolleStore.createdRolle.rollenart}`
+                  `admin.rolle.mappingFrontBackEnd.rollenarten.${rolleStore.createdRolle.rollenart}`
                 )
               }}</v-col
             >
