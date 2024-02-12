@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import LayoutCard from '@/components/cards/LayoutCard.vue'
-  import { ref, type Ref, onMounted, computed } from 'vue'
+  import { ref, type Ref, onMounted, computed, type ComputedRef } from 'vue'
   import {
     useRolleStore,
     type RolleStore,
@@ -20,19 +20,16 @@
   const { t }: Composer = useI18n({ useScope: 'global' })
   const router: Router = useRouter()
 
-  type Selection = string | null
-  type SelectionArray = string[] | null
-
   type TranslatedRollenArt = { value: RolleResponseRollenartEnum; title: string }
   const translatedRollenart: Ref<TranslatedRollenArt[]> = ref([])
 
   type TranslatedMerkmal = { value: RolleResponseMerkmaleEnum; title: string }
   const translatedMerkmale: Ref<TranslatedMerkmal[]> = ref([])
 
-  const selectedSchulstrukturKnoten: Ref<Selection> = ref(null)
-  const selectedRollenArt: Ref<Selection> = ref(null)
-  const selectedRollenName: Ref<Selection> = ref(null)
-  const selectedMerkmale: Ref<SelectionArray> = ref(null)
+  const selectedSchulstrukturKnoten: Ref<string | null> = ref(null)
+  const selectedRollenName: Ref<string | null> = ref(null)
+  const selectedRollenArt: Ref<CreateRolleBodyParamsRollenartEnum | null> = ref(null)
+  const selectedMerkmale: Ref<CreateRolleBodyParamsMerkmaleEnum[] | null> = ref(null)
 
   const schulstrukturKnoten: string[] = ['cef7240e-fd08-4961-927e-c9ea0c5a37c5']
 
@@ -53,12 +50,13 @@
   ]
   const submitForm = async (): Promise<void> => {
     if (selectedRollenName.value && selectedSchulstrukturKnoten.value && selectedRollenArt.value) {
-      const merkmaleToSubmit: string[] = selectedMerkmale.value?.map((m: string) => m) || []
+      const merkmaleToSubmit: CreateRolleBodyParamsMerkmaleEnum[] =
+        selectedMerkmale.value?.map((m: string) => m) || []
       await rolleStore.createRolle(
         selectedRollenName.value,
         selectedSchulstrukturKnoten.value,
-        selectedRollenArt.value as CreateRolleBodyParamsRollenartEnum,
-        merkmaleToSubmit as CreateRolleBodyParamsMerkmaleEnum[] | []
+        selectedRollenArt.value,
+        merkmaleToSubmit
       )
     }
   }
@@ -74,16 +72,18 @@
   function navigateBackToRolleForm(): void {
     rolleStore.errorCode = ''
   }
+  const translatedCreatedRolleMerkmale: ComputedRef<string> = computed(() => {
+    // Check if `createdRolle.merkmale` exists and is an array
+    if (!rolleStore.createdRolle?.merkmale || !Array.isArray(rolleStore.createdRolle.merkmale)) {
+      return ''
+    }
 
-  const translatedCreatedRolleMerkmale: ComputedRef<RolleResponseMerkmaleEnum> = computed(() => {
-    if (!rolleStore.createdRolle?.merkmale) return ''
-
-    // Translate each merkmal and join with a comma
     return rolleStore.createdRolle.merkmale
-      .map((merkmalKey: string) => t(`admin.rolle.mappingFrontBackEnd.merkmale.${merkmalKey}`))
+      .map((merkmalKey: string) => {
+        return t(`admin.rolle.mappingFrontBackEnd.merkmale.${merkmalKey}`)
+      })
       .join(', ')
   })
-
   onMounted(() => {
     // Iterate over the enum values
     Object.values(RolleResponseRollenartEnum).forEach((enumValue: RolleResponseRollenartEnum) => {
