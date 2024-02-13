@@ -28,7 +28,8 @@ describe('rolleStore', () => {
           administeredBySchulstrukturknoten: '1234',
           rollenart: 'LEHR',
           name: 'Lehrer',
-          merkmale: new Set([RolleResponseMerkmaleEnum.KopersPflicht]),
+          //TODO remove type casting when generator is fixed
+          merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RolleResponseMerkmaleEnum>,
           createdAt: '2022',
           updatedAt: '2022',
           id: '1'
@@ -40,11 +41,11 @@ describe('rolleStore', () => {
         'Lehrer',
         '1234',
         'LEHR',
-        new Set([RolleResponseMerkmaleEnum.KopersPflicht])
+        ['KOPERS_PFLICHT']
       )
       expect(rolleStore.loading).toBe(true)
       await createRollePromise
-      expect(new Set(rolleStore.createdRolle.merkmale)).toEqual(new Set(mockResponse[0].merkmale));
+      expect(rolleStore.createdRolle).toEqual([...mockResponse])
       expect(rolleStore.loading).toBe(false)
     })
 
@@ -54,7 +55,7 @@ describe('rolleStore', () => {
         'Lehrer',
         '1234',
         'LEHR',
-        new Set([RolleResponseMerkmaleEnum.KopersPflicht])
+        ['KOPERS_PFLICHT']
       )
       expect(rolleStore.loading).toBe(true)
       await rejects(createRollePromise)
@@ -68,7 +69,7 @@ describe('rolleStore', () => {
         'Lehrer',
         '1234',
         'LEHR',
-        new Set([RolleResponseMerkmaleEnum.KopersPflicht])
+        ['KOPERS_PFLICHT']
       )
       expect(rolleStore.loading).toBe(true)
       await expect(createRollePromise).rejects.toEqual('some mock server error')
