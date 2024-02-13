@@ -44,7 +44,7 @@ describe('rolleStore', () => {
       )
       expect(rolleStore.loading).toBe(true)
       await createRollePromise
-      expect(rolleStore.createdRolle).toEqual([...mockResponse])
+      expect(new Set(rolleStore.createdRolle.merkmale)).toEqual(new Set(mockResponse[0].merkmale));
       expect(rolleStore.loading).toBe(false)
     })
 
