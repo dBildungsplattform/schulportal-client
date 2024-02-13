@@ -50,13 +50,11 @@
   ]
   const submitForm = async (): Promise<void> => {
     if (selectedRollenName.value && selectedSchulstrukturKnoten.value && selectedRollenArt.value) {
-      const merkmaleToSubmit: CreateRolleBodyParamsMerkmaleEnum[] =
-        selectedMerkmale.value?.map((m: CreateRolleBodyParamsMerkmaleEnum) => m) || []
       await rolleStore.createRolle(
         selectedRollenName.value,
         selectedSchulstrukturKnoten.value,
         selectedRollenArt.value,
-        merkmaleToSubmit
+        new Set(selectedMerkmale.value || [])
       )
     }
   }

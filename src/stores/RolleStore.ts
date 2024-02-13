@@ -14,13 +14,6 @@ import axiosApiInstance from '@/services/ApiService'
 
 const rolleApi: RolleApiInterface = RolleApiFactory(undefined, '', axiosApiInstance)
 
-export type Rolle = {
-  schulStrukturKnoten: string
-  rollenArt: string
-  rollenName: string
-  merkmale: Array<string>
-}
-
 type RolleState = {
   createdRolle: RolleResponse | null
   errorCode: string
@@ -33,7 +26,7 @@ type RolleActions = {
     rollenName: string,
     schulStrukturKnoten: string,
     rollenArt: CreateRolleBodyParamsRollenartEnum,
-    merkmale: CreateRolleBodyParamsMerkmaleEnum[]
+    merkmale: Set<CreateRolleBodyParamsMerkmaleEnum>
   ) => Promise<RolleResponse>
 }
 
@@ -59,18 +52,16 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
         rollenName: string,
         schulStrukturKnoten: string,
         rollenArt: CreateRolleBodyParamsRollenartEnum,
-        merkmale: CreateRolleBodyParamsMerkmaleEnum[]
+        merkmale: Set<CreateRolleBodyParamsMerkmaleEnum>
       ): Promise<RolleResponse> {
         this.loading = true
         try {
-          const rollenArtValue: CreateRolleBodyParamsRollenartEnum = rollenArt
-          const merkmaleValues: CreateRolleBodyParamsMerkmaleEnum[] = merkmale
           // Construct the body params object
           const createRolleBodyParams: CreateRolleBodyParams = {
             name: rollenName,
             administeredBySchulstrukturknoten: schulStrukturKnoten,
-            rollenart: rollenArtValue,
-            merkmale: merkmaleValues
+            rollenart: rollenArt,
+            merkmale: merkmale
           }
           const { data }: { data: RolleResponse } =
             await rolleApi.rolleControllerCreateRolle(createRolleBodyParams)

@@ -108,6 +108,11 @@
         },
         "tags": [
           "personen"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
         ]
       },
       "get": {
@@ -210,6 +215,11 @@
         },
         "tags": [
           "personen"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
         ]
       }
     },
@@ -257,6 +267,11 @@
         },
         "tags": [
           "personen"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
         ]
       },
       "put": {
@@ -312,6 +327,11 @@
         },
         "tags": [
           "personen"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
         ]
       }
     },
@@ -359,6 +379,11 @@
         },
         "tags": [
           "personen"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
         ]
       },
       "get": {
@@ -475,6 +500,11 @@
         },
         "tags": [
           "personen"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
         ]
       }
     },
@@ -513,229 +543,11 @@
         },
         "tags": [
           "personen"
-        ]
-      }
-    },
-    "/api/personenkontexte/{personenkontextId}": {
-      "get": {
-        "operationId": "PersonenkontextController_findPersonenkontextById",
-        "parameters": [
-          {
-            "name": "personenkontextId",
-            "required": true,
-            "in": "path",
-            "description": "The id for the personenkontext.",
-            "schema": {
-              "nullable": false,
-              "type": "string"
-            }
-          }
         ],
-        "responses": {
-          "200": {
-            "description": "The personenkontext was successfully returned.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PersonendatensatzResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Request has wrong format."
-          },
-          "401": {
-            "description": "Request is not authorized."
-          },
-          "403": {
-            "description": "Insufficient permissions to perform operation."
-          },
-          "404": {
-            "description": "The personenkontext was not found."
-          },
-          "500": {
-            "description": "An internal server error occurred."
+        "security": [
+          {
+            "bearer": []
           }
-        },
-        "tags": [
-          "personenkontexte"
-        ]
-      },
-      "put": {
-        "operationId": "PersonenkontextController_updatePersonenkontextWithId",
-        "parameters": [
-          {
-            "name": "personenkontextId",
-            "required": true,
-            "in": "path",
-            "description": "The id for the personenkontext.",
-            "schema": {
-              "nullable": false,
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdatePersonenkontextBodyParams"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "The personenkontext was successfully updated.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PersonenkontextResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Request has wrong format."
-          },
-          "401": {
-            "description": "Request is not authorized."
-          },
-          "403": {
-            "description": "Insufficient permissions to perform operation."
-          },
-          "404": {
-            "description": "The personenkontext was not found."
-          },
-          "500": {
-            "description": "An internal server error occurred."
-          }
-        },
-        "tags": [
-          "personenkontexte"
-        ]
-      }
-    },
-    "/api/personenkontexte": {
-      "get": {
-        "operationId": "PersonenkontextController_findPersonenkontexte",
-        "parameters": [
-          {
-            "name": "offset",
-            "required": false,
-            "in": "query",
-            "description": "The offset of the paginated list.",
-            "schema": {
-              "type": "number"
-            }
-          },
-          {
-            "name": "limit",
-            "required": false,
-            "in": "query",
-            "description": "The requested limit for the page size.",
-            "schema": {
-              "type": "number"
-            }
-          },
-          {
-            "name": "referrer",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "nullable": true,
-              "type": "string"
-            }
-          },
-          {
-            "name": "rolle",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "nullable": true,
-              "enum": [
-                "LERN",
-                "LEHR",
-                "EXTERN",
-                "ORGADMIN",
-                "LEIT",
-                "SYSADMIN"
-              ],
-              "type": "string"
-            }
-          },
-          {
-            "name": "personenstatus",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "nullable": true,
-              "enum": [
-                "AKTIV"
-              ],
-              "type": "string"
-            }
-          },
-          {
-            "name": "sichtfreigabe",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "nullable": true,
-              "default": "nein",
-              "enum": [
-                "ja",
-                "nein"
-              ],
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "The personenkontexte were successfully returned.",
-            "headers": {
-              "X-Paging-Offset": {
-                "description": "The offset of the first item from the list. List starts with index 0."
-              },
-              "X-Paging-Limit": {
-                "description": "The maximum amount of items returned in one request."
-              },
-              "X-Paging-Total": {
-                "description": "The total amount of items in the list."
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/PersonendatensatzResponse"
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Request has wrong format."
-          },
-          "401": {
-            "description": "Request is not authorized."
-          },
-          "403": {
-            "description": "Insufficient permissions to perform operation."
-          },
-          "404": {
-            "description": "The personenkontexte were not found."
-          },
-          "500": {
-            "description": "An internal server error occurred."
-          }
-        },
-        "tags": [
-          "personenkontexte"
         ]
       }
     },
@@ -843,6 +655,11 @@
         },
         "tags": [
           "personen-frontend"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
         ]
       }
     },
@@ -879,6 +696,11 @@
         },
         "tags": [
           "organisationen"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
         ]
       },
       "get": {
@@ -974,10 +796,75 @@
         },
         "tags": [
           "organisationen"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
         ]
       }
     },
     "/api/organisationen/{organisationId}": {
+      "put": {
+        "operationId": "OrganisationController_updateOrganisation",
+        "parameters": [
+          {
+            "name": "organisationId",
+            "required": true,
+            "in": "path",
+            "description": "The id of an organization",
+            "schema": {
+              "nullable": false,
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateOrganisationBodyParams"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The organisation was successfully updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganisationResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request has wrong format."
+          },
+          "401": {
+            "description": "Request is not authorized."
+          },
+          "403": {
+            "description": "Insufficient permissions to perform operation."
+          },
+          "404": {
+            "description": "The organisation was not found."
+          },
+          "500": {
+            "description": "An internal server error occurred."
+          }
+        },
+        "tags": [
+          "organisationen"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
       "get": {
         "operationId": "OrganisationController_findOrganisationById",
         "parameters": [
@@ -1014,37 +901,291 @@
         },
         "tags": [
           "organisationen"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
         ]
       }
     },
-    "/api/provider": {
+    "/api/organisationen/root": {
       "get": {
-        "operationId": "ProviderController_getServiceProvidersByPersonId",
+        "operationId": "OrganisationController_getRootOrganisation",
         "parameters": [],
         "responses": {
           "200": {
-            "description": "",
+            "description": "The organization was successfully pulled."
+          },
+          "401": {
+            "description": "Not authorized to get the organization."
+          },
+          "403": {
+            "description": "Insufficient permissions to get the organization."
+          },
+          "404": {
+            "description": "The organization does not exist."
+          },
+          "500": {
+            "description": "Internal server error while getting the organization."
+          }
+        },
+        "tags": [
+          "organisationen"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/organisationen/{organisationId}/administriert": {
+      "get": {
+        "operationId": "OrganisationController_getAdministrierteOrganisationen",
+        "parameters": [
+          {
+            "name": "organisationId",
+            "required": true,
+            "in": "path",
+            "description": "The id of an organization",
+            "schema": {
+              "nullable": false,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The organizations were successfully returned.",
+            "headers": {
+              "X-Paging-Offset": {
+                "description": "The offset of the first item from the list. List starts with index 0."
+              },
+              "X-Paging-Limit": {
+                "description": "The maximum amount of items returned in one request."
+              },
+              "X-Paging-Total": {
+                "description": "The total amount of items in the list."
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/ServiceProviderInfoResponse"
+                    "$ref": "#/components/schemas/OrganisationResponse"
                   }
                 }
               }
             }
           },
           "401": {
-            "description": "Not authorized to get available service providers."
+            "description": "Not authorized to get organizations."
+          },
+          "403": {
+            "description": "Insufficient permissions to get organizations."
+          },
+          "500": {
+            "description": "Internal server error while getting all organizations."
           }
         },
         "tags": [
-          "provider"
+          "organisationen"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "OrganisationController_addAdministrierteOrganisation",
+        "parameters": [
+          {
+            "name": "organisationId",
+            "required": true,
+            "in": "path",
+            "description": "The id of an organization",
+            "schema": {
+              "nullable": false,
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrganisationByIdBodyParams"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The organisation was successfully updated."
+          },
+          "400": {
+            "description": "The organisation could not be modified."
+          },
+          "401": {
+            "description": "Not authorized to modify the organisation."
+          },
+          "403": {
+            "description": "Not permitted to modify the organisation."
+          },
+          "500": {
+            "description": "Internal server error while modifying the organisation."
+          }
+        },
+        "tags": [
+          "organisationen"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/organisationen/{organisationId}/zugehoerig": {
+      "get": {
+        "operationId": "OrganisationController_getZugehoerigeOrganisationen",
+        "parameters": [
+          {
+            "name": "organisationId",
+            "required": true,
+            "in": "path",
+            "description": "The id of an organization",
+            "schema": {
+              "nullable": false,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The organizations were successfully returned.",
+            "headers": {
+              "X-Paging-Offset": {
+                "description": "The offset of the first item from the list. List starts with index 0."
+              },
+              "X-Paging-Limit": {
+                "description": "The maximum amount of items returned in one request."
+              },
+              "X-Paging-Total": {
+                "description": "The total amount of items in the list."
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OrganisationResponse"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authorized to get organizations."
+          },
+          "403": {
+            "description": "Insufficient permissions to get organizations."
+          },
+          "500": {
+            "description": "Internal server error while getting all organizations."
+          }
+        },
+        "tags": [
+          "organisationen"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "OrganisationController_addZugehoerigeOrganisation",
+        "parameters": [
+          {
+            "name": "organisationId",
+            "required": true,
+            "in": "path",
+            "description": "The id of an organization",
+            "schema": {
+              "nullable": false,
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrganisationByIdBodyParams"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The organisation was successfully updated."
+          },
+          "400": {
+            "description": "The organisation could not be modified."
+          },
+          "401": {
+            "description": "Not authorized to modify the organisation."
+          },
+          "403": {
+            "description": "Not permitted to modify the organisation."
+          },
+          "500": {
+            "description": "Internal server error while modifying the organisation."
+          }
+        },
+        "tags": [
+          "organisationen"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
         ]
       }
     },
     "/api/rolle": {
+      "get": {
+        "operationId": "RolleController_findRollen",
+        "summary": "",
+        "description": "List all rollen.",
+        "parameters": [],
+        "responses": {
+          "401": {
+            "description": "Not authorized to get rollen."
+          },
+          "403": {
+            "description": "Insufficient permissions to get rollen."
+          },
+          "500": {
+            "description": "Internal server error while getting all rollen."
+          }
+        },
+        "tags": [
+          "rolle"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
       "post": {
         "operationId": "RolleController_createRolle",
         "summary": "",
@@ -1075,17 +1216,54 @@
             "description": "The input was not valid."
           },
           "401": {
-            "description": "Not authorized to create the roll."
+            "description": "Not authorized to create the rolle."
           },
           "403": {
             "description": "Insufficient permissions to create the rolle."
           },
           "500": {
-            "description": "Internal serve rerror while creating the person."
+            "description": "Internal server error while creating the person."
           }
         },
         "tags": [
           "rolle"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/provider": {
+      "get": {
+        "operationId": "ProviderController_getServiceProvidersByPersonId",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ServiceProviderResponse"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authorized to get available service providers."
+          }
+        },
+        "tags": [
+          "provider"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
         ]
       }
     }
@@ -1099,6 +1277,22 @@
   "tags": [],
   "servers": [],
   "components": {
+    "securitySchemes": {
+      "oauth2": {
+        "type": "oauth2",
+        "flows": {
+          "password": {
+            "tokenUrl": "http://127.0.0.1:8080/realms/SPSH/protocol/openid-connect/token",
+            "scopes": {}
+          }
+        }
+      },
+      "bearer": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
+      }
+    },
     "schemas": {
       "UserinfoResponse": {
         "type": "object",
@@ -1265,9 +1459,6 @@
           "referrer": {
             "type": "string"
           },
-          "mandant": {
-            "type": "string"
-          },
           "stammorganisation": {
             "type": "string"
           },
@@ -1303,7 +1494,6 @@
           }
         },
         "required": [
-          "mandant",
           "name"
         ]
       },
@@ -1537,45 +1727,6 @@
           "revision"
         ]
       },
-      "UpdatePersonenkontextBodyParams": {
-        "type": "object",
-        "properties": {
-          "referrer": {
-            "type": "string",
-            "description": "The new referrer of the personenkontext."
-          },
-          "personenstatus": {
-            "type": "string",
-            "enum": [
-              "AKTIV"
-            ],
-            "description": "The new personenstatus of the personenkontext."
-          },
-          "jahrgangsstufe": {
-            "type": "string",
-            "enum": [
-              "01",
-              "02",
-              "03",
-              "04",
-              "05",
-              "06",
-              "07",
-              "08",
-              "09",
-              "10"
-            ],
-            "description": "The new jahrgangsstufe of the personenkontext."
-          },
-          "revision": {
-            "type": "string",
-            "description": "The revision of the personenkontext."
-          }
-        },
-        "required": [
-          "revision"
-        ]
-      },
       "RawPagedResponse": {
         "type": "object",
         "properties": {
@@ -1605,6 +1756,62 @@
       "CreateOrganisationBodyParams": {
         "type": "object",
         "properties": {
+          "administriertVon": {
+            "type": "string"
+          },
+          "zugehoerigZu": {
+            "type": "string"
+          },
+          "kennung": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "namensergaenzung": {
+            "type": "string"
+          },
+          "kuerzel": {
+            "type": "string"
+          },
+          "typ": {
+            "type": "string",
+            "enum": [
+              "SCHULE",
+              "ANBIETER",
+              "SONSTIGE ORGANISATION / EINRICHTUNG",
+              "UNBESTAETIGT"
+            ]
+          },
+          "traegerschaft": {
+            "type": "string",
+            "enum": [
+              "01",
+              "02",
+              "03",
+              "04",
+              "05",
+              "06"
+            ]
+          }
+        },
+        "required": [
+          "kennung",
+          "name",
+          "namensergaenzung",
+          "kuerzel",
+          "typ"
+        ]
+      },
+      "UpdateOrganisationBodyParams": {
+        "type": "object",
+        "properties": {
+          "administriertVon": {
+            "type": "string"
+          },
+          "zugehoerigZu": {
+            "type": "string"
+          },
           "kennung": {
             "type": "string"
           },
@@ -1683,23 +1890,17 @@
           "typ"
         ]
       },
-      "ServiceProviderInfoResponse": {
+      "OrganisationByIdBodyParams": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "url": {
-            "type": "string"
+          "organisationId": {
+            "type": "string",
+            "description": "The id of an organization",
+            "nullable": false
           }
         },
         "required": [
-          "id",
-          "name",
-          "url"
+          "organisationId"
         ]
       },
       "CreateRolleBodyParams": {
@@ -1724,15 +1925,15 @@
           },
           "merkmale": {
             "type": "array",
+            "uniqueItems": true,
             "items": {
               "type": "string",
               "enum": [
-               "BEFRISTUNG_PFLICHT",
-               "KOPERS_PFLICHT"
-             ]
-           }
+                "BEFRISTUNG_PFLICHT",
+                "KOPERS_PFLICHT"
+              ]
             }
-            
+          }
         },
         "required": [
           "name",
@@ -1773,11 +1974,15 @@
             ]
           },
           "merkmale": {
-            "type": "string",
-            "enum": [
-              "BEFRISTUNG_PFLICHT",
-              "KOPERS_PFLICHT"
-            ]
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "enum": [
+                "BEFRISTUNG_PFLICHT",
+                "KOPERS_PFLICHT"
+              ]
+            }
           }
         },
         "required": [
@@ -1788,6 +1993,25 @@
           "administeredBySchulstrukturknoten",
           "rollenart",
           "merkmale"
+        ]
+      },
+      "ServiceProviderResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "url"
         ]
       }
     }

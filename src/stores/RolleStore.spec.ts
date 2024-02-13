@@ -2,7 +2,7 @@ import ApiService from '@/services/ApiService'
 import MockAdapter from 'axios-mock-adapter'
 import { setActivePinia, createPinia } from 'pinia'
 import { useRolleStore, type RolleStore } from './RolleStore'
-import { type RolleResponse } from '../api-client/generated/api'
+import { RolleResponseMerkmaleEnum, type RolleResponse } from '../api-client/generated/api'
 import { rejects } from 'assert'
 
 const mockadapter: MockAdapter = new MockAdapter(ApiService)
@@ -28,7 +28,7 @@ describe('rolleStore', () => {
           administeredBySchulstrukturknoten: '1234',
           rollenart: 'LEHR',
           name: 'Lehrer',
-          merkmale: 'KOPERS_PFLICHT',
+          merkmale: new Set([RolleResponseMerkmaleEnum.KopersPflicht]),
           createdAt: '2022',
           updatedAt: '2022',
           id: '1'
@@ -40,7 +40,7 @@ describe('rolleStore', () => {
         'Lehrer',
         '1234',
         'LEHR',
-        ['KOPERS_PFLICHT']
+        new Set([RolleResponseMerkmaleEnum.KopersPflicht])
       )
       expect(rolleStore.loading).toBe(true)
       await createRollePromise
@@ -54,7 +54,7 @@ describe('rolleStore', () => {
         'Lehrer',
         '1234',
         'LEHR',
-        ['KOPERS_PFLICHT']
+        new Set([RolleResponseMerkmaleEnum.KopersPflicht])
       )
       expect(rolleStore.loading).toBe(true)
       await rejects(createRollePromise)
@@ -68,7 +68,7 @@ describe('rolleStore', () => {
         'Lehrer',
         '1234',
         'LEHR',
-        ['KOPERS_PFLICHT']
+        new Set([RolleResponseMerkmaleEnum.KopersPflicht])
       )
       expect(rolleStore.loading).toBe(true)
       await expect(createRollePromise).rejects.toEqual('some mock server error')
