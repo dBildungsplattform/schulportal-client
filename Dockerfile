@@ -4,12 +4,9 @@ ARG BASE_IMAGE=nginx:1.25-alpine
 # Build Stage
 FROM $BASE_IMAGE_BUILDER as build
 
-
 RUN apk add openjdk17-jre=17.0.10_p7-r0
 
-
 WORKDIR /app
-
 COPY tsconfig*.json ./
 COPY package*.json ./
 COPY vite*.ts ./
@@ -18,7 +15,6 @@ COPY env*.ts ./
 COPY src/ src/
 COPY public/ public/
 
-
 RUN npm install
 RUN npm run build
 
@@ -26,25 +22,22 @@ RUN npm run build
 FROM $BASE_IMAGE as deployment
 
 
-RUN addgroup -S nginxgroup && adduser -S nginxuser -G nginxgroup
-
-
 COPY --from=build /app/dist/ /usr/share/nginx/html/
 
-
 RUN rm /etc/nginx/conf.d/default.conf
+
 COPY nginx-vue.conf /etc/nginx/conf.d/
 
 
-RUN mkdir -p /var/cache/nginx/client_temp && \
-    chown -R nginxuser:nginxgroup /var/cache/nginx && \
-    chmod -R 755 /var/cache/nginx
+RUN addgroup -g 1001 nginxgroup && \
+    adduser -D -u 1001 -G nginxgroup nginxuser && \
+    chown -R nginxuser:nginxgroup /var/cache/nginx /var/run /var/log/nginx /usr/share/nginx/html && \
+    chmod -R 755 /usr/share/nginx/html && \
+    chmod -R 644 /etc/nginx/conf.d/*
 
-# Switch to non-root user for running Nginx
+
 USER nginxuser
 
-# Expose the port Nginx is listening on
-EXPOSE 80
+EXPOSE 8080
 
-# Start Nginx
 CMD ["nginx", "-g", "daemon off;"]
