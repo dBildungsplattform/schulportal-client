@@ -43,6 +43,7 @@
     </v-row>
     <LayoutCard
       :closable="true"
+      data-testid="person-details-card"
       :header="$t('admin.person.edit')"
       @onCloseClicked="navigateToPersonTable"
       :padded="true"
@@ -81,7 +82,7 @@
               >
                 <span class="subtitle-2"> {{ $t('person.firstName') }}: </span>
               </v-col>
-              <v-col cols="auto">
+              <v-col cols="auto" data-testid="person-vorname">
                 {{ personStore.currentPerson.person.name.vorname }}
               </v-col>
             </v-row>
@@ -96,7 +97,7 @@
               >
                 <span class="subtitle-2"> {{ $t('person.lastName') }}: </span>
               </v-col>
-              <v-col cols="auto">
+              <v-col cols="auto" data-testid="person-familienname">
                 {{ personStore.currentPerson.person.name.familienname }}
               </v-col>
             </v-row>

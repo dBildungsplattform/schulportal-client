@@ -18,7 +18,7 @@ const personenFrontendApi: PersonenFrontendApiInterface = PersonenFrontendApiFac
   axiosApiInstance
 )
 
-type Person = {
+export type Person = {
   id: string
   name: {
     familienname: string

@@ -14,6 +14,7 @@
   <div class="admin">
     <h1 class="text-center headline">{{ $t('admin.headline') }}</h1>
     <UserTable
+      data-testid="person-table"
       :items="personStore.allPersons || []"
       :loading="personStore.loading"
       @onUpdateTable="personStore.getAllPersons()"

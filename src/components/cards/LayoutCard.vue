@@ -25,6 +25,7 @@
         <v-btn
           class="hidden-sm-and-down"
           @click.stop="$emit('onCloseClicked')"
+          data-testid="close-layout-card"
           :ripple="false"
           variant="text"
         >

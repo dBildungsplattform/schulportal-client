@@ -12,6 +12,7 @@ beforeEach(() => {
   `
 
   wrapper = mount(MenuBar, {
+    attachTo: document.getElementById('app') || '',
     global: {
       components: {
         MenuBar
