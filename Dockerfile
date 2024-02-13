@@ -22,12 +22,11 @@ RUN npm run build
 FROM $BASE_IMAGE as deployment
 
 
+USER root
+
 COPY --from=build /app/dist/ /usr/share/nginx/html/
-
 RUN rm /etc/nginx/conf.d/default.conf
-
 COPY nginx-vue.conf /etc/nginx/conf.d/
-
 
 RUN addgroup -g 1000 nginxgroup && \
     adduser -D -u 1000 -G nginxgroup nginxuser && \
@@ -35,9 +34,7 @@ RUN addgroup -g 1000 nginxgroup && \
     chmod -R 755 /usr/share/nginx/html && \
     chmod -R 644 /etc/nginx/conf.d/*
 
-
+EXPOSE 80
 USER nginxuser
-
-EXPOSE 8080
 
 CMD ["nginx", "-g", "daemon off;"]

@@ -34,7 +34,7 @@ spec:
 
           ports:
             - name: {{ .Values.serviceName }} 
-              containerPort:  8080 ## 
+              containerPort:  {{ .Values.containerPorts.http }}
           {{- if .Values.enabledStartupProbe }}
           startupProbe: {{- toYaml .Values.startupProbe | nindent 12 }}
           {{- end }}
