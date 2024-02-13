@@ -82,7 +82,10 @@
               >
                 <span class="subtitle-2"> {{ $t('person.firstName') }}: </span>
               </v-col>
-              <v-col cols="auto" data-testid="person-vorname">
+              <v-col
+                cols="auto"
+                data-testid="person-vorname"
+              >
                 {{ personStore.currentPerson.person.name.vorname }}
               </v-col>
             </v-row>
@@ -97,7 +100,10 @@
               >
                 <span class="subtitle-2"> {{ $t('person.lastName') }}: </span>
               </v-col>
-              <v-col cols="auto" data-testid="person-familienname">
+              <v-col
+                cols="auto"
+                data-testid="person-familienname"
+              >
                 {{ personStore.currentPerson.person.name.familienname }}
               </v-col>
             </v-row>

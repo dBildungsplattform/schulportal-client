@@ -1,10 +1,10 @@
-import { expect, test } from 'vitest'
+import { expect, test, type Mock } from 'vitest'
 import { VueWrapper, mount } from '@vue/test-utils'
 import PasswordOutput from './PasswordOutput.vue'
 
 let wrapper: VueWrapper | null = null
 
-const writeText = vi.fn(async () => {})
+const writeText: Mock<[], Promise<void>> = vi.fn(async () => {})
 
 Object.assign(navigator, {
   clipboard: {
@@ -39,6 +39,7 @@ describe('PasswordOutput', () => {
 
   test('it copies the password', () => {
     expect(wrapper?.find('[data-testid="copy-password-icon"]').trigger('click'))
+    // eslint-disable-next-line @typescript-eslint/unbound-method
     expect(navigator.clipboard.writeText).toHaveBeenCalledTimes(1)
   })
 })

@@ -2,7 +2,7 @@ import { config } from '@vue/test-utils'
 import { I18n, createI18n } from 'vue-i18n'
 import { createVuetify } from 'vuetify'
 import { afterAll, afterEach, beforeAll } from 'vitest'
-import { createTestingPinia } from '@pinia/testing'
+import { TestingPinia, createTestingPinia } from '@pinia/testing'
 // MSW will probably be removed soon anyways
 // eslint-disable-next-line import/no-extraneous-dependencies, import/named
 import { SetupServer, setupServer } from 'msw/node'
@@ -19,7 +19,7 @@ const i18n: I18n = createI18n({
 // eslint-disable-next-line @typescript-eslint/typedef
 const vuetify = createVuetify({})
 
-const pinia = createTestingPinia()
+const pinia: TestingPinia = createTestingPinia()
 
 /* Setup mock server */
 const server: SetupServer = setupServer(...requestHandlers)
