@@ -1,49 +1,28 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ template "common.names.releasename" . }}
-  namespace: {{ .Values.namespace }}
-  labels:
-    app.kubernetes.io/name: {{ .Values.commonLabels.name }}
+  name: nginx-deployment
 spec:
+  replicas: 1
   selector:
     matchLabels:
-      app.kubernetes.io/layer: {{ .Values.selector.layer }}
-  replicas: {{ .Values.replicaCount }}
+      app: nginx
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: {{ .Values.commonLabels.name }}
-        app.kubernetes.io/layer: {{ .Values.selector.layer }} 
+        app: nginx
     spec:
-      automountServiceAccountToken: {{ .Values.automountServiceAccountToken }} 
+      serviceAccountName: nginx-ingress
+      hostNetwork: true
       containers:
-        - name: {{ .Values.commonLabels.name }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }} 
-
-          {{- if .Values.enabledcontainerSecurityContext }}
-          securityContext: {{- toYaml .Values.containerSecurityContext | nindent 12 }}
-          {{- end }}
-          {{- if .Values.volumePermissions.resources }}
-          resources: {{- toYaml .Values.volumePermissions.resources | nindent 12 }}
-          {{- end }}
-          {{- if .Values.enabledreadinessProbe }}
-          readinessProbe: {{- toYaml .Values.readinessProbe | nindent 12 }}
-          {{- end }}
-
-          ports:
-            - name: {{ .Values.serviceName }} 
-              containerPort:  {{ .Values.containerPorts.http }}
-          {{- if .Values.enabledStartupProbe }}
-          startupProbe: {{- toYaml .Values.startupProbe | nindent 12 }}
-          {{- end }}
-
-          {{- if .Values.enabledlivenessProbe }}
-          livenessProbe: {{- toYaml .Values.livenessProbe | nindent 12 }}
-          {{- end }}
-
-          {{- if .Values.enabledreadinessProbe }}
-          readinessProbe: {{- toYaml .Values.readinessProbe | nindent 12 }}
-          {{- end }} 
-      restartPolicy: {{ default "Always" .Values.restartPolicy }}
+      - name: nginx
+        image: nginx:1.25-alpine
+        ports:
+        - name: http
+          containerPort: 80
+          hostPort: 80
+        - name: https
+          containerPort: 443
+          hostPort: 443
+        securityContext:
+          runAsUser: 1000 # Example user ID for non-root user, adjust as necessary

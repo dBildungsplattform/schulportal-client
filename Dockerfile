@@ -4,7 +4,7 @@ ARG BASE_IMAGE=nginx:1.25-alpine
 # Build Stage
 FROM $BASE_IMAGE_BUILDER as build
 
-RUN apk add openjdk17-jre=17.0.10_p7-r0
+RUN apk add --no-cache openjdk17-jre
 
 WORKDIR /app
 COPY tsconfig*.json ./
@@ -21,20 +21,23 @@ RUN npm run build
 # Deployment Stage
 FROM $BASE_IMAGE as deployment
 
-
-USER root
-
+# Copying from build stage
 COPY --from=build /app/dist/ /usr/share/nginx/html/
+
+# Removing default Nginx configuration
 RUN rm /etc/nginx/conf.d/default.conf
 COPY nginx-vue.conf /etc/nginx/conf.d/
 
+# Creating a non-root user and adjusting permissions
 RUN addgroup -g 1000 nginxgroup && \
     adduser -D -u 1000 -G nginxgroup nginxuser && \
     chown -R nginxuser:nginxgroup /var/cache/nginx /var/run /var/log/nginx /usr/share/nginx/html && \
     chmod -R 755 /usr/share/nginx/html && \
     chmod -R 644 /etc/nginx/conf.d/*
 
-EXPOSE 80
 USER nginxuser
+
+# Exposing ports (useful for documentation, not required for host port bindings)
+EXPOSE 8080
 
 CMD ["nginx", "-g", "daemon off;"]
