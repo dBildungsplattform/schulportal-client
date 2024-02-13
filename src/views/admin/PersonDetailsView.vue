@@ -14,7 +14,7 @@
   const password: Ref<string> = ref('')
 
   function navigateToPersonTable(): void {
-    router.push({ name: 'user-management' })
+    router.push({ name: 'person-management' })
   }
 
   function resetPassword(personId: string): void {

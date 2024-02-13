@@ -22,15 +22,14 @@
     selectedFamilienname: string
   }
 
-  const { handleSubmit }: { handleSubmit: HandleSubmitFactory<PersonCreationForm> } =
-    useForm<PersonCreationForm>({
-      validationSchema: toTypedSchema(
-        object({
-          selectedVorname: string().required(t('admin.person.rules.vorname')),
-          selectedFamilienname: string().required(t('admin.person.rules.familienname'))
-        })
-      )
-    })
+  const { handleSubmit } = useForm<PersonCreationForm>({
+    validationSchema: toTypedSchema(
+      object({
+        selectedVorname: string().required(t('admin.person.rules.vorname')),
+        selectedFamilienname: string().required(t('admin.person.rules.familienname'))
+      })
+    )
+  })
 
   const noKoPersNumber: Ref<boolean> = ref(false)
   const koPersNumber: Ref<string> = ref('')
@@ -39,7 +38,7 @@
   const selectedFamilienname: FieldContext<unknown> = useField('selectedFamilienname')
 
   function navigateToPersonTable(): void {
-    router.push({ name: 'user-management' })
+    router.push({ name: 'person-management' })
   }
 
   function createPerson(): void {
@@ -110,7 +109,10 @@
 
     <!-- The form to create a new Person  -->
     <template v-if="!personStore.createdPerson">
-      <v-form @submit.prevent="onSubmit">
+      <v-form
+        @submit.prevent="onSubmit"
+        data-testid="person-creation-form"
+      >
         <v-container class="px-3 px-sm-16">
           <v-row class="align-center flex-nowrap mx-auto py-6">
             <v-icon

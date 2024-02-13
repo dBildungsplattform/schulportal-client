@@ -90,24 +90,24 @@
     </v-list-item>
     <v-divider></v-divider>
 
-    <!-- User menu -->
+    <!-- Person menu -->
     <v-list-item
       class="menu-bar-main-item headline-2"
       :title="$t('admin.person.management')"
     ></v-list-item>
     <v-list-item
       class="menu-bar-sub-item caption"
-      data-testid="user-management-menu-item"
+      data-testid="person-management-menu-item"
       prepend-icon="mdi-format-list-bulleted"
       :title="$t('admin.person.showAll')"
-      to="/admin/users"
+      to="/admin/personen"
     ></v-list-item>
     <v-list-item
       class="menu-bar-sub-item caption"
-      data-testid="user-creation-menu-item"
+      data-testid="person-creation-menu-item"
       prepend-icon="mdi-plus-circle-outline"
       :title="$t('admin.person.createNew')"
-      to="/admin/users/new"
+      to="/admin/personen/new"
     ></v-list-item>
 
     <!-- Klassenverwaltung -->

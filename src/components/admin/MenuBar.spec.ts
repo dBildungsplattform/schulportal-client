@@ -30,7 +30,7 @@ describe('MenuBar', () => {
     expect(wrapper?.find('[data-testid="menu-bar-title"]').isVisible()).toBe(true)
   })
 
-  test.skip('it renders user management links', () => {
+  test.skip('it renders person management links', () => {
     expect(wrapper?.find('[data-testid="menu-bar-title"]').isVisible()).toBe(true)
   })
 

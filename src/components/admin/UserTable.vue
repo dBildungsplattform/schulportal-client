@@ -28,7 +28,7 @@
   ]
 
   function handleRowClick(_$event: PointerEvent, { item }: { item: Personendatensatz }): void {
-    router.push({ name: 'user-details', params: { id: item.person.id } })
+    router.push({ name: 'person-details', params: { id: item.person.id } })
   }
 
   // TODO: these two values will come from the API in the future

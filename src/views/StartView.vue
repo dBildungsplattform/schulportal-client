@@ -51,7 +51,7 @@
       >
         <ServiceProviderCard
           :testId="'service-provider-card-admin'"
-          :to="'/admin/users'"
+          :to="'/admin/personen'"
           :title="$t('nav.admin')"
           variant="outlined"
         >
