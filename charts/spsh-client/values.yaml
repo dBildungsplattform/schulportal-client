@@ -14,7 +14,7 @@ selector:
   layer: spsh-client
  
 containerPorts:
-  http: 80
+  http: 8080
 
 restartPolicy: Always
 automountServiceAccountToken: false
@@ -76,7 +76,7 @@ enabledserviceport:  true
 ports:
   - protocol: TCP
     port: 80
-    targetPort: 80
+    targetPort: 8080
 
 servicetype: NodePort
 serviceName: http

@@ -2,14 +2,11 @@ apiVersion: v1
 kind: Service
 metadata:
   name: {{ template "common.names.releasename" . }}
-  namespace: {{ .Values.namespace }}
-  labels: 
-    app.kubernetes.io/name: {{ .Values.commonLabels.name }}
 spec:
+  type: NodePort
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8080
   selector:
-    app.kubernetes.io/layer: {{ .Values.selector.layer }}
-  type: {{ .Values.servicetype }}
-  
-  {{- if .Values.enabledserviceport }}
-  ports: {{- toYaml .Values.ports | nindent 6 }}
-  {{- end }}
+    app.kubernetes.io/name: {{ .Values.commonLabels.name }}
