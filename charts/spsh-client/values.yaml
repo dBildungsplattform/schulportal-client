@@ -32,6 +32,10 @@ containerSecurityContext:
     drop: ["NET_RAW"]
   seccompProfile:
     type: "RuntimeDefault"
+  sysctls:
+    - name: net.ipv4.ip_unprivileged_port_start
+      value: "80"
+
 
 volumePermissions:
   resources:
