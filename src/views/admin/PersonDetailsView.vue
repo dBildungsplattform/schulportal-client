@@ -71,8 +71,8 @@
             >
           </v-row>
           <div v-if="personStore.currentPerson?.person">
+            <!-- Vorname -->
             <v-row>
-              <!-- Spacer column -->
               <v-col cols="1"></v-col>
               <v-col
                 class="text-right"
@@ -89,8 +89,8 @@
                 {{ personStore.currentPerson.person.name.vorname }}
               </v-col>
             </v-row>
+            <!-- Familienname -->
             <v-row>
-              <!-- Spacer column -->
               <v-col cols="1"></v-col>
               <v-col
                 class="text-right"
@@ -105,6 +105,24 @@
                 data-testid="person-familienname"
               >
                 {{ personStore.currentPerson.person.name.familienname }}
+              </v-col>
+            </v-row>
+            <!-- Benutzername -->
+            <v-row>
+              <v-col cols="1"></v-col>
+              <v-col
+                class="text-right"
+                md="2"
+                sm="3"
+                cols="5"
+              >
+                <span class="subtitle-2"> {{ $t('person.userName') }}: </span>
+              </v-col>
+              <v-col
+                cols="auto"
+                data-testid="person-username"
+              >
+                {{ personStore.currentPerson.person.referrer }}
               </v-col>
             </v-row>
           </div>
