@@ -36,7 +36,6 @@ containerSecurityContext:
     - name: net.ipv4.ip_unprivileged_port_start
       value: "80"
 
-
 volumePermissions:
   resources:
     limits: 
@@ -76,7 +75,7 @@ enabledserviceport:  true
 ports:
   - protocol: TCP
     port: 80
-    targetPort: 8080 #  This should refer to the containerPort named 'http'
+    targetPort: 80
 
 servicetype: NodePort
 serviceName: http
