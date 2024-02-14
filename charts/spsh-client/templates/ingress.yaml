@@ -1,21 +1,20 @@
-{{- if .Values.ingress.enabled -}}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ include "spsh-client.ingressName" . }}
-  labels:
-    app: {{ template "spsh-client.name" . }}
+  name: {{ include "common.names.releasename" . }}
+  namespace: {{ .Values.namespace }}
+  labels: 
+    app.kubernetes.io/name: {{ .Values.commonLabels.name }}
 spec:
-  ingressClassName: {{ .Values.ingress.className | quote }}
+  ingressClassName: {{ .Values.ingress.ingressClassName }}
   rules:
-    - host: {{.Values.frontendHostname}}
+    - host: {{ .Values.frontendHostname  }}
       http:
         paths:
-          - path: /
-            pathType: Prefix
-            backend:
+          - path:  {{ .Values.ingress.httpRelativePath  }}
+            pathType: {{ .Values.ingress.pathType }}
+            backend: 
               service:
-                name: {{ include "spsh-client.serviceName" . }}
+                name: {{ template "common.names.releasename" . }}
                 port:
-                  number: {{ .Values.service.port }}
-{{- end }}
+                  number: {{ .Values.ingress.portnumber }}
