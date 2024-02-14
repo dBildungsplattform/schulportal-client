@@ -55,7 +55,6 @@ const routes: readonly RouteRecordRaw[] = [
       requiresAuth: true
     }
   }
-  
 ]
 
 export default routes
