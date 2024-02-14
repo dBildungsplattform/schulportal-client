@@ -45,6 +45,6 @@ li {
 
 .Schulportal-Logo-Div {
 
-    display: flex;
-    justify-content: flex-end;
+    float:right;
+    margin-right: -50px;
 }
