@@ -22,7 +22,6 @@
     selectedFamilienname: string
   }
 
-  // eslint-disable-next-line @typescript-eslint/typedef
   const { handleSubmit } = useForm<PersonCreationForm>({
     validationSchema: toTypedSchema(
       object({
@@ -58,7 +57,6 @@
 
   const handleAlertClose = (): void => {
     personStore.errorCode = ''
-    navigateToPersonTable()
   }
 
   const handleCreateAnotherPerson = (): void => {
@@ -104,12 +102,14 @@
       :title="$t('admin.person.creationErrorTitle')"
       :type="'error'"
       :closable="false"
+      :showButton="true"
+      :buttonText="$t('admin.backToForm')"
       :text="$t('admin.person.creationErrorText')"
       @update:modelValue="handleAlertClose"
     />
 
     <!-- The form to create a new Person  -->
-    <template v-if="!personStore.createdPerson">
+    <template v-if="!personStore.createdPerson && !personStore.errorCode">
       <v-form
         @submit.prevent="onSubmit"
         data-testid="person-creation-form"
@@ -317,7 +317,7 @@
     </template>
 
     <!-- Result template on success after submit  -->
-    <template v-if="personStore.createdPerson">
+    <template v-if="personStore.createdPerson && !personStore.errorCode">
       <v-container class="new-role-success">
         <v-row justify="center">
           <v-col

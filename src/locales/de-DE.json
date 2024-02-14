@@ -1,12 +1,12 @@
 {
   "action": "Aktion",
   "admin": {
-    "followingDataCreated": "Folgende Daten wurden gespeichert:",
-    "headline": "Administrationsbereich",
-    "mandatoryFieldsNotice": "Mit * markierte Felder sind Pflichtangaben.",
+    "backToForm": "Zurück zum Formular",
     "class": {
       "management": "Klassenverwaltung"
     },
+    "followingDataCreated": "Folgende Daten wurden gespeichert:",
+    "headline": "Administrationsbereich",
     "koPers": {
       "koPersNumber": "KoPers-Nr",
       "noKoPersNumber": "Keine KoPers-Nr vorhanden"
@@ -16,14 +16,7 @@
       "management": "Rollenverwaltung",
       "noRollenFound": "Keine Rollen gefunden"
     },
-    "school": {
-      "assign": "Schule zuordnen",
-      "management": "Schulverwaltung",
-      "noSchoolsFound": "Keine Schulen gefunden"
-    },
-    "schulTraeger": {
-      "management": "Schulträgerverwaltung"
-    },
+    "mandatoryFieldsNotice": "Mit * markierte Felder sind Pflichtangaben.",
     "person": {
       "addedSuccessfully": "{firstname} {lastname} wurde erfolgreich hinzugefügt.",
       "addNew": "Neuen Benutzer hinzufügen",
@@ -52,6 +45,14 @@
       "showAll": "Alle Benutzer anzeigen",
       "startPassword": "Einstiegs-Passwort",
       "status": "Status"
+    },
+    "school": {
+      "assign": "Schule zuordnen",
+      "management": "Schulverwaltung",
+      "noSchoolsFound": "Keine Schulen gefunden"
+    },
+    "schulTraeger": {
+      "management": "Schulträgerverwaltung"
     }
   },
   "cancel": "Abbrechen",
