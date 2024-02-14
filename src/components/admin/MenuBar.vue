@@ -6,6 +6,12 @@
   const menuDrawer: Ref<boolean> = ref(true)
   const { mobile }: { mobile: ComputedRef<boolean> } = useDisplay()
 
+  function closeMenuOnMobile(): void {
+    if (mobile.value) {
+      menuDrawer.value = false
+    }
+  }
+
   onMounted(() => {
     menuDrawer.value = !mobile.value
   })
@@ -97,6 +103,7 @@
       prepend-icon="mdi-format-list-bulleted"
       :title="$t('admin.user.showAll')"
       to="/admin/users"
+      @click="closeMenuOnMobile"
     ></v-list-item>
     <v-list-item
       class="menu-bar-sub-item caption"
