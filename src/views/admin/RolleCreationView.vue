@@ -127,7 +127,7 @@
         :closable="false"
         :text="$t('admin.rolle.rolleCreateErrorText')"
         :showButton="true"
-        :buttonText="$t('admin.rolle.backToCreateRole')"
+        :buttonText="$t('admin.rolle.backToCreateRolle')"
         :buttonAction="navigateBackToRolleForm"
         buttonClass="primary"
       />

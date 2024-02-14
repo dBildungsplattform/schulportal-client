@@ -61,7 +61,7 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
             name: rollenName,
             administeredBySchulstrukturknoten: schulStrukturKnoten,
             rollenart: rollenArt,
-            //TODO Remove casting when generator issue is fixed from the server side
+            // TODO Remove casting when generator issue is fixed from the server side
             merkmale: merkmale as unknown as Set<CreateRolleBodyParamsMerkmaleEnum>
           }
           const { data }: { data: RolleResponse } =
