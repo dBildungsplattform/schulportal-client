@@ -28,7 +28,7 @@ describe('rolleStore', () => {
           administeredBySchulstrukturknoten: '1234',
           rollenart: 'LEHR',
           name: 'Lehrer',
-          //TODO remove type casting when generator is fixed
+          // TODO remove type casting when generator is fixed
           merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RolleResponseMerkmaleEnum>,
           createdAt: '2022',
           updatedAt: '2022',
