@@ -15,9 +15,8 @@
 
   const password: Ref<string> = ref('')
 
-  async function navigateToUserTable(): Promise<void> {
-    await router.push({ name: 'user-management' })
-    personStore.errorCode = ''
+  function navigateToUserTable(): void {
+    router.push({ name: 'user-management' })
   }
 
   function resetPassword(personId: string): void {
