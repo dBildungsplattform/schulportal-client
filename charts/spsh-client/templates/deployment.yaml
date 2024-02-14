@@ -16,7 +16,6 @@ spec:
         app.kubernetes.io/name: {{ .Values.commonLabels.name }}
         app.kubernetes.io/layer: {{ .Values.selector.layer }}
     spec:
-      hostNetwork: true #####
       automountServiceAccountToken: {{ .Values.automountServiceAccountToken }}
       containers:
         - name: {{ .Values.commonLabels.name }}
