@@ -22,6 +22,7 @@
     selectedFamilienname: string
   }
 
+  // eslint-disable-next-line @typescript-eslint/typedef
   const { handleSubmit } = useForm<PersonCreationForm>({
     validationSchema: toTypedSchema(
       object({

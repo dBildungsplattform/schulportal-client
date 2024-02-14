@@ -9,12 +9,12 @@ import {
 } from 'vue-router'
 import routes from '@/router/routes'
 import PersonDetailsView from './PersonDetailsView.vue'
-import { type Personendatensatz, usePersonStore } from '@/stores/PersonStore'
+import { type Personendatensatz, type PersonStore, usePersonStore } from '@/stores/PersonStore'
 
 let wrapper: VueWrapper | null = null
 let router: Router
 
-const personStore = usePersonStore()
+const personStore: PersonStore = usePersonStore()
 const mockPerson: Personendatensatz = {
   person: {
     id: '1',

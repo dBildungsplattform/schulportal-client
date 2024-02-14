@@ -23,7 +23,7 @@ export type Person = {
   name: {
     familienname: string
     vorname: string
-  },
+  }
   referrer: string
 }
 
