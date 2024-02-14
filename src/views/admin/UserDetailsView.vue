@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { onMounted, type Ref, ref } from 'vue'
+  import { type Ref, ref, onBeforeMount } from 'vue'
   import { type Router, type RouteLocationNormalizedLoaded, useRoute, useRouter } from 'vue-router'
   import { usePersonStore, type PersonStore } from '@/stores/PersonStore'
   import PasswordReset from '@/components/admin/PasswordReset.vue'
@@ -29,7 +29,7 @@
     personStore.errorCode = ''
   }
 
-  onMounted(async () => {
+  onBeforeMount(async () => {
     await personStore.getPersonById(currentPersonId)
   })
 </script>
