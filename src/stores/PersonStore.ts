@@ -92,7 +92,6 @@ export const usePersonStore: StoreDefinition<
           await personenApi.personControllerFindPersonById(personId)
         this.loading = false
         this.currentPerson = data
-        this.errorCode = ''
         return data
       } catch (error) {
         this.errorCode = 'UNSPECIFIED_ERROR'
