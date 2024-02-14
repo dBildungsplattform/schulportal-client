@@ -29,12 +29,12 @@ containerSecurityContext:
   readOnlyRootFilesystem: false
   privileged: false
   capabilities:
-    drop: ["NET_BIND_SERVICE"]
+    drop: ["CAP_NET_BIND_SERVICE"]
   seccompProfile:
     type: "RuntimeDefault"
-  #sysctls:
-  #  - name: net.ipv4.ip_unprivileged_port_start
-  #    value: "80"
+  sysctls:
+    - name: net.ipv4.ip_unprivileged_port_start
+      value: "80"
 
 
 volumePermissions:
