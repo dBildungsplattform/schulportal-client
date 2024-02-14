@@ -15,8 +15,8 @@ const routes: readonly RouteRecordRaw[] = [
     name: 'person-management',
     component: () => import('../views/admin/PersonManagementView.vue'),
     meta: {
-      layout: 'AdminLayout',
-      requiresAuth: true
+      requiresAuth: true,
+      layout: 'AdminLayout'
     }
   },
   {
@@ -38,6 +38,15 @@ const routes: readonly RouteRecordRaw[] = [
     }
   },
   {
+    path: '/admin/rolle/new',
+    name: 'create-rolle',
+    component: () => import('../views/admin/RolleCreationView.vue'),
+    meta: {
+      layout: 'AdminLayout',
+      requiresAuth: true
+    }
+  },
+  {
     path: '/start',
     name: 'start',
     component: () => import('../views/StartView.vue'),
@@ -46,6 +55,7 @@ const routes: readonly RouteRecordRaw[] = [
       requiresAuth: true
     }
   }
+  
 ]
 
 export default routes

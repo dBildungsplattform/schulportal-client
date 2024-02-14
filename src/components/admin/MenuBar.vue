@@ -6,6 +6,12 @@
   const menuDrawer: Ref<boolean> = ref(true)
   const { mobile }: { mobile: ComputedRef<boolean> } = useDisplay()
 
+  function closeMenuOnMobile(): void {
+    if (mobile.value) {
+      menuDrawer.value = false
+    }
+  }
+
   onMounted(() => {
     menuDrawer.value = !mobile.value
   })
@@ -97,6 +103,7 @@
     ></v-list-item>
     <v-list-item
       class="menu-bar-sub-item caption"
+      @click="closeMenuOnMobile"
       data-testid="person-management-menu-item"
       prepend-icon="mdi-format-list-bulleted"
       :title="$t('admin.person.showAll')"
@@ -121,7 +128,20 @@
       class="menu-bar-main-item headline-2"
       :title="$t('admin.rolle.management')"
     ></v-list-item>
-
+    <v-list-item
+      class="menu-bar-sub-item caption"
+      data-testid="rolle-management-menu-item"
+      prepend-icon="mdi-format-list-bulleted"
+      :title="$t('admin.rolle.showAll')"
+    ></v-list-item>
+    <v-list-item
+      class="menu-bar-sub-item caption"
+      @click="closeMenuOnMobile"
+      data-testid="rolle-creation-menu-item"
+      prepend-icon="mdi-plus-circle-outline"
+      :title="$t('admin.rolle.createNew')"
+      to="/admin/rolle/new"
+    ></v-list-item>
     <!-- Schulverwaltung -->
     <v-list-item
       class="menu-bar-main-item headline-2"

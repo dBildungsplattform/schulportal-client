@@ -12,9 +12,46 @@
       "noKoPersNumber": "Keine KoPers-Nr vorhanden"
     },
     "rolle": {
-      "selectRolle": "Rolle auswählen",
+      "addNew": "Neue Rolle hinzufügen",
+      "backToCreateRolle": "Zurück zur Rollenanlage",
+      "create": "Rolle anlegen",
+      "createAnother": "Weitere Rolle anlegen",
+      "createNew": "Neue Rolle anlegen",
+      "discard": "Rolle verwerfen",
+      "enterRollenname": "Rollenname eingeben",
       "management": "Rollenverwaltung",
-      "noRollenFound": "Keine Rollen gefunden"
+      "mappingFrontBackEnd": {
+        "rollenarten": {
+          "LERN": "Lern",
+          "LEHR": "Lehr",
+          "EXTERN": "Extern",
+          "ORGADMIN": "Orgadmin",
+          "LEIT": "Leit",
+          "SYSADMIN": "Sysadmin"
+        },
+        "merkmale": {
+          "BEFRISTUNG_PFLICHT": "Befristung ist Pflichtangabe",
+          "KOPERS_PFLICHT": "KoPers-Nr. ist Pflichtangabe"
+        }
+      },
+      "merkmale": "Merkmale",
+      "noRollenFound": "Keine Rollen gefunden",
+      "rolleCreateErrorTitle": "Fehler beim Anlegen der Rolle",
+      "rolleCreateErrorText": "Die Rolle konnte nicht angelegt werden.",
+      "rollenart": "Rollenart",
+      "rollenname": "Rollenname",
+      "rolleAddedSuccessfully": "Die Rolle wurde erfolgreich hinzugefügt.",
+      "rule": {
+        "rolleNameLength": "Der Rollenname darf nicht länger als 200 Zeichen sein.",
+        "rolleNameRequired": "Der Rollenname ist erforderlich."
+      },
+      "selectSchulstrukturKnoten": "Schulstrukturknoten auswählen",
+      "selectRolle": "Rolle auswählen",
+      "selectRollenart": "Rollenart auswählen",
+      "selectMerkmale": "Merkmale auswählen",
+      "schulstrukurknoten": "Schulstrukturknoten",
+      "showAll": "Alle Rollen anzeigen",
+      "userDataLoadingErrorText": "Es konnten keine Benutzerdaten geladen werden."
     },
     "mandatoryFieldsNotice": "Mit * markierte Felder sind Pflichtangaben.",
     "person": {

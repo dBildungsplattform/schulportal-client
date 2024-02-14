@@ -112,6 +112,7 @@ export const usePersonStore: StoreDefinition<
 
     async getPersonById(personId: string): Promise<Personendatensatz> {
       this.loading = true
+      this.errorCode = ''
       try {
         const { data }: { data: Personendatensatz } =
           await personenApi.personControllerFindPersonById(personId)

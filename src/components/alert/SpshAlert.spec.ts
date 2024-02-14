@@ -31,7 +31,7 @@ beforeEach(() => {
 })
 
 describe('SpshAlert Alert', () => {
-  test('it renders the alert when showAlert is true', () => {
+  test('it renders the alert when modelValue is true', () => {
     expect(wrapper?.find('.v-alert').isVisible()).toBe(true)
   })
 
