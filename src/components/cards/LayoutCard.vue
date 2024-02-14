@@ -11,7 +11,7 @@
   <v-card class="layout-card">
     <v-row
       align="center"
-      class="ml-md-6 ml-1 my-1"
+      class="ml-md-3 ml-1"
     >
       <v-col cols="auto">
         <h2 class="text-left headline-2">{{ header }}</h2>
