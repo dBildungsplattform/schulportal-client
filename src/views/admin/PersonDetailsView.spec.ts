@@ -9,9 +9,25 @@ import {
 } from 'vue-router'
 import routes from '@/router/routes'
 import PersonDetailsView from './PersonDetailsView.vue'
+import { type Personendatensatz, usePersonStore } from '@/stores/PersonStore'
 
 let wrapper: VueWrapper | null = null
 let router: Router
+
+const personStore = usePersonStore()
+const mockPerson: Personendatensatz = {
+  person: {
+    id: '1',
+    name: {
+      familienname: 'Orton',
+      vorname: 'John'
+    },
+    referrer: 'jorton'
+  },
+  personenkontexte: []
+}
+
+personStore.currentPerson = mockPerson
 
 beforeEach(async () => {
   document.body.innerHTML = `
@@ -39,8 +55,11 @@ beforeEach(async () => {
 })
 
 describe('PersonDetailsView', () => {
-  test('it renders the person details page', async () => {
+  test('it renders the person details page and shows person data', async () => {
     expect(wrapper?.find('[data-testid="person-details-card"]').isVisible()).toBe(true)
+    expect(wrapper?.find('[data-testid="person-vorname"]').text()).toBe('John')
+    expect(wrapper?.find('[data-testid="person-familienname"]').text()).toBe('Orton')
+    expect(wrapper?.find('[data-testid="person-username"]').text()).toBe('jorton')
   })
 
   test('it navigates back to user table', async () => {
