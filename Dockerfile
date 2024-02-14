@@ -6,6 +6,7 @@ ARG BASE_IMAGE=nginx:1.25-alpine
 FROM $BASE_IMAGE_BUILDER as build
 
 RUN apk add openjdk17-jre=17.0.10_p7-r0
+RUN apk add libexpat=2.6.0-r0
 
 WORKDIR /app
 COPY tsconfig*.json ./
