@@ -1,0 +1,11 @@
+label[disabled='true'] {
+  color: $disabledLabelColor;
+}
+
+label[error='true'] {
+  color: $labelErrorColor;
+}
+
+label[required='true']:after {
+  content: ' *';
+}

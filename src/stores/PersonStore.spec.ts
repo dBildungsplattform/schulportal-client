@@ -191,9 +191,7 @@ describe('PersonStore', () => {
     })
 
     it('should handle string error', async () => {
-      mockadapter
-        .onPost('/api/personen')
-        .replyOnce(500, 'some error')
+      mockadapter.onPost('/api/personen').replyOnce(500, 'some error')
       const createPersonPromise: Promise<PersonendatensatzResponse> = personStore.createPerson({
         name: {
           familienname: 'Copeland',
@@ -207,9 +205,7 @@ describe('PersonStore', () => {
     })
 
     it('should handle error code', async () => {
-      mockadapter
-        .onPost('/api/personen')
-        .replyOnce(500, { code: 'some mock server error' })
+      mockadapter.onPost('/api/personen').replyOnce(500, { code: 'some mock server error' })
       const createPersonPromise: Promise<PersonendatensatzResponse> = personStore.createPerson({
         name: {
           familienname: 'Copeland',

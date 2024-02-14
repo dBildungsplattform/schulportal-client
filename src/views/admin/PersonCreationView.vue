@@ -5,7 +5,7 @@
   import { type Router, useRouter } from 'vue-router'
   import { useDisplay } from 'vuetify'
   import { type Composer, useI18n } from 'vue-i18n'
-  import { type FieldContext, useField, useForm } from 'vee-validate'
+  import { useForm, type TypedSchema, type BaseFieldProps } from 'vee-validate'
   import { object, string } from 'yup'
   import { toTypedSchema } from '@vee-validate/yup'
   import SpshAlert from '@/components/alert/SpshAlert.vue'
@@ -17,36 +17,55 @@
   const { smAndDown }: { smAndDown: Ref<boolean> } = useDisplay()
   const { t }: Composer = useI18n({ useScope: 'global' })
 
+  const validationSchema: TypedSchema = toTypedSchema(
+    object({
+      selectedVorname: string().required(t('admin.person.rules.vorname')),
+      selectedFamilienname: string().required(t('admin.person.rules.familienname'))
+    })
+  )
+
+  const vuetifyConfig = (state: {
+    errors: Array<string>
+  }): { props: { error: boolean; 'error-messages': Array<string> } } => ({
+    props: {
+      error: !!state.errors.length,
+      'error-messages': state.errors
+    }
+  })
+
   type PersonCreationForm = {
     selectedVorname: string
     selectedFamilienname: string
   }
 
   // eslint-disable-next-line @typescript-eslint/typedef
-  const { handleSubmit } = useForm<PersonCreationForm>({
-    validationSchema: toTypedSchema(
-      object({
-        selectedVorname: string().required(t('admin.person.rules.vorname')),
-        selectedFamilienname: string().required(t('admin.person.rules.familienname'))
-      })
-    )
+  const { defineField, handleSubmit, resetForm } = useForm<PersonCreationForm>({
+    validationSchema
   })
 
   const noKoPersNumber: Ref<boolean> = ref(false)
   const koPersNumber: Ref<string> = ref('')
   const selectedRolle: Ref<string> = ref('')
-  const selectedVorname: FieldContext<unknown> = useField('selectedVorname')
-  const selectedFamilienname: FieldContext<unknown> = useField('selectedFamilienname')
+  const [selectedVorname, selectedVornameProps]: [
+    Ref<string>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>
+  ] = defineField('selectedVorname', vuetifyConfig)
+  const [selectedFamilienname, selectedFamiliennameProps]: [
+    Ref<string>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>
+  ] = defineField('selectedFamilienname', vuetifyConfig)
 
   function navigateToPersonTable(): void {
     router.push({ name: 'person-management' })
+    personStore.createdPerson = null
+    resetForm()
   }
 
   function createPerson(): void {
     const unpersistedPerson: CreatedPerson = {
       name: {
-        familienname: selectedFamilienname.value.value as string,
-        vorname: selectedVorname.value.value as string
+        familienname: selectedFamilienname.value as string,
+        vorname: selectedVorname.value as string
       }
     }
     personStore.createPerson(unpersistedPerson)
@@ -62,11 +81,7 @@
 
   const handleCreateAnotherPerson = (): void => {
     personStore.createdPerson = null
-    selectedRolle.value = ''
-    noKoPersNumber.value = false
-    koPersNumber.value = ''
-    selectedVorname.value.value = ''
-    selectedFamilienname.value.value = ''
+    resetForm()
     router.push({ name: 'create-person' })
   }
 
@@ -212,7 +227,12 @@
                   cols="12"
                   sm="4"
                 >
-                  <label for="vorname-input">{{ $t('person.firstName') }}</label>
+                  <label
+                    for="vorname-input"
+                    :error="selectedVornameProps['error']"
+                    required="true"
+                    >{{ $t('person.firstName') }}</label
+                  >
                 </v-col>
                 <v-col
                   class="py-0"
@@ -221,10 +241,10 @@
                 >
                   <v-text-field
                     data-testid="vorname-input"
-                    :error-messages="selectedVorname.errorMessage.value"
                     id="vorname-input"
                     variant="outlined"
-                    v-model="selectedVorname.value.value"
+                    v-bind="selectedVornameProps"
+                    v-model="selectedVorname"
                   ></v-text-field>
                 </v-col>
               </v-row>
@@ -234,7 +254,12 @@
                   cols="12"
                   sm="4"
                 >
-                  <label for="familienname-input">{{ $t('person.lastName') }}</label>
+                  <label
+                    for="familienname-input"
+                    :error="selectedFamiliennameProps['error']"
+                    required="true"
+                    >{{ $t('person.lastName') }}</label
+                  >
                 </v-col>
                 <v-col
                   class="py-0"
@@ -243,10 +268,10 @@
                 >
                   <v-text-field
                     data-testid="familienname-input"
-                    :error-messages="selectedFamilienname.errorMessage.value"
                     id="familienname-input"
                     variant="outlined"
-                    v-model="selectedFamilienname.value.value"
+                    v-bind="selectedFamiliennameProps"
+                    v-model="selectedFamilienname"
                   ></v-text-field>
                 </v-col>
               </v-row>
