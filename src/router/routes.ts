@@ -15,14 +15,23 @@ const routes: readonly RouteRecordRaw[] = [
     name: 'user-management',
     component: () => import('../views/admin/UserManagementView.vue'),
     meta: {
-      layout: 'AdminLayout',
-      requiresAuth: true
+      requiresAuth: true,
+      layout: 'AdminLayout'
     }
   },
   {
     path: '/admin/users/:id',
     name: 'user-details',
     component: () => import('../views/admin/UserDetailsView.vue'),
+    meta: {
+      layout: 'AdminLayout',
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/admin/rolle/new',
+    name: 'create-rolle',
+    component: () => import('../views/admin/RolleCreationView.vue'),
     meta: {
       layout: 'AdminLayout',
       requiresAuth: true
@@ -37,6 +46,7 @@ const routes: readonly RouteRecordRaw[] = [
       requiresAuth: true
     }
   }
+  
 ]
 
 export default routes

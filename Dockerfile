@@ -1,4 +1,4 @@
-ARG BASE_IMAGE_BUILDER=node:21.6.0-alpine3.18
+ARG BASE_IMAGE_BUILDER=node:21.6-alpine3.19
 ARG BASE_IMAGE=nginx:1.25-alpine
 
 # Build Stage
@@ -20,6 +20,8 @@ RUN npm run build
 
 # Deployment Stage
 FROM $BASE_IMAGE as deployment
+RUN apk add libexpat=2.6.0-r0  \
+    && rm -rf /var/cache/apk/*
 
 # Copying from build stage
 COPY --from=build /app/dist/ /usr/share/nginx/html/
@@ -34,7 +36,6 @@ RUN addgroup -g 1000 nginxgroup && \
 USER nginxuser
 EXPOSE 8080
 
-# Update nginx configuration to listen on port 8080
-#RUN sed -i 's/listen       80;/listen       8080;/g' /etc/nginx/conf.d/nginx-vue.conf
+
 
 CMD ["nginx", "-g", "daemon off;"]

@@ -2,11 +2,50 @@
   "action": "Aktion",
   "admin": {
     "headline": "Administrationsbereich",
+    "mandatoryFieldsNotice": "Mit * markierte Felder sind Pflichtangaben.",
+    "followingDataCreated" : "Folgende Daten wurden gespeichert:",
     "class": {
       "management": "Klassenverwaltung"
     },
-    "role": {
-      "management": "Rollenverwaltung"
+    "rolle": {
+      "backToCreateRolle": "Zurück zur Rollenanlage",
+      "management": "Rollenverwaltung",
+      "createNew": "Neue Rolle anlegen",
+      "create": "Rolle anlegen",
+      "addNew": "Neue Rolle hinzufügen",
+      "selectSchulstrukturKnoten": "Schulstrukturknoten auswählen",
+      "selectRollenart": "Rollenart auswählen",
+      "enterRollenname": "Rollenname eingeben",
+      "selectMerkmale": "Merkmale auswählen",
+      "userDataLoadingErrorText": "Es konnten keine Benutzerdaten geladen werden.",
+      "showAll": "Alle Rollen anzeigen",
+      "discard": "Rolle verwerfen",
+      "rolleCreateErrorTitle": "Fehler beim Anlegen der Rolle",
+      "rolleCreateErrorText": "Die Rolle konnte nicht angelegt werden.",
+      "createAnother": "Weitere Rolle anlegen",
+      "schulstrukurknoten": "Schulstrukturknoten",
+      "rollenart": "Rollenart",
+      "rollenname": "Rollenname",
+      "merkmale": "Merkmale",
+      "rolleAddedSuccessfully": "Die Rolle wurde erfolgreich hinzugefügt.",
+        "rule": {
+          "rolleNameLength": "Der Rollenname darf nicht länger als 200 Zeichen sein.",
+          "rolleNameRequired": "Der Rollenname ist erforderlich."
+        },
+        "mappingFrontBackEnd": {
+          "rollenarten": {
+            "LERN": "Lern",
+            "LEHR": "Lehr",
+            "EXTERN": "Extern",
+            "ORGADMIN": "Orgadmin",
+            "LEIT": "Leit",
+            "SYSADMIN": "Sysadmin"
+          },
+          "merkmale": {
+            "BEFRISTUNG_PFLICHT": "Befristung ist Pflichtangabe",
+            "KOPERS_PFLICHT": "KoPers-Nr. ist Pflichtangabe"
+          }
+        }
     },
     "school": {
       "management": "Schulverwaltung"
@@ -62,11 +101,12 @@
   },
   "nav": {
     "admin": "Schulportal-Administration",
-    "backToStart": "zurück zur Startseite",
+    "backToStart": "Zurück zur Startseite",
     "login": "Anmelden",
     "logout": "Abmelden",
     "navigation": "Navigation",
-    "help": "Hilfe"
+    "help": "Hilfe",
+    "backToList": "Zurück zur Ergebnisliste"
   },
   "pagination": {
     "all": "Alle",
