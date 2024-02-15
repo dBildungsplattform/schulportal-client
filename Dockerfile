@@ -35,7 +35,7 @@ RUN addgroup -g 1000 nginxgroup && \
     chmod -R 644 /etc/nginx/conf.d/*
 
 RUN touch /run/nginx.pid \
- && chown -R api-gatway:api-gatway /run/nginx.pid /cache/nginx
+&& chown -R /run/nginx.pid 
 
 USER nginxuser
 EXPOSE 8080
