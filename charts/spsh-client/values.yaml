@@ -14,7 +14,7 @@ selector:
   layer: spsh-client
  
 containerPorts:
-  http: 8080 ## Adjusted for the container's new internal port
+  http: 8080
 
 restartPolicy: Always
 automountServiceAccountToken: false
@@ -29,13 +29,10 @@ containerSecurityContext:
   readOnlyRootFilesystem: false
   privileged: false
   capabilities:
-    drop: ["ALL"] # ALL
-    #add: ["CAP_NET_BIND_SERVICE"] 
+    drop: ["ALL"] 
   seccompProfile:
     type: "RuntimeDefault"
-  #sysctls:
-  #  - name: net.ipv4.ip_unprivileged_port_start
-  #    value: "80"
+
 
 volumePermissions:
   resources:
@@ -76,7 +73,7 @@ enabledserviceport:  true
 ports:
   - protocol: TCP
     port: 8080
-    targetPort: 8080 # port on which your application run
+    targetPort: 8080
 
 servicetype: NodePort
 serviceName: http

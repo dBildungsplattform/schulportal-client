@@ -34,7 +34,7 @@ RUN addgroup -g 1000 nginxgroup && \
     chmod -R 755 /usr/share/nginx/html && \
     chmod -R 644 /etc/nginx/conf.d/*
 
-# Erstellen von /run/nginx.pid und Einstellung der Besitzrechte
+
 RUN touch /run/nginx.pid \
     && chown -R nginxuser:nginxgroup /run/nginx.pid /var/cache/nginx /var/run /var/log/nginx /usr/share/nginx/html
 
