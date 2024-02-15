@@ -33,6 +33,7 @@ RUN addgroup -g 1000 nginxgroup && \
     chown -R nginxuser:nginxgroup /var/cache/nginx /var/run /var/log/nginx /usr/share/nginx/html && \
     chmod -R 755 /usr/share/nginx/html && \
     chmod -R 644 /etc/nginx/conf.d/*
+
 USER nginxuser
 EXPOSE 8080
 
