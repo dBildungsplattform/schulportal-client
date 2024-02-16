@@ -131,7 +131,7 @@
             <!-- Dieses Div auf Auswahl einer Rolle bedingen -->
             <div>
               <!-- KoPers-Nr -->
-              
+
               <!-- Persönliche Informationen -->
               <v-row>
                 <h3 class="headline-3">{{ $t('admin.person.personalInfo') }}</h3>

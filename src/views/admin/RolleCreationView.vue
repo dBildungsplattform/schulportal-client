@@ -260,8 +260,10 @@
                 md="3"
                 class="md-text-right py-0"
               >
-                <label class="text-body"
-                    for="schulstrukturknoten-select">
+                <label
+                  class="text-body"
+                  for="schulstrukturknoten-select"
+                >
                   {{ $t('admin.rolle.schulstrukturknoten') + '*' }}
                 </label></v-col
               >
@@ -313,8 +315,10 @@
                 md="3"
                 class="md-text-right py-0"
               >
-                <label class="text-body"
-                    for="rollenart-select">
+                <label
+                  class="text-body"
+                  for="rollenart-select"
+                >
                   {{ $t('admin.rolle.rollenart') + '*' }}
                 </label></v-col
               >
@@ -369,8 +373,10 @@
                   md="3"
                   class="md-text-right py-0"
                 >
-                  <label class="text-body"
-                  for="rollenname-input">
+                  <label
+                    class="text-body"
+                    for="rollenname-input"
+                  >
                     {{ $t('admin.rolle.rollenname') + '*' }}
                   </label></v-col
                 >
@@ -413,10 +419,12 @@
                   md="3"
                   class="md-text-right py-0"
                 >
-                  <label class="text-body"
-                  for="merkmale-select">
+                  <label
+                    class="text-body"
+                    for="merkmale-select"
+                  >
                     {{ $t('admin.rolle.merkmale') }}
-              </label></v-col
+                  </label></v-col
                 >
                 <v-col
                   cols="12"
