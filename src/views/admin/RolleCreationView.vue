@@ -13,9 +13,15 @@
   import SpshAlert from '@/components/alert/SpshAlert.vue'
   import { type Router, useRouter } from 'vue-router'
   import { useDisplay } from 'vuetify'
+  import {
+    useOrganisationStore,
+    type OrganisationStore,
+    type Organisation
+  } from '@/stores/OrganisationStore'
 
   const { smAndDown }: { smAndDown: Ref<boolean> } = useDisplay()
   const rolleStore: RolleStore = useRolleStore()
+  const organisationStore: OrganisationStore = useOrganisationStore()
 
   const { t }: Composer = useI18n({ useScope: 'global' })
   const router: Router = useRouter()
@@ -30,8 +36,6 @@
   const selectedRollenName: Ref<string | null> = ref(null)
   const selectedRollenArt: Ref<CreateRolleBodyParamsRollenartEnum | null> = ref(null)
   const selectedMerkmale: Ref<CreateRolleBodyParamsMerkmaleEnum[] | null> = ref(null)
-
-  const schulstrukturKnoten: string[] = ['cef7240e-fd08-4961-927e-c9ea0c5a37c5']
 
   // Rule for validating the rolle name. Maybe enhance a validation framework like VeeValidate instead?
   const rolleNameRules: Array<(v: string | null | undefined) => boolean | string> = [
@@ -84,7 +88,19 @@
       })
       .join(', ')
   })
-  onMounted(() => {
+
+  // TODO: As soon as we have a unique combination of attribute besides the UUID (org.id) 
+  // it should be used as a title here for UI as a user friendly displ
+  const organisationsForSelect: OrganisationStore = computed(() =>
+    organisationStore.AllOrganisations.map((org: Organisation) => ({
+      value: org.id,
+      title: org.id
+    }))
+  )
+
+  onMounted(async () => {
+    await organisationStore.getAllOrganisations()
+
     // Iterate over the enum values
     Object.values(RolleResponseRollenartEnum).forEach((enumValue: RolleResponseRollenartEnum) => {
       // Use the enum value to construct the i18n path
@@ -165,6 +181,7 @@
               {{ $t('admin.rolle.schulstrukurknoten') }}:
             </v-col>
             <v-col class="text-body">
+
               {{ rolleStore.createdRolle.administeredBySchulstrukturknoten }}</v-col
             >
           </v-row>
@@ -271,8 +288,10 @@
               >
                 <v-select
                   data-testid="schulstruktur-knoten-select"
-                  :items="schulstrukturKnoten"
+                  :items="organisationsForSelect"
                   v-model="selectedSchulstrukturKnoten"
+                  item-value="value"
+                  item-text="title"
                   variant="outlined"
                   density="compact"
                   single-line
