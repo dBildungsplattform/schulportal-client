@@ -139,7 +139,7 @@
     width: -webkit-fill-available;
   }
 
-  @media (max-width: 1280px) {
+  @media (max-width: 1279px) {
     .footer {
       min-height: 280px;
       background-size:
