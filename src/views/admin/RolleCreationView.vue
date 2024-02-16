@@ -89,9 +89,14 @@
       .join(', ')
   })
 
-  // TODO: As soon as we have a unique combination of attribute besides the UUID (org.id) 
-  // it should be used as a title here for UI as a user friendly displ
-  const organisationsForSelect: OrganisationStore = computed(() =>
+  // TODO: As soon as we have a unique combination of attribute besides the UUID (org.id)
+  // it should be used as a title here for UI as a user friendly display
+  const organisationsForSelect: ComputedRef<
+    {
+      value: string
+      title: string
+    }[]
+  > = computed(() =>
     organisationStore.AllOrganisations.map((org: Organisation) => ({
       value: org.id,
       title: org.id
@@ -181,7 +186,6 @@
               {{ $t('admin.rolle.schulstrukurknoten') }}:
             </v-col>
             <v-col class="text-body">
-
               {{ rolleStore.createdRolle.administeredBySchulstrukturknoten }}</v-col
             >
           </v-row>

@@ -135,6 +135,7 @@
       prepend-icon="mdi-plus-circle-outline"
       :title="$t('admin.rolle.createNew')"
       to="/admin/rolle/new"
+      @click="closeMenuOnMobile"
     ></v-list-item>
     <!-- Schulverwaltung -->
     <v-list-item
