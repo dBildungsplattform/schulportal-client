@@ -9,3 +9,7 @@ label[error='true'] {
 label[required='true']:after {
   content: ' *';
 }
+
+.v-field__clearable > i.v-icon {
+  opacity: 1;
+}

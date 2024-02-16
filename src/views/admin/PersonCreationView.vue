@@ -1,7 +1,6 @@
 <script setup lang="ts">
   import { usePersonStore, type CreatedPerson, type PersonStore } from '@/stores/PersonStore'
-  // import { type RolleResponse } from '@/api-client/generated/api'
-  import { onMounted, type Ref, ref } from 'vue'
+  import { onMounted, type Ref } from 'vue'
   import { type Router, useRouter } from 'vue-router'
   import { useDisplay } from 'vuetify'
   import { type Composer, useI18n } from 'vue-i18n'
@@ -19,8 +18,11 @@
 
   const validationSchema: TypedSchema = toTypedSchema(
     object({
-      selectedVorname: string().required(t('admin.person.rules.vorname')),
-      selectedFamilienname: string().required(t('admin.person.rules.familienname'))
+      selectedVorname: string()
+        .matches(/^[A-Za-z]*[A-Za-z][A-Za-z0-9- ]*$/, t('admin.person.rules.vorname.matches'))
+        .min(2, t('admin.person.rules.vorname.min'))
+        .required(t('admin.person.rules.vorname.required')),
+      selectedFamilienname: string().required(t('admin.person.rules.familienname.required'))
     })
   )
 
@@ -43,9 +45,6 @@
     validationSchema
   })
 
-  const noKoPersNumber: Ref<boolean> = ref(false)
-  const koPersNumber: Ref<string> = ref('')
-  const selectedRolle: Ref<string> = ref('')
   const [selectedVorname, selectedVornameProps]: [
     Ref<string>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>
@@ -84,20 +83,6 @@
     resetForm()
     router.push({ name: 'create-person' })
   }
-
-  const rollen: Array<Object> = [
-    {
-      id: '1',
-      name: 'Tutor',
-      rollenart: 'LERN',
-      merkmale: '',
-      createdAt: '',
-      updatedAt: '',
-      administeredBySchulstrukturknoten: '1'
-    }
-  ]
-
-  const schulen: Array<string> = ['1', '2', '3']
 
   onMounted(async () => {
     personStore.errorCode = ''
@@ -142,84 +127,14 @@
           </v-row>
           <v-container class="px-lg-16">
             <!-- Rollenzuordnung -->
-            <v-row>
-              <h3 class="headline-3">1. {{ $t('admin.rolle.selectRolle') }}</h3>
-            </v-row>
-            <v-row class="align-center mt-8">
-              <v-col
-                class="py-0 pb-sm-8 pt-sm-3 text-sm-right"
-                cols="12"
-                sm="4"
-              >
-                <label for="rolle-select">{{ $t('admin.rolle.selectRolle') }}</label>
-              </v-col>
-              <v-col
-                class="py-0"
-                cols="12"
-                sm="8"
-              >
-                <v-select
-                  data-testid="rolle-select"
-                  id="rolle-select"
-                  :items="rollen"
-                  item-title="name"
-                  item-value="id"
-                  :no-data-text="$t('admin.rolle.noRollenFound')"
-                  variant="outlined"
-                  v-model="selectedRolle"
-                ></v-select>
-              </v-col>
-            </v-row>
 
-            <div v-if="selectedRolle">
+            <!-- Dieses Div auf Auswahl einer Rolle bedingen -->
+            <div>
               <!-- KoPers-Nr -->
-              <v-row class="align-center">
-                <v-col
-                  class="hidden-xs-and-down"
-                  cols="12"
-                  sm="4"
-                ></v-col>
-                <v-col
-                  class="pa-0"
-                  cols="8"
-                >
-                  <v-checkbox
-                    class="no-kopers-checkbox"
-                    data-testid="no-kopers-checkbox"
-                    hide-details
-                    :label="$t('admin.koPers.noKoPersNumber')"
-                    v-model="noKoPersNumber"
-                  ></v-checkbox>
-                </v-col>
-                <v-col
-                  class="py-0 pb-sm-8 text-sm-right"
-                  cols="12"
-                  sm="4"
-                >
-                  <label
-                    for="kopers-number"
-                    :disabled="noKoPersNumber"
-                    >{{ $t('admin.koPers.koPersNumber') }}</label
-                  >
-                </v-col>
-                <v-col
-                  class="pt-0"
-                  cols="12"
-                  sm="8"
-                >
-                  <v-text-field
-                    id="kopers-number"
-                    data-testid="kopers-number-input"
-                    :disabled="noKoPersNumber"
-                    v-model="koPersNumber"
-                    variant="outlined"
-                  ></v-text-field>
-                </v-col>
-              </v-row>
-
+              
               <!-- Persönliche Informationen -->
               <v-row>
-                <h3 class="headline-3">2. {{ $t('admin.person.personalInfo') }}</h3>
+                <h3 class="headline-3">{{ $t('admin.person.personalInfo') }}</h3>
               </v-row>
               <v-row class="align-center mt-8">
                 <v-col
@@ -240,8 +155,10 @@
                   sm="8"
                 >
                   <v-text-field
+                    clearable
                     data-testid="vorname-input"
                     id="vorname-input"
+                    :placeholder="$t('person.enterFirstName')"
                     variant="outlined"
                     v-bind="selectedVornameProps"
                     v-model="selectedVorname"
@@ -267,8 +184,10 @@
                   sm="8"
                 >
                   <v-text-field
+                    clearable
                     data-testid="familienname-input"
                     id="familienname-input"
+                    :placeholder="$t('person.enterlastName')"
                     variant="outlined"
                     v-bind="selectedFamiliennameProps"
                     v-model="selectedFamilienname"
@@ -277,31 +196,6 @@
               </v-row>
 
               <!-- Schulzuordnung -->
-              <v-row>
-                <h3 class="headline-3">3. {{ $t('admin.school.assign') }}</h3>
-              </v-row>
-              <v-row class="align-center mt-8">
-                <v-col
-                  class="py-0 pb-sm-8 pt-sm-3 text-sm-right"
-                  cols="12"
-                  sm="4"
-                >
-                  <label for="schule-select">{{ $t('admin.school.assign') }}</label>
-                </v-col>
-                <v-col
-                  class="py-0"
-                  cols="12"
-                  sm="8"
-                >
-                  <v-select
-                    data-testid="schule-select"
-                    id="schule-select"
-                    :items="schulen"
-                    :no-data-text="$t('admin.school.noSchoolsFound')"
-                    variant="outlined"
-                  ></v-select>
-                </v-col>
-              </v-row>
             </div>
           </v-container>
         </v-container>

@@ -45,11 +45,11 @@
         "rolleNameLength": "Der Rollenname darf nicht länger als 200 Zeichen sein.",
         "rolleNameRequired": "Der Rollenname ist erforderlich."
       },
-      "selectSchulstrukturKnoten": "Schulstrukturknoten auswählen",
+      "selectSchulstrukturknoten": "Schulstrukturknoten auswählen",
       "selectRolle": "Rolle auswählen",
       "selectRollenart": "Rollenart auswählen",
       "selectMerkmale": "Merkmale auswählen",
-      "schulstrukurknoten": "Schulstrukturknoten",
+      "schulstrukturknoten": "Schulstrukturknoten",
       "showAll": "Alle Rollen anzeigen",
       "userDataLoadingErrorText": "Es konnten keine Benutzerdaten geladen werden."
     },
@@ -76,8 +76,14 @@
       "resetPasswordInformation": "Bitte teilen Sie dem Benutzer das temporäre Passwort mit. Nach dem Schließen des Dialogs wird es aus Sicherheitsgründen nicht mehr angezeigt.",
       "resetPassword": "Passwort zurücksetzen",
       "rules": {
-        "vorname": "Der Vorname muss angegeben werden.",
-        "familienname": "Der Familienname muss angegeben werden."
+        "vorname": {
+          "matches": "Der Vorname muss mit einem Buchstaben beginnen",
+          "min": "Der Vorname muss mindestens 2 Zeichen beinhalten",
+          "required": "Der Vorname muss angegeben werden."
+        },
+        "familienname": {
+          "required": "Der Familienname muss angegeben werden."
+        }
       },
       "showAll": "Alle Benutzer anzeigen",
       "startPassword": "Einstiegs-Passwort",
@@ -137,6 +143,8 @@
   },
   "person": {
     "email": "E-Mail",
+    "enterFirstName": "Vorname eingeben",
+    "enterLastName": "Nachname eingeben",
     "firstName": "Vorname",
     "lastName": "Nachname",
     "password": "Passwort",
