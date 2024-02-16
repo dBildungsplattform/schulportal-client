@@ -91,20 +91,20 @@
 
   // TODO: As soon as we have a unique combination of attribute besides the UUID (org.id)
   // it should be used as a title here for UI as a user friendly display
-  const organisationsForSelect: ComputedRef<
+  const organisationen: ComputedRef<
     {
       value: string
       title: string
     }[]
   > = computed(() =>
-    organisationStore.AllOrganisations.map((org: Organisation) => ({
+    organisationStore.allOrganisationen.map((org: Organisation) => ({
       value: org.id,
       title: org.id
     }))
   )
 
   onMounted(async () => {
-    await organisationStore.getAllOrganisations()
+    await organisationStore.getAllOrganisationen()
 
     // Iterate over the enum values
     Object.values(RolleResponseRollenartEnum).forEach((enumValue: RolleResponseRollenartEnum) => {
@@ -292,7 +292,7 @@
               >
                 <v-select
                   data-testid="schulstruktur-knoten-select"
-                  :items="organisationsForSelect"
+                  :items="organisationen"
                   v-model="selectedSchulstrukturKnoten"
                   item-value="value"
                   item-text="title"

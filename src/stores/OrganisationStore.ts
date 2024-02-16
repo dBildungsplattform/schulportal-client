@@ -24,14 +24,14 @@ export type Organisation = {
 }
 
 type OrganisationState = {
-  AllOrganisations: Array<OrganisationResponse>
+  allOrganisationen: Array<OrganisationResponse>
   errorCode: string
   loading: boolean
 }
 
 type OrganisationGetters = {}
 type OrganisationActions = {
-  getAllOrganisations: () => Promise<void>
+  getAllOrganisationen: () => Promise<void>
 }
 
 export type OrganisationStore = Store<
@@ -50,19 +50,19 @@ export const useOrganisationStore: StoreDefinition<
   id: 'organisationStore',
   state: (): OrganisationState => {
     return {
-      AllOrganisations: [],
+      allOrganisationen: [],
       errorCode: '',
       loading: false
     }
   },
   actions: {
-    async getAllOrganisations() {
+    async getAllOrganisationen() {
       this.loading = true
       try {
         const { data }: AxiosResponse<OrganisationResponse[]> =
           await organisationApi.organisationControllerFindOrganizations()
 
-        this.AllOrganisations = data
+        this.allOrganisationen = data
         this.loading = false
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR'

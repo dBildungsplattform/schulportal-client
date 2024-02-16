@@ -15,7 +15,7 @@ describe('OrganisationStore', () => {
   })
 
   it('should initialize state correctly', () => {
-    expect(organisationStore.AllOrganisations).toEqual([])
+    expect(organisationStore.allOrganisationen).toEqual([])
     expect(organisationStore.errorCode).toEqual('')
     expect(organisationStore.loading).toBeFalsy()
   })
@@ -34,28 +34,28 @@ describe('OrganisationStore', () => {
       ]
 
       mockadapter.onGet('/api/organisationen').replyOnce(200, mockResponse)
-      const getAllOrgaisationsPromise: Promise<void> = organisationStore.getAllOrganisations()
+      const getAllOrgaisationsPromise: Promise<void> = organisationStore.getAllOrganisationen()
       await getAllOrgaisationsPromise
-      expect(organisationStore.AllOrganisations).toEqual(mockResponse)
+      expect(organisationStore.allOrganisationen).toEqual(mockResponse)
       expect(organisationStore.loading).toBeFalsy()
     })
 
     it('should handle string error', async () => {
       mockadapter.onGet('/api/organisationen').replyOnce(500, 'some mock server error')
-      const getAllOrgaisationsPromise: Promise<void> = organisationStore.getAllOrganisations()
+      const getAllOrgaisationsPromise: Promise<void> = organisationStore.getAllOrganisationen()
       expect(organisationStore.loading).toBe(true)
       await getAllOrgaisationsPromise
-      expect(organisationStore.AllOrganisations).toEqual([])
+      expect(organisationStore.allOrganisationen).toEqual([])
       expect(organisationStore.errorCode).toEqual('UNSPECIFIED_ERROR')
       expect(organisationStore.loading).toBe(false)
     })
 
     it('should handle error code', async () => {
       mockadapter.onGet('/api/organisationen').replyOnce(500, { code: 'some mock server error' })
-      const getAllOrgaisationsPromise: Promise<void> = organisationStore.getAllOrganisations()
+      const getAllOrgaisationsPromise: Promise<void> = organisationStore.getAllOrganisationen()
       expect(organisationStore.loading).toBe(true)
       await getAllOrgaisationsPromise
-      expect(organisationStore.AllOrganisations).toEqual([])
+      expect(organisationStore.allOrganisationen).toEqual([])
       expect(organisationStore.errorCode).toEqual('some mock server error')
       expect(organisationStore.loading).toBe(false)
     })
