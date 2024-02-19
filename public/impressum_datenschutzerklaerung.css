@@ -40,11 +40,12 @@ li {
 
 .Schulportal-Logo {
     
-    width: 250px;
+    width: 270px;
 }
 
 .Schulportal-Logo-Div {
 
-    display: flex;
-    justify-content: flex-end;
+    float:right;
+    margin-right: -50px;
+    margin-top: -20px;
 }
