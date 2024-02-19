@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest'
 import { VueWrapper, mount } from '@vue/test-utils'
-import UserTable from './UserTable.vue'
+import ResultTable from './ResultTable.vue'
 
 let wrapper: VueWrapper | null = null
 
@@ -11,7 +11,7 @@ beforeEach(() => {
     </div>
   `
 
-  wrapper = mount(UserTable, {
+  wrapper = mount(ResultTable, {
     attachTo: document.getElementById('app') || '',
     props: {
       items: [],
@@ -21,7 +21,7 @@ beforeEach(() => {
     },
     global: {
       components: {
-        UserTable
+        ResultTable
       }
     }
   })

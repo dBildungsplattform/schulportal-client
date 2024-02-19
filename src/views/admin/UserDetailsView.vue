@@ -15,7 +15,7 @@
 
   const password: Ref<string> = ref('')
 
-  function navigateToUserTable(): void {
+  function navigateToResultTable(): void {
     router.push({ name: 'user-management' })
   }
 
@@ -44,7 +44,7 @@
     <LayoutCard
       :closable="true"
       :header="$t('admin.user.edit')"
-      @onCloseClicked="navigateToUserTable"
+      @onCloseClicked="navigateToResultTable"
       :padded="true"
       :showCloseText="true"
     >
@@ -58,7 +58,7 @@
         :showButton="true"
         :buttonText="$t('admin.user.backToList')"
         buttonClass="primary"
-        :buttonAction="navigateToUserTable"
+        :buttonAction="navigateToResultTable"
         @update:modelValue="handleAlertClose"
       />
 

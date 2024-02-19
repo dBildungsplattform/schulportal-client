@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import { usePersonStore, type PersonStore } from '@/stores/PersonStore'
   import { onMounted } from 'vue'
-  import UserTable from '@/components/admin/UserTable.vue'
+  import ResultTable from '@/components/admin/ResultTable.vue'
 
   const personStore: PersonStore = usePersonStore()
 
@@ -13,12 +13,12 @@
 <template>
   <div class="admin">
     <h1 class="text-center headline">{{ $t('admin.headline') }}</h1>
-    <UserTable
+    <ResultTable
       :items="personStore.allPersons || []"
       :loading="personStore.loading"
       @onUpdateTable="personStore.getAllPersons()"
       :totalItems="personStore.totalPersons"
-    ></UserTable>
+    ></ResultTable>
   </div>
 </template>
 
