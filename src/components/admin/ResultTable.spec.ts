@@ -1,6 +1,7 @@
 import { expect, test } from 'vitest'
 import { VueWrapper, mount } from '@vue/test-utils'
 import ResultTable from './ResultTable.vue'
+import type { VDataTableServer } from 'vuetify/lib/components/index.mjs'
 
 let wrapper: VueWrapper | null = null
 
@@ -9,7 +10,10 @@ beforeEach(() => {
     <div>
       <div id="app"></div>
     </div>
-  `
+ 
+    `
+  type ReadonlyHeaders = InstanceType<typeof VDataTableServer>['headers']
+  const headers: ReadonlyHeaders = [{ title: 'title', key: 'key', align: 'start' }]
 
   wrapper = mount(ResultTable, {
     attachTo: document.getElementById('app') || '',
@@ -17,7 +21,10 @@ beforeEach(() => {
       items: [],
       loading: false,
       password: 'qwertzuiop',
-      totalItems: 25
+      totalItems: 25,
+      headers: headers,
+      header: 'header',
+      itemValuePath: 'id'
     },
     global: {
       components: {
