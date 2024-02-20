@@ -16,6 +16,8 @@
     loading: boolean
     totalItems: number
     headers: ReadonlyHeaders
+    header: string
+    itemValuePath: string,
   }
   const props: Props = defineProps<Props>()
 
@@ -36,20 +38,20 @@
 </script>
 
 <template>
-  <LayoutCard :header="$t('admin.user.management')">
+  <LayoutCard :header="header">
     <v-data-table-server
-      class="user-table"
+      class="result-table"
       @click:row="
         ($event: PointerEvent, item: GenericItem[]) => $emit('onHandleRowClick', $event, item)
       "
-      data-testid="user-table"
+      data-testid="result-table"
       density="compact"
       :headers="headers"
       :items="items"
       :items-length="totalItems"
       :items-per-page-options="[{ value: -1, title: $t('pagination.all') }]"
       :items-per-page-text="$t('itemsPerPage')"
-      item-value="person.id"
+      :item-value="itemValuePath"
       :page-text="pageText"
       select-strategy="page"
       show-select

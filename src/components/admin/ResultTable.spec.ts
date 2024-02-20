@@ -29,6 +29,6 @@ beforeEach(() => {
 
 describe('user table', () => {
   test('it renders a user table', () => {
-    expect(wrapper?.get('[data-testid="user-table"]')).not.toBeNull()
+    expect(wrapper?.get('[data-testid="result-table"]')).not.toBeNull()
   })
 })

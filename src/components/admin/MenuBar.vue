@@ -128,6 +128,7 @@
       data-testid="rolle-management-menu-item"
       prepend-icon="mdi-format-list-bulleted"
       :title="$t('admin.rolle.showAll')"
+      to="/admin/rolle"
     ></v-list-item>
     <v-list-item
       class="menu-bar-sub-item caption"
