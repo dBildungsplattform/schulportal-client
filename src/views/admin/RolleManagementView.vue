@@ -65,6 +65,7 @@
       :loading="rolleStore.loading"
       :headers="headers"
       @onUpdateTable="rolleStore.getAllRollen()"
+      :totalItems="rolleStore.allRollen.length"
       item-value-path="id"
     ></ResultTable>
   </div>
