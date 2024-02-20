@@ -26,6 +26,7 @@
         <v-btn
           append-icon="mdi-close"
           @click.stop="$emit('onCloseClicked')"
+          data-testid="close-layout-card"
           :ripple="false"
           variant="text"
         >
