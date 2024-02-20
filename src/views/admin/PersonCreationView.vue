@@ -187,7 +187,7 @@
                     clearable
                     data-testid="familienname-input"
                     id="familienname-input"
-                    :placeholder="$t('person.enterlastName')"
+                    :placeholder="$t('person.enterLastName')"
                     variant="outlined"
                     v-bind="selectedFamiliennameProps"
                     v-model="selectedFamilienname"

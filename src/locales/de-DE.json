@@ -128,8 +128,8 @@
   },
   "nav": {
     "admin": "Schulportal-Administration",
-    "backToList": "zurück zur Ergebnisliste",
-    "backToStart": "zurück zur Startseite",
+    "backToList": "Zurück zur Ergebnisliste",
+    "backToStart": "Zurück zur Startseite",
     "closeMobileMenu": "Mobiles Menü schließen",
     "login": "Anmelden",
     "logout": "Abmelden",

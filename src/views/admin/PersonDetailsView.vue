@@ -29,7 +29,6 @@
   }
 
   onBeforeMount(async () => {
-    personStore.errorCode = ''
     await personStore.getPersonById(currentPersonId)
   })
 </script>
