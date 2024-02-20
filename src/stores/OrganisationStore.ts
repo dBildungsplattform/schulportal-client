@@ -25,6 +25,7 @@ export type Organisation = {
 
 type OrganisationState = {
   allOrganisationen: Array<OrganisationResponse>
+  currentOrganisation: Organisation | null
   errorCode: string
   loading: boolean
 }
@@ -32,6 +33,7 @@ type OrganisationState = {
 type OrganisationGetters = {}
 type OrganisationActions = {
   getAllOrganisationen: () => Promise<void>
+  getOrganisationById: (organisationId: number) => Promise<void>
 }
 
 export type OrganisationStore = Store<
@@ -51,6 +53,7 @@ export const useOrganisationStore: StoreDefinition<
   state: (): OrganisationState => {
     return {
       allOrganisationen: [],
+      currentOrganisation: null,
       errorCode: '',
       loading: false
     }
@@ -63,6 +66,22 @@ export const useOrganisationStore: StoreDefinition<
           await organisationApi.organisationControllerFindOrganizations()
 
         this.allOrganisationen = data
+        this.loading = false
+      } catch (error: unknown) {
+        this.errorCode = 'UNSPECIFIED_ERROR'
+        if (isAxiosError(error)) {
+          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR'
+        }
+        this.loading = false
+      }
+    },
+    async getOrganisationById(organisationId: string) {
+      this.loading = true
+      try {
+        const { data }: Promise<OrganisationResponse> =
+          await organisationApi.organisationControllerFindOrganisationById(organisationId)
+
+        this.currentOrganisation = data
         this.loading = false
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR'

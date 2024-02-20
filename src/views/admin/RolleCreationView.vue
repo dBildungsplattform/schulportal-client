@@ -89,8 +89,6 @@
       .join(', ')
   })
 
-  // TODO: As soon as we have a unique combination of attribute besides the UUID (org.id)
-  // it should be used as a title here for UI as a user friendly display
   const organisationen: ComputedRef<
     {
       value: string
@@ -99,7 +97,7 @@
   > = computed(() =>
     organisationStore.allOrganisationen.map((org: Organisation) => ({
       value: org.id,
-      title: org.id
+      title: `${org.kennung} (${org.name})`
     }))
   )
 
