@@ -59,6 +59,7 @@
   <div class="admin">
     <h1 class="text-center headline">{{ $t('admin.headline') }}</h1>
     <ResultTable
+      data-testid="role-table"
       :header="$t('admin.rolle.management')"
       :items="transformedRollenAndMerkmale || []"
       :loading="rolleStore.loading"
