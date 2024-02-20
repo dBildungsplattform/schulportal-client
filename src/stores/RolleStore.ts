@@ -45,7 +45,7 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
     state: (): RolleState => {
       return {
         createdRolle: null,
-        allRollen:[],
+        allRollen: [],
         errorCode: '',
         loading: false
       }
@@ -85,8 +85,9 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
       async getAllRollen() {
         this.loading = true
         try {
-          const { data }: AxiosResponse<void> = await rolleApi.rolleControllerFindRollen()
-          
+          const { data }: AxiosResponse<Array<RolleResponse>> =
+            await rolleApi.rolleControllerFindRollen()
+          this.allRollen = data
           this.loading = false
         } catch (error: unknown) {
           this.errorCode = 'UNSPECIFIED_ERROR'
