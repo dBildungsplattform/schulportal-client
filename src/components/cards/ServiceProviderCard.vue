@@ -1,6 +1,4 @@
 <script setup lang="ts">
-  import sanitizeHtml from 'sanitize-html'
-
   defineProps<{
     href?: string
     newTab?: boolean
@@ -14,7 +12,7 @@
 <template>
   <v-card
     :data-testid="testId || 'service-provider-card'"
-    :href="href ? sanitizeHtml(href) : ''"
+    :href="href ? href : ''"
     :rel="newTab ? 'noreferrer' : ''"
     :target="newTab ? '_blank' : '_self'"
     :title="title"
