@@ -2,10 +2,12 @@
   import { computed, type ComputedRef, ref, type Ref } from 'vue'
   import { type Personendatensatz } from '@/stores/PersonStore'
   import { type Composer, useI18n } from 'vue-i18n'
+  import { useDisplay } from 'vuetify'
   import LayoutCard from '@/components/cards/LayoutCard.vue'
   import PasswordOutput from '@/components/form/PasswordOutput.vue'
 
   const { t }: Composer = useI18n({ useScope: 'global' })
+  const { smAndDown }: { smAndDown: Ref<boolean> } = useDisplay()
 
   type Props = {
     errorCode: string
@@ -43,15 +45,13 @@
 </script>
 
 <template>
-  <v-dialog
-    min-width="320px"
-    persistent
-  >
+  <v-dialog persistent>
     <template v-slot:activator="{ props }">
       <v-btn
         class="primary button"
         data-testid="open-password-reset-dialog-icon"
         v-bind="props"
+        :block="smAndDown"
       >
         {{ $t('admin.person.changePassword') }}
       </v-btn>
@@ -81,7 +81,7 @@
                 </p>
               </v-col>
             </v-row>
-            <v-row class="text-body bold px-16">
+            <v-row class="text-body bold px-md-16">
               <v-col>
                 <p data-testid="password-reset-info-text">
                   {{ resetPasswordInformationMessage }}
@@ -96,21 +96,37 @@
           </v-container>
         </v-card-text>
         <v-card-actions class="justify-center">
-          <v-btn
-            @click.stop="closePasswordResetDialog(isActive)"
-            class="secondary button"
-            data-testid="close-password-reset-dialog-button"
-          >
-            {{ !!password ? $t('close') : $t('cancel') }}
-          </v-btn>
-          <v-btn
-            @click.stop="$emit('onResetPassword', person.person.id)"
-            class="primary button"
-            data-testid="password-reset-button"
-            :disabled="!!password"
-          >
-            {{ $t('admin.person.resetPassword') }}
-          </v-btn>
+          <v-row class="justify-center">
+            <v-col
+              cols="12"
+              sm="6"
+              md="4"
+            >
+              <v-btn
+                :block="smAndDown"
+                class="secondary button"
+                @click.stop="closePasswordResetDialog(isActive)"
+                data-testid="close-password-reset-dialog-button"
+              >
+                {{ !!password ? $t('close') : $t('cancel') }}
+              </v-btn>
+            </v-col>
+            <v-col
+              cols="12"
+              sm="6"
+              md="4"
+            >
+              <v-btn
+                :block="smAndDown"
+                class="primary button"
+                @click.stop="$emit('onResetPassword', person.person.id)"
+                data-testid="password-reset-button"
+                :disabled="!!password"
+              >
+                {{ $t('admin.person.resetPassword') }}
+              </v-btn>
+            </v-col>
+          </v-row>
         </v-card-actions>
       </LayoutCard>
     </template>

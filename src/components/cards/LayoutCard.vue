@@ -8,7 +8,7 @@
 </script>
 
 <template>
-  <v-card class="layout-card">
+  <v-card class="layout-card pb-1">
     <v-row
       align="center"
       class="flex-nowrap ml-md-6 ml-1 my-1"
@@ -20,7 +20,7 @@
       <v-col
         cols="2"
         v-if="closable"
-        class="text-right mr-6"
+        class="text-right mr-md-3 mr-8"
       >
         <v-btn
           class="hidden-sm-and-down"

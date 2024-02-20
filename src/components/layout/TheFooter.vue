@@ -141,7 +141,7 @@
     width: -webkit-fill-available; /* Mozilla-based browsers will ignore this. */
   }
 
-  @media (max-width: 1280px) {
+  @media (max-width: 1279px) {
     .footer {
       min-height: 280px;
       background-size:
