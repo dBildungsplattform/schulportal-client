@@ -76,6 +76,7 @@ export const useOrganisationStore: StoreDefinition<
       }
     },
     async getOrganisationById(organisationId: string) {
+      this.errorCode = ''
       this.loading = true
       try {
         const { data }: { data: OrganisationResponse } =
