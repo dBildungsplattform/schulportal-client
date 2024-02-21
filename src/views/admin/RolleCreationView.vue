@@ -82,6 +82,7 @@
 
   function navigateBackToRolleForm(): void {
     rolleStore.errorCode = ''
+    router.push({ name: 'create-rolle' })
   }
   const translatedCreatedRolleMerkmale: ComputedRef<string> = computed(() => {
     // Check if `createdRolle.merkmale` exists and is an array
