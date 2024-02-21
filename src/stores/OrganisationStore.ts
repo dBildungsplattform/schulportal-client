@@ -33,7 +33,7 @@ type OrganisationState = {
 type OrganisationGetters = {}
 type OrganisationActions = {
   getAllOrganisationen: () => Promise<void>
-  getOrganisationById: (organisationId: number) => Promise<void>
+  getOrganisationById: (organisationId: string) => Promise<OrganisationResponse>
 }
 
 export type OrganisationStore = Store<
@@ -78,17 +78,19 @@ export const useOrganisationStore: StoreDefinition<
     async getOrganisationById(organisationId: string) {
       this.loading = true
       try {
-        const { data }: Promise<OrganisationResponse> =
+        const { data }: { data: OrganisationResponse } =
           await organisationApi.organisationControllerFindOrganisationById(organisationId)
 
         this.currentOrganisation = data
         this.loading = false
+        return data
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR'
         if (isAxiosError(error)) {
           this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR'
         }
         this.loading = false
+        return Promise.reject(this.errorCode)
       }
     }
   }

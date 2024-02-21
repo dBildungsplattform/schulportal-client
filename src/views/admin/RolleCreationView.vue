@@ -62,10 +62,17 @@
         selectedRollenArt.value,
         merkmaleToSubmit
       )
+
+      if (rolleStore.createdRolle) {
+        await organisationStore.getOrganisationById(
+          rolleStore.createdRolle.administeredBySchulstrukturknoten
+        )
+      }
     }
   }
   const handleCreateAnotherRolle = (): void => {
     rolleStore.createdRolle = null
+    organisationStore.currentOrganisation = null
     selectedSchulstrukturKnoten.value = null
     selectedRollenArt.value = null
     selectedRollenName.value = null
@@ -89,7 +96,7 @@
       .join(', ')
   })
 
-  const organisationen: ComputedRef<
+  const schulstrukturknoten: ComputedRef<
     {
       value: string
       title: string
@@ -184,7 +191,9 @@
               {{ $t('admin.rolle.schulstrukurknoten') }}:
             </v-col>
             <v-col class="text-body">
-              {{ rolleStore.createdRolle.administeredBySchulstrukturknoten }}</v-col
+              {{
+                `${organisationStore.currentOrganisation?.kennung} (${organisationStore.currentOrganisation?.name})`
+              }}</v-col
             >
           </v-row>
           <v-row>
@@ -290,7 +299,7 @@
               >
                 <v-select
                   data-testid="schulstruktur-knoten-select"
-                  :items="organisationen"
+                  :items="schulstrukturknoten"
                   v-model="selectedSchulstrukturKnoten"
                   item-value="value"
                   item-text="title"
