@@ -51,9 +51,9 @@
   })
 
   type RolleCreationForm = {
-    selectedschulstrukturknoten: string,
-    selectedRollenArt: CreateRolleBodyParamsRollenartEnum,
-    selectedRollenName: string,
+    selectedschulstrukturknoten: string
+    selectedRollenArt: CreateRolleBodyParamsRollenartEnum
+    selectedRollenName: string
     selectedMerkmale: CreateRolleBodyParamsMerkmaleEnum[]
   }
 
@@ -82,18 +82,24 @@
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>
   ] = defineField('selectedMerkmale', vuetifyConfig)
 
-  const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = handleSubmit(async () => {
-    if (selectedRollenName.value && selectedSchulstrukturknoten.value && selectedRollenArt.value) {
-      const merkmaleToSubmit: CreateRolleBodyParamsMerkmaleEnum[] =
-        selectedMerkmale.value?.map((m: CreateRolleBodyParamsMerkmaleEnum) => m) || []
-      await rolleStore.createRolle(
-        selectedRollenName.value,
-        selectedSchulstrukturknoten.value,
-        selectedRollenArt.value,
-        merkmaleToSubmit
-      )
+  const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = handleSubmit(
+    async () => {
+      if (
+        selectedRollenName.value &&
+        selectedSchulstrukturknoten.value &&
+        selectedRollenArt.value
+      ) {
+        const merkmaleToSubmit: CreateRolleBodyParamsMerkmaleEnum[] =
+          selectedMerkmale.value?.map((m: CreateRolleBodyParamsMerkmaleEnum) => m) || []
+        await rolleStore.createRolle(
+          selectedRollenName.value,
+          selectedSchulstrukturknoten.value,
+          selectedRollenArt.value,
+          merkmaleToSubmit
+        )
+      }
     }
-  })
+  )
 
   const handleCreateAnotherRolle = (): void => {
     rolleStore.createdRolle = null

@@ -3,7 +3,7 @@
   "admin": {
     "headline": "Administrationsbereich",
     "mandatoryFieldsNotice": "Mit * markierte Felder sind Pflichtangaben.",
-    "followingDataCreated" : "Folgende Daten wurden gespeichert:",
+    "followingDataCreated": "Folgende Daten wurden gespeichert:",
     "class": {
       "management": "Klassenverwaltung"
     },
@@ -28,24 +28,24 @@
       "rollenname": "Rollenname",
       "merkmale": "Merkmale",
       "rolleAddedSuccessfully": "Die Rolle wurde erfolgreich hinzugefügt.",
-        "rule": {
-          "rolleNameLength": "Der Rollenname darf nicht länger als 200 Zeichen sein.",
-          "rolleNameRequired": "Der Rollenname ist erforderlich."
+      "rule": {
+        "rolleNameLength": "Der Rollenname darf nicht länger als 200 Zeichen sein.",
+        "rolleNameRequired": "Der Rollenname ist erforderlich."
+      },
+      "mappingFrontBackEnd": {
+        "rollenarten": {
+          "LERN": "Lern",
+          "LEHR": "Lehr",
+          "EXTERN": "Extern",
+          "ORGADMIN": "Orgadmin",
+          "LEIT": "Leit",
+          "SYSADMIN": "Sysadmin"
         },
-        "mappingFrontBackEnd": {
-          "rollenarten": {
-            "LERN": "Lern",
-            "LEHR": "Lehr",
-            "EXTERN": "Extern",
-            "ORGADMIN": "Orgadmin",
-            "LEIT": "Leit",
-            "SYSADMIN": "Sysadmin"
-          },
-          "merkmale": {
-            "BEFRISTUNG_PFLICHT": "Befristung ist Pflichtangabe",
-            "KOPERS_PFLICHT": "KoPers-Nr. ist Pflichtangabe"
-          }
+        "merkmale": {
+          "BEFRISTUNG_PFLICHT": "Befristung ist Pflichtangabe",
+          "KOPERS_PFLICHT": "KoPers-Nr. ist Pflichtangabe"
         }
+      }
     },
     "school": {
       "management": "Schulverwaltung"

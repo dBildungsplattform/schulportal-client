@@ -14,7 +14,7 @@ beforeEach(() => {
   wrapper = mount(InputRow, {
     attachTo: document.getElementById('app') || '',
     props: {
-      id: "test-input"
+      id: 'test-input'
     },
     global: {
       components: {

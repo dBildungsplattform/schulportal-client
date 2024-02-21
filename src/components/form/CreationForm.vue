@@ -32,7 +32,7 @@
         <label class="subtitle-2">{{ $t('admin.mandatoryFieldsNotice') }}</label>
       </v-row>
       <v-container class="px-lg-16">
-        <slot/>
+        <slot />
       </v-container>
     </v-container>
     <v-divider

@@ -12,22 +12,23 @@
     label: string
     modelValue: string | undefined
     placeholder: string
-    selectableItems?: Array<any>
+    selectableItems?: Array<unknown>
   }
 
-  const props = defineProps<Props>()
+  const props: Props = defineProps<Props>()
 
-  const emit = defineEmits(['update:modelValue'])
+  const emit: (event: 'update:modelValue', ...args: unknown[]) => void = defineEmits([
+    'update:modelValue'
+  ])
 
   const value: WritableComputedRef<string | undefined> = computed({
     get() {
       return props.modelValue
     },
-    set(newValue) {
+    set(newValue: string | undefined) {
       emit('update:modelValue', newValue)
     }
   })
-
 </script>
 
 <template>
