@@ -24,7 +24,7 @@
 </script>
 
 <template>
-  <v-container>
+  <v-container v-if="modelValue">
     <v-slide-y-transition>
       <v-alert
         :model-value="modelValue"

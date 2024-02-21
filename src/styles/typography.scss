@@ -1,5 +1,6 @@
 .headline-1,
 .headline-2,
+.headline-3,
 .subtitle-1,
 .subtitle-2 {
   font-weight: bold;
@@ -62,6 +63,14 @@
     }
   }
 
+  .headline-3 {
+    font-size: $smallHeadline3FontSize;
+
+    .v-list-item-title {
+      font-size: $smallHeadline3FontSize;
+    }
+  }
+
   .subtitle-1 {
     font-size: $smallSubtitle1FontSize;
 
@@ -115,6 +124,14 @@
 
     .v-list-item-title {
       font-size: $mediumHeadline2FontSize;
+    }
+  }
+
+  .headline-3 {
+    font-size: $mediumHeadline3FontSize;
+
+    .v-list-item-title {
+      font-size: $mediumHeadline3FontSize;
     }
   }
 
@@ -172,6 +189,14 @@
 
     .v-list-item-title {
       font-size: $bigHeadline2FontSize;
+    }
+  }
+
+  .headline-3 {
+    font-size: $bigHeadline3FontSize;
+
+    .v-list-item-title {
+      font-size: $bigHeadline3FontSize;
     }
   }
 

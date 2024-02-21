@@ -11,7 +11,7 @@
   <v-card class="layout-card pb-1">
     <v-row
       align="center"
-      class="ml-md-3 ml-1"
+      class="flex-nowrap ml-md-3 ml-1"
     >
       <v-col cols="auto">
         <h2 class="text-left headline-2">{{ header }}</h2>
