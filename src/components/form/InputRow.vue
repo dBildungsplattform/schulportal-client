@@ -17,7 +17,8 @@
 
   const props: Props = defineProps<Props>()
 
-  const emit: (event: 'update:modelValue', ...args: unknown[]) => void = defineEmits([
+  const emit: (event: 'onDirtyModelValue' | 'update:modelValue', ...args: unknown[]) => void = defineEmits([
+    'onDirtyModelValue',
     'update:modelValue'
   ])
 
@@ -27,6 +28,8 @@
     },
     set(newValue: string | undefined) {
       emit('update:modelValue', newValue)
+      /* if a value is set, we manually dirty the model to simplify dirty handling */
+      emit('onDirtyModelValue', !!newValue)
     }
   })
 </script>

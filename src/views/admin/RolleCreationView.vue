@@ -11,7 +11,13 @@
   } from '@/stores/RolleStore'
   import { useI18n, type Composer } from 'vue-i18n'
   import SpshAlert from '@/components/alert/SpshAlert.vue'
-  import { type Router, useRouter } from 'vue-router'
+  import {
+    onBeforeRouteLeave,
+    type Router,
+    useRouter,
+    type NavigationGuardNext,
+    type RouteLocationNormalized
+  } from 'vue-router'
   import { useDisplay } from 'vuetify'
   import { type BaseFieldProps, type TypedSchema, useForm } from 'vee-validate'
   import { object, string } from 'yup'
@@ -51,7 +57,7 @@
   })
 
   type RolleCreationForm = {
-    selectedschulstrukturknoten: string
+    selectedSchulstrukturknoten: string
     selectedRollenArt: CreateRolleBodyParamsRollenartEnum
     selectedRollenName: string
     selectedMerkmale: CreateRolleBodyParamsMerkmaleEnum[]
@@ -65,7 +71,7 @@
   const [selectedSchulstrukturknoten, selectedSchulstrukturknotenProps]: [
     Ref<string>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>
-  ] = defineField('selectedschulstrukturknoten', vuetifyConfig)
+  ] = defineField('selectedSchulstrukturknoten', vuetifyConfig)
 
   const [selectedRollenArt, selectedRollenArtProps]: [
     Ref<CreateRolleBodyParamsRollenartEnum | null>,
@@ -81,6 +87,22 @@
     Ref<CreateRolleBodyParamsMerkmaleEnum[] | null>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>
   ] = defineField('selectedMerkmale', vuetifyConfig)
+
+  const isFormDirty: Ref<boolean> = ref(false)
+
+  onBeforeRouteLeave(
+    (_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
+      if (isFormDirty.value) {
+        // this.warningDialog = {
+        //   isOpen: true,
+        //   onConfirm: next,
+        // };
+        alert('You have unsaved changes. Are you sure you want to leave?')
+      } else {
+        next()
+      }
+    }
+  )
 
   const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = handleSubmit(
     async () => {
@@ -108,6 +130,12 @@
     selectedRollenName.value = ''
     selectedMerkmale.value = null
     router.push({ name: 'create-rolle' })
+  }
+
+  function handleDirtyModels(value: boolean): void {
+    if (value) {
+      isFormDirty.value = value
+    }
   }
 
   function navigateBackToRolleForm(): void {
@@ -143,6 +171,14 @@
         value: enumValue,
         title: t(i18nPath)
       })
+    })
+
+    /* listen for browser changes and prevent them when form is dirty */
+    window.addEventListener('beforeunload', (event: BeforeUnloadEvent) => {
+      if (!isFormDirty.value) return
+      event.preventDefault()
+      /* Chrome requires returnValue to be set. */
+      event.returnValue = ''
     })
   })
 </script>
@@ -191,6 +227,7 @@
             :errorLabel="selectedSchulstrukturknotenProps['error']"
             :fieldProps="selectedSchulstrukturknotenProps"
             id="schulstruktur-knoten-select"
+            @onDirtyModelValue="handleDirtyModels"
             :isRequired="true"
             :isSelect="true"
             :label="$t('admin.rolle.schulstrukturknoten')"
@@ -207,6 +244,7 @@
             :errorLabel="selectedRollenArtProps['error']"
             :fieldProps="selectedRollenArtProps"
             id="rollenart-select"
+            @onDirtyModelValue="handleDirtyModels"
             :isRequired="true"
             :isSelect="true"
             :label="$t('admin.rolle.rollenart')"
@@ -224,6 +262,7 @@
               :errorLabel="selectedRollenNameProps['error']"
               :fieldProps="selectedRollenNameProps"
               id="rollenname-input"
+              @onDirtyModelValue="handleDirtyModels"
               :isRequired="true"
               :label="$t('admin.rolle.rollenname')"
               :placeholder="$t('admin.rolle.enterRollenname')"
@@ -238,6 +277,7 @@
               :errorLabel="selectedMerkmaleProps['error']"
               :fieldProps="selectedMerkmaleProps"
               id="merkmale-select"
+              @onDirtyModelValue="handleDirtyModels"
               :isSelect="true"
               :isMultiple="true"
               :label="$t('admin.rolle.merkmale')"
@@ -249,7 +289,7 @@
         </CreationForm>
       </template>
 
-      <!-- Result template on success after submit (Present value in createdRolle and no errorCode)  -->
+      <!-- Result template on success after submit  -->
       <template v-if="rolleStore.createdRolle && !rolleStore.errorCode">
         <v-container class="new-rolle-success">
           <v-row justify="center">
