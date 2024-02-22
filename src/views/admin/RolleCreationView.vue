@@ -65,7 +65,7 @@
 
   // eslint-disable-next-line @typescript-eslint/typedef
   const { defineField, handleSubmit, resetForm } = useForm<RolleCreationForm>({
-    validationSchema: validationSchema
+    validationSchema
   })
 
   const [selectedSchulstrukturknoten, selectedSchulstrukturknotenProps]: [

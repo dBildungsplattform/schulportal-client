@@ -17,10 +17,8 @@
 
   const props: Props = defineProps<Props>()
 
-  const emit: (event: 'onDirtyModelValue' | 'update:modelValue', ...args: unknown[]) => void = defineEmits([
-    'onDirtyModelValue',
-    'update:modelValue'
-  ])
+  const emit: (event: 'onDirtyModelValue' | 'update:modelValue', ...args: unknown[]) => void =
+    defineEmits(['onDirtyModelValue', 'update:modelValue'])
 
   const value: WritableComputedRef<string | undefined> = computed({
     get() {
