@@ -63,7 +63,8 @@
       "adminstrativeSchulträger": "Verwaltender Schulträger",
       "management": "Schulverwaltung",
       "schuleCreateErrorTitle": "Fehler beim Anlegen der Schule",
-      "schuleCreateErrorText": "Die Schule konnte nicht angelegt werden."
+      "schuleCreateErrorText": "Die Schule konnte nicht angelegt werden.",
+      "schuleAddedSuccessfully": "Die Schule wurde erfolgreich hinzugefügt."
     },
     "schoolBoard": {
       "management": "Schulträgerverwaltung"

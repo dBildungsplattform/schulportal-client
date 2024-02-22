@@ -1,17 +1,21 @@
 <script setup lang="ts">
   import LayoutCard from '@/components/cards/LayoutCard.vue'
-  import { ref, type Ref, onMounted, computed, type ComputedRef } from 'vue'
+  import { ref, type Ref, onMounted } from 'vue'
   import { useI18n, type Composer } from 'vue-i18n'
   import SpshAlert from '@/components/alert/SpshAlert.vue'
   import { type Router, useRouter } from 'vue-router'
   import { useDisplay } from 'vuetify'
-  import { useSchuleStore, type SchuleStore } from '@/stores/SchuleStore'
+  import {
+    useOrganisationStore,
+    type OrganisationStore,
+    CreateOrganisationBodyParamsTypEnum
+  } from '@/stores/OrganisationStore'
 
   const { smAndDown }: { smAndDown: Ref<boolean> } = useDisplay()
 
   const { t }: Composer = useI18n({ useScope: 'global' })
   const router: Router = useRouter()
-  const schuleStore: SchuleStore = useSchuleStore()
+  const organisationStore: OrganisationStore = useOrganisationStore()
 
   const selectedDienstellennummer: Ref<string | null> = ref(null)
   const selectedSchulname: Ref<string | null> = ref(null)
@@ -25,23 +29,26 @@
       selectedSchulname.value &&
       selectedAdministrativeSchulträger.value
     ) {
-      await rolleStore.createRolle(
-        selectedRollenName.value,
-        selectedSchulstrukturKnoten.value,
-        selectedRollenArt.value,
-        merkmaleToSubmit
+      await organisationStore.createOrganisation(
+        selectedDienstellennummer.value,
+        selectedSchulname.value,
+        ' ',
+        ' ',
+        CreateOrganisationBodyParamsTypEnum.Schule
       )
     }
   }
   const handleCreateAnotherRolle = (): void => {
-    router.push({ name: 'create-rolle' })
+    organisationStore.createdOrganisation = null
+    selectedDienstellennummer.value = null
+    selectedSchulname.value = null
+    selectedAdministrativeSchulträger.value = null
+    router.push({ name: 'create-schule' })
   }
 
   function navigateBackToRolleForm(): void {
-    rolleStore.errorCode = ''
+    organisationStore.errorCode = ''
   }
-
-  onMounted(() => {})
 </script>
 
 <template>
@@ -59,7 +66,7 @@
     >
       <!-- Error Message Display if error on submit -->
       <SpshAlert
-        :model-value="!!schuleStore.errorCode"
+        :model-value="!!organisationStore.errorCode"
         :title="t('admin.schule.schuleCreateErrorTitle')"
         :type="'error'"
         :closable="false"
@@ -70,14 +77,14 @@
         buttonClass="primary"
       />
       <!-- Result template on success after submit (Present value in createdSchule and no errorCode)  -->
-      <template v-if="schuleStore.createdSchule && !schuleStore.errorCode">
+      <template v-if="organisationStore.createdOrganisation && !organisationStore.errorCode">
         <v-container class="new-rolle-success">
           <v-row justify="center">
             <v-col
               class="subtitle-1"
               cols="auto"
             >
-              {{ $t('admin.rolle.rolleAddedSuccessfully') }}
+              {{ $t('admin.schule.schuleAddedSuccessfully') }}
             </v-col>
           </v-row>
           <v-row justify="center">
@@ -100,30 +107,20 @@
           </v-row>
           <v-row>
             <v-col class="text-body bold text-right">
-              {{ $t('admin.rolle.schulstrukurknoten') }}:
+              {{ $t('admin.schule.dienstellennummer') }}:
             </v-col>
-            <v-col class="text-body">
-              {{ schuleStore.createdRolle.administeredBySchulstrukturknoten }}</v-col
+            <v-col class="text-body"> {{ organisationStore.createdOrganisation.kennung }}</v-col>
+          </v-row>
+          <v-row>
+            <v-col class="text-body bold text-right"> {{ $t('admin.schule.schulname') }}: </v-col>
+            <v-col class="text-body"> {{ organisationStore.createdOrganisation.name }}</v-col>
+          </v-row>
+          <v-row>
+            <v-col class="text-body bold text-right">
+              {{ $t('admin.schule.adminstrativeSchulträger') }}:</v-col
             >
+            <v-col class="text-body">{{ administrativeSchulträger.join(',') }} </v-col>
           </v-row>
-          <v-row>
-            <v-col class="text-body bold text-right"> {{ $t('admin.rolle.rollenart') }}: </v-col>
-            <v-col class="text-body">
-              {{
-                $t(
-                  `admin.rolle.mappingFrontBackEnd.rollenarten.${schuleStore.createdRolle.rollenart}`
-                )
-              }}</v-col
-            >
-          </v-row>
-          <v-row>
-            <v-col class="text-body bold text-right"> {{ $t('admin.rolle.rollenname') }}:</v-col>
-            <v-col class="text-body">{{ schuleStore.createdRolle.name }} </v-col>
-          </v-row>
-          <v-row>
-            <v-col class="text-body bold text-right"> {{ $t('admin.rolle.merkmale') }}:</v-col>
-            <v-col class="text-body"> {{ translatedCreatedRolleMerkmale }}</v-col></v-row
-          >
           <v-divider
             class="border-opacity-100 rounded my-6"
             color="#E5EAEF"
@@ -158,7 +155,7 @@
         </v-container>
       </template>
       <!-- The form to create a new school (No created school yet and no errorCode) -->
-      <template v-if="!schuleStore.createdSchule && !schuleStore.errorCode">
+      <template v-if="!organisationStore.createdOrganisation && !organisationStore.errorCode">
         <v-container class="new-rolle">
           <v-form @submit.prevent="submitForm">
             <v-row>
