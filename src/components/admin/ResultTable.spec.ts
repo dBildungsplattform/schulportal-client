@@ -10,7 +10,6 @@ beforeEach(() => {
     <div>
       <div id="app"></div>
     </div>
- 
     `
   type ReadonlyHeaders = InstanceType<typeof VDataTableServer>['headers']
   const headers: ReadonlyHeaders = [{ title: 'title', key: 'key', align: 'start' }]

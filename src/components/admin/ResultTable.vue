@@ -9,15 +9,15 @@
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs'
   type ReadonlyHeaders = InstanceType<typeof VDataTableServer>['headers']
 
-  type GenericItem = Record<string, unknown>
+  type TableItem = Record<string, unknown>
 
   type Props = {
-    items: GenericItem[]
+    items: TableItem[]
     loading: boolean
     totalItems: number
     headers: ReadonlyHeaders
     header: string
-    itemValuePath: string,
+    itemValuePath: string
   }
   const props: Props = defineProps<Props>()
 
@@ -42,7 +42,7 @@
     <v-data-table-server
       class="result-table"
       @click:row="
-        ($event: PointerEvent, item: GenericItem[]) => $emit('onHandleRowClick', $event, item)
+        ($event: PointerEvent, item: TableItem[]) => $emit('onHandleRowClick', $event, item)
       "
       data-testid="result-table"
       density="compact"

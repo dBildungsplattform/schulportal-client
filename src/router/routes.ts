@@ -38,7 +38,7 @@ const routes: readonly RouteRecordRaw[] = [
     }
   },
   {
-    path: '/admin/rolle',
+    path: '/admin/rollen',
     name: 'rolle-management',
     component: () => import('../views/admin/RolleManagementView.vue'),
     meta: {

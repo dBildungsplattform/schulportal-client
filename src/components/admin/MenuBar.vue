@@ -132,7 +132,7 @@
       prepend-icon="mdi-format-list-bulleted"
       :title="$t('admin.rolle.showAll')"
       @click="closeMenuOnMobile"
-      to="/admin/rolle"
+      to="/admin/rollen"
     ></v-list-item>
     <v-list-item
       class="menu-bar-sub-item caption"

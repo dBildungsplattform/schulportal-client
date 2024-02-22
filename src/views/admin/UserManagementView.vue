@@ -19,7 +19,10 @@
 
   const router: Router = useRouter()
 
-  function handleRowClick(_$event: PointerEvent, { item }: { item: Personendatensatz }): void {
+  function navigateToPersonDetails(
+    _$event: PointerEvent,
+    { item }: { item: Personendatensatz }
+  ): void {
     router.push({ name: 'user-details', params: { id: item.person.id } })
   }
 
@@ -36,7 +39,7 @@
       :items="personStore.allPersons || []"
       :loading="personStore.loading"
       :headers="headers"
-      @onHandleRowClick="handleRowClick"
+      @onHandleRowClick="navigateToPersonDetails"
       @onUpdateTable="personStore.getAllPersons()"
       :totalItems="personStore.totalPersons"
       item-value-path="person.id"

@@ -72,7 +72,7 @@
   function navigateBackToRolleForm(): void {
     rolleStore.errorCode = ''
   }
-  function navigateToResultTable(): void {
+  function navigateToRolleManagement(): void {
     rolleStore.createdRolle = null
     selectedSchulstrukturKnoten.value = null
     selectedRollenArt.value = null
@@ -118,7 +118,7 @@
   <div class="admin">
     <LayoutCard
       :closable="true"
-      @onCloseClicked="navigateToResultTable"
+      @onCloseClicked="navigateToRolleManagement"
       :header="$t('admin.rolle.addNew')"
       :padded="true"
       :showCloseText="true"
@@ -204,7 +204,7 @@
                 class="secondary"
                 data-testid="back-to-list-button"
                 :block="smAndDown"
-                @click="navigateToResultTable"
+                @click="navigateToRolleManagement"
                 >{{ $t('nav.backToList') }}</v-btn
               >
             </v-col>
@@ -459,7 +459,7 @@
                     class="secondary"
                     data-testid="discard-rolle-button"
                     :block="smAndDown"
-                    @click="navigateToResultTable"
+                    @click="navigateToRolleManagement"
                     >{{ $t('admin.rolle.discard') }}</v-btn
                   >
                 </v-col>
