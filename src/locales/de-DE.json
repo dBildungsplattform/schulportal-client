@@ -47,8 +47,23 @@
           }
         }
     },
-    "school": {
-      "management": "Schulverwaltung"
+    "schule": {
+      "addNew": "Neue Schule hinzufügen",
+      "backToCreateSchule": "Zurück zur Schulnanlage",
+      "createNew": "Neue Schule anlegen",
+      "create": "Schule anlegen",
+      "createAnother": "Weitere Schule anlegen",
+      "discard": "Schule verwerfen",
+      "showAll": "Alle Schulen anzeigen",
+      "dienstellennummer": "Dienstellennummer",
+      "enterDienstellennummer": "Dienstellennummer eingeben",
+      "enterSchulname": "Schulname eingeben",
+      "schulname": "Schulname",
+      "assignAdminstrativeSchulträger": "Verwaltender Schulträger zuordnen",
+      "adminstrativeSchulträger": "Verwaltender Schulträger",
+      "management": "Schulverwaltung",
+      "schuleCreateErrorTitle": "Fehler beim Anlegen der Schule",
+      "schuleCreateErrorText": "Die Schule konnte nicht angelegt werden."
     },
     "schoolBoard": {
       "management": "Schulträgerverwaltung"

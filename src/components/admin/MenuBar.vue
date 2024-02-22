@@ -139,9 +139,21 @@
     <!-- Schulverwaltung -->
     <v-list-item
       class="menu-bar-main-item headline-2"
-      :title="$t('admin.school.management')"
+      :title="$t('admin.schule.management')"
     ></v-list-item>
-
+    <v-list-item
+      class="menu-bar-sub-item caption"
+      data-testid="schule-management-menu-item"
+      prepend-icon="mdi-format-list-bulleted"
+      :title="$t('admin.schule.showAll')"
+    ></v-list-item>
+    <v-list-item
+      class="menu-bar-sub-item caption"
+      data-testid="rolle-creation-menu-item"
+      prepend-icon="mdi-plus-circle-outline"
+      :title="$t('admin.schule.createNew')"
+      to="/admin/schule/new"
+    ></v-list-item>
     <!-- Schulträgerverwaltung -->
     <v-list-item
       class="menu-bar-main-item headline-2"
