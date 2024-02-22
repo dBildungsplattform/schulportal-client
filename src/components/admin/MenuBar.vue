@@ -145,7 +145,7 @@
     <!-- Schulverwaltung -->
     <v-list-item
       class="menu-bar-main-item headline-2"
-      :title="$t('admin.school.management')"
+      :title="$t('admin.schule.management')"
     ></v-list-item>
 
     <!-- Schulträgerverwaltung -->

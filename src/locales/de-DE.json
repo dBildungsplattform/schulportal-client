@@ -13,6 +13,8 @@
     },
     "rolle": {
       "addNew": "Neue Rolle hinzufügen",
+      "assignMerkmale": "Merkmale zuordnen",
+      "assignRollenart": "Rollenart zuordnen",
       "backToCreateRolle": "Zurück zur Rollenanlage",
       "create": "Rolle anlegen",
       "createAnother": "Weitere Rolle anlegen",
@@ -45,11 +47,9 @@
         "rolleNameLength": "Der Rollenname darf nicht länger als 200 Zeichen sein.",
         "rolleNameRequired": "Der Rollenname ist erforderlich."
       },
-      "selectSchulstrukturknoten": "Schulstrukturknoten auswählen",
       "selectRolle": "Rolle auswählen",
       "selectRollenart": "Rollenart auswählen",
       "selectMerkmale": "Merkmale auswählen",
-      "schulstrukturknoten": "Schulstrukturknoten",
       "showAll": "Alle Rollen anzeigen",
       "userDataLoadingErrorText": "Es konnten keine Benutzerdaten geladen werden."
     },
@@ -89,10 +89,14 @@
       "startPassword": "Einstiegs-Passwort",
       "status": "Status"
     },
-    "school": {
+    "schule": {
       "assign": "Schule zuordnen",
-      "management": "Schulverwaltung",
-      "noSchoolsFound": "Keine Schulen gefunden"
+      "management": "Schulverwaltung"
+    },
+    "schulstrukturknoten": {
+      "assignSchulstrukturknoten": "Schulstrukturknoten zuordnen",
+      "schulstrukturknoten": "Schulstrukturknoten",
+      "selectSchulstrukturknoten": "Schulstrukturknoten auswählen"
     },
     "schulTraeger": {
       "management": "Schulträgerverwaltung"

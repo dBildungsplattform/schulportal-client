@@ -162,7 +162,7 @@
           </v-row>
           <v-row>
             <v-col class="text-body bold text-right">
-              {{ $t('admin.rolle.schulstrukturknoten') }}:
+              {{ $t('admin.schulstrukturknoten.schulstrukturknoten') }}:
             </v-col>
             <v-col class="text-body">
               {{ rolleStore.createdRolle.administeredBySchulstrukturknoten }}</v-col
@@ -246,7 +246,7 @@
                 class="d-none d-md-flex"
               ></v-col>
               <v-col>
-                <h3 class="subtitle-2">1. {{ $t('admin.rolle.schulstrukturknoten') }}</h3>
+                <h3 class="subtitle-2">1. {{ $t('admin.schulstrukturknoten.assignSchulstrukturknoten') }}</h3>
               </v-col>
             </v-row>
             <v-row>
@@ -263,8 +263,9 @@
                 <label
                   class="text-body"
                   for="schulstrukturknoten-select"
+                  required="true"
                 >
-                  {{ $t('admin.rolle.schulstrukturknoten') + '*' }}
+                  {{ $t('admin.schulstrukturknoten.schulstrukturknoten') }}
                 </label></v-col
               >
               <v-col
@@ -280,7 +281,7 @@
                   variant="outlined"
                   density="compact"
                   single-line
-                  :placeholder="$t('admin.rolle.selectSchulstrukturknoten')"
+                  :placeholder="$t('admin.schulstrukturknoten.selectSchulstrukturknoten')"
                   clearable
                   required
                 >
@@ -301,7 +302,7 @@
                 class="d-none d-md-flex"
               ></v-col>
               <v-col>
-                <h3 class="subtitle-2">2. {{ $t('admin.rolle.rollenart') }}</h3>
+                <h3 class="subtitle-2">2. {{ $t('admin.rolle.assignRollenart') }}</h3>
               </v-col>
             </v-row>
             <v-row>
@@ -318,8 +319,9 @@
                 <label
                   class="text-body"
                   for="rollenart-select"
+                  required="true"
                 >
-                  {{ $t('admin.rolle.rollenart') + '*' }}
+                  {{ $t('admin.rolle.rollenart') }}
                 </label></v-col
               >
               <v-col
@@ -359,7 +361,7 @@
                   class="d-none d-md-flex"
                 ></v-col>
                 <v-col>
-                  <label class="subtitle-2">3. {{ $t('admin.rolle.rollenname') }}</label>
+                  <label class="subtitle-2">3. {{ $t('admin.rolle.enterRollenname') }}</label>
                 </v-col>
               </v-row>
               <v-row>
@@ -376,8 +378,9 @@
                   <label
                     class="text-body"
                     for="rollenname-input"
+                    required="true"
                   >
-                    {{ $t('admin.rolle.rollenname') + '*' }}
+                    {{ $t('admin.rolle.rollenname') }}
                   </label></v-col
                 >
                 <v-col
@@ -405,7 +408,7 @@
                   cols="2"
                 ></v-col>
                 <v-col>
-                  <label class="subtitle-2">4. {{ $t('admin.rolle.merkmale') }}</label>
+                  <label class="subtitle-2">4. {{ $t('admin.rolle.assignMerkmale') }}</label>
                 </v-col>
               </v-row>
               <v-row>
