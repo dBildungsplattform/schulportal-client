@@ -8,20 +8,20 @@
 </script>
 
 <template>
-  <v-card class="layout-card">
+  <v-card class="layout-card pb-1">
     <v-row
       align="center"
       class="ml-md-3 ml-1"
     >
       <v-col cols="auto">
-        <h2 class="text-left headline-2">{{ header }}</h2>
+        <h2 class="text-left headline-2" data-testid="layout-card-headline">{{ header }}</h2>
       </v-col>
       <v-spacer v-if="closable"></v-spacer>
       <v-col
         cols="2"
         cols-md="auto"
         v-if="closable"
-        class="text-right mr-6"
+        class="text-right mr-md-3 mr-8"
       >
         <v-btn
           append-icon="mdi-close"
