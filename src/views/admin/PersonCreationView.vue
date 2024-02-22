@@ -19,10 +19,13 @@
   const validationSchema: TypedSchema = toTypedSchema(
     object({
       selectedVorname: string()
-        .matches(/^[A-Za-z]*[A-Za-z][A-Za-z0-9- ]*$/, t('admin.person.rules.vorname.matches'))
+        .matches(/^[A-Za-z]*[A-Za-zÀ-ÖØ-öø-ÿ-' ]*$/, t('admin.person.rules.vorname.matches'))
         .min(2, t('admin.person.rules.vorname.min'))
         .required(t('admin.person.rules.vorname.required')),
-      selectedFamilienname: string().required(t('admin.person.rules.familienname.required'))
+      selectedFamilienname: string()
+        .matches(/^[A-Za-z]*[A-Za-zÀ-ÖØ-öø-ÿ-' ]*$/, t('admin.person.rules.familienname.matches'))
+        .min(2, t('admin.person.rules.nachname.min'))  
+        .required(t('admin.person.rules.familienname.required'))
     })
   )
 

@@ -77,11 +77,13 @@
       "resetPassword": "Passwort zurücksetzen",
       "rules": {
         "vorname": {
-          "matches": "Der Vorname muss mit einem Buchstaben beginnen",
-          "min": "Der Vorname muss mindestens 2 Zeichen beinhalten",
+          "matches": "Der Vorname darf keine ungültigen Zeichen beinhalten.",
+          "min": "Der Vorname muss aus mindestens 2 Zeichen bestehen.",
           "required": "Der Vorname muss angegeben werden."
         },
         "familienname": {
+          "matches": "Der Familienname darf keine ungültigen Zeichen beinhalten.",
+          "min": "Der Familienname muss aus mindestens 2 Zeichen bestehen.",
           "required": "Der Familienname muss angegeben werden."
         }
       },
