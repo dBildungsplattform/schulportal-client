@@ -18,6 +18,7 @@
     headers: ReadonlyHeaders
     header: string
     itemValuePath: string
+    enableRowClick: boolean,
   }
   const props: Props = defineProps<Props>()
 
@@ -35,15 +36,31 @@
 
     return t('pagination.pageText', { interval: interval, total: totalItems })
   })
+
+  type Emits = {
+    (event: 'onHandleRowClick', eventPayload: PointerEvent, item: TableItem): void
+    (event: 'onTableUpdate'): void;
+  }
+  const emit: Emits = defineEmits<{
+    (event: 'onHandleRowClick', eventPayload: PointerEvent, item: TableItem): void
+    (event: 'onTableUpdate'): void;
+  }>()
+
+
+  function handleRowClick(event: PointerEvent, item: TableItem): void {
+    // Conditionally emit the row click event
+    if (props.enableRowClick) {
+      emit('onHandleRowClick', event, item);
+    }
+    // If enableRowClick is false or not provided, do nothing
+  }
 </script>
 
 <template>
   <LayoutCard :header="header">
     <v-data-table-server
       class="result-table"
-      @click:row="
-        ($event: PointerEvent, item: TableItem[]) => $emit('onHandleRowClick', $event, item)
-      "
+      @click:row="handleRowClick"
       data-testid="result-table"
       density="compact"
       :headers="headers"

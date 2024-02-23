@@ -13,8 +13,8 @@
 
   type ReadonlyHeaders = InstanceType<typeof VDataTableServer>['headers']
   const headers: ReadonlyHeaders = [
-    { title: t('user.lastName'), key: 'person.name.familienname', align: 'start' },
-    { title: t('user.firstName'), key: 'person.name.vorname', align: 'start' }
+    { title: t('person.lastName'), key: 'person.name.familienname', align: 'start' },
+    { title: t('person.firstName'), key: 'person.name.vorname', align: 'start' }
   ]
 
   const router: Router = useRouter()
@@ -23,7 +23,7 @@
     _$event: PointerEvent,
     { item }: { item: Personendatensatz }
   ): void {
-    router.push({ name: 'user-details', params: { id: item.person.id } })
+    router.push({ name: 'person-details', params: { id: item.person.id } })
   }
 
   onMounted(async () => {
@@ -36,7 +36,7 @@
     <h1 class="text-center headline">{{ $t('admin.headline') }}</h1>
     <ResultTable
       data-testid="person-table"
-      :header="$t('admin.user.management')"
+      :header="$t('admin.person.management')"
       :items="personStore.allPersons || []"
       :loading="personStore.loading"
       :headers="headers"
@@ -44,6 +44,7 @@
       @onUpdateTable="personStore.getAllPersons()"
       :totalItems="personStore.totalPersons"
       item-value-path="person.id"
+      :enableRowClick="false"
     ></ResultTable>
   </div>
 </template>
