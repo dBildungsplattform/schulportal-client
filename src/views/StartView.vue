@@ -8,7 +8,12 @@
 
 <template>
   <div class="home">
-    <h2 class="text-h4">{{ $t('start.allServiceProviders') }}</h2>
+    <h2
+      class="text-h4"
+      data-testid="all-service-provider-title"
+    >
+      {{ $t('start.allServiceProviders') }}
+    </h2>
 
     <v-progress-circular
       v-if="serviceProviderStore.loading"

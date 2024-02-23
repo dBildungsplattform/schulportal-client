@@ -99,6 +99,7 @@
     <!-- Person menu -->
     <v-list-item
       class="menu-bar-main-item headline-2"
+      data-testid="person-management-title"
       :title="$t('admin.person.management')"
     ></v-list-item>
     <v-list-item
@@ -120,12 +121,14 @@
     <!-- Klassenverwaltung -->
     <v-list-item
       class="menu-bar-main-item headline-2"
+      data-testid="klasse-management-title"
       :title="$t('admin.class.management')"
     ></v-list-item>
 
     <!-- Rollenverwaltung -->
     <v-list-item
       class="menu-bar-main-item headline-2"
+      data-testid="rolle-management-title"
       :title="$t('admin.rolle.management')"
     ></v-list-item>
     <v-list-item
@@ -145,13 +148,15 @@
     <!-- Schulverwaltung -->
     <v-list-item
       class="menu-bar-main-item headline-2"
+      data-testid="schule-management-title"
       :title="$t('admin.schule.management')"
     ></v-list-item>
 
     <!-- Schulträgerverwaltung -->
     <v-list-item
       class="menu-bar-main-item headline-2"
-      :title="$t('admin.schulTraeger.management')"
+      data-testid="schultraeger-management-title"
+      :title="$t('admin.schultraeger.management')"
     ></v-list-item>
   </v-navigation-drawer>
 </template>
