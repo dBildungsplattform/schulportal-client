@@ -9,8 +9,15 @@
   import ResultTable from '@/components/admin/ResultTable.vue'
   import { type Composer, useI18n } from 'vue-i18n'
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs'
+  import {
+    OrganisationResponseTypEnum,
+    useOrganisationStore,
+    type Organisation,
+    type OrganisationStore
+  } from '@/stores/OrganisationStore'
 
   const rolleStore: RolleStore = useRolleStore()
+  const organisationStore: OrganisationStore = useOrganisationStore()
 
   const { t }: Composer = useI18n({ useScope: 'global' })
 
@@ -38,6 +45,25 @@
     }[]
   > = computed(() => {
     return rolleStore.allRollen.map((rolle: RolleResponse) => {
+      // Find the organization that matches the rolle.administeredBySchulstrukturknoten
+      const matchingOrganisation:
+        | {
+            id: string
+            kennung: string
+            name: string
+            namensergaenzung: string
+            kuerzel: string
+            typ: OrganisationResponseTypEnum
+          }
+        | undefined = organisationStore.allOrganisationen.find(
+        (organisation: Organisation) => organisation.id === rolle.administeredBySchulstrukturknoten
+      )
+
+      // If a matching organization is found, format the administeredBySchulstrukturknoten field accordingly
+      const administeredBySchulstrukturknoten: string = matchingOrganisation
+        ? `${matchingOrganisation.kennung} (${matchingOrganisation.name})`
+        : ''
+
       return {
         ...rolle,
         rollenart: t(`admin.rolle.mappingFrontBackEnd.rollenarten.${rolle.rollenart}`),
@@ -45,13 +71,15 @@
           .map((merkmal: RolleResponseMerkmaleEnum) =>
             t(`admin.rolle.mappingFrontBackEnd.merkmale.${merkmal}`)
           )
-          .join(', ')
+          .join(', '),
+        administeredBySchulstrukturknoten
       }
     })
   })
 
   onMounted(async () => {
     await rolleStore.getAllRollen()
+    await organisationStore.getAllOrganisationen()
   })
 </script>
 

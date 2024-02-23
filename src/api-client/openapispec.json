@@ -703,7 +703,14 @@
                 },
                 "responses": {
                     "201": {
-                        "description": "The organisation was successfully created."
+                        "description": "The organisation was successfully created.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OrganisationResponse"
+                                }
+                            }
+                        }
                     },
                     "400": {
                         "description": "The organisation already exists."
@@ -1913,6 +1920,43 @@
                     "typ"
                 ]
             },
+            "OrganisationResponse": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "kennung": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "namensergaenzung": {
+                        "type": "string"
+                    },
+                    "kuerzel": {
+                        "type": "string"
+                    },
+                    "typ": {
+                        "type": "string",
+                        "enum": [
+                            "SCHULE",
+                            "ANBIETER",
+                            "SONSTIGE ORGANISATION / EINRICHTUNG",
+                            "UNBESTAETIGT"
+                        ]
+                    }
+                },
+                "required": [
+                    "id",
+                    "kennung",
+                    "name",
+                    "namensergaenzung",
+                    "kuerzel",
+                    "typ"
+                ]
+            },
             "UpdateOrganisationBodyParams": {
                 "type": "object",
                 "properties": {
@@ -1956,43 +2000,6 @@
                     }
                 },
                 "required": [
-                    "kennung",
-                    "name",
-                    "namensergaenzung",
-                    "kuerzel",
-                    "typ"
-                ]
-            },
-            "OrganisationResponse": {
-                "type": "object",
-                "properties": {
-                    "id": {
-                        "type": "string"
-                    },
-                    "kennung": {
-                        "type": "string"
-                    },
-                    "name": {
-                        "type": "string"
-                    },
-                    "namensergaenzung": {
-                        "type": "string"
-                    },
-                    "kuerzel": {
-                        "type": "string"
-                    },
-                    "typ": {
-                        "type": "string",
-                        "enum": [
-                            "SCHULE",
-                            "ANBIETER",
-                            "SONSTIGE ORGANISATION / EINRICHTUNG",
-                            "UNBESTAETIGT"
-                        ]
-                    }
-                },
-                "required": [
-                    "id",
                     "kennung",
                     "name",
                     "namensergaenzung",

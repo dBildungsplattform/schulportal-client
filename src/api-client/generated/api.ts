@@ -389,6 +389,50 @@ export interface PersonBirthParams {
 /**
  * 
  * @export
+ * @interface PersonControllerFindPersonenkontexte200Response
+ */
+export interface PersonControllerFindPersonenkontexte200Response {
+    /**
+     * 
+     * @type {number}
+     * @memberof PersonControllerFindPersonenkontexte200Response
+     */
+    'total': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof PersonControllerFindPersonenkontexte200Response
+     */
+    'offset': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof PersonControllerFindPersonenkontexte200Response
+     */
+    'limit': number;
+    /**
+     * 
+     * @type {Array<PersonenkontextResponse>}
+     * @memberof PersonControllerFindPersonenkontexte200Response
+     */
+    'items': Array<PersonenkontextResponse>;
+}
+/**
+ * 
+ * @export
+ * @interface PersonControllerFindPersonenkontexte200ResponseAllOf
+ */
+export interface PersonControllerFindPersonenkontexte200ResponseAllOf {
+    /**
+     * 
+     * @type {Array<PersonenkontextResponse>}
+     * @memberof PersonControllerFindPersonenkontexte200ResponseAllOf
+     */
+    'items': Array<PersonenkontextResponse>;
+}
+/**
+ * 
+ * @export
  * @interface PersonFrontendControllerFindPersons200Response
  */
 export interface PersonFrontendControllerFindPersons200Response {
@@ -1766,7 +1810,7 @@ export const OrganisationenApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async organisationControllerCreateOrganisation(createOrganisationBodyParams: CreateOrganisationBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+        async organisationControllerCreateOrganisation(createOrganisationBodyParams: CreateOrganisationBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<OrganisationResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.organisationControllerCreateOrganisation(createOrganisationBodyParams, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -1776,7 +1820,7 @@ export const OrganisationenApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async organisationControllerFindOrganisationById(organisationId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+        async organisationControllerFindOrganisationById(organisationId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<OrganisationResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.organisationControllerFindOrganisationById(organisationId, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -1809,7 +1853,7 @@ export const OrganisationenApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async organisationControllerGetRootOrganisation(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+        async organisationControllerGetRootOrganisation(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<OrganisationResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.organisationControllerGetRootOrganisation(options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -1870,7 +1914,7 @@ export const OrganisationenApiFactory = function (configuration?: Configuration,
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        organisationControllerCreateOrganisation(createOrganisationBodyParams: CreateOrganisationBodyParams, options?: any): AxiosPromise<void> {
+        organisationControllerCreateOrganisation(createOrganisationBodyParams: CreateOrganisationBodyParams, options?: any): AxiosPromise<OrganisationResponse> {
             return localVarFp.organisationControllerCreateOrganisation(createOrganisationBodyParams, options).then((request) => request(axios, basePath));
         },
         /**
@@ -1879,7 +1923,7 @@ export const OrganisationenApiFactory = function (configuration?: Configuration,
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        organisationControllerFindOrganisationById(organisationId: string, options?: any): AxiosPromise<void> {
+        organisationControllerFindOrganisationById(organisationId: string, options?: any): AxiosPromise<OrganisationResponse> {
             return localVarFp.organisationControllerFindOrganisationById(organisationId, options).then((request) => request(axios, basePath));
         },
         /**
@@ -1909,7 +1953,7 @@ export const OrganisationenApiFactory = function (configuration?: Configuration,
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        organisationControllerGetRootOrganisation(options?: any): AxiosPromise<void> {
+        organisationControllerGetRootOrganisation(options?: any): AxiosPromise<OrganisationResponse> {
             return localVarFp.organisationControllerGetRootOrganisation(options).then((request) => request(axios, basePath));
         },
         /**
@@ -1967,7 +2011,7 @@ export interface OrganisationenApiInterface {
      * @throws {RequiredError}
      * @memberof OrganisationenApiInterface
      */
-    organisationControllerCreateOrganisation(createOrganisationBodyParams: CreateOrganisationBodyParams, options?: AxiosRequestConfig): AxiosPromise<void>;
+    organisationControllerCreateOrganisation(createOrganisationBodyParams: CreateOrganisationBodyParams, options?: AxiosRequestConfig): AxiosPromise<OrganisationResponse>;
 
     /**
      * 
@@ -1976,7 +2020,7 @@ export interface OrganisationenApiInterface {
      * @throws {RequiredError}
      * @memberof OrganisationenApiInterface
      */
-    organisationControllerFindOrganisationById(organisationId: string, options?: AxiosRequestConfig): AxiosPromise<void>;
+    organisationControllerFindOrganisationById(organisationId: string, options?: AxiosRequestConfig): AxiosPromise<OrganisationResponse>;
 
     /**
      * 
@@ -2006,7 +2050,7 @@ export interface OrganisationenApiInterface {
      * @throws {RequiredError}
      * @memberof OrganisationenApiInterface
      */
-    organisationControllerGetRootOrganisation(options?: AxiosRequestConfig): AxiosPromise<void>;
+    organisationControllerGetRootOrganisation(options?: AxiosRequestConfig): AxiosPromise<OrganisationResponse>;
 
     /**
      * 
@@ -2531,7 +2575,7 @@ export const PersonenApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async personControllerFindPersonenkontexte(personId: string, offset?: number, limit?: number, referrer?: string, rolle?: 'LERN' | 'LEHR' | 'EXTERN' | 'ORGADMIN' | 'LEIT' | 'SYSADMIN', personenstatus?: 'AKTIV', sichtfreigabe?: 'ja' | 'nein', options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+        async personControllerFindPersonenkontexte(personId: string, offset?: number, limit?: number, referrer?: string, rolle?: 'LERN' | 'LEHR' | 'EXTERN' | 'ORGADMIN' | 'LEIT' | 'SYSADMIN', personenstatus?: 'AKTIV', sichtfreigabe?: 'ja' | 'nein', options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonControllerFindPersonenkontexte200Response>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.personControllerFindPersonenkontexte(personId, offset, limit, referrer, rolle, personenstatus, sichtfreigabe, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -2621,7 +2665,7 @@ export const PersonenApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        personControllerFindPersonenkontexte(personId: string, offset?: number, limit?: number, referrer?: string, rolle?: 'LERN' | 'LEHR' | 'EXTERN' | 'ORGADMIN' | 'LEIT' | 'SYSADMIN', personenstatus?: 'AKTIV', sichtfreigabe?: 'ja' | 'nein', options?: any): AxiosPromise<void> {
+        personControllerFindPersonenkontexte(personId: string, offset?: number, limit?: number, referrer?: string, rolle?: 'LERN' | 'LEHR' | 'EXTERN' | 'ORGADMIN' | 'LEIT' | 'SYSADMIN', personenstatus?: 'AKTIV', sichtfreigabe?: 'ja' | 'nein', options?: any): AxiosPromise<PersonControllerFindPersonenkontexte200Response> {
             return localVarFp.personControllerFindPersonenkontexte(personId, offset, limit, referrer, rolle, personenstatus, sichtfreigabe, options).then((request) => request(axios, basePath));
         },
         /**
@@ -2707,7 +2751,7 @@ export interface PersonenApiInterface {
      * @throws {RequiredError}
      * @memberof PersonenApiInterface
      */
-    personControllerFindPersonenkontexte(personId: string, offset?: number, limit?: number, referrer?: string, rolle?: 'LERN' | 'LEHR' | 'EXTERN' | 'ORGADMIN' | 'LEIT' | 'SYSADMIN', personenstatus?: 'AKTIV', sichtfreigabe?: 'ja' | 'nein', options?: AxiosRequestConfig): AxiosPromise<void>;
+    personControllerFindPersonenkontexte(personId: string, offset?: number, limit?: number, referrer?: string, rolle?: 'LERN' | 'LEHR' | 'EXTERN' | 'ORGADMIN' | 'LEIT' | 'SYSADMIN', personenstatus?: 'AKTIV', sichtfreigabe?: 'ja' | 'nein', options?: AxiosRequestConfig): AxiosPromise<PersonControllerFindPersonenkontexte200Response>;
 
     /**
      * 
