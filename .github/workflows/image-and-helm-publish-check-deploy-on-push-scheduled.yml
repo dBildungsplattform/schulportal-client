@@ -3,6 +3,8 @@ name: "Dev Pipeline"
 
 # All triggers have to be in one file, so that the trivy results can be compared to identify introduced vulnerabilities
 # See DBP-340
+
+# comment for test deploy
 on:
   push:
   schedule:
