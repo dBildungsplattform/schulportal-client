@@ -24,7 +24,7 @@ beforeEach(() => {
       headers: headers,
       header: 'header',
       itemValuePath: 'id',
-      enableRowClick: false
+      disableRowClick: false
     },
     global: {
       components: {
