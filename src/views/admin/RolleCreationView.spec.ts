@@ -12,7 +12,6 @@ beforeEach(() => {
       <div id="app"></div>
     </div>
   `
-
   wrapper = mount(RolleCreationView, {
     attachTo: document.getElementById('app') || '',
     global: {
