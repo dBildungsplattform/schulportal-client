@@ -237,7 +237,7 @@
           <InputRow
             :errorLabel="selectedSchulstrukturknotenProps['error']"
             :fieldProps="selectedSchulstrukturknotenProps"
-            id="schulstruktur-knoten-select"
+            id="schulstrukturknoten-select"
             @onDirtyModelValue="handleDirtyModels"
             :isRequired="true"
             :isSelect="true"
