@@ -34,8 +34,8 @@ beforeEach(() => {
   })
 })
 
-describe('user table', () => {
-  test('it renders a user table', () => {
+describe('result table', () => {
+  test('it renders the result table', () => {
     expect(wrapper?.get('[data-testid="result-table"]')).not.toBeNull()
   })
 })
