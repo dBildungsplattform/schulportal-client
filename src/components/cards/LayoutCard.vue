@@ -14,7 +14,12 @@
       class="flex-nowrap ml-md-6 ml-1 my-1"
     >
       <v-col cols="auto">
-        <h2 class="text-left headline-2" data-testid="layout-card-headline">{{ header }}</h2>
+        <h2
+          class="text-left headline-2"
+          data-testid="layout-card-headline"
+        >
+          {{ header }}
+        </h2>
       </v-col>
       <v-spacer v-if="closable"></v-spacer>
       <v-col
@@ -25,7 +30,7 @@
         <v-btn
           class="hidden-sm-and-down"
           @click.stop="$emit('onCloseClicked')"
-          data-testid="close-layout-card"
+          data-testid="close-layout-card-button"
           :ripple="false"
           variant="text"
         >

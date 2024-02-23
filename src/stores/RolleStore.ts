@@ -1,5 +1,5 @@
 import { defineStore, type Store, type StoreDefinition } from 'pinia'
-import { isAxiosError } from 'axios'
+import { isAxiosError, type AxiosResponse } from 'axios'
 import {
   CreateRolleBodyParamsRollenartEnum,
   CreateRolleBodyParamsMerkmaleEnum,
@@ -8,7 +8,7 @@ import {
   RolleResponseMerkmaleEnum,
   type CreateRolleBodyParams,
   type RolleApiInterface,
-  type RolleResponse
+  type RolleResponse,
 } from '../api-client/generated/api'
 import axiosApiInstance from '@/services/ApiService'
 
@@ -16,12 +16,14 @@ const rolleApi: RolleApiInterface = RolleApiFactory(undefined, '', axiosApiInsta
 
 type RolleState = {
   createdRolle: RolleResponse | null
+  allRollen: Array<RolleResponse>
   errorCode: string
   loading: boolean
 }
 
 type RolleGetters = {}
 type RolleActions = {
+  getAllRollen: () => Promise<void>
   createRolle: (
     rollenName: string,
     schulStrukturKnoten: string,
@@ -34,6 +36,7 @@ export { CreateRolleBodyParamsRollenartEnum }
 export { CreateRolleBodyParamsMerkmaleEnum }
 export { RolleResponseMerkmaleEnum }
 export { RolleResponseRollenartEnum }
+export type { RolleResponse }
 
 export type RolleStore = Store<'rolleStore', RolleState, RolleGetters, RolleActions>
 
@@ -43,6 +46,7 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
     state: (): RolleState => {
       return {
         createdRolle: null,
+        allRollen: [],
         errorCode: '',
         loading: false
       }
@@ -76,6 +80,22 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
           }
           this.loading = false
           return Promise.reject(this.errorCode)
+        }
+      },
+
+      async getAllRollen() {
+        this.loading = true
+        try {
+          const { data }: AxiosResponse<Array<RolleResponse>> =
+            await rolleApi.rolleControllerFindRollen()
+          this.allRollen = data
+          this.loading = false
+        } catch (error: unknown) {
+          this.errorCode = 'UNSPECIFIED_ERROR'
+          if (isAxiosError(error)) {
+            this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR'
+          }
+          this.loading = false
         }
       }
     }

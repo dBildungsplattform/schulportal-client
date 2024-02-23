@@ -17,6 +17,7 @@ describe('rolleStore', () => {
 
   it('should initalize state correctly', () => {
     expect(rolleStore.createdRolle).toEqual(null)
+    expect(rolleStore.allRollen).toEqual([])
     expect(rolleStore.errorCode).toEqual('')
     expect(rolleStore.loading).toBeFalsy()
   })
@@ -75,6 +76,48 @@ describe('rolleStore', () => {
       await expect(createRollePromise).rejects.toEqual('some mock server error')
       expect(rolleStore.errorCode).toEqual('some mock server error')
       expect(rolleStore.createdRolle).toEqual(null)
+      expect(rolleStore.loading).toBe(false)
+    })
+  })
+  describe('getAllRollen', () => {
+    it('should load rollen and update state', async () => {
+      const mockResponse: RolleResponse[] = [
+        {
+          administeredBySchulstrukturknoten: '1234',
+          rollenart: 'LEHR',
+          name: 'Lehrer',
+          // TODO: remove type casting when generator is fixed
+          merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RolleResponseMerkmaleEnum>,
+          createdAt: '2022',
+          updatedAt: '2022',
+          id: '1'
+        }
+      ]
+
+      mockadapter.onGet('/api/rolle').replyOnce(200, mockResponse, {})
+      const getAllRollenPromise: Promise<void> = rolleStore.getAllRollen()
+      expect(rolleStore.loading).toBe(true)
+      await getAllRollenPromise
+      expect(rolleStore.allRollen).toEqual([...mockResponse])
+      expect(rolleStore.loading).toBe(false)
+    })
+
+    it('should handle string error', async () => {
+      mockadapter.onGet('/api/rolle').replyOnce(500, 'some mock server error')
+      const getAllRollenPromise: Promise<void> = rolleStore.getAllRollen()
+      expect(rolleStore.loading).toBe(true)
+      await getAllRollenPromise
+      expect(rolleStore.errorCode).toEqual('UNSPECIFIED_ERROR')
+      expect(rolleStore.allRollen).toEqual([])
+      expect(rolleStore.loading).toBe(false)
+    })
+    it('should handle error code', async () => {
+      mockadapter.onGet('/api/rolle').replyOnce(500, { code: 'some mock server error' })
+      const getAllRollenPromise: Promise<void> = rolleStore.getAllRollen()
+      expect(rolleStore.loading).toBe(true)
+      await getAllRollenPromise
+      expect(rolleStore.errorCode).toEqual('some mock server error')
+      expect(rolleStore.allRollen).toEqual([])
       expect(rolleStore.loading).toBe(false)
     })
   })

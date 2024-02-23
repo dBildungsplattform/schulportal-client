@@ -84,6 +84,14 @@
     rolleStore.errorCode = ''
     router.push({ name: 'create-rolle' })
   }
+  function navigateToRolleManagement(): void {
+    rolleStore.createdRolle = null
+    selectedSchulstrukturKnoten.value = null
+    selectedRollenArt.value = null
+    selectedRollenName.value = null
+    selectedMerkmale.value = null
+    router.push({ name: 'rolle-management' })
+  }
   const translatedCreatedRolleMerkmale: ComputedRef<string> = computed(() => {
     // Check if `createdRolle.merkmale` exists and is an array
     if (!rolleStore.createdRolle?.merkmale || !Array.isArray(rolleStore.createdRolle.merkmale)) {
@@ -135,13 +143,9 @@
 
 <template>
   <div class="admin">
-    <v-row>
-      <v-col cols="12">
-        <h1 class="text-center headline-1">{{ $t('admin.headline') }}</h1>
-      </v-col>
-    </v-row>
     <LayoutCard
       :closable="true"
+      @onCloseClicked="navigateToRolleManagement"
       :header="$t('admin.rolle.addNew')"
       :padded="true"
       :showCloseText="true"
@@ -229,6 +233,7 @@
                 class="secondary"
                 data-testid="back-to-list-button"
                 :block="smAndDown"
+                @click="navigateToRolleManagement"
                 >{{ $t('nav.backToList') }}</v-btn
               >
             </v-col>
@@ -505,6 +510,7 @@
                     class="secondary"
                     data-testid="discard-rolle-button"
                     :block="smAndDown"
+                    @click="navigateToRolleManagement"
                     >{{ $t('admin.rolle.discard') }}</v-btn
                   >
                 </v-col>
