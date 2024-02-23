@@ -11,18 +11,27 @@ const routes: readonly RouteRecordRaw[] = [
     }
   },
   {
-    path: '/admin/users',
-    name: 'user-management',
-    component: () => import('../views/admin/UserManagementView.vue'),
+    path: '/admin/personen',
+    name: 'person-management',
+    component: () => import('../views/admin/PersonManagementView.vue'),
     meta: {
       requiresAuth: true,
       layout: 'AdminLayout'
     }
   },
   {
-    path: '/admin/users/:id',
-    name: 'user-details',
-    component: () => import('../views/admin/UserDetailsView.vue'),
+    path: '/admin/personen/:id',
+    name: 'person-details',
+    component: () => import('../views/admin/PersonDetailsView.vue'),
+    meta: {
+      layout: 'AdminLayout',
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/admin/personen/new',
+    name: 'create-person',
+    component: () => import('../views/admin/PersonCreationView.vue'),
     meta: {
       layout: 'AdminLayout',
       requiresAuth: true

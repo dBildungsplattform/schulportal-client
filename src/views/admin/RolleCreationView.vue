@@ -221,7 +221,9 @@
         >
           <!-- Schulstrukturknoten -->
           <v-row>
-            <h3 class="headline-3">1. {{ $t('admin.rolle.schulstrukturknoten') }}</h3>
+            <h3 class="headline-3">
+              1. {{ $t('admin.schulstrukturknoten.assignSchulstrukturknoten') }}
+            </h3>
           </v-row>
           <InputRow
             :errorLabel="selectedSchulstrukturknotenProps['error']"
@@ -230,15 +232,15 @@
             @onDirtyModelValue="handleDirtyModels"
             :isRequired="true"
             :isSelect="true"
-            :label="$t('admin.rolle.schulstrukturknoten')"
-            :placeholder="$t('admin.rolle.selectSchulstrukturknoten')"
+            :label="$t('admin.schulstrukturknoten.schulstrukturknoten')"
+            :placeholder="$t('admin.schulstrukturknoten.selectSchulstrukturknoten')"
             :selectableItems="schulstrukturknoten"
             v-model="selectedSchulstrukturknoten"
           ></InputRow>
 
           <!-- Rollenart -->
           <v-row>
-            <h3 class="headline-3">2. {{ $t('admin.rolle.rollenart') }}</h3>
+            <h3 class="headline-3">2. {{ $t('admin.rolle.assignRollenart') }}</h3>
           </v-row>
           <InputRow
             :errorLabel="selectedRollenArtProps['error']"
@@ -256,7 +258,7 @@
           <template v-if="selectedRollenArt && selectedSchulstrukturknoten">
             <!-- Rollenname -->
             <v-row>
-              <h3 class="headline-3">3. {{ $t('admin.rolle.rollenname') }}</h3>
+              <h3 class="headline-3">3. {{ $t('admin.rolle.enterRollenname') }}</h3>
             </v-row>
             <InputRow
               :errorLabel="selectedRollenNameProps['error']"
@@ -271,7 +273,7 @@
 
             <!-- Merkmale -->
             <v-row>
-              <h3 class="headline-3">4. {{ $t('admin.rolle.merkmale') }}</h3>
+              <h3 class="headline-3">4. {{ $t('admin.rolle.assignMerkmale') }}</h3>
             </v-row>
             <InputRow
               :errorLabel="selectedMerkmaleProps['error']"
@@ -320,7 +322,7 @@
           </v-row>
           <v-row>
             <v-col class="text-body bold text-right">
-              {{ $t('admin.rolle.schulstrukturknoten') }}:
+              {{ $t('admin.schulstrukturknoten.schulstrukturknoten') }}:
             </v-col>
             <v-col class="text-body">
               {{ rolleStore.createdRolle.administeredBySchulstrukturknoten }}</v-col

@@ -144,7 +144,6 @@ describe('PersonStore', () => {
       const resetPasswordPromise: Promise<string> = personStore.resetPassword(userId)
       expect(personStore.loading).toBe(true)
       await rejects(resetPasswordPromise)
-      expect(personStore.allPersons).toEqual([])
       expect(personStore.errorCode).toEqual('UNSPECIFIED_ERROR')
       expect(personStore.loading).toBe(false)
     })
@@ -158,7 +157,63 @@ describe('PersonStore', () => {
       const resetPasswordPromise: Promise<string> = personStore.resetPassword(userId)
       expect(personStore.loading).toBe(true)
       await rejects(resetPasswordPromise)
-      expect(personStore.allPersons).toEqual([])
+      expect(personStore.errorCode).toEqual('some mock server error')
+      expect(personStore.loading).toBe(false)
+    })
+  })
+
+  describe('createPerson', () => {
+    it('should create a Person', async () => {
+      const mockPersonResponse: PersonendatensatzResponse = {
+        person: {
+          id: '9876',
+          name: {
+            familienname: 'Cena',
+            vorname: 'Randy'
+          },
+          referrer: 'rcena'
+        }
+      } as PersonendatensatzResponse
+
+      const mockResponse: PersonendatensatzResponse = mockPersonResponse
+
+      mockadapter.onPost('/api/personen').replyOnce(201, mockResponse)
+      const createPersonPromise: Promise<PersonendatensatzResponse> = personStore.createPerson({
+        name: {
+          familienname: 'Cena',
+          vorname: 'Randy'
+        }
+      })
+      expect(personStore.loading).toBe(true)
+      const createdPerson: PersonendatensatzResponse = await createPersonPromise
+      expect(createdPerson).toEqual(mockPersonResponse)
+      expect(personStore.loading).toBe(false)
+    })
+
+    it('should handle string error', async () => {
+      mockadapter.onPost('/api/personen').replyOnce(500, 'some error')
+      const createPersonPromise: Promise<PersonendatensatzResponse> = personStore.createPerson({
+        name: {
+          familienname: 'Copeland',
+          vorname: 'Christian'
+        }
+      })
+      expect(personStore.loading).toBe(true)
+      await rejects(createPersonPromise)
+      expect(personStore.errorCode).toEqual('UNSPECIFIED_ERROR')
+      expect(personStore.loading).toBe(false)
+    })
+
+    it('should handle error code', async () => {
+      mockadapter.onPost('/api/personen').replyOnce(500, { code: 'some mock server error' })
+      const createPersonPromise: Promise<PersonendatensatzResponse> = personStore.createPerson({
+        name: {
+          familienname: 'Copeland',
+          vorname: 'Christian'
+        }
+      })
+      expect(personStore.loading).toBe(true)
+      await rejects(createPersonPromise)
       expect(personStore.errorCode).toEqual('some mock server error')
       expect(personStore.loading).toBe(false)
     })

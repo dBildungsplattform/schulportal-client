@@ -23,12 +23,13 @@
   const router: Router = useRouter()
 
   const headers: ReadonlyHeaders = [
-    { title: t('user.lastName'), key: 'person.name.familienname', align: 'start' },
-    { title: t('user.firstName'), key: 'person.name.vorname', align: 'start' }
+    { title: t('person.lastName'), key: 'person.name.familienname', align: 'start' },
+    { title: t('person.firstName'), key: 'person.name.vorname', align: 'start' },
+    { title: t('person.userName'), key: 'person.referrer', align: 'start' }
   ]
 
   function handleRowClick(_$event: PointerEvent, { item }: { item: Personendatensatz }): void {
-    router.push({ name: 'user-details', params: { id: item.person.id } })
+    router.push({ name: 'person-details', params: { id: item.person.id } })
   }
 
   // TODO: these two values will come from the API in the future
@@ -46,7 +47,7 @@
 </script>
 
 <template>
-  <LayoutCard :header="$t('admin.user.management')">
+  <LayoutCard :header="$t('admin.person.management')">
     <v-data-table-server
       class="user-table"
       @click:row="handleRowClick"

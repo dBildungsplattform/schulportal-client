@@ -17,7 +17,6 @@ beforeEach(() => {
       modelValue: true,
       title: 'Alert title',
       text: 'This is the text of the alert',
-      showButton: false,
       buttonText: '',
       type: 'error',
       closable: true
