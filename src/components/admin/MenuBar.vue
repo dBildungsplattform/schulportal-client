@@ -139,11 +139,11 @@
     ></v-list-item>
     <v-list-item
       class="menu-bar-sub-item caption"
+      @click="closeMenuOnMobile"
       data-testid="rolle-creation-menu-item"
       prepend-icon="mdi-plus-circle-outline"
       :title="$t('admin.rolle.createNew')"
       to="/admin/rolle/new"
-      @click="closeMenuOnMobile"
     ></v-list-item>
     <!-- Schulverwaltung -->
     <v-list-item

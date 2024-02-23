@@ -35,17 +35,17 @@ describe('OrganisationStore', () => {
       ]
 
       mockadapter.onGet('/api/organisationen').replyOnce(200, mockResponse)
-      const getAllOrgaisationsPromise: Promise<void> = organisationStore.getAllOrganisationen()
-      await getAllOrgaisationsPromise
+      const getAllOrganisationenPromise: Promise<void> = organisationStore.getAllOrganisationen()
+      await getAllOrganisationenPromise
       expect(organisationStore.allOrganisationen).toEqual(mockResponse)
       expect(organisationStore.loading).toBeFalsy()
     })
 
     it('should handle string error', async () => {
       mockadapter.onGet('/api/organisationen').replyOnce(500, 'some mock server error')
-      const getAllOrgaisationsPromise: Promise<void> = organisationStore.getAllOrganisationen()
+      const getAllOrganisationenPromise: Promise<void> = organisationStore.getAllOrganisationen()
       expect(organisationStore.loading).toBe(true)
-      await getAllOrgaisationsPromise
+      await getAllOrganisationenPromise
       expect(organisationStore.allOrganisationen).toEqual([])
       expect(organisationStore.errorCode).toEqual('UNSPECIFIED_ERROR')
       expect(organisationStore.loading).toBe(false)
