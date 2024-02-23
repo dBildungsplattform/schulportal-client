@@ -1,19 +1,34 @@
 <script setup lang="ts">
-  import { type Ref } from 'vue'
+  import { computed, type Ref, type WritableComputedRef } from 'vue'
   import { useDisplay } from 'vuetify'
+  import LayoutCard from '../cards/LayoutCard.vue';
 
   type Props = {
+    confirmUnsavedChangesAction: () => void
     createButtonLabel: string
     discardButtonLabel: string
     id: string
     onDiscard: () => void
     onSubmit: () => void
     resetForm: () => void
+    showUnsavedChangesDialog?: boolean
   }
 
-  defineProps<Props>()
+  const props = defineProps<Props>()
+
+  const emit: (event: 'onShowDialogChange', ...args: unknown[]) => void =
+    defineEmits(['onShowDialogChange'])
 
   const { smAndDown }: { smAndDown: Ref<boolean> } = useDisplay()
+
+  const showDialogValue: WritableComputedRef<boolean | undefined> = computed({
+    get() {
+      return props.showUnsavedChangesDialog
+    },
+    set(newValue: boolean | undefined) {
+      emit('onShowDialogChange', newValue)
+    }
+  })
 </script>
 
 <template>
@@ -70,6 +85,57 @@
       </v-col>
     </v-row>
   </v-form>
+  
+  <!-- Warning dialog for unsaved changes -->
+  <v-dialog persistent v-model="showDialogValue">
+    <LayoutCard
+      :header="$t('unsavedChanges.title')"
+    >
+      <v-card-text>
+        <v-container>
+          <v-row class="text-body bold px-md-16">
+            <v-col>
+              <p data-testid="unsaved-changes-warning-text">
+                {{ $t('unsavedChanges.message') }}
+              </p>
+            </v-col>
+          </v-row>
+        </v-container>
+      </v-card-text>
+      <v-card-actions class="justify-center">
+        <v-row class="justify-center">
+          <v-col
+            cols="12"
+            sm="6"
+            md="4"
+          >
+            <v-btn
+              @click.stop="confirmUnsavedChangesAction"
+              class="secondary button"
+              data-testid="confirm-unsaved-changes-button"
+              :block="smAndDown"
+            >
+              {{ $t('yes') }}
+            </v-btn>
+          </v-col>
+          <v-col
+            cols="12"
+            sm="6"
+            md="4"
+          >
+            <v-btn
+              @click.stop="showDialogValue = false"
+              class="primary button"
+              data-testid="close-unsaved-changes-dialog-button"
+              :block="smAndDown"
+            >
+              {{ $t('no') }}
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-card-actions>
+    </LayoutCard>
+  </v-dialog>
 </template>
 
 <style></style>

@@ -20,7 +20,7 @@
   const emit: (event: 'onDirtyModelValue' | 'update:modelValue', ...args: unknown[]) => void =
     defineEmits(['onDirtyModelValue', 'update:modelValue'])
 
-  const value: WritableComputedRef<string | undefined> = computed({
+  const inputValue: WritableComputedRef<string | undefined> = computed({
     get() {
       return props.modelValue
     },
@@ -65,7 +65,7 @@
         :required="isRequired"
         variant="outlined"
         v-bind="fieldProps"
-        v-model="value"
+        v-model="inputValue"
       ></v-select>
 
       <v-text-field
@@ -78,7 +78,7 @@
         :required="isRequired"
         variant="outlined"
         v-bind="fieldProps"
-        v-model="value"
+        v-model="inputValue"
       ></v-text-field>
     </v-col>
   </v-row>

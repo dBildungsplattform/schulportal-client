@@ -93,15 +93,14 @@
   ] = defineField('selectedMerkmale', vuetifyConfig)
 
   const isFormDirty: Ref<boolean> = ref(false)
+  const showUnsavedChangesDialog: Ref<boolean> = ref(false)
+  let blockedNext: () => void = () => {}
 
   onBeforeRouteLeave(
     (_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
       if (isFormDirty.value) {
-        // this.warningDialog = {
-        //   isOpen: true,
-        //   onConfirm: next,
-        // };
-        alert('You have unsaved changes. Are you sure you want to leave?')
+        showUnsavedChangesDialog.value = true
+        blockedNext = next
       } else {
         next()
       }
@@ -142,9 +141,14 @@
     }
   }
 
+  function handleConfirmUnsavedChanges(): void {
+    blockedNext()
+  }
+
   function navigateBackToRolleForm(): void {
     rolleStore.errorCode = ''
   }
+
   const translatedCreatedRolleMerkmale: ComputedRef<string> = computed(() => {
     // Check if `createdRolle.merkmale` exists and is an array
     if (!rolleStore.createdRolle?.merkmale || !Array.isArray(rolleStore.createdRolle.merkmale)) {
@@ -216,12 +220,15 @@
       <!-- The form to create a new Rolle -->
       <template v-if="!rolleStore.createdRolle && !rolleStore.errorCode">
         <CreationForm
+          :confirmUnsavedChangesAction="handleConfirmUnsavedChanges"
           :createButtonLabel="$t('admin.rolle.create')"
           :discardButtonLabel="$t('admin.rolle.discard')"
           id="rolle-creation-form"
           :onDiscard="resetForm"
+          @onShowDialogChange="(value: boolean) => showUnsavedChangesDialog = value"
           :onSubmit="onSubmit"
           :resetForm="resetForm"
+          :showUnsavedChangesDialog="showUnsavedChangesDialog"
         >
           <!-- Schulstrukturknoten -->
           <v-row>

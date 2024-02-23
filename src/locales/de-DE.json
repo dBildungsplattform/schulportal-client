@@ -151,6 +151,7 @@
     "openMobileMenu": "Mobiles Menü öffnen",
     "help": "Hilfe"
   },
+  "no": "Nein",
   "pagination": {
     "all": "Alle",
     "pageText": "{interval} von {total} Einträgen"
@@ -163,5 +164,10 @@
     "lastName": "Nachname",
     "password": "Passwort",
     "userName": "Benutzername"
-  }
+  },
+  "unsavedChanges": {
+    "message": "Sie haben nicht gespeicherte Änderungen vorgenommen. Wollen Sie die Seite trotzdem verlassen?",
+    "title": "Änderungen vorgenommen"
+  },
+  "yes": "Ja"
 }
