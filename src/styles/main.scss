@@ -4,7 +4,10 @@
 @import './variables.scss';
 @import './typography.scss';
 @import './components/button.scss';
+@import './components/form.scss';
+@import './components/input.scss';
 @import './components/link.scss';
+@import './components/layout-card.scss';
 @import './components/menu-bar.scss';
 @import './components/user-table.scss';
 @import './components/dialog.scss';
@@ -31,17 +34,6 @@ body {
   font-weight: normal;
 }
 
-.layout-card {
-  .padded {
-    padding: 22px 100px 22px 50px;
-  }
-}
-
-.layout-card {
-  box-shadow: 0px 3px 6px #001e4980;
-  border-radius: 5px;
-}
-
 .v-field--variant-outlined .v-field__outline {
   --v-field-border-opacity: 1;
 }
@@ -50,4 +42,16 @@ p {
   white-space: pre;
   /* text-wrap needs to be placed after white-space to overwrite wrapping behaviour */
   text-wrap: pretty;
+}
+
+label.v-label {
+  opacity: 1;
+}
+
+.primary-text-color {
+  color: $primaryColor;
+}
+
+.no-kopers-checkbox label.v-label {
+  text-wrap: nowrap;
 }

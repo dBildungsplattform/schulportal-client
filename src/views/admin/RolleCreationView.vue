@@ -189,7 +189,7 @@
           </v-row>
           <v-row>
             <v-col class="text-body bold text-right">
-              {{ $t('admin.rolle.schulstrukurknoten') }}:
+              {{ $t('admin.schulstrukturknoten.schulstrukturknoten') }}:
             </v-col>
             <v-col class="text-body">
               {{
@@ -275,7 +275,9 @@
                 class="d-none d-md-flex"
               ></v-col>
               <v-col>
-                <h3 class="subtitle-2">1. {{ $t('admin.rolle.selectSchulstrukturKnoten') }}</h3>
+                <h3 class="subtitle-2">
+                  1. {{ $t('admin.schulstrukturknoten.assignSchulstrukturknoten') }}
+                </h3>
               </v-col>
             </v-row>
             <v-row>
@@ -289,8 +291,12 @@
                 md="3"
                 class="md-text-right py-0"
               >
-                <label class="text-body">
-                  {{ $t('admin.rolle.selectSchulstrukturKnoten') + '*' }}
+                <label
+                  class="text-body"
+                  for="schulstrukturknoten-select"
+                  required="true"
+                >
+                  {{ $t('admin.schulstrukturknoten.schulstrukturknoten') }}
                 </label></v-col
               >
               <v-col
@@ -299,7 +305,8 @@
                 class="py-0"
               >
                 <v-select
-                  data-testid="schulstruktur-knoten-select"
+                  data-testid="schulstrukturknoten-select"
+                  id="schulstrukturknoten-select"
                   :items="schulstrukturknoten"
                   v-model="selectedSchulstrukturKnoten"
                   item-value="value"
@@ -307,8 +314,7 @@
                   variant="outlined"
                   density="compact"
                   single-line
-                  :placeholder="$t('admin.rolle.selectSchulstrukturKnoten')"
-                  :bg-color="selectedSchulstrukturKnoten ? '#4dc7bc' : ''"
+                  :placeholder="$t('admin.schulstrukturknoten.selectSchulstrukturknoten')"
                   clearable
                   required
                 >
@@ -329,7 +335,7 @@
                 class="d-none d-md-flex"
               ></v-col>
               <v-col>
-                <h3 class="subtitle-2">2. {{ $t('admin.rolle.selectRollenart') }}</h3>
+                <h3 class="subtitle-2">2. {{ $t('admin.rolle.assignRollenart') }}</h3>
               </v-col>
             </v-row>
             <v-row>
@@ -343,8 +349,12 @@
                 md="3"
                 class="md-text-right py-0"
               >
-                <label class="text-body">
-                  {{ $t('admin.rolle.selectRollenart') + '*' }}
+                <label
+                  class="text-body"
+                  for="rollenart-select"
+                  required="true"
+                >
+                  {{ $t('admin.rolle.rollenart') }}
                 </label></v-col
               >
               <v-col
@@ -354,6 +364,7 @@
               >
                 <v-select
                   data-testid="rollenart-select"
+                  id="rollenart-select"
                   :items="translatedRollenart"
                   v-model="selectedRollenArt"
                   item-value="value"
@@ -361,7 +372,6 @@
                   :placeholder="$t('admin.rolle.selectRollenart')"
                   variant="outlined"
                   density="compact"
-                  :bg-color="selectedRollenArt ? '#4dc7bc' : ''"
                   clearable
                   required
                 >
@@ -398,8 +408,12 @@
                   md="3"
                   class="md-text-right py-0"
                 >
-                  <label class="text-body">
-                    {{ $t('admin.rolle.enterRollenname') + '*' }}
+                  <label
+                    class="text-body"
+                    for="rollenname-input"
+                    required="true"
+                  >
+                    {{ $t('admin.rolle.rollenname') }}
                   </label></v-col
                 >
                 <v-col
@@ -408,7 +422,9 @@
                   class="py-0"
                 >
                   <v-text-field
-                    data-testid="rollen-name-input"
+                    clearable
+                    data-testid="rollenname-input"
+                    id="rollenname-input"
                     v-model="selectedRollenName"
                     :placeholder="$t('admin.rolle.enterRollenname')"
                     variant="outlined"
@@ -425,7 +441,7 @@
                   cols="2"
                 ></v-col>
                 <v-col>
-                  <label class="subtitle-2">4. {{ $t('admin.rolle.selectMerkmale') }}</label>
+                  <label class="subtitle-2">4. {{ $t('admin.rolle.assignMerkmale') }}</label>
                 </v-col>
               </v-row>
               <v-row>
@@ -439,9 +455,12 @@
                   md="3"
                   class="md-text-right py-0"
                 >
-                  <h3 class="text-body">
-                    {{ $t('admin.rolle.selectMerkmale') }}
-                  </h3></v-col
+                  <label
+                    class="text-body"
+                    for="merkmale-select"
+                  >
+                    {{ $t('admin.rolle.merkmale') }}
+                  </label></v-col
                 >
                 <v-col
                   cols="12"
@@ -450,6 +469,7 @@
                 >
                   <v-select
                     data-testid="merkmale-select"
+                    id="merkmale-select"
                     :items="translatedMerkmale"
                     v-model="selectedMerkmale"
                     item-value="value"
@@ -458,7 +478,6 @@
                     variant="outlined"
                     density="compact"
                     multiple
-                    :bg-color="selectedMerkmale && selectedMerkmale.length > 0 ? '#4dc7bc' : ''"
                     clearable
                   >
                     <template v-slot:item="{ props, item }">
@@ -466,8 +485,9 @@
                         v-bind="props"
                         :title="item.title"
                         class="select-item-text"
-                      ></v-list-item> </template
-                  ></v-select>
+                      ></v-list-item>
+                    </template>
+                  </v-select>
                 </v-col>
               </v-row>
               <v-divider

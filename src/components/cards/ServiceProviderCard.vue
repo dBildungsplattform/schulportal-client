@@ -11,7 +11,7 @@
 
 <template>
   <v-card
-    :data-testid="testId || 'provider-card'"
+    :data-testid="testId || 'service-provider-card'"
     :href="href ? href : ''"
     :rel="newTab ? 'noreferrer' : ''"
     :target="newTab ? '_blank' : '_self'"

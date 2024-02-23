@@ -11,7 +11,7 @@
   <v-card class="layout-card pb-1">
     <v-row
       align="center"
-      class="ml-md-3 ml-1"
+      class="flex-nowrap ml-md-6 ml-1 my-1"
     >
       <v-col cols="auto">
         <h2 class="text-left headline-2" data-testid="layout-card-headline">{{ header }}</h2>
@@ -19,22 +19,37 @@
       <v-spacer v-if="closable"></v-spacer>
       <v-col
         cols="2"
-        cols-md="auto"
         v-if="closable"
         class="text-right mr-md-3 mr-8"
       >
         <v-btn
-          append-icon="mdi-close"
+          class="hidden-sm-and-down"
           @click.stop="$emit('onCloseClicked')"
+          data-testid="close-layout-card"
           :ripple="false"
           variant="text"
         >
-          <span
-            v-if="showCloseText"
-            class="hidden-sm-and-down"
-          >
+          <span v-if="showCloseText">
             {{ $t('close') }}
           </span>
+          <template #append>
+            <v-icon
+              icon="mdi-close"
+              size="x-large"
+            ></v-icon>
+          </template>
+        </v-btn>
+        <v-btn
+          class="hidden-md-and-up"
+          density="compact"
+          icon
+          variant="text"
+        >
+          <v-icon
+            @click.stop="$emit('onCloseClicked')"
+            icon="mdi-close"
+            size="x-large"
+          ></v-icon>
         </v-btn>
       </v-col>
     </v-row>
