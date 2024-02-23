@@ -483,6 +483,30 @@
                             "X-Paging-Total": {
                                 "description": "The total amount of items in the list."
                             }
+                        },
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/RawPagedResponse"
+                                        },
+                                        {
+                                            "required": [
+                                                "items"
+                                            ],
+                                            "properties": {
+                                                "items": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/PersonenkontextResponse"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
                         }
                     },
                     "401": {
@@ -881,7 +905,14 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "The organization was successfully pulled."
+                        "description": "The organization was successfully pulled.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OrganisationResponse"
+                                }
+                            }
+                        }
                     },
                     "400": {
                         "description": "Organization ID is required"
@@ -915,7 +946,14 @@
                 "parameters": [],
                 "responses": {
                     "200": {
-                        "description": "The organization was successfully pulled."
+                        "description": "The organization was successfully pulled.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OrganisationResponse"
+                                }
+                            }
+                        }
                     },
                     "401": {
                         "description": "Not authorized to get the organization."
@@ -1751,6 +1789,32 @@
                     "rolle"
                 ]
             },
+            "RawPagedResponse": {
+                "type": "object",
+                "properties": {
+                    "total": {
+                        "type": "number"
+                    },
+                    "offset": {
+                        "type": "number"
+                    },
+                    "limit": {
+                        "type": "number"
+                    },
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "required": [
+                    "total",
+                    "offset",
+                    "limit",
+                    "items"
+                ]
+            },
             "UpdatePersonBodyParams": {
                 "type": "object",
                 "properties": {
@@ -1797,32 +1861,6 @@
                 "required": [
                     "name",
                     "revision"
-                ]
-            },
-            "RawPagedResponse": {
-                "type": "object",
-                "properties": {
-                    "total": {
-                        "type": "number"
-                    },
-                    "offset": {
-                        "type": "number"
-                    },
-                    "limit": {
-                        "type": "number"
-                    },
-                    "items": {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        }
-                    }
-                },
-                "required": [
-                    "total",
-                    "offset",
-                    "limit",
-                    "items"
                 ]
             },
             "CreateOrganisationBodyParams": {

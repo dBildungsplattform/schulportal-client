@@ -1,6 +1,4 @@
-import type {
-  UserinfoResponse
-} from '@/api-client/generated'
+import type { UserinfoResponse } from '@/api-client/generated'
 import { useAuthStore, type AuthStore } from './AuthStore'
 import ApiService from '@/services/ApiService'
 import MockAdapter from 'axios-mock-adapter'

@@ -35,6 +35,7 @@
   <div class="admin">
     <h1 class="text-center headline">{{ $t('admin.headline') }}</h1>
     <ResultTable
+      data-testid="person-table"
       :header="$t('admin.user.management')"
       :items="personStore.allPersons || []"
       :loading="personStore.loading"

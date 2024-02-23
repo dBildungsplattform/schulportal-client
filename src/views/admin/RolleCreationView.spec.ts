@@ -43,7 +43,7 @@ beforeEach(async () => {
 
 describe('RolleCreationView', () => {
   test('it renders the role form', () => {
-    expect(wrapper?.find('[data-testid="schulstruktur-knoten-select"]').isVisible()).toBe(true)
+    expect(wrapper?.find('[data-testid="schulstrukturknoten-select"]').isVisible()).toBe(true)
   })
 
   test('it navigates back to role table', async () => {
