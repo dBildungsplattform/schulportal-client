@@ -41,13 +41,11 @@
 
   const validationSchema: TypedSchema = toTypedSchema(
     object({
-      selectedRollenArt: string()
-        .required(t('admin.rolle.rules.rollenart.required')),
+      selectedRollenArt: string().required(t('admin.rolle.rules.rollenart.required')),
       selectedRollenName: string()
         .max(200, t('admin.rolle.rules.rollenname.length'))
         .required(t('admin.rolle.rules.rollenname.required')),
-      selectedSchulstrukturknoten: string()
-        .required(t('admin.schulstrukturknoten.rules.required'))
+      selectedSchulstrukturknoten: string().required(t('admin.schulstrukturknoten.rules.required'))
     })
   )
 
@@ -225,7 +223,7 @@
           :discardButtonLabel="$t('admin.rolle.discard')"
           id="rolle-creation-form"
           :onDiscard="resetForm"
-          @onShowDialogChange="(value: boolean) => showUnsavedChangesDialog = value"
+          @onShowDialogChange="(value: boolean) => (showUnsavedChangesDialog = value)"
           :onSubmit="onSubmit"
           :resetForm="resetForm"
           :showUnsavedChangesDialog="showUnsavedChangesDialog"

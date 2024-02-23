@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import { computed, type Ref, type WritableComputedRef } from 'vue'
   import { useDisplay } from 'vuetify'
-  import LayoutCard from '../cards/LayoutCard.vue';
+  import LayoutCard from '../cards/LayoutCard.vue'
 
   type Props = {
     confirmUnsavedChangesAction: () => void
@@ -14,10 +14,11 @@
     showUnsavedChangesDialog?: boolean
   }
 
-  const props = defineProps<Props>()
+  const props: Props = defineProps<Props>()
 
-  const emit: (event: 'onShowDialogChange', ...args: unknown[]) => void =
-    defineEmits(['onShowDialogChange'])
+  const emit: (event: 'onShowDialogChange', ...args: unknown[]) => void = defineEmits([
+    'onShowDialogChange'
+  ])
 
   const { smAndDown }: { smAndDown: Ref<boolean> } = useDisplay()
 
@@ -85,12 +86,13 @@
       </v-col>
     </v-row>
   </v-form>
-  
+
   <!-- Warning dialog for unsaved changes -->
-  <v-dialog persistent v-model="showDialogValue">
-    <LayoutCard
-      :header="$t('unsavedChanges.title')"
-    >
+  <v-dialog
+    persistent
+    v-model="showDialogValue"
+  >
+    <LayoutCard :header="$t('unsavedChanges.title')">
       <v-card-text>
         <v-container>
           <v-row class="text-body bold px-md-16">

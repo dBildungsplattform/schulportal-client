@@ -15,6 +15,7 @@ beforeEach(() => {
     attachTo: document.getElementById('app') || '',
     props: {
       id: 'test-creation-form',
+      confirmUnsavedChangesAction: () => vi.fn(),
       createButtonLabel: 'what a label',
       discardButtonLabel: 'another label',
       onDiscard: () => vi.fn(),
