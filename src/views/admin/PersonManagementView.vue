@@ -44,7 +44,7 @@
       @onUpdateTable="personStore.getAllPersons()"
       :totalItems="personStore.totalPersons"
       item-value-path="person.id"
-      :enableRowClick="false"
+      :enableRowClick="true"
     ></ResultTable>
   </div>
 </template>

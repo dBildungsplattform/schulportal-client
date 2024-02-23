@@ -95,6 +95,7 @@
       @onUpdateTable="rolleStore.getAllRollen()"
       :totalItems="rolleStore.allRollen.length"
       item-value-path="id"
+      :enableRowClick="false"
     ></ResultTable>
   </div>
 </template>
