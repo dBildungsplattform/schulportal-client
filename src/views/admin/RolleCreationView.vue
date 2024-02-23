@@ -41,9 +41,13 @@
 
   const validationSchema: TypedSchema = toTypedSchema(
     object({
+      selectedRollenArt: string()
+        .required(t('admin.rolle.rules.rollenart.required')),
       selectedRollenName: string()
-        .max(200, t('admin.rolle.rule.rolleNameLength'))
-        .required(t('admin.rolle.rule.rolleNameRequired'))
+        .max(200, t('admin.rolle.rules.rollenname.length'))
+        .required(t('admin.rolle.rules.rollenname.required')),
+      selectedSchulstrukturknoten: string()
+        .required(t('admin.schulstrukturknoten.rules.required'))
     })
   )
 

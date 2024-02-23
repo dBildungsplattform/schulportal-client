@@ -44,9 +44,14 @@
       "rollenart": "Rollenart",
       "rollenname": "Rollenname",
       "rolleAddedSuccessfully": "Die Rolle wurde erfolgreich hinzugefügt.",
-      "rule": {
-        "rolleNameLength": "Der Rollenname darf nicht länger als 200 Zeichen sein.",
-        "rolleNameRequired": "Der Rollenname ist erforderlich."
+      "rules": {
+        "rollenart": {
+          "required": "Die Rollenart muss ausgewählt werden."
+        },
+        "rollenname": {
+          "length": "Der Rollenname darf nicht länger als 200 Zeichen sein.",
+          "required": "Der Rollenname muss ausgewählt werden."
+        }
       },
       "selectMerkmale": "Merkmale auswählen",
       "selectRolle": "Rolle auswählen",
@@ -97,6 +102,9 @@
     },
     "schulstrukturknoten": {
       "assignSchulstrukturknoten": "Schulstrukturknoten zuordnen",
+      "rules": {
+        "required": "Der Schulstrukturknoten muss ausgewählt werden."
+      },
       "schulstrukturknoten": "Schulstrukturknoten",
       "selectSchulstrukturknoten": "Schulstrukturknoten auswählen"
     },
