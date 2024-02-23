@@ -10,7 +10,6 @@
   import { type Composer, useI18n } from 'vue-i18n'
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs'
   import {
-    OrganisationResponseTypEnum,
     useOrganisationStore,
     type Organisation,
     type OrganisationStore
@@ -88,7 +87,7 @@
       @onUpdateTable="rolleStore.getAllRollen()"
       :totalItems="rolleStore.allRollen.length"
       item-value-path="id"
-      :enableRowClick="false"
+      :disableRowClick="true"
     ></ResultTable>
   </div>
 </template>

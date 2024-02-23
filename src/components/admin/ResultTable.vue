@@ -18,7 +18,7 @@
     headers: ReadonlyHeaders
     header: string
     itemValuePath: string
-    enableRowClick: boolean,
+    disableRowClick?: boolean
   }
   const props: Props = defineProps<Props>()
 
@@ -39,20 +39,17 @@
 
   type Emits = {
     (event: 'onHandleRowClick', eventPayload: PointerEvent, item: TableItem): void
-    (event: 'onTableUpdate'): void;
+    (event: 'onTableUpdate'): void
   }
   const emit: Emits = defineEmits<{
     (event: 'onHandleRowClick', eventPayload: PointerEvent, item: TableItem): void
-    (event: 'onTableUpdate'): void;
+    (event: 'onTableUpdate'): void
   }>()
 
-
   function handleRowClick(event: PointerEvent, item: TableItem): void {
-    // Conditionally emit the row click event
-    if (props.enableRowClick) {
-      emit('onHandleRowClick', event, item);
+    if (!props.disableRowClick) {
+      emit('onHandleRowClick', event, item)
     }
-    // If enableRowClick is false or not provided, do nothing
   }
 </script>
 
