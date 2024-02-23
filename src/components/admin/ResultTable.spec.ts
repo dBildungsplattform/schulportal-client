@@ -23,7 +23,8 @@ beforeEach(() => {
       totalItems: 25,
       headers: headers,
       header: 'header',
-      itemValuePath: 'id'
+      itemValuePath: 'id',
+      enableRowClick: true
     },
     global: {
       components: {
