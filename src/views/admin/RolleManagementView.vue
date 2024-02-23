@@ -46,18 +46,11 @@
   > = computed(() => {
     return rolleStore.allRollen.map((rolle: RolleResponse) => {
       // Find the organization that matches the rolle.administeredBySchulstrukturknoten
-      const matchingOrganisation:
-        | {
-            id: string
-            kennung: string
-            name: string
-            namensergaenzung: string
-            kuerzel: string
-            typ: OrganisationResponseTypEnum
-          }
-        | undefined = organisationStore.allOrganisationen.find(
-        (organisation: Organisation) => organisation.id === rolle.administeredBySchulstrukturknoten
-      )
+      const matchingOrganisation: Organisation | undefined =
+        organisationStore.allOrganisationen.find(
+          (organisation: Organisation) =>
+            organisation.id === rolle.administeredBySchulstrukturknoten
+        )
 
       // If a matching organization is found, format the administeredBySchulstrukturknoten field accordingly
       const administeredBySchulstrukturknoten: string = matchingOrganisation
