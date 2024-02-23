@@ -251,7 +251,9 @@
                 class="d-none d-md-flex"
               ></v-col>
               <v-col>
-                <h3 class="subtitle-2">1. {{ $t('admin.schulstrukturknoten.assignSchulstrukturknoten') }}</h3>
+                <h3 class="subtitle-2">
+                  1. {{ $t('admin.schulstrukturknoten.assignSchulstrukturknoten') }}
+                </h3>
               </v-col>
             </v-row>
             <v-row>
