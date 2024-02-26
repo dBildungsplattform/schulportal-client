@@ -1,14 +1,8 @@
-import { expect, test, type MockInstance } from 'vitest'
+import { expect, test } from 'vitest'
 import { VueWrapper, mount } from '@vue/test-utils'
 import SchuleCreationView from './SchuleCreationView.vue'
 import { setActivePinia, createPinia } from 'pinia'
-import {
-  createRouter,
-  createWebHistory,
-  type NavigationFailure,
-  type RouteLocationRaw,
-  type Router
-} from 'vue-router'
+import { createRouter, createWebHistory, type Router } from 'vue-router'
 import routes from '@/router/routes'
 
 let wrapper: VueWrapper | null = null
@@ -46,4 +40,3 @@ describe('SchuleCreationView', () => {
     expect(wrapper?.find('[data-testid="dienstellennummer-input"]').isVisible()).toBe(true)
   })
 })
-
