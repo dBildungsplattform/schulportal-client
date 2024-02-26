@@ -1,22 +1,20 @@
 <script setup lang="ts">
-  import { onMounted, type Ref, ref } from 'vue'
+  import { type Ref, ref, onBeforeMount } from 'vue'
   import { type Router, type RouteLocationNormalizedLoaded, useRoute, useRouter } from 'vue-router'
   import { usePersonStore, type PersonStore } from '@/stores/PersonStore'
   import PasswordReset from '@/components/admin/PasswordReset.vue'
   import LayoutCard from '@/components/cards/LayoutCard.vue'
   import SpshAlert from '@/components/alert/SpshAlert.vue'
-  import { type Composer, useI18n } from 'vue-i18n'
 
   const route: RouteLocationNormalizedLoaded = useRoute()
   const router: Router = useRouter()
   const currentPersonId: string = route.params['id'] as string
   const personStore: PersonStore = usePersonStore()
-  const { t }: Composer = useI18n({ useScope: 'global' })
 
   const password: Ref<string> = ref('')
 
-  function navigateToUserTable(): void {
-    router.push({ name: 'user-management' })
+  function navigateToPersonTable(): void {
+    router.push({ name: 'person-management' })
   }
 
   function resetPassword(personId: string): void {
@@ -27,9 +25,10 @@
 
   const handleAlertClose = (): void => {
     personStore.errorCode = ''
+    navigateToPersonTable()
   }
 
-  onMounted(async () => {
+  onBeforeMount(async () => {
     await personStore.getPersonById(currentPersonId)
   })
 </script>
@@ -43,22 +42,21 @@
     </v-row>
     <LayoutCard
       :closable="true"
-      :header="$t('admin.user.edit')"
-      @onCloseClicked="navigateToUserTable"
+      data-testid="person-details-card"
+      :header="$t('admin.person.edit')"
+      @onCloseClicked="navigateToPersonTable"
       :padded="true"
       :showCloseText="true"
     >
       <!-- Error Message Display -->
       <SpshAlert
         :model-value="!!personStore.errorCode"
-        :title="t('admin.user.userDataLoadingErrorTitle')"
+        :title="$t('admin.person.loadingErrorTitle')"
         :type="'error'"
         :closable="false"
-        :text="$t('admin.user.userDataLoadingErrorText')"
+        :text="$t('admin.person.loadingErrorText')"
         :showButton="true"
-        :buttonText="$t('admin.user.backToList')"
-        buttonClass="primary"
-        :buttonAction="navigateToUserTable"
+        :buttonText="$t('nav.backToList')"
         @update:modelValue="handleAlertClose"
       />
 
@@ -67,13 +65,13 @@
           <v-row class="ml-md-16">
             <v-col>
               <h3 class="subtitle-1">
-                {{ $t('admin.user.personalInfo') }}
+                {{ $t('admin.person.personalInfo') }}
               </h3></v-col
             >
           </v-row>
           <div v-if="personStore.currentPerson?.person">
+            <!-- Vorname -->
             <v-row>
-              <!-- Spacer column -->
               <v-col cols="1"></v-col>
               <v-col
                 class="text-right"
@@ -81,14 +79,17 @@
                 sm="3"
                 cols="5"
               >
-                <span class="subtitle-2"> {{ $t('user.firstName') }}: </span>
+                <span class="subtitle-2"> {{ $t('person.firstName') }}: </span>
               </v-col>
-              <v-col cols="auto">
+              <v-col
+                cols="auto"
+                data-testid="person-vorname"
+              >
                 {{ personStore.currentPerson.person.name.vorname }}
               </v-col>
             </v-row>
+            <!-- Familienname -->
             <v-row>
-              <!-- Spacer column -->
               <v-col cols="1"></v-col>
               <v-col
                 class="text-right"
@@ -96,10 +97,31 @@
                 sm="3"
                 cols="5"
               >
-                <span class="subtitle-2"> {{ $t('user.lastName') }}: </span>
+                <span class="subtitle-2"> {{ $t('person.lastName') }}: </span>
               </v-col>
-              <v-col cols="auto">
+              <v-col
+                cols="auto"
+                data-testid="person-familienname"
+              >
                 {{ personStore.currentPerson.person.name.familienname }}
+              </v-col>
+            </v-row>
+            <!-- Benutzername -->
+            <v-row>
+              <v-col cols="1"></v-col>
+              <v-col
+                class="text-right"
+                md="2"
+                sm="3"
+                cols="5"
+              >
+                <span class="subtitle-2"> {{ $t('person.userName') }}: </span>
+              </v-col>
+              <v-col
+                cols="auto"
+                data-testid="person-username"
+              >
+                {{ personStore.currentPerson.person.referrer }}
               </v-col>
             </v-row>
           </div>
@@ -115,7 +137,7 @@
         <v-container class="password-reset">
           <v-row class="ml-md-16">
             <v-col>
-              <h3 class="subtitle-1">{{ $t('user.password') }}</h3>
+              <h3 class="subtitle-1">{{ $t('person.password') }}</h3>
             </v-col></v-row
           >
           <v-row

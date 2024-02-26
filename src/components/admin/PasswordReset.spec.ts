@@ -23,7 +23,8 @@ beforeEach(() => {
           name: {
             vorname: 'Albert',
             familienname: 'Test'
-          }
+          },
+          referrer: 'atest'
         },
         personenkontexte: []
       }

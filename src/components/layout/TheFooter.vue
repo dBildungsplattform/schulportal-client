@@ -61,10 +61,10 @@
 
 <template>
   <v-footer
-    class="footer"
-    data-testid="footer"
     absolute
     :app="mobile"
+    class="footer"
+    data-testid="footer"
   >
     <v-container>
       <v-row>
@@ -136,10 +136,12 @@
     bottom: 0;
     min-height: 240px; /* Avoid footer shrinking vertically on smaller screen sizes*/
     position: absolute;
-    width: -webkit-fill-available;
+    width: 100%;
+    width: -moz-available; /* WebKit-based browsers will ignore this. */
+    width: -webkit-fill-available; /* Mozilla-based browsers will ignore this. */
   }
 
-  @media (max-width: 1280px) {
+  @media (max-width: 1279px) {
     .footer {
       min-height: 280px;
       background-size:
@@ -236,9 +238,9 @@
     bottom: 0;
     left: 0;
     width: 100%;
-    height: 22px; 
+    height: 22px;
     background-color: #001e49;
-    z-index: 1000; 
+    z-index: 1000;
   }
 
   .sponsor-logos-col,

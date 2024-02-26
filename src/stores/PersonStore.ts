@@ -3,7 +3,9 @@ import { isAxiosError, type AxiosResponse } from 'axios'
 import {
   PersonenApiFactory,
   PersonenFrontendApiFactory,
+  type CreatePersonBodyParams,
   type PersonenApiInterface,
+  type PersonendatensatzResponse,
   type PersonenFrontendApiInterface,
   type PersonFrontendControllerFindPersons200Response
 } from '../api-client/generated/api'
@@ -16,13 +18,16 @@ const personenFrontendApi: PersonenFrontendApiInterface = PersonenFrontendApiFac
   axiosApiInstance
 )
 
-type Person = {
+export type Person = {
   id: string
   name: {
     familienname: string
     vorname: string
   }
+  referrer: string
 }
+
+export type CreatedPerson = CreatePersonBodyParams
 
 type Personenkontext = {
   id: string
@@ -35,6 +40,7 @@ export type Personendatensatz = {
 
 type PersonState = {
   allPersons: Array<Personendatensatz>
+  createdPerson: PersonendatensatzResponse | null
   errorCode: string
   loading: boolean
   totalPersons: number
@@ -43,6 +49,7 @@ type PersonState = {
 
 type PersonGetters = {}
 type PersonActions = {
+  createPerson: (person: CreatePersonBodyParams) => Promise<PersonendatensatzResponse>
   getAllPersons: () => Promise<void>
   getPersonById: (personId: string) => Promise<Personendatensatz>
   resetPassword: (personId: string) => Promise<string>
@@ -60,6 +67,7 @@ export const usePersonStore: StoreDefinition<
   state: (): PersonState => {
     return {
       allPersons: [],
+      createdPerson: null,
       errorCode: '',
       loading: false,
       totalPersons: 0,
@@ -67,6 +75,23 @@ export const usePersonStore: StoreDefinition<
     }
   },
   actions: {
+    async createPerson(person: CreatePersonBodyParams): Promise<PersonendatensatzResponse> {
+      this.loading = true
+      try {
+        const { data }: { data: PersonendatensatzResponse } =
+          await personenApi.personControllerCreatePerson(person)
+        this.loading = false
+        this.createdPerson = data
+        return data
+      } catch (error: unknown) {
+        this.errorCode = 'UNSPECIFIED_ERROR'
+        if (isAxiosError(error)) {
+          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR'
+        }
+        this.loading = false
+        return Promise.reject(this.errorCode)
+      }
+    },
     async getAllPersons() {
       this.loading = true
       try {
@@ -87,6 +112,7 @@ export const usePersonStore: StoreDefinition<
 
     async getPersonById(personId: string): Promise<Personendatensatz> {
       this.loading = true
+      this.errorCode = ''
       try {
         const { data }: { data: Personendatensatz } =
           await personenApi.personControllerFindPersonById(personId)

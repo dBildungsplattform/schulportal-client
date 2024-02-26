@@ -3,7 +3,7 @@ namespace: ""
 image:
   repository: ghcr.io/dbildungsplattform/schulportal-client
   tag: ""
-  pullPolicy: Always 
+  pullPolicy: Always
 
 frontendHostname: "helm.dev.spsh.dbildungsplattform.de"
 
