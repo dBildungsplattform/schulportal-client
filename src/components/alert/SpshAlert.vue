@@ -3,9 +3,8 @@
     modelValue: boolean
     title: string
     text: string
-    showButton: boolean
+    showButton?: boolean
     buttonText?: string
-    buttonClass?: string
     buttonAction?: Function
     type: 'error' | 'success' | 'warning' | 'info' | undefined
     closable?: boolean
@@ -35,18 +34,18 @@
       >
         <v-row>
           <v-col
+            class="primary-text-color"
             cols="auto"
-            style="color: #001e49"
           >
-            <strong>{{ title }}</strong>
+            <strong data-testid="alert-title">{{ title }}</strong>
           </v-col>
         </v-row>
         <v-row>
           <v-col
+            class="primary-text-color"
             cols="auto"
-            style="color: #001e49"
           >
-            {{ text }}
+            <span data-testid="alert-text">{{ text }}</span>
           </v-col>
         </v-row>
         <v-row

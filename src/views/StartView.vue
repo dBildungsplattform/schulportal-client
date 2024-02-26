@@ -1,44 +1,49 @@
 <script setup lang="ts">
-  import { useProviderStore, type ProviderStore } from '@/stores/ProviderStore'
-  import ProviderCard from '@/components/cards/ProviderCard.vue'
+  import { useServiceProviderStore, type ServiceProviderStore } from '@/stores/ServiceProviderStore'
+  import ServiceProviderCard from '@/components/cards/ServiceProviderCard.vue'
 
-  const providerStore: ProviderStore = useProviderStore()
-  providerStore.getAllProviders()
+  const serviceProviderStore: ServiceProviderStore = useServiceProviderStore()
+  serviceProviderStore.getAllServiceProviders()
 </script>
 
 <template>
   <div class="home">
-    <h2 class="text-h4">{{ $t('start.allProviders') }}</h2>
+    <h2
+      class="text-h4"
+      data-testid="all-service-provider-title"
+    >
+      {{ $t('start.allServiceProviders') }}
+    </h2>
 
     <v-progress-circular
-      v-if="providerStore.loading"
+      v-if="serviceProviderStore.loading"
       indeterminate
     ></v-progress-circular>
 
     <p
-      v-if="providerStore.errorCode"
+      v-if="serviceProviderStore.errorCode"
       class="text-caption text-left"
       data-testid="error-text"
     >
-      {{ $t(`errors.${providerStore.errorCode}`) }}
+      {{ $t(`errors.${serviceProviderStore.errorCode}`) }}
     </p>
 
     <v-row v-else>
       <v-col
-        v-for="provider in providerStore.allProviders"
+        v-for="serviceProvider in serviceProviderStore.allServiceProviders"
         cols="12"
-        :key="provider.id"
+        :key="serviceProvider.id"
         sm="6"
         md="4"
       >
-        <ProviderCard
-          :href="provider.url"
+        <ServiceProviderCard
+          :href="serviceProvider.url"
           :newTab="true"
-          :testId="`provider-card-${provider.id}`"
-          :title="provider.name"
+          :testId="`service-provider-card-${serviceProvider.id}`"
+          :title="serviceProvider.name"
           variant="outlined"
         >
-        </ProviderCard>
+        </ServiceProviderCard>
       </v-col>
     </v-row>
 
@@ -49,13 +54,13 @@
         sm="6"
         md="4"
       >
-        <ProviderCard
-          :testId="'provider-card-admin'"
-          :to="'/admin/users'"
+        <ServiceProviderCard
+          :testId="'service-provider-card-admin'"
+          :to="'/admin/personen'"
           :title="$t('nav.admin')"
           variant="outlined"
         >
-        </ProviderCard>
+        </ServiceProviderCard>
       </v-col>
     </v-row>
   </div>

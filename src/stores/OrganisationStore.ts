@@ -59,6 +59,8 @@ export type OrganisationStore = Store<
   OrganisationActions
 >
 
+export { OrganisationResponseTypEnum }
+
 export const useOrganisationStore: StoreDefinition<
   'organisationStore',
   OrganisationState,

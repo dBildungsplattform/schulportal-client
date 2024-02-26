@@ -35,7 +35,12 @@
       >
         <v-col cols="auto">
           <!-- Subtitle/welcome message -->
-          <h1 class="headline-2">{{ $t('login.title') }}</h1>
+          <h1
+            class="headline-2"
+            data-testid="landing-headline"
+          >
+            {{ $t('landingTitle') }}
+          </h1>
         </v-col>
       </v-row>
 

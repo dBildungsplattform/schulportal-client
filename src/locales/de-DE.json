@@ -1,53 +1,97 @@
 {
   "action": "Aktion",
   "admin": {
-    "headline": "Administrationsbereich",
-    "mandatoryFieldsNotice": "Mit * markierte Felder sind Pflichtangaben.",
-    "followingDataCreated" : "Folgende Daten wurden gespeichert:",
+    "backToForm": "Zurück zum Formular",
     "class": {
       "management": "Klassenverwaltung"
     },
+    "followingDataCreated": "Folgende Daten wurden gespeichert:",
+    "headline": "Administrationsbereich",
+    "koPers": {
+      "koPersNumber": "KoPers-Nr",
+      "noKoPersNumber": "Keine KoPers-Nr vorhanden"
+    },
     "rolle": {
-      "backToCreateRolle": "Zurück zur Rollenanlage",
-      "management": "Rollenverwaltung",
-      "createNew": "Neue Rolle anlegen",
-      "create": "Rolle anlegen",
       "addNew": "Neue Rolle hinzufügen",
-      "selectSchulstrukturKnoten": "Schulstrukturknoten auswählen",
-      "selectRollenart": "Rollenart auswählen",
-      "enterRollenname": "Rollenname eingeben",
-      "selectMerkmale": "Merkmale auswählen",
-      "userDataLoadingErrorText": "Es konnten keine Benutzerdaten geladen werden.",
-      "showAll": "Alle Rollen anzeigen",
+      "assignMerkmale": "Merkmale zuordnen",
+      "assignRollenart": "Rollenart zuordnen",
+      "backToCreateRolle": "Zurück zur Rollenanlage",
+      "create": "Rolle anlegen",
+      "createAnother": "Weitere Rolle anlegen",
+      "createNew": "Neue Rolle anlegen",
       "discard": "Rolle verwerfen",
+      "enterRollenname": "Rollenname eingeben",
+      "management": "Rollenverwaltung",
+      "mappingFrontBackEnd": {
+        "rollenarten": {
+          "LERN": "Lern",
+          "LEHR": "Lehr",
+          "EXTERN": "Extern",
+          "ORGADMIN": "Orgadmin",
+          "LEIT": "Leit",
+          "SYSADMIN": "Sysadmin"
+        },
+        "merkmale": {
+          "BEFRISTUNG_PFLICHT": "Befristung ist Pflichtangabe",
+          "KOPERS_PFLICHT": "KoPers-Nr. ist Pflichtangabe"
+        }
+      },
+      "merkmale": "Merkmale",
+      "noRollenFound": "Keine Rollen gefunden",
       "rolleCreateErrorTitle": "Fehler beim Anlegen der Rolle",
       "rolleCreateErrorText": "Die Rolle konnte nicht angelegt werden.",
-      "createAnother": "Weitere Rolle anlegen",
-      "schulstrukurknoten": "Schulstrukturknoten",
       "rollenart": "Rollenart",
       "rollenname": "Rollenname",
-      "merkmale": "Merkmale",
       "rolleAddedSuccessfully": "Die Rolle wurde erfolgreich hinzugefügt.",
-        "rule": {
-          "rolleNameLength": "Der Rollenname darf nicht länger als 200 Zeichen sein.",
-          "rolleNameRequired": "Der Rollenname ist erforderlich."
+      "rule": {
+        "rolleNameLength": "Der Rollenname darf nicht länger als 200 Zeichen sein.",
+        "rolleNameRequired": "Der Rollenname ist erforderlich."
+      },
+      "selectRolle": "Rolle auswählen",
+      "selectRollenart": "Rollenart auswählen",
+      "selectMerkmale": "Merkmale auswählen",
+      "showAll": "Alle Rollen anzeigen",
+      "userDataLoadingErrorText": "Es konnten keine Benutzerdaten geladen werden."
+    },
+    "person": {
+      "addedSuccessfully": "{firstname} {lastname} wurde erfolgreich hinzugefügt.",
+      "addNew": "Neuen Benutzer hinzufügen",
+      "changePassword": "Passwort ändern",
+      "copyPasswordError": "Passwort konnte nicht in die Zwischenablage kopiert werden",
+      "copyPasswordSuccess": "Passwort in Zwischenablage kopiert",
+      "create": "Benutzer anlegen",
+      "createAnother": "Weiteren Benutzer anlegen",
+      "createNew": "Neue Benutzer anlegen",
+      "creationErrorText": "",
+      "creationErrorTitle": "Fehler beim Anlegen des Benutzers",
+      "discard": "Benutzer verwerfen",
+      "edit": "Benutzer bearbeiten",
+      "generatedPassword": "Generiertes Passwort",
+      "loadingErrorText": "Es konnten keine Benutzerdaten geladen werden.",
+      "loadingErrorTitle": "Fehler beim Laden des Benutzers",
+      "management": "Benutzerverwaltung",
+      "personalInfo": "Persönliche Informationen",
+      "resetPasswordConfirmation": "Sind Sie sicher, dass Sie das Passwort für {firstname} {lastname} zurücksetzen möchten?",
+      "resetPasswordInformation": "Bitte teilen Sie dem Benutzer das temporäre Passwort mit. Nach dem Schließen des Dialogs wird es aus Sicherheitsgründen nicht mehr angezeigt.",
+      "resetPassword": "Passwort zurücksetzen",
+      "rules": {
+        "vorname": {
+          "matches": "Der Vorname darf keine ungültigen Zeichen beinhalten.",
+          "min": "Der Vorname muss aus mindestens 2 Zeichen bestehen.",
+          "required": "Der Vorname muss angegeben werden."
         },
-        "mappingFrontBackEnd": {
-          "rollenarten": {
-            "LERN": "Lern",
-            "LEHR": "Lehr",
-            "EXTERN": "Extern",
-            "ORGADMIN": "Orgadmin",
-            "LEIT": "Leit",
-            "SYSADMIN": "Sysadmin"
-          },
-          "merkmale": {
-            "BEFRISTUNG_PFLICHT": "Befristung ist Pflichtangabe",
-            "KOPERS_PFLICHT": "KoPers-Nr. ist Pflichtangabe"
-          }
+        "familienname": {
+          "matches": "Der Familienname darf keine ungültigen Zeichen beinhalten.",
+          "min": "Der Familienname muss aus mindestens 2 Zeichen bestehen.",
+          "required": "Der Familienname muss angegeben werden."
         }
+      },
+      "showAll": "Alle Benutzer anzeigen",
+      "startPassword": "Einstiegs-Passwort",
+      "status": "Status"
     },
     "schule": {
+      "assign": "Schule zuordnen",
       "addNew": "Neue Schule hinzufügen",
       "backToCreateSchule": "Zurück zur Schulnanlage",
       "createNew": "Neue Schule anlegen",
@@ -66,25 +110,13 @@
       "schuleCreateErrorText": "Die Schule konnte nicht angelegt werden.",
       "schuleAddedSuccessfully": "Die Schule wurde erfolgreich hinzugefügt."
     },
-    "schoolBoard": {
-      "management": "Schulträgerverwaltung"
+    "schulstrukturknoten": {
+      "assignSchulstrukturknoten": "Schulstrukturknoten zuordnen",
+      "schulstrukturknoten": "Schulstrukturknoten",
+      "selectSchulstrukturknoten": "Schulstrukturknoten auswählen"
     },
-    "user": {
-      "addNew": "Neue Benutzer anlegen",
-      "backToList": "Zurück zur Liste",
-      "changePassword": "Passwort ändern",
-      "copyPasswordError": "Passwort konnte nicht in die Zwischenablage kopiert werden",
-      "copyPasswordSuccess": "Passwort in Zwischenablage kopiert",
-      "edit": "Benutzer bearbeiten",
-      "management": "Benutzerverwaltung",
-      "personalInfo": "Persönliche Informationen",
-      "resetPasswordConfirmation": "Sind Sie sicher, dass Sie das Passwort für {firstname} {lastname} zurücksetzen möchten?",
-      "resetPasswordInformation": "Bitte teilen Sie dem Benutzer das temporäre Passwort mit. Nach dem Schließen des Dialogs wird es aus Sicherheitsgründen nicht mehr angezeigt.",
-      "resetPassword": "Passwort zurücksetzen",
-      "showAll": "Alle Benutzer anzeigen",
-      "status": "Status",
-      "userDataLoadingErrorTitle": "Fehler beim Laden des Benutzers",
-      "userDataLoadingErrorText": "Es konnten keine Benutzerdaten geladen werden."
+    "schultraeger": {
+      "management": "Schulträgerverwaltung"
     }
   },
   "cancel": "Abbrechen",
@@ -104,11 +136,11 @@
   },
   "start": {
     "administration": "Verwaltung",
-    "allProviders": "Alle Angebote"
+    "allServiceProviders": "Alle Angebote"
   },
   "itemsPerPage": "Einträge pro Seite",
+  "landingTitle": "Willkommen im Schulportal SH.",
   "login": {
-    "title": "Willkommen im Schulportal SH.",
     "button": "Anmelden",
     "forgotPassword": "Passwort vergessen? \n Wenden Sie sich bitte an Ihre schulischen Administratorinnen und Administratoren.",
     "header": "Anmeldung im Schulportal SH",
@@ -117,19 +149,23 @@
   },
   "nav": {
     "admin": "Schulportal-Administration",
+    "backToList": "Zurück zur Ergebnisliste",
     "backToStart": "Zurück zur Startseite",
+    "closeMobileMenu": "Mobiles Menü schließen",
     "login": "Anmelden",
     "logout": "Abmelden",
     "navigation": "Navigation",
-    "help": "Hilfe",
-    "backToList": "Zurück zur Ergebnisliste"
+    "openMobileMenu": "Mobiles Menü öffnen",
+    "help": "Hilfe"
   },
   "pagination": {
     "all": "Alle",
     "pageText": "{interval} von {total} Einträgen"
   },
-  "user": {
+  "person": {
     "email": "E-Mail",
+    "enterFirstName": "Vorname eingeben",
+    "enterLastName": "Nachname eingeben",
     "firstName": "Vorname",
     "lastName": "Nachname",
     "password": "Passwort",

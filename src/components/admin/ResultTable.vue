@@ -2,8 +2,6 @@
   import { computed, type ComputedRef } from 'vue'
   import LayoutCard from '@/components/cards/LayoutCard.vue'
   import { type Composer, useI18n } from 'vue-i18n'
-  import { type Personendatensatz } from '@/stores/PersonStore'
-  import { type Router, useRouter } from 'vue-router'
 
   /* this block is necessary to introduce a table header type for defining table headers
       watch source for updates: https://stackoverflow.com/a/75993081/4790594
@@ -11,25 +9,20 @@
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs'
   type ReadonlyHeaders = InstanceType<typeof VDataTableServer>['headers']
 
+  type TableItem = Record<string, unknown>
+
   type Props = {
-    items: Personendatensatz[]
+    items: TableItem[]
     loading: boolean
     totalItems: number
+    headers: ReadonlyHeaders
+    header: string
+    itemValuePath: string
+    disableRowClick?: boolean
   }
-
   const props: Props = defineProps<Props>()
 
   const { t }: Composer = useI18n({ useScope: 'global' })
-  const router: Router = useRouter()
-
-  const headers: ReadonlyHeaders = [
-    { title: t('user.lastName'), key: 'person.name.familienname', align: 'start' },
-    { title: t('user.firstName'), key: 'person.name.vorname', align: 'start' }
-  ]
-
-  function handleRowClick(_$event: PointerEvent, { item }: { item: Personendatensatz }): void {
-    router.push({ name: 'user-details', params: { id: item.person.id } })
-  }
 
   // TODO: these two values will come from the API in the future
   const itemsPerPage: number = 25
@@ -43,21 +36,36 @@
 
     return t('pagination.pageText', { interval: interval, total: totalItems })
   })
+
+  type Emits = {
+    (event: 'onHandleRowClick', eventPayload: PointerEvent, item: TableItem): void
+    (event: 'onTableUpdate'): void
+  }
+  const emit: Emits = defineEmits<{
+    (event: 'onHandleRowClick', eventPayload: PointerEvent, item: TableItem): void
+    (event: 'onTableUpdate'): void
+  }>()
+
+  function handleRowClick(event: PointerEvent, item: TableItem): void {
+    if (!props.disableRowClick) {
+      emit('onHandleRowClick', event, item)
+    }
+  }
 </script>
 
 <template>
-  <LayoutCard :header="$t('admin.user.management')">
+  <LayoutCard :header="header">
     <v-data-table-server
-      class="user-table"
+      class="result-table"
       @click:row="handleRowClick"
-      data-testid="user-table"
+      data-testid="result-table"
       density="compact"
       :headers="headers"
       :items="items"
       :items-length="totalItems"
       :items-per-page-options="[{ value: -1, title: $t('pagination.all') }]"
       :items-per-page-text="$t('itemsPerPage')"
-      item-value="person.id"
+      :item-value="itemValuePath"
       :page-text="pageText"
       select-strategy="page"
       show-select

@@ -2,8 +2,9 @@
   import { computed, type ComputedRef, ref, type Ref } from 'vue'
   import { type Personendatensatz } from '@/stores/PersonStore'
   import { type Composer, useI18n } from 'vue-i18n'
-  import LayoutCard from '@/components/cards/LayoutCard.vue'
   import { useDisplay } from 'vuetify'
+  import LayoutCard from '@/components/cards/LayoutCard.vue'
+  import PasswordOutput from '@/components/form/PasswordOutput.vue'
 
   const { t }: Composer = useI18n({ useScope: 'global' })
   const { smAndDown }: { smAndDown: Ref<boolean> } = useDisplay()
@@ -21,19 +22,15 @@
 
   const props: Props = defineProps<Props>()
   const emit: Emits = defineEmits<Emits>()
-
-  const passwordCopied: Ref<boolean> = ref(false)
-  const showPassword: Ref<boolean> = ref(false)
   const errorMessage: Ref<string> = ref('')
-  const copyToClipboardError: Ref<string> = ref('')
 
   const resetPasswordInformationMessage: ComputedRef<string> = computed(() => {
     if (errorMessage.value || props.errorCode) {
       return ''
     }
-    let message: string = t('admin.user.resetPasswordInformation')
+    let message: string = t('admin.person.resetPasswordInformation')
     if (!props.password) {
-      message += `\n\n${t('admin.user.resetPasswordConfirmation', {
+      message += `\n\n${t('admin.person.resetPasswordConfirmation', {
         firstname: props.person.person.name.vorname,
         lastname: props.person.person.name.familienname
       })}`
@@ -41,24 +38,8 @@
     return message
   })
 
-  function copyToClipboard(text: string): void {
-    navigator.clipboard.writeText(text).then(
-      () => {
-        passwordCopied.value = true
-        copyToClipboardError.value = ''
-      },
-      (error: unknown) => {
-        // eslint-disable-next-line no-console
-        console.log(error)
-        copyToClipboardError.value = t('admin.user.copyPasswordError')
-      }
-    )
-  }
-
   async function closePasswordResetDialog(isActive: Ref<boolean>): Promise<void> {
     isActive.value = false
-    passwordCopied.value = false
-    showPassword.value = false
     emit('onClearPassword')
   }
 </script>
@@ -72,14 +53,14 @@
         v-bind="props"
         :block="smAndDown"
       >
-        {{ $t('admin.user.changePassword') }}
+        {{ $t('admin.person.changePassword') }}
       </v-btn>
     </template>
 
     <template v-slot:default="{ isActive }">
       <LayoutCard
         :closable="true"
-        :header="$t('admin.user.resetPassword')"
+        :header="$t('admin.person.resetPassword')"
         @onCloseClicked="closePasswordResetDialog(isActive)"
       >
         <v-card-text>
@@ -109,31 +90,7 @@
             </v-row>
             <v-row>
               <v-col cols="12">
-                <v-text-field
-                  v-if="password"
-                  data-testid="password-output-field"
-                  :error-messages="copyToClipboardError"
-                  :hint="passwordCopied ? $t('admin.user.copyPasswordSuccess') : ''"
-                  :persistent-hint="passwordCopied"
-                  readonly
-                  :type="showPassword ? 'text' : 'password'"
-                  :value="password"
-                >
-                  <template v-slot:append-inner>
-                    <v-icon
-                      @click.stop="showPassword = !showPassword"
-                      data-testid="show-password-icon"
-                      :icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-                    ></v-icon>
-                  </template>
-                  <template v-slot:append>
-                    <v-icon
-                      @click.stop="copyToClipboard(password)"
-                      data-testid="copy-password-icon"
-                      icon="mdi-content-copy"
-                    ></v-icon>
-                  </template>
-                </v-text-field>
+                <PasswordOutput :password="password"></PasswordOutput>
               </v-col>
             </v-row>
           </v-container>
@@ -146,10 +103,10 @@
               md="4"
             >
               <v-btn
-                @click.stop="closePasswordResetDialog(isActive)"
-                class="secondary button"
-                data-testid="close-password-reset-dialog-button"
                 :block="smAndDown"
+                class="secondary button"
+                @click.stop="closePasswordResetDialog(isActive)"
+                data-testid="close-password-reset-dialog-button"
               >
                 {{ !!password ? $t('close') : $t('cancel') }}
               </v-btn>
@@ -160,13 +117,13 @@
               md="4"
             >
               <v-btn
-                @click.stop="$emit('onResetPassword', person.person.id)"
+                :block="smAndDown"
                 class="primary button"
+                @click.stop="$emit('onResetPassword', person.person.id)"
                 data-testid="password-reset-button"
                 :disabled="!!password"
-                :block="smAndDown"
               >
-                {{ $t('admin.user.resetPassword') }}
+                {{ $t('admin.person.resetPassword') }}
               </v-btn>
             </v-col>
           </v-row>
