@@ -262,7 +262,7 @@
                 class="py-0"
               >
                 <v-text-field
-                  data-testid="rollen-name-input"
+                  data-testid="dienstellennummer-input"
                   v-model="selectedDienstellennummer"
                   :placeholder="$t('admin.schule.dienstellennummer')"
                   variant="outlined"
@@ -306,7 +306,7 @@
                 class="py-0"
               >
                 <v-text-field
-                  data-testid="rollen-name-input"
+                  data-testid="schul-name-input"
                   v-model="selectedSchulname"
                   :placeholder="$t('admin.schule.schulname')"
                   variant="outlined"
@@ -353,7 +353,7 @@
                 class="py-0"
               >
                 <v-select
-                  data-testid="schulstruktur-knoten-select"
+                  data-testid="adminstrativeSchulträger-select"
                   :items="administrativeSchulträger"
                   v-model="selectedAdministrativeSchulträger"
                   variant="outlined"
@@ -386,7 +386,7 @@
               >
                 <v-btn
                   class="secondary"
-                  data-testid="discard-rolle-button"
+                  data-testid="discard-schule-button"
                   :block="smAndDown"
                   >{{ $t('admin.schule.discard') }}</v-btn
                 >
@@ -399,7 +399,7 @@
                 <v-btn
                   type="submit"
                   class="primary button"
-                  data-testid="create-rolle-button"
+                  data-testid="create-schule-button"
                   :block="smAndDown"
                 >
                   {{ $t('admin.schule.create') }}
