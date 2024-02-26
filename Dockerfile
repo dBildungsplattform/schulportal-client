@@ -27,16 +27,16 @@ COPY --from=build /app/dist/ /usr/share/nginx/html/
 RUN rm /etc/nginx/conf.d/default.conf
 COPY nginx-vue.conf /etc/nginx/conf.d/
 
-RUN addgroup -g 1000 nginxgroup && \
-    adduser -D -u 1000 -G nginxgroup nginxuser && \
-    chown -R nginxuser:nginxgroup /var/cache/nginx /var/run /var/log/nginx /usr/share/nginx/html && \
+RUN addgroup -g 1000 nginx && \
+    adduser -D -u 1000 -G nginx nginx && \
+    chown -R nginx:nginx /var/cache/nginx /var/run /var/log/nginx /usr/share/nginx/html && \
     chmod -R 755 /usr/share/nginx/html && \
     chmod -R 644 /etc/nginx/conf.d/*
 
 RUN touch /run/nginx.pid \
-    && chown -R nginxuser:nginxgroup /run/nginx.pid /var/cache/nginx /var/run /var/log/nginx /usr/share/nginx/html
+    && chown -R nginx:nginx /run/nginx.pid /var/cache/nginx /var/run /var/log/nginx /usr/share/nginx/html
 
-USER nginxuser
+USER nginx
 EXPOSE 8080
 
 CMD ["nginx", "-g", "daemon off;"]
