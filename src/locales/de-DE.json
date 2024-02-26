@@ -109,9 +109,13 @@
       "management": "Schulverwaltung",
       "publicSchule": "Öffentliche Schule",
       "rules": {
-        "dienstellennummerRequired":"Die Dienstellennummer ist erforderlich.",
-        "schulnameMatches":"Der Schulname darf keine ungültigen Zeichen beinhalten.",
-        "schulnameRequired": "Der Schulname ist erforderlich."
+        "dienstellennummer": {
+          "required": "Die Dienstellennummer muss angegeben werden."
+        },
+        "schulname": {
+          "matches": "Der Schulname darf keine ungültigen Zeichen beinhalten.",
+          "required": "Der Schulname muss angegeben werden."
+        }
       },
       "schulname": "Schulname",
       "schulform": "Schulform",

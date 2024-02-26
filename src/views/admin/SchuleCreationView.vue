@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import LayoutCard from '@/components/cards/LayoutCard.vue'
-  import { ref, type Ref } from 'vue'
+  import { type Ref } from 'vue'
   import { useI18n, type Composer } from 'vue-i18n'
   import SpshAlert from '@/components/alert/SpshAlert.vue'
   import { type Router, useRouter } from 'vue-router'
@@ -10,6 +10,9 @@
     type OrganisationStore,
     CreateOrganisationBodyParamsTypEnum
   } from '@/stores/OrganisationStore'
+  import { useForm, type TypedSchema, type BaseFieldProps } from 'vee-validate'
+  import { object, string } from 'yup'
+  import { toTypedSchema } from '@vee-validate/yup'
 
   const { smAndDown }: { smAndDown: Ref<boolean> } = useDisplay()
 
@@ -17,46 +20,61 @@
   const router: Router = useRouter()
   const organisationStore: OrganisationStore = useOrganisationStore()
 
-  const selectedDienstellennummer: Ref<string | null> = ref(null)
-  const selectedSchulname: Ref<string | null> = ref(null)
-  const selectedAdministrativeSchulträger: Ref<string | null> = ref(null)
+  const validationSchema: TypedSchema = toTypedSchema(
+    object({
+      selectedDienstellennummer: string().required(
+        t('admin.schule.rules.dienstellennummer.required')
+      ),
+      selectedSchulname: string()
+        .matches(/^[A-Za-z]*[A-Za-zÀ-ÖØ-öø-ÿ-' ]*$/, t('admin.schule.rules.schulname.matches'))
+        .required(t('admin.schule.rules.schulname.required'))
+    })
+  )
 
+  const vuetifyConfig = (state: {
+    errors: Array<string>
+  }): { props: { error: boolean; 'error-messages': Array<string> } } => ({
+    props: {
+      error: !!state.errors.length,
+      'error-messages': state.errors
+    }
+  })
+
+  type SchulereationForm = {
+    selectedDienstellennummer: string
+    selectedSchulname: string
+    selectedAdministrativeSchulträger: string
+  }
+
+  // eslint-disable-next-line @typescript-eslint/typedef
+  const { defineField, handleSubmit, resetForm } = useForm<SchulereationForm>({
+    validationSchema
+  })
+
+  const [selectedSchulname, selectedSchulnameProps]: [
+    Ref<string>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>
+  ] = defineField('selectedSchulname', vuetifyConfig)
+  const [selectedDienstellennummer, selectedDienstellennummerProps]: [
+    Ref<string>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>
+  ] = defineField('selectedDienstellennummer', vuetifyConfig)
+  const [selectedAdministrativeSchulträger, selectedAdministrativeSchulträgerProps]: [
+    Ref<string>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>
+  ] = defineField('selectedAdministrativeSchulträger', vuetifyConfig)
+
+
+  // For now this wil be hardcoded as we have no Schulträger in the DB.
   const administrativeSchulträger: string[] = ['Eigenständig verwaltet']
 
-  const SchulnameRules: Array<(v: string | null | undefined) => boolean | string> = [
-    (v: string | null | undefined): boolean | string => {
-      // First, check for null or undefined values and return a required field message.
-      if (v == null || v.trim().length === 0) {
-        return t('admin.schule.rules.schulnameRequired')
-      }
-      const pattern: RegExp = /^[A-Za-zÀ-ÖØ-öø-ÿ-' ]+$/
-      if (!pattern.test(v)) {
-        // If the string matches the pattern, return an error message
-        return t('admin.schule.rules.schulnameMatches')
-      }
-      // If none of the above conditions are met, the input is valid.
-      return true
-    }
-  ]
-
-  const dienstellennummerRules: Array<(v: string | null | undefined) => boolean | string> = [
-    (v: string | null | undefined): boolean | string => {
-      // First, check for null or undefined values and return a required field message.
-      if (v == null || v.trim().length === 0) {
-        return t('admin.schule.rules.dienstellennummerRequired')
-      }
-      // If none of the above conditions are met, the input is valid.
-      return true
-    }
-  ]
-
-  const submitForm = async (): Promise<void> => {
+  const onSubmit: (e?: Event | undefined) => Promise<void | undefined> = handleSubmit(() => {
     if (
       selectedDienstellennummer.value &&
       selectedSchulname.value &&
       selectedAdministrativeSchulträger.value
     ) {
-      await organisationStore.createOrganisation(
+      organisationStore.createOrganisation(
         selectedDienstellennummer.value,
         selectedSchulname.value,
         ' ',
@@ -64,12 +82,11 @@
         CreateOrganisationBodyParamsTypEnum.Schule
       )
     }
-  }
+  })
+
   const handleCreateAnotherSchule = (): void => {
     organisationStore.createdOrganisation = null
-    selectedDienstellennummer.value = null
-    selectedSchulname.value = null
-    selectedAdministrativeSchulträger.value = null
+    resetForm()
     router.push({ name: 'create-schule' })
   }
 
@@ -178,8 +195,8 @@
       </template>
       <!-- The form to create a new school (No created school yet and no errorCode) -->
       <template v-if="!organisationStore.createdOrganisation && !organisationStore.errorCode">
-        <v-container class="new-rolle">
-          <v-form @submit.prevent="submitForm">
+        <v-container class="new-schule">
+          <v-form @submit.prevent="onSubmit">
             <v-row>
               <v-col
                 class="d-none d-md-flex"
@@ -195,7 +212,7 @@
                 <span class="subtitle-2">{{ $t('admin.mandatoryFieldsNotice') }}</span>
               </v-col>
             </v-row>
-            <!-- Select school type -->
+            <!-- Select school type. For now not bound to anything and just a UI element -->
             <v-row>
               <!-- This column will be hidden on xs screens and visible on sm and larger screens -->
               <v-col
@@ -251,6 +268,7 @@
               >
                 <label
                   class="text-body"
+                  :error="selectedDienstellennummerProps['error']"
                   required="true"
                 >
                   {{ $t('admin.schule.dienstellennummer') }}
@@ -263,12 +281,11 @@
               >
                 <v-text-field
                   data-testid="dienstellennummer-input"
+                  v-bind="selectedDienstellennummerProps"
                   v-model="selectedDienstellennummer"
                   :placeholder="$t('admin.schule.dienstellennummer')"
                   variant="outlined"
                   density="compact"
-                  :rules="dienstellennummerRules"
-                  required
                 ></v-text-field>
               </v-col>
             </v-row>
@@ -295,6 +312,7 @@
               >
                 <label
                   class="text-body"
+                  :error="selectedSchulnameProps['error']"
                   required="true"
                 >
                   {{ $t('admin.schule.schulname') }}
@@ -307,12 +325,12 @@
               >
                 <v-text-field
                   data-testid="schul-name-input"
+                  v-bind="selectedSchulnameProps"
                   v-model="selectedSchulname"
                   :placeholder="$t('admin.schule.schulname')"
                   variant="outlined"
                   density="compact"
                   required
-                  :rules="SchulnameRules"
                 ></v-text-field>
               </v-col>
             </v-row>
@@ -356,12 +374,12 @@
                   data-testid="adminstrativeSchulträger-select"
                   :items="administrativeSchulträger"
                   v-model="selectedAdministrativeSchulträger"
+                  v-bind="selectedAdministrativeSchulträgerProps"
                   variant="outlined"
                   density="compact"
                   single-line
                   :placeholder="$t('admin.schule.adminstrativeSchulträger')"
                   clearable
-                  required
                 >
                   <template v-slot:item="{ props, item }">
                     <v-list-item
