@@ -24,7 +24,7 @@
         .required(t('admin.person.rules.vorname.required')),
       selectedFamilienname: string()
         .matches(/^[A-Za-z]*[A-Za-zÀ-ÖØ-öø-ÿ-' ]*$/, t('admin.person.rules.familienname.matches'))
-        .min(2, t('admin.person.rules.nachname.min'))  
+        .min(2, t('admin.person.rules.familienname.min'))  
         .required(t('admin.person.rules.familienname.required'))
     })
   )

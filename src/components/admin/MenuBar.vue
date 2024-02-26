@@ -145,7 +145,7 @@
       data-testid="rolle-creation-menu-item"
       prepend-icon="mdi-plus-circle-outline"
       :title="$t('admin.rolle.createNew')"
-      to="/admin/rolle/new"
+      to="/admin/rollen/new"
     ></v-list-item>
     <!-- Schulverwaltung -->
     <v-list-item
@@ -164,7 +164,7 @@
       data-testid="rolle-creation-menu-item"
       prepend-icon="mdi-plus-circle-outline"
       :title="$t('admin.schule.createNew')"
-      to="/admin/schule/new"
+      to="/admin/schulen/new"
     ></v-list-item>
     <!-- Schulträgerverwaltung -->
     <v-list-item

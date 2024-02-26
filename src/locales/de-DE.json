@@ -53,6 +53,7 @@
       "showAll": "Alle Rollen anzeigen",
       "userDataLoadingErrorText": "Es konnten keine Benutzerdaten geladen werden."
     },
+    "mandatoryFieldsNotice": "Mit * markierte Felder sind Pflichtangaben.",
     "person": {
       "addedSuccessfully": "{firstname} {lastname} wurde erfolgreich hinzugefügt.",
       "addNew": "Neuen Benutzer hinzufügen",
@@ -93,22 +94,32 @@
     "schule": {
       "assign": "Schule zuordnen",
       "addNew": "Neue Schule hinzufügen",
+      "adminstrativeSchulträger": "Verwaltender Schulträger",
+      "alternativeSchule": "Ersatzschule",
+      "assignAdminstrativeSchulträger": "Verwaltender Schulträger zuordnen",
+      "assignSchulform": "Schulform zuordnen",
       "backToCreateSchule": "Zurück zur Schulnanlage",
       "createNew": "Neue Schule anlegen",
       "create": "Schule anlegen",
       "createAnother": "Weitere Schule anlegen",
       "discard": "Schule verwerfen",
-      "showAll": "Alle Schulen anzeigen",
       "dienstellennummer": "Dienstellennummer",
       "enterDienstellennummer": "Dienstellennummer eingeben",
       "enterSchulname": "Schulname eingeben",
-      "schulname": "Schulname",
-      "assignAdminstrativeSchulträger": "Verwaltender Schulträger zuordnen",
-      "adminstrativeSchulträger": "Verwaltender Schulträger",
       "management": "Schulverwaltung",
+      "publicSchule": "Öffentliche Schule",
+      "rules": {
+        "dienstellennummerRequired":"Die Dienstellennummer ist erforderlich.",
+        "schulnameMatches":"Der Schulname darf keine ungültigen Zeichen beinhalten.",
+        "schulnameRequired": "Der Schulname ist erforderlich."
+      },
+      "schulname": "Schulname",
+      "schulform": "Schulform",
       "schuleCreateErrorTitle": "Fehler beim Anlegen der Schule",
       "schuleCreateErrorText": "Die Schule konnte nicht angelegt werden.",
-      "schuleAddedSuccessfully": "Die Schule wurde erfolgreich hinzugefügt."
+      "schuleAddedSuccessfully": "Die Schule wurde erfolgreich hinzugefügt.",
+      "showAll": "Alle Schulen anzeigen"
+
     },
     "schulstrukturknoten": {
       "assignSchulstrukturknoten": "Schulstrukturknoten zuordnen",

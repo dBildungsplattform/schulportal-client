@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import LayoutCard from '@/components/cards/LayoutCard.vue'
-  import { ref, type Ref, onMounted } from 'vue'
+  import { ref, type Ref } from 'vue'
   import { useI18n, type Composer } from 'vue-i18n'
   import SpshAlert from '@/components/alert/SpshAlert.vue'
   import { type Router, useRouter } from 'vue-router'
@@ -23,6 +23,33 @@
 
   const administrativeSchulträger: string[] = ['Eigenständig verwaltet']
 
+  const SchulnameRules: Array<(v: string | null | undefined) => boolean | string> = [
+    (v: string | null | undefined): boolean | string => {
+      // First, check for null or undefined values and return a required field message.
+      if (v == null || v.trim().length === 0) {
+        return t('admin.schule.rules.schulnameRequired')
+      }
+      const pattern: RegExp = /^[A-Za-zÀ-ÖØ-öø-ÿ-' ]+$/
+      if (!pattern.test(v)) {
+        // If the string matches the pattern, return an error message
+        return t('admin.schule.rules.schulnameMatches')
+      }
+      // If none of the above conditions are met, the input is valid.
+      return true
+    }
+  ]
+
+  const dienstellennummerRules: Array<(v: string | null | undefined) => boolean | string> = [
+    (v: string | null | undefined): boolean | string => {
+      // First, check for null or undefined values and return a required field message.
+      if (v == null || v.trim().length === 0) {
+        return t('admin.schule.rules.dienstellennummerRequired')
+      }
+      // If none of the above conditions are met, the input is valid.
+      return true
+    }
+  ]
+
   const submitForm = async (): Promise<void> => {
     if (
       selectedDienstellennummer.value &&
@@ -38,7 +65,7 @@
       )
     }
   }
-  const handleCreateAnotherRolle = (): void => {
+  const handleCreateAnotherSchule = (): void => {
     organisationStore.createdOrganisation = null
     selectedDienstellennummer.value = null
     selectedSchulname.value = null
@@ -46,18 +73,13 @@
     router.push({ name: 'create-schule' })
   }
 
-  function navigateBackToRolleForm(): void {
+  function navigateBackToSchuleForm(): void {
     organisationStore.errorCode = ''
   }
 </script>
 
 <template>
   <div class="admin">
-    <v-row>
-      <v-col cols="12">
-        <h1 class="text-center headline-1">{{ $t('admin.headline') }}</h1>
-      </v-col>
-    </v-row>
     <LayoutCard
       :closable="true"
       :header="$t('admin.schule.addNew')"
@@ -73,7 +95,7 @@
         :text="$t('admin.schule.schuleCreateErrorText')"
         :showButton="true"
         :buttonText="$t('admin.schule.backToCreateSchule')"
-        :buttonAction="navigateBackToRolleForm"
+        :buttonAction="navigateBackToSchuleForm"
         buttonClass="primary"
       />
       <!-- Result template on success after submit (Present value in createdSchule and no errorCode)  -->
@@ -145,7 +167,7 @@
               <v-btn
                 class="primary button"
                 data-testid="create-another-schule-button"
-                @click="handleCreateAnotherRolle"
+                @click="handleCreateAnotherSchule"
                 :block="smAndDown"
               >
                 {{ $t('admin.schule.createAnother') }}
@@ -173,6 +195,38 @@
                 <span class="subtitle-2">{{ $t('admin.mandatoryFieldsNotice') }}</span>
               </v-col>
             </v-row>
+            <!-- Select school type -->
+            <v-row>
+              <!-- This column will be hidden on xs screens and visible on sm and larger screens -->
+              <v-col
+                cols="2"
+                class="d-none d-md-flex"
+              ></v-col>
+              <v-col>
+                <h3 class="subtitle-2">1. {{ $t('admin.schule.assignSchulform') }}</h3>
+              </v-col>
+            </v-row>
+            <v-row>
+              <!-- Spacer column -->
+              <v-col
+                cols="4"
+                class="d-none d-md-flex"
+              ></v-col>
+              <v-col
+                cols="12"
+                sm="4"
+                class="pb-0"
+              >
+                <v-checkbox :label="$t('admin.schule.publicSchule')"></v-checkbox>
+              </v-col>
+              <v-col
+                cols="12"
+                sm="4"
+                class="pt-0 pt-sm-3"
+              >
+                <v-checkbox :label="$t('admin.schule.alternativeSchule')"></v-checkbox>
+              </v-col>
+            </v-row>
             <!-- Enter service number -->
             <v-row>
               <!-- This column will be hidden on xs screens and visible on sm and larger screens -->
@@ -181,7 +235,7 @@
                 class="d-none d-md-flex"
               ></v-col>
               <v-col>
-                <h3 class="subtitle-2">1. {{ $t('admin.schule.enterDienstellennummer') }}</h3>
+                <h3 class="subtitle-2">2. {{ $t('admin.schule.enterDienstellennummer') }}</h3>
               </v-col>
             </v-row>
             <v-row>
@@ -195,8 +249,11 @@
                 md="3"
                 class="md-text-right py-0"
               >
-                <label class="text-body">
-                  {{ $t('admin.schule.dienstellennummer') + '*' }}
+                <label
+                  class="text-body"
+                  required="true"
+                >
+                  {{ $t('admin.schule.dienstellennummer') }}
                 </label></v-col
               >
               <v-col
@@ -210,6 +267,7 @@
                   :placeholder="$t('admin.schule.dienstellennummer')"
                   variant="outlined"
                   density="compact"
+                  :rules="dienstellennummerRules"
                   required
                 ></v-text-field>
               </v-col>
@@ -221,7 +279,7 @@
                 class="d-none d-md-flex"
               ></v-col>
               <v-col>
-                <h3 class="subtitle-2">2. {{ $t('admin.schule.enterSchulname') }}</h3>
+                <h3 class="subtitle-2">3. {{ $t('admin.schule.enterSchulname') }}</h3>
               </v-col>
             </v-row>
             <v-row>
@@ -235,8 +293,11 @@
                 md="3"
                 class="md-text-right py-0"
               >
-                <label class="text-body">
-                  {{ $t('admin.schule.schulname') + '*' }}
+                <label
+                  class="text-body"
+                  required="true"
+                >
+                  {{ $t('admin.schule.schulname') }}
                 </label></v-col
               >
               <v-col
@@ -251,6 +312,7 @@
                   variant="outlined"
                   density="compact"
                   required
+                  :rules="SchulnameRules"
                 ></v-text-field>
               </v-col>
             </v-row>
@@ -263,7 +325,7 @@
               ></v-col>
               <v-col>
                 <label class="subtitle-2"
-                  >3. {{ $t('admin.schule.assignAdminstrativeSchulträger') }}</label
+                  >4. {{ $t('admin.schule.assignAdminstrativeSchulträger') }}</label
                 >
               </v-col>
             </v-row>
@@ -278,8 +340,11 @@
                 md="3"
                 class="md-text-right py-0"
               >
-                <label class="text-body">
-                  {{ $t('admin.schule.adminstrativeSchulträger') + '*' }}
+                <label
+                  class="text-body"
+                  required="true"
+                >
+                  {{ $t('admin.schule.adminstrativeSchulträger') }}
                 </label></v-col
               >
               <v-col
