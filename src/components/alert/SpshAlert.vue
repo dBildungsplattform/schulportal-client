@@ -55,7 +55,7 @@
           <v-col cols="auto">
             <v-btn
               class="primary"
-              @click="closeAlert"
+              @click="buttonAction"
               data-testid="alert-button"
             >
               {{ buttonText }}

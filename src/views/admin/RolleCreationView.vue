@@ -24,9 +24,15 @@
   import { toTypedSchema } from '@vee-validate/yup'
   import CreationForm from '@/components/form/CreationForm.vue'
   import InputRow from '@/components/form/InputRow.vue'
+  import {
+    useOrganisationStore,
+    type OrganisationStore,
+    type Organisation
+  } from '@/stores/OrganisationStore'
 
   const { smAndDown }: { smAndDown: Ref<boolean> } = useDisplay()
   const rolleStore: RolleStore = useRolleStore()
+  const organisationStore: OrganisationStore = useOrganisationStore()
 
   const { t }: Composer = useI18n({ useScope: 'global' })
   const router: Router = useRouter()
@@ -36,8 +42,6 @@
 
   type TranslatedMerkmal = { value: RolleResponseMerkmaleEnum; title: string }
   const translatedMerkmale: Ref<TranslatedMerkmal[]> = ref([])
-
-  const schulstrukturknoten: string[] = ['cef7240e-fd08-4961-927e-c9ea0c5a37c5']
 
   const validationSchema: TypedSchema = toTypedSchema(
     object({
@@ -120,11 +124,18 @@
           selectedRollenArt.value,
           merkmaleToSubmit
         )
+
+        if (rolleStore.createdRolle) {
+          await organisationStore.getOrganisationById(
+            rolleStore.createdRolle.administeredBySchulstrukturknoten
+          )
+        }
       }
     }
   )
 
   const handleCreateAnotherRolle = (): void => {
+    organisationStore.currentOrganisation = null
     rolleStore.createdRolle = null
     selectedSchulstrukturknoten.value = ''
     selectedRollenArt.value = null
@@ -145,6 +156,15 @@
 
   function navigateBackToRolleForm(): void {
     rolleStore.errorCode = ''
+    router.push({ name: 'create-rolle' })
+  }
+  function navigateToRolleManagement(): void {
+    rolleStore.createdRolle = null
+    selectedSchulstrukturknoten.value = ''
+    selectedRollenArt.value = null
+    selectedRollenName.value = ''
+    selectedMerkmale.value = null
+    router.push({ name: 'rolle-management' })
   }
 
   const translatedCreatedRolleMerkmale: ComputedRef<string> = computed(() => {
@@ -159,7 +179,22 @@
       })
       .join(', ')
   })
-  onMounted(() => {
+
+  const schulstrukturknoten: ComputedRef<
+    {
+      value: string
+      title: string
+    }[]
+  > = computed(() =>
+    organisationStore.allOrganisationen.map((org: Organisation) => ({
+      value: org.id,
+      title: `${org.kennung} (${org.name})`
+    }))
+  )
+
+  onMounted(async () => {
+    await organisationStore.getAllOrganisationen()
+
     // Iterate over the enum values
     Object.values(RolleResponseRollenartEnum).forEach((enumValue: RolleResponseRollenartEnum) => {
       // Use the enum value to construct the i18n path
@@ -191,13 +226,9 @@
 
 <template>
   <div class="admin">
-    <v-row>
-      <v-col cols="12">
-        <h1 class="text-center headline-1">{{ $t('admin.headline') }}</h1>
-      </v-col>
-    </v-row>
     <LayoutCard
       :closable="true"
+      @onCloseClicked="navigateToRolleManagement"
       :header="$t('admin.rolle.addNew')"
       :padded="true"
       :showCloseText="true"
@@ -222,7 +253,7 @@
           :createButtonLabel="$t('admin.rolle.create')"
           :discardButtonLabel="$t('admin.rolle.discard')"
           id="rolle-creation-form"
-          :onDiscard="resetForm"
+          :onDiscard="navigateToRolleManagement"
           @onShowDialogChange="(value: boolean) => (showUnsavedChangesDialog = value)"
           :onSubmit="onSubmit"
           :resetForm="resetForm"
@@ -334,7 +365,9 @@
               {{ $t('admin.schulstrukturknoten.schulstrukturknoten') }}:
             </v-col>
             <v-col class="text-body">
-              {{ rolleStore.createdRolle.administeredBySchulstrukturknoten }}</v-col
+              {{
+                `${organisationStore.currentOrganisation?.kennung} (${organisationStore.currentOrganisation?.name})`
+              }}</v-col
             >
           </v-row>
           <v-row>
@@ -369,6 +402,7 @@
                 class="secondary"
                 data-testid="back-to-list-button"
                 :block="smAndDown"
+                @click="navigateToRolleManagement"
                 >{{ $t('nav.backToList') }}</v-btn
               >
             </v-col>

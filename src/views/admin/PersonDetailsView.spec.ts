@@ -67,7 +67,7 @@ describe('PersonDetailsView', () => {
       [to: RouteLocationRaw],
       Promise<void | NavigationFailure | undefined>
     > = vi.spyOn(router, 'push')
-    await wrapper?.find('[data-testid="close-layout-card"]').trigger('click')
+    await wrapper?.find('[data-testid="close-layout-card-button"]').trigger('click')
     expect(push).toHaveBeenCalledTimes(1)
   })
 })

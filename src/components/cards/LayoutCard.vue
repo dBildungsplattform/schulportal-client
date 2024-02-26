@@ -30,7 +30,7 @@
         <v-btn
           class="hidden-sm-and-down"
           @click.stop="$emit('onCloseClicked')"
-          data-testid="close-layout-card"
+          data-testid="close-layout-card-button"
           :ripple="false"
           variant="text"
         >
