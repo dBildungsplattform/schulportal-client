@@ -1,10 +1,10 @@
 <script setup lang="ts">
   defineProps<{
-    closable?: boolean
-    header: string
-    padded?: boolean
-    showCloseText?: boolean
-  }>()
+    closable?: boolean;
+    header: string;
+    padded?: boolean;
+    showCloseText?: boolean;
+  }>();
 </script>
 
 <template>

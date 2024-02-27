@@ -1,5 +1,5 @@
-import { defineStore, type Store, type StoreDefinition } from 'pinia'
-import { isAxiosError, type AxiosResponse } from 'axios'
+import { defineStore, type Store, type StoreDefinition } from 'pinia';
+import { isAxiosError, type AxiosResponse } from 'axios';
 import {
   CreateRolleBodyParamsRollenartEnum,
   CreateRolleBodyParamsMerkmaleEnum,
@@ -8,37 +8,37 @@ import {
   RolleResponseMerkmaleEnum,
   type CreateRolleBodyParams,
   type RolleApiInterface,
-  type RolleResponse
-} from '../api-client/generated/api'
-import axiosApiInstance from '@/services/ApiService'
+  type RolleResponse,
+} from '../api-client/generated/api';
+import axiosApiInstance from '@/services/ApiService';
 
-const rolleApi: RolleApiInterface = RolleApiFactory(undefined, '', axiosApiInstance)
+const rolleApi: RolleApiInterface = RolleApiFactory(undefined, '', axiosApiInstance);
 
 type RolleState = {
-  createdRolle: RolleResponse | null
-  allRollen: Array<RolleResponse>
-  errorCode: string
-  loading: boolean
-}
+  createdRolle: RolleResponse | null;
+  allRollen: Array<RolleResponse>;
+  errorCode: string;
+  loading: boolean;
+};
 
-type RolleGetters = {}
+type RolleGetters = {};
 type RolleActions = {
-  getAllRollen: () => Promise<void>
+  getAllRollen: () => Promise<void>;
   createRolle: (
     rollenName: string,
     schulStrukturKnoten: string,
     rollenArt: CreateRolleBodyParamsRollenartEnum,
-    merkmale: CreateRolleBodyParamsMerkmaleEnum[]
-  ) => Promise<RolleResponse>
-}
+    merkmale: CreateRolleBodyParamsMerkmaleEnum[],
+  ) => Promise<RolleResponse>;
+};
 
-export { CreateRolleBodyParamsRollenartEnum }
-export { CreateRolleBodyParamsMerkmaleEnum }
-export { RolleResponseMerkmaleEnum }
-export { RolleResponseRollenartEnum }
-export type { RolleResponse }
+export { CreateRolleBodyParamsRollenartEnum };
+export { CreateRolleBodyParamsMerkmaleEnum };
+export { RolleResponseMerkmaleEnum };
+export { RolleResponseRollenartEnum };
+export type { RolleResponse };
 
-export type RolleStore = Store<'rolleStore', RolleState, RolleGetters, RolleActions>
+export type RolleStore = Store<'rolleStore', RolleState, RolleGetters, RolleActions>;
 
 export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGetters, RolleActions> = defineStore({
   id: 'rolleStore',
@@ -47,17 +47,17 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
       createdRolle: null,
       allRollen: [],
       errorCode: '',
-      loading: false
-    }
+      loading: false,
+    };
   },
   actions: {
     async createRolle(
       rollenName: string,
       schulStrukturKnoten: string,
       rollenArt: CreateRolleBodyParamsRollenartEnum,
-      merkmale: CreateRolleBodyParamsMerkmaleEnum[]
+      merkmale: CreateRolleBodyParamsMerkmaleEnum[],
     ): Promise<RolleResponse> {
-      this.loading = true
+      this.loading = true;
       try {
         // Construct the body params object
         const createRolleBodyParams: CreateRolleBodyParams = {
@@ -65,35 +65,35 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
           administeredBySchulstrukturknoten: schulStrukturKnoten,
           rollenart: rollenArt,
           // TODO Remove casting when generator issue is fixed from the server side
-          merkmale: merkmale as unknown as Set<CreateRolleBodyParamsMerkmaleEnum>
-        }
-        const { data }: { data: RolleResponse } = await rolleApi.rolleControllerCreateRolle(createRolleBodyParams)
-        this.loading = false
-        this.createdRolle = data
-        return data
+          merkmale: merkmale as unknown as Set<CreateRolleBodyParamsMerkmaleEnum>,
+        };
+        const { data }: { data: RolleResponse } = await rolleApi.rolleControllerCreateRolle(createRolleBodyParams);
+        this.loading = false;
+        this.createdRolle = data;
+        return data;
       } catch (error: unknown) {
-        this.errorCode = 'UNSPECIFIED_ERROR'
+        this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR'
+          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
         }
-        this.loading = false
-        return Promise.reject(this.errorCode)
+        this.loading = false;
+        return Promise.reject(this.errorCode);
       }
     },
 
     async getAllRollen() {
-      this.loading = true
+      this.loading = true;
       try {
-        const { data }: AxiosResponse<Array<RolleResponse>> = await rolleApi.rolleControllerFindRollen()
-        this.allRollen = data
-        this.loading = false
+        const { data }: AxiosResponse<Array<RolleResponse>> = await rolleApi.rolleControllerFindRollen();
+        this.allRollen = data;
+        this.loading = false;
       } catch (error: unknown) {
-        this.errorCode = 'UNSPECIFIED_ERROR'
+        this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR'
+          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
         }
-        this.loading = false
+        this.loading = false;
       }
-    }
-  }
-})
+    },
+  },
+});

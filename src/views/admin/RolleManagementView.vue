@@ -1,17 +1,17 @@
 <script setup lang="ts">
-  import { RolleResponseMerkmaleEnum, useRolleStore, type RolleResponse, type RolleStore } from '@/stores/RolleStore'
-  import { computed, onMounted, type ComputedRef } from 'vue'
-  import ResultTable from '@/components/admin/ResultTable.vue'
-  import { type Composer, useI18n } from 'vue-i18n'
-  import type { VDataTableServer } from 'vuetify/lib/components/index.mjs'
-  import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore'
+  import { RolleResponseMerkmaleEnum, useRolleStore, type RolleResponse, type RolleStore } from '@/stores/RolleStore';
+  import { computed, onMounted, type ComputedRef } from 'vue';
+  import ResultTable from '@/components/admin/ResultTable.vue';
+  import { type Composer, useI18n } from 'vue-i18n';
+  import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
+  import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
 
-  const rolleStore: RolleStore = useRolleStore()
-  const organisationStore: OrganisationStore = useOrganisationStore()
+  const rolleStore: RolleStore = useRolleStore();
+  const organisationStore: OrganisationStore = useOrganisationStore();
 
-  const { t }: Composer = useI18n({ useScope: 'global' })
+  const { t }: Composer = useI18n({ useScope: 'global' });
 
-  type ReadonlyHeaders = InstanceType<typeof VDataTableServer>['headers']
+  type ReadonlyHeaders = InstanceType<typeof VDataTableServer>['headers'];
   const headers: ReadonlyHeaders = [
     { title: t('admin.rolle.rollenname'), key: 'name', align: 'start' },
     { title: t('admin.rolle.rollenart'), key: 'rollenart', align: 'start' },
@@ -19,31 +19,31 @@
     {
       title: t('admin.schulstrukturknoten.schulstrukturknoten'),
       key: 'administeredBySchulstrukturknoten',
-      align: 'start'
-    }
-  ]
+      align: 'start',
+    },
+  ];
 
   const transformedRollenAndMerkmale: ComputedRef<
     {
-      rollenart: string
-      merkmale: string
-      id: string
-      createdAt: string
-      updatedAt: string
-      name: string
-      administeredBySchulstrukturknoten: string
+      rollenart: string;
+      merkmale: string;
+      id: string;
+      createdAt: string;
+      updatedAt: string;
+      name: string;
+      administeredBySchulstrukturknoten: string;
     }[]
   > = computed(() => {
     return rolleStore.allRollen.map((rolle: RolleResponse) => {
       // Find the organization that matches the rolle.administeredBySchulstrukturknoten
       const matchingOrganisation: Organisation | undefined = organisationStore.allOrganisationen.find(
-        (organisation: Organisation) => organisation.id === rolle.administeredBySchulstrukturknoten
-      )
+        (organisation: Organisation) => organisation.id === rolle.administeredBySchulstrukturknoten,
+      );
 
       // If a matching organization is found, format the administeredBySchulstrukturknoten field accordingly
       const administeredBySchulstrukturknoten: string = matchingOrganisation
         ? `${matchingOrganisation.kennung} (${matchingOrganisation.name})`
-        : ''
+        : '';
 
       return {
         ...rolle,
@@ -51,15 +51,15 @@
         merkmale: Array.from(rolle.merkmale)
           .map((merkmal: RolleResponseMerkmaleEnum) => t(`admin.rolle.mappingFrontBackEnd.merkmale.${merkmal}`))
           .join(', '),
-        administeredBySchulstrukturknoten
-      }
-    })
-  })
+        administeredBySchulstrukturknoten,
+      };
+    });
+  });
 
   onMounted(async () => {
-    await rolleStore.getAllRollen()
-    await organisationStore.getAllOrganisationen()
-  })
+    await rolleStore.getAllRollen();
+    await organisationStore.getAllOrganisationen();
+  });
 </script>
 
 <template>

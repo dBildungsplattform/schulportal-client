@@ -1,36 +1,36 @@
 <script setup lang="ts">
-  import { type Ref, ref, onBeforeMount } from 'vue'
-  import { type Router, type RouteLocationNormalizedLoaded, useRoute, useRouter } from 'vue-router'
-  import { usePersonStore, type PersonStore } from '@/stores/PersonStore'
-  import PasswordReset from '@/components/admin/PasswordReset.vue'
-  import LayoutCard from '@/components/cards/LayoutCard.vue'
-  import SpshAlert from '@/components/alert/SpshAlert.vue'
+  import { type Ref, ref, onBeforeMount } from 'vue';
+  import { type Router, type RouteLocationNormalizedLoaded, useRoute, useRouter } from 'vue-router';
+  import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
+  import PasswordReset from '@/components/admin/PasswordReset.vue';
+  import LayoutCard from '@/components/cards/LayoutCard.vue';
+  import SpshAlert from '@/components/alert/SpshAlert.vue';
 
-  const route: RouteLocationNormalizedLoaded = useRoute()
-  const router: Router = useRouter()
-  const currentPersonId: string = route.params['id'] as string
-  const personStore: PersonStore = usePersonStore()
+  const route: RouteLocationNormalizedLoaded = useRoute();
+  const router: Router = useRouter();
+  const currentPersonId: string = route.params['id'] as string;
+  const personStore: PersonStore = usePersonStore();
 
-  const password: Ref<string> = ref('')
+  const password: Ref<string> = ref('');
 
   function navigateToPersonTable(): void {
-    router.push({ name: 'person-management' })
+    router.push({ name: 'person-management' });
   }
 
   function resetPassword(personId: string): void {
     personStore.resetPassword(personId).then((newPassword?: string) => {
-      password.value = newPassword || ''
-    })
+      password.value = newPassword || '';
+    });
   }
 
   const handleAlertClose = (): void => {
-    personStore.errorCode = ''
-    navigateToPersonTable()
-  }
+    personStore.errorCode = '';
+    navigateToPersonTable();
+  };
 
   onBeforeMount(async () => {
-    await personStore.getPersonById(currentPersonId)
-  })
+    await personStore.getPersonById(currentPersonId);
+  });
 </script>
 
 <template>

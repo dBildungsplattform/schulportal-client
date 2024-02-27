@@ -1,30 +1,30 @@
 <script setup lang="ts">
-  import { ref, type Ref } from 'vue'
-  import { type Composer, useI18n } from 'vue-i18n'
+  import { ref, type Ref } from 'vue';
+  import { type Composer, useI18n } from 'vue-i18n';
 
   type Props = {
-    password: string
-  }
+    password: string;
+  };
 
-  defineProps<Props>()
+  defineProps<Props>();
 
-  const { t }: Composer = useI18n({ useScope: 'global' })
-  const copyToClipboardError: Ref<string> = ref('')
-  const passwordCopied: Ref<boolean> = ref(false)
-  const showPassword: Ref<boolean> = ref(false)
+  const { t }: Composer = useI18n({ useScope: 'global' });
+  const copyToClipboardError: Ref<string> = ref('');
+  const passwordCopied: Ref<boolean> = ref(false);
+  const showPassword: Ref<boolean> = ref(false);
 
   function copyToClipboard(text: string): void {
     navigator.clipboard.writeText(text).then(
       () => {
-        passwordCopied.value = true
-        copyToClipboardError.value = ''
+        passwordCopied.value = true;
+        copyToClipboardError.value = '';
       },
       (error: unknown) => {
         // eslint-disable-next-line no-console
-        console.log(error)
-        copyToClipboardError.value = t('admin.person.copyPasswordError')
-      }
-    )
+        console.log(error);
+        copyToClipboardError.value = t('admin.person.copyPasswordError');
+      },
+    );
   }
 </script>
 

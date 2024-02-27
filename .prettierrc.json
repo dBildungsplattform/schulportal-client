@@ -1,9 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/prettierrc",
   "printWidth": 120,
-  "semi": false,
   "singleAttributePerLine": true,
   "singleQuote": true,
-  "trailingComma": "none",
   "vueIndentScriptAndStyle": true
 }

@@ -1,138 +1,138 @@
 <script setup lang="ts">
-  import LayoutCard from '@/components/cards/LayoutCard.vue'
-  import { ref, type Ref, onMounted, computed, type ComputedRef } from 'vue'
+  import LayoutCard from '@/components/cards/LayoutCard.vue';
+  import { ref, type Ref, onMounted, computed, type ComputedRef } from 'vue';
   import {
     useRolleStore,
     type RolleStore,
     RolleResponseMerkmaleEnum,
     RolleResponseRollenartEnum,
     CreateRolleBodyParamsRollenartEnum,
-    CreateRolleBodyParamsMerkmaleEnum
-  } from '@/stores/RolleStore'
-  import { useI18n, type Composer } from 'vue-i18n'
-  import SpshAlert from '@/components/alert/SpshAlert.vue'
-  import { type Router, useRouter } from 'vue-router'
-  import { useDisplay } from 'vuetify'
-  import { useOrganisationStore, type OrganisationStore, type Organisation } from '@/stores/OrganisationStore'
+    CreateRolleBodyParamsMerkmaleEnum,
+  } from '@/stores/RolleStore';
+  import { useI18n, type Composer } from 'vue-i18n';
+  import SpshAlert from '@/components/alert/SpshAlert.vue';
+  import { type Router, useRouter } from 'vue-router';
+  import { useDisplay } from 'vuetify';
+  import { useOrganisationStore, type OrganisationStore, type Organisation } from '@/stores/OrganisationStore';
 
-  const { smAndDown }: { smAndDown: Ref<boolean> } = useDisplay()
-  const rolleStore: RolleStore = useRolleStore()
-  const organisationStore: OrganisationStore = useOrganisationStore()
+  const { smAndDown }: { smAndDown: Ref<boolean> } = useDisplay();
+  const rolleStore: RolleStore = useRolleStore();
+  const organisationStore: OrganisationStore = useOrganisationStore();
 
-  const { t }: Composer = useI18n({ useScope: 'global' })
-  const router: Router = useRouter()
+  const { t }: Composer = useI18n({ useScope: 'global' });
+  const router: Router = useRouter();
 
-  type TranslatedRollenArt = { value: RolleResponseRollenartEnum; title: string }
-  const translatedRollenart: Ref<TranslatedRollenArt[]> = ref([])
+  type TranslatedRollenArt = { value: RolleResponseRollenartEnum; title: string };
+  const translatedRollenart: Ref<TranslatedRollenArt[]> = ref([]);
 
-  type TranslatedMerkmal = { value: RolleResponseMerkmaleEnum; title: string }
-  const translatedMerkmale: Ref<TranslatedMerkmal[]> = ref([])
+  type TranslatedMerkmal = { value: RolleResponseMerkmaleEnum; title: string };
+  const translatedMerkmale: Ref<TranslatedMerkmal[]> = ref([]);
 
-  const selectedSchulstrukturKnoten: Ref<string | null> = ref(null)
-  const selectedRollenName: Ref<string | null> = ref(null)
-  const selectedRollenArt: Ref<CreateRolleBodyParamsRollenartEnum | null> = ref(null)
-  const selectedMerkmale: Ref<CreateRolleBodyParamsMerkmaleEnum[] | null> = ref(null)
+  const selectedSchulstrukturKnoten: Ref<string | null> = ref(null);
+  const selectedRollenName: Ref<string | null> = ref(null);
+  const selectedRollenArt: Ref<CreateRolleBodyParamsRollenartEnum | null> = ref(null);
+  const selectedMerkmale: Ref<CreateRolleBodyParamsMerkmaleEnum[] | null> = ref(null);
 
   // Rule for validating the rolle name. Maybe enhance a validation framework like VeeValidate instead?
   const rolleNameRules: Array<(v: string | null | undefined) => boolean | string> = [
     (v: string | null | undefined): boolean | string => {
       // First, check for null or undefined values and return a required field message.
       if (v == null || v.trim().length === 0) {
-        return t('admin.rolle.rule.rolleNameRequired')
+        return t('admin.rolle.rule.rolleNameRequired');
       }
       // Next, check for the length constraint.
       if (v.length > 200) {
-        return t('admin.rolle.rule.rolleNameLength')
+        return t('admin.rolle.rule.rolleNameLength');
       }
       // If none of the above conditions are met, the input is valid.
-      return true
-    }
-  ]
+      return true;
+    },
+  ];
   const submitForm = async (): Promise<void> => {
     if (selectedRollenName.value && selectedSchulstrukturKnoten.value && selectedRollenArt.value) {
       const merkmaleToSubmit: CreateRolleBodyParamsMerkmaleEnum[] =
-        selectedMerkmale.value?.map((m: CreateRolleBodyParamsMerkmaleEnum) => m) || []
+        selectedMerkmale.value?.map((m: CreateRolleBodyParamsMerkmaleEnum) => m) || [];
       await rolleStore.createRolle(
         selectedRollenName.value,
         selectedSchulstrukturKnoten.value,
         selectedRollenArt.value,
-        merkmaleToSubmit
-      )
+        merkmaleToSubmit,
+      );
 
       if (rolleStore.createdRolle) {
-        await organisationStore.getOrganisationById(rolleStore.createdRolle.administeredBySchulstrukturknoten)
+        await organisationStore.getOrganisationById(rolleStore.createdRolle.administeredBySchulstrukturknoten);
       }
     }
-  }
+  };
   const handleCreateAnotherRolle = (): void => {
-    rolleStore.createdRolle = null
-    organisationStore.currentOrganisation = null
-    selectedSchulstrukturKnoten.value = null
-    selectedRollenArt.value = null
-    selectedRollenName.value = null
-    selectedMerkmale.value = null
-    router.push({ name: 'create-rolle' })
-  }
+    rolleStore.createdRolle = null;
+    organisationStore.currentOrganisation = null;
+    selectedSchulstrukturKnoten.value = null;
+    selectedRollenArt.value = null;
+    selectedRollenName.value = null;
+    selectedMerkmale.value = null;
+    router.push({ name: 'create-rolle' });
+  };
 
   function navigateBackToRolleForm(): void {
-    rolleStore.errorCode = ''
-    router.push({ name: 'create-rolle' })
+    rolleStore.errorCode = '';
+    router.push({ name: 'create-rolle' });
   }
   function navigateToRolleManagement(): void {
-    rolleStore.createdRolle = null
-    selectedSchulstrukturKnoten.value = null
-    selectedRollenArt.value = null
-    selectedRollenName.value = null
-    selectedMerkmale.value = null
-    router.push({ name: 'rolle-management' })
+    rolleStore.createdRolle = null;
+    selectedSchulstrukturKnoten.value = null;
+    selectedRollenArt.value = null;
+    selectedRollenName.value = null;
+    selectedMerkmale.value = null;
+    router.push({ name: 'rolle-management' });
   }
   const translatedCreatedRolleMerkmale: ComputedRef<string> = computed(() => {
     // Check if `createdRolle.merkmale` exists and is an array
     if (!rolleStore.createdRolle?.merkmale || !Array.isArray(rolleStore.createdRolle.merkmale)) {
-      return ''
+      return '';
     }
 
     return rolleStore.createdRolle.merkmale
       .map((merkmalKey: string) => {
-        return t(`admin.rolle.mappingFrontBackEnd.merkmale.${merkmalKey}`)
+        return t(`admin.rolle.mappingFrontBackEnd.merkmale.${merkmalKey}`);
       })
-      .join(', ')
-  })
+      .join(', ');
+  });
 
   const schulstrukturknoten: ComputedRef<
     {
-      value: string
-      title: string
+      value: string;
+      title: string;
     }[]
   > = computed(() =>
     organisationStore.allOrganisationen.map((org: Organisation) => ({
       value: org.id,
-      title: `${org.kennung} (${org.name})`
-    }))
-  )
+      title: `${org.kennung} (${org.name})`,
+    })),
+  );
 
   onMounted(async () => {
-    await organisationStore.getAllOrganisationen()
+    await organisationStore.getAllOrganisationen();
 
     // Iterate over the enum values
     Object.values(RolleResponseRollenartEnum).forEach((enumValue: RolleResponseRollenartEnum) => {
       // Use the enum value to construct the i18n path
-      const i18nPath: string = `admin.rolle.mappingFrontBackEnd.rollenarten.${enumValue}`
+      const i18nPath: string = `admin.rolle.mappingFrontBackEnd.rollenarten.${enumValue}`;
       // Push the mapped object into the array
       translatedRollenart.value.push({
         value: enumValue, // Keep the enum value for internal use
-        title: t(i18nPath) // Get the localized title
-      })
-    })
+        title: t(i18nPath), // Get the localized title
+      });
+    });
 
     Object.values(RolleResponseMerkmaleEnum).forEach((enumValue: RolleResponseMerkmaleEnum) => {
-      const i18nPath: string = `admin.rolle.mappingFrontBackEnd.merkmale.${enumValue}`
+      const i18nPath: string = `admin.rolle.mappingFrontBackEnd.merkmale.${enumValue}`;
       translatedMerkmale.value.push({
         value: enumValue,
-        title: t(i18nPath)
-      })
-    })
-  })
+        title: t(i18nPath),
+      });
+    });
+  });
 </script>
 
 <template>
