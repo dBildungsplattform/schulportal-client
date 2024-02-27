@@ -56,7 +56,7 @@ export default defineConfig({
     include: ['src/**/*.spec.ts'],
     setupFiles: 'vitest.setup.ts',
     coverage: {
-      reporter: ['lcov'],
+      reporter: ['text', 'lcov'],
       include: ['src/**'],
       exclude: [
         'src/api-client/**',
