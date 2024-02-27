@@ -18,9 +18,6 @@
     type OrganisationStore,
     type Organisation
   } from '@/stores/OrganisationStore'
-  import { useForm, type TypedSchema, type BaseFieldProps } from 'vee-validate'
-  import { object, string } from 'yup'
-  import { toTypedSchema } from '@vee-validate/yup'
 
   const { smAndDown }: { smAndDown: Ref<boolean> } = useDisplay()
   const rolleStore: RolleStore = useRolleStore()
@@ -29,82 +26,57 @@
   const { t }: Composer = useI18n({ useScope: 'global' })
   const router: Router = useRouter()
 
-  const validationSchema: TypedSchema = toTypedSchema(
-    object({
-      selectedRollenName: string()
-        .required(t('admin.rolle.rules.rollenname.required'))
-        .max(200, t('admin.rolle.rules.rollenname.max'))
-    })
-  )
-
-  const vuetifyConfig = (state: {
-    errors: Array<string>
-  }): { props: { error: boolean; 'error-messages': Array<string> } } => ({
-    props: {
-      error: !!state.errors.length,
-      'error-messages': state.errors
-    }
-  })
-
-  type RollereationForm = {
-    selectedSchulstrukturKnoten: string
-    selectedRollenName: string
-    selectedRollenArt: CreateRolleBodyParamsRollenartEnum
-    selectedMerkmale: CreateRolleBodyParamsMerkmaleEnum[] | []
-  }
-
-  // eslint-disable-next-line @typescript-eslint/typedef
-  const { defineField, handleSubmit, resetForm } = useForm<RollereationForm>({
-    validationSchema
-  })
-
   type TranslatedRollenArt = { value: RolleResponseRollenartEnum; title: string }
   const translatedRollenart: Ref<TranslatedRollenArt[]> = ref([])
 
   type TranslatedMerkmal = { value: RolleResponseMerkmaleEnum; title: string }
   const translatedMerkmale: Ref<TranslatedMerkmal[]> = ref([])
 
-  const [selectedSchulstrukturKnoten, selectedSchulstrukturKnotenProps]: [
-    Ref<string>,
-    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>
-  ] = defineField('selectedSchulstrukturKnoten', vuetifyConfig)
-  const [selectedRollenName, selectedRollenNameProps]: [
-    Ref<string>,
-    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>
-  ] = defineField('selectedRollenName', vuetifyConfig)
-  const [selectedRollenArt, selectedRollenArtProps]: [
-    Ref<CreateRolleBodyParamsRollenartEnum>,
-    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>
-  ] = defineField('selectedRollenArt', vuetifyConfig)
-
+  const selectedSchulstrukturKnoten: Ref<string | null> = ref(null)
+  const selectedRollenName: Ref<string | null> = ref(null)
+  const selectedRollenArt: Ref<CreateRolleBodyParamsRollenartEnum | null> = ref(null)
   const selectedMerkmale: Ref<CreateRolleBodyParamsMerkmaleEnum[] | null> = ref(null)
 
-  const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = handleSubmit(
-    async () => {
-      if (selectedRollenName.value && selectedSchulstrukturKnoten.value) {
-        const merkmaleToSubmit: CreateRolleBodyParamsMerkmaleEnum[] =
-          selectedMerkmale.value?.map((m: CreateRolleBodyParamsMerkmaleEnum) => m) || []
-        await rolleStore.createRolle(
-          selectedRollenName.value,
-          selectedSchulstrukturKnoten.value,
-          selectedRollenArt.value,
-          merkmaleToSubmit
-        )
+  // Rule for validating the rolle name. Maybe enhance a validation framework like VeeValidate instead?
+  const rolleNameRules: Array<(v: string | null | undefined) => boolean | string> = [
+    (v: string | null | undefined): boolean | string => {
+      // First, check for null or undefined values and return a required field message.
+      if (v == null || v.trim().length === 0) {
+        return t('admin.rolle.rule.rolleNameRequired')
+      }
+      // Next, check for the length constraint.
+      if (v.length > 200) {
+        return t('admin.rolle.rule.rolleNameLength')
+      }
+      // If none of the above conditions are met, the input is valid.
+      return true
+    }
+  ]
+  const submitForm = async (): Promise<void> => {
+    if (selectedRollenName.value && selectedSchulstrukturKnoten.value && selectedRollenArt.value) {
+      const merkmaleToSubmit: CreateRolleBodyParamsMerkmaleEnum[] =
+        selectedMerkmale.value?.map((m: CreateRolleBodyParamsMerkmaleEnum) => m) || []
+      await rolleStore.createRolle(
+        selectedRollenName.value,
+        selectedSchulstrukturKnoten.value,
+        selectedRollenArt.value,
+        merkmaleToSubmit
+      )
 
-        // Check if `createRolle` operation has successfully created a role and set `createdRolle`
-        if (rolleStore.createdRolle) {
-          await organisationStore.getOrganisationById(
-            rolleStore.createdRolle.administeredBySchulstrukturknoten
-          )
-        }
+      if (rolleStore.createdRolle) {
+        await organisationStore.getOrganisationById(
+          rolleStore.createdRolle.administeredBySchulstrukturknoten
+        )
       }
     }
-  )
-
+  }
   const handleCreateAnotherRolle = (): void => {
     rolleStore.createdRolle = null
+    organisationStore.currentOrganisation = null
+    selectedSchulstrukturKnoten.value = null
+    selectedRollenArt.value = null
+    selectedRollenName.value = null
     selectedMerkmale.value = null
-    resetForm()
     router.push({ name: 'create-rolle' })
   }
 
@@ -114,8 +86,10 @@
   }
   function navigateToRolleManagement(): void {
     rolleStore.createdRolle = null
+    selectedSchulstrukturKnoten.value = null
+    selectedRollenArt.value = null
+    selectedRollenName.value = null
     selectedMerkmale.value = null
-    resetForm()
     router.push({ name: 'rolle-management' })
   }
   const translatedCreatedRolleMerkmale: ComputedRef<string> = computed(() => {
@@ -282,7 +256,7 @@
       <!-- The form to create a new role (No created role yet and no errorCode) -->
       <template v-if="!rolleStore.createdRolle && !rolleStore.errorCode">
         <v-container class="new-rolle">
-          <v-form @submit.prevent="onSubmit">
+          <v-form @submit.prevent="submitForm">
             <v-row>
               <v-col
                 class="d-none d-md-flex"
@@ -339,7 +313,6 @@
                   data-testid="schulstrukturknoten-select"
                   id="schulstrukturknoten-select"
                   :items="schulstrukturknoten"
-                  v-bind="selectedSchulstrukturKnotenProps"
                   v-model="selectedSchulstrukturKnoten"
                   item-value="value"
                   item-text="title"
@@ -348,6 +321,7 @@
                   single-line
                   :placeholder="$t('admin.schulstrukturknoten.selectSchulstrukturknoten')"
                   clearable
+                  required
                 >
                   <template v-slot:item="{ props, item }">
                     <v-list-item
@@ -397,7 +371,6 @@
                   data-testid="rollenart-select"
                   id="rollenart-select"
                   :items="translatedRollenart"
-                  v-bind="selectedRollenArtProps"
                   v-model="selectedRollenArt"
                   item-value="value"
                   item-text="title"
@@ -457,11 +430,12 @@
                     clearable
                     data-testid="rollenname-input"
                     id="rollenname-input"
-                    v-bind="selectedRollenNameProps"
                     v-model="selectedRollenName"
                     :placeholder="$t('admin.rolle.enterRollenname')"
                     variant="outlined"
                     density="compact"
+                    :rules="rolleNameRules"
+                    required
                   ></v-text-field>
                 </v-col>
               </v-row>
