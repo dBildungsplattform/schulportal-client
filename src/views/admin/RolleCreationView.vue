@@ -135,12 +135,8 @@
   )
 
   const handleCreateAnotherRolle = (): void => {
-    organisationStore.currentOrganisation = null
     rolleStore.createdRolle = null
-    selectedSchulstrukturknoten.value = ''
-    selectedRollenArt.value = null
-    selectedRollenName.value = ''
-    selectedMerkmale.value = null
+    resetForm()
     router.push({ name: 'create-rolle' })
   }
 
@@ -158,12 +154,10 @@
     rolleStore.errorCode = ''
     router.push({ name: 'create-rolle' })
   }
+
   function navigateToRolleManagement(): void {
     rolleStore.createdRolle = null
-    selectedSchulstrukturknoten.value = ''
-    selectedRollenArt.value = null
-    selectedRollenName.value = ''
-    selectedMerkmale.value = null
+    resetForm()
     router.push({ name: 'rolle-management' })
   }
 
