@@ -75,5 +75,5 @@ ports:
     port: 8080
     targetPort: 8080
 
-servicetype: NodePort
+servicetype: ClusterIP
 serviceName: http
