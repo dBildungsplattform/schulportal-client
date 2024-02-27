@@ -43,11 +43,9 @@
       "rollenart": "Rollenart",
       "rollenname": "Rollenname",
       "rolleAddedSuccessfully": "Die Rolle wurde erfolgreich hinzugefügt.",
-      "rules": {
-        "rollenname": {
-          "required": "Die Rollenname muss angegeben werden.",
-          "max": "Die Rollenname muss aus höchstens 200 Zeichen bestehen."
-        }
+      "rule": {
+        "rolleNameLength": "Der Rollenname darf nicht länger als 200 Zeichen sein.",
+        "rolleNameRequired": "Der Rollenname ist erforderlich."
       },
       "selectRolle": "Rolle auswählen",
       "selectRollenart": "Rollenart auswählen",
@@ -96,23 +94,23 @@
     "schule": {
       "assign": "Schule zuordnen",
       "addNew": "Neue Schule hinzufügen",
-      "adminstrativeSchulträger": "Verwaltender Schulträger",
-      "alternativeSchule": "Ersatzschule",
-      "assignAdminstrativeSchulträger": "Verwaltender Schulträger zuordnen",
+      "administratingSchultraeger": "Verwaltender Schulträger",
+      "ersatzschule": "Ersatzschule",
+      "assignAdminstratingSchultraeger": "Verwaltender Schulträger zuordnen",
       "assignSchulform": "Schulform zuordnen",
-      "backToCreateSchule": "Zurück zur Schulnanlage",
+      "backToCreateSchule": "Zurück zur Schulanlage",
       "createNew": "Neue Schule anlegen",
       "create": "Schule anlegen",
       "createAnother": "Weitere Schule anlegen",
       "discard": "Schule verwerfen",
-      "dienstellennummer": "Dienstellennummer",
-      "enterDienstellennummer": "Dienstellennummer eingeben",
+      "dienstellennummer": "Dienststellennummer",
+      "enterDienstellennummer": "Dienststellennummer eingeben",
       "enterSchulname": "Schulname eingeben",
       "management": "Schulverwaltung",
       "publicSchule": "Öffentliche Schule",
       "rules": {
-        "dienstellennummer": {
-          "required": "Die Dienstellennummer muss angegeben werden."
+        "dienststellennummer": {
+          "required": "Die Dienststellennummer muss angegeben werden."
         },
         "schulname": {
           "matches": "Der Schulname darf keine ungültigen Zeichen beinhalten.",

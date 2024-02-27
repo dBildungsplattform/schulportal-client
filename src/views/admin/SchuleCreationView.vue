@@ -22,8 +22,8 @@
 
   const validationSchema: TypedSchema = toTypedSchema(
     object({
-      selectedDienstellennummer: string().required(
-        t('admin.schule.rules.dienstellennummer.required')
+      selectedDienststellennummer: string().required(
+        t('admin.schule.rules.dienststellennummer.required')
       ),
       selectedSchulname: string()
         .matches(/^[A-Za-z]*[A-Za-zÀ-ÖØ-öø-ÿ-' ]*$/, t('admin.schule.rules.schulname.matches'))
@@ -40,14 +40,14 @@
     }
   })
 
-  type SchulereationForm = {
-    selectedDienstellennummer: string
+  type SchuleCreationForm = {
+    selectedDienststellennummer: string
     selectedSchulname: string
     selectedAdministrativeSchulträger: string
   }
 
   // eslint-disable-next-line @typescript-eslint/typedef
-  const { defineField, handleSubmit, resetForm } = useForm<SchulereationForm>({
+  const { defineField, handleSubmit, resetForm } = useForm<SchuleCreationForm>({
     validationSchema
   })
 
@@ -55,27 +55,15 @@
     Ref<string>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>
   ] = defineField('selectedSchulname', vuetifyConfig)
-  const [selectedDienstellennummer, selectedDienstellennummerProps]: [
+  const [selectedDienststellennummer, selectedDienststellennummerProps]: [
     Ref<string>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>
-  ] = defineField('selectedDienstellennummer', vuetifyConfig)
-  const [selectedAdministrativeSchulträger, selectedAdministrativeSchulträgerProps]: [
-    Ref<string>,
-    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>
-  ] = defineField('selectedAdministrativeSchulträger', vuetifyConfig)
-
-
-  // For now this wil be hardcoded as we have no Schulträger in the DB.
-  const administrativeSchulträger: string[] = ['Eigenständig verwaltet']
+  ] = defineField('selectedDienststellennummer', vuetifyConfig)
 
   const onSubmit: (e?: Event | undefined) => Promise<void | undefined> = handleSubmit(() => {
-    if (
-      selectedDienstellennummer.value &&
-      selectedSchulname.value &&
-      selectedAdministrativeSchulträger.value
-    ) {
+    if (selectedDienststellennummer.value && selectedSchulname.value) {
       organisationStore.createOrganisation(
-        selectedDienstellennummer.value,
+        selectedDienststellennummer.value,
         selectedSchulname.value,
         ' ',
         ' ',
@@ -153,12 +141,6 @@
           <v-row>
             <v-col class="text-body bold text-right"> {{ $t('admin.schule.schulname') }}: </v-col>
             <v-col class="text-body"> {{ organisationStore.createdOrganisation.name }}</v-col>
-          </v-row>
-          <v-row>
-            <v-col class="text-body bold text-right">
-              {{ $t('admin.schule.adminstrativeSchulträger') }}:</v-col
-            >
-            <v-col class="text-body">{{ administrativeSchulträger.join(',') }} </v-col>
           </v-row>
           <v-divider
             class="border-opacity-100 rounded my-6"
@@ -241,7 +223,7 @@
                 sm="4"
                 class="pt-0 pt-sm-3"
               >
-                <v-checkbox :label="$t('admin.schule.alternativeSchule')"></v-checkbox>
+                <v-checkbox :label="$t('admin.schule.ersatzschule')"></v-checkbox>
               </v-col>
             </v-row>
             <!-- Enter service number -->
@@ -268,7 +250,7 @@
               >
                 <label
                   class="text-body"
-                  :error="selectedDienstellennummerProps['error']"
+                  :error="selectedDienststellennummerProps['error']"
                   required="true"
                 >
                   {{ $t('admin.schule.dienstellennummer') }}
@@ -281,8 +263,8 @@
               >
                 <v-text-field
                   data-testid="dienstellennummer-input"
-                  v-bind="selectedDienstellennummerProps"
-                  v-model="selectedDienstellennummer"
+                  v-bind="selectedDienststellennummerProps"
+                  v-model="selectedDienststellennummer"
                   :placeholder="$t('admin.schule.dienstellennummer')"
                   variant="outlined"
                   density="compact"
@@ -332,63 +314,6 @@
                   density="compact"
                   required
                 ></v-text-field>
-              </v-col>
-            </v-row>
-
-            <!-- Enter managing school authority  -->
-            <v-row>
-              <v-col
-                cols="2"
-                class="d-none d-md-flex"
-              ></v-col>
-              <v-col>
-                <label class="subtitle-2"
-                  >4. {{ $t('admin.schule.assignAdminstrativeSchulträger') }}</label
-                >
-              </v-col>
-            </v-row>
-            <v-row>
-              <!-- Spacer column -->
-              <v-col
-                cols="3"
-                class="d-none d-md-flex"
-              ></v-col>
-              <v-col
-                cols="12"
-                md="3"
-                class="md-text-right py-0"
-              >
-                <label
-                  class="text-body"
-                  required="true"
-                >
-                  {{ $t('admin.schule.adminstrativeSchulträger') }}
-                </label></v-col
-              >
-              <v-col
-                cols="12"
-                md="auto"
-                class="py-0"
-              >
-                <v-select
-                  data-testid="adminstrativeSchulträger-select"
-                  :items="administrativeSchulträger"
-                  v-model="selectedAdministrativeSchulträger"
-                  v-bind="selectedAdministrativeSchulträgerProps"
-                  variant="outlined"
-                  density="compact"
-                  single-line
-                  :placeholder="$t('admin.schule.adminstrativeSchulträger')"
-                  clearable
-                >
-                  <template v-slot:item="{ props, item }">
-                    <v-list-item
-                      v-bind="props"
-                      :title="item.title"
-                      class="select-item-text"
-                    ></v-list-item>
-                  </template>
-                </v-select>
               </v-col>
             </v-row>
             <v-divider
