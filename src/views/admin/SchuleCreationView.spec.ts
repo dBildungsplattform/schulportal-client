@@ -37,6 +37,6 @@ beforeEach(async () => {
 
 describe('SchuleCreationView', () => {
   test('it renders the schule form', () => {
-    expect(wrapper?.find('[data-testid="dienstellennummer-input"]').isVisible()).toBe(true)
+    expect(wrapper?.find('[data-testid="dienststellennummer-input"]').isVisible()).toBe(true)
   })
 })

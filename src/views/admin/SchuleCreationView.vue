@@ -143,7 +143,7 @@
           </v-row>
           <v-row>
             <v-col class="text-body bold text-right">
-              {{ $t('admin.schule.dienstellennummer') }}:
+              {{ $t('admin.schule.dienststellennummer') }}:
             </v-col>
             <v-col class="text-body"> {{ organisationStore.createdOrganisation.kennung }}</v-col>
           </v-row>
@@ -254,7 +254,7 @@
                 class="d-none d-md-flex"
               ></v-col>
               <v-col>
-                <h3 class="subtitle-2">2. {{ $t('admin.schule.enterDienstellennummer') }}</h3>
+                <h3 class="subtitle-2">2. {{ $t('admin.schule.enterDienststellennummer') }}</h3>
               </v-col>
             </v-row>
             <v-row>
@@ -273,7 +273,7 @@
                   :error="selectedDienststellennummerProps['error']"
                   required="true"
                 >
-                  {{ $t('admin.schule.dienstellennummer') }}
+                  {{ $t('admin.schule.dienststellennummer') }}
                 </label></v-col
               >
               <v-col
@@ -282,10 +282,10 @@
                 class="py-0"
               >
                 <v-text-field
-                  data-testid="dienstellennummer-input"
+                  data-testid="dienststellennummer-input"
                   v-bind="selectedDienststellennummerProps"
                   v-model="selectedDienststellennummer"
-                  :placeholder="$t('admin.schule.dienstellennummer')"
+                  :placeholder="$t('admin.schule.dienststellennummer')"
                   variant="outlined"
                   density="compact"
                 ></v-text-field>
