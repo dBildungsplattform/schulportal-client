@@ -1,9 +1,4 @@
-import {
-  createRouter,
-  createWebHistory,
-  type RouteLocationNormalized,
-  type Router
-} from 'vue-router'
+import { createRouter, createWebHistory, type RouteLocationNormalized, type Router } from 'vue-router'
 import { useAuthStore, type AuthStore } from '@/stores/AuthStore'
 import routes from './routes'
 

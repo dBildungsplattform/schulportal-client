@@ -13,11 +13,7 @@
   import SpshAlert from '@/components/alert/SpshAlert.vue'
   import { type Router, useRouter } from 'vue-router'
   import { useDisplay } from 'vuetify'
-  import {
-    useOrganisationStore,
-    type OrganisationStore,
-    type Organisation
-  } from '@/stores/OrganisationStore'
+  import { useOrganisationStore, type OrganisationStore, type Organisation } from '@/stores/OrganisationStore'
 
   const { smAndDown }: { smAndDown: Ref<boolean> } = useDisplay()
   const rolleStore: RolleStore = useRolleStore()
@@ -64,9 +60,7 @@
       )
 
       if (rolleStore.createdRolle) {
-        await organisationStore.getOrganisationById(
-          rolleStore.createdRolle.administeredBySchulstrukturknoten
-        )
+        await organisationStore.getOrganisationById(rolleStore.createdRolle.administeredBySchulstrukturknoten)
       }
     }
   }
@@ -204,11 +198,7 @@
           <v-row>
             <v-col class="text-body bold text-right"> {{ $t('admin.rolle.rollenart') }}: </v-col>
             <v-col class="text-body">
-              {{
-                $t(
-                  `admin.rolle.mappingFrontBackEnd.rollenarten.${rolleStore.createdRolle.rollenart}`
-                )
-              }}</v-col
+              {{ $t(`admin.rolle.mappingFrontBackEnd.rollenarten.${rolleStore.createdRolle.rollenart}`) }}</v-col
             >
           </v-row>
           <v-row>
@@ -280,9 +270,7 @@
                 class="d-none d-md-flex"
               ></v-col>
               <v-col>
-                <h3 class="subtitle-2">
-                  1. {{ $t('admin.schulstrukturknoten.assignSchulstrukturknoten') }}
-                </h3>
+                <h3 class="subtitle-2">1. {{ $t('admin.schulstrukturknoten.assignSchulstrukturknoten') }}</h3>
               </v-col>
             </v-row>
             <v-row>

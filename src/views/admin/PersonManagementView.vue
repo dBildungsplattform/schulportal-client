@@ -19,10 +19,7 @@
 
   const router: Router = useRouter()
 
-  function navigateToPersonDetails(
-    _$event: PointerEvent,
-    { item }: { item: Personendatensatz }
-  ): void {
+  function navigateToPersonDetails(_$event: PointerEvent, { item }: { item: Personendatensatz }): void {
     router.push({ name: 'person-details', params: { id: item.person.id } })
   }
 

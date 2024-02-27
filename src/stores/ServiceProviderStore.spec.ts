@@ -1,11 +1,7 @@
 import ApiService from '@/services/ApiService'
 import MockAdapter from 'axios-mock-adapter'
 import { setActivePinia, createPinia } from 'pinia'
-import {
-  useServiceProviderStore,
-  type ServiceProviderStore,
-  type ServiceProvider
-} from './ServiceProviderStore'
+import { useServiceProviderStore, type ServiceProviderStore, type ServiceProvider } from './ServiceProviderStore'
 
 const mockadapter: MockAdapter = new MockAdapter(ApiService)
 
@@ -31,8 +27,7 @@ describe('serviceProviderStore', () => {
       ]
 
       mockadapter.onGet('/api/provider').replyOnce(200, mockResponse)
-      const getAllServiceProvidersPromise: Promise<void> =
-        serviceProviderStore.getAllServiceProviders()
+      const getAllServiceProvidersPromise: Promise<void> = serviceProviderStore.getAllServiceProviders()
       expect(serviceProviderStore.loading).toBe(true)
       await getAllServiceProvidersPromise
       expect(serviceProviderStore.allServiceProviders).toEqual([...mockResponse])
@@ -41,8 +36,7 @@ describe('serviceProviderStore', () => {
 
     it('should handle string error', async () => {
       mockadapter.onGet('/api/provider').replyOnce(500, 'some mock server error')
-      const getAllServiceProvidersPromise: Promise<void> =
-        serviceProviderStore.getAllServiceProviders()
+      const getAllServiceProvidersPromise: Promise<void> = serviceProviderStore.getAllServiceProviders()
       expect(serviceProviderStore.loading).toBe(true)
       await getAllServiceProvidersPromise
       expect(serviceProviderStore.allServiceProviders).toEqual([])
@@ -52,8 +46,7 @@ describe('serviceProviderStore', () => {
 
     it('should handle error code', async () => {
       mockadapter.onGet('/api/provider').replyOnce(500, { code: 'some mock server error' })
-      const getAllServiceProvidersPromise: Promise<void> =
-        serviceProviderStore.getAllServiceProviders()
+      const getAllServiceProvidersPromise: Promise<void> = serviceProviderStore.getAllServiceProviders()
       expect(serviceProviderStore.loading).toBe(true)
       await getAllServiceProvidersPromise
       expect(serviceProviderStore.allServiceProviders).toEqual([])

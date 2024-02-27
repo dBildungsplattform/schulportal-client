@@ -24,7 +24,7 @@
         .required(t('admin.person.rules.vorname.required')),
       selectedFamilienname: string()
         .matches(/^[A-Za-z]*[A-Za-zÀ-ÖØ-öø-ÿ-' ]*$/, t('admin.person.rules.familienname.matches'))
-        .min(2, t('admin.person.rules.nachname.min'))  
+        .min(2, t('admin.person.rules.nachname.min'))
         .required(t('admin.person.rules.familienname.required'))
     })
   )
@@ -287,13 +287,9 @@
           <v-col class="text-body"> {{ personStore.createdPerson.person.referrer }}</v-col>
         </v-row>
         <v-row class="align-center">
-          <v-col class="text-body bold text-right pb-8">
-            {{ $t('admin.person.startPassword') }}:
-          </v-col>
+          <v-col class="text-body bold text-right pb-8"> {{ $t('admin.person.startPassword') }}: </v-col>
           <v-col class="text-body">
-            <PasswordOutput
-              :password="personStore.createdPerson.person.startpasswort"
-            ></PasswordOutput>
+            <PasswordOutput :password="personStore.createdPerson.person.startpasswort"></PasswordOutput>
           </v-col>
         </v-row>
         <v-divider

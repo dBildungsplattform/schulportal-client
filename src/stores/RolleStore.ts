@@ -8,7 +8,7 @@ import {
   RolleResponseMerkmaleEnum,
   type CreateRolleBodyParams,
   type RolleApiInterface,
-  type RolleResponse,
+  type RolleResponse
 } from '../api-client/generated/api'
 import axiosApiInstance from '@/services/ApiService'
 
@@ -40,63 +40,60 @@ export type { RolleResponse }
 
 export type RolleStore = Store<'rolleStore', RolleState, RolleGetters, RolleActions>
 
-export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGetters, RolleActions> =
-  defineStore({
-    id: 'rolleStore',
-    state: (): RolleState => {
-      return {
-        createdRolle: null,
-        allRollen: [],
-        errorCode: '',
-        loading: false
+export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGetters, RolleActions> = defineStore({
+  id: 'rolleStore',
+  state: (): RolleState => {
+    return {
+      createdRolle: null,
+      allRollen: [],
+      errorCode: '',
+      loading: false
+    }
+  },
+  actions: {
+    async createRolle(
+      rollenName: string,
+      schulStrukturKnoten: string,
+      rollenArt: CreateRolleBodyParamsRollenartEnum,
+      merkmale: CreateRolleBodyParamsMerkmaleEnum[]
+    ): Promise<RolleResponse> {
+      this.loading = true
+      try {
+        // Construct the body params object
+        const createRolleBodyParams: CreateRolleBodyParams = {
+          name: rollenName,
+          administeredBySchulstrukturknoten: schulStrukturKnoten,
+          rollenart: rollenArt,
+          // TODO Remove casting when generator issue is fixed from the server side
+          merkmale: merkmale as unknown as Set<CreateRolleBodyParamsMerkmaleEnum>
+        }
+        const { data }: { data: RolleResponse } = await rolleApi.rolleControllerCreateRolle(createRolleBodyParams)
+        this.loading = false
+        this.createdRolle = data
+        return data
+      } catch (error: unknown) {
+        this.errorCode = 'UNSPECIFIED_ERROR'
+        if (isAxiosError(error)) {
+          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR'
+        }
+        this.loading = false
+        return Promise.reject(this.errorCode)
       }
     },
-    actions: {
-      async createRolle(
-        rollenName: string,
-        schulStrukturKnoten: string,
-        rollenArt: CreateRolleBodyParamsRollenartEnum,
-        merkmale: CreateRolleBodyParamsMerkmaleEnum[]
-      ): Promise<RolleResponse> {
-        this.loading = true
-        try {
-          // Construct the body params object
-          const createRolleBodyParams: CreateRolleBodyParams = {
-            name: rollenName,
-            administeredBySchulstrukturknoten: schulStrukturKnoten,
-            rollenart: rollenArt,
-            // TODO Remove casting when generator issue is fixed from the server side
-            merkmale: merkmale as unknown as Set<CreateRolleBodyParamsMerkmaleEnum>
-          }
-          const { data }: { data: RolleResponse } =
-            await rolleApi.rolleControllerCreateRolle(createRolleBodyParams)
-          this.loading = false
-          this.createdRolle = data
-          return data
-        } catch (error: unknown) {
-          this.errorCode = 'UNSPECIFIED_ERROR'
-          if (isAxiosError(error)) {
-            this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR'
-          }
-          this.loading = false
-          return Promise.reject(this.errorCode)
-        }
-      },
 
-      async getAllRollen() {
-        this.loading = true
-        try {
-          const { data }: AxiosResponse<Array<RolleResponse>> =
-            await rolleApi.rolleControllerFindRollen()
-          this.allRollen = data
-          this.loading = false
-        } catch (error: unknown) {
-          this.errorCode = 'UNSPECIFIED_ERROR'
-          if (isAxiosError(error)) {
-            this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR'
-          }
-          this.loading = false
+    async getAllRollen() {
+      this.loading = true
+      try {
+        const { data }: AxiosResponse<Array<RolleResponse>> = await rolleApi.rolleControllerFindRollen()
+        this.allRollen = data
+        this.loading = false
+      } catch (error: unknown) {
+        this.errorCode = 'UNSPECIFIED_ERROR'
+        if (isAxiosError(error)) {
+          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR'
         }
+        this.loading = false
       }
     }
-  })
+  }
+})

@@ -1,7 +1,4 @@
-import type {
-  PersonFrontendControllerFindPersons200Response,
-  PersonendatensatzResponse
-} from '@/api-client/generated'
+import type { PersonFrontendControllerFindPersons200Response, PersonendatensatzResponse } from '@/api-client/generated'
 import { usePersonStore, type PersonStore, type Personendatensatz } from './PersonStore'
 import ApiService from '@/services/ApiService'
 import MockAdapter from 'axios-mock-adapter'
@@ -151,9 +148,7 @@ describe('PersonStore', () => {
     it('should handle error code', async () => {
       const userId: string = '2345'
 
-      mockadapter
-        .onPatch(`/api/personen/${userId}/password`)
-        .replyOnce(500, { code: 'some mock server error' })
+      mockadapter.onPatch(`/api/personen/${userId}/password`).replyOnce(500, { code: 'some mock server error' })
       const resetPasswordPromise: Promise<string> = personStore.resetPassword(userId)
       expect(personStore.loading).toBe(true)
       await rejects(resetPasswordPromise)

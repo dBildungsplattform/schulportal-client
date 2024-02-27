@@ -1,12 +1,6 @@
 import { expect, test, type MockInstance } from 'vitest'
 import { VueWrapper, mount } from '@vue/test-utils'
-import {
-  createRouter,
-  createWebHistory,
-  type NavigationFailure,
-  type RouteLocationRaw,
-  type Router
-} from 'vue-router'
+import { createRouter, createWebHistory, type NavigationFailure, type RouteLocationRaw, type Router } from 'vue-router'
 import routes from '@/router/routes'
 import PersonDetailsView from './PersonDetailsView.vue'
 import { type Personendatensatz, type PersonStore, usePersonStore } from '@/stores/PersonStore'
@@ -63,10 +57,10 @@ describe('PersonDetailsView', () => {
   })
 
   test('it navigates back to user table', async () => {
-    const push: MockInstance<
-      [to: RouteLocationRaw],
-      Promise<void | NavigationFailure | undefined>
-    > = vi.spyOn(router, 'push')
+    const push: MockInstance<[to: RouteLocationRaw], Promise<void | NavigationFailure | undefined>> = vi.spyOn(
+      router,
+      'push'
+    )
     await wrapper?.find('[data-testid="close-layout-card-button"]').trigger('click')
     expect(push).toHaveBeenCalledTimes(1)
   })

@@ -8,11 +8,7 @@ import {
 } from '../api-client/generated/api'
 import axiosApiInstance from '@/services/ApiService'
 
-const organisationApi: OrganisationenApiInterface = OrganisationenApiFactory(
-  undefined,
-  '',
-  axiosApiInstance
-)
+const organisationApi: OrganisationenApiInterface = OrganisationenApiFactory(undefined, '', axiosApiInstance)
 
 export type Organisation = {
   id: string
@@ -36,12 +32,7 @@ type OrganisationActions = {
   getOrganisationById: (organisationId: string) => Promise<OrganisationResponse>
 }
 
-export type OrganisationStore = Store<
-  'organisationStore',
-  OrganisationState,
-  OrganisationGetters,
-  OrganisationActions
->
+export type OrganisationStore = Store<'organisationStore', OrganisationState, OrganisationGetters, OrganisationActions>
 
 export { OrganisationResponseTypEnum }
 

@@ -12,11 +12,7 @@ import {
 import axiosApiInstance from '@/services/ApiService'
 
 const personenApi: PersonenApiInterface = PersonenApiFactory(undefined, '', axiosApiInstance)
-const personenFrontendApi: PersonenFrontendApiInterface = PersonenFrontendApiFactory(
-  undefined,
-  '',
-  axiosApiInstance
-)
+const personenFrontendApi: PersonenFrontendApiInterface = PersonenFrontendApiFactory(undefined, '', axiosApiInstance)
 
 export type Person = {
   id: string
@@ -57,12 +53,7 @@ type PersonActions = {
 
 export type PersonStore = Store<'personStore', PersonState, PersonGetters, PersonActions>
 
-export const usePersonStore: StoreDefinition<
-  'personStore',
-  PersonState,
-  PersonGetters,
-  PersonActions
-> = defineStore({
+export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonGetters, PersonActions> = defineStore({
   id: 'personStore',
   state: (): PersonState => {
     return {
@@ -78,8 +69,7 @@ export const usePersonStore: StoreDefinition<
     async createPerson(person: CreatePersonBodyParams): Promise<PersonendatensatzResponse> {
       this.loading = true
       try {
-        const { data }: { data: PersonendatensatzResponse } =
-          await personenApi.personControllerCreatePerson(person)
+        const { data }: { data: PersonendatensatzResponse } = await personenApi.personControllerCreatePerson(person)
         this.loading = false
         this.createdPerson = data
         return data
@@ -114,8 +104,7 @@ export const usePersonStore: StoreDefinition<
       this.loading = true
       this.errorCode = ''
       try {
-        const { data }: { data: Personendatensatz } =
-          await personenApi.personControllerFindPersonById(personId)
+        const { data }: { data: Personendatensatz } = await personenApi.personControllerFindPersonById(personId)
         this.loading = false
         this.currentPerson = data
         return data
@@ -132,8 +121,7 @@ export const usePersonStore: StoreDefinition<
     async resetPassword(personId: string): Promise<string> {
       this.loading = true
       try {
-        const { data }: { data: string } =
-          await personenApi.personControllerResetPasswordByPersonId(personId)
+        const { data }: { data: string } = await personenApi.personControllerResetPasswordByPersonId(personId)
         this.loading = false
         return data
       } catch (error: unknown) {

@@ -71,9 +71,7 @@ describe('reset password', () => {
   test.skip('it copies password to clipboard', async () => {
     wrapper?.get('[data-testid="open-password-reset-dialog-icon"]').trigger('click')
     await document.querySelector('[data-testid="password-output-field"] mdi-content-copy')
-    expect(
-      document.querySelector('[data-testid="password-output-field"] mdi-content-copy')
-    ).not.toBeNull()
+    expect(document.querySelector('[data-testid="password-output-field"] mdi-content-copy')).not.toBeNull()
   })
 })
 
