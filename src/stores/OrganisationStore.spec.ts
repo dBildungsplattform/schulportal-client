@@ -103,4 +103,64 @@ describe('OrganisationStore', () => {
       expect(organisationStore.loading).toBe(false)
     })
   })
+  describe('createOrganisation', () => {
+    it('should create the Organisation and update state', async () => {
+      const mockResponse: OrganisationResponse[] = [
+        {
+          id: '1',
+          kennung: 'Org1',
+          name: 'Organisation 1',
+          namensergaenzung: 'Ergänzung',
+          kuerzel: 'O1',
+          typ: OrganisationResponseTypEnum.Anbieter
+        }
+      ]
+
+      mockadapter.onPost('/api/organisationen').replyOnce(200, mockResponse)
+      const createOrganisationPromise: Promise<OrganisationResponse> =
+        organisationStore.createOrganisation(
+          'Org1',
+          'Organisation 1',
+          'Ergänzung',
+          '01',
+          OrganisationResponseTypEnum.Anbieter
+        )
+      await createOrganisationPromise
+      expect(organisationStore.createdOrganisation).toEqual(mockResponse)
+      expect(organisationStore.loading).toBeFalsy()
+    })
+
+    it('should handle string error', async () => {
+      mockadapter.onPost('/api/organisationen').replyOnce(500, 'some mock server error')
+      const createOrganisationPromise: Promise<OrganisationResponse> =
+        organisationStore.createOrganisation(
+          'Org1',
+          'Organisation 1',
+          'Ergänzung',
+          '01',
+          OrganisationResponseTypEnum.Anbieter
+        )
+      await rejects(createOrganisationPromise)
+      expect(organisationStore.createdOrganisation).toEqual(null)
+      expect(organisationStore.errorCode).toEqual('UNSPECIFIED_ERROR')
+      expect(organisationStore.loading).toBe(false)
+    })
+
+    it('should handle error code', async () => {
+      mockadapter.onPost('/api/organisationen').replyOnce(500, { code: 'some mock server error' })
+      const createOrganisationPromise: Promise<OrganisationResponse> =
+        organisationStore.createOrganisation(
+          'Org1',
+          'Organisation 1',
+          'Ergänzung',
+          '01',
+          OrganisationResponseTypEnum.Anbieter
+        )
+      expect(organisationStore.loading).toBe(true)
+      await expect(createOrganisationPromise).rejects.toEqual('some mock server error')
+      expect(organisationStore.createdOrganisation).toEqual(null)
+      expect(organisationStore.errorCode).toEqual('some mock server error')
+      expect(organisationStore.loading).toBe(false)
+    })
+  })
 })
