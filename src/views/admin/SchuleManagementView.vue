@@ -16,7 +16,7 @@
 
   type ReadonlyHeaders = InstanceType<typeof VDataTableServer>['headers']
   const headers: ReadonlyHeaders = [
-    { title: t('admin.schule.dienstellennummer'), key: 'kennung', align: 'start' },
+    { title: t('admin.schule.dienststellennummer'), key: 'kennung', align: 'start' },
     { title: t('admin.schule.schulname'), key: 'name', align: 'start' }
   ]
 
