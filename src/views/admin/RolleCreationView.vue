@@ -79,25 +79,27 @@
 
   const selectedMerkmale: Ref<CreateRolleBodyParamsMerkmaleEnum[] | null> = ref(null)
 
-  const onSubmit: (e?: Event | undefined) => Promise<void | undefined> = handleSubmit(async () => {
-    if (selectedRollenName.value && selectedSchulstrukturKnoten.value) {
-      const merkmaleToSubmit: CreateRolleBodyParamsMerkmaleEnum[] =
-        selectedMerkmale.value?.map((m: CreateRolleBodyParamsMerkmaleEnum) => m) || []
-      await rolleStore.createRolle(
-        selectedRollenName.value,
-        selectedSchulstrukturKnoten.value,
-        selectedRollenArt.value,
-        merkmaleToSubmit
-      )
-
-      // Check if `createRolle` operation has successfully created a role and set `createdRolle`
-      if (rolleStore.createdRolle) {
-        await organisationStore.getOrganisationById(
-          rolleStore.createdRolle.administeredBySchulstrukturknoten
+  const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = handleSubmit(
+    async () => {
+      if (selectedRollenName.value && selectedSchulstrukturKnoten.value) {
+        const merkmaleToSubmit: CreateRolleBodyParamsMerkmaleEnum[] =
+          selectedMerkmale.value?.map((m: CreateRolleBodyParamsMerkmaleEnum) => m) || []
+        await rolleStore.createRolle(
+          selectedRollenName.value,
+          selectedSchulstrukturKnoten.value,
+          selectedRollenArt.value,
+          merkmaleToSubmit
         )
+
+        // Check if `createRolle` operation has successfully created a role and set `createdRolle`
+        if (rolleStore.createdRolle) {
+          await organisationStore.getOrganisationById(
+            rolleStore.createdRolle.administeredBySchulstrukturknoten
+          )
+        }
       }
     }
-  })
+  )
 
   const handleCreateAnotherRolle = (): void => {
     rolleStore.createdRolle = null
@@ -112,6 +114,7 @@
   }
   function navigateToRolleManagement(): void {
     rolleStore.createdRolle = null
+    selectedMerkmale.value = null
     resetForm()
     router.push({ name: 'rolle-management' })
   }
