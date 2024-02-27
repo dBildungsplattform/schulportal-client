@@ -97,8 +97,9 @@
       "status": "Status"
     },
     "schule": {
-      "assign": "Schule zuordnen",
-      "management": "Schulverwaltung"
+      "assignSchule": "Schule zuordnen",
+      "management": "Schulverwaltung",
+      "selectSchule": "Schule auswählen"
     },
     "schulstrukturknoten": {
       "assignSchulstrukturknoten": "Schulstrukturknoten zuordnen",

@@ -1,6 +1,11 @@
 <script setup lang="ts">
+  import {
+    useOrganisationStore,
+    type OrganisationStore,
+    type Organisation
+  } from '@/stores/OrganisationStore'
   import { usePersonStore, type CreatedPerson, type PersonStore } from '@/stores/PersonStore'
-  import { onMounted, type Ref, ref } from 'vue'
+  import { onMounted, type Ref, ref, type ComputedRef, computed } from 'vue'
   import {
     onBeforeRouteLeave,
     type Router,
@@ -20,6 +25,7 @@
 
   const router: Router = useRouter()
   const personStore: PersonStore = usePersonStore()
+  const organisationStore: OrganisationStore = useOrganisationStore()
   const { t }: Composer = useI18n({ useScope: 'global' })
 
   const isFormDirty: Ref<boolean> = ref(false)
@@ -51,6 +57,7 @@
   type PersonCreationForm = {
     selectedVorname: string
     selectedFamilienname: string
+    selectedSchule: string
   }
 
   // eslint-disable-next-line @typescript-eslint/typedef
@@ -66,6 +73,22 @@
     Ref<string>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>
   ] = defineField('selectedFamilienname', vuetifyConfig)
+  const [selectedSchule, selectedSchuleProps]: [
+    Ref<string>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>
+  ] = defineField('selectedSchule', vuetifyConfig)
+
+  const schulen: ComputedRef<
+    {
+      value: string
+      title: string
+    }[]
+  > = computed(() =>
+    organisationStore.allOrganisationen.map((org: Organisation) => ({
+      value: org.id,
+      title: `${org.kennung} (${org.name})`
+    }))
+  )
 
   function navigateToPersonTable(): void {
     router.push({ name: 'person-management' })
@@ -118,6 +141,7 @@
   )
 
   onMounted(async () => {
+    await organisationStore.getAllOrganisationen()
     personStore.errorCode = ''
   })
 </script>
@@ -158,7 +182,7 @@
         <!-- Persönliche Informationen -->
         <v-row>
           <h3 class="headline-3">
-            {{ $t('admin.person.personalInfo') }}
+            1. {{ $t('admin.person.personalInfo') }}
           </h3>
         </v-row>
         <!-- Vorname -->
@@ -166,9 +190,9 @@
           :errorLabel="selectedVornameProps['error']"
           :fieldProps="selectedVornameProps"
           id="vorname-input"
-          @onDirtyModelValue="handleDirtyModels"
           :isRequired="true"
           :label="$t('person.firstName')"
+          @onDirtyModelValue="handleDirtyModels"
           :placeholder="$t('person.enterFirstName')"
           v-model="selectedVorname"
         ></InputRow>
@@ -178,11 +202,30 @@
           :errorLabel="selectedFamiliennameProps['error']"
           :fieldProps="selectedFamiliennameProps"
           id="familienname-input"
-          @onDirtyModelValue="handleDirtyModels"
           :isRequired="true"
           :label="$t('person.lastName')"
+          @onDirtyModelValue="handleDirtyModels"
           :placeholder="$t('person.enterLastName')"
           v-model="selectedFamilienname"
+        ></InputRow>
+
+        <!-- Schule zuordnen -->
+        <v-row>
+          <h3 class="headline-3">
+            2. {{ $t('admin.schule.assignSchule') }}
+          </h3>
+        </v-row>
+        <!-- Vorname -->
+        <InputRow
+          :errorLabel="selectedSchuleProps['error']"
+          :fieldProps="selectedSchuleProps"
+          id="schule-select"
+          :isSelect="true"
+          :label="$t('admin.schule.assignSchule')"
+          @onDirtyModelValue="handleDirtyModels"
+          :placeholder="$t('admin.schule.selectSchule')"
+          :selectableItems="schulen"
+          v-model="selectedSchule"
         ></InputRow>
       </CreationForm>
     </template>
