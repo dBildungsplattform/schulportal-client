@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { useRolleStore, type RolleResponse, type RolleStore } from '@/stores/RolleStore'
+  import { useRolleStore, type RolleStore } from '@/stores/RolleStore'
   import { computed, onMounted, type ComputedRef } from 'vue'
   import ResultTable from '@/components/admin/ResultTable.vue'
   import { type Composer, useI18n } from 'vue-i18n'
