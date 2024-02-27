@@ -93,7 +93,37 @@
     },
     "schule": {
       "assign": "Schule zuordnen",
-      "management": "Schulverwaltung"
+      "addNew": "Neue Schule hinzufügen",
+      "administratingSchultraeger": "Verwaltender Schulträger",
+      "ersatzschule": "Ersatzschule",
+      "assignAdminstratingSchultraeger": "Verwaltender Schulträger zuordnen",
+      "assignSchulform": "Schulform zuordnen",
+      "backToCreateSchule": "Zurück zur Schulanlage",
+      "createNew": "Neue Schule anlegen",
+      "create": "Schule anlegen",
+      "createAnother": "Weitere Schule anlegen",
+      "discard": "Schule verwerfen",
+      "dienstellennummer": "Dienststellennummer",
+      "enterDienstellennummer": "Dienststellennummer eingeben",
+      "enterSchulname": "Schulname eingeben",
+      "management": "Schulverwaltung",
+      "publicSchule": "Öffentliche Schule",
+      "rules": {
+        "dienststellennummer": {
+          "required": "Die Dienststellennummer muss angegeben werden."
+        },
+        "schulname": {
+          "matches": "Der Schulname darf keine ungültigen Zeichen beinhalten.",
+          "required": "Der Schulname muss angegeben werden."
+        }
+      },
+      "schulname": "Schulname",
+      "schulform": "Schulform",
+      "schuleCreateErrorTitle": "Fehler beim Anlegen der Schule",
+      "schuleCreateErrorText": "Die Schule konnte nicht angelegt werden.",
+      "schuleAddedSuccessfully": "Die Schule wurde erfolgreich hinzugefügt.",
+      "showAll": "Alle Schulen anzeigen"
+
     },
     "schulstrukturknoten": {
       "assignSchulstrukturknoten": "Schulstrukturknoten zuordnen",
