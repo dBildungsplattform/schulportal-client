@@ -44,7 +44,6 @@
     selectedSchulform: string
     selectedDienststellennummer: string
     selectedSchulname: string
-    selectedAdministrativeSchulträger: string
   }
 
   // eslint-disable-next-line @typescript-eslint/typedef
