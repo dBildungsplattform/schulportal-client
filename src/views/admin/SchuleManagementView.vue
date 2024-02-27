@@ -1,5 +1,4 @@
 <script setup lang="ts">
-  import { useRolleStore, type RolleStore } from '@/stores/RolleStore'
   import { computed, onMounted, type ComputedRef } from 'vue'
   import ResultTable from '@/components/admin/ResultTable.vue'
   import { type Composer, useI18n } from 'vue-i18n'
@@ -11,7 +10,6 @@
     type OrganisationStore
   } from '@/stores/OrganisationStore'
 
-  const rolleStore: RolleStore = useRolleStore()
   const organisationStore: OrganisationStore = useOrganisationStore()
 
   const { t }: Composer = useI18n({ useScope: 'global' })
@@ -41,10 +39,10 @@
       data-testid="schule-table"
       :header="$t('admin.schule.management')"
       :items="filteredOrganisationen || []"
-      :loading="rolleStore.loading"
+      :loading="organisationStore.loading"
       :headers="headers"
-      @onUpdateTable="rolleStore.getAllRollen()"
-      :totalItems="rolleStore.allRollen.length"
+      @onUpdateTable="organisationStore.getAllOrganisationen()"
+      :totalItems="organisationStore.allOrganisationen.length"
       item-value-path="id"
       :disableRowClick="true"
     ></ResultTable>
