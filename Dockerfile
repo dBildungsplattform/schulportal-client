@@ -27,9 +27,7 @@ COPY --from=build /app/dist/ /usr/share/nginx/html/
 RUN rm /etc/nginx/conf.d/default.conf
 COPY nginx-vue.conf /etc/nginx/conf.d/
 
-RUN addgroup -g 1000 nginx && \
-    adduser -D -u 1000 -G nginx nginx && \
-    chown -R nginx:nginx /var/cache/nginx /var/run /var/log/nginx /usr/share/nginx/html && \
+RUN chown -R nginx:nginx /var/cache/nginx /var/run /var/log/nginx /usr/share/nginx/html && \
     chmod -R 755 /usr/share/nginx/html && \
     chmod -R 644 /etc/nginx/conf.d/*
 
