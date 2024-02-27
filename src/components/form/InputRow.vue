@@ -53,6 +53,7 @@
     >
       <v-select
         v-if="isSelect"
+        :chips="isMultiple"
         clearable
         :data-testid="id"
         density="compact"
