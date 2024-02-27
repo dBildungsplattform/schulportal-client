@@ -41,6 +41,7 @@
   })
 
   type SchuleCreationForm = {
+    selectedSchulform: string
     selectedDienststellennummer: string
     selectedSchulname: string
     selectedAdministrativeSchulträger: string
@@ -51,6 +52,10 @@
     validationSchema
   })
 
+  const [selectedSchulform]: [
+    Ref<string>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>
+  ] = defineField('selectedSchulform', vuetifyConfig)
   const [selectedSchulname, selectedSchulnameProps]: [
     Ref<string>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>
@@ -133,6 +138,10 @@
             </v-col>
           </v-row>
           <v-row>
+            <v-col class="text-body bold text-right"> {{ $t('admin.schule.schulform') }}: </v-col>
+            <v-col class="text-body"> {{ selectedSchulform }}</v-col>
+          </v-row>
+          <v-row>
             <v-col class="text-body bold text-right">
               {{ $t('admin.schule.dienstellennummer') }}:
             </v-col>
@@ -211,20 +220,31 @@
                 cols="4"
                 class="d-none d-md-flex"
               ></v-col>
-              <v-col
-                cols="12"
-                sm="4"
-                class="pb-0"
+              <v-radio-group
+                inline
+                v-model="selectedSchulform"
               >
-                <v-checkbox :label="$t('admin.schule.publicSchule')"></v-checkbox>
-              </v-col>
-              <v-col
-                cols="12"
-                sm="4"
-                class="pt-0 pt-sm-3"
-              >
-                <v-checkbox :label="$t('admin.schule.ersatzschule')"></v-checkbox>
-              </v-col>
+                <v-col
+                  cols="12"
+                  sm="4"
+                  class="pb-0"
+                >
+                  <v-radio
+                    :label="$t('admin.schule.publicSchule')"
+                    :value="$t('admin.schule.publicSchule')"
+                  ></v-radio>
+                </v-col>
+                <v-col
+                  cols="12"
+                  sm="4"
+                  class="pt-0 pt-sm-3"
+                >
+                  <v-radio
+                    :label="$t('admin.schule.ersatzschule')"
+                    :value="$t('admin.schule.ersatzschule')"
+                  ></v-radio>
+                </v-col>
+              </v-radio-group>
             </v-row>
             <!-- Enter service number -->
             <v-row>
