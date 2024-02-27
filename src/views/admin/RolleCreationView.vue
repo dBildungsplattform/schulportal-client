@@ -157,7 +157,6 @@
 
   function navigateToRolleManagement(): void {
     rolleStore.createdRolle = null
-    resetForm()
     router.push({ name: 'rolle-management' })
   }
 
