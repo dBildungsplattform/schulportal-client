@@ -43,9 +43,11 @@
       "rollenart": "Rollenart",
       "rollenname": "Rollenname",
       "rolleAddedSuccessfully": "Die Rolle wurde erfolgreich hinzugefügt.",
-      "rule": {
-        "rolleNameLength": "Der Rollenname darf nicht länger als 200 Zeichen sein.",
-        "rolleNameRequired": "Der Rollenname ist erforderlich."
+      "rules": {
+        "rollenname": {
+          "required": "Die Rollenname muss angegeben werden.",
+          "max": "Die Rollenname muss aus höchstens 200 Zeichen bestehen."
+        }
       },
       "selectRolle": "Rolle auswählen",
       "selectRollenart": "Rollenart auswählen",
