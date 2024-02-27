@@ -38,8 +38,8 @@
   <div class="admin">
     <h1 class="text-center headline">{{ $t('admin.headline') }}</h1>
     <ResultTable
-      data-testid="role-table"
-      :header="$t('admin.rolle.management')"
+      data-testid="schule-table"
+      :header="$t('admin.schule.management')"
       :items="filteredOrganisationen || []"
       :loading="rolleStore.loading"
       :headers="headers"
