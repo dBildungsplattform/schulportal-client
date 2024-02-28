@@ -16,7 +16,11 @@
 
   type ReadonlyHeaders = InstanceType<typeof VDataTableServer>['headers']
   const headers: ReadonlyHeaders = [
-    { title: t('admin.schule.dienststellennummer'), key: 'kennung', align: 'start' },
+    {
+      title: t('admin.schule.dienststellennummer'),
+      key: 'kennung',
+      align: 'start'
+    },
     { title: t('admin.schule.schulname'), key: 'name', align: 'start' }
   ]
 
@@ -45,8 +49,24 @@
       :totalItems="organisationStore.allOrganisationen.length"
       item-value-path="id"
       :disableRowClick="true"
-    ></ResultTable>
+    >
+      <template v-slot:[`item.name`]="{ item }">
+        <div
+          class="ellipsis-wrapper"
+          :title="item.name"
+        >
+          {{ item.name }}
+        </div>
+      </template></ResultTable
+    >
   </div>
 </template>
 
-<style></style>
+<style>
+  .ellipsis-wrapper {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    max-width: 241px;
+  }
+</style>

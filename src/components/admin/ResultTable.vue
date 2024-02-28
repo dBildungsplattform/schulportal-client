@@ -71,6 +71,15 @@
       show-select
       @update:options="$emit('onTableUpdate')"
     >
+      <template
+        v-for="(_, slot) in $slots"
+        v-slot:[slot]="scope"
+      >
+        <slot
+          :name="slot"
+          v-bind="scope || {}"
+        />
+      </template>
     </v-data-table-server>
   </LayoutCard>
 </template>
