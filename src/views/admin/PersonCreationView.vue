@@ -22,7 +22,6 @@
   const personStore: PersonStore = usePersonStore()
   const { t }: Composer = useI18n({ useScope: 'global' })
 
-  const isFormDirty: Ref<boolean> = ref(false)
   const showUnsavedChangesDialog: Ref<boolean> = ref(false)
   let blockedNext: () => void = () => {}
 
@@ -54,7 +53,7 @@
   }
 
   // eslint-disable-next-line @typescript-eslint/typedef
-  const { defineField, handleSubmit, resetForm } = useForm<PersonCreationForm>({
+  const { defineField, handleSubmit, isFieldDirty, resetForm } = useForm<PersonCreationForm>({
     validationSchema
   })
 
@@ -66,6 +65,10 @@
     Ref<string>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>
   ] = defineField('selectedFamilienname', vuetifyConfig)
+
+  function isFormDirty(): boolean {
+    return isFieldDirty('selectedVorname') || isFieldDirty('selectedFamilienname')
+  }
 
   function navigateToPersonTable(): void {
     router.push({ name: 'person-management' })
@@ -100,15 +103,9 @@
     blockedNext()
   }
 
-  function handleDirtyModels(value: boolean): void {
-    if (value) {
-      isFormDirty.value = value
-    }
-  }
-
   onBeforeRouteLeave(
     (_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
-      if (isFormDirty.value) {
+      if (isFormDirty()) {
         showUnsavedChangesDialog.value = true
         blockedNext = next
       } else {
@@ -164,26 +161,42 @@
         <!-- Vorname -->
         <InputRow
           :errorLabel="selectedVornameProps['error']"
-          :fieldProps="selectedVornameProps"
-          id="vorname-input"
-          @onDirtyModelValue="handleDirtyModels"
+          labelForId="vorname-input"
           :isRequired="true"
           :label="$t('person.firstName')"
-          :placeholder="$t('person.enterFirstName')"
-          v-model="selectedVorname"
-        ></InputRow>
+        >
+          <v-text-field
+            clearable
+            data-testid="vorname-input"
+            density="compact"
+            id="vorname-input"
+            :placeholder="$t('person.enterFirstName')"
+            required="true"
+            variant="outlined"
+            v-bind="selectedVornameProps"
+            v-model="selectedVorname"
+          ></v-text-field>
+        </InputRow>
 
         <!-- Nachname -->
         <InputRow
           :errorLabel="selectedFamiliennameProps['error']"
-          :fieldProps="selectedFamiliennameProps"
-          id="familienname-input"
-          @onDirtyModelValue="handleDirtyModels"
+          labelForId="familienname-input"
           :isRequired="true"
           :label="$t('person.lastName')"
-          :placeholder="$t('person.enterLastName')"
-          v-model="selectedFamilienname"
-        ></InputRow>
+        >
+          <v-text-field
+            clearable
+            data-testid="familienname-input"
+            density="compact"
+            id="familienname-input"
+            :placeholder="$t('person.enterLastName')"
+            required="true"
+            variant="outlined"
+            v-bind="selectedFamiliennameProps"
+            v-model="selectedFamilienname"
+          ></v-text-field>
+        </InputRow>
       </CreationForm>
     </template>
 

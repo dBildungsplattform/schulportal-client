@@ -87,9 +87,9 @@
           "required": "Der Vorname muss angegeben werden."
         },
         "familienname": {
-          "matches": "Der Familienname darf keine ungültigen Zeichen beinhalten.",
-          "min": "Der Familienname muss aus mindestens 2 Zeichen bestehen.",
-          "required": "Der Familienname muss angegeben werden."
+          "matches": "Der Nachname darf keine ungültigen Zeichen beinhalten.",
+          "min": "Der Nachname muss aus mindestens 2 Zeichen bestehen.",
+          "required": "Der Nachname muss angegeben werden."
         }
       },
       "showAll": "Alle Benutzer anzeigen",
