@@ -1,0 +1,51 @@
+
+body {
+    color: #001E49; /* Setting the text color for all text */
+    font-family: Arial, sans-serif;
+    padding: 0 40px;
+}
+
+h1 {
+    font-weight: bold;
+    font-size: 30px;
+}
+
+h2 {
+   
+    font-weight: bold;
+    font-size: 24px;
+}
+
+h3 {
+    font-weight: bold;
+    font-size: 22px;
+}
+
+h4 {
+    font-weight: normal;
+    font-size: 22px;
+}
+
+p {
+    font-size: 18px;
+}
+
+a {
+    color: #D4004B; /* Setting the color for all links */
+}
+
+li {
+    font-size: 18px;
+}
+
+.Schulportal-Logo {
+    
+    width: 270px;
+}
+
+.Schulportal-Logo-Div {
+
+    float:right;
+    margin-right: -50px;
+    margin-top: -20px;
+}

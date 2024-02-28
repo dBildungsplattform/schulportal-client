@@ -1,0 +1,37 @@
+name: 'Generate API-Client'
+
+on:
+  workflow_call:
+    inputs:
+      node_version:
+        type: string
+        description: "Version to use for node"
+        required: true
+      node_heap_size:
+        type: number
+        description: "Heap Size for node in MB"
+        required: false
+        default: 4096
+      timeout_minutes:
+        type: number
+        description: "Timout in minutes"
+        required: false
+        default: 10
+env:
+  NODE_VERSION: ${{ inputs.node_version }} # needed for npm test
+  NODE_OPTIONS: "--max-old-space-size=${{ inputs.node_heap_size }}"
+
+jobs:
+  generate-API-client:
+    name: Generate API-Client
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    timeout-minutes: ${{ inputs.timeout_minutes }}
+    steps:
+        - uses: actions/setup-java@387ac29b308b003ca37ba93a6cab5eb57c8f5f93  #v4.0.0
+          with:
+            distribution: 'oracle' # See 'Supported distributions' for available options
+            java-version: '21'
+            java-package: 'jre'
+        - run: npx openapi-generator-cli generate --generator-key bff --openapi-normalizer REFACTOR_ALLOF_WITH_PROPERTIES_ONLY=true

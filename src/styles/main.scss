@@ -1,0 +1,57 @@
+@use './settings';
+@use 'vuetify';
+
+@import './variables.scss';
+@import './typography.scss';
+@import './components/button.scss';
+@import './components/form.scss';
+@import './components/input.scss';
+@import './components/link.scss';
+@import './components/layout-card.scss';
+@import './components/menu-bar.scss';
+@import './components/result-table.scss';
+@import './components/dialog.scss';
+
+body {
+  min-height: 100vh;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  font-weight: normal;
+}
+
+#app {
+  background: $backgroundColor;
+  color: $bodyFontColor;
+  font-family: Arial, sans-serif;
+  font-weight: normal;
+}
+
+.v-field--variant-outlined .v-field__outline {
+  --v-field-border-opacity: 1;
+}
+
+p {
+  white-space: pre;
+  /* text-wrap needs to be placed after white-space to overwrite wrapping behaviour */
+  text-wrap: pretty;
+}
+
+label.v-label {
+  opacity: 1;
+}
+
+.primary-text-color {
+  color: $primaryColor;
+}
+
+.no-kopers-checkbox label.v-label {
+  text-wrap: nowrap;
+}

@@ -1,0 +1,80 @@
+/*********************
+ * COLOR DEFINITIONS *
+ *********************/
+$cyan: #1eae9c;
+$darkBlue: #001e49;
+$grey: #a4adb6;
+$lightBlue: #325e91;
+$lightCyan: #4dc7bc;
+$lightGrey: #e5eaef;
+$lightRed: #eeabc3;
+$red: #d4004b;
+$white: #ffffff;
+
+/***********************
+ * GENERAL COLOR USAGE *
+ ***********************/
+$backgroundColor: $white;
+$primaryColor: $darkBlue;
+
+/***************
+ * FONT STYLES *
+ ***************/
+$bodyFontColor: $primaryColor;
+$bigBodyFontSize: 20px;
+$bigBody2FontSize: 18px;
+$bigCaptionFontSize: 14px;
+$bigHeadline1FontSize: 30px;
+$bigHeadline2FontSize: 24px;
+$bigHeadline3FontSize: 22px;
+$bigSubtitle1FontSize: 20px;
+$bigSubtitle2FontSize: 16px;
+$disabledLabelColor: $grey;
+$labelErrorColor: $red;
+$mediumBodyFontSize: 18px;
+$mediumBody2FontSize: 16px;
+$mediumCaptionFontSize: 12px;
+$mediumHeadline1FontSize: 28px;
+$mediumHeadline2FontSize: 22px;
+$mediumHeadline3FontSize: 20px;
+$mediumSubtitle1FontSize: 18px;
+$mediumSubtitle2FontSize: 16px;
+$smallBodyFontSize: 16px;
+$smallBody2FontSize: 14px;
+$smallCaptionFontSize: 10px;
+$smallHeadline1FontSize: 26px;
+$smallHeadline2FontSize: 20px;
+$smallHeadline3FontSize: 18px;
+$smallSubtitle1FontSize: 16px;
+$smallSubtitle2FontSize: 14px;
+
+/*****************
+ * BUTTON STYLES *
+ *****************/
+$bigButtonFontSize: $bigBodyFontSize;
+$mediumButtonFontSize: $mediumBodyFontSize;
+$smallButtonFontSize: $smallBodyFontSize;
+$smallButtonTransformScale: scaleX(0.95);
+$disabledPrimaryButtonBackgroundColor: $grey;
+$disabledPrimaryButtonColor: $white;
+$disabledPrimaryButtonBorderColor: $grey;
+$disabledSecondaryButtonBackgroundColor: $grey;
+$disabledSecondaryButtonColor: $grey;
+$primaryButtonBackgroundColor: $primaryColor;
+$primaryButtonBorderColor: $primaryColor;
+$primaryButtonBorderSize: 2px;
+$primaryButtonColor: $white;
+$primaryButtonHoverBackgroundColor: $lightBlue;
+$primaryButtonTransition: transform 0.3s ease-in-out;
+$primaryButtontransformOrigin: left center;
+$secondaryButtonBackgroundColor: $white;
+$secondaryButtonColor: $primaryColor;
+$secondaryButtonBorderColor: $primaryColor;
+$secondaryButtonBorderSize: 2px;
+$secondaryButtonHoverBorderSize: 4px;
+
+/*******************
+ * MENU BAR STYLES *
+ *******************/
+$menuBarBackgroundColor: $lightGrey;
+$menuBarActiveItemColor: $lightCyan;
