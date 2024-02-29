@@ -18,8 +18,13 @@ COPY src/ src/
 COPY public/ public/
 
 RUN npm ci
-RUN npx openapi-generator-cli generate --generator-key bff --openapi-normalizer REFACTOR_ALLOF_WITH_PROPERTIES_ONLY=true
+RUN npx openapi-generator-cli generate --generator-key backend --openapi-normalizer REFACTOR_ALLOF_WITH_PROPERTIES_ONLY=true
 RUN npm run build
+RUN ls /
+
+FROM scratch as artifacts
+COPY --from=build /app/src/api-client/generated /
+
 
 # Deployment Stage
 FROM $BASE_IMAGE as deployment
