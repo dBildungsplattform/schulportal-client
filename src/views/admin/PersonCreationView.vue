@@ -103,10 +103,6 @@
       }
     }
     personStore.createPerson(unpersistedPerson)
-    .then((personResponse) => {
-      console.log(personResponse)
-      // personStore.createPersonenkontext(personResponse.person.id, selectedSchule.value)
-    })
   }
 
   const onSubmit: (e?: Event | undefined) => Promise<void | undefined> = handleSubmit(() => {

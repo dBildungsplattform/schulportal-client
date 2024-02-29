@@ -4,8 +4,6 @@ import {
   PersonenApiFactory,
   PersonenFrontendApiFactory,
   type CreatePersonBodyParams,
-  // type DBiamCreatePersonenkontextBodyParams,
-  // type DBiamPersonenkontextResponse,
   type PersonenApiInterface,
   type PersonendatensatzResponse,
   type PersonenFrontendApiInterface,
@@ -52,7 +50,6 @@ type PersonState = {
 type PersonGetters = {}
 type PersonActions = {
   createPerson: (person: CreatePersonBodyParams) => Promise<PersonendatensatzResponse>
-  // createPersonenkontext: (DBiamCreatePersonenkontextBodyParams) => Promise<DBiamPersonenkontextResponse>
   getAllPersons: () => Promise<void>
   getPersonById: (personId: string) => Promise<Personendatensatz>
   resetPassword: (personId: string) => Promise<string>
@@ -95,24 +92,6 @@ export const usePersonStore: StoreDefinition<
         this.loading = false
       }
     },
-
-    // async createPersonenkontext(personId: string, organisationId: string, rolleId: string): Promise<DBiamPersonenkontextResponse> {
-    //   this.loading = true
-    //   try {
-    //     const { data }: { data: PersonendatensatzResponse } =
-    //       await personenApi.personControllerCreatePersonenkontext(personId, organisationId, rolleId)
-    //     this.createdPersonenkontext = data
-    //     return data
-    //   } catch (error: unknown) {
-    //     this.errorCode = 'UNSPECIFIED_ERROR'
-    //     if (isAxiosError(error)) {
-    //       this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR'
-    //     }
-    //     return Promise.reject(this.errorCode)
-    //   } finally {
-    //    this.loading = false
-    //   }
-    // },
 
     async getAllPersons() {
       this.loading = true
