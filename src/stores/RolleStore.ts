@@ -8,7 +8,7 @@ import {
   RolleResponseMerkmaleEnum,
   type CreateRolleBodyParams,
   type RolleApiInterface,
-  type RolleResponse,
+  type RolleResponse
 } from '../api-client/generated/api'
 import axiosApiInstance from '@/services/ApiService'
 

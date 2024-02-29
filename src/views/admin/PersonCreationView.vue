@@ -149,7 +149,6 @@
         :onDiscard="navigateToPersonTable"
         @onShowDialogChange="(value: boolean) => (showUnsavedChangesDialog = value)"
         :onSubmit="onSubmit"
-        :resetForm="resetForm"
         :showUnsavedChangesDialog="showUnsavedChangesDialog"
       >
         <!-- Persönliche Informationen -->

@@ -251,7 +251,6 @@
           :onDiscard="navigateToRolleManagement"
           @onShowDialogChange="(value: boolean) => (showUnsavedChangesDialog = value)"
           :onSubmit="onSubmit"
-          :resetForm="resetForm"
           :showUnsavedChangesDialog="showUnsavedChangesDialog"
         >
           <!-- Schulstrukturknoten -->
