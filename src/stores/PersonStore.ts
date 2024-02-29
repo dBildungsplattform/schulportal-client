@@ -21,7 +21,11 @@ const personenFrontendApi: PersonenFrontendApiInterface = PersonenFrontendApiFac
   '',
   axiosApiInstance
 )
-const personenKontexteApi: DbiamPersonenkontexteApiInterface = DbiamPersonenkontexteApiFactory(undefined, '', axiosApiInstance)
+const personenKontexteApi: DbiamPersonenkontexteApiInterface = DbiamPersonenkontexteApiFactory(
+  undefined,
+  '',
+  axiosApiInstance
+)
 
 export type Person = {
   id: string
@@ -44,10 +48,12 @@ export type Personendatensatz = {
   personenkontexte: Array<Personenkontext>
 }
 
+export type { PersonendatensatzResponse }
+
 type PersonState = {
   allPersons: Array<Personendatensatz>
   createdPerson: PersonendatensatzResponse | null
-  createdPersonenkontext: DBiamPersonenkontextResponse |null
+  createdPersonenkontext: DBiamPersonenkontextResponse | null
   errorCode: string
   loading: boolean
   totalPersons: number
@@ -57,7 +63,9 @@ type PersonState = {
 type PersonGetters = {}
 type PersonActions = {
   createPerson: (person: CreatePersonBodyParams) => Promise<PersonendatensatzResponse>
-  createPersonenkontext: (personenkontext: DBiamCreatePersonenkontextBodyParams) => Promise<DBiamPersonenkontextResponse>
+  createPersonenkontext: (
+    personenkontext: DBiamCreatePersonenkontextBodyParams
+  ) => Promise<DBiamPersonenkontextResponse>
   getAllPersons: () => Promise<void>
   getPersonById: (personId: string) => Promise<Personendatensatz>
   resetPassword: (personId: string) => Promise<string>
@@ -87,26 +95,30 @@ export const usePersonStore: StoreDefinition<
     async createPerson(person: CreatePersonBodyParams): Promise<PersonendatensatzResponse> {
       this.loading = true
       try {
-        const response =
-        await personenApi.personControllerCreatePerson(person)
-        this.createdPerson = response.data
-        return response.data
+        const { data }: { data: PersonendatensatzResponse } =
+          await personenApi.personControllerCreatePerson(person)
+        this.createdPerson = data
+        return data
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR'
         if (isAxiosError(error)) {
           this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR'
         }
-        return Promise.reject(this.errorCode)
+        return await Promise.reject(this.errorCode)
       } finally {
         this.loading = false
       }
     },
 
-    async createPersonenkontext(personenkontext: DBiamCreatePersonenkontextBodyParams): Promise<DBiamPersonenkontextResponse> {
+    async createPersonenkontext(
+      personenkontext: DBiamCreatePersonenkontextBodyParams
+    ): Promise<DBiamPersonenkontextResponse> {
       this.loading = true
       try {
         const { data }: { data: DBiamPersonenkontextResponse } =
-          await personenKontexteApi.dBiamPersonenkontextControllerCreatePersonenkontext(personenkontext)
+          await personenKontexteApi.dBiamPersonenkontextControllerCreatePersonenkontext(
+            personenkontext
+          )
         this.createdPersonenkontext = data
         return data
       } catch (error: unknown) {
@@ -114,9 +126,9 @@ export const usePersonStore: StoreDefinition<
         if (isAxiosError(error)) {
           this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR'
         }
-        return Promise.reject(this.errorCode)
+        return await Promise.reject(this.errorCode)
       } finally {
-       this.loading = false
+        this.loading = false
       }
     },
 
@@ -151,7 +163,7 @@ export const usePersonStore: StoreDefinition<
         if (isAxiosError(error)) {
           this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR'
         }
-        return Promise.reject(this.errorCode)
+        return await Promise.reject(this.errorCode)
       } finally {
         this.loading = false
       }
@@ -168,7 +180,7 @@ export const usePersonStore: StoreDefinition<
         if (isAxiosError(error)) {
           this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR'
         }
-        return Promise.reject(this.errorCode)
+        return await Promise.reject(this.errorCode)
       } finally {
         this.loading = false
       }

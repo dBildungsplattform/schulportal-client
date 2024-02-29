@@ -4,7 +4,13 @@
     type OrganisationStore,
     type Organisation
   } from '@/stores/OrganisationStore'
-  import { usePersonStore, type CreatedPerson, type CreatedPersonenkontext, type PersonStore } from '@/stores/PersonStore'
+  import {
+    usePersonStore,
+    type CreatedPerson,
+    type CreatedPersonenkontext,
+    type PersonStore,
+    type PersonendatensatzResponse
+  } from '@/stores/PersonStore'
   import { type RolleStore, useRolleStore, type Rolle } from '@/stores/RolleStore'
   import { onMounted, type Ref, ref, type ComputedRef, computed } from 'vue'
   import {
@@ -121,14 +127,16 @@
         vorname: selectedVorname.value as string
       }
     }
-    personStore.createPerson(unpersistedPerson).then((personResponse) => {
-      const unpersistedPersonenkontext: CreatedPersonenkontext = {
-        personId: personResponse.person.id,
-        organisationId: selectedSchule.value,
-        rolleId: selectedRolle.value
-      }
-      personStore.createPersonenkontext(unpersistedPersonenkontext)
-    })
+    personStore
+      .createPerson(unpersistedPerson)
+      .then((personResponse: PersonendatensatzResponse) => {
+        const unpersistedPersonenkontext: CreatedPersonenkontext = {
+          personId: personResponse.person.id,
+          organisationId: selectedSchule.value,
+          rolleId: selectedRolle.value
+        }
+        personStore.createPersonenkontext(unpersistedPersonenkontext)
+      })
   }
 
   const onSubmit: (e?: Event | undefined) => Promise<void | undefined> = handleSubmit(() => {
