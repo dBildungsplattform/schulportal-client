@@ -1,45 +1,45 @@
-import { expect, test, type Mock } from 'vitest'
-import { VueWrapper, mount } from '@vue/test-utils'
-import PasswordOutput from './PasswordOutput.vue'
+import { expect, test, type Mock } from 'vitest';
+import { VueWrapper, mount } from '@vue/test-utils';
+import PasswordOutput from './PasswordOutput.vue';
 
-let wrapper: VueWrapper | null = null
+let wrapper: VueWrapper | null = null;
 
-const writeText: Mock<[], Promise<void>> = vi.fn(async () => {})
+const writeText: Mock<[], Promise<void>> = vi.fn(async () => {});
 
 Object.assign(navigator, {
   clipboard: {
-    writeText
-  }
-})
+    writeText,
+  },
+});
 
 beforeEach(() => {
   document.body.innerHTML = `
     <div>
       <div id="app"></div>
     </div>
-  `
+  `;
 
   wrapper = mount(PasswordOutput, {
     attachTo: document.getElementById('app') || '',
     props: {
-      password: 'password'
+      password: 'password',
     },
     global: {
       components: {
-        PasswordOutput
-      }
-    }
-  })
-})
+        PasswordOutput,
+      },
+    },
+  });
+});
 
 describe('PasswordOutput', () => {
   test('it renders the password output', () => {
-    expect(wrapper?.find('[data-testid="password-output-field"]').isVisible()).toBe(true)
-  })
+    expect(wrapper?.find('[data-testid="password-output-field"]').isVisible()).toBe(true);
+  });
 
   test('it copies the password', () => {
-    expect(wrapper?.find('[data-testid="copy-password-icon"]').trigger('click'))
+    expect(wrapper?.find('[data-testid="copy-password-icon"]').trigger('click'));
     // eslint-disable-next-line @typescript-eslint/unbound-method
-    expect(navigator.clipboard.writeText).toHaveBeenCalledTimes(1)
-  })
-})
+    expect(navigator.clipboard.writeText).toHaveBeenCalledTimes(1);
+  });
+});
