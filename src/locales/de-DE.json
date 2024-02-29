@@ -15,6 +15,7 @@
     "rolle": {
       "addNew": "Neue Rolle hinzufügen",
       "assignMerkmale": "Merkmale zuordnen",
+      "assignRolle": "Rolle zuordnen",
       "assignRollenart": "Rollenart zuordnen",
       "backToCreateRolle": "Zurück zur Rollenanlage",
       "create": "Rolle anlegen",
@@ -39,6 +40,7 @@
       },
       "merkmale": "Merkmale",
       "noRollenFound": "Keine Rollen gefunden",
+      "rolle": "Rolle",
       "rolleCreateErrorTitle": "Fehler beim Anlegen der Rolle",
       "rolleCreateErrorText": "Die Rolle konnte nicht angelegt werden.",
       "rollenart": "Rollenart",

@@ -4,7 +4,8 @@
     type OrganisationStore,
     type Organisation
   } from '@/stores/OrganisationStore'
-  import { usePersonStore, type CreatedPerson, type PersonStore } from '@/stores/PersonStore'
+  import { usePersonStore, type CreatedPerson, type CreatedPersonenkontext, type PersonStore } from '@/stores/PersonStore'
+  import { type RolleStore, useRolleStore, type Rolle } from '@/stores/RolleStore'
   import { onMounted, type Ref, ref, type ComputedRef, computed } from 'vue'
   import {
     onBeforeRouteLeave,
@@ -24,8 +25,9 @@
   import InputRow from '@/components/form/InputRow.vue'
 
   const router: Router = useRouter()
-  const personStore: PersonStore = usePersonStore()
   const organisationStore: OrganisationStore = useOrganisationStore()
+  const personStore: PersonStore = usePersonStore()
+  const rolleStore: RolleStore = useRolleStore()
   const { t }: Composer = useI18n({ useScope: 'global' })
 
   const isFormDirty: Ref<boolean> = ref(false)
@@ -55,6 +57,7 @@
   })
 
   type PersonCreationForm = {
+    selectedRolle: string
     selectedVorname: string
     selectedFamilienname: string
     selectedSchule: string
@@ -65,6 +68,10 @@
     validationSchema
   })
 
+  const [selectedRolle, selectedRolleProps]: [
+    Ref<string>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>
+  ] = defineField('selectedRolle', vuetifyConfig)
   const [selectedVorname, selectedVornameProps]: [
     Ref<string>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>
@@ -77,6 +84,18 @@
     Ref<string>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>
   ] = defineField('selectedSchule', vuetifyConfig)
+
+  const rollen: ComputedRef<
+    {
+      value: string
+      title: string
+    }[]
+  > = computed(() =>
+    rolleStore.allRollen.map((rolle: Rolle) => ({
+      value: rolle.id,
+      title: rolle.name
+    }))
+  )
 
   const schulen: ComputedRef<
     {
@@ -102,10 +121,13 @@
         vorname: selectedVorname.value as string
       }
     }
-    personStore.createPerson(unpersistedPerson)
-    .then((personResponse) => {
-      console.log(personResponse)
-      // personStore.createPersonenkontext(personResponse.person.id, selectedSchule.value)
+    personStore.createPerson(unpersistedPerson).then((personResponse) => {
+      const unpersistedPersonenkontext: CreatedPersonenkontext = {
+        personId: personResponse.person.id,
+        organisationId: selectedSchule.value,
+        rolleId: selectedRolle.value
+      }
+      personStore.createPersonenkontext(unpersistedPersonenkontext)
     })
   }
 
@@ -146,6 +168,7 @@
 
   onMounted(async () => {
     await organisationStore.getAllOrganisationen()
+    await rolleStore.getAllRollen()
     personStore.errorCode = ''
   })
 </script>
@@ -183,54 +206,68 @@
         :resetForm="resetForm"
         :showUnsavedChangesDialog="showUnsavedChangesDialog"
       >
-        <!-- Persönliche Informationen -->
+        <!-- Rollenzuordnung -->
         <v-row>
-          <h3 class="headline-3">
-            1. {{ $t('admin.person.personalInfo') }}
-          </h3>
+          <h3 class="headline-3">1. {{ $t('admin.rolle.assignRolle') }}</h3>
         </v-row>
-        <!-- Vorname -->
         <InputRow
-          :errorLabel="selectedVornameProps['error']"
-          :fieldProps="selectedVornameProps"
-          id="vorname-input"
+          :errorLabel="selectedRolleProps['error']"
+          :fieldProps="selectedRolleProps"
+          id="rolle-select"
           :isRequired="true"
-          :label="$t('person.firstName')"
-          @onDirtyModelValue="handleDirtyModels"
-          :placeholder="$t('person.enterFirstName')"
-          v-model="selectedVorname"
-        ></InputRow>
-
-        <!-- Nachname -->
-        <InputRow
-          :errorLabel="selectedFamiliennameProps['error']"
-          :fieldProps="selectedFamiliennameProps"
-          id="familienname-input"
-          :isRequired="true"
-          :label="$t('person.lastName')"
-          @onDirtyModelValue="handleDirtyModels"
-          :placeholder="$t('person.enterLastName')"
-          v-model="selectedFamilienname"
-        ></InputRow>
-
-        <!-- Schule zuordnen -->
-        <v-row>
-          <h3 class="headline-3">
-            2. {{ $t('admin.schule.assignSchule') }}
-          </h3>
-        </v-row>
-        <!-- Vorname -->
-        <InputRow
-          :errorLabel="selectedSchuleProps['error']"
-          :fieldProps="selectedSchuleProps"
-          id="schule-select"
           :isSelect="true"
-          :label="$t('admin.schule.assignSchule')"
+          :label="$t('admin.rolle.rolle')"
           @onDirtyModelValue="handleDirtyModels"
-          :placeholder="$t('admin.schule.selectSchule')"
-          :selectableItems="schulen"
-          v-model="selectedSchule"
+          :placeholder="$t('admin.rolle.selectRolle')"
+          :selectableItems="rollen"
+          v-model="selectedRolle"
         ></InputRow>
+
+        <!-- Persönliche Informationen -->
+        <div v-if="selectedRolle">
+          <v-row>
+            <h3 class="headline-3">2. {{ $t('admin.person.personalInfo') }}</h3>
+          </v-row>
+          <!-- Vorname -->
+          <InputRow
+            :errorLabel="selectedVornameProps['error']"
+            :fieldProps="selectedVornameProps"
+            id="vorname-input"
+            :isRequired="true"
+            :label="$t('person.firstName')"
+            @onDirtyModelValue="handleDirtyModels"
+            :placeholder="$t('person.enterFirstName')"
+            v-model="selectedVorname"
+          ></InputRow>
+
+          <!-- Nachname -->
+          <InputRow
+            :errorLabel="selectedFamiliennameProps['error']"
+            :fieldProps="selectedFamiliennameProps"
+            id="familienname-input"
+            :isRequired="true"
+            :label="$t('person.lastName')"
+            @onDirtyModelValue="handleDirtyModels"
+            :placeholder="$t('person.enterLastName')"
+            v-model="selectedFamilienname"
+          ></InputRow>
+
+          <!-- Schule zuordnen -->
+          <v-row>
+            <h3 class="headline-3">3. {{ $t('admin.schule.assignSchule') }}</h3>
+          </v-row>
+          <InputRow
+            :errorLabel="selectedSchuleProps['error']"
+            :fieldProps="selectedSchuleProps"
+            id="schule-select"
+            :isSelect="true"
+            :label="$t('admin.schule.assignSchule')"
+            @onDirtyModelValue="handleDirtyModels"
+            :placeholder="$t('admin.schule.selectSchule')"
+            :selectableItems="schulen"
+            v-model="selectedSchule"
+          ></InputRow>
+        </div>
       </CreationForm>
     </template>
 

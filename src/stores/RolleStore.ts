@@ -8,7 +8,7 @@ import {
   RolleResponseMerkmaleEnum,
   type CreateRolleBodyParams,
   type RolleApiInterface,
-  type RolleResponse,
+  type RolleResponse
 } from '../api-client/generated/api'
 import axiosApiInstance from '@/services/ApiService'
 
@@ -37,6 +37,14 @@ export { CreateRolleBodyParamsMerkmaleEnum }
 export { RolleResponseMerkmaleEnum }
 export { RolleResponseRollenartEnum }
 export type { RolleResponse }
+
+export type Rolle = {
+  id: string
+  administeredBySchulstrukturknoten: string
+  merkmale: Set<RolleResponseMerkmaleEnum>
+  name: string
+  rollenart: RolleResponseRollenartEnum
+}
 
 export type RolleStore = Store<'rolleStore', RolleState, RolleGetters, RolleActions>
 
