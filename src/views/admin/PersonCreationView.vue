@@ -6,7 +6,7 @@
     type Router,
     useRouter,
     type RouteLocationNormalized,
-    type NavigationGuardNext
+    type NavigationGuardNext,
   } from 'vue-router';
   import { type Composer, useI18n } from 'vue-i18n';
   import { useForm, type TypedSchema, type BaseFieldProps } from 'vee-validate';
@@ -15,15 +15,15 @@
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import PasswordOutput from '@/components/form/PasswordOutput.vue';
-  import CreationForm from '@/components/form/CreationForm.vue'
-  import InputRow from '@/components/form/InputRow.vue'
+  import CreationForm from '@/components/form/CreationForm.vue';
+  import InputRow from '@/components/form/InputRow.vue';
 
   const router: Router = useRouter();
   const personStore: PersonStore = usePersonStore();
   const { t }: Composer = useI18n({ useScope: 'global' });
 
-  const showUnsavedChangesDialog: Ref<boolean> = ref(false)
-  let blockedNext: () => void = () => {}
+  const showUnsavedChangesDialog: Ref<boolean> = ref(false);
+  let blockedNext: () => void = () => {};
 
   const validationSchema: TypedSchema = toTypedSchema(
     object({
@@ -67,7 +67,7 @@
   ] = defineField('selectedFamilienname', vuetifyConfig);
 
   function isFormDirty(): boolean {
-    return isFieldDirty('selectedVorname') || isFieldDirty('selectedFamilienname')
+    return isFieldDirty('selectedVorname') || isFieldDirty('selectedFamilienname');
   }
 
   function navigateToPersonTable(): void {
@@ -100,19 +100,17 @@
   };
 
   function handleConfirmUnsavedChanges(): void {
-    blockedNext()
+    blockedNext();
   }
 
-  onBeforeRouteLeave(
-    (_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
-      if (isFormDirty()) {
-        showUnsavedChangesDialog.value = true
-        blockedNext = next
-      } else {
-        next()
-      }
+  onBeforeRouteLeave((_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
+    if (isFormDirty()) {
+      showUnsavedChangesDialog.value = true;
+      blockedNext = next;
+    } else {
+      next();
     }
-  )
+  });
 
   onMounted(async () => {
     personStore.errorCode = '';

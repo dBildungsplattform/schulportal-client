@@ -1,12 +1,12 @@
 <script setup lang="ts">
   type Props = {
-    errorLabel: string | boolean
-    labelForId: string
-    isRequired?: boolean
-    label: string
-  }
+    errorLabel: string | boolean;
+    labelForId: string;
+    isRequired?: boolean;
+    label: string;
+  };
 
-  defineProps<Props>()
+  defineProps<Props>();
 </script>
 
 <template>
