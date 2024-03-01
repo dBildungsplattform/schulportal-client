@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest';
 import { VueWrapper, mount } from '@vue/test-utils';
-import CreationForm from './CreationForm.vue';
+import FormWrapper from './FormWrapper.vue';
 
 let wrapper: VueWrapper | null = null;
 
@@ -11,10 +11,10 @@ beforeEach(() => {
     </div>
   `;
 
-  wrapper = mount(CreationForm, {
+  wrapper = mount(FormWrapper, {
     attachTo: document.getElementById('app') || '',
     props: {
-      id: 'test-creation-form',
+      id: 'test-form-wrapper',
       confirmUnsavedChangesAction: () => vi.fn(),
       createButtonLabel: 'what a label',
       discardButtonLabel: 'another label',
@@ -23,14 +23,14 @@ beforeEach(() => {
     },
     global: {
       components: {
-        CreationForm,
+        FormWrapper,
       },
     },
   });
 });
 
-describe('CreationForm', () => {
-  test.skip('it renders the creation form', () => {
-    expect(wrapper?.find('[data-testid="test-creation-form"]').isVisible()).toBe(true);
+describe('FormWrapper', () => {
+  test.skip('it renders the form wrapper', () => {
+    expect(wrapper?.find('[data-testid="test-form-wrapper"]').isVisible()).toBe(true);
   });
 });

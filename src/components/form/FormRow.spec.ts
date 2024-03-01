@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest';
 import { VueWrapper, mount } from '@vue/test-utils';
-import InputRow from './InputRow.vue';
+import FormRow from './FormRow.vue';
 
 let wrapper: VueWrapper | null = null;
 
@@ -11,7 +11,7 @@ beforeEach(() => {
     </div>
   `;
 
-  wrapper = mount(InputRow, {
+  wrapper = mount(FormRow, {
     attachTo: document.getElementById('app') || '',
     props: {
       labelForId: 'test-input',
@@ -20,14 +20,14 @@ beforeEach(() => {
     },
     global: {
       components: {
-        InputRow,
+        FormRow,
       },
     },
   });
 });
 
-describe('InputRow', () => {
-  test.skip('it renders an input row', () => {
+describe('FormRow', () => {
+  test.skip('it renders a form row', () => {
     expect(wrapper?.find('[data-testid="test-input"]').isVisible()).toBe(true);
   });
 });

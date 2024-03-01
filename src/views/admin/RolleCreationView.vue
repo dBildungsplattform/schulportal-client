@@ -22,8 +22,8 @@
   import { type BaseFieldProps, type TypedSchema, useForm } from 'vee-validate';
   import { object, string } from 'yup';
   import { toTypedSchema } from '@vee-validate/yup';
-  import CreationForm from '@/components/form/CreationForm.vue';
-  import InputRow from '@/components/form/InputRow.vue';
+  import FormWrapper from '@/components/form/FormWrapper.vue';
+  import FormRow from '@/components/form/FormRow.vue';
   import { useOrganisationStore, type OrganisationStore, type Organisation } from '@/stores/OrganisationStore';
 
   const { smAndDown }: { smAndDown: Ref<boolean> } = useDisplay();
@@ -229,7 +229,7 @@
 
       <!-- The form to create a new Rolle -->
       <template v-if="!rolleStore.createdRolle && !rolleStore.errorCode">
-        <CreationForm
+        <FormWrapper
           :confirmUnsavedChangesAction="handleConfirmUnsavedChanges"
           :createButtonLabel="$t('admin.rolle.create')"
           :discardButtonLabel="$t('admin.rolle.discard')"
@@ -243,7 +243,7 @@
           <v-row>
             <h3 class="headline-3">1. {{ $t('admin.schulstrukturknoten.assignSchulstrukturknoten') }}</h3>
           </v-row>
-          <InputRow
+          <FormRow
             :errorLabel="selectedSchulstrukturknotenProps['error']"
             labelForId="schulstrukturknoten-select"
             :isRequired="true"
@@ -263,13 +263,13 @@
               v-bind="selectedSchulstrukturknotenProps"
               v-model="selectedSchulstrukturknoten"
             ></v-select>
-          </InputRow>
+          </FormRow>
 
           <!-- Rollenart -->
           <v-row>
             <h3 class="headline-3">2. {{ $t('admin.rolle.assignRollenart') }}</h3>
           </v-row>
-          <InputRow
+          <FormRow
             :errorLabel="selectedRollenArtProps['error']"
             labelForId="rollenart-select"
             :isRequired="true"
@@ -289,14 +289,14 @@
               v-bind="selectedRollenArtProps"
               v-model="selectedRollenArt"
             ></v-select>
-          </InputRow>
+          </FormRow>
 
           <template v-if="selectedRollenArt && selectedSchulstrukturknoten">
             <!-- Rollenname -->
             <v-row>
               <h3 class="headline-3">3. {{ $t('admin.rolle.enterRollenname') }}</h3>
             </v-row>
-            <InputRow
+            <FormRow
               :errorLabel="selectedRollenNameProps['error']"
               labelForId="rollenname-input"
               :isRequired="true"
@@ -313,13 +313,13 @@
                 v-bind="selectedRollenNameProps"
                 v-model="selectedRollenName"
               ></v-text-field>
-            </InputRow>
+            </FormRow>
 
             <!-- Merkmale -->
             <v-row>
               <h3 class="headline-3">4. {{ $t('admin.rolle.assignMerkmale') }}</h3>
             </v-row>
-            <InputRow
+            <FormRow
               :errorLabel="selectedMerkmaleProps['error']"
               labelForId="merkmale-select"
               :label="$t('admin.rolle.merkmale')"
@@ -339,9 +339,9 @@
                 v-bind="selectedMerkmaleProps"
                 v-model="selectedMerkmale"
               ></v-select>
-            </InputRow>
+            </FormRow>
           </template>
-        </CreationForm>
+        </FormWrapper>
       </template>
 
       <!-- Result template on success after submit  -->

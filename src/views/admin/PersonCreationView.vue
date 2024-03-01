@@ -15,8 +15,8 @@
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import PasswordOutput from '@/components/form/PasswordOutput.vue';
-  import CreationForm from '@/components/form/CreationForm.vue';
-  import InputRow from '@/components/form/InputRow.vue';
+  import FormWrapper from '@/components/form/FormWrapper.vue';
+  import FormRow from '@/components/form/FormRow.vue';
 
   const router: Router = useRouter();
   const personStore: PersonStore = usePersonStore();
@@ -139,7 +139,7 @@
 
     <!-- The form to create a new Person  -->
     <template v-if="!personStore.createdPerson && !personStore.errorCode">
-      <CreationForm
+      <FormWrapper
         :confirmUnsavedChangesAction="handleConfirmUnsavedChanges"
         :createButtonLabel="$t('admin.person.create')"
         :discardButtonLabel="$t('admin.person.discard')"
@@ -156,7 +156,7 @@
           </h3>
         </v-row>
         <!-- Vorname -->
-        <InputRow
+        <FormRow
           :errorLabel="selectedVornameProps['error']"
           labelForId="vorname-input"
           :isRequired="true"
@@ -173,10 +173,10 @@
             v-bind="selectedVornameProps"
             v-model="selectedVorname"
           ></v-text-field>
-        </InputRow>
+        </FormRow>
 
         <!-- Nachname -->
-        <InputRow
+        <FormRow
           :errorLabel="selectedFamiliennameProps['error']"
           labelForId="familienname-input"
           :isRequired="true"
@@ -193,8 +193,8 @@
             v-bind="selectedFamiliennameProps"
             v-model="selectedFamilienname"
           ></v-text-field>
-        </InputRow>
-      </CreationForm>
+        </FormRow>
+      </FormWrapper>
     </template>
 
     <!-- Result template on success after submit  -->
