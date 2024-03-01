@@ -255,7 +255,7 @@
       </template>
       <!-- Result template on success after submit (Present value in createdSchule and no errorCode)  -->
       <template v-if="organisationStore.createdOrganisation && !organisationStore.errorCode">
-        <v-container class="new-rolle-success">
+        <v-container class="new-schule-success">
           <v-row justify="center">
             <v-col
               class="subtitle-1"
