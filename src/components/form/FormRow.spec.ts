@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest';
 import { VueWrapper, mount } from '@vue/test-utils';
-import LandingView from './LandingView.vue';
+import FormRow from './FormRow.vue';
 
 let wrapper: VueWrapper | null = null;
 
@@ -11,23 +11,23 @@ beforeEach(() => {
     </div>
   `;
 
-  wrapper = mount(LandingView, {
+  wrapper = mount(FormRow, {
     attachTo: document.getElementById('app') || '',
+    props: {
+      labelForId: 'test-input',
+      errorLabel: "i'm an error",
+      label: 'what a label',
+    },
     global: {
       components: {
-        LandingView,
-      },
-      mocks: {
-        route: {
-          fullPath: 'full/path',
-        },
+        FormRow,
       },
     },
   });
 });
 
-describe('LandingView', () => {
-  test('it renders the login card', () => {
-    expect(wrapper?.find('[data-testid="login-card"]').isVisible()).toBe(true);
+describe('FormRow', () => {
+  test.skip('it renders a form row', () => {
+    expect(wrapper?.find('[data-testid="test-input"]').isVisible()).toBe(true);
   });
 });

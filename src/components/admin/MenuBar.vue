@@ -1,20 +1,20 @@
 <script setup lang="ts">
-  import { type Ref, ref, type ComputedRef } from 'vue'
-  import { onMounted } from 'vue'
-  import { useDisplay } from 'vuetify'
+  import { type Ref, ref, type ComputedRef } from 'vue';
+  import { onMounted } from 'vue';
+  import { useDisplay } from 'vuetify';
 
-  const menuDrawer: Ref<boolean> = ref(true)
-  const { mobile }: { mobile: ComputedRef<boolean> } = useDisplay()
+  const menuDrawer: Ref<boolean> = ref(true);
+  const { mobile }: { mobile: ComputedRef<boolean> } = useDisplay();
 
   function closeMenuOnMobile(): void {
     if (mobile.value) {
-      menuDrawer.value = false
+      menuDrawer.value = false;
     }
   }
 
   onMounted(() => {
-    menuDrawer.value = !mobile.value
-  })
+    menuDrawer.value = !mobile.value;
+  });
 </script>
 
 <template>

@@ -1,10 +1,10 @@
-import { createVuetify, type ThemeDefinition, type VuetifyOptions } from 'vuetify'
-import '@mdi/font/css/materialdesignicons.css'
-import { aliases, mdi } from 'vuetify/iconsets/mdi'
-import '@/styles/main.scss'
+import { createVuetify, type ThemeDefinition, type VuetifyOptions } from 'vuetify';
+import '@mdi/font/css/materialdesignicons.css';
+import { aliases, mdi } from 'vuetify/iconsets/mdi';
+import '@/styles/main.scss';
 
 // eslint-disable-next-line no-var
-declare var cspNonce: string
+declare var cspNonce: string;
 
 const shTheme: ThemeDefinition = {
   dark: false,
@@ -18,25 +18,25 @@ const shTheme: ThemeDefinition = {
     error: '#d4004b',
     info: '#2196F3',
     success: '#4CAF50',
-    warning: '#FF9825'
-  }
-}
+    warning: '#FF9825',
+  },
+};
 
 const vuetifyConfig: VuetifyOptions = {
   icons: {
     defaultSet: 'mdi',
     aliases,
     sets: {
-      mdi
-    }
+      mdi,
+    },
   },
   theme: {
     cspNonce,
     defaultTheme: 'shTheme',
     themes: {
-      shTheme
-    }
-  }
-}
+      shTheme,
+    },
+  },
+};
 
-export default createVuetify(vuetifyConfig)
+export default createVuetify(vuetifyConfig);

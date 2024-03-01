@@ -11,8 +11,19 @@
   } from '@/stores/RolleStore'
   import { useI18n, type Composer } from 'vue-i18n'
   import SpshAlert from '@/components/alert/SpshAlert.vue'
-  import { type Router, useRouter } from 'vue-router'
+  import {
+    onBeforeRouteLeave,
+    type Router,
+    useRouter,
+    type NavigationGuardNext,
+    type RouteLocationNormalized
+  } from 'vue-router'
   import { useDisplay } from 'vuetify'
+  import { type BaseFieldProps, type TypedSchema, useForm } from 'vee-validate'
+  import { object, string } from 'yup'
+  import { toTypedSchema } from '@vee-validate/yup'
+  import FormWrapper from '@/components/form/FormWrapper.vue'
+  import FormRow from '@/components/form/FormRow.vue'
   import {
     useOrganisationStore,
     type OrganisationStore,
@@ -27,71 +38,130 @@
   const router: Router = useRouter()
 
   type TranslatedRollenArt = { value: RolleResponseRollenartEnum; title: string }
-  const translatedRollenart: Ref<TranslatedRollenArt[]> = ref([])
+  const translatedRollenarten: Ref<TranslatedRollenArt[]> = ref([])
 
   type TranslatedMerkmal = { value: RolleResponseMerkmaleEnum; title: string }
   const translatedMerkmale: Ref<TranslatedMerkmal[]> = ref([])
 
-  const selectedSchulstrukturKnoten: Ref<string | null> = ref(null)
-  const selectedRollenName: Ref<string | null> = ref(null)
-  const selectedRollenArt: Ref<CreateRolleBodyParamsRollenartEnum | null> = ref(null)
-  const selectedMerkmale: Ref<CreateRolleBodyParamsMerkmaleEnum[] | null> = ref(null)
+  const validationSchema: TypedSchema = toTypedSchema(
+    object({
+      selectedRollenArt: string().required(t('admin.rolle.rules.rollenart.required')),
+      selectedRollenName: string()
+        .max(200, t('admin.rolle.rules.rollenname.length'))
+        .required(t('admin.rolle.rules.rollenname.required')),
+      selectedSchulstrukturknoten: string().required(t('admin.schulstrukturknoten.rules.required'))
+    })
+  )
 
-  // Rule for validating the rolle name. Maybe enhance a validation framework like VeeValidate instead?
-  const rolleNameRules: Array<(v: string | null | undefined) => boolean | string> = [
-    (v: string | null | undefined): boolean | string => {
-      // First, check for null or undefined values and return a required field message.
-      if (v == null || v.trim().length === 0) {
-        return t('admin.rolle.rule.rolleNameRequired')
-      }
-      // Next, check for the length constraint.
-      if (v.length > 200) {
-        return t('admin.rolle.rule.rolleNameLength')
-      }
-      // If none of the above conditions are met, the input is valid.
-      return true
+  const vuetifyConfig = (state: {
+    errors: Array<string>
+  }): { props: { error: boolean; 'error-messages': Array<string> } } => ({
+    props: {
+      error: !!state.errors.length,
+      'error-messages': state.errors
     }
-  ]
-  const submitForm = async (): Promise<void> => {
-    if (selectedRollenName.value && selectedSchulstrukturKnoten.value && selectedRollenArt.value) {
-      const merkmaleToSubmit: CreateRolleBodyParamsMerkmaleEnum[] =
-        selectedMerkmale.value?.map((m: CreateRolleBodyParamsMerkmaleEnum) => m) || []
-      await rolleStore.createRolle(
-        selectedRollenName.value,
-        selectedSchulstrukturKnoten.value,
-        selectedRollenArt.value,
-        merkmaleToSubmit
-      )
+  })
 
-      if (rolleStore.createdRolle) {
-        await organisationStore.getOrganisationById(
-          rolleStore.createdRolle.administeredBySchulstrukturknoten
-        )
-      }
-    }
+  type RolleCreationForm = {
+    selectedSchulstrukturknoten: string
+    selectedRollenArt: CreateRolleBodyParamsRollenartEnum
+    selectedRollenName: string
+    selectedMerkmale: CreateRolleBodyParamsMerkmaleEnum[]
   }
+
+  // eslint-disable-next-line @typescript-eslint/typedef
+  const { defineField, handleSubmit, isFieldDirty, resetForm } = useForm<RolleCreationForm>({
+    validationSchema
+  })
+
+  const [selectedSchulstrukturknoten, selectedSchulstrukturknotenProps]: [
+    Ref<string>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>
+  ] = defineField('selectedSchulstrukturknoten', vuetifyConfig)
+
+  const [selectedRollenArt, selectedRollenArtProps]: [
+    Ref<CreateRolleBodyParamsRollenartEnum | null>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>
+  ] = defineField('selectedRollenArt', vuetifyConfig)
+
+  const [selectedRollenName, selectedRollenNameProps]: [
+    Ref<string>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>
+  ] = defineField('selectedRollenName', vuetifyConfig)
+
+  const [selectedMerkmale, selectedMerkmaleProps]: [
+    Ref<CreateRolleBodyParamsMerkmaleEnum[] | null>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>
+  ] = defineField('selectedMerkmale', vuetifyConfig)
+
+  function isFormDirty(): boolean {
+    return (
+      isFieldDirty('selectedSchulstrukturknoten') ||
+      isFieldDirty('selectedRollenArt') ||
+      isFieldDirty('selectedRollenName') ||
+      isFieldDirty('selectedMerkmale')
+    )
+  }
+
+  const showUnsavedChangesDialog: Ref<boolean> = ref(false)
+  let blockedNext: () => void = () => {}
+
+  onBeforeRouteLeave(
+    (_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
+      if (isFormDirty()) {
+        showUnsavedChangesDialog.value = true
+        blockedNext = next
+      } else {
+        next()
+      }
+    }
+  )
+
+  const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = handleSubmit(
+    async () => {
+      if (
+        selectedRollenName.value &&
+        selectedSchulstrukturknoten.value &&
+        selectedRollenArt.value
+      ) {
+        const merkmaleToSubmit: CreateRolleBodyParamsMerkmaleEnum[] =
+          selectedMerkmale.value?.map((m: CreateRolleBodyParamsMerkmaleEnum) => m) || []
+        await rolleStore.createRolle(
+          selectedRollenName.value,
+          selectedSchulstrukturknoten.value,
+          selectedRollenArt.value,
+          merkmaleToSubmit
+        )
+
+        if (rolleStore.createdRolle) {
+          await organisationStore.getOrganisationById(
+            rolleStore.createdRolle.administeredBySchulstrukturknoten
+          )
+        }
+      }
+    }
+  )
+
   const handleCreateAnotherRolle = (): void => {
     rolleStore.createdRolle = null
-    organisationStore.currentOrganisation = null
-    selectedSchulstrukturKnoten.value = null
-    selectedRollenArt.value = null
-    selectedRollenName.value = null
-    selectedMerkmale.value = null
+    resetForm()
     router.push({ name: 'create-rolle' })
+  }
+
+  function handleConfirmUnsavedChanges(): void {
+    blockedNext()
   }
 
   function navigateBackToRolleForm(): void {
     rolleStore.errorCode = ''
     router.push({ name: 'create-rolle' })
   }
+
   function navigateToRolleManagement(): void {
     rolleStore.createdRolle = null
-    selectedSchulstrukturKnoten.value = null
-    selectedRollenArt.value = null
-    selectedRollenName.value = null
-    selectedMerkmale.value = null
     router.push({ name: 'rolle-management' })
   }
+
   const translatedCreatedRolleMerkmale: ComputedRef<string> = computed(() => {
     // Check if `createdRolle.merkmale` exists and is an array
     if (!rolleStore.createdRolle?.merkmale || !Array.isArray(rolleStore.createdRolle.merkmale)) {
@@ -125,7 +195,7 @@
       // Use the enum value to construct the i18n path
       const i18nPath: string = `admin.rolle.mappingFrontBackEnd.rollenarten.${enumValue}`
       // Push the mapped object into the array
-      translatedRollenart.value.push({
+      translatedRollenarten.value.push({
         value: enumValue, // Keep the enum value for internal use
         title: t(i18nPath) // Get the localized title
       })
@@ -137,6 +207,14 @@
         value: enumValue,
         title: t(i18nPath)
       })
+    })
+
+    /* listen for browser changes and prevent them when form is dirty */
+    window.addEventListener('beforeunload', (event: BeforeUnloadEvent) => {
+      if (!isFormDirty()) return
+      event.preventDefault()
+      /* Chrome requires returnValue to be set. */
+      event.returnValue = ''
     })
   })
 </script>
@@ -162,7 +240,127 @@
         :buttonAction="navigateBackToRolleForm"
         buttonClass="primary"
       />
-      <!-- Result template on success after submit (Present value in createdRolle and no errorCode)  -->
+
+      <!-- The form to create a new Rolle -->
+      <template v-if="!rolleStore.createdRolle && !rolleStore.errorCode">
+        <FormWrapper
+          :confirmUnsavedChangesAction="handleConfirmUnsavedChanges"
+          :createButtonLabel="$t('admin.rolle.create')"
+          :discardButtonLabel="$t('admin.rolle.discard')"
+          id="rolle-creation-form"
+          :onDiscard="navigateToRolleManagement"
+          @onShowDialogChange="(value: boolean) => (showUnsavedChangesDialog = value)"
+          :onSubmit="onSubmit"
+          :showUnsavedChangesDialog="showUnsavedChangesDialog"
+        >
+          <!-- Schulstrukturknoten -->
+          <v-row>
+            <h3 class="headline-3">
+              1. {{ $t('admin.schulstrukturknoten.assignSchulstrukturknoten') }}
+            </h3>
+          </v-row>
+          <FormRow
+            :errorLabel="selectedSchulstrukturknotenProps['error']"
+            labelForId="schulstrukturknoten-select"
+            :isRequired="true"
+            :label="$t('admin.schulstrukturknoten.schulstrukturknoten')"
+          >
+            <v-select
+              clearable
+              data-testid="schulstrukturknoten-select"
+              density="compact"
+              id="schulstrukturknoten-select"
+              :items="schulstrukturknoten"
+              item-value="value"
+              item-text="title"
+              :placeholder="$t('admin.schulstrukturknoten.selectSchulstrukturknoten')"
+              required="true"
+              variant="outlined"
+              v-bind="selectedSchulstrukturknotenProps"
+              v-model="selectedSchulstrukturknoten"
+            ></v-select>
+          </FormRow>
+
+          <!-- Rollenart -->
+          <v-row>
+            <h3 class="headline-3">2. {{ $t('admin.rolle.assignRollenart') }}</h3>
+          </v-row>
+          <FormRow
+            :errorLabel="selectedRollenArtProps['error']"
+            labelForId="rollenart-select"
+            :isRequired="true"
+            :label="$t('admin.rolle.rollenart')"
+          >
+            <v-select
+              clearable
+              data-testid="rollenart-select"
+              density="compact"
+              id="rollenart-select"
+              :items="translatedRollenarten"
+              item-value="value"
+              item-text="title"
+              :placeholder="$t('admin.rolle.selectRollenart')"
+              required="true"
+              variant="outlined"
+              v-bind="selectedRollenArtProps"
+              v-model="selectedRollenArt"
+            ></v-select>
+          </FormRow>
+
+          <template v-if="selectedRollenArt && selectedSchulstrukturknoten">
+            <!-- Rollenname -->
+            <v-row>
+              <h3 class="headline-3">3. {{ $t('admin.rolle.enterRollenname') }}</h3>
+            </v-row>
+            <FormRow
+              :errorLabel="selectedRollenNameProps['error']"
+              labelForId="rollenname-input"
+              :isRequired="true"
+              :label="$t('admin.rolle.rollenname')"
+            >
+              <v-text-field
+                clearable
+                data-testid="rollenname-input"
+                density="compact"
+                id="rollenname-input"
+                :placeholder="$t('admin.rolle.enterRollenname')"
+                required="true"
+                variant="outlined"
+                v-bind="selectedRollenNameProps"
+                v-model="selectedRollenName"
+              ></v-text-field>
+            </FormRow>
+
+            <!-- Merkmale -->
+            <v-row>
+              <h3 class="headline-3">4. {{ $t('admin.rolle.assignMerkmale') }}</h3>
+            </v-row>
+            <FormRow
+              :errorLabel="selectedMerkmaleProps['error']"
+              labelForId="merkmale-select"
+              :label="$t('admin.rolle.merkmale')"
+            >
+              <v-select
+                chips
+                clearable
+                data-testid="merkmale-select"
+                density="compact"
+                id="merkmale-select"
+                :items="translatedMerkmale"
+                item-value="value"
+                item-text="title"
+                multiple
+                :placeholder="$t('admin.rolle.selectMerkmale')"
+                variant="outlined"
+                v-bind="selectedMerkmaleProps"
+                v-model="selectedMerkmale"
+              ></v-select>
+            </FormRow>
+          </template>
+        </FormWrapper>
+      </template>
+
+      <!-- Result template on success after submit  -->
       <template v-if="rolleStore.createdRolle && !rolleStore.errorCode">
         <v-container class="new-rolle-success">
           <v-row justify="center">
@@ -253,305 +451,8 @@
           </v-row>
         </v-container>
       </template>
-      <!-- The form to create a new role (No created role yet and no errorCode) -->
-      <template v-if="!rolleStore.createdRolle && !rolleStore.errorCode">
-        <v-container class="new-rolle">
-          <v-form @submit.prevent="submitForm">
-            <v-row>
-              <v-col
-                class="d-none d-md-flex"
-                cols="1"
-              ></v-col>
-              <v-col cols="auto">
-                <v-icon
-                  small
-                  class="mr-2"
-                  icon="mdi-alert-circle-outline"
-                >
-                </v-icon>
-                <span class="subtitle-2">{{ $t('admin.mandatoryFieldsNotice') }}</span>
-              </v-col>
-            </v-row>
-            <!-- select school structure node -->
-            <v-row>
-              <!-- This column will be hidden on xs screens and visible on sm and larger screens -->
-              <v-col
-                cols="2"
-                class="d-none d-md-flex"
-              ></v-col>
-              <v-col>
-                <h3 class="subtitle-2">
-                  1. {{ $t('admin.schulstrukturknoten.assignSchulstrukturknoten') }}
-                </h3>
-              </v-col>
-            </v-row>
-            <v-row>
-              <!-- Spacer column -->
-              <v-col
-                cols="3"
-                class="d-none d-md-flex"
-              ></v-col>
-              <v-col
-                cols="12"
-                md="3"
-                class="md-text-right py-0"
-              >
-                <label
-                  class="text-body"
-                  for="schulstrukturknoten-select"
-                  required="true"
-                >
-                  {{ $t('admin.schulstrukturknoten.schulstrukturknoten') }}
-                </label></v-col
-              >
-              <v-col
-                cols="12"
-                md="auto"
-                class="py-0"
-              >
-                <v-select
-                  data-testid="schulstrukturknoten-select"
-                  id="schulstrukturknoten-select"
-                  :items="schulstrukturknoten"
-                  v-model="selectedSchulstrukturKnoten"
-                  item-value="value"
-                  item-text="title"
-                  variant="outlined"
-                  density="compact"
-                  single-line
-                  :placeholder="$t('admin.schulstrukturknoten.selectSchulstrukturknoten')"
-                  clearable
-                  required
-                >
-                  <template v-slot:item="{ props, item }">
-                    <v-list-item
-                      v-bind="props"
-                      :title="item.title"
-                      class="select-item-text"
-                    ></v-list-item>
-                  </template>
-                </v-select>
-              </v-col>
-            </v-row>
-            <!-- select Role type -->
-            <v-row>
-              <v-col
-                cols="2"
-                class="d-none d-md-flex"
-              ></v-col>
-              <v-col>
-                <h3 class="subtitle-2">2. {{ $t('admin.rolle.assignRollenart') }}</h3>
-              </v-col>
-            </v-row>
-            <v-row>
-              <!-- Spacer column -->
-              <v-col
-                cols="3"
-                class="d-none d-md-flex"
-              ></v-col>
-              <v-col
-                cols="12"
-                md="3"
-                class="md-text-right py-0"
-              >
-                <label
-                  class="text-body"
-                  for="rollenart-select"
-                  required="true"
-                >
-                  {{ $t('admin.rolle.rollenart') }}
-                </label></v-col
-              >
-              <v-col
-                cols="12"
-                md="auto"
-                class="py-0"
-              >
-                <v-select
-                  data-testid="rollenart-select"
-                  id="rollenart-select"
-                  :items="translatedRollenart"
-                  v-model="selectedRollenArt"
-                  item-value="value"
-                  item-text="title"
-                  :placeholder="$t('admin.rolle.selectRollenart')"
-                  variant="outlined"
-                  density="compact"
-                  clearable
-                  required
-                >
-                  <template v-slot:item="{ props, item }">
-                    <v-list-item
-                      v-bind="props"
-                      :title="item.title"
-                      class="select-item-text"
-                    ></v-list-item>
-                  </template>
-                </v-select>
-              </v-col>
-            </v-row>
-
-            <!-- Enter Role name -->
-            <template v-if="selectedRollenArt && selectedSchulstrukturKnoten">
-              <v-row>
-                <v-col
-                  cols="2"
-                  class="d-none d-md-flex"
-                ></v-col>
-                <v-col>
-                  <label class="subtitle-2">3. {{ $t('admin.rolle.enterRollenname') }}</label>
-                </v-col>
-              </v-row>
-              <v-row>
-                <!-- Spacer column -->
-                <v-col
-                  cols="3"
-                  class="d-none d-md-flex"
-                ></v-col>
-                <v-col
-                  cols="12"
-                  md="3"
-                  class="md-text-right py-0"
-                >
-                  <label
-                    class="text-body"
-                    for="rollenname-input"
-                    required="true"
-                  >
-                    {{ $t('admin.rolle.rollenname') }}
-                  </label></v-col
-                >
-                <v-col
-                  cols="12"
-                  md="auto"
-                  class="py-0"
-                >
-                  <v-text-field
-                    clearable
-                    data-testid="rollenname-input"
-                    id="rollenname-input"
-                    v-model="selectedRollenName"
-                    :placeholder="$t('admin.rolle.enterRollenname')"
-                    variant="outlined"
-                    density="compact"
-                    :rules="rolleNameRules"
-                    required
-                  ></v-text-field>
-                </v-col>
-              </v-row>
-              <!-- select characteristics -->
-              <v-row>
-                <v-col
-                  class="d-none d-md-flex"
-                  cols="2"
-                ></v-col>
-                <v-col>
-                  <label class="subtitle-2">4. {{ $t('admin.rolle.assignMerkmale') }}</label>
-                </v-col>
-              </v-row>
-              <v-row>
-                <!-- Spacer column -->
-                <v-col
-                  cols="3"
-                  class="d-none d-md-flex"
-                ></v-col>
-                <v-col
-                  cols="12"
-                  md="3"
-                  class="md-text-right py-0"
-                >
-                  <label
-                    class="text-body"
-                    for="merkmale-select"
-                  >
-                    {{ $t('admin.rolle.merkmale') }}
-                  </label></v-col
-                >
-                <v-col
-                  cols="12"
-                  md="auto"
-                  class="py-0"
-                >
-                  <v-select
-                    data-testid="merkmale-select"
-                    id="merkmale-select"
-                    :items="translatedMerkmale"
-                    v-model="selectedMerkmale"
-                    item-value="value"
-                    item-text="title"
-                    :placeholder="$t('admin.rolle.selectMerkmale')"
-                    variant="outlined"
-                    density="compact"
-                    multiple
-                    clearable
-                  >
-                    <template v-slot:item="{ props, item }">
-                      <v-list-item
-                        v-bind="props"
-                        :title="item.title"
-                        class="select-item-text"
-                      ></v-list-item>
-                    </template>
-                  </v-select>
-                </v-col>
-              </v-row>
-              <v-divider
-                class="border-opacity-100 rounded my-6"
-                color="#E5EAEF"
-                thickness="6"
-              ></v-divider>
-              <v-row justify="end">
-                <v-col
-                  cols="12"
-                  sm="6"
-                  md="4"
-                >
-                  <v-btn
-                    class="secondary"
-                    data-testid="discard-rolle-button"
-                    :block="smAndDown"
-                    @click="navigateToRolleManagement"
-                    >{{ $t('admin.rolle.discard') }}</v-btn
-                  >
-                </v-col>
-                <v-col
-                  cols="12"
-                  sm="6"
-                  md="4"
-                >
-                  <v-btn
-                    type="submit"
-                    class="primary button"
-                    data-testid="create-rolle-button"
-                    :block="smAndDown"
-                  >
-                    {{ $t('admin.rolle.create') }}
-                  </v-btn>
-                </v-col>
-              </v-row>
-            </template>
-          </v-form>
-        </v-container>
-      </template>
     </LayoutCard>
   </div>
 </template>
 
-<style>
-  @media (min-width: 960px) {
-    .md-text-right {
-      text-align: right;
-    }
-    .v-select {
-      width: 310px;
-    }
-
-    .v-text-field {
-      width: 310px;
-    }
-  }
-
-  .select-item-text {
-    color: #001e49;
-  }
-</style>
+<style></style>

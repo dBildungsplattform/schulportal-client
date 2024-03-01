@@ -50,7 +50,7 @@ type OrganisationActions = {
   ) => Promise<OrganisationResponse>
 }
 
-export { CreateOrganisationBodyParamsTypEnum } 
+export { CreateOrganisationBodyParamsTypEnum }
 
 export type OrganisationStore = Store<
   'organisationStore',
@@ -121,8 +121,7 @@ export const useOrganisationStore: StoreDefinition<
       typ: CreateOrganisationBodyParamsTypEnum,
       traegerschaft?: CreateOrganisationBodyParamsTraegerschaftEnum,
       administriertVon?: string,
-      zugehoerigZu?: string,
-
+      zugehoerigZu?: string
     ): Promise<OrganisationResponse> {
       this.loading = true
       try {
