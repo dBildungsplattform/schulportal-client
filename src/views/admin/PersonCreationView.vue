@@ -1,26 +1,26 @@
 <script setup lang="ts">
-  import { usePersonStore, type CreatedPerson, type PersonStore } from '@/stores/PersonStore'
-  import { onMounted, type Ref, ref } from 'vue'
+  import { usePersonStore, type CreatedPerson, type PersonStore } from '@/stores/PersonStore';
+  import { onMounted, type Ref, ref } from 'vue';
   import {
     onBeforeRouteLeave,
     type Router,
     useRouter,
     type RouteLocationNormalized,
     type NavigationGuardNext
-  } from 'vue-router'
-  import { type Composer, useI18n } from 'vue-i18n'
-  import { useForm, type TypedSchema, type BaseFieldProps } from 'vee-validate'
-  import { object, string } from 'yup'
-  import { toTypedSchema } from '@vee-validate/yup'
-  import SpshAlert from '@/components/alert/SpshAlert.vue'
-  import LayoutCard from '@/components/cards/LayoutCard.vue'
-  import PasswordOutput from '@/components/form/PasswordOutput.vue'
+  } from 'vue-router';
+  import { type Composer, useI18n } from 'vue-i18n';
+  import { useForm, type TypedSchema, type BaseFieldProps } from 'vee-validate';
+  import { object, string } from 'yup';
+  import { toTypedSchema } from '@vee-validate/yup';
+  import SpshAlert from '@/components/alert/SpshAlert.vue';
+  import LayoutCard from '@/components/cards/LayoutCard.vue';
+  import PasswordOutput from '@/components/form/PasswordOutput.vue';
   import CreationForm from '@/components/form/CreationForm.vue'
   import InputRow from '@/components/form/InputRow.vue'
 
-  const router: Router = useRouter()
-  const personStore: PersonStore = usePersonStore()
-  const { t }: Composer = useI18n({ useScope: 'global' })
+  const router: Router = useRouter();
+  const personStore: PersonStore = usePersonStore();
+  const { t }: Composer = useI18n({ useScope: 'global' });
 
   const showUnsavedChangesDialog: Ref<boolean> = ref(false)
   let blockedNext: () => void = () => {}
@@ -34,70 +34,70 @@
       selectedFamilienname: string()
         .matches(/^[A-Za-z]*[A-Za-zÀ-ÖØ-öø-ÿ-' ]*$/, t('admin.person.rules.familienname.matches'))
         .min(2, t('admin.person.rules.familienname.min'))
-        .required(t('admin.person.rules.familienname.required'))
-    })
-  )
+        .required(t('admin.person.rules.familienname.required')),
+    }),
+  );
 
   const vuetifyConfig = (state: {
-    errors: Array<string>
+    errors: Array<string>;
   }): { props: { error: boolean; 'error-messages': Array<string> } } => ({
     props: {
       error: !!state.errors.length,
-      'error-messages': state.errors
-    }
-  })
+      'error-messages': state.errors,
+    },
+  });
 
   type PersonCreationForm = {
-    selectedVorname: string
-    selectedFamilienname: string
-  }
+    selectedVorname: string;
+    selectedFamilienname: string;
+  };
 
   // eslint-disable-next-line @typescript-eslint/typedef
   const { defineField, handleSubmit, isFieldDirty, resetForm } = useForm<PersonCreationForm>({
-    validationSchema
-  })
+    validationSchema,
+  });
 
   const [selectedVorname, selectedVornameProps]: [
     Ref<string>,
-    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>
-  ] = defineField('selectedVorname', vuetifyConfig)
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = defineField('selectedVorname', vuetifyConfig);
   const [selectedFamilienname, selectedFamiliennameProps]: [
     Ref<string>,
-    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>
-  ] = defineField('selectedFamilienname', vuetifyConfig)
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = defineField('selectedFamilienname', vuetifyConfig);
 
   function isFormDirty(): boolean {
     return isFieldDirty('selectedVorname') || isFieldDirty('selectedFamilienname')
   }
 
   function navigateToPersonTable(): void {
-    router.push({ name: 'person-management' })
-    personStore.createdPerson = null
+    router.push({ name: 'person-management' });
+    personStore.createdPerson = null;
   }
 
   function createPerson(): void {
     const unpersistedPerson: CreatedPerson = {
       name: {
         familienname: selectedFamilienname.value as string,
-        vorname: selectedVorname.value as string
-      }
-    }
-    personStore.createPerson(unpersistedPerson)
+        vorname: selectedVorname.value as string,
+      },
+    };
+    personStore.createPerson(unpersistedPerson);
   }
 
   const onSubmit: (e?: Event | undefined) => Promise<void | undefined> = handleSubmit(() => {
-    createPerson()
-  })
+    createPerson();
+  });
 
   const handleAlertClose = (): void => {
-    personStore.errorCode = ''
-  }
+    personStore.errorCode = '';
+  };
 
   const handleCreateAnotherPerson = (): void => {
-    personStore.createdPerson = null
-    resetForm()
-    router.push({ name: 'create-person' })
-  }
+    personStore.createdPerson = null;
+    resetForm();
+    router.push({ name: 'create-person' });
+  };
 
   function handleConfirmUnsavedChanges(): void {
     blockedNext()
@@ -115,8 +115,8 @@
   )
 
   onMounted(async () => {
-    personStore.errorCode = ''
-  })
+    personStore.errorCode = '';
+  });
 </script>
 
 <template>
@@ -210,7 +210,7 @@
             {{
               $t('admin.person.addedSuccessfully', {
                 firstname: personStore.createdPerson.person.name.vorname,
-                lastname: personStore.createdPerson.person.name.familienname
+                lastname: personStore.createdPerson.person.name.familienname,
               })
             }}
           </v-col>
@@ -247,13 +247,9 @@
           <v-col class="text-body"> {{ personStore.createdPerson.person.referrer }}</v-col>
         </v-row>
         <v-row class="align-center">
-          <v-col class="text-body bold text-right pb-8">
-            {{ $t('admin.person.startPassword') }}:
-          </v-col>
+          <v-col class="text-body bold text-right pb-8"> {{ $t('admin.person.startPassword') }}: </v-col>
           <v-col class="text-body">
-            <PasswordOutput
-              :password="personStore.createdPerson.person.startpasswort"
-            ></PasswordOutput>
+            <PasswordOutput :password="personStore.createdPerson.person.startpasswort"></PasswordOutput>
           </v-col>
         </v-row>
         <v-divider

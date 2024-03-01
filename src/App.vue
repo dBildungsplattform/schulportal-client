@@ -1,16 +1,16 @@
 <script setup lang="ts">
-  import { ref, type Ref } from 'vue'
-  import { RouterView, type RouteLocationNormalized } from 'vue-router'
-  import router from './router'
-  import AdminLayout from '@/layouts/AdminLayout.vue'
-  import DefaultLayout from '@/layouts/DefaultLayout.vue'
-  import TheHeader from '@/components/layout/TheHeader.vue'
+  import { ref, type Ref } from 'vue';
+  import { RouterView, type RouteLocationNormalized } from 'vue-router';
+  import router from './router';
+  import AdminLayout from '@/layouts/AdminLayout.vue';
+  import DefaultLayout from '@/layouts/DefaultLayout.vue';
+  import TheHeader from '@/components/layout/TheHeader.vue';
 
-  const isAdminRoute: Ref<boolean> = ref(false)
+  const isAdminRoute: Ref<boolean> = ref(false);
 
   router.afterEach((to: RouteLocationNormalized) => {
-    isAdminRoute.value = to.meta['layout'] === 'AdminLayout'
-  })
+    isAdminRoute.value = to.meta['layout'] === 'AdminLayout';
+  });
 </script>
 
 <template>
