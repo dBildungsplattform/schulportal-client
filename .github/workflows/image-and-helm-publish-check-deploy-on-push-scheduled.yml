@@ -44,8 +44,8 @@ jobs:
       actions: read
       contents: read
       security-events: write
-      needs:
-        - build_image_generate_code_on_push
+    needs:
+      - build_image_generate_code_on_push
   
   nest_lint:
     name: "Linting"
