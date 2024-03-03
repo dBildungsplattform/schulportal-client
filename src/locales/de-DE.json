@@ -121,7 +121,12 @@
   },
   "start": {
     "administration": "Verwaltung",
-    "allServiceProviders": "Alle Angebote"
+    "allServiceProviders": "Alle Angebote",
+    "class": "Unterricht",
+    "hints": "Hinweise",
+    "homePage": "Startseite",
+    "schoolOfferings": "Schulische Angebote",
+    "workEmail": "Dienstliche E-Mail"
   },
   "itemsPerPage": "Einträge pro Seite",
   "landingTitle": "Willkommen im Schulportal SH.",

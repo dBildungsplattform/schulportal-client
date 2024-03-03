@@ -35,5 +35,7 @@
 <style>
   .v-card .v-card-title {
     text-wrap: pretty;
+    display: flex;
+    justify-content: center; /* Center horizontally */
   }
 </style>

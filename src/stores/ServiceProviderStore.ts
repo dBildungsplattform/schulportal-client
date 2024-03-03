@@ -1,6 +1,6 @@
 import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import { isAxiosError } from 'axios';
-import { ProviderApiFactory, type ProviderApiInterface } from '../api-client/generated/api';
+import { ProviderApiFactory, ServiceProviderKategorie, type ProviderApiInterface } from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
 
 const serviceProviderApi: ProviderApiInterface = ProviderApiFactory(undefined, '', axiosApiInstance);
@@ -9,6 +9,8 @@ export type ServiceProvider = {
   id: string;
   name: string;
   url: string;
+  kategorie: string;
+  hasLogo: boolean;
 };
 
 type ServiceProviderState = {
@@ -19,6 +21,8 @@ type ServiceProviderState = {
 
 type ServiceProviderGetters = {};
 type ServiceProviderActions = { getAllServiceProviders: () => Promise<void> };
+
+export { ServiceProviderKategorie };
 
 export type ServiceProviderStore = Store<
   'serviceProviderStore',
