@@ -86,63 +86,66 @@
     <!-- Template to be displayed in case of no error nor loading -->
     <template v-else>
       <!-- Categorie 1: Work Email -->
-      <v-row>
-        <label class="mx-3">{{ $t('start.workEmail') }}</label>
-        <v-col>
-          <v-divider
-            class="border-opacity-100 rounded"
-            color="#E5EAEF"
-            thickness="6"
-          ></v-divider>
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col
-          v-for="serviceProvider in emailServiceProviders"
-          cols="12"
-          :key="serviceProvider.id"
-          sm="6"
-          md="4"
-        >
-          <ServiceProviderCard
-            :href="serviceProvider.url"
-            :newTab="true"
-            :testId="`service-provider-card-${serviceProvider.id}`"
-            :title="serviceProvider.name"
-            variant="outlined"
+      <template v-if="emailServiceProviders.length > 0">
+        <v-row>
+          <label class="mx-3">{{ $t('start.workEmail') }}</label>
+          <v-col>
+            <v-divider
+              class="border-opacity-100 rounded"
+              color="#E5EAEF"
+              thickness="6"
+            ></v-divider>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col
+            v-for="serviceProvider in emailServiceProviders"
+            :key="serviceProvider.id"
+            cols="12"
+            sm="6"
+            md="4"
           >
-          </ServiceProviderCard>
-        </v-col>
-      </v-row>
+            <ServiceProviderCard
+              :href="serviceProvider.url"
+              :newTab="true"
+              :testId="`service-provider-card-${serviceProvider.id}`"
+              :title="serviceProvider.name"
+              variant="outlined"
+            ></ServiceProviderCard>
+          </v-col>
+        </v-row>
+      </template>
       <!-- Categorie 2: Class -->
-      <v-row>
-        <label class="mx-3">{{ $t('start.class') }}</label>
-        <v-col>
-          <v-divider
-            class="border-opacity-100 rounded"
-            color="#E5EAEF"
-            thickness="6"
-          ></v-divider>
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col
-          v-for="serviceProvider in classServiceProviders"
-          cols="12"
-          :key="serviceProvider.id"
-          sm="6"
-          md="4"
-        >
-          <ServiceProviderCard
-            :href="serviceProvider.url"
-            :newTab="true"
-            :testId="`service-provider-card-${serviceProvider.id}`"
-            :title="serviceProvider.name"
-            variant="outlined"
+      <template v-if="classServiceProviders.length > 0">
+        <v-row>
+          <label class="mx-3">{{ $t('start.class') }}</label>
+          <v-col>
+            <v-divider
+              class="border-opacity-100 rounded"
+              color="#E5EAEF"
+              thickness="6"
+            ></v-divider>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col
+            v-for="serviceProvider in classServiceProviders"
+            cols="12"
+            :key="serviceProvider.id"
+            sm="6"
+            md="4"
           >
-          </ServiceProviderCard>
-        </v-col>
-      </v-row>
+            <ServiceProviderCard
+              :href="serviceProvider.url"
+              :newTab="true"
+              :testId="`service-provider-card-${serviceProvider.id}`"
+              :title="serviceProvider.name"
+              variant="outlined"
+            >
+            </ServiceProviderCard>
+          </v-col>
+        </v-row>
+      </template>
       <!-- Categorie 3: Administration -->
       <v-row>
         <label class="mx-3">{{ $t('start.administration') }}</label>
@@ -187,63 +190,67 @@
         </v-col>
       </v-row>
       <!-- Categorie 4: Hints -->
-      <v-row>
-        <label class="mx-3">{{ $t('start.hints') }}</label>
-        <v-col>
-          <v-divider
-            class="border-opacity-100 rounded"
-            color="#E5EAEF"
-            thickness="6"
-          ></v-divider>
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col
-          v-for="serviceProvider in hintsServiceProviders"
-          cols="12"
-          :key="serviceProvider.id"
-          sm="6"
-          md="4"
-        >
-          <ServiceProviderCard
-            :href="serviceProvider.url"
-            :newTab="true"
-            :testId="`service-provider-card-${serviceProvider.id}`"
-            :title="serviceProvider.name"
-            variant="outlined"
+      <template v-if="hintsServiceProviders.length > 0">
+        <v-row>
+          <label class="mx-3">{{ $t('start.hints') }}</label>
+          <v-col>
+            <v-divider
+              class="border-opacity-100 rounded"
+              color="#E5EAEF"
+              thickness="6"
+            ></v-divider>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col
+            v-for="serviceProvider in hintsServiceProviders"
+            cols="12"
+            :key="serviceProvider.id"
+            sm="6"
+            md="4"
           >
-          </ServiceProviderCard>
-        </v-col>
-      </v-row>
+            <ServiceProviderCard
+              :href="serviceProvider.url"
+              :newTab="true"
+              :testId="`service-provider-card-${serviceProvider.id}`"
+              :title="serviceProvider.name"
+              variant="outlined"
+            >
+            </ServiceProviderCard>
+          </v-col>
+        </v-row>
+      </template>
       <!-- Categorie 5: School Offerings -->
-      <v-row>
-        <label class="mx-3">{{ $t('start.schoolOfferings') }}</label>
-        <v-col>
-          <v-divider
-            class="border-opacity-100 rounded"
-            color="#E5EAEF"
-            thickness="6"
-          ></v-divider>
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col
-          v-for="serviceProvider in schoolOfferingsServiceProviders"
-          cols="12"
-          :key="serviceProvider.id"
-          sm="6"
-          md="4"
-        >
-          <ServiceProviderCard
-            :href="serviceProvider.url"
-            :newTab="true"
-            :testId="`service-provider-card-${serviceProvider.id}`"
-            :title="serviceProvider.name"
-            variant="outlined"
+      <template v-if="schoolOfferingsServiceProviders.length > 0">
+        <v-row>
+          <label class="mx-3">{{ $t('start.schoolOfferings') }}</label>
+          <v-col>
+            <v-divider
+              class="border-opacity-100 rounded"
+              color="#E5EAEF"
+              thickness="6"
+            ></v-divider>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col
+            v-for="serviceProvider in schoolOfferingsServiceProviders"
+            cols="12"
+            :key="serviceProvider.id"
+            sm="6"
+            md="4"
           >
-          </ServiceProviderCard>
-        </v-col>
-      </v-row>
+            <ServiceProviderCard
+              :href="serviceProvider.url"
+              :newTab="true"
+              :testId="`service-provider-card-${serviceProvider.id}`"
+              :title="serviceProvider.name"
+              variant="outlined"
+            >
+            </ServiceProviderCard>
+          </v-col>
+        </v-row>
+      </template>
     </template>
   </v-card>
 </template>
