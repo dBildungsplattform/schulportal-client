@@ -11,6 +11,7 @@
     transition: transform 0.3s ease;
   }
   
+  &:focus,
   &:hover {
     border: $serviceProviderHoverBorderSize solid $primaryColor;
     text-decoration: none;
