@@ -99,8 +99,8 @@
       },
     };
     personStore.createPerson(unpersistedPerson).then(() => {
-      resetForm()
-      isFormDirty.value = false
+      resetForm();
+      isFormDirty.value = false;
     });
   }
 
@@ -129,7 +129,6 @@
   }
 
   onBeforeRouteLeave((_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
-
     if (isFormDirty.value) {
       showUnsavedChangesDialog.value = true;
       blockedNext = next;

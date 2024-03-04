@@ -107,15 +107,17 @@
     if (selectedRollenName.value && selectedSchulstrukturknoten.value && selectedRollenArt.value) {
       const merkmaleToSubmit: CreateRolleBodyParamsMerkmaleEnum[] =
         selectedMerkmale.value?.map((m: CreateRolleBodyParamsMerkmaleEnum) => m) || [];
-      await rolleStore.createRolle(
-        selectedRollenName.value,
-        selectedSchulstrukturknoten.value,
-        selectedRollenArt.value,
-        merkmaleToSubmit,
-      ).then(() => {
-        resetForm()
-        isFormDirty.value = false
-      });
+      await rolleStore
+        .createRolle(
+          selectedRollenName.value,
+          selectedSchulstrukturknoten.value,
+          selectedRollenArt.value,
+          merkmaleToSubmit,
+        )
+        .then(() => {
+          resetForm();
+          isFormDirty.value = false;
+        });
 
       if (rolleStore.createdRolle) {
         await organisationStore.getOrganisationById(rolleStore.createdRolle.administeredBySchulstrukturknoten);
@@ -141,11 +143,11 @@
   function navigateBackToRolleForm(): void {
     rolleStore.errorCode = '';
     router.push({ name: 'create-rolle' });
-    rolleStore.createdRolle = null
+    rolleStore.createdRolle = null;
   }
   async function navigateToRolleManagement(): Promise<void> {
     await router.push({ name: 'rolle-management' });
-    rolleStore.createdRolle = null
+    rolleStore.createdRolle = null;
   }
 
   const translatedCreatedRolleMerkmale: ComputedRef<string> = computed(() => {
