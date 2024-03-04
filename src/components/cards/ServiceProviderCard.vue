@@ -4,6 +4,7 @@
     newTab?: boolean;
     testId: string;
     title: string;
+    logoUrl?: string;
     to?: string;
     variant?: NonNullable<'flat' | 'text' | 'elevated' | 'tonal' | 'outlined' | 'plain'>;
   }>();
@@ -21,7 +22,13 @@
   >
     <template #prepend>
       <!-- this slot is a placeholder for the provider image -->
-      <v-icon icon="mdi-home"></v-icon>
+      <v-avatar
+        color="grey"
+        rounded="0"
+        size="50"
+      >
+        <v-img :src="logoUrl"></v-img>
+      </v-avatar>
     </template>
     <template #append>
       <v-icon

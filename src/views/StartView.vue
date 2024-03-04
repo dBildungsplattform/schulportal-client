@@ -6,10 +6,9 @@
     type ServiceProviderStore,
   } from '@/stores/ServiceProviderStore';
   import ServiceProviderCard from '@/components/cards/ServiceProviderCard.vue';
-  import { computed, type ComputedRef } from 'vue';
+  import { computed, onMounted, type ComputedRef } from 'vue';
 
   const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
-  serviceProviderStore.getAllServiceProviders();
 
   // Filter service providers by category "EMAIL"
   const emailServiceProviders: ComputedRef<ServiceProvider[]> = computed(() => {
@@ -40,6 +39,16 @@
     return serviceProviderStore.allServiceProviders.filter(
       (provider: ServiceProvider) => provider.kategorie === ServiceProviderKategorie.Angebote,
     );
+  });
+
+  onMounted(async () => {
+    await serviceProviderStore.getAllServiceProviders();
+
+    for (const provider of serviceProviderStore.allServiceProviders) {
+      if (provider.hasLogo) {
+        await serviceProviderStore.getLogoByServiceProviderId(provider.id);
+      }
+    }
   });
 </script>
 
@@ -110,6 +119,7 @@
               :newTab="true"
               :testId="`service-provider-card-${serviceProvider.id}`"
               :title="serviceProvider.name"
+              :logoUrl="serviceProvider.logoUrl"
               variant="outlined"
             ></ServiceProviderCard>
           </v-col>
