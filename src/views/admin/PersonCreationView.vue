@@ -53,7 +53,7 @@
   type PersonCreationForm = {
     selectedVorname: string;
     selectedFamilienname: string;
-    selectedSchule: string;
+    selectedOrganisation: string;
   };
 
   // eslint-disable-next-line @typescript-eslint/typedef
@@ -69,12 +69,12 @@
     Ref<string>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedFamilienname', vuetifyConfig);
-  const [selectedSchule, selectedSchuleProps]: [
+  const [selectedOrganisation, selectedOrganisationProps]: [
     Ref<string>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineField('selectedSchule', vuetifyConfig);
+  ] = defineField('selectedOrganisation', vuetifyConfig);
 
-  const schulen: ComputedRef<
+  const organisationen: ComputedRef<
     {
       value: string;
       title: string;
@@ -170,7 +170,6 @@
         :onDiscard="navigateToPersonTable"
         @onShowDialogChange="(value: boolean) => (showUnsavedChangesDialog = value)"
         :onSubmit="onSubmit"
-        :resetForm="resetForm"
         :showUnsavedChangesDialog="showUnsavedChangesDialog"
       >
         <!-- Persönliche Informationen -->
@@ -201,21 +200,21 @@
           v-model="selectedFamilienname"
         ></InputRow>
 
-        <!-- Schule zuordnen -->
+        <!-- Organisation zuordnen -->
         <v-row>
           <h3 class="headline-3">2. {{ $t('admin.schule.assignSchule') }}</h3>
         </v-row>
         <!-- Vorname -->
         <InputRow
-          :errorLabel="selectedSchuleProps['error']"
-          :fieldProps="selectedSchuleProps"
-          id="schule-select"
+          :errorLabel="selectedOrganisationProps['error']"
+          :fieldProps="selectedOrganisationProps"
+          id="organisation-select"
           :isSelect="true"
           :label="$t('admin.schule.assignSchule')"
           @onDirtyModelValue="handleDirtyModels"
           :placeholder="$t('admin.schule.selectSchule')"
-          :selectableItems="schulen"
-          v-model="selectedSchule"
+          :selectableItems="organisationen"
+          v-model="selectedOrganisation"
         ></InputRow>
       </CreationForm>
     </template>

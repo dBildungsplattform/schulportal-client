@@ -20,7 +20,6 @@ beforeEach(() => {
       discardButtonLabel: 'another label',
       onDiscard: () => vi.fn(),
       onSubmit: () => vi.fn(),
-      resetForm: () => vi.fn(),
     },
     global: {
       components: {

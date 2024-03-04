@@ -10,7 +10,6 @@
     id: string;
     onDiscard: () => void;
     onSubmit: () => void;
-    resetForm: () => void;
     showUnsavedChangesDialog?: boolean;
   };
 

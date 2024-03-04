@@ -121,12 +121,7 @@
   });
 
   const handleCreateAnotherRolle = (): void => {
-    organisationStore.currentOrganisation = null;
-    rolleStore.createdRolle = null;
-    selectedSchulstrukturknoten.value = '';
-    selectedRollenArt.value = null;
-    selectedRollenName.value = '';
-    selectedMerkmale.value = null;
+    resetForm();
     router.push({ name: 'create-rolle' });
   };
 
@@ -242,7 +237,6 @@
           :onDiscard="navigateToRolleManagement"
           @onShowDialogChange="(value: boolean) => (showUnsavedChangesDialog = value)"
           :onSubmit="onSubmit"
-          :resetForm="resetForm"
           :showUnsavedChangesDialog="showUnsavedChangesDialog"
         >
           <!-- Schulstrukturknoten -->
