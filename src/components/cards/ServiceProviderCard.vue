@@ -14,13 +14,13 @@
 
 <template>
   <v-card
+    class="serviceProvider-card mx-1 my-1"
     :data-testid="testId || 'service-provider-card'"
     :href="href ? href : ''"
     :rel="newTab ? 'noreferrer' : ''"
     :target="newTab ? '_blank' : '_self'"
     :title="title"
     :to="to"
-    :variant="variant"
   >
     <template #prepend>
       <!-- If the logoUrl is defined-->
@@ -48,10 +48,4 @@
   </v-card>
 </template>
 
-<style>
-  .v-card .v-card-title {
-    text-wrap: pretty;
-    display: flex;
-    justify-content: center; /* Center horizontally */
-  }
-</style>
+<style></style>

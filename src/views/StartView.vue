@@ -120,7 +120,6 @@
               :testId="`service-provider-card-${serviceProvider.id}`"
               :title="serviceProvider.name"
               :logoUrl="serviceProvider.logoUrl"
-              variant="outlined"
             ></ServiceProviderCard>
           </v-col>
         </v-row>
@@ -151,7 +150,6 @@
               :testId="`service-provider-card-${serviceProvider.id}`"
               :title="serviceProvider.name"
               :logoUrl="serviceProvider.logoUrl"
-              variant="outlined"
             >
             </ServiceProviderCard>
           </v-col>
@@ -182,7 +180,6 @@
             :testId="`service-provider-card-${serviceProvider.id}`"
             :title="serviceProvider.name"
             :logoUrl="serviceProvider.logoUrl"
-            variant="outlined"
           >
           </ServiceProviderCard>
         </v-col>
@@ -196,7 +193,6 @@
             :testId="'service-provider-card-admin'"
             :to="'/admin/personen'"
             :title="$t('nav.admin')"
-            variant="outlined"
           >
           </ServiceProviderCard>
         </v-col>
@@ -227,7 +223,6 @@
               :testId="`service-provider-card-${serviceProvider.id}`"
               :title="serviceProvider.name"
               :logoUrl="serviceProvider.logoUrl"
-              variant="outlined"
             >
             </ServiceProviderCard>
           </v-col>
@@ -259,7 +254,6 @@
               :testId="`service-provider-card-${serviceProvider.id}`"
               :title="serviceProvider.name"
               :logoUrl="serviceProvider.logoUrl"
-              variant="outlined"
             >
             </ServiceProviderCard>
           </v-col>

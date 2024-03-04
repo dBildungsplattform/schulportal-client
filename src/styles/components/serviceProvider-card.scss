@@ -1,0 +1,21 @@
+.serviceProvider-card {
+  border-radius: 5px;
+
+  &.v-card--variant-elevated {
+    box-shadow: 0px 3px 6px 2px #001e4940;
+  }
+  &.v-card .v-card-title {
+    text-wrap: pretty;
+    display: flex;
+    justify-content: center;
+    transition: transform 0.3s ease;
+  }
+  
+  &:hover {
+    border: $serviceProviderHoverBorderSize solid $primaryColor;
+    text-decoration: none;
+    .v-card-title {
+      transform: scale(1.09); // Adjust scale value as needed
+    }
+  }
+}
