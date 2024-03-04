@@ -1,49 +1,40 @@
-import { defineStore, type Store, type StoreDefinition } from 'pinia'
-import { isAxiosError, type AxiosResponse } from 'axios'
+import { defineStore, type Store, type StoreDefinition } from 'pinia';
+import { isAxiosError, type AxiosResponse } from 'axios';
 import {
   OrganisationenApiFactory,
   OrganisationResponseTypEnum,
   type OrganisationenApiInterface,
-  type OrganisationResponse
-} from '../api-client/generated/api'
-import axiosApiInstance from '@/services/ApiService'
+  type OrganisationResponse,
+} from '../api-client/generated/api';
+import axiosApiInstance from '@/services/ApiService';
 
-const organisationApi: OrganisationenApiInterface = OrganisationenApiFactory(
-  undefined,
-  '',
-  axiosApiInstance
-)
+const organisationApi: OrganisationenApiInterface = OrganisationenApiFactory(undefined, '', axiosApiInstance);
 
 export type Organisation = {
-  id: string
-  kennung: string
-  name: string
-  namensergaenzung: string
-  kuerzel: string
-  typ: OrganisationResponseTypEnum
-}
+  id: string;
+  kennung: string;
+  name: string;
+  namensergaenzung: string;
+  kuerzel: string;
+  typ: OrganisationResponseTypEnum;
+};
 
 type OrganisationState = {
-  allOrganisationen: Array<OrganisationResponse>
-  currentOrganisation: Organisation | null
-  errorCode: string
-  loading: boolean
-}
+  allOrganisationen: Array<OrganisationResponse>;
+  currentOrganisation: Organisation | null;
+  errorCode: string;
+  loading: boolean;
+};
 
-type OrganisationGetters = {}
+type OrganisationGetters = {};
 type OrganisationActions = {
-  getAllOrganisationen: () => Promise<void>
-  getOrganisationById: (organisationId: string) => Promise<OrganisationResponse>
-}
+  getAllOrganisationen: () => Promise<void>;
+  getOrganisationById: (organisationId: string) => Promise<OrganisationResponse>;
+};
 
-export type OrganisationStore = Store<
-  'organisationStore',
-  OrganisationState,
-  OrganisationGetters,
-  OrganisationActions
->
+export type OrganisationStore = Store<'organisationStore', OrganisationState, OrganisationGetters, OrganisationActions>;
 
-export { OrganisationResponseTypEnum }
+export { OrganisationResponseTypEnum };
 
 export const useOrganisationStore: StoreDefinition<
   'organisationStore',
@@ -57,44 +48,44 @@ export const useOrganisationStore: StoreDefinition<
       allOrganisationen: [],
       currentOrganisation: null,
       errorCode: '',
-      loading: false
-    }
+      loading: false,
+    };
   },
   actions: {
     async getAllOrganisationen() {
-      this.loading = true
+      this.loading = true;
       try {
         const { data }: AxiosResponse<OrganisationResponse[]> =
-          await organisationApi.organisationControllerFindOrganizations()
+          await organisationApi.organisationControllerFindOrganizations();
 
-        this.allOrganisationen = data
-        this.loading = false
+        this.allOrganisationen = data;
+        this.loading = false;
       } catch (error: unknown) {
-        this.errorCode = 'UNSPECIFIED_ERROR'
+        this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR'
+          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
         }
-        this.loading = false
+        this.loading = false;
       }
     },
     async getOrganisationById(organisationId: string) {
-      this.errorCode = ''
-      this.loading = true
+      this.errorCode = '';
+      this.loading = true;
       try {
         const { data }: { data: OrganisationResponse } =
-          await organisationApi.organisationControllerFindOrganisationById(organisationId)
+          await organisationApi.organisationControllerFindOrganisationById(organisationId);
 
-        this.currentOrganisation = data
-        this.loading = false
-        return data
+        this.currentOrganisation = data;
+        this.loading = false;
+        return data;
       } catch (error: unknown) {
-        this.errorCode = 'UNSPECIFIED_ERROR'
+        this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR'
+          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
         }
-        this.loading = false
-        return Promise.reject(this.errorCode)
+        this.loading = false;
+        return Promise.reject(this.errorCode);
       }
-    }
-  }
-})
+    },
+  },
+});

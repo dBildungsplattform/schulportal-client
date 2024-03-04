@@ -1,35 +1,37 @@
 <script setup lang="ts">
-  import { computed, type Ref, type WritableComputedRef } from 'vue'
-  import { type BaseFieldProps } from 'vee-validate'
+  import { computed, type Ref, type WritableComputedRef } from 'vue';
+  import { type BaseFieldProps } from 'vee-validate';
 
   type Props = {
-    errorLabel: string | boolean
-    fieldProps: Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>
-    id: string
-    isMultiple?: boolean
-    isRequired?: boolean
-    isSelect?: boolean
-    label: string
-    modelValue: string | undefined
-    placeholder: string
-    selectableItems?: Array<unknown>
-  }
+    errorLabel: string | boolean;
+    fieldProps: Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>;
+    id: string;
+    isMultiple?: boolean;
+    isRequired?: boolean;
+    isSelect?: boolean;
+    label: string;
+    modelValue: string | undefined;
+    placeholder: string;
+    selectableItems?: Array<unknown>;
+  };
 
-  const props: Props = defineProps<Props>()
+  const props: Props = defineProps<Props>();
 
-  const emit: (event: 'onDirtyModelValue' | 'update:modelValue', ...args: unknown[]) => void =
-    defineEmits(['onDirtyModelValue', 'update:modelValue'])
+  const emit: (event: 'onDirtyModelValue' | 'update:modelValue', ...args: unknown[]) => void = defineEmits([
+    'onDirtyModelValue',
+    'update:modelValue',
+  ]);
 
   const inputValue: WritableComputedRef<string | undefined> = computed({
     get() {
-      return props.modelValue
+      return props.modelValue;
     },
     set(newValue: string | undefined) {
-      emit('update:modelValue', newValue)
+      emit('update:modelValue', newValue);
       /* if a value is set, we manually dirty the model to simplify dirty handling */
-      emit('onDirtyModelValue', !!newValue)
-    }
-  })
+      emit('onDirtyModelValue', !!newValue);
+    },
+  });
 </script>
 
 <template>

@@ -1,35 +1,33 @@
 <script setup lang="ts">
-  import { computed, type Ref, type WritableComputedRef } from 'vue'
-  import { useDisplay } from 'vuetify'
-  import LayoutCard from '../cards/LayoutCard.vue'
+  import { computed, type Ref, type WritableComputedRef } from 'vue';
+  import { useDisplay } from 'vuetify';
+  import LayoutCard from '../cards/LayoutCard.vue';
 
   type Props = {
-    confirmUnsavedChangesAction: () => void
-    createButtonLabel: string
-    discardButtonLabel: string
-    id: string
-    onDiscard: () => void
-    onSubmit: () => void
-    resetForm: () => void
-    showUnsavedChangesDialog?: boolean
-  }
+    confirmUnsavedChangesAction: () => void;
+    createButtonLabel: string;
+    discardButtonLabel: string;
+    id: string;
+    onDiscard: () => void;
+    onSubmit: () => void;
+    resetForm: () => void;
+    showUnsavedChangesDialog?: boolean;
+  };
 
-  const props: Props = defineProps<Props>()
+  const props: Props = defineProps<Props>();
 
-  const emit: (event: 'onShowDialogChange', ...args: unknown[]) => void = defineEmits([
-    'onShowDialogChange'
-  ])
+  const emit: (event: 'onShowDialogChange', ...args: unknown[]) => void = defineEmits(['onShowDialogChange']);
 
-  const { smAndDown }: { smAndDown: Ref<boolean> } = useDisplay()
+  const { smAndDown }: { smAndDown: Ref<boolean> } = useDisplay();
 
   const showDialogValue: WritableComputedRef<boolean | undefined> = computed({
     get() {
-      return props.showUnsavedChangesDialog
+      return props.showUnsavedChangesDialog;
     },
     set(newValue: boolean | undefined) {
-      emit('onShowDialogChange', newValue)
-    }
-  })
+      emit('onShowDialogChange', newValue);
+    },
+  });
 </script>
 
 <template>

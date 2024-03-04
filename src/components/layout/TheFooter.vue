@@ -1,62 +1,62 @@
 <script setup lang="ts">
-  import { type ComputedRef, ref, type Ref } from 'vue'
-  import SH_LOGO from '@/assets/logos/landesdachmarke_01_KORR.svg'
-  import DIGITAL_PAKT_LOGO from '@/assets/logos/digitalPakt.svg'
-  import { type Composer, useI18n } from 'vue-i18n'
-  import { useDisplay } from 'vuetify'
+  import { type ComputedRef, ref, type Ref } from 'vue';
+  import SH_LOGO from '@/assets/logos/landesdachmarke_01_KORR.svg';
+  import DIGITAL_PAKT_LOGO from '@/assets/logos/digitalPakt.svg';
+  import { type Composer, useI18n } from 'vue-i18n';
+  import { useDisplay } from 'vuetify';
 
-  const { t }: Composer = useI18n({ useScope: 'global' })
+  const { t }: Composer = useI18n({ useScope: 'global' });
 
   type FooterLink = {
-    text: string
-    href: string
-    external: boolean
-  }
+    text: string;
+    href: string;
+    external: boolean;
+  };
 
   type Sponsor = {
-    src: string
-    alt: string
-    href: string
-  }
+    src: string;
+    alt: string;
+    href: string;
+  };
 
   const footerLinks: Ref<FooterLink[]> = ref([
     { text: t('footer.contact'), href: 'https://www.secure-lernnetz.de/helpdesk/', external: true },
     {
       text: t('footer.help'),
       href: 'https://medienberatung.iqsh.de/schulportal-sh.html',
-      external: true
+      external: true,
     },
     {
       text: t('footer.legalNotice'),
       href: '/impressum_datenschutzerklaerung.html',
-      external: false
+      external: false,
     },
     {
       text: t('footer.privacyPolicy'),
       href: '/impressum_datenschutzerklaerung.html#privacy_policy',
-      external: false
+      external: false,
     },
     {
       text: t('footer.accessibility'),
       href: '/impressum_datenschutzerklaerung.html#accessibility',
-      external: false
-    }
-  ])
+      external: false,
+    },
+  ]);
 
   const sponsors: Ref<Sponsor[]> = ref([
     {
       src: DIGITAL_PAKT_LOGO,
       alt: 'Logo DigitalPakt Schule',
-      href: 'https://www.digitalpaktschule.de/de/schleswig-holstein-1800.html'
+      href: 'https://www.digitalpaktschule.de/de/schleswig-holstein-1800.html',
     },
     {
       src: SH_LOGO,
       alt: 'Logo Schleswig-Holstein',
-      href: 'https://www.schleswig-holstein.de/DE/landesportal/landesportal_node.html'
-    }
-  ])
+      href: 'https://www.schleswig-holstein.de/DE/landesportal/landesportal_node.html',
+    },
+  ]);
 
-  const { mobile }: { mobile: ComputedRef<boolean> } = useDisplay()
+  const { mobile }: { mobile: ComputedRef<boolean> } = useDisplay();
 </script>
 
 <template>

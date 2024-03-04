@@ -1,46 +1,46 @@
 <script setup lang="ts">
-  import { computed, type ComputedRef, ref, type Ref } from 'vue'
-  import { type Personendatensatz } from '@/stores/PersonStore'
-  import { type Composer, useI18n } from 'vue-i18n'
-  import { useDisplay } from 'vuetify'
-  import LayoutCard from '@/components/cards/LayoutCard.vue'
-  import PasswordOutput from '@/components/form/PasswordOutput.vue'
+  import { computed, type ComputedRef, ref, type Ref } from 'vue';
+  import { type Personendatensatz } from '@/stores/PersonStore';
+  import { type Composer, useI18n } from 'vue-i18n';
+  import { useDisplay } from 'vuetify';
+  import LayoutCard from '@/components/cards/LayoutCard.vue';
+  import PasswordOutput from '@/components/form/PasswordOutput.vue';
 
-  const { t }: Composer = useI18n({ useScope: 'global' })
-  const { smAndDown }: { smAndDown: Ref<boolean> } = useDisplay()
+  const { t }: Composer = useI18n({ useScope: 'global' });
+  const { smAndDown }: { smAndDown: Ref<boolean> } = useDisplay();
 
   type Props = {
-    errorCode: string
-    person: Personendatensatz
-    password: string
-  }
+    errorCode: string;
+    person: Personendatensatz;
+    password: string;
+  };
 
   type Emits = {
-    (event: 'onClearPassword'): void
-    (event: 'onResetPassword', id: string): void
-  }
+    (event: 'onClearPassword'): void;
+    (event: 'onResetPassword', id: string): void;
+  };
 
-  const props: Props = defineProps<Props>()
-  const emit: Emits = defineEmits<Emits>()
-  const errorMessage: Ref<string> = ref('')
+  const props: Props = defineProps<Props>();
+  const emit: Emits = defineEmits<Emits>();
+  const errorMessage: Ref<string> = ref('');
 
   const resetPasswordInformationMessage: ComputedRef<string> = computed(() => {
     if (errorMessage.value || props.errorCode) {
-      return ''
+      return '';
     }
-    let message: string = t('admin.person.resetPasswordInformation')
+    let message: string = t('admin.person.resetPasswordInformation');
     if (!props.password) {
       message += `\n\n${t('admin.person.resetPasswordConfirmation', {
         firstname: props.person.person.name.vorname,
-        lastname: props.person.person.name.familienname
-      })}`
+        lastname: props.person.person.name.familienname,
+      })}`;
     }
-    return message
-  })
+    return message;
+  });
 
   async function closePasswordResetDialog(isActive: Ref<boolean>): Promise<void> {
-    isActive.value = false
-    emit('onClearPassword')
+    isActive.value = false;
+    emit('onClearPassword');
   }
 </script>
 

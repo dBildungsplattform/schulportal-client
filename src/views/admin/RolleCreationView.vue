@@ -1,47 +1,43 @@
 <script setup lang="ts">
-  import LayoutCard from '@/components/cards/LayoutCard.vue'
-  import { ref, type Ref, onMounted, computed, type ComputedRef } from 'vue'
+  import LayoutCard from '@/components/cards/LayoutCard.vue';
+  import { ref, type Ref, onMounted, computed, type ComputedRef } from 'vue';
   import {
     useRolleStore,
     type RolleStore,
     RolleResponseMerkmaleEnum,
     RolleResponseRollenartEnum,
     CreateRolleBodyParamsRollenartEnum,
-    CreateRolleBodyParamsMerkmaleEnum
-  } from '@/stores/RolleStore'
-  import { useI18n, type Composer } from 'vue-i18n'
-  import SpshAlert from '@/components/alert/SpshAlert.vue'
+    CreateRolleBodyParamsMerkmaleEnum,
+  } from '@/stores/RolleStore';
+  import { useI18n, type Composer } from 'vue-i18n';
+  import SpshAlert from '@/components/alert/SpshAlert.vue';
   import {
     onBeforeRouteLeave,
     type Router,
     useRouter,
     type NavigationGuardNext,
-    type RouteLocationNormalized
-  } from 'vue-router'
-  import { useDisplay } from 'vuetify'
-  import { type BaseFieldProps, type TypedSchema, useForm } from 'vee-validate'
-  import { object, string } from 'yup'
-  import { toTypedSchema } from '@vee-validate/yup'
-  import CreationForm from '@/components/form/CreationForm.vue'
-  import InputRow from '@/components/form/InputRow.vue'
-  import {
-    useOrganisationStore,
-    type OrganisationStore,
-    type Organisation
-  } from '@/stores/OrganisationStore'
+    type RouteLocationNormalized,
+  } from 'vue-router';
+  import { useDisplay } from 'vuetify';
+  import { type BaseFieldProps, type TypedSchema, useForm } from 'vee-validate';
+  import { object, string } from 'yup';
+  import { toTypedSchema } from '@vee-validate/yup';
+  import CreationForm from '@/components/form/CreationForm.vue';
+  import InputRow from '@/components/form/InputRow.vue';
+  import { useOrganisationStore, type OrganisationStore, type Organisation } from '@/stores/OrganisationStore';
 
-  const { smAndDown }: { smAndDown: Ref<boolean> } = useDisplay()
-  const rolleStore: RolleStore = useRolleStore()
-  const organisationStore: OrganisationStore = useOrganisationStore()
+  const { smAndDown }: { smAndDown: Ref<boolean> } = useDisplay();
+  const rolleStore: RolleStore = useRolleStore();
+  const organisationStore: OrganisationStore = useOrganisationStore();
 
-  const { t }: Composer = useI18n({ useScope: 'global' })
-  const router: Router = useRouter()
+  const { t }: Composer = useI18n({ useScope: 'global' });
+  const router: Router = useRouter();
 
-  type TranslatedRollenArt = { value: RolleResponseRollenartEnum; title: string }
-  const translatedRollenart: Ref<TranslatedRollenArt[]> = ref([])
+  type TranslatedRollenArt = { value: RolleResponseRollenartEnum; title: string };
+  const translatedRollenart: Ref<TranslatedRollenArt[]> = ref([]);
 
-  type TranslatedMerkmal = { value: RolleResponseMerkmaleEnum; title: string }
-  const translatedMerkmale: Ref<TranslatedMerkmal[]> = ref([])
+  type TranslatedMerkmal = { value: RolleResponseMerkmaleEnum; title: string };
+  const translatedMerkmale: Ref<TranslatedMerkmal[]> = ref([]);
 
   const validationSchema: TypedSchema = toTypedSchema(
     object({
@@ -49,179 +45,169 @@
       selectedRollenName: string()
         .max(200, t('admin.rolle.rules.rollenname.length'))
         .required(t('admin.rolle.rules.rollenname.required')),
-      selectedSchulstrukturknoten: string().required(t('admin.schulstrukturknoten.rules.required'))
-    })
-  )
+      selectedSchulstrukturknoten: string().required(t('admin.schulstrukturknoten.rules.required')),
+    }),
+  );
 
   const vuetifyConfig = (state: {
-    errors: Array<string>
+    errors: Array<string>;
   }): { props: { error: boolean; 'error-messages': Array<string> } } => ({
     props: {
       error: !!state.errors.length,
-      'error-messages': state.errors
-    }
-  })
+      'error-messages': state.errors,
+    },
+  });
 
   type RolleCreationForm = {
-    selectedSchulstrukturknoten: string
-    selectedRollenArt: CreateRolleBodyParamsRollenartEnum
-    selectedRollenName: string
-    selectedMerkmale: CreateRolleBodyParamsMerkmaleEnum[]
-  }
+    selectedSchulstrukturknoten: string;
+    selectedRollenArt: CreateRolleBodyParamsRollenartEnum;
+    selectedRollenName: string;
+    selectedMerkmale: CreateRolleBodyParamsMerkmaleEnum[];
+  };
 
   // eslint-disable-next-line @typescript-eslint/typedef
   const { defineField, handleSubmit, resetForm } = useForm<RolleCreationForm>({
-    validationSchema
-  })
+    validationSchema,
+  });
 
   const [selectedSchulstrukturknoten, selectedSchulstrukturknotenProps]: [
     Ref<string>,
-    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>
-  ] = defineField('selectedSchulstrukturknoten', vuetifyConfig)
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = defineField('selectedSchulstrukturknoten', vuetifyConfig);
 
   const [selectedRollenArt, selectedRollenArtProps]: [
     Ref<CreateRolleBodyParamsRollenartEnum | null>,
-    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>
-  ] = defineField('selectedRollenArt', vuetifyConfig)
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = defineField('selectedRollenArt', vuetifyConfig);
 
   const [selectedRollenName, selectedRollenNameProps]: [
     Ref<string>,
-    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>
-  ] = defineField('selectedRollenName', vuetifyConfig)
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = defineField('selectedRollenName', vuetifyConfig);
 
   const [selectedMerkmale, selectedMerkmaleProps]: [
     Ref<CreateRolleBodyParamsMerkmaleEnum[] | null>,
-    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>
-  ] = defineField('selectedMerkmale', vuetifyConfig)
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = defineField('selectedMerkmale', vuetifyConfig);
 
-  const isFormDirty: Ref<boolean> = ref(false)
-  const showUnsavedChangesDialog: Ref<boolean> = ref(false)
-  let blockedNext: () => void = () => {}
+  const isFormDirty: Ref<boolean> = ref(false);
+  const showUnsavedChangesDialog: Ref<boolean> = ref(false);
+  let blockedNext: () => void = () => {};
 
-  onBeforeRouteLeave(
-    (_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
-      if (isFormDirty.value) {
-        showUnsavedChangesDialog.value = true
-        blockedNext = next
-      } else {
-        next()
+  onBeforeRouteLeave((_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
+    if (isFormDirty.value) {
+      showUnsavedChangesDialog.value = true;
+      blockedNext = next;
+    } else {
+      next();
+    }
+  });
+
+  const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = handleSubmit(async () => {
+    if (selectedRollenName.value && selectedSchulstrukturknoten.value && selectedRollenArt.value) {
+      const merkmaleToSubmit: CreateRolleBodyParamsMerkmaleEnum[] =
+        selectedMerkmale.value?.map((m: CreateRolleBodyParamsMerkmaleEnum) => m) || [];
+      await rolleStore.createRolle(
+        selectedRollenName.value,
+        selectedSchulstrukturknoten.value,
+        selectedRollenArt.value,
+        merkmaleToSubmit,
+      );
+
+      if (rolleStore.createdRolle) {
+        await organisationStore.getOrganisationById(rolleStore.createdRolle.administeredBySchulstrukturknoten);
       }
     }
-  )
-
-  const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = handleSubmit(
-    async () => {
-      if (
-        selectedRollenName.value &&
-        selectedSchulstrukturknoten.value &&
-        selectedRollenArt.value
-      ) {
-        const merkmaleToSubmit: CreateRolleBodyParamsMerkmaleEnum[] =
-          selectedMerkmale.value?.map((m: CreateRolleBodyParamsMerkmaleEnum) => m) || []
-        await rolleStore.createRolle(
-          selectedRollenName.value,
-          selectedSchulstrukturknoten.value,
-          selectedRollenArt.value,
-          merkmaleToSubmit
-        )
-
-        if (rolleStore.createdRolle) {
-          await organisationStore.getOrganisationById(
-            rolleStore.createdRolle.administeredBySchulstrukturknoten
-          )
-        }
-      }
-    }
-  )
+  });
 
   const handleCreateAnotherRolle = (): void => {
-    organisationStore.currentOrganisation = null
-    rolleStore.createdRolle = null
-    selectedSchulstrukturknoten.value = ''
-    selectedRollenArt.value = null
-    selectedRollenName.value = ''
-    selectedMerkmale.value = null
-    router.push({ name: 'create-rolle' })
-  }
+    organisationStore.currentOrganisation = null;
+    rolleStore.createdRolle = null;
+    selectedSchulstrukturknoten.value = '';
+    selectedRollenArt.value = null;
+    selectedRollenName.value = '';
+    selectedMerkmale.value = null;
+    router.push({ name: 'create-rolle' });
+  };
 
   function handleDirtyModels(value: boolean): void {
     if (value) {
-      isFormDirty.value = value
+      isFormDirty.value = value;
     }
   }
 
   function handleConfirmUnsavedChanges(): void {
-    blockedNext()
+    blockedNext();
   }
 
   function navigateBackToRolleForm(): void {
-    rolleStore.errorCode = ''
-    router.push({ name: 'create-rolle' })
+    rolleStore.errorCode = '';
+    router.push({ name: 'create-rolle' });
   }
   function navigateToRolleManagement(): void {
-    rolleStore.createdRolle = null
-    selectedSchulstrukturknoten.value = ''
-    selectedRollenArt.value = null
-    selectedRollenName.value = ''
-    selectedMerkmale.value = null
-    router.push({ name: 'rolle-management' })
+    rolleStore.createdRolle = null;
+    selectedSchulstrukturknoten.value = '';
+    selectedRollenArt.value = null;
+    selectedRollenName.value = '';
+    selectedMerkmale.value = null;
+    router.push({ name: 'rolle-management' });
   }
 
   const translatedCreatedRolleMerkmale: ComputedRef<string> = computed(() => {
     // Check if `createdRolle.merkmale` exists and is an array
     if (!rolleStore.createdRolle?.merkmale || !Array.isArray(rolleStore.createdRolle.merkmale)) {
-      return ''
+      return '';
     }
 
     return rolleStore.createdRolle.merkmale
       .map((merkmalKey: string) => {
-        return t(`admin.rolle.mappingFrontBackEnd.merkmale.${merkmalKey}`)
+        return t(`admin.rolle.mappingFrontBackEnd.merkmale.${merkmalKey}`);
       })
-      .join(', ')
-  })
+      .join(', ');
+  });
 
   const schulstrukturknoten: ComputedRef<
     {
-      value: string
-      title: string
+      value: string;
+      title: string;
     }[]
   > = computed(() =>
     organisationStore.allOrganisationen.map((org: Organisation) => ({
       value: org.id,
-      title: `${org.kennung} (${org.name})`
-    }))
-  )
+      title: `${org.kennung} (${org.name})`,
+    })),
+  );
 
   onMounted(async () => {
-    await organisationStore.getAllOrganisationen()
+    await organisationStore.getAllOrganisationen();
 
     // Iterate over the enum values
     Object.values(RolleResponseRollenartEnum).forEach((enumValue: RolleResponseRollenartEnum) => {
       // Use the enum value to construct the i18n path
-      const i18nPath: string = `admin.rolle.mappingFrontBackEnd.rollenarten.${enumValue}`
+      const i18nPath: string = `admin.rolle.mappingFrontBackEnd.rollenarten.${enumValue}`;
       // Push the mapped object into the array
       translatedRollenart.value.push({
         value: enumValue, // Keep the enum value for internal use
-        title: t(i18nPath) // Get the localized title
-      })
-    })
+        title: t(i18nPath), // Get the localized title
+      });
+    });
 
     Object.values(RolleResponseMerkmaleEnum).forEach((enumValue: RolleResponseMerkmaleEnum) => {
-      const i18nPath: string = `admin.rolle.mappingFrontBackEnd.merkmale.${enumValue}`
+      const i18nPath: string = `admin.rolle.mappingFrontBackEnd.merkmale.${enumValue}`;
       translatedMerkmale.value.push({
         value: enumValue,
-        title: t(i18nPath)
-      })
-    })
+        title: t(i18nPath),
+      });
+    });
 
     /* listen for browser changes and prevent them when form is dirty */
     window.addEventListener('beforeunload', (event: BeforeUnloadEvent) => {
-      if (!isFormDirty.value) return
-      event.preventDefault()
+      if (!isFormDirty.value) return;
+      event.preventDefault();
       /* Chrome requires returnValue to be set. */
-      event.returnValue = ''
-    })
-  })
+      event.returnValue = '';
+    });
+  });
 </script>
 
 <template>
@@ -261,9 +247,7 @@
         >
           <!-- Schulstrukturknoten -->
           <v-row>
-            <h3 class="headline-3">
-              1. {{ $t('admin.schulstrukturknoten.assignSchulstrukturknoten') }}
-            </h3>
+            <h3 class="headline-3">1. {{ $t('admin.schulstrukturknoten.assignSchulstrukturknoten') }}</h3>
           </v-row>
           <InputRow
             :errorLabel="selectedSchulstrukturknotenProps['error']"
@@ -373,11 +357,7 @@
           <v-row>
             <v-col class="text-body bold text-right"> {{ $t('admin.rolle.rollenart') }}: </v-col>
             <v-col class="text-body">
-              {{
-                $t(
-                  `admin.rolle.mappingFrontBackEnd.rollenarten.${rolleStore.createdRolle.rollenart}`
-                )
-              }}</v-col
+              {{ $t(`admin.rolle.mappingFrontBackEnd.rollenarten.${rolleStore.createdRolle.rollenart}`) }}</v-col
             >
           </v-row>
           <v-row>

@@ -1,36 +1,32 @@
 <script setup lang="ts">
-  import {
-    useOrganisationStore,
-    type OrganisationStore,
-    type Organisation
-  } from '@/stores/OrganisationStore'
-  import { usePersonStore, type CreatedPerson, type PersonStore } from '@/stores/PersonStore'
-  import { onMounted, type Ref, ref, type ComputedRef, computed } from 'vue'
+  import { useOrganisationStore, type OrganisationStore, type Organisation } from '@/stores/OrganisationStore';
+  import { usePersonStore, type CreatedPerson, type PersonStore } from '@/stores/PersonStore';
+  import { onMounted, type Ref, ref, type ComputedRef, computed } from 'vue';
   import {
     onBeforeRouteLeave,
     type Router,
     useRouter,
     type RouteLocationNormalized,
-    type NavigationGuardNext
-  } from 'vue-router'
-  import { type Composer, useI18n } from 'vue-i18n'
-  import { useForm, type TypedSchema, type BaseFieldProps } from 'vee-validate'
-  import { object, string } from 'yup'
-  import { toTypedSchema } from '@vee-validate/yup'
-  import SpshAlert from '@/components/alert/SpshAlert.vue'
-  import LayoutCard from '@/components/cards/LayoutCard.vue'
-  import PasswordOutput from '@/components/form/PasswordOutput.vue'
-  import CreationForm from '@/components/form/CreationForm.vue'
-  import InputRow from '@/components/form/InputRow.vue'
+    type NavigationGuardNext,
+  } from 'vue-router';
+  import { type Composer, useI18n } from 'vue-i18n';
+  import { useForm, type TypedSchema, type BaseFieldProps } from 'vee-validate';
+  import { object, string } from 'yup';
+  import { toTypedSchema } from '@vee-validate/yup';
+  import SpshAlert from '@/components/alert/SpshAlert.vue';
+  import LayoutCard from '@/components/cards/LayoutCard.vue';
+  import PasswordOutput from '@/components/form/PasswordOutput.vue';
+  import CreationForm from '@/components/form/CreationForm.vue';
+  import InputRow from '@/components/form/InputRow.vue';
 
-  const router: Router = useRouter()
-  const personStore: PersonStore = usePersonStore()
-  const organisationStore: OrganisationStore = useOrganisationStore()
-  const { t }: Composer = useI18n({ useScope: 'global' })
+  const router: Router = useRouter();
+  const personStore: PersonStore = usePersonStore();
+  const organisationStore: OrganisationStore = useOrganisationStore();
+  const { t }: Composer = useI18n({ useScope: 'global' });
 
-  const isFormDirty: Ref<boolean> = ref(false)
-  const showUnsavedChangesDialog: Ref<boolean> = ref(false)
-  let blockedNext: () => void = () => {}
+  const isFormDirty: Ref<boolean> = ref(false);
+  const showUnsavedChangesDialog: Ref<boolean> = ref(false);
+  let blockedNext: () => void = () => {};
 
   const validationSchema: TypedSchema = toTypedSchema(
     object({
@@ -41,109 +37,107 @@
       selectedFamilienname: string()
         .matches(/^[A-Za-z]*[A-Za-zÀ-ÖØ-öø-ÿ-' ]*$/, t('admin.person.rules.familienname.matches'))
         .min(2, t('admin.person.rules.familienname.min'))
-        .required(t('admin.person.rules.familienname.required'))
-    })
-  )
+        .required(t('admin.person.rules.familienname.required')),
+    }),
+  );
 
   const vuetifyConfig = (state: {
-    errors: Array<string>
+    errors: Array<string>;
   }): { props: { error: boolean; 'error-messages': Array<string> } } => ({
     props: {
       error: !!state.errors.length,
-      'error-messages': state.errors
-    }
-  })
+      'error-messages': state.errors,
+    },
+  });
 
   type PersonCreationForm = {
-    selectedVorname: string
-    selectedFamilienname: string
-    selectedSchule: string
-  }
+    selectedVorname: string;
+    selectedFamilienname: string;
+    selectedSchule: string;
+  };
 
   // eslint-disable-next-line @typescript-eslint/typedef
   const { defineField, handleSubmit, resetForm } = useForm<PersonCreationForm>({
-    validationSchema
-  })
+    validationSchema,
+  });
 
   const [selectedVorname, selectedVornameProps]: [
     Ref<string>,
-    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>
-  ] = defineField('selectedVorname', vuetifyConfig)
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = defineField('selectedVorname', vuetifyConfig);
   const [selectedFamilienname, selectedFamiliennameProps]: [
     Ref<string>,
-    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>
-  ] = defineField('selectedFamilienname', vuetifyConfig)
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = defineField('selectedFamilienname', vuetifyConfig);
   const [selectedSchule, selectedSchuleProps]: [
     Ref<string>,
-    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>
-  ] = defineField('selectedSchule', vuetifyConfig)
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = defineField('selectedSchule', vuetifyConfig);
 
   const schulen: ComputedRef<
     {
-      value: string
-      title: string
+      value: string;
+      title: string;
     }[]
   > = computed(() =>
     organisationStore.allOrganisationen.map((org: Organisation) => ({
       value: org.id,
-      title: `${org.kennung} (${org.name})`
-    }))
-  )
+      title: `${org.kennung} (${org.name})`,
+    })),
+  );
 
   function navigateToPersonTable(): void {
-    router.push({ name: 'person-management' })
-    personStore.createdPerson = null
+    router.push({ name: 'person-management' });
+    personStore.createdPerson = null;
   }
 
   function createPerson(): void {
     const unpersistedPerson: CreatedPerson = {
       name: {
         familienname: selectedFamilienname.value as string,
-        vorname: selectedVorname.value as string
-      }
-    }
-    personStore.createPerson(unpersistedPerson)
+        vorname: selectedVorname.value as string,
+      },
+    };
+    personStore.createPerson(unpersistedPerson);
   }
 
   const onSubmit: (e?: Event | undefined) => Promise<void | undefined> = handleSubmit(() => {
-    createPerson()
-  })
+    createPerson();
+  });
 
   const handleAlertClose = (): void => {
-    personStore.errorCode = ''
-  }
+    personStore.errorCode = '';
+  };
 
   const handleCreateAnotherPerson = (): void => {
-    personStore.createdPerson = null
-    resetForm()
-    router.push({ name: 'create-person' })
-  }
+    personStore.createdPerson = null;
+    resetForm();
+    router.push({ name: 'create-person' });
+  };
 
   function handleConfirmUnsavedChanges(): void {
-    blockedNext()
+    blockedNext();
   }
 
   function handleDirtyModels(value: boolean): void {
     if (value) {
-      isFormDirty.value = value
+      isFormDirty.value = value;
     }
   }
 
-  onBeforeRouteLeave(
-    (_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
-      if (isFormDirty.value) {
-        showUnsavedChangesDialog.value = true
-        blockedNext = next
-      } else {
-        next()
-      }
+  onBeforeRouteLeave((_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
+    if (isFormDirty.value) {
+      showUnsavedChangesDialog.value = true;
+      blockedNext = next;
+    } else {
+      next();
     }
-  )
+  });
 
   onMounted(async () => {
-    await organisationStore.getAllOrganisationen()
-    personStore.errorCode = ''
-  })
+    await organisationStore.getAllOrganisationen();
+    personStore.errorCode = '';
+  });
 </script>
 
 <template>
@@ -181,9 +175,7 @@
       >
         <!-- Persönliche Informationen -->
         <v-row>
-          <h3 class="headline-3">
-            1. {{ $t('admin.person.personalInfo') }}
-          </h3>
+          <h3 class="headline-3">1. {{ $t('admin.person.personalInfo') }}</h3>
         </v-row>
         <!-- Vorname -->
         <InputRow
@@ -211,9 +203,7 @@
 
         <!-- Schule zuordnen -->
         <v-row>
-          <h3 class="headline-3">
-            2. {{ $t('admin.schule.assignSchule') }}
-          </h3>
+          <h3 class="headline-3">2. {{ $t('admin.schule.assignSchule') }}</h3>
         </v-row>
         <!-- Vorname -->
         <InputRow
@@ -241,7 +231,7 @@
             {{
               $t('admin.person.addedSuccessfully', {
                 firstname: personStore.createdPerson.person.name.vorname,
-                lastname: personStore.createdPerson.person.name.familienname
+                lastname: personStore.createdPerson.person.name.familienname,
               })
             }}
           </v-col>
@@ -278,13 +268,9 @@
           <v-col class="text-body"> {{ personStore.createdPerson.person.referrer }}</v-col>
         </v-row>
         <v-row class="align-center">
-          <v-col class="text-body bold text-right pb-8">
-            {{ $t('admin.person.startPassword') }}:
-          </v-col>
+          <v-col class="text-body bold text-right pb-8"> {{ $t('admin.person.startPassword') }}: </v-col>
           <v-col class="text-body">
-            <PasswordOutput
-              :password="personStore.createdPerson.person.startpasswort"
-            ></PasswordOutput>
+            <PasswordOutput :password="personStore.createdPerson.person.startpasswort"></PasswordOutput>
           </v-col>
         </v-row>
         <v-divider
