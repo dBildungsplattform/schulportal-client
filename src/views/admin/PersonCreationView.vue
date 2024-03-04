@@ -86,8 +86,8 @@
     })),
   );
 
-  function navigateToPersonTable(): void {
-    router.push({ name: 'person-management' });
+  async function navigateToPersonTable(): Promise<void> {
+    await router.push({ name: 'person-management' });
     personStore.createdPerson = null;
   }
 
@@ -98,7 +98,10 @@
         vorname: selectedVorname.value as string,
       },
     };
-    personStore.createPerson(unpersistedPerson);
+    personStore.createPerson(unpersistedPerson).then(() => {
+      resetForm()
+      isFormDirty.value = false
+    });
   }
 
   const onSubmit: (e?: Event | undefined) => Promise<void | undefined> = handleSubmit(() => {
@@ -126,6 +129,7 @@
   }
 
   onBeforeRouteLeave((_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
+
     if (isFormDirty.value) {
       showUnsavedChangesDialog.value = true;
       blockedNext = next;
@@ -202,7 +206,7 @@
 
         <!-- Organisation zuordnen -->
         <v-row>
-          <h3 class="headline-3">2. {{ $t('admin.schule.assignSchule') }}</h3>
+          <h3 class="headline-3">2. {{ $t('admin.organisation.assignOrganisation') }}</h3>
         </v-row>
         <!-- Vorname -->
         <InputRow
@@ -210,9 +214,9 @@
           :fieldProps="selectedOrganisationProps"
           id="organisation-select"
           :isSelect="true"
-          :label="$t('admin.schule.assignSchule')"
+          :label="$t('admin.organisation.assignOrganisation')"
           @onDirtyModelValue="handleDirtyModels"
-          :placeholder="$t('admin.schule.selectSchule')"
+          :placeholder="$t('admin.organisation.selectOrganisation')"
           :selectableItems="organisationen"
           v-model="selectedOrganisation"
         ></InputRow>

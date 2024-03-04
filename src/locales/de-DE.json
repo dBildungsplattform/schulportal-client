@@ -11,6 +11,10 @@
     "koPers": {
       "koPersNumber": "KoPers-Nr",
       "noKoPersNumber": "Keine KoPers-Nr vorhanden"
+    },    
+    "organisation": {
+      "assignOrganisation": "Organisationsebene zuordnen",
+      "selectOrganisation": "Organisationsebene auswählen"
     },
     "rolle": {
       "addNew": "Neue Rolle hinzufügen",
@@ -97,9 +101,7 @@
       "status": "Status"
     },
     "schule": {
-      "assignSchule": "Schule zuordnen",
-      "management": "Schulverwaltung",
-      "selectSchule": "Schule auswählen"
+      "management": "Schulverwaltung"
     },
     "schulstrukturknoten": {
       "assignSchulstrukturknoten": "Schulstrukturknoten zuordnen",

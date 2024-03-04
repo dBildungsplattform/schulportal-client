@@ -112,7 +112,10 @@
         selectedSchulstrukturknoten.value,
         selectedRollenArt.value,
         merkmaleToSubmit,
-      );
+      ).then(() => {
+        resetForm()
+        isFormDirty.value = false
+      });
 
       if (rolleStore.createdRolle) {
         await organisationStore.getOrganisationById(rolleStore.createdRolle.administeredBySchulstrukturknoten);
@@ -138,14 +141,11 @@
   function navigateBackToRolleForm(): void {
     rolleStore.errorCode = '';
     router.push({ name: 'create-rolle' });
+    rolleStore.createdRolle = null
   }
-  function navigateToRolleManagement(): void {
-    rolleStore.createdRolle = null;
-    selectedSchulstrukturknoten.value = '';
-    selectedRollenArt.value = null;
-    selectedRollenName.value = '';
-    selectedMerkmale.value = null;
-    router.push({ name: 'rolle-management' });
+  async function navigateToRolleManagement(): Promise<void> {
+    await router.push({ name: 'rolle-management' });
+    rolleStore.createdRolle = null
   }
 
   const translatedCreatedRolleMerkmale: ComputedRef<string> = computed(() => {
