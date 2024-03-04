@@ -43,10 +43,10 @@
 
   onMounted(async () => {
     await serviceProviderStore.getAllServiceProviders();
-
     for (const provider of serviceProviderStore.allServiceProviders) {
       if (provider.hasLogo) {
-        await serviceProviderStore.getLogoByServiceProviderId(provider.id);
+        const logoUrl: string = await serviceProviderStore.getLogoByServiceProviderId(provider.id);
+        provider.logoUrl = logoUrl;
       }
     }
   });
@@ -150,6 +150,7 @@
               :newTab="true"
               :testId="`service-provider-card-${serviceProvider.id}`"
               :title="serviceProvider.name"
+              :logoUrl="serviceProvider.logoUrl"
               variant="outlined"
             >
             </ServiceProviderCard>
@@ -180,6 +181,7 @@
             :newTab="true"
             :testId="`service-provider-card-${serviceProvider.id}`"
             :title="serviceProvider.name"
+            :logoUrl="serviceProvider.logoUrl"
             variant="outlined"
           >
           </ServiceProviderCard>
@@ -224,6 +226,7 @@
               :newTab="true"
               :testId="`service-provider-card-${serviceProvider.id}`"
               :title="serviceProvider.name"
+              :logoUrl="serviceProvider.logoUrl"
               variant="outlined"
             >
             </ServiceProviderCard>
@@ -255,6 +258,7 @@
               :newTab="true"
               :testId="`service-provider-card-${serviceProvider.id}`"
               :title="serviceProvider.name"
+              :logoUrl="serviceProvider.logoUrl"
               variant="outlined"
             >
             </ServiceProviderCard>
