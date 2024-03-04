@@ -114,6 +114,14 @@
 
   onMounted(async () => {
     personStore.errorCode = '';
+
+    /* listen for browser changes and prevent them when form is dirty */
+    window.addEventListener('beforeunload', (event: BeforeUnloadEvent) => {
+      if (!isFormDirty()) return;
+      event.preventDefault();
+      /* Chrome requires returnValue to be set. */
+      event.returnValue = '';
+    });
   });
 </script>
 
