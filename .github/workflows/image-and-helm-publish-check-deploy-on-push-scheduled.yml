@@ -40,7 +40,7 @@ jobs:
         with:
           name: generated-code
           path: |
-            src/api-client/generated/**/*
+            src*/api-client/generated/**/*
 
   codeql_analyze:
     name: "CodeQL"
