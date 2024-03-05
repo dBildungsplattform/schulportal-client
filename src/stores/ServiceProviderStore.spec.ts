@@ -2,7 +2,6 @@ import ApiService from '@/services/ApiService';
 import MockAdapter from 'axios-mock-adapter';
 import { setActivePinia, createPinia } from 'pinia';
 import { useServiceProviderStore, type ServiceProviderStore, type ServiceProvider } from './ServiceProviderStore';
-import { rejects } from 'assert';
 
 const mockadapter: MockAdapter = new MockAdapter(ApiService);
 
