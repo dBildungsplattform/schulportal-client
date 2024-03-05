@@ -7,7 +7,6 @@ image:
 allowPrivilegeEscalation: ""
 restartPolicy: Always
 
-
 service:
   type: NodePort
   targetPort: 80  
