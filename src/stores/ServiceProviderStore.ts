@@ -23,7 +23,7 @@ type ServiceProviderState = {
 type ServiceProviderGetters = {};
 type ServiceProviderActions = {
   getAllServiceProviders: () => Promise<void>;
-  getLogoByServiceProviderId: (angebotId: string) => Promise<string>;
+  getLogoUrlByServiceProviderId: (angebotId: string) => Promise<string>;
 };
 
 export { ServiceProviderKategorie };
@@ -65,7 +65,7 @@ export const useServiceProviderStore: StoreDefinition<
         this.loading = false;
       }
     },
-    async getLogoByServiceProviderId(angebotId: string): Promise<string> {
+    async getLogoUrlByServiceProviderId(angebotId: string): Promise<string> {
       this.loading = true;
       try {
         const { data }: { data: Blob } = await serviceProviderApi.providerControllerGetServiceProviderLogo(angebotId, {

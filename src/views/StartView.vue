@@ -45,7 +45,7 @@
     await serviceProviderStore.getAllServiceProviders();
     for (const provider of serviceProviderStore.allServiceProviders) {
       if (provider.hasLogo) {
-        const logoUrl: string = await serviceProviderStore.getLogoByServiceProviderId(provider.id);
+        const logoUrl: string = await serviceProviderStore.getLogoUrlByServiceProviderId(provider.id);
         provider.logoUrl = logoUrl;
       }
     }
