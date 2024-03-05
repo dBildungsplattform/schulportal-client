@@ -112,8 +112,8 @@
   }
 
   // TODO: Navigate back to Rolle-management for now until the list for Schulen is merged
-  function navigateToSchuleManagement(): void {
-    router.push({ name: 'rolle-management' });
+  async function navigateToSchuleManagement(): Promise<void> {
+    await router.push({ name: 'rolle-management' });
     organisationStore.createdOrganisation = null;
   }
 
