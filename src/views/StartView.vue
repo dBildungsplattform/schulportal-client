@@ -44,9 +44,10 @@
 
   onMounted(async () => {
     await serviceProviderStore.getAllServiceProviders();
+    const baseUrl: string = `${window.location.protocol}//${window.location.host}`;
     for (const provider of serviceProviderStore.allServiceProviders) {
       if (provider.hasLogo) {
-        const logoUrl: string = await serviceProviderStore.getLogoUrlByServiceProviderId(provider.id);
+        const logoUrl: string = `${baseUrl}/api/provider/${provider.id}/logo`;
         provider.logoUrl = logoUrl;
       }
     }
@@ -55,7 +56,7 @@
 
 <template>
   <v-card flat>
-    <v-row class="flex-nowrap my-1 justify-center">
+    <v-row class="flex-nowrap mb-1 justify-center">
       <v-col cols="auto">
         <h2
           class="headline-1"

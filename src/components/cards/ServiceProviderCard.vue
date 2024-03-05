@@ -27,8 +27,7 @@
       <v-avatar
         v-if="logoUrl"
         alt="provider-logo"
-        :image="logoUrl"
-        size="small"
+        :image="logoUrl"  
       ></v-avatar>
       <!-- Fallback logo -->
       <v-avatar
