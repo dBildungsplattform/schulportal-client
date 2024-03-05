@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import { usePersonStore, type CreatedPerson, type PersonStore } from '@/stores/PersonStore';
-  import { onMounted, type Ref, ref } from 'vue';
+  import { onMounted, onUnmounted, type Ref, ref } from 'vue';
   import {
     onBeforeRouteLeave,
     type Router,
@@ -70,8 +70,8 @@
     return isFieldDirty('selectedVorname') || isFieldDirty('selectedFamilienname');
   }
 
-  function navigateToPersonTable(): void {
-    router.push({ name: 'person-management' });
+  async function navigateToPersonTable(): Promise<void> {
+    await router.push({ name: 'person-management' });
     personStore.createdPerson = null;
   }
 
@@ -82,7 +82,9 @@
         vorname: selectedVorname.value as string,
       },
     };
-    personStore.createPerson(unpersistedPerson);
+    personStore.createPerson(unpersistedPerson).then(() => {
+      resetForm()
+    });
   }
 
   const onSubmit: (e?: Event | undefined) => Promise<void | undefined> = handleSubmit(() => {
@@ -103,6 +105,13 @@
     blockedNext();
   }
 
+  function preventNavigation(event: BeforeUnloadEvent): void {
+    if (!isFormDirty()) return;
+    event.preventDefault();
+    /* Chrome requires returnValue to be set. */
+    event.returnValue = '';
+  }
+
   onBeforeRouteLeave((_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
     if (isFormDirty()) {
       showUnsavedChangesDialog.value = true;
@@ -112,16 +121,16 @@
     }
   });
 
-  onMounted(async () => {
+  onMounted(() => {
     personStore.errorCode = '';
+    personStore.createdPerson = null
 
     /* listen for browser changes and prevent them when form is dirty */
-    window.addEventListener('beforeunload', (event: BeforeUnloadEvent) => {
-      if (!isFormDirty()) return;
-      event.preventDefault();
-      /* Chrome requires returnValue to be set. */
-      event.returnValue = '';
-    });
+    window.addEventListener('beforeunload', preventNavigation);
+  });
+
+  onUnmounted(() => {
+    window.removeEventListener('beforeunload', preventNavigation);
   });
 </script>
 

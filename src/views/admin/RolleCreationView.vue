@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import { ref, type Ref, onMounted, computed, type ComputedRef } from 'vue';
+  import { ref, type Ref, onMounted, onUnmounted, computed, type ComputedRef } from 'vue';
   import {
     useRolleStore,
     type RolleStore,
@@ -120,7 +120,9 @@
         selectedSchulstrukturknoten.value,
         selectedRollenArt.value,
         merkmaleToSubmit,
-      );
+      ).then(() => {
+        resetForm()
+      });
 
       if (rolleStore.createdRolle) {
         await organisationStore.getOrganisationById(rolleStore.createdRolle.administeredBySchulstrukturknoten);
@@ -138,14 +140,14 @@
     blockedNext();
   }
 
-  function navigateBackToRolleForm(): void {
+  async function navigateBackToRolleForm(): Promise<void> {
+    await router.push({ name: 'create-rolle' });
     rolleStore.errorCode = '';
-    router.push({ name: 'create-rolle' });
   }
 
-  function navigateToRolleManagement(): void {
+  async function navigateToRolleManagement(): Promise<void> {
+    await router.push({ name: 'rolle-management' });
     rolleStore.createdRolle = null;
-    router.push({ name: 'rolle-management' });
   }
 
   const translatedCreatedRolleMerkmale: ComputedRef<string> = computed(() => {
@@ -173,7 +175,15 @@
     })),
   );
 
+  function preventNavigation(event: BeforeUnloadEvent): void {
+    if (!isFormDirty()) return;
+    event.preventDefault();
+    /* Chrome requires returnValue to be set. */
+    event.returnValue = '';
+  }
+
   onMounted(async () => {
+    rolleStore.createdRolle = null
     await organisationStore.getAllOrganisationen();
 
     // Iterate over the enum values
@@ -196,12 +206,11 @@
     });
 
     /* listen for browser changes and prevent them when form is dirty */
-    window.addEventListener('beforeunload', (event: BeforeUnloadEvent) => {
-      if (!isFormDirty()) return;
-      event.preventDefault();
-      /* Chrome requires returnValue to be set. */
-      event.returnValue = '';
-    });
+    window.addEventListener('beforeunload', preventNavigation);
+  });
+
+  onUnmounted(() => {
+    window.removeEventListener('beforeunload', preventNavigation);
   });
 </script>
 
