@@ -44,10 +44,9 @@
 
   onMounted(async () => {
     await serviceProviderStore.getAllServiceProviders();
-    const baseUrl: string = `${window.location.protocol}//${window.location.host}`;
     for (const provider of serviceProviderStore.allServiceProviders) {
       if (provider.hasLogo) {
-        const logoUrl: string = `${baseUrl}/api/provider/${provider.id}/logo`;
+        const logoUrl: string = `/api/provider/${provider.id}/logo`;
         provider.logoUrl = logoUrl;
       }
     }
