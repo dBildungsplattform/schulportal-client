@@ -38,13 +38,6 @@
         size="small"
       ></v-avatar>
     </template>
-    <template #append>
-      <v-icon
-        @click.prevent
-        icon="mdi-heart-outline"
-        size="x-small"
-      ></v-icon>
-    </template>
   </v-card>
 </template>
 
