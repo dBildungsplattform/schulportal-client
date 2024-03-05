@@ -61,8 +61,8 @@ const routes: readonly RouteRecordRaw[] = [
     component: () => import('../views/admin/SchuleManagementView.vue'),
     meta: {
       requiresAuth: true,
-      layout: 'AdminLayout'
-    }
+      layout: 'AdminLayout',
+    },
   },
   {
     path: '/start',
