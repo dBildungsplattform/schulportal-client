@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import { onMounted, ref, type Ref } from 'vue';
+  import { onMounted, onUnmounted, ref, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import {
@@ -113,22 +113,30 @@
 
   // TODO: Navigate back to Rolle-management for now until the list for Schulen is merged
   function navigateToSchuleManagement(): void {
-    organisationStore.createdOrganisation = null;
     router.push({ name: 'rolle-management' });
+    organisationStore.createdOrganisation = null;
   }
 
   function navigateBackToSchuleForm(): void {
     organisationStore.errorCode = '';
   }
 
+  function preventNavigation(event: BeforeUnloadEvent): void {
+    if (!isFormDirty()) return;
+    event.preventDefault();
+    /* Chrome requires returnValue to be set. */
+    event.returnValue = '';
+  }
+
   onMounted(async () => {
+    organisationStore.createdOrganisation = null;
+
     /* listen for browser changes and prevent them when form is dirty */
-    window.addEventListener('beforeunload', (event: BeforeUnloadEvent) => {
-      if (!isFormDirty()) return;
-      event.preventDefault();
-      /* Chrome requires returnValue to be set. */
-      event.returnValue = '';
-    });
+    window.addEventListener('beforeunload', preventNavigation);
+  });
+
+  onUnmounted(() => {
+    window.removeEventListener('beforeunload', preventNavigation);
   });
 </script>
 
