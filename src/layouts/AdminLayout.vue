@@ -1,6 +1,6 @@
 <script setup lang="ts">
-  import AdminMenuBar from '@/components/admin/MenuBar.vue'
-  import TheFooter from '@/components/layout/TheFooter.vue'
+  import AdminMenuBar from '@/components/admin/MenuBar.vue';
+  import TheFooter from '@/components/layout/TheFooter.vue';
 </script>
 
 <template>

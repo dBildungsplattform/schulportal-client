@@ -1,20 +1,20 @@
 <script setup lang="ts">
-  import { type Ref, ref, type ComputedRef } from 'vue'
-  import { onMounted } from 'vue'
-  import { useDisplay } from 'vuetify'
+  import { type Ref, ref, type ComputedRef } from 'vue';
+  import { onMounted } from 'vue';
+  import { useDisplay } from 'vuetify';
 
-  const menuDrawer: Ref<boolean> = ref(true)
-  const { mobile }: { mobile: ComputedRef<boolean> } = useDisplay()
+  const menuDrawer: Ref<boolean> = ref(true);
+  const { mobile }: { mobile: ComputedRef<boolean> } = useDisplay();
 
   function closeMenuOnMobile(): void {
     if (mobile.value) {
-      menuDrawer.value = false
+      menuDrawer.value = false;
     }
   }
 
   onMounted(() => {
-    menuDrawer.value = !mobile.value
-  })
+    menuDrawer.value = !mobile.value;
+  });
 </script>
 
 <template>
@@ -152,6 +152,14 @@
       class="menu-bar-main-item headline-2"
       data-testid="schule-management-title"
       :title="$t('admin.schule.management')"
+    ></v-list-item>
+    <v-list-item
+      class="menu-bar-sub-item caption"
+      @click="closeMenuOnMobile"
+      data-testid="schule-management-menu-item"
+      prepend-icon="mdi-format-list-bulleted"
+      :title="$t('admin.schule.showAll')"
+      to="/admin/schulen"
     ></v-list-item>
 
     <!-- Schulträgerverwaltung -->

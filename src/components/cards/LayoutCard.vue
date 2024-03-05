@@ -1,10 +1,10 @@
 <script setup lang="ts">
   defineProps<{
-    closable?: boolean
-    header: string
-    padded?: boolean
-    showCloseText?: boolean
-  }>()
+    closable?: boolean;
+    header: string;
+    padded?: boolean;
+    showCloseText?: boolean;
+  }>();
 </script>
 
 <template>
@@ -12,6 +12,7 @@
     <v-row
       align="center"
       class="flex-nowrap ml-md-6 ml-1"
+      :class="!closable ? 'py-3' : ''"
     >
       <v-col cols="auto">
         <h2

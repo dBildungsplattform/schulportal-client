@@ -1,4 +1,4 @@
-import type { RouteRecordRaw } from 'vue-router'
+import type { RouteRecordRaw } from 'vue-router';
 
 const routes: readonly RouteRecordRaw[] = [
   {
@@ -7,8 +7,8 @@ const routes: readonly RouteRecordRaw[] = [
     component: () => import('../views/LandingView.vue'),
     meta: {
       layout: 'DefaultLayout',
-      requiresAuth: false
-    }
+      requiresAuth: false,
+    },
   },
   {
     path: '/admin/personen',
@@ -16,8 +16,8 @@ const routes: readonly RouteRecordRaw[] = [
     component: () => import('../views/admin/PersonManagementView.vue'),
     meta: {
       requiresAuth: true,
-      layout: 'AdminLayout'
-    }
+      layout: 'AdminLayout',
+    },
   },
   {
     path: '/admin/personen/:id',
@@ -25,8 +25,8 @@ const routes: readonly RouteRecordRaw[] = [
     component: () => import('../views/admin/PersonDetailsView.vue'),
     meta: {
       layout: 'AdminLayout',
-      requiresAuth: true
-    }
+      requiresAuth: true,
+    },
   },
   {
     path: '/admin/personen/new',
@@ -34,8 +34,8 @@ const routes: readonly RouteRecordRaw[] = [
     component: () => import('../views/admin/PersonCreationView.vue'),
     meta: {
       layout: 'AdminLayout',
-      requiresAuth: true
-    }
+      requiresAuth: true,
+    },
   },
   {
     path: '/admin/rolle/new',
@@ -43,8 +43,8 @@ const routes: readonly RouteRecordRaw[] = [
     component: () => import('../views/admin/RolleCreationView.vue'),
     meta: {
       layout: 'AdminLayout',
-      requiresAuth: true
-    }
+      requiresAuth: true,
+    },
   },
   {
     path: '/admin/rollen',
@@ -52,8 +52,17 @@ const routes: readonly RouteRecordRaw[] = [
     component: () => import('../views/admin/RolleManagementView.vue'),
     meta: {
       requiresAuth: true,
-      layout: 'AdminLayout'
-    }
+      layout: 'AdminLayout',
+    },
+  },
+  {
+    path: '/admin/schulen',
+    name: 'schule-management',
+    component: () => import('../views/admin/SchuleManagementView.vue'),
+    meta: {
+      requiresAuth: true,
+      layout: 'AdminLayout',
+    },
   },
   {
     path: '/start',
@@ -61,9 +70,9 @@ const routes: readonly RouteRecordRaw[] = [
     component: () => import('../views/StartView.vue'),
     meta: {
       layout: 'DefaultLayout',
-      requiresAuth: true
-    }
-  }
-]
+      requiresAuth: true,
+    },
+  },
+];
 
-export default routes
+export default routes;
