@@ -1,8 +1,13 @@
 <script setup lang="ts">
   import { usePersonStore, type CreatedPerson, type PersonStore } from '@/stores/PersonStore';
-  import { onMounted, type Ref } from 'vue';
-  import { type Router, useRouter } from 'vue-router';
-  import { useDisplay } from 'vuetify';
+  import { onMounted, onUnmounted, type Ref, ref } from 'vue';
+  import {
+    onBeforeRouteLeave,
+    type Router,
+    useRouter,
+    type RouteLocationNormalized,
+    type NavigationGuardNext,
+  } from 'vue-router';
   import { type Composer, useI18n } from 'vue-i18n';
   import { useForm, type TypedSchema, type BaseFieldProps } from 'vee-validate';
   import { object, string } from 'yup';
@@ -10,11 +15,15 @@
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import PasswordOutput from '@/components/form/PasswordOutput.vue';
+  import FormWrapper from '@/components/form/FormWrapper.vue';
+  import FormRow from '@/components/form/FormRow.vue';
 
   const router: Router = useRouter();
   const personStore: PersonStore = usePersonStore();
-  const { smAndDown }: { smAndDown: Ref<boolean> } = useDisplay();
   const { t }: Composer = useI18n({ useScope: 'global' });
+
+  const showUnsavedChangesDialog: Ref<boolean> = ref(false);
+  let blockedNext: () => void = () => {};
 
   const validationSchema: TypedSchema = toTypedSchema(
     object({
@@ -24,7 +33,7 @@
         .required(t('admin.person.rules.vorname.required')),
       selectedFamilienname: string()
         .matches(/^[A-Za-z]*[A-Za-zÀ-ÖØ-öø-ÿ-' ]*$/, t('admin.person.rules.familienname.matches'))
-        .min(2, t('admin.person.rules.nachname.min'))
+        .min(2, t('admin.person.rules.familienname.min'))
         .required(t('admin.person.rules.familienname.required')),
     }),
   );
@@ -44,7 +53,7 @@
   };
 
   // eslint-disable-next-line @typescript-eslint/typedef
-  const { defineField, handleSubmit, resetForm } = useForm<PersonCreationForm>({
+  const { defineField, handleSubmit, isFieldDirty, resetForm } = useForm<PersonCreationForm>({
     validationSchema,
   });
 
@@ -57,20 +66,24 @@
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedFamilienname', vuetifyConfig);
 
-  function navigateToPersonTable(): void {
-    router.push({ name: 'person-management' });
-    personStore.createdPerson = null;
-    resetForm();
+  function isFormDirty(): boolean {
+    return isFieldDirty('selectedVorname') || isFieldDirty('selectedFamilienname');
   }
 
-  function createPerson(): void {
+  async function navigateToPersonTable(): Promise<void> {
+    await router.push({ name: 'person-management' });
+    personStore.createdPerson = null;
+  }
+
+  async function createPerson(): Promise<void> {
     const unpersistedPerson: CreatedPerson = {
       name: {
         familienname: selectedFamilienname.value as string,
         vorname: selectedVorname.value as string,
       },
     };
-    personStore.createPerson(unpersistedPerson);
+    await personStore.createPerson(unpersistedPerson);
+    resetForm();
   }
 
   const onSubmit: (e?: Event | undefined) => Promise<void | undefined> = handleSubmit(() => {
@@ -87,8 +100,36 @@
     router.push({ name: 'create-person' });
   };
 
-  onMounted(async () => {
+  function handleConfirmUnsavedChanges(): void {
+    blockedNext();
+  }
+
+  function preventNavigation(event: BeforeUnloadEvent): void {
+    if (!isFormDirty()) return;
+    event.preventDefault();
+    /* Chrome requires returnValue to be set. */
+    event.returnValue = '';
+  }
+
+  onBeforeRouteLeave((_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
+    if (isFormDirty()) {
+      showUnsavedChangesDialog.value = true;
+      blockedNext = next;
+    } else {
+      next();
+    }
+  });
+
+  onMounted(() => {
     personStore.errorCode = '';
+    personStore.createdPerson = null;
+
+    /* listen for browser changes and prevent them when form is dirty */
+    window.addEventListener('beforeunload', preventNavigation);
+  });
+
+  onUnmounted(() => {
+    window.removeEventListener('beforeunload', preventNavigation);
   });
 </script>
 
@@ -114,129 +155,62 @@
 
     <!-- The form to create a new Person  -->
     <template v-if="!personStore.createdPerson && !personStore.errorCode">
-      <v-form
-        @submit.prevent="onSubmit"
-        data-testid="person-creation-form"
+      <FormWrapper
+        :confirmUnsavedChangesAction="handleConfirmUnsavedChanges"
+        :createButtonLabel="$t('admin.person.create')"
+        :discardButtonLabel="$t('admin.person.discard')"
+        id="person-creation-form"
+        :onDiscard="navigateToPersonTable"
+        @onShowDialogChange="(value: boolean) => (showUnsavedChangesDialog = value)"
+        :onSubmit="onSubmit"
+        :showUnsavedChangesDialog="showUnsavedChangesDialog"
       >
-        <v-container class="px-3 px-sm-16">
-          <v-row class="align-center flex-nowrap mx-auto py-6">
-            <v-icon
-              aria-hidden="true"
-              class="mr-2"
-              icon="mdi-alert-circle-outline"
-              size="small"
-            ></v-icon>
-            <label class="subtitle-2">{{ $t('admin.mandatoryFieldsNotice') }}</label>
-          </v-row>
-          <v-container class="px-lg-16">
-            <!-- Rollenzuordnung -->
-
-            <!-- Dieses Div auf Auswahl einer Rolle bedingen -->
-            <div>
-              <!-- KoPers-Nr -->
-
-              <!-- Persönliche Informationen -->
-              <v-row>
-                <h3 class="headline-3">{{ $t('admin.person.personalInfo') }}</h3>
-              </v-row>
-              <v-row class="align-center mt-8">
-                <v-col
-                  class="py-0 pb-sm-8 pt-sm-3 text-sm-right"
-                  cols="12"
-                  sm="4"
-                >
-                  <label
-                    for="vorname-input"
-                    :error="selectedVornameProps['error']"
-                    required="true"
-                    >{{ $t('person.firstName') }}</label
-                  >
-                </v-col>
-                <v-col
-                  class="py-0"
-                  cols="12"
-                  sm="8"
-                >
-                  <v-text-field
-                    clearable
-                    data-testid="vorname-input"
-                    id="vorname-input"
-                    :placeholder="$t('person.enterFirstName')"
-                    variant="outlined"
-                    v-bind="selectedVornameProps"
-                    v-model="selectedVorname"
-                  ></v-text-field>
-                </v-col>
-              </v-row>
-              <v-row class="align-center">
-                <v-col
-                  class="py-0 pb-sm-8 pt-sm-3 text-sm-right"
-                  cols="12"
-                  sm="4"
-                >
-                  <label
-                    for="familienname-input"
-                    :error="selectedFamiliennameProps['error']"
-                    required="true"
-                    >{{ $t('person.lastName') }}</label
-                  >
-                </v-col>
-                <v-col
-                  class="py-0"
-                  cols="12"
-                  sm="8"
-                >
-                  <v-text-field
-                    clearable
-                    data-testid="familienname-input"
-                    id="familienname-input"
-                    :placeholder="$t('person.enterLastName')"
-                    variant="outlined"
-                    v-bind="selectedFamiliennameProps"
-                    v-model="selectedFamilienname"
-                  ></v-text-field>
-                </v-col>
-              </v-row>
-
-              <!-- Schulzuordnung -->
-            </div>
-          </v-container>
-        </v-container>
-        <v-divider
-          class="border-opacity-100 rounded"
-          color="#E5EAEF"
-          thickness="5px"
-        ></v-divider>
-        <v-row class="py-3 px-2 justify-center">
-          <v-spacer class="hidden-sm-and-down"></v-spacer>
-          <v-col
-            cols="12"
-            sm="6"
-            md="4"
-          >
-            <v-btn
-              :block="smAndDown"
-              class="secondary"
-              @click.stop="navigateToPersonTable"
-              data-testid="discard-person-button"
-              >{{ $t('admin.person.discard') }}</v-btn
-            >
-          </v-col>
-          <v-col
-            cols="12"
-            sm="6"
-            md="4"
-          >
-            <v-btn
-              :block="smAndDown"
-              class="primary"
-              data-testid="create-person-button"
-              type="submit"
-              >{{ $t('admin.person.create') }}</v-btn
-            >
-          </v-col>
+        <!-- Persönliche Informationen -->
+        <v-row>
+          <h3 class="headline-3">
+            {{ $t('admin.person.personalInfo') }}
+          </h3>
         </v-row>
-      </v-form>
+        <!-- Vorname -->
+        <FormRow
+          :errorLabel="selectedVornameProps['error']"
+          labelForId="vorname-input"
+          :isRequired="true"
+          :label="$t('person.firstName')"
+        >
+          <v-text-field
+            clearable
+            data-testid="vorname-input"
+            density="compact"
+            id="vorname-input"
+            :placeholder="$t('person.enterFirstName')"
+            required="true"
+            variant="outlined"
+            v-bind="selectedVornameProps"
+            v-model="selectedVorname"
+          ></v-text-field>
+        </FormRow>
+
+        <!-- Nachname -->
+        <FormRow
+          :errorLabel="selectedFamiliennameProps['error']"
+          labelForId="familienname-input"
+          :isRequired="true"
+          :label="$t('person.lastName')"
+        >
+          <v-text-field
+            clearable
+            data-testid="familienname-input"
+            density="compact"
+            id="familienname-input"
+            :placeholder="$t('person.enterLastName')"
+            required="true"
+            variant="outlined"
+            v-bind="selectedFamiliennameProps"
+            v-model="selectedFamilienname"
+          ></v-text-field>
+        </FormRow>
+      </FormWrapper>
     </template>
 
     <!-- Result template on success after submit  -->
