@@ -8,6 +8,9 @@ label[error='true'] {
 
 label[required='true']:after {
   content: ' *';
+  display: inline-block;
+  margin-left: 3px;
+  margin-right: -8px;
 }
 
 .v-field__clearable > i.v-icon {

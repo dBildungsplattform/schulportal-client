@@ -1,6 +1,7 @@
 {
   "action": "Aktion",
   "admin": {
+    "mandatoryFieldsNotice": "Mit * markierte Felder sind Pflichtangaben.",
     "backToForm": "Zurück zum Formular",
     "class": {
       "management": "Klassenverwaltung"
@@ -43,17 +44,21 @@
       "rollenart": "Rollenart",
       "rollenname": "Rollenname",
       "rolleAddedSuccessfully": "Die Rolle wurde erfolgreich hinzugefügt.",
-      "rule": {
-        "rolleNameLength": "Der Rollenname darf nicht länger als 200 Zeichen sein.",
-        "rolleNameRequired": "Der Rollenname ist erforderlich."
+      "rules": {
+        "rollenart": {
+          "required": "Die Rollenart muss ausgewählt werden."
+        },
+        "rollenname": {
+          "length": "Der Rollenname darf nicht länger als 200 Zeichen sein.",
+          "required": "Der Rollenname muss ausgewählt werden."
+        }
       },
+      "selectMerkmale": "Merkmale auswählen",
       "selectRolle": "Rolle auswählen",
       "selectRollenart": "Rollenart auswählen",
-      "selectMerkmale": "Merkmale auswählen",
       "showAll": "Alle Rollen anzeigen",
       "userDataLoadingErrorText": "Es konnten keine Benutzerdaten geladen werden."
     },
-    "mandatoryFieldsNotice": "Mit * markierte Felder sind Pflichtangaben.",
     "person": {
       "addedSuccessfully": "{firstname} {lastname} wurde erfolgreich hinzugefügt.",
       "addNew": "Neuen Benutzer hinzufügen",
@@ -82,9 +87,9 @@
           "required": "Der Vorname muss angegeben werden."
         },
         "familienname": {
-          "matches": "Der Familienname darf keine ungültigen Zeichen beinhalten.",
-          "min": "Der Familienname muss aus mindestens 2 Zeichen bestehen.",
-          "required": "Der Familienname muss angegeben werden."
+          "matches": "Der Nachname darf keine ungültigen Zeichen beinhalten.",
+          "min": "Der Nachname muss aus mindestens 2 Zeichen bestehen.",
+          "required": "Der Nachname muss angegeben werden."
         }
       },
       "showAll": "Alle Benutzer anzeigen",
@@ -93,10 +98,43 @@
     },
     "schule": {
       "assign": "Schule zuordnen",
-      "management": "Schulverwaltung"
+      "addNew": "Neue Schule hinzufügen",
+      "administratingSchultraeger": "Verwaltender Schulträger",
+      "ersatzschule": "Ersatzschule",
+      "assignAdministratingSchultraeger": "Verwaltenden Schulträger zuordnen",
+      "assignSchulform": "Schulform zuordnen",
+      "backToCreateSchule": "Zurück zur Schulanlage",
+      "createNew": "Neue Schule anlegen",
+      "create": "Schule anlegen",
+      "createAnother": "Weitere Schule anlegen",
+      "discard": "Schule verwerfen",
+      "dienststellennummer": "Dienststellennummer",
+      "enterDienststellennummer": "Dienststellennummer eingeben",
+      "enterSchulname": "Schulname eingeben",
+      "management": "Schulverwaltung",
+      "publicSchule": "Öffentliche Schule",
+      "rules": {
+        "dienststellennummer": {
+          "required": "Die Dienststellennummer muss angegeben werden."
+        },
+        "schulname": {
+          "matches": "Der Schulname darf keine ungültigen Zeichen beinhalten.",
+          "required": "Der Schulname muss angegeben werden."
+        }
+      },
+      "schulname": "Schulname",
+      "schulform": "Schulform",
+      "schuleCreateErrorTitle": "Fehler beim Anlegen der Schule",
+      "schuleCreateErrorText": "Die Schule konnte nicht angelegt werden.",
+      "schuleAddedSuccessfully": "Die Schule wurde erfolgreich hinzugefügt.",
+      "showAll": "Alle Schulen anzeigen"
+
     },
     "schulstrukturknoten": {
       "assignSchulstrukturknoten": "Schulstrukturknoten zuordnen",
+      "rules": {
+        "required": "Der Schulstrukturknoten muss ausgewählt werden."
+      },
       "schulstrukturknoten": "Schulstrukturknoten",
       "selectSchulstrukturknoten": "Schulstrukturknoten auswählen"
     },
@@ -143,6 +181,7 @@
     "openMobileMenu": "Mobiles Menü öffnen",
     "help": "Hilfe"
   },
+  "no": "Nein",
   "pagination": {
     "all": "Alle",
     "pageText": "{interval} von {total} Einträgen"
@@ -155,5 +194,10 @@
     "lastName": "Nachname",
     "password": "Passwort",
     "userName": "Benutzername"
-  }
+  },
+  "unsavedChanges": {
+    "message": "Sie haben nicht gespeicherte Änderungen vorgenommen. Wollen Sie die Seite trotzdem verlassen?",
+    "title": "Änderungen vorgenommen"
+  },
+  "yes": "Ja"
 }

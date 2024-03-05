@@ -51,6 +51,11 @@
       emit('onHandleRowClick', event, item);
     }
   }
+  interface Slots {
+    default: (props: { default: string }) => string
+    top: (props: { top: number }) => string
+    bottom: (props: { bottom: boolean }) => string
+  }
 </script>
 
 <template>
@@ -71,6 +76,15 @@
       show-select
       @update:options="$emit('onTableUpdate')"
     >
+      <template
+        v-for="(_, name) in $slots as unknown as Readonly<Slots>"
+        #[name]="slotProps"
+      >
+        <slot
+          :name="name"
+          v-bind="slotProps"
+        />
+      </template>
     </v-data-table-server>
   </LayoutCard>
 </template>
