@@ -5,8 +5,9 @@
     type ServiceProvider,
     type ServiceProviderStore,
   } from '@/stores/ServiceProviderStore';
-  import ServiceProviderCard from '@/components/cards/ServiceProviderCard.vue';
   import { computed, onMounted, type ComputedRef } from 'vue';
+  import ServiceProviderCard from '@/components/cards/ServiceProviderCard.vue';
+
 
   const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
 
