@@ -64,6 +64,11 @@ const routes: readonly RouteRecordRaw[] = [
       requiresAuth: true,
     },
   },
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'not-found',
+    component: () => import('../views/NotFoundView.vue'),
+  },
 ];
 
 export default routes;
