@@ -1,13 +1,17 @@
 .serviceProvider-card {
   border-radius: 5px;
+  height:70px; /* Adjust the height as needed */
+  width: 365px;
+  display: flex;
+  justify-content: center;
+  align-items: center; 
+  text-align: center; 
 
   &.v-card--variant-elevated {
     box-shadow: 0px 3px 6px 2px #001e4940;
   }
   &.v-card .v-card-title {
     text-wrap: pretty;
-    display: flex;
-    justify-content: center;
     transition: transform 0.3s ease;
   }
   
@@ -18,5 +22,11 @@
     .v-card-title {
       transform: scale(1.09); // Adjust scale value as needed
     }
+  }
+}
+
+@media only screen and (max-width: 960px) {  
+  .serviceProvider-card {
+      width:auto;
   }
 }

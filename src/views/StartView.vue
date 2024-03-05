@@ -112,8 +112,8 @@
             v-for="serviceProvider in emailServiceProviders"
             :key="serviceProvider.id"
             cols="12"
-            sm="6"
-            md="4"
+            md="6"
+            lg="4"
           >
             <ServiceProviderCard
               :href="serviceProvider.url"
@@ -142,8 +142,8 @@
             v-for="serviceProvider in classServiceProviders"
             cols="12"
             :key="serviceProvider.id"
-            sm="6"
-            md="4"
+            md="6"
+            lg="4"
           >
             <ServiceProviderCard
               :href="serviceProvider.url"
@@ -172,8 +172,8 @@
           v-for="serviceProvider in administrationServiceProviders"
           cols="12"
           :key="serviceProvider.id"
-          sm="6"
-          md="4"
+          md="6"
+          lg="4"
         >
           <ServiceProviderCard
             :href="serviceProvider.url"
@@ -187,8 +187,8 @@
         <!-- This provider is always available since it doesn't come from the backend -->
         <v-col
           cols="12"
-          sm="6"
-          md="4"
+          md="6"
+          lg="4"
         >
           <ServiceProviderCard
             :testId="'service-provider-card-admin'"
@@ -215,8 +215,8 @@
             v-for="serviceProvider in hintsServiceProviders"
             cols="12"
             :key="serviceProvider.id"
-            sm="6"
-            md="4"
+            md="6"
+            lg="4"
           >
             <ServiceProviderCard
               :href="serviceProvider.url"
@@ -246,8 +246,8 @@
             v-for="serviceProvider in schoolOfferingsServiceProviders"
             cols="12"
             :key="serviceProvider.id"
-            sm="6"
-            md="4"
+            md="6"
+            lg="4" 
           >
             <ServiceProviderCard
               :href="serviceProvider.url"

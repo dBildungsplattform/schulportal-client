@@ -34,7 +34,6 @@
         v-else
         alt="schulportal-logo"
         :image="SchulPortalLogo"
-        size="small"
       ></v-avatar>
     </template>
   </v-card>
