@@ -1,98 +1,92 @@
 <script setup lang="ts">
-  import LayoutCard from '@/components/cards/LayoutCard.vue'
-  import { onMounted, ref, type Ref } from 'vue'
-  import { useI18n, type Composer } from 'vue-i18n'
-  import SpshAlert from '@/components/alert/SpshAlert.vue'
+  import LayoutCard from '@/components/cards/LayoutCard.vue';
+  import { onMounted, ref, type Ref } from 'vue';
+  import { useI18n, type Composer } from 'vue-i18n';
+  import SpshAlert from '@/components/alert/SpshAlert.vue';
   import {
     type Router,
     useRouter,
     onBeforeRouteLeave,
     type RouteLocationNormalized,
-    type NavigationGuardNext
-  } from 'vue-router'
-  import { useDisplay } from 'vuetify'
+    type NavigationGuardNext,
+  } from 'vue-router';
+  import { useDisplay } from 'vuetify';
   import {
     useOrganisationStore,
     type OrganisationStore,
-    CreateOrganisationBodyParamsTypEnum
-  } from '@/stores/OrganisationStore'
-  import { useForm, type TypedSchema, type BaseFieldProps } from 'vee-validate'
-  import FormWrapper from '@/components/form/FormWrapper.vue'
-  import FormRow from '@/components/form/FormRow.vue'
-  import { object, string } from 'yup'
-  import { toTypedSchema } from '@vee-validate/yup'
+    CreateOrganisationBodyParamsTypEnum,
+  } from '@/stores/OrganisationStore';
+  import { useForm, type TypedSchema, type BaseFieldProps } from 'vee-validate';
+  import FormWrapper from '@/components/form/FormWrapper.vue';
+  import FormRow from '@/components/form/FormRow.vue';
+  import { object, string } from 'yup';
+  import { toTypedSchema } from '@vee-validate/yup';
 
-  const { smAndDown }: { smAndDown: Ref<boolean> } = useDisplay()
+  const { smAndDown }: { smAndDown: Ref<boolean> } = useDisplay();
 
-  const { t }: Composer = useI18n({ useScope: 'global' })
-  const router: Router = useRouter()
-  const organisationStore: OrganisationStore = useOrganisationStore()
+  const { t }: Composer = useI18n({ useScope: 'global' });
+  const router: Router = useRouter();
+  const organisationStore: OrganisationStore = useOrganisationStore();
 
   const validationSchema: TypedSchema = toTypedSchema(
     object({
-      selectedDienststellennummer: string().required(
-        t('admin.schule.rules.dienststellennummer.required')
-      ),
+      selectedDienststellennummer: string().required(t('admin.schule.rules.dienststellennummer.required')),
       selectedSchulname: string()
         .matches(/^[A-Za-z]*[A-Za-zÀ-ÖØ-öø-ÿ-' ]*$/, t('admin.schule.rules.schulname.matches'))
-        .required(t('admin.schule.rules.schulname.required'))
-    })
-  )
+        .required(t('admin.schule.rules.schulname.required')),
+    }),
+  );
 
   const vuetifyConfig = (state: {
-    errors: Array<string>
+    errors: Array<string>;
   }): { props: { error: boolean; 'error-messages': Array<string> } } => ({
     props: {
       error: !!state.errors.length,
-      'error-messages': state.errors
-    }
-  })
+      'error-messages': state.errors,
+    },
+  });
 
   type SchuleCreationForm = {
-    selectedSchulform: string
-    selectedDienststellennummer: string
-    selectedSchulname: string
-  }
+    selectedSchulform: string;
+    selectedDienststellennummer: string;
+    selectedSchulname: string;
+  };
 
   // eslint-disable-next-line @typescript-eslint/typedef
   const { defineField, handleSubmit, isFieldDirty, resetForm } = useForm<SchuleCreationForm>({
-    validationSchema
-  })
+    validationSchema,
+  });
 
-  const [selectedSchulform]: [
-    Ref<string>,
-    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>
-  ] = defineField('selectedSchulform', vuetifyConfig)
+  const [selectedSchulform]: [Ref<string>, Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>] =
+    defineField('selectedSchulform', vuetifyConfig);
   const [selectedSchulname, selectedSchulnameProps]: [
     Ref<string>,
-    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>
-  ] = defineField('selectedSchulname', vuetifyConfig)
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = defineField('selectedSchulname', vuetifyConfig);
   const [selectedDienststellennummer, selectedDienststellennummerProps]: [
     Ref<string>,
-    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>
-  ] = defineField('selectedDienststellennummer', vuetifyConfig)
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = defineField('selectedDienststellennummer', vuetifyConfig);
 
   function isFormDirty(): boolean {
     return (
       isFieldDirty('selectedSchulform') ||
       isFieldDirty('selectedSchulname') ||
       isFieldDirty('selectedDienststellennummer')
-    )
+    );
   }
 
-  const showUnsavedChangesDialog: Ref<boolean> = ref(false)
-  let blockedNext: () => void = () => {}
+  const showUnsavedChangesDialog: Ref<boolean> = ref(false);
+  let blockedNext: () => void = () => {};
 
-  onBeforeRouteLeave(
-    (_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
-      if (isFormDirty()) {
-        showUnsavedChangesDialog.value = true
-        blockedNext = next
-      } else {
-        next()
-      }
+  onBeforeRouteLeave((_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
+    if (isFormDirty()) {
+      showUnsavedChangesDialog.value = true;
+      blockedNext = next;
+    } else {
+      next();
     }
-  )
+  });
 
   const onSubmit: (e?: Event | undefined) => Promise<void | undefined> = handleSubmit(() => {
     if (selectedDienststellennummer.value && selectedSchulname.value) {
@@ -101,40 +95,40 @@
         selectedSchulname.value,
         ' ',
         ' ',
-        CreateOrganisationBodyParamsTypEnum.Schule
-      )
+        CreateOrganisationBodyParamsTypEnum.Schule,
+      );
     }
-  })
+  });
 
   const handleCreateAnotherSchule = (): void => {
-    organisationStore.createdOrganisation = null
-    resetForm()
-    router.push({ name: 'create-schule' })
-  }
+    organisationStore.createdOrganisation = null;
+    resetForm();
+    router.push({ name: 'create-schule' });
+  };
 
   function handleConfirmUnsavedChanges(): void {
-    blockedNext()
+    blockedNext();
   }
 
   // TODO: Navigate back to Rolle-management for now until the list for Schulen is merged
   function navigateToSchuleManagement(): void {
-    organisationStore.createdOrganisation = null
-    router.push({ name: 'rolle-management' })
+    organisationStore.createdOrganisation = null;
+    router.push({ name: 'rolle-management' });
   }
 
   function navigateBackToSchuleForm(): void {
-    organisationStore.errorCode = ''
+    organisationStore.errorCode = '';
   }
 
   onMounted(async () => {
     /* listen for browser changes and prevent them when form is dirty */
     window.addEventListener('beforeunload', (event: BeforeUnloadEvent) => {
-      if (!isFormDirty()) return
-      event.preventDefault()
+      if (!isFormDirty()) return;
+      event.preventDefault();
       /* Chrome requires returnValue to be set. */
-      event.returnValue = ''
-    })
-  })
+      event.returnValue = '';
+    });
+  });
 </script>
 
 <template>
@@ -287,9 +281,7 @@
             <v-col class="text-body"> {{ selectedSchulform }}</v-col>
           </v-row>
           <v-row>
-            <v-col class="text-body bold text-right">
-              {{ $t('admin.schule.dienststellennummer') }}:
-            </v-col>
+            <v-col class="text-body bold text-right"> {{ $t('admin.schule.dienststellennummer') }}: </v-col>
             <v-col class="text-body"> {{ organisationStore.createdOrganisation.kennung }}</v-col>
           </v-row>
           <v-row>
@@ -309,6 +301,7 @@
               <v-btn
                 class="secondary"
                 data-testid="back-to-list-button"
+                @click="navigateToSchuleManagement"
                 :block="smAndDown"
                 >{{ $t('nav.backToList') }}</v-btn
               >
