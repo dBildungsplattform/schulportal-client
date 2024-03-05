@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import { ref, type Ref, onMounted, computed, type ComputedRef } from 'vue';
+  import { ref, type Ref, onMounted, onUnmounted, computed, type ComputedRef } from 'vue';
   import {
     useRolleStore,
     type RolleStore,
@@ -22,8 +22,8 @@
   import { type BaseFieldProps, type TypedSchema, useForm } from 'vee-validate';
   import { object, string } from 'yup';
   import { toTypedSchema } from '@vee-validate/yup';
-  import CreationForm from '@/components/form/CreationForm.vue';
-  import InputRow from '@/components/form/InputRow.vue';
+  import FormWrapper from '@/components/form/FormWrapper.vue';
+  import FormRow from '@/components/form/FormRow.vue';
   import { useOrganisationStore, type OrganisationStore, type Organisation } from '@/stores/OrganisationStore';
 
   const { smAndDown }: { smAndDown: Ref<boolean> } = useDisplay();
@@ -34,7 +34,7 @@
   const router: Router = useRouter();
 
   type TranslatedRollenArt = { value: RolleResponseRollenartEnum; title: string };
-  const translatedRollenart: Ref<TranslatedRollenArt[]> = ref([]);
+  const translatedRollenarten: Ref<TranslatedRollenArt[]> = ref([]);
 
   type TranslatedMerkmal = { value: RolleResponseMerkmaleEnum; title: string };
   const translatedMerkmale: Ref<TranslatedMerkmal[]> = ref([]);
@@ -66,7 +66,7 @@
   };
 
   // eslint-disable-next-line @typescript-eslint/typedef
-  const { defineField, handleSubmit, resetForm } = useForm<RolleCreationForm>({
+  const { defineField, handleSubmit, isFieldDirty, resetForm } = useForm<RolleCreationForm>({
     validationSchema,
   });
 
@@ -90,12 +90,20 @@
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedMerkmale', vuetifyConfig);
 
-  const isFormDirty: Ref<boolean> = ref(false);
+  function isFormDirty(): boolean {
+    return (
+      isFieldDirty('selectedSchulstrukturknoten') ||
+      isFieldDirty('selectedRollenArt') ||
+      isFieldDirty('selectedRollenName') ||
+      isFieldDirty('selectedMerkmale')
+    );
+  }
+
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
   let blockedNext: () => void = () => {};
 
   onBeforeRouteLeave((_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
-    if (isFormDirty.value) {
+    if (isFormDirty()) {
       showUnsavedChangesDialog.value = true;
       blockedNext = next;
     } else {
@@ -107,17 +115,13 @@
     if (selectedRollenName.value && selectedSchulstrukturknoten.value && selectedRollenArt.value) {
       const merkmaleToSubmit: CreateRolleBodyParamsMerkmaleEnum[] =
         selectedMerkmale.value?.map((m: CreateRolleBodyParamsMerkmaleEnum) => m) || [];
-      await rolleStore
-        .createRolle(
-          selectedRollenName.value,
-          selectedSchulstrukturknoten.value,
-          selectedRollenArt.value,
-          merkmaleToSubmit,
-        )
-        .then(() => {
-          resetForm();
-          isFormDirty.value = false;
-        });
+      await rolleStore.createRolle(
+        selectedRollenName.value,
+        selectedSchulstrukturknoten.value,
+        selectedRollenArt.value,
+        merkmaleToSubmit,
+      );
+      resetForm();
 
       if (rolleStore.createdRolle) {
         await organisationStore.getOrganisationById(rolleStore.createdRolle.administeredBySchulstrukturknoten);
@@ -126,25 +130,20 @@
   });
 
   const handleCreateAnotherRolle = (): void => {
+    rolleStore.createdRolle = null;
     resetForm();
     router.push({ name: 'create-rolle' });
   };
-
-  function handleDirtyModels(value: boolean): void {
-    if (value) {
-      isFormDirty.value = value;
-    }
-  }
 
   function handleConfirmUnsavedChanges(): void {
     blockedNext();
   }
 
-  function navigateBackToRolleForm(): void {
+  async function navigateBackToRolleForm(): Promise<void> {
+    await router.push({ name: 'create-rolle' });
     rolleStore.errorCode = '';
-    router.push({ name: 'create-rolle' });
-    rolleStore.createdRolle = null;
   }
+
   async function navigateToRolleManagement(): Promise<void> {
     await router.push({ name: 'rolle-management' });
     rolleStore.createdRolle = null;
@@ -175,7 +174,15 @@
     })),
   );
 
+  function preventNavigation(event: BeforeUnloadEvent): void {
+    if (!isFormDirty()) return;
+    event.preventDefault();
+    /* Chrome requires returnValue to be set. */
+    event.returnValue = '';
+  }
+
   onMounted(async () => {
+    rolleStore.createdRolle = null;
     await organisationStore.getAllOrganisationen();
 
     // Iterate over the enum values
@@ -183,7 +190,7 @@
       // Use the enum value to construct the i18n path
       const i18nPath: string = `admin.rolle.mappingFrontBackEnd.rollenarten.${enumValue}`;
       // Push the mapped object into the array
-      translatedRollenart.value.push({
+      translatedRollenarten.value.push({
         value: enumValue, // Keep the enum value for internal use
         title: t(i18nPath), // Get the localized title
       });
@@ -198,12 +205,11 @@
     });
 
     /* listen for browser changes and prevent them when form is dirty */
-    window.addEventListener('beforeunload', (event: BeforeUnloadEvent) => {
-      if (!isFormDirty.value) return;
-      event.preventDefault();
-      /* Chrome requires returnValue to be set. */
-      event.returnValue = '';
-    });
+    window.addEventListener('beforeunload', preventNavigation);
+  });
+
+  onUnmounted(() => {
+    window.removeEventListener('beforeunload', preventNavigation);
   });
 </script>
 
@@ -231,7 +237,7 @@
 
       <!-- The form to create a new Rolle -->
       <template v-if="!rolleStore.createdRolle && !rolleStore.errorCode">
-        <CreationForm
+        <FormWrapper
           :confirmUnsavedChangesAction="handleConfirmUnsavedChanges"
           :createButtonLabel="$t('admin.rolle.create')"
           :discardButtonLabel="$t('admin.rolle.discard')"
@@ -245,70 +251,105 @@
           <v-row>
             <h3 class="headline-3">1. {{ $t('admin.schulstrukturknoten.assignSchulstrukturknoten') }}</h3>
           </v-row>
-          <InputRow
+          <FormRow
             :errorLabel="selectedSchulstrukturknotenProps['error']"
-            :fieldProps="selectedSchulstrukturknotenProps"
-            id="schulstrukturknoten-select"
-            @onDirtyModelValue="handleDirtyModels"
+            labelForId="schulstrukturknoten-select"
             :isRequired="true"
-            :isSelect="true"
             :label="$t('admin.schulstrukturknoten.schulstrukturknoten')"
-            :placeholder="$t('admin.schulstrukturknoten.selectSchulstrukturknoten')"
-            :selectableItems="schulstrukturknoten"
-            v-model="selectedSchulstrukturknoten"
-          ></InputRow>
+          >
+            <v-select
+              clearable
+              data-testid="schulstrukturknoten-select"
+              density="compact"
+              id="schulstrukturknoten-select"
+              :items="schulstrukturknoten"
+              item-value="value"
+              item-text="title"
+              :placeholder="$t('admin.schulstrukturknoten.selectSchulstrukturknoten')"
+              required="true"
+              variant="outlined"
+              v-bind="selectedSchulstrukturknotenProps"
+              v-model="selectedSchulstrukturknoten"
+            ></v-select>
+          </FormRow>
 
           <!-- Rollenart -->
           <v-row>
             <h3 class="headline-3">2. {{ $t('admin.rolle.assignRollenart') }}</h3>
           </v-row>
-          <InputRow
+          <FormRow
             :errorLabel="selectedRollenArtProps['error']"
-            :fieldProps="selectedRollenArtProps"
-            id="rollenart-select"
-            @onDirtyModelValue="handleDirtyModels"
+            labelForId="rollenart-select"
             :isRequired="true"
-            :isSelect="true"
             :label="$t('admin.rolle.rollenart')"
-            :placeholder="$t('admin.rolle.selectRollenart')"
-            :selectableItems="translatedRollenart"
-            v-model="selectedRollenArt"
-          ></InputRow>
+          >
+            <v-select
+              clearable
+              data-testid="rollenart-select"
+              density="compact"
+              id="rollenart-select"
+              :items="translatedRollenarten"
+              item-value="value"
+              item-text="title"
+              :placeholder="$t('admin.rolle.selectRollenart')"
+              required="true"
+              variant="outlined"
+              v-bind="selectedRollenArtProps"
+              v-model="selectedRollenArt"
+            ></v-select>
+          </FormRow>
 
           <template v-if="selectedRollenArt && selectedSchulstrukturknoten">
             <!-- Rollenname -->
             <v-row>
               <h3 class="headline-3">3. {{ $t('admin.rolle.enterRollenname') }}</h3>
             </v-row>
-            <InputRow
+            <FormRow
               :errorLabel="selectedRollenNameProps['error']"
-              :fieldProps="selectedRollenNameProps"
-              id="rollenname-input"
-              @onDirtyModelValue="handleDirtyModels"
+              labelForId="rollenname-input"
               :isRequired="true"
               :label="$t('admin.rolle.rollenname')"
-              :placeholder="$t('admin.rolle.enterRollenname')"
-              v-model="selectedRollenName"
-            ></InputRow>
+            >
+              <v-text-field
+                clearable
+                data-testid="rollenname-input"
+                density="compact"
+                id="rollenname-input"
+                :placeholder="$t('admin.rolle.enterRollenname')"
+                required="true"
+                variant="outlined"
+                v-bind="selectedRollenNameProps"
+                v-model="selectedRollenName"
+              ></v-text-field>
+            </FormRow>
 
             <!-- Merkmale -->
             <v-row>
               <h3 class="headline-3">4. {{ $t('admin.rolle.assignMerkmale') }}</h3>
             </v-row>
-            <InputRow
+            <FormRow
               :errorLabel="selectedMerkmaleProps['error']"
-              :fieldProps="selectedMerkmaleProps"
-              id="merkmale-select"
-              @onDirtyModelValue="handleDirtyModels"
-              :isSelect="true"
-              :isMultiple="true"
+              labelForId="merkmale-select"
               :label="$t('admin.rolle.merkmale')"
-              :placeholder="$t('admin.rolle.selectMerkmale')"
-              :selectableItems="translatedMerkmale"
-              v-model="selectedMerkmale"
-            ></InputRow>
+            >
+              <v-select
+                chips
+                clearable
+                data-testid="merkmale-select"
+                density="compact"
+                id="merkmale-select"
+                :items="translatedMerkmale"
+                item-value="value"
+                item-text="title"
+                multiple
+                :placeholder="$t('admin.rolle.selectMerkmale')"
+                variant="outlined"
+                v-bind="selectedMerkmaleProps"
+                v-model="selectedMerkmale"
+              ></v-select>
+            </FormRow>
           </template>
-        </CreationForm>
+        </FormWrapper>
       </template>
 
       <!-- Result template on success after submit  -->

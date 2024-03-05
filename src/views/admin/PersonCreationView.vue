@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import { useOrganisationStore, type OrganisationStore, type Organisation } from '@/stores/OrganisationStore';
   import { usePersonStore, type CreatedPerson, type PersonStore } from '@/stores/PersonStore';
-  import { onMounted, type Ref, ref, type ComputedRef, computed } from 'vue';
+  import { type ComputedRef, computed, onMounted, onUnmounted, type Ref, ref } from 'vue';
   import {
     onBeforeRouteLeave,
     type Router,
@@ -16,15 +16,14 @@
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import PasswordOutput from '@/components/form/PasswordOutput.vue';
-  import CreationForm from '@/components/form/CreationForm.vue';
-  import InputRow from '@/components/form/InputRow.vue';
+  import FormWrapper from '@/components/form/FormWrapper.vue';
+  import FormRow from '@/components/form/FormRow.vue';
 
   const router: Router = useRouter();
   const personStore: PersonStore = usePersonStore();
   const organisationStore: OrganisationStore = useOrganisationStore();
   const { t }: Composer = useI18n({ useScope: 'global' });
 
-  const isFormDirty: Ref<boolean> = ref(false);
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
   let blockedNext: () => void = () => {};
 
@@ -57,7 +56,7 @@
   };
 
   // eslint-disable-next-line @typescript-eslint/typedef
-  const { defineField, handleSubmit, resetForm } = useForm<PersonCreationForm>({
+  const { defineField, handleSubmit, isFieldDirty, resetForm } = useForm<PersonCreationForm>({
     validationSchema,
   });
 
@@ -86,22 +85,24 @@
     })),
   );
 
+  function isFormDirty(): boolean {
+    return isFieldDirty('selectedVorname') || isFieldDirty('selectedFamilienname');
+  }
+
   async function navigateToPersonTable(): Promise<void> {
     await router.push({ name: 'person-management' });
     personStore.createdPerson = null;
   }
 
-  function createPerson(): void {
+  async function createPerson(): Promise<void> {
     const unpersistedPerson: CreatedPerson = {
       name: {
         familienname: selectedFamilienname.value as string,
         vorname: selectedVorname.value as string,
       },
     };
-    personStore.createPerson(unpersistedPerson).then(() => {
-      resetForm();
-      isFormDirty.value = false;
-    });
+    await personStore.createPerson(unpersistedPerson);
+    resetForm();
   }
 
   const onSubmit: (e?: Event | undefined) => Promise<void | undefined> = handleSubmit(() => {
@@ -122,14 +123,15 @@
     blockedNext();
   }
 
-  function handleDirtyModels(value: boolean): void {
-    if (value) {
-      isFormDirty.value = value;
-    }
+  function preventNavigation(event: BeforeUnloadEvent): void {
+    if (!isFormDirty()) return;
+    event.preventDefault();
+    /* Chrome requires returnValue to be set. */
+    event.returnValue = '';
   }
 
   onBeforeRouteLeave((_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
-    if (isFormDirty.value) {
+    if (isFormDirty()) {
       showUnsavedChangesDialog.value = true;
       blockedNext = next;
     } else {
@@ -140,6 +142,14 @@
   onMounted(async () => {
     await organisationStore.getAllOrganisationen();
     personStore.errorCode = '';
+    personStore.createdPerson = null;
+
+    /* listen for browser changes and prevent them when form is dirty */
+    window.addEventListener('beforeunload', preventNavigation);
+  });
+
+  onUnmounted(() => {
+    window.removeEventListener('beforeunload', preventNavigation);
   });
 </script>
 
@@ -165,7 +175,7 @@
 
     <!-- The form to create a new Person  -->
     <template v-if="!personStore.createdPerson && !personStore.errorCode">
-      <CreationForm
+      <FormWrapper
         :confirmUnsavedChangesAction="handleConfirmUnsavedChanges"
         :createButtonLabel="$t('admin.person.create')"
         :discardButtonLabel="$t('admin.person.discard')"
@@ -180,46 +190,70 @@
           <h3 class="headline-3">1. {{ $t('admin.person.personalInfo') }}</h3>
         </v-row>
         <!-- Vorname -->
-        <InputRow
+        <FormRow
           :errorLabel="selectedVornameProps['error']"
-          :fieldProps="selectedVornameProps"
-          id="vorname-input"
+          labelForId="vorname-input"
           :isRequired="true"
           :label="$t('person.firstName')"
-          @onDirtyModelValue="handleDirtyModels"
-          :placeholder="$t('person.enterFirstName')"
-          v-model="selectedVorname"
-        ></InputRow>
+        >
+          <v-text-field
+            clearable
+            data-testid="vorname-input"
+            density="compact"
+            id="vorname-input"
+            :placeholder="$t('person.enterFirstName')"
+            required="true"
+            variant="outlined"
+            v-bind="selectedVornameProps"
+            v-model="selectedVorname"
+          ></v-text-field>
+        </FormRow>
 
         <!-- Nachname -->
-        <InputRow
+        <FormRow
           :errorLabel="selectedFamiliennameProps['error']"
-          :fieldProps="selectedFamiliennameProps"
-          id="familienname-input"
+          labelForId="familienname-input"
           :isRequired="true"
           :label="$t('person.lastName')"
-          @onDirtyModelValue="handleDirtyModels"
-          :placeholder="$t('person.enterLastName')"
-          v-model="selectedFamilienname"
-        ></InputRow>
+        >
+          <v-text-field
+            clearable
+            data-testid="familienname-input"
+            density="compact"
+            id="familienname-input"
+            :placeholder="$t('person.enterLastName')"
+            required="true"
+            variant="outlined"
+            v-bind="selectedFamiliennameProps"
+            v-model="selectedFamilienname"
+          ></v-text-field>
+        </FormRow>
 
         <!-- Organisation zuordnen -->
         <v-row>
           <h3 class="headline-3">2. {{ $t('admin.organisation.assignOrganisation') }}</h3>
         </v-row>
         <!-- Vorname -->
-        <InputRow
+        <FormRow
           :errorLabel="selectedOrganisationProps['error']"
-          :fieldProps="selectedOrganisationProps"
-          id="organisation-select"
-          :isSelect="true"
+          labelForId="organisation-select"
           :label="$t('admin.organisation.assignOrganisation')"
-          @onDirtyModelValue="handleDirtyModels"
-          :placeholder="$t('admin.organisation.selectOrganisation')"
-          :selectableItems="organisationen"
-          v-model="selectedOrganisation"
-        ></InputRow>
-      </CreationForm>
+        >
+          <v-select
+            clearable
+            data-testid="organisation-select"
+            density="compact"
+            id="organisation-select"
+            :items="organisationen"
+            item-value="value"
+            item-text="title"
+            :placeholder="$t('admin.organisation.selectOrganisation')"
+            variant="outlined"
+            v-bind="selectedOrganisationProps"
+            v-model="selectedOrganisation"
+          ></v-select>
+        </FormRow>
+      </FormWrapper>
     </template>
 
     <!-- Result template on success after submit  -->
