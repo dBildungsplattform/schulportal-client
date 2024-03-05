@@ -14,7 +14,7 @@
 
 <template>
   <v-card
-    class="serviceProvider-card mx-1 my-1"
+    class="serviceProvider-card mx-1 my-1 rounded-lg"
     :data-testid="testId || 'service-provider-card'"
     :href="href ? href : ''"
     :rel="newTab ? 'noreferrer' : ''"

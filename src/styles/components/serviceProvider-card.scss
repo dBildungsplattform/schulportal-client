@@ -1,6 +1,5 @@
 .serviceProvider-card {
-  border-radius: 5px;
-  height:70px; /* Adjust the height as needed */
+  height:70px; 
   width: 365px;
   display: flex;
   justify-content: center;
@@ -20,7 +19,7 @@
     border: $serviceProviderHoverBorderSize solid $primaryColor;
     text-decoration: none;
     .v-card-title {
-      transform: scale(1.09); // Adjust scale value as needed
+      transform: scale(1.09); 
     }
   }
 }
