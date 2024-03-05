@@ -130,7 +130,6 @@
 
   onMounted(async () => {
     organisationStore.createdOrganisation = null;
-
     /* listen for browser changes and prevent them when form is dirty */
     window.addEventListener('beforeunload', preventNavigation);
   });
