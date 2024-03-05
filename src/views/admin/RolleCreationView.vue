@@ -120,9 +120,8 @@
         selectedSchulstrukturknoten.value,
         selectedRollenArt.value,
         merkmaleToSubmit,
-      ).then(() => {
-        resetForm()
-      });
+      );
+      resetForm();
 
       if (rolleStore.createdRolle) {
         await organisationStore.getOrganisationById(rolleStore.createdRolle.administeredBySchulstrukturknoten);
@@ -183,7 +182,7 @@
   }
 
   onMounted(async () => {
-    rolleStore.createdRolle = null
+    rolleStore.createdRolle = null;
     await organisationStore.getAllOrganisationen();
 
     // Iterate over the enum values

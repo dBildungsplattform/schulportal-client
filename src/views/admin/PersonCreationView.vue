@@ -75,16 +75,15 @@
     personStore.createdPerson = null;
   }
 
-  function createPerson(): void {
+  async function createPerson(): Promise<void> {
     const unpersistedPerson: CreatedPerson = {
       name: {
         familienname: selectedFamilienname.value as string,
         vorname: selectedVorname.value as string,
       },
     };
-    personStore.createPerson(unpersistedPerson).then(() => {
-      resetForm()
-    });
+    await personStore.createPerson(unpersistedPerson);
+    resetForm();
   }
 
   const onSubmit: (e?: Event | undefined) => Promise<void | undefined> = handleSubmit(() => {
@@ -123,7 +122,7 @@
 
   onMounted(() => {
     personStore.errorCode = '';
-    personStore.createdPerson = null
+    personStore.createdPerson = null;
 
     /* listen for browser changes and prevent them when form is dirty */
     window.addEventListener('beforeunload', preventNavigation);
