@@ -2,9 +2,9 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ include "spsh-client.ingressName" . }}
+  name: {{ include "schulportal-client.ingressName" . }}
   labels:
-    app: {{ template "spsh-client.name" . }}
+    app: {{ template "schulportal-client.name" . }}
 spec:
   ingressClassName: {{ .Values.ingress.className | quote }}
   rules:
@@ -15,7 +15,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: {{ include "spsh-client.serviceName" . }}
+                name: {{ include "schulportal-client.serviceName" . }}
                 port:
                   number: {{ .Values.service.port }}
 {{- end }}

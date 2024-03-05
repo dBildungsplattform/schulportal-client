@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "spsh-client.serviceName" . }}
+  name: {{ include "schulportal-client.serviceName" . }}
   labels:
-    app: {{ template "spsh-client.name" . }}
+    app: {{ template "schulportal-client.name" . }}
 spec:
   type: {{ .Values.service.type }}
   ports:
@@ -11,4 +11,4 @@ spec:
       targetPort: {{ .Values.service.targetPort }}
       protocol: TCP
   selector:
-    app: {{ template "spsh-client.name" . }}
+    app: {{ template "schulportal-client.name" . }}
