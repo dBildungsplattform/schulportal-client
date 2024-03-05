@@ -88,15 +88,16 @@
     }
   });
 
-  const onSubmit: (e?: Event | undefined) => Promise<void | undefined> = handleSubmit(() => {
+  const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = handleSubmit(async () => {
     if (selectedDienststellennummer.value && selectedSchulname.value) {
-      organisationStore.createOrganisation(
+      await organisationStore.createOrganisation(
         selectedDienststellennummer.value,
         selectedSchulname.value,
         ' ',
         ' ',
         CreateOrganisationBodyParamsTypEnum.Schule,
       );
+      resetForm();
     }
   });
 
@@ -193,7 +194,7 @@
               <v-col
                 cols="12"
                 sm="4"
-                class="pt-0 pt-sm-3"
+                class="pt-0 pt-sm-3 pb-0"
               >
                 <v-radio
                   :label="$t('admin.schule.ersatzschule')"
