@@ -23,7 +23,6 @@ type ServiceProviderState = {
 type ServiceProviderGetters = {};
 type ServiceProviderActions = {
   getAllServiceProviders: () => Promise<void>;
-  getLogoUrlByServiceProviderId: (angebotId: string) => Promise<string>;
 };
 
 export { ServiceProviderKategorie };
@@ -64,24 +63,6 @@ export const useServiceProviderStore: StoreDefinition<
         }
         this.loading = false;
       }
-    },
-    async getLogoUrlByServiceProviderId(angebotId: string): Promise<string> {
-      this.loading = true;
-      try {
-        const { data }: { data: Blob } = await serviceProviderApi.providerControllerGetServiceProviderLogo(angebotId, {
-          responseType: 'blob',
-        });
-        const logoUrl: string = URL.createObjectURL(data);
-        this.loading = false;
-        return logoUrl; // Return the created object URL
-      } catch (error: unknown) {
-        this.errorCode = 'UNSPECIFIED_ERROR';
-        if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
-        }
-        this.loading = false;
-        return Promise.reject(this.errorCode);
-      }
-    },
+    }
   },
 });
