@@ -109,7 +109,7 @@
               md="4"
             >
               <v-btn
-                :block="smAndDown"
+                :block="mdAndDown"
                 class="secondary button"
                 @click.stop="closePasswordResetDialog(isActive)"
                 data-testid="close-password-reset-dialog-button"
@@ -123,7 +123,7 @@
               md="4"
             >
               <v-btn
-                :block="smAndDown"
+                :block="mdAndDown"
                 class="primary button"
                 @click.stop="$emit('onResetPassword', person.person.id)"
                 data-testid="password-reset-button"
