@@ -1,5 +1,5 @@
-import { defineStore, type Store, type StoreDefinition } from 'pinia'
-import { isAxiosError, type AxiosResponse } from 'axios'
+import { defineStore, type Store, type StoreDefinition } from 'pinia';
+import { isAxiosError, type AxiosResponse } from 'axios';
 import {
   OrganisationenApiFactory,
   OrganisationResponseTypEnum,
@@ -7,37 +7,33 @@ import {
   CreateOrganisationBodyParamsTraegerschaftEnum,
   type OrganisationenApiInterface,
   type OrganisationResponse,
-  type CreateOrganisationBodyParams
-} from '../api-client/generated/api'
-import axiosApiInstance from '@/services/ApiService'
+  type CreateOrganisationBodyParams,
+} from '../api-client/generated/api';
+import axiosApiInstance from '@/services/ApiService';
 
-const organisationApi: OrganisationenApiInterface = OrganisationenApiFactory(
-  undefined,
-  '',
-  axiosApiInstance
-)
+const organisationApi: OrganisationenApiInterface = OrganisationenApiFactory(undefined, '', axiosApiInstance);
 
 export type Organisation = {
-  id: string
-  kennung: string
-  name: string
-  namensergaenzung: string
-  kuerzel: string
-  typ: OrganisationResponseTypEnum
-}
+  id: string;
+  kennung: string;
+  name: string;
+  namensergaenzung: string;
+  kuerzel: string;
+  typ: OrganisationResponseTypEnum;
+};
 
 type OrganisationState = {
-  allOrganisationen: Array<OrganisationResponse>
-  currentOrganisation: Organisation | null
-  createdOrganisation: Organisation | null
-  errorCode: string
-  loading: boolean
-}
+  allOrganisationen: Array<OrganisationResponse>;
+  currentOrganisation: Organisation | null;
+  createdOrganisation: Organisation | null;
+  errorCode: string;
+  loading: boolean;
+};
 
-type OrganisationGetters = {}
+type OrganisationGetters = {};
 type OrganisationActions = {
-  getAllOrganisationen: () => Promise<void>
-  getOrganisationById: (organisationId: string) => Promise<OrganisationResponse>
+  getAllOrganisationen: () => Promise<void>;
+  getOrganisationById: (organisationId: string) => Promise<OrganisationResponse>;
   createOrganisation: (
     kennung: string,
     name: string,
@@ -46,20 +42,15 @@ type OrganisationActions = {
     typ: CreateOrganisationBodyParamsTypEnum,
     traegerschaft?: CreateOrganisationBodyParamsTraegerschaftEnum,
     administriertVon?: string,
-    zugehoerigZu?: string
-  ) => Promise<OrganisationResponse>
-}
+    zugehoerigZu?: string,
+  ) => Promise<OrganisationResponse>;
+};
 
-export { CreateOrganisationBodyParamsTypEnum }
+export { CreateOrganisationBodyParamsTypEnum };
 
-export type OrganisationStore = Store<
-  'organisationStore',
-  OrganisationState,
-  OrganisationGetters,
-  OrganisationActions
->
+export type OrganisationStore = Store<'organisationStore', OrganisationState, OrganisationGetters, OrganisationActions>;
 
-export { OrganisationResponseTypEnum }
+export { OrganisationResponseTypEnum };
 
 export const useOrganisationStore: StoreDefinition<
   'organisationStore',
@@ -74,43 +65,43 @@ export const useOrganisationStore: StoreDefinition<
       currentOrganisation: null,
       createdOrganisation: null,
       errorCode: '',
-      loading: false
-    }
+      loading: false,
+    };
   },
   actions: {
     async getAllOrganisationen() {
-      this.loading = true
+      this.loading = true;
       try {
         const { data }: AxiosResponse<OrganisationResponse[]> =
-          await organisationApi.organisationControllerFindOrganizations()
+          await organisationApi.organisationControllerFindOrganizations();
 
-        this.allOrganisationen = data
-        this.loading = false
+        this.allOrganisationen = data;
+        this.loading = false;
       } catch (error: unknown) {
-        this.errorCode = 'UNSPECIFIED_ERROR'
+        this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR'
+          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
         }
-        this.loading = false
+        this.loading = false;
       }
     },
     async getOrganisationById(organisationId: string) {
-      this.errorCode = ''
-      this.loading = true
+      this.errorCode = '';
+      this.loading = true;
       try {
         const { data }: { data: OrganisationResponse } =
-          await organisationApi.organisationControllerFindOrganisationById(organisationId)
+          await organisationApi.organisationControllerFindOrganisationById(organisationId);
 
-        this.currentOrganisation = data
-        this.loading = false
-        return data
+        this.currentOrganisation = data;
+        this.loading = false;
+        return data;
       } catch (error: unknown) {
-        this.errorCode = 'UNSPECIFIED_ERROR'
+        this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR'
+          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
         }
-        this.loading = false
-        return Promise.reject(this.errorCode)
+        this.loading = false;
+        return Promise.reject(this.errorCode);
       }
     },
     async createOrganisation(
@@ -121,9 +112,9 @@ export const useOrganisationStore: StoreDefinition<
       typ: CreateOrganisationBodyParamsTypEnum,
       traegerschaft?: CreateOrganisationBodyParamsTraegerschaftEnum,
       administriertVon?: string,
-      zugehoerigZu?: string
+      zugehoerigZu?: string,
     ): Promise<OrganisationResponse> {
-      this.loading = true
+      this.loading = true;
       try {
         const createOrganisationBodyParams: CreateOrganisationBodyParams = {
           kennung: kennung,
@@ -133,23 +124,21 @@ export const useOrganisationStore: StoreDefinition<
           typ: typ,
           traegerschaft: traegerschaft,
           administriertVon: administriertVon,
-          zugehoerigZu: zugehoerigZu
-        }
+          zugehoerigZu: zugehoerigZu,
+        };
         const { data }: { data: OrganisationResponse } =
-          await organisationApi.organisationControllerCreateOrganisation(
-            createOrganisationBodyParams
-          )
-        this.loading = false
-        this.createdOrganisation = data
-        return data
+          await organisationApi.organisationControllerCreateOrganisation(createOrganisationBodyParams);
+        this.loading = false;
+        this.createdOrganisation = data;
+        return data;
       } catch (error: unknown) {
-        this.errorCode = 'UNSPECIFIED_ERROR'
+        this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR'
+          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
         }
-        this.loading = false
-        return Promise.reject(this.errorCode)
+        this.loading = false;
+        return Promise.reject(this.errorCode);
       }
-    }
-  }
-})
+    },
+  },
+});

@@ -15,7 +15,7 @@
   const headers: ReadonlyHeaders = [
     { title: t('person.lastName'), key: 'person.name.familienname', align: 'start' },
     { title: t('person.firstName'), key: 'person.name.vorname', align: 'start' },
-    { title: t('person.userName'), key: 'person.referrer', align: 'start' }
+    { title: t('person.userName'), key: 'person.referrer', align: 'start' },
   ];
 
   const router: Router = useRouter();
