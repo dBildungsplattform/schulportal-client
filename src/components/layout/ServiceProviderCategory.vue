@@ -8,7 +8,7 @@
   }>();
 </script>
 
-<template v-if="serviceProviders?.length > 0">
+<template v-if="serviceProvider && serviceProviders.length > 0">
   <v-row>
     <label class="mx-3">{{ categoryTitle }}</label>
     <v-col>

@@ -134,8 +134,8 @@
         </v-col>
         <v-col
           cols="12"
-          sm="6"
-          md="4"
+          md="6"
+          lg="4"
         >
           <ServiceProviderCard
             :testId="'service-provider-card-admin'"
