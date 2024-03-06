@@ -111,13 +111,13 @@
     blockedNext();
   }
 
-  // TODO: Navigate back to Rolle-management for now until the list for Schulen is merged
   async function navigateToSchuleManagement(): Promise<void> {
-    await router.push({ name: 'rolle-management' });
+    await router.push({ name: 'schule-management' });
     organisationStore.createdOrganisation = null;
   }
 
-  function navigateBackToSchuleForm(): void {
+  async function navigateBackToSchuleForm(): Promise<void> {
+    await router.push({ name: 'create-schule' });
     organisationStore.errorCode = '';
   }
 
