@@ -16,7 +16,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: {{ include "schulportal-client.serviceName" . }}
+                name: {{ include "schulportal-client.name" . }}
                 port:
                   number: {{ .Values.service.port }}
 {{- end }}
