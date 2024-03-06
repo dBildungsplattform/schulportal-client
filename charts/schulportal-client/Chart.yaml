@@ -1,6 +1,6 @@
 apiVersion: v2
 name: schulportal-client
-description: Helm-Chart für den Schulportal-SH Client
+description: Helm-Chart for schulportal-client
 type: application
 version: 0.1.1
 appVersion: ""
