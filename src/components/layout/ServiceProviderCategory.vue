@@ -9,7 +9,7 @@
 </script>
 
 <template>
-  <v-container v-if="serviceProviders?.length > 0">
+  <template v-if="serviceProviders && serviceProviders.length > 0">
     <v-row>
       <label class="mx-3">{{ categoryTitle }}</label>
       <v-col>
@@ -37,5 +37,5 @@
         ></ServiceProviderCard>
       </v-col>
     </v-row>
-  </v-container>
+  </template>
 </template>

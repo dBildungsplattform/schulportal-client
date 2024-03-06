@@ -106,48 +106,46 @@
         :serviceProviders="classServiceProviders"
       ></ServiceProviderCategory>
       <!-- Categorie 3: Administration directly rendered here because of the always present provider -->
-      <v-container>
-        <v-row>
-          <label class="mx-3">{{ $t('start.categories.administration') }}</label>
-          <v-col>
-            <v-divider
-              class="border-opacity-100 rounded"
-              color="#E5EAEF"
-              thickness="6"
-            ></v-divider>
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col
-            v-for="serviceProvider in administrationServiceProviders"
-            :key="serviceProvider.id"
-            cols="12"
-            md="6"
-            lg="4"
+      <v-row>
+        <label class="mx-3">{{ $t('start.categories.administration') }}</label>
+        <v-col>
+          <v-divider
+            class="border-opacity-100 rounded"
+            color="#E5EAEF"
+            thickness="6"
+          ></v-divider>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col
+          v-for="serviceProvider in administrationServiceProviders"
+          :key="serviceProvider.id"
+          cols="12"
+          md="6"
+          lg="4"
+        >
+          <ServiceProviderCard
+            :href="serviceProvider.url"
+            :newTab="true"
+            :testId="`service-provider-card-${serviceProvider.id}`"
+            :title="serviceProvider.name"
+            :logoUrl="serviceProvider.logoUrl"
+          ></ServiceProviderCard>
+        </v-col>
+        <v-col
+          cols="12"
+          md="6"
+          lg="4"
+        >
+          <ServiceProviderCard
+            :testId="'service-provider-card-admin'"
+            :to="'/admin/personen'"
+            :title="$t('nav.admin')"
+            variant="outlined"
           >
-            <ServiceProviderCard
-              :href="serviceProvider.url"
-              :newTab="true"
-              :testId="`service-provider-card-${serviceProvider.id}`"
-              :title="serviceProvider.name"
-              :logoUrl="serviceProvider.logoUrl"
-            ></ServiceProviderCard>
-          </v-col>
-          <v-col
-            cols="12"
-            md="6"
-            lg="4"
-          >
-            <ServiceProviderCard
-              :testId="'service-provider-card-admin'"
-              :to="'/admin/personen'"
-              :title="$t('nav.admin')"
-              variant="outlined"
-            >
-            </ServiceProviderCard>
-          </v-col>
-        </v-row>
-      </v-container>
+          </ServiceProviderCard>
+        </v-col>
+      </v-row>
       <!-- Categorie 4: Hints -->
       <ServiceProviderCategory
         :categoryTitle="$t('start.categories.hints')"
