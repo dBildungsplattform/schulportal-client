@@ -19,6 +19,7 @@
     border: $serviceProviderHoverBorderSize solid $primaryColor;
     text-decoration: none;
     .v-card-title {
+      filter: blur(0);
       transform: scale(1.09); 
     }
   }

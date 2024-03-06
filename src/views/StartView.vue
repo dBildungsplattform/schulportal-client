@@ -7,7 +7,7 @@
   } from '@/stores/ServiceProviderStore';
   import { computed, onMounted, type ComputedRef } from 'vue';
   import ServiceProviderCard from '@/components/cards/ServiceProviderCard.vue';
-  import ProviderCategoryWrapper from '@/components/providers/ProviderCategoryWrapper.vue';
+  import ServiceProviderCategory from '@/components/layout/ServiceProviderCategory.vue';
 
   const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
 
@@ -96,44 +96,66 @@
     <!-- Template to be displayed in case of no error nor loading -->
     <template v-else>
       <!-- Categorie 1: Work Email -->
-      <ProviderCategoryWrapper
+      <ServiceProviderCategory
         :categoryTitle="$t('start.categories.workEmail')"
         :serviceProviders="emailServiceProviders"
-      ></ProviderCategoryWrapper>
+      ></ServiceProviderCategory>
       <!-- Categorie 2: Class -->
-      <ProviderCategoryWrapper
+      <ServiceProviderCategory
         :categoryTitle="$t('start.categories.class')"
         :serviceProviders="classServiceProviders"
-      ></ProviderCategoryWrapper>
-      <!-- Categorie 3: Administration -->
-      <ProviderCategoryWrapper
-        :categoryTitle="$t('start.categories.administration')"
-        :serviceProviders="administrationServiceProviders"
-      >
-        <!-- This provider is always available for now sand doesn't come from the backend so it's passed inside the slot -->
+      ></ServiceProviderCategory>
+      <!-- Categorie 3: Administration directly rendered here because of the always present provider -->
+      <v-row>
+        <label class="mx-3">{{ $t('start.categories.administration') }}</label>
+        <v-col>
+          <v-divider
+            class="border-opacity-100 rounded"
+            color="#E5EAEF"
+            thickness="6"
+          ></v-divider>
+        </v-col>
+      </v-row>
+      <v-row>
         <v-col
+          v-for="serviceProvider in administrationServiceProviders"
+          :key="serviceProvider.id"
           cols="12"
           md="6"
           lg="4"
         >
           <ServiceProviderCard
+            :href="serviceProvider.url"
+            :newTab="true"
+            :testId="`service-provider-card-${serviceProvider.id}`"
+            :title="serviceProvider.name"
+            :logoUrl="serviceProvider.logoUrl"
+          ></ServiceProviderCard>
+        </v-col>
+        <v-col
+          cols="12"
+          sm="6"
+          md="4"
+        >
+          <ServiceProviderCard
             :testId="'service-provider-card-admin'"
             :to="'/admin/personen'"
             :title="$t('nav.admin')"
+            variant="outlined"
           >
           </ServiceProviderCard>
         </v-col>
-      </ProviderCategoryWrapper>
+      </v-row>
       <!-- Categorie 4: Hints -->
-      <ProviderCategoryWrapper
+      <ServiceProviderCategory
         :categoryTitle="$t('start.categories.hints')"
         :serviceProviders="hintsServiceProviders"
-      ></ProviderCategoryWrapper>
+      ></ServiceProviderCategory>
       <!-- Categorie 5: School Offerings -->
-      <ProviderCategoryWrapper
+      <ServiceProviderCategory
         :categoryTitle="$t('start.categories.schoolOfferings')"
         :serviceProviders="schoolOfferingsServiceProviders"
-      ></ProviderCategoryWrapper>
+      ></ServiceProviderCategory>
     </template>
   </v-card>
 </template>
