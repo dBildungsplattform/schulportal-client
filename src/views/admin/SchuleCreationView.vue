@@ -57,6 +57,8 @@
     validationSchema,
   });
 
+  const preservedSchulform: Ref<string> = ref<string>('');
+
   const [selectedSchulform]: [Ref<string>, Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>] =
     defineField('selectedSchulform', vuetifyConfig);
   const [selectedSchulname, selectedSchulnameProps]: [
@@ -89,6 +91,9 @@
   });
 
   const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = handleSubmit(async () => {
+    // TODO: remove this assignment once schulform can be retrieved from the backend.
+    // (Necessary here since when we flush the form onSubmit the selectedSchulform won't show up in the success page)
+    preservedSchulform.value = selectedSchulform.value;
     if (selectedDienststellennummer.value && selectedSchulname.value) {
       await organisationStore.createOrganisation(
         selectedDienststellennummer.value,
@@ -286,7 +291,7 @@
           </v-row>
           <v-row>
             <v-col class="text-body bold text-right"> {{ $t('admin.schule.schulform') }}: </v-col>
-            <v-col class="text-body"> {{ selectedSchulform }}</v-col>
+            <v-col class="text-body"> {{ preservedSchulform }}</v-col>
           </v-row>
           <v-row>
             <v-col class="text-body bold text-right"> {{ $t('admin.schule.dienststellennummer') }}: </v-col>
