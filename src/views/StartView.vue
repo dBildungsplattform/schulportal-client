@@ -61,7 +61,7 @@
           class="headline-1"
           data-testid="start-card-headline"
         >
-          {{ $t('start.homePage') }}
+          {{ $t('start.categories.homePage') }}
         </h2>
       </v-col>
     </v-row>
@@ -98,7 +98,7 @@
       <!-- Categorie 1: Work Email -->
       <template v-if="emailServiceProviders.length > 0">
         <v-row>
-          <label class="mx-3">{{ $t('start.workEmail') }}</label>
+          <label class="mx-3">{{ $t('start.categories.workEmail') }}</label>
           <v-col>
             <v-divider
               class="border-opacity-100 rounded"
@@ -128,7 +128,7 @@
       <!-- Categorie 2: Class -->
       <template v-if="classServiceProviders.length > 0">
         <v-row>
-          <label class="mx-3">{{ $t('start.class') }}</label>
+          <label class="mx-3">{{ $t('start.categories.class') }}</label>
           <v-col>
             <v-divider
               class="border-opacity-100 rounded"
@@ -158,7 +158,7 @@
       </template>
       <!-- Categorie 3: Administration -->
       <v-row>
-        <label class="mx-3">{{ $t('start.administration') }}</label>
+        <label class="mx-3">{{ $t('start.categories.administration') }}</label>
         <v-col>
           <v-divider
             class="border-opacity-100 rounded"
@@ -201,7 +201,7 @@
       <!-- Categorie 4: Hints -->
       <template v-if="hintsServiceProviders.length > 0">
         <v-row>
-          <label class="mx-3">{{ $t('start.hints') }}</label>
+          <label class="mx-3">{{ $t('start.categories.hints') }}</label>
           <v-col>
             <v-divider
               class="border-opacity-100 rounded"
@@ -232,7 +232,7 @@
       <!-- Categorie 5: School Offerings -->
       <template v-if="schoolOfferingsServiceProviders.length > 0">
         <v-row>
-          <label class="mx-3">{{ $t('start.schoolOfferings') }}</label>
+          <label class="mx-3">{{ $t('start.categories.schoolOfferings') }}</label>
           <v-col>
             <v-divider
               class="border-opacity-100 rounded"

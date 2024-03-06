@@ -1,4 +1,4 @@
-.serviceProvider-card {
+.service-provider-card {
   height:70px; 
   width: 365px;
   display: flex;
@@ -25,7 +25,7 @@
 }
 
 @media only screen and (max-width: 960px) {  
-  .serviceProvider-card {
+  .service-provider-card {
       width:auto;
   }
 }

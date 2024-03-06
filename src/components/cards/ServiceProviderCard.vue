@@ -14,7 +14,7 @@
 
 <template>
   <v-card
-    class="serviceProvider-card mx-1 my-1 rounded-lg"
+    class="service-provider-card mx-1 my-1 rounded-lg"
     :data-testid="testId || 'service-provider-card'"
     :href="href ? href : ''"
     :rel="newTab ? 'noreferrer' : ''"
@@ -26,14 +26,20 @@
       <!-- If the logoUrl is defined-->
       <v-avatar
         v-if="logoUrl"
-        alt="provider-logo"
-        :image="logoUrl"  
+        rounded="0"
+        ><v-img
+          alt="provider-logo"
+          :src="logoUrl"
+        ></v-img
       ></v-avatar>
       <!-- Fallback logo -->
       <v-avatar
         v-else
-        alt="schulportal-logo"
-        :image="SchulPortalLogo"
+        rounded="0"
+        ><v-img
+          alt="schulportal-logo"
+          :src="SchulPortalLogo"
+        ></v-img
       ></v-avatar>
     </template>
   </v-card>

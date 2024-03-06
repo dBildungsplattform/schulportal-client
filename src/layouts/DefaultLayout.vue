@@ -10,7 +10,6 @@
 </template>
 
 <style scoped lang="scss">
-  @import '@/styles/variables';
 
   @media (min-width: 1280px) {
     .v-container {

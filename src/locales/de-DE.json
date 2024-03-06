@@ -158,13 +158,15 @@
     "privacyPolicy": "Datenschutzerklärung"
   },
   "start": {
-    "administration": "Verwaltung",
     "allServiceProviders": "Alle Angebote",
-    "class": "Unterricht",
-    "hints": "Hinweise",
-    "homePage": "Startseite",
-    "schoolOfferings": "Schulische Angebote",
-    "workEmail": "Dienstliche E-Mail"
+    "categories": {
+      "administration": "Verwaltung",
+      "class": "Unterricht",
+      "hints": "Hinweise",
+      "homePage": "Startseite",
+      "schoolOfferings": "Schulische Angebote",
+      "workEmail": "Dienstliche E-Mail"
+    }
   },
   "itemsPerPage": "Einträge pro Seite",
   "landingTitle": "Willkommen im Schulportal SH.",
