@@ -1,6 +1,6 @@
 {{/*
-Create release name with common name: schulportal-client
+Expand the name of the chart.
 */}}
-{{- define "common.names.releasename" -}}
-{{- printf "schulportal-client" -}}
+{{- define "schulportal-client.name" -}}
+{{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" -}}
 {{- end -}}

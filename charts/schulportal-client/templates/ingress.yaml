@@ -2,7 +2,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ include "common.names.releasename" . }}
+  name: {{ include "schulportal-client.name" . }}
   labels:
     app.kubernetes.io/name: {{ template "schulportal-client.name" . }}
     app.kubernetes.io/version: {{ .Chart.Version }}

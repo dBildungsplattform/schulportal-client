@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "common.names.releasename" . }}
+  name: {{ include "schulportal-client.name" . }}
   labels:
     app: {{ template "schulportal-client.name" . }}
 spec:
