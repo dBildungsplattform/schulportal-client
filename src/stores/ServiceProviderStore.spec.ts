@@ -5,10 +5,6 @@ import { useServiceProviderStore, type ServiceProviderStore, type ServiceProvide
 
 const mockadapter: MockAdapter = new MockAdapter(ApiService);
 
-beforeEach(() => {
-  URL.createObjectURL = (): string => 'http://mockurl.com/mockBlobUrl';
-});
-
 describe('serviceProviderStore', () => {
   let serviceProviderStore: ServiceProviderStore;
   beforeEach(() => {
