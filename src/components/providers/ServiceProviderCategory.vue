@@ -37,12 +37,7 @@
         ></ServiceProviderCard>
       </v-col>
       <!-- Slot for additional content, like the always-present provider -->
-      <v-col
-        cols="12"
-        md="6"
-        lg="4"
-        ><slot></slot>
-      </v-col>
+      <slot></slot>
     </v-row>
   </v-container>
 </template>

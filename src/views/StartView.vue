@@ -110,13 +110,19 @@
         :categoryTitle="$t('start.categories.administration')"
         :serviceProviders="administrationServiceProviders"
       >
-        <!-- This provider is always available for now and doesn't come from the backend so it's passed inside the slot -->
-        <ServiceProviderCard
-          :testId="'service-provider-card-admin'"
-          :to="'/admin/personen'"
-          :title="$t('nav.admin')"
+        <!-- This provider is always available for now sand doesn't come from the backend so it's passed inside the slot -->
+        <v-col
+          cols="12"
+          md="6"
+          lg="4"
         >
-        </ServiceProviderCard>
+          <ServiceProviderCard
+            :testId="'service-provider-card-admin'"
+            :to="'/admin/personen'"
+            :title="$t('nav.admin')"
+          >
+          </ServiceProviderCard>
+        </v-col>
       </ServiceProviderCategory>
       <!-- Categorie 4: Hints -->
       <ServiceProviderCategory
