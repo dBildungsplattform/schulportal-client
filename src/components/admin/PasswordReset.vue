@@ -7,7 +7,7 @@
   import PasswordOutput from '@/components/form/PasswordOutput.vue';
 
   const { t }: Composer = useI18n({ useScope: 'global' });
-  const { smAndDown }: { smAndDown: Ref<boolean> } = useDisplay();
+  const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
   type Props = {
     errorCode: string;
@@ -47,14 +47,20 @@
 <template>
   <v-dialog persistent>
     <template v-slot:activator="{ props }">
-      <v-btn
-        class="primary button"
-        data-testid="open-password-reset-dialog-icon"
-        v-bind="props"
-        :block="smAndDown"
+      <v-col
+        cols="12"
+        sm="6"
+        md="auto"
       >
-        {{ $t('admin.person.changePassword') }}
-      </v-btn>
+        <v-btn
+          class="primary button"
+          data-testid="open-password-reset-dialog-icon"
+          v-bind="props"
+          :block="mdAndDown"
+        >
+          {{ $t('admin.person.changePassword') }}
+        </v-btn>
+      </v-col>
     </template>
 
     <template v-slot:default="{ isActive }">

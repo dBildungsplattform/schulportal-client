@@ -17,6 +17,9 @@
   import PasswordOutput from '@/components/form/PasswordOutput.vue';
   import FormWrapper from '@/components/form/FormWrapper.vue';
   import FormRow from '@/components/form/FormRow.vue';
+  import { useDisplay } from 'vuetify';
+
+  const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
   const router: Router = useRouter();
   const personStore: PersonStore = usePersonStore();
@@ -274,24 +277,28 @@
         <v-row justify="end">
           <v-col
             cols="12"
+            sm="6"
             md="auto"
           >
             <v-btn
               class="secondary"
               @click.stop="navigateToPersonTable"
               data-testid="back-to-list-button"
+              :block="mdAndDown"
             >
               {{ $t('nav.backToList') }}
             </v-btn>
           </v-col>
           <v-col
             cols="12"
+            sm="6"
             md="auto"
           >
             <v-btn
               class="primary button"
               @click="handleCreateAnotherPerson"
               data-testid="create-another-person-button"
+              :block="mdAndDown"
             >
               {{ $t('admin.person.createAnother') }}
             </v-btn>

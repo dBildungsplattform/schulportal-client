@@ -22,7 +22,7 @@
   import { object, string } from 'yup';
   import { toTypedSchema } from '@vee-validate/yup';
 
-  const { smAndDown }: { smAndDown: Ref<boolean> } = useDisplay();
+  const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
   const { t }: Composer = useI18n({ useScope: 'global' });
   const router: Router = useRouter();
@@ -309,25 +309,27 @@
           <v-row justify="end">
             <v-col
               cols="12"
+              sm="6"
               md="auto"
             >
               <v-btn
                 class="secondary"
                 data-testid="back-to-list-button"
                 @click="navigateToSchuleManagement"
-                :block="smAndDown"
+                :block="mdAndDown"
                 >{{ $t('nav.backToList') }}</v-btn
               >
             </v-col>
             <v-col
               cols="12"
+              sm="6"
               md="auto"
             >
               <v-btn
                 class="primary button"
                 data-testid="create-another-schule-button"
                 @click="handleCreateAnotherSchule"
-                :block="smAndDown"
+                :block="mdAndDown"
               >
                 {{ $t('admin.schule.createAnother') }}
               </v-btn>
