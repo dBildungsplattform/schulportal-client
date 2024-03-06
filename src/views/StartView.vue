@@ -7,7 +7,7 @@
   } from '@/stores/ServiceProviderStore';
   import { computed, onMounted, type ComputedRef } from 'vue';
   import ServiceProviderCard from '@/components/cards/ServiceProviderCard.vue';
-  import ServiceProviderCategory from '@/components/providers/ServiceProviderCategory.vue';
+  import ProviderCategoryWrapper from '@/components/providers/ProviderCategoryWrapper.vue';
 
   const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
 
@@ -96,17 +96,17 @@
     <!-- Template to be displayed in case of no error nor loading -->
     <template v-else>
       <!-- Categorie 1: Work Email -->
-      <ServiceProviderCategory
+      <ProviderCategoryWrapper
         :categoryTitle="$t('start.categories.workEmail')"
         :serviceProviders="emailServiceProviders"
-      ></ServiceProviderCategory>
+      ></ProviderCategoryWrapper>
       <!-- Categorie 2: Class -->
-      <ServiceProviderCategory
+      <ProviderCategoryWrapper
         :categoryTitle="$t('start.categories.class')"
         :serviceProviders="classServiceProviders"
-      ></ServiceProviderCategory>
+      ></ProviderCategoryWrapper>
       <!-- Categorie 3: Administration -->
-      <ServiceProviderCategory
+      <ProviderCategoryWrapper
         :categoryTitle="$t('start.categories.administration')"
         :serviceProviders="administrationServiceProviders"
       >
@@ -123,17 +123,17 @@
           >
           </ServiceProviderCard>
         </v-col>
-      </ServiceProviderCategory>
+      </ProviderCategoryWrapper>
       <!-- Categorie 4: Hints -->
-      <ServiceProviderCategory
+      <ProviderCategoryWrapper
         :categoryTitle="$t('start.categories.hints')"
         :serviceProviders="hintsServiceProviders"
-      ></ServiceProviderCategory>
+      ></ProviderCategoryWrapper>
       <!-- Categorie 5: School Offerings -->
-      <ServiceProviderCategory
+      <ProviderCategoryWrapper
         :categoryTitle="$t('start.categories.schoolOfferings')"
         :serviceProviders="schoolOfferingsServiceProviders"
-      ></ServiceProviderCategory>
+      ></ProviderCategoryWrapper>
     </template>
   </v-card>
 </template>
