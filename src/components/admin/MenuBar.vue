@@ -154,10 +154,11 @@
       :title="$t('admin.schule.management')"
     ></v-list-item>
     <v-list-item
-      class="menu-bar-sub-item caption"
+      @click="closeMenuOnMobile"
       data-testid="schule-management-menu-item"
       prepend-icon="mdi-format-list-bulleted"
       :title="$t('admin.schule.showAll')"
+      to="/admin/schulen"
     ></v-list-item>
     <v-list-item
       class="menu-bar-sub-item caption"

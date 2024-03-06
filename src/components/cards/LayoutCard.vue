@@ -12,6 +12,7 @@
     <v-row
       align="center"
       class="flex-nowrap ml-md-6 ml-1"
+      :class="!closable ? 'py-3' : ''"
     >
       <v-col cols="auto">
         <h2
