@@ -13,7 +13,7 @@
     height="60"
   >
     <!-- Logo and title -->
-    <v-toolbar-title>
+    <v-toolbar-title class="fill-height">
       <v-row no-gutters>
         <v-col
           class="hidden-sm-and-down"
