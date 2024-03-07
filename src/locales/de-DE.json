@@ -11,6 +11,10 @@
     "koPers": {
       "koPersNumber": "KoPers-Nr",
       "noKoPersNumber": "Keine KoPers-Nr vorhanden"
+    },    
+    "organisation": {
+      "assignOrganisation": "Organisationsebene zuordnen",
+      "selectOrganisation": "Organisationsebene auswählen"
     },
     "rolle": {
       "addNew": "Neue Rolle hinzufügen",
@@ -97,7 +101,6 @@
       "status": "Status"
     },
     "schule": {
-      "assign": "Schule zuordnen",
       "addNew": "Neue Schule hinzufügen",
       "administratingSchultraeger": "Verwaltender Schulträger",
       "ersatzschule": "Ersatzschule",
@@ -128,7 +131,6 @@
       "schuleCreateErrorText": "Die Schule konnte nicht angelegt werden.",
       "schuleAddedSuccessfully": "Die Schule wurde erfolgreich hinzugefügt.",
       "showAll": "Alle Schulen anzeigen"
-
     },
     "schulstrukturknoten": {
       "assignSchulstrukturknoten": "Schulstrukturknoten zuordnen",

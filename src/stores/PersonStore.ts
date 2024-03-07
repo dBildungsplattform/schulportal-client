@@ -70,7 +70,6 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
       this.loading = true;
       try {
         const { data }: { data: PersonendatensatzResponse } = await personenApi.personControllerCreatePerson(person);
-        this.loading = false;
         this.createdPerson = data;
         return data;
       } catch (error: unknown) {
@@ -78,10 +77,12 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
         if (isAxiosError(error)) {
           this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
         }
+        return await Promise.reject(this.errorCode);
+      } finally {
         this.loading = false;
-        return Promise.reject(this.errorCode);
       }
     },
+
     async getAllPersons() {
       this.loading = true;
       try {
@@ -90,12 +91,12 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
 
         this.allPersons = data.items;
         this.totalPersons = data.total;
-        this.loading = false;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
           this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
         }
+      } finally {
         this.loading = false;
       }
     },
@@ -105,7 +106,6 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
       this.errorCode = '';
       try {
         const { data }: { data: Personendatensatz } = await personenApi.personControllerFindPersonById(personId);
-        this.loading = false;
         this.currentPerson = data;
         return data;
       } catch (error) {
@@ -113,8 +113,9 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
         if (isAxiosError(error)) {
           this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
         }
+        return await Promise.reject(this.errorCode);
+      } finally {
         this.loading = false;
-        return Promise.reject(this.errorCode);
       }
     },
 
@@ -122,15 +123,15 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
       this.loading = true;
       try {
         const { data }: { data: string } = await personenApi.personControllerResetPasswordByPersonId(personId);
-        this.loading = false;
         return data;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
           this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
         }
+        return await Promise.reject(this.errorCode);
+      } finally {
         this.loading = false;
-        return Promise.reject(this.errorCode);
       }
     },
   },
