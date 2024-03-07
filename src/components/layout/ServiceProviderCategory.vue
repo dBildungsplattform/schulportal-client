@@ -9,7 +9,7 @@
 </script>
 
 <template>
-  <template v-if="serviceProviders?.length > 0">
+  <template v-if="serviceProviders?.length">
     <v-row>
       <label class="mx-3">{{ categoryTitle }}</label>
       <v-col>

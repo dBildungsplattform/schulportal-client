@@ -138,7 +138,7 @@
           lg="4"
         >
           <ServiceProviderCard
-            :testId="'service-provider-card-admin'"
+            testId="service-provider-card-admin"
             :to="'/admin/personen'"
             :title="$t('nav.admin')"
             variant="outlined"

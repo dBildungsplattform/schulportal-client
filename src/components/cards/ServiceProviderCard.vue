@@ -19,29 +19,39 @@
     :href="href ? href : ''"
     :rel="newTab ? 'noreferrer' : ''"
     :target="newTab ? '_blank' : '_self'"
-    :title="title"
     :to="to"
   >
-    <template #prepend>
-      <!-- If the logoUrl is defined-->
-      <v-avatar
-        v-if="logoUrl"
-        rounded="0"
-        ><v-img
-          alt="provider-logo"
-          :src="logoUrl"
-        ></v-img
-      ></v-avatar>
-      <!-- Fallback logo -->
-      <v-avatar
-        v-else
-        rounded="0"
-        ><v-img
-          alt="schulportal-logo"
-          :src="SchulPortalLogo"
-        ></v-img
-      ></v-avatar>
-    </template>
+    <v-card-text class="d-flex align-center justify-center mt-1">
+      <v-row align="center">
+        <v-col cols="2">
+          <div class="logo">
+            <v-avatar
+              v-if="logoUrl"
+              rounded="0"
+              ><v-img
+                alt="provider-logo"
+                :src="logoUrl"
+              ></v-img
+            ></v-avatar>
+            <!-- Fallback logo -->
+            <v-avatar
+              v-else
+              rounded="0"
+              ><v-img
+                alt="schulportal-logo"
+                :src="SchulPortalLogo"
+              ></v-img
+            ></v-avatar>
+          </div>
+        </v-col>
+        <v-col
+          cols="10"
+          class="d-flex justify-center align-center text-center"
+        >
+          <span>{{ title }}</span>
+        </v-col>
+      </v-row></v-card-text
+    >
   </v-card>
 </template>
 
