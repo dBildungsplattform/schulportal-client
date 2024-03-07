@@ -52,9 +52,9 @@
     }
   }
   interface Slots {
-    default: (props: { default: string }) => string
-    top: (props: { top: number }) => string
-    bottom: (props: { bottom: boolean }) => string
+    default: (props: { default: string }) => string;
+    top: (props: { top: number }) => string;
+    bottom: (props: { bottom: boolean }) => string;
   }
 </script>
 
