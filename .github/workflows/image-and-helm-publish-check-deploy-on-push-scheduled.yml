@@ -38,9 +38,9 @@ jobs:
       - name: Archive generated code
         uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
         with:
-          name: src
+          name: generated
           path: |
-            src/api-client/generated/**/*
+            src/api-client/generated
 
   codeql_analyze:
     name: "CodeQL"
