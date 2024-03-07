@@ -249,13 +249,13 @@
         >
           <!-- Schulstrukturknoten -->
           <v-row>
-            <h3 class="headline-3">1. {{ $t('admin.schulstrukturknoten.assignSchulstrukturknoten') }}</h3>
+            <h3 class="headline-3">1. {{ $t('admin.administrationsebene.assignAdministrationsebene') }}</h3>
           </v-row>
           <FormRow
             :errorLabel="selectedSchulstrukturknotenProps['error']"
             labelForId="schulstrukturknoten-select"
             :isRequired="true"
-            :label="$t('admin.schulstrukturknoten.schulstrukturknoten')"
+            :label="$t('admin.administrationsebene.administrationsebene')"
           >
             <v-select
               clearable
@@ -265,7 +265,7 @@
               :items="schulstrukturknoten"
               item-value="value"
               item-text="title"
-              :placeholder="$t('admin.schulstrukturknoten.selectSchulstrukturknoten')"
+              :placeholder="$t('admin.administrationsebene.assignAdministrationsebene')"
               required="true"
               variant="outlined"
               v-bind="selectedSchulstrukturknotenProps"
@@ -383,7 +383,7 @@
           </v-row>
           <v-row>
             <v-col class="text-body bold text-right">
-              {{ $t('admin.schulstrukturknoten.schulstrukturknoten') }}:
+              {{ $t('admin.administrationsebene.administrationsebene') }}:
             </v-col>
             <v-col class="text-body">
               {{

@@ -1,6 +1,10 @@
 {
   "action": "Aktion",
   "admin": {
+    "administrationsebene": {
+      "administrationsebene": "Administrationsebene",
+      "assignAdministrationsebene": "Administrationsebene zuordnen"
+    },
     "mandatoryFieldsNotice": "Mit * markierte Felder sind Pflichtangaben.",
     "backToForm": "Zurück zum Formular",
     "class": {
