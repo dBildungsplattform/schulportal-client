@@ -3,7 +3,10 @@
   "admin": {
     "administrationsebene": {
       "administrationsebene": "Administrationsebene",
-      "assignAdministrationsebene": "Administrationsebene zuordnen"
+      "assignAdministrationsebene": "Administrationsebene zuordnen",
+      "rules": {
+        "required": "Die Administrationsebene muss ausgewählt werden."
+      }
     },
     "mandatoryFieldsNotice": "Mit * markierte Felder sind Pflichtangaben.",
     "backToForm": "Zurück zum Formular",
@@ -135,14 +138,6 @@
       "schuleCreateErrorText": "Die Schule konnte nicht angelegt werden.",
       "schuleAddedSuccessfully": "Die Schule wurde erfolgreich hinzugefügt.",
       "showAll": "Alle Schulen anzeigen"
-    },
-    "schulstrukturknoten": {
-      "assignSchulstrukturknoten": "Schulstrukturknoten zuordnen",
-      "rules": {
-        "required": "Der Schulstrukturknoten muss ausgewählt werden."
-      },
-      "schulstrukturknoten": "Schulstrukturknoten",
-      "selectSchulstrukturknoten": "Schulstrukturknoten auswählen"
     },
     "schultraeger": {
       "management": "Schulträgerverwaltung"

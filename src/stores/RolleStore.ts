@@ -26,7 +26,7 @@ type RolleActions = {
   getAllRollen: () => Promise<void>;
   createRolle: (
     rollenName: string,
-    schulStrukturKnoten: string,
+    administrationsebene: string,
     rollenArt: CreateRolleBodyParamsRollenartEnum,
     merkmale: CreateRolleBodyParamsMerkmaleEnum[],
   ) => Promise<RolleResponse>;
@@ -53,7 +53,7 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
   actions: {
     async createRolle(
       rollenName: string,
-      schulStrukturKnoten: string,
+      administrationsebene: string,
       rollenArt: CreateRolleBodyParamsRollenartEnum,
       merkmale: CreateRolleBodyParamsMerkmaleEnum[],
     ): Promise<RolleResponse> {
@@ -62,7 +62,7 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
         // Construct the body params object
         const createRolleBodyParams: CreateRolleBodyParams = {
           name: rollenName,
-          administeredBySchulstrukturknoten: schulStrukturKnoten,
+          administeredBySchulstrukturknoten: administrationsebene,
           rollenart: rollenArt,
           // TODO Remove casting when generator issue is fixed from the server side
           merkmale: merkmale as unknown as Set<CreateRolleBodyParamsMerkmaleEnum>,
