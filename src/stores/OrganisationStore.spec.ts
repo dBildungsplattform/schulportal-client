@@ -121,9 +121,10 @@ describe('OrganisationStore', () => {
         '01',
         OrganisationResponseTypEnum.Anbieter,
       );
+      expect(organisationStore.loading).toBe(true);
       await createOrganisationPromise;
       expect(organisationStore.createdOrganisation).toEqual(mockResponse);
-      expect(organisationStore.loading).toBeFalsy();
+      expect(organisationStore.loading).toBe(false);
     });
 
     it('should handle string error', async () => {
@@ -135,6 +136,7 @@ describe('OrganisationStore', () => {
         '01',
         OrganisationResponseTypEnum.Anbieter,
       );
+      expect(organisationStore.loading).toBe(true);
       await rejects(createOrganisationPromise);
       expect(organisationStore.createdOrganisation).toEqual(null);
       expect(organisationStore.errorCode).toEqual('UNSPECIFIED_ERROR');
