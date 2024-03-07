@@ -83,9 +83,11 @@
             </v-row>
             <v-row class="text-body bold px-md-16">
               <v-col>
-                <p data-testid="password-reset-info-text">
-                  {{ resetPasswordInformationMessage }}
-                </p>
+                <span
+                  class="preserve-line-breaks"
+                  data-testid="password-reset-info-text"
+                  >{{ resetPasswordInformationMessage }}</span
+                >
               </v-col>
             </v-row>
             <v-row>
@@ -133,4 +135,8 @@
   </v-dialog>
 </template>
 
-<style></style>
+<style>
+  .preserve-line-breaks {
+    white-space: pre-wrap; /* CSS property to preserve whitespaces and line breaks */
+  }
+</style>
