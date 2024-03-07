@@ -76,9 +76,12 @@
                 <v-icon icon="mdi-alert"></v-icon>
               </v-col>
               <v-col>
-                <p data-testid="error-text">
+                <span
+                  class="preserve-line-breaks"
+                  data-testid="error-text"
+                >
                   {{ errorMessage || errorCode }}
-                </p>
+                </span>
               </v-col>
             </v-row>
             <v-row class="text-body bold px-md-16">
