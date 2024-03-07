@@ -18,7 +18,7 @@ describe('OrganisationStore', () => {
   it('should initialize state correctly', () => {
     expect(organisationStore.allOrganisationen).toEqual([]);
     expect(organisationStore.errorCode).toEqual('');
-    expect(organisationStore.loading).toBeFalsy();
+    expect(organisationStore.loading).toBe(false);
   });
 
   describe('getAllOrganisations', () => {
@@ -38,7 +38,7 @@ describe('OrganisationStore', () => {
       const getAllOrganisationenPromise: Promise<void> = organisationStore.getAllOrganisationen();
       await getAllOrganisationenPromise;
       expect(organisationStore.allOrganisationen).toEqual(mockResponse);
-      expect(organisationStore.loading).toBeFalsy();
+      expect(organisationStore.loading).toBe(false);
     });
 
     it('should handle string error', async () => {
@@ -78,7 +78,7 @@ describe('OrganisationStore', () => {
       const getOrganisationByIdPromise: Promise<OrganisationResponse> = organisationStore.getOrganisationById('1');
       await getOrganisationByIdPromise;
       expect(organisationStore.currentOrganisation).toEqual(mockResponse);
-      expect(organisationStore.loading).toBeFalsy();
+      expect(organisationStore.loading).toBe(false);
     });
 
     it('should handle string error', async () => {
