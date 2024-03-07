@@ -21,7 +21,7 @@
     :target="newTab ? '_blank' : '_self'"
     :to="to"
   >
-    <v-card-text class="d-flex justify-center text-center mt-1">
+    <v-card-text class="d-flex justify-center mt-1">
       <v-row align="center">
         <v-col cols="2">
           <div>
