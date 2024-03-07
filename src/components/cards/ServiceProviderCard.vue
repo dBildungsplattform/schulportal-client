@@ -21,10 +21,10 @@
     :target="newTab ? '_blank' : '_self'"
     :to="to"
   >
-    <v-card-text class="d-flex align-center justify-center mt-1">
+    <v-card-text class="d-flex justify-center text-center mt-1">
       <v-row align="center">
         <v-col cols="2">
-          <div class="logo">
+          <div>
             <v-avatar
               v-if="logoUrl"
               rounded="0"
@@ -46,9 +46,9 @@
         </v-col>
         <v-col
           cols="10"
-          class="d-flex justify-center align-center text-center"
+          class="d-flex justify-center text-center"
         >
-          <span>{{ title }}</span>
+          <span data-testid="card-title">{{ title }}</span>
         </v-col>
       </v-row></v-card-text
     >
