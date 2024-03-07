@@ -12,6 +12,7 @@ concurrency:
 jobs:
   release_image_and_helm_chart:
     name: "Publish image and scan with trivy"
+    secrets: inherit
     permissions:
       packages: write
       security-events: write
