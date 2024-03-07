@@ -1,0 +1,26 @@
+# Push image to GHCR and Helm Chart to helm-charts-registry
+name: Release Image and Helm Chart
+on:
+  push:
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+'
+
+concurrency:
+  group: dbildungs-iam-server-image-chart
+  cancel-in-progress: true
+
+jobs:
+  release_image_and_helm_chart:
+    name: "Publish image and scan with trivy"
+    permissions:
+      packages: write
+      security-events: write
+      contents: read
+    uses: dBildungsplattform/dbp-github-workflows/.github/workflows/release-image-and-helm-chart.yaml@DBP-679-create-release-gha
+    with:
+      release_tag: ${{ github.ref_name }} 
+      deploy_stage: dev
+      image_name: "schulportal-client"
+      helm_chart_name: "schulportal-client"
+
+  
