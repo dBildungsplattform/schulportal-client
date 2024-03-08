@@ -18,7 +18,7 @@ jobs:
       security-events: write
       contents: read
       actions: read
-    uses: dBildungsplattform/dbp-github-workflows/.github/workflows/release-image-and-helm-chart.yaml@DBP-679-create-release-gha
+    uses: dBildungsplattform/dbp-github-workflows/.github/workflows/release-image-and-helm-chart.yaml@5
     with:
       release_tag: ${{ github.ref_name }}
       image_name: "schulportal-client"
