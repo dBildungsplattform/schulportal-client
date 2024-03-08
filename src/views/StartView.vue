@@ -6,8 +6,10 @@
     type ServiceProviderStore,
   } from '@/stores/ServiceProviderStore';
   import { computed, onMounted, type ComputedRef } from 'vue';
-  import ServiceProviderCard from '@/components/cards/ServiceProviderCard.vue';
   import ServiceProviderCategory from '@/components/layout/ServiceProviderCategory.vue';
+  import { useI18n, type Composer } from 'vue-i18n';
+  
+  const { t }: Composer = useI18n({ useScope: 'global' });
 
   const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
 
@@ -42,6 +44,21 @@
     );
   });
 
+  // Define the always present service provider for the SH-administration
+  const alwaysPresentServiceProvider: ServiceProvider = {
+    id: 'unique-id-for-administration-service-provider',
+    name: t('nav.admin'),
+    kategorie: ServiceProviderKategorie.Verwaltung,
+    url: '/admin/personen',
+    hasLogo: false,
+  };
+
+  // Extend the administrationServiceProviders computed property to add the always present provider
+  const extendedAdministrationServiceProviders: ComputedRef<ServiceProvider[]> = computed(() => {
+    const providers: ServiceProvider[] = [...administrationServiceProviders.value];
+    providers.push(alwaysPresentServiceProvider);
+    return providers;
+  });
   onMounted(async () => {
     await serviceProviderStore.getAllServiceProviders();
     for (const provider of serviceProviderStore.allServiceProviders) {
@@ -105,47 +122,11 @@
         :categoryTitle="$t('start.categories.class')"
         :serviceProviders="classServiceProviders"
       ></ServiceProviderCategory>
-      <!-- Categorie 3: Administration directly rendered here because of the always present provider -->
-      <v-row>
-        <label class="mx-3">{{ $t('start.categories.administration') }}</label>
-        <v-col>
-          <v-divider
-            class="border-opacity-100 rounded"
-            color="#E5EAEF"
-            thickness="6"
-          ></v-divider>
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col
-          v-for="serviceProvider in administrationServiceProviders"
-          :key="serviceProvider.id"
-          cols="12"
-          md="6"
-          lg="4"
-        >
-          <ServiceProviderCard
-            :href="serviceProvider.url"
-            :newTab="true"
-            :testId="`service-provider-card-${serviceProvider.id}`"
-            :title="serviceProvider.name"
-            :logoUrl="serviceProvider.logoUrl"
-          ></ServiceProviderCard>
-        </v-col>
-        <v-col
-          cols="12"
-          md="6"
-          lg="4"
-        >
-          <ServiceProviderCard
-            testId="service-provider-card-admin"
-            :to="'/admin/personen'"
-            :title="$t('nav.admin')"
-            variant="outlined"
-          >
-          </ServiceProviderCard>
-        </v-col>
-      </v-row>
+      <!-- Categorie 3: Administration -->
+      <ServiceProviderCategory
+        :categoryTitle="$t('start.categories.administration')"
+        :serviceProviders="extendedAdministrationServiceProviders"
+      ></ServiceProviderCategory>
       <!-- Categorie 4: Hints -->
       <ServiceProviderCategory
         :categoryTitle="$t('start.categories.hints')"
