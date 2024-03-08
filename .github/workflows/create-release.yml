@@ -6,7 +6,7 @@ on:
       - '[0-9]+.[0-9]+.[0-9]+'
 
 concurrency:
-  group: dbildungs-iam-server-image-helm-chart
+  group: schulportal-client-image-helm-chart
   cancel-in-progress: true
 
 jobs:
@@ -21,8 +21,5 @@ jobs:
     uses: dBildungsplattform/dbp-github-workflows/.github/workflows/release-image-and-helm-chart.yaml@DBP-679-create-release-gha
     with:
       release_tag: ${{ github.ref_name }}
-      deploy_stage: dev
       image_name: "schulportal-client"
       helm_chart_name: "schulportal-client"
-
-  
