@@ -45,8 +45,8 @@
   });
 
   // Define the always present service provider for the SH-administration
-  const alwaysPresentServiceProvider: ServiceProvider = {
-    id: 'unique-id-for-administration-service-provider',
+  const spshAdministrationServiceProvider: ServiceProvider = {
+    id: 'spsh-administration-service-provider',
     name: t('nav.admin'),
     kategorie: ServiceProviderKategorie.Verwaltung,
     url: '/admin/personen',
@@ -56,7 +56,7 @@
   // Extend the administrationServiceProviders computed property to add the always present provider
   const extendedAdministrationServiceProviders: ComputedRef<ServiceProvider[]> = computed(() => {
     const providers: ServiceProvider[] = [...administrationServiceProviders.value];
-    providers.push(alwaysPresentServiceProvider);
+    providers.push(spshAdministrationServiceProvider);
     return providers;
   });
   onMounted(async () => {
