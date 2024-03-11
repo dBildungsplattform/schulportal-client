@@ -26,6 +26,26 @@ import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError } from './base';
 /**
  * 
  * @export
+ * @interface AddSystemrechtBodyParams
+ */
+export interface AddSystemrechtBodyParams {
+    /**
+     * 
+     * @type {string}
+     * @memberof AddSystemrechtBodyParams
+     */
+    'systemRecht': AddSystemrechtBodyParamsSystemRechtEnum;
+}
+
+export const AddSystemrechtBodyParamsSystemRechtEnum = {
+    RollenVerwalten: 'ROLLEN_VERWALTEN'
+} as const;
+
+export type AddSystemrechtBodyParamsSystemRechtEnum = typeof AddSystemrechtBodyParamsSystemRechtEnum[keyof typeof AddSystemrechtBodyParamsSystemRechtEnum];
+
+/**
+ * 
+ * @export
  * @interface CreateOrganisationBodyParams
  */
 export interface CreateOrganisationBodyParams {
@@ -42,11 +62,11 @@ export interface CreateOrganisationBodyParams {
      */
     'zugehoerigZu'?: string;
     /**
-     * 
+     * Required, if `typ` is equal to `SCHULE`
      * @type {string}
      * @memberof CreateOrganisationBodyParams
      */
-    'kennung': string;
+    'kennung'?: string;
     /**
      * 
      * @type {string}
@@ -58,13 +78,13 @@ export interface CreateOrganisationBodyParams {
      * @type {string}
      * @memberof CreateOrganisationBodyParams
      */
-    'namensergaenzung': string;
+    'namensergaenzung'?: string;
     /**
      * 
      * @type {string}
      * @memberof CreateOrganisationBodyParams
      */
-    'kuerzel': string;
+    'kuerzel'?: string;
     /**
      * 
      * @type {string}
@@ -80,6 +100,7 @@ export interface CreateOrganisationBodyParams {
 }
 
 export const CreateOrganisationBodyParamsTypEnum = {
+    Traeger: 'TRAEGER',
     Schule: 'SCHULE',
     Anbieter: 'ANBIETER',
     SonstigeOrganisationEinrichtung: 'SONSTIGE ORGANISATION / EINRICHTUNG',
@@ -269,6 +290,12 @@ export interface CreateRolleBodyParams {
      * @memberof CreateRolleBodyParams
      */
     'merkmale': Set<CreateRolleBodyParamsMerkmaleEnum>;
+    /**
+     * 
+     * @type {Set<string>}
+     * @memberof CreateRolleBodyParams
+     */
+    'systemrechte': Set<CreateRolleBodyParamsSystemrechteEnum>;
 }
 
 export const CreateRolleBodyParamsRollenartEnum = {
@@ -287,6 +314,44 @@ export const CreateRolleBodyParamsMerkmaleEnum = {
 } as const;
 
 export type CreateRolleBodyParamsMerkmaleEnum = typeof CreateRolleBodyParamsMerkmaleEnum[keyof typeof CreateRolleBodyParamsMerkmaleEnum];
+export const CreateRolleBodyParamsSystemrechteEnum = {
+    RollenVerwalten: 'ROLLEN_VERWALTEN'
+} as const;
+
+export type CreateRolleBodyParamsSystemrechteEnum = typeof CreateRolleBodyParamsSystemrechteEnum[keyof typeof CreateRolleBodyParamsSystemrechteEnum];
+
+/**
+ * 
+ * @export
+ * @interface DeleteRevisionBodyParams
+ */
+export interface DeleteRevisionBodyParams {
+    /**
+     * The revision of a personenkontext.
+     * @type {string}
+     * @memberof DeleteRevisionBodyParams
+     */
+    'revision': string;
+}
+/**
+ * 
+ * @export
+ * @interface HatSystemrechtBodyParams
+ */
+export interface HatSystemrechtBodyParams {
+    /**
+     * 
+     * @type {string}
+     * @memberof HatSystemrechtBodyParams
+     */
+    'systemRecht': HatSystemrechtBodyParamsSystemRechtEnum;
+}
+
+export const HatSystemrechtBodyParamsSystemRechtEnum = {
+    RollenVerwalten: 'ROLLEN_VERWALTEN'
+} as const;
+
+export type HatSystemrechtBodyParamsSystemRechtEnum = typeof HatSystemrechtBodyParamsSystemRechtEnum[keyof typeof HatSystemrechtBodyParamsSystemRechtEnum];
 
 /**
  * 
@@ -359,6 +424,7 @@ export interface OrganisationResponse {
 }
 
 export const OrganisationResponseTypEnum = {
+    Traeger: 'TRAEGER',
     Schule: 'SCHULE',
     Anbieter: 'ANBIETER',
     SonstigeOrganisationEinrichtung: 'SONSTIGE ORGANISATION / EINRICHTUNG',
@@ -544,85 +610,85 @@ export interface PersonNameParams {
 /**
  * 
  * @export
- * @interface PersonResponse
+ * @interface PersonResponseAutomapper
  */
-export interface PersonResponse {
+export interface PersonResponseAutomapper {
     /**
      * 
      * @type {string}
-     * @memberof PersonResponse
+     * @memberof PersonResponseAutomapper
      */
     'id': string;
     /**
      * 
      * @type {string}
-     * @memberof PersonResponse
+     * @memberof PersonResponseAutomapper
      */
     'referrer': string;
     /**
      * 
      * @type {string}
-     * @memberof PersonResponse
+     * @memberof PersonResponseAutomapper
      */
     'mandant': string;
     /**
      * 
      * @type {PersonNameParams}
-     * @memberof PersonResponse
+     * @memberof PersonResponseAutomapper
      */
     'name': PersonNameParams;
     /**
      * 
      * @type {PersonBirthParams}
-     * @memberof PersonResponse
+     * @memberof PersonResponseAutomapper
      */
     'geburt': PersonBirthParams;
     /**
      * 
      * @type {string}
-     * @memberof PersonResponse
+     * @memberof PersonResponseAutomapper
      */
     'stammorganisation': string;
     /**
      * 
      * @type {string}
-     * @memberof PersonResponse
+     * @memberof PersonResponseAutomapper
      */
     'geschlecht': string;
     /**
      * 
      * @type {string}
-     * @memberof PersonResponse
+     * @memberof PersonResponseAutomapper
      */
     'lokalisierung': string;
     /**
      * 
      * @type {string}
-     * @memberof PersonResponse
+     * @memberof PersonResponseAutomapper
      */
-    'vertrauensstufe': PersonResponseVertrauensstufeEnum;
+    'vertrauensstufe': PersonResponseAutomapperVertrauensstufeEnum;
     /**
      * 
      * @type {string}
-     * @memberof PersonResponse
+     * @memberof PersonResponseAutomapper
      */
     'revision': string;
     /**
      * Initiales Benutzerpasswort, muss nach der ersten Anmeldung geändert werden
      * @type {string}
-     * @memberof PersonResponse
+     * @memberof PersonResponseAutomapper
      */
     'startpasswort': string;
 }
 
-export const PersonResponseVertrauensstufeEnum = {
+export const PersonResponseAutomapperVertrauensstufeEnum = {
     Kein: 'KEIN',
     Unbe: 'UNBE',
     Teil: 'TEIL',
     Voll: 'VOLL'
 } as const;
 
-export type PersonResponseVertrauensstufeEnum = typeof PersonResponseVertrauensstufeEnum[keyof typeof PersonResponseVertrauensstufeEnum];
+export type PersonResponseAutomapperVertrauensstufeEnum = typeof PersonResponseAutomapperVertrauensstufeEnum[keyof typeof PersonResponseAutomapperVertrauensstufeEnum];
 
 /**
  * 
@@ -632,14 +698,27 @@ export type PersonResponseVertrauensstufeEnum = typeof PersonResponseVertrauenss
 export interface PersonendatensatzResponse {
     /**
      * 
-     * @type {PersonResponse}
+     * @type {object}
      * @memberof PersonendatensatzResponse
      */
-    'person': PersonResponse;
+    'person': object;
+}
+/**
+ * 
+ * @export
+ * @interface PersonendatensatzResponseAutomapper
+ */
+export interface PersonendatensatzResponseAutomapper {
+    /**
+     * 
+     * @type {PersonResponseAutomapper}
+     * @memberof PersonendatensatzResponseAutomapper
+     */
+    'person': PersonResponseAutomapper;
     /**
      * 
      * @type {Array<PersonenkontextResponse>}
-     * @memberof PersonendatensatzResponse
+     * @memberof PersonendatensatzResponseAutomapper
      */
     'personenkontexte': Array<PersonenkontextResponse>;
 }
@@ -789,6 +868,12 @@ export interface RolleResponse {
      * @memberof RolleResponse
      */
     'merkmale': Set<RolleResponseMerkmaleEnum>;
+    /**
+     * 
+     * @type {Set<string>}
+     * @memberof RolleResponse
+     */
+    'systemrechte': Set<RolleResponseSystemrechteEnum>;
 }
 
 export const RolleResponseRollenartEnum = {
@@ -807,6 +892,11 @@ export const RolleResponseMerkmaleEnum = {
 } as const;
 
 export type RolleResponseMerkmaleEnum = typeof RolleResponseMerkmaleEnum[keyof typeof RolleResponseMerkmaleEnum];
+export const RolleResponseSystemrechteEnum = {
+    RollenVerwalten: 'ROLLEN_VERWALTEN'
+} as const;
+
+export type RolleResponseSystemrechteEnum = typeof RolleResponseSystemrechteEnum[keyof typeof RolleResponseSystemrechteEnum];
 
 /**
  * 
@@ -867,6 +957,19 @@ export interface ServiceProviderResponse {
 /**
  * 
  * @export
+ * @interface SystemrechtResponse
+ */
+export interface SystemrechtResponse {
+    /**
+     * 
+     * @type {Array<OrganisationResponse>}
+     * @memberof SystemrechtResponse
+     */
+    'ROLLEN_VERWALTEN': Array<OrganisationResponse>;
+}
+/**
+ * 
+ * @export
  * @interface UpdateOrganisationBodyParams
  */
 export interface UpdateOrganisationBodyParams {
@@ -883,11 +986,11 @@ export interface UpdateOrganisationBodyParams {
      */
     'zugehoerigZu'?: string;
     /**
-     * 
+     * Required, if `typ` is equal to `SCHULE`
      * @type {string}
      * @memberof UpdateOrganisationBodyParams
      */
-    'kennung': string;
+    'kennung'?: string;
     /**
      * 
      * @type {string}
@@ -899,13 +1002,13 @@ export interface UpdateOrganisationBodyParams {
      * @type {string}
      * @memberof UpdateOrganisationBodyParams
      */
-    'namensergaenzung': string;
+    'namensergaenzung'?: string;
     /**
      * 
      * @type {string}
      * @memberof UpdateOrganisationBodyParams
      */
-    'kuerzel': string;
+    'kuerzel'?: string;
     /**
      * 
      * @type {string}
@@ -921,6 +1024,7 @@ export interface UpdateOrganisationBodyParams {
 }
 
 export const UpdateOrganisationBodyParamsTypEnum = {
+    Traeger: 'TRAEGER',
     Schule: 'SCHULE',
     Anbieter: 'ANBIETER',
     SonstigeOrganisationEinrichtung: 'SONSTIGE ORGANISATION / EINRICHTUNG',
@@ -1017,6 +1121,58 @@ export const UpdatePersonBodyParamsVertrauensstufeEnum = {
 } as const;
 
 export type UpdatePersonBodyParamsVertrauensstufeEnum = typeof UpdatePersonBodyParamsVertrauensstufeEnum[keyof typeof UpdatePersonBodyParamsVertrauensstufeEnum];
+
+/**
+ * 
+ * @export
+ * @interface UpdatePersonenkontextBodyParams
+ */
+export interface UpdatePersonenkontextBodyParams {
+    /**
+     * The new referrer of the personenkontext.
+     * @type {string}
+     * @memberof UpdatePersonenkontextBodyParams
+     */
+    'referrer'?: string;
+    /**
+     * The new personenstatus of the personenkontext.
+     * @type {string}
+     * @memberof UpdatePersonenkontextBodyParams
+     */
+    'personenstatus'?: UpdatePersonenkontextBodyParamsPersonenstatusEnum;
+    /**
+     * The new jahrgangsstufe of the personenkontext.
+     * @type {string}
+     * @memberof UpdatePersonenkontextBodyParams
+     */
+    'jahrgangsstufe'?: UpdatePersonenkontextBodyParamsJahrgangsstufeEnum;
+    /**
+     * The revision of the personenkontext.
+     * @type {string}
+     * @memberof UpdatePersonenkontextBodyParams
+     */
+    'revision': string;
+}
+
+export const UpdatePersonenkontextBodyParamsPersonenstatusEnum = {
+    Aktiv: 'AKTIV'
+} as const;
+
+export type UpdatePersonenkontextBodyParamsPersonenstatusEnum = typeof UpdatePersonenkontextBodyParamsPersonenstatusEnum[keyof typeof UpdatePersonenkontextBodyParamsPersonenstatusEnum];
+export const UpdatePersonenkontextBodyParamsJahrgangsstufeEnum = {
+    _01: '01',
+    _02: '02',
+    _03: '03',
+    _04: '04',
+    _05: '05',
+    _06: '06',
+    _07: '07',
+    _08: '08',
+    _09: '09',
+    _10: '10'
+} as const;
+
+export type UpdatePersonenkontextBodyParamsJahrgangsstufeEnum = typeof UpdatePersonenkontextBodyParamsJahrgangsstufeEnum[keyof typeof UpdatePersonenkontextBodyParamsJahrgangsstufeEnum];
 
 /**
  * 
@@ -1570,11 +1726,11 @@ export const OrganisationenApiAxiosParamCreator = function (configuration?: Conf
          * @param {number} [limit] The requested limit for the page size.
          * @param {string} [kennung] 
          * @param {string} [name] 
-         * @param {'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT'} [typ] 
+         * @param {'TRAEGER' | 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT'} [typ] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        organisationControllerFindOrganizations: async (offset?: number, limit?: number, kennung?: string, name?: string, typ?: 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        organisationControllerFindOrganizations: async (offset?: number, limit?: number, kennung?: string, name?: string, typ?: 'TRAEGER' | 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/organisationen`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -1830,11 +1986,11 @@ export const OrganisationenApiFp = function(configuration?: Configuration) {
          * @param {number} [limit] The requested limit for the page size.
          * @param {string} [kennung] 
          * @param {string} [name] 
-         * @param {'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT'} [typ] 
+         * @param {'TRAEGER' | 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT'} [typ] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, typ?: 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<OrganisationResponse>>> {
+        async organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, typ?: 'TRAEGER' | 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<OrganisationResponse>>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.organisationControllerFindOrganizations(offset, limit, kennung, name, typ, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -1932,11 +2088,11 @@ export const OrganisationenApiFactory = function (configuration?: Configuration,
          * @param {number} [limit] The requested limit for the page size.
          * @param {string} [kennung] 
          * @param {string} [name] 
-         * @param {'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT'} [typ] 
+         * @param {'TRAEGER' | 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT'} [typ] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, typ?: 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', options?: any): AxiosPromise<Array<OrganisationResponse>> {
+        organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, typ?: 'TRAEGER' | 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', options?: any): AxiosPromise<Array<OrganisationResponse>> {
             return localVarFp.organisationControllerFindOrganizations(offset, limit, kennung, name, typ, options).then((request) => request(axios, basePath));
         },
         /**
@@ -2028,12 +2184,12 @@ export interface OrganisationenApiInterface {
      * @param {number} [limit] The requested limit for the page size.
      * @param {string} [kennung] 
      * @param {string} [name] 
-     * @param {'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT'} [typ] 
+     * @param {'TRAEGER' | 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT'} [typ] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrganisationenApiInterface
      */
-    organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, typ?: 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', options?: AxiosRequestConfig): AxiosPromise<Array<OrganisationResponse>>;
+    organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, typ?: 'TRAEGER' | 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', options?: AxiosRequestConfig): AxiosPromise<Array<OrganisationResponse>>;
 
     /**
      * 
@@ -2132,12 +2288,12 @@ export class OrganisationenApi extends BaseAPI implements OrganisationenApiInter
      * @param {number} [limit] The requested limit for the page size.
      * @param {string} [kennung] 
      * @param {string} [name] 
-     * @param {'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT'} [typ] 
+     * @param {'TRAEGER' | 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT'} [typ] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrganisationenApi
      */
-    public organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, typ?: 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', options?: AxiosRequestConfig) {
+    public organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, typ?: 'TRAEGER' | 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', options?: AxiosRequestConfig) {
         return OrganisationenApiFp(this.configuration).organisationControllerFindOrganizations(offset, limit, kennung, name, typ, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -3056,6 +3212,508 @@ export class PersonenFrontendApi extends BaseAPI implements PersonenFrontendApiI
 
 
 /**
+ * PersonenkontexteApi - axios parameter creator
+ * @export
+ */
+export const PersonenkontexteApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * 
+         * @param {string} personenkontextId The id for the personenkontext.
+         * @param {DeleteRevisionBodyParams} deleteRevisionBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        personenkontextControllerDeletePersonenkontextById: async (personenkontextId: string, deleteRevisionBodyParams: DeleteRevisionBodyParams, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'personenkontextId' is not null or undefined
+            assertParamExists('personenkontextControllerDeletePersonenkontextById', 'personenkontextId', personenkontextId)
+            // verify required parameter 'deleteRevisionBodyParams' is not null or undefined
+            assertParamExists('personenkontextControllerDeletePersonenkontextById', 'deleteRevisionBodyParams', deleteRevisionBodyParams)
+            const localVarPath = `/api/personenkontexte/{personenkontextId}`
+                .replace(`{${"personenkontextId"}}`, encodeURIComponent(String(personenkontextId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(deleteRevisionBodyParams, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {string} personenkontextId The id for the personenkontext.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        personenkontextControllerFindPersonenkontextById: async (personenkontextId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'personenkontextId' is not null or undefined
+            assertParamExists('personenkontextControllerFindPersonenkontextById', 'personenkontextId', personenkontextId)
+            const localVarPath = `/api/personenkontexte/{personenkontextId}`
+                .replace(`{${"personenkontextId"}}`, encodeURIComponent(String(personenkontextId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {number} [offset] The offset of the paginated list.
+         * @param {number} [limit] The requested limit for the page size.
+         * @param {string} [referrer] 
+         * @param {'LERN' | 'LEHR' | 'EXTERN' | 'ORGADMIN' | 'LEIT' | 'SYSADMIN'} [rolle] 
+         * @param {'AKTIV'} [personenstatus] 
+         * @param {'ja' | 'nein'} [sichtfreigabe] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        personenkontextControllerFindPersonenkontexte: async (offset?: number, limit?: number, referrer?: string, rolle?: 'LERN' | 'LEHR' | 'EXTERN' | 'ORGADMIN' | 'LEIT' | 'SYSADMIN', personenstatus?: 'AKTIV', sichtfreigabe?: 'ja' | 'nein', options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/personenkontexte`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (offset !== undefined) {
+                localVarQueryParameter['offset'] = offset;
+            }
+
+            if (limit !== undefined) {
+                localVarQueryParameter['limit'] = limit;
+            }
+
+            if (referrer !== undefined) {
+                localVarQueryParameter['referrer'] = referrer;
+            }
+
+            if (rolle !== undefined) {
+                localVarQueryParameter['rolle'] = rolle;
+            }
+
+            if (personenstatus !== undefined) {
+                localVarQueryParameter['personenstatus'] = personenstatus;
+            }
+
+            if (sichtfreigabe !== undefined) {
+                localVarQueryParameter['sichtfreigabe'] = sichtfreigabe;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {string} personId The id for the account.
+         * @param {HatSystemrechtBodyParams} hatSystemrechtBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        personenkontextControllerHatSystemRecht: async (personId: string, hatSystemrechtBodyParams: HatSystemrechtBodyParams, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'personId' is not null or undefined
+            assertParamExists('personenkontextControllerHatSystemRecht', 'personId', personId)
+            // verify required parameter 'hatSystemrechtBodyParams' is not null or undefined
+            assertParamExists('personenkontextControllerHatSystemRecht', 'hatSystemrechtBodyParams', hatSystemrechtBodyParams)
+            const localVarPath = `/api/personenkontexte/{personId}/hatSystemrecht`
+                .replace(`{${"personId"}}`, encodeURIComponent(String(personId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(hatSystemrechtBodyParams, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {string} personenkontextId The id for the personenkontext.
+         * @param {UpdatePersonenkontextBodyParams} updatePersonenkontextBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        personenkontextControllerUpdatePersonenkontextWithId: async (personenkontextId: string, updatePersonenkontextBodyParams: UpdatePersonenkontextBodyParams, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'personenkontextId' is not null or undefined
+            assertParamExists('personenkontextControllerUpdatePersonenkontextWithId', 'personenkontextId', personenkontextId)
+            // verify required parameter 'updatePersonenkontextBodyParams' is not null or undefined
+            assertParamExists('personenkontextControllerUpdatePersonenkontextWithId', 'updatePersonenkontextBodyParams', updatePersonenkontextBodyParams)
+            const localVarPath = `/api/personenkontexte/{personenkontextId}`
+                .replace(`{${"personenkontextId"}}`, encodeURIComponent(String(personenkontextId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(updatePersonenkontextBodyParams, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * PersonenkontexteApi - functional programming interface
+ * @export
+ */
+export const PersonenkontexteApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = PersonenkontexteApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * 
+         * @param {string} personenkontextId The id for the personenkontext.
+         * @param {DeleteRevisionBodyParams} deleteRevisionBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async personenkontextControllerDeletePersonenkontextById(personenkontextId: string, deleteRevisionBodyParams: DeleteRevisionBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.personenkontextControllerDeletePersonenkontextById(personenkontextId, deleteRevisionBodyParams, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @param {string} personenkontextId The id for the personenkontext.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async personenkontextControllerFindPersonenkontextById(personenkontextId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonendatensatzResponseAutomapper>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.personenkontextControllerFindPersonenkontextById(personenkontextId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @param {number} [offset] The offset of the paginated list.
+         * @param {number} [limit] The requested limit for the page size.
+         * @param {string} [referrer] 
+         * @param {'LERN' | 'LEHR' | 'EXTERN' | 'ORGADMIN' | 'LEIT' | 'SYSADMIN'} [rolle] 
+         * @param {'AKTIV'} [personenstatus] 
+         * @param {'ja' | 'nein'} [sichtfreigabe] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async personenkontextControllerFindPersonenkontexte(offset?: number, limit?: number, referrer?: string, rolle?: 'LERN' | 'LEHR' | 'EXTERN' | 'ORGADMIN' | 'LEIT' | 'SYSADMIN', personenstatus?: 'AKTIV', sichtfreigabe?: 'ja' | 'nein', options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<PersonendatensatzResponseAutomapper>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.personenkontextControllerFindPersonenkontexte(offset, limit, referrer, rolle, personenstatus, sichtfreigabe, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @param {string} personId The id for the account.
+         * @param {HatSystemrechtBodyParams} hatSystemrechtBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async personenkontextControllerHatSystemRecht(personId: string, hatSystemrechtBodyParams: HatSystemrechtBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SystemrechtResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.personenkontextControllerHatSystemRecht(personId, hatSystemrechtBodyParams, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @param {string} personenkontextId The id for the personenkontext.
+         * @param {UpdatePersonenkontextBodyParams} updatePersonenkontextBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async personenkontextControllerUpdatePersonenkontextWithId(personenkontextId: string, updatePersonenkontextBodyParams: UpdatePersonenkontextBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonenkontextResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.personenkontextControllerUpdatePersonenkontextWithId(personenkontextId, updatePersonenkontextBodyParams, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+    }
+};
+
+/**
+ * PersonenkontexteApi - factory interface
+ * @export
+ */
+export const PersonenkontexteApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = PersonenkontexteApiFp(configuration)
+    return {
+        /**
+         * 
+         * @param {string} personenkontextId The id for the personenkontext.
+         * @param {DeleteRevisionBodyParams} deleteRevisionBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        personenkontextControllerDeletePersonenkontextById(personenkontextId: string, deleteRevisionBodyParams: DeleteRevisionBodyParams, options?: any): AxiosPromise<void> {
+            return localVarFp.personenkontextControllerDeletePersonenkontextById(personenkontextId, deleteRevisionBodyParams, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {string} personenkontextId The id for the personenkontext.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        personenkontextControllerFindPersonenkontextById(personenkontextId: string, options?: any): AxiosPromise<PersonendatensatzResponseAutomapper> {
+            return localVarFp.personenkontextControllerFindPersonenkontextById(personenkontextId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {number} [offset] The offset of the paginated list.
+         * @param {number} [limit] The requested limit for the page size.
+         * @param {string} [referrer] 
+         * @param {'LERN' | 'LEHR' | 'EXTERN' | 'ORGADMIN' | 'LEIT' | 'SYSADMIN'} [rolle] 
+         * @param {'AKTIV'} [personenstatus] 
+         * @param {'ja' | 'nein'} [sichtfreigabe] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        personenkontextControllerFindPersonenkontexte(offset?: number, limit?: number, referrer?: string, rolle?: 'LERN' | 'LEHR' | 'EXTERN' | 'ORGADMIN' | 'LEIT' | 'SYSADMIN', personenstatus?: 'AKTIV', sichtfreigabe?: 'ja' | 'nein', options?: any): AxiosPromise<Array<PersonendatensatzResponseAutomapper>> {
+            return localVarFp.personenkontextControllerFindPersonenkontexte(offset, limit, referrer, rolle, personenstatus, sichtfreigabe, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {string} personId The id for the account.
+         * @param {HatSystemrechtBodyParams} hatSystemrechtBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        personenkontextControllerHatSystemRecht(personId: string, hatSystemrechtBodyParams: HatSystemrechtBodyParams, options?: any): AxiosPromise<SystemrechtResponse> {
+            return localVarFp.personenkontextControllerHatSystemRecht(personId, hatSystemrechtBodyParams, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {string} personenkontextId The id for the personenkontext.
+         * @param {UpdatePersonenkontextBodyParams} updatePersonenkontextBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        personenkontextControllerUpdatePersonenkontextWithId(personenkontextId: string, updatePersonenkontextBodyParams: UpdatePersonenkontextBodyParams, options?: any): AxiosPromise<PersonenkontextResponse> {
+            return localVarFp.personenkontextControllerUpdatePersonenkontextWithId(personenkontextId, updatePersonenkontextBodyParams, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * PersonenkontexteApi - interface
+ * @export
+ * @interface PersonenkontexteApi
+ */
+export interface PersonenkontexteApiInterface {
+    /**
+     * 
+     * @param {string} personenkontextId The id for the personenkontext.
+     * @param {DeleteRevisionBodyParams} deleteRevisionBodyParams 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PersonenkontexteApiInterface
+     */
+    personenkontextControllerDeletePersonenkontextById(personenkontextId: string, deleteRevisionBodyParams: DeleteRevisionBodyParams, options?: AxiosRequestConfig): AxiosPromise<void>;
+
+    /**
+     * 
+     * @param {string} personenkontextId The id for the personenkontext.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PersonenkontexteApiInterface
+     */
+    personenkontextControllerFindPersonenkontextById(personenkontextId: string, options?: AxiosRequestConfig): AxiosPromise<PersonendatensatzResponseAutomapper>;
+
+    /**
+     * 
+     * @param {number} [offset] The offset of the paginated list.
+     * @param {number} [limit] The requested limit for the page size.
+     * @param {string} [referrer] 
+     * @param {'LERN' | 'LEHR' | 'EXTERN' | 'ORGADMIN' | 'LEIT' | 'SYSADMIN'} [rolle] 
+     * @param {'AKTIV'} [personenstatus] 
+     * @param {'ja' | 'nein'} [sichtfreigabe] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PersonenkontexteApiInterface
+     */
+    personenkontextControllerFindPersonenkontexte(offset?: number, limit?: number, referrer?: string, rolle?: 'LERN' | 'LEHR' | 'EXTERN' | 'ORGADMIN' | 'LEIT' | 'SYSADMIN', personenstatus?: 'AKTIV', sichtfreigabe?: 'ja' | 'nein', options?: AxiosRequestConfig): AxiosPromise<Array<PersonendatensatzResponseAutomapper>>;
+
+    /**
+     * 
+     * @param {string} personId The id for the account.
+     * @param {HatSystemrechtBodyParams} hatSystemrechtBodyParams 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PersonenkontexteApiInterface
+     */
+    personenkontextControllerHatSystemRecht(personId: string, hatSystemrechtBodyParams: HatSystemrechtBodyParams, options?: AxiosRequestConfig): AxiosPromise<SystemrechtResponse>;
+
+    /**
+     * 
+     * @param {string} personenkontextId The id for the personenkontext.
+     * @param {UpdatePersonenkontextBodyParams} updatePersonenkontextBodyParams 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PersonenkontexteApiInterface
+     */
+    personenkontextControllerUpdatePersonenkontextWithId(personenkontextId: string, updatePersonenkontextBodyParams: UpdatePersonenkontextBodyParams, options?: AxiosRequestConfig): AxiosPromise<PersonenkontextResponse>;
+
+}
+
+/**
+ * PersonenkontexteApi - object-oriented interface
+ * @export
+ * @class PersonenkontexteApi
+ * @extends {BaseAPI}
+ */
+export class PersonenkontexteApi extends BaseAPI implements PersonenkontexteApiInterface {
+    /**
+     * 
+     * @param {string} personenkontextId The id for the personenkontext.
+     * @param {DeleteRevisionBodyParams} deleteRevisionBodyParams 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PersonenkontexteApi
+     */
+    public personenkontextControllerDeletePersonenkontextById(personenkontextId: string, deleteRevisionBodyParams: DeleteRevisionBodyParams, options?: AxiosRequestConfig) {
+        return PersonenkontexteApiFp(this.configuration).personenkontextControllerDeletePersonenkontextById(personenkontextId, deleteRevisionBodyParams, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {string} personenkontextId The id for the personenkontext.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PersonenkontexteApi
+     */
+    public personenkontextControllerFindPersonenkontextById(personenkontextId: string, options?: AxiosRequestConfig) {
+        return PersonenkontexteApiFp(this.configuration).personenkontextControllerFindPersonenkontextById(personenkontextId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {number} [offset] The offset of the paginated list.
+     * @param {number} [limit] The requested limit for the page size.
+     * @param {string} [referrer] 
+     * @param {'LERN' | 'LEHR' | 'EXTERN' | 'ORGADMIN' | 'LEIT' | 'SYSADMIN'} [rolle] 
+     * @param {'AKTIV'} [personenstatus] 
+     * @param {'ja' | 'nein'} [sichtfreigabe] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PersonenkontexteApi
+     */
+    public personenkontextControllerFindPersonenkontexte(offset?: number, limit?: number, referrer?: string, rolle?: 'LERN' | 'LEHR' | 'EXTERN' | 'ORGADMIN' | 'LEIT' | 'SYSADMIN', personenstatus?: 'AKTIV', sichtfreigabe?: 'ja' | 'nein', options?: AxiosRequestConfig) {
+        return PersonenkontexteApiFp(this.configuration).personenkontextControllerFindPersonenkontexte(offset, limit, referrer, rolle, personenstatus, sichtfreigabe, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {string} personId The id for the account.
+     * @param {HatSystemrechtBodyParams} hatSystemrechtBodyParams 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PersonenkontexteApi
+     */
+    public personenkontextControllerHatSystemRecht(personId: string, hatSystemrechtBodyParams: HatSystemrechtBodyParams, options?: AxiosRequestConfig) {
+        return PersonenkontexteApiFp(this.configuration).personenkontextControllerHatSystemRecht(personId, hatSystemrechtBodyParams, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {string} personenkontextId The id for the personenkontext.
+     * @param {UpdatePersonenkontextBodyParams} updatePersonenkontextBodyParams 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PersonenkontexteApi
+     */
+    public personenkontextControllerUpdatePersonenkontextWithId(personenkontextId: string, updatePersonenkontextBodyParams: UpdatePersonenkontextBodyParams, options?: AxiosRequestConfig) {
+        return PersonenkontexteApiFp(this.configuration).personenkontextControllerUpdatePersonenkontextWithId(personenkontextId, updatePersonenkontextBodyParams, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+/**
  * ProviderApi - axios parameter creator
  * @export
  */
@@ -3252,6 +3910,50 @@ export class ProviderApi extends BaseAPI implements ProviderApiInterface {
 export const RolleApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
+         * Add systemrecht to a rolle.
+         * @summary 
+         * @param {string} rolleId The id for the rolle.
+         * @param {AddSystemrechtBodyParams} addSystemrechtBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rolleControllerAddSystemRecht: async (rolleId: string, addSystemrechtBodyParams: AddSystemrechtBodyParams, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'rolleId' is not null or undefined
+            assertParamExists('rolleControllerAddSystemRecht', 'rolleId', rolleId)
+            // verify required parameter 'addSystemrechtBodyParams' is not null or undefined
+            assertParamExists('rolleControllerAddSystemRecht', 'addSystemrechtBodyParams', addSystemrechtBodyParams)
+            const localVarPath = `/api/rolle/{rolleId}`
+                .replace(`{${"rolleId"}}`, encodeURIComponent(String(rolleId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(addSystemrechtBodyParams, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Create a new rolle.
          * @summary 
          * @param {CreateRolleBodyParams} createRolleBodyParams 
@@ -3336,6 +4038,18 @@ export const RolleApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = RolleApiAxiosParamCreator(configuration)
     return {
         /**
+         * Add systemrecht to a rolle.
+         * @summary 
+         * @param {string} rolleId The id for the rolle.
+         * @param {AddSystemrechtBodyParams} addSystemrechtBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async rolleControllerAddSystemRecht(rolleId: string, addSystemrechtBodyParams: AddSystemrechtBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.rolleControllerAddSystemRecht(rolleId, addSystemrechtBodyParams, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
          * Create a new rolle.
          * @summary 
          * @param {CreateRolleBodyParams} createRolleBodyParams 
@@ -3367,6 +4081,17 @@ export const RolleApiFactory = function (configuration?: Configuration, basePath
     const localVarFp = RolleApiFp(configuration)
     return {
         /**
+         * Add systemrecht to a rolle.
+         * @summary 
+         * @param {string} rolleId The id for the rolle.
+         * @param {AddSystemrechtBodyParams} addSystemrechtBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rolleControllerAddSystemRecht(rolleId: string, addSystemrechtBodyParams: AddSystemrechtBodyParams, options?: any): AxiosPromise<void> {
+            return localVarFp.rolleControllerAddSystemRecht(rolleId, addSystemrechtBodyParams, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Create a new rolle.
          * @summary 
          * @param {CreateRolleBodyParams} createRolleBodyParams 
@@ -3395,6 +4120,17 @@ export const RolleApiFactory = function (configuration?: Configuration, basePath
  */
 export interface RolleApiInterface {
     /**
+     * Add systemrecht to a rolle.
+     * @summary 
+     * @param {string} rolleId The id for the rolle.
+     * @param {AddSystemrechtBodyParams} addSystemrechtBodyParams 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RolleApiInterface
+     */
+    rolleControllerAddSystemRecht(rolleId: string, addSystemrechtBodyParams: AddSystemrechtBodyParams, options?: AxiosRequestConfig): AxiosPromise<void>;
+
+    /**
      * Create a new rolle.
      * @summary 
      * @param {CreateRolleBodyParams} createRolleBodyParams 
@@ -3422,6 +4158,19 @@ export interface RolleApiInterface {
  * @extends {BaseAPI}
  */
 export class RolleApi extends BaseAPI implements RolleApiInterface {
+    /**
+     * Add systemrecht to a rolle.
+     * @summary 
+     * @param {string} rolleId The id for the rolle.
+     * @param {AddSystemrechtBodyParams} addSystemrechtBodyParams 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RolleApi
+     */
+    public rolleControllerAddSystemRecht(rolleId: string, addSystemrechtBodyParams: AddSystemrechtBodyParams, options?: AxiosRequestConfig) {
+        return RolleApiFp(this.configuration).rolleControllerAddSystemRecht(rolleId, addSystemrechtBodyParams, options).then((request) => request(this.axios, this.basePath));
+    }
+
     /**
      * Create a new rolle.
      * @summary 
