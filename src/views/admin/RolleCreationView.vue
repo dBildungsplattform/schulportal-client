@@ -384,7 +384,7 @@
             </FormRow>
             <!-- Checkbox to assign the right "ROLLE VERWALTEN" to the rolle -->
             <v-row>
-              <h3 class="headline-3">5. {{ $t('admin.rolle.assignSystemRight') }}</h3>
+              <h3 class="headline-3">5. {{ $t('admin.rolle.assignSystemrechte') }}</h3>
             </v-row>
             <!-- Iterate over each system right and create a checkbox for it -->
             <FormRow
