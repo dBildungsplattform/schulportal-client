@@ -1,7 +1,7 @@
 <script setup lang="ts">
-  import { type RouteLocationNormalizedLoaded, useRoute } from 'vue-router'
+  import { type RouteLocationNormalizedLoaded, useRoute } from 'vue-router';
 
-  const route: RouteLocationNormalizedLoaded = useRoute()
+  const route: RouteLocationNormalizedLoaded = useRoute();
 </script>
 
 <template>

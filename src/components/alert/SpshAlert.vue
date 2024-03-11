@@ -1,29 +1,29 @@
 <script setup lang="ts">
   defineProps<{
-    modelValue: boolean
-    title: string
-    text: string
-    showButton?: boolean
-    buttonText?: string
-    buttonAction?: Function
-    type: 'error' | 'success' | 'warning' | 'info' | undefined
-    closable?: boolean
-  }>()
+    modelValue: boolean;
+    title: string;
+    text: string;
+    showButton?: boolean;
+    buttonText?: string;
+    buttonAction?: Function;
+    type: 'error' | 'success' | 'warning' | 'info' | undefined;
+    closable?: boolean;
+  }>();
 
   type Emits = {
-    (event: 'update:modelValue', value: boolean): void
-  }
+    (event: 'update:modelValue', value: boolean): void;
+  };
   const emit: Emits = defineEmits<{
-    (event: 'update:modelValue', value: boolean): void
-  }>()
+    (event: 'update:modelValue', value: boolean): void;
+  }>();
 
   const closeAlert = (): void => {
-    emit('update:modelValue', false) // Emit the event to update modelValue
-  }
+    emit('update:modelValue', false); // Emit the event to update modelValue
+  };
 </script>
 
 <template>
-  <v-container>
+  <v-container v-if="modelValue">
     <v-slide-y-transition>
       <v-alert
         :model-value="modelValue"

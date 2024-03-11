@@ -1,12 +1,12 @@
 <script setup lang="ts">
   defineProps<{
-    href?: string
-    newTab?: boolean
-    testId: string
-    title: string
-    to?: string
-    variant?: NonNullable<'flat' | 'text' | 'elevated' | 'tonal' | 'outlined' | 'plain'>
-  }>()
+    href?: string;
+    newTab?: boolean;
+    testId: string;
+    title: string;
+    to?: string;
+    variant?: NonNullable<'flat' | 'text' | 'elevated' | 'tonal' | 'outlined' | 'plain'>;
+  }>();
 </script>
 
 <template>

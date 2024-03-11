@@ -1,9 +1,9 @@
 <script setup lang="ts">
-  import { useServiceProviderStore, type ServiceProviderStore } from '@/stores/ServiceProviderStore'
-  import ServiceProviderCard from '@/components/cards/ServiceProviderCard.vue'
+  import { useServiceProviderStore, type ServiceProviderStore } from '@/stores/ServiceProviderStore';
+  import ServiceProviderCard from '@/components/cards/ServiceProviderCard.vue';
 
-  const serviceProviderStore: ServiceProviderStore = useServiceProviderStore()
-  serviceProviderStore.getAllServiceProviders()
+  const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
+  serviceProviderStore.getAllServiceProviders();
 </script>
 
 <template>

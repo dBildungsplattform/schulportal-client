@@ -1,21 +1,23 @@
 import { expect, test } from 'vitest';
 import { VueWrapper, mount } from '@vue/test-utils';
-import LandingView from './LandingView.vue';
+import SchuleManagementView from './SchuleManagementView.vue';
+import { setActivePinia, createPinia } from 'pinia';
 
 let wrapper: VueWrapper | null = null;
 
 beforeEach(() => {
+  setActivePinia(createPinia());
   document.body.innerHTML = `
     <div>
       <div id="app"></div>
     </div>
   `;
 
-  wrapper = mount(LandingView, {
+  wrapper = mount(SchuleManagementView, {
     attachTo: document.getElementById('app') || '',
     global: {
       components: {
-        LandingView,
+        SchuleManagementView,
       },
       mocks: {
         route: {
@@ -26,8 +28,8 @@ beforeEach(() => {
   });
 });
 
-describe('LandingView', () => {
-  test('it renders the login card', () => {
-    expect(wrapper?.find('[data-testid="login-card"]').isVisible()).toBe(true);
+describe('SchuleManagementView', () => {
+  test('it renders the schule management view', () => {
+    expect(wrapper?.find('[data-testid="schule-table"]').isVisible()).toBe(true);
   });
 });
