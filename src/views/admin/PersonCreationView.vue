@@ -37,6 +37,8 @@
 
   const validationSchema: TypedSchema = toTypedSchema(
     object({
+      selectedRolle: string()
+        .required(t('admin.rolle.rules.rolle.required')),
       selectedVorname: string()
         .matches(/^[A-Za-z]*[A-Za-zÀ-ÖØ-öø-ÿ-' ]*$/, t('admin.person.rules.vorname.matches'))
         .min(2, t('admin.person.rules.vorname.min'))
@@ -45,6 +47,8 @@
         .matches(/^[A-Za-z]*[A-Za-zÀ-ÖØ-öø-ÿ-' ]*$/, t('admin.person.rules.familienname.matches'))
         .min(2, t('admin.person.rules.familienname.min'))
         .required(t('admin.person.rules.familienname.required')),
+        selectedOrganisation: string()
+        .required(t('admin.organisation.rules.organisation.required')),
     }),
   );
 
@@ -239,6 +243,7 @@
             item-value="value"
             item-text="title"
             :placeholder="$t('admin.rolle.selectRolle')"
+            required="true"
             variant="outlined"
             v-bind="selectedRolleProps"
             v-model="selectedRolle"
@@ -296,6 +301,7 @@
           </v-row>
           <FormRow
             :errorLabel="selectedOrganisationProps['error']"
+            :isRequired="true"
             labelForId="organisation-select"
             :label="$t('admin.organisation.assignOrganisation')"
           >
@@ -308,6 +314,7 @@
               item-value="value"
               item-text="title"
               :placeholder="$t('admin.organisation.selectOrganisation')"
+              required="true"
               variant="outlined"
               v-bind="selectedOrganisationProps"
               v-model="selectedOrganisation"
@@ -369,6 +376,14 @@
           <v-col class="text-body">
             <PasswordOutput :password="personStore.createdPerson.person.startpasswort"></PasswordOutput>
           </v-col>
+        </v-row>
+        <v-row>
+          <v-col class="text-body bold text-right"> {{ $t('admin.rolle.rolle') }}: </v-col>
+          <v-col class="text-body"> {{ personStore.createdPersonenkontext?.rolleId }}</v-col>
+        </v-row>
+        <v-row>
+          <v-col class="text-body bold text-right"> {{ $t('admin.organisation.organisation') }}: </v-col>
+          <v-col class="text-body"> {{ personStore.createdPersonenkontext?.organisationId }}</v-col>
         </v-row>
         <v-divider
           class="border-opacity-100 rounded my-6"

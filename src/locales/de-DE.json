@@ -14,7 +14,13 @@
     },    
     "organisation": {
       "assignOrganisation": "Organisationsebene zuordnen",
-      "selectOrganisation": "Organisationsebene auswählen"
+      "organisation": "Organisationsebene",
+      "selectOrganisation": "Organisationsebene auswählen",
+      "rules": {
+        "organisation": {
+          "required": "Die Organisationsebene muss ausgewählt werden."
+        }
+      }
     },
     "rolle": {
       "addNew": "Neue Rolle hinzufügen",
@@ -51,6 +57,9 @@
       "rollenname": "Rollenname",
       "rolleAddedSuccessfully": "Die Rolle wurde erfolgreich hinzugefügt.",
       "rules": {
+        "rolle": {
+          "required": "Die Rolle muss ausgewählt werden."
+        },
         "rollenart": {
           "required": "Die Rollenart muss ausgewählt werden."
         },
