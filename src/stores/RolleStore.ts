@@ -31,7 +31,7 @@ type RolleActions = {
     schulStrukturKnoten: string,
     rollenArt: CreateRolleBodyParamsRollenartEnum,
     merkmale: CreateRolleBodyParamsMerkmaleEnum[],
-    systemrechte: CreateRolleBodyParamsSystemrechteEnum[]
+    systemrechte: CreateRolleBodyParamsSystemrechteEnum[],
   ) => Promise<RolleResponse>;
 };
 
@@ -39,7 +39,7 @@ export { CreateRolleBodyParamsRollenartEnum };
 export { CreateRolleBodyParamsMerkmaleEnum };
 export { RolleResponseMerkmaleEnum };
 export { RolleResponseRollenartEnum };
-export { RolleResponseSystemrechteEnum }
+export { RolleResponseSystemrechteEnum };
 export type { RolleResponse };
 
 export type RolleStore = Store<'rolleStore', RolleState, RolleGetters, RolleActions>;
@@ -60,7 +60,7 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
       schulStrukturKnoten: string,
       rollenArt: CreateRolleBodyParamsRollenartEnum,
       merkmale: CreateRolleBodyParamsMerkmaleEnum[],
-      systemrechte: CreateRolleBodyParamsSystemrechteEnum[]
+      systemrechte: CreateRolleBodyParamsSystemrechteEnum[],
     ): Promise<RolleResponse> {
       this.loading = true;
       try {
@@ -71,7 +71,7 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
           rollenart: rollenArt,
           // TODO Remove casting when generator issue is fixed from the server side
           merkmale: merkmale as unknown as Set<CreateRolleBodyParamsMerkmaleEnum>,
-          systemrechte: systemrechte as unknown as Set<CreateRolleBodyParamsSystemrechteEnum>
+          systemrechte: systemrechte as unknown as Set<CreateRolleBodyParamsSystemrechteEnum>,
         };
         const { data }: { data: RolleResponse } = await rolleApi.rolleControllerCreateRolle(createRolleBodyParams);
         this.loading = false;

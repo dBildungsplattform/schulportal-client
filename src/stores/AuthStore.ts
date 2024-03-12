@@ -44,7 +44,7 @@ export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, 
   id: 'authStore',
   state: (): AuthState => ({
     isAuthed: false as boolean,
-    currentUser: null
+    currentUser: null,
   }),
   actions: {
     async initializeAuthStatus() {

@@ -25,7 +25,6 @@ export type Person = {
 
 export type CreatedPerson = CreatePersonBodyParams;
 
-
 export type Personendatensatz = {
   person: Person;
 };
