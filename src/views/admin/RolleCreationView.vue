@@ -25,6 +25,7 @@
   import FormWrapper from '@/components/form/FormWrapper.vue';
   import FormRow from '@/components/form/FormRow.vue';
   import { useOrganisationStore, type OrganisationStore, type Organisation } from '@/stores/OrganisationStore';
+  import { DIN_91379A_EXT } from '@/validation';
 
   const { smAndDown }: { smAndDown: Ref<boolean> } = useDisplay();
   const rolleStore: RolleStore = useRolleStore();
@@ -44,6 +45,7 @@
       selectedRollenArt: string().required(t('admin.rolle.rules.rollenart.required')),
       selectedRollenName: string()
         .max(200, t('admin.rolle.rules.rollenname.length'))
+        .matches(DIN_91379A_EXT, t('admin.rolle.rules.rollenname.matches'))
         .required(t('admin.rolle.rules.rollenname.required')),
       selectedSchulstrukturknoten: string().required(t('admin.schulstrukturknoten.rules.required')),
     }),
