@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "spsh-client.deploymentName" . }}
+  name: {{ include "schulportal-client.name" . }}
   labels:
-    app: {{ template "spsh-client.name" . }}
+    app: {{ template "schulportal-client.name" . }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app: {{ template "spsh-client.name" . }}
+      app: {{ template "schulportal-client.name" . }}
   template:
     metadata:
       labels:
-        app: {{ template "spsh-client.name" . }}
+        app: {{ template "schulportal-client.name" . }}
     spec:
       containers:
-        - name: {{ template "spsh-client.name" . }}
+        - name: {{ template "schulportal-client.name" . }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ default "Always" .Values.image.pullPolicy | quote }}
           ports:

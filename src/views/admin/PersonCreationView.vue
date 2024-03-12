@@ -294,7 +294,6 @@
           <v-row>
             <h3 class="headline-3">3. {{ $t('admin.organisation.assignOrganisation') }}</h3>
           </v-row>
-          <!-- Vorname -->
           <FormRow
             :errorLabel="selectedOrganisationProps['error']"
             labelForId="organisation-select"
