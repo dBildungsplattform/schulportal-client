@@ -17,8 +17,7 @@ const mockPerson: Personendatensatz = {
       vorname: 'John',
     },
     referrer: 'jorton',
-  },
-  personenkontexte: [],
+  }
 };
 
 personStore.currentPerson = mockPerson;
