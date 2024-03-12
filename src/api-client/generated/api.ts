@@ -610,6 +610,89 @@ export interface PersonNameParams {
 /**
  * 
  * @export
+ * @interface PersonResponse
+ */
+export interface PersonResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonResponse
+     */
+    'id': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonResponse
+     */
+    'referrer': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonResponse
+     */
+    'mandant': string;
+    /**
+     * 
+     * @type {PersonNameParams}
+     * @memberof PersonResponse
+     */
+    'name': PersonNameParams;
+    /**
+     * 
+     * @type {PersonBirthParams}
+     * @memberof PersonResponse
+     */
+    'geburt': PersonBirthParams;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonResponse
+     */
+    'stammorganisation': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonResponse
+     */
+    'geschlecht': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonResponse
+     */
+    'lokalisierung': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonResponse
+     */
+    'vertrauensstufe': PersonResponseVertrauensstufeEnum;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonResponse
+     */
+    'revision': string;
+    /**
+     * Initiales Benutzerpasswort, muss nach der ersten Anmeldung geändert werden
+     * @type {string}
+     * @memberof PersonResponse
+     */
+    'startpasswort': string;
+}
+
+export const PersonResponseVertrauensstufeEnum = {
+    Kein: 'KEIN',
+    Unbe: 'UNBE',
+    Teil: 'TEIL',
+    Voll: 'VOLL'
+} as const;
+
+export type PersonResponseVertrauensstufeEnum = typeof PersonResponseVertrauensstufeEnum[keyof typeof PersonResponseVertrauensstufeEnum];
+
+/**
+ * 
+ * @export
  * @interface PersonResponseAutomapper
  */
 export interface PersonResponseAutomapper {
@@ -698,10 +781,10 @@ export type PersonResponseAutomapperVertrauensstufeEnum = typeof PersonResponseA
 export interface PersonendatensatzResponse {
     /**
      * 
-     * @type {object}
+     * @type {PersonResponse}
      * @memberof PersonendatensatzResponse
      */
-    'person': object;
+    'person': PersonResponse;
 }
 /**
  * 

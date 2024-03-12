@@ -2012,7 +2012,61 @@
             },
             "PersonResponse": {
                 "type": "object",
-                "properties": {}
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "referrer": {
+                        "type": "string"
+                    },
+                    "mandant": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "$ref": "#/components/schemas/PersonNameParams"
+                    },
+                    "geburt": {
+                        "$ref": "#/components/schemas/PersonBirthParams"
+                    },
+                    "stammorganisation": {
+                        "type": "string"
+                    },
+                    "geschlecht": {
+                        "type": "string"
+                    },
+                    "lokalisierung": {
+                        "type": "string"
+                    },
+                    "vertrauensstufe": {
+                        "type": "string",
+                        "enum": [
+                            "KEIN",
+                            "UNBE",
+                            "TEIL",
+                            "VOLL"
+                        ]
+                    },
+                    "revision": {
+                        "type": "string"
+                    },
+                    "startpasswort": {
+                        "type": "string",
+                        "description": "Initiales Benutzerpasswort, muss nach der ersten Anmeldung geändert werden"
+                    }
+                },
+                "required": [
+                    "id",
+                    "referrer",
+                    "mandant",
+                    "name",
+                    "geburt",
+                    "stammorganisation",
+                    "geschlecht",
+                    "lokalisierung",
+                    "vertrauensstufe",
+                    "revision",
+                    "startpasswort"
+                ]
             },
             "PersonendatensatzResponse": {
                 "type": "object",

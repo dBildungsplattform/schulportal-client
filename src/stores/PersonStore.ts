@@ -25,13 +25,9 @@ export type Person = {
 
 export type CreatedPerson = CreatePersonBodyParams;
 
-type Personenkontext = {
-  id: string;
-};
 
 export type Personendatensatz = {
   person: Person;
-  personenkontexte: Array<Personenkontext>;
 };
 
 type PersonState = {
