@@ -64,6 +64,7 @@ export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, 
         });
         this.currentUser = data;
       } catch {
+        // If retrieving user informations can't be done then consider the user unauthenticated.
         this.isAuthed = false;
       }
     },
