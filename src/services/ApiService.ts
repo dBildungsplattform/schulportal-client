@@ -16,7 +16,6 @@ axiosApiInstance.interceptors.response.use(
     if (error instanceof AxiosError && error.response?.status === HttpStatusCode.Unauthorized) {
       window.location.href = `/api/auth/login?redirectUrl=${location.href}`;
     }
-
     return Promise.reject(error);
   },
 );
