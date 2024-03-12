@@ -30,7 +30,7 @@
       >
         <ServiceProviderCard
           :href="serviceProvider.url"
-          :newTab="true"
+          :newTab="serviceProvider.id !== 'spsh-administration-service-provider'"
           :testId="`service-provider-card-${serviceProvider.id}`"
           :title="serviceProvider.name"
           :logoUrl="serviceProvider.logoUrl"
