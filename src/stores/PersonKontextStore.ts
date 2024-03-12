@@ -4,7 +4,6 @@ import {
   HatSystemrechtBodyParamsSystemRechtEnum,
   PersonenkontexteApiFactory,
   type HatSystemrechtBodyParams,
-  type OrganisationResponse,
   type PersonenkontexteApiInterface,
   type SystemrechtResponse,
 } from '../api-client/generated/api';
@@ -13,7 +12,6 @@ import axiosApiInstance from '@/services/ApiService';
 const personenKontextApi: PersonenkontexteApiInterface = PersonenkontexteApiFactory(undefined, '', axiosApiInstance);
 
 type PersonenkontextState = {
-  systemrechtsAdministrationsebenen: Array<OrganisationResponse>;
   errorCode: string;
   loading: boolean;
 };
@@ -27,6 +25,7 @@ type PersonenkontextActions = {
 };
 
 export { HatSystemrechtBodyParamsSystemRechtEnum };
+export type { SystemrechtResponse };
 
 export type PersonenkontextStore = Store<
   'personenkontextStore',
@@ -44,7 +43,6 @@ export const usePersonenkontextStore: StoreDefinition<
   id: 'personenkontextStore',
   state: (): PersonenkontextState => {
     return {
-      systemrechtsAdministrationsebenen: [],
       errorCode: '',
       loading: false,
     };
@@ -61,7 +59,6 @@ export const usePersonenkontextStore: StoreDefinition<
         };
         const { data }: { data: SystemrechtResponse } =
           await personenKontextApi.personenkontextControllerHatSystemRecht(personId, createSystemrechtBodyParams);
-        this.systemrechtsAdministrationsebenen = data.ROLLEN_VERWALTEN;
         return data;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';

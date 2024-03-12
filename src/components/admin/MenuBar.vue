@@ -4,6 +4,7 @@
     HatSystemrechtBodyParamsSystemRechtEnum,
     usePersonenkontextStore,
     type PersonenkontextStore,
+    type SystemrechtResponse,
   } from '@/stores/PersonKontextStore';
   import { type Ref, ref, type ComputedRef } from 'vue';
   import { onMounted } from 'vue';
@@ -16,6 +17,7 @@
   const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
 
   const hasRollenverwaltungRecht: Ref<boolean> = ref(false);
+  const systemrechte: Ref<SystemrechtResponse | null> = ref(null);
 
   function closeMenuOnMobile(): void {
     if (mobile.value) {
@@ -23,18 +25,23 @@
     }
   }
 
+  // Retrieves logged in user info on mounted and check using the user's sub if he has the right "ROLLEN_VERWALTEN". If not (error from the endpoint) then
+  // hide the menu from the menubar.
   onMounted(async () => {
     await auth.getLoggedInUserInfo();
-    if (auth.currentUser) {
-      await personenkontextStore.hasSystemrecht(
-        auth.currentUser.sub,
-        HatSystemrechtBodyParamsSystemRechtEnum.RollenVerwalten,
-      );
+    try {
+      if (auth.currentUser) {
+        systemrechte.value = await personenkontextStore.hasSystemrecht(
+          auth.currentUser.sub,
+          HatSystemrechtBodyParamsSystemRechtEnum.RollenVerwalten,
+        );
+        hasRollenverwaltungRecht.value = true;
+      }
+    } catch (error: unknown) {
+      hasRollenverwaltungRecht.value = false;
+    } finally {
+      menuDrawer.value = !mobile.value;
     }
-    if (!personenkontextStore.errorCode) {
-      hasRollenverwaltungRecht.value = true;
-    }
-    menuDrawer.value = !mobile.value;
   });
 </script>
 
