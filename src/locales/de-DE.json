@@ -156,7 +156,8 @@
   "errors": {
     "KEYCLOAK_CLIENT_ERROR": "Die Anmeldung ist momentan nicht möglich.",
     "UNSPECIFIED_ERROR": "Es ist ein Fehler aufgetreten.",
-    "USER_AUTHENTICATION_FAILED_ERROR": "Ihr Benutzername oder Ihr Passwort war falsch. Versuchen Sie es erneut oder wenden Sie sich an Ihre schulischen Administratorinnen und Administratoren."
+    "USER_AUTHENTICATION_FAILED_ERROR": "Ihr Benutzername oder Ihr Passwort war falsch. Versuchen Sie es erneut oder wenden Sie sich an Ihre schulischen Administratorinnen und Administratoren.",
+    "NOT_FOUND": "Die aufgerufene Seite wurde nicht gefunden."
   },
   "footer": {
     "accessibility": "Barrierefreiheit",
@@ -181,6 +182,7 @@
   "nav": {
     "admin": "Schulportal-Administration",
     "backToList": "Zurück zur Ergebnisliste",
+    "back": "Zurück",
     "backToStart": "Zurück zur Startseite",
     "closeMobileMenu": "Mobiles Menü schließen",
     "login": "Anmelden",
