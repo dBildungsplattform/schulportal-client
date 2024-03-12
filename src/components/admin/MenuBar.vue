@@ -4,8 +4,7 @@
     HatSystemrechtBodyParamsSystemRechtEnum,
     usePersonenkontextStore,
     type PersonenkontextStore,
-    type SystemrechtResponse,
-  } from '@/stores/PersonKontextStore';
+  } from '@/stores/PersonenKontextStore';
   import { type Ref, ref, type ComputedRef } from 'vue';
   import { onMounted } from 'vue';
   import { useDisplay } from 'vuetify';
@@ -17,7 +16,6 @@
   const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
 
   const hasRollenverwaltungRecht: Ref<boolean> = ref(false);
-  const systemrechte: Ref<SystemrechtResponse | null> = ref(null);
 
   function closeMenuOnMobile(): void {
     if (mobile.value) {
@@ -31,7 +29,7 @@
     await auth.getLoggedInUserInfo();
     try {
       if (auth.currentUser) {
-        systemrechte.value = await personenkontextStore.hasSystemrecht(
+        await personenkontextStore.hasSystemrecht(
           auth.currentUser.sub,
           HatSystemrechtBodyParamsSystemRechtEnum.RollenVerwalten,
         );
@@ -201,4 +199,4 @@
   </v-navigation-drawer>
 </template>
 
-<style></style>
+<style></style>@/stores/PersonenKontextStore@/stores/PersonKontextStore
