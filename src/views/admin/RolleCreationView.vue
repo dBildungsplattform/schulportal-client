@@ -25,7 +25,7 @@
   import FormWrapper from '@/components/form/FormWrapper.vue';
   import FormRow from '@/components/form/FormRow.vue';
   import { useOrganisationStore, type OrganisationStore, type Organisation } from '@/stores/OrganisationStore';
-  import { DIN_91379A_EXT } from '@/validation';
+  import { DIN_91379A_EXT } from '@/utils/validation';
 
   const { smAndDown }: { smAndDown: Ref<boolean> } = useDisplay();
   const rolleStore: RolleStore = useRolleStore();

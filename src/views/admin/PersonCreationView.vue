@@ -18,7 +18,7 @@
   import PasswordOutput from '@/components/form/PasswordOutput.vue';
   import FormWrapper from '@/components/form/FormWrapper.vue';
   import FormRow from '@/components/form/FormRow.vue';
-  import { DIN_91379A } from '@/validation';
+  import { DIN_91379A } from '@/utils/validation';
 
   const router: Router = useRouter();
   const personStore: PersonStore = usePersonStore();
