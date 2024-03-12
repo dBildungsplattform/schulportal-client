@@ -199,4 +199,4 @@
   </v-navigation-drawer>
 </template>
 
-<style></style>@/stores/PersonenKontextStore@/stores/PersonKontextStore
+<style></style>
