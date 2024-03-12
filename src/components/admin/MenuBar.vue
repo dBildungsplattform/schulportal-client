@@ -1,4 +1,10 @@
 <script setup lang="ts">
+  import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
+  import {
+    HatSystemrechtBodyParamsSystemRechtEnum,
+    usePersonenkontextStore,
+    type PersonenkontextStore,
+  } from '@/stores/PersonKontextStore';
   import { type Ref, ref, type ComputedRef } from 'vue';
   import { onMounted } from 'vue';
   import { useDisplay } from 'vuetify';
@@ -6,13 +12,28 @@
   const menuDrawer: Ref<boolean> = ref(true);
   const { mobile }: { mobile: ComputedRef<boolean> } = useDisplay();
 
+  const auth: AuthStore = useAuthStore();
+  const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
+
+  const hasRollenverwaltungRecht: Ref<boolean> = ref(false);
+
   function closeMenuOnMobile(): void {
     if (mobile.value) {
       menuDrawer.value = false;
     }
   }
 
-  onMounted(() => {
+  onMounted(async () => {
+    await auth.getLoggedInUserInfo();
+    if (auth.currentUser) {
+      await personenkontextStore.hasSystemrecht(
+        auth.currentUser.sub,
+        HatSystemrechtBodyParamsSystemRechtEnum.RollenVerwalten,
+      );
+    }
+    if (!personenkontextStore.errorCode) {
+      hasRollenverwaltungRecht.value = true;
+    }
     menuDrawer.value = !mobile.value;
   });
 </script>
@@ -126,27 +147,29 @@
     ></v-list-item>
 
     <!-- Rollenverwaltung -->
-    <v-list-item
-      class="menu-bar-main-item headline-2"
-      data-testid="rolle-management-title"
-      :title="$t('admin.rolle.management')"
-    ></v-list-item>
-    <v-list-item
-      class="menu-bar-sub-item caption"
-      @click="closeMenuOnMobile"
-      data-testid="rolle-management-menu-item"
-      prepend-icon="mdi-format-list-bulleted"
-      :title="$t('admin.rolle.showAll')"
-      to="/admin/rollen"
-    ></v-list-item>
-    <v-list-item
-      class="menu-bar-sub-item caption"
-      @click="closeMenuOnMobile"
-      data-testid="rolle-creation-menu-item"
-      prepend-icon="mdi-plus-circle-outline"
-      :title="$t('admin.rolle.createNew')"
-      to="/admin/rolle/new"
-    ></v-list-item>
+    <div v-if="hasRollenverwaltungRecht">
+      <v-list-item
+        class="menu-bar-main-item headline-2"
+        data-testid="rolle-management-title"
+        :title="$t('admin.rolle.management')"
+      ></v-list-item>
+      <v-list-item
+        class="menu-bar-sub-item caption"
+        @click="closeMenuOnMobile"
+        data-testid="rolle-management-menu-item"
+        prepend-icon="mdi-format-list-bulleted"
+        :title="$t('admin.rolle.showAll')"
+        to="/admin/rollen"
+      ></v-list-item>
+      <v-list-item
+        class="menu-bar-sub-item caption"
+        @click="closeMenuOnMobile"
+        data-testid="rolle-creation-menu-item"
+        prepend-icon="mdi-plus-circle-outline"
+        :title="$t('admin.rolle.createNew')"
+        to="/admin/rolle/new"
+      ></v-list-item>
+    </div>
     <!-- Schulverwaltung -->
     <v-list-item
       class="menu-bar-main-item headline-2"
