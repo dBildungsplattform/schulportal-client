@@ -24,6 +24,5 @@ spec:
               protocol: TCP
           securityContext:
             allowPrivilegeEscalation: {{ default false .Values.allowPrivilegeEscalation }}
-          resources:
-            {{- toYaml .Values.containerResources | indent 12 }}
+          resources: {{- toYaml .Values.containerResources | nindent 12 }}
       restartPolicy: {{ .Values.restartPolicy  }}
