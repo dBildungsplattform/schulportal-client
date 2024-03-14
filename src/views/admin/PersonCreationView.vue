@@ -109,9 +109,10 @@
     createPerson();
   });
 
-  const handleAlertClose = (): void => {
+  async function navigateBackToPersonForm(): Promise<void> {
+    await router.push({ name: 'create-person' });
     personStore.errorCode = '';
-  };
+  }
 
   const handleCreateAnotherPerson = (): void => {
     personStore.createdPerson = null;
@@ -170,7 +171,8 @@
       :showButton="true"
       :buttonText="$t('admin.backToForm')"
       :text="$t('admin.person.creationErrorText')"
-      @update:modelValue="handleAlertClose"
+      :buttonAction="navigateBackToPersonForm"
+       buttonClass="primary"
     />
 
     <!-- The form to create a new Person  -->
