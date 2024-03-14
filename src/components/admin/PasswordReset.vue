@@ -76,21 +76,16 @@
                 <v-icon icon="mdi-alert"></v-icon>
               </v-col>
               <v-col>
-                <span
-                  class="preserve-line-breaks"
-                  data-testid="error-text"
-                >
+                <p data-testid="error-text">
                   {{ errorMessage || errorCode }}
-                </span>
+                </p>
               </v-col>
             </v-row>
             <v-row class="text-body bold px-md-16">
               <v-col>
-                <span
-                  class="preserve-line-breaks"
-                  data-testid="password-reset-info-text"
-                  >{{ resetPasswordInformationMessage }}</span
-                >
+                <p data-testid="password-reset-info-text">
+                  {{ resetPasswordInformationMessage }}
+                </p>
               </v-col>
             </v-row>
             <v-row>
@@ -138,8 +133,4 @@
   </v-dialog>
 </template>
 
-<style>
-  .preserve-line-breaks {
-    white-space: pre-wrap; /* CSS property to preserve whitespaces and line breaks */
-  }
-</style>
+<style></style>
