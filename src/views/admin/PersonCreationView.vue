@@ -172,7 +172,6 @@
       :buttonText="$t('admin.backToForm')"
       :text="$t('admin.person.creationErrorText')"
       :buttonAction="navigateBackToPersonForm"
-       buttonClass="primary"
     />
 
     <!-- The form to create a new Person  -->
