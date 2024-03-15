@@ -112,7 +112,7 @@
   async function navigateBackToPersonForm(): Promise<void> {
     await router.push({ name: 'create-person' });
     personStore.errorCode = '';
-  }
+  };
 
   const handleCreateAnotherPerson = (): void => {
     personStore.createdPerson = null;
