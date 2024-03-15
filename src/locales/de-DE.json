@@ -54,6 +54,7 @@
         },
         "rollenname": {
           "length": "Der Rollenname darf nicht länger als 200 Zeichen sein.",
+          "matches": "Der Rollenname darf keine ungültigen Zeichen beinhalten.",
           "required": "Der Rollenname muss ausgewählt werden."
         }
       },
