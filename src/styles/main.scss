@@ -34,6 +34,10 @@ body {
   font-weight: normal;
 }
 
+.v-toolbar-title__placeholder {
+  height: 100%;
+}
+
 .v-field--variant-outlined .v-field__outline {
   --v-field-border-opacity: 1;
 }
