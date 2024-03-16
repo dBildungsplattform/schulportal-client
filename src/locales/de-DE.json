@@ -59,6 +59,7 @@
         },
         "rollenname": {
           "length": "Der Rollenname darf nicht länger als 200 Zeichen sein.",
+          "matches": "Der Rollenname darf keine ungültigen Zeichen beinhalten.",
           "required": "Der Rollenname muss ausgewählt werden."
         }
       },
@@ -167,8 +168,15 @@
     "privacyPolicy": "Datenschutzerklärung"
   },
   "start": {
-    "administration": "Verwaltung",
-    "allServiceProviders": "Alle Angebote"
+    "allServiceProviders": "Alle Angebote",
+    "categories": {
+      "administration": "Verwaltung",
+      "class": "Unterricht",
+      "hints": "Hinweise",
+      "homePage": "Startseite",
+      "schoolOfferings": "Schulische Angebote",
+      "workEmail": "Dienstliche E-Mail"
+    }
   },
   "itemsPerPage": "Einträge pro Seite",
   "landingTitle": "Willkommen im Schulportal SH.",
