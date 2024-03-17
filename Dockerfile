@@ -20,8 +20,19 @@ RUN npm run build
 
 # Deployment Stage
 FROM $BASE_IMAGE as deployment
-RUN apk add libexpat=2.6.0-r0  \
-    && rm -rf /var/cache/apk/*
+
+
+#fix erreur:
+#ERROR: failed to solve: process "/bin/sh -c apk add libexpat=2.6.0-r0  
+#&& rm -rf /var/cache/apk/*" did not complete successfully: exit code: 4
+#Error: buildx failed with: ERROR: failed to solve: process 
+#"/bin/sh -c apk add libexpat=2.6.0-r0      && rm -rf /var/cache/apk/*"
+#did not complete successfully: exit code: 4
+
+RUN apk update && \
+    apk add libexpat && \
+    rm -rf /var/cache/apk/*
+
 
 COPY --from=build /app/dist/ /usr/share/nginx/html/
 RUN rm /etc/nginx/conf.d/default.conf
