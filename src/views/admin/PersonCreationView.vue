@@ -1,5 +1,10 @@
 <script setup lang="ts">
-  import { useOrganisationStore, type OrganisationStore, type Organisation } from '@/stores/OrganisationStore';
+  import {
+    useOrganisationStore,
+    type OrganisationStore,
+    type Organisation,
+    type OrganisationResponse,
+  } from '@/stores/OrganisationStore';
   import {
     usePersonStore,
     type CreatedPerson,
@@ -7,8 +12,8 @@
     type PersonStore,
     type PersonendatensatzResponse,
   } from '@/stores/PersonStore';
-  import { type RolleStore, useRolleStore, type Rolle } from '@/stores/RolleStore';
-  import { type ComputedRef, computed, onMounted, onUnmounted, type Ref, ref } from 'vue';
+  import { type RolleStore, useRolleStore, type RolleResponse } from '@/stores/RolleStore';
+  import { type ComputedRef, computed, onMounted, onUnmounted, type Ref, ref, watch } from 'vue';
   import {
     onBeforeRouteLeave,
     type Router,
@@ -25,9 +30,11 @@
   import PasswordOutput from '@/components/form/PasswordOutput.vue';
   import FormWrapper from '@/components/form/FormWrapper.vue';
   import FormRow from '@/components/form/FormRow.vue';
+  import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenKontextStore';
 
   const router: Router = useRouter();
   const personStore: PersonStore = usePersonStore();
+  const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
   const organisationStore: OrganisationStore = useOrganisationStore();
   const rolleStore: RolleStore = useRolleStore();
   const { t }: Composer = useI18n({ useScope: 'global' });
@@ -37,8 +44,7 @@
 
   const validationSchema: TypedSchema = toTypedSchema(
     object({
-      selectedRolle: string()
-        .required(t('admin.rolle.rules.rolle.required')),
+      selectedRolle: string().required(t('admin.rolle.rules.rolle.required')),
       selectedVorname: string()
         .matches(/^[A-Za-z]*[A-Za-zÀ-ÖØ-öø-ÿ-' ]*$/, t('admin.person.rules.vorname.matches'))
         .min(2, t('admin.person.rules.vorname.min'))
@@ -47,8 +53,7 @@
         .matches(/^[A-Za-z]*[A-Za-zÀ-ÖØ-öø-ÿ-' ]*$/, t('admin.person.rules.familienname.matches'))
         .min(2, t('admin.person.rules.familienname.min'))
         .required(t('admin.person.rules.familienname.required')),
-        selectedOrganisation: string()
-        .required(t('admin.organisation.rules.organisation.required')),
+      selectedOrganisation: string().required(t('admin.organisation.rules.organisation.required')),
     }),
   );
 
@@ -90,29 +95,117 @@
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedOrganisation', vuetifyConfig);
 
+  const searchInputRollen: Ref<string> = ref('');
+  const searchInputOrganisation: Ref<string> = ref('');
+  // Watcher to detect when the search input has 3 or more characters
+  watch(searchInputRollen, async (newValue: string, _oldValue: string) => {
+    if (newValue.length >= 3) {
+      await personenkontextStore.getPersonenkontextRolleWithFilter(newValue, 25);
+    }
+  });
+  watch(searchInputOrganisation, async (newValue: string, _oldValue: string) => {
+    if (newValue.length >= 3) {
+      await personenkontextStore.getPersonenkontextAdministrationsebeneWithFilter(selectedRolle.value, newValue, 25);
+    }
+  });
+
   const rollen: ComputedRef<
-    {
-      value: string;
-      title: string;
-    }[]
-  > = computed(() =>
-    rolleStore.allRollen.map((rolle: Rolle) => ({
-      value: rolle.id,
-      title: rolle.name,
-    })),
-  );
+    | {
+        value: string;
+        title: string;
+      }[]
+    | undefined
+  > = computed(() => {
+    // If searchInput is less than 3 characters, return the initial 25 roles from the rolleStore
+    if (searchInputRollen.value.length < 3) {
+      return rolleStore.allRollen
+        .slice(0, 25)
+        .map((rolle: RolleResponse) => ({
+          value: rolle.id,
+          title: rolle.name,
+        }))
+        .sort(
+          (
+            a: {
+              value: string;
+              title: string;
+            },
+            b: {
+              value: string;
+              title: string;
+            },
+          ) => a.title.localeCompare(b.title),
+        );
+    } else {
+      // Once filtering is applied, map the filteredRollen for the autocomplete
+      return personenkontextStore.filteredRollen?.moeglicheRollen
+        .slice(0, 25)
+        .map((rolle: RolleResponse) => ({
+          value: rolle.id,
+          title: rolle.name,
+        }))
+        .sort(
+          (
+            a: {
+              value: string;
+              title: string;
+            },
+            b: {
+              value: string;
+              title: string;
+            },
+          ) => a.title.localeCompare(b.title),
+        );
+    }
+  });
 
   const organisationen: ComputedRef<
-    {
-      value: string;
-      title: string;
-    }[]
-  > = computed(() =>
-    organisationStore.allOrganisationen.map((org: Organisation) => ({
-      value: org.id,
-      title: `${org.kennung} (${org.name})`,
-    })),
-  );
+    | {
+        value: string;
+        title: string;
+      }[]
+    | undefined
+  > = computed(() => {
+    if (searchInputRollen.value.length < 3) {
+      return organisationStore.allOrganisationen
+        .slice(0, 25)
+        .map((org: Organisation) => ({
+          value: org.id,
+          title: `${org.kennung} (${org.name})`,
+        }))
+        .sort(
+          (
+            a: {
+              value: string;
+              title: string;
+            },
+            b: {
+              value: string;
+              title: string;
+            },
+          ) => a.title.localeCompare(b.title),
+        );
+    } else {
+      return personenkontextStore.filteredOrganisationen?.moeglicheSkks
+        .slice(0, 25)
+        .map((org: OrganisationResponse) => ({
+          value: org.id,
+          title: `${org.kennung} (${org.name})`,
+        }))
+        .sort(
+          (
+            a: {
+              value: string;
+              title: string;
+            },
+            b: {
+              value: string;
+              title: string;
+            },
+          ) => a.title.localeCompare(b.title),
+        );
+    }
+  });
 
   function isFormDirty(): boolean {
     return isFieldDirty('selectedVorname') || isFieldDirty('selectedFamilienname');
@@ -233,7 +326,7 @@
           :isRequired="true"
           :label="$t('admin.rolle.rolle')"
         >
-          <v-select
+          <v-autocomplete
             clearable
             data-testid="rolle-select"
             density="compact"
@@ -246,7 +339,8 @@
             variant="outlined"
             v-bind="selectedRolleProps"
             v-model="selectedRolle"
-          ></v-select>
+            v-model:search="searchInputRollen"
+          ></v-autocomplete>
         </FormRow>
 
         <!-- Persönliche Informationen -->
@@ -304,7 +398,7 @@
             labelForId="organisation-select"
             :label="$t('admin.organisation.assignOrganisation')"
           >
-            <v-select
+            <v-autocomplete
               clearable
               data-testid="organisation-select"
               density="compact"
@@ -317,7 +411,8 @@
               variant="outlined"
               v-bind="selectedOrganisationProps"
               v-model="selectedOrganisation"
-            ></v-select>
+              v-model:search="searchInputOrganisation"
+            ></v-autocomplete>
           </FormRow>
         </div>
       </FormWrapper>
