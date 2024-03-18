@@ -97,7 +97,7 @@
 
   const searchInputRollen: Ref<string> = ref('');
   const searchInputOrganisation: Ref<string> = ref('');
-  // Watcher to detect when the search input has 3 or more characters
+  // Watcher to detect when the search input has 3 or more characters to trigger filtering
   watch(searchInputRollen, async (newValue: string, _oldValue: string) => {
     if (newValue.length >= 3) {
       await personenkontextStore.getPersonenkontextRolleWithFilter(newValue, 25);
@@ -106,6 +106,9 @@
   watch(searchInputOrganisation, async (newValue: string, _oldValue: string) => {
     if (newValue.length >= 3) {
       await personenkontextStore.getPersonenkontextAdministrationsebeneWithFilter(selectedRolle.value, newValue, 25);
+    } else {
+      // If newValue has less than 3 characters, use an empty string instead of newValue.
+      await personenkontextStore.getPersonenkontextAdministrationsebeneWithFilter(selectedRolle.value, '', 25);
     }
   });
 
@@ -166,45 +169,24 @@
       }[]
     | undefined
   > = computed(() => {
-    if (searchInputRollen.value.length < 3) {
-      return organisationStore.allOrganisationen
-        .slice(0, 25)
-        .map((org: Organisation) => ({
-          value: org.id,
-          title: `${org.kennung} (${org.name})`,
-        }))
-        .sort(
-          (
-            a: {
-              value: string;
-              title: string;
-            },
-            b: {
-              value: string;
-              title: string;
-            },
-          ) => a.title.localeCompare(b.title),
-        );
-    } else {
-      return personenkontextStore.filteredOrganisationen?.moeglicheSkks
-        .slice(0, 25)
-        .map((org: OrganisationResponse) => ({
-          value: org.id,
-          title: `${org.kennung} (${org.name})`,
-        }))
-        .sort(
-          (
-            a: {
-              value: string;
-              title: string;
-            },
-            b: {
-              value: string;
-              title: string;
-            },
-          ) => a.title.localeCompare(b.title),
-        );
-    }
+    return personenkontextStore.filteredOrganisationen?.moeglicheSkks
+      .slice(0, 25)
+      .map((org: OrganisationResponse) => ({
+        value: org.id,
+        title: `${org.kennung} (${org.name})`,
+      }))
+      .sort(
+        (
+          a: {
+            value: string;
+            title: string;
+          },
+          b: {
+            value: string;
+            title: string;
+          },
+        ) => a.title.localeCompare(b.title),
+      );
   });
 
   function isFormDirty(): boolean {
