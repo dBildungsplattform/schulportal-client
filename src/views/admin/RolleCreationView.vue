@@ -234,7 +234,6 @@
         :showButton="true"
         :buttonText="$t('admin.rolle.backToCreateRolle')"
         :buttonAction="navigateBackToRolleForm"
-        buttonClass="primary"
       />
 
       <!-- The form to create a new Rolle -->
