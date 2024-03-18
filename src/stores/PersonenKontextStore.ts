@@ -86,12 +86,8 @@ export const usePersonenkontextStore: StoreDefinition<
     async getPersonenkontextRolleWithFilter(rolleName: string, limit: number) {
       this.loading = true;
       try {
-        const findPersonenkontextRollenBodyParams: FindPersonenkontextRollenBodyParams = {
-          rolleName: rolleName,
-          limit: limit,
-        };
         const { data }: { data: FindRollenResponse } =
-          await personenKontextApi.dbiamPersonenkontextFilterControllerFindRollen(findPersonenkontextRollenBodyParams);
+          await personenKontextApi.dbiamPersonenkontextFilterControllerFindRollen(rolleName, limit);
         this.filteredRollen = data;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
@@ -106,15 +102,8 @@ export const usePersonenkontextStore: StoreDefinition<
     async getPersonenkontextAdministrationsebeneWithFilter(rolleId: string, sskName: string, limit: number) {
       this.loading = true;
       try {
-        const findPersonenkontextSSKBodyParams: FindPersonenkontextSchulstrukturknotenBodyParams = {
-          rolleId: rolleId,
-          sskName: sskName,
-          limit: limit
-        };
         const { data }: { data: FindSchulstrukturknotenResponse } =
-          await personenKontextApi.dbiamPersonenkontextFilterControllerFindSchulstrukturknoten(
-            findPersonenkontextSSKBodyParams,
-          );
+          await personenKontextApi.dbiamPersonenkontextFilterControllerFindSchulstrukturknoten(rolleId, sskName, limit);
         this.filteredOrganisationen = data;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';

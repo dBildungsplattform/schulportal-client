@@ -1124,17 +1124,28 @@
         "/api/personenkontext/rollen": {
             "get": {
                 "operationId": "DbiamPersonenkontextFilterController_findRollen",
-                "parameters": [],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/FindPersonenkontextRollenBodyParams"
-                            }
+                "parameters": [
+                    {
+                        "name": "rolleName",
+                        "required": true,
+                        "in": "query",
+                        "description": "Rolle name used to filter for rollen in personenkontext.",
+                        "schema": {
+                            "nullable": false,
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "required": true,
+                        "in": "query",
+                        "description": "The limit of items for the request.",
+                        "schema": {
+                            "nullable": false,
+                            "type": "number"
                         }
                     }
-                },
+                ],
                 "responses": {
                     "200": {
                         "description": "The rollen for a personenkontext were successfully returned.",
@@ -1169,17 +1180,38 @@
         "/api/personenkontext/schulstrukturknoten": {
             "get": {
                 "operationId": "DbiamPersonenkontextFilterController_findSchulstrukturknoten",
-                "parameters": [],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/FindPersonenkontextSchulstrukturknotenBodyParams"
-                            }
+                "parameters": [
+                    {
+                        "name": "rolleId",
+                        "required": true,
+                        "in": "query",
+                        "description": "RolleId used to filter for schulstrukturknoten in personenkontext.",
+                        "schema": {
+                            "nullable": false,
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "sskName",
+                        "required": true,
+                        "in": "query",
+                        "description": "Organisation/SSK name used to filter for schulstrukturknoten in personenkontext.",
+                        "schema": {
+                            "nullable": false,
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "required": true,
+                        "in": "query",
+                        "description": "The limit of items for the request.",
+                        "schema": {
+                            "nullable": false,
+                            "type": "number"
                         }
                     }
-                },
+                ],
                 "responses": {
                     "200": {
                         "description": "The schulstrukturknoten for a personenkontext were successfully returned.",
@@ -2674,25 +2706,6 @@
                     "rolleId"
                 ]
             },
-            "FindPersonenkontextRollenBodyParams": {
-                "type": "object",
-                "properties": {
-                    "rolleName": {
-                        "type": "string",
-                        "description": "Rolle name used to filter for rollen in personenkontext.",
-                        "nullable": false
-                    },
-                    "limit": {
-                        "type": "number",
-                        "description": "The limit of items for the request.",
-                        "nullable": false
-                    }
-                },
-                "required": [
-                    "rolleName",
-                    "limit"
-                ]
-            },
             "RolleResponse": {
                 "type": "object",
                 "properties": {
@@ -2773,31 +2786,6 @@
                 "required": [
                     "moeglicheRollen",
                     "total"
-                ]
-            },
-            "FindPersonenkontextSchulstrukturknotenBodyParams": {
-                "type": "object",
-                "properties": {
-                    "rolleId": {
-                        "type": "string",
-                        "description": "RolleId used to filter for schulstrukturknoten in personenkontext.",
-                        "nullable": false
-                    },
-                    "sskName": {
-                        "type": "string",
-                        "description": "Organisation/SSK name used to filter for schulstrukturknoten in personenkontext.",
-                        "nullable": false
-                    },
-                    "limit": {
-                        "type": "number",
-                        "description": "The limit of items for the request.",
-                        "nullable": false
-                    }
-                },
-                "required": [
-                    "rolleId",
-                    "sskName",
-                    "limit"
                 ]
             },
             "FindSchulstrukturknotenResponse": {
