@@ -66,6 +66,11 @@
     },
   });
 
+  type ValueTitleOption = {
+    value: string;
+    title: string;
+  };
+
   type PersonCreationForm = {
     selectedRolle: string;
     selectedVorname: string;
@@ -112,13 +117,7 @@
     }
   });
 
-  const rollen: ComputedRef<
-    | {
-        value: string;
-        title: string;
-      }[]
-    | undefined
-  > = computed(() => {
+  const rollen: ComputedRef<ValueTitleOption[] | undefined> = computed(() => {
     // If searchInput is less than 3 characters, return the initial 25 roles from the rolleStore
     if (searchInputRollen.value.length < 3) {
       return rolleStore.allRollen
@@ -127,18 +126,7 @@
           value: rolle.id,
           title: rolle.name,
         }))
-        .sort(
-          (
-            a: {
-              value: string;
-              title: string;
-            },
-            b: {
-              value: string;
-              title: string;
-            },
-          ) => a.title.localeCompare(b.title),
-        );
+        .sort((a: ValueTitleOption, b: ValueTitleOption) => a.title.localeCompare(b.title));
     } else {
       // Once filtering is applied, map the filteredRollen for the autocomplete
       return personenkontextStore.filteredRollen?.moeglicheRollen
@@ -147,18 +135,7 @@
           value: rolle.id,
           title: rolle.name,
         }))
-        .sort(
-          (
-            a: {
-              value: string;
-              title: string;
-            },
-            b: {
-              value: string;
-              title: string;
-            },
-          ) => a.title.localeCompare(b.title),
-        );
+        .sort((a: ValueTitleOption, b: ValueTitleOption) => a.title.localeCompare(b.title));
     }
   });
 
@@ -175,18 +152,7 @@
         value: org.id,
         title: `${org.kennung} (${org.name})`,
       }))
-      .sort(
-        (
-          a: {
-            value: string;
-            title: string;
-          },
-          b: {
-            value: string;
-            title: string;
-          },
-        ) => a.title.localeCompare(b.title),
-      );
+      .sort((a: ValueTitleOption, b: ValueTitleOption) => a.title.localeCompare(b.title));
   });
 
   function isFormDirty(): boolean {
