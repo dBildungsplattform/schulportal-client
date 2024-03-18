@@ -23,8 +23,6 @@ spec:
             - name: http
               containerPort: {{ default 8080 .Values.service.port }}
               protocol: TCP
-          #securityContext: {{- toYaml .Values.containerSecurityContext | nindent 12 }}
-          securityContext:
-            allowPrivilegeEscalation: {{ default false .Values.allowPrivilegeEscalation }}
+          securityContext: {{- toYaml .Values.containerSecurityContext | nindent 12 }}
           resources: {{- toYaml .Values.containerResources | nindent 12 }}
       restartPolicy: {{ .Values.restartPolicy  }}
