@@ -20,9 +20,8 @@ RUN npm run build
 
 # Deployment Stage
 FROM $BASE_IMAGE as deployment
-RUN apk update && \
-    apk add libexpat && \
-    rm -rf /var/cache/apk/*
+RUN apk add libexpat=2.6.2-r0  \ 
+    && rm -rf /var/cache/apk/*
 
 
 COPY --from=build /app/dist/ /usr/share/nginx/html/

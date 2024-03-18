@@ -149,7 +149,7 @@ jobs:
     if: ${{ github.event_name == 'delete' && github.event.ref_type == 'branch'}}
     needs:
       - create_branch_identifier_for_deletion
-    uses: dBildungsplattform/spsh-app-deploy/.github/workflows/delete-namespace.yml@2
+    uses: dBildungsplattform/spsh-app-deploy/.github/workflows/delete-namespace.yml@DBP-620-run-Nginx-container-as-nonrootuser
     with:
       namespace: ${{ needs.create_branch_identifier_for_deletion.outputs.namespace_from_branch }}
     secrets:
