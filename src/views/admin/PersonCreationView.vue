@@ -1,10 +1,5 @@
 <script setup lang="ts">
-  import {
-    useOrganisationStore,
-    type OrganisationStore,
-    type Organisation,
-    type OrganisationResponse,
-  } from '@/stores/OrganisationStore';
+  import { useOrganisationStore, type OrganisationStore, type OrganisationResponse } from '@/stores/OrganisationStore';
   import {
     usePersonStore,
     type CreatedPerson,
