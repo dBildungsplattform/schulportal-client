@@ -1,4 +1,3 @@
-
 ARG BASE_IMAGE_BUILDER=node:21.6-alpine3.19
 ARG BASE_IMAGE=nginx:1.25-alpine
 
@@ -24,6 +23,19 @@ FROM $BASE_IMAGE as deployment
 RUN apk add libexpat=2.6.2-r0  \ 
     && rm -rf /var/cache/apk/*
 
+
 COPY --from=build /app/dist/ /usr/share/nginx/html/
 RUN rm /etc/nginx/conf.d/default.conf
 COPY nginx-vue.conf /etc/nginx/conf.d/
+
+RUN chown -R nginx:nginx /var/cache/nginx /var/run /var/log/nginx /usr/share/nginx/html && \
+    chmod -R 755 /usr/share/nginx/html && \
+    chmod -R 644 /etc/nginx/conf.d/*
+
+RUN touch /run/nginx.pid \
+    && chown -R nginx:nginx /run/nginx.pid /var/cache/nginx /var/run /var/log/nginx /usr/share/nginx/html
+
+USER nginx
+EXPOSE 8080
+
+CMD ["nginx", "-g", "daemon off;"]
