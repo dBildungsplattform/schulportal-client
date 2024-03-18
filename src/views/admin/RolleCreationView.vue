@@ -47,7 +47,7 @@
         .max(200, t('admin.rolle.rules.rollenname.length'))
         .matches(DIN_91379A_EXT, t('admin.rolle.rules.rollenname.matches'))
         .required(t('admin.rolle.rules.rollenname.required')),
-      selectedSchulstrukturknoten: string().required(t('admin.schulstrukturknoten.rules.required')),
+      selectedAdministrationsebene: string().required(t('admin.administrationsebene.rules.required')),
     }),
   );
 
@@ -61,7 +61,7 @@
   });
 
   type RolleCreationForm = {
-    selectedSchulstrukturknoten: string;
+    selectedAdministrationsebene: string;
     selectedRollenArt: CreateRolleBodyParamsRollenartEnum;
     selectedRollenName: string;
     selectedMerkmale: CreateRolleBodyParamsMerkmaleEnum[];
@@ -72,10 +72,10 @@
     validationSchema,
   });
 
-  const [selectedSchulstrukturknoten, selectedSchulstrukturknotenProps]: [
+  const [selectedAdministrationsebene, selectedAdministrationsebeneProps]: [
     Ref<string>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineField('selectedSchulstrukturknoten', vuetifyConfig);
+  ] = defineField('selectedAdministrationsebene', vuetifyConfig);
 
   const [selectedRollenArt, selectedRollenArtProps]: [
     Ref<CreateRolleBodyParamsRollenartEnum | null>,
@@ -94,7 +94,7 @@
 
   function isFormDirty(): boolean {
     return (
-      isFieldDirty('selectedSchulstrukturknoten') ||
+      isFieldDirty('selectedAdministrationsebene') ||
       isFieldDirty('selectedRollenArt') ||
       isFieldDirty('selectedRollenName') ||
       isFieldDirty('selectedMerkmale')
@@ -114,12 +114,12 @@
   });
 
   const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = handleSubmit(async () => {
-    if (selectedRollenName.value && selectedSchulstrukturknoten.value && selectedRollenArt.value) {
+    if (selectedRollenName.value && selectedAdministrationsebene.value && selectedRollenArt.value) {
       const merkmaleToSubmit: CreateRolleBodyParamsMerkmaleEnum[] =
         selectedMerkmale.value?.map((m: CreateRolleBodyParamsMerkmaleEnum) => m) || [];
       await rolleStore.createRolle(
         selectedRollenName.value,
-        selectedSchulstrukturknoten.value,
+        selectedAdministrationsebene.value,
         selectedRollenArt.value,
         merkmaleToSubmit,
       );
@@ -164,7 +164,7 @@
       .join(', ');
   });
 
-  const schulstrukturknoten: ComputedRef<
+  const administrationsebene: ComputedRef<
     {
       value: string;
       title: string;
@@ -248,29 +248,29 @@
           :onSubmit="onSubmit"
           :showUnsavedChangesDialog="showUnsavedChangesDialog"
         >
-          <!-- Schulstrukturknoten -->
+          <!-- administrationsebene -->
           <v-row>
-            <h3 class="headline-3">1. {{ $t('admin.schulstrukturknoten.assignSchulstrukturknoten') }}</h3>
+            <h3 class="headline-3">1. {{ $t('admin.administrationsebene.assignAdministrationsebene') }}</h3>
           </v-row>
           <FormRow
-            :errorLabel="selectedSchulstrukturknotenProps['error']"
-            labelForId="schulstrukturknoten-select"
+            :errorLabel="selectedAdministrationsebeneProps['error']"
+            labelForId="administrationsebene-select"
             :isRequired="true"
-            :label="$t('admin.schulstrukturknoten.schulstrukturknoten')"
+            :label="$t('admin.administrationsebene.administrationsebene')"
           >
             <v-select
               clearable
-              data-testid="schulstrukturknoten-select"
+              data-testid="administrationsebene-select"
               density="compact"
-              id="schulstrukturknoten-select"
-              :items="schulstrukturknoten"
+              id="administrationsebene-select"
+              :items="administrationsebene"
               item-value="value"
               item-text="title"
-              :placeholder="$t('admin.schulstrukturknoten.selectSchulstrukturknoten')"
+              :placeholder="$t('admin.administrationsebene.assignAdministrationsebene')"
               required="true"
               variant="outlined"
-              v-bind="selectedSchulstrukturknotenProps"
-              v-model="selectedSchulstrukturknoten"
+              v-bind="selectedAdministrationsebeneProps"
+              v-model="selectedAdministrationsebene"
             ></v-select>
           </FormRow>
 
@@ -300,7 +300,7 @@
             ></v-select>
           </FormRow>
 
-          <template v-if="selectedRollenArt && selectedSchulstrukturknoten">
+          <template v-if="selectedRollenArt && selectedAdministrationsebene">
             <!-- Rollenname -->
             <v-row>
               <h3 class="headline-3">3. {{ $t('admin.rolle.enterRollenname') }}</h3>
@@ -384,7 +384,7 @@
           </v-row>
           <v-row>
             <v-col class="text-body bold text-right">
-              {{ $t('admin.schulstrukturknoten.schulstrukturknoten') }}:
+              {{ $t('admin.administrationsebene.administrationsebene') }}:
             </v-col>
             <v-col class="text-body">
               {{
