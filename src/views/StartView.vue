@@ -141,8 +141,4 @@
   </v-card>
 </template>
 
-<style scoped>
-  .v-card {
-    padding-bottom: 40px;
-  }
-</style>
+<style></style>

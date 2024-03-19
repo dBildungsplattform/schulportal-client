@@ -13,7 +13,7 @@
 
   @media (min-width: 1280px) {
     .v-container {
-      margin-bottom: 240px;
+      margin-bottom: 280px;
     }
   }
 
