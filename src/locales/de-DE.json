@@ -1,6 +1,13 @@
 {
   "action": "Aktion",
   "admin": {
+    "administrationsebene": {
+      "administrationsebene": "Administrationsebene",
+      "assignAdministrationsebene": "Administrationsebene zuordnen",
+      "rules": {
+        "required": "Die Administrationsebene muss ausgewählt werden."
+      }
+    },
     "mandatoryFieldsNotice": "Mit * markierte Felder sind Pflichtangaben.",
     "backToForm": "Zurück zum Formular",
     "class": {
@@ -80,12 +87,12 @@
       "createAnother": "Weiteren Benutzer anlegen",
       "createNew": "Neue Benutzer anlegen",
       "creationErrorText": "",
-      "creationErrorTitle": "Fehler beim Anlegen des Benutzers",
+      "creationErrorTitle": "Fehler beim Anlegen des Benutzers.",
       "discard": "Benutzer verwerfen",
       "edit": "Benutzer bearbeiten",
       "generatedPassword": "Generiertes Passwort",
       "loadingErrorText": "Es konnten keine Benutzerdaten geladen werden.",
-      "loadingErrorTitle": "Fehler beim Laden des Benutzers",
+      "loadingErrorTitle": "Fehler beim Laden des Benutzers.",
       "management": "Benutzerverwaltung",
       "personalInfo": "Persönliche Informationen",
       "resetPasswordConfirmation": "Sind Sie sicher, dass Sie das Passwort für {firstname} {lastname} zurücksetzen möchten?",
@@ -138,14 +145,6 @@
       "schuleCreateErrorText": "Die Schule konnte nicht angelegt werden.",
       "schuleAddedSuccessfully": "Die Schule wurde erfolgreich hinzugefügt.",
       "showAll": "Alle Schulen anzeigen"
-    },
-    "schulstrukturknoten": {
-      "assignSchulstrukturknoten": "Schulstrukturknoten zuordnen",
-      "rules": {
-        "required": "Der Schulstrukturknoten muss ausgewählt werden."
-      },
-      "schulstrukturknoten": "Schulstrukturknoten",
-      "selectSchulstrukturknoten": "Schulstrukturknoten auswählen"
     },
     "schultraeger": {
       "management": "Schulträgerverwaltung"
