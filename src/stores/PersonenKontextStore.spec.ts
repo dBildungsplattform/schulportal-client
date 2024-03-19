@@ -1,4 +1,4 @@
-import { HatSystemrechtBodyParamsSystemRechtEnum, type SystemrechtResponse } from '@/api-client/generated';
+import { type SystemrechtResponse, OrganisationResponseTypEnum } from '@/api-client/generated';
 import ApiService from '@/services/ApiService';
 import MockAdapter from 'axios-mock-adapter';
 import { setActivePinia, createPinia } from 'pinia';
@@ -8,16 +8,16 @@ import { usePersonenkontextStore, type PersonenkontextStore } from './PersonenKo
 const mockadapter: MockAdapter = new MockAdapter(ApiService);
 
 describe('PersonenkontextStore', () => {
-  let personkontextStore: PersonenkontextStore;
+  let personenkontextStore: PersonenkontextStore;
   beforeEach(() => {
     setActivePinia(createPinia());
-    personkontextStore = usePersonenkontextStore();
+    personenkontextStore = usePersonenkontextStore();
     mockadapter.reset();
   });
 
   it('should initalize state correctly', () => {
-    expect(personkontextStore.errorCode).toEqual('');
-    expect(personkontextStore.loading).toBeFalsy();
+    expect(personenkontextStore.errorCode).toEqual('');
+    expect(personenkontextStore.loading).toBe(false);
   });
 
   describe('hasSystemrecht', () => {
@@ -25,48 +25,48 @@ describe('PersonenkontextStore', () => {
       const mockResponse: SystemrechtResponse = {
         ROLLEN_VERWALTEN: [
           {
-            id: 'string',
-            kennung: 'string',
-            name: 'string',
-            namensergaenzung: 'string',
-            kuerzel: 'string',
-            typ: 'TRAEGER',
+            id: '1',
+            kennung: '12345',
+            name: 'Organisation 1',
+            namensergaenzung: 'Ergänzung',
+            kuerzel: 'O1',
+            typ: OrganisationResponseTypEnum.Anbieter,
           },
         ],
       };
 
       mockadapter.onGet('/api/personenkontexte/1/hatSystemrecht').replyOnce(200, mockResponse, {});
-      const hasSystemRechtPromise: Promise<SystemrechtResponse> = personkontextStore.hasSystemrecht(
+      const hasSystemRechtPromise: Promise<SystemrechtResponse> = personenkontextStore.hasSystemrecht(
         '1',
-        HatSystemrechtBodyParamsSystemRechtEnum.RollenVerwalten,
+        'ROLLEN_VERWALTEN',
       );
-      expect(personkontextStore.loading).toBe(true);
+      expect(personenkontextStore.loading).toBe(true);
       await hasSystemRechtPromise;
-      expect(personkontextStore.loading).toBe(false);
+      expect(personenkontextStore.loading).toBe(false);
     });
 
     it('should handle string error', async () => {
       mockadapter.onGet('/api/personenkontexte/1/hatSystemrecht').replyOnce(500, 'some mock server error');
-      const hasSystemRechtPromise: Promise<SystemrechtResponse> = personkontextStore.hasSystemrecht(
+      const hasSystemRechtPromise: Promise<SystemrechtResponse> = personenkontextStore.hasSystemrecht(
         '1',
-        HatSystemrechtBodyParamsSystemRechtEnum.RollenVerwalten,
+        'ROLLEN_VERWALTEN',
       );
-      expect(personkontextStore.loading).toBe(true);
+      expect(personenkontextStore.loading).toBe(true);
       await rejects(hasSystemRechtPromise);
-      expect(personkontextStore.errorCode).toEqual('UNSPECIFIED_ERROR');
-      expect(personkontextStore.loading).toBe(false);
+      expect(personenkontextStore.errorCode).toEqual('UNSPECIFIED_ERROR');
+      expect(personenkontextStore.loading).toBe(false);
     });
 
     it('should handle error code', async () => {
       mockadapter.onGet('/api/personenkontexte/1/hatSystemrecht').replyOnce(500, { code: 'some mock server error' });
-      const hasSystemRechtPromise: Promise<SystemrechtResponse> = personkontextStore.hasSystemrecht(
+      const hasSystemRechtPromise: Promise<SystemrechtResponse> = personenkontextStore.hasSystemrecht(
         '1',
-        HatSystemrechtBodyParamsSystemRechtEnum.RollenVerwalten,
+        'ROLLEN_VERWALTEN',
       );
-      expect(personkontextStore.loading).toBe(true);
+      expect(personenkontextStore.loading).toBe(true);
       await rejects(hasSystemRechtPromise);
-      expect(personkontextStore.errorCode).toEqual('some mock server error');
-      expect(personkontextStore.loading).toBe(false);
+      expect(personenkontextStore.errorCode).toEqual('some mock server error');
+      expect(personenkontextStore.loading).toBe(false);
     });
   });
 });

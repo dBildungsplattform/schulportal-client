@@ -991,18 +991,19 @@
                             "nullable": false,
                             "type": "string"
                         }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/HatSystemrechtBodyParams"
-                            }
+                    },
+                    {
+                        "name": "systemRecht",
+                        "required": true,
+                        "in": "query",
+                        "schema": {
+                            "enum": [
+                                "ROLLEN_VERWALTEN"
+                            ],
+                            "type": "string"
                         }
                     }
-                },
+                ],
                 "responses": {
                     "200": {
                         "description": "The SchulStrukturKnoten associated with this personId and systemrecht.",
@@ -1020,6 +1021,221 @@
                 },
                 "tags": [
                     "personenkontexte"
+                ],
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
+        "/api/dbiam/personenkontext/{personId}": {
+            "get": {
+                "operationId": "DBiamPersonenkontextController_findPersonenkontextsByPerson",
+                "parameters": [
+                    {
+                        "name": "personId",
+                        "required": true,
+                        "in": "path",
+                        "description": "The ID for the person.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The personenkontexte were successfully returned.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/DBiamPersonenkontextResponse"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Not authorized to get available personenkontexte."
+                    },
+                    "403": {
+                        "description": "Insufficient permission to get personenkontexte for this user."
+                    },
+                    "500": {
+                        "description": "Internal server error while getting personenkontexte."
+                    }
+                },
+                "tags": [
+                    "dbiam-personenkontexte"
+                ],
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
+        "/api/dbiam/personenkontext": {
+            "post": {
+                "operationId": "DBiamPersonenkontextController_createPersonenkontext",
+                "parameters": [],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DBiamCreatePersonenkontextBodyParams"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Test",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DBiamPersonenkontextResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Not authorized to create personenkontext."
+                    },
+                    "403": {
+                        "description": "Insufficient permission to create personenkontext."
+                    },
+                    "500": {
+                        "description": "Internal server error while creating personenkontext."
+                    }
+                },
+                "tags": [
+                    "dbiam-personenkontexte"
+                ],
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
+        "/api/personenkontext/rollen": {
+            "get": {
+                "operationId": "DbiamPersonenkontextFilterController_findRollen",
+                "parameters": [
+                    {
+                        "name": "rolleName",
+                        "required": true,
+                        "in": "query",
+                        "description": "Rolle name used to filter for rollen in personenkontext.",
+                        "schema": {
+                            "nullable": false,
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "required": true,
+                        "in": "query",
+                        "description": "The limit of items for the request.",
+                        "schema": {
+                            "nullable": false,
+                            "type": "number"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The rollen for a personenkontext were successfully returned.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/FindRollenResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Not authorized to get available rolen for personenkontexte."
+                    },
+                    "403": {
+                        "description": "Insufficient permission to get rollen for personenkontext."
+                    },
+                    "500": {
+                        "description": "Internal server error while getting rollen for personenkontexte."
+                    }
+                },
+                "tags": [
+                    "personenkontext"
+                ],
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
+        "/api/personenkontext/schulstrukturknoten": {
+            "get": {
+                "operationId": "DbiamPersonenkontextFilterController_findSchulstrukturknoten",
+                "parameters": [
+                    {
+                        "name": "rolleId",
+                        "required": true,
+                        "in": "query",
+                        "description": "RolleId used to filter for schulstrukturknoten in personenkontext.",
+                        "schema": {
+                            "nullable": false,
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "sskName",
+                        "required": true,
+                        "in": "query",
+                        "description": "Organisation/SSK name used to filter for schulstrukturknoten in personenkontext.",
+                        "schema": {
+                            "nullable": false,
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "required": true,
+                        "in": "query",
+                        "description": "The limit of items for the request.",
+                        "schema": {
+                            "nullable": false,
+                            "type": "number"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The schulstrukturknoten for a personenkontext were successfully returned.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/FindSchulstrukturknotenResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Not authorized to get available schulstrukturknoten for personenkontexte."
+                    },
+                    "403": {
+                        "description": "Insufficient permission to get schulstrukturknoten for personenkontext."
+                    },
+                    "500": {
+                        "description": "Internal server error while getting schulstrukturknoten for personenkontexte."
+                    }
+                },
+                "tags": [
+                    "personenkontext"
                 ],
                 "security": [
                     {
@@ -2335,20 +2551,6 @@
                     "personenkontexte"
                 ]
             },
-            "HatSystemrechtBodyParams": {
-                "type": "object",
-                "properties": {
-                    "systemRecht": {
-                        "type": "string",
-                        "enum": [
-                            "ROLLEN_VERWALTEN"
-                        ]
-                    }
-                },
-                "required": [
-                    "systemRecht"
-                ]
-            },
             "OrganisationResponse": {
                 "type": "object",
                 "properties": {
@@ -2451,6 +2653,144 @@
                 },
                 "required": [
                     "revision"
+                ]
+            },
+            "DBiamPersonenkontextResponse": {
+                "type": "object",
+                "properties": {
+                    "personId": {
+                        "type": "string"
+                    },
+                    "organisationId": {
+                        "type": "string"
+                    },
+                    "rolleId": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "personId",
+                    "organisationId",
+                    "rolleId"
+                ]
+            },
+            "DBiamCreatePersonenkontextBodyParams": {
+                "type": "object",
+                "properties": {
+                    "personId": {
+                        "type": "string"
+                    },
+                    "organisationId": {
+                        "type": "string"
+                    },
+                    "rolleId": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "personId",
+                    "organisationId",
+                    "rolleId"
+                ]
+            },
+            "RolleResponse": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "createdAt": {
+                        "format": "date-time",
+                        "type": "string"
+                    },
+                    "updatedAt": {
+                        "format": "date-time",
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "administeredBySchulstrukturknoten": {
+                        "type": "string"
+                    },
+                    "rollenart": {
+                        "type": "string",
+                        "enum": [
+                            "LERN",
+                            "LEHR",
+                            "EXTERN",
+                            "ORGADMIN",
+                            "LEIT",
+                            "SYSADMIN"
+                        ]
+                    },
+                    "merkmale": {
+                        "type": "array",
+                        "uniqueItems": true,
+                        "items": {
+                            "type": "string",
+                            "enum": [
+                                "BEFRISTUNG_PFLICHT",
+                                "KOPERS_PFLICHT"
+                            ]
+                        }
+                    },
+                    "systemrechte": {
+                        "type": "array",
+                        "uniqueItems": true,
+                        "items": {
+                            "type": "string",
+                            "enum": [
+                                "ROLLEN_VERWALTEN"
+                            ]
+                        }
+                    }
+                },
+                "required": [
+                    "id",
+                    "createdAt",
+                    "updatedAt",
+                    "name",
+                    "administeredBySchulstrukturknoten",
+                    "rollenart",
+                    "merkmale",
+                    "systemrechte"
+                ]
+            },
+            "FindRollenResponse": {
+                "type": "object",
+                "properties": {
+                    "moeglicheRollen": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/RolleResponse"
+                        }
+                    },
+                    "total": {
+                        "type": "number"
+                    }
+                },
+                "required": [
+                    "moeglicheRollen",
+                    "total"
+                ]
+            },
+            "FindSchulstrukturknotenResponse": {
+                "type": "object",
+                "properties": {
+                    "moeglicheSkks": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/OrganisationResponse"
+                        }
+                    },
+                    "total": {
+                        "type": "number"
+                    }
+                },
+                "required": [
+                    "moeglicheSkks",
+                    "total"
                 ]
             },
             "CreateOrganisationBodyParams": {
@@ -2562,70 +2902,6 @@
                 },
                 "required": [
                     "organisationId"
-                ]
-            },
-            "RolleResponse": {
-                "type": "object",
-                "properties": {
-                    "id": {
-                        "type": "string"
-                    },
-                    "createdAt": {
-                        "format": "date-time",
-                        "type": "string"
-                    },
-                    "updatedAt": {
-                        "format": "date-time",
-                        "type": "string"
-                    },
-                    "name": {
-                        "type": "string"
-                    },
-                    "administeredBySchulstrukturknoten": {
-                        "type": "string"
-                    },
-                    "rollenart": {
-                        "type": "string",
-                        "enum": [
-                            "LERN",
-                            "LEHR",
-                            "EXTERN",
-                            "ORGADMIN",
-                            "LEIT",
-                            "SYSADMIN"
-                        ]
-                    },
-                    "merkmale": {
-                        "type": "array",
-                        "uniqueItems": true,
-                        "items": {
-                            "type": "string",
-                            "enum": [
-                                "BEFRISTUNG_PFLICHT",
-                                "KOPERS_PFLICHT"
-                            ]
-                        }
-                    },
-                    "systemrechte": {
-                        "type": "array",
-                        "uniqueItems": true,
-                        "items": {
-                            "type": "string",
-                            "enum": [
-                                "ROLLEN_VERWALTEN"
-                            ]
-                        }
-                    }
-                },
-                "required": [
-                    "id",
-                    "createdAt",
-                    "updatedAt",
-                    "name",
-                    "administeredBySchulstrukturknoten",
-                    "rollenart",
-                    "merkmale",
-                    "systemrechte"
                 ]
             },
             "CreateRolleBodyParams": {

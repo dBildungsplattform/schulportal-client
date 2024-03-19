@@ -1,9 +1,7 @@
 import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import { isAxiosError } from 'axios';
 import {
-  HatSystemrechtBodyParamsSystemRechtEnum,
   PersonenkontexteApiFactory,
-  type HatSystemrechtBodyParams,
   type PersonenkontexteApiInterface,
   type SystemrechtResponse,
 } from '../api-client/generated/api';
@@ -18,13 +16,9 @@ type PersonenkontextState = {
 
 type PersonenkontextGetters = {};
 type PersonenkontextActions = {
-  hasSystemrecht: (
-    personId: string,
-    systemrecht: HatSystemrechtBodyParamsSystemRechtEnum,
-  ) => Promise<SystemrechtResponse>;
+  hasSystemrecht: (personId: string, systemrecht: 'ROLLEN_VERWALTEN') => Promise<SystemrechtResponse>;
 };
 
-export { HatSystemrechtBodyParamsSystemRechtEnum };
 export type { SystemrechtResponse };
 
 export type PersonenkontextStore = Store<
@@ -48,17 +42,11 @@ export const usePersonenkontextStore: StoreDefinition<
     };
   },
   actions: {
-    async hasSystemrecht(
-      personId: string,
-      systemrecht: HatSystemrechtBodyParamsSystemRechtEnum,
-    ): Promise<SystemrechtResponse> {
+    async hasSystemrecht(personId: string, systemRecht: 'ROLLEN_VERWALTEN'): Promise<SystemrechtResponse> {
       this.loading = true;
       try {
-        const createSystemrechtBodyParams: HatSystemrechtBodyParams = {
-          systemRecht: systemrecht,
-        };
         const { data }: { data: SystemrechtResponse } =
-          await personenKontextApi.personenkontextControllerHatSystemRecht(personId, createSystemrechtBodyParams);
+          await personenKontextApi.personenkontextControllerHatSystemRecht(personId, systemRecht);
         return data;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';

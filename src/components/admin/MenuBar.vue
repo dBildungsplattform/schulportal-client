@@ -1,10 +1,6 @@
 <script setup lang="ts">
   import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
-  import {
-    HatSystemrechtBodyParamsSystemRechtEnum,
-    usePersonenkontextStore,
-    type PersonenkontextStore,
-  } from '@/stores/PersonenKontextStore';
+  import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenKontextStore';
   import { type Ref, ref, type ComputedRef } from 'vue';
   import { onMounted } from 'vue';
   import { useDisplay } from 'vuetify';
@@ -29,10 +25,7 @@
     await auth.getLoggedInUserInfo();
     try {
       if (auth.currentUser) {
-        await personenkontextStore.hasSystemrecht(
-          auth.currentUser.sub,
-          HatSystemrechtBodyParamsSystemRechtEnum.RollenVerwalten,
-        );
+        await personenkontextStore.hasSystemrecht(auth.currentUser.sub, 'ROLLEN_VERWALTEN');
         hasRollenverwaltungRecht.value = true;
       }
     } catch (error: unknown) {
