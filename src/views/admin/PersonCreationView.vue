@@ -18,6 +18,7 @@
   import PasswordOutput from '@/components/form/PasswordOutput.vue';
   import FormWrapper from '@/components/form/FormWrapper.vue';
   import FormRow from '@/components/form/FormRow.vue';
+  import { DIN_91379A } from '@/utils/validation';
 
   const router: Router = useRouter();
   const personStore: PersonStore = usePersonStore();
@@ -30,11 +31,11 @@
   const validationSchema: TypedSchema = toTypedSchema(
     object({
       selectedVorname: string()
-        .matches(/^[A-Za-z]*[A-Za-zÀ-ÖØ-öø-ÿ-' ]*$/, t('admin.person.rules.vorname.matches'))
+        .matches(DIN_91379A, t('admin.person.rules.vorname.matches'))
         .min(2, t('admin.person.rules.vorname.min'))
         .required(t('admin.person.rules.vorname.required')),
       selectedFamilienname: string()
-        .matches(/^[A-Za-z]*[A-Za-zÀ-ÖØ-öø-ÿ-' ]*$/, t('admin.person.rules.familienname.matches'))
+        .matches(DIN_91379A, t('admin.person.rules.familienname.matches'))
         .min(2, t('admin.person.rules.familienname.min'))
         .required(t('admin.person.rules.familienname.required')),
     }),
@@ -109,7 +110,8 @@
     createPerson();
   });
 
-  const handleAlertClose = (): void => {
+  async function navigateBackToPersonForm(): Promise<void> {
+    await router.push({ name: 'create-person' });
     personStore.errorCode = '';
   };
 
@@ -170,7 +172,7 @@
       :showButton="true"
       :buttonText="$t('admin.backToForm')"
       :text="$t('admin.person.creationErrorText')"
-      @update:modelValue="handleAlertClose"
+      :buttonAction="navigateBackToPersonForm"
     />
 
     <!-- The form to create a new Person  -->
