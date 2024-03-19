@@ -35,7 +35,9 @@ describe('PersonenkontextStore', () => {
         ],
       };
 
-      mockadapter.onGet('/api/personenkontexte/1/hatSystemrecht').replyOnce(200, mockResponse, {});
+      mockadapter
+        .onGet('/api/personenkontexte/1/hatSystemrecht?systemRecht=ROLLEN_VERWALTEN')
+        .replyOnce(200, mockResponse);
       const hasSystemRechtPromise: Promise<SystemrechtResponse> = personenkontextStore.hasSystemrecht(
         '1',
         'ROLLEN_VERWALTEN',
@@ -46,7 +48,9 @@ describe('PersonenkontextStore', () => {
     });
 
     it('should handle string error', async () => {
-      mockadapter.onGet('/api/personenkontexte/1/hatSystemrecht').replyOnce(500, 'some mock server error');
+      mockadapter
+        .onGet('/api/personenkontexte/1/hatSystemrecht?systemRecht=ROLLEN_VERWALTEN')
+        .replyOnce(500, 'some mock server error');
       const hasSystemRechtPromise: Promise<SystemrechtResponse> = personenkontextStore.hasSystemrecht(
         '1',
         'ROLLEN_VERWALTEN',
@@ -58,7 +62,9 @@ describe('PersonenkontextStore', () => {
     });
 
     it('should handle error code', async () => {
-      mockadapter.onGet('/api/personenkontexte/1/hatSystemrecht').replyOnce(500, { code: 'some mock server error' });
+      mockadapter
+        .onGet('/api/personenkontexte/1/hatSystemrecht?systemRecht=ROLLEN_VERWALTEN')
+        .replyOnce(500, { code: 'some mock server error' });
       const hasSystemRechtPromise: Promise<SystemrechtResponse> = personenkontextStore.hasSystemrecht(
         '1',
         'ROLLEN_VERWALTEN',
