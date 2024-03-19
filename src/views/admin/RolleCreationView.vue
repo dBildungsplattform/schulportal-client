@@ -216,7 +216,7 @@
 </script>
 
 <template>
-  <div class="admin">
+  <div class="admin card-padding">
     <LayoutCard
       :closable="true"
       @onCloseClicked="navigateToRolleManagement"
@@ -444,4 +444,8 @@
   </div>
 </template>
 
-<style></style>
+<style scoped>
+  .card-padding {
+    padding-bottom: 40px;
+  }
+</style>
