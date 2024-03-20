@@ -1,4 +1,4 @@
-ARG BASE_IMAGE_BUILDER=node:21.6-alpine3.19
+ARG BASE_IMAGE_BUILDER=node:20.11.1-alpine3.19
 ARG BASE_IMAGE=nginx:1.25-alpine
 
 # Build Stage
@@ -15,14 +15,11 @@ COPY env*.ts ./
 COPY src/ src/
 COPY public/ public/
 
-RUN npm install
+RUN npm ci
 RUN npm run build
 
 # Deployment Stage
 FROM $BASE_IMAGE as deployment
-RUN apk add libexpat=2.6.2-r0  \ 
-    && rm -rf /var/cache/apk/*
-
 
 COPY --from=build /app/dist/ /usr/share/nginx/html/
 RUN rm /etc/nginx/conf.d/default.conf
