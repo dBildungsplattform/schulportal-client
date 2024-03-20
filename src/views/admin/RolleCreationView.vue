@@ -360,7 +360,7 @@
               class="subtitle-1"
               cols="auto"
             >
-              {{ $t('admin.rolle.rolleAddedSuccessfully') }}
+              <span data-testid="rolle-success-text">{{ $t('admin.rolle.rolleAddedSuccessfully') }}</span>
             </v-col>
           </v-row>
           <v-row justify="center">
