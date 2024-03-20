@@ -1,6 +1,7 @@
 <script setup lang="ts">
+  import { useOrganisationStore, type OrganisationStore, type Organisation } from '@/stores/OrganisationStore';
   import { usePersonStore, type CreatedPerson, type PersonStore } from '@/stores/PersonStore';
-  import { onMounted, onUnmounted, type Ref, ref } from 'vue';
+  import { type ComputedRef, computed, onMounted, onUnmounted, type Ref, ref } from 'vue';
   import {
     onBeforeRouteLeave,
     type Router,
@@ -20,9 +21,11 @@
   import { useDisplay } from 'vuetify';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
+  import { DIN_91379A } from '@/utils/validation';
 
   const router: Router = useRouter();
   const personStore: PersonStore = usePersonStore();
+  const organisationStore: OrganisationStore = useOrganisationStore();
   const { t }: Composer = useI18n({ useScope: 'global' });
 
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
@@ -31,11 +34,11 @@
   const validationSchema: TypedSchema = toTypedSchema(
     object({
       selectedVorname: string()
-        .matches(/^[A-Za-z]*[A-Za-zÀ-ÖØ-öø-ÿ-' ]*$/, t('admin.person.rules.vorname.matches'))
+        .matches(DIN_91379A, t('admin.person.rules.vorname.matches'))
         .min(2, t('admin.person.rules.vorname.min'))
         .required(t('admin.person.rules.vorname.required')),
       selectedFamilienname: string()
-        .matches(/^[A-Za-z]*[A-Za-zÀ-ÖØ-öø-ÿ-' ]*$/, t('admin.person.rules.familienname.matches'))
+        .matches(DIN_91379A, t('admin.person.rules.familienname.matches'))
         .min(2, t('admin.person.rules.familienname.min'))
         .required(t('admin.person.rules.familienname.required')),
     }),
@@ -53,6 +56,7 @@
   type PersonCreationForm = {
     selectedVorname: string;
     selectedFamilienname: string;
+    selectedOrganisation: string;
   };
 
   // eslint-disable-next-line @typescript-eslint/typedef
@@ -68,6 +72,22 @@
     Ref<string>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedFamilienname', vuetifyConfig);
+  const [selectedOrganisation, selectedOrganisationProps]: [
+    Ref<string>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = defineField('selectedOrganisation', vuetifyConfig);
+
+  const organisationen: ComputedRef<
+    {
+      value: string;
+      title: string;
+    }[]
+  > = computed(() =>
+    organisationStore.allOrganisationen.map((org: Organisation) => ({
+      value: org.id,
+      title: `${org.kennung} (${org.name})`,
+    })),
+  );
 
   function isFormDirty(): boolean {
     return isFieldDirty('selectedVorname') || isFieldDirty('selectedFamilienname');
@@ -93,7 +113,8 @@
     createPerson();
   });
 
-  const handleAlertClose = (): void => {
+  async function navigateBackToPersonForm(): Promise<void> {
+    await router.push({ name: 'create-person' });
     personStore.errorCode = '';
   };
 
@@ -123,7 +144,8 @@
     }
   });
 
-  onMounted(() => {
+  onMounted(async () => {
+    await organisationStore.getAllOrganisationen();
     personStore.errorCode = '';
     personStore.createdPerson = null;
 
@@ -153,7 +175,7 @@
       :showButton="true"
       :buttonText="$t('admin.backToForm')"
       :text="$t('admin.person.creationErrorText')"
-      @update:modelValue="handleAlertClose"
+      :buttonAction="navigateBackToPersonForm"
     />
 
     <!-- The form to create a new Person  -->
@@ -170,9 +192,7 @@
       >
         <!-- Persönliche Informationen -->
         <v-row>
-          <h3 class="headline-3">
-            {{ $t('admin.person.personalInfo') }}
-          </h3>
+          <h3 class="headline-3">1. {{ $t('admin.person.personalInfo') }}</h3>
         </v-row>
         <!-- Vorname -->
         <FormRow
@@ -212,6 +232,31 @@
             v-bind="selectedFamiliennameProps"
             v-model="selectedFamilienname"
           ></v-text-field>
+        </FormRow>
+
+        <!-- Organisation zuordnen -->
+        <v-row>
+          <h3 class="headline-3">2. {{ $t('admin.organisation.assignOrganisation') }}</h3>
+        </v-row>
+        <!-- Vorname -->
+        <FormRow
+          :errorLabel="selectedOrganisationProps['error']"
+          labelForId="organisation-select"
+          :label="$t('admin.organisation.assignOrganisation')"
+        >
+          <v-select
+            clearable
+            data-testid="organisation-select"
+            density="compact"
+            id="organisation-select"
+            :items="organisationen"
+            item-value="value"
+            item-text="title"
+            :placeholder="$t('admin.organisation.selectOrganisation')"
+            variant="outlined"
+            v-bind="selectedOrganisationProps"
+            v-model="selectedOrganisation"
+          ></v-select>
         </FormRow>
       </FormWrapper>
     </template>
