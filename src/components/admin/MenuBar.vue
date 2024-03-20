@@ -1,6 +1,10 @@
 <script setup lang="ts">
   import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
-  import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenKontextStore';
+  import {
+    usePersonenkontextStore,
+    type PersonenkontextStore,
+    type SystemrechtResponse,
+  } from '@/stores/PersonenKontextStore';
   import { type Ref, ref, type ComputedRef } from 'vue';
   import { onMounted } from 'vue';
   import { useDisplay } from 'vuetify';
@@ -25,10 +29,15 @@
     await auth.getLoggedInUserInfo();
     try {
       if (auth.currentUser) {
-        await personenkontextStore.hasSystemrecht(auth.currentUser.sub, 'ROLLEN_VERWALTEN');
-        hasRollenverwaltungRecht.value = true;
+        const response: SystemrechtResponse = await personenkontextStore.hasSystemrecht(
+          auth.currentUser.sub,
+          'ROLLEN_VERWALTEN',
+        );
+        // Check if the response is an empty array and set hasRollenverwaltungRecht accordingly
+        hasRollenverwaltungRecht.value = Array.isArray(response) && response.length > 0;
       }
     } catch (error: unknown) {
+      // If the systemrecht doesn't exist at all, It's a 404 and so the user has no right to manage roles.
       hasRollenverwaltungRecht.value = false;
     } finally {
       menuDrawer.value = !mobile.value;
