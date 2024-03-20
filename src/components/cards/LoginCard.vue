@@ -67,7 +67,7 @@
 
 <style scoped>
   .login-card {
-    padding: 6.25rem 0; /* Top and bottom padding */
+    padding: 6.25rem 0;
   }
 
   @media (max-width: 680px) {

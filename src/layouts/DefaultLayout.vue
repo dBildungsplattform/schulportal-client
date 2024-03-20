@@ -9,4 +9,18 @@
   <TheFooter></TheFooter>
 </template>
 
-<style></style>
+<style scoped lang="scss">
+
+  @media (min-width: 1280px) {
+    .v-container {
+      margin-bottom: 240px;
+    }
+  }
+
+  @media (min-width: 1600px) {
+    .v-container {
+      max-width: 1200px;
+    }
+  }
+</style>
+
