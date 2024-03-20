@@ -15,7 +15,6 @@ frontendHostname: "helm.dev.spsh.dbildungsplattform.de"
 containerSecurityContext:
   enabled: true
   runAsUser: 101
-  fsGroup: 101
   runAsNonRoot: true
   privileged: false
   readOnlyRootFilesystem: false
