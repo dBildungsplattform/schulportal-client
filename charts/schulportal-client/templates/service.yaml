@@ -1,15 +1,18 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "schulportal-client.name" . }}
-  labels:
-    app.kubernetes.io/name: {{ template "schulportal-client.name" . }}
-    app.kubernetes.io/version: {{.Chart.Version}}
+  name: {{ template "common.names.name" . }}
+  namespace: {{ template "common.names.namespace" . }}
+  labels: 
+    {{- include "common.labels" . | nindent 4 }}
 spec:
+  selector:
+    app.kubernetes.io/name: {{ template "common.names.name" . }}
+    app.kubernetes.io/component: client
   type: {{ .Values.service.type }}
   ports:
-    - port: {{ .Values.service.port }}
-      targetPort: {{ .Values.service.targetPort }}
+    {{- if .Values.service.http.enabled }}
+    - name: http
+      port: {{  .Values.service.ports.http }}
       protocol: TCP
-  selector:
-    app: {{ template "schulportal-client.name" . }}
+    {{- end }}
