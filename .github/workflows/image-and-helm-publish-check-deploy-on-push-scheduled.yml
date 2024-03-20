@@ -106,7 +106,6 @@ jobs:
 
     needs: 
       - select_helm_version_generation_and_image_tag_generation
-      - build_image_on_push
     secrets: inherit
     with:
       chart_name: schulportal-client
