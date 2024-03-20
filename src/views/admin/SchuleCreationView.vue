@@ -195,7 +195,7 @@
             >
               <v-col
                 cols="12"
-                sm="4"
+                sm="5"
                 class="pb-0"
               >
                 <v-radio
@@ -205,7 +205,7 @@
               </v-col>
               <v-col
                 cols="12"
-                sm="4"
+                sm="5"
                 class="pt-0 pt-sm-3 pb-0"
               >
                 <v-radio
