@@ -34,7 +34,8 @@
           'ROLLEN_VERWALTEN',
         );
         // Check if the response is an empty array and set hasRollenverwaltungRecht accordingly
-        hasRollenverwaltungRecht.value = Array.isArray(response) && response.length > 0;
+        // Empty array means the user has the right but not attached to any Administrationsebene.
+        hasRollenverwaltungRecht.value = response.ROLLEN_VERWALTEN.length > 0;
       }
     } catch (error: unknown) {
       // If the systemrecht doesn't exist at all, It's a 404 and so the user has no right to manage roles.
