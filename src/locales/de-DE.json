@@ -198,6 +198,7 @@
     "pageText": "{interval} von {total} Einträgen"
   },
   "person": {
+    "assignments": "Zuordnungen",
     "email": "E-Mail",
     "enterFirstName": "Vorname eingeben",
     "enterLastName": "Nachname eingeben",

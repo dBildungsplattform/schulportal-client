@@ -31,6 +31,29 @@
   onBeforeMount(async () => {
     await personStore.getPersonById(currentPersonId);
   });
+
+  const personenuebersicht: any = {
+    personId: '12345',
+    zuordnungen: [
+      {
+        sskId: '101',
+        rolleId: '201',
+        sskName: 'Finanzen',
+        sskDstNr: 'FIN123',
+        rolle: 'Manager',
+      },
+      {
+        sskId: '102',
+        rolleId: '202',
+        sskName: 'IT',
+        sskDstNr: 'IT456',
+        rolle: 'Administrator',
+      },
+    ],
+    vorname: 'Max',
+    nachname: 'Mustermann',
+    benutzername: 'mmustermann',
+  };
 </script>
 
 <template>
@@ -161,6 +184,28 @@
               </div>
             </v-col>
             <v-col v-else-if="personStore.loading"> <v-progress-circular indeterminate></v-progress-circular></v-col>
+          </v-row>
+        </v-container>
+        <v-divider
+          class="border-opacity-100 rounded my-6 mx-4"
+          color="#E5EAEF"
+          thickness="6"
+        ></v-divider>
+        <!-- Zuordnungen -->
+        <v-container class="person-assignments">
+          <v-row class="ml-md-16">
+            <v-col>
+              <h3 class="subtitle-1">{{ $t('person.assignments') }}</h3>
+            </v-col>
+          </v-row>
+          <v-row class="ml-md-16">
+            <v-col
+              cols="12"
+              v-for="assignment in personenuebersicht.zuordnungen"
+              :key="assignment.sskId"
+            >
+              {{ assignment.sskDstNr }} ({{ assignment.sskName }}): {{ assignment.rolle }}
+            </v-col>
           </v-row>
         </v-container>
       </template>
