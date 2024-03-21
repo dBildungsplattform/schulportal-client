@@ -4,8 +4,6 @@ import {
   HatSystemrechtBodyParamsSystemRechtEnum,
   PersonenkontextApiFactory,
   PersonenkontexteApiFactory,
-  type FindPersonenkontextRollenBodyParams,
-  type FindPersonenkontextSchulstrukturknotenBodyParams,
   type FindRollenResponse,
   type FindSchulstrukturknotenResponse,
   type HatSystemrechtBodyParams,
