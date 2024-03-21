@@ -22,6 +22,7 @@ export type UserInfo = {
   locale: string | null;
   phone_number: string | null;
   updated_at: number | null;
+  personId: string | null;
 };
 
 type AuthState = {

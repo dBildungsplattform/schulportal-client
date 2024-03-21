@@ -28,13 +28,13 @@
   onMounted(async () => {
     await auth.getLoggedInUserInfo();
     try {
-      if (auth.currentUser) {
+      if (auth.currentUser && auth.currentUser.personId) {
         const response: SystemrechtResponse = await personenkontextStore.hasSystemrecht(
-          auth.currentUser.sub,
+          auth.currentUser.personId,
           'ROLLEN_VERWALTEN',
         );
         // Check if the response is an empty array and set hasRollenverwaltungRecht accordingly
-        // Empty array means the user has the right but not attached to any Administrationsebene.
+        // Empty array means the user has the right but not attached to any Administrationsebene which also doesn't qualify him to manage roles.
         hasRollenverwaltungRecht.value = response.ROLLEN_VERWALTEN.length > 0;
       }
     } catch (error: unknown) {
