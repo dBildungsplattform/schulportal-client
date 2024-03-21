@@ -147,7 +147,7 @@
       };
       await personStore.createPersonenkontext(unpersistedPersonenkontext).catch(() => {
         creationErrorText.value = t('admin.personenkontext.creationErrorText');
-      })
+      });
       resetForm();
     });
   }
