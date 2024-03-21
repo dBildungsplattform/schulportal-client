@@ -130,7 +130,7 @@
     background-repeat: no-repeat, no-repeat;
 
     background-size:
-      200% 80%,
+      200% 75%,
       100% 100%;
 
     bottom: 0;
