@@ -21,6 +21,7 @@
   import FormRow from '@/components/form/FormRow.vue';
   import { object, string } from 'yup';
   import { toTypedSchema } from '@vee-validate/yup';
+  import { DIN_91379A_EXT } from '@/utils/validation';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
@@ -32,7 +33,7 @@
     object({
       selectedDienststellennummer: string().required(t('admin.schule.rules.dienststellennummer.required')),
       selectedSchulname: string()
-        .matches(/^[A-Za-z]*[A-Za-zÀ-ÖØ-öø-ÿ-' ]*$/, t('admin.schule.rules.schulname.matches'))
+        .matches(DIN_91379A_EXT, t('admin.schule.rules.schulname.matches'))
         .required(t('admin.schule.rules.schulname.required')),
     }),
   );
