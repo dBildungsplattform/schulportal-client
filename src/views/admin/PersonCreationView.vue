@@ -38,8 +38,7 @@
 
   const validationSchema: TypedSchema = toTypedSchema(
     object({
-      selectedRolle: string()
-        .required(t('admin.rolle.rules.rolle.required')),
+      selectedRolle: string().required(t('admin.rolle.rules.rolle.required')),
       selectedVorname: string()
         .matches(DIN_91379A, t('admin.person.rules.vorname.matches'))
         .min(2, t('admin.person.rules.vorname.min'))
@@ -48,8 +47,7 @@
         .matches(DIN_91379A, t('admin.person.rules.familienname.matches'))
         .min(2, t('admin.person.rules.familienname.min'))
         .required(t('admin.person.rules.familienname.required')),
-        selectedOrganisation: string()
-        .required(t('admin.organisation.rules.organisation.required')),
+      selectedOrganisation: string().required(t('admin.organisation.rules.organisation.required')),
     }),
   );
 
@@ -67,6 +65,11 @@
     selectedVorname: string;
     selectedFamilienname: string;
     selectedOrganisation: string;
+  };
+
+  type TranslatedObject = {
+    value: string;
+    title: string;
   };
 
   // eslint-disable-next-line @typescript-eslint/typedef
@@ -91,28 +94,31 @@
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedOrganisation', vuetifyConfig);
 
-  const rollen: ComputedRef<
-    {
-      value: string;
-      title: string;
-    }[]
-  > = computed(() =>
+  const rollen: ComputedRef<TranslatedObject[]> = computed(() =>
     rolleStore.allRollen.map((rolle: Rolle) => ({
       value: rolle.id,
       title: rolle.name,
     })),
   );
 
-  const organisationen: ComputedRef<
-    {
-      value: string;
-      title: string;
-    }[]
-  > = computed(() =>
+  const organisationen: ComputedRef<TranslatedObject[]> = computed(() =>
     organisationStore.allOrganisationen.map((org: Organisation) => ({
       value: org.id,
       title: `${org.kennung} (${org.name})`,
     })),
+  );
+
+  const translatedOrganisationsname: ComputedRef<string> = computed(
+    () =>
+      organisationen.value.find(
+        (organisation: TranslatedObject) => organisation.value === personStore.createdPersonenkontext?.organisationId,
+      )?.title || '',
+  );
+
+  const translatedRollenname: ComputedRef<string> = computed(
+    () =>
+      rollen.value.find((rolle: TranslatedObject) => rolle.value === personStore.createdPersonenkontext?.rolleId)
+        ?.title || '',
   );
 
   function isFormDirty(): boolean {
@@ -379,11 +385,11 @@
         </v-row>
         <v-row>
           <v-col class="text-body bold text-right"> {{ $t('admin.rolle.rolle') }}: </v-col>
-          <v-col class="text-body"> {{ personStore.createdPersonenkontext?.rolleId }}</v-col>
+          <v-col class="text-body"> {{ translatedRollenname }}</v-col>
         </v-row>
         <v-row>
           <v-col class="text-body bold text-right"> {{ $t('admin.organisation.organisation') }}: </v-col>
-          <v-col class="text-body"> {{ personStore.createdPersonenkontext?.organisationId }}</v-col>
+          <v-col class="text-body"> {{ translatedOrganisationsname }}</v-col>
         </v-row>
         <v-divider
           class="border-opacity-100 rounded my-6"
