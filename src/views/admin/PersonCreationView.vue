@@ -121,6 +121,8 @@
         ?.title || '',
   );
 
+  const creationErrorText: Ref<string> = ref('');
+
   function isFormDirty(): boolean {
     return isFieldDirty('selectedVorname') || isFieldDirty('selectedFamilienname');
   }
@@ -143,7 +145,9 @@
         organisationId: selectedOrganisation.value,
         rolleId: selectedRolle.value,
       };
-      await personStore.createPersonenkontext(unpersistedPersonenkontext);
+      await personStore.createPersonenkontext(unpersistedPersonenkontext).catch(() => {
+        creationErrorText.value = t('admin.personenkontext.creationErrorText');
+      })
       resetForm();
     });
   }
@@ -215,7 +219,7 @@
       :showButton="true"
       :buttonText="$t('admin.backToForm')"
       :buttonAction="navigateBackToPersonForm"
-      :text="$t('admin.person.creationErrorText')"
+      :text="creationErrorText"
     />
 
     <!-- The form to create a new Person  -->

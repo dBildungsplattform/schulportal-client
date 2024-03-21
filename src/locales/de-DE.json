@@ -119,6 +119,9 @@
       "startPassword": "Einstiegs-Passwort",
       "status": "Status"
     },
+    "personenkontext": {
+      "creationErrorText": "Bei der Zuordnung des Personenkontextes ist ein Fehler aufgetreten. Bitte prüfen Sie die Zuordnungen an der Person."
+    },
     "schule": {
       "addNew": "Neue Schule hinzufügen",
       "administratingSchultraeger": "Verwaltender Schulträger",
