@@ -1,6 +1,13 @@
 {
   "action": "Aktion",
   "admin": {
+    "administrationsebene": {
+      "administrationsebene": "Administrationsebene",
+      "assignAdministrationsebene": "Administrationsebene zuordnen",
+      "rules": {
+        "required": "Die Administrationsebene muss ausgewählt werden."
+      }
+    },
     "mandatoryFieldsNotice": "Mit * markierte Felder sind Pflichtangaben.",
     "backToForm": "Zurück zum Formular",
     "class": {
@@ -65,6 +72,7 @@
         },
         "rollenname": {
           "length": "Der Rollenname darf nicht länger als 200 Zeichen sein.",
+          "matches": "Der Rollenname darf keine ungültigen Zeichen beinhalten.",
           "required": "Der Rollenname muss ausgewählt werden."
         }
       },
@@ -84,12 +92,12 @@
       "createAnother": "Weiteren Benutzer anlegen",
       "createNew": "Neue Benutzer anlegen",
       "creationErrorText": "",
-      "creationErrorTitle": "Fehler beim Anlegen des Benutzers",
+      "creationErrorTitle": "Fehler beim Anlegen des Benutzers.",
       "discard": "Benutzer verwerfen",
       "edit": "Benutzer bearbeiten",
       "generatedPassword": "Generiertes Passwort",
       "loadingErrorText": "Es konnten keine Benutzerdaten geladen werden.",
-      "loadingErrorTitle": "Fehler beim Laden des Benutzers",
+      "loadingErrorTitle": "Fehler beim Laden des Benutzers.",
       "management": "Benutzerverwaltung",
       "personalInfo": "Persönliche Informationen",
       "resetPasswordConfirmation": "Sind Sie sicher, dass Sie das Passwort für {firstname} {lastname} zurücksetzen möchten?",
@@ -110,6 +118,9 @@
       "showAll": "Alle Benutzer anzeigen",
       "startPassword": "Einstiegs-Passwort",
       "status": "Status"
+    },
+    "personenkontext": {
+      "creationErrorText": "Bei der Zuordnung des Personenkontextes ist ein Fehler aufgetreten. Bitte prüfen Sie die Zuordnungen an der Person."
     },
     "schule": {
       "addNew": "Neue Schule hinzufügen",
@@ -143,14 +154,6 @@
       "schuleAddedSuccessfully": "Die Schule wurde erfolgreich hinzugefügt.",
       "showAll": "Alle Schulen anzeigen"
     },
-    "schulstrukturknoten": {
-      "assignSchulstrukturknoten": "Schulstrukturknoten zuordnen",
-      "rules": {
-        "required": "Der Schulstrukturknoten muss ausgewählt werden."
-      },
-      "schulstrukturknoten": "Schulstrukturknoten",
-      "selectSchulstrukturknoten": "Schulstrukturknoten auswählen"
-    },
     "schultraeger": {
       "management": "Schulträgerverwaltung"
     }
@@ -172,8 +175,15 @@
     "privacyPolicy": "Datenschutzerklärung"
   },
   "start": {
-    "administration": "Verwaltung",
-    "allServiceProviders": "Alle Angebote"
+    "allServiceProviders": "Alle Angebote",
+    "categories": {
+      "administration": "Verwaltung",
+      "class": "Unterricht",
+      "hints": "Hinweise",
+      "homePage": "Startseite",
+      "schoolOfferings": "Schulische Angebote",
+      "workEmail": "Dienstliche E-Mail"
+    }
   },
   "itemsPerPage": "Einträge pro Seite",
   "landingTitle": "Willkommen im Schulportal SH.",

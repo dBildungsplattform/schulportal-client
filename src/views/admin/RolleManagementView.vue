@@ -17,7 +17,7 @@
     { title: t('admin.rolle.rollenart'), key: 'rollenart', align: 'start' },
     { title: t('admin.rolle.merkmale'), key: 'merkmale', align: 'start' },
     {
-      title: t('admin.schulstrukturknoten.schulstrukturknoten'),
+      title: t('admin.administrationsebene.administrationsebene'),
       key: 'administeredBySchulstrukturknoten',
       align: 'start',
     },

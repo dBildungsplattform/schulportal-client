@@ -14,7 +14,7 @@
     <v-col
       class="py-0 pb-sm-8 pt-sm-3 text-sm-right"
       cols="12"
-      sm="4"
+      sm="5"
     >
       <label
         :for="labelForId"
@@ -26,7 +26,7 @@
     <v-col
       class="py-0"
       cols="12"
-      sm="8"
+      sm="7"
     >
       <slot />
     </v-col>

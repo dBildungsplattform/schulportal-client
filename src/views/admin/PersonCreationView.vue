@@ -26,6 +26,7 @@
   import FormWrapper from '@/components/form/FormWrapper.vue';
   import FormRow from '@/components/form/FormRow.vue';
   import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenKontextStore';
+  import { DIN_91379A } from '@/utils/validation';
 
   const router: Router = useRouter();
   const personStore: PersonStore = usePersonStore();
@@ -41,11 +42,11 @@
     object({
       selectedRolle: string().required(t('admin.rolle.rules.rolle.required')),
       selectedVorname: string()
-        .matches(/^[A-Za-z]*[A-Za-zÀ-ÖØ-öø-ÿ-' ]*$/, t('admin.person.rules.vorname.matches'))
+        .matches(DIN_91379A, t('admin.person.rules.vorname.matches'))
         .min(2, t('admin.person.rules.vorname.min'))
         .required(t('admin.person.rules.vorname.required')),
       selectedFamilienname: string()
-        .matches(/^[A-Za-z]*[A-Za-zÀ-ÖØ-öø-ÿ-' ]*$/, t('admin.person.rules.familienname.matches'))
+        .matches(DIN_91379A, t('admin.person.rules.familienname.matches'))
         .min(2, t('admin.person.rules.familienname.min'))
         .required(t('admin.person.rules.familienname.required')),
       selectedOrganisation: string().required(t('admin.organisation.rules.organisation.required')),
@@ -61,16 +62,16 @@
     },
   });
 
-  type ValueTitleOption = {
-    value: string;
-    title: string;
-  };
-
   type PersonCreationForm = {
     selectedRolle: string;
     selectedVorname: string;
     selectedFamilienname: string;
     selectedOrganisation: string;
+  };
+
+  type TranslatedObject = {
+    value: string;
+    title: string;
   };
 
   // eslint-disable-next-line @typescript-eslint/typedef
@@ -112,7 +113,7 @@
     }
   });
 
-  const rollen: ComputedRef<ValueTitleOption[] | undefined> = computed(() => {
+  const rollen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
     // If searchInput is less than 3 characters, return the initial 25 roles from the rolleStore
     if (searchInputRollen.value.length < 3) {
       return rolleStore.allRollen
@@ -121,7 +122,7 @@
           value: rolle.id,
           title: rolle.name,
         }))
-        .sort((a: ValueTitleOption, b: ValueTitleOption) => a.title.localeCompare(b.title));
+        .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
     } else {
       // Once filtering is applied, map the filteredRollen for the autocomplete
       return personenkontextStore.filteredRollen?.moeglicheRollen
@@ -130,25 +131,34 @@
           value: rolle.id,
           title: rolle.name,
         }))
-        .sort((a: ValueTitleOption, b: ValueTitleOption) => a.title.localeCompare(b.title));
+        .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
     }
   });
 
-  const organisationen: ComputedRef<
-    | {
-        value: string;
-        title: string;
-      }[]
-    | undefined
-  > = computed(() => {
+  const organisationen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
     return personenkontextStore.filteredOrganisationen?.moeglicheSkks
       .slice(0, 25)
       .map((org: OrganisationResponse) => ({
         value: org.id,
         title: `${org.kennung} (${org.name})`,
       }))
-      .sort((a: ValueTitleOption, b: ValueTitleOption) => a.title.localeCompare(b.title));
+      .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
   });
+
+  const translatedOrganisationsname: ComputedRef<string> = computed(
+    () =>
+      organisationen.value?.find(
+        (organisation: TranslatedObject) => organisation.value === personStore.createdPersonenkontext?.organisationId,
+      )?.title || '',
+  );
+
+  const translatedRollenname: ComputedRef<string> = computed(
+    () =>
+      rollen.value?.find((rolle: TranslatedObject) => rolle.value === personStore.createdPersonenkontext?.rolleId)
+        ?.title || '',
+  );
+
+  const creationErrorText: Ref<string> = ref('');
 
   function isFormDirty(): boolean {
     return isFieldDirty('selectedVorname') || isFieldDirty('selectedFamilienname');
@@ -172,7 +182,9 @@
         organisationId: selectedOrganisation.value,
         rolleId: selectedRolle.value,
       };
-      await personStore.createPersonenkontext(unpersistedPersonenkontext);
+      await personStore.createPersonenkontext(unpersistedPersonenkontext).catch(() => {
+        creationErrorText.value = t('admin.personenkontext.creationErrorText');
+      });
       resetForm();
     });
   }
@@ -244,7 +256,7 @@
       :showButton="true"
       :buttonText="$t('admin.backToForm')"
       :buttonAction="navigateBackToPersonForm"
-      :text="$t('admin.person.creationErrorText')"
+      :text="creationErrorText"
     />
 
     <!-- The form to create a new Person  -->
@@ -416,11 +428,11 @@
         </v-row>
         <v-row>
           <v-col class="text-body bold text-right"> {{ $t('admin.rolle.rolle') }}: </v-col>
-          <v-col class="text-body"> {{ personStore.createdPersonenkontext?.rolleId }}</v-col>
+          <v-col class="text-body"> {{ translatedRollenname }}</v-col>
         </v-row>
         <v-row>
           <v-col class="text-body bold text-right"> {{ $t('admin.organisation.organisation') }}: </v-col>
-          <v-col class="text-body"> {{ personStore.createdPersonenkontext?.organisationId }}</v-col>
+          <v-col class="text-body"> {{ translatedOrganisationsname }}</v-col>
         </v-row>
         <v-divider
           class="border-opacity-100 rounded my-6"
