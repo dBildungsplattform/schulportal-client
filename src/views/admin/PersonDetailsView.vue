@@ -198,13 +198,15 @@
               <h3 class="subtitle-1">{{ $t('person.assignments') }}</h3>
             </v-col>
           </v-row>
-          <v-row class="ml-md-16">
+          <v-row>
             <v-col
-              cols="12"
+              cols="10"
+              offset-md="2"
+              offset="1"
               v-for="assignment in personenuebersicht.zuordnungen"
               :key="assignment.sskId"
             >
-              {{ assignment.sskDstNr }} ({{ assignment.sskName }}): {{ assignment.rolle }}
+              <h3 class="text-body">{{ assignment.sskDstNr }} ({{ assignment.sskName }}): {{ assignment.rolle }}</h3>
             </v-col>
           </v-row>
         </v-container>
