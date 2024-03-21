@@ -229,6 +229,20 @@
     background-color: #001e49;
     transform: translateX(-50%);
   }
+  @-moz-document url-prefix() {
+    .sponsor-logos-div::before {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background-color: #001e49;
+      transform: translateX(-50%);
+      height: 130px;
+      margin-top: 45px;
+    }
+  }
   .sponsor-logo {
     height: auto; /* Maintain aspect ratio */
     margin: 0 10px; /* Adds some space between logos */
