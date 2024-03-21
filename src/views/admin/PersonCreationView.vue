@@ -26,6 +26,9 @@
   import FormWrapper from '@/components/form/FormWrapper.vue';
   import FormRow from '@/components/form/FormRow.vue';
   import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenKontextStore';
+  import { useDisplay } from 'vuetify';
+
+  const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
   import { DIN_91379A } from '@/utils/validation';
 
   const router: Router = useRouter();
@@ -442,24 +445,28 @@
         <v-row justify="end">
           <v-col
             cols="12"
+            sm="6"
             md="auto"
           >
             <v-btn
               class="secondary"
               @click.stop="navigateToPersonTable"
               data-testid="back-to-list-button"
+              :block="mdAndDown"
             >
               {{ $t('nav.backToList') }}
             </v-btn>
           </v-col>
           <v-col
             cols="12"
+            sm="6"
             md="auto"
           >
             <v-btn
               class="primary button"
               @click="handleCreateAnotherPerson"
               data-testid="create-another-person-button"
+              :block="mdAndDown"
             >
               {{ $t('admin.person.createAnother') }}
             </v-btn>
