@@ -24,8 +24,7 @@ spec:
         - name: {{ template "common.names.name" . }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ default "Always" .Values.image.pullPolicy | quote }}
-          securityContext: {{- toYaml .Values.containerSecurityContext | nindent 12 }}
-          resources: {{- toYaml .Values.containerResources | nindent 12 }}
+          resources: {{- toYaml .Values.resources | nindent 12 }}
           securityContext: {{- omit .Values.containerSecurityContext "enabled" | toYaml | nindent 12 }}
           resources: {{- toYaml .Values.resources | nindent 12 }}
           ports:
