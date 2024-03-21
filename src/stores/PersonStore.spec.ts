@@ -18,7 +18,7 @@ describe('PersonStore', () => {
   it('should initalize state correctly', () => {
     expect(personStore.allPersons).toEqual([]);
     expect(personStore.errorCode).toEqual('');
-    expect(personStore.loading).toBeFalsy();
+    expect(personStore.loading).toBe(false);
   });
 
   describe('getAllPersons', () => {

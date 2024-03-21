@@ -17,7 +17,7 @@
 
   const emit: (event: 'onShowDialogChange', ...args: unknown[]) => void = defineEmits(['onShowDialogChange']);
 
-  const { smAndDown }: { smAndDown: Ref<boolean> } = useDisplay();
+  const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
   const showDialogValue: WritableComputedRef<boolean | undefined> = computed({
     get() {
@@ -58,10 +58,10 @@
       <v-col
         cols="12"
         sm="6"
-        md="4"
+        md="auto"
       >
         <v-btn
-          :block="smAndDown"
+          :block="mdAndDown"
           class="secondary"
           @click.stop="onDiscard"
           :data-testid="`${id}-discard-button`"
@@ -71,10 +71,10 @@
       <v-col
         cols="12"
         sm="6"
-        md="4"
+        md="auto"
       >
         <v-btn
-          :block="smAndDown"
+          :block="mdAndDown"
           class="primary"
           :data-testid="`${id}-create-button`"
           type="submit"
@@ -106,13 +106,13 @@
           <v-col
             cols="12"
             sm="6"
-            md="4"
+            md="auto"
           >
             <v-btn
               @click.stop="confirmUnsavedChangesAction"
               class="secondary button"
               data-testid="confirm-unsaved-changes-button"
-              :block="smAndDown"
+              :block="mdAndDown"
             >
               {{ $t('yes') }}
             </v-btn>
@@ -120,13 +120,13 @@
           <v-col
             cols="12"
             sm="6"
-            md="4"
+            md="auto"
           >
             <v-btn
               @click.stop="showDialogValue = false"
               class="primary button"
               data-testid="close-unsaved-changes-dialog-button"
-              :block="smAndDown"
+              :block="mdAndDown"
             >
               {{ $t('no') }}
             </v-btn>
