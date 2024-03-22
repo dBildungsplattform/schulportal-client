@@ -10,7 +10,7 @@ image:
 
 restartPolicy: Always
 
-frontendHostname: "helm.dev.spsh.dbildungsplattform.de"
+frontendHostname: ""
 
 containerSecurityContext:
   enabled: true
