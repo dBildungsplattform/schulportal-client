@@ -101,7 +101,7 @@
     rolleStore.allRollen.map((rolle: Rolle) => ({
       value: rolle.id,
       title: rolle.name,
-    })),
+    })).sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title))
   );
 
   const organisationen: ComputedRef<TranslatedObject[]> = computed(() =>
