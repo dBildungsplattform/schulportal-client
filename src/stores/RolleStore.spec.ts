@@ -23,7 +23,7 @@ describe('rolleStore', () => {
     expect(rolleStore.createdRolle).toEqual(null);
     expect(rolleStore.allRollen).toEqual([]);
     expect(rolleStore.errorCode).toEqual('');
-    expect(rolleStore.loading).toBeFalsy();
+    expect(rolleStore.loading).toBe(false);
   });
 
   describe('createRolle', () => {

@@ -29,7 +29,7 @@
   import type { CreateRolleBodyParamsSystemrechteEnum } from '@/api-client/generated';
   import { DIN_91379A_EXT } from '@/utils/validation';
 
-  const { smAndDown }: { smAndDown: Ref<boolean> } = useDisplay();
+  const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
   const rolleStore: RolleStore = useRolleStore();
   const organisationStore: OrganisationStore = useOrganisationStore();
 
@@ -414,7 +414,7 @@
               class="subtitle-1"
               cols="auto"
             >
-              {{ $t('admin.rolle.rolleAddedSuccessfully') }}
+              <span data-testid="rolle-success-text">{{ $t('admin.rolle.rolleAddedSuccessfully') }}</span>
             </v-col>
           </v-row>
           <v-row justify="center">
@@ -471,25 +471,27 @@
           <v-row justify="end">
             <v-col
               cols="12"
+              sm="6"
               md="auto"
             >
               <v-btn
                 class="secondary"
                 data-testid="back-to-list-button"
-                :block="smAndDown"
+                :block="mdAndDown"
                 @click="navigateToRolleManagement"
                 >{{ $t('nav.backToList') }}</v-btn
               >
             </v-col>
             <v-col
               cols="12"
+              sm="6"
               md="auto"
             >
               <v-btn
                 class="primary button"
                 data-testid="create-another-rolle-button"
                 @click="handleCreateAnotherRolle"
-                :block="smAndDown"
+                :block="mdAndDown"
               >
                 {{ $t('admin.rolle.createAnother') }}
               </v-btn>

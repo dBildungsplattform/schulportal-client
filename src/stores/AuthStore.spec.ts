@@ -15,7 +15,7 @@ describe('AuthStore', () => {
   });
 
   it('should initalize state correctly', () => {
-    expect(authStore.isAuthed).toBeFalsy();
+    expect(authStore.isAuthed).toBe(false);
   });
 
   describe('initializeAuthStatus', () => {

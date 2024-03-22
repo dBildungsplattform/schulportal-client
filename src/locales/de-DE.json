@@ -21,11 +21,18 @@
     },    
     "organisation": {
       "assignOrganisation": "Organisationsebene zuordnen",
-      "selectOrganisation": "Organisationsebene auswählen"
+      "organisation": "Organisationsebene",
+      "selectOrganisation": "Organisationsebene auswählen",
+      "rules": {
+        "organisation": {
+          "required": "Die Organisationsebene muss ausgewählt werden."
+        }
+      }
     },
     "rolle": {
       "addNew": "Neue Rolle hinzufügen",
       "assignMerkmale": "Merkmale zuordnen",
+      "assignRolle": "Rolle zuordnen",
       "assignRollenart": "Rollenart zuordnen",
       "assignSystemrechte": "Systemrechte zuordnen",
       "backToCreateRolle": "Zurück zur Rollenanlage",
@@ -55,12 +62,16 @@
       },
       "merkmale": "Merkmale",
       "noRollenFound": "Keine Rollen gefunden",
+      "rolle": "Rolle",
       "rolleCreateErrorTitle": "Fehler beim Anlegen der Rolle",
       "rolleCreateErrorText": "Die Rolle konnte nicht angelegt werden.",
       "rollenart": "Rollenart",
       "rollenname": "Rollenname",
       "rolleAddedSuccessfully": "Die Rolle wurde erfolgreich hinzugefügt.",
       "rules": {
+        "rolle": {
+          "required": "Die Rolle muss ausgewählt werden."
+        },
         "rollenart": {
           "required": "Die Rollenart muss ausgewählt werden."
         },
@@ -113,6 +124,9 @@
       "showAll": "Alle Benutzer anzeigen",
       "startPassword": "Einstiegs-Passwort",
       "status": "Status"
+    },
+    "personenkontext": {
+      "creationErrorText": "Bei der Zuordnung des Personenkontextes ist ein Fehler aufgetreten. Bitte prüfen Sie die Zuordnungen an der Person."
     },
     "schule": {
       "addNew": "Neue Schule hinzufügen",

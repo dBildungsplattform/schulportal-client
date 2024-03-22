@@ -42,6 +42,14 @@ export { RolleResponseRollenartEnum };
 export { RolleResponseSystemrechteEnum };
 export type { RolleResponse };
 
+export type Rolle = {
+  id: string;
+  administeredBySchulstrukturknoten: string;
+  merkmale: Set<RolleResponseMerkmaleEnum>;
+  name: string;
+  rollenart: RolleResponseRollenartEnum;
+};
+
 export type RolleStore = Store<'rolleStore', RolleState, RolleGetters, RolleActions>;
 
 export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGetters, RolleActions> = defineStore({
