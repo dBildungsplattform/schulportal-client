@@ -16,7 +16,7 @@ describe('serviceProviderStore', () => {
   it('should initalize state correctly', () => {
     expect(serviceProviderStore.allServiceProviders).toEqual([]);
     expect(serviceProviderStore.errorCode).toEqual('');
-    expect(serviceProviderStore.loading).toBeFalsy();
+    expect(serviceProviderStore.loading).toBe(false);
   });
 
   describe('getAllServiceProviders', () => {
