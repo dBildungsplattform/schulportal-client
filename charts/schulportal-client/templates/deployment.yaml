@@ -2,27 +2,33 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "schulportal-client.name" . }}
+  name: {{ template "common.names.name" . }}
+  namespace: {{ template "common.names.namespace" . }}
   labels:
-    app: {{ template "schulportal-client.name" . }}
+  {{- include "common.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app: {{ template "schulportal-client.name" . }}
+      app.kubernetes.io/name: {{ template "common.names.name" . }}
+      app.kubernetes.io/component: client
   template:
     metadata:
       labels:
-        app: {{ template "schulportal-client.name" . }}
+        {{- include "common.labels" . | nindent 8 }}
+        app.kubernetes.io/component: client
     spec:
+      automountServiceAccountToken: false
+      restartPolicy: {{ .Values.restartPolicy  }}
       containers:
-        - name: {{ template "schulportal-client.name" . }}
+        - name: {{ template "common.names.name" . }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ default "Always" .Values.image.pullPolicy | quote }}
+          resources: {{- toYaml .Values.resources | nindent 12 }}
+          securityContext: {{- omit .Values.containerSecurityContext "enabled" | toYaml | nindent 12 }}
+          resources: {{- toYaml .Values.resources | nindent 12 }}
           ports:
-            - name: http
-              containerPort: {{ default 8080 .Values.service.port }}
+            - name: {{ .Values.containerPorts.name }} 
+              containerPort: {{ .Values.containerPorts.http }} 
               protocol: TCP
-          securityContext: {{- toYaml .Values.containerSecurityContext | nindent 12 }}
-          resources: {{- toYaml .Values.containerResources | nindent 12 }}
-      restartPolicy: {{ .Values.restartPolicy  }}
+      
