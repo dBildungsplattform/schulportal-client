@@ -424,26 +424,6 @@ export interface FindSchulstrukturknotenResponse {
 /**
  * 
  * @export
- * @interface HatSystemrechtBodyParams
- */
-export interface HatSystemrechtBodyParams {
-    /**
-     * 
-     * @type {string}
-     * @memberof HatSystemrechtBodyParams
-     */
-    'systemRecht': HatSystemrechtBodyParamsSystemRechtEnum;
-}
-
-export const HatSystemrechtBodyParamsSystemRechtEnum = {
-    RollenVerwalten: 'ROLLEN_VERWALTEN'
-} as const;
-
-export type HatSystemrechtBodyParamsSystemRechtEnum = typeof HatSystemrechtBodyParamsSystemRechtEnum[keyof typeof HatSystemrechtBodyParamsSystemRechtEnum];
-
-/**
- * 
- * @export
  * @interface LoeschungResponse
  */
 export interface LoeschungResponse {
@@ -1459,6 +1439,12 @@ export interface UserinfoResponse {
      * @memberof UserinfoResponse
      */
     'updated_at': number | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserinfoResponse
+     */
+    'personId': string | null;
 }
 
 /**
@@ -3971,15 +3957,15 @@ export const PersonenkontexteApiAxiosParamCreator = function (configuration?: Co
         /**
          * 
          * @param {string} personId The id for the account.
-         * @param {HatSystemrechtBodyParams} hatSystemrechtBodyParams 
+         * @param {'ROLLEN_VERWALTEN'} systemRecht 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        personenkontextControllerHatSystemRecht: async (personId: string, hatSystemrechtBodyParams: HatSystemrechtBodyParams, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        personenkontextControllerHatSystemRecht: async (personId: string, systemRecht: 'ROLLEN_VERWALTEN', options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'personId' is not null or undefined
             assertParamExists('personenkontextControllerHatSystemRecht', 'personId', personId)
-            // verify required parameter 'hatSystemrechtBodyParams' is not null or undefined
-            assertParamExists('personenkontextControllerHatSystemRecht', 'hatSystemrechtBodyParams', hatSystemrechtBodyParams)
+            // verify required parameter 'systemRecht' is not null or undefined
+            assertParamExists('personenkontextControllerHatSystemRecht', 'systemRecht', systemRecht)
             const localVarPath = `/api/personenkontexte/{personId}/hatSystemrecht`
                 .replace(`{${"personId"}}`, encodeURIComponent(String(personId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -3997,14 +3983,15 @@ export const PersonenkontexteApiAxiosParamCreator = function (configuration?: Co
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
+            if (systemRecht !== undefined) {
+                localVarQueryParameter['systemRecht'] = systemRecht;
+            }
+
 
     
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(hatSystemrechtBodyParams, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -4103,12 +4090,12 @@ export const PersonenkontexteApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @param {string} personId The id for the account.
-         * @param {HatSystemrechtBodyParams} hatSystemrechtBodyParams 
+         * @param {'ROLLEN_VERWALTEN'} systemRecht 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async personenkontextControllerHatSystemRecht(personId: string, hatSystemrechtBodyParams: HatSystemrechtBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SystemrechtResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.personenkontextControllerHatSystemRecht(personId, hatSystemrechtBodyParams, options);
+        async personenkontextControllerHatSystemRecht(personId: string, systemRecht: 'ROLLEN_VERWALTEN', options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SystemrechtResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.personenkontextControllerHatSystemRecht(personId, systemRecht, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -4168,12 +4155,12 @@ export const PersonenkontexteApiFactory = function (configuration?: Configuratio
         /**
          * 
          * @param {string} personId The id for the account.
-         * @param {HatSystemrechtBodyParams} hatSystemrechtBodyParams 
+         * @param {'ROLLEN_VERWALTEN'} systemRecht 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        personenkontextControllerHatSystemRecht(personId: string, hatSystemrechtBodyParams: HatSystemrechtBodyParams, options?: any): AxiosPromise<SystemrechtResponse> {
-            return localVarFp.personenkontextControllerHatSystemRecht(personId, hatSystemrechtBodyParams, options).then((request) => request(axios, basePath));
+        personenkontextControllerHatSystemRecht(personId: string, systemRecht: 'ROLLEN_VERWALTEN', options?: any): AxiosPromise<SystemrechtResponse> {
+            return localVarFp.personenkontextControllerHatSystemRecht(personId, systemRecht, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -4230,12 +4217,12 @@ export interface PersonenkontexteApiInterface {
     /**
      * 
      * @param {string} personId The id for the account.
-     * @param {HatSystemrechtBodyParams} hatSystemrechtBodyParams 
+     * @param {'ROLLEN_VERWALTEN'} systemRecht 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PersonenkontexteApiInterface
      */
-    personenkontextControllerHatSystemRecht(personId: string, hatSystemrechtBodyParams: HatSystemrechtBodyParams, options?: AxiosRequestConfig): AxiosPromise<SystemrechtResponse>;
+    personenkontextControllerHatSystemRecht(personId: string, systemRecht: 'ROLLEN_VERWALTEN', options?: AxiosRequestConfig): AxiosPromise<SystemrechtResponse>;
 
     /**
      * 
@@ -4298,13 +4285,13 @@ export class PersonenkontexteApi extends BaseAPI implements PersonenkontexteApiI
     /**
      * 
      * @param {string} personId The id for the account.
-     * @param {HatSystemrechtBodyParams} hatSystemrechtBodyParams 
+     * @param {'ROLLEN_VERWALTEN'} systemRecht 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PersonenkontexteApi
      */
-    public personenkontextControllerHatSystemRecht(personId: string, hatSystemrechtBodyParams: HatSystemrechtBodyParams, options?: AxiosRequestConfig) {
-        return PersonenkontexteApiFp(this.configuration).personenkontextControllerHatSystemRecht(personId, hatSystemrechtBodyParams, options).then((request) => request(this.axios, this.basePath));
+    public personenkontextControllerHatSystemRecht(personId: string, systemRecht: 'ROLLEN_VERWALTEN', options?: AxiosRequestConfig) {
+        return PersonenkontexteApiFp(this.configuration).personenkontextControllerHatSystemRecht(personId, systemRecht, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

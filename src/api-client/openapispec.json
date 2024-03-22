@@ -991,21 +991,22 @@
                             "nullable": false,
                             "type": "string"
                         }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/HatSystemrechtBodyParams"
-                            }
+                    },
+                    {
+                        "name": "systemRecht",
+                        "required": true,
+                        "in": "query",
+                        "schema": {
+                            "enum": [
+                                "ROLLEN_VERWALTEN"
+                            ],
+                            "type": "string"
                         }
                     }
-                },
+                ],
                 "responses": {
                     "200": {
-                        "description": "The SchulStrukturKnoten associated with this personId and systemrecht.",
+                        "description": "The SchulStrukturKnoten associated with this personId and systemrecht. Can return empty list",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1015,7 +1016,7 @@
                         }
                     },
                     "404": {
-                        "description": "The systemrecht could not be found."
+                        "description": "The systemrecht could not be found (does not exist as type of systemrecht)."
                     }
                 },
                 "tags": [
@@ -2095,6 +2096,10 @@
                     "updated_at": {
                         "type": "number",
                         "nullable": true
+                    },
+                    "personId": {
+                        "type": "string",
+                        "nullable": true
                     }
                 },
                 "required": [
@@ -2115,7 +2120,8 @@
                     "zoneinfo",
                     "locale",
                     "phone_number",
-                    "updated_at"
+                    "updated_at",
+                    "personId"
                 ]
             },
             "PersonNameParams": {
@@ -2548,20 +2554,6 @@
                 "required": [
                     "person",
                     "personenkontexte"
-                ]
-            },
-            "HatSystemrechtBodyParams": {
-                "type": "object",
-                "properties": {
-                    "systemRecht": {
-                        "type": "string",
-                        "enum": [
-                            "ROLLEN_VERWALTEN"
-                        ]
-                    }
-                },
-                "required": [
-                    "systemRecht"
                 ]
             },
             "OrganisationResponse": {
