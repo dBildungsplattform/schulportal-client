@@ -37,7 +37,7 @@ ingress:
   ingressClassName: nginx
   path: /
   pathType: Prefix
-  # annotations: {}
+  annotations: {}
 
 containerPorts: 
   name: http 
