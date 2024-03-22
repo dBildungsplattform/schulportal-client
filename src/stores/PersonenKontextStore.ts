@@ -1,12 +1,10 @@
 import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import { isAxiosError } from 'axios';
 import {
-  HatSystemrechtBodyParamsSystemRechtEnum,
   PersonenkontextApiFactory,
   PersonenkontexteApiFactory,
   type FindRollenResponse,
   type FindSchulstrukturknotenResponse,
-  type HatSystemrechtBodyParams,
   type PersonenkontextApiInterface,
   type PersonenkontexteApiInterface,
   type SystemrechtResponse,
@@ -25,15 +23,11 @@ type PersonenkontextState = {
 
 type PersonenkontextGetters = {};
 type PersonenkontextActions = {
-  hasSystemrecht: (
-    personId: string,
-    systemrecht: HatSystemrechtBodyParamsSystemRechtEnum,
-  ) => Promise<SystemrechtResponse>;
+  hasSystemrecht: (personId: string, systemrecht: 'ROLLEN_VERWALTEN') => Promise<SystemrechtResponse>;
   getPersonenkontextRolleWithFilter: (rolleName: string, limit: number) => void;
   getPersonenkontextAdministrationsebeneWithFilter: (rolleId: string, sskName: string, limit: number) => void;
 };
 
-export { HatSystemrechtBodyParamsSystemRechtEnum };
 export type { SystemrechtResponse };
 
 export type PersonenkontextStore = Store<
@@ -59,17 +53,11 @@ export const usePersonenkontextStore: StoreDefinition<
     };
   },
   actions: {
-    async hasSystemrecht(
-      personId: string,
-      systemrecht: HatSystemrechtBodyParamsSystemRechtEnum,
-    ): Promise<SystemrechtResponse> {
+    async hasSystemrecht(personId: string, systemrecht: 'ROLLEN_VERWALTEN'): Promise<SystemrechtResponse> {
       this.loading = true;
       try {
-        const createSystemrechtBodyParams: HatSystemrechtBodyParams = {
-          systemRecht: systemrecht,
-        };
         const { data }: { data: SystemrechtResponse } =
-          await personenKontexteApi.personenkontextControllerHatSystemRecht(personId, createSystemrechtBodyParams);
+          await personenKontexteApi.personenkontextControllerHatSystemRecht(personId, systemrecht);
         return data;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
