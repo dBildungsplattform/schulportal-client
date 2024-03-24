@@ -8,7 +8,7 @@
   import { computed, onMounted, type ComputedRef } from 'vue';
   import ServiceProviderCategory from '@/components/layout/ServiceProviderCategory.vue';
   import { useI18n, type Composer } from 'vue-i18n';
-  
+
   const { t }: Composer = useI18n({ useScope: 'global' });
 
   const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();

@@ -176,7 +176,7 @@
               md="auto"
               v-if="personStore.currentPerson"
             >
-              <div>
+              <div class="d-flex justify-sm-end">
                 <PasswordReset
                   :errorCode="personStore.errorCode"
                   :person="personStore.currentPerson"
