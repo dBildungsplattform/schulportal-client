@@ -24,8 +24,8 @@ type PersonenkontextState = {
 type PersonenkontextGetters = {};
 type PersonenkontextActions = {
   hasSystemrecht: (personId: string, systemrecht: 'ROLLEN_VERWALTEN') => Promise<SystemrechtResponse>;
-  getPersonenkontextRolleWithFilter: (rolleName: string, limit: number) => void;
-  getPersonenkontextAdministrationsebeneWithFilter: (rolleId: string, sskName: string, limit: number) => void;
+  getPersonenkontextRolleWithFilter: (rolleName: string, limit: number) => Promise<void>;
+  getPersonenkontextAdministrationsebeneWithFilter: (rolleId: string, sskName: string, limit: number) => Promise<void>;
 };
 
 export type { SystemrechtResponse };
