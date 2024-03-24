@@ -23,6 +23,10 @@
     });
   }
 
+  function truncateSskName(sskName: string): string {
+    return sskName.length > 30 ? `${sskName.substring(0, 30)}...` : sskName;
+  }
+
   const handleAlertClose = (): void => {
     personStore.errorCode = '';
     navigateToPersonTable();
@@ -38,16 +42,16 @@
       {
         sskId: '101',
         rolleId: '201',
-        sskName: 'Finanzen',
-        sskDstNr: 'FIN123',
-        rolle: 'Manager',
+        sskName: 'Humboldt-Schule Wiesbaden',
+        sskDstNr: '123456',
+        rolle: 'Lehrkraft',
       },
       {
         sskId: '102',
         rolleId: '202',
-        sskName: 'IT',
-        sskDstNr: 'IT456',
-        rolle: 'Administrator',
+        sskName: 'Goethe-Schule',
+        sskDstNr: '123456',
+        rolle: 'Admin',
       },
     ],
     vorname: 'Max',
@@ -206,7 +210,12 @@
               v-for="assignment in personenuebersicht.zuordnungen"
               :key="assignment.sskId"
             >
-              <h3 class="text-body">{{ assignment.sskDstNr }} ({{ assignment.sskName }}): {{ assignment.rolle }}</h3>
+              <h3
+                class="text-body"
+                :title="assignment.sskName"
+              >
+                {{ assignment.sskDstNr }} ({{ truncateSskName(assignment.sskName) }}): {{ assignment.rolle }}
+              </h3>
             </v-col>
           </v-row>
         </v-container>
