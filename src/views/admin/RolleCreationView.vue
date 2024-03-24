@@ -6,6 +6,7 @@
     type RolleStore,
     RolleResponseMerkmaleEnum,
     RolleResponseRollenartEnum,
+    RolleResponseSystemrechteEnum,
     CreateRolleBodyParamsRollenartEnum,
     CreateRolleBodyParamsMerkmaleEnum,
   } from '@/stores/RolleStore';
@@ -25,6 +26,7 @@
   import FormWrapper from '@/components/form/FormWrapper.vue';
   import FormRow from '@/components/form/FormRow.vue';
   import { useOrganisationStore, type OrganisationStore, type Organisation } from '@/stores/OrganisationStore';
+  import type { CreateRolleBodyParamsSystemrechteEnum } from '@/api-client/generated';
   import { DIN_91379A_EXT } from '@/utils/validation';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
@@ -39,6 +41,9 @@
 
   type TranslatedMerkmal = { value: RolleResponseMerkmaleEnum; title: string };
   const translatedMerkmale: Ref<TranslatedMerkmal[]> = ref([]);
+
+  type TranslatedSystemrecht = { value: RolleResponseSystemrechteEnum; title: string };
+  const translatedSystemrechte: Ref<TranslatedSystemrecht[]> = ref([]);
 
   const validationSchema: TypedSchema = toTypedSchema(
     object({
@@ -65,6 +70,7 @@
     selectedRollenArt: CreateRolleBodyParamsRollenartEnum;
     selectedRollenName: string;
     selectedMerkmale: CreateRolleBodyParamsMerkmaleEnum[];
+    selectedSystemRechte: CreateRolleBodyParamsSystemrechteEnum[];
   };
 
   // eslint-disable-next-line @typescript-eslint/typedef
@@ -92,12 +98,18 @@
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedMerkmale', vuetifyConfig);
 
+  const [selectedSystemRechte, selectedSystemRechtProps]: [
+    Ref<CreateRolleBodyParamsSystemrechteEnum[] | null>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = defineField('selectedSystemRechte', vuetifyConfig);
+
   function isFormDirty(): boolean {
     return (
       isFieldDirty('selectedAdministrationsebene') ||
       isFieldDirty('selectedRollenArt') ||
       isFieldDirty('selectedRollenName') ||
-      isFieldDirty('selectedMerkmale')
+      isFieldDirty('selectedMerkmale') ||
+      isFieldDirty('selectedSystemRechte')
     );
   }
 
@@ -117,11 +129,14 @@
     if (selectedRollenName.value && selectedAdministrationsebene.value && selectedRollenArt.value) {
       const merkmaleToSubmit: CreateRolleBodyParamsMerkmaleEnum[] =
         selectedMerkmale.value?.map((m: CreateRolleBodyParamsMerkmaleEnum) => m) || [];
+      const systemrechteToSubmit: CreateRolleBodyParamsSystemrechteEnum[] =
+        selectedSystemRechte.value?.map((m: CreateRolleBodyParamsSystemrechteEnum) => m) || [];
       await rolleStore.createRolle(
         selectedRollenName.value,
         selectedAdministrationsebene.value,
         selectedRollenArt.value,
         merkmaleToSubmit,
+        systemrechteToSubmit,
       );
       resetForm();
 
@@ -164,6 +179,18 @@
       .join(', ');
   });
 
+  const translatedCreatedSystemrecht: ComputedRef<string> = computed(() => {
+    if (!rolleStore.createdRolle?.systemrechte || !Array.isArray(rolleStore.createdRolle.systemrechte)) {
+      return '';
+    }
+
+    return rolleStore.createdRolle.systemrechte
+      .map((systemrechtKey: string) => {
+        return t(`admin.rolle.mappingFrontBackEnd.systemrechte.${systemrechtKey}`);
+      })
+      .join(', ');
+  });
+  
   const administrationsebene: ComputedRef<
     {
       value: string;
@@ -186,7 +213,6 @@
   onMounted(async () => {
     rolleStore.createdRolle = null;
     await organisationStore.getAllOrganisationen();
-
     // Iterate over the enum values
     Object.values(RolleResponseRollenartEnum).forEach((enumValue: RolleResponseRollenartEnum) => {
       // Use the enum value to construct the i18n path
@@ -206,6 +232,13 @@
       });
     });
 
+    Object.values(RolleResponseSystemrechteEnum).forEach((enumValue: RolleResponseSystemrechteEnum) => {
+      const i18nPath: string = `admin.rolle.mappingFrontBackEnd.systemrechte.${enumValue}`;
+      translatedSystemrechte.value.push({
+        value: enumValue,
+        title: t(i18nPath),
+      });
+    });
     /* listen for browser changes and prevent them when form is dirty */
     window.addEventListener('beforeunload', preventNavigation);
   });
@@ -349,6 +382,25 @@
                 v-model="selectedMerkmale"
               ></v-select>
             </FormRow>
+            <!-- Checkbox to assign the right "ROLLE VERWALTEN" to the rolle -->
+            <v-row>
+              <h3 class="headline-3">5. {{ $t('admin.rolle.assignSystemrechte') }}</h3>
+            </v-row>
+            <!-- Iterate over each system right and create a checkbox for it -->
+            <FormRow
+              v-for="systemrecht in translatedSystemrechte"
+              :key="systemrecht.value"
+              :errorLabel="selectedSystemRechtProps['error']"
+              labelForId="systemrecht-select"
+              :label="systemrecht.title"
+            >
+              <v-checkbox
+                :value="systemrecht.value"
+                v-model="selectedSystemRechte"
+                :id="`systemrecht-${systemrecht.value}`"
+                multiple
+              ></v-checkbox>
+            </FormRow>
           </template>
         </FormWrapper>
       </template>
@@ -405,6 +457,10 @@
           <v-row>
             <v-col class="text-body bold text-right"> {{ $t('admin.rolle.merkmale') }}:</v-col>
             <v-col class="text-body"> {{ translatedCreatedRolleMerkmale }}</v-col></v-row
+          >
+          <v-row>
+            <v-col class="text-body bold text-right"> {{ $t('admin.rolle.systemrechte') }}:</v-col>
+            <v-col class="text-body"> {{ translatedCreatedSystemrecht }}</v-col></v-row
           >
           <v-divider
             class="border-opacity-100 rounded my-6"
