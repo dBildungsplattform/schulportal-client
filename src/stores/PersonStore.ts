@@ -35,13 +35,8 @@ export type Person = {
 export type CreatedPerson = CreatePersonBodyParams;
 export type CreatedPersonenkontext = DBiamCreatePersonenkontextBodyParams;
 
-type Personenkontext = {
-  id: string;
-};
-
 export type Personendatensatz = {
   person: Person;
-  personenkontexte: Array<Personenkontext>;
 };
 
 export type { PersonendatensatzResponse };
