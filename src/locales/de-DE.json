@@ -212,12 +212,14 @@
     "pageText": "{interval} von {total} Einträgen"
   },
   "person": {
+    "zuordnung": "Zuordnung",
     "email": "E-Mail",
     "enterFirstName": "Vorname eingeben",
     "enterLastName": "Nachname eingeben",
     "firstName": "Vorname",
     "lastName": "Nachname",
     "password": "Passwort",
+    "rolle": "Rolle",
     "userName": "Benutzername"
   },
   "unsavedChanges": {
