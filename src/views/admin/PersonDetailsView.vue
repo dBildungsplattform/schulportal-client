@@ -38,6 +38,28 @@
     await personStore.getPersonById(currentPersonId);
     await personenKontextStore.getPersonenuebersichtById(currentPersonId);
   });
+  const personenuebersicht: any = {
+    personId: '12345',
+    zuordnungen: [
+      {
+        sskId: '101',
+        rolleId: '201',
+        sskName: 'Finanzen',
+        sskDstNr: 'FIN123',
+        rolle: 'Manager',
+      },
+      {
+        sskId: '102',
+        rolleId: '202',
+        sskName: 'IT',
+        sskDstNr: 'IT456',
+        rolle: 'Administrator',
+      },
+    ],
+    vorname: 'Max',
+    nachname: 'Mustermann',
+    benutzername: 'mmustermann',
+  };
 </script>
 
 <template>
