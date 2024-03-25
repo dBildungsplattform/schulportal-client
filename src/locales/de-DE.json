@@ -212,14 +212,14 @@
     "pageText": "{interval} von {total} Einträgen"
   },
   "person": {
-    "assignments": "Zuordnungen",
     "email": "E-Mail",
     "enterFirstName": "Vorname eingeben",
     "enterLastName": "Nachname eingeben",
     "firstName": "Vorname",
     "lastName": "Nachname",
     "password": "Passwort",
-    "userName": "Benutzername"
+    "userName": "Benutzername",
+    "zuordnungen": "Zuordnungen"
   },
   "unsavedChanges": {
     "message": "Sie haben nicht gespeicherte Änderungen vorgenommen. Wollen Sie die Seite trotzdem verlassen?",

@@ -38,28 +38,6 @@
     await personStore.getPersonById(currentPersonId);
     await personenKontextStore.getPersonenuebersichtById(currentPersonId);
   });
-  const personenuebersicht: any = {
-    personId: '12345',
-    zuordnungen: [
-      {
-        sskId: '101',
-        rolleId: '201',
-        sskName: 'Finanzen',
-        sskDstNr: 'FIN123',
-        rolle: 'Manager',
-      },
-      {
-        sskId: '102',
-        rolleId: '202',
-        sskName: 'IT',
-        sskDstNr: 'IT456',
-        rolle: 'Administrator',
-      },
-    ],
-    vorname: 'Max',
-    nachname: 'Mustermann',
-    benutzername: 'mmustermann',
-  };
 </script>
 
 <template>
@@ -198,10 +176,10 @@
           thickness="6"
         ></v-divider>
         <!-- Zuordnungen -->
-        <v-container class="person-assignments">
+        <v-container class="person-zuordnungen">
           <v-row class="ml-md-16">
             <v-col>
-              <h3 class="subtitle-1">{{ $t('person.assignments') }}</h3>
+              <h3 class="subtitle-1">{{ $t('person.zuordnungen') }}</h3>
             </v-col>
           </v-row>
           <v-row>
@@ -209,14 +187,14 @@
               cols="10"
               offset-md="2"
               offset="1"
-              v-for="assignment in personenuebersicht.zuordnungen"
-              :key="assignment.sskId"
+              v-for="zuordnung in personenKontextStore.personenubersicht?.zuordnungen"
+              :key="zuordnung.sskId"
             >
               <h3
                 class="text-body"
-                :title="assignment.sskName"
+                :title="zuordnung.sskName"
               >
-                {{ assignment.sskDstNr }} ({{ truncateSskName(assignment.sskName) }}): {{ assignment.rolle }}
+                {{ zuordnung.sskDstNr }} ({{ truncateSskName(zuordnung.sskName) }}): {{ zuordnung.rolle }}
               </h3>
             </v-col>
           </v-row>

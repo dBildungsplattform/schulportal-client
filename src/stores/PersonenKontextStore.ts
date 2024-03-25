@@ -16,7 +16,7 @@ const personenuebersicht: DbiamPersonenuebersichtApiInterface = DbiamPersonenueb
 );
 
 type PersonenkontextState = {
-  personenubersicht: DBiamPersonenuebersichtResponse[] | null;
+  personenubersicht: DBiamPersonenuebersichtResponse | null;
   errorCode: string;
   loading: boolean;
 };
@@ -54,7 +54,7 @@ export const usePersonenkontextStore: StoreDefinition<
     async getPersonenuebersichtById(personId: string): Promise<void> {
       this.loading = true;
       try {
-        const { data }: { data: DBiamPersonenuebersichtResponse[] } =
+        const { data }: { data: DBiamPersonenuebersichtResponse } =
           await personenuebersicht.dBiamPersonenuebersichtControllerFindPersonenuebersichtenByPerson(personId);
         this.personenubersicht = data;
       } catch (error: unknown) {

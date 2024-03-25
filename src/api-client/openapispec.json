@@ -713,13 +713,38 @@
                 "responses": {
                     "200": {
                         "description": "The personenuebersichten were successfully returned.",
+                        "headers": {
+                            "X-Paging-Offset": {
+                                "description": "The offset of the first item from the list. List starts with index 0."
+                            },
+                            "X-Paging-Limit": {
+                                "description": "The maximum amount of items returned in one request."
+                            },
+                            "X-Paging-Total": {
+                                "description": "The total amount of items in the list."
+                            }
+                        },
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/PagedResponse"
-                                    }
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/RawPagedResponse"
+                                        },
+                                        {
+                                            "required": [
+                                                "items"
+                                            ],
+                                            "properties": {
+                                                "items": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/DBiamPersonenuebersichtResponse"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ]
                                 }
                             }
                         }
@@ -760,14 +785,11 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "The personenuebersicht was successfully returned.",
+                        "description": "The personenuebersichten were successfully returned.",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/DBiamPersonenuebersichtResponse"
-                                    }
+                                    "$ref": "#/components/schemas/DBiamPersonenuebersichtResponse"
                                 }
                             }
                         }
@@ -1887,6 +1909,146 @@
                 ]
             }
         },
+        "/api/rolle/{rolleId}/serviceProviders": {
+            "get": {
+                "operationId": "RolleController_getRolleServiceProviderIds",
+                "summary": "",
+                "description": "Get service-providers for a rolle by its id.",
+                "parameters": [
+                    {
+                        "name": "rolleId",
+                        "required": true,
+                        "in": "path",
+                        "description": "The id for the rolle.",
+                        "schema": {
+                            "nullable": false,
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns a list of service-provider ids.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RolleServiceProviderResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Not authorized to retrieve service-providers for rolle."
+                    },
+                    "404": {
+                        "description": "The rolle does not exist."
+                    }
+                },
+                "tags": [
+                    "rolle"
+                ],
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ]
+            },
+            "post": {
+                "operationId": "RolleController_addServiceProviderById",
+                "summary": "",
+                "description": "Add a service-provider to a rolle by id.",
+                "parameters": [
+                    {
+                        "name": "rolleId",
+                        "required": true,
+                        "in": "path",
+                        "description": "The id for the rolle.",
+                        "schema": {
+                            "nullable": false,
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RolleServiceProviderQueryParams"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Adding service-provider finished successfully."
+                    },
+                    "400": {
+                        "description": "The service-provider is already attached to rolle."
+                    },
+                    "401": {
+                        "description": "Not authorized to retrieve service-providers for rolle."
+                    },
+                    "404": {
+                        "description": "The rolle or the service-provider to add does not exist."
+                    }
+                },
+                "tags": [
+                    "rolle"
+                ],
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ]
+            },
+            "delete": {
+                "operationId": "RolleController_removeServiceProviderById",
+                "summary": "",
+                "description": "Remove a service-provider from a rolle by id.",
+                "parameters": [
+                    {
+                        "name": "rolleId",
+                        "required": true,
+                        "in": "path",
+                        "description": "The id for the rolle.",
+                        "schema": {
+                            "nullable": false,
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "serviceProviderId",
+                        "required": true,
+                        "in": "query",
+                        "description": "The id for the rolle.",
+                        "schema": {
+                            "nullable": false,
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Removing service-provider finished successfully."
+                    },
+                    "401": {
+                        "description": "Not authorized to retrieve service-providers for rolle."
+                    },
+                    "404": {
+                        "description": "The rolle or the service-provider that should be removed does not exist."
+                    }
+                },
+                "tags": [
+                    "rolle"
+                ],
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
         "/api/provider": {
             "get": {
                 "operationId": "ProviderController_getAllServiceProviders",
@@ -2462,18 +2624,31 @@
                     "revision"
                 ]
             },
-            "PagedResponse": {
+            "DBiamPersonenzuordnungResponse": {
                 "type": "object",
                 "properties": {
-                    "items": {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        }
+                    "sskId": {
+                        "type": "string"
+                    },
+                    "rolleId": {
+                        "type": "string"
+                    },
+                    "sskName": {
+                        "type": "string"
+                    },
+                    "sskDstNr": {
+                        "type": "string"
+                    },
+                    "rolle": {
+                        "type": "string"
                     }
                 },
                 "required": [
-                    "items"
+                    "sskId",
+                    "rolleId",
+                    "sskName",
+                    "sskDstNr",
+                    "rolle"
                 ]
             },
             "DBiamPersonenuebersichtResponse": {
@@ -2492,7 +2667,10 @@
                         "type": "string"
                     },
                     "zuordnungen": {
-                        "type": "string"
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/DBiamPersonenzuordnungResponse"
+                        }
                     }
                 },
                 "required": [
@@ -2972,6 +3150,33 @@
                 },
                 "required": [
                     "systemRecht"
+                ]
+            },
+            "RolleServiceProviderResponse": {
+                "type": "object",
+                "properties": {
+                    "serviceProviderIds": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "required": [
+                    "serviceProviderIds"
+                ]
+            },
+            "RolleServiceProviderQueryParams": {
+                "type": "object",
+                "properties": {
+                    "serviceProviderId": {
+                        "type": "string",
+                        "description": "The id for the rolle.",
+                        "nullable": false
+                    }
+                },
+                "required": [
+                    "serviceProviderId"
                 ]
             },
             "ServiceProviderKategorie": {
