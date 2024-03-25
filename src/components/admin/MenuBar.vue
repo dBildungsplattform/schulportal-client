@@ -23,7 +23,7 @@
     }
   }
 
-  // Retrieves logged in user info on mounted and check using the user's sub if he has the right "ROLLEN_VERWALTEN". If not (error from the endpoint) then
+  // Retrieves logged in user info on mounted and check using the user's personId if he has the right "ROLLEN_VERWALTEN". If not (error from the endpoint) then
   // hide the menu from the menubar.
   onMounted(async () => {
     await auth.getLoggedInUserInfo();
