@@ -2,21 +2,25 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ include "schulportal-client.name" . }}
-  labels:
-    app.kubernetes.io/name: {{ template "schulportal-client.name" . }}
-    app.kubernetes.io/version: {{ .Chart.Version }}
+  name: {{ template "common.names.name" . }}
+  namespace: {{ template "common.names.namespace" . }}
+  labels: 
+    {{- include "common.labels" . | nindent 4 }}
+  {{- with .Values.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
-  ingressClassName: {{ .Values.ingress.className | quote }}
+  ingressClassName: {{ .Values.ingress.ingressClassName }}
   rules:
     - host: {{.Values.frontendHostname}}
       http:
         paths:
-          - path: /
-            pathType: Prefix
-            backend:
+          - path: {{ .Values.ingress.path }}
+            pathType: {{ .Values.ingress.pathType }}
+            backend: 
               service:
-                name: {{ include "schulportal-client.name" . }}
+                name: {{ template "common.names.name" . }}
                 port:
-                  number: {{ .Values.service.port }}
+                  number: {{ .Values.service.ports.http }}
 {{- end }}
