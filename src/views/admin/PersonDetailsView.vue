@@ -5,11 +5,13 @@
   import PasswordReset from '@/components/admin/PasswordReset.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
+  import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenKontextStore';
 
   const route: RouteLocationNormalizedLoaded = useRoute();
   const router: Router = useRouter();
   const currentPersonId: string = route.params['id'] as string;
   const personStore: PersonStore = usePersonStore();
+  const personenKontextStore: PersonenkontextStore = usePersonenkontextStore();
 
   const password: Ref<string> = ref('');
 
@@ -34,30 +36,8 @@
 
   onBeforeMount(async () => {
     await personStore.getPersonById(currentPersonId);
+    await personenKontextStore.getPersonenuebersichtById(currentPersonId);
   });
-
-  const personenuebersicht: any = {
-    personId: '12345',
-    zuordnungen: [
-      {
-        sskId: '101',
-        rolleId: '201',
-        sskName: 'Humboldt-Schule Wiesbaden',
-        sskDstNr: '123456',
-        rolle: 'Lehrkraft',
-      },
-      {
-        sskId: '102',
-        rolleId: '202',
-        sskName: 'Goethe-Schule',
-        sskDstNr: '123456',
-        rolle: 'Admin',
-      },
-    ],
-    vorname: 'Max',
-    nachname: 'Mustermann',
-    benutzername: 'mmustermann',
-  };
 </script>
 
 <template>
