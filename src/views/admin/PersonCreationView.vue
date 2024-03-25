@@ -1,6 +1,13 @@
 <script setup lang="ts">
   import { useOrganisationStore, type OrganisationStore, type Organisation } from '@/stores/OrganisationStore';
-  import { usePersonStore, type CreatedPerson, type PersonStore } from '@/stores/PersonStore';
+  import {
+    usePersonStore,
+    type CreatedPerson,
+    type CreatedPersonenkontext,
+    type PersonStore,
+    type PersonendatensatzResponse,
+  } from '@/stores/PersonStore';
+  import { type RolleStore, useRolleStore, type Rolle } from '@/stores/RolleStore';
   import { type ComputedRef, computed, onMounted, onUnmounted, type Ref, ref } from 'vue';
   import {
     onBeforeRouteLeave,
@@ -18,11 +25,15 @@
   import PasswordOutput from '@/components/form/PasswordOutput.vue';
   import FormWrapper from '@/components/form/FormWrapper.vue';
   import FormRow from '@/components/form/FormRow.vue';
+  import { useDisplay } from 'vuetify';
+
+  const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
   import { DIN_91379A } from '@/utils/validation';
 
   const router: Router = useRouter();
   const personStore: PersonStore = usePersonStore();
   const organisationStore: OrganisationStore = useOrganisationStore();
+  const rolleStore: RolleStore = useRolleStore();
   const { t }: Composer = useI18n({ useScope: 'global' });
 
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
@@ -30,6 +41,7 @@
 
   const validationSchema: TypedSchema = toTypedSchema(
     object({
+      selectedRolle: string().required(t('admin.rolle.rules.rolle.required')),
       selectedVorname: string()
         .matches(DIN_91379A, t('admin.person.rules.vorname.matches'))
         .min(2, t('admin.person.rules.vorname.min'))
@@ -38,6 +50,7 @@
         .matches(DIN_91379A, t('admin.person.rules.familienname.matches'))
         .min(2, t('admin.person.rules.familienname.min'))
         .required(t('admin.person.rules.familienname.required')),
+      selectedOrganisation: string().required(t('admin.organisation.rules.organisation.required')),
     }),
   );
 
@@ -51,9 +64,15 @@
   });
 
   type PersonCreationForm = {
+    selectedRolle: string;
     selectedVorname: string;
     selectedFamilienname: string;
     selectedOrganisation: string;
+  };
+
+  type TranslatedObject = {
+    value: string;
+    title: string;
   };
 
   // eslint-disable-next-line @typescript-eslint/typedef
@@ -61,6 +80,10 @@
     validationSchema,
   });
 
+  const [selectedRolle, selectedRolleProps]: [
+    Ref<string>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = defineField('selectedRolle', vuetifyConfig);
   const [selectedVorname, selectedVornameProps]: [
     Ref<string>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
@@ -74,17 +97,34 @@
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedOrganisation', vuetifyConfig);
 
-  const organisationen: ComputedRef<
-    {
-      value: string;
-      title: string;
-    }[]
-  > = computed(() =>
+  const rollen: ComputedRef<TranslatedObject[]> = computed(() =>
+    rolleStore.allRollen.map((rolle: Rolle) => ({
+      value: rolle.id,
+      title: rolle.name,
+    })).sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title))
+  );
+
+  const organisationen: ComputedRef<TranslatedObject[]> = computed(() =>
     organisationStore.allOrganisationen.map((org: Organisation) => ({
       value: org.id,
       title: `${org.kennung} (${org.name})`,
     })),
   );
+
+  const translatedOrganisationsname: ComputedRef<string> = computed(
+    () =>
+      organisationen.value.find(
+        (organisation: TranslatedObject) => organisation.value === personStore.createdPersonenkontext?.organisationId,
+      )?.title || '',
+  );
+
+  const translatedRollenname: ComputedRef<string> = computed(
+    () =>
+      rollen.value.find((rolle: TranslatedObject) => rolle.value === personStore.createdPersonenkontext?.rolleId)
+        ?.title || '',
+  );
+
+  const creationErrorText: Ref<string> = ref('');
 
   function isFormDirty(): boolean {
     return isFieldDirty('selectedVorname') || isFieldDirty('selectedFamilienname');
@@ -102,8 +142,17 @@
         vorname: selectedVorname.value as string,
       },
     };
-    await personStore.createPerson(unpersistedPerson);
-    resetForm();
+    personStore.createPerson(unpersistedPerson).then(async (personResponse: PersonendatensatzResponse) => {
+      const unpersistedPersonenkontext: CreatedPersonenkontext = {
+        personId: personResponse.person.id,
+        organisationId: selectedOrganisation.value,
+        rolleId: selectedRolle.value,
+      };
+      await personStore.createPersonenkontext(unpersistedPersonenkontext).catch(() => {
+        creationErrorText.value = t('admin.personenkontext.creationErrorText');
+      });
+      resetForm();
+    });
   }
 
   const onSubmit: (e?: Event | undefined) => Promise<void | undefined> = handleSubmit(() => {
@@ -113,7 +162,7 @@
   async function navigateBackToPersonForm(): Promise<void> {
     await router.push({ name: 'create-person' });
     personStore.errorCode = '';
-  };
+  }
 
   const handleCreateAnotherPerson = (): void => {
     personStore.createdPerson = null;
@@ -143,6 +192,7 @@
 
   onMounted(async () => {
     await organisationStore.getAllOrganisationen();
+    await rolleStore.getAllRollen();
     personStore.errorCode = '';
     personStore.createdPerson = null;
 
@@ -171,8 +221,8 @@
       :closable="false"
       :showButton="true"
       :buttonText="$t('admin.backToForm')"
-      :text="$t('admin.person.creationErrorText')"
       :buttonAction="navigateBackToPersonForm"
+      :text="creationErrorText"
     />
 
     <!-- The form to create a new Person  -->
@@ -187,74 +237,103 @@
         :onSubmit="onSubmit"
         :showUnsavedChangesDialog="showUnsavedChangesDialog"
       >
-        <!-- Persönliche Informationen -->
+        <!-- Rollenzuordnung -->
         <v-row>
-          <h3 class="headline-3">1. {{ $t('admin.person.personalInfo') }}</h3>
+          <h3 class="headline-3">1. {{ $t('admin.rolle.assignRolle') }}</h3>
         </v-row>
-        <!-- Vorname -->
         <FormRow
-          :errorLabel="selectedVornameProps['error']"
-          labelForId="vorname-input"
+          :errorLabel="selectedRolleProps['error']"
+          labelForId="rolle-select"
           :isRequired="true"
-          :label="$t('person.firstName')"
-        >
-          <v-text-field
-            clearable
-            data-testid="vorname-input"
-            density="compact"
-            id="vorname-input"
-            :placeholder="$t('person.enterFirstName')"
-            required="true"
-            variant="outlined"
-            v-bind="selectedVornameProps"
-            v-model="selectedVorname"
-          ></v-text-field>
-        </FormRow>
-
-        <!-- Nachname -->
-        <FormRow
-          :errorLabel="selectedFamiliennameProps['error']"
-          labelForId="familienname-input"
-          :isRequired="true"
-          :label="$t('person.lastName')"
-        >
-          <v-text-field
-            clearable
-            data-testid="familienname-input"
-            density="compact"
-            id="familienname-input"
-            :placeholder="$t('person.enterLastName')"
-            required="true"
-            variant="outlined"
-            v-bind="selectedFamiliennameProps"
-            v-model="selectedFamilienname"
-          ></v-text-field>
-        </FormRow>
-
-        <!-- Organisation zuordnen -->
-        <v-row>
-          <h3 class="headline-3">2. {{ $t('admin.organisation.assignOrganisation') }}</h3>
-        </v-row>
-        <!-- Vorname -->
-        <FormRow
-          :errorLabel="selectedOrganisationProps['error']"
-          labelForId="organisation-select"
-          :label="$t('admin.organisation.assignOrganisation')"
+          :label="$t('admin.rolle.rolle')"
         >
           <v-select
             clearable
-            data-testid="organisation-select"
+            data-testid="rolle-select"
             density="compact"
-            id="organisation-select"
-            :items="organisationen"
+            id="rolle-select"
+            :items="rollen"
             item-value="value"
             item-text="title"
-            :placeholder="$t('admin.organisation.selectOrganisation')"
+            :placeholder="$t('admin.rolle.selectRolle')"
+            required="true"
             variant="outlined"
-            v-bind="selectedOrganisationProps"
-            v-model="selectedOrganisation"
+            v-bind="selectedRolleProps"
+            v-model="selectedRolle"
           ></v-select>
         </FormRow>
+
+        <!-- Persönliche Informationen -->
+        <div v-if="selectedRolle">
+          <v-row>
+            <h3 class="headline-3">2. {{ $t('admin.person.personalInfo') }}</h3>
+          </v-row>
+          <!-- Vorname -->
+          <FormRow
+            :errorLabel="selectedVornameProps['error']"
+            labelForId="vorname-input"
+            :isRequired="true"
+            :label="$t('person.firstName')"
+          >
+            <v-text-field
+              clearable
+              data-testid="vorname-input"
+              density="compact"
+              id="vorname-input"
+              :placeholder="$t('person.enterFirstName')"
+              required="true"
+              variant="outlined"
+              v-bind="selectedVornameProps"
+              v-model="selectedVorname"
+            ></v-text-field>
+          </FormRow>
+
+          <!-- Nachname -->
+          <FormRow
+            :errorLabel="selectedFamiliennameProps['error']"
+            labelForId="familienname-input"
+            :isRequired="true"
+            :label="$t('person.lastName')"
+          >
+            <v-text-field
+              clearable
+              data-testid="familienname-input"
+              density="compact"
+              id="familienname-input"
+              :placeholder="$t('person.enterLastName')"
+              required="true"
+              variant="outlined"
+              v-bind="selectedFamiliennameProps"
+              v-model="selectedFamilienname"
+            ></v-text-field>
+          </FormRow>
+
+          <!-- Organisation zuordnen -->
+          <v-row>
+            <h3 class="headline-3">3. {{ $t('admin.organisation.assignOrganisation') }}</h3>
+          </v-row>
+          <FormRow
+            :errorLabel="selectedOrganisationProps['error']"
+            :isRequired="true"
+            labelForId="organisation-select"
+            :label="$t('admin.organisation.assignOrganisation')"
+          >
+            <v-select
+              clearable
+              data-testid="organisation-select"
+              density="compact"
+              id="organisation-select"
+              :items="organisationen"
+              item-value="value"
+              item-text="title"
+              :placeholder="$t('admin.organisation.selectOrganisation')"
+              required="true"
+              variant="outlined"
+              v-bind="selectedOrganisationProps"
+              v-model="selectedOrganisation"
+            ></v-select>
+          </FormRow>
+        </div>
       </FormWrapper>
     </template>
 
@@ -311,6 +390,14 @@
             <PasswordOutput :password="personStore.createdPerson.person.startpasswort"></PasswordOutput>
           </v-col>
         </v-row>
+        <v-row>
+          <v-col class="text-body bold text-right"> {{ $t('admin.rolle.rolle') }}: </v-col>
+          <v-col class="text-body"> {{ translatedRollenname }}</v-col>
+        </v-row>
+        <v-row>
+          <v-col class="text-body bold text-right"> {{ $t('admin.organisation.organisation') }}: </v-col>
+          <v-col class="text-body"> {{ translatedOrganisationsname }}</v-col>
+        </v-row>
         <v-divider
           class="border-opacity-100 rounded my-6"
           color="#E5EAEF"
@@ -319,24 +406,28 @@
         <v-row justify="end">
           <v-col
             cols="12"
+            sm="6"
             md="auto"
           >
             <v-btn
               class="secondary"
               @click.stop="navigateToPersonTable"
               data-testid="back-to-list-button"
+              :block="mdAndDown"
             >
               {{ $t('nav.backToList') }}
             </v-btn>
           </v-col>
           <v-col
             cols="12"
+            sm="6"
             md="auto"
           >
             <v-btn
               class="primary button"
               @click="handleCreateAnotherPerson"
               data-testid="create-another-person-button"
+              :block="mdAndDown"
             >
               {{ $t('admin.person.createAnother') }}
             </v-btn>

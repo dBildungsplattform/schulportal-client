@@ -63,6 +63,6 @@ export const useServiceProviderStore: StoreDefinition<
         }
         this.loading = false;
       }
-    }
+    },
   },
 });
