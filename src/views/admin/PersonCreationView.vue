@@ -101,17 +101,25 @@
 
   const searchInputRollen: Ref<string> = ref('');
   const searchInputOrganisation: Ref<string> = ref('');
-  // Watcher to detect when the search input has 3 or more characters to trigger filtering
+  // Watcher to detect when the search input for Rollen has 3 or more characters to trigger filtering.
   watch(searchInputRollen, async (newValue: string, _oldValue: string) => {
     if (newValue.length >= 3) {
       await personenkontextStore.getPersonenkontextRolleWithFilter(newValue, 25);
     }
   });
+  // Watcher to detect when the Rolle is selected so the Organisationen show all the possible choices using that value.
+  watch(selectedRolle, (newValue: string, oldValue: string) => {
+    if (newValue !== oldValue) {
+      // Call fetch with an empty string to get the initial organizations for the selected role without any filter
+      personenkontextStore.getPersonenkontextAdministrationsebeneWithFilter(newValue, '', 25);
+    }
+  });
+  // Watcher to detect when the search input for Organisationen is triggered. 
   watch(searchInputOrganisation, async (newValue: string, _oldValue: string) => {
     if (newValue.length >= 3) {
       await personenkontextStore.getPersonenkontextAdministrationsebeneWithFilter(selectedRolle.value, newValue, 25);
     } else {
-      // If newValue has less than 3 characters, use an empty string instead of newValue.
+      // If newValue has less than 3 characters, use an empty string instead of newValue to show all organisationen under the selectedRolle.
       await personenkontextStore.getPersonenkontextAdministrationsebeneWithFilter(selectedRolle.value, '', 25);
     }
   });
