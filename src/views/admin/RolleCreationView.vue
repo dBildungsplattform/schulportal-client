@@ -167,16 +167,14 @@
   }
 
   const translatedCreatedRolleMerkmale: ComputedRef<string> = computed(() => {
-    // Check if `createdRolle.merkmale` exists and is an array
     if (
       !rolleStore.createdRolle?.merkmale ||
-      !Array.isArray(rolleStore.createdRolle.merkmale) ||
-      rolleStore.createdRolle.merkmale.size == 0
+      (!Array.isArray(rolleStore.createdRolle.merkmale) && rolleStore.createdRolle.merkmale.size === 0)
     ) {
       return '-';
     }
 
-    return rolleStore.createdRolle.merkmale
+    return Array.from(rolleStore.createdRolle.merkmale)
       .map((merkmalKey: string) => {
         return t(`admin.rolle.mappingFrontBackEnd.merkmale.${merkmalKey}`);
       })
@@ -186,13 +184,12 @@
   const translatedCreatedSystemrecht: ComputedRef<string> = computed(() => {
     if (
       !rolleStore.createdRolle?.systemrechte ||
-      !Array.isArray(rolleStore.createdRolle.systemrechte) ||
-      rolleStore.createdRolle.systemrechte.size == 0
+      (!Array.isArray(rolleStore.createdRolle.systemrechte) && rolleStore.createdRolle.systemrechte.size === 0)
     ) {
       return '-';
     }
 
-    return rolleStore.createdRolle.systemrechte
+    return Array.from(rolleStore.createdRolle.systemrechte)
       .map((systemrechtKey: string) => {
         return t(`admin.rolle.mappingFrontBackEnd.systemrechte.${systemrechtKey}`);
       })
