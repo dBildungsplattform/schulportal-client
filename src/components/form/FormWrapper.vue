@@ -33,7 +33,6 @@
   <v-form
     :data-testid="id"
     @submit.prevent="onSubmit"
-    autocomplete="off"
   >
     <v-container class="px-3 px-sm-16">
       <v-row class="align-center flex-nowrap mx-auto py-6">

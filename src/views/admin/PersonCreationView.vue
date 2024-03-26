@@ -298,6 +298,7 @@
             v-bind="selectedRolleProps"
             v-model="selectedRolle"
             v-model:search="searchInputRollen"
+            autocomplete="off"
           ></v-autocomplete>
         </FormRow>
 
@@ -370,6 +371,7 @@
               v-bind="selectedOrganisationProps"
               v-model="selectedOrganisation"
               v-model:search="searchInputOrganisation"
+              autocomplete="off"
             ></v-autocomplete>
           </FormRow>
         </div>
