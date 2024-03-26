@@ -46,7 +46,7 @@
         : '';
 
       const formattedMerkmale: string =
-        rolle.merkmale.size !== 0
+        Array.from(rolle.merkmale).length > 0
           ? Array.from(rolle.merkmale)
               .map((merkmal: RolleResponseMerkmaleEnum) => t(`admin.rolle.mappingFrontBackEnd.merkmale.${merkmal}`))
               .join(', ')

@@ -167,10 +167,7 @@
   }
 
   const translatedCreatedRolleMerkmale: ComputedRef<string> = computed(() => {
-    if (
-      !rolleStore.createdRolle?.merkmale ||
-      (!Array.isArray(rolleStore.createdRolle.merkmale) && rolleStore.createdRolle.merkmale.size === 0)
-    ) {
+    if (!rolleStore.createdRolle?.merkmale || Array.from(rolleStore.createdRolle.merkmale).length === 0) {
       return '-';
     }
 
@@ -182,10 +179,7 @@
   });
 
   const translatedCreatedSystemrecht: ComputedRef<string> = computed(() => {
-    if (
-      !rolleStore.createdRolle?.systemrechte ||
-      (!Array.isArray(rolleStore.createdRolle.systemrechte) && rolleStore.createdRolle.systemrechte.size === 0)
-    ) {
+    if (!rolleStore.createdRolle?.systemrechte || Array.from(rolleStore.createdRolle.systemrechte).length === 0) {
       return '-';
     }
 
