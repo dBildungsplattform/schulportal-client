@@ -37,7 +37,7 @@ ingress:
   ingressClassName: nginx
   path: /
   pathType: Prefix
-  annotations: {}
+  annotations: {nginx.ingress.kubernetes.io/force-ssl-redirect: "true"}
 
 containerPorts: 
   name: http 
