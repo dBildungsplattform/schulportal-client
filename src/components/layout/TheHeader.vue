@@ -13,8 +13,8 @@
     height="60"
   >
     <!-- Logo and title -->
-    <v-toolbar-title>
-      <v-row no-gutters>
+    <v-app-bar-title class="fill-height">
+      <v-row no-gutters class="align-center fill-height">
         <v-col
           class="hidden-sm-and-down"
           cols="auto"
@@ -44,7 +44,7 @@
           </router-link>
         </v-col>
       </v-row>
-    </v-toolbar-title>
+    </v-app-bar-title>
     <v-spacer></v-spacer>
 
     <v-toolbar-items>
