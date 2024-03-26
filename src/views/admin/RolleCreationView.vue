@@ -98,7 +98,7 @@
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedMerkmale', vuetifyConfig);
 
-  const [selectedSystemRechte, selectedSystemRechtProps]: [
+  const [selectedSystemRechte, selectedSystemRechteProps]: [
     Ref<CreateRolleBodyParamsSystemrechteEnum[] | null>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedSystemRechte', vuetifyConfig);
@@ -390,7 +390,7 @@
             <FormRow
               v-for="systemrecht in translatedSystemrechte"
               :key="systemrecht.value"
-              :errorLabel="selectedSystemRechtProps['error']"
+              :errorLabel="selectedSystemRechteProps['error']"
               labelForId="systemrecht-select"
               :label="systemrecht.title"
             >

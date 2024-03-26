@@ -104,7 +104,7 @@
   // Watcher to detect when the search input for Rollen has 3 or more characters to trigger filtering.
   watch(searchInputRollen, async (newValue: string, _oldValue: string) => {
     if (newValue.length >= 3) {
-      await personenkontextStore.getPersonenkontextRolleWithFilter(newValue, 25);
+      personenkontextStore.getPersonenkontextRolleWithFilter(newValue, 25);
     }
   });
   // Watcher to detect when the Rolle is selected so the Organisationen show all the possible choices using that value.
@@ -117,10 +117,10 @@
   // Watcher to detect when the search input for Organisationen is triggered. 
   watch(searchInputOrganisation, async (newValue: string, _oldValue: string) => {
     if (newValue.length >= 3) {
-      await personenkontextStore.getPersonenkontextAdministrationsebeneWithFilter(selectedRolle.value, newValue, 25);
+      personenkontextStore.getPersonenkontextAdministrationsebeneWithFilter(selectedRolle.value, newValue, 25);
     } else {
       // If newValue has less than 3 characters, use an empty string instead of newValue to show all organisationen under the selectedRolle.
-      await personenkontextStore.getPersonenkontextAdministrationsebeneWithFilter(selectedRolle.value, '', 25);
+      personenkontextStore.getPersonenkontextAdministrationsebeneWithFilter(selectedRolle.value, '', 25);
     }
   });
 
