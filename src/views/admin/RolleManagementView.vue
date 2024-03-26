@@ -45,12 +45,17 @@
         ? `${matchingOrganisation.kennung} (${matchingOrganisation.name})`
         : '';
 
+      const formattedMerkmale: string =
+        rolle.merkmale.size > 0
+          ? Array.from(rolle.merkmale)
+              .map((merkmal: RolleResponseMerkmaleEnum) => t(`admin.rolle.mappingFrontBackEnd.merkmale.${merkmal}`))
+              .join(', ')
+          : '-'; // Return dash if merkmale is empty or not defined
+
       return {
         ...rolle,
         rollenart: t(`admin.rolle.mappingFrontBackEnd.rollenarten.${rolle.rollenart}`),
-        merkmale: Array.from(rolle.merkmale)
-          .map((merkmal: RolleResponseMerkmaleEnum) => t(`admin.rolle.mappingFrontBackEnd.merkmale.${merkmal}`))
-          .join(', '),
+        merkmale: formattedMerkmale,
         administeredBySchulstrukturknoten,
       };
     });

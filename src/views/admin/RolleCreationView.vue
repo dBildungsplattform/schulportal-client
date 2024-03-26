@@ -169,7 +169,7 @@
   const translatedCreatedRolleMerkmale: ComputedRef<string> = computed(() => {
     // Check if `createdRolle.merkmale` exists and is an array
     if (!rolleStore.createdRolle?.merkmale || !Array.isArray(rolleStore.createdRolle.merkmale)) {
-      return '';
+      return '-';
     }
 
     return rolleStore.createdRolle.merkmale
@@ -181,7 +181,7 @@
 
   const translatedCreatedSystemrecht: ComputedRef<string> = computed(() => {
     if (!rolleStore.createdRolle?.systemrechte || !Array.isArray(rolleStore.createdRolle.systemrechte)) {
-      return '';
+      return '-';
     }
 
     return rolleStore.createdRolle.systemrechte
