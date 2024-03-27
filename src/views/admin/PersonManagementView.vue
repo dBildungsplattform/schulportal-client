@@ -22,8 +22,8 @@
     { title: t('person.lastName'), key: 'person.name.familienname', align: 'start' },
     { title: t('person.firstName'), key: 'person.name.vorname', align: 'start' },
     { title: t('person.userName'), key: 'person.referrer', align: 'start' },
-    { title: t('person.rolle'), key: 'person.rolle', align: 'start' },
-    { title: t('person.zuordnung'), key: 'person.administrationsebenen', align: 'start' },
+    { title: t('person.rolle'), key: 'rolle', align: 'start' },
+    { title: t('person.zuordnung'), key: 'administrationsebenen', align: 'start' },
   ];
 
   type PersonenWithRolleAndZuordnung = {
@@ -44,15 +44,15 @@
       const uebersicht: Uebersicht = personenKontextStore.allUebersichte?.items.find(
         (ueb: Uebersicht) => ueb?.personId === person.person.id,
       );
-      const rollen: string = uebersicht
+      const rollen: string = uebersicht?.zuordnungen.length
         ? uebersicht.zuordnungen.map((zuordnung: Zuordnung) => zuordnung.rolle).join(', ')
-        : '';
-      // Choose sskDstNr if available, otherwise sskName
-      const administrationsebenen: string = uebersicht
+        : '-';
+      // Choose sskDstNr if available, otherwise sskName.
+      const administrationsebenen: string = uebersicht?.zuordnungen.length
         ? uebersicht.zuordnungen
             .map((zuordnung: Zuordnung) => (zuordnung.sskDstNr ? zuordnung.sskDstNr : zuordnung.sskName))
             .join(', ')
-        : '';
+        : '-';
       return { ...person, rolle: rollen, administrationsebenen: administrationsebenen };
     });
   });
