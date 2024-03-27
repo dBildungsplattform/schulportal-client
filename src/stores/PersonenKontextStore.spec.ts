@@ -153,7 +153,7 @@ describe('PersonenkontextStore', () => {
       const getPersonenuebersichtByIdPromise: Promise<void> = personenkontextStore.getPersonenuebersichtById('1');
       expect(personenkontextStore.loading).toBe(true);
       await getPersonenuebersichtByIdPromise;
-      expect(personenkontextStore.personenubersicht).toEqual(mockResponse);
+      expect(personenkontextStore.personenuebersicht).toEqual(mockResponse);
       expect(personenkontextStore.loading).toBe(false);
     });
 
