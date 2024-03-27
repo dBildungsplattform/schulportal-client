@@ -34,14 +34,19 @@
       "assignMerkmale": "Merkmale zuordnen",
       "assignRolle": "Rolle zuordnen",
       "assignRollenart": "Rollenart zuordnen",
+      "assignSystemrechte": "Systemrechte zuordnen",
       "backToCreateRolle": "Zurück zur Rollenanlage",
       "create": "Rolle anlegen",
       "createAnother": "Weitere Rolle anlegen",
       "createNew": "Neue Rolle anlegen",
       "discard": "Rolle verwerfen",
       "enterRollenname": "Rollenname eingeben",
+      "isAllowedToManageRollen": "Darf Rollen verwalten",
       "management": "Rollenverwaltung",
       "mappingFrontBackEnd": {
+        "systemrechte": {
+          "ROLLEN_VERWALTEN": "Darf Rollen verwalten"
+        },
         "rollenarten": {
           "LERN": "Lern",
           "LEHR": "Lehr",
@@ -80,6 +85,7 @@
       "selectRolle": "Rolle auswählen",
       "selectRollenart": "Rollenart auswählen",
       "showAll": "Alle Rollen anzeigen",
+      "systemrechte": "Systemrechte",
       "userDataLoadingErrorText": "Es konnten keine Benutzerdaten geladen werden."
     },
     "person": {
