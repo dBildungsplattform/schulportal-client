@@ -191,7 +191,7 @@
           >
             <v-col
               cols="10"
-              offset-md="2"
+              offset-lg="2"
               offset="1"
               v-for="zuordnung in personenKontextStore.personenuebersicht.zuordnungen"
               :key="zuordnung.sskId"
@@ -209,7 +209,7 @@
             <v-col
               cols="10"
               offset-lg="2"
-              offset-md="1"
+              offset="1"
             >
               <h3 class="text-body">{{ $t('person.noZuordnungenFound') }}</h3>
             </v-col>
