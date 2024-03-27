@@ -32,6 +32,10 @@
     &:hover {
       background: $primaryButtonHoverBackgroundColor;
     }
+
+    &:active {
+      color: $primaryButtonColor;
+    }
   }
 
   &.secondary {
