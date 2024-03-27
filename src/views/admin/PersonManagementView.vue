@@ -82,6 +82,13 @@
           :title="item.rolle"
         >
           {{ item.rolle }}
+        </div> </template
+      ><template v-slot:[`item.administrationsebenen`]="{ item }">
+        <div
+          class="ellipsis-wrapper"
+          :title="item.administrationsebenen"
+        >
+          {{ item.administrationsebenen }}
         </div>
       </template></ResultTable
     >
@@ -93,6 +100,6 @@
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
-    max-width: 241px;
+    max-width: 200px;
   }
 </style>
