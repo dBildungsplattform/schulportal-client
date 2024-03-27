@@ -53,7 +53,7 @@ export const useServiceProviderStore: StoreDefinition<
       this.loading = true;
       try {
         const { data }: { data: ServiceProvider[] } =
-          await serviceProviderApi.providerControllerGetServiceProvidersByPersonId();
+          await serviceProviderApi.providerControllerGetAllServiceProviders();
         this.allServiceProviders = data;
         this.loading = false;
       } catch (error: unknown) {
