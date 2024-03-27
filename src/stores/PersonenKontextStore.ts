@@ -10,10 +10,12 @@ import {
   type DBiamPersonenkontextResponse,
   type PersonenkontexteApiInterface,
   type SystemrechtResponse,
+  PersonenkontextApiFactory,
+  type PersonenkontextApiInterface,
 } from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
 
-const personenKontextApi: PersonenkontexteApiInterface = PersonenkontexteApiFactory(undefined, '', axiosApiInstance);
+const personenKontextApi: PersonenkontextApiInterface = PersonenkontextApiFactory(undefined, '', axiosApiInstance);
 const personenKontexteApi: PersonenkontexteApiInterface = PersonenkontexteApiFactory(undefined, '', axiosApiInstance);
 const dbiamPersonenKontexteApi: DbiamPersonenkontexteApiInterface = DbiamPersonenkontexteApiFactory(
   undefined,

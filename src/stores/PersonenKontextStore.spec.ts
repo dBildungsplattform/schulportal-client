@@ -1,5 +1,6 @@
 import {
   type DBiamPersonenkontextResponse,
+  type FindRollenResponse,
   type FindSchulstrukturknotenResponse,
   type SystemrechtResponse,
   OrganisationResponseTypEnum,
