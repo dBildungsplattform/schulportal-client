@@ -1,4 +1,10 @@
 <script setup lang="ts">
+  import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
+  import {
+    usePersonenkontextStore,
+    type PersonenkontextStore,
+    type SystemrechtResponse,
+  } from '@/stores/PersonenKontextStore';
   import { type Ref, ref, type ComputedRef } from 'vue';
   import { onMounted } from 'vue';
   import { useDisplay } from 'vuetify';
@@ -6,14 +12,37 @@
   const menuDrawer: Ref<boolean> = ref(true);
   const { mobile }: { mobile: ComputedRef<boolean> } = useDisplay();
 
+  const auth: AuthStore = useAuthStore();
+  const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
+
+  const hasRollenverwaltungRecht: Ref<boolean> = ref(false);
+
   function closeMenuOnMobile(): void {
     if (mobile.value) {
       menuDrawer.value = false;
     }
   }
 
-  onMounted(() => {
-    menuDrawer.value = !mobile.value;
+  // Retrieves logged in user info on mounted and check using the user's personId if he has the right "ROLLEN_VERWALTEN". If not (error from the endpoint) then
+  // hide the menu from the menubar.
+  onMounted(async () => {
+    await auth.getLoggedInUserInfo();
+    try {
+      if (auth.currentUser && auth.currentUser.personId) {
+        const response: SystemrechtResponse = await personenkontextStore.hasSystemrecht(
+          auth.currentUser.personId,
+          'ROLLEN_VERWALTEN',
+        );
+        // Check if the response is an empty array and set hasRollenverwaltungRecht accordingly
+        // Empty array means the user has the right but not attached to any Administrationsebene which also doesn't qualify him to manage roles.
+        hasRollenverwaltungRecht.value = response.ROLLEN_VERWALTEN.length > 0;
+      }
+    } catch (error: unknown) {
+      // If the systemrecht doesn't exist at all, It's a 404 and so the user has no right to manage roles.
+      hasRollenverwaltungRecht.value = false;
+    } finally {
+      menuDrawer.value = !mobile.value;
+    }
   });
 </script>
 
@@ -126,27 +155,29 @@
     ></v-list-item>
 
     <!-- Rollenverwaltung -->
-    <v-list-item
-      class="menu-bar-main-item headline-2"
-      data-testid="rolle-management-title"
-      :title="$t('admin.rolle.management')"
-    ></v-list-item>
-    <v-list-item
-      class="menu-bar-sub-item caption"
-      @click="closeMenuOnMobile"
-      data-testid="rolle-management-menu-item"
-      prepend-icon="mdi-format-list-bulleted"
-      :title="$t('admin.rolle.showAll')"
-      to="/admin/rollen"
-    ></v-list-item>
-    <v-list-item
-      class="menu-bar-sub-item caption"
-      @click="closeMenuOnMobile"
-      data-testid="rolle-creation-menu-item"
-      prepend-icon="mdi-plus-circle-outline"
-      :title="$t('admin.rolle.createNew')"
-      to="/admin/rollen/new"
-    ></v-list-item>
+    <div v-if="hasRollenverwaltungRecht">
+      <v-list-item
+        class="menu-bar-main-item headline-2"
+        data-testid="rolle-management-title"
+        :title="$t('admin.rolle.management')"
+      ></v-list-item>
+      <v-list-item
+        class="menu-bar-sub-item caption"
+        @click="closeMenuOnMobile"
+        data-testid="rolle-management-menu-item"
+        prepend-icon="mdi-format-list-bulleted"
+        :title="$t('admin.rolle.showAll')"
+        to="/admin/rollen"
+      ></v-list-item>
+      <v-list-item
+        class="menu-bar-sub-item caption"
+        @click="closeMenuOnMobile"
+        data-testid="rolle-creation-menu-item"
+        prepend-icon="mdi-plus-circle-outline"
+        :title="$t('admin.rolle.createNew')"
+        to="/admin/rollen/new"
+      ></v-list-item>
+    </div>
     <!-- Schulverwaltung -->
     <v-list-item
       class="menu-bar-main-item headline-2"

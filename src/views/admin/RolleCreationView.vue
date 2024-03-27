@@ -98,7 +98,7 @@
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedMerkmale', vuetifyConfig);
 
-  const [selectedSystemRechte, selectedSystemRechtProps]: [
+  const [selectedSystemRechte, selectedSystemRechteProps]: [
     Ref<CreateRolleBodyParamsSystemrechteEnum[] | null>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedSystemRechte', vuetifyConfig);
@@ -167,12 +167,11 @@
   }
 
   const translatedCreatedRolleMerkmale: ComputedRef<string> = computed(() => {
-    // Check if `createdRolle.merkmale` exists and is an array
-    if (!rolleStore.createdRolle?.merkmale || !Array.isArray(rolleStore.createdRolle.merkmale)) {
-      return '';
+    if (!rolleStore.createdRolle?.merkmale || Array.from(rolleStore.createdRolle.merkmale).length === 0) {
+      return '-';
     }
 
-    return rolleStore.createdRolle.merkmale
+    return Array.from(rolleStore.createdRolle.merkmale)
       .map((merkmalKey: string) => {
         return t(`admin.rolle.mappingFrontBackEnd.merkmale.${merkmalKey}`);
       })
@@ -180,17 +179,16 @@
   });
 
   const translatedCreatedSystemrecht: ComputedRef<string> = computed(() => {
-    if (!rolleStore.createdRolle?.systemrechte || !Array.isArray(rolleStore.createdRolle.systemrechte)) {
-      return '';
+    if (!rolleStore.createdRolle?.systemrechte || Array.from(rolleStore.createdRolle.systemrechte).length === 0) {
+      return '-';
     }
 
-    return rolleStore.createdRolle.systemrechte
+    return Array.from(rolleStore.createdRolle.systemrechte)
       .map((systemrechtKey: string) => {
         return t(`admin.rolle.mappingFrontBackEnd.systemrechte.${systemrechtKey}`);
       })
       .join(', ');
   });
-  
   const administrationsebene: ComputedRef<
     {
       value: string;
@@ -213,7 +211,6 @@
   onMounted(async () => {
     rolleStore.createdRolle = null;
     await organisationStore.getAllOrganisationen();
-
     // Iterate over the enum values
     Object.values(RolleResponseRollenartEnum).forEach((enumValue: RolleResponseRollenartEnum) => {
       // Use the enum value to construct the i18n path
@@ -391,7 +388,7 @@
             <FormRow
               v-for="systemrecht in translatedSystemrechte"
               :key="systemrecht.value"
-              :errorLabel="selectedSystemRechtProps['error']"
+              :errorLabel="selectedSystemRechteProps['error']"
               labelForId="systemrecht-select"
               :label="systemrecht.title"
             >

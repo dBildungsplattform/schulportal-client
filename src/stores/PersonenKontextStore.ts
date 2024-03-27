@@ -1,15 +1,26 @@
 import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import { isAxiosError } from 'axios';
 import {
+  DbiamPersonenkontexteApiFactory,
   DbiamPersonenuebersichtApiFactory,
+  PersonenkontexteApiFactory,
   type DBiamCreatePersonenkontextBodyParams,
+  type DbiamPersonenkontexteApiInterface,
+  type DBiamPersonenkontextResponse,
   type DbiamPersonenuebersichtApiInterface,
   type DBiamPersonenuebersichtResponse,
+  type PersonenkontexteApiInterface,
   type SystemrechtResponse,
 } from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
 
-const personenuebersicht: DbiamPersonenuebersichtApiInterface = DbiamPersonenuebersichtApiFactory(
+const personenKontextApi: PersonenkontexteApiInterface = PersonenkontexteApiFactory(undefined, '', axiosApiInstance);
+const personenKontexteApi: DbiamPersonenkontexteApiInterface = DbiamPersonenkontexteApiFactory(
+  undefined,
+  '',
+  axiosApiInstance,
+);
+const personenuebersichtApi: DbiamPersonenuebersichtApiInterface = DbiamPersonenuebersichtApiFactory(
   undefined,
   '',
   axiosApiInstance,
@@ -17,12 +28,17 @@ const personenuebersicht: DbiamPersonenuebersichtApiInterface = DbiamPersonenueb
 
 type PersonenkontextState = {
   personenubersicht: DBiamPersonenuebersichtResponse | null;
+  createdPersonenkontext: DBiamPersonenkontextResponse | null;
   errorCode: string;
   loading: boolean;
 };
 
 type PersonenkontextGetters = {};
 type PersonenkontextActions = {
+  hasSystemrecht: (personId: string, systemrecht: 'ROLLEN_VERWALTEN') => Promise<SystemrechtResponse>;
+  createPersonenkontext: (
+    personenkontext: DBiamCreatePersonenkontextBodyParams,
+  ) => Promise<DBiamPersonenkontextResponse>;
   getPersonenuebersichtById: (personId: string) => Promise<void>;
 };
 
@@ -46,16 +62,52 @@ export const usePersonenkontextStore: StoreDefinition<
   state: (): PersonenkontextState => {
     return {
       personenubersicht: null,
+      createdPersonenkontext: null,
       errorCode: '',
       loading: false,
     };
   },
   actions: {
+    async hasSystemrecht(personId: string, systemRecht: 'ROLLEN_VERWALTEN'): Promise<SystemrechtResponse> {
+      this.loading = true;
+      try {
+        const { data }: { data: SystemrechtResponse } =
+          await personenKontextApi.personenkontextControllerHatSystemRecht(personId, systemRecht);
+        return data;
+      } catch (error: unknown) {
+        this.errorCode = 'UNSPECIFIED_ERROR';
+        if (isAxiosError(error)) {
+          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
+        }
+        return await Promise.reject(this.errorCode);
+      } finally {
+        this.loading = false;
+      }
+    },
+    async createPersonenkontext(
+      personenkontext: DBiamCreatePersonenkontextBodyParams,
+    ): Promise<DBiamPersonenkontextResponse> {
+      this.loading = true;
+      try {
+        const { data }: { data: DBiamPersonenkontextResponse } =
+          await personenKontexteApi.dBiamPersonenkontextControllerCreatePersonenkontext(personenkontext);
+        this.createdPersonenkontext = data;
+        return data;
+      } catch (error: unknown) {
+        this.errorCode = 'UNSPECIFIED_ERROR';
+        if (isAxiosError(error)) {
+          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
+        }
+        return await Promise.reject(this.errorCode);
+      } finally {
+        this.loading = false;
+      }
+    },
     async getPersonenuebersichtById(personId: string): Promise<void> {
       this.loading = true;
       try {
         const { data }: { data: DBiamPersonenuebersichtResponse } =
-          await personenuebersicht.dBiamPersonenuebersichtControllerFindPersonenuebersichtenByPerson(personId);
+          await personenuebersichtApi.dBiamPersonenuebersichtControllerFindPersonenuebersichtenByPerson(personId);
         this.personenubersicht = data;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
