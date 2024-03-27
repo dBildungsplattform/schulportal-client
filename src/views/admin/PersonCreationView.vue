@@ -307,6 +307,7 @@
             v-model="selectedRolle"
             v-model:search="searchInputRollen"
             autocomplete="off"
+            :no-data-text="$t('noDataFound')"
           ></v-autocomplete>
         </FormRow>
 
@@ -380,6 +381,7 @@
               v-model="selectedOrganisation"
               v-model:search="searchInputOrganisation"
               autocomplete="off"
+              :no-data-text="$t('noDataFound')"
             ></v-autocomplete>
           </FormRow>
         </div>
