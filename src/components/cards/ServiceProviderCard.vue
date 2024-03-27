@@ -30,6 +30,7 @@
               rounded="0"
               ><v-img
                 alt="provider-logo"
+                class="service-provider-logo"
                 :src="logoUrl"
               ></v-img
             ></v-avatar>
@@ -39,6 +40,7 @@
               rounded="0"
               ><v-img
                 alt="schulportal-logo"
+                class="service-provider-logo"
                 :src="SchulPortalLogo"
               ></v-img
             ></v-avatar>
