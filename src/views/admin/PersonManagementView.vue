@@ -1,14 +1,17 @@
 <script setup lang="ts">
-  import { usePersonStore, type PersonStore, type Personendatensatz } from '@/stores/PersonStore';
-  import { computed, onMounted } from 'vue';
+  import { usePersonStore, type Person, type PersonStore, type Personendatensatz } from '@/stores/PersonStore';
+  import { computed, onMounted, type ComputedRef } from 'vue';
   import ResultTable from '@/components/admin/ResultTable.vue';
   import { type Composer, useI18n } from 'vue-i18n';
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
 
   import { type Router, useRouter } from 'vue-router';
-  import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenKontextStore';
-  import type { PagedResponse } from '@/api-client/generated';
-
+  import {
+    usePersonenkontextStore,
+    type PersonenkontextStore,
+    type Uebersicht,
+    type Zuordnung,
+  } from '@/stores/PersonenKontextStore';
   const personStore: PersonStore = usePersonStore();
   const personenKontextStore: PersonenkontextStore = usePersonenkontextStore();
 
@@ -24,20 +27,10 @@
   ];
 
   type PersonenWithRolleAndZuordnung = {
-    rollen: string;
+    rolle: string;
     administrationsebenen: string;
-    person: {
-      id: string;
-      name: {
-        familienname: string;
-        vorname: string;
-      };
-      referrer: string;
-    };
-    personenkontexte: {
-      id: string;
-    }[];
-  };
+    person: Person;
+  }[];
   const router: Router = useRouter();
 
   function navigateToPersonDetails(_$event: PointerEvent, { item }: { item: Personendatensatz }): void {
@@ -45,22 +38,19 @@
   }
 
   // Maps over allPersons, finds the corresponding zuordnungen for each person by matching the personId, and then extracts and combines
-  // the rolle values into a single string. The result is merged with the original person data, adding a new role property.
-  const personenWithUebersicht: PersonenWithRolleAndZuordnung = computed(() => {
+  // the rolle values into a single comma separated string. The result is merged with the original person data, adding a new role property.
+  const personenWithUebersicht: ComputedRef<PersonenWithRolleAndZuordnung> = computed(() => {
     return personStore.allPersons.map((person: Personendatensatz) => {
-      const uebersicht:
-        | {
-            items: string[];
-          }
-        | undefined = personenKontextStore.allUebersichte.find(
-        (ueb: PagedResponse) => ueb.personId === person.person.id,
+      const uebersicht: Uebersicht = personenKontextStore.allUebersichte?.items.find(
+        (ueb: Uebersicht) => ueb?.personId === person.person.id,
       );
-      // TODO: This needs to be fixed from the backend as the endpoint gives us an array of strings back instead of an array of objects
-      const rollen: string = uebersicht ? uebersicht.zuordnungen.map((zuordnung) => zuordnung.rolle).join(', ') : '';
+      const rollen: string = uebersicht
+        ? uebersicht.zuordnungen.map((zuordnung: Zuordnung) => zuordnung.rolle).join(', ')
+        : '';
       // Choose sskDstNr if available, otherwise sskName
       const administrationsebenen: string = uebersicht
         ? uebersicht.zuordnungen
-            .map((zuordnung) => (zuordnung.sskDstNr ? zuordnung.sskDstNr : zuordnung.sskName))
+            .map((zuordnung: Zuordnung) => (zuordnung.sskDstNr ? zuordnung.sskDstNr : zuordnung.sskName))
             .join(', ')
         : '';
       return { ...person, rolle: rollen, administrationsebenen: administrationsebenen };
@@ -92,13 +82,6 @@
           :title="item.rolle"
         >
           {{ item.rolle }}
-        </div> </template
-      ><template v-slot:[`item.administrationsebenen`]="{ item }">
-        <div
-          class="ellipsis-wrapper"
-          :title="item.administrationsebenen"
-        >
-          {{ item.administrationsebenen }}
         </div>
       </template></ResultTable
     >

@@ -4,6 +4,7 @@ import {
   DbiamPersonenuebersichtApiFactory,
   type DBiamCreatePersonenkontextBodyParams,
   type DbiamPersonenuebersichtApiInterface,
+  type DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response,
   type DBiamPersonenuebersichtResponse,
   type RawPagedResponse,
   type SystemrechtResponse,
@@ -15,10 +16,32 @@ const personenuebersichtApi: DbiamPersonenuebersichtApiInterface = DbiamPersonen
   '',
   axiosApiInstance,
 );
+export type Zuordnung = {
+  sskId: string;
+  rolleId: string;
+  sskName: string;
+  sskDstNr: string;
+  rolle: string;
+}
 
+export type Uebersicht =
+  | {
+      personId: string;
+      vorname: string;
+      nachname: string;
+      benutzername: string;
+      zuordnungen: {
+        sskId: string;
+        rolleId: string;
+        sskName: string;
+        sskDstNr: string;
+        rolle: string;
+      }[];
+    }
+  | undefined;
 type PersonenkontextState = {
   currentPersonenuebersicht: DBiamPersonenuebersichtResponse | null;
-  allUebersichte: Array<RawPagedResponse>; 
+  allUebersichte: DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response | null;
   errorCode: string;
   loading: boolean;
 };
@@ -29,7 +52,7 @@ type PersonenkontextActions = {
   getAllPersonenuebersichte: () => Promise<void>;
 };
 
-export type { SystemrechtResponse, RawPagedResponse };
+export type { SystemrechtResponse, RawPagedResponse, DBiamPersonenuebersichtResponse };
 export type CreatedPersonenkontext = DBiamCreatePersonenkontextBodyParams;
 
 export type PersonenkontextStore = Store<
@@ -49,7 +72,7 @@ export const usePersonenkontextStore: StoreDefinition<
   state: (): PersonenkontextState => {
     return {
       currentPersonenuebersicht: null,
-      allUebersichte: [],
+      allUebersichte: null,
       errorCode: '',
       loading: false,
     };
@@ -72,7 +95,7 @@ export const usePersonenkontextStore: StoreDefinition<
     async getAllPersonenuebersichte(): Promise<void> {
       this.loading = true;
       try {
-        const { data }: { data: PagedResponse[] } =
+        const { data }: { data: DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response } =
           await personenuebersichtApi.dBiamPersonenuebersichtControllerFindPersonenuebersichten();
         this.allUebersichte = data;
       } catch (error: unknown) {
