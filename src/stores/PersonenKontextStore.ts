@@ -27,7 +27,7 @@ const personenuebersichtApi: DbiamPersonenuebersichtApiInterface = DbiamPersonen
 );
 
 type PersonenkontextState = {
-  personenubersicht: DBiamPersonenuebersichtResponse | null;
+  personenuebersicht: DBiamPersonenuebersichtResponse | null;
   createdPersonenkontext: DBiamPersonenkontextResponse | null;
   errorCode: string;
   loading: boolean;
@@ -61,7 +61,7 @@ export const usePersonenkontextStore: StoreDefinition<
   id: 'personenkontextStore',
   state: (): PersonenkontextState => {
     return {
-      personenubersicht: null,
+      personenuebersicht: null,
       createdPersonenkontext: null,
       errorCode: '',
       loading: false,
@@ -108,7 +108,7 @@ export const usePersonenkontextStore: StoreDefinition<
       try {
         const { data }: { data: DBiamPersonenuebersichtResponse } =
           await personenuebersichtApi.dBiamPersonenuebersichtControllerFindPersonenuebersichtenByPerson(personId);
-        this.personenubersicht = data;
+        this.personenuebersicht = data;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {

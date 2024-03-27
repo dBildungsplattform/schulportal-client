@@ -223,6 +223,7 @@
     "enterLastName": "Nachname eingeben",
     "firstName": "Vorname",
     "lastName": "Nachname",
+    "noZuordnungenFound": "Keine Zuordnungen gefunden.",
     "password": "Passwort",
     "userName": "Benutzername",
     "zuordnungen": "Zuordnungen"

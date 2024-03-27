@@ -182,12 +182,18 @@
               <h3 class="subtitle-1">{{ $t('person.zuordnungen') }}</h3>
             </v-col>
           </v-row>
-          <v-row>
+          <!-- Check if 'zuordnungen' array exists and has length > 0 -->
+          <v-row
+            v-if="
+              personenKontextStore.personenuebersicht?.zuordnungen &&
+              personenKontextStore.personenuebersicht?.zuordnungen.length > 0
+            "
+          >
             <v-col
               cols="10"
               offset-md="2"
               offset="1"
-              v-for="zuordnung in personenKontextStore.personenubersicht?.zuordnungen"
+              v-for="zuordnung in personenKontextStore.personenuebersicht.zuordnungen"
               :key="zuordnung.sskId"
             >
               <h3
@@ -196,6 +202,16 @@
               >
                 {{ zuordnung.sskDstNr }} ({{ truncateSskName(zuordnung.sskName) }}): {{ zuordnung.rolle }}
               </h3>
+            </v-col>
+          </v-row>
+          <!-- Display 'No data available' if the above condition is false -->
+          <v-row v-else>
+            <v-col
+              cols="10"
+              offset-lg="2"
+              offset-md="1"
+            >
+              <h3 class="text-body">{{ $t('person.noZuordnungenFound') }}</h3>
             </v-col>
           </v-row>
         </v-container>
