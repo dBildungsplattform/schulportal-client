@@ -713,13 +713,38 @@
                 "responses": {
                     "200": {
                         "description": "The personenuebersichten were successfully returned.",
+                        "headers": {
+                            "X-Paging-Offset": {
+                                "description": "The offset of the first item from the list. List starts with index 0."
+                            },
+                            "X-Paging-Limit": {
+                                "description": "The maximum amount of items returned in one request."
+                            },
+                            "X-Paging-Total": {
+                                "description": "The total amount of items in the list."
+                            }
+                        },
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/PagedResponse"
-                                    }
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/RawPagedResponse"
+                                        },
+                                        {
+                                            "required": [
+                                                "items"
+                                            ],
+                                            "properties": {
+                                                "items": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/DBiamPersonenuebersichtResponse"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ]
                                 }
                             }
                         }
@@ -760,14 +785,11 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "The personenuebersicht was successfully returned.",
+                        "description": "The personenuebersichten were successfully returned.",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/DBiamPersonenuebersichtResponse"
-                                    }
+                                    "$ref": "#/components/schemas/DBiamPersonenuebersichtResponse"
                                 }
                             }
                         }
@@ -1096,21 +1118,22 @@
                             "nullable": false,
                             "type": "string"
                         }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/HatSystemrechtBodyParams"
-                            }
+                    },
+                    {
+                        "name": "systemRecht",
+                        "required": true,
+                        "in": "query",
+                        "schema": {
+                            "enum": [
+                                "ROLLEN_VERWALTEN"
+                            ],
+                            "type": "string"
                         }
                     }
-                },
+                ],
                 "responses": {
                     "200": {
-                        "description": "The SchulStrukturKnoten associated with this personId and systemrecht.",
+                        "description": "The SchulStrukturKnoten associated with this personId and systemrecht. Can return empty list",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1120,7 +1143,7 @@
                         }
                     },
                     "404": {
-                        "description": "The systemrecht could not be found."
+                        "description": "The systemrecht could not be found (does not exist as type of systemrecht)."
                     }
                 },
                 "tags": [
@@ -1218,6 +1241,128 @@
                 },
                 "tags": [
                     "dbiam-personenkontexte"
+                ],
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
+        "/api/personenkontext/rollen": {
+            "get": {
+                "operationId": "DbiamPersonenkontextFilterController_findRollen",
+                "parameters": [
+                    {
+                        "name": "rolleName",
+                        "required": true,
+                        "in": "query",
+                        "description": "Rolle name used to filter for rollen in personenkontext.",
+                        "schema": {
+                            "nullable": false,
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "required": false,
+                        "in": "query",
+                        "description": "The limit of items for the request.",
+                        "schema": {
+                            "nullable": false,
+                            "type": "number"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The rollen for a personenkontext were successfully returned.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/FindRollenResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Not authorized to get available rolen for personenkontexte."
+                    },
+                    "403": {
+                        "description": "Insufficient permission to get rollen for personenkontext."
+                    },
+                    "500": {
+                        "description": "Internal server error while getting rollen for personenkontexte."
+                    }
+                },
+                "tags": [
+                    "personenkontext"
+                ],
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
+        "/api/personenkontext/schulstrukturknoten": {
+            "get": {
+                "operationId": "DbiamPersonenkontextFilterController_findSchulstrukturknoten",
+                "parameters": [
+                    {
+                        "name": "rolleId",
+                        "required": true,
+                        "in": "query",
+                        "description": "RolleId used to filter for schulstrukturknoten in personenkontext.",
+                        "schema": {
+                            "nullable": false,
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "sskName",
+                        "required": true,
+                        "in": "query",
+                        "description": "Organisation/SSK name used to filter for schulstrukturknoten in personenkontext.",
+                        "schema": {
+                            "nullable": false,
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "required": false,
+                        "in": "query",
+                        "description": "The limit of items for the request.",
+                        "schema": {
+                            "nullable": false,
+                            "type": "number"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The schulstrukturknoten for a personenkontext were successfully returned.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/FindSchulstrukturknotenResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Not authorized to get available schulstrukturknoten for personenkontexte."
+                    },
+                    "403": {
+                        "description": "Insufficient permission to get schulstrukturknoten for personenkontext."
+                    },
+                    "500": {
+                        "description": "Internal server error while getting schulstrukturknoten for personenkontexte."
+                    }
+                },
+                "tags": [
+                    "personenkontext"
                 ],
                 "security": [
                     {
@@ -1887,6 +2032,146 @@
                 ]
             }
         },
+        "/api/rolle/{rolleId}/serviceProviders": {
+            "get": {
+                "operationId": "RolleController_getRolleServiceProviderIds",
+                "summary": "",
+                "description": "Get service-providers for a rolle by its id.",
+                "parameters": [
+                    {
+                        "name": "rolleId",
+                        "required": true,
+                        "in": "path",
+                        "description": "The id for the rolle.",
+                        "schema": {
+                            "nullable": false,
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns a list of service-provider ids.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RolleServiceProviderResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Not authorized to retrieve service-providers for rolle."
+                    },
+                    "404": {
+                        "description": "The rolle does not exist."
+                    }
+                },
+                "tags": [
+                    "rolle"
+                ],
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ]
+            },
+            "post": {
+                "operationId": "RolleController_addServiceProviderById",
+                "summary": "",
+                "description": "Add a service-provider to a rolle by id.",
+                "parameters": [
+                    {
+                        "name": "rolleId",
+                        "required": true,
+                        "in": "path",
+                        "description": "The id for the rolle.",
+                        "schema": {
+                            "nullable": false,
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RolleServiceProviderQueryParams"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Adding service-provider finished successfully."
+                    },
+                    "400": {
+                        "description": "The service-provider is already attached to rolle."
+                    },
+                    "401": {
+                        "description": "Not authorized to retrieve service-providers for rolle."
+                    },
+                    "404": {
+                        "description": "The rolle or the service-provider to add does not exist."
+                    }
+                },
+                "tags": [
+                    "rolle"
+                ],
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ]
+            },
+            "delete": {
+                "operationId": "RolleController_removeServiceProviderById",
+                "summary": "",
+                "description": "Remove a service-provider from a rolle by id.",
+                "parameters": [
+                    {
+                        "name": "rolleId",
+                        "required": true,
+                        "in": "path",
+                        "description": "The id for the rolle.",
+                        "schema": {
+                            "nullable": false,
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "serviceProviderId",
+                        "required": true,
+                        "in": "query",
+                        "description": "The id for the rolle.",
+                        "schema": {
+                            "nullable": false,
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Removing service-provider finished successfully."
+                    },
+                    "401": {
+                        "description": "Not authorized to retrieve service-providers for rolle."
+                    },
+                    "404": {
+                        "description": "The rolle or the service-provider that should be removed does not exist."
+                    }
+                },
+                "tags": [
+                    "rolle"
+                ],
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
         "/api/provider": {
             "get": {
                 "operationId": "ProviderController_getAllServiceProviders",
@@ -2462,18 +2747,31 @@
                     "revision"
                 ]
             },
-            "PagedResponse": {
+            "DBiamPersonenzuordnungResponse": {
                 "type": "object",
                 "properties": {
-                    "items": {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        }
+                    "sskId": {
+                        "type": "string"
+                    },
+                    "rolleId": {
+                        "type": "string"
+                    },
+                    "sskName": {
+                        "type": "string"
+                    },
+                    "sskDstNr": {
+                        "type": "string"
+                    },
+                    "rolle": {
+                        "type": "string"
                     }
                 },
                 "required": [
-                    "items"
+                    "sskId",
+                    "rolleId",
+                    "sskName",
+                    "sskDstNr",
+                    "rolle"
                 ]
             },
             "DBiamPersonenuebersichtResponse": {
@@ -2492,7 +2790,10 @@
                         "type": "string"
                     },
                     "zuordnungen": {
-                        "type": "string"
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/DBiamPersonenzuordnungResponse"
+                        }
                     }
                 },
                 "required": [
@@ -2577,20 +2878,6 @@
                 "required": [
                     "person",
                     "personenkontexte"
-                ]
-            },
-            "HatSystemrechtBodyParams": {
-                "type": "object",
-                "properties": {
-                    "systemRecht": {
-                        "type": "string",
-                        "enum": [
-                            "ROLLEN_VERWALTEN"
-                        ]
-                    }
-                },
-                "required": [
-                    "systemRecht"
                 ]
             },
             "OrganisationResponse": {
@@ -2735,6 +3022,106 @@
                     "rolleId"
                 ]
             },
+            "RolleResponse": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "createdAt": {
+                        "format": "date-time",
+                        "type": "string"
+                    },
+                    "updatedAt": {
+                        "format": "date-time",
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "administeredBySchulstrukturknoten": {
+                        "type": "string"
+                    },
+                    "rollenart": {
+                        "type": "string",
+                        "enum": [
+                            "LERN",
+                            "LEHR",
+                            "EXTERN",
+                            "ORGADMIN",
+                            "LEIT",
+                            "SYSADMIN"
+                        ]
+                    },
+                    "merkmale": {
+                        "type": "array",
+                        "uniqueItems": true,
+                        "items": {
+                            "type": "string",
+                            "enum": [
+                                "BEFRISTUNG_PFLICHT",
+                                "KOPERS_PFLICHT"
+                            ]
+                        }
+                    },
+                    "systemrechte": {
+                        "type": "array",
+                        "uniqueItems": true,
+                        "items": {
+                            "type": "string",
+                            "enum": [
+                                "ROLLEN_VERWALTEN"
+                            ]
+                        }
+                    }
+                },
+                "required": [
+                    "id",
+                    "createdAt",
+                    "updatedAt",
+                    "name",
+                    "administeredBySchulstrukturknoten",
+                    "rollenart",
+                    "merkmale",
+                    "systemrechte"
+                ]
+            },
+            "FindRollenResponse": {
+                "type": "object",
+                "properties": {
+                    "moeglicheRollen": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/RolleResponse"
+                        }
+                    },
+                    "total": {
+                        "type": "number"
+                    }
+                },
+                "required": [
+                    "moeglicheRollen",
+                    "total"
+                ]
+            },
+            "FindSchulstrukturknotenResponse": {
+                "type": "object",
+                "properties": {
+                    "moeglicheSkks": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/OrganisationResponse"
+                        }
+                    },
+                    "total": {
+                        "type": "number"
+                    }
+                },
+                "required": [
+                    "moeglicheSkks",
+                    "total"
+                ]
+            },
             "CreateOrganisationBodyParams": {
                 "type": "object",
                 "properties": {
@@ -2846,70 +3233,6 @@
                     "organisationId"
                 ]
             },
-            "RolleResponse": {
-                "type": "object",
-                "properties": {
-                    "id": {
-                        "type": "string"
-                    },
-                    "createdAt": {
-                        "format": "date-time",
-                        "type": "string"
-                    },
-                    "updatedAt": {
-                        "format": "date-time",
-                        "type": "string"
-                    },
-                    "name": {
-                        "type": "string"
-                    },
-                    "administeredBySchulstrukturknoten": {
-                        "type": "string"
-                    },
-                    "rollenart": {
-                        "type": "string",
-                        "enum": [
-                            "LERN",
-                            "LEHR",
-                            "EXTERN",
-                            "ORGADMIN",
-                            "LEIT",
-                            "SYSADMIN"
-                        ]
-                    },
-                    "merkmale": {
-                        "type": "array",
-                        "uniqueItems": true,
-                        "items": {
-                            "type": "string",
-                            "enum": [
-                                "BEFRISTUNG_PFLICHT",
-                                "KOPERS_PFLICHT"
-                            ]
-                        }
-                    },
-                    "systemrechte": {
-                        "type": "array",
-                        "uniqueItems": true,
-                        "items": {
-                            "type": "string",
-                            "enum": [
-                                "ROLLEN_VERWALTEN"
-                            ]
-                        }
-                    }
-                },
-                "required": [
-                    "id",
-                    "createdAt",
-                    "updatedAt",
-                    "name",
-                    "administeredBySchulstrukturknoten",
-                    "rollenart",
-                    "merkmale",
-                    "systemrechte"
-                ]
-            },
             "CreateRolleBodyParams": {
                 "type": "object",
                 "properties": {
@@ -2972,6 +3295,33 @@
                 },
                 "required": [
                     "systemRecht"
+                ]
+            },
+            "RolleServiceProviderResponse": {
+                "type": "object",
+                "properties": {
+                    "serviceProviderIds": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "required": [
+                    "serviceProviderIds"
+                ]
+            },
+            "RolleServiceProviderQueryParams": {
+                "type": "object",
+                "properties": {
+                    "serviceProviderId": {
+                        "type": "string",
+                        "description": "The id for the rolle.",
+                        "nullable": false
+                    }
+                },
+                "required": [
+                    "serviceProviderId"
                 ]
             },
             "ServiceProviderKategorie": {
