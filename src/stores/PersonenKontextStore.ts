@@ -5,7 +5,7 @@ import {
   type DBiamCreatePersonenkontextBodyParams,
   type DbiamPersonenuebersichtApiInterface,
   type DBiamPersonenuebersichtResponse,
-  type PagedResponse,
+  type RawPagedResponse,
   type SystemrechtResponse,
 } from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
@@ -17,8 +17,8 @@ const personenuebersichtApi: DbiamPersonenuebersichtApiInterface = DbiamPersonen
 );
 
 type PersonenkontextState = {
-  currentPersonenubersicht: DBiamPersonenuebersichtResponse[] | null;
-  allUebersichte: Array<PagedResponse>; 
+  currentPersonenuebersicht: DBiamPersonenuebersichtResponse | null;
+  allUebersichte: Array<RawPagedResponse>; 
   errorCode: string;
   loading: boolean;
 };
@@ -29,7 +29,7 @@ type PersonenkontextActions = {
   getAllPersonenuebersichte: () => Promise<void>;
 };
 
-export type { SystemrechtResponse, PagedResponse };
+export type { SystemrechtResponse, RawPagedResponse };
 export type CreatedPersonenkontext = DBiamCreatePersonenkontextBodyParams;
 
 export type PersonenkontextStore = Store<
@@ -48,7 +48,7 @@ export const usePersonenkontextStore: StoreDefinition<
   id: 'personenkontextStore',
   state: (): PersonenkontextState => {
     return {
-      currentPersonenubersicht: null,
+      currentPersonenuebersicht: null,
       allUebersichte: [],
       errorCode: '',
       loading: false,
@@ -58,9 +58,9 @@ export const usePersonenkontextStore: StoreDefinition<
     async getPersonenuebersichtById(personId: string): Promise<void> {
       this.loading = true;
       try {
-        const { data }: { data: DBiamPersonenuebersichtResponse[] } =
+        const { data }: { data: DBiamPersonenuebersichtResponse } =
           await personenuebersichtApi.dBiamPersonenuebersichtControllerFindPersonenuebersichtenByPerson(personId);
-        this.currentPersonenubersicht = data;
+        this.currentPersonenuebersicht = data;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
