@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { useOrganisationStore, type OrganisationStore, type Organisation } from '@/stores/OrganisationStore';
+  import { useOrganisationStore, type OrganisationStore, type OrganisationResponse } from '@/stores/OrganisationStore';
   import {
     usePersonStore,
     type CreatedPerson,
@@ -7,8 +7,8 @@
     type PersonStore,
     type PersonendatensatzResponse,
   } from '@/stores/PersonStore';
-  import { type RolleStore, useRolleStore, type Rolle } from '@/stores/RolleStore';
-  import { type ComputedRef, computed, onMounted, onUnmounted, type Ref, ref } from 'vue';
+  import { type RolleStore, useRolleStore, type RolleResponse } from '@/stores/RolleStore';
+  import { type ComputedRef, computed, onMounted, onUnmounted, type Ref, ref, watch } from 'vue';
   import {
     onBeforeRouteLeave,
     type Router,
@@ -25,6 +25,7 @@
   import PasswordOutput from '@/components/form/PasswordOutput.vue';
   import FormWrapper from '@/components/form/FormWrapper.vue';
   import FormRow from '@/components/form/FormRow.vue';
+  import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenKontextStore';
   import { useDisplay } from 'vuetify';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
@@ -32,6 +33,7 @@
 
   const router: Router = useRouter();
   const personStore: PersonStore = usePersonStore();
+  const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
   const organisationStore: OrganisationStore = useOrganisationStore();
   const rolleStore: RolleStore = useRolleStore();
   const { t }: Composer = useI18n({ useScope: 'global' });
@@ -76,7 +78,7 @@
   };
 
   // eslint-disable-next-line @typescript-eslint/typedef
-  const { defineField, handleSubmit, isFieldDirty, resetForm } = useForm<PersonCreationForm>({
+  const { defineField, handleSubmit, isFieldDirty, resetForm, resetField } = useForm<PersonCreationForm>({
     validationSchema,
   });
 
@@ -97,32 +99,77 @@
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedOrganisation', vuetifyConfig);
 
-  const rollen: ComputedRef<TranslatedObject[]> = computed(() =>
-    rolleStore.allRollen
-      .map((rolle: Rolle) => ({
-        value: rolle.id,
-        title: rolle.name,
-      }))
-      .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title)),
-  );
+  const searchInputRollen: Ref<string> = ref('');
+  const searchInputOrganisation: Ref<string> = ref('');
+  // Watcher to detect when the search input for Rollen has 3 or more characters to trigger filtering.
+  watch(searchInputRollen, async (newValue: string, _oldValue: string) => {
+    if (newValue.length >= 3) {
+      personenkontextStore.getPersonenkontextRolleWithFilter(newValue, 25);
+    }
+  });
+  // Watcher to detect when the Rolle is selected so the Organisationen show all the possible choices using that value.
+  watch(selectedRolle, (newValue: string, oldValue: string) => {
+    if (newValue !== oldValue) {
+      // Call fetch with an empty string to get the initial organizations for the selected role without any filter
+      personenkontextStore.getPersonenkontextAdministrationsebeneWithFilter(newValue, '', 25);
+    }
+    // This checks if `selectedRolle` is cleared or set to a falsy value
+    if (!newValue) {
+      resetField('selectedOrganisation');
+    }
+  });
+  // Watcher to detect when the search input for Organisationen is triggered.
+  watch(searchInputOrganisation, async (newValue: string, _oldValue: string) => {
+    if (newValue.length >= 3) {
+      personenkontextStore.getPersonenkontextAdministrationsebeneWithFilter(selectedRolle.value, newValue, 25);
+    } else {
+      // If newValue has less than 3 characters, use an empty string instead of newValue to show all organisationen under the selectedRolle.
+      personenkontextStore.getPersonenkontextAdministrationsebeneWithFilter(selectedRolle.value, '', 25);
+    }
+  });
 
-  const organisationen: ComputedRef<TranslatedObject[]> = computed(() =>
-    organisationStore.allOrganisationen.map((org: Organisation) => ({
-      value: org.id,
-      title: `${org.kennung} (${org.name})`,
-    })),
-  );
+  const rollen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
+    // If searchInput is less than 3 characters, return the initial 25 roles from the rolleStore
+    if (searchInputRollen.value.length < 3) {
+      return rolleStore.allRollen
+        .slice(0, 25)
+        .map((rolle: RolleResponse) => ({
+          value: rolle.id,
+          title: rolle.name,
+        }))
+        .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
+    } else {
+      // Once filtering is applied, map the filteredRollen for the autocomplete
+      return personenkontextStore.filteredRollen?.moeglicheRollen
+        .slice(0, 25)
+        .map((rolle: RolleResponse) => ({
+          value: rolle.id,
+          title: rolle.name,
+        }))
+        .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
+    }
+  });
+
+  const organisationen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
+    return personenkontextStore.filteredOrganisationen?.moeglicheSkks
+      .slice(0, 25)
+      .map((org: OrganisationResponse) => ({
+        value: org.id,
+        title: `${org.kennung} (${org.name})`,
+      }))
+      .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
+  });
 
   const translatedOrganisationsname: ComputedRef<string> = computed(
     () =>
-      organisationen.value.find(
+      organisationen.value?.find(
         (organisation: TranslatedObject) => organisation.value === personStore.createdPersonenkontext?.organisationId,
       )?.title || '',
   );
 
   const translatedRollenname: ComputedRef<string> = computed(
     () =>
-      rollen.value.find((rolle: TranslatedObject) => rolle.value === personStore.createdPersonenkontext?.rolleId)
+      rollen.value?.find((rolle: TranslatedObject) => rolle.value === personStore.createdPersonenkontext?.rolleId)
         ?.title || '',
   );
 
@@ -249,7 +296,7 @@
           :isRequired="true"
           :label="$t('admin.rolle.rolle')"
         >
-          <v-select
+          <v-autocomplete
             clearable
             data-testid="rolle-select"
             density="compact"
@@ -262,7 +309,10 @@
             variant="outlined"
             v-bind="selectedRolleProps"
             v-model="selectedRolle"
-          ></v-select>
+            v-model:search="searchInputRollen"
+            autocomplete="off"
+            :no-data-text="$t('noDataFound')"
+          ></v-autocomplete>
         </FormRow>
 
         <!-- Persönliche Informationen -->
@@ -320,7 +370,7 @@
             labelForId="organisation-select"
             :label="$t('admin.organisation.assignOrganisation')"
           >
-            <v-select
+            <v-autocomplete
               clearable
               data-testid="organisation-select"
               density="compact"
@@ -333,7 +383,10 @@
               variant="outlined"
               v-bind="selectedOrganisationProps"
               v-model="selectedOrganisation"
-            ></v-select>
+              v-model:search="searchInputOrganisation"
+              autocomplete="off"
+              :no-data-text="$t('noDataFound')"
+            ></v-autocomplete>
           </FormRow>
         </div>
       </FormWrapper>

@@ -213,6 +213,7 @@
     "help": "Hilfe"
   },
   "no": "Nein",
+  "noDataFound": "Keine Daten gefunden.",
   "pagination": {
     "all": "Alle",
     "pageText": "{interval} von {total} Einträgen"

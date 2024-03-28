@@ -51,6 +51,7 @@ export { CreateOrganisationBodyParamsTypEnum };
 export type OrganisationStore = Store<'organisationStore', OrganisationState, OrganisationGetters, OrganisationActions>;
 
 export { OrganisationResponseTypEnum };
+export type { OrganisationResponse };
 
 export const useOrganisationStore: StoreDefinition<
   'organisationStore',
