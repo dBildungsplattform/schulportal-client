@@ -113,8 +113,12 @@
       // Call fetch with an empty string to get the initial organizations for the selected role without any filter
       personenkontextStore.getPersonenkontextAdministrationsebeneWithFilter(newValue, '', 25);
     }
+    // This checks if `selectedRolle` is cleared or set to a falsy value
+    if (!newValue) {
+      resetForm();
+    }
   });
-  // Watcher to detect when the search input for Organisationen is triggered. 
+  // Watcher to detect when the search input for Organisationen is triggered.
   watch(searchInputOrganisation, async (newValue: string, _oldValue: string) => {
     if (newValue.length >= 3) {
       personenkontextStore.getPersonenkontextAdministrationsebeneWithFilter(selectedRolle.value, newValue, 25);
