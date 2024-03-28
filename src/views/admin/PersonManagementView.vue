@@ -22,7 +22,7 @@
     { title: t('person.lastName'), key: 'person.name.familienname', align: 'start' },
     { title: t('person.firstName'), key: 'person.name.vorname', align: 'start' },
     { title: t('person.userName'), key: 'person.referrer', align: 'start' },
-    { title: t('person.rolle'), key: 'rolle', align: 'start' },
+    { title: t('person.rolle'), key: 'rollen', align: 'start' },
     { title: t('person.zuordnung'), key: 'administrationsebenen', align: 'start' },
   ];
 
@@ -95,11 +95,4 @@
   </div>
 </template>
 
-<style>
-  .ellipsis-wrapper {
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
-    max-width: 200px;
-  }
-</style>
+<style></style>
