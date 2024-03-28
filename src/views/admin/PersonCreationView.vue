@@ -78,7 +78,7 @@
   };
 
   // eslint-disable-next-line @typescript-eslint/typedef
-  const { defineField, handleSubmit, isFieldDirty, resetForm } = useForm<PersonCreationForm>({
+  const { defineField, handleSubmit, isFieldDirty, resetForm, resetField } = useForm<PersonCreationForm>({
     validationSchema,
   });
 
@@ -115,7 +115,7 @@
     }
     // This checks if `selectedRolle` is cleared or set to a falsy value
     if (!newValue) {
-      resetForm();
+      resetField('selectedOrganisation');
     }
   });
   // Watcher to detect when the search input for Organisationen is triggered.
