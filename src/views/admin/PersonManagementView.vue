@@ -27,7 +27,7 @@
   ];
 
   type PersonenWithRolleAndZuordnung = {
-    rolle: string;
+    rollen: string;
     administrationsebenen: string;
     person: Person;
   }[];
@@ -41,7 +41,7 @@
   // the rolle values into a single comma separated string. The result is merged with the original person data, adding a new role property.
   const personenWithUebersicht: ComputedRef<PersonenWithRolleAndZuordnung> = computed(() => {
     return personStore.allPersons.map((person: Personendatensatz) => {
-      const uebersicht: Uebersicht = personenKontextStore.allUebersichte?.items.find(
+      const uebersicht: Uebersicht = personenKontextStore.allUebersichten?.items.find(
         (ueb: Uebersicht) => ueb?.personId === person.person.id,
       );
       const rollen: string = uebersicht?.zuordnungen.length
@@ -53,13 +53,13 @@
             .map((zuordnung: Zuordnung) => (zuordnung.sskDstNr ? zuordnung.sskDstNr : zuordnung.sskName))
             .join(', ')
         : '-';
-      return { ...person, rolle: rollen, administrationsebenen: administrationsebenen };
+      return { ...person, rollen: rollen, administrationsebenen: administrationsebenen };
     });
   });
 
   onMounted(async () => {
     await personStore.getAllPersons();
-    await personenKontextStore.getAllPersonenuebersichte();
+    await personenKontextStore.getAllPersonenuebersichten();
   });
 </script>
 

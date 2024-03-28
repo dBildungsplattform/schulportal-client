@@ -52,7 +52,7 @@ export type Uebersicht =
   | undefined;
 
 type PersonenkontextState = {
-  allUebersichte: DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response | null;
+  allUebersichten: DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response | null;
   personenuebersicht: DBiamPersonenuebersichtResponse | null;
   createdPersonenkontext: DBiamPersonenkontextResponse | null;
   errorCode: string;
@@ -66,7 +66,7 @@ type PersonenkontextActions = {
     personenkontext: DBiamCreatePersonenkontextBodyParams,
   ) => Promise<DBiamPersonenkontextResponse>;
   getPersonenuebersichtById: (personId: string) => Promise<void>;
-  getAllPersonenuebersichte: () => Promise<void>;
+  getAllPersonenuebersichten: () => Promise<void>;
 };
 
 export type { SystemrechtResponse };
@@ -88,7 +88,7 @@ export const usePersonenkontextStore: StoreDefinition<
   id: 'personenkontextStore',
   state: (): PersonenkontextState => {
     return {
-      allUebersichte: null,
+      allUebersichten: null,
       personenuebersicht: null,
       createdPersonenkontext: null,
       errorCode: '',
@@ -145,12 +145,12 @@ export const usePersonenkontextStore: StoreDefinition<
       }
       this.loading = false;
     },
-    async getAllPersonenuebersichte(): Promise<void> {
+    async getAllPersonenuebersichten(): Promise<void> {
       this.loading = true;
       try {
         const { data }: { data: DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response } =
           await personenuebersichtApi.dBiamPersonenuebersichtControllerFindPersonenuebersichten();
-        this.allUebersichte = data;
+        this.allUebersichten = data;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {

@@ -201,27 +201,27 @@ describe('PersonenkontextStore', () => {
         ],
       };
       mockadapter.onGet('/api/dbiam/personenuebersicht').replyOnce(200, mockResponse);
-      const getAllPersonenuebersichtePromise: Promise<void> = personenkontextStore.getAllPersonenuebersichte();
+      const getAllPersonenuebersichtenPromise: Promise<void> = personenkontextStore.getAllPersonenuebersichten();
       expect(personenkontextStore.loading).toBe(true);
-      await getAllPersonenuebersichtePromise;
-      expect(personenkontextStore.allUebersichte).toEqual(mockResponse);
+      await getAllPersonenuebersichtenPromise;
+      expect(personenkontextStore.allUebersichten).toEqual(mockResponse);
       expect(personenkontextStore.loading).toBe(false);
     });
 
     it('should handle string error', async () => {
       mockadapter.onGet('/api/dbiam/personenuebersicht').replyOnce(500, 'some error');
-      const getAllPersonenuebersichtePromise: Promise<void> = personenkontextStore.getAllPersonenuebersichte();
+      const getAllPersonenuebersichtenPromise: Promise<void> = personenkontextStore.getAllPersonenuebersichten();
       expect(personenkontextStore.loading).toBe(true);
-      await getAllPersonenuebersichtePromise;
+      await getAllPersonenuebersichtenPromise;
       expect(personenkontextStore.errorCode).toEqual('UNSPECIFIED_ERROR');
       expect(personenkontextStore.loading).toBe(false);
     });
 
     it('should handle error code', async () => {
       mockadapter.onGet('/api/dbiam/personenuebersicht').replyOnce(500, { code: 'some mock server error' });
-      const getAllPersonenuebersichtePromise: Promise<void> = personenkontextStore.getAllPersonenuebersichte();
+      const getAllPersonenuebersichtenPromise: Promise<void> = personenkontextStore.getAllPersonenuebersichten();
       expect(personenkontextStore.loading).toBe(true);
-      await getAllPersonenuebersichtePromise;
+      await getAllPersonenuebersichtenPromise;
       expect(personenkontextStore.errorCode).toEqual('some mock server error');
       expect(personenkontextStore.loading).toBe(false);
     });
