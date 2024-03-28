@@ -1,17 +1,20 @@
 import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import { isAxiosError } from 'axios';
 import {
+  DbiamPersonenkontexteApiFactory,
   PersonenkontexteApiFactory,
   type FindRollenResponse,
   type FindSchulstrukturknotenResponse,
-  DbiamPersonenkontexteApiFactory,
   type DBiamCreatePersonenkontextBodyParams,
   type DbiamPersonenkontexteApiInterface,
   type DBiamPersonenkontextResponse,
+  type DbiamPersonenuebersichtApiInterface,
+  type DBiamPersonenuebersichtResponse,
   type PersonenkontexteApiInterface,
   type SystemrechtResponse,
   PersonenkontextApiFactory,
   type PersonenkontextApiInterface,
+  DbiamPersonenuebersichtApiFactory,
 } from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
 
@@ -22,9 +25,16 @@ const dbiamPersonenKontexteApi: DbiamPersonenkontexteApiInterface = DbiamPersone
   '',
   axiosApiInstance,
 );
+const personenuebersichtApi: DbiamPersonenuebersichtApiInterface = DbiamPersonenuebersichtApiFactory(
+  undefined,
+  '',
+  axiosApiInstance,
+);
+
 type PersonenkontextState = {
   filteredRollen: FindRollenResponse | null;
   filteredOrganisationen: FindSchulstrukturknotenResponse | null;
+  personenuebersicht: DBiamPersonenuebersichtResponse | null;
   createdPersonenkontext: DBiamPersonenkontextResponse | null;
   errorCode: string;
   loading: boolean;
@@ -38,6 +48,7 @@ type PersonenkontextActions = {
   createPersonenkontext: (
     personenkontext: DBiamCreatePersonenkontextBodyParams,
   ) => Promise<DBiamPersonenkontextResponse>;
+  getPersonenuebersichtById: (personId: string) => Promise<void>;
 };
 
 export type { SystemrechtResponse };
@@ -61,6 +72,7 @@ export const usePersonenkontextStore: StoreDefinition<
     return {
       filteredRollen: null,
       filteredOrganisationen: null,
+      personenuebersicht: null,
       createdPersonenkontext: null,
       errorCode: '',
       loading: false,
@@ -133,6 +145,20 @@ export const usePersonenkontextStore: StoreDefinition<
       } finally {
         this.loading = false;
       }
+    },
+    async getPersonenuebersichtById(personId: string): Promise<void> {
+      this.loading = true;
+      try {
+        const { data }: { data: DBiamPersonenuebersichtResponse } =
+          await personenuebersichtApi.dBiamPersonenuebersichtControllerFindPersonenuebersichtenByPerson(personId);
+        this.personenuebersicht = data;
+      } catch (error: unknown) {
+        this.errorCode = 'UNSPECIFIED_ERROR';
+        if (isAxiosError(error)) {
+          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
+        }
+      }
+      this.loading = false;
     },
   },
 });

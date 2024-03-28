@@ -19,6 +19,12 @@
       font-size: 22px;
     }
   }
+
+  .service-provider-logo img {
+    max-width: 40px;
+    max-height: 40px;
+    object-fit: scale-down;
+  }
 }
 
 @media only screen and (max-width: 960px) {  

@@ -71,7 +71,10 @@
 </script>
 
 <template>
-  <v-card flat>
+  <v-card
+    class="pr-3"
+    flat
+  >
     <v-row class="flex-nowrap mb-1 justify-center">
       <v-col cols="auto">
         <h2

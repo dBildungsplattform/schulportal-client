@@ -1,5 +1,6 @@
 import {
   type DBiamPersonenkontextResponse,
+  type DBiamPersonenuebersichtResponse,
   type FindRollenResponse,
   type FindSchulstrukturknotenResponse,
   type SystemrechtResponse,
@@ -134,6 +135,50 @@ describe('PersonenkontextStore', () => {
       expect(personenkontextStore.loading).toBe(false);
     });
   });
+  describe('getPersonenuebersichtById', () => {
+    it('should get Personenuebersicht', async () => {
+      const mockResponse: DBiamPersonenuebersichtResponse = {
+        personId: '1',
+        vorname: 'string',
+        nachname: 'string',
+        benutzername: 'string',
+        zuordnungen: [
+          {
+            sskId: 'string',
+            rolleId: 'string',
+            sskName: 'string',
+            sskDstNr: 'string',
+            rolle: 'string',
+          },
+        ],
+      };
+
+      mockadapter.onGet('/api/dbiam/personenuebersicht/1').replyOnce(200, mockResponse);
+      const getPersonenuebersichtByIdPromise: Promise<void> = personenkontextStore.getPersonenuebersichtById('1');
+      expect(personenkontextStore.loading).toBe(true);
+      await getPersonenuebersichtByIdPromise;
+      expect(personenkontextStore.personenuebersicht).toEqual(mockResponse);
+      expect(personenkontextStore.loading).toBe(false);
+    });
+
+    it('should handle string error', async () => {
+      mockadapter.onGet('/api/dbiam/personenuebersicht/1').replyOnce(500, 'some error');
+      const getPersonenuebersichtByIdPromise: Promise<void> = personenkontextStore.getPersonenuebersichtById('1');
+      expect(personenkontextStore.loading).toBe(true);
+      await getPersonenuebersichtByIdPromise;
+      expect(personenkontextStore.errorCode).toEqual('UNSPECIFIED_ERROR');
+      expect(personenkontextStore.loading).toBe(false);
+    });
+
+    it('should handle error code', async () => {
+      mockadapter.onGet('/api/dbiam/personenuebersicht/1').replyOnce(500, { code: 'some mock server error' });
+      const getPersonenuebersichtByIdPromise: Promise<void> = personenkontextStore.getPersonenuebersichtById('1');
+      expect(personenkontextStore.loading).toBe(true);
+      await getPersonenuebersichtByIdPromise;
+      expect(personenkontextStore.errorCode).toEqual('some mock server error');
+      expect(personenkontextStore.loading).toBe(false);
+    });
+  });
   describe('getPersonenkontextRolleWithFilter', () => {
     it('should get filtered Rollen', async () => {
       const mockResponse: FindRollenResponse = {
@@ -141,8 +186,7 @@ describe('PersonenkontextStore', () => {
           {
             id: 'string',
             createdAt: '2024-03-24T16:35:32.711Z',
-            updatedAt: '2024-03-24T16:35:32.711Z',
-            name: 'string',
+            updatedAt: '2024-03-24T16:35:32.711Z',  name: 'string',
             administeredBySchulstrukturknoten: 'string',
             rollenart: 'LERN',
             merkmale: ['BEFRISTUNG_PFLICHT'] as unknown as Set<RolleResponseMerkmaleEnum>,
