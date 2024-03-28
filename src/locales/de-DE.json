@@ -218,15 +218,17 @@
     "pageText": "{interval} von {total} Einträgen"
   },
   "person": {
-    "zuordnung": "Zuordnung",
     "email": "E-Mail",
     "enterFirstName": "Vorname eingeben",
     "enterLastName": "Nachname eingeben",
     "firstName": "Vorname",
     "lastName": "Nachname",
+    "noZuordnungenFound": "Keine Zuordnungen gefunden.",
     "password": "Passwort",
     "rolle": "Rolle",
-    "userName": "Benutzername"
+    "userName": "Benutzername",
+    "zuordnungen": "Zuordnungen",
+    "zuordnung": "Zuordnung"
   },
   "unsavedChanges": {
     "message": "Sie haben nicht gespeicherte Änderungen vorgenommen. Wollen Sie die Seite trotzdem verlassen?",

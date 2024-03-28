@@ -52,8 +52,8 @@ export type Uebersicht =
   | undefined;
 
 type PersonenkontextState = {
-  personenuebersicht: DBiamPersonenuebersichtResponse | null;
   allUebersichte: DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response | null;
+  personenuebersicht: DBiamPersonenuebersichtResponse | null;
   createdPersonenkontext: DBiamPersonenkontextResponse | null;
   errorCode: string;
   loading: boolean;
