@@ -302,6 +302,7 @@
               variant="outlined"
               v-bind="selectedAdministrationsebeneProps"
               v-model="selectedAdministrationsebene"
+              :no-data-text="$t('noDataFound')"
             ></v-select>
           </FormRow>
 
@@ -328,6 +329,7 @@
               variant="outlined"
               v-bind="selectedRollenArtProps"
               v-model="selectedRollenArt"
+              :no-data-text="$t('noDataFound')"
             ></v-select>
           </FormRow>
 
@@ -378,6 +380,7 @@
                 variant="outlined"
                 v-bind="selectedMerkmaleProps"
                 v-model="selectedMerkmale"
+                :no-data-text="$t('noDataFound')"
               ></v-select>
             </FormRow>
             <!-- Checkbox to assign the right "ROLLE VERWALTEN" to the rolle -->
