@@ -1,5 +1,6 @@
 import {
   type DBiamPersonenkontextResponse,
+  type DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response,
   type DBiamPersonenuebersichtResponse,
   type FindRollenResponse,
   type FindSchulstrukturknotenResponse,
@@ -273,6 +274,56 @@ describe('PersonenkontextStore', () => {
         personenkontextStore.getPersonenkontextAdministrationsebeneWithFilter('1', 'Org', 2);
       expect(personenkontextStore.loading).toBe(true);
       await rejects(getPersonenkontextAdministrationsebeneWithFilterPromise);
+      expect(personenkontextStore.errorCode).toEqual('some mock server error');
+      expect(personenkontextStore.loading).toBe(false);
+    });
+  });
+  describe('getAllPersonenuebersichte', () => {
+    it('should get All Personenuebersicht', async () => {
+      const mockResponse: DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response = {
+        total: 0,
+        offset: 0,
+        limit: 0,
+        items: [
+          {
+            personId: 'string',
+            vorname: 'string',
+            nachname: 'string',
+            benutzername: 'string',
+            zuordnungen: [
+              {
+                sskId: 'string',
+                rolleId: 'string',
+                sskName: 'string',
+                sskDstNr: 'string',
+                rolle: 'string',
+              },
+            ],
+          },
+        ],
+      };
+      mockadapter.onGet('/api/dbiam/personenuebersicht').replyOnce(200, mockResponse);
+      const getAllPersonenuebersichtenPromise: Promise<void> = personenkontextStore.getAllPersonenuebersichten();
+      expect(personenkontextStore.loading).toBe(true);
+      await getAllPersonenuebersichtenPromise;
+      expect(personenkontextStore.allUebersichten).toEqual(mockResponse);
+      expect(personenkontextStore.loading).toBe(false);
+    });
+
+    it('should handle string error', async () => {
+      mockadapter.onGet('/api/dbiam/personenuebersicht').replyOnce(500, 'some error');
+      const getAllPersonenuebersichtenPromise: Promise<void> = personenkontextStore.getAllPersonenuebersichten();
+      expect(personenkontextStore.loading).toBe(true);
+      await getAllPersonenuebersichtenPromise;
+      expect(personenkontextStore.errorCode).toEqual('UNSPECIFIED_ERROR');
+      expect(personenkontextStore.loading).toBe(false);
+    });
+
+    it('should handle error code', async () => {
+      mockadapter.onGet('/api/dbiam/personenuebersicht').replyOnce(500, { code: 'some mock server error' });
+      const getAllPersonenuebersichtenPromise: Promise<void> = personenkontextStore.getAllPersonenuebersichten();
+      expect(personenkontextStore.loading).toBe(true);
+      await getAllPersonenuebersichtenPromise;
       expect(personenkontextStore.errorCode).toEqual('some mock server error');
       expect(personenkontextStore.loading).toBe(false);
     });

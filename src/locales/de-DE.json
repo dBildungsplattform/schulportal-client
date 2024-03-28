@@ -226,8 +226,9 @@
     "lastName": "Nachname",
     "noZuordnungenFound": "Keine Zuordnungen gefunden.",
     "password": "Passwort",
+    "rolle": "Rolle",
     "userName": "Benutzername",
-    "zuordnungen": "Zuordnungen"
+    "zuordnungen": "Zuordnung(en)"
   },
   "unsavedChanges": {
     "message": "Sie haben nicht gespeicherte Änderungen vorgenommen. Wollen Sie die Seite trotzdem verlassen?",
