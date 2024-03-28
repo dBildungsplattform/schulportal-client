@@ -227,8 +227,7 @@
     "password": "Passwort",
     "rolle": "Rolle",
     "userName": "Benutzername",
-    "zuordnungen": "Zuordnung(en)",
-    "zuordnung": "Zuordnung"
+    "zuordnungen": "Zuordnung(en)"
   },
   "unsavedChanges": {
     "message": "Sie haben nicht gespeicherte Änderungen vorgenommen. Wollen Sie die Seite trotzdem verlassen?",
