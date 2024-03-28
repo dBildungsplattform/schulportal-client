@@ -1,5 +1,6 @@
 import {
   type DBiamPersonenkontextResponse,
+  type DBiamPersonenuebersichtResponse,
   type SystemrechtResponse,
   OrganisationResponseTypEnum,
 } from '@/api-client/generated';
@@ -126,6 +127,50 @@ describe('PersonenkontextStore', () => {
         });
       expect(personenkontextStore.loading).toBe(true);
       await rejects(createPersonenkontextPromise);
+      expect(personenkontextStore.errorCode).toEqual('some mock server error');
+      expect(personenkontextStore.loading).toBe(false);
+    });
+  });
+  describe('getPersonenuebersichtById', () => {
+    it('should get Personenuebersicht', async () => {
+      const mockResponse: DBiamPersonenuebersichtResponse = {
+        personId: '1',
+        vorname: 'string',
+        nachname: 'string',
+        benutzername: 'string',
+        zuordnungen: [
+          {
+            sskId: 'string',
+            rolleId: 'string',
+            sskName: 'string',
+            sskDstNr: 'string',
+            rolle: 'string',
+          },
+        ],
+      };
+
+      mockadapter.onGet('/api/dbiam/personenuebersicht/1').replyOnce(200, mockResponse);
+      const getPersonenuebersichtByIdPromise: Promise<void> = personenkontextStore.getPersonenuebersichtById('1');
+      expect(personenkontextStore.loading).toBe(true);
+      await getPersonenuebersichtByIdPromise;
+      expect(personenkontextStore.personenuebersicht).toEqual(mockResponse);
+      expect(personenkontextStore.loading).toBe(false);
+    });
+
+    it('should handle string error', async () => {
+      mockadapter.onGet('/api/dbiam/personenuebersicht/1').replyOnce(500, 'some error');
+      const getPersonenuebersichtByIdPromise: Promise<void> = personenkontextStore.getPersonenuebersichtById('1');
+      expect(personenkontextStore.loading).toBe(true);
+      await getPersonenuebersichtByIdPromise;
+      expect(personenkontextStore.errorCode).toEqual('UNSPECIFIED_ERROR');
+      expect(personenkontextStore.loading).toBe(false);
+    });
+
+    it('should handle error code', async () => {
+      mockadapter.onGet('/api/dbiam/personenuebersicht/1').replyOnce(500, { code: 'some mock server error' });
+      const getPersonenuebersichtByIdPromise: Promise<void> = personenkontextStore.getPersonenuebersichtById('1');
+      expect(personenkontextStore.loading).toBe(true);
+      await getPersonenuebersichtByIdPromise;
       expect(personenkontextStore.errorCode).toEqual('some mock server error');
       expect(personenkontextStore.loading).toBe(false);
     });

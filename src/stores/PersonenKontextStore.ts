@@ -2,10 +2,13 @@ import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import { isAxiosError } from 'axios';
 import {
   DbiamPersonenkontexteApiFactory,
+  DbiamPersonenuebersichtApiFactory,
   PersonenkontexteApiFactory,
   type DBiamCreatePersonenkontextBodyParams,
   type DbiamPersonenkontexteApiInterface,
   type DBiamPersonenkontextResponse,
+  type DbiamPersonenuebersichtApiInterface,
+  type DBiamPersonenuebersichtResponse,
   type PersonenkontexteApiInterface,
   type SystemrechtResponse,
 } from '../api-client/generated/api';
@@ -17,8 +20,14 @@ const personenKontexteApi: DbiamPersonenkontexteApiInterface = DbiamPersonenkont
   '',
   axiosApiInstance,
 );
+const personenuebersichtApi: DbiamPersonenuebersichtApiInterface = DbiamPersonenuebersichtApiFactory(
+  undefined,
+  '',
+  axiosApiInstance,
+);
 
 type PersonenkontextState = {
+  personenuebersicht: DBiamPersonenuebersichtResponse | null;
   createdPersonenkontext: DBiamPersonenkontextResponse | null;
   errorCode: string;
   loading: boolean;
@@ -30,6 +39,7 @@ type PersonenkontextActions = {
   createPersonenkontext: (
     personenkontext: DBiamCreatePersonenkontextBodyParams,
   ) => Promise<DBiamPersonenkontextResponse>;
+  getPersonenuebersichtById: (personId: string) => Promise<void>;
 };
 
 export type { SystemrechtResponse };
@@ -51,6 +61,7 @@ export const usePersonenkontextStore: StoreDefinition<
   id: 'personenkontextStore',
   state: (): PersonenkontextState => {
     return {
+      personenuebersicht: null,
       createdPersonenkontext: null,
       errorCode: '',
       loading: false,
@@ -91,6 +102,20 @@ export const usePersonenkontextStore: StoreDefinition<
       } finally {
         this.loading = false;
       }
+    },
+    async getPersonenuebersichtById(personId: string): Promise<void> {
+      this.loading = true;
+      try {
+        const { data }: { data: DBiamPersonenuebersichtResponse } =
+          await personenuebersichtApi.dBiamPersonenuebersichtControllerFindPersonenuebersichtenByPerson(personId);
+        this.personenuebersicht = data;
+      } catch (error: unknown) {
+        this.errorCode = 'UNSPECIFIED_ERROR';
+        if (isAxiosError(error)) {
+          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
+        }
+      }
+      this.loading = false;
     },
   },
 });

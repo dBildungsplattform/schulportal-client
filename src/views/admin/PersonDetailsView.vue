@@ -5,11 +5,13 @@
   import PasswordReset from '@/components/admin/PasswordReset.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
+  import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenKontextStore';
 
   const route: RouteLocationNormalizedLoaded = useRoute();
   const router: Router = useRouter();
   const currentPersonId: string = route.params['id'] as string;
   const personStore: PersonStore = usePersonStore();
+  const personenKontextStore: PersonenkontextStore = usePersonenkontextStore();
 
   const password: Ref<string> = ref('');
 
@@ -23,6 +25,10 @@
     });
   }
 
+  function truncateSskName(sskName: string): string {
+    return sskName.length > 30 ? `${sskName.substring(0, 30)}...` : sskName;
+  }
+
   const handleAlertClose = (): void => {
     personStore.errorCode = '';
     navigateToPersonTable();
@@ -30,6 +36,7 @@
 
   onBeforeMount(async () => {
     await personStore.getPersonById(currentPersonId);
+    await personenKontextStore.getPersonenuebersichtById(currentPersonId);
   });
 </script>
 
@@ -161,6 +168,51 @@
               </div>
             </v-col>
             <v-col v-else-if="personStore.loading"> <v-progress-circular indeterminate></v-progress-circular></v-col>
+          </v-row>
+        </v-container>
+        <v-divider
+          class="border-opacity-100 rounded my-6 mx-4"
+          color="#E5EAEF"
+          thickness="6"
+        ></v-divider>
+        <!-- Zuordnungen -->
+        <v-container class="person-zuordnungen">
+          <v-row class="ml-md-16">
+            <v-col>
+              <h3 class="subtitle-1">{{ $t('person.zuordnungen') }}</h3>
+            </v-col>
+          </v-row>
+          <!-- Check if 'zuordnungen' array exists and has length > 0 -->
+          <v-row
+            v-if="
+              personenKontextStore.personenuebersicht?.zuordnungen &&
+              personenKontextStore.personenuebersicht?.zuordnungen.length > 0
+            "
+          >
+            <v-col
+              cols="10"
+              offset-lg="2"
+              offset="1"
+              v-for="zuordnung in personenKontextStore.personenuebersicht.zuordnungen"
+              :key="zuordnung.sskId"
+            >
+              <h3
+                class="text-body"
+                :title="zuordnung.sskName"
+              >
+                {{ zuordnung.sskDstNr }} ({{ truncateSskName(zuordnung.sskName) }}): {{ zuordnung.rolle }}
+              </h3>
+            </v-col>
+          </v-row>
+          <!-- Display 'No data available' if the above condition is false -->
+          <v-row v-else>
+            <v-col
+              cols="10"
+              offset-lg="2"
+              offset="1"
+            >
+              <h3 class="text-body">{{ $t('person.noZuordnungenFound') }}</h3>
+            </v-col>
           </v-row>
         </v-container>
       </template>

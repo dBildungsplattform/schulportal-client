@@ -98,7 +98,7 @@
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedMerkmale', vuetifyConfig);
 
-  const [selectedSystemRechte, selectedSystemRechtProps]: [
+  const [selectedSystemRechte, selectedSystemRechteProps]: [
     Ref<CreateRolleBodyParamsSystemrechteEnum[] | null>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedSystemRechte', vuetifyConfig);
@@ -189,7 +189,6 @@
       })
       .join(', ');
   });
-
   const administrationsebene: ComputedRef<
     {
       value: string;
@@ -212,7 +211,6 @@
   onMounted(async () => {
     rolleStore.createdRolle = null;
     await organisationStore.getAllOrganisationen();
-
     // Iterate over the enum values
     Object.values(RolleResponseRollenartEnum).forEach((enumValue: RolleResponseRollenartEnum) => {
       // Use the enum value to construct the i18n path
@@ -390,7 +388,7 @@
             <FormRow
               v-for="systemrecht in translatedSystemrechte"
               :key="systemrecht.value"
-              :errorLabel="selectedSystemRechtProps['error']"
+              :errorLabel="selectedSystemRechteProps['error']"
               labelForId="systemrecht-select"
               :label="systemrecht.title"
             >

@@ -98,10 +98,12 @@
   ] = defineField('selectedOrganisation', vuetifyConfig);
 
   const rollen: ComputedRef<TranslatedObject[]> = computed(() =>
-    rolleStore.allRollen.map((rolle: Rolle) => ({
-      value: rolle.id,
-      title: rolle.name,
-    })).sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title))
+    rolleStore.allRollen
+      .map((rolle: Rolle) => ({
+        value: rolle.id,
+        title: rolle.name,
+      }))
+      .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title)),
   );
 
   const organisationen: ComputedRef<TranslatedObject[]> = computed(() =>
