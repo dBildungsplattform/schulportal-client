@@ -162,6 +162,11 @@
     },
     "schultraeger": {
       "management": "Schulträgerverwaltung"
+    },
+    "serviceProvider": {
+      "assignServiceProvider": "Anbieter zuordnen",
+      "selectServiceProvider": "Angebote auswählen",
+      "serviceProvider": "Angebote"
     }
   },
   "cancel": "Abbrechen",

@@ -11,6 +11,7 @@ import {
   type RolleResponse,
   CreateRolleBodyParamsSystemrechteEnum,
   RolleResponseSystemrechteEnum,
+  type RolleServiceProviderQueryParams,
 } from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
 
@@ -33,6 +34,10 @@ type RolleActions = {
     merkmale: CreateRolleBodyParamsMerkmaleEnum[],
     systemrechte: CreateRolleBodyParamsSystemrechteEnum[],
   ) => Promise<RolleResponse>;
+  addServiceProviderToRolle: (
+    rolleId: string,
+    rolleServiceProviderQueryParams: RolleServiceProviderQueryParams,
+  ) => Promise<void>;
 };
 
 export { CreateRolleBodyParamsRollenartEnum };
@@ -41,6 +46,7 @@ export { RolleResponseMerkmaleEnum };
 export { RolleResponseRollenartEnum };
 export { RolleResponseSystemrechteEnum };
 export type { RolleResponse };
+export type { CreateRolleBodyParamsSystemrechteEnum };
 
 export type Rolle = {
   id: string;
@@ -104,6 +110,21 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
+          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
+        }
+        this.loading = false;
+      }
+    },
+
+    async addServiceProviderToRolle(rolleId: string, rolleServiceProviderQueryParams: RolleServiceProviderQueryParams) {
+      this.loading = true;
+      try {
+        await rolleApi.rolleControllerAddServiceProviderById(rolleId, rolleServiceProviderQueryParams);
+        this.loading = false;
+      } catch (error: unknown) {
+        this.errorCode = 'UNSPECIFIED_ERROR';
+        if (isAxiosError(error)) {
+          console.log(error)
           this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
         }
         this.loading = false;

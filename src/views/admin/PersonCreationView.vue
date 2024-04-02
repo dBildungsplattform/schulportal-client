@@ -114,7 +114,7 @@
       personenkontextStore.getPersonenkontextAdministrationsebeneWithFilter(newValue, '', 25);
     }
   });
-  // Watcher to detect when the search input for Organisationen is triggered. 
+  // Watcher to detect when the search input for Organisationen is triggered.
   watch(searchInputOrganisation, async (newValue: string, _oldValue: string) => {
     if (newValue.length >= 3) {
       personenkontextStore.getPersonenkontextAdministrationsebeneWithFilter(selectedRolle.value, newValue, 25);
