@@ -62,11 +62,4 @@
   </div>
 </template>
 
-<style>
-  .ellipsis-wrapper {
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
-    max-width: 241px;
-  }
-</style>
+<style></style>
