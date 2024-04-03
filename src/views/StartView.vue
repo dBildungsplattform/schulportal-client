@@ -60,8 +60,8 @@
     return providers;
   });
   onMounted(async () => {
-    await serviceProviderStore.getAllServiceProviders();
-    for (const provider of serviceProviderStore.allServiceProviders) {
+    await serviceProviderStore.getAvailableServiceProviders();
+    for (const provider of serviceProviderStore.availableServiceProviders) {
       if (provider.hasLogo) {
         const logoUrl: string = `/api/provider/${provider.id}/logo`;
         provider.logoUrl = logoUrl;

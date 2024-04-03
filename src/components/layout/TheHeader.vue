@@ -14,7 +14,10 @@
   >
     <!-- Logo and title -->
     <v-app-bar-title class="fill-height">
-      <v-row no-gutters class="align-center fill-height">
+      <v-row
+        no-gutters
+        class="align-center fill-height"
+      >
         <v-col
           class="hidden-sm-and-down"
           cols="auto"
