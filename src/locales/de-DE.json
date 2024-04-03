@@ -164,7 +164,8 @@
       "management": "Schulträgerverwaltung"
     },
     "serviceProvider": {
-      "assignServiceProvider": "Anbieter zuordnen",
+      "assignServiceProvider": "Angebote zuordnen",
+      "assignedServiceProvider": "zugeordnete Angebote",
       "selectServiceProvider": "Angebote auswählen",
       "serviceProvider": "Angebote"
     }
