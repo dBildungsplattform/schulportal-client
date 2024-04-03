@@ -1,6 +1,5 @@
 <script setup lang="ts">
   import { computed, type ComputedRef } from 'vue';
-  import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { type Composer, useI18n } from 'vue-i18n';
 
   /* this block is necessary to introduce a table header type for defining table headers
@@ -16,7 +15,6 @@
     loading: boolean;
     totalItems: number;
     headers: ReadonlyHeaders;
-    header: string;
     itemValuePath: string;
     disableRowClick?: boolean;
   };
@@ -59,34 +57,32 @@
 </script>
 
 <template>
-  <LayoutCard :header="header">
-    <v-data-table-server
-      class="result-table"
-      @click:row="handleRowClick"
-      data-testid="result-table"
-      density="compact"
-      :headers="headers"
-      :items="items"
-      :items-length="totalItems"
-      :items-per-page-options="[{ value: -1, title: $t('pagination.all') }]"
-      :items-per-page-text="$t('itemsPerPage')"
-      :item-value="itemValuePath"
-      :page-text="pageText"
-      select-strategy="page"
-      show-select
-      @update:options="$emit('onTableUpdate')"
+  <v-data-table-server
+    class="result-table"
+    @click:row="handleRowClick"
+    data-testid="result-table"
+    density="compact"
+    :headers="headers"
+    :items="items"
+    :items-length="totalItems"
+    :items-per-page-options="[{ value: -1, title: $t('pagination.all') }]"
+    :items-per-page-text="$t('itemsPerPage')"
+    :item-value="itemValuePath"
+    :page-text="pageText"
+    select-strategy="page"
+    show-select
+    @update:options="$emit('onTableUpdate')"
+  >
+    <template
+      v-for="(_, name) in $slots as unknown as Readonly<Slots>"
+      #[name]="slotProps"
     >
-      <template
-        v-for="(_, name) in $slots as unknown as Readonly<Slots>"
-        #[name]="slotProps"
-      >
-        <slot
-          :name="name"
-          v-bind="slotProps"
-        />
-      </template>
-    </v-data-table-server>
-  </LayoutCard>
+      <slot
+        :name="name"
+        v-bind="slotProps"
+      />
+    </template>
+  </v-data-table-server>
 </template>
 
 <style></style>

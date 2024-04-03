@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import { computed, onMounted, type ComputedRef } from 'vue';
   import ResultTable from '@/components/admin/ResultTable.vue';
+  import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { type Composer, useI18n } from 'vue-i18n';
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
   import {
@@ -39,26 +40,27 @@
 <template>
   <div class="admin">
     <h1 class="text-center headline">{{ $t('admin.headline') }}</h1>
-    <ResultTable
-      data-testid="schule-table"
-      :header="$t('admin.schule.management')"
-      :items="filteredOrganisationen || []"
-      :loading="organisationStore.loading"
-      :headers="headers"
-      @onUpdateTable="organisationStore.getAllOrganisationen()"
-      :totalItems="organisationStore.allOrganisationen.length"
-      item-value-path="id"
-      :disableRowClick="true"
-    >
-      <template v-slot:[`item.name`]="{ item }">
-        <div
-          class="ellipsis-wrapper"
-          :title="item.name"
-        >
-          {{ item.name }}
-        </div>
-      </template></ResultTable
-    >
+    <LayoutCard :header="$t('admin.schule.management')">
+      <ResultTable
+        data-testid="schule-table"
+        :items="filteredOrganisationen || []"
+        :loading="organisationStore.loading"
+        :headers="headers"
+        @onUpdateTable="organisationStore.getAllOrganisationen()"
+        :totalItems="organisationStore.allOrganisationen.length"
+        item-value-path="id"
+        :disableRowClick="true"
+      >
+        <template v-slot:[`item.name`]="{ item }">
+          <div
+            class="ellipsis-wrapper"
+            :title="item.name"
+          >
+            {{ item.name }}
+          </div>
+        </template>
+      </ResultTable>
+    </LayoutCard>
   </div>
 </template>
 

@@ -2,6 +2,7 @@
   import { RolleResponseMerkmaleEnum, useRolleStore, type RolleResponse, type RolleStore } from '@/stores/RolleStore';
   import { computed, onMounted, type ComputedRef } from 'vue';
   import ResultTable from '@/components/admin/ResultTable.vue';
+  import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { type Composer, useI18n } from 'vue-i18n';
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
   import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
@@ -70,17 +71,18 @@
 <template>
   <div class="admin">
     <h1 class="text-center headline">{{ $t('admin.headline') }}</h1>
-    <ResultTable
-      data-testid="role-table"
-      :header="$t('admin.rolle.management')"
-      :items="transformedRollenAndMerkmale || []"
-      :loading="rolleStore.loading"
-      :headers="headers"
-      @onUpdateTable="rolleStore.getAllRollen()"
-      :totalItems="rolleStore.allRollen.length"
-      item-value-path="id"
-      :disableRowClick="true"
-    ></ResultTable>
+    <LayoutCard :header="$t('admin.rolle.management')">
+      <ResultTable
+        data-testid="role-table"
+        :items="transformedRollenAndMerkmale || []"
+        :loading="rolleStore.loading"
+        :headers="headers"
+        @onUpdateTable="rolleStore.getAllRollen()"
+        :totalItems="rolleStore.allRollen.length"
+        item-value-path="id"
+        :disableRowClick="true"
+      ></ResultTable>
+    </LayoutCard>
   </div>
 </template>
 

@@ -1,10 +1,8 @@
 <script setup lang="ts">
   import { usePersonStore, type Person, type PersonStore, type Personendatensatz } from '@/stores/PersonStore';
   import { computed, onMounted, type ComputedRef } from 'vue';
-  import ResultTable from '@/components/admin/ResultTable.vue';
   import { type Composer, useI18n } from 'vue-i18n';
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
-
   import { type Router, useRouter } from 'vue-router';
   import {
     usePersonenkontextStore,
@@ -12,6 +10,9 @@
     type Uebersicht,
     type Zuordnung,
   } from '@/stores/PersonenKontextStore';
+  import ResultTable from '@/components/admin/ResultTable.vue';
+  import LayoutCard from '@/components/cards/LayoutCard.vue';
+
   const personStore: PersonStore = usePersonStore();
   const personenKontextStore: PersonenkontextStore = usePersonenkontextStore();
 
@@ -66,32 +67,35 @@
 <template>
   <div class="admin">
     <h1 class="text-center headline">{{ $t('admin.headline') }}</h1>
-    <ResultTable
-      data-testid="person-table"
-      :header="$t('admin.person.management')"
-      :items="personenWithUebersicht || []"
-      :loading="personStore.loading"
-      :headers="headers"
-      @onHandleRowClick="navigateToPersonDetails"
-      @onUpdateTable="personStore.getAllPersons()"
-      :totalItems="personStore.totalPersons"
-      item-value-path="person.id"
-      ><template v-slot:[`item.rolle`]="{ item }">
-        <div
-          class="ellipsis-wrapper"
-          :title="item.rolle"
+    <LayoutCard :header="$t('admin.person.management')">
+      <ResultTable
+        data-testid="person-table"
+        :items="personenWithUebersicht || []"
+        :loading="personStore.loading"
+        :headers="headers"
+        @onHandleRowClick="navigateToPersonDetails"
+        @onUpdateTable="personStore.getAllPersons()"
+        :totalItems="personStore.totalPersons"
+        item-value-path="person.id"
+      >
+        <template v-slot:[`item.rolle`]="{ item }">
+          <div
+            class="ellipsis-wrapper"
+            :title="item.rolle"
+          >
+            {{ item.rolle }}
+          </div> </template
         >
-          {{ item.rolle }}
-        </div> </template
-      ><template v-slot:[`item.administrationsebenen`]="{ item }">
-        <div
-          class="ellipsis-wrapper"
-          :title="item.administrationsebenen"
-        >
-          {{ item.administrationsebenen }}
-        </div>
-      </template></ResultTable
-    >
+        <template v-slot:[`item.administrationsebenen`]="{ item }">
+          <div
+            class="ellipsis-wrapper"
+            :title="item.administrationsebenen"
+          >
+            {{ item.administrationsebenen }}
+          </div>
+        </template>
+      </ResultTable>
+    </LayoutCard>
   </div>
 </template>
 
