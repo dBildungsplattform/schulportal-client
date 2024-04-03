@@ -432,7 +432,8 @@
               labelForId="service-provider-select"
               :label="$t('admin.serviceProvider.serviceProvider')"
             >
-              <v-select
+              <v-autocomplete
+                autocomplete="off"
                 chips
                 clearable
                 data-testid="service-provider-select"
@@ -442,12 +443,12 @@
                 item-value="value"
                 item-text="title"
                 multiple
+                :no-data-text="$t('noDataFound')"
                 :placeholder="$t('admin.serviceProvider.selectServiceProvider')"
                 variant="outlined"
                 v-bind="selectedServiceProvidersProps"
                 v-model="selectedServiceProviders"
-                :no-data-text="$t('noDataFound')"
-              ></v-select>
+              ></v-autocomplete>
             </FormRow>
 
             <!-- 6. Systemrechte zuordnen -->

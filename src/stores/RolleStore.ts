@@ -26,7 +26,10 @@ type RolleState = {
 
 type RolleGetters = {};
 type RolleActions = {
-  getAllRollen: () => Promise<void>;
+  addServiceProviderToRolle: (
+    rolleId: string,
+    rolleServiceProviderQueryParams: RolleServiceProviderQueryParams,
+  ) => Promise<void>;
   createRolle: (
     rollenName: string,
     administrationsebene: string,
@@ -34,10 +37,7 @@ type RolleActions = {
     merkmale: CreateRolleBodyParamsMerkmaleEnum[],
     systemrechte: CreateRolleBodyParamsSystemrechteEnum[],
   ) => Promise<RolleResponse>;
-  addServiceProviderToRolle: (
-    rolleId: string,
-    rolleServiceProviderQueryParams: RolleServiceProviderQueryParams,
-  ) => Promise<void>;
+  getAllRollen: () => Promise<void>;
 };
 
 export { CreateRolleBodyParamsRollenartEnum };

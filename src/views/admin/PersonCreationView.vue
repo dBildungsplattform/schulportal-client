@@ -292,7 +292,8 @@
           :isRequired="true"
           :label="$t('admin.rolle.rolle')"
         >
-          <v-autocomplete
+        <v-autocomplete
+            autocomplete="off"
             clearable
             data-testid="rolle-select"
             density="compact"
@@ -300,14 +301,13 @@
             :items="rollen"
             item-value="value"
             item-text="title"
+            :no-data-text="$t('noDataFound')"
             :placeholder="$t('admin.rolle.selectRolle')"
             required="true"
             variant="outlined"
             v-bind="selectedRolleProps"
             v-model="selectedRolle"
             v-model:search="searchInputRollen"
-            autocomplete="off"
-            :no-data-text="$t('noDataFound')"
           ></v-autocomplete>
         </FormRow>
 
@@ -367,6 +367,7 @@
             :label="$t('admin.organisation.assignOrganisation')"
           >
             <v-autocomplete
+              autocomplete="off"
               clearable
               data-testid="organisation-select"
               density="compact"
@@ -374,14 +375,13 @@
               :items="organisationen"
               item-value="value"
               item-text="title"
+              :no-data-text="$t('noDataFound')"
               :placeholder="$t('admin.organisation.selectOrganisation')"
               required="true"
               variant="outlined"
               v-bind="selectedOrganisationProps"
               v-model="selectedOrganisation"
               v-model:search="searchInputOrganisation"
-              autocomplete="off"
-              :no-data-text="$t('noDataFound')"
             ></v-autocomplete>
           </FormRow>
         </div>
