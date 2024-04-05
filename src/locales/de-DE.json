@@ -15,6 +15,9 @@
     },
     "followingDataCreated": "Folgende Daten wurden gespeichert:",
     "headline": "Administrationsbereich",
+    "klasse": {
+      "klasse": "Klasse"
+    },
     "koPers": {
       "koPersNumber": "KoPers-Nr",
       "noKoPersNumber": "Keine KoPers-Nr vorhanden"
@@ -153,6 +156,7 @@
           "required": "Der Schulname muss angegeben werden."
         }
       },
+      "schule": "Schule",
       "schulname": "Schulname",
       "schulform": "Schulform",
       "schuleCreateErrorTitle": "Fehler beim Anlegen der Schule",
@@ -162,7 +166,8 @@
     },
     "schultraeger": {
       "management": "Schulträgerverwaltung"
-    }
+    },
+    "status": "Status"
   },
   "cancel": "Abbrechen",
   "close": "Schließen",

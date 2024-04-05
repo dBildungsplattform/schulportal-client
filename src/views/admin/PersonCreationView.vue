@@ -101,12 +101,14 @@
 
   const searchInputRollen: Ref<string> = ref('');
   const searchInputOrganisation: Ref<string> = ref('');
-  // Watcher to detect when the search input for Rollen has 3 or more characters to trigger filtering.
+  
+    // Watcher to detect when the search input for Rollen has 3 or more characters to trigger filtering.
   watch(searchInputRollen, async (newValue: string, _oldValue: string) => {
     if (newValue.length >= 3) {
       personenkontextStore.getPersonenkontextRolleWithFilter(newValue, 25);
     }
   });
+
   // Watcher to detect when the Rolle is selected so the Organisationen show all the possible choices using that value.
   watch(selectedRolle, (newValue: string, oldValue: string) => {
     if (newValue !== oldValue) {
@@ -118,6 +120,7 @@
       resetField('selectedOrganisation');
     }
   });
+
   // Watcher to detect when the search input for Organisationen is triggered.
   watch(searchInputOrganisation, async (newValue: string, _oldValue: string) => {
     if (newValue.length >= 3) {

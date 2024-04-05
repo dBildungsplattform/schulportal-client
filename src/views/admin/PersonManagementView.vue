@@ -1,6 +1,8 @@
 <script setup lang="ts">
+  import { useOrganisationStore, type OrganisationStore, type OrganisationResponse } from '@/stores/OrganisationStore';
   import { usePersonStore, type Person, type PersonStore, type Personendatensatz } from '@/stores/PersonStore';
-  import { computed, onMounted, type ComputedRef } from 'vue';
+  import type { Rolle } from '@/stores/RolleStore';
+  import { computed, onMounted, type ComputedRef, watch, type Ref, ref } from 'vue';
   import { type Composer, useI18n } from 'vue-i18n';
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
   import { type Router, useRouter } from 'vue-router';
@@ -13,9 +15,10 @@
   import ResultTable from '@/components/admin/ResultTable.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
 
+  const router: Router = useRouter();
+  const organisationStore: OrganisationStore = useOrganisationStore();
   const personStore: PersonStore = usePersonStore();
-  const personenKontextStore: PersonenkontextStore = usePersonenkontextStore();
-
+  const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
   const { t }: Composer = useI18n({ useScope: 'global' });
 
   type ReadonlyHeaders = InstanceType<typeof VDataTableServer>['headers'];
@@ -32,7 +35,25 @@
     administrationsebenen: string;
     person: Person;
   }[];
-  const router: Router = useRouter();
+
+  type TranslatedObject = {
+    value: string;
+    title: string;
+  };
+
+  const schulen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
+    return personenkontextStore.filteredOrganisationen?.moeglicheSkks
+      .slice(0, 25)
+      .map((org: OrganisationResponse) => ({
+        value: org.id,
+        title: `${org.kennung} (${org.name})`,
+      }))
+      .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
+  });
+  const rollen: Array<Rolle> = [];
+  const klassen: Array<string> = ['klasse', 'nicht so klasse'];
+  const statuses: Array<string> = ['Aktiv', 'Inaktiv'];
+  const searchInputSchule: Ref<string> = ref('');
 
   function navigateToPersonDetails(_$event: PointerEvent, { item }: { item: Personendatensatz }): void {
     router.push({ name: 'person-details', params: { id: item.person.id } });
@@ -42,7 +63,7 @@
   // the rolle values into a single comma separated string. The result is merged with the original person data, adding a new role property.
   const personenWithUebersicht: ComputedRef<PersonenWithRolleAndZuordnung> = computed(() => {
     return personStore.allPersons.map((person: Personendatensatz) => {
-      const uebersicht: Uebersicht = personenKontextStore.allUebersichten?.items.find(
+      const uebersicht: Uebersicht = personenkontextStore.allUebersichten?.items.find(
         (ueb: Uebersicht) => ueb?.personId === person.person.id,
       );
       const rollen: string = uebersicht?.zuordnungen.length
@@ -58,9 +79,20 @@
     });
   });
 
+  // Watcher to detect when the search input for Organisationen is triggered.
+  watch(searchInputSchule, async (newValue: string, _oldValue: string) => {
+    if (newValue.length >= 3) {
+      personenkontextStore.getPersonenkontextAdministrationsebeneWithFilter(selectedRolle.value, newValue, 25);
+    } else {
+      // If newValue has less than 3 characters, use an empty string instead of newValue to show all organisationen under the selectedRolle.
+      personenkontextStore.getPersonenkontextAdministrationsebeneWithFilter(selectedRolle.value, '', 25);
+    }
+  });
+
   onMounted(async () => {
+    await organisationStore.getAllOrganisationen();
     await personStore.getAllPersons();
-    await personenKontextStore.getAllPersonenuebersichten();
+    await personenkontextStore.getAllPersonenuebersichten();
   });
 </script>
 
@@ -68,6 +100,97 @@
   <div class="admin">
     <h1 class="text-center headline">{{ $t('admin.headline') }}</h1>
     <LayoutCard :header="$t('admin.person.management')">
+      <v-row align="center" class="ma-3">
+        <v-col cols="4" class="py-0 text-right">
+          <span class="reset-filter">Filter zurücksetzen</span>
+        </v-col>
+        <v-col cols="2" class="py-0">
+          <v-autocomplete
+            autocomplete="off"
+            class="filter-dropdown"
+            clearable
+            data-testid="schule-select"
+            density="compact"
+            hide-details
+            id="schule-select"
+            :items="schulen"
+            item-value="value"
+            item-text="title"
+            :no-data-text="$t('noDataFound')"
+            :placeholder="$t('admin.schule.schule')"
+            required="true"
+            variant="outlined"
+            v-model="selectedSchule"
+            v-model:search="searchInputSchule"
+            >
+
+          </v-autocomplete>
+        </v-col>
+        <v-col cols="2" class="py-0">
+          <v-autocomplete
+            autocomplete="off"
+            class="filter-dropdown"
+            clearable
+            data-testid="rolle-select"
+            density="compact"
+            hide-details
+            id="rolle-select"
+            :items="rollen"
+            item-value="value"
+            item-text="title"
+            :no-data-text="$t('noDataFound')"
+            :placeholder="$t('admin.rolle.rolle')"
+            required="true"
+            variant="outlined"
+            v-model="selectedRolle"
+            >
+            <!-- v-model:search="searchInputSchulen" -->
+
+          </v-autocomplete>
+        </v-col>
+        <v-col cols="2" class="py-0">
+          <v-autocomplete
+            autocomplete="off"
+            class="filter-dropdown"
+            clearable
+            data-testid="klasse-select"
+            density="compact"
+            hide-details
+            id="klasse-select"
+            :items="klassen"
+            item-value="value"
+            item-text="title"
+            :no-data-text="$t('noDataFound')"
+            :placeholder="$t('admin.klasse.klasse')"
+            required="true"
+            variant="outlined"
+            v-model="selectedKlasse"
+            >
+
+          </v-autocomplete>
+        </v-col>
+        <v-col cols="2" class="py-0">
+          <v-autocomplete
+            autocomplete="off"
+            class="filter-dropdown"
+            clearable
+            data-testid="status-select"
+            density="compact"
+            hide-details
+            id="status-select"
+            :items="statuses"
+            item-value="value"
+            item-text="title"
+            :no-data-text="$t('noDataFound')"
+            :placeholder="$t('admin.status')"
+            required="true"
+            variant="outlined"
+            v-model="selectedStatus"
+            >
+
+          </v-autocomplete>
+        </v-col>
+      </v-row>
       <ResultTable
         data-testid="person-table"
         :items="personenWithUebersicht || []"

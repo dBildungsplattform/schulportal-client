@@ -1,0 +1,16 @@
+.filter-dropdown {
+  .v-input__control {
+    max-height: 35px;
+  }
+  .v-field__input {
+    font-size: 15px;
+    line-height: 15px;
+    min-height: 35px;
+    padding-bottom: 9px;
+    padding-top: 9px;
+  }
+}
+
+.reset-filter {
+  font-size: 14px;
+}
