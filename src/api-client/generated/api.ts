@@ -531,7 +531,7 @@ export interface FindSchulstrukturknotenResponse {
      * @type {Array<OrganisationResponse>}
      * @memberof FindSchulstrukturknotenResponse
      */
-    'moeglicheSkks': Array<OrganisationResponse>;
+    'moeglicheSsks': Array<OrganisationResponse>;
     /**
      * 
      * @type {number}

@@ -3107,7 +3107,7 @@
             "FindSchulstrukturknotenResponse": {
                 "type": "object",
                 "properties": {
-                    "moeglicheSkks": {
+                    "moeglicheSsks": {
                         "type": "array",
                         "items": {
                             "$ref": "#/components/schemas/OrganisationResponse"
@@ -3118,7 +3118,7 @@
                     }
                 },
                 "required": [
-                    "moeglicheSkks",
+                    "moeglicheSsks",
                     "total"
                 ]
             },
