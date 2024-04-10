@@ -101,8 +101,8 @@
 
   const searchInputRollen: Ref<string> = ref('');
   const searchInputOrganisation: Ref<string> = ref('');
-  
-    // Watcher to detect when the search input for Rollen has 3 or more characters to trigger filtering.
+
+  // Watcher to detect when the search input for Rollen has 3 or more characters to trigger filtering.
   watch(searchInputRollen, async (newValue: string, _oldValue: string) => {
     if (newValue.length >= 3) {
       personenkontextStore.getPersonenkontextRolleWithFilter(newValue, 25);
@@ -154,7 +154,7 @@
   });
 
   const organisationen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
-    return personenkontextStore.filteredOrganisationen?.moeglicheSkks
+    return personenkontextStore.filteredOrganisationen?.moeglicheSsks
       .slice(0, 25)
       .map((org: OrganisationResponse) => ({
         value: org.id,
