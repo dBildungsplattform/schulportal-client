@@ -95,10 +95,10 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
       }
     },
 
-    async getAllRollen() {
+    async getAllRollen(searchString: string = '') {
       this.loading = true;
       try {
-        const { data }: AxiosResponse<Array<RolleResponse>> = await rolleApi.rolleControllerFindRollen();
+        const { data }: AxiosResponse<Array<RolleResponse>> = await rolleApi.rolleControllerFindRollen(searchString);
         this.allRollen = data;
         this.loading = false;
       } catch (error: unknown) {

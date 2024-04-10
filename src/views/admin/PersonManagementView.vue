@@ -1,17 +1,17 @@
 <script setup lang="ts">
-  import { useOrganisationStore, type OrganisationStore, type OrganisationResponse } from '@/stores/OrganisationStore';
-  import { usePersonStore, type Person, type PersonStore, type Personendatensatz } from '@/stores/PersonStore';
-  import type { Rolle } from '@/stores/RolleStore';
   import { computed, onMounted, type ComputedRef, watch, type Ref, ref } from 'vue';
   import { type Composer, useI18n } from 'vue-i18n';
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
   import { type Router, useRouter } from 'vue-router';
+  import { useOrganisationStore, type OrganisationStore, type OrganisationResponse } from '@/stores/OrganisationStore';
+  import { usePersonStore, type Person, type PersonStore, type Personendatensatz } from '@/stores/PersonStore';
   import {
     usePersonenkontextStore,
     type PersonenkontextStore,
     type Uebersicht,
     type Zuordnung,
   } from '@/stores/PersonenKontextStore';
+  import { useRolleStore, type RolleStore, type RolleResponse } from '@/stores/RolleStore';
   import ResultTable from '@/components/admin/ResultTable.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
 
@@ -19,6 +19,7 @@
   const organisationStore: OrganisationStore = useOrganisationStore();
   const personStore: PersonStore = usePersonStore();
   const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
+  const rolleStore: RolleStore = useRolleStore();
   const { t }: Composer = useI18n({ useScope: 'global' });
 
   type ReadonlyHeaders = InstanceType<typeof VDataTableServer>['headers'];
@@ -42,7 +43,7 @@
   };
 
   const schulen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
-    return personenkontextStore.filteredOrganisationen?.moeglicheSkks
+    return organisationStore.allOrganisationen
       .slice(0, 25)
       .map((org: OrganisationResponse) => ({
         value: org.id,
@@ -50,9 +51,19 @@
       }))
       .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
   });
-  const rollen: Array<Rolle> = [];
-  const klassen: Array<string> = ['klasse', 'nicht so klasse'];
+  const rollen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
+    return rolleStore.allRollen
+      .slice(0, 25)
+      .map((rolle: RolleResponse) => ({
+        value: rolle.id,
+        title: rolle.name,
+      }))
+      .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
+    });
+  const klassen: Array<string> = ['Klasse', 'Nicht so klasse'];
   const statuses: Array<string> = ['Aktiv', 'Inaktiv'];
+  
+  const searchInputRolle: Ref<string> = ref('');
   const searchInputSchule: Ref<string> = ref('');
 
   function navigateToPersonDetails(_$event: PointerEvent, { item }: { item: Personendatensatz }): void {
@@ -66,7 +77,7 @@
       const uebersicht: Uebersicht = personenkontextStore.allUebersichten?.items.find(
         (ueb: Uebersicht) => ueb?.personId === person.person.id,
       );
-      const rollen: string = uebersicht?.zuordnungen.length
+      const rollenZuordnungen: string = uebersicht?.zuordnungen.length
         ? uebersicht.zuordnungen.map((zuordnung: Zuordnung) => zuordnung.rolle).join(', ')
         : '-';
       // Choose sskDstNr if available, otherwise sskName.
@@ -75,24 +86,33 @@
             .map((zuordnung: Zuordnung) => (zuordnung.sskDstNr ? zuordnung.sskDstNr : zuordnung.sskName))
             .join(', ')
         : '-';
-      return { ...person, rollen: rollen, administrationsebenen: administrationsebenen };
+      return { ...person, rollen: rollenZuordnungen, administrationsebenen: administrationsebenen };
     });
   });
 
   // Watcher to detect when the search input for Organisationen is triggered.
   watch(searchInputSchule, async (newValue: string, _oldValue: string) => {
     if (newValue.length >= 3) {
-      personenkontextStore.getPersonenkontextAdministrationsebeneWithFilter(selectedRolle.value, newValue, 25);
+      organisationStore.getAllOrganisationen(newValue);
     } else {
-      // If newValue has less than 3 characters, use an empty string instead of newValue to show all organisationen under the selectedRolle.
-      personenkontextStore.getPersonenkontextAdministrationsebeneWithFilter(selectedRolle.value, '', 25);
+      organisationStore.getAllOrganisationen();
     }
   });
+
+  // Watcher to detect when the search input for Organisationen is triggered.
+  watch(searchInputRolle, async (newValue: string, _oldValue: string) => {
+    if (newValue.length >= 3) {
+      rolleStore.getAllRollen(newValue);
+    } else {
+      rolleStore.getAllRollen();
+    }
+});
 
   onMounted(async () => {
     await organisationStore.getAllOrganisationen();
     await personStore.getAllPersons();
     await personenkontextStore.getAllPersonenuebersichten();
+    await rolleStore.getAllRollen();
   });
 </script>
 
@@ -100,11 +120,20 @@
   <div class="admin">
     <h1 class="text-center headline">{{ $t('admin.headline') }}</h1>
     <LayoutCard :header="$t('admin.person.management')">
-      <v-row align="center" class="ma-3">
-        <v-col cols="4" class="py-0 text-right">
-          <span class="reset-filter">Filter zurücksetzen</span>
+      <v-row
+        align="center"
+        class="ma-3"
+      >
+        <v-col
+          cols="4"
+          class="py-0 text-right"
+        >
+          <span class="reset-filter">{{ $t("resetFilter") }}</span>
         </v-col>
-        <v-col cols="2" class="py-0">
+        <v-col
+          cols="2"
+          class="py-0"
+        >
           <v-autocomplete
             autocomplete="off"
             class="filter-dropdown"
@@ -122,11 +151,13 @@
             variant="outlined"
             v-model="selectedSchule"
             v-model:search="searchInputSchule"
-            >
-
+          >
           </v-autocomplete>
         </v-col>
-        <v-col cols="2" class="py-0">
+        <v-col
+          cols="2"
+          class="py-0"
+        >
           <v-autocomplete
             autocomplete="off"
             class="filter-dropdown"
@@ -143,12 +174,14 @@
             required="true"
             variant="outlined"
             v-model="selectedRolle"
-            >
-            <!-- v-model:search="searchInputSchulen" -->
-
+            v-model:search="searchInputRolle"
+          >
           </v-autocomplete>
         </v-col>
-        <v-col cols="2" class="py-0">
+        <v-col
+          cols="2"
+          class="py-0"
+        >
           <v-autocomplete
             autocomplete="off"
             class="filter-dropdown"
@@ -165,11 +198,13 @@
             required="true"
             variant="outlined"
             v-model="selectedKlasse"
-            >
-
+          >
           </v-autocomplete>
         </v-col>
-        <v-col cols="2" class="py-0">
+        <v-col
+          cols="2"
+          class="py-0"
+        >
           <v-autocomplete
             autocomplete="off"
             class="filter-dropdown"
@@ -186,8 +221,7 @@
             required="true"
             variant="outlined"
             v-model="selectedStatus"
-            >
-
+          >
           </v-autocomplete>
         </v-col>
       </v-row>
@@ -207,8 +241,8 @@
             :title="item.rolle"
           >
             {{ item.rolle }}
-          </div> </template
-        >
+          </div>
+        </template>
         <template v-slot:[`item.administrationsebenen`]="{ item }">
           <div
             class="ellipsis-wrapper"

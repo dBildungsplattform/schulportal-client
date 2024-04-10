@@ -15,9 +15,9 @@ const organisationApi: OrganisationenApiInterface = OrganisationenApiFactory(und
 
 export type Organisation = {
   id: string;
-  kennung?: string;
+  kennung?: string | null;
   name: string;
-  namensergaenzung?: string;
+  namensergaenzung?: string | null;
   kuerzel?: string;
   typ: OrganisationResponseTypEnum;
 };
@@ -69,13 +69,13 @@ export const useOrganisationStore: StoreDefinition<
       loading: false,
     };
   },
+
   actions: {
-    async getAllOrganisationen() {
+    async getAllOrganisationen(searchString: string = '') {
       this.loading = true;
       try {
         const { data }: AxiosResponse<OrganisationResponse[]> =
-          await organisationApi.organisationControllerFindOrganizations();
-
+          await organisationApi.organisationControllerFindOrganizations(searchString);
         this.allOrganisationen = data;
         this.loading = false;
       } catch (error: unknown) {
@@ -86,13 +86,13 @@ export const useOrganisationStore: StoreDefinition<
         this.loading = false;
       }
     },
+
     async getOrganisationById(organisationId: string) {
       this.errorCode = '';
       this.loading = true;
       try {
         const { data }: { data: OrganisationResponse } =
           await organisationApi.organisationControllerFindOrganisationById(organisationId);
-
         this.currentOrganisation = data;
         this.loading = false;
         return data;
@@ -105,6 +105,7 @@ export const useOrganisationStore: StoreDefinition<
         return Promise.reject(this.errorCode);
       }
     },
+
     async createOrganisation(
       kennung: string,
       name: string,
