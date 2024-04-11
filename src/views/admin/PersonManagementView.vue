@@ -65,7 +65,12 @@
 
 <template>
   <div class="admin">
-    <h1 class="text-center headline" data-testid="admin-headline">{{ $t('admin.headline') }}</h1>
+    <h1
+      class="text-center headline"
+      data-testid="admin-headline"
+    >
+      {{ $t('admin.headline') }}
+    </h1>
     <ResultTable
       data-testid="person-table"
       :header="$t('admin.person.management')"

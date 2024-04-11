@@ -187,7 +187,8 @@ describe('PersonenkontextStore', () => {
           {
             id: 'string',
             createdAt: '2024-03-24T16:35:32.711Z',
-            updatedAt: '2024-03-24T16:35:32.711Z',  name: 'string',
+            updatedAt: '2024-03-24T16:35:32.711Z',
+            name: 'string',
             administeredBySchulstrukturknoten: 'string',
             rollenart: 'LERN',
             merkmale: ['BEFRISTUNG_PFLICHT'] as unknown as Set<RolleResponseMerkmaleEnum>,
