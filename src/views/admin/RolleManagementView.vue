@@ -83,6 +83,7 @@
       :disableRowClick="true"
     >
       <template v-slot:[`item.serviceProviders`]="{ item }">
+        <span v-if="!item.serviceProviders.length">-</span>
         <span
           v-for="(serviceProvider, index) in item.serviceProviders"
           :key="serviceProvider.id"
