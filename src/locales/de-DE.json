@@ -230,8 +230,11 @@
     "enterLastName": "Nachname eingeben",
     "firstName": "Vorname",
     "lastName": "Nachname",
+    "noZuordnungenFound": "Keine Zuordnungen gefunden.",
     "password": "Passwort",
-    "userName": "Benutzername"
+    "rolle": "Rolle",
+    "userName": "Benutzername",
+    "zuordnungen": "Zuordnung(en)"
   },
   "unsavedChanges": {
     "message": "Sie haben nicht gespeicherte Änderungen vorgenommen. Wollen Sie die Seite trotzdem verlassen?",

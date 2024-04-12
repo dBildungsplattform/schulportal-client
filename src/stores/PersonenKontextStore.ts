@@ -8,10 +8,14 @@ import {
   type DBiamCreatePersonenkontextBodyParams,
   type DbiamPersonenkontexteApiInterface,
   type DBiamPersonenkontextResponse,
+  type DbiamPersonenuebersichtApiInterface,
+  type DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response,
+  type DBiamPersonenuebersichtResponse,
   type PersonenkontexteApiInterface,
   type SystemrechtResponse,
   PersonenkontextApiFactory,
   type PersonenkontextApiInterface,
+  DbiamPersonenuebersichtApiFactory,
 } from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
 
@@ -22,9 +26,41 @@ const dbiamPersonenKontexteApi: DbiamPersonenkontexteApiInterface = DbiamPersone
   '',
   axiosApiInstance,
 );
+const personenuebersichtApi: DbiamPersonenuebersichtApiInterface = DbiamPersonenuebersichtApiFactory(
+  undefined,
+  '',
+  axiosApiInstance,
+);
+
+export type Zuordnung = {
+  sskId: string;
+  rolleId: string;
+  sskName: string;
+  sskDstNr: string;
+  rolle: string;
+};
+
+export type Uebersicht =
+  | {
+      personId: string;
+      vorname: string;
+      nachname: string;
+      benutzername: string;
+      zuordnungen: {
+        sskId: string;
+        rolleId: string;
+        sskName: string;
+        sskDstNr: string;
+        rolle: string;
+      }[];
+    }
+  | undefined;
+
 type PersonenkontextState = {
+  allUebersichten: DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response | null;
   filteredRollen: FindRollenResponse | null;
   filteredOrganisationen: FindSchulstrukturknotenResponse | null;
+  personenuebersicht: DBiamPersonenuebersichtResponse | null;
   createdPersonenkontext: DBiamPersonenkontextResponse | null;
   errorCode: string;
   loading: boolean;
@@ -38,6 +74,8 @@ type PersonenkontextActions = {
   createPersonenkontext: (
     personenkontext: DBiamCreatePersonenkontextBodyParams,
   ) => Promise<DBiamPersonenkontextResponse>;
+  getPersonenuebersichtById: (personId: string) => Promise<void>;
+  getAllPersonenuebersichten: () => Promise<void>;
 };
 
 export type { SystemrechtResponse };
@@ -59,8 +97,10 @@ export const usePersonenkontextStore: StoreDefinition<
   id: 'personenkontextStore',
   state: (): PersonenkontextState => {
     return {
+      allUebersichten: null,
       filteredRollen: null,
       filteredOrganisationen: null,
+      personenuebersicht: null,
       createdPersonenkontext: null,
       errorCode: '',
       loading: false,
@@ -133,6 +173,34 @@ export const usePersonenkontextStore: StoreDefinition<
       } finally {
         this.loading = false;
       }
+    },
+    async getPersonenuebersichtById(personId: string): Promise<void> {
+      this.loading = true;
+      try {
+        const { data }: { data: DBiamPersonenuebersichtResponse } =
+          await personenuebersichtApi.dBiamPersonenuebersichtControllerFindPersonenuebersichtenByPerson(personId);
+        this.personenuebersicht = data;
+      } catch (error: unknown) {
+        this.errorCode = 'UNSPECIFIED_ERROR';
+        if (isAxiosError(error)) {
+          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
+        }
+      }
+      this.loading = false;
+    },
+    async getAllPersonenuebersichten(): Promise<void> {
+      this.loading = true;
+      try {
+        const { data }: { data: DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response } =
+          await personenuebersichtApi.dBiamPersonenuebersichtControllerFindPersonenuebersichten();
+        this.allUebersichten = data;
+      } catch (error: unknown) {
+        this.errorCode = 'UNSPECIFIED_ERROR';
+        if (isAxiosError(error)) {
+          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
+        }
+      }
+      this.loading = false;
     },
   },
 });

@@ -42,9 +42,10 @@
       );
 
       // If a matching organization is found, format the administeredBySchulstrukturknoten field accordingly
-      const administeredBySchulstrukturknoten: string = matchingOrganisation
-        ? `${matchingOrganisation.kennung} (${matchingOrganisation.name})`
-        : '';
+      let administeredBySchulstrukturknoten: string = '';
+      if (matchingOrganisation) {
+        administeredBySchulstrukturknoten = `${matchingOrganisation.kennung ?? ''} (${matchingOrganisation.name})`;
+      }
 
       const formattedMerkmale: string =
         Array.from(rolle.merkmale).length > 0

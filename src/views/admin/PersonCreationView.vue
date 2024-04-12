@@ -78,7 +78,7 @@
   };
 
   // eslint-disable-next-line @typescript-eslint/typedef
-  const { defineField, handleSubmit, isFieldDirty, resetForm } = useForm<PersonCreationForm>({
+  const { defineField, handleSubmit, isFieldDirty, resetForm, resetField } = useForm<PersonCreationForm>({
     validationSchema,
   });
 
@@ -112,6 +112,10 @@
     if (newValue !== oldValue) {
       // Call fetch with an empty string to get the initial organizations for the selected role without any filter
       personenkontextStore.getPersonenkontextAdministrationsebeneWithFilter(newValue, '', 25);
+    }
+    // This checks if `selectedRolle` is cleared or set to a falsy value
+    if (!newValue) {
+      resetField('selectedOrganisation');
     }
   });
   // Watcher to detect when the search input for Organisationen is triggered.

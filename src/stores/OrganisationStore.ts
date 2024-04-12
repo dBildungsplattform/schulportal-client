@@ -15,10 +15,10 @@ const organisationApi: OrganisationenApiInterface = OrganisationenApiFactory(und
 
 export type Organisation = {
   id: string;
-  kennung: string | null;
+  kennung?: string | null;
   name: string;
-  namensergaenzung: string | null;
-  kuerzel: string;
+  namensergaenzung?: string | null;
+  kuerzel?: string;
   typ: OrganisationResponseTypEnum;
 };
 

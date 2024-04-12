@@ -190,7 +190,7 @@
   > = computed(() =>
     organisationStore.allOrganisationen.map((org: Organisation) => ({
       value: org.id,
-      title: `${org.kennung} (${org.name})`,
+      title: `${org.kennung ?? ''} (${org.name})`,
     })),
   );
 
