@@ -7,9 +7,6 @@
   } from '@/stores/ServiceProviderStore';
   import { computed, onMounted, type ComputedRef } from 'vue';
   import ServiceProviderCategory from '@/components/layout/ServiceProviderCategory.vue';
-  import { useI18n, type Composer } from 'vue-i18n';
-
-  const { t }: Composer = useI18n({ useScope: 'global' });
 
   const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
 
@@ -44,21 +41,6 @@
     );
   });
 
-  // Define the always present service provider for the SH-administration
-  const spshAdministrationServiceProvider: ServiceProvider = {
-    id: 'spsh-administration-service-provider',
-    name: t('nav.admin'),
-    kategorie: ServiceProviderKategorie.Verwaltung,
-    url: '/admin/personen',
-    hasLogo: false,
-  };
-
-  // Extend the administrationServiceProviders computed property to add the always present provider
-  const extendedAdministrationServiceProviders: ComputedRef<ServiceProvider[]> = computed(() => {
-    const providers: ServiceProvider[] = [...administrationServiceProviders.value];
-    providers.push(spshAdministrationServiceProvider);
-    return providers;
-  });
   onMounted(async () => {
     await serviceProviderStore.getAllServiceProviders();
     for (const provider of serviceProviderStore.allServiceProviders) {
@@ -128,7 +110,7 @@
       <!-- Categorie 3: Administration -->
       <ServiceProviderCategory
         :categoryTitle="$t('start.categories.administration')"
-        :serviceProviders="extendedAdministrationServiceProviders"
+        :serviceProviders="administrationServiceProviders"
       ></ServiceProviderCategory>
       <!-- Categorie 4: Hints -->
       <ServiceProviderCategory
