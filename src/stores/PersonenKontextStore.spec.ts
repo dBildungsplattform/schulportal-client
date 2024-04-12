@@ -186,7 +186,7 @@ describe('PersonenkontextStore', () => {
   describe('getPersonenkontextAdministrationsebeneWithFilter', () => {
     it('should get filtered Administrationsebenen', async () => {
       const mockResponse: FindSchulstrukturknotenResponse = {
-        moeglicheSkks: [
+        moeglicheSsks: [
           {
             id: 'string',
             kennung: 'string',

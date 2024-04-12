@@ -147,7 +147,7 @@
   });
 
   const organisationen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
-    return personenkontextStore.filteredOrganisationen?.moeglicheSkks
+    return personenkontextStore.filteredOrganisationen?.moeglicheSsks
       .slice(0, 25)
       .map((org: OrganisationResponse) => ({
         value: org.id,
