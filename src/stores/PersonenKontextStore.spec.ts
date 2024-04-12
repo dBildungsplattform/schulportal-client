@@ -136,7 +136,7 @@ describe('PersonenkontextStore', () => {
       expect(personenkontextStore.loading).toBe(false);
     });
   });
-  
+
   describe('getPersonenuebersichtById', () => {
     it('should get Personenuebersicht', async () => {
       const mockResponse: DBiamPersonenuebersichtResponse = {
