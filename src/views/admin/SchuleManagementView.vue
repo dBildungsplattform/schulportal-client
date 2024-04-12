@@ -49,24 +49,8 @@
       :totalItems="organisationStore.allOrganisationen.length"
       item-value-path="id"
       :disableRowClick="true"
-    >
-      <template v-slot:[`item.name`]="{ item }">
-        <div
-          class="ellipsis-wrapper"
-          :title="item.name"
-        >
-          {{ item.name }}
-        </div>
-      </template></ResultTable
-    >
+    ></ResultTable>
   </div>
 </template>
 
-<style>
-  .ellipsis-wrapper {
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
-    max-width: 241px;
-  }
-</style>
+<style></style>

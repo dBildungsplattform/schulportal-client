@@ -81,7 +81,16 @@
       :totalItems="rolleStore.allRollen.length"
       item-value-path="id"
       :disableRowClick="true"
-    ></ResultTable>
+    >
+      <template v-slot:[`item.serviceProviders`]="{ item }">
+        <span
+          v-for="(serviceProvider, index) in item.serviceProviders"
+          :key="serviceProvider.id"
+        >
+          {{ serviceProvider.name }}{{ index < item.serviceProviders.length - 1 ? ', ' : '' }}
+        </span>
+      </template>
+    </ResultTable>
   </div>
 </template>
 

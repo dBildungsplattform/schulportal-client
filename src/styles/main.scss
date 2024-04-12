@@ -60,3 +60,9 @@ label.v-label {
 .no-kopers-checkbox label.v-label {
   text-wrap: nowrap;
 }
+
+@media (min-width: 960px) {
+  .v-container {
+    max-width: none;
+  }
+}

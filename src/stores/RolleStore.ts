@@ -124,7 +124,6 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
-          console.log(error)
           this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
         }
         this.loading = false;

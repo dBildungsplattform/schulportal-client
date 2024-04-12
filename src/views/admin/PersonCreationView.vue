@@ -292,7 +292,7 @@
           :isRequired="true"
           :label="$t('admin.rolle.rolle')"
         >
-        <v-autocomplete
+          <v-autocomplete
             autocomplete="off"
             clearable
             data-testid="rolle-select"
