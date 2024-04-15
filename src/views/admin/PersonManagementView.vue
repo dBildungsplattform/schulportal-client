@@ -24,6 +24,7 @@
     { title: t('person.userName'), key: 'person.referrer', align: 'start' },
     { title: t('person.rolle'), key: 'rollen', align: 'start' },
     { title: t('person.zuordnungen'), key: 'administrationsebenen', align: 'start' },
+    { title: t('person.kopersnr'), key: 'kopersNr', align: 'start' },
   ];
 
   type PersonenWithRolleAndZuordnung = {
