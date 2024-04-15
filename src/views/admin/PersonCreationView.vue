@@ -157,7 +157,7 @@
       .slice(0, 25)
       .map((org: OrganisationResponse) => ({
         value: org.id,
-        title: `${org.kennung} (${org.name})`,
+        title: `${org.kennung ?? ''} (${org.name})`,
       }))
       .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
   });
