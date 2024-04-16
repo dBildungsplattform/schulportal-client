@@ -100,6 +100,8 @@ export interface CreateOrganisationBodyParams {
 }
 
 export const CreateOrganisationBodyParamsTypEnum = {
+    Root: 'ROOT',
+    Land: 'LAND',
     Traeger: 'TRAEGER',
     Schule: 'SCHULE',
     Anbieter: 'ANBIETER',
@@ -582,7 +584,7 @@ export interface OrganisationResponse {
      * @type {string}
      * @memberof OrganisationResponse
      */
-    'kennung': string;
+    'kennung': string | null;
     /**
      * 
      * @type {string}
@@ -594,7 +596,7 @@ export interface OrganisationResponse {
      * @type {string}
      * @memberof OrganisationResponse
      */
-    'namensergaenzung': string;
+    'namensergaenzung': string | null;
     /**
      * 
      * @type {string}
@@ -610,6 +612,8 @@ export interface OrganisationResponse {
 }
 
 export const OrganisationResponseTypEnum = {
+    Root: 'ROOT',
+    Land: 'LAND',
     Traeger: 'TRAEGER',
     Schule: 'SCHULE',
     Anbieter: 'ANBIETER',
@@ -810,7 +814,7 @@ export interface PersonResponse {
      * @type {string}
      * @memberof PersonResponse
      */
-    'referrer': string;
+    'referrer': string | null;
     /**
      * 
      * @type {string}
@@ -828,25 +832,25 @@ export interface PersonResponse {
      * @type {PersonBirthParams}
      * @memberof PersonResponse
      */
-    'geburt': PersonBirthParams;
+    'geburt': PersonBirthParams | null;
     /**
      * 
      * @type {string}
      * @memberof PersonResponse
      */
-    'stammorganisation': string;
+    'stammorganisation': string | null;
     /**
      * 
      * @type {string}
      * @memberof PersonResponse
      */
-    'geschlecht': string;
+    'geschlecht': string | null;
     /**
      * 
      * @type {string}
      * @memberof PersonResponse
      */
-    'lokalisierung': string;
+    'lokalisierung': string | null;
     /**
      * 
      * @type {string}
@@ -865,6 +869,12 @@ export interface PersonResponse {
      * @memberof PersonResponse
      */
     'startpasswort': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonResponse
+     */
+    'personalnummer': string | null;
 }
 
 export const PersonResponseVertrauensstufeEnum = {
@@ -948,6 +958,12 @@ export interface PersonResponseAutomapper {
      * @memberof PersonResponseAutomapper
      */
     'startpasswort': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonResponseAutomapper
+     */
+    'personalnummer': string;
 }
 
 export const PersonResponseAutomapperVertrauensstufeEnum = {
@@ -1196,6 +1212,109 @@ export interface RolleServiceProviderResponse {
 /**
  * 
  * @export
+ * @interface RolleWithServiceProvidersResponse
+ */
+export interface RolleWithServiceProvidersResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof RolleWithServiceProvidersResponse
+     */
+    'id': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RolleWithServiceProvidersResponse
+     */
+    'createdAt': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RolleWithServiceProvidersResponse
+     */
+    'updatedAt': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RolleWithServiceProvidersResponse
+     */
+    'name': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RolleWithServiceProvidersResponse
+     */
+    'administeredBySchulstrukturknoten': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RolleWithServiceProvidersResponse
+     */
+    'rollenart': RolleWithServiceProvidersResponseRollenartEnum;
+    /**
+     * 
+     * @type {Set<string>}
+     * @memberof RolleWithServiceProvidersResponse
+     */
+    'merkmale': Set<RolleWithServiceProvidersResponseMerkmaleEnum>;
+    /**
+     * 
+     * @type {Set<string>}
+     * @memberof RolleWithServiceProvidersResponse
+     */
+    'systemrechte': Set<RolleWithServiceProvidersResponseSystemrechteEnum>;
+    /**
+     * 
+     * @type {Array<ServiceProviderIdNameResponse>}
+     * @memberof RolleWithServiceProvidersResponse
+     */
+    'serviceProviders': Array<ServiceProviderIdNameResponse>;
+}
+
+export const RolleWithServiceProvidersResponseRollenartEnum = {
+    Lern: 'LERN',
+    Lehr: 'LEHR',
+    Extern: 'EXTERN',
+    Orgadmin: 'ORGADMIN',
+    Leit: 'LEIT',
+    Sysadmin: 'SYSADMIN'
+} as const;
+
+export type RolleWithServiceProvidersResponseRollenartEnum = typeof RolleWithServiceProvidersResponseRollenartEnum[keyof typeof RolleWithServiceProvidersResponseRollenartEnum];
+export const RolleWithServiceProvidersResponseMerkmaleEnum = {
+    BefristungPflicht: 'BEFRISTUNG_PFLICHT',
+    KopersPflicht: 'KOPERS_PFLICHT'
+} as const;
+
+export type RolleWithServiceProvidersResponseMerkmaleEnum = typeof RolleWithServiceProvidersResponseMerkmaleEnum[keyof typeof RolleWithServiceProvidersResponseMerkmaleEnum];
+export const RolleWithServiceProvidersResponseSystemrechteEnum = {
+    RollenVerwalten: 'ROLLEN_VERWALTEN'
+} as const;
+
+export type RolleWithServiceProvidersResponseSystemrechteEnum = typeof RolleWithServiceProvidersResponseSystemrechteEnum[keyof typeof RolleWithServiceProvidersResponseSystemrechteEnum];
+
+/**
+ * 
+ * @export
+ * @interface ServiceProviderIdNameResponse
+ */
+export interface ServiceProviderIdNameResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof ServiceProviderIdNameResponse
+     */
+    'id': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ServiceProviderIdNameResponse
+     */
+    'name': string;
+}
+/**
+ * 
+ * @export
  * @enum {string}
  */
 
@@ -1230,6 +1349,12 @@ export interface ServiceProviderResponse {
     'name': string;
     /**
      * 
+     * @type {ServiceProviderTarget}
+     * @memberof ServiceProviderResponse
+     */
+    'target': ServiceProviderTarget;
+    /**
+     * Can be undefined, if `target` is not equal to `URL`
      * @type {string}
      * @memberof ServiceProviderResponse
      */
@@ -1247,6 +1372,20 @@ export interface ServiceProviderResponse {
      */
     'hasLogo': boolean;
 }
+
+
+/**
+ * 
+ * @export
+ * @enum {string}
+ */
+
+export const ServiceProviderTarget = {
+    Url: 'URL',
+    SchulportalAdministration: 'SCHULPORTAL_ADMINISTRATION'
+} as const;
+
+export type ServiceProviderTarget = typeof ServiceProviderTarget[keyof typeof ServiceProviderTarget];
 
 
 /**
@@ -1319,6 +1458,8 @@ export interface UpdateOrganisationBodyParams {
 }
 
 export const UpdateOrganisationBodyParamsTypEnum = {
+    Root: 'ROOT',
+    Land: 'LAND',
     Traeger: 'TRAEGER',
     Schule: 'SCHULE',
     Anbieter: 'ANBIETER',
@@ -1486,6 +1627,12 @@ export interface UserinfoResponse {
      * @type {string}
      * @memberof UserinfoResponse
      */
+    'personId': string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserinfoResponse
+     */
     'name': string | null;
     /**
      * 
@@ -1583,12 +1730,6 @@ export interface UserinfoResponse {
      * @memberof UserinfoResponse
      */
     'updated_at': number | null;
-    /**
-     * 
-     * @type {string}
-     * @memberof UserinfoResponse
-     */
-    'personId': string | null;
 }
 
 /**
@@ -1615,6 +1756,14 @@ export const AuthApiAxiosParamCreator = function (configuration?: Configuration)
             const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
 
 
     
@@ -1680,6 +1829,14 @@ export const AuthApiAxiosParamCreator = function (configuration?: Configuration)
             const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
 
 
     
@@ -1884,6 +2041,10 @@ export const DbiamPersonenkontexteApiAxiosParamCreator = function (configuration
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
 
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
@@ -1923,6 +2084,10 @@ export const DbiamPersonenkontexteApiAxiosParamCreator = function (configuration
             // authentication bearer required
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
 
 
     
@@ -2296,6 +2461,10 @@ export const OrganisationenApiAxiosParamCreator = function (configuration?: Conf
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
 
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
@@ -2339,6 +2508,10 @@ export const OrganisationenApiAxiosParamCreator = function (configuration?: Conf
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
 
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
@@ -2377,6 +2550,10 @@ export const OrganisationenApiAxiosParamCreator = function (configuration?: Conf
             // authentication bearer required
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
 
 
     
@@ -2418,6 +2595,10 @@ export const OrganisationenApiAxiosParamCreator = function (configuration?: Conf
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
 
     
             setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -2435,11 +2616,11 @@ export const OrganisationenApiAxiosParamCreator = function (configuration?: Conf
          * @param {number} [limit] The requested limit for the page size.
          * @param {string} [kennung] 
          * @param {string} [name] 
-         * @param {'TRAEGER' | 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT'} [typ] 
+         * @param {'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT'} [typ] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        organisationControllerFindOrganizations: async (offset?: number, limit?: number, kennung?: string, name?: string, typ?: 'TRAEGER' | 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        organisationControllerFindOrganizations: async (offset?: number, limit?: number, kennung?: string, name?: string, typ?: 'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/organisationen`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -2455,6 +2636,10 @@ export const OrganisationenApiAxiosParamCreator = function (configuration?: Conf
             // authentication bearer required
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
 
             if (offset !== undefined) {
                 localVarQueryParameter['offset'] = offset;
@@ -2513,6 +2698,10 @@ export const OrganisationenApiAxiosParamCreator = function (configuration?: Conf
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
 
     
             setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -2545,6 +2734,10 @@ export const OrganisationenApiAxiosParamCreator = function (configuration?: Conf
             // authentication bearer required
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
 
 
     
@@ -2582,6 +2775,10 @@ export const OrganisationenApiAxiosParamCreator = function (configuration?: Conf
             // authentication bearer required
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
 
 
     
@@ -2622,6 +2819,10 @@ export const OrganisationenApiAxiosParamCreator = function (configuration?: Conf
             // authentication bearer required
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
 
 
     
@@ -2695,11 +2896,11 @@ export const OrganisationenApiFp = function(configuration?: Configuration) {
          * @param {number} [limit] The requested limit for the page size.
          * @param {string} [kennung] 
          * @param {string} [name] 
-         * @param {'TRAEGER' | 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT'} [typ] 
+         * @param {'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT'} [typ] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, typ?: 'TRAEGER' | 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<OrganisationResponse>>> {
+        async organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, typ?: 'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<OrganisationResponse>>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.organisationControllerFindOrganizations(offset, limit, kennung, name, typ, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -2797,11 +2998,11 @@ export const OrganisationenApiFactory = function (configuration?: Configuration,
          * @param {number} [limit] The requested limit for the page size.
          * @param {string} [kennung] 
          * @param {string} [name] 
-         * @param {'TRAEGER' | 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT'} [typ] 
+         * @param {'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT'} [typ] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, typ?: 'TRAEGER' | 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', options?: any): AxiosPromise<Array<OrganisationResponse>> {
+        organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, typ?: 'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', options?: any): AxiosPromise<Array<OrganisationResponse>> {
             return localVarFp.organisationControllerFindOrganizations(offset, limit, kennung, name, typ, options).then((request) => request(axios, basePath));
         },
         /**
@@ -2893,12 +3094,12 @@ export interface OrganisationenApiInterface {
      * @param {number} [limit] The requested limit for the page size.
      * @param {string} [kennung] 
      * @param {string} [name] 
-     * @param {'TRAEGER' | 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT'} [typ] 
+     * @param {'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT'} [typ] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrganisationenApiInterface
      */
-    organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, typ?: 'TRAEGER' | 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', options?: AxiosRequestConfig): AxiosPromise<Array<OrganisationResponse>>;
+    organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, typ?: 'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', options?: AxiosRequestConfig): AxiosPromise<Array<OrganisationResponse>>;
 
     /**
      * 
@@ -2997,12 +3198,12 @@ export class OrganisationenApi extends BaseAPI implements OrganisationenApiInter
      * @param {number} [limit] The requested limit for the page size.
      * @param {string} [kennung] 
      * @param {string} [name] 
-     * @param {'TRAEGER' | 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT'} [typ] 
+     * @param {'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT'} [typ] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrganisationenApi
      */
-    public organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, typ?: 'TRAEGER' | 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', options?: AxiosRequestConfig) {
+    public organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, typ?: 'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', options?: AxiosRequestConfig) {
         return OrganisationenApiFp(this.configuration).organisationControllerFindOrganizations(offset, limit, kennung, name, typ, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -3083,6 +3284,10 @@ export const PersonenApiAxiosParamCreator = function (configuration?: Configurat
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
 
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
@@ -3126,6 +3331,10 @@ export const PersonenApiAxiosParamCreator = function (configuration?: Configurat
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
 
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
@@ -3165,6 +3374,10 @@ export const PersonenApiAxiosParamCreator = function (configuration?: Configurat
             // authentication bearer required
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
 
 
     
@@ -3208,6 +3421,10 @@ export const PersonenApiAxiosParamCreator = function (configuration?: Configurat
             // authentication bearer required
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
 
             if (offset !== undefined) {
                 localVarQueryParameter['offset'] = offset;
@@ -3272,6 +3489,10 @@ export const PersonenApiAxiosParamCreator = function (configuration?: Configurat
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
             if (offset !== undefined) {
                 localVarQueryParameter['offset'] = offset;
             }
@@ -3333,6 +3554,10 @@ export const PersonenApiAxiosParamCreator = function (configuration?: Configurat
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
 
     
             setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -3372,6 +3597,10 @@ export const PersonenApiAxiosParamCreator = function (configuration?: Configurat
             // authentication bearer required
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
 
 
     
@@ -3786,6 +4015,10 @@ export const PersonenFrontendApiAxiosParamCreator = function (configuration?: Co
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
             if (offset !== undefined) {
                 localVarQueryParameter['offset'] = offset;
             }
@@ -4188,6 +4421,10 @@ export const PersonenkontexteApiAxiosParamCreator = function (configuration?: Co
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
 
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
@@ -4228,6 +4465,10 @@ export const PersonenkontexteApiAxiosParamCreator = function (configuration?: Co
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
 
     
             setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -4266,6 +4507,10 @@ export const PersonenkontexteApiAxiosParamCreator = function (configuration?: Co
             // authentication bearer required
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
 
             if (offset !== undefined) {
                 localVarQueryParameter['offset'] = offset;
@@ -4331,6 +4576,10 @@ export const PersonenkontexteApiAxiosParamCreator = function (configuration?: Co
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
             if (systemRecht !== undefined) {
                 localVarQueryParameter['systemRecht'] = systemRecht;
             }
@@ -4374,6 +4623,10 @@ export const PersonenkontexteApiAxiosParamCreator = function (configuration?: Co
             // authentication bearer required
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
 
 
     
@@ -4684,6 +4937,10 @@ export const ProviderApiAxiosParamCreator = function (configuration?: Configurat
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
 
     
             setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -4720,6 +4977,10 @@ export const ProviderApiAxiosParamCreator = function (configuration?: Configurat
             // authentication bearer required
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
 
 
     
@@ -4882,6 +5143,10 @@ export const RolleApiAxiosParamCreator = function (configuration?: Configuration
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
 
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
@@ -4926,6 +5191,10 @@ export const RolleApiAxiosParamCreator = function (configuration?: Configuration
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
 
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
@@ -4966,6 +5235,10 @@ export const RolleApiAxiosParamCreator = function (configuration?: Configuration
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
 
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
@@ -5002,6 +5275,10 @@ export const RolleApiAxiosParamCreator = function (configuration?: Configuration
             // authentication bearer required
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
 
 
     
@@ -5040,6 +5317,10 @@ export const RolleApiAxiosParamCreator = function (configuration?: Configuration
             // authentication bearer required
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
 
 
     
@@ -5081,6 +5362,10 @@ export const RolleApiAxiosParamCreator = function (configuration?: Configuration
             // authentication bearer required
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
 
             if (serviceProviderId !== undefined) {
                 localVarQueryParameter['serviceProviderId'] = serviceProviderId;
@@ -5148,7 +5433,7 @@ export const RolleApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async rolleControllerFindRollen(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<RolleResponse>>> {
+        async rolleControllerFindRollen(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<RolleWithServiceProvidersResponse>>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.rolleControllerFindRollen(options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -5223,7 +5508,7 @@ export const RolleApiFactory = function (configuration?: Configuration, basePath
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        rolleControllerFindRollen(options?: any): AxiosPromise<Array<RolleResponse>> {
+        rolleControllerFindRollen(options?: any): AxiosPromise<Array<RolleWithServiceProvidersResponse>> {
             return localVarFp.rolleControllerFindRollen(options).then((request) => request(axios, basePath));
         },
         /**
@@ -5295,7 +5580,7 @@ export interface RolleApiInterface {
      * @throws {RequiredError}
      * @memberof RolleApiInterface
      */
-    rolleControllerFindRollen(options?: AxiosRequestConfig): AxiosPromise<Array<RolleResponse>>;
+    rolleControllerFindRollen(options?: AxiosRequestConfig): AxiosPromise<Array<RolleWithServiceProvidersResponse>>;
 
     /**
      * Get service-providers for a rolle by its id.

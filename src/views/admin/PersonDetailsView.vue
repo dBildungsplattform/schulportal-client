@@ -151,7 +151,11 @@
                 cols="auto"
                 data-testid="person-kopersnr"
               >
-                {{ personStore.currentPerson.person.referrer }}
+                {{
+                  personStore.currentPerson.person.personalnummer
+                    ? personStore.currentPerson.person.personalnummer
+                    : '---'
+                }}
               </v-col>
             </v-row>
           </div>
