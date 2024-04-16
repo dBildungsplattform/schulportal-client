@@ -165,7 +165,7 @@
     },
     "serviceProvider": {
       "assignServiceProvider": "Angebote zuordnen",
-      "assignedServiceProvider": "zugeordnete Angebote",
+      "assignedServiceProvider": "Zugeordnete Angebote",
       "selectServiceProvider": "Angebote auswählen",
       "serviceProvider": "Angebote"
     }
