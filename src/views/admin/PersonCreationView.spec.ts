@@ -30,4 +30,11 @@ describe('PersonCreationView', () => {
   test('it renders the person creation form', () => {
     expect(wrapper?.find('[data-testid="person-creation-form"]').isVisible()).toBe(true);
   });
+
+  test('it renders all child components', () => {
+    expect(wrapper?.getComponent({ name: 'LayoutCard' })).toBeTruthy()
+    expect(wrapper?.getComponent({ name: 'SpshAlert' })).toBeTruthy()
+    expect(wrapper?.getComponent({ name: 'FormWrapper' })).toBeTruthy()
+    expect(wrapper?.getComponent({ name: 'FormRow' })).toBeTruthy()
+  });
 });
