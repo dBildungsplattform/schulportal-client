@@ -81,8 +81,7 @@
       @onUpdateTable="personStore.getAllPersons()"
       :totalItems="personStore.totalPersons"
       item-value-path="person.id"
-      ></ResultTable
-    >
+    ></ResultTable>
   </div>
 </template>
 
