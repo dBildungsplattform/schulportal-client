@@ -11,7 +11,7 @@
     type PersonenkontextStore,
     type Uebersicht,
     type Zuordnung,
-  } from '@/stores/PersonenKontextStore';
+  } from '@/stores/PersonenkontextStore';
   const personStore: PersonStore = usePersonStore();
   const personenKontextStore: PersonenkontextStore = usePersonenkontextStore();
 

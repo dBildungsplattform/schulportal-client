@@ -11,6 +11,24 @@ const routes: readonly RouteRecordRaw[] = [
     },
   },
   {
+    path: '/admin/klassen',
+    name: 'klasse-management',
+    component: () => import('../views/admin/KlasseManagementView.vue'),
+    meta: {
+      requiresAuth: true,
+      layout: 'AdminLayout',
+    },
+  },
+  {
+    path: '/admin/klassen/new',
+    name: 'create-klasse',
+    component: () => import('../views/admin/KlasseCreationView.vue'),
+    meta: {
+      layout: 'AdminLayout',
+      requiresAuth: true,
+    },
+  },
+  {
     path: '/admin/personen',
     name: 'person-management',
     component: () => import('../views/admin/PersonManagementView.vue'),
@@ -38,15 +56,6 @@ const routes: readonly RouteRecordRaw[] = [
     },
   },
   {
-    path: '/admin/rollen/new',
-    name: 'create-rolle',
-    component: () => import('../views/admin/RolleCreationView.vue'),
-    meta: {
-      layout: 'AdminLayout',
-      requiresAuth: true,
-    },
-  },
-  {
     path: '/admin/rollen',
     name: 'rolle-management',
     component: () => import('../views/admin/RolleManagementView.vue'),
@@ -56,9 +65,9 @@ const routes: readonly RouteRecordRaw[] = [
     },
   },
   {
-    path: '/admin/schulen/new',
-    name: 'create-schule',
-    component: () => import('../views/admin/SchuleCreationView.vue'),
+    path: '/admin/rollen/new',
+    name: 'create-rolle',
+    component: () => import('../views/admin/RolleCreationView.vue'),
     meta: {
       layout: 'AdminLayout',
       requiresAuth: true,
@@ -71,6 +80,15 @@ const routes: readonly RouteRecordRaw[] = [
     meta: {
       requiresAuth: true,
       layout: 'AdminLayout',
+    },
+  },
+  {
+    path: '/admin/schulen/new',
+    name: 'create-schule',
+    component: () => import('../views/admin/SchuleCreationView.vue'),
+    meta: {
+      layout: 'AdminLayout',
+      requiresAuth: true,
     },
   },
   {

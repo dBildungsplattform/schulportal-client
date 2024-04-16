@@ -25,7 +25,7 @@
   import PasswordOutput from '@/components/form/PasswordOutput.vue';
   import FormWrapper from '@/components/form/FormWrapper.vue';
   import FormRow from '@/components/form/FormRow.vue';
-  import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenKontextStore';
+  import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
   import { useDisplay } from 'vuetify';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();

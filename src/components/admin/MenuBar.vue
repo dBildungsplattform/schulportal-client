@@ -4,7 +4,7 @@
     usePersonenkontextStore,
     type PersonenkontextStore,
     type SystemrechtResponse,
-  } from '@/stores/PersonenKontextStore';
+  } from '@/stores/PersonenkontextStore';
   import { type Ref, ref, type ComputedRef } from 'vue';
   import { onMounted } from 'vue';
   import { useDisplay } from 'vuetify';
@@ -125,7 +125,7 @@
     </v-list-item>
     <v-divider></v-divider>
 
-    <!-- Person menu -->
+    <!-- Benutzerverwaltung -->
     <v-list-item
       class="menu-bar-main-item headline-2"
       data-testid="person-management-title"
@@ -152,7 +152,15 @@
     <v-list-item
       class="menu-bar-main-item headline-2"
       data-testid="klasse-management-title"
-      :title="$t('admin.class.management')"
+      :title="$t('admin.klasse.management')"
+    ></v-list-item>
+    <v-list-item
+      class="menu-bar-sub-item caption"
+      @click="closeMenuOnMobile"
+      data-testid="klasse-creation-menu-item"
+      prepend-icon="mdi-plus-circle-outline"
+      :title="$t('admin.klasse.createNew')"
+      to="/admin/klassen/new"
     ></v-list-item>
 
     <!-- Rollenverwaltung -->
@@ -179,6 +187,7 @@
         to="/admin/rollen/new"
       ></v-list-item>
     </div>
+
     <!-- Schulverwaltung -->
     <v-list-item
       class="menu-bar-main-item headline-2"
@@ -201,6 +210,7 @@
       :title="$t('admin.schule.createNew')"
       to="/admin/schulen/new"
     ></v-list-item>
+
     <!-- Schulträgerverwaltung -->
     <v-list-item
       class="menu-bar-main-item headline-2"

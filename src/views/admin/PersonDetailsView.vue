@@ -5,7 +5,7 @@
   import PasswordReset from '@/components/admin/PasswordReset.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
-  import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenKontextStore';
+  import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
 
   const route: RouteLocationNormalizedLoaded = useRoute();
   const router: Router = useRouter();
