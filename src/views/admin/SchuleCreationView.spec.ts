@@ -41,9 +41,9 @@ describe('SchuleCreationView', () => {
   });
 
   test('it renders all child components', () => {
-    expect(wrapper?.getComponent({ name: 'LayoutCard' })).toBeTruthy()
-    expect(wrapper?.getComponent({ name: 'SpshAlert' })).toBeTruthy()
-    expect(wrapper?.getComponent({ name: 'FormWrapper' })).toBeTruthy()
-    expect(wrapper?.getComponent({ name: 'FormRow' })).toBeTruthy()
+    expect(wrapper?.getComponent({ name: 'LayoutCard' })).toBeTruthy();
+    expect(wrapper?.getComponent({ name: 'SpshAlert' })).toBeTruthy();
+    expect(wrapper?.getComponent({ name: 'FormWrapper' })).toBeTruthy();
+    expect(wrapper?.getComponent({ name: 'FormRow' })).toBeTruthy();
   });
 });

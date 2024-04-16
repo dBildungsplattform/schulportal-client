@@ -1,10 +1,10 @@
 import { expect, test, type MockInstance } from 'vitest';
 import { VueWrapper, mount } from '@vue/test-utils';
 import RolleCreationView from './RolleCreationView.vue';
-import { createTestingPinia } from '@pinia/testing'
+import { createTestingPinia } from '@pinia/testing';
 import { createRouter, createWebHistory, type NavigationFailure, type RouteLocationRaw, type Router } from 'vue-router';
 import routes from '@/router/routes';
-import { RolleStore, useRolleStore } from '@/stores/RolleStore'
+import { type RolleStore, useRolleStore } from '@/stores/RolleStore';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
@@ -54,17 +54,17 @@ beforeEach(async () => {
               errorCode: '',
               loading: false,
             },
-          }
+          },
         }),
-      router
-    ],
+        router,
+      ],
     },
   });
 });
 
 afterEach(() => {
-  wrapper?.unmount()
-})
+  wrapper?.unmount();
+});
 
 describe('RolleCreationView', () => {
   test('it renders the role form', () => {
@@ -72,10 +72,10 @@ describe('RolleCreationView', () => {
   });
 
   test('it renders all child components', () => {
-    expect(wrapper?.getComponent({ name: 'LayoutCard' })).toBeTruthy()
-    expect(wrapper?.getComponent({ name: 'SpshAlert' })).toBeTruthy()
-    expect(wrapper?.getComponent({ name: 'FormWrapper' })).toBeTruthy()
-    expect(wrapper?.getComponent({ name: 'FormRow' })).toBeTruthy()
+    expect(wrapper?.getComponent({ name: 'LayoutCard' })).toBeTruthy();
+    expect(wrapper?.getComponent({ name: 'SpshAlert' })).toBeTruthy();
+    expect(wrapper?.getComponent({ name: 'FormWrapper' })).toBeTruthy();
+    expect(wrapper?.getComponent({ name: 'FormRow' })).toBeTruthy();
   });
 
   test('it navigates back to role table', async () => {
