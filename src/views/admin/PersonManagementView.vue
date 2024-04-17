@@ -55,7 +55,7 @@
             .join(', ')
         : '---';
       // Check if personalnummer is null, if so, replace it with "---"
-      const personalnummer: string = person.person.personalnummer ? person.person.personalnummer : '---';
+      const personalnummer: string = person.person.personalnummer ?? '---';
       return {
         ...person,
         rollen: rollen,
