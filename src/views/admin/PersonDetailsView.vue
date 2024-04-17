@@ -25,8 +25,16 @@
     });
   }
 
-  function truncateSskName(sskName: string): string {
-    return sskName.length > 30 ? `${sskName.substring(0, 30)}...` : sskName;
+  function getSskName(sskDstNr: string, sskName: string): string {
+    /* truncate ssk name */
+    const truncatededSskName: string = sskName.length > 30 ? `${sskName.substring(0, 30)}...` : sskName;
+
+    /* omit parens when there is no ssk kennung  */
+    if (sskDstNr) {
+      return `${sskDstNr} (${truncatededSskName})`;
+    } else {
+      return truncatededSskName;
+    }
   }
 
   const handleAlertClose = (): void => {
@@ -205,7 +213,7 @@
                 class="text-body"
                 :title="zuordnung.sskName"
               >
-                {{ zuordnung.sskDstNr }} ({{ truncateSskName(zuordnung.sskName) }}): {{ zuordnung.rolle }}
+                {{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
               </h3>
             </v-col>
           </v-row>
