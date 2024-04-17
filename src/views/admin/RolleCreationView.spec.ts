@@ -76,7 +76,11 @@ describe('RolleCreationView', () => {
     expect(push).toHaveBeenCalledTimes(1);
   });
 
-  test('it renders the success template', async () => {
+  test('it renders the success template and goes back to form', async () => {
+    const push: MockInstance<[to: RouteLocationRaw], Promise<void | NavigationFailure | undefined>> = vi.spyOn(
+      router,
+      'push',
+    );
     rolleStore.createdRolle = {
       id: '3',
       createdAt: '2022-02-26T16:37:48.244Z',
@@ -90,6 +94,9 @@ describe('RolleCreationView', () => {
     rolleStore.errorCode = '';
     await nextTick();
     expect(wrapper?.find('[data-testid="rolle-success-text"]').isVisible()).toBe(true);
+    wrapper?.find('[data-testid="back-to-list-button"]').trigger('click');
+    await nextTick();
+    expect(push).toHaveBeenCalledTimes(1);
   });
 
   test.skip('it fills the rolle creation form', async () => {
