@@ -109,13 +109,15 @@
   });
   // Watcher to detect when the Rolle is selected so the Organisationen show all the possible choices using that value.
   watch(selectedRolle, (newValue: string, oldValue: string) => {
-    if (newValue !== oldValue) {
-      // Call fetch with an empty string to get the initial organizations for the selected role without any filter
-      personenkontextStore.getPersonenkontextAdministrationsebeneWithFilter(newValue, '', 25);
-    }
     // This checks if `selectedRolle` is cleared or set to a falsy value
     if (!newValue) {
       resetField('selectedOrganisation');
+      return;
+    }
+
+    if (newValue !== oldValue) {
+      // Call fetch with an empty string to get the initial organizations for the selected role without any filter
+      personenkontextStore.getPersonenkontextAdministrationsebeneWithFilter(newValue, '', 25);
     }
   });
   // Watcher to detect when the search input for Organisationen is triggered.
@@ -151,7 +153,7 @@
   });
 
   const organisationen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
-    return personenkontextStore.filteredOrganisationen?.moeglicheSkks
+    return personenkontextStore.filteredOrganisationen?.moeglicheSsks
       .slice(0, 25)
       .map((org: OrganisationResponse) => ({
         value: org.id,
