@@ -25,6 +25,7 @@ COPY --from=build /app/dist/ /usr/share/nginx/html/
 
 # Fix Trivy Warnings CVE-2024-2511
 RUN apk --no-cache add "libssl3>3.1.4-r5"
+RUN apk --no-cache add "libcrypto3>3.1.4-r5"
 
 RUN rm /etc/nginx/conf.d/default.conf
 COPY nginx-vue.conf /etc/nginx/conf.d/
