@@ -45,7 +45,11 @@
       "management": "Rollenverwaltung",
       "mappingFrontBackEnd": {
         "systemrechte": {
-          "ROLLEN_VERWALTEN": "Darf Rollen verwalten"
+          "ROLLEN_VERWALTEN": "Darf Rollen verwalten",
+          "PERSONEN_VERWALTEN": "Darf Personen verwalten",
+          "SCHULEN_VERWALTEN": "Darf Schulen verwalten",
+          "KLASSEN_VERWALTEN": "Darf Klassen verwalten",
+          "SCHULTRAEGER_VERWALTEN": "Darf Schulträger verwalten"
         },
         "rollenarten": {
           "LERN": "Lern",
