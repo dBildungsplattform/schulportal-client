@@ -43,6 +43,46 @@ describe('PersonenkontextStore', () => {
             typ: OrganisationResponseTypEnum.Anbieter,
           },
         ],
+        KLASSEN_VERWALTEN: [
+          {
+            id: '1',
+            kennung: '12345',
+            name: 'Organisation 1',
+            namensergaenzung: 'Ergänzung',
+            kuerzel: 'O1',
+            typ: OrganisationResponseTypEnum.Anbieter,
+          },
+        ],
+        SCHULEN_VERWALTEN: [
+          {
+            id: '1',
+            kennung: '12345',
+            name: 'Organisation 1',
+            namensergaenzung: 'Ergänzung',
+            kuerzel: 'O1',
+            typ: OrganisationResponseTypEnum.Anbieter,
+          },
+        ],
+        PERSONEN_VERWALTEN: [
+          {
+            id: '1',
+            kennung: '12345',
+            name: 'Organisation 1',
+            namensergaenzung: 'Ergänzung',
+            kuerzel: 'O1',
+            typ: OrganisationResponseTypEnum.Anbieter,
+          },
+        ],
+        SCHULTRAEGER_VERWALTEN: [
+          {
+            id: '1',
+            kennung: '12345',
+            name: 'Organisation 1',
+            namensergaenzung: 'Ergänzung',
+            kuerzel: 'O1',
+            typ: OrganisationResponseTypEnum.Anbieter,
+          },
+        ],
       };
 
       mockadapter
