@@ -450,7 +450,12 @@
             </v-col>
             <v-col class="text-body">
               <span data-testid="created-rolle-administrationsebene">
-                {{ getSskName(organisationStore.currentOrganisation?.kennung, organisationStore.currentOrganisation?.name) }}
+                {{
+                  getSskName(
+                    organisationStore.currentOrganisation?.kennung,
+                    organisationStore.currentOrganisation?.name,
+                  )
+                }}
               </span>
             </v-col>
           </v-row>
