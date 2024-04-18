@@ -4,7 +4,7 @@
     usePersonenkontextStore,
     type PersonenkontextStore,
     type SystemrechtResponse,
-  } from '@/stores/PersonenKontextStore';
+  } from '@/stores/PersonenkontextStore';
   import { type Ref, ref, type ComputedRef } from 'vue';
   import { onMounted } from 'vue';
   import { useDisplay } from 'vuetify';
@@ -211,3 +211,4 @@
 </template>
 
 <style></style>
+@/stores/PersonenkontextStore
