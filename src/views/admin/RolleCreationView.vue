@@ -166,7 +166,7 @@
     rolleStore.createdRolle = null;
   }
 
-  function getSskName(sskDstNr: string | undefined, sskName: string | undefined): string {
+  function getSskName(sskDstNr: string | null | undefined, sskName: string | null | undefined): string {
     /* omit parens when there is no ssk kennung  */
     if (sskDstNr) {
       return `${sskDstNr} (${sskName})`;
