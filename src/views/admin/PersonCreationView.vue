@@ -402,12 +402,14 @@
             class="subtitle-1"
             cols="auto"
           >
-            {{
-              $t('admin.person.addedSuccessfully', {
-                firstname: personStore.createdPerson.person.name.vorname,
-                lastname: personStore.createdPerson.person.name.familienname,
-              })
-            }}
+            <span data-testid="person-success-text">
+              {{
+                $t('admin.person.addedSuccessfully', {
+                  firstname: personStore.createdPerson.person.name.vorname,
+                  lastname: personStore.createdPerson.person.name.familienname,
+                })
+              }}
+            </span>
           </v-col>
         </v-row>
         <v-row justify="center">
@@ -431,29 +433,43 @@
         </v-row>
         <v-row>
           <v-col class="text-body bold text-right"> {{ $t('person.firstName') }}: </v-col>
-          <v-col class="text-body"> {{ personStore.createdPerson.person.name.vorname }}</v-col>
+          <v-col class="text-body"
+            ><span data-testid="created-person-vorname">{{
+              personStore.createdPerson.person.name.vorname
+            }}</span></v-col
+          >
         </v-row>
         <v-row>
           <v-col class="text-body bold text-right"> {{ $t('person.lastName') }}: </v-col>
-          <v-col class="text-body"> {{ personStore.createdPerson.person.name.familienname }}</v-col>
+          <v-col class="text-body"
+            ><span data-testid="created-person-familienname">{{
+              personStore.createdPerson.person.name.familienname
+            }}</span></v-col
+          >
         </v-row>
         <v-row>
           <v-col class="text-body bold text-right"> {{ $t('person.userName') }}: </v-col>
-          <v-col class="text-body"> {{ personStore.createdPerson.person.referrer }}</v-col>
+          <v-col class="text-body"
+            ><span data-testid="created-person-username">{{ personStore.createdPerson.person.referrer }}</span></v-col
+          >
         </v-row>
         <v-row class="align-center">
-          <v-col class="text-body bold text-right pb-8"> {{ $t('admin.person.startPassword') }}: </v-col>
+          <v-col class="text-body bold text-right pb-8">{{ $t('admin.person.startPassword') }}: </v-col>
           <v-col class="text-body">
             <PasswordOutput :password="personStore.createdPerson.person.startpasswort"></PasswordOutput>
           </v-col>
         </v-row>
         <v-row>
           <v-col class="text-body bold text-right"> {{ $t('admin.rolle.rolle') }}: </v-col>
-          <v-col class="text-body"> {{ translatedRollenname }}</v-col>
+          <v-col class="text-body"
+            ><span data-testid="created-person-rolle">{{ translatedRollenname }}</span></v-col
+          >
         </v-row>
         <v-row>
           <v-col class="text-body bold text-right"> {{ $t('admin.organisation.organisation') }}: </v-col>
-          <v-col class="text-body"> {{ translatedOrganisationsname }}</v-col>
+          <v-col class="text-body"
+            ><span data-testid="created-person-organisation">{{ translatedOrganisationsname }}</span></v-col
+          >
         </v-row>
         <v-divider
           class="border-opacity-100 rounded my-6"
