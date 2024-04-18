@@ -508,28 +508,38 @@
               {{ $t('admin.administrationsebene.administrationsebene') }}:
             </v-col>
             <v-col class="text-body">
-              {{
-                `${organisationStore.currentOrganisation?.kennung} (${organisationStore.currentOrganisation?.name})`
-              }}</v-col
-            >
+              <span data-testid="created-rolle-administrationsebene">
+                {{
+                  `${organisationStore.currentOrganisation?.kennung} (${organisationStore.currentOrganisation?.name})`
+                }}
+              </span>
+            </v-col>
           </v-row>
           <v-row>
             <v-col class="text-body bold text-right"> {{ $t('admin.rolle.rollenart') }}: </v-col>
             <v-col class="text-body">
-              {{ $t(`admin.rolle.mappingFrontBackEnd.rollenarten.${rolleStore.createdRolle.rollenart}`) }}</v-col
-            >
+              <span data-testid="created-rolle-rollenart">
+                {{ $t(`admin.rolle.mappingFrontBackEnd.rollenarten.${rolleStore.createdRolle.rollenart}`) }}
+              </span>
+            </v-col>
           </v-row>
           <v-row>
             <v-col class="text-body bold text-right"> {{ $t('admin.rolle.rollenname') }}:</v-col>
-            <v-col class="text-body">{{ rolleStore.createdRolle.name }} </v-col>
+            <v-col class="text-body"
+              ><span data-testid="created-rolle-name">{{ rolleStore.createdRolle.name }}</span></v-col
+            >
           </v-row>
           <v-row>
             <v-col class="text-body bold text-right"> {{ $t('admin.rolle.merkmale') }}:</v-col>
-            <v-col class="text-body"> {{ translatedCreatedRolleMerkmale }}</v-col></v-row
+            <v-col class="text-body"
+              ><span data-testid="created-rolle-merkmale">{{ translatedCreatedRolleMerkmale }}</span></v-col
+            ></v-row
           >
           <v-row>
             <v-col class="text-body bold text-right"> {{ $t('admin.rolle.systemrechte') }}:</v-col>
-            <v-col class="text-body"> {{ translatedCreatedSystemrecht }}</v-col></v-row
+            <v-col class="text-body"
+              ><span data-testid="created-rolle-systemrecht">{{ translatedCreatedSystemrecht }}</span></v-col
+            ></v-row
           >
           <v-divider
             class="border-opacity-100 rounded my-6"

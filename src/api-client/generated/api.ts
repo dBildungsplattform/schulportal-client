@@ -38,7 +38,11 @@ export interface AddSystemrechtBodyParams {
 }
 
 export const AddSystemrechtBodyParamsSystemRechtEnum = {
-    RollenVerwalten: 'ROLLEN_VERWALTEN'
+    RollenVerwalten: 'ROLLEN_VERWALTEN',
+    PersonenVerwalten: 'PERSONEN_VERWALTEN',
+    SchulenVerwalten: 'SCHULEN_VERWALTEN',
+    KlassenVerwalten: 'KLASSEN_VERWALTEN',
+    SchultraegerVerwalten: 'SCHULTRAEGER_VERWALTEN'
 } as const;
 
 export type AddSystemrechtBodyParamsSystemRechtEnum = typeof AddSystemrechtBodyParamsSystemRechtEnum[keyof typeof AddSystemrechtBodyParamsSystemRechtEnum];
@@ -317,7 +321,11 @@ export const CreateRolleBodyParamsMerkmaleEnum = {
 
 export type CreateRolleBodyParamsMerkmaleEnum = typeof CreateRolleBodyParamsMerkmaleEnum[keyof typeof CreateRolleBodyParamsMerkmaleEnum];
 export const CreateRolleBodyParamsSystemrechteEnum = {
-    RollenVerwalten: 'ROLLEN_VERWALTEN'
+    RollenVerwalten: 'ROLLEN_VERWALTEN',
+    PersonenVerwalten: 'PERSONEN_VERWALTEN',
+    SchulenVerwalten: 'SCHULEN_VERWALTEN',
+    KlassenVerwalten: 'KLASSEN_VERWALTEN',
+    SchultraegerVerwalten: 'SCHULTRAEGER_VERWALTEN'
 } as const;
 
 export type CreateRolleBodyParamsSystemrechteEnum = typeof CreateRolleBodyParamsSystemrechteEnum[keyof typeof CreateRolleBodyParamsSystemrechteEnum];
@@ -1166,7 +1174,11 @@ export const RolleResponseMerkmaleEnum = {
 
 export type RolleResponseMerkmaleEnum = typeof RolleResponseMerkmaleEnum[keyof typeof RolleResponseMerkmaleEnum];
 export const RolleResponseSystemrechteEnum = {
-    RollenVerwalten: 'ROLLEN_VERWALTEN'
+    RollenVerwalten: 'ROLLEN_VERWALTEN',
+    PersonenVerwalten: 'PERSONEN_VERWALTEN',
+    SchulenVerwalten: 'SCHULEN_VERWALTEN',
+    KlassenVerwalten: 'KLASSEN_VERWALTEN',
+    SchultraegerVerwalten: 'SCHULTRAEGER_VERWALTEN'
 } as const;
 
 export type RolleResponseSystemrechteEnum = typeof RolleResponseSystemrechteEnum[keyof typeof RolleResponseSystemrechteEnum];
@@ -1276,7 +1288,11 @@ export const RolleWithServiceProvidersResponseMerkmaleEnum = {
 
 export type RolleWithServiceProvidersResponseMerkmaleEnum = typeof RolleWithServiceProvidersResponseMerkmaleEnum[keyof typeof RolleWithServiceProvidersResponseMerkmaleEnum];
 export const RolleWithServiceProvidersResponseSystemrechteEnum = {
-    RollenVerwalten: 'ROLLEN_VERWALTEN'
+    RollenVerwalten: 'ROLLEN_VERWALTEN',
+    PersonenVerwalten: 'PERSONEN_VERWALTEN',
+    SchulenVerwalten: 'SCHULEN_VERWALTEN',
+    KlassenVerwalten: 'KLASSEN_VERWALTEN',
+    SchultraegerVerwalten: 'SCHULTRAEGER_VERWALTEN'
 } as const;
 
 export type RolleWithServiceProvidersResponseSystemrechteEnum = typeof RolleWithServiceProvidersResponseSystemrechteEnum[keyof typeof RolleWithServiceProvidersResponseSystemrechteEnum];
@@ -1337,6 +1353,12 @@ export interface ServiceProviderResponse {
     'name': string;
     /**
      * 
+     * @type {ServiceProviderTarget}
+     * @memberof ServiceProviderResponse
+     */
+    'target': ServiceProviderTarget;
+    /**
+     * Can be undefined, if `target` is not equal to `URL`
      * @type {string}
      * @memberof ServiceProviderResponse
      */
@@ -1359,6 +1381,20 @@ export interface ServiceProviderResponse {
 /**
  * 
  * @export
+ * @enum {string}
+ */
+
+export const ServiceProviderTarget = {
+    Url: 'URL',
+    SchulportalAdministration: 'SCHULPORTAL_ADMINISTRATION'
+} as const;
+
+export type ServiceProviderTarget = typeof ServiceProviderTarget[keyof typeof ServiceProviderTarget];
+
+
+/**
+ * 
+ * @export
  * @interface SystemrechtResponse
  */
 export interface SystemrechtResponse {
@@ -1368,6 +1404,30 @@ export interface SystemrechtResponse {
      * @memberof SystemrechtResponse
      */
     'ROLLEN_VERWALTEN': Array<OrganisationResponse>;
+    /**
+     * 
+     * @type {Array<OrganisationResponse>}
+     * @memberof SystemrechtResponse
+     */
+    'KLASSEN_VERWALTEN': Array<OrganisationResponse>;
+    /**
+     * 
+     * @type {Array<OrganisationResponse>}
+     * @memberof SystemrechtResponse
+     */
+    'SCHULEN_VERWALTEN': Array<OrganisationResponse>;
+    /**
+     * 
+     * @type {Array<OrganisationResponse>}
+     * @memberof SystemrechtResponse
+     */
+    'PERSONEN_VERWALTEN': Array<OrganisationResponse>;
+    /**
+     * 
+     * @type {Array<OrganisationResponse>}
+     * @memberof SystemrechtResponse
+     */
+    'SCHULTRAEGER_VERWALTEN': Array<OrganisationResponse>;
 }
 /**
  * 
@@ -1595,6 +1655,12 @@ export interface UserinfoResponse {
      * @type {string}
      * @memberof UserinfoResponse
      */
+    'personId': string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserinfoResponse
+     */
     'name': string | null;
     /**
      * 
@@ -1692,12 +1758,6 @@ export interface UserinfoResponse {
      * @memberof UserinfoResponse
      */
     'updated_at': number | null;
-    /**
-     * 
-     * @type {string}
-     * @memberof UserinfoResponse
-     */
-    'personId': string | null;
 }
 
 /**
@@ -4518,11 +4578,11 @@ export const PersonenkontexteApiAxiosParamCreator = function (configuration?: Co
         /**
          * 
          * @param {string} personId The id for the account.
-         * @param {'ROLLEN_VERWALTEN'} systemRecht 
+         * @param {'ROLLEN_VERWALTEN' | 'PERSONEN_VERWALTEN' | 'SCHULEN_VERWALTEN' | 'KLASSEN_VERWALTEN' | 'SCHULTRAEGER_VERWALTEN'} systemRecht 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        personenkontextControllerHatSystemRecht: async (personId: string, systemRecht: 'ROLLEN_VERWALTEN', options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        personenkontextControllerHatSystemRecht: async (personId: string, systemRecht: 'ROLLEN_VERWALTEN' | 'PERSONEN_VERWALTEN' | 'SCHULEN_VERWALTEN' | 'KLASSEN_VERWALTEN' | 'SCHULTRAEGER_VERWALTEN', options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'personId' is not null or undefined
             assertParamExists('personenkontextControllerHatSystemRecht', 'personId', personId)
             // verify required parameter 'systemRecht' is not null or undefined
@@ -4659,11 +4719,11 @@ export const PersonenkontexteApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @param {string} personId The id for the account.
-         * @param {'ROLLEN_VERWALTEN'} systemRecht 
+         * @param {'ROLLEN_VERWALTEN' | 'PERSONEN_VERWALTEN' | 'SCHULEN_VERWALTEN' | 'KLASSEN_VERWALTEN' | 'SCHULTRAEGER_VERWALTEN'} systemRecht 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async personenkontextControllerHatSystemRecht(personId: string, systemRecht: 'ROLLEN_VERWALTEN', options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SystemrechtResponse>> {
+        async personenkontextControllerHatSystemRecht(personId: string, systemRecht: 'ROLLEN_VERWALTEN' | 'PERSONEN_VERWALTEN' | 'SCHULEN_VERWALTEN' | 'KLASSEN_VERWALTEN' | 'SCHULTRAEGER_VERWALTEN', options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SystemrechtResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.personenkontextControllerHatSystemRecht(personId, systemRecht, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -4724,11 +4784,11 @@ export const PersonenkontexteApiFactory = function (configuration?: Configuratio
         /**
          * 
          * @param {string} personId The id for the account.
-         * @param {'ROLLEN_VERWALTEN'} systemRecht 
+         * @param {'ROLLEN_VERWALTEN' | 'PERSONEN_VERWALTEN' | 'SCHULEN_VERWALTEN' | 'KLASSEN_VERWALTEN' | 'SCHULTRAEGER_VERWALTEN'} systemRecht 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        personenkontextControllerHatSystemRecht(personId: string, systemRecht: 'ROLLEN_VERWALTEN', options?: any): AxiosPromise<SystemrechtResponse> {
+        personenkontextControllerHatSystemRecht(personId: string, systemRecht: 'ROLLEN_VERWALTEN' | 'PERSONEN_VERWALTEN' | 'SCHULEN_VERWALTEN' | 'KLASSEN_VERWALTEN' | 'SCHULTRAEGER_VERWALTEN', options?: any): AxiosPromise<SystemrechtResponse> {
             return localVarFp.personenkontextControllerHatSystemRecht(personId, systemRecht, options).then((request) => request(axios, basePath));
         },
         /**
@@ -4786,12 +4846,12 @@ export interface PersonenkontexteApiInterface {
     /**
      * 
      * @param {string} personId The id for the account.
-     * @param {'ROLLEN_VERWALTEN'} systemRecht 
+     * @param {'ROLLEN_VERWALTEN' | 'PERSONEN_VERWALTEN' | 'SCHULEN_VERWALTEN' | 'KLASSEN_VERWALTEN' | 'SCHULTRAEGER_VERWALTEN'} systemRecht 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PersonenkontexteApiInterface
      */
-    personenkontextControllerHatSystemRecht(personId: string, systemRecht: 'ROLLEN_VERWALTEN', options?: AxiosRequestConfig): AxiosPromise<SystemrechtResponse>;
+    personenkontextControllerHatSystemRecht(personId: string, systemRecht: 'ROLLEN_VERWALTEN' | 'PERSONEN_VERWALTEN' | 'SCHULEN_VERWALTEN' | 'KLASSEN_VERWALTEN' | 'SCHULTRAEGER_VERWALTEN', options?: AxiosRequestConfig): AxiosPromise<SystemrechtResponse>;
 
     /**
      * 
@@ -4854,12 +4914,12 @@ export class PersonenkontexteApi extends BaseAPI implements PersonenkontexteApiI
     /**
      * 
      * @param {string} personId The id for the account.
-     * @param {'ROLLEN_VERWALTEN'} systemRecht 
+     * @param {'ROLLEN_VERWALTEN' | 'PERSONEN_VERWALTEN' | 'SCHULEN_VERWALTEN' | 'KLASSEN_VERWALTEN' | 'SCHULTRAEGER_VERWALTEN'} systemRecht 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PersonenkontexteApi
      */
-    public personenkontextControllerHatSystemRecht(personId: string, systemRecht: 'ROLLEN_VERWALTEN', options?: AxiosRequestConfig) {
+    public personenkontextControllerHatSystemRecht(personId: string, systemRecht: 'ROLLEN_VERWALTEN' | 'PERSONEN_VERWALTEN' | 'SCHULEN_VERWALTEN' | 'KLASSEN_VERWALTEN' | 'SCHULTRAEGER_VERWALTEN', options?: AxiosRequestConfig) {
         return PersonenkontexteApiFp(this.configuration).personenkontextControllerHatSystemRecht(personId, systemRecht, options).then((request) => request(this.axios, this.basePath));
     }
 

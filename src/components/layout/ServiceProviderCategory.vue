@@ -6,6 +6,11 @@
     categoryTitle: string;
     serviceProviders: Array<ServiceProvider>;
   }>();
+
+  function getInternalServiceProviderUrl(target: string): string {
+    if (target === 'SCHULPORTAL_ADMINISTRATION') return '/admin/personen';
+    return '';
+  }
 </script>
 
 <template>
@@ -29,8 +34,12 @@
         lg="4"
       >
         <ServiceProviderCard
-          :href="serviceProvider.url"
-          :newTab="serviceProvider.id !== 'spsh-administration-service-provider'"
+          :href="
+            serviceProvider.target === 'URL'
+              ? serviceProvider.url
+              : getInternalServiceProviderUrl(serviceProvider.target)
+          "
+          :newTab="serviceProvider.target === 'URL'"
           :testId="`service-provider-card-${serviceProvider.id}`"
           :title="serviceProvider.name"
           :logoUrl="serviceProvider.logoUrl"
