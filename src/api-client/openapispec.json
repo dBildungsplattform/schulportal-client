@@ -1205,7 +1205,11 @@
                         "in": "query",
                         "schema": {
                             "enum": [
-                                "ROLLEN_VERWALTEN"
+                                "ROLLEN_VERWALTEN",
+                                "PERSONEN_VERWALTEN",
+                                "SCHULEN_VERWALTEN",
+                                "KLASSEN_VERWALTEN",
+                                "SCHULTRAEGER_VERWALTEN"
                             ],
                             "type": "string"
                         }
@@ -3133,10 +3137,38 @@
                         "items": {
                             "$ref": "#/components/schemas/OrganisationResponse"
                         }
+                    },
+                    "KLASSEN_VERWALTEN": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/OrganisationResponse"
+                        }
+                    },
+                    "SCHULEN_VERWALTEN": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/OrganisationResponse"
+                        }
+                    },
+                    "PERSONEN_VERWALTEN": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/OrganisationResponse"
+                        }
+                    },
+                    "SCHULTRAEGER_VERWALTEN": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/OrganisationResponse"
+                        }
                     }
                 },
                 "required": [
-                    "ROLLEN_VERWALTEN"
+                    "ROLLEN_VERWALTEN",
+                    "KLASSEN_VERWALTEN",
+                    "SCHULEN_VERWALTEN",
+                    "PERSONEN_VERWALTEN",
+                    "SCHULTRAEGER_VERWALTEN"
                 ]
             },
             "UpdatePersonenkontextBodyParams": {
@@ -3277,7 +3309,11 @@
                         "items": {
                             "type": "string",
                             "enum": [
-                                "ROLLEN_VERWALTEN"
+                                "ROLLEN_VERWALTEN",
+                                "PERSONEN_VERWALTEN",
+                                "SCHULEN_VERWALTEN",
+                                "KLASSEN_VERWALTEN",
+                                "SCHULTRAEGER_VERWALTEN"
                             ]
                         }
                     }
@@ -3507,7 +3543,11 @@
                         "items": {
                             "type": "string",
                             "enum": [
-                                "ROLLEN_VERWALTEN"
+                                "ROLLEN_VERWALTEN",
+                                "PERSONEN_VERWALTEN",
+                                "SCHULEN_VERWALTEN",
+                                "KLASSEN_VERWALTEN",
+                                "SCHULTRAEGER_VERWALTEN"
                             ]
                         }
                     },
@@ -3567,7 +3607,11 @@
                         "items": {
                             "type": "string",
                             "enum": [
-                                "ROLLEN_VERWALTEN"
+                                "ROLLEN_VERWALTEN",
+                                "PERSONEN_VERWALTEN",
+                                "SCHULEN_VERWALTEN",
+                                "KLASSEN_VERWALTEN",
+                                "SCHULTRAEGER_VERWALTEN"
                             ]
                         }
                     }
@@ -3586,7 +3630,11 @@
                     "systemRecht": {
                         "type": "string",
                         "enum": [
-                            "ROLLEN_VERWALTEN"
+                            "ROLLEN_VERWALTEN",
+                            "PERSONEN_VERWALTEN",
+                            "SCHULEN_VERWALTEN",
+                            "KLASSEN_VERWALTEN",
+                            "SCHULTRAEGER_VERWALTEN"
                         ]
                     }
                 },

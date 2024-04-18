@@ -5,7 +5,7 @@
   import PasswordReset from '@/components/admin/PasswordReset.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
-  import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenKontextStore';
+  import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
 
   const route: RouteLocationNormalizedLoaded = useRoute();
   const router: Router = useRouter();
@@ -25,8 +25,16 @@
     });
   }
 
-  function truncateSskName(sskName: string): string {
-    return sskName.length > 30 ? `${sskName.substring(0, 30)}...` : sskName;
+  function getSskName(sskDstNr: string, sskName: string): string {
+    /* truncate ssk name */
+    const truncatededSskName: string = sskName.length > 30 ? `${sskName.substring(0, 30)}...` : sskName;
+
+    /* omit parens when there is no ssk kennung  */
+    if (sskDstNr) {
+      return `${sskDstNr} (${truncatededSskName})`;
+    } else {
+      return truncatededSskName;
+    }
   }
 
   const handleAlertClose = (): void => {
@@ -223,9 +231,10 @@
             >
               <h3
                 class="text-body"
+                :data-testid="`person-zuordnung-${zuordnung.sskId}`"
                 :title="zuordnung.sskName"
               >
-                {{ zuordnung.sskDstNr }} ({{ truncateSskName(zuordnung.sskName) }}): {{ zuordnung.rolle }}
+                {{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
               </h3>
             </v-col>
           </v-row>
@@ -246,3 +255,4 @@
 </template>
 
 <style></style>
+@/stores/PersonenkontextStore

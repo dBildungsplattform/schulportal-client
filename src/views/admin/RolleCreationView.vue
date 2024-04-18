@@ -166,6 +166,15 @@
     rolleStore.createdRolle = null;
   }
 
+  function getSskName(sskDstNr: string | null | undefined, sskName: string | null | undefined): string {
+    /* omit parens when there is no ssk kennung  */
+    if (sskDstNr) {
+      return `${sskDstNr} (${sskName})`;
+    } else {
+      return sskName || '';
+    }
+  }
+
   const translatedCreatedRolleMerkmale: ComputedRef<string> = computed(() => {
     if (!rolleStore.createdRolle?.merkmale || Array.from(rolleStore.createdRolle.merkmale).length === 0) {
       return '-';
@@ -197,7 +206,7 @@
   > = computed(() =>
     organisationStore.allOrganisationen.map((org: Organisation) => ({
       value: org.id,
-      title: `${org.kennung ?? ''} (${org.name})`,
+      title: org.kennung ? `${org.kennung} (${org.name})` : org.name,
     })),
   );
 
@@ -442,7 +451,10 @@
             <v-col class="text-body">
               <span data-testid="created-rolle-administrationsebene">
                 {{
-                  `${organisationStore.currentOrganisation?.kennung} (${organisationStore.currentOrganisation?.name})`
+                  getSskName(
+                    organisationStore.currentOrganisation?.kennung,
+                    organisationStore.currentOrganisation?.name,
+                  )
                 }}
               </span>
             </v-col>

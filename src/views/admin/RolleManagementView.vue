@@ -43,7 +43,9 @@
       // If a matching organization is found, format the administeredBySchulstrukturknoten field accordingly
       let administeredBySchulstrukturknoten: string = '';
       if (matchingOrganisation) {
-        administeredBySchulstrukturknoten = `${matchingOrganisation.kennung ?? ''} (${matchingOrganisation.name})`;
+        administeredBySchulstrukturknoten = matchingOrganisation.kennung
+          ? `${matchingOrganisation.kennung} (${matchingOrganisation.name})`
+          : matchingOrganisation.name;
       }
 
       const formattedMerkmale: string =
