@@ -166,6 +166,15 @@
     rolleStore.createdRolle = null;
   }
 
+  function getSskName(sskDstNr: string | undefined, sskName: string | undefined): string {
+    /* omit parens when there is no ssk kennung  */
+    if (sskDstNr) {
+      return `${sskDstNr} (${sskName})`;
+    } else {
+      return sskName || '';
+    }
+  }
+
   const translatedCreatedRolleMerkmale: ComputedRef<string> = computed(() => {
     if (!rolleStore.createdRolle?.merkmale || Array.from(rolleStore.createdRolle.merkmale).length === 0) {
       return '-';
@@ -441,9 +450,7 @@
             </v-col>
             <v-col class="text-body">
               <span data-testid="created-rolle-administrationsebene">
-                {{
-                  `${organisationStore.currentOrganisation?.kennung} (${organisationStore.currentOrganisation?.name})`
-                }}
+                {{ getSskName(organisationStore.currentOrganisation?.kennung, organisationStore.currentOrganisation?.name) }}
               </span>
             </v-col>
           </v-row>
