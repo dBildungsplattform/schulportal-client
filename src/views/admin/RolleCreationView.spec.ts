@@ -134,6 +134,8 @@ describe('RolleCreationView', () => {
     expect(orgSelect?.text()).toEqual('9356494 (Albert-Emil-Hansebrot-Gymnasium)');
     expect(rollenartSelect?.text()).toEqual('Lern');
 
+    // TODO: meaningfully expand this test
+
     // expect(rollennameInput?.exists()).toBe(true);
 
     wrapper?.find('[data-testid="close-layout-card-button"]').trigger('click');
