@@ -4,7 +4,7 @@
     usePersonenkontextStore,
     type PersonenkontextStore,
     type SystemrechtResponse,
-  } from '@/stores/PersonenKontextStore';
+  } from '@/stores/PersonenkontextStore';
   import { type Ref, ref, type ComputedRef } from 'vue';
   import { onMounted } from 'vue';
   import { useDisplay } from 'vuetify';
@@ -141,6 +141,7 @@
     ></v-list-item>
     <v-list-item
       class="menu-bar-sub-item caption"
+      @click="closeMenuOnMobile"
       data-testid="person-creation-menu-item"
       prepend-icon="mdi-plus-circle-outline"
       :title="$t('admin.person.createNew')"
@@ -194,7 +195,8 @@
     ></v-list-item>
     <v-list-item
       class="menu-bar-sub-item caption"
-      data-testid="rolle-creation-menu-item"
+      @click="closeMenuOnMobile"
+      data-testid="schule-creation-menu-item"
       prepend-icon="mdi-plus-circle-outline"
       :title="$t('admin.schule.createNew')"
       to="/admin/schulen/new"
@@ -209,3 +211,4 @@
 </template>
 
 <style></style>
+@/stores/PersonenkontextStore

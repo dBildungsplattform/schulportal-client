@@ -1200,6 +1200,109 @@ export interface RolleServiceProviderResponse {
 /**
  * 
  * @export
+ * @interface RolleWithServiceProvidersResponse
+ */
+export interface RolleWithServiceProvidersResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof RolleWithServiceProvidersResponse
+     */
+    'id': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RolleWithServiceProvidersResponse
+     */
+    'createdAt': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RolleWithServiceProvidersResponse
+     */
+    'updatedAt': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RolleWithServiceProvidersResponse
+     */
+    'name': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RolleWithServiceProvidersResponse
+     */
+    'administeredBySchulstrukturknoten': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RolleWithServiceProvidersResponse
+     */
+    'rollenart': RolleWithServiceProvidersResponseRollenartEnum;
+    /**
+     * 
+     * @type {Set<string>}
+     * @memberof RolleWithServiceProvidersResponse
+     */
+    'merkmale': Set<RolleWithServiceProvidersResponseMerkmaleEnum>;
+    /**
+     * 
+     * @type {Set<string>}
+     * @memberof RolleWithServiceProvidersResponse
+     */
+    'systemrechte': Set<RolleWithServiceProvidersResponseSystemrechteEnum>;
+    /**
+     * 
+     * @type {Array<ServiceProviderIdNameResponse>}
+     * @memberof RolleWithServiceProvidersResponse
+     */
+    'serviceProviders': Array<ServiceProviderIdNameResponse>;
+}
+
+export const RolleWithServiceProvidersResponseRollenartEnum = {
+    Lern: 'LERN',
+    Lehr: 'LEHR',
+    Extern: 'EXTERN',
+    Orgadmin: 'ORGADMIN',
+    Leit: 'LEIT',
+    Sysadmin: 'SYSADMIN'
+} as const;
+
+export type RolleWithServiceProvidersResponseRollenartEnum = typeof RolleWithServiceProvidersResponseRollenartEnum[keyof typeof RolleWithServiceProvidersResponseRollenartEnum];
+export const RolleWithServiceProvidersResponseMerkmaleEnum = {
+    BefristungPflicht: 'BEFRISTUNG_PFLICHT',
+    KopersPflicht: 'KOPERS_PFLICHT'
+} as const;
+
+export type RolleWithServiceProvidersResponseMerkmaleEnum = typeof RolleWithServiceProvidersResponseMerkmaleEnum[keyof typeof RolleWithServiceProvidersResponseMerkmaleEnum];
+export const RolleWithServiceProvidersResponseSystemrechteEnum = {
+    RollenVerwalten: 'ROLLEN_VERWALTEN'
+} as const;
+
+export type RolleWithServiceProvidersResponseSystemrechteEnum = typeof RolleWithServiceProvidersResponseSystemrechteEnum[keyof typeof RolleWithServiceProvidersResponseSystemrechteEnum];
+
+/**
+ * 
+ * @export
+ * @interface ServiceProviderIdNameResponse
+ */
+export interface ServiceProviderIdNameResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof ServiceProviderIdNameResponse
+     */
+    'id': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ServiceProviderIdNameResponse
+     */
+    'name': string;
+}
+/**
+ * 
+ * @export
  * @enum {string}
  */
 
@@ -1234,6 +1337,12 @@ export interface ServiceProviderResponse {
     'name': string;
     /**
      * 
+     * @type {ServiceProviderTarget}
+     * @memberof ServiceProviderResponse
+     */
+    'target': ServiceProviderTarget;
+    /**
+     * Can be undefined, if `target` is not equal to `URL`
      * @type {string}
      * @memberof ServiceProviderResponse
      */
@@ -1251,6 +1360,20 @@ export interface ServiceProviderResponse {
      */
     'hasLogo': boolean;
 }
+
+
+/**
+ * 
+ * @export
+ * @enum {string}
+ */
+
+export const ServiceProviderTarget = {
+    Url: 'URL',
+    SchulportalAdministration: 'SCHULPORTAL_ADMINISTRATION'
+} as const;
+
+export type ServiceProviderTarget = typeof ServiceProviderTarget[keyof typeof ServiceProviderTarget];
 
 
 /**
@@ -5298,7 +5421,7 @@ export const RolleApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async rolleControllerFindRollen(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<RolleResponse>>> {
+        async rolleControllerFindRollen(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<RolleWithServiceProvidersResponse>>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.rolleControllerFindRollen(options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -5373,7 +5496,7 @@ export const RolleApiFactory = function (configuration?: Configuration, basePath
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        rolleControllerFindRollen(options?: any): AxiosPromise<Array<RolleResponse>> {
+        rolleControllerFindRollen(options?: any): AxiosPromise<Array<RolleWithServiceProvidersResponse>> {
             return localVarFp.rolleControllerFindRollen(options).then((request) => request(axios, basePath));
         },
         /**
@@ -5445,7 +5568,7 @@ export interface RolleApiInterface {
      * @throws {RequiredError}
      * @memberof RolleApiInterface
      */
-    rolleControllerFindRollen(options?: AxiosRequestConfig): AxiosPromise<Array<RolleResponse>>;
+    rolleControllerFindRollen(options?: AxiosRequestConfig): AxiosPromise<Array<RolleWithServiceProvidersResponse>>;
 
     /**
      * Get service-providers for a rolle by its id.

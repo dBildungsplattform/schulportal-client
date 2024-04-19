@@ -10,7 +10,7 @@
     type PersonenkontextStore,
     type Uebersicht,
     type Zuordnung,
-  } from '@/stores/PersonenKontextStore';
+  } from '@/stores/PersonenkontextStore';
   import { useRolleStore, type RolleStore, type RolleResponse } from '@/stores/RolleStore';
   import ResultTable from '@/components/admin/ResultTable.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
@@ -51,15 +51,17 @@
       }))
       .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
   });
+
   const rollen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
     return rolleStore.allRollen
-      .slice(0, 25)
-      .map((rolle: RolleResponse) => ({
-        value: rolle.id,
-        title: rolle.name,
-      }))
-      .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
-    });
+    .slice(0, 25)
+    .map((rolle: RolleResponse) => ({
+      value: rolle.id,
+      title: rolle.name,
+    }))
+    .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
+  });
+  
   const klassen: Array<string> = ['Klasse', 'Nicht so klasse'];
   const statuses: Array<string> = ['Aktiv', 'Inaktiv'];
   
@@ -118,7 +120,7 @@
 
 <template>
   <div class="admin">
-    <h1 class="text-center headline">{{ $t('admin.headline') }}</h1>
+    <h1 class="text-center headline" data-testid="admin-headline">{{ $t('admin.headline') }}</h1>
     <LayoutCard :header="$t('admin.person.management')">
       <v-row
         align="center"
@@ -257,3 +259,4 @@
 </template>
 
 <style></style>
+@/stores/PersonenkontextStore
