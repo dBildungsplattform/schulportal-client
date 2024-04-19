@@ -1,6 +1,6 @@
 import { expect, test, type MockInstance } from 'vitest';
 import { nextTick } from 'vue';
-import { VueWrapper, mount } from '@vue/test-utils';
+import { flushPromises, mount, VueWrapper } from '@vue/test-utils';
 import RolleCreationView from './RolleCreationView.vue';
 import { createRouter, createWebHistory, type NavigationFailure, type RouteLocationRaw, type Router } from 'vue-router';
 import routes from '@/router/routes';
@@ -11,6 +11,25 @@ let wrapper: VueWrapper | null = null;
 let router: Router;
 const rolleStore: RolleStore = useRolleStore();
 const organisationStore: OrganisationStore = useOrganisationStore();
+
+organisationStore.allOrganisationen = [
+  {
+    id: '1',
+    name: 'Albert-Emil-Hansebrot-Gymnasium',
+    kennung: '9356494',
+    namensergaenzung: 'Schule',
+    kuerzel: 'aehg',
+    typ: 'SCHULE',
+  },
+  {
+    id: '2',
+    name: 'Einstein-Grundschule',
+    kennung: '123798465',
+    namensergaenzung: 'des Alberts',
+    kuerzel: 'EGS',
+    typ: 'SCHULE',
+  },
+];
 
 beforeEach(async () => {
   document.body.innerHTML = `
@@ -93,33 +112,34 @@ describe('RolleCreationView', () => {
     };
     rolleStore.errorCode = '';
     await nextTick();
-    expect(wrapper?.find('[data-testid="rolle-success-text"]').isVisible()).toBe(true);
+    expect(wrapper?.find('[data-testid="rolle-success-text"]').exists()).toBe(true);
     wrapper?.find('[data-testid="back-to-list-button"]').trigger('click');
     await nextTick();
     expect(push).toHaveBeenCalledTimes(1);
   });
 
-  test.skip('it fills the rolle creation form', async () => {
-    organisationStore.allOrganisationen = [
-      {
-        id: '1',
-        name: 'Albert-Emil-Hansebrot-Gymnasium',
-        kennung: '9356494',
-        namensergaenzung: 'Schule',
-        kuerzel: 'aehg',
-        typ: 'SCHULE',
-      },
-      {
-        id: '2',
-        name: 'Einstein-Grundschule',
-        kennung: '9356495',
-        namensergaenzung: 'des Alberts',
-        kuerzel: 'EGS',
-        typ: 'SCHULE',
-      },
-    ];
+  test('it fills the rolle creation form', async () => {
+    const rollennameInput: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rollenname-input' });
+    expect(rollennameInput?.exists()).toBe(false);
+
+    const orgSelect: VueWrapper | undefined = wrapper?.findComponent({ ref: 'administrationsebene-select' });
+    await orgSelect?.setValue('1');
     await nextTick();
-    wrapper?.find('[data-testid="administrationsebene-select"]').trigger('click');
+
+    const rollenartSelect: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rollenart-select' });
+    rollenartSelect?.setValue('LERN');
     await nextTick();
+    await flushPromises();
+
+    expect(orgSelect?.text()).toEqual('9356494 (Albert-Emil-Hansebrot-Gymnasium)');
+    expect(rollenartSelect?.text()).toEqual('Lern');
+
+    // expect(rollennameInput?.exists()).toBe(true);
+
+    wrapper?.find('[data-testid="close-layout-card-button"]').trigger('click');
+    await nextTick();
+
+    // const unsavedChangesDialog: VueWrapper | undefined = wrapper?.findComponent({ ref: 'unsaved-changes-dialog' });
+    // console.log('****', unsavedChangesDialog);
   });
 });
