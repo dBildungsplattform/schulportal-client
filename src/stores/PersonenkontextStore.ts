@@ -21,7 +21,7 @@ import axiosApiInstance from '@/services/ApiService';
 
 const personenKontextApi: PersonenkontextApiInterface = PersonenkontextApiFactory(undefined, '', axiosApiInstance);
 const personenKontexteApi: PersonenkontexteApiInterface = PersonenkontexteApiFactory(undefined, '', axiosApiInstance);
-const dbiamPersonenKontexteApi: DbiamPersonenkontexteApiInterface = DbiamPersonenkontexteApiFactory(
+const dbiamPersonenkontexteApi: DbiamPersonenkontexteApiInterface = DbiamPersonenkontexteApiFactory(
   undefined,
   '',
   axiosApiInstance,
@@ -161,7 +161,7 @@ export const usePersonenkontextStore: StoreDefinition<
       this.loading = true;
       try {
         const { data }: { data: DBiamPersonenkontextResponse } =
-          await dbiamPersonenKontexteApi.dBiamPersonenkontextControllerCreatePersonenkontext(personenkontext);
+          await dbiamPersonenkontexteApi.dBiamPersonenkontextControllerCreatePersonenkontext(personenkontext);
         this.createdPersonenkontext = data;
         return data;
       } catch (error: unknown) {

@@ -13,7 +13,7 @@ import ApiService from '@/services/ApiService';
 import MockAdapter from 'axios-mock-adapter';
 import { setActivePinia, createPinia } from 'pinia';
 import { rejects } from 'assert';
-import { usePersonenkontextStore, type PersonenkontextStore } from './PersonenKontextStore';
+import { usePersonenkontextStore, type PersonenkontextStore } from './PersonenkontextStore';
 
 const mockadapter: MockAdapter = new MockAdapter(ApiService);
 

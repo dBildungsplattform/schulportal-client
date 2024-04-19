@@ -25,7 +25,7 @@
   import PasswordOutput from '@/components/form/PasswordOutput.vue';
   import FormWrapper from '@/components/form/FormWrapper.vue';
   import FormRow from '@/components/form/FormRow.vue';
-  import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenKontextStore';
+  import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
   import { useDisplay } from 'vuetify';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
@@ -157,7 +157,7 @@
       .slice(0, 25)
       .map((org: OrganisationResponse) => ({
         value: org.id,
-        title: `${org.kennung} (${org.name})`,
+        title: org.kennung ? `${org.kennung} (${org.name})` : org.name,
       }))
       .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
   });
@@ -512,3 +512,4 @@
 </template>
 
 <style></style>
+@/stores/PersonenkontextStore
