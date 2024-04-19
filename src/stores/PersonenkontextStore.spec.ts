@@ -4,7 +4,6 @@ import {
   type DBiamPersonenuebersichtResponse,
   type FindRollenResponse,
   type FindSchulstrukturknotenResponse,
-  type PersonFrontendControllerFindPersons200Response,
   type SystemrechtResponse,
   OrganisationResponseTypEnum,
   RolleResponseMerkmaleEnum,
@@ -14,52 +13,19 @@ import ApiService from '@/services/ApiService';
 import MockAdapter from 'axios-mock-adapter';
 import { setActivePinia, createPinia } from 'pinia';
 import { rejects } from 'assert';
-import {
-  usePersonenkontextStore,
-  type PersonenkontextStore,
-} from './PersonenkontextStore';
-import {
-  usePersonStore,
-  type PersonendatensatzResponse,
-  type PersonStore,
-} from './PersonStore';
+import { usePersonenkontextStore, type PersonenkontextStore } from './PersonenkontextStore';
 
 const mockadapter: MockAdapter = new MockAdapter(ApiService);
 
 describe('PersonenkontextStore', () => {
-  let personStore: PersonStore;
   let personenkontextStore: PersonenkontextStore;
   beforeEach(() => {
     setActivePinia(createPinia());
-    personStore = usePersonStore();
     personenkontextStore = usePersonenkontextStore();
-    personenkontextStore.allUebersichten =  {
-      total: 0,
-      offset: 0,
-      limit: 0,
-      items: [
-        {
-          personId: '1234',
-          vorname: 'Samuel',
-          nachname: 'Vimes',
-          benutzername: 'string',
-          zuordnungen: [
-            {
-              sskId: 'string',
-              rolleId: 'string',
-              sskName: 'string',
-              sskDstNr: 'string',
-              rolle: 'string',
-            },
-          ],
-        },
-      ],
-    };
     mockadapter.reset();
   });
 
   it('should initalize state correctly', () => {
-    expect(personStore.allPersons).toEqual([]);
     expect(personenkontextStore.errorCode).toEqual('');
     expect(personenkontextStore.loading).toBe(false);
   });
@@ -79,8 +45,8 @@ describe('PersonenkontextStore', () => {
         ],
         KLASSEN_VERWALTEN: [],
         SCHULEN_VERWALTEN: [],
-        PERSONEN_VERWALTEN: [],
-        SCHULTRAEGER_VERWALTEN: [],
+        PERSONEN_VERWALTEN:[],
+        SCHULTRAEGER_VERWALTEN:[],
       };
 
       mockadapter
@@ -325,9 +291,9 @@ describe('PersonenkontextStore', () => {
         limit: 0,
         items: [
           {
-            personId: '1234',
-            vorname: 'Samuel',
-            nachname: 'Vimes',
+            personId: 'string',
+            vorname: 'string',
+            nachname: 'string',
             benutzername: 'string',
             zuordnungen: [
               {
@@ -341,30 +307,9 @@ describe('PersonenkontextStore', () => {
           },
         ],
       };
-      const mockPersons: PersonendatensatzResponse[] = [
-        {
-          person: {
-            id: '1234',
-            name: {
-              familienname: 'Vimes',
-              vorname: 'Samuel',
-            },
-          },
-        },
-      ] as PersonendatensatzResponse[];
-
-      const mockPersonsResponse: PersonFrontendControllerFindPersons200Response = {
-        offset: 0,
-        limit: 2,
-        total: 2,
-        items: mockPersons,
-      };
       mockadapter.onGet('/api/dbiam/personenuebersicht').replyOnce(200, mockResponse);
-      mockadapter.onGet('/api/personen-frontend').replyOnce(200, mockPersonsResponse, {});
       const getAllPersonenuebersichtenPromise: Promise<void> = personenkontextStore.getAllPersonenuebersichten();
-      const getAllPersonPromise: Promise<void> = personStore.getAllPersons();
       expect(personenkontextStore.loading).toBe(true);
-      await getAllPersonPromise;
       await getAllPersonenuebersichtenPromise;
       expect(personenkontextStore.allUebersichten).toEqual(mockResponse);
       expect(personenkontextStore.loading).toBe(false);
