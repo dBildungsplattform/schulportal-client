@@ -24,6 +24,7 @@
     { title: t('person.userName'), key: 'person.referrer', align: 'start' },
     { title: t('person.rolle'), key: 'rollen', align: 'start' },
     { title: t('person.zuordnungen'), key: 'administrationsebenen', align: 'start' },
+    { title: t('person.kopersnr'), key: 'person.personalnummer', align: 'start' },
   ];
 
   type PersonenWithRolleAndZuordnung = {
@@ -46,14 +47,21 @@
       );
       const rollen: string = uebersicht?.zuordnungen.length
         ? uebersicht.zuordnungen.map((zuordnung: Zuordnung) => zuordnung.rolle).join(', ')
-        : '-';
+        : '---';
       // Choose sskDstNr if available, otherwise sskName.
       const administrationsebenen: string = uebersicht?.zuordnungen.length
         ? uebersicht.zuordnungen
             .map((zuordnung: Zuordnung) => (zuordnung.sskDstNr ? zuordnung.sskDstNr : zuordnung.sskName))
             .join(', ')
-        : '-';
-      return { ...person, rollen: rollen, administrationsebenen: administrationsebenen };
+        : '---';
+      // Check if personalnummer is null, if so, replace it with "---"
+      const personalnummer: string = person.person.personalnummer ?? '---';
+      return {
+        ...person,
+        rollen: rollen,
+        administrationsebenen: administrationsebenen,
+        person: { ...person.person, personalnummer: personalnummer },
+      };
     });
   });
 

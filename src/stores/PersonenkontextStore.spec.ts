@@ -43,6 +43,10 @@ describe('PersonenkontextStore', () => {
             typ: OrganisationResponseTypEnum.Anbieter,
           },
         ],
+        KLASSEN_VERWALTEN: [],
+        SCHULEN_VERWALTEN: [],
+        PERSONEN_VERWALTEN:[],
+        SCHULTRAEGER_VERWALTEN:[],
       };
 
       mockadapter
