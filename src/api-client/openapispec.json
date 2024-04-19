@@ -201,6 +201,16 @@
                             ],
                             "type": "string"
                         }
+                    },
+                    {
+                        "name": "suchFilter",
+                        "required": true,
+                        "in": "query",
+                        "description": "Search filter used to filter for Persons. It could be the vorname, familienname, referrer or the personalnummer.",
+                        "schema": {
+                            "nullable": false,
+                            "type": "string"
+                        }
                     }
                 ],
                 "responses": {
@@ -690,6 +700,16 @@
                                 "ja",
                                 "nein"
                             ],
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "suchFilter",
+                        "required": true,
+                        "in": "query",
+                        "description": "Search filter used to filter for Persons. It could be the vorname, familienname, referrer or the personalnummer.",
+                        "schema": {
+                            "nullable": false,
                             "type": "string"
                         }
                     }

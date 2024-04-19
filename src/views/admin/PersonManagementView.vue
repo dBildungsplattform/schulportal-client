@@ -4,6 +4,7 @@
   import ResultTable from '@/components/admin/ResultTable.vue';
   import { type Composer, useI18n } from 'vue-i18n';
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
+  import LayoutCard from '@/components/cards/LayoutCard.vue';
 
   import { type Router, useRouter } from 'vue-router';
   import {
@@ -79,34 +80,34 @@
     >
       {{ $t('admin.headline') }}
     </h1>
-    <ResultTable
-      data-testid="person-table"
-      :header="$t('admin.person.management')"
-      :items="personenWithUebersicht || []"
-      :loading="personStore.loading"
-      :headers="headers"
-      @onHandleRowClick="navigateToPersonDetails"
-      @onUpdateTable="personStore.getAllPersons()"
-      :totalItems="personStore.totalPersons"
-      item-value-path="person.id"
-      ><template v-slot:[`item.rolle`]="{ item }">
-        <div
-          class="ellipsis-wrapper"
-          :title="item.rolle"
-        >
-          {{ item.rolle }}
-        </div> </template
-      ><template v-slot:[`item.administrationsebenen`]="{ item }">
-        <div
-          class="ellipsis-wrapper"
-          :title="item.administrationsebenen"
-        >
-          {{ item.administrationsebenen }}
-        </div>
-      </template></ResultTable
-    >
+    <LayoutCard :header="$t('admin.person.management')">
+      <ResultTable
+        data-testid="person-table"
+        :items="personenWithUebersicht || []"
+        :loading="personStore.loading"
+        :headers="headers"
+        @onHandleRowClick="navigateToPersonDetails"
+        @onUpdateTable="personStore.getAllPersons()"
+        :totalItems="personStore.totalPersons"
+        item-value-path="person.id"
+        ><template v-slot:[`item.rolle`]="{ item }">
+          <div
+            class="ellipsis-wrapper"
+            :title="item.rolle"
+          >
+            {{ item.rolle }}
+          </div> </template
+        ><template v-slot:[`item.administrationsebenen`]="{ item }">
+          <div
+            class="ellipsis-wrapper"
+            :title="item.administrationsebenen"
+          >
+            {{ item.administrationsebenen }}
+          </div>
+        </template></ResultTable
+      >
+    </LayoutCard>
   </div>
 </template>
 
 <style></style>
-@/stores/PersonenkontextStore
