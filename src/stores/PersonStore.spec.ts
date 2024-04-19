@@ -52,7 +52,7 @@ describe('PersonStore', () => {
       };
 
       mockadapter.onGet('/api/personen-frontend').replyOnce(200, mockResponse, {});
-      const getAllPersonPromise: Promise<void> = personStore.getAllPersons();
+      const getAllPersonPromise: Promise<void> = personStore.getAllPersons('');
       expect(personStore.loading).toBe(true);
       await getAllPersonPromise;
       expect(personStore.allPersons).toEqual([...mockPersons]);
@@ -61,7 +61,7 @@ describe('PersonStore', () => {
 
     it('should handle string error', async () => {
       mockadapter.onGet('/api/personen-frontend').replyOnce(500, 'some mock server error');
-      const getAllPersonPromise: Promise<void> = personStore.getAllPersons();
+      const getAllPersonPromise: Promise<void> = personStore.getAllPersons('');
       expect(personStore.loading).toBe(true);
       await getAllPersonPromise;
       expect(personStore.allPersons).toEqual([]);
@@ -71,7 +71,7 @@ describe('PersonStore', () => {
 
     it('should handle error code', async () => {
       mockadapter.onGet('/api/personen-frontend').replyOnce(500, { code: 'some mock server error' });
-      const getAllPersonPromise: Promise<void> = personStore.getAllPersons();
+      const getAllPersonPromise: Promise<void> = personStore.getAllPersons('');
       expect(personStore.loading).toBe(true);
       await getAllPersonPromise;
       expect(personStore.allPersons).toEqual([]);
