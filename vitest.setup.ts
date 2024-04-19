@@ -7,9 +7,15 @@ import { TestingPinia, createTestingPinia } from '@pinia/testing';
 // eslint-disable-next-line import/no-extraneous-dependencies, import/named
 import { SetupServer, setupServer } from 'msw/node';
 import requestHandlers from './src/specs/request-handlers';
+import de_locales from './src/locales/de-DE.json';
 
 const i18n: I18n = createI18n({
+  fallbackLocale: 'de',
   legacy: false,
+  locale: 'de',
+  messages: {
+    de: de_locales,
+  },
 });
 
 // TODO: how to fix i18n warnings for not found messages?

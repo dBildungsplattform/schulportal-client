@@ -70,10 +70,24 @@ describe('serviceProviderStore', () => {
   });
 
   describe('getAvailableServiceProviders', () => {
-    it('should load user\'s available service providers and update state', async () => {
+    it("should load user's available service providers and update state", async () => {
       const mockResponse: ServiceProvider[] = [
-        { id: '1234', name: 'itslearning mock', url: 'example.org/itslearning', kategorie: 'EMAIL', hasLogo: true },
-        { id: '5678', name: 'administration mock', url: '/admin', kategorie: 'VERWALTUNG', hasLogo: true },
+        {
+          id: '1234',
+          name: 'itslearning mock',
+          url: 'example.org/itslearning',
+          kategorie: 'EMAIL',
+          hasLogo: true,
+          target: 'URL',
+        },
+        {
+          id: '5678',
+          name: 'administration mock',
+          url: '/admin',
+          kategorie: 'VERWALTUNG',
+          hasLogo: true,
+          target: 'URL',
+        },
       ];
 
       mockadapter.onGet('/api/provider').replyOnce(200, mockResponse);

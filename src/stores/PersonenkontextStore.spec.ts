@@ -43,6 +43,46 @@ describe('PersonenkontextStore', () => {
             typ: OrganisationResponseTypEnum.Anbieter,
           },
         ],
+        KLASSEN_VERWALTEN: [
+          {
+            id: '1',
+            kennung: '12345',
+            name: 'Organisation 1',
+            namensergaenzung: 'Ergänzung',
+            kuerzel: 'O1',
+            typ: OrganisationResponseTypEnum.Anbieter,
+          },
+        ],
+        SCHULEN_VERWALTEN: [
+          {
+            id: '1',
+            kennung: '12345',
+            name: 'Organisation 1',
+            namensergaenzung: 'Ergänzung',
+            kuerzel: 'O1',
+            typ: OrganisationResponseTypEnum.Anbieter,
+          },
+        ],
+        PERSONEN_VERWALTEN: [
+          {
+            id: '1',
+            kennung: '12345',
+            name: 'Organisation 1',
+            namensergaenzung: 'Ergänzung',
+            kuerzel: 'O1',
+            typ: OrganisationResponseTypEnum.Anbieter,
+          },
+        ],
+        SCHULTRAEGER_VERWALTEN: [
+          {
+            id: '1',
+            kennung: '12345',
+            name: 'Organisation 1',
+            namensergaenzung: 'Ergänzung',
+            kuerzel: 'O1',
+            typ: OrganisationResponseTypEnum.Anbieter,
+          },
+        ],
       };
 
       mockadapter
@@ -85,6 +125,7 @@ describe('PersonenkontextStore', () => {
       expect(personenkontextStore.loading).toBe(false);
     });
   });
+
   describe('createPersonenkontext', () => {
     it('should create a Personenkontext', async () => {
       const mockPersonenkontext: DBiamPersonenkontextResponse = {
@@ -136,6 +177,7 @@ describe('PersonenkontextStore', () => {
       expect(personenkontextStore.loading).toBe(false);
     });
   });
+
   describe('getPersonenuebersichtById', () => {
     it('should get Personenuebersicht', async () => {
       const mockResponse: DBiamPersonenuebersichtResponse = {
@@ -180,6 +222,7 @@ describe('PersonenkontextStore', () => {
       expect(personenkontextStore.loading).toBe(false);
     });
   });
+
   describe('getPersonenkontextRolleWithFilter', () => {
     it('should get filtered Rollen', async () => {
       const mockResponse: FindRollenResponse = {
@@ -229,6 +272,7 @@ describe('PersonenkontextStore', () => {
       expect(personenkontextStore.loading).toBe(false);
     });
   });
+
   describe('getPersonenkontextAdministrationsebeneWithFilter', () => {
     it('should get filtered Administrationsebenen', async () => {
       const mockResponse: FindSchulstrukturknotenResponse = {
@@ -279,6 +323,7 @@ describe('PersonenkontextStore', () => {
       expect(personenkontextStore.loading).toBe(false);
     });
   });
+
   describe('getAllPersonenuebersichte', () => {
     it('should get All Personenuebersicht', async () => {
       const mockResponse: DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response = {
