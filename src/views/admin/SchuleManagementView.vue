@@ -38,7 +38,12 @@
 
 <template>
   <div class="admin">
-    <h1 class="text-center headline">{{ $t('admin.headline') }}</h1>
+    <h1
+      class="text-center headline"
+      data-testid="admin-headline"
+    >
+      {{ $t('admin.headline') }}
+    </h1>
     <ResultTable
       data-testid="schule-table"
       :header="$t('admin.schule.management')"
@@ -62,11 +67,4 @@
   </div>
 </template>
 
-<style>
-  .ellipsis-wrapper {
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
-    max-width: 241px;
-  }
-</style>
+<style></style>

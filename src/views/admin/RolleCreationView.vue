@@ -166,6 +166,15 @@
     rolleStore.createdRolle = null;
   }
 
+  function getSskName(sskDstNr: string | null | undefined, sskName: string | null | undefined): string {
+    /* omit parens when there is no ssk kennung  */
+    if (sskDstNr) {
+      return `${sskDstNr} (${sskName})`;
+    } else {
+      return sskName || '';
+    }
+  }
+
   const translatedCreatedRolleMerkmale: ComputedRef<string> = computed(() => {
     if (!rolleStore.createdRolle?.merkmale || Array.from(rolleStore.createdRolle.merkmale).length === 0) {
       return '-';
@@ -197,7 +206,7 @@
   > = computed(() =>
     organisationStore.allOrganisationen.map((org: Organisation) => ({
       value: org.id,
-      title: `${org.kennung} (${org.name})`,
+      title: org.kennung ? `${org.kennung} (${org.name})` : org.name,
     })),
   );
 
@@ -440,28 +449,41 @@
               {{ $t('admin.administrationsebene.administrationsebene') }}:
             </v-col>
             <v-col class="text-body">
-              {{
-                `${organisationStore.currentOrganisation?.kennung} (${organisationStore.currentOrganisation?.name})`
-              }}</v-col
-            >
+              <span data-testid="created-rolle-administrationsebene">
+                {{
+                  getSskName(
+                    organisationStore.currentOrganisation?.kennung,
+                    organisationStore.currentOrganisation?.name,
+                  )
+                }}
+              </span>
+            </v-col>
           </v-row>
           <v-row>
             <v-col class="text-body bold text-right"> {{ $t('admin.rolle.rollenart') }}: </v-col>
             <v-col class="text-body">
-              {{ $t(`admin.rolle.mappingFrontBackEnd.rollenarten.${rolleStore.createdRolle.rollenart}`) }}</v-col
-            >
+              <span data-testid="created-rolle-rollenart">
+                {{ $t(`admin.rolle.mappingFrontBackEnd.rollenarten.${rolleStore.createdRolle.rollenart}`) }}
+              </span>
+            </v-col>
           </v-row>
           <v-row>
             <v-col class="text-body bold text-right"> {{ $t('admin.rolle.rollenname') }}:</v-col>
-            <v-col class="text-body">{{ rolleStore.createdRolle.name }} </v-col>
+            <v-col class="text-body"
+              ><span data-testid="created-rolle-name">{{ rolleStore.createdRolle.name }}</span></v-col
+            >
           </v-row>
           <v-row>
             <v-col class="text-body bold text-right"> {{ $t('admin.rolle.merkmale') }}:</v-col>
-            <v-col class="text-body"> {{ translatedCreatedRolleMerkmale }}</v-col></v-row
+            <v-col class="text-body"
+              ><span data-testid="created-rolle-merkmale">{{ translatedCreatedRolleMerkmale }}</span></v-col
+            ></v-row
           >
           <v-row>
             <v-col class="text-body bold text-right"> {{ $t('admin.rolle.systemrechte') }}:</v-col>
-            <v-col class="text-body"> {{ translatedCreatedSystemrecht }}</v-col></v-row
+            <v-col class="text-body"
+              ><span data-testid="created-rolle-systemrecht">{{ translatedCreatedSystemrecht }}</span></v-col
+            ></v-row
           >
           <v-divider
             class="border-opacity-100 rounded my-6"

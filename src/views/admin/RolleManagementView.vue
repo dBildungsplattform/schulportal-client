@@ -41,9 +41,12 @@
       );
 
       // If a matching organization is found, format the administeredBySchulstrukturknoten field accordingly
-      const administeredBySchulstrukturknoten: string = matchingOrganisation
-        ? `${matchingOrganisation.kennung} (${matchingOrganisation.name})`
-        : '';
+      let administeredBySchulstrukturknoten: string = '';
+      if (matchingOrganisation) {
+        administeredBySchulstrukturknoten = matchingOrganisation.kennung
+          ? `${matchingOrganisation.kennung} (${matchingOrganisation.name})`
+          : matchingOrganisation.name;
+      }
 
       const formattedMerkmale: string =
         Array.from(rolle.merkmale).length > 0
@@ -69,7 +72,12 @@
 
 <template>
   <div class="admin">
-    <h1 class="text-center headline">{{ $t('admin.headline') }}</h1>
+    <h1
+      class="text-center headline"
+      data-testid="admin-headline"
+    >
+      {{ $t('admin.headline') }}
+    </h1>
     <ResultTable
       data-testid="role-table"
       :header="$t('admin.rolle.management')"

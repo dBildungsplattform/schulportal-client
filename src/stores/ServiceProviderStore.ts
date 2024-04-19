@@ -12,6 +12,7 @@ export type ServiceProvider = {
   kategorie: string;
   hasLogo: boolean;
   logoUrl?: string;
+  target: string;
 };
 
 type ServiceProviderState = {

@@ -25,7 +25,7 @@
   import PasswordOutput from '@/components/form/PasswordOutput.vue';
   import FormWrapper from '@/components/form/FormWrapper.vue';
   import FormRow from '@/components/form/FormRow.vue';
-  import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenKontextStore';
+  import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
   import { useDisplay } from 'vuetify';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
@@ -109,13 +109,15 @@
   });
   // Watcher to detect when the Rolle is selected so the Organisationen show all the possible choices using that value.
   watch(selectedRolle, (newValue: string, oldValue: string) => {
-    if (newValue !== oldValue) {
-      // Call fetch with an empty string to get the initial organizations for the selected role without any filter
-      personenkontextStore.getPersonenkontextAdministrationsebeneWithFilter(newValue, '', 25);
-    }
     // This checks if `selectedRolle` is cleared or set to a falsy value
     if (!newValue) {
       resetField('selectedOrganisation');
+      return;
+    }
+
+    if (newValue !== oldValue) {
+      // Call fetch with an empty string to get the initial organizations for the selected role without any filter
+      personenkontextStore.getPersonenkontextAdministrationsebeneWithFilter(newValue, '', 25);
     }
   });
   // Watcher to detect when the search input for Organisationen is triggered.
@@ -151,11 +153,11 @@
   });
 
   const organisationen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
-    return personenkontextStore.filteredOrganisationen?.moeglicheSkks
+    return personenkontextStore.filteredOrganisationen?.moeglicheSsks
       .slice(0, 25)
       .map((org: OrganisationResponse) => ({
         value: org.id,
-        title: `${org.kennung} (${org.name})`,
+        title: org.kennung ? `${org.kennung} (${org.name})` : org.name,
       }))
       .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
   });
@@ -400,12 +402,14 @@
             class="subtitle-1"
             cols="auto"
           >
-            {{
-              $t('admin.person.addedSuccessfully', {
-                firstname: personStore.createdPerson.person.name.vorname,
-                lastname: personStore.createdPerson.person.name.familienname,
-              })
-            }}
+            <span data-testid="person-success-text">
+              {{
+                $t('admin.person.addedSuccessfully', {
+                  firstname: personStore.createdPerson.person.name.vorname,
+                  lastname: personStore.createdPerson.person.name.familienname,
+                })
+              }}
+            </span>
           </v-col>
         </v-row>
         <v-row justify="center">
@@ -429,29 +433,43 @@
         </v-row>
         <v-row>
           <v-col class="text-body bold text-right"> {{ $t('person.firstName') }}: </v-col>
-          <v-col class="text-body"> {{ personStore.createdPerson.person.name.vorname }}</v-col>
+          <v-col class="text-body"
+            ><span data-testid="created-person-vorname">{{
+              personStore.createdPerson.person.name.vorname
+            }}</span></v-col
+          >
         </v-row>
         <v-row>
           <v-col class="text-body bold text-right"> {{ $t('person.lastName') }}: </v-col>
-          <v-col class="text-body"> {{ personStore.createdPerson.person.name.familienname }}</v-col>
+          <v-col class="text-body"
+            ><span data-testid="created-person-familienname">{{
+              personStore.createdPerson.person.name.familienname
+            }}</span></v-col
+          >
         </v-row>
         <v-row>
           <v-col class="text-body bold text-right"> {{ $t('person.userName') }}: </v-col>
-          <v-col class="text-body"> {{ personStore.createdPerson.person.referrer }}</v-col>
+          <v-col class="text-body"
+            ><span data-testid="created-person-username">{{ personStore.createdPerson.person.referrer }}</span></v-col
+          >
         </v-row>
         <v-row class="align-center">
-          <v-col class="text-body bold text-right pb-8"> {{ $t('admin.person.startPassword') }}: </v-col>
+          <v-col class="text-body bold text-right pb-8">{{ $t('admin.person.startPassword') }}: </v-col>
           <v-col class="text-body">
             <PasswordOutput :password="personStore.createdPerson.person.startpasswort"></PasswordOutput>
           </v-col>
         </v-row>
         <v-row>
           <v-col class="text-body bold text-right"> {{ $t('admin.rolle.rolle') }}: </v-col>
-          <v-col class="text-body"> {{ translatedRollenname }}</v-col>
+          <v-col class="text-body"
+            ><span data-testid="created-person-rolle">{{ translatedRollenname }}</span></v-col
+          >
         </v-row>
         <v-row>
           <v-col class="text-body bold text-right"> {{ $t('admin.organisation.organisation') }}: </v-col>
-          <v-col class="text-body"> {{ translatedOrganisationsname }}</v-col>
+          <v-col class="text-body"
+            ><span data-testid="created-person-organisation">{{ translatedOrganisationsname }}</span></v-col
+          >
         </v-row>
         <v-divider
           class="border-opacity-100 rounded my-6"
@@ -494,3 +512,4 @@
 </template>
 
 <style></style>
+@/stores/PersonenkontextStore
