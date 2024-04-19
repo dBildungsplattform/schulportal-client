@@ -14,8 +14,15 @@ import ApiService from '@/services/ApiService';
 import MockAdapter from 'axios-mock-adapter';
 import { setActivePinia, createPinia } from 'pinia';
 import { rejects } from 'assert';
-import { usePersonenkontextStore, type PersonenkontextStore } from './PersonenkontextStore';
-import { usePersonStore, type PersonendatensatzResponse, type PersonStore } from './PersonStore';
+import {
+  usePersonenkontextStore,
+  type PersonenkontextStore,
+} from './PersonenkontextStore';
+import {
+  usePersonStore,
+  type PersonendatensatzResponse,
+  type PersonStore,
+} from './PersonStore';
 
 const mockadapter: MockAdapter = new MockAdapter(ApiService);
 
@@ -26,6 +33,28 @@ describe('PersonenkontextStore', () => {
     setActivePinia(createPinia());
     personStore = usePersonStore();
     personenkontextStore = usePersonenkontextStore();
+    personenkontextStore.allUebersichten =  {
+      total: 0,
+      offset: 0,
+      limit: 0,
+      items: [
+        {
+          personId: '1234',
+          vorname: 'Samuel',
+          nachname: 'Vimes',
+          benutzername: 'string',
+          zuordnungen: [
+            {
+              sskId: 'string',
+              rolleId: 'string',
+              sskName: 'string',
+              sskDstNr: 'string',
+              rolle: 'string',
+            },
+          ],
+        },
+      ],
+    };
     mockadapter.reset();
   });
 
