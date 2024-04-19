@@ -1,10 +1,11 @@
 <script setup lang="ts">
   import { usePersonStore, type Person, type PersonStore, type Personendatensatz } from '@/stores/PersonStore';
-  import { computed, onMounted, type ComputedRef } from 'vue';
+  import { computed, onMounted, ref, type ComputedRef, type Ref } from 'vue';
   import ResultTable from '@/components/admin/ResultTable.vue';
   import { type Composer, useI18n } from 'vue-i18n';
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
+  import SearchField from '@/components/admin/SearchField.vue';
 
   import { type Router, useRouter } from 'vue-router';
   import {
@@ -17,6 +18,7 @@
   const personenKontextStore: PersonenkontextStore = usePersonenkontextStore();
 
   const { t }: Composer = useI18n({ useScope: 'global' });
+  const searchFilter: Ref<string> = ref('');
 
   type ReadonlyHeaders = InstanceType<typeof VDataTableServer>['headers'];
   const headers: ReadonlyHeaders = [
@@ -66,8 +68,13 @@
     });
   });
 
+  const handleSearchFilter = (filter: string): void => {
+    searchFilter.value = filter;
+    personStore.getAllPersons(searchFilter.value);
+  };
+
   onMounted(async () => {
-    await personStore.getAllPersons();
+    await personStore.getAllPersons('');
     await personenKontextStore.getAllPersonenuebersichten();
   });
 </script>
@@ -81,13 +88,14 @@
       {{ $t('admin.headline') }}
     </h1>
     <LayoutCard :header="$t('admin.person.management')">
+      <SearchField @onApplySearchFilter="handleSearchFilter"></SearchField>
       <ResultTable
         data-testid="person-table"
         :items="personenWithUebersicht || []"
         :loading="personStore.loading"
         :headers="headers"
         @onHandleRowClick="navigateToPersonDetails"
-        @onUpdateTable="personStore.getAllPersons()"
+        @onUpdateTable="personStore.getAllPersons('')"
         :totalItems="personStore.totalPersons"
         item-value-path="person.id"
         ><template v-slot:[`item.rolle`]="{ item }">
