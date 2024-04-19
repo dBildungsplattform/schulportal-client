@@ -46,6 +46,7 @@
         class="primary button"
         data-testid="apply-search-filter-button"
         @click="applySearchFilter()"
+        height="45"
       >
         {{ $t('admin.search') }}</v-btn
       >
