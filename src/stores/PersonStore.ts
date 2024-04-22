@@ -125,6 +125,7 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
         this.allPersons = data.items;
         this.totalPersons = data.total;
       } catch (error: unknown) {
+        console.log(error);
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
           this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';

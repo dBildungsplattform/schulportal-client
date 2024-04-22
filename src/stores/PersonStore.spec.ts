@@ -51,7 +51,7 @@ describe('PersonStore', () => {
         items: mockPersons,
       };
 
-      mockadapter.onGet('/api/personen-frontend').replyOnce(200, mockResponse, {});
+      mockadapter.onGet('/api/personen-frontend?suchFilter=').replyOnce(200, mockResponse, {});
       const getAllPersonPromise: Promise<void> = personStore.getAllPersons('');
       expect(personStore.loading).toBe(true);
       await getAllPersonPromise;
@@ -60,7 +60,7 @@ describe('PersonStore', () => {
     });
 
     it('should handle string error', async () => {
-      mockadapter.onGet('/api/personen-frontend').replyOnce(500, 'some mock server error');
+      mockadapter.onGet('/api/personen-frontend?suchFilter=').replyOnce(500, 'some mock server error');
       const getAllPersonPromise: Promise<void> = personStore.getAllPersons('');
       expect(personStore.loading).toBe(true);
       await getAllPersonPromise;
@@ -70,7 +70,7 @@ describe('PersonStore', () => {
     });
 
     it('should handle error code', async () => {
-      mockadapter.onGet('/api/personen-frontend').replyOnce(500, { code: 'some mock server error' });
+      mockadapter.onGet('/api/personen-frontend?suchFilter=').replyOnce(500, { code: 'some mock server error' });
       const getAllPersonPromise: Promise<void> = personStore.getAllPersons('');
       expect(personStore.loading).toBe(true);
       await getAllPersonPromise;
