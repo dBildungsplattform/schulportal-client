@@ -225,6 +225,7 @@
     "enterFirstName": "Vorname eingeben",
     "enterLastName": "Nachname eingeben",
     "firstName": "Vorname",
+    "firstNameLastNameReferrerKopersNr":"Vor-/Nachname/Benutzername/KoPers-Nr.",
     "kopersnr": "Kopers-Nr",
     "lastName": "Nachname",
     "noZuordnungenFound": "Keine Zuordnungen gefunden.",

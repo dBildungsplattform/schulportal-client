@@ -88,7 +88,10 @@
       {{ $t('admin.headline') }}
     </h1>
     <LayoutCard :header="$t('admin.person.management')">
-      <SearchField @onApplySearchFilter="handleSearchFilter"></SearchField>
+      <SearchField
+        :hover-text="$t('person.firstNameLastNameReferrerKopersNr')"
+        @onApplySearchFilter="handleSearchFilter"
+      ></SearchField>
       <ResultTable
         data-testid="person-table"
         :items="personenWithUebersicht || []"

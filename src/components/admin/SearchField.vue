@@ -10,9 +10,15 @@
     (event: 'onApplySearchFilter', searchFilter: string): void;
   };
 
+  type Props = {
+    hoverText: string;
+  };
+
   const emit: Emits = defineEmits<{
     (event: 'onApplySearchFilter', searchFilter: string): void;
   }>();
+
+  const props: Props = defineProps<Props>()
 
   function applySearchFilter(): void {
     if (searchFilter.value !== null) {
@@ -41,6 +47,7 @@
         required="true"
         variant="outlined"
         v-model="searchFilter"
+        :title="props.hoverText"
       ></v-text-field>
     </v-col>
     <v-col md="2">
