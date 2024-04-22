@@ -73,7 +73,12 @@
 
 <template>
   <div class="admin">
-    <h1 class="text-center headline" data-testid="admin-headline">{{ $t('admin.headline') }}</h1>
+    <h1
+      class="text-center headline"
+      data-testid="admin-headline"
+    >
+      {{ $t('admin.headline') }}
+    </h1>
     <LayoutCard :header="$t('admin.rolle.management')">
       <ResultTable
         data-testid="role-table"

@@ -54,17 +54,17 @@
 
   const rollen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
     return rolleStore.allRollen
-    .slice(0, 25)
-    .map((rolle: RolleResponse) => ({
-      value: rolle.id,
-      title: rolle.name,
-    }))
-    .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
+      .slice(0, 25)
+      .map((rolle: RolleResponse) => ({
+        value: rolle.id,
+        title: rolle.name,
+      }))
+      .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
   });
-  
+
   const klassen: Array<string> = ['Klasse', 'Nicht so klasse'];
   const statuses: Array<string> = ['Aktiv', 'Inaktiv'];
-  
+
   const searchInputRolle: Ref<string> = ref('');
   const searchInputSchule: Ref<string> = ref('');
 
@@ -95,23 +95,23 @@
   // Watcher to detect when the search input for Organisationen is triggered.
   watch(searchInputSchule, async (newValue: string, _oldValue: string) => {
     if (newValue.length >= 3) {
-      organisationStore.getAllOrganisationen(newValue);
+      organisationStore.getAllOrganisationen(undefined, 25, undefined, undefined, newValue, undefined);
     } else {
-      organisationStore.getAllOrganisationen();
+      organisationStore.getAllOrganisationen(undefined, 25, undefined, undefined, undefined, undefined);
     }
   });
 
   // Watcher to detect when the search input for Organisationen is triggered.
   watch(searchInputRolle, async (newValue: string, _oldValue: string) => {
     if (newValue.length >= 3) {
-      rolleStore.getAllRollen(newValue);
+      rolleStore.getAllRollen();
     } else {
       rolleStore.getAllRollen();
     }
-});
+  });
 
   onMounted(async () => {
-    await organisationStore.getAllOrganisationen();
+    await organisationStore.getAllOrganisationen(undefined, 25, undefined, undefined, undefined, undefined);
     await personStore.getAllPersons();
     await personenkontextStore.getAllPersonenuebersichten();
     await rolleStore.getAllRollen();
@@ -120,7 +120,12 @@
 
 <template>
   <div class="admin">
-    <h1 class="text-center headline" data-testid="admin-headline">{{ $t('admin.headline') }}</h1>
+    <h1
+      class="text-center headline"
+      data-testid="admin-headline"
+    >
+      {{ $t('admin.headline') }}
+    </h1>
     <LayoutCard :header="$t('admin.person.management')">
       <v-row
         align="center"
@@ -130,7 +135,7 @@
           cols="4"
           class="py-0 text-right"
         >
-          <span class="reset-filter">{{ $t("resetFilter") }}</span>
+          <span class="reset-filter">{{ $t('resetFilter') }}</span>
         </v-col>
         <v-col
           cols="2"
@@ -259,4 +264,3 @@
 </template>
 
 <style></style>
-@/stores/PersonenkontextStore
