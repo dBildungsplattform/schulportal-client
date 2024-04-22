@@ -25,10 +25,13 @@
 
 <template>
   <v-row
-    class="pt-4 pr-3"
+    class="pt-4 px-3"
     justify="end"
   >
-    <v-col cols="3">
+    <v-col
+      cols="6"
+      md="3"
+    >
       <v-text-field
         clearable
         data-testid="searchFilter-input"
@@ -40,13 +43,14 @@
         v-model="searchFilter"
       ></v-text-field>
     </v-col>
-    <v-col cols="2">
+    <v-col md="2">
       <v-btn
         prepend-icon="mdi-magnify"
         class="primary button"
         data-testid="apply-search-filter-button"
         @click="applySearchFilter()"
         height="45"
+        width="130"
       >
         {{ $t('admin.search') }}</v-btn
       >
