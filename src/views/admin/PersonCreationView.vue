@@ -1,5 +1,9 @@
 <script setup lang="ts">
-  import { useOrganisationStore, type OrganisationStore, type OrganisationResponse } from '@/stores/OrganisationStore';
+  import {
+    useOrganisationStore,
+    type OrganisationStore,
+    type OrganisationResponseLegacy,
+  } from '@/stores/OrganisationStore';
   import {
     usePersonStore,
     type CreatedPerson,
@@ -155,7 +159,7 @@
   const organisationen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
     return personenkontextStore.filteredOrganisationen?.moeglicheSsks
       .slice(0, 25)
-      .map((org: OrganisationResponse) => ({
+      .map((org: OrganisationResponseLegacy) => ({
         value: org.id,
         title: org.kennung ? `${org.kennung} (${org.name})` : org.name,
       }))
