@@ -40,9 +40,9 @@
     >
       <v-text-field
         clearable
-        data-testid="searchFilter-input"
+        data-testid="search-filter-input"
         density="compact"
-        id="searchFilter-input"
+        id="search-filter-input"
         :placeholder="$t('admin.searchResultTable')"
         required="true"
         variant="outlined"

@@ -50,12 +50,39 @@ describe('PersonStore', () => {
         total: 2,
         items: mockPersons,
       };
-
       mockadapter.onGet('/api/personen-frontend?suchFilter=').replyOnce(200, mockResponse, {});
       const getAllPersonPromise: Promise<void> = personStore.getAllPersons('');
       expect(personStore.loading).toBe(true);
       await getAllPersonPromise;
       expect(personStore.allPersons).toEqual([...mockPersons]);
+      expect(personStore.loading).toBe(false);
+    });
+
+    it('should load persons according to filter', async () => {
+      const mockPersonsWithFilter: PersonendatensatzResponse[] = [
+        {
+          person: {
+            id: '123456',
+            name: {
+              familienname: 'Vimes',
+              vorname: 'Susan',
+            },
+          },
+        },
+      ] as PersonendatensatzResponse[];
+
+      const mockResponseWithFilter: PersonFrontendControllerFindPersons200Response = {
+        offset: 0,
+        limit: 1,
+        total: 1,
+        items: mockPersonsWithFilter,
+      };
+
+      mockadapter.onGet('/api/personen-frontend?suchFilter=Sus').replyOnce(200, mockResponseWithFilter, {});
+      const getAllPersonPromise: Promise<void> = personStore.getAllPersons('Sus');
+      expect(personStore.loading).toBe(true);
+      await getAllPersonPromise;
+      expect(personStore.allPersons).toEqual([...mockPersonsWithFilter]);
       expect(personStore.loading).toBe(false);
     });
 
