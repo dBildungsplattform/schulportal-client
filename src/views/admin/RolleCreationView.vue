@@ -224,7 +224,7 @@
 
   onMounted(async () => {
     rolleStore.createdRolle = null;
-    await organisationStore.getAllOrganisationen();
+    await organisationStore.getAllOrganisationen('');
     await serviceProviderStore.getAllServiceProviders();
 
     // Iterate over the enum values

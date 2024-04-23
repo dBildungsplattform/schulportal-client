@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { ref, type ComputedRef, type Ref, computed } from 'vue';
+  import { ref, type ComputedRef, type Ref, computed, onMounted, watch } from 'vue';
   import {
     type Router,
     useRouter,
@@ -14,21 +14,22 @@
   import {
     useOrganisationStore,
     type OrganisationStore,
-
     CreateOrganisationBodyParamsTypEnum,
+    OrganisationResponseTypEnum,
   } from '@/stores/OrganisationStore';
-  import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
   import { DIN_91379A_EXT } from '@/utils/validation';
   import FormRow from '@/components/form/FormRow.vue';
   import FormWrapper from '@/components/form/FormWrapper.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
-import type { OrganisationResponseLegacy } from '@/api-client/generated/api';
+  import type { OrganisationResponseLegacy } from '@/api-client/generated/api';
+  import { useDisplay } from 'vuetify';
+
+  const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
   const { t }: Composer = useI18n({ useScope: 'global' });
   const router: Router = useRouter();
   const organisationStore: OrganisationStore = useOrganisationStore();
-  const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
 
   const validationSchema: TypedSchema = toTypedSchema(
     object({
@@ -72,14 +73,27 @@ import type { OrganisationResponseLegacy } from '@/api-client/generated/api';
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedKlassenname', vuetifyConfig);
 
+  const searchInputSchule: Ref<string> = ref('');
+
   const schulen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
-    return personenkontextStore.filteredOrganisationen?.moeglicheSsks
+    return organisationStore.allOrganisationen
       .slice(0, 25)
+      .filter((org: OrganisationResponseLegacy) => org.typ === OrganisationResponseTypEnum.Schule)
       .map((org: OrganisationResponseLegacy) => ({
         value: org.id,
-        title: `${org.kennung} (${org.name})`,
+        title: org.kennung ? `${org.kennung} (${org.name})` : org.name,
       }))
       .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
+  });
+
+  // Watcher to detect when the search input for Organisationen is triggered.
+  watch(searchInputSchule, async (newValue: string, _oldValue: string) => {
+    if (newValue.length >= 3) {
+      organisationStore.getAllOrganisationen(newValue);
+    } else {
+      // If newValue has less than 3 characters, use an empty string instead of newValue to show all organisationen under the selectedRolle.
+      organisationStore.getAllOrganisationen('');
+    }
   });
 
   function isFormDirty(): boolean {
@@ -88,6 +102,13 @@ import type { OrganisationResponseLegacy } from '@/api-client/generated/api';
 
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
   let blockedNext: () => void = () => {};
+
+  function preventNavigation(event: BeforeUnloadEvent): void {
+    if (!isFormDirty()) return;
+    event.preventDefault();
+    /* Chrome requires returnValue to be set. */
+    event.returnValue = '';
+  }
 
   onBeforeRouteLeave((_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
     if (isFormDirty()) {
@@ -98,9 +119,11 @@ import type { OrganisationResponseLegacy } from '@/api-client/generated/api';
     }
   });
 
-  function handleConfirmUnsavedChanges(): void {
-    blockedNext();
-  }
+  const handleCreateAnotherKlasse = (): void => {
+    organisationStore.createdOrganisation = null;
+    resetForm();
+    router.push({ name: 'create-klasse' });
+  };
 
   async function navigateBackToKlasseForm(): Promise<void> {
     await router.push({ name: 'create-klasse' });
@@ -108,8 +131,21 @@ import type { OrganisationResponseLegacy } from '@/api-client/generated/api';
   }
 
   async function navigateToKlasseManagement(): Promise<void> {
-    await router.push({ name: 'klasse-management' });
+    await router.push({ name: 'rolle-management' });
     organisationStore.createdOrganisation = null;
+  }
+
+  function getSskName(sskDstNr: string | null | undefined, sskName: string | null | undefined): string {
+    /* omit parens when there is no ssk kennung  */
+    if (sskDstNr) {
+      return `${sskDstNr} (${sskName})`;
+    } else {
+      return sskName || '';
+    }
+  }
+
+  function handleConfirmUnsavedChanges(): void {
+    blockedNext();
   }
 
   const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = handleSubmit(async () => {
@@ -120,10 +156,16 @@ import type { OrganisationResponseLegacy } from '@/api-client/generated/api';
       '',
       CreateOrganisationBodyParamsTypEnum.Klasse,
       undefined,
-      selectedSchule.value, 
-      selectedSchule.value, 
+      selectedSchule.value,
+      selectedSchule.value,
     );
     resetForm();
+  });
+
+  onMounted(async () => {
+    organisationStore.getAllOrganisationen('');
+    /* listen for browser changes and prevent them when form is dirty */
+    window.addEventListener('beforeunload', preventNavigation);
   });
 </script>
 
@@ -170,7 +212,8 @@ import type { OrganisationResponseLegacy } from '@/api-client/generated/api';
             :isRequired="true"
             :label="$t('admin.organisation.organisation')"
           >
-            <v-select
+            <v-autocomplete
+              autocomplete="off"
               clearable
               data-testid="schule-select"
               density="compact"
@@ -183,8 +226,9 @@ import type { OrganisationResponseLegacy } from '@/api-client/generated/api';
               variant="outlined"
               v-bind="selectedSchuleProps"
               v-model="selectedSchule"
+              v-model:search="searchInputSchule"
               :no-data-text="$t('noDataFound')"
-            ></v-select>
+            ></v-autocomplete>
           </FormRow>
 
           <!-- Klassenname -->
@@ -210,6 +254,97 @@ import type { OrganisationResponseLegacy } from '@/api-client/generated/api';
             ></v-text-field>
           </FormRow>
         </FormWrapper>
+      </template>
+
+      <!-- Result template on success after submit  -->
+      <template v-if="organisationStore.createdOrganisation && !organisationStore.errorCode">
+        <v-container class="new-role-success">
+          <v-row justify="center">
+            <v-col
+              class="subtitle-1"
+              cols="auto"
+            >
+              <span data-testid="klasse-success-text">{{ $t('admin.klasse.klasseAddedSuccessfully') }}</span>
+            </v-col>
+          </v-row>
+          <v-row justify="center">
+            <v-col cols="auto">
+              <v-icon
+                aria-hidden="true"
+                color="#1EAE9C"
+                icon="mdi-check-circle"
+                small
+              >
+              </v-icon>
+            </v-col>
+          </v-row>
+          <v-row justify="center">
+            <v-col
+              class="subtitle-2"
+              cols="auto"
+            >
+              {{ $t('admin.followingDataCreated') }}
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col class="text-body bold text-right">
+              {{ $t('admin.organisationsebene.administrationsebene') }}:
+            </v-col>
+            <v-col class="text-body">
+              <span data-testid="created-rolle-organisationsebene">
+                {{
+                  getSskName(
+                    organisationStore.currentOrganisation?.kennung,
+                    organisationStore.currentOrganisation?.name,
+                  )
+                }}
+              </span>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col class="text-body bold text-right"> {{ $t('admin.klasse.klassenname') }}: </v-col>
+            <v-col class="text-body"
+              ><span data-testid="created-person-familienname">{{
+                organisationStore.currentOrganisation?.name
+              }}</span></v-col
+            >
+          </v-row>
+          <v-divider
+            class="border-opacity-100 rounded my-6"
+            color="#E5EAEF"
+            thickness="6"
+          ></v-divider>
+          <v-row justify="end">
+            <v-col
+              cols="12"
+              sm="6"
+              md="auto"
+            >
+              <v-btn
+                class="secondary"
+                @click.stop="navigateToKlasseManagement"
+                data-testid="back-to-list-button"
+                :block="mdAndDown"
+              >
+                {{ $t('nav.backToList') }}
+              </v-btn>
+            </v-col>
+            <v-col
+              cols="12"
+              sm="6"
+              md="auto"
+            >
+              <v-btn
+                class="primary button"
+                @click="handleCreateAnotherKlasse"
+                data-testid="create-another-person-button"
+                :block="mdAndDown"
+              >
+                {{ $t('admin.klasse.createAnother') }}
+              </v-btn>
+            </v-col>
+          </v-row>
+        </v-container>
       </template>
     </LayoutCard>
   </div>
