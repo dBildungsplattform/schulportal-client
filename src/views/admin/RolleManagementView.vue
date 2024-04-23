@@ -55,7 +55,7 @@
           ? Array.from(rolle.merkmale)
               .map((merkmal: RolleResponseMerkmaleEnum) => t(`admin.rolle.mappingFrontBackEnd.merkmale.${merkmal}`))
               .join(', ')
-          : '-'; // Return dash if merkmale is empty or not defined
+          : '---'; // Return dash if merkmale is empty or not defined
 
       return {
         ...rolle,
