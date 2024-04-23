@@ -40,6 +40,16 @@
                 },
                 "tags": [
                     "auth"
+                ],
+                "security": [
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
+                    {
+                        "bearer": []
+                    }
                 ]
             }
         },
@@ -65,6 +75,16 @@
                 },
                 "tags": [
                     "auth"
+                ],
+                "security": [
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
+                    {
+                        "bearer": []
+                    }
                 ]
             }
         },
@@ -110,6 +130,11 @@
                     "personen"
                 ],
                 "security": [
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
                     {
                         "bearer": []
                     }
@@ -176,6 +201,16 @@
                             ],
                             "type": "string"
                         }
+                    },
+                    {
+                        "name": "suchFilter",
+                        "required": true,
+                        "in": "query",
+                        "description": "Search filter used to filter for Persons. It could be the vorname, familienname, referrer or the personalnummer.",
+                        "schema": {
+                            "nullable": false,
+                            "type": "string"
+                        }
                     }
                 ],
                 "responses": {
@@ -217,6 +252,11 @@
                     "personen"
                 ],
                 "security": [
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
                     {
                         "bearer": []
                     }
@@ -269,6 +309,11 @@
                     "personen"
                 ],
                 "security": [
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
                     {
                         "bearer": []
                     }
@@ -330,6 +375,11 @@
                 ],
                 "security": [
                     {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
+                    {
                         "bearer": []
                     }
                 ]
@@ -381,6 +431,11 @@
                     "personen"
                 ],
                 "security": [
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
                     {
                         "bearer": []
                     }
@@ -527,6 +582,11 @@
                 ],
                 "security": [
                     {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
+                    {
                         "bearer": []
                     }
                 ]
@@ -569,6 +629,11 @@
                     "personen"
                 ],
                 "security": [
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
                     {
                         "bearer": []
                     }
@@ -637,6 +702,16 @@
                             ],
                             "type": "string"
                         }
+                    },
+                    {
+                        "name": "suchFilter",
+                        "required": true,
+                        "in": "query",
+                        "description": "Search filter used to filter for Persons. It could be the vorname, familienname, referrer or the personalnummer.",
+                        "schema": {
+                            "nullable": false,
+                            "type": "string"
+                        }
                     }
                 ],
                 "responses": {
@@ -681,6 +756,11 @@
                     "personen-frontend"
                 ],
                 "security": [
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
                     {
                         "bearer": []
                     }
@@ -814,6 +894,1049 @@
                 ]
             }
         },
+        "/api/organisationen": {
+            "post": {
+                "operationId": "OrganisationController_createOrganisation",
+                "parameters": [],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateOrganisationBodyParams"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "The organisation was successfully created.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OrganisationResponseLegacy"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "The organisation already exists."
+                    },
+                    "401": {
+                        "description": "Not authorized to create the organisation."
+                    },
+                    "403": {
+                        "description": "Not permitted to create the organisation."
+                    },
+                    "500": {
+                        "description": "Internal server error while creating the organisation."
+                    }
+                },
+                "tags": [
+                    "organisationen"
+                ],
+                "security": [
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
+                    {
+                        "bearer": []
+                    }
+                ]
+            },
+            "get": {
+                "operationId": "OrganisationController_findOrganizations",
+                "parameters": [
+                    {
+                        "name": "offset",
+                        "required": false,
+                        "in": "query",
+                        "description": "The offset of the paginated list.",
+                        "schema": {
+                            "type": "number"
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "required": false,
+                        "in": "query",
+                        "description": "The requested limit for the page size.",
+                        "schema": {
+                            "type": "number"
+                        }
+                    },
+                    {
+                        "name": "kennung",
+                        "required": false,
+                        "in": "query",
+                        "schema": {
+                            "nullable": true,
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "name",
+                        "required": false,
+                        "in": "query",
+                        "schema": {
+                            "nullable": true,
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "searchString",
+                        "required": false,
+                        "in": "query",
+                        "schema": {
+                            "nullable": true,
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "typ",
+                        "required": false,
+                        "in": "query",
+                        "schema": {
+                            "nullable": true,
+                            "default": "SONSTIGE ORGANISATION / EINRICHTUNG",
+                            "enum": [
+                                "ROOT",
+                                "LAND",
+                                "TRAEGER",
+                                "SCHULE",
+                                "KLASSE",
+                                "ANBIETER",
+                                "SONSTIGE ORGANISATION / EINRICHTUNG",
+                                "UNBESTAETIGT"
+                            ],
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The organizations were successfully returned.",
+                        "headers": {
+                            "X-Paging-Offset": {
+                                "description": "The offset of the first item from the list. List starts with index 0."
+                            },
+                            "X-Paging-Limit": {
+                                "description": "The maximum amount of items returned in one request."
+                            },
+                            "X-Paging-Total": {
+                                "description": "The total amount of items in the list."
+                            }
+                        },
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/OrganisationResponse"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Not authorized to get organizations."
+                    },
+                    "403": {
+                        "description": "Insufficient permissions to get organizations."
+                    },
+                    "500": {
+                        "description": "Internal server error while getting all organizations."
+                    }
+                },
+                "tags": [
+                    "organisationen"
+                ],
+                "security": [
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
+        "/api/organisationen/{organisationId}": {
+            "put": {
+                "operationId": "OrganisationController_updateOrganisation",
+                "parameters": [
+                    {
+                        "name": "organisationId",
+                        "required": true,
+                        "in": "path",
+                        "description": "The id of an organization",
+                        "schema": {
+                            "nullable": false,
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateOrganisationBodyParams"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "The organisation was successfully updated.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OrganisationResponseLegacy"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Request has wrong format."
+                    },
+                    "401": {
+                        "description": "Request is not authorized."
+                    },
+                    "403": {
+                        "description": "Insufficient permissions to perform operation."
+                    },
+                    "404": {
+                        "description": "The organisation was not found."
+                    },
+                    "500": {
+                        "description": "An internal server error occurred."
+                    }
+                },
+                "tags": [
+                    "organisationen"
+                ],
+                "security": [
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
+                    {
+                        "bearer": []
+                    }
+                ]
+            },
+            "get": {
+                "operationId": "OrganisationController_findOrganisationById",
+                "parameters": [
+                    {
+                        "name": "organisationId",
+                        "required": true,
+                        "in": "path",
+                        "description": "The id of an organization",
+                        "schema": {
+                            "nullable": false,
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The organization was successfully pulled.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OrganisationResponseLegacy"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Organization ID is required"
+                    },
+                    "401": {
+                        "description": "Not authorized to get the organization."
+                    },
+                    "403": {
+                        "description": "Insufficient permissions to get the organization."
+                    },
+                    "404": {
+                        "description": "The organization does not exist."
+                    },
+                    "500": {
+                        "description": "Internal server error while getting the organization."
+                    }
+                },
+                "tags": [
+                    "organisationen"
+                ],
+                "security": [
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
+        "/api/organisationen/root": {
+            "get": {
+                "operationId": "OrganisationController_getRootOrganisation",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "The organization was successfully pulled.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OrganisationResponseLegacy"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Not authorized to get the organization."
+                    },
+                    "403": {
+                        "description": "Insufficient permissions to get the organization."
+                    },
+                    "404": {
+                        "description": "The organization does not exist."
+                    },
+                    "500": {
+                        "description": "Internal server error while getting the organization."
+                    }
+                },
+                "tags": [
+                    "organisationen"
+                ],
+                "security": [
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
+        "/api/organisationen/{organisationId}/administriert": {
+            "get": {
+                "operationId": "OrganisationController_getAdministrierteOrganisationen",
+                "parameters": [
+                    {
+                        "name": "organisationId",
+                        "required": true,
+                        "in": "path",
+                        "description": "The id of an organization",
+                        "schema": {
+                            "nullable": false,
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The organizations were successfully returned.",
+                        "headers": {
+                            "X-Paging-Offset": {
+                                "description": "The offset of the first item from the list. List starts with index 0."
+                            },
+                            "X-Paging-Limit": {
+                                "description": "The maximum amount of items returned in one request."
+                            },
+                            "X-Paging-Total": {
+                                "description": "The total amount of items in the list."
+                            }
+                        },
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/OrganisationResponseLegacy"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Not authorized to get organizations."
+                    },
+                    "403": {
+                        "description": "Insufficient permissions to get organizations."
+                    },
+                    "500": {
+                        "description": "Internal server error while getting all organizations."
+                    }
+                },
+                "tags": [
+                    "organisationen"
+                ],
+                "security": [
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
+                    {
+                        "bearer": []
+                    }
+                ]
+            },
+            "post": {
+                "operationId": "OrganisationController_addAdministrierteOrganisation",
+                "parameters": [
+                    {
+                        "name": "organisationId",
+                        "required": true,
+                        "in": "path",
+                        "description": "The id of an organization",
+                        "schema": {
+                            "nullable": false,
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/OrganisationByIdBodyParams"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "The organisation was successfully updated."
+                    },
+                    "400": {
+                        "description": "The organisation could not be modified."
+                    },
+                    "401": {
+                        "description": "Not authorized to modify the organisation."
+                    },
+                    "403": {
+                        "description": "Not permitted to modify the organisation."
+                    },
+                    "500": {
+                        "description": "Internal server error while modifying the organisation."
+                    }
+                },
+                "tags": [
+                    "organisationen"
+                ],
+                "security": [
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
+        "/api/organisationen/{organisationId}/zugehoerig": {
+            "get": {
+                "operationId": "OrganisationController_getZugehoerigeOrganisationen",
+                "parameters": [
+                    {
+                        "name": "organisationId",
+                        "required": true,
+                        "in": "path",
+                        "description": "The id of an organization",
+                        "schema": {
+                            "nullable": false,
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The organizations were successfully returned.",
+                        "headers": {
+                            "X-Paging-Offset": {
+                                "description": "The offset of the first item from the list. List starts with index 0."
+                            },
+                            "X-Paging-Limit": {
+                                "description": "The maximum amount of items returned in one request."
+                            },
+                            "X-Paging-Total": {
+                                "description": "The total amount of items in the list."
+                            }
+                        },
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/OrganisationResponseLegacy"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Not authorized to get organizations."
+                    },
+                    "403": {
+                        "description": "Insufficient permissions to get organizations."
+                    },
+                    "500": {
+                        "description": "Internal server error while getting all organizations."
+                    }
+                },
+                "tags": [
+                    "organisationen"
+                ],
+                "security": [
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
+                    {
+                        "bearer": []
+                    }
+                ]
+            },
+            "post": {
+                "operationId": "OrganisationController_addZugehoerigeOrganisation",
+                "parameters": [
+                    {
+                        "name": "organisationId",
+                        "required": true,
+                        "in": "path",
+                        "description": "The id of an organization",
+                        "schema": {
+                            "nullable": false,
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/OrganisationByIdBodyParams"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "The organisation was successfully updated."
+                    },
+                    "400": {
+                        "description": "The organisation could not be modified."
+                    },
+                    "401": {
+                        "description": "Not authorized to modify the organisation."
+                    },
+                    "403": {
+                        "description": "Not permitted to modify the organisation."
+                    },
+                    "500": {
+                        "description": "Internal server error while modifying the organisation."
+                    }
+                },
+                "tags": [
+                    "organisationen"
+                ],
+                "security": [
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
+        "/api/rolle": {
+            "get": {
+                "operationId": "RolleController_findRollen",
+                "summary": "",
+                "description": "List all rollen.",
+                "parameters": [
+                    {
+                        "name": "searchStr",
+                        "required": false,
+                        "in": "query",
+                        "description": "The name for the role.",
+                        "schema": {
+                            "nullable": false,
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The rollen were successfully returned",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/RolleWithServiceProvidersResponse"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Not authorized to get rollen."
+                    },
+                    "403": {
+                        "description": "Insufficient permissions to get rollen."
+                    },
+                    "500": {
+                        "description": "Internal server error while getting all rollen."
+                    }
+                },
+                "tags": [
+                    "rolle"
+                ],
+                "security": [
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
+                    {
+                        "bearer": []
+                    }
+                ]
+            },
+            "post": {
+                "operationId": "RolleController_createRolle",
+                "summary": "",
+                "description": "Create a new rolle.",
+                "parameters": [],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateRolleBodyParams"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "The rolle was successfully created.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RolleResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "The input was not valid."
+                    },
+                    "401": {
+                        "description": "Not authorized to create the rolle."
+                    },
+                    "403": {
+                        "description": "Insufficient permissions to create the rolle."
+                    },
+                    "500": {
+                        "description": "Internal server error while creating the rolle."
+                    }
+                },
+                "tags": [
+                    "rolle"
+                ],
+                "security": [
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
+        "/api/rolle/{rolleId}": {
+            "patch": {
+                "operationId": "RolleController_addSystemRecht",
+                "summary": "",
+                "description": "Add systemrecht to a rolle.",
+                "parameters": [
+                    {
+                        "name": "rolleId",
+                        "required": true,
+                        "in": "path",
+                        "description": "The id for the rolle.",
+                        "schema": {
+                            "nullable": false,
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AddSystemrechtBodyParams"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "The systemrecht was successfully added to rolle."
+                    },
+                    "400": {
+                        "description": "The input was not valid."
+                    },
+                    "401": {
+                        "description": "Not authorized to create the rolle."
+                    },
+                    "403": {
+                        "description": "Insufficient permissions to create the rolle."
+                    },
+                    "500": {
+                        "description": "Internal server error while adding systemrecht to rolle."
+                    }
+                },
+                "tags": [
+                    "rolle"
+                ],
+                "security": [
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
+        "/api/rolle/{rolleId}/serviceProviders": {
+            "get": {
+                "operationId": "RolleController_getRolleServiceProviderIds",
+                "summary": "",
+                "description": "Get service-providers for a rolle by its id.",
+                "parameters": [
+                    {
+                        "name": "rolleId",
+                        "required": true,
+                        "in": "path",
+                        "description": "The id for the rolle.",
+                        "schema": {
+                            "nullable": false,
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns a list of service-provider ids.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RolleServiceProviderResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Not authorized to retrieve service-providers for rolle."
+                    },
+                    "404": {
+                        "description": "The rolle does not exist."
+                    }
+                },
+                "tags": [
+                    "rolle"
+                ],
+                "security": [
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
+                    {
+                        "bearer": []
+                    }
+                ]
+            },
+            "post": {
+                "operationId": "RolleController_addServiceProviderById",
+                "summary": "",
+                "description": "Add a service-provider to a rolle by id.",
+                "parameters": [
+                    {
+                        "name": "rolleId",
+                        "required": true,
+                        "in": "path",
+                        "description": "The id for the rolle.",
+                        "schema": {
+                            "nullable": false,
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RolleServiceProviderQueryParams"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Adding service-provider finished successfully."
+                    },
+                    "400": {
+                        "description": "The service-provider is already attached to rolle."
+                    },
+                    "401": {
+                        "description": "Not authorized to retrieve service-providers for rolle."
+                    },
+                    "404": {
+                        "description": "The rolle or the service-provider to add does not exist."
+                    }
+                },
+                "tags": [
+                    "rolle"
+                ],
+                "security": [
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
+                    {
+                        "bearer": []
+                    }
+                ]
+            },
+            "delete": {
+                "operationId": "RolleController_removeServiceProviderById",
+                "summary": "",
+                "description": "Remove a service-provider from a rolle by id.",
+                "parameters": [
+                    {
+                        "name": "rolleId",
+                        "required": true,
+                        "in": "path",
+                        "description": "The id for the rolle.",
+                        "schema": {
+                            "nullable": false,
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "serviceProviderId",
+                        "required": true,
+                        "in": "query",
+                        "description": "The id for the rolle.",
+                        "schema": {
+                            "nullable": false,
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Removing service-provider finished successfully."
+                    },
+                    "401": {
+                        "description": "Not authorized to retrieve service-providers for rolle."
+                    },
+                    "404": {
+                        "description": "The rolle or the service-provider that should be removed does not exist."
+                    }
+                },
+                "tags": [
+                    "rolle"
+                ],
+                "security": [
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
+        "/api/provider/all": {
+            "get": {
+                "operationId": "ProviderController_getAllServiceProviders",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "The service-providers were successfully returned.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ServiceProviderResponse"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Not authorized to get available service providers."
+                    },
+                    "403": {
+                        "description": "Insufficient permissions to get service-providers."
+                    },
+                    "500": {
+                        "description": "Internal server error while getting all service-providers."
+                    }
+                },
+                "tags": [
+                    "provider"
+                ],
+                "security": [
+                    {
+                        "bearer": []
+                    },
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    }
+                ]
+            }
+        },
+        "/api/provider": {
+            "get": {
+                "operationId": "ProviderController_getAvailableServiceProviders",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "The service-providers were successfully returned.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ServiceProviderResponse"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Not authorized to get available service providers."
+                    },
+                    "403": {
+                        "description": "Insufficient permissions to get service-providers."
+                    },
+                    "500": {
+                        "description": "Internal server error while getting all service-providers."
+                    }
+                },
+                "tags": [
+                    "provider"
+                ],
+                "security": [
+                    {
+                        "bearer": []
+                    },
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    }
+                ]
+            }
+        },
+        "/api/provider/{angebotId}/logo": {
+            "get": {
+                "operationId": "ProviderController_getServiceProviderLogo",
+                "parameters": [
+                    {
+                        "name": "angebotId",
+                        "required": true,
+                        "in": "path",
+                        "description": "The id of the service provider",
+                        "schema": {
+                            "nullable": false,
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The logo for the service provider was successfully returned.",
+                        "content": {
+                            "image/*": {
+                                "schema": {
+                                    "type": "file",
+                                    "format": "binary"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Angebot ID is required."
+                    },
+                    "401": {
+                        "description": "Not authorized to get service provider logo."
+                    },
+                    "403": {
+                        "description": "Insufficient permissions to get the logo."
+                    },
+                    "404": {
+                        "description": "The service-provider does not exist or has no logo."
+                    },
+                    "500": {
+                        "description": "Internal server error while getting the logo."
+                    }
+                },
+                "tags": [
+                    "provider"
+                ],
+                "security": [
+                    {
+                        "bearer": []
+                    },
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    }
+                ]
+            }
+        },
         "/api/personenkontexte/{personenkontextId}": {
             "get": {
                 "operationId": "PersonenkontextController_findPersonenkontextById",
@@ -860,6 +1983,11 @@
                     "personenkontexte"
                 ],
                 "security": [
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
                     {
                         "bearer": []
                     }
@@ -921,6 +2049,11 @@
                 ],
                 "security": [
                     {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
+                    {
                         "bearer": []
                     }
                 ]
@@ -973,6 +2106,11 @@
                     "personenkontexte"
                 ],
                 "security": [
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
                     {
                         "bearer": []
                     }
@@ -1100,6 +2238,11 @@
                 ],
                 "security": [
                     {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
+                    {
                         "bearer": []
                     }
                 ]
@@ -1125,7 +2268,11 @@
                         "in": "query",
                         "schema": {
                             "enum": [
-                                "ROLLEN_VERWALTEN"
+                                "ROLLEN_VERWALTEN",
+                                "PERSONEN_VERWALTEN",
+                                "SCHULEN_VERWALTEN",
+                                "KLASSEN_VERWALTEN",
+                                "SCHULTRAEGER_VERWALTEN"
                             ],
                             "type": "string"
                         }
@@ -1150,6 +2297,11 @@
                     "personenkontexte"
                 ],
                 "security": [
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
                     {
                         "bearer": []
                     }
@@ -1199,6 +2351,11 @@
                 ],
                 "security": [
                     {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
+                    {
                         "bearer": []
                     }
                 ]
@@ -1229,6 +2386,9 @@
                             }
                         }
                     },
+                    "400": {
+                        "description": "The personenkontext could not be created, may due to unsatisfied specifications."
+                    },
                     "401": {
                         "description": "Not authorized to create personenkontext."
                     },
@@ -1243,6 +2403,11 @@
                     "dbiam-personenkontexte"
                 ],
                 "security": [
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
                     {
                         "bearer": []
                     }
@@ -1370,898 +2535,6 @@
                     }
                 ]
             }
-        },
-        "/api/organisationen": {
-            "post": {
-                "operationId": "OrganisationController_createOrganisation",
-                "parameters": [],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/CreateOrganisationBodyParams"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "201": {
-                        "description": "The organisation was successfully created.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/OrganisationResponse"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "The organisation already exists."
-                    },
-                    "401": {
-                        "description": "Not authorized to create the organisation."
-                    },
-                    "403": {
-                        "description": "Not permitted to create the organisation."
-                    },
-                    "500": {
-                        "description": "Internal server error while creating the organisation."
-                    }
-                },
-                "tags": [
-                    "organisationen"
-                ],
-                "security": [
-                    {
-                        "bearer": []
-                    }
-                ]
-            },
-            "get": {
-                "operationId": "OrganisationController_findOrganizations",
-                "parameters": [
-                    {
-                        "name": "offset",
-                        "required": false,
-                        "in": "query",
-                        "description": "The offset of the paginated list.",
-                        "schema": {
-                            "type": "number"
-                        }
-                    },
-                    {
-                        "name": "limit",
-                        "required": false,
-                        "in": "query",
-                        "description": "The requested limit for the page size.",
-                        "schema": {
-                            "type": "number"
-                        }
-                    },
-                    {
-                        "name": "kennung",
-                        "required": false,
-                        "in": "query",
-                        "schema": {
-                            "nullable": true,
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "name",
-                        "required": false,
-                        "in": "query",
-                        "schema": {
-                            "nullable": true,
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "typ",
-                        "required": false,
-                        "in": "query",
-                        "schema": {
-                            "nullable": true,
-                            "default": "SONSTIGE ORGANISATION / EINRICHTUNG",
-                            "enum": [
-                                "TRAEGER",
-                                "SCHULE",
-                                "ANBIETER",
-                                "SONSTIGE ORGANISATION / EINRICHTUNG",
-                                "UNBESTAETIGT"
-                            ],
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "The organizations were successfully returned.",
-                        "headers": {
-                            "X-Paging-Offset": {
-                                "description": "The offset of the first item from the list. List starts with index 0."
-                            },
-                            "X-Paging-Limit": {
-                                "description": "The maximum amount of items returned in one request."
-                            },
-                            "X-Paging-Total": {
-                                "description": "The total amount of items in the list."
-                            }
-                        },
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/OrganisationResponse"
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Not authorized to get organizations."
-                    },
-                    "403": {
-                        "description": "Insufficient permissions to get organizations."
-                    },
-                    "500": {
-                        "description": "Internal server error while getting all organizations."
-                    }
-                },
-                "tags": [
-                    "organisationen"
-                ],
-                "security": [
-                    {
-                        "bearer": []
-                    }
-                ]
-            }
-        },
-        "/api/organisationen/{organisationId}": {
-            "put": {
-                "operationId": "OrganisationController_updateOrganisation",
-                "parameters": [
-                    {
-                        "name": "organisationId",
-                        "required": true,
-                        "in": "path",
-                        "description": "The id of an organization",
-                        "schema": {
-                            "nullable": false,
-                            "type": "string"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/UpdateOrganisationBodyParams"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "The organisation was successfully updated.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/OrganisationResponse"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Request has wrong format."
-                    },
-                    "401": {
-                        "description": "Request is not authorized."
-                    },
-                    "403": {
-                        "description": "Insufficient permissions to perform operation."
-                    },
-                    "404": {
-                        "description": "The organisation was not found."
-                    },
-                    "500": {
-                        "description": "An internal server error occurred."
-                    }
-                },
-                "tags": [
-                    "organisationen"
-                ],
-                "security": [
-                    {
-                        "bearer": []
-                    }
-                ]
-            },
-            "get": {
-                "operationId": "OrganisationController_findOrganisationById",
-                "parameters": [
-                    {
-                        "name": "organisationId",
-                        "required": true,
-                        "in": "path",
-                        "description": "The id of an organization",
-                        "schema": {
-                            "nullable": false,
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "The organization was successfully pulled.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/OrganisationResponse"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Organization ID is required"
-                    },
-                    "401": {
-                        "description": "Not authorized to get the organization."
-                    },
-                    "403": {
-                        "description": "Insufficient permissions to get the organization."
-                    },
-                    "404": {
-                        "description": "The organization does not exist."
-                    },
-                    "500": {
-                        "description": "Internal server error while getting the organization."
-                    }
-                },
-                "tags": [
-                    "organisationen"
-                ],
-                "security": [
-                    {
-                        "bearer": []
-                    }
-                ]
-            }
-        },
-        "/api/organisationen/root": {
-            "get": {
-                "operationId": "OrganisationController_getRootOrganisation",
-                "parameters": [],
-                "responses": {
-                    "200": {
-                        "description": "The organization was successfully pulled.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/OrganisationResponse"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Not authorized to get the organization."
-                    },
-                    "403": {
-                        "description": "Insufficient permissions to get the organization."
-                    },
-                    "404": {
-                        "description": "The organization does not exist."
-                    },
-                    "500": {
-                        "description": "Internal server error while getting the organization."
-                    }
-                },
-                "tags": [
-                    "organisationen"
-                ],
-                "security": [
-                    {
-                        "bearer": []
-                    }
-                ]
-            }
-        },
-        "/api/organisationen/{organisationId}/administriert": {
-            "get": {
-                "operationId": "OrganisationController_getAdministrierteOrganisationen",
-                "parameters": [
-                    {
-                        "name": "organisationId",
-                        "required": true,
-                        "in": "path",
-                        "description": "The id of an organization",
-                        "schema": {
-                            "nullable": false,
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "The organizations were successfully returned.",
-                        "headers": {
-                            "X-Paging-Offset": {
-                                "description": "The offset of the first item from the list. List starts with index 0."
-                            },
-                            "X-Paging-Limit": {
-                                "description": "The maximum amount of items returned in one request."
-                            },
-                            "X-Paging-Total": {
-                                "description": "The total amount of items in the list."
-                            }
-                        },
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/OrganisationResponse"
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Not authorized to get organizations."
-                    },
-                    "403": {
-                        "description": "Insufficient permissions to get organizations."
-                    },
-                    "500": {
-                        "description": "Internal server error while getting all organizations."
-                    }
-                },
-                "tags": [
-                    "organisationen"
-                ],
-                "security": [
-                    {
-                        "bearer": []
-                    }
-                ]
-            },
-            "post": {
-                "operationId": "OrganisationController_addAdministrierteOrganisation",
-                "parameters": [
-                    {
-                        "name": "organisationId",
-                        "required": true,
-                        "in": "path",
-                        "description": "The id of an organization",
-                        "schema": {
-                            "nullable": false,
-                            "type": "string"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/OrganisationByIdBodyParams"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "201": {
-                        "description": "The organisation was successfully updated."
-                    },
-                    "400": {
-                        "description": "The organisation could not be modified."
-                    },
-                    "401": {
-                        "description": "Not authorized to modify the organisation."
-                    },
-                    "403": {
-                        "description": "Not permitted to modify the organisation."
-                    },
-                    "500": {
-                        "description": "Internal server error while modifying the organisation."
-                    }
-                },
-                "tags": [
-                    "organisationen"
-                ],
-                "security": [
-                    {
-                        "bearer": []
-                    }
-                ]
-            }
-        },
-        "/api/organisationen/{organisationId}/zugehoerig": {
-            "get": {
-                "operationId": "OrganisationController_getZugehoerigeOrganisationen",
-                "parameters": [
-                    {
-                        "name": "organisationId",
-                        "required": true,
-                        "in": "path",
-                        "description": "The id of an organization",
-                        "schema": {
-                            "nullable": false,
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "The organizations were successfully returned.",
-                        "headers": {
-                            "X-Paging-Offset": {
-                                "description": "The offset of the first item from the list. List starts with index 0."
-                            },
-                            "X-Paging-Limit": {
-                                "description": "The maximum amount of items returned in one request."
-                            },
-                            "X-Paging-Total": {
-                                "description": "The total amount of items in the list."
-                            }
-                        },
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/OrganisationResponse"
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Not authorized to get organizations."
-                    },
-                    "403": {
-                        "description": "Insufficient permissions to get organizations."
-                    },
-                    "500": {
-                        "description": "Internal server error while getting all organizations."
-                    }
-                },
-                "tags": [
-                    "organisationen"
-                ],
-                "security": [
-                    {
-                        "bearer": []
-                    }
-                ]
-            },
-            "post": {
-                "operationId": "OrganisationController_addZugehoerigeOrganisation",
-                "parameters": [
-                    {
-                        "name": "organisationId",
-                        "required": true,
-                        "in": "path",
-                        "description": "The id of an organization",
-                        "schema": {
-                            "nullable": false,
-                            "type": "string"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/OrganisationByIdBodyParams"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "201": {
-                        "description": "The organisation was successfully updated."
-                    },
-                    "400": {
-                        "description": "The organisation could not be modified."
-                    },
-                    "401": {
-                        "description": "Not authorized to modify the organisation."
-                    },
-                    "403": {
-                        "description": "Not permitted to modify the organisation."
-                    },
-                    "500": {
-                        "description": "Internal server error while modifying the organisation."
-                    }
-                },
-                "tags": [
-                    "organisationen"
-                ],
-                "security": [
-                    {
-                        "bearer": []
-                    }
-                ]
-            }
-        },
-        "/api/rolle": {
-            "get": {
-                "operationId": "RolleController_findRollen",
-                "summary": "",
-                "description": "List all rollen.",
-                "parameters": [],
-                "responses": {
-                    "200": {
-                        "description": "The rollen were successfully returned",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/RolleResponse"
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Not authorized to get rollen."
-                    },
-                    "403": {
-                        "description": "Insufficient permissions to get rollen."
-                    },
-                    "500": {
-                        "description": "Internal server error while getting all rollen."
-                    }
-                },
-                "tags": [
-                    "rolle"
-                ],
-                "security": [
-                    {
-                        "bearer": []
-                    }
-                ]
-            },
-            "post": {
-                "operationId": "RolleController_createRolle",
-                "summary": "",
-                "description": "Create a new rolle.",
-                "parameters": [],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/CreateRolleBodyParams"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "201": {
-                        "description": "The rolle was successfully created.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/RolleResponse"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "The input was not valid."
-                    },
-                    "401": {
-                        "description": "Not authorized to create the rolle."
-                    },
-                    "403": {
-                        "description": "Insufficient permissions to create the rolle."
-                    },
-                    "500": {
-                        "description": "Internal server error while creating the rolle."
-                    }
-                },
-                "tags": [
-                    "rolle"
-                ],
-                "security": [
-                    {
-                        "bearer": []
-                    }
-                ]
-            }
-        },
-        "/api/rolle/{rolleId}": {
-            "patch": {
-                "operationId": "RolleController_addSystemRecht",
-                "summary": "",
-                "description": "Add systemrecht to a rolle.",
-                "parameters": [
-                    {
-                        "name": "rolleId",
-                        "required": true,
-                        "in": "path",
-                        "description": "The id for the rolle.",
-                        "schema": {
-                            "nullable": false,
-                            "type": "string"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/AddSystemrechtBodyParams"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "The systemrecht was successfully added to rolle."
-                    },
-                    "400": {
-                        "description": "The input was not valid."
-                    },
-                    "401": {
-                        "description": "Not authorized to create the rolle."
-                    },
-                    "403": {
-                        "description": "Insufficient permissions to create the rolle."
-                    },
-                    "500": {
-                        "description": "Internal server error while adding systemrecht to rolle."
-                    }
-                },
-                "tags": [
-                    "rolle"
-                ],
-                "security": [
-                    {
-                        "bearer": []
-                    }
-                ]
-            }
-        },
-        "/api/rolle/{rolleId}/serviceProviders": {
-            "get": {
-                "operationId": "RolleController_getRolleServiceProviderIds",
-                "summary": "",
-                "description": "Get service-providers for a rolle by its id.",
-                "parameters": [
-                    {
-                        "name": "rolleId",
-                        "required": true,
-                        "in": "path",
-                        "description": "The id for the rolle.",
-                        "schema": {
-                            "nullable": false,
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Returns a list of service-provider ids.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/RolleServiceProviderResponse"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Not authorized to retrieve service-providers for rolle."
-                    },
-                    "404": {
-                        "description": "The rolle does not exist."
-                    }
-                },
-                "tags": [
-                    "rolle"
-                ],
-                "security": [
-                    {
-                        "bearer": []
-                    }
-                ]
-            },
-            "post": {
-                "operationId": "RolleController_addServiceProviderById",
-                "summary": "",
-                "description": "Add a service-provider to a rolle by id.",
-                "parameters": [
-                    {
-                        "name": "rolleId",
-                        "required": true,
-                        "in": "path",
-                        "description": "The id for the rolle.",
-                        "schema": {
-                            "nullable": false,
-                            "type": "string"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/RolleServiceProviderQueryParams"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Adding service-provider finished successfully."
-                    },
-                    "400": {
-                        "description": "The service-provider is already attached to rolle."
-                    },
-                    "401": {
-                        "description": "Not authorized to retrieve service-providers for rolle."
-                    },
-                    "404": {
-                        "description": "The rolle or the service-provider to add does not exist."
-                    }
-                },
-                "tags": [
-                    "rolle"
-                ],
-                "security": [
-                    {
-                        "bearer": []
-                    }
-                ]
-            },
-            "delete": {
-                "operationId": "RolleController_removeServiceProviderById",
-                "summary": "",
-                "description": "Remove a service-provider from a rolle by id.",
-                "parameters": [
-                    {
-                        "name": "rolleId",
-                        "required": true,
-                        "in": "path",
-                        "description": "The id for the rolle.",
-                        "schema": {
-                            "nullable": false,
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "serviceProviderId",
-                        "required": true,
-                        "in": "query",
-                        "description": "The id for the rolle.",
-                        "schema": {
-                            "nullable": false,
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Removing service-provider finished successfully."
-                    },
-                    "401": {
-                        "description": "Not authorized to retrieve service-providers for rolle."
-                    },
-                    "404": {
-                        "description": "The rolle or the service-provider that should be removed does not exist."
-                    }
-                },
-                "tags": [
-                    "rolle"
-                ],
-                "security": [
-                    {
-                        "bearer": []
-                    }
-                ]
-            }
-        },
-        "/api/provider": {
-            "get": {
-                "operationId": "ProviderController_getAllServiceProviders",
-                "parameters": [],
-                "responses": {
-                    "200": {
-                        "description": "The service-providers were successfully returned.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/ServiceProviderResponse"
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Not authorized to get available service providers."
-                    },
-                    "403": {
-                        "description": "Insufficient permissions to get service-providers."
-                    },
-                    "500": {
-                        "description": "Internal server error while getting all service-providers."
-                    }
-                },
-                "tags": [
-                    "provider"
-                ],
-                "security": [
-                    {
-                        "bearer": []
-                    }
-                ]
-            }
-        },
-        "/api/provider/{angebotId}/logo": {
-            "get": {
-                "operationId": "ProviderController_getServiceProviderLogo",
-                "parameters": [
-                    {
-                        "name": "angebotId",
-                        "required": true,
-                        "in": "path",
-                        "description": "The id of the service provider",
-                        "schema": {
-                            "nullable": false,
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "The logo for the service provider was successfully returned.",
-                        "content": {
-                            "image/*": {
-                                "schema": {
-                                    "type": "file",
-                                    "format": "binary"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Angebot ID is required."
-                    },
-                    "401": {
-                        "description": "Not authorized to get service provider logo."
-                    },
-                    "403": {
-                        "description": "Insufficient permissions to get the logo."
-                    },
-                    "404": {
-                        "description": "The service-provider does not exist or has no logo."
-                    },
-                    "500": {
-                        "description": "Internal server error while getting the logo."
-                    }
-                },
-                "tags": [
-                    "provider"
-                ],
-                "security": [
-                    {
-                        "bearer": []
-                    }
-                ]
-            }
         }
     },
     "info": {
@@ -2277,8 +2550,10 @@
             "oauth2": {
                 "type": "oauth2",
                 "flows": {
-                    "password": {
-                        "tokenUrl": "http://127.0.0.1:8080/realms/SPSH/protocol/openid-connect/token",
+                    "authorizationCode": {
+                        "authorizationUrl": "http://localhost:8080/realms/SPSH/protocol/openid-connect/auth",
+                        "tokenUrl": "http://localhost:8080/realms/SPSH/protocol/openid-connect/token",
+                        "refreshUrl": "http://localhost:8080/realms/SPSH/protocol/openid-connect/token",
                         "scopes": {}
                     }
                 }
@@ -2295,6 +2570,10 @@
                 "properties": {
                     "sub": {
                         "type": "string"
+                    },
+                    "personId": {
+                        "type": "string",
+                        "nullable": true
                     },
                     "name": {
                         "type": "string",
@@ -2363,14 +2642,11 @@
                     "updated_at": {
                         "type": "number",
                         "nullable": true
-                    },
-                    "personId": {
-                        "type": "string",
-                        "nullable": true
                     }
                 },
                 "required": [
                     "sub",
+                    "personId",
                     "name",
                     "given_name",
                     "family_name",
@@ -2387,8 +2663,7 @@
                     "zoneinfo",
                     "locale",
                     "phone_number",
-                    "updated_at",
-                    "personId"
+                    "updated_at"
                 ]
             },
             "PersonNameParams": {
@@ -2505,7 +2780,8 @@
                         "type": "string"
                     },
                     "referrer": {
-                        "type": "string"
+                        "type": "string",
+                        "nullable": true
                     },
                     "mandant": {
                         "type": "string"
@@ -2514,16 +2790,24 @@
                         "$ref": "#/components/schemas/PersonNameParams"
                     },
                     "geburt": {
-                        "$ref": "#/components/schemas/PersonBirthParams"
+                        "nullable": true,
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/PersonBirthParams"
+                            }
+                        ]
                     },
                     "stammorganisation": {
-                        "type": "string"
+                        "type": "string",
+                        "nullable": true
                     },
                     "geschlecht": {
-                        "type": "string"
+                        "type": "string",
+                        "nullable": true
                     },
                     "lokalisierung": {
-                        "type": "string"
+                        "type": "string",
+                        "nullable": true
                     },
                     "vertrauensstufe": {
                         "type": "string",
@@ -2532,7 +2816,8 @@
                             "UNBE",
                             "TEIL",
                             "VOLL"
-                        ]
+                        ],
+                        "nullable": true
                     },
                     "revision": {
                         "type": "string"
@@ -2540,6 +2825,10 @@
                     "startpasswort": {
                         "type": "string",
                         "description": "Initiales Benutzerpasswort, muss nach der ersten Anmeldung geändert werden"
+                    },
+                    "personalnummer": {
+                        "type": "string",
+                        "nullable": true
                     }
                 },
                 "required": [
@@ -2553,7 +2842,8 @@
                     "lokalisierung",
                     "vertrauensstufe",
                     "revision",
-                    "startpasswort"
+                    "startpasswort",
+                    "personalnummer"
                 ]
             },
             "PersonendatensatzResponse": {
@@ -2804,6 +3094,527 @@
                     "zuordnungen"
                 ]
             },
+            "CreateOrganisationBodyParams": {
+                "type": "object",
+                "properties": {
+                    "administriertVon": {
+                        "type": "string"
+                    },
+                    "zugehoerigZu": {
+                        "type": "string"
+                    },
+                    "kennung": {
+                        "type": "string",
+                        "description": "Required, if `typ` is equal to `SCHULE`"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "namensergaenzung": {
+                        "type": "string"
+                    },
+                    "kuerzel": {
+                        "type": "string"
+                    },
+                    "typ": {
+                        "type": "string",
+                        "enum": [
+                            "ROOT",
+                            "LAND",
+                            "TRAEGER",
+                            "SCHULE",
+                            "KLASSE",
+                            "ANBIETER",
+                            "SONSTIGE ORGANISATION / EINRICHTUNG",
+                            "UNBESTAETIGT"
+                        ]
+                    },
+                    "traegerschaft": {
+                        "type": "string",
+                        "enum": [
+                            "01",
+                            "02",
+                            "03",
+                            "04",
+                            "05",
+                            "06"
+                        ]
+                    }
+                },
+                "required": [
+                    "name",
+                    "typ"
+                ]
+            },
+            "OrganisationResponseLegacy": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "kennung": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "namensergaenzung": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "kuerzel": {
+                        "type": "string"
+                    },
+                    "typ": {
+                        "type": "string",
+                        "enum": [
+                            "ROOT",
+                            "LAND",
+                            "TRAEGER",
+                            "SCHULE",
+                            "KLASSE",
+                            "ANBIETER",
+                            "SONSTIGE ORGANISATION / EINRICHTUNG",
+                            "UNBESTAETIGT"
+                        ]
+                    }
+                },
+                "required": [
+                    "id",
+                    "kennung",
+                    "name",
+                    "namensergaenzung",
+                    "kuerzel",
+                    "typ"
+                ]
+            },
+            "UpdateOrganisationBodyParams": {
+                "type": "object",
+                "properties": {
+                    "administriertVon": {
+                        "type": "string"
+                    },
+                    "zugehoerigZu": {
+                        "type": "string"
+                    },
+                    "kennung": {
+                        "type": "string",
+                        "description": "Required, if `typ` is equal to `SCHULE`"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "namensergaenzung": {
+                        "type": "string"
+                    },
+                    "kuerzel": {
+                        "type": "string"
+                    },
+                    "typ": {
+                        "type": "string",
+                        "enum": [
+                            "ROOT",
+                            "LAND",
+                            "TRAEGER",
+                            "SCHULE",
+                            "KLASSE",
+                            "ANBIETER",
+                            "SONSTIGE ORGANISATION / EINRICHTUNG",
+                            "UNBESTAETIGT"
+                        ]
+                    },
+                    "traegerschaft": {
+                        "type": "string",
+                        "enum": [
+                            "01",
+                            "02",
+                            "03",
+                            "04",
+                            "05",
+                            "06"
+                        ]
+                    }
+                },
+                "required": [
+                    "name",
+                    "typ"
+                ]
+            },
+            "OrganisationResponse": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "kennung": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "namensergaenzung": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "kuerzel": {
+                        "type": "string"
+                    },
+                    "typ": {
+                        "type": "string",
+                        "enum": [
+                            "ROOT",
+                            "LAND",
+                            "TRAEGER",
+                            "SCHULE",
+                            "KLASSE",
+                            "ANBIETER",
+                            "SONSTIGE ORGANISATION / EINRICHTUNG",
+                            "UNBESTAETIGT"
+                        ]
+                    },
+                    "traegerschaft": {
+                        "type": "string",
+                        "enum": [
+                            "01",
+                            "02",
+                            "03",
+                            "04",
+                            "05",
+                            "06"
+                        ]
+                    }
+                },
+                "required": [
+                    "id",
+                    "kennung",
+                    "name",
+                    "namensergaenzung",
+                    "kuerzel",
+                    "typ",
+                    "traegerschaft"
+                ]
+            },
+            "OrganisationByIdBodyParams": {
+                "type": "object",
+                "properties": {
+                    "organisationId": {
+                        "type": "string",
+                        "description": "The id of an organization",
+                        "nullable": false
+                    }
+                },
+                "required": [
+                    "organisationId"
+                ]
+            },
+            "ServiceProviderIdNameResponse": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "id",
+                    "name"
+                ]
+            },
+            "RolleWithServiceProvidersResponse": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "createdAt": {
+                        "format": "date-time",
+                        "type": "string"
+                    },
+                    "updatedAt": {
+                        "format": "date-time",
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "administeredBySchulstrukturknoten": {
+                        "type": "string"
+                    },
+                    "rollenart": {
+                        "type": "string",
+                        "enum": [
+                            "LERN",
+                            "LEHR",
+                            "EXTERN",
+                            "ORGADMIN",
+                            "LEIT",
+                            "SYSADMIN"
+                        ]
+                    },
+                    "merkmale": {
+                        "type": "array",
+                        "uniqueItems": true,
+                        "items": {
+                            "type": "string",
+                            "enum": [
+                                "BEFRISTUNG_PFLICHT",
+                                "KOPERS_PFLICHT"
+                            ]
+                        }
+                    },
+                    "systemrechte": {
+                        "type": "array",
+                        "uniqueItems": true,
+                        "items": {
+                            "type": "string",
+                            "enum": [
+                                "ROLLEN_VERWALTEN",
+                                "PERSONEN_VERWALTEN",
+                                "SCHULEN_VERWALTEN",
+                                "KLASSEN_VERWALTEN",
+                                "SCHULTRAEGER_VERWALTEN"
+                            ]
+                        }
+                    },
+                    "serviceProviders": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ServiceProviderIdNameResponse"
+                        }
+                    }
+                },
+                "required": [
+                    "id",
+                    "createdAt",
+                    "updatedAt",
+                    "name",
+                    "administeredBySchulstrukturknoten",
+                    "rollenart",
+                    "merkmale",
+                    "systemrechte",
+                    "serviceProviders"
+                ]
+            },
+            "CreateRolleBodyParams": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string"
+                    },
+                    "administeredBySchulstrukturknoten": {
+                        "type": "string"
+                    },
+                    "rollenart": {
+                        "type": "string",
+                        "enum": [
+                            "LERN",
+                            "LEHR",
+                            "EXTERN",
+                            "ORGADMIN",
+                            "LEIT",
+                            "SYSADMIN"
+                        ]
+                    },
+                    "merkmale": {
+                        "type": "array",
+                        "uniqueItems": true,
+                        "items": {
+                            "type": "string",
+                            "enum": [
+                                "BEFRISTUNG_PFLICHT",
+                                "KOPERS_PFLICHT"
+                            ]
+                        }
+                    },
+                    "systemrechte": {
+                        "type": "array",
+                        "uniqueItems": true,
+                        "items": {
+                            "type": "string",
+                            "enum": [
+                                "ROLLEN_VERWALTEN",
+                                "PERSONEN_VERWALTEN",
+                                "SCHULEN_VERWALTEN",
+                                "KLASSEN_VERWALTEN",
+                                "SCHULTRAEGER_VERWALTEN"
+                            ]
+                        }
+                    }
+                },
+                "required": [
+                    "name",
+                    "administeredBySchulstrukturknoten",
+                    "rollenart",
+                    "merkmale",
+                    "systemrechte"
+                ]
+            },
+            "RolleResponse": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "createdAt": {
+                        "format": "date-time",
+                        "type": "string"
+                    },
+                    "updatedAt": {
+                        "format": "date-time",
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "administeredBySchulstrukturknoten": {
+                        "type": "string"
+                    },
+                    "rollenart": {
+                        "type": "string",
+                        "enum": [
+                            "LERN",
+                            "LEHR",
+                            "EXTERN",
+                            "ORGADMIN",
+                            "LEIT",
+                            "SYSADMIN"
+                        ]
+                    },
+                    "merkmale": {
+                        "type": "array",
+                        "uniqueItems": true,
+                        "items": {
+                            "type": "string",
+                            "enum": [
+                                "BEFRISTUNG_PFLICHT",
+                                "KOPERS_PFLICHT"
+                            ]
+                        }
+                    },
+                    "systemrechte": {
+                        "type": "array",
+                        "uniqueItems": true,
+                        "items": {
+                            "type": "string",
+                            "enum": [
+                                "ROLLEN_VERWALTEN",
+                                "PERSONEN_VERWALTEN",
+                                "SCHULEN_VERWALTEN",
+                                "KLASSEN_VERWALTEN",
+                                "SCHULTRAEGER_VERWALTEN"
+                            ]
+                        }
+                    }
+                },
+                "required": [
+                    "id",
+                    "createdAt",
+                    "updatedAt",
+                    "name",
+                    "administeredBySchulstrukturknoten",
+                    "rollenart",
+                    "merkmale",
+                    "systemrechte"
+                ]
+            },
+            "AddSystemrechtBodyParams": {
+                "type": "object",
+                "properties": {
+                    "systemRecht": {
+                        "type": "string",
+                        "enum": [
+                            "ROLLEN_VERWALTEN",
+                            "PERSONEN_VERWALTEN",
+                            "SCHULEN_VERWALTEN",
+                            "KLASSEN_VERWALTEN",
+                            "SCHULTRAEGER_VERWALTEN"
+                        ]
+                    }
+                },
+                "required": [
+                    "systemRecht"
+                ]
+            },
+            "RolleServiceProviderResponse": {
+                "type": "object",
+                "properties": {
+                    "serviceProviderIds": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "required": [
+                    "serviceProviderIds"
+                ]
+            },
+            "RolleServiceProviderQueryParams": {
+                "type": "object",
+                "properties": {
+                    "serviceProviderId": {
+                        "type": "string",
+                        "description": "The id for the rolle.",
+                        "nullable": false
+                    }
+                },
+                "required": [
+                    "serviceProviderId"
+                ]
+            },
+            "ServiceProviderTarget": {
+                "type": "string",
+                "enum": [
+                    "URL",
+                    "SCHULPORTAL_ADMINISTRATION"
+                ]
+            },
+            "ServiceProviderKategorie": {
+                "type": "string",
+                "enum": [
+                    "EMAIL",
+                    "UNTERRICHT",
+                    "VERWALTUNG",
+                    "HINWEISE",
+                    "ANGEBOTE"
+                ]
+            },
+            "ServiceProviderResponse": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "target": {
+                        "$ref": "#/components/schemas/ServiceProviderTarget"
+                    },
+                    "url": {
+                        "type": "string",
+                        "description": "Can be undefined, if `target` is not equal to `URL`"
+                    },
+                    "kategorie": {
+                        "$ref": "#/components/schemas/ServiceProviderKategorie"
+                    },
+                    "hasLogo": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "id",
+                    "name",
+                    "target",
+                    "url",
+                    "kategorie",
+                    "hasLogo"
+                ]
+            },
             "PersonResponseAutomapper": {
                 "type": "object",
                 "properties": {
@@ -2846,6 +3657,9 @@
                     "startpasswort": {
                         "type": "string",
                         "description": "Initiales Benutzerpasswort, muss nach der ersten Anmeldung geändert werden"
+                    },
+                    "personalnummer": {
+                        "type": "string"
                     }
                 },
                 "required": [
@@ -2859,7 +3673,8 @@
                     "lokalisierung",
                     "vertrauensstufe",
                     "revision",
-                    "startpasswort"
+                    "startpasswort",
+                    "personalnummer"
                 ]
             },
             "PersonendatensatzResponseAutomapper": {
@@ -2880,56 +3695,46 @@
                     "personenkontexte"
                 ]
             },
-            "OrganisationResponse": {
-                "type": "object",
-                "properties": {
-                    "id": {
-                        "type": "string"
-                    },
-                    "kennung": {
-                        "type": "string"
-                    },
-                    "name": {
-                        "type": "string"
-                    },
-                    "namensergaenzung": {
-                        "type": "string"
-                    },
-                    "kuerzel": {
-                        "type": "string"
-                    },
-                    "typ": {
-                        "type": "string",
-                        "enum": [
-                            "TRAEGER",
-                            "SCHULE",
-                            "ANBIETER",
-                            "SONSTIGE ORGANISATION / EINRICHTUNG",
-                            "UNBESTAETIGT"
-                        ]
-                    }
-                },
-                "required": [
-                    "id",
-                    "kennung",
-                    "name",
-                    "namensergaenzung",
-                    "kuerzel",
-                    "typ"
-                ]
-            },
             "SystemrechtResponse": {
                 "type": "object",
                 "properties": {
                     "ROLLEN_VERWALTEN": {
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/OrganisationResponse"
+                            "$ref": "#/components/schemas/OrganisationResponseLegacy"
+                        }
+                    },
+                    "KLASSEN_VERWALTEN": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/OrganisationResponseLegacy"
+                        }
+                    },
+                    "SCHULEN_VERWALTEN": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/OrganisationResponseLegacy"
+                        }
+                    },
+                    "PERSONEN_VERWALTEN": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/OrganisationResponseLegacy"
+                        }
+                    },
+                    "SCHULTRAEGER_VERWALTEN": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/OrganisationResponseLegacy"
                         }
                     }
                 },
                 "required": [
-                    "ROLLEN_VERWALTEN"
+                    "ROLLEN_VERWALTEN",
+                    "KLASSEN_VERWALTEN",
+                    "SCHULEN_VERWALTEN",
+                    "PERSONEN_VERWALTEN",
+                    "SCHULTRAEGER_VERWALTEN"
                 ]
             },
             "UpdatePersonenkontextBodyParams": {
@@ -3022,70 +3827,6 @@
                     "rolleId"
                 ]
             },
-            "RolleResponse": {
-                "type": "object",
-                "properties": {
-                    "id": {
-                        "type": "string"
-                    },
-                    "createdAt": {
-                        "format": "date-time",
-                        "type": "string"
-                    },
-                    "updatedAt": {
-                        "format": "date-time",
-                        "type": "string"
-                    },
-                    "name": {
-                        "type": "string"
-                    },
-                    "administeredBySchulstrukturknoten": {
-                        "type": "string"
-                    },
-                    "rollenart": {
-                        "type": "string",
-                        "enum": [
-                            "LERN",
-                            "LEHR",
-                            "EXTERN",
-                            "ORGADMIN",
-                            "LEIT",
-                            "SYSADMIN"
-                        ]
-                    },
-                    "merkmale": {
-                        "type": "array",
-                        "uniqueItems": true,
-                        "items": {
-                            "type": "string",
-                            "enum": [
-                                "BEFRISTUNG_PFLICHT",
-                                "KOPERS_PFLICHT"
-                            ]
-                        }
-                    },
-                    "systemrechte": {
-                        "type": "array",
-                        "uniqueItems": true,
-                        "items": {
-                            "type": "string",
-                            "enum": [
-                                "ROLLEN_VERWALTEN"
-                            ]
-                        }
-                    }
-                },
-                "required": [
-                    "id",
-                    "createdAt",
-                    "updatedAt",
-                    "name",
-                    "administeredBySchulstrukturknoten",
-                    "rollenart",
-                    "merkmale",
-                    "systemrechte"
-                ]
-            },
             "FindRollenResponse": {
                 "type": "object",
                 "properties": {
@@ -3110,7 +3851,7 @@
                     "moeglicheSsks": {
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/OrganisationResponse"
+                            "$ref": "#/components/schemas/OrganisationResponseLegacy"
                         }
                     },
                     "total": {
@@ -3120,245 +3861,6 @@
                 "required": [
                     "moeglicheSsks",
                     "total"
-                ]
-            },
-            "CreateOrganisationBodyParams": {
-                "type": "object",
-                "properties": {
-                    "administriertVon": {
-                        "type": "string"
-                    },
-                    "zugehoerigZu": {
-                        "type": "string"
-                    },
-                    "kennung": {
-                        "type": "string",
-                        "description": "Required, if `typ` is equal to `SCHULE`"
-                    },
-                    "name": {
-                        "type": "string"
-                    },
-                    "namensergaenzung": {
-                        "type": "string"
-                    },
-                    "kuerzel": {
-                        "type": "string"
-                    },
-                    "typ": {
-                        "type": "string",
-                        "enum": [
-                            "TRAEGER",
-                            "SCHULE",
-                            "ANBIETER",
-                            "SONSTIGE ORGANISATION / EINRICHTUNG",
-                            "UNBESTAETIGT"
-                        ]
-                    },
-                    "traegerschaft": {
-                        "type": "string",
-                        "enum": [
-                            "01",
-                            "02",
-                            "03",
-                            "04",
-                            "05",
-                            "06"
-                        ]
-                    }
-                },
-                "required": [
-                    "name",
-                    "typ"
-                ]
-            },
-            "UpdateOrganisationBodyParams": {
-                "type": "object",
-                "properties": {
-                    "administriertVon": {
-                        "type": "string"
-                    },
-                    "zugehoerigZu": {
-                        "type": "string"
-                    },
-                    "kennung": {
-                        "type": "string",
-                        "description": "Required, if `typ` is equal to `SCHULE`"
-                    },
-                    "name": {
-                        "type": "string"
-                    },
-                    "namensergaenzung": {
-                        "type": "string"
-                    },
-                    "kuerzel": {
-                        "type": "string"
-                    },
-                    "typ": {
-                        "type": "string",
-                        "enum": [
-                            "TRAEGER",
-                            "SCHULE",
-                            "ANBIETER",
-                            "SONSTIGE ORGANISATION / EINRICHTUNG",
-                            "UNBESTAETIGT"
-                        ]
-                    },
-                    "traegerschaft": {
-                        "type": "string",
-                        "enum": [
-                            "01",
-                            "02",
-                            "03",
-                            "04",
-                            "05",
-                            "06"
-                        ]
-                    }
-                },
-                "required": [
-                    "name",
-                    "typ"
-                ]
-            },
-            "OrganisationByIdBodyParams": {
-                "type": "object",
-                "properties": {
-                    "organisationId": {
-                        "type": "string",
-                        "description": "The id of an organization",
-                        "nullable": false
-                    }
-                },
-                "required": [
-                    "organisationId"
-                ]
-            },
-            "CreateRolleBodyParams": {
-                "type": "object",
-                "properties": {
-                    "name": {
-                        "type": "string"
-                    },
-                    "administeredBySchulstrukturknoten": {
-                        "type": "string"
-                    },
-                    "rollenart": {
-                        "type": "string",
-                        "enum": [
-                            "LERN",
-                            "LEHR",
-                            "EXTERN",
-                            "ORGADMIN",
-                            "LEIT",
-                            "SYSADMIN"
-                        ]
-                    },
-                    "merkmale": {
-                        "type": "array",
-                        "uniqueItems": true,
-                        "items": {
-                            "type": "string",
-                            "enum": [
-                                "BEFRISTUNG_PFLICHT",
-                                "KOPERS_PFLICHT"
-                            ]
-                        }
-                    },
-                    "systemrechte": {
-                        "type": "array",
-                        "uniqueItems": true,
-                        "items": {
-                            "type": "string",
-                            "enum": [
-                                "ROLLEN_VERWALTEN"
-                            ]
-                        }
-                    }
-                },
-                "required": [
-                    "name",
-                    "administeredBySchulstrukturknoten",
-                    "rollenart",
-                    "merkmale",
-                    "systemrechte"
-                ]
-            },
-            "AddSystemrechtBodyParams": {
-                "type": "object",
-                "properties": {
-                    "systemRecht": {
-                        "type": "string",
-                        "enum": [
-                            "ROLLEN_VERWALTEN"
-                        ]
-                    }
-                },
-                "required": [
-                    "systemRecht"
-                ]
-            },
-            "RolleServiceProviderResponse": {
-                "type": "object",
-                "properties": {
-                    "serviceProviderIds": {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        }
-                    }
-                },
-                "required": [
-                    "serviceProviderIds"
-                ]
-            },
-            "RolleServiceProviderQueryParams": {
-                "type": "object",
-                "properties": {
-                    "serviceProviderId": {
-                        "type": "string",
-                        "description": "The id for the rolle.",
-                        "nullable": false
-                    }
-                },
-                "required": [
-                    "serviceProviderId"
-                ]
-            },
-            "ServiceProviderKategorie": {
-                "type": "string",
-                "enum": [
-                    "EMAIL",
-                    "UNTERRICHT",
-                    "VERWALTUNG",
-                    "HINWEISE",
-                    "ANGEBOTE"
-                ]
-            },
-            "ServiceProviderResponse": {
-                "type": "object",
-                "properties": {
-                    "id": {
-                        "type": "string"
-                    },
-                    "name": {
-                        "type": "string"
-                    },
-                    "url": {
-                        "type": "string"
-                    },
-                    "kategorie": {
-                        "$ref": "#/components/schemas/ServiceProviderKategorie"
-                    },
-                    "hasLogo": {
-                        "type": "boolean"
-                    }
-                },
-                "required": [
-                    "id",
-                    "name",
-                    "url",
-                    "kategorie",
-                    "hasLogo"
                 ]
             }
         }
