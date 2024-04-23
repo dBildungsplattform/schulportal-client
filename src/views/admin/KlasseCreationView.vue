@@ -1,6 +1,12 @@
 <script setup lang="ts">
   import { ref, type ComputedRef, type Ref, computed } from 'vue';
-  import { type Router, useRouter, onBeforeRouteLeave, type RouteLocationNormalized, type NavigationGuardNext } from 'vue-router';
+  import {
+    type Router,
+    useRouter,
+    onBeforeRouteLeave,
+    type RouteLocationNormalized,
+    type NavigationGuardNext,
+  } from 'vue-router';
   import { type Composer, useI18n } from 'vue-i18n';
   import { useForm, type TypedSchema, type BaseFieldProps } from 'vee-validate';
   import { toTypedSchema } from '@vee-validate/yup';
@@ -8,8 +14,8 @@
   import {
     useOrganisationStore,
     type OrganisationStore,
-    type OrganisationResponse,
-CreateOrganisationBodyParamsTypEnum,
+
+    CreateOrganisationBodyParamsTypEnum,
   } from '@/stores/OrganisationStore';
   import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
   import { DIN_91379A_EXT } from '@/utils/validation';
@@ -17,6 +23,7 @@ CreateOrganisationBodyParamsTypEnum,
   import FormWrapper from '@/components/form/FormWrapper.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
+import type { OrganisationResponseLegacy } from '@/api-client/generated/api';
 
   const { t }: Composer = useI18n({ useScope: 'global' });
   const router: Router = useRouter();
@@ -56,8 +63,10 @@ CreateOrganisationBodyParamsTypEnum,
     validationSchema,
   });
 
-  const [selectedSchule, selectedSchuleProps]: [Ref<string>, Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>] =
-    defineField('selectedSchule', vuetifyConfig);
+  const [selectedSchule, selectedSchuleProps]: [
+    Ref<string>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = defineField('selectedSchule', vuetifyConfig);
   const [selectedKlassenname, selectedKlassennameProps]: [
     Ref<string>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
@@ -66,7 +75,7 @@ CreateOrganisationBodyParamsTypEnum,
   const schulen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
     return personenkontextStore.filteredOrganisationen?.moeglicheSsks
       .slice(0, 25)
-      .map((org: OrganisationResponse) => ({
+      .map((org: OrganisationResponseLegacy) => ({
         value: org.id,
         title: `${org.kennung} (${org.name})`,
       }))
@@ -74,10 +83,7 @@ CreateOrganisationBodyParamsTypEnum,
   });
 
   function isFormDirty(): boolean {
-    return (
-      isFieldDirty('selectedSchule') ||
-      isFieldDirty('selectedKlassenname')
-    );
+    return isFieldDirty('selectedSchule') || isFieldDirty('selectedKlassenname');
   }
 
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
@@ -112,11 +118,10 @@ CreateOrganisationBodyParamsTypEnum,
       selectedKlassenname.value,
       '',
       '',
-      // CreateOrganisationBodyParamsTypEnum.Klasse,
-      CreateOrganisationBodyParamsTypEnum.Schule,
-      '', // traegerschaft
-      selectedSchule.value, // administriertVon
-      selectedSchule.value, // zugehoerigZu
+      CreateOrganisationBodyParamsTypEnum.Klasse,
+      undefined,
+      selectedSchule.value, 
+      selectedSchule.value, 
     );
     resetForm();
   });
