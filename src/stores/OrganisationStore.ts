@@ -2,7 +2,7 @@ import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import { isAxiosError, type AxiosResponse } from 'axios';
 import {
   OrganisationenApiFactory,
-  OrganisationResponseTypEnum,
+  OrganisationsTyp,
   CreateOrganisationBodyParamsTypEnum,
   CreateOrganisationBodyParamsTraegerschaftEnum,
   type OrganisationenApiInterface,
@@ -19,7 +19,7 @@ export type Organisation = {
   name: string;
   namensergaenzung?: string | null;
   kuerzel?: string;
-  typ: OrganisationResponseTypEnum;
+  typ: OrganisationsTyp;
 };
 
 type OrganisationState = {
@@ -50,7 +50,7 @@ export { CreateOrganisationBodyParamsTypEnum };
 
 export type OrganisationStore = Store<'organisationStore', OrganisationState, OrganisationGetters, OrganisationActions>;
 
-export { OrganisationResponseTypEnum };
+export { OrganisationsTyp };
 export type { OrganisationResponse };
 
 export const useOrganisationStore: StoreDefinition<
