@@ -88,7 +88,7 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
+          this.errorCode = error.response?.data?.code || 'UNSPECIFIED_ERROR';
         }
         return await Promise.reject(this.errorCode);
       } finally {
@@ -108,7 +108,7 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
+          this.errorCode = error.response?.data?.code || 'UNSPECIFIED_ERROR';
         }
         return await Promise.reject(this.errorCode);
       } finally {
@@ -120,14 +120,14 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
       this.loading = true;
       try {
         const { data }: AxiosResponse<PersonFrontendControllerFindPersons200Response> =
-          await personenFrontendApi.personFrontendControllerFindPersons('');
+          await personenFrontendApi.personFrontendControllerFindPersons();
 
         this.allPersons = data.items;
         this.totalPersons = data.total;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
+          this.errorCode = error.response?.data?.code || 'UNSPECIFIED_ERROR';
         }
       } finally {
         this.loading = false;
@@ -144,7 +144,7 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
       } catch (error) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
+          this.errorCode = error.response?.data?.code || 'UNSPECIFIED_ERROR';
         }
         return await Promise.reject(this.errorCode);
       } finally {
@@ -160,7 +160,7 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
+          this.errorCode = error.response?.data?.code || 'UNSPECIFIED_ERROR';
         }
         return await Promise.reject(this.errorCode);
       } finally {
