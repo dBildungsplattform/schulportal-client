@@ -132,7 +132,6 @@
     "personenkontext": {
       "creationErrorText": "Bei der Zuordnung des Personenkontextes ist ein Fehler aufgetreten. Bitte prüfen Sie die Zuordnungen an der Person."
     },
-    "search": "Suchen",
     "searchResultTable":"Ergebnisliste durchsuchen",
     "schule": {
       "addNew": "Neue Schule hinzufügen",
@@ -192,6 +191,7 @@
     "legalNotice": "Impressum",
     "privacyPolicy": "Datenschutzerklärung"
   },
+  "search": "Suchen",
   "start": {
     "allServiceProviders": "Alle Angebote",
     "categories": {

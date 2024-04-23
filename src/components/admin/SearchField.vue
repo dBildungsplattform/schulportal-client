@@ -48,6 +48,7 @@
         variant="outlined"
         v-model="searchFilter"
         :title="props.hoverText"
+        @keyup.enter="applySearchFilter"
       ></v-text-field>
     </v-col>
     <v-col md="2">
@@ -59,7 +60,7 @@
         height="45"
         width="130"
       >
-        {{ $t('admin.search') }}</v-btn
+        {{ $t('search') }}</v-btn
       >
     </v-col>
   </v-row>
