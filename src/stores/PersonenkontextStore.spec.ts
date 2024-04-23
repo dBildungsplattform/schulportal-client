@@ -4,7 +4,6 @@ import {
   type DBiamPersonenuebersichtResponse,
   type FindRollenResponse,
   type FindSchulstrukturknotenResponse,
-  type PersonFrontendControllerFindPersons200Response,
   type SystemrechtResponse,
   OrganisationResponseTypEnum,
   RolleResponseMerkmaleEnum,
@@ -14,20 +13,8 @@ import ApiService from '@/services/ApiService';
 import MockAdapter from 'axios-mock-adapter';
 import { setActivePinia, createPinia } from 'pinia';
 import { rejects } from 'assert';
-import {
-  usePersonenkontextStore,
-  type PersonenkontextStore,
-  type Uebersicht,
-  type Zuordnung,
-} from './PersonenkontextStore';
-import {
-  usePersonStore,
-  type Person,
-  type Personendatensatz,
-  type PersonendatensatzResponse,
-  type PersonStore,
-} from './PersonStore';
-import { computed, type ComputedRef } from 'vue';
+import { usePersonenkontextStore, type PersonenkontextStore } from './PersonenkontextStore';
+import { usePersonStore, type PersonStore } from './PersonStore';
 
 const mockadapter: MockAdapter = new MockAdapter(ApiService);
 
@@ -360,18 +347,6 @@ describe('PersonenkontextStore', () => {
           },
         ],
       };
-      const mockPersons: PersonendatensatzResponse[] = [
-        {
-          person: {
-            id: '1234',
-            name: {
-              familienname: 'Vimes',
-              vorname: 'Samuel',
-            },
-          },
-        },
-      ] as PersonendatensatzResponse[];
-
       mockadapter.onGet('/api/dbiam/personenuebersicht').replyOnce(200, mockResponse);
       const getAllPersonenuebersichtenPromise: Promise<void> = personenkontextStore.getAllPersonenuebersichten();
       expect(personenkontextStore.loading).toBe(true);
