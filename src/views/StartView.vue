@@ -12,38 +12,38 @@
 
   // Filter service providers by category "EMAIL"
   const emailServiceProviders: ComputedRef<ServiceProvider[]> = computed(() => {
-    return serviceProviderStore.allServiceProviders.filter(
+    return serviceProviderStore.availableServiceProviders.filter(
       (provider: ServiceProvider) => provider.kategorie === ServiceProviderKategorie.Email,
     );
   });
   // Filter service providers by category "UNTERRICHT"
   const classServiceProviders: ComputedRef<ServiceProvider[]> = computed(() => {
-    return serviceProviderStore.allServiceProviders.filter(
+    return serviceProviderStore.availableServiceProviders.filter(
       (provider: ServiceProvider) => provider.kategorie === ServiceProviderKategorie.Unterricht,
     );
   });
   // Filter service providers by category "VERWALTUNG"
   const administrationServiceProviders: ComputedRef<ServiceProvider[]> = computed(() => {
-    return serviceProviderStore.allServiceProviders.filter(
+    return serviceProviderStore.availableServiceProviders.filter(
       (provider: ServiceProvider) => provider.kategorie === ServiceProviderKategorie.Verwaltung,
     );
   });
   // Filter service providers by category "HINWEISE"
   const hintsServiceProviders: ComputedRef<ServiceProvider[]> = computed(() => {
-    return serviceProviderStore.allServiceProviders.filter(
+    return serviceProviderStore.availableServiceProviders.filter(
       (provider: ServiceProvider) => provider.kategorie === ServiceProviderKategorie.Hinweise,
     );
   });
   // Filter service providers by category "ANGEBOTE"
   const schoolOfferingsServiceProviders: ComputedRef<ServiceProvider[]> = computed(() => {
-    return serviceProviderStore.allServiceProviders.filter(
+    return serviceProviderStore.availableServiceProviders.filter(
       (provider: ServiceProvider) => provider.kategorie === ServiceProviderKategorie.Angebote,
     );
   });
 
   onMounted(async () => {
-    await serviceProviderStore.getAllServiceProviders();
-    for (const provider of serviceProviderStore.allServiceProviders) {
+    await serviceProviderStore.getAvailableServiceProviders();
+    for (const provider of serviceProviderStore.availableServiceProviders) {
       if (provider.hasLogo) {
         const logoUrl: string = `/api/provider/${provider.id}/logo`;
         provider.logoUrl = logoUrl;
