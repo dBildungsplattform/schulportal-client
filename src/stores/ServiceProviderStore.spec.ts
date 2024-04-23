@@ -68,4 +68,54 @@ describe('serviceProviderStore', () => {
       expect(serviceProviderStore.loading).toBe(false);
     });
   });
+
+  describe('getAvailableServiceProviders', () => {
+    it("should load user's available service providers and update state", async () => {
+      const mockResponse: ServiceProvider[] = [
+        {
+          id: '1234',
+          name: 'itslearning mock',
+          url: 'example.org/itslearning',
+          kategorie: 'EMAIL',
+          hasLogo: true,
+          target: 'URL',
+        },
+        {
+          id: '5678',
+          name: 'administration mock',
+          url: '/admin',
+          kategorie: 'VERWALTUNG',
+          hasLogo: true,
+          target: 'URL',
+        },
+      ];
+
+      mockadapter.onGet('/api/provider').replyOnce(200, mockResponse);
+      const getAvailableServiceProvidersPromise: Promise<void> = serviceProviderStore.getAvailableServiceProviders();
+      expect(serviceProviderStore.loading).toBe(true);
+      await getAvailableServiceProvidersPromise;
+      expect(serviceProviderStore.availableServiceProviders).toEqual([...mockResponse]);
+      expect(serviceProviderStore.loading).toBe(false);
+    });
+
+    it('should handle string error', async () => {
+      mockadapter.onGet('/api/provider').replyOnce(500, 'some mock server error');
+      const getAvailableServiceProvidersPromise: Promise<void> = serviceProviderStore.getAvailableServiceProviders();
+      expect(serviceProviderStore.loading).toBe(true);
+      await getAvailableServiceProvidersPromise;
+      expect(serviceProviderStore.availableServiceProviders).toEqual([]);
+      expect(serviceProviderStore.errorCode).toEqual('UNSPECIFIED_ERROR');
+      expect(serviceProviderStore.loading).toBe(false);
+    });
+
+    it('should handle error code', async () => {
+      mockadapter.onGet('/api/provider').replyOnce(500, { code: 'some mock server error' });
+      const getAvailableServiceProvidersPromise: Promise<void> = serviceProviderStore.getAvailableServiceProviders();
+      expect(serviceProviderStore.loading).toBe(true);
+      await getAvailableServiceProvidersPromise;
+      expect(serviceProviderStore.availableServiceProviders).toEqual([]);
+      expect(serviceProviderStore.errorCode).toEqual('some mock server error');
+      expect(serviceProviderStore.loading).toBe(false);
+    });
+  });
 });
