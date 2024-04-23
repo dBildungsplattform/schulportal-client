@@ -144,6 +144,24 @@
                 {{ personStore.currentPerson.person.referrer }}
               </v-col>
             </v-row>
+            <!-- Kopers-Nr -->
+            <v-row>
+              <v-col cols="1"></v-col>
+              <v-col
+                class="text-right"
+                md="2"
+                sm="3"
+                cols="5"
+              >
+                <span class="subtitle-2"> {{ $t('person.kopersnr') }}: </span>
+              </v-col>
+              <v-col
+                cols="auto"
+                data-testid="person-kopersnr"
+              >
+                {{ personStore.currentPerson.person.personalnummer ?? '---' }}
+              </v-col>
+            </v-row>
           </div>
           <div v-else-if="personStore.loading">
             <v-progress-circular indeterminate></v-progress-circular>

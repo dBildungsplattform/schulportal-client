@@ -4,6 +4,7 @@ import {
   type DBiamPersonenuebersichtResponse,
   type FindRollenResponse,
   type FindSchulstrukturknotenResponse,
+  type PersonFrontendControllerFindPersons200Response,
   type SystemrechtResponse,
   OrganisationResponseTypEnum,
   RolleResponseMerkmaleEnum,
@@ -13,19 +14,35 @@ import ApiService from '@/services/ApiService';
 import MockAdapter from 'axios-mock-adapter';
 import { setActivePinia, createPinia } from 'pinia';
 import { rejects } from 'assert';
-import { usePersonenkontextStore, type PersonenkontextStore } from './PersonenkontextStore';
+import {
+  usePersonenkontextStore,
+  type PersonenkontextStore,
+  type Uebersicht,
+  type Zuordnung,
+} from './PersonenkontextStore';
+import {
+  usePersonStore,
+  type Person,
+  type Personendatensatz,
+  type PersonendatensatzResponse,
+  type PersonStore,
+} from './PersonStore';
+import { computed, type ComputedRef } from 'vue';
 
 const mockadapter: MockAdapter = new MockAdapter(ApiService);
 
 describe('PersonenkontextStore', () => {
+  let personStore: PersonStore;
   let personenkontextStore: PersonenkontextStore;
   beforeEach(() => {
     setActivePinia(createPinia());
+    personStore = usePersonStore();
     personenkontextStore = usePersonenkontextStore();
     mockadapter.reset();
   });
 
   it('should initalize state correctly', () => {
+    expect(personStore.allPersons).toEqual([]);
     expect(personenkontextStore.errorCode).toEqual('');
     expect(personenkontextStore.loading).toBe(false);
   });
@@ -332,9 +349,9 @@ describe('PersonenkontextStore', () => {
         limit: 0,
         items: [
           {
-            personId: 'string',
-            vorname: 'string',
-            nachname: 'string',
+            personId: '1234',
+            vorname: 'Samuel',
+            nachname: 'Vimes',
             benutzername: 'string',
             zuordnungen: [
               {
@@ -348,11 +365,64 @@ describe('PersonenkontextStore', () => {
           },
         ],
       };
+      const mockPersons: PersonendatensatzResponse[] = [
+        {
+          person: {
+            id: '1234',
+            name: {
+              familienname: 'Vimes',
+              vorname: 'Samuel',
+            },
+          },
+        },
+      ] as PersonendatensatzResponse[];
+
+      const mockPersonsResponse: PersonFrontendControllerFindPersons200Response = {
+        offset: 0,
+        limit: 2,
+        total: 2,
+        items: mockPersons,
+      };
+
+      type PersonenWithRolleAndZuordnung = {
+        rollen: string;
+        administrationsebenen: string;
+        person: Person;
+      }[];
+
+      const personenWithUebersicht: ComputedRef<PersonenWithRolleAndZuordnung> = computed(() => {
+        return personStore.allPersons.map((person: Personendatensatz) => {
+          const uebersicht: Uebersicht = personenkontextStore.allUebersichten?.items.find(
+            (ueb: Uebersicht) => ueb?.personId === person.person.id,
+          );
+          const rollen: string = uebersicht?.zuordnungen.length
+            ? uebersicht.zuordnungen.map((zuordnung: Zuordnung) => zuordnung.rolle).join(', ')
+            : '---';
+          // Choose sskDstNr if available, otherwise sskName.
+          const administrationsebenen: string = uebersicht?.zuordnungen.length
+            ? uebersicht.zuordnungen
+                .map((zuordnung: Zuordnung) => (zuordnung.sskDstNr ? zuordnung.sskDstNr : zuordnung.sskName))
+                .join(', ')
+            : '---';
+          // Check if personalnummer is null, if so, replace it with "---"
+          const personalnummer: string = person.person.personalnummer ?? '---';
+          return {
+            ...person,
+            rollen: rollen,
+            administrationsebenen: administrationsebenen,
+            person: { ...person.person, personalnummer: personalnummer },
+          };
+        });
+      });
       mockadapter.onGet('/api/dbiam/personenuebersicht').replyOnce(200, mockResponse);
+      mockadapter.onGet('/api/personen-frontend').replyOnce(200, mockPersonsResponse, {});
       const getAllPersonenuebersichtenPromise: Promise<void> = personenkontextStore.getAllPersonenuebersichten();
+      const getAllPersonPromise: Promise<void> = personStore.getAllPersons();
       expect(personenkontextStore.loading).toBe(true);
+      await getAllPersonPromise;
       await getAllPersonenuebersichtenPromise;
       expect(personenkontextStore.allUebersichten).toEqual(mockResponse);
+      expect(personenWithUebersicht.value.at(0)?.person.name.familienname).toEqual('Vimes');
       expect(personenkontextStore.loading).toBe(false);
     });
 

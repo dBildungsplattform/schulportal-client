@@ -108,6 +108,7 @@ export const CreateOrganisationBodyParamsTypEnum = {
     Land: 'LAND',
     Traeger: 'TRAEGER',
     Schule: 'SCHULE',
+    Klasse: 'KLASSE',
     Anbieter: 'ANBIETER',
     SonstigeOrganisationEinrichtung: 'SONSTIGE ORGANISATION / EINRICHTUNG',
     Unbestaetigt: 'UNBESTAETIGT'
@@ -538,10 +539,10 @@ export interface FindRollenResponse {
 export interface FindSchulstrukturknotenResponse {
     /**
      * 
-     * @type {Array<OrganisationResponse>}
+     * @type {Array<OrganisationResponseLegacy>}
      * @memberof FindSchulstrukturknotenResponse
      */
-    'moeglicheSsks': Array<OrganisationResponse>;
+    'moeglicheSsks': Array<OrganisationResponseLegacy>;
     /**
      * 
      * @type {number}
@@ -617,6 +618,12 @@ export interface OrganisationResponse {
      * @memberof OrganisationResponse
      */
     'typ': OrganisationResponseTypEnum;
+    /**
+     * 
+     * @type {string}
+     * @memberof OrganisationResponse
+     */
+    'traegerschaft': OrganisationResponseTraegerschaftEnum;
 }
 
 export const OrganisationResponseTypEnum = {
@@ -624,12 +631,80 @@ export const OrganisationResponseTypEnum = {
     Land: 'LAND',
     Traeger: 'TRAEGER',
     Schule: 'SCHULE',
+    Klasse: 'KLASSE',
     Anbieter: 'ANBIETER',
     SonstigeOrganisationEinrichtung: 'SONSTIGE ORGANISATION / EINRICHTUNG',
     Unbestaetigt: 'UNBESTAETIGT'
 } as const;
 
 export type OrganisationResponseTypEnum = typeof OrganisationResponseTypEnum[keyof typeof OrganisationResponseTypEnum];
+export const OrganisationResponseTraegerschaftEnum = {
+    _01: '01',
+    _02: '02',
+    _03: '03',
+    _04: '04',
+    _05: '05',
+    _06: '06'
+} as const;
+
+export type OrganisationResponseTraegerschaftEnum = typeof OrganisationResponseTraegerschaftEnum[keyof typeof OrganisationResponseTraegerschaftEnum];
+
+/**
+ * 
+ * @export
+ * @interface OrganisationResponseLegacy
+ */
+export interface OrganisationResponseLegacy {
+    /**
+     * 
+     * @type {string}
+     * @memberof OrganisationResponseLegacy
+     */
+    'id': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof OrganisationResponseLegacy
+     */
+    'kennung': string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof OrganisationResponseLegacy
+     */
+    'name': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof OrganisationResponseLegacy
+     */
+    'namensergaenzung': string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof OrganisationResponseLegacy
+     */
+    'kuerzel': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof OrganisationResponseLegacy
+     */
+    'typ': OrganisationResponseLegacyTypEnum;
+}
+
+export const OrganisationResponseLegacyTypEnum = {
+    Root: 'ROOT',
+    Land: 'LAND',
+    Traeger: 'TRAEGER',
+    Schule: 'SCHULE',
+    Klasse: 'KLASSE',
+    Anbieter: 'ANBIETER',
+    SonstigeOrganisationEinrichtung: 'SONSTIGE ORGANISATION / EINRICHTUNG',
+    Unbestaetigt: 'UNBESTAETIGT'
+} as const;
+
+export type OrganisationResponseLegacyTypEnum = typeof OrganisationResponseLegacyTypEnum[keyof typeof OrganisationResponseLegacyTypEnum];
 
 /**
  * 
@@ -877,6 +952,12 @@ export interface PersonResponse {
      * @memberof PersonResponse
      */
     'startpasswort': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonResponse
+     */
+    'personalnummer': string | null;
 }
 
 export const PersonResponseVertrauensstufeEnum = {
@@ -960,6 +1041,12 @@ export interface PersonResponseAutomapper {
      * @memberof PersonResponseAutomapper
      */
     'startpasswort': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonResponseAutomapper
+     */
+    'personalnummer': string;
 }
 
 export const PersonResponseAutomapperVertrauensstufeEnum = {
@@ -1400,34 +1487,34 @@ export type ServiceProviderTarget = typeof ServiceProviderTarget[keyof typeof Se
 export interface SystemrechtResponse {
     /**
      * 
-     * @type {Array<OrganisationResponse>}
+     * @type {Array<OrganisationResponseLegacy>}
      * @memberof SystemrechtResponse
      */
-    'ROLLEN_VERWALTEN': Array<OrganisationResponse>;
+    'ROLLEN_VERWALTEN': Array<OrganisationResponseLegacy>;
     /**
      * 
-     * @type {Array<OrganisationResponse>}
+     * @type {Array<OrganisationResponseLegacy>}
      * @memberof SystemrechtResponse
      */
-    'KLASSEN_VERWALTEN': Array<OrganisationResponse>;
+    'KLASSEN_VERWALTEN': Array<OrganisationResponseLegacy>;
     /**
      * 
-     * @type {Array<OrganisationResponse>}
+     * @type {Array<OrganisationResponseLegacy>}
      * @memberof SystemrechtResponse
      */
-    'SCHULEN_VERWALTEN': Array<OrganisationResponse>;
+    'SCHULEN_VERWALTEN': Array<OrganisationResponseLegacy>;
     /**
      * 
-     * @type {Array<OrganisationResponse>}
+     * @type {Array<OrganisationResponseLegacy>}
      * @memberof SystemrechtResponse
      */
-    'PERSONEN_VERWALTEN': Array<OrganisationResponse>;
+    'PERSONEN_VERWALTEN': Array<OrganisationResponseLegacy>;
     /**
      * 
-     * @type {Array<OrganisationResponse>}
+     * @type {Array<OrganisationResponseLegacy>}
      * @memberof SystemrechtResponse
      */
-    'SCHULTRAEGER_VERWALTEN': Array<OrganisationResponse>;
+    'SCHULTRAEGER_VERWALTEN': Array<OrganisationResponseLegacy>;
 }
 /**
  * 
@@ -1490,6 +1577,7 @@ export const UpdateOrganisationBodyParamsTypEnum = {
     Land: 'LAND',
     Traeger: 'TRAEGER',
     Schule: 'SCHULE',
+    Klasse: 'KLASSE',
     Anbieter: 'ANBIETER',
     SonstigeOrganisationEinrichtung: 'SONSTIGE ORGANISATION / EINRICHTUNG',
     Unbestaetigt: 'UNBESTAETIGT'
@@ -2644,11 +2732,12 @@ export const OrganisationenApiAxiosParamCreator = function (configuration?: Conf
          * @param {number} [limit] The requested limit for the page size.
          * @param {string} [kennung] 
          * @param {string} [name] 
-         * @param {'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT'} [typ] 
+         * @param {string} [searchString] 
+         * @param {'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'KLASSE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT'} [typ] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        organisationControllerFindOrganizations: async (offset?: number, limit?: number, kennung?: string, name?: string, typ?: 'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        organisationControllerFindOrganizations: async (offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: 'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'KLASSE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/organisationen`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -2683,6 +2772,10 @@ export const OrganisationenApiAxiosParamCreator = function (configuration?: Conf
 
             if (name !== undefined) {
                 localVarQueryParameter['name'] = name;
+            }
+
+            if (searchString !== undefined) {
+                localVarQueryParameter['searchString'] = searchString;
             }
 
             if (typ !== undefined) {
@@ -2904,7 +2997,7 @@ export const OrganisationenApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async organisationControllerCreateOrganisation(createOrganisationBodyParams: CreateOrganisationBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<OrganisationResponse>> {
+        async organisationControllerCreateOrganisation(createOrganisationBodyParams: CreateOrganisationBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<OrganisationResponseLegacy>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.organisationControllerCreateOrganisation(createOrganisationBodyParams, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -2914,7 +3007,7 @@ export const OrganisationenApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async organisationControllerFindOrganisationById(organisationId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<OrganisationResponse>> {
+        async organisationControllerFindOrganisationById(organisationId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<OrganisationResponseLegacy>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.organisationControllerFindOrganisationById(organisationId, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -2924,12 +3017,13 @@ export const OrganisationenApiFp = function(configuration?: Configuration) {
          * @param {number} [limit] The requested limit for the page size.
          * @param {string} [kennung] 
          * @param {string} [name] 
-         * @param {'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT'} [typ] 
+         * @param {string} [searchString] 
+         * @param {'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'KLASSE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT'} [typ] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, typ?: 'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<OrganisationResponse>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.organisationControllerFindOrganizations(offset, limit, kennung, name, typ, options);
+        async organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: 'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'KLASSE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<OrganisationResponse>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.organisationControllerFindOrganizations(offset, limit, kennung, name, searchString, typ, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -2938,7 +3032,7 @@ export const OrganisationenApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async organisationControllerGetAdministrierteOrganisationen(organisationId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<OrganisationResponse>>> {
+        async organisationControllerGetAdministrierteOrganisationen(organisationId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<OrganisationResponseLegacy>>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.organisationControllerGetAdministrierteOrganisationen(organisationId, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -2947,7 +3041,7 @@ export const OrganisationenApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async organisationControllerGetRootOrganisation(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<OrganisationResponse>> {
+        async organisationControllerGetRootOrganisation(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<OrganisationResponseLegacy>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.organisationControllerGetRootOrganisation(options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -2957,7 +3051,7 @@ export const OrganisationenApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async organisationControllerGetZugehoerigeOrganisationen(organisationId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<OrganisationResponse>>> {
+        async organisationControllerGetZugehoerigeOrganisationen(organisationId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<OrganisationResponseLegacy>>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.organisationControllerGetZugehoerigeOrganisationen(organisationId, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -2968,7 +3062,7 @@ export const OrganisationenApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async organisationControllerUpdateOrganisation(organisationId: string, updateOrganisationBodyParams: UpdateOrganisationBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<OrganisationResponse>> {
+        async organisationControllerUpdateOrganisation(organisationId: string, updateOrganisationBodyParams: UpdateOrganisationBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<OrganisationResponseLegacy>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.organisationControllerUpdateOrganisation(organisationId, updateOrganisationBodyParams, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -3008,7 +3102,7 @@ export const OrganisationenApiFactory = function (configuration?: Configuration,
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        organisationControllerCreateOrganisation(createOrganisationBodyParams: CreateOrganisationBodyParams, options?: any): AxiosPromise<OrganisationResponse> {
+        organisationControllerCreateOrganisation(createOrganisationBodyParams: CreateOrganisationBodyParams, options?: any): AxiosPromise<OrganisationResponseLegacy> {
             return localVarFp.organisationControllerCreateOrganisation(createOrganisationBodyParams, options).then((request) => request(axios, basePath));
         },
         /**
@@ -3017,7 +3111,7 @@ export const OrganisationenApiFactory = function (configuration?: Configuration,
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        organisationControllerFindOrganisationById(organisationId: string, options?: any): AxiosPromise<OrganisationResponse> {
+        organisationControllerFindOrganisationById(organisationId: string, options?: any): AxiosPromise<OrganisationResponseLegacy> {
             return localVarFp.organisationControllerFindOrganisationById(organisationId, options).then((request) => request(axios, basePath));
         },
         /**
@@ -3026,12 +3120,13 @@ export const OrganisationenApiFactory = function (configuration?: Configuration,
          * @param {number} [limit] The requested limit for the page size.
          * @param {string} [kennung] 
          * @param {string} [name] 
-         * @param {'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT'} [typ] 
+         * @param {string} [searchString] 
+         * @param {'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'KLASSE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT'} [typ] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, typ?: 'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', options?: any): AxiosPromise<Array<OrganisationResponse>> {
-            return localVarFp.organisationControllerFindOrganizations(offset, limit, kennung, name, typ, options).then((request) => request(axios, basePath));
+        organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: 'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'KLASSE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', options?: any): AxiosPromise<Array<OrganisationResponse>> {
+            return localVarFp.organisationControllerFindOrganizations(offset, limit, kennung, name, searchString, typ, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -3039,7 +3134,7 @@ export const OrganisationenApiFactory = function (configuration?: Configuration,
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        organisationControllerGetAdministrierteOrganisationen(organisationId: string, options?: any): AxiosPromise<Array<OrganisationResponse>> {
+        organisationControllerGetAdministrierteOrganisationen(organisationId: string, options?: any): AxiosPromise<Array<OrganisationResponseLegacy>> {
             return localVarFp.organisationControllerGetAdministrierteOrganisationen(organisationId, options).then((request) => request(axios, basePath));
         },
         /**
@@ -3047,7 +3142,7 @@ export const OrganisationenApiFactory = function (configuration?: Configuration,
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        organisationControllerGetRootOrganisation(options?: any): AxiosPromise<OrganisationResponse> {
+        organisationControllerGetRootOrganisation(options?: any): AxiosPromise<OrganisationResponseLegacy> {
             return localVarFp.organisationControllerGetRootOrganisation(options).then((request) => request(axios, basePath));
         },
         /**
@@ -3056,7 +3151,7 @@ export const OrganisationenApiFactory = function (configuration?: Configuration,
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        organisationControllerGetZugehoerigeOrganisationen(organisationId: string, options?: any): AxiosPromise<Array<OrganisationResponse>> {
+        organisationControllerGetZugehoerigeOrganisationen(organisationId: string, options?: any): AxiosPromise<Array<OrganisationResponseLegacy>> {
             return localVarFp.organisationControllerGetZugehoerigeOrganisationen(organisationId, options).then((request) => request(axios, basePath));
         },
         /**
@@ -3066,7 +3161,7 @@ export const OrganisationenApiFactory = function (configuration?: Configuration,
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        organisationControllerUpdateOrganisation(organisationId: string, updateOrganisationBodyParams: UpdateOrganisationBodyParams, options?: any): AxiosPromise<OrganisationResponse> {
+        organisationControllerUpdateOrganisation(organisationId: string, updateOrganisationBodyParams: UpdateOrganisationBodyParams, options?: any): AxiosPromise<OrganisationResponseLegacy> {
             return localVarFp.organisationControllerUpdateOrganisation(organisationId, updateOrganisationBodyParams, options).then((request) => request(axios, basePath));
         },
     };
@@ -3105,7 +3200,7 @@ export interface OrganisationenApiInterface {
      * @throws {RequiredError}
      * @memberof OrganisationenApiInterface
      */
-    organisationControllerCreateOrganisation(createOrganisationBodyParams: CreateOrganisationBodyParams, options?: AxiosRequestConfig): AxiosPromise<OrganisationResponse>;
+    organisationControllerCreateOrganisation(createOrganisationBodyParams: CreateOrganisationBodyParams, options?: AxiosRequestConfig): AxiosPromise<OrganisationResponseLegacy>;
 
     /**
      * 
@@ -3114,7 +3209,7 @@ export interface OrganisationenApiInterface {
      * @throws {RequiredError}
      * @memberof OrganisationenApiInterface
      */
-    organisationControllerFindOrganisationById(organisationId: string, options?: AxiosRequestConfig): AxiosPromise<OrganisationResponse>;
+    organisationControllerFindOrganisationById(organisationId: string, options?: AxiosRequestConfig): AxiosPromise<OrganisationResponseLegacy>;
 
     /**
      * 
@@ -3122,12 +3217,13 @@ export interface OrganisationenApiInterface {
      * @param {number} [limit] The requested limit for the page size.
      * @param {string} [kennung] 
      * @param {string} [name] 
-     * @param {'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT'} [typ] 
+     * @param {string} [searchString] 
+     * @param {'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'KLASSE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT'} [typ] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrganisationenApiInterface
      */
-    organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, typ?: 'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', options?: AxiosRequestConfig): AxiosPromise<Array<OrganisationResponse>>;
+    organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: 'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'KLASSE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', options?: AxiosRequestConfig): AxiosPromise<Array<OrganisationResponse>>;
 
     /**
      * 
@@ -3136,7 +3232,7 @@ export interface OrganisationenApiInterface {
      * @throws {RequiredError}
      * @memberof OrganisationenApiInterface
      */
-    organisationControllerGetAdministrierteOrganisationen(organisationId: string, options?: AxiosRequestConfig): AxiosPromise<Array<OrganisationResponse>>;
+    organisationControllerGetAdministrierteOrganisationen(organisationId: string, options?: AxiosRequestConfig): AxiosPromise<Array<OrganisationResponseLegacy>>;
 
     /**
      * 
@@ -3144,7 +3240,7 @@ export interface OrganisationenApiInterface {
      * @throws {RequiredError}
      * @memberof OrganisationenApiInterface
      */
-    organisationControllerGetRootOrganisation(options?: AxiosRequestConfig): AxiosPromise<OrganisationResponse>;
+    organisationControllerGetRootOrganisation(options?: AxiosRequestConfig): AxiosPromise<OrganisationResponseLegacy>;
 
     /**
      * 
@@ -3153,7 +3249,7 @@ export interface OrganisationenApiInterface {
      * @throws {RequiredError}
      * @memberof OrganisationenApiInterface
      */
-    organisationControllerGetZugehoerigeOrganisationen(organisationId: string, options?: AxiosRequestConfig): AxiosPromise<Array<OrganisationResponse>>;
+    organisationControllerGetZugehoerigeOrganisationen(organisationId: string, options?: AxiosRequestConfig): AxiosPromise<Array<OrganisationResponseLegacy>>;
 
     /**
      * 
@@ -3163,7 +3259,7 @@ export interface OrganisationenApiInterface {
      * @throws {RequiredError}
      * @memberof OrganisationenApiInterface
      */
-    organisationControllerUpdateOrganisation(organisationId: string, updateOrganisationBodyParams: UpdateOrganisationBodyParams, options?: AxiosRequestConfig): AxiosPromise<OrganisationResponse>;
+    organisationControllerUpdateOrganisation(organisationId: string, updateOrganisationBodyParams: UpdateOrganisationBodyParams, options?: AxiosRequestConfig): AxiosPromise<OrganisationResponseLegacy>;
 
 }
 
@@ -3226,13 +3322,14 @@ export class OrganisationenApi extends BaseAPI implements OrganisationenApiInter
      * @param {number} [limit] The requested limit for the page size.
      * @param {string} [kennung] 
      * @param {string} [name] 
-     * @param {'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT'} [typ] 
+     * @param {string} [searchString] 
+     * @param {'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'KLASSE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT'} [typ] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrganisationenApi
      */
-    public organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, typ?: 'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', options?: AxiosRequestConfig) {
-        return OrganisationenApiFp(this.configuration).organisationControllerFindOrganizations(offset, limit, kennung, name, typ, options).then((request) => request(this.axios, this.basePath));
+    public organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: 'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'KLASSE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', options?: AxiosRequestConfig) {
+        return OrganisationenApiFp(this.configuration).organisationControllerFindOrganizations(offset, limit, kennung, name, searchString, typ, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -5356,10 +5453,11 @@ export const RolleApiAxiosParamCreator = function (configuration?: Configuration
         /**
          * List all rollen.
          * @summary 
+         * @param {string} [searchStr] The name for the role.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        rolleControllerFindRollen: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        rolleControllerFindRollen: async (searchStr?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/rolle`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -5379,6 +5477,10 @@ export const RolleApiAxiosParamCreator = function (configuration?: Configuration
             // authentication oauth2 required
             // oauth required
             await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+            if (searchStr !== undefined) {
+                localVarQueryParameter['searchStr'] = searchStr;
+            }
 
 
     
@@ -5530,11 +5632,12 @@ export const RolleApiFp = function(configuration?: Configuration) {
         /**
          * List all rollen.
          * @summary 
+         * @param {string} [searchStr] The name for the role.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async rolleControllerFindRollen(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<RolleWithServiceProvidersResponse>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.rolleControllerFindRollen(options);
+        async rolleControllerFindRollen(searchStr?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<RolleWithServiceProvidersResponse>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.rolleControllerFindRollen(searchStr, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -5605,11 +5708,12 @@ export const RolleApiFactory = function (configuration?: Configuration, basePath
         /**
          * List all rollen.
          * @summary 
+         * @param {string} [searchStr] The name for the role.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        rolleControllerFindRollen(options?: any): AxiosPromise<Array<RolleWithServiceProvidersResponse>> {
-            return localVarFp.rolleControllerFindRollen(options).then((request) => request(axios, basePath));
+        rolleControllerFindRollen(searchStr?: string, options?: any): AxiosPromise<Array<RolleWithServiceProvidersResponse>> {
+            return localVarFp.rolleControllerFindRollen(searchStr, options).then((request) => request(axios, basePath));
         },
         /**
          * Get service-providers for a rolle by its id.
@@ -5676,11 +5780,12 @@ export interface RolleApiInterface {
     /**
      * List all rollen.
      * @summary 
+     * @param {string} [searchStr] The name for the role.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof RolleApiInterface
      */
-    rolleControllerFindRollen(options?: AxiosRequestConfig): AxiosPromise<Array<RolleWithServiceProvidersResponse>>;
+    rolleControllerFindRollen(searchStr?: string, options?: AxiosRequestConfig): AxiosPromise<Array<RolleWithServiceProvidersResponse>>;
 
     /**
      * Get service-providers for a rolle by its id.
@@ -5753,12 +5858,13 @@ export class RolleApi extends BaseAPI implements RolleApiInterface {
     /**
      * List all rollen.
      * @summary 
+     * @param {string} [searchStr] The name for the role.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof RolleApi
      */
-    public rolleControllerFindRollen(options?: AxiosRequestConfig) {
-        return RolleApiFp(this.configuration).rolleControllerFindRollen(options).then((request) => request(this.axios, this.basePath));
+    public rolleControllerFindRollen(searchStr?: string, options?: AxiosRequestConfig) {
+        return RolleApiFp(this.configuration).rolleControllerFindRollen(searchStr, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

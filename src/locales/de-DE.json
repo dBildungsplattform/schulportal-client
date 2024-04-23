@@ -166,6 +166,12 @@
     },
     "schultraeger": {
       "management": "Schulträgerverwaltung"
+    },
+    "serviceProvider": {
+      "assignServiceProvider": "Angebote zuordnen",
+      "assignedServiceProvider": "Zugeordnete Angebote",
+      "selectServiceProvider": "Angebote auswählen",
+      "serviceProvider": "Angebote"
     }
   },
   "cancel": "Abbrechen",
@@ -227,6 +233,7 @@
     "enterFirstName": "Vorname eingeben",
     "enterLastName": "Nachname eingeben",
     "firstName": "Vorname",
+    "kopersnr": "Kopers-Nr",
     "lastName": "Nachname",
     "noZuordnungenFound": "Keine Zuordnungen gefunden.",
     "password": "Passwort",

@@ -1,8 +1,8 @@
-import { useOrganisationStore, type OrganisationStore } from './OrganisationStore';
+import { useOrganisationStore, type Organisation, type OrganisationStore } from './OrganisationStore';
 import ApiService from '@/services/ApiService';
 import MockAdapter from 'axios-mock-adapter';
 import { setActivePinia, createPinia } from 'pinia';
-import { type OrganisationResponse, OrganisationResponseTypEnum } from '../api-client/generated/api';
+import { OrganisationResponseTypEnum } from '../api-client/generated/api';
 import { rejects } from 'assert';
 
 const mockadapter: MockAdapter = new MockAdapter(ApiService);
@@ -23,7 +23,7 @@ describe('OrganisationStore', () => {
 
   describe('getAllOrganisations', () => {
     it('should fetch all organisations and update state', async () => {
-      const mockResponse: OrganisationResponse[] = [
+      const mockResponse: Organisation[] = [
         {
           id: '1',
           kennung: 'Org1',
@@ -63,7 +63,7 @@ describe('OrganisationStore', () => {
   });
   describe('getOrganisationById', () => {
     it('should load the Organisation and update state', async () => {
-      const mockResponse: OrganisationResponse[] = [
+      const mockResponse: Organisation[] = [
         {
           id: '1',
           kennung: 'Org1',
@@ -75,7 +75,7 @@ describe('OrganisationStore', () => {
       ];
 
       mockadapter.onGet('/api/organisationen/1').replyOnce(200, mockResponse);
-      const getOrganisationByIdPromise: Promise<OrganisationResponse> = organisationStore.getOrganisationById('1');
+      const getOrganisationByIdPromise: Promise<Organisation> = organisationStore.getOrganisationById('1');
       await getOrganisationByIdPromise;
       expect(organisationStore.currentOrganisation).toEqual(mockResponse);
       expect(organisationStore.loading).toBe(false);
@@ -83,7 +83,7 @@ describe('OrganisationStore', () => {
 
     it('should handle string error', async () => {
       mockadapter.onGet('/api/organisationen/1').replyOnce(500, 'some mock server error');
-      const getOrganisationByIdPromise: Promise<OrganisationResponse> = organisationStore.getOrganisationById('1');
+      const getOrganisationByIdPromise: Promise<Organisation> = organisationStore.getOrganisationById('1');
       await rejects(getOrganisationByIdPromise);
       expect(organisationStore.currentOrganisation).toEqual(null);
       expect(organisationStore.errorCode).toEqual('UNSPECIFIED_ERROR');
@@ -92,7 +92,7 @@ describe('OrganisationStore', () => {
 
     it('should handle error code', async () => {
       mockadapter.onGet('/api/organisationen/1').replyOnce(500, { code: 'some mock server error' });
-      const getOrganisationByIdPromise: Promise<OrganisationResponse> = organisationStore.getOrganisationById('1');
+      const getOrganisationByIdPromise: Promise<Organisation> = organisationStore.getOrganisationById('1');
       expect(organisationStore.loading).toBe(true);
       await rejects(getOrganisationByIdPromise);
       expect(organisationStore.currentOrganisation).toEqual(null);
@@ -102,7 +102,7 @@ describe('OrganisationStore', () => {
   });
   describe('createOrganisation', () => {
     it('should create the Organisation and update state', async () => {
-      const mockResponse: OrganisationResponse[] = [
+      const mockResponse: Organisation[] = [
         {
           id: '1',
           kennung: 'Org1',
@@ -114,7 +114,7 @@ describe('OrganisationStore', () => {
       ];
 
       mockadapter.onPost('/api/organisationen').replyOnce(200, mockResponse);
-      const createOrganisationPromise: Promise<OrganisationResponse> = organisationStore.createOrganisation(
+      const createOrganisationPromise: Promise<Organisation> = organisationStore.createOrganisation(
         'Org1',
         'Organisation 1',
         'Ergänzung',
@@ -129,7 +129,7 @@ describe('OrganisationStore', () => {
 
     it('should handle string error', async () => {
       mockadapter.onPost('/api/organisationen').replyOnce(500, 'some mock server error');
-      const createOrganisationPromise: Promise<OrganisationResponse> = organisationStore.createOrganisation(
+      const createOrganisationPromise: Promise<Organisation> = organisationStore.createOrganisation(
         'Org1',
         'Organisation 1',
         'Ergänzung',
@@ -145,7 +145,7 @@ describe('OrganisationStore', () => {
 
     it('should handle error code', async () => {
       mockadapter.onPost('/api/organisationen').replyOnce(500, { code: 'some mock server error' });
-      const createOrganisationPromise: Promise<OrganisationResponse> = organisationStore.createOrganisation(
+      const createOrganisationPromise: Promise<Organisation> = organisationStore.createOrganisation(
         'Org1',
         'Organisation 1',
         'Ergänzung',
