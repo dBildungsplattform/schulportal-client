@@ -169,7 +169,7 @@
 
   const translatedCreatedRolleMerkmale: ComputedRef<string> = computed(() => {
     if (!rolleStore.createdRolle?.merkmale || Array.from(rolleStore.createdRolle.merkmale).length === 0) {
-      return '-';
+      return '---';
     }
 
     return Array.from(rolleStore.createdRolle.merkmale)
