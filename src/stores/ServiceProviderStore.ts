@@ -17,6 +17,7 @@ export type ServiceProvider = {
 
 type ServiceProviderState = {
   allServiceProviders: ServiceProvider[];
+  availableServiceProviders: ServiceProvider[];
   errorCode: string;
   loading: boolean;
 };
@@ -24,6 +25,7 @@ type ServiceProviderState = {
 type ServiceProviderGetters = {};
 type ServiceProviderActions = {
   getAllServiceProviders: () => Promise<void>;
+  getAvailableServiceProviders: () => Promise<void>;
 };
 
 export { ServiceProviderKategorie };
@@ -45,6 +47,7 @@ export const useServiceProviderStore: StoreDefinition<
   state: (): ServiceProviderState => {
     return {
       allServiceProviders: [],
+      availableServiceProviders: [],
       errorCode: '',
       loading: false,
     };
@@ -56,6 +59,22 @@ export const useServiceProviderStore: StoreDefinition<
         const { data }: { data: ServiceProvider[] } =
           await serviceProviderApi.providerControllerGetAllServiceProviders();
         this.allServiceProviders = data;
+        this.loading = false;
+      } catch (error: unknown) {
+        this.errorCode = 'UNSPECIFIED_ERROR';
+        if (isAxiosError(error)) {
+          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
+        }
+        this.loading = false;
+      }
+    },
+
+    async getAvailableServiceProviders() {
+      this.loading = true;
+      try {
+        const { data }: { data: ServiceProvider[] } =
+          await serviceProviderApi.providerControllerGetAvailableServiceProviders();
+        this.availableServiceProviders = data;
         this.loading = false;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';

@@ -129,6 +129,7 @@ describe('PersonenkontextStore', () => {
       expect(personenkontextStore.loading).toBe(false);
     });
   });
+
   describe('createPersonenkontext', () => {
     it('should create a Personenkontext', async () => {
       const mockPersonenkontext: DBiamPersonenkontextResponse = {
@@ -180,6 +181,7 @@ describe('PersonenkontextStore', () => {
       expect(personenkontextStore.loading).toBe(false);
     });
   });
+
   describe('getPersonenuebersichtById', () => {
     it('should get Personenuebersicht', async () => {
       const mockResponse: DBiamPersonenuebersichtResponse = {
@@ -224,6 +226,7 @@ describe('PersonenkontextStore', () => {
       expect(personenkontextStore.loading).toBe(false);
     });
   });
+
   describe('getPersonenkontextRolleWithFilter', () => {
     it('should get filtered Rollen', async () => {
       const mockResponse: FindRollenResponse = {
@@ -273,6 +276,7 @@ describe('PersonenkontextStore', () => {
       expect(personenkontextStore.loading).toBe(false);
     });
   });
+
   describe('getPersonenkontextAdministrationsebeneWithFilter', () => {
     it('should get filtered Administrationsebenen', async () => {
       const mockResponse: FindSchulstrukturknotenResponse = {
@@ -323,6 +327,7 @@ describe('PersonenkontextStore', () => {
       expect(personenkontextStore.loading).toBe(false);
     });
   });
+
   describe('getAllPersonenuebersichte', () => {
     it('should get All Personenuebersicht', async () => {
       const mockResponse: DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response = {
