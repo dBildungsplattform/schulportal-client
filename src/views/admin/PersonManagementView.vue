@@ -89,22 +89,7 @@
       @onUpdateTable="personStore.getAllPersons()"
       :totalItems="personStore.totalPersons"
       item-value-path="person.id"
-      ><template v-slot:[`item.rolle`]="{ item }">
-        <div
-          class="ellipsis-wrapper"
-          :title="item.rolle"
-        >
-          {{ item.rolle }}
-        </div> </template
-      ><template v-slot:[`item.administrationsebenen`]="{ item }">
-        <div
-          class="ellipsis-wrapper"
-          :title="item.administrationsebenen"
-        >
-          {{ item.administrationsebenen }}
-        </div>
-      </template></ResultTable
-    >
+    ></ResultTable>
   </div>
 </template>
 
