@@ -471,7 +471,7 @@
             <FormRow
               :errorLabel="selectedSystemRechteProps['error']"
               labelForId="systemrecht-select"
-              :label="$t('admin.rolle.assignSystemrechte')" 
+              :label="$t('admin.rolle.systemrechte')" 
             >
               <v-autocomplete
                 autocomplete="off"
