@@ -11,7 +11,7 @@
     type NavigationGuardNext,
   } from 'vue-router';
   import { useDisplay } from 'vuetify';
-  import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
+  import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
   import { useForm, type TypedSchema, type BaseFieldProps } from 'vee-validate';
   import FormWrapper from '@/components/form/FormWrapper.vue';
   import FormRow from '@/components/form/FormRow.vue';
@@ -97,7 +97,7 @@
         selectedSchulname.value,
         ' ',
         ' ',
-        CreateOrganisationBodyParamsTypEnum.Schule,
+        OrganisationsTyp.Schule,
       );
       resetForm();
     }
