@@ -40,7 +40,7 @@ describe('serviceProviderStore', () => {
         },
       ];
 
-      mockadapter.onGet('/api/provider').replyOnce(200, mockResponse);
+      mockadapter.onGet('/api/provider/all').replyOnce(200, mockResponse);
       const getAllServiceProvidersPromise: Promise<void> = serviceProviderStore.getAllServiceProviders();
       expect(serviceProviderStore.loading).toBe(true);
       await getAllServiceProvidersPromise;
@@ -49,7 +49,7 @@ describe('serviceProviderStore', () => {
     });
 
     it('should handle string error', async () => {
-      mockadapter.onGet('/api/provider').replyOnce(500, 'some mock server error');
+      mockadapter.onGet('/api/provider/all').replyOnce(500, 'some mock server error');
       const getAllServiceProvidersPromise: Promise<void> = serviceProviderStore.getAllServiceProviders();
       expect(serviceProviderStore.loading).toBe(true);
       await getAllServiceProvidersPromise;
@@ -59,7 +59,7 @@ describe('serviceProviderStore', () => {
     });
 
     it('should handle error code', async () => {
-      mockadapter.onGet('/api/provider').replyOnce(500, { code: 'some mock server error' });
+      mockadapter.onGet('/api/provider/all').replyOnce(500, { code: 'some mock server error' });
       const getAllServiceProvidersPromise: Promise<void> = serviceProviderStore.getAllServiceProviders();
       expect(serviceProviderStore.loading).toBe(true);
       await getAllServiceProvidersPromise;
