@@ -3,10 +3,8 @@ import { isAxiosError, type AxiosResponse } from 'axios';
 import {
   OrganisationenApiFactory,
   OrganisationsTyp,
-  CreateOrganisationBodyParamsTypEnum,
-  CreateOrganisationBodyParamsTraegerschaftEnum,
+  TraegerschaftTyp,
   type OrganisationenApiInterface,
-  type OrganisationResponse,
   type CreateOrganisationBodyParams,
 } from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
@@ -23,7 +21,7 @@ export type Organisation = {
 };
 
 type OrganisationState = {
-  allOrganisationen: Array<OrganisationResponse>;
+  allOrganisationen: Array<Organisation>;
   currentOrganisation: Organisation | null;
   createdOrganisation: Organisation | null;
   errorCode: string;
@@ -33,25 +31,21 @@ type OrganisationState = {
 type OrganisationGetters = {};
 type OrganisationActions = {
   getAllOrganisationen: () => Promise<void>;
-  getOrganisationById: (organisationId: string) => Promise<OrganisationResponse>;
+  getOrganisationById: (organisationId: string) => Promise<Organisation>;
   createOrganisation: (
     kennung: string,
     name: string,
     namensergaenzung: string,
     kuerzel: string,
-    typ: CreateOrganisationBodyParamsTypEnum,
-    traegerschaft?: CreateOrganisationBodyParamsTraegerschaftEnum,
+    typ: OrganisationsTyp,
+    traegerschaft?: TraegerschaftTyp,
     administriertVon?: string,
     zugehoerigZu?: string,
-  ) => Promise<OrganisationResponse>;
+  ) => Promise<Organisation>;
 };
 
-export { CreateOrganisationBodyParamsTypEnum };
-
-export type OrganisationStore = Store<'organisationStore', OrganisationState, OrganisationGetters, OrganisationActions>;
-
 export { OrganisationsTyp };
-export type { OrganisationResponse };
+export type OrganisationStore = Store<'organisationStore', OrganisationState, OrganisationGetters, OrganisationActions>;
 
 export const useOrganisationStore: StoreDefinition<
   'organisationStore',
@@ -73,8 +67,7 @@ export const useOrganisationStore: StoreDefinition<
     async getAllOrganisationen() {
       this.loading = true;
       try {
-        const { data }: AxiosResponse<OrganisationResponse[]> =
-          await organisationApi.organisationControllerFindOrganizations();
+        const { data }: AxiosResponse<Organisation[]> = await organisationApi.organisationControllerFindOrganizations();
 
         this.allOrganisationen = data;
         this.loading = false;
@@ -90,7 +83,7 @@ export const useOrganisationStore: StoreDefinition<
       this.errorCode = '';
       this.loading = true;
       try {
-        const { data }: { data: OrganisationResponse } =
+        const { data }: { data: Organisation } =
           await organisationApi.organisationControllerFindOrganisationById(organisationId);
 
         this.currentOrganisation = data;
@@ -110,11 +103,11 @@ export const useOrganisationStore: StoreDefinition<
       name: string,
       namensergaenzung: string,
       kuerzel: string,
-      typ: CreateOrganisationBodyParamsTypEnum,
-      traegerschaft?: CreateOrganisationBodyParamsTraegerschaftEnum,
+      typ: OrganisationsTyp,
+      traegerschaft?: TraegerschaftTyp,
       administriertVon?: string,
       zugehoerigZu?: string,
-    ): Promise<OrganisationResponse> {
+    ): Promise<Organisation> {
       this.loading = true;
       try {
         const createOrganisationBodyParams: CreateOrganisationBodyParams = {
@@ -127,7 +120,7 @@ export const useOrganisationStore: StoreDefinition<
           administriertVon: administriertVon,
           zugehoerigZu: zugehoerigZu,
         };
-        const { data }: { data: OrganisationResponse } =
+        const { data }: { data: Organisation } =
           await organisationApi.organisationControllerCreateOrganisation(createOrganisationBodyParams);
         this.loading = false;
         this.createdOrganisation = data;

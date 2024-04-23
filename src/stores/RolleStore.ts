@@ -8,6 +8,7 @@ import {
   type RolleApiInterface,
   type RolleResponse,
   RollenSystemRecht,
+  type RolleServiceProviderQueryParams,
 } from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
 
@@ -22,7 +23,10 @@ type RolleState = {
 
 type RolleGetters = {};
 type RolleActions = {
-  getAllRollen: () => Promise<void>;
+  addServiceProviderToRolle: (
+    rolleId: string,
+    rolleServiceProviderQueryParams: RolleServiceProviderQueryParams,
+  ) => Promise<void>;
   createRolle: (
     rollenName: string,
     administrationsebene: string,
@@ -30,6 +34,7 @@ type RolleActions = {
     merkmale: RollenMerkmal[],
     systemrechte: RollenSystemRecht[],
   ) => Promise<RolleResponse>;
+  getAllRollen: () => Promise<void>;
 };
 
 export { RollenArt };
@@ -95,6 +100,20 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
       try {
         const { data }: AxiosResponse<Array<RolleResponse>> = await rolleApi.rolleControllerFindRollen();
         this.allRollen = data;
+        this.loading = false;
+      } catch (error: unknown) {
+        this.errorCode = 'UNSPECIFIED_ERROR';
+        if (isAxiosError(error)) {
+          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
+        }
+        this.loading = false;
+      }
+    },
+
+    async addServiceProviderToRolle(rolleId: string, rolleServiceProviderQueryParams: RolleServiceProviderQueryParams) {
+      this.loading = true;
+      try {
+        await rolleApi.rolleControllerAddServiceProviderById(rolleId, rolleServiceProviderQueryParams);
         this.loading = false;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';

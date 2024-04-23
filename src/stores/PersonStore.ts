@@ -120,7 +120,7 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
       this.loading = true;
       try {
         const { data }: AxiosResponse<PersonFrontendControllerFindPersons200Response> =
-          await personenFrontendApi.personFrontendControllerFindPersons();
+          await personenFrontendApi.personFrontendControllerFindPersons('');
 
         this.allPersons = data.items;
         this.totalPersons = data.total;

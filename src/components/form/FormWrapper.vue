@@ -86,6 +86,8 @@
 
   <!-- Warning dialog for unsaved changes -->
   <v-dialog
+    data-testid="unsaved-changes-dialog"
+    ref="unsaved-changes-dialog"
     persistent
     v-model="showDialogValue"
   >
