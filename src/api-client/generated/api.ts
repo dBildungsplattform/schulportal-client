@@ -108,6 +108,7 @@ export const CreateOrganisationBodyParamsTypEnum = {
     Land: 'LAND',
     Traeger: 'TRAEGER',
     Schule: 'SCHULE',
+    Klasse: 'KLASSE',
     Anbieter: 'ANBIETER',
     SonstigeOrganisationEinrichtung: 'SONSTIGE ORGANISATION / EINRICHTUNG',
     Unbestaetigt: 'UNBESTAETIGT'
@@ -630,6 +631,7 @@ export const OrganisationResponseTypEnum = {
     Land: 'LAND',
     Traeger: 'TRAEGER',
     Schule: 'SCHULE',
+    Klasse: 'KLASSE',
     Anbieter: 'ANBIETER',
     SonstigeOrganisationEinrichtung: 'SONSTIGE ORGANISATION / EINRICHTUNG',
     Unbestaetigt: 'UNBESTAETIGT'
@@ -696,6 +698,7 @@ export const OrganisationResponseLegacyTypEnum = {
     Land: 'LAND',
     Traeger: 'TRAEGER',
     Schule: 'SCHULE',
+    Klasse: 'KLASSE',
     Anbieter: 'ANBIETER',
     SonstigeOrganisationEinrichtung: 'SONSTIGE ORGANISATION / EINRICHTUNG',
     Unbestaetigt: 'UNBESTAETIGT'
@@ -1574,6 +1577,7 @@ export const UpdateOrganisationBodyParamsTypEnum = {
     Land: 'LAND',
     Traeger: 'TRAEGER',
     Schule: 'SCHULE',
+    Klasse: 'KLASSE',
     Anbieter: 'ANBIETER',
     SonstigeOrganisationEinrichtung: 'SONSTIGE ORGANISATION / EINRICHTUNG',
     Unbestaetigt: 'UNBESTAETIGT'
@@ -2729,11 +2733,11 @@ export const OrganisationenApiAxiosParamCreator = function (configuration?: Conf
          * @param {string} [kennung] 
          * @param {string} [name] 
          * @param {string} [searchString] 
-         * @param {'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT'} [typ] 
+         * @param {'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'KLASSE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT'} [typ] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        organisationControllerFindOrganizations: async (offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: 'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        organisationControllerFindOrganizations: async (offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: 'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'KLASSE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/organisationen`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -3014,11 +3018,11 @@ export const OrganisationenApiFp = function(configuration?: Configuration) {
          * @param {string} [kennung] 
          * @param {string} [name] 
          * @param {string} [searchString] 
-         * @param {'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT'} [typ] 
+         * @param {'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'KLASSE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT'} [typ] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: 'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<OrganisationResponse>>> {
+        async organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: 'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'KLASSE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<OrganisationResponse>>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.organisationControllerFindOrganizations(offset, limit, kennung, name, searchString, typ, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -3117,11 +3121,11 @@ export const OrganisationenApiFactory = function (configuration?: Configuration,
          * @param {string} [kennung] 
          * @param {string} [name] 
          * @param {string} [searchString] 
-         * @param {'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT'} [typ] 
+         * @param {'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'KLASSE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT'} [typ] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: 'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', options?: any): AxiosPromise<Array<OrganisationResponse>> {
+        organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: 'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'KLASSE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', options?: any): AxiosPromise<Array<OrganisationResponse>> {
             return localVarFp.organisationControllerFindOrganizations(offset, limit, kennung, name, searchString, typ, options).then((request) => request(axios, basePath));
         },
         /**
@@ -3214,12 +3218,12 @@ export interface OrganisationenApiInterface {
      * @param {string} [kennung] 
      * @param {string} [name] 
      * @param {string} [searchString] 
-     * @param {'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT'} [typ] 
+     * @param {'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'KLASSE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT'} [typ] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrganisationenApiInterface
      */
-    organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: 'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', options?: AxiosRequestConfig): AxiosPromise<Array<OrganisationResponse>>;
+    organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: 'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'KLASSE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', options?: AxiosRequestConfig): AxiosPromise<Array<OrganisationResponse>>;
 
     /**
      * 
@@ -3319,12 +3323,12 @@ export class OrganisationenApi extends BaseAPI implements OrganisationenApiInter
      * @param {string} [kennung] 
      * @param {string} [name] 
      * @param {string} [searchString] 
-     * @param {'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT'} [typ] 
+     * @param {'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'KLASSE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT'} [typ] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrganisationenApi
      */
-    public organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: 'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', options?: AxiosRequestConfig) {
+    public organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: 'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'KLASSE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', options?: AxiosRequestConfig) {
         return OrganisationenApiFp(this.configuration).organisationControllerFindOrganizations(offset, limit, kennung, name, searchString, typ, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -5471,10 +5475,11 @@ export const RolleApiAxiosParamCreator = function (configuration?: Configuration
         /**
          * List all rollen.
          * @summary 
+         * @param {string} [searchStr] The name for the role.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        rolleControllerFindRollen: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        rolleControllerFindRollen: async (searchStr?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/rolle`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -5494,6 +5499,10 @@ export const RolleApiAxiosParamCreator = function (configuration?: Configuration
             // authentication oauth2 required
             // oauth required
             await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+            if (searchStr !== undefined) {
+                localVarQueryParameter['searchStr'] = searchStr;
+            }
 
 
     
@@ -5645,11 +5654,12 @@ export const RolleApiFp = function(configuration?: Configuration) {
         /**
          * List all rollen.
          * @summary 
+         * @param {string} [searchStr] The name for the role.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async rolleControllerFindRollen(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<RolleWithServiceProvidersResponse>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.rolleControllerFindRollen(options);
+        async rolleControllerFindRollen(searchStr?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<RolleWithServiceProvidersResponse>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.rolleControllerFindRollen(searchStr, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -5720,11 +5730,12 @@ export const RolleApiFactory = function (configuration?: Configuration, basePath
         /**
          * List all rollen.
          * @summary 
+         * @param {string} [searchStr] The name for the role.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        rolleControllerFindRollen(options?: any): AxiosPromise<Array<RolleWithServiceProvidersResponse>> {
-            return localVarFp.rolleControllerFindRollen(options).then((request) => request(axios, basePath));
+        rolleControllerFindRollen(searchStr?: string, options?: any): AxiosPromise<Array<RolleWithServiceProvidersResponse>> {
+            return localVarFp.rolleControllerFindRollen(searchStr, options).then((request) => request(axios, basePath));
         },
         /**
          * Get service-providers for a rolle by its id.
@@ -5791,11 +5802,12 @@ export interface RolleApiInterface {
     /**
      * List all rollen.
      * @summary 
+     * @param {string} [searchStr] The name for the role.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof RolleApiInterface
      */
-    rolleControllerFindRollen(options?: AxiosRequestConfig): AxiosPromise<Array<RolleWithServiceProvidersResponse>>;
+    rolleControllerFindRollen(searchStr?: string, options?: AxiosRequestConfig): AxiosPromise<Array<RolleWithServiceProvidersResponse>>;
 
     /**
      * Get service-providers for a rolle by its id.
@@ -5868,12 +5880,13 @@ export class RolleApi extends BaseAPI implements RolleApiInterface {
     /**
      * List all rollen.
      * @summary 
+     * @param {string} [searchStr] The name for the role.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof RolleApi
      */
-    public rolleControllerFindRollen(options?: AxiosRequestConfig) {
-        return RolleApiFp(this.configuration).rolleControllerFindRollen(options).then((request) => request(this.axios, this.basePath));
+    public rolleControllerFindRollen(searchStr?: string, options?: AxiosRequestConfig) {
+        return RolleApiFp(this.configuration).rolleControllerFindRollen(searchStr, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
