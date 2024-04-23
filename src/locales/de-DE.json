@@ -88,6 +88,7 @@
       "selectMerkmale": "Merkmale auswählen",
       "selectRolle": "Rolle auswählen",
       "selectRollenart": "Rollenart auswählen",
+      "selectSystemrechte":"Systemrechte auswählen",
       "showAll": "Alle Rollen anzeigen",
       "systemrechte": "Systemrechte",
       "userDataLoadingErrorText": "Es konnten keine Benutzerdaten geladen werden."
