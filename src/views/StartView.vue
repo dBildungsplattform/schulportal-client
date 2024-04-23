@@ -7,61 +7,43 @@
   } from '@/stores/ServiceProviderStore';
   import { computed, onMounted, type ComputedRef } from 'vue';
   import ServiceProviderCategory from '@/components/layout/ServiceProviderCategory.vue';
-  import { useI18n, type Composer } from 'vue-i18n';
-
-  const { t }: Composer = useI18n({ useScope: 'global' });
 
   const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
 
   // Filter service providers by category "EMAIL"
   const emailServiceProviders: ComputedRef<ServiceProvider[]> = computed(() => {
-    return serviceProviderStore.allServiceProviders.filter(
+    return serviceProviderStore.availableServiceProviders.filter(
       (provider: ServiceProvider) => provider.kategorie === ServiceProviderKategorie.Email,
     );
   });
   // Filter service providers by category "UNTERRICHT"
   const classServiceProviders: ComputedRef<ServiceProvider[]> = computed(() => {
-    return serviceProviderStore.allServiceProviders.filter(
+    return serviceProviderStore.availableServiceProviders.filter(
       (provider: ServiceProvider) => provider.kategorie === ServiceProviderKategorie.Unterricht,
     );
   });
   // Filter service providers by category "VERWALTUNG"
   const administrationServiceProviders: ComputedRef<ServiceProvider[]> = computed(() => {
-    return serviceProviderStore.allServiceProviders.filter(
+    return serviceProviderStore.availableServiceProviders.filter(
       (provider: ServiceProvider) => provider.kategorie === ServiceProviderKategorie.Verwaltung,
     );
   });
   // Filter service providers by category "HINWEISE"
   const hintsServiceProviders: ComputedRef<ServiceProvider[]> = computed(() => {
-    return serviceProviderStore.allServiceProviders.filter(
+    return serviceProviderStore.availableServiceProviders.filter(
       (provider: ServiceProvider) => provider.kategorie === ServiceProviderKategorie.Hinweise,
     );
   });
   // Filter service providers by category "ANGEBOTE"
   const schoolOfferingsServiceProviders: ComputedRef<ServiceProvider[]> = computed(() => {
-    return serviceProviderStore.allServiceProviders.filter(
+    return serviceProviderStore.availableServiceProviders.filter(
       (provider: ServiceProvider) => provider.kategorie === ServiceProviderKategorie.Angebote,
     );
   });
 
-  // Define the always present service provider for the SH-administration
-  const spshAdministrationServiceProvider: ServiceProvider = {
-    id: 'spsh-administration-service-provider',
-    name: t('nav.admin'),
-    kategorie: ServiceProviderKategorie.Verwaltung,
-    url: '/admin/personen',
-    hasLogo: false,
-  };
-
-  // Extend the administrationServiceProviders computed property to add the always present provider
-  const extendedAdministrationServiceProviders: ComputedRef<ServiceProvider[]> = computed(() => {
-    const providers: ServiceProvider[] = [...administrationServiceProviders.value];
-    providers.push(spshAdministrationServiceProvider);
-    return providers;
-  });
   onMounted(async () => {
-    await serviceProviderStore.getAllServiceProviders();
-    for (const provider of serviceProviderStore.allServiceProviders) {
+    await serviceProviderStore.getAvailableServiceProviders();
+    for (const provider of serviceProviderStore.availableServiceProviders) {
       if (provider.hasLogo) {
         const logoUrl: string = `/api/provider/${provider.id}/logo`;
         provider.logoUrl = logoUrl;
@@ -128,7 +110,7 @@
       <!-- Categorie 3: Administration -->
       <ServiceProviderCategory
         :categoryTitle="$t('start.categories.administration')"
-        :serviceProviders="extendedAdministrationServiceProviders"
+        :serviceProviders="administrationServiceProviders"
       ></ServiceProviderCategory>
       <!-- Categorie 4: Hints -->
       <ServiceProviderCategory

@@ -25,8 +25,16 @@
     });
   }
 
-  function truncateSskName(sskName: string): string {
-    return sskName.length > 30 ? `${sskName.substring(0, 30)}...` : sskName;
+  function getSskName(sskDstNr: string, sskName: string): string {
+    /* truncate ssk name */
+    const truncatededSskName: string = sskName.length > 30 ? `${sskName.substring(0, 30)}...` : sskName;
+
+    /* omit parens when there is no ssk kennung  */
+    if (sskDstNr) {
+      return `${sskDstNr} (${truncatededSskName})`;
+    } else {
+      return truncatededSskName;
+    }
   }
 
   const handleAlertClose = (): void => {
@@ -136,6 +144,24 @@
                 {{ personStore.currentPerson.person.referrer }}
               </v-col>
             </v-row>
+            <!-- Kopers-Nr -->
+            <v-row>
+              <v-col cols="1"></v-col>
+              <v-col
+                class="text-right"
+                md="2"
+                sm="3"
+                cols="5"
+              >
+                <span class="subtitle-2"> {{ $t('person.kopersnr') }}: </span>
+              </v-col>
+              <v-col
+                cols="auto"
+                data-testid="person-kopersnr"
+              >
+                {{ personStore.currentPerson.person.personalnummer ?? '---' }}
+              </v-col>
+            </v-row>
           </div>
           <div v-else-if="personStore.loading">
             <v-progress-circular indeterminate></v-progress-circular>
@@ -203,9 +229,10 @@
             >
               <h3
                 class="text-body"
+                :data-testid="`person-zuordnung-${zuordnung.sskId}`"
                 :title="zuordnung.sskName"
               >
-                {{ zuordnung.sskDstNr }} ({{ truncateSskName(zuordnung.sskName) }}): {{ zuordnung.rolle }}
+                {{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
               </h3>
             </v-col>
           </v-row>
@@ -226,3 +253,4 @@
 </template>
 
 <style></style>
+@/stores/PersonenkontextStore

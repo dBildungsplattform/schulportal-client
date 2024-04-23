@@ -16,6 +16,7 @@
     { title: t('admin.rolle.rollenname'), key: 'name', align: 'start' },
     { title: t('admin.rolle.rollenart'), key: 'rollenart', align: 'start' },
     { title: t('admin.rolle.merkmale'), key: 'merkmale', align: 'start' },
+    { title: t('admin.serviceProvider.serviceProvider'), key: 'serviceProviders', align: 'start' },
     {
       title: t('admin.administrationsebene.administrationsebene'),
       key: 'administeredBySchulstrukturknoten',
@@ -43,7 +44,9 @@
       // If a matching organization is found, format the administeredBySchulstrukturknoten field accordingly
       let administeredBySchulstrukturknoten: string = '';
       if (matchingOrganisation) {
-        administeredBySchulstrukturknoten = `${matchingOrganisation.kennung ?? ''} (${matchingOrganisation.name})`;
+        administeredBySchulstrukturknoten = matchingOrganisation.kennung
+          ? `${matchingOrganisation.kennung} (${matchingOrganisation.name})`
+          : matchingOrganisation.name;
       }
 
       const formattedMerkmale: string =
@@ -86,7 +89,17 @@
       :totalItems="rolleStore.allRollen.length"
       item-value-path="id"
       :disableRowClick="true"
-    ></ResultTable>
+    >
+      <template v-slot:[`item.serviceProviders`]="{ item }">
+        <span v-if="!item.serviceProviders.length">-</span>
+        <span
+          v-for="(serviceProvider, index) in item.serviceProviders"
+          :key="serviceProvider.id"
+        >
+          {{ serviceProvider.name }}{{ index < item.serviceProviders.length - 1 ? ', ' : '' }}
+        </span>
+      </template>
+    </ResultTable>
   </div>
 </template>
 

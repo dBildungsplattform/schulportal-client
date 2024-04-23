@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { useOrganisationStore, type OrganisationStore, type OrganisationResponse } from '@/stores/OrganisationStore';
+  import { useOrganisationStore, type OrganisationStore, type Organisation } from '@/stores/OrganisationStore';
   import {
     usePersonStore,
     type CreatedPerson,
@@ -155,9 +155,9 @@
   const organisationen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
     return personenkontextStore.filteredOrganisationen?.moeglicheSsks
       .slice(0, 25)
-      .map((org: OrganisationResponse) => ({
+      .map((org: Organisation) => ({
         value: org.id,
-        title: `${org.kennung} (${org.name})`,
+        title: org.kennung ? `${org.kennung} (${org.name})` : org.name,
       }))
       .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
   });
@@ -299,6 +299,7 @@
           :label="$t('admin.rolle.rolle')"
         >
           <v-autocomplete
+            autocomplete="off"
             clearable
             data-testid="rolle-select"
             density="compact"
@@ -306,14 +307,13 @@
             :items="rollen"
             item-value="value"
             item-text="title"
+            :no-data-text="$t('noDataFound')"
             :placeholder="$t('admin.rolle.selectRolle')"
             required="true"
             variant="outlined"
             v-bind="selectedRolleProps"
             v-model="selectedRolle"
             v-model:search="searchInputRollen"
-            autocomplete="off"
-            :no-data-text="$t('noDataFound')"
           ></v-autocomplete>
         </FormRow>
 
@@ -373,6 +373,7 @@
             :label="$t('admin.organisation.assignOrganisation')"
           >
             <v-autocomplete
+              autocomplete="off"
               clearable
               data-testid="organisation-select"
               density="compact"
@@ -380,14 +381,13 @@
               :items="organisationen"
               item-value="value"
               item-text="title"
+              :no-data-text="$t('noDataFound')"
               :placeholder="$t('admin.organisation.selectOrganisation')"
               required="true"
               variant="outlined"
               v-bind="selectedOrganisationProps"
               v-model="selectedOrganisation"
               v-model:search="searchInputOrganisation"
-              autocomplete="off"
-              :no-data-text="$t('noDataFound')"
             ></v-autocomplete>
           </FormRow>
         </div>
@@ -402,12 +402,14 @@
             class="subtitle-1"
             cols="auto"
           >
-            {{
-              $t('admin.person.addedSuccessfully', {
-                firstname: personStore.createdPerson.person.name.vorname,
-                lastname: personStore.createdPerson.person.name.familienname,
-              })
-            }}
+            <span data-testid="person-success-text">
+              {{
+                $t('admin.person.addedSuccessfully', {
+                  firstname: personStore.createdPerson.person.name.vorname,
+                  lastname: personStore.createdPerson.person.name.familienname,
+                })
+              }}
+            </span>
           </v-col>
         </v-row>
         <v-row justify="center">
@@ -431,29 +433,43 @@
         </v-row>
         <v-row>
           <v-col class="text-body bold text-right"> {{ $t('person.firstName') }}: </v-col>
-          <v-col class="text-body"> {{ personStore.createdPerson.person.name.vorname }}</v-col>
+          <v-col class="text-body"
+            ><span data-testid="created-person-vorname">{{
+              personStore.createdPerson.person.name.vorname
+            }}</span></v-col
+          >
         </v-row>
         <v-row>
           <v-col class="text-body bold text-right"> {{ $t('person.lastName') }}: </v-col>
-          <v-col class="text-body"> {{ personStore.createdPerson.person.name.familienname }}</v-col>
+          <v-col class="text-body"
+            ><span data-testid="created-person-familienname">{{
+              personStore.createdPerson.person.name.familienname
+            }}</span></v-col
+          >
         </v-row>
         <v-row>
           <v-col class="text-body bold text-right"> {{ $t('person.userName') }}: </v-col>
-          <v-col class="text-body"> {{ personStore.createdPerson.person.referrer }}</v-col>
+          <v-col class="text-body"
+            ><span data-testid="created-person-username">{{ personStore.createdPerson.person.referrer }}</span></v-col
+          >
         </v-row>
         <v-row class="align-center">
-          <v-col class="text-body bold text-right pb-8"> {{ $t('admin.person.startPassword') }}: </v-col>
+          <v-col class="text-body bold text-right pb-8">{{ $t('admin.person.startPassword') }}: </v-col>
           <v-col class="text-body">
             <PasswordOutput :password="personStore.createdPerson.person.startpasswort"></PasswordOutput>
           </v-col>
         </v-row>
         <v-row>
           <v-col class="text-body bold text-right"> {{ $t('admin.rolle.rolle') }}: </v-col>
-          <v-col class="text-body"> {{ translatedRollenname }}</v-col>
+          <v-col class="text-body"
+            ><span data-testid="created-person-rolle">{{ translatedRollenname }}</span></v-col
+          >
         </v-row>
         <v-row>
           <v-col class="text-body bold text-right"> {{ $t('admin.organisation.organisation') }}: </v-col>
-          <v-col class="text-body"> {{ translatedOrganisationsname }}</v-col>
+          <v-col class="text-body"
+            ><span data-testid="created-person-organisation">{{ translatedOrganisationsname }}</span></v-col
+          >
         </v-row>
         <v-divider
           class="border-opacity-100 rounded my-6"
@@ -496,3 +512,4 @@
 </template>
 
 <style></style>
+@/stores/PersonenkontextStore

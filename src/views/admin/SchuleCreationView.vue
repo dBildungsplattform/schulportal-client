@@ -269,7 +269,7 @@
               class="subtitle-1"
               cols="auto"
             >
-              {{ $t('admin.schule.schuleAddedSuccessfully') }}
+              <span data-testid="schule-success-text">{{ $t('admin.schule.schuleAddedSuccessfully') }}</span>
             </v-col>
           </v-row>
           <v-row justify="center">
@@ -292,15 +292,23 @@
           </v-row>
           <v-row>
             <v-col class="text-body bold text-right"> {{ $t('admin.schule.schulform') }}: </v-col>
-            <v-col class="text-body"> {{ preservedSchulform }}</v-col>
+            <v-col class="text-body"
+              ><span data-testid="created-schule-form">{{ preservedSchulform }}</span></v-col
+            >
           </v-row>
           <v-row>
             <v-col class="text-body bold text-right"> {{ $t('admin.schule.dienststellennummer') }}: </v-col>
-            <v-col class="text-body"> {{ organisationStore.createdOrganisation.kennung }}</v-col>
+            <v-col class="text-body"
+              ><span data-testid="created-schule-dienststellennummer">{{
+                organisationStore.createdOrganisation.kennung
+              }}</span></v-col
+            >
           </v-row>
           <v-row>
             <v-col class="text-body bold text-right"> {{ $t('admin.schule.schulname') }}: </v-col>
-            <v-col class="text-body"> {{ organisationStore.createdOrganisation.name }}</v-col>
+            <v-col class="text-body"
+              ><span data-testid="created-schule-name">{{ organisationStore.createdOrganisation.name }}</span></v-col
+            >
           </v-row>
           <v-divider
             class="border-opacity-100 rounded my-6"

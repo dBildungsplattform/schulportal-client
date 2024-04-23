@@ -29,7 +29,8 @@ export type Person = {
     familienname: string;
     vorname: string;
   };
-  referrer: string;
+  referrer: string | null;
+  personalnummer?: string | null;
 };
 
 export type CreatedPerson = CreatePersonBodyParams;
