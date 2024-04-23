@@ -34,7 +34,7 @@ import type { RolleResponse } from '@/stores/RolleStore';
   const { t }: Composer = useI18n({ useScope: 'global' });
   const router: Router = useRouter();
 
-  type TranslatedRollenArt = { value:   RollenArt; title: string };
+  type TranslatedRollenArt = { value: RollenArt; title: string };
   const translatedRollenarten: Ref<TranslatedRollenArt[]> = ref([]);
 
   type TranslatedMerkmal = { value: RollenMerkmal; title: string };
