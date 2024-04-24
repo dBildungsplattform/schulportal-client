@@ -666,6 +666,12 @@ export interface OrganisationResponseLegacy {
      * @type {string}
      * @memberof OrganisationResponseLegacy
      */
+    'administriertVon': string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof OrganisationResponseLegacy
+     */
     'kennung': string | null;
     /**
      * 

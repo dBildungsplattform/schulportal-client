@@ -88,8 +88,9 @@
 
   const translatedSchulname: ComputedRef<string> = computed(
     () =>
-      schulen.value?.find((schule: TranslatedObject) => schule.value === organisationStore.createdOrganisation?.id)
-        ?.title || '',
+      schulen.value?.find(
+        (schule: TranslatedObject) => schule.value === organisationStore.createdOrganisation?.administriertVon,
+      )?.title || '',
   );
 
   // Watcher to detect when the search input for Organisationen is triggered.
@@ -205,7 +206,7 @@
         >
           <!-- Organisationsebene -->
           <v-row>
-            <h3 class="headline-3">1. {{ $t('admin.organisation.selectOrganisation') }}</h3>
+            <h3 class="headline-3">1. {{ $t('admin.organisation.assignOrganisation') }}</h3>
           </v-row>
           <FormRow
             :errorLabel="selectedSchuleProps['error']"
@@ -222,7 +223,7 @@
               :items="schulen"
               item-value="value"
               item-text="title"
-              :placeholder="$t('admin.organisation.selectOrganisation')"
+              :placeholder="$t('admin.organisation.assignOrganisation')"
               required="true"
               variant="outlined"
               v-bind="selectedSchuleProps"
