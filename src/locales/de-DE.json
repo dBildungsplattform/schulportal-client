@@ -133,6 +133,7 @@
     "personenkontext": {
       "creationErrorText": "Bei der Zuordnung des Personenkontextes ist ein Fehler aufgetreten. Bitte prüfen Sie die Zuordnungen an der Person."
     },
+    "searchResultTable":"Ergebnisliste durchsuchen",
     "schule": {
       "addNew": "Neue Schule hinzufügen",
       "administratingSchultraeger": "Verwaltender Schulträger",
@@ -191,6 +192,7 @@
     "legalNotice": "Impressum",
     "privacyPolicy": "Datenschutzerklärung"
   },
+  "search": "Suchen",
   "start": {
     "allServiceProviders": "Alle Angebote",
     "categories": {
@@ -234,6 +236,7 @@
     "enterFirstName": "Vorname eingeben",
     "enterLastName": "Nachname eingeben",
     "firstName": "Vorname",
+    "firstNameLastNameReferrerKopersNr":"Vor-/Nachname/Benutzername/KoPers-Nr.",
     "kopersnr": "Kopers-Nr",
     "lastName": "Nachname",
     "noZuordnungenFound": "Keine Zuordnungen gefunden.",

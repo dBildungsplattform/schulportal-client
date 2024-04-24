@@ -9,6 +9,7 @@
     type Organisation,
     type OrganisationStore,
   } from '@/stores/OrganisationStore';
+  import LayoutCard from '@/components/cards/LayoutCard.vue';
 
   const organisationStore: OrganisationStore = useOrganisationStore();
 
@@ -44,17 +45,19 @@
     >
       {{ $t('admin.headline') }}
     </h1>
-    <ResultTable
-      data-testid="schule-table"
-      :header="$t('admin.schule.management')"
-      :items="filteredOrganisationen || []"
-      :loading="organisationStore.loading"
-      :headers="headers"
-      @onUpdateTable="organisationStore.getAllOrganisationen()"
-      :totalItems="organisationStore.allOrganisationen.length"
-      item-value-path="id"
-      :disableRowClick="true"
-    ></ResultTable>
+    <LayoutCard :header="$t('admin.schule.management')">
+      <ResultTable
+        data-testid="schule-table"
+        :header="$t('admin.schule.management')"
+        :items="filteredOrganisationen || []"
+        :loading="organisationStore.loading"
+        :headers="headers"
+        @onUpdateTable="organisationStore.getAllOrganisationen()"
+        :totalItems="organisationStore.allOrganisationen.length"
+        item-value-path="id"
+        :disableRowClick="true"
+      ></ResultTable>
+    </LayoutCard>
   </div>
 </template>
 
