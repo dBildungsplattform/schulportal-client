@@ -224,7 +224,7 @@
 
   onMounted(async () => {
     rolleStore.createdRolle = null;
-    await organisationStore.getAllOrganisationen();
+    await organisationStore.getAllOrganisationenWithRecht(['ROLLEN_VERWALTEN']);
     await serviceProviderStore.getAllServiceProviders();
 
     // Iterate over the enum values
@@ -471,7 +471,7 @@
             <FormRow
               :errorLabel="selectedSystemRechteProps['error']"
               labelForId="systemrecht-select"
-              :label="$t('admin.rolle.systemrechte')" 
+              :label="$t('admin.rolle.systemrechte')"
             >
               <v-autocomplete
                 autocomplete="off"

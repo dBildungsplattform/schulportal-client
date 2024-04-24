@@ -1013,6 +1013,17 @@
                             ],
                             "type": "string"
                         }
+                    },
+                    {
+                        "name": "systemrechte",
+                        "required": false,
+                        "in": "query",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/components/schemas/RollenSystemRecht"
+                            }
+                        }
                     }
                 ],
                 "responses": {
@@ -3239,6 +3250,16 @@
                 "required": [
                     "name",
                     "typ"
+                ]
+            },
+            "RollenSystemRecht": {
+                "type": "string",
+                "enum": [
+                    "ROLLEN_VERWALTEN",
+                    "PERSONEN_VERWALTEN",
+                    "SCHULEN_VERWALTEN",
+                    "KLASSEN_VERWALTEN",
+                    "SCHULTRAEGER_VERWALTEN"
                 ]
             },
             "OrganisationResponse": {

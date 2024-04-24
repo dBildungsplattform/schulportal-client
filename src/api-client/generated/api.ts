@@ -1387,6 +1387,23 @@ export type RolleWithServiceProvidersResponseSystemrechteEnum = typeof RolleWith
 /**
  * 
  * @export
+ * @enum {string}
+ */
+
+export const RollenSystemRecht = {
+    RollenVerwalten: 'ROLLEN_VERWALTEN',
+    PersonenVerwalten: 'PERSONEN_VERWALTEN',
+    SchulenVerwalten: 'SCHULEN_VERWALTEN',
+    KlassenVerwalten: 'KLASSEN_VERWALTEN',
+    SchultraegerVerwalten: 'SCHULTRAEGER_VERWALTEN'
+} as const;
+
+export type RollenSystemRecht = typeof RollenSystemRecht[keyof typeof RollenSystemRecht];
+
+
+/**
+ * 
+ * @export
  * @interface ServiceProviderIdNameResponse
  */
 export interface ServiceProviderIdNameResponse {
@@ -2734,10 +2751,11 @@ export const OrganisationenApiAxiosParamCreator = function (configuration?: Conf
          * @param {string} [name] 
          * @param {string} [searchString] 
          * @param {'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'KLASSE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT'} [typ] 
+         * @param {Array<RollenSystemRecht>} [systemrechte] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        organisationControllerFindOrganizations: async (offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: 'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'KLASSE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        organisationControllerFindOrganizations: async (offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: 'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'KLASSE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', systemrechte?: Array<RollenSystemRecht>, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/organisationen`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -2780,6 +2798,10 @@ export const OrganisationenApiAxiosParamCreator = function (configuration?: Conf
 
             if (typ !== undefined) {
                 localVarQueryParameter['typ'] = typ;
+            }
+
+            if (systemrechte) {
+                localVarQueryParameter['systemrechte'] = systemrechte;
             }
 
 
@@ -3019,11 +3041,12 @@ export const OrganisationenApiFp = function(configuration?: Configuration) {
          * @param {string} [name] 
          * @param {string} [searchString] 
          * @param {'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'KLASSE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT'} [typ] 
+         * @param {Array<RollenSystemRecht>} [systemrechte] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: 'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'KLASSE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<OrganisationResponse>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.organisationControllerFindOrganizations(offset, limit, kennung, name, searchString, typ, options);
+        async organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: 'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'KLASSE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', systemrechte?: Array<RollenSystemRecht>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<OrganisationResponse>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.organisationControllerFindOrganizations(offset, limit, kennung, name, searchString, typ, systemrechte, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -3122,11 +3145,12 @@ export const OrganisationenApiFactory = function (configuration?: Configuration,
          * @param {string} [name] 
          * @param {string} [searchString] 
          * @param {'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'KLASSE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT'} [typ] 
+         * @param {Array<RollenSystemRecht>} [systemrechte] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: 'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'KLASSE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', options?: any): AxiosPromise<Array<OrganisationResponse>> {
-            return localVarFp.organisationControllerFindOrganizations(offset, limit, kennung, name, searchString, typ, options).then((request) => request(axios, basePath));
+        organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: 'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'KLASSE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', systemrechte?: Array<RollenSystemRecht>, options?: any): AxiosPromise<Array<OrganisationResponse>> {
+            return localVarFp.organisationControllerFindOrganizations(offset, limit, kennung, name, searchString, typ, systemrechte, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -3219,11 +3243,12 @@ export interface OrganisationenApiInterface {
      * @param {string} [name] 
      * @param {string} [searchString] 
      * @param {'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'KLASSE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT'} [typ] 
+     * @param {Array<RollenSystemRecht>} [systemrechte] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrganisationenApiInterface
      */
-    organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: 'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'KLASSE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', options?: AxiosRequestConfig): AxiosPromise<Array<OrganisationResponse>>;
+    organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: 'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'KLASSE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', systemrechte?: Array<RollenSystemRecht>, options?: AxiosRequestConfig): AxiosPromise<Array<OrganisationResponse>>;
 
     /**
      * 
@@ -3324,12 +3349,13 @@ export class OrganisationenApi extends BaseAPI implements OrganisationenApiInter
      * @param {string} [name] 
      * @param {string} [searchString] 
      * @param {'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'KLASSE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT'} [typ] 
+     * @param {Array<RollenSystemRecht>} [systemrechte] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrganisationenApi
      */
-    public organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: 'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'KLASSE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', options?: AxiosRequestConfig) {
-        return OrganisationenApiFp(this.configuration).organisationControllerFindOrganizations(offset, limit, kennung, name, searchString, typ, options).then((request) => request(this.axios, this.basePath));
+    public organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: 'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'KLASSE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', systemrechte?: Array<RollenSystemRecht>, options?: AxiosRequestConfig) {
+        return OrganisationenApiFp(this.configuration).organisationControllerFindOrganizations(offset, limit, kennung, name, searchString, typ, systemrechte, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
