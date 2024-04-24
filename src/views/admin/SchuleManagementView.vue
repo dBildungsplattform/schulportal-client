@@ -10,6 +10,7 @@
     type Organisation,
     type OrganisationStore,
   } from '@/stores/OrganisationStore';
+  import LayoutCard from '@/components/cards/LayoutCard.vue';
 
   const organisationStore: OrganisationStore = useOrganisationStore();
 
@@ -55,16 +56,7 @@
         :totalItems="organisationStore.allOrganisationen.length"
         item-value-path="id"
         :disableRowClick="true"
-      >
-        <template v-slot:[`item.name`]="{ item }">
-          <div
-            class="ellipsis-wrapper"
-            :title="item.name"
-          >
-            {{ item.name }}
-          </div>
-        </template>
-      </ResultTable>
+      ></ResultTable>
     </LayoutCard>
   </div>
 </template>

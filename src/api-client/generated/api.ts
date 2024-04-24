@@ -108,6 +108,7 @@ export const CreateOrganisationBodyParamsTypEnum = {
     Land: 'LAND',
     Traeger: 'TRAEGER',
     Schule: 'SCHULE',
+    Klasse: 'KLASSE',
     Anbieter: 'ANBIETER',
     SonstigeOrganisationEinrichtung: 'SONSTIGE ORGANISATION / EINRICHTUNG',
     Unbestaetigt: 'UNBESTAETIGT'
@@ -630,6 +631,7 @@ export const OrganisationResponseTypEnum = {
     Land: 'LAND',
     Traeger: 'TRAEGER',
     Schule: 'SCHULE',
+    Klasse: 'KLASSE',
     Anbieter: 'ANBIETER',
     SonstigeOrganisationEinrichtung: 'SONSTIGE ORGANISATION / EINRICHTUNG',
     Unbestaetigt: 'UNBESTAETIGT'
@@ -696,6 +698,7 @@ export const OrganisationResponseLegacyTypEnum = {
     Land: 'LAND',
     Traeger: 'TRAEGER',
     Schule: 'SCHULE',
+    Klasse: 'KLASSE',
     Anbieter: 'ANBIETER',
     SonstigeOrganisationEinrichtung: 'SONSTIGE ORGANISATION / EINRICHTUNG',
     Unbestaetigt: 'UNBESTAETIGT'
@@ -1574,6 +1577,7 @@ export const UpdateOrganisationBodyParamsTypEnum = {
     Land: 'LAND',
     Traeger: 'TRAEGER',
     Schule: 'SCHULE',
+    Klasse: 'KLASSE',
     Anbieter: 'ANBIETER',
     SonstigeOrganisationEinrichtung: 'SONSTIGE ORGANISATION / EINRICHTUNG',
     Unbestaetigt: 'UNBESTAETIGT'
@@ -2729,11 +2733,11 @@ export const OrganisationenApiAxiosParamCreator = function (configuration?: Conf
          * @param {string} [kennung] 
          * @param {string} [name] 
          * @param {string} [searchString] 
-         * @param {'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT'} [typ] 
+         * @param {'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'KLASSE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT'} [typ] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        organisationControllerFindOrganizations: async (offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: 'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        organisationControllerFindOrganizations: async (offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: 'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'KLASSE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/organisationen`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -3014,11 +3018,11 @@ export const OrganisationenApiFp = function(configuration?: Configuration) {
          * @param {string} [kennung] 
          * @param {string} [name] 
          * @param {string} [searchString] 
-         * @param {'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT'} [typ] 
+         * @param {'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'KLASSE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT'} [typ] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: 'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<OrganisationResponse>>> {
+        async organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: 'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'KLASSE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<OrganisationResponse>>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.organisationControllerFindOrganizations(offset, limit, kennung, name, searchString, typ, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -3117,11 +3121,11 @@ export const OrganisationenApiFactory = function (configuration?: Configuration,
          * @param {string} [kennung] 
          * @param {string} [name] 
          * @param {string} [searchString] 
-         * @param {'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT'} [typ] 
+         * @param {'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'KLASSE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT'} [typ] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: 'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', options?: any): AxiosPromise<Array<OrganisationResponse>> {
+        organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: 'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'KLASSE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', options?: any): AxiosPromise<Array<OrganisationResponse>> {
             return localVarFp.organisationControllerFindOrganizations(offset, limit, kennung, name, searchString, typ, options).then((request) => request(axios, basePath));
         },
         /**
@@ -3214,12 +3218,12 @@ export interface OrganisationenApiInterface {
      * @param {string} [kennung] 
      * @param {string} [name] 
      * @param {string} [searchString] 
-     * @param {'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT'} [typ] 
+     * @param {'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'KLASSE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT'} [typ] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrganisationenApiInterface
      */
-    organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: 'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', options?: AxiosRequestConfig): AxiosPromise<Array<OrganisationResponse>>;
+    organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: 'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'KLASSE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', options?: AxiosRequestConfig): AxiosPromise<Array<OrganisationResponse>>;
 
     /**
      * 
@@ -3319,12 +3323,12 @@ export class OrganisationenApi extends BaseAPI implements OrganisationenApiInter
      * @param {string} [kennung] 
      * @param {string} [name] 
      * @param {string} [searchString] 
-     * @param {'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT'} [typ] 
+     * @param {'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'KLASSE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT'} [typ] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrganisationenApi
      */
-    public organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: 'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', options?: AxiosRequestConfig) {
+    public organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: 'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'KLASSE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', options?: AxiosRequestConfig) {
         return OrganisationenApiFp(this.configuration).organisationControllerFindOrganizations(offset, limit, kennung, name, searchString, typ, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -3584,6 +3588,7 @@ export const PersonenApiAxiosParamCreator = function (configuration?: Configurat
         },
         /**
          * 
+         * @param {string} suchFilter Search filter used to filter for Persons. It could be the vorname, familienname, referrer or the personalnummer.
          * @param {number} [offset] The offset of the paginated list.
          * @param {number} [limit] The requested limit for the page size.
          * @param {string} [referrer] 
@@ -3593,7 +3598,9 @@ export const PersonenApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        personControllerFindPersons: async (offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        personControllerFindPersons: async (suchFilter: string, offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'suchFilter' is not null or undefined
+            assertParamExists('personControllerFindPersons', 'suchFilter', suchFilter)
             const localVarPath = `/api/personen`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -3636,6 +3643,10 @@ export const PersonenApiAxiosParamCreator = function (configuration?: Configurat
 
             if (sichtfreigabe !== undefined) {
                 localVarQueryParameter['sichtfreigabe'] = sichtfreigabe;
+            }
+
+            if (suchFilter !== undefined) {
+                localVarQueryParameter['suchFilter'] = suchFilter;
             }
 
 
@@ -3796,6 +3807,7 @@ export const PersonenApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @param {string} suchFilter Search filter used to filter for Persons. It could be the vorname, familienname, referrer or the personalnummer.
          * @param {number} [offset] The offset of the paginated list.
          * @param {number} [limit] The requested limit for the page size.
          * @param {string} [referrer] 
@@ -3805,8 +3817,8 @@ export const PersonenApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async personControllerFindPersons(offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<PersonendatensatzResponse>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.personControllerFindPersons(offset, limit, referrer, familienname, vorname, sichtfreigabe, options);
+        async personControllerFindPersons(suchFilter: string, offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<PersonendatensatzResponse>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.personControllerFindPersons(suchFilter, offset, limit, referrer, familienname, vorname, sichtfreigabe, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -3885,6 +3897,7 @@ export const PersonenApiFactory = function (configuration?: Configuration, baseP
         },
         /**
          * 
+         * @param {string} suchFilter Search filter used to filter for Persons. It could be the vorname, familienname, referrer or the personalnummer.
          * @param {number} [offset] The offset of the paginated list.
          * @param {number} [limit] The requested limit for the page size.
          * @param {string} [referrer] 
@@ -3894,8 +3907,8 @@ export const PersonenApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        personControllerFindPersons(offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', options?: any): AxiosPromise<Array<PersonendatensatzResponse>> {
-            return localVarFp.personControllerFindPersons(offset, limit, referrer, familienname, vorname, sichtfreigabe, options).then((request) => request(axios, basePath));
+        personControllerFindPersons(suchFilter: string, offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', options?: any): AxiosPromise<Array<PersonendatensatzResponse>> {
+            return localVarFp.personControllerFindPersons(suchFilter, offset, limit, referrer, familienname, vorname, sichtfreigabe, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -3970,6 +3983,7 @@ export interface PersonenApiInterface {
 
     /**
      * 
+     * @param {string} suchFilter Search filter used to filter for Persons. It could be the vorname, familienname, referrer or the personalnummer.
      * @param {number} [offset] The offset of the paginated list.
      * @param {number} [limit] The requested limit for the page size.
      * @param {string} [referrer] 
@@ -3980,7 +3994,7 @@ export interface PersonenApiInterface {
      * @throws {RequiredError}
      * @memberof PersonenApiInterface
      */
-    personControllerFindPersons(offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', options?: AxiosRequestConfig): AxiosPromise<Array<PersonendatensatzResponse>>;
+    personControllerFindPersons(suchFilter: string, offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', options?: AxiosRequestConfig): AxiosPromise<Array<PersonendatensatzResponse>>;
 
     /**
      * 
@@ -4063,6 +4077,7 @@ export class PersonenApi extends BaseAPI implements PersonenApiInterface {
 
     /**
      * 
+     * @param {string} suchFilter Search filter used to filter for Persons. It could be the vorname, familienname, referrer or the personalnummer.
      * @param {number} [offset] The offset of the paginated list.
      * @param {number} [limit] The requested limit for the page size.
      * @param {string} [referrer] 
@@ -4073,8 +4088,8 @@ export class PersonenApi extends BaseAPI implements PersonenApiInterface {
      * @throws {RequiredError}
      * @memberof PersonenApi
      */
-    public personControllerFindPersons(offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', options?: AxiosRequestConfig) {
-        return PersonenApiFp(this.configuration).personControllerFindPersons(offset, limit, referrer, familienname, vorname, sichtfreigabe, options).then((request) => request(this.axios, this.basePath));
+    public personControllerFindPersons(suchFilter: string, offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', options?: AxiosRequestConfig) {
+        return PersonenApiFp(this.configuration).personControllerFindPersons(suchFilter, offset, limit, referrer, familienname, vorname, sichtfreigabe, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -4110,6 +4125,7 @@ export const PersonenFrontendApiAxiosParamCreator = function (configuration?: Co
     return {
         /**
          * 
+         * @param {string} suchFilter Search filter used to filter for Persons. It could be the vorname, familienname, referrer or the personalnummer.
          * @param {number} [offset] The offset of the paginated list.
          * @param {number} [limit] The requested limit for the page size.
          * @param {string} [referrer] 
@@ -4119,7 +4135,9 @@ export const PersonenFrontendApiAxiosParamCreator = function (configuration?: Co
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        personFrontendControllerFindPersons: async (offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        personFrontendControllerFindPersons: async (suchFilter: string, offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'suchFilter' is not null or undefined
+            assertParamExists('personFrontendControllerFindPersons', 'suchFilter', suchFilter)
             const localVarPath = `/api/personen-frontend`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -4164,6 +4182,10 @@ export const PersonenFrontendApiAxiosParamCreator = function (configuration?: Co
                 localVarQueryParameter['sichtfreigabe'] = sichtfreigabe;
             }
 
+            if (suchFilter !== undefined) {
+                localVarQueryParameter['suchFilter'] = suchFilter;
+            }
+
 
     
             setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -4187,6 +4209,7 @@ export const PersonenFrontendApiFp = function(configuration?: Configuration) {
     return {
         /**
          * 
+         * @param {string} suchFilter Search filter used to filter for Persons. It could be the vorname, familienname, referrer or the personalnummer.
          * @param {number} [offset] The offset of the paginated list.
          * @param {number} [limit] The requested limit for the page size.
          * @param {string} [referrer] 
@@ -4196,8 +4219,8 @@ export const PersonenFrontendApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async personFrontendControllerFindPersons(offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonFrontendControllerFindPersons200Response>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.personFrontendControllerFindPersons(offset, limit, referrer, familienname, vorname, sichtfreigabe, options);
+        async personFrontendControllerFindPersons(suchFilter: string, offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonFrontendControllerFindPersons200Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.personFrontendControllerFindPersons(suchFilter, offset, limit, referrer, familienname, vorname, sichtfreigabe, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -4212,6 +4235,7 @@ export const PersonenFrontendApiFactory = function (configuration?: Configuratio
     return {
         /**
          * 
+         * @param {string} suchFilter Search filter used to filter for Persons. It could be the vorname, familienname, referrer or the personalnummer.
          * @param {number} [offset] The offset of the paginated list.
          * @param {number} [limit] The requested limit for the page size.
          * @param {string} [referrer] 
@@ -4221,8 +4245,8 @@ export const PersonenFrontendApiFactory = function (configuration?: Configuratio
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        personFrontendControllerFindPersons(offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', options?: any): AxiosPromise<PersonFrontendControllerFindPersons200Response> {
-            return localVarFp.personFrontendControllerFindPersons(offset, limit, referrer, familienname, vorname, sichtfreigabe, options).then((request) => request(axios, basePath));
+        personFrontendControllerFindPersons(suchFilter: string, offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', options?: any): AxiosPromise<PersonFrontendControllerFindPersons200Response> {
+            return localVarFp.personFrontendControllerFindPersons(suchFilter, offset, limit, referrer, familienname, vorname, sichtfreigabe, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -4235,6 +4259,7 @@ export const PersonenFrontendApiFactory = function (configuration?: Configuratio
 export interface PersonenFrontendApiInterface {
     /**
      * 
+     * @param {string} suchFilter Search filter used to filter for Persons. It could be the vorname, familienname, referrer or the personalnummer.
      * @param {number} [offset] The offset of the paginated list.
      * @param {number} [limit] The requested limit for the page size.
      * @param {string} [referrer] 
@@ -4245,7 +4270,7 @@ export interface PersonenFrontendApiInterface {
      * @throws {RequiredError}
      * @memberof PersonenFrontendApiInterface
      */
-    personFrontendControllerFindPersons(offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', options?: AxiosRequestConfig): AxiosPromise<PersonFrontendControllerFindPersons200Response>;
+    personFrontendControllerFindPersons(suchFilter: string, offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', options?: AxiosRequestConfig): AxiosPromise<PersonFrontendControllerFindPersons200Response>;
 
 }
 
@@ -4258,6 +4283,7 @@ export interface PersonenFrontendApiInterface {
 export class PersonenFrontendApi extends BaseAPI implements PersonenFrontendApiInterface {
     /**
      * 
+     * @param {string} suchFilter Search filter used to filter for Persons. It could be the vorname, familienname, referrer or the personalnummer.
      * @param {number} [offset] The offset of the paginated list.
      * @param {number} [limit] The requested limit for the page size.
      * @param {string} [referrer] 
@@ -4268,8 +4294,8 @@ export class PersonenFrontendApi extends BaseAPI implements PersonenFrontendApiI
      * @throws {RequiredError}
      * @memberof PersonenFrontendApi
      */
-    public personFrontendControllerFindPersons(offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', options?: AxiosRequestConfig) {
-        return PersonenFrontendApiFp(this.configuration).personFrontendControllerFindPersons(offset, limit, referrer, familienname, vorname, sichtfreigabe, options).then((request) => request(this.axios, this.basePath));
+    public personFrontendControllerFindPersons(suchFilter: string, offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', options?: AxiosRequestConfig) {
+        return PersonenFrontendApiFp(this.configuration).personFrontendControllerFindPersons(suchFilter, offset, limit, referrer, familienname, vorname, sichtfreigabe, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
@@ -5449,10 +5475,11 @@ export const RolleApiAxiosParamCreator = function (configuration?: Configuration
         /**
          * List all rollen.
          * @summary 
+         * @param {string} [searchStr] The name for the role.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        rolleControllerFindRollen: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        rolleControllerFindRollen: async (searchStr?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/rolle`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -5472,6 +5499,10 @@ export const RolleApiAxiosParamCreator = function (configuration?: Configuration
             // authentication oauth2 required
             // oauth required
             await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+            if (searchStr !== undefined) {
+                localVarQueryParameter['searchStr'] = searchStr;
+            }
 
 
     
@@ -5623,11 +5654,12 @@ export const RolleApiFp = function(configuration?: Configuration) {
         /**
          * List all rollen.
          * @summary 
+         * @param {string} [searchStr] The name for the role.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async rolleControllerFindRollen(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<RolleWithServiceProvidersResponse>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.rolleControllerFindRollen(options);
+        async rolleControllerFindRollen(searchStr?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<RolleWithServiceProvidersResponse>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.rolleControllerFindRollen(searchStr, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -5698,11 +5730,12 @@ export const RolleApiFactory = function (configuration?: Configuration, basePath
         /**
          * List all rollen.
          * @summary 
+         * @param {string} [searchStr] The name for the role.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        rolleControllerFindRollen(options?: any): AxiosPromise<Array<RolleWithServiceProvidersResponse>> {
-            return localVarFp.rolleControllerFindRollen(options).then((request) => request(axios, basePath));
+        rolleControllerFindRollen(searchStr?: string, options?: any): AxiosPromise<Array<RolleWithServiceProvidersResponse>> {
+            return localVarFp.rolleControllerFindRollen(searchStr, options).then((request) => request(axios, basePath));
         },
         /**
          * Get service-providers for a rolle by its id.
@@ -5769,11 +5802,12 @@ export interface RolleApiInterface {
     /**
      * List all rollen.
      * @summary 
+     * @param {string} [searchStr] The name for the role.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof RolleApiInterface
      */
-    rolleControllerFindRollen(options?: AxiosRequestConfig): AxiosPromise<Array<RolleWithServiceProvidersResponse>>;
+    rolleControllerFindRollen(searchStr?: string, options?: AxiosRequestConfig): AxiosPromise<Array<RolleWithServiceProvidersResponse>>;
 
     /**
      * Get service-providers for a rolle by its id.
@@ -5846,12 +5880,13 @@ export class RolleApi extends BaseAPI implements RolleApiInterface {
     /**
      * List all rollen.
      * @summary 
+     * @param {string} [searchStr] The name for the role.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof RolleApi
      */
-    public rolleControllerFindRollen(options?: AxiosRequestConfig) {
-        return RolleApiFp(this.configuration).rolleControllerFindRollen(options).then((request) => request(this.axios, this.basePath));
+    public rolleControllerFindRollen(searchStr?: string, options?: AxiosRequestConfig) {
+        return RolleApiFp(this.configuration).rolleControllerFindRollen(searchStr, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

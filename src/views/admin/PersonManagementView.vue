@@ -2,8 +2,9 @@
   import { computed, onMounted, type ComputedRef, watch, type Ref, ref } from 'vue';
   import { type Composer, useI18n } from 'vue-i18n';
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
+  
   import { type Router, useRouter } from 'vue-router';
-  import { useOrganisationStore, type OrganisationStore, type OrganisationResponse } from '@/stores/OrganisationStore';
+  import { useOrganisationStore, type OrganisationStore, type Organisation } from '@/stores/OrganisationStore';
   import { usePersonStore, type Person, type PersonStore, type Personendatensatz } from '@/stores/PersonStore';
   import {
     usePersonenkontextStore,
@@ -12,8 +13,9 @@
     type Zuordnung,
   } from '@/stores/PersonenkontextStore';
   import { useRolleStore, type RolleStore, type RolleResponse } from '@/stores/RolleStore';
-  import ResultTable from '@/components/admin/ResultTable.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
+  import ResultTable from '@/components/admin/ResultTable.vue';
+  import SearchField from '@/components/admin/SearchField.vue';
 
   const router: Router = useRouter();
   const organisationStore: OrganisationStore = useOrganisationStore();
@@ -21,12 +23,14 @@
   const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
   const rolleStore: RolleStore = useRolleStore();
   const { t }: Composer = useI18n({ useScope: 'global' });
+  const searchFilter: Ref<string> = ref('');
 
   type ReadonlyHeaders = InstanceType<typeof VDataTableServer>['headers'];
   const headers: ReadonlyHeaders = [
     { title: t('person.lastName'), key: 'person.name.familienname', align: 'start' },
     { title: t('person.firstName'), key: 'person.name.vorname', align: 'start' },
     { title: t('person.userName'), key: 'person.referrer', align: 'start' },
+    { title: t('person.kopersnr'), key: 'person.personalnummer', align: 'start' },
     { title: t('person.rolle'), key: 'rollen', align: 'start' },
     { title: t('person.zuordnungen'), key: 'administrationsebenen', align: 'start' },
   ];
@@ -45,7 +49,7 @@
   const schulen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
     return organisationStore.allOrganisationen
       .slice(0, 25)
-      .map((org: OrganisationResponse) => ({
+      .map((org: Organisation) => ({
         value: org.id,
         title: `${org.kennung} (${org.name})`,
       }))
@@ -81,16 +85,28 @@
       );
       const rollenZuordnungen: string = uebersicht?.zuordnungen.length
         ? uebersicht.zuordnungen.map((zuordnung: Zuordnung) => zuordnung.rolle).join(', ')
-        : '-';
+        : '---';
       // Choose sskDstNr if available, otherwise sskName.
       const administrationsebenen: string = uebersicht?.zuordnungen.length
         ? uebersicht.zuordnungen
             .map((zuordnung: Zuordnung) => (zuordnung.sskDstNr ? zuordnung.sskDstNr : zuordnung.sskName))
             .join(', ')
-        : '-';
-      return { ...person, rollen: rollenZuordnungen, administrationsebenen: administrationsebenen };
+        : '---';
+      // Check if personalnummer is null, if so, replace it with "---"
+      const personalnummer: string = person.person.personalnummer ?? '---';
+      return {
+        ...person,
+        rollen: rollen,
+        administrationsebenen: administrationsebenen,
+        person: { ...person.person, personalnummer: personalnummer },
+      };
     });
   });
+
+  const handleSearchFilter = (filter: string): void => {
+    searchFilter.value = filter;
+    personStore.getAllPersons(searchFilter.value);
+  };
 
   // Watcher to detect when the search input for Organisationen is triggered.
   watch(searchInputSchule, async (newValue: string, _oldValue: string) => {
@@ -112,7 +128,7 @@
 
   onMounted(async () => {
     await organisationStore.getAllOrganisationen(undefined, 25, undefined, undefined, undefined, undefined);
-    await personStore.getAllPersons();
+    await personStore.getAllPersons('');
     await personenkontextStore.getAllPersonenuebersichten();
     await rolleStore.getAllRollen();
   });
@@ -231,6 +247,15 @@
           >
           </v-autocomplete>
         </v-col>
+        <v-col
+          cols="2"
+          class="py-0"
+        >
+          <SearchField
+            :hover-text="$t('person.firstNameLastNameReferrerKopersNr')"
+            @onApplySearchFilter="handleSearchFilter"
+          ></SearchField>
+        </v-col>
       </v-row>
       <ResultTable
         data-testid="person-table"
@@ -238,27 +263,10 @@
         :loading="personStore.loading"
         :headers="headers"
         @onHandleRowClick="navigateToPersonDetails"
-        @onUpdateTable="personStore.getAllPersons()"
+        @onUpdateTable="personStore.getAllPersons('')"
         :totalItems="personStore.totalPersons"
         item-value-path="person.id"
-      >
-        <template v-slot:[`item.rolle`]="{ item }">
-          <div
-            class="ellipsis-wrapper"
-            :title="item.rolle"
-          >
-            {{ item.rolle }}
-          </div>
-        </template>
-        <template v-slot:[`item.administrationsebenen`]="{ item }">
-          <div
-            class="ellipsis-wrapper"
-            :title="item.administrationsebenen"
-          >
-            {{ item.administrationsebenen }}
-          </div>
-        </template>
-      </ResultTable>
+      ></ResultTable>
     </LayoutCard>
   </div>
 </template>

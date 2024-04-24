@@ -14,18 +14,22 @@ import MockAdapter from 'axios-mock-adapter';
 import { setActivePinia, createPinia } from 'pinia';
 import { rejects } from 'assert';
 import { usePersonenkontextStore, type PersonenkontextStore } from './PersonenkontextStore';
+import { usePersonStore, type PersonStore } from './PersonStore';
 
 const mockadapter: MockAdapter = new MockAdapter(ApiService);
 
 describe('PersonenkontextStore', () => {
+  let personStore: PersonStore;
   let personenkontextStore: PersonenkontextStore;
   beforeEach(() => {
     setActivePinia(createPinia());
+    personStore = usePersonStore();
     personenkontextStore = usePersonenkontextStore();
     mockadapter.reset();
   });
 
   it('should initalize state correctly', () => {
+    expect(personStore.allPersons).toEqual([]);
     expect(personenkontextStore.errorCode).toEqual('');
     expect(personenkontextStore.loading).toBe(false);
   });
@@ -34,6 +38,46 @@ describe('PersonenkontextStore', () => {
     it('should check for systemrecht and update state', async () => {
       const mockResponse: SystemrechtResponse = {
         ROLLEN_VERWALTEN: [
+          {
+            id: '1',
+            kennung: '12345',
+            name: 'Organisation 1',
+            namensergaenzung: 'Ergänzung',
+            kuerzel: 'O1',
+            typ: OrganisationResponseTypEnum.Anbieter,
+          },
+        ],
+        KLASSEN_VERWALTEN: [
+          {
+            id: '1',
+            kennung: '12345',
+            name: 'Organisation 1',
+            namensergaenzung: 'Ergänzung',
+            kuerzel: 'O1',
+            typ: OrganisationResponseTypEnum.Anbieter,
+          },
+        ],
+        SCHULEN_VERWALTEN: [
+          {
+            id: '1',
+            kennung: '12345',
+            name: 'Organisation 1',
+            namensergaenzung: 'Ergänzung',
+            kuerzel: 'O1',
+            typ: OrganisationResponseTypEnum.Anbieter,
+          },
+        ],
+        PERSONEN_VERWALTEN: [
+          {
+            id: '1',
+            kennung: '12345',
+            name: 'Organisation 1',
+            namensergaenzung: 'Ergänzung',
+            kuerzel: 'O1',
+            typ: OrganisationResponseTypEnum.Anbieter,
+          },
+        ],
+        SCHULTRAEGER_VERWALTEN: [
           {
             id: '1',
             kennung: '12345',
@@ -85,6 +129,7 @@ describe('PersonenkontextStore', () => {
       expect(personenkontextStore.loading).toBe(false);
     });
   });
+
   describe('createPersonenkontext', () => {
     it('should create a Personenkontext', async () => {
       const mockPersonenkontext: DBiamPersonenkontextResponse = {
@@ -136,6 +181,7 @@ describe('PersonenkontextStore', () => {
       expect(personenkontextStore.loading).toBe(false);
     });
   });
+
   describe('getPersonenuebersichtById', () => {
     it('should get Personenuebersicht', async () => {
       const mockResponse: DBiamPersonenuebersichtResponse = {
@@ -180,6 +226,7 @@ describe('PersonenkontextStore', () => {
       expect(personenkontextStore.loading).toBe(false);
     });
   });
+
   describe('getPersonenkontextRolleWithFilter', () => {
     it('should get filtered Rollen', async () => {
       const mockResponse: FindRollenResponse = {
@@ -229,6 +276,7 @@ describe('PersonenkontextStore', () => {
       expect(personenkontextStore.loading).toBe(false);
     });
   });
+
   describe('getPersonenkontextAdministrationsebeneWithFilter', () => {
     it('should get filtered Administrationsebenen', async () => {
       const mockResponse: FindSchulstrukturknotenResponse = {
@@ -279,6 +327,7 @@ describe('PersonenkontextStore', () => {
       expect(personenkontextStore.loading).toBe(false);
     });
   });
+
   describe('getAllPersonenuebersichte', () => {
     it('should get All Personenuebersicht', async () => {
       const mockResponse: DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response = {
@@ -287,9 +336,9 @@ describe('PersonenkontextStore', () => {
         limit: 0,
         items: [
           {
-            personId: 'string',
-            vorname: 'string',
-            nachname: 'string',
+            personId: '1234',
+            vorname: 'Samuel',
+            nachname: 'Vimes',
             benutzername: 'string',
             zuordnungen: [
               {
