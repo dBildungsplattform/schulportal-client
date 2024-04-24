@@ -249,7 +249,7 @@
               data-testid="klassenname-input"
               v-bind="selectedKlassennameProps"
               v-model="selectedKlassenname"
-              :placeholder="$t('admin.klasse.klassenname')"
+              :placeholder="$t('admin.klasse.enterKlassenname')"
               variant="outlined"
               density="compact"
               required
