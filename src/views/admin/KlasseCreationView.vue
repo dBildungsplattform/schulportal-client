@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { ref, type ComputedRef, type Ref, computed, onMounted, watch } from 'vue';
+  import { ref, type ComputedRef, type Ref, computed, onMounted, watch, onUnmounted } from 'vue';
   import {
     type Router,
     useRouter,
@@ -86,6 +86,12 @@
       .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
   });
 
+  const translatedSchulname: ComputedRef<string> = computed(
+    () =>
+      schulen.value?.find((schule: TranslatedObject) => schule.value === organisationStore.createdOrganisation?.id)
+        ?.title || '',
+  );
+
   // Watcher to detect when the search input for Organisationen is triggered.
   watch(searchInputSchule, async (newValue: string, _oldValue: string) => {
     if (newValue.length >= 3) {
@@ -135,15 +141,6 @@
     organisationStore.createdOrganisation = null;
   }
 
-  function getSskName(sskDstNr: string | null | undefined, sskName: string | null | undefined): string {
-    /* omit parens when there is no ssk kennung  */
-    if (sskDstNr) {
-      return `${sskDstNr} (${sskName})`;
-    } else {
-      return sskName || '';
-    }
-  }
-
   function handleConfirmUnsavedChanges(): void {
     blockedNext();
   }
@@ -166,6 +163,10 @@
     organisationStore.getAllOrganisationen('');
     /* listen for browser changes and prevent them when form is dirty */
     window.addEventListener('beforeunload', preventNavigation);
+  });
+
+  onUnmounted(() => {
+    window.removeEventListener('beforeunload', preventNavigation);
   });
 </script>
 
@@ -287,26 +288,17 @@
             </v-col>
           </v-row>
           <v-row>
-            <v-col class="text-body bold text-right">
-              {{ $t('admin.organisationsebene.administrationsebene') }}:
-            </v-col>
+            <v-col class="text-body bold text-right"> {{ $t('admin.organisation.organisation') }}: </v-col>
             <v-col class="text-body">
               <span data-testid="created-rolle-organisationsebene">
-                {{
-                  getSskName(
-                    organisationStore.currentOrganisation?.kennung,
-                    organisationStore.currentOrganisation?.name,
-                  )
-                }}
+                {{ translatedSchulname }}
               </span>
             </v-col>
           </v-row>
           <v-row>
             <v-col class="text-body bold text-right"> {{ $t('admin.klasse.klassenname') }}: </v-col>
             <v-col class="text-body"
-              ><span data-testid="created-person-familienname">{{
-                organisationStore.currentOrganisation?.name
-              }}</span></v-col
+              ><span data-testid="created-klasse-name">{{ organisationStore.createdOrganisation?.name }}</span></v-col
             >
           </v-row>
           <v-divider

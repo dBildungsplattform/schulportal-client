@@ -370,7 +370,7 @@
             :errorLabel="selectedOrganisationProps['error']"
             :isRequired="true"
             labelForId="organisation-select"
-            :label="$t('admin.organisation.assignOrganisation')"
+            :label="$t('admin.organisation.organisation')"
           >
             <v-autocomplete
               autocomplete="off"
