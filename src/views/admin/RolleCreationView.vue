@@ -11,6 +11,7 @@
     CreateRolleBodyParamsMerkmaleEnum,
     type CreateRolleBodyParamsSystemrechteEnum,
     type RolleResponse,
+    type RolleServiceProviderResponse,
   } from '@/stores/RolleStore';
   import {
     useServiceProviderStore,
@@ -51,6 +52,8 @@
 
   type TranslatedSystemrecht = { value: RolleResponseSystemrechteEnum; title: string };
   const translatedSystemrechte: Ref<TranslatedSystemrecht[]> = ref([]);
+
+  const assignedServiceProviders: Ref<string> = ref('---');
 
   const validationSchema: TypedSchema = toTypedSchema(
     object({
@@ -222,6 +225,25 @@
     event.returnValue = '';
   }
 
+  async function getNamesOfAssignedServiceProviders(rolleId: string): Promise<void> {
+    if (!rolleId) return;
+
+    const response: RolleServiceProviderResponse = await rolleStore.getServiceProviderIdsFromRolle(rolleId);
+    const serviceProviderNames: Array<string> = [];
+
+    response.serviceProviderIds.forEach((id: string) => {
+      serviceProviders.value.forEach((serviceProvider: { value: string; title: string }) => {
+        if (serviceProvider.value === id) {
+          serviceProviderNames.push(serviceProvider.title);
+        }
+      });
+    });
+
+    if (!serviceProviderNames.length) return;
+
+    assignedServiceProviders.value = serviceProviderNames.join(', ');
+  }
+
   onMounted(async () => {
     rolleStore.createdRolle = null;
     await organisationStore.getAllOrganisationen();
@@ -289,6 +311,7 @@
 
       if (rolleStore.createdRolle) {
         await organisationStore.getOrganisationById(rolleStore.createdRolle.administeredBySchulstrukturknoten);
+        getNamesOfAssignedServiceProviders(rolleStore.createdRolle.id);
       }
     }
   });
@@ -471,7 +494,7 @@
             <FormRow
               :errorLabel="selectedSystemRechteProps['error']"
               labelForId="systemrecht-select"
-              :label="$t('admin.rolle.systemrechte')" 
+              :label="$t('admin.rolle.systemrechte')"
             >
               <v-autocomplete
                 autocomplete="off"
@@ -557,6 +580,12 @@
             <v-col class="text-body bold text-right"> {{ $t('admin.rolle.merkmale') }}:</v-col>
             <v-col class="text-body"
               ><span data-testid="created-rolle-merkmale">{{ translatedCreatedRolleMerkmale }}</span></v-col
+            ></v-row
+          >
+          <v-row>
+            <v-col class="text-body bold text-right"> {{ $t('admin.serviceProvider.assignedServiceProvider') }}:</v-col>
+            <v-col class="text-body"
+              ><span data-testid="created-rolle-systemrecht">{{ assignedServiceProviders }}</span></v-col
             ></v-row
           >
           <v-row>
