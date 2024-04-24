@@ -3262,6 +3262,10 @@
                     "id": {
                         "type": "string"
                     },
+                    "administriertVon": {
+                        "type": "string",
+                        "nullable": true
+                    },
                     "kennung": {
                         "type": "string",
                         "nullable": true
@@ -3303,6 +3307,7 @@
                 },
                 "required": [
                     "id",
+                    "administriertVon",
                     "kennung",
                     "name",
                     "namensergaenzung",

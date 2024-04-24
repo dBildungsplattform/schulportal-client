@@ -31,10 +31,11 @@ describe('OrganisationStore', () => {
           namensergaenzung: 'Ergänzung',
           kuerzel: 'O1',
           typ: OrganisationResponseTypEnum.Anbieter,
+          administriertVon: '1',
         },
       ];
 
-      mockadapter.onGet('/api/organisationen').replyOnce(200, mockResponse);
+      mockadapter.onGet('/api/organisationen?searchString=').replyOnce(200, mockResponse);
       const getAllOrganisationenPromise: Promise<void> = organisationStore.getAllOrganisationen('');
       await getAllOrganisationenPromise;
       expect(organisationStore.allOrganisationen).toEqual(mockResponse);
@@ -42,7 +43,7 @@ describe('OrganisationStore', () => {
     });
 
     it('should handle string error', async () => {
-      mockadapter.onGet('/api/organisationen').replyOnce(500, 'some mock server error');
+      mockadapter.onGet('/api/organisationen?searchString=').replyOnce(500, 'some mock server error');
       const getAllOrganisationenPromise: Promise<void> = organisationStore.getAllOrganisationen('');
       expect(organisationStore.loading).toBe(true);
       await getAllOrganisationenPromise;
@@ -52,7 +53,7 @@ describe('OrganisationStore', () => {
     });
 
     it('should handle error code', async () => {
-      mockadapter.onGet('/api/organisationen').replyOnce(500, { code: 'some mock server error' });
+      mockadapter.onGet('/api/organisationen?searchString=').replyOnce(500, { code: 'some mock server error' });
       const getAllOrgaisationsPromise: Promise<void> = organisationStore.getAllOrganisationen('');
       expect(organisationStore.loading).toBe(true);
       await getAllOrgaisationsPromise;
@@ -71,6 +72,7 @@ describe('OrganisationStore', () => {
           namensergaenzung: 'Ergänzung',
           kuerzel: 'O1',
           typ: OrganisationResponseTypEnum.Anbieter,
+          administriertVon: '1',
         },
       ];
 
@@ -110,6 +112,7 @@ describe('OrganisationStore', () => {
           namensergaenzung: 'Ergänzung',
           kuerzel: 'O1',
           typ: OrganisationResponseTypEnum.Anbieter,
+          administriertVon: '1',
         },
       ];
 

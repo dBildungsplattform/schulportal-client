@@ -593,6 +593,12 @@ export interface OrganisationResponse {
      * @type {string}
      * @memberof OrganisationResponse
      */
+    'administriertVon': string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof OrganisationResponse
+     */
     'kennung': string | null;
     /**
      * 
