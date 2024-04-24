@@ -53,8 +53,6 @@
   type TranslatedSystemrecht = { value: RolleResponseSystemrechteEnum; title: string };
   const translatedSystemrechte: Ref<TranslatedSystemrecht[]> = ref([]);
 
-  const assignedServiceProviders: Ref<string> = ref('---');
-
   const validationSchema: TypedSchema = toTypedSchema(
     object({
       selectedRollenArt: string().required(t('admin.rolle.rules.rollenart.required')),
@@ -182,6 +180,25 @@
       .join(', ');
   });
 
+  const assignedServiceProviders: ComputedRef<Promise<string>> = computed(async () => {
+    if (!rolleStore.createdRolle) return '---';
+
+    const response: RolleServiceProviderResponse = await rolleStore.getServiceProviderIdsFromRolle(rolleStore.createdRolle.id);
+    const serviceProviderNames: Array<string> = [];
+
+    response.serviceProviderIds.forEach((id: string) => {
+      serviceProviders.value.forEach((serviceProvider: { value: string; title: string }) => {
+        if (serviceProvider.value === id) {
+          serviceProviderNames.push(serviceProvider.title);
+        }
+      });
+    });
+
+    if (!serviceProviderNames.length) return '---';
+
+    return serviceProviderNames.join(', ');
+  });
+
   const translatedCreatedSystemrecht: ComputedRef<string> = computed(() => {
     if (!rolleStore.createdRolle?.systemrechte || Array.from(rolleStore.createdRolle.systemrechte).length === 0) {
       return '---';
@@ -223,25 +240,6 @@
     event.preventDefault();
     /* Chrome requires returnValue to be set. */
     event.returnValue = '';
-  }
-
-  async function getNamesOfAssignedServiceProviders(rolleId: string): Promise<void> {
-    if (!rolleId) return;
-
-    const response: RolleServiceProviderResponse = await rolleStore.getServiceProviderIdsFromRolle(rolleId);
-    const serviceProviderNames: Array<string> = [];
-
-    response.serviceProviderIds.forEach((id: string) => {
-      serviceProviders.value.forEach((serviceProvider: { value: string; title: string }) => {
-        if (serviceProvider.value === id) {
-          serviceProviderNames.push(serviceProvider.title);
-        }
-      });
-    });
-
-    if (!serviceProviderNames.length) return;
-
-    assignedServiceProviders.value = serviceProviderNames.join(', ');
   }
 
   onMounted(async () => {
@@ -311,7 +309,6 @@
 
       if (rolleStore.createdRolle) {
         await organisationStore.getOrganisationById(rolleStore.createdRolle.administeredBySchulstrukturknoten);
-        getNamesOfAssignedServiceProviders(rolleStore.createdRolle.id);
       }
     }
   });
@@ -585,7 +582,7 @@
           <v-row>
             <v-col class="text-body bold text-right"> {{ $t('admin.serviceProvider.assignedServiceProvider') }}:</v-col>
             <v-col class="text-body"
-              ><span data-testid="created-rolle-systemrecht">{{ assignedServiceProviders }}</span></v-col
+              ><span data-testid="created-rolle-angebote">{{ assignedServiceProviders }}</span></v-col
             ></v-row
           >
           <v-row>

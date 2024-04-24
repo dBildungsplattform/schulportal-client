@@ -113,6 +113,7 @@ describe('RolleCreationView', () => {
     rolleStore.errorCode = '';
     await nextTick();
     expect(wrapper?.find('[data-testid="rolle-success-text"]').exists()).toBe(true);
+    expect(wrapper?.find('[data-testid="created-rolle-angebote"]').exists()).toBe(true);
     wrapper?.find('[data-testid="back-to-list-button"]').trigger('click');
     await nextTick();
     expect(push).toHaveBeenCalledTimes(1);
