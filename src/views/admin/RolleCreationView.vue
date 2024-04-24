@@ -219,7 +219,7 @@ import type { RolleResponse } from '@/stores/RolleStore';
     await serviceProviderStore.getAllServiceProviders();
 
     // Iterate over the enum values
-    Object.values(  RollenArt).forEach((enumValue:   RollenArt) => {
+    Object.values(RollenArt).forEach((enumValue: RollenArt) => {
       // Use the enum value to construct the i18n path
       const i18nPath: string = `admin.rolle.mappingFrontBackEnd.rollenarten.${enumValue}`;
       // Push the mapped object into the array
