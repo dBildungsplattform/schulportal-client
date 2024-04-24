@@ -844,6 +844,11 @@
                 ],
                 "security": [
                     {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
+                    {
                         "bearer": []
                     }
                 ]
@@ -888,6 +893,11 @@
                     "dbiam-personenuebersicht"
                 ],
                 "security": [
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
                     {
                         "bearer": []
                     }

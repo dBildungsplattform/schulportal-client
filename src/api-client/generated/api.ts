@@ -2364,6 +2364,10 @@ export const DbiamPersonenuebersichtApiAxiosParamCreator = function (configurati
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
             if (offset !== undefined) {
                 localVarQueryParameter['offset'] = offset;
             }
@@ -2408,6 +2412,10 @@ export const DbiamPersonenuebersichtApiAxiosParamCreator = function (configurati
             // authentication bearer required
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
 
 
     
