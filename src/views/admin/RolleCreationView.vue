@@ -169,7 +169,7 @@
 
   const translatedCreatedRolleMerkmale: ComputedRef<string> = computed(() => {
     if (!rolleStore.createdRolle?.merkmale || Array.from(rolleStore.createdRolle.merkmale).length === 0) {
-      return '-';
+      return '---';
     }
 
     return Array.from(rolleStore.createdRolle.merkmale)
@@ -181,7 +181,7 @@
 
   const translatedCreatedSystemrecht: ComputedRef<string> = computed(() => {
     if (!rolleStore.createdRolle?.systemrechte || Array.from(rolleStore.createdRolle.systemrechte).length === 0) {
-      return '-';
+      return '---';
     }
 
     return Array.from(rolleStore.createdRolle.systemrechte)
@@ -469,18 +469,27 @@
             </v-row>
             <!-- Iterate over each system right and create a checkbox for it -->
             <FormRow
-              v-for="systemrecht in translatedSystemrechte"
-              :key="systemrecht.value"
               :errorLabel="selectedSystemRechteProps['error']"
               labelForId="systemrecht-select"
-              :label="systemrecht.title"
+              :label="$t('admin.rolle.systemrechte')" 
             >
-              <v-checkbox
-                :value="systemrecht.value"
-                v-model="selectedSystemRechte"
-                :id="`systemrecht-${systemrecht.value}`"
+              <v-autocomplete
+                autocomplete="off"
+                chips
+                clearable
+                data-testid="systemrechte-select"
+                density="compact"
+                id="systemrechte-select"
+                :items="translatedSystemrechte"
+                item-value="value"
+                item-text="title"
                 multiple
-              ></v-checkbox>
+                :no-data-text="$t('noDataFound')"
+                :placeholder="$t('admin.rolle.selectSystemrechte')"
+                variant="outlined"
+                v-bind="selectedSystemRechteProps"
+                v-model="selectedSystemRechte"
+              ></v-autocomplete>
             </FormRow>
           </template>
         </FormWrapper>

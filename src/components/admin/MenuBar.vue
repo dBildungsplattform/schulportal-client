@@ -221,4 +221,3 @@
 </template>
 
 <style></style>
-@/stores/PersonenkontextStore
