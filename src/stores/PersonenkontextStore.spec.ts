@@ -45,6 +45,7 @@ describe('PersonenkontextStore', () => {
             namensergaenzung: 'Ergänzung',
             kuerzel: 'O1',
             typ: OrganisationResponseTypEnum.Anbieter,
+            administriertVon: '1',
           },
         ],
         KLASSEN_VERWALTEN: [
@@ -55,6 +56,7 @@ describe('PersonenkontextStore', () => {
             namensergaenzung: 'Ergänzung',
             kuerzel: 'O1',
             typ: OrganisationResponseTypEnum.Anbieter,
+            administriertVon: '1',
           },
         ],
         SCHULEN_VERWALTEN: [
@@ -65,6 +67,7 @@ describe('PersonenkontextStore', () => {
             namensergaenzung: 'Ergänzung',
             kuerzel: 'O1',
             typ: OrganisationResponseTypEnum.Anbieter,
+            administriertVon: '1',
           },
         ],
         PERSONEN_VERWALTEN: [
@@ -75,6 +78,7 @@ describe('PersonenkontextStore', () => {
             namensergaenzung: 'Ergänzung',
             kuerzel: 'O1',
             typ: OrganisationResponseTypEnum.Anbieter,
+            administriertVon: '1',
           },
         ],
         SCHULTRAEGER_VERWALTEN: [
@@ -85,6 +89,7 @@ describe('PersonenkontextStore', () => {
             namensergaenzung: 'Ergänzung',
             kuerzel: 'O1',
             typ: OrganisationResponseTypEnum.Anbieter,
+            administriertVon: '1',
           },
         ],
       };
@@ -288,6 +293,7 @@ describe('PersonenkontextStore', () => {
             namensergaenzung: 'string',
             kuerzel: 'string',
             typ: 'TRAEGER',
+            administriertVon: '1',
           },
         ],
         total: 0,
