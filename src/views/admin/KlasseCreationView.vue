@@ -291,7 +291,7 @@
           <v-row>
             <v-col class="text-body bold text-right"> {{ $t('admin.organisation.organisation') }}: </v-col>
             <v-col class="text-body">
-              <span data-testid="created-rolle-organisationsebene">
+              <span data-testid="created-klasse-organisationsebene">
                 {{ translatedSchulname }}
               </span>
             </v-col>
@@ -330,7 +330,7 @@
               <v-btn
                 class="primary button"
                 @click="handleCreateAnotherKlasse"
-                data-testid="create-another-person-button"
+                data-testid="create-another-klasse-button"
                 :block="mdAndDown"
               >
                 {{ $t('admin.klasse.createAnother') }}
