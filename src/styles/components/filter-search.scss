@@ -1,4 +1,4 @@
-.filter-dropdown {
+.filter-dropdown, .search-field {
   .v-input__control {
     max-height: 35px;
   }
@@ -14,7 +14,9 @@
     padding-bottom: 9px;
     padding-top: 9px;
   }
+}
 
+.filter-dropdown {
   .v-autocomplete__selection {
     height: 15px;
   }
@@ -22,4 +24,9 @@
 
 .reset-filter {
   font-size: 14px;
+}
+
+.search.button {
+  font-size: 15px;
+  line-height: 15px;
 }

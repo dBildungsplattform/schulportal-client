@@ -23,7 +23,6 @@
   const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
   const rolleStore: RolleStore = useRolleStore();
   const { t }: Composer = useI18n({ useScope: 'global' });
-  const searchFilter: Ref<string> = ref('');
 
   type ReadonlyHeaders = InstanceType<typeof VDataTableServer>['headers'];
   const headers: ReadonlyHeaders = [
@@ -69,8 +68,12 @@
   const klassen: Array<string> = ['Klasse', 'Nicht so klasse'];
   const statuses: Array<string> = ['Aktiv', 'Inaktiv'];
 
-  const searchInputRolle: Ref<string> = ref('');
-  const searchInputSchule: Ref<string> = ref('');
+  const searchInputRollen: Ref<string> = ref('');
+  const searchInputSchulen: Ref<string> = ref('');
+
+  const selectedRollen: Ref<Array<string>> = ref([]);
+  const selectedSchulen: Ref<Array<string>> = ref([]);
+  const searchFilter: Ref<string> = ref('');
 
   function navigateToPersonDetails(_$event: PointerEvent, { item }: { item: Personendatensatz }): void {
     router.push({ name: 'person-details', params: { id: item.person.id } });
@@ -96,7 +99,7 @@
       const personalnummer: string = person.person.personalnummer ?? '---';
       return {
         ...person,
-        rollen: rollen,
+        rollen: rollenZuordnungen,
         administrationsebenen: administrationsebenen,
         person: { ...person.person, personalnummer: personalnummer },
       };
@@ -109,16 +112,16 @@
   };
 
   // Watcher to detect when the search input for Organisationen is triggered.
-  watch(searchInputSchule, async (newValue: string, _oldValue: string) => {
+  watch(searchInputSchulen, async (newValue: string, _oldValue: string) => {
     if (newValue.length >= 3) {
-      organisationStore.getAllOrganisationen(undefined, 25, undefined, undefined, newValue, undefined);
+      organisationStore.getAllOrganisationen(undefined, 25, undefined, undefined, newValue, OrganisationsTyp.Schule);
     } else {
-      organisationStore.getAllOrganisationen(undefined, 25, undefined, undefined, undefined, undefined);
+      organisationStore.getAllOrganisationen(undefined, 25, undefined, undefined, undefined, OrganisationsTyp.Schule);
     }
   });
 
   // Watcher to detect when the search input for Organisationen is triggered.
-  watch(searchInputRolle, async (newValue: string, _oldValue: string) => {
+  watch(searchInputRollen, async (newValue: string, _oldValue: string) => {
     if (newValue.length >= 3) {
       rolleStore.getAllRollen();
     } else {
@@ -127,7 +130,7 @@
   });
 
   onMounted(async () => {
-    await organisationStore.getAllOrganisationen(undefined, 25, undefined, undefined, undefined, undefined);
+    await organisationStore.getAllOrganisationen(undefined, 25, undefined, undefined, undefined, OrganisationsTyp.Schule);
     await personStore.getAllPersons('');
     await personenkontextStore.getAllPersonenuebersichten();
     await rolleStore.getAllRollen();
@@ -146,6 +149,7 @@
       <v-row
         align="center"
         class="ma-3"
+        justify="end"
       >
         <v-col
           cols="4"
@@ -159,6 +163,7 @@
         >
           <v-autocomplete
             autocomplete="off"
+            chips
             class="filter-dropdown"
             clearable
             data-testid="schule-select"
@@ -168,12 +173,13 @@
             :items="schulen"
             item-value="value"
             item-text="title"
+            multiple
             :no-data-text="$t('noDataFound')"
             :placeholder="$t('admin.schule.schule')"
             required="true"
             variant="outlined"
-            v-model="selectedSchule"
-            v-model:search="searchInputSchule"
+            v-model="selectedSchulen"
+            v-model:search="searchInputSchulen"
           >
           </v-autocomplete>
         </v-col>
@@ -183,6 +189,7 @@
         >
           <v-autocomplete
             autocomplete="off"
+            chips
             class="filter-dropdown"
             clearable
             data-testid="rolle-select"
@@ -192,12 +199,13 @@
             :items="rollen"
             item-value="value"
             item-text="title"
+            multiple
             :no-data-text="$t('noDataFound')"
             :placeholder="$t('admin.rolle.rolle')"
             required="true"
             variant="outlined"
-            v-model="selectedRolle"
-            v-model:search="searchInputRolle"
+            v-model="selectedRollen"
+            v-model:search="searchInputRollen"
           >
           </v-autocomplete>
         </v-col>
@@ -207,6 +215,7 @@
         >
           <v-autocomplete
             autocomplete="off"
+            chips
             class="filter-dropdown"
             clearable
             data-testid="klasse-select"
@@ -216,11 +225,12 @@
             :items="klassen"
             item-value="value"
             item-text="title"
+            multiple
             :no-data-text="$t('noDataFound')"
             :placeholder="$t('admin.klasse.klasse')"
             required="true"
             variant="outlined"
-            v-model="selectedKlasse"
+            v-model="selectedKlassen"
           >
           </v-autocomplete>
         </v-col>
@@ -247,15 +257,16 @@
           >
           </v-autocomplete>
         </v-col>
-        <v-col
-          cols="2"
-          class="py-0"
-        >
+      </v-row>
+      <v-row
+        align="center"
+        class="ma-3"
+        justify="end"
+      >
           <SearchField
-            :hover-text="$t('person.firstNameLastNameReferrerKopersNr')"
-            @onApplySearchFilter="handleSearchFilter"
+          :hover-text="$t('person.firstNameLastNameReferrerKopersNr')"
+          @onApplySearchFilter="handleSearchFilter"
           ></SearchField>
-        </v-col>
       </v-row>
       <ResultTable
         data-testid="person-table"
