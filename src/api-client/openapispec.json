@@ -2996,6 +2996,19 @@
                     "revision"
                 ]
             },
+            "OrganisationsTyp": {
+                "type": "string",
+                "enum": [
+                    "ROOT",
+                    "LAND",
+                    "TRAEGER",
+                    "SCHULE",
+                    "KLASSE",
+                    "ANBIETER",
+                    "SONSTIGE ORGANISATION / EINRICHTUNG",
+                    "UNBESTAETIGT"
+                ]
+            },
             "DBiamPersonenzuordnungResponse": {
                 "type": "object",
                 "properties": {
@@ -3013,6 +3026,10 @@
                     },
                     "rolle": {
                         "type": "string"
+                    },
+                    "typ": {
+                        "nullable": true,
+                        "$ref": "#/components/schemas/OrganisationsTyp"
                     }
                 },
                 "required": [
@@ -3020,7 +3037,8 @@
                     "rolleId",
                     "sskName",
                     "sskDstNr",
-                    "rolle"
+                    "rolle",
+                    "typ"
                 ]
             },
             "DBiamPersonenuebersichtResponse": {
@@ -3051,19 +3069,6 @@
                     "nachname",
                     "benutzername",
                     "zuordnungen"
-                ]
-            },
-            "OrganisationsTyp": {
-                "type": "string",
-                "enum": [
-                    "ROOT",
-                    "LAND",
-                    "TRAEGER",
-                    "SCHULE",
-                    "KLASSE",
-                    "ANBIETER",
-                    "SONSTIGE ORGANISATION / EINRICHTUNG",
-                    "UNBESTAETIGT"
                 ]
             },
             "TraegerschaftTyp": {
