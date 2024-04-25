@@ -73,7 +73,7 @@ export const useOrganisationStore: StoreDefinition<
           undefined,
           undefined,
           undefined,
-          searchString
+          searchString,
         );
 
         this.allOrganisationen = data;

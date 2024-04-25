@@ -1,7 +1,14 @@
 <script setup lang="ts">
   import { ref, type Ref, onMounted, onUnmounted, computed, type ComputedRef } from 'vue';
   import { useOrganisationStore, type OrganisationStore, type Organisation } from '@/stores/OrganisationStore';
-  import { useRolleStore, type RolleStore, RollenMerkmal, RollenSystemRecht, RollenArt } from '@/stores/RolleStore';
+  import {
+    useRolleStore,
+    type RolleStore,
+    RollenMerkmal,
+    RollenSystemRecht,
+    RollenArt,
+    RolleResponse,
+  } from '@/stores/RolleStore';
   import {
     useServiceProviderStore,
     type ServiceProvider,
@@ -24,7 +31,6 @@
   import FormRow from '@/components/form/FormRow.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { DIN_91379A_EXT } from '@/utils/validation';
-import type { RolleResponse } from '@/stores/RolleStore';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
   const rolleStore: RolleStore = useRolleStore();
@@ -255,8 +261,7 @@ import type { RolleResponse } from '@/stores/RolleStore';
 
   const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = handleSubmit(async () => {
     if (selectedRollenName.value && selectedAdministrationsebene.value && selectedRollenArt.value) {
-      const merkmaleToSubmit: RollenMerkmal[] =
-        selectedMerkmale.value?.map((m: RollenMerkmal) => m) || [];
+      const merkmaleToSubmit: RollenMerkmal[] = selectedMerkmale.value?.map((m: RollenMerkmal) => m) || [];
       const systemrechteToSubmit: RollenSystemRecht[] =
         selectedSystemRechte.value?.map((m: RollenSystemRecht) => m) || [];
       await rolleStore
@@ -462,7 +467,7 @@ import type { RolleResponse } from '@/stores/RolleStore';
             <FormRow
               :errorLabel="selectedSystemRechteProps['error']"
               labelForId="systemrecht-select"
-              :label="$t('admin.rolle.systemrechte')" 
+              :label="$t('admin.rolle.systemrechte')"
             >
               <v-autocomplete
                 autocomplete="off"

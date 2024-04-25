@@ -14,9 +14,8 @@
   import {
     useOrganisationStore,
     type OrganisationStore,
-    CreateOrganisationBodyParamsTypEnum,
-    OrganisationResponseTypEnum,
-type Organisation,
+    type Organisation,
+    OrganisationsTyp,
   } from '@/stores/OrganisationStore';
   import { DIN_91379A_EXT } from '@/utils/validation';
   import FormRow from '@/components/form/FormRow.vue';
@@ -78,7 +77,7 @@ type Organisation,
   const schulen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
     return organisationStore.allOrganisationen
       .slice(0, 25)
-      .filter((org: Organisation) => org.typ === OrganisationResponseTypEnum.Schule)
+      .filter((org: Organisation) => org.typ === OrganisationsTyp.Schule)
       .map((org: Organisation) => ({
         value: org.id,
         title: org.kennung ? `${org.kennung} (${org.name})` : org.name,
@@ -152,7 +151,7 @@ type Organisation,
       selectedKlassenname.value,
       '',
       '',
-      CreateOrganisationBodyParamsTypEnum.Klasse,
+      OrganisationsTyp.Klasse,
       undefined,
       selectedSchule.value,
       selectedSchule.value,
