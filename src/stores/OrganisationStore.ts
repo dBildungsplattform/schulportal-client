@@ -18,6 +18,7 @@ export type Organisation = {
   namensergaenzung?: string | null;
   kuerzel?: string;
   typ: OrganisationsTyp;
+  administriertVon?: string | null;
 };
 
 type OrganisationState = {
