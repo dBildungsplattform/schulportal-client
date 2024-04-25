@@ -2,9 +2,14 @@
   import { computed, onMounted, type ComputedRef, watch, type Ref, ref } from 'vue';
   import { type Composer, useI18n } from 'vue-i18n';
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
-  
+
   import { type Router, useRouter } from 'vue-router';
-  import { useOrganisationStore, type OrganisationStore, type Organisation } from '@/stores/OrganisationStore';
+  import {
+    useOrganisationStore,
+    type OrganisationStore,
+    type Organisation,
+    OrganisationsTyp,
+  } from '@/stores/OrganisationStore';
   import { usePersonStore, type Person, type PersonStore, type Personendatensatz } from '@/stores/PersonStore';
   import {
     usePersonenkontextStore,
@@ -130,7 +135,14 @@
   });
 
   onMounted(async () => {
-    await organisationStore.getAllOrganisationen(undefined, 25, undefined, undefined, undefined, OrganisationsTyp.Schule);
+    await organisationStore.getAllOrganisationen(
+      undefined,
+      25,
+      undefined,
+      undefined,
+      undefined,
+      OrganisationsTyp.Schule,
+    );
     await personStore.getAllPersons('');
     await personenkontextStore.getAllPersonenuebersichten();
     await rolleStore.getAllRollen();
@@ -230,7 +242,6 @@
             :placeholder="$t('admin.klasse.klasse')"
             required="true"
             variant="outlined"
-            v-model="selectedKlassen"
           >
           </v-autocomplete>
         </v-col>
@@ -253,7 +264,6 @@
             :placeholder="$t('admin.status')"
             required="true"
             variant="outlined"
-            v-model="selectedStatus"
           >
           </v-autocomplete>
         </v-col>
@@ -263,10 +273,10 @@
         class="ma-3"
         justify="end"
       >
-          <SearchField
+        <SearchField
           :hover-text="$t('person.firstNameLastNameReferrerKopersNr')"
           @onApplySearchFilter="handleSearchFilter"
-          ></SearchField>
+        ></SearchField>
       </v-row>
       <ResultTable
         data-testid="person-table"

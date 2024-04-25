@@ -10,7 +10,6 @@
     type Organisation,
     type OrganisationStore,
   } from '@/stores/OrganisationStore';
-  import LayoutCard from '@/components/cards/LayoutCard.vue';
 
   const organisationStore: OrganisationStore = useOrganisationStore();
 

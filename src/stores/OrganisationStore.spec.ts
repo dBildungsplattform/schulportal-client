@@ -1,6 +1,4 @@
-import {
-  OrganisationsTyp,
-} from '@/api-client/generated';
+import { OrganisationsTyp } from '@/api-client/generated';
 import ApiService from '@/services/ApiService';
 import MockAdapter from 'axios-mock-adapter';
 import { setActivePinia, createPinia } from 'pinia';

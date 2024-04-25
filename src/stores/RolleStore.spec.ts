@@ -2,11 +2,7 @@ import ApiService from '@/services/ApiService';
 import MockAdapter from 'axios-mock-adapter';
 import { setActivePinia, createPinia } from 'pinia';
 import { useRolleStore, type RolleStore } from './RolleStore';
-import {
-  RollenMerkmal,
-  RollenSystemRecht,
-  type RolleResponse,
-} from '../api-client/generated/api';
+import { RollenMerkmal, RollenSystemRecht, type RolleResponse } from '../api-client/generated/api';
 import { rejects } from 'assert';
 
 const mockadapter: MockAdapter = new MockAdapter(ApiService);
@@ -104,7 +100,7 @@ describe('rolleStore', () => {
         },
       ];
 
-      mockadapter.onGet('/api/rolle').replyOnce(200, mockResponse, {});
+      mockadapter.onGet('/api/rolle?searchStr=').replyOnce(200, mockResponse, {});
       const getAllRollenPromise: Promise<void> = rolleStore.getAllRollen();
       expect(rolleStore.loading).toBe(true);
       await getAllRollenPromise;
@@ -113,7 +109,7 @@ describe('rolleStore', () => {
     });
 
     it('should handle string error', async () => {
-      mockadapter.onGet('/api/rolle').replyOnce(500, 'some mock server error');
+      mockadapter.onGet('/api/rolle?searchStr=').replyOnce(500, 'some mock server error');
       const getAllRollenPromise: Promise<void> = rolleStore.getAllRollen();
       expect(rolleStore.loading).toBe(true);
       await getAllRollenPromise;
@@ -123,7 +119,7 @@ describe('rolleStore', () => {
     });
 
     it('should handle error code', async () => {
-      mockadapter.onGet('/api/rolle').replyOnce(500, { code: 'some mock server error' });
+      mockadapter.onGet('/api/rolle?searchStr=').replyOnce(500, { code: 'some mock server error' });
       const getAllRollenPromise: Promise<void> = rolleStore.getAllRollen();
       expect(rolleStore.loading).toBe(true);
       await getAllRollenPromise;

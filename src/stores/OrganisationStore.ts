@@ -30,8 +30,14 @@ type OrganisationState = {
 
 type OrganisationGetters = {};
 type OrganisationActions = {
-  getAllOrganisationen: (offset: number | undefined, limit: number | undefined, kennung: string | undefined, 
-    name: string | undefined, searchString: string | undefined, typ: OrganisationResponseTypEnum | undefined) => Promise<void>;
+  getAllOrganisationen: (
+    offset?: number,
+    limit?: number,
+    kennung?: string,
+    name?: string,
+    searchString?: string,
+    typ?: OrganisationsTyp,
+  ) => Promise<void>;
   getOrganisationById: (organisationId: string) => Promise<Organisation>;
   createOrganisation: (
     kennung: string,
@@ -66,12 +72,24 @@ export const useOrganisationStore: StoreDefinition<
   },
 
   actions: {
-    async getAllOrganisationen(offset: number | undefined, limit: number | undefined, kennung: string | undefined, 
-      name: string | undefined, searchString: string | undefined, typ: OrganisationResponseTypEnum | undefined) {
+    async getAllOrganisationen(
+      offset?: number,
+      limit?: number,
+      kennung?: string,
+      name?: string,
+      searchString?: string,
+      typ?: OrganisationsTyp,
+    ) {
       this.loading = true;
       try {
-        const { data }: AxiosResponse<Organisation[]> =
-          await organisationApi.organisationControllerFindOrganizations(offset, limit, kennung, name, searchString, typ);
+        const { data }: AxiosResponse<Organisation[]> = await organisationApi.organisationControllerFindOrganizations(
+          offset,
+          limit,
+          kennung,
+          name,
+          searchString,
+          typ,
+        );
         this.allOrganisationen = data;
         this.loading = false;
       } catch (error: unknown) {
