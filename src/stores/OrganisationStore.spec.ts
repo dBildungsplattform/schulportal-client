@@ -73,7 +73,9 @@ describe('OrganisationStore', () => {
         },
       ];
 
-      mockadapter.onGet('/api/organisationen').replyOnce(200, mockResponse);
+      mockadapter
+        .onGet('/api/organisationen?searchString=searchString&systemrechte=ROLLEN_VERWALTEN')
+        .replyOnce(200, mockResponse);
       const getAllOrganisationenPromise: Promise<void> = organisationStore.getAllOrganisationen({
         searchString: 'searchString',
         systemrechte: ['ROLLEN_VERWALTEN'],
