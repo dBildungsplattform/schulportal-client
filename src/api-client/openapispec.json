@@ -204,11 +204,11 @@
                     },
                     {
                         "name": "suchFilter",
-                        "required": false,
+                        "required": true,
                         "in": "query",
                         "description": "Search filter used to filter for Persons. It could be the vorname, familienname, referrer or the personalnummer.",
                         "schema": {
-                            "nullable": true,
+                            "nullable": false,
                             "type": "string"
                         }
                     }
@@ -686,11 +686,11 @@
                     },
                     {
                         "name": "suchFilter",
-                        "required": false,
+                        "required": true,
                         "in": "query",
                         "description": "Search filter used to filter for Persons. It could be the vorname, familienname, referrer or the personalnummer.",
                         "schema": {
-                            "nullable": true,
+                            "nullable": false,
                             "type": "string"
                         }
                     }
@@ -2439,11 +2439,11 @@
                     },
                     {
                         "name": "sskName",
-                        "required": false,
+                        "required": true,
                         "in": "query",
                         "description": "Organisation/SSK name used to filter for schulstrukturknoten in personenkontext.",
                         "schema": {
-                            "nullable": true,
+                            "nullable": false,
                             "type": "string"
                         }
                     },
@@ -3117,6 +3117,10 @@
                     "id": {
                         "type": "string"
                     },
+                    "administriertVon": {
+                        "type": "string",
+                        "nullable": true
+                    },
                     "kennung": {
                         "type": "string",
                         "nullable": true
@@ -3137,6 +3141,7 @@
                 },
                 "required": [
                     "id",
+                    "administriertVon",
                     "kennung",
                     "name",
                     "namensergaenzung",
@@ -3184,6 +3189,10 @@
                     "id": {
                         "type": "string"
                     },
+                    "administriertVon": {
+                        "type": "string",
+                        "nullable": true
+                    },
                     "kennung": {
                         "type": "string",
                         "nullable": true
@@ -3207,6 +3216,7 @@
                 },
                 "required": [
                     "id",
+                    "administriertVon",
                     "kennung",
                     "name",
                     "namensergaenzung",
