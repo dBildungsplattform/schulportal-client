@@ -5,6 +5,7 @@ import { usePersonStore, type PersonendatensatzResponse, type PersonStore } from
 import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
 import MockAdapter from 'axios-mock-adapter';
 import ApiService from '@/services/ApiService';
+import { OrganisationsTyp } from '@/stores/OrganisationStore';
 
 const mockadapter: MockAdapter = new MockAdapter(ApiService);
 let wrapper: VueWrapper | null = null;
@@ -37,6 +38,7 @@ beforeEach(() => {
             sskName: 'string',
             sskDstNr: 'string',
             rolle: 'string',
+            typ: OrganisationsTyp.Schule,
           },
         ],
       },
