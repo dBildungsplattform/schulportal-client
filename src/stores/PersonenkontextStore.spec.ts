@@ -196,6 +196,7 @@ describe('PersonenkontextStore', () => {
             sskName: 'string',
             sskDstNr: 'string',
             rolle: 'string',
+            typ: OrganisationsTyp.Klasse,
           },
         ],
       };
@@ -347,6 +348,7 @@ describe('PersonenkontextStore', () => {
                 sskName: 'string',
                 sskDstNr: 'string',
                 rolle: 'string',
+                typ: OrganisationsTyp.Klasse,
               },
             ],
           },
