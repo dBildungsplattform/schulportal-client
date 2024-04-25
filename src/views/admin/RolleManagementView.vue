@@ -5,6 +5,7 @@
   import { type Composer, useI18n } from 'vue-i18n';
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
   import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
+  import LayoutCard from '@/components/cards/LayoutCard.vue';
 
   const rolleStore: RolleStore = useRolleStore();
   const organisationStore: OrganisationStore = useOrganisationStore();
@@ -54,7 +55,7 @@
           ? Array.from(rolle.merkmale)
               .map((merkmal: RollenMerkmal) => t(`admin.rolle.mappingFrontBackEnd.merkmale.${merkmal}`))
               .join(', ')
-          : '-'; // Return dash if merkmale is empty or not defined
+          : '---'; // Return dash if merkmale is empty or not defined
 
       return {
         ...rolle,
@@ -79,27 +80,29 @@
     >
       {{ $t('admin.headline') }}
     </h1>
-    <ResultTable
-      data-testid="role-table"
-      :header="$t('admin.rolle.management')"
-      :items="transformedRollenAndMerkmale || []"
-      :loading="rolleStore.loading"
-      :headers="headers"
-      @onUpdateTable="rolleStore.getAllRollen()"
-      :totalItems="rolleStore.allRollen.length"
-      item-value-path="id"
-      :disableRowClick="true"
-    >
-      <template v-slot:[`item.serviceProviders`]="{ item }">
-        <span v-if="!item.serviceProviders.length">-</span>
-        <span
-          v-for="(serviceProvider, index) in item.serviceProviders"
-          :key="serviceProvider.id"
-        >
-          {{ serviceProvider.name }}{{ index < item.serviceProviders.length - 1 ? ', ' : '' }}
-        </span>
-      </template>
-    </ResultTable>
+    <LayoutCard :header="$t('admin.rolle.management')">
+      <ResultTable
+        data-testid="role-table"
+        :header="$t('admin.rolle.management')"
+        :items="transformedRollenAndMerkmale || []"
+        :loading="rolleStore.loading"
+        :headers="headers"
+        @onUpdateTable="rolleStore.getAllRollen()"
+        :totalItems="rolleStore.allRollen.length"
+        item-value-path="id"
+        :disableRowClick="true"
+      >
+        <template v-slot:[`item.serviceProviders`]="{ item }">
+          <span v-if="!item.serviceProviders.length">-</span>
+          <span
+            v-for="(serviceProvider, index) in item.serviceProviders"
+            :key="serviceProvider.id"
+          >
+            {{ serviceProvider.name }}{{ index < item.serviceProviders.length - 1 ? ', ' : '' }}
+          </span>
+        </template>
+      </ResultTable>
+    </LayoutCard>
   </div>
 </template>
 

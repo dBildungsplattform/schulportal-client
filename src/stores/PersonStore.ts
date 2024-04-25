@@ -58,7 +58,7 @@ type PersonActions = {
   createPersonenkontext: (
     personenkontext: DBiamCreatePersonenkontextBodyParams,
   ) => Promise<DBiamPersonenkontextResponse>;
-  getAllPersons: () => Promise<void>;
+  getAllPersons: (searchFilter: string) => Promise<void>;
   getPersonById: (personId: string) => Promise<Personendatensatz>;
   resetPassword: (personId: string) => Promise<string>;
 };
@@ -116,15 +116,16 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
       }
     },
 
-    async getAllPersons() {
+    async getAllPersons(searchFilter: string) {
       this.loading = true;
       try {
         const { data }: AxiosResponse<PersonFrontendControllerFindPersons200Response> =
-          await personenFrontendApi.personFrontendControllerFindPersons();
+          await personenFrontendApi.personFrontendControllerFindPersons(searchFilter);
 
         this.allPersons = data.items;
         this.totalPersons = data.total;
       } catch (error: unknown) {
+        console.log(error);
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
           this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
