@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { RolleResponseMerkmaleEnum, useRolleStore, type RolleResponse, type RolleStore } from '@/stores/RolleStore';
+  import { RollenMerkmal, useRolleStore, type RolleResponse, type RolleStore } from '@/stores/RolleStore';
   import { computed, onMounted, type ComputedRef } from 'vue';
   import ResultTable from '@/components/admin/ResultTable.vue';
   import { type Composer, useI18n } from 'vue-i18n';
@@ -53,7 +53,7 @@
       const formattedMerkmale: string =
         Array.from(rolle.merkmale).length > 0
           ? Array.from(rolle.merkmale)
-              .map((merkmal: RolleResponseMerkmaleEnum) => t(`admin.rolle.mappingFrontBackEnd.merkmale.${merkmal}`))
+              .map((merkmal: RollenMerkmal) => t(`admin.rolle.mappingFrontBackEnd.merkmale.${merkmal}`))
               .join(', ')
           : '---'; // Return dash if merkmale is empty or not defined
 

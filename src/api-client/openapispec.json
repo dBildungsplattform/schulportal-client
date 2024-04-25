@@ -486,16 +486,7 @@
                         "required": false,
                         "in": "query",
                         "schema": {
-                            "nullable": true,
-                            "enum": [
-                                "LERN",
-                                "LEHR",
-                                "EXTERN",
-                                "ORGADMIN",
-                                "LEIT",
-                                "SYSADMIN"
-                            ],
-                            "type": "string"
+                            "$ref": "#/components/schemas/Rolle"
                         }
                     },
                     {
@@ -503,11 +494,7 @@
                         "required": false,
                         "in": "query",
                         "schema": {
-                            "nullable": true,
-                            "enum": [
-                                "AKTIV"
-                            ],
-                            "type": "string"
+                            "$ref": "#/components/schemas/Personenstatus"
                         }
                     },
                     {
@@ -515,13 +502,7 @@
                         "required": false,
                         "in": "query",
                         "schema": {
-                            "nullable": true,
-                            "default": "nein",
-                            "enum": [
-                                "ja",
-                                "nein"
-                            ],
-                            "type": "string"
+                            "$ref": "#/components/schemas/Sichtfreigabe"
                         }
                     }
                 ],
@@ -1009,19 +990,7 @@
                         "required": false,
                         "in": "query",
                         "schema": {
-                            "nullable": true,
-                            "default": "SONSTIGE ORGANISATION / EINRICHTUNG",
-                            "enum": [
-                                "ROOT",
-                                "LAND",
-                                "TRAEGER",
-                                "SCHULE",
-                                "KLASSE",
-                                "ANBIETER",
-                                "SONSTIGE ORGANISATION / EINRICHTUNG",
-                                "UNBESTAETIGT"
-                            ],
-                            "type": "string"
+                            "$ref": "#/components/schemas/OrganisationsTyp"
                         }
                     }
                 ],
@@ -2163,16 +2132,7 @@
                         "required": false,
                         "in": "query",
                         "schema": {
-                            "nullable": true,
-                            "enum": [
-                                "LERN",
-                                "LEHR",
-                                "EXTERN",
-                                "ORGADMIN",
-                                "LEIT",
-                                "SYSADMIN"
-                            ],
-                            "type": "string"
+                            "$ref": "#/components/schemas/Rolle"
                         }
                     },
                     {
@@ -2180,11 +2140,7 @@
                         "required": false,
                         "in": "query",
                         "schema": {
-                            "nullable": true,
-                            "enum": [
-                                "AKTIV"
-                            ],
-                            "type": "string"
+                            "$ref": "#/components/schemas/Personenstatus"
                         }
                     },
                     {
@@ -2192,13 +2148,7 @@
                         "required": false,
                         "in": "query",
                         "schema": {
-                            "nullable": true,
-                            "default": "nein",
-                            "enum": [
-                                "ja",
-                                "nein"
-                            ],
-                            "type": "string"
+                            "$ref": "#/components/schemas/Sichtfreigabe"
                         }
                     }
                 ],
@@ -2277,14 +2227,7 @@
                         "required": true,
                         "in": "query",
                         "schema": {
-                            "enum": [
-                                "ROLLEN_VERWALTEN",
-                                "PERSONEN_VERWALTEN",
-                                "SCHULEN_VERWALTEN",
-                                "KLASSEN_VERWALTEN",
-                                "SCHULTRAEGER_VERWALTEN"
-                            ],
-                            "type": "string"
+                            "$ref": "#/components/schemas/RollenSystemRecht"
                         }
                     }
                 ],
@@ -2736,6 +2679,24 @@
                     }
                 }
             },
+            "Geschlecht": {
+                "type": "string",
+                "enum": [
+                    "m",
+                    "w",
+                    "d",
+                    "x"
+                ]
+            },
+            "Vertrauensstufe": {
+                "type": "string",
+                "enum": [
+                    "KEIN",
+                    "UNBE",
+                    "TEIL",
+                    "VOLL"
+                ]
+            },
             "CreatePersonBodyParams": {
                 "type": "object",
                 "properties": {
@@ -2755,25 +2716,13 @@
                         "$ref": "#/components/schemas/PersonBirthParams"
                     },
                     "geschlecht": {
-                        "type": "string",
-                        "enum": [
-                            "m",
-                            "w",
-                            "d",
-                            "x"
-                        ]
+                        "$ref": "#/components/schemas/Geschlecht"
                     },
                     "lokalisierung": {
                         "type": "string"
                     },
                     "vertrauensstufe": {
-                        "type": "string",
-                        "enum": [
-                            "KEIN",
-                            "UNBE",
-                            "TEIL",
-                            "VOLL"
-                        ]
+                        "$ref": "#/components/schemas/Vertrauensstufe"
                     },
                     "auskunftssperre": {
                         "type": "boolean"
@@ -2820,14 +2769,8 @@
                         "nullable": true
                     },
                     "vertrauensstufe": {
-                        "type": "string",
-                        "enum": [
-                            "KEIN",
-                            "UNBE",
-                            "TEIL",
-                            "VOLL"
-                        ],
-                        "nullable": true
+                        "nullable": true,
+                        "$ref": "#/components/schemas/Vertrauensstufe"
                     },
                     "revision": {
                         "type": "string"
@@ -2867,6 +2810,40 @@
                     "person"
                 ]
             },
+            "Rolle": {
+                "type": "string",
+                "enum": [
+                    "LERN",
+                    "LEHR",
+                    "EXTERN",
+                    "ORGADMIN",
+                    "LEIT",
+                    "SYSADMIN"
+                ]
+            },
+            "Personenstatus": {
+                "type": "string",
+                "description": "The new personenstatus of the personenkontext.",
+                "enum": [
+                    "AKTIV"
+                ]
+            },
+            "Jahrgangsstufe": {
+                "type": "string",
+                "description": "The new jahrgangsstufe of the personenkontext.",
+                "enum": [
+                    "01",
+                    "02",
+                    "03",
+                    "04",
+                    "05",
+                    "06",
+                    "07",
+                    "08",
+                    "09",
+                    "10"
+                ]
+            },
             "CreatePersonenkontextBodyParams": {
                 "type": "object",
                 "properties": {
@@ -2874,36 +2851,13 @@
                         "type": "string"
                     },
                     "rolle": {
-                        "type": "string",
-                        "enum": [
-                            "LERN",
-                            "LEHR",
-                            "EXTERN",
-                            "ORGADMIN",
-                            "LEIT",
-                            "SYSADMIN"
-                        ]
+                        "$ref": "#/components/schemas/Rolle"
                     },
                     "personenstatus": {
-                        "type": "string",
-                        "enum": [
-                            "AKTIV"
-                        ]
+                        "$ref": "#/components/schemas/Personenstatus"
                     },
                     "jahrgangsstufe": {
-                        "type": "string",
-                        "enum": [
-                            "01",
-                            "02",
-                            "03",
-                            "04",
-                            "05",
-                            "06",
-                            "07",
-                            "08",
-                            "09",
-                            "10"
-                        ]
+                        "$ref": "#/components/schemas/Jahrgangsstufe"
                     }
                 },
                 "required": [
@@ -2999,6 +2953,13 @@
                     "revision"
                 ]
             },
+            "Sichtfreigabe": {
+                "type": "string",
+                "enum": [
+                    "ja",
+                    "nein"
+                ]
+            },
             "UpdatePersonBodyParams": {
                 "type": "object",
                 "properties": {
@@ -3015,25 +2976,13 @@
                         "$ref": "#/components/schemas/PersonBirthParams"
                     },
                     "geschlecht": {
-                        "type": "string",
-                        "enum": [
-                            "m",
-                            "w",
-                            "d",
-                            "x"
-                        ]
+                        "$ref": "#/components/schemas/Geschlecht"
                     },
                     "lokalisierung": {
                         "type": "string"
                     },
                     "vertrauensstufe": {
-                        "type": "string",
-                        "enum": [
-                            "KEIN",
-                            "UNBE",
-                            "TEIL",
-                            "VOLL"
-                        ]
+                        "$ref": "#/components/schemas/Vertrauensstufe"
                     },
                     "auskunftssperre": {
                         "type": "boolean"
@@ -3104,6 +3053,30 @@
                     "zuordnungen"
                 ]
             },
+            "OrganisationsTyp": {
+                "type": "string",
+                "enum": [
+                    "ROOT",
+                    "LAND",
+                    "TRAEGER",
+                    "SCHULE",
+                    "KLASSE",
+                    "ANBIETER",
+                    "SONSTIGE ORGANISATION / EINRICHTUNG",
+                    "UNBESTAETIGT"
+                ]
+            },
+            "TraegerschaftTyp": {
+                "type": "string",
+                "enum": [
+                    "01",
+                    "02",
+                    "03",
+                    "04",
+                    "05",
+                    "06"
+                ]
+            },
             "CreateOrganisationBodyParams": {
                 "type": "object",
                 "properties": {
@@ -3127,28 +3100,10 @@
                         "type": "string"
                     },
                     "typ": {
-                        "type": "string",
-                        "enum": [
-                            "ROOT",
-                            "LAND",
-                            "TRAEGER",
-                            "SCHULE",
-                            "KLASSE",
-                            "ANBIETER",
-                            "SONSTIGE ORGANISATION / EINRICHTUNG",
-                            "UNBESTAETIGT"
-                        ]
+                        "$ref": "#/components/schemas/OrganisationsTyp"
                     },
                     "traegerschaft": {
-                        "type": "string",
-                        "enum": [
-                            "01",
-                            "02",
-                            "03",
-                            "04",
-                            "05",
-                            "06"
-                        ]
+                        "$ref": "#/components/schemas/TraegerschaftTyp"
                     }
                 },
                 "required": [
@@ -3181,17 +3136,7 @@
                         "type": "string"
                     },
                     "typ": {
-                        "type": "string",
-                        "enum": [
-                            "ROOT",
-                            "LAND",
-                            "TRAEGER",
-                            "SCHULE",
-                            "KLASSE",
-                            "ANBIETER",
-                            "SONSTIGE ORGANISATION / EINRICHTUNG",
-                            "UNBESTAETIGT"
-                        ]
+                        "$ref": "#/components/schemas/OrganisationsTyp"
                     }
                 },
                 "required": [
@@ -3227,28 +3172,10 @@
                         "type": "string"
                     },
                     "typ": {
-                        "type": "string",
-                        "enum": [
-                            "ROOT",
-                            "LAND",
-                            "TRAEGER",
-                            "SCHULE",
-                            "KLASSE",
-                            "ANBIETER",
-                            "SONSTIGE ORGANISATION / EINRICHTUNG",
-                            "UNBESTAETIGT"
-                        ]
+                        "$ref": "#/components/schemas/OrganisationsTyp"
                     },
                     "traegerschaft": {
-                        "type": "string",
-                        "enum": [
-                            "01",
-                            "02",
-                            "03",
-                            "04",
-                            "05",
-                            "06"
-                        ]
+                        "$ref": "#/components/schemas/TraegerschaftTyp"
                     }
                 },
                 "required": [
@@ -3281,28 +3208,10 @@
                         "type": "string"
                     },
                     "typ": {
-                        "type": "string",
-                        "enum": [
-                            "ROOT",
-                            "LAND",
-                            "TRAEGER",
-                            "SCHULE",
-                            "KLASSE",
-                            "ANBIETER",
-                            "SONSTIGE ORGANISATION / EINRICHTUNG",
-                            "UNBESTAETIGT"
-                        ]
+                        "$ref": "#/components/schemas/OrganisationsTyp"
                     },
                     "traegerschaft": {
-                        "type": "string",
-                        "enum": [
-                            "01",
-                            "02",
-                            "03",
-                            "04",
-                            "05",
-                            "06"
-                        ]
+                        "$ref": "#/components/schemas/TraegerschaftTyp"
                     }
                 },
                 "required": [
@@ -3327,6 +3236,34 @@
                 },
                 "required": [
                     "organisationId"
+                ]
+            },
+            "RollenArt": {
+                "type": "string",
+                "enum": [
+                    "LERN",
+                    "LEHR",
+                    "EXTERN",
+                    "ORGADMIN",
+                    "LEIT",
+                    "SYSADMIN"
+                ]
+            },
+            "RollenMerkmal": {
+                "type": "string",
+                "enum": [
+                    "BEFRISTUNG_PFLICHT",
+                    "KOPERS_PFLICHT"
+                ]
+            },
+            "RollenSystemRecht": {
+                "type": "string",
+                "enum": [
+                    "ROLLEN_VERWALTEN",
+                    "PERSONEN_VERWALTEN",
+                    "SCHULEN_VERWALTEN",
+                    "KLASSEN_VERWALTEN",
+                    "SCHULTRAEGER_VERWALTEN"
                 ]
             },
             "ServiceProviderIdNameResponse": {
@@ -3365,39 +3302,20 @@
                         "type": "string"
                     },
                     "rollenart": {
-                        "type": "string",
-                        "enum": [
-                            "LERN",
-                            "LEHR",
-                            "EXTERN",
-                            "ORGADMIN",
-                            "LEIT",
-                            "SYSADMIN"
-                        ]
+                        "$ref": "#/components/schemas/RollenArt"
                     },
                     "merkmale": {
                         "type": "array",
                         "uniqueItems": true,
                         "items": {
-                            "type": "string",
-                            "enum": [
-                                "BEFRISTUNG_PFLICHT",
-                                "KOPERS_PFLICHT"
-                            ]
+                            "$ref": "#/components/schemas/RollenMerkmal"
                         }
                     },
                     "systemrechte": {
                         "type": "array",
                         "uniqueItems": true,
                         "items": {
-                            "type": "string",
-                            "enum": [
-                                "ROLLEN_VERWALTEN",
-                                "PERSONEN_VERWALTEN",
-                                "SCHULEN_VERWALTEN",
-                                "KLASSEN_VERWALTEN",
-                                "SCHULTRAEGER_VERWALTEN"
-                            ]
+                            "$ref": "#/components/schemas/RollenSystemRecht"
                         }
                     },
                     "serviceProviders": {
@@ -3429,39 +3347,20 @@
                         "type": "string"
                     },
                     "rollenart": {
-                        "type": "string",
-                        "enum": [
-                            "LERN",
-                            "LEHR",
-                            "EXTERN",
-                            "ORGADMIN",
-                            "LEIT",
-                            "SYSADMIN"
-                        ]
+                        "$ref": "#/components/schemas/RollenArt"
                     },
                     "merkmale": {
                         "type": "array",
                         "uniqueItems": true,
                         "items": {
-                            "type": "string",
-                            "enum": [
-                                "BEFRISTUNG_PFLICHT",
-                                "KOPERS_PFLICHT"
-                            ]
+                            "$ref": "#/components/schemas/RollenMerkmal"
                         }
                     },
                     "systemrechte": {
                         "type": "array",
                         "uniqueItems": true,
                         "items": {
-                            "type": "string",
-                            "enum": [
-                                "ROLLEN_VERWALTEN",
-                                "PERSONEN_VERWALTEN",
-                                "SCHULEN_VERWALTEN",
-                                "KLASSEN_VERWALTEN",
-                                "SCHULTRAEGER_VERWALTEN"
-                            ]
+                            "$ref": "#/components/schemas/RollenSystemRecht"
                         }
                     }
                 },
@@ -3494,39 +3393,20 @@
                         "type": "string"
                     },
                     "rollenart": {
-                        "type": "string",
-                        "enum": [
-                            "LERN",
-                            "LEHR",
-                            "EXTERN",
-                            "ORGADMIN",
-                            "LEIT",
-                            "SYSADMIN"
-                        ]
+                        "$ref": "#/components/schemas/RollenArt"
                     },
                     "merkmale": {
                         "type": "array",
                         "uniqueItems": true,
                         "items": {
-                            "type": "string",
-                            "enum": [
-                                "BEFRISTUNG_PFLICHT",
-                                "KOPERS_PFLICHT"
-                            ]
+                            "$ref": "#/components/schemas/RollenMerkmal"
                         }
                     },
                     "systemrechte": {
                         "type": "array",
                         "uniqueItems": true,
                         "items": {
-                            "type": "string",
-                            "enum": [
-                                "ROLLEN_VERWALTEN",
-                                "PERSONEN_VERWALTEN",
-                                "SCHULEN_VERWALTEN",
-                                "KLASSEN_VERWALTEN",
-                                "SCHULTRAEGER_VERWALTEN"
-                            ]
+                            "$ref": "#/components/schemas/RollenSystemRecht"
                         }
                     }
                 },
@@ -3545,14 +3425,7 @@
                 "type": "object",
                 "properties": {
                     "systemRecht": {
-                        "type": "string",
-                        "enum": [
-                            "ROLLEN_VERWALTEN",
-                            "PERSONEN_VERWALTEN",
-                            "SCHULEN_VERWALTEN",
-                            "KLASSEN_VERWALTEN",
-                            "SCHULTRAEGER_VERWALTEN"
-                        ]
+                        "$ref": "#/components/schemas/RollenSystemRecht"
                     }
                 },
                 "required": [
@@ -3663,13 +3536,7 @@
                         "type": "string"
                     },
                     "vertrauensstufe": {
-                        "type": "string",
-                        "enum": [
-                            "KEIN",
-                            "UNBE",
-                            "TEIL",
-                            "VOLL"
-                        ]
+                        "$ref": "#/components/schemas/Vertrauensstufe"
                     },
                     "revision": {
                         "type": "string"
@@ -3765,27 +3632,10 @@
                         "description": "The new referrer of the personenkontext."
                     },
                     "personenstatus": {
-                        "type": "string",
-                        "enum": [
-                            "AKTIV"
-                        ],
-                        "description": "The new personenstatus of the personenkontext."
+                        "$ref": "#/components/schemas/Personenstatus"
                     },
                     "jahrgangsstufe": {
-                        "type": "string",
-                        "enum": [
-                            "01",
-                            "02",
-                            "03",
-                            "04",
-                            "05",
-                            "06",
-                            "07",
-                            "08",
-                            "09",
-                            "10"
-                        ],
-                        "description": "The new jahrgangsstufe of the personenkontext."
+                        "$ref": "#/components/schemas/Jahrgangsstufe"
                     },
                     "revision": {
                         "type": "string",
