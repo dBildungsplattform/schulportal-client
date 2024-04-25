@@ -27,7 +27,7 @@ beforeEach(() => {
 });
 
 describe('KlasseCreationView', () => {
-  test('it renders the person creation form', () => {
+  test('it renders the klasse creation form', () => {
     expect(wrapper?.find('[data-testid="klasse-creation-form"]').isVisible()).toBe(true);
   });
 

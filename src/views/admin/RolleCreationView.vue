@@ -497,7 +497,7 @@
 
       <!-- Result template on success after submit  -->
       <template v-if="rolleStore.createdRolle && !rolleStore.errorCode">
-        <v-container class="new-rolle-success">
+        <v-container>
           <v-row justify="center">
             <v-col
               class="subtitle-1"

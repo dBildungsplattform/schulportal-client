@@ -16,13 +16,13 @@
     type OrganisationStore,
     CreateOrganisationBodyParamsTypEnum,
     OrganisationResponseTypEnum,
+type Organisation,
   } from '@/stores/OrganisationStore';
   import { DIN_91379A_EXT } from '@/utils/validation';
   import FormRow from '@/components/form/FormRow.vue';
   import FormWrapper from '@/components/form/FormWrapper.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
-  import type { OrganisationResponseLegacy } from '@/api-client/generated/api';
   import { useDisplay } from 'vuetify';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
@@ -78,8 +78,8 @@
   const schulen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
     return organisationStore.allOrganisationen
       .slice(0, 25)
-      .filter((org: OrganisationResponseLegacy) => org.typ === OrganisationResponseTypEnum.Schule)
-      .map((org: OrganisationResponseLegacy) => ({
+      .filter((org: Organisation) => org.typ === OrganisationResponseTypEnum.Schule)
+      .map((org: Organisation) => ({
         value: org.id,
         title: org.kennung ? `${org.kennung} (${org.name})` : org.name,
       }))
@@ -260,7 +260,7 @@
 
       <!-- Result template on success after submit  -->
       <template v-if="organisationStore.createdOrganisation && !organisationStore.errorCode">
-        <v-container class="new-role-success">
+        <v-container>
           <v-row justify="center">
             <v-col
               class="subtitle-1"

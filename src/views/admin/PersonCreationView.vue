@@ -396,7 +396,7 @@
 
     <!-- Result template on success after submit  -->
     <template v-if="personStore.createdPerson && !personStore.errorCode">
-      <v-container class="new-role-success">
+      <v-container>
         <v-row justify="center">
           <v-col
             class="subtitle-1"
