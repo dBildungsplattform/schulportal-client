@@ -204,11 +204,11 @@
                     },
                     {
                         "name": "suchFilter",
-                        "required": true,
+                        "required": false,
                         "in": "query",
                         "description": "Search filter used to filter for Persons. It could be the vorname, familienname, referrer or the personalnummer.",
                         "schema": {
-                            "nullable": false,
+                            "nullable": true,
                             "type": "string"
                         }
                     }
@@ -705,11 +705,11 @@
                     },
                     {
                         "name": "suchFilter",
-                        "required": true,
+                        "required": false,
                         "in": "query",
                         "description": "Search filter used to filter for Persons. It could be the vorname, familienname, referrer or the personalnummer.",
                         "schema": {
-                            "nullable": false,
+                            "nullable": true,
                             "type": "string"
                         }
                     }
@@ -844,6 +844,11 @@
                 ],
                 "security": [
                     {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
+                    {
                         "bearer": []
                     }
                 ]
@@ -888,6 +893,11 @@
                     "dbiam-personenuebersicht"
                 ],
                 "security": [
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
                     {
                         "bearer": []
                     }
@@ -2486,11 +2496,11 @@
                     },
                     {
                         "name": "sskName",
-                        "required": true,
+                        "required": false,
                         "in": "query",
                         "description": "Organisation/SSK name used to filter for schulstrukturknoten in personenkontext.",
                         "schema": {
-                            "nullable": false,
+                            "nullable": true,
                             "type": "string"
                         }
                     },
