@@ -1,16 +1,13 @@
 import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import { isAxiosError, type AxiosResponse } from 'axios';
 import {
-  CreateRolleBodyParamsRollenartEnum,
-  CreateRolleBodyParamsMerkmaleEnum,
+  RollenArt,
+  RollenMerkmal,
   RolleApiFactory,
-  RolleResponseRollenartEnum,
-  RolleResponseMerkmaleEnum,
   type CreateRolleBodyParams,
   type RolleApiInterface,
   type RolleResponse,
-  CreateRolleBodyParamsSystemrechteEnum,
-  RolleResponseSystemrechteEnum,
+  RollenSystemRecht,
   type RolleServiceProviderQueryParams,
 } from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
@@ -33,27 +30,24 @@ type RolleActions = {
   createRolle: (
     rollenName: string,
     administrationsebene: string,
-    rollenArt: CreateRolleBodyParamsRollenartEnum,
-    merkmale: CreateRolleBodyParamsMerkmaleEnum[],
-    systemrechte: CreateRolleBodyParamsSystemrechteEnum[],
+    rollenArt: RollenArt,
+    merkmale: RollenMerkmal[],
+    systemrechte: RollenSystemRecht[],
   ) => Promise<RolleResponse>;
   getAllRollen: () => Promise<void>;
 };
 
-export { CreateRolleBodyParamsRollenartEnum };
-export { CreateRolleBodyParamsMerkmaleEnum };
-export { RolleResponseMerkmaleEnum };
-export { RolleResponseRollenartEnum };
-export { RolleResponseSystemrechteEnum };
+export { RollenArt };
+export { RollenMerkmal };
+export { RollenSystemRecht };
 export type { RolleResponse };
-export type { CreateRolleBodyParamsSystemrechteEnum };
 
 export type Rolle = {
   id: string;
   administeredBySchulstrukturknoten: string;
-  merkmale: Set<RolleResponseMerkmaleEnum>;
+  merkmale: Set<RollenMerkmal>;
   name: string;
-  rollenart: RolleResponseRollenartEnum;
+  rollenart: RollenArt;
 };
 
 export type RolleStore = Store<'rolleStore', RolleState, RolleGetters, RolleActions>;
@@ -72,9 +66,9 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
     async createRolle(
       rollenName: string,
       administrationsebene: string,
-      rollenArt: CreateRolleBodyParamsRollenartEnum,
-      merkmale: CreateRolleBodyParamsMerkmaleEnum[],
-      systemrechte: CreateRolleBodyParamsSystemrechteEnum[],
+      rollenArt: RollenArt,
+      merkmale: RollenMerkmal[],
+      systemrechte: RollenSystemRecht[],
     ): Promise<RolleResponse> {
       this.loading = true;
       try {
@@ -84,8 +78,8 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
           administeredBySchulstrukturknoten: administrationsebene,
           rollenart: rollenArt,
           // TODO Remove casting when generator issue is fixed from the server side
-          merkmale: merkmale as unknown as Set<CreateRolleBodyParamsMerkmaleEnum>,
-          systemrechte: systemrechte as unknown as Set<CreateRolleBodyParamsSystemrechteEnum>,
+          merkmale: merkmale as unknown as Set<RollenMerkmal>,
+          systemrechte: systemrechte as unknown as Set<RollenSystemRecht>,
         };
         const { data }: { data: RolleResponse } = await rolleApi.rolleControllerCreateRolle(createRolleBodyParams);
         this.loading = false;
