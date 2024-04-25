@@ -5,7 +5,7 @@
   import { type Composer, useI18n } from 'vue-i18n';
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
   import {
-    OrganisationResponseTypEnum,
+    OrganisationsTyp,
     useOrganisationStore,
     type Organisation,
     type OrganisationStore,
@@ -29,7 +29,7 @@
   const filteredOrganisationen: ComputedRef<Organisation[]> = computed(() => {
     // filter the organisations to only include the ones from Typ "Schule"
     return organisationStore.allOrganisationen.filter(
-      (organisation: Organisation) => organisation.typ === OrganisationResponseTypEnum.Schule,
+      (organisation: Organisation) => organisation.typ === OrganisationsTyp.Schule,
     );
   });
 
