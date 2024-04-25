@@ -3,10 +3,9 @@ import MockAdapter from 'axios-mock-adapter';
 import { setActivePinia, createPinia } from 'pinia';
 import { useRolleStore, type RolleStore } from './RolleStore';
 import {
-  RolleResponseMerkmaleEnum,
-  RolleResponseSystemrechteEnum,
+  RollenMerkmal,
+  RollenSystemRecht,
   type RolleResponse,
-  type RolleServiceProviderResponse,
 } from '../api-client/generated/api';
 import { rejects } from 'assert';
 
@@ -35,8 +34,8 @@ describe('rolleStore', () => {
           rollenart: 'LEHR',
           name: 'Lehrer',
           // TODO remove type casting when generator is fixed
-          merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RolleResponseMerkmaleEnum>,
-          systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RolleResponseSystemrechteEnum>,
+          merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RollenMerkmal>,
+          systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
           createdAt: '2022',
           updatedAt: '2022',
           id: '1',
@@ -97,8 +96,8 @@ describe('rolleStore', () => {
           rollenart: 'LEHR',
           name: 'Lehrer',
           // TODO: remove type casting when generator is fixed
-          merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RolleResponseMerkmaleEnum>,
-          systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RolleResponseSystemrechteEnum>,
+          merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RollenMerkmal>,
+          systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
           createdAt: '2022',
           updatedAt: '2022',
           id: '1',
@@ -142,6 +141,7 @@ describe('rolleStore', () => {
       });
       expect(rolleStore.loading).toBe(true);
       await addServiceProviderToRollePromise;
+      // expect(rolleStore.createdRolle.serviceProvider).toContain(mockResponse);
       expect(rolleStore.loading).toBe(false);
     });
 
@@ -164,40 +164,6 @@ describe('rolleStore', () => {
       });
       expect(rolleStore.loading).toBe(true);
       await addServiceProviderToRollePromise;
-      expect(rolleStore.errorCode).toEqual('some mock server error');
-      expect(rolleStore.allRollen).toEqual([]);
-      expect(rolleStore.loading).toBe(false);
-    });
-  });
-
-  describe('getServiceProviderIdsFromRolle', () => {
-    it('should add a service provider to a rolle', async () => {
-      const mockResponse = {
-        serviceProviderIds: ['1'],
-      };
-      mockadapter.onGet('/api/rolle/1/serviceProviders').replyOnce(200, mockResponse, {});
-      const getServiceProviderIdsFromRollePromise: Promise<RolleServiceProviderResponse> = rolleStore.getServiceProviderIdsFromRolle('1');
-      expect(rolleStore.loading).toBe(true);
-      const serviceProviderIds = await getServiceProviderIdsFromRollePromise;
-      expect(serviceProviderIds).toEqual(mockResponse);
-      expect(rolleStore.loading).toBe(false);
-    });
-
-    it('should handle string error', async () => {
-      mockadapter.onGet('/api/rolle/1/serviceProviders').replyOnce(500, 'some mock server error');
-      const getServiceProviderIdsFromRollePromise: Promise<RolleServiceProviderResponse> = rolleStore.getServiceProviderIdsFromRolle('1');
-      expect(rolleStore.loading).toBe(true);
-      await rejects(getServiceProviderIdsFromRollePromise);
-      expect(rolleStore.errorCode).toEqual('UNSPECIFIED_ERROR');
-      expect(rolleStore.allRollen).toEqual([]);
-      expect(rolleStore.loading).toBe(false);
-    });
-
-    it('should handle error code', async () => {
-      mockadapter.onGet('/api/rolle/1/serviceProviders').replyOnce(500, { code: 'some mock server error' });
-      const getServiceProviderIdsFromRollePromise: Promise<RolleServiceProviderResponse> = rolleStore.getServiceProviderIdsFromRolle('1');
-      expect(rolleStore.loading).toBe(true);
-      await rejects(getServiceProviderIdsFromRollePromise);
       expect(rolleStore.errorCode).toEqual('some mock server error');
       expect(rolleStore.allRollen).toEqual([]);
       expect(rolleStore.loading).toBe(false);

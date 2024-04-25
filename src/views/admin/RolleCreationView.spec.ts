@@ -102,8 +102,6 @@ describe('RolleCreationView', () => {
     );
     rolleStore.createdRolle = {
       id: '3',
-      createdAt: '2022-02-26T16:37:48.244Z',
-      updatedAt: '2022-02-26T16:37:48.244Z',
       administeredBySchulstrukturknoten: '3',
       merkmale: new Set(),
       name: 'Rolle 3',

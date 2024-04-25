@@ -1,25 +1,21 @@
 import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import { isAxiosError, type AxiosResponse } from 'axios';
 import {
-  CreateRolleBodyParamsRollenartEnum,
-  CreateRolleBodyParamsMerkmaleEnum,
+  RollenArt,
+  RollenMerkmal,
   RolleApiFactory,
-  RolleResponseRollenartEnum,
-  RolleResponseMerkmaleEnum,
   type CreateRolleBodyParams,
   type RolleApiInterface,
   type RolleResponse,
-  CreateRolleBodyParamsSystemrechteEnum,
-  RolleResponseSystemrechteEnum,
+  RollenSystemRecht,
   type RolleServiceProviderQueryParams,
-  type RolleServiceProviderResponse,
 } from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
 
 const rolleApi: RolleApiInterface = RolleApiFactory(undefined, '', axiosApiInstance);
 
 type RolleState = {
-  createdRolle: RolleResponse | null;
+  createdRolle: Rolle | null;
   allRollen: Array<RolleResponse>;
   errorCode: string;
   loading: boolean;
@@ -34,29 +30,26 @@ type RolleActions = {
   createRolle: (
     rollenName: string,
     administrationsebene: string,
-    rollenArt: CreateRolleBodyParamsRollenartEnum,
-    merkmale: CreateRolleBodyParamsMerkmaleEnum[],
-    systemrechte: CreateRolleBodyParamsSystemrechteEnum[],
+    rollenArt: RollenArt,
+    merkmale: RollenMerkmal[],
+    systemrechte: RollenSystemRecht[],
   ) => Promise<RolleResponse>;
   getAllRollen: () => Promise<void>;
-  getServiceProviderIdsFromRolle: (rolleId: string) => Promise<RolleServiceProviderResponse>;
 };
 
-export { CreateRolleBodyParamsRollenartEnum };
-export { CreateRolleBodyParamsMerkmaleEnum };
-export { RolleResponseMerkmaleEnum };
-export { RolleResponseRollenartEnum };
-export { RolleResponseSystemrechteEnum };
+export { RollenArt };
+export { RollenMerkmal };
+export { RollenSystemRecht };
 export type { RolleResponse };
-export type { RolleServiceProviderResponse };
-export type { CreateRolleBodyParamsSystemrechteEnum };
 
 export type Rolle = {
-  id: string;
   administeredBySchulstrukturknoten: string;
-  merkmale: Set<RolleResponseMerkmaleEnum>;
+  id: string;
+  merkmale: Set<RollenMerkmal>;
   name: string;
-  rollenart: RolleResponseRollenartEnum;
+  rollenart: RollenArt;
+  systemrechte?: Set<RollenSystemRecht>;
+  serviceProviders?: Array<string>;
 };
 
 export type RolleStore = Store<'rolleStore', RolleState, RolleGetters, RolleActions>;
@@ -75,7 +68,11 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
     async addServiceProviderToRolle(rolleId: string, rolleServiceProviderQueryParams: RolleServiceProviderQueryParams) {
       this.loading = true;
       try {
-        await rolleApi.rolleControllerAddServiceProviderById(rolleId, rolleServiceProviderQueryParams);
+        const { data }: AxiosResponse<string> = await rolleApi.rolleControllerAddServiceProviderById(
+          rolleId,
+          rolleServiceProviderQueryParams,
+        );
+        debugger;
         this.loading = false;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
@@ -89,9 +86,9 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
     async createRolle(
       rollenName: string,
       administrationsebene: string,
-      rollenArt: CreateRolleBodyParamsRollenartEnum,
-      merkmale: CreateRolleBodyParamsMerkmaleEnum[],
-      systemrechte: CreateRolleBodyParamsSystemrechteEnum[],
+      rollenArt: RollenArt,
+      merkmale: RollenMerkmal[],
+      systemrechte: RollenSystemRecht[],
     ): Promise<RolleResponse> {
       this.loading = true;
       try {
@@ -101,8 +98,8 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
           administeredBySchulstrukturknoten: administrationsebene,
           rollenart: rollenArt,
           // TODO Remove casting when generator issue is fixed from the server side
-          merkmale: merkmale as unknown as Set<CreateRolleBodyParamsMerkmaleEnum>,
-          systemrechte: systemrechte as unknown as Set<CreateRolleBodyParamsSystemrechteEnum>,
+          merkmale: merkmale as unknown as Set<RollenMerkmal>,
+          systemrechte: systemrechte as unknown as Set<RollenSystemRecht>,
         };
         const { data }: { data: RolleResponse } = await rolleApi.rolleControllerCreateRolle(createRolleBodyParams);
         this.loading = false;
@@ -130,23 +127,6 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
           this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
         }
         this.loading = false;
-      }
-    },
-
-    async getServiceProviderIdsFromRolle(rolleId: string) {
-      this.loading = true;
-      try {
-        const { data }: AxiosResponse<RolleServiceProviderResponse> =
-          await rolleApi.rolleControllerGetRolleServiceProviderIds(rolleId);
-        this.loading = false;
-        return data;
-      } catch (error: unknown) {
-        this.errorCode = 'UNSPECIFIED_ERROR';
-        if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
-        }
-        this.loading = false;
-        return Promise.reject(this.errorCode);
       }
     },
   },

@@ -4,14 +4,10 @@
   import {
     useRolleStore,
     type RolleStore,
-    RolleResponseMerkmaleEnum,
-    RolleResponseRollenartEnum,
-    RolleResponseSystemrechteEnum,
-    CreateRolleBodyParamsRollenartEnum,
-    CreateRolleBodyParamsMerkmaleEnum,
-    type CreateRolleBodyParamsSystemrechteEnum,
     type RolleResponse,
-    type RolleServiceProviderResponse,
+    RollenMerkmal,
+    RollenSystemRecht,
+    RollenArt,
   } from '@/stores/RolleStore';
   import {
     useServiceProviderStore,
@@ -44,13 +40,13 @@
   const { t }: Composer = useI18n({ useScope: 'global' });
   const router: Router = useRouter();
 
-  type TranslatedRollenArt = { value: RolleResponseRollenartEnum; title: string };
+  type TranslatedRollenArt = { value: RollenArt; title: string };
   const translatedRollenarten: Ref<TranslatedRollenArt[]> = ref([]);
 
-  type TranslatedMerkmal = { value: RolleResponseMerkmaleEnum; title: string };
+  type TranslatedMerkmal = { value: RollenMerkmal; title: string };
   const translatedMerkmale: Ref<TranslatedMerkmal[]> = ref([]);
 
-  type TranslatedSystemrecht = { value: RolleResponseSystemrechteEnum; title: string };
+  type TranslatedSystemrecht = { value: RollenSystemRecht; title: string };
   const translatedSystemrechte: Ref<TranslatedSystemrecht[]> = ref([]);
 
   const validationSchema: TypedSchema = toTypedSchema(
@@ -75,11 +71,11 @@
 
   type RolleCreationForm = {
     selectedAdministrationsebene: string;
-    selectedRollenArt: CreateRolleBodyParamsRollenartEnum;
+    selectedRollenArt: RollenArt;
     selectedRollenName: string;
-    selectedMerkmale: CreateRolleBodyParamsMerkmaleEnum[];
+    selectedMerkmale: RollenMerkmal[];
     selectedServiceProviders: ServiceProvider[];
-    selectedSystemRechte: CreateRolleBodyParamsSystemrechteEnum[];
+    selectedSystemRechte: RollenSystemRecht[];
   };
 
   // eslint-disable-next-line @typescript-eslint/typedef
@@ -93,7 +89,7 @@
   ] = defineField('selectedAdministrationsebene', vuetifyConfig);
 
   const [selectedRollenArt, selectedRollenArtProps]: [
-    Ref<CreateRolleBodyParamsRollenartEnum | null>,
+    Ref<RollenArt | null>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedRollenArt', vuetifyConfig);
 
@@ -103,17 +99,17 @@
   ] = defineField('selectedRollenName', vuetifyConfig);
 
   const [selectedMerkmale, selectedMerkmaleProps]: [
-    Ref<CreateRolleBodyParamsMerkmaleEnum[] | null>,
+    Ref<RollenMerkmal[] | null>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedMerkmale', vuetifyConfig);
 
   const [selectedServiceProviders, selectedServiceProvidersProps]: [
-    Ref<CreateRolleBodyParamsMerkmaleEnum[] | null>,
+    Ref<RollenMerkmal[] | null>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedServiceProviders', vuetifyConfig);
 
   const [selectedSystemRechte, selectedSystemRechteProps]: [
-    Ref<CreateRolleBodyParamsSystemrechteEnum[] | null>,
+    Ref<RollenSystemRecht[] | null>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedSystemRechte', vuetifyConfig);
 
@@ -180,25 +176,6 @@
       .join(', ');
   });
 
-  const assignedServiceProviders: ComputedRef<Promise<string>> = computed(async () => {
-    if (!rolleStore.createdRolle) return '---';
-
-    const response: RolleServiceProviderResponse = await rolleStore.getServiceProviderIdsFromRolle(rolleStore.createdRolle.id);
-    const serviceProviderNames: Array<string> = [];
-
-    response.serviceProviderIds.forEach((id: string) => {
-      serviceProviders.value.forEach((serviceProvider: { value: string; title: string }) => {
-        if (serviceProvider.value === id) {
-          serviceProviderNames.push(serviceProvider.title);
-        }
-      });
-    });
-
-    if (!serviceProviderNames.length) return '---';
-
-    return serviceProviderNames.join(', ');
-  });
-
   const translatedCreatedSystemrecht: ComputedRef<string> = computed(() => {
     if (!rolleStore.createdRolle?.systemrechte || Array.from(rolleStore.createdRolle.systemrechte).length === 0) {
       return '---';
@@ -248,7 +225,7 @@
     await serviceProviderStore.getAllServiceProviders();
 
     // Iterate over the enum values
-    Object.values(RolleResponseRollenartEnum).forEach((enumValue: RolleResponseRollenartEnum) => {
+    Object.values(RollenArt).forEach((enumValue: RollenArt) => {
       // Use the enum value to construct the i18n path
       const i18nPath: string = `admin.rolle.mappingFrontBackEnd.rollenarten.${enumValue}`;
       // Push the mapped object into the array
@@ -258,7 +235,7 @@
       });
     });
 
-    Object.values(RolleResponseMerkmaleEnum).forEach((enumValue: RolleResponseMerkmaleEnum) => {
+    Object.values(RollenMerkmal).forEach((enumValue: RollenMerkmal) => {
       const i18nPath: string = `admin.rolle.mappingFrontBackEnd.merkmale.${enumValue}`;
       translatedMerkmale.value.push({
         value: enumValue,
@@ -266,7 +243,7 @@
       });
     });
 
-    Object.values(RolleResponseSystemrechteEnum).forEach((enumValue: RolleResponseSystemrechteEnum) => {
+    Object.values(RollenSystemRecht).forEach((enumValue: RollenSystemRecht) => {
       const i18nPath: string = `admin.rolle.mappingFrontBackEnd.systemrechte.${enumValue}`;
       translatedSystemrechte.value.push({
         value: enumValue,
@@ -284,10 +261,9 @@
 
   const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = handleSubmit(async () => {
     if (selectedRollenName.value && selectedAdministrationsebene.value && selectedRollenArt.value) {
-      const merkmaleToSubmit: CreateRolleBodyParamsMerkmaleEnum[] =
-        selectedMerkmale.value?.map((m: CreateRolleBodyParamsMerkmaleEnum) => m) || [];
-      const systemrechteToSubmit: CreateRolleBodyParamsSystemrechteEnum[] =
-        selectedSystemRechte.value?.map((m: CreateRolleBodyParamsSystemrechteEnum) => m) || [];
+      const merkmaleToSubmit: RollenMerkmal[] = selectedMerkmale.value?.map((m: RollenMerkmal) => m) || [];
+      const systemrechteToSubmit: RollenSystemRecht[] =
+        selectedSystemRechte.value?.map((m: RollenSystemRecht) => m) || [];
       await rolleStore
         .createRolle(
           selectedRollenName.value,
@@ -581,10 +557,17 @@
           >
           <v-row>
             <v-col class="text-body bold text-right"> {{ $t('admin.serviceProvider.assignedServiceProvider') }}:</v-col>
-            <v-col class="text-body"
-              ><span data-testid="created-rolle-angebote">{{ assignedServiceProviders }}</span></v-col
-            ></v-row
-          >
+            <v-col class="text-body">
+              <span data-testid="created-rolle-angebote">
+                <!-- <span
+                  :data-testid="`created-rolle-angebot-${}`"
+                  v-for="serviceProvider in "
+                >
+                  {{ assignedServiceProviders }}
+                </span> -->
+              </span>
+            </v-col>
+          </v-row>
           <v-row>
             <v-col class="text-body bold text-right"> {{ $t('admin.rolle.systemrechte') }}:</v-col>
             <v-col class="text-body"
