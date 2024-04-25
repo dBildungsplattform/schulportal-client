@@ -22,10 +22,14 @@ type OrganisationState = {
   loading: boolean;
 };
 
+type GetAllOrganisationenFilter = {
+  searchString?: string;
+  systemrechte?: RollenSystemRecht[];
+};
+
 type OrganisationGetters = {};
 type OrganisationActions = {
-  getAllOrganisationen: () => Promise<void>;
-  getAllOrganisationenWithRecht: (rechte: RollenSystemRecht[]) => Promise<void>;
+  getAllOrganisationen: (filter?: GetAllOrganisationenFilter) => Promise<void>;
   getOrganisationById: (organisationId: string) => Promise<Organisation>;
   createOrganisation: (
     kennung: string,
@@ -61,22 +65,7 @@ export const useOrganisationStore: StoreDefinition<
     };
   },
   actions: {
-    async getAllOrganisationen() {
-      this.loading = true;
-      try {
-        const { data }: AxiosResponse<Organisation[]> = await organisationApi.organisationControllerFindOrganizations();
-
-        this.allOrganisationen = data;
-        this.loading = false;
-      } catch (error: unknown) {
-        this.errorCode = 'UNSPECIFIED_ERROR';
-        if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
-        }
-        this.loading = false;
-      }
-    },
-    async getAllOrganisationenWithRecht(rechte: RollenSystemRecht[]) {
+    async getAllOrganisationen(filter?: GetAllOrganisationenFilter) {
       this.loading = true;
       try {
         const { data }: AxiosResponse<Organisation[]> = await organisationApi.organisationControllerFindOrganizations(
@@ -84,9 +73,9 @@ export const useOrganisationStore: StoreDefinition<
           undefined,
           undefined,
           undefined,
+          filter?.searchString,
           undefined,
-          undefined,
-          rechte,
+          filter?.systemrechte,
         );
 
         this.allOrganisationen = data;

@@ -60,6 +60,28 @@ describe('OrganisationStore', () => {
       expect(organisationStore.errorCode).toEqual('some mock server error');
       expect(organisationStore.loading).toBe(false);
     });
+
+    it('should accept filter', async () => {
+      const mockResponse: Organisation[] = [
+        {
+          id: '1',
+          kennung: 'Org1',
+          name: 'Organisation 1',
+          namensergaenzung: 'Ergänzung',
+          kuerzel: 'O1',
+          typ: OrganisationResponseTypEnum.Anbieter,
+        },
+      ];
+
+      mockadapter.onGet('/api/organisationen').replyOnce(200, mockResponse);
+      const getAllOrganisationenPromise: Promise<void> = organisationStore.getAllOrganisationen({
+        searchString: 'searchString',
+        systemrechte: ['ROLLEN_VERWALTEN'],
+      });
+      await getAllOrganisationenPromise;
+      expect(organisationStore.allOrganisationen).toEqual(mockResponse);
+      expect(organisationStore.loading).toBe(false);
+    });
   });
   describe('getOrganisationById', () => {
     it('should load the Organisation and update state', async () => {
