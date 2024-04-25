@@ -7,7 +7,7 @@
     RollenMerkmal,
     RollenSystemRecht,
     RollenArt,
-    RolleResponse,
+    type RolleResponse,
   } from '@/stores/RolleStore';
   import {
     useServiceProviderStore,

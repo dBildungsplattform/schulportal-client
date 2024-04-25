@@ -203,7 +203,7 @@
           :onSubmit="onSubmit"
           :showUnsavedChangesDialog="showUnsavedChangesDialog"
         >
-          <!-- Organisationsebene -->
+          <!-- Schule -->
           <v-row>
             <h3 class="headline-3">1. {{ $t('admin.schule.assignSchule') }}</h3>
           </v-row>
@@ -290,7 +290,7 @@
           <v-row>
             <v-col class="text-body bold text-right"> {{ $t('admin.schule.schule') }}: </v-col>
             <v-col class="text-body">
-              <span data-testid="created-klasse-organisationsebene">
+              <span data-testid="created-klasse-schule">
                 {{ translatedSchulname }}
               </span>
             </v-col>

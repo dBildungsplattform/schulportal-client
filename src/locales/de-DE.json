@@ -26,7 +26,7 @@
       "enterKlassenname": "Klassenname eingeben",
       "klasseAddedSuccessfully": "Die Klasse wurde erfolgreich hinzugefügt.",
       "klasseCreateErrorText": "Die Klasse konnte nicht angelegt werden.",
-      "klasseCreateErrorTitle": "Fehler beim Anlegen der Klasse.",
+      "klasseCreateErrorTitle": "Fehler beim Anlegen der Klasse",
       "klassenname": "Klassenname",
       "management": "Klassenverwaltung",
       "rules": {
