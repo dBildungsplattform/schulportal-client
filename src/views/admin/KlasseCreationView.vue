@@ -206,13 +206,13 @@ type Organisation,
         >
           <!-- Organisationsebene -->
           <v-row>
-            <h3 class="headline-3">1. {{ $t('admin.organisation.assignOrganisation') }}</h3>
+            <h3 class="headline-3">1. {{ $t('admin.schule.assignSchule') }}</h3>
           </v-row>
           <FormRow
             :errorLabel="selectedSchuleProps['error']"
             labelForId="schule-select"
             :isRequired="true"
-            :label="$t('admin.organisation.organisation')"
+            :label="$t('admin.schule.schule')"
           >
             <v-autocomplete
               autocomplete="off"
@@ -223,7 +223,7 @@ type Organisation,
               :items="schulen"
               item-value="value"
               item-text="title"
-              :placeholder="$t('admin.organisation.assignOrganisation')"
+              :placeholder="$t('admin.schule.assignSchule')"
               required="true"
               variant="outlined"
               v-bind="selectedSchuleProps"
@@ -289,7 +289,7 @@ type Organisation,
             </v-col>
           </v-row>
           <v-row>
-            <v-col class="text-body bold text-right"> {{ $t('admin.organisation.organisation') }}: </v-col>
+            <v-col class="text-body bold text-right"> {{ $t('admin.schule.schule') }}: </v-col>
             <v-col class="text-body">
               <span data-testid="created-klasse-organisationsebene">
                 {{ translatedSchulname }}

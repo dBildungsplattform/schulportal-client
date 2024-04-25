@@ -160,6 +160,7 @@
       "ersatzschule": "Ersatzschule",
       "assignAdministratingSchultraeger": "Verwaltenden Schulträger zuordnen",
       "assignSchulform": "Schulform zuordnen",
+      "assignSchule": "Schule zuordnen",
       "backToCreateSchule": "Zurück zur Schulanlage",
       "createNew": "Neue Schule anlegen",
       "create": "Schule anlegen",
@@ -179,6 +180,7 @@
           "required": "Der Schulname muss angegeben werden."
         }
       },
+      "schule": "Schule",
       "schulname": "Schulname",
       "schulform": "Schulform",
       "schuleCreateErrorTitle": "Fehler beim Anlegen der Schule",
