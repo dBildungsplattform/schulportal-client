@@ -17,9 +17,9 @@ COPY src/ src/
 COPY public/ public/
 
 RUN npm ci
-RUN npx openapi-generator-cli generate --generator-key backend --openapi-normalizer REFACTOR_ALLOF_WITH_PROPERTIES_ONLY=true
+RUN npx generate-client
 RUN npm run build
-RUN ls /
+RUN ls /app/src/api-client/generated
 
 FROM scratch as artifacts
 COPY --from=build /app/src/api-client/generated /
