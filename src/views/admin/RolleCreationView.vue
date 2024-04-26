@@ -1,14 +1,12 @@
 <script setup lang="ts">
-  import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { ref, type Ref, onMounted, onUnmounted, computed, type ComputedRef } from 'vue';
+  import { useOrganisationStore, type OrganisationStore, type Organisation } from '@/stores/OrganisationStore';
+  import { useRolleStore, type RolleStore, RollenMerkmal, RollenSystemRecht, RollenArt } from '@/stores/RolleStore';
   import {
-    useRolleStore,
-    type RolleStore,
-    RolleResponseMerkmaleEnum,
-    RolleResponseRollenartEnum,
-    CreateRolleBodyParamsRollenartEnum,
-    CreateRolleBodyParamsMerkmaleEnum,
-  } from '@/stores/RolleStore';
+    useServiceProviderStore,
+    type ServiceProvider,
+    type ServiceProviderStore,
+  } from '@/stores/ServiceProviderStore';
   import { useI18n, type Composer } from 'vue-i18n';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import {
@@ -24,28 +22,35 @@
   import { toTypedSchema } from '@vee-validate/yup';
   import FormWrapper from '@/components/form/FormWrapper.vue';
   import FormRow from '@/components/form/FormRow.vue';
-  import { useOrganisationStore, type OrganisationStore, type Organisation } from '@/stores/OrganisationStore';
+  import LayoutCard from '@/components/cards/LayoutCard.vue';
+  import { DIN_91379A_EXT } from '@/utils/validation';
+import type { RolleResponse } from '@/stores/RolleStore';
 
-  const { smAndDown }: { smAndDown: Ref<boolean> } = useDisplay();
+  const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
   const rolleStore: RolleStore = useRolleStore();
   const organisationStore: OrganisationStore = useOrganisationStore();
+  const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
 
   const { t }: Composer = useI18n({ useScope: 'global' });
   const router: Router = useRouter();
 
-  type TranslatedRollenArt = { value: RolleResponseRollenartEnum; title: string };
+  type TranslatedRollenArt = { value: RollenArt; title: string };
   const translatedRollenarten: Ref<TranslatedRollenArt[]> = ref([]);
 
-  type TranslatedMerkmal = { value: RolleResponseMerkmaleEnum; title: string };
+  type TranslatedMerkmal = { value: RollenMerkmal; title: string };
   const translatedMerkmale: Ref<TranslatedMerkmal[]> = ref([]);
+
+  type TranslatedSystemrecht = { value: RollenSystemRecht; title: string };
+  const translatedSystemrechte: Ref<TranslatedSystemrecht[]> = ref([]);
 
   const validationSchema: TypedSchema = toTypedSchema(
     object({
       selectedRollenArt: string().required(t('admin.rolle.rules.rollenart.required')),
       selectedRollenName: string()
         .max(200, t('admin.rolle.rules.rollenname.length'))
+        .matches(DIN_91379A_EXT, t('admin.rolle.rules.rollenname.matches'))
         .required(t('admin.rolle.rules.rollenname.required')),
-      selectedSchulstrukturknoten: string().required(t('admin.schulstrukturknoten.rules.required')),
+      selectedAdministrationsebene: string().required(t('admin.administrationsebene.rules.required')),
     }),
   );
 
@@ -59,10 +64,12 @@
   });
 
   type RolleCreationForm = {
-    selectedSchulstrukturknoten: string;
-    selectedRollenArt: CreateRolleBodyParamsRollenartEnum;
+    selectedAdministrationsebene: string;
+    selectedRollenArt: RollenArt;
     selectedRollenName: string;
-    selectedMerkmale: CreateRolleBodyParamsMerkmaleEnum[];
+    selectedMerkmale: RollenMerkmal[];
+    selectedServiceProviders: ServiceProvider[];
+    selectedSystemRechte: RollenSystemRecht[];
   };
 
   // eslint-disable-next-line @typescript-eslint/typedef
@@ -70,13 +77,13 @@
     validationSchema,
   });
 
-  const [selectedSchulstrukturknoten, selectedSchulstrukturknotenProps]: [
+  const [selectedAdministrationsebene, selectedAdministrationsebeneProps]: [
     Ref<string>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineField('selectedSchulstrukturknoten', vuetifyConfig);
+  ] = defineField('selectedAdministrationsebene', vuetifyConfig);
 
   const [selectedRollenArt, selectedRollenArtProps]: [
-    Ref<CreateRolleBodyParamsRollenartEnum | null>,
+    Ref<RollenArt | null>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedRollenArt', vuetifyConfig);
 
@@ -86,16 +93,27 @@
   ] = defineField('selectedRollenName', vuetifyConfig);
 
   const [selectedMerkmale, selectedMerkmaleProps]: [
-    Ref<CreateRolleBodyParamsMerkmaleEnum[] | null>,
+    Ref<RollenMerkmal[] | null>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedMerkmale', vuetifyConfig);
 
+  const [selectedServiceProviders, selectedServiceProvidersProps]: [
+    Ref<RollenMerkmal[] | null>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = defineField('selectedServiceProviders', vuetifyConfig);
+
+  const [selectedSystemRechte, selectedSystemRechteProps]: [
+    Ref<RollenSystemRecht[] | null>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = defineField('selectedSystemRechte', vuetifyConfig);
+
   function isFormDirty(): boolean {
     return (
-      isFieldDirty('selectedSchulstrukturknoten') ||
+      isFieldDirty('selectedAdministrationsebene') ||
       isFieldDirty('selectedRollenArt') ||
       isFieldDirty('selectedRollenName') ||
-      isFieldDirty('selectedMerkmale')
+      isFieldDirty('selectedMerkmale') ||
+      isFieldDirty('selectedSystemRechte')
     );
   }
 
@@ -108,24 +126,6 @@
       blockedNext = next;
     } else {
       next();
-    }
-  });
-
-  const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = handleSubmit(async () => {
-    if (selectedRollenName.value && selectedSchulstrukturknoten.value && selectedRollenArt.value) {
-      const merkmaleToSubmit: CreateRolleBodyParamsMerkmaleEnum[] =
-        selectedMerkmale.value?.map((m: CreateRolleBodyParamsMerkmaleEnum) => m) || [];
-      await rolleStore.createRolle(
-        selectedRollenName.value,
-        selectedSchulstrukturknoten.value,
-        selectedRollenArt.value,
-        merkmaleToSubmit,
-      );
-      resetForm();
-
-      if (rolleStore.createdRolle) {
-        await organisationStore.getOrganisationById(rolleStore.createdRolle.administeredBySchulstrukturknoten);
-      }
     }
   });
 
@@ -149,20 +149,40 @@
     rolleStore.createdRolle = null;
   }
 
+  function getSskName(sskDstNr: string | null | undefined, sskName: string | null | undefined): string {
+    /* omit parens when there is no ssk kennung  */
+    if (sskDstNr) {
+      return `${sskDstNr} (${sskName})`;
+    } else {
+      return sskName || '';
+    }
+  }
+
   const translatedCreatedRolleMerkmale: ComputedRef<string> = computed(() => {
-    // Check if `createdRolle.merkmale` exists and is an array
-    if (!rolleStore.createdRolle?.merkmale || !Array.isArray(rolleStore.createdRolle.merkmale)) {
-      return '';
+    if (!rolleStore.createdRolle?.merkmale || Array.from(rolleStore.createdRolle.merkmale).length === 0) {
+      return '---';
     }
 
-    return rolleStore.createdRolle.merkmale
+    return Array.from(rolleStore.createdRolle.merkmale)
       .map((merkmalKey: string) => {
         return t(`admin.rolle.mappingFrontBackEnd.merkmale.${merkmalKey}`);
       })
       .join(', ');
   });
 
-  const schulstrukturknoten: ComputedRef<
+  const translatedCreatedSystemrecht: ComputedRef<string> = computed(() => {
+    if (!rolleStore.createdRolle?.systemrechte || Array.from(rolleStore.createdRolle.systemrechte).length === 0) {
+      return '---';
+    }
+
+    return Array.from(rolleStore.createdRolle.systemrechte)
+      .map((systemrechtKey: string) => {
+        return t(`admin.rolle.mappingFrontBackEnd.systemrechte.${systemrechtKey}`);
+      })
+      .join(', ');
+  });
+
+  const administrationsebenen: ComputedRef<
     {
       value: string;
       title: string;
@@ -170,7 +190,19 @@
   > = computed(() =>
     organisationStore.allOrganisationen.map((org: Organisation) => ({
       value: org.id,
-      title: `${org.kennung} (${org.name})`,
+      title: org.kennung ? `${org.kennung} (${org.name})` : org.name,
+    })),
+  );
+
+  const serviceProviders: ComputedRef<
+    {
+      value: string;
+      title: string;
+    }[]
+  > = computed(() =>
+    serviceProviderStore.allServiceProviders.map((provider: ServiceProvider) => ({
+      value: provider.id,
+      title: provider.name,
     })),
   );
 
@@ -184,9 +216,10 @@
   onMounted(async () => {
     rolleStore.createdRolle = null;
     await organisationStore.getAllOrganisationen();
+    await serviceProviderStore.getAllServiceProviders();
 
     // Iterate over the enum values
-    Object.values(RolleResponseRollenartEnum).forEach((enumValue: RolleResponseRollenartEnum) => {
+    Object.values(RollenArt).forEach((enumValue: RollenArt) => {
       // Use the enum value to construct the i18n path
       const i18nPath: string = `admin.rolle.mappingFrontBackEnd.rollenarten.${enumValue}`;
       // Push the mapped object into the array
@@ -196,9 +229,17 @@
       });
     });
 
-    Object.values(RolleResponseMerkmaleEnum).forEach((enumValue: RolleResponseMerkmaleEnum) => {
+    Object.values(RollenMerkmal).forEach((enumValue: RollenMerkmal) => {
       const i18nPath: string = `admin.rolle.mappingFrontBackEnd.merkmale.${enumValue}`;
       translatedMerkmale.value.push({
+        value: enumValue,
+        title: t(i18nPath),
+      });
+    });
+
+    Object.values(RollenSystemRecht).forEach((enumValue: RollenSystemRecht) => {
+      const i18nPath: string = `admin.rolle.mappingFrontBackEnd.systemrechte.${enumValue}`;
+      translatedSystemrechte.value.push({
         value: enumValue,
         title: t(i18nPath),
       });
@@ -210,6 +251,37 @@
 
   onUnmounted(() => {
     window.removeEventListener('beforeunload', preventNavigation);
+  });
+
+  const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = handleSubmit(async () => {
+    if (selectedRollenName.value && selectedAdministrationsebene.value && selectedRollenArt.value) {
+      const merkmaleToSubmit: RollenMerkmal[] =
+        selectedMerkmale.value?.map((m: RollenMerkmal) => m) || [];
+      const systemrechteToSubmit: RollenSystemRecht[] =
+        selectedSystemRechte.value?.map((m: RollenSystemRecht) => m) || [];
+      await rolleStore
+        .createRolle(
+          selectedRollenName.value,
+          selectedAdministrationsebene.value,
+          selectedRollenArt.value,
+          merkmaleToSubmit,
+          systemrechteToSubmit,
+        )
+        .then(async (rolleResponse: RolleResponse) => {
+          if (selectedServiceProviders.value) {
+            selectedServiceProviders.value.forEach(async (serviceProviderId: string) => {
+              await rolleStore.addServiceProviderToRolle(rolleResponse.id, {
+                serviceProviderId,
+              });
+            });
+          }
+        });
+      resetForm();
+
+      if (rolleStore.createdRolle) {
+        await organisationStore.getOrganisationById(rolleStore.createdRolle.administeredBySchulstrukturknoten);
+      }
+    }
   });
 </script>
 
@@ -232,7 +304,6 @@
         :showButton="true"
         :buttonText="$t('admin.rolle.backToCreateRolle')"
         :buttonAction="navigateBackToRolleForm"
-        buttonClass="primary"
       />
 
       <!-- The form to create a new Rolle -->
@@ -247,33 +318,35 @@
           :onSubmit="onSubmit"
           :showUnsavedChangesDialog="showUnsavedChangesDialog"
         >
-          <!-- Schulstrukturknoten -->
+          <!-- 1. Administrationsebene zuordnen -->
           <v-row>
-            <h3 class="headline-3">1. {{ $t('admin.schulstrukturknoten.assignSchulstrukturknoten') }}</h3>
+            <h3 class="headline-3">1. {{ $t('admin.administrationsebene.assignAdministrationsebene') }}</h3>
           </v-row>
           <FormRow
-            :errorLabel="selectedSchulstrukturknotenProps['error']"
-            labelForId="schulstrukturknoten-select"
+            :errorLabel="selectedAdministrationsebeneProps['error']"
+            labelForId="administrationsebene-select"
             :isRequired="true"
-            :label="$t('admin.schulstrukturknoten.schulstrukturknoten')"
+            :label="$t('admin.administrationsebene.administrationsebene')"
           >
             <v-select
               clearable
-              data-testid="schulstrukturknoten-select"
+              data-testid="administrationsebene-select"
               density="compact"
-              id="schulstrukturknoten-select"
-              :items="schulstrukturknoten"
+              id="administrationsebene-select"
+              :items="administrationsebenen"
               item-value="value"
               item-text="title"
-              :placeholder="$t('admin.schulstrukturknoten.selectSchulstrukturknoten')"
+              :placeholder="$t('admin.administrationsebene.assignAdministrationsebene')"
+              ref="administrationsebene-select"
               required="true"
               variant="outlined"
-              v-bind="selectedSchulstrukturknotenProps"
-              v-model="selectedSchulstrukturknoten"
+              v-bind="selectedAdministrationsebeneProps"
+              v-model="selectedAdministrationsebene"
+              :no-data-text="$t('noDataFound')"
             ></v-select>
           </FormRow>
 
-          <!-- Rollenart -->
+          <!-- 2. Rollenart zuordnen -->
           <v-row>
             <h3 class="headline-3">2. {{ $t('admin.rolle.assignRollenart') }}</h3>
           </v-row>
@@ -292,15 +365,17 @@
               item-value="value"
               item-text="title"
               :placeholder="$t('admin.rolle.selectRollenart')"
+              ref="rollenart-select"
               required="true"
               variant="outlined"
               v-bind="selectedRollenArtProps"
               v-model="selectedRollenArt"
+              :no-data-text="$t('noDataFound')"
             ></v-select>
           </FormRow>
 
-          <template v-if="selectedRollenArt && selectedSchulstrukturknoten">
-            <!-- Rollenname -->
+          <template v-if="selectedRollenArt && selectedAdministrationsebene">
+            <!-- 3. Rollenname eingeben -->
             <v-row>
               <h3 class="headline-3">3. {{ $t('admin.rolle.enterRollenname') }}</h3>
             </v-row>
@@ -316,6 +391,7 @@
                 density="compact"
                 id="rollenname-input"
                 :placeholder="$t('admin.rolle.enterRollenname')"
+                ref="rollenname-input"
                 required="true"
                 variant="outlined"
                 v-bind="selectedRollenNameProps"
@@ -323,7 +399,7 @@
               ></v-text-field>
             </FormRow>
 
-            <!-- Merkmale -->
+            <!-- 4. Merkmale zuordnen -->
             <v-row>
               <h3 class="headline-3">4. {{ $t('admin.rolle.assignMerkmale') }}</h3>
             </v-row>
@@ -346,7 +422,65 @@
                 variant="outlined"
                 v-bind="selectedMerkmaleProps"
                 v-model="selectedMerkmale"
+                :no-data-text="$t('noDataFound')"
               ></v-select>
+            </FormRow>
+
+            <!-- 5. Angebote zuordnen -->
+            <v-row>
+              <h3 class="headline-3">5. {{ $t('admin.serviceProvider.assignServiceProvider') }}</h3>
+            </v-row>
+            <FormRow
+              :errorLabel="selectedServiceProvidersProps['error']"
+              labelForId="service-provider-select"
+              :label="$t('admin.serviceProvider.serviceProvider')"
+            >
+              <v-autocomplete
+                autocomplete="off"
+                chips
+                clearable
+                data-testid="service-provider-select"
+                density="compact"
+                id="service-provider-select"
+                :items="serviceProviders"
+                item-value="value"
+                item-text="title"
+                multiple
+                :no-data-text="$t('noDataFound')"
+                :placeholder="$t('admin.serviceProvider.selectServiceProvider')"
+                variant="outlined"
+                v-bind="selectedServiceProvidersProps"
+                v-model="selectedServiceProviders"
+              ></v-autocomplete>
+            </FormRow>
+
+            <!-- 6. Systemrechte zuordnen -->
+            <v-row>
+              <h3 class="headline-3">6. {{ $t('admin.rolle.assignSystemrechte') }}</h3>
+            </v-row>
+            <!-- Iterate over each system right and create a checkbox for it -->
+            <FormRow
+              :errorLabel="selectedSystemRechteProps['error']"
+              labelForId="systemrecht-select"
+              :label="$t('admin.rolle.systemrechte')" 
+            >
+              <v-autocomplete
+                autocomplete="off"
+                chips
+                clearable
+                data-testid="systemrechte-select"
+                density="compact"
+                id="systemrechte-select"
+                :items="translatedSystemrechte"
+                item-value="value"
+                item-text="title"
+                multiple
+                :no-data-text="$t('noDataFound')"
+                :placeholder="$t('admin.rolle.selectSystemrechte')"
+                variant="outlined"
+                v-bind="selectedSystemRechteProps"
+                v-model="selectedSystemRechte"
+              ></v-autocomplete>
             </FormRow>
           </template>
         </FormWrapper>
@@ -360,7 +494,7 @@
               class="subtitle-1"
               cols="auto"
             >
-              {{ $t('admin.rolle.rolleAddedSuccessfully') }}
+              <span data-testid="rolle-success-text">{{ $t('admin.rolle.rolleAddedSuccessfully') }}</span>
             </v-col>
           </v-row>
           <v-row justify="center">
@@ -383,27 +517,44 @@
           </v-row>
           <v-row>
             <v-col class="text-body bold text-right">
-              {{ $t('admin.schulstrukturknoten.schulstrukturknoten') }}:
+              {{ $t('admin.administrationsebene.administrationsebene') }}:
             </v-col>
             <v-col class="text-body">
-              {{
-                `${organisationStore.currentOrganisation?.kennung} (${organisationStore.currentOrganisation?.name})`
-              }}</v-col
-            >
+              <span data-testid="created-rolle-administrationsebene">
+                {{
+                  getSskName(
+                    organisationStore.currentOrganisation?.kennung,
+                    organisationStore.currentOrganisation?.name,
+                  )
+                }}
+              </span>
+            </v-col>
           </v-row>
           <v-row>
             <v-col class="text-body bold text-right"> {{ $t('admin.rolle.rollenart') }}: </v-col>
             <v-col class="text-body">
-              {{ $t(`admin.rolle.mappingFrontBackEnd.rollenarten.${rolleStore.createdRolle.rollenart}`) }}</v-col
-            >
+              <span data-testid="created-rolle-rollenart">
+                {{ $t(`admin.rolle.mappingFrontBackEnd.rollenarten.${rolleStore.createdRolle.rollenart}`) }}
+              </span>
+            </v-col>
           </v-row>
           <v-row>
             <v-col class="text-body bold text-right"> {{ $t('admin.rolle.rollenname') }}:</v-col>
-            <v-col class="text-body">{{ rolleStore.createdRolle.name }} </v-col>
+            <v-col class="text-body"
+              ><span data-testid="created-rolle-name">{{ rolleStore.createdRolle.name }}</span></v-col
+            >
           </v-row>
           <v-row>
             <v-col class="text-body bold text-right"> {{ $t('admin.rolle.merkmale') }}:</v-col>
-            <v-col class="text-body"> {{ translatedCreatedRolleMerkmale }}</v-col></v-row
+            <v-col class="text-body"
+              ><span data-testid="created-rolle-merkmale">{{ translatedCreatedRolleMerkmale }}</span></v-col
+            ></v-row
+          >
+          <v-row>
+            <v-col class="text-body bold text-right"> {{ $t('admin.rolle.systemrechte') }}:</v-col>
+            <v-col class="text-body"
+              ><span data-testid="created-rolle-systemrecht">{{ translatedCreatedSystemrecht }}</span></v-col
+            ></v-row
           >
           <v-divider
             class="border-opacity-100 rounded my-6"
@@ -413,25 +564,27 @@
           <v-row justify="end">
             <v-col
               cols="12"
+              sm="6"
               md="auto"
             >
               <v-btn
                 class="secondary"
                 data-testid="back-to-list-button"
-                :block="smAndDown"
+                :block="mdAndDown"
                 @click="navigateToRolleManagement"
                 >{{ $t('nav.backToList') }}</v-btn
               >
             </v-col>
             <v-col
               cols="12"
+              sm="6"
               md="auto"
             >
               <v-btn
                 class="primary button"
                 data-testid="create-another-rolle-button"
                 @click="handleCreateAnotherRolle"
-                :block="smAndDown"
+                :block="mdAndDown"
               >
                 {{ $t('admin.rolle.createAnother') }}
               </v-btn>

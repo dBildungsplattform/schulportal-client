@@ -1,20 +1,51 @@
+nameOverride: ""
+fullnameOverride: ""
+namespaceOverride: ""
+
 replicaCount: 1
 image:
   repository: ghcr.io/dbildungsplattform/schulportal-client
   tag: ""
   pullPolicy: Always
 
-allowPrivilegeEscalation: ""
 restartPolicy: Always
 
-nameOverride: ""
+frontendHostname: ""
 
-service:
-  type: NodePort
-  targetPort: 80  
-  port: 80
+containerSecurityContext:
+  enabled: true
+  runAsUser: 101
+  runAsNonRoot: true
+  privileged: false
+  readOnlyRootFilesystem: false
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop: ["ALL"]
+  seccompProfile:
+    type: "RuntimeDefault"
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 1G
+  requests:
+    cpu: 50m
+    memory: 200Mi
 
 ingress:
   enabled: true
-  className: nginx
-frontendHostname: "helm.dev.spsh.dbildungsplattform.de"
+  ingressClassName: nginx
+  path: /
+  pathType: Prefix
+  annotations: {}
+
+containerPorts: 
+  name: http 
+  http: 8080
+
+service:
+  type: NodePort
+  http:
+    enabled: true
+  ports:
+    http: 8080 

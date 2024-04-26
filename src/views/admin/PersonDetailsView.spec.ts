@@ -4,11 +4,14 @@ import { createRouter, createWebHistory, type NavigationFailure, type RouteLocat
 import routes from '@/router/routes';
 import PersonDetailsView from './PersonDetailsView.vue';
 import { type Personendatensatz, type PersonStore, usePersonStore } from '@/stores/PersonStore';
+import { usePersonenkontextStore, type PersonenkontextStore, type Uebersicht } from '@/stores/PersonenkontextStore';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
 
 const personStore: PersonStore = usePersonStore();
+const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
+
 const mockPerson: Personendatensatz = {
   person: {
     id: '1',
@@ -18,10 +21,26 @@ const mockPerson: Personendatensatz = {
     },
     referrer: 'jorton',
   },
-  personenkontexte: [],
+};
+
+const mockPersonenuebersicht: Uebersicht = {
+  personId: '1',
+  vorname: 'John',
+  nachname: 'Orton',
+  benutzername: 'jorton',
+  zuordnungen: [
+    {
+      sskId: '1',
+      rolleId: '1',
+      sskName: 'Testschule Birmingham',
+      sskDstNr: '123456',
+      rolle: 'Lehrer',
+    },
+  ],
 };
 
 personStore.currentPerson = mockPerson;
+personenkontextStore.personenuebersicht = mockPersonenuebersicht;
 
 beforeEach(async () => {
   document.body.innerHTML = `
@@ -54,6 +73,7 @@ describe('PersonDetailsView', () => {
     expect(wrapper?.find('[data-testid="person-vorname"]').text()).toBe('John');
     expect(wrapper?.find('[data-testid="person-familienname"]').text()).toBe('Orton');
     expect(wrapper?.find('[data-testid="person-username"]').text()).toBe('jorton');
+    expect(wrapper?.find('[data-testid="person-zuordnung-1"]').text()).toBe('123456 (Testschule Birmingham): Lehrer');
   });
 
   test('it navigates back to user table', async () => {

@@ -1,6 +1,13 @@
 {
   "action": "Aktion",
   "admin": {
+    "administrationsebene": {
+      "administrationsebene": "Administrationsebene",
+      "assignAdministrationsebene": "Administrationsebene zuordnen",
+      "rules": {
+        "required": "Die Administrationsebene muss ausgewählt werden."
+      }
+    },
     "mandatoryFieldsNotice": "Mit * markierte Felder sind Pflichtangaben.",
     "backToForm": "Zurück zum Formular",
     "class": {
@@ -14,20 +21,36 @@
     },    
     "organisation": {
       "assignOrganisation": "Organisationsebene zuordnen",
-      "selectOrganisation": "Organisationsebene auswählen"
+      "organisation": "Organisationsebene",
+      "selectOrganisation": "Organisationsebene auswählen",
+      "rules": {
+        "organisation": {
+          "required": "Die Organisationsebene muss ausgewählt werden."
+        }
+      }
     },
     "rolle": {
       "addNew": "Neue Rolle hinzufügen",
       "assignMerkmale": "Merkmale zuordnen",
+      "assignRolle": "Rolle zuordnen",
       "assignRollenart": "Rollenart zuordnen",
+      "assignSystemrechte": "Systemrechte zuordnen",
       "backToCreateRolle": "Zurück zur Rollenanlage",
       "create": "Rolle anlegen",
       "createAnother": "Weitere Rolle anlegen",
       "createNew": "Neue Rolle anlegen",
       "discard": "Rolle verwerfen",
       "enterRollenname": "Rollenname eingeben",
+      "isAllowedToManageRollen": "Darf Rollen verwalten",
       "management": "Rollenverwaltung",
       "mappingFrontBackEnd": {
+        "systemrechte": {
+          "ROLLEN_VERWALTEN": "Darf Rollen verwalten",
+          "PERSONEN_VERWALTEN": "Darf Personen verwalten",
+          "SCHULEN_VERWALTEN": "Darf Schulen verwalten",
+          "KLASSEN_VERWALTEN": "Darf Klassen verwalten",
+          "SCHULTRAEGER_VERWALTEN": "Darf Schulträger verwalten"
+        },
         "rollenarten": {
           "LERN": "Lern",
           "LEHR": "Lehr",
@@ -43,24 +66,31 @@
       },
       "merkmale": "Merkmale",
       "noRollenFound": "Keine Rollen gefunden",
+      "rolle": "Rolle",
       "rolleCreateErrorTitle": "Fehler beim Anlegen der Rolle",
       "rolleCreateErrorText": "Die Rolle konnte nicht angelegt werden.",
       "rollenart": "Rollenart",
       "rollenname": "Rollenname",
       "rolleAddedSuccessfully": "Die Rolle wurde erfolgreich hinzugefügt.",
       "rules": {
+        "rolle": {
+          "required": "Die Rolle muss ausgewählt werden."
+        },
         "rollenart": {
           "required": "Die Rollenart muss ausgewählt werden."
         },
         "rollenname": {
           "length": "Der Rollenname darf nicht länger als 200 Zeichen sein.",
+          "matches": "Der Rollenname darf keine ungültigen Zeichen beinhalten.",
           "required": "Der Rollenname muss ausgewählt werden."
         }
       },
       "selectMerkmale": "Merkmale auswählen",
       "selectRolle": "Rolle auswählen",
       "selectRollenart": "Rollenart auswählen",
+      "selectSystemrechte":"Systemrechte auswählen",
       "showAll": "Alle Rollen anzeigen",
+      "systemrechte": "Systemrechte",
       "userDataLoadingErrorText": "Es konnten keine Benutzerdaten geladen werden."
     },
     "person": {
@@ -73,12 +103,12 @@
       "createAnother": "Weiteren Benutzer anlegen",
       "createNew": "Neue Benutzer anlegen",
       "creationErrorText": "",
-      "creationErrorTitle": "Fehler beim Anlegen des Benutzers",
+      "creationErrorTitle": "Fehler beim Anlegen des Benutzers.",
       "discard": "Benutzer verwerfen",
       "edit": "Benutzer bearbeiten",
       "generatedPassword": "Generiertes Passwort",
       "loadingErrorText": "Es konnten keine Benutzerdaten geladen werden.",
-      "loadingErrorTitle": "Fehler beim Laden des Benutzers",
+      "loadingErrorTitle": "Fehler beim Laden des Benutzers.",
       "management": "Benutzerverwaltung",
       "personalInfo": "Persönliche Informationen",
       "resetPasswordConfirmation": "Sind Sie sicher, dass Sie das Passwort für {firstname} {lastname} zurücksetzen möchten?",
@@ -100,6 +130,10 @@
       "startPassword": "Einstiegs-Passwort",
       "status": "Status"
     },
+    "personenkontext": {
+      "creationErrorText": "Bei der Zuordnung des Personenkontextes ist ein Fehler aufgetreten. Bitte prüfen Sie die Zuordnungen an der Person."
+    },
+    "searchResultTable":"Ergebnisliste durchsuchen",
     "schule": {
       "addNew": "Neue Schule hinzufügen",
       "administratingSchultraeger": "Verwaltender Schulträger",
@@ -132,16 +166,14 @@
       "schuleAddedSuccessfully": "Die Schule wurde erfolgreich hinzugefügt.",
       "showAll": "Alle Schulen anzeigen"
     },
-    "schulstrukturknoten": {
-      "assignSchulstrukturknoten": "Schulstrukturknoten zuordnen",
-      "rules": {
-        "required": "Der Schulstrukturknoten muss ausgewählt werden."
-      },
-      "schulstrukturknoten": "Schulstrukturknoten",
-      "selectSchulstrukturknoten": "Schulstrukturknoten auswählen"
-    },
     "schultraeger": {
       "management": "Schulträgerverwaltung"
+    },
+    "serviceProvider": {
+      "assignServiceProvider": "Angebote zuordnen",
+      "assignedServiceProvider": "Zugeordnete Angebote",
+      "selectServiceProvider": "Angebote auswählen",
+      "serviceProvider": "Angebote"
     }
   },
   "cancel": "Abbrechen",
@@ -150,7 +182,8 @@
   "errors": {
     "KEYCLOAK_CLIENT_ERROR": "Die Anmeldung ist momentan nicht möglich.",
     "UNSPECIFIED_ERROR": "Es ist ein Fehler aufgetreten.",
-    "USER_AUTHENTICATION_FAILED_ERROR": "Ihr Benutzername oder Ihr Passwort war falsch. Versuchen Sie es erneut oder wenden Sie sich an Ihre schulischen Administratorinnen und Administratoren."
+    "USER_AUTHENTICATION_FAILED_ERROR": "Ihr Benutzername oder Ihr Passwort war falsch. Versuchen Sie es erneut oder wenden Sie sich an Ihre schulischen Administratorinnen und Administratoren.",
+    "NOT_FOUND": "Die aufgerufene Seite wurde nicht gefunden."
   },
   "footer": {
     "accessibility": "Barrierefreiheit",
@@ -159,9 +192,17 @@
     "legalNotice": "Impressum",
     "privacyPolicy": "Datenschutzerklärung"
   },
+  "search": "Suchen",
   "start": {
-    "administration": "Verwaltung",
-    "allServiceProviders": "Alle Angebote"
+    "allServiceProviders": "Alle Angebote",
+    "categories": {
+      "administration": "Verwaltung",
+      "class": "Unterricht",
+      "hints": "Hinweise",
+      "homePage": "Startseite",
+      "schoolOfferings": "Schulische Angebote",
+      "workEmail": "Dienstliche E-Mail"
+    }
   },
   "itemsPerPage": "Einträge pro Seite",
   "landingTitle": "Willkommen im Schulportal SH.",
@@ -175,6 +216,7 @@
   "nav": {
     "admin": "Schulportal-Administration",
     "backToList": "Zurück zur Ergebnisliste",
+    "back": "Zurück",
     "backToStart": "Zurück zur Startseite",
     "closeMobileMenu": "Mobiles Menü schließen",
     "login": "Anmelden",
@@ -184,6 +226,7 @@
     "help": "Hilfe"
   },
   "no": "Nein",
+  "noDataFound": "Keine Daten gefunden.",
   "pagination": {
     "all": "Alle",
     "pageText": "{interval} von {total} Einträgen"
@@ -193,9 +236,14 @@
     "enterFirstName": "Vorname eingeben",
     "enterLastName": "Nachname eingeben",
     "firstName": "Vorname",
+    "firstNameLastNameReferrerKopersNr":"Vor-/Nachname/Benutzername/KoPers-Nr.",
+    "kopersnr": "Kopers-Nr",
     "lastName": "Nachname",
+    "noZuordnungenFound": "Keine Zuordnungen gefunden.",
     "password": "Passwort",
-    "userName": "Benutzername"
+    "rolle": "Rolle",
+    "userName": "Benutzername",
+    "zuordnungen": "Zuordnung(en)"
   },
   "unsavedChanges": {
     "message": "Sie haben nicht gespeicherte Änderungen vorgenommen. Wollen Sie die Seite trotzdem verlassen?",

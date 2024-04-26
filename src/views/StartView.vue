@@ -1,69 +1,129 @@
 <script setup lang="ts">
-  import { useServiceProviderStore, type ServiceProviderStore } from '@/stores/ServiceProviderStore';
-  import ServiceProviderCard from '@/components/cards/ServiceProviderCard.vue';
+  import {
+    ServiceProviderKategorie,
+    useServiceProviderStore,
+    type ServiceProvider,
+    type ServiceProviderStore,
+  } from '@/stores/ServiceProviderStore';
+  import { computed, onMounted, type ComputedRef } from 'vue';
+  import ServiceProviderCategory from '@/components/layout/ServiceProviderCategory.vue';
 
   const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
-  serviceProviderStore.getAllServiceProviders();
+
+  // Filter service providers by category "EMAIL"
+  const emailServiceProviders: ComputedRef<ServiceProvider[]> = computed(() => {
+    return serviceProviderStore.availableServiceProviders.filter(
+      (provider: ServiceProvider) => provider.kategorie === ServiceProviderKategorie.Email,
+    );
+  });
+  // Filter service providers by category "UNTERRICHT"
+  const classServiceProviders: ComputedRef<ServiceProvider[]> = computed(() => {
+    return serviceProviderStore.availableServiceProviders.filter(
+      (provider: ServiceProvider) => provider.kategorie === ServiceProviderKategorie.Unterricht,
+    );
+  });
+  // Filter service providers by category "VERWALTUNG"
+  const administrationServiceProviders: ComputedRef<ServiceProvider[]> = computed(() => {
+    return serviceProviderStore.availableServiceProviders.filter(
+      (provider: ServiceProvider) => provider.kategorie === ServiceProviderKategorie.Verwaltung,
+    );
+  });
+  // Filter service providers by category "HINWEISE"
+  const hintsServiceProviders: ComputedRef<ServiceProvider[]> = computed(() => {
+    return serviceProviderStore.availableServiceProviders.filter(
+      (provider: ServiceProvider) => provider.kategorie === ServiceProviderKategorie.Hinweise,
+    );
+  });
+  // Filter service providers by category "ANGEBOTE"
+  const schoolOfferingsServiceProviders: ComputedRef<ServiceProvider[]> = computed(() => {
+    return serviceProviderStore.availableServiceProviders.filter(
+      (provider: ServiceProvider) => provider.kategorie === ServiceProviderKategorie.Angebote,
+    );
+  });
+
+  onMounted(async () => {
+    await serviceProviderStore.getAvailableServiceProviders();
+    for (const provider of serviceProviderStore.availableServiceProviders) {
+      if (provider.hasLogo) {
+        const logoUrl: string = `/api/provider/${provider.id}/logo`;
+        provider.logoUrl = logoUrl;
+      }
+    }
+  });
 </script>
 
 <template>
-  <div class="home">
-    <h2
-      class="text-h4"
-      data-testid="all-service-provider-title"
-    >
-      {{ $t('start.allServiceProviders') }}
-    </h2>
-
-    <v-progress-circular
-      v-if="serviceProviderStore.loading"
-      indeterminate
-    ></v-progress-circular>
-
-    <p
-      v-if="serviceProviderStore.errorCode"
-      class="text-caption text-left"
-      data-testid="error-text"
-    >
-      {{ $t(`errors.${serviceProviderStore.errorCode}`) }}
-    </p>
-
-    <v-row v-else>
-      <v-col
-        v-for="serviceProvider in serviceProviderStore.allServiceProviders"
-        cols="12"
-        :key="serviceProvider.id"
-        sm="6"
-        md="4"
-      >
-        <ServiceProviderCard
-          :href="serviceProvider.url"
-          :newTab="true"
-          :testId="`service-provider-card-${serviceProvider.id}`"
-          :title="serviceProvider.name"
-          variant="outlined"
+  <v-card
+    class="pr-3"
+    flat
+  >
+    <v-row class="flex-nowrap mb-1 justify-center">
+      <v-col cols="auto">
+        <h2
+          class="headline-1"
+          data-testid="start-card-headline"
         >
-        </ServiceProviderCard>
+          {{ $t('start.categories.homePage') }}
+        </h2>
       </v-col>
     </v-row>
-
-    <h2 class="text-h4">{{ $t('start.administration') }}</h2>
-    <v-row>
-      <v-col
-        cols="12"
-        sm="6"
-        md="4"
-      >
-        <ServiceProviderCard
-          :testId="'service-provider-card-admin'"
-          :to="'/admin/personen'"
-          :title="$t('nav.admin')"
-          variant="outlined"
+    <v-divider
+      class="border-opacity-100 rounded"
+      color="#1EAE9C"
+      thickness="5px"
+    ></v-divider>
+    <v-row class="flex-nowrap my-3">
+      <v-col cols="auto">
+        <h2
+          class="headline-2"
+          data-testid="all-service-provider-title"
         >
-        </ServiceProviderCard>
+          {{ $t('start.allServiceProviders') }}
+        </h2>
       </v-col>
     </v-row>
-  </div>
+    <!-- Template to be displayed in case the providers are still being loaded -->
+    <template v-if="serviceProviderStore.loading">
+      <v-progress-circular indeterminate></v-progress-circular>
+    </template>
+    <!-- Template to be displayed in case loading the providers throws an error -->
+    <template v-else-if="serviceProviderStore.errorCode">
+      <p
+        class="text-caption text-left"
+        data-testid="error-text"
+      >
+        {{ $t(`errors.${serviceProviderStore.errorCode}`) }}
+      </p>
+    </template>
+    <!-- Template to be displayed in case of no error nor loading -->
+    <template v-else>
+      <!-- Categorie 1: Work Email -->
+      <ServiceProviderCategory
+        :categoryTitle="$t('start.categories.workEmail')"
+        :serviceProviders="emailServiceProviders"
+      ></ServiceProviderCategory>
+      <!-- Categorie 2: Class -->
+      <ServiceProviderCategory
+        :categoryTitle="$t('start.categories.class')"
+        :serviceProviders="classServiceProviders"
+      ></ServiceProviderCategory>
+      <!-- Categorie 3: Administration -->
+      <ServiceProviderCategory
+        :categoryTitle="$t('start.categories.administration')"
+        :serviceProviders="administrationServiceProviders"
+      ></ServiceProviderCategory>
+      <!-- Categorie 4: Hints -->
+      <ServiceProviderCategory
+        :categoryTitle="$t('start.categories.hints')"
+        :serviceProviders="hintsServiceProviders"
+      ></ServiceProviderCategory>
+      <!-- Categorie 5: School Offerings -->
+      <ServiceProviderCategory
+        :categoryTitle="$t('start.categories.schoolOfferings')"
+        :serviceProviders="schoolOfferingsServiceProviders"
+      ></ServiceProviderCategory>
+    </template>
+  </v-card>
 </template>
 
 <style></style>

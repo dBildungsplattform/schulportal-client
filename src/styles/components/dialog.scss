@@ -1,6 +1,10 @@
 .v-dialog {
   max-width: 1000px;
 
+  .v-card-text p {
+    white-space: pre-wrap;
+  }
+
   @media only screen and (max-width: 400px) {
     .v-btn {
       width: auto;

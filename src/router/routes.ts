@@ -38,7 +38,7 @@ const routes: readonly RouteRecordRaw[] = [
     },
   },
   {
-    path: '/admin/rolle/new',
+    path: '/admin/rollen/new',
     name: 'create-rolle',
     component: () => import('../views/admin/RolleCreationView.vue'),
     meta: {
@@ -53,6 +53,15 @@ const routes: readonly RouteRecordRaw[] = [
     meta: {
       requiresAuth: true,
       layout: 'AdminLayout',
+    },
+  },
+  {
+    path: '/admin/schulen/new',
+    name: 'create-schule',
+    component: () => import('../views/admin/SchuleCreationView.vue'),
+    meta: {
+      layout: 'AdminLayout',
+      requiresAuth: true,
     },
   },
   {
@@ -72,6 +81,11 @@ const routes: readonly RouteRecordRaw[] = [
       layout: 'DefaultLayout',
       requiresAuth: true,
     },
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'not-found',
+    component: () => import('../views/NotFoundView.vue'),
   },
 ];
 

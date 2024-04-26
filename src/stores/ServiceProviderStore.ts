@@ -1,6 +1,6 @@
 import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import { isAxiosError } from 'axios';
-import { ProviderApiFactory, type ProviderApiInterface } from '../api-client/generated/api';
+import { ProviderApiFactory, ServiceProviderKategorie, type ProviderApiInterface } from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
 
 const serviceProviderApi: ProviderApiInterface = ProviderApiFactory(undefined, '', axiosApiInstance);
@@ -9,16 +9,26 @@ export type ServiceProvider = {
   id: string;
   name: string;
   url: string;
+  kategorie: string;
+  hasLogo: boolean;
+  logoUrl?: string;
+  target: string;
 };
 
 type ServiceProviderState = {
   allServiceProviders: ServiceProvider[];
+  availableServiceProviders: ServiceProvider[];
   errorCode: string;
   loading: boolean;
 };
 
 type ServiceProviderGetters = {};
-type ServiceProviderActions = { getAllServiceProviders: () => Promise<void> };
+type ServiceProviderActions = {
+  getAllServiceProviders: () => Promise<void>;
+  getAvailableServiceProviders: () => Promise<void>;
+};
+
+export { ServiceProviderKategorie };
 
 export type ServiceProviderStore = Store<
   'serviceProviderStore',
@@ -37,6 +47,7 @@ export const useServiceProviderStore: StoreDefinition<
   state: (): ServiceProviderState => {
     return {
       allServiceProviders: [],
+      availableServiceProviders: [],
       errorCode: '',
       loading: false,
     };
@@ -46,8 +57,24 @@ export const useServiceProviderStore: StoreDefinition<
       this.loading = true;
       try {
         const { data }: { data: ServiceProvider[] } =
-          await serviceProviderApi.providerControllerGetServiceProvidersByPersonId();
+          await serviceProviderApi.providerControllerGetAllServiceProviders();
         this.allServiceProviders = data;
+        this.loading = false;
+      } catch (error: unknown) {
+        this.errorCode = 'UNSPECIFIED_ERROR';
+        if (isAxiosError(error)) {
+          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
+        }
+        this.loading = false;
+      }
+    },
+
+    async getAvailableServiceProviders() {
+      this.loading = true;
+      try {
+        const { data }: { data: ServiceProvider[] } =
+          await serviceProviderApi.providerControllerGetAvailableServiceProviders();
+        this.availableServiceProviders = data;
         this.loading = false;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';

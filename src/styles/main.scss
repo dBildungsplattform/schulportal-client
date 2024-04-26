@@ -8,6 +8,7 @@
 @import './components/input.scss';
 @import './components/link.scss';
 @import './components/layout-card.scss';
+@import './components/service-provider-card.scss';
 @import './components/menu-bar.scss';
 @import './components/result-table.scss';
 @import './components/dialog.scss';
@@ -34,6 +35,10 @@ body {
   font-weight: normal;
 }
 
+.v-toolbar-title__placeholder {
+  height: 100%;
+}
+
 .v-field--variant-outlined .v-field__outline {
   --v-field-border-opacity: 1;
 }
@@ -54,4 +59,10 @@ label.v-label {
 
 .no-kopers-checkbox label.v-label {
   text-wrap: nowrap;
+}
+
+@media (min-width: 960px) {
+  .v-container {
+    max-width: none;
+  }
 }
