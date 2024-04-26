@@ -71,7 +71,7 @@ describe('OrganisationStore', () => {
           name: 'Organisation 1',
           namensergaenzung: 'Ergänzung',
           kuerzel: 'O1',
-          typ: OrganisationResponseTypEnum.Anbieter,
+          typ: OrganisationsTyp.Anbieter,
         },
       ];
 
