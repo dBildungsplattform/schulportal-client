@@ -31,21 +31,12 @@ import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError } from './base';
 export interface AddSystemrechtBodyParams {
     /**
      * 
-     * @type {string}
+     * @type {RollenSystemRecht}
      * @memberof AddSystemrechtBodyParams
      */
-    'systemRecht': AddSystemrechtBodyParamsSystemRechtEnum;
+    'systemRecht': RollenSystemRecht;
 }
 
-export const AddSystemrechtBodyParamsSystemRechtEnum = {
-    RollenVerwalten: 'ROLLEN_VERWALTEN',
-    PersonenVerwalten: 'PERSONEN_VERWALTEN',
-    SchulenVerwalten: 'SCHULEN_VERWALTEN',
-    KlassenVerwalten: 'KLASSEN_VERWALTEN',
-    SchultraegerVerwalten: 'SCHULTRAEGER_VERWALTEN'
-} as const;
-
-export type AddSystemrechtBodyParamsSystemRechtEnum = typeof AddSystemrechtBodyParamsSystemRechtEnum[keyof typeof AddSystemrechtBodyParamsSystemRechtEnum];
 
 /**
  * 
@@ -91,40 +82,18 @@ export interface CreateOrganisationBodyParams {
     'kuerzel'?: string;
     /**
      * 
-     * @type {string}
+     * @type {OrganisationsTyp}
      * @memberof CreateOrganisationBodyParams
      */
-    'typ': CreateOrganisationBodyParamsTypEnum;
+    'typ': OrganisationsTyp;
     /**
      * 
-     * @type {string}
+     * @type {TraegerschaftTyp}
      * @memberof CreateOrganisationBodyParams
      */
-    'traegerschaft'?: CreateOrganisationBodyParamsTraegerschaftEnum;
+    'traegerschaft'?: TraegerschaftTyp;
 }
 
-export const CreateOrganisationBodyParamsTypEnum = {
-    Root: 'ROOT',
-    Land: 'LAND',
-    Traeger: 'TRAEGER',
-    Schule: 'SCHULE',
-    Klasse: 'KLASSE',
-    Anbieter: 'ANBIETER',
-    SonstigeOrganisationEinrichtung: 'SONSTIGE ORGANISATION / EINRICHTUNG',
-    Unbestaetigt: 'UNBESTAETIGT'
-} as const;
-
-export type CreateOrganisationBodyParamsTypEnum = typeof CreateOrganisationBodyParamsTypEnum[keyof typeof CreateOrganisationBodyParamsTypEnum];
-export const CreateOrganisationBodyParamsTraegerschaftEnum = {
-    _01: '01',
-    _02: '02',
-    _03: '03',
-    _04: '04',
-    _05: '05',
-    _06: '06'
-} as const;
-
-export type CreateOrganisationBodyParamsTraegerschaftEnum = typeof CreateOrganisationBodyParamsTraegerschaftEnum[keyof typeof CreateOrganisationBodyParamsTraegerschaftEnum];
 
 /**
  * 
@@ -164,10 +133,10 @@ export interface CreatePersonBodyParams {
     'geburt'?: PersonBirthParams;
     /**
      * 
-     * @type {string}
+     * @type {Geschlecht}
      * @memberof CreatePersonBodyParams
      */
-    'geschlecht'?: CreatePersonBodyParamsGeschlechtEnum;
+    'geschlecht'?: Geschlecht;
     /**
      * 
      * @type {string}
@@ -176,10 +145,10 @@ export interface CreatePersonBodyParams {
     'lokalisierung'?: string;
     /**
      * 
-     * @type {string}
+     * @type {Vertrauensstufe}
      * @memberof CreatePersonBodyParams
      */
-    'vertrauensstufe'?: CreatePersonBodyParamsVertrauensstufeEnum;
+    'vertrauensstufe'?: Vertrauensstufe;
     /**
      * 
      * @type {boolean}
@@ -188,22 +157,6 @@ export interface CreatePersonBodyParams {
     'auskunftssperre'?: boolean;
 }
 
-export const CreatePersonBodyParamsGeschlechtEnum = {
-    M: 'm',
-    W: 'w',
-    D: 'd',
-    X: 'x'
-} as const;
-
-export type CreatePersonBodyParamsGeschlechtEnum = typeof CreatePersonBodyParamsGeschlechtEnum[keyof typeof CreatePersonBodyParamsGeschlechtEnum];
-export const CreatePersonBodyParamsVertrauensstufeEnum = {
-    Kein: 'KEIN',
-    Unbe: 'UNBE',
-    Teil: 'TEIL',
-    Voll: 'VOLL'
-} as const;
-
-export type CreatePersonBodyParamsVertrauensstufeEnum = typeof CreatePersonBodyParamsVertrauensstufeEnum[keyof typeof CreatePersonBodyParamsVertrauensstufeEnum];
 
 /**
  * 
@@ -219,53 +172,24 @@ export interface CreatePersonenkontextBodyParams {
     'referrer'?: string;
     /**
      * 
-     * @type {string}
+     * @type {Rolle}
      * @memberof CreatePersonenkontextBodyParams
      */
-    'rolle': CreatePersonenkontextBodyParamsRolleEnum;
+    'rolle': Rolle;
     /**
      * 
-     * @type {string}
+     * @type {Personenstatus}
      * @memberof CreatePersonenkontextBodyParams
      */
-    'personenstatus'?: CreatePersonenkontextBodyParamsPersonenstatusEnum;
+    'personenstatus'?: Personenstatus;
     /**
      * 
-     * @type {string}
+     * @type {Jahrgangsstufe}
      * @memberof CreatePersonenkontextBodyParams
      */
-    'jahrgangsstufe'?: CreatePersonenkontextBodyParamsJahrgangsstufeEnum;
+    'jahrgangsstufe'?: Jahrgangsstufe;
 }
 
-export const CreatePersonenkontextBodyParamsRolleEnum = {
-    Lern: 'LERN',
-    Lehr: 'LEHR',
-    Extern: 'EXTERN',
-    Orgadmin: 'ORGADMIN',
-    Leit: 'LEIT',
-    Sysadmin: 'SYSADMIN'
-} as const;
-
-export type CreatePersonenkontextBodyParamsRolleEnum = typeof CreatePersonenkontextBodyParamsRolleEnum[keyof typeof CreatePersonenkontextBodyParamsRolleEnum];
-export const CreatePersonenkontextBodyParamsPersonenstatusEnum = {
-    Aktiv: 'AKTIV'
-} as const;
-
-export type CreatePersonenkontextBodyParamsPersonenstatusEnum = typeof CreatePersonenkontextBodyParamsPersonenstatusEnum[keyof typeof CreatePersonenkontextBodyParamsPersonenstatusEnum];
-export const CreatePersonenkontextBodyParamsJahrgangsstufeEnum = {
-    _01: '01',
-    _02: '02',
-    _03: '03',
-    _04: '04',
-    _05: '05',
-    _06: '06',
-    _07: '07',
-    _08: '08',
-    _09: '09',
-    _10: '10'
-} as const;
-
-export type CreatePersonenkontextBodyParamsJahrgangsstufeEnum = typeof CreatePersonenkontextBodyParamsJahrgangsstufeEnum[keyof typeof CreatePersonenkontextBodyParamsJahrgangsstufeEnum];
 
 /**
  * 
@@ -287,49 +211,24 @@ export interface CreateRolleBodyParams {
     'administeredBySchulstrukturknoten': string;
     /**
      * 
-     * @type {string}
+     * @type {RollenArt}
      * @memberof CreateRolleBodyParams
      */
-    'rollenart': CreateRolleBodyParamsRollenartEnum;
+    'rollenart': RollenArt;
     /**
      * 
-     * @type {Set<string>}
+     * @type {Set<RollenMerkmal>}
      * @memberof CreateRolleBodyParams
      */
-    'merkmale': Set<CreateRolleBodyParamsMerkmaleEnum>;
+    'merkmale': Set<RollenMerkmal>;
     /**
      * 
-     * @type {Set<string>}
+     * @type {Set<RollenSystemRecht>}
      * @memberof CreateRolleBodyParams
      */
-    'systemrechte': Set<CreateRolleBodyParamsSystemrechteEnum>;
+    'systemrechte': Set<RollenSystemRecht>;
 }
 
-export const CreateRolleBodyParamsRollenartEnum = {
-    Lern: 'LERN',
-    Lehr: 'LEHR',
-    Extern: 'EXTERN',
-    Orgadmin: 'ORGADMIN',
-    Leit: 'LEIT',
-    Sysadmin: 'SYSADMIN'
-} as const;
-
-export type CreateRolleBodyParamsRollenartEnum = typeof CreateRolleBodyParamsRollenartEnum[keyof typeof CreateRolleBodyParamsRollenartEnum];
-export const CreateRolleBodyParamsMerkmaleEnum = {
-    BefristungPflicht: 'BEFRISTUNG_PFLICHT',
-    KopersPflicht: 'KOPERS_PFLICHT'
-} as const;
-
-export type CreateRolleBodyParamsMerkmaleEnum = typeof CreateRolleBodyParamsMerkmaleEnum[keyof typeof CreateRolleBodyParamsMerkmaleEnum];
-export const CreateRolleBodyParamsSystemrechteEnum = {
-    RollenVerwalten: 'ROLLEN_VERWALTEN',
-    PersonenVerwalten: 'PERSONEN_VERWALTEN',
-    SchulenVerwalten: 'SCHULEN_VERWALTEN',
-    KlassenVerwalten: 'KLASSEN_VERWALTEN',
-    SchultraegerVerwalten: 'SCHULTRAEGER_VERWALTEN'
-} as const;
-
-export type CreateRolleBodyParamsSystemrechteEnum = typeof CreateRolleBodyParamsSystemrechteEnum[keyof typeof CreateRolleBodyParamsSystemrechteEnum];
 
 /**
  * 
@@ -553,6 +452,44 @@ export interface FindSchulstrukturknotenResponse {
 /**
  * 
  * @export
+ * @enum {string}
+ */
+
+export const Geschlecht = {
+    M: 'm',
+    W: 'w',
+    D: 'd',
+    X: 'x'
+} as const;
+
+export type Geschlecht = typeof Geschlecht[keyof typeof Geschlecht];
+
+
+/**
+ * The new jahrgangsstufe of the personenkontext.
+ * @export
+ * @enum {string}
+ */
+
+export const Jahrgangsstufe = {
+    _01: '01',
+    _02: '02',
+    _03: '03',
+    _04: '04',
+    _05: '05',
+    _06: '06',
+    _07: '07',
+    _08: '08',
+    _09: '09',
+    _10: '10'
+} as const;
+
+export type Jahrgangsstufe = typeof Jahrgangsstufe[keyof typeof Jahrgangsstufe];
+
+
+/**
+ * 
+ * @export
  * @interface LoeschungResponse
  */
 export interface LoeschungResponse {
@@ -614,40 +551,18 @@ export interface OrganisationResponse {
     'kuerzel': string;
     /**
      * 
-     * @type {string}
+     * @type {OrganisationsTyp}
      * @memberof OrganisationResponse
      */
-    'typ': OrganisationResponseTypEnum;
+    'typ': OrganisationsTyp;
     /**
      * 
-     * @type {string}
+     * @type {TraegerschaftTyp}
      * @memberof OrganisationResponse
      */
-    'traegerschaft': OrganisationResponseTraegerschaftEnum;
+    'traegerschaft': TraegerschaftTyp;
 }
 
-export const OrganisationResponseTypEnum = {
-    Root: 'ROOT',
-    Land: 'LAND',
-    Traeger: 'TRAEGER',
-    Schule: 'SCHULE',
-    Klasse: 'KLASSE',
-    Anbieter: 'ANBIETER',
-    SonstigeOrganisationEinrichtung: 'SONSTIGE ORGANISATION / EINRICHTUNG',
-    Unbestaetigt: 'UNBESTAETIGT'
-} as const;
-
-export type OrganisationResponseTypEnum = typeof OrganisationResponseTypEnum[keyof typeof OrganisationResponseTypEnum];
-export const OrganisationResponseTraegerschaftEnum = {
-    _01: '01',
-    _02: '02',
-    _03: '03',
-    _04: '04',
-    _05: '05',
-    _06: '06'
-} as const;
-
-export type OrganisationResponseTraegerschaftEnum = typeof OrganisationResponseTraegerschaftEnum[keyof typeof OrganisationResponseTraegerschaftEnum];
 
 /**
  * 
@@ -687,13 +602,20 @@ export interface OrganisationResponseLegacy {
     'kuerzel': string;
     /**
      * 
-     * @type {string}
+     * @type {OrganisationsTyp}
      * @memberof OrganisationResponseLegacy
      */
-    'typ': OrganisationResponseLegacyTypEnum;
+    'typ': OrganisationsTyp;
 }
 
-export const OrganisationResponseLegacyTypEnum = {
+
+/**
+ * 
+ * @export
+ * @enum {string}
+ */
+
+export const OrganisationsTyp = {
     Root: 'ROOT',
     Land: 'LAND',
     Traeger: 'TRAEGER',
@@ -704,7 +626,8 @@ export const OrganisationResponseLegacyTypEnum = {
     Unbestaetigt: 'UNBESTAETIGT'
 } as const;
 
-export type OrganisationResponseLegacyTypEnum = typeof OrganisationResponseLegacyTypEnum[keyof typeof OrganisationResponseLegacyTypEnum];
+export type OrganisationsTyp = typeof OrganisationsTyp[keyof typeof OrganisationsTyp];
+
 
 /**
  * 
@@ -936,10 +859,10 @@ export interface PersonResponse {
     'lokalisierung': string | null;
     /**
      * 
-     * @type {string}
+     * @type {Vertrauensstufe}
      * @memberof PersonResponse
      */
-    'vertrauensstufe': PersonResponseVertrauensstufeEnum;
+    'vertrauensstufe': Vertrauensstufe;
     /**
      * 
      * @type {string}
@@ -960,14 +883,6 @@ export interface PersonResponse {
     'personalnummer': string | null;
 }
 
-export const PersonResponseVertrauensstufeEnum = {
-    Kein: 'KEIN',
-    Unbe: 'UNBE',
-    Teil: 'TEIL',
-    Voll: 'VOLL'
-} as const;
-
-export type PersonResponseVertrauensstufeEnum = typeof PersonResponseVertrauensstufeEnum[keyof typeof PersonResponseVertrauensstufeEnum];
 
 /**
  * 
@@ -1025,10 +940,10 @@ export interface PersonResponseAutomapper {
     'lokalisierung': string;
     /**
      * 
-     * @type {string}
+     * @type {Vertrauensstufe}
      * @memberof PersonResponseAutomapper
      */
-    'vertrauensstufe': PersonResponseAutomapperVertrauensstufeEnum;
+    'vertrauensstufe': Vertrauensstufe;
     /**
      * 
      * @type {string}
@@ -1049,14 +964,6 @@ export interface PersonResponseAutomapper {
     'personalnummer': string;
 }
 
-export const PersonResponseAutomapperVertrauensstufeEnum = {
-    Kein: 'KEIN',
-    Unbe: 'UNBE',
-    Teil: 'TEIL',
-    Voll: 'VOLL'
-} as const;
-
-export type PersonResponseAutomapperVertrauensstufeEnum = typeof PersonResponseAutomapperVertrauensstufeEnum[keyof typeof PersonResponseAutomapperVertrauensstufeEnum];
 
 /**
  * 
@@ -1158,6 +1065,19 @@ export interface PersonenkontextResponse {
     'revision': string;
 }
 /**
+ * The new personenstatus of the personenkontext.
+ * @export
+ * @enum {string}
+ */
+
+export const Personenstatus = {
+    Aktiv: 'AKTIV'
+} as const;
+
+export type Personenstatus = typeof Personenstatus[keyof typeof Personenstatus];
+
+
+/**
  * 
  * @export
  * @interface RawPagedResponse
@@ -1188,6 +1108,24 @@ export interface RawPagedResponse {
      */
     'items': Array<string>;
 }
+/**
+ * 
+ * @export
+ * @enum {string}
+ */
+
+export const Rolle = {
+    Lern: 'LERN',
+    Lehr: 'LEHR',
+    Extern: 'EXTERN',
+    Orgadmin: 'ORGADMIN',
+    Leit: 'LEIT',
+    Sysadmin: 'SYSADMIN'
+} as const;
+
+export type Rolle = typeof Rolle[keyof typeof Rolle];
+
+
 /**
  * 
  * @export
@@ -1226,49 +1164,24 @@ export interface RolleResponse {
     'administeredBySchulstrukturknoten': string;
     /**
      * 
-     * @type {string}
+     * @type {RollenArt}
      * @memberof RolleResponse
      */
-    'rollenart': RolleResponseRollenartEnum;
+    'rollenart': RollenArt;
     /**
      * 
-     * @type {Set<string>}
+     * @type {Set<RollenMerkmal>}
      * @memberof RolleResponse
      */
-    'merkmale': Set<RolleResponseMerkmaleEnum>;
+    'merkmale': Set<RollenMerkmal>;
     /**
      * 
-     * @type {Set<string>}
+     * @type {Set<RollenSystemRecht>}
      * @memberof RolleResponse
      */
-    'systemrechte': Set<RolleResponseSystemrechteEnum>;
+    'systemrechte': Set<RollenSystemRecht>;
 }
 
-export const RolleResponseRollenartEnum = {
-    Lern: 'LERN',
-    Lehr: 'LEHR',
-    Extern: 'EXTERN',
-    Orgadmin: 'ORGADMIN',
-    Leit: 'LEIT',
-    Sysadmin: 'SYSADMIN'
-} as const;
-
-export type RolleResponseRollenartEnum = typeof RolleResponseRollenartEnum[keyof typeof RolleResponseRollenartEnum];
-export const RolleResponseMerkmaleEnum = {
-    BefristungPflicht: 'BEFRISTUNG_PFLICHT',
-    KopersPflicht: 'KOPERS_PFLICHT'
-} as const;
-
-export type RolleResponseMerkmaleEnum = typeof RolleResponseMerkmaleEnum[keyof typeof RolleResponseMerkmaleEnum];
-export const RolleResponseSystemrechteEnum = {
-    RollenVerwalten: 'ROLLEN_VERWALTEN',
-    PersonenVerwalten: 'PERSONEN_VERWALTEN',
-    SchulenVerwalten: 'SCHULEN_VERWALTEN',
-    KlassenVerwalten: 'KLASSEN_VERWALTEN',
-    SchultraegerVerwalten: 'SCHULTRAEGER_VERWALTEN'
-} as const;
-
-export type RolleResponseSystemrechteEnum = typeof RolleResponseSystemrechteEnum[keyof typeof RolleResponseSystemrechteEnum];
 
 /**
  * 
@@ -1334,22 +1247,22 @@ export interface RolleWithServiceProvidersResponse {
     'administeredBySchulstrukturknoten': string;
     /**
      * 
-     * @type {string}
+     * @type {RollenArt}
      * @memberof RolleWithServiceProvidersResponse
      */
-    'rollenart': RolleWithServiceProvidersResponseRollenartEnum;
+    'rollenart': RollenArt;
     /**
      * 
-     * @type {Set<string>}
+     * @type {Set<RollenMerkmal>}
      * @memberof RolleWithServiceProvidersResponse
      */
-    'merkmale': Set<RolleWithServiceProvidersResponseMerkmaleEnum>;
+    'merkmale': Set<RollenMerkmal>;
     /**
      * 
-     * @type {Set<string>}
+     * @type {Set<RollenSystemRecht>}
      * @memberof RolleWithServiceProvidersResponse
      */
-    'systemrechte': Set<RolleWithServiceProvidersResponseSystemrechteEnum>;
+    'systemrechte': Set<RollenSystemRecht>;
     /**
      * 
      * @type {Array<ServiceProviderIdNameResponse>}
@@ -1358,7 +1271,14 @@ export interface RolleWithServiceProvidersResponse {
     'serviceProviders': Array<ServiceProviderIdNameResponse>;
 }
 
-export const RolleWithServiceProvidersResponseRollenartEnum = {
+
+/**
+ * 
+ * @export
+ * @enum {string}
+ */
+
+export const RollenArt = {
     Lern: 'LERN',
     Lehr: 'LEHR',
     Extern: 'EXTERN',
@@ -1367,22 +1287,22 @@ export const RolleWithServiceProvidersResponseRollenartEnum = {
     Sysadmin: 'SYSADMIN'
 } as const;
 
-export type RolleWithServiceProvidersResponseRollenartEnum = typeof RolleWithServiceProvidersResponseRollenartEnum[keyof typeof RolleWithServiceProvidersResponseRollenartEnum];
-export const RolleWithServiceProvidersResponseMerkmaleEnum = {
+export type RollenArt = typeof RollenArt[keyof typeof RollenArt];
+
+
+/**
+ * 
+ * @export
+ * @enum {string}
+ */
+
+export const RollenMerkmal = {
     BefristungPflicht: 'BEFRISTUNG_PFLICHT',
     KopersPflicht: 'KOPERS_PFLICHT'
 } as const;
 
-export type RolleWithServiceProvidersResponseMerkmaleEnum = typeof RolleWithServiceProvidersResponseMerkmaleEnum[keyof typeof RolleWithServiceProvidersResponseMerkmaleEnum];
-export const RolleWithServiceProvidersResponseSystemrechteEnum = {
-    RollenVerwalten: 'ROLLEN_VERWALTEN',
-    PersonenVerwalten: 'PERSONEN_VERWALTEN',
-    SchulenVerwalten: 'SCHULEN_VERWALTEN',
-    KlassenVerwalten: 'KLASSEN_VERWALTEN',
-    SchultraegerVerwalten: 'SCHULTRAEGER_VERWALTEN'
-} as const;
+export type RollenMerkmal = typeof RollenMerkmal[keyof typeof RollenMerkmal];
 
-export type RolleWithServiceProvidersResponseSystemrechteEnum = typeof RolleWithServiceProvidersResponseSystemrechteEnum[keyof typeof RolleWithServiceProvidersResponseSystemrechteEnum];
 
 /**
  * 
@@ -1499,6 +1419,20 @@ export type ServiceProviderTarget = typeof ServiceProviderTarget[keyof typeof Se
 /**
  * 
  * @export
+ * @enum {string}
+ */
+
+export const Sichtfreigabe = {
+    Ja: 'ja',
+    Nein: 'nein'
+} as const;
+
+export type Sichtfreigabe = typeof Sichtfreigabe[keyof typeof Sichtfreigabe];
+
+
+/**
+ * 
+ * @export
  * @interface SystemrechtResponse
  */
 export interface SystemrechtResponse {
@@ -1533,6 +1467,24 @@ export interface SystemrechtResponse {
      */
     'SCHULTRAEGER_VERWALTEN': Array<OrganisationResponseLegacy>;
 }
+/**
+ * 
+ * @export
+ * @enum {string}
+ */
+
+export const TraegerschaftTyp = {
+    _01: '01',
+    _02: '02',
+    _03: '03',
+    _04: '04',
+    _05: '05',
+    _06: '06'
+} as const;
+
+export type TraegerschaftTyp = typeof TraegerschaftTyp[keyof typeof TraegerschaftTyp];
+
+
 /**
  * 
  * @export
@@ -1577,40 +1529,18 @@ export interface UpdateOrganisationBodyParams {
     'kuerzel'?: string;
     /**
      * 
-     * @type {string}
+     * @type {OrganisationsTyp}
      * @memberof UpdateOrganisationBodyParams
      */
-    'typ': UpdateOrganisationBodyParamsTypEnum;
+    'typ': OrganisationsTyp;
     /**
      * 
-     * @type {string}
+     * @type {TraegerschaftTyp}
      * @memberof UpdateOrganisationBodyParams
      */
-    'traegerschaft'?: UpdateOrganisationBodyParamsTraegerschaftEnum;
+    'traegerschaft'?: TraegerschaftTyp;
 }
 
-export const UpdateOrganisationBodyParamsTypEnum = {
-    Root: 'ROOT',
-    Land: 'LAND',
-    Traeger: 'TRAEGER',
-    Schule: 'SCHULE',
-    Klasse: 'KLASSE',
-    Anbieter: 'ANBIETER',
-    SonstigeOrganisationEinrichtung: 'SONSTIGE ORGANISATION / EINRICHTUNG',
-    Unbestaetigt: 'UNBESTAETIGT'
-} as const;
-
-export type UpdateOrganisationBodyParamsTypEnum = typeof UpdateOrganisationBodyParamsTypEnum[keyof typeof UpdateOrganisationBodyParamsTypEnum];
-export const UpdateOrganisationBodyParamsTraegerschaftEnum = {
-    _01: '01',
-    _02: '02',
-    _03: '03',
-    _04: '04',
-    _05: '05',
-    _06: '06'
-} as const;
-
-export type UpdateOrganisationBodyParamsTraegerschaftEnum = typeof UpdateOrganisationBodyParamsTraegerschaftEnum[keyof typeof UpdateOrganisationBodyParamsTraegerschaftEnum];
 
 /**
  * 
@@ -1644,10 +1574,10 @@ export interface UpdatePersonBodyParams {
     'geburt'?: PersonBirthParams;
     /**
      * 
-     * @type {string}
+     * @type {Geschlecht}
      * @memberof UpdatePersonBodyParams
      */
-    'geschlecht'?: UpdatePersonBodyParamsGeschlechtEnum;
+    'geschlecht'?: Geschlecht;
     /**
      * 
      * @type {string}
@@ -1656,10 +1586,10 @@ export interface UpdatePersonBodyParams {
     'lokalisierung'?: string;
     /**
      * 
-     * @type {string}
+     * @type {Vertrauensstufe}
      * @memberof UpdatePersonBodyParams
      */
-    'vertrauensstufe'?: UpdatePersonBodyParamsVertrauensstufeEnum;
+    'vertrauensstufe'?: Vertrauensstufe;
     /**
      * 
      * @type {boolean}
@@ -1674,22 +1604,6 @@ export interface UpdatePersonBodyParams {
     'revision': string;
 }
 
-export const UpdatePersonBodyParamsGeschlechtEnum = {
-    M: 'm',
-    W: 'w',
-    D: 'd',
-    X: 'x'
-} as const;
-
-export type UpdatePersonBodyParamsGeschlechtEnum = typeof UpdatePersonBodyParamsGeschlechtEnum[keyof typeof UpdatePersonBodyParamsGeschlechtEnum];
-export const UpdatePersonBodyParamsVertrauensstufeEnum = {
-    Kein: 'KEIN',
-    Unbe: 'UNBE',
-    Teil: 'TEIL',
-    Voll: 'VOLL'
-} as const;
-
-export type UpdatePersonBodyParamsVertrauensstufeEnum = typeof UpdatePersonBodyParamsVertrauensstufeEnum[keyof typeof UpdatePersonBodyParamsVertrauensstufeEnum];
 
 /**
  * 
@@ -1704,17 +1618,17 @@ export interface UpdatePersonenkontextBodyParams {
      */
     'referrer'?: string;
     /**
-     * The new personenstatus of the personenkontext.
-     * @type {string}
+     * 
+     * @type {Personenstatus}
      * @memberof UpdatePersonenkontextBodyParams
      */
-    'personenstatus'?: UpdatePersonenkontextBodyParamsPersonenstatusEnum;
+    'personenstatus'?: Personenstatus;
     /**
-     * The new jahrgangsstufe of the personenkontext.
-     * @type {string}
+     * 
+     * @type {Jahrgangsstufe}
      * @memberof UpdatePersonenkontextBodyParams
      */
-    'jahrgangsstufe'?: UpdatePersonenkontextBodyParamsJahrgangsstufeEnum;
+    'jahrgangsstufe'?: Jahrgangsstufe;
     /**
      * The revision of the personenkontext.
      * @type {string}
@@ -1723,25 +1637,6 @@ export interface UpdatePersonenkontextBodyParams {
     'revision': string;
 }
 
-export const UpdatePersonenkontextBodyParamsPersonenstatusEnum = {
-    Aktiv: 'AKTIV'
-} as const;
-
-export type UpdatePersonenkontextBodyParamsPersonenstatusEnum = typeof UpdatePersonenkontextBodyParamsPersonenstatusEnum[keyof typeof UpdatePersonenkontextBodyParamsPersonenstatusEnum];
-export const UpdatePersonenkontextBodyParamsJahrgangsstufeEnum = {
-    _01: '01',
-    _02: '02',
-    _03: '03',
-    _04: '04',
-    _05: '05',
-    _06: '06',
-    _07: '07',
-    _08: '08',
-    _09: '09',
-    _10: '10'
-} as const;
-
-export type UpdatePersonenkontextBodyParamsJahrgangsstufeEnum = typeof UpdatePersonenkontextBodyParamsJahrgangsstufeEnum[keyof typeof UpdatePersonenkontextBodyParamsJahrgangsstufeEnum];
 
 /**
  * 
@@ -1864,6 +1759,22 @@ export interface UserinfoResponse {
      */
     'updated_at': number | null;
 }
+/**
+ * 
+ * @export
+ * @enum {string}
+ */
+
+export const Vertrauensstufe = {
+    Kein: 'KEIN',
+    Unbe: 'UNBE',
+    Teil: 'TEIL',
+    Voll: 'VOLL'
+} as const;
+
+export type Vertrauensstufe = typeof Vertrauensstufe[keyof typeof Vertrauensstufe];
+
+
 
 /**
  * AuthApi - axios parameter creator
@@ -2381,6 +2292,10 @@ export const DbiamPersonenuebersichtApiAxiosParamCreator = function (configurati
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
             if (offset !== undefined) {
                 localVarQueryParameter['offset'] = offset;
             }
@@ -2425,6 +2340,10 @@ export const DbiamPersonenuebersichtApiAxiosParamCreator = function (configurati
             // authentication bearer required
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
 
 
     
@@ -2750,12 +2669,12 @@ export const OrganisationenApiAxiosParamCreator = function (configuration?: Conf
          * @param {string} [kennung] 
          * @param {string} [name] 
          * @param {string} [searchString] 
-         * @param {'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'KLASSE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT'} [typ] 
+         * @param {OrganisationsTyp} [typ] 
          * @param {Array<RollenSystemRecht>} [systemrechte] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        organisationControllerFindOrganizations: async (offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: 'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'KLASSE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', systemrechte?: Array<RollenSystemRecht>, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        organisationControllerFindOrganizations: async (offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: OrganisationsTyp, systemrechte?: Array<RollenSystemRecht>, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/organisationen`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -3040,12 +2959,12 @@ export const OrganisationenApiFp = function(configuration?: Configuration) {
          * @param {string} [kennung] 
          * @param {string} [name] 
          * @param {string} [searchString] 
-         * @param {'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'KLASSE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT'} [typ] 
+         * @param {OrganisationsTyp} [typ] 
          * @param {Array<RollenSystemRecht>} [systemrechte] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: 'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'KLASSE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', systemrechte?: Array<RollenSystemRecht>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<OrganisationResponse>>> {
+        async organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: OrganisationsTyp, systemrechte?: Array<RollenSystemRecht>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<OrganisationResponse>>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.organisationControllerFindOrganizations(offset, limit, kennung, name, searchString, typ, systemrechte, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -3144,12 +3063,12 @@ export const OrganisationenApiFactory = function (configuration?: Configuration,
          * @param {string} [kennung] 
          * @param {string} [name] 
          * @param {string} [searchString] 
-         * @param {'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'KLASSE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT'} [typ] 
+         * @param {OrganisationsTyp} [typ] 
          * @param {Array<RollenSystemRecht>} [systemrechte] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: 'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'KLASSE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', systemrechte?: Array<RollenSystemRecht>, options?: any): AxiosPromise<Array<OrganisationResponse>> {
+        organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: OrganisationsTyp, systemrechte?: Array<RollenSystemRecht>, options?: any): AxiosPromise<Array<OrganisationResponse>> {
             return localVarFp.organisationControllerFindOrganizations(offset, limit, kennung, name, searchString, typ, systemrechte, options).then((request) => request(axios, basePath));
         },
         /**
@@ -3242,13 +3161,13 @@ export interface OrganisationenApiInterface {
      * @param {string} [kennung] 
      * @param {string} [name] 
      * @param {string} [searchString] 
-     * @param {'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'KLASSE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT'} [typ] 
+     * @param {OrganisationsTyp} [typ] 
      * @param {Array<RollenSystemRecht>} [systemrechte] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrganisationenApiInterface
      */
-    organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: 'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'KLASSE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', systemrechte?: Array<RollenSystemRecht>, options?: AxiosRequestConfig): AxiosPromise<Array<OrganisationResponse>>;
+    organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: OrganisationsTyp, systemrechte?: Array<RollenSystemRecht>, options?: AxiosRequestConfig): AxiosPromise<Array<OrganisationResponse>>;
 
     /**
      * 
@@ -3348,13 +3267,13 @@ export class OrganisationenApi extends BaseAPI implements OrganisationenApiInter
      * @param {string} [kennung] 
      * @param {string} [name] 
      * @param {string} [searchString] 
-     * @param {'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'KLASSE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT'} [typ] 
+     * @param {OrganisationsTyp} [typ] 
      * @param {Array<RollenSystemRecht>} [systemrechte] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrganisationenApi
      */
-    public organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: 'ROOT' | 'LAND' | 'TRAEGER' | 'SCHULE' | 'KLASSE' | 'ANBIETER' | 'SONSTIGE ORGANISATION / EINRICHTUNG' | 'UNBESTAETIGT', systemrechte?: Array<RollenSystemRecht>, options?: AxiosRequestConfig) {
+    public organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: OrganisationsTyp, systemrechte?: Array<RollenSystemRecht>, options?: AxiosRequestConfig) {
         return OrganisationenApiFp(this.configuration).organisationControllerFindOrganizations(offset, limit, kennung, name, searchString, typ, systemrechte, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -3547,13 +3466,13 @@ export const PersonenApiAxiosParamCreator = function (configuration?: Configurat
          * @param {number} [offset] The offset of the paginated list.
          * @param {number} [limit] The requested limit for the page size.
          * @param {string} [referrer] 
-         * @param {'LERN' | 'LEHR' | 'EXTERN' | 'ORGADMIN' | 'LEIT' | 'SYSADMIN'} [rolle] 
-         * @param {'AKTIV'} [personenstatus] 
-         * @param {'ja' | 'nein'} [sichtfreigabe] 
+         * @param {Rolle} [rolle] 
+         * @param {Personenstatus} [personenstatus] 
+         * @param {Sichtfreigabe} [sichtfreigabe] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        personControllerFindPersonenkontexte: async (personId: string, offset?: number, limit?: number, referrer?: string, rolle?: 'LERN' | 'LEHR' | 'EXTERN' | 'ORGADMIN' | 'LEIT' | 'SYSADMIN', personenstatus?: 'AKTIV', sichtfreigabe?: 'ja' | 'nein', options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        personControllerFindPersonenkontexte: async (personId: string, offset?: number, limit?: number, referrer?: string, rolle?: Rolle, personenstatus?: Personenstatus, sichtfreigabe?: Sichtfreigabe, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'personId' is not null or undefined
             assertParamExists('personControllerFindPersonenkontexte', 'personId', personId)
             const localVarPath = `/api/personen/{personId}/personenkontexte`
@@ -3614,19 +3533,17 @@ export const PersonenApiAxiosParamCreator = function (configuration?: Configurat
         },
         /**
          * 
-         * @param {string} suchFilter Search filter used to filter for Persons. It could be the vorname, familienname, referrer or the personalnummer.
          * @param {number} [offset] The offset of the paginated list.
          * @param {number} [limit] The requested limit for the page size.
          * @param {string} [referrer] 
          * @param {string} [familienname] 
          * @param {string} [vorname] 
          * @param {'ja' | 'nein'} [sichtfreigabe] 
+         * @param {string} [suchFilter] Search filter used to filter for Persons. It could be the vorname, familienname, referrer or the personalnummer.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        personControllerFindPersons: async (suchFilter: string, offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'suchFilter' is not null or undefined
-            assertParamExists('personControllerFindPersons', 'suchFilter', suchFilter)
+        personControllerFindPersons: async (offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', suchFilter?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/personen`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -3821,30 +3738,30 @@ export const PersonenApiFp = function(configuration?: Configuration) {
          * @param {number} [offset] The offset of the paginated list.
          * @param {number} [limit] The requested limit for the page size.
          * @param {string} [referrer] 
-         * @param {'LERN' | 'LEHR' | 'EXTERN' | 'ORGADMIN' | 'LEIT' | 'SYSADMIN'} [rolle] 
-         * @param {'AKTIV'} [personenstatus] 
-         * @param {'ja' | 'nein'} [sichtfreigabe] 
+         * @param {Rolle} [rolle] 
+         * @param {Personenstatus} [personenstatus] 
+         * @param {Sichtfreigabe} [sichtfreigabe] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async personControllerFindPersonenkontexte(personId: string, offset?: number, limit?: number, referrer?: string, rolle?: 'LERN' | 'LEHR' | 'EXTERN' | 'ORGADMIN' | 'LEIT' | 'SYSADMIN', personenstatus?: 'AKTIV', sichtfreigabe?: 'ja' | 'nein', options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonControllerFindPersonenkontexte200Response>> {
+        async personControllerFindPersonenkontexte(personId: string, offset?: number, limit?: number, referrer?: string, rolle?: Rolle, personenstatus?: Personenstatus, sichtfreigabe?: Sichtfreigabe, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonControllerFindPersonenkontexte200Response>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.personControllerFindPersonenkontexte(personId, offset, limit, referrer, rolle, personenstatus, sichtfreigabe, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
          * 
-         * @param {string} suchFilter Search filter used to filter for Persons. It could be the vorname, familienname, referrer or the personalnummer.
          * @param {number} [offset] The offset of the paginated list.
          * @param {number} [limit] The requested limit for the page size.
          * @param {string} [referrer] 
          * @param {string} [familienname] 
          * @param {string} [vorname] 
          * @param {'ja' | 'nein'} [sichtfreigabe] 
+         * @param {string} [suchFilter] Search filter used to filter for Persons. It could be the vorname, familienname, referrer or the personalnummer.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async personControllerFindPersons(suchFilter: string, offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<PersonendatensatzResponse>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.personControllerFindPersons(suchFilter, offset, limit, referrer, familienname, vorname, sichtfreigabe, options);
+        async personControllerFindPersons(offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', suchFilter?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<PersonendatensatzResponse>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.personControllerFindPersons(offset, limit, referrer, familienname, vorname, sichtfreigabe, suchFilter, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -3912,29 +3829,29 @@ export const PersonenApiFactory = function (configuration?: Configuration, baseP
          * @param {number} [offset] The offset of the paginated list.
          * @param {number} [limit] The requested limit for the page size.
          * @param {string} [referrer] 
-         * @param {'LERN' | 'LEHR' | 'EXTERN' | 'ORGADMIN' | 'LEIT' | 'SYSADMIN'} [rolle] 
-         * @param {'AKTIV'} [personenstatus] 
-         * @param {'ja' | 'nein'} [sichtfreigabe] 
+         * @param {Rolle} [rolle] 
+         * @param {Personenstatus} [personenstatus] 
+         * @param {Sichtfreigabe} [sichtfreigabe] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        personControllerFindPersonenkontexte(personId: string, offset?: number, limit?: number, referrer?: string, rolle?: 'LERN' | 'LEHR' | 'EXTERN' | 'ORGADMIN' | 'LEIT' | 'SYSADMIN', personenstatus?: 'AKTIV', sichtfreigabe?: 'ja' | 'nein', options?: any): AxiosPromise<PersonControllerFindPersonenkontexte200Response> {
+        personControllerFindPersonenkontexte(personId: string, offset?: number, limit?: number, referrer?: string, rolle?: Rolle, personenstatus?: Personenstatus, sichtfreigabe?: Sichtfreigabe, options?: any): AxiosPromise<PersonControllerFindPersonenkontexte200Response> {
             return localVarFp.personControllerFindPersonenkontexte(personId, offset, limit, referrer, rolle, personenstatus, sichtfreigabe, options).then((request) => request(axios, basePath));
         },
         /**
          * 
-         * @param {string} suchFilter Search filter used to filter for Persons. It could be the vorname, familienname, referrer or the personalnummer.
          * @param {number} [offset] The offset of the paginated list.
          * @param {number} [limit] The requested limit for the page size.
          * @param {string} [referrer] 
          * @param {string} [familienname] 
          * @param {string} [vorname] 
          * @param {'ja' | 'nein'} [sichtfreigabe] 
+         * @param {string} [suchFilter] Search filter used to filter for Persons. It could be the vorname, familienname, referrer or the personalnummer.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        personControllerFindPersons(suchFilter: string, offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', options?: any): AxiosPromise<Array<PersonendatensatzResponse>> {
-            return localVarFp.personControllerFindPersons(suchFilter, offset, limit, referrer, familienname, vorname, sichtfreigabe, options).then((request) => request(axios, basePath));
+        personControllerFindPersons(offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', suchFilter?: string, options?: any): AxiosPromise<Array<PersonendatensatzResponse>> {
+            return localVarFp.personControllerFindPersons(offset, limit, referrer, familienname, vorname, sichtfreigabe, suchFilter, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -3998,29 +3915,29 @@ export interface PersonenApiInterface {
      * @param {number} [offset] The offset of the paginated list.
      * @param {number} [limit] The requested limit for the page size.
      * @param {string} [referrer] 
-     * @param {'LERN' | 'LEHR' | 'EXTERN' | 'ORGADMIN' | 'LEIT' | 'SYSADMIN'} [rolle] 
-     * @param {'AKTIV'} [personenstatus] 
-     * @param {'ja' | 'nein'} [sichtfreigabe] 
+     * @param {Rolle} [rolle] 
+     * @param {Personenstatus} [personenstatus] 
+     * @param {Sichtfreigabe} [sichtfreigabe] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PersonenApiInterface
      */
-    personControllerFindPersonenkontexte(personId: string, offset?: number, limit?: number, referrer?: string, rolle?: 'LERN' | 'LEHR' | 'EXTERN' | 'ORGADMIN' | 'LEIT' | 'SYSADMIN', personenstatus?: 'AKTIV', sichtfreigabe?: 'ja' | 'nein', options?: AxiosRequestConfig): AxiosPromise<PersonControllerFindPersonenkontexte200Response>;
+    personControllerFindPersonenkontexte(personId: string, offset?: number, limit?: number, referrer?: string, rolle?: Rolle, personenstatus?: Personenstatus, sichtfreigabe?: Sichtfreigabe, options?: AxiosRequestConfig): AxiosPromise<PersonControllerFindPersonenkontexte200Response>;
 
     /**
      * 
-     * @param {string} suchFilter Search filter used to filter for Persons. It could be the vorname, familienname, referrer or the personalnummer.
      * @param {number} [offset] The offset of the paginated list.
      * @param {number} [limit] The requested limit for the page size.
      * @param {string} [referrer] 
      * @param {string} [familienname] 
      * @param {string} [vorname] 
      * @param {'ja' | 'nein'} [sichtfreigabe] 
+     * @param {string} [suchFilter] Search filter used to filter for Persons. It could be the vorname, familienname, referrer or the personalnummer.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PersonenApiInterface
      */
-    personControllerFindPersons(suchFilter: string, offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', options?: AxiosRequestConfig): AxiosPromise<Array<PersonendatensatzResponse>>;
+    personControllerFindPersons(offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', suchFilter?: string, options?: AxiosRequestConfig): AxiosPromise<Array<PersonendatensatzResponse>>;
 
     /**
      * 
@@ -4090,32 +4007,32 @@ export class PersonenApi extends BaseAPI implements PersonenApiInterface {
      * @param {number} [offset] The offset of the paginated list.
      * @param {number} [limit] The requested limit for the page size.
      * @param {string} [referrer] 
-     * @param {'LERN' | 'LEHR' | 'EXTERN' | 'ORGADMIN' | 'LEIT' | 'SYSADMIN'} [rolle] 
-     * @param {'AKTIV'} [personenstatus] 
-     * @param {'ja' | 'nein'} [sichtfreigabe] 
+     * @param {Rolle} [rolle] 
+     * @param {Personenstatus} [personenstatus] 
+     * @param {Sichtfreigabe} [sichtfreigabe] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PersonenApi
      */
-    public personControllerFindPersonenkontexte(personId: string, offset?: number, limit?: number, referrer?: string, rolle?: 'LERN' | 'LEHR' | 'EXTERN' | 'ORGADMIN' | 'LEIT' | 'SYSADMIN', personenstatus?: 'AKTIV', sichtfreigabe?: 'ja' | 'nein', options?: AxiosRequestConfig) {
+    public personControllerFindPersonenkontexte(personId: string, offset?: number, limit?: number, referrer?: string, rolle?: Rolle, personenstatus?: Personenstatus, sichtfreigabe?: Sichtfreigabe, options?: AxiosRequestConfig) {
         return PersonenApiFp(this.configuration).personControllerFindPersonenkontexte(personId, offset, limit, referrer, rolle, personenstatus, sichtfreigabe, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * 
-     * @param {string} suchFilter Search filter used to filter for Persons. It could be the vorname, familienname, referrer or the personalnummer.
      * @param {number} [offset] The offset of the paginated list.
      * @param {number} [limit] The requested limit for the page size.
      * @param {string} [referrer] 
      * @param {string} [familienname] 
      * @param {string} [vorname] 
      * @param {'ja' | 'nein'} [sichtfreigabe] 
+     * @param {string} [suchFilter] Search filter used to filter for Persons. It could be the vorname, familienname, referrer or the personalnummer.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PersonenApi
      */
-    public personControllerFindPersons(suchFilter: string, offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', options?: AxiosRequestConfig) {
-        return PersonenApiFp(this.configuration).personControllerFindPersons(suchFilter, offset, limit, referrer, familienname, vorname, sichtfreigabe, options).then((request) => request(this.axios, this.basePath));
+    public personControllerFindPersons(offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', suchFilter?: string, options?: AxiosRequestConfig) {
+        return PersonenApiFp(this.configuration).personControllerFindPersons(offset, limit, referrer, familienname, vorname, sichtfreigabe, suchFilter, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -4151,19 +4068,17 @@ export const PersonenFrontendApiAxiosParamCreator = function (configuration?: Co
     return {
         /**
          * 
-         * @param {string} suchFilter Search filter used to filter for Persons. It could be the vorname, familienname, referrer or the personalnummer.
          * @param {number} [offset] The offset of the paginated list.
          * @param {number} [limit] The requested limit for the page size.
          * @param {string} [referrer] 
          * @param {string} [familienname] 
          * @param {string} [vorname] 
          * @param {'ja' | 'nein'} [sichtfreigabe] 
+         * @param {string} [suchFilter] Search filter used to filter for Persons. It could be the vorname, familienname, referrer or the personalnummer.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        personFrontendControllerFindPersons: async (suchFilter: string, offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'suchFilter' is not null or undefined
-            assertParamExists('personFrontendControllerFindPersons', 'suchFilter', suchFilter)
+        personFrontendControllerFindPersons: async (offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', suchFilter?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/personen-frontend`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -4235,18 +4150,18 @@ export const PersonenFrontendApiFp = function(configuration?: Configuration) {
     return {
         /**
          * 
-         * @param {string} suchFilter Search filter used to filter for Persons. It could be the vorname, familienname, referrer or the personalnummer.
          * @param {number} [offset] The offset of the paginated list.
          * @param {number} [limit] The requested limit for the page size.
          * @param {string} [referrer] 
          * @param {string} [familienname] 
          * @param {string} [vorname] 
          * @param {'ja' | 'nein'} [sichtfreigabe] 
+         * @param {string} [suchFilter] Search filter used to filter for Persons. It could be the vorname, familienname, referrer or the personalnummer.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async personFrontendControllerFindPersons(suchFilter: string, offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonFrontendControllerFindPersons200Response>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.personFrontendControllerFindPersons(suchFilter, offset, limit, referrer, familienname, vorname, sichtfreigabe, options);
+        async personFrontendControllerFindPersons(offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', suchFilter?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonFrontendControllerFindPersons200Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.personFrontendControllerFindPersons(offset, limit, referrer, familienname, vorname, sichtfreigabe, suchFilter, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -4261,18 +4176,18 @@ export const PersonenFrontendApiFactory = function (configuration?: Configuratio
     return {
         /**
          * 
-         * @param {string} suchFilter Search filter used to filter for Persons. It could be the vorname, familienname, referrer or the personalnummer.
          * @param {number} [offset] The offset of the paginated list.
          * @param {number} [limit] The requested limit for the page size.
          * @param {string} [referrer] 
          * @param {string} [familienname] 
          * @param {string} [vorname] 
          * @param {'ja' | 'nein'} [sichtfreigabe] 
+         * @param {string} [suchFilter] Search filter used to filter for Persons. It could be the vorname, familienname, referrer or the personalnummer.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        personFrontendControllerFindPersons(suchFilter: string, offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', options?: any): AxiosPromise<PersonFrontendControllerFindPersons200Response> {
-            return localVarFp.personFrontendControllerFindPersons(suchFilter, offset, limit, referrer, familienname, vorname, sichtfreigabe, options).then((request) => request(axios, basePath));
+        personFrontendControllerFindPersons(offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', suchFilter?: string, options?: any): AxiosPromise<PersonFrontendControllerFindPersons200Response> {
+            return localVarFp.personFrontendControllerFindPersons(offset, limit, referrer, familienname, vorname, sichtfreigabe, suchFilter, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -4285,18 +4200,18 @@ export const PersonenFrontendApiFactory = function (configuration?: Configuratio
 export interface PersonenFrontendApiInterface {
     /**
      * 
-     * @param {string} suchFilter Search filter used to filter for Persons. It could be the vorname, familienname, referrer or the personalnummer.
      * @param {number} [offset] The offset of the paginated list.
      * @param {number} [limit] The requested limit for the page size.
      * @param {string} [referrer] 
      * @param {string} [familienname] 
      * @param {string} [vorname] 
      * @param {'ja' | 'nein'} [sichtfreigabe] 
+     * @param {string} [suchFilter] Search filter used to filter for Persons. It could be the vorname, familienname, referrer or the personalnummer.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PersonenFrontendApiInterface
      */
-    personFrontendControllerFindPersons(suchFilter: string, offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', options?: AxiosRequestConfig): AxiosPromise<PersonFrontendControllerFindPersons200Response>;
+    personFrontendControllerFindPersons(offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', suchFilter?: string, options?: AxiosRequestConfig): AxiosPromise<PersonFrontendControllerFindPersons200Response>;
 
 }
 
@@ -4309,19 +4224,19 @@ export interface PersonenFrontendApiInterface {
 export class PersonenFrontendApi extends BaseAPI implements PersonenFrontendApiInterface {
     /**
      * 
-     * @param {string} suchFilter Search filter used to filter for Persons. It could be the vorname, familienname, referrer or the personalnummer.
      * @param {number} [offset] The offset of the paginated list.
      * @param {number} [limit] The requested limit for the page size.
      * @param {string} [referrer] 
      * @param {string} [familienname] 
      * @param {string} [vorname] 
      * @param {'ja' | 'nein'} [sichtfreigabe] 
+     * @param {string} [suchFilter] Search filter used to filter for Persons. It could be the vorname, familienname, referrer or the personalnummer.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PersonenFrontendApi
      */
-    public personFrontendControllerFindPersons(suchFilter: string, offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', options?: AxiosRequestConfig) {
-        return PersonenFrontendApiFp(this.configuration).personFrontendControllerFindPersons(suchFilter, offset, limit, referrer, familienname, vorname, sichtfreigabe, options).then((request) => request(this.axios, this.basePath));
+    public personFrontendControllerFindPersons(offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', suchFilter?: string, options?: AxiosRequestConfig) {
+        return PersonenFrontendApiFp(this.configuration).personFrontendControllerFindPersons(offset, limit, referrer, familienname, vorname, sichtfreigabe, suchFilter, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
@@ -4380,16 +4295,14 @@ export const PersonenkontextApiAxiosParamCreator = function (configuration?: Con
         /**
          * 
          * @param {string} rolleId RolleId used to filter for schulstrukturknoten in personenkontext.
-         * @param {string} sskName Organisation/SSK name used to filter for schulstrukturknoten in personenkontext.
+         * @param {string} [sskName] Organisation/SSK name used to filter for schulstrukturknoten in personenkontext.
          * @param {number} [limit] The limit of items for the request.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        dbiamPersonenkontextFilterControllerFindSchulstrukturknoten: async (rolleId: string, sskName: string, limit?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        dbiamPersonenkontextFilterControllerFindSchulstrukturknoten: async (rolleId: string, sskName?: string, limit?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'rolleId' is not null or undefined
             assertParamExists('dbiamPersonenkontextFilterControllerFindSchulstrukturknoten', 'rolleId', rolleId)
-            // verify required parameter 'sskName' is not null or undefined
-            assertParamExists('dbiamPersonenkontextFilterControllerFindSchulstrukturknoten', 'sskName', sskName)
             const localVarPath = `/api/personenkontext/schulstrukturknoten`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -4453,12 +4366,12 @@ export const PersonenkontextApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @param {string} rolleId RolleId used to filter for schulstrukturknoten in personenkontext.
-         * @param {string} sskName Organisation/SSK name used to filter for schulstrukturknoten in personenkontext.
+         * @param {string} [sskName] Organisation/SSK name used to filter for schulstrukturknoten in personenkontext.
          * @param {number} [limit] The limit of items for the request.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async dbiamPersonenkontextFilterControllerFindSchulstrukturknoten(rolleId: string, sskName: string, limit?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<FindSchulstrukturknotenResponse>> {
+        async dbiamPersonenkontextFilterControllerFindSchulstrukturknoten(rolleId: string, sskName?: string, limit?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<FindSchulstrukturknotenResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.dbiamPersonenkontextFilterControllerFindSchulstrukturknoten(rolleId, sskName, limit, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -4485,12 +4398,12 @@ export const PersonenkontextApiFactory = function (configuration?: Configuration
         /**
          * 
          * @param {string} rolleId RolleId used to filter for schulstrukturknoten in personenkontext.
-         * @param {string} sskName Organisation/SSK name used to filter for schulstrukturknoten in personenkontext.
+         * @param {string} [sskName] Organisation/SSK name used to filter for schulstrukturknoten in personenkontext.
          * @param {number} [limit] The limit of items for the request.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        dbiamPersonenkontextFilterControllerFindSchulstrukturknoten(rolleId: string, sskName: string, limit?: number, options?: any): AxiosPromise<FindSchulstrukturknotenResponse> {
+        dbiamPersonenkontextFilterControllerFindSchulstrukturknoten(rolleId: string, sskName?: string, limit?: number, options?: any): AxiosPromise<FindSchulstrukturknotenResponse> {
             return localVarFp.dbiamPersonenkontextFilterControllerFindSchulstrukturknoten(rolleId, sskName, limit, options).then((request) => request(axios, basePath));
         },
     };
@@ -4515,13 +4428,13 @@ export interface PersonenkontextApiInterface {
     /**
      * 
      * @param {string} rolleId RolleId used to filter for schulstrukturknoten in personenkontext.
-     * @param {string} sskName Organisation/SSK name used to filter for schulstrukturknoten in personenkontext.
+     * @param {string} [sskName] Organisation/SSK name used to filter for schulstrukturknoten in personenkontext.
      * @param {number} [limit] The limit of items for the request.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PersonenkontextApiInterface
      */
-    dbiamPersonenkontextFilterControllerFindSchulstrukturknoten(rolleId: string, sskName: string, limit?: number, options?: AxiosRequestConfig): AxiosPromise<FindSchulstrukturknotenResponse>;
+    dbiamPersonenkontextFilterControllerFindSchulstrukturknoten(rolleId: string, sskName?: string, limit?: number, options?: AxiosRequestConfig): AxiosPromise<FindSchulstrukturknotenResponse>;
 
 }
 
@@ -4547,13 +4460,13 @@ export class PersonenkontextApi extends BaseAPI implements PersonenkontextApiInt
     /**
      * 
      * @param {string} rolleId RolleId used to filter for schulstrukturknoten in personenkontext.
-     * @param {string} sskName Organisation/SSK name used to filter for schulstrukturknoten in personenkontext.
+     * @param {string} [sskName] Organisation/SSK name used to filter for schulstrukturknoten in personenkontext.
      * @param {number} [limit] The limit of items for the request.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PersonenkontextApi
      */
-    public dbiamPersonenkontextFilterControllerFindSchulstrukturknoten(rolleId: string, sskName: string, limit?: number, options?: AxiosRequestConfig) {
+    public dbiamPersonenkontextFilterControllerFindSchulstrukturknoten(rolleId: string, sskName?: string, limit?: number, options?: AxiosRequestConfig) {
         return PersonenkontextApiFp(this.configuration).dbiamPersonenkontextFilterControllerFindSchulstrukturknoten(rolleId, sskName, limit, options).then((request) => request(this.axios, this.basePath));
     }
 }
@@ -4658,13 +4571,13 @@ export const PersonenkontexteApiAxiosParamCreator = function (configuration?: Co
          * @param {number} [offset] The offset of the paginated list.
          * @param {number} [limit] The requested limit for the page size.
          * @param {string} [referrer] 
-         * @param {'LERN' | 'LEHR' | 'EXTERN' | 'ORGADMIN' | 'LEIT' | 'SYSADMIN'} [rolle] 
-         * @param {'AKTIV'} [personenstatus] 
-         * @param {'ja' | 'nein'} [sichtfreigabe] 
+         * @param {Rolle} [rolle] 
+         * @param {Personenstatus} [personenstatus] 
+         * @param {Sichtfreigabe} [sichtfreigabe] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        personenkontextControllerFindPersonenkontexte: async (offset?: number, limit?: number, referrer?: string, rolle?: 'LERN' | 'LEHR' | 'EXTERN' | 'ORGADMIN' | 'LEIT' | 'SYSADMIN', personenstatus?: 'AKTIV', sichtfreigabe?: 'ja' | 'nein', options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        personenkontextControllerFindPersonenkontexte: async (offset?: number, limit?: number, referrer?: string, rolle?: Rolle, personenstatus?: Personenstatus, sichtfreigabe?: Sichtfreigabe, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/personenkontexte`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -4723,11 +4636,11 @@ export const PersonenkontexteApiAxiosParamCreator = function (configuration?: Co
         /**
          * 
          * @param {string} personId The id for the account.
-         * @param {'ROLLEN_VERWALTEN' | 'PERSONEN_VERWALTEN' | 'SCHULEN_VERWALTEN' | 'KLASSEN_VERWALTEN' | 'SCHULTRAEGER_VERWALTEN'} systemRecht 
+         * @param {RollenSystemRecht} systemRecht 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        personenkontextControllerHatSystemRecht: async (personId: string, systemRecht: 'ROLLEN_VERWALTEN' | 'PERSONEN_VERWALTEN' | 'SCHULEN_VERWALTEN' | 'KLASSEN_VERWALTEN' | 'SCHULTRAEGER_VERWALTEN', options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        personenkontextControllerHatSystemRecht: async (personId: string, systemRecht: RollenSystemRecht, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'personId' is not null or undefined
             assertParamExists('personenkontextControllerHatSystemRecht', 'personId', personId)
             // verify required parameter 'systemRecht' is not null or undefined
@@ -4851,24 +4764,24 @@ export const PersonenkontexteApiFp = function(configuration?: Configuration) {
          * @param {number} [offset] The offset of the paginated list.
          * @param {number} [limit] The requested limit for the page size.
          * @param {string} [referrer] 
-         * @param {'LERN' | 'LEHR' | 'EXTERN' | 'ORGADMIN' | 'LEIT' | 'SYSADMIN'} [rolle] 
-         * @param {'AKTIV'} [personenstatus] 
-         * @param {'ja' | 'nein'} [sichtfreigabe] 
+         * @param {Rolle} [rolle] 
+         * @param {Personenstatus} [personenstatus] 
+         * @param {Sichtfreigabe} [sichtfreigabe] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async personenkontextControllerFindPersonenkontexte(offset?: number, limit?: number, referrer?: string, rolle?: 'LERN' | 'LEHR' | 'EXTERN' | 'ORGADMIN' | 'LEIT' | 'SYSADMIN', personenstatus?: 'AKTIV', sichtfreigabe?: 'ja' | 'nein', options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<PersonendatensatzResponseAutomapper>>> {
+        async personenkontextControllerFindPersonenkontexte(offset?: number, limit?: number, referrer?: string, rolle?: Rolle, personenstatus?: Personenstatus, sichtfreigabe?: Sichtfreigabe, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<PersonendatensatzResponseAutomapper>>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.personenkontextControllerFindPersonenkontexte(offset, limit, referrer, rolle, personenstatus, sichtfreigabe, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
          * 
          * @param {string} personId The id for the account.
-         * @param {'ROLLEN_VERWALTEN' | 'PERSONEN_VERWALTEN' | 'SCHULEN_VERWALTEN' | 'KLASSEN_VERWALTEN' | 'SCHULTRAEGER_VERWALTEN'} systemRecht 
+         * @param {RollenSystemRecht} systemRecht 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async personenkontextControllerHatSystemRecht(personId: string, systemRecht: 'ROLLEN_VERWALTEN' | 'PERSONEN_VERWALTEN' | 'SCHULEN_VERWALTEN' | 'KLASSEN_VERWALTEN' | 'SCHULTRAEGER_VERWALTEN', options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SystemrechtResponse>> {
+        async personenkontextControllerHatSystemRecht(personId: string, systemRecht: RollenSystemRecht, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SystemrechtResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.personenkontextControllerHatSystemRecht(personId, systemRecht, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -4917,23 +4830,23 @@ export const PersonenkontexteApiFactory = function (configuration?: Configuratio
          * @param {number} [offset] The offset of the paginated list.
          * @param {number} [limit] The requested limit for the page size.
          * @param {string} [referrer] 
-         * @param {'LERN' | 'LEHR' | 'EXTERN' | 'ORGADMIN' | 'LEIT' | 'SYSADMIN'} [rolle] 
-         * @param {'AKTIV'} [personenstatus] 
-         * @param {'ja' | 'nein'} [sichtfreigabe] 
+         * @param {Rolle} [rolle] 
+         * @param {Personenstatus} [personenstatus] 
+         * @param {Sichtfreigabe} [sichtfreigabe] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        personenkontextControllerFindPersonenkontexte(offset?: number, limit?: number, referrer?: string, rolle?: 'LERN' | 'LEHR' | 'EXTERN' | 'ORGADMIN' | 'LEIT' | 'SYSADMIN', personenstatus?: 'AKTIV', sichtfreigabe?: 'ja' | 'nein', options?: any): AxiosPromise<Array<PersonendatensatzResponseAutomapper>> {
+        personenkontextControllerFindPersonenkontexte(offset?: number, limit?: number, referrer?: string, rolle?: Rolle, personenstatus?: Personenstatus, sichtfreigabe?: Sichtfreigabe, options?: any): AxiosPromise<Array<PersonendatensatzResponseAutomapper>> {
             return localVarFp.personenkontextControllerFindPersonenkontexte(offset, limit, referrer, rolle, personenstatus, sichtfreigabe, options).then((request) => request(axios, basePath));
         },
         /**
          * 
          * @param {string} personId The id for the account.
-         * @param {'ROLLEN_VERWALTEN' | 'PERSONEN_VERWALTEN' | 'SCHULEN_VERWALTEN' | 'KLASSEN_VERWALTEN' | 'SCHULTRAEGER_VERWALTEN'} systemRecht 
+         * @param {RollenSystemRecht} systemRecht 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        personenkontextControllerHatSystemRecht(personId: string, systemRecht: 'ROLLEN_VERWALTEN' | 'PERSONEN_VERWALTEN' | 'SCHULEN_VERWALTEN' | 'KLASSEN_VERWALTEN' | 'SCHULTRAEGER_VERWALTEN', options?: any): AxiosPromise<SystemrechtResponse> {
+        personenkontextControllerHatSystemRecht(personId: string, systemRecht: RollenSystemRecht, options?: any): AxiosPromise<SystemrechtResponse> {
             return localVarFp.personenkontextControllerHatSystemRecht(personId, systemRecht, options).then((request) => request(axios, basePath));
         },
         /**
@@ -4979,24 +4892,24 @@ export interface PersonenkontexteApiInterface {
      * @param {number} [offset] The offset of the paginated list.
      * @param {number} [limit] The requested limit for the page size.
      * @param {string} [referrer] 
-     * @param {'LERN' | 'LEHR' | 'EXTERN' | 'ORGADMIN' | 'LEIT' | 'SYSADMIN'} [rolle] 
-     * @param {'AKTIV'} [personenstatus] 
-     * @param {'ja' | 'nein'} [sichtfreigabe] 
+     * @param {Rolle} [rolle] 
+     * @param {Personenstatus} [personenstatus] 
+     * @param {Sichtfreigabe} [sichtfreigabe] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PersonenkontexteApiInterface
      */
-    personenkontextControllerFindPersonenkontexte(offset?: number, limit?: number, referrer?: string, rolle?: 'LERN' | 'LEHR' | 'EXTERN' | 'ORGADMIN' | 'LEIT' | 'SYSADMIN', personenstatus?: 'AKTIV', sichtfreigabe?: 'ja' | 'nein', options?: AxiosRequestConfig): AxiosPromise<Array<PersonendatensatzResponseAutomapper>>;
+    personenkontextControllerFindPersonenkontexte(offset?: number, limit?: number, referrer?: string, rolle?: Rolle, personenstatus?: Personenstatus, sichtfreigabe?: Sichtfreigabe, options?: AxiosRequestConfig): AxiosPromise<Array<PersonendatensatzResponseAutomapper>>;
 
     /**
      * 
      * @param {string} personId The id for the account.
-     * @param {'ROLLEN_VERWALTEN' | 'PERSONEN_VERWALTEN' | 'SCHULEN_VERWALTEN' | 'KLASSEN_VERWALTEN' | 'SCHULTRAEGER_VERWALTEN'} systemRecht 
+     * @param {RollenSystemRecht} systemRecht 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PersonenkontexteApiInterface
      */
-    personenkontextControllerHatSystemRecht(personId: string, systemRecht: 'ROLLEN_VERWALTEN' | 'PERSONEN_VERWALTEN' | 'SCHULEN_VERWALTEN' | 'KLASSEN_VERWALTEN' | 'SCHULTRAEGER_VERWALTEN', options?: AxiosRequestConfig): AxiosPromise<SystemrechtResponse>;
+    personenkontextControllerHatSystemRecht(personId: string, systemRecht: RollenSystemRecht, options?: AxiosRequestConfig): AxiosPromise<SystemrechtResponse>;
 
     /**
      * 
@@ -5045,26 +4958,26 @@ export class PersonenkontexteApi extends BaseAPI implements PersonenkontexteApiI
      * @param {number} [offset] The offset of the paginated list.
      * @param {number} [limit] The requested limit for the page size.
      * @param {string} [referrer] 
-     * @param {'LERN' | 'LEHR' | 'EXTERN' | 'ORGADMIN' | 'LEIT' | 'SYSADMIN'} [rolle] 
-     * @param {'AKTIV'} [personenstatus] 
-     * @param {'ja' | 'nein'} [sichtfreigabe] 
+     * @param {Rolle} [rolle] 
+     * @param {Personenstatus} [personenstatus] 
+     * @param {Sichtfreigabe} [sichtfreigabe] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PersonenkontexteApi
      */
-    public personenkontextControllerFindPersonenkontexte(offset?: number, limit?: number, referrer?: string, rolle?: 'LERN' | 'LEHR' | 'EXTERN' | 'ORGADMIN' | 'LEIT' | 'SYSADMIN', personenstatus?: 'AKTIV', sichtfreigabe?: 'ja' | 'nein', options?: AxiosRequestConfig) {
+    public personenkontextControllerFindPersonenkontexte(offset?: number, limit?: number, referrer?: string, rolle?: Rolle, personenstatus?: Personenstatus, sichtfreigabe?: Sichtfreigabe, options?: AxiosRequestConfig) {
         return PersonenkontexteApiFp(this.configuration).personenkontextControllerFindPersonenkontexte(offset, limit, referrer, rolle, personenstatus, sichtfreigabe, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * 
      * @param {string} personId The id for the account.
-     * @param {'ROLLEN_VERWALTEN' | 'PERSONEN_VERWALTEN' | 'SCHULEN_VERWALTEN' | 'KLASSEN_VERWALTEN' | 'SCHULTRAEGER_VERWALTEN'} systemRecht 
+     * @param {RollenSystemRecht} systemRecht 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PersonenkontexteApi
      */
-    public personenkontextControllerHatSystemRecht(personId: string, systemRecht: 'ROLLEN_VERWALTEN' | 'PERSONEN_VERWALTEN' | 'SCHULEN_VERWALTEN' | 'KLASSEN_VERWALTEN' | 'SCHULTRAEGER_VERWALTEN', options?: AxiosRequestConfig) {
+    public personenkontextControllerHatSystemRecht(personId: string, systemRecht: RollenSystemRecht, options?: AxiosRequestConfig) {
         return PersonenkontexteApiFp(this.configuration).personenkontextControllerHatSystemRecht(personId, systemRecht, options).then((request) => request(this.axios, this.basePath));
     }
 

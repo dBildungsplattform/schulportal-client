@@ -1,9 +1,11 @@
-import { useOrganisationStore, type Organisation, type OrganisationStore } from './OrganisationStore';
+import {
+  OrganisationsTyp,
+} from '@/api-client/generated';
 import ApiService from '@/services/ApiService';
 import MockAdapter from 'axios-mock-adapter';
 import { setActivePinia, createPinia } from 'pinia';
-import { OrganisationResponseTypEnum } from '../api-client/generated/api';
 import { rejects } from 'assert';
+import { useOrganisationStore, type OrganisationStore, type Organisation } from './OrganisationStore';
 
 const mockadapter: MockAdapter = new MockAdapter(ApiService);
 
@@ -30,7 +32,7 @@ describe('OrganisationStore', () => {
           name: 'Organisation 1',
           namensergaenzung: 'Ergänzung',
           kuerzel: 'O1',
-          typ: OrganisationResponseTypEnum.Anbieter,
+          typ: OrganisationsTyp.Anbieter,
         },
       ];
 
@@ -94,7 +96,7 @@ describe('OrganisationStore', () => {
           name: 'Organisation 1',
           namensergaenzung: 'Ergänzung',
           kuerzel: 'O1',
-          typ: OrganisationResponseTypEnum.Anbieter,
+          typ: OrganisationsTyp.Anbieter,
         },
       ];
 
@@ -133,7 +135,7 @@ describe('OrganisationStore', () => {
           name: 'Organisation 1',
           namensergaenzung: 'Ergänzung',
           kuerzel: 'O1',
-          typ: OrganisationResponseTypEnum.Anbieter,
+          typ: OrganisationsTyp.Anbieter,
         },
       ];
 
@@ -143,7 +145,7 @@ describe('OrganisationStore', () => {
         'Organisation 1',
         'Ergänzung',
         '01',
-        OrganisationResponseTypEnum.Anbieter,
+        OrganisationsTyp.Anbieter,
       );
       expect(organisationStore.loading).toBe(true);
       await createOrganisationPromise;
@@ -158,7 +160,7 @@ describe('OrganisationStore', () => {
         'Organisation 1',
         'Ergänzung',
         '01',
-        OrganisationResponseTypEnum.Anbieter,
+        OrganisationsTyp.Anbieter,
       );
       expect(organisationStore.loading).toBe(true);
       await rejects(createOrganisationPromise);
@@ -174,7 +176,7 @@ describe('OrganisationStore', () => {
         'Organisation 1',
         'Ergänzung',
         '01',
-        OrganisationResponseTypEnum.Anbieter,
+        OrganisationsTyp.Anbieter,
       );
       expect(organisationStore.loading).toBe(true);
       await expect(createOrganisationPromise).rejects.toEqual('some mock server error');

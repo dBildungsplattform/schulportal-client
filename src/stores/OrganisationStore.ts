@@ -2,17 +2,24 @@ import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import { isAxiosError, type AxiosResponse } from 'axios';
 import {
   OrganisationenApiFactory,
-  OrganisationResponseTypEnum,
-  CreateOrganisationBodyParamsTypEnum,
-  CreateOrganisationBodyParamsTraegerschaftEnum,
+  OrganisationsTyp,
+  TraegerschaftTyp,
   type OrganisationenApiInterface,
   type CreateOrganisationBodyParams,
-  type OrganisationResponseLegacy,
-  RollenSystemRecht,
+  type RollenSystemRecht,
 } from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
 
 const organisationApi: OrganisationenApiInterface = OrganisationenApiFactory(undefined, '', axiosApiInstance);
+
+export type Organisation = {
+  id: string;
+  kennung?: string | null;
+  name: string;
+  namensergaenzung?: string | null;
+  kuerzel?: string;
+  typ: OrganisationsTyp;
+};
 
 type OrganisationState = {
   allOrganisationen: Array<Organisation>;
@@ -36,17 +43,15 @@ type OrganisationActions = {
     name: string,
     namensergaenzung: string,
     kuerzel: string,
-    typ: CreateOrganisationBodyParamsTypEnum,
-    traegerschaft?: CreateOrganisationBodyParamsTraegerschaftEnum,
+    typ: OrganisationsTyp,
+    traegerschaft?: TraegerschaftTyp,
     administriertVon?: string,
     zugehoerigZu?: string,
   ) => Promise<Organisation>;
 };
 
-export { CreateOrganisationBodyParamsTypEnum };
-export { OrganisationResponseTypEnum };
+export { OrganisationsTyp };
 export type OrganisationStore = Store<'organisationStore', OrganisationState, OrganisationGetters, OrganisationActions>;
-export type Organisation = OrganisationResponseLegacy;
 
 export const useOrganisationStore: StoreDefinition<
   'organisationStore',
@@ -112,8 +117,8 @@ export const useOrganisationStore: StoreDefinition<
       name: string,
       namensergaenzung: string,
       kuerzel: string,
-      typ: CreateOrganisationBodyParamsTypEnum,
-      traegerschaft?: CreateOrganisationBodyParamsTraegerschaftEnum,
+      typ: OrganisationsTyp,
+      traegerschaft?: TraegerschaftTyp,
       administriertVon?: string,
       zugehoerigZu?: string,
     ): Promise<Organisation> {

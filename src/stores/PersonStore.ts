@@ -120,12 +120,19 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
       this.loading = true;
       try {
         const { data }: AxiosResponse<PersonFrontendControllerFindPersons200Response> =
-          await personenFrontendApi.personFrontendControllerFindPersons(searchFilter);
+          await personenFrontendApi.personFrontendControllerFindPersons(
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            searchFilter,
+          );
 
         this.allPersons = data.items;
         this.totalPersons = data.total;
       } catch (error: unknown) {
-        console.log(error);
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
           this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';

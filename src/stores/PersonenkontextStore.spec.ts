@@ -5,9 +5,9 @@ import {
   type FindRollenResponse,
   type FindSchulstrukturknotenResponse,
   type SystemrechtResponse,
-  OrganisationResponseTypEnum,
-  RolleResponseMerkmaleEnum,
-  RolleResponseSystemrechteEnum,
+  OrganisationsTyp,
+  RollenMerkmal,
+  RollenSystemRecht,
 } from '@/api-client/generated';
 import ApiService from '@/services/ApiService';
 import MockAdapter from 'axios-mock-adapter';
@@ -44,7 +44,7 @@ describe('PersonenkontextStore', () => {
             name: 'Organisation 1',
             namensergaenzung: 'Ergänzung',
             kuerzel: 'O1',
-            typ: OrganisationResponseTypEnum.Anbieter,
+            typ: OrganisationsTyp.Anbieter,
           },
         ],
         KLASSEN_VERWALTEN: [
@@ -54,7 +54,7 @@ describe('PersonenkontextStore', () => {
             name: 'Organisation 1',
             namensergaenzung: 'Ergänzung',
             kuerzel: 'O1',
-            typ: OrganisationResponseTypEnum.Anbieter,
+            typ: OrganisationsTyp.Anbieter,
           },
         ],
         SCHULEN_VERWALTEN: [
@@ -64,7 +64,7 @@ describe('PersonenkontextStore', () => {
             name: 'Organisation 1',
             namensergaenzung: 'Ergänzung',
             kuerzel: 'O1',
-            typ: OrganisationResponseTypEnum.Anbieter,
+            typ: OrganisationsTyp.Anbieter,
           },
         ],
         PERSONEN_VERWALTEN: [
@@ -74,7 +74,7 @@ describe('PersonenkontextStore', () => {
             name: 'Organisation 1',
             namensergaenzung: 'Ergänzung',
             kuerzel: 'O1',
-            typ: OrganisationResponseTypEnum.Anbieter,
+            typ: OrganisationsTyp.Anbieter,
           },
         ],
         SCHULTRAEGER_VERWALTEN: [
@@ -84,7 +84,7 @@ describe('PersonenkontextStore', () => {
             name: 'Organisation 1',
             namensergaenzung: 'Ergänzung',
             kuerzel: 'O1',
-            typ: OrganisationResponseTypEnum.Anbieter,
+            typ: OrganisationsTyp.Anbieter,
           },
         ],
       };
@@ -238,8 +238,8 @@ describe('PersonenkontextStore', () => {
             name: 'string',
             administeredBySchulstrukturknoten: 'string',
             rollenart: 'LERN',
-            merkmale: ['BEFRISTUNG_PFLICHT'] as unknown as Set<RolleResponseMerkmaleEnum>,
-            systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RolleResponseSystemrechteEnum>,
+            merkmale: ['BEFRISTUNG_PFLICHT'] as unknown as Set<RollenMerkmal>,
+            systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
           },
         ],
         total: 0,

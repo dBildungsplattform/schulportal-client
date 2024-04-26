@@ -3,8 +3,8 @@ import MockAdapter from 'axios-mock-adapter';
 import { setActivePinia, createPinia } from 'pinia';
 import { useRolleStore, type RolleStore } from './RolleStore';
 import {
-  RolleResponseMerkmaleEnum,
-  RolleResponseSystemrechteEnum,
+  RollenMerkmal,
+  RollenSystemRecht,
   type RolleResponse,
 } from '../api-client/generated/api';
 import { rejects } from 'assert';
@@ -34,8 +34,8 @@ describe('rolleStore', () => {
           rollenart: 'LEHR',
           name: 'Lehrer',
           // TODO remove type casting when generator is fixed
-          merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RolleResponseMerkmaleEnum>,
-          systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RolleResponseSystemrechteEnum>,
+          merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RollenMerkmal>,
+          systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
           createdAt: '2022',
           updatedAt: '2022',
           id: '1',
@@ -96,8 +96,8 @@ describe('rolleStore', () => {
           rollenart: 'LEHR',
           name: 'Lehrer',
           // TODO: remove type casting when generator is fixed
-          merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RolleResponseMerkmaleEnum>,
-          systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RolleResponseSystemrechteEnum>,
+          merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RollenMerkmal>,
+          systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
           createdAt: '2022',
           updatedAt: '2022',
           id: '1',
