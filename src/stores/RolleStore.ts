@@ -9,6 +9,7 @@ import {
   type RolleResponse,
   RollenSystemRecht,
   type RolleServiceProviderQueryParams,
+  type ServiceProviderResponse,
 } from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
 
@@ -49,7 +50,7 @@ export type Rolle = {
   name: string;
   rollenart: RollenArt;
   systemrechte?: Set<RollenSystemRecht>;
-  serviceProviders?: Array<string>;
+  serviceProviders?: Array<ServiceProviderResponse>;
 };
 
 export type RolleStore = Store<'rolleStore', RolleState, RolleGetters, RolleActions>;
@@ -68,11 +69,17 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
     async addServiceProviderToRolle(rolleId: string, rolleServiceProviderQueryParams: RolleServiceProviderQueryParams) {
       this.loading = true;
       try {
-        const { data }: AxiosResponse<string> = await rolleApi.rolleControllerAddServiceProviderById(
+        const { data }: AxiosResponse<ServiceProviderResponse> = await rolleApi.rolleControllerAddServiceProviderById(
           rolleId,
           rolleServiceProviderQueryParams,
         );
-        debugger;
+        if (this.createdRolle) {
+          if (this.createdRolle.serviceProviders) {
+            this.createdRolle.serviceProviders.push(data);
+          } else {
+            this.createdRolle.serviceProviders = [data];
+          }
+        }
         this.loading = false;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';

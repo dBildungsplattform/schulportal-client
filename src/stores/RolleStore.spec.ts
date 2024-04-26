@@ -2,11 +2,7 @@ import ApiService from '@/services/ApiService';
 import MockAdapter from 'axios-mock-adapter';
 import { setActivePinia, createPinia } from 'pinia';
 import { useRolleStore, type RolleStore } from './RolleStore';
-import {
-  RollenMerkmal,
-  RollenSystemRecht,
-  type RolleResponse,
-} from '../api-client/generated/api';
+import { RollenMerkmal, RollenSystemRecht, type RolleResponse } from '../api-client/generated/api';
 import { rejects } from 'assert';
 
 const mockadapter: MockAdapter = new MockAdapter(ApiService);
