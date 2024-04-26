@@ -4,19 +4,26 @@ ARG BASE_IMAGE=nginx:1.25-alpine
 # Build Stage
 FROM $BASE_IMAGE_BUILDER as build
 
-RUN apk add openjdk17-jre=17.0.10_p7-r0
+RUN apk add openjdk17-jre=17.0.11_p9-r0
 
 WORKDIR /app
 COPY tsconfig*.json ./
 COPY package*.json ./
 COPY vite*.ts ./
 COPY index.html ./
+COPY openapitools.json ./
 COPY env*.ts ./
 COPY src/ src/
 COPY public/ public/
 
 RUN npm ci
+RUN npm run generate-client
 RUN npm run build
+RUN ls /app/src/api-client/generated
+
+FROM scratch as artifacts
+COPY --from=build /app/src/api-client/generated /
+
 
 # Deployment Stage
 FROM $BASE_IMAGE as deployment
