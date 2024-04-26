@@ -22,14 +22,14 @@ type OrganisationState = {
   loading: boolean;
 };
 
-type GetAllOrganisationenFilter = {
+type OrganisationenFilter = {
   searchString?: string;
   systemrechte?: RollenSystemRecht[];
 };
 
 type OrganisationGetters = {};
 type OrganisationActions = {
-  getAllOrganisationen: (filter?: GetAllOrganisationenFilter) => Promise<void>;
+  getAllOrganisationen: (filter?: OrganisationenFilter) => Promise<void>;
   getOrganisationById: (organisationId: string) => Promise<Organisation>;
   createOrganisation: (
     kennung: string,
@@ -65,7 +65,7 @@ export const useOrganisationStore: StoreDefinition<
     };
   },
   actions: {
-    async getAllOrganisationen(filter?: GetAllOrganisationenFilter) {
+    async getAllOrganisationen(filter?: OrganisationenFilter) {
       this.loading = true;
       try {
         const { data }: AxiosResponse<Organisation[]> = await organisationApi.organisationControllerFindOrganizations(
