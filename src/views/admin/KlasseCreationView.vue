@@ -234,9 +234,7 @@
 
           <!-- Klassenname -->
           <v-row>
-            <v-col>
-              <h3 class="headline-3">2. {{ $t('admin.klasse.enterKlassenname') }}</h3>
-            </v-col>
+            <h3 class="headline-3">2. {{ $t('admin.klasse.enterKlassenname') }}</h3>
           </v-row>
           <FormRow
             :errorLabel="selectedKlassennameProps['error']"
