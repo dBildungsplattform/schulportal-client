@@ -17,7 +17,7 @@ COPY src/ src/
 COPY public/ public/
 
 RUN npm ci
-RUN npx generate-client
+RUN npx run generate-client
 RUN npm run build
 RUN ls /app/src/api-client/generated
 
