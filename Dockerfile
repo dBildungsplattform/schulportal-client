@@ -4,7 +4,7 @@ ARG BASE_IMAGE=nginx:1.25-alpine
 # Build Stage
 FROM $BASE_IMAGE_BUILDER as build
 
-RUN apk add openjdk17-jre=17.0.10_p7-r0
+RUN apk add openjdk17-jre=17.0.11_p9-r0
 
 WORKDIR /app
 COPY tsconfig*.json ./
