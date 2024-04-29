@@ -992,6 +992,17 @@
                         "schema": {
                             "$ref": "#/components/schemas/OrganisationsTyp"
                         }
+                    },
+                    {
+                        "name": "systemrechte",
+                        "required": false,
+                        "in": "query",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/components/schemas/RollenSystemRecht"
+                            }
+                        }
                     }
                 ],
                 "responses": {
@@ -2996,6 +3007,19 @@
                     "revision"
                 ]
             },
+            "OrganisationsTyp": {
+                "type": "string",
+                "enum": [
+                    "ROOT",
+                    "LAND",
+                    "TRAEGER",
+                    "SCHULE",
+                    "KLASSE",
+                    "ANBIETER",
+                    "SONSTIGE ORGANISATION / EINRICHTUNG",
+                    "UNBESTAETIGT"
+                ]
+            },
             "DBiamPersonenzuordnungResponse": {
                 "type": "object",
                 "properties": {
@@ -3013,6 +3037,10 @@
                     },
                     "rolle": {
                         "type": "string"
+                    },
+                    "typ": {
+                        "nullable": true,
+                        "$ref": "#/components/schemas/OrganisationsTyp"
                     }
                 },
                 "required": [
@@ -3020,7 +3048,8 @@
                     "rolleId",
                     "sskName",
                     "sskDstNr",
-                    "rolle"
+                    "rolle",
+                    "typ"
                 ]
             },
             "DBiamPersonenuebersichtResponse": {
@@ -3051,19 +3080,6 @@
                     "nachname",
                     "benutzername",
                     "zuordnungen"
-                ]
-            },
-            "OrganisationsTyp": {
-                "type": "string",
-                "enum": [
-                    "ROOT",
-                    "LAND",
-                    "TRAEGER",
-                    "SCHULE",
-                    "KLASSE",
-                    "ANBIETER",
-                    "SONSTIGE ORGANISATION / EINRICHTUNG",
-                    "UNBESTAETIGT"
                 ]
             },
             "TraegerschaftTyp": {
@@ -3117,6 +3133,10 @@
                     "id": {
                         "type": "string"
                     },
+                    "administriertVon": {
+                        "type": "string",
+                        "nullable": true
+                    },
                     "kennung": {
                         "type": "string",
                         "nullable": true
@@ -3137,6 +3157,7 @@
                 },
                 "required": [
                     "id",
+                    "administriertVon",
                     "kennung",
                     "name",
                     "namensergaenzung",
@@ -3178,11 +3199,25 @@
                     "typ"
                 ]
             },
+            "RollenSystemRecht": {
+                "type": "string",
+                "enum": [
+                    "ROLLEN_VERWALTEN",
+                    "PERSONEN_VERWALTEN",
+                    "SCHULEN_VERWALTEN",
+                    "KLASSEN_VERWALTEN",
+                    "SCHULTRAEGER_VERWALTEN"
+                ]
+            },
             "OrganisationResponse": {
                 "type": "object",
                 "properties": {
                     "id": {
                         "type": "string"
+                    },
+                    "administriertVon": {
+                        "type": "string",
+                        "nullable": true
                     },
                     "kennung": {
                         "type": "string",
@@ -3207,6 +3242,7 @@
                 },
                 "required": [
                     "id",
+                    "administriertVon",
                     "kennung",
                     "name",
                     "namensergaenzung",
@@ -3244,16 +3280,6 @@
                 "enum": [
                     "BEFRISTUNG_PFLICHT",
                     "KOPERS_PFLICHT"
-                ]
-            },
-            "RollenSystemRecht": {
-                "type": "string",
-                "enum": [
-                    "ROLLEN_VERWALTEN",
-                    "PERSONEN_VERWALTEN",
-                    "SCHULEN_VERWALTEN",
-                    "KLASSEN_VERWALTEN",
-                    "SCHULTRAEGER_VERWALTEN"
                 ]
             },
             "ServiceProviderIdNameResponse": {

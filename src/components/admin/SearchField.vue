@@ -18,7 +18,7 @@
     (event: 'onApplySearchFilter', searchFilter: string): void;
   }>();
 
-  const props: Props = defineProps<Props>()
+  const props: Props = defineProps<Props>();
 
   function applySearchFilter(): void {
     if (searchFilter.value !== null) {
