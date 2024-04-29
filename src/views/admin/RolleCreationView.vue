@@ -215,7 +215,7 @@ import type { RolleResponse } from '@/stores/RolleStore';
 
   onMounted(async () => {
     rolleStore.createdRolle = null;
-    await organisationStore.getAllOrganisationen();
+    await organisationStore.getAllOrganisationen({ systemrechte: ['ROLLEN_VERWALTEN'] });
     await serviceProviderStore.getAllServiceProviders();
 
     // Iterate over the enum values
@@ -462,7 +462,7 @@ import type { RolleResponse } from '@/stores/RolleStore';
             <FormRow
               :errorLabel="selectedSystemRechteProps['error']"
               labelForId="systemrecht-select"
-              :label="$t('admin.rolle.systemrechte')" 
+              :label="$t('admin.rolle.systemrechte')"
             >
               <v-autocomplete
                 autocomplete="off"
