@@ -19,6 +19,7 @@ export type Organisation = {
   namensergaenzung?: string | null;
   kuerzel?: string;
   typ: OrganisationsTyp;
+  administriertVon?: string | null;
 };
 
 type OrganisationState = {
@@ -29,7 +30,7 @@ type OrganisationState = {
   loading: boolean;
 };
 
-type OrganisationenFilter = {
+export type OrganisationenFilter = {
   searchString?: string;
   systemrechte?: RollenSystemRecht[];
 };
@@ -82,7 +83,6 @@ export const useOrganisationStore: StoreDefinition<
           undefined,
           filter?.systemrechte,
         );
-
         this.allOrganisationen = data;
         this.loading = false;
       } catch (error: unknown) {

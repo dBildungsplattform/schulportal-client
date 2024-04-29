@@ -1,7 +1,14 @@
 <script setup lang="ts">
   import { ref, type Ref, onMounted, onUnmounted, computed, type ComputedRef } from 'vue';
   import { useOrganisationStore, type OrganisationStore, type Organisation } from '@/stores/OrganisationStore';
-  import { useRolleStore, type RolleStore, RollenMerkmal, RollenSystemRecht, RollenArt } from '@/stores/RolleStore';
+  import {
+    useRolleStore,
+    type RolleStore,
+    RollenMerkmal,
+    RollenSystemRecht,
+    RollenArt,
+    type RolleResponse,
+  } from '@/stores/RolleStore';
   import {
     useServiceProviderStore,
     type ServiceProvider,
@@ -24,7 +31,6 @@
   import FormRow from '@/components/form/FormRow.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { DIN_91379A_EXT } from '@/utils/validation';
-import type { RolleResponse } from '@/stores/RolleStore';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
   const rolleStore: RolleStore = useRolleStore();
@@ -255,8 +261,7 @@ import type { RolleResponse } from '@/stores/RolleStore';
 
   const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = handleSubmit(async () => {
     if (selectedRollenName.value && selectedAdministrationsebene.value && selectedRollenArt.value) {
-      const merkmaleToSubmit: RollenMerkmal[] =
-        selectedMerkmale.value?.map((m: RollenMerkmal) => m) || [];
+      const merkmaleToSubmit: RollenMerkmal[] = selectedMerkmale.value?.map((m: RollenMerkmal) => m) || [];
       const systemrechteToSubmit: RollenSystemRecht[] =
         selectedSystemRechte.value?.map((m: RollenSystemRecht) => m) || [];
       await rolleStore
@@ -488,7 +493,7 @@ import type { RolleResponse } from '@/stores/RolleStore';
 
       <!-- Result template on success after submit  -->
       <template v-if="rolleStore.createdRolle && !rolleStore.errorCode">
-        <v-container class="new-rolle-success">
+        <v-container>
           <v-row justify="center">
             <v-col
               class="subtitle-1"

@@ -538,6 +538,12 @@ export interface OrganisationResponse {
      * @type {string}
      * @memberof OrganisationResponse
      */
+    'administriertVon': string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof OrganisationResponse
+     */
     'kennung': string | null;
     /**
      * 
@@ -584,6 +590,12 @@ export interface OrganisationResponseLegacy {
      * @memberof OrganisationResponseLegacy
      */
     'id': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof OrganisationResponseLegacy
+     */
+    'administriertVon': string | null;
     /**
      * 
      * @type {string}

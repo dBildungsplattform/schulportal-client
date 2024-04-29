@@ -73,6 +73,7 @@
     select-strategy="page"
     show-select
     @update:options="$emit('onTableUpdate')"
+    :no-data-text="$t('noDataFound')"
   >
     <template
       v-for="(_, name) in $slots as unknown as Readonly<Slots>"

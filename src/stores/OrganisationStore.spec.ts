@@ -1,6 +1,4 @@
-import {
-  OrganisationsTyp,
-} from '@/api-client/generated';
+import { OrganisationsTyp } from '@/api-client/generated';
 import ApiService from '@/services/ApiService';
 import MockAdapter from 'axios-mock-adapter';
 import { setActivePinia, createPinia } from 'pinia';
@@ -33,6 +31,7 @@ describe('OrganisationStore', () => {
           namensergaenzung: 'Ergänzung',
           kuerzel: 'O1',
           typ: OrganisationsTyp.Anbieter,
+          administriertVon: '1',
         },
       ];
 
@@ -97,6 +96,7 @@ describe('OrganisationStore', () => {
           namensergaenzung: 'Ergänzung',
           kuerzel: 'O1',
           typ: OrganisationsTyp.Anbieter,
+          administriertVon: '1',
         },
       ];
 
@@ -136,6 +136,7 @@ describe('OrganisationStore', () => {
           namensergaenzung: 'Ergänzung',
           kuerzel: 'O1',
           typ: OrganisationsTyp.Anbieter,
+          administriertVon: '1',
         },
       ];
 
