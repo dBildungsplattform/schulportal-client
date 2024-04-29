@@ -101,6 +101,7 @@
         @onUpdateTable="personStore.getAllPersons('')"
         :totalItems="personStore.totalPersons"
         item-value-path="person.id"
+        :no-data-text="$t('noDataFound')"
       ></ResultTable>
     </LayoutCard>
   </div>

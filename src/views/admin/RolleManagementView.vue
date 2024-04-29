@@ -91,6 +91,7 @@
         :totalItems="rolleStore.allRollen.length"
         item-value-path="id"
         :disableRowClick="true"
+        :no-data-text="$t('noDataFound')"
       >
         <template v-slot:[`item.serviceProviders`]="{ item }">
           <span v-if="!item.serviceProviders.length">-</span>

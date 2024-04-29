@@ -56,6 +56,7 @@
         :totalItems="organisationStore.allOrganisationen.length"
         item-value-path="id"
         :disableRowClick="true"
+        :no-data-text="$t('noDataFound')"
       ></ResultTable>
     </LayoutCard>
   </div>
