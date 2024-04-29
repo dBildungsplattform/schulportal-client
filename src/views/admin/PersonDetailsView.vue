@@ -226,14 +226,10 @@
               offset="1"
               v-for="zuordnung in personenKontextStore.personenuebersicht.zuordnungen"
               :key="zuordnung.sskId"
+              :data-testid="`person-zuordnung-${zuordnung.sskId}`"
+              :title="zuordnung.sskName"
             >
-              <h3
-                class="text-body"
-                :data-testid="`person-zuordnung-${zuordnung.sskId}`"
-                :title="zuordnung.sskName"
-              >
-                {{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
-              </h3>
+              {{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
             </v-col>
           </v-row>
           <!-- Display 'No data available' if the above condition is false -->
@@ -243,7 +239,7 @@
               offset-lg="2"
               offset="1"
             >
-              <h3 class="text-body">{{ $t('person.noZuordnungenFound') }}</h3>
+              {{ $t('person.noZuordnungenFound') }}
             </v-col>
           </v-row>
         </v-container>
