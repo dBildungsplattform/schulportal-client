@@ -992,6 +992,17 @@
                         "schema": {
                             "$ref": "#/components/schemas/OrganisationsTyp"
                         }
+                    },
+                    {
+                        "name": "systemrechte",
+                        "required": false,
+                        "in": "query",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/components/schemas/RollenSystemRecht"
+                            }
+                        }
                     }
                 ],
                 "responses": {
@@ -3183,6 +3194,16 @@
                     "typ"
                 ]
             },
+            "RollenSystemRecht": {
+                "type": "string",
+                "enum": [
+                    "ROLLEN_VERWALTEN",
+                    "PERSONEN_VERWALTEN",
+                    "SCHULEN_VERWALTEN",
+                    "KLASSEN_VERWALTEN",
+                    "SCHULTRAEGER_VERWALTEN"
+                ]
+            },
             "OrganisationResponse": {
                 "type": "object",
                 "properties": {
@@ -3249,16 +3270,6 @@
                 "enum": [
                     "BEFRISTUNG_PFLICHT",
                     "KOPERS_PFLICHT"
-                ]
-            },
-            "RollenSystemRecht": {
-                "type": "string",
-                "enum": [
-                    "ROLLEN_VERWALTEN",
-                    "PERSONEN_VERWALTEN",
-                    "SCHULEN_VERWALTEN",
-                    "KLASSEN_VERWALTEN",
-                    "SCHULTRAEGER_VERWALTEN"
                 ]
             },
             "ServiceProviderIdNameResponse": {
