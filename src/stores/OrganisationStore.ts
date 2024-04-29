@@ -30,7 +30,7 @@ type OrganisationState = {
   loading: boolean;
 };
 
-type OrganisationenFilter = {
+export type OrganisationenFilter = {
   searchString?: string;
   systemrechte?: RollenSystemRecht[];
 };

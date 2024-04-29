@@ -242,7 +242,7 @@
   });
 
   onMounted(async () => {
-    await organisationStore.getAllOrganisationen('');
+    await organisationStore.getAllOrganisationen();
     await rolleStore.getAllRollen();
     personStore.errorCode = '';
     personStore.createdPerson = null;

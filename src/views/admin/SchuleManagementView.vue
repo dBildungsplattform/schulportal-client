@@ -33,7 +33,7 @@
   });
 
   onMounted(async () => {
-    await organisationStore.getAllOrganisationen('');
+    await organisationStore.getAllOrganisationen();
   });
 </script>
 
@@ -52,7 +52,7 @@
         :items="filteredOrganisationen || []"
         :loading="organisationStore.loading"
         :headers="headers"
-        @onUpdateTable="organisationStore.getAllOrganisationen('')"
+        @onUpdateTable="organisationStore.getAllOrganisationen()"
         :totalItems="organisationStore.allOrganisationen.length"
         item-value-path="id"
         :disableRowClick="true"

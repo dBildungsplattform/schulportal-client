@@ -95,10 +95,10 @@
   // Watcher to detect when the search input for Organisationen is triggered.
   watch(searchInputSchule, async (newValue: string, _oldValue: string) => {
     if (newValue.length >= 3) {
-      organisationStore.getAllOrganisationen(newValue);
+      organisationStore.getAllOrganisationen({ searchString: newValue });
     } else {
       // If newValue has less than 3 characters, use an empty string instead of newValue to show all organisationen under the selectedRolle.
-      organisationStore.getAllOrganisationen('');
+      organisationStore.getAllOrganisationen();
     }
   });
 
@@ -160,7 +160,7 @@
   });
 
   onMounted(async () => {
-    organisationStore.getAllOrganisationen('');
+    organisationStore.getAllOrganisationen();
     /* listen for browser changes and prevent them when form is dirty */
     window.addEventListener('beforeunload', preventNavigation);
   });

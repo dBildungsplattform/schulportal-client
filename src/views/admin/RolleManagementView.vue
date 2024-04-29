@@ -68,7 +68,7 @@
 
   onMounted(async () => {
     await rolleStore.getAllRollen();
-    await organisationStore.getAllOrganisationen('');
+    await organisationStore.getAllOrganisationen();
   });
 </script>
 
