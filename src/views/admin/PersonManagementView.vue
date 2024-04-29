@@ -14,6 +14,7 @@
     type Uebersicht,
     type Zuordnung,
   } from '@/stores/PersonenkontextStore';
+  import { OrganisationsTyp } from '@/stores/OrganisationStore';
   const personStore: PersonStore = usePersonStore();
   const personenKontextStore: PersonenkontextStore = usePersonenkontextStore();
 
@@ -28,11 +29,13 @@
     { title: t('person.kopersnr'), key: 'person.personalnummer', align: 'start' },
     { title: t('person.rolle'), key: 'rollen', align: 'start' },
     { title: t('person.zuordnungen'), key: 'administrationsebenen', align: 'start' },
+    { title: t('person.klasse'), key: 'klassen', align: 'start' },
   ];
 
   type PersonenWithRolleAndZuordnung = {
     rollen: string;
     administrationsebenen: string;
+    klassen: string;
     person: Person;
   }[];
   const router: Router = useRouter();
@@ -59,10 +62,20 @@
         : '---';
       // Check if personalnummer is null, if so, replace it with "---"
       const personalnummer: string = person.person.personalnummer ?? '---';
+      // Check if the uebersicht has a zuordnung of type "Klasse" if no then show directly "---" without filtering or mapping
+      const klassen: string = uebersicht?.zuordnungen.some(
+        (zuordnung: Zuordnung) => zuordnung.typ === OrganisationsTyp.Klasse,
+      )
+        ? uebersicht.zuordnungen
+            .filter((zuordnung: Zuordnung) => zuordnung.typ === OrganisationsTyp.Klasse)
+            .map((zuordnung: Zuordnung) => (zuordnung.sskName.length ? zuordnung.sskName : '---'))
+            .join(', ')
+        : '---';
       return {
         ...person,
         rollen: rollen,
         administrationsebenen: administrationsebenen,
+        klassen: klassen,
         person: { ...person.person, personalnummer: personalnummer },
       };
     });

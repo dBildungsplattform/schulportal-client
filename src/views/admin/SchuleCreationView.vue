@@ -153,7 +153,7 @@
       <!-- Error Message Display if error on submit -->
       <SpshAlert
         :model-value="!!organisationStore.errorCode"
-        :title="t('admin.schule.schuleCreateErrorTitle')"
+        :title="$t('admin.schule.schuleCreateErrorTitle')"
         :type="'error'"
         :closable="false"
         :text="$t('admin.schule.schuleCreateErrorText')"

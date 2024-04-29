@@ -25,5 +25,4 @@ describe('SearchField', () => {
   test.skip('it renders the search field', () => {
     expect(wrapper?.find('[data-testid="apply-search-filter-button"]').isVisible()).toBe(true);
   });
-
 });

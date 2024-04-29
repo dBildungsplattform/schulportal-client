@@ -5,6 +5,7 @@ import routes from '@/router/routes';
 import PersonDetailsView from './PersonDetailsView.vue';
 import { type Personendatensatz, type PersonStore, usePersonStore } from '@/stores/PersonStore';
 import { usePersonenkontextStore, type PersonenkontextStore, type Uebersicht } from '@/stores/PersonenkontextStore';
+import { OrganisationsTyp } from '@/stores/OrganisationStore';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
@@ -35,6 +36,7 @@ const mockPersonenuebersicht: Uebersicht = {
       sskName: 'Testschule Birmingham',
       sskDstNr: '123456',
       rolle: 'Lehrer',
+      typ: OrganisationsTyp.Schule,
     },
   ],
 };
