@@ -35,16 +35,16 @@ describe('OrganisationStore', () => {
         },
       ];
 
-      mockadapter.onGet('/api/organisationen?searchString=').replyOnce(200, mockResponse);
-      const getAllOrganisationenPromise: Promise<void> = organisationStore.getAllOrganisationen('');
+      mockadapter.onGet('/api/organisationen').replyOnce(200, mockResponse);
+      const getAllOrganisationenPromise: Promise<void> = organisationStore.getAllOrganisationen();
       await getAllOrganisationenPromise;
       expect(organisationStore.allOrganisationen).toEqual(mockResponse);
       expect(organisationStore.loading).toBe(false);
     });
 
     it('should handle string error', async () => {
-      mockadapter.onGet('/api/organisationen?searchString=').replyOnce(500, 'some mock server error');
-      const getAllOrganisationenPromise: Promise<void> = organisationStore.getAllOrganisationen('');
+      mockadapter.onGet('/api/organisationen').replyOnce(500, 'some mock server error');
+      const getAllOrganisationenPromise: Promise<void> = organisationStore.getAllOrganisationen();
       expect(organisationStore.loading).toBe(true);
       await getAllOrganisationenPromise;
       expect(organisationStore.allOrganisationen).toEqual([]);
@@ -53,8 +53,8 @@ describe('OrganisationStore', () => {
     });
 
     it('should handle error code', async () => {
-      mockadapter.onGet('/api/organisationen?searchString=').replyOnce(500, { code: 'some mock server error' });
-      const getAllOrgaisationsPromise: Promise<void> = organisationStore.getAllOrganisationen('');
+      mockadapter.onGet('/api/organisationen').replyOnce(500, { code: 'some mock server error' });
+      const getAllOrgaisationsPromise: Promise<void> = organisationStore.getAllOrganisationen();
       expect(organisationStore.loading).toBe(true);
       await getAllOrgaisationsPromise;
       expect(organisationStore.allOrganisationen).toEqual([]);
