@@ -148,7 +148,7 @@ describe('rolleStore', () => {
         target: 'URL',
         kategorie: 'EMAIL',
         hasLogo: true,
-      }
+      };
 
       mockadapter.onPost('/api/rolle/1/serviceProviders').replyOnce(200, mockResponse, {});
       const addServiceProviderToRollePromise: Promise<void> = rolleStore.addServiceProviderToRolle('1', {
@@ -156,7 +156,7 @@ describe('rolleStore', () => {
       });
       expect(rolleStore.loading).toBe(true);
       await addServiceProviderToRollePromise;
-      expect(rolleStore.createdRolle?.serviceProviders).toEqual([mockResponse]);
+      expect(rolleStore.createdRolle.serviceProviders).toEqual([mockResponse]);
       expect(rolleStore.loading).toBe(false);
     });
 

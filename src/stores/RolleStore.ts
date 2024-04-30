@@ -74,11 +74,8 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
           rolleServiceProviderQueryParams,
         );
         if (this.createdRolle) {
-          if (this.createdRolle.serviceProviders) {
-            this.createdRolle.serviceProviders.push(data);
-          } else {
-            this.createdRolle.serviceProviders = [data];
-          }
+          this.createdRolle.serviceProviders = this.createdRolle.serviceProviders || [];
+          this.createdRolle.serviceProviders.push(data);
         }
         this.loading = false;
       } catch (error: unknown) {
