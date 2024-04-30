@@ -35,8 +35,10 @@ describe('AuthStore', () => {
       mockadapter.onGet('/api/auth/logininfo').replyOnce(200, mockResponse);
       const initializeAuthStatus: Promise<void> = authStore.initializeAuthStatus();
       expect(authStore.isAuthed).toBe(false);
+      expect(authStore.currentUser).toBe(null);
       await initializeAuthStatus;
       expect(authStore.isAuthed).toBe(true);
+      expect(authStore.currentUser).toEqual(mockInfo);
     });
 
     it('should not authenticate on server error', async () => {
@@ -44,35 +46,6 @@ describe('AuthStore', () => {
       const initializeAuthStatus: Promise<void> = authStore.initializeAuthStatus();
       expect(authStore.isAuthed).toBe(false);
       await initializeAuthStatus;
-      expect(authStore.isAuthed).toBe(false);
-    });
-  });
-  describe('getLoggedInUserInfo', () => {
-    it('should get logged in user informations ', async () => {
-      const mockUserInfo: UserinfoResponse = {
-        email: 'albert@test.de',
-        email_verified: true,
-        family_name: 'Test',
-        given_name: 'Albert',
-        name: 'Albert Test',
-        preferred_username: 'albert',
-        sub: 'c71be903-d0ec-4207-b653-40c114680b63',
-      } as UserinfoResponse;
-
-      const mockResponse: UserinfoResponse = mockUserInfo;
-
-      mockadapter.onGet('/api/auth/logininfo').replyOnce(200, mockResponse);
-      const getLoggedInUserInfoPromise: Promise<void> = authStore.getLoggedInUserInfo();
-      expect(authStore.currentUser).toBe(null);
-      await getLoggedInUserInfoPromise;
-      expect(authStore.currentUser).toEqual(mockUserInfo);
-    });
-
-    it('should not authenticate on server error', async () => {
-      mockadapter.onGet('/api/auth/logininfo').replyOnce(500, 'some mock server error');
-      const getLoggedInUserInfoPromise: Promise<void> = authStore.getLoggedInUserInfo();
-      expect(authStore.isAuthed).toBe(false);
-      await getLoggedInUserInfoPromise;
       expect(authStore.isAuthed).toBe(false);
     });
   });
