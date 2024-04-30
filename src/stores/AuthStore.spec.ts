@@ -28,6 +28,20 @@ describe('AuthStore', () => {
         name: 'Albert Test',
         preferred_username: 'albert',
         sub: 'c71be903-d0ec-4207-b653-40c114680b63',
+        personenkontexte: [
+          {
+            organisationsId: "123456",
+            rolle: {
+              systemrechte: [
+                "ROLLEN_VERWALTEN",
+                "SCHULEN_VERWALTEN"
+              ],
+              serviceProviderIds: [
+                "789897798"
+              ]
+            }
+          }
+        ]
       } as UserinfoResponse;
 
       const mockResponse: UserinfoResponse = mockInfo;
@@ -36,9 +50,19 @@ describe('AuthStore', () => {
       const initializeAuthStatus: Promise<void> = authStore.initializeAuthStatus();
       expect(authStore.isAuthed).toBe(false);
       expect(authStore.currentUser).toBe(null);
+      expect(authStore.hasKlassenverwaltungPermission).toBe(false);
+      expect(authStore.hasPersonenverwaltungPermission).toBe(false);
+      expect(authStore.hasRollenverwaltungPermission).toBe(false);
+      expect(authStore.hasSchulverwaltungPermission).toBe(false);
+      expect(authStore.hasSchultraegerverwaltungPermission).toBe(false);
       await initializeAuthStatus;
       expect(authStore.isAuthed).toBe(true);
       expect(authStore.currentUser).toEqual(mockInfo);
+      expect(authStore.hasKlassenverwaltungPermission).toBe(false);
+      expect(authStore.hasPersonenverwaltungPermission).toBe(false);
+      expect(authStore.hasRollenverwaltungPermission).toBe(true);
+      expect(authStore.hasSchulverwaltungPermission).toBe(true);
+      expect(authStore.hasSchultraegerverwaltungPermission).toBe(false);
     });
 
     it('should not authenticate on server error', async () => {

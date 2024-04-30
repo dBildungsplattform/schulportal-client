@@ -1,8 +1,46 @@
 import { expect, test } from 'vitest';
 import { VueWrapper, mount } from '@vue/test-utils';
 import MenuBar from './MenuBar.vue';
+import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
+const authStore: AuthStore = useAuthStore();
 
 let wrapper: VueWrapper | null = null;
+
+authStore.currentUser = {
+  middle_name: null,
+  nickname: null,
+  profile: null,
+  picture: null,
+  website: null,
+  gender: null,
+  birthdate: null,
+  zoneinfo: null,
+  locale: null,
+  phone_number: null,
+  updated_at: null,
+  personId: null,
+  email: 'albert@test.de',
+  email_verified: true,
+  family_name: 'Test',
+  given_name: 'Albert',
+  name: 'Albert Test',
+  preferred_username: 'albert',
+  sub: 'c71be903-d0ec-4207-b653-40c114680b63',
+  personenkontexte: [
+    {
+      organisationsId: "123456",
+      rolle: {
+        systemrechte: [
+          "ROLLEN_VERWALTEN",
+          "SCHULEN_VERWALTEN"
+        ],
+        serviceProviderIds: [
+          "789897798"
+        ]
+      }
+    }
+  ]
+}
 
 beforeEach(() => {
   document.body.innerHTML = `
@@ -31,8 +69,14 @@ describe('MenuBar', () => {
     expect(wrapper?.find('[data-testid="menu-bar-title"]').isVisible()).toBe(true);
   });
 
-  test.skip('it renders person management links', () => {
+  test.skip('it renders rolle and schule management links', () => {
     expect(wrapper?.find('[data-testid="menu-bar-title"]').isVisible()).toBe(true);
+    expect(wrapper?.find('[data-testid="rolle-management-title"]').isVisible()).toBe(true);
+    expect(wrapper?.find('[data-testid="rolle-creation-menu-item"]').isVisible()).toBe(true);
+    expect(wrapper?.find('[data-testid="schule-management-title"]').isVisible()).toBe(true);
+    expect(wrapper?.find('[data-testid="schule-management-menu-item"]').isVisible()).toBe(true);
+    expect(wrapper?.find('[data-testid="schule-creation-menu-item"]').isVisible()).toBe(true);
+
   });
 
   // TODO: can we rely on vuetify's mobile breakpoint in tests?
