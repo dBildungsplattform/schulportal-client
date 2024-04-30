@@ -5,7 +5,7 @@
   import { useDisplay } from 'vuetify';
 
   const authStore: AuthStore = useAuthStore();
-  
+
   const menuDrawer: Ref<boolean> = ref(true);
   const { mobile }: { mobile: ComputedRef<boolean> } = useDisplay();
 

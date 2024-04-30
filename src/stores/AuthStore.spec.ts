@@ -30,18 +30,13 @@ describe('AuthStore', () => {
         sub: 'c71be903-d0ec-4207-b653-40c114680b63',
         personenkontexte: [
           {
-            organisationsId: "123456",
+            organisationsId: '123456',
             rolle: {
-              systemrechte: [
-                "ROLLEN_VERWALTEN",
-                "SCHULEN_VERWALTEN"
-              ],
-              serviceProviderIds: [
-                "789897798"
-              ]
-            }
-          }
-        ]
+              systemrechte: ['ROLLEN_VERWALTEN', 'SCHULEN_VERWALTEN'],
+              serviceProviderIds: ['789897798'],
+            },
+          },
+        ],
       } as UserinfoResponse;
 
       const mockResponse: UserinfoResponse = mockInfo;

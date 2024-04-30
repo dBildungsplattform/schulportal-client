@@ -1,6 +1,12 @@
 import { defineStore, type Store, type StoreDefinition } from 'pinia';
-import { AuthApiFactory, type AuthApiInterface, type PersonenkontextRolleFieldsResponse, type UserinfoResponse } from '../api-client/generated/api';
+import {
+  AuthApiFactory,
+  type AuthApiInterface,
+  type PersonenkontextRolleFieldsResponse,
+  type UserinfoResponse,
+} from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
+import type { UserinfoPersonenkontext } from './PersonenkontextStore';
 
 export type UserInfo = {
   sub: string;
@@ -61,21 +67,22 @@ export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, 
   actions: {
     async initializeAuthStatus() {
       try {
-        const { data, status: loginStatus }: { data: UserinfoResponse, status: number } = await authApi.authenticationControllerInfo({
-          validateStatus: null,
-        });
+        const { data, status: loginStatus }: { data: UserinfoResponse; status: number } =
+          await authApi.authenticationControllerInfo({
+            validateStatus: null,
+          });
 
         this.isAuthed = loginStatus >= 200 && loginStatus < 400;
         this.currentUser = data;
 
         /* extract all system permissions from current user's personenkontexte */
-        const personenkontexte  = this.currentUser.personenkontexte;
-        personenkontexte?.forEach((personenkontext) => {
-          personenkontext.rolle.systemrechte.forEach((systemrecht) => {
+        const personenkontexte: Array<UserinfoPersonenkontext> | null = this.currentUser.personenkontexte;
+        personenkontexte?.forEach((personenkontext: UserinfoPersonenkontext) => {
+          personenkontext.rolle.systemrechte.forEach((systemrecht: string) => {
             /* push unique permissions only */
             if (this.currentUserPermissions.indexOf(systemrecht) === -1) this.currentUserPermissions.push(systemrecht);
           });
-        })
+        });
 
         /* set permission aliases for easier global access */
         this.hasKlassenverwaltungPermission = this.currentUserPermissions.includes('KLASSEN_VERWALTEN');

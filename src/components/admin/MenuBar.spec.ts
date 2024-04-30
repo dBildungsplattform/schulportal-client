@@ -28,19 +28,14 @@ authStore.currentUser = {
   sub: 'c71be903-d0ec-4207-b653-40c114680b63',
   personenkontexte: [
     {
-      organisationsId: "123456",
+      organisationsId: '123456',
       rolle: {
-        systemrechte: [
-          "ROLLEN_VERWALTEN",
-          "SCHULEN_VERWALTEN"
-        ],
-        serviceProviderIds: [
-          "789897798"
-        ]
-      }
-    }
-  ]
-}
+        systemrechte: ['ROLLEN_VERWALTEN', 'SCHULEN_VERWALTEN'],
+        serviceProviderIds: ['789897798'],
+      },
+    },
+  ],
+};
 
 beforeEach(() => {
   document.body.innerHTML = `
@@ -76,7 +71,6 @@ describe('MenuBar', () => {
     expect(wrapper?.find('[data-testid="schule-management-title"]').isVisible()).toBe(true);
     expect(wrapper?.find('[data-testid="schule-management-menu-item"]').isVisible()).toBe(true);
     expect(wrapper?.find('[data-testid="schule-creation-menu-item"]').isVisible()).toBe(true);
-
   });
 
   // TODO: can we rely on vuetify's mobile breakpoint in tests?
