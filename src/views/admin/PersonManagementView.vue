@@ -57,6 +57,7 @@
       // Choose sskDstNr if available, otherwise sskName.
       const administrationsebenen: string = uebersicht?.zuordnungen.length
         ? uebersicht.zuordnungen
+            .filter((zuordnung: Zuordnung) => zuordnung.typ !== OrganisationsTyp.Klasse)
             .map((zuordnung: Zuordnung) => (zuordnung.sskDstNr ? zuordnung.sskDstNr : zuordnung.sskName))
             .join(', ')
         : '---';

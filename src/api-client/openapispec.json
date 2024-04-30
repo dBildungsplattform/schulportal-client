@@ -3038,6 +3038,9 @@
                     "rolle": {
                         "type": "string"
                     },
+                    "administriertVon": {
+                        "type": "string"
+                    },
                     "typ": {
                         "nullable": true,
                         "$ref": "#/components/schemas/OrganisationsTyp"
@@ -3049,6 +3052,7 @@
                     "sskName",
                     "sskDstNr",
                     "rolle",
+                    "administriertVon",
                     "typ"
                 ]
             },

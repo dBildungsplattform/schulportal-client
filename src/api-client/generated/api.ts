@@ -399,6 +399,12 @@ export interface DBiamPersonenzuordnungResponse {
     'rolle': string;
     /**
      * 
+     * @type {string}
+     * @memberof DBiamPersonenzuordnungResponse
+     */
+    'administriertVon': string;
+    /**
+     * 
      * @type {OrganisationsTyp}
      * @memberof DBiamPersonenzuordnungResponse
      */
