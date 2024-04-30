@@ -4,10 +4,10 @@
   import {
     useRolleStore,
     type RolleStore,
-    type RolleResponse,
     RollenMerkmal,
     RollenSystemRecht,
     RollenArt,
+    type RolleResponse,
   } from '@/stores/RolleStore';
   import {
     useServiceProviderStore,
@@ -236,7 +236,7 @@
 
   onMounted(async () => {
     rolleStore.createdRolle = null;
-    await organisationStore.getAllOrganisationen();
+    await organisationStore.getAllOrganisationen({ systemrechte: ['ROLLEN_VERWALTEN'] });
     await serviceProviderStore.getAllServiceProviders();
 
     // Iterate over the enum values
@@ -508,7 +508,7 @@
 
       <!-- Result template on success after submit  -->
       <template v-if="rolleStore.createdRolle && !rolleStore.errorCode">
-        <v-container class="new-rolle-success">
+        <v-container>
           <v-row justify="center">
             <v-col
               class="subtitle-1"

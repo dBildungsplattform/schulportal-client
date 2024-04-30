@@ -16,6 +16,7 @@ import {
   PersonenkontextApiFactory,
   type PersonenkontextApiInterface,
   DbiamPersonenuebersichtApiFactory,
+  OrganisationsTyp,
 } from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
 
@@ -38,6 +39,7 @@ export type Zuordnung = {
   sskName: string;
   sskDstNr: string;
   rolle: string;
+  typ: OrganisationsTyp;
 };
 
 export type Uebersicht =
@@ -52,6 +54,7 @@ export type Uebersicht =
         sskName: string;
         sskDstNr: string;
         rolle: string;
+        typ: OrganisationsTyp;
       }[];
     }
   | undefined;

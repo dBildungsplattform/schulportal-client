@@ -38,6 +38,15 @@ const routes: readonly RouteRecordRaw[] = [
     },
   },
   {
+    path: '/admin/klassen/new',
+    name: 'create-klasse',
+    component: () => import('../views/admin/KlasseCreationView.vue'),
+    meta: {
+      layout: 'AdminLayout',
+      requiresAuth: true,
+    },
+  },
+  {
     path: '/admin/rollen/new',
     name: 'create-rolle',
     component: () => import('../views/admin/RolleCreationView.vue'),

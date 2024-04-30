@@ -20,6 +20,7 @@ organisationStore.allOrganisationen = [
     namensergaenzung: 'Schule',
     kuerzel: 'aehg',
     typ: 'SCHULE',
+    administriertVon: '1',
   },
   {
     id: '2',
@@ -28,6 +29,7 @@ organisationStore.allOrganisationen = [
     namensergaenzung: 'des Alberts',
     kuerzel: 'EGS',
     typ: 'SCHULE',
+    administriertVon: '1',
   },
 ];
 

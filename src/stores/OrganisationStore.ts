@@ -6,6 +6,7 @@ import {
   TraegerschaftTyp,
   type OrganisationenApiInterface,
   type CreateOrganisationBodyParams,
+  type RollenSystemRecht,
 } from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
 
@@ -18,6 +19,7 @@ export type Organisation = {
   namensergaenzung?: string | null;
   kuerzel?: string;
   typ: OrganisationsTyp;
+  administriertVon?: string | null;
 };
 
 type OrganisationState = {
@@ -28,9 +30,14 @@ type OrganisationState = {
   loading: boolean;
 };
 
+export type OrganisationenFilter = {
+  searchString?: string;
+  systemrechte?: RollenSystemRecht[];
+};
+
 type OrganisationGetters = {};
 type OrganisationActions = {
-  getAllOrganisationen: () => Promise<void>;
+  getAllOrganisationen: (filter?: OrganisationenFilter) => Promise<void>;
   getOrganisationById: (organisationId: string) => Promise<Organisation>;
   createOrganisation: (
     kennung: string,
@@ -64,11 +71,18 @@ export const useOrganisationStore: StoreDefinition<
     };
   },
   actions: {
-    async getAllOrganisationen() {
+    async getAllOrganisationen(filter?: OrganisationenFilter) {
       this.loading = true;
       try {
-        const { data }: AxiosResponse<Organisation[]> = await organisationApi.organisationControllerFindOrganizations();
-
+        const { data }: AxiosResponse<Organisation[]> = await organisationApi.organisationControllerFindOrganizations(
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          filter?.searchString,
+          undefined,
+          filter?.systemrechte,
+        );
         this.allOrganisationen = data;
         this.loading = false;
       } catch (error: unknown) {

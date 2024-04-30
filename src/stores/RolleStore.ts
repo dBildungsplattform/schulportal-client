@@ -1,13 +1,13 @@
 import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import { isAxiosError, type AxiosResponse } from 'axios';
 import {
+  RolleApiFactory,
   RollenArt,
   RollenMerkmal,
-  RolleApiFactory,
+  RollenSystemRecht,
   type CreateRolleBodyParams,
   type RolleApiInterface,
   type RolleResponse,
-  RollenSystemRecht,
   type RolleServiceProviderQueryParams,
   type ServiceProviderResponse,
 } from '../api-client/generated/api';
