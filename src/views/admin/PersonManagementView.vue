@@ -51,9 +51,10 @@
       const uebersicht: Uebersicht = personenKontextStore.allUebersichten?.items.find(
         (ueb: Uebersicht) => ueb?.personId === person.person.id,
       );
-      const rollen: string = uebersicht?.zuordnungen.length
-        ? uebersicht.zuordnungen.map((zuordnung: Zuordnung) => zuordnung.rolle).join(', ')
-        : '---';
+      const uniqueRollen: Set<string> = new Set<string>();
+      uebersicht?.zuordnungen.forEach((zuordnung: Zuordnung) => uniqueRollen.add(zuordnung.rolle));
+      const rollen: string = Array.from(uniqueRollen).join(', ');
+
       // Choose sskDstNr if available, otherwise sskName.
       const administrationsebenen: string = uebersicht?.zuordnungen.length
         ? uebersicht.zuordnungen

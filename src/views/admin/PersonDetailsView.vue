@@ -1,11 +1,12 @@
 <script setup lang="ts">
-  import { type Ref, ref, onBeforeMount } from 'vue';
+  import { type Ref, ref, onBeforeMount, computed, type ComputedRef } from 'vue';
   import { type Router, type RouteLocationNormalizedLoaded, useRoute, useRouter } from 'vue-router';
   import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
   import PasswordReset from '@/components/admin/PasswordReset.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
-  import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
+  import { usePersonenkontextStore, type PersonenkontextStore, type Zuordnung } from '@/stores/PersonenkontextStore';
+  import { OrganisationsTyp } from '@/stores/OrganisationStore';
 
   const route: RouteLocationNormalizedLoaded = useRoute();
   const router: Router = useRouter();
@@ -37,10 +38,39 @@
     }
   }
 
-  const handleAlertClose = (): void => {
-    personStore.errorCode = '';
-    navigateToPersonTable();
-  };
+  const getZuordnungen: ComputedRef<Zuordnung[] | undefined> = computed(() => {
+    const zuordnungen: Zuordnung[] | undefined = personenKontextStore.personenuebersicht?.zuordnungen;
+
+    if (!zuordnungen) return;
+
+    const zuordnungenWithKlasse: Zuordnung[] = [];
+
+    for (const zuordnung of zuordnungen) {
+      if (zuordnung.typ === OrganisationsTyp.Klasse) {
+        const administrierendeZuordnung: Zuordnung | undefined = zuordnungen.find(
+          (z) => z.sskId === zuordnung.administriertVon && z.typ !== OrganisationsTyp.Klasse,
+        );
+        if (administrierendeZuordnung) {
+          const klasseWithAdmin: Zuordnung = {
+            ...administrierendeZuordnung,
+            klasse: zuordnung.sskName,
+          };
+          zuordnungenWithKlasse.push(klasseWithAdmin);
+        }
+      } else {
+        zuordnungenWithKlasse.push(zuordnung);
+      }
+    }
+
+    const uniqueZuordnungen: Zuordnung[] = zuordnungenWithKlasse.filter(
+      (zuordnung: Zuordnung, index: number, self: Zuordnung[]) => {
+        const foundIndex: number = self.findIndex((z: Zuordnung) => z.sskId === zuordnung.sskId);
+        return foundIndex === index || 'klasse' in zuordnung;
+      },
+    );
+
+    return uniqueZuordnungen.filter((zuordnung: Zuordnung) => zuordnung.typ !== OrganisationsTyp.Klasse);
+  });
 
   onBeforeMount(async () => {
     await personStore.getPersonById(currentPersonId);
@@ -224,16 +254,12 @@
               cols="10"
               offset-lg="2"
               offset="1"
-              v-for="zuordnung in personenKontextStore.personenuebersicht.zuordnungen"
+              v-for="zuordnung in getZuordnungen"
               :key="zuordnung.sskId"
+              :data-testid="`person-zuordnung-${zuordnung.sskId}`"
+              :title="zuordnung.sskName"
             >
-              <h3
-                class="text-body"
-                :data-testid="`person-zuordnung-${zuordnung.sskId}`"
-                :title="zuordnung.sskName"
-              >
-                {{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
-              </h3>
+              {{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }} {{ zuordnung.klasse }}
             </v-col>
           </v-row>
           <!-- Display 'No data available' if the above condition is false -->
