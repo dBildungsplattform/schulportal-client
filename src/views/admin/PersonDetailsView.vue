@@ -53,7 +53,7 @@
     for (const zuordnung of zuordnungen) {
       if (zuordnung.typ === OrganisationsTyp.Klasse) {
         const administrierendeZuordnung: Zuordnung | undefined = zuordnungen.find(
-          (z) => z.sskId === zuordnung.administriertVon && z.typ !== OrganisationsTyp.Klasse,
+          (z: Zuordnung) => z.sskId === zuordnung.administriertVon && z.typ !== OrganisationsTyp.Klasse,
         );
         if (administrierendeZuordnung) {
           const klasseWithAdmin: Zuordnung = {
