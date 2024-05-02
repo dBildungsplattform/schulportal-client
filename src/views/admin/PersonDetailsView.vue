@@ -50,31 +50,49 @@
 
     const zuordnungenWithKlasse: Map<string, Zuordnung> = new Map();
 
+    // Loop through all Zuordnungen
     for (const zuordnung of zuordnungen) {
+      // If the Zuordnung is of type Klasse
       if (zuordnung.typ === OrganisationsTyp.Klasse) {
-        const administrierendeZuordnung: Zuordnung | undefined = zuordnungen.find(
+        // Find all corresponding parent Zuordnungen
+        const administrierendeZuordnungen: Zuordnung[] = zuordnungen.filter(
           (z: Zuordnung) => z.sskId === zuordnung.administriertVon && z.typ !== OrganisationsTyp.Klasse,
         );
-        if (administrierendeZuordnung) {
-          const existingZuordnung: Zuordnung | undefined = zuordnungenWithKlasse.get(zuordnung.administriertVon);
-          if (existingZuordnung) {
-            existingZuordnung.klasse = existingZuordnung.klasse
-              ? `${existingZuordnung.klasse}, ${zuordnung.sskName}`
-              : zuordnung.sskName;
-          } else {
-            const klasseWithAdmin: Zuordnung = {
-              ...administrierendeZuordnung,
-              klasse: zuordnung.sskName,
-            };
-            zuordnungenWithKlasse.set(zuordnung.administriertVon, klasseWithAdmin);
+
+        // When the parents are found
+        if (administrierendeZuordnungen.length > 0) {
+          for (const administrierendeZuordnung of administrierendeZuordnungen) {
+            // Try to retrieve the child Zuordnung using the administiriertVon property
+            let existingZuordnung: Zuordnung | undefined = zuordnungenWithKlasse.get(
+              administrierendeZuordnung.sskId + administrierendeZuordnung.rolleId,
+            );
+            console.log(existingZuordnung);
+            if (existingZuordnung) {
+              // If the Zuordnung exists then add its sskName to the klasse property comma separated.
+              existingZuordnung.klasse = existingZuordnung.klasse
+                ? `${existingZuordnung.klasse}, ${zuordnung.sskName}`
+                : zuordnung.sskName;
+            } else {
+              // If the Zuordnung doesn't exist then create a new Zuordnung with the klasse attribute and add the sskName to it.
+              // (This will always be executed first when the loop first starts)
+              existingZuordnung = {
+                ...administrierendeZuordnung,
+                klasse: zuordnung.sskName,
+              };
+              zuordnungenWithKlasse.set(
+                administrierendeZuordnung.sskId + administrierendeZuordnung.rolleId,
+                existingZuordnung,
+              );
+            }
           }
         }
       } else {
-        const existingZuordnung: Zuordnung | undefined = zuordnungenWithKlasse.get(zuordnung.sskId);
+        // If the Zuordnung is not of type Klasse
+        const existingZuordnung: Zuordnung | undefined = zuordnungenWithKlasse.get(zuordnung.sskId + zuordnung.rolleId);
         if (existingZuordnung) {
-          zuordnungenWithKlasse.set(zuordnung.sskId, { ...existingZuordnung, ...zuordnung });
+          zuordnungenWithKlasse.set(zuordnung.sskId + zuordnung.rolleId, { ...existingZuordnung, ...zuordnung });
         } else {
-          zuordnungenWithKlasse.set(zuordnung.sskId, zuordnung);
+          zuordnungenWithKlasse.set(zuordnung.sskId + zuordnung.rolleId, zuordnung);
         }
       }
     }
