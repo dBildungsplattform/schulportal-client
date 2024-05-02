@@ -46,7 +46,7 @@ const mockPersonenuebersicht: Uebersicht = {
       sskDstNr: '123459',
       rolle: 'Lern',
       typ: OrganisationsTyp.Klasse,
-      administriertVon: '2',
+      administriertVon: '1',
     },
   ],
 };
