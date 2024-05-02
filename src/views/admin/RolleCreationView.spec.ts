@@ -104,8 +104,6 @@ describe('RolleCreationView', () => {
     );
     rolleStore.createdRolle = {
       id: '3',
-      createdAt: '2022-02-26T16:37:48.244Z',
-      updatedAt: '2022-02-26T16:37:48.244Z',
       administeredBySchulstrukturknoten: '3',
       merkmale: new Set(),
       name: 'Rolle 3',
@@ -115,6 +113,7 @@ describe('RolleCreationView', () => {
     rolleStore.errorCode = '';
     await nextTick();
     expect(wrapper?.find('[data-testid="rolle-success-text"]').exists()).toBe(true);
+    expect(wrapper?.find('[data-testid="created-rolle-angebote"]').exists()).toBe(true);
     wrapper?.find('[data-testid="back-to-list-button"]').trigger('click');
     await nextTick();
     expect(push).toHaveBeenCalledTimes(1);
