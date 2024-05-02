@@ -42,13 +42,13 @@
     personStore.errorCode = '';
     navigateToPersonTable();
   };
-  
+
   const getZuordnungen: ComputedRef<Zuordnung[] | undefined> = computed(() => {
     const zuordnungen: Zuordnung[] | undefined = personenKontextStore.personenuebersicht?.zuordnungen;
 
     if (!zuordnungen) return;
 
-    const zuordnungenWithKlasse: Zuordnung[] = [];
+    const zuordnungenWithKlasse: Map<string, Zuordnung> = new Map();
 
     for (const zuordnung of zuordnungen) {
       if (zuordnung.typ === OrganisationsTyp.Klasse) {
@@ -56,25 +56,29 @@
           (z: Zuordnung) => z.sskId === zuordnung.administriertVon && z.typ !== OrganisationsTyp.Klasse,
         );
         if (administrierendeZuordnung) {
-          const klasseWithAdmin: Zuordnung = {
-            ...administrierendeZuordnung,
-            klasse: zuordnung.sskName,
-          };
-          zuordnungenWithKlasse.push(klasseWithAdmin);
+          const existingZuordnung: Zuordnung | undefined = zuordnungenWithKlasse.get(zuordnung.administriertVon);
+          if (existingZuordnung) {
+            existingZuordnung.klasse = existingZuordnung.klasse
+              ? `${existingZuordnung.klasse}, ${zuordnung.sskName}`
+              : zuordnung.sskName;
+          } else {
+            const klasseWithAdmin: Zuordnung = {
+              ...administrierendeZuordnung,
+              klasse: zuordnung.sskName,
+            };
+            zuordnungenWithKlasse.set(zuordnung.administriertVon, klasseWithAdmin);
+          }
         }
       } else {
-        zuordnungenWithKlasse.push(zuordnung);
+        const existingZuordnung: Zuordnung | undefined = zuordnungenWithKlasse.get(zuordnung.sskId);
+        if (existingZuordnung) {
+          zuordnungenWithKlasse.set(zuordnung.sskId, { ...existingZuordnung, ...zuordnung });
+        } else {
+          zuordnungenWithKlasse.set(zuordnung.sskId, zuordnung);
+        }
       }
     }
-
-    const uniqueZuordnungen: Zuordnung[] = zuordnungenWithKlasse.filter(
-      (zuordnung: Zuordnung, index: number, self: Zuordnung[]) => {
-        const foundIndex: number = self.findIndex((z: Zuordnung) => z.sskId === zuordnung.sskId);
-        return foundIndex === index || 'klasse' in zuordnung;
-      },
-    );
-
-    return uniqueZuordnungen.filter((zuordnung: Zuordnung) => zuordnung.typ !== OrganisationsTyp.Klasse);
+    return Array.from(zuordnungenWithKlasse.values());
   });
 
   onBeforeMount(async () => {
@@ -284,4 +288,3 @@
 </template>
 
 <style></style>
-@/stores/PersonenkontextStore
