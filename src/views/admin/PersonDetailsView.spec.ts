@@ -36,7 +36,7 @@ const mockPersonenuebersicht: Uebersicht = {
       sskName: 'Testschule Birmingham',
       sskDstNr: '123456',
       rolle: 'Lehrer',
-      typ: OrganisationsTyp.Schule,
+      typ: OrganisationsTyp.Klasse,
       administriertVon: '2',
     },
   ],
