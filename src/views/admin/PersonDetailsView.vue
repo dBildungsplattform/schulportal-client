@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { type Ref, ref, onBeforeMount, computed, type ComputedRef } from 'vue';
+  import { type Ref, ref, onBeforeMount, computed, type ComputedRef, watch } from 'vue';
   import { type Router, type RouteLocationNormalizedLoaded, useRoute, useRouter } from 'vue-router';
   import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
   import PasswordReset from '@/components/admin/PasswordReset.vue';
@@ -43,62 +43,57 @@
     navigateToPersonTable();
   };
 
-  const getZuordnungen: ComputedRef<Zuordnung[] | undefined> = computed(() => {
-    const zuordnungen: Zuordnung[] | undefined = personenKontextStore.personenuebersicht?.zuordnungen;
+  const zuordnungenResult = ref<Zuordnung[] | undefined>(undefined);
+
+
+
+  const getZuordnungen = computed(() => zuordnungenResult.value);
+
+  function computeZuordnungen(personenuebersicht: Uebersicht | undefined): Zuordnung[] | undefined {
+    const zuordnungen: Zuordnung[] | undefined = personenuebersicht?.zuordnungen;
 
     if (!zuordnungen) return;
 
     const zuordnungenWithKlasse: Map<string, Zuordnung> = new Map();
 
-    // Loop through all Zuordnungen
     for (const zuordnung of zuordnungen) {
-      // If the Zuordnung is of type Klasse
       if (zuordnung.typ === OrganisationsTyp.Klasse) {
-        // Find all corresponding parent Zuordnungen
         const administrierendeZuordnungen: Zuordnung[] = zuordnungen.filter(
           (z: Zuordnung) => z.sskId === zuordnung.administriertVon && z.typ !== OrganisationsTyp.Klasse,
         );
 
-        // When the parents are found
         if (administrierendeZuordnungen.length > 0) {
           for (const administrierendeZuordnung of administrierendeZuordnungen) {
-            // Try to retrieve the child Zuordnung using the administiriertVon property
-            let existingZuordnung: Zuordnung | undefined = zuordnungenWithKlasse.get(
-              administrierendeZuordnung.sskId + administrierendeZuordnung.rolleId,
-            );
-            console.log(existingZuordnung);
+            const key = administrierendeZuordnung.sskId + administrierendeZuordnung.rolleId;
+            const existingZuordnung = zuordnungenWithKlasse.get(key);
             if (existingZuordnung) {
-              // If the Zuordnung exists then add its sskName to the klasse property comma separated.
               existingZuordnung.klasse = existingZuordnung.klasse
                 ? `${existingZuordnung.klasse}, ${zuordnung.sskName}`
                 : zuordnung.sskName;
             } else {
-              // If the Zuordnung doesn't exist then create a new Zuordnung with the klasse attribute and add the sskName to it.
-              // (This will always be executed first when the loop first starts)
-              existingZuordnung = {
-                ...administrierendeZuordnung,
-                klasse: zuordnung.sskName,
-              };
-              zuordnungenWithKlasse.set(
-                administrierendeZuordnung.sskId + administrierendeZuordnung.rolleId,
-                existingZuordnung,
-              );
+              zuordnungenWithKlasse.set(key, { ...administrierendeZuordnung, klasse: zuordnung.sskName });
             }
           }
         }
       } else {
-        // If the Zuordnung is not of type Klasse
-        const existingZuordnung: Zuordnung | undefined = zuordnungenWithKlasse.get(zuordnung.sskId + zuordnung.rolleId);
+        const key = zuordnung.sskId + zuordnung.rolleId;
+        const existingZuordnung = zuordnungenWithKlasse.get(key);
         if (existingZuordnung) {
-          zuordnungenWithKlasse.set(zuordnung.sskId + zuordnung.rolleId, { ...existingZuordnung, ...zuordnung });
+          zuordnungenWithKlasse.set(key, { ...existingZuordnung, ...zuordnung });
         } else {
-          zuordnungenWithKlasse.set(zuordnung.sskId + zuordnung.rolleId, zuordnung);
+          zuordnungenWithKlasse.set(key, zuordnung);
         }
       }
     }
     return Array.from(zuordnungenWithKlasse.values());
-  });
-
+  }
+  watch(
+    () => personenKontextStore.personenuebersicht,
+    (newValue) => {
+      zuordnungenResult.value = computeZuordnungen(newValue);
+    },
+    { immediate: true },
+  );
   onBeforeMount(async () => {
     await personStore.getPersonById(currentPersonId);
     await personenKontextStore.getPersonenuebersichtById(currentPersonId);
