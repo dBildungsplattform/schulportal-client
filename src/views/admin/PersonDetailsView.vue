@@ -38,6 +38,11 @@
     }
   }
 
+  const handleAlertClose = (): void => {
+    personStore.errorCode = '';
+    navigateToPersonTable();
+  };
+  
   const getZuordnungen: ComputedRef<Zuordnung[] | undefined> = computed(() => {
     const zuordnungen: Zuordnung[] | undefined = personenKontextStore.personenuebersicht?.zuordnungen;
 
