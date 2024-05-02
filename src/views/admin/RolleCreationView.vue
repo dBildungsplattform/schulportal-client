@@ -181,6 +181,21 @@
       .join(', ');
   });
 
+  const translatedCreatedAngebote: ComputedRef<string> = computed(() => {
+    if (
+      !rolleStore.createdRolle?.serviceProviders ||
+      Array.from(rolleStore.createdRolle.serviceProviders).length === 0
+    ) {
+      return '---';
+    }
+
+    return rolleStore.createdRolle.serviceProviders
+      .map((serviceProvider: ServiceProvider) => {
+        return serviceProvider.name;
+      })
+      .join(', ');
+  });
+
   const translatedCreatedSystemrecht: ComputedRef<string> = computed(() => {
     if (!rolleStore.createdRolle?.systemrechte || Array.from(rolleStore.createdRolle.systemrechte).length === 0) {
       return '---';
@@ -563,6 +578,12 @@
               ><span data-testid="created-rolle-merkmale">{{ translatedCreatedRolleMerkmale }}</span></v-col
             ></v-row
           >
+          <v-row>
+            <v-col class="text-body bold text-right"> {{ $t('admin.serviceProvider.assignedServiceProvider') }}:</v-col>
+            <v-col class="text-body">
+              <span data-testid="created-rolle-angebote">{{ translatedCreatedAngebote }}</span>
+            </v-col>
+          </v-row>
           <v-row>
             <v-col class="text-body bold text-right"> {{ $t('admin.rolle.systemrechte') }}:</v-col>
             <v-col class="text-body"

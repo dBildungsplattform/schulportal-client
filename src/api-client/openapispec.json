@@ -1581,6 +1581,57 @@
             }
         },
         "/api/rolle/{rolleId}": {
+            "get": {
+                "operationId": "RolleController_findRolleByIdWithServiceProviders",
+                "summary": "",
+                "description": "Get rolle by id.",
+                "parameters": [
+                    {
+                        "name": "rolleId",
+                        "required": true,
+                        "in": "path",
+                        "description": "The id for the rolle.",
+                        "schema": {
+                            "nullable": false,
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The rolle was successfully returned.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RolleWithServiceProvidersResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Not authorized to get rolle by id."
+                    },
+                    "403": {
+                        "description": "Insufficient permission to get rolle by id."
+                    },
+                    "500": {
+                        "description": "Internal server error while getting rolle by id."
+                    }
+                },
+                "tags": [
+                    "rolle"
+                ],
+                "security": [
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
+                    {
+                        "bearer": []
+                    }
+                ]
+            },
             "patch": {
                 "operationId": "RolleController_addSystemRecht",
                 "summary": "",
@@ -1716,7 +1767,14 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Adding service-provider finished successfully."
+                        "description": "Adding service-provider finished successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ServiceProviderResponse"
+                                }
+                            }
+                        }
                     },
                     "400": {
                         "description": "The service-provider is already attached to rolle."
@@ -1726,6 +1784,9 @@
                     },
                     "404": {
                         "description": "The rolle or the service-provider to add does not exist."
+                    },
+                    "500": {
+                        "description": "Internal server error, the service-provider may could not be found after attaching to rolle."
                     }
                 },
                 "tags": [
@@ -1797,6 +1858,8 @@
         "/api/provider/all": {
             "get": {
                 "operationId": "ProviderController_getAllServiceProviders",
+                "summary": "",
+                "description": "Get all service-providers.",
                 "parameters": [],
                 "responses": {
                     "200": {
@@ -1840,6 +1903,8 @@
         "/api/provider": {
             "get": {
                 "operationId": "ProviderController_getAvailableServiceProviders",
+                "summary": "",
+                "description": "Get service-providers available for logged-in user.",
                 "parameters": [],
                 "responses": {
                     "200": {
