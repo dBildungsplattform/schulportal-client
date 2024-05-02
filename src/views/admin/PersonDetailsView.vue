@@ -5,7 +5,7 @@
   import PasswordReset from '@/components/admin/PasswordReset.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
-  import { usePersonenkontextStore, type PersonenkontextStore, type Zuordnung } from '@/stores/PersonenkontextStore';
+  import { usePersonenkontextStore, type PersonenkontextStore, type Uebersicht, type Zuordnung } from '@/stores/PersonenkontextStore';
   import { OrganisationsTyp } from '@/stores/OrganisationStore';
 
   const route: RouteLocationNormalizedLoaded = useRoute();
@@ -43,13 +43,11 @@
     navigateToPersonTable();
   };
 
-  const zuordnungenResult = ref<Zuordnung[] | undefined>(undefined);
+  const zuordnungenResult: Ref<Zuordnung[] | undefined> = ref<Zuordnung[] | undefined>(undefined);
 
+  const getZuordnungen: ComputedRef<Zuordnung[] | undefined> = computed(() => zuordnungenResult.value);
 
-
-  const getZuordnungen = computed(() => zuordnungenResult.value);
-
-  function computeZuordnungen(personenuebersicht: Uebersicht | undefined): Zuordnung[] | undefined {
+  function computeZuordnungen(personenuebersicht: Uebersicht | null): Zuordnung[] | undefined {
     const zuordnungen: Zuordnung[] | undefined = personenuebersicht?.zuordnungen;
 
     if (!zuordnungen) return;
@@ -64,8 +62,8 @@
 
         if (administrierendeZuordnungen.length > 0) {
           for (const administrierendeZuordnung of administrierendeZuordnungen) {
-            const key = administrierendeZuordnung.sskId + administrierendeZuordnung.rolleId;
-            const existingZuordnung = zuordnungenWithKlasse.get(key);
+            const key: string = administrierendeZuordnung.sskId + administrierendeZuordnung.rolleId;
+            const existingZuordnung: Zuordnung | undefined = zuordnungenWithKlasse.get(key);
             if (existingZuordnung) {
               existingZuordnung.klasse = existingZuordnung.klasse
                 ? `${existingZuordnung.klasse}, ${zuordnung.sskName}`
@@ -76,8 +74,8 @@
           }
         }
       } else {
-        const key = zuordnung.sskId + zuordnung.rolleId;
-        const existingZuordnung = zuordnungenWithKlasse.get(key);
+        const key: string = zuordnung.sskId + zuordnung.rolleId;
+        const existingZuordnung: Zuordnung | undefined = zuordnungenWithKlasse.get(key);
         if (existingZuordnung) {
           zuordnungenWithKlasse.set(key, { ...existingZuordnung, ...zuordnung });
         } else {
@@ -89,7 +87,7 @@
   }
   watch(
     () => personenKontextStore.personenuebersicht,
-    (newValue) => {
+    (newValue: Uebersicht | null) => {
       zuordnungenResult.value = computeZuordnungen(newValue);
     },
     { immediate: true },
