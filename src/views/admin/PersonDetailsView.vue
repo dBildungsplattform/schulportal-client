@@ -5,7 +5,12 @@
   import PasswordReset from '@/components/admin/PasswordReset.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
-  import { usePersonenkontextStore, type PersonenkontextStore, type Uebersicht, type Zuordnung } from '@/stores/PersonenkontextStore';
+  import {
+    usePersonenkontextStore,
+    type PersonenkontextStore,
+    type Uebersicht,
+    type Zuordnung,
+  } from '@/stores/PersonenkontextStore';
   import { OrganisationsTyp } from '@/stores/OrganisationStore';
 
   const route: RouteLocationNormalizedLoaded = useRoute();
@@ -64,12 +69,21 @@
           for (const administrierendeZuordnung of administrierendeZuordnungen) {
             const key: string = administrierendeZuordnung.sskId + administrierendeZuordnung.rolleId;
             const existingZuordnung: Zuordnung | undefined = zuordnungenWithKlasse.get(key);
-            if (existingZuordnung) {
-              existingZuordnung.klasse = existingZuordnung.klasse
-                ? `${existingZuordnung.klasse}, ${zuordnung.sskName}`
-                : zuordnung.sskName;
+            if (administrierendeZuordnung.rolle === 'SuS') {
+              if (existingZuordnung) {
+                zuordnungenWithKlasse.set(key + zuordnung.sskName, {
+                  ...administrierendeZuordnung,
+                  klasse: zuordnung.sskName,
+                });
+              } else {
+                zuordnungenWithKlasse.set(key, { ...administrierendeZuordnung, klasse: zuordnung.sskName });
+              }
             } else {
-              zuordnungenWithKlasse.set(key, { ...administrierendeZuordnung, klasse: zuordnung.sskName });
+              if (existingZuordnung) {
+                zuordnungenWithKlasse.set(key, { ...existingZuordnung, ...zuordnung });
+              } else {
+                zuordnungenWithKlasse.set(key, zuordnung);
+              }
             }
           }
         }
@@ -92,6 +106,7 @@
     },
     { immediate: true },
   );
+
   onBeforeMount(async () => {
     await personStore.getPersonById(currentPersonId);
     await personenKontextStore.getPersonenuebersichtById(currentPersonId);
