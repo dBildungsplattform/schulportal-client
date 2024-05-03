@@ -57,47 +57,35 @@
 
     if (!zuordnungen) return;
 
-    const zuordnungenWithKlasse: Map<string, Zuordnung> = new Map();
+    const result: Zuordnung[] = [];
 
-    for (const zuordnung of zuordnungen) {
-      if (zuordnung.typ === OrganisationsTyp.Klasse) {
-        const administrierendeZuordnungen: Zuordnung[] = zuordnungen.filter(
-          (z: Zuordnung) => z.sskId === zuordnung.administriertVon && z.typ !== OrganisationsTyp.Klasse,
-        );
+    // Add every klasse to result
+    for (const klasse of zuordnungen.filter((z: Zuordnung) => z.typ === OrganisationsTyp.Klasse)) {
+      const administrierendeZuordnung: Zuordnung | undefined = zuordnungen.find(
+        (z: Zuordnung) =>
+          z.sskId === klasse.administriertVon && z.rolleId === klasse.rolleId && z.typ !== OrganisationsTyp.Klasse,
+      );
 
-        if (administrierendeZuordnungen.length > 0) {
-          for (const administrierendeZuordnung of administrierendeZuordnungen) {
-            const key: string = administrierendeZuordnung.sskId + administrierendeZuordnung.rolleId;
-            const existingZuordnung: Zuordnung | undefined = zuordnungenWithKlasse.get(key);
-            if (administrierendeZuordnung.rolle === 'SuS') {
-              if (existingZuordnung) {
-                zuordnungenWithKlasse.set(key + zuordnung.sskName, {
-                  ...administrierendeZuordnung,
-                  klasse: zuordnung.sskName,
-                });
-              } else {
-                zuordnungenWithKlasse.set(key, { ...administrierendeZuordnung, klasse: zuordnung.sskName });
-              }
-            } else {
-              if (existingZuordnung) {
-                zuordnungenWithKlasse.set(key, { ...existingZuordnung, ...zuordnung });
-              } else {
-                zuordnungenWithKlasse.set(key, zuordnung);
-              }
-            }
-          }
-        }
-      } else {
-        const key: string = zuordnung.sskId + zuordnung.rolleId;
-        const existingZuordnung: Zuordnung | undefined = zuordnungenWithKlasse.get(key);
-        if (existingZuordnung) {
-          zuordnungenWithKlasse.set(key, { ...existingZuordnung, ...zuordnung });
-        } else {
-          zuordnungenWithKlasse.set(key, zuordnung);
-        }
+      if (administrierendeZuordnung) {
+        result.push({
+          ...administrierendeZuordnung,
+          klasse: klasse.sskName,
+        });
       }
     }
-    return Array.from(zuordnungenWithKlasse.values());
+    // Add zuordnungen without any klassen
+    for (const orga of zuordnungen.filter((z: Zuordnung) => z.typ !== OrganisationsTyp.Klasse)) {
+      if (!result.find((z: Zuordnung) => z.sskId === orga.sskId && z.rolleId === orga.rolleId)) {
+        result.push(orga);
+      }
+    }
+    // Sort by klasse, rolle and SSK (optional)
+    result
+      .sort((a: Zuordnung, b: Zuordnung) => (a.klasse && b.klasse ? a.klasse.localeCompare(b.klasse) : 0))
+      .sort((a: Zuordnung, b: Zuordnung) => a.rolle.localeCompare(b.rolle))
+      .sort((a: Zuordnung, b: Zuordnung) => a.sskDstNr.localeCompare(b.sskDstNr));
+
+    return result;
   }
   watch(
     () => personenKontextStore.personenuebersicht,
@@ -106,7 +94,6 @@
     },
     { immediate: true },
   );
-
   onBeforeMount(async () => {
     await personStore.getPersonById(currentPersonId);
     await personenKontextStore.getPersonenuebersichtById(currentPersonId);
