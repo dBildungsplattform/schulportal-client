@@ -59,13 +59,18 @@
 
     const result: Zuordnung[] = [];
 
+    // Extract all Klassen from the Zuordnungen
+    const klassen: Zuordnung[] = zuordnungen.filter(
+      (zuordnung: Zuordnung) => zuordnung.typ === OrganisationsTyp.Klasse,
+    );
     // Add every klasse to result
-    for (const klasse of zuordnungen.filter((z: Zuordnung) => z.typ === OrganisationsTyp.Klasse)) {
+    for (const klasse of klassen) {
+      // Find the specific parent of every Klasse (The rolle in the Klasse should also be the same role in the Parent (Schule))
       const administrierendeZuordnung: Zuordnung | undefined = zuordnungen.find(
         (z: Zuordnung) =>
           z.sskId === klasse.administriertVon && z.rolleId === klasse.rolleId && z.typ !== OrganisationsTyp.Klasse,
       );
-
+      // If the parent is found then add the Klasse property to it
       if (administrierendeZuordnung) {
         result.push({
           ...administrierendeZuordnung,
@@ -73,10 +78,15 @@
         });
       }
     }
-    // Add zuordnungen without any klassen
-    for (const orga of zuordnungen.filter((z: Zuordnung) => z.typ !== OrganisationsTyp.Klasse)) {
-      if (!result.find((z: Zuordnung) => z.sskId === orga.sskId && z.rolleId === orga.rolleId)) {
-        result.push(orga);
+    // Other Zuordnungen not of typ Klasse
+    const otherZuordnungen: Zuordnung[] = zuordnungen.filter(
+      (zuordnung: Zuordnung) => zuordnung.typ !== OrganisationsTyp.Klasse,
+    );
+
+    for (const zuordnung of otherZuordnungen) {
+      // Only add Zuordnungen that don't have the same sskId and rolleId to avoid redundancy in the final result
+      if (!result.find((z: Zuordnung) => z.sskId === zuordnung.sskId && z.rolleId === zuordnung.rolleId)) {
+        result.push(zuordnung);
       }
     }
     // Sort by klasse, rolle and SSK (optional)
