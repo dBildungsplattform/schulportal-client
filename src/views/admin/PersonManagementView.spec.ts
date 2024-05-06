@@ -39,6 +39,7 @@ beforeEach(() => {
             sskDstNr: 'string',
             rolle: 'string',
             typ: OrganisationsTyp.Klasse,
+            administriertVon: 'string',
           },
         ],
       },
