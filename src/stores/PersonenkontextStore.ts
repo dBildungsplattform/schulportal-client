@@ -87,6 +87,13 @@ type PersonenkontextActions = {
 
 export type { SystemrechtResponse };
 export type CreatedPersonenkontext = DBiamCreatePersonenkontextBodyParams;
+export type UserinfoPersonenkontext = {
+  organisationsId: string;
+  rolle: {
+    systemrechte: string[];
+    serviceProviderIds: string[];
+  };
+};
 
 export type PersonenkontextStore = Store<
   'personenkontextStore',
