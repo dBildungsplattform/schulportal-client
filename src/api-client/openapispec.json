@@ -1003,6 +1003,17 @@
                                 "$ref": "#/components/schemas/RollenSystemRecht"
                             }
                         }
+                    },
+                    {
+                        "name": "excludeTyp",
+                        "required": false,
+                        "in": "query",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/components/schemas/OrganisationsTyp"
+                            }
+                        }
                     }
                 ],
                 "responses": {
@@ -2494,6 +2505,11 @@
                 ],
                 "security": [
                     {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
+                    {
                         "bearer": []
                     }
                 ]
@@ -2560,6 +2576,11 @@
                 ],
                 "security": [
                     {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
+                    {
                         "bearer": []
                     }
                 ]
@@ -2594,6 +2615,42 @@
             }
         },
         "schemas": {
+            "RollenSystemRechtServiceProviderIDResponse": {
+                "type": "object",
+                "properties": {
+                    "systemrechte": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "serviceProviderIds": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "required": [
+                    "systemrechte",
+                    "serviceProviderIds"
+                ]
+            },
+            "PersonenkontextRolleFieldsResponse": {
+                "type": "object",
+                "properties": {
+                    "organisationsId": {
+                        "type": "string"
+                    },
+                    "rolle": {
+                        "$ref": "#/components/schemas/RollenSystemRechtServiceProviderIDResponse"
+                    }
+                },
+                "required": [
+                    "organisationsId",
+                    "rolle"
+                ]
+            },
             "UserinfoResponse": {
                 "type": "object",
                 "properties": {
@@ -2671,6 +2728,12 @@
                     "updated_at": {
                         "type": "number",
                         "nullable": true
+                    },
+                    "personenkontexte": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PersonenkontextRolleFieldsResponse"
+                        }
                     }
                 },
                 "required": [
@@ -2692,7 +2755,8 @@
                     "zoneinfo",
                     "locale",
                     "phone_number",
-                    "updated_at"
+                    "updated_at",
+                    "personenkontexte"
                 ]
             },
             "PersonNameParams": {

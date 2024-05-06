@@ -1,6 +1,11 @@
 <script setup lang="ts">
   import { ref, type Ref, onMounted, onUnmounted, computed, type ComputedRef } from 'vue';
-  import { useOrganisationStore, type OrganisationStore, type Organisation } from '@/stores/OrganisationStore';
+  import {
+    useOrganisationStore,
+    type OrganisationStore,
+    type Organisation,
+    OrganisationsTyp,
+  } from '@/stores/OrganisationStore';
   import {
     useRolleStore,
     type RolleStore,
@@ -236,7 +241,10 @@
 
   onMounted(async () => {
     rolleStore.createdRolle = null;
-    await organisationStore.getAllOrganisationen({ systemrechte: ['ROLLEN_VERWALTEN'] });
+    await organisationStore.getAllOrganisationen({
+      systemrechte: ['ROLLEN_VERWALTEN'],
+      excludeTyp: [OrganisationsTyp.Klasse],
+    });
     await serviceProviderStore.getAllServiceProviders();
 
     // Iterate over the enum values
