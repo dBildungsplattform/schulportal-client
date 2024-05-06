@@ -100,7 +100,7 @@
     <v-divider></v-divider>
 
     <!-- Benutzerverwaltung -->
-    <div v-if="authStore.hasRollenverwaltungPermission">
+    <div v-if="authStore.hasPersonenverwaltungPermission">
       <v-list-item
         class="menu-bar-main-item headline-2"
         data-testid="person-management-title"
@@ -192,7 +192,7 @@
     </div>
 
     <!-- Schulträgerverwaltung -->
-    <div v-if="authStore.hasRollenverwaltungPermission">
+    <div v-if="authStore.hasSchultraegerverwaltungPermission">
       <v-list-item
         class="menu-bar-main-item headline-2"
         data-testid="schultraeger-management-title"
