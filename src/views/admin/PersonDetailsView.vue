@@ -1,11 +1,17 @@
 <script setup lang="ts">
-  import { type Ref, ref, onBeforeMount } from 'vue';
+  import { type Ref, ref, onBeforeMount, computed, type ComputedRef, watch } from 'vue';
   import { type Router, type RouteLocationNormalizedLoaded, useRoute, useRouter } from 'vue-router';
   import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
   import PasswordReset from '@/components/admin/PasswordReset.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
-  import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
+  import {
+    usePersonenkontextStore,
+    type PersonenkontextStore,
+    type Uebersicht,
+    type Zuordnung,
+  } from '@/stores/PersonenkontextStore';
+  import { OrganisationsTyp } from '@/stores/OrganisationStore';
 
   const route: RouteLocationNormalizedLoaded = useRoute();
   const router: Router = useRouter();
@@ -42,6 +48,62 @@
     navigateToPersonTable();
   };
 
+  const zuordnungenResult: Ref<Zuordnung[] | undefined> = ref<Zuordnung[] | undefined>(undefined);
+
+  const getZuordnungen: ComputedRef<Zuordnung[] | undefined> = computed(() => zuordnungenResult.value);
+
+  function computeZuordnungen(personenuebersicht: Uebersicht | null): Zuordnung[] | undefined {
+    const zuordnungen: Zuordnung[] | undefined = personenuebersicht?.zuordnungen;
+
+    if (!zuordnungen) return;
+
+    const result: Zuordnung[] = [];
+
+    // Extract all Klassen from the Zuordnungen
+    const klassen: Zuordnung[] = zuordnungen.filter(
+      (zuordnung: Zuordnung) => zuordnung.typ === OrganisationsTyp.Klasse,
+    );
+    // Add every klasse to result
+    for (const klasse of klassen) {
+      // Find the specific parent of every Klasse (The rolle in the Klasse should also be the same role in the Parent (Schule))
+      const administrierendeZuordnung: Zuordnung | undefined = zuordnungen.find(
+        (z: Zuordnung) =>
+          z.sskId === klasse.administriertVon && z.rolleId === klasse.rolleId && z.typ !== OrganisationsTyp.Klasse,
+      );
+      // If the parent is found then add the Klasse property to it
+      if (administrierendeZuordnung) {
+        result.push({
+          ...administrierendeZuordnung,
+          klasse: klasse.sskName,
+        });
+      }
+    }
+    // Other Zuordnungen not of typ Klasse
+    const otherZuordnungen: Zuordnung[] = zuordnungen.filter(
+      (zuordnung: Zuordnung) => zuordnung.typ !== OrganisationsTyp.Klasse,
+    );
+
+    for (const zuordnung of otherZuordnungen) {
+      // Only add Zuordnungen that don't have the same sskId and rolleId to avoid redundancy in the final result
+      if (!result.find((z: Zuordnung) => z.sskId === zuordnung.sskId && z.rolleId === zuordnung.rolleId)) {
+        result.push(zuordnung);
+      }
+    }
+    // Sort by klasse, rolle and SSK (optional)
+    result
+      .sort((a: Zuordnung, b: Zuordnung) => (a.klasse && b.klasse ? a.klasse.localeCompare(b.klasse) : 0))
+      .sort((a: Zuordnung, b: Zuordnung) => a.rolle.localeCompare(b.rolle))
+      .sort((a: Zuordnung, b: Zuordnung) => a.sskDstNr.localeCompare(b.sskDstNr));
+
+    return result;
+  }
+  watch(
+    () => personenKontextStore.personenuebersicht,
+    (newValue: Uebersicht | null) => {
+      zuordnungenResult.value = computeZuordnungen(newValue);
+    },
+    { immediate: true },
+  );
   onBeforeMount(async () => {
     await personStore.getPersonById(currentPersonId);
     await personenKontextStore.getPersonenuebersichtById(currentPersonId);
@@ -224,16 +286,12 @@
               cols="10"
               offset-lg="2"
               offset="1"
-              v-for="zuordnung in personenKontextStore.personenuebersicht.zuordnungen"
+              v-for="zuordnung in getZuordnungen"
               :key="zuordnung.sskId"
+              :data-testid="`person-zuordnung-${zuordnung.sskId}`"
+              :title="zuordnung.sskName"
             >
-              <h3
-                class="text-body"
-                :data-testid="`person-zuordnung-${zuordnung.sskId}`"
-                :title="zuordnung.sskName"
-              >
-                {{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
-              </h3>
+              {{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }} {{ zuordnung.klasse }}
             </v-col>
           </v-row>
           <!-- Display 'No data available' if the above condition is false -->
@@ -253,4 +311,3 @@
 </template>
 
 <style></style>
-@/stores/PersonenkontextStore

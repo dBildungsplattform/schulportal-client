@@ -35,8 +35,27 @@ const mockPersonenuebersicht: Uebersicht = {
       rolleId: '1',
       sskName: 'Testschule Birmingham',
       sskDstNr: '123456',
-      rolle: 'Lehrer',
+      rolle: 'SuS',
       typ: OrganisationsTyp.Schule,
+      administriertVon: '2',
+    },
+    {
+      sskId: '1',
+      rolleId: '4',
+      sskName: 'Testschule London',
+      sskDstNr: '123459',
+      rolle: 'SuS',
+      typ: OrganisationsTyp.Schule,
+      administriertVon: '2',
+    },
+    {
+      sskId: '2',
+      rolleId: '1',
+      sskName: '9a',
+      sskDstNr: '123459',
+      rolle: 'SuS',
+      typ: OrganisationsTyp.Klasse,
+      administriertVon: '1',
     },
   ],
 };
@@ -75,7 +94,7 @@ describe('PersonDetailsView', () => {
     expect(wrapper?.find('[data-testid="person-vorname"]').text()).toBe('John');
     expect(wrapper?.find('[data-testid="person-familienname"]').text()).toBe('Orton');
     expect(wrapper?.find('[data-testid="person-username"]').text()).toBe('jorton');
-    expect(wrapper?.find('[data-testid="person-zuordnung-1"]').text()).toBe('123456 (Testschule Birmingham): Lehrer');
+    expect(wrapper?.find('[data-testid="person-zuordnung-1"]').text()).toBe('123456 (Testschule Birmingham): SuS 9a');
   });
 
   test('it navigates back to user table', async () => {
