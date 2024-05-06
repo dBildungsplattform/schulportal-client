@@ -1091,6 +1091,25 @@ export interface PersonenkontextResponse {
     'revision': string;
 }
 /**
+ * 
+ * @export
+ * @interface PersonenkontextRolleFieldsResponse
+ */
+export interface PersonenkontextRolleFieldsResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonenkontextRolleFieldsResponse
+     */
+    'organisationsId': string;
+    /**
+     * 
+     * @type {RollenSystemRechtServiceProviderIDResponse}
+     * @memberof PersonenkontextRolleFieldsResponse
+     */
+    'rolle': RollenSystemRechtServiceProviderIDResponse;
+}
+/**
  * The new personenstatus of the personenkontext.
  * @export
  * @enum {string}
@@ -1347,6 +1366,25 @@ export const RollenSystemRecht = {
 export type RollenSystemRecht = typeof RollenSystemRecht[keyof typeof RollenSystemRecht];
 
 
+/**
+ * 
+ * @export
+ * @interface RollenSystemRechtServiceProviderIDResponse
+ */
+export interface RollenSystemRechtServiceProviderIDResponse {
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof RollenSystemRechtServiceProviderIDResponse
+     */
+    'systemrechte': Array<string>;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof RollenSystemRechtServiceProviderIDResponse
+     */
+    'serviceProviderIds': Array<string>;
+}
 /**
  * 
  * @export
@@ -1784,6 +1822,12 @@ export interface UserinfoResponse {
      * @memberof UserinfoResponse
      */
     'updated_at': number | null;
+    /**
+     * 
+     * @type {Array<PersonenkontextRolleFieldsResponse>}
+     * @memberof UserinfoResponse
+     */
+    'personenkontexte': Array<PersonenkontextRolleFieldsResponse>;
 }
 /**
  * 
@@ -4308,6 +4352,10 @@ export const PersonenkontextApiAxiosParamCreator = function (configuration?: Con
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
             if (rolleName !== undefined) {
                 localVarQueryParameter['rolleName'] = rolleName;
             }
@@ -4353,6 +4401,10 @@ export const PersonenkontextApiAxiosParamCreator = function (configuration?: Con
             // authentication bearer required
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
 
             if (rolleId !== undefined) {
                 localVarQueryParameter['rolleId'] = rolleId;
