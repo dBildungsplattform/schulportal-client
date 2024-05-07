@@ -7,7 +7,7 @@
     type PersonStore,
     type PersonendatensatzResponse,
   } from '@/stores/PersonStore';
-  import { type RolleStore, useRolleStore, type RolleResponse } from '@/stores/RolleStore';
+  import { type RolleStore, useRolleStore, type RolleResponse, RollenArt } from '@/stores/RolleStore';
   import { type ComputedRef, computed, onMounted, onUnmounted, type Ref, ref, watch } from 'vue';
   import {
     onBeforeRouteLeave,
@@ -150,7 +150,14 @@
     }
   });
 
-  const rollen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
+  const rollen: ComputedRef<
+    | {
+        value: string;
+        title: string;
+        Rollenart: RollenArt;
+      }[]
+    | undefined
+  > = computed(() => {
     // If searchInput is less than 3 characters, return the initial 25 roles from the rolleStore
     if (searchInputRollen.value.length < 3) {
       return rolleStore.allRollen
@@ -158,6 +165,7 @@
         .map((rolle: RolleResponse) => ({
           value: rolle.id,
           title: rolle.name,
+          Rollenart: rolle.rollenart, // Include Rollenart in the object
         }))
         .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
     } else {
@@ -167,10 +175,25 @@
         .map((rolle: RolleResponse) => ({
           value: rolle.id,
           title: rolle.name,
+          Rollenart: rolle.rollenart, // Include Rollenart in the object
         }))
         .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
     }
   });
+
+  // Define a method to check if the selected Rolle is of type "Lern"
+  function isLernRolle(selectedRolleId: string): boolean {
+    const rolle:
+      | {
+          value: string;
+          title: string;
+          Rollenart: RollenArt;
+        }
+      | undefined = rollen.value?.find(
+      (r: { value: string; title: string; Rollenart: RollenArt }) => r.value === selectedRolleId,
+    );
+    return !!rolle && rolle.Rollenart === 'LERN';
+  }
 
   const organisationen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
     return personenkontextStore.filteredOrganisationen?.moeglicheSsks
@@ -420,33 +443,34 @@
               v-model:search="searchInputOrganisation"
             ></v-autocomplete>
           </FormRow>
-
-          <!-- Klasse zuordnen -->
-          <v-row>
-            <h3 class="headline-3">3. {{ $t('admin.klasse.assignKlasse') }}</h3>
-          </v-row>
-          <FormRow
-            :errorLabel="selectedKlasseProps['error']"
-            labelForId="klasse-select"
-            :label="$t('admin.klasse.klasse')"
-          >
-            <v-autocomplete
-              autocomplete="off"
-              clearable
-              data-testid="klasse-select"
-              density="compact"
-              id="klasse-select"
-              :items="klassen"
-              item-value="value"
-              item-text="title"
-              :no-data-text="$t('noDataFound')"
-              :placeholder="$t('admin.klasse.selectKlasse')"
-              variant="outlined"
-              v-bind="selectedKlasseProps"
-              v-model="selectedKlasse"
-              v-model:search="searchInputKlasse"
-            ></v-autocomplete>
-          </FormRow>
+          <template v-if="selectedRolle && isLernRolle(selectedRolle)">
+            <!-- Klasse zuordnen -->
+            <v-row>
+              <h3 class="headline-3">3. {{ $t('admin.klasse.assignKlasse') }}</h3>
+            </v-row>
+            <FormRow
+              :errorLabel="selectedKlasseProps['error']"
+              labelForId="klasse-select"
+              :label="$t('admin.klasse.klasse')"
+            >
+              <v-autocomplete
+                autocomplete="off"
+                clearable
+                data-testid="klasse-select"
+                density="compact"
+                id="klasse-select"
+                :items="klassen"
+                item-value="value"
+                item-text="title"
+                :no-data-text="$t('noDataFound')"
+                :placeholder="$t('admin.klasse.selectKlasse')"
+                variant="outlined"
+                v-bind="selectedKlasseProps"
+                v-model="selectedKlasse"
+                v-model:search="searchInputKlasse"
+              ></v-autocomplete>
+            </FormRow>
+          </template>
         </div>
       </FormWrapper>
     </template>
