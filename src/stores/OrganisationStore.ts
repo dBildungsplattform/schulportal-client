@@ -41,7 +41,7 @@ type OrganisationGetters = {};
 type OrganisationActions = {
   getAllOrganisationen: (filter?: OrganisationenFilter) => Promise<void>;
   getKlassenByOrganisationId: (organisationId: string, searchFilter?: string) => Promise<void>;
-  getOrganisationById: (organisationId: string, searchFilter: string) => Promise<Organisation>;
+  getOrganisationById: (organisationId: string) => Promise<Organisation>;
   createOrganisation: (
     kennung: string,
     name: string,
