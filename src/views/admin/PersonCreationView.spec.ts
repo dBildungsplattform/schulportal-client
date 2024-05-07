@@ -1,15 +1,45 @@
 import { expect, test } from 'vitest';
 import { VueWrapper, mount } from '@vue/test-utils';
 import PersonCreationView from './PersonCreationView.vue';
+import { OrganisationsTyp, type OrganisationStore } from '@/stores/OrganisationStore';
+import type { PersonenkontextStore } from '@/stores/PersonenkontextStore';
 
 let wrapper: VueWrapper | null = null;
-
+let organisationStore: OrganisationStore;
+let personenkontextStore: PersonenkontextStore;
 beforeEach(() => {
   document.body.innerHTML = `
     <div>
       <div id="app"></div>
     </div>
   `;
+
+  personenkontextStore.filteredOrganisationen = {
+    moeglicheSsks: [
+      {
+        id: 'string',
+        kennung: 'string',
+        name: 'Organisation1',
+        namensergaenzung: 'string',
+        kuerzel: 'string',
+        typ: 'TRAEGER',
+        administriertVon: '1',
+      },
+    ],
+    total: 0,
+  };
+
+  organisationStore.klassen = [
+    {
+      id: '1',
+      kennung: 'Org1',
+      name: '9a',
+      namensergaenzung: 'Ergänzung',
+      kuerzel: 'O1',
+      typ: OrganisationsTyp.Klasse,
+      administriertVon: '1',
+    },
+  ];
 
   wrapper = mount(PersonCreationView, {
     attachTo: document.getElementById('app') || '',
