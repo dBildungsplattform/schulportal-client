@@ -150,6 +150,15 @@
     }
   });
 
+  // Watcher to detect when the search input for Klassen is triggered.
+  watch(searchInputKlasse, async (newValue: string, _oldValue: string) => {
+    if (newValue.length >= 1) {
+      organisationStore.getKlassenByOrganisationId(selectedOrganisation.value, newValue);
+    } else {
+      organisationStore.getKlassenByOrganisationId(selectedOrganisation.value);
+    }
+  });
+
   const rollen: ComputedRef<
     | {
         value: string;
@@ -445,11 +454,9 @@
           </FormRow>
           <template v-if="selectedRolle && isLernRolle(selectedRolle)">
             <!-- Klasse zuordnen -->
-            <v-row>
-              <h3 class="headline-3">3. {{ $t('admin.klasse.assignKlasse') }}</h3>
-            </v-row>
             <FormRow
               :errorLabel="selectedKlasseProps['error']"
+              :isRequired="true"
               labelForId="klasse-select"
               :label="$t('admin.klasse.klasse')"
             >

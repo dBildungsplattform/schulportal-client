@@ -2812,10 +2812,11 @@ export const OrganisationenApiAxiosParamCreator = function (configuration?: Conf
         /**
          * 
          * @param {string} organisationId The id of an organization
+         * @param {string} [searchFilter] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        organisationControllerGetAdministrierteOrganisationen: async (organisationId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        organisationControllerGetAdministrierteOrganisationen: async (organisationId: string, searchFilter?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'organisationId' is not null or undefined
             assertParamExists('organisationControllerGetAdministrierteOrganisationen', 'organisationId', organisationId)
             const localVarPath = `/api/organisationen/{organisationId}/administriert`
@@ -2838,6 +2839,10 @@ export const OrganisationenApiAxiosParamCreator = function (configuration?: Conf
             // authentication oauth2 required
             // oauth required
             await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+            if (searchFilter !== undefined) {
+                localVarQueryParameter['searchFilter'] = searchFilter;
+            }
 
 
     
@@ -3047,11 +3052,12 @@ export const OrganisationenApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @param {string} organisationId The id of an organization
+         * @param {string} [searchFilter] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async organisationControllerGetAdministrierteOrganisationen(organisationId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<OrganisationResponseLegacy>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.organisationControllerGetAdministrierteOrganisationen(organisationId, options);
+        async organisationControllerGetAdministrierteOrganisationen(organisationId: string, searchFilter?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<OrganisationResponseLegacy>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.organisationControllerGetAdministrierteOrganisationen(organisationId, searchFilter, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -3151,11 +3157,12 @@ export const OrganisationenApiFactory = function (configuration?: Configuration,
         /**
          * 
          * @param {string} organisationId The id of an organization
+         * @param {string} [searchFilter] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        organisationControllerGetAdministrierteOrganisationen(organisationId: string, options?: any): AxiosPromise<Array<OrganisationResponseLegacy>> {
-            return localVarFp.organisationControllerGetAdministrierteOrganisationen(organisationId, options).then((request) => request(axios, basePath));
+        organisationControllerGetAdministrierteOrganisationen(organisationId: string, searchFilter?: string, options?: any): AxiosPromise<Array<OrganisationResponseLegacy>> {
+            return localVarFp.organisationControllerGetAdministrierteOrganisationen(organisationId, searchFilter, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -3250,11 +3257,12 @@ export interface OrganisationenApiInterface {
     /**
      * 
      * @param {string} organisationId The id of an organization
+     * @param {string} [searchFilter] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrganisationenApiInterface
      */
-    organisationControllerGetAdministrierteOrganisationen(organisationId: string, options?: AxiosRequestConfig): AxiosPromise<Array<OrganisationResponseLegacy>>;
+    organisationControllerGetAdministrierteOrganisationen(organisationId: string, searchFilter?: string, options?: AxiosRequestConfig): AxiosPromise<Array<OrganisationResponseLegacy>>;
 
     /**
      * 
@@ -3359,12 +3367,13 @@ export class OrganisationenApi extends BaseAPI implements OrganisationenApiInter
     /**
      * 
      * @param {string} organisationId The id of an organization
+     * @param {string} [searchFilter] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrganisationenApi
      */
-    public organisationControllerGetAdministrierteOrganisationen(organisationId: string, options?: AxiosRequestConfig) {
-        return OrganisationenApiFp(this.configuration).organisationControllerGetAdministrierteOrganisationen(organisationId, options).then((request) => request(this.axios, this.basePath));
+    public organisationControllerGetAdministrierteOrganisationen(organisationId: string, searchFilter?: string, options?: AxiosRequestConfig) {
+        return OrganisationenApiFp(this.configuration).organisationControllerGetAdministrierteOrganisationen(organisationId, searchFilter, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

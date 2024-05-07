@@ -40,8 +40,8 @@ export type OrganisationenFilter = {
 type OrganisationGetters = {};
 type OrganisationActions = {
   getAllOrganisationen: (filter?: OrganisationenFilter) => Promise<void>;
-  getKlassenByOrganisationId: (organisationId: string) => Promise<void>;
-  getOrganisationById: (organisationId: string) => Promise<Organisation>;
+  getKlassenByOrganisationId: (organisationId: string, searchFilter?: string) => Promise<void>;
+  getOrganisationById: (organisationId: string, searchFilter: string) => Promise<Organisation>;
   createOrganisation: (
     kennung: string,
     name: string,
@@ -117,12 +117,12 @@ export const useOrganisationStore: StoreDefinition<
         return Promise.reject(this.errorCode);
       }
     },
-    async getKlassenByOrganisationId(organisationId: string) {
+    async getKlassenByOrganisationId(organisationId: string, searchFilter?: string) {
       this.errorCode = '';
       this.loading = true;
       try {
         const { data }: { data: Organisation[] } =
-          await organisationApi.organisationControllerGetAdministrierteOrganisationen(organisationId);
+          await organisationApi.organisationControllerGetAdministrierteOrganisationen(organisationId, searchFilter);
 
         this.klassen = data;
         this.loading = false;
