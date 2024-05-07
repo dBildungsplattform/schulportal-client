@@ -70,6 +70,7 @@
     selectedVorname: string;
     selectedFamilienname: string;
     selectedOrganisation: string;
+    selectedKlasse: string;
   };
 
   type TranslatedObject = {
@@ -98,9 +99,14 @@
     Ref<string>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedOrganisation', vuetifyConfig);
+  const [selectedKlasse, selectedKlasseProps]: [
+    Ref<string>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = defineField('selectedKlasse', vuetifyConfig);
 
   const searchInputRollen: Ref<string> = ref('');
   const searchInputOrganisation: Ref<string> = ref('');
+  const searchInputKlasse: Ref<string> = ref('');
   // Watcher to detect when the search input for Rollen has 3 or more characters to trigger filtering.
   watch(searchInputRollen, async (newValue: string, _oldValue: string) => {
     if (newValue.length >= 3) {
@@ -118,6 +124,20 @@
     if (newValue !== oldValue) {
       // Call fetch with an empty string to get the initial organizations for the selected role without any filter
       personenkontextStore.getPersonenkontextAdministrationsebeneWithFilter(newValue, '', 25);
+    }
+  });
+
+  // Watcher to detect when the Organisationsebene is selected so the Klasse show all the possible choices using that value.
+  watch(selectedOrganisation, (newValue: string, oldValue: string) => {
+    // This checks if `selectedOrganisation` is cleared or set to a falsy value
+    if (!newValue) {
+      resetField('selectedKlasse');
+      return;
+    }
+
+    if (newValue !== oldValue) {
+      // Call fetch with an empty string to get the initial organizations for the selected role without any filter
+      organisationStore.getKlassenByOrganisationId(newValue);
     }
   });
   // Watcher to detect when the search input for Organisationen is triggered.
@@ -158,6 +178,16 @@
       .map((org: Organisation) => ({
         value: org.id,
         title: org.kennung ? `${org.kennung} (${org.name})` : org.name,
+      }))
+      .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
+  });
+
+  const klassen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
+    return organisationStore.klassen
+      .slice(0, 25)
+      .map((org: Organisation) => ({
+        value: org.id,
+        title: org.name,
       }))
       .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
   });
@@ -388,6 +418,33 @@
               v-bind="selectedOrganisationProps"
               v-model="selectedOrganisation"
               v-model:search="searchInputOrganisation"
+            ></v-autocomplete>
+          </FormRow>
+
+          <!-- Klasse zuordnen -->
+          <v-row>
+            <h3 class="headline-3">3. {{ $t('admin.klasse.assignKlasse') }}</h3>
+          </v-row>
+          <FormRow
+            :errorLabel="selectedKlasseProps['error']"
+            labelForId="klasse-select"
+            :label="$t('admin.klasse.klasse')"
+          >
+            <v-autocomplete
+              autocomplete="off"
+              clearable
+              data-testid="klasse-select"
+              density="compact"
+              id="klasse-select"
+              :items="klassen"
+              item-value="value"
+              item-text="title"
+              :no-data-text="$t('noDataFound')"
+              :placeholder="$t('admin.klasse.selectKlasse')"
+              variant="outlined"
+              v-bind="selectedKlasseProps"
+              v-model="selectedKlasse"
+              v-model:search="searchInputKlasse"
             ></v-autocomplete>
           </FormRow>
         </div>

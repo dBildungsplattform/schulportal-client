@@ -18,6 +18,7 @@
     },
     "klasse": {
       "addNew":"Neue Klasse hinzufügen",
+      "assignKlasse": "Klasse zuordnen",
       "backToCreateKlasse": "Zurück zur Klassenanlage",
       "create": "Klasse anlegen",
       "createAnother": "Weitere Klasse anlegen",
@@ -27,6 +28,8 @@
       "klasseAddedSuccessfully": "Die Klasse wurde erfolgreich hinzugefügt.",
       "klasseCreateErrorText": "Die Klasse konnte nicht angelegt werden.",
       "klasseCreateErrorTitle": "Fehler beim Anlegen der Klasse",
+      "selectKlasse": "Klasse auswählen",
+      "klasse": "Klasse",
       "klassenname": "Klassenname",
       "management": "Klassenverwaltung",
       "rules": {
