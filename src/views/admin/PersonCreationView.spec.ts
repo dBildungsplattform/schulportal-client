@@ -1,12 +1,12 @@
 import { expect, test } from 'vitest';
 import { VueWrapper, mount } from '@vue/test-utils';
 import PersonCreationView from './PersonCreationView.vue';
-import { OrganisationsTyp, type OrganisationStore } from '@/stores/OrganisationStore';
-import type { PersonenkontextStore } from '@/stores/PersonenkontextStore';
+import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
+import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
 
 let wrapper: VueWrapper | null = null;
-let organisationStore: OrganisationStore;
-let personenkontextStore: PersonenkontextStore;
+const organisationStore: OrganisationStore = useOrganisationStore();
+const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
 beforeEach(() => {
   document.body.innerHTML = `
     <div>
