@@ -3,17 +3,23 @@ import { VueWrapper, mount } from '@vue/test-utils';
 import PersonCreationView from './PersonCreationView.vue';
 import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
 import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
+import MockAdapter from 'axios-mock-adapter';
+import ApiService from '@/services/ApiService';
 
+const mockadapter: MockAdapter = new MockAdapter(ApiService);
 let wrapper: VueWrapper | null = null;
-const organisationStore: OrganisationStore = useOrganisationStore();
-const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
+let organisationStore: OrganisationStore;
+let personenkontextStore: PersonenkontextStore;
 beforeEach(() => {
+  mockadapter.reset();
   document.body.innerHTML = `
     <div>
       <div id="app"></div>
     </div>
   `;
 
+  organisationStore = useOrganisationStore();
+  personenkontextStore = usePersonenkontextStore();
   personenkontextStore.filteredOrganisationen = {
     moeglicheSsks: [
       {
@@ -36,6 +42,15 @@ beforeEach(() => {
       name: '9a',
       namensergaenzung: 'Ergänzung',
       kuerzel: 'O1',
+      typ: OrganisationsTyp.Klasse,
+      administriertVon: '1',
+    },
+    {
+      id: '2',
+      kennung: 'Org2',
+      name: '9b',
+      namensergaenzung: 'Ergänzung',
+      kuerzel: 'O2',
       typ: OrganisationsTyp.Klasse,
       administriertVon: '1',
     },
