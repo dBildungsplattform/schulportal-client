@@ -45,7 +45,8 @@ export type { PersonendatensatzResponse };
 type PersonState = {
   allPersons: Array<Personendatensatz>;
   createdPerson: PersonendatensatzResponse | null;
-  createdPersonenkontext: DBiamPersonenkontextResponse | null;
+  createdPersonenkontextForOrganisation: DBiamPersonenkontextResponse | null;
+  createdPersonenkontextForKlasse: DBiamPersonenkontextResponse | null;
   errorCode: string;
   loading: boolean;
   totalPersons: number;
@@ -55,7 +56,10 @@ type PersonState = {
 type PersonGetters = {};
 type PersonActions = {
   createPerson: (person: CreatePersonBodyParams) => Promise<PersonendatensatzResponse>;
-  createPersonenkontext: (
+  createPersonenkontextForOrganisation: (
+    personenkontext: DBiamCreatePersonenkontextBodyParams,
+  ) => Promise<DBiamPersonenkontextResponse>;
+  createPersonenkontextForKlasse: (
     personenkontext: DBiamCreatePersonenkontextBodyParams,
   ) => Promise<DBiamPersonenkontextResponse>;
   getAllPersons: (searchFilter: string) => Promise<void>;
@@ -71,7 +75,8 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
     return {
       allPersons: [],
       createdPerson: null,
-      createdPersonenkontext: null,
+      createdPersonenkontextForOrganisation: null,
+      createdPersonenkontextForKlasse: null,
       errorCode: '',
       loading: false,
       totalPersons: 0,
@@ -96,14 +101,33 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
       }
     },
 
-    async createPersonenkontext(
+    async createPersonenkontextForOrganisation(
       personenkontext: DBiamCreatePersonenkontextBodyParams,
     ): Promise<DBiamPersonenkontextResponse> {
       this.loading = true;
       try {
         const { data }: { data: DBiamPersonenkontextResponse } =
           await personenKontexteApi.dBiamPersonenkontextControllerCreatePersonenkontext(personenkontext);
-        this.createdPersonenkontext = data;
+        this.createdPersonenkontextForOrganisation = data;
+        return data;
+      } catch (error: unknown) {
+        this.errorCode = 'UNSPECIFIED_ERROR';
+        if (isAxiosError(error)) {
+          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
+        }
+        return await Promise.reject(this.errorCode);
+      } finally {
+        this.loading = false;
+      }
+    },
+    async createPersonenkontextForKlasse(
+      personenkontext: DBiamCreatePersonenkontextBodyParams,
+    ): Promise<DBiamPersonenkontextResponse> {
+      this.loading = true;
+      try {
+        const { data }: { data: DBiamPersonenkontextResponse } =
+          await personenKontexteApi.dBiamPersonenkontextControllerCreatePersonenkontext(personenkontext);
+        this.createdPersonenkontextForKlasse = data;
         return data;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
