@@ -1,13 +1,10 @@
 import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import { isAxiosError, type AxiosResponse } from 'axios';
 import {
-  DbiamPersonenkontexteApiFactory,
   PersonenApiFactory,
   PersonenFrontendApiFactory,
   type CreatePersonBodyParams,
   type DBiamCreatePersonenkontextBodyParams,
-  type DbiamPersonenkontexteApiInterface,
-  type DBiamPersonenkontextResponse,
   type PersonenApiInterface,
   type PersonendatensatzResponse,
   type PersonenFrontendApiInterface,
@@ -17,11 +14,6 @@ import axiosApiInstance from '@/services/ApiService';
 
 const personenApi: PersonenApiInterface = PersonenApiFactory(undefined, '', axiosApiInstance);
 const personenFrontendApi: PersonenFrontendApiInterface = PersonenFrontendApiFactory(undefined, '', axiosApiInstance);
-const personenKontexteApi: DbiamPersonenkontexteApiInterface = DbiamPersonenkontexteApiFactory(
-  undefined,
-  '',
-  axiosApiInstance,
-);
 
 export type Person = {
   id: string;
@@ -45,8 +37,6 @@ export type { PersonendatensatzResponse };
 type PersonState = {
   allPersons: Array<Personendatensatz>;
   createdPerson: PersonendatensatzResponse | null;
-  createdPersonenkontextForOrganisation: DBiamPersonenkontextResponse | null;
-  createdPersonenkontextForKlasse: DBiamPersonenkontextResponse | null;
   errorCode: string;
   loading: boolean;
   totalPersons: number;
@@ -56,12 +46,6 @@ type PersonState = {
 type PersonGetters = {};
 type PersonActions = {
   createPerson: (person: CreatePersonBodyParams) => Promise<PersonendatensatzResponse>;
-  createPersonenkontextForOrganisation: (
-    personenkontext: DBiamCreatePersonenkontextBodyParams,
-  ) => Promise<DBiamPersonenkontextResponse>;
-  createPersonenkontextForKlasse: (
-    personenkontext: DBiamCreatePersonenkontextBodyParams,
-  ) => Promise<DBiamPersonenkontextResponse>;
   getAllPersons: (searchFilter: string) => Promise<void>;
   getPersonById: (personId: string) => Promise<Personendatensatz>;
   resetPassword: (personId: string) => Promise<string>;
@@ -75,8 +59,6 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
     return {
       allPersons: [],
       createdPerson: null,
-      createdPersonenkontextForOrganisation: null,
-      createdPersonenkontextForKlasse: null,
       errorCode: '',
       loading: false,
       totalPersons: 0,
@@ -100,46 +82,6 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
         this.loading = false;
       }
     },
-
-    async createPersonenkontextForOrganisation(
-      personenkontext: DBiamCreatePersonenkontextBodyParams,
-    ): Promise<DBiamPersonenkontextResponse> {
-      this.loading = true;
-      try {
-        const { data }: { data: DBiamPersonenkontextResponse } =
-          await personenKontexteApi.dBiamPersonenkontextControllerCreatePersonenkontext(personenkontext);
-        this.createdPersonenkontextForOrganisation = data;
-        return data;
-      } catch (error: unknown) {
-        this.errorCode = 'UNSPECIFIED_ERROR';
-        if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
-        }
-        return await Promise.reject(this.errorCode);
-      } finally {
-        this.loading = false;
-      }
-    },
-    async createPersonenkontextForKlasse(
-      personenkontext: DBiamCreatePersonenkontextBodyParams,
-    ): Promise<DBiamPersonenkontextResponse> {
-      this.loading = true;
-      try {
-        const { data }: { data: DBiamPersonenkontextResponse } =
-          await personenKontexteApi.dBiamPersonenkontextControllerCreatePersonenkontext(personenkontext);
-        this.createdPersonenkontextForKlasse = data;
-        return data;
-      } catch (error: unknown) {
-        this.errorCode = 'UNSPECIFIED_ERROR';
-        if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
-        }
-        return await Promise.reject(this.errorCode);
-      } finally {
-        this.loading = false;
-      }
-    },
-
     async getAllPersons(searchFilter: string) {
       this.loading = true;
       try {

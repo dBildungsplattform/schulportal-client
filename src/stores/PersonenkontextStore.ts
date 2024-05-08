@@ -68,7 +68,8 @@ type PersonenkontextState = {
   filteredRollen: FindRollenResponse | null;
   filteredOrganisationen: FindSchulstrukturknotenResponse | null;
   personenuebersicht: DBiamPersonenuebersichtResponse | null;
-  createdPersonenkontext: DBiamPersonenkontextResponse | null;
+  createdPersonenkontextForOrganisation: DBiamPersonenkontextResponse | null;
+  createdPersonenkontextForKlasse: DBiamPersonenkontextResponse | null;
   errorCode: string;
   loading: boolean;
 };
@@ -78,7 +79,10 @@ type PersonenkontextActions = {
   hasSystemrecht: (personId: string, systemrecht: 'ROLLEN_VERWALTEN') => Promise<SystemrechtResponse>;
   getPersonenkontextRolleWithFilter: (rolleName: string, limit: number) => Promise<void>;
   getPersonenkontextAdministrationsebeneWithFilter: (rolleId: string, sskName: string, limit: number) => Promise<void>;
-  createPersonenkontext: (
+  createPersonenkontextForOrganisation: (
+    personenkontext: DBiamCreatePersonenkontextBodyParams,
+  ) => Promise<DBiamPersonenkontextResponse>;
+  createPersonenkontextForKlasse: (
     personenkontext: DBiamCreatePersonenkontextBodyParams,
   ) => Promise<DBiamPersonenkontextResponse>;
   getPersonenuebersichtById: (personId: string) => Promise<void>;
@@ -115,7 +119,8 @@ export const usePersonenkontextStore: StoreDefinition<
       filteredRollen: null,
       filteredOrganisationen: null,
       personenuebersicht: null,
-      createdPersonenkontext: null,
+      createdPersonenkontextForOrganisation: null,
+      createdPersonenkontextForKlasse: null,
       errorCode: '',
       loading: false,
     };
@@ -169,14 +174,34 @@ export const usePersonenkontextStore: StoreDefinition<
         this.loading = false;
       }
     },
-    async createPersonenkontext(
+
+    async createPersonenkontextForOrganisation(
       personenkontext: DBiamCreatePersonenkontextBodyParams,
     ): Promise<DBiamPersonenkontextResponse> {
       this.loading = true;
       try {
         const { data }: { data: DBiamPersonenkontextResponse } =
           await dbiamPersonenkontexteApi.dBiamPersonenkontextControllerCreatePersonenkontext(personenkontext);
-        this.createdPersonenkontext = data;
+        this.createdPersonenkontextForOrganisation = data;
+        return data;
+      } catch (error: unknown) {
+        this.errorCode = 'UNSPECIFIED_ERROR';
+        if (isAxiosError(error)) {
+          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
+        }
+        return await Promise.reject(this.errorCode);
+      } finally {
+        this.loading = false;
+      }
+    },
+    async createPersonenkontextForKlasse(
+      personenkontext: DBiamCreatePersonenkontextBodyParams,
+    ): Promise<DBiamPersonenkontextResponse> {
+      this.loading = true;
+      try {
+        const { data }: { data: DBiamPersonenkontextResponse } =
+          await dbiamPersonenkontexteApi.dBiamPersonenkontextControllerCreatePersonenkontext(personenkontext);
+        this.createdPersonenkontextForKlasse = data;
         return data;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';

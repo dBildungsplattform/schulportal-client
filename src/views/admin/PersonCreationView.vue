@@ -228,21 +228,23 @@
     () =>
       organisationen.value?.find(
         (organisation: TranslatedObject) =>
-          organisation.value === personStore.createdPersonenkontextForOrganisation?.organisationId,
+          organisation.value === personenkontextStore.createdPersonenkontextForOrganisation?.organisationId,
       )?.title || '',
   );
 
   const translatedRollenname: ComputedRef<string> = computed(
     () =>
       rollen.value?.find(
-        (rolle: TranslatedObject) => rolle.value === personStore.createdPersonenkontextForOrganisation?.rolleId,
+        (rolle: TranslatedObject) =>
+          rolle.value === personenkontextStore.createdPersonenkontextForOrganisation?.rolleId,
       )?.title || '',
   );
 
   const translatedKlassenname: ComputedRef<string> = computed(
     () =>
       klassen.value?.find(
-        (klasse: TranslatedObject) => klasse.value === personStore.createdPersonenkontextForKlasse?.organisationId,
+        (klasse: TranslatedObject) =>
+          klasse.value === personenkontextStore.createdPersonenkontextForKlasse?.organisationId,
       )?.title || '',
   );
 
@@ -271,9 +273,11 @@
         organisationId: selectedOrganisation.value,
         rolleId: selectedRolle.value,
       };
-      await personStore.createPersonenkontextForOrganisation(unpersistedOrganisationPersonenkontext).catch(() => {
-        creationErrorText.value = t('admin.personenkontext.creationErrorText');
-      });
+      await personenkontextStore
+        .createPersonenkontextForOrganisation(unpersistedOrganisationPersonenkontext)
+        .catch(() => {
+          creationErrorText.value = t('admin.personenkontext.creationErrorText');
+        });
       // Build the context for the Klasse and save it only if the the Klasse was selected
       if (selectedKlasse.value) {
         const unpersistedKlassePersonenkontext: CreatedPersonenkontext = {
@@ -281,7 +285,7 @@
           organisationId: selectedKlasse.value,
           rolleId: selectedRolle.value,
         };
-        await personStore.createPersonenkontextForKlasse(unpersistedKlassePersonenkontext).catch(() => {
+        await personenkontextStore.createPersonenkontextForKlasse(unpersistedKlassePersonenkontext).catch(() => {
           creationErrorText.value = t('admin.personenkontext.creationErrorText');
         });
       }
