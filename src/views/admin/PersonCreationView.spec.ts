@@ -1,10 +1,11 @@
-import { expect, test } from 'vitest';
-import { VueWrapper, mount } from '@vue/test-utils';
+import { expect, test, type MockInstance } from 'vitest';
+import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
 import PersonCreationView from './PersonCreationView.vue';
 import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
 import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
 import MockAdapter from 'axios-mock-adapter';
 import ApiService from '@/services/ApiService';
+import { nextTick } from 'vue';
 
 const mockadapter: MockAdapter = new MockAdapter(ApiService);
 let wrapper: VueWrapper | null = null;
@@ -85,5 +86,19 @@ describe('PersonCreationView', () => {
     expect(wrapper?.getComponent({ name: 'SpshAlert' })).toBeTruthy();
     expect(wrapper?.getComponent({ name: 'FormWrapper' })).toBeTruthy();
     expect(wrapper?.getComponent({ name: 'FormRow' })).toBeTruthy();
+  });
+
+  test('it calls watcher', async () => {
+
+    const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
+    await rolleAutocomplete?.setValue('1');
+    await nextTick();
+
+
+    const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
+    await organisationAutocomplete?.setValue('1');
+    await nextTick();
+
+    expect(organisationAutocomplete?.text()).toEqual('1');
   });
 });
