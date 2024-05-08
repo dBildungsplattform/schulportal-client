@@ -201,7 +201,7 @@
       | undefined = rollen.value?.find(
       (r: { value: string; title: string; Rollenart: RollenArt }) => r.value === selectedRolleId,
     );
-    return !!rolle && rolle.Rollenart === 'LERN';
+    return !!rolle && rolle.Rollenart === RollenArt.Lern;
   }
 
   const organisationen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
