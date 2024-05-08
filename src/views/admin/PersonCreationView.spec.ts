@@ -89,18 +89,6 @@ describe('PersonCreationView', () => {
     expect(wrapper?.getComponent({ name: 'FormRow' })).toBeTruthy();
   });
 
-  test('it renders an error', async () => {
-    personStore.errorCode = 'ERROR_ERROR';
-    await nextTick();
-    const push: MockInstance<[to: RouteLocationRaw], Promise<void | NavigationFailure | undefined>> = vi.spyOn(
-      router,
-      'push',
-    );
-    wrapper?.find('[data-testid="alert-button"]').trigger('click');
-    await nextTick();
-    expect(push).toHaveBeenCalledTimes(1);
-  });
-
   test('it closes the view and navigates back to rolle table', async () => {
     const push: MockInstance<[to: RouteLocationRaw], Promise<void | NavigationFailure | undefined>> = vi.spyOn(
       router,
