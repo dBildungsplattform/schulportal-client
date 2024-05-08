@@ -10,7 +10,7 @@ const mockadapter: MockAdapter = new MockAdapter(ApiService);
 let wrapper: VueWrapper | null = null;
 let organisationStore: OrganisationStore;
 let personenkontextStore: PersonenkontextStore;
-beforeEach(() => {
+beforeEach(async () => {
   mockadapter.reset();
   document.body.innerHTML = `
     <div>
@@ -69,6 +69,7 @@ beforeEach(() => {
       },
     },
   });
+  await wrapper.vm.$nextTick();
 });
 
 describe('PersonCreationView', () => {
