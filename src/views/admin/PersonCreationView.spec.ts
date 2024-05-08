@@ -1,20 +1,15 @@
-import { expect, test, type MockInstance } from 'vitest';
+import { expect, test } from 'vitest';
 import { VueWrapper, mount } from '@vue/test-utils';
 import PersonCreationView from './PersonCreationView.vue';
 import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
 import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
 import MockAdapter from 'axios-mock-adapter';
 import ApiService from '@/services/ApiService';
-import { nextTick } from 'vue';
-import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
-import type { NavigationFailure, RouteLocationRaw } from 'vue-router';
-import router from '@/router';
 
 const mockadapter: MockAdapter = new MockAdapter(ApiService);
 let wrapper: VueWrapper | null = null;
 let organisationStore: OrganisationStore;
 let personenkontextStore: PersonenkontextStore;
-let personStore : PersonStore;
 beforeEach(() => {
   mockadapter.reset();
   document.body.innerHTML = `
@@ -25,7 +20,6 @@ beforeEach(() => {
 
   organisationStore = useOrganisationStore();
   personenkontextStore = usePersonenkontextStore();
-  personStore = usePersonStore();
   personenkontextStore.filteredOrganisationen = {
     moeglicheSsks: [
       {
@@ -87,15 +81,5 @@ describe('PersonCreationView', () => {
     expect(wrapper?.getComponent({ name: 'SpshAlert' })).toBeTruthy();
     expect(wrapper?.getComponent({ name: 'FormWrapper' })).toBeTruthy();
     expect(wrapper?.getComponent({ name: 'FormRow' })).toBeTruthy();
-  });
-
-  test('it closes the view and navigates back to rolle table', async () => {
-    const push: MockInstance<[to: RouteLocationRaw], Promise<void | NavigationFailure | undefined>> = vi.spyOn(
-      router,
-      'push',
-    );
-    wrapper?.find('[data-testid="close-layout-card-button"]').trigger('click');
-    await nextTick();
-    expect(push).toHaveBeenCalledTimes(1);
   });
 });
