@@ -1,5 +1,5 @@
-import { expect, test, type MockInstance } from 'vitest';
-import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
+import { expect, test } from 'vitest';
+import { VueWrapper, mount } from '@vue/test-utils';
 import PersonCreationView from './PersonCreationView.vue';
 import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
 import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
