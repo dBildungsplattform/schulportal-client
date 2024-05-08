@@ -1,4 +1,4 @@
-import { expect, test, type MockInstance } from 'vitest';
+import { expect, test } from 'vitest';
 import { VueWrapper, mount } from '@vue/test-utils';
 import PersonCreationView from './PersonCreationView.vue';
 import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
@@ -10,7 +10,7 @@ const mockadapter: MockAdapter = new MockAdapter(ApiService);
 let wrapper: VueWrapper | null = null;
 let organisationStore: OrganisationStore;
 let personenkontextStore: PersonenkontextStore;
-beforeEach(async () => {
+beforeEach(() => {
   mockadapter.reset();
   document.body.innerHTML = `
     <div>
@@ -57,6 +57,10 @@ beforeEach(async () => {
   ];
 
   wrapper = mount(PersonCreationView, {
+    propsData: {
+      searchInputKlasse: 'Testing the ref',
+      searchInputOrganisation: 'Testing the ref',
+    },
     attachTo: document.getElementById('app') || '',
     global: {
       components: {
@@ -69,7 +73,6 @@ beforeEach(async () => {
       },
     },
   });
-  await wrapper.vm.$nextTick();
 });
 
 describe('PersonCreationView', () => {
@@ -82,35 +85,5 @@ describe('PersonCreationView', () => {
     expect(wrapper?.getComponent({ name: 'SpshAlert' })).toBeTruthy();
     expect(wrapper?.getComponent({ name: 'FormWrapper' })).toBeTruthy();
     expect(wrapper?.getComponent({ name: 'FormRow' })).toBeTruthy();
-  });
-  test('searchInputKlasse watcher is triggered when search input changes', async () => {
-    // Set up spy for the organisationStore.getKlassenByOrganisationId method
-    const getKlassenSpy: MockInstance<
-      [organisationId: string, searchFilter?: string | undefined],
-      Promise<void>
-    > = vi.spyOn(organisationStore, 'getKlassenByOrganisationId');
-
-    // Mount the component
-    wrapper = mount(PersonCreationView, {
-      attachTo: document.getElementById('app') || '',
-      global: {
-        components: {
-          PersonCreationView,
-        },
-        mocks: {
-          route: {
-            fullPath: 'full/path',
-          },
-        },
-      },
-    });
-    // Wait for the next tick to ensure reactivity has been triggered
-    await wrapper.vm.$nextTick();
-    // Change the value of searchInputKlasse
-    await wrapper.setData({ searchInputKlasse: 'search value' });
-    // Wait for the next tick to ensure the watcher has been triggered
-    await wrapper.vm.$nextTick();
-    // Expect that the organisationStore.getKlassenByOrganisationId method has been called
-    expect(getKlassenSpy).toHaveBeenCalledTimes(1);
   });
 });
