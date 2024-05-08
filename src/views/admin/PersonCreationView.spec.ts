@@ -88,12 +88,11 @@ describe('PersonCreationView', () => {
     expect(wrapper?.getComponent({ name: 'FormRow' })).toBeTruthy();
   });
 
-  test('it calls watcher', async () => {
+  test('it calls watchers for rolle and organisation', async () => {
 
     const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
     await rolleAutocomplete?.setValue('1');
     await nextTick();
-
 
     const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
     await organisationAutocomplete?.setValue('1');
