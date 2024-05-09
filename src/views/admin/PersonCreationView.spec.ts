@@ -6,12 +6,15 @@ import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/Per
 import MockAdapter from 'axios-mock-adapter';
 import ApiService from '@/services/ApiService';
 import { nextTick } from 'vue';
-import type { DBiamPersonenkontextResponse } from '@/api-client/generated';
+import type { DBiamPersonenkontextResponse, RollenMerkmal, RollenSystemRecht } from '@/api-client/generated';
+import { useRolleStore, type RolleStore } from '@/stores/RolleStore';
 
 const mockadapter: MockAdapter = new MockAdapter(ApiService);
 let wrapper: VueWrapper | null = null;
 let organisationStore: OrganisationStore;
 let personenkontextStore: PersonenkontextStore;
+let rolleStore: RolleStore;
+
 beforeEach(() => {
   mockadapter.reset();
   document.body.innerHTML = `
@@ -22,6 +25,7 @@ beforeEach(() => {
 
   organisationStore = useOrganisationStore();
   personenkontextStore = usePersonenkontextStore();
+  rolleStore = useRolleStore();
   personenkontextStore.filteredOrganisationen = {
     moeglicheSsks: [
       {
@@ -64,6 +68,18 @@ beforeEach(() => {
     },
   ];
 
+  rolleStore.allRollen =[
+    {
+      administeredBySchulstrukturknoten: '1234',
+      rollenart: 'LERN',
+      name: 'SuS',
+      merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RollenMerkmal>,
+      systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
+      createdAt: '2022',
+      updatedAt: '2022',
+      id: '54321',
+    },
+  ];
   wrapper = mount(PersonCreationView, {
     propsData: {
       searchInputKlasse: 'Testing the ref',
@@ -106,6 +122,13 @@ describe('PersonCreationView', () => {
 
     expect(organisationAutocomplete?.text()).toEqual('O1');
     await nextTick();
+
+    const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
+    await klasseAutocomplete?.setValue('Some value');
+    await nextTick();
+  
+    expect(organisationAutocomplete?.text()).toEqual('O1');
+    expect(klasseAutocomplete?.text()).toEqual('Some value');
   });
 
   test('it calls watchers for unselected organisation', async () => {
