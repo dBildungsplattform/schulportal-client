@@ -53,6 +53,7 @@
         .min(2, t('admin.person.rules.familienname.min'))
         .required(t('admin.person.rules.familienname.required')),
       selectedOrganisation: string().required(t('admin.organisation.rules.organisation.required')),
+      selectedKlasse: string().required(t('admin.klasse.rules.klasse.required')),
     }),
   );
 
@@ -132,6 +133,7 @@
     // This checks if `selectedOrganisation` is cleared or set to a falsy value
     if (!newValue) {
       resetField('selectedKlasse');
+
       return;
     }
 
@@ -479,7 +481,7 @@
               v-model:search="searchInputOrganisation"
             ></v-autocomplete>
           </FormRow>
-          <template v-if="selectedRolle && isLernRolle(selectedRolle)">
+          <template v-if="selectedRolle && isLernRolle(selectedRolle) && selectedOrganisation">
             <!-- Klasse zuordnen -->
             <FormRow
               :errorLabel="selectedKlasseProps['error']"

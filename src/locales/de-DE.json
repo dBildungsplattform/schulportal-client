@@ -33,6 +33,9 @@
       "klassenname": "Klassenname",
       "management": "Klassenverwaltung",
       "rules": {
+        "klasse": {
+          "required": "Die Klasse muss ausgewählt werden."
+        },
         "klassenname": {
           "matches": "Der Klassenname darf keine ungültigen Zeichen beinhalten.",
           "required": "Der Klassenname muss angegeben werden."
