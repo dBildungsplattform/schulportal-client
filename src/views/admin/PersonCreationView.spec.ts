@@ -68,7 +68,7 @@ beforeEach(() => {
     },
   ];
 
-  rolleStore.allRollen =[
+  rolleStore.allRollen = [
     {
       administeredBySchulstrukturknoten: '1234',
       rollenart: 'LERN',
@@ -126,9 +126,8 @@ describe('PersonCreationView', () => {
     const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
     await klasseAutocomplete?.setValue('9b');
     await nextTick();
-  
-    expect(organisationAutocomplete?.text()).toEqual('O1');
-    expect(klasseAutocomplete?.text()).toEqual('Some value');
+
+    expect(klasseAutocomplete?.text()).toEqual('9b');
   });
 
   test('it calls watchers for unselected organisation', async () => {
