@@ -124,7 +124,7 @@ describe('PersonCreationView', () => {
     await nextTick();
 
     const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
-    await klasseAutocomplete?.setValue('Some value');
+    await klasseAutocomplete?.setValue('9b');
     await nextTick();
   
     expect(organisationAutocomplete?.text()).toEqual('O1');
