@@ -111,7 +111,7 @@ describe('PersonCreationView', () => {
     expect(wrapper?.getComponent({ name: 'FormRow' })).toBeTruthy();
   });
 
-  test('it calls watchers for selected rolle and organisation with value', async () => {
+  test('it calls watchers for selected rolle, organisation and klasse with value', async () => {
     const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
     await rolleAutocomplete?.setValue('54321');
     await nextTick();
