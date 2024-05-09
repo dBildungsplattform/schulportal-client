@@ -133,7 +133,6 @@
     // This checks if `selectedOrganisation` is cleared or set to a falsy value
     if (!newValue) {
       resetField('selectedKlasse');
-
       return;
     }
 
