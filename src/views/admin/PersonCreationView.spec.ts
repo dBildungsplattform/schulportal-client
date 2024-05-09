@@ -6,6 +6,7 @@ import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/Per
 import MockAdapter from 'axios-mock-adapter';
 import ApiService from '@/services/ApiService';
 import { nextTick } from 'vue';
+import type { DBiamPersonenkontextResponse } from '@/api-client/generated';
 
 const mockadapter: MockAdapter = new MockAdapter(ApiService);
 let wrapper: VueWrapper | null = null;
@@ -35,6 +36,12 @@ beforeEach(() => {
     ],
     total: 0,
   };
+
+  personenkontextStore.createdPersonenkontextForOrganisation = {
+    personId: '12345',
+    organisationId: '67890',
+    rolleId: '54321',
+  } as DBiamPersonenkontextResponse;
 
   organisationStore.klassen = [
     {
@@ -89,16 +96,15 @@ describe('PersonCreationView', () => {
   });
 
   test('it calls watchers for rolle and organisation', async () => {
-
     const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
-    await rolleAutocomplete?.setValue('Lern');
+    await rolleAutocomplete?.setValue('54321');
     await nextTick();
 
     const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
-    await organisationAutocomplete?.setValue('1');
+    await organisationAutocomplete?.setValue('O1');
     await nextTick();
 
-    expect(organisationAutocomplete?.text()).toEqual('1');
+    expect(organisationAutocomplete?.text()).toEqual('O1');
     await nextTick();
   });
 });
