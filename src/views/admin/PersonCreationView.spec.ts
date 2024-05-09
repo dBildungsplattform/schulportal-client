@@ -95,7 +95,7 @@ describe('PersonCreationView', () => {
     expect(wrapper?.getComponent({ name: 'FormRow' })).toBeTruthy();
   });
 
-  test('it calls watchers for rolle and organisation', async () => {
+  test('it calls watchers for selected rolle and organisation with value', async () => {
     const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
     await rolleAutocomplete?.setValue('54321');
     await nextTick();
@@ -106,5 +106,14 @@ describe('PersonCreationView', () => {
 
     expect(organisationAutocomplete?.text()).toEqual('O1');
     await nextTick();
+  });
+
+  test('it calls watchers for unselected organisation', async () => {
+    const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
+    await rolleAutocomplete?.setValue(undefined);
+    await nextTick();
+
+    const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
+    expect(organisationAutocomplete?.exists()).toBe(false);
   });
 });
