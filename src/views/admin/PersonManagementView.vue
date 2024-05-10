@@ -127,30 +127,46 @@
 
   const handleSearchFilter = (filter: string): void => {
     searchFilter.value = filter;
-    personStore.getAllPersons(searchFilter.value);
+    personStore.getAllPersons({ searchFilter: searchFilter.value });
   };
 
   // Watcher to detect when the search input for Organisationen is triggered.
   watch(searchInputSchulen, async (newValue: string, _oldValue: string) => {
-    if (newValue.length >= 3) {
-      organisationStore.getAllOrganisationen({ searchString: newValue, includeTyp: OrganisationsTyp.Schule});
+    if (newValue?.length >= 3) {
+      organisationStore.getAllOrganisationen({ searchString: newValue, includeTyp: OrganisationsTyp.Schule });
     } else {
-      organisationStore.getAllOrganisationen({ searchString: undefined });
+      organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Schule });
     }
   });
 
   // Watcher to detect when the search input for Organisationen is triggered.
   watch(searchInputRollen, async (newValue: string, _oldValue: string) => {
-    if (newValue.length >= 3) {
+    if (newValue?.length >= 3) {
       rolleStore.getAllRollen();
     } else {
       rolleStore.getAllRollen();
     }
   });
 
+  watch(selectedSchulen, async (newValue: Array<string>, _oldValue: Array<string>) => {
+    if (newValue.length > 0) {
+      personStore.getAllPersons({ organisation: newValue });
+    } else {
+      personStore.getAllPersons({});
+    }
+  });
+
+  watch(selectedRollen, async (newValue: Array<string>, _oldValue: Array<string>) => {
+    if (newValue.length > 0) {
+      personStore.getAllPersons({ rolle: newValue });
+    } else {
+      personStore.getAllPersons({});
+    }
+  });
+
   onMounted(async () => {
     await organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Schule});
-    await personStore.getAllPersons('');
+    await personStore.getAllPersons({});
     await personenkontextStore.getAllPersonenuebersichten();
     await rolleStore.getAllRollen();
   });
@@ -291,7 +307,7 @@
         :loading="personStore.loading"
         :headers="headers"
         @onHandleRowClick="navigateToPersonDetails"
-        @onUpdateTable="personStore.getAllPersons('')"
+        @onUpdateTable="personStore.getAllPersons({})"
         :totalItems="personStore.totalPersons"
         item-value-path="person.id"
       ></ResultTable>

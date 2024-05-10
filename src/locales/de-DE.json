@@ -12,9 +12,6 @@
     "backToForm": "Zurück zum Formular",
     "followingDataCreated": "Folgende Daten wurden gespeichert:",
     "headline": "Administrationsbereich",
-    "klasse": {
-      "klasse": "Klasse"
-    },
     "koPers": {
       "koPersNumber": "KoPers-Nr",
       "noKoPersNumber": "Keine KoPers-Nr vorhanden"
@@ -27,6 +24,7 @@
       "createNew": "Neue Klasse anlegen",
       "discard": "Klasse verwerfen",
       "enterKlassenname": "Klassenname eingeben",
+      "klasse": "Klasse",
       "klasseAddedSuccessfully": "Die Klasse wurde erfolgreich hinzugefügt.",
       "klasseCreateErrorText": "Die Klasse konnte nicht angelegt werden.",
       "klasseCreateErrorTitle": "Fehler beim Anlegen der Klasse",

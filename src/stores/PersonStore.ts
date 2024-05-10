@@ -52,13 +52,19 @@ type PersonState = {
   currentPerson: Personendatensatz | null;
 };
 
+export type PersonFilter = {
+  organisation?: string;
+  rolle?: string;
+  searchFilter?: string;
+};
+
 type PersonGetters = {};
 type PersonActions = {
   createPerson: (person: CreatePersonBodyParams) => Promise<PersonendatensatzResponse>;
   createPersonenkontext: (
     personenkontext: DBiamCreatePersonenkontextBodyParams,
   ) => Promise<DBiamPersonenkontextResponse>;
-  getAllPersons: (searchFilter: string) => Promise<void>;
+  getAllPersons: (filter: PersonFilter) => Promise<void>;
   getPersonById: (personId: string) => Promise<Personendatensatz>;
   resetPassword: (personId: string) => Promise<string>;
 };
@@ -116,7 +122,7 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
       }
     },
 
-    async getAllPersons(searchFilter: string) {
+    async getAllPersons(filter: PersonFilter) {
       this.loading = true;
       try {
         const { data }: AxiosResponse<PersonFrontendControllerFindPersons200Response> =
@@ -127,7 +133,9 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
             undefined,
             undefined,
             undefined,
-            searchFilter,
+            filter?.organisation,
+            filter?.rolle,
+            filter?.searchFilter,
           );
 
         this.allPersons = data.items;
