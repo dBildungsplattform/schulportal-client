@@ -6,6 +6,7 @@ import {
   TraegerschaftTyp,
   type OrganisationenApiInterface,
   type CreateOrganisationBodyParams,
+  type RollenSystemRecht,
 } from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
 
@@ -18,6 +19,7 @@ export type Organisation = {
   namensergaenzung?: string | null;
   kuerzel?: string;
   typ: OrganisationsTyp;
+  administriertVon?: string | null;
 };
 
 type OrganisationState = {
@@ -28,16 +30,15 @@ type OrganisationState = {
   loading: boolean;
 };
 
+export type OrganisationenFilter = {
+  searchString?: string;
+  systemrechte?: RollenSystemRecht[];
+  excludeTyp?: OrganisationsTyp[];
+};
+
 type OrganisationGetters = {};
 type OrganisationActions = {
-  getAllOrganisationen: (
-    offset?: number,
-    limit?: number,
-    kennung?: string,
-    name?: string,
-    searchString?: string,
-    typ?: OrganisationsTyp,
-  ) => Promise<void>;
+  getAllOrganisationen: (filter?: OrganisationenFilter) => Promise<void>;
   getOrganisationById: (organisationId: string) => Promise<Organisation>;
   createOrganisation: (
     kennung: string,
@@ -72,23 +73,18 @@ export const useOrganisationStore: StoreDefinition<
   },
 
   actions: {
-    async getAllOrganisationen(
-      offset?: number,
-      limit?: number,
-      kennung?: string,
-      name?: string,
-      searchString?: string,
-      typ?: OrganisationsTyp,
-    ) {
+    async getAllOrganisationen(filter?: OrganisationenFilter) {
       this.loading = true;
       try {
         const { data }: AxiosResponse<Organisation[]> = await organisationApi.organisationControllerFindOrganizations(
-          offset,
-          limit,
-          kennung,
-          name,
-          searchString,
-          typ,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          filter?.searchString,
+          undefined,
+          filter?.systemrechte,
+          filter?.excludeTyp,
         );
         this.allOrganisationen = data;
         this.loading = false;

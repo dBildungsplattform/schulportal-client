@@ -16,6 +16,7 @@ import {
   PersonenkontextApiFactory,
   type PersonenkontextApiInterface,
   DbiamPersonenuebersichtApiFactory,
+  OrganisationsTyp,
 } from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
 
@@ -33,11 +34,14 @@ const personenuebersichtApi: DbiamPersonenuebersichtApiInterface = DbiamPersonen
 );
 
 export type Zuordnung = {
+  klasse?: string | undefined;
   sskId: string;
   rolleId: string;
   sskName: string;
   sskDstNr: string;
   rolle: string;
+  administriertVon: string;
+  typ: OrganisationsTyp;
 };
 
 export type Uebersicht =
@@ -47,11 +51,14 @@ export type Uebersicht =
       nachname: string;
       benutzername: string;
       zuordnungen: {
+        klasse?: string | undefined;
         sskId: string;
         rolleId: string;
         sskName: string;
         sskDstNr: string;
         rolle: string;
+        administriertVon: string;
+        typ: OrganisationsTyp;
       }[];
     }
   | undefined;
@@ -80,6 +87,13 @@ type PersonenkontextActions = {
 
 export type { SystemrechtResponse };
 export type CreatedPersonenkontext = DBiamCreatePersonenkontextBodyParams;
+export type UserinfoPersonenkontext = {
+  organisationsId: string;
+  rolle: {
+    systemrechte: string[];
+    serviceProviderIds: string[];
+  };
+};
 
 export type PersonenkontextStore = Store<
   'personenkontextStore',

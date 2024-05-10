@@ -1,6 +1,11 @@
 <script setup lang="ts">
   import { ref, type Ref, onMounted, onUnmounted, computed, type ComputedRef } from 'vue';
-  import { useOrganisationStore, type OrganisationStore, type Organisation } from '@/stores/OrganisationStore';
+  import {
+    useOrganisationStore,
+    type OrganisationStore,
+    type Organisation,
+    OrganisationsTyp,
+  } from '@/stores/OrganisationStore';
   import {
     useRolleStore,
     type RolleStore,
@@ -176,6 +181,21 @@
       .join(', ');
   });
 
+  const translatedCreatedAngebote: ComputedRef<string> = computed(() => {
+    if (
+      !rolleStore.createdRolle?.serviceProviders ||
+      Array.from(rolleStore.createdRolle.serviceProviders).length === 0
+    ) {
+      return '---';
+    }
+
+    return rolleStore.createdRolle.serviceProviders
+      .map((serviceProvider: ServiceProvider) => {
+        return serviceProvider.name;
+      })
+      .join(', ');
+  });
+
   const translatedCreatedSystemrecht: ComputedRef<string> = computed(() => {
     if (!rolleStore.createdRolle?.systemrechte || Array.from(rolleStore.createdRolle.systemrechte).length === 0) {
       return '---';
@@ -221,7 +241,10 @@
 
   onMounted(async () => {
     rolleStore.createdRolle = null;
-    await organisationStore.getAllOrganisationen();
+    await organisationStore.getAllOrganisationen({
+      systemrechte: ['ROLLEN_VERWALTEN'],
+      excludeTyp: [OrganisationsTyp.Klasse],
+    });
     await serviceProviderStore.getAllServiceProviders();
 
     // Iterate over the enum values
@@ -493,7 +516,7 @@
 
       <!-- Result template on success after submit  -->
       <template v-if="rolleStore.createdRolle && !rolleStore.errorCode">
-        <v-container class="new-rolle-success">
+        <v-container>
           <v-row justify="center">
             <v-col
               class="subtitle-1"
@@ -555,6 +578,12 @@
               ><span data-testid="created-rolle-merkmale">{{ translatedCreatedRolleMerkmale }}</span></v-col
             ></v-row
           >
+          <v-row>
+            <v-col class="text-body bold text-right"> {{ $t('admin.serviceProvider.assignedServiceProvider') }}:</v-col>
+            <v-col class="text-body">
+              <span data-testid="created-rolle-angebote">{{ translatedCreatedAngebote }}</span>
+            </v-col>
+          </v-row>
           <v-row>
             <v-col class="text-body bold text-right"> {{ $t('admin.rolle.systemrechte') }}:</v-col>
             <v-col class="text-body"

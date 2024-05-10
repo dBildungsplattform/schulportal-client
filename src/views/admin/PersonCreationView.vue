@@ -373,7 +373,7 @@
             :errorLabel="selectedOrganisationProps['error']"
             :isRequired="true"
             labelForId="organisation-select"
-            :label="$t('admin.organisation.assignOrganisation')"
+            :label="$t('admin.organisation.organisation')"
           >
             <v-autocomplete
               autocomplete="off"
@@ -399,7 +399,7 @@
 
     <!-- Result template on success after submit  -->
     <template v-if="personStore.createdPerson && !personStore.errorCode">
-      <v-container class="new-role-success">
+      <v-container>
         <v-row justify="center">
           <v-col
             class="subtitle-1"
@@ -515,4 +515,3 @@
 </template>
 
 <style></style>
-@/stores/PersonenkontextStore

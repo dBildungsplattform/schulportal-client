@@ -1,21 +1,22 @@
 import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import { isAxiosError, type AxiosResponse } from 'axios';
 import {
+  RolleApiFactory,
   RollenArt,
   RollenMerkmal,
-  RolleApiFactory,
+  RollenSystemRecht,
   type CreateRolleBodyParams,
   type RolleApiInterface,
   type RolleResponse,
-  RollenSystemRecht,
   type RolleServiceProviderQueryParams,
+  type ServiceProviderResponse,
 } from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
 
 const rolleApi: RolleApiInterface = RolleApiFactory(undefined, '', axiosApiInstance);
 
 type RolleState = {
-  createdRolle: RolleResponse | null;
+  createdRolle: Rolle | null;
   allRollen: Array<RolleResponse>;
   errorCode: string;
   loading: boolean;
@@ -43,11 +44,13 @@ export { RollenSystemRecht };
 export type { RolleResponse };
 
 export type Rolle = {
-  id: string;
   administeredBySchulstrukturknoten: string;
+  id: string;
   merkmale: Set<RollenMerkmal>;
   name: string;
   rollenart: RollenArt;
+  systemrechte?: Set<RollenSystemRecht>;
+  serviceProviders?: Array<ServiceProviderResponse>;
 };
 
 export type RolleStore = Store<'rolleStore', RolleState, RolleGetters, RolleActions>;
@@ -63,6 +66,27 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
     };
   },
   actions: {
+    async addServiceProviderToRolle(rolleId: string, rolleServiceProviderQueryParams: RolleServiceProviderQueryParams) {
+      this.loading = true;
+      try {
+        const { data }: AxiosResponse<ServiceProviderResponse> = await rolleApi.rolleControllerAddServiceProviderById(
+          rolleId,
+          rolleServiceProviderQueryParams,
+        );
+        if (this.createdRolle) {
+          this.createdRolle.serviceProviders = this.createdRolle.serviceProviders || [];
+          this.createdRolle.serviceProviders.push(data);
+        }
+        this.loading = false;
+      } catch (error: unknown) {
+        this.errorCode = 'UNSPECIFIED_ERROR';
+        if (isAxiosError(error)) {
+          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
+        }
+        this.loading = false;
+      }
+    },
+
     async createRolle(
       rollenName: string,
       administrationsebene: string,
@@ -100,20 +124,6 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
       try {
         const { data }: AxiosResponse<Array<RolleResponse>> = await rolleApi.rolleControllerFindRollen(searchString);
         this.allRollen = data;
-        this.loading = false;
-      } catch (error: unknown) {
-        this.errorCode = 'UNSPECIFIED_ERROR';
-        if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
-        }
-        this.loading = false;
-      }
-    },
-
-    async addServiceProviderToRolle(rolleId: string, rolleServiceProviderQueryParams: RolleServiceProviderQueryParams) {
-      this.loading = true;
-      try {
-        await rolleApi.rolleControllerAddServiceProviderById(rolleId, rolleServiceProviderQueryParams);
         this.loading = false;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';

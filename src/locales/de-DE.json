@@ -10,9 +10,6 @@
     },
     "mandatoryFieldsNotice": "Mit * markierte Felder sind Pflichtangaben.",
     "backToForm": "Zurück zum Formular",
-    "class": {
-      "management": "Klassenverwaltung"
-    },
     "followingDataCreated": "Folgende Daten wurden gespeichert:",
     "headline": "Administrationsbereich",
     "klasse": {
@@ -21,7 +18,30 @@
     "koPers": {
       "koPersNumber": "KoPers-Nr",
       "noKoPersNumber": "Keine KoPers-Nr vorhanden"
-    },    
+    },
+    "klasse": {
+      "addNew":"Neue Klasse hinzufügen",
+      "backToCreateKlasse": "Zurück zur Klassenanlage",
+      "create": "Klasse anlegen",
+      "createAnother": "Weitere Klasse anlegen",
+      "createNew": "Neue Klasse anlegen",
+      "discard": "Klasse verwerfen",
+      "enterKlassenname": "Klassenname eingeben",
+      "klasseAddedSuccessfully": "Die Klasse wurde erfolgreich hinzugefügt.",
+      "klasseCreateErrorText": "Die Klasse konnte nicht angelegt werden.",
+      "klasseCreateErrorTitle": "Fehler beim Anlegen der Klasse",
+      "klassenname": "Klassenname",
+      "management": "Klassenverwaltung",
+      "rules": {
+        "klassenname": {
+          "matches": "Der Klassenname darf keine ungültigen Zeichen beinhalten.",
+          "required": "Der Klassenname muss angegeben werden."
+        },
+        "schule": {
+          "required": "Die Schule muss ausgewählt werden."
+        }
+      }
+    },
     "organisation": {
       "assignOrganisation": "Organisationsebene zuordnen",
       "organisation": "Organisationsebene",
@@ -143,6 +163,7 @@
       "ersatzschule": "Ersatzschule",
       "assignAdministratingSchultraeger": "Verwaltenden Schulträger zuordnen",
       "assignSchulform": "Schulform zuordnen",
+      "assignSchule": "Schule zuordnen",
       "backToCreateSchule": "Zurück zur Schulanlage",
       "createNew": "Neue Schule anlegen",
       "create": "Schule anlegen",
@@ -242,6 +263,7 @@
     "enterLastName": "Nachname eingeben",
     "firstName": "Vorname",
     "firstNameLastNameReferrerKopersNr":"Vor-/Nachname/Benutzername/KoPers-Nr.",
+    "klasse": "Klasse",
     "kopersnr": "Kopers-Nr",
     "lastName": "Nachname",
     "noZuordnungenFound": "Keine Zuordnungen gefunden.",

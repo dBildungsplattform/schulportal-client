@@ -37,11 +37,13 @@
     { title: t('person.kopersnr'), key: 'person.personalnummer', align: 'start' },
     { title: t('person.rolle'), key: 'rollen', align: 'start' },
     { title: t('person.zuordnungen'), key: 'administrationsebenen', align: 'start' },
+    { title: t('person.klasse'), key: 'klassen', align: 'start' },
   ];
 
   type PersonenWithRolleAndZuordnung = {
     rollen: string;
     administrationsebenen: string;
+    klassen: string;
     person: Person;
   }[];
 
@@ -91,21 +93,33 @@
       const uebersicht: Uebersicht = personenkontextStore.allUebersichten?.items.find(
         (ueb: Uebersicht) => ueb?.personId === person.person.id,
       );
-      const rollenZuordnungen: string = uebersicht?.zuordnungen.length
-        ? uebersicht.zuordnungen.map((zuordnung: Zuordnung) => zuordnung.rolle).join(', ')
-        : '---';
+      const uniqueRollen: Set<string> = new Set<string>();
+      uebersicht?.zuordnungen.forEach((zuordnung: Zuordnung) => uniqueRollen.add(zuordnung.rolle));
+      const rollen: string = Array.from(uniqueRollen).join(', ');
+
       // Choose sskDstNr if available, otherwise sskName.
       const administrationsebenen: string = uebersicht?.zuordnungen.length
         ? uebersicht.zuordnungen
+            .filter((zuordnung: Zuordnung) => zuordnung.typ !== OrganisationsTyp.Klasse)
             .map((zuordnung: Zuordnung) => (zuordnung.sskDstNr ? zuordnung.sskDstNr : zuordnung.sskName))
             .join(', ')
         : '---';
       // Check if personalnummer is null, if so, replace it with "---"
       const personalnummer: string = person.person.personalnummer ?? '---';
+      // Check if the uebersicht has a zuordnung of type "Klasse" if no then show directly "---" without filtering or mapping
+      const klassen: string = uebersicht?.zuordnungen.some(
+        (zuordnung: Zuordnung) => zuordnung.typ === OrganisationsTyp.Klasse,
+      )
+        ? uebersicht.zuordnungen
+            .filter((zuordnung: Zuordnung) => zuordnung.typ === OrganisationsTyp.Klasse)
+            .map((zuordnung: Zuordnung) => (zuordnung.sskName.length ? zuordnung.sskName : '---'))
+            .join(', ')
+        : '---';
       return {
         ...person,
-        rollen: rollenZuordnungen,
+        rollen,
         administrationsebenen: administrationsebenen,
+        klassen: klassen,
         person: { ...person.person, personalnummer: personalnummer },
       };
     });

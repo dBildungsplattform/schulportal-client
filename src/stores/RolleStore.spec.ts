@@ -4,6 +4,7 @@ import { setActivePinia, createPinia } from 'pinia';
 import { useRolleStore, type RolleStore } from './RolleStore';
 import { RollenMerkmal, RollenSystemRecht, type RolleResponse } from '../api-client/generated/api';
 import { rejects } from 'assert';
+import type { ServiceProvider } from './ServiceProviderStore';
 
 const mockadapter: MockAdapter = new MockAdapter(ApiService);
 
@@ -131,12 +132,31 @@ describe('rolleStore', () => {
 
   describe('addServiceProviderToRolle', () => {
     it('should add a service provider to a rolle', async () => {
-      mockadapter.onPost('/api/rolle/1/serviceProviders').replyOnce(200, {}, {});
+      rolleStore.createdRolle = {
+        id: '1',
+        administeredBySchulstrukturknoten: '3',
+        merkmale: new Set(),
+        name: 'Rolle 1',
+        rollenart: 'LERN',
+        systemrechte: new Set(),
+      };
+
+      const mockResponse: ServiceProvider = {
+        id: '1234',
+        name: 'itslearning mock',
+        url: 'example.org/itslearning',
+        target: 'URL',
+        kategorie: 'EMAIL',
+        hasLogo: true,
+      };
+
+      mockadapter.onPost('/api/rolle/1/serviceProviders').replyOnce(200, mockResponse, {});
       const addServiceProviderToRollePromise: Promise<void> = rolleStore.addServiceProviderToRolle('1', {
-        serviceProviderId: '1',
+        serviceProviderId: '1234',
       });
       expect(rolleStore.loading).toBe(true);
       await addServiceProviderToRollePromise;
+      expect(rolleStore.createdRolle.serviceProviders).toEqual([mockResponse]);
       expect(rolleStore.loading).toBe(false);
     });
 
