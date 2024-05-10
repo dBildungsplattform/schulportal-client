@@ -18,7 +18,7 @@
   } from 'vue-router';
   import { type Composer, useI18n } from 'vue-i18n';
   import { useForm, type TypedSchema, type BaseFieldProps } from 'vee-validate';
-  import { object, string } from 'yup';
+  import { object, string, StringSchema, type AnyObject } from 'yup';
   import { toTypedSchema } from '@vee-validate/yup';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
@@ -41,6 +41,62 @@
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
   let blockedNext: () => void = () => {};
 
+  const searchInputRollen: Ref<string> = ref('');
+  const searchInputOrganisation: Ref<string> = ref('');
+  const searchInputKlasse: Ref<string> = ref('');
+
+  // Watcher to detect when the search input for Rollen has 3 or more characters to trigger filtering.
+  watch(searchInputRollen, async (newValue: string, _oldValue: string) => {
+    if (newValue.length >= 3) {
+      personenkontextStore.getPersonenkontextRolleWithFilter(newValue, 25);
+    }
+  });
+
+  const rollen: ComputedRef<
+    | {
+        value: string;
+        title: string;
+        Rollenart: RollenArt;
+      }[]
+    | undefined
+  > = computed(() => {
+    // If searchInput is less than 3 characters, return the initial 25 roles from the rolleStore
+    if (searchInputRollen.value.length < 3) {
+      return rolleStore.allRollen
+        .slice(0, 25)
+        .map((rolle: RolleResponse) => ({
+          value: rolle.id,
+          title: rolle.name,
+          Rollenart: rolle.rollenart, // Include Rollenart in the object
+        }))
+        .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
+    } else {
+      // Once filtering is applied, map the filteredRollen for the autocomplete
+      return personenkontextStore.filteredRollen?.moeglicheRollen
+        .slice(0, 25)
+        .map((rolle: RolleResponse) => ({
+          value: rolle.id,
+          title: rolle.name,
+          Rollenart: rolle.rollenart, // Include Rollenart in the object
+        }))
+        .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
+    }
+  });
+
+  // Define a method to check if the selected Rolle is of type "Lern"
+  function isLernRolle(selectedRolleId: string): boolean {
+    const rolle:
+      | {
+          value: string;
+          title: string;
+          Rollenart: RollenArt;
+        }
+      | undefined = rollen.value?.find(
+      (r: { value: string; title: string; Rollenart: RollenArt }) => r.value === selectedRolleId,
+    );
+    return !!rolle && rolle.Rollenart === RollenArt.Lern;
+  }
+
   const validationSchema: TypedSchema = toTypedSchema(
     object({
       selectedRolle: string().required(t('admin.rolle.rules.rolle.required')),
@@ -53,7 +109,11 @@
         .min(2, t('admin.person.rules.familienname.min'))
         .required(t('admin.person.rules.familienname.required')),
       selectedOrganisation: string().required(t('admin.organisation.rules.organisation.required')),
-      selectedKlasse: string().required(t('admin.klasse.rules.klasse.required')),
+      selectedKlasse: string().when('selectedRolle', {
+        is: (selectedRolleId: string) => isLernRolle(selectedRolleId),
+        then: (schema: StringSchema<string | undefined, AnyObject, undefined, ''>) =>
+          schema.required(t('admin.klasse.rules.klasse.required')),
+      }),
     }),
   );
 
@@ -105,15 +165,6 @@
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedKlasse', vuetifyConfig);
 
-  const searchInputRollen: Ref<string> = ref('');
-  const searchInputOrganisation: Ref<string> = ref('');
-  const searchInputKlasse: Ref<string> = ref('');
-  // Watcher to detect when the search input for Rollen has 3 or more characters to trigger filtering.
-  watch(searchInputRollen, async (newValue: string, _oldValue: string) => {
-    if (newValue.length >= 3) {
-      personenkontextStore.getPersonenkontextRolleWithFilter(newValue, 25);
-    }
-  });
   // Watcher to detect when the Rolle is selected so the Organisationen show all the possible choices using that value.
   watch(selectedRolle, (newValue: string, oldValue: string) => {
     // This checks if `selectedRolle` is cleared or set to a falsy value
@@ -159,51 +210,6 @@
       organisationStore.getKlassenByOrganisationId(selectedOrganisation.value);
     }
   });
-
-  const rollen: ComputedRef<
-    | {
-        value: string;
-        title: string;
-        Rollenart: RollenArt;
-      }[]
-    | undefined
-  > = computed(() => {
-    // If searchInput is less than 3 characters, return the initial 25 roles from the rolleStore
-    if (searchInputRollen.value.length < 3) {
-      return rolleStore.allRollen
-        .slice(0, 25)
-        .map((rolle: RolleResponse) => ({
-          value: rolle.id,
-          title: rolle.name,
-          Rollenart: rolle.rollenart, // Include Rollenart in the object
-        }))
-        .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
-    } else {
-      // Once filtering is applied, map the filteredRollen for the autocomplete
-      return personenkontextStore.filteredRollen?.moeglicheRollen
-        .slice(0, 25)
-        .map((rolle: RolleResponse) => ({
-          value: rolle.id,
-          title: rolle.name,
-          Rollenart: rolle.rollenart, // Include Rollenart in the object
-        }))
-        .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
-    }
-  });
-
-  // Define a method to check if the selected Rolle is of type "Lern"
-  function isLernRolle(selectedRolleId: string): boolean {
-    const rolle:
-      | {
-          value: string;
-          title: string;
-          Rollenart: RollenArt;
-        }
-      | undefined = rollen.value?.find(
-      (r: { value: string; title: string; Rollenart: RollenArt }) => r.value === selectedRolleId,
-    );
-    return !!rolle && rolle.Rollenart === RollenArt.Lern;
-  }
 
   const organisationen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
     return personenkontextStore.filteredOrganisationen?.moeglicheSsks
@@ -591,7 +597,9 @@
         <v-row>
           <v-col class="text-body bold text-right"> {{ $t('admin.klasse.klasse') }}: </v-col>
           <v-col class="text-body"
-            ><span data-testid="created-person-klasse">{{ translatedKlassenname }}</span></v-col
+            ><span data-testid="created-person-klasse">{{
+              translatedKlassenname ? translatedKlassenname : '---'
+            }}</span></v-col
           >
         </v-row>
         <v-divider
