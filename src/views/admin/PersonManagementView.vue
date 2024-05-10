@@ -133,9 +133,9 @@
   // Watcher to detect when the search input for Organisationen is triggered.
   watch(searchInputSchulen, async (newValue: string, _oldValue: string) => {
     if (newValue.length >= 3) {
-      organisationStore.getAllOrganisationen(undefined, 25, undefined, undefined, newValue, OrganisationsTyp.Schule);
+      organisationStore.getAllOrganisationen({ searchString: newValue, includeTyp: OrganisationsTyp.Schule});
     } else {
-      organisationStore.getAllOrganisationen(undefined, 25, undefined, undefined, undefined, OrganisationsTyp.Schule);
+      organisationStore.getAllOrganisationen({ searchString: undefined });
     }
   });
 
@@ -149,14 +149,7 @@
   });
 
   onMounted(async () => {
-    await organisationStore.getAllOrganisationen(
-      undefined,
-      25,
-      undefined,
-      undefined,
-      undefined,
-      OrganisationsTyp.Schule,
-    );
+    await organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Schule});
     await personStore.getAllPersons('');
     await personenkontextStore.getAllPersonenuebersichten();
     await rolleStore.getAllRollen();

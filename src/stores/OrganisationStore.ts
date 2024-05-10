@@ -33,6 +33,7 @@ type OrganisationState = {
 export type OrganisationenFilter = {
   searchString?: string;
   systemrechte?: RollenSystemRecht[];
+  includeTyp?: OrganisationsTyp;
   excludeTyp?: OrganisationsTyp[];
 };
 
@@ -82,7 +83,7 @@ export const useOrganisationStore: StoreDefinition<
           undefined,
           undefined,
           filter?.searchString,
-          undefined,
+          filter?.includeTyp,
           filter?.systemrechte,
           filter?.excludeTyp,
         );
