@@ -5,7 +5,7 @@ type SearchFilterState = {
 };
 
 type SearchFilterActions = {
-  setFilter: (searchFilter: string) => Promise<void>;
+  setFilter: (searchFilter: string | null) => Promise<void>;
 };
 
 type SearchFilterGetters = {};
@@ -23,7 +23,7 @@ export const useSearchFilterStore: StoreDefinition<
     searchFilter: '',
   }),
   actions: {
-    async setFilter(searchFilter: string) {
+    async setFilter(searchFilter: string | null) {
       this.searchFilter = searchFilter;
     },
   },

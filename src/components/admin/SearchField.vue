@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { onBeforeMount, onMounted, ref, type Ref } from 'vue';
+  import { onBeforeMount, ref, type Ref } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
 
@@ -28,13 +28,14 @@
       await searchFilterStore.setFilter(searchFilter.value.trim());
       emit('onApplySearchFilter', searchFilter.value.trim());
     } else {
+      await searchFilterStore.setFilter(searchFilter.value);
       emit('onApplySearchFilter', '');
     }
   }
 
   onBeforeMount(() => {
     searchFilter.value = searchFilterStore.searchFilter ?? '';
-     applySearchFilter(); // Apply the filter when the component mounts
+     applySearchFilter(); // Apply the filter before the component mounts
   });
 </script>
 
