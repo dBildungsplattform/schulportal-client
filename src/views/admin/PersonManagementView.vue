@@ -94,7 +94,6 @@ import { type SearchFilterStore, useSearchFilterStore } from '@/stores/SearchFil
   onMounted(async () => {
     await personStore.getAllPersons('');
     await personenKontextStore.getAllPersonenuebersichten();
-    console.log(searchFilterStore.searchFilter)
 
   });
 </script>
