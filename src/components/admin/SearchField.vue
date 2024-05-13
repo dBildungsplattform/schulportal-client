@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { onMounted, ref, type Ref } from 'vue';
+  import { onBeforeMount, onMounted, ref, type Ref } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
 
@@ -23,17 +23,18 @@
 
   const props: Props = defineProps<Props>();
 
-  function applySearchFilter(): void {
+  async function applySearchFilter(): Promise<void>  {
     if (searchFilter.value !== null) {
-      searchFilterStore.setFilter(searchFilter.value.trim());
+      await searchFilterStore.setFilter(searchFilter.value.trim());
       emit('onApplySearchFilter', searchFilter.value.trim());
     } else {
       emit('onApplySearchFilter', '');
     }
   }
 
-  onMounted(() => {
+  onBeforeMount(() => {
     searchFilter.value = searchFilterStore.searchFilter ?? '';
+     applySearchFilter(); // Apply the filter when the component mounts
   });
 </script>
 
