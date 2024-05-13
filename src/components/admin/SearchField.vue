@@ -1,8 +1,11 @@
 <script setup lang="ts">
   import { ref, type Ref } from 'vue';
   import { useI18n } from 'vue-i18n';
+  import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
 
   useI18n({ useScope: 'global' });
+
+  const searchFilterStore: SearchFilterStore = useSearchFilterStore();
 
   const searchFilter: Ref<string | null> = ref('');
 
@@ -22,6 +25,7 @@
 
   function applySearchFilter(): void {
     if (searchFilter.value !== null) {
+      searchFilterStore.setFilter(searchFilter.value.trim())
       emit('onApplySearchFilter', searchFilter.value.trim());
     } else {
       emit('onApplySearchFilter', '');
