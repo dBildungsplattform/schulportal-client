@@ -189,6 +189,7 @@
             <v-radio-group
               inline
               v-model="selectedSchulform"
+              data-testid="schulform-radio-group"
             >
               <v-col
                 cols="12"
@@ -198,6 +199,7 @@
                 <v-radio
                   :label="$t('admin.schule.publicSchule')"
                   :value="$t('admin.schule.publicSchule')"
+                  data-testid="public-schule-radio-button"
                 ></v-radio>
               </v-col>
               <v-col
@@ -208,6 +210,7 @@
                 <v-radio
                   :label="$t('admin.schule.ersatzschule')"
                   :value="$t('admin.schule.ersatzschule')"
+                  data-testid="ersatzschule-radio-button"
                 ></v-radio>
               </v-col>
             </v-radio-group>
@@ -246,7 +249,7 @@
             :label="$t('admin.schule.schulname')"
           >
             <v-text-field
-              data-testid="schul-name-input"
+              data-testid="schulname-input"
               v-bind="selectedSchulnameProps"
               v-model="selectedSchulname"
               :placeholder="$t('admin.schule.schulname')"
