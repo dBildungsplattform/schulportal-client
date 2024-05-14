@@ -30,7 +30,7 @@ beforeEach(() => {
     moeglicheSsks: [
       {
         id: 'string',
-        kennung: 'string',
+        kennung: '',
         name: 'Organisation1',
         namensergaenzung: 'string',
         kuerzel: 'string',
