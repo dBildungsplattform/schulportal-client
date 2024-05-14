@@ -93,13 +93,18 @@
         :disableRowClick="true"
       >
         <template v-slot:[`item.serviceProviders`]="{ item }">
-          <span v-if="!item.serviceProviders.length">-</span>
-          <span
-            v-for="(serviceProvider, index) in item.serviceProviders"
-            :key="serviceProvider.id"
+          <div
+            class="ellipsis-wrapper"
+            :title="item.serviceProviders.join(', ')"
           >
-            {{ serviceProvider.name }}{{ index < item.serviceProviders.length - 1 ? ', ' : '' }}
-          </span>
+            <span v-if="!item.serviceProviders.length">---</span>
+            <span
+              v-for="(serviceProvider, index) in item.serviceProviders"
+              :key="serviceProvider.id"
+            >
+              {{ serviceProvider.name }}{{ index < item.serviceProviders.length - 1 ? ', ' : '' }}
+            </span>
+          </div>
         </template>
       </ResultTable>
     </LayoutCard>

@@ -116,7 +116,22 @@
         @onUpdateTable="personStore.getAllPersons('')"
         :totalItems="personStore.totalPersons"
         item-value-path="person.id"
-      ></ResultTable>
+        ><template v-slot:[`item.rollen`]="{ item }">
+          <div
+            class="ellipsis-wrapper"
+            :title="item.rollen"
+          >
+            {{ item.rollen }}
+          </div> </template
+        ><template v-slot:[`item.administrationsebenen`]="{ item }">
+          <div
+            class="ellipsis-wrapper"
+            :title="item.administrationsebenen"
+          >
+            {{ item.administrationsebenen }}
+          </div>
+        </template></ResultTable
+      >
     </LayoutCard>
   </div>
 </template>
