@@ -7,7 +7,7 @@
 
   const searchFilterStore: SearchFilterStore = useSearchFilterStore();
 
-  const searchFilter: Ref<string | null> = ref('');
+  const searchFilter: Ref<string | null> = ref(searchFilterStore.searchFilter);
 
   type Emits = {
     (event: 'onApplySearchFilter', searchFilter: string): void;
@@ -23,7 +23,7 @@
 
   const props: Props = defineProps<Props>();
 
-  async function applySearchFilter(): Promise<void>  {
+  async function applySearchFilter(): Promise<void> {
     if (searchFilter.value !== null) {
       await searchFilterStore.setFilter(searchFilter.value.trim());
       emit('onApplySearchFilter', searchFilter.value.trim());
@@ -35,7 +35,7 @@
 
   onBeforeMount(() => {
     searchFilter.value = searchFilterStore.searchFilter ?? '';
-     applySearchFilter(); // Apply the filter before the component mounts
+    applySearchFilter(); // Apply the filter if the searchFilter is not an empty string
   });
 </script>
 

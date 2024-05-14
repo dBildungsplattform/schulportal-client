@@ -15,9 +15,11 @@
     type Zuordnung,
   } from '@/stores/PersonenkontextStore';
   import { OrganisationsTyp } from '@/stores/OrganisationStore';
+  import { type SearchFilterStore, useSearchFilterStore } from '@/stores/SearchFilterStore';
 
   const personStore: PersonStore = usePersonStore();
   const personenKontextStore: PersonenkontextStore = usePersonenkontextStore();
+  const searchFilterStore: SearchFilterStore = useSearchFilterStore();
 
   const { t }: Composer = useI18n({ useScope: 'global' });
   const searchFilter: Ref<string> = ref('');
@@ -90,7 +92,9 @@
   };
 
   onMounted(async () => {
-    await personStore.getAllPersons('');
+    if (searchFilterStore.searchFilter === '') {
+      await personStore.getAllPersons('');
+    }
     await personenKontextStore.getAllPersonenuebersichten();
   });
 </script>
