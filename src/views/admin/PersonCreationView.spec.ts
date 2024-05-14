@@ -138,4 +138,28 @@ describe('PersonCreationView', () => {
     const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
     expect(organisationAutocomplete?.exists()).toBe(false);
   });
+
+  test('it resets field Klasse when organisation is reset', async () => {
+    const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
+    await rolleAutocomplete?.setValue('54321');
+    await nextTick();
+
+    const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
+    await organisationAutocomplete?.setValue('O1');
+    await nextTick();
+
+    expect(organisationAutocomplete?.text()).toEqual('O1');
+    await nextTick();
+
+    const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
+    await klasseAutocomplete?.setValue('9b');
+    await nextTick();
+
+    expect(klasseAutocomplete?.text()).toEqual('9b');
+
+    await organisationAutocomplete?.setValue(undefined);
+    await nextTick();
+
+    expect(klasseAutocomplete?.exists()).toBe(false);
+  });
 });
