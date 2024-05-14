@@ -45,6 +45,12 @@
   const searchInputOrganisation: Ref<string> = ref('');
   const searchInputKlasse: Ref<string> = ref('');
 
+  type RolleWithRollenart = {
+    value: string;
+    title: string;
+    Rollenart: RollenArt;
+  };
+
   // Watcher to detect when the search input for Rollen has 3 or more characters to trigger filtering.
   watch(searchInputRollen, async (newValue: string, _oldValue: string) => {
     if (newValue.length >= 3) {
@@ -52,14 +58,7 @@
     }
   });
 
-  const rollen: ComputedRef<
-    | {
-        value: string;
-        title: string;
-        Rollenart: RollenArt;
-      }[]
-    | undefined
-  > = computed(() => {
+  const rollen: ComputedRef<RolleWithRollenart[] | undefined> = computed(() => {
     // If searchInput is less than 3 characters, return the initial 25 roles from the rolleStore
     if (searchInputRollen.value.length < 3) {
       return rolleStore.allRollen
@@ -85,13 +84,7 @@
 
   // Define a method to check if the selected Rolle is of type "Lern"
   function isLernRolle(selectedRolleId: string): boolean {
-    const rolle:
-      | {
-          value: string;
-          title: string;
-          Rollenart: RollenArt;
-        }
-      | undefined = rollen.value?.find(
+    const rolle: RolleWithRollenart | undefined = rollen.value?.find(
       (r: { value: string; title: string; Rollenart: RollenArt }) => r.value === selectedRolleId,
     );
     return !!rolle && rolle.Rollenart === RollenArt.Lern;
@@ -486,33 +479,32 @@
               v-model:search="searchInputOrganisation"
             ></v-autocomplete>
           </FormRow>
-          <template v-if="selectedRolle && isLernRolle(selectedRolle) && selectedOrganisation">
-            <!-- Klasse zuordnen -->
-            <FormRow
-              :errorLabel="selectedKlasseProps['error']"
-              :isRequired="true"
-              labelForId="klasse-select"
-              :label="$t('admin.klasse.klasse')"
-            >
-              <v-autocomplete
-                autocomplete="off"
-                clearable
-                data-testid="klasse-select"
-                density="compact"
-                id="klasse-select"
-                ref="klasse-select"
-                :items="klassen"
-                item-value="value"
-                item-text="title"
-                :no-data-text="$t('noDataFound')"
-                :placeholder="$t('admin.klasse.selectKlasse')"
-                variant="outlined"
-                v-bind="selectedKlasseProps"
-                v-model="selectedKlasse"
-                v-model:search="searchInputKlasse"
-              ></v-autocomplete>
-            </FormRow>
-          </template>
+          <!-- Klasse zuordnen -->
+          <FormRow
+            v-if="isLernRolle(selectedRolle) && selectedOrganisation"
+            :errorLabel="selectedKlasseProps['error']"
+            :isRequired="true"
+            labelForId="klasse-select"
+            :label="$t('admin.klasse.klasse')"
+          >
+            <v-autocomplete
+              autocomplete="off"
+              clearable
+              data-testid="klasse-select"
+              density="compact"
+              id="klasse-select"
+              ref="klasse-select"
+              :items="klassen"
+              item-value="value"
+              item-text="title"
+              :no-data-text="$t('noDataFound')"
+              :placeholder="$t('admin.klasse.selectKlasse')"
+              variant="outlined"
+              v-bind="selectedKlasseProps"
+              v-model="selectedKlasse"
+              v-model:search="searchInputKlasse"
+            ></v-autocomplete>
+          </FormRow>
         </div>
       </FormWrapper>
     </template>
