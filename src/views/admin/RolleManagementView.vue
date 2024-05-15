@@ -94,7 +94,11 @@
       >
         <template v-slot:[`item.serviceProviders`]="{ item }">
           <div class="ellipsis-wrapper">
-            <span v-if="!item.serviceProviders.length">---</span>
+            <span
+              v-if="!item.serviceProviders.length"
+              title="---"
+              >---</span
+            >
             <span :title="item.serviceProviders.map((provider: any) => provider.name).join(', ')">
               <span
                 v-for="(serviceProvider, index) in item.serviceProviders"
