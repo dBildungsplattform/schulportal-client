@@ -1,4 +1,5 @@
 <script setup lang="ts">
+  import router from '@/router';
   import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
   import { type Ref, ref, type ComputedRef } from 'vue';
   import { onMounted } from 'vue';
@@ -13,6 +14,19 @@
     if (mobile.value) {
       menuDrawer.value = false;
     }
+  }
+
+  function handleMenuItemClick(route: string): void {
+    if (router.currentRoute.value.path === route) {
+      // If current route is the same as the route we're navigating to,
+      // force a refresh by pushing the same route again
+      router.push(route).then(() => {
+        router.go(0);
+      });
+    } else {
+      router.push(route);
+    }
+    closeMenuOnMobile();
   }
 
   onMounted(async () => {
@@ -108,7 +122,7 @@
       ></v-list-item>
       <v-list-item
         class="menu-bar-sub-item caption"
-        @click="closeMenuOnMobile"
+        @click="handleMenuItemClick('/admin/personen')"
         data-testid="person-management-menu-item"
         prepend-icon="mdi-format-list-bulleted"
         :title="$t('admin.person.showAll')"
@@ -150,7 +164,7 @@
       ></v-list-item>
       <v-list-item
         class="menu-bar-sub-item caption"
-        @click="closeMenuOnMobile"
+        @click="handleMenuItemClick('/admin/rollen')"
         data-testid="rolle-management-menu-item"
         prepend-icon="mdi-format-list-bulleted"
         :title="$t('admin.rolle.showAll')"
@@ -175,7 +189,7 @@
       ></v-list-item>
       <v-list-item
         class="menu-bar-sub-item caption"
-        @click="closeMenuOnMobile"
+        @click="handleMenuItemClick('/admin/schulen')"
         data-testid="schule-management-menu-item"
         prepend-icon="mdi-format-list-bulleted"
         :title="$t('admin.schule.showAll')"
