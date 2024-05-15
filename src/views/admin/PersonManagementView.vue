@@ -53,7 +53,7 @@
       );
       const uniqueRollen: Set<string> = new Set<string>();
       uebersicht?.zuordnungen.forEach((zuordnung: Zuordnung) => uniqueRollen.add(zuordnung.rolle));
-      const rollen: string = Array.from(uniqueRollen).join(', ');
+      const rollen: string = uniqueRollen.size > 0 ? Array.from(uniqueRollen).join(', ') : '---';
 
       // Choose sskDstNr if available, otherwise sskName.
       const administrationsebenen: string = uebersicht?.zuordnungen.length
