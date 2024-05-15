@@ -124,6 +124,8 @@
       "createNew": "Neue Benutzer anlegen",
       "creationErrorText": "",
       "creationErrorTitle": "Fehler beim Anlegen des Benutzers.",
+      "deletePersonConfirmation": "Sind Sie sicher, dass Sie {firstname} {lastname} löschen möchten?",
+      "deletePerson": "Benutzer löschen",
       "discard": "Benutzer verwerfen",
       "edit": "Benutzer bearbeiten",
       "generatedPassword": "Generiertes Passwort",
