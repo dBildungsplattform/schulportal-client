@@ -11,16 +11,9 @@
   type Props = {
     errorCode: string;
     person: Personendatensatz;
-    password: string;
-  };
-
-  type Emits = {
-    (event: 'onClearPassword'): void;
-    (event: 'onResetPassword', id: string): void;
   };
 
   const props: Props = defineProps<Props>();
-  const emit: Emits = defineEmits<Emits>();
   const errorMessage: Ref<string> = ref('');
 
   const deletePersonConfirmationMessage: ComputedRef<string> = computed(() => {
@@ -35,9 +28,8 @@
     return message;
   });
 
-  async function closePasswordResetDialog(isActive: Ref<boolean>): Promise<void> {
+  async function closePersonDeleteDialog(isActive: Ref<boolean>): Promise<void> {
     isActive.value = false;
-    emit('onClearPassword');
   }
 </script>
 
@@ -64,7 +56,7 @@
       <LayoutCard
         :closable="true"
         :header="$t('admin.person.deletePerson')"
-        @onCloseClicked="closePasswordResetDialog(isActive)"
+        @onCloseClicked="closePersonDeleteDialog(isActive)"
       >
         <v-card-text>
           <v-container>
@@ -106,10 +98,10 @@
               <v-btn
                 :block="mdAndDown"
                 class="secondary button"
-                @click.stop="closePasswordResetDialog(isActive)"
+                @click.stop="closePersonDeleteDialog(isActive)"
                 data-testid="close-password-reset-dialog-button"
               >
-                {{ !!password ? $t('close') : $t('cancel') }}
+                {{ $t('cancel') }}
               </v-btn>
             </v-col>
             <v-col
@@ -122,7 +114,6 @@
                 class="primary button"
                 @click.stop="$emit('onResetPassword', person.person.id)"
                 data-testid="person-delete-button"
-                :disabled="!!password"
               >
                 {{ $t('admin.person.deletePerson') }}
               </v-btn>
