@@ -5,7 +5,7 @@ import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '
 import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
 import MockAdapter from 'axios-mock-adapter';
 import ApiService from '@/services/ApiService';
-import { nextTick } from 'vue';
+import { nextTick, ref, type Ref } from 'vue';
 import type { DBiamPersonenkontextResponse, RollenMerkmal, RollenSystemRecht } from '@/api-client/generated';
 import { useRolleStore, type RolleStore } from '@/stores/RolleStore';
 
@@ -53,7 +53,6 @@ beforeEach(() => {
     rolleId: '54321',
   } as DBiamPersonenkontextResponse;
 
-
   organisationStore.klassen = [
     {
       id: '1',
@@ -87,6 +86,12 @@ beforeEach(() => {
       id: '54321',
     },
   ];
+  const selectedFamilienname: Ref<string> = ref('Doe');
+  const selectedVorname: Ref<string> = ref('John');
+  const selectedOrganisation: Ref<string> = ref('orgId');
+  const selectedRolle: Ref<string> = ref('rolleId');
+  const selectedKlasse: Ref<string> = ref('');
+
   wrapper = mount(PersonCreationView, {
     propsData: {
       searchInputKlasse: 'Testing the ref',
@@ -102,6 +107,15 @@ beforeEach(() => {
           fullPath: 'full/path',
         },
       },
+    },
+    data() {
+      return {
+        selectedFamilienname,
+        selectedVorname,
+        selectedOrganisation,
+        selectedRolle,
+        selectedKlasse,
+      };
     },
   });
 });
@@ -172,7 +186,7 @@ describe('PersonCreationView', () => {
     await nextTick();
 
     await rolleAutocomplete?.setValue(undefined);
-    await nextTick()
+    await nextTick();
 
     expect(organisationAutocomplete?.exists()).toBe(false);
   });
