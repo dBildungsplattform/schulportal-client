@@ -10,7 +10,6 @@
     type CreatedPerson,
     type CreatedPersonenkontext,
     type PersonStore,
-    type PersonendatensatzResponse,
   } from '@/stores/PersonStore';
   import { type RolleStore, useRolleStore, type RolleResponse, RollenArt } from '@/stores/RolleStore';
   import { type ComputedRef, computed, onMounted, onUnmounted, type Ref, ref, watch } from 'vue';
@@ -270,10 +269,12 @@
         vorname: selectedVorname.value as string,
       },
     };
-    personStore.createPerson(unpersistedPerson).then(async (personResponse: PersonendatensatzResponse) => {
+
+    await personStore.createPerson(unpersistedPerson);
+    if (personStore.createdPerson) {
       // Build the context for the organisation
       const unpersistedOrganisationPersonenkontext: CreatedPersonenkontext = {
-        personId: personResponse.person.id,
+        personId: personStore.createdPerson.person.id,
         organisationId: selectedOrganisation.value,
         rolleId: selectedRolle.value,
       };
@@ -285,7 +286,7 @@
       // Build the context for the Klasse and save it only if the the Klasse was selected
       if (selectedKlasse.value) {
         const unpersistedKlassePersonenkontext: CreatedPersonenkontext = {
-          personId: personResponse.person.id,
+          personId: personStore.createdPerson.person.id,
           organisationId: selectedKlasse.value,
           rolleId: selectedRolle.value,
         };
@@ -296,7 +297,7 @@
           });
       }
       resetForm();
-    });
+    }
   }
 
   const onSubmit: (e?: Event | undefined) => Promise<void | undefined> = handleSubmit(() => {
@@ -428,6 +429,7 @@
               data-testid="vorname-input"
               density="compact"
               id="vorname-input"
+              ref="vorname-input"
               :placeholder="$t('person.enterFirstName')"
               required="true"
               variant="outlined"
@@ -448,6 +450,7 @@
               data-testid="familienname-input"
               density="compact"
               id="familienname-input"
+              ref="familienname-input"
               :placeholder="$t('person.enterLastName')"
               required="true"
               variant="outlined"

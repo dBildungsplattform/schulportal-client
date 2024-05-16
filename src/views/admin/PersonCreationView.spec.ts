@@ -5,15 +5,22 @@ import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '
 import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
 import MockAdapter from 'axios-mock-adapter';
 import ApiService from '@/services/ApiService';
-import { nextTick, ref, type Ref } from 'vue';
-import type { DBiamPersonenkontextResponse, RollenMerkmal, RollenSystemRecht } from '@/api-client/generated';
+import { nextTick } from 'vue';
+import type {
+  DBiamPersonenkontextResponse,
+  PersonendatensatzResponse,
+  RollenMerkmal,
+  RollenSystemRecht,
+} from '@/api-client/generated';
 import { useRolleStore, type RolleStore } from '@/stores/RolleStore';
+import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
 
 const mockadapter: MockAdapter = new MockAdapter(ApiService);
 let wrapper: VueWrapper | null = null;
 let organisationStore: OrganisationStore;
 let personenkontextStore: PersonenkontextStore;
 let rolleStore: RolleStore;
+let personStore: PersonStore;
 
 beforeEach(() => {
   mockadapter.reset();
@@ -26,6 +33,8 @@ beforeEach(() => {
   organisationStore = useOrganisationStore();
   personenkontextStore = usePersonenkontextStore();
   rolleStore = useRolleStore();
+  personStore = usePersonStore();
+
   personenkontextStore.filteredOrganisationen = {
     moeglicheSsks: [
       {
@@ -86,12 +95,6 @@ beforeEach(() => {
       id: '54321',
     },
   ];
-  const selectedFamilienname: Ref<string> = ref('Doe');
-  const selectedVorname: Ref<string> = ref('John');
-  const selectedOrganisation: Ref<string> = ref('orgId');
-  const selectedRolle: Ref<string> = ref('rolleId');
-  const selectedKlasse: Ref<string> = ref('');
-
   wrapper = mount(PersonCreationView, {
     propsData: {
       searchInputKlasse: 'Testing the ref',
@@ -107,15 +110,6 @@ beforeEach(() => {
           fullPath: 'full/path',
         },
       },
-    },
-    data() {
-      return {
-        selectedFamilienname,
-        selectedVorname,
-        selectedOrganisation,
-        selectedRolle,
-        selectedKlasse,
-      };
     },
   });
 });
@@ -189,5 +183,42 @@ describe('PersonCreationView', () => {
     await nextTick();
 
     expect(organisationAutocomplete?.exists()).toBe(false);
+  });
+
+  test('it triggers submit', async () => {
+    const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
+    await rolleAutocomplete?.setValue('54321');
+    await nextTick();
+
+    const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
+    await organisationAutocomplete?.setValue('O1');
+    await nextTick();
+
+    expect(organisationAutocomplete?.text()).toEqual('O1');
+    await nextTick();
+
+    const familiennameSelect: VueWrapper | undefined = wrapper?.findComponent({ ref: 'familienname-input' });
+    await familiennameSelect?.setValue('Mustermann');
+    await nextTick();
+
+    const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
+    await klasseAutocomplete?.setValue('55555');
+    await nextTick();
+
+    const mockPerson: PersonendatensatzResponse = {
+      person: {
+        id: '9876',
+        name: {
+          familienname: 'Cena',
+          vorname: 'Randy',
+        },
+        referrer: 'rcena',
+      },
+    } as PersonendatensatzResponse;
+
+    personStore.createdPerson = mockPerson;
+
+    wrapper?.find('[data-testid="person-creation-form-create-button"]').trigger('click');
+    await nextTick();
   });
 });
