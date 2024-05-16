@@ -233,15 +233,14 @@
     () =>
       organisationen.value?.find(
         (organisation: TranslatedObject) =>
-          organisation.value === personenkontextStore.createdPersonenkontextForOrganisation?.organisationId,
+          organisation.value === personenkontextStore.createdPersonenkontextForSchule?.organisationId,
       )?.title || '',
   );
 
   const translatedRollenname: ComputedRef<string> = computed(
     () =>
       rollen.value?.find(
-        (rolle: TranslatedObject) =>
-          rolle.value === personenkontextStore.createdPersonenkontextForOrganisation?.rolleId,
+        (rolle: TranslatedObject) => rolle.value === personenkontextStore.createdPersonenkontextForSchule?.rolleId,
       )?.title || '',
   );
 
