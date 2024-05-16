@@ -41,11 +41,18 @@ beforeEach(() => {
     total: 0,
   };
 
-  personenkontextStore.createdPersonenkontextForOrganisation = {
+  personenkontextStore.createdPersonenkontextForSchule = {
     personId: '12345',
     organisationId: '67890',
     rolleId: '54321',
   } as DBiamPersonenkontextResponse;
+
+  personenkontextStore.createdPersonenkontextForKlasse = {
+    personId: '12345',
+    organisationId: '55555',
+    rolleId: '54321',
+  } as DBiamPersonenkontextResponse;
+
 
   organisationStore.klassen = [
     {
@@ -124,10 +131,10 @@ describe('PersonCreationView', () => {
     await nextTick();
 
     const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
-    await klasseAutocomplete?.setValue('9b');
+    await klasseAutocomplete?.setValue('55555');
     await nextTick();
 
-    expect(klasseAutocomplete?.text()).toEqual('9b');
+    expect(klasseAutocomplete?.text()).toEqual('55555');
   });
 
   test('it calls watchers for unselected organisation', async () => {

@@ -69,7 +69,7 @@ type PersonenkontextState = {
   filteredRollen: FindRollenResponse | null;
   filteredOrganisationen: FindSchulstrukturknotenResponse | null;
   personenuebersicht: DBiamPersonenuebersichtResponse | null;
-  createdPersonenkontextForOrganisation: DBiamPersonenkontextResponse | null;
+  createdPersonenkontextForSchule: DBiamPersonenkontextResponse | null;
   createdPersonenkontextForKlasse: DBiamPersonenkontextResponse | null;
   errorCode: string;
   loading: boolean;
@@ -118,7 +118,7 @@ export const usePersonenkontextStore: StoreDefinition<
       filteredRollen: null,
       filteredOrganisationen: null,
       personenuebersicht: null,
-      createdPersonenkontextForOrganisation: null,
+      createdPersonenkontextForSchule: null,
       createdPersonenkontextForKlasse: null,
       errorCode: '',
       loading: false,
@@ -182,7 +182,7 @@ export const usePersonenkontextStore: StoreDefinition<
         const { data }: { data: DBiamPersonenkontextResponse } =
           await dbiamPersonenkontexteApi.dBiamPersonenkontextControllerCreatePersonenkontext(personenkontext);
         if (organisationTyp === OrganisationsTyp.Schule) {
-          this.createdPersonenkontextForOrganisation = data;
+          this.createdPersonenkontextForSchule = data;
         } else if (organisationTyp === OrganisationsTyp.Klasse) {
           this.createdPersonenkontextForKlasse = data;
         }
