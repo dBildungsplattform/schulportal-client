@@ -1,5 +1,10 @@
 <script setup lang="ts">
-  import { useOrganisationStore, type OrganisationStore, type Organisation } from '@/stores/OrganisationStore';
+  import {
+    useOrganisationStore,
+    type OrganisationStore,
+    type Organisation,
+    OrganisationsTyp,
+  } from '@/stores/OrganisationStore';
   import {
     usePersonStore,
     type CreatedPerson,
@@ -85,7 +90,7 @@
   // Define a method to check if the selected Rolle is of type "Lern"
   function isLernRolle(selectedRolleId: string): boolean {
     const rolle: RolleWithRollenart | undefined = rollen.value?.find(
-      (r: { value: string; title: string; Rollenart: RollenArt }) => r.value === selectedRolleId,
+      (r: RolleWithRollenart) => r.value === selectedRolleId,
     );
     return !!rolle && rolle.Rollenart === RollenArt.Lern;
   }
@@ -274,7 +279,7 @@
         rolleId: selectedRolle.value,
       };
       await personenkontextStore
-        .createPersonenkontextForOrganisation(unpersistedOrganisationPersonenkontext)
+        .createPersonenkontext(unpersistedOrganisationPersonenkontext, OrganisationsTyp.Schule)
         .catch(() => {
           creationErrorText.value = t('admin.personenkontext.creationErrorText');
         });
@@ -285,9 +290,11 @@
           organisationId: selectedKlasse.value,
           rolleId: selectedRolle.value,
         };
-        await personenkontextStore.createPersonenkontextForKlasse(unpersistedKlassePersonenkontext).catch(() => {
-          creationErrorText.value = t('admin.personenkontext.creationErrorText');
-        });
+        await personenkontextStore
+          .createPersonenkontext(unpersistedKlassePersonenkontext, OrganisationsTyp.Klasse)
+          .catch(() => {
+            creationErrorText.value = t('admin.personenkontext.creationErrorText');
+          });
       }
       resetForm();
     });

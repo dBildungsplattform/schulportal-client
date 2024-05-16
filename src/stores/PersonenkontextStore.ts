@@ -33,6 +33,7 @@ const personenuebersichtApi: DbiamPersonenuebersichtApiInterface = DbiamPersonen
   axiosApiInstance,
 );
 
+
 export type Zuordnung = {
   klasse?: string | undefined;
   sskId: string;
@@ -79,11 +80,9 @@ type PersonenkontextActions = {
   hasSystemrecht: (personId: string, systemrecht: 'ROLLEN_VERWALTEN') => Promise<SystemrechtResponse>;
   getPersonenkontextRolleWithFilter: (rolleName: string, limit: number) => Promise<void>;
   getPersonenkontextAdministrationsebeneWithFilter: (rolleId: string, sskName: string, limit: number) => Promise<void>;
-  createPersonenkontextForOrganisation: (
+  createPersonenkontext: (
     personenkontext: DBiamCreatePersonenkontextBodyParams,
-  ) => Promise<DBiamPersonenkontextResponse>;
-  createPersonenkontextForKlasse: (
-    personenkontext: DBiamCreatePersonenkontextBodyParams,
+    organisationTyp: OrganisationsTyp,
   ) => Promise<DBiamPersonenkontextResponse>;
   getPersonenuebersichtById: (personId: string) => Promise<void>;
   getAllPersonenuebersichten: () => Promise<void>;
@@ -174,34 +173,19 @@ export const usePersonenkontextStore: StoreDefinition<
         this.loading = false;
       }
     },
-
-    async createPersonenkontextForOrganisation(
+    async createPersonenkontext(
       personenkontext: DBiamCreatePersonenkontextBodyParams,
+      organisationTyp: OrganisationsTyp,
     ): Promise<DBiamPersonenkontextResponse> {
       this.loading = true;
       try {
         const { data }: { data: DBiamPersonenkontextResponse } =
           await dbiamPersonenkontexteApi.dBiamPersonenkontextControllerCreatePersonenkontext(personenkontext);
-        this.createdPersonenkontextForOrganisation = data;
-        return data;
-      } catch (error: unknown) {
-        this.errorCode = 'UNSPECIFIED_ERROR';
-        if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
+        if (organisationTyp === OrganisationsTyp.Schule) {
+          this.createdPersonenkontextForOrganisation = data;
+        } else if (organisationTyp === OrganisationsTyp.Klasse) {
+          this.createdPersonenkontextForKlasse = data;
         }
-        return await Promise.reject(this.errorCode);
-      } finally {
-        this.loading = false;
-      }
-    },
-    async createPersonenkontextForKlasse(
-      personenkontext: DBiamCreatePersonenkontextBodyParams,
-    ): Promise<DBiamPersonenkontextResponse> {
-      this.loading = true;
-      try {
-        const { data }: { data: DBiamPersonenkontextResponse } =
-          await dbiamPersonenkontexteApi.dBiamPersonenkontextControllerCreatePersonenkontext(personenkontext);
-        this.createdPersonenkontextForKlasse = data;
         return data;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
