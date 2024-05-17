@@ -18,9 +18,12 @@
     type Zuordnung,
   } from '@/stores/PersonenkontextStore';
   import { useRolleStore, type RolleStore, type RolleResponse } from '@/stores/RolleStore';
+  import { type SearchFilterStore, useSearchFilterStore } from '@/stores/SearchFilterStore';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import ResultTable from '@/components/admin/ResultTable.vue';
   import SearchField from '@/components/admin/SearchField.vue';
+
+  const searchFilterStore: SearchFilterStore = useSearchFilterStore();
 
   const router: Router = useRouter();
   const organisationStore: OrganisationStore = useOrganisationStore();
@@ -95,7 +98,7 @@
       );
       const uniqueRollen: Set<string> = new Set<string>();
       uebersicht?.zuordnungen.forEach((zuordnung: Zuordnung) => uniqueRollen.add(zuordnung.rolle));
-      const rollenZuordnungen: string = Array.from(uniqueRollen).join(', ');
+      const rollenZuordnungen: string = uniqueRollen.size > 0 ? Array.from(uniqueRollen).join(', ') : '---';
 
       // Choose sskDstNr if available, otherwise sskName.
       const administrationsebenen: string = uebersicht?.zuordnungen.length
@@ -165,8 +168,10 @@
   });
 
   onMounted(async () => {
+    if (searchFilterStore.searchFilter === '') {
+      await personStore.getAllPersons({});
+    }
     await organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Schule });
-    await personStore.getAllPersons({});
     await personenkontextStore.getAllPersonenuebersichten();
     await rolleStore.getAllRollen();
   });
@@ -310,7 +315,22 @@
         @onUpdateTable="personStore.getAllPersons({})"
         :totalItems="personStore.totalPersons"
         item-value-path="person.id"
-      ></ResultTable>
+        ><template v-slot:[`item.rollen`]="{ item }">
+          <div
+            class="ellipsis-wrapper"
+            :title="item.rollen"
+          >
+            {{ item.rollen }}
+          </div> </template
+        ><template v-slot:[`item.administrationsebenen`]="{ item }">
+          <div
+            class="ellipsis-wrapper"
+            :title="item.administrationsebenen"
+          >
+            {{ item.administrationsebenen }}
+          </div>
+        </template></ResultTable
+      >
     </LayoutCard>
   </div>
 </template>

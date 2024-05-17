@@ -1,10 +1,13 @@
 <script setup lang="ts">
-  import { ref, type Ref } from 'vue';
+  import { onBeforeMount, ref, type Ref } from 'vue';
   import { useI18n } from 'vue-i18n';
+  import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
 
   useI18n({ useScope: 'global' });
 
-  const searchFilter: Ref<string | null> = ref('');
+  const searchFilterStore: SearchFilterStore = useSearchFilterStore();
+
+  const searchFilter: Ref<string | null> = ref(searchFilterStore.searchFilter);
 
   type Emits = {
     (event: 'onApplySearchFilter', searchFilter: string): void;
@@ -20,13 +23,20 @@
 
   const props: Props = defineProps<Props>();
 
-  function applySearchFilter(): void {
+  async function applySearchFilter(): Promise<void> {
     if (searchFilter.value !== null) {
+      await searchFilterStore.setFilter(searchFilter.value.trim());
       emit('onApplySearchFilter', searchFilter.value.trim());
     } else {
+      await searchFilterStore.setFilter(searchFilter.value);
       emit('onApplySearchFilter', '');
     }
   }
+
+  onBeforeMount(() => {
+    searchFilter.value = searchFilterStore.searchFilter ?? '';
+    applySearchFilter(); // Apply the filter if the searchFilter is not an empty string
+  });
 </script>
 
 <template>

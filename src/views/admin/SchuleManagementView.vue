@@ -55,7 +55,16 @@
         :totalItems="organisationStore.allOrganisationen.length"
         item-value-path="id"
         :disableRowClick="true"
-      ></ResultTable>
+      >
+        <template v-slot:[`item.name`]="{ item }">
+          <div
+            class="ellipsis-wrapper"
+            :title="item.name"
+          >
+            {{ item.name }}
+          </div>
+        </template></ResultTable
+      >
     </LayoutCard>
   </div>
 </template>
