@@ -200,7 +200,7 @@
         rolleId: selectedRolle.value,
       };
       await personStore.createPersonenkontext(unpersistedPersonenkontext).catch(() => {
-        creationErrorText.value = t('admin.personenkontext.creationErrorText');
+        creationErrorText.value = t(`admin.personenkontext.errors.${personenkontextStore.errorCode}`);
       });
       resetForm();
     });
