@@ -1,10 +1,5 @@
 <script setup lang="ts">
-  import {
-    useOrganisationStore,
-    type OrganisationStore,
-    type Organisation,
-    OrganisationsTyp,
-  } from '@/stores/OrganisationStore';
+  import { useOrganisationStore, type OrganisationStore, type Organisation } from '@/stores/OrganisationStore';
   import {
     usePersonStore,
     type CreatedPerson,
@@ -29,7 +24,11 @@
   import PasswordOutput from '@/components/form/PasswordOutput.vue';
   import FormWrapper from '@/components/form/FormWrapper.vue';
   import FormRow from '@/components/form/FormRow.vue';
-  import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
+  import {
+    PersonenKontextTyp,
+    usePersonenkontextStore,
+    type PersonenkontextStore,
+  } from '@/stores/PersonenkontextStore';
   import { useDisplay } from 'vuetify';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
@@ -232,14 +231,15 @@
     () =>
       organisationen.value?.find(
         (organisation: TranslatedObject) =>
-          organisation.value === personenkontextStore.createdPersonenkontextForSchule?.organisationId,
+          organisation.value === personenkontextStore.createdPersonenkontextForOrganisation?.organisationId,
       )?.title || '',
   );
 
   const translatedRollenname: ComputedRef<string> = computed(
     () =>
       rollen.value?.find(
-        (rolle: TranslatedObject) => rolle.value === personenkontextStore.createdPersonenkontextForSchule?.rolleId,
+        (rolle: TranslatedObject) =>
+          rolle.value === personenkontextStore.createdPersonenkontextForOrganisation?.rolleId,
       )?.title || '',
   );
 
@@ -279,7 +279,7 @@
         rolleId: selectedRolle.value,
       };
       await personenkontextStore
-        .createPersonenkontext(unpersistedOrganisationPersonenkontext, OrganisationsTyp.Schule)
+        .createPersonenkontext(unpersistedOrganisationPersonenkontext, PersonenKontextTyp.Organisation)
         .catch(() => {
           creationErrorText.value = t('admin.personenkontext.creationErrorText');
         });
@@ -291,7 +291,7 @@
           rolleId: selectedRolle.value,
         };
         await personenkontextStore
-          .createPersonenkontext(unpersistedKlassePersonenkontext, OrganisationsTyp.Klasse)
+          .createPersonenkontext(unpersistedKlassePersonenkontext, PersonenKontextTyp.Klasse)
           .catch(() => {
             creationErrorText.value = t('admin.personenkontext.creationErrorText');
           });

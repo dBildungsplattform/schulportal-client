@@ -33,6 +33,10 @@ const personenuebersichtApi: DbiamPersonenuebersichtApiInterface = DbiamPersonen
   axiosApiInstance,
 );
 
+export enum PersonenKontextTyp {
+  Organisation = 'ORGANISATION',
+  Klasse = 'KLASSE',
+}
 
 export type Zuordnung = {
   klasse?: string | undefined;
@@ -69,7 +73,7 @@ type PersonenkontextState = {
   filteredRollen: FindRollenResponse | null;
   filteredOrganisationen: FindSchulstrukturknotenResponse | null;
   personenuebersicht: DBiamPersonenuebersichtResponse | null;
-  createdPersonenkontextForSchule: DBiamPersonenkontextResponse | null;
+  createdPersonenkontextForOrganisation: DBiamPersonenkontextResponse | null;
   createdPersonenkontextForKlasse: DBiamPersonenkontextResponse | null;
   errorCode: string;
   loading: boolean;
@@ -82,7 +86,7 @@ type PersonenkontextActions = {
   getPersonenkontextAdministrationsebeneWithFilter: (rolleId: string, sskName: string, limit: number) => Promise<void>;
   createPersonenkontext: (
     personenkontext: DBiamCreatePersonenkontextBodyParams,
-    organisationTyp: OrganisationsTyp,
+    personenKontextTyp: PersonenKontextTyp,
   ) => Promise<DBiamPersonenkontextResponse>;
   getPersonenuebersichtById: (personId: string) => Promise<void>;
   getAllPersonenuebersichten: () => Promise<void>;
@@ -118,7 +122,7 @@ export const usePersonenkontextStore: StoreDefinition<
       filteredRollen: null,
       filteredOrganisationen: null,
       personenuebersicht: null,
-      createdPersonenkontextForSchule: null,
+      createdPersonenkontextForOrganisation: null,
       createdPersonenkontextForKlasse: null,
       errorCode: '',
       loading: false,
@@ -175,16 +179,19 @@ export const usePersonenkontextStore: StoreDefinition<
     },
     async createPersonenkontext(
       personenkontext: DBiamCreatePersonenkontextBodyParams,
-      organisationTyp: OrganisationsTyp,
+      personenKontextTyp: PersonenKontextTyp,
     ): Promise<DBiamPersonenkontextResponse> {
       this.loading = true;
       try {
         const { data }: { data: DBiamPersonenkontextResponse } =
           await dbiamPersonenkontexteApi.dBiamPersonenkontextControllerCreatePersonenkontext(personenkontext);
-        if (organisationTyp === OrganisationsTyp.Schule) {
-          this.createdPersonenkontextForSchule = data;
-        } else if (organisationTyp === OrganisationsTyp.Klasse) {
-          this.createdPersonenkontextForKlasse = data;
+        switch (personenKontextTyp) {
+          case PersonenKontextTyp.Klasse:
+            this.createdPersonenkontextForKlasse = data;
+            break;
+          case PersonenKontextTyp.Organisation:
+            this.createdPersonenkontextForOrganisation = data;
+            break;
         }
         return data;
       } catch (error: unknown) {

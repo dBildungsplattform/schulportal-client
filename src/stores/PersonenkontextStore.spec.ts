@@ -13,7 +13,7 @@ import ApiService from '@/services/ApiService';
 import MockAdapter from 'axios-mock-adapter';
 import { setActivePinia, createPinia } from 'pinia';
 import { rejects } from 'assert';
-import { usePersonenkontextStore, type PersonenkontextStore } from './PersonenkontextStore';
+import { PersonenKontextTyp, usePersonenkontextStore, type PersonenkontextStore } from './PersonenkontextStore';
 import { usePersonStore, type PersonStore } from './PersonStore';
 
 const mockadapter: MockAdapter = new MockAdapter(ApiService);
@@ -153,7 +153,7 @@ describe('PersonenkontextStore', () => {
             organisationId: '67890',
             rolleId: '54321',
           },
-          OrganisationsTyp.Schule,
+          PersonenKontextTyp.Organisation,
         );
       expect(personenkontextStore.loading).toBe(true);
       const createdPersonenkontext: DBiamPersonenkontextResponse = await createPersonenkontextPromise;
@@ -170,7 +170,7 @@ describe('PersonenkontextStore', () => {
             organisationId: '67890',
             rolleId: '54321',
           },
-          OrganisationsTyp.Schule,
+          PersonenKontextTyp.Organisation,
         );
       expect(personenkontextStore.loading).toBe(true);
       await rejects(createPersonenkontextPromise);
@@ -187,7 +187,7 @@ describe('PersonenkontextStore', () => {
             organisationId: '67890',
             rolleId: '54321',
           },
-          OrganisationsTyp.Schule,
+          PersonenKontextTyp.Organisation,
         );
       expect(personenkontextStore.loading).toBe(true);
       await rejects(createPersonenkontextPromise);
@@ -213,7 +213,7 @@ describe('PersonenkontextStore', () => {
             organisationId: '67890',
             rolleId: '54321',
           },
-          OrganisationsTyp.Klasse,
+          PersonenKontextTyp.Klasse,
         );
       expect(personenkontextStore.loading).toBe(true);
       const createdPersonenkontext: DBiamPersonenkontextResponse = await createPersonenkontextPromise;
@@ -230,7 +230,7 @@ describe('PersonenkontextStore', () => {
             organisationId: '67890',
             rolleId: '54321',
           },
-          OrganisationsTyp.Klasse,
+          PersonenKontextTyp.Klasse,
         );
       expect(personenkontextStore.loading).toBe(true);
       await rejects(createPersonenkontextPromise);
@@ -247,7 +247,7 @@ describe('PersonenkontextStore', () => {
             organisationId: '67890',
             rolleId: '54321',
           },
-          OrganisationsTyp.Klasse,
+          PersonenKontextTyp.Klasse,
         );
       expect(personenkontextStore.loading).toBe(true);
       await rejects(createPersonenkontextPromise);
