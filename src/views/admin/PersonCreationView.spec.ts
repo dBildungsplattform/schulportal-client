@@ -50,7 +50,7 @@ beforeEach(() => {
     total: 0,
   };
 
-  personenkontextStore.createdPersonenkontextForSchule = {
+  personenkontextStore.createdPersonenkontextForOrganisation = {
     personId: '12345',
     organisationId: '67890',
     rolleId: '54321',
