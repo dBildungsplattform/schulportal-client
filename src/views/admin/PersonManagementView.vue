@@ -15,8 +15,11 @@
     type Zuordnung,
   } from '@/stores/PersonenkontextStore';
   import { OrganisationsTyp } from '@/stores/OrganisationStore';
+  import { type SearchFilterStore, useSearchFilterStore } from '@/stores/SearchFilterStore';
+
   const personStore: PersonStore = usePersonStore();
   const personenKontextStore: PersonenkontextStore = usePersonenkontextStore();
+  const searchFilterStore: SearchFilterStore = useSearchFilterStore();
 
   const { t }: Composer = useI18n({ useScope: 'global' });
   const searchFilter: Ref<string> = ref('');
@@ -53,7 +56,7 @@
       );
       const uniqueRollen: Set<string> = new Set<string>();
       uebersicht?.zuordnungen.forEach((zuordnung: Zuordnung) => uniqueRollen.add(zuordnung.rolle));
-      const rollen: string = Array.from(uniqueRollen).join(', ');
+      const rollen: string = uniqueRollen.size > 0 ? Array.from(uniqueRollen).join(', ') : '---';
 
       // Choose sskDstNr if available, otherwise sskName.
       const administrationsebenen: string = uebersicht?.zuordnungen.length
@@ -89,7 +92,9 @@
   };
 
   onMounted(async () => {
-    await personStore.getAllPersons('');
+    if (searchFilterStore.searchFilter === '') {
+      await personStore.getAllPersons('');
+    }
     await personenKontextStore.getAllPersonenuebersichten();
   });
 </script>
@@ -116,7 +121,22 @@
         @onUpdateTable="personStore.getAllPersons('')"
         :totalItems="personStore.totalPersons"
         item-value-path="person.id"
-      ></ResultTable>
+        ><template v-slot:[`item.rollen`]="{ item }">
+          <div
+            class="ellipsis-wrapper"
+            :title="item.rollen"
+          >
+            {{ item.rollen }}
+          </div> </template
+        ><template v-slot:[`item.administrationsebenen`]="{ item }">
+          <div
+            class="ellipsis-wrapper"
+            :title="item.administrationsebenen"
+          >
+            {{ item.administrationsebenen }}
+          </div>
+        </template></ResultTable
+      >
     </LayoutCard>
   </div>
 </template>
