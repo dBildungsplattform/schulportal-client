@@ -95,7 +95,7 @@
       );
       const uniqueRollen: Set<string> = new Set<string>();
       uebersicht?.zuordnungen.forEach((zuordnung: Zuordnung) => uniqueRollen.add(zuordnung.rolle));
-      const rollen: string = Array.from(uniqueRollen).join(', ');
+      const rollenZuordnungen: string = Array.from(uniqueRollen).join(', ');
 
       // Choose sskDstNr if available, otherwise sskName.
       const administrationsebenen: string = uebersicht?.zuordnungen.length
@@ -107,7 +107,7 @@
       // Check if personalnummer is null, if so, replace it with "---"
       const personalnummer: string = person.person.personalnummer ?? '---';
       // Check if the uebersicht has a zuordnung of type "Klasse" if no then show directly "---" without filtering or mapping
-      const klassen: string = uebersicht?.zuordnungen.some(
+      const klassenZuordnungen: string = uebersicht?.zuordnungen.some(
         (zuordnung: Zuordnung) => zuordnung.typ === OrganisationsTyp.Klasse,
       )
         ? uebersicht.zuordnungen
@@ -117,9 +117,9 @@
         : '---';
       return {
         ...person,
-        rollen,
+        rollen: rollenZuordnungen,
         administrationsebenen: administrationsebenen,
-        klassen: klassen,
+        klassen: klassenZuordnungen,
         person: { ...person.person, personalnummer: personalnummer },
       };
     });
@@ -132,7 +132,7 @@
 
   // Watcher to detect when the search input for Organisationen is triggered.
   watch(searchInputSchulen, async (newValue: string, _oldValue: string) => {
-    if (newValue?.length >= 3) {
+    if (newValue.length >= 3) {
       organisationStore.getAllOrganisationen({ searchString: newValue, includeTyp: OrganisationsTyp.Schule });
     } else {
       organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Schule });
@@ -141,7 +141,7 @@
 
   // Watcher to detect when the search input for Organisationen is triggered.
   watch(searchInputRollen, async (newValue: string, _oldValue: string) => {
-    if (newValue?.length >= 3) {
+    if (newValue.length >= 3) {
       rolleStore.getAllRollen();
     } else {
       rolleStore.getAllRollen();
@@ -165,7 +165,7 @@
   });
 
   onMounted(async () => {
-    await organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Schule});
+    await organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Schule });
     await personStore.getAllPersons({});
     await personenkontextStore.getAllPersonenuebersichten();
     await rolleStore.getAllRollen();

@@ -133,9 +133,9 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
             undefined,
             undefined,
             undefined,
-            filter?.organisation,
-            filter?.rolle,
-            filter?.searchFilter,
+            filter.organisation,
+            filter.rolle,
+            filter.searchFilter,
           );
 
         this.allPersons = data.items;
