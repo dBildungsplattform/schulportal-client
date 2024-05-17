@@ -61,6 +61,7 @@ type PersonActions = {
   getAllPersons: (searchFilter: string) => Promise<void>;
   getPersonById: (personId: string) => Promise<Personendatensatz>;
   resetPassword: (personId: string) => Promise<string>;
+  deletePerson: (personId: string) => Promise<void>;
 };
 
 export type PersonStore = Store<'personStore', PersonState, PersonGetters, PersonActions>;
@@ -165,6 +166,20 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
       try {
         const { data }: { data: string } = await personenApi.personControllerResetPasswordByPersonId(personId);
         return data;
+      } catch (error: unknown) {
+        this.errorCode = 'UNSPECIFIED_ERROR';
+        if (isAxiosError(error)) {
+          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
+        }
+        return await Promise.reject(this.errorCode);
+      } finally {
+        this.loading = false;
+      }
+    },
+    async deletePerson(personId: string) {
+      this.loading = true;
+      try {
+        await personenApi.personControllerDeletePersonById(personId);
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {

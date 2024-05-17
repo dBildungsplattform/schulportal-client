@@ -4,16 +4,23 @@
   import { type Composer, useI18n } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
+  import { type Router, useRouter } from 'vue-router';
 
   const { t }: Composer = useI18n({ useScope: 'global' });
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
+
+  const router: Router = useRouter();
 
   type Props = {
     errorCode: string;
     person: Personendatensatz;
   };
 
+  type Emits = {
+    (event: 'onDeletePerson', personId: string): void;
+  };
   const props: Props = defineProps<Props>();
+  const emit: Emits = defineEmits<Emits>();
   const errorMessage: Ref<string> = ref('');
 
   const deletePersonConfirmationMessage: ComputedRef<string> = computed(() => {
@@ -28,8 +35,13 @@
     return message;
   });
 
-  async function closePersonDeleteDialog(isActive: Ref<boolean>): Promise<void> {
+  async function closePasswordResetDialog(isActive: Ref<boolean>): Promise<void> {
     isActive.value = false;
+  }
+
+  async function deletePersonAndPushToPersonManagement(personId: string): Promise<void> {
+    emit('onDeletePerson', personId);
+    router.push({ name: 'person-management' });
   }
 </script>
 
@@ -56,7 +68,7 @@
       <LayoutCard
         :closable="true"
         :header="$t('admin.person.deletePerson')"
-        @onCloseClicked="closePersonDeleteDialog(isActive)"
+        @onCloseClicked="closePasswordResetDialog(isActive)"
       >
         <v-card-text>
           <v-container>
@@ -98,8 +110,8 @@
               <v-btn
                 :block="mdAndDown"
                 class="secondary button"
-                @click.stop="closePersonDeleteDialog(isActive)"
-                data-testid="close-password-reset-dialog-button"
+                @click.stop="closePasswordResetDialog(isActive)"
+                data-testid="close-person-delete-dialog-button"
               >
                 {{ $t('cancel') }}
               </v-btn>
@@ -112,7 +124,7 @@
               <v-btn
                 :block="mdAndDown"
                 class="primary button"
-                @click.stop="$emit('onResetPassword', person.person.id)"
+                @click.stop="deletePersonAndPushToPersonManagement(person.person.id)"
                 data-testid="person-delete-button"
               >
                 {{ $t('admin.person.deletePerson') }}

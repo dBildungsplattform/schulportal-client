@@ -32,6 +32,10 @@
     });
   }
 
+  function deletePerson(personId: string): void {
+    personStore.deletePerson(personId);
+  }
+
   function getSskName(sskDstNr: string, sskName: string): string {
     /* truncate ssk name */
     const truncatededSskName: string = sskName.length > 30 ? `${sskName.substring(0, 30)}...` : sskName;
@@ -305,7 +309,7 @@
               <h3 class="text-body">{{ $t('person.noZuordnungenFound') }}</h3>
             </v-col>
           </v-row>
-          <!-- Remove user -->
+          <!-- Delete person -->
         </v-container>
         <v-divider
           class="border-opacity-100 rounded my-6 mx-4"
@@ -331,9 +335,7 @@
                 <PersonDelete
                   :errorCode="personStore.errorCode"
                   :person="personStore.currentPerson"
-                  @onClearPassword="password = ''"
-                  @onResetPassword="resetPassword(currentPersonId)"
-                  :password="password"
+                  @onDeletePerson="deletePerson(currentPersonId)"
                 >
                 </PersonDelete>
               </div>
