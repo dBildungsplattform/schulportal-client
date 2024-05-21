@@ -53,8 +53,8 @@ type PersonState = {
 };
 
 export type PersonFilter = {
-  organisation?: string;
-  rolle?: string;
+  organisationIDs?: Array<string>;
+  rolleIDs?: Array<string>;
   searchFilter?: string;
 };
 
@@ -133,8 +133,8 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
             undefined,
             undefined,
             undefined,
-            filter.organisation,
-            filter.rolle,
+            filter.organisationIDs,
+            filter.rolleIDs,
             filter.searchFilter,
           );
 

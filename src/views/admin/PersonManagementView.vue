@@ -135,7 +135,7 @@
 
   // Watcher to detect when the search input for Organisationen is triggered.
   watch(searchInputSchulen, async (newValue: string, _oldValue: string) => {
-    if (newValue.length >= 3) {
+    if (newValue?.length >= 3) {
       organisationStore.getAllOrganisationen({ searchString: newValue, includeTyp: OrganisationsTyp.Schule });
     } else {
       organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Schule });
@@ -144,7 +144,7 @@
 
   // Watcher to detect when the search input for Organisationen is triggered.
   watch(searchInputRollen, async (newValue: string, _oldValue: string) => {
-    if (newValue.length >= 3) {
+    if (newValue?.length >= 3) {
       rolleStore.getAllRollen();
     } else {
       rolleStore.getAllRollen();
@@ -152,16 +152,16 @@
   });
 
   watch(selectedSchulen, async (newValue: Array<string>, _oldValue: Array<string>) => {
-    if (newValue.length > 0) {
-      personStore.getAllPersons({ organisation: newValue });
+    if (newValue?.length > 0) {
+      personStore.getAllPersons({ organisationIDs: newValue });
     } else {
       personStore.getAllPersons({});
     }
   });
 
   watch(selectedRollen, async (newValue: Array<string>, _oldValue: Array<string>) => {
-    if (newValue.length > 0) {
-      personStore.getAllPersons({ rolle: newValue });
+    if (newValue?.length > 0) {
+      personStore.getAllPersons({ rolleIDs: newValue });
     } else {
       personStore.getAllPersons({});
     }
@@ -217,6 +217,7 @@
             :no-data-text="$t('noDataFound')"
             :placeholder="$t('admin.schule.schule')"
             required="true"
+            single-line
             variant="outlined"
             v-model="selectedSchulen"
             v-model:search="searchInputSchulen"
