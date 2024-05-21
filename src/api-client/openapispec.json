@@ -291,54 +291,6 @@
             }
         },
         "/api/personen/{personId}": {
-            "delete": {
-                "operationId": "PersonController_deletePersonById",
-                "parameters": [
-                    {
-                        "name": "personId",
-                        "required": true,
-                        "in": "path",
-                        "description": "The id for the account.",
-                        "schema": {
-                            "nullable": false,
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": "The person and all their kontexte were successfully deleted."
-                    },
-                    "400": {
-                        "description": "Request has wrong format."
-                    },
-                    "401": {
-                        "description": "Request is not authorized."
-                    },
-                    "403": {
-                        "description": "Insufficient permissions to perform operation."
-                    },
-                    "404": {
-                        "description": "The person was not found."
-                    },
-                    "500": {
-                        "description": "An internal server error occurred."
-                    }
-                },
-                "tags": [
-                    "personen"
-                ],
-                "security": [
-                    {
-                        "oauth2": [
-                            "openid"
-                        ]
-                    },
-                    {
-                        "bearer": []
-                    }
-                ]
-            },
             "get": {
                 "operationId": "PersonController_findPersonById",
                 "parameters": [
@@ -1151,6 +1103,17 @@
                                 "$ref": "#/components/schemas/OrganisationsTyp"
                             }
                         }
+                    },
+                    {
+                        "name": "administriertVon",
+                        "required": false,
+                        "in": "query",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
                     }
                 ],
                 "responses": {
@@ -1379,6 +1342,15 @@
                         "description": "The id of an organization",
                         "schema": {
                             "nullable": false,
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "searchFilter",
+                        "required": false,
+                        "in": "query",
+                        "schema": {
+                            "nullable": true,
                             "type": "string"
                         }
                     }
@@ -3677,6 +3649,7 @@
                 "type": "string",
                 "enum": [
                     "ROLLEN_VERWALTEN",
+                    "PERSONEN_SOFORT_LOESCHEN",
                     "PERSONEN_VERWALTEN",
                     "SCHULEN_VERWALTEN",
                     "KLASSEN_VERWALTEN",
