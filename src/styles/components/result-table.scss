@@ -27,10 +27,6 @@
     }
     .v-data-table__td {
       border-bottom: 1px solid $lightGrey;
-      text-overflow: ellipsis;
-      overflow: hidden;
-      white-space: nowrap;
-      max-width: 241px;
     }
   }
 

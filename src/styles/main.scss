@@ -61,6 +61,13 @@ label.v-label {
   text-wrap: nowrap;
 }
 
+.ellipsis-wrapper {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  max-width: 241px;
+}
+
 @media (min-width: 960px) {
   .v-container {
     max-width: none;

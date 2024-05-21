@@ -206,6 +206,30 @@
                         }
                     },
                     {
+                        "name": "organisationIDs",
+                        "required": false,
+                        "in": "query",
+                        "description": "List of Organisation ID used to filter for Persons.",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    {
+                        "name": "rolleIDs",
+                        "required": false,
+                        "in": "query",
+                        "description": "List of Role ID used to filter for Persons.",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    {
                         "name": "suchFilter",
                         "required": false,
                         "in": "query",
@@ -736,6 +760,30 @@
                                 "nein"
                             ],
                             "type": "string"
+                        }
+                    },
+                    {
+                        "name": "organisationIDs",
+                        "required": false,
+                        "in": "query",
+                        "description": "List of Organisation ID used to filter for Persons.",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    {
+                        "name": "rolleIDs",
+                        "required": false,
+                        "in": "query",
+                        "description": "List of Role ID used to filter for Persons.",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
                         }
                     },
                     {
