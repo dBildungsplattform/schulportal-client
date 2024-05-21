@@ -20,8 +20,8 @@ RUN npm run build
 
 # Deployment Stage
 FROM $BASE_IMAGE as deployment
-# Fix Trivy Warnings CVE-2024-2511
-RUN apk --no-cache add "libssl3>=3.1.4-r6" "libcrypto3>=3.1.4-r6"
+# Fix Trivy Warnings CVE-2024-2511, CVE-2023-42365
+RUN apk --no-cache add "libssl3>=3.1.5-r0" "libcrypto3>=3.1.5-r0" "ssl_client>=1.36.1-r17"
 
 COPY --from=build /app/dist/ /usr/share/nginx/html/
 
