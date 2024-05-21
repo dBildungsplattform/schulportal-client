@@ -79,6 +79,7 @@
       "mappingFrontBackEnd": {
         "systemrechte": {
           "ROLLEN_VERWALTEN": "Darf Rollen verwalten",
+          "PERSONEN_SOFORT_LOESCHEN": "Darf Personen sofort löschen",
           "PERSONEN_VERWALTEN": "Darf Personen verwalten",
           "SCHULEN_VERWALTEN": "Darf Schulen verwalten",
           "KLASSEN_VERWALTEN": "Darf Klassen verwalten",
