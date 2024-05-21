@@ -205,6 +205,7 @@
             autocomplete="off"
             chips
             class="filter-dropdown"
+            :class="{ 'selected': selectedSchulen.length > 0 }"
             clearable
             data-testid="schule-select"
             density="compact"
