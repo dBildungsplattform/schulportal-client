@@ -85,8 +85,18 @@
   const selectedSchulen: Ref<Array<string>> = ref([]);
   const searchFilter: Ref<string> = ref('');
 
+  const filterOrSearchActive: Ref<boolean> = computed(() => selectedSchulen.value.length > 0 || selectedRollen.value.length > 0 || searchFilter.value.length > 0);
+
   function navigateToPersonDetails(_$event: PointerEvent, { item }: { item: Personendatensatz }): void {
     router.push({ name: 'person-details', params: { id: item.person.id } });
+  }
+
+  function resetSearchAndFilter(): void {
+    searchInputSchulen.value = '';
+    searchInputRollen.value = '';
+    selectedSchulen.value = [];
+    selectedRollen.value = [];
+    personStore.getAllPersons({});
   }
 
   // Maps over allPersons, finds the corresponding zuordnungen for each person by matching the personId, and then extracts and combines
@@ -195,7 +205,16 @@
           cols="4"
           class="py-0 text-right"
         >
-          <span class="reset-filter">{{ $t('resetFilter') }}</span>
+          <v-btn
+            class="reset-filter"
+            :disabled="!filterOrSearchActive"
+            @click="resetSearchAndFilter()"
+            size="x-small"
+            variant="text"
+            width="auto"
+          >
+            {{ $t('resetFilter') }}
+          </v-btn>
         </v-col>
         <v-col
           cols="2"
