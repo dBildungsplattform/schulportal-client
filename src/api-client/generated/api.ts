@@ -1580,6 +1580,7 @@ export type RollenMerkmal = typeof RollenMerkmal[keyof typeof RollenMerkmal];
 
 export const RollenSystemRecht = {
     RollenVerwalten: 'ROLLEN_VERWALTEN',
+    PersonenSofortLoeschen: 'PERSONEN_SOFORT_LOESCHEN',
     PersonenVerwalten: 'PERSONEN_VERWALTEN',
     SchulenVerwalten: 'SCHULEN_VERWALTEN',
     KlassenVerwalten: 'KLASSEN_VERWALTEN',
@@ -2965,10 +2966,11 @@ export const OrganisationenApiAxiosParamCreator = function (configuration?: Conf
          * @param {OrganisationsTyp} [typ] 
          * @param {Array<RollenSystemRecht>} [systemrechte] 
          * @param {Array<OrganisationsTyp>} [excludeTyp] 
+         * @param {Array<string>} [administriertVon] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        organisationControllerFindOrganizations: async (offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: OrganisationsTyp, systemrechte?: Array<RollenSystemRecht>, excludeTyp?: Array<OrganisationsTyp>, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        organisationControllerFindOrganizations: async (offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: OrganisationsTyp, systemrechte?: Array<RollenSystemRecht>, excludeTyp?: Array<OrganisationsTyp>, administriertVon?: Array<string>, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/organisationen`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -3021,6 +3023,10 @@ export const OrganisationenApiAxiosParamCreator = function (configuration?: Conf
                 localVarQueryParameter['excludeTyp'] = excludeTyp;
             }
 
+            if (administriertVon) {
+                localVarQueryParameter['administriertVon'] = administriertVon;
+            }
+
 
     
             setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -3035,10 +3041,11 @@ export const OrganisationenApiAxiosParamCreator = function (configuration?: Conf
         /**
          * 
          * @param {string} organisationId The id of an organization
+         * @param {string} [searchFilter] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        organisationControllerGetAdministrierteOrganisationen: async (organisationId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        organisationControllerGetAdministrierteOrganisationen: async (organisationId: string, searchFilter?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'organisationId' is not null or undefined
             assertParamExists('organisationControllerGetAdministrierteOrganisationen', 'organisationId', organisationId)
             const localVarPath = `/api/organisationen/{organisationId}/administriert`
@@ -3061,6 +3068,10 @@ export const OrganisationenApiAxiosParamCreator = function (configuration?: Conf
             // authentication oauth2 required
             // oauth required
             await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+            if (searchFilter !== undefined) {
+                localVarQueryParameter['searchFilter'] = searchFilter;
+            }
 
 
     
@@ -3260,21 +3271,23 @@ export const OrganisationenApiFp = function(configuration?: Configuration) {
          * @param {OrganisationsTyp} [typ] 
          * @param {Array<RollenSystemRecht>} [systemrechte] 
          * @param {Array<OrganisationsTyp>} [excludeTyp] 
+         * @param {Array<string>} [administriertVon] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: OrganisationsTyp, systemrechte?: Array<RollenSystemRecht>, excludeTyp?: Array<OrganisationsTyp>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<OrganisationResponse>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.organisationControllerFindOrganizations(offset, limit, kennung, name, searchString, typ, systemrechte, excludeTyp, options);
+        async organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: OrganisationsTyp, systemrechte?: Array<RollenSystemRecht>, excludeTyp?: Array<OrganisationsTyp>, administriertVon?: Array<string>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<OrganisationResponse>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.organisationControllerFindOrganizations(offset, limit, kennung, name, searchString, typ, systemrechte, excludeTyp, administriertVon, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
          * 
          * @param {string} organisationId The id of an organization
+         * @param {string} [searchFilter] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async organisationControllerGetAdministrierteOrganisationen(organisationId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<OrganisationResponseLegacy>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.organisationControllerGetAdministrierteOrganisationen(organisationId, options);
+        async organisationControllerGetAdministrierteOrganisationen(organisationId: string, searchFilter?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<OrganisationResponseLegacy>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.organisationControllerGetAdministrierteOrganisationen(organisationId, searchFilter, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -3365,20 +3378,22 @@ export const OrganisationenApiFactory = function (configuration?: Configuration,
          * @param {OrganisationsTyp} [typ] 
          * @param {Array<RollenSystemRecht>} [systemrechte] 
          * @param {Array<OrganisationsTyp>} [excludeTyp] 
+         * @param {Array<string>} [administriertVon] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: OrganisationsTyp, systemrechte?: Array<RollenSystemRecht>, excludeTyp?: Array<OrganisationsTyp>, options?: any): AxiosPromise<Array<OrganisationResponse>> {
-            return localVarFp.organisationControllerFindOrganizations(offset, limit, kennung, name, searchString, typ, systemrechte, excludeTyp, options).then((request) => request(axios, basePath));
+        organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: OrganisationsTyp, systemrechte?: Array<RollenSystemRecht>, excludeTyp?: Array<OrganisationsTyp>, administriertVon?: Array<string>, options?: any): AxiosPromise<Array<OrganisationResponse>> {
+            return localVarFp.organisationControllerFindOrganizations(offset, limit, kennung, name, searchString, typ, systemrechte, excludeTyp, administriertVon, options).then((request) => request(axios, basePath));
         },
         /**
          * 
          * @param {string} organisationId The id of an organization
+         * @param {string} [searchFilter] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        organisationControllerGetAdministrierteOrganisationen(organisationId: string, options?: any): AxiosPromise<Array<OrganisationResponseLegacy>> {
-            return localVarFp.organisationControllerGetAdministrierteOrganisationen(organisationId, options).then((request) => request(axios, basePath));
+        organisationControllerGetAdministrierteOrganisationen(organisationId: string, searchFilter?: string, options?: any): AxiosPromise<Array<OrganisationResponseLegacy>> {
+            return localVarFp.organisationControllerGetAdministrierteOrganisationen(organisationId, searchFilter, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -3464,20 +3479,22 @@ export interface OrganisationenApiInterface {
      * @param {OrganisationsTyp} [typ] 
      * @param {Array<RollenSystemRecht>} [systemrechte] 
      * @param {Array<OrganisationsTyp>} [excludeTyp] 
+     * @param {Array<string>} [administriertVon] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrganisationenApiInterface
      */
-    organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: OrganisationsTyp, systemrechte?: Array<RollenSystemRecht>, excludeTyp?: Array<OrganisationsTyp>, options?: AxiosRequestConfig): AxiosPromise<Array<OrganisationResponse>>;
+    organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: OrganisationsTyp, systemrechte?: Array<RollenSystemRecht>, excludeTyp?: Array<OrganisationsTyp>, administriertVon?: Array<string>, options?: AxiosRequestConfig): AxiosPromise<Array<OrganisationResponse>>;
 
     /**
      * 
      * @param {string} organisationId The id of an organization
+     * @param {string} [searchFilter] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrganisationenApiInterface
      */
-    organisationControllerGetAdministrierteOrganisationen(organisationId: string, options?: AxiosRequestConfig): AxiosPromise<Array<OrganisationResponseLegacy>>;
+    organisationControllerGetAdministrierteOrganisationen(organisationId: string, searchFilter?: string, options?: AxiosRequestConfig): AxiosPromise<Array<OrganisationResponseLegacy>>;
 
     /**
      * 
@@ -3571,23 +3588,25 @@ export class OrganisationenApi extends BaseAPI implements OrganisationenApiInter
      * @param {OrganisationsTyp} [typ] 
      * @param {Array<RollenSystemRecht>} [systemrechte] 
      * @param {Array<OrganisationsTyp>} [excludeTyp] 
+     * @param {Array<string>} [administriertVon] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrganisationenApi
      */
-    public organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: OrganisationsTyp, systemrechte?: Array<RollenSystemRecht>, excludeTyp?: Array<OrganisationsTyp>, options?: AxiosRequestConfig) {
-        return OrganisationenApiFp(this.configuration).organisationControllerFindOrganizations(offset, limit, kennung, name, searchString, typ, systemrechte, excludeTyp, options).then((request) => request(this.axios, this.basePath));
+    public organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: OrganisationsTyp, systemrechte?: Array<RollenSystemRecht>, excludeTyp?: Array<OrganisationsTyp>, administriertVon?: Array<string>, options?: AxiosRequestConfig) {
+        return OrganisationenApiFp(this.configuration).organisationControllerFindOrganizations(offset, limit, kennung, name, searchString, typ, systemrechte, excludeTyp, administriertVon, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * 
      * @param {string} organisationId The id of an organization
+     * @param {string} [searchFilter] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrganisationenApi
      */
-    public organisationControllerGetAdministrierteOrganisationen(organisationId: string, options?: AxiosRequestConfig) {
-        return OrganisationenApiFp(this.configuration).organisationControllerGetAdministrierteOrganisationen(organisationId, options).then((request) => request(this.axios, this.basePath));
+    public organisationControllerGetAdministrierteOrganisationen(organisationId: string, searchFilter?: string, options?: AxiosRequestConfig) {
+        return OrganisationenApiFp(this.configuration).organisationControllerGetAdministrierteOrganisationen(organisationId, searchFilter, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -3838,47 +3857,6 @@ export const PersonenApiAxiosParamCreator = function (configuration?: Configurat
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(createPersonenkontextBodyParams, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @param {string} personId The id for the account.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        personControllerDeletePersonById: async (personId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'personId' is not null or undefined
-            assertParamExists('personControllerDeletePersonById', 'personId', personId)
-            const localVarPath = `/api/personen/{personId}`
-                .replace(`{${"personId"}}`, encodeURIComponent(String(personId)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication bearer required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            // authentication oauth2 required
-            // oauth required
-            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -4204,16 +4182,6 @@ export const PersonenApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async personControllerDeletePersonById(personId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.personControllerDeletePersonById(personId, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
-         * 
-         * @param {string} personId The id for the account.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
         async personControllerFindPersonById(personId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonendatensatzResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.personControllerFindPersonById(personId, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
@@ -4301,15 +4269,6 @@ export const PersonenApiFactory = function (configuration?: Configuration, baseP
          */
         personControllerCreatePersonenkontext(personId: string, createPersonenkontextBodyParams: CreatePersonenkontextBodyParams, options?: any): AxiosPromise<void> {
             return localVarFp.personControllerCreatePersonenkontext(personId, createPersonenkontextBodyParams, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @param {string} personId The id for the account.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        personControllerDeletePersonById(personId: string, options?: any): AxiosPromise<void> {
-            return localVarFp.personControllerDeletePersonById(personId, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -4406,15 +4365,6 @@ export interface PersonenApiInterface {
      * @throws {RequiredError}
      * @memberof PersonenApiInterface
      */
-    personControllerDeletePersonById(personId: string, options?: AxiosRequestConfig): AxiosPromise<void>;
-
-    /**
-     * 
-     * @param {string} personId The id for the account.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof PersonenApiInterface
-     */
     personControllerFindPersonById(personId: string, options?: AxiosRequestConfig): AxiosPromise<PersonendatensatzResponse>;
 
     /**
@@ -4498,17 +4448,6 @@ export class PersonenApi extends BaseAPI implements PersonenApiInterface {
      */
     public personControllerCreatePersonenkontext(personId: string, createPersonenkontextBodyParams: CreatePersonenkontextBodyParams, options?: AxiosRequestConfig) {
         return PersonenApiFp(this.configuration).personControllerCreatePersonenkontext(personId, createPersonenkontextBodyParams, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @param {string} personId The id for the account.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof PersonenApi
-     */
-    public personControllerDeletePersonById(personId: string, options?: AxiosRequestConfig) {
-        return PersonenApiFp(this.configuration).personControllerDeletePersonById(personId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
