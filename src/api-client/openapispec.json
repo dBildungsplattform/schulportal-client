@@ -206,6 +206,30 @@
                         }
                     },
                     {
+                        "name": "organisationIDs",
+                        "required": false,
+                        "in": "query",
+                        "description": "List of Organisation ID used to filter for Persons.",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    {
+                        "name": "rolleIDs",
+                        "required": false,
+                        "in": "query",
+                        "description": "List of Role ID used to filter for Persons.",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    {
                         "name": "suchFilter",
                         "required": false,
                         "in": "query",
@@ -267,6 +291,54 @@
             }
         },
         "/api/personen/{personId}": {
+            "delete": {
+                "operationId": "PersonController_deletePersonById",
+                "parameters": [
+                    {
+                        "name": "personId",
+                        "required": true,
+                        "in": "path",
+                        "description": "The id for the account.",
+                        "schema": {
+                            "nullable": false,
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "The person and all their kontexte were successfully deleted."
+                    },
+                    "400": {
+                        "description": "Request has wrong format."
+                    },
+                    "401": {
+                        "description": "Request is not authorized."
+                    },
+                    "403": {
+                        "description": "Insufficient permissions to perform operation."
+                    },
+                    "404": {
+                        "description": "The person was not found."
+                    },
+                    "500": {
+                        "description": "An internal server error occurred."
+                    }
+                },
+                "tags": [
+                    "personen"
+                ],
+                "security": [
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
+                    {
+                        "bearer": []
+                    }
+                ]
+            },
             "get": {
                 "operationId": "PersonController_findPersonById",
                 "parameters": [
@@ -691,6 +763,30 @@
                         }
                     },
                     {
+                        "name": "organisationIDs",
+                        "required": false,
+                        "in": "query",
+                        "description": "List of Organisation ID used to filter for Persons.",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    {
+                        "name": "rolleIDs",
+                        "required": false,
+                        "in": "query",
+                        "description": "List of Role ID used to filter for Persons.",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    {
                         "name": "suchFilter",
                         "required": false,
                         "in": "query",
@@ -878,6 +974,41 @@
                 },
                 "tags": [
                     "dbiam-personenuebersicht"
+                ],
+                "security": [
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
+        "/api/person-info": {
+            "get": {
+                "operationId": "PersonInfoController_info",
+                "summary": "Info about logged in person.",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "Returns info about the person.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PersonInfoResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "person is not logged in."
+                    }
+                },
+                "tags": [
+                    "person-info"
                 ],
                 "security": [
                     {
@@ -1248,15 +1379,6 @@
                         "description": "The id of an organization",
                         "schema": {
                             "nullable": false,
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "searchFilter",
-                        "required": false,
-                        "in": "query",
-                        "schema": {
-                            "nullable": true,
                             "type": "string"
                         }
                     }
@@ -3068,7 +3190,8 @@
                         "type": "string"
                     },
                     "referrer": {
-                        "type": "string"
+                        "type": "string",
+                        "nullable": true
                     },
                     "mandant": {
                         "type": "string"
@@ -3077,19 +3200,54 @@
                         "$ref": "#/components/schemas/CreatedPersonenkontextOrganisationDto"
                     },
                     "rolle": {
-                        "type": "string"
+                        "type": "string",
+                        "enum": [
+                            "LERN",
+                            "LEHR",
+                            "EXTERN",
+                            "ORGADMIN",
+                            "LEIT",
+                            "SYSADMIN"
+                        ]
                     },
                     "personenstatus": {
-                        "type": "string"
+                        "type": "string",
+                        "enum": [
+                            "AKTIV"
+                        ],
+                        "nullable": true
                     },
                     "jahrgangsstufe": {
-                        "type": "string"
+                        "type": "string",
+                        "enum": [
+                            "01",
+                            "02",
+                            "03",
+                            "04",
+                            "05",
+                            "06",
+                            "07",
+                            "08",
+                            "09",
+                            "10"
+                        ],
+                        "nullable": true
                     },
                     "sichtfreigabe": {
-                        "type": "string"
+                        "type": "string",
+                        "enum": [
+                            "ja",
+                            "nein"
+                        ],
+                        "nullable": true
                     },
                     "loeschung": {
-                        "$ref": "#/components/schemas/LoeschungResponse"
+                        "nullable": true,
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/LoeschungResponse"
+                            }
+                        ]
                     },
                     "revision": {
                         "type": "string"
@@ -3228,6 +3386,174 @@
                     "nachname",
                     "benutzername",
                     "zuordnungen"
+                ]
+            },
+            "PersonNameResponse": {
+                "type": "object",
+                "properties": {
+                    "familiennamen": {
+                        "type": "string"
+                    },
+                    "vorname": {
+                        "type": "string"
+                    },
+                    "initialenfamilienname": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "initialenvorname": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "rufname": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "titel": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "anrede": {
+                        "nullable": true,
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "namenspraefix": {
+                        "nullable": true,
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "namenssuffix": {
+                        "nullable": true,
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "sortierindex": {
+                        "type": "string",
+                        "nullable": true
+                    }
+                },
+                "required": [
+                    "familiennamen",
+                    "vorname",
+                    "initialenfamilienname",
+                    "initialenvorname",
+                    "rufname",
+                    "titel",
+                    "anrede",
+                    "namenspraefix",
+                    "namenssuffix",
+                    "sortierindex"
+                ]
+            },
+            "PersonBirthResponse": {
+                "type": "object",
+                "properties": {
+                    "datum": {
+                        "format": "date-time",
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "geburtsort": {
+                        "type": "string",
+                        "nullable": true
+                    }
+                },
+                "required": [
+                    "datum",
+                    "geburtsort"
+                ]
+            },
+            "Person": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "referrer": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "mandant": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "$ref": "#/components/schemas/PersonNameResponse"
+                    },
+                    "geburt": {
+                        "nullable": true,
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/PersonBirthResponse"
+                            }
+                        ]
+                    },
+                    "stammorganisation": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "geschlecht": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "lokalisierung": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "vertrauensstufe": {
+                        "nullable": true,
+                        "$ref": "#/components/schemas/Vertrauensstufe"
+                    },
+                    "revision": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "id",
+                    "referrer",
+                    "mandant",
+                    "name",
+                    "geburt",
+                    "stammorganisation",
+                    "geschlecht",
+                    "lokalisierung",
+                    "vertrauensstufe",
+                    "revision"
+                ]
+            },
+            "PersonInfoResponse": {
+                "type": "object",
+                "properties": {
+                    "pid": {
+                        "type": "string"
+                    },
+                    "person": {
+                        "$ref": "#/components/schemas/Person"
+                    },
+                    "personenkontexte": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PersonenkontextResponse"
+                        }
+                    },
+                    "gruppen": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "required": [
+                    "pid",
+                    "person",
+                    "personenkontexte",
+                    "gruppen"
                 ]
             },
             "TraegerschaftTyp": {
