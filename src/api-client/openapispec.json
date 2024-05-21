@@ -1151,6 +1151,17 @@
                                 "$ref": "#/components/schemas/OrganisationsTyp"
                             }
                         }
+                    },
+                    {
+                        "name": "administriertVon",
+                        "required": false,
+                        "in": "query",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
                     }
                 ],
                 "responses": {
@@ -1379,6 +1390,15 @@
                         "description": "The id of an organization",
                         "schema": {
                             "nullable": false,
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "searchFilter",
+                        "required": false,
+                        "in": "query",
+                        "schema": {
+                            "nullable": true,
                             "type": "string"
                         }
                     }
@@ -3677,6 +3697,7 @@
                 "type": "string",
                 "enum": [
                     "ROLLEN_VERWALTEN",
+                    "PERSONEN_SOFORT_LOESCHEN",
                     "PERSONEN_VERWALTEN",
                     "SCHULEN_VERWALTEN",
                     "KLASSEN_VERWALTEN",
