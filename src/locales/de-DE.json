@@ -133,6 +133,7 @@
       "creationErrorTitle": "Fehler beim Anlegen des Benutzers.",
       "deletePersonConfirmation": "Sind Sie sicher, dass Sie {firstname} {lastname} löschen möchten?",
       "deletePerson": "Benutzer löschen",
+      "deletePersonSuccessMessage": "{firstname} {lastname} wurde erfolgreich gelöscht",
       "discard": "Benutzer verwerfen",
       "edit": "Benutzer bearbeiten",
       "generatedPassword": "Generiertes Passwort",

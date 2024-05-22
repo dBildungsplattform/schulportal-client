@@ -22,6 +22,7 @@
   const props: Props = defineProps<Props>();
   const emit: Emits = defineEmits<Emits>();
   const errorMessage: Ref<string> = ref('');
+  const successDialogVisible: Ref<boolean> = ref(false);
 
   const deletePersonConfirmationMessage: ComputedRef<string> = computed(() => {
     if (errorMessage.value || props.errorCode) {
@@ -35,18 +36,81 @@
     return message;
   });
 
+  const deletePersonSuccessMessage: ComputedRef<string> = computed(() => {
+    if (errorMessage.value || props.errorCode) {
+      return '';
+    }
+    let message: string = '';
+    message += `\n\n${t('admin.person.deletePersonSuccessMessage', {
+      firstname: props.person.person.name.vorname,
+      lastname: props.person.person.name.familienname,
+    })}`;
+    return message;
+  });
+
   async function closePasswordResetDialog(isActive: Ref<boolean>): Promise<void> {
     isActive.value = false;
   }
 
   async function deletePersonAndPushToPersonManagement(personId: string): Promise<void> {
     emit('onDeletePerson', personId);
+    successDialogVisible.value = true;
+  }
+
+  async function closeSuccessDialog(): Promise<void> {
+    successDialogVisible.value = false;
     router.push({ name: 'person-management' });
   }
 </script>
 
 <template>
-  <v-dialog persistent>
+  <v-dialog
+    v-model="successDialogVisible"
+    persistent
+  >
+    <LayoutCard
+      v-if="successDialogVisible"
+      :closable="false"
+      :header="$t('admin.person.deletePerson')"
+    >
+      <v-card-text>
+        <v-container>
+          <v-row class="text-body bold px-md-16">
+            <v-col
+              offset="3"
+              cols="10"
+            >
+              <p data-testid="person-delete-success-text">
+                {{ deletePersonSuccessMessage }}
+              </p>
+            </v-col>
+          </v-row>
+        </v-container>
+      </v-card-text>
+      <v-card-actions class="justify-center">
+        <v-row class="justify-center">
+          <v-col
+            cols="12"
+            sm="6"
+            md="4"
+          >
+            <v-btn
+              :block="mdAndDown"
+              class="primary"
+              @click.stop="closeSuccessDialog()"
+              data-testid="close-person-delete-success-dialog-button"
+            >
+              {{ $t('close') }}
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-card-actions>
+    </LayoutCard>
+  </v-dialog>
+  <v-dialog
+    v-if="!successDialogVisible"
+    persistent
+  >
     <template v-slot:activator="{ props }">
       <v-col
         cols="12"
@@ -64,7 +128,10 @@
       </v-col>
     </template>
 
-    <template v-slot:default="{ isActive }">
+    <template
+      v-if="!successDialogVisible"
+      v-slot:default="{ isActive }"
+    >
       <LayoutCard
         :closable="true"
         :header="$t('admin.person.deletePerson')"
@@ -135,6 +202,62 @@
       </LayoutCard>
     </template>
   </v-dialog>
+  <template v-if="successDialogVisible">
+    <!-- Success LayoutCard -->
+    <LayoutCard
+      :closable="true"
+      :header="$t('admin.person.deletePerson')"
+    >
+      <v-card-text>
+        <v-container>
+          <v-row
+            v-if="errorMessage || errorCode"
+            class="text-body text-error"
+          >
+            <v-col
+              class="text-right"
+              cols="1"
+            >
+              <v-icon icon="mdi-alert"></v-icon>
+            </v-col>
+            <v-col>
+              <p data-testid="error-text">
+                {{ errorMessage || errorCode }}
+              </p>
+            </v-col>
+          </v-row>
+          <v-row class="text-body bold px-md-16">
+            <v-col
+              offset="2"
+              cols="10"
+            >
+              <p data-testid="person-delete-confirmation-text">
+                {{ deletePersonSuccessMessage }}
+              </p>
+            </v-col>
+          </v-row>
+        </v-container>
+      </v-card-text>
+      <v-card-actions class="justify-center">
+        <v-row class="justify-center">
+          <v-col
+            cols="12"
+            sm="6"
+            md="4"
+          >
+            <v-btn
+              :block="mdAndDown"
+              class="primary"
+              @click.stop="closeSuccessDialog()"
+              data-testid="close-person-delete-dialog-button"
+            >
+              {{ $t('close') }}
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-card-actions>
+    </LayoutCard>
+  </template>
 </template>
 
 <style></style>
