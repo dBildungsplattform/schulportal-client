@@ -29,7 +29,7 @@
       return '';
     }
     let message: string = '';
-    message += `\n\n${t('admin.person.deletePersonConfirmation', {
+    message += `${t('admin.person.deletePersonConfirmation', {
       firstname: props.person.person.name.vorname,
       lastname: props.person.person.name.familienname,
     })}`;
@@ -41,7 +41,7 @@
       return '';
     }
     let message: string = '';
-    message += `\n\n${t('admin.person.deletePersonSuccessMessage', {
+    message += `${t('admin.person.deletePersonSuccessMessage', {
       firstname: props.person.person.name.vorname,
       lastname: props.person.person.name.familienname,
     })}`;
@@ -52,12 +52,12 @@
     isActive.value = false;
   }
 
-  async function deletePersonAndPushToPersonManagement(personId: string): Promise<void> {
+  async function handlePersonDelete(personId: string): Promise<void> {
     emit('onDeletePerson', personId);
     successDialogVisible.value = true;
   }
 
-  async function closeSuccessDialog(): Promise<void> {
+  async function closeSuccessDialogAndPushToManagent(): Promise<void> {
     successDialogVisible.value = false;
     router.push({ name: 'person-management' });
   }
@@ -97,7 +97,7 @@
             <v-btn
               :block="mdAndDown"
               class="primary"
-              @click.stop="closeSuccessDialog()"
+              @click.stop="closeSuccessDialogAndPushToManagent()"
               data-testid="close-person-delete-success-dialog-button"
             >
               {{ $t('close') }}
@@ -191,7 +191,7 @@
               <v-btn
                 :block="mdAndDown"
                 class="primary button"
-                @click.stop="deletePersonAndPushToPersonManagement(person.person.id)"
+                @click.stop="handlePersonDelete(person.person.id)"
                 data-testid="person-delete-button"
               >
                 {{ $t('admin.person.deletePerson') }}
