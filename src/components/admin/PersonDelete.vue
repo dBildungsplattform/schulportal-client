@@ -80,9 +80,9 @@
               offset="3"
               cols="10"
             >
-              <p data-testid="person-delete-success-text">
+              <span data-testid="person-delete-success-text">
                 {{ deletePersonSuccessMessage }}
-              </p>
+              </span>
             </v-col>
           </v-row>
         </v-container>
@@ -118,7 +118,7 @@
         md="auto"
       >
         <v-btn
-          class="primary button"
+          class="secondary button"
           data-testid="open-person-delete-dialog-icon"
           v-bind="props"
           :block="mdAndDown"
@@ -160,9 +160,9 @@
                 offset="2"
                 cols="10"
               >
-                <p data-testid="person-delete-confirmation-text">
+                <span data-testid="person-delete-confirmation-text">
                   {{ deletePersonConfirmationMessage }}
-                </p>
+                </span>
               </v-col>
             </v-row>
           </v-container>
@@ -202,62 +202,6 @@
       </LayoutCard>
     </template>
   </v-dialog>
-  <template v-if="successDialogVisible">
-    <!-- Success LayoutCard -->
-    <LayoutCard
-      :closable="true"
-      :header="$t('admin.person.deletePerson')"
-    >
-      <v-card-text>
-        <v-container>
-          <v-row
-            v-if="errorMessage || errorCode"
-            class="text-body text-error"
-          >
-            <v-col
-              class="text-right"
-              cols="1"
-            >
-              <v-icon icon="mdi-alert"></v-icon>
-            </v-col>
-            <v-col>
-              <p data-testid="error-text">
-                {{ errorMessage || errorCode }}
-              </p>
-            </v-col>
-          </v-row>
-          <v-row class="text-body bold px-md-16">
-            <v-col
-              offset="2"
-              cols="10"
-            >
-              <p data-testid="person-delete-confirmation-text">
-                {{ deletePersonSuccessMessage }}
-              </p>
-            </v-col>
-          </v-row>
-        </v-container>
-      </v-card-text>
-      <v-card-actions class="justify-center">
-        <v-row class="justify-center">
-          <v-col
-            cols="12"
-            sm="6"
-            md="4"
-          >
-            <v-btn
-              :block="mdAndDown"
-              class="primary"
-              @click.stop="closeSuccessDialog()"
-              data-testid="close-person-delete-dialog-button"
-            >
-              {{ $t('close') }}
-            </v-btn>
-          </v-col>
-        </v-row>
-      </v-card-actions>
-    </LayoutCard>
-  </template>
 </template>
 
 <style></style>
