@@ -25,7 +25,6 @@ beforeEach(() => {
           },
           referrer: 'atest',
         },
-        personenkontexte: [],
       },
     },
     global: {
