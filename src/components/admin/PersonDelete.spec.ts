@@ -1,7 +1,6 @@
 import { expect, test } from 'vitest';
 import { VueWrapper, mount } from '@vue/test-utils';
 import PersonDelete from './PersonDelete.vue';
-// import { VDialog } from 'vuetify/lib/components/index.mjs'
 
 let wrapper: VueWrapper | null = null;
 

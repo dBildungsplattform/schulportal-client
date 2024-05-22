@@ -311,15 +311,15 @@
               <h3 class="text-body">{{ $t('person.noZuordnungenFound') }}</h3>
             </v-col>
           </v-row>
-          <!-- Delete person -->
         </v-container>
         <v-divider
           class="border-opacity-100 rounded my-6 mx-4"
           color="#E5EAEF"
           thickness="6"
         ></v-divider>
+        <!-- Delete person -->
         <v-container
-          v-if="authStore.hasPersonenloeschenPermission"
+          v-if="authStore.hasPersonenLoeschenPermission"
           class="person-delete"
         >
           <v-row class="ml-md-16">

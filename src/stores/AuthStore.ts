@@ -36,7 +36,7 @@ type AuthState = {
   currentUserPermissions: Array<string>;
   hasKlassenverwaltungPermission: boolean;
   hasPersonenverwaltungPermission: boolean;
-  hasPersonenloeschenPermission: boolean;
+  hasPersonenLoeschenPermission: boolean;
   hasRollenverwaltungPermission: boolean;
   hasSchulverwaltungPermission: boolean;
   hasSchultraegerverwaltungPermission: boolean;
@@ -60,7 +60,7 @@ export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, 
     currentUserPermissions: [],
     hasKlassenverwaltungPermission: false,
     hasPersonenverwaltungPermission: false,
-    hasPersonenloeschenPermission: false,
+    hasPersonenLoeschenPermission: false,
     hasRollenverwaltungPermission: false,
     hasSchulverwaltungPermission: false,
     hasSchultraegerverwaltungPermission: false,
@@ -89,7 +89,7 @@ export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, 
         /* set permission aliases for easier global access */
         this.hasKlassenverwaltungPermission = this.currentUserPermissions.includes('KLASSEN_VERWALTEN');
         this.hasPersonenverwaltungPermission = this.currentUserPermissions.includes('PERSONEN_VERWALTEN');
-        this.hasPersonenloeschenPermission = this.currentUserPermissions.includes('PERSONEN_SOFORT_LOESCHEN');
+        this.hasPersonenLoeschenPermission = this.currentUserPermissions.includes('PERSONEN_SOFORT_LOESCHEN');
         this.hasRollenverwaltungPermission = this.currentUserPermissions.includes('ROLLEN_VERWALTEN');
         this.hasSchulverwaltungPermission = this.currentUserPermissions.includes('SCHULEN_VERWALTEN');
         this.hasSchultraegerverwaltungPermission = this.currentUserPermissions.includes('SCHULTRAEGER_VERWALTEN');
