@@ -14,6 +14,7 @@
   type Props = {
     errorCode: string;
     person: Personendatensatz;
+    successDeleteDialogVisible: boolean;
   };
 
   type Emits = {

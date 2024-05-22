@@ -21,7 +21,6 @@
   const personenKontextStore: PersonenkontextStore = usePersonenkontextStore();
 
   const password: Ref<string> = ref('');
-  const successDeleteDialogVisible: Ref<boolean> = ref(false);
 
   function navigateToPersonTable(): void {
     router.push({ name: 'person-management' });
@@ -33,10 +32,8 @@
     });
   }
 
-  function deletePerson(personId: string): void {
-    personStore.deletePerson(personId).then(() => {
-      successDeleteDialogVisible.value = true;
-    });
+  async function deletePerson(personId: string): Promise<void> {
+    await personStore.deletePerson(personId);
   }
 
   function getSskName(sskDstNr: string, sskName: string): string {
@@ -339,7 +336,6 @@
                   :errorCode="personStore.errorCode"
                   :person="personStore.currentPerson"
                   @onDeletePerson="deletePerson(currentPersonId)"
-                  :successDeleteDialogVisible="successDeleteDialogVisible"
                 >
                 </PersonDelete>
               </div>
