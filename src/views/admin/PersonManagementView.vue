@@ -89,6 +89,14 @@
     () => selectedSchulen.value.length > 0 || selectedRollen.value.length > 0 || searchFilter.value.length > 0,
   );
 
+  function applySearchAndFilters(): void {
+    personStore.getAllPersons({
+      organisationIDs: selectedSchulen.value,
+      rolleIDs: selectedRollen.value,
+      searchFilter: searchFilter.value,
+    });
+  }
+
   function navigateToPersonDetails(_$event: PointerEvent, { item }: { item: Personendatensatz }): void {
     router.push({ name: 'person-details', params: { id: item.person.id } });
   }
@@ -149,7 +157,7 @@
 
   // Watcher to detect when the search input for Organisationen is triggered.
   watch(searchInputSchulen, async (newValue: string, _oldValue: string) => {
-    if (newValue?.length >= 3) {
+    if (newValue.length >= 3) {
       organisationStore.getAllOrganisationen({ searchString: newValue, includeTyp: OrganisationsTyp.Schule });
     } else {
       organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Schule });
@@ -158,7 +166,7 @@
 
   // Watcher to detect when the search input for Organisationen is triggered.
   watch(searchInputRollen, async (newValue: string, _oldValue: string) => {
-    if (newValue?.length >= 3) {
+    if (newValue.length >= 3) {
       rolleStore.getAllRollen(newValue);
     } else {
       rolleStore.getAllRollen('');
@@ -172,14 +180,6 @@
   watch(selectedRollen, async (_newValue: Array<string>, _oldValue: Array<string>) => {
     applySearchAndFilters();
   });
-
-  function applySearchAndFilters() {
-    personStore.getAllPersons({
-      organisationIDs: selectedSchulen.value,
-      rolleIDs: selectedRollen.value,
-      searchFilter: searchFilter.value,
-    });
-  }
 
   onMounted(async () => {
     if (searchFilterStore.searchFilter === '') {
