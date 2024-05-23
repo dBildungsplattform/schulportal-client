@@ -144,12 +144,12 @@
 
   const handleSearchFilter = (filter: string): void => {
     searchFilter.value = filter;
-    personStore.getAllPersons({ searchFilter: searchFilter.value });
+    applySearchAndFilters();
   };
 
   // Watcher to detect when the search input for Organisationen is triggered.
   watch(searchInputSchulen, async (newValue: string, _oldValue: string) => {
-    if (newValue.length >= 3) {
+    if (newValue?.length >= 3) {
       organisationStore.getAllOrganisationen({ searchString: newValue, includeTyp: OrganisationsTyp.Schule });
     } else {
       organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Schule });
@@ -158,28 +158,28 @@
 
   // Watcher to detect when the search input for Organisationen is triggered.
   watch(searchInputRollen, async (newValue: string, _oldValue: string) => {
-    if (newValue.length >= 3) {
+    if (newValue?.length >= 3) {
       rolleStore.getAllRollen(newValue);
     } else {
       rolleStore.getAllRollen('');
     }
   });
 
-  watch(selectedSchulen, async (newValue: Array<string>, _oldValue: Array<string>) => {
-    if (newValue.length > 0) {
-      personStore.getAllPersons({ organisationIDs: newValue });
-    } else {
-      personStore.getAllPersons({});
-    }
+  watch(selectedSchulen, async (_newValue: Array<string>, _oldValue: Array<string>) => {
+    applySearchAndFilters();
   });
 
-  watch(selectedRollen, async (newValue: Array<string>, _oldValue: Array<string>) => {
-    if (newValue.length > 0) {
-      personStore.getAllPersons({ rolleIDs: newValue });
-    } else {
-      personStore.getAllPersons({});
-    }
+  watch(selectedRollen, async (_newValue: Array<string>, _oldValue: Array<string>) => {
+    applySearchAndFilters();
   });
+
+  function applySearchAndFilters() {
+    personStore.getAllPersons({
+      organisationIDs: selectedSchulen.value,
+      rolleIDs: selectedRollen.value,
+      searchFilter: searchFilter.value,
+    });
+  }
 
   onMounted(async () => {
     if (searchFilterStore.searchFilter === '') {
@@ -241,7 +241,6 @@
             :no-data-text="$t('noDataFound')"
             :placeholder="$t('admin.schule.schule')"
             required="true"
-            single-line
             variant="outlined"
             v-model="selectedSchulen"
             v-model:search="searchInputSchulen"
@@ -256,6 +255,7 @@
             autocomplete="off"
             chips
             class="filter-dropdown"
+            :class="{ selected: selectedRollen.length > 0 }"
             clearable
             data-testid="rolle-select"
             density="compact"
