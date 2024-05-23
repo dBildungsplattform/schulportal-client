@@ -18,6 +18,7 @@
     },
     "klasse": {
       "addNew":"Neue Klasse hinzufügen",
+      "assignKlasse": "Klasse zuordnen",
       "backToCreateKlasse": "Zurück zur Klassenanlage",
       "create": "Klasse anlegen",
       "createAnother": "Weitere Klasse anlegen",
@@ -31,9 +32,14 @@
       "enterKlassenname": "Klassenname eingeben",
       "klasseAddedSuccessfully": "Die Klasse wurde erfolgreich hinzugefügt.",
       "klasseCreateErrorTitle": "Fehler beim Anlegen der Klasse",
+      "selectKlasse": "Klasse auswählen",
+      "klasse": "Klasse",
       "klassenname": "Klassenname",
       "management": "Klassenverwaltung",
       "rules": {
+        "klasse": {
+          "required": "Die Klasse muss ausgewählt werden."
+        },
         "klassenname": {
           "matches": "Der Klassenname darf keine ungültigen Zeichen beinhalten.",
           "required": "Der Klassenname muss angegeben werden."

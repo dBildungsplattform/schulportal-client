@@ -5,9 +5,8 @@
     type CreatedPerson,
     type CreatedPersonenkontext,
     type PersonStore,
-    type PersonendatensatzResponse,
   } from '@/stores/PersonStore';
-  import { type RolleStore, useRolleStore, type RolleResponse } from '@/stores/RolleStore';
+  import { type RolleStore, useRolleStore, type RolleResponse, RollenArt } from '@/stores/RolleStore';
   import { type ComputedRef, computed, onMounted, onUnmounted, type Ref, ref, watch } from 'vue';
   import {
     onBeforeRouteLeave,
@@ -18,14 +17,18 @@
   } from 'vue-router';
   import { type Composer, useI18n } from 'vue-i18n';
   import { useForm, type TypedSchema, type BaseFieldProps } from 'vee-validate';
-  import { object, string } from 'yup';
+  import { object, string, StringSchema, type AnyObject } from 'yup';
   import { toTypedSchema } from '@vee-validate/yup';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import PasswordOutput from '@/components/form/PasswordOutput.vue';
   import FormWrapper from '@/components/form/FormWrapper.vue';
   import FormRow from '@/components/form/FormRow.vue';
-  import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
+  import {
+    PersonenKontextTyp,
+    usePersonenkontextStore,
+    type PersonenkontextStore,
+  } from '@/stores/PersonenkontextStore';
   import { useDisplay } from 'vuetify';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
@@ -41,6 +44,55 @@
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
   let blockedNext: () => void = () => {};
 
+  const searchInputRollen: Ref<string> = ref('');
+  const searchInputOrganisation: Ref<string> = ref('');
+  const searchInputKlasse: Ref<string> = ref('');
+
+  type RolleWithRollenart = {
+    value: string;
+    title: string;
+    Rollenart: RollenArt;
+  };
+
+  // Watcher to detect when the search input for Rollen has 3 or more characters to trigger filtering.
+  watch(searchInputRollen, async (newValue: string, _oldValue: string) => {
+    if (newValue.length >= 3) {
+      personenkontextStore.getPersonenkontextRolleWithFilter(newValue, 25);
+    }
+  });
+
+  const rollen: ComputedRef<RolleWithRollenart[] | undefined> = computed(() => {
+    // If searchInput is less than 3 characters, return the initial 25 roles from the rolleStore
+    if (searchInputRollen.value.length < 3) {
+      return rolleStore.allRollen
+        .slice(0, 25)
+        .map((rolle: RolleResponse) => ({
+          value: rolle.id,
+          title: rolle.name,
+          Rollenart: rolle.rollenart, // Include Rollenart in the object
+        }))
+        .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
+    } else {
+      // Once filtering is applied, map the filteredRollen for the autocomplete
+      return personenkontextStore.filteredRollen?.moeglicheRollen
+        .slice(0, 25)
+        .map((rolle: RolleResponse) => ({
+          value: rolle.id,
+          title: rolle.name,
+          Rollenart: rolle.rollenart, // Include Rollenart in the object
+        }))
+        .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
+    }
+  });
+
+  // Define a method to check if the selected Rolle is of type "Lern"
+  function isLernRolle(selectedRolleId: string): boolean {
+    const rolle: RolleWithRollenart | undefined = rollen.value?.find(
+      (r: RolleWithRollenart) => r.value === selectedRolleId,
+    );
+    return !!rolle && rolle.Rollenart === RollenArt.Lern;
+  }
+
   const validationSchema: TypedSchema = toTypedSchema(
     object({
       selectedRolle: string().required(t('admin.rolle.rules.rolle.required')),
@@ -53,6 +105,11 @@
         .min(2, t('admin.person.rules.familienname.min'))
         .required(t('admin.person.rules.familienname.required')),
       selectedOrganisation: string().required(t('admin.organisation.rules.organisation.required')),
+      selectedKlasse: string().when('selectedRolle', {
+        is: (selectedRolleId: string) => isLernRolle(selectedRolleId),
+        then: (schema: StringSchema<string | undefined, AnyObject, undefined, ''>) =>
+          schema.required(t('admin.klasse.rules.klasse.required')),
+      }),
     }),
   );
 
@@ -70,6 +127,7 @@
     selectedVorname: string;
     selectedFamilienname: string;
     selectedOrganisation: string;
+    selectedKlasse: string;
   };
 
   type TranslatedObject = {
@@ -98,15 +156,11 @@
     Ref<string>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedOrganisation', vuetifyConfig);
+  const [selectedKlasse, selectedKlasseProps]: [
+    Ref<string>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = defineField('selectedKlasse', vuetifyConfig);
 
-  const searchInputRollen: Ref<string> = ref('');
-  const searchInputOrganisation: Ref<string> = ref('');
-  // Watcher to detect when the search input for Rollen has 3 or more characters to trigger filtering.
-  watch(searchInputRollen, async (newValue: string, _oldValue: string) => {
-    if (newValue.length >= 3) {
-      personenkontextStore.getPersonenkontextRolleWithFilter(newValue, 25);
-    }
-  });
   // Watcher to detect when the Rolle is selected so the Organisationen show all the possible choices using that value.
   watch(selectedRolle, (newValue: string, oldValue: string) => {
     // This checks if `selectedRolle` is cleared or set to a falsy value
@@ -120,6 +174,20 @@
       personenkontextStore.getPersonenkontextAdministrationsebeneWithFilter(newValue, '', 25);
     }
   });
+
+  // Watcher to detect when the Organisationsebene is selected so the Klasse show all the possible choices using that value.
+  watch(selectedOrganisation, (newValue: string, oldValue: string) => {
+    // This checks if `selectedOrganisation` is cleared or set to a falsy value
+    if (!newValue) {
+      resetField('selectedKlasse');
+      return;
+    }
+
+    if (newValue !== oldValue) {
+      // Call fetch with an empty string to get the initial organizations for the selected role without any filter
+      organisationStore.getKlassenByOrganisationId(newValue);
+    }
+  });
   // Watcher to detect when the search input for Organisationen is triggered.
   watch(searchInputOrganisation, async (newValue: string, _oldValue: string) => {
     if (newValue.length >= 3) {
@@ -130,25 +198,12 @@
     }
   });
 
-  const rollen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
-    // If searchInput is less than 3 characters, return the initial 25 roles from the rolleStore
-    if (searchInputRollen.value.length < 3) {
-      return rolleStore.allRollen
-        .slice(0, 25)
-        .map((rolle: RolleResponse) => ({
-          value: rolle.id,
-          title: rolle.name,
-        }))
-        .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
+  // Watcher to detect when the search input for Klassen is triggered.
+  watch(searchInputKlasse, async (newValue: string, _oldValue: string) => {
+    if (newValue.length >= 1) {
+      organisationStore.getKlassenByOrganisationId(selectedOrganisation.value, newValue);
     } else {
-      // Once filtering is applied, map the filteredRollen for the autocomplete
-      return personenkontextStore.filteredRollen?.moeglicheRollen
-        .slice(0, 25)
-        .map((rolle: RolleResponse) => ({
-          value: rolle.id,
-          title: rolle.name,
-        }))
-        .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
+      organisationStore.getKlassenByOrganisationId(selectedOrganisation.value);
     }
   });
 
@@ -162,17 +217,38 @@
       .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
   });
 
+  const klassen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
+    return organisationStore.klassen
+      .slice(0, 25)
+      .map((org: Organisation) => ({
+        value: org.id,
+        title: org.name,
+      }))
+      .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
+  });
+
   const translatedOrganisationsname: ComputedRef<string> = computed(
     () =>
       organisationen.value?.find(
-        (organisation: TranslatedObject) => organisation.value === personStore.createdPersonenkontext?.organisationId,
+        (organisation: TranslatedObject) =>
+          organisation.value === personenkontextStore.createdPersonenkontextForOrganisation?.organisationId,
       )?.title || '',
   );
 
   const translatedRollenname: ComputedRef<string> = computed(
     () =>
-      rollen.value?.find((rolle: TranslatedObject) => rolle.value === personStore.createdPersonenkontext?.rolleId)
-        ?.title || '',
+      rollen.value?.find(
+        (rolle: TranslatedObject) =>
+          rolle.value === personenkontextStore.createdPersonenkontextForOrganisation?.rolleId,
+      )?.title || '',
+  );
+
+  const translatedKlassenname: ComputedRef<string> = computed(
+    () =>
+      klassen.value?.find(
+        (klasse: TranslatedObject) =>
+          klasse.value === personenkontextStore.createdPersonenkontextForKlasse?.organisationId,
+      )?.title || '',
   );
 
   const creationErrorText: Ref<string> = ref('');
@@ -193,17 +269,35 @@
         vorname: selectedVorname.value as string,
       },
     };
-    personStore.createPerson(unpersistedPerson).then(async (personResponse: PersonendatensatzResponse) => {
-      const unpersistedPersonenkontext: CreatedPersonenkontext = {
-        personId: personResponse.person.id,
+
+    await personStore.createPerson(unpersistedPerson);
+    if (personStore.createdPerson) {
+      // Build the context for the organisation
+      const unpersistedOrganisationPersonenkontext: CreatedPersonenkontext = {
+        personId: personStore.createdPerson.person.id,
         organisationId: selectedOrganisation.value,
         rolleId: selectedRolle.value,
       };
-      await personStore.createPersonenkontext(unpersistedPersonenkontext).catch(() => {
-        creationErrorText.value = t(`admin.personenkontext.errors.${personenkontextStore.errorCode}`);
-      });
+      await personenkontextStore
+        .createPersonenkontext(unpersistedOrganisationPersonenkontext, PersonenKontextTyp.Organisation)
+        .catch(() => {
+          creationErrorText.value = t(`admin.personenkontext.errors.${personenkontextStore.errorCode}`);
+        });
+      // Build the context for the Klasse and save it only if the the Klasse was selected
+      if (selectedKlasse.value) {
+        const unpersistedKlassePersonenkontext: CreatedPersonenkontext = {
+          personId: personStore.createdPerson.person.id,
+          organisationId: selectedKlasse.value,
+          rolleId: selectedRolle.value,
+        };
+        await personenkontextStore
+          .createPersonenkontext(unpersistedKlassePersonenkontext, PersonenKontextTyp.Klasse)
+          .catch(() => {
+            creationErrorText.value = t(`admin.personenkontext.errors.${personenkontextStore.errorCode}`);
+          });
+      }
       resetForm();
-    });
+    }
   }
 
   const onSubmit: (e?: Event | undefined) => Promise<void | undefined> = handleSubmit(() => {
@@ -304,6 +398,7 @@
             data-testid="rolle-select"
             density="compact"
             id="rolle-select"
+            ref="rolle-select"
             :items="rollen"
             item-value="value"
             item-text="title"
@@ -334,6 +429,7 @@
               data-testid="vorname-input"
               density="compact"
               id="vorname-input"
+              ref="vorname-input"
               :placeholder="$t('person.enterFirstName')"
               required="true"
               variant="outlined"
@@ -354,6 +450,7 @@
               data-testid="familienname-input"
               density="compact"
               id="familienname-input"
+              ref="familienname-input"
               :placeholder="$t('person.enterLastName')"
               required="true"
               variant="outlined"
@@ -378,6 +475,7 @@
               data-testid="organisation-select"
               density="compact"
               id="organisation-select"
+              ref="organisation-select"
               :items="organisationen"
               item-value="value"
               item-text="title"
@@ -388,6 +486,32 @@
               v-bind="selectedOrganisationProps"
               v-model="selectedOrganisation"
               v-model:search="searchInputOrganisation"
+            ></v-autocomplete>
+          </FormRow>
+          <!-- Klasse zuordnen -->
+          <FormRow
+            v-if="isLernRolle(selectedRolle) && selectedOrganisation"
+            :errorLabel="selectedKlasseProps['error']"
+            :isRequired="true"
+            labelForId="klasse-select"
+            :label="$t('admin.klasse.klasse')"
+          >
+            <v-autocomplete
+              autocomplete="off"
+              clearable
+              data-testid="klasse-select"
+              density="compact"
+              id="klasse-select"
+              ref="klasse-select"
+              :items="klassen"
+              item-value="value"
+              item-text="title"
+              :no-data-text="$t('noDataFound')"
+              :placeholder="$t('admin.klasse.selectKlasse')"
+              variant="outlined"
+              v-bind="selectedKlasseProps"
+              v-model="selectedKlasse"
+              v-model:search="searchInputKlasse"
             ></v-autocomplete>
           </FormRow>
         </div>
@@ -469,6 +593,14 @@
           <v-col class="text-body bold text-right"> {{ $t('admin.organisation.organisation') }}: </v-col>
           <v-col class="text-body"
             ><span data-testid="created-person-organisation">{{ translatedOrganisationsname }}</span></v-col
+          >
+        </v-row>
+        <v-row>
+          <v-col class="text-body bold text-right"> {{ $t('admin.klasse.klasse') }}: </v-col>
+          <v-col class="text-body"
+            ><span data-testid="created-person-klasse">{{
+              translatedKlassenname ? translatedKlassenname : '---'
+            }}</span></v-col
           >
         </v-row>
         <v-divider
