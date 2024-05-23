@@ -67,7 +67,7 @@
   });
 
   onMounted(async () => {
-    await rolleStore.getAllRollen();
+    await rolleStore.getAllRollen('');
     await organisationStore.getAllOrganisationen();
   });
 </script>
@@ -86,7 +86,7 @@
         :items="transformedRollenAndMerkmale || []"
         :loading="rolleStore.loading"
         :headers="headers"
-        @onUpdateTable="rolleStore.getAllRollen()"
+        @onUpdateTable="rolleStore.getAllRollen('')"
         :totalItems="rolleStore.allRollen.length"
         item-value-path="id"
         :disableRowClick="true"
