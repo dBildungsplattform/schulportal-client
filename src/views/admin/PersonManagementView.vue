@@ -85,7 +85,9 @@
   const selectedSchulen: Ref<Array<string>> = ref([]);
   const searchFilter: Ref<string> = ref('');
 
-  const filterOrSearchActive: Ref<boolean> = computed(() => selectedSchulen.value.length > 0 || selectedRollen.value.length > 0 || searchFilter.value.length > 0);
+  const filterOrSearchActive: Ref<boolean> = computed(
+    () => selectedSchulen.value.length > 0 || selectedRollen.value.length > 0 || searchFilter.value.length > 0,
+  );
 
   function navigateToPersonDetails(_$event: PointerEvent, { item }: { item: Personendatensatz }): void {
     router.push({ name: 'person-details', params: { id: item.person.id } });
@@ -145,7 +147,7 @@
 
   // Watcher to detect when the search input for Organisationen is triggered.
   watch(searchInputSchulen, async (newValue: string, _oldValue: string) => {
-    if (newValue?.length >= 3) {
+    if (newValue.length >= 3) {
       organisationStore.getAllOrganisationen({ searchString: newValue, includeTyp: OrganisationsTyp.Schule });
     } else {
       organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Schule });
@@ -154,7 +156,7 @@
 
   // Watcher to detect when the search input for Organisationen is triggered.
   watch(searchInputRollen, async (newValue: string, _oldValue: string) => {
-    if (newValue?.length >= 3) {
+    if (newValue.length >= 3) {
       rolleStore.getAllRollen();
     } else {
       rolleStore.getAllRollen();
@@ -162,7 +164,7 @@
   });
 
   watch(selectedSchulen, async (newValue: Array<string>, _oldValue: Array<string>) => {
-    if (newValue?.length > 0) {
+    if (newValue.length > 0) {
       personStore.getAllPersons({ organisationIDs: newValue });
     } else {
       personStore.getAllPersons({});
@@ -170,7 +172,7 @@
   });
 
   watch(selectedRollen, async (newValue: Array<string>, _oldValue: Array<string>) => {
-    if (newValue?.length > 0) {
+    if (newValue.length > 0) {
       personStore.getAllPersons({ rolleIDs: newValue });
     } else {
       personStore.getAllPersons({});
@@ -224,7 +226,7 @@
             autocomplete="off"
             chips
             class="filter-dropdown"
-            :class="{ 'selected': selectedSchulen.length > 0 }"
+            :class="{ selected: selectedSchulen.length > 0 }"
             clearable
             data-testid="schule-select"
             density="compact"
