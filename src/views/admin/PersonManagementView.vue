@@ -112,13 +112,15 @@
       uebersicht?.zuordnungen.forEach((zuordnung: Zuordnung) => uniqueRollen.add(zuordnung.rolle));
       const rollenZuordnungen: string = uniqueRollen.size > 0 ? Array.from(uniqueRollen).join(', ') : '---';
 
-      // Choose sskDstNr if available, otherwise sskName.
-      const administrationsebenen: string = uebersicht?.zuordnungen.length
-        ? uebersicht.zuordnungen
-            .filter((zuordnung: Zuordnung) => zuordnung.typ !== OrganisationsTyp.Klasse)
-            .map((zuordnung: Zuordnung) => (zuordnung.sskDstNr ? zuordnung.sskDstNr : zuordnung.sskName))
-            .join(', ')
-        : '---';
+      // Collect unique administrationsebenen
+      const uniqueAdministrationsebenen: Set<string> = new Set<string>();
+      uebersicht?.zuordnungen
+        .filter((zuordnung: Zuordnung) => zuordnung.typ !== OrganisationsTyp.Klasse)
+        .forEach((zuordnung: Zuordnung) =>
+          uniqueAdministrationsebenen.add(zuordnung.sskDstNr ? zuordnung.sskDstNr : zuordnung.sskName),
+        );
+      const administrationsebenen: string =
+        uniqueAdministrationsebenen.size > 0 ? Array.from(uniqueAdministrationsebenen).join(', ') : '---';
       // Check if personalnummer is null, if so, replace it with "---"
       const personalnummer: string = person.person.personalnummer ?? '---';
       // Check if the uebersicht has a zuordnung of type "Klasse" if no then show directly "---" without filtering or mapping

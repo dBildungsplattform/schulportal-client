@@ -167,9 +167,10 @@ export const useOrganisationStore: StoreDefinition<
         this.createdOrganisation = data;
         return data;
       } catch (error: unknown) {
+        /* if an unknown error occurs, set to UNSPECIFIED */
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
+          this.errorCode = error.response?.data.i18nKey || 'ORGANISATION_SPECIFICATION_ERROR';
         }
         this.loading = false;
         return Promise.reject(this.errorCode);
