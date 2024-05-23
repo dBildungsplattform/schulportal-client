@@ -126,64 +126,107 @@ describe('OrganisationStore', () => {
       expect(organisationStore.loading).toBe(false);
     });
   });
-  describe('createOrganisation', () => {
-    it('should create the Organisation and update state', async () => {
+
+  describe('getKlassenByOrganisationId', () => {
+    it('should fetch all Klassen and update state', async () => {
       const mockResponse: Organisation[] = [
         {
           id: '1',
           kennung: 'Org1',
-          name: 'Organisation 1',
+          name: '9a',
           namensergaenzung: 'Ergänzung',
           kuerzel: 'O1',
-          typ: OrganisationsTyp.Anbieter,
+          typ: OrganisationsTyp.Klasse,
           administriertVon: '1',
         },
       ];
 
-      mockadapter.onPost('/api/organisationen').replyOnce(200, mockResponse);
-      const createOrganisationPromise: Promise<Organisation> = organisationStore.createOrganisation(
-        'Org1',
-        'Organisation 1',
-        'Ergänzung',
-        '01',
-        OrganisationsTyp.Anbieter,
-      );
-      expect(organisationStore.loading).toBe(true);
-      await createOrganisationPromise;
-      expect(organisationStore.createdOrganisation).toEqual(mockResponse);
+      mockadapter.onGet('/api/organisationen/1/administriert').replyOnce(200, mockResponse);
+      const getAllKlassenByOrganisationId: Promise<void> = organisationStore.getKlassenByOrganisationId('1');
+      await getAllKlassenByOrganisationId;
+      expect(organisationStore.klassen).toEqual(mockResponse);
       expect(organisationStore.loading).toBe(false);
     });
 
     it('should handle string error', async () => {
-      mockadapter.onPost('/api/organisationen').replyOnce(500, 'some mock server error');
-      const createOrganisationPromise: Promise<Organisation> = organisationStore.createOrganisation(
-        'Org1',
-        'Organisation 1',
-        'Ergänzung',
-        '01',
-        OrganisationsTyp.Anbieter,
-      );
+      mockadapter.onGet('/api/organisationen/1/administriert').replyOnce(500, 'some mock server error');
+      const getAllKlassenByOrganisationId: Promise<void> = organisationStore.getKlassenByOrganisationId('1');
       expect(organisationStore.loading).toBe(true);
-      await rejects(createOrganisationPromise);
-      expect(organisationStore.createdOrganisation).toEqual(null);
+      await rejects(getAllKlassenByOrganisationId);
+      expect(organisationStore.klassen).toEqual([]);
       expect(organisationStore.errorCode).toEqual('UNSPECIFIED_ERROR');
       expect(organisationStore.loading).toBe(false);
     });
 
     it('should handle error code', async () => {
-      mockadapter.onPost('/api/organisationen').replyOnce(500, { code: 'some mock server error' });
-      const createOrganisationPromise: Promise<Organisation> = organisationStore.createOrganisation(
-        'Org1',
-        'Organisation 1',
-        'Ergänzung',
-        '01',
-        OrganisationsTyp.Anbieter,
-      );
+      mockadapter.onGet('/api/organisationen/1/administriert').replyOnce(500, { code: 'some mock server error' });
+      const getAllKlassenByOrganisationId: Promise<void> = organisationStore.getKlassenByOrganisationId('1');
       expect(organisationStore.loading).toBe(true);
-      await expect(createOrganisationPromise).rejects.toEqual('some mock server error');
-      expect(organisationStore.createdOrganisation).toEqual(null);
+      await rejects(getAllKlassenByOrganisationId);
+      expect(organisationStore.klassen).toEqual([]);
       expect(organisationStore.errorCode).toEqual('some mock server error');
       expect(organisationStore.loading).toBe(false);
+    });
+
+    describe('createOrganisation', () => {
+      it('should create the Organisation and update state', async () => {
+        const mockResponse: Organisation[] = [
+          {
+            id: '1',
+            kennung: 'Org1',
+            name: 'Organisation 1',
+            namensergaenzung: 'Ergänzung',
+            kuerzel: 'O1',
+            typ: OrganisationsTyp.Anbieter,
+            administriertVon: '1',
+          },
+        ];
+
+        mockadapter.onPost('/api/organisationen').replyOnce(200, mockResponse);
+        const createOrganisationPromise: Promise<Organisation> = organisationStore.createOrganisation(
+          'Org1',
+          'Organisation 1',
+          'Ergänzung',
+          '01',
+          OrganisationsTyp.Anbieter,
+        );
+        expect(organisationStore.loading).toBe(true);
+        await createOrganisationPromise;
+        expect(organisationStore.createdOrganisation).toEqual(mockResponse);
+        expect(organisationStore.loading).toBe(false);
+      });
+
+      it('should handle string error', async () => {
+        mockadapter.onPost('/api/organisationen').replyOnce(500, 'some mock server error');
+        const createOrganisationPromise: Promise<Organisation> = organisationStore.createOrganisation(
+          'Org1',
+          'Organisation 1',
+          'Ergänzung',
+          '01',
+          OrganisationsTyp.Anbieter,
+        );
+        expect(organisationStore.loading).toBe(true);
+        await rejects(createOrganisationPromise);
+        expect(organisationStore.createdOrganisation).toEqual(null);
+        expect(organisationStore.errorCode).toEqual('UNSPECIFIED_ERROR');
+        expect(organisationStore.loading).toBe(false);
+      });
+
+      it('should handle error code', async () => {
+        mockadapter.onPost('/api/organisationen').replyOnce(500, { code: 'some mock server error' });
+        const createOrganisationPromise: Promise<Organisation> = organisationStore.createOrganisation(
+          'Org1',
+          'Organisation 1',
+          'Ergänzung',
+          '01',
+          OrganisationsTyp.Anbieter,
+        );
+        expect(organisationStore.loading).toBe(true);
+        await expect(createOrganisationPromise).rejects.toEqual('some mock server error');
+        expect(organisationStore.createdOrganisation).toEqual(null);
+        expect(organisationStore.errorCode).toEqual('some mock server error');
+        expect(organisationStore.loading).toBe(false);
+      });
     });
   });
 });
