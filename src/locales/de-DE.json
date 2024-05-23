@@ -29,10 +29,9 @@
       "klasseAddedSuccessfully": "Die Klasse wurde erfolgreich hinzugefügt.",
       "klasseCreateErrorText": "Die Klasse konnte nicht angelegt werden.",
       "klasseCreateErrorTitle": "Fehler beim Anlegen der Klasse",
-      "selectKlasse": "Klasse auswählen",
-      "klasse": "Klasse",
       "klassenname": "Klassenname",
       "management": "Klassenverwaltung",
+      "selectKlasse": "Klasse auswählen",
       "rules": {
         "klasse": {
           "required": "Die Klasse muss ausgewählt werden."
