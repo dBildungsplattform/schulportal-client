@@ -25,7 +25,7 @@
       "discard": "Klasse verwerfen",
       "errors": {
         "KLASSE_NUR_VON_SCHULE_ADMINISTRIERT": "Klassen dürfen nur von einer Schule administriert werden.",
-        "KLASSENNAME_AN_SCHULE_EINDEUTIG": "Der Klassenname ist an der ausgewählten Schule bereits vorhanden.",
+        "KLASSENNAME_AN_SCHULE_EINDEUTIG": "Der Klassenname existiert bereits an dieser Schule.",
         "ORGANISATION_SPECIFICATION_ERROR": "Die Klasse konnte nicht angelegt werden."
       },
       "enterKlassenname": "Klassenname eingeben",
