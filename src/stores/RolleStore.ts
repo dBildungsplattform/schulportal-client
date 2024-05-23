@@ -35,7 +35,7 @@ type RolleActions = {
     merkmale: RollenMerkmal[],
     systemrechte: RollenSystemRecht[],
   ) => Promise<RolleResponse>;
-  getAllRollen: () => Promise<void>;
+  getAllRollen: (searchString: string) => Promise<void>;
 };
 
 export { RollenArt };

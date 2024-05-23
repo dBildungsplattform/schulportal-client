@@ -159,9 +159,9 @@
   // Watcher to detect when the search input for Organisationen is triggered.
   watch(searchInputRollen, async (newValue: string, _oldValue: string) => {
     if (newValue.length >= 3) {
-      rolleStore.getAllRollen();
+      rolleStore.getAllRollen(newValue);
     } else {
-      rolleStore.getAllRollen();
+      rolleStore.getAllRollen('');
     }
   });
 
@@ -187,7 +187,7 @@
     }
     await organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Schule });
     await personenkontextStore.getAllPersonenuebersichten();
-    await rolleStore.getAllRollen();
+    await rolleStore.getAllRollen('');
   });
 </script>
 
