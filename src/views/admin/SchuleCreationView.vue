@@ -156,7 +156,7 @@
         :title="$t('admin.schule.schuleCreateErrorTitle')"
         :type="'error'"
         :closable="false"
-        :text="$t('admin.schule.schuleCreateErrorText')"
+        :text="$t(`admin.schule.errors.${organisationStore.errorCode}`)"
         :showButton="true"
         :buttonText="$t('admin.schule.backToCreateSchule')"
         :buttonAction="navigateBackToSchuleForm"
