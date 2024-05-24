@@ -23,13 +23,14 @@
   import ResultTable from '@/components/admin/ResultTable.vue';
   import SearchField from '@/components/admin/SearchField.vue';
 
-  const searchFilterStore: SearchFilterStore = useSearchFilterStore();
-
+  const searchFieldComponent = ref()
+  
   const router: Router = useRouter();
   const organisationStore: OrganisationStore = useOrganisationStore();
   const personStore: PersonStore = usePersonStore();
   const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
   const rolleStore: RolleStore = useRolleStore();
+  const searchFilterStore: SearchFilterStore = useSearchFilterStore();
   const { t }: Composer = useI18n({ useScope: 'global' });
 
   type ReadonlyHeaders = InstanceType<typeof VDataTableServer>['headers'];
@@ -102,6 +103,8 @@
   }
 
   function resetSearchAndFilter(): void {
+    searchFilter.value = '';
+    searchFieldComponent.value.searchFilter = '';
     searchInputSchulen.value = '';
     searchInputRollen.value = '';
     selectedSchulen.value = [];
@@ -329,6 +332,7 @@
         <SearchField
           :hover-text="$t('person.firstNameLastNameReferrerKopersNr')"
           @onApplySearchFilter="handleSearchFilter"
+          ref="searchFieldComponent"
         ></SearchField>
       </v-row>
       <ResultTable

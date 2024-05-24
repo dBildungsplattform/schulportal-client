@@ -6,7 +6,6 @@
   useI18n({ useScope: 'global' });
 
   const searchFilterStore: SearchFilterStore = useSearchFilterStore();
-
   const searchFilter: Ref<string | null> = ref(searchFilterStore.searchFilter);
 
   type Emits = {
@@ -22,6 +21,10 @@
   }>();
 
   const props: Props = defineProps<Props>();
+
+  defineExpose({
+    searchFilter
+  })
 
   async function applySearchFilter(): Promise<void> {
     if (searchFilter.value !== null) {
