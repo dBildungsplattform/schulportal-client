@@ -29,7 +29,7 @@
       "klasseCreateErrorText": "Die Klasse konnte nicht angelegt werden.",
       "klasseCreateErrorTitle": "Fehler beim Anlegen der Klasse",
       "selectKlasse": "Klasse auswählen",
-      "klasse": "Klasse",
+      "klasse": "Klasse(n)",
       "klassenname": "Klassenname",
       "management": "Klassenverwaltung",
       "rules": {
@@ -43,7 +43,8 @@
         "schule": {
           "required": "Die Schule muss ausgewählt werden."
         }
-      }
+      },
+      "showAll": "Alle Klassen anzeigen"
     },
     "organisation": {
       "assignOrganisation": "Organisationsebene zuordnen",

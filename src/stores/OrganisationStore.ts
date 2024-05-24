@@ -34,12 +34,14 @@ type OrganisationState = {
 export type OrganisationenFilter = {
   searchString?: string;
   systemrechte?: RollenSystemRecht[];
+  includeTyp?: OrganisationsTyp;
   excludeTyp?: OrganisationsTyp[];
+  administriertVon?: string[];
 };
 
 type OrganisationGetters = {};
 type OrganisationActions = {
-  getAllOrganisationen: (filter?: OrganisationenFilter) => Promise<void>;
+  getAllOrganisationen: (filter?: OrganisationenFilter) => Promise<Organisation[] | undefined>;
   getKlassenByOrganisationId: (organisationId: string, searchFilter?: string) => Promise<void>;
   getOrganisationById: (organisationId: string) => Promise<Organisation>;
   createOrganisation: (
@@ -75,7 +77,7 @@ export const useOrganisationStore: StoreDefinition<
     };
   },
   actions: {
-    async getAllOrganisationen(filter?: OrganisationenFilter) {
+    async getAllOrganisationen(filter?: OrganisationenFilter): Promise<Organisation[] | undefined> {
       this.loading = true;
       try {
         const { data }: AxiosResponse<Organisation[]> = await organisationApi.organisationControllerFindOrganizations(
@@ -84,18 +86,21 @@ export const useOrganisationStore: StoreDefinition<
           undefined,
           undefined,
           filter?.searchString,
-          undefined,
+          filter?.includeTyp,
           filter?.systemrechte,
           filter?.excludeTyp,
+          filter?.administriertVon,
         );
         this.allOrganisationen = data;
         this.loading = false;
+        return data;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
           this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
         }
         this.loading = false;
+        return Promise.reject(this.errorCode);
       }
     },
     async getOrganisationById(organisationId: string) {
