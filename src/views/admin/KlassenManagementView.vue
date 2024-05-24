@@ -12,7 +12,6 @@
   import LayoutCard from '@/components/cards/LayoutCard.vue';
 
   const organisationStore: OrganisationStore = useOrganisationStore();
-
   const { t }: Composer = useI18n({ useScope: 'global' });
 
   type ReadonlyHeaders = InstanceType<typeof VDataTableServer>['headers'];
@@ -47,59 +46,76 @@
       .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
   });
 
+  // Watcher to update Klassen and options when Schule is selected or unselected
   watch(selectedSchule, async (newValue: string | null, oldValue: string | null) => {
-    if (newValue !== oldValue) {
-      if (newValue !== null) {
-        await organisationStore.getKlassenByOrganisationId(newValue);
-        klassenOptions.value = organisationStore.klassen.map((org: Organisation) => ({
-          value: org.id,
-          title: org.name,
-        }));
-        finalKlassen.value = organisationStore.klassen;
-      } else {
-        selectedKlassen.value = []; // Reset selectedKlassen
-        klassenOptions.value = []; // Clear klassenOptions
-        finalKlassen.value = (await organisationStore.getAllOrganisationen()) || [];
-      }
+    if (newValue !== oldValue && newValue !== null) {
+      // Fetch Klassen related to the selected Schule
+      await organisationStore.getKlassenByOrganisationId(newValue);
+      // Update the klassenOptions for the dropdown
+      klassenOptions.value = organisationStore.klassen.map((org: Organisation) => ({
+        value: org.id,
+        title: org.name,
+      }));
+      // Update finalKlassen to show in the table
+      finalKlassen.value = organisationStore.klassen;
+    } else {
+      // Reset selectedKlassen and klassenOptions when Schule is unselected
+      selectedKlassen.value = [];
+      klassenOptions.value = [];
+      // Fetch all organisations when no Schule is selected
+      finalKlassen.value = (await organisationStore.getAllOrganisationen()) || [];
     }
   });
 
+  // Watcher to update finalKlassen when Klassen are selected or unselected
   watch(selectedKlassen, async (newValue: string[] | null, oldValue: string[] | null) => {
     if (newValue !== oldValue) {
       if (newValue && newValue.length > 0) {
-        finalKlassen.value = organisationStore.klassen.filter((klasse) => newValue.includes(klasse.id));
+        // Filter finalKlassen to only include the selected Klassen
+        finalKlassen.value = organisationStore.klassen.filter((klasse: Organisation) => newValue.includes(klasse.id));
       } else if (selectedSchule.value !== null) {
+        // If no Klassen are selected but a Schule is selected, show all Klassen for the selected Schule
         finalKlassen.value = organisationStore.klassen;
       } else {
+        // If no Klassen and no Schule are selected, show all organisations
         finalKlassen.value = (await organisationStore.getAllOrganisationen()) || [];
       }
     }
   });
 
+  // Watcher to search Schulen based on input text
   watch(searchInputSchulen, async (newValue: string, _oldValue: string) => {
     if (newValue.length >= 3) {
+      // Fetch Schulen matching the search string when it has 3 or more characters
       organisationStore.getAllOrganisationen({ searchString: newValue, includeTyp: OrganisationsTyp.Schule });
     } else {
+      // Fetch all Schulen when the search string is less than 3 characters
       organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Schule });
     }
   });
 
+  // Watcher to search Klassen based on input text
   watch(searchInputKlassen, async (newValue: string, _oldValue: string) => {
     if (newValue.length >= 1 && selectedSchule.value !== null) {
+      // Fetch Klassen for the selected Schule matching the search string
       organisationStore.getKlassenByOrganisationId(selectedSchule.value, newValue);
     } else if (selectedSchule.value !== null) {
+      // Fetch all Klassen for the selected Schule when the search string is cleared
       organisationStore.getKlassenByOrganisationId(selectedSchule.value);
     }
   });
 
+  // Computed property to filter finalKlassen to only include those of type Klasse
   const klassenForTable: ComputedRef<Organisation[]> = computed(() => {
     return finalKlassen.value.filter((organisation: Organisation) => organisation.typ === OrganisationsTyp.Klasse);
   });
 
+  // Fetch all organisations when the component is mounted
   onMounted(async () => {
     finalKlassen.value = (await organisationStore.getAllOrganisationen()) || [];
   });
 </script>
+
 
 <template>
   <div class="admin">
