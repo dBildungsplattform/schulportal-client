@@ -31,7 +31,8 @@
 
   const selectedSchule: Ref<string | null> = ref(null);
   const selectedKlassen: Ref<Array<string>> = ref([]);
-  const finalKlassen: Ref<Array<Organisation> | undefined> = ref(undefined);
+  const finalKlassen: Ref<Array<Organisation>> = ref([]);
+  const klassenOptions: Ref<TranslatedObject[] | undefined> = ref([]);
 
   const searchInputSchulen: Ref<string> = ref('');
   const searchInputKlassen: Ref<string> = ref('');
@@ -46,44 +47,43 @@
       .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
   });
 
-  const klassen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
-    return organisationStore.klassen
-      .slice(0, 25)
-      .map((org: Organisation) => ({
-        value: org.id,
-        title: org.name,
-      }))
-      .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
-  });
-
-  // Watcher to detect when the Schule is selected so the Klasse show all the possible choices using that value.
   watch(selectedSchule, async (newValue: string | null, oldValue: string | null) => {
-    if (newValue !== oldValue && newValue !== null) {
-      organisationStore.getKlassenByOrganisationId(newValue);
-      finalKlassen.value = await organisationStore.getAllOrganisationen({ administriertVon: [newValue] });
-    } else if (!newValue) {
-      finalKlassen.value = await organisationStore.getAllOrganisationen();
+    if (newValue !== oldValue) {
+      if (newValue !== null) {
+        await organisationStore.getKlassenByOrganisationId(newValue);
+        klassenOptions.value = organisationStore.klassen.map((org: Organisation) => ({
+          value: org.id,
+          title: org.name,
+        }));
+        finalKlassen.value = organisationStore.klassen;
+      } else {
+        selectedKlassen.value = []; // Reset selectedKlassen
+        klassenOptions.value = []; // Clear klassenOptions
+        finalKlassen.value = (await organisationStore.getAllOrganisationen()) || [];
+      }
     }
   });
-  // Watcher to detect when the search input for Schulen is triggered.
+
+  watch(selectedKlassen, async (newValue: string[] | null, oldValue: string[] | null) => {
+    if (newValue !== oldValue) {
+      if (newValue && newValue.length > 0) {
+        finalKlassen.value = organisationStore.klassen.filter((klasse) => newValue.includes(klasse.id));
+      } else if (selectedSchule.value !== null) {
+        finalKlassen.value = organisationStore.klassen;
+      } else {
+        finalKlassen.value = (await organisationStore.getAllOrganisationen()) || [];
+      }
+    }
+  });
+
   watch(searchInputSchulen, async (newValue: string, _oldValue: string) => {
     if (newValue.length >= 3) {
       organisationStore.getAllOrganisationen({ searchString: newValue, includeTyp: OrganisationsTyp.Schule });
     } else {
-      // If newValue has less than 3 characters, use an empty string instead of newValue to show all Schulen.
       organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Schule });
     }
   });
-  // Watcher to detect when the Klasse is selected
-  watch(selectedKlassen, async (newValue: string[] | null, oldValue: string[] | null) => {
-    if (newValue !== oldValue && newValue !== null) {
-      finalKlassen.value = organisationStore.klassen.filter((klasse) => newValue.includes(klasse.id));
-    } else {
-      finalKlassen.value = await organisationStore.getAllOrganisationen();
-    }
-  });
 
-  // Watcher to detect when the search input for Klassen is triggered.
   watch(searchInputKlassen, async (newValue: string, _oldValue: string) => {
     if (newValue.length >= 1 && selectedSchule.value !== null) {
       organisationStore.getKlassenByOrganisationId(selectedSchule.value, newValue);
@@ -92,13 +92,12 @@
     }
   });
 
-  const klassenForTable: ComputedRef<Organisation[] | undefined> = computed(() => {
-    // filter the organisations to only include the ones from Typ "Klasse"
-    return finalKlassen.value?.filter((organisation: Organisation) => organisation.typ === OrganisationsTyp.Klasse);
+  const klassenForTable: ComputedRef<Organisation[]> = computed(() => {
+    return finalKlassen.value.filter((organisation: Organisation) => organisation.typ === OrganisationsTyp.Klasse);
   });
 
   onMounted(async () => {
-    finalKlassen.value = await organisationStore.getAllOrganisationen();
+    finalKlassen.value = (await organisationStore.getAllOrganisationen()) || [];
   });
 </script>
 
@@ -139,8 +138,7 @@
             variant="outlined"
             v-model="selectedSchule"
             v-model:search="searchInputSchulen"
-          >
-          </v-autocomplete>
+          />
         </v-col>
         <v-col
           cols="2"
@@ -156,7 +154,7 @@
             density="compact"
             hide-details
             id="klasse-select"
-            :items="klassen"
+            :items="klassenOptions"
             item-value="value"
             item-text="title"
             multiple
@@ -166,8 +164,7 @@
             variant="outlined"
             v-model="selectedKlassen"
             v-model:search="searchInputKlassen"
-          >
-          </v-autocomplete>
+          />
         </v-col>
       </v-row>
       <ResultTable
@@ -180,9 +177,7 @@
         :totalItems="organisationStore.allOrganisationen.length"
         item-value-path="id"
         :disableRowClick="true"
-      ></ResultTable>
+      />
     </LayoutCard>
   </div>
 </template>
-
-<style></style>
