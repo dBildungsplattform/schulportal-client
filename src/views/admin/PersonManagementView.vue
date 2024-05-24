@@ -23,8 +23,8 @@
   import ResultTable from '@/components/admin/ResultTable.vue';
   import SearchField from '@/components/admin/SearchField.vue';
 
-  const searchFieldComponent = ref()
-  
+  const searchFieldComponent: Ref = ref();
+
   const router: Router = useRouter();
   const organisationStore: OrganisationStore = useOrganisationStore();
   const personStore: PersonStore = usePersonStore();
@@ -229,7 +229,6 @@
         >
           <v-autocomplete
             autocomplete="off"
-            chips
             class="filter-dropdown"
             :class="{ selected: selectedSchulen.length > 0 }"
             clearable
@@ -256,7 +255,6 @@
         >
           <v-autocomplete
             autocomplete="off"
-            chips
             class="filter-dropdown"
             :class="{ selected: selectedRollen.length > 0 }"
             clearable
@@ -283,7 +281,6 @@
         >
           <v-autocomplete
             autocomplete="off"
-            chips
             class="filter-dropdown"
             clearable
             data-testid="klasse-select"

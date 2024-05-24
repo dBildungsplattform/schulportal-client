@@ -23,8 +23,8 @@
   const props: Props = defineProps<Props>();
 
   defineExpose({
-    searchFilter
-  })
+    searchFilter,
+  });
 
   async function applySearchFilter(): Promise<void> {
     if (searchFilter.value !== null) {
