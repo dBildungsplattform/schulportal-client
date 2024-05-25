@@ -281,7 +281,7 @@
       await personenkontextStore
         .createPersonenkontext(unpersistedOrganisationPersonenkontext, PersonenKontextTyp.Organisation)
         .catch(() => {
-          creationErrorText.value = t('admin.personenkontext.creationErrorText');
+          creationErrorText.value = t(`admin.personenkontext.errors.${personenkontextStore.errorCode}`);
         });
       // Build the context for the Klasse and save it only if the the Klasse was selected
       if (selectedKlasse.value) {
@@ -293,7 +293,7 @@
         await personenkontextStore
           .createPersonenkontext(unpersistedKlassePersonenkontext, PersonenKontextTyp.Klasse)
           .catch(() => {
-            creationErrorText.value = t('admin.personenkontext.creationErrorText');
+            creationErrorText.value = t(`admin.personenkontext.errors.${personenkontextStore.errorCode}`);
           });
       }
       resetForm();

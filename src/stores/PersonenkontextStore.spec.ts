@@ -162,7 +162,7 @@ describe('PersonenkontextStore', () => {
     });
 
     it('should handle string error', async () => {
-      mockadapter.onPost('/api/dbiam/personenkontext').replyOnce(500, 'some error');
+      mockadapter.onPost('/api/dbiam/personenkontext').replyOnce(500, 'some mock server error');
       const createPersonenkontextPromise: Promise<DBiamPersonenkontextResponse> =
         personenkontextStore.createPersonenkontext(
           {
@@ -174,12 +174,12 @@ describe('PersonenkontextStore', () => {
         );
       expect(personenkontextStore.loading).toBe(true);
       await rejects(createPersonenkontextPromise);
-      expect(personenkontextStore.errorCode).toEqual('UNSPECIFIED_ERROR');
+      expect(personenkontextStore.errorCode).toEqual('PERSONENKONTEXT_SPECIFICATION_ERROR');
       expect(personenkontextStore.loading).toBe(false);
     });
 
     it('should handle error code', async () => {
-      mockadapter.onPost('/api/dbiam/personenkontext').replyOnce(500, { code: 'some mock server error' });
+      mockadapter.onPost('/api/dbiam/personenkontext').replyOnce(500, { i18nKey: 'SOME_MOCK_SERVER_ERROR' });
       const createPersonenkontextPromise: Promise<DBiamPersonenkontextResponse> =
         personenkontextStore.createPersonenkontext(
           {
@@ -191,7 +191,7 @@ describe('PersonenkontextStore', () => {
         );
       expect(personenkontextStore.loading).toBe(true);
       await rejects(createPersonenkontextPromise);
-      expect(personenkontextStore.errorCode).toEqual('some mock server error');
+      expect(personenkontextStore.errorCode).toEqual('SOME_MOCK_SERVER_ERROR');
       expect(personenkontextStore.loading).toBe(false);
     });
   });
@@ -234,12 +234,12 @@ describe('PersonenkontextStore', () => {
         );
       expect(personenkontextStore.loading).toBe(true);
       await rejects(createPersonenkontextPromise);
-      expect(personenkontextStore.errorCode).toEqual('UNSPECIFIED_ERROR');
+      expect(personenkontextStore.errorCode).toEqual('PERSONENKONTEXT_SPECIFICATION_ERROR');
       expect(personenkontextStore.loading).toBe(false);
     });
 
     it('should handle error code', async () => {
-      mockadapter.onPost('/api/dbiam/personenkontext').replyOnce(500, { code: 'some mock server error' });
+      mockadapter.onPost('/api/dbiam/personenkontext').replyOnce(500, { i18nKey: 'SOME_MOCK_SERVER_ERROR' });
       const createPersonenkontextPromise: Promise<DBiamPersonenkontextResponse> =
         personenkontextStore.createPersonenkontext(
           {
@@ -251,7 +251,7 @@ describe('PersonenkontextStore', () => {
         );
       expect(personenkontextStore.loading).toBe(true);
       await rejects(createPersonenkontextPromise);
-      expect(personenkontextStore.errorCode).toEqual('some mock server error');
+      expect(personenkontextStore.errorCode).toEqual('SOME_MOCK_SERVER_ERROR');
       expect(personenkontextStore.loading).toBe(false);
     });
   });
