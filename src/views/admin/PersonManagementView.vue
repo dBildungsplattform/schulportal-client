@@ -160,22 +160,16 @@
     applySearchAndFilters();
   };
 
-  // Watcher to detect when the search input for Organisationen is triggered.
+  /* Watcher to detect when the search input for Schulen is triggered.
+     Always request from backend to keep display of hits consistent */
   watch(searchInputSchulen, async (newValue: string, _oldValue: string) => {
-    if (newValue?.length >= 3) {
-      organisationStore.getAllOrganisationen({ searchString: newValue, includeTyp: OrganisationsTyp.Schule });
-    } else {
-      organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Schule });
-    }
+    organisationStore.getAllOrganisationen({ searchString: newValue, includeTyp: OrganisationsTyp.Schule });
   });
 
-  // Watcher to detect when the search input for Organisationen is triggered.
+  /* Watcher to detect when the search input for Rollen is triggered.
+     Always request from backend to keep display of hits consistent */
   watch(searchInputRollen, async (newValue: string, _oldValue: string) => {
-    if (newValue?.length >= 3) {
-      rolleStore.getAllRollen(newValue);
-    } else {
-      rolleStore.getAllRollen('');
-    }
+    rolleStore.getAllRollen(newValue);
   });
 
   watch(selectedSchulen, async (_newValue: Array<string>, _oldValue: Array<string>) => {
@@ -254,7 +248,7 @@
               <v-list-item>
                 <v-progress-circular indeterminate v-if="organisationStore.loading"></v-progress-circular>
                 <span v-else class="filter-header">{{ 
-                  organisationStore.totalOrganisationen == 1
+                  organisationStore.totalOrganisationen === 1
                     ? $t('admin.schule.schuleFound', { total: organisationStore.totalOrganisationen })
                     : $t('admin.schule.schulenFound', { total: organisationStore.totalOrganisationen })
                 }}</span>
