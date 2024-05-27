@@ -26,6 +26,7 @@
   type TranslatedObject = {
     value: string;
     title: string;
+    chipTitle?: string | null;
   };
 
   const selectedSchule: Ref<string | null> = ref(null);
@@ -38,10 +39,10 @@
 
   const schulen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
     return organisationStore.allOrganisationen
-      .slice(0, 25)
       .map((org: Organisation) => ({
         value: org.id,
         title: `${org.kennung} (${org.name})`,
+        chipTitle: org.kennung,
       }))
       .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
   });
@@ -62,8 +63,9 @@
       // Reset selectedKlassen and klassenOptions when Schule is unselected
       selectedKlassen.value = [];
       klassenOptions.value = [];
-      // Fetch all organisations when no Schule is selected
-      finalKlassen.value = (await organisationStore.getAllOrganisationen()) || [];
+      // Fetch all Klassen when no Schule is selected
+      await organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Klasse });
+      finalKlassen.value = organisationStore.allKlassen;
     }
   });
 
@@ -77,20 +79,21 @@
         // If no Klassen are selected but a Schule is selected, show all Klassen for the selected Schule
         finalKlassen.value = organisationStore.klassen;
       } else {
-        // If no Klassen and no Schule are selected, show all organisations
-        finalKlassen.value = (await organisationStore.getAllOrganisationen()) || [];
+        // If no Klassen and no Schule are selected, show all Klassen
+        await organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Klasse });
+        finalKlassen.value = organisationStore.allKlassen;
       }
     }
   });
 
   // Watcher to search Schulen based on input text
   watch(searchInputSchulen, async (newValue: string, _oldValue: string) => {
-    if (newValue.length >= 3) {
+    if (newValue.length >= 1) {
       // Fetch Schulen matching the search string when it has 3 or more characters
-      organisationStore.getAllOrganisationen({ searchString: newValue, includeTyp: OrganisationsTyp.Schule });
+      await organisationStore.getAllOrganisationen({ searchString: newValue, includeTyp: OrganisationsTyp.Schule });
     } else {
       // Fetch all Schulen when the search string is less than 3 characters
-      organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Schule });
+      await organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Schule });
     }
   });
 
@@ -98,10 +101,12 @@
   watch(searchInputKlassen, async (newValue: string, _oldValue: string) => {
     if (newValue.length >= 1 && selectedSchule.value !== null) {
       // Fetch Klassen for the selected Schule matching the search string
-      organisationStore.getKlassenByOrganisationId(selectedSchule.value, newValue);
+      await organisationStore.getKlassenByOrganisationId(selectedSchule.value, newValue);
+      finalKlassen.value = organisationStore.klassen;
     } else if (selectedSchule.value !== null) {
       // Fetch all Klassen for the selected Schule when the search string is cleared
-      organisationStore.getKlassenByOrganisationId(selectedSchule.value);
+      await organisationStore.getKlassenByOrganisationId(selectedSchule.value);
+      finalKlassen.value = organisationStore.klassen;
     }
   });
 
@@ -110,12 +115,13 @@
     return finalKlassen.value.filter((organisation: Organisation) => organisation.typ === OrganisationsTyp.Klasse);
   });
 
-  // Fetch all organisations when the component is mounted
+  // Fetch all organisations and klassen when the component is mounted
   onMounted(async () => {
-    finalKlassen.value = (await organisationStore.getAllOrganisationen()) || [];
+    await organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Schule });
+    await organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Klasse });
+    finalKlassen.value = organisationStore.allKlassen;
   });
 </script>
-
 
 <template>
   <div class="admin">
@@ -132,7 +138,7 @@
         justify="end"
       >
         <v-col
-          cols="2"
+          cols="3"
           class="py-0"
         >
           <v-autocomplete
@@ -154,10 +160,33 @@
             variant="outlined"
             v-model="selectedSchule"
             v-model:search="searchInputSchulen"
-          />
+          >
+            <template v-slot:prepend-item>
+              <v-list-item>
+                <v-progress-circular
+                  indeterminate
+                  v-if="organisationStore.loading"
+                ></v-progress-circular>
+                <span
+                  v-else
+                  class="filter-header"
+                  >{{
+                    organisationStore.totalOrganisationen === 1
+                      ? $t('admin.schule.schuleFound', { total: organisationStore.totalOrganisationen })
+                      : $t('admin.schule.schulenFound', { total: organisationStore.totalOrganisationen })
+                  }}</span
+                >
+              </v-list-item>
+            </template>
+            <template v-slot:chip="{ item }">
+              <v-list-item>
+                <v-chip>{{ item.raw.chipTitle }}</v-chip>
+              </v-list-item>
+            </template>
+          </v-autocomplete>
         </v-col>
         <v-col
-          cols="2"
+          cols="3"
           class="py-0"
         >
           <v-autocomplete
@@ -180,7 +209,8 @@
             variant="outlined"
             v-model="selectedKlassen"
             v-model:search="searchInputKlassen"
-          />
+          >
+          </v-autocomplete>
         </v-col>
       </v-row>
       <ResultTable
@@ -190,7 +220,7 @@
         :loading="organisationStore.loading"
         :headers="headers"
         @onUpdateTable="organisationStore.getAllOrganisationen()"
-        :totalItems="organisationStore.allOrganisationen.length"
+        :totalItems="organisationStore.allKlassen.length"
         item-value-path="id"
         :disableRowClick="true"
       />

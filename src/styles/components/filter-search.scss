@@ -1,31 +1,32 @@
 .filter-dropdown, .search-field {
-    .v-input__control {
-      max-height: 35px;
-    }
-  
-    .v-field__field {
-      line-height: 15px;
-      max-height: 35px;
-      overflow: hidden;
-    }
-  
-    .v-field__input {
-      font-size: 15px;
-      max-height: 35px;
-      min-height: 35px;
-    }
-  
-    &.selected {
-      background-color: $filterDropdownSelectionColor;
-    }
-  }
-  
-  .reset-filter {
-    font-size: 14px;
-  }
-  
-  .search.button {
-    font-size: 15px;
+  .v-field__field {
     line-height: 15px;
+    overflow: hidden;
   }
-  
+
+  .v-field__input {
+    font-size: 15px;
+  }
+
+  &.selected {
+    background-color: $filterDropdownSelectionColor;
+
+    .v-list-item {
+      padding: 4px 6px;
+    }
+  }
+}
+
+.reset-filter {
+  font-size: 14px;
+}
+
+.search.button {
+  font-size: 15px;
+  line-height: 15px;
+}
+
+.filter-header {
+  font-size: 18px;
+  font-weight: bold;
+}

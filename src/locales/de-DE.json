@@ -178,6 +178,8 @@
       "enterDienststellennummer": "Dienststellennummer eingeben",
       "enterSchulname": "Schulname eingeben",
       "management": "Schulverwaltung",
+      "schuleFound": "{total} Schule gefunden",
+      "schulenFound": "{total} Schulen gefunden",
       "publicSchule": "Öffentliche Schule",
       "rules": {
         "dienststellennummer": {
