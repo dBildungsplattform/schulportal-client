@@ -246,12 +246,19 @@
           >
             <template v-slot:prepend-item>
               <v-list-item>
-                <v-progress-circular indeterminate v-if="organisationStore.loading"></v-progress-circular>
-                <span v-else class="filter-header">{{ 
-                  organisationStore.totalOrganisationen === 1
-                    ? $t('admin.schule.schuleFound', { total: organisationStore.totalOrganisationen })
-                    : $t('admin.schule.schulenFound', { total: organisationStore.totalOrganisationen })
-                }}</span>
+                <v-progress-circular
+                  indeterminate
+                  v-if="organisationStore.loading"
+                ></v-progress-circular>
+                <span
+                  v-else
+                  class="filter-header"
+                  >{{
+                    organisationStore.totalOrganisationen === 1
+                      ? $t('admin.schule.schuleFound', { total: organisationStore.totalOrganisationen })
+                      : $t('admin.schule.schulenFound', { total: organisationStore.totalOrganisationen })
+                  }}</span
+                >
               </v-list-item>
             </template>
             <template v-slot:chip="{ item }">
