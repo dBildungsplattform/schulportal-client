@@ -5,18 +5,19 @@
 
   .v-field__field {
     line-height: 15px;
-    max-height: 35px;
     overflow: hidden;
   }
 
   .v-field__input {
     font-size: 15px;
-    max-height: 35px;
-    min-height: 35px;
   }
 
   &.selected {
     background-color: $filterDropdownSelectionColor;
+
+    .v-list-item {
+      padding: 4px 6px;
+    }
   }
 }
 

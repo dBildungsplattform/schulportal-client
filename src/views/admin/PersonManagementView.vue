@@ -54,6 +54,7 @@
   type TranslatedObject = {
     value: string;
     title: string;
+    chipTitle?: string | null;
   };
 
   const schulen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
@@ -62,6 +63,7 @@
       .map((org: Organisation) => ({
         value: org.id,
         title: `${org.kennung} (${org.name})`,
+        chipTitle: org.kennung,
       }))
       .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
   });
@@ -160,7 +162,7 @@
 
   // Watcher to detect when the search input for Organisationen is triggered.
   watch(searchInputSchulen, async (newValue: string, _oldValue: string) => {
-    if (newValue.length >= 3) {
+    if (newValue?.length >= 3) {
       organisationStore.getAllOrganisationen({ searchString: newValue, includeTyp: OrganisationsTyp.Schule });
     } else {
       organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Schule });
@@ -169,7 +171,7 @@
 
   // Watcher to detect when the search input for Organisationen is triggered.
   watch(searchInputRollen, async (newValue: string, _oldValue: string) => {
-    if (newValue.length >= 3) {
+    if (newValue?.length >= 3) {
       rolleStore.getAllRollen(newValue);
     } else {
       rolleStore.getAllRollen('');
@@ -209,7 +211,7 @@
         justify="end"
       >
         <v-col
-          cols="4"
+          cols="2"
           class="py-0 text-right"
         >
           <v-btn
@@ -224,11 +226,12 @@
           </v-btn>
         </v-col>
         <v-col
-          cols="2"
+          cols="3"
           class="py-0"
         >
           <v-autocomplete
             autocomplete="off"
+            chips
             class="filter-dropdown"
             :class="{ selected: selectedSchulen.length > 0 }"
             clearable
@@ -247,14 +250,20 @@
             v-model="selectedSchulen"
             v-model:search="searchInputSchulen"
           >
+            <template v-slot:chip="{ item }">
+              <v-list-item>
+                <v-chip>{{ item.raw.chipTitle }}</v-chip>
+              </v-list-item>
+            </template>
           </v-autocomplete>
         </v-col>
         <v-col
-          cols="2"
+          cols="3"
           class="py-0"
         >
           <v-autocomplete
             autocomplete="off"
+            chips
             class="filter-dropdown"
             :class="{ selected: selectedRollen.length > 0 }"
             clearable
@@ -281,6 +290,7 @@
         >
           <v-autocomplete
             autocomplete="off"
+            chips
             class="filter-dropdown"
             clearable
             data-testid="klasse-select"
@@ -304,6 +314,7 @@
         >
           <v-autocomplete
             autocomplete="off"
+            chips
             class="filter-dropdown"
             clearable
             data-testid="status-select"
