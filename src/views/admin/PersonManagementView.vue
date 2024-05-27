@@ -250,6 +250,15 @@
             v-model="selectedSchulen"
             v-model:search="searchInputSchulen"
           >
+            <template v-slot:prepend-item>
+              <v-list-item>
+                <span class="filter-header">{{ 
+                  organisationStore.totalOrganisationen == 1
+                    ? $t('admin.schule.schuleFound', { total: organisationStore.totalOrganisationen })
+                    : $t('admin.schule.schulenFound', { total: organisationStore.totalOrganisationen })
+                }}</span>
+              </v-list-item>
+            </template>
             <template v-slot:chip="{ item }">
               <v-list-item>
                 <v-chip>{{ item.raw.chipTitle }}</v-chip>

@@ -1,8 +1,4 @@
 .filter-dropdown, .search-field {
-  .v-input__control {
-    max-height: 35px;
-  }
-
   .v-field__field {
     line-height: 15px;
     overflow: hidden;
@@ -28,4 +24,9 @@
 .search.button {
   font-size: 15px;
   line-height: 15px;
+}
+
+.filter-header {
+  font-size: 18px;
+  font-weight: bold;
 }

@@ -182,6 +182,7 @@
     "schule": {
       "addNew": "Neue Schule hinzufügen",
       "administratingSchultraeger": "Verwaltender Schulträger",
+      "all": "Alle Schulen",
       "ersatzschule": "Ersatzschule",
       "assignAdministratingSchultraeger": "Verwaltenden Schulträger zuordnen",
       "assignSchulform": "Schulform zuordnen",
@@ -201,6 +202,8 @@
         "ORGANISATION_SPECIFICATION_ERROR": "Die Schule konnte nicht angelegt werden.",
         "SCHULE_UNTER_TRAEGER": "Eine Schule darf nicht einer anderen Schule zugeordnet werden."
       },
+      "schuleFound": "{total} Schule gefunden",
+      "schulenFound": "{total} Schulen gefunden",
       "management": "Schulverwaltung",
       "publicSchule": "Öffentliche Schule",
       "rules": {

@@ -26,6 +26,7 @@ type OrganisationState = {
   allOrganisationen: Array<Organisation>;
   currentOrganisation: Organisation | null;
   createdOrganisation: Organisation | null;
+  totalOrganisationen: number;
   klassen: Array<Organisation>;
   errorCode: string;
   loading: boolean;
@@ -70,6 +71,7 @@ export const useOrganisationStore: StoreDefinition<
       allOrganisationen: [],
       currentOrganisation: null,
       createdOrganisation: null,
+      totalOrganisationen: 0,
       klassen: [],
       errorCode: '',
       loading: false,
@@ -80,7 +82,7 @@ export const useOrganisationStore: StoreDefinition<
     async getAllOrganisationen(filter?: OrganisationenFilter) {
       this.loading = true;
       try {
-        const { data }: AxiosResponse<Organisation[]> = await organisationApi.organisationControllerFindOrganizations(
+        const response: AxiosResponse<Organisation[]> = await organisationApi.organisationControllerFindOrganizations(
           undefined,
           undefined,
           undefined,
@@ -90,7 +92,8 @@ export const useOrganisationStore: StoreDefinition<
           filter?.systemrechte,
           filter?.excludeTyp,
         );
-        this.allOrganisationen = data;
+        this.allOrganisationen = response.data;
+        this.totalOrganisationen = response.headers['x-paging-total'];
         this.loading = false;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
