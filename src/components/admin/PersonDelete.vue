@@ -29,7 +29,10 @@
       return '';
     }
     let message: string = '';
-    message += `${t('admin.person.deletePersonConfirmation')}`;
+    message += `${t('admin.person.deletePersonConfirmation', {
+      firstname: props.person.person.name.vorname,
+      lastname: props.person.person.name.familienname,
+    })}`;
     return message;
   });
 
@@ -154,7 +157,7 @@
             </v-row>
             <v-row class="text-body bold px-md-16">
               <v-col
-                offset="2"
+                offset="1"
                 cols="10"
               >
                 <span data-testid="person-delete-confirmation-text">
