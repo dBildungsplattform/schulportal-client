@@ -211,11 +211,12 @@
         justify="end"
       >
         <v-col
-          cols="2"
-          class="py-0 text-right"
+          cols="12"
+          md="2"
+          class="py-md-0 text-md-right"
         >
           <v-btn
-            class="reset-filter"
+            class="px-0 reset-filter"
             :disabled="!filterOrSearchActive"
             @click="resetSearchAndFilter()"
             size="x-small"
@@ -226,8 +227,9 @@
           </v-btn>
         </v-col>
         <v-col
-          cols="3"
-          class="py-0"
+          cols="12"
+          md="3"
+          class="py-md-0"
         >
           <v-autocomplete
             autocomplete="off"
@@ -275,8 +277,9 @@
           </v-autocomplete>
         </v-col>
         <v-col
-          cols="3"
-          class="py-0"
+          cols="12"
+          md="3"
+          class="py-md-0"
         >
           <v-autocomplete
             autocomplete="off"
@@ -319,8 +322,9 @@
           </v-autocomplete>
         </v-col>
         <v-col
-          cols="2"
-          class="py-0"
+          cols="12"
+          md="2"
+          class="py-md-0"
         >
           <v-autocomplete
             autocomplete="off"
@@ -343,8 +347,9 @@
           </v-autocomplete>
         </v-col>
         <v-col
-          cols="2"
-          class="py-0"
+          cols="12"
+          md="2"
+          class="py-md-0"
         >
           <v-autocomplete
             autocomplete="off"
