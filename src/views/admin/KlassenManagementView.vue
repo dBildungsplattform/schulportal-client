@@ -121,6 +121,7 @@
     await organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Schule });
     await organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Klasse });
 
+    // Autoselect the Schule for the current user that only has 1 Schule assigned to him.
     const personenkontexte: Array<UserinfoPersonenkontext> | null = authStore.currentUser?.personenkontexte || [];
     if (personenkontexte.length > 0) {
       const matchingOrganisations: UserinfoPersonenkontext[] = personenkontexte.filter(
