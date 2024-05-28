@@ -305,6 +305,7 @@
     "userName": "Benutzername",
     "zuordnungen": "Zuordnung(en)"
   },
+  "resetFilter": "Filter zurücksetzen",
   "unsavedChanges": {
     "message": "Sie haben nicht gespeicherte Änderungen vorgenommen. Wollen Sie die Seite trotzdem verlassen?",
     "title": "Änderungen vorgenommen"

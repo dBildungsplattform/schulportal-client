@@ -117,6 +117,29 @@
     return finalKlassen.value.filter((organisation: Organisation) => organisation.typ === OrganisationsTyp.Klasse);
   });
 
+  // Checks if the filter is active or not
+  const filterActive: Ref<boolean> = computed(() => !!selectedSchule.value);
+
+  function resetSearchAndFilter(): void {
+    // Clear search inputs
+    searchInputSchulen.value = '';
+    searchInputKlassen.value = '';
+
+    // Clear selected values
+    selectedSchule.value = null;
+    selectedKlassen.value = [];
+
+    // Reset klassenOptions
+    klassenOptions.value = [];
+
+    // Refetch all data
+    organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Schule }).then(() => {
+      organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Klasse }).then(() => {
+        finalKlassen.value = organisationStore.allKlassen;
+      });
+    });
+  }
+
   onMounted(async () => {
     await organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Schule });
     await organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Klasse });
@@ -157,6 +180,21 @@
         class="ma-3"
         justify="end"
       >
+        <v-col
+          cols="2"
+          class="py-0 text-right"
+        >
+          <v-btn
+            class="reset-filter"
+            :disabled="!filterActive"
+            @click="resetSearchAndFilter()"
+            size="x-small"
+            variant="text"
+            width="auto"
+          >
+            {{ $t('resetFilter') }}
+          </v-btn>
+        </v-col>
         <v-col
           cols="3"
           class="py-0"
