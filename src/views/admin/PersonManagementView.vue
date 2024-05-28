@@ -81,11 +81,14 @@
   const klassen: Array<string> = ['Klasse', 'Nicht so klasse'];
   const statuses: Array<string> = ['Aktiv', 'Inaktiv'];
 
+  const searchInputKlassen: Ref<string> = ref('');
   const searchInputRollen: Ref<string> = ref('');
   const searchInputSchulen: Ref<string> = ref('');
 
+  const selectedKlassen: Ref<Array<string>> = ref([]);
   const selectedRollen: Ref<Array<string>> = ref([]);
   const selectedSchulen: Ref<Array<string>> = ref([]);
+  const selectedStatus: Ref<string> = ref('');
   const searchFilter: Ref<string> = ref('');
 
   const filterOrSearchActive: Ref<boolean> = computed(
@@ -109,8 +112,11 @@
     searchFieldComponent.value.searchFilter = '';
     searchInputSchulen.value = '';
     searchInputRollen.value = '';
+    searchInputKlassen.value = '';
     selectedSchulen.value = [];
     selectedRollen.value = [];
+    selectedKlassen.value = [];
+    selectedStatus.value = '';
     personStore.getAllPersons({});
   }
 
