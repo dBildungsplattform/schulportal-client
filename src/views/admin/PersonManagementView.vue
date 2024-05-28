@@ -293,6 +293,23 @@
             v-model="selectedRollen"
             v-model:search="searchInputRollen"
           >
+            <template v-slot:prepend-item>
+              <v-list-item>
+                <v-progress-circular
+                  indeterminate
+                  v-if="rolleStore.loading"
+                ></v-progress-circular>
+                <span
+                  v-else
+                  class="filter-header"
+                  >{{
+                    rolleStore.totalRollen === 1
+                      ? $t('admin.rolle.rolleFound', { total: rolleStore.totalRollen })
+                      : $t('admin.rolle.rollenFound', { total: rolleStore.totalRollen })
+                  }}</span
+                >
+              </v-list-item>
+            </template>
           </v-autocomplete>
         </v-col>
         <v-col

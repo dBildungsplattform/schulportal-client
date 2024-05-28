@@ -64,6 +64,51 @@
         }
       }
     },
+    "person": {
+      "addedSuccessfully": "{firstname} {lastname} wurde erfolgreich hinzugefügt.",
+      "addNew": "Neuen Benutzer hinzufügen",
+      "changePassword": "Passwort ändern",
+      "copyPasswordError": "Passwort konnte nicht in die Zwischenablage kopiert werden",
+      "copyPasswordSuccess": "Passwort in Zwischenablage kopiert",
+      "create": "Benutzer anlegen",
+      "createAnother": "Weiteren Benutzer anlegen",
+      "createNew": "Neue Benutzer anlegen",
+      "creationErrorText": "",
+      "creationErrorTitle": "Fehler beim Anlegen des Benutzers.",
+      "discard": "Benutzer verwerfen",
+      "edit": "Benutzer bearbeiten",
+      "generatedPassword": "Generiertes Passwort",
+      "loadingErrorText": "Es konnten keine Benutzerdaten geladen werden.",
+      "loadingErrorTitle": "Fehler beim Laden des Benutzers.",
+      "management": "Benutzerverwaltung",
+      "personalInfo": "Persönliche Informationen",
+      "resetPasswordConfirmation": "Sind Sie sicher, dass Sie das Passwort für {firstname} {lastname} zurücksetzen möchten?",
+      "resetPasswordInformation": "Bitte teilen Sie dem Benutzer das temporäre Passwort mit. Nach dem Schließen des Dialogs wird es aus Sicherheitsgründen nicht mehr angezeigt.",
+      "resetPassword": "Passwort zurücksetzen",
+      "rules": {
+        "vorname": {
+          "matches": "Der Vorname darf keine ungültigen Zeichen beinhalten.",
+          "min": "Der Vorname muss aus mindestens 2 Zeichen bestehen.",
+          "required": "Der Vorname muss angegeben werden."
+        },
+        "familienname": {
+          "matches": "Der Nachname darf keine ungültigen Zeichen beinhalten.",
+          "min": "Der Nachname muss aus mindestens 2 Zeichen bestehen.",
+          "required": "Der Nachname muss angegeben werden."
+        }
+      },
+      "showAll": "Alle Benutzer anzeigen",
+      "startPassword": "Einstiegs-Passwort",
+      "status": "Status"
+    },
+    "personenkontext": {
+      "creationErrorText": "Bei der Zuordnung des Personenkontextes ist ein Fehler aufgetreten. Bitte prüfen Sie die Zuordnungen an der Person.",
+      "errors": {
+        "GLEICHE_ROLLE_AN_KLASSE_WIE_SCHULE": "Mindestens eine Rolle der Person ist an der Schule nicht bekannt.",
+        "NUR_LEHR_UND_LERN_AN_KLASSE": "Nur Schüler dürfen einer Klasse zugeordnet werden.",
+        "PERSONENKONTEXT_SPECIFICATION_ERROR": "Die Zurodnung konnte nicht angelegt werden."
+      }
+    },
     "rolle": {
       "addNew": "Neue Rolle hinzufügen",
       "assignMerkmale": "Merkmale zuordnen",
@@ -109,6 +154,8 @@
       "rolle": "Rolle",
       "rolleCreateErrorTitle": "Fehler beim Anlegen der Rolle",
       "rolleCreateErrorText": "Die Rolle konnte nicht angelegt werden.",
+      "rolleFound": "{total} Rolle gefunden",
+      "rollenFound": "{total} Rollen gefunden",
       "rollenart": "Rollenart",
       "rollenname": "Rollenname",
       "rolleAddedSuccessfully": "Die Rolle wurde erfolgreich hinzugefügt.",
@@ -132,51 +179,6 @@
       "showAll": "Alle Rollen anzeigen",
       "systemrechte": "Systemrechte",
       "userDataLoadingErrorText": "Es konnten keine Benutzerdaten geladen werden."
-    },
-    "person": {
-      "addedSuccessfully": "{firstname} {lastname} wurde erfolgreich hinzugefügt.",
-      "addNew": "Neuen Benutzer hinzufügen",
-      "changePassword": "Passwort ändern",
-      "copyPasswordError": "Passwort konnte nicht in die Zwischenablage kopiert werden",
-      "copyPasswordSuccess": "Passwort in Zwischenablage kopiert",
-      "create": "Benutzer anlegen",
-      "createAnother": "Weiteren Benutzer anlegen",
-      "createNew": "Neue Benutzer anlegen",
-      "creationErrorText": "",
-      "creationErrorTitle": "Fehler beim Anlegen des Benutzers.",
-      "discard": "Benutzer verwerfen",
-      "edit": "Benutzer bearbeiten",
-      "generatedPassword": "Generiertes Passwort",
-      "loadingErrorText": "Es konnten keine Benutzerdaten geladen werden.",
-      "loadingErrorTitle": "Fehler beim Laden des Benutzers.",
-      "management": "Benutzerverwaltung",
-      "personalInfo": "Persönliche Informationen",
-      "resetPasswordConfirmation": "Sind Sie sicher, dass Sie das Passwort für {firstname} {lastname} zurücksetzen möchten?",
-      "resetPasswordInformation": "Bitte teilen Sie dem Benutzer das temporäre Passwort mit. Nach dem Schließen des Dialogs wird es aus Sicherheitsgründen nicht mehr angezeigt.",
-      "resetPassword": "Passwort zurücksetzen",
-      "rules": {
-        "vorname": {
-          "matches": "Der Vorname darf keine ungültigen Zeichen beinhalten.",
-          "min": "Der Vorname muss aus mindestens 2 Zeichen bestehen.",
-          "required": "Der Vorname muss angegeben werden."
-        },
-        "familienname": {
-          "matches": "Der Nachname darf keine ungültigen Zeichen beinhalten.",
-          "min": "Der Nachname muss aus mindestens 2 Zeichen bestehen.",
-          "required": "Der Nachname muss angegeben werden."
-        }
-      },
-      "showAll": "Alle Benutzer anzeigen",
-      "startPassword": "Einstiegs-Passwort",
-      "status": "Status"
-    },
-    "personenkontext": {
-      "creationErrorText": "Bei der Zuordnung des Personenkontextes ist ein Fehler aufgetreten. Bitte prüfen Sie die Zuordnungen an der Person.",
-      "errors": {
-        "GLEICHE_ROLLE_AN_KLASSE_WIE_SCHULE": "Mindestens eine Rolle der Person ist an der Schule nicht bekannt.",
-        "NUR_LEHR_UND_LERN_AN_KLASSE": "Nur Schüler dürfen einer Klasse zugeordnet werden.",
-        "PERSONENKONTEXT_SPECIFICATION_ERROR": "Die Zurodnung konnte nicht angelegt werden."
-      }
     },
     "searchResultTable":"Ergebnisliste durchsuchen",
     "schule": {
