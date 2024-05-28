@@ -10,8 +10,11 @@
     type OrganisationStore,
   } from '@/stores/OrganisationStore';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
+  import type { UserinfoPersonenkontext } from '@/stores/PersonenkontextStore';
+  import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
 
   const organisationStore: OrganisationStore = useOrganisationStore();
+  const authStore: AuthStore = useAuthStore();
   const { t }: Composer = useI18n({ useScope: 'global' });
 
   type ReadonlyHeaders = InstanceType<typeof VDataTableServer>['headers'];
@@ -114,10 +117,27 @@
     return finalKlassen.value.filter((organisation: Organisation) => organisation.typ === OrganisationsTyp.Klasse);
   });
 
-  // Fetch all organisations and klassen when the component is mounted
   onMounted(async () => {
     await organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Schule });
     await organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Klasse });
+
+    const personenkontexte: Array<UserinfoPersonenkontext> | null = authStore.currentUser?.personenkontexte || [];
+    if (personenkontexte.length > 0) {
+      const matchingOrganisations: UserinfoPersonenkontext[] = personenkontexte.filter(
+        (kontext: UserinfoPersonenkontext) =>
+          organisationStore.allOrganisationen.some((org: Organisation) => org.id === kontext.organisationsId),
+      );
+
+      if (matchingOrganisations.length === 1) {
+        const matchedOrganisation: UserinfoPersonenkontext | undefined = matchingOrganisations[0];
+
+        selectedSchule.value = matchedOrganisation?.organisationsId || null;
+        if (selectedSchule.value) {
+          await organisationStore.getKlassenByOrganisationId(selectedSchule.value);
+          finalKlassen.value = organisationStore.klassen;
+        }
+      }
+    }
     finalKlassen.value = organisationStore.allKlassen;
   });
 </script>
@@ -226,3 +246,4 @@
     </LayoutCard>
   </div>
 </template>
+import { type AuthStore, useAuthStore } from '@/stores/AuthStore';
