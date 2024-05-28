@@ -48,6 +48,8 @@
           "required": "Die Schule muss ausgewählt werden."
         }
       },
+      "klasseFound": "{total} Klasse gefunden",
+      "klassenFound": "{total} Klassen gefunden",
       "showAll": "Alle Klassen anzeigen"
     },
     "organisation": {

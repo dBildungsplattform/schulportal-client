@@ -273,6 +273,23 @@
             v-model="selectedKlassen"
             v-model:search="searchInputKlassen"
           >
+            <template v-slot:prepend-item>
+              <v-list-item>
+                <v-progress-circular
+                  indeterminate
+                  v-if="organisationStore.loading"
+                ></v-progress-circular>
+                <span
+                  v-else
+                  class="filter-header"
+                  >{{
+                    organisationStore.totalKlassen === 1
+                      ? $t('admin.klasse.klasseFound', { total: organisationStore.totalKlassen })
+                      : $t('admin.klasse.klassenFound', { total: organisationStore.totalKlassen })
+                  }}</span
+                >
+              </v-list-item>
+            </template>
           </v-autocomplete>
         </v-col>
       </v-row>
