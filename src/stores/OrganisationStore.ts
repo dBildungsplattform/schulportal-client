@@ -43,7 +43,7 @@ export type OrganisationenFilter = {
 
 type OrganisationGetters = {};
 type OrganisationActions = {
-  getAllOrganisationen: (filter?: OrganisationenFilter) => Promise<Organisation[] | undefined>;
+  getAllOrganisationen: (filter?: OrganisationenFilter) => Promise<void>;
   getKlassenByOrganisationId: (organisationId: string, searchFilter?: string) => Promise<void>;
   getOrganisationById: (organisationId: string) => Promise<Organisation>;
   createOrganisation: (
@@ -81,7 +81,7 @@ export const useOrganisationStore: StoreDefinition<
     };
   },
   actions: {
-    async getAllOrganisationen(filter?: OrganisationenFilter): Promise<Organisation[] | undefined> {
+    async getAllOrganisationen(filter?: OrganisationenFilter): Promise<void> {
       this.loading = true;
       try {
         const response: AxiosResponse<Organisation[]> = await organisationApi.organisationControllerFindOrganizations(
@@ -102,14 +102,12 @@ export const useOrganisationStore: StoreDefinition<
           this.totalOrganisationen = response.headers['x-paging-total'];
         }
         this.loading = false;
-        return response.data;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
           this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
         }
         this.loading = false;
-        return Promise.reject(this.errorCode);
       }
     },
     async getOrganisationById(organisationId: string) {

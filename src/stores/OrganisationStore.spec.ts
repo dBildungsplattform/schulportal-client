@@ -54,9 +54,9 @@ describe('OrganisationStore', () => {
 
     it('should handle error code', async () => {
       mockadapter.onGet('/api/organisationen').replyOnce(500, { code: 'some mock server error' });
-      const getAllOrgaisationsPromise: Promise<void> = organisationStore.getAllOrganisationen();
+      const getAllOrganisationenPromise: Promise<void> = organisationStore.getAllOrganisationen();
       expect(organisationStore.loading).toBe(true);
-      await getAllOrgaisationsPromise;
+      await getAllOrganisationenPromise;
       expect(organisationStore.allOrganisationen).toEqual([]);
       expect(organisationStore.errorCode).toEqual('some mock server error');
       expect(organisationStore.loading).toBe(false);

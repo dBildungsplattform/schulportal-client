@@ -110,7 +110,6 @@
     }
   });
 
-  // Computed property to filter finalKlassen to only include those of type Klasse
   const klassenForTable: ComputedRef<Organisation[]> = computed(() => {
     return finalKlassen.value.filter((organisation: Organisation) => organisation.typ === OrganisationsTyp.Klasse);
   });
