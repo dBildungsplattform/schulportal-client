@@ -64,6 +64,7 @@
       // Reset selectedKlassen and klassenOptions when Schule is unselected
       selectedKlassen.value = [];
       klassenOptions.value = [];
+      organisationStore.totalKlassen = 0;
       // Fetch all Klassen when no Schule is selected
       await organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Klasse });
       finalKlassen.value = organisationStore.allKlassen;
