@@ -78,7 +78,19 @@
       .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
   });
 
-  const klassen: Array<string> = ['Klasse', 'Nicht so klasse'];
+  const klassen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
+    if (selectedSchulen) {
+      return organisationStore.klassen
+        .slice(0, 25)
+        .map((org: Organisation) => ({
+          value: org.id,
+          title: org.name,
+        }))
+        .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
+    }
+    return []
+  });
+
   const statuses: Array<string> = ['Aktiv', 'Inaktiv'];
 
   const searchInputRollen: Ref<string> = ref('');
@@ -86,6 +98,7 @@
 
   const selectedRollen: Ref<Array<string>> = ref([]);
   const selectedSchulen: Ref<Array<string>> = ref([]);
+  const selectedKlassen: Ref<Array<string>> = ref([]);
   const searchFilter: Ref<string> = ref('');
 
   const filterOrSearchActive: Ref<boolean> = computed(
@@ -94,7 +107,7 @@
 
   function applySearchAndFilters(): void {
     personStore.getAllPersons({
-      organisationIDs: selectedSchulen.value,
+      organisationIDs: selectedSchulen.value.concat(selectedKlassen.value),
       rolleIDs: selectedRollen.value,
       searchFilter: searchFilter.value,
     });
@@ -172,7 +185,11 @@
     rolleStore.getAllRollen(newValue);
   });
 
-  watch(selectedSchulen, async (_newValue: Array<string>, _oldValue: Array<string>) => {
+  watch(selectedSchulen, async (newValue: Array<string>, _oldValue: Array<string>) => {
+    if (selectedSchulen.value.length) {
+      // for each schule get klassen
+      organisationStore.getKlassenByOrganisationId(newValue, searchFilter?: string);
+    }
     applySearchAndFilters();
   });
 
