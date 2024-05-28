@@ -208,12 +208,12 @@ describe('OrganisationStore', () => {
         expect(organisationStore.loading).toBe(true);
         await rejects(createOrganisationPromise);
         expect(organisationStore.createdOrganisation).toEqual(null);
-        expect(organisationStore.errorCode).toEqual('UNSPECIFIED_ERROR');
+        expect(organisationStore.errorCode).toEqual('ORGANISATION_SPECIFICATION_ERROR');
         expect(organisationStore.loading).toBe(false);
       });
 
       it('should handle error code', async () => {
-        mockadapter.onPost('/api/organisationen').replyOnce(500, { code: 'some mock server error' });
+        mockadapter.onPost('/api/organisationen').replyOnce(500, { i18nKey: 'SOME_MOCK_SERVER_ERROR' });
         const createOrganisationPromise: Promise<Organisation> = organisationStore.createOrganisation(
           'Org1',
           'Organisation 1',
@@ -222,9 +222,9 @@ describe('OrganisationStore', () => {
           OrganisationsTyp.Anbieter,
         );
         expect(organisationStore.loading).toBe(true);
-        await expect(createOrganisationPromise).rejects.toEqual('some mock server error');
+        await expect(createOrganisationPromise).rejects.toEqual('SOME_MOCK_SERVER_ERROR');
         expect(organisationStore.createdOrganisation).toEqual(null);
-        expect(organisationStore.errorCode).toEqual('some mock server error');
+        expect(organisationStore.errorCode).toEqual('SOME_MOCK_SERVER_ERROR');
         expect(organisationStore.loading).toBe(false);
       });
     });
