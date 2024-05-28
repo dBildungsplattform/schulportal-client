@@ -144,7 +144,7 @@
       "createNew": "Neue Benutzer anlegen",
       "creationErrorText": "",
       "creationErrorTitle": "Fehler beim Anlegen des Benutzers.",
-      "deletePersonConfirmation": "Sind Sie sicher, dass Sie {firstname} {lastname} löschen möchten?",
+      "deletePersonConfirmation": "Wollen Sie denn {firstname} {lastname} sofort und endgültig löschen?",
       "deletePerson": "Benutzer löschen",
       "deletePersonSuccessMessage": "{firstname} {lastname} wurde erfolgreich gelöscht",
       "discard": "Benutzer verwerfen",
