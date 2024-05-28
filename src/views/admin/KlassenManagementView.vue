@@ -181,8 +181,9 @@
         justify="end"
       >
         <v-col
-          cols="2"
-          class="py-0 text-right"
+          cols="12"
+          md="2"
+          class="py-0 sm-text-right"
         >
           <v-btn
             class="reset-filter"
@@ -196,7 +197,8 @@
           </v-btn>
         </v-col>
         <v-col
-          cols="3"
+          md="3"
+          sm="6"
           class="py-0"
         >
           <v-autocomplete
@@ -245,7 +247,8 @@
           </v-autocomplete>
         </v-col>
         <v-col
-          cols="3"
+          md="3"
+          sm="6"
           class="py-0"
         >
           <v-autocomplete
