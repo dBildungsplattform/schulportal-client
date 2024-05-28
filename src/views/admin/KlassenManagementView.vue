@@ -171,6 +171,7 @@
             density="compact"
             hide-details
             id="schule-select"
+            ref="schule-select"
             :items="schulen"
             item-value="value"
             item-text="title"
@@ -219,6 +220,7 @@
             density="compact"
             hide-details
             id="klasse-select"
+            ref="klasse-select"
             :items="klassenOptions"
             item-value="value"
             item-text="title"
@@ -247,4 +249,3 @@
     </LayoutCard>
   </div>
 </template>
-import { type AuthStore, useAuthStore } from '@/stores/AuthStore';
