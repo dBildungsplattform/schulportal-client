@@ -183,7 +183,7 @@
         <v-col
           cols="12"
           md="2"
-          class="py-0 sm-text-right"
+          class="py-0 px-0 sm-text-right"
         >
           <v-btn
             class="reset-filter"
