@@ -3869,6 +3869,47 @@ export const PersonenApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
+        personControllerDeletePersonById: async (personId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'personId' is not null or undefined
+            assertParamExists('personControllerDeletePersonById', 'personId', personId)
+            const localVarPath = `/api/personen/{personId}`
+                .replace(`{${"personId"}}`, encodeURIComponent(String(personId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {string} personId The id for the account.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
         personControllerFindPersonById: async (personId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'personId' is not null or undefined
             assertParamExists('personControllerFindPersonById', 'personId', personId)
@@ -4182,6 +4223,16 @@ export const PersonenApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
+        async personControllerDeletePersonById(personId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.personControllerDeletePersonById(personId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @param {string} personId The id for the account.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
         async personControllerFindPersonById(personId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonendatensatzResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.personControllerFindPersonById(personId, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
@@ -4269,6 +4320,15 @@ export const PersonenApiFactory = function (configuration?: Configuration, baseP
          */
         personControllerCreatePersonenkontext(personId: string, createPersonenkontextBodyParams: CreatePersonenkontextBodyParams, options?: any): AxiosPromise<void> {
             return localVarFp.personControllerCreatePersonenkontext(personId, createPersonenkontextBodyParams, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {string} personId The id for the account.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        personControllerDeletePersonById(personId: string, options?: any): AxiosPromise<void> {
+            return localVarFp.personControllerDeletePersonById(personId, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -4365,6 +4425,15 @@ export interface PersonenApiInterface {
      * @throws {RequiredError}
      * @memberof PersonenApiInterface
      */
+    personControllerDeletePersonById(personId: string, options?: AxiosRequestConfig): AxiosPromise<void>;
+
+    /**
+     * 
+     * @param {string} personId The id for the account.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PersonenApiInterface
+     */
     personControllerFindPersonById(personId: string, options?: AxiosRequestConfig): AxiosPromise<PersonendatensatzResponse>;
 
     /**
@@ -4448,6 +4517,17 @@ export class PersonenApi extends BaseAPI implements PersonenApiInterface {
      */
     public personControllerCreatePersonenkontext(personId: string, createPersonenkontextBodyParams: CreatePersonenkontextBodyParams, options?: AxiosRequestConfig) {
         return PersonenApiFp(this.configuration).personControllerCreatePersonenkontext(personId, createPersonenkontextBodyParams, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {string} personId The id for the account.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PersonenApi
+     */
+    public personControllerDeletePersonById(personId: string, options?: AxiosRequestConfig) {
+        return PersonenApiFp(this.configuration).personControllerDeletePersonById(personId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
