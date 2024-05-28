@@ -29,10 +29,7 @@
       return '';
     }
     let message: string = '';
-    message += `${t('admin.person.deletePersonConfirmation', {
-      firstname: props.person.person.name.vorname,
-      lastname: props.person.person.name.familienname,
-    })}`;
+    message += `${t('admin.person.deletePersonConfirmation')}`;
     return message;
   });
 
@@ -41,7 +38,10 @@
       return '';
     }
     let message: string = '';
-    message += `${t('admin.person.deletePersonSuccessMessage')}`;
+    message += `${t('admin.person.deletePersonSuccessMessage', {
+      firstname: props.person.person.name.vorname,
+      lastname: props.person.person.name.familienname,
+    })}`;
     return message;
   });
 
