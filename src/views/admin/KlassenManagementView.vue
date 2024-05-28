@@ -29,7 +29,6 @@
   type TranslatedObject = {
     value: string;
     title: string;
-    chipTitle?: string | null;
   };
 
   const selectedSchule: Ref<string | null> = ref(null);
@@ -45,7 +44,6 @@
       .map((org: Organisation) => ({
         value: org.id,
         title: `${org.kennung} (${org.name})`,
-        chipTitle: org.kennung,
       }))
       .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
   });
@@ -183,10 +181,10 @@
         <v-col
           cols="12"
           md="2"
-          class="py-0 px-0 sm-text-right"
+          class="py-md-0 text-md-right"
         >
           <v-btn
-            class="reset-filter"
+            class="px-0 reset-filter"
             :disabled="!filterActive"
             @click="resetSearchAndFilter()"
             size="x-small"
@@ -198,12 +196,11 @@
         </v-col>
         <v-col
           md="3"
-          sm="6"
-          class="py-0"
+          cols="12"
+          class="py-md-0"
         >
           <v-autocomplete
             autocomplete="off"
-            chips
             class="filter-dropdown"
             :class="{ selected: selectedSchule }"
             clearable
@@ -239,17 +236,12 @@
                 >
               </v-list-item>
             </template>
-            <template v-slot:chip="{ item }">
-              <v-list-item>
-                <v-chip>{{ item.raw.chipTitle }}</v-chip>
-              </v-list-item>
-            </template>
           </v-autocomplete>
         </v-col>
         <v-col
           md="3"
-          sm="6"
-          class="py-0"
+          cols="12"
+          class="py-md-0"
         >
           <v-autocomplete
             autocomplete="off"
