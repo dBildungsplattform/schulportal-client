@@ -93,6 +93,7 @@
 
   const statuses: Array<string> = ['Aktiv', 'Inaktiv'];
 
+  const searchInputKlassen: Ref<string> = ref('');
   const searchInputRollen: Ref<string> = ref('');
   const searchInputSchulen: Ref<string> = ref('');
 
@@ -185,10 +186,12 @@
     rolleStore.getAllRollen(newValue);
   });
 
-  watch(selectedSchulen, async (newValue: Array<string>, _oldValue: Array<string>) => {
+  watch(selectedSchulen, async (_newValue: Array<string>, _oldValue: Array<string>) => {
     if (selectedSchulen.value.length) {
-      // for each schule get klassen
-      organisationStore.getKlassenByOrganisationId(newValue, searchFilter?: string);
+      selectedSchulen.value.forEach((schuleId: string) => {
+        organisationStore.getKlassenByOrganisationId(schuleId, searchInputKlassen.value);
+      });
+      // save klassen from all schulen in same array
     }
     applySearchAndFilters();
   });
