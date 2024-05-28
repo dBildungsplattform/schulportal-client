@@ -41,10 +41,7 @@
       return '';
     }
     let message: string = '';
-    message += `${t('admin.person.deletePersonSuccessMessage', {
-      firstname: props.person.person.name.vorname,
-      lastname: props.person.person.name.familienname,
-    })}`;
+    message += `${t('admin.person.deletePersonSuccessMessage')}`;
     return message;
   });
 
