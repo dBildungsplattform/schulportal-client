@@ -90,7 +90,7 @@
   const selectedKlassen: Ref<Array<string>> = ref([]);
   const selectedRollen: Ref<Array<string>> = ref([]);
   const selectedSchulen: Ref<Array<string>> = ref([]);
-  const selectedStatus: Ref<string> = ref('');
+  const selectedStatus: Ref<string | null> = ref(null);
   const searchFilter: Ref<string> = ref('');
 
   const filterOrSearchActive: Ref<boolean> = computed(
@@ -118,7 +118,7 @@
     selectedSchulen.value = [];
     selectedRollen.value = [];
     selectedKlassen.value = [];
-    selectedStatus.value = '';
+    selectedStatus.value = null;
     personStore.getAllPersons({});
   }
 
