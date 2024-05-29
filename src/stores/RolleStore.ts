@@ -125,7 +125,11 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
     async getAllRollen(searchString: string = '') {
       this.loading = true;
       try {
-        const response: AxiosResponse<Array<RolleResponse>> = await rolleApi.rolleControllerFindRollen(searchString);
+        const response: AxiosResponse<Array<RolleResponse>> = await rolleApi.rolleControllerFindRollen(
+          undefined,
+          undefined,
+          searchString,
+        );
         this.allRollen = response.data;
         this.totalRollen = response.headers['x-paging-total'];
         this.loading = false;
