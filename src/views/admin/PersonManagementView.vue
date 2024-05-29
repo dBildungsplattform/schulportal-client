@@ -221,11 +221,12 @@
     </h1>
     <LayoutCard :header="$t('admin.person.management')">
       <v-row
-        align="center"
+        align="start"
         class="ma-3"
         justify="end"
       >
         <v-col
+          align-self="center"
           cols="12"
           md="2"
           class="py-md-0 text-md-right"
