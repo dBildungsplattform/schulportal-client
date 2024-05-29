@@ -14,6 +14,9 @@
   } from '@/stores/PersonenkontextStore';
   import { OrganisationsTyp } from '@/stores/OrganisationStore';
   import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
+  import { useDisplay } from 'vuetify/lib/framework.mjs';
+
+  const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
   const route: RouteLocationNormalizedLoaded = useRoute();
   const router: Router = useRouter();
@@ -278,8 +281,25 @@
         <!-- Zuordnungen -->
         <v-container class="person-zuordnungen">
           <v-row class="ml-md-16">
-            <v-col>
+            <v-col
+              cols="12"
+              md="auto"
+            >
               <h3 class="subtitle-1">{{ $t('person.zuordnungen') }}</h3>
+            </v-col>
+
+            <v-col
+              cols="12"
+              sm="4"
+              md="6"
+            >
+              <v-btn
+                class="primary button ml-md-5"
+                data-testid="zuordnung-edit"
+                :block="mdAndDown"
+              >
+                {{ $t('edit') }}
+              </v-btn>
             </v-col>
           </v-row>
           <!-- Check if 'zuordnungen' array exists and has length > 0 -->
