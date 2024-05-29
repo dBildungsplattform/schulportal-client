@@ -112,10 +112,6 @@
     }
   });
 
-  const klassenForTable: ComputedRef<Organisation[]> = computed(() => {
-    return finalKlassen.value.filter((organisation: Organisation) => organisation.typ === OrganisationsTyp.Klasse);
-  });
-
   // Checks if the filter is active or not
   const filterActive: Ref<boolean> = computed(() => !!selectedSchule.value);
 
@@ -289,7 +285,7 @@
       <ResultTable
         data-testid="klasse-table"
         :header="$t('admin.klasse.management')"
-        :items="klassenForTable || []"
+        :items="finalKlassen || []"
         :loading="organisationStore.loading"
         :headers="headers"
         @onUpdateTable="organisationStore.getAllOrganisationen()"
