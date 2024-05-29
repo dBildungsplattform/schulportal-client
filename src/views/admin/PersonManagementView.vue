@@ -2,8 +2,8 @@
   import { computed, onMounted, type ComputedRef, watch, type Ref, ref } from 'vue';
   import { type Composer, useI18n } from 'vue-i18n';
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
-
   import { type Router, useRouter } from 'vue-router';
+  import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
   import {
     useOrganisationStore,
     type OrganisationStore,
@@ -15,6 +15,7 @@
     usePersonenkontextStore,
     type PersonenkontextStore,
     type Uebersicht,
+    type UserinfoPersonenkontext,
     type Zuordnung,
   } from '@/stores/PersonenkontextStore';
   import { useRolleStore, type RolleStore, type RolleResponse } from '@/stores/RolleStore';
@@ -26,6 +27,7 @@
   const searchFieldComponent: Ref = ref();
 
   const router: Router = useRouter();
+  const authStore: AuthStore = useAuthStore();
   const organisationStore: OrganisationStore = useOrganisationStore();
   const personStore: PersonStore = usePersonStore();
   const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
@@ -193,6 +195,19 @@
     await organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Schule });
     await personenkontextStore.getAllPersonenuebersichten();
     await rolleStore.getAllRollen('');
+
+    // Autoselect the Schule for the current user that only has 1 Schule assigned to him.
+    const personenkontexte: Array<UserinfoPersonenkontext> | null = authStore.currentUser?.personenkontexte || [];
+    if (personenkontexte.length > 0) {
+      const matchingOrganisations: UserinfoPersonenkontext[] = personenkontexte.filter(
+        (kontext: UserinfoPersonenkontext) =>
+          organisationStore.allOrganisationen.some((org: Organisation) => org.id === kontext.organisationsId),
+      );
+      if (matchingOrganisations.length === 1) {
+        const matchedOrganisation: UserinfoPersonenkontext | undefined = matchingOrganisations[0];
+        selectedSchulen.value = [matchedOrganisation?.organisationsId || ''];
+      }
+    }
   });
 </script>
 
