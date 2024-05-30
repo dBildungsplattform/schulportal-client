@@ -224,6 +224,9 @@
       if (matchingOrganisations.length === 1) {
         const matchedOrganisation: UserinfoPersonenkontext | undefined = matchingOrganisations[0];
         selectedSchulen.value = [matchedOrganisation?.organisationsId || ''];
+        if (selectedSchulen.value[0]) {
+          await organisationStore.getKlassenByOrganisationId(selectedSchulen.value[0]);
+        }
       }
     }
   });
@@ -410,6 +413,42 @@
             variant="outlined"
             v-model="selectedKlassen"
           >
+            <template v-slot:prepend-item>
+              <v-list-item>
+                <v-progress-circular
+                  indeterminate
+                  v-if="organisationStore.loadingKlassen"
+                ></v-progress-circular>
+                <span
+                  v-else
+                  class="filter-header"
+                  >{{
+                    organisationStore.totalKlassen === 1
+                      ? $t('admin.klasse.klasseFound', { total: organisationStore.totalKlassen })
+                      : $t('admin.klasse.klassenFound', { total: organisationStore.totalKlassen })
+                  }}</span
+                >
+              </v-list-item>
+            </template>
+            <template v-slot:selection="{ item, index }">
+              <!-- option 1, wait for IQSH to decide before deletion -->
+              <!-- <v-chip v-if="index < 1">
+                <span>{{ item.title }}</span>
+              </v-chip>
+              <span
+                v-if="index === 1"
+              >
+                {{ $t('plusOthers', { count: selectedKlassen.length - 1 }) }}
+              </span> -->
+
+              <!-- option 2, wait for IQSH to decide before deletion -->
+              <v-chip v-if="selectedKlassen.length < 2">
+                <span>{{ item.title }}</span>
+              </v-chip>
+              <div v-else-if="index === 0">
+                {{ $t('admin.klasse.klassenSelected', { count: selectedKlassen.length }) }}
+              </div>
+            </template>
           </v-autocomplete>
         </v-col>
         <v-col

@@ -34,6 +34,9 @@
       "klasseAddedSuccessfully": "Die Klasse wurde erfolgreich hinzugefügt.",
       "klasseCreateErrorTitle": "Fehler beim Anlegen der Klasse",
       "klassenname": "Klassenname",
+      "klasseFound": "{total} Klasse gefunden",
+      "klassenFound": "{total} Klassen gefunden",
+      "klassenSelected": "{count} Klassen ausgewählt",
       "management": "Klassenverwaltung",
       "selectKlasse": "Klasse auswählen",
       "rules": {

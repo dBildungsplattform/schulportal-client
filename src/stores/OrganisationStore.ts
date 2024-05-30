@@ -26,10 +26,12 @@ type OrganisationState = {
   allOrganisationen: Array<Organisation>;
   currentOrganisation: Organisation | null;
   createdOrganisation: Organisation | null;
+  totalKlassen: number;
   totalOrganisationen: number;
   klassen: Array<Organisation>;
   errorCode: string;
   loading: boolean;
+  loadingKlassen: boolean;
 };
 
 export type OrganisationenFilter = {
@@ -71,10 +73,12 @@ export const useOrganisationStore: StoreDefinition<
       allOrganisationen: [],
       currentOrganisation: null,
       createdOrganisation: null,
+      totalKlassen: 0,
       totalOrganisationen: 0,
       klassen: [],
       errorCode: '',
       loading: false,
+      loadingKlassen: false,
     };
   },
 
@@ -125,19 +129,19 @@ export const useOrganisationStore: StoreDefinition<
 
     async getKlassenByOrganisationId(organisationId: string, searchFilter?: string) {
       this.errorCode = '';
-      this.loading = true;
+      this.loadingKlassen = true;
       try {
-        const { data }: { data: Organisation[] } =
+        const response: AxiosResponse<Organisation[]> =
           await organisationApi.organisationControllerGetAdministrierteOrganisationen(organisationId, searchFilter);
-
-        this.klassen = data;
-        this.loading = false;
+        this.klassen = response.data;
+        this.totalKlassen = response.headers['x-paging-total'];
+        this.loadingKlassen = false;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
           this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
         }
-        this.loading = false;
+        this.loadingKlassen = false;
         return Promise.reject(this.errorCode);
       }
     },
