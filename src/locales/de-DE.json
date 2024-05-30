@@ -155,9 +155,10 @@
       "rolleCreateErrorTitle": "Fehler beim Anlegen der Rolle",
       "rolleCreateErrorText": "Die Rolle konnte nicht angelegt werden.",
       "rolleFound": "{total} Rolle gefunden",
-      "rollenFound": "{total} Rollen gefunden",
       "rollenart": "Rollenart",
+      "rollenFound": "{total} Rollen gefunden",
       "rollenname": "Rollenname",
+      "rollenSelected": "{count} Rollen ausgewählt",
       "rolleAddedSuccessfully": "Die Rolle wurde erfolgreich hinzugefügt.",
       "rules": {
         "rolle": {
@@ -204,8 +205,6 @@
         "ORGANISATION_SPECIFICATION_ERROR": "Die Schule konnte nicht angelegt werden.",
         "SCHULE_UNTER_TRAEGER": "Eine Schule darf nicht einer anderen Schule zugeordnet werden."
       },
-      "schuleFound": "{total} Schule gefunden",
-      "schulenFound": "{total} Schulen gefunden",
       "management": "Schulverwaltung",
       "publicSchule": "Öffentliche Schule",
       "rules": {
@@ -218,6 +217,9 @@
         }
       },
       "schule": "Schule",
+      "schuleFound": "{total} Schule gefunden",
+      "schulenFound": "{total} Schulen gefunden",
+      "schulenSelected": "{count} Schulen ausgewählt",
       "schulname": "Schulname",
       "schulform": "Schulform",
       "schuleCreateErrorTitle": "Fehler beim Anlegen der Schule",
@@ -253,18 +255,6 @@
     "help": "Hilfe",
     "legalNotice": "Impressum",
     "privacyPolicy": "Datenschutzerklärung"
-  },
-  "search": "Suchen",
-  "start": {
-    "allServiceProviders": "Alle Angebote",
-    "categories": {
-      "administration": "Verwaltung",
-      "class": "Unterricht",
-      "hints": "Hinweise",
-      "homePage": "Startseite",
-      "schoolOfferings": "Schulische Angebote",
-      "workEmail": "Dienstliche E-Mail"
-    }
   },
   "itemsPerPage": "Einträge pro Seite",
   "landingTitle": "Willkommen im Schulportal SH.",
@@ -308,7 +298,20 @@
     "userName": "Benutzername",
     "zuordnungen": "Zuordnung(en)"
   },
+  "plusOthers": "(+{count} weitere)",
   "resetFilter": "Filter zurücksetzen",
+  "search": "Suchen",
+  "start": {
+    "allServiceProviders": "Alle Angebote",
+    "categories": {
+      "administration": "Verwaltung",
+      "class": "Unterricht",
+      "hints": "Hinweise",
+      "homePage": "Startseite",
+      "schoolOfferings": "Schulische Angebote",
+      "workEmail": "Dienstliche E-Mail"
+    }
+  },
   "unsavedChanges": {
     "message": "Sie haben nicht gespeicherte Änderungen vorgenommen. Wollen Sie die Seite trotzdem verlassen?",
     "title": "Änderungen vorgenommen"

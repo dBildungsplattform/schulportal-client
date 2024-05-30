@@ -249,7 +249,6 @@
         >
           <v-autocomplete
             autocomplete="off"
-            chips
             class="filter-dropdown"
             :class="{ selected: selectedSchulen.length > 0 }"
             clearable
@@ -285,10 +284,24 @@
                 >
               </v-list-item>
             </template>
-            <template v-slot:chip="{ item }">
-              <v-list-item>
-                <v-chip>{{ item.raw.chipTitle }}</v-chip>
-              </v-list-item>
+            <template v-slot:selection="{ item, index }">
+              <!-- option 1, wait for IQSH to decide before deletion -->
+              <!-- <v-chip v-if="index < 1">
+                <span>{{ item.raw.chipTitle }}</span>
+              </v-chip>
+              <span
+                v-if="index === 1"
+              >
+                {{ $t('plusOthers', { count: selectedSchulen.length - 1 }) }}
+              </span> -->
+
+              <!-- option 2, wait for IQSH to decide before deletion -->
+              <v-chip v-if="selectedSchulen.length < 2">
+                <span>{{ item.raw.chipTitle }}</span>
+              </v-chip>
+              <div v-else-if="index === 0">
+                  {{ $t('admin.schule.schulenSelected', { count: selectedSchulen.length }) }}
+              </div>
             </template>
           </v-autocomplete>
         </v-col>
@@ -299,7 +312,6 @@
         >
           <v-autocomplete
             autocomplete="off"
-            chips
             class="filter-dropdown"
             :class="{ selected: selectedRollen.length > 0 }"
             clearable
@@ -334,6 +346,25 @@
                   }}</span
                 >
               </v-list-item>
+            </template>
+            <template v-slot:selection="{ item, index }">
+              <!-- option 1, wait for IQSH to decide before deletion -->
+              <!-- <v-chip v-if="index < 1">
+                <span>{{ item.title }}</span>
+              </v-chip>
+              <span
+                v-if="index === 1"
+              >
+                {{ $t('plusOthers', { count: selectedRollen.length - 1 }) }}
+              </span> -->
+
+              <!-- option 2, wait for IQSH to decide before deletion -->
+              <v-chip v-if="selectedRollen.length < 2">
+                <span>{{ item.title }}</span>
+              </v-chip>
+              <div v-else-if="index === 0">
+                  {{ $t('admin.rolle.rollenSelected', { count: selectedRollen.length }) }}
+              </div>
             </template>
           </v-autocomplete>
         </v-col>
