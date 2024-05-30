@@ -145,27 +145,27 @@ describe('OrganisationStore', () => {
       const getAllKlassenByOrganisationId: Promise<void> = organisationStore.getKlassenByOrganisationId('1');
       await getAllKlassenByOrganisationId;
       expect(organisationStore.klassen).toEqual(mockResponse);
-      expect(organisationStore.loading).toBe(false);
+      expect(organisationStore.loadingKlassen).toBe(false);
     });
 
     it('should handle string error', async () => {
       mockadapter.onGet('/api/organisationen/1/administriert').replyOnce(500, 'some mock server error');
       const getAllKlassenByOrganisationId: Promise<void> = organisationStore.getKlassenByOrganisationId('1');
-      expect(organisationStore.loading).toBe(true);
+      expect(organisationStore.loadingKlassen).toBe(true);
       await rejects(getAllKlassenByOrganisationId);
       expect(organisationStore.klassen).toEqual([]);
       expect(organisationStore.errorCode).toEqual('UNSPECIFIED_ERROR');
-      expect(organisationStore.loading).toBe(false);
+      expect(organisationStore.loadingKlassen).toBe(false);
     });
 
     it('should handle error code', async () => {
       mockadapter.onGet('/api/organisationen/1/administriert').replyOnce(500, { code: 'some mock server error' });
       const getAllKlassenByOrganisationId: Promise<void> = organisationStore.getKlassenByOrganisationId('1');
-      expect(organisationStore.loading).toBe(true);
+      expect(organisationStore.loadingKlassen).toBe(true);
       await rejects(getAllKlassenByOrganisationId);
       expect(organisationStore.klassen).toEqual([]);
       expect(organisationStore.errorCode).toEqual('some mock server error');
-      expect(organisationStore.loading).toBe(false);
+      expect(organisationStore.loadingKlassen).toBe(false);
     });
 
     describe('createOrganisation', () => {
