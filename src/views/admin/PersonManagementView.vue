@@ -300,7 +300,7 @@
                 <span>{{ item.raw.chipTitle }}</span>
               </v-chip>
               <div v-else-if="index === 0">
-                  {{ $t('admin.schule.schulenSelected', { count: selectedSchulen.length }) }}
+                {{ $t('admin.schule.schulenSelected', { count: selectedSchulen.length }) }}
               </div>
             </template>
           </v-autocomplete>
@@ -363,7 +363,7 @@
                 <span>{{ item.title }}</span>
               </v-chip>
               <div v-else-if="index === 0">
-                  {{ $t('admin.rolle.rollenSelected', { count: selectedRollen.length }) }}
+                {{ $t('admin.rolle.rollenSelected', { count: selectedRollen.length }) }}
               </div>
             </template>
           </v-autocomplete>
