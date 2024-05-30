@@ -59,6 +59,16 @@
     chipTitle?: string | null;
   };
 
+  const searchInputKlassen: Ref<string> = ref('');
+  const searchInputRollen: Ref<string> = ref('');
+  const searchInputSchulen: Ref<string> = ref('');
+
+  const selectedKlassen: Ref<Array<string>> = ref([]);
+  const selectedRollen: Ref<Array<string>> = ref([]);
+  const selectedSchulen: Ref<Array<string>> = ref([]);
+  const selectedStatus: Ref<string | null> = ref(null);
+  const searchFilter: Ref<string> = ref('');
+
   const schulen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
     return organisationStore.allOrganisationen
       .slice(0, 25)
@@ -81,7 +91,7 @@
   });
 
   const klassen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
-    if (selectedSchulen) {
+    if (selectedSchulen.value.length) {
       return organisationStore.klassen
         .slice(0, 25)
         .map((org: Organisation) => ({
@@ -90,20 +100,10 @@
         }))
         .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
     }
-    return []
+    return [];
   });
 
   const statuses: Array<string> = ['Aktiv', 'Inaktiv'];
-
-  const searchInputKlassen: Ref<string> = ref('');
-  const searchInputRollen: Ref<string> = ref('');
-  const searchInputSchulen: Ref<string> = ref('');
-
-  const selectedKlassen: Ref<Array<string>> = ref([]);
-  const selectedRollen: Ref<Array<string>> = ref([]);
-  const selectedSchulen: Ref<Array<string>> = ref([]);
-  const selectedStatus: Ref<string | null> = ref(null);
-  const searchFilter: Ref<string> = ref('');
 
   const filterOrSearchActive: Ref<boolean> = computed(
     () => selectedSchulen.value.length > 0 || selectedRollen.value.length > 0 || searchFilter.value.length > 0,
