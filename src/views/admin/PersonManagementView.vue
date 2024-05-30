@@ -390,6 +390,7 @@
             :placeholder="$t('admin.klasse.klasse')"
             required="true"
             variant="outlined"
+            v-model="selectedKlassen"
           >
           </v-autocomplete>
         </v-col>
@@ -414,6 +415,7 @@
             :placeholder="$t('admin.status')"
             required="true"
             variant="outlined"
+            v-model="selectedStatus"
           >
           </v-autocomplete>
         </v-col>
