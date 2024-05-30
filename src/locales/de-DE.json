@@ -301,7 +301,6 @@
     "userName": "Benutzername",
     "zuordnungen": "Zuordnung(en)"
   },
-  "plusOthers": "(+{count} weitere)",
   "resetFilter": "Filter zurücksetzen",
   "search": "Suchen",
   "start": {

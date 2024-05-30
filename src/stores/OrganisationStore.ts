@@ -39,11 +39,13 @@ export type OrganisationenFilter = {
   systemrechte?: RollenSystemRecht[];
   includeTyp?: OrganisationsTyp;
   excludeTyp?: OrganisationsTyp[];
+  administriertVon?: Array<string>;
 };
 
 type OrganisationGetters = {};
 type OrganisationActions = {
   getAllOrganisationen: (filter?: OrganisationenFilter) => Promise<void>;
+  getFilteredKlassen(filter?: OrganisationenFilter): Promise<void>;
   getKlassenByOrganisationId: (organisationId: string, searchFilter?: string) => Promise<void>;
   getOrganisationById: (organisationId: string) => Promise<Organisation>;
   createOrganisation: (
@@ -95,6 +97,7 @@ export const useOrganisationStore: StoreDefinition<
           filter?.includeTyp,
           filter?.systemrechte,
           filter?.excludeTyp,
+          filter?.administriertVon,
         );
         this.allOrganisationen = response.data;
         this.totalOrganisationen = response.headers['x-paging-total'];
@@ -105,6 +108,32 @@ export const useOrganisationStore: StoreDefinition<
           this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
         }
         this.loading = false;
+      }
+    },
+
+    async getFilteredKlassen(filter?: OrganisationenFilter) {
+      this.loadingKlassen = true;
+      try {
+        const response: AxiosResponse<Organisation[]> = await organisationApi.organisationControllerFindOrganizations(
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          filter?.searchString,
+          OrganisationsTyp.Klasse,
+          filter?.systemrechte,
+          filter?.excludeTyp,
+          filter?.administriertVon,
+        );
+        this.klassen = response.data;
+        this.totalKlassen = response.headers['x-paging-total'];
+        this.loadingKlassen = false;
+      } catch (error: unknown) {
+        this.errorCode = 'UNSPECIFIED_ERROR';
+        if (isAxiosError(error)) {
+          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
+        }
+        this.loadingKlassen = false;
       }
     },
 

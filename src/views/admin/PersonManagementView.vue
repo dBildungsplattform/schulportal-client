@@ -180,6 +180,12 @@
     applySearchAndFilters();
   };
 
+  /* Watcher to detect when the search input for Klassen is triggered.
+    Always request from backend to keep display of hits consistent */
+  watch(searchInputKlassen, async (newValue: string, _oldValue: string) => {
+    organisationStore.getFilteredKlassen({ searchString: newValue, administriertVon: selectedSchulen.value });
+  });
+
   /* Watcher to detect when the search input for Schulen is triggered.
      Always request from backend to keep display of hits consistent */
   watch(searchInputSchulen, async (newValue: string, _oldValue: string) => {
@@ -306,17 +312,6 @@
               </v-list-item>
             </template>
             <template v-slot:selection="{ item, index }">
-              <!-- option 1, wait for IQSH to decide before deletion -->
-              <!-- <v-chip v-if="index < 1">
-                <span>{{ item.raw.chipTitle }}</span>
-              </v-chip>
-              <span
-                v-if="index === 1"
-              >
-                {{ $t('plusOthers', { count: selectedSchulen.length - 1 }) }}
-              </span> -->
-
-              <!-- option 2, wait for IQSH to decide before deletion -->
               <v-chip v-if="selectedSchulen.length < 2">
                 <span>{{ item.raw.chipTitle }}</span>
               </v-chip>
@@ -369,17 +364,6 @@
               </v-list-item>
             </template>
             <template v-slot:selection="{ item, index }">
-              <!-- option 1, wait for IQSH to decide before deletion -->
-              <!-- <v-chip v-if="index < 1">
-                <span>{{ item.title }}</span>
-              </v-chip>
-              <span
-                v-if="index === 1"
-              >
-                {{ $t('plusOthers', { count: selectedRollen.length - 1 }) }}
-              </span> -->
-
-              <!-- option 2, wait for IQSH to decide before deletion -->
               <v-chip v-if="selectedRollen.length < 2">
                 <span>{{ item.title }}</span>
               </v-chip>
@@ -396,8 +380,8 @@
         >
           <v-autocomplete
             autocomplete="off"
-            chips
             class="filter-dropdown"
+            :class="{ selected: selectedKlassen.length > 0 }"
             clearable
             data-testid="klasse-select"
             density="compact"
@@ -412,6 +396,7 @@
             required="true"
             variant="outlined"
             v-model="selectedKlassen"
+            v-model:search="searchInputKlassen"
           >
             <template v-slot:prepend-item>
               <v-list-item>
@@ -431,17 +416,6 @@
               </v-list-item>
             </template>
             <template v-slot:selection="{ item, index }">
-              <!-- option 1, wait for IQSH to decide before deletion -->
-              <!-- <v-chip v-if="index < 1">
-                <span>{{ item.title }}</span>
-              </v-chip>
-              <span
-                v-if="index === 1"
-              >
-                {{ $t('plusOthers', { count: selectedKlassen.length - 1 }) }}
-              </span> -->
-
-              <!-- option 2, wait for IQSH to decide before deletion -->
               <v-chip v-if="selectedKlassen.length < 2">
                 <span>{{ item.title }}</span>
               </v-chip>
