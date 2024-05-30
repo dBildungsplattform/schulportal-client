@@ -2,8 +2,8 @@
   import { computed, onMounted, type ComputedRef, watch, type Ref, ref } from 'vue';
   import { type Composer, useI18n } from 'vue-i18n';
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
-
   import { type Router, useRouter } from 'vue-router';
+  import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
   import {
     useOrganisationStore,
     type OrganisationStore,
@@ -15,6 +15,7 @@
     usePersonenkontextStore,
     type PersonenkontextStore,
     type Uebersicht,
+    type UserinfoPersonenkontext,
     type Zuordnung,
   } from '@/stores/PersonenkontextStore';
   import { useRolleStore, type RolleStore, type RolleResponse } from '@/stores/RolleStore';
@@ -26,6 +27,7 @@
   const searchFieldComponent: Ref = ref();
 
   const router: Router = useRouter();
+  const authStore: AuthStore = useAuthStore();
   const organisationStore: OrganisationStore = useOrganisationStore();
   const personStore: PersonStore = usePersonStore();
   const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
@@ -97,9 +99,10 @@
   const searchInputRollen: Ref<string> = ref('');
   const searchInputSchulen: Ref<string> = ref('');
 
+  const selectedKlassen: Ref<Array<string>> = ref([]);
   const selectedRollen: Ref<Array<string>> = ref([]);
   const selectedSchulen: Ref<Array<string>> = ref([]);
-  const selectedKlassen: Ref<Array<string>> = ref([]);
+  const selectedStatus: Ref<string | null> = ref(null);
   const searchFilter: Ref<string> = ref('');
 
   const filterOrSearchActive: Ref<boolean> = computed(
@@ -123,8 +126,11 @@
     searchFieldComponent.value.searchFilter = '';
     searchInputSchulen.value = '';
     searchInputRollen.value = '';
+    searchInputKlassen.value = '';
     selectedSchulen.value = [];
     selectedRollen.value = [];
+    selectedKlassen.value = [];
+    selectedStatus.value = null;
     personStore.getAllPersons({});
   }
 
@@ -207,6 +213,19 @@
     await organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Schule });
     await personenkontextStore.getAllPersonenuebersichten();
     await rolleStore.getAllRollen('');
+
+    // Autoselect the Schule for the current user that only has 1 Schule assigned to him.
+    const personenkontexte: Array<UserinfoPersonenkontext> | null = authStore.currentUser?.personenkontexte || [];
+    if (personenkontexte.length > 0) {
+      const matchingOrganisations: UserinfoPersonenkontext[] = personenkontexte.filter(
+        (kontext: UserinfoPersonenkontext) =>
+          organisationStore.allOrganisationen.some((org: Organisation) => org.id === kontext.organisationsId),
+      );
+      if (matchingOrganisations.length === 1) {
+        const matchedOrganisation: UserinfoPersonenkontext | undefined = matchingOrganisations[0];
+        selectedSchulen.value = [matchedOrganisation?.organisationsId || ''];
+      }
+    }
   });
 </script>
 
@@ -220,16 +239,18 @@
     </h1>
     <LayoutCard :header="$t('admin.person.management')">
       <v-row
-        align="center"
+        align="start"
         class="ma-3"
         justify="end"
       >
         <v-col
-          cols="2"
-          class="py-0 text-right"
+          align-self="center"
+          cols="12"
+          md="2"
+          class="py-md-0 text-md-right"
         >
           <v-btn
-            class="reset-filter"
+            class="px-0 reset-filter"
             :disabled="!filterOrSearchActive"
             @click="resetSearchAndFilter()"
             size="x-small"
@@ -240,12 +261,12 @@
           </v-btn>
         </v-col>
         <v-col
-          cols="3"
-          class="py-0"
+          cols="12"
+          md="3"
+          class="py-md-0"
         >
           <v-autocomplete
             autocomplete="off"
-            chips
             class="filter-dropdown"
             :class="{ selected: selectedSchulen.length > 0 }"
             clearable
@@ -281,20 +302,34 @@
                 >
               </v-list-item>
             </template>
-            <template v-slot:chip="{ item }">
-              <v-list-item>
-                <v-chip>{{ item.raw.chipTitle }}</v-chip>
-              </v-list-item>
+            <template v-slot:selection="{ item, index }">
+              <!-- option 1, wait for IQSH to decide before deletion -->
+              <!-- <v-chip v-if="index < 1">
+                <span>{{ item.raw.chipTitle }}</span>
+              </v-chip>
+              <span
+                v-if="index === 1"
+              >
+                {{ $t('plusOthers', { count: selectedSchulen.length - 1 }) }}
+              </span> -->
+
+              <!-- option 2, wait for IQSH to decide before deletion -->
+              <v-chip v-if="selectedSchulen.length < 2">
+                <span>{{ item.raw.chipTitle }}</span>
+              </v-chip>
+              <div v-else-if="index === 0">
+                {{ $t('admin.schule.schulenSelected', { count: selectedSchulen.length }) }}
+              </div>
             </template>
           </v-autocomplete>
         </v-col>
         <v-col
-          cols="3"
-          class="py-0"
+          cols="12"
+          md="3"
+          class="py-md-0"
         >
           <v-autocomplete
             autocomplete="off"
-            chips
             class="filter-dropdown"
             :class="{ selected: selectedRollen.length > 0 }"
             clearable
@@ -313,11 +348,48 @@
             v-model="selectedRollen"
             v-model:search="searchInputRollen"
           >
+            <template v-slot:prepend-item>
+              <v-list-item>
+                <v-progress-circular
+                  indeterminate
+                  v-if="rolleStore.loading"
+                ></v-progress-circular>
+                <span
+                  v-else
+                  class="filter-header"
+                  >{{
+                    rolleStore.totalRollen === 1
+                      ? $t('admin.rolle.rolleFound', { total: rolleStore.totalRollen })
+                      : $t('admin.rolle.rollenFound', { total: rolleStore.totalRollen })
+                  }}</span
+                >
+              </v-list-item>
+            </template>
+            <template v-slot:selection="{ item, index }">
+              <!-- option 1, wait for IQSH to decide before deletion -->
+              <!-- <v-chip v-if="index < 1">
+                <span>{{ item.title }}</span>
+              </v-chip>
+              <span
+                v-if="index === 1"
+              >
+                {{ $t('plusOthers', { count: selectedRollen.length - 1 }) }}
+              </span> -->
+
+              <!-- option 2, wait for IQSH to decide before deletion -->
+              <v-chip v-if="selectedRollen.length < 2">
+                <span>{{ item.title }}</span>
+              </v-chip>
+              <div v-else-if="index === 0">
+                {{ $t('admin.rolle.rollenSelected', { count: selectedRollen.length }) }}
+              </div>
+            </template>
           </v-autocomplete>
         </v-col>
         <v-col
-          cols="2"
-          class="py-0"
+          cols="12"
+          md="2"
+          class="py-md-0"
         >
           <v-autocomplete
             autocomplete="off"
@@ -336,12 +408,14 @@
             :placeholder="$t('admin.klasse.klasse')"
             required="true"
             variant="outlined"
+            v-model="selectedKlassen"
           >
           </v-autocomplete>
         </v-col>
         <v-col
-          cols="2"
-          class="py-0"
+          cols="12"
+          md="2"
+          class="py-md-0"
         >
           <v-autocomplete
             autocomplete="off"
@@ -359,6 +433,7 @@
             :placeholder="$t('admin.status')"
             required="true"
             variant="outlined"
+            v-model="selectedStatus"
           >
           </v-autocomplete>
         </v-col>

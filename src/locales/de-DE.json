@@ -64,75 +64,6 @@
         }
       }
     },
-    "rolle": {
-      "addNew": "Neue Rolle hinzufügen",
-      "assignMerkmale": "Merkmale zuordnen",
-      "assignRolle": "Rolle zuordnen",
-      "assignRollenart": "Rollenart zuordnen",
-      "assignSystemrechte": "Systemrechte zuordnen",
-      "backToCreateRolle": "Zurück zur Rollenanlage",
-      "create": "Rolle anlegen",
-      "createAnother": "Weitere Rolle anlegen",
-      "createNew": "Neue Rolle anlegen",
-      "discard": "Rolle verwerfen",
-      "enterRollenname": "Rollenname eingeben",
-      "errors": {
-        "ADD_SYSTEMRECHT_ERROR": "Das Systemrecht konnte nicht hinzugefügt werden.",
-        "ROLLE_ERROR":  "Die Rolle konnte nicht angelegt werden."
-      },
-      "isAllowedToManageRollen": "Darf Rollen verwalten",
-      "management": "Rollenverwaltung",
-      "mappingFrontBackEnd": {
-        "systemrechte": {
-          "ROLLEN_VERWALTEN": "Darf Rollen verwalten",
-          "PERSONEN_SOFORT_LOESCHEN": "Darf Personen sofort löschen",
-          "PERSONEN_VERWALTEN": "Darf Personen verwalten",
-          "SCHULEN_VERWALTEN": "Darf Schulen verwalten",
-          "KLASSEN_VERWALTEN": "Darf Klassen verwalten",
-          "SCHULTRAEGER_VERWALTEN": "Darf Schulträger verwalten"
-        },
-        "rollenarten": {
-          "LERN": "Lern",
-          "LEHR": "Lehr",
-          "EXTERN": "Extern",
-          "ORGADMIN": "Orgadmin",
-          "LEIT": "Leit",
-          "SYSADMIN": "Sysadmin"
-        },
-        "merkmale": {
-          "BEFRISTUNG_PFLICHT": "Befristung ist Pflichtangabe",
-          "KOPERS_PFLICHT": "KoPers-Nr. ist Pflichtangabe"
-        }
-      },
-      "merkmale": "Merkmale",
-      "noRollenFound": "Keine Rollen gefunden",
-      "rolle": "Rolle",
-      "rolleCreateErrorTitle": "Fehler beim Anlegen der Rolle",
-      "rolleCreateErrorText": "Die Rolle konnte nicht angelegt werden.",
-      "rollenart": "Rollenart",
-      "rollenname": "Rollenname",
-      "rolleAddedSuccessfully": "Die Rolle wurde erfolgreich hinzugefügt.",
-      "rules": {
-        "rolle": {
-          "required": "Die Rolle muss ausgewählt werden."
-        },
-        "rollenart": {
-          "required": "Die Rollenart muss ausgewählt werden."
-        },
-        "rollenname": {
-          "length": "Der Rollenname darf nicht länger als 200 Zeichen sein.",
-          "matches": "Der Rollenname darf keine ungültigen Zeichen beinhalten.",
-          "required": "Der Rollenname muss ausgewählt werden."
-        }
-      },
-      "selectMerkmale": "Merkmale auswählen",
-      "selectRolle": "Rolle auswählen",
-      "selectRollenart": "Rollenart auswählen",
-      "selectSystemrechte":"Systemrechte auswählen",
-      "showAll": "Alle Rollen anzeigen",
-      "systemrechte": "Systemrechte",
-      "userDataLoadingErrorText": "Es konnten keine Benutzerdaten geladen werden."
-    },
     "person": {
       "addedSuccessfully": "{firstname} {lastname} wurde erfolgreich hinzugefügt.",
       "addNew": "Neuen Benutzer hinzufügen",
@@ -178,6 +109,78 @@
         "PERSONENKONTEXT_SPECIFICATION_ERROR": "Die Zurodnung konnte nicht angelegt werden."
       }
     },
+    "rolle": {
+      "addNew": "Neue Rolle hinzufügen",
+      "assignMerkmale": "Merkmale zuordnen",
+      "assignRolle": "Rolle zuordnen",
+      "assignRollenart": "Rollenart zuordnen",
+      "assignSystemrechte": "Systemrechte zuordnen",
+      "backToCreateRolle": "Zurück zur Rollenanlage",
+      "create": "Rolle anlegen",
+      "createAnother": "Weitere Rolle anlegen",
+      "createNew": "Neue Rolle anlegen",
+      "discard": "Rolle verwerfen",
+      "enterRollenname": "Rollenname eingeben",
+      "errors": {
+        "ADD_SYSTEMRECHT_ERROR": "Das Systemrecht konnte nicht hinzugefügt werden.",
+        "ROLLE_ERROR":  "Die Rolle konnte nicht angelegt werden."
+      },
+      "isAllowedToManageRollen": "Darf Rollen verwalten",
+      "management": "Rollenverwaltung",
+      "mappingFrontBackEnd": {
+        "systemrechte": {
+          "ROLLEN_VERWALTEN": "Darf Rollen verwalten",
+          "PERSONEN_SOFORT_LOESCHEN": "Darf Personen sofort löschen",
+          "PERSONEN_VERWALTEN": "Darf Personen verwalten",
+          "SCHULEN_VERWALTEN": "Darf Schulen verwalten",
+          "KLASSEN_VERWALTEN": "Darf Klassen verwalten",
+          "SCHULTRAEGER_VERWALTEN": "Darf Schulträger verwalten"
+        },
+        "rollenarten": {
+          "LERN": "Lern",
+          "LEHR": "Lehr",
+          "EXTERN": "Extern",
+          "ORGADMIN": "Orgadmin",
+          "LEIT": "Leit",
+          "SYSADMIN": "Sysadmin"
+        },
+        "merkmale": {
+          "BEFRISTUNG_PFLICHT": "Befristung ist Pflichtangabe",
+          "KOPERS_PFLICHT": "KoPers-Nr. ist Pflichtangabe"
+        }
+      },
+      "merkmale": "Merkmale",
+      "noRollenFound": "Keine Rollen gefunden",
+      "rolle": "Rolle",
+      "rolleCreateErrorTitle": "Fehler beim Anlegen der Rolle",
+      "rolleCreateErrorText": "Die Rolle konnte nicht angelegt werden.",
+      "rolleFound": "{total} Rolle gefunden",
+      "rollenart": "Rollenart",
+      "rollenFound": "{total} Rollen gefunden",
+      "rollenname": "Rollenname",
+      "rollenSelected": "{count} Rollen ausgewählt",
+      "rolleAddedSuccessfully": "Die Rolle wurde erfolgreich hinzugefügt.",
+      "rules": {
+        "rolle": {
+          "required": "Die Rolle muss ausgewählt werden."
+        },
+        "rollenart": {
+          "required": "Die Rollenart muss ausgewählt werden."
+        },
+        "rollenname": {
+          "length": "Der Rollenname darf nicht länger als 200 Zeichen sein.",
+          "matches": "Der Rollenname darf keine ungültigen Zeichen beinhalten.",
+          "required": "Der Rollenname muss ausgewählt werden."
+        }
+      },
+      "selectMerkmale": "Merkmale auswählen",
+      "selectRolle": "Rolle auswählen",
+      "selectRollenart": "Rollenart auswählen",
+      "selectSystemrechte":"Systemrechte auswählen",
+      "showAll": "Alle Rollen anzeigen",
+      "systemrechte": "Systemrechte",
+      "userDataLoadingErrorText": "Es konnten keine Benutzerdaten geladen werden."
+    },
     "searchResultTable":"Ergebnisliste durchsuchen",
     "schule": {
       "addNew": "Neue Schule hinzufügen",
@@ -202,8 +205,6 @@
         "ORGANISATION_SPECIFICATION_ERROR": "Die Schule konnte nicht angelegt werden.",
         "SCHULE_UNTER_TRAEGER": "Eine Schule darf nicht einer anderen Schule zugeordnet werden."
       },
-      "schuleFound": "{total} Schule gefunden",
-      "schulenFound": "{total} Schulen gefunden",
       "management": "Schulverwaltung",
       "publicSchule": "Öffentliche Schule",
       "rules": {
@@ -216,6 +217,9 @@
         }
       },
       "schule": "Schule",
+      "schuleFound": "{total} Schule gefunden",
+      "schulenFound": "{total} Schulen gefunden",
+      "schulenSelected": "{count} Schulen ausgewählt",
       "schulname": "Schulname",
       "schulform": "Schulform",
       "schuleCreateErrorTitle": "Fehler beim Anlegen der Schule",
@@ -251,18 +255,6 @@
     "help": "Hilfe",
     "legalNotice": "Impressum",
     "privacyPolicy": "Datenschutzerklärung"
-  },
-  "search": "Suchen",
-  "start": {
-    "allServiceProviders": "Alle Angebote",
-    "categories": {
-      "administration": "Verwaltung",
-      "class": "Unterricht",
-      "hints": "Hinweise",
-      "homePage": "Startseite",
-      "schoolOfferings": "Schulische Angebote",
-      "workEmail": "Dienstliche E-Mail"
-    }
   },
   "itemsPerPage": "Einträge pro Seite",
   "landingTitle": "Willkommen im Schulportal SH.",
@@ -306,7 +298,20 @@
     "userName": "Benutzername",
     "zuordnungen": "Zuordnung(en)"
   },
+  "plusOthers": "(+{count} weitere)",
   "resetFilter": "Filter zurücksetzen",
+  "search": "Suchen",
+  "start": {
+    "allServiceProviders": "Alle Angebote",
+    "categories": {
+      "administration": "Verwaltung",
+      "class": "Unterricht",
+      "hints": "Hinweise",
+      "homePage": "Startseite",
+      "schoolOfferings": "Schulische Angebote",
+      "workEmail": "Dienstliche E-Mail"
+    }
+  },
   "unsavedChanges": {
     "message": "Sie haben nicht gespeicherte Änderungen vorgenommen. Wollen Sie die Seite trotzdem verlassen?",
     "title": "Änderungen vorgenommen"
