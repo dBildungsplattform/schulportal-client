@@ -285,17 +285,6 @@
               </v-list-item>
             </template>
             <template v-slot:selection="{ item, index }">
-              <!-- option 1, wait for IQSH to decide before deletion -->
-              <!-- <v-chip v-if="index < 1">
-                <span>{{ item.raw.chipTitle }}</span>
-              </v-chip>
-              <span
-                v-if="index === 1"
-              >
-                {{ $t('plusOthers', { count: selectedSchulen.length - 1 }) }}
-              </span> -->
-
-              <!-- option 2, wait for IQSH to decide before deletion -->
               <v-chip v-if="selectedSchulen.length < 2">
                 <span>{{ item.raw.chipTitle }}</span>
               </v-chip>
@@ -348,17 +337,6 @@
               </v-list-item>
             </template>
             <template v-slot:selection="{ item, index }">
-              <!-- option 1, wait for IQSH to decide before deletion -->
-              <!-- <v-chip v-if="index < 1">
-                <span>{{ item.title }}</span>
-              </v-chip>
-              <span
-                v-if="index === 1"
-              >
-                {{ $t('plusOthers', { count: selectedRollen.length - 1 }) }}
-              </span> -->
-
-              <!-- option 2, wait for IQSH to decide before deletion -->
               <v-chip v-if="selectedRollen.length < 2">
                 <span>{{ item.title }}</span>
               </v-chip>
