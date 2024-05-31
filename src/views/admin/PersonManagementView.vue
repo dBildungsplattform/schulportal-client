@@ -199,10 +199,16 @@
   });
 
   watch(selectedSchulen, async (_newValue: Array<string>, _oldValue: Array<string>) => {
+    let filteredKlassen: Array<string> = [];
     if (selectedSchulen.value.length) {
-      organisationStore.getFilteredKlassen({ searchString: searchInputKlassen.value, administriertVon: selectedSchulen.value });
+      selectedSchulen.value.forEach(async (schuleId: string) => {
+        await organisationStore.getKlassenByOrganisationId(schuleId, searchInputKlassen.value);
+        filteredKlassen.concat(organisationStore.klassen.map((klasse: Organisation) => klasse.id))
+      });
+      
+      debugger
     }
-    applySearchAndFilters();
+    applySearchAndFilters(filteredKlassen);
   });
 
   watch(selectedRollen, async (_newValue: Array<string>, _oldValue: Array<string>) => {
