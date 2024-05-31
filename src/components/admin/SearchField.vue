@@ -68,7 +68,7 @@
       class="primary search button"
       @click="applySearchFilter()"
       data-testid="apply-search-filter-button"
-      height="35"
+      height="44"
       prepend-icon="mdi-magnify"
       width="130"
     >
