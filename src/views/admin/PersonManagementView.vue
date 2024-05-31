@@ -200,10 +200,7 @@
 
   watch(selectedSchulen, async (_newValue: Array<string>, _oldValue: Array<string>) => {
     if (selectedSchulen.value.length) {
-      selectedSchulen.value.forEach((schuleId: string) => {
-        organisationStore.getKlassenByOrganisationId(schuleId, searchInputKlassen.value);
-      });
-      // save klassen from all schulen in same array
+      organisationStore.getFilteredKlassen({ searchString: searchInputKlassen.value, administriertVon: selectedSchulen.value });
     }
     applySearchAndFilters();
   });
