@@ -75,6 +75,9 @@
       "createNew": "Neue Benutzer anlegen",
       "creationErrorText": "",
       "creationErrorTitle": "Fehler beim Anlegen des Benutzers.",
+      "deletePerson": "Benutzer löschen",
+      "deletePersonConfirmation": "Wollen Sie den Benutzer {firstname} {lastname} sofort und endgültig löschen?",
+      "deletePersonSuccessMessage": "{firstname} {lastname} wurde erfolgreich gelöscht",
       "discard": "Benutzer verwerfen",
       "edit": "Benutzer bearbeiten",
       "generatedPassword": "Generiertes Passwort",
@@ -106,7 +109,7 @@
       "errors": {
         "GLEICHE_ROLLE_AN_KLASSE_WIE_SCHULE": "Mindestens eine Rolle der Person ist an der Schule nicht bekannt.",
         "NUR_LEHR_UND_LERN_AN_KLASSE": "Nur Schüler dürfen einer Klasse zugeordnet werden.",
-        "PERSONENKONTEXT_SPECIFICATION_ERROR": "Die Zurodnung konnte nicht angelegt werden."
+        "PERSONENKONTEXT_SPECIFICATION_ERROR": "Die Zuordnung konnte nicht angelegt werden."
       }
     },
     "rolle": {
