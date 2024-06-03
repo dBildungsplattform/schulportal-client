@@ -17,14 +17,22 @@
   const authStore: AuthStore = useAuthStore();
   const { t }: Composer = useI18n({ useScope: 'global' });
 
-  type ReadonlyHeaders = InstanceType<typeof VDataTableServer>['headers'];
-  const headers: ReadonlyHeaders = [
+  type ReadonlyHeaders = VDataTableServer['$props']['headers'];
+  type UnwrapReadonlyArray<A> = A extends Readonly<Array<infer I>> ? I : never;
+  type ReadonlyDataTableHeader = UnwrapReadonlyArray<ReadonlyHeaders>;
+
+  // Utility type to make headers mutable
+  type DeepMutable<T> = { -readonly [P in keyof T]: DeepMutable<T[P]> };
+  type DataTableHeader = DeepMutable<ReadonlyDataTableHeader>;
+
+  // Define headers as a mutable array
+  const headers: Ref<DataTableHeader[]> = ref([
     {
       title: t('admin.klasse.klasse'),
       key: 'name',
       align: 'start',
-    },
-  ];
+    } as DataTableHeader,
+  ]);
 
   type TranslatedObject = {
     value: string;
@@ -179,6 +187,12 @@
           finalKlassen.value = organisationStore.klassen;
           isSchuleDropdownDisabled.value = true;
         }
+      } else if (matchingOrganisations.length > 1) {
+        headers.value.unshift({
+          title: t('admin.schule.dienststellennummer'),
+          key: 'kennung',
+          align: 'start',
+        } as DataTableHeader);
       }
     }
     finalKlassen.value = organisationStore.allKlassen;
