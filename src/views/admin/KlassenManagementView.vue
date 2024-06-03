@@ -187,7 +187,7 @@
           finalKlassen.value = organisationStore.klassen;
           isSchuleDropdownDisabled.value = true;
         }
-      } else if (matchingOrganisations.length > 1) {
+      } else {
         headers.value.unshift({
           title: t('admin.schule.dienststellennummer'),
           key: 'kennung',
