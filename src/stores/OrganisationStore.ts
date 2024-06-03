@@ -99,6 +99,7 @@ export const useOrganisationStore: StoreDefinition<
         );
         if (filter?.includeTyp === OrganisationsTyp.Klasse) {
           this.allKlassen = response.data;
+          this.totalKlassen = response.headers['x-paging-total'];
         } else {
           this.allOrganisationen = response.data;
           this.totalOrganisationen = response.headers['x-paging-total'];

@@ -71,6 +71,10 @@
       isSchuleDropdownDisabled.value = false;
       // Fetch all Klassen when no Schule is selected
       await organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Klasse });
+      klassenOptions.value = organisationStore.allKlassen.map((org: Organisation) => ({
+        value: org.id,
+        title: org.name,
+      }));
       finalKlassen.value = organisationStore.allKlassen;
     }
   });
@@ -78,9 +82,13 @@
   // Watcher to update finalKlassen when Klassen are selected or unselected
   watch(selectedKlassen, async (newValue: string[] | null, oldValue: string[] | null) => {
     if (newValue !== oldValue) {
-      if (newValue && newValue.length > 0) {
+      if (newValue && newValue.length > 0 && selectedSchule.value !== null) {
         // Filter finalKlassen to only include the selected Klassen
         finalKlassen.value = organisationStore.klassen.filter((klasse: Organisation) => newValue.includes(klasse.id));
+      } else if (newValue && newValue.length > 0 && selectedSchule.value === null) {
+        finalKlassen.value = organisationStore.allKlassen.filter((klasse: Organisation) =>
+          newValue.includes(klasse.id),
+        );
       } else if (selectedSchule.value !== null) {
         // If no Klassen are selected but a Schule is selected, show all Klassen for the selected Schule
         finalKlassen.value = organisationStore.klassen;
@@ -108,11 +116,9 @@
     if (newValue.length >= 1 && selectedSchule.value !== null) {
       // Fetch Klassen for the selected Schule matching the search string
       await organisationStore.getKlassenByOrganisationId(selectedSchule.value, newValue);
-
     } else if (selectedSchule.value !== null) {
       // Fetch all Klassen for the selected Schule when the search string is cleared
       await organisationStore.getKlassenByOrganisationId(selectedSchule.value);
-
     }
   });
 
@@ -142,6 +148,11 @@
   onMounted(async () => {
     await organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Schule });
     await organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Klasse });
+    // Initialize klassenOptions with all classes
+    klassenOptions.value = organisationStore.allKlassen.map((org: Organisation) => ({
+      value: org.id,
+      title: org.name,
+    }));
 
     // Autoselect the Schule for the current user that only has 1 Schule assigned to him.
     const personenkontexte: Array<UserinfoPersonenkontext> | null = authStore.currentUser?.personenkontexte || [];
