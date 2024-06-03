@@ -5,6 +5,7 @@
   import PasswordReset from '@/components/admin/PasswordReset.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
+  import PersonDelete from '@/components/admin/PersonDelete.vue';
   import {
     usePersonenkontextStore,
     type PersonenkontextStore,
@@ -12,12 +13,14 @@
     type Zuordnung,
   } from '@/stores/PersonenkontextStore';
   import { OrganisationsTyp } from '@/stores/OrganisationStore';
+  import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
 
   const route: RouteLocationNormalizedLoaded = useRoute();
   const router: Router = useRouter();
   const currentPersonId: string = route.params['id'] as string;
   const personStore: PersonStore = usePersonStore();
   const personenKontextStore: PersonenkontextStore = usePersonenkontextStore();
+  const authStore: AuthStore = useAuthStore();
 
   const password: Ref<string> = ref('');
 
@@ -29,6 +32,10 @@
     personStore.resetPassword(personId).then((newPassword?: string) => {
       password.value = newPassword || '';
     });
+  }
+
+  async function deletePerson(personId: string): Promise<void> {
+    await personStore.deletePerson(personId);
   }
 
   function getSskName(sskDstNr: string, sskName: string): string {
@@ -303,6 +310,42 @@
             >
               <h3 class="text-body">{{ $t('person.noZuordnungenFound') }}</h3>
             </v-col>
+          </v-row>
+        </v-container>
+        <v-divider
+          class="border-opacity-100 rounded my-6 mx-4"
+          color="#E5EAEF"
+          thickness="6"
+        ></v-divider>
+        <!-- Delete person -->
+        <v-container
+          v-if="authStore.hasPersonenLoeschenPermission"
+          class="person-delete"
+        >
+          <v-row class="ml-md-16">
+            <v-col>
+              <h3 class="subtitle-1">{{ $t('admin.person.status') }}</h3>
+            </v-col></v-row
+          >
+          <v-row
+            justify="end"
+            class="mr-lg-10"
+          >
+            <v-col
+              cols="12"
+              md="auto"
+              v-if="personStore.currentPerson"
+            >
+              <div class="d-flex justify-sm-end">
+                <PersonDelete
+                  :errorCode="personStore.errorCode"
+                  :person="personStore.currentPerson"
+                  @onDeletePerson="deletePerson(currentPersonId)"
+                >
+                </PersonDelete>
+              </div>
+            </v-col>
+            <v-col v-else-if="personStore.loading"> <v-progress-circular indeterminate></v-progress-circular></v-col>
           </v-row>
         </v-container>
       </template>

@@ -35,6 +35,8 @@
   const searchFilterStore: SearchFilterStore = useSearchFilterStore();
   const { t }: Composer = useI18n({ useScope: 'global' });
 
+  let timerId: ReturnType<typeof setTimeout>;
+
   type ReadonlyHeaders = InstanceType<typeof VDataTableServer>['headers'];
   const headers: ReadonlyHeaders = [
     { title: t('person.lastName'), key: 'person.name.familienname', align: 'start' },
@@ -180,23 +182,35 @@
     applySearchAndFilters();
   };
 
-  /* Watcher to detect when the search input for Klassen is triggered.
-    Always request from backend to keep display of hits consistent */
-  watch(searchInputKlassen, async (newValue: string, _oldValue: string) => {
-    organisationStore.getFilteredKlassen({ searchString: newValue, administriertVon: selectedSchulen.value });
-  });
+  function updateKlassenSearch(searchValue: string): void {
+    /* cancel pending call */
+    clearTimeout(timerId);
 
-  /* Watcher to detect when the search input for Schulen is triggered.
-     Always request from backend to keep display of hits consistent */
-  watch(searchInputSchulen, async (newValue: string, _oldValue: string) => {
-    organisationStore.getAllOrganisationen({ searchString: newValue, includeTyp: OrganisationsTyp.Schule });
-  });
+    /* delay new call 500ms */
+    timerId = setTimeout(() => {
+      organisationStore.getFilteredKlassen({ searchString: searchValue, administriertVon: selectedSchulen.value });
+    }, 500);
+  }
 
-  /* Watcher to detect when the search input for Rollen is triggered.
-     Always request from backend to keep display of hits consistent */
-  watch(searchInputRollen, async (newValue: string, _oldValue: string) => {
-    rolleStore.getAllRollen(newValue);
-  });
+  function updateSchulenSearch(searchValue: string): void {
+    /* cancel pending call */
+    clearTimeout(timerId);
+
+    /* delay new call 500ms */
+    timerId = setTimeout(() => {
+      organisationStore.getAllOrganisationen({ searchString: searchValue, includeTyp: OrganisationsTyp.Schule });
+    }, 500);
+  }
+
+  function updateRollenSearch(searchValue: string): void {
+    /* cancel pending call */
+    clearTimeout(timerId);
+
+    /* delay new call 500ms */
+    timerId = setTimeout(() => {
+      rolleStore.getAllRollen(searchValue);
+    }, 500);
+  }
 
   watch(selectedSchulen, async (_newValue: Array<string>, _oldValue: Array<string>) => {
     let filteredKlassen: Array<string> = [];
@@ -293,6 +307,7 @@
             :no-data-text="$t('noDataFound')"
             :placeholder="$t('admin.schule.schule')"
             required="true"
+            @update:search="updateSchulenSearch"
             variant="outlined"
             v-model="selectedSchulen"
             v-model:search="searchInputSchulen"
@@ -303,15 +318,20 @@
                   indeterminate
                   v-if="organisationStore.loading"
                 ></v-progress-circular>
-                <span
+                <!-- <span
                   v-else
                   class="filter-header"
                   >{{
                     organisationStore.totalOrganisationen === 1
                       ? $t('admin.schule.schuleFound', { total: organisationStore.totalOrganisationen })
                       : $t('admin.schule.schulenFound', { total: organisationStore.totalOrganisationen })
-                  }}</span
-                >
+                  }}</span -->
+                <span
+                  v-else
+                  class="filter-header"
+                  >{{
+                    $t('admin.schule.schulenFound', { count: organisationStore.totalOrganisationen }, organisationStore.totalOrganisationen)
+                  }}</span>
               </v-list-item>
             </template>
             <template v-slot:selection="{ item, index }">
@@ -345,6 +365,7 @@
             :no-data-text="$t('noDataFound')"
             :placeholder="$t('admin.rolle.rolle')"
             required="true"
+            @update:search="updateRollenSearch"
             variant="outlined"
             v-model="selectedRollen"
             v-model:search="searchInputRollen"
@@ -397,6 +418,7 @@
             :no-data-text="$t('noDataFound')"
             :placeholder="$t('admin.klasse.klasse')"
             required="true"
+            @update:search="updateKlassenSearch"
             variant="outlined"
             v-model="selectedKlassen"
             v-model:search="searchInputKlassen"
