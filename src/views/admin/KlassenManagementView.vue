@@ -144,7 +144,7 @@
   // Checks if the filter is active or not
   const filterActive: Ref<boolean> = computed(() => !!selectedSchule.value || selectedKlassen.value.length > 0);
 
-  function resetSearchAndFilter(): void {
+  async function resetSearchAndFilter(): Promise<void> {
     // Clear search inputs
     searchInputSchulen.value = '';
     searchInputKlassen.value = '';
@@ -154,13 +154,11 @@
     selectedKlassen.value = [];
 
     // Refetch all data
-    organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Schule }).then(() => {
-      organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Klasse }).then(() => {
-        finalKlassen.value = organisationStore.allKlassen;
-      });
-    });
-  }
+    await organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Schule });
+    await organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Klasse });
+    finalKlassen.value = organisationStore.allKlassen;
 
+  }
   onMounted(async () => {
     await organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Schule });
     await organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Klasse });
@@ -220,6 +218,7 @@
         >
           <v-btn
             class="px-0 reset-filter"
+            data-testid="reset-filter-button"
             :disabled="!filterActive"
             @click="resetSearchAndFilter()"
             size="x-small"

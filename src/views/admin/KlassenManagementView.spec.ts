@@ -90,4 +90,18 @@ describe('KlassenManagementView', () => {
     expect(klasseAutocomplete?.text()).toEqual('1b');
   });
 
+  test('it triggers reset for filters', async () => {
+    const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
+    await organisationAutocomplete?.setValue('O1');
+    await nextTick();
+
+    const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
+    await klasseAutocomplete?.setValue('9a');
+    await nextTick();
+
+    wrapper?.find('[data-testid="reset-filter-button"]').trigger('click');
+    await nextTick();
+
+    expect(klasseAutocomplete?.text()).toEqual('');
+  });
 });
