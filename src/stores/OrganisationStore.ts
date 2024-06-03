@@ -141,6 +141,7 @@ export const useOrganisationStore: StoreDefinition<
 
         this.klassen = response.data;
         this.totalKlassen = response.headers['x-paging-total'];
+
         this.loading = false;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';

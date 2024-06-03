@@ -114,16 +114,27 @@
   // Watcher to search Klassen based on input text
   watch(searchInputKlassen, async (newValue: string, _oldValue: string) => {
     if (newValue.length >= 1 && selectedSchule.value !== null) {
-      // Fetch Klassen for the selected Schule matching the search string
-      await organisationStore.getKlassenByOrganisationId(selectedSchule.value, newValue);
+      // Fetch Klassen matching the search string and selected schule
+      await organisationStore.getAllOrganisationen({
+        administriertVon: [selectedSchule.value],
+        searchString: newValue,
+        includeTyp: OrganisationsTyp.Klasse,
+      });
+    } else if (newValue.length >= 1 && selectedSchule.value === null) {
+      await organisationStore.getAllOrganisationen({
+        searchString: newValue,
+        includeTyp: OrganisationsTyp.Klasse,
+      });
     } else if (selectedSchule.value !== null) {
       // Fetch all Klassen for the selected Schule when the search string is cleared
-      await organisationStore.getKlassenByOrganisationId(selectedSchule.value);
+      await organisationStore.getAllOrganisationen({
+        administriertVon: [selectedSchule.value],
+      });
     }
   });
 
   // Checks if the filter is active or not
-  const filterActive: Ref<boolean> = computed(() => !!selectedSchule.value);
+  const filterActive: Ref<boolean> = computed(() => !!selectedSchule.value || selectedKlassen.value.length > 0);
 
   function resetSearchAndFilter(): void {
     // Clear search inputs
@@ -133,9 +144,6 @@
     // Clear selected values
     selectedSchule.value = null;
     selectedKlassen.value = [];
-
-    // Reset klassenOptions
-    klassenOptions.value = [];
 
     // Refetch all data
     organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Schule }).then(() => {
