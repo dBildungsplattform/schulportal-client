@@ -35,6 +35,8 @@
   const searchFilterStore: SearchFilterStore = useSearchFilterStore();
   const { t }: Composer = useI18n({ useScope: 'global' });
 
+  let timerId: ReturnType<typeof setTimeout>;
+
   type ReadonlyHeaders = InstanceType<typeof VDataTableServer>['headers'];
   const headers: ReadonlyHeaders = [
     { title: t('person.lastName'), key: 'person.name.familienname', align: 'start' },
@@ -169,11 +171,23 @@
   };
 
   function updateSchulenSearch(searchValue: string): void {
-    organisationStore.getAllOrganisationen({ searchString: searchValue, includeTyp: OrganisationsTyp.Schule });
+    /* cancel pending call */
+    clearTimeout(timerId);
+
+    /* delay new call 500ms */
+    timerId = setTimeout(() => {
+      organisationStore.getAllOrganisationen({ searchString: searchValue, includeTyp: OrganisationsTyp.Schule });
+    }, 500);
   }
 
   function updateRollenSearch(searchValue: string): void {
-    rolleStore.getAllRollen(searchValue);
+    /* cancel pending call */
+    clearTimeout(timerId);
+
+    /* delay new call 500ms */
+    timerId = setTimeout(() => {
+      rolleStore.getAllRollen(searchValue);
+    }, 500);
   }
 
   watch(selectedSchulen, async (_newValue: Array<string>, _oldValue: Array<string>) => {
