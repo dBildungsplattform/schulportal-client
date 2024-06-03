@@ -220,8 +220,7 @@
         }
       },
       "schule": "Schule",
-      "schuleFound": "{total} Schule gefunden",
-      "schulenFound": "{total} Schulen gefunden",
+      "schulenFound": "{count} Schule gefunden | {count} Schulen gefunden",
       "schulenSelected": "{count} Schulen ausgewählt",
       "schulname": "Schulname",
       "schulform": "Schulform",

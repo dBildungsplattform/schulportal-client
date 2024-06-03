@@ -284,15 +284,20 @@
                   indeterminate
                   v-if="organisationStore.loading"
                 ></v-progress-circular>
-                <span
+                <!-- <span
                   v-else
                   class="filter-header"
                   >{{
                     organisationStore.totalOrganisationen === 1
                       ? $t('admin.schule.schuleFound', { total: organisationStore.totalOrganisationen })
                       : $t('admin.schule.schulenFound', { total: organisationStore.totalOrganisationen })
-                  }}</span
-                >
+                  }}</span -->
+                <span
+                  v-else
+                  class="filter-header"
+                  >{{
+                    $t('admin.schule.schulenFound', { count: organisationStore.totalOrganisationen }, organisationStore.totalOrganisationen)
+                  }}</span>
               </v-list-item>
             </template>
             <template v-slot:selection="{ item, index }">
