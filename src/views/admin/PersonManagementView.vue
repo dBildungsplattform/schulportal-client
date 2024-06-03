@@ -168,17 +168,13 @@
     applySearchAndFilters();
   };
 
-  /* Watcher to detect when the search input for Schulen is triggered.
-     Always request from backend to keep display of hits consistent */
-  watch(searchInputSchulen, async (newValue: string, _oldValue: string) => {
-    organisationStore.getAllOrganisationen({ searchString: newValue, includeTyp: OrganisationsTyp.Schule });
-  });
+  function updateSchulenSearch(searchValue: string): void {
+    organisationStore.getAllOrganisationen({ searchString: searchValue, includeTyp: OrganisationsTyp.Schule });
+  }
 
-  /* Watcher to detect when the search input for Rollen is triggered.
-     Always request from backend to keep display of hits consistent */
-  watch(searchInputRollen, async (newValue: string, _oldValue: string) => {
-    rolleStore.getAllRollen(newValue);
-  });
+  function updateRollenSearch(searchValue: string): void {
+    rolleStore.getAllRollen(searchValue);
+  }
 
   watch(selectedSchulen, async (_newValue: Array<string>, _oldValue: Array<string>) => {
     applySearchAndFilters();
@@ -263,6 +259,7 @@
             :no-data-text="$t('noDataFound')"
             :placeholder="$t('admin.schule.schule')"
             required="true"
+            @update:search="updateSchulenSearch"
             variant="outlined"
             v-model="selectedSchulen"
             v-model:search="searchInputSchulen"
@@ -315,6 +312,7 @@
             :no-data-text="$t('noDataFound')"
             :placeholder="$t('admin.rolle.rolle')"
             required="true"
+            @update:search="updateRollenSearch"
             variant="outlined"
             v-model="selectedRollen"
             v-model:search="searchInputRollen"
