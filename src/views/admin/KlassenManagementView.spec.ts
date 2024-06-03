@@ -63,4 +63,31 @@ describe('KlassenManagementView', () => {
 
     expect(klasseAutocomplete?.text()).toEqual('');
   });
+
+  test('it resets field Klasse when Schule is reset after being selected', async () => {
+    const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
+    await organisationAutocomplete?.setValue('O1');
+    await nextTick();
+
+    const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
+    await klasseAutocomplete?.setValue('9a');
+    await nextTick();
+
+    await organisationAutocomplete?.setValue(null);
+    await nextTick();
+
+    expect(klasseAutocomplete?.text()).toEqual('');
+  });
+
+  test('it calls watcher for klasse without schule', async () => {
+    const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
+    await klasseAutocomplete?.setValue('9a');
+    await nextTick();
+
+    await klasseAutocomplete?.setValue('1b');
+    await nextTick();
+
+    expect(klasseAutocomplete?.text()).toEqual('1b');
+  });
+
 });
