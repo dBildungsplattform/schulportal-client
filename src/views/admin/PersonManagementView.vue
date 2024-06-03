@@ -288,8 +288,13 @@
                   v-else
                   class="filter-header"
                   >{{
-                    $t('admin.schule.schulenFound', { count: organisationStore.totalOrganisationen }, organisationStore.totalOrganisationen)
-                  }}</span>
+                    $t(
+                      'admin.schule.schulenFound',
+                      { count: organisationStore.totalOrganisationen },
+                      organisationStore.totalOrganisationen,
+                    )
+                  }}</span
+                >
               </v-list-item>
             </template>
             <template v-slot:selection="{ item, index }">
@@ -337,9 +342,7 @@
                 <span
                   v-else
                   class="filter-header"
-                  >{{
-                    $t('admin.rolle.rollenFound', { count: rolleStore.totalRollen }, rolleStore.totalRollen)
-                  }}</span
+                  >{{ $t('admin.rolle.rollenFound', { count: rolleStore.totalRollen }, rolleStore.totalRollen) }}</span
                 >
               </v-list-item>
             </template>
