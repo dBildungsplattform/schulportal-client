@@ -38,6 +38,7 @@
 
   const searchInputSchulen: Ref<string> = ref('');
   const searchInputKlassen: Ref<string> = ref('');
+  const isSchuleDropdownDisabled: Ref<boolean> = ref(false);
 
   const schulen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
     return organisationStore.allOrganisationen
@@ -65,6 +66,9 @@
       selectedKlassen.value = [];
       klassenOptions.value = [];
       organisationStore.totalKlassen = 0;
+
+      // Re-enable the dropdown
+      isSchuleDropdownDisabled.value = false;
       // Fetch all Klassen when no Schule is selected
       await organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Klasse });
       finalKlassen.value = organisationStore.allKlassen;
@@ -104,11 +108,11 @@
     if (newValue.length >= 1 && selectedSchule.value !== null) {
       // Fetch Klassen for the selected Schule matching the search string
       await organisationStore.getKlassenByOrganisationId(selectedSchule.value, newValue);
-      finalKlassen.value = organisationStore.klassen;
+
     } else if (selectedSchule.value !== null) {
       // Fetch all Klassen for the selected Schule when the search string is cleared
       await organisationStore.getKlassenByOrganisationId(selectedSchule.value);
-      finalKlassen.value = organisationStore.klassen;
+
     }
   });
 
@@ -154,6 +158,7 @@
         if (selectedSchule.value) {
           await organisationStore.getKlassenByOrganisationId(selectedSchule.value);
           finalKlassen.value = organisationStore.klassen;
+          isSchuleDropdownDisabled.value = true;
         }
       }
     }
@@ -215,6 +220,7 @@
             variant="outlined"
             v-model="selectedSchule"
             v-model:search="searchInputSchulen"
+            :disabled="isSchuleDropdownDisabled"
           >
             <template v-slot:prepend-item>
               <v-list-item>

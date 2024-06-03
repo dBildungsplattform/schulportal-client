@@ -137,7 +137,7 @@
   }
 
   async function navigateToKlasseManagement(): Promise<void> {
-    await router.push({ name: 'rolle-management' });
+    await router.push({ name: 'klasse-management' });
     organisationStore.createdOrganisation = null;
   }
 
