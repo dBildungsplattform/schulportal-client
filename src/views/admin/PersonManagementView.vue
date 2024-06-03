@@ -111,9 +111,9 @@
     () => selectedSchulen.value.length > 0 || selectedRollen.value.length > 0 || searchFilter.value.length > 0,
   );
 
-  function applySearchAndFilters(): void {
+  function applySearchAndFilters(organisations?: Array<string>): void {
     personStore.getAllPersons({
-      organisationIDs: selectedSchulen.value.concat(selectedKlassen.value),
+      organisationIDs: organisations ? organisations : selectedSchulen.value,
       rolleIDs: selectedRollen.value,
       searchFilter: searchFilter.value,
     });
@@ -212,17 +212,25 @@
     }, 500);
   }
 
-  watch(selectedSchulen, async (_newValue: Array<string>, _oldValue: Array<string>) => {
-    let filteredKlassen: Array<string> = [];
+  watch(selectedKlassen, async (newValue: Array<string>, _oldValue: Array<string>) => {
+    if (!newValue.length) {
+      applySearchAndFilters();
+      return;
+    }
+
+    applySearchAndFilters(selectedKlassen.value);
+  });
+
+  watch(selectedSchulen, async (newValue: Array<string>, _oldValue: Array<string>) => {
+    if (!newValue.length) {
+      selectedKlassen.value = [];
+    }
     if (selectedSchulen.value.length) {
       selectedSchulen.value.forEach(async (schuleId: string) => {
         await organisationStore.getKlassenByOrganisationId(schuleId, searchInputKlassen.value);
-        filteredKlassen.concat(organisationStore.klassen.map((klasse: Organisation) => klasse.id))
       });
-      
-      debugger
     }
-    applySearchAndFilters(filteredKlassen);
+    applySearchAndFilters();
   });
 
   watch(selectedRollen, async (_newValue: Array<string>, _oldValue: Array<string>) => {
@@ -318,19 +326,13 @@
                   indeterminate
                   v-if="organisationStore.loading"
                 ></v-progress-circular>
-                <!-- <span
+                <span
                   v-else
                   class="filter-header"
                   >{{
                     organisationStore.totalOrganisationen === 1
                       ? $t('admin.schule.schuleFound', { total: organisationStore.totalOrganisationen })
                       : $t('admin.schule.schulenFound', { total: organisationStore.totalOrganisationen })
-                  }}</span -->
-                <span
-                  v-else
-                  class="filter-header"
-                  >{{
-                    $t('admin.schule.schulenFound', { count: organisationStore.totalOrganisationen }, organisationStore.totalOrganisationen)
                   }}</span>
               </v-list-item>
             </template>
