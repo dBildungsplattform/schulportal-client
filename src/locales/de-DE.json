@@ -290,7 +290,9 @@
     "all": "Alle",
     "pageText": "{interval} von {total} Einträgen"
   },
+  "pleaseSelect": "Bitte auswählen",
   "person": {
+    "editZuordnungen": "Zuordnungen bearbeiten:",
     "email": "E-Mail",
     "enterFirstName": "Vorname eingeben",
     "enterLastName": "Nachname eingeben",
@@ -305,6 +307,7 @@
     "userName": "Benutzername",
     "zuordnungen": "Zuordnung(en)"
   },
+  "save":"Speichern",
   "unsavedChanges": {
     "message": "Sie haben nicht gespeicherte Änderungen vorgenommen. Wollen Sie die Seite trotzdem verlassen?",
     "title": "Änderungen vorgenommen"

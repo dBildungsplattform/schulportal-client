@@ -14,7 +14,7 @@
   } from '@/stores/PersonenkontextStore';
   import { OrganisationsTyp } from '@/stores/OrganisationStore';
   import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
-  import { useDisplay } from 'vuetify/lib/framework.mjs';
+  import { useDisplay } from 'vuetify';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
@@ -26,6 +26,8 @@
   const authStore: AuthStore = useAuthStore();
 
   const password: Ref<string> = ref('');
+
+  const isEditActive: Ref<boolean> = ref(false);
 
   function navigateToPersonTable(): void {
     router.push({ name: 'person-management' });
@@ -56,6 +58,11 @@
   const handleAlertClose = (): void => {
     personStore.errorCode = '';
     navigateToPersonTable();
+  };
+
+  const triggerEdit = (): void => {
+    console.log('hahaxd');
+    isEditActive.value = true;
   };
 
   const zuordnungenResult: Ref<Zuordnung[] | undefined> = ref<Zuordnung[] | undefined>(undefined);
@@ -279,23 +286,27 @@
           thickness="6"
         ></v-divider>
         <!-- Zuordnungen -->
-        <v-container class="person-zuordnungen">
+        <v-container
+          v-if="!isEditActive"
+          class="person-zuordnungen"
+        >
           <v-row class="ml-md-16">
             <v-col
               cols="12"
-              md="auto"
+              sm="auto"
             >
               <h3 class="subtitle-1">{{ $t('person.zuordnungen') }}</h3>
             </v-col>
-
+            <v-spacer></v-spacer>
             <v-col
               cols="12"
-              sm="4"
-              md="6"
+              sm="6"
+              md="auto"
             >
               <v-btn
-                class="primary button ml-md-5"
+                class="primary ml-lg-8 mr-lg-16 mr-sm-3"
                 data-testid="zuordnung-edit"
+                @click="triggerEdit"
                 :block="mdAndDown"
               >
                 {{ $t('edit') }}
@@ -332,6 +343,71 @@
             </v-col>
           </v-row>
         </v-container>
+        <!-- Show this template if the edit button is active-->
+        <v-container v-if="isEditActive">
+          <v-row class="ml-md-16">
+            <v-col
+              cols="12"
+              sm="auto"
+            >
+              <h3 class="subtitle-1">{{ $t('person.editZuordnungen') }} {{ $t('pleaseSelect') }}</h3>
+            </v-col>
+            <v-spacer></v-spacer>
+            <v-col
+              cols="12"
+              sm="6"
+              md="auto"
+            >
+              <v-btn
+                class="primary ml-lg-8 mr-lg-16 mr-sm-6"
+                data-testid="zuordnung-edit"
+                @onClick="triggerEdit"
+                :block="mdAndDown"
+              >
+                {{ $t('save') }}
+              </v-btn>
+            </v-col>
+          </v-row>
+          <v-row
+            justify="end"
+            class="mr-lg-10"
+          >
+            <div class="d-flex justify-sm-end">
+              <v-col
+                cols="12"
+                md="auto"
+              >
+                <v-btn
+                  class="primary"
+                  data-testid="zuordnung-edit"
+                  @onClick="triggerEdit"
+                  :block="mdAndDown"
+                >
+                  {{ $t('cancel') }}
+                </v-btn>
+              </v-col>
+            </div></v-row
+          >
+          <!-- Check if 'zuordnungen' array exists and has length > 0 -->
+          <v-row
+            v-if="
+              personenKontextStore.personenuebersicht?.zuordnungen &&
+              personenKontextStore.personenuebersicht?.zuordnungen.length > 0
+            "
+          >
+            <v-col
+              cols="10"
+              offset-lg="2"
+              offset="1"
+              v-for="zuordnung in getZuordnungen"
+              :key="zuordnung.sskId"
+              :data-testid="`person-zuordnung-${zuordnung.sskId}`"
+              :title="zuordnung.sskName"
+            >
+              {{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }} {{ zuordnung.klasse }}
+            </v-col>
+          </v-row>
+        </v-container>
         <v-divider
           class="border-opacity-100 rounded my-6 mx-4"
           color="#E5EAEF"
@@ -353,6 +429,7 @@
           >
             <v-col
               cols="12"
+              sm="6"
               md="auto"
               v-if="personStore.currentPerson"
             >
