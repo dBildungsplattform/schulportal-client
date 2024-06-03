@@ -284,14 +284,6 @@
                   indeterminate
                   v-if="organisationStore.loading"
                 ></v-progress-circular>
-                <!-- <span
-                  v-else
-                  class="filter-header"
-                  >{{
-                    organisationStore.totalOrganisationen === 1
-                      ? $t('admin.schule.schuleFound', { total: organisationStore.totalOrganisationen })
-                      : $t('admin.schule.schulenFound', { total: organisationStore.totalOrganisationen })
-                  }}</span -->
                 <span
                   v-else
                   class="filter-header"
@@ -346,9 +338,7 @@
                   v-else
                   class="filter-header"
                   >{{
-                    rolleStore.totalRollen === 1
-                      ? $t('admin.rolle.rolleFound', { total: rolleStore.totalRollen })
-                      : $t('admin.rolle.rollenFound', { total: rolleStore.totalRollen })
+                    $t('admin.rolle.rollenFound', { count: rolleStore.totalRollen }, rolleStore.totalRollen)
                   }}</span
                 >
               </v-list-item>

@@ -93,7 +93,7 @@ export const useOrganisationStore: StoreDefinition<
           filter?.excludeTyp,
         );
         this.allOrganisationen = response.data;
-        this.totalOrganisationen = response.headers['x-paging-total'];
+        this.totalOrganisationen = +response.headers['x-paging-total'];
         this.loading = false;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';

@@ -131,7 +131,7 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
           searchString,
         );
         this.allRollen = response.data;
-        this.totalRollen = response.headers['x-paging-total'];
+        this.totalRollen = +response.headers['x-paging-total'];
         this.loading = false;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
