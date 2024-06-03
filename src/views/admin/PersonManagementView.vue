@@ -333,7 +333,8 @@
                     organisationStore.totalOrganisationen === 1
                       ? $t('admin.schule.schuleFound', { total: organisationStore.totalOrganisationen })
                       : $t('admin.schule.schulenFound', { total: organisationStore.totalOrganisationen })
-                  }}</span>
+                  }}</span
+                >
               </v-list-item>
             </template>
             <template v-slot:selection="{ item, index }">
