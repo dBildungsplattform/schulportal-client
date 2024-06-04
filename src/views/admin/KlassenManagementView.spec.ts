@@ -5,9 +5,32 @@ import MockAdapter from 'axios-mock-adapter';
 import ApiService from '@/services/ApiService';
 import KlassenManagementView from './KlassenManagementView.vue';
 import { nextTick } from 'vue';
+import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
 
 const mockadapter: MockAdapter = new MockAdapter(ApiService);
 let wrapper: VueWrapper | null = null;
+const organisationStore: OrganisationStore = useOrganisationStore();
+
+organisationStore.allKlassen = [
+  {
+    id: '1',
+    name: '9a',
+    kennung: '9356494-9a',
+    namensergaenzung: 'Klasse',
+    kuerzel: 'aehg',
+    typ: 'KLASSE',
+    administriertVon: '1',
+  },
+  {
+    id: '1',
+    name: '9b',
+    kennung: '9356494-9b',
+    namensergaenzung: 'Klasse',
+    kuerzel: 'aehg',
+    typ: 'KLASSE',
+    administriertVon: '1',
+  },
+];
 beforeEach(() => {
   mockadapter.reset();
 
