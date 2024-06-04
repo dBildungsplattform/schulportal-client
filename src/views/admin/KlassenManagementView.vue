@@ -145,7 +145,7 @@
   // Checks if the filter is active or not
   const filterActive: Ref<boolean> = computed(() => !!selectedSchule.value || selectedKlassen.value.length > 0);
 
-  function resetSearchAndFilter(): void {
+  async function resetSearchAndFilter(): Promise<void> {
     // Clear search input for Klassen
     searchInputKlassen.value = '';
     // Clear selected Klassen
@@ -165,11 +165,9 @@
       // Reset klassenOptions
       klassenOptions.value = [];
       // Refetch all data
-      organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Schule }).then(() => {
-        organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Klasse }).then(() => {
-          finalKlassen.value = organisationStore.allKlassen;
-        });
-      });
+      await organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Schule });
+      await organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Klasse });
+      finalKlassen.value = organisationStore.allKlassen;
     }
   }
 
