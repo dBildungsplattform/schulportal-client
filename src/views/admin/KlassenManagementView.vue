@@ -46,8 +46,11 @@
 
   const searchInputSchulen: Ref<string> = ref('');
   const searchInputKlassen: Ref<string> = ref('');
-  const isSchuleDropdownDisabled: Ref<boolean> = ref(false);
-  const isResetSchuleButtonDisabled: Ref<boolean> = ref(false);
+  const hasAutoselectedSchule: Ref<boolean> = ref(false);
+
+  const schuleMap: Ref<
+    Map<string, string | null | undefined> & Omit<Map<string, string | null | undefined>, keyof Map<never, never>>
+  > = ref(new Map<string, string | null | undefined>());
 
   const schulen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
     return organisationStore.allOrganisationen
@@ -58,6 +61,10 @@
       .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
   });
 
+  async function fetchSchuleMap(): Promise<Map<string, string | null | undefined>> {
+    await organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Schule });
+    return new Map(organisationStore.allOrganisationen.map((org: Organisation) => [org.id, org.kennung]));
+  }
   // Watcher to update Klassen and options when Schule is selected or unselected
   watch(selectedSchule, async (newValue: string | null, oldValue: string | null) => {
     if (newValue !== oldValue && newValue !== null) {
@@ -68,23 +75,42 @@
         value: org.id,
         title: org.name,
       }));
+
       // Update finalKlassen to show in the table
-      finalKlassen.value = organisationStore.klassen;
+      finalKlassen.value = organisationStore.klassen.map((klasse: Organisation) => {
+        const schuleKennung: string | null | undefined = schuleMap.value.get(klasse.administriertVon || '---');
+        const schuleName: string | undefined = organisationStore.allOrganisationen.find(
+          (org: Organisation) => org.id === klasse.administriertVon,
+        )?.name;
+        return {
+          ...klasse,
+          schuleKennung: schuleKennung ? `${schuleKennung} (${schuleName})` : '---',
+        };
+      });
     } else {
       // Reset selectedKlassen and klassenOptions when Schule is unselected
       selectedKlassen.value = [];
       klassenOptions.value = [];
       organisationStore.totalKlassen = 0;
 
-      // Re-enable the dropdown
-      isSchuleDropdownDisabled.value = false;
       // Fetch all Klassen when no Schule is selected
       await organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Klasse });
       klassenOptions.value = organisationStore.allKlassen.map((org: Organisation) => ({
         value: org.id,
         title: org.name,
       }));
-      finalKlassen.value = organisationStore.allKlassen;
+
+      // Update finalKlassen to include schuleKennung
+      finalKlassen.value = organisationStore.allKlassen.map((klasse: Organisation) => {
+        const schuleKennung: string | null | undefined = schuleMap.value.get(klasse.administriertVon || '---');
+        const schuleName: string | undefined = organisationStore.allOrganisationen.find(
+          (org: Organisation) => org.id === klasse.administriertVon,
+        )?.name;
+        return {
+          ...klasse,
+          schuleKennung: schuleKennung ? `${schuleKennung} (${schuleName})` : '---',
+        };
+      });
     }
   });
 
@@ -93,18 +119,56 @@
     if (newValue !== oldValue) {
       if (newValue && newValue.length > 0 && selectedSchule.value !== null) {
         // Filter finalKlassen to only include the selected Klassen
-        finalKlassen.value = organisationStore.klassen.filter((klasse: Organisation) => newValue.includes(klasse.id));
+        finalKlassen.value = organisationStore.klassen
+          .filter((klasse: Organisation) => newValue.includes(klasse.id))
+          .map((klasse: Organisation) => {
+            const schuleKennung: string | null | undefined = schuleMap.value.get(klasse.administriertVon || '---');
+            const schuleName: string | undefined = organisationStore.allOrganisationen.find(
+              (org) => org.id === klasse.administriertVon,
+            )?.name;
+            return {
+              ...klasse,
+              schuleKennung: schuleKennung ? `${schuleKennung} (${schuleName})` : '---',
+            };
+          });
       } else if (newValue && newValue.length > 0 && selectedSchule.value === null) {
-        finalKlassen.value = organisationStore.allKlassen.filter((klasse: Organisation) =>
-          newValue.includes(klasse.id),
-        );
+        finalKlassen.value = organisationStore.allKlassen
+          .filter((klasse: Organisation) => newValue.includes(klasse.id))
+          .map((klasse: Organisation) => {
+            const schuleKennung: string | null | undefined = schuleMap.value.get(klasse.administriertVon || '---');
+            const schuleName: string | undefined = organisationStore.allOrganisationen.find(
+              (org: Organisation) => org.id === klasse.administriertVon,
+            )?.name;
+            return {
+              ...klasse,
+              schuleKennung: schuleKennung ? `${schuleKennung} (${schuleName})` : '---',
+            };
+          });
       } else if (selectedSchule.value !== null) {
         // If no Klassen are selected but a Schule is selected, show all Klassen for the selected Schule
-        finalKlassen.value = organisationStore.klassen;
+        finalKlassen.value = organisationStore.klassen.map((klasse: Organisation) => {
+          const schuleKennung: string | null | undefined = schuleMap.value.get(klasse.administriertVon || '---');
+          const schuleName: string | undefined = organisationStore.allOrganisationen.find(
+            (org: Organisation) => org.id === klasse.administriertVon,
+          )?.name;
+          return {
+            ...klasse,
+            schuleKennung: schuleKennung ? `${schuleKennung} (${schuleName})` : '---',
+          };
+        });
       } else {
         // If no Klassen and no Schule are selected, show all Klassen
         await organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Klasse });
-        finalKlassen.value = organisationStore.allKlassen;
+        finalKlassen.value = organisationStore.allKlassen.map((klasse: Organisation) => {
+          const schuleKennung: string | null | undefined = schuleMap.value.get(klasse.administriertVon || '---');
+          const schuleName: string | undefined = organisationStore.allOrganisationen.find(
+            (org: Organisation) => org.id === klasse.administriertVon,
+          )?.name;
+          return {
+            ...klasse,
+            schuleKennung: schuleKennung ? `${schuleKennung} (${schuleName})` : '---',
+          };
+        });
       }
     }
   });
@@ -138,6 +202,7 @@
       // Fetch all Klassen for the selected Schule when the search string is cleared
       await organisationStore.getAllOrganisationen({
         administriertVon: [selectedSchule.value],
+        includeTyp: OrganisationsTyp.Klasse,
       });
     }
   });
@@ -152,7 +217,7 @@
     selectedKlassen.value = [];
 
     // If the user has an autoselected Schule, do not reset it
-    if (isResetSchuleButtonDisabled.value && selectedSchule.value !== null) {
+    if (hasAutoselectedSchule.value && selectedSchule.value !== null) {
       // Fetch all Klassen for the selected Schule
       organisationStore.getKlassenByOrganisationId(selectedSchule.value).then(() => {
         finalKlassen.value = organisationStore.klassen;
@@ -168,6 +233,10 @@
       await organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Schule });
       await organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Klasse });
       finalKlassen.value = organisationStore.allKlassen;
+      finalKlassen.value = organisationStore.allKlassen.map((klasse: Organisation) => ({
+        ...klasse,
+        schuleKennung: schuleMap.value.get(klasse.administriertVon || ''),
+      }));
     }
   }
 
@@ -179,6 +248,10 @@
       value: org.id,
       title: org.name,
     }));
+
+    // Fetch Schule map
+    // Fetch Schule map
+    schuleMap.value = await fetchSchuleMap();
 
     // Autoselect the Schule for the current user that only has 1 Schule assigned to him.
     const personenkontexte: Array<UserinfoPersonenkontext> | null = authStore.currentUser?.personenkontexte || [];
@@ -194,19 +267,30 @@
         selectedSchule.value = matchedOrganisation?.organisationsId || null;
         if (selectedSchule.value) {
           await organisationStore.getKlassenByOrganisationId(selectedSchule.value);
-          finalKlassen.value = organisationStore.klassen;
-          isSchuleDropdownDisabled.value = true;
-          isResetSchuleButtonDisabled.value = true; // Disable reset button
+          finalKlassen.value = organisationStore.klassen.map((klasse: Organisation) => ({
+            ...klasse,
+            schuleKennung: schuleMap.value.get(klasse.administriertVon || '---'),
+          }));
+          hasAutoselectedSchule.value = true;
         }
       } else {
         headers.value.unshift({
           title: t('admin.schule.dienststellennummer'),
-          key: 'kennung',
+          key: 'schuleKennung',
           align: 'start',
         } as DataTableHeader);
       }
     }
-    finalKlassen.value = organisationStore.allKlassen;
+    finalKlassen.value = organisationStore.allKlassen.map((klasse: Organisation) => {
+      const schuleKennung: string | null | undefined = schuleMap.value.get(klasse.administriertVon || '---');
+      const schuleName: string | undefined = organisationStore.allOrganisationen.find(
+        (org: Organisation) => org.id === klasse.administriertVon,
+      )?.name;
+      return {
+        ...klasse,
+        schuleKennung: schuleKennung ? `${schuleKennung} (${schuleName})` : '---',
+      };
+    });
   });
 </script>
 
@@ -265,7 +349,7 @@
             variant="outlined"
             v-model="selectedSchule"
             v-model:search="searchInputSchulen"
-            :disabled="isSchuleDropdownDisabled"
+            :disabled="hasAutoselectedSchule"
           >
             <template v-slot:prepend-item>
               <v-list-item>
@@ -343,7 +427,16 @@
         :totalItems="organisationStore.allKlassen.length"
         item-value-path="id"
         :disableRowClick="true"
-      />
+      >
+        <template v-slot:[`item.schuleKennung`]="{ item }">
+          <div
+            class="ellipsis-wrapper"
+            :title="item.schuleKennung"
+          >
+            {{ item.schuleKennung }}
+          </div>
+        </template></ResultTable
+      >
     </LayoutCard>
   </div>
 </template>
