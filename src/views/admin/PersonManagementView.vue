@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { computed, onMounted, type ComputedRef, watch, type Ref, ref } from 'vue';
+  import { computed, onMounted, type ComputedRef, type Ref, ref } from 'vue';
   import { type Composer, useI18n } from 'vue-i18n';
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
   import { type Router, useRouter } from 'vue-router';
@@ -36,6 +36,7 @@
   const { t }: Composer = useI18n({ useScope: 'global' });
 
   let timerId: ReturnType<typeof setTimeout>;
+  const hasAutoselectedSchule: Ref<boolean> = ref(false);
 
   type ReadonlyHeaders = InstanceType<typeof VDataTableServer>['headers'];
   const headers: ReadonlyHeaders = [
@@ -95,29 +96,38 @@
   const selectedStatus: Ref<string | null> = ref(null);
   const searchFilter: Ref<string> = ref('');
 
-  let matchingOrganisations: Ref<Array<UserinfoPersonenkontext>> = ref([]);
-
   const filterOrSearchActive: Ref<boolean> = computed(
     () => selectedSchulen.value.length > 0 || selectedRollen.value.length > 0 || searchFilter.value.length > 0,
   );
 
-  function matchOrganisations(): void {
+  function autoSelectSchule(): void {
     const personenkontexte: Array<UserinfoPersonenkontext> | null = authStore.currentUser?.personenkontexte || [];
 
     // Autoselect the Schule for the current user that only has 1 Schule assigned to him.
     if (personenkontexte.length > 0) {
-      matchingOrganisations.value = personenkontexte.filter(
+      const matchingOrganisations: UserinfoPersonenkontext[] = personenkontexte.filter(
         (kontext: UserinfoPersonenkontext) =>
           organisationStore.allOrganisationen.some((org: Organisation) => org.id === kontext.organisationsId),
       );
-      if (matchingOrganisations.value.length === 1) {
-        const matchedOrganisation: UserinfoPersonenkontext | undefined = matchingOrganisations.value[0];
+      if (matchingOrganisations.length === 1) {
+        const matchedOrganisation: UserinfoPersonenkontext | undefined = matchingOrganisations[0];
         selectedSchulen.value = [matchedOrganisation?.organisationsId || ''];
+        hasAutoselectedSchule.value = true;
       }
     }
   };
 
-  function applySearchAndFilters(): void {
+  async function setSchuleFilter(newValue: Array<string>): Promise<void> {
+    await searchFilterStore.setFilter(searchFilter.value, newValue, selectedRollen.value);
+    applySearchAndFilters();
+  }
+
+  async function setRolleFilter(newValue: Array<string>): Promise<void> {
+    await searchFilterStore.setFilter(searchFilter.value, selectedSchulen.value, newValue);
+    applySearchAndFilters();
+  }
+
+  async function applySearchAndFilters(): Promise<void> {
     personStore.getAllPersons({
       organisationIDs: selectedSchulen.value,
       rolleIDs: selectedRollen.value,
@@ -132,7 +142,7 @@
   function resetSearchAndFilter(): void {
     searchFilter.value = '';
     searchFieldComponent.value.searchFilter = '';
-    if (matchingOrganisations.value.length > 1) {
+    if (!hasAutoselectedSchule) {
       selectedSchulen.value = [];
     }
     searchInputSchulen.value = '';
@@ -210,23 +220,19 @@
     }, 500);
   }
 
-  watch(selectedSchulen, async (_newValue: Array<string>, _oldValue: Array<string>) => {
-    applySearchAndFilters();
-  });
-
-  watch(selectedRollen, async (_newValue: Array<string>, _oldValue: Array<string>) => {
-    applySearchAndFilters();
-  });
-
   onMounted(async () => {
-    if (searchFilterStore.searchFilter === '') {
+    if (!filterOrSearchActive) {
       await personStore.getAllPersons({});
+    } else {
+      selectedSchulen.value = searchFilterStore.selectedSchulen || [];
+      selectedRollen.value = searchFilterStore.selectedRollen || [];
     }
+    
     await organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Schule });
     await personenkontextStore.getAllPersonenuebersichten();
     await rolleStore.getAllRollen('');
 
-    matchOrganisations();
+    autoSelectSchule();
   });
 </script>
 
@@ -273,7 +279,7 @@
             clearable
             data-testid="schule-select"
             density="compact"
-            :disabled="matchingOrganisations.length === 1"
+            :disabled="hasAutoselectedSchule"
             hide-details
             id="schule-select"
             :items="schulen"
@@ -283,6 +289,7 @@
             :no-data-text="$t('noDataFound')"
             :placeholder="$t('admin.schule.schule')"
             required="true"
+            @update:modelValue="setSchuleFilter"
             @update:search="updateSchulenSearch"
             variant="outlined"
             v-model="selectedSchulen"
@@ -338,6 +345,7 @@
             :no-data-text="$t('noDataFound')"
             :placeholder="$t('admin.rolle.rolle')"
             required="true"
+            @update:modelValue="setRolleFilter"
             @update:search="updateRollenSearch"
             variant="outlined"
             v-model="selectedRollen"
