@@ -61,6 +61,7 @@
       .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
   });
 
+  // Create a map that holds all Schulen with their id, kennung and name
   async function fetchSchuleMap(): Promise<Map<string, string>> {
     await organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Schule });
     return new Map(
@@ -68,10 +69,11 @@
     );
   }
 
-  function getSchuleDetails(klasse: Organisation): { schuleKennung: string } {
-    const schuleKennung: string | null | undefined = schuleMap.value.get(klasse.administriertVon || '---');
+  // Retrieve the parent Schule from the Klasse using the map's key
+  function getSchuleDetails(klasse: Organisation): { schuleDetails: string } {
+    const schuleDetails: string | undefined = schuleMap.value.get(klasse.administriertVon || '') ?? '---';
     return {
-      schuleKennung: schuleKennung ? schuleKennung : '---',
+      schuleDetails,
     };
   }
 
