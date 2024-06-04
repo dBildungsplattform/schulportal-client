@@ -47,6 +47,7 @@
   const searchInputSchulen: Ref<string> = ref('');
   const searchInputKlassen: Ref<string> = ref('');
   const isSchuleDropdownDisabled: Ref<boolean> = ref(false);
+  const isResetSchuleButtonDisabled: Ref<boolean> = ref(false);
 
   const schulen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
     return organisationStore.allOrganisationen
@@ -144,21 +145,34 @@
   // Checks if the filter is active or not
   const filterActive: Ref<boolean> = computed(() => !!selectedSchule.value || selectedKlassen.value.length > 0);
 
-  async function resetSearchAndFilter(): Promise<void> {
-    // Clear search inputs
-    searchInputSchulen.value = '';
+  function resetSearchAndFilter(): void {
+    // Clear search input for Klassen
     searchInputKlassen.value = '';
-
-    // Clear selected values
-    selectedSchule.value = null;
+    // Clear selected Klassen
     selectedKlassen.value = [];
 
-    // Refetch all data
-    await organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Schule });
-    await organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Klasse });
-    finalKlassen.value = organisationStore.allKlassen;
-
+    // If the user has an autoselected Schule, do not reset it
+    if (isResetSchuleButtonDisabled.value && selectedSchule.value !== null) {
+      // Fetch all Klassen for the selected Schule
+      organisationStore.getKlassenByOrganisationId(selectedSchule.value).then(() => {
+        finalKlassen.value = organisationStore.klassen;
+      });
+    } else {
+      // Clear search input for Schulen
+      searchInputSchulen.value = '';
+      // Clear selected Schule
+      selectedSchule.value = null;
+      // Reset klassenOptions
+      klassenOptions.value = [];
+      // Refetch all data
+      organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Schule }).then(() => {
+        organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Klasse }).then(() => {
+          finalKlassen.value = organisationStore.allKlassen;
+        });
+      });
+    }
   }
+
   onMounted(async () => {
     await organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Schule });
     await organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Klasse });
@@ -184,6 +198,7 @@
           await organisationStore.getKlassenByOrganisationId(selectedSchule.value);
           finalKlassen.value = organisationStore.klassen;
           isSchuleDropdownDisabled.value = true;
+          isResetSchuleButtonDisabled.value = true; // Disable reset button
         }
       } else {
         headers.value.unshift({
