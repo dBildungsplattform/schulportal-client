@@ -97,7 +97,10 @@
   const searchFilter: Ref<string> = ref('');
 
   const filterOrSearchActive: Ref<boolean> = computed(
-    () => (!hasAutoselectedSchule.value && selectedSchulen.value.length > 0) || selectedRollen.value.length > 0 || searchFilter.value.length > 0,
+    () =>
+      (!hasAutoselectedSchule.value && selectedSchulen.value.length > 0) ||
+      selectedRollen.value.length > 0 ||
+      searchFilter.value.length > 0,
   );
 
   function autoSelectSchule(): void {
@@ -115,7 +118,15 @@
         hasAutoselectedSchule.value = true;
       }
     }
-  };
+  }
+
+  async function applySearchAndFilters(): Promise<void> {
+    personStore.getAllPersons({
+      organisationIDs: selectedSchulen.value,
+      rolleIDs: selectedRollen.value,
+      searchFilter: searchFilter.value,
+    });
+  }
 
   async function setSchuleFilter(newValue: Array<string>): Promise<void> {
     await searchFilterStore.setFilter(searchFilter.value, newValue, selectedRollen.value);
@@ -125,14 +136,6 @@
   async function setRolleFilter(newValue: Array<string>): Promise<void> {
     await searchFilterStore.setFilter(searchFilter.value, selectedSchulen.value, newValue);
     applySearchAndFilters();
-  }
-
-  async function applySearchAndFilters(): Promise<void> {
-    personStore.getAllPersons({
-      organisationIDs: selectedSchulen.value,
-      rolleIDs: selectedRollen.value,
-      searchFilter: searchFilter.value,
-    });
   }
 
   function navigateToPersonDetails(_$event: PointerEvent, { item }: { item: Personendatensatz }): void {
@@ -221,13 +224,13 @@
   }
 
   onMounted(async () => {
-    if (!filterOrSearchActive) {
+    if (!filterOrSearchActive.value) {
       await personStore.getAllPersons({});
     } else {
       selectedSchulen.value = searchFilterStore.selectedSchulen || [];
       selectedRollen.value = searchFilterStore.selectedRollen || [];
     }
-    
+
     await organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Schule });
     await personenkontextStore.getAllPersonenuebersichten();
     await rolleStore.getAllRollen('');

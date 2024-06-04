@@ -7,7 +7,11 @@ type SearchFilterState = {
 };
 
 type SearchFilterActions = {
-  setFilter: (searchFilter: string | null, selectedSchulen: Array<string> | null, selectedRollen: Array<string> | null) => Promise<void>;
+  setFilter: (
+    searchFilter: string | null,
+    selectedSchulen: Array<string> | null,
+    selectedRollen: Array<string> | null,
+  ) => Promise<void>;
 };
 
 type SearchFilterGetters = {};
@@ -27,7 +31,11 @@ export const useSearchFilterStore: StoreDefinition<
     selectedRollen: [],
   }),
   actions: {
-    async setFilter(searchFilter: string | null, selectedSchulen: Array<string> | null, selectedRollen: Array<string> | null) {
+    async setFilter(
+      searchFilter: string | null,
+      selectedSchulen: Array<string> | null,
+      selectedRollen: Array<string> | null,
+    ) {
       this.searchFilter = searchFilter;
       this.selectedSchulen = selectedSchulen;
       this.selectedRollen = selectedRollen;
