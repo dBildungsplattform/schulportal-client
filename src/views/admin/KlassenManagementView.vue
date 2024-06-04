@@ -150,28 +150,28 @@
   });
 
   // Watcher to search Schulen based on input text
-  watch(searchInputSchulen, async (newValue: string, _oldValue: string) => {
-    if (newValue.length >= 1) {
+  async function updateSchulenSearch(searchValue: string): Promise<void> {
+    if (searchValue.length >= 1) {
       // Fetch Schulen matching the search string when it has 3 or more characters
-      await organisationStore.getAllOrganisationen({ searchString: newValue, includeTyp: OrganisationsTyp.Schule });
+      await organisationStore.getAllOrganisationen({ searchString: searchValue, includeTyp: OrganisationsTyp.Schule });
     } else {
       // Fetch all Schulen when the search string is less than 3 characters
       await organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Schule });
     }
-  });
+  };
 
   // Watcher to search Klassen based on input text
-  watch(searchInputKlassen, async (newValue: string, _oldValue: string) => {
-    if (newValue.length >= 1 && selectedSchule.value !== null) {
+  async function updateKlassenSearch(searchValue: string): Promise<void> {
+    if (searchValue.length >= 1 && selectedSchule.value !== null) {
       // Fetch Klassen matching the search string and selected schule
       await organisationStore.getAllOrganisationen({
         administriertVon: [selectedSchule.value],
-        searchString: newValue,
+        searchString: searchValue,
         includeTyp: OrganisationsTyp.Klasse,
       });
-    } else if (newValue.length >= 1 && selectedSchule.value === null) {
+    } else if (searchValue.length >= 1 && selectedSchule.value === null) {
       await organisationStore.getAllOrganisationen({
-        searchString: newValue,
+        searchString: searchValue,
         includeTyp: OrganisationsTyp.Klasse,
       });
     } else if (selectedSchule.value !== null) {
@@ -181,7 +181,7 @@
         includeTyp: OrganisationsTyp.Klasse,
       });
     }
-  });
+  };
 
   // Checks if the filter is active or not
   const filterActive: Ref<boolean> = computed(() => !!selectedSchule.value || selectedKlassen.value.length > 0);
@@ -326,6 +326,7 @@
             :placeholder="$t('admin.schule.schule')"
             ref="schule-select"
             required="true"
+            @update:search="updateSchulenSearch"
             variant="outlined"
             v-model="selectedSchule"
             v-model:search="searchInputSchulen"
@@ -372,6 +373,7 @@
             :no-data-text="$t('noDataFound')"
             :placeholder="$t('admin.klasse.klasse')"
             required="true"
+            @update:search="updateKlassenSearch"
             variant="outlined"
             v-model="selectedKlassen"
             v-model:search="searchInputKlassen"
