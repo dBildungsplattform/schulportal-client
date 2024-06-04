@@ -95,9 +95,27 @@
   const selectedStatus: Ref<string | null> = ref(null);
   const searchFilter: Ref<string> = ref('');
 
+  let matchingOrganisations: Ref<Array<UserinfoPersonenkontext>> = ref([]);
+
   const filterOrSearchActive: Ref<boolean> = computed(
     () => selectedSchulen.value.length > 0 || selectedRollen.value.length > 0 || searchFilter.value.length > 0,
   );
+
+  function matchOrganisations(): void {
+    const personenkontexte: Array<UserinfoPersonenkontext> | null = authStore.currentUser?.personenkontexte || [];
+
+    // Autoselect the Schule for the current user that only has 1 Schule assigned to him.
+    if (personenkontexte.length > 0) {
+      matchingOrganisations.value = personenkontexte.filter(
+        (kontext: UserinfoPersonenkontext) =>
+          organisationStore.allOrganisationen.some((org: Organisation) => org.id === kontext.organisationsId),
+      );
+      if (matchingOrganisations.value.length === 1) {
+        const matchedOrganisation: UserinfoPersonenkontext | undefined = matchingOrganisations.value[0];
+        selectedSchulen.value = [matchedOrganisation?.organisationsId || ''];
+      }
+    }
+  };
 
   function applySearchAndFilters(): void {
     personStore.getAllPersons({
@@ -114,10 +132,12 @@
   function resetSearchAndFilter(): void {
     searchFilter.value = '';
     searchFieldComponent.value.searchFilter = '';
+    if (matchingOrganisations.value.length > 1) {
+      selectedSchulen.value = [];
+    }
     searchInputSchulen.value = '';
     searchInputRollen.value = '';
     searchInputKlassen.value = '';
-    selectedSchulen.value = [];
     selectedRollen.value = [];
     selectedKlassen.value = [];
     selectedStatus.value = null;
@@ -206,18 +226,7 @@
     await personenkontextStore.getAllPersonenuebersichten();
     await rolleStore.getAllRollen('');
 
-    // Autoselect the Schule for the current user that only has 1 Schule assigned to him.
-    const personenkontexte: Array<UserinfoPersonenkontext> | null = authStore.currentUser?.personenkontexte || [];
-    if (personenkontexte.length > 0) {
-      const matchingOrganisations: UserinfoPersonenkontext[] = personenkontexte.filter(
-        (kontext: UserinfoPersonenkontext) =>
-          organisationStore.allOrganisationen.some((org: Organisation) => org.id === kontext.organisationsId),
-      );
-      if (matchingOrganisations.length === 1) {
-        const matchedOrganisation: UserinfoPersonenkontext | undefined = matchingOrganisations[0];
-        selectedSchulen.value = [matchedOrganisation?.organisationsId || ''];
-      }
-    }
+    matchOrganisations();
   });
 </script>
 
@@ -264,6 +273,7 @@
             clearable
             data-testid="schule-select"
             density="compact"
+            :disabled="matchingOrganisations.length === 1"
             hide-details
             id="schule-select"
             :items="schulen"
