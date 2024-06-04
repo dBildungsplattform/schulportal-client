@@ -99,10 +99,10 @@ export const useOrganisationStore: StoreDefinition<
         );
         if (filter?.includeTyp === OrganisationsTyp.Klasse) {
           this.allKlassen = response.data;
-          this.totalKlassen = response.headers['x-paging-total'];
+          this.totalKlassen = +response.headers['x-paging-total'];
         } else {
           this.allOrganisationen = response.data;
-          this.totalOrganisationen = response.headers['x-paging-total'];
+          this.totalOrganisationen = +response.headers['x-paging-total'];
         }
         this.loading = false;
       } catch (error: unknown) {
@@ -140,7 +140,7 @@ export const useOrganisationStore: StoreDefinition<
           await organisationApi.organisationControllerGetAdministrierteOrganisationen(organisationId, searchFilter);
 
         this.klassen = response.data;
-        this.totalKlassen = response.headers['x-paging-total'];
+        this.totalKlassen = +response.headers['x-paging-total'];
 
         this.loading = false;
       } catch (error: unknown) {

@@ -218,21 +218,9 @@
       }));
     }
   }
-
-  // Mounted lifecycle hook
-  onMounted(async () => {
-    await organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Schule });
-    await organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Klasse });
-    // Initialize klassenOptions with all classes
-    klassenOptions.value = organisationStore.allKlassen.map((org: Organisation) => ({
-      value: org.id,
-      title: org.name,
-    }));
-
-    // Fetch Schule map
-    schuleMap.value = await fetchSchuleMap();
-
-    // Autoselect the Schule for the current user that only has 1 Schule assigned to him.
+  // Checks the current logged in user's kontexte and compares that to the organisations in the DB.
+  // If the user has exactly 1 matching organisation then the Schule will be autoselectd for him.
+  async function handleUserContext(): Promise<void> {
     const personenkontexte: Array<UserinfoPersonenkontext> | null = authStore.currentUser?.personenkontexte || [];
     if (personenkontexte.length > 0) {
       const matchingOrganisations: UserinfoPersonenkontext[] = personenkontexte.filter(
@@ -260,6 +248,24 @@
         } as DataTableHeader);
       }
     }
+  }
+
+  onMounted(async () => {
+    await organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Schule });
+    await organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Klasse });
+    // Initialize klassenOptions with all classes
+    klassenOptions.value = organisationStore.allKlassen.map((org: Organisation) => ({
+      value: org.id,
+      title: org.name,
+    }));
+
+    // Fetch Schule map
+    schuleMap.value = await fetchSchuleMap();
+
+    // Handle user context
+    await handleUserContext();
+
+    // Update finalKlassen with Schule details
     finalKlassen.value = organisationStore.allKlassen.map((klasse: Organisation) => ({
       ...klasse,
       ...getSchuleDetails(klasse),
@@ -310,19 +316,19 @@
             clearable
             data-testid="schule-select"
             density="compact"
+            :disabled="hasAutoselectedSchule"
             hide-details
             id="schule-select"
-            ref="schule-select"
             :items="schulen"
             item-value="value"
             item-text="title"
             :no-data-text="$t('noDataFound')"
             :placeholder="$t('admin.schule.schule')"
+            ref="schule-select"
             required="true"
             variant="outlined"
             v-model="selectedSchule"
             v-model:search="searchInputSchulen"
-            :disabled="hasAutoselectedSchule"
           >
             <template v-slot:prepend-item>
               <v-list-item>
