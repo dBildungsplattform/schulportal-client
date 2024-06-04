@@ -255,7 +255,7 @@
       } else {
         headers.value.unshift({
           title: t('admin.schule.dienststellennummer'),
-          key: 'schuleKennung',
+          key: 'schuleDetails',
           align: 'start',
         } as DataTableHeader);
       }
@@ -401,12 +401,12 @@
         item-value-path="id"
         :disableRowClick="true"
       >
-        <template v-slot:[`item.schuleKennung`]="{ item }">
+        <template v-slot:[`item.schuleDetails`]="{ item }">
           <div
             class="ellipsis-wrapper"
-            :title="item.schuleKennung"
+            :title="item.schuleDetails"
           >
-            {{ item.schuleKennung }}
+            {{ item.schuleDetails }}
           </div>
         </template></ResultTable
       >
