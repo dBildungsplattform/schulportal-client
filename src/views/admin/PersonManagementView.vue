@@ -104,9 +104,9 @@
   );
 
   function autoSelectSchule(): void {
+    // Autoselect the Schule for the current user that only has 1 Schule assigned to him.
     const personenkontexte: Array<UserinfoPersonenkontext> | null = authStore.currentUser?.personenkontexte || [];
 
-    // Autoselect the Schule for the current user that only has 1 Schule assigned to him.
     if (personenkontexte.length > 0) {
       const matchingOrganisations: UserinfoPersonenkontext[] = personenkontexte.filter(
         (kontext: UserinfoPersonenkontext) =>
@@ -145,6 +145,7 @@
   function resetSearchAndFilter(): void {
     searchFilter.value = '';
     searchFieldComponent.value.searchFilter = '';
+    /* do not reset schulen if schule was autoselected */
     if (!hasAutoselectedSchule.value) {
       selectedSchulen.value = [];
     }
