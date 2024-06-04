@@ -97,7 +97,7 @@
   const searchFilter: Ref<string> = ref('');
 
   const filterOrSearchActive: Ref<boolean> = computed(
-    () => selectedSchulen.value.length > 0 || selectedRollen.value.length > 0 || searchFilter.value.length > 0,
+    () => (!hasAutoselectedSchule.value && selectedSchulen.value.length > 0) || selectedRollen.value.length > 0 || searchFilter.value.length > 0,
   );
 
   function autoSelectSchule(): void {
@@ -142,7 +142,7 @@
   function resetSearchAndFilter(): void {
     searchFilter.value = '';
     searchFieldComponent.value.searchFilter = '';
-    if (!hasAutoselectedSchule) {
+    if (!hasAutoselectedSchule.value) {
       selectedSchulen.value = [];
     }
     searchInputSchulen.value = '';
