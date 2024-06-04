@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { computed, onMounted, ref, watch, type ComputedRef, type Ref } from 'vue';
+  import { computed, onMounted, ref, type ComputedRef, type Ref } from 'vue';
   import ResultTable from '@/components/admin/ResultTable.vue';
   import { type Composer, useI18n } from 'vue-i18n';
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
@@ -77,9 +77,8 @@
     };
   }
 
-  // Watcher to update Klassen and options when Schule is selected or unselected
-  watch(selectedSchule, async (newValue: string | null, oldValue: string | null) => {
-    if (newValue !== oldValue && newValue !== null) {
+  async function updateSelectedSchule(newValue: string | null): Promise<void> {
+    if (newValue !== null) {
       // Fetch Klassen related to the selected Schule
       await organisationStore.getKlassenByOrganisationId(newValue);
       // Update the klassenOptions for the dropdown
@@ -112,44 +111,40 @@
         ...getSchuleDetails(klasse),
       }));
     }
-  });
+  }
 
-  // Watcher to update finalKlassen when Klassen are selected or unselected
-  watch(selectedKlassen, async (newValue: string[] | null, oldValue: string[] | null) => {
-    if (newValue !== oldValue) {
-      if (newValue && newValue.length > 0 && selectedSchule.value !== null) {
-        // Filter finalKlassen to only include the selected Klassen
-        finalKlassen.value = organisationStore.klassen
-          .filter((klasse: Organisation) => newValue.includes(klasse.id))
-          .map((klasse: Organisation) => ({
-            ...klasse,
-            ...getSchuleDetails(klasse),
-          }));
-      } else if (newValue && newValue.length > 0 && selectedSchule.value === null) {
-        finalKlassen.value = organisationStore.allKlassen
-          .filter((klasse: Organisation) => newValue.includes(klasse.id))
-          .map((klasse: Organisation) => ({
-            ...klasse,
-            ...getSchuleDetails(klasse),
-          }));
-      } else if (selectedSchule.value !== null) {
-        // If no Klassen are selected but a Schule is selected, show all Klassen for the selected Schule
-        finalKlassen.value = organisationStore.klassen.map((klasse: Organisation) => ({
+  async function updateSelectedKlassen(newValue: string[]): Promise<void> {
+    if (newValue.length > 0 && selectedSchule.value !== null) {
+      // Filter finalKlassen to only include the selected Klassen
+      finalKlassen.value = organisationStore.klassen
+        .filter((klasse: Organisation) => newValue.includes(klasse.id))
+        .map((klasse: Organisation) => ({
           ...klasse,
           ...getSchuleDetails(klasse),
         }));
-      } else {
-        // If no Klassen and no Schule are selected, show all Klassen
-        await organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Klasse });
-        finalKlassen.value = organisationStore.allKlassen.map((klasse: Organisation) => ({
+    } else if (newValue.length > 0 && selectedSchule.value === null) {
+      finalKlassen.value = organisationStore.allKlassen
+        .filter((klasse: Organisation) => newValue.includes(klasse.id))
+        .map((klasse: Organisation) => ({
           ...klasse,
           ...getSchuleDetails(klasse),
         }));
-      }
+    } else if (selectedSchule.value !== null) {
+      // If no Klassen are selected but a Schule is selected, show all Klassen for the selected Schule
+      finalKlassen.value = organisationStore.klassen.map((klasse: Organisation) => ({
+        ...klasse,
+        ...getSchuleDetails(klasse),
+      }));
+    } else {
+      // If no Klassen and no Schule are selected, show all Klassen
+      await organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Klasse });
+      finalKlassen.value = organisationStore.allKlassen.map((klasse: Organisation) => ({
+        ...klasse,
+        ...getSchuleDetails(klasse),
+      }));
     }
-  });
+  }
 
-  // Watcher to search Schulen based on input text
   async function updateSchulenSearch(searchValue: string): Promise<void> {
     if (searchValue.length >= 1) {
       // Fetch Schulen matching the search string when it has 3 or more characters
@@ -158,9 +153,8 @@
       // Fetch all Schulen when the search string is less than 3 characters
       await organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Schule });
     }
-  };
+  }
 
-  // Watcher to search Klassen based on input text
   async function updateKlassenSearch(searchValue: string): Promise<void> {
     if (searchValue.length >= 1 && selectedSchule.value !== null) {
       // Fetch Klassen matching the search string and selected schule
@@ -181,7 +175,7 @@
         includeTyp: OrganisationsTyp.Klasse,
       });
     }
-  };
+  }
 
   // Checks if the filter is active or not
   const filterActive: Ref<boolean> = computed(() => !!selectedSchule.value || selectedKlassen.value.length > 0);
@@ -328,6 +322,7 @@
             required="true"
             @update:search="updateSchulenSearch"
             variant="outlined"
+            @update:modelValue="updateSelectedSchule"
             v-model="selectedSchule"
             v-model:search="searchInputSchulen"
           >
@@ -375,6 +370,7 @@
             required="true"
             @update:search="updateKlassenSearch"
             variant="outlined"
+            @update:modelValue="updateSelectedKlassen"
             v-model="selectedKlassen"
             v-model:search="searchInputKlassen"
           >
