@@ -303,6 +303,7 @@
     "lastName": "Nachname",
     "noZuordnungenFound": "Keine Zuordnungen gefunden.",
     "password": "Passwort",
+    "removeZuordnung": "Zuordnung zurücknehmen",
     "rolle": "Rolle",
     "userName": "Benutzername",
     "zuordnungen": "Zuordnung(en)"

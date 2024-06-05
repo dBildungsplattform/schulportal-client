@@ -28,6 +28,7 @@
   const password: Ref<string> = ref('');
 
   const isEditActive: Ref<boolean> = ref(false);
+  const selectedZuordnungen = ref<Zuordnung[]>([]);
 
   function navigateToPersonTable(): void {
     router.push({ name: 'person-management' });
@@ -61,10 +62,8 @@
   };
 
   const triggerEdit = (): void => {
-    console.log('hahaxd');
     isEditActive.value = true;
   };
-
   const zuordnungenResult: Ref<Zuordnung[] | undefined> = ref<Zuordnung[] | undefined>(undefined);
 
   const getZuordnungen: ComputedRef<Zuordnung[] | undefined> = computed(() => zuordnungenResult.value);
@@ -184,7 +183,7 @@
                 cols="auto"
                 data-testid="person-vorname"
               >
-                {{ personStore.currentPerson.person.name.vorname }}
+                <span class="text-body"> {{ personStore.currentPerson.person.name.vorname }} </span>
               </v-col>
             </v-row>
             <!-- Familienname -->
@@ -202,7 +201,7 @@
                 cols="auto"
                 data-testid="person-familienname"
               >
-                {{ personStore.currentPerson.person.name.familienname }}
+                <span class="text-body"> {{ personStore.currentPerson.person.name.familienname }}</span>
               </v-col>
             </v-row>
             <!-- Benutzername -->
@@ -220,7 +219,7 @@
                 cols="auto"
                 data-testid="person-username"
               >
-                {{ personStore.currentPerson.person.referrer }}
+                <span class="text-body">{{ personStore.currentPerson.person.referrer }} </span>
               </v-col>
             </v-row>
             <!-- Kopers-Nr -->
@@ -238,7 +237,7 @@
                 cols="auto"
                 data-testid="person-kopersnr"
               >
-                {{ personStore.currentPerson.person.personalnummer ?? '---' }}
+                <span class="text-body">{{ personStore.currentPerson.person.personalnummer ?? '---' }} </span>
               </v-col>
             </v-row>
           </div>
@@ -329,7 +328,10 @@
               :data-testid="`person-zuordnung-${zuordnung.sskId}`"
               :title="zuordnung.sskName"
             >
-              {{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }} {{ zuordnung.klasse }}
+              <span class="text-body"
+                >{{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
+                {{ zuordnung.klasse }}</span
+              >
             </v-col>
           </v-row>
           <!-- Display 'No data available' if the above condition is false -->
@@ -368,26 +370,6 @@
               </v-btn>
             </v-col>
           </v-row>
-          <v-row
-            justify="end"
-            class="mr-lg-10"
-          >
-            <div class="d-flex justify-sm-end">
-              <v-col
-                cols="12"
-                md="auto"
-              >
-                <v-btn
-                  class="primary"
-                  data-testid="zuordnung-edit"
-                  @onClick="triggerEdit"
-                  :block="mdAndDown"
-                >
-                  {{ $t('cancel') }}
-                </v-btn>
-              </v-col>
-            </div></v-row
-          >
           <!-- Check if 'zuordnungen' array exists and has length > 0 -->
           <v-row
             v-if="
@@ -403,8 +385,54 @@
               :key="zuordnung.sskId"
               :data-testid="`person-zuordnung-${zuordnung.sskId}`"
               :title="zuordnung.sskName"
+              class="py-0"
             >
-              {{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }} {{ zuordnung.klasse }}
+              <v-checkbox
+                v-model="selectedZuordnungen"
+                :value="zuordnung"
+                class="mr-2"
+              >
+                <template v-slot:label>
+                  <span class="text body"
+                    >{{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
+                    {{ zuordnung.klasse }}</span
+                  >
+                </template>
+              </v-checkbox>
+            </v-col>
+          </v-row>
+          <v-row
+            justify="end"
+            class="mr-lg-12"
+          >
+            <v-col
+              cols="12"
+              sm="6"
+              md="auto"
+            >
+              <v-btn
+                class="primary ml-lg-16"
+                data-testid="zuordnung-edit"
+                @onClick="triggerEdit"
+                :block="mdAndDown"
+              >
+                {{ $t('person.removeZuordnung') }}
+              </v-btn>
+            </v-col>
+            <v-spacer></v-spacer>
+            <v-col
+              cols="12"
+              sm="6"
+              md="auto"
+            >
+              <v-btn
+                class="secondary"
+                data-testid="zuordnung-edit"
+                @onClick="triggerEdit"
+                :block="mdAndDown"
+              >
+                {{ $t('cancel') }}
+              </v-btn>
             </v-col>
           </v-row>
         </v-container>

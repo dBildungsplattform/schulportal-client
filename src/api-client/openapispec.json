@@ -1048,7 +1048,14 @@
                         }
                     },
                     "400": {
-                        "description": "The organisation already exists."
+                        "description": "The organisation already exists.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DbiamOrganisationError"
+                                }
+                            }
+                        }
                     },
                     "401": {
                         "description": "Not authorized to create the organisation."
@@ -1251,7 +1258,14 @@
                         }
                     },
                     "400": {
-                        "description": "Request has wrong format."
+                        "description": "Request has wrong format.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DbiamOrganisationError"
+                                }
+                            }
+                        }
                     },
                     "401": {
                         "description": "Request is not authorized."
@@ -1379,6 +1393,46 @@
                 ]
             }
         },
+        "/api/organisationen/root/children": {
+            "get": {
+                "operationId": "OrganisationController_getRootChildren",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "The root organizations were successfully pulled.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OrganisationRootChildrenResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Not authorized to get the organizations."
+                    },
+                    "403": {
+                        "description": "Insufficient permissions to get the organizations."
+                    },
+                    "500": {
+                        "description": "Internal server error while getting the organization."
+                    }
+                },
+                "tags": [
+                    "organisationen"
+                ],
+                "security": [
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
         "/api/organisationen/{organisationId}/administriert": {
             "get": {
                 "operationId": "OrganisationController_getAdministrierteOrganisationen",
@@ -1481,7 +1535,14 @@
                         "description": "The organisation was successfully updated."
                     },
                     "400": {
-                        "description": "The organisation could not be modified."
+                        "description": "The organisation could not be modified.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DbiamOrganisationError"
+                                }
+                            }
+                        }
                     },
                     "401": {
                         "description": "Not authorized to modify the organisation."
@@ -1601,7 +1662,14 @@
                         "description": "The organisation was successfully updated."
                     },
                     "400": {
-                        "description": "The organisation could not be modified."
+                        "description": "The organisation could not be modified.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DbiamOrganisationError"
+                                }
+                            }
+                        }
                     },
                     "401": {
                         "description": "Not authorized to modify the organisation."
@@ -1635,6 +1703,24 @@
                 "description": "List all rollen.",
                 "parameters": [
                     {
+                        "name": "offset",
+                        "required": false,
+                        "in": "query",
+                        "description": "The offset of the paginated list.",
+                        "schema": {
+                            "type": "number"
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "required": false,
+                        "in": "query",
+                        "description": "The requested limit for the page size.",
+                        "schema": {
+                            "type": "number"
+                        }
+                    },
+                    {
                         "name": "searchStr",
                         "required": false,
                         "in": "query",
@@ -1648,6 +1734,17 @@
                 "responses": {
                     "200": {
                         "description": "The rollen were successfully returned",
+                        "headers": {
+                            "X-Paging-Offset": {
+                                "description": "The offset of the first item from the list. List starts with index 0."
+                            },
+                            "X-Paging-Limit": {
+                                "description": "The maximum amount of items returned in one request."
+                            },
+                            "X-Paging-Total": {
+                                "description": "The total amount of items in the list."
+                            }
+                        },
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2556,6 +2653,77 @@
                         "bearer": []
                     }
                 ]
+            },
+            "put": {
+                "operationId": "DBiamPersonenkontextController_updatePersonenkontexte",
+                "parameters": [
+                    {
+                        "name": "personId",
+                        "required": true,
+                        "in": "path",
+                        "description": "The ID for the person.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DbiamUpdatePersonenkontexteBodyParams"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Add or remove personenkontexte as one operation.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DBiamPersonenkontextResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "The personenkontexte could not be updated, may due to unsatisfied specifications.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DbiamPersonenkontexteUpdateError"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Not authorized to update personenkontexte."
+                    },
+                    "403": {
+                        "description": "Insufficient permission to update personenkontexte."
+                    },
+                    "409": {
+                        "description": "Changes are conflicting with current state of personenkontexte."
+                    },
+                    "500": {
+                        "description": "Internal server error while updating personenkontexte."
+                    }
+                },
+                "tags": [
+                    "dbiam-personenkontexte"
+                ],
+                "security": [
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
+                    {
+                        "bearer": []
+                    }
+                ]
             }
         },
         "/api/dbiam/personenkontext": {
@@ -2574,7 +2742,7 @@
                 },
                 "responses": {
                     "201": {
-                        "description": "Test",
+                        "description": "Successfully created personenkontext.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2584,7 +2752,14 @@
                         }
                     },
                     "400": {
-                        "description": "The personenkontext could not be created, may due to unsatisfied specifications."
+                        "description": "The personenkontext could not be created, may due to unsatisfied specifications.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DbiamPersonenkontextError"
+                                }
+                            }
+                        }
                     },
                     "401": {
                         "description": "Not authorized to create personenkontext."
@@ -3659,6 +3834,34 @@
                     "typ"
                 ]
             },
+            "DbiamOrganisationError": {
+                "type": "object",
+                "properties": {
+                    "i18nKey": {
+                        "type": "string",
+                        "enum": [
+                            "ORGANISATION_SPECIFICATION_ERROR",
+                            "KENNUNG_REQUIRED_FOR_SCHULE",
+                            "NAME_REQUIRED_FOR_SCHULE",
+                            "SCHULE_UNTER_TRAEGER",
+                            "TRAEGER_IN_TRAEGER",
+                            "NUR_KLASSE_UNTER_SCHULE",
+                            "ZYKLUS_IN_ORGANISATION",
+                            "ROOT_ORGANISATION_IMMUTABLE",
+                            "KLASSE_NUR_VON_SCHULE_ADMINISTRIERT",
+                            "KLASSENNAME_AN_SCHULE_EINDEUTIG"
+                        ]
+                    },
+                    "code": {
+                        "type": "number",
+                        "description": "Corresponds to HTTP Status code like 200, 404, 500"
+                    }
+                },
+                "required": [
+                    "i18nKey",
+                    "code"
+                ]
+            },
             "UpdateOrganisationBodyParams": {
                 "type": "object",
                 "properties": {
@@ -3691,17 +3894,6 @@
                 "required": [
                     "name",
                     "typ"
-                ]
-            },
-            "RollenSystemRecht": {
-                "type": "string",
-                "enum": [
-                    "ROLLEN_VERWALTEN",
-                    "PERSONEN_SOFORT_LOESCHEN",
-                    "PERSONEN_VERWALTEN",
-                    "SCHULEN_VERWALTEN",
-                    "KLASSEN_VERWALTEN",
-                    "SCHULTRAEGER_VERWALTEN"
                 ]
             },
             "OrganisationResponse": {
@@ -3744,6 +3936,32 @@
                     "kuerzel",
                     "typ",
                     "traegerschaft"
+                ]
+            },
+            "OrganisationRootChildrenResponse": {
+                "type": "object",
+                "properties": {
+                    "oeffentlich": {
+                        "$ref": "#/components/schemas/OrganisationResponse"
+                    },
+                    "ersatz": {
+                        "$ref": "#/components/schemas/OrganisationResponse"
+                    }
+                },
+                "required": [
+                    "oeffentlich",
+                    "ersatz"
+                ]
+            },
+            "RollenSystemRecht": {
+                "type": "string",
+                "enum": [
+                    "ROLLEN_VERWALTEN",
+                    "PERSONEN_SOFORT_LOESCHEN",
+                    "PERSONEN_VERWALTEN",
+                    "SCHULEN_VERWALTEN",
+                    "KLASSEN_VERWALTEN",
+                    "SCHULTRAEGER_VERWALTEN"
                 ]
             },
             "OrganisationByIdBodyParams": {
@@ -4206,6 +4424,78 @@
                     "personId",
                     "organisationId",
                     "rolleId"
+                ]
+            },
+            "DbiamPersonenkontextError": {
+                "type": "object",
+                "properties": {
+                    "i18nKey": {
+                        "type": "string",
+                        "enum": [
+                            "PERSONENKONTEXT_SPECIFICATION_ERROR",
+                            "NUR_LEHR_UND_LERN_AN_KLASSE",
+                            "GLEICHE_ROLLE_AN_KLASSE_WIE_SCHULE"
+                        ]
+                    },
+                    "code": {
+                        "type": "number",
+                        "description": "Corresponds to HTTP Status code like 200, 404, 500"
+                    }
+                },
+                "required": [
+                    "i18nKey",
+                    "code"
+                ]
+            },
+            "DbiamUpdatePersonenkontexteBodyParams": {
+                "type": "object",
+                "properties": {
+                    "lastModified": {
+                        "format": "date-time",
+                        "type": "string",
+                        "nullable": false,
+                        "description": "Date of the most recent changed personenkontext"
+                    },
+                    "count": {
+                        "type": "number",
+                        "nullable": false,
+                        "description": "The amount of personenkontexte"
+                    },
+                    "personenkontexte": {
+                        "nullable": false,
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/DBiamCreatePersonenkontextBodyParams"
+                        }
+                    }
+                },
+                "required": [
+                    "lastModified",
+                    "count",
+                    "personenkontexte"
+                ]
+            },
+            "DbiamPersonenkontexteUpdateError": {
+                "type": "object",
+                "properties": {
+                    "i18nKey": {
+                        "type": "string",
+                        "enum": [
+                            "PERSONENKONTEXTE_UPDATE_ERROR",
+                            "PERSONENKONTEXT_NOT_FOUND",
+                            "COUNT_MISMATCHING_ERROR",
+                            "NEWER_VERSION_OF_PERSONENKONTEXTE_AVAILABLE",
+                            "PERSON_ID_MISMATCH_ERROR"
+                        ]
+                    },
+                    "code": {
+                        "type": "number",
+                        "description": "Corresponds to HTTP Status code like 200, 404, 500"
+                    }
+                },
+                "required": [
+                    "i18nKey",
+                    "code"
                 ]
             },
             "FindRollenResponse": {
