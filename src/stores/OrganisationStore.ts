@@ -100,13 +100,13 @@ export const useOrganisationStore: StoreDefinition<
           filter?.administriertVon,
         );
         this.allOrganisationen = response.data;
-        this.totalOrganisationen = response.headers['x-paging-total'];
-        this.loading = false;
+        this.totalOrganisationen = +response.headers['x-paging-total'];
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
           this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
         }
+      } finally {
         this.loading = false;
       }
     },
@@ -126,13 +126,14 @@ export const useOrganisationStore: StoreDefinition<
           filter?.administriertVon,
         );
         this.klassen = response.data;
-        this.totalKlassen = response.headers['x-paging-total'];
-        this.loadingKlassen = false;
+        this.totalKlassen = +response.headers['x-paging-total'];
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
           this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
         }
+        return await Promise.reject(this.errorCode);
+      } finally {
         this.loadingKlassen = false;
       }
     },
@@ -144,15 +145,15 @@ export const useOrganisationStore: StoreDefinition<
         const { data }: { data: Organisation } =
           await organisationApi.organisationControllerFindOrganisationById(organisationId);
         this.currentOrganisation = data;
-        this.loading = false;
         return data;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
           this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
         }
+        return await Promise.reject(this.errorCode);
+      } finally {
         this.loading = false;
-        return Promise.reject(this.errorCode);
       }
     },
 
@@ -163,15 +164,15 @@ export const useOrganisationStore: StoreDefinition<
         const response: AxiosResponse<Organisation[]> =
           await organisationApi.organisationControllerGetAdministrierteOrganisationen(organisationId, searchFilter);
         this.klassen = response.data;
-        this.totalKlassen = response.headers['x-paging-total'];
-        this.loadingKlassen = false;
+        this.totalKlassen = +response.headers['x-paging-total'];
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
           this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
         }
+        return await Promise.reject(this.errorCode);
+      } finally {
         this.loadingKlassen = false;
-        return Promise.reject(this.errorCode);
       }
     },
 
@@ -199,7 +200,6 @@ export const useOrganisationStore: StoreDefinition<
         };
         const { data }: { data: Organisation } =
           await organisationApi.organisationControllerCreateOrganisation(createOrganisationBodyParams);
-        this.loading = false;
         this.createdOrganisation = data;
         return data;
       } catch (error: unknown) {
@@ -208,8 +208,9 @@ export const useOrganisationStore: StoreDefinition<
         if (isAxiosError(error)) {
           this.errorCode = error.response?.data.i18nKey || 'ORGANISATION_SPECIFICATION_ERROR';
         }
+        return await Promise.reject(this.errorCode);
+      } finally {
         this.loading = false;
-        return Promise.reject(this.errorCode);
       }
     },
   },

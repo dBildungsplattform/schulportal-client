@@ -216,8 +216,9 @@ export const usePersonenkontextStore: StoreDefinition<
         if (isAxiosError(error)) {
           this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
         }
+      } finally {
+        this.loading = false;
       }
-      this.loading = false;
     },
     async getAllPersonenuebersichten(): Promise<void> {
       this.loading = true;
@@ -230,8 +231,9 @@ export const usePersonenkontextStore: StoreDefinition<
         if (isAxiosError(error)) {
           this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
         }
+      } finally {
+        this.loading = false;
       }
-      this.loading = false;
     },
   },
 });
