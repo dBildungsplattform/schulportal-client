@@ -7,15 +7,9 @@ type SearchFilterState = {
 };
 
 type SearchFilterActions = {
-  setRolleFilter: (
-    selectedRollen: Array<string> | null,
-  ) => Promise<void>;
-  setSchuleFilter: (
-    selectedSchulen: Array<string> | null,
-  ) => Promise<void>;
-  setSearchFilter: (
-    searchFilter: string | null,
-  ) => Promise<void>;
+  setRolleFilter: (selectedRollen: Array<string> | null) => Promise<void>;
+  setSchuleFilter: (selectedSchulen: Array<string> | null) => Promise<void>;
+  setSearchFilter: (searchFilter: string | null) => Promise<void>;
 };
 
 type SearchFilterGetters = {};
@@ -35,21 +29,15 @@ export const useSearchFilterStore: StoreDefinition<
     selectedRollen: [],
   }),
   actions: {
-    async setRolleFilter(
-      selectedRollen: Array<string> | null,
-    ) {
+    async setRolleFilter(selectedRollen: Array<string> | null) {
       this.selectedRollen = selectedRollen;
     },
 
-    async setSchuleFilter(
-      selectedSchulen: Array<string> | null,
-    ) {
+    async setSchuleFilter(selectedSchulen: Array<string> | null) {
       this.selectedSchulen = selectedSchulen;
     },
 
-    async setSearchFilter(
-      searchFilter: string | null,
-    ) {
+    async setSearchFilter(searchFilter: string | null) {
       this.searchFilter = searchFilter;
     },
   },
