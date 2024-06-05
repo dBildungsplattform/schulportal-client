@@ -7,9 +7,11 @@ type SearchFilterState = {
 };
 
 type SearchFilterActions = {
-  setDropdownFilter: (
-    selectedSchulen: Array<string> | null,
+  setRolleFilter: (
     selectedRollen: Array<string> | null,
+  ) => Promise<void>;
+  setSchuleFilter: (
+    selectedSchulen: Array<string> | null,
   ) => Promise<void>;
   setSearchFilter: (
     searchFilter: string | null,
@@ -33,12 +35,16 @@ export const useSearchFilterStore: StoreDefinition<
     selectedRollen: [],
   }),
   actions: {
-    async setDropdownFilter(
-      selectedSchulen: Array<string> | null,
+    async setRolleFilter(
       selectedRollen: Array<string> | null,
     ) {
-      this.selectedSchulen = selectedSchulen;
       this.selectedRollen = selectedRollen;
+    },
+
+    async setSchuleFilter(
+      selectedSchulen: Array<string> | null,
+    ) {
+      this.selectedSchulen = selectedSchulen;
     },
 
     async setSearchFilter(

@@ -131,12 +131,12 @@
   }
 
   async function setSchuleFilter(newValue: Array<string>): Promise<void> {
-    await searchFilterStore.setDropdownFilter(newValue, selectedRollen.value);
+    await searchFilterStore.setSchuleFilter(newValue);
     applySearchAndFilters();
   }
 
   async function setRolleFilter(newValue: Array<string>): Promise<void> {
-    await searchFilterStore.setDropdownFilter(selectedSchulen.value, newValue);
+    await searchFilterStore.setRolleFilter(newValue);
     applySearchAndFilters();
   }
 
