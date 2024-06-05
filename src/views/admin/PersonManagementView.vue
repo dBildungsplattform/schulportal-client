@@ -100,6 +100,8 @@
     () =>
       (!hasAutoselectedSchule.value && selectedSchulen.value.length > 0) ||
       selectedRollen.value.length > 0 ||
+      !!searchFilterStore.selectedSchulen?.length ||
+      !!searchFilterStore.selectedRollen?.length ||
       searchFilter.value.length > 0,
   );
 
@@ -129,12 +131,12 @@
   }
 
   async function setSchuleFilter(newValue: Array<string>): Promise<void> {
-    await searchFilterStore.setFilter(searchFilter.value, newValue, selectedRollen.value);
+    await searchFilterStore.setDropdownFilter(newValue, selectedRollen.value);
     applySearchAndFilters();
   }
 
   async function setRolleFilter(newValue: Array<string>): Promise<void> {
-    await searchFilterStore.setFilter(searchFilter.value, selectedSchulen.value, newValue);
+    await searchFilterStore.setDropdownFilter(selectedSchulen.value, newValue);
     applySearchAndFilters();
   }
 
