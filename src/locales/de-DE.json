@@ -303,9 +303,10 @@
     "lastName": "Nachname",
     "noZuordnungenFound": "Keine Zuordnungen gefunden.",
     "password": "Passwort",
-    "removeZuordnung": "Zuordnung zurücknehmen",
+    "removeZuordnung": "Zuordnung entfernen",
     "rolle": "Rolle",
     "userName": "Benutzername",
+    "willBeRemoved": "wird entfernt",
     "zuordnungen": "Zuordnung(en)"
   },
   "save":"Speichern",

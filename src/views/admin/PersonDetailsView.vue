@@ -27,8 +27,12 @@
 
   const password: Ref<string> = ref('');
 
+  const zuordnungenResult: Ref<Zuordnung[] | undefined> = ref<Zuordnung[] | undefined>(undefined);
+  const getZuordnungen: ComputedRef<Zuordnung[] | undefined> = computed(() => zuordnungenResult.value);
+  const selectedZuordnungen: Zuordnung[] = ref<Zuordnung[]>([]);
+
   const isEditActive: Ref<boolean> = ref(false);
-  const selectedZuordnungen = ref<Zuordnung[]>([]);
+  const pendingDeletion: Ref<boolean> = ref(false);
 
   function navigateToPersonTable(): void {
     router.push({ name: 'person-management' });
@@ -40,9 +44,49 @@
     });
   }
 
+  const handleAlertClose = (): void => {
+    personStore.errorCode = '';
+    navigateToPersonTable();
+  };
+
+  const triggerEdit = (): void => {
+    isEditActive.value = true;
+  };
+  const cancelEdit = (): void => {
+    isEditActive.value = false;
+    pendingDeletion.value = false;
+    selectedZuordnungen.value = [];
+  };
+
+  const prepareDeletion = (): void => {
+    pendingDeletion.value = true;
+    console.log(pendingDeletion.value);
+  };
+
   async function deletePerson(personId: string): Promise<void> {
     await personStore.deletePerson(personId);
   }
+
+  // This will send the updated list of Zuordnungen to the BE WITHOUT the selected Zuordnungen.
+  const confirmDeletion = async (): Promise<void> => {
+    const remainingZuordnungen: Zuordnung[] | undefined = zuordnungenResult.value?.filter(
+      (zuordnung: Zuordnung) => !selectedZuordnungen.value.includes(zuordnung),
+    );
+
+    const updateParams: DbiamUpdatePersonenkontexteBodyParams = {
+      lastModified: new Date().toISOString(),
+      count: remainingZuordnungen?.length ?? 0,
+      personenkontexte: remainingZuordnungen?.map((zuordnung: Zuordnung) => ({
+        personId: currentPersonId,
+        organisationId: zuordnung.sskId,
+        rolleId: zuordnung.rolleId,
+      })) as DBiamCreatePersonenkontextBodyParams[],
+    };
+
+    await personenKontextStore.updatePersonenkontexte(updateParams, currentPersonId);
+    zuordnungenResult.value = remainingZuordnungen;
+    selectedZuordnungen.value = [];
+  };
 
   function getSskName(sskDstNr: string, sskName: string): string {
     /* truncate ssk name */
@@ -55,18 +99,6 @@
       return truncatededSskName;
     }
   }
-
-  const handleAlertClose = (): void => {
-    personStore.errorCode = '';
-    navigateToPersonTable();
-  };
-
-  const triggerEdit = (): void => {
-    isEditActive.value = true;
-  };
-  const zuordnungenResult: Ref<Zuordnung[] | undefined> = ref<Zuordnung[] | undefined>(undefined);
-
-  const getZuordnungen: ComputedRef<Zuordnung[] | undefined> = computed(() => zuordnungenResult.value);
 
   function computeZuordnungen(personenuebersicht: Uebersicht | null): Zuordnung[] | undefined {
     const zuordnungen: Zuordnung[] | undefined = personenuebersicht?.zuordnungen;
@@ -120,6 +152,7 @@
     },
     { immediate: true },
   );
+
   onBeforeMount(async () => {
     await personStore.getPersonById(currentPersonId);
     await personenKontextStore.getPersonenuebersichtById(currentPersonId);
@@ -305,7 +338,7 @@
               <v-btn
                 class="primary ml-lg-8 mr-lg-16 mr-sm-3"
                 data-testid="zuordnung-edit"
-                @click="triggerEdit"
+                @Click="triggerEdit"
                 :block="mdAndDown"
               >
                 {{ $t('edit') }}
@@ -362,9 +395,10 @@
             >
               <v-btn
                 class="primary ml-lg-8 mr-lg-16 mr-sm-6"
-                data-testid="zuordnung-edit"
-                @onClick="triggerEdit"
+                data-testid="zuordnung-save"
+                @click="confirmDeletion"
                 :block="mdAndDown"
+                :disabled="!pendingDeletion"
               >
                 {{ $t('save') }}
               </v-btn>
@@ -385,35 +419,56 @@
               :key="zuordnung.sskId"
               :data-testid="`person-zuordnung-${zuordnung.sskId}`"
               :title="zuordnung.sskName"
-              class="py-0"
+              class="py-0 d-flex align-items-center"
             >
-              <v-checkbox
-                v-model="selectedZuordnungen"
-                :value="zuordnung"
-                class="mr-2"
-              >
-                <template v-slot:label>
-                  <span class="text body"
-                    >{{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
-                    {{ zuordnung.klasse }}</span
+              <template v-if="!pendingDeletion">
+                <v-checkbox
+                  v-model="selectedZuordnungen"
+                  :value="zuordnung"
+                >
+                  <template v-slot:label>
+                    <span class="text-body">
+                      {{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
+                      {{ zuordnung.klasse }}
+                    </span>
+                  </template>
+                </v-checkbox>
+              </template>
+              <template v-else>
+                <span
+                  class="my-2"
+                  :class="{
+                    'text-body--error': selectedZuordnungen.includes(zuordnung),
+                    'text-body': !selectedZuordnungen.includes(zuordnung),
+                  }"
+                >
+                  {{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
+                  {{ zuordnung.klasse }}
+                  <span
+                    v-if="selectedZuordnungen.includes(zuordnung)"
+                    class="text-body--error"
                   >
-                </template>
-              </v-checkbox>
+                    ({{ $t('person.willBeRemoved') }})</span
+                  >
+                </span>
+              </template>
             </v-col>
           </v-row>
           <v-row
             justify="end"
-            class="mr-lg-12"
+            class="mr-lg-12 mt-4"
           >
             <v-col
+              v-if="!pendingDeletion"
               cols="12"
               sm="6"
               md="auto"
             >
               <v-btn
                 class="primary ml-lg-16"
-                data-testid="zuordnung-edit"
-                @onClick="triggerEdit"
+                data-testid="zuordnung-delete"
+                :disabled="selectedZuordnungen.length === 0"
+                @click="prepareDeletion"
                 :block="mdAndDown"
               >
                 {{ $t('person.removeZuordnung') }}
@@ -427,8 +482,8 @@
             >
               <v-btn
                 class="secondary"
-                data-testid="zuordnung-edit"
-                @onClick="triggerEdit"
+                data-testid="zuordnung-cancel"
+                @click="cancelEdit"
                 :block="mdAndDown"
               >
                 {{ $t('cancel') }}
