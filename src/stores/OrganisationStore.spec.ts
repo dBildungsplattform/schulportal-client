@@ -70,7 +70,7 @@ describe('OrganisationStore', () => {
           name: 'Organisation 1',
           namensergaenzung: 'Ergänzung',
           kuerzel: 'O1',
-          typ: OrganisationsTyp.Anbieter,
+          typ: OrganisationsTyp.Klasse,
         },
       ];
 
@@ -83,6 +83,26 @@ describe('OrganisationStore', () => {
       });
       await getAllOrganisationenPromise;
       expect(organisationStore.allOrganisationen).toEqual(mockResponse);
+      expect(organisationStore.loading).toBe(false);
+    });
+    it('should accept filter for typ Klasse', async () => {
+      const mockResponse: Organisation[] = [
+        {
+          id: '1',
+          kennung: 'Org1',
+          name: 'Organisation 1',
+          namensergaenzung: 'Ergänzung',
+          kuerzel: 'O1',
+          typ: OrganisationsTyp.Klasse,
+        },
+      ];
+
+      mockadapter.onGet('/api/organisationen?typ=KLASSE').replyOnce(200, mockResponse);
+      const getAllOrganisationenPromise: Promise<void> = organisationStore.getAllOrganisationen({
+        includeTyp: OrganisationsTyp.Klasse,
+      });
+      await getAllOrganisationenPromise;
+      expect(organisationStore.allKlassen).toEqual(mockResponse);
       expect(organisationStore.loading).toBe(false);
     });
   });
