@@ -106,7 +106,7 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
           );
 
         this.allPersons = data.items;
-        this.totalPersons = data.total;
+        this.totalPersons = +data.total;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {

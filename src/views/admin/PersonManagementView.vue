@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { computed, onMounted, type ComputedRef, watch, type Ref, ref } from 'vue';
+  import { computed, onMounted, type ComputedRef, type Ref, ref } from 'vue';
   import { type Composer, useI18n } from 'vue-i18n';
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
   import { type Router, useRouter } from 'vue-router';
@@ -36,6 +36,7 @@
   const { t }: Composer = useI18n({ useScope: 'global' });
 
   let timerId: ReturnType<typeof setTimeout>;
+  const hasAutoselectedSchule: Ref<boolean> = ref(false);
 
   type ReadonlyHeaders = InstanceType<typeof VDataTableServer>['headers'];
   const headers: ReadonlyHeaders = [
@@ -70,6 +71,15 @@
   const selectedSchulen: Ref<Array<string>> = ref([]);
   const selectedStatus: Ref<string | null> = ref(null);
   const searchFilter: Ref<string> = ref('');
+
+  const filterOrSearchActive: Ref<boolean> = computed(
+    () =>
+      (!hasAutoselectedSchule.value && selectedSchulen.value.length > 0) ||
+      selectedRollen.value.length > 0 ||
+      !!searchFilterStore.selectedSchulen?.length ||
+      !!searchFilterStore.selectedRollen?.length ||
+      searchFilter.value.length > 0,
+  );
 
   const schulen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
     return organisationStore.allOrganisationen
@@ -107,9 +117,22 @@
 
   const statuses: Array<string> = ['Aktiv', 'Inaktiv'];
 
-  const filterOrSearchActive: Ref<boolean> = computed(
-    () => selectedSchulen.value.length > 0 || selectedRollen.value.length > 0 || searchFilter.value.length > 0,
-  );
+  function autoSelectSchule(): void {
+    // Autoselect the Schule for the current user that only has 1 Schule assigned to him.
+    const personenkontexte: Array<UserinfoPersonenkontext> | null = authStore.currentUser?.personenkontexte || [];
+
+    if (personenkontexte.length > 0) {
+      const matchingOrganisations: UserinfoPersonenkontext[] = personenkontexte.filter(
+        (kontext: UserinfoPersonenkontext) =>
+          organisationStore.allOrganisationen.some((org: Organisation) => org.id === kontext.organisationsId),
+      );
+      if (matchingOrganisations.length === 1) {
+        const matchedOrganisation: UserinfoPersonenkontext | undefined = matchingOrganisations[0];
+        selectedSchulen.value = [matchedOrganisation?.organisationsId || ''];
+        hasAutoselectedSchule.value = true;
+      }
+    }
+  }
 
   function applySearchAndFilters(organisations?: Array<string>): void {
     personStore.getAllPersons({
@@ -119,6 +142,21 @@
     });
   }
 
+  async function setKlasseFilter(newValue: Array<string>): Promise<void> {
+    await searchFilterStore.setKlasseFilter(newValue);
+    applySearchAndFilters();
+  }
+
+  async function setRolleFilter(newValue: Array<string>): Promise<void> {
+    await searchFilterStore.setRolleFilter(newValue);
+    applySearchAndFilters();
+  }
+
+  async function setSchuleFilter(newValue: Array<string>): Promise<void> {
+    await searchFilterStore.setSchuleFilter(newValue);
+    applySearchAndFilters();
+  }
+
   function navigateToPersonDetails(_$event: PointerEvent, { item }: { item: Personendatensatz }): void {
     router.push({ name: 'person-details', params: { id: item.person.id } });
   }
@@ -126,10 +164,13 @@
   function resetSearchAndFilter(): void {
     searchFilter.value = '';
     searchFieldComponent.value.searchFilter = '';
+    /* do not reset schulen if schule was autoselected */
+    if (!hasAutoselectedSchule.value) {
+      selectedSchulen.value = [];
+    }
     searchInputSchulen.value = '';
     searchInputRollen.value = '';
     searchInputKlassen.value = '';
-    selectedSchulen.value = [];
     selectedRollen.value = [];
     selectedKlassen.value = [];
     selectedStatus.value = null;
@@ -212,54 +253,19 @@
     }, 500);
   }
 
-  watch(selectedKlassen, async (newValue: Array<string>, _oldValue: Array<string>) => {
-    if (!newValue.length) {
-      applySearchAndFilters();
-      return;
-    }
-
-    applySearchAndFilters(selectedKlassen.value);
-  });
-
-  watch(selectedSchulen, async (newValue: Array<string>, _oldValue: Array<string>) => {
-    if (!newValue.length) {
-      selectedKlassen.value = [];
-    }
-    if (selectedSchulen.value.length) {
-      selectedSchulen.value.forEach(async (schuleId: string) => {
-        await organisationStore.getKlassenByOrganisationId(schuleId, searchInputKlassen.value);
-      });
-    }
-    applySearchAndFilters();
-  });
-
-  watch(selectedRollen, async (_newValue: Array<string>, _oldValue: Array<string>) => {
-    applySearchAndFilters();
-  });
-
   onMounted(async () => {
-    if (searchFilterStore.searchFilter === '') {
+    if (!filterOrSearchActive.value) {
       await personStore.getAllPersons({});
+    } else {
+      selectedSchulen.value = searchFilterStore.selectedSchulen || [];
+      selectedRollen.value = searchFilterStore.selectedRollen || [];
     }
+
     await organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Schule });
     await personenkontextStore.getAllPersonenuebersichten();
     await rolleStore.getAllRollen('');
 
-    // Autoselect the Schule for the current user that only has 1 Schule assigned to him.
-    const personenkontexte: Array<UserinfoPersonenkontext> | null = authStore.currentUser?.personenkontexte || [];
-    if (personenkontexte.length > 0) {
-      const matchingOrganisations: UserinfoPersonenkontext[] = personenkontexte.filter(
-        (kontext: UserinfoPersonenkontext) =>
-          organisationStore.allOrganisationen.some((org: Organisation) => org.id === kontext.organisationsId),
-      );
-      if (matchingOrganisations.length === 1) {
-        const matchedOrganisation: UserinfoPersonenkontext | undefined = matchingOrganisations[0];
-        selectedSchulen.value = [matchedOrganisation?.organisationsId || ''];
-        if (selectedSchulen.value[0]) {
-          await organisationStore.getKlassenByOrganisationId(selectedSchulen.value[0]);
-        }
-      }
-    }
+    autoSelectSchule();
   });
 </script>
 
@@ -306,6 +312,7 @@
             clearable
             data-testid="schule-select"
             density="compact"
+            :disabled="hasAutoselectedSchule"
             hide-details
             id="schule-select"
             :items="schulen"
@@ -315,6 +322,7 @@
             :no-data-text="$t('noDataFound')"
             :placeholder="$t('admin.schule.schule')"
             required="true"
+            @update:modelValue="setSchuleFilter"
             @update:search="updateSchulenSearch"
             variant="outlined"
             v-model="selectedSchulen"
@@ -330,9 +338,11 @@
                   v-else
                   class="filter-header"
                   >{{
-                    organisationStore.totalOrganisationen === 1
-                      ? $t('admin.schule.schuleFound', { total: organisationStore.totalOrganisationen })
-                      : $t('admin.schule.schulenFound', { total: organisationStore.totalOrganisationen })
+                    $t(
+                      'admin.schule.schulenFound',
+                      { count: organisationStore.totalOrganisationen },
+                      organisationStore.totalOrganisationen,
+                    )
                   }}</span
                 >
               </v-list-item>
@@ -368,6 +378,7 @@
             :no-data-text="$t('noDataFound')"
             :placeholder="$t('admin.rolle.rolle')"
             required="true"
+            @update:modelValue="setRolleFilter"
             @update:search="updateRollenSearch"
             variant="outlined"
             v-model="selectedRollen"
@@ -382,11 +393,7 @@
                 <span
                   v-else
                   class="filter-header"
-                  >{{
-                    rolleStore.totalRollen === 1
-                      ? $t('admin.rolle.rolleFound', { total: rolleStore.totalRollen })
-                      : $t('admin.rolle.rollenFound', { total: rolleStore.totalRollen })
-                  }}</span
+                  >{{ $t('admin.rolle.rollenFound', { count: rolleStore.totalRollen }, rolleStore.totalRollen) }}</span
                 >
               </v-list-item>
             </template>
@@ -421,6 +428,7 @@
             :no-data-text="$t('noDataFound')"
             :placeholder="$t('admin.klasse.klasse')"
             required="true"
+            @update:modelValue="setKlasseFilter"
             @update:search="updateKlassenSearch"
             variant="outlined"
             v-model="selectedKlassen"

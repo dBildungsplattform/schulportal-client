@@ -162,7 +162,7 @@
       "rolleCreateErrorText": "Die Rolle konnte nicht angelegt werden.",
       "rolleFound": "{total} Rolle gefunden",
       "rollenart": "Rollenart",
-      "rollenFound": "{total} Rollen gefunden",
+      "rollenFound": "{count} Rolle gefunden | {count} Rollen gefunden",
       "rollenname": "Rollenname",
       "rollenSelected": "{count} Rollen ausgewählt",
       "rolleAddedSuccessfully": "Die Rolle wurde erfolgreich hinzugefügt.",
