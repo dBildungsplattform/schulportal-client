@@ -15,6 +15,10 @@
   import { OrganisationsTyp } from '@/stores/OrganisationStore';
   import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
   import { useDisplay } from 'vuetify';
+  import type {
+    DbiamUpdatePersonenkontexteBodyParams,
+    DBiamCreatePersonenkontextBodyParams,
+  } from '@/api-client/generated';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
@@ -29,7 +33,7 @@
 
   const zuordnungenResult: Ref<Zuordnung[] | undefined> = ref<Zuordnung[] | undefined>(undefined);
   const getZuordnungen: ComputedRef<Zuordnung[] | undefined> = computed(() => zuordnungenResult.value);
-  const selectedZuordnungen: Zuordnung[] = ref<Zuordnung[]>([]);
+  const selectedZuordnungen = ref<Zuordnung[]>([]);
 
   const isEditActive: Ref<boolean> = ref(false);
   const pendingDeletion: Ref<boolean> = ref(false);
