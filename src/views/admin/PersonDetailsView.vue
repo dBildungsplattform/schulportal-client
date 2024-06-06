@@ -440,7 +440,7 @@
               </template>
               <template v-else>
                 <span
-                  class="my-2"
+                  class="my-3"
                   :class="{
                     'text-body--error': selectedZuordnungen.includes(zuordnung),
                     'text-body': !selectedZuordnungen.includes(zuordnung),

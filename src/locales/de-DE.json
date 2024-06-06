@@ -292,6 +292,7 @@
   },
   "pleaseSelect": "Bitte auswählen",
   "person": {
+    "deleteZuordnungConfirmation": "Wollen Sie wirklich die Schulzuordnung entfernen?",
     "editZuordnungen": "Zuordnungen bearbeiten:",
     "email": "E-Mail",
     "enterFirstName": "Vorname eingeben",
