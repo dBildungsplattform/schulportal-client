@@ -4,14 +4,15 @@
 @import './variables.scss';
 @import './typography.scss';
 @import './components/button.scss';
+@import './components/dialog.scss';
+@import './components/filter-search.scss';
 @import './components/form.scss';
 @import './components/input.scss';
 @import './components/link.scss';
 @import './components/layout-card.scss';
-@import './components/service-provider-card.scss';
 @import './components/menu-bar.scss';
 @import './components/result-table.scss';
-@import './components/dialog.scss';
+@import './components/service-provider-card.scss';
 
 body {
   min-height: 100vh;
