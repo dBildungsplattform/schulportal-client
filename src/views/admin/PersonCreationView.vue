@@ -188,24 +188,6 @@
       organisationStore.getKlassenByOrganisationId(newValue);
     }
   });
-  // Watcher to detect when the search input for Organisationen is triggered.
-  watch(searchInputOrganisation, async (newValue: string, _oldValue: string) => {
-    if (newValue.length >= 3) {
-      personenkontextStore.getPersonenkontextAdministrationsebeneWithFilter(selectedRolle.value, newValue, 25);
-    } else {
-      // If newValue has less than 3 characters, use an empty string instead of newValue to show all organisationen under the selectedRolle.
-      personenkontextStore.getPersonenkontextAdministrationsebeneWithFilter(selectedRolle.value, '', 25);
-    }
-  });
-
-  // Watcher to detect when the search input for Klassen is triggered.
-  watch(searchInputKlasse, async (newValue: string, _oldValue: string) => {
-    if (newValue.length >= 1) {
-      organisationStore.getKlassenByOrganisationId(selectedOrganisation.value, newValue);
-    } else {
-      organisationStore.getKlassenByOrganisationId(selectedOrganisation.value);
-    }
-  });
 
   const organisationen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
     return personenkontextStore.filteredOrganisationen?.moeglicheSsks
@@ -334,6 +316,24 @@
       next();
     }
   });
+
+  function updateKlasseSearch(searchValue: string): void {
+    /* cancel pending call */
+    clearTimeout(timerId);
+    /* delay new call 500ms */
+    timerId = setTimeout(() => {
+      organisationStore.getKlassenByOrganisationId(selectedOrganisation.value, searchValue);
+    }, 500);
+  }
+
+  function updateOrganisationSearch(searchValue: string): void {
+    /* cancel pending call */
+    clearTimeout(timerId);
+    /* delay new call 500ms */
+    timerId = setTimeout(() => {
+      personenkontextStore.getPersonenkontextAdministrationsebeneWithFilter(selectedRolle.value, searchValue, 25);
+    }, 500);
+  }
 
   function updateRollenSearch(searchValue: string): void {
     /* cancel pending call */
@@ -492,6 +492,7 @@
               :no-data-text="$t('noDataFound')"
               :placeholder="$t('admin.organisation.selectOrganisation')"
               required="true"
+              @update:search="updateOrganisationSearch"
               variant="outlined"
               v-bind="selectedOrganisationProps"
               v-model="selectedOrganisation"
@@ -518,6 +519,7 @@
               item-text="title"
               :no-data-text="$t('noDataFound')"
               :placeholder="$t('admin.klasse.selectKlasse')"
+              @update:search="updateKlasseSearch"
               variant="outlined"
               v-bind="selectedKlasseProps"
               v-model="selectedKlasse"
