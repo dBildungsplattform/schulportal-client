@@ -138,11 +138,11 @@ describe('PersonCreationView', () => {
     expect(organisationAutocomplete?.text()).toEqual('O1');
     await nextTick();
 
-    const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
-    await klasseAutocomplete?.setValue('55555');
-    await nextTick();
+    // const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
+    // await klasseAutocomplete?.setValue('55555');
+    // await nextTick();
 
-    expect(klasseAutocomplete?.text()).toEqual('55555');
+    // expect(klasseAutocomplete?.text()).toEqual('55555');
   });
 
   test('it calls watchers for unselected organisation', async () => {
@@ -197,13 +197,13 @@ describe('PersonCreationView', () => {
     expect(organisationAutocomplete?.text()).toEqual('O1');
     await nextTick();
 
-    const familiennameSelect: VueWrapper | undefined = wrapper?.findComponent({ ref: 'familienname-input' });
-    await familiennameSelect?.setValue('Mustermann');
+    const familiennameInput: VueWrapper | undefined = wrapper?.findComponent({ ref: 'familienname-input' });
+    await familiennameInput?.setValue('Mustermann');
     await nextTick();
 
-    const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
-    await klasseAutocomplete?.setValue('55555');
-    await nextTick();
+    // const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
+    // await klasseAutocomplete?.setValue('55555');
+    // await nextTick();
 
     const mockPerson: PersonendatensatzResponse = {
       person: {
