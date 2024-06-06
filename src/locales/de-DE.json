@@ -30,12 +30,12 @@
         "ORGANISATION_SPECIFICATION_ERROR": "Die Klasse konnte nicht angelegt werden."
       },
       "enterKlassenname": "Klassenname eingeben",
+      "klasse": "Klasse",
       "klasseAddedSuccessfully": "Die Klasse wurde erfolgreich hinzugefügt.",
       "klasseCreateErrorTitle": "Fehler beim Anlegen der Klasse",
-      "selectKlasse": "Klasse auswählen",
-      "klasse": "Klasse(n)",
       "klassenname": "Klassenname",
       "management": "Klassenverwaltung",
+      "selectKlasse": "Klasse auswählen",
       "rules": {
         "klasse": {
           "required": "Die Klasse muss ausgewählt werden."
@@ -65,6 +65,54 @@
         "organisation": {
           "required": "Die Organisationsebene muss ausgewählt werden."
         }
+      }
+    },
+    "person": {
+      "addedSuccessfully": "{firstname} {lastname} wurde erfolgreich hinzugefügt.",
+      "addNew": "Neuen Benutzer hinzufügen",
+      "changePassword": "Passwort ändern",
+      "copyPasswordError": "Passwort konnte nicht in die Zwischenablage kopiert werden",
+      "copyPasswordSuccess": "Passwort in Zwischenablage kopiert",
+      "create": "Benutzer anlegen",
+      "createAnother": "Weiteren Benutzer anlegen",
+      "createNew": "Neue Benutzer anlegen",
+      "creationErrorText": "",
+      "creationErrorTitle": "Fehler beim Anlegen des Benutzers.",
+      "deletePerson": "Benutzer löschen",
+      "deletePersonConfirmation": "Wollen Sie den Benutzer {firstname} {lastname} sofort und endgültig löschen?",
+      "deletePersonSuccessMessage": "{firstname} {lastname} wurde erfolgreich gelöscht",
+      "discard": "Benutzer verwerfen",
+      "edit": "Benutzer bearbeiten",
+      "generatedPassword": "Generiertes Passwort",
+      "loadingErrorText": "Es konnten keine Benutzerdaten geladen werden.",
+      "loadingErrorTitle": "Fehler beim Laden des Benutzers.",
+      "management": "Benutzerverwaltung",
+      "personalInfo": "Persönliche Informationen",
+      "resetPasswordConfirmation": "Sind Sie sicher, dass Sie das Passwort für {firstname} {lastname} zurücksetzen möchten?",
+      "resetPasswordInformation": "Bitte teilen Sie dem Benutzer das temporäre Passwort mit. Nach dem Schließen des Dialogs wird es aus Sicherheitsgründen nicht mehr angezeigt.",
+      "resetPassword": "Passwort zurücksetzen",
+      "rules": {
+        "vorname": {
+          "matches": "Der Vorname darf keine ungültigen Zeichen beinhalten.",
+          "min": "Der Vorname muss aus mindestens 2 Zeichen bestehen.",
+          "required": "Der Vorname muss angegeben werden."
+        },
+        "familienname": {
+          "matches": "Der Nachname darf keine ungültigen Zeichen beinhalten.",
+          "min": "Der Nachname muss aus mindestens 2 Zeichen bestehen.",
+          "required": "Der Nachname muss angegeben werden."
+        }
+      },
+      "showAll": "Alle Benutzer anzeigen",
+      "startPassword": "Einstiegs-Passwort",
+      "status": "Status"
+    },
+    "personenkontext": {
+      "creationErrorText": "Bei der Zuordnung des Personenkontextes ist ein Fehler aufgetreten. Bitte prüfen Sie die Zuordnungen an der Person.",
+      "errors": {
+        "GLEICHE_ROLLE_AN_KLASSE_WIE_SCHULE": "Mindestens eine Rolle der Person ist an der Schule nicht bekannt.",
+        "NUR_LEHR_UND_LERN_AN_KLASSE": "Nur Schüler dürfen einer Klasse zugeordnet werden.",
+        "PERSONENKONTEXT_SPECIFICATION_ERROR": "Die Zuordnung konnte nicht angelegt werden."
       }
     },
     "rolle": {
@@ -113,7 +161,9 @@
       "rolleCreateErrorTitle": "Fehler beim Anlegen der Rolle",
       "rolleCreateErrorText": "Die Rolle konnte nicht angelegt werden.",
       "rollenart": "Rollenart",
+      "rollenFound": "{count} Rolle gefunden | {count} Rollen gefunden",
       "rollenname": "Rollenname",
+      "rollenSelected": "{count} Rollen ausgewählt",
       "rolleAddedSuccessfully": "Die Rolle wurde erfolgreich hinzugefügt.",
       "rules": {
         "rolle": {
@@ -136,55 +186,11 @@
       "systemrechte": "Systemrechte",
       "userDataLoadingErrorText": "Es konnten keine Benutzerdaten geladen werden."
     },
-    "person": {
-      "addedSuccessfully": "{firstname} {lastname} wurde erfolgreich hinzugefügt.",
-      "addNew": "Neuen Benutzer hinzufügen",
-      "changePassword": "Passwort ändern",
-      "copyPasswordError": "Passwort konnte nicht in die Zwischenablage kopiert werden",
-      "copyPasswordSuccess": "Passwort in Zwischenablage kopiert",
-      "create": "Benutzer anlegen",
-      "createAnother": "Weiteren Benutzer anlegen",
-      "createNew": "Neue Benutzer anlegen",
-      "creationErrorText": "",
-      "creationErrorTitle": "Fehler beim Anlegen des Benutzers.",
-      "discard": "Benutzer verwerfen",
-      "edit": "Benutzer bearbeiten",
-      "generatedPassword": "Generiertes Passwort",
-      "loadingErrorText": "Es konnten keine Benutzerdaten geladen werden.",
-      "loadingErrorTitle": "Fehler beim Laden des Benutzers.",
-      "management": "Benutzerverwaltung",
-      "personalInfo": "Persönliche Informationen",
-      "resetPasswordConfirmation": "Sind Sie sicher, dass Sie das Passwort für {firstname} {lastname} zurücksetzen möchten?",
-      "resetPasswordInformation": "Bitte teilen Sie dem Benutzer das temporäre Passwort mit. Nach dem Schließen des Dialogs wird es aus Sicherheitsgründen nicht mehr angezeigt.",
-      "resetPassword": "Passwort zurücksetzen",
-      "rules": {
-        "vorname": {
-          "matches": "Der Vorname darf keine ungültigen Zeichen beinhalten.",
-          "min": "Der Vorname muss aus mindestens 2 Zeichen bestehen.",
-          "required": "Der Vorname muss angegeben werden."
-        },
-        "familienname": {
-          "matches": "Der Nachname darf keine ungültigen Zeichen beinhalten.",
-          "min": "Der Nachname muss aus mindestens 2 Zeichen bestehen.",
-          "required": "Der Nachname muss angegeben werden."
-        }
-      },
-      "showAll": "Alle Benutzer anzeigen",
-      "startPassword": "Einstiegs-Passwort",
-      "status": "Status"
-    },
-    "personenkontext": {
-      "creationErrorText": "Bei der Zuordnung des Personenkontextes ist ein Fehler aufgetreten. Bitte prüfen Sie die Zuordnungen an der Person.",
-      "errors": {
-        "GLEICHE_ROLLE_AN_KLASSE_WIE_SCHULE": "Mindestens eine Rolle der Person ist an der Schule nicht bekannt.",
-        "NUR_LEHR_UND_LERN_AN_KLASSE": "Nur Schüler dürfen einer Klasse zugeordnet werden.",
-        "PERSONENKONTEXT_SPECIFICATION_ERROR": "Die Zurodnung konnte nicht angelegt werden."
-      }
-    },
     "searchResultTable":"Ergebnisliste durchsuchen",
     "schule": {
       "addNew": "Neue Schule hinzufügen",
       "administratingSchultraeger": "Verwaltender Schulträger",
+      "all": "Alle Schulen",
       "ersatzschule": "Ersatzschule",
       "assignAdministratingSchultraeger": "Verwaltenden Schulträger zuordnen",
       "assignSchulform": "Schulform zuordnen",
@@ -205,8 +211,6 @@
         "SCHULE_UNTER_TRAEGER": "Eine Schule darf nicht einer anderen Schule zugeordnet werden."
       },
       "management": "Schulverwaltung",
-      "schuleFound": "{total} Schule gefunden",
-      "schulenFound": "{total} Schulen gefunden",
       "publicSchule": "Öffentliche Schule",
       "rules": {
         "dienststellennummer": {
@@ -218,6 +222,8 @@
         }
       },
       "schule": "Schule",
+      "schulenFound": "{count} Schule gefunden | {count} Schulen gefunden",
+      "schulenSelected": "{count} Schulen ausgewählt",
       "schulname": "Schulname",
       "schulform": "Schulform",
       "schuleCreateErrorTitle": "Fehler beim Anlegen der Schule",
@@ -235,7 +241,8 @@
       "assignedServiceProvider": "Zugeordnete Angebote",
       "selectServiceProvider": "Angebote auswählen",
       "serviceProvider": "Angebote"
-    }
+    },
+    "status": "Status"
   },
   "cancel": "Abbrechen",
   "close": "Schließen",
@@ -252,18 +259,6 @@
     "help": "Hilfe",
     "legalNotice": "Impressum",
     "privacyPolicy": "Datenschutzerklärung"
-  },
-  "search": "Suchen",
-  "start": {
-    "allServiceProviders": "Alle Angebote",
-    "categories": {
-      "administration": "Verwaltung",
-      "class": "Unterricht",
-      "hints": "Hinweise",
-      "homePage": "Startseite",
-      "schoolOfferings": "Schulische Angebote",
-      "workEmail": "Dienstliche E-Mail"
-    }
   },
   "itemsPerPage": "Einträge pro Seite",
   "landingTitle": "Willkommen im Schulportal SH.",
@@ -308,6 +303,18 @@
     "zuordnungen": "Zuordnung(en)"
   },
   "resetFilter": "Filter zurücksetzen",
+  "search": "Suchen",
+  "start": {
+    "allServiceProviders": "Alle Angebote",
+    "categories": {
+      "administration": "Verwaltung",
+      "class": "Unterricht",
+      "hints": "Hinweise",
+      "homePage": "Startseite",
+      "schoolOfferings": "Schulische Angebote",
+      "workEmail": "Dienstliche E-Mail"
+    }
+  },
   "unsavedChanges": {
     "message": "Sie haben nicht gespeicherte Änderungen vorgenommen. Wollen Sie die Seite trotzdem verlassen?",
     "title": "Änderungen vorgenommen"

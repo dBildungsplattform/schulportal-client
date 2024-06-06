@@ -43,12 +43,19 @@ type PersonState = {
   currentPerson: Personendatensatz | null;
 };
 
+export type PersonFilter = {
+  organisationIDs?: Array<string>;
+  rolleIDs?: Array<string>;
+  searchFilter?: string;
+};
+
 type PersonGetters = {};
 type PersonActions = {
   createPerson: (person: CreatePersonBodyParams) => Promise<PersonendatensatzResponse>;
-  getAllPersons: (searchFilter: string) => Promise<void>;
+  getAllPersons: (filter: PersonFilter) => Promise<void>;
   getPersonById: (personId: string) => Promise<Personendatensatz>;
   resetPassword: (personId: string) => Promise<string>;
+  deletePerson: (personId: string) => Promise<void>;
 };
 
 export type PersonStore = Store<'personStore', PersonState, PersonGetters, PersonActions>;
@@ -82,7 +89,7 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
         this.loading = false;
       }
     },
-    async getAllPersons(searchFilter: string) {
+    async getAllPersons(filter: PersonFilter) {
       this.loading = true;
       try {
         const { data }: AxiosResponse<PersonFrontendControllerFindPersons200Response> =
@@ -93,13 +100,13 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
             undefined,
             undefined,
             undefined,
-            undefined,
-            undefined,
-            searchFilter,
+            filter.organisationIDs,
+            filter.rolleIDs,
+            filter.searchFilter,
           );
 
         this.allPersons = data.items;
-        this.totalPersons = data.total;
+        this.totalPersons = +data.total;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
@@ -133,6 +140,20 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
       try {
         const { data }: { data: string } = await personenApi.personControllerResetPasswordByPersonId(personId);
         return data;
+      } catch (error: unknown) {
+        this.errorCode = 'UNSPECIFIED_ERROR';
+        if (isAxiosError(error)) {
+          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
+        }
+        return await Promise.reject(this.errorCode);
+      } finally {
+        this.loading = false;
+      }
+    },
+    async deletePerson(personId: string) {
+      this.loading = true;
+      try {
+        await personenApi.personControllerDeletePersonById(personId);
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {

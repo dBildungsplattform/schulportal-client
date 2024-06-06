@@ -82,6 +82,7 @@ export const useOrganisationStore: StoreDefinition<
       loading: false,
     };
   },
+
   actions: {
     async getAllOrganisationen(filter?: OrganisationenFilter): Promise<void> {
       this.loading = true;
@@ -113,13 +114,13 @@ export const useOrganisationStore: StoreDefinition<
         this.loading = false;
       }
     },
+
     async getOrganisationById(organisationId: string) {
       this.errorCode = '';
       this.loading = true;
       try {
         const { data }: { data: Organisation } =
           await organisationApi.organisationControllerFindOrganisationById(organisationId);
-
         this.currentOrganisation = data;
         this.loading = false;
         return data;
@@ -132,6 +133,7 @@ export const useOrganisationStore: StoreDefinition<
         return Promise.reject(this.errorCode);
       }
     },
+
     async getKlassenByOrganisationId(organisationId: string, searchFilter?: string) {
       this.errorCode = '';
       this.loading = true;
@@ -152,6 +154,7 @@ export const useOrganisationStore: StoreDefinition<
         return Promise.reject(this.errorCode);
       }
     },
+
     async createOrganisation(
       kennung: string,
       name: string,

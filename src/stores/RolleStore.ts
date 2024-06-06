@@ -20,6 +20,7 @@ type RolleState = {
   allRollen: Array<RolleResponse>;
   errorCode: string;
   loading: boolean;
+  totalRollen: number;
 };
 
 type RolleGetters = {};
@@ -35,7 +36,7 @@ type RolleActions = {
     merkmale: RollenMerkmal[],
     systemrechte: RollenSystemRecht[],
   ) => Promise<RolleResponse>;
-  getAllRollen: () => Promise<void>;
+  getAllRollen: (searchString: string) => Promise<void>;
 };
 
 export { RollenArt };
@@ -63,6 +64,7 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
       allRollen: [],
       errorCode: '',
       loading: false,
+      totalRollen: 0,
     };
   },
   actions: {
@@ -120,11 +122,16 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
       }
     },
 
-    async getAllRollen() {
+    async getAllRollen(searchString: string = '') {
       this.loading = true;
       try {
-        const { data }: AxiosResponse<Array<RolleResponse>> = await rolleApi.rolleControllerFindRollen();
-        this.allRollen = data;
+        const response: AxiosResponse<Array<RolleResponse>> = await rolleApi.rolleControllerFindRollen(
+          undefined,
+          undefined,
+          searchString,
+        );
+        this.allRollen = response.data;
+        this.totalRollen = +response.headers['x-paging-total'];
         this.loading = false;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
