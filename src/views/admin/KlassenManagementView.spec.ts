@@ -31,6 +31,26 @@ organisationStore.allKlassen = [
     administriertVon: '1',
   },
 ];
+organisationStore.allOrganisationen = [
+  {
+    id: '1',
+    name: '9a',
+    kennung: '9356494-9a',
+    namensergaenzung: 'Klasse',
+    kuerzel: 'aehg',
+    typ: 'SCHULE',
+    administriertVon: '1',
+  },
+  {
+    id: '1',
+    name: '9b',
+    kennung: '9356494-9b',
+    namensergaenzung: 'Klasse',
+    kuerzel: 'aehg',
+    typ: 'SCHULE',
+    administriertVon: '1',
+  },
+];
 beforeEach(() => {
   mockadapter.reset();
 
