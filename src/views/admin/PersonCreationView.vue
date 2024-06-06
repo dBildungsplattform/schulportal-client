@@ -6,7 +6,7 @@
     type CreatedPersonenkontext,
     type PersonStore,
   } from '@/stores/PersonStore';
-  import { type RolleStore, useRolleStore, type RolleResponse, RollenArt } from '@/stores/RolleStore';
+  import { type RolleResponse, RollenArt } from '@/stores/RolleStore';
   import { type ComputedRef, computed, onMounted, onUnmounted, type Ref, ref, watch } from 'vue';
   import {
     onBeforeRouteLeave,
@@ -38,11 +38,11 @@
   const personStore: PersonStore = usePersonStore();
   const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
   const organisationStore: OrganisationStore = useOrganisationStore();
-  const rolleStore: RolleStore = useRolleStore();
   const { t }: Composer = useI18n({ useScope: 'global' });
 
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
   let blockedNext: () => void = () => {};
+  let timerId: ReturnType<typeof setTimeout>;
 
   const searchInputRollen: Ref<string> = ref('');
   const searchInputOrganisation: Ref<string> = ref('');
@@ -64,7 +64,7 @@
   const rollen: ComputedRef<RolleWithRollenart[] | undefined> = computed(() => {
     // If searchInput is less than 3 characters, return the initial 25 roles from the rolleStore
     if (searchInputRollen.value.length < 3) {
-      return rolleStore.allRollen
+      return personenkontextStore.filteredRollen?.moeglicheRollen
         .slice(0, 25)
         .map((rolle: RolleResponse) => ({
           value: rolle.id,
@@ -335,9 +335,18 @@
     }
   });
 
+  function updateRollenSearch(searchValue: string): void {
+    /* cancel pending call */
+    clearTimeout(timerId);
+    /* delay new call 500ms */
+    timerId = setTimeout(() => {
+      personenkontextStore.getPersonenkontextRolleWithFilter(searchValue, 25);
+    }, 500);
+  }
+
   onMounted(async () => {
     await organisationStore.getAllOrganisationen();
-    await rolleStore.getAllRollen();
+    await personenkontextStore.getPersonenkontextRolleWithFilter('', 25);
     personStore.errorCode = '';
     personStore.createdPerson = null;
 
@@ -405,6 +414,7 @@
             :no-data-text="$t('noDataFound')"
             :placeholder="$t('admin.rolle.selectRolle')"
             required="true"
+            @update:search="updateRollenSearch"
             variant="outlined"
             v-bind="selectedRolleProps"
             v-model="selectedRolle"
