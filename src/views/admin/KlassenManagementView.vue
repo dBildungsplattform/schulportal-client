@@ -168,6 +168,10 @@
         searchString: searchValue,
         includeTyp: OrganisationsTyp.Klasse,
       });
+    } else if (searchValue.length < 1 && selectedSchule.value === null) {
+      await organisationStore.getAllOrganisationen({
+        includeTyp: OrganisationsTyp.Klasse,
+      });
     } else if (selectedSchule.value !== null) {
       // Fetch all Klassen for the selected Schule when the search string is cleared
       await organisationStore.getAllOrganisationen({
