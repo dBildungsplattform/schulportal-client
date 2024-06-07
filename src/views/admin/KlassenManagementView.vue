@@ -122,13 +122,6 @@
           ...klasse,
           ...getSchuleDetails(klasse),
         }));
-    } else if (newValue.length > 0 && selectedSchule.value === null) {
-      finalKlassen.value = organisationStore.allKlassen
-        .filter((klasse: Organisation) => newValue.includes(klasse.id))
-        .map((klasse: Organisation) => ({
-          ...klasse,
-          ...getSchuleDetails(klasse),
-        }));
     } else if (selectedSchule.value !== null) {
       // If no Klassen are selected but a Schule is selected, show all Klassen for the selected Schule
       finalKlassen.value = organisationStore.klassen.map((klasse: Organisation) => ({
@@ -340,9 +333,11 @@
                   v-else
                   class="filter-header"
                   >{{
-                    organisationStore.totalOrganisationen === 1
-                      ? $t('admin.schule.schuleFound', { total: organisationStore.totalOrganisationen })
-                      : $t('admin.schule.schulenFound', { total: organisationStore.totalOrganisationen })
+                    $t(
+                      'admin.schule.schulenFound',
+                      { count: organisationStore.totalOrganisationen },
+                      organisationStore.totalOrganisationen,
+                    )
                   }}</span
                 >
               </v-list-item>
@@ -362,6 +357,7 @@
             clearable
             data-testid="klasse-select"
             density="compact"
+            :disabled="!selectedSchule"
             hide-details
             id="klasse-select"
             ref="klasse-select"
@@ -388,9 +384,11 @@
                   v-else
                   class="filter-header"
                   >{{
-                    organisationStore.totalKlassen === 1
-                      ? $t('admin.klasse.klasseFound', { total: organisationStore.totalKlassen })
-                      : $t('admin.klasse.klassenFound', { total: organisationStore.totalKlassen })
+                    $t(
+                      'admin.klasse.klassenFound',
+                      { count: organisationStore.totalKlassen },
+                      organisationStore.totalKlassen,
+                    )
                   }}</span
                 >
               </v-list-item>

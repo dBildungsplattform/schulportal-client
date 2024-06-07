@@ -48,8 +48,7 @@
           "required": "Die Schule muss ausgewählt werden."
         }
       },
-      "klasseFound": "{total} Klasse gefunden",
-      "klassenFound": "{total} Klassen gefunden",
+      "klassenFound": "{count} Klasse gefunden | {count} Klassen gefunden",
       "showAll": "Alle Klassen anzeigen"
     },
     "organisation": {
