@@ -127,33 +127,14 @@ describe('PersonCreationView', () => {
     expect(wrapper?.getComponent({ name: 'FormRow' })).toBeTruthy();
   });
 
-  test('it sets values selected rolle, organisation and klasse', async () => {
-    const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
-    await rolleAutocomplete?.setValue('54321');
-    await nextTick();
-
-    const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
-    await organisationAutocomplete?.setValue('O1');
-    await nextTick();
-
-    expect(organisationAutocomplete?.text()).toEqual('O1');
-    await nextTick();
-
-    const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
-    await klasseAutocomplete?.setValue('55555');
-    await nextTick();
-
-    expect(klasseAutocomplete?.text()).toEqual('55555');
-  });
-
-  test('it updates search for rolle, organisation and klasse', async () => {
+  test('it updates search and sets values selected rolle, organisation and klasse', async () => {
     const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
     await rolleAutocomplete?.vm.$emit('update:search', '54321');
     await rolleAutocomplete?.setValue('54321');
     await nextTick();
 
     const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
-    await rolleAutocomplete?.vm.$emit('update:search', '01');
+    await organisationAutocomplete?.vm.$emit('update:search', '01');
     await organisationAutocomplete?.setValue('O1');
     await nextTick();
 
@@ -161,7 +142,7 @@ describe('PersonCreationView', () => {
     await nextTick();
 
     const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
-    await rolleAutocomplete?.vm.$emit('update:search', '55555');
+    await klasseAutocomplete?.vm.$emit('update:search', '55555');
     await klasseAutocomplete?.setValue('55555');
     await nextTick();
 
