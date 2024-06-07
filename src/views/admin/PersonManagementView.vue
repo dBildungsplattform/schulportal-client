@@ -417,54 +417,62 @@
           md="2"
           class="py-md-0"
         >
-          <v-autocomplete
-            autocomplete="off"
-            class="filter-dropdown"
-            :class="{ selected: selectedKlassen.length > 0 }"
-            clearable
-            data-testid="klasse-select"
-            density="compact"
-            hide-details
-            id="klasse-select"
-            :items="klassen"
-            item-value="value"
-            item-text="title"
-            multiple
-            :no-data-text="$t('noDataFound')"
-            :placeholder="$t('admin.klasse.klasse')"
-            required="true"
-            @update:modelValue="setKlasseFilter"
-            @update:search="updateKlassenSearch"
-            variant="outlined"
-            v-model="selectedKlassen"
-            v-model:search="searchInputKlassen"
-          >
-            <template v-slot:prepend-item>
-              <v-list-item>
-                <v-progress-circular
-                  indeterminate
-                  v-if="organisationStore.loadingKlassen"
-                ></v-progress-circular>
-                <span
-                  v-else
-                  class="filter-header"
-                  >{{
-                    organisationStore.totalKlassen === 1
-                      ? $t('admin.klasse.klasseFound', { total: organisationStore.totalKlassen })
-                      : $t('admin.klasse.klassenFound', { total: organisationStore.totalKlassen })
-                  }}</span
+          <v-tooltip :disabled="!!selectedSchulen.length" location="top">
+            <template v-slot:activator="{ props }">
+              <div v-bind="props">
+                <v-autocomplete
+                  autocomplete="off"
+                  class="filter-dropdown"
+                  :class="{ selected: selectedKlassen.length > 0 }"
+                  clearable
+                  data-testid="klasse-select"
+                  density="compact"
+                  :disabled="!selectedSchulen.length"
+                  hide-details
+                  id="klasse-select"
+                  :items="klassen"
+                  item-value="value"
+                  item-text="title"
+                  multiple
+                  :no-data-text="$t('noDataFound')"
+                  :placeholder="$t('admin.klasse.klasse')"
+                  required="true"
+                  @update:modelValue="setKlasseFilter"
+                  @update:search="updateKlassenSearch"
+                  variant="outlined"
+                  v-model="selectedKlassen"
+                  v-model:search="searchInputKlassen"
                 >
-              </v-list-item>
-            </template>
-            <template v-slot:selection="{ item, index }">
-              <v-chip v-if="selectedKlassen.length < 2">
-                <span>{{ item.title }}</span>
-              </v-chip>
-              <div v-else-if="index === 0">
-                {{ $t('admin.klasse.klassenSelected', { count: selectedKlassen.length }) }}
+                  <template v-slot:prepend-item>
+                    <v-list-item>
+                      <v-progress-circular
+                        indeterminate
+                        v-if="organisationStore.loadingKlassen"
+                      ></v-progress-circular>
+                      <span
+                        v-else
+                        class="filter-header"
+                        >{{
+                          organisationStore.totalKlassen === 1
+                            ? $t('admin.klasse.klasseFound', { total: organisationStore.totalKlassen })
+                            : $t('admin.klasse.klassenFound', { total: organisationStore.totalKlassen })
+                        }}</span
+                      >
+                    </v-list-item>
+                  </template>
+                  <template v-slot:selection="{ item, index }">
+                    <v-chip v-if="selectedKlassen.length < 2">
+                      <span>{{ item.title }}</span>
+                    </v-chip>
+                    <div v-else-if="index === 0">
+                      {{ $t('admin.klasse.klassenSelected', { count: selectedKlassen.length }) }}
+                    </div>
+                  </template>
+                </v-autocomplete>
               </div>
             </template>
-          </v-autocomplete>
+            <span>{{ $t('admin.schule.selectSchuleFirst') }}</span>
+          </v-tooltip>
         </v-col>
         <v-col
           cols="12"
