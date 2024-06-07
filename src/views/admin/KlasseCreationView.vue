@@ -88,7 +88,7 @@
   const translatedSchulname: ComputedRef<string> = computed(
     () =>
       schulen.value?.find(
-        (schule: TranslatedObject) => schule.value === organisationStore.createdOrganisation?.administriertVon,
+        (schule: TranslatedObject) => schule.value === organisationStore.createdKlasse?.administriertVon,
       )?.title || '',
   );
 
@@ -126,7 +126,7 @@
   });
 
   const handleCreateAnotherKlasse = (): void => {
-    organisationStore.createdOrganisation = null;
+    organisationStore.createdKlasse = null;
     resetForm();
     router.push({ name: 'create-klasse' });
   };
@@ -138,7 +138,7 @@
 
   async function navigateToKlasseManagement(): Promise<void> {
     await router.push({ name: 'rolle-management' });
-    organisationStore.createdOrganisation = null;
+    organisationStore.createdKlasse = null;
   }
 
   function handleConfirmUnsavedChanges(): void {
@@ -192,7 +192,7 @@
       />
 
       <!-- The form to create a new Klasse -->
-      <template v-if="!organisationStore.createdOrganisation && !organisationStore.errorCode">
+      <template v-if="!organisationStore.createdKlasse && !organisationStore.errorCode">
         <FormWrapper
           :confirmUnsavedChangesAction="handleConfirmUnsavedChanges"
           :createButtonLabel="$t('admin.klasse.create')"
@@ -256,7 +256,7 @@
       </template>
 
       <!-- Result template on success after submit  -->
-      <template v-if="organisationStore.createdOrganisation && !organisationStore.errorCode">
+      <template v-if="organisationStore.createdKlasse && !organisationStore.errorCode">
         <v-container>
           <v-row justify="center">
             <v-col
@@ -296,7 +296,7 @@
           <v-row>
             <v-col class="text-body bold text-right"> {{ $t('admin.klasse.klassenname') }}: </v-col>
             <v-col class="text-body"
-              ><span data-testid="created-klasse-name">{{ organisationStore.createdOrganisation?.name }}</span></v-col
+              ><span data-testid="created-klasse-name">{{ organisationStore.createdKlasse?.name }}</span></v-col
             >
           </v-row>
           <v-divider

@@ -104,7 +104,7 @@
   });
 
   const handleCreateAnotherSchule = (): void => {
-    organisationStore.createdOrganisation = null;
+    organisationStore.createdSchule = null;
     resetForm();
     router.push({ name: 'create-schule' });
   };
@@ -115,7 +115,7 @@
 
   async function navigateToSchuleManagement(): Promise<void> {
     await router.push({ name: 'schule-management' });
-    organisationStore.createdOrganisation = null;
+    organisationStore.createdSchule = null;
   }
 
   async function navigateBackToSchuleForm(): Promise<void> {
@@ -131,7 +131,7 @@
   }
 
   onMounted(async () => {
-    organisationStore.createdOrganisation = null;
+    organisationStore.createdSchule = null;
     /* listen for browser changes and prevent them when form is dirty */
     window.addEventListener('beforeunload', preventNavigation);
   });
@@ -163,7 +163,7 @@
         buttonClass="primary"
       />
       <!-- The form to create a new school (No created school yet and no errorCode) -->
-      <template v-if="!organisationStore.createdOrganisation && !organisationStore.errorCode">
+      <template v-if="!organisationStore.createdSchule && !organisationStore.errorCode">
         <FormWrapper
           :confirmUnsavedChangesAction="handleConfirmUnsavedChanges"
           :createButtonLabel="$t('admin.schule.create')"
@@ -261,7 +261,7 @@
         </FormWrapper>
       </template>
       <!-- Result template on success after submit (Present value in createdSchule and no errorCode)  -->
-      <template v-if="organisationStore.createdOrganisation && !organisationStore.errorCode">
+      <template v-if="organisationStore.createdSchule && !organisationStore.errorCode">
         <v-container class="new-schule-success">
           <v-row justify="center">
             <v-col
@@ -299,14 +299,14 @@
             <v-col class="text-body bold text-right"> {{ $t('admin.schule.dienststellennummer') }}: </v-col>
             <v-col class="text-body"
               ><span data-testid="created-schule-dienststellennummer">{{
-                organisationStore.createdOrganisation.kennung
+                organisationStore.createdSchule.kennung
               }}</span></v-col
             >
           </v-row>
           <v-row>
             <v-col class="text-body bold text-right"> {{ $t('admin.schule.schulname') }}: </v-col>
             <v-col class="text-body"
-              ><span data-testid="created-schule-name">{{ organisationStore.createdOrganisation.name }}</span></v-col
+              ><span data-testid="created-schule-name">{{ organisationStore.createdSchule.name }}</span></v-col
             >
           </v-row>
           <v-divider
