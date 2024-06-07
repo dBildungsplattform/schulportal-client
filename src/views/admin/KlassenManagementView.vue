@@ -349,51 +349,61 @@
           cols="12"
           class="py-md-0"
         >
-          <v-autocomplete
-            autocomplete="off"
-            chips
-            class="filter-dropdown"
-            :class="{ selected: selectedKlassen.length > 0 }"
-            clearable
-            data-testid="klasse-select"
-            density="compact"
-            :disabled="!selectedSchule"
-            hide-details
-            id="klasse-select"
-            ref="klasse-select"
-            :items="klassenOptions"
-            item-value="value"
-            item-text="title"
-            multiple
-            :no-data-text="$t('noDataFound')"
-            :placeholder="$t('admin.klasse.klasse')"
-            required="true"
-            @update:search="updateKlassenSearch"
-            variant="outlined"
-            @update:modelValue="updateSelectedKlassen"
-            v-model="selectedKlassen"
-            v-model:search="searchInputKlassen"
+          <v-tooltip
+            :disabled="!!selectedSchule"
+            location="top"
           >
-            <template v-slot:prepend-item>
-              <v-list-item>
-                <v-progress-circular
-                  indeterminate
-                  v-if="organisationStore.loading"
-                ></v-progress-circular>
-                <span
-                  v-else
-                  class="filter-header"
-                  >{{
-                    $t(
-                      'admin.klasse.klassenFound',
-                      { count: organisationStore.totalKlassen },
-                      organisationStore.totalKlassen,
-                    )
-                  }}</span
+            <template v-slot:activator="{ props }">
+              <div v-bind="props">
+                <v-autocomplete
+                  autocomplete="off"
+                  chips
+                  class="filter-dropdown"
+                  :class="{ selected: selectedKlassen.length > 0 }"
+                  clearable
+                  data-testid="klasse-select"
+                  density="compact"
+                  :disabled="!selectedSchule"
+                  hide-details
+                  id="klasse-select"
+                  ref="klasse-select"
+                  :items="klassenOptions"
+                  item-value="value"
+                  item-text="title"
+                  multiple
+                  :no-data-text="$t('noDataFound')"
+                  :placeholder="$t('admin.klasse.klasse')"
+                  required="true"
+                  @update:search="updateKlassenSearch"
+                  variant="outlined"
+                  @update:modelValue="updateSelectedKlassen"
+                  v-model="selectedKlassen"
+                  v-model:search="searchInputKlassen"
                 >
-              </v-list-item>
+                  <template v-slot:prepend-item>
+                    <v-list-item>
+                      <v-progress-circular
+                        indeterminate
+                        v-if="organisationStore.loading"
+                      ></v-progress-circular>
+                      <span
+                        v-else
+                        class="filter-header"
+                        >{{
+                          $t(
+                            'admin.klasse.klassenFound',
+                            { count: organisationStore.totalKlassen },
+                            organisationStore.totalKlassen,
+                          )
+                        }}</span
+                      >
+                    </v-list-item>
+                  </template>
+                </v-autocomplete>
+              </div>
             </template>
-          </v-autocomplete>
+            <span>{{ $t('admin.schule.selectSchuleFirst') }}</span>
+          </v-tooltip>
         </v-col>
       </v-row>
       <ResultTable
