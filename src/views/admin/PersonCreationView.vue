@@ -55,27 +55,14 @@
   };
 
   const rollen: ComputedRef<RolleWithRollenart[] | undefined> = computed(() => {
-    // If searchInput is less than 3 characters, return the initial 25 roles from the rolleStore
-    if (searchInputRollen.value.length < 3) {
-      return personenkontextStore.filteredRollen?.moeglicheRollen
-        .slice(0, 25)
-        .map((rolle: RolleResponse) => ({
-          value: rolle.id,
-          title: rolle.name,
-          Rollenart: rolle.rollenart, // Include Rollenart in the object
-        }))
-        .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
-    } else {
-      // Once filtering is applied, map the filteredRollen for the autocomplete
-      return personenkontextStore.filteredRollen?.moeglicheRollen
-        .slice(0, 25)
-        .map((rolle: RolleResponse) => ({
-          value: rolle.id,
-          title: rolle.name,
-          Rollenart: rolle.rollenart, // Include Rollenart in the object
-        }))
-        .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
-    }
+    return personenkontextStore.filteredRollen?.moeglicheRollen
+      .slice(0, 25)
+      .map((rolle: RolleResponse) => ({
+        value: rolle.id,
+        title: rolle.name,
+        Rollenart: rolle.rollenart, // Include Rollenart in the object
+      }))
+      .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
   });
 
   // Define a method to check if the selected Rolle is of type "Lern"
