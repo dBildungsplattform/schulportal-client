@@ -55,7 +55,9 @@ describe('SchuleCreationView', () => {
   });
 
   test('it fills form and triggers submit', async () => {
-    const dienststellennummerInput: VueWrapper | undefined = wrapper?.findComponent({ ref: 'dienststellennummer-input' });
+    const dienststellennummerInput: VueWrapper | undefined = wrapper?.findComponent({
+      ref: 'dienststellennummer-input',
+    });
     await dienststellennummerInput?.setValue('9356494');
     await nextTick();
 
@@ -64,13 +66,13 @@ describe('SchuleCreationView', () => {
     await nextTick();
 
     const mockSchule: OrganisationResponse = {
-        id: '9876',
-        name: 'Random Schulname Gymnasium',
-        kennung: '9356494',
-        namensergaenzung: 'Schule',
-        kuerzel: 'rsg',
-        typ: 'SCHULE',
-        administriertVon: '1',
+      id: '9876',
+      name: 'Random Schulname Gymnasium',
+      kennung: '9356494',
+      namensergaenzung: 'Schule',
+      kuerzel: 'rsg',
+      typ: 'SCHULE',
+      administriertVon: '1',
     } as OrganisationResponse;
 
     organisationStore.createdSchule = mockSchule;

@@ -17,15 +17,17 @@ beforeEach(() => {
 
   organisationStore = useOrganisationStore();
 
-  organisationStore.allOrganisationen = [{
-    id: '1',
-    name: 'Albert-Emil-Hansebrot-Gymnasium',
-    kennung: '9356494',
-    namensergaenzung: 'Schule',
-    kuerzel: 'aehg',
-    typ: 'SCHULE',
-    administriertVon: '1',
-  }]
+  organisationStore.allOrganisationen = [
+    {
+      id: '1',
+      name: 'Albert-Emil-Hansebrot-Gymnasium',
+      kennung: '9356494',
+      namensergaenzung: 'Schule',
+      kuerzel: 'aehg',
+      typ: 'SCHULE',
+      administriertVon: '1',
+    },
+  ];
 
   wrapper = mount(KlasseCreationView, {
     attachTo: document.getElementById('app') || '',
@@ -64,13 +66,13 @@ describe('KlasseCreationView', () => {
     await nextTick();
 
     const mockKlasse: OrganisationResponse = {
-        id: '9876',
-        name: '11b',
-        kennung: '9356494-11b',
-        namensergaenzung: 'Klasse',
-        kuerzel: '11b',
-        typ: 'KLASSE',
-        administriertVon: '1',
+      id: '9876',
+      name: '11b',
+      kennung: '9356494-11b',
+      namensergaenzung: 'Klasse',
+      kuerzel: '11b',
+      typ: 'KLASSE',
+      administriertVon: '1',
     } as OrganisationResponse;
 
     organisationStore.createdKlasse = mockKlasse;
