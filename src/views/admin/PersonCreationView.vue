@@ -54,13 +54,6 @@
     Rollenart: RollenArt;
   };
 
-  // Watcher to detect when the search input for Rollen has 3 or more characters to trigger filtering.
-  watch(searchInputRollen, async (newValue: string, _oldValue: string) => {
-    if (newValue.length >= 3) {
-      personenkontextStore.getPersonenkontextRolleWithFilter(newValue, 25);
-    }
-  });
-
   const rollen: ComputedRef<RolleWithRollenart[] | undefined> = computed(() => {
     // If searchInput is less than 3 characters, return the initial 25 roles from the rolleStore
     if (searchInputRollen.value.length < 3) {
