@@ -223,6 +223,7 @@
               item-value="value"
               item-text="title"
               :placeholder="$t('admin.schule.assignSchule')"
+              ref="schule-select"
               required="true"
               variant="outlined"
               v-bind="selectedSchuleProps"
@@ -247,6 +248,7 @@
               v-bind="selectedKlassennameProps"
               v-model="selectedKlassenname"
               :placeholder="$t('admin.klasse.enterKlassenname')"
+              ref="klassenname-input"
               variant="outlined"
               density="compact"
               required
