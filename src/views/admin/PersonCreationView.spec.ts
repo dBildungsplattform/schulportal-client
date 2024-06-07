@@ -153,6 +153,7 @@ describe('PersonCreationView', () => {
     await nextTick();
 
     const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
+    await rolleAutocomplete?.vm.$emit('update:search', '01');
     await organisationAutocomplete?.setValue('O1');
     await nextTick();
 
@@ -160,6 +161,7 @@ describe('PersonCreationView', () => {
     await nextTick();
 
     const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
+    await rolleAutocomplete?.vm.$emit('update:search', '55555');
     await klasseAutocomplete?.setValue('55555');
     await nextTick();
 
