@@ -232,6 +232,7 @@
               v-bind="selectedDienststellennummerProps"
               v-model="selectedDienststellennummer"
               :placeholder="$t('admin.schule.dienststellennummer')"
+              ref="dienststellennummer-input"
               variant="outlined"
               density="compact"
             ></v-text-field>
@@ -253,6 +254,7 @@
               v-bind="selectedSchulnameProps"
               v-model="selectedSchulname"
               :placeholder="$t('admin.schule.schulname')"
+              ref="schulname-input"
               variant="outlined"
               density="compact"
               required

@@ -1,9 +1,10 @@
 import { expect, test } from 'vitest';
-import { VueWrapper, mount } from '@vue/test-utils';
+import { VueWrapper, flushPromises, mount } from '@vue/test-utils';
 import SchuleCreationView from './SchuleCreationView.vue';
 import { setActivePinia, createPinia } from 'pinia';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import routes from '@/router/routes';
+import { nextTick } from 'vue';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
@@ -45,5 +46,24 @@ describe('SchuleCreationView', () => {
     expect(wrapper?.getComponent({ name: 'SpshAlert' })).toBeTruthy();
     expect(wrapper?.getComponent({ name: 'FormWrapper' })).toBeTruthy();
     expect(wrapper?.getComponent({ name: 'FormRow' })).toBeTruthy();
+  });
+
+  test('it fills the schule creation form', async () => {
+    const dienststellennummerInput: VueWrapper | undefined = wrapper?.findComponent({ ref: 'dienststellennummer-input' });
+    await dienststellennummerInput?.setValue('9356494');
+    await nextTick();
+
+    const schulnameInput: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schulname-input' });
+    await schulnameInput?.setValue('Random Schulname Gymnasium');
+    await nextTick();
+    await flushPromises();
+
+    // TODO: meaningfully expand this test
+
+    wrapper?.find('[data-testid="close-layout-card-button"]').trigger('click');
+    await nextTick();
+
+    // const unsavedChangesDialog: VueWrapper | undefined = wrapper?.findComponent({ ref: 'unsaved-changes-dialog' });
+    // console.log('****', unsavedChangesDialog);
   });
 });
