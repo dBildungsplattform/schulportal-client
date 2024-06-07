@@ -154,6 +154,11 @@
 
   async function setSchuleFilter(newValue: Array<string>): Promise<void> {
     await searchFilterStore.setSchuleFilter(newValue);
+    if (selectedSchulen.value.length) {
+      selectedSchulen.value.forEach(async (schuleId: string) => {
+        await organisationStore.getKlassenByOrganisationId(schuleId, searchInputKlassen.value);
+      });
+    }
     applySearchAndFilters();
   }
 
