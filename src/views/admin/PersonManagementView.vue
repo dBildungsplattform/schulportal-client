@@ -417,7 +417,10 @@
           md="2"
           class="py-md-0"
         >
-          <v-tooltip :disabled="!!selectedSchulen.length" location="top">
+          <v-tooltip
+            :disabled="!!selectedSchulen.length"
+            location="top"
+          >
             <template v-slot:activator="{ props }">
               <div v-bind="props">
                 <v-autocomplete
