@@ -12,14 +12,12 @@ import type {
   RollenMerkmal,
   RollenSystemRecht,
 } from '@/api-client/generated';
-import { useRolleStore, type RolleStore } from '@/stores/RolleStore';
 import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
 
 const mockadapter: MockAdapter = new MockAdapter(ApiService);
 let wrapper: VueWrapper | null = null;
 let organisationStore: OrganisationStore;
 let personenkontextStore: PersonenkontextStore;
-let rolleStore: RolleStore;
 let personStore: PersonStore;
 
 beforeEach(() => {
@@ -32,7 +30,6 @@ beforeEach(() => {
 
   organisationStore = useOrganisationStore();
   personenkontextStore = usePersonenkontextStore();
-  rolleStore = useRolleStore();
   personStore = usePersonStore();
 
   personenkontextStore.filteredOrganisationen = {
@@ -83,18 +80,22 @@ beforeEach(() => {
     },
   ];
 
-  rolleStore.allRollen = [
-    {
-      administeredBySchulstrukturknoten: '1234',
-      rollenart: 'LERN',
-      name: 'SuS',
-      merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RollenMerkmal>,
-      systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
-      createdAt: '2022',
-      updatedAt: '2022',
-      id: '54321',
-    },
-  ];
+  personenkontextStore.filteredRollen = {
+    moeglicheRollen: [
+      {
+        administeredBySchulstrukturknoten: '1234',
+        rollenart: 'LERN',
+        name: 'SuS',
+        merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RollenMerkmal>,
+        systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
+        createdAt: '2022',
+        updatedAt: '2022',
+        id: '54321',
+      },
+    ],
+    total: 1,
+  };
+
   wrapper = mount(PersonCreationView, {
     propsData: {
       searchInputKlasse: 'Testing the ref',
@@ -138,11 +139,11 @@ describe('PersonCreationView', () => {
     expect(organisationAutocomplete?.text()).toEqual('O1');
     await nextTick();
 
-    // const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
-    // await klasseAutocomplete?.setValue('55555');
-    // await nextTick();
+    const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
+    await klasseAutocomplete?.setValue('55555');
+    await nextTick();
 
-    // expect(klasseAutocomplete?.text()).toEqual('55555');
+    expect(klasseAutocomplete?.text()).toEqual('55555');
   });
 
   test('it calls watchers for unselected organisation', async () => {
@@ -201,9 +202,9 @@ describe('PersonCreationView', () => {
     await familiennameInput?.setValue('Mustermann');
     await nextTick();
 
-    // const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
-    // await klasseAutocomplete?.setValue('55555');
-    // await nextTick();
+    const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
+    await klasseAutocomplete?.setValue('55555');
+    await nextTick();
 
     const mockPerson: PersonendatensatzResponse = {
       person: {
