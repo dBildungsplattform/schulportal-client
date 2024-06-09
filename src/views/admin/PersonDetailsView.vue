@@ -6,6 +6,7 @@
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import PersonDelete from '@/components/admin/PersonDelete.vue';
+  import PersonenkontextDelete from '@/components/admin/PersonenkontextDelete.vue';
   import {
     usePersonenkontextStore,
     type PersonenkontextStore,
@@ -33,7 +34,7 @@
 
   const zuordnungenResult: Ref<Zuordnung[] | undefined> = ref<Zuordnung[] | undefined>(undefined);
   const getZuordnungen: ComputedRef<Zuordnung[] | undefined> = computed(() => zuordnungenResult.value);
-  const selectedZuordnungen = ref<Zuordnung[]>([]);
+  const selectedZuordnungen: Ref<Zuordnung[]> = ref<Zuordnung[]>([]);
 
   const isEditActive: Ref<boolean> = ref(false);
   const pendingDeletion: Ref<boolean> = ref(false);
@@ -53,33 +54,36 @@
     navigateToPersonTable();
   };
 
+  // Triggers the template to start editing
   const triggerEdit = (): void => {
     isEditActive.value = true;
   };
+  // Cancels editing
   const cancelEdit = (): void => {
     isEditActive.value = false;
     pendingDeletion.value = false;
     selectedZuordnungen.value = [];
   };
 
+  // Triggers the template to prepare the deletion
   const prepareDeletion = (): void => {
     pendingDeletion.value = true;
-    console.log(pendingDeletion.value);
   };
 
   async function deletePerson(personId: string): Promise<void> {
     await personStore.deletePerson(personId);
   }
 
-  // This will send the updated list of Zuordnungen to the BE WITHOUT the selected Zuordnungen.
+  // This will send the updated list of Zuordnungen to the Backend WITHOUT the selected Zuordnungen.
   const confirmDeletion = async (): Promise<void> => {
+    // The remaining Zuordnungen that were not selected
     const remainingZuordnungen: Zuordnung[] | undefined = zuordnungenResult.value?.filter(
       (zuordnung: Zuordnung) => !selectedZuordnungen.value.includes(zuordnung),
     );
 
     const updateParams: DbiamUpdatePersonenkontexteBodyParams = {
       lastModified: new Date().toISOString(),
-      count: remainingZuordnungen?.length ?? 0,
+      count: zuordnungenResult.value?.length ?? 0,
       personenkontexte: remainingZuordnungen?.map((zuordnung: Zuordnung) => ({
         personId: currentPersonId,
         organisationId: zuordnung.sskId,
@@ -90,6 +94,10 @@
     await personenKontextStore.updatePersonenkontexte(updateParams, currentPersonId);
     zuordnungenResult.value = remainingZuordnungen;
     selectedZuordnungen.value = [];
+    // Reload the route to fetch the Zuordnungen again from the backend
+    router.push(route).then(() => {
+      router.go(0);
+    });
   };
 
   function getSskName(sskDstNr: string, sskName: string): string {
@@ -389,24 +397,17 @@
               cols="12"
               sm="auto"
             >
-              <h3 class="subtitle-1">{{ $t('person.editZuordnungen') }} {{ $t('pleaseSelect') }}</h3>
+              <h3 class="subtitle-1">{{ $t('person.editZuordnungen') }}: {{ $t('pleaseSelect') }}</h3>
             </v-col>
             <v-spacer></v-spacer>
-            <v-col
-              cols="12"
-              sm="6"
-              md="auto"
+            <PersonenkontextDelete
+              v-if="!pendingDeletion"
+              :errorCode="personStore.errorCode"
+              :person="personStore.currentPerson"
+              :disabled="selectedZuordnungen.length === 0"
+              @onDeletePersonenkontext="prepareDeletion"
             >
-              <v-btn
-                class="primary ml-lg-8 mr-lg-16 mr-sm-6"
-                data-testid="zuordnung-save"
-                @click="confirmDeletion"
-                :block="mdAndDown"
-                :disabled="!pendingDeletion"
-              >
-                {{ $t('save') }}
-              </v-btn>
-            </v-col>
+            </PersonenkontextDelete>
           </v-row>
           <!-- Check if 'zuordnungen' array exists and has length > 0 -->
           <v-row
@@ -458,27 +459,7 @@
               </template>
             </v-col>
           </v-row>
-          <v-row
-            justify="end"
-            class="mr-lg-12 mt-4"
-          >
-            <v-col
-              v-if="!pendingDeletion"
-              cols="12"
-              sm="6"
-              md="auto"
-            >
-              <v-btn
-                class="primary ml-lg-16"
-                data-testid="zuordnung-delete"
-                :disabled="selectedZuordnungen.length === 0"
-                @click="prepareDeletion"
-                :block="mdAndDown"
-              >
-                {{ $t('person.removeZuordnung') }}
-              </v-btn>
-            </v-col>
-            <v-spacer></v-spacer>
+          <v-row class="ml-md-16">
             <v-col
               cols="12"
               sm="6"
@@ -491,6 +472,21 @@
                 :block="mdAndDown"
               >
                 {{ $t('cancel') }}
+              </v-btn>
+            </v-col>
+            <v-col
+              cols="12"
+              sm="6"
+              md="auto"
+            >
+              <v-btn
+                class="primary ml-lg-8 mr-lg-16 mr-sm-6"
+                data-testid="zuordnung-save"
+                @click="confirmDeletion"
+                :block="mdAndDown"
+                :disabled="!pendingDeletion"
+              >
+                {{ $t('save') }}
               </v-btn>
             </v-col>
           </v-row>

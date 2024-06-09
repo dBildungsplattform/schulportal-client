@@ -293,7 +293,7 @@
   "pleaseSelect": "Bitte auswählen",
   "person": {
     "deleteZuordnungConfirmation": "Wollen Sie wirklich die Schulzuordnung entfernen?",
-    "editZuordnungen": "Zuordnungen bearbeiten:",
+    "editZuordnungen": "Schulzuordnungen bearbeiten",
     "email": "E-Mail",
     "enterFirstName": "Vorname eingeben",
     "enterLastName": "Nachname eingeben",
@@ -302,13 +302,13 @@
     "klasse": "Klasse",
     "kopersnr": "Kopers-Nr",
     "lastName": "Nachname",
-    "noZuordnungenFound": "Keine Zuordnungen gefunden.",
+    "noZuordnungenFound": "Keine Schulzuordnungen gefunden.",
     "password": "Passwort",
-    "removeZuordnung": "Zuordnung entfernen",
+    "removeZuordnung": "Schulzuordnung entfernen",
     "rolle": "Rolle",
     "userName": "Benutzername",
     "willBeRemoved": "wird entfernt",
-    "zuordnungen": "Zuordnung(en)"
+    "zuordnungen": "Schulzuordnung(en)"
   },
   "save":"Speichern",
   "unsavedChanges": {
