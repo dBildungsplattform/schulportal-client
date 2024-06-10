@@ -144,7 +144,7 @@
 
   async function setKlasseFilter(newValue: Array<string>): Promise<void> {
     await searchFilterStore.setKlasseFilter(newValue);
-    applySearchAndFilters();
+    applySearchAndFilters(newValue);
   }
 
   async function setRolleFilter(newValue: Array<string>): Promise<void> {
