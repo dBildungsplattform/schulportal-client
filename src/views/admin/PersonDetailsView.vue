@@ -366,7 +366,6 @@
           >
             <v-col
               cols="10"
-              offset-lg="2"
               offset="1"
               v-for="zuordnung in getZuordnungen"
               :key="zuordnung.sskId"
@@ -418,7 +417,6 @@
           >
             <v-col
               cols="10"
-              offset-lg="2"
               offset="1"
               v-for="zuordnung in getZuordnungen"
               :key="zuordnung.sskId"
@@ -466,7 +464,7 @@
               md="auto"
             >
               <v-btn
-                class="secondary"
+                class="secondary v-btn--small"
                 data-testid="zuordnung-cancel"
                 @click="cancelEdit"
                 :block="mdAndDown"
@@ -480,7 +478,7 @@
               md="auto"
             >
               <v-btn
-                class="primary ml-lg-8 mr-lg-16 mr-sm-6"
+                class="primary v-btn--small ml-lg-8 mr-lg-16 mr-sm-6"
                 data-testid="zuordnung-save"
                 @click="confirmDeletion"
                 :block="mdAndDown"

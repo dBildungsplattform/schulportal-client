@@ -1,4 +1,4 @@
-.v-btn {
+@mixin button-styles {
   width: 340px;
 
   .v-btn__content {
@@ -68,4 +68,14 @@
   @media only screen and (min-width: 1281px) {
     font-size: $bigButtonFontSize;
   }
+}
+// Default button style
+.v-btn {
+  @include button-styles;
+}
+
+// Small button style
+.v-btn--small {
+  @include button-styles;
+  width: 220px;
 }
