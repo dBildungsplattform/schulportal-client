@@ -30,7 +30,7 @@ describe('OrganisationStore', () => {
           name: 'Organisation 1',
           namensergaenzung: 'Ergänzung',
           kuerzel: 'O1',
-          typ: OrganisationsTyp.Anbieter,
+          typ: OrganisationsTyp.Schule,
           administriertVon: '1',
         },
       ];
@@ -70,7 +70,7 @@ describe('OrganisationStore', () => {
           name: 'Organisation 1',
           namensergaenzung: 'Ergänzung',
           kuerzel: 'O1',
-          typ: OrganisationsTyp.Anbieter,
+          typ: OrganisationsTyp.Schule,
         },
       ];
 
@@ -95,7 +95,7 @@ describe('OrganisationStore', () => {
           name: 'Organisation 1',
           namensergaenzung: 'Ergänzung',
           kuerzel: 'O1',
-          typ: OrganisationsTyp.Anbieter,
+          typ: OrganisationsTyp.Schule,
           administriertVon: '1',
         },
       ];
@@ -169,7 +169,7 @@ describe('OrganisationStore', () => {
     });
 
     describe('createOrganisation', () => {
-      it('should create the Organisation and update state', async () => {
+      it('should create schule and update state', async () => {
         const mockResponse: Organisation[] = [
           {
             id: '1',
@@ -177,7 +177,7 @@ describe('OrganisationStore', () => {
             name: 'Organisation 1',
             namensergaenzung: 'Ergänzung',
             kuerzel: 'O1',
-            typ: OrganisationsTyp.Anbieter,
+            typ: OrganisationsTyp.Schule,
             administriertVon: '1',
           },
         ];
@@ -188,11 +188,40 @@ describe('OrganisationStore', () => {
           'Organisation 1',
           'Ergänzung',
           '01',
-          OrganisationsTyp.Anbieter,
+          OrganisationsTyp.Schule,
         );
         expect(organisationStore.loading).toBe(true);
         await createOrganisationPromise;
-        expect(organisationStore.createdOrganisation).toEqual(mockResponse);
+        expect(organisationStore.createdSchule).toEqual(mockResponse);
+        expect(organisationStore.loading).toBe(false);
+      });
+
+      it('should create klasse and update state', async () => {
+        const mockResponse: Organisation[] = [
+          {
+            id: '1',
+            kennung: 'Org1',
+            name: 'Organisation 1',
+            namensergaenzung: 'Ergänzung',
+            kuerzel: 'O1',
+            typ: OrganisationsTyp.Klasse,
+            administriertVon: '1',
+          },
+        ];
+
+        mockadapter.onPost('/api/organisationen').replyOnce(200, mockResponse);
+        const createOrganisationPromise: Promise<Organisation> = organisationStore.createOrganisation(
+          'Org1',
+          'Organisation 1',
+          'Ergänzung',
+          '01',
+          OrganisationsTyp.Klasse,
+          undefined,
+          '1',
+        );
+        expect(organisationStore.loading).toBe(true);
+        await createOrganisationPromise;
+        expect(organisationStore.createdKlasse).toEqual(mockResponse);
         expect(organisationStore.loading).toBe(false);
       });
 
@@ -203,11 +232,11 @@ describe('OrganisationStore', () => {
           'Organisation 1',
           'Ergänzung',
           '01',
-          OrganisationsTyp.Anbieter,
+          OrganisationsTyp.Schule,
         );
         expect(organisationStore.loading).toBe(true);
         await rejects(createOrganisationPromise);
-        expect(organisationStore.createdOrganisation).toEqual(null);
+        expect(organisationStore.createdSchule).toEqual(null);
         expect(organisationStore.errorCode).toEqual('ORGANISATION_SPECIFICATION_ERROR');
         expect(organisationStore.loading).toBe(false);
       });
@@ -219,11 +248,11 @@ describe('OrganisationStore', () => {
           'Organisation 1',
           'Ergänzung',
           '01',
-          OrganisationsTyp.Anbieter,
+          OrganisationsTyp.Schule,
         );
         expect(organisationStore.loading).toBe(true);
         await expect(createOrganisationPromise).rejects.toEqual('SOME_MOCK_SERVER_ERROR');
-        expect(organisationStore.createdOrganisation).toEqual(null);
+        expect(organisationStore.createdSchule).toEqual(null);
         expect(organisationStore.errorCode).toEqual('SOME_MOCK_SERVER_ERROR');
         expect(organisationStore.loading).toBe(false);
       });
