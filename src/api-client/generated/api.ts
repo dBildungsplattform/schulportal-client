@@ -155,6 +155,18 @@ export interface CreatePersonBodyParams {
      * @memberof CreatePersonBodyParams
      */
     'auskunftssperre'?: boolean;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreatePersonBodyParams
+     */
+    'hashedPassword'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreatePersonBodyParams
+     */
+    'username'?: string;
 }
 
 
@@ -436,6 +448,7 @@ export const DbiamOrganisationErrorI18nKeyEnum = {
     OrganisationSpecificationError: 'ORGANISATION_SPECIFICATION_ERROR',
     KennungRequiredForSchule: 'KENNUNG_REQUIRED_FOR_SCHULE',
     NameRequiredForSchule: 'NAME_REQUIRED_FOR_SCHULE',
+    SchuleKennungEindeutig: 'SCHULE_KENNUNG_EINDEUTIG',
     SchuleUnterTraeger: 'SCHULE_UNTER_TRAEGER',
     TraegerInTraeger: 'TRAEGER_IN_TRAEGER',
     NurKlasseUnterSchule: 'NUR_KLASSE_UNTER_SCHULE',
@@ -1666,7 +1679,8 @@ export const RollenSystemRecht = {
     PersonenVerwalten: 'PERSONEN_VERWALTEN',
     SchulenVerwalten: 'SCHULEN_VERWALTEN',
     KlassenVerwalten: 'KLASSEN_VERWALTEN',
-    SchultraegerVerwalten: 'SCHULTRAEGER_VERWALTEN'
+    SchultraegerVerwalten: 'SCHULTRAEGER_VERWALTEN',
+    MigrationDurchfuehren: 'MIGRATION_DURCHFUEHREN'
 } as const;
 
 export type RollenSystemRecht = typeof RollenSystemRecht[keyof typeof RollenSystemRecht];

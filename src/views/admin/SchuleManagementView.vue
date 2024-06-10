@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import { computed, onMounted, type ComputedRef } from 'vue';
   import ResultTable from '@/components/admin/ResultTable.vue';
+  import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { type Composer, useI18n } from 'vue-i18n';
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
   import {
@@ -9,7 +10,6 @@
     type Organisation,
     type OrganisationStore,
   } from '@/stores/OrganisationStore';
-  import LayoutCard from '@/components/cards/LayoutCard.vue';
 
   const organisationStore: OrganisationStore = useOrganisationStore();
 
@@ -48,7 +48,6 @@
     <LayoutCard :header="$t('admin.schule.management')">
       <ResultTable
         data-testid="schule-table"
-        :header="$t('admin.schule.management')"
         :items="filteredOrganisationen || []"
         :loading="organisationStore.loading"
         :headers="headers"

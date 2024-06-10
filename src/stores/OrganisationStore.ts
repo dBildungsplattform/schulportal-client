@@ -25,7 +25,9 @@ export type Organisation = {
 type OrganisationState = {
   allOrganisationen: Array<Organisation>;
   currentOrganisation: Organisation | null;
-  createdOrganisation: Organisation | null;
+  createdKlasse: Organisation | null;
+  createdSchule: Organisation | null;
+  totalOrganisationen: number;
   klassen: Array<Organisation>;
   errorCode: string;
   loading: boolean;
@@ -34,6 +36,7 @@ type OrganisationState = {
 export type OrganisationenFilter = {
   searchString?: string;
   systemrechte?: RollenSystemRecht[];
+  includeTyp?: OrganisationsTyp;
   excludeTyp?: OrganisationsTyp[];
 };
 
@@ -68,27 +71,31 @@ export const useOrganisationStore: StoreDefinition<
     return {
       allOrganisationen: [],
       currentOrganisation: null,
-      createdOrganisation: null,
+      createdKlasse: null,
+      createdSchule: null,
+      totalOrganisationen: 0,
       klassen: [],
       errorCode: '',
       loading: false,
     };
   },
+
   actions: {
     async getAllOrganisationen(filter?: OrganisationenFilter) {
       this.loading = true;
       try {
-        const { data }: AxiosResponse<Organisation[]> = await organisationApi.organisationControllerFindOrganizations(
+        const response: AxiosResponse<Organisation[]> = await organisationApi.organisationControllerFindOrganizations(
           undefined,
           undefined,
           undefined,
           undefined,
           filter?.searchString,
-          undefined,
+          filter?.includeTyp,
           filter?.systemrechte,
           filter?.excludeTyp,
         );
-        this.allOrganisationen = data;
+        this.allOrganisationen = response.data;
+        this.totalOrganisationen = +response.headers['x-paging-total'];
         this.loading = false;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
@@ -98,13 +105,13 @@ export const useOrganisationStore: StoreDefinition<
         this.loading = false;
       }
     },
+
     async getOrganisationById(organisationId: string) {
       this.errorCode = '';
       this.loading = true;
       try {
         const { data }: { data: Organisation } =
           await organisationApi.organisationControllerFindOrganisationById(organisationId);
-
         this.currentOrganisation = data;
         this.loading = false;
         return data;
@@ -117,6 +124,7 @@ export const useOrganisationStore: StoreDefinition<
         return Promise.reject(this.errorCode);
       }
     },
+
     async getKlassenByOrganisationId(organisationId: string, searchFilter?: string) {
       this.errorCode = '';
       this.loading = true;
@@ -135,6 +143,7 @@ export const useOrganisationStore: StoreDefinition<
         return Promise.reject(this.errorCode);
       }
     },
+
     async createOrganisation(
       kennung: string,
       name: string,
@@ -160,7 +169,11 @@ export const useOrganisationStore: StoreDefinition<
         const { data }: { data: Organisation } =
           await organisationApi.organisationControllerCreateOrganisation(createOrganisationBodyParams);
         this.loading = false;
-        this.createdOrganisation = data;
+        if (typ === OrganisationsTyp.Klasse) {
+          this.createdKlasse = data;
+        } else if (typ === OrganisationsTyp.Schule) {
+          this.createdSchule = data;
+        }
         return data;
       } catch (error: unknown) {
         /* if an unknown error occurs, set to UNSPECIFIED */
