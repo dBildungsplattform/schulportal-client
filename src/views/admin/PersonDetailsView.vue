@@ -420,9 +420,71 @@
               @onDeletePersonenkontext="prepareDeletion"
             >
             </PersonenkontextDelete>
+            <v-col
+              v-if="!pendingDeletion"
+              class="button-container"
+            >
+              <v-tooltip location="left">
+                <template v-slot:activator="{ props: tooltipProps }">
+                  <div v-bind="tooltipProps">
+                    <v-btn
+                      class="primary"
+                      data-testid="open-person-delete-dialog-icon"
+                      :disabled="selectedZuordnungen.length > 0"
+                      v-bind="props"
+                      :block="mdAndDown"
+                    >
+                      {{ $t('person.addZuordnung') }}
+                    </v-btn>
+                  </div>
+                </template>
+                <span>{{
+                  selectedZuordnungen.length > 0 ? $t('person.addZuordnungNotAllowed') : $t('person.addZuordnung')
+                }}</span>
+              </v-tooltip>
+              <v-tooltip location="left">
+                <template v-slot:activator="{ props: tooltipProps }">
+                  <div v-bind="tooltipProps">
+                    <v-btn
+                      class="primary mt-2"
+                      data-testid="open-person-delete-dialog-icon"
+                      :disabled="selectedZuordnungen.length === 0"
+                      v-bind="props"
+                      :block="mdAndDown"
+                    >
+                      {{ $t('person.changeRolle') }}
+                    </v-btn>
+                  </div>
+                </template>
+                <span>{{
+                  selectedZuordnungen.length === 0 ? $t('person.chooseZuordnungFirst') : $t('person.changeRolleHover')
+                }}</span>
+              </v-tooltip>
+              <v-tooltip location="bottom">
+                <template v-slot:activator="{ props: tooltipProps }">
+                  <div v-bind="tooltipProps">
+                    <v-btn
+                      class="primary mt-2"
+                      data-testid="open-person-delete-dialog-icon"
+                      :disabled="selectedZuordnungen.length === 0"
+                      v-bind="props"
+                      :block="mdAndDown"
+                    >
+                      {{ $t('person.modifyBefristung') }}
+                    </v-btn>
+                  </div>
+                </template>
+                <span>{{
+                  selectedZuordnungen.length === 0
+                    ? $t('person.chooseZuordnungFirst')
+                    : $t('person.modifyBefristungHover')
+                }}</span>
+              </v-tooltip>
+            </v-col>
           </v-row>
           <!-- Check if 'zuordnungen' array exists and has length > 0 -->
           <v-row
+            class="ml-md-16 checkbox-row"
             v-if="
               personenKontextStore.personenuebersicht?.zuordnungen &&
               personenKontextStore.personenuebersicht?.zuordnungen.length > 0
@@ -430,7 +492,6 @@
           >
             <v-col
               cols="10"
-              offset="1"
               v-for="zuordnung in getZuordnungen"
               :key="zuordnung.sskId"
               :data-testid="`person-zuordnung-${zuordnung.sskId}`"
@@ -452,7 +513,7 @@
               </template>
               <template v-else>
                 <span
-                  class="my-3"
+                  class="my-3 ml-5"
                   :class="{
                     'text-body--error': selectedZuordnungen.includes(zuordnung),
                     'text-body': !selectedZuordnungen.includes(zuordnung),
@@ -591,4 +652,14 @@
   </div>
 </template>
 
-<style></style>
+<style scoped>
+  .button-container {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    justify-content: end;
+    align-items: flex-end;
+    right: 68px;
+    margin-top: 58px;
+  }
+</style>

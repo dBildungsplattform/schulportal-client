@@ -45,8 +45,8 @@
           <template v-slot:activator="{ props: tooltipProps }">
             <div v-bind="tooltipProps">
               <v-btn
-                class="primary button"
-                data-testid="open-person-delete-dialog-icon"
+                class="primary"
+                data-testid="open-zuordnung-delete-dialog"
                 :disabled="disabled"
                 v-bind="props"
                 :block="mdAndDown"
