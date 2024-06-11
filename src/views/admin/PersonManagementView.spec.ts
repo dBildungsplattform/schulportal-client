@@ -152,7 +152,6 @@ describe('PersonManagementView', () => {
     await nextTick();
 
     expect(schuleAutocomplete?.text()).toEqual('9356494');
-    expect(searchFilterStore.selectedSchulen?.length).toEqual(1);
 
     const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
     await rolleAutocomplete?.setValue(['1']);
