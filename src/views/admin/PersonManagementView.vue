@@ -327,6 +327,7 @@
             multiple
             :no-data-text="$t('noDataFound')"
             :placeholder="$t('admin.schule.schule')"
+            ref="schule-select"
             required="true"
             @update:modelValue="setSchuleFilter"
             @update:search="updateSchulenSearch"
@@ -383,6 +384,7 @@
             multiple
             :no-data-text="$t('noDataFound')"
             :placeholder="$t('admin.rolle.rolle')"
+            ref="rolle-select"
             required="true"
             @update:modelValue="setRolleFilter"
             @update:search="updateRollenSearch"
@@ -440,6 +442,7 @@
                   multiple
                   :no-data-text="$t('noDataFound')"
                   :placeholder="$t('admin.klasse.klasse')"
+                  ref="klasse-select"
                   required="true"
                   @update:modelValue="setKlasseFilter"
                   @update:search="updateKlassenSearch"
