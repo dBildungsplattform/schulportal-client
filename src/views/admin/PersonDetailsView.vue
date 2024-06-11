@@ -424,6 +424,8 @@
             <v-col
               v-if="!pendingDeletion"
               class="button-container"
+              cols="12"
+              sm="auto"
             >
               <v-tooltip location="left">
                 <template v-slot:activator="{ props: tooltipProps }">
@@ -669,4 +671,22 @@
   .checkbox-row {
     margin-bottom: -10px;
   }
+  @media only screen and (min-width: 1280px) and (max-width: 1600px) {
+  .button-container {
+    position: static;
+    margin-top: -15px; 
+    margin-bottom: 10px; 
+    align-items: start;
+  }
+}
+  @media (max-width: 975px) {
+  .button-container {
+    position: static;
+    margin-top: -15px; 
+    margin-bottom: 10px; 
+    align-items: center;
+  }
+}
+
+
 </style>
