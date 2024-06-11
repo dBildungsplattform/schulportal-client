@@ -37,7 +37,7 @@
   >
     <template v-slot:activator="{ props }">
       <v-col
-        class="mr-16"
+        class="mr-lg-16 mr-md-3"
         cols="12"
         sm="6"
         md="auto"

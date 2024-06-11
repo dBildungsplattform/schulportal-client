@@ -659,6 +659,7 @@
 </template>
 
 <style scoped>
+
   .button-container {
     position: absolute;
     display: flex;
@@ -668,15 +669,25 @@
     right: 68px;
     margin-top: 58px;
   }
-  .checkbox-row {
-    margin-bottom: -10px;
-  }
+
   @media only screen and (min-width: 1280px) and (max-width: 1600px) {
   .button-container {
     position: static;
     margin-top: -15px; 
     margin-bottom: 10px; 
     align-items: start;
+  }
+}
+@media only screen and (min-width: 975px) and (max-width: 1279px) {
+  .button-container {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    justify-content: end;
+    align-items: flex-end;
+    right: 68px;
+    margin-top: 58px;
+    margin-right:-50px;
   }
 }
   @media (max-width: 975px) {
@@ -686,7 +697,14 @@
     margin-bottom: 10px; 
     align-items: center;
   }
+  .button-container .v-btn {
+    width: 420px;
+    min-width:100%;
+  }
 }
+.checkbox-row {
+    margin-bottom: -10px;
+  }
 
 
 </style>
