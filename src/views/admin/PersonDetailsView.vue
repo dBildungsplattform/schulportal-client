@@ -84,7 +84,7 @@
 
     const updateParams: DbiamUpdatePersonenkontexteBodyParams = {
       lastModified: new Date().toISOString(),
-      count: zuordnungenResult.value?.length ?? 0,
+      count: personenKontextStore.personenuebersicht?.zuordnungen.length ?? 0,
       personenkontexte: remainingZuordnungen?.map((zuordnung: Zuordnung) => ({
         personId: currentPersonId,
         organisationId: zuordnung.sskId,
