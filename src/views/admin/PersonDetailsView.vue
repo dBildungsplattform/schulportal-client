@@ -484,14 +484,14 @@
           </v-row>
           <!-- Check if 'zuordnungen' array exists and has length > 0 -->
           <v-row
-            class="ml-md-16 checkbox-row"
+            class="ml-md-16"
             v-if="
               personenKontextStore.personenuebersicht?.zuordnungen &&
               personenKontextStore.personenuebersicht?.zuordnungen.length > 0
             "
           >
             <v-col
-              cols="10"
+              cols="12"
               v-for="zuordnung in getZuordnungen"
               :key="zuordnung.sskId"
               :data-testid="`person-zuordnung-${zuordnung.sskId}`"
@@ -499,6 +499,7 @@
               class="py-0 d-flex align-items-center"
             >
               <template v-if="!pendingDeletion">
+                <div class="checkbox-row">
                 <v-checkbox
                   v-model="selectedZuordnungen"
                   :value="zuordnung"
@@ -510,6 +511,7 @@
                     </span>
                   </template>
                 </v-checkbox>
+              </div>
               </template>
               <template v-else>
                 <span
@@ -551,12 +553,12 @@
               sm="6"
               md="auto"
             >
-              <v-tooltip location="bottom">
+              <v-tooltip location="top">
                 <template v-slot:activator="{ props: tooltipProps }">
                   <div v-bind="tooltipProps">
                     <v-btn
-                      class="primary v-btn--small ml-lg-8 mr-lg-16 mr-sm-6"
-                      data-testid="zuordnung-save"
+                      class="primary v-btn--small"
+                      data-testid="zuordnung-changes-save"
                       @click="confirmDeletion"
                       :block="mdAndDown"
                       :disabled="!pendingDeletion"
@@ -661,5 +663,8 @@
     align-items: flex-end;
     right: 68px;
     margin-top: 58px;
+  }
+  .checkbox-row {
+    margin-bottom: -10px;
   }
 </style>
