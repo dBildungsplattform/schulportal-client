@@ -298,6 +298,7 @@
     "changeRolleHover": "Ändert die Rolle des Benutzers an der Schule ohne ihn zu entfernen",
     "chooseZuordnungFirst":"Wählen Sie bitte zuerst eine Zuordnung aus",
     "deleteZuordnungConfirmation": "Wollen Sie wirklich die Schulzuordnung entfernen?",
+    "deleteLastZuordnungConfirmation":"Dies ist die letzte Zuordnung. Wollen Sie wirklich die Schulzuordnung entfernen?",
     "deleteZuordnungSuccess": "Die Zuordnung wurde erfolgreich entfernt.",
     "editZuordnungen": "Schulzuordnungen bearbeiten",
     "email": "E-Mail",

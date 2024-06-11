@@ -10,6 +10,7 @@
   type Props = {
     errorCode: string;
     disabled: boolean;
+    zuordnungCount: number;
   };
 
   type Emits = {
@@ -89,10 +90,20 @@
             </v-row>
             <v-row class="text-body bold px-md-16">
               <v-col
+                v-if="zuordnungCount == 1"
+                offset="2"
+                cols="9"
+              >
+                <span data-testid="last-zuordnung-delete-confirmation-text">
+                  {{ $t('person.deleteLastZuordnungConfirmation') }}
+                </span>
+              </v-col>
+              <v-col
+                v-else
                 offset="3"
                 cols="9"
               >
-                <span data-testid="person-delete-confirmation-text">
+                <span data-testid="zuordnung-delete-confirmation-text">
                   {{ $t('person.deleteZuordnungConfirmation') }}
                 </span>
               </v-col>

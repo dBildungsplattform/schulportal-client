@@ -417,6 +417,7 @@
               :errorCode="personStore.errorCode"
               :person="personStore.currentPerson"
               :disabled="selectedZuordnungen.length === 0"
+              :zuordnung-count="zuordnungenResult?.length"
               @onDeletePersonenkontext="prepareDeletion"
             >
             </PersonenkontextDelete>
@@ -484,7 +485,7 @@
           </v-row>
           <!-- Check if 'zuordnungen' array exists and has length > 0 -->
           <v-row
-            class="ml-md-16"
+            class="ml-md-16 mb-12"
             v-if="
               personenKontextStore.personenuebersicht?.zuordnungen &&
               personenKontextStore.personenuebersicht?.zuordnungen.length > 0
@@ -533,7 +534,7 @@
               </template>
             </v-col>
           </v-row>
-          <v-row class="ml-md-16">
+          <v-row class="ml-md-16 mb-3">
             <v-col
               cols="12"
               sm="6"
