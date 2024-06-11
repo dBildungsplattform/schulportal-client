@@ -431,7 +431,7 @@
                       class="primary"
                       data-testid="open-person-delete-dialog-icon"
                       :disabled="selectedZuordnungen.length > 0"
-                      v-bind="props"
+                      v-bind="tooltipProps"
                       :block="mdAndDown"
                     >
                       {{ $t('person.addZuordnung') }}
@@ -449,7 +449,7 @@
                       class="primary mt-2"
                       data-testid="open-person-delete-dialog-icon"
                       :disabled="selectedZuordnungen.length === 0"
-                      v-bind="props"
+                      v-bind="tooltipProps"
                       :block="mdAndDown"
                     >
                       {{ $t('person.changeRolle') }}
@@ -467,7 +467,7 @@
                       class="primary mt-2"
                       data-testid="open-person-delete-dialog-icon"
                       :disabled="selectedZuordnungen.length === 0"
-                      v-bind="props"
+                      v-bind="tooltipProps"
                       :block="mdAndDown"
                     >
                       {{ $t('person.modifyBefristung') }}
@@ -562,6 +562,7 @@
                       @click="confirmDeletion"
                       :block="mdAndDown"
                       :disabled="!pendingDeletion"
+                      v-bind="tooltipProps"
                     >
                       {{ $t('save') }}
                     </v-btn>
