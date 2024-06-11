@@ -41,15 +41,22 @@
         sm="6"
         md="auto"
       >
-        <v-btn
-          class="primary button"
-          data-testid="open-person-delete-dialog-icon"
-          :disabled="disabled"
-          v-bind="props"
-          :block="mdAndDown"
-        >
-          {{ $t('person.removeZuordnung') }}
-        </v-btn>
+        <v-tooltip location="top">
+          <template v-slot:activator="{ props: tooltipProps }">
+            <div v-bind="tooltipProps">
+              <v-btn
+                class="primary button"
+                data-testid="open-person-delete-dialog-icon"
+                :disabled="disabled"
+                v-bind="props"
+                :block="mdAndDown"
+              >
+                {{ $t('person.removeZuordnung') }}
+              </v-btn>
+            </div>
+          </template>
+          <span>{{ disabled ? $t('person.chooseZuordnungFirst') : $t('person.removeZuordnungInfo') }}</span>
+        </v-tooltip>
       </v-col>
     </template>
 

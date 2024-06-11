@@ -38,6 +38,7 @@
 
   const isEditActive: Ref<boolean> = ref(false);
   const pendingDeletion: Ref<boolean> = ref(false);
+  const successDialogVisible: Ref<boolean> = ref(false);
 
   function navigateToPersonTable(): void {
     router.push({ name: 'person-management' });
@@ -94,7 +95,11 @@
     await personenKontextStore.updatePersonenkontexte(updateParams, currentPersonId);
     zuordnungenResult.value = remainingZuordnungen;
     selectedZuordnungen.value = [];
-    // Reload the route to fetch the Zuordnungen again from the backend
+    successDialogVisible.value = true;
+  };
+
+  const closeSuccessDialog = (): void => {
+    successDialogVisible.value = false;
     router.push(route).then(() => {
       router.go(0);
     });
@@ -393,11 +398,19 @@
         <v-container v-if="isEditActive">
           <v-row class="ml-md-16">
             <v-col
+              v-if="!pendingDeletion"
               cols="12"
               sm="auto"
             >
               <h3 class="subtitle-1">{{ $t('person.editZuordnungen') }}: {{ $t('pleaseSelect') }}</h3>
             </v-col>
+            <v-col
+              v-if="pendingDeletion"
+              cols="12"
+              sm="auto"
+            >
+              <h3 class="subtitle-1">{{ $t('person.editZuordnungen') }}:</h3></v-col
+            >
             <v-spacer></v-spacer>
             <PersonenkontextDelete
               v-if="!pendingDeletion"
@@ -477,15 +490,22 @@
               sm="6"
               md="auto"
             >
-              <v-btn
-                class="primary v-btn--small ml-lg-8 mr-lg-16 mr-sm-6"
-                data-testid="zuordnung-save"
-                @click="confirmDeletion"
-                :block="mdAndDown"
-                :disabled="!pendingDeletion"
-              >
-                {{ $t('save') }}
-              </v-btn>
+              <v-tooltip location="bottom">
+                <template v-slot:activator="{ props: tooltipProps }">
+                  <div v-bind="tooltipProps">
+                    <v-btn
+                      class="primary v-btn--small ml-lg-8 mr-lg-16 mr-sm-6"
+                      data-testid="zuordnung-save"
+                      @click="confirmDeletion"
+                      :block="mdAndDown"
+                      :disabled="!pendingDeletion"
+                    >
+                      {{ $t('save') }}
+                    </v-btn>
+                  </div>
+                </template>
+                <span>{{ !pendingDeletion ? $t('person.noChangesToSave') : $t('person.saveChanges') }}</span>
+              </v-tooltip>
             </v-col>
           </v-row>
         </v-container>
@@ -510,7 +530,6 @@
           >
             <v-col
               cols="12"
-              sm="6"
               md="auto"
               v-if="personStore.currentPerson"
             >
@@ -528,6 +547,47 @@
         </v-container>
       </template>
     </LayoutCard>
+    <!-- Success Dialog after deleting the Zuordnung-->
+    <v-dialog
+      v-model="successDialogVisible"
+      persistent
+      max-width="600px"
+    >
+      <LayoutCard
+        :closable="true"
+        :header="$t('person.editZuordnungen')"
+      >
+        <v-card-text>
+          <v-container>
+            <v-row class="text-body bold px-md-16">
+              <v-col
+                offset="1"
+                cols="10"
+              >
+                <span>{{ $t('person.deleteZuordnungSuccess') }}</span>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card-text>
+        <v-card-actions class="justify-center">
+          <v-row class="justify-center">
+            <v-col
+              cols="12"
+              sm="6"
+              md="4"
+            >
+              <v-btn
+                :block="mdAndDown"
+                class="primary"
+                @click.stop="closeSuccessDialog"
+              >
+                {{ $t('close') }}
+              </v-btn>
+            </v-col>
+          </v-row>
+        </v-card-actions>
+      </LayoutCard>
+    </v-dialog>
   </div>
 </template>
 
