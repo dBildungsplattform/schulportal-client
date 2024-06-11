@@ -372,7 +372,7 @@
                   item-text="title"
                   multiple
                   :no-data-text="$t('noDataFound')"
-                  :placeholder="$t('admin.klasse.klasse')"
+                  :placeholder="$t('admin.klasse.klassen')"
                   required="true"
                   @update:search="updateKlassenSearch"
                   variant="outlined"
