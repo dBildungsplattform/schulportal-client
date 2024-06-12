@@ -2671,7 +2671,7 @@
                 },
                 "responses": {
                     "201": {
-                        "description": "Test",
+                        "description": "Personenkontext was successfully created.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2721,7 +2721,7 @@
                 "parameters": [
                     {
                         "name": "rolleName",
-                        "required": true,
+                        "required": false,
                         "in": "query",
                         "description": "Rolle name used to filter for rollen in personenkontext.",
                         "schema": {
@@ -3127,6 +3127,12 @@
                     },
                     "auskunftssperre": {
                         "type": "boolean"
+                    },
+                    "hashedPassword": {
+                        "type": "string"
+                    },
+                    "username": {
+                        "type": "string"
                     }
                 },
                 "required": [
@@ -3772,6 +3778,7 @@
                             "ORGANISATION_SPECIFICATION_ERROR",
                             "KENNUNG_REQUIRED_FOR_SCHULE",
                             "NAME_REQUIRED_FOR_SCHULE",
+                            "SCHULE_KENNUNG_EINDEUTIG",
                             "SCHULE_UNTER_TRAEGER",
                             "TRAEGER_IN_TRAEGER",
                             "NUR_KLASSE_UNTER_SCHULE",
@@ -3890,7 +3897,8 @@
                     "PERSONEN_VERWALTEN",
                     "SCHULEN_VERWALTEN",
                     "KLASSEN_VERWALTEN",
-                    "SCHULTRAEGER_VERWALTEN"
+                    "SCHULTRAEGER_VERWALTEN",
+                    "MIGRATION_DURCHFUEHREN"
                 ]
             },
             "OrganisationByIdBodyParams": {

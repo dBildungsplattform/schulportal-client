@@ -26,7 +26,8 @@ type OrganisationState = {
   allOrganisationen: Array<Organisation>;
   allKlassen: Array<Organisation>;
   currentOrganisation: Organisation | null;
-  createdOrganisation: Organisation | null;
+  createdKlasse: Organisation | null;
+  createdSchule: Organisation | null;
   totalOrganisationen: number;
   totalKlassen: number;
   klassen: Array<Organisation>;
@@ -74,7 +75,8 @@ export const useOrganisationStore: StoreDefinition<
       allOrganisationen: [],
       allKlassen: [],
       currentOrganisation: null,
-      createdOrganisation: null,
+      createdKlasse: null,
+      createdSchule: null,
       totalOrganisationen: 0,
       totalKlassen: 0,
       klassen: [],
@@ -180,7 +182,11 @@ export const useOrganisationStore: StoreDefinition<
         const { data }: { data: Organisation } =
           await organisationApi.organisationControllerCreateOrganisation(createOrganisationBodyParams);
         this.loading = false;
-        this.createdOrganisation = data;
+        if (typ === OrganisationsTyp.Klasse) {
+          this.createdKlasse = data;
+        } else if (typ === OrganisationsTyp.Schule) {
+          this.createdSchule = data;
+        }
         return data;
       } catch (error: unknown) {
         /* if an unknown error occurs, set to UNSPECIFIED */

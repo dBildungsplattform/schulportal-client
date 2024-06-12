@@ -6,7 +6,7 @@
     type CreatedPersonenkontext,
     type PersonStore,
   } from '@/stores/PersonStore';
-  import { type RolleStore, useRolleStore, type RolleResponse, RollenArt } from '@/stores/RolleStore';
+  import { type RolleResponse, RollenArt } from '@/stores/RolleStore';
   import { type ComputedRef, computed, onMounted, onUnmounted, type Ref, ref, watch } from 'vue';
   import {
     onBeforeRouteLeave,
@@ -38,11 +38,11 @@
   const personStore: PersonStore = usePersonStore();
   const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
   const organisationStore: OrganisationStore = useOrganisationStore();
-  const rolleStore: RolleStore = useRolleStore();
   const { t }: Composer = useI18n({ useScope: 'global' });
 
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
   let blockedNext: () => void = () => {};
+  let timerId: ReturnType<typeof setTimeout>;
 
   const searchInputRollen: Ref<string> = ref('');
   const searchInputOrganisation: Ref<string> = ref('');
@@ -54,35 +54,15 @@
     Rollenart: RollenArt;
   };
 
-  // Watcher to detect when the search input for Rollen has 3 or more characters to trigger filtering.
-  watch(searchInputRollen, async (newValue: string, _oldValue: string) => {
-    if (newValue.length >= 3) {
-      personenkontextStore.getPersonenkontextRolleWithFilter(newValue, 25);
-    }
-  });
-
   const rollen: ComputedRef<RolleWithRollenart[] | undefined> = computed(() => {
-    // If searchInput is less than 3 characters, return the initial 25 roles from the rolleStore
-    if (searchInputRollen.value.length < 3) {
-      return rolleStore.allRollen
-        .slice(0, 25)
-        .map((rolle: RolleResponse) => ({
-          value: rolle.id,
-          title: rolle.name,
-          Rollenart: rolle.rollenart, // Include Rollenart in the object
-        }))
-        .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
-    } else {
-      // Once filtering is applied, map the filteredRollen for the autocomplete
-      return personenkontextStore.filteredRollen?.moeglicheRollen
-        .slice(0, 25)
-        .map((rolle: RolleResponse) => ({
-          value: rolle.id,
-          title: rolle.name,
-          Rollenart: rolle.rollenart, // Include Rollenart in the object
-        }))
-        .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
-    }
+    return personenkontextStore.filteredRollen?.moeglicheRollen
+      .slice(0, 25)
+      .map((rolle: RolleResponse) => ({
+        value: rolle.id,
+        title: rolle.name,
+        Rollenart: rolle.rollenart, // Include Rollenart in the object
+      }))
+      .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
   });
 
   // Define a method to check if the selected Rolle is of type "Lern"
@@ -186,24 +166,6 @@
     if (newValue !== oldValue) {
       // Call fetch with an empty string to get the initial organizations for the selected role without any filter
       organisationStore.getKlassenByOrganisationId(newValue);
-    }
-  });
-  // Watcher to detect when the search input for Organisationen is triggered.
-  watch(searchInputOrganisation, async (newValue: string, _oldValue: string) => {
-    if (newValue.length >= 3) {
-      personenkontextStore.getPersonenkontextAdministrationsebeneWithFilter(selectedRolle.value, newValue, 25);
-    } else {
-      // If newValue has less than 3 characters, use an empty string instead of newValue to show all organisationen under the selectedRolle.
-      personenkontextStore.getPersonenkontextAdministrationsebeneWithFilter(selectedRolle.value, '', 25);
-    }
-  });
-
-  // Watcher to detect when the search input for Klassen is triggered.
-  watch(searchInputKlasse, async (newValue: string, _oldValue: string) => {
-    if (newValue.length >= 1) {
-      organisationStore.getKlassenByOrganisationId(selectedOrganisation.value, newValue);
-    } else {
-      organisationStore.getKlassenByOrganisationId(selectedOrganisation.value);
     }
   });
 
@@ -335,9 +297,36 @@
     }
   });
 
+  function updateKlasseSearch(searchValue: string): void {
+    /* cancel pending call */
+    clearTimeout(timerId);
+    /* delay new call 500ms */
+    timerId = setTimeout(() => {
+      organisationStore.getKlassenByOrganisationId(selectedOrganisation.value, searchValue);
+    }, 500);
+  }
+
+  function updateOrganisationSearch(searchValue: string): void {
+    /* cancel pending call */
+    clearTimeout(timerId);
+    /* delay new call 500ms */
+    timerId = setTimeout(() => {
+      personenkontextStore.getPersonenkontextAdministrationsebeneWithFilter(selectedRolle.value, searchValue, 25);
+    }, 500);
+  }
+
+  function updateRollenSearch(searchValue: string): void {
+    /* cancel pending call */
+    clearTimeout(timerId);
+    /* delay new call 500ms */
+    timerId = setTimeout(() => {
+      personenkontextStore.getPersonenkontextRolleWithFilter(searchValue, 25);
+    }, 500);
+  }
+
   onMounted(async () => {
     await organisationStore.getAllOrganisationen();
-    await rolleStore.getAllRollen('');
+    await personenkontextStore.getPersonenkontextRolleWithFilter('', 25);
     personStore.errorCode = '';
     personStore.createdPerson = null;
 
@@ -405,6 +394,7 @@
             :no-data-text="$t('noDataFound')"
             :placeholder="$t('admin.rolle.selectRolle')"
             required="true"
+            @update:search="updateRollenSearch"
             variant="outlined"
             v-bind="selectedRolleProps"
             v-model="selectedRolle"
@@ -482,6 +472,7 @@
               :no-data-text="$t('noDataFound')"
               :placeholder="$t('admin.organisation.selectOrganisation')"
               required="true"
+              @update:search="updateOrganisationSearch"
               variant="outlined"
               v-bind="selectedOrganisationProps"
               v-model="selectedOrganisation"
@@ -508,6 +499,7 @@
               item-text="title"
               :no-data-text="$t('noDataFound')"
               :placeholder="$t('admin.klasse.selectKlasse')"
+              @update:search="updateKlasseSearch"
               variant="outlined"
               v-bind="selectedKlasseProps"
               v-model="selectedKlasse"
