@@ -31,6 +31,7 @@
       },
       "enterKlassenname": "Klassenname eingeben",
       "klasse": "Klasse",
+      "klassen": "Klasse(n)",
       "klasseAddedSuccessfully": "Die Klasse wurde erfolgreich hinzugefügt.",
       "klasseCreateErrorTitle": "Fehler beim Anlegen der Klasse",
       "klassenname": "Klassenname",
@@ -49,7 +50,9 @@
         "schule": {
           "required": "Die Schule muss ausgewählt werden."
         }
-      }
+      },
+      "klassenFound": "{count} Klasse gefunden | {count} Klassen gefunden",
+      "showAll": "Alle Klassen anzeigen"
     },
     "organisation": {
       "assignOrganisation": "Organisationsebene zuordnen",

@@ -24,6 +24,7 @@ export type Organisation = {
 
 type OrganisationState = {
   allOrganisationen: Array<Organisation>;
+  allKlassen: Array<Organisation>;
   currentOrganisation: Organisation | null;
   createdKlasse: Organisation | null;
   createdSchule: Organisation | null;
@@ -74,6 +75,7 @@ export const useOrganisationStore: StoreDefinition<
   state: (): OrganisationState => {
     return {
       allOrganisationen: [],
+      allKlassen: [],
       currentOrganisation: null,
       createdKlasse: null,
       createdSchule: null,
@@ -87,7 +89,7 @@ export const useOrganisationStore: StoreDefinition<
   },
 
   actions: {
-    async getAllOrganisationen(filter?: OrganisationenFilter) {
+    async getAllOrganisationen(filter?: OrganisationenFilter): Promise<void> {
       this.loading = true;
       try {
         const response: AxiosResponse<Organisation[]> = await organisationApi.organisationControllerFindOrganizations(
@@ -101,8 +103,14 @@ export const useOrganisationStore: StoreDefinition<
           filter?.excludeTyp,
           filter?.administriertVon,
         );
-        this.allOrganisationen = response.data;
-        this.totalOrganisationen = +response.headers['x-paging-total'];
+        if (filter?.includeTyp === OrganisationsTyp.Klasse) {
+          this.allKlassen = response.data;
+          this.totalKlassen = +response.headers['x-paging-total'];
+        } else {
+          this.allOrganisationen = response.data;
+          this.totalOrganisationen = +response.headers['x-paging-total'];
+        }
+        this.loading = false;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
