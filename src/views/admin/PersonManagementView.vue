@@ -59,7 +59,6 @@
   type TranslatedObject = {
     value: string;
     title: string;
-    chipTitle?: string | null;
   };
 
   const searchInputKlassen: Ref<string> = ref('');
@@ -87,7 +86,6 @@
       .map((org: Organisation) => ({
         value: org.id,
         title: `${org.kennung} (${org.name})`,
-        chipTitle: org.kennung,
       }))
       .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
   });
@@ -355,9 +353,7 @@
               </v-list-item>
             </template>
             <template v-slot:selection="{ item, index }">
-              <v-chip v-if="selectedSchulen.length < 2">
-                <span>{{ item.raw.chipTitle }}</span>
-              </v-chip>
+              <span v-if="selectedSchulen.length < 2" class="v-autocomplete__selection-text">{{ item.title }}</span>
               <div v-else-if="index === 0">
                 {{ $t('admin.schule.schulenSelected', { count: selectedSchulen.length }) }}
               </div>
