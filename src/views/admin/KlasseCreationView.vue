@@ -80,7 +80,7 @@
       .filter((org: Organisation) => org.typ === OrganisationsTyp.Schule)
       .map((org: Organisation) => ({
         value: org.id,
-        title: org.kennung ? `${org.kennung} (${org.name})` : org.name,
+        title: org.kennung ? `${org.kennung} (${org.name.trim()})` : org.name,
       }))
       .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
   });
