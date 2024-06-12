@@ -30,7 +30,7 @@ describe('OrganisationStore', () => {
           name: 'Organisation 1',
           namensergaenzung: 'Ergänzung',
           kuerzel: 'O1',
-          typ: OrganisationsTyp.Schule,
+          typ: OrganisationsTyp.Klasse,
           administriertVon: '1',
         },
       ];
@@ -54,9 +54,9 @@ describe('OrganisationStore', () => {
 
     it('should handle error code', async () => {
       mockadapter.onGet('/api/organisationen').replyOnce(500, { code: 'some mock server error' });
-      const getAllOrgaisationsPromise: Promise<void> = organisationStore.getAllOrganisationen();
+      const getAllOrganisationenPromise: Promise<void> = organisationStore.getAllOrganisationen();
       expect(organisationStore.loading).toBe(true);
-      await getAllOrgaisationsPromise;
+      await getAllOrganisationenPromise;
       expect(organisationStore.allOrganisationen).toEqual([]);
       expect(organisationStore.errorCode).toEqual('some mock server error');
       expect(organisationStore.loading).toBe(false);
@@ -70,7 +70,7 @@ describe('OrganisationStore', () => {
           name: 'Organisation 1',
           namensergaenzung: 'Ergänzung',
           kuerzel: 'O1',
-          typ: OrganisationsTyp.Schule,
+          typ: OrganisationsTyp.Klasse,
         },
       ];
 
@@ -83,6 +83,26 @@ describe('OrganisationStore', () => {
       });
       await getAllOrganisationenPromise;
       expect(organisationStore.allOrganisationen).toEqual(mockResponse);
+      expect(organisationStore.loading).toBe(false);
+    });
+    it('should accept filter for typ Klasse', async () => {
+      const mockResponse: Organisation[] = [
+        {
+          id: '1',
+          kennung: 'Org1',
+          name: 'Organisation 1',
+          namensergaenzung: 'Ergänzung',
+          kuerzel: 'O1',
+          typ: OrganisationsTyp.Klasse,
+        },
+      ];
+
+      mockadapter.onGet('/api/organisationen?typ=KLASSE').replyOnce(200, mockResponse);
+      const getAllOrganisationenPromise: Promise<void> = organisationStore.getAllOrganisationen({
+        includeTyp: OrganisationsTyp.Klasse,
+      });
+      await getAllOrganisationenPromise;
+      expect(organisationStore.allKlassen).toEqual(mockResponse);
       expect(organisationStore.loading).toBe(false);
     });
   });

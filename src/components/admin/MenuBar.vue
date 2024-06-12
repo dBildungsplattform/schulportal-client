@@ -147,6 +147,14 @@
       ></v-list-item>
       <v-list-item
         class="menu-bar-sub-item caption"
+        @click="handleMenuItemClick('/admin/klassen')"
+        data-testid="klassen-management-menu-item"
+        prepend-icon="mdi-format-list-bulleted"
+        :title="$t('admin.klasse.showAll')"
+        to="/admin/klassen"
+      ></v-list-item>
+      <v-list-item
+        class="menu-bar-sub-item caption"
         @click="closeMenuOnMobile"
         data-testid="klasse-creation-menu-item"
         prepend-icon="mdi-plus-circle-outline"
