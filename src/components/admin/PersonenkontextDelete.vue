@@ -36,7 +36,7 @@
     persistent
   >
     <template v-slot:activator="{ props }">
-      <v-tooltip location="top">
+      <v-tooltip location="left">
         <template v-slot:activator="{ props: tooltipProps }">
           <div v-bind="tooltipProps">
             <v-btn
@@ -50,7 +50,7 @@
             </v-btn>
           </div>
         </template>
-        <span>{{ disabled ? $t('person.chooseZuordnungFirst') : $t('person.removeZuordnungInfo') }}</span>
+        <span>{{ disabled ? $t('person.chooseZuordnungFirst') : $t('person.removeZuordnungDescription') }}</span>
       </v-tooltip>
     </template>
 

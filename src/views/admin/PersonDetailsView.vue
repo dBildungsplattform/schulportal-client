@@ -9,6 +9,8 @@
   import PersonenkontextDelete from '@/components/admin/PersonenkontextDelete.vue';
   import {
     usePersonenkontextStore,
+    type DBiamCreatePersonenkontextBodyParams,
+    type DbiamUpdatePersonenkontexteBodyParams,
     type PersonenkontextStore,
     type Uebersicht,
     type Zuordnung,
@@ -16,10 +18,6 @@
   import { OrganisationsTyp } from '@/stores/OrganisationStore';
   import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
   import { useDisplay } from 'vuetify';
-  import type {
-    DbiamUpdatePersonenkontexteBodyParams,
-    DBiamCreatePersonenkontextBodyParams,
-  } from '@/api-client/generated';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
@@ -429,7 +427,7 @@
                   :errorCode="personStore.errorCode"
                   :person="personStore.currentPerson"
                   :disabled="selectedZuordnungen.length === 0"
-                  :zuordnung-count="zuordnungenResult?.length"
+                  :zuordnungCount="zuordnungenResult?.length"
                   @onDeletePersonenkontext="prepareDeletion"
                 >
                 </PersonenkontextDelete>
@@ -466,10 +464,10 @@
                     </div>
                   </template>
                   <span>{{
-                    selectedZuordnungen.length === 0 ? $t('person.chooseZuordnungFirst') : $t('person.changeRolleHover')
+                    selectedZuordnungen.length === 0 ? $t('person.chooseZuordnungFirst') : $t('person.changeRolleDescription')
                   }}</span>
                 </v-tooltip>
-                <v-tooltip location="bottom">
+                <v-tooltip location="left">
                   <template v-slot:activator="{ props: tooltipProps }">
                     <div v-bind="tooltipProps">
                       <v-btn
@@ -486,7 +484,7 @@
                   <span>{{
                     selectedZuordnungen.length === 0
                       ? $t('person.chooseZuordnungFirst')
-                      : $t('person.modifyBefristungHover')
+                      : $t('person.modifyBefristungDescription')
                   }}</span>
                 </v-tooltip>
               </v-col>
@@ -527,7 +525,7 @@
                 <span
                   class="my-3 ml-5"
                   :class="{
-                    'text-body--error': selectedZuordnungen.includes(zuordnung),
+                    'text-red': selectedZuordnungen.includes(zuordnung),
                     'text-body': !selectedZuordnungen.includes(zuordnung),
                   }"
                 >
@@ -535,7 +533,7 @@
                   {{ zuordnung.klasse }}
                   <span
                     v-if="selectedZuordnungen.includes(zuordnung)"
-                    class="text-body--error"
+                    class="text-red"
                   >
                     ({{ $t('person.willBeRemoved') }})</span
                   >
@@ -550,7 +548,7 @@
               md="auto"
             >
               <v-btn
-                class="secondary v-btn--small"
+                class="secondary small"
                 data-testid="zuordnung-cancel"
                 @click="cancelEdit"
                 :block="mdAndDown"
@@ -567,7 +565,7 @@
                 <template v-slot:activator="{ props: tooltipProps }">
                   <div v-bind="tooltipProps">
                     <v-btn
-                      class="primary v-btn--small"
+                      class="primary small"
                       data-testid="zuordnung-changes-save"
                       @click="confirmDeletion"
                       :block="mdAndDown"
@@ -665,38 +663,4 @@
   </div>
 </template>
 
-<style scoped>
-  .button-container {
-    position: absolute;
-    display: flex;
-    flex-direction: column;
-    justify-content: end;
-    align-items: flex-end;
-    right: 55px;
-    margin-top: -15px;
-  }
-
-  @media only screen and (min-width: 960px) and (max-width: 1280px) {
-    .button-container {
-      position: absolute;
-      display: flex;
-      flex-direction: column;
-      justify-content: end;
-      align-items: flex-end;
-      right: 68px;
-      margin-top: -15px;
-    }
-  }
-
-  @media (max-width: 1600px) {
-    .button-container {
-      position: static;
-      margin-top: -15px;
-      margin-bottom: 10px;
-      align-items: start;
-    }
-  }
-  .checkbox-row {
-    margin-bottom: -10px;
-  }
-</style>
+<style></style>

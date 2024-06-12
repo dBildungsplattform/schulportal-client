@@ -97,7 +97,7 @@ type PersonenkontextActions = {
   getAllPersonenuebersichten: () => Promise<void>;
 };
 
-export type { SystemrechtResponse };
+export type { SystemrechtResponse, DbiamUpdatePersonenkontexteBodyParams, DBiamCreatePersonenkontextBodyParams };
 export type CreatedPersonenkontext = DBiamCreatePersonenkontextBodyParams;
 export type UserinfoPersonenkontext = {
   organisationsId: string;

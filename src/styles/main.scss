@@ -68,6 +68,41 @@ label.v-label {
   max-width: 241px;
 }
 
+.button-container {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  justify-content: end;
+  align-items: flex-end;
+  right: 55px;
+  margin-top: -15px;
+}
+
+.checkbox-row {
+  margin-bottom: -10px;
+}
+
+@media only screen and (min-width: 960px) and (max-width: 1280px) {
+  .button-container {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    justify-content: end;
+    align-items: flex-end;
+    right: 68px;
+    margin-top: -15px;
+  }
+}
+
+@media (max-width: 1600px) {
+  .button-container {
+    position: static;
+    margin-top: -15px;
+    margin-bottom: 10px;
+    align-items: start;
+  }
+}
+
 @media (min-width: 960px) {
   .v-container {
     max-width: none;

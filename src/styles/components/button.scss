@@ -1,4 +1,4 @@
-@mixin button-styles {
+.v-btn {
   width: 340px;
 
   .v-btn__content {
@@ -48,6 +48,10 @@
       border: $secondaryButtonHoverBorderSize solid $secondaryButtonBorderColor;
     }
   }
+  
+  &.small {
+    width: 220px;
+  }
 
   /* small screen */
   @media only screen and (max-width: 600px) {
@@ -68,14 +72,4 @@
   @media only screen and (min-width: 1281px) {
     font-size: $bigButtonFontSize;
   }
-}
-// Default button style
-.v-btn {
-  @include button-styles;
-}
-
-// Small button style
-.v-btn--small {
-  @include button-styles;
-  width: 220px;
 }
