@@ -460,9 +460,11 @@
                         v-else
                         class="filter-header"
                         >{{
-                          organisationStore.totalKlassen === 1
-                            ? $t('admin.klasse.klasseFound', { total: organisationStore.totalKlassen })
-                            : $t('admin.klasse.klassenFound', { total: organisationStore.totalKlassen })
+                          $t(
+                            'admin.klasse.klassenFound',
+                            { count: organisationStore.totalKlassen },
+                            organisationStore.totalKlassen,
+                          )
                         }}</span
                       >
                     </v-list-item>

@@ -136,7 +136,7 @@ beforeEach(() => {
         personenkontextStore,
         rolleStore,
         searchFilterStore,
-      }
+      },
     },
   });
 });
