@@ -65,10 +65,9 @@
   async function fetchSchuleMap(): Promise<Map<string, string>> {
     await organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Schule });
     return new Map(
-      organisationStore.allOrganisationen.map((org: Organisation) => [org.id, `${org.kennung} (${org.name})`]),
+      organisationStore.allOrganisationen.map((org: Organisation) => [org.id, `${org.kennung} (${org.name.trim()})`]),
     );
   }
-
   // Retrieve the parent Schule from the Klasse using the map's key
   function getSchuleDetails(klasse: Organisation): { schuleDetails: string } {
     const schuleDetails: string | undefined = schuleMap.value.get(klasse.administriertVon || '') ?? '---';
@@ -303,7 +302,7 @@
           <v-autocomplete
             autocomplete="off"
             class="filter-dropdown"
-            :class="{ selected: selectedSchule }"
+            :class="{ selected: selectedSchule, disabled: hasAutoselectedSchule }"
             clearable
             data-testid="schule-select"
             density="compact"
