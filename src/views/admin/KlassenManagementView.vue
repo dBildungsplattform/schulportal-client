@@ -302,7 +302,7 @@
           <v-autocomplete
             autocomplete="off"
             class="filter-dropdown"
-            :class="{ selected: selectedSchule, disabled: hasAutoselectedSchule }"
+            :class="{ selected: selectedSchule }"
             clearable
             data-testid="schule-select"
             density="compact"
