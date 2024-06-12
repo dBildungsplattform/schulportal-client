@@ -2,11 +2,11 @@
   import { type Ref, ref, onBeforeMount, computed, type ComputedRef, watch } from 'vue';
   import { type Router, type RouteLocationNormalizedLoaded, useRoute, useRouter } from 'vue-router';
   import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
-  import PasswordReset from '@/components/admin/PasswordReset.vue';
+  import PasswordReset from '@/components/admin/personen/PasswordReset.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
-  import PersonDelete from '@/components/admin/PersonDelete.vue';
-  import PersonenkontextDelete from '@/components/admin/PersonenkontextDelete.vue';
+  import PersonDelete from '@/components/admin/personen/PersonDelete.vue';
+  import PersonenkontextDelete from '@/components/admin/personen/PersonenkontextDelete.vue';
   import {
     usePersonenkontextStore,
     type DBiamCreatePersonenkontextBodyParams,
