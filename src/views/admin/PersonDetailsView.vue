@@ -494,7 +494,7 @@
           </v-row>
           <!-- Check if 'zuordnungen' array exists and has length > 0 -->
           <v-row
-            class="ml-md-16 mb-12"
+            class="checkbox-row ml-md-16 mb-12"
             v-if="
               personenKontextStore.personenuebersicht?.zuordnungen &&
               personenKontextStore.personenuebersicht?.zuordnungen.length > 0
@@ -509,7 +509,7 @@
               class="py-0 d-flex align-items-center"
             >
               <template v-if="!pendingDeletion">
-                <div class="checkbox-row">
+                <div class="checkbox-div">
                   <v-checkbox
                     v-model="selectedZuordnungen"
                     :value="zuordnung"
