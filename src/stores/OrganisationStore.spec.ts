@@ -30,11 +30,7 @@ describe('OrganisationStore', () => {
           name: 'Organisation 1',
           namensergaenzung: 'Ergänzung',
           kuerzel: 'O1',
-<<<<<<< HEAD
           typ: OrganisationsTyp.Klasse,
-=======
-          typ: OrganisationsTyp.Schule,
->>>>>>> 5210622021552a5fdae78d3ff966f906ec0897c4
           administriertVon: '1',
         },
       ];
@@ -74,11 +70,7 @@ describe('OrganisationStore', () => {
           name: 'Organisation 1',
           namensergaenzung: 'Ergänzung',
           kuerzel: 'O1',
-<<<<<<< HEAD
           typ: OrganisationsTyp.Klasse,
-=======
-          typ: OrganisationsTyp.Schule,
->>>>>>> 5210622021552a5fdae78d3ff966f906ec0897c4
         },
       ];
 
