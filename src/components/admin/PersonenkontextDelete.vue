@@ -36,29 +36,22 @@
     persistent
   >
     <template v-slot:activator="{ props }">
-      <v-col
-        class="mr-lg-16 mr-md-3"
-        cols="12"
-        sm="6"
-        md="auto"
-      >
-        <v-tooltip location="top">
-          <template v-slot:activator="{ props: tooltipProps }">
-            <div v-bind="tooltipProps">
-              <v-btn
-                class="primary"
-                data-testid="open-zuordnung-delete-dialog"
-                :disabled="disabled"
-                v-bind="props"
-                :block="mdAndDown"
-              >
-                {{ $t('person.removeZuordnung') }}
-              </v-btn>
-            </div>
-          </template>
-          <span>{{ disabled ? $t('person.chooseZuordnungFirst') : $t('person.removeZuordnungInfo') }}</span>
-        </v-tooltip>
-      </v-col>
+      <v-tooltip location="top">
+        <template v-slot:activator="{ props: tooltipProps }">
+          <div v-bind="tooltipProps">
+            <v-btn
+              class="primary"
+              data-testid="open-zuordnung-delete-dialog-icon"
+              :disabled="disabled"
+              v-bind="props"
+              :block="mdAndDown"
+            >
+              {{ $t('person.removeZuordnung') }}
+            </v-btn>
+          </div>
+        </template>
+        <span>{{ disabled ? $t('person.chooseZuordnungFirst') : $t('person.removeZuordnungInfo') }}</span>
+      </v-tooltip>
     </template>
 
     <template

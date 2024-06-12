@@ -53,7 +53,7 @@
         md="auto"
       >
         <v-btn
-          class="primary button"
+          class="primary"
           data-testid="open-password-reset-dialog-icon"
           v-bind="props"
           :block="mdAndDown"

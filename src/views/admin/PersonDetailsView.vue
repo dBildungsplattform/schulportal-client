@@ -412,77 +412,83 @@
               <h3 class="subtitle-1">{{ $t('person.editZuordnungen') }}:</h3></v-col
             >
             <v-spacer></v-spacer>
-            <PersonenkontextDelete
-              v-if="!pendingDeletion"
-              :errorCode="personStore.errorCode"
-              :person="personStore.currentPerson"
-              :disabled="selectedZuordnungen.length === 0"
-              :zuordnung-count="zuordnungenResult?.length"
-              @onDeletePersonenkontext="prepareDeletion"
-            >
-            </PersonenkontextDelete>
             <v-col
               v-if="!pendingDeletion"
               class="button-container"
               cols="12"
-              sm="auto"
+              md="auto"
             >
-              <v-tooltip location="left">
-                <template v-slot:activator="{ props: tooltipProps }">
-                  <div v-bind="tooltipProps">
-                    <v-btn
-                      class="primary"
-                      data-testid="open-person-delete-dialog-icon"
-                      :disabled="selectedZuordnungen.length > 0"
-                      v-bind="tooltipProps"
-                      :block="mdAndDown"
-                    >
-                      {{ $t('person.addZuordnung') }}
-                    </v-btn>
-                  </div>
-                </template>
-                <span>{{
-                  selectedZuordnungen.length > 0 ? $t('person.addZuordnungNotAllowed') : $t('person.addZuordnung')
-                }}</span>
-              </v-tooltip>
-              <v-tooltip location="left">
-                <template v-slot:activator="{ props: tooltipProps }">
-                  <div v-bind="tooltipProps">
-                    <v-btn
-                      class="primary mt-2"
-                      data-testid="open-person-delete-dialog-icon"
-                      :disabled="selectedZuordnungen.length === 0"
-                      v-bind="tooltipProps"
-                      :block="mdAndDown"
-                    >
-                      {{ $t('person.changeRolle') }}
-                    </v-btn>
-                  </div>
-                </template>
-                <span>{{
-                  selectedZuordnungen.length === 0 ? $t('person.chooseZuordnungFirst') : $t('person.changeRolleHover')
-                }}</span>
-              </v-tooltip>
-              <v-tooltip location="bottom">
-                <template v-slot:activator="{ props: tooltipProps }">
-                  <div v-bind="tooltipProps">
-                    <v-btn
-                      class="primary mt-2"
-                      data-testid="open-person-delete-dialog-icon"
-                      :disabled="selectedZuordnungen.length === 0"
-                      v-bind="tooltipProps"
-                      :block="mdAndDown"
-                    >
-                      {{ $t('person.modifyBefristung') }}
-                    </v-btn>
-                  </div>
-                </template>
-                <span>{{
-                  selectedZuordnungen.length === 0
-                    ? $t('person.chooseZuordnungFirst')
-                    : $t('person.modifyBefristungHover')
-                }}</span>
-              </v-tooltip>
+              <v-col
+                cols="12"
+                sm="6"
+                md="auto"
+              >
+                <PersonenkontextDelete
+                  v-if="!pendingDeletion"
+                  :errorCode="personStore.errorCode"
+                  :person="personStore.currentPerson"
+                  :disabled="selectedZuordnungen.length === 0"
+                  :zuordnung-count="zuordnungenResult?.length"
+                  @onDeletePersonenkontext="prepareDeletion"
+                >
+                </PersonenkontextDelete>
+                <v-tooltip location="left">
+                  <template v-slot:activator="{ props: tooltipProps }">
+                    <div v-bind="tooltipProps">
+                      <v-btn
+                        class="primary mt-2"
+                        data-testid="open-person-delete-dialog-icon"
+                        :disabled="selectedZuordnungen.length > 0"
+                        v-bind="tooltipProps"
+                        :block="mdAndDown"
+                      >
+                        {{ $t('person.addZuordnung') }}
+                      </v-btn>
+                    </div>
+                  </template>
+                  <span>{{
+                    selectedZuordnungen.length > 0 ? $t('person.addZuordnungNotAllowed') : $t('person.addZuordnung')
+                  }}</span>
+                </v-tooltip>
+                <v-tooltip location="left">
+                  <template v-slot:activator="{ props: tooltipProps }">
+                    <div v-bind="tooltipProps">
+                      <v-btn
+                        class="primary mt-2"
+                        data-testid="open-person-delete-dialog-icon"
+                        :disabled="selectedZuordnungen.length === 0"
+                        v-bind="tooltipProps"
+                        :block="mdAndDown"
+                      >
+                        {{ $t('person.changeRolle') }}
+                      </v-btn>
+                    </div>
+                  </template>
+                  <span>{{
+                    selectedZuordnungen.length === 0 ? $t('person.chooseZuordnungFirst') : $t('person.changeRolleHover')
+                  }}</span>
+                </v-tooltip>
+                <v-tooltip location="bottom">
+                  <template v-slot:activator="{ props: tooltipProps }">
+                    <div v-bind="tooltipProps">
+                      <v-btn
+                        class="primary mt-2"
+                        data-testid="open-person-delete-dialog-icon"
+                        :disabled="selectedZuordnungen.length === 0"
+                        v-bind="tooltipProps"
+                        :block="mdAndDown"
+                      >
+                        {{ $t('person.modifyBefristung') }}
+                      </v-btn>
+                    </div>
+                  </template>
+                  <span>{{
+                    selectedZuordnungen.length === 0
+                      ? $t('person.chooseZuordnungFirst')
+                      : $t('person.modifyBefristungHover')
+                  }}</span>
+                </v-tooltip>
+              </v-col>
             </v-col>
           </v-row>
           <!-- Check if 'zuordnungen' array exists and has length > 0 -->
@@ -503,18 +509,18 @@
             >
               <template v-if="!pendingDeletion">
                 <div class="checkbox-row">
-                <v-checkbox
-                  v-model="selectedZuordnungen"
-                  :value="zuordnung"
-                >
-                  <template v-slot:label>
-                    <span class="text-body">
-                      {{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
-                      {{ zuordnung.klasse }}
-                    </span>
-                  </template>
-                </v-checkbox>
-              </div>
+                  <v-checkbox
+                    v-model="selectedZuordnungen"
+                    :value="zuordnung"
+                  >
+                    <template v-slot:label>
+                      <span class="text-body">
+                        {{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
+                        {{ zuordnung.klasse }}
+                      </span>
+                    </template>
+                  </v-checkbox>
+                </div>
               </template>
               <template v-else>
                 <span
@@ -659,7 +665,6 @@
 </template>
 
 <style scoped>
-
   .button-container {
     position: absolute;
     display: flex;
@@ -667,44 +672,30 @@
     justify-content: end;
     align-items: flex-end;
     right: 68px;
-    margin-top: 58px;
+    margin-top: -15px;
   }
 
-  @media only screen and (min-width: 1280px) and (max-width: 1600px) {
-  .button-container {
-    position: static;
-    margin-top: -15px; 
-    margin-bottom: 10px; 
-    align-items: start;
-  }
-}
-@media only screen and (min-width: 975px) and (max-width: 1279px) {
-  .button-container {
+  @media only screen and (min-width: 960px) and (max-width: 1280px) {
+    .button-container {
     position: absolute;
     display: flex;
     flex-direction: column;
     justify-content: end;
     align-items: flex-end;
     right: 68px;
-    margin-top: 58px;
-    margin-right:-50px;
+    margin-top: -15px;
   }
-}
-  @media (max-width: 975px) {
-  .button-container {
-    position: static;
-    margin-top: -15px; 
-    margin-bottom: 10px; 
-    align-items: center;
   }
-  .button-container .v-btn {
-    width: 420px;
-    min-width:100%;
+
+  @media (max-width: 1600px) {
+    .button-container {
+      position: static;
+      margin-top: -15px;
+      margin-bottom: 10px;
+      align-items: start;
+    }
   }
-}
-.checkbox-row {
+  .checkbox-row {
     margin-bottom: -10px;
   }
-
-
 </style>
