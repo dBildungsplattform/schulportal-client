@@ -83,7 +83,7 @@ label.v-label {
   margin-bottom: -10px;
 }
 
-@media only screen and (max-width: 1039px) {
+@media only screen and (max-width: 960px) {
   .button-container {
     position: static;
     margin-top: -15px;
@@ -104,6 +104,7 @@ label.v-label {
     margin-right: -65px;
   }
 }
+
 @media only screen and (min-width: 1281px) and (max-width: 1600px) {
   .button-container {
     position: static;
