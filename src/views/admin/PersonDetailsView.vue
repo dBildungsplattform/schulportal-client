@@ -198,6 +198,7 @@
     >
       <!-- Error Message Display -->
       <SpshAlert
+        :buttonAction="navigateToPersonTable"
         :model-value="!!personStore.errorCode"
         :title="$t('admin.person.loadingErrorTitle')"
         :type="'error'"
@@ -671,20 +672,20 @@
     flex-direction: column;
     justify-content: end;
     align-items: flex-end;
-    right: 68px;
+    right: 55px;
     margin-top: -15px;
   }
 
   @media only screen and (min-width: 960px) and (max-width: 1280px) {
     .button-container {
-    position: absolute;
-    display: flex;
-    flex-direction: column;
-    justify-content: end;
-    align-items: flex-end;
-    right: 68px;
-    margin-top: -15px;
-  }
+      position: absolute;
+      display: flex;
+      flex-direction: column;
+      justify-content: end;
+      align-items: flex-end;
+      right: 68px;
+      margin-top: -15px;
+    }
   }
 
   @media (max-width: 1600px) {
