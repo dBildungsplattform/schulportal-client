@@ -12,14 +12,12 @@ import type {
   RollenMerkmal,
   RollenSystemRecht,
 } from '@/api-client/generated';
-import { useRolleStore, type RolleStore } from '@/stores/RolleStore';
 import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
 
 const mockadapter: MockAdapter = new MockAdapter(ApiService);
 let wrapper: VueWrapper | null = null;
 let organisationStore: OrganisationStore;
 let personenkontextStore: PersonenkontextStore;
-let rolleStore: RolleStore;
 let personStore: PersonStore;
 
 beforeEach(() => {
@@ -32,7 +30,6 @@ beforeEach(() => {
 
   organisationStore = useOrganisationStore();
   personenkontextStore = usePersonenkontextStore();
-  rolleStore = useRolleStore();
   personStore = usePersonStore();
 
   personenkontextStore.filteredOrganisationen = {
@@ -83,18 +80,22 @@ beforeEach(() => {
     },
   ];
 
-  rolleStore.allRollen = [
-    {
-      administeredBySchulstrukturknoten: '1234',
-      rollenart: 'LERN',
-      name: 'SuS',
-      merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RollenMerkmal>,
-      systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
-      createdAt: '2022',
-      updatedAt: '2022',
-      id: '54321',
-    },
-  ];
+  personenkontextStore.filteredRollen = {
+    moeglicheRollen: [
+      {
+        administeredBySchulstrukturknoten: '1234',
+        rollenart: 'LERN',
+        name: 'SuS',
+        merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RollenMerkmal>,
+        systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
+        createdAt: '2022',
+        updatedAt: '2022',
+        id: '54321',
+      },
+    ],
+    total: 1,
+  };
+
   wrapper = mount(PersonCreationView, {
     propsData: {
       searchInputKlasse: 'Testing the ref',
@@ -126,12 +127,14 @@ describe('PersonCreationView', () => {
     expect(wrapper?.getComponent({ name: 'FormRow' })).toBeTruthy();
   });
 
-  test('it calls watchers for selected rolle, organisation and klasse with value', async () => {
+  test('it updates search and sets values selected rolle, organisation and klasse', async () => {
     const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
+    await rolleAutocomplete?.vm.$emit('update:search', '54321');
     await rolleAutocomplete?.setValue('54321');
     await nextTick();
 
     const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
+    await organisationAutocomplete?.vm.$emit('update:search', '01');
     await organisationAutocomplete?.setValue('O1');
     await nextTick();
 
@@ -139,19 +142,11 @@ describe('PersonCreationView', () => {
     await nextTick();
 
     const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
+    await klasseAutocomplete?.vm.$emit('update:search', '55555');
     await klasseAutocomplete?.setValue('55555');
     await nextTick();
 
     expect(klasseAutocomplete?.text()).toEqual('55555');
-  });
-
-  test('it calls watchers for unselected organisation', async () => {
-    const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
-    await rolleAutocomplete?.setValue(undefined);
-    await nextTick();
-
-    const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
-    expect(organisationAutocomplete?.exists()).toBe(false);
   });
 
   test('it resets field Organisation when Rolle is reset after being selected', async () => {
@@ -197,8 +192,8 @@ describe('PersonCreationView', () => {
     expect(organisationAutocomplete?.text()).toEqual('O1');
     await nextTick();
 
-    const familiennameSelect: VueWrapper | undefined = wrapper?.findComponent({ ref: 'familienname-input' });
-    await familiennameSelect?.setValue('Mustermann');
+    const familiennameInput: VueWrapper | undefined = wrapper?.findComponent({ ref: 'familienname-input' });
+    await familiennameInput?.setValue('Mustermann');
     await nextTick();
 
     const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });

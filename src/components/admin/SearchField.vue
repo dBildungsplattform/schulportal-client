@@ -6,7 +6,6 @@
   useI18n({ useScope: 'global' });
 
   const searchFilterStore: SearchFilterStore = useSearchFilterStore();
-
   const searchFilter: Ref<string | null> = ref(searchFilterStore.searchFilter);
 
   type Emits = {
@@ -23,12 +22,16 @@
 
   const props: Props = defineProps<Props>();
 
+  defineExpose({
+    searchFilter,
+  });
+
   async function applySearchFilter(): Promise<void> {
     if (searchFilter.value !== null) {
-      await searchFilterStore.setFilter(searchFilter.value.trim());
+      await searchFilterStore.setSearchFilter(searchFilter.value.trim());
       emit('onApplySearchFilter', searchFilter.value.trim());
     } else {
-      await searchFilterStore.setFilter(searchFilter.value);
+      await searchFilterStore.setSearchFilter(searchFilter.value);
       emit('onApplySearchFilter', '');
     }
   }
@@ -40,40 +43,38 @@
 </script>
 
 <template>
-  <v-row
-    class="pt-4 px-3"
-    justify="end"
+  <v-col
+    cols="6"
+    md="3"
   >
-    <v-col
-      cols="6"
-      md="3"
+    <v-text-field
+      class="search-field"
+      clearable
+      data-testid="search-filter-input"
+      density="compact"
+      hide-details
+      id="search-filter-input"
+      @keyup.enter="applySearchFilter"
+      :placeholder="$t('admin.searchResultTable')"
+      required="true"
+      :title="props.hoverText"
+      variant="outlined"
+      v-model="searchFilter"
+    ></v-text-field>
+  </v-col>
+  <v-col md="2">
+    <v-btn
+      block
+      class="primary search button"
+      @click="applySearchFilter()"
+      data-testid="apply-search-filter-button"
+      height="44"
+      prepend-icon="mdi-magnify"
+      width="130"
     >
-      <v-text-field
-        clearable
-        data-testid="search-filter-input"
-        density="compact"
-        id="search-filter-input"
-        :placeholder="$t('admin.searchResultTable')"
-        required="true"
-        variant="outlined"
-        v-model="searchFilter"
-        :title="props.hoverText"
-        @keyup.enter="applySearchFilter"
-      ></v-text-field>
-    </v-col>
-    <v-col md="2">
-      <v-btn
-        prepend-icon="mdi-magnify"
-        class="primary button"
-        data-testid="apply-search-filter-button"
-        @click="applySearchFilter()"
-        height="45"
-        width="130"
-      >
-        {{ $t('search') }}</v-btn
-      >
-    </v-col>
-  </v-row>
+      {{ $t('search') }}
+    </v-btn>
+  </v-col>
 </template>
 
 <style></style>

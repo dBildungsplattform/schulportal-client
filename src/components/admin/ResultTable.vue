@@ -1,6 +1,5 @@
 <script setup lang="ts">
   import { computed, type ComputedRef } from 'vue';
-
   import { type Composer, useI18n } from 'vue-i18n';
 
   /* this block is necessary to introduce a table header type for defining table headers

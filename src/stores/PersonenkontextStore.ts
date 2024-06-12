@@ -152,6 +152,7 @@ export const usePersonenkontextStore: StoreDefinition<
         this.loading = false;
       }
     },
+
     async getPersonenkontextRolleWithFilter(rolleName: string, limit: number) {
       this.loading = true;
       try {
@@ -168,6 +169,7 @@ export const usePersonenkontextStore: StoreDefinition<
         this.loading = false;
       }
     },
+
     async getPersonenkontextAdministrationsebeneWithFilter(rolleId: string, sskName: string, limit: number) {
       this.loading = true;
       try {
@@ -184,6 +186,7 @@ export const usePersonenkontextStore: StoreDefinition<
         this.loading = false;
       }
     },
+
     async createPersonenkontext(
       personenkontext: DBiamCreatePersonenkontextBodyParams,
       personenKontextTyp: PersonenKontextTyp,
