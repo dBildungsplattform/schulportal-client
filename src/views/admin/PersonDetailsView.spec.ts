@@ -38,6 +38,7 @@ const mockPersonenuebersicht: Uebersicht = {
       rolle: 'SuS',
       typ: OrganisationsTyp.Schule,
       administriertVon: '2',
+      editable: true,
     },
     {
       sskId: '1',
@@ -47,6 +48,7 @@ const mockPersonenuebersicht: Uebersicht = {
       rolle: 'SuS',
       typ: OrganisationsTyp.Schule,
       administriertVon: '2',
+      editable: true,
     },
     {
       sskId: '2',
@@ -56,6 +58,7 @@ const mockPersonenuebersicht: Uebersicht = {
       rolle: 'SuS',
       typ: OrganisationsTyp.Klasse,
       administriertVon: '1',
+      editable: true,
     },
   ],
 };
