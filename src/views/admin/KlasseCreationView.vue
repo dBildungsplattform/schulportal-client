@@ -185,7 +185,7 @@
         :title="$t('admin.klasse.klasseCreateErrorTitle')"
         :type="'error'"
         :closable="false"
-        :text="$t(`admin.klasse.errors.${organisationStore.errorCode}`)"
+        :text="organisationStore.errorCode ? $t(`admin.klasse.errors.${organisationStore.errorCode}`) : ''"
         :showButton="true"
         :buttonText="$t('admin.klasse.backToCreateKlasse')"
         :buttonAction="navigateBackToKlasseForm"

@@ -328,7 +328,7 @@
         :title="t('admin.rolle.rolleCreateErrorTitle')"
         :type="'error'"
         :closable="false"
-        :text="$t(`admin.rolle.errors.${rolleStore.errorCode}`)"
+        :text="rolleStore.errorCode ? $t(`admin.rolle.errors.${rolleStore.errorCode}`) : ''"
         :showButton="true"
         :buttonText="$t('admin.rolle.backToCreateRolle')"
         :buttonAction="navigateBackToRolleForm"
