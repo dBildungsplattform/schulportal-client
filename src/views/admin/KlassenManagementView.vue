@@ -56,7 +56,7 @@
     return organisationStore.allOrganisationen
       .map((org: Organisation) => ({
         value: org.id,
-        title: `${org.kennung} (${org.name})`,
+        title: `${org.kennung} (${org.name.trim()})`,
       }))
       .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
   });
