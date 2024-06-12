@@ -464,7 +464,9 @@
                     </div>
                   </template>
                   <span>{{
-                    selectedZuordnungen.length === 0 ? $t('person.chooseZuordnungFirst') : $t('person.changeRolleDescription')
+                    selectedZuordnungen.length === 0
+                      ? $t('person.chooseZuordnungFirst')
+                      : $t('person.changeRolleDescription')
                   }}</span>
                 </v-tooltip>
                 <v-tooltip location="left">
@@ -500,7 +502,7 @@
           >
             <v-col
               cols="12"
-              v-for="zuordnung in getZuordnungen"
+              v-for="zuordnung in getZuordnungen?.filter(zuordnung => zuordnung.editable)"
               :key="zuordnung.sskId"
               :data-testid="`person-zuordnung-${zuordnung.sskId}`"
               :title="zuordnung.sskName"

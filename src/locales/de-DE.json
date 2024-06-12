@@ -292,7 +292,7 @@
   },
   "pleaseSelect": "Bitte auswählen",
   "person": {
-    "addZuordnung": "Schulzuordnung hinzufügen.",
+    "addZuordnung": "Schulzuordnung hinzufügen",
     "addZuordnungNotAllowed": "Diese Aktion ist nach Auswahl einer Schulzuordnung nicht ausführbar.",
     "changeRolle": "Rolle ändern",
     "changeRolleDescription": "Ändert die Rolle des Benutzers an der Schule ohne ihn zu entfernen.",

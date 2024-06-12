@@ -2742,7 +2742,7 @@
                 },
                 "responses": {
                     "201": {
-                        "description": "Successfully created personenkontext.",
+                        "description": "Personenkontext was successfully created.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -3198,6 +3198,12 @@
                     },
                     "auskunftssperre": {
                         "type": "boolean"
+                    },
+                    "hashedPassword": {
+                        "type": "string"
+                    },
+                    "username": {
+                        "type": "string"
                     }
                 },
                 "required": [
@@ -3541,6 +3547,9 @@
                     "typ": {
                         "nullable": true,
                         "$ref": "#/components/schemas/OrganisationsTyp"
+                    },
+                    "editable": {
+                        "type": "boolean"
                     }
                 },
                 "required": [
@@ -3550,7 +3559,8 @@
                     "sskDstNr",
                     "rolle",
                     "administriertVon",
-                    "typ"
+                    "typ",
+                    "editable"
                 ]
             },
             "DBiamPersonenuebersichtResponse": {
@@ -3843,6 +3853,7 @@
                             "ORGANISATION_SPECIFICATION_ERROR",
                             "KENNUNG_REQUIRED_FOR_SCHULE",
                             "NAME_REQUIRED_FOR_SCHULE",
+                            "SCHULE_KENNUNG_EINDEUTIG",
                             "SCHULE_UNTER_TRAEGER",
                             "TRAEGER_IN_TRAEGER",
                             "NUR_KLASSE_UNTER_SCHULE",
@@ -3961,7 +3972,8 @@
                     "PERSONEN_VERWALTEN",
                     "SCHULEN_VERWALTEN",
                     "KLASSEN_VERWALTEN",
-                    "SCHULTRAEGER_VERWALTEN"
+                    "SCHULTRAEGER_VERWALTEN",
+                    "MIGRATION_DURCHFUEHREN"
                 ]
             },
             "OrganisationByIdBodyParams": {

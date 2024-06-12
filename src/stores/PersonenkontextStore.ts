@@ -48,6 +48,7 @@ export type Zuordnung = {
   rolle: string;
   administriertVon: string;
   typ: OrganisationsTyp;
+  editable: boolean;
 };
 
 export type Uebersicht =
@@ -65,6 +66,7 @@ export type Uebersicht =
         rolle: string;
         administriertVon: string;
         typ: OrganisationsTyp;
+        editable: boolean;
       }[];
     }
   | undefined;
