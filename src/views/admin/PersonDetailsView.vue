@@ -545,6 +545,7 @@
           </v-row>
           <v-row class="save-cancel-row ml-md-16 mb-3">
             <v-col
+            class= "cancel-col"
               cols="12"
               sm="6"
               md="auto"
@@ -660,7 +661,13 @@
 </template>
 
 <style scoped>
+
+@media only screen and (max-width: 600px) {
   .save-cancel-row {
     margin-top: -40px;
   }
+  .cancel-col {
+    margin-bottom: -15px;
+  }
+}
 </style>
