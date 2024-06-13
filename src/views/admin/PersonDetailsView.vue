@@ -368,7 +368,7 @@
           </v-row>
           <!-- Check if 'zuordnungen' array exists and has length > 0 -->
           <v-row
-            class="mt-0"
+            class="mt-0 ml-md-3"
             v-if="
               personenKontextStore.personenuebersicht?.zuordnungen &&
               personenKontextStore.personenuebersicht?.zuordnungen.length > 0
