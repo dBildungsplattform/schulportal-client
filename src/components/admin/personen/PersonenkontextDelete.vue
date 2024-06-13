@@ -3,6 +3,7 @@
   import { useI18n } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
+  import SpshTooltip from '@/components/admin/SpshTooltip.vue';
 
   useI18n({ useScope: 'global' });
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
@@ -36,22 +37,21 @@
     persistent
   >
     <template v-slot:activator="{ props }">
-      <v-tooltip location="left">
-        <template v-slot:activator="{ props: tooltipProps }">
-          <div v-bind="tooltipProps">
-            <v-btn
-              class="primary"
-              data-testid="open-zuordnung-delete-dialog-icon"
-              :disabled="disabled"
-              v-bind="props"
-              :block="mdAndDown"
-            >
-              {{ $t('person.removeZuordnung') }}
-            </v-btn>
-          </div>
-        </template>
-        <span>{{ disabled ? $t('person.chooseZuordnungFirst') : $t('person.removeZuordnungDescription') }}</span>
-      </v-tooltip>
+      <SpshTooltip
+        :enabledCondition="!disabled"
+        :disabledText="$t('person.chooseZuordnungFirst')"
+        :enabledText="$t('person.removeZuordnungDescription')"
+      >
+        <v-btn
+          class="primary"
+          data-testid="open-zuordnung-delete-dialog-icon"
+          :disabled="disabled"
+          :block="mdAndDown"
+          v-bind="props"
+        >
+          {{ $t('person.removeZuordnung') }}
+        </v-btn>
+      </SpshTooltip>
     </template>
 
     <template

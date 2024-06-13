@@ -5,6 +5,7 @@
   import PasswordReset from '@/components/admin/personen/PasswordReset.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
+  import SpshTooltip from '@/components/admin/SpshTooltip.vue';
   import PersonDelete from '@/components/admin/personen/PersonDelete.vue';
   import PersonenkontextDelete from '@/components/admin/personen/PersonenkontextDelete.vue';
   import {
@@ -431,64 +432,48 @@
                   @onDeletePersonenkontext="prepareDeletion"
                 >
                 </PersonenkontextDelete>
-                <v-tooltip location="left">
-                  <template v-slot:activator="{ props: tooltipProps }">
-                    <div v-bind="tooltipProps">
-                      <v-btn
-                        class="primary mt-2"
-                        data-testid="open-person-delete-dialog-icon"
-                        :disabled="selectedZuordnungen.length > 0"
-                        v-bind="tooltipProps"
-                        :block="mdAndDown"
-                      >
-                        {{ $t('person.addZuordnung') }}
-                      </v-btn>
-                    </div>
-                  </template>
-                  <span>{{
-                    selectedZuordnungen.length > 0 ? $t('person.addZuordnungNotAllowed') : $t('person.addZuordnung')
-                  }}</span>
-                </v-tooltip>
-                <v-tooltip location="left">
-                  <template v-slot:activator="{ props: tooltipProps }">
-                    <div v-bind="tooltipProps">
-                      <v-btn
-                        class="primary mt-2"
-                        data-testid="open-person-delete-dialog-icon"
-                        :disabled="selectedZuordnungen.length === 0"
-                        v-bind="tooltipProps"
-                        :block="mdAndDown"
-                      >
-                        {{ $t('person.changeRolle') }}
-                      </v-btn>
-                    </div>
-                  </template>
-                  <span>{{
-                    selectedZuordnungen.length === 0
-                      ? $t('person.chooseZuordnungFirst')
-                      : $t('person.changeRolleDescription')
-                  }}</span>
-                </v-tooltip>
-                <v-tooltip location="left">
-                  <template v-slot:activator="{ props: tooltipProps }">
-                    <div v-bind="tooltipProps">
-                      <v-btn
-                        class="primary mt-2"
-                        data-testid="open-person-delete-dialog-icon"
-                        :disabled="selectedZuordnungen.length === 0"
-                        v-bind="tooltipProps"
-                        :block="mdAndDown"
-                      >
-                        {{ $t('person.modifyBefristung') }}
-                      </v-btn>
-                    </div>
-                  </template>
-                  <span>{{
-                    selectedZuordnungen.length === 0
-                      ? $t('person.chooseZuordnungFirst')
-                      : $t('person.modifyBefristungDescription')
-                  }}</span>
-                </v-tooltip>
+                <SpshTooltip
+                  :enabledCondition="selectedZuordnungen.length === 0"
+                  :disabledText="$t('person.addZuordnungNotAllowed')"
+                  :enabledText="$t('person.addZuordnung')"
+                >
+                  <v-btn
+                    class="primary mt-2"
+                    data-testid="open-person-delete-dialog-icon"
+                    :disabled="selectedZuordnungen.length > 0"
+                    :block="mdAndDown"
+                  >
+                    {{ $t('person.addZuordnung') }}
+                  </v-btn>
+                </SpshTooltip>
+                <SpshTooltip
+                  :enabledCondition="selectedZuordnungen.length > 0"
+                  :disabledText="$t('person.chooseZuordnungFirst')"
+                  :enabledText="$t('person.changeRolleDescription')"
+                >
+                  <v-btn
+                    class="primary mt-2"
+                    data-testid="open-person-delete-dialog-icon"
+                    :disabled="selectedZuordnungen.length === 0"
+                    :block="mdAndDown"
+                  >
+                    {{ $t('person.changeRolle') }}
+                  </v-btn>
+                </SpshTooltip>
+                <SpshTooltip
+                  :enabledCondition="selectedZuordnungen.length > 0"
+                  :disabledText="$t('person.chooseZuordnungFirst')"
+                  :enabledText="$t('person.modifyBefristungDescription')"
+                >
+                  <v-btn
+                    class="primary mt-2"
+                    data-testid="open-person-delete-dialog-icon"
+                    :disabled="selectedZuordnungen.length === 0"
+                    :block="mdAndDown"
+                  >
+                    {{ $t('person.modifyBefristung') }}
+                  </v-btn>
+                </SpshTooltip>
               </v-col>
             </v-col>
           </v-row>
@@ -502,7 +487,7 @@
           >
             <v-col
               cols="12"
-              v-for="zuordnung in getZuordnungen?.filter(zuordnung => zuordnung.editable)"
+              v-for="zuordnung in getZuordnungen?.filter((zuordnung) => zuordnung.editable)"
               :key="zuordnung.sskId"
               :data-testid="`person-zuordnung-${zuordnung.sskId}`"
               :title="zuordnung.sskName"
@@ -563,23 +548,21 @@
               sm="6"
               md="auto"
             >
-              <v-tooltip location="top">
-                <template v-slot:activator="{ props: tooltipProps }">
-                  <div v-bind="tooltipProps">
-                    <v-btn
-                      class="primary small"
-                      data-testid="zuordnung-changes-save"
-                      @click="confirmDeletion"
-                      :block="mdAndDown"
-                      :disabled="!pendingDeletion"
-                      v-bind="tooltipProps"
-                    >
-                      {{ $t('save') }}
-                    </v-btn>
-                  </div>
-                </template>
-                <span>{{ !pendingDeletion ? $t('person.noChangesToSave') : $t('person.saveChanges') }}</span>
-              </v-tooltip>
+              <SpshTooltip
+                :enabledCondition="!pendingDeletion"
+                :disabledText="$t('person.noChangesToSave')"
+                :enabledText="$t('person.saveChanges')"
+              >
+                <v-btn
+                  class="primary small"
+                  data-testid="zuordnung-changes-save"
+                  @click="confirmDeletion"
+                  :block="mdAndDown"
+                  :disabled="!pendingDeletion"
+                >
+                  {{ $t('save') }}
+                </v-btn>
+              </SpshTooltip>
             </v-col>
           </v-row>
         </v-container>
