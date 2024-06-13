@@ -419,6 +419,13 @@
             "
           >
             <v-col
+              v-if="pendingDeletion"
+              cols="12"
+              sm="auto"
+            >
+              <h3 class="subtitle-1">{{ $t('person.editZuordnungen') }}:</h3></v-col
+            >
+            <v-col
               cols="12"
               v-for="zuordnung in getZuordnungen?.filter((zuordnung) => zuordnung.editable)"
               :key="zuordnung.sskId"
@@ -460,13 +467,6 @@
                 </span>
               </template>
             </v-col>
-            <v-col
-              v-if="pendingDeletion"
-              cols="12"
-              sm="auto"
-            >
-              <h3 class="subtitle-1">{{ $t('person.editZuordnungen') }}:</h3></v-col
-            >
             <v-spacer></v-spacer>
             <v-col
               v-if="!pendingDeletion"
@@ -660,7 +660,7 @@
 </template>
 
 <style scoped>
-.save-cancel-row {
-  margin-top: -40px;
-}
+  .save-cancel-row {
+    margin-top: -40px;
+  }
 </style>
