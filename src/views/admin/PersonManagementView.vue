@@ -3,7 +3,6 @@
   import { type Composer, useI18n } from 'vue-i18n';
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
   import { type Router, useRouter } from 'vue-router';
-  import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
   import {
     useOrganisationStore,
     type OrganisationStore,
@@ -15,7 +14,6 @@
     usePersonenkontextStore,
     type PersonenkontextStore,
     type Uebersicht,
-    type UserinfoPersonenkontext,
     type Zuordnung,
   } from '@/stores/PersonenkontextStore';
   import { useRolleStore, type RolleStore, type RolleResponse } from '@/stores/RolleStore';
@@ -27,7 +25,6 @@
   const searchFieldComponent: Ref = ref();
 
   const router: Router = useRouter();
-  const authStore: AuthStore = useAuthStore();
   const organisationStore: OrganisationStore = useOrganisationStore();
   const personStore: PersonStore = usePersonStore();
   const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
@@ -59,32 +56,7 @@
   type TranslatedObject = {
     value: string;
     title: string;
-    chipTitle?: string | null;
   };
-
-  const schulen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
-    return organisationStore.allOrganisationen
-      .slice(0, 25)
-      .map((org: Organisation) => ({
-        value: org.id,
-        title: `${org.kennung} (${org.name})`,
-        chipTitle: org.kennung,
-      }))
-      .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
-  });
-
-  const rollen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
-    return rolleStore.allRollen
-      .slice(0, 25)
-      .map((rolle: RolleResponse) => ({
-        value: rolle.id,
-        title: rolle.name,
-      }))
-      .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
-  });
-
-  const klassen: Array<string> = ['Klasse', 'Nicht so klasse'];
-  const statuses: Array<string> = ['Aktiv', 'Inaktiv'];
 
   const searchInputKlassen: Ref<string> = ref('');
   const searchInputRollen: Ref<string> = ref('');
@@ -105,38 +77,75 @@
       searchFilter.value.length > 0,
   );
 
+  const schulen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
+    return organisationStore.allOrganisationen
+      .slice(0, 25)
+      .map((org: Organisation) => ({
+        value: org.id,
+        title: `${org.kennung} (${org.name})`,
+      }))
+      .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
+  });
+
+  const rollen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
+    return rolleStore.allRollen
+      .slice(0, 25)
+      .map((rolle: RolleResponse) => ({
+        value: rolle.id,
+        title: rolle.name,
+      }))
+      .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
+  });
+
+  const klassen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
+    if (selectedSchulen.value.length) {
+      return organisationStore.klassen
+        .slice(0, 25)
+        .map((org: Organisation) => ({
+          value: org.id,
+          title: org.name,
+        }))
+        .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
+    }
+    return [];
+  });
+
+  const statuses: Array<string> = ['Aktiv', 'Inaktiv'];
+
   function autoSelectSchule(): void {
     // Autoselect the Schule for the current user that only has 1 Schule assigned to him.
-    const personenkontexte: Array<UserinfoPersonenkontext> | null = authStore.currentUser?.personenkontexte || [];
-
-    if (personenkontexte.length > 0) {
-      const matchingOrganisations: UserinfoPersonenkontext[] = personenkontexte.filter(
-        (kontext: UserinfoPersonenkontext) =>
-          organisationStore.allOrganisationen.some((org: Organisation) => org.id === kontext.organisationsId),
-      );
-      if (matchingOrganisations.length === 1) {
-        const matchedOrganisation: UserinfoPersonenkontext | undefined = matchingOrganisations[0];
-        selectedSchulen.value = [matchedOrganisation?.organisationsId || ''];
-        hasAutoselectedSchule.value = true;
-      }
+    if (organisationStore.allOrganisationen.length === 1) {
+      selectedSchulen.value = [organisationStore.allOrganisationen[0]?.id || ''];
+      hasAutoselectedSchule.value = true;
     }
   }
 
-  async function applySearchAndFilters(): Promise<void> {
+  function applySearchAndFilters(organisations?: Array<string>): void {
     personStore.getAllPersons({
-      organisationIDs: selectedSchulen.value,
+      organisationIDs: organisations ? organisations : selectedSchulen.value,
       rolleIDs: selectedRollen.value,
       searchFilter: searchFilter.value,
     });
   }
 
-  async function setSchuleFilter(newValue: Array<string>): Promise<void> {
-    await searchFilterStore.setSchuleFilter(newValue);
-    applySearchAndFilters();
+  async function setKlasseFilter(newValue: Array<string>): Promise<void> {
+    await searchFilterStore.setKlasseFilter(newValue);
+    applySearchAndFilters(newValue);
   }
 
   async function setRolleFilter(newValue: Array<string>): Promise<void> {
     await searchFilterStore.setRolleFilter(newValue);
+    applySearchAndFilters();
+  }
+
+  async function setSchuleFilter(newValue: Array<string>): Promise<void> {
+    await searchFilterStore.setSchuleFilter(newValue);
+    if (selectedSchulen.value.length) {
+      await organisationStore.getFilteredKlassen({
+        administriertVon: selectedSchulen.value,
+        searchString: searchInputKlassen.value,
+      });
+    }
     applySearchAndFilters();
   }
 
@@ -206,13 +215,27 @@
     applySearchAndFilters();
   };
 
+  function updateKlassenSearch(searchValue: string): void {
+    /* cancel pending call */
+    clearTimeout(timerId);
+
+    /* delay new call 500ms */
+    timerId = setTimeout(() => {
+      organisationStore.getFilteredKlassen({ searchString: searchValue, administriertVon: selectedSchulen.value });
+    }, 500);
+  }
+
   function updateSchulenSearch(searchValue: string): void {
     /* cancel pending call */
     clearTimeout(timerId);
 
     /* delay new call 500ms */
     timerId = setTimeout(() => {
-      organisationStore.getAllOrganisationen({ searchString: searchValue, includeTyp: OrganisationsTyp.Schule });
+      organisationStore.getAllOrganisationen({
+        searchString: searchValue,
+        includeTyp: OrganisationsTyp.Schule,
+        systemrechte: ['PERSONEN_VERWALTEN'],
+      });
     }, 500);
   }
 
@@ -234,7 +257,10 @@
       selectedRollen.value = searchFilterStore.selectedRollen || [];
     }
 
-    await organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Schule });
+    await organisationStore.getAllOrganisationen({
+      includeTyp: OrganisationsTyp.Schule,
+      systemrechte: ['PERSONEN_VERWALTEN'],
+    });
     await personenkontextStore.getAllPersonenuebersichten();
     await rolleStore.getAllRollen('');
 
@@ -294,6 +320,7 @@
             multiple
             :no-data-text="$t('noDataFound')"
             :placeholder="$t('admin.schule.schule')"
+            ref="schule-select"
             required="true"
             @update:modelValue="setSchuleFilter"
             @update:search="updateSchulenSearch"
@@ -321,9 +348,11 @@
               </v-list-item>
             </template>
             <template v-slot:selection="{ item, index }">
-              <v-chip v-if="selectedSchulen.length < 2">
-                <span>{{ item.raw.chipTitle }}</span>
-              </v-chip>
+              <span
+                v-if="selectedSchulen.length < 2"
+                class="v-autocomplete__selection-text"
+                >{{ item.title }}</span
+              >
               <div v-else-if="index === 0">
                 {{ $t('admin.schule.schulenSelected', { count: selectedSchulen.length }) }}
               </div>
@@ -350,6 +379,7 @@
             multiple
             :no-data-text="$t('noDataFound')"
             :placeholder="$t('admin.rolle.rolle')"
+            ref="rolle-select"
             required="true"
             @update:modelValue="setRolleFilter"
             @update:search="updateRollenSearch"
@@ -385,26 +415,68 @@
           md="2"
           class="py-md-0"
         >
-          <v-autocomplete
-            autocomplete="off"
-            chips
-            class="filter-dropdown"
-            clearable
-            data-testid="klasse-select"
-            density="compact"
-            hide-details
-            id="klasse-select"
-            :items="klassen"
-            item-value="value"
-            item-text="title"
-            multiple
-            :no-data-text="$t('noDataFound')"
-            :placeholder="$t('admin.klasse.klasse')"
-            required="true"
-            variant="outlined"
-            v-model="selectedKlassen"
+          <v-tooltip
+            :disabled="!!selectedSchulen.length"
+            location="top"
           >
-          </v-autocomplete>
+            <template v-slot:activator="{ props }">
+              <div v-bind="props">
+                <v-autocomplete
+                  autocomplete="off"
+                  class="filter-dropdown"
+                  :class="{ selected: selectedKlassen.length > 0 }"
+                  clearable
+                  data-testid="klasse-select"
+                  density="compact"
+                  :disabled="!selectedSchulen.length"
+                  hide-details
+                  id="klasse-select"
+                  :items="klassen"
+                  item-value="value"
+                  item-text="title"
+                  multiple
+                  :no-data-text="$t('noDataFound')"
+                  :placeholder="$t('admin.klasse.klasse')"
+                  ref="klasse-select"
+                  required="true"
+                  @update:modelValue="setKlasseFilter"
+                  @update:search="updateKlassenSearch"
+                  variant="outlined"
+                  v-model="selectedKlassen"
+                  v-model:search="searchInputKlassen"
+                >
+                  <template v-slot:prepend-item>
+                    <v-list-item>
+                      <v-progress-circular
+                        indeterminate
+                        v-if="organisationStore.loadingKlassen"
+                      ></v-progress-circular>
+                      <span
+                        v-else
+                        class="filter-header"
+                        >{{
+                          $t(
+                            'admin.klasse.klassenFound',
+                            { count: organisationStore.totalKlassen },
+                            organisationStore.totalKlassen,
+                          )
+                        }}</span
+                      >
+                    </v-list-item>
+                  </template>
+                  <template v-slot:selection="{ item, index }">
+                    <v-chip v-if="selectedKlassen.length < 2">
+                      <span>{{ item.title }}</span>
+                    </v-chip>
+                    <div v-else-if="index === 0">
+                      {{ $t('admin.klasse.klassenSelected', { count: selectedKlassen.length }) }}
+                    </div>
+                  </template>
+                </v-autocomplete>
+              </div>
+            </template>
+            <span>{{ $t('admin.schule.selectSchuleFirst') }}</span>
+          </v-tooltip>
         </v-col>
         <v-col
           cols="12"
