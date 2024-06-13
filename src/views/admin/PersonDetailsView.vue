@@ -219,7 +219,7 @@
           </v-row>
           <div v-if="personStore.currentPerson?.person">
             <!-- Vorname -->
-            <v-row>
+            <v-row class="mt-0">
               <v-col cols="1"></v-col>
               <v-col
                 class="text-right"
@@ -237,7 +237,7 @@
               </v-col>
             </v-row>
             <!-- Familienname -->
-            <v-row>
+            <v-row class="mt-0">
               <v-col cols="1"></v-col>
               <v-col
                 class="text-right"
@@ -255,7 +255,7 @@
               </v-col>
             </v-row>
             <!-- Benutzername -->
-            <v-row>
+            <v-row class="mt-0">
               <v-col cols="1"></v-col>
               <v-col
                 class="text-right"
@@ -273,7 +273,7 @@
               </v-col>
             </v-row>
             <!-- Kopers-Nr -->
-            <v-row>
+            <v-row class="mt-0">
               <v-col cols="1"></v-col>
               <v-col
                 class="text-right"
@@ -364,6 +364,7 @@
           </v-row>
           <!-- Check if 'zuordnungen' array exists and has length > 0 -->
           <v-row
+            class="mt-0"
             v-if="
               personenKontextStore.personenuebersicht?.zuordnungen &&
               personenKontextStore.personenuebersicht?.zuordnungen.length > 0
