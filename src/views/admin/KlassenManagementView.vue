@@ -63,7 +63,10 @@
 
   // Create a map that holds all Schulen with their id, kennung and name
   async function fetchSchuleMap(): Promise<Map<string, string>> {
-    await organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Schule });
+    await organisationStore.getAllOrganisationen({
+      includeTyp: OrganisationsTyp.Schule,
+      systemrechte: ['KLASSEN_VERWALTEN'],
+    });
     return new Map(
       organisationStore.allOrganisationen.map((org: Organisation) => [org.id, `${org.kennung} (${org.name.trim()})`]),
     );
@@ -98,7 +101,10 @@
       organisationStore.totalKlassen = 0;
 
       // Fetch all Klassen when no Schule is selected
-      await organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Klasse });
+      await organisationStore.getAllOrganisationen({
+        includeTyp: OrganisationsTyp.Klasse,
+        systemrechte: ['KLASSEN_VERWALTEN'],
+      });
       klassenOptions.value = organisationStore.allKlassen.map((org: Organisation) => ({
         value: org.id,
         title: org.name,
@@ -129,7 +135,10 @@
       }));
     } else {
       // If no Klassen and no Schule are selected, show all Klassen
-      await organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Klasse });
+      await organisationStore.getAllOrganisationen({
+        includeTyp: OrganisationsTyp.Klasse,
+        systemrechte: ['KLASSEN_VERWALTEN'],
+      });
       finalKlassen.value = organisationStore.allKlassen.map((klasse: Organisation) => ({
         ...klasse,
         ...getSchuleDetails(klasse),
@@ -140,10 +149,17 @@
   async function updateSchulenSearch(searchValue: string): Promise<void> {
     if (searchValue.length >= 1) {
       // Fetch Schulen matching the search string when it has 3 or more characters
-      await organisationStore.getAllOrganisationen({ searchString: searchValue, includeTyp: OrganisationsTyp.Schule });
+      await organisationStore.getAllOrganisationen({
+        searchString: searchValue,
+        includeTyp: OrganisationsTyp.Schule,
+        systemrechte: ['KLASSEN_VERWALTEN'],
+      });
     } else {
       // Fetch all Schulen when the search string is less than 3 characters
-      await organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Schule });
+      await organisationStore.getAllOrganisationen({
+        includeTyp: OrganisationsTyp.Schule,
+        systemrechte: ['KLASSEN_VERWALTEN'],
+      });
     }
   }
 
@@ -154,21 +170,25 @@
         administriertVon: [selectedSchule.value],
         searchString: searchValue,
         includeTyp: OrganisationsTyp.Klasse,
+        systemrechte: ['KLASSEN_VERWALTEN'],
       });
     } else if (searchValue.length >= 1 && selectedSchule.value === null) {
       await organisationStore.getAllOrganisationen({
         searchString: searchValue,
         includeTyp: OrganisationsTyp.Klasse,
+        systemrechte: ['KLASSEN_VERWALTEN'],
       });
     } else if (searchValue.length < 1 && selectedSchule.value === null) {
       await organisationStore.getAllOrganisationen({
         includeTyp: OrganisationsTyp.Klasse,
+        systemrechte: ['KLASSEN_VERWALTEN'],
       });
     } else if (selectedSchule.value !== null) {
       // Fetch all Klassen for the selected Schule when the search string is cleared
       await organisationStore.getAllOrganisationen({
         administriertVon: [selectedSchule.value],
         includeTyp: OrganisationsTyp.Klasse,
+        systemrechte: ['KLASSEN_VERWALTEN'],
       });
     }
   }
@@ -200,8 +220,14 @@
       // Reset klassenOptions
       klassenOptions.value = [];
       // Refetch all data
-      await organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Schule });
-      await organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Klasse });
+      await organisationStore.getAllOrganisationen({
+        includeTyp: OrganisationsTyp.Schule,
+        systemrechte: ['KLASSEN_VERWALTEN'],
+      });
+      await organisationStore.getAllOrganisationen({
+        includeTyp: OrganisationsTyp.Klasse,
+        systemrechte: ['KLASSEN_VERWALTEN'],
+      });
       finalKlassen.value = organisationStore.allKlassen.map((klasse: Organisation) => ({
         ...klasse,
         ...getSchuleDetails(klasse),
@@ -213,15 +239,8 @@
   async function handleUserContext(): Promise<void> {
     const personenkontexte: Array<UserinfoPersonenkontext> | null = authStore.currentUser?.personenkontexte || [];
     if (personenkontexte.length > 0) {
-      const matchingOrganisations: UserinfoPersonenkontext[] = personenkontexte.filter(
-        (kontext: UserinfoPersonenkontext) =>
-          organisationStore.allOrganisationen.some((org: Organisation) => org.id === kontext.organisationsId),
-      );
-
-      if (matchingOrganisations.length === 1) {
-        const matchedOrganisation: UserinfoPersonenkontext | undefined = matchingOrganisations[0];
-
-        selectedSchule.value = matchedOrganisation?.organisationsId || null;
+      if (organisationStore.allOrganisationen.length === 1) {
+        selectedSchule.value = organisationStore.allOrganisationen[0]?.id || null;
         if (selectedSchule.value) {
           await organisationStore.getKlassenByOrganisationId(selectedSchule.value);
           finalKlassen.value = organisationStore.klassen.map((klasse: Organisation) => ({
@@ -241,8 +260,14 @@
   }
 
   onMounted(async () => {
-    await organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Schule });
-    await organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Klasse });
+    await organisationStore.getAllOrganisationen({
+      includeTyp: OrganisationsTyp.Schule,
+      systemrechte: ['KLASSEN_VERWALTEN'],
+    });
+    await organisationStore.getAllOrganisationen({
+      includeTyp: OrganisationsTyp.Klasse,
+      systemrechte: ['KLASSEN_VERWALTEN'],
+    });
     // Initialize klassenOptions with all classes
     klassenOptions.value = organisationStore.allKlassen.map((org: Organisation) => ({
       value: org.id,
@@ -411,7 +436,12 @@
         :items="finalKlassen || []"
         :loading="organisationStore.loading"
         :headers="headers"
-        @onUpdateTable="organisationStore.getAllOrganisationen()"
+        @onUpdateTable="
+          organisationStore.getAllOrganisationen({
+            includeTyp: OrganisationsTyp.Klasse,
+            systemrechte: ['KLASSEN_VERWALTEN'],
+          })
+        "
         :totalItems="organisationStore.allKlassen.length"
         item-value-path="id"
         :disableRowClick="true"
