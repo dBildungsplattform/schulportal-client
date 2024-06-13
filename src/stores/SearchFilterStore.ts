@@ -2,11 +2,13 @@ import { defineStore, type Store, type StoreDefinition } from 'pinia';
 
 type SearchFilterState = {
   searchFilter: string | null;
-  selectedSchulen: Array<string> | null;
+  selectedKlassen: Array<string> | null;
   selectedRollen: Array<string> | null;
+  selectedSchulen: Array<string> | null;
 };
 
 type SearchFilterActions = {
+  setKlasseFilter: (selectedKlassen: Array<string> | null) => Promise<void>;
   setRolleFilter: (selectedRollen: Array<string> | null) => Promise<void>;
   setSchuleFilter: (selectedSchulen: Array<string> | null) => Promise<void>;
   setSearchFilter: (searchFilter: string | null) => Promise<void>;
@@ -25,10 +27,15 @@ export const useSearchFilterStore: StoreDefinition<
   id: 'searchFilterStore',
   state: (): SearchFilterState => ({
     searchFilter: '',
-    selectedSchulen: [],
+    selectedKlassen: [],
     selectedRollen: [],
+    selectedSchulen: [],
   }),
   actions: {
+    async setKlasseFilter(selectedKlassen: Array<string> | null) {
+      this.selectedKlassen = selectedKlassen;
+    },
+
     async setRolleFilter(selectedRollen: Array<string> | null) {
       this.selectedRollen = selectedRollen;
     },

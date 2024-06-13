@@ -165,27 +165,27 @@ describe('OrganisationStore', () => {
       const getAllKlassenByOrganisationId: Promise<void> = organisationStore.getKlassenByOrganisationId('1');
       await getAllKlassenByOrganisationId;
       expect(organisationStore.klassen).toEqual(mockResponse);
-      expect(organisationStore.loading).toBe(false);
+      expect(organisationStore.loadingKlassen).toBe(false);
     });
 
     it('should handle string error', async () => {
       mockadapter.onGet('/api/organisationen/1/administriert').replyOnce(500, 'some mock server error');
       const getAllKlassenByOrganisationId: Promise<void> = organisationStore.getKlassenByOrganisationId('1');
-      expect(organisationStore.loading).toBe(true);
+      expect(organisationStore.loadingKlassen).toBe(true);
       await rejects(getAllKlassenByOrganisationId);
       expect(organisationStore.klassen).toEqual([]);
       expect(organisationStore.errorCode).toEqual('UNSPECIFIED_ERROR');
-      expect(organisationStore.loading).toBe(false);
+      expect(organisationStore.loadingKlassen).toBe(false);
     });
 
     it('should handle error code', async () => {
       mockadapter.onGet('/api/organisationen/1/administriert').replyOnce(500, { code: 'some mock server error' });
       const getAllKlassenByOrganisationId: Promise<void> = organisationStore.getKlassenByOrganisationId('1');
-      expect(organisationStore.loading).toBe(true);
+      expect(organisationStore.loadingKlassen).toBe(true);
       await rejects(getAllKlassenByOrganisationId);
       expect(organisationStore.klassen).toEqual([]);
       expect(organisationStore.errorCode).toEqual('some mock server error');
-      expect(organisationStore.loading).toBe(false);
+      expect(organisationStore.loadingKlassen).toBe(false);
     });
 
     describe('createOrganisation', () => {
@@ -275,6 +275,66 @@ describe('OrganisationStore', () => {
         expect(organisationStore.createdSchule).toEqual(null);
         expect(organisationStore.errorCode).toEqual('SOME_MOCK_SERVER_ERROR');
         expect(organisationStore.loading).toBe(false);
+      });
+    });
+
+    describe('getFilteredKlassen', () => {
+      it('should get all klassen for a schule with search string', async () => {
+        const mockResponse: Organisation[] = [
+          {
+            id: '1',
+            kennung: '1234567',
+            name: 'Klasse 1',
+            namensergaenzung: 'Ergänzung',
+            kuerzel: 'K1',
+            typ: OrganisationsTyp.Klasse,
+            administriertVon: '1',
+          },
+        ];
+
+        mockadapter
+          .onGet('/api/organisationen?searchString=klasse&typ=KLASSE&administriertVon=1')
+          .replyOnce(200, mockResponse, { 'x-paging-total': '1' });
+        const getFilteredKlassenPromise: Promise<void> = organisationStore.getFilteredKlassen({
+          searchString: 'klasse',
+          administriertVon: ['1'],
+        });
+
+        expect(organisationStore.loadingKlassen).toBe(true);
+        await getFilteredKlassenPromise;
+        expect(organisationStore.klassen).toEqual(mockResponse);
+        expect(organisationStore.totalKlassen).toEqual(1);
+        expect(organisationStore.loadingKlassen).toBe(false);
+      });
+
+      it('should handle string error', async () => {
+        mockadapter
+          .onGet('/api/organisationen?searchString=klasse&typ=KLASSE&administriertVon=1')
+          .replyOnce(500, 'some mock server error');
+        const getFilteredKlassenPromise: Promise<void> = organisationStore.getFilteredKlassen({
+          searchString: 'klasse',
+          administriertVon: ['1'],
+        });
+
+        expect(organisationStore.loadingKlassen).toBe(true);
+        await rejects(getFilteredKlassenPromise);
+        expect(organisationStore.errorCode).toEqual('UNSPECIFIED_ERROR');
+        expect(organisationStore.loadingKlassen).toBe(false);
+      });
+
+      it('should handle error code', async () => {
+        mockadapter
+          .onGet('/api/organisationen?searchString=hund&typ=KLASSE&administriertVon=100')
+          .replyOnce(500, { code: 'some mock server error' });
+        const getFilteredKlassenPromise: Promise<void> = organisationStore.getFilteredKlassen({
+          searchString: 'hund',
+          administriertVon: ['100'],
+        });
+
+        expect(organisationStore.loadingKlassen).toBe(true);
+        await rejects(getFilteredKlassenPromise);
+        expect(organisationStore.errorCode).toEqual('some mock server error');
+        expect(organisationStore.loadingKlassen).toBe(false);
       });
     });
   });

@@ -79,12 +79,12 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
           this.createdRolle.serviceProviders = this.createdRolle.serviceProviders || [];
           this.createdRolle.serviceProviders.push(data);
         }
-        this.loading = false;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
           this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
         }
+      } finally {
         this.loading = false;
       }
     },
@@ -108,7 +108,6 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
           systemrechte: systemrechte as unknown as Set<RollenSystemRecht>,
         };
         const { data }: { data: RolleResponse } = await rolleApi.rolleControllerCreateRolle(createRolleBodyParams);
-        this.loading = false;
         this.createdRolle = data;
         return data;
       } catch (error: unknown) {
@@ -117,8 +116,9 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
         if (isAxiosError(error)) {
           this.errorCode = error.response?.data.i18nKey || 'ROLLE_ERROR';
         }
+        return await Promise.reject(this.errorCode);
+      } finally {
         this.loading = false;
-        return Promise.reject(this.errorCode);
       }
     },
 
@@ -132,12 +132,12 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
         );
         this.allRollen = response.data;
         this.totalRollen = +response.headers['x-paging-total'];
-        this.loading = false;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
           this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
         }
+      } finally {
         this.loading = false;
       }
     },

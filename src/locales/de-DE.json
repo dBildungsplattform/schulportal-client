@@ -35,6 +35,8 @@
       "klasseAddedSuccessfully": "Die Klasse wurde erfolgreich hinzugefügt.",
       "klasseCreateErrorTitle": "Fehler beim Anlegen der Klasse",
       "klassenname": "Klassenname",
+      "klassenFound": "{count} Klasse gefunden | {count} Klassen gefunden",
+      "klassenSelected": "{count} Klassen ausgewählt",
       "management": "Klassenverwaltung",
       "selectKlasse": "Klasse auswählen",
       "rules": {
@@ -160,6 +162,7 @@
       "rolle": "Rolle",
       "rolleCreateErrorTitle": "Fehler beim Anlegen der Rolle",
       "rolleCreateErrorText": "Die Rolle konnte nicht angelegt werden.",
+      "rolleFound": "{total} Rolle gefunden",
       "rollenart": "Rollenart",
       "rollenFound": "{count} Rolle gefunden | {count} Rollen gefunden",
       "rollenname": "Rollenname",
