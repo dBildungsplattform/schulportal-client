@@ -452,7 +452,7 @@
                 <span
                   class="my-3 ml-5"
                   :class="{
-                    'text-red': selectedZuordnungen.includes(zuordnung),
+                    'text-body text-red': selectedZuordnungen.includes(zuordnung),
                     'text-body': !selectedZuordnungen.includes(zuordnung),
                   }"
                 >
@@ -492,6 +492,7 @@
                   :enabledCondition="selectedZuordnungen.length === 0"
                   :disabledText="$t('person.addZuordnungNotAllowed')"
                   :enabledText="$t('person.addZuordnung')"
+                   position="left"
                 >
                   <v-btn
                     class="primary mt-2"
@@ -506,6 +507,7 @@
                   :enabledCondition="selectedZuordnungen.length > 0"
                   :disabledText="$t('person.chooseZuordnungFirst')"
                   :enabledText="$t('person.changeRolleDescription')"
+                   position="left"
                 >
                   <v-btn
                     class="primary mt-2"
@@ -520,6 +522,7 @@
                   :enabledCondition="selectedZuordnungen.length > 0"
                   :disabledText="$t('person.chooseZuordnungFirst')"
                   :enabledText="$t('person.modifyBefristungDescription')"
+                   position="left"
                 >
                   <v-btn
                     class="primary mt-2"

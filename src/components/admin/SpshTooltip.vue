@@ -3,6 +3,8 @@
     enabledCondition: boolean;
     disabledText: string;
     enabledText: string;
+    position?: 'top' | 'bottom' | 'left' | 'right';
+
   };
 
   defineProps<Props>();
@@ -11,7 +13,7 @@
 <template>
   <v-tooltip
     data-testid="tooltip"
-    location="top"
+    :location="position"
     open-delay="500"
   >
     <template v-slot:activator="{ props: tooltipProps }">
