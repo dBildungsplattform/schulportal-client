@@ -345,17 +345,25 @@
             <v-spacer></v-spacer>
             <v-col
               cols="12"
-              sm="6"
               md="auto"
+              class="mr-lg-13"
             >
-              <v-btn
-                class="primary ml-lg-8 mr-lg-16 mr-sm-3"
-                data-testid="zuordnung-edit"
-                @Click="triggerEdit"
-                :block="mdAndDown"
-              >
-                {{ $t('edit') }}
-              </v-btn>
+              <div class="d-flex justify-sm-end">
+                <v-col
+                  cols="12"
+                  sm="6"
+                  md="auto"
+                >
+                  <v-btn
+                    class="primary ml-lg-8"
+                    data-testid="zuordnung-edit"
+                    @Click="triggerEdit"
+                    :block="mdAndDown"
+                  >
+                    {{ $t('edit') }}
+                  </v-btn>
+                </v-col>
+              </div>
             </v-col>
           </v-row>
           <!-- Check if 'zuordnungen' array exists and has length > 0 -->
@@ -526,8 +534,8 @@
             </v-col>
           </v-row>
           <v-row v-else>
-            <v-col 
-            class="mb-14"
+            <v-col
+              class="mb-14"
               cols="10"
               offset-lg="2"
               offset="1"
@@ -535,7 +543,7 @@
               <h3 class="text-body">{{ $t('person.noZuordnungenFound') }}</h3>
             </v-col>
           </v-row>
-          <v-row class="ml-md-16 mb-3">
+          <v-row class="save-cancel-row ml-md-16 mb-3">
             <v-col
               cols="12"
               sm="6"
@@ -586,8 +594,9 @@
           <v-row class="ml-md-16">
             <v-col>
               <h3 class="subtitle-1">{{ $t('admin.person.status') }}</h3>
-            </v-col> <v-col
-            class="mr-lg-10"
+            </v-col>
+            <v-col
+              class="mr-lg-10"
               cols="12"
               md="auto"
               v-if="personStore.currentPerson"
@@ -601,8 +610,8 @@
                 </PersonDelete>
               </div>
             </v-col>
-            <v-col v-else-if="personStore.loading"> <v-progress-circular indeterminate></v-progress-circular></v-col></v-row
-          >
+            <v-col v-else-if="personStore.loading"> <v-progress-circular indeterminate></v-progress-circular></v-col
+          ></v-row>
         </v-container>
       </template>
     </LayoutCard>
@@ -650,4 +659,8 @@
   </div>
 </template>
 
-<style></style>
+<style scoped>
+.save-cancel-row {
+  margin-top: -40px;
+}
+</style>

@@ -85,9 +85,9 @@ label.v-label {
 
 @media only screen and (max-width: 960px) {
   .button-container {
+    align-items: start;
     position: static;
     margin-top: -5px;
-    align-items: start;
   }
 }
 
