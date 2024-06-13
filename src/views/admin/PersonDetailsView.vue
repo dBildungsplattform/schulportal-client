@@ -525,6 +525,16 @@
               </template>
             </v-col>
           </v-row>
+          <v-row v-else>
+            <v-col 
+            class="mb-14"
+              cols="10"
+              offset-lg="2"
+              offset="1"
+            >
+              <h3 class="text-body">{{ $t('person.noZuordnungenFound') }}</h3>
+            </v-col>
+          </v-row>
           <v-row class="ml-md-16 mb-3">
             <v-col
               cols="12"
