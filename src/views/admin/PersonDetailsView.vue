@@ -401,6 +401,57 @@
             >
               <h3 class="subtitle-1">{{ $t('person.editZuordnungen') }}: {{ $t('pleaseSelect') }}</h3>
             </v-col>
+          </v-row>
+          <!-- Check if 'zuordnungen' array exists and has length > 0 -->
+          <v-row
+            class="checkbox-row ml-md-16 mb-12"
+            v-if="
+              personenKontextStore.personenuebersicht?.zuordnungen &&
+              personenKontextStore.personenuebersicht?.zuordnungen.length > 0
+            "
+          >
+            <v-col
+              cols="12"
+              v-for="zuordnung in getZuordnungen?.filter((zuordnung) => zuordnung.editable)"
+              :key="zuordnung.sskId"
+              :data-testid="`person-zuordnung-${zuordnung.sskId}`"
+              :title="zuordnung.sskName"
+              class="py-0 d-flex align-items-center"
+            >
+              <template v-if="!pendingDeletion">
+                <div class="checkbox-div">
+                  <v-checkbox
+                    v-model="selectedZuordnungen"
+                    :value="zuordnung"
+                  >
+                    <template v-slot:label>
+                      <span class="text-body">
+                        {{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
+                        {{ zuordnung.klasse }}
+                      </span>
+                    </template>
+                  </v-checkbox>
+                </div>
+              </template>
+              <template v-else>
+                <span
+                  class="my-3 ml-5"
+                  :class="{
+                    'text-red': selectedZuordnungen.includes(zuordnung),
+                    'text-body': !selectedZuordnungen.includes(zuordnung),
+                  }"
+                >
+                  {{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
+                  {{ zuordnung.klasse }}
+                  <span
+                    v-if="selectedZuordnungen.includes(zuordnung)"
+                    class="text-red"
+                  >
+                    ({{ $t('person.willBeRemoved') }})</span
+                  >
+                </span>
+              </template>
+            </v-col>
             <v-col
               v-if="pendingDeletion"
               cols="12"
@@ -472,57 +523,6 @@
                   </v-btn>
                 </SpshTooltip>
               </v-col>
-            </v-col>
-          </v-row>
-          <!-- Check if 'zuordnungen' array exists and has length > 0 -->
-          <v-row
-            class="checkbox-row ml-md-16 mb-12"
-            v-if="
-              personenKontextStore.personenuebersicht?.zuordnungen &&
-              personenKontextStore.personenuebersicht?.zuordnungen.length > 0
-            "
-          >
-            <v-col
-              cols="12"
-              v-for="zuordnung in getZuordnungen?.filter((zuordnung) => zuordnung.editable)"
-              :key="zuordnung.sskId"
-              :data-testid="`person-zuordnung-${zuordnung.sskId}`"
-              :title="zuordnung.sskName"
-              class="py-0 d-flex align-items-center"
-            >
-              <template v-if="!pendingDeletion">
-                <div class="checkbox-div">
-                  <v-checkbox
-                    v-model="selectedZuordnungen"
-                    :value="zuordnung"
-                  >
-                    <template v-slot:label>
-                      <span class="text-body">
-                        {{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
-                        {{ zuordnung.klasse }}
-                      </span>
-                    </template>
-                  </v-checkbox>
-                </div>
-              </template>
-              <template v-else>
-                <span
-                  class="my-3 ml-5"
-                  :class="{
-                    'text-red': selectedZuordnungen.includes(zuordnung),
-                    'text-body': !selectedZuordnungen.includes(zuordnung),
-                  }"
-                >
-                  {{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
-                  {{ zuordnung.klasse }}
-                  <span
-                    v-if="selectedZuordnungen.includes(zuordnung)"
-                    class="text-red"
-                  >
-                    ({{ $t('person.willBeRemoved') }})</span
-                  >
-                </span>
-              </template>
             </v-col>
           </v-row>
           <v-row v-else>
