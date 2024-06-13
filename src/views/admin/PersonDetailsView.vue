@@ -368,7 +368,7 @@
           </v-row>
           <!-- Check if 'zuordnungen' array exists and has length > 0 -->
           <v-row
-            class="mt-0 ml-md-3"
+            class="ml-md-3 mt-md-n8"
             v-if="
               personenKontextStore.personenuebersicht?.zuordnungen &&
               personenKontextStore.personenuebersicht?.zuordnungen.length > 0
@@ -388,6 +388,7 @@
               >
             </v-col>
           </v-row>
+
           <!-- Display 'No data available' if the above condition is false -->
           <v-row v-else>
             <v-col
@@ -492,7 +493,7 @@
                   :enabledCondition="selectedZuordnungen.length === 0"
                   :disabledText="$t('person.addZuordnungNotAllowed')"
                   :enabledText="$t('person.addZuordnung')"
-                   position="left"
+                  position="left"
                 >
                   <v-btn
                     class="primary mt-2"
@@ -507,7 +508,7 @@
                   :enabledCondition="selectedZuordnungen.length > 0"
                   :disabledText="$t('person.chooseZuordnungFirst')"
                   :enabledText="$t('person.changeRolleDescription')"
-                   position="left"
+                  position="left"
                 >
                   <v-btn
                     class="primary mt-2"
@@ -522,7 +523,7 @@
                   :enabledCondition="selectedZuordnungen.length > 0"
                   :disabledText="$t('person.chooseZuordnungFirst')"
                   :enabledText="$t('person.modifyBefristungDescription')"
-                   position="left"
+                  position="left"
                 >
                   <v-btn
                     class="primary mt-2"
@@ -548,7 +549,7 @@
           </v-row>
           <v-row class="save-cancel-row ml-md-16 mb-3">
             <v-col
-            class= "cancel-col"
+              class="cancel-col"
               cols="12"
               sm="6"
               md="auto"
@@ -664,13 +665,12 @@
 </template>
 
 <style scoped>
-
-@media only screen and (max-width: 600px) {
-  .save-cancel-row {
-    margin-top: -40px;
+  @media only screen and (max-width: 600px) {
+    .save-cancel-row {
+      margin-top: -40px;
+    }
+    .cancel-col {
+      margin-bottom: -15px;
+    }
   }
-  .cancel-col {
-    margin-bottom: -15px;
-  }
-}
 </style>
