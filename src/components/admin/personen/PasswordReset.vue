@@ -57,7 +57,7 @@
         <SpshTooltip
           :enabledCondition="!disabled"
           :disabledText="$t('person.finishEditFirst')"
-          :enabledText="$t('admin.person.deletePerson')"
+          :enabledText="$t('admin.person.changePassword')"
           position="start"
         >
           <v-btn
