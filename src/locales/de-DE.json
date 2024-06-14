@@ -31,9 +31,12 @@
       },
       "enterKlassenname": "Klassenname eingeben",
       "klasse": "Klasse",
+      "klassen": "Klasse(n)",
       "klasseAddedSuccessfully": "Die Klasse wurde erfolgreich hinzugefügt.",
       "klasseCreateErrorTitle": "Fehler beim Anlegen der Klasse",
       "klassenname": "Klassenname",
+      "klassenFound": "{count} Klasse gefunden | {count} Klassen gefunden",
+      "klassenSelected": "{count} Klassen ausgewählt",
       "management": "Klassenverwaltung",
       "selectKlasse": "Klasse auswählen",
       "rules": {
@@ -47,7 +50,9 @@
         "schule": {
           "required": "Die Schule muss ausgewählt werden."
         }
-      }
+      },
+      "klassenFound": "{count} Klasse gefunden | {count} Klassen gefunden",
+      "showAll": "Alle Klassen anzeigen"
     },
     "organisation": {
       "assignOrganisation": "Organisationsebene zuordnen",
@@ -157,6 +162,7 @@
       "rolle": "Rolle",
       "rolleCreateErrorTitle": "Fehler beim Anlegen der Rolle",
       "rolleCreateErrorText": "Die Rolle konnte nicht angelegt werden.",
+      "rolleFound": "{total} Rolle gefunden",
       "rollenart": "Rollenart",
       "rollenFound": "{count} Rolle gefunden | {count} Rollen gefunden",
       "rollenname": "Rollenname",
@@ -218,6 +224,7 @@
           "required": "Der Schulname muss angegeben werden."
         }
       },
+      "selectSchuleFirst": "Bitte erst eine Schule auswählen.",
       "schule": "Schule",
       "schulenFound": "{count} Schule gefunden | {count} Schulen gefunden",
       "schulenSelected": "{count} Schulen ausgewählt",
