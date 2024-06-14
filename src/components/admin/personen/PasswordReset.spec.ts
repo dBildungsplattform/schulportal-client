@@ -15,6 +15,7 @@ beforeEach(() => {
   wrapper = mount(PasswordReset, {
     attachTo: document.getElementById('app') || '',
     props: {
+      disabled: true,
       errorCode: '',
       password: 'qwertzuiop',
       person: {
@@ -26,7 +27,6 @@ beforeEach(() => {
           },
           referrer: 'atest',
         },
-        personenkontexte: [],
       },
     },
     global: {

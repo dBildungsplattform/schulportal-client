@@ -14,6 +14,7 @@ beforeEach(() => {
   wrapper = mount(PersonDelete, {
     attachTo: document.getElementById('app') || '',
     props: {
+      disabled: true,
       errorCode: '',
       person: {
         person: {
