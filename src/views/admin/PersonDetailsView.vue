@@ -424,7 +424,7 @@
               cols="12"
               sm="auto"
             >
-              <h3 class="subtitle-1">{{ $t('person.editZuordnungen') }}:</h3></v-col
+              <h3 class="subtitle-1">{{ $t('person.checkAndSave') }}:</h3></v-col
             >
             <v-col
               cols="12"
