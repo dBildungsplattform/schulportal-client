@@ -16,28 +16,47 @@
     type Uebersicht,
     type Zuordnung,
   } from '@/stores/PersonenkontextStore';
-  import { OrganisationsTyp } from '@/stores/OrganisationStore';
+  import {
+    OrganisationsTyp,
+    useOrganisationStore,
+    type Organisation,
+    type OrganisationStore,
+  } from '@/stores/OrganisationStore';
   import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
   import { useDisplay } from 'vuetify';
+  import { object, string, StringSchema, type AnyObject } from 'yup';
+  import { toTypedSchema } from '@vee-validate/yup';
+  import { useForm, type BaseFieldProps, type TypedSchema } from 'vee-validate';
+  import { type RolleResponse, RollenArt } from '@/stores/RolleStore';
+  import { type Composer, useI18n } from 'vue-i18n';
+  import FormRow from '@/components/form/FormRow.vue';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
+
+  const { t }: Composer = useI18n({ useScope: 'global' });
 
   const route: RouteLocationNormalizedLoaded = useRoute();
   const router: Router = useRouter();
   const currentPersonId: string = route.params['id'] as string;
   const personStore: PersonStore = usePersonStore();
-  const personenKontextStore: PersonenkontextStore = usePersonenkontextStore();
+  const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
   const authStore: AuthStore = useAuthStore();
+  const organisationStore: OrganisationStore = useOrganisationStore();
 
   const password: Ref<string> = ref('');
 
   const zuordnungenResult: Ref<Zuordnung[] | undefined> = ref<Zuordnung[] | undefined>(undefined);
   const getZuordnungen: ComputedRef<Zuordnung[] | undefined> = computed(() => zuordnungenResult.value);
   const selectedZuordnungen: Ref<Zuordnung[]> = ref<Zuordnung[]>([]);
+  const newZuordnung: Ref<Zuordnung | undefined> = ref<Zuordnung | undefined>(undefined);
 
   const isEditActive: Ref<boolean> = ref(false);
+  const isZuordnungFormActive: Ref<boolean> = ref(false);
   const pendingDeletion: Ref<boolean> = ref(false);
   const successDialogVisible: Ref<boolean> = ref(false);
+
+  let timerId: ReturnType<typeof setTimeout>;
+  const searchInputRollen: Ref<string> = ref('');
 
   function navigateToPersonTable(): void {
     router.push({ name: 'person-management' });
@@ -66,13 +85,17 @@
   };
 
   // Triggers the template to prepare the deletion
-  const prepareDeletion = (): void => {
+  const prepareChange = (): void => {
     pendingDeletion.value = true;
   };
 
   async function deletePerson(personId: string): Promise<void> {
     await personStore.deletePerson(personId);
   }
+
+  const triggerAddZuordnung = (): void => {
+    isZuordnungFormActive.value = true;
+  };
 
   // This will send the updated list of Zuordnungen to the Backend WITHOUT the selected Zuordnungen.
   const confirmDeletion = async (): Promise<void> => {
@@ -83,7 +106,7 @@
 
     const updateParams: DbiamUpdatePersonenkontexteBodyParams = {
       lastModified: new Date().toISOString(),
-      count: personenKontextStore.personenuebersicht?.zuordnungen.length ?? 0,
+      count: personenkontextStore.personenuebersicht?.zuordnungen.length ?? 0,
       personenkontexte: remainingZuordnungen?.map((zuordnung: Zuordnung) => ({
         personId: currentPersonId,
         organisationId: zuordnung.sskId,
@@ -91,8 +114,29 @@
       })) as DBiamCreatePersonenkontextBodyParams[],
     };
 
-    await personenKontextStore.updatePersonenkontexte(updateParams, currentPersonId);
+    await personenkontextStore.updatePersonenkontexte(updateParams, currentPersonId);
     zuordnungenResult.value = remainingZuordnungen;
+    selectedZuordnungen.value = [];
+    successDialogVisible.value = true;
+  };
+
+  // This will send the updated list of Zuordnungen to the Backend on TOP of the new added one through the form.
+  const confirmAddition = async (): Promise<void> => {
+
+    if (newZuordnung.value) {
+      zuordnungenResult.value?.push(newZuordnung.value);
+    }
+    const updateParams: DbiamUpdatePersonenkontexteBodyParams = {
+      lastModified: new Date().toISOString(),
+      count: personenkontextStore.personenuebersicht?.zuordnungen.length ?? 0,
+      personenkontexte: zuordnungenResult.value?.map((zuordnung: Zuordnung) => ({
+        personId: currentPersonId,
+        organisationId: zuordnung.sskId,
+        rolleId: zuordnung.rolleId,
+      })) as DBiamCreatePersonenkontextBodyParams[],
+    };
+
+    await personenkontextStore.updatePersonenkontexte(updateParams, currentPersonId);
     selectedZuordnungen.value = [];
     successDialogVisible.value = true;
   };
@@ -161,8 +205,161 @@
 
     return result;
   }
+  const rollen: ComputedRef<RolleWithRollenart[] | undefined> = computed(() => {
+    return personenkontextStore.filteredRollen?.moeglicheRollen
+      .slice(0, 25)
+      .map((rolle: RolleResponse) => ({
+        value: rolle.id,
+        title: rolle.name,
+        Rollenart: rolle.rollenart, // Include Rollenart in the object
+      }))
+      .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
+  });
+
+  const organisationen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
+    return personenkontextStore.filteredOrganisationen?.moeglicheSsks
+      .slice(0, 25)
+      .map((org: Organisation) => ({
+        value: org.id,
+        title: org.kennung ? `${org.kennung} (${org.name})` : org.name,
+      }))
+      .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
+  });
+
+  const klassen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
+    return organisationStore.klassen
+      .slice(0, 25)
+      .map((org: Organisation) => ({
+        value: org.id,
+        title: org.name,
+      }))
+      .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
+  });
+
+  type RolleWithRollenart = {
+    value: string;
+    title: string;
+    Rollenart: RollenArt;
+  };
+
+  type TranslatedObject = {
+    value: string;
+    title: string;
+  };
+
+  type ZuordnungCreationForm = {
+    selectedRolle: string;
+    selectedOrganisation: string;
+    selectedKlasse: string;
+  };
+
+  // Define a method to check if the selected Rolle is of type "Lern"
+  function isLernRolle(selectedRolleId: string): boolean {
+    const rolle: RolleWithRollenart | undefined = rollen.value?.find(
+      (r: RolleWithRollenart) => r.value === selectedRolleId,
+    );
+    return !!rolle && rolle.Rollenart === RollenArt.Lern;
+  }
+
+  const validationSchema: TypedSchema = toTypedSchema(
+    object({
+      selectedRolle: string().required(t('admin.rolle.rules.rolle.required')),
+      selectedOrganisation: string().required(t('admin.organisation.rules.organisation.required')),
+      selectedKlasse: string().when('selectedRolle', {
+        is: (selectedRolleId: string) => isLernRolle(selectedRolleId),
+        then: (schema: StringSchema<string | undefined, AnyObject, undefined, ''>) =>
+          schema.required(t('admin.klasse.rules.klasse.required')),
+      }),
+    }),
+  );
+
+  const vuetifyConfig = (state: {
+    errors: Array<string>;
+  }): { props: { error: boolean; 'error-messages': Array<string> } } => ({
+    props: {
+      error: !!state.errors.length,
+      'error-messages': state.errors,
+    },
+  });
+
+  // eslint-disable-next-line @typescript-eslint/typedef
+  const { defineField, handleSubmit, resetForm, resetField } = useForm<ZuordnungCreationForm>({
+    validationSchema,
+  });
+
+  const [selectedRolle, selectedRolleProps]: [
+    Ref<string>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = defineField('selectedRolle', vuetifyConfig);
+  const [selectedOrganisation, selectedOrganisationProps]: [
+    Ref<string>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = defineField('selectedOrganisation', vuetifyConfig);
+  const [selectedKlasse, selectedKlasseProps]: [
+    Ref<string>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = defineField('selectedKlasse', vuetifyConfig);
+
+  const onSubmit: (e?: Event | undefined) => Promise<void | undefined> = handleSubmit(() => {
+    prepareChange();
+  });
+
+  // Watcher to detect when the Rolle is selected so the Organisationen show all the possible choices using that value.
+  watch(selectedRolle, (newValue: string, oldValue: string) => {
+    // This checks if `selectedRolle` is cleared or set to a falsy value
+    if (!newValue) {
+      resetField('selectedOrganisation');
+      return;
+    }
+
+    if (newValue !== oldValue) {
+      // Call fetch with an empty string to get the initial organizations for the selected role without any filter
+      personenkontextStore.getPersonenkontextAdministrationsebeneWithFilter(newValue, '', 25);
+    }
+  });
+
+  // Watcher to detect when the Organisationsebene is selected so the Klasse show all the possible choices using that value.
+  watch(selectedOrganisation, (newValue: string, oldValue: string) => {
+    // This checks if `selectedOrganisation` is cleared or set to a falsy value
+    if (!newValue) {
+      resetField('selectedKlasse');
+      return;
+    }
+
+    if (newValue !== oldValue) {
+      // Call fetch with an empty string to get the initial organizations for the selected role without any filter
+      organisationStore.getKlassenByOrganisationId(newValue);
+    }
+  });
+
+  function updateOrganisationSearch(searchValue: string): void {
+    /* cancel pending call */
+    clearTimeout(timerId);
+    /* delay new call 500ms */
+    timerId = setTimeout(() => {
+      personenkontextStore.getPersonenkontextAdministrationsebeneWithFilter(selectedRolle.value, searchValue, 25);
+    }, 500);
+  }
+
+  function updateRollenSearch(searchValue: string): void {
+    /* cancel pending call */
+    clearTimeout(timerId);
+    /* delay new call 500ms */
+    timerId = setTimeout(() => {
+      personenkontextStore.getPersonenkontextRolleWithFilter(searchValue, 25);
+    }, 500);
+  }
+
+  function updateKlasseSearch(searchValue: string): void {
+    /* cancel pending call */
+    clearTimeout(timerId);
+    /* delay new call 500ms */
+    timerId = setTimeout(() => {
+      organisationStore.getKlassenByOrganisationId(selectedOrganisation.value, searchValue);
+    }, 500);
+  }
   watch(
-    () => personenKontextStore.personenuebersicht,
+    () => personenkontextStore.personenuebersicht,
     (newValue: Uebersicht | null) => {
       zuordnungenResult.value = computeZuordnungen(newValue);
     },
@@ -171,7 +368,7 @@
 
   onBeforeMount(async () => {
     await personStore.getPersonById(currentPersonId);
-    await personenKontextStore.getPersonenuebersichtById(currentPersonId);
+    await personenkontextStore.getPersonenuebersichtById(currentPersonId);
   });
 </script>
 
@@ -195,7 +392,7 @@
       :padded="true"
       :showCloseText="true"
     >
-      <!-- Error Message Display -->
+      <!-- Error Message Display if the personStore throws any kind of error -->
       <SpshAlert
         :buttonAction="navigateToPersonTable"
         :model-value="!!personStore.errorCode"
@@ -300,6 +497,7 @@
           color="#E5EAEF"
           thickness="6"
         ></v-divider>
+        <!-- Password reset -->
         <v-container class="password-reset">
           <v-row class="ml-md-16">
             <v-col>
@@ -371,8 +569,8 @@
           <v-row
             class="ml-md-3 mt-md-n8"
             v-if="
-              personenKontextStore.personenuebersicht?.zuordnungen &&
-              personenKontextStore.personenuebersicht?.zuordnungen.length > 0
+              personenkontextStore.personenuebersicht?.zuordnungen &&
+              personenkontextStore.personenuebersicht?.zuordnungen.length > 0
             "
           >
             <v-col
@@ -389,8 +587,7 @@
               >
             </v-col>
           </v-row>
-
-          <!-- Display 'No data available' if the above condition is false -->
+          <!-- Display 'Keine Zuordnungen gefunden' if the above condition is false -->
           <v-row v-else>
             <v-col
               cols="10"
@@ -401,191 +598,289 @@
             </v-col>
           </v-row>
         </v-container>
-        <!-- Show this template if the edit button is active-->
+        <!-- Show this template if the edit button is triggered-->
         <v-container v-if="isEditActive">
-          <v-row class="ml-md-16">
-            <v-col
-              v-if="!pendingDeletion"
-              cols="12"
-              sm="auto"
+          <template v-if="!isZuordnungFormActive">
+            <v-row class="ml-md-16">
+              <v-col
+                v-if="!pendingDeletion"
+                cols="12"
+                sm="auto"
+              >
+                <h3 class="subtitle-1">{{ $t('person.editZuordnungen') }}: {{ $t('pleaseSelect') }}</h3>
+              </v-col>
+            </v-row>
+            <!-- Check if 'zuordnungen' array exists and has length > 0 -->
+            <v-row
+              class="checkbox-row ml-md-16 mb-12"
+              v-if="
+                personenkontextStore.personenuebersicht?.zuordnungen &&
+                personenkontextStore.personenuebersicht?.zuordnungen.length > 0
+              "
             >
-              <h3 class="subtitle-1">{{ $t('person.editZuordnungen') }}: {{ $t('pleaseSelect') }}</h3>
-            </v-col>
-          </v-row>
-          <!-- Check if 'zuordnungen' array exists and has length > 0 -->
-          <v-row
-            class="checkbox-row ml-md-16 mb-12"
-            v-if="
-              personenKontextStore.personenuebersicht?.zuordnungen &&
-              personenKontextStore.personenuebersicht?.zuordnungen.length > 0
-            "
-          >
-            <v-col
-              v-if="pendingDeletion"
-              cols="12"
-              sm="auto"
-            >
-              <h3 class="subtitle-1">{{ $t('person.checkAndSave') }}:</h3></v-col
-            >
-            <v-col
-              cols="12"
-              v-for="zuordnung in getZuordnungen?.filter((zuordnung) => zuordnung.editable)"
-              :key="zuordnung.sskId"
-              :data-testid="`person-zuordnung-${zuordnung.sskId}`"
-              :title="zuordnung.sskName"
-              class="py-0 d-flex align-items-center"
-            >
-              <template v-if="!pendingDeletion">
-                <div class="checkbox-div">
-                  <v-checkbox
-                    v-model="selectedZuordnungen"
-                    :value="zuordnung"
-                  >
-                    <template v-slot:label>
-                      <span class="text-body">
-                        {{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
-                        {{ zuordnung.klasse }}
-                      </span>
-                    </template>
-                  </v-checkbox>
-                </div>
-              </template>
-              <template v-else>
-                <span
-                  class="my-3 ml-5"
-                  :class="{
-                    'text-body text-red': selectedZuordnungen.includes(zuordnung),
-                    'text-body': !selectedZuordnungen.includes(zuordnung),
-                  }"
-                >
-                  {{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
-                  {{ zuordnung.klasse }}
+              <v-col
+                v-if="pendingDeletion"
+                cols="12"
+                sm="auto"
+              >
+                <h3 class="subtitle-1">{{ $t('person.checkAndSave') }}:</h3></v-col
+              >
+              <v-col
+                cols="12"
+                v-for="zuordnung in getZuordnungen?.filter((zuordnung) => zuordnung.editable)"
+                :key="zuordnung.sskId"
+                :data-testid="`person-zuordnung-${zuordnung.sskId}`"
+                :title="zuordnung.sskName"
+                class="py-0 d-flex align-items-center"
+              >
+                <template v-if="!pendingDeletion">
+                  <div class="checkbox-div">
+                    <v-checkbox
+                      v-model="selectedZuordnungen"
+                      :value="zuordnung"
+                    >
+                      <template v-slot:label>
+                        <span class="text-body">
+                          {{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
+                          {{ zuordnung.klasse }}
+                        </span>
+                      </template>
+                    </v-checkbox>
+                  </div>
+                </template>
+                <template v-else>
                   <span
-                    v-if="selectedZuordnungen.includes(zuordnung)"
-                    class="text-red"
+                    class="my-3 ml-5"
+                    :class="{
+                      'text-body text-red': selectedZuordnungen.includes(zuordnung),
+                      'text-body': !selectedZuordnungen.includes(zuordnung),
+                    }"
                   >
-                    ({{ $t('person.willBeRemoved') }})</span
+                    {{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
+                    {{ zuordnung.klasse }}
+                    <span
+                      v-if="selectedZuordnungen.includes(zuordnung)"
+                      class="text-red"
+                    >
+                      ({{ $t('person.willBeRemoved') }})</span
+                    >
+                  </span>
+                </template>
+              </v-col>
+              <v-spacer></v-spacer>
+              <v-col
+                v-if="!pendingDeletion"
+                class="button-container"
+                cols="12"
+                md="auto"
+              >
+                <v-col
+                  cols="12"
+                  sm="6"
+                  md="auto"
+                >
+                  <PersonenkontextDelete
+                    v-if="!pendingDeletion"
+                    :errorCode="personStore.errorCode"
+                    :person="personStore.currentPerson"
+                    :disabled="selectedZuordnungen.length === 0"
+                    :zuordnungCount="zuordnungenResult?.length"
+                    @onDeletePersonenkontext="prepareChange"
                   >
-                </span>
-              </template>
-            </v-col>
-            <v-spacer></v-spacer>
-            <v-col
-              v-if="!pendingDeletion"
-              class="button-container"
-              cols="12"
-              md="auto"
-            >
+                  </PersonenkontextDelete>
+                  <SpshTooltip
+                    :enabledCondition="selectedZuordnungen.length === 0"
+                    :disabledText="$t('person.addZuordnungNotAllowed')"
+                    :enabledText="$t('person.addZuordnung')"
+                    position="start"
+                  >
+                    <v-btn
+                      class="primary mt-2"
+                      @Click="triggerAddZuordnung"
+                      data-testid="open-person-delete-dialog-icon"
+                      :disabled="selectedZuordnungen.length > 0"
+                      :block="mdAndDown"
+                    >
+                      {{ $t('person.addZuordnung') }}
+                    </v-btn>
+                  </SpshTooltip>
+                  <SpshTooltip
+                    :enabledCondition="selectedZuordnungen.length > 0"
+                    :disabledText="$t('person.chooseZuordnungFirst')"
+                    :enabledText="$t('person.changeRolleDescription')"
+                    position="start"
+                  >
+                    <v-btn
+                      class="primary mt-2"
+                      data-testid="open-person-delete-dialog-icon"
+                      :disabled="selectedZuordnungen.length === 0"
+                      :block="mdAndDown"
+                    >
+                      {{ $t('person.changeRolle') }}
+                    </v-btn>
+                  </SpshTooltip>
+                  <SpshTooltip
+                    :enabledCondition="selectedZuordnungen.length > 0"
+                    :disabledText="$t('person.chooseZuordnungFirst')"
+                    :enabledText="$t('person.modifyBefristungDescription')"
+                    position="start"
+                  >
+                    <v-btn
+                      class="primary mt-2"
+                      data-testid="open-person-delete-dialog-icon"
+                      :disabled="selectedZuordnungen.length === 0"
+                      :block="mdAndDown"
+                    >
+                      {{ $t('person.modifyBefristung') }}
+                    </v-btn>
+                  </SpshTooltip>
+                </v-col>
+              </v-col>
+            </v-row>
+            <v-row v-else>
+              <v-col
+                class="mb-14"
+                cols="10"
+                offset-lg="2"
+                offset="1"
+              >
+                <h3 class="text-body">{{ $t('person.noZuordnungenFound') }}</h3>
+              </v-col>
+            </v-row>
+            <v-row class="save-cancel-row ml-md-16 mb-3">
+              <v-col
+                class="cancel-col"
+                cols="12"
+                sm="6"
+                md="auto"
+              >
+                <v-btn
+                  class="secondary small"
+                  data-testid="zuordnung-cancel"
+                  @click="cancelEdit"
+                  :block="mdAndDown"
+                >
+                  {{ $t('cancel') }}
+                </v-btn>
+              </v-col>
               <v-col
                 cols="12"
                 sm="6"
                 md="auto"
               >
-                <PersonenkontextDelete
-                  v-if="!pendingDeletion"
-                  :errorCode="personStore.errorCode"
-                  :person="personStore.currentPerson"
-                  :disabled="selectedZuordnungen.length === 0"
-                  :zuordnungCount="zuordnungenResult?.length"
-                  @onDeletePersonenkontext="prepareDeletion"
-                >
-                </PersonenkontextDelete>
                 <SpshTooltip
-                  :enabledCondition="selectedZuordnungen.length === 0"
-                  :disabledText="$t('person.addZuordnungNotAllowed')"
-                  :enabledText="$t('person.addZuordnung')"
-                  position="start"
+                  :enabledCondition="pendingDeletion"
+                  :disabledText="$t('person.noChangesToSave')"
+                  :enabledText="$t('person.saveChanges')"
                 >
                   <v-btn
-                    class="primary mt-2"
-                    data-testid="open-person-delete-dialog-icon"
-                    :disabled="selectedZuordnungen.length > 0"
+                    class="primary small"
+                    data-testid="zuordnung-changes-save"
+                    @click="confirmDeletion"
                     :block="mdAndDown"
+                    :disabled="!pendingDeletion"
                   >
-                    {{ $t('person.addZuordnung') }}
-                  </v-btn>
-                </SpshTooltip>
-                <SpshTooltip
-                  :enabledCondition="selectedZuordnungen.length > 0"
-                  :disabledText="$t('person.chooseZuordnungFirst')"
-                  :enabledText="$t('person.changeRolleDescription')"
-                  position="start"
-                >
-                  <v-btn
-                    class="primary mt-2"
-                    data-testid="open-person-delete-dialog-icon"
-                    :disabled="selectedZuordnungen.length === 0"
-                    :block="mdAndDown"
-                  >
-                    {{ $t('person.changeRolle') }}
-                  </v-btn>
-                </SpshTooltip>
-                <SpshTooltip
-                  :enabledCondition="selectedZuordnungen.length > 0"
-                  :disabledText="$t('person.chooseZuordnungFirst')"
-                  :enabledText="$t('person.modifyBefristungDescription')"
-                  position="start"
-                >
-                  <v-btn
-                    class="primary mt-2"
-                    data-testid="open-person-delete-dialog-icon"
-                    :disabled="selectedZuordnungen.length === 0"
-                    :block="mdAndDown"
-                  >
-                    {{ $t('person.modifyBefristung') }}
+                    {{ $t('save') }}
                   </v-btn>
                 </SpshTooltip>
               </v-col>
-            </v-col>
-          </v-row>
-          <v-row v-else>
-            <v-col
-              class="mb-14"
-              cols="10"
-              offset-lg="2"
-              offset="1"
-            >
-              <h3 class="text-body">{{ $t('person.noZuordnungenFound') }}</h3>
-            </v-col>
-          </v-row>
-          <v-row class="save-cancel-row ml-md-16 mb-3">
-            <v-col
-              class="cancel-col"
-              cols="12"
-              sm="6"
-              md="auto"
-            >
-              <v-btn
-                class="secondary small"
-                data-testid="zuordnung-cancel"
-                @click="cancelEdit"
-                :block="mdAndDown"
+            </v-row>
+          </template>
+          <template v-if="isZuordnungFormActive">
+            <v-row class="ml-md-16">
+              <v-col
+                cols="12"
+                sm="auto"
               >
-                {{ $t('cancel') }}
-              </v-btn>
-            </v-col>
-            <v-col
-              cols="12"
-              sm="6"
-              md="auto"
-            >
-              <SpshTooltip
-                :enabledCondition="pendingDeletion"
-                :disabledText="$t('person.noChangesToSave')"
-                :enabledText="$t('person.saveChanges')"
+                <h3 class="subtitle-1">{{ $t('person.addZuordnung') }}:</h3></v-col
               >
-                <v-btn
-                  class="primary small"
-                  data-testid="zuordnung-changes-save"
-                  @click="confirmDeletion"
-                  :block="mdAndDown"
-                  :disabled="!pendingDeletion"
-                >
-                  {{ $t('save') }}
-                </v-btn>
-              </SpshTooltip>
-            </v-col>
-          </v-row>
+            </v-row>
+            <!-- Rollenzuordnung -->
+            <v-row>
+              <h3 class="headline-3">1. {{ $t('admin.rolle.assignRolle') }}</h3>
+            </v-row>
+            <FormRow
+              :errorLabel="selectedRolleProps['error']"
+              labelForId="rolle-select"
+              :isRequired="true"
+              :label="$t('admin.rolle.rolle')"
+            >
+              <v-autocomplete
+                autocomplete="off"
+                clearable
+                data-testid="rolle-select"
+                density="compact"
+                id="rolle-select"
+                ref="rolle-select"
+                :items="rollen"
+                item-value="value"
+                item-text="title"
+                :no-data-text="$t('noDataFound')"
+                :placeholder="$t('admin.rolle.selectRolle')"
+                required="true"
+                @update:search="updateRollenSearch"
+                variant="outlined"
+                v-bind="selectedRolleProps"
+                v-model="selectedRolle"
+                v-model:search="searchInputRollen"
+              ></v-autocomplete>
+            </FormRow>
+            <!-- Organisation zuordnen -->
+            <v-row>
+              <h3 class="headline-3">3. {{ $t('admin.organisation.assignOrganisation') }}</h3>
+            </v-row>
+            <FormRow
+              :errorLabel="selectedOrganisationProps['error']"
+              :isRequired="true"
+              labelForId="organisation-select"
+              :label="$t('admin.organisation.organisation')"
+            >
+              <v-autocomplete
+                autocomplete="off"
+                clearable
+                data-testid="organisation-select"
+                density="compact"
+                id="organisation-select"
+                ref="organisation-select"
+                :items="organisationen"
+                item-value="value"
+                item-text="title"
+                :no-data-text="$t('noDataFound')"
+                :placeholder="$t('admin.organisation.selectOrganisation')"
+                required="true"
+                @update:search="updateOrganisationSearch"
+                variant="outlined"
+                v-bind="selectedOrganisationProps"
+                v-model="selectedOrganisation"
+              ></v-autocomplete>
+            </FormRow>
+            <!-- Klasse zuordnen -->
+            <FormRow
+              v-if="isLernRolle(selectedRolle) && selectedOrganisation"
+              :errorLabel="selectedKlasseProps['error']"
+              :isRequired="true"
+              labelForId="klasse-select"
+              :label="$t('admin.klasse.klasse')"
+            >
+              <v-autocomplete
+                autocomplete="off"
+                clearable
+                data-testid="klasse-select"
+                density="compact"
+                id="klasse-select"
+                ref="klasse-select"
+                :items="klassen"
+                item-value="value"
+                item-text="title"
+                :no-data-text="$t('noDataFound')"
+                :placeholder="$t('admin.klasse.selectKlasse')"
+                @update:search="updateKlasseSearch"
+                variant="outlined"
+                v-bind="selectedKlasseProps"
+                v-model="selectedKlasse"
+              ></v-autocomplete>
+            </FormRow>
+          </template>
         </v-container>
         <v-divider
           class="border-opacity-100 rounded my-6 mx-4"

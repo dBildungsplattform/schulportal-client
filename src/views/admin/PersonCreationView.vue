@@ -44,10 +44,6 @@
   let blockedNext: () => void = () => {};
   let timerId: ReturnType<typeof setTimeout>;
 
-  const searchInputRollen: Ref<string> = ref('');
-  const searchInputOrganisation: Ref<string> = ref('');
-  const searchInputKlasse: Ref<string> = ref('');
-
   type RolleWithRollenart = {
     value: string;
     title: string;
@@ -398,7 +394,6 @@
             variant="outlined"
             v-bind="selectedRolleProps"
             v-model="selectedRolle"
-            v-model:search="searchInputRollen"
           ></v-autocomplete>
         </FormRow>
 
@@ -476,7 +471,6 @@
               variant="outlined"
               v-bind="selectedOrganisationProps"
               v-model="selectedOrganisation"
-              v-model:search="searchInputOrganisation"
             ></v-autocomplete>
           </FormRow>
           <!-- Klasse zuordnen -->
@@ -503,7 +497,6 @@
               variant="outlined"
               v-bind="selectedKlasseProps"
               v-model="selectedKlasse"
-              v-model:search="searchInputKlasse"
             ></v-autocomplete>
           </FormRow>
         </div>
