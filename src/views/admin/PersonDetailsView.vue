@@ -93,7 +93,9 @@
     await personStore.deletePerson(personId);
   }
 
-  const triggerAddZuordnung = (): void => {
+  const triggerAddZuordnung = async (): Promise<void> => {
+    await organisationStore.getAllOrganisationen();
+    await personenkontextStore.getPersonenkontextRolleWithFilter('', 25);
     isZuordnungFormActive.value = true;
   };
 
@@ -116,27 +118,6 @@
 
     await personenkontextStore.updatePersonenkontexte(updateParams, currentPersonId);
     zuordnungenResult.value = remainingZuordnungen;
-    selectedZuordnungen.value = [];
-    successDialogVisible.value = true;
-  };
-
-  // This will send the updated list of Zuordnungen to the Backend on TOP of the new added one through the form.
-  const confirmAddition = async (): Promise<void> => {
-
-    if (newZuordnung.value) {
-      zuordnungenResult.value?.push(newZuordnung.value);
-    }
-    const updateParams: DbiamUpdatePersonenkontexteBodyParams = {
-      lastModified: new Date().toISOString(),
-      count: personenkontextStore.personenuebersicht?.zuordnungen.length ?? 0,
-      personenkontexte: zuordnungenResult.value?.map((zuordnung: Zuordnung) => ({
-        personId: currentPersonId,
-        organisationId: zuordnung.sskId,
-        rolleId: zuordnung.rolleId,
-      })) as DBiamCreatePersonenkontextBodyParams[],
-    };
-
-    await personenkontextStore.updatePersonenkontexte(updateParams, currentPersonId);
     selectedZuordnungen.value = [];
     successDialogVisible.value = true;
   };
@@ -304,6 +285,25 @@
     prepareChange();
   });
 
+  // This will send the updated list of Zuordnungen to the Backend on TOP of the new added one through the form.
+  const confirmAddition = async (): Promise<void> => {
+    if (newZuordnung.value) {
+      zuordnungenResult.value?.push(newZuordnung.value);
+    }
+    const updateParams: DbiamUpdatePersonenkontexteBodyParams = {
+      lastModified: new Date().toISOString(),
+      count: personenkontextStore.personenuebersicht?.zuordnungen.length ?? 0,
+      personenkontexte: zuordnungenResult.value?.map((zuordnung: Zuordnung) => ({
+        personId: currentPersonId,
+        organisationId: zuordnung.sskId,
+        rolleId: zuordnung.rolleId,
+      })) as DBiamCreatePersonenkontextBodyParams[],
+    };
+
+    await personenkontextStore.updatePersonenkontexte(updateParams, currentPersonId);
+    resetForm();
+    successDialogVisible.value = true;
+  };
   // Watcher to detect when the Rolle is selected so the Organisationen show all the possible choices using that value.
   watch(selectedRolle, (newValue: string, oldValue: string) => {
     // This checks if `selectedRolle` is cleared or set to a falsy value
@@ -787,99 +787,128 @@
             </v-row>
           </template>
           <template v-if="isZuordnungFormActive">
-            <v-row class="ml-md-16">
-              <v-col
-                cols="12"
-                sm="auto"
-              >
-                <h3 class="subtitle-1">{{ $t('person.addZuordnung') }}:</h3></v-col
-              >
-            </v-row>
-            <!-- Rollenzuordnung -->
-            <v-row>
-              <h3 class="headline-3">1. {{ $t('admin.rolle.assignRolle') }}</h3>
-            </v-row>
-            <FormRow
-              :errorLabel="selectedRolleProps['error']"
-              labelForId="rolle-select"
-              :isRequired="true"
-              :label="$t('admin.rolle.rolle')"
+            <v-form
+              data-testid="zuordnung-creation-form"
+              @submit.prevent="onSubmit"
             >
-              <v-autocomplete
-                autocomplete="off"
-                clearable
-                data-testid="rolle-select"
-                density="compact"
-                id="rolle-select"
-                ref="rolle-select"
-                :items="rollen"
-                item-value="value"
-                item-text="title"
-                :no-data-text="$t('noDataFound')"
-                :placeholder="$t('admin.rolle.selectRolle')"
-                required="true"
-                @update:search="updateRollenSearch"
-                variant="outlined"
-                v-bind="selectedRolleProps"
-                v-model="selectedRolle"
-                v-model:search="searchInputRollen"
-              ></v-autocomplete>
-            </FormRow>
-            <!-- Organisation zuordnen -->
-            <v-row>
-              <h3 class="headline-3">3. {{ $t('admin.organisation.assignOrganisation') }}</h3>
-            </v-row>
-            <FormRow
-              :errorLabel="selectedOrganisationProps['error']"
-              :isRequired="true"
-              labelForId="organisation-select"
-              :label="$t('admin.organisation.organisation')"
-            >
-              <v-autocomplete
-                autocomplete="off"
-                clearable
-                data-testid="organisation-select"
-                density="compact"
-                id="organisation-select"
-                ref="organisation-select"
-                :items="organisationen"
-                item-value="value"
-                item-text="title"
-                :no-data-text="$t('noDataFound')"
-                :placeholder="$t('admin.organisation.selectOrganisation')"
-                required="true"
-                @update:search="updateOrganisationSearch"
-                variant="outlined"
-                v-bind="selectedOrganisationProps"
-                v-model="selectedOrganisation"
-              ></v-autocomplete>
-            </FormRow>
-            <!-- Klasse zuordnen -->
-            <FormRow
-              v-if="isLernRolle(selectedRolle) && selectedOrganisation"
-              :errorLabel="selectedKlasseProps['error']"
-              :isRequired="true"
-              labelForId="klasse-select"
-              :label="$t('admin.klasse.klasse')"
-            >
-              <v-autocomplete
-                autocomplete="off"
-                clearable
-                data-testid="klasse-select"
-                density="compact"
-                id="klasse-select"
-                ref="klasse-select"
-                :items="klassen"
-                item-value="value"
-                item-text="title"
-                :no-data-text="$t('noDataFound')"
-                :placeholder="$t('admin.klasse.selectKlasse')"
-                @update:search="updateKlasseSearch"
-                variant="outlined"
-                v-bind="selectedKlasseProps"
-                v-model="selectedKlasse"
-              ></v-autocomplete>
-            </FormRow>
+              <v-row class="ml-md-16">
+                <v-col
+                  cols="12"
+                  sm="auto"
+                >
+                  <h3 class="subtitle-1">{{ $t('person.addZuordnung') }}:</h3></v-col
+                >
+              </v-row>
+              <!-- Rollenzuordnung -->
+              <v-container class="px-lg-16">
+                <FormRow
+                  :errorLabel="selectedRolleProps['error']"
+                  labelForId="rolle-select"
+                  :isRequired="true"
+                  :label="$t('admin.rolle.rolle')"
+                >
+                  <v-autocomplete
+                    autocomplete="off"
+                    clearable
+                    data-testid="rolle-select"
+                    density="compact"
+                    id="rolle-select"
+                    ref="rolle-select"
+                    :items="rollen"
+                    item-value="value"
+                    item-text="title"
+                    :no-data-text="$t('noDataFound')"
+                    :placeholder="$t('admin.rolle.selectRolle')"
+                    required="true"
+                    @update:search="updateRollenSearch"
+                    variant="outlined"
+                    v-bind="selectedRolleProps"
+                    v-model="selectedRolle"
+                    v-model:search="searchInputRollen"
+                  ></v-autocomplete>
+                </FormRow>
+                <!-- Organisation zuordnen -->
+                <FormRow
+                  :errorLabel="selectedOrganisationProps['error']"
+                  :isRequired="true"
+                  labelForId="organisation-select"
+                  :label="$t('admin.organisation.organisation')"
+                >
+                  <v-autocomplete
+                    autocomplete="off"
+                    clearable
+                    data-testid="organisation-select"
+                    density="compact"
+                    id="organisation-select"
+                    ref="organisation-select"
+                    :items="organisationen"
+                    item-value="value"
+                    item-text="title"
+                    :no-data-text="$t('noDataFound')"
+                    :placeholder="$t('admin.organisation.selectOrganisation')"
+                    required="true"
+                    @update:search="updateOrganisationSearch"
+                    variant="outlined"
+                    v-bind="selectedOrganisationProps"
+                    v-model="selectedOrganisation"
+                  ></v-autocomplete>
+                </FormRow>
+                <!-- Klasse zuordnen -->
+                <FormRow
+                  v-if="isLernRolle(selectedRolle) && selectedOrganisation"
+                  :errorLabel="selectedKlasseProps['error']"
+                  :isRequired="true"
+                  labelForId="klasse-select"
+                  :label="$t('admin.klasse.klasse')"
+                >
+                  <v-autocomplete
+                    autocomplete="off"
+                    clearable
+                    data-testid="klasse-select"
+                    density="compact"
+                    id="klasse-select"
+                    ref="klasse-select"
+                    :items="klassen"
+                    item-value="value"
+                    item-text="title"
+                    :no-data-text="$t('noDataFound')"
+                    :placeholder="$t('admin.klasse.selectKlasse')"
+                    @update:search="updateKlasseSearch"
+                    variant="outlined"
+                    v-bind="selectedKlasseProps"
+                    v-model="selectedKlasse"
+                  ></v-autocomplete>
+                </FormRow>
+              </v-container>
+              <v-row class="py-3 px-2 justify-center">
+                <v-spacer class="hidden-sm-and-down"></v-spacer>
+                <v-col
+                  cols="12"
+                  sm="6"
+                  md="auto"
+                >
+                  <v-btn
+                    :block="mdAndDown"
+                    class="secondary"
+                    data-testid="zuordnung-creation-discard-button"
+                    >{{ $t('cancel') }}</v-btn
+                  >
+                </v-col>
+                <v-col
+                  cols="12"
+                  sm="6"
+                  md="auto"
+                >
+                  <v-btn
+                    :block="mdAndDown"
+                    class="primary"
+                    data-testid="zuordnung-creation-discard-button"
+                    type="submit"
+                    >{{ $t('person.addZuordnung') }}</v-btn
+                  >
+                </v-col>
+              </v-row>
+            </v-form>
           </template>
         </v-container>
         <v-divider
