@@ -314,6 +314,7 @@
               <div class="d-flex justify-sm-end">
                 <PasswordReset
                   :errorCode="personStore.errorCode"
+                  :disabled="isEditActive"
                   :person="personStore.currentPerson"
                   @onClearPassword="password = ''"
                   @onResetPassword="resetPassword(currentPersonId)"
@@ -356,7 +357,7 @@
                 >
                   <v-btn
                     class="primary ml-lg-8"
-                    data-testid="zuordnung-edit"
+                    data-testid="zuordnung-edit-button"
                     @Click="triggerEdit"
                     :block="mdAndDown"
                   >
@@ -493,7 +494,7 @@
                   :enabledCondition="selectedZuordnungen.length === 0"
                   :disabledText="$t('person.addZuordnungNotAllowed')"
                   :enabledText="$t('person.addZuordnung')"
-                  position="left"
+                  position="start"
                 >
                   <v-btn
                     class="primary mt-2"
@@ -508,7 +509,7 @@
                   :enabledCondition="selectedZuordnungen.length > 0"
                   :disabledText="$t('person.chooseZuordnungFirst')"
                   :enabledText="$t('person.changeRolleDescription')"
-                  position="left"
+                  position="start"
                 >
                   <v-btn
                     class="primary mt-2"
@@ -523,7 +524,7 @@
                   :enabledCondition="selectedZuordnungen.length > 0"
                   :disabledText="$t('person.chooseZuordnungFirst')"
                   :enabledText="$t('person.modifyBefristungDescription')"
-                  position="left"
+                  position="start"
                 >
                   <v-btn
                     class="primary mt-2"
@@ -608,6 +609,7 @@
             >
               <div class="d-flex justify-sm-end">
                 <PersonDelete
+                  :disabled="isEditActive"
                   :errorCode="personStore.errorCode"
                   :person="personStore.currentPerson"
                   @onDeletePerson="deletePerson(currentPersonId)"

@@ -51,7 +51,6 @@
           "required": "Die Schule muss ausgewählt werden."
         }
       },
-      "klassenFound": "{count} Klasse gefunden | {count} Klassen gefunden",
       "showAll": "Alle Klassen anzeigen"
     },
     "organisation": {
@@ -308,6 +307,7 @@
     "enterLastName": "Nachname eingeben",
     "firstName": "Vorname",
     "firstNameLastNameReferrerKopersNr":"Vor-/Nachname/Benutzername/KoPers-Nr.",
+    "finishEditFirst": "Bitte beenden Sie zunächst Ihre aktuelle Bearbeitung.",
     "klasse": "Klasse",
     "kopersnr": "Kopers-Nr",
     "lastName": "Nachname",

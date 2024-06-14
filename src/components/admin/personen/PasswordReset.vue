@@ -5,12 +5,14 @@
   import { useDisplay } from 'vuetify';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import PasswordOutput from '@/components/form/PasswordOutput.vue';
+  import SpshTooltip from '@/components/admin/SpshTooltip.vue';
 
   const { t }: Composer = useI18n({ useScope: 'global' });
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
   type Props = {
     errorCode: string;
+    disabled: boolean;
     person: Personendatensatz;
     password: string;
   };
@@ -52,14 +54,22 @@
         sm="6"
         md="auto"
       >
-        <v-btn
-          class="primary"
-          data-testid="open-password-reset-dialog-icon"
-          v-bind="props"
-          :block="mdAndDown"
+        <SpshTooltip
+          :enabledCondition="!disabled"
+          :disabledText="$t('person.finishEditFirst')"
+          :enabledText="$t('admin.person.deletePerson')"
+          position="start"
         >
-          {{ $t('admin.person.changePassword') }}
-        </v-btn>
+          <v-btn
+            class="primary"
+            data-testid="open-password-reset-dialog-icon"
+            :block="mdAndDown"
+            :disabled="disabled"
+            v-bind="props"
+          >
+            {{ $t('admin.person.changePassword') }}
+          </v-btn>
+        </SpshTooltip>
       </v-col>
     </template>
 

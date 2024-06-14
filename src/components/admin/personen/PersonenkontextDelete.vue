@@ -41,6 +41,7 @@
         :enabledCondition="!disabled"
         :disabledText="$t('person.chooseZuordnungFirst')"
         :enabledText="$t('person.removeZuordnungDescription')"
+        position="start"
       >
         <v-btn
           class="primary"

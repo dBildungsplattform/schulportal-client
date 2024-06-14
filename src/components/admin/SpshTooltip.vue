@@ -1,13 +1,19 @@
 <script setup lang="ts">
-  type Props = {
-    enabledCondition: boolean;
-    disabledText: string;
-    enabledText: string;
-    position?: 'top' | 'bottom' | 'left' | 'right';
-
-  };
-
-  defineProps<Props>();
+  defineProps({
+    enabledCondition: {
+      type: Boolean,
+    },
+    disabledText: {
+      type: String,
+    },
+    enabledText: {
+      type: String,
+    },
+    position: {
+      type: String as () => 'start' | 'end' | 'top' | 'bottom',
+      default: 'top',
+    },
+  });
 </script>
 
 <template>
