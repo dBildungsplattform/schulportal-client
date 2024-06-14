@@ -1,19 +1,30 @@
-import { expect, test } from 'vitest';
+import { expect, test, type MockInstance } from 'vitest';
 import { VueWrapper, mount } from '@vue/test-utils';
+import { createRouter, createWebHistory, type NavigationFailure, type RouteLocationRaw, type Router } from 'vue-router';
+import routes from '@/router/routes';
 import KlasseCreationView from './KlasseCreationView.vue';
 import { nextTick } from 'vue';
 import type { OrganisationResponse } from '@/api-client/generated';
 import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
 
 let wrapper: VueWrapper | null = null;
+let router: Router;
 let organisationStore: OrganisationStore;
 
-beforeEach(() => {
+beforeEach(async () => {
   document.body.innerHTML = `
     <div>
       <div id="app"></div>
     </div>
   `;
+  
+  router = createRouter({
+    history: createWebHistory(),
+    routes,
+  });
+
+  router.push('/');
+  await router.isReady();
 
   organisationStore = useOrganisationStore();
 
@@ -40,6 +51,7 @@ beforeEach(() => {
           fullPath: 'full/path',
         },
       },
+      plugins: [router],
     },
   });
 });
@@ -54,6 +66,15 @@ describe('KlasseCreationView', () => {
     expect(wrapper?.getComponent({ name: 'SpshAlert' })).toBeTruthy();
     expect(wrapper?.getComponent({ name: 'FormWrapper' })).toBeTruthy();
     expect(wrapper?.getComponent({ name: 'FormRow' })).toBeTruthy();
+  });
+
+  test('it navigates back to klassen table', async () => {
+    const push: MockInstance<[to: RouteLocationRaw], Promise<void | NavigationFailure | undefined>> = vi.spyOn(
+      router,
+      'push',
+    );
+    await wrapper?.find('[data-testid="close-layout-card-button"]').trigger('click');
+    expect(push).toHaveBeenCalledTimes(1);
   });
 
   test('it fills form and triggers submit', async () => {
@@ -79,5 +100,12 @@ describe('KlasseCreationView', () => {
 
     wrapper?.find('[data-testid="klasse-creation-form-create-button"]').trigger('click');
     await nextTick();
+
+    expect(wrapper?.find('[data-testid="create-another-klasse-button"]').isVisible()).toBe(true);
+
+    wrapper?.find('[data-testid="create-another-klasse-button"]').trigger('click');
+    await nextTick();
+
+    expect(organisationStore.createdKlasse).toBe(null);
   });
 });
