@@ -53,6 +53,7 @@
   const isEditActive: Ref<boolean> = ref(false);
   const isZuordnungFormActive: Ref<boolean> = ref(false);
   const pendingDeletion: Ref<boolean> = ref(false);
+  const pendingCreation: Ref<boolean> = ref(false);
   const successDialogVisible: Ref<boolean> = ref(false);
 
   let timerId: ReturnType<typeof setTimeout>;
@@ -73,22 +74,15 @@
     navigateToPersonTable();
   };
 
-  // Triggers the template to start editing
-  const triggerEdit = (): void => {
-    isEditActive.value = true;
-  };
-  // Cancels editing
-  const cancelEdit = (): void => {
-    isEditActive.value = false;
-    pendingDeletion.value = false;
-    selectedZuordnungen.value = [];
-  };
-
   // Triggers the template to prepare the deletion
-  const prepareChange = (): void => {
+  const prepareDeletion = (): void => {
     pendingDeletion.value = true;
   };
-
+  // Triggers the template to prepare the creation
+  const prepareCreation = (): void => {
+    pendingCreation.value = true;
+    isZuordnungFormActive.value = false;
+  };
   async function deletePerson(personId: string): Promise<void> {
     await personStore.deletePerson(personId);
   }
@@ -282,8 +276,33 @@
   ] = defineField('selectedKlasse', vuetifyConfig);
 
   const onSubmit: (e?: Event | undefined) => Promise<void | undefined> = handleSubmit(() => {
-    prepareChange();
+    newZuordnung.value = {
+      sskId: selectedOrganisation.value,
+      rolleId: selectedRolle.value,
+      klasse: selectedKlasse.value,
+      sskDstNr: selectedOrganisation.value,
+      sskName:
+        organisationen.value?.find((org: TranslatedObject) => org.value === selectedOrganisation.value)?.title || '',
+      rolle: rollen.value?.find((rolle: RolleWithRollenart) => rolle.value === selectedRolle.value)?.title || '',
+      editable: true,
+      typ: OrganisationsTyp.Schule, 
+    };
+    prepareCreation();
   });
+
+  // Triggers the template to start editing
+  const triggerEdit = (): void => {
+    isEditActive.value = true;
+  };
+  // Cancels editing
+  const cancelEdit = (): void => {
+    isEditActive.value = false;
+    pendingDeletion.value = false;
+    pendingCreation.value = false;
+    selectedZuordnungen.value = [];
+    isZuordnungFormActive.value = false;
+    resetForm();
+  };
 
   // This will send the updated list of Zuordnungen to the Backend on TOP of the new added one through the form.
   const confirmAddition = async (): Promise<void> => {
@@ -633,7 +652,7 @@
                 :title="zuordnung.sskName"
                 class="py-0 d-flex align-items-center"
               >
-                <template v-if="!pendingDeletion">
+                <template v-if="!pendingDeletion && !pendingCreation">
                   <div class="checkbox-div">
                     <v-checkbox
                       v-model="selectedZuordnungen"
@@ -648,7 +667,25 @@
                     </v-checkbox>
                   </div>
                 </template>
-                <template v-else>
+                <template v-else-if="pendingCreation && !pendingDeletion">
+                  <span
+                    class="my-3 ml-5"
+                    :class="{
+                      'text-body text-green': zuordnungenResult?.includes(zuordnung),
+                      'text-body': !zuordnungenResult?.includes(zuordnung),
+                    }"
+                  >
+                    {{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
+                    {{ zuordnung.klasse }}
+                    <span
+                      v-if="selectedZuordnungen.includes(zuordnung)"
+                      class="text-green"
+                    >
+                      ({{ $t('person.willBeCreated') }})</span
+                    >
+                  </span>
+                </template>
+                <template v-else-if="pendingDeletion">
                   <span
                     class="my-3 ml-5"
                     :class="{
@@ -669,7 +706,7 @@
               </v-col>
               <v-spacer></v-spacer>
               <v-col
-                v-if="!pendingDeletion"
+                v-if="!pendingDeletion && !pendingCreation"
                 class="button-container"
                 cols="12"
                 md="auto"
@@ -685,7 +722,7 @@
                     :person="personStore.currentPerson"
                     :disabled="selectedZuordnungen.length === 0"
                     :zuordnungCount="zuordnungenResult?.length"
-                    @onDeletePersonenkontext="prepareChange"
+                    @onDeletePersonenkontext="prepareDeletion"
                   >
                   </PersonenkontextDelete>
                   <SpshTooltip
@@ -786,7 +823,8 @@
               </v-col>
             </v-row>
           </template>
-          <template v-if="isZuordnungFormActive">
+          <template v-if="isZuordnungFormActive && !pendingDeletion">
+            <!-- Formwrapper geht hier nicht, eigene Komponente hier einrichten?-->
             <v-form
               data-testid="zuordnung-creation-form"
               @submit.prevent="onSubmit"
@@ -799,7 +837,7 @@
                   <h3 class="subtitle-1">{{ $t('person.addZuordnung') }}:</h3></v-col
                 >
               </v-row>
-              <!-- Rollenzuordnung -->
+              <!-- Rolle zuordnen -->
               <v-container class="px-lg-16">
                 <FormRow
                   :errorLabel="selectedRolleProps['error']"
@@ -829,6 +867,7 @@
                 </FormRow>
                 <!-- Organisation zuordnen -->
                 <FormRow
+                  v-if="selectedRolle"
                   :errorLabel="selectedOrganisationProps['error']"
                   :isRequired="true"
                   labelForId="organisation-select"
@@ -890,6 +929,7 @@
                   <v-btn
                     :block="mdAndDown"
                     class="secondary"
+                    @Click="cancelEdit"
                     data-testid="zuordnung-creation-discard-button"
                     >{{ $t('cancel') }}</v-btn
                   >
@@ -902,7 +942,8 @@
                   <v-btn
                     :block="mdAndDown"
                     class="primary"
-                    data-testid="zuordnung-creation-discard-button"
+                    @Click="prepareCreation"
+                    data-testid="zuordnung-creation-submit-button"
                     type="submit"
                     >{{ $t('person.addZuordnung') }}</v-btn
                   >
