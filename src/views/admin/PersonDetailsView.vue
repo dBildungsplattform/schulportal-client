@@ -70,6 +70,7 @@
     pendingDeletion.value = true;
   };
 
+  // Deletes the person and all kontexte
   async function deletePerson(personId: string): Promise<void> {
     await personStore.deletePerson(personId);
   }
@@ -81,10 +82,27 @@
       (zuordnung: Zuordnung) => !selectedZuordnungen.value.includes(zuordnung),
     );
 
+    // Extract Zuordnungen of type "Klasse"
+    const klassenZuordnungen: Zuordnung[] | undefined = personenKontextStore.personenuebersicht?.zuordnungen.filter(
+      (zuordnung: Zuordnung) => zuordnung.typ === OrganisationsTyp.Klasse,
+    );
+
+    // Filter out Klassen where administriertVon is equal to any selectedZuordnungen.sskId so the Klasse is also deleted alongside the Schule.
+    // Otherwise the Zuordnung to the Schule will be deleted but the one to the Klasse will remain.
+    const filteredKlassenZuordnungen: Zuordnung[] | undefined = klassenZuordnungen?.filter(
+      (klasseZuordnung: Zuordnung) =>
+        !selectedZuordnungen.value.some(
+          (selectedZuordnung: Zuordnung) => selectedZuordnung.sskId === klasseZuordnung.administriertVon,
+        ),
+    );
+
+    // Combine remaining Zuordnungen and filtered Klassen Zuordnungen
+    const combinedZuordnungen: Zuordnung[] | undefined = remainingZuordnungen?.concat(filteredKlassenZuordnungen || []);
+
     const updateParams: DbiamUpdatePersonenkontexteBodyParams = {
       lastModified: new Date().toISOString(),
       count: personenKontextStore.personenuebersicht?.zuordnungen.length ?? 0,
-      personenkontexte: remainingZuordnungen?.map((zuordnung: Zuordnung) => ({
+      personenkontexte: combinedZuordnungen?.map((zuordnung: Zuordnung) => ({
         personId: currentPersonId,
         organisationId: zuordnung.sskId,
         rolleId: zuordnung.rolleId,
@@ -92,7 +110,7 @@
     };
 
     await personenKontextStore.updatePersonenkontexte(updateParams, currentPersonId);
-    zuordnungenResult.value = remainingZuordnungen;
+    zuordnungenResult.value = combinedZuordnungen;
     selectedZuordnungen.value = [];
     successDialogVisible.value = true;
   };
@@ -116,6 +134,7 @@
     }
   }
 
+  // Add the Klasse to it's corresponding Schule
   function computeZuordnungen(personenuebersicht: Uebersicht | null): Zuordnung[] | undefined {
     const zuordnungen: Zuordnung[] | undefined = personenuebersicht?.zuordnungen;
 
