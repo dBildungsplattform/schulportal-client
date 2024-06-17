@@ -266,7 +266,10 @@
       });
     });
 
-    Object.values(RollenSystemRecht).forEach((enumValue: RollenSystemRecht) => {
+    // TODO: we have to hide technical Systemrechte from RollenSystemRecht until SPSH-773 is implemented
+    const { MigrationDurchfuehren, ...filteredSystemrechte } = RollenSystemRecht;
+
+    Object.values(filteredSystemrechte).forEach((enumValue: RollenSystemRecht) => {
       const i18nPath: string = `admin.rolle.mappingFrontBackEnd.systemrechte.${enumValue}`;
       translatedSystemrechte.value.push({
         value: enumValue,
