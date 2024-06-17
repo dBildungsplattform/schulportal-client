@@ -1,11 +1,11 @@
 import { expect, test, type MockInstance } from 'vitest';
 import { VueWrapper, mount } from '@vue/test-utils';
+import KlasseCreationView from './KlasseCreationView.vue';
 import { createRouter, createWebHistory, type NavigationFailure, type RouteLocationRaw, type Router } from 'vue-router';
 import routes from '@/router/routes';
-import KlasseCreationView from './KlasseCreationView.vue';
 import { nextTick } from 'vue';
-import type { OrganisationResponse } from '@/api-client/generated';
 import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
+import type { OrganisationResponse } from '@/api-client/generated';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
@@ -17,7 +17,9 @@ beforeEach(async () => {
       <div id="app"></div>
     </div>
   `;
-  
+
+  organisationStore = useOrganisationStore();
+
   router = createRouter({
     history: createWebHistory(),
     routes,
@@ -25,8 +27,6 @@ beforeEach(async () => {
 
   router.push('/');
   await router.isReady();
-
-  organisationStore = useOrganisationStore();
 
   organisationStore.allOrganisationen = [
     {
@@ -107,5 +107,12 @@ describe('KlasseCreationView', () => {
     await nextTick();
 
     expect(organisationStore.createdKlasse).toBe(null);
+  });
+
+  test('it shows error message', async () => {
+    organisationStore.errorCode = 'KLASSENNAME_AN_SCHULE_EINDEUTIG';
+    await nextTick();
+
+    expect(wrapper?.find('[data-testid="alert-title"]').isVisible()).toBe(true);
   });
 });
