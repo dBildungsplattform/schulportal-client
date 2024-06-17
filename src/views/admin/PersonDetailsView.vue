@@ -740,17 +740,16 @@
                 </template>
                 <template v-else-if="pendingCreation && !pendingDeletion">
                   <span
-                    class="my-3 ml-5"
-                    :class="{
-                      'text-body text-green': zuordnungenResult?.includes(zuordnung),
-                      'text-body': !zuordnungenResult?.includes(zuordnung),
-                    }"
-                  >
+                 class="my-3 ml-5"
+                       :class="{ 'text-body text-green': newZuordnung && zuordnung.sskId === newZuordnung.sskId && zuordnung.rolleId === newZuordnung.rolleId,
+                        'text-body': newZuordnung && zuordnung.sskId !== newZuordnung.sskId && zuordnung.rolleId !== newZuordnung.rolleId,
+                       }"
+      >
                     {{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
                     {{ zuordnung.klasse }}
                     <span
-                      v-if="zuordnungenResult?.includes(zuordnung)"
-                      class="text-green"
+                      v-if="newZuordnung && zuordnung.sskId === newZuordnung.sskId && zuordnung.rolleId === newZuordnung.rolleId"
+                      class="text-body text-green"
                     >
                       ({{ $t('person.willBeCreated') }})</span
                     >
