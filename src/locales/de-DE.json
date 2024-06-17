@@ -298,6 +298,7 @@
     "changeRolle": "Rolle ändern",
     "changeRolleDescription": "Ändert die Rolle des Benutzers an der Schule ohne ihn zu entfernen.",
     "chooseZuordnungFirst": "Wählen Sie bitte zuerst eine Schulzuordnung aus.",
+    "createZuordnungSuccess": "Die Zuordnung wurde erfolgreich hinzugefügt.",
     "deleteZuordnungConfirmation": "Wollen Sie die Schulzuordnung wirklich entfernen?",
     "deleteLastZuordnungConfirmation": "Dies ist die letzte Zuordnung des Benutzers zu dieser Schule. Wollen Sie die Schulzuordnung wirklich entfernen?",
     "deleteZuordnungSuccess": "Die Schulzuordnung wurde erfolgreich entfernt.",

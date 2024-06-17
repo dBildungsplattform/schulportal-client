@@ -49,12 +49,15 @@
   const getZuordnungen: ComputedRef<Zuordnung[] | undefined> = computed(() => zuordnungenResult.value);
   const selectedZuordnungen: Ref<Zuordnung[]> = ref<Zuordnung[]>([]);
   const newZuordnung: Ref<Zuordnung | undefined> = ref<Zuordnung | undefined>(undefined);
+  const finalZuordnungen: Ref<Zuordnung[]> = ref<Zuordnung[]>([]);
+  const originalZuordnungenResult: Ref<Zuordnung[] | undefined> = ref(undefined);
 
   const isEditActive: Ref<boolean> = ref(false);
   const isZuordnungFormActive: Ref<boolean> = ref(false);
   const pendingDeletion: Ref<boolean> = ref(false);
   const pendingCreation: Ref<boolean> = ref(false);
-  const successDialogVisible: Ref<boolean> = ref(false);
+  const deleteSuccessDialogVisible: Ref<boolean> = ref(false);
+  const createSuccessDialogVisible: Ref<boolean> = ref(false);
 
   let timerId: ReturnType<typeof setTimeout>;
   const searchInputRollen: Ref<string> = ref('');
@@ -103,7 +106,7 @@
     );
 
     // Extract Zuordnungen of type "Klasse"
-    const klassenZuordnungen: Zuordnung[] | undefined = personenKontextStore.personenuebersicht?.zuordnungen.filter(
+    const klassenZuordnungen: Zuordnung[] | undefined = personenkontextStore.personenuebersicht?.zuordnungen.filter(
       (zuordnung: Zuordnung) => zuordnung.typ === OrganisationsTyp.Klasse,
     );
 
@@ -121,7 +124,7 @@
 
     const updateParams: DbiamUpdatePersonenkontexteBodyParams = {
       lastModified: new Date().toISOString(),
-      count: personenKontextStore.personenuebersicht?.zuordnungen.length ?? 0,
+      count: personenkontextStore.personenuebersicht?.zuordnungen.length ?? 0,
       personenkontexte: combinedZuordnungen?.map((zuordnung: Zuordnung) => ({
         personId: currentPersonId,
         organisationId: zuordnung.sskId,
@@ -129,14 +132,14 @@
       })) as DBiamCreatePersonenkontextBodyParams[],
     };
 
-    await personenKontextStore.updatePersonenkontexte(updateParams, currentPersonId);
+    await personenkontextStore.updatePersonenkontexte(updateParams, currentPersonId);
     zuordnungenResult.value = combinedZuordnungen;
     selectedZuordnungen.value = [];
-    successDialogVisible.value = true;
+    deleteSuccessDialogVisible.value = true;
   };
 
   const closeSuccessDialog = (): void => {
-    successDialogVisible.value = false;
+    deleteSuccessDialogVisible.value = false;
     router.push(route).then(() => {
       router.go(0);
     });
@@ -296,24 +299,59 @@
   ] = defineField('selectedKlasse', vuetifyConfig);
 
   const onSubmit: (e?: Event | undefined) => Promise<void | undefined> = handleSubmit(() => {
-    newZuordnung.value = {
-      sskId: selectedOrganisation.value,
-      rolleId: selectedRolle.value,
-      klasse: selectedKlasse.value,
-      sskDstNr: selectedOrganisation.value,
-      sskName:
-        organisationen.value?.find((org: TranslatedObject) => org.value === selectedOrganisation.value)?.title || '',
-      rolle: rollen.value?.find((rolle: RolleWithRollenart) => rolle.value === selectedRolle.value)?.title || '',
-      editable: true,
-      typ: OrganisationsTyp.Schule, 
-    };
+    const organisation: Organisation | undefined = personenkontextStore.filteredOrganisationen?.moeglicheSsks.find(
+      (orga: Organisation) => orga.id === selectedOrganisation.value,
+    );
+    const klasse: Organisation | undefined = organisationStore.klassen.find(
+      (k: Organisation) => k.id === selectedKlasse.value,
+    );
+    // If the added Zuordnung through the form also contains a Klasse then send 2 Backend Requests since it's actually 2 separate Zuordnungen.
+    // But in the UI only show 1 row that contains the whole thing (Schule + Klasse).
+    if (organisation) {
+      newZuordnung.value = {
+        sskId: organisation.id,
+        rolleId: selectedRolle.value,
+        klasse: klasse?.name,
+        sskDstNr: organisation.kennung ?? '',
+        sskName: organisation.name,
+        rolle: rollen.value?.find((rolle: RolleWithRollenart) => rolle.value === selectedRolle.value)?.title || '',
+        administriertVon: organisation.administriertVon ?? '',
+        editable: true,
+        typ: OrganisationsTyp.Schule,
+      };
+      if (zuordnungenResult.value) {
+        finalZuordnungen.value = zuordnungenResult.value;
+        finalZuordnungen.value.push(newZuordnung.value);
+      }
+      if (klasse) {
+        finalZuordnungen.value.push({
+          sskId: klasse.id,
+          rolleId: selectedRolle.value,
+          sskDstNr: klasse.kennung ?? '',
+          sskName: klasse.name,
+          rolle: rollen.value?.find((rolle: RolleWithRollenart) => rolle.value === selectedRolle.value)?.title || '',
+          administriertVon: klasse.administriertVon ?? '',
+          editable: true,
+          typ: OrganisationsTyp.Klasse,
+        });
+      }
+    }
+    // Filter out Zuordnungen of type Klasse from zuordnungenResult so they aren't shown in the UI
+    // (They are included in the finalZuordnung though so they are sent to the Backend)
+    zuordnungenResult.value = zuordnungenResult.value?.filter(
+      (zuordnung: Zuordnung) => zuordnung.typ !== OrganisationsTyp.Klasse,
+    );
     prepareCreation();
   });
 
   // Triggers the template to start editing
   const triggerEdit = (): void => {
     isEditActive.value = true;
+    // Deep copy of the zuordnungenResult to keep track of the Zuordnungen before any changes were done.
+    // This is necessary if a user cancels the editing at some point and the zuordnungenResult was mutated at the time.
+    originalZuordnungenResult.value = JSON.parse(JSON.stringify(zuordnungenResult.value));
   };
+
   // Cancels editing
   const cancelEdit = (): void => {
     isEditActive.value = false;
@@ -322,17 +360,17 @@
     selectedZuordnungen.value = [];
     isZuordnungFormActive.value = false;
     resetForm();
+    zuordnungenResult.value = originalZuordnungenResult.value
+      ? JSON.parse(JSON.stringify(originalZuordnungenResult.value))
+      : undefined;
   };
 
   // This will send the updated list of Zuordnungen to the Backend on TOP of the new added one through the form.
   const confirmAddition = async (): Promise<void> => {
-    if (newZuordnung.value) {
-      zuordnungenResult.value?.push(newZuordnung.value);
-    }
     const updateParams: DbiamUpdatePersonenkontexteBodyParams = {
       lastModified: new Date().toISOString(),
       count: personenkontextStore.personenuebersicht?.zuordnungen.length ?? 0,
-      personenkontexte: zuordnungenResult.value?.map((zuordnung: Zuordnung) => ({
+      personenkontexte: finalZuordnungen.value.map((zuordnung: Zuordnung) => ({
         personId: currentPersonId,
         organisationId: zuordnung.sskId,
         rolleId: zuordnung.rolleId,
@@ -340,9 +378,22 @@
     };
 
     await personenkontextStore.updatePersonenkontexte(updateParams, currentPersonId);
+    createSuccessDialogVisible.value = true;
     resetForm();
-    successDialogVisible.value = true;
   };
+
+  // The save button will act according to what kind of pending action we have.
+  const handleSaveClick = (): void => {
+    if (pendingCreation.value) {
+      confirmAddition();
+    } else if (pendingDeletion.value) {
+      confirmDeletion();
+    }
+  };
+
+  // The save button is always disabled if there is no pending creation nor deletion.
+  const isSaveButtonDisabled: ComputedRef<boolean> = computed(() => !pendingCreation.value && !pendingDeletion.value);
+
   // Watcher to detect when the Rolle is selected so the Organisationen show all the possible choices using that value.
   watch(selectedRolle, (newValue: string, oldValue: string) => {
     // This checks if `selectedRolle` is cleared or set to a falsy value
@@ -698,7 +749,7 @@
                     {{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
                     {{ zuordnung.klasse }}
                     <span
-                      v-if="selectedZuordnungen.includes(zuordnung)"
+                      v-if="zuordnungenResult?.includes(zuordnung)"
                       class="text-green"
                     >
                       ({{ $t('person.willBeCreated') }})</span
@@ -826,16 +877,16 @@
                 md="auto"
               >
                 <SpshTooltip
-                  :enabledCondition="pendingDeletion"
+                  :enabledCondition="!isSaveButtonDisabled"
                   :disabledText="$t('person.noChangesToSave')"
                   :enabledText="$t('person.saveChanges')"
                 >
                   <v-btn
                     class="primary small"
                     data-testid="zuordnung-changes-save"
-                    @click="confirmDeletion"
+                    @click="handleSaveClick"
                     :block="mdAndDown"
-                    :disabled="!pendingDeletion"
+                    :disabled="isSaveButtonDisabled"
                   >
                     {{ $t('save') }}
                   </v-btn>
@@ -847,7 +898,7 @@
             <!-- Formwrapper geht hier nicht, eigene Komponente hier einrichten?-->
             <v-form
               data-testid="zuordnung-creation-form"
-              @submit.prevent="onSubmit"
+              @submit="onSubmit"
             >
               <v-row class="ml-md-16">
                 <v-col
@@ -962,7 +1013,6 @@
                   <v-btn
                     :block="mdAndDown"
                     class="primary"
-                    @Click="prepareCreation"
                     data-testid="zuordnung-creation-submit-button"
                     type="submit"
                     >{{ $t('person.addZuordnung') }}</v-btn
@@ -1009,7 +1059,7 @@
     </LayoutCard>
     <!-- Success Dialog after deleting the Zuordnung-->
     <v-dialog
-      v-model="successDialogVisible"
+      v-model="deleteSuccessDialogVisible"
       persistent
       max-width="600px"
     >
@@ -1025,6 +1075,47 @@
                 cols="10"
               >
                 <span>{{ $t('person.deleteZuordnungSuccess') }}</span>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card-text>
+        <v-card-actions class="justify-center">
+          <v-row class="justify-center">
+            <v-col
+              cols="12"
+              sm="6"
+              md="4"
+            >
+              <v-btn
+                :block="mdAndDown"
+                class="primary"
+                @click.stop="closeSuccessDialog"
+              >
+                {{ $t('close') }}
+              </v-btn>
+            </v-col>
+          </v-row>
+        </v-card-actions>
+      </LayoutCard>
+    </v-dialog>
+    <!-- Success Dialog after creating the Zuordnung-->
+    <v-dialog
+      v-model="createSuccessDialogVisible"
+      persistent
+      max-width="600px"
+    >
+      <LayoutCard
+        :closable="true"
+        :header="$t('person.editZuordnungen')"
+      >
+        <v-card-text>
+          <v-container>
+            <v-row class="text-body bold px-md-16">
+              <v-col
+                offset="1"
+                cols="10"
+              >
+                <span>{{ $t('person.createZuordnungSuccess') }}</span>
               </v-col>
             </v-row>
           </v-container>
