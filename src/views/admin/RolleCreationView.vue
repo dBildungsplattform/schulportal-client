@@ -266,15 +266,14 @@
       });
     });
 
-    // TODO: we have to hide technical Systemrechte from RollenSystemRecht until SPSH-773 is implemented
-    const { MigrationDurchfuehren, ...filteredSystemrechte } = RollenSystemRecht;
-
-    Object.values(filteredSystemrechte).forEach((enumValue: RollenSystemRecht) => {
-      const i18nPath: string = `admin.rolle.mappingFrontBackEnd.systemrechte.${enumValue}`;
-      translatedSystemrechte.value.push({
-        value: enumValue,
-        title: t(i18nPath),
-      });
+    Object.values(RollenSystemRecht).forEach((enumValue: RollenSystemRecht) => {
+      if (enumValue !== RollenSystemRecht.MigrationDurchfuehren) {
+        const i18nPath: string = `admin.rolle.mappingFrontBackEnd.systemrechte.${enumValue}`;
+        translatedSystemrechte.value.push({
+          value: enumValue,
+          title: t(i18nPath),
+        });
+      }
     });
 
     /* listen for browser changes and prevent them when form is dirty */
