@@ -2,7 +2,7 @@
   import ServiceProviderCard from '@/components/cards/ServiceProviderCard.vue';
   import { type AuthStore, useAuthStore } from '@/stores/AuthStore';
   import { type ServiceProvider } from '@/stores/ServiceProviderStore';
-  
+
   const authStore: AuthStore = useAuthStore();
 
   defineProps<{
