@@ -740,10 +740,8 @@
                 </template>
                 <template v-else-if="pendingCreation && !pendingDeletion">
                   <span
-                 class="my-3 ml-5"
-                       :class="{ 'text-body text-green': newZuordnung && zuordnung.sskId === newZuordnung.sskId && zuordnung.rolleId === newZuordnung.rolleId,
-                        'text-body': newZuordnung && zuordnung.sskId !== newZuordnung.sskId && zuordnung.rolleId !== newZuordnung.rolleId,
-                       }"
+                 class="text-body my-3 ml-5"
+                       :class="{ 'text-green': newZuordnung && zuordnung.sskId === newZuordnung.sskId && zuordnung.rolleId === newZuordnung.rolleId }"
       >
                     {{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
                     {{ zuordnung.klasse }}
@@ -757,17 +755,16 @@
                 </template>
                 <template v-else-if="pendingDeletion">
                   <span
-                    class="my-3 ml-5"
+                    class="text-body my-3 ml-5"
                     :class="{
-                      'text-body text-red': selectedZuordnungen.includes(zuordnung),
-                      'text-body': !selectedZuordnungen.includes(zuordnung),
+                      'text-red': selectedZuordnungen.includes(zuordnung),
                     }"
                   >
                     {{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
                     {{ zuordnung.klasse }}
                     <span
                       v-if="selectedZuordnungen.includes(zuordnung)"
-                      class="text-red"
+                      class="text-body text-red"
                     >
                       ({{ $t('person.willBeRemoved') }})</span
                     >
