@@ -70,6 +70,16 @@ const routes: readonly RouteRecordRaw[] = [
     },
   },
   {
+    path: '/admin/rollen/:id',
+    name: 'rolle-details',
+    component: () => import('../views/admin/RolleDetailsView.vue'),
+    meta: {
+      layout: 'AdminLayout',
+      requiresAuth: true,
+      requiresPermission: 'rollenverwaltung',
+    },
+  },
+  {
     path: '/admin/rollen',
     name: 'rolle-management',
     component: () => import('../views/admin/RolleManagementView.vue'),

@@ -17,6 +17,7 @@ const rolleApi: RolleApiInterface = RolleApiFactory(undefined, '', axiosApiInsta
 
 type RolleState = {
   createdRolle: Rolle | null;
+  currentRolle: Rolle | null;
   allRollen: Array<RolleResponse>;
   errorCode: string;
   loading: boolean;
@@ -37,6 +38,7 @@ type RolleActions = {
     systemrechte: RollenSystemRecht[],
   ) => Promise<RolleResponse>;
   getAllRollen: (searchString: string) => Promise<void>;
+  getRolleById: (rolleId: string) => Promise<Rolle>;
 };
 
 export { RollenArt };
@@ -61,6 +63,7 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
   state: (): RolleState => {
     return {
       createdRolle: null,
+      currentRolle: null,
       allRollen: [],
       errorCode: '',
       loading: false,
@@ -137,6 +140,24 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
         if (isAxiosError(error)) {
           this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
         }
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async getRolleById(rolleId: string): Promise<RolleResponse> {
+      this.loading = true;
+      this.errorCode = '';
+      try {
+        const { data }: { data: RolleResponse } = await rolleApi.rolleControllerFindRolleByIdWithServiceProviders(rolleId);
+        this.currentRolle = data;
+        return data;
+      } catch (error) {
+        this.errorCode = 'UNSPECIFIED_ERROR';
+        if (isAxiosError(error)) {
+          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
+        }
+        return await Promise.reject(this.errorCode);
       } finally {
         this.loading = false;
       }
