@@ -4977,12 +4977,14 @@ export const PersonenkontextApiAxiosParamCreator = function (configuration?: Con
     return {
         /**
          * 
-         * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
+         * @param {string} rolleName Rolle name used to filter for rollen in personenkontext.
          * @param {number} [limit] The limit of items for the request.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        dbiamPersonenkontextFilterControllerFindRollen: async (rolleName?: string, limit?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        dbiamPersonenkontextFilterControllerFindRollen: async (rolleName: string, limit?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'rolleName' is not null or undefined
+            assertParamExists('dbiamPersonenkontextFilterControllerFindRollen', 'rolleName', rolleName)
             const localVarPath = `/api/personenkontext/rollen`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -5088,12 +5090,12 @@ export const PersonenkontextApiFp = function(configuration?: Configuration) {
     return {
         /**
          * 
-         * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
+         * @param {string} rolleName Rolle name used to filter for rollen in personenkontext.
          * @param {number} [limit] The limit of items for the request.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async dbiamPersonenkontextFilterControllerFindRollen(rolleName?: string, limit?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<FindRollenResponse>> {
+        async dbiamPersonenkontextFilterControllerFindRollen(rolleName: string, limit?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<FindRollenResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.dbiamPersonenkontextFilterControllerFindRollen(rolleName, limit, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -5121,12 +5123,12 @@ export const PersonenkontextApiFactory = function (configuration?: Configuration
     return {
         /**
          * 
-         * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
+         * @param {string} rolleName Rolle name used to filter for rollen in personenkontext.
          * @param {number} [limit] The limit of items for the request.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        dbiamPersonenkontextFilterControllerFindRollen(rolleName?: string, limit?: number, options?: any): AxiosPromise<FindRollenResponse> {
+        dbiamPersonenkontextFilterControllerFindRollen(rolleName: string, limit?: number, options?: any): AxiosPromise<FindRollenResponse> {
             return localVarFp.dbiamPersonenkontextFilterControllerFindRollen(rolleName, limit, options).then((request) => request(axios, basePath));
         },
         /**
@@ -5151,13 +5153,13 @@ export const PersonenkontextApiFactory = function (configuration?: Configuration
 export interface PersonenkontextApiInterface {
     /**
      * 
-     * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
+     * @param {string} rolleName Rolle name used to filter for rollen in personenkontext.
      * @param {number} [limit] The limit of items for the request.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PersonenkontextApiInterface
      */
-    dbiamPersonenkontextFilterControllerFindRollen(rolleName?: string, limit?: number, options?: AxiosRequestConfig): AxiosPromise<FindRollenResponse>;
+    dbiamPersonenkontextFilterControllerFindRollen(rolleName: string, limit?: number, options?: AxiosRequestConfig): AxiosPromise<FindRollenResponse>;
 
     /**
      * 
@@ -5181,13 +5183,13 @@ export interface PersonenkontextApiInterface {
 export class PersonenkontextApi extends BaseAPI implements PersonenkontextApiInterface {
     /**
      * 
-     * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
+     * @param {string} rolleName Rolle name used to filter for rollen in personenkontext.
      * @param {number} [limit] The limit of items for the request.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PersonenkontextApi
      */
-    public dbiamPersonenkontextFilterControllerFindRollen(rolleName?: string, limit?: number, options?: AxiosRequestConfig) {
+    public dbiamPersonenkontextFilterControllerFindRollen(rolleName: string, limit?: number, options?: AxiosRequestConfig) {
         return PersonenkontextApiFp(this.configuration).dbiamPersonenkontextFilterControllerFindRollen(rolleName, limit, options).then((request) => request(this.axios, this.basePath));
     }
 
