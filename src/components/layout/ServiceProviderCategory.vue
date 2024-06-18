@@ -1,6 +1,9 @@
 <script setup lang="ts">
   import ServiceProviderCard from '@/components/cards/ServiceProviderCard.vue';
+  import { type AuthStore, useAuthStore } from '@/stores/AuthStore';
   import { type ServiceProvider } from '@/stores/ServiceProviderStore';
+
+  const authStore: AuthStore = useAuthStore();
 
   defineProps<{
     categoryTitle: string;
@@ -8,7 +11,20 @@
   }>();
 
   function getInternalServiceProviderUrl(target: string): string {
-    if (target === 'SCHULPORTAL_ADMINISTRATION') return '/admin/personen';
+    if (target === 'SCHULPORTAL_ADMINISTRATION') {
+      if (authStore.hasPersonenverwaltungPermission) {
+        return '/admin/personen';
+      }
+      if (authStore.hasRollenverwaltungPermission) {
+        return '/admin/rollen';
+      }
+      if (authStore.hasSchulverwaltungPermission) {
+        return '/admin/schulen';
+      }
+      if (authStore.hasKlassenverwaltungPermission) {
+        return '/admin/klassen';
+      }
+    }
     return '';
   }
 </script>

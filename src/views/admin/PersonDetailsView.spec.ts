@@ -69,6 +69,7 @@ beforeEach(async () => {
       <div id="app"></div>
     </div>
   `;
+
   router = createRouter({
     history: createWebHistory(),
     routes,

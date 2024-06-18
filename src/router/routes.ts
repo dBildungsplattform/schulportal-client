@@ -15,8 +15,9 @@ const routes: readonly RouteRecordRaw[] = [
     name: 'person-management',
     component: () => import('../views/admin/PersonManagementView.vue'),
     meta: {
-      requiresAuth: true,
       layout: 'AdminLayout',
+      requiresAuth: true,
+      requiresPermission: 'personenverwaltung',
     },
   },
   {
@@ -26,6 +27,7 @@ const routes: readonly RouteRecordRaw[] = [
     meta: {
       layout: 'AdminLayout',
       requiresAuth: true,
+      requiresPermission: 'personenverwaltung',
     },
   },
   {
@@ -35,6 +37,7 @@ const routes: readonly RouteRecordRaw[] = [
     meta: {
       layout: 'AdminLayout',
       requiresAuth: true,
+      requiresPermission: 'personenverwaltung',
     },
   },
   {
@@ -53,6 +56,7 @@ const routes: readonly RouteRecordRaw[] = [
     meta: {
       layout: 'AdminLayout',
       requiresAuth: true,
+      requiresPermission: 'klassenverwaltung',
     },
   },
   {
@@ -62,6 +66,7 @@ const routes: readonly RouteRecordRaw[] = [
     meta: {
       layout: 'AdminLayout',
       requiresAuth: true,
+      requiresPermission: 'rollenverwaltung',
     },
   },
   {
@@ -69,8 +74,9 @@ const routes: readonly RouteRecordRaw[] = [
     name: 'rolle-management',
     component: () => import('../views/admin/RolleManagementView.vue'),
     meta: {
-      requiresAuth: true,
       layout: 'AdminLayout',
+      requiresAuth: true,
+      requiresPermission: 'rollenverwaltung',
     },
   },
   {
@@ -80,6 +86,7 @@ const routes: readonly RouteRecordRaw[] = [
     meta: {
       layout: 'AdminLayout',
       requiresAuth: true,
+      requiresPermission: 'schulverwaltung',
     },
   },
   {
@@ -87,8 +94,9 @@ const routes: readonly RouteRecordRaw[] = [
     name: 'schule-management',
     component: () => import('../views/admin/SchuleManagementView.vue'),
     meta: {
-      requiresAuth: true,
       layout: 'AdminLayout',
+      requiresAuth: true,
+      requiresPermission: 'schulverwaltung',
     },
   },
   {
