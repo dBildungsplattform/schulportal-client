@@ -38,6 +38,7 @@
   const isEditActive: Ref<boolean> = ref(false);
   const pendingDeletion: Ref<boolean> = ref(false);
   const successDialogVisible: Ref<boolean> = ref(false);
+  const cannotDeleteDialogVisible: Ref<boolean> = ref(false);
 
   function navigateToPersonTable(): void {
     router.push({ name: 'person-management' });
@@ -75,6 +76,9 @@
     await personStore.deletePerson(personId);
   }
 
+  const closeCannotDeleteDialog = (): void => {
+    cannotDeleteDialogVisible.value = false;
+  };
   let closeSuccessDialog = (): void => {
     successDialogVisible.value = false;
     router.push(route).then(() => {
@@ -83,6 +87,11 @@
   };
   // This will send the updated list of Zuordnungen to the Backend WITHOUT the selected Zuordnungen.
   const confirmDeletion = async (): Promise<void> => {
+    // Check if the current user is trying to delete their own Zuordnungen
+    if (authStore.currentUser?.personId === currentPersonId) {
+      cannotDeleteDialogVisible.value = true;
+      return;
+    }
     // The remaining Zuordnungen that were not selected
     const remainingZuordnungen: Zuordnung[] | undefined = zuordnungenResult.value?.filter(
       (zuordnung: Zuordnung) => !selectedZuordnungen.value.includes(zuordnung),
@@ -702,6 +711,48 @@
         </v-card-actions>
       </LayoutCard>
     </v-dialog>
+    <!-- Dialog to inform the user that he can't delete his own Zuordnungen -->
+    <v-dialog
+  v-model="cannotDeleteDialogVisible"
+  persistent
+  max-width="600px"
+>
+  <LayoutCard
+    :closable="true"
+    :header="$t('person.editZuordnungen')"
+  >
+    <v-card-text>
+      <v-container>
+        <v-row class="text-body bold px-md-16">
+          <v-col
+            offset="1"
+            cols="10"
+          >
+            <span>{{ $t('person.cannotDeleteOwnZuordnung') }}</span>
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-card-text>
+    <v-card-actions class="justify-center">
+      <v-row class="justify-center">
+        <v-col
+          cols="12"
+          sm="6"
+          md="4"
+        >
+          <v-btn
+            :block="mdAndDown"
+            class="primary"
+            @click.stop="closeCannotDeleteDialog"
+          >
+            {{ $t('close') }}
+          </v-btn>
+        </v-col>
+      </v-row>
+    </v-card-actions>
+  </LayoutCard>
+</v-dialog>
+
   </div>
 </template>
 
