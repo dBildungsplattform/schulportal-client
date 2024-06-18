@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { type RolleStore, useRolleStore } from '@/stores/RolleStore';
+  import { type RolleStore, useRolleStore, RollenMerkmal, RollenSystemRecht } from '@/stores/RolleStore';
   import { onBeforeMount } from 'vue';
   import { type Router, useRouter, type RouteLocationNormalizedLoaded, useRoute } from 'vue-router';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
@@ -20,9 +20,37 @@
     navigateToRolleTable();
   };
 
+  function translateProviderNames(): string | undefined {
+    if (!rolleStore.currentRolle?.serviceProviders?.length) {
+      return '---';
+    }
+
+    return rolleStore.currentRolle?.serviceProviders?.map((provider) => provider.name).join(', ');
+  }
+  
+  function translateMerkmale(): string | undefined {
+    const merkmale: Array<RollenMerkmal> = Array.from(rolleStore.currentRolle?.merkmale || [])
+
+    if (!merkmale.length) {
+      return '---';
+    }
+
+    return merkmale.map((merkmal) => merkmal).join(', ');
+  }
+
+  function translateSystemrechte(): string | undefined {
+    const systemrechte: Array<RollenSystemRecht> = Array.from(rolleStore.currentRolle?.systemrechte || [])
+
+    if (!systemrechte.length) {
+      return '---';
+    }
+
+    return systemrechte.map((systemrecht) => systemrecht).join(', ');
+  }
+
   onBeforeMount(async () => {
     await rolleStore.getRolleById(currentRolleId);
-  });  
+  });
 </script>
 
 <template>
@@ -121,11 +149,11 @@
                 cols="auto"
                 data-testid="rolle-merkmale"
               >
-                {{ rolleStore.currentRolle.merkmale ?? '---' }}
+                {{ translateMerkmale() }}
               </v-col>
             </v-row>
             <!-- Angebote (ServiceProvider) -->
-            <v-row>
+            <v-row class="flex-nowrap">
               <v-col
                 class="text-right"
                 sm="3"
@@ -134,10 +162,11 @@
                 <span class="subtitle-2"> {{ $t('admin.serviceProvider.serviceProvider') }}: </span>
               </v-col>
               <v-col
-                cols="auto"
+                sm="9"
+                cols="7"
                 data-testid="rolle-angebote"
               >
-                {{ rolleStore.currentRolle.serviceProviders ?? '---' }}
+                {{ translateProviderNames() }}
               </v-col>
             </v-row>
             <!-- Systemrechte -->
@@ -153,7 +182,7 @@
                 cols="auto"
                 data-testid="rolle-systemrechte"
               >
-                {{ rolleStore.currentRolle.systemrechte ?? '---' }}
+                {{ translateSystemrechte() }}
               </v-col>
             </v-row>
           </div>
