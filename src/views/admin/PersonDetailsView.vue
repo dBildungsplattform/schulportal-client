@@ -75,6 +75,12 @@
     await personStore.deletePerson(personId);
   }
 
+  let closeSuccessDialog = (): void => {
+    successDialogVisible.value = false;
+    router.push(route).then(() => {
+      router.go(0);
+    });
+  };
   // This will send the updated list of Zuordnungen to the Backend WITHOUT the selected Zuordnungen.
   const confirmDeletion = async (): Promise<void> => {
     // The remaining Zuordnungen that were not selected
@@ -118,18 +124,22 @@
       (zuordnung: Zuordnung) => zuordnung.editable,
     );
 
-    if (!editableZuordnungen || editableZuordnungen.length === 0) {
-      navigateToPersonTable();
-    } else {
-      successDialogVisible.value = true;
-    }
-  };
+    successDialogVisible.value = true;
 
-  const closeSuccessDialog = (): void => {
-    successDialogVisible.value = false;
-    router.push(route).then(() => {
-      router.go(0);
-    });
+    if (!editableZuordnungen || editableZuordnungen.length === 0) {
+      // If no editable Zuordnungen are left, navigate to person table after the dialog is closed
+      closeSuccessDialog = (): void => {
+        successDialogVisible.value = false;
+        navigateToPersonTable();
+      };
+    } else {
+      closeSuccessDialog = (): void => {
+        successDialogVisible.value = false;
+        router.push(route).then(() => {
+          router.go(0);
+        });
+      };
+    }
   };
 
   function getSskName(sskDstNr: string, sskName: string): string {
@@ -515,7 +525,7 @@
                   :errorCode="personStore.errorCode"
                   :person="personStore.currentPerson"
                   :disabled="selectedZuordnungen.length === 0"
-                  :zuordnungCount="zuordnungenResult?.filter(zuordnung => zuordnung.editable).length"
+                  :zuordnungCount="zuordnungenResult?.filter((zuordnung) => zuordnung.editable).length"
                   @onDeletePersonenkontext="prepareDeletion"
                 >
                 </PersonenkontextDelete>
