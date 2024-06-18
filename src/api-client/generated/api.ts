@@ -270,6 +270,25 @@ export interface DBiamCreatePersonenkontextBodyParams {
 /**
  * 
  * @export
+ * @interface DBiamPersonResponse
+ */
+export interface DBiamPersonResponse {
+    /**
+     * 
+     * @type {PersonResponse}
+     * @memberof DBiamPersonResponse
+     */
+    'person': PersonResponse;
+    /**
+     * 
+     * @type {DBiamPersonenkontextResponse}
+     * @memberof DBiamPersonResponse
+     */
+    'DBiamPersonenkontextResponse': DBiamPersonenkontextResponse;
+}
+/**
+ * 
+ * @export
  * @interface DBiamPersonenkontextResponse
  */
 export interface DBiamPersonenkontextResponse {
@@ -427,6 +446,37 @@ export interface DBiamPersonenzuordnungResponse {
 /**
  * 
  * @export
+ * @interface DbiamCreatePersonWithContextBodyParams
+ */
+export interface DbiamCreatePersonWithContextBodyParams {
+    /**
+     * 
+     * @type {string}
+     * @memberof DbiamCreatePersonWithContextBodyParams
+     */
+    'familienname': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof DbiamCreatePersonWithContextBodyParams
+     */
+    'vorname': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof DbiamCreatePersonWithContextBodyParams
+     */
+    'organisationId': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof DbiamCreatePersonWithContextBodyParams
+     */
+    'rolleId': string;
+}
+/**
+ * 
+ * @export
  * @interface DbiamOrganisationError
  */
 export interface DbiamOrganisationError {
@@ -483,7 +533,10 @@ export interface DbiamPersonenkontextError {
 export const DbiamPersonenkontextErrorI18nKeyEnum = {
     PersonenkontextSpecificationError: 'PERSONENKONTEXT_SPECIFICATION_ERROR',
     NurLehrUndLernAnKlasse: 'NUR_LEHR_UND_LERN_AN_KLASSE',
-    GleicheRolleAnKlasseWieSchule: 'GLEICHE_ROLLE_AN_KLASSE_WIE_SCHULE'
+    GleicheRolleAnKlasseWieSchule: 'GLEICHE_ROLLE_AN_KLASSE_WIE_SCHULE',
+    OrganisationMatchesRollenart: 'ORGANISATION_MATCHES_ROLLENART',
+    PersonenkontextAnlageError: 'PERSONENKONTEXT_ANLAGE_ERROR',
+    RolleNurAnPassendeOrganisation: 'ROLLE_NUR_AN_PASSENDE_ORGANISATION'
 } as const;
 
 export type DbiamPersonenkontextErrorI18nKeyEnum = typeof DbiamPersonenkontextErrorI18nKeyEnum[keyof typeof DbiamPersonenkontextErrorI18nKeyEnum];
@@ -2440,6 +2493,134 @@ export class AuthApi extends BaseAPI implements AuthApiInterface {
      */
     public authenticationControllerLogout(options?: AxiosRequestConfig) {
         return AuthApiFp(this.configuration).authenticationControllerLogout(options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+/**
+ * DbiamPersonenApi - axios parameter creator
+ * @export
+ */
+export const DbiamPersonenApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * 
+         * @param {DbiamCreatePersonWithContextBodyParams} dbiamCreatePersonWithContextBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dBiamPersonControllerCreatePersonWithKontext: async (dbiamCreatePersonWithContextBodyParams: DbiamCreatePersonWithContextBodyParams, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'dbiamCreatePersonWithContextBodyParams' is not null or undefined
+            assertParamExists('dBiamPersonControllerCreatePersonWithKontext', 'dbiamCreatePersonWithContextBodyParams', dbiamCreatePersonWithContextBodyParams)
+            const localVarPath = `/api/dbiam/personen`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(dbiamCreatePersonWithContextBodyParams, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * DbiamPersonenApi - functional programming interface
+ * @export
+ */
+export const DbiamPersonenApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = DbiamPersonenApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * 
+         * @param {DbiamCreatePersonWithContextBodyParams} dbiamCreatePersonWithContextBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async dBiamPersonControllerCreatePersonWithKontext(dbiamCreatePersonWithContextBodyParams: DbiamCreatePersonWithContextBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DBiamPersonResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.dBiamPersonControllerCreatePersonWithKontext(dbiamCreatePersonWithContextBodyParams, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+    }
+};
+
+/**
+ * DbiamPersonenApi - factory interface
+ * @export
+ */
+export const DbiamPersonenApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = DbiamPersonenApiFp(configuration)
+    return {
+        /**
+         * 
+         * @param {DbiamCreatePersonWithContextBodyParams} dbiamCreatePersonWithContextBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dBiamPersonControllerCreatePersonWithKontext(dbiamCreatePersonWithContextBodyParams: DbiamCreatePersonWithContextBodyParams, options?: any): AxiosPromise<DBiamPersonResponse> {
+            return localVarFp.dBiamPersonControllerCreatePersonWithKontext(dbiamCreatePersonWithContextBodyParams, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * DbiamPersonenApi - interface
+ * @export
+ * @interface DbiamPersonenApi
+ */
+export interface DbiamPersonenApiInterface {
+    /**
+     * 
+     * @param {DbiamCreatePersonWithContextBodyParams} dbiamCreatePersonWithContextBodyParams 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DbiamPersonenApiInterface
+     */
+    dBiamPersonControllerCreatePersonWithKontext(dbiamCreatePersonWithContextBodyParams: DbiamCreatePersonWithContextBodyParams, options?: AxiosRequestConfig): AxiosPromise<DBiamPersonResponse>;
+
+}
+
+/**
+ * DbiamPersonenApi - object-oriented interface
+ * @export
+ * @class DbiamPersonenApi
+ * @extends {BaseAPI}
+ */
+export class DbiamPersonenApi extends BaseAPI implements DbiamPersonenApiInterface {
+    /**
+     * 
+     * @param {DbiamCreatePersonWithContextBodyParams} dbiamCreatePersonWithContextBodyParams 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DbiamPersonenApi
+     */
+    public dBiamPersonControllerCreatePersonWithKontext(dbiamCreatePersonWithContextBodyParams: DbiamCreatePersonWithContextBodyParams, options?: AxiosRequestConfig) {
+        return DbiamPersonenApiFp(this.configuration).dBiamPersonControllerCreatePersonWithKontext(dbiamCreatePersonWithContextBodyParams, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
