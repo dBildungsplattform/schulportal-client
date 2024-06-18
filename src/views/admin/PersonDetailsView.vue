@@ -112,7 +112,17 @@
     await personenKontextStore.updatePersonenkontexte(updateParams, currentPersonId);
     zuordnungenResult.value = combinedZuordnungen;
     selectedZuordnungen.value = [];
-    successDialogVisible.value = true;
+
+    // Filter out Zuordnungen with editable === false
+    const editableZuordnungen: Zuordnung[] | undefined = combinedZuordnungen?.filter(
+      (zuordnung: Zuordnung) => zuordnung.editable,
+    );
+
+    if (!editableZuordnungen || editableZuordnungen.length === 0) {
+      navigateToPersonTable();
+    } else {
+      successDialogVisible.value = true;
+    }
   };
 
   const closeSuccessDialog = (): void => {
@@ -505,7 +515,7 @@
                   :errorCode="personStore.errorCode"
                   :person="personStore.currentPerson"
                   :disabled="selectedZuordnungen.length === 0"
-                  :zuordnungCount="zuordnungenResult?.length"
+                  :zuordnungCount="zuordnungenResult?.filter(zuordnung => zuordnung.editable).length"
                   @onDeletePersonenkontext="prepareDeletion"
                 >
                 </PersonenkontextDelete>
