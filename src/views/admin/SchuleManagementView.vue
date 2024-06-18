@@ -33,7 +33,7 @@
   });
 
   onMounted(async () => {
-    await organisationStore.getAllOrganisationen();
+    await organisationStore.getAllOrganisationen({ systemrechte: ['SCHULEN_VERWALTEN'] });
   });
 </script>
 
@@ -51,7 +51,7 @@
         :items="filteredOrganisationen || []"
         :loading="organisationStore.loading"
         :headers="headers"
-        @onUpdateTable="organisationStore.getAllOrganisationen()"
+        @onUpdateTable="organisationStore.getAllOrganisationen({ systemrechte: ['SCHULEN_VERWALTEN'] })"
         :totalItems="organisationStore.allOrganisationen.length"
         item-value-path="id"
         :disableRowClick="true"
