@@ -271,6 +271,7 @@ describe('PersonenkontextStore', () => {
             rolle: 'string',
             typ: OrganisationsTyp.Klasse,
             administriertVon: 'string',
+            editable: true,
           },
         ],
       };
@@ -425,6 +426,7 @@ describe('PersonenkontextStore', () => {
                 rolle: 'string',
                 typ: OrganisationsTyp.Klasse,
                 administriertVon: 'string',
+                editable: true,
               },
             ],
           },

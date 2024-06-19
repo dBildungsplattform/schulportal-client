@@ -17,6 +17,7 @@ import {
   type PersonenkontextApiInterface,
   DbiamPersonenuebersichtApiFactory,
   OrganisationsTyp,
+  type DbiamUpdatePersonenkontexteBodyParams,
 } from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
 
@@ -47,6 +48,7 @@ export type Zuordnung = {
   rolle: string;
   administriertVon: string;
   typ: OrganisationsTyp;
+  editable: boolean;
 };
 
 export type Uebersicht =
@@ -64,6 +66,7 @@ export type Uebersicht =
         rolle: string;
         administriertVon: string;
         typ: OrganisationsTyp;
+        editable: boolean;
       }[];
     }
   | undefined;
@@ -84,6 +87,10 @@ type PersonenkontextActions = {
   hasSystemrecht: (personId: string, systemrecht: 'ROLLEN_VERWALTEN') => Promise<SystemrechtResponse>;
   getPersonenkontextRolleWithFilter: (rolleName: string, limit: number) => Promise<void>;
   getPersonenkontextAdministrationsebeneWithFilter: (rolleId: string, sskName: string, limit: number) => Promise<void>;
+  updatePersonenkontexte: (
+    personenkontexte: DbiamUpdatePersonenkontexteBodyParams,
+    personId: string,
+  ) => Promise<DBiamPersonenkontextResponse>;
   createPersonenkontext: (
     personenkontext: DBiamCreatePersonenkontextBodyParams,
     personenKontextTyp: PersonenKontextTyp,
@@ -92,7 +99,7 @@ type PersonenkontextActions = {
   getAllPersonenuebersichten: () => Promise<void>;
 };
 
-export type { SystemrechtResponse };
+export type { SystemrechtResponse, DbiamUpdatePersonenkontexteBodyParams, DBiamCreatePersonenkontextBodyParams };
 export type CreatedPersonenkontext = DBiamCreatePersonenkontextBodyParams;
 export type UserinfoPersonenkontext = {
   organisationsId: string;
@@ -208,7 +215,28 @@ export const usePersonenkontextStore: StoreDefinition<
         this.loading = false;
       }
     },
-
+    async updatePersonenkontexte(
+      personenkontexte: DbiamUpdatePersonenkontexteBodyParams,
+      personId: string,
+    ): Promise<DBiamPersonenkontextResponse> {
+      this.loading = true;
+      try {
+        const { data }: { data: DBiamPersonenkontextResponse } =
+          await dbiamPersonenkontexteApi.dBiamPersonenkontextControllerUpdatePersonenkontexte(
+            personId,
+            personenkontexte,
+          );
+        return data;
+      } catch (error: unknown) {
+        this.errorCode = 'UNSPECIFIED_ERROR';
+        if (isAxiosError(error)) {
+          this.errorCode = error.response?.data.i18nKey || 'PERSONENKONTEXTE_UPDATE_ERROR';
+        }
+        return await Promise.reject(this.errorCode);
+      } finally {
+        this.loading = false;
+      }
+    },
     async getPersonenuebersichtById(personId: string): Promise<void> {
       this.loading = true;
       try {
