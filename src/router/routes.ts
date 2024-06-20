@@ -47,6 +47,7 @@ const routes: readonly RouteRecordRaw[] = [
     meta: {
       requiresAuth: true,
       layout: 'AdminLayout',
+      requiresPermission: 'klassenverwaltung',
     },
   },
   {

@@ -30,6 +30,11 @@ router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormal
           return true;
         }
         return false;
+      case 'klassenverwaltung':
+        if (authStore.hasKlassenverwaltungPermission) {
+          return true;
+        }
+        return false;
       case 'rollenverwaltung':
         if (authStore.hasRollenverwaltungPermission) {
           return true;
@@ -37,11 +42,6 @@ router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormal
         return false;
       case 'schulverwaltung':
         if (authStore.hasSchulverwaltungPermission) {
-          return true;
-        }
-        return false;
-      case 'klassenverwaltung':
-        if (authStore.hasKlassenverwaltungPermission) {
           return true;
         }
         return false;
