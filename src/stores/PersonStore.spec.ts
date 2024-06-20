@@ -199,12 +199,12 @@ describe('PersonStore', () => {
 
       const mockResponse: PersonendatensatzResponse = mockPerson;
 
-      mockadapter.onPost('/api/personen').replyOnce(201, mockResponse);
-      const createPersonPromise: Promise<PersonendatensatzResponse> = personStore.createPerson({
-        name: {
-          familienname: 'Cena',
-          vorname: 'Randy',
-        },
+      mockadapter.onPost('/api/dbiam/personen').replyOnce(201, mockResponse);
+      const createPersonPromise: Promise<PersonendatensatzResponse> = personStore.createPersonWithKontext({
+        familienname: 'Cena',
+        vorname: 'Randy',
+        organisationId: '1234',
+        rolleId: '5678',
       });
       expect(personStore.loading).toBe(true);
       const createdPerson: PersonendatensatzResponse = await createPersonPromise;
@@ -213,12 +213,12 @@ describe('PersonStore', () => {
     });
 
     it('should handle string error', async () => {
-      mockadapter.onPost('/api/personen').replyOnce(500, 'some error');
-      const createPersonPromise: Promise<PersonendatensatzResponse> = personStore.createPerson({
-        name: {
-          familienname: 'Copeland',
-          vorname: 'Christian',
-        },
+      mockadapter.onPost('/api/dbiam/personen').replyOnce(500, 'some error');
+      const createPersonPromise: Promise<PersonendatensatzResponse> = personStore.createPersonWithKontext({
+        familienname: 'Copeland',
+        vorname: 'Christian',
+        organisationId: '',
+        rolleId: '5678',
       });
       expect(personStore.loading).toBe(true);
       await rejects(createPersonPromise);
@@ -227,12 +227,12 @@ describe('PersonStore', () => {
     });
 
     it('should handle error code', async () => {
-      mockadapter.onPost('/api/personen').replyOnce(500, { code: 'some mock server error' });
-      const createPersonPromise: Promise<PersonendatensatzResponse> = personStore.createPerson({
-        name: {
-          familienname: 'Copeland',
-          vorname: 'Christian',
-        },
+      mockadapter.onPost('/api/dbiam/personen').replyOnce(500, { code: 'some mock server error' });
+      const createPersonPromise: Promise<PersonendatensatzResponse> = personStore.createPersonWithKontext({
+        familienname: 'Copeland',
+        vorname: 'Christian',
+        organisationId: '1234',
+        rolleId: '',
       });
       expect(personStore.loading).toBe(true);
       await rejects(createPersonPromise);
