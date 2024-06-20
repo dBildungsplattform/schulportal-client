@@ -4,7 +4,7 @@ import {
   DbiamPersonenApiFactory,
   PersonenApiFactory,
   PersonenFrontendApiFactory,
-  type DBiamCreatePersonenkontextBodyParams,
+  type DbiamPersonenkontextBodyParams,
   type DbiamCreatePersonWithContextBodyParams,
   type DbiamPersonenApiInterface,
   type DBiamPersonResponse,
@@ -30,7 +30,7 @@ export type Person = {
 };
 
 export type CreatePersonBodyParams = DbiamCreatePersonWithContextBodyParams;
-export type CreatedPersonenkontext = DBiamCreatePersonenkontextBodyParams;
+export type CreatedPersonenkontext = DbiamPersonenkontextBodyParams;
 
 export type Personendatensatz = {
   person: Person;
