@@ -10,7 +10,7 @@
   import PersonenkontextDelete from '@/components/admin/personen/PersonenkontextDelete.vue';
   import {
     usePersonenkontextStore,
-    type DBiamCreatePersonenkontextBodyParams,
+    type DbiamPersonenkontextBodyParams,
     type DbiamUpdatePersonenkontexteBodyParams,
     type PersonenkontextStore,
     type Uebersicht,
@@ -121,7 +121,7 @@
         personId: currentPersonId,
         organisationId: zuordnung.sskId,
         rolleId: zuordnung.rolleId,
-      })) as DBiamCreatePersonenkontextBodyParams[],
+      })) as DbiamPersonenkontextBodyParams[],
     };
 
     await personenKontextStore.updatePersonenkontexte(updateParams, currentPersonId);
@@ -713,46 +713,45 @@
     </v-dialog>
     <!-- Dialog to inform the user that he can't delete his own Zuordnungen -->
     <v-dialog
-  v-model="cannotDeleteDialogVisible"
-  persistent
-  max-width="600px"
->
-  <LayoutCard
-    :closable="true"
-    :header="$t('person.editZuordnungen')"
-  >
-    <v-card-text>
-      <v-container>
-        <v-row class="text-body bold px-md-16">
-          <v-col
-            offset="1"
-            cols="10"
-          >
-            <span>{{ $t('person.cannotDeleteOwnZuordnung') }}</span>
-          </v-col>
-        </v-row>
-      </v-container>
-    </v-card-text>
-    <v-card-actions class="justify-center">
-      <v-row class="justify-center">
-        <v-col
-          cols="12"
-          sm="6"
-          md="4"
-        >
-          <v-btn
-            :block="mdAndDown"
-            class="primary"
-            @click.stop="closeCannotDeleteDialog"
-          >
-            {{ $t('close') }}
-          </v-btn>
-        </v-col>
-      </v-row>
-    </v-card-actions>
-  </LayoutCard>
-</v-dialog>
-
+      v-model="cannotDeleteDialogVisible"
+      persistent
+      max-width="600px"
+    >
+      <LayoutCard
+        :closable="true"
+        :header="$t('person.editZuordnungen')"
+      >
+        <v-card-text>
+          <v-container>
+            <v-row class="text-body bold px-md-16">
+              <v-col
+                offset="1"
+                cols="10"
+              >
+                <span>{{ $t('person.cannotDeleteOwnZuordnung') }}</span>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card-text>
+        <v-card-actions class="justify-center">
+          <v-row class="justify-center">
+            <v-col
+              cols="12"
+              sm="6"
+              md="4"
+            >
+              <v-btn
+                :block="mdAndDown"
+                class="primary"
+                @click.stop="closeCannotDeleteDialog"
+              >
+                {{ $t('close') }}
+              </v-btn>
+            </v-col>
+          </v-row>
+        </v-card-actions>
+      </LayoutCard>
+    </v-dialog>
   </div>
 </template>
 

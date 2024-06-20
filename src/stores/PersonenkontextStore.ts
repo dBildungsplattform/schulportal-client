@@ -5,7 +5,7 @@ import {
   type FindRollenResponse,
   type FindSchulstrukturknotenResponse,
   DbiamPersonenkontexteApiFactory,
-  type DBiamCreatePersonenkontextBodyParams,
+  type DbiamPersonenkontextBodyParams,
   type DbiamPersonenkontexteApiInterface,
   type DBiamPersonenkontextResponse,
   type DbiamPersonenuebersichtApiInterface,
@@ -18,6 +18,7 @@ import {
   DbiamPersonenuebersichtApiFactory,
   OrganisationsTyp,
   type DbiamUpdatePersonenkontexteBodyParams,
+  type PersonenkontexteUpdateResponse,
 } from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
 
@@ -90,17 +91,17 @@ type PersonenkontextActions = {
   updatePersonenkontexte: (
     personenkontexte: DbiamUpdatePersonenkontexteBodyParams,
     personId: string,
-  ) => Promise<DBiamPersonenkontextResponse>;
+  ) => Promise<PersonenkontexteUpdateResponse>;
   createPersonenkontext: (
-    personenkontext: DBiamCreatePersonenkontextBodyParams,
+    personenkontext: DbiamPersonenkontextBodyParams,
     personenKontextTyp: PersonenKontextTyp,
   ) => Promise<DBiamPersonenkontextResponse>;
   getPersonenuebersichtById: (personId: string) => Promise<void>;
   getAllPersonenuebersichten: () => Promise<void>;
 };
 
-export type { SystemrechtResponse, DbiamUpdatePersonenkontexteBodyParams, DBiamCreatePersonenkontextBodyParams };
-export type CreatedPersonenkontext = DBiamCreatePersonenkontextBodyParams;
+export type { SystemrechtResponse, DbiamUpdatePersonenkontexteBodyParams, DbiamPersonenkontextBodyParams };
+export type CreatedPersonenkontext = DbiamPersonenkontextBodyParams;
 export type UserinfoPersonenkontext = {
   organisationsId: string;
   rolle: {
@@ -188,7 +189,7 @@ export const usePersonenkontextStore: StoreDefinition<
     },
 
     async createPersonenkontext(
-      personenkontext: DBiamCreatePersonenkontextBodyParams,
+      personenkontext: DbiamPersonenkontextBodyParams,
       personenKontextTyp: PersonenKontextTyp,
     ): Promise<DBiamPersonenkontextResponse> {
       this.loading = true;
@@ -218,10 +219,10 @@ export const usePersonenkontextStore: StoreDefinition<
     async updatePersonenkontexte(
       personenkontexte: DbiamUpdatePersonenkontexteBodyParams,
       personId: string,
-    ): Promise<DBiamPersonenkontextResponse> {
+    ): Promise<PersonenkontexteUpdateResponse> {
       this.loading = true;
       try {
-        const { data }: { data: DBiamPersonenkontextResponse } =
+        const { data }: { data: PersonenkontexteUpdateResponse } =
           await dbiamPersonenkontexteApi.dBiamPersonenkontextControllerUpdatePersonenkontexte(
             personId,
             personenkontexte,

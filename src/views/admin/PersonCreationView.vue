@@ -2,7 +2,7 @@
   import { useOrganisationStore, type OrganisationStore, type Organisation } from '@/stores/OrganisationStore';
   import {
     usePersonStore,
-    type CreatedPerson,
+    type CreatePersonBodyParams,
     type CreatedPersonenkontext,
     type PersonStore,
   } from '@/stores/PersonStore';
@@ -193,7 +193,7 @@
     () =>
       organisationen.value?.find(
         (organisation: TranslatedObject) =>
-          organisation.value === personenkontextStore.createdPersonenkontextForOrganisation?.organisationId,
+          organisation.value === personStore.createdPersonWithKontext?.DBiamPersonenkontextResponse.organisationId,
       )?.title || '',
   );
 
@@ -201,7 +201,7 @@
     () =>
       rollen.value?.find(
         (rolle: TranslatedObject) =>
-          rolle.value === personenkontextStore.createdPersonenkontextForOrganisation?.rolleId,
+          rolle.value === personStore.createdPersonWithKontext?.DBiamPersonenkontextResponse.rolleId,
       )?.title || '',
   );
 
@@ -221,34 +221,23 @@
 
   async function navigateToPersonTable(): Promise<void> {
     await router.push({ name: 'person-management' });
-    personStore.createdPerson = null;
+    personStore.createdPersonWithKontext = null;
   }
 
   async function createPerson(): Promise<void> {
-    const unpersistedPerson: CreatedPerson = {
-      name: {
-        familienname: selectedFamilienname.value as string,
-        vorname: selectedVorname.value as string,
-      },
+    const bodyParams: CreatePersonBodyParams = {
+      familienname: selectedFamilienname.value as string,
+      vorname: selectedVorname.value as string,
+      organisationId: selectedOrganisation.value,
+      rolleId: selectedRolle.value,
     };
 
-    await personStore.createPerson(unpersistedPerson);
-    if (personStore.createdPerson) {
-      // Build the context for the organisation
-      const unpersistedOrganisationPersonenkontext: CreatedPersonenkontext = {
-        personId: personStore.createdPerson.person.id,
-        organisationId: selectedOrganisation.value,
-        rolleId: selectedRolle.value,
-      };
-      await personenkontextStore
-        .createPersonenkontext(unpersistedOrganisationPersonenkontext, PersonenKontextTyp.Organisation)
-        .catch(() => {
-          creationErrorText.value = t(`admin.personenkontext.errors.${personenkontextStore.errorCode}`);
-        });
+    await personStore.createPersonWithKontext(bodyParams);
+    if (personStore.createdPersonWithKontext) {
       // Build the context for the Klasse and save it only if the the Klasse was selected
       if (selectedKlasse.value) {
         const unpersistedKlassePersonenkontext: CreatedPersonenkontext = {
-          personId: personStore.createdPerson.person.id,
+          personId: personStore.createdPersonWithKontext.person.id,
           organisationId: selectedKlasse.value,
           rolleId: selectedRolle.value,
         };
@@ -272,7 +261,7 @@
   }
 
   const handleCreateAnotherPerson = (): void => {
-    personStore.createdPerson = null;
+    personStore.createdPersonWithKontext = null;
     resetForm();
     router.push({ name: 'create-person' });
   };
@@ -328,7 +317,7 @@
     await organisationStore.getAllOrganisationen();
     await personenkontextStore.getPersonenkontextRolleWithFilter('', 25);
     personStore.errorCode = '';
-    personStore.createdPerson = null;
+    personStore.createdPersonWithKontext = null;
 
     /* listen for browser changes and prevent them when form is dirty */
     window.addEventListener('beforeunload', preventNavigation);
@@ -360,7 +349,7 @@
     />
 
     <!-- The form to create a new Person  -->
-    <template v-if="!personStore.createdPerson && !personStore.errorCode">
+    <template v-if="!personStore.createdPersonWithKontext && !personStore.errorCode">
       <FormWrapper
         :confirmUnsavedChangesAction="handleConfirmUnsavedChanges"
         :createButtonLabel="$t('admin.person.create')"
@@ -511,7 +500,7 @@
     </template>
 
     <!-- Result template on success after submit  -->
-    <template v-if="personStore.createdPerson && !personStore.errorCode">
+    <template v-if="personStore.createdPersonWithKontext && !personStore.errorCode">
       <v-container>
         <v-row justify="center">
           <v-col
@@ -521,8 +510,8 @@
             <span data-testid="person-success-text">
               {{
                 $t('admin.person.addedSuccessfully', {
-                  firstname: personStore.createdPerson.person.name.vorname,
-                  lastname: personStore.createdPerson.person.name.familienname,
+                  firstname: personStore.createdPersonWithKontext.person.name.vorname,
+                  lastname: personStore.createdPersonWithKontext.person.name.familienname,
                 })
               }}
             </span>
@@ -551,7 +540,7 @@
           <v-col class="text-body bold text-right"> {{ $t('person.firstName') }}: </v-col>
           <v-col class="text-body"
             ><span data-testid="created-person-vorname">{{
-              personStore.createdPerson.person.name.vorname
+              personStore.createdPersonWithKontext.person.name.vorname
             }}</span></v-col
           >
         </v-row>
@@ -559,20 +548,22 @@
           <v-col class="text-body bold text-right"> {{ $t('person.lastName') }}: </v-col>
           <v-col class="text-body"
             ><span data-testid="created-person-familienname">{{
-              personStore.createdPerson.person.name.familienname
+              personStore.createdPersonWithKontext.person.name.familienname
             }}</span></v-col
           >
         </v-row>
         <v-row>
           <v-col class="text-body bold text-right"> {{ $t('person.userName') }}: </v-col>
           <v-col class="text-body"
-            ><span data-testid="created-person-username">{{ personStore.createdPerson.person.referrer }}</span></v-col
+            ><span data-testid="created-person-username">{{
+              personStore.createdPersonWithKontext.person.referrer
+            }}</span></v-col
           >
         </v-row>
         <v-row class="align-center">
           <v-col class="text-body bold text-right pb-8">{{ $t('admin.person.startPassword') }}: </v-col>
           <v-col class="text-body">
-            <PasswordOutput :password="personStore.createdPerson.person.startpasswort"></PasswordOutput>
+            <PasswordOutput :password="personStore.createdPersonWithKontext.person.startpasswort"></PasswordOutput>
           </v-col>
         </v-row>
         <v-row>
