@@ -222,6 +222,7 @@
   async function navigateToPersonTable(): Promise<void> {
     await router.push({ name: 'person-management' });
     personStore.createdPersonWithKontext = null;
+    personenkontextStore.createdPersonenkontextForKlasse = null;
   }
 
   async function createPerson(): Promise<void> {
@@ -262,6 +263,7 @@
 
   const handleCreateAnotherPerson = (): void => {
     personStore.createdPersonWithKontext = null;
+    personenkontextStore.createdPersonenkontextForKlasse = null;
     resetForm();
     router.push({ name: 'create-person' });
   };
@@ -318,6 +320,7 @@
     await personenkontextStore.getPersonenkontextRolleWithFilter('', 25);
     personStore.errorCode = '';
     personStore.createdPersonWithKontext = null;
+    personenkontextStore.createdPersonenkontextForKlasse = null;
 
     /* listen for browser changes and prevent them when form is dirty */
     window.addEventListener('beforeunload', preventNavigation);
