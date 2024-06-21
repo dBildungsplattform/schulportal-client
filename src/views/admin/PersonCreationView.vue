@@ -163,7 +163,7 @@
       return;
     }
 
-    if (newValue !== oldValue) {
+    if (newValue !== oldValue && isLernRolle(selectedRolle.value)) {
       // Call fetch with an empty string to get the initial organizations for the selected role without any filter
       organisationStore.getKlassenByOrganisationId(newValue);
     }
@@ -222,6 +222,7 @@
   async function navigateToPersonTable(): Promise<void> {
     await router.push({ name: 'person-management' });
     personStore.createdPersonWithKontext = null;
+    personenkontextStore.createdPersonenkontextForKlasse = null;
   }
 
   async function createPerson(): Promise<void> {
@@ -262,6 +263,7 @@
 
   const handleCreateAnotherPerson = (): void => {
     personStore.createdPersonWithKontext = null;
+    personenkontextStore.createdPersonenkontextForKlasse = null;
     resetForm();
     router.push({ name: 'create-person' });
   };
@@ -296,12 +298,7 @@
   }
 
   function updateOrganisationSearch(searchValue: string): void {
-    /* cancel pending call */
-    clearTimeout(timerId);
-    /* delay new call 500ms */
-    timerId = setTimeout(() => {
-      personenkontextStore.getPersonenkontextAdministrationsebeneWithFilter(selectedRolle.value, searchValue, 25);
-    }, 500);
+    personenkontextStore.getPersonenkontextAdministrationsebeneWithFilter(selectedRolle.value, searchValue, 25);
   }
 
   function updateRollenSearch(searchValue: string): void {
@@ -318,6 +315,7 @@
     await personenkontextStore.getPersonenkontextRolleWithFilter('', 25);
     personStore.errorCode = '';
     personStore.createdPersonWithKontext = null;
+    personenkontextStore.createdPersonenkontextForKlasse = null;
 
     /* listen for browser changes and prevent them when form is dirty */
     window.addEventListener('beforeunload', preventNavigation);
