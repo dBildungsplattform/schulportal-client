@@ -163,7 +163,7 @@
       return;
     }
 
-    if (newValue !== oldValue) {
+    if (newValue !== oldValue && isLernRolle(selectedRolle.value)) {
       // Call fetch with an empty string to get the initial organizations for the selected role without any filter
       organisationStore.getKlassenByOrganisationId(newValue);
     }
@@ -298,12 +298,7 @@
   }
 
   function updateOrganisationSearch(searchValue: string): void {
-    /* cancel pending call */
-    clearTimeout(timerId);
-    /* delay new call 500ms */
-    timerId = setTimeout(() => {
-      personenkontextStore.getPersonenkontextAdministrationsebeneWithFilter(selectedRolle.value, searchValue, 25);
-    }, 500);
+    personenkontextStore.getPersonenkontextAdministrationsebeneWithFilter(selectedRolle.value, searchValue, 25);
   }
 
   function updateRollenSearch(searchValue: string): void {
