@@ -4,13 +4,13 @@ import {
   PersonenApiFactory,
   PersonenFrontendApiFactory,
   type CreatePersonBodyParams,
-  type DBiamCreatePersonenkontextBodyParams,
   type PersonenApiInterface,
   type PersonendatensatzResponse,
   type PersonenFrontendApiInterface,
   type PersonFrontendControllerFindPersons200Response,
 } from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
+import type { DbiamPersonenkontextBodyParams } from './PersonenkontextStore';
 
 const personenApi: PersonenApiInterface = PersonenApiFactory(undefined, '', axiosApiInstance);
 const personenFrontendApi: PersonenFrontendApiInterface = PersonenFrontendApiFactory(undefined, '', axiosApiInstance);
@@ -26,7 +26,7 @@ export type Person = {
 };
 
 export type CreatedPerson = CreatePersonBodyParams;
-export type CreatedPersonenkontext = DBiamCreatePersonenkontextBodyParams;
+export type CreatedPersonenkontext = DbiamPersonenkontextBodyParams;
 
 export type Personendatensatz = {
   person: Person;

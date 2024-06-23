@@ -5,7 +5,6 @@ import {
   type FindRollenResponse,
   type FindSchulstrukturknotenResponse,
   DbiamPersonenkontexteApiFactory,
-  type DBiamCreatePersonenkontextBodyParams,
   type DbiamPersonenkontexteApiInterface,
   type DBiamPersonenkontextResponse,
   type DbiamPersonenuebersichtApiInterface,
@@ -18,6 +17,8 @@ import {
   DbiamPersonenuebersichtApiFactory,
   OrganisationsTyp,
   type DbiamUpdatePersonenkontexteBodyParams,
+  type PersonenkontexteUpdateResponse,
+  type DbiamPersonenkontextBodyParams,
 } from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
 
@@ -90,17 +91,17 @@ type PersonenkontextActions = {
   updatePersonenkontexte: (
     personenkontexte: DbiamUpdatePersonenkontexteBodyParams,
     personId: string,
-  ) => Promise<DBiamPersonenkontextResponse>;
+  ) => Promise<PersonenkontexteUpdateResponse>;
   createPersonenkontext: (
-    personenkontext: DBiamCreatePersonenkontextBodyParams,
+    personenkontext: DbiamPersonenkontextBodyParams,
     personenKontextTyp: PersonenKontextTyp,
   ) => Promise<DBiamPersonenkontextResponse>;
   getPersonenuebersichtById: (personId: string) => Promise<void>;
   getAllPersonenuebersichten: () => Promise<void>;
 };
 
-export type { SystemrechtResponse, DbiamUpdatePersonenkontexteBodyParams, DBiamCreatePersonenkontextBodyParams };
-export type CreatedPersonenkontext = DBiamCreatePersonenkontextBodyParams;
+export type { SystemrechtResponse, DbiamUpdatePersonenkontexteBodyParams, DbiamPersonenkontextBodyParams };
+export type CreatedPersonenkontext = DbiamPersonenkontextBodyParams;
 export type UserinfoPersonenkontext = {
   organisationsId: string;
   rolle: {
@@ -157,7 +158,7 @@ export const usePersonenkontextStore: StoreDefinition<
       this.loading = true;
       try {
         const { data }: { data: FindRollenResponse } =
-          await personenKontextApi.dbiamPersonenkontextFilterControllerFindRollen(rolleName, limit);
+          await personenKontextApi.dbiamPersonenkontextWorkflowControllerFindRollen(rolleName, limit);
         this.filteredRollen = data;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
@@ -174,7 +175,11 @@ export const usePersonenkontextStore: StoreDefinition<
       this.loading = true;
       try {
         const { data }: { data: FindSchulstrukturknotenResponse } =
-          await personenKontextApi.dbiamPersonenkontextFilterControllerFindSchulstrukturknoten(rolleId, sskName, limit);
+          await personenKontextApi.dbiamPersonenkontextWorkflowControllerFindSchulstrukturknoten(
+            rolleId,
+            sskName,
+            limit,
+          );
         this.filteredOrganisationen = data;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
@@ -188,7 +193,7 @@ export const usePersonenkontextStore: StoreDefinition<
     },
 
     async createPersonenkontext(
-      personenkontext: DBiamCreatePersonenkontextBodyParams,
+      personenkontext: DbiamPersonenkontextBodyParams,
       personenKontextTyp: PersonenKontextTyp,
     ): Promise<DBiamPersonenkontextResponse> {
       this.loading = true;
@@ -218,14 +223,11 @@ export const usePersonenkontextStore: StoreDefinition<
     async updatePersonenkontexte(
       personenkontexte: DbiamUpdatePersonenkontexteBodyParams,
       personId: string,
-    ): Promise<DBiamPersonenkontextResponse> {
+    ): Promise<PersonenkontexteUpdateResponse> {
       this.loading = true;
       try {
-        const { data }: { data: DBiamPersonenkontextResponse } =
-          await dbiamPersonenkontexteApi.dBiamPersonenkontextControllerUpdatePersonenkontexte(
-            personId,
-            personenkontexte,
-          );
+        const { data }: { data: PersonenkontexteUpdateResponse } =
+          await personenKontextApi.dbiamPersonenkontextWorkflowControllerCommit(personId, personenkontexte);
         return data;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';

@@ -245,27 +245,21 @@ export interface CreateRolleBodyParams {
 /**
  * 
  * @export
- * @interface DBiamCreatePersonenkontextBodyParams
+ * @interface DBiamPersonResponse
  */
-export interface DBiamCreatePersonenkontextBodyParams {
+export interface DBiamPersonResponse {
     /**
      * 
-     * @type {string}
-     * @memberof DBiamCreatePersonenkontextBodyParams
+     * @type {PersonResponse}
+     * @memberof DBiamPersonResponse
      */
-    'personId': string;
+    'person': PersonResponse;
     /**
      * 
-     * @type {string}
-     * @memberof DBiamCreatePersonenkontextBodyParams
+     * @type {DBiamPersonenkontextResponse}
+     * @memberof DBiamPersonResponse
      */
-    'organisationId': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof DBiamCreatePersonenkontextBodyParams
-     */
-    'rolleId': string;
+    'DBiamPersonenkontextResponse': DBiamPersonenkontextResponse;
 }
 /**
  * 
@@ -433,6 +427,37 @@ export interface DBiamPersonenzuordnungResponse {
 /**
  * 
  * @export
+ * @interface DbiamCreatePersonWithContextBodyParams
+ */
+export interface DbiamCreatePersonWithContextBodyParams {
+    /**
+     * 
+     * @type {string}
+     * @memberof DbiamCreatePersonWithContextBodyParams
+     */
+    'familienname': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof DbiamCreatePersonWithContextBodyParams
+     */
+    'vorname': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof DbiamCreatePersonWithContextBodyParams
+     */
+    'organisationId': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof DbiamCreatePersonWithContextBodyParams
+     */
+    'rolleId': string;
+}
+/**
+ * 
+ * @export
  * @interface DbiamOrganisationError
  */
 export interface DbiamOrganisationError {
@@ -469,6 +494,31 @@ export type DbiamOrganisationErrorI18nKeyEnum = typeof DbiamOrganisationErrorI18
 /**
  * 
  * @export
+ * @interface DbiamPersonenkontextBodyParams
+ */
+export interface DbiamPersonenkontextBodyParams {
+    /**
+     * 
+     * @type {string}
+     * @memberof DbiamPersonenkontextBodyParams
+     */
+    'personId': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof DbiamPersonenkontextBodyParams
+     */
+    'organisationId': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof DbiamPersonenkontextBodyParams
+     */
+    'rolleId': string;
+}
+/**
+ * 
+ * @export
  * @interface DbiamPersonenkontextError
  */
 export interface DbiamPersonenkontextError {
@@ -489,7 +539,10 @@ export interface DbiamPersonenkontextError {
 export const DbiamPersonenkontextErrorI18nKeyEnum = {
     PersonenkontextSpecificationError: 'PERSONENKONTEXT_SPECIFICATION_ERROR',
     NurLehrUndLernAnKlasse: 'NUR_LEHR_UND_LERN_AN_KLASSE',
-    GleicheRolleAnKlasseWieSchule: 'GLEICHE_ROLLE_AN_KLASSE_WIE_SCHULE'
+    GleicheRolleAnKlasseWieSchule: 'GLEICHE_ROLLE_AN_KLASSE_WIE_SCHULE',
+    OrganisationMatchesRollenart: 'ORGANISATION_MATCHES_ROLLENART',
+    PersonenkontextAnlageError: 'PERSONENKONTEXT_ANLAGE_ERROR',
+    RolleNurAnPassendeOrganisation: 'ROLLE_NUR_AN_PASSENDE_ORGANISATION'
 } as const;
 
 export type DbiamPersonenkontextErrorI18nKeyEnum = typeof DbiamPersonenkontextErrorI18nKeyEnum[keyof typeof DbiamPersonenkontextErrorI18nKeyEnum];
@@ -544,10 +597,10 @@ export interface DbiamUpdatePersonenkontexteBodyParams {
     'count': number;
     /**
      * 
-     * @type {Array<DBiamCreatePersonenkontextBodyParams>}
+     * @type {Array<DbiamPersonenkontextBodyParams>}
      * @memberof DbiamUpdatePersonenkontexteBodyParams
      */
-    'personenkontexte': Array<DBiamCreatePersonenkontextBodyParams>;
+    'personenkontexte': Array<DbiamPersonenkontextBodyParams>;
 }
 /**
  * 
@@ -1487,6 +1540,56 @@ export interface PersonenkontextRolleFieldsResponse {
      * @memberof PersonenkontextRolleFieldsResponse
      */
     'rolle': RollenSystemRechtServiceProviderIDResponse;
+}
+/**
+ * 
+ * @export
+ * @interface PersonenkontextWorkflowResponse
+ */
+export interface PersonenkontextWorkflowResponse {
+    /**
+     * List of available organisations.
+     * @type {Array<OrganisationResponseLegacy>}
+     * @memberof PersonenkontextWorkflowResponse
+     */
+    'organisations': Array<OrganisationResponseLegacy>;
+    /**
+     * List of available roles.
+     * @type {Array<RolleResponse>}
+     * @memberof PersonenkontextWorkflowResponse
+     */
+    'rollen': Array<RolleResponse>;
+    /**
+     * Selected organisation.
+     * @type {string}
+     * @memberof PersonenkontextWorkflowResponse
+     */
+    'selectedOrganisation': string | null;
+    /**
+     * Selected rolle.
+     * @type {string}
+     * @memberof PersonenkontextWorkflowResponse
+     */
+    'selectedRolle': string | null;
+    /**
+     * Indicates whether the commit action can be performed.
+     * @type {boolean}
+     * @memberof PersonenkontextWorkflowResponse
+     */
+    'canCommit': boolean;
+}
+/**
+ * 
+ * @export
+ * @interface PersonenkontexteUpdateResponse
+ */
+export interface PersonenkontexteUpdateResponse {
+    /**
+     * 
+     * @type {Array<DBiamPersonenkontextResponse>}
+     * @memberof PersonenkontexteUpdateResponse
+     */
+    'dBiamPersonenkontextResponses': Array<DBiamPersonenkontextResponse>;
 }
 /**
  * The new personenstatus of the personenkontext.
@@ -2506,6 +2609,134 @@ export class AuthApi extends BaseAPI implements AuthApiInterface {
 
 
 /**
+ * DbiamPersonenApi - axios parameter creator
+ * @export
+ */
+export const DbiamPersonenApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * 
+         * @param {DbiamCreatePersonWithContextBodyParams} dbiamCreatePersonWithContextBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dBiamPersonControllerCreatePersonWithKontext: async (dbiamCreatePersonWithContextBodyParams: DbiamCreatePersonWithContextBodyParams, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'dbiamCreatePersonWithContextBodyParams' is not null or undefined
+            assertParamExists('dBiamPersonControllerCreatePersonWithKontext', 'dbiamCreatePersonWithContextBodyParams', dbiamCreatePersonWithContextBodyParams)
+            const localVarPath = `/api/dbiam/personen`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(dbiamCreatePersonWithContextBodyParams, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * DbiamPersonenApi - functional programming interface
+ * @export
+ */
+export const DbiamPersonenApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = DbiamPersonenApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * 
+         * @param {DbiamCreatePersonWithContextBodyParams} dbiamCreatePersonWithContextBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async dBiamPersonControllerCreatePersonWithKontext(dbiamCreatePersonWithContextBodyParams: DbiamCreatePersonWithContextBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DBiamPersonResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.dBiamPersonControllerCreatePersonWithKontext(dbiamCreatePersonWithContextBodyParams, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+    }
+};
+
+/**
+ * DbiamPersonenApi - factory interface
+ * @export
+ */
+export const DbiamPersonenApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = DbiamPersonenApiFp(configuration)
+    return {
+        /**
+         * 
+         * @param {DbiamCreatePersonWithContextBodyParams} dbiamCreatePersonWithContextBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dBiamPersonControllerCreatePersonWithKontext(dbiamCreatePersonWithContextBodyParams: DbiamCreatePersonWithContextBodyParams, options?: any): AxiosPromise<DBiamPersonResponse> {
+            return localVarFp.dBiamPersonControllerCreatePersonWithKontext(dbiamCreatePersonWithContextBodyParams, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * DbiamPersonenApi - interface
+ * @export
+ * @interface DbiamPersonenApi
+ */
+export interface DbiamPersonenApiInterface {
+    /**
+     * 
+     * @param {DbiamCreatePersonWithContextBodyParams} dbiamCreatePersonWithContextBodyParams 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DbiamPersonenApiInterface
+     */
+    dBiamPersonControllerCreatePersonWithKontext(dbiamCreatePersonWithContextBodyParams: DbiamCreatePersonWithContextBodyParams, options?: AxiosRequestConfig): AxiosPromise<DBiamPersonResponse>;
+
+}
+
+/**
+ * DbiamPersonenApi - object-oriented interface
+ * @export
+ * @class DbiamPersonenApi
+ * @extends {BaseAPI}
+ */
+export class DbiamPersonenApi extends BaseAPI implements DbiamPersonenApiInterface {
+    /**
+     * 
+     * @param {DbiamCreatePersonWithContextBodyParams} dbiamCreatePersonWithContextBodyParams 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DbiamPersonenApi
+     */
+    public dBiamPersonControllerCreatePersonWithKontext(dbiamCreatePersonWithContextBodyParams: DbiamCreatePersonWithContextBodyParams, options?: AxiosRequestConfig) {
+        return DbiamPersonenApiFp(this.configuration).dBiamPersonControllerCreatePersonWithKontext(dbiamCreatePersonWithContextBodyParams, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+/**
  * DbiamPersonenkontexteApi - axios parameter creator
  * @export
  */
@@ -2513,13 +2744,13 @@ export const DbiamPersonenkontexteApiAxiosParamCreator = function (configuration
     return {
         /**
          * 
-         * @param {DBiamCreatePersonenkontextBodyParams} dBiamCreatePersonenkontextBodyParams 
+         * @param {DbiamPersonenkontextBodyParams} dbiamPersonenkontextBodyParams 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        dBiamPersonenkontextControllerCreatePersonenkontext: async (dBiamCreatePersonenkontextBodyParams: DBiamCreatePersonenkontextBodyParams, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'dBiamCreatePersonenkontextBodyParams' is not null or undefined
-            assertParamExists('dBiamPersonenkontextControllerCreatePersonenkontext', 'dBiamCreatePersonenkontextBodyParams', dBiamCreatePersonenkontextBodyParams)
+        dBiamPersonenkontextControllerCreatePersonenkontext: async (dbiamPersonenkontextBodyParams: DbiamPersonenkontextBodyParams, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'dbiamPersonenkontextBodyParams' is not null or undefined
+            assertParamExists('dBiamPersonenkontextControllerCreatePersonenkontext', 'dbiamPersonenkontextBodyParams', dbiamPersonenkontextBodyParams)
             const localVarPath = `/api/dbiam/personenkontext`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -2547,7 +2778,7 @@ export const DbiamPersonenkontexteApiAxiosParamCreator = function (configuration
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(dBiamCreatePersonenkontextBodyParams, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(dbiamPersonenkontextBodyParams, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -2595,53 +2826,6 @@ export const DbiamPersonenkontexteApiAxiosParamCreator = function (configuration
                 options: localVarRequestOptions,
             };
         },
-        /**
-         * 
-         * @param {string} personId The ID for the person.
-         * @param {DbiamUpdatePersonenkontexteBodyParams} dbiamUpdatePersonenkontexteBodyParams 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        dBiamPersonenkontextControllerUpdatePersonenkontexte: async (personId: string, dbiamUpdatePersonenkontexteBodyParams: DbiamUpdatePersonenkontexteBodyParams, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'personId' is not null or undefined
-            assertParamExists('dBiamPersonenkontextControllerUpdatePersonenkontexte', 'personId', personId)
-            // verify required parameter 'dbiamUpdatePersonenkontexteBodyParams' is not null or undefined
-            assertParamExists('dBiamPersonenkontextControllerUpdatePersonenkontexte', 'dbiamUpdatePersonenkontexteBodyParams', dbiamUpdatePersonenkontexteBodyParams)
-            const localVarPath = `/api/dbiam/personenkontext/{personId}`
-                .replace(`{${"personId"}}`, encodeURIComponent(String(personId)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication bearer required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            // authentication oauth2 required
-            // oauth required
-            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
-
-
-    
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(dbiamUpdatePersonenkontexteBodyParams, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
     }
 };
 
@@ -2654,12 +2838,12 @@ export const DbiamPersonenkontexteApiFp = function(configuration?: Configuration
     return {
         /**
          * 
-         * @param {DBiamCreatePersonenkontextBodyParams} dBiamCreatePersonenkontextBodyParams 
+         * @param {DbiamPersonenkontextBodyParams} dbiamPersonenkontextBodyParams 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async dBiamPersonenkontextControllerCreatePersonenkontext(dBiamCreatePersonenkontextBodyParams: DBiamCreatePersonenkontextBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DBiamPersonenkontextResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.dBiamPersonenkontextControllerCreatePersonenkontext(dBiamCreatePersonenkontextBodyParams, options);
+        async dBiamPersonenkontextControllerCreatePersonenkontext(dbiamPersonenkontextBodyParams: DbiamPersonenkontextBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DBiamPersonenkontextResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.dBiamPersonenkontextControllerCreatePersonenkontext(dbiamPersonenkontextBodyParams, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -2670,17 +2854,6 @@ export const DbiamPersonenkontexteApiFp = function(configuration?: Configuration
          */
         async dBiamPersonenkontextControllerFindPersonenkontextsByPerson(personId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<DBiamPersonenkontextResponse>>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.dBiamPersonenkontextControllerFindPersonenkontextsByPerson(personId, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
-         * 
-         * @param {string} personId The ID for the person.
-         * @param {DbiamUpdatePersonenkontexteBodyParams} dbiamUpdatePersonenkontexteBodyParams 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async dBiamPersonenkontextControllerUpdatePersonenkontexte(personId: string, dbiamUpdatePersonenkontexteBodyParams: DbiamUpdatePersonenkontexteBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DBiamPersonenkontextResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.dBiamPersonenkontextControllerUpdatePersonenkontexte(personId, dbiamUpdatePersonenkontexteBodyParams, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -2695,12 +2868,12 @@ export const DbiamPersonenkontexteApiFactory = function (configuration?: Configu
     return {
         /**
          * 
-         * @param {DBiamCreatePersonenkontextBodyParams} dBiamCreatePersonenkontextBodyParams 
+         * @param {DbiamPersonenkontextBodyParams} dbiamPersonenkontextBodyParams 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        dBiamPersonenkontextControllerCreatePersonenkontext(dBiamCreatePersonenkontextBodyParams: DBiamCreatePersonenkontextBodyParams, options?: any): AxiosPromise<DBiamPersonenkontextResponse> {
-            return localVarFp.dBiamPersonenkontextControllerCreatePersonenkontext(dBiamCreatePersonenkontextBodyParams, options).then((request) => request(axios, basePath));
+        dBiamPersonenkontextControllerCreatePersonenkontext(dbiamPersonenkontextBodyParams: DbiamPersonenkontextBodyParams, options?: any): AxiosPromise<DBiamPersonenkontextResponse> {
+            return localVarFp.dBiamPersonenkontextControllerCreatePersonenkontext(dbiamPersonenkontextBodyParams, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -2710,16 +2883,6 @@ export const DbiamPersonenkontexteApiFactory = function (configuration?: Configu
          */
         dBiamPersonenkontextControllerFindPersonenkontextsByPerson(personId: string, options?: any): AxiosPromise<Array<DBiamPersonenkontextResponse>> {
             return localVarFp.dBiamPersonenkontextControllerFindPersonenkontextsByPerson(personId, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @param {string} personId The ID for the person.
-         * @param {DbiamUpdatePersonenkontexteBodyParams} dbiamUpdatePersonenkontexteBodyParams 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        dBiamPersonenkontextControllerUpdatePersonenkontexte(personId: string, dbiamUpdatePersonenkontexteBodyParams: DbiamUpdatePersonenkontexteBodyParams, options?: any): AxiosPromise<DBiamPersonenkontextResponse> {
-            return localVarFp.dBiamPersonenkontextControllerUpdatePersonenkontexte(personId, dbiamUpdatePersonenkontexteBodyParams, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -2732,12 +2895,12 @@ export const DbiamPersonenkontexteApiFactory = function (configuration?: Configu
 export interface DbiamPersonenkontexteApiInterface {
     /**
      * 
-     * @param {DBiamCreatePersonenkontextBodyParams} dBiamCreatePersonenkontextBodyParams 
+     * @param {DbiamPersonenkontextBodyParams} dbiamPersonenkontextBodyParams 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DbiamPersonenkontexteApiInterface
      */
-    dBiamPersonenkontextControllerCreatePersonenkontext(dBiamCreatePersonenkontextBodyParams: DBiamCreatePersonenkontextBodyParams, options?: AxiosRequestConfig): AxiosPromise<DBiamPersonenkontextResponse>;
+    dBiamPersonenkontextControllerCreatePersonenkontext(dbiamPersonenkontextBodyParams: DbiamPersonenkontextBodyParams, options?: AxiosRequestConfig): AxiosPromise<DBiamPersonenkontextResponse>;
 
     /**
      * 
@@ -2747,16 +2910,6 @@ export interface DbiamPersonenkontexteApiInterface {
      * @memberof DbiamPersonenkontexteApiInterface
      */
     dBiamPersonenkontextControllerFindPersonenkontextsByPerson(personId: string, options?: AxiosRequestConfig): AxiosPromise<Array<DBiamPersonenkontextResponse>>;
-
-    /**
-     * 
-     * @param {string} personId The ID for the person.
-     * @param {DbiamUpdatePersonenkontexteBodyParams} dbiamUpdatePersonenkontexteBodyParams 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof DbiamPersonenkontexteApiInterface
-     */
-    dBiamPersonenkontextControllerUpdatePersonenkontexte(personId: string, dbiamUpdatePersonenkontexteBodyParams: DbiamUpdatePersonenkontexteBodyParams, options?: AxiosRequestConfig): AxiosPromise<DBiamPersonenkontextResponse>;
 
 }
 
@@ -2769,13 +2922,13 @@ export interface DbiamPersonenkontexteApiInterface {
 export class DbiamPersonenkontexteApi extends BaseAPI implements DbiamPersonenkontexteApiInterface {
     /**
      * 
-     * @param {DBiamCreatePersonenkontextBodyParams} dBiamCreatePersonenkontextBodyParams 
+     * @param {DbiamPersonenkontextBodyParams} dbiamPersonenkontextBodyParams 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DbiamPersonenkontexteApi
      */
-    public dBiamPersonenkontextControllerCreatePersonenkontext(dBiamCreatePersonenkontextBodyParams: DBiamCreatePersonenkontextBodyParams, options?: AxiosRequestConfig) {
-        return DbiamPersonenkontexteApiFp(this.configuration).dBiamPersonenkontextControllerCreatePersonenkontext(dBiamCreatePersonenkontextBodyParams, options).then((request) => request(this.axios, this.basePath));
+    public dBiamPersonenkontextControllerCreatePersonenkontext(dbiamPersonenkontextBodyParams: DbiamPersonenkontextBodyParams, options?: AxiosRequestConfig) {
+        return DbiamPersonenkontexteApiFp(this.configuration).dBiamPersonenkontextControllerCreatePersonenkontext(dbiamPersonenkontextBodyParams, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -2787,18 +2940,6 @@ export class DbiamPersonenkontexteApi extends BaseAPI implements DbiamPersonenko
      */
     public dBiamPersonenkontextControllerFindPersonenkontextsByPerson(personId: string, options?: AxiosRequestConfig) {
         return DbiamPersonenkontexteApiFp(this.configuration).dBiamPersonenkontextControllerFindPersonenkontextsByPerson(personId, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @param {string} personId The ID for the person.
-     * @param {DbiamUpdatePersonenkontexteBodyParams} dbiamUpdatePersonenkontexteBodyParams 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof DbiamPersonenkontexteApi
-     */
-    public dBiamPersonenkontextControllerUpdatePersonenkontexte(personId: string, dbiamUpdatePersonenkontexteBodyParams: DbiamUpdatePersonenkontexteBodyParams, options?: AxiosRequestConfig) {
-        return DbiamPersonenkontexteApiFp(this.configuration).dBiamPersonenkontextControllerUpdatePersonenkontexte(personId, dbiamUpdatePersonenkontexteBodyParams, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
@@ -5128,14 +5269,59 @@ export const PersonenkontextApiAxiosParamCreator = function (configuration?: Con
     return {
         /**
          * 
-         * @param {string} rolleName Rolle name used to filter for rollen in personenkontext.
+         * @param {string} personId The ID for the person.
+         * @param {DbiamUpdatePersonenkontexteBodyParams} dbiamUpdatePersonenkontexteBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dbiamPersonenkontextWorkflowControllerCommit: async (personId: string, dbiamUpdatePersonenkontexteBodyParams: DbiamUpdatePersonenkontexteBodyParams, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'personId' is not null or undefined
+            assertParamExists('dbiamPersonenkontextWorkflowControllerCommit', 'personId', personId)
+            // verify required parameter 'dbiamUpdatePersonenkontexteBodyParams' is not null or undefined
+            assertParamExists('dbiamPersonenkontextWorkflowControllerCommit', 'dbiamUpdatePersonenkontexteBodyParams', dbiamUpdatePersonenkontexteBodyParams)
+            const localVarPath = `/api/personenkontext/{personId}`
+                .replace(`{${"personId"}}`, encodeURIComponent(String(personId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(dbiamUpdatePersonenkontexteBodyParams, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
          * @param {number} [limit] The limit of items for the request.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        dbiamPersonenkontextFilterControllerFindRollen: async (rolleName: string, limit?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'rolleName' is not null or undefined
-            assertParamExists('dbiamPersonenkontextFilterControllerFindRollen', 'rolleName', rolleName)
+        dbiamPersonenkontextWorkflowControllerFindRollen: async (rolleName?: string, limit?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/personenkontext/rollen`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -5183,9 +5369,9 @@ export const PersonenkontextApiAxiosParamCreator = function (configuration?: Con
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        dbiamPersonenkontextFilterControllerFindSchulstrukturknoten: async (rolleId: string, sskName?: string, limit?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        dbiamPersonenkontextWorkflowControllerFindSchulstrukturknoten: async (rolleId: string, sskName?: string, limit?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'rolleId' is not null or undefined
-            assertParamExists('dbiamPersonenkontextFilterControllerFindSchulstrukturknoten', 'rolleId', rolleId)
+            assertParamExists('dbiamPersonenkontextWorkflowControllerFindSchulstrukturknoten', 'rolleId', rolleId)
             const localVarPath = `/api/personenkontext/schulstrukturknoten`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -5229,6 +5415,68 @@ export const PersonenkontextApiAxiosParamCreator = function (configuration?: Con
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * 
+         * @param {string} [organisationId] ID of the organisation to filter the rollen later
+         * @param {string} [rolleId] ID of the rolle.
+         * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
+         * @param {string} [organisationName] Organisation/SSK name used to filter for schulstrukturknoten in personenkontext.
+         * @param {number} [limit] The limit of items for the request.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dbiamPersonenkontextWorkflowControllerProcessStep: async (organisationId?: string, rolleId?: string, rolleName?: string, organisationName?: string, limit?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/personenkontext/step`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+            if (organisationId !== undefined) {
+                localVarQueryParameter['organisationId'] = organisationId;
+            }
+
+            if (rolleId !== undefined) {
+                localVarQueryParameter['rolleId'] = rolleId;
+            }
+
+            if (rolleName !== undefined) {
+                localVarQueryParameter['rolleName'] = rolleName;
+            }
+
+            if (organisationName !== undefined) {
+                localVarQueryParameter['organisationName'] = organisationName;
+            }
+
+            if (limit !== undefined) {
+                localVarQueryParameter['limit'] = limit;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -5241,13 +5489,24 @@ export const PersonenkontextApiFp = function(configuration?: Configuration) {
     return {
         /**
          * 
-         * @param {string} rolleName Rolle name used to filter for rollen in personenkontext.
+         * @param {string} personId The ID for the person.
+         * @param {DbiamUpdatePersonenkontexteBodyParams} dbiamUpdatePersonenkontexteBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async dbiamPersonenkontextWorkflowControllerCommit(personId: string, dbiamUpdatePersonenkontexteBodyParams: DbiamUpdatePersonenkontexteBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonenkontexteUpdateResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.dbiamPersonenkontextWorkflowControllerCommit(personId, dbiamUpdatePersonenkontexteBodyParams, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
          * @param {number} [limit] The limit of items for the request.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async dbiamPersonenkontextFilterControllerFindRollen(rolleName: string, limit?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<FindRollenResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.dbiamPersonenkontextFilterControllerFindRollen(rolleName, limit, options);
+        async dbiamPersonenkontextWorkflowControllerFindRollen(rolleName?: string, limit?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<FindRollenResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.dbiamPersonenkontextWorkflowControllerFindRollen(rolleName, limit, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -5258,8 +5517,22 @@ export const PersonenkontextApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async dbiamPersonenkontextFilterControllerFindSchulstrukturknoten(rolleId: string, sskName?: string, limit?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<FindSchulstrukturknotenResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.dbiamPersonenkontextFilterControllerFindSchulstrukturknoten(rolleId, sskName, limit, options);
+        async dbiamPersonenkontextWorkflowControllerFindSchulstrukturknoten(rolleId: string, sskName?: string, limit?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<FindSchulstrukturknotenResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.dbiamPersonenkontextWorkflowControllerFindSchulstrukturknoten(rolleId, sskName, limit, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @param {string} [organisationId] ID of the organisation to filter the rollen later
+         * @param {string} [rolleId] ID of the rolle.
+         * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
+         * @param {string} [organisationName] Organisation/SSK name used to filter for schulstrukturknoten in personenkontext.
+         * @param {number} [limit] The limit of items for the request.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async dbiamPersonenkontextWorkflowControllerProcessStep(organisationId?: string, rolleId?: string, rolleName?: string, organisationName?: string, limit?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonenkontextWorkflowResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.dbiamPersonenkontextWorkflowControllerProcessStep(organisationId, rolleId, rolleName, organisationName, limit, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -5274,13 +5547,23 @@ export const PersonenkontextApiFactory = function (configuration?: Configuration
     return {
         /**
          * 
-         * @param {string} rolleName Rolle name used to filter for rollen in personenkontext.
+         * @param {string} personId The ID for the person.
+         * @param {DbiamUpdatePersonenkontexteBodyParams} dbiamUpdatePersonenkontexteBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dbiamPersonenkontextWorkflowControllerCommit(personId: string, dbiamUpdatePersonenkontexteBodyParams: DbiamUpdatePersonenkontexteBodyParams, options?: any): AxiosPromise<PersonenkontexteUpdateResponse> {
+            return localVarFp.dbiamPersonenkontextWorkflowControllerCommit(personId, dbiamUpdatePersonenkontexteBodyParams, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
          * @param {number} [limit] The limit of items for the request.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        dbiamPersonenkontextFilterControllerFindRollen(rolleName: string, limit?: number, options?: any): AxiosPromise<FindRollenResponse> {
-            return localVarFp.dbiamPersonenkontextFilterControllerFindRollen(rolleName, limit, options).then((request) => request(axios, basePath));
+        dbiamPersonenkontextWorkflowControllerFindRollen(rolleName?: string, limit?: number, options?: any): AxiosPromise<FindRollenResponse> {
+            return localVarFp.dbiamPersonenkontextWorkflowControllerFindRollen(rolleName, limit, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -5290,8 +5573,21 @@ export const PersonenkontextApiFactory = function (configuration?: Configuration
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        dbiamPersonenkontextFilterControllerFindSchulstrukturknoten(rolleId: string, sskName?: string, limit?: number, options?: any): AxiosPromise<FindSchulstrukturknotenResponse> {
-            return localVarFp.dbiamPersonenkontextFilterControllerFindSchulstrukturknoten(rolleId, sskName, limit, options).then((request) => request(axios, basePath));
+        dbiamPersonenkontextWorkflowControllerFindSchulstrukturknoten(rolleId: string, sskName?: string, limit?: number, options?: any): AxiosPromise<FindSchulstrukturknotenResponse> {
+            return localVarFp.dbiamPersonenkontextWorkflowControllerFindSchulstrukturknoten(rolleId, sskName, limit, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {string} [organisationId] ID of the organisation to filter the rollen later
+         * @param {string} [rolleId] ID of the rolle.
+         * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
+         * @param {string} [organisationName] Organisation/SSK name used to filter for schulstrukturknoten in personenkontext.
+         * @param {number} [limit] The limit of items for the request.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dbiamPersonenkontextWorkflowControllerProcessStep(organisationId?: string, rolleId?: string, rolleName?: string, organisationName?: string, limit?: number, options?: any): AxiosPromise<PersonenkontextWorkflowResponse> {
+            return localVarFp.dbiamPersonenkontextWorkflowControllerProcessStep(organisationId, rolleId, rolleName, organisationName, limit, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -5304,13 +5600,23 @@ export const PersonenkontextApiFactory = function (configuration?: Configuration
 export interface PersonenkontextApiInterface {
     /**
      * 
-     * @param {string} rolleName Rolle name used to filter for rollen in personenkontext.
+     * @param {string} personId The ID for the person.
+     * @param {DbiamUpdatePersonenkontexteBodyParams} dbiamUpdatePersonenkontexteBodyParams 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PersonenkontextApiInterface
+     */
+    dbiamPersonenkontextWorkflowControllerCommit(personId: string, dbiamUpdatePersonenkontexteBodyParams: DbiamUpdatePersonenkontexteBodyParams, options?: AxiosRequestConfig): AxiosPromise<PersonenkontexteUpdateResponse>;
+
+    /**
+     * 
+     * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
      * @param {number} [limit] The limit of items for the request.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PersonenkontextApiInterface
      */
-    dbiamPersonenkontextFilterControllerFindRollen(rolleName: string, limit?: number, options?: AxiosRequestConfig): AxiosPromise<FindRollenResponse>;
+    dbiamPersonenkontextWorkflowControllerFindRollen(rolleName?: string, limit?: number, options?: AxiosRequestConfig): AxiosPromise<FindRollenResponse>;
 
     /**
      * 
@@ -5321,7 +5627,20 @@ export interface PersonenkontextApiInterface {
      * @throws {RequiredError}
      * @memberof PersonenkontextApiInterface
      */
-    dbiamPersonenkontextFilterControllerFindSchulstrukturknoten(rolleId: string, sskName?: string, limit?: number, options?: AxiosRequestConfig): AxiosPromise<FindSchulstrukturknotenResponse>;
+    dbiamPersonenkontextWorkflowControllerFindSchulstrukturknoten(rolleId: string, sskName?: string, limit?: number, options?: AxiosRequestConfig): AxiosPromise<FindSchulstrukturknotenResponse>;
+
+    /**
+     * 
+     * @param {string} [organisationId] ID of the organisation to filter the rollen later
+     * @param {string} [rolleId] ID of the rolle.
+     * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
+     * @param {string} [organisationName] Organisation/SSK name used to filter for schulstrukturknoten in personenkontext.
+     * @param {number} [limit] The limit of items for the request.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PersonenkontextApiInterface
+     */
+    dbiamPersonenkontextWorkflowControllerProcessStep(organisationId?: string, rolleId?: string, rolleName?: string, organisationName?: string, limit?: number, options?: AxiosRequestConfig): AxiosPromise<PersonenkontextWorkflowResponse>;
 
 }
 
@@ -5334,14 +5653,26 @@ export interface PersonenkontextApiInterface {
 export class PersonenkontextApi extends BaseAPI implements PersonenkontextApiInterface {
     /**
      * 
-     * @param {string} rolleName Rolle name used to filter for rollen in personenkontext.
+     * @param {string} personId The ID for the person.
+     * @param {DbiamUpdatePersonenkontexteBodyParams} dbiamUpdatePersonenkontexteBodyParams 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PersonenkontextApi
+     */
+    public dbiamPersonenkontextWorkflowControllerCommit(personId: string, dbiamUpdatePersonenkontexteBodyParams: DbiamUpdatePersonenkontexteBodyParams, options?: AxiosRequestConfig) {
+        return PersonenkontextApiFp(this.configuration).dbiamPersonenkontextWorkflowControllerCommit(personId, dbiamUpdatePersonenkontexteBodyParams, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
      * @param {number} [limit] The limit of items for the request.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PersonenkontextApi
      */
-    public dbiamPersonenkontextFilterControllerFindRollen(rolleName: string, limit?: number, options?: AxiosRequestConfig) {
-        return PersonenkontextApiFp(this.configuration).dbiamPersonenkontextFilterControllerFindRollen(rolleName, limit, options).then((request) => request(this.axios, this.basePath));
+    public dbiamPersonenkontextWorkflowControllerFindRollen(rolleName?: string, limit?: number, options?: AxiosRequestConfig) {
+        return PersonenkontextApiFp(this.configuration).dbiamPersonenkontextWorkflowControllerFindRollen(rolleName, limit, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -5353,8 +5684,23 @@ export class PersonenkontextApi extends BaseAPI implements PersonenkontextApiInt
      * @throws {RequiredError}
      * @memberof PersonenkontextApi
      */
-    public dbiamPersonenkontextFilterControllerFindSchulstrukturknoten(rolleId: string, sskName?: string, limit?: number, options?: AxiosRequestConfig) {
-        return PersonenkontextApiFp(this.configuration).dbiamPersonenkontextFilterControllerFindSchulstrukturknoten(rolleId, sskName, limit, options).then((request) => request(this.axios, this.basePath));
+    public dbiamPersonenkontextWorkflowControllerFindSchulstrukturknoten(rolleId: string, sskName?: string, limit?: number, options?: AxiosRequestConfig) {
+        return PersonenkontextApiFp(this.configuration).dbiamPersonenkontextWorkflowControllerFindSchulstrukturknoten(rolleId, sskName, limit, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {string} [organisationId] ID of the organisation to filter the rollen later
+     * @param {string} [rolleId] ID of the rolle.
+     * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
+     * @param {string} [organisationName] Organisation/SSK name used to filter for schulstrukturknoten in personenkontext.
+     * @param {number} [limit] The limit of items for the request.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PersonenkontextApi
+     */
+    public dbiamPersonenkontextWorkflowControllerProcessStep(organisationId?: string, rolleId?: string, rolleName?: string, organisationName?: string, limit?: number, options?: AxiosRequestConfig) {
+        return PersonenkontextApiFp(this.configuration).dbiamPersonenkontextWorkflowControllerProcessStep(organisationId, rolleId, rolleName, organisationName, limit, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
