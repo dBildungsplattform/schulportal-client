@@ -80,8 +80,8 @@ beforeEach(() => {
     },
   ];
 
-  personenkontextStore.filteredRollen = {
-    moeglicheRollen: [
+  personenkontextStore.workflowStepResponse = {
+    rollen: [
       {
         administeredBySchulstrukturknoten: '1234',
         rollenart: 'LERN',
@@ -93,7 +93,10 @@ beforeEach(() => {
         id: '54321',
       },
     ],
-    total: 1,
+    organisations: [],
+    selectedOrganisation: null,
+    selectedRolle: null,
+    canCommit: true,
   };
 
   wrapper = mount(PersonCreationView, {
@@ -128,14 +131,15 @@ describe('PersonCreationView', () => {
   });
 
   test('it updates search and sets values selected rolle, organisation and klasse', async () => {
-    const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
-    await rolleAutocomplete?.vm.$emit('update:search', '54321');
-    await rolleAutocomplete?.setValue('54321');
-    await nextTick();
 
     const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
     await organisationAutocomplete?.vm.$emit('update:search', '01');
     await organisationAutocomplete?.setValue('O1');
+    await nextTick();
+
+    const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
+    await rolleAutocomplete?.vm.$emit('update:search', '54321');
+    await rolleAutocomplete?.setValue('54321');
     await nextTick();
 
     expect(organisationAutocomplete?.text()).toEqual('O1');
@@ -149,56 +153,61 @@ describe('PersonCreationView', () => {
     expect(klasseAutocomplete?.text()).toEqual('55555');
   });
 
-  test('it resets field Organisation when Rolle is reset after being selected', async () => {
-    const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
-    await rolleAutocomplete?.setValue('54321');
-    await nextTick();
+  test('it resets field Rolle when Organisation is reset after being selected', async () => {
 
     const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
     await organisationAutocomplete?.setValue('O1');
     await nextTick();
 
-    expect(organisationAutocomplete?.text()).toEqual('O1');
+    const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
+    await rolleAutocomplete?.setValue('54321');
     await nextTick();
+
+    await organisationAutocomplete?.setValue(undefined);
+    await nextTick();
+
+    expect(rolleAutocomplete?.exists()).toBe(false);
   });
 
-  test('it resets field Klasse when organisation is reset after being selected', async () => {
-    const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
-    await rolleAutocomplete?.setValue('54321');
-    await nextTick();
+  test('it resets field Klasse when Rolle is reset after being selected', async () => {
 
     const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
     await organisationAutocomplete?.setValue('O1');
     await nextTick();
 
-    expect(organisationAutocomplete?.text()).toEqual('O1');
+
+    const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
+    await rolleAutocomplete?.setValue('54321');
     await nextTick();
 
-    await rolleAutocomplete?.setValue(undefined);
+    const klassenAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
+    await klassenAutocomplete?.setValue('O1');
     await nextTick();
 
-    expect(organisationAutocomplete?.exists()).toBe(false);
+    await organisationAutocomplete?.setValue(undefined);
+    await nextTick();
+
+    expect(klassenAutocomplete?.exists()).toBe(false);
   });
 
   test('it triggers submit', async () => {
-    const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
-    await rolleAutocomplete?.setValue('54321');
-    await nextTick();
 
     const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
     await organisationAutocomplete?.setValue('O1');
     await nextTick();
 
-    expect(organisationAutocomplete?.text()).toEqual('O1');
+    const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
+    await rolleAutocomplete?.setValue('54321');
+    await nextTick();
+
+    const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
+    await klasseAutocomplete?.setValue('55555');
     await nextTick();
 
     const familiennameInput: VueWrapper | undefined = wrapper?.findComponent({ ref: 'familienname-input' });
     await familiennameInput?.setValue('Mustermann');
     await nextTick();
 
-    const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
-    await klasseAutocomplete?.setValue('55555');
-    await nextTick();
 
     const mockPerson: PersonendatensatzResponse = {
       person: {
