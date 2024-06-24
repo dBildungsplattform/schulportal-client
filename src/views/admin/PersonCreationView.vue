@@ -51,7 +51,7 @@
   };
 
   const rollen: ComputedRef<RolleWithRollenart[] | undefined> = computed(() => {
-    return personenkontextStore.filteredRollen?.moeglicheRollen
+    return personenkontextStore.workflowStepResponse?.rollen
       .slice(0, 25)
       .map((rolle: RolleResponse) => ({
         value: rolle.id,
@@ -137,17 +137,15 @@
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedKlasse', vuetifyConfig);
 
-  // Watcher to detect when the Rolle is selected so the Organisationen show all the possible choices using that value.
+  // Watcher to detect when the Rolle is selected
   watch(selectedRolle, (newValue: string, oldValue: string) => {
-    // This checks if `selectedRolle` is cleared or set to a falsy value
-    if (!newValue) {
-      resetField('selectedOrganisation');
-      return;
-    }
-
     if (newValue !== oldValue) {
       // Call fetch with an empty string to get the initial organizations for the selected role without any filter
-      personenkontextStore.getPersonenkontextAdministrationsebeneWithFilter(newValue, '', 25);
+      personenkontextStore.processWorkflowStep({
+        organisationId: selectedOrganisation.value,
+        rolleId: newValue,
+        limit: 25,
+      });
     }
   });
 
@@ -156,17 +154,22 @@
     // This checks if `selectedOrganisation` is cleared or set to a falsy value
     if (!newValue) {
       resetField('selectedKlasse');
+      resetField('selectedRolle');
       return;
     }
 
     if (newValue !== oldValue) {
+      // This is mainly to fetch the rollen after selecting the orga
+      personenkontextStore.processWorkflowStep({
+        organisationId: newValue,
+      });
       // Call fetch with an empty string to get the initial organizations for the selected role without any filter
       organisationStore.getKlassenByOrganisationId(newValue);
     }
   });
 
   const organisationen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
-    return personenkontextStore.filteredOrganisationen?.moeglicheSsks
+    return personenkontextStore.workflowStepResponse?.organisations
       .slice(0, 25)
       .map((org: Organisation) => ({
         value: org.id,
@@ -303,26 +306,29 @@
   }
 
   function updateOrganisationSearch(searchValue: string): void {
-    /* cancel pending call */
-    clearTimeout(timerId);
-    /* delay new call 500ms */
-    timerId = setTimeout(() => {
-      personenkontextStore.getPersonenkontextAdministrationsebeneWithFilter(selectedRolle.value, searchValue, 25);
-    }, 500);
+    personenkontextStore.processWorkflowStep({
+      organisationName: searchValue,
+      limit: 25,
+    });
   }
 
   function updateRollenSearch(searchValue: string): void {
     /* cancel pending call */
     clearTimeout(timerId);
     /* delay new call 500ms */
+    // Using the selected Organisation, find all rollen that match the search string
     timerId = setTimeout(() => {
-      personenkontextStore.getPersonenkontextRolleWithFilter(searchValue, 25);
+      personenkontextStore.processWorkflowStep({
+        organisationId: selectedOrganisation.value,
+        rolleName: searchValue,
+        limit: 25,
+      });
     }, 500);
   }
 
   onMounted(async () => {
     await organisationStore.getAllOrganisationen();
-    await personenkontextStore.getPersonenkontextRolleWithFilter('', 25);
+    await personenkontextStore.processWorkflowStep();
     personStore.errorCode = '';
     personStore.createdPerson = null;
 
@@ -367,40 +373,94 @@
         :onSubmit="onSubmit"
         :showUnsavedChangesDialog="showUnsavedChangesDialog"
       >
-        <!-- Rollenzuordnung -->
+        <!-- Organisation zuordnen -->
         <v-row>
-          <h3 class="headline-3">1. {{ $t('admin.rolle.assignRolle') }}</h3>
+          <h3 class="headline-3">1. {{ $t('admin.organisation.assignOrganisation') }}</h3>
         </v-row>
         <FormRow
-          :errorLabel="selectedRolleProps['error']"
-          labelForId="rolle-select"
+          :errorLabel="selectedOrganisationProps['error']"
           :isRequired="true"
-          :label="$t('admin.rolle.rolle')"
+          labelForId="organisation-select"
+          :label="$t('admin.organisation.organisation')"
         >
           <v-autocomplete
             autocomplete="off"
             clearable
-            data-testid="rolle-select"
+            data-testid="organisation-select"
             density="compact"
-            id="rolle-select"
-            ref="rolle-select"
-            :items="rollen"
+            id="organisation-select"
+            ref="organisation-select"
+            :items="organisationen"
             item-value="value"
             item-text="title"
             :no-data-text="$t('noDataFound')"
-            :placeholder="$t('admin.rolle.selectRolle')"
+            :placeholder="$t('admin.organisation.selectOrganisation')"
             required="true"
-            @update:search="updateRollenSearch"
+            @update:search="updateOrganisationSearch"
             variant="outlined"
-            v-bind="selectedRolleProps"
-            v-model="selectedRolle"
+            v-bind="selectedOrganisationProps"
+            v-model="selectedOrganisation"
           ></v-autocomplete>
         </FormRow>
-
         <!-- Persönliche Informationen -->
-        <div v-if="selectedRolle">
+        <div v-if="selectedOrganisation">
+          <!-- Rollenzuordnung -->
           <v-row>
-            <h3 class="headline-3">2. {{ $t('admin.person.personalInfo') }}</h3>
+            <h3 class="headline-3">2. {{ $t('admin.rolle.assignRolle') }}</h3>
+          </v-row>
+          <FormRow
+            :errorLabel="selectedRolleProps['error']"
+            labelForId="rolle-select"
+            :isRequired="true"
+            :label="$t('admin.rolle.rolle')"
+          >
+            <v-autocomplete
+              autocomplete="off"
+              clearable
+              data-testid="rolle-select"
+              density="compact"
+              id="rolle-select"
+              ref="rolle-select"
+              :items="rollen"
+              item-value="value"
+              item-text="title"
+              :no-data-text="$t('noDataFound')"
+              :placeholder="$t('admin.rolle.selectRolle')"
+              required="true"
+              @update:search="updateRollenSearch"
+              variant="outlined"
+              v-bind="selectedRolleProps"
+              v-model="selectedRolle"
+            ></v-autocomplete>
+          </FormRow>
+          <!-- Klasse zuordnen -->
+          <FormRow
+            v-if="isLernRolle(selectedRolle) && selectedOrganisation"
+            :errorLabel="selectedKlasseProps['error']"
+            :isRequired="true"
+            labelForId="klasse-select"
+            :label="$t('admin.klasse.klasse')"
+          >
+            <v-autocomplete
+              autocomplete="off"
+              clearable
+              data-testid="klasse-select"
+              density="compact"
+              id="klasse-select"
+              ref="klasse-select"
+              :items="klassen"
+              item-value="value"
+              item-text="title"
+              :no-data-text="$t('noDataFound')"
+              :placeholder="$t('admin.klasse.selectKlasse')"
+              @update:search="updateKlasseSearch"
+              variant="outlined"
+              v-bind="selectedKlasseProps"
+              v-model="selectedKlasse"
+            ></v-autocomplete>
+          </FormRow>
+          <v-row>
+            <h3 class="headline-3">3. {{ $t('admin.person.personalInfo') }}</h3>
           </v-row>
           <!-- Vorname -->
           <FormRow
@@ -442,62 +502,6 @@
               v-bind="selectedFamiliennameProps"
               v-model="selectedFamilienname"
             ></v-text-field>
-          </FormRow>
-
-          <!-- Organisation zuordnen -->
-          <v-row>
-            <h3 class="headline-3">3. {{ $t('admin.organisation.assignOrganisation') }}</h3>
-          </v-row>
-          <FormRow
-            :errorLabel="selectedOrganisationProps['error']"
-            :isRequired="true"
-            labelForId="organisation-select"
-            :label="$t('admin.organisation.organisation')"
-          >
-            <v-autocomplete
-              autocomplete="off"
-              clearable
-              data-testid="organisation-select"
-              density="compact"
-              id="organisation-select"
-              ref="organisation-select"
-              :items="organisationen"
-              item-value="value"
-              item-text="title"
-              :no-data-text="$t('noDataFound')"
-              :placeholder="$t('admin.organisation.selectOrganisation')"
-              required="true"
-              @update:search="updateOrganisationSearch"
-              variant="outlined"
-              v-bind="selectedOrganisationProps"
-              v-model="selectedOrganisation"
-            ></v-autocomplete>
-          </FormRow>
-          <!-- Klasse zuordnen -->
-          <FormRow
-            v-if="isLernRolle(selectedRolle) && selectedOrganisation"
-            :errorLabel="selectedKlasseProps['error']"
-            :isRequired="true"
-            labelForId="klasse-select"
-            :label="$t('admin.klasse.klasse')"
-          >
-            <v-autocomplete
-              autocomplete="off"
-              clearable
-              data-testid="klasse-select"
-              density="compact"
-              id="klasse-select"
-              ref="klasse-select"
-              :items="klassen"
-              item-value="value"
-              item-text="title"
-              :no-data-text="$t('noDataFound')"
-              :placeholder="$t('admin.klasse.selectKlasse')"
-              @update:search="updateKlasseSearch"
-              variant="outlined"
-              v-bind="selectedKlasseProps"
-              v-model="selectedKlasse"
-            ></v-autocomplete>
           </FormRow>
         </div>
       </FormWrapper>

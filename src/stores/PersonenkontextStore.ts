@@ -19,6 +19,7 @@ import {
   type DbiamUpdatePersonenkontexteBodyParams,
   type PersonenkontexteUpdateResponse,
   type DbiamPersonenkontextBodyParams,
+  type PersonenkontextWorkflowResponse,
 } from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
 
@@ -72,8 +73,17 @@ export type Uebersicht =
     }
   | undefined;
 
+export type WorkflowFilter = {
+  organisationId?: string;
+  rolleId?: string;
+  rolleName?: string;
+  organisationName?: string;
+  limit?: number;
+};
+
 type PersonenkontextState = {
   allUebersichten: DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response | null;
+  workflowStepResponse: PersonenkontextWorkflowResponse | null;
   filteredRollen: FindRollenResponse | null;
   filteredOrganisationen: FindSchulstrukturknotenResponse | null;
   personenuebersicht: DBiamPersonenuebersichtResponse | null;
@@ -86,6 +96,7 @@ type PersonenkontextState = {
 type PersonenkontextGetters = {};
 type PersonenkontextActions = {
   hasSystemrecht: (personId: string, systemrecht: 'ROLLEN_VERWALTEN') => Promise<SystemrechtResponse>;
+  processWorkflowStep: (filter?: WorkflowFilter) => Promise<void>;
   getPersonenkontextRolleWithFilter: (rolleName: string, limit: number) => Promise<void>;
   getPersonenkontextAdministrationsebeneWithFilter: (rolleId: string, sskName: string, limit: number) => Promise<void>;
   updatePersonenkontexte: (
@@ -127,6 +138,7 @@ export const usePersonenkontextStore: StoreDefinition<
   state: (): PersonenkontextState => {
     return {
       allUebersichten: null,
+      workflowStepResponse: null,
       filteredRollen: null,
       filteredOrganisationen: null,
       personenuebersicht: null,
@@ -143,6 +155,29 @@ export const usePersonenkontextStore: StoreDefinition<
         const { data }: { data: SystemrechtResponse } =
           await personenKontexteApi.personenkontextControllerHatSystemRecht(personId, systemRecht);
         return data;
+      } catch (error: unknown) {
+        this.errorCode = 'UNSPECIFIED_ERROR';
+        if (isAxiosError(error)) {
+          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
+        }
+        return await Promise.reject(this.errorCode);
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async processWorkflowStep(filter?: WorkflowFilter) {
+      this.loading = true;
+      try {
+        const { data }: { data: PersonenkontextWorkflowResponse } =
+          await personenKontextApi.dbiamPersonenkontextWorkflowControllerProcessStep(
+            filter?.organisationId,
+            filter?.rolleId,
+            filter?.rolleName,
+            filter?.organisationName,
+            filter?.limit,
+          );
+        this.workflowStepResponse = data;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
