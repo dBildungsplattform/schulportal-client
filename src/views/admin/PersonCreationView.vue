@@ -257,7 +257,7 @@
             creationErrorText.value = t(`admin.personenkontext.errors.${personenkontextStore.errorCode}`);
           });
       }
-      resetForm();
+
     }
   }
 
@@ -296,38 +296,67 @@
     }
   });
 
-  function updateKlasseSearch(searchValue: string): void {
-    /* cancel pending call */
-    clearTimeout(timerId);
-    /* delay new call 500ms */
-    timerId = setTimeout(() => {
-      organisationStore.getKlassenByOrganisationId(selectedOrganisation.value, searchValue);
-    }, 500);
-  }
+  // Computed property to get the title of the selected organisation
+  const selectedOrganisationTitle: ComputedRef<string | undefined> = computed(() => {
+    return organisationen.value?.find((org: TranslatedObject) => org.value === selectedOrganisation.value)?.title;
+  });
+
+  // Computed property to get the title of the selected role
+  const selectedRolleTitle: ComputedRef<string | undefined> = computed(() => {
+    return rollen.value?.find((role: TranslatedObject) => role.value === selectedRolle.value)?.title;
+  });
+
+  // Computed property to get the title of the selected class
+  const selectedKlasseTitle: ComputedRef<string | undefined> = computed(() => {
+    return klassen.value?.find((klasse: TranslatedObject) => klasse.value === selectedKlasse.value)?.title;
+  });
 
   function updateOrganisationSearch(searchValue: string): void {
-    personenkontextStore.processWorkflowStep({
-      organisationName: searchValue,
-      limit: 25,
-    });
+    if (searchValue && searchValue !== selectedOrganisationTitle.value) {
+      clearTimeout(timerId);
+      timerId = setTimeout(async () => {
+        await personenkontextStore.processWorkflowStep({
+          organisationName: searchValue,
+          limit: 25,
+        });
+      }, 500);
+    }
   }
 
   function updateRollenSearch(searchValue: string): void {
-    /* cancel pending call */
     clearTimeout(timerId);
-    /* delay new call 500ms */
-    // Using the selected Organisation, find all rollen that match the search string
-    timerId = setTimeout(() => {
-      personenkontextStore.processWorkflowStep({
-        organisationId: selectedOrganisation.value,
-        rolleName: searchValue,
-        limit: 25,
-      });
-    }, 500);
+
+    // If searchValue is empty, fetch all roles for the organisationId
+    // (When clicking inside the input field, the searchValue is always an empty string apparently so an extra request is always made)
+    if (searchValue === '') {
+      timerId = setTimeout(() => {
+        personenkontextStore.processWorkflowStep({
+          organisationId: selectedOrganisation.value,
+          limit: 25,
+        });
+      }, 500);
+    } else if (searchValue && searchValue !== selectedRolleTitle.value) {
+      timerId = setTimeout(() => {
+        personenkontextStore.processWorkflowStep({
+          organisationId: selectedOrganisation.value,
+          rolleName: searchValue,
+          limit: 25,
+        });
+      }, 500);
+    }
+  }
+  function updateKlasseSearch(searchValue: string): void {
+    if (searchValue && searchValue !== selectedKlasseTitle.value) {
+      /* cancel pending call */
+      clearTimeout(timerId);
+      /* delay new call 500ms */
+      timerId = setTimeout(() => {
+        organisationStore.getKlassenByOrganisationId(selectedOrganisation.value, searchValue);
+      }, 500);
+    }
   }
 
   onMounted(async () => {
-    await organisationStore.getAllOrganisationen();
     await personenkontextStore.processWorkflowStep();
     personStore.errorCode = '';
     personStore.createdPerson = null;
