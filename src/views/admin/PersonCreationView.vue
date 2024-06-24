@@ -112,7 +112,7 @@
   };
 
   // eslint-disable-next-line @typescript-eslint/typedef
-  const { defineField, handleSubmit, isFieldDirty, resetForm, resetField } = useForm<PersonCreationForm>({
+  const { defineField, handleSubmit, isFieldDirty, resetForm } = useForm<PersonCreationForm>({
     validationSchema,
   });
 
@@ -139,7 +139,7 @@
 
   // Watcher to detect when the Rolle is selected
   watch(selectedRolle, (newValue: string, oldValue: string) => {
-    if (newValue !== oldValue) {
+    if (newValue && newValue !== oldValue) {
       // Call fetch with an empty string to get the initial organizations for the selected role without any filter
       personenkontextStore.processWorkflowStep({
         organisationId: selectedOrganisation.value,
@@ -149,16 +149,9 @@
     }
   });
 
-  // Watcher to detect when the Organisationsebene is selected so the Klasse show all the possible choices using that value.
+  // Watcher to detect when the Organisationsebene is selected so the Klasse shows all the possible choices using that value.
   watch(selectedOrganisation, (newValue: string, oldValue: string) => {
-    // This checks if `selectedOrganisation` is cleared or set to a falsy value
-    if (!newValue) {
-      resetField('selectedKlasse');
-      resetField('selectedRolle');
-      return;
-    }
-
-    if (newValue !== oldValue) {
+    if (newValue && newValue !== oldValue) {
       // This is mainly to fetch the rollen after selecting the orga
       personenkontextStore.processWorkflowStep({
         organisationId: newValue,
@@ -257,7 +250,7 @@
             creationErrorText.value = t(`admin.personenkontext.errors.${personenkontextStore.errorCode}`);
           });
       }
-
+      resetForm();
     }
   }
 
