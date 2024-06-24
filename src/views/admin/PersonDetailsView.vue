@@ -10,7 +10,7 @@
   import PersonenkontextDelete from '@/components/admin/personen/PersonenkontextDelete.vue';
   import {
     usePersonenkontextStore,
-    type DBiamCreatePersonenkontextBodyParams,
+    type DbiamPersonenkontextBodyParams,
     type DbiamUpdatePersonenkontexteBodyParams,
     type PersonenkontextStore,
     type Uebersicht,
@@ -129,7 +129,7 @@
         personId: currentPersonId,
         organisationId: zuordnung.sskId,
         rolleId: zuordnung.rolleId,
-      })) as DBiamCreatePersonenkontextBodyParams[],
+      })) as DbiamPersonenkontextBodyParams[],
     };
 
     await personenkontextStore.updatePersonenkontexte(updateParams, currentPersonId);
@@ -374,7 +374,7 @@
         personId: currentPersonId,
         organisationId: zuordnung.sskId,
         rolleId: zuordnung.rolleId,
-      })) as DBiamCreatePersonenkontextBodyParams[],
+      })) as DbiamPersonenkontextBodyParams[],
     };
 
     await personenkontextStore.updatePersonenkontexte(updateParams, currentPersonId);
