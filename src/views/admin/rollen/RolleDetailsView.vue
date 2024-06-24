@@ -4,6 +4,7 @@
   import { type Router, useRouter, type RouteLocationNormalizedLoaded, useRoute } from 'vue-router';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
+  import type { ServiceProvider } from '@/stores/ServiceProviderStore';
 
   const rolleStore: RolleStore = useRolleStore();
 
@@ -25,27 +26,27 @@
       return '---';
     }
 
-    return rolleStore.currentRolle?.serviceProviders?.map((provider) => provider.name).join(', ');
+    return rolleStore.currentRolle.serviceProviders.map((provider: ServiceProvider) => provider.name).join(', ');
   }
-  
+
   function translateMerkmale(): string | undefined {
-    const merkmale: Array<RollenMerkmal> = Array.from(rolleStore.currentRolle?.merkmale || [])
+    const merkmale: Array<RollenMerkmal> = Array.from(rolleStore.currentRolle?.merkmale || []);
 
     if (!merkmale.length) {
       return '---';
     }
 
-    return merkmale.map((merkmal) => merkmal).join(', ');
+    return merkmale.map((merkmal: RollenMerkmal) => merkmal).join(', ');
   }
 
   function translateSystemrechte(): string | undefined {
-    const systemrechte: Array<RollenSystemRecht> = Array.from(rolleStore.currentRolle?.systemrechte || [])
+    const systemrechte: Array<RollenSystemRecht> = Array.from(rolleStore.currentRolle?.systemrechte || []);
 
     if (!systemrechte.length) {
       return '---';
     }
 
-    return systemrechte.map((systemrecht) => systemrecht).join(', ');
+    return systemrechte.map((systemrecht: RollenSystemRecht) => systemrecht).join(', ');
   }
 
   onBeforeMount(async () => {

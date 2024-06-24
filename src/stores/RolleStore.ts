@@ -149,7 +149,8 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
       this.loading = true;
       this.errorCode = '';
       try {
-        const { data }: { data: RolleResponse } = await rolleApi.rolleControllerFindRolleByIdWithServiceProviders(rolleId);
+        const { data }: { data: RolleResponse } =
+          await rolleApi.rolleControllerFindRolleByIdWithServiceProviders(rolleId);
         this.currentRolle = data;
         return data;
       } catch (error) {
