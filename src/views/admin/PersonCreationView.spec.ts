@@ -32,8 +32,8 @@ beforeEach(() => {
   personenkontextStore = usePersonenkontextStore();
   personStore = usePersonStore();
 
-  personenkontextStore.filteredOrganisationen = {
-    moeglicheSsks: [
+  personenkontextStore.workflowStepResponse = {
+    organisations: [
       {
         id: 'string',
         kennung: '',
@@ -44,7 +44,10 @@ beforeEach(() => {
         administriertVon: '1',
       },
     ],
-    total: 0,
+    rollen: [],
+    selectedOrganisation: null,
+    selectedRolle: null,
+    canCommit: true,
   };
 
   personenkontextStore.createdPersonenkontextForOrganisation = {
