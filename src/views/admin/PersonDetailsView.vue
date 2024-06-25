@@ -336,7 +336,7 @@
   ] = defineField('selectedKlasse', vuetifyConfig);
 
   const onSubmit: (e?: Event | undefined) => Promise<void | undefined> = handleSubmit(() => {
-    const organisation: Organisation | undefined = personenkontextStore.filteredOrganisationen?.moeglicheSsks.find(
+    const organisation: Organisation | undefined = personenkontextStore.workflowStepResponse?.organisations.find(
       (orga: Organisation) => orga.id === selectedOrganisation.value,
     );
     const klasse: Organisation | undefined = organisationStore.klassen.find(
@@ -460,6 +460,17 @@
       resetField('selectedKlasse');
       resetField('selectedRolle');
     }
+  });
+
+  // Filter out the Rollen in case the admin chooses an organisation that the user has already a kontext in
+  const filteredRollen: ComputedRef<RolleWithRollenart[] | undefined> = computed(() => {
+    const existingZuordnungen: Zuordnung[] | undefined = personenkontextStore.personenuebersicht?.zuordnungen.filter(
+      (zuordnung: Zuordnung) => zuordnung.sskId === selectedOrganisation.value,
+    );
+    return rollen.value?.filter(
+      (rolle: RolleWithRollenart) =>
+        !existingZuordnungen?.some((zuordnung: Zuordnung) => zuordnung.rolleId === rolle.value),
+    );
   });
 
   // Computed property to get the title of the selected organisation
@@ -1051,7 +1062,7 @@
                       density="compact"
                       id="rolle-select"
                       ref="rolle-select"
-                      :items="rollen"
+                      :items="filteredRollen"
                       item-value="value"
                       item-text="title"
                       :no-data-text="$t('noDataFound')"
