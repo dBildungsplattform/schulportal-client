@@ -448,9 +448,14 @@
 
   const onSubmit: (e?: Event | undefined) => Promise<void | undefined> = handleSubmit(() => {
     if (isLernRolle(selectedRolle.value)) {
-      createZuordnungConfirmationDialogMessage.value = `Wollen Sie die Schulzuordnung als ${selectedRolleTitle.value} in Klasse ${selectedKlasseTitle.value} hinzufügen?`;
+      createZuordnungConfirmationDialogMessage.value = t('person.addZuordnungKlasseConfirmation', {
+        rollenname: selectedRolleTitle.value,
+        klassenname: selectedKlasseTitle.value,
+      });
     } else {
-      createZuordnungConfirmationDialogMessage.value = `Wollen Sie die Schulzuordnung als ${selectedRolleTitle.value} hinzufügen?`;
+      createZuordnungConfirmationDialogMessage.value = t('person.addZuordnungConfirmation', {
+        rollenname: selectedRolleTitle.value,
+      });
     }
     createZuordnungConfirmationDialogVisible.value = true;
   });
