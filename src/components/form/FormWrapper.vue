@@ -5,6 +5,7 @@
 
   type Props = {
     confirmUnsavedChangesAction: () => void;
+    canCommit: boolean;
     createButtonLabel: string;
     discardButtonLabel: string;
     id: string;
@@ -77,6 +78,7 @@
           :block="mdAndDown"
           class="primary"
           :data-testid="`${id}-create-button`"
+          :disabled="!canCommit"
           type="submit"
           >{{ createButtonLabel }}</v-btn
         >

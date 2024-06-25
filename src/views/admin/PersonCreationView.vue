@@ -44,6 +44,8 @@
   let blockedNext: () => void = () => {};
   let timerId: ReturnType<typeof setTimeout>;
 
+  const canCommit: Ref<boolean> = ref(false);
+
   type RolleWithRollenart = {
     value: string;
     title: string;
@@ -141,11 +143,15 @@
   watch(selectedRolle, (newValue: string, oldValue: string) => {
     if (newValue && newValue !== oldValue) {
       // Call fetch with an empty string to get the initial organizations for the selected role without any filter
-      personenkontextStore.processWorkflowStep({
-        organisationId: selectedOrganisation.value,
-        rolleId: newValue,
-        limit: 25,
-      });
+      personenkontextStore
+        .processWorkflowStep({
+          organisationId: selectedOrganisation.value,
+          rolleId: newValue,
+          limit: 25,
+        })
+        .then(() => {
+          canCommit.value = personenkontextStore.workflowStepResponse?.canCommit ?? false; // Update canCommit from the response
+        });
     }
   });
 
@@ -309,7 +315,7 @@
         });
       }, 500);
     } else if (searchValue && searchValue !== selectedOrganisationTitle.value) {
-      // If searchValue is not empty and different from the current title, proceed with the search 
+      // If searchValue is not empty and different from the current title, proceed with the search
       // (This stops an extra request being made once a value is selected)
       timerId = setTimeout(async () => {
         await personenkontextStore.processWorkflowStep({
@@ -402,6 +408,7 @@
     <!-- The form to create a new Person  -->
     <template v-if="!personStore.createdPersonWithKontext && !personStore.errorCode">
       <FormWrapper
+        :canCommit="canCommit"
         :confirmUnsavedChangesAction="handleConfirmUnsavedChanges"
         :createButtonLabel="$t('admin.person.create')"
         :discardButtonLabel="$t('admin.person.discard')"
