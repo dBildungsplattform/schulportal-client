@@ -140,6 +140,8 @@
 
   async function setSchuleFilter(newValue: Array<string>): Promise<void> {
     await searchFilterStore.setSchuleFilter(newValue);
+    await searchFilterStore.setKlasseFilter([]);
+    selectedKlassen.value = [];
     if (selectedSchulen.value.length) {
       await organisationStore.getFilteredKlassen({
         administriertVon: selectedSchulen.value,
