@@ -121,14 +121,20 @@ describe('RolleCreationView', () => {
   });
 
   test('it fills the rolle creation form', async () => {
-    const rollennameInput: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-creation-form' }).findComponent({ ref: 'rollenname-input' });
+    const rollennameInput: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'rolle-creation-form' })
+      .findComponent({ ref: 'rollenname-input' });
     expect(rollennameInput?.exists()).toBe(false);
 
-    const orgSelect: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-creation-form' }).findComponent({ ref: 'administrationsebene-select' });
+    const orgSelect: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'rolle-creation-form' })
+      .findComponent({ ref: 'administrationsebene-select' });
     await orgSelect?.setValue('1');
     await nextTick();
 
-    const rollenartSelect: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-creation-form' }).findComponent({ ref: 'rollenart-select' });
+    const rollenartSelect: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'rolle-creation-form' })
+      .findComponent({ ref: 'rollenart-select' });
     rollenartSelect?.setValue('LERN');
     await nextTick();
     await flushPromises();

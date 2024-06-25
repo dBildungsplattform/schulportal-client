@@ -33,7 +33,7 @@
   import { object, string } from 'yup';
   import { toTypedSchema } from '@vee-validate/yup';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import RolleCreationForm from '@/components/form/RolleCreationForm.vue';
+  import RolleForm from '@/components/form/RolleForm.vue';
   import { DIN_91379A_EXT } from '@/utils/validation';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
@@ -337,7 +337,7 @@
 
       <!-- The form to create a new Rolle -->
       <template v-if="!rolleStore.createdRolle && !rolleStore.errorCode">
-        <RolleCreationForm
+        <RolleForm
           :administrationsebenen="administrationsebenen"
           :onHandleConfirmUnsavedChanges="handleConfirmUnsavedChanges"
           :onHandleDiscard="navigateToRolleManagement"
@@ -356,12 +356,12 @@
           :selectedServiceProvidersProps="selectedServiceProvidersProps"
           v-model:selectedSystemRechte="selectedSystemRechte"
           :selectedSystemRechteProps="selectedSystemRechteProps"
-          v-model:serviceProviders="serviceProviders"
+          :serviceProviders="serviceProviders"
           :showUnsavedChangesDialog="showUnsavedChangesDialog"
           :translatedRollenarten="translatedRollenarten"
           :translatedMerkmale="translatedMerkmale"
           :translatedSystemrechte="translatedSystemrechte"
-        ></RolleCreationForm>
+        ></RolleForm>
       </template>
 
       <!-- Result template on success after submit  -->

@@ -1,16 +1,21 @@
 <script setup lang="ts">
   import { type RolleStore, useRolleStore, RollenMerkmal, RollenSystemRecht } from '@/stores/RolleStore';
-  import { onBeforeMount } from 'vue';
+  import { computed, onBeforeMount, ref, type ComputedRef, type Ref } from 'vue';
   import { type Router, useRouter, type RouteLocationNormalizedLoaded, useRoute } from 'vue-router';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
-  import type { ServiceProvider } from '@/stores/ServiceProviderStore';
-
-  const rolleStore: RolleStore = useRolleStore();
+  import { type ServiceProvider } from '@/stores/ServiceProviderStore';
+  import RolleForm from '@/components/form/RolleForm.vue';
+  import { type Composer, useI18n } from 'vue-i18n';
 
   const route: RouteLocationNormalizedLoaded = useRoute();
   const router: Router = useRouter();
+  const { t }: Composer = useI18n({ useScope: 'global' });
+
+  const rolleStore: RolleStore = useRolleStore();
   const currentRolleId: string = route.params['id'] as string;
+
+  const showUnsavedChangesDialog: Ref<boolean> = ref(false);
 
   function navigateToRolleTable(): void {
     router.push({ name: 'rolle-management' });
@@ -21,32 +26,57 @@
     navigateToRolleTable();
   };
 
-  function translateProviderNames(): string | undefined {
+  const translatedRollenart: ComputedRef<string> = computed(() => {
+    if (!rolleStore.currentRolle?.rollenart) {
+      return '---';
+    }
+
+    return t(`admin.rolle.mappingFrontBackEnd.rollenarten.${rolleStore.currentRolle.rollenart}`);
+  });
+
+  const translatedProviderNames: ComputedRef<string> = computed(() => {
     if (!rolleStore.currentRolle?.serviceProviders?.length) {
       return '---';
     }
 
     return rolleStore.currentRolle.serviceProviders.map((provider: ServiceProvider) => provider.name).join(', ');
-  }
+  });
 
-  function translateMerkmale(): string | undefined {
+  const translatedMerkmale: ComputedRef<string> = computed(() => {
     const merkmale: Array<RollenMerkmal> = Array.from(rolleStore.currentRolle?.merkmale || []);
 
     if (!merkmale.length) {
       return '---';
     }
 
-    return merkmale.map((merkmal: RollenMerkmal) => merkmal).join(', ');
-  }
+    return merkmale
+      .map((merkmalKey: RollenMerkmal) => t(`admin.rolle.mappingFrontBackEnd.merkmale.${merkmalKey}`))
+      .join(', ');
+  });
 
-  function translateSystemrechte(): string | undefined {
+  const translatedSystemrechte: ComputedRef<string> = computed(() => {
     const systemrechte: Array<RollenSystemRecht> = Array.from(rolleStore.currentRolle?.systemrechte || []);
 
     if (!systemrechte.length) {
       return '---';
     }
 
-    return systemrechte.map((systemrecht: RollenSystemRecht) => systemrecht).join(', ');
+    return systemrechte
+      .map((systemrechtKey: RollenSystemRecht) => t(`admin.rolle.mappingFrontBackEnd.systemrechte.${systemrechtKey}`))
+      .join(', ');
+  });
+
+  function handleConfirmUnsavedChanges(): void {
+    return;
+  }
+
+  async function navigateToRolleManagement(): Promise<void> {
+    await router.push({ name: 'rolle-management' });
+    rolleStore.createdRolle = null;
+  }
+
+  function onSubmit(): void {
+    return;
   }
 
   onBeforeMount(async () => {
@@ -89,103 +119,20 @@
       <template v-if="!rolleStore.errorCode">
         <v-container>
           <div v-if="rolleStore.currentRolle">
-            <!-- Administrationsebene (Organisation) -->
-            <v-row>
-              <v-col
-                class="text-right"
-                sm="3"
-                cols="5"
-              >
-                <span class="subtitle-2"> {{ $t('admin.administrationsebene.administrationsebene') }}: </span>
-              </v-col>
-              <v-col
-                cols="auto"
-                data-testid="rolle-administrationsebene"
-              >
-                {{ rolleStore.currentRolle.administeredBySchulstrukturknoten }}
-              </v-col>
-            </v-row>
-            <!-- Rollenart -->
-            <v-row>
-              <v-col
-                class="text-right"
-                sm="3"
-                cols="5"
-              >
-                <span class="subtitle-2"> {{ $t('admin.rolle.rollenart') }}: </span>
-              </v-col>
-              <v-col
-                cols="auto"
-                data-testid="rolle-rollenart"
-              >
-                {{ rolleStore.currentRolle.rollenart }}
-              </v-col>
-            </v-row>
-            <!-- Rollenname -->
-            <v-row>
-              <v-col
-                class="text-right"
-                sm="3"
-                cols="5"
-              >
-                <span class="subtitle-2"> {{ $t('admin.rolle.rollenname') }}: </span>
-              </v-col>
-              <v-col
-                cols="auto"
-                data-testid="rolle-name"
-              >
-                {{ rolleStore.currentRolle.name }}
-              </v-col>
-            </v-row>
-            <!-- Rollenmerkmale -->
-            <v-row>
-              <v-col
-                class="text-right"
-                sm="3"
-                cols="5"
-              >
-                <span class="subtitle-2"> {{ $t('admin.rolle.merkmale') }}: </span>
-              </v-col>
-              <v-col
-                cols="auto"
-                data-testid="rolle-merkmale"
-              >
-                {{ translateMerkmale() }}
-              </v-col>
-            </v-row>
-            <!-- Angebote (ServiceProvider) -->
-            <v-row class="flex-nowrap">
-              <v-col
-                class="text-right"
-                sm="3"
-                cols="5"
-              >
-                <span class="subtitle-2"> {{ $t('admin.serviceProvider.serviceProvider') }}: </span>
-              </v-col>
-              <v-col
-                sm="9"
-                cols="7"
-                data-testid="rolle-angebote"
-              >
-                {{ translateProviderNames() }}
-              </v-col>
-            </v-row>
-            <!-- Systemrechte -->
-            <v-row>
-              <v-col
-                class="text-right"
-                sm="3"
-                cols="5"
-              >
-                <span class="subtitle-2"> {{ $t('admin.rolle.systemrechte') }}: </span>
-              </v-col>
-              <v-col
-                cols="auto"
-                data-testid="rolle-systemrechte"
-              >
-                {{ translateSystemrechte() }}
-              </v-col>
-            </v-row>
+            <RolleForm
+              :onHandleConfirmUnsavedChanges="handleConfirmUnsavedChanges"
+              :onHandleDiscard="navigateToRolleManagement"
+              :onShowDialogChange="(value: boolean) => (showUnsavedChangesDialog = value)"
+              :onSubmit="onSubmit"
+              :readonly="true"
+              ref="rolle-form"
+              v-model:selectedAdministrationsebene="rolleStore.currentRolle.administeredBySchulstrukturknoten"
+              v-model:selectedRollenArt="translatedRollenart"
+              v-model:selectedRollenName="rolleStore.currentRolle.name"
+              v-model:selectedMerkmale="translatedMerkmale"
+              v-model:selectedServiceProviders="translatedProviderNames"
+              v-model:selectedSystemRechte="translatedSystemrechte"
+            ></RolleForm>
           </div>
           <div v-else-if="rolleStore.loading">
             <v-progress-circular indeterminate></v-progress-circular>
