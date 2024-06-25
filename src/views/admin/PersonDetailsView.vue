@@ -1166,7 +1166,7 @@
               <h3 class="subtitle-1">{{ $t('admin.person.status') }}</h3>
             </v-col>
             <v-col
-              class="mr-lg-10"
+              class="mr-lg-13"
               cols="12"
               md="auto"
               v-if="personStore.currentPerson"
