@@ -390,18 +390,15 @@
   const isSaveButtonDisabled: ComputedRef<boolean> = computed(() => !pendingCreation.value && !pendingDeletion.value);
 
   // Watcher to detect when the Rolle is selected
-  watch(selectedRolle, (newValue: string, oldValue: string) => {
+  watch(selectedRolle, async (newValue: string, oldValue: string) => {
     if (newValue && newValue !== oldValue) {
       // Call fetch with an empty string to get the initial organizations for the selected role without any filter
-      personenkontextStore
-        .processWorkflowStep({
-          organisationId: selectedOrganisation.value,
-          rolleId: newValue,
-          limit: 25,
-        })
-        .then(() => {
-          canCommit.value = personenkontextStore.workflowStepResponse?.canCommit ?? false; // Update canCommit from the response
-        });
+      await personenkontextStore.processWorkflowStep({
+        organisationId: selectedOrganisation.value,
+        rolleId: newValue,
+        limit: 25,
+      });
+      canCommit.value = personenkontextStore.workflowStepResponse?.canCommit ?? false;
     }
   });
 
