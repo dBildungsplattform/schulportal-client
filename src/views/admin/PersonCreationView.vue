@@ -448,7 +448,6 @@
             v-model="selectedOrganisation"
           ></v-autocomplete>
         </FormRow>
-        <!-- Persönliche Informationen -->
         <div v-if="selectedOrganisation">
           <!-- Rollenzuordnung -->
           <v-row>

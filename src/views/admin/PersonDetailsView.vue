@@ -55,12 +55,15 @@
   const isEditActive: Ref<boolean> = ref(false);
   const isZuordnungFormActive: Ref<boolean> = ref(false);
   const pendingDeletion: Ref<boolean> = ref(false);
+  const successDialogVisible: Ref<boolean> = ref(false);
+  const cannotDeleteDialogVisible: Ref<boolean> = ref(false);
   const pendingCreation: Ref<boolean> = ref(false);
   const deleteSuccessDialogVisible: Ref<boolean> = ref(false);
   const createSuccessDialogVisible: Ref<boolean> = ref(false);
 
   let timerId: ReturnType<typeof setTimeout>;
-  const searchInputRollen: Ref<string> = ref('');
+
+  const canCommit: Ref<boolean> = ref(false);
 
   function navigateToPersonTable(): void {
     router.push({ name: 'person-management' });
@@ -92,14 +95,35 @@
     await personStore.deletePerson(personId);
   }
 
+  let closeCannotDeleteDialog = (): void => {
+    cannotDeleteDialogVisible.value = false;
+  };
+  let closeCreateSuccessDialog = (): void => {
+    createSuccessDialogVisible.value = false;
+    router.push(route).then(() => {
+      router.go(0);
+    });
+  };
+
+  let closeDeleteSuccessDialog = (): void => {
+    deleteSuccessDialogVisible.value = false;
+    router.push(route).then(() => {
+      router.go(0);
+    });
+  };
+
   const triggerAddZuordnung = async (): Promise<void> => {
-    await organisationStore.getAllOrganisationen();
-    await personenkontextStore.getPersonenkontextRolleWithFilter('', 25);
+    await personenkontextStore.processWorkflowStep();
     isZuordnungFormActive.value = true;
   };
 
-  // This will send the updated list of Zuordnungen to the Backend WITHOUT the selected Zuordnungen.
-  const confirmDeletion = async (): Promise<void> => {
+// This will send the updated list of Zuordnungen to the Backend WITHOUT the selected Zuordnungen.
+const confirmDeletion = async (): Promise<void> => {
+    // Check if the current user is trying to delete their own Zuordnungen
+    if (authStore.currentUser?.personId === currentPersonId) {
+      cannotDeleteDialogVisible.value = true;
+      return;
+    }
     // The remaining Zuordnungen that were not selected
     const remainingZuordnungen: Zuordnung[] | undefined = zuordnungenResult.value?.filter(
       (zuordnung: Zuordnung) => !selectedZuordnungen.value.includes(zuordnung),
@@ -135,16 +159,29 @@
     await personenkontextStore.updatePersonenkontexte(updateParams, currentPersonId);
     zuordnungenResult.value = combinedZuordnungen;
     selectedZuordnungen.value = [];
-    deleteSuccessDialogVisible.value = true;
-  };
 
-  const closeSuccessDialog = (): void => {
-    deleteSuccessDialogVisible.value = false;
-    router.push(route).then(() => {
-      router.go(0);
-    });
-  };
+    // Filter out Zuordnungen with editable === false
+    const editableZuordnungen: Zuordnung[] | undefined = combinedZuordnungen?.filter(
+      (zuordnung: Zuordnung) => zuordnung.editable,
+    );
 
+    successDialogVisible.value = true;
+
+    if (!editableZuordnungen || editableZuordnungen.length === 0) {
+      // If no editable Zuordnungen are left, navigate to person table after the dialog is closed
+      closeDeleteSuccessDialog = (): void => {
+        successDialogVisible.value = false;
+        navigateToPersonTable();
+      };
+    } else {
+      closeDeleteSuccessDialog = (): void => {
+        successDialogVisible.value = false;
+        router.push(route).then(() => {
+          router.go(0);
+        });
+      };
+    }
+  };
   function getSskName(sskDstNr: string, sskName: string): string {
     /* truncate ssk name */
     const truncatededSskName: string = sskName.length > 30 ? `${sskName.substring(0, 30)}...` : sskName;
@@ -203,8 +240,9 @@
 
     return result;
   }
+
   const rollen: ComputedRef<RolleWithRollenart[] | undefined> = computed(() => {
-    return personenkontextStore.filteredRollen?.moeglicheRollen
+    return personenkontextStore.workflowStepResponse?.rollen
       .slice(0, 25)
       .map((rolle: RolleResponse) => ({
         value: rolle.id,
@@ -215,7 +253,7 @@
   });
 
   const organisationen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
-    return personenkontextStore.filteredOrganisationen?.moeglicheSsks
+    return personenkontextStore.workflowStepResponse?.organisations
       .slice(0, 25)
       .map((org: Organisation) => ({
         value: org.id,
@@ -394,59 +432,116 @@
   // The save button is always disabled if there is no pending creation nor deletion.
   const isSaveButtonDisabled: ComputedRef<boolean> = computed(() => !pendingCreation.value && !pendingDeletion.value);
 
-  // Watcher to detect when the Rolle is selected so the Organisationen show all the possible choices using that value.
+  // Watcher to detect when the Rolle is selected
   watch(selectedRolle, (newValue: string, oldValue: string) => {
-    // This checks if `selectedRolle` is cleared or set to a falsy value
-    if (!newValue) {
-      resetField('selectedOrganisation');
-      return;
-    }
-
-    if (newValue !== oldValue) {
+    if (newValue && newValue !== oldValue) {
       // Call fetch with an empty string to get the initial organizations for the selected role without any filter
-      personenkontextStore.getPersonenkontextAdministrationsebeneWithFilter(newValue, '', 25);
+      personenkontextStore
+        .processWorkflowStep({
+          organisationId: selectedOrganisation.value,
+          rolleId: newValue,
+          limit: 25,
+        })
+        .then(() => {
+          canCommit.value = personenkontextStore.workflowStepResponse?.canCommit ?? false; // Update canCommit from the response
+        });
     }
   });
 
-  // Watcher to detect when the Organisationsebene is selected so the Klasse show all the possible choices using that value.
+  // Watcher to detect when the Organisationsebene is selected so the Klasse shows all the possible choices using that value.
   watch(selectedOrganisation, (newValue: string, oldValue: string) => {
-    // This checks if `selectedOrganisation` is cleared or set to a falsy value
-    if (!newValue) {
-      resetField('selectedKlasse');
-      return;
-    }
-
-    if (newValue !== oldValue) {
+    if (newValue && newValue !== oldValue) {
+      // This is mainly to fetch the rollen after selecting the orga
+      personenkontextStore.processWorkflowStep({
+        organisationId: newValue,
+      });
       // Call fetch with an empty string to get the initial organizations for the selected role without any filter
       organisationStore.getKlassenByOrganisationId(newValue);
+    } else if (!newValue) {
+      resetField('selectedKlasse');
+      resetField('selectedRolle');
     }
+  });
+
+  // Computed property to get the title of the selected organisation
+  const selectedOrganisationTitle: ComputedRef<string | undefined> = computed(() => {
+    return organisationen.value?.find((org: TranslatedObject) => org.value === selectedOrganisation.value)?.title;
+  });
+
+  // Computed property to get the title of the selected role
+  const selectedRolleTitle: ComputedRef<string | undefined> = computed(() => {
+    return rollen.value?.find((role: TranslatedObject) => role.value === selectedRolle.value)?.title;
+  });
+
+  // Computed property to get the title of the selected class
+  const selectedKlasseTitle: ComputedRef<string | undefined> = computed(() => {
+    return klassen.value?.find((klasse: TranslatedObject) => klasse.value === selectedKlasse.value)?.title;
   });
 
   function updateOrganisationSearch(searchValue: string): void {
-    /* cancel pending call */
     clearTimeout(timerId);
-    /* delay new call 500ms */
-    timerId = setTimeout(() => {
-      personenkontextStore.getPersonenkontextAdministrationsebeneWithFilter(selectedRolle.value, searchValue, 25);
-    }, 500);
+
+    // If searchValue is empty and selectedOrganisation does not have a value, fetch data without getKlassenByOrganisationId
+    if (searchValue === '' && !selectedOrganisation.value) {
+      timerId = setTimeout(async () => {
+        await personenkontextStore.processWorkflowStep({
+          limit: 25,
+        });
+      }, 500);
+    } else if (searchValue && searchValue !== selectedOrganisationTitle.value) {
+      // If searchValue is not empty and different from the current title, proceed with the search
+      // (This stops an extra request being made once a value is selected)
+      timerId = setTimeout(async () => {
+        await personenkontextStore.processWorkflowStep({
+          organisationName: searchValue,
+          limit: 25,
+        });
+      }, 500);
+    }
   }
 
   function updateRollenSearch(searchValue: string): void {
-    /* cancel pending call */
     clearTimeout(timerId);
-    /* delay new call 500ms */
-    timerId = setTimeout(() => {
-      personenkontextStore.getPersonenkontextRolleWithFilter(searchValue, 25);
-    }, 500);
+    // If searchValue is empty, fetch all roles for the organisationId
+    if (searchValue === '' && !selectedOrganisation.value) {
+      timerId = setTimeout(() => {
+        personenkontextStore.processWorkflowStep({
+          organisationId: selectedOrganisation.value,
+          limit: 25,
+        });
+      }, 500);
+      // Else fetch the Rollen that correspond to the orgaId
+      // (This stops an extra request being made once a value is selected since we check if model !== searchValue)
+    } else if (searchValue && searchValue !== selectedRolleTitle.value) {
+      timerId = setTimeout(() => {
+        personenkontextStore.processWorkflowStep({
+          organisationId: selectedOrganisation.value,
+          rolleName: searchValue,
+          limit: 25,
+        });
+      }, 500);
+    }
+  }
+  function updateKlasseSearch(searchValue: string): void {
+    if (searchValue && searchValue !== selectedKlasseTitle.value) {
+      /* cancel pending call */
+      clearTimeout(timerId);
+      /* delay new call 500ms */
+      timerId = setTimeout(() => {
+        organisationStore.getKlassenByOrganisationId(selectedOrganisation.value, searchValue);
+      }, 500);
+    }
   }
 
-  function updateKlasseSearch(searchValue: string): void {
-    /* cancel pending call */
-    clearTimeout(timerId);
-    /* delay new call 500ms */
-    timerId = setTimeout(() => {
-      organisationStore.getKlassenByOrganisationId(selectedOrganisation.value, searchValue);
-    }, 500);
+  // Clear the selected Organisation once the input field is cleared (This is the only way to fetch all Orgas again)
+  // This is also important since we only want to fetch all orgas once the selected Orga is null, otherwise an extra request is made with an empty string
+  function clearSelectedOrganisation(): void {
+    resetField('selectedOrganisation');
+  }
+  // Clear the selected Rolle once the input field is cleared (This is the only way to fetch all Rollen again)
+  // This is also important since we only want to fetch all orgas once the selected Rolle is null, otherwise an extra request is made with an empty string
+  function clearSelectedRolle(): void {
+    resetField('selectedRolle');
   }
   watch(
     () => personenkontextStore.personenuebersicht,
@@ -740,13 +835,22 @@
                 </template>
                 <template v-else-if="pendingCreation && !pendingDeletion">
                   <span
-                 class="text-body my-3 ml-5"
-                       :class="{ 'text-green': newZuordnung && zuordnung.sskId === newZuordnung.sskId && zuordnung.rolleId === newZuordnung.rolleId }"
-      >
+                    class="text-body my-3 ml-5"
+                    :class="{
+                      'text-green':
+                        newZuordnung &&
+                        zuordnung.sskId === newZuordnung.sskId &&
+                        zuordnung.rolleId === newZuordnung.rolleId,
+                    }"
+                  >
                     {{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
                     {{ zuordnung.klasse }}
                     <span
-                      v-if="newZuordnung && zuordnung.sskId === newZuordnung.sskId && zuordnung.rolleId === newZuordnung.rolleId"
+                      v-if="
+                        newZuordnung &&
+                        zuordnung.sskId === newZuordnung.sskId &&
+                        zuordnung.rolleId === newZuordnung.rolleId
+                      "
                       class="text-body text-green"
                     >
                       ({{ $t('person.willBeCreated') }})</span
@@ -788,7 +892,7 @@
                     :errorCode="personStore.errorCode"
                     :person="personStore.currentPerson"
                     :disabled="selectedZuordnungen.length === 0"
-                    :zuordnungCount="zuordnungenResult?.length"
+                     :zuordnungCount="zuordnungenResult?.filter((zuordnung) => zuordnung.editable).length"
                     @onDeletePersonenkontext="prepareDeletion"
                   >
                   </PersonenkontextDelete>
@@ -904,37 +1008,9 @@
                   <h3 class="subtitle-1">{{ $t('person.addZuordnung') }}:</h3></v-col
                 >
               </v-row>
-              <!-- Rolle zuordnen -->
               <v-container class="px-lg-16">
-                <FormRow
-                  :errorLabel="selectedRolleProps['error']"
-                  labelForId="rolle-select"
-                  :isRequired="true"
-                  :label="$t('admin.rolle.rolle')"
-                >
-                  <v-autocomplete
-                    autocomplete="off"
-                    clearable
-                    data-testid="rolle-select"
-                    density="compact"
-                    id="rolle-select"
-                    ref="rolle-select"
-                    :items="rollen"
-                    item-value="value"
-                    item-text="title"
-                    :no-data-text="$t('noDataFound')"
-                    :placeholder="$t('admin.rolle.selectRolle')"
-                    required="true"
-                    @update:search="updateRollenSearch"
-                    variant="outlined"
-                    v-bind="selectedRolleProps"
-                    v-model="selectedRolle"
-                    v-model:search="searchInputRollen"
-                  ></v-autocomplete>
-                </FormRow>
                 <!-- Organisation zuordnen -->
                 <FormRow
-                  v-if="selectedRolle"
                   :errorLabel="selectedOrganisationProps['error']"
                   :isRequired="true"
                   labelForId="organisation-select"
@@ -943,6 +1019,7 @@
                   <v-autocomplete
                     autocomplete="off"
                     clearable
+                    @clear="clearSelectedOrganisation"
                     data-testid="organisation-select"
                     density="compact"
                     id="organisation-select"
@@ -959,32 +1036,61 @@
                     v-model="selectedOrganisation"
                   ></v-autocomplete>
                 </FormRow>
-                <!-- Klasse zuordnen -->
-                <FormRow
-                  v-if="isLernRolle(selectedRolle) && selectedOrganisation"
-                  :errorLabel="selectedKlasseProps['error']"
-                  :isRequired="true"
-                  labelForId="klasse-select"
-                  :label="$t('admin.klasse.klasse')"
-                >
-                  <v-autocomplete
-                    autocomplete="off"
-                    clearable
-                    data-testid="klasse-select"
-                    density="compact"
-                    id="klasse-select"
-                    ref="klasse-select"
-                    :items="klassen"
-                    item-value="value"
-                    item-text="title"
-                    :no-data-text="$t('noDataFound')"
-                    :placeholder="$t('admin.klasse.selectKlasse')"
-                    @update:search="updateKlasseSearch"
-                    variant="outlined"
-                    v-bind="selectedKlasseProps"
-                    v-model="selectedKlasse"
-                  ></v-autocomplete>
-                </FormRow>
+                <div v-if="selectedOrganisation">
+                  <!-- Rollenzuordnung -->
+                  <FormRow
+                    :errorLabel="selectedRolleProps['error']"
+                    labelForId="rolle-select"
+                    :isRequired="true"
+                    :label="$t('admin.rolle.rolle')"
+                  >
+                    <v-autocomplete
+                      autocomplete="off"
+                      clearable
+                      @clear="clearSelectedRolle"
+                      data-testid="rolle-select"
+                      density="compact"
+                      id="rolle-select"
+                      ref="rolle-select"
+                      :items="rollen"
+                      item-value="value"
+                      item-text="title"
+                      :no-data-text="$t('noDataFound')"
+                      :placeholder="$t('admin.rolle.selectRolle')"
+                      required="true"
+                      @update:search="updateRollenSearch"
+                      variant="outlined"
+                      v-bind="selectedRolleProps"
+                      v-model="selectedRolle"
+                    ></v-autocomplete>
+                  </FormRow>
+                  <!-- Klasse zuordnen -->
+                  <FormRow
+                    v-if="isLernRolle(selectedRolle) && selectedOrganisation"
+                    :errorLabel="selectedKlasseProps['error']"
+                    :isRequired="true"
+                    labelForId="klasse-select"
+                    :label="$t('admin.klasse.klasse')"
+                  >
+                    <v-autocomplete
+                      autocomplete="off"
+                      clearable
+                      data-testid="klasse-select"
+                      density="compact"
+                      id="klasse-select"
+                      ref="klasse-select"
+                      :items="klassen"
+                      item-value="value"
+                      item-text="title"
+                      :no-data-text="$t('noDataFound')"
+                      :placeholder="$t('admin.klasse.selectKlasse')"
+                      @update:search="updateKlasseSearch"
+                      variant="outlined"
+                      v-bind="selectedKlasseProps"
+                      v-model="selectedKlasse"
+                    ></v-autocomplete>
+                  </FormRow>
+                </div>
               </v-container>
               <v-row class="py-3 px-2 justify-center">
                 <v-spacer class="hidden-sm-and-down"></v-spacer>
@@ -1008,6 +1114,7 @@
                 >
                   <v-btn
                     :block="mdAndDown"
+                    :disabled="!canCommit"
                     class="primary"
                     data-testid="zuordnung-creation-submit-button"
                     type="submit"
@@ -1085,7 +1192,7 @@
               <v-btn
                 :block="mdAndDown"
                 class="primary"
-                @click.stop="closeSuccessDialog"
+                @click.stop="closeDeleteSuccessDialog"
               >
                 {{ $t('close') }}
               </v-btn>
@@ -1126,7 +1233,7 @@
               <v-btn
                 :block="mdAndDown"
                 class="primary"
-                @click.stop="closeSuccessDialog"
+                @click.stop="closeCreateSuccessDialog"
               >
                 {{ $t('close') }}
               </v-btn>
@@ -1135,6 +1242,47 @@
         </v-card-actions>
       </LayoutCard>
     </v-dialog>
+     <!-- Dialog to inform the user that he can't delete his own Zuordnungen -->
+     <v-dialog
+  v-model="cannotDeleteDialogVisible"
+  persistent
+  max-width="600px"
+>
+  <LayoutCard
+    :closable="true"
+    :header="$t('person.editZuordnungen')"
+  >
+    <v-card-text>
+      <v-container>
+        <v-row class="text-body bold px-md-16">
+          <v-col
+            offset="1"
+            cols="10"
+          >
+            <span>{{ $t('person.cannotDeleteOwnZuordnung') }}</span>
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-card-text>
+    <v-card-actions class="justify-center">
+      <v-row class="justify-center">
+        <v-col
+          cols="12"
+          sm="6"
+          md="4"
+        >
+          <v-btn
+            :block="mdAndDown"
+            class="primary"
+            @click.stop="closeCannotDeleteDialog"
+          >
+            {{ $t('close') }}
+          </v-btn>
+        </v-col>
+      </v-row>
+    </v-card-actions>
+  </LayoutCard>
+</v-dialog>
   </div>
 </template>
 
