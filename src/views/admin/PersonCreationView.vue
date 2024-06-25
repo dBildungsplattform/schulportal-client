@@ -154,6 +154,8 @@
   // Watcher to detect when the Organisationsebene is selected so the Klasse shows all the possible choices using that value.
   watch(selectedOrganisation, (newValue: string, oldValue: string) => {
     if (newValue && newValue !== oldValue) {
+      resetField('selectedKlasse');
+      resetField('selectedRolle');
       // This is mainly to fetch the rollen after selecting the orga
       personenkontextStore.processWorkflowStep({
         organisationId: newValue,
