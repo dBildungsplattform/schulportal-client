@@ -299,8 +299,18 @@
   });
 
   function updateOrganisationSearch(searchValue: string): void {
-    if (searchValue && searchValue !== selectedOrganisationTitle.value) {
-      clearTimeout(timerId);
+    clearTimeout(timerId);
+
+    // If searchValue is empty and selectedOrganisation does not have a value, fetch data without getKlassenByOrganisationId
+    if (searchValue === '' && !selectedOrganisation.value) {
+      timerId = setTimeout(async () => {
+        await personenkontextStore.processWorkflowStep({
+          limit: 25,
+        });
+      }, 500);
+    } else if (searchValue && searchValue !== selectedOrganisationTitle.value) {
+      // If searchValue is not empty and different from the current title, proceed with the search 
+      // (This stops an extra request being made once a value is selected)
       timerId = setTimeout(async () => {
         await personenkontextStore.processWorkflowStep({
           organisationName: searchValue,
@@ -312,16 +322,16 @@
 
   function updateRollenSearch(searchValue: string): void {
     clearTimeout(timerId);
-
     // If searchValue is empty, fetch all roles for the organisationId
-    // (When clicking inside the input field, the searchValue is always an empty string apparently so an extra request is always made)
-    if (searchValue === '') {
+    if (searchValue === '' && !selectedOrganisation.value) {
       timerId = setTimeout(() => {
         personenkontextStore.processWorkflowStep({
           organisationId: selectedOrganisation.value,
           limit: 25,
         });
       }, 500);
+      // Else fetch the Rollen that correspond to the orgaId
+      // (This stops an extra request being made once a value is selected since we check if model !== searchValue)
     } else if (searchValue && searchValue !== selectedRolleTitle.value) {
       timerId = setTimeout(() => {
         personenkontextStore.processWorkflowStep({
@@ -341,6 +351,17 @@
         organisationStore.getKlassenByOrganisationId(selectedOrganisation.value, searchValue);
       }, 500);
     }
+  }
+
+  // Clear the selected Organisation once the input field is cleared (This is the only way to fetch all Orgas again)
+  // This is also important since we only want to fetch all orgas once the selected Orga is null, otherwise an extra request is made with an empty string
+  function clearSelectedOrganisation(): void {
+    resetField('selectedOrganisation');
+  }
+  // Clear the selected Rolle once the input field is cleared (This is the only way to fetch all Rollen again)
+  // This is also important since we only want to fetch all orgas once the selected Rolle is null, otherwise an extra request is made with an empty string
+  function clearSelectedRolle(): void {
+    resetField('selectedRolle');
   }
 
   onMounted(async () => {
@@ -403,6 +424,7 @@
           <v-autocomplete
             autocomplete="off"
             clearable
+            @clear="clearSelectedOrganisation"
             data-testid="organisation-select"
             density="compact"
             id="organisation-select"
@@ -434,6 +456,7 @@
             <v-autocomplete
               autocomplete="off"
               clearable
+              @clear="clearSelectedRolle"
               data-testid="rolle-select"
               density="compact"
               id="rolle-select"
