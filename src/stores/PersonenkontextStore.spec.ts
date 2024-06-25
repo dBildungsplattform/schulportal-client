@@ -321,7 +321,7 @@ describe('PersonenkontextStore', () => {
         total: 0,
       };
 
-      mockadapter.onGet('/api/personenkontext/rollen?rolleName=str&limit=2').replyOnce(200, mockResponse);
+      mockadapter.onGet('/api/personenkontext-workflow/rollen?rolleName=str&limit=2').replyOnce(200, mockResponse);
       const getPersonenkontextRolleWithFilterPromise: Promise<void> =
         personenkontextStore.getPersonenkontextRolleWithFilter('str', 2);
       expect(personenkontextStore.loading).toBe(true);
@@ -331,7 +331,7 @@ describe('PersonenkontextStore', () => {
     });
 
     it('should handle string error', async () => {
-      mockadapter.onGet('/api/personenkontext/rollen?rolleName=str&limit=2').replyOnce(500, 'some mock server error');
+      mockadapter.onGet('/api/personenkontext-workflow/rollen?rolleName=str&limit=2').replyOnce(500, 'some mock server error');
       const getPersonenkontextRolleWithFilterPromise: Promise<void> =
         personenkontextStore.getPersonenkontextRolleWithFilter('str', 2);
       expect(personenkontextStore.loading).toBe(true);
@@ -342,7 +342,7 @@ describe('PersonenkontextStore', () => {
 
     it('should handle error code', async () => {
       mockadapter
-        .onGet('/api/personenkontext/rollen?rolleName=str&limit=2')
+        .onGet('/api/personenkontext-workflow/rollen?rolleName=str&limit=2')
         .replyOnce(500, { code: 'some mock server error' });
       const getPersonenkontextRolleWithFilterPromise: Promise<void> =
         personenkontextStore.getPersonenkontextRolleWithFilter('str', 2);
@@ -370,7 +370,7 @@ describe('PersonenkontextStore', () => {
         total: 0,
       };
       mockadapter
-        .onGet('/api/personenkontext/schulstrukturknoten?rolleId=1&sskName=Org&limit=2')
+        .onGet('/api/personenkontext-workflow/schulstrukturknoten?rolleId=1&sskName=Org&limit=2')
         .replyOnce(200, mockResponse);
       const getPersonenkontextAdministrationsebeneWithFilterPromise: Promise<void> =
         personenkontextStore.getPersonenkontextAdministrationsebeneWithFilter('1', 'Org', 2);
@@ -382,7 +382,7 @@ describe('PersonenkontextStore', () => {
 
     it('should handle string error', async () => {
       mockadapter
-        .onGet('/api/personenkontext/schulstrukturknoten?rolleId=1&sskName=Org&limit=2')
+        .onGet('/api/personenkontext-workflow/schulstrukturknoten?rolleId=1&sskName=Org&limit=2')
         .replyOnce(500, 'some mock server error');
       const getPersonenkontextAdministrationsebeneWithFilterPromise: Promise<void> =
         personenkontextStore.getPersonenkontextAdministrationsebeneWithFilter('1', 'Org', 2);
@@ -394,7 +394,7 @@ describe('PersonenkontextStore', () => {
 
     it('should handle error code', async () => {
       mockadapter
-        .onGet('/api/personenkontext/schulstrukturknoten?rolleId=1&sskName=Org&limit=2')
+        .onGet('/api/personenkontext-workflow/schulstrukturknoten?rolleId=1&sskName=Org&limit=2')
         .replyOnce(500, { code: 'some mock server error' });
       const getPersonenkontextAdministrationsebeneWithFilterPromise: Promise<void> =
         personenkontextStore.getPersonenkontextAdministrationsebeneWithFilter('1', 'Org', 2);
