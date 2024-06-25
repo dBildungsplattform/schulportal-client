@@ -16,6 +16,8 @@ import { rejects } from 'assert';
 import {
   PersonenKontextTyp,
   usePersonenkontextStore,
+  type DbiamUpdatePersonenkontexteBodyParams,
+  type PersonenkontexteUpdateResponse,
   type PersonenkontextStore,
   type PersonenkontextWorkflowResponse,
 } from './PersonenkontextStore';
@@ -190,6 +192,84 @@ describe('PersonenkontextStore', () => {
     });
   });
 
+  describe('updatePersonenkontexte', () => {
+    it('should update Personenkontexte', async () => {
+      const mockResponse: PersonenkontexteUpdateResponse = {
+        dBiamPersonenkontextResponses: [
+          {
+            personId: '1',
+            organisationId: '67890',
+            rolleId: '54321',
+          } as DBiamPersonenkontextResponse,
+        ],
+      };
+
+      const updateParams: DbiamUpdatePersonenkontexteBodyParams = {
+        lastModified: '2024-06-24T16:35:32.711Z',
+        count: 1,
+        personenkontexte: [
+          {
+            personId: '12345',
+            organisationId: '67890',
+            rolleId: '54321',
+          },
+        ],
+      };
+
+      mockadapter.onPut('/api/personenkontext-workflow/1').replyOnce(200, mockResponse);
+
+      const updatePersonenkontextePromise: Promise<PersonenkontexteUpdateResponse> =
+        personenkontextStore.updatePersonenkontexte(updateParams, '1');
+      expect(personenkontextStore.loading).toBe(true);
+      const response: PersonenkontexteUpdateResponse = await updatePersonenkontextePromise;
+      expect(response).toEqual(mockResponse);
+      expect(personenkontextStore.loading).toBe(false);
+    });
+
+    it('should handle string error', async () => {
+      const updateParams: DbiamUpdatePersonenkontexteBodyParams = {
+        lastModified: '2024-06-24T16:35:32.711Z',
+        count: 1,
+        personenkontexte: [
+          {
+            personId: '1',
+            organisationId: '67890',
+            rolleId: '54321',
+          },
+        ],
+      };
+
+      mockadapter.onPut('/api/personenkontext-workflow/1').replyOnce(500, 'some error');
+      const updatePersonenkontextePromise: Promise<PersonenkontexteUpdateResponse> =
+        personenkontextStore.updatePersonenkontexte(updateParams, '1');
+      expect(personenkontextStore.loading).toBe(true);
+      await rejects(updatePersonenkontextePromise);
+      expect(personenkontextStore.errorCode).toEqual('PERSONENKONTEXTE_UPDATE_ERROR');
+      expect(personenkontextStore.loading).toBe(false);
+    });
+
+    it('should handle error code', async () => {
+      const updateParams: DbiamUpdatePersonenkontexteBodyParams = {
+        lastModified: '2024-06-24T16:35:32.711Z',
+        count: 1,
+        personenkontexte: [
+          {
+            personId: '1',
+            organisationId: '67890',
+            rolleId: '54321',
+          },
+        ],
+      };
+
+      mockadapter.onPut('/api/personenkontext-workflow/1').replyOnce(500, { i18nKey: 'SOME_MOCK_SERVER_ERROR' });
+      const updatePersonenkontextePromise: Promise<PersonenkontexteUpdateResponse> =
+        personenkontextStore.updatePersonenkontexte(updateParams, '1');
+      expect(personenkontextStore.loading).toBe(true);
+      await rejects(updatePersonenkontextePromise);
+      expect(personenkontextStore.errorCode).toEqual('SOME_MOCK_SERVER_ERROR');
+      expect(personenkontextStore.loading).toBe(false);
+    });
+  });
   describe('createPersonenkontextForSchule', () => {
     it('should create a Personenkontext for the Schule', async () => {
       const mockPersonenkontext: DBiamPersonenkontextResponse = {

@@ -116,6 +116,7 @@ export type {
   DbiamUpdatePersonenkontexteBodyParams,
   DbiamPersonenkontextBodyParams,
   PersonenkontextWorkflowResponse,
+  PersonenkontexteUpdateResponse,
 };
 export type CreatedPersonenkontext = DbiamPersonenkontextBodyParams;
 export type UserinfoPersonenkontext = {
