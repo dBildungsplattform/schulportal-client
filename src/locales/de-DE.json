@@ -294,6 +294,7 @@
   "person": {
     "addZuordnung": "Schulzuordnung hinzufügen",
     "addZuordnungNotAllowed": "Diese Aktion ist nach Auswahl einer Schulzuordnung nicht ausführbar.",
+    "cannotDeleteOwnZuordnung": "Sie dürfen sich selbst keine Zuordnungen entziehen.",
     "checkAndSave": "Bitte prüfen und abschließend speichern, um die Aktion auszuführen",
     "changeRolle": "Rolle ändern",
     "changeRolleDescription": "Ändert die Rolle des Benutzers an der Schule ohne ihn zu entfernen.",

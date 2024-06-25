@@ -7,19 +7,47 @@ const router: Router = createRouter({
   routes,
 });
 
-router.beforeEach(async (to: RouteLocationNormalized /*, from */) => {
-  const auth: AuthStore = useAuthStore();
+router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormalized) => {
+  const authStore: AuthStore = useAuthStore();
 
-  await auth.initializeAuthStatus();
+  await authStore.initializeAuthStatus();
 
   // Redirect authenticated users trying to access the login page to the start page
-  if (to.path === '/' && auth.isAuthed) {
+  if (to.path === '/' && authStore.isAuthed) {
     return { path: '/start' };
   }
 
-  if (to.meta['requiresAuth'] && !auth.isAuthed) {
+  if (to.meta['requiresAuth'] && !authStore.isAuthed) {
     window.location.href = `/api/auth/login?redirectUrl=${to.fullPath}`;
     return false;
+  }
+
+  if (to.meta['requiresPermission']) {
+    /* check if the user has person management permissions */
+    switch (to.meta['requiresPermission']) {
+      case 'personenverwaltung':
+        if (authStore.hasPersonenverwaltungPermission) {
+          return true;
+        }
+        return { path: 'not-found' };
+      case 'klassenverwaltung':
+        if (authStore.hasKlassenverwaltungPermission) {
+          return true;
+        }
+        return { path: 'not-found' };
+      case 'rollenverwaltung':
+        if (authStore.hasRollenverwaltungPermission) {
+          return true;
+        }
+        return { path: 'not-found' };
+      case 'schulverwaltung':
+        if (authStore.hasSchulverwaltungPermission) {
+          return true;
+        }
+        return { path: 'not-found' };
+      default:
+        return { path: 'not-found' };
+    }
   }
 
   return true;

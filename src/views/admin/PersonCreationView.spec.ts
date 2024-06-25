@@ -7,8 +7,8 @@ import MockAdapter from 'axios-mock-adapter';
 import ApiService from '@/services/ApiService';
 import { nextTick } from 'vue';
 import type {
+  DBiamPersonResponse,
   DBiamPersonenkontextResponse,
-  PersonendatensatzResponse,
   RollenMerkmal,
   RollenSystemRecht,
 } from '@/api-client/generated';
@@ -212,7 +212,7 @@ describe('PersonCreationView', () => {
     await nextTick();
 
 
-    const mockPerson: PersonendatensatzResponse = {
+    const mockPerson: DBiamPersonResponse = {
       person: {
         id: '9876',
         name: {
@@ -220,10 +220,24 @@ describe('PersonCreationView', () => {
           vorname: 'Randy',
         },
         referrer: 'rcena',
+        mandant: '',
+        geburt: null,
+        stammorganisation: null,
+        geschlecht: null,
+        lokalisierung: null,
+        vertrauensstufe: 'KEIN',
+        revision: '',
+        startpasswort: '',
+        personalnummer: null,
       },
-    } as PersonendatensatzResponse;
+      DBiamPersonenkontextResponse: {
+        organisationId: '12345',
+        rolleId: '54321',
+        personId: '9876',
+      },
+    };
 
-    personStore.createdPerson = mockPerson;
+    personStore.createdPersonWithKontext = mockPerson;
 
     wrapper?.find('[data-testid="person-creation-form-create-button"]').trigger('click');
     await nextTick();

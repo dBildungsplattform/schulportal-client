@@ -1,8 +1,7 @@
-import { expect, test } from 'vitest';
+import { expect, test, type MockInstance } from 'vitest';
 import { VueWrapper, mount } from '@vue/test-utils';
 import SchuleCreationView from './SchuleCreationView.vue';
-import { setActivePinia, createPinia } from 'pinia';
-import { createRouter, createWebHistory, type Router } from 'vue-router';
+import { createRouter, createWebHistory, type NavigationFailure, type RouteLocationRaw, type Router } from 'vue-router';
 import routes from '@/router/routes';
 import { nextTick } from 'vue';
 import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
@@ -13,7 +12,6 @@ let router: Router;
 let organisationStore: OrganisationStore;
 
 beforeEach(async () => {
-  setActivePinia(createPinia());
   document.body.innerHTML = `
     <div>
       <div id="app"></div>
@@ -36,6 +34,11 @@ beforeEach(async () => {
       components: {
         SchuleCreationView,
       },
+      mocks: {
+        route: {
+          fullPath: 'full/path',
+        },
+      },
       plugins: [router],
     },
   });
@@ -52,6 +55,15 @@ describe('SchuleCreationView', () => {
     expect(wrapper?.getComponent({ name: 'SpshAlert' })).toBeTruthy();
     expect(wrapper?.getComponent({ name: 'FormWrapper' })).toBeTruthy();
     expect(wrapper?.getComponent({ name: 'FormRow' })).toBeTruthy();
+  });
+
+  test('it navigates back to schulen table', async () => {
+    const push: MockInstance<[to: RouteLocationRaw], Promise<void | NavigationFailure | undefined>> = vi.spyOn(
+      router,
+      'push',
+    );
+    await wrapper?.find('[data-testid="close-layout-card-button"]').trigger('click');
+    expect(push).toHaveBeenCalledTimes(1);
   });
 
   test('it fills form and triggers submit', async () => {
@@ -79,5 +91,19 @@ describe('SchuleCreationView', () => {
 
     wrapper?.find('[data-testid="schule-creation-form-create-button"]').trigger('click');
     await nextTick();
+
+    expect(wrapper?.find('[data-testid="create-another-schule-button"]').isVisible()).toBe(true);
+
+    wrapper?.find('[data-testid="create-another-schule-button"]').trigger('click');
+    await nextTick();
+
+    expect(organisationStore.createdSchule).toBe(null);
+  });
+
+  test('it shows error message', async () => {
+    organisationStore.errorCode = 'NAME_REQUIRED_FOR_SCHULE';
+    await nextTick();
+
+    expect(wrapper?.find('[data-testid="alert-title"]').isVisible()).toBe(true);
   });
 });

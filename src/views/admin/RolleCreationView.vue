@@ -267,11 +267,13 @@
     });
 
     Object.values(RollenSystemRecht).forEach((enumValue: RollenSystemRecht) => {
-      const i18nPath: string = `admin.rolle.mappingFrontBackEnd.systemrechte.${enumValue}`;
-      translatedSystemrechte.value.push({
-        value: enumValue,
-        title: t(i18nPath),
-      });
+      if (enumValue !== RollenSystemRecht.MigrationDurchfuehren) {
+        const i18nPath: string = `admin.rolle.mappingFrontBackEnd.systemrechte.${enumValue}`;
+        translatedSystemrechte.value.push({
+          value: enumValue,
+          title: t(i18nPath),
+        });
+      }
     });
 
     /* listen for browser changes and prevent them when form is dirty */
@@ -328,7 +330,7 @@
         :title="t('admin.rolle.rolleCreateErrorTitle')"
         :type="'error'"
         :closable="false"
-        :text="$t(`admin.rolle.errors.${rolleStore.errorCode}`)"
+        :text="rolleStore.errorCode ? $t(`admin.rolle.errors.${rolleStore.errorCode}`) : ''"
         :showButton="true"
         :buttonText="$t('admin.rolle.backToCreateRolle')"
         :buttonAction="navigateBackToRolleForm"

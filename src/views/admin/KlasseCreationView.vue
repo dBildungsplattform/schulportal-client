@@ -95,10 +95,10 @@
   // Watcher to detect when the search input for Organisationen is triggered.
   watch(searchInputSchule, async (newValue: string, _oldValue: string) => {
     if (newValue.length >= 3) {
-      organisationStore.getAllOrganisationen({ searchString: newValue });
+      organisationStore.getAllOrganisationen({ searchString: newValue, systemrechte: ['KLASSEN_VERWALTEN'] });
     } else {
       // If newValue has less than 3 characters, use an empty string instead of newValue to show all organisationen under the selectedRolle.
-      organisationStore.getAllOrganisationen();
+      organisationStore.getAllOrganisationen({ systemrechte: ['KLASSEN_VERWALTEN'] });
     }
   });
 
@@ -160,7 +160,7 @@
   });
 
   onMounted(async () => {
-    organisationStore.getAllOrganisationen();
+    organisationStore.getAllOrganisationen({ systemrechte: ['KLASSEN_VERWALTEN'] });
     /* listen for browser changes and prevent them when form is dirty */
     window.addEventListener('beforeunload', preventNavigation);
   });
@@ -185,7 +185,7 @@
         :title="$t('admin.klasse.klasseCreateErrorTitle')"
         :type="'error'"
         :closable="false"
-        :text="$t(`admin.klasse.errors.${organisationStore.errorCode}`)"
+        :text="organisationStore.errorCode ? $t(`admin.klasse.errors.${organisationStore.errorCode}`) : ''"
         :showButton="true"
         :buttonText="$t('admin.klasse.backToCreateKlasse')"
         :buttonAction="navigateBackToKlasseForm"
