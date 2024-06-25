@@ -2713,6 +2713,77 @@
                         "bearer": []
                     }
                 ]
+            },
+            "put": {
+                "operationId": "DBiamPersonenkontextController_updatePersonenkontexte",
+                "parameters": [
+                    {
+                        "name": "personId",
+                        "required": true,
+                        "in": "path",
+                        "description": "The ID for the person.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DbiamUpdatePersonenkontexteBodyParams"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Add or remove personenkontexte as one operation. Returns the Personenkontexte existing after update.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PersonenkontexteUpdateResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "The personenkontexte could not be updated, may due to unsatisfied specifications.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DbiamPersonenkontexteUpdateError"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Not authorized to update personenkontexte."
+                    },
+                    "403": {
+                        "description": "Insufficient permission to update personenkontexte."
+                    },
+                    "409": {
+                        "description": "Changes are conflicting with current state of personenkontexte."
+                    },
+                    "500": {
+                        "description": "Internal server error while updating personenkontexte."
+                    }
+                },
+                "tags": [
+                    "dbiam-personenkontexte"
+                ],
+                "security": [
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
+                    {
+                        "bearer": []
+                    }
+                ]
             }
         },
         "/api/dbiam/personenkontext": {
@@ -2775,7 +2846,7 @@
                 ]
             }
         },
-        "/api/personenkontext/step": {
+        "/api/personenkontext-workflow/step": {
             "get": {
                 "operationId": "DbiamPersonenkontextWorkflowController_processStep",
                 "parameters": [
@@ -2832,7 +2903,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Initialize or process data from the person creation form.",
+                        "description": "Initialize or process data from the person creation form. \n                      Valid combinations:\n                      - Both organisationId and rolleId are undefined: Fetch all possible organisations.\n                      - organisationId is provided, but rolleId is undefined: Fetch Rollen for the given organisation.\n                      - Both organisationId and rolleId are provided: Check if the Rolle can be committed for the organisation.\n                      Note: Providing rolleId without organisationId is invalid.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2866,7 +2937,7 @@
                 ]
             }
         },
-        "/api/personenkontext/{personId}": {
+        "/api/personenkontext-workflow/{personId}": {
             "put": {
                 "operationId": "DbiamPersonenkontextWorkflowController_commit",
                 "parameters": [
@@ -2939,7 +3010,7 @@
                 ]
             }
         },
-        "/api/personenkontext/rollen": {
+        "/api/personenkontext-workflow/rollen": {
             "get": {
                 "operationId": "DbiamPersonenkontextWorkflowController_findRollen",
                 "parameters": [
@@ -3000,7 +3071,7 @@
                 ]
             }
         },
-        "/api/personenkontext/schulstrukturknoten": {
+        "/api/personenkontext-workflow/schulstrukturknoten": {
             "get": {
                 "operationId": "DbiamPersonenkontextWorkflowController_findSchulstrukturknoten",
                 "parameters": [
@@ -4653,46 +4724,6 @@
                     "rolleId"
                 ]
             },
-            "PersonenkontextWorkflowResponse": {
-                "type": "object",
-                "properties": {
-                    "organisations": {
-                        "description": "List of available organisations.",
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/OrganisationResponseLegacy"
-                        }
-                    },
-                    "rollen": {
-                        "description": "List of available roles.",
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/RolleResponse"
-                        }
-                    },
-                    "selectedOrganisation": {
-                        "type": "string",
-                        "description": "Selected organisation.",
-                        "nullable": true
-                    },
-                    "selectedRolle": {
-                        "type": "string",
-                        "description": "Selected rolle.",
-                        "nullable": true
-                    },
-                    "canCommit": {
-                        "type": "boolean",
-                        "description": "Indicates whether the commit action can be performed."
-                    }
-                },
-                "required": [
-                    "organisations",
-                    "rollen",
-                    "selectedOrganisation",
-                    "selectedRolle",
-                    "canCommit"
-                ]
-            },
             "DbiamUpdatePersonenkontexteBodyParams": {
                 "type": "object",
                 "properties": {
@@ -4756,6 +4787,46 @@
                 "required": [
                     "i18nKey",
                     "code"
+                ]
+            },
+            "PersonenkontextWorkflowResponse": {
+                "type": "object",
+                "properties": {
+                    "organisations": {
+                        "description": "List of available organisations.",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/OrganisationResponseLegacy"
+                        }
+                    },
+                    "rollen": {
+                        "description": "List of available roles.",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/RolleResponse"
+                        }
+                    },
+                    "selectedOrganisation": {
+                        "type": "string",
+                        "description": "Selected organisation.",
+                        "nullable": true
+                    },
+                    "selectedRolle": {
+                        "type": "string",
+                        "description": "Selected rolle.",
+                        "nullable": true
+                    },
+                    "canCommit": {
+                        "type": "boolean",
+                        "description": "Indicates whether the commit action can be performed."
+                    }
+                },
+                "required": [
+                    "organisations",
+                    "rollen",
+                    "selectedOrganisation",
+                    "selectedRolle",
+                    "canCommit"
                 ]
             },
             "FindRollenResponse": {
