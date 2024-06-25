@@ -339,6 +339,7 @@
       <!-- The form to create a new Rolle -->
       <template v-if="!rolleStore.createdRolle && !rolleStore.errorCode">
         <FormWrapper
+          :canCommit="true"
           :confirmUnsavedChangesAction="handleConfirmUnsavedChanges"
           :createButtonLabel="$t('admin.rolle.create')"
           :discardButtonLabel="$t('admin.rolle.discard')"

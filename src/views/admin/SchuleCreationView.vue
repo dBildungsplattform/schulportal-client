@@ -165,6 +165,7 @@
       <!-- The form to create a new school (No created school yet and no errorCode) -->
       <template v-if="!organisationStore.createdSchule && !organisationStore.errorCode">
         <FormWrapper
+          :canCommit="true"
           :confirmUnsavedChangesAction="handleConfirmUnsavedChanges"
           :createButtonLabel="$t('admin.schule.create')"
           :discardButtonLabel="$t('admin.schule.discard')"
