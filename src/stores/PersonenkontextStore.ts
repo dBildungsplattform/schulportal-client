@@ -96,7 +96,7 @@ type PersonenkontextState = {
 type PersonenkontextGetters = {};
 type PersonenkontextActions = {
   hasSystemrecht: (personId: string, systemrecht: 'ROLLEN_VERWALTEN') => Promise<SystemrechtResponse>;
-  processWorkflowStep: (filter?: WorkflowFilter) => Promise<void>;
+  processWorkflowStep: (filter?: WorkflowFilter) => Promise<PersonenkontextWorkflowResponse>;
   getPersonenkontextRolleWithFilter: (rolleName: string, limit: number) => Promise<void>;
   getPersonenkontextAdministrationsebeneWithFilter: (rolleId: string, sskName: string, limit: number) => Promise<void>;
   updatePersonenkontexte: (
@@ -166,7 +166,7 @@ export const usePersonenkontextStore: StoreDefinition<
       }
     },
 
-    async processWorkflowStep(filter?: WorkflowFilter) {
+    async processWorkflowStep(filter?: WorkflowFilter): Promise<PersonenkontextWorkflowResponse> {
       this.loading = true;
       try {
         const { data }: { data: PersonenkontextWorkflowResponse } =
@@ -178,6 +178,7 @@ export const usePersonenkontextStore: StoreDefinition<
             filter?.limit,
           );
         this.workflowStepResponse = data;
+        return data;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
