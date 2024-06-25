@@ -54,11 +54,15 @@
 
   const isEditActive: Ref<boolean> = ref(false);
   const isZuordnungFormActive: Ref<boolean> = ref(false);
+
   const pendingDeletion: Ref<boolean> = ref(false);
-  const cannotDeleteDialogVisible: Ref<boolean> = ref(false);
   const pendingCreation: Ref<boolean> = ref(false);
+
   const deleteSuccessDialogVisible: Ref<boolean> = ref(false);
   const createSuccessDialogVisible: Ref<boolean> = ref(false);
+  const cannotDeleteDialogVisible: Ref<boolean> = ref(false);
+  const createZuordnungConfirmationDialogVisible: Ref<boolean> = ref(false);
+  const createZuordnungConfirmationDialogMessage: Ref<string> = ref('');
 
   let timerId: ReturnType<typeof setTimeout>;
 
@@ -335,52 +339,6 @@
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedKlasse', vuetifyConfig);
 
-  const onSubmit: (e?: Event | undefined) => Promise<void | undefined> = handleSubmit(() => {
-    const organisation: Organisation | undefined = personenkontextStore.workflowStepResponse?.organisations.find(
-      (orga: Organisation) => orga.id === selectedOrganisation.value,
-    );
-    const klasse: Organisation | undefined = organisationStore.klassen.find(
-      (k: Organisation) => k.id === selectedKlasse.value,
-    );
-    // If the added Zuordnung through the form also contains a Klasse then send 2 Backend Requests since it's actually 2 separate Zuordnungen.
-    // But in the UI only show 1 row that contains the whole thing (Schule + Klasse).
-    if (organisation) {
-      newZuordnung.value = {
-        sskId: organisation.id,
-        rolleId: selectedRolle.value,
-        klasse: klasse?.name,
-        sskDstNr: organisation.kennung ?? '',
-        sskName: organisation.name,
-        rolle: rollen.value?.find((rolle: RolleWithRollenart) => rolle.value === selectedRolle.value)?.title || '',
-        administriertVon: organisation.administriertVon ?? '',
-        editable: true,
-        typ: OrganisationsTyp.Schule,
-      };
-      if (zuordnungenResult.value) {
-        finalZuordnungen.value = zuordnungenResult.value;
-        finalZuordnungen.value.push(newZuordnung.value);
-      }
-      if (klasse) {
-        finalZuordnungen.value.push({
-          sskId: klasse.id,
-          rolleId: selectedRolle.value,
-          sskDstNr: klasse.kennung ?? '',
-          sskName: klasse.name,
-          rolle: rollen.value?.find((rolle: RolleWithRollenart) => rolle.value === selectedRolle.value)?.title || '',
-          administriertVon: klasse.administriertVon ?? '',
-          editable: true,
-          typ: OrganisationsTyp.Klasse,
-        });
-      }
-    }
-    // Filter out Zuordnungen of type Klasse from zuordnungenResult so they aren't shown in the UI
-    // (They are included in the finalZuordnung though so they are sent to the Backend)
-    zuordnungenResult.value = zuordnungenResult.value?.filter(
-      (zuordnung: Zuordnung) => zuordnung.typ !== OrganisationsTyp.Klasse,
-    );
-    prepareCreation();
-  });
-
   // Triggers the template to start editing
   const triggerEdit = (): void => {
     isEditActive.value = true;
@@ -487,6 +445,62 @@
   const selectedKlasseTitle: ComputedRef<string | undefined> = computed(() => {
     return klassen.value?.find((klasse: TranslatedObject) => klasse.value === selectedKlasse.value)?.title;
   });
+
+  const onSubmit: (e?: Event | undefined) => Promise<void | undefined> = handleSubmit(() => {
+    if (isLernRolle(selectedRolle.value)) {
+      createZuordnungConfirmationDialogMessage.value = `Wollen Sie die Schulzuordnung als ${selectedRolleTitle.value} in Klasse ${selectedKlasseTitle.value} hinzufügen?`;
+    } else {
+      createZuordnungConfirmationDialogMessage.value = `Wollen Sie die Schulzuordnung als ${selectedRolleTitle.value} hinzufügen?`;
+    }
+    createZuordnungConfirmationDialogVisible.value = true;
+  });
+
+  const confirmDialogAddition = async (): Promise<void> => {
+    createZuordnungConfirmationDialogVisible.value = false;
+    const organisation: Organisation | undefined = personenkontextStore.workflowStepResponse?.organisations.find(
+      (orga: Organisation) => orga.id === selectedOrganisation.value,
+    );
+    const klasse: Organisation | undefined = organisationStore.klassen.find(
+      (k: Organisation) => k.id === selectedKlasse.value,
+    );
+    if (organisation) {
+      newZuordnung.value = {
+        sskId: organisation.id,
+        rolleId: selectedRolle.value,
+        klasse: klasse?.name,
+        sskDstNr: organisation.kennung ?? '',
+        sskName: organisation.name,
+        rolle: rollen.value?.find((rolle: RolleWithRollenart) => rolle.value === selectedRolle.value)?.title || '',
+        administriertVon: organisation.administriertVon ?? '',
+        editable: true,
+        typ: OrganisationsTyp.Schule,
+      };
+      if (zuordnungenResult.value) {
+        finalZuordnungen.value = zuordnungenResult.value;
+        finalZuordnungen.value.push(newZuordnung.value);
+      }
+      if (klasse) {
+        finalZuordnungen.value.push({
+          sskId: klasse.id,
+          rolleId: selectedRolle.value,
+          sskDstNr: klasse.kennung ?? '',
+          sskName: klasse.name,
+          rolle: rollen.value?.find((rolle: RolleWithRollenart) => rolle.value === selectedRolle.value)?.title || '',
+          administriertVon: klasse.administriertVon ?? '',
+          editable: true,
+          typ: OrganisationsTyp.Klasse,
+        });
+      }
+    }
+    zuordnungenResult.value = zuordnungenResult.value?.filter(
+      (zuordnung: Zuordnung) => zuordnung.typ !== OrganisationsTyp.Klasse,
+    );
+    prepareCreation();
+  };
+
+  const cancelAddition = (): void => {
+    createZuordnungConfirmationDialogVisible.value = false;
+  };
 
   function updateOrganisationSearch(searchValue: string): void {
     clearTimeout(timerId);
@@ -1228,7 +1242,7 @@
                 offset="1"
                 cols="10"
               >
-                <span>{{ $t('person.createZuordnungSuccess') }}</span>
+                <span>{{ $t('person.addZuordnungSuccess') }}</span>
               </v-col>
             </v-row>
           </v-container>
@@ -1246,6 +1260,60 @@
                 @click.stop="closeCreateSuccessDialog"
               >
                 {{ $t('close') }}
+              </v-btn>
+            </v-col>
+          </v-row>
+        </v-card-actions>
+      </LayoutCard>
+    </v-dialog>
+
+    <v-dialog
+      v-model="createZuordnungConfirmationDialogVisible"
+      persistent
+      max-width="600px"
+    >
+      <LayoutCard
+        :closable="true"
+        :header="$t('person.editZuordnungen')"
+      >
+        <v-card-text>
+          <v-container>
+            <v-row class="text-body bold px-md-16">
+              <v-col
+                offset="1"
+                cols="10"
+              >
+                <span>{{ createZuordnungConfirmationDialogMessage }}</span>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card-text>
+        <v-card-actions class="justify-center">
+          <v-row class="justify-center">
+            <v-col
+              cols="12"
+              sm="6"
+              md="4"
+            >
+              <v-btn
+                :block="mdAndDown"
+                class="primary"
+                @click.stop="confirmDialogAddition"
+              >
+                {{ $t('yes') }}
+              </v-btn>
+            </v-col>
+            <v-col
+              cols="12"
+              sm="6"
+              md="4"
+            >
+              <v-btn
+                :block="mdAndDown"
+                class="secondary"
+                @click.stop="cancelAddition"
+              >
+                {{ $t('no') }}
               </v-btn>
             </v-col>
           </v-row>
