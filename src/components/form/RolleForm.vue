@@ -39,7 +39,7 @@
     :confirmUnsavedChangesAction="onHandleConfirmUnsavedChanges"
     :createButtonLabel="$t('admin.rolle.create')"
     :discardButtonLabel="$t('admin.rolle.discard')"
-    :hideActions="true"
+    :hideActions="readonly"
     id="rolle-form"
     :onDiscard="onHandleDiscard"
     @onShowDialogChange="onShowDialogChange"

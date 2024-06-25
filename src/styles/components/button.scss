@@ -48,6 +48,10 @@
       border: $secondaryButtonHoverBorderSize solid $secondaryButtonBorderColor;
     }
   }
+  
+  &.small {
+    width: 220px;
+  }
 
   /* small screen */
   @media only screen and (max-width: 600px) {

@@ -73,7 +73,7 @@ describe('RolleCreationView', () => {
     expect(wrapper?.getComponent({ name: 'SpshAlert' })).toBeTruthy();
     expect(wrapper?.getComponent({ name: 'FormWrapper' })).toBeTruthy();
     expect(wrapper?.getComponent({ name: 'FormRow' })).toBeTruthy();
-    expect(wrapper?.getComponent({ name: 'RolleCreationForm' })).toBeTruthy();
+    expect(wrapper?.getComponent({ name: 'RolleForm' })).toBeTruthy();
   });
 
   test('it renders an error', async () => {

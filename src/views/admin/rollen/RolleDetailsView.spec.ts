@@ -2,16 +2,27 @@ import { expect, test } from 'vitest';
 import { VueWrapper, mount } from '@vue/test-utils';
 import RolleDetailsView from './RolleDetailsView.vue';
 import { setActivePinia, createPinia } from 'pinia';
+import routes from '@/router/routes';
+import { type Router, createRouter, createWebHistory } from 'vue-router';
 
 let wrapper: VueWrapper | null = null;
+let router: Router;
 
-beforeEach(() => {
+beforeEach( async() => {
   setActivePinia(createPinia());
   document.body.innerHTML = `
     <div>
       <div id="app"></div>
     </div>
   `;
+
+  router = createRouter({
+    history: createWebHistory(),
+    routes,
+  });
+
+  router.push('/');
+  await router.isReady();
 
   wrapper = mount(RolleDetailsView, {
     attachTo: document.getElementById('app') || '',
@@ -24,6 +35,7 @@ beforeEach(() => {
           fullPath: 'full/path',
         },
       },
+      plugins: [router],
     },
   });
 });

@@ -5,6 +5,7 @@
   import { useDisplay } from 'vuetify';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { type Router, useRouter } from 'vue-router';
+  import SpshTooltip from '@/components/admin/SpshTooltip.vue';
 
   const { t }: Composer = useI18n({ useScope: 'global' });
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
@@ -12,6 +13,7 @@
   const router: Router = useRouter();
 
   type Props = {
+    disabled: boolean;
     errorCode: string;
     person: Personendatensatz;
   };
@@ -117,14 +119,22 @@
         sm="6"
         md="auto"
       >
-        <v-btn
-          class="secondary button"
-          data-testid="open-person-delete-dialog-icon"
-          v-bind="props"
-          :block="mdAndDown"
+        <SpshTooltip
+          :enabledCondition="!disabled"
+          :disabledText="$t('person.finishEditFirst')"
+          :enabledText="$t('admin.person.deletePerson')"
+          position="start"
         >
-          {{ $t('admin.person.deletePerson') }}
-        </v-btn>
+          <v-btn
+            class="secondary button"
+            data-testid="open-person-delete-dialog-icon"
+            :disabled="disabled"
+            v-bind="props"
+            :block="mdAndDown"
+          >
+            {{ $t('admin.person.deletePerson') }}
+          </v-btn>
+        </SpshTooltip>
       </v-col>
     </template>
 

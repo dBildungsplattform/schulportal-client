@@ -29,24 +29,24 @@ router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormal
         if (authStore.hasPersonenverwaltungPermission) {
           return true;
         }
-        return false;
-      case 'rollenverwaltung':
-        if (authStore.hasRollenverwaltungPermission) {
-          return true;
-        }
-        return false;
-      case 'schulverwaltung':
-        if (authStore.hasSchulverwaltungPermission) {
-          return true;
-        }
-        return false;
+        return { path: 'not-found' };
       case 'klassenverwaltung':
         if (authStore.hasKlassenverwaltungPermission) {
           return true;
         }
-        return false;
+        return { path: 'not-found' };
+      case 'rollenverwaltung':
+        if (authStore.hasRollenverwaltungPermission) {
+          return true;
+        }
+        return { path: 'not-found' };
+      case 'schulverwaltung':
+        if (authStore.hasSchulverwaltungPermission) {
+          return true;
+        }
+        return { path: 'not-found' };
       default:
-        return false;
+        return { path: 'not-found' };
     }
   }
 
