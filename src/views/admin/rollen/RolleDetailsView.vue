@@ -1,10 +1,11 @@
 <script setup lang="ts">
   import { type RolleStore, useRolleStore, RollenMerkmal, RollenSystemRecht } from '@/stores/RolleStore';
+  import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
+  import { type ServiceProvider } from '@/stores/ServiceProviderStore';
   import { computed, onBeforeMount, ref, type ComputedRef, type Ref } from 'vue';
   import { type Router, useRouter, type RouteLocationNormalizedLoaded, useRoute } from 'vue-router';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
-  import { type ServiceProvider } from '@/stores/ServiceProviderStore';
   import RolleForm from '@/components/form/RolleForm.vue';
   import { type Composer, useI18n } from 'vue-i18n';
 
@@ -13,6 +14,7 @@
   const { t }: Composer = useI18n({ useScope: 'global' });
 
   const rolleStore: RolleStore = useRolleStore();
+  const organisationStore: OrganisationStore = useOrganisationStore();
   const currentRolleId: string = route.params['id'] as string;
 
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
@@ -25,6 +27,14 @@
     rolleStore.errorCode = '';
     navigateToRolleTable();
   };
+
+  const translatedOrgName: ComputedRef<string> = computed(() => {
+    if (!rolleStore.currentRolle?.administeredBySchulstrukturknoten) {
+      return '---';
+    }
+
+    return `${organisationStore.currentOrganisation?.kennung} (${organisationStore.currentOrganisation?.name})` || '---';
+  });
 
   const translatedRollenart: ComputedRef<string> = computed(() => {
     if (!rolleStore.currentRolle?.rollenart) {
@@ -81,6 +91,7 @@
 
   onBeforeMount(async () => {
     await rolleStore.getRolleById(currentRolleId);
+    await organisationStore.getOrganisationById(rolleStore.currentRolle?.administeredBySchulstrukturknoten || '');
   });
 </script>
 
@@ -126,7 +137,7 @@
               :onSubmit="onSubmit"
               :readonly="true"
               ref="rolle-form"
-              v-model:selectedAdministrationsebene="rolleStore.currentRolle.administeredBySchulstrukturknoten"
+              v-model:selectedAdministrationsebene="translatedOrgName"
               v-model:selectedRollenArt="translatedRollenart"
               v-model:selectedRollenName="rolleStore.currentRolle.name"
               v-model:selectedMerkmale="translatedMerkmale"
