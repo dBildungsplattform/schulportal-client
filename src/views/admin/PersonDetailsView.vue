@@ -55,7 +55,6 @@
   const isEditActive: Ref<boolean> = ref(false);
   const isZuordnungFormActive: Ref<boolean> = ref(false);
   const pendingDeletion: Ref<boolean> = ref(false);
-  const successDialogVisible: Ref<boolean> = ref(false);
   const cannotDeleteDialogVisible: Ref<boolean> = ref(false);
   const pendingCreation: Ref<boolean> = ref(false);
   const deleteSuccessDialogVisible: Ref<boolean> = ref(false);
@@ -117,8 +116,8 @@
     isZuordnungFormActive.value = true;
   };
 
-// This will send the updated list of Zuordnungen to the Backend WITHOUT the selected Zuordnungen.
-const confirmDeletion = async (): Promise<void> => {
+  // This will send the updated list of Zuordnungen to the Backend WITHOUT the selected Zuordnungen.
+  const confirmDeletion = async (): Promise<void> => {
     // Check if the current user is trying to delete their own Zuordnungen
     if (authStore.currentUser?.personId === currentPersonId) {
       cannotDeleteDialogVisible.value = true;
@@ -165,17 +164,17 @@ const confirmDeletion = async (): Promise<void> => {
       (zuordnung: Zuordnung) => zuordnung.editable,
     );
 
-    successDialogVisible.value = true;
+    deleteSuccessDialogVisible.value = true;
 
     if (!editableZuordnungen || editableZuordnungen.length === 0) {
       // If no editable Zuordnungen are left, navigate to person table after the dialog is closed
       closeDeleteSuccessDialog = (): void => {
-        successDialogVisible.value = false;
+        deleteSuccessDialogVisible.value = false;
         navigateToPersonTable();
       };
     } else {
       closeDeleteSuccessDialog = (): void => {
-        successDialogVisible.value = false;
+        deleteSuccessDialogVisible.value = false;
         router.push(route).then(() => {
           router.go(0);
         });
@@ -892,7 +891,7 @@ const confirmDeletion = async (): Promise<void> => {
                     :errorCode="personStore.errorCode"
                     :person="personStore.currentPerson"
                     :disabled="selectedZuordnungen.length === 0"
-                     :zuordnungCount="zuordnungenResult?.filter((zuordnung) => zuordnung.editable).length"
+                    :zuordnungCount="zuordnungenResult?.filter((zuordnung) => zuordnung.editable).length"
                     @onDeletePersonenkontext="prepareDeletion"
                   >
                   </PersonenkontextDelete>
@@ -1242,47 +1241,47 @@ const confirmDeletion = async (): Promise<void> => {
         </v-card-actions>
       </LayoutCard>
     </v-dialog>
-     <!-- Dialog to inform the user that he can't delete his own Zuordnungen -->
-     <v-dialog
-  v-model="cannotDeleteDialogVisible"
-  persistent
-  max-width="600px"
->
-  <LayoutCard
-    :closable="true"
-    :header="$t('person.editZuordnungen')"
-  >
-    <v-card-text>
-      <v-container>
-        <v-row class="text-body bold px-md-16">
-          <v-col
-            offset="1"
-            cols="10"
-          >
-            <span>{{ $t('person.cannotDeleteOwnZuordnung') }}</span>
-          </v-col>
-        </v-row>
-      </v-container>
-    </v-card-text>
-    <v-card-actions class="justify-center">
-      <v-row class="justify-center">
-        <v-col
-          cols="12"
-          sm="6"
-          md="4"
-        >
-          <v-btn
-            :block="mdAndDown"
-            class="primary"
-            @click.stop="closeCannotDeleteDialog"
-          >
-            {{ $t('close') }}
-          </v-btn>
-        </v-col>
-      </v-row>
-    </v-card-actions>
-  </LayoutCard>
-</v-dialog>
+    <!-- Dialog to inform the user that he can't delete his own Zuordnungen -->
+    <v-dialog
+      v-model="cannotDeleteDialogVisible"
+      persistent
+      max-width="600px"
+    >
+      <LayoutCard
+        :closable="true"
+        :header="$t('person.editZuordnungen')"
+      >
+        <v-card-text>
+          <v-container>
+            <v-row class="text-body bold px-md-16">
+              <v-col
+                offset="1"
+                cols="10"
+              >
+                <span>{{ $t('person.cannotDeleteOwnZuordnung') }}</span>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card-text>
+        <v-card-actions class="justify-center">
+          <v-row class="justify-center">
+            <v-col
+              cols="12"
+              sm="6"
+              md="4"
+            >
+              <v-btn
+                :block="mdAndDown"
+                class="primary"
+                @click.stop="closeCannotDeleteDialog"
+              >
+                {{ $t('close') }}
+              </v-btn>
+            </v-col>
+          </v-row>
+        </v-card-actions>
+      </LayoutCard>
+    </v-dialog>
   </div>
 </template>
 
