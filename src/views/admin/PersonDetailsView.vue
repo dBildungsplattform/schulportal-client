@@ -532,7 +532,7 @@
   function updateRollenSearch(searchValue: string): void {
     clearTimeout(timerId);
     // If searchValue is empty, fetch all roles for the organisationId
-    if (searchValue === '' && !selectedOrganisation.value) {
+    if (searchValue === '' && !selectedRolle.value) {
       timerId = setTimeout(() => {
         personenkontextStore.processWorkflowStep({
           organisationId: selectedOrganisation.value,
@@ -934,7 +934,7 @@
                     <v-btn
                       class="primary mt-2"
                       @Click="triggerAddZuordnung"
-                      data-testid="open-person-delete-dialog-icon"
+                      data-testid="zuordnung-create-button"
                       :disabled="selectedZuordnungen.length > 0"
                       :block="mdAndDown"
                     >
@@ -949,7 +949,7 @@
                   >
                     <v-btn
                       class="primary mt-2"
-                      data-testid="open-person-delete-dialog-icon"
+                      data-testid="rolle-change-button"
                       :disabled="selectedZuordnungen.length === 0"
                       :block="mdAndDown"
                     >
@@ -964,7 +964,7 @@
                   >
                     <v-btn
                       class="primary mt-2"
-                      data-testid="open-person-delete-dialog-icon"
+                      data-testid="befristung-change-button"
                       :disabled="selectedZuordnungen.length === 0"
                       :block="mdAndDown"
                     >

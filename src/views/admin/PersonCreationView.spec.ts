@@ -134,7 +134,6 @@ describe('PersonCreationView', () => {
   });
 
   test('it updates search and sets values selected rolle, organisation and klasse', async () => {
-
     const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
     await organisationAutocomplete?.vm.$emit('update:search', '01');
     await organisationAutocomplete?.setValue('O1');
@@ -157,7 +156,6 @@ describe('PersonCreationView', () => {
   });
 
   test('it resets field Rolle when Organisation is reset after being selected', async () => {
-
     const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
     await organisationAutocomplete?.setValue('O1');
     await nextTick();
@@ -173,11 +171,9 @@ describe('PersonCreationView', () => {
   });
 
   test('it resets field Klasse when Rolle is reset after being selected', async () => {
-
     const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
     await organisationAutocomplete?.setValue('O1');
     await nextTick();
-
 
     const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
     await rolleAutocomplete?.setValue('54321');
@@ -194,7 +190,6 @@ describe('PersonCreationView', () => {
   });
 
   test('it triggers submit', async () => {
-
     const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
     await organisationAutocomplete?.setValue('O1');
     await nextTick();
@@ -210,7 +205,6 @@ describe('PersonCreationView', () => {
     const familiennameInput: VueWrapper | undefined = wrapper?.findComponent({ ref: 'familienname-input' });
     await familiennameInput?.setValue('Mustermann');
     await nextTick();
-
 
     const mockPerson: DBiamPersonResponse = {
       person: {
@@ -241,5 +235,32 @@ describe('PersonCreationView', () => {
 
     wrapper?.find('[data-testid="person-creation-form-create-button"]').trigger('click');
     await nextTick();
+  });
+
+  test('it updates Organisation search correctly', async () => {
+    const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
+
+    await organisationAutocomplete?.setValue(undefined);
+    await nextTick();
+
+    await organisationAutocomplete?.vm.$emit('update:search', '');
+    await nextTick();
+    expect(personenkontextStore.processWorkflowStep).toHaveBeenCalled();
+  });
+
+  test('it updates Rollen search correctly', async () => {
+    const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
+
+    await organisationAutocomplete?.setValue('org');
+    await nextTick();
+
+    const rollenAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
+
+    await rollenAutocomplete?.setValue(undefined);
+    await nextTick();
+
+    await rollenAutocomplete?.vm.$emit('update:search', '');
+    await nextTick();
+    expect(personenkontextStore.processWorkflowStep).toHaveBeenCalled();
   });
 });

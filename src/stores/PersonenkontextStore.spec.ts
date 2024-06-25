@@ -13,7 +13,12 @@ import ApiService from '@/services/ApiService';
 import MockAdapter from 'axios-mock-adapter';
 import { setActivePinia, createPinia } from 'pinia';
 import { rejects } from 'assert';
-import { PersonenKontextTyp, usePersonenkontextStore, type PersonenkontextStore } from './PersonenkontextStore';
+import {
+  PersonenKontextTyp,
+  usePersonenkontextStore,
+  type PersonenkontextStore,
+  type PersonenkontextWorkflowResponse,
+} from './PersonenkontextStore';
 import { usePersonStore, type PersonStore } from './PersonStore';
 
 const mockadapter: MockAdapter = new MockAdapter(ApiService);
@@ -130,6 +135,56 @@ describe('PersonenkontextStore', () => {
       );
       expect(personenkontextStore.loading).toBe(true);
       await rejects(hasSystemRechtPromise);
+      expect(personenkontextStore.errorCode).toEqual('some mock server error');
+      expect(personenkontextStore.loading).toBe(false);
+    });
+  });
+
+  describe('processWorkflowStep', () => {
+    it('should get step', async () => {
+      const mockResponse: PersonenkontextWorkflowResponse = {
+        organisations: [
+          {
+            id: 'string',
+            administriertVon: 'string',
+            kennung: 'string',
+            name: 'string',
+            namensergaenzung: 'string',
+            kuerzel: 'string',
+            typ: 'ROOT',
+          },
+        ],
+        rollen: [],
+        selectedOrganisation: 'string',
+        selectedRolle: 'string',
+        canCommit: true,
+      };
+
+      mockadapter.onGet('/api/personenkontext-workflow/step').replyOnce(200, mockResponse);
+      const getPersonenkontextWorkFlowStep: Promise<PersonenkontextWorkflowResponse> =
+        personenkontextStore.processWorkflowStep();
+      expect(personenkontextStore.loading).toBe(true);
+      await getPersonenkontextWorkFlowStep;
+      expect(personenkontextStore.workflowStepResponse).toEqual(mockResponse);
+      expect(personenkontextStore.loading).toBe(false);
+    });
+
+    it('should handle string error', async () => {
+      mockadapter.onGet('/api/personenkontext-workflow/step').replyOnce(500, 'some error');
+      const getPersonenkontextWorkFlowStep: Promise<PersonenkontextWorkflowResponse> =
+        personenkontextStore.processWorkflowStep();
+      expect(personenkontextStore.loading).toBe(true);
+      await rejects(getPersonenkontextWorkFlowStep);
+      expect(personenkontextStore.errorCode).toEqual('UNSPECIFIED_ERROR');
+      expect(personenkontextStore.loading).toBe(false);
+    });
+
+    it('should handle error code', async () => {
+      mockadapter.onGet('/api/personenkontext-workflow/step').replyOnce(500, { code: 'some mock server error' });
+      const getPersonenkontextWorkFlowStep: Promise<PersonenkontextWorkflowResponse> =
+        personenkontextStore.processWorkflowStep();
+      expect(personenkontextStore.loading).toBe(true);
+      await rejects(getPersonenkontextWorkFlowStep);
       expect(personenkontextStore.errorCode).toEqual('some mock server error');
       expect(personenkontextStore.loading).toBe(false);
     });
@@ -331,7 +386,9 @@ describe('PersonenkontextStore', () => {
     });
 
     it('should handle string error', async () => {
-      mockadapter.onGet('/api/personenkontext-workflow/rollen?rolleName=str&limit=2').replyOnce(500, 'some mock server error');
+      mockadapter
+        .onGet('/api/personenkontext-workflow/rollen?rolleName=str&limit=2')
+        .replyOnce(500, 'some mock server error');
       const getPersonenkontextRolleWithFilterPromise: Promise<void> =
         personenkontextStore.getPersonenkontextRolleWithFilter('str', 2);
       expect(personenkontextStore.loading).toBe(true);
