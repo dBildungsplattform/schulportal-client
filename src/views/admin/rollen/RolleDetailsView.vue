@@ -33,7 +33,7 @@
       return '---';
     }
 
-    return `${organisationStore.currentOrganisation?.kennung} (${organisationStore.currentOrganisation?.name})` || '---';
+    return `${organisationStore.currentOrganisation?.kennung} (${organisationStore.currentOrganisation?.name})`;
   });
 
   const translatedRollenart: ComputedRef<string> = computed(() => {
