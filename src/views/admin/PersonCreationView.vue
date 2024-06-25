@@ -347,7 +347,12 @@
     }
   }
   function updateKlasseSearch(searchValue: string): void {
-    if (searchValue && searchValue !== selectedKlasseTitle.value) {
+    // If searchValue is empty, fetch all roles for the organisationId
+    if (searchValue === '' && !selectedKlasse.value) {
+      timerId = setTimeout(() => {
+        organisationStore.getKlassenByOrganisationId(selectedOrganisation.value, searchValue);
+      }, 500);
+    } else if (searchValue && searchValue !== selectedKlasseTitle.value) {
       /* cancel pending call */
       clearTimeout(timerId);
       /* delay new call 500ms */
