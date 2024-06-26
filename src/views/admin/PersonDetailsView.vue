@@ -35,6 +35,7 @@
   import { useKlassen } from '@/composables/useKlassen';
   import { useOrganisationWatcher } from '@/composables/useOrganisationWatcher';
   import { useRolleWatcher } from '@/composables/useRolleWatcher';
+  import { useSelectedTitles, type SelectedTitles } from '@/composables/useSelectedTitles';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
@@ -386,20 +387,14 @@
     );
   });
 
-  // Computed property to get the title of the selected organisation
-  const selectedOrganisationTitle: ComputedRef<string | undefined> = computed(() => {
-    return organisationen.value?.find((org: TranslatedObject) => org.value === selectedOrganisation.value)?.title;
-  });
-
-  // Computed property to get the title of the selected role
-  const selectedRolleTitle: ComputedRef<string | undefined> = computed(() => {
-    return rollen.value?.find((role: TranslatedObject) => role.value === selectedRolle.value)?.title;
-  });
-
-  // Computed property to get the title of the selected class
-  const selectedKlasseTitle: ComputedRef<string | undefined> = computed(() => {
-    return klassen.value?.find((klasse: TranslatedObject) => klasse.value === selectedKlasse.value)?.title;
-  });
+  const { selectedOrganisationTitle, selectedRolleTitle, selectedKlasseTitle }: SelectedTitles = useSelectedTitles(
+    organisationen,
+    rollen,
+    klassen,
+    selectedOrganisation,
+    selectedRolle,
+    selectedKlasse,
+  );
 
   const onSubmit: (e?: Event | undefined) => Promise<void | undefined> = handleSubmit(() => {
     if (isLernRolle(selectedRolle.value)) {
