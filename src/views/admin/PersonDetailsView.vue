@@ -30,6 +30,8 @@
   import { type RolleResponse, RollenArt } from '@/stores/RolleStore';
   import { type Composer, useI18n } from 'vue-i18n';
   import FormRow from '@/components/form/FormRow.vue';
+  import { useKlassen } from '@/composables/useKlassen';
+  import { useOrganisationen } from '@/composables/useOrganisationen';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
@@ -255,25 +257,9 @@
       .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
   });
 
-  const organisationen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
-    return personenkontextStore.workflowStepResponse?.organisations
-      .slice(0, 25)
-      .map((org: Organisation) => ({
-        value: org.id,
-        title: org.kennung ? `${org.kennung} (${org.name})` : org.name,
-      }))
-      .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
-  });
+  const organisationen: ComputedRef<TranslatedObject[] | undefined> = useOrganisationen();
 
-  const klassen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
-    return organisationStore.klassen
-      .slice(0, 25)
-      .map((org: Organisation) => ({
-        value: org.id,
-        title: org.name,
-      }))
-      .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
-  });
+  const klassen: ComputedRef<TranslatedObject[] | undefined> = useKlassen();
 
   type RolleWithRollenart = {
     value: string;
