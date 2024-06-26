@@ -36,6 +36,7 @@
   import { useOrganisationWatcher } from '@/composables/useOrganisationWatcher';
   import { useRolleWatcher } from '@/composables/useRolleWatcher';
   import { useSelectedTitles, type SelectedTitles } from '@/composables/useSelectedTitles';
+  import { useSearchUpdates, type SearchUpdates } from '@/composables/useSearchUpdates';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
@@ -70,7 +71,7 @@
   const createZuordnungConfirmationDialogVisible: Ref<boolean> = ref(false);
   const createZuordnungConfirmationDialogMessage: Ref<string> = ref('');
 
-  let timerId: ReturnType<typeof setTimeout>;
+  const timerId: Ref<ReturnType<typeof setTimeout> | undefined> = ref<ReturnType<typeof setTimeout>>();
 
   const canCommit: Ref<boolean> = ref(false);
 
@@ -375,7 +376,6 @@
   // Watcher to detect when the Organisationsebene is selected so the Klasse and Rollen shows all the possible choices using that value.
   useOrganisationWatcher(selectedOrganisation, resetField);
 
-
   // Filter out the Rollen in case the admin chooses an organisation that the user has already a kontext in
   const filteredRollen: ComputedRef<RolleWithRollenart[] | undefined> = computed(() => {
     const existingZuordnungen: Zuordnung[] | undefined = personenkontextStore.personenuebersicht?.zuordnungen.filter(
@@ -457,60 +457,13 @@
     createZuordnungConfirmationDialogVisible.value = false;
   };
 
-  function updateOrganisationSearch(searchValue: string): void {
-    clearTimeout(timerId);
-
-    // If searchValue is empty and selectedOrganisation does not have a value, fetch data without getKlassenByOrganisationId
-    if (searchValue === '' && !selectedOrganisation.value) {
-      timerId = setTimeout(async () => {
-        await personenkontextStore.processWorkflowStep({
-          limit: 25,
-        });
-      }, 500);
-    } else if (searchValue && searchValue !== selectedOrganisationTitle.value) {
-      // If searchValue is not empty and different from the current title, proceed with the search
-      // (This stops an extra request being made once a value is selected)
-      timerId = setTimeout(async () => {
-        await personenkontextStore.processWorkflowStep({
-          organisationName: searchValue,
-          limit: 25,
-        });
-      }, 500);
-    }
-  }
-
-  function updateRollenSearch(searchValue: string): void {
-    clearTimeout(timerId);
-    // If searchValue is empty, fetch all roles for the organisationId
-    if (searchValue === '' && !selectedRolle.value) {
-      timerId = setTimeout(() => {
-        personenkontextStore.processWorkflowStep({
-          organisationId: selectedOrganisation.value,
-          limit: 25,
-        });
-      }, 500);
-      // Else fetch the Rollen that correspond to the orgaId
-      // (This stops an extra request being made once a value is selected since we check if model !== searchValue)
-    } else if (searchValue && searchValue !== selectedRolleTitle.value) {
-      timerId = setTimeout(() => {
-        personenkontextStore.processWorkflowStep({
-          organisationId: selectedOrganisation.value,
-          rolleName: searchValue,
-          limit: 25,
-        });
-      }, 500);
-    }
-  }
-  function updateKlasseSearch(searchValue: string): void {
-    if (searchValue && searchValue !== selectedKlasseTitle.value) {
-      /* cancel pending call */
-      clearTimeout(timerId);
-      /* delay new call 500ms */
-      timerId = setTimeout(() => {
-        organisationStore.getKlassenByOrganisationId(selectedOrganisation.value, searchValue);
-      }, 500);
-    }
-  }
+  const { updateOrganisationSearch, updateRollenSearch, updateKlassenSearch }: SearchUpdates = useSearchUpdates(
+    selectedOrganisation,
+    selectedOrganisationTitle,
+    selectedRolleTitle,
+    selectedKlasseTitle,
+    timerId,
+  );
 
   // Clear the selected Organisation once the input field is cleared (This is the only way to fetch all Orgas again)
   // This is also important since we only want to fetch all orgas once the selected Orga is null, otherwise an extra request is made with an empty string
@@ -1064,7 +1017,7 @@
                       item-text="title"
                       :no-data-text="$t('noDataFound')"
                       :placeholder="$t('admin.klasse.selectKlasse')"
-                      @update:search="updateKlasseSearch"
+                      @update:search="updateKlassenSearch"
                       variant="outlined"
                       v-bind="selectedKlasseProps"
                       v-model="selectedKlasse"
