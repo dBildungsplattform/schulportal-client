@@ -28,12 +28,13 @@
     navigateToRolleTable();
   };
 
-  const translatedOrgName: ComputedRef<string> = computed(() => {
+  const translatedOrgName: ComputedRef<string | undefined> = computed(() => {
     if (!rolleStore.currentRolle?.administeredBySchulstrukturknoten) {
       return '---';
     }
-
-    return `${organisationStore.currentOrganisation?.kennung} (${organisationStore.currentOrganisation?.name})`;
+    return organisationStore.currentOrganisation?.kennung
+      ? `${organisationStore.currentOrganisation.kennung} (${organisationStore.currentOrganisation.name})`
+      : organisationStore.currentOrganisation?.name;
   });
 
   const translatedRollenart: ComputedRef<string> = computed(() => {
