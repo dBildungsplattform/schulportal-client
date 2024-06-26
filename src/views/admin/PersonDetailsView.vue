@@ -27,11 +27,12 @@
   import { object, string, StringSchema, type AnyObject } from 'yup';
   import { toTypedSchema } from '@vee-validate/yup';
   import { useForm, type BaseFieldProps, type TypedSchema } from 'vee-validate';
-  import { type RolleResponse, RollenArt } from '@/stores/RolleStore';
+  import { RollenArt } from '@/stores/RolleStore';
   import { type Composer, useI18n } from 'vue-i18n';
   import FormRow from '@/components/form/FormRow.vue';
-  import { useKlassen } from '@/composables/useKlassen';
   import { useOrganisationen } from '@/composables/useOrganisationen';
+  import { useRollen } from '@/composables/useRollen';
+  import { useKlassen } from '@/composables/useKlassen';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
@@ -246,16 +247,7 @@
     return result;
   }
 
-  const rollen: ComputedRef<RolleWithRollenart[] | undefined> = computed(() => {
-    return personenkontextStore.workflowStepResponse?.rollen
-      .slice(0, 25)
-      .map((rolle: RolleResponse) => ({
-        value: rolle.id,
-        title: rolle.name,
-        Rollenart: rolle.rollenart, // Include Rollenart in the object
-      }))
-      .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
-  });
+  const rollen: ComputedRef<RolleWithRollenart[] | undefined> = useRollen();
 
   const organisationen: ComputedRef<TranslatedObject[] | undefined> = useOrganisationen();
 

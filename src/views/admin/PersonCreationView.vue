@@ -1,12 +1,12 @@
 <script setup lang="ts">
-  import { useOrganisationStore, type OrganisationStore, type Organisation } from '@/stores/OrganisationStore';
+  import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
   import {
     usePersonStore,
     type CreatePersonBodyParams,
     type CreatedPersonenkontext,
     type PersonStore,
   } from '@/stores/PersonStore';
-  import { type RolleResponse, RollenArt } from '@/stores/RolleStore';
+  import { RollenArt } from '@/stores/RolleStore';
   import { type ComputedRef, computed, onMounted, onUnmounted, type Ref, ref, watch } from 'vue';
   import {
     onBeforeRouteLeave,
@@ -33,6 +33,9 @@
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
   import { DIN_91379A } from '@/utils/validation';
+  import { useOrganisationen } from '@/composables/useOrganisationen';
+  import { useRollen } from '@/composables/useRollen';
+  import { useKlassen } from '@/composables/useKlassen';
 
   const router: Router = useRouter();
   const personStore: PersonStore = usePersonStore();
@@ -52,16 +55,7 @@
     Rollenart: RollenArt;
   };
 
-  const rollen: ComputedRef<RolleWithRollenart[] | undefined> = computed(() => {
-    return personenkontextStore.workflowStepResponse?.rollen
-      .slice(0, 25)
-      .map((rolle: RolleResponse) => ({
-        value: rolle.id,
-        title: rolle.name,
-        Rollenart: rolle.rollenart, // Include Rollenart in the object
-      }))
-      .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
-  });
+  const rollen: ComputedRef<RolleWithRollenart[] | undefined> = useRollen();
 
   // Define a method to check if the selected Rolle is of type "Lern"
   function isLernRolle(selectedRolleId: string): boolean {
@@ -168,25 +162,9 @@
     }
   });
 
-  const organisationen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
-    return personenkontextStore.workflowStepResponse?.organisations
-      .slice(0, 25)
-      .map((org: Organisation) => ({
-        value: org.id,
-        title: org.kennung ? `${org.kennung} (${org.name})` : org.name,
-      }))
-      .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
-  });
+  const organisationen: ComputedRef<TranslatedObject[] | undefined> = useOrganisationen();
 
-  const klassen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
-    return organisationStore.klassen
-      .slice(0, 25)
-      .map((org: Organisation) => ({
-        value: org.id,
-        title: org.name,
-      }))
-      .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
-  });
+  const klassen: ComputedRef<TranslatedObject[] | undefined> = useKlassen();
 
   const translatedOrganisationsname: ComputedRef<string> = computed(
     () =>
