@@ -10,6 +10,8 @@ export type SearchUpdates = {
 
 export function useSearchUpdates(
   selectedOrganisation: Ref<string>,
+  selectedRolle: Ref<string>,
+  selectedKlasse: Ref<string>,
   selectedOrganisationTitle: Ref<string | undefined>,
   selectedRolleTitle: Ref<string | undefined>,
   selectedKlasseTitle: Ref<string | undefined>,
@@ -40,9 +42,8 @@ export function useSearchUpdates(
   }
 
   function updateRollenSearch(searchValue: string): void {
-    clearTimeout(timerId.value);
     // If searchValue is empty, fetch all roles for the organisationId
-    if (searchValue === '' && !selectedOrganisation.value) {
+    if (searchValue === '' && !selectedRolle.value) {
       timerId.value = setTimeout(() => {
         personenkontextStore.processWorkflowStep({
           organisationId: selectedOrganisation.value,
@@ -63,7 +64,12 @@ export function useSearchUpdates(
   }
 
   function updateKlassenSearch(searchValue: string): void {
-    if (searchValue && searchValue !== selectedKlasseTitle.value) {
+    // If searchValue is empty, fetch all roles for the organisationId
+    if (searchValue === '' && !selectedKlasse.value) {
+      timerId.value = setTimeout(() => {
+        organisationStore.getKlassenByOrganisationId(selectedOrganisation.value, searchValue);
+      }, 500);
+    } else if (searchValue && searchValue !== selectedKlasseTitle.value) {
       /* cancel pending call */
       clearTimeout(timerId.value);
       /* delay new call 500ms */
@@ -72,7 +78,6 @@ export function useSearchUpdates(
       }, 500);
     }
   }
-
 
   return {
     updateOrganisationSearch,

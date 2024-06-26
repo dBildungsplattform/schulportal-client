@@ -459,6 +459,8 @@
 
   const { updateOrganisationSearch, updateRollenSearch, updateKlassenSearch }: SearchUpdates = useSearchUpdates(
     selectedOrganisation,
+    selectedRolle,
+    selectedKlasse,
     selectedOrganisationTitle,
     selectedRolleTitle,
     selectedKlasseTitle,
