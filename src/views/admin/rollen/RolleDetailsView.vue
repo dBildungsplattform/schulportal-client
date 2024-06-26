@@ -45,36 +45,34 @@
     return t(`admin.rolle.mappingFrontBackEnd.rollenarten.${rolleStore.currentRolle.rollenart}`);
   });
 
-  const translatedProviderNames: ComputedRef<string> = computed(() => {
+  const translatedProviderNames: ComputedRef<string[]> = computed(() => {
     if (!rolleStore.currentRolle?.serviceProviders?.length) {
-      return '---';
+      return ['---'];
     }
 
-    return rolleStore.currentRolle.serviceProviders.map((provider: ServiceProvider) => provider.name).join(', ');
+    return rolleStore.currentRolle.serviceProviders.map((provider: ServiceProvider) => provider.name);
   });
 
-  const translatedMerkmale: ComputedRef<string> = computed(() => {
+  const translatedMerkmale: ComputedRef<string[]> = computed(() => {
     const merkmale: Array<RollenMerkmal> = Array.from(rolleStore.currentRolle?.merkmale || []);
 
     if (!merkmale.length) {
-      return '---';
+      return ['---'];
     }
 
-    return merkmale
-      .map((merkmalKey: RollenMerkmal) => t(`admin.rolle.mappingFrontBackEnd.merkmale.${merkmalKey}`))
-      .join(', ');
+    return merkmale.map((merkmalKey: RollenMerkmal) => t(`admin.rolle.mappingFrontBackEnd.merkmale.${merkmalKey}`));
   });
 
-  const translatedSystemrechte: ComputedRef<string> = computed(() => {
+  const translatedSystemrechte: ComputedRef<string[]> = computed(() => {
     const systemrechte: Array<RollenSystemRecht> = Array.from(rolleStore.currentRolle?.systemrechte || []);
 
     if (!systemrechte.length) {
-      return '---';
+      return ['---'];
     }
 
-    return systemrechte
-      .map((systemrechtKey: RollenSystemRecht) => t(`admin.rolle.mappingFrontBackEnd.systemrechte.${systemrechtKey}`))
-      .join(', ');
+    return systemrechte.map((systemrechtKey: RollenSystemRecht) =>
+      t(`admin.rolle.mappingFrontBackEnd.systemrechte.${systemrechtKey}`),
+    );
   });
 
   function handleConfirmUnsavedChanges(): void {
