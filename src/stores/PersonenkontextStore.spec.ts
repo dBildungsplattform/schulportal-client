@@ -143,28 +143,37 @@ describe('PersonenkontextStore', () => {
   });
 
   describe('processWorkflowStep', () => {
+    const mockResponse: PersonenkontextWorkflowResponse = {
+      organisations: [
+        {
+          id: '1',
+          administriertVon: 'string',
+          kennung: 'string',
+          name: 'string',
+          namensergaenzung: 'string',
+          kuerzel: 'string',
+          typ: OrganisationsTyp.Schule,
+        },
+      ],
+      rollen: [],
+      selectedOrganisation: '1',
+      selectedRolle: '1',
+      canCommit: true,
+    };
     it('should get step', async () => {
-      const mockResponse: PersonenkontextWorkflowResponse = {
-        organisations: [
-          {
-            id: 'string',
-            administriertVon: 'string',
-            kennung: 'string',
-            name: 'string',
-            namensergaenzung: 'string',
-            kuerzel: 'string',
-            typ: 'ROOT',
-          },
-        ],
-        rollen: [],
-        selectedOrganisation: 'string',
-        selectedRolle: 'string',
-        canCommit: true,
-      };
-
       mockadapter.onGet('/api/personenkontext-workflow/step').replyOnce(200, mockResponse);
       const getPersonenkontextWorkFlowStep: Promise<PersonenkontextWorkflowResponse> =
         personenkontextStore.processWorkflowStep();
+      expect(personenkontextStore.loading).toBe(true);
+      await getPersonenkontextWorkFlowStep;
+      expect(personenkontextStore.workflowStepResponse).toEqual(mockResponse);
+      expect(personenkontextStore.loading).toBe(false);
+    });
+
+    it('should get step with parameters', async () => {
+      mockadapter.onGet('/api/personenkontext-workflow/step?organisationId=1&rolleId=1').replyOnce(200, mockResponse);
+      const getPersonenkontextWorkFlowStep: Promise<PersonenkontextWorkflowResponse> =
+        personenkontextStore.processWorkflowStep({ organisationId: '1', rolleId: '1' });
       expect(personenkontextStore.loading).toBe(true);
       await getPersonenkontextWorkFlowStep;
       expect(personenkontextStore.workflowStepResponse).toEqual(mockResponse);
