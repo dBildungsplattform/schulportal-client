@@ -1,13 +1,13 @@
 import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
-import type { RolleResponse } from '@/stores/RolleStore';
+import type { RollenArt, RolleResponse } from '@/stores/RolleStore';
 import { computed, type ComputedRef } from 'vue';
 
-interface TranslatedObject {
+type RolleWithRollenart = {
   value: string;
   title: string;
-}
-
-export function useRollen(): ComputedRef<TranslatedObject[] | undefined> {
+  Rollenart: RollenArt;
+};
+export function useRollen(): ComputedRef<RolleWithRollenart[] | undefined> {
   const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
 
   return computed(() => {
@@ -18,6 +18,6 @@ export function useRollen(): ComputedRef<TranslatedObject[] | undefined> {
         title: rolle.name,
         Rollenart: rolle.rollenart, // Include Rollenart in the object
       }))
-      .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
+      .sort((a: RolleWithRollenart, b: RolleWithRollenart) => a.title.localeCompare(b.title));
   });
 }
