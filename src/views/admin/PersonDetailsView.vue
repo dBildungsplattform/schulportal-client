@@ -937,6 +937,7 @@
                       data-testid="zuordnung-create-button"
                       :disabled="selectedZuordnungen.length > 0"
                       :block="mdAndDown"
+                      ref="zuordnung-create-button"
                     >
                       {{ $t('person.addZuordnung') }}
                     </v-btn>
@@ -993,7 +994,7 @@
               >
                 <v-btn
                   class="secondary small"
-                  data-testid="zuordnung-cancel"
+                  data-testid="zuordnung-edit-cancel"
                   @click="cancelEdit"
                   :block="mdAndDown"
                 >

@@ -80,7 +80,7 @@ personenkontextStore.workflowStepResponse = {
   ],
   rollen: [
     {
-      id: 'string',
+      id: '54321',
       createdAt: '2024-06-25T13:03:53.802Z',
       updatedAt: '2024-06-25T13:03:53.802Z',
       name: 'string',
@@ -213,5 +213,39 @@ describe('PersonDetailsView', () => {
 
     expect(rolleAutocomplete?.exists()).toBe(true);
     expect(personenkontextStore.processWorkflowStep).toHaveBeenCalled();
+  });
+
+  test('it triggers search value for Klassen when the selected Rolle is of type Lern', async () => {
+    await wrapper?.find('[data-testid="zuordnung-edit-button"]').trigger('click');
+    await nextTick();
+
+    await wrapper?.find('[data-testid="zuordnung-create-button"]').trigger('click');
+    await nextTick();
+
+    const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
+    await organisationAutocomplete?.setValue('O1');
+    await nextTick();
+
+    const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
+    await rolleAutocomplete?.setValue('54321');
+    await nextTick();
+
+    const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
+    await klasseAutocomplete?.setValue('1234');
+    await nextTick();
+
+    expect(klasseAutocomplete?.exists()).toBe(true);
+  });
+
+  test('It cancels editing', async () => {
+    await wrapper?.find('[data-testid="zuordnung-edit-button"]').trigger('click');
+    await nextTick();
+
+    const zuordnungCreateButton: VueWrapper | undefined = wrapper?.findComponent({ ref: 'zuordnung-create-button' });
+
+    await wrapper?.find('[data-testid="zuordnung-edit-cancel"]').trigger('click');
+    await nextTick();
+
+    expect(zuordnungCreateButton?.exists()).toBe(false);
   });
 });
