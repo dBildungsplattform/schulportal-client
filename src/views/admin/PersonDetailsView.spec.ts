@@ -7,6 +7,7 @@ import { type Personendatensatz, type PersonStore, usePersonStore } from '@/stor
 import { usePersonenkontextStore, type PersonenkontextStore, type Uebersicht } from '@/stores/PersonenkontextStore';
 import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
 import { RollenMerkmal, RollenSystemRecht } from '@/stores/RolleStore';
+import { nextTick } from 'vue';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
@@ -151,5 +152,66 @@ describe('PersonDetailsView', () => {
     );
     await wrapper?.find('[data-testid="close-layout-card-button"]').trigger('click');
     expect(push).toHaveBeenCalledTimes(1);
+  });
+
+  test('it resets field Rolle and removes it from the DOM when Organisation is reset after being selected', async () => {
+    await wrapper?.find('[data-testid="zuordnung-edit-button"]').trigger('click');
+    await nextTick();
+
+    await wrapper?.find('[data-testid="zuordnung-create-button"]').trigger('click');
+    await nextTick();
+
+    const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
+    await organisationAutocomplete?.setValue('O1');
+    await nextTick();
+
+    const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
+    await rolleAutocomplete?.setValue('54321');
+    await nextTick();
+
+    await organisationAutocomplete?.setValue(undefined);
+    await nextTick();
+
+    expect(rolleAutocomplete?.exists()).toBe(false);
+  });
+
+  test('it resets field Rolle when Organisation is reset after its value got modified to another', async () => {
+    await wrapper?.find('[data-testid="zuordnung-edit-button"]').trigger('click');
+    await nextTick();
+
+    await wrapper?.find('[data-testid="zuordnung-create-button"]').trigger('click');
+    await nextTick();
+
+    const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
+    await organisationAutocomplete?.setValue('O1');
+    await nextTick();
+
+    const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
+    await rolleAutocomplete?.setValue('54321');
+    await nextTick();
+
+    await organisationAutocomplete?.setValue('O2');
+    await nextTick();
+
+    expect(rolleAutocomplete?.exists()).toBe(true);
+  });
+
+  test('it triggers search value for Rollen and sends a request', async () => {
+    await wrapper?.find('[data-testid="zuordnung-edit-button"]').trigger('click');
+    await nextTick();
+
+    await wrapper?.find('[data-testid="zuordnung-create-button"]').trigger('click');
+    await nextTick();
+
+    const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
+    await organisationAutocomplete?.setValue('O1');
+    await nextTick();
+
+    const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
+    await rolleAutocomplete?.setValue('54321');
+    await nextTick();
+
+    expect(rolleAutocomplete?.exists()).toBe(true);
+    expect(personenkontextStore.processWorkflowStep).toHaveBeenCalled();
   });
 });

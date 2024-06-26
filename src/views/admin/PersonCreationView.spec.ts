@@ -103,10 +103,6 @@ beforeEach(() => {
   };
 
   wrapper = mount(PersonCreationView, {
-    propsData: {
-      searchInputKlasse: 'Testing the ref',
-      searchInputOrganisation: 'Testing the ref',
-    },
     attachTo: document.getElementById('app') || '',
     global: {
       components: {
