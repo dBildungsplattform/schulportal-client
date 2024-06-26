@@ -12,7 +12,6 @@ export function useRollen(): ComputedRef<RolleWithRollenart[] | undefined> {
 
   return computed(() => {
     return personenkontextStore.workflowStepResponse?.rollen
-      .slice(0, 25)
       .map((rolle: RolleResponse) => ({
         value: rolle.id,
         title: rolle.name,

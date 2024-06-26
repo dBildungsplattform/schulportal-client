@@ -12,7 +12,6 @@ export function useOrganisationen(): ComputedRef<TranslatedObject[] | undefined>
 
   return computed(() => {
     return personenkontextStore.workflowStepResponse?.organisations
-      .slice(0, 25)
       .map((org: Organisation) => ({
         value: org.id,
         title: org.kennung ? `${org.kennung} (${org.name})` : org.name,

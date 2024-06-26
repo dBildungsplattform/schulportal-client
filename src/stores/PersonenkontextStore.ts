@@ -100,7 +100,7 @@ type PersonenkontextActions = {
   getPersonenkontextRolleWithFilter: (rolleName: string, limit: number) => Promise<void>;
   getPersonenkontextAdministrationsebeneWithFilter: (rolleId: string, sskName: string, limit: number) => Promise<void>;
   updatePersonenkontexte: (
-    personenkontexte: DbiamUpdatePersonenkontexteBodyParams,
+    combinedZuordnungen: Zuordnung[] | undefined,
     personId: string,
   ) => Promise<PersonenkontexteUpdateResponse>;
   createPersonenkontext: (
@@ -263,13 +263,22 @@ export const usePersonenkontextStore: StoreDefinition<
       }
     },
     async updatePersonenkontexte(
-      personenkontexte: DbiamUpdatePersonenkontexteBodyParams,
+      combinedZuordnungen: Zuordnung[] | undefined,
       personId: string,
     ): Promise<PersonenkontexteUpdateResponse> {
       this.loading = true;
       try {
+        const updateParams: DbiamUpdatePersonenkontexteBodyParams = {
+          lastModified: new Date().toISOString(),
+          count: this.personenuebersicht?.zuordnungen.length ?? 0,
+          personenkontexte: combinedZuordnungen?.map((zuordnung: Zuordnung) => ({
+            personId: personId,
+            organisationId: zuordnung.sskId,
+            rolleId: zuordnung.rolleId,
+          })) as DbiamPersonenkontextBodyParams[],
+        };
         const { data }: { data: PersonenkontexteUpdateResponse } =
-          await personenKontextApi.dbiamPersonenkontextWorkflowControllerCommit(personId, personenkontexte);
+          await personenKontextApi.dbiamPersonenkontextWorkflowControllerCommit(personId, updateParams);
         return data;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';

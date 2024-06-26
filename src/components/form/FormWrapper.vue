@@ -4,17 +4,49 @@
   import LayoutCard from '../cards/LayoutCard.vue';
 
   type Props = {
-    confirmUnsavedChangesAction: () => void;
-    canCommit: boolean;
-    createButtonLabel: string;
-    discardButtonLabel: string;
-    id: string;
-    onDiscard: () => void;
-    onSubmit: () => void;
-    showUnsavedChangesDialog?: boolean;
-  };
-
-  const props: Props = defineProps<Props>();
+    readonly confirmUnsavedChangesAction: Function;
+    readonly canCommit: boolean;
+    readonly createButtonLabel: string;
+    readonly discardButtonLabel: string;
+    readonly id: string;
+    readonly onDiscard: Function;
+    readonly onSubmit: Function;
+    readonly showUnsavedChangesDialog: boolean;
+  }
+  const props: Props = defineProps({
+    confirmUnsavedChangesAction: {
+      type: Function,
+      required: true,
+    },
+    canCommit: {
+      type: Boolean,
+      default: true,
+    },
+    createButtonLabel: {
+      type: String,
+      required: true,
+    },
+    discardButtonLabel: {
+      type: String,
+      required: true,
+    },
+    id: {
+      type: String,
+      required: true,
+    },
+    onDiscard: {
+      type: Function,
+      required: true,
+    },
+    onSubmit: {
+      type: Function,
+      required: true,
+    },
+    showUnsavedChangesDialog: {
+      type: Boolean,
+      default: false,
+    },
+  });
 
   const emit: (event: 'onShowDialogChange', ...args: unknown[]) => void = defineEmits(['onShowDialogChange']);
 

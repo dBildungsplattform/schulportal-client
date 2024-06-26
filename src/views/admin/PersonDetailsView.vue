@@ -10,8 +10,6 @@
   import PersonenkontextDelete from '@/components/admin/personen/PersonenkontextDelete.vue';
   import {
     usePersonenkontextStore,
-    type DbiamPersonenkontextBodyParams,
-    type DbiamUpdatePersonenkontexteBodyParams,
     type PersonenkontextStore,
     type Uebersicht,
     type Zuordnung,
@@ -156,17 +154,7 @@
     // Combine remaining Zuordnungen and filtered Klassen Zuordnungen
     const combinedZuordnungen: Zuordnung[] | undefined = remainingZuordnungen?.concat(filteredKlassenZuordnungen || []);
 
-    const updateParams: DbiamUpdatePersonenkontexteBodyParams = {
-      lastModified: new Date().toISOString(),
-      count: personenkontextStore.personenuebersicht?.zuordnungen.length ?? 0,
-      personenkontexte: combinedZuordnungen?.map((zuordnung: Zuordnung) => ({
-        personId: currentPersonId,
-        organisationId: zuordnung.sskId,
-        rolleId: zuordnung.rolleId,
-      })) as DbiamPersonenkontextBodyParams[],
-    };
-
-    await personenkontextStore.updatePersonenkontexte(updateParams, currentPersonId);
+    await personenkontextStore.updatePersonenkontexte(combinedZuordnungen, currentPersonId);
     zuordnungenResult.value = combinedZuordnungen;
     selectedZuordnungen.value = [];
 
@@ -344,17 +332,8 @@
 
   // This will send the updated list of Zuordnungen to the Backend on TOP of the new added one through the form.
   const confirmAddition = async (): Promise<void> => {
-    const updateParams: DbiamUpdatePersonenkontexteBodyParams = {
-      lastModified: new Date().toISOString(),
-      count: personenkontextStore.personenuebersicht?.zuordnungen.length ?? 0,
-      personenkontexte: finalZuordnungen.value.map((zuordnung: Zuordnung) => ({
-        personId: currentPersonId,
-        organisationId: zuordnung.sskId,
-        rolleId: zuordnung.rolleId,
-      })) as DbiamPersonenkontextBodyParams[],
-    };
 
-    await personenkontextStore.updatePersonenkontexte(updateParams, currentPersonId);
+    await personenkontextStore.updatePersonenkontexte(finalZuordnungen.value, currentPersonId);
     createSuccessDialogVisible.value = true;
     resetForm();
   };

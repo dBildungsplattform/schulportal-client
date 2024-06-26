@@ -194,7 +194,6 @@
       <!-- The form to create a new Klasse -->
       <template v-if="!organisationStore.createdKlasse && !organisationStore.errorCode">
         <FormWrapper
-          :canCommit="true"
           :confirmUnsavedChangesAction="handleConfirmUnsavedChanges"
           :createButtonLabel="$t('admin.klasse.create')"
           :discardButtonLabel="$t('admin.klasse.discard')"

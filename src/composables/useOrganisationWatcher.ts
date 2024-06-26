@@ -19,6 +19,7 @@ export function useOrganisationWatcher(
       // This is mainly to fetch the rollen after selecting the orga
       personenkontextStore.processWorkflowStep({
         organisationId: newValue,
+        limit: 25,
       });
       // Call fetch with an empty string to get the initial organizations for the selected role without any filter
       organisationStore.getKlassenByOrganisationId(newValue);
