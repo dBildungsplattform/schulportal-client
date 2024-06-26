@@ -9,9 +9,19 @@ function loadLocaleMessages(): { [x: string]: DefaultLocaleMessageSchema } {
   return messages;
 }
 
+const messages: { [x: string]: DefaultLocaleMessageSchema } = {
+  de: {
+    ...loadLocaleMessages()['de'],
+    $vuetify: {
+      close: 'Schließen',
+      open: 'Öffnen',
+    },
+  },
+};
+
 export default createI18n({
   fallbackLocale: 'de',
   legacy: false,
   locale: 'de',
-  messages: loadLocaleMessages(),
+  messages,
 });
