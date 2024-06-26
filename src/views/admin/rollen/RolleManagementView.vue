@@ -1,15 +1,17 @@
 <script setup lang="ts">
-  import { RollenMerkmal, useRolleStore, type RolleResponse, type RolleStore } from '@/stores/RolleStore';
+  import { RollenMerkmal, useRolleStore, type Rolle, type RolleResponse, type RolleStore } from '@/stores/RolleStore';
   import { computed, onMounted, type ComputedRef } from 'vue';
   import ResultTable from '@/components/admin/ResultTable.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { type Composer, useI18n } from 'vue-i18n';
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
   import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
+  import { useRouter, type Router } from 'vue-router';
 
   const rolleStore: RolleStore = useRolleStore();
   const organisationStore: OrganisationStore = useOrganisationStore();
 
+  const router: Router = useRouter();
   const { t }: Composer = useI18n({ useScope: 'global' });
 
   type ReadonlyHeaders = InstanceType<typeof VDataTableServer>['headers'];
@@ -66,6 +68,10 @@
     });
   });
 
+  function navigateToRolleDetails(_$event: PointerEvent, { item }: { item: Rolle }): void {
+    router.push({ name: 'rolle-details', params: { id: item.id } });
+  }
+
   onMounted(async () => {
     await rolleStore.getAllRollen('');
     await organisationStore.getAllOrganisationen();
@@ -86,10 +92,10 @@
         :items="transformedRollenAndMerkmale || []"
         :loading="rolleStore.loading"
         :headers="headers"
+        @onHandleRowClick="navigateToRolleDetails"
         @onUpdateTable="rolleStore.getAllRollen('')"
         :totalItems="rolleStore.allRollen.length"
         item-value-path="id"
-        :disableRowClick="true"
       >
         <template v-slot:[`item.serviceProviders`]="{ item }">
           <div class="ellipsis-wrapper">

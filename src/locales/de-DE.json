@@ -86,7 +86,7 @@
       "edit": "Benutzer bearbeiten",
       "generatedPassword": "Generiertes Passwort",
       "loadingErrorText": "Es konnten keine Benutzerdaten geladen werden.",
-      "loadingErrorTitle": "Fehler beim Laden des Benutzers.",
+      "loadingErrorTitle": "Fehler beim Laden des Benutzers",
       "management": "Benutzerverwaltung",
       "personalInfo": "Persönliche Informationen",
       "resetPasswordConfirmation": "Sind Sie sicher, dass Sie das Passwort für {firstname} {lastname} zurücksetzen möchten?",
@@ -127,12 +127,15 @@
       "createAnother": "Weitere Rolle anlegen",
       "createNew": "Neue Rolle anlegen",
       "discard": "Rolle verwerfen",
+      "edit": "Rolle bearbeiten",
       "enterRollenname": "Rollenname eingeben",
       "errors": {
         "ADD_SYSTEMRECHT_ERROR": "Das Systemrecht konnte nicht hinzugefügt werden.",
         "ROLLE_ERROR":  "Die Rolle konnte nicht angelegt werden."
       },
       "isAllowedToManageRollen": "Darf Rollen verwalten",
+      "loadingErrorText": "Es konnten keine Rollendaten geladen werden.",
+      "loadingErrorTitle": "Fehler beim Laden der Rolle",
       "management": "Rollenverwaltung",
       "mappingFrontBackEnd": {
         "systemrechte": {
@@ -162,6 +165,7 @@
       "rolleCreateErrorTitle": "Fehler beim Anlegen der Rolle",
       "rolleCreateErrorText": "Die Rolle konnte nicht angelegt werden.",
       "rolleFound": "{total} Rolle gefunden",
+      "rolleInfo": "Rolleninformationen",
       "rollenart": "Rollenart",
       "rollenFound": "{count} Rolle gefunden | {count} Rollen gefunden",
       "rollenname": "Rollenname",

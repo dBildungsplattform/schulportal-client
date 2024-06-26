@@ -32,9 +32,8 @@
   import { type BaseFieldProps, type TypedSchema, useForm } from 'vee-validate';
   import { object, string } from 'yup';
   import { toTypedSchema } from '@vee-validate/yup';
-  import FormWrapper from '@/components/form/FormWrapper.vue';
-  import FormRow from '@/components/form/FormRow.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
+  import RolleForm from '@/components/form/RolleForm.vue';
   import { DIN_91379A_EXT } from '@/utils/validation';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
@@ -74,7 +73,7 @@
     },
   });
 
-  type RolleCreationForm = {
+  type RolleCreationFormType = {
     selectedAdministrationsebene: string;
     selectedRollenArt: RollenArt;
     selectedRollenName: string;
@@ -84,7 +83,7 @@
   };
 
   // eslint-disable-next-line @typescript-eslint/typedef
-  const { defineField, handleSubmit, isFieldDirty, resetForm } = useForm<RolleCreationForm>({
+  const { defineField, handleSubmit, isFieldDirty, resetForm } = useForm<RolleCreationFormType>({
     validationSchema,
   });
 
@@ -338,182 +337,31 @@
 
       <!-- The form to create a new Rolle -->
       <template v-if="!rolleStore.createdRolle && !rolleStore.errorCode">
-        <FormWrapper
-          :confirmUnsavedChangesAction="handleConfirmUnsavedChanges"
-          :createButtonLabel="$t('admin.rolle.create')"
-          :discardButtonLabel="$t('admin.rolle.discard')"
-          id="rolle-creation-form"
-          :onDiscard="navigateToRolleManagement"
-          @onShowDialogChange="(value: boolean) => (showUnsavedChangesDialog = value)"
+        <RolleForm
+          :administrationsebenen="administrationsebenen"
+          :onHandleConfirmUnsavedChanges="handleConfirmUnsavedChanges"
+          :onHandleDiscard="navigateToRolleManagement"
+          :onShowDialogChange="(value: boolean) => (showUnsavedChangesDialog = value)"
           :onSubmit="onSubmit"
+          ref="rolle-creation-form"
+          v-model:selectedAdministrationsebene="selectedAdministrationsebene"
+          :selectedAdministrationsebeneProps="selectedAdministrationsebeneProps"
+          v-model:selectedRollenArt="selectedRollenArt"
+          :selectedRollenArtProps="selectedRollenArtProps"
+          v-model:selectedRollenName="selectedRollenName"
+          :selectedRollenNameProps="selectedRollenNameProps"
+          v-model:selectedMerkmale="selectedMerkmale"
+          :selectedMerkmaleProps="selectedMerkmaleProps"
+          v-model:selectedServiceProviders="selectedServiceProviders"
+          :selectedServiceProvidersProps="selectedServiceProvidersProps"
+          v-model:selectedSystemRechte="selectedSystemRechte"
+          :selectedSystemRechteProps="selectedSystemRechteProps"
+          :serviceProviders="serviceProviders"
           :showUnsavedChangesDialog="showUnsavedChangesDialog"
-        >
-          <!-- 1. Administrationsebene zuordnen -->
-          <v-row>
-            <h3 class="headline-3">1. {{ $t('admin.administrationsebene.assignAdministrationsebene') }}</h3>
-          </v-row>
-          <FormRow
-            :errorLabel="selectedAdministrationsebeneProps['error']"
-            labelForId="administrationsebene-select"
-            :isRequired="true"
-            :label="$t('admin.administrationsebene.administrationsebene')"
-          >
-            <v-select
-              clearable
-              data-testid="administrationsebene-select"
-              density="compact"
-              id="administrationsebene-select"
-              :items="administrationsebenen"
-              item-value="value"
-              item-text="title"
-              :placeholder="$t('admin.administrationsebene.assignAdministrationsebene')"
-              ref="administrationsebene-select"
-              required="true"
-              variant="outlined"
-              v-bind="selectedAdministrationsebeneProps"
-              v-model="selectedAdministrationsebene"
-              :no-data-text="$t('noDataFound')"
-            ></v-select>
-          </FormRow>
-
-          <!-- 2. Rollenart zuordnen -->
-          <v-row>
-            <h3 class="headline-3">2. {{ $t('admin.rolle.assignRollenart') }}</h3>
-          </v-row>
-          <FormRow
-            :errorLabel="selectedRollenArtProps['error']"
-            labelForId="rollenart-select"
-            :isRequired="true"
-            :label="$t('admin.rolle.rollenart')"
-          >
-            <v-select
-              clearable
-              data-testid="rollenart-select"
-              density="compact"
-              id="rollenart-select"
-              :items="translatedRollenarten"
-              item-value="value"
-              item-text="title"
-              :placeholder="$t('admin.rolle.selectRollenart')"
-              ref="rollenart-select"
-              required="true"
-              variant="outlined"
-              v-bind="selectedRollenArtProps"
-              v-model="selectedRollenArt"
-              :no-data-text="$t('noDataFound')"
-            ></v-select>
-          </FormRow>
-
-          <template v-if="selectedRollenArt && selectedAdministrationsebene">
-            <!-- 3. Rollenname eingeben -->
-            <v-row>
-              <h3 class="headline-3">3. {{ $t('admin.rolle.enterRollenname') }}</h3>
-            </v-row>
-            <FormRow
-              :errorLabel="selectedRollenNameProps['error']"
-              labelForId="rollenname-input"
-              :isRequired="true"
-              :label="$t('admin.rolle.rollenname')"
-            >
-              <v-text-field
-                clearable
-                data-testid="rollenname-input"
-                density="compact"
-                id="rollenname-input"
-                :placeholder="$t('admin.rolle.enterRollenname')"
-                ref="rollenname-input"
-                required="true"
-                variant="outlined"
-                v-bind="selectedRollenNameProps"
-                v-model="selectedRollenName"
-              ></v-text-field>
-            </FormRow>
-
-            <!-- 4. Merkmale zuordnen -->
-            <v-row>
-              <h3 class="headline-3">4. {{ $t('admin.rolle.assignMerkmale') }}</h3>
-            </v-row>
-            <FormRow
-              :errorLabel="selectedMerkmaleProps['error']"
-              labelForId="merkmale-select"
-              :label="$t('admin.rolle.merkmale')"
-            >
-              <v-select
-                chips
-                clearable
-                data-testid="merkmale-select"
-                density="compact"
-                id="merkmale-select"
-                :items="translatedMerkmale"
-                item-value="value"
-                item-text="title"
-                multiple
-                :placeholder="$t('admin.rolle.selectMerkmale')"
-                variant="outlined"
-                v-bind="selectedMerkmaleProps"
-                v-model="selectedMerkmale"
-                :no-data-text="$t('noDataFound')"
-              ></v-select>
-            </FormRow>
-
-            <!-- 5. Angebote zuordnen -->
-            <v-row>
-              <h3 class="headline-3">5. {{ $t('admin.serviceProvider.assignServiceProvider') }}</h3>
-            </v-row>
-            <FormRow
-              :errorLabel="selectedServiceProvidersProps['error']"
-              labelForId="service-provider-select"
-              :label="$t('admin.serviceProvider.serviceProvider')"
-            >
-              <v-autocomplete
-                autocomplete="off"
-                chips
-                clearable
-                data-testid="service-provider-select"
-                density="compact"
-                id="service-provider-select"
-                :items="serviceProviders"
-                item-value="value"
-                item-text="title"
-                multiple
-                :no-data-text="$t('noDataFound')"
-                :placeholder="$t('admin.serviceProvider.selectServiceProvider')"
-                variant="outlined"
-                v-bind="selectedServiceProvidersProps"
-                v-model="selectedServiceProviders"
-              ></v-autocomplete>
-            </FormRow>
-
-            <!-- 6. Systemrechte zuordnen -->
-            <v-row>
-              <h3 class="headline-3">6. {{ $t('admin.rolle.assignSystemrechte') }}</h3>
-            </v-row>
-            <!-- Iterate over each system right and create a checkbox for it -->
-            <FormRow
-              :errorLabel="selectedSystemRechteProps['error']"
-              labelForId="systemrecht-select"
-              :label="$t('admin.rolle.systemrechte')"
-            >
-              <v-autocomplete
-                autocomplete="off"
-                chips
-                clearable
-                data-testid="systemrechte-select"
-                density="compact"
-                id="systemrechte-select"
-                :items="translatedSystemrechte"
-                item-value="value"
-                item-text="title"
-                multiple
-                :no-data-text="$t('noDataFound')"
-                :placeholder="$t('admin.rolle.selectSystemrechte')"
-                variant="outlined"
-                v-bind="selectedSystemRechteProps"
-                v-model="selectedSystemRechte"
-              ></v-autocomplete>
-            </FormRow>
-          </template>
-        </FormWrapper>
+          :translatedRollenarten="translatedRollenarten"
+          :translatedMerkmale="translatedMerkmale"
+          :translatedSystemrechte="translatedSystemrechte"
+        ></RolleForm>
       </template>
 
       <!-- Result template on success after submit  -->
