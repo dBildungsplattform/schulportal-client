@@ -7,7 +7,7 @@
     type PersonStore,
   } from '@/stores/PersonStore';
   import { RollenArt } from '@/stores/RolleStore';
-  import { type ComputedRef, computed, onMounted, onUnmounted, type Ref, ref, watch } from 'vue';
+  import { type ComputedRef, computed, onMounted, onUnmounted, type Ref, ref } from 'vue';
   import {
     onBeforeRouteLeave,
     type Router,
@@ -36,6 +36,8 @@
   import { useOrganisationen } from '@/composables/useOrganisationen';
   import { useRollen } from '@/composables/useRollen';
   import { useKlassen } from '@/composables/useKlassen';
+  import { useOrganisationWatcher } from '@/composables/useOrganisationWatcher';
+  import { useRolleWatcher } from '@/composables/useRolleWatcher';
 
   const router: Router = useRouter();
   const personStore: PersonStore = usePersonStore();
@@ -133,34 +135,10 @@
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedKlasse', vuetifyConfig);
 
-  watch(selectedRolle, async (newValue: string, oldValue: string) => {
-    if (newValue && newValue !== oldValue) {
-      // Call fetch with an empty string to get the initial organizations for the selected role without any filter
-      await personenkontextStore.processWorkflowStep({
-        organisationId: selectedOrganisation.value,
-        rolleId: newValue,
-        limit: 25,
-      });
-      canCommit.value = personenkontextStore.workflowStepResponse?.canCommit ?? false;
-    }
-  });
-
-  // Watcher to detect when the Organisationsebene is selected so the Klasse shows all the possible choices using that value.
-  watch(selectedOrganisation, (newValue: string, oldValue: string) => {
-    if (newValue && newValue !== oldValue) {
-      resetField('selectedKlasse');
-      resetField('selectedRolle');
-      // This is mainly to fetch the rollen after selecting the orga
-      personenkontextStore.processWorkflowStep({
-        organisationId: newValue,
-      });
-      // Call fetch with an empty string to get the initial organizations for the selected role without any filter
-      organisationStore.getKlassenByOrganisationId(newValue);
-    } else if (!newValue) {
-      resetField('selectedKlasse');
-      resetField('selectedRolle');
-    }
-  });
+  // Watcher to check if the selected Rolle and Orga were selected and then if both can be commited
+  useRolleWatcher(selectedRolle, selectedOrganisation, canCommit);
+  // Watcher to detect when the Organisationsebene is selected so the Klasse and Rollen shows all the possible choices using that value.
+  useOrganisationWatcher(selectedOrganisation, resetField);
 
   const organisationen: ComputedRef<TranslatedObject[] | undefined> = useOrganisationen();
 
