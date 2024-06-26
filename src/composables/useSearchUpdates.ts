@@ -42,6 +42,7 @@ export function useSearchUpdates(
   }
 
   function updateRollenSearch(searchValue: string): void {
+    clearTimeout(timerId.value);
     // If searchValue is empty, fetch all roles for the organisationId
     if (searchValue === '' && !selectedRolle.value) {
       timerId.value = setTimeout(() => {
@@ -64,6 +65,7 @@ export function useSearchUpdates(
   }
 
   function updateKlassenSearch(searchValue: string): void {
+    clearTimeout(timerId.value);
     // If searchValue is empty, fetch all roles for the organisationId
     if (searchValue === '' && !selectedKlasse.value) {
       timerId.value = setTimeout(() => {
