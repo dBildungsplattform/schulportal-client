@@ -11,7 +11,7 @@ export function useKlassen(): ComputedRef<TranslatedObject[]> {
   const organisationStore: OrganisationStore = useOrganisationStore();
 
   return computed(() => {
-    return organisationStore.klassen.map((org: Organisation) => ({
+    return organisationStore.klassen.slice(0, 25).map((org: Organisation) => ({
       value: org.id,
       title: org.name,
     }));
