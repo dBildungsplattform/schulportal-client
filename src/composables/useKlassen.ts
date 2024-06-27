@@ -11,11 +11,9 @@ export function useKlassen(): ComputedRef<TranslatedObject[]> {
   const organisationStore: OrganisationStore = useOrganisationStore();
 
   return computed(() => {
-    return organisationStore.klassen
-      .map((org: Organisation) => ({
-        value: org.id,
-        title: org.name,
-      }))
-      .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
+    return organisationStore.klassen.map((org: Organisation) => ({
+      value: org.id,
+      title: org.name,
+    }));
   });
 }
