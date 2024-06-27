@@ -156,6 +156,9 @@
           limit: 25,
         });
       }, 500);
+      // Necessary since clearing the field manually until an empty searchValue should retrieve all organisations again
+      // PS: By default the autocomplete's searchValue defaults to empty string as soon as the input field is unfocused and so this will be triggered again
+      // resulting in a request (Makes no difference though as we send the orgaId and receive the Rollen again)
     } else if (searchValue === '' && selectedOrganisation.value) {
       // If searchValue is empty and an organization is selected, fetch roles for the selected organization
       timerId.value = setTimeout(async () => {
