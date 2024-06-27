@@ -27,15 +27,11 @@
   import { useForm, type BaseFieldProps, type TypedSchema } from 'vee-validate';
   import { RollenArt } from '@/stores/RolleStore';
   import { type Composer, useI18n } from 'vue-i18n';
-  import FormRow from '@/components/form/FormRow.vue';
   import { useOrganisationen } from '@/composables/useOrganisationen';
   import { useRollen } from '@/composables/useRollen';
   import { useKlassen } from '@/composables/useKlassen';
-  import { useOrganisationWatcher } from '@/composables/useOrganisationWatcher';
-  import { useRolleWatcher } from '@/composables/useRolleWatcher';
-  import { useSelectedTitles, type SelectedTitles } from '@/composables/useSelectedTitles';
-  import { useSearchUpdates, type SearchUpdates } from '@/composables/useSearchUpdates';
-
+  import PersonenkontextCreate from '@/components/admin/personen/PersonenkontextCreate.vue';
+  
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
   const { t }: Composer = useI18n({ useScope: 'global' });
@@ -68,8 +64,6 @@
   const cannotDeleteDialogVisible: Ref<boolean> = ref(false);
   const createZuordnungConfirmationDialogVisible: Ref<boolean> = ref(false);
   const createZuordnungConfirmationDialogMessage: Ref<string> = ref('');
-
-  let timerId: Ref<ReturnType<typeof setTimeout> | undefined> = ref<ReturnType<typeof setTimeout>>();
 
   const canCommit: Ref<boolean> = ref(false);
 
@@ -292,12 +286,12 @@
   });
 
   // eslint-disable-next-line @typescript-eslint/typedef
-  const { defineField, handleSubmit, resetForm, resetField } = useForm<ZuordnungCreationForm>({
+  const { defineField, handleSubmit, resetForm } = useForm<ZuordnungCreationForm>({
     validationSchema,
   });
 
   const [selectedRolle, selectedRolleProps]: [
-    Ref<string>,
+    Ref<string | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedRolle', vuetifyConfig);
   const [selectedOrganisation, selectedOrganisationProps]: [
@@ -305,7 +299,7 @@
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedOrganisation', vuetifyConfig);
   const [selectedKlasse, selectedKlasseProps]: [
-    Ref<string>,
+    Ref<string | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedKlasse', vuetifyConfig);
 
@@ -332,7 +326,6 @@
 
   // This will send the updated list of Zuordnungen to the Backend on TOP of the new added one through the form.
   const confirmAddition = async (): Promise<void> => {
-
     await personenkontextStore.updatePersonenkontexte(finalZuordnungen.value, currentPersonId);
     createSuccessDialogVisible.value = true;
     resetForm();
@@ -350,11 +343,6 @@
   // The save button is always disabled if there is no pending creation nor deletion.
   const isSaveButtonDisabled: ComputedRef<boolean> = computed(() => !pendingCreation.value && !pendingDeletion.value);
 
-  // Watcher to check if the selected Rolle and Orga were selected and then if both can be commited
-  useRolleWatcher(selectedRolle, selectedOrganisation, canCommit);
-  // Watcher to detect when the Organisationsebene is selected so the Klasse and Rollen shows all the possible choices using that value.
-  useOrganisationWatcher(selectedOrganisation, resetField);
-
   // Filter out the Rollen in case the admin chooses an organisation that the user has already a kontext in
   const filteredRollen: ComputedRef<RolleWithRollenart[] | undefined> = computed(() => {
     const existingZuordnungen: Zuordnung[] | undefined = personenkontextStore.personenuebersicht?.zuordnungen.filter(
@@ -366,27 +354,31 @@
     );
   });
 
-  const { selectedOrganisationTitle, selectedRolleTitle, selectedKlasseTitle }: SelectedTitles = useSelectedTitles(
-    organisationen,
-    rollen,
-    klassen,
-    selectedOrganisation,
-    selectedRolle,
-    selectedKlasse,
-  );
+
+  // Computed property to get the title of the selected role
+  const selectedRolleTitle: ComputedRef<string | undefined> = computed(() => {
+    return rollen.value?.find((rolle: TranslatedObject) => rolle.value === selectedRolle.value)?.title;
+  });
+
+  // Computed property to get the title of the selected class
+  const selectedKlasseTitle: ComputedRef<string | undefined> = computed(() => {
+    return klassen.value?.find((klasse: TranslatedObject) => klasse.value === selectedKlasse.value)?.title;
+  });
 
   const onSubmit: (e?: Event | undefined) => Promise<void | undefined> = handleSubmit(() => {
-    if (isLernRolle(selectedRolle.value)) {
-      createZuordnungConfirmationDialogMessage.value = t('person.addZuordnungKlasseConfirmation', {
-        rollenname: selectedRolleTitle.value,
-        klassenname: selectedKlasseTitle.value,
-      });
-    } else {
-      createZuordnungConfirmationDialogMessage.value = t('person.addZuordnungConfirmation', {
-        rollenname: selectedRolleTitle.value,
-      });
+    if (selectedRolle.value) {
+      if (isLernRolle(selectedRolle.value)) {
+        createZuordnungConfirmationDialogMessage.value = t('person.addZuordnungKlasseConfirmation', {
+          rollenname: selectedRolleTitle.value,
+          klassenname: selectedKlasseTitle.value,
+        });
+      } else {
+        createZuordnungConfirmationDialogMessage.value = t('person.addZuordnungConfirmation', {
+          rollenname: selectedRolleTitle.value,
+        });
+      }
+      createZuordnungConfirmationDialogVisible.value = true;
     }
-    createZuordnungConfirmationDialogVisible.value = true;
   });
 
   const confirmDialogAddition = async (): Promise<void> => {
@@ -400,7 +392,7 @@
     if (organisation) {
       newZuordnung.value = {
         sskId: organisation.id,
-        rolleId: selectedRolle.value,
+        rolleId: selectedRolle.value ?? '',
         klasse: klasse?.name,
         sskDstNr: organisation.kennung ?? '',
         sskName: organisation.name,
@@ -416,7 +408,7 @@
       if (klasse) {
         finalZuordnungen.value.push({
           sskId: klasse.id,
-          rolleId: selectedRolle.value,
+          rolleId: selectedRolle.value ?? '',
           sskDstNr: klasse.kennung ?? '',
           sskName: klasse.name,
           rolle: rollen.value?.find((rolle: RolleWithRollenart) => rolle.value === selectedRolle.value)?.title || '',
@@ -436,26 +428,6 @@
     createZuordnungConfirmationDialogVisible.value = false;
   };
 
-  const { updateOrganisationSearch, updateRollenSearch, updateKlassenSearch }: SearchUpdates = useSearchUpdates(
-    selectedOrganisation,
-    selectedRolle,
-    selectedKlasse,
-    selectedOrganisationTitle,
-    selectedRolleTitle,
-    selectedKlasseTitle,
-    timerId,
-  );
-
-  // Clear the selected Organisation once the input field is cleared (This is the only way to fetch all Orgas again)
-  // This is also important since we only want to fetch all orgas once the selected Orga is null, otherwise an extra request is made with an empty string
-  function clearSelectedOrganisation(): void {
-    resetField('selectedOrganisation');
-  }
-  // Clear the selected Rolle once the input field is cleared (This is the only way to fetch all Rollen again)
-  // This is also important since we only want to fetch all orgas once the selected Rolle is null, otherwise an extra request is made with an empty string
-  function clearSelectedRolle(): void {
-    resetField('selectedRolle');
-  }
   watch(
     () => personenkontextStore.personenuebersicht,
     (newValue: Uebersicht | null) => {
@@ -464,6 +436,13 @@
     { immediate: true },
   );
 
+  function handleFieldReset(field: string): void {
+    if (field === 'selectedRolle') {
+      selectedRolle.value = undefined;
+    } else if (field === 'selectedKlasse') {
+      selectedKlasse.value = undefined;
+    }
+  }
   onBeforeMount(async () => {
     await personStore.getPersonById(currentPersonId);
     await personenkontextStore.getPersonenuebersichtById(currentPersonId);
@@ -923,88 +902,24 @@
                 >
               </v-row>
               <v-container class="px-lg-16">
-                <!-- Organisation zuordnen -->
-                <FormRow
-                  :errorLabel="selectedOrganisationProps['error']"
-                  :isRequired="true"
-                  labelForId="organisation-select"
-                  :label="$t('admin.organisation.organisation')"
-                >
-                  <v-autocomplete
-                    autocomplete="off"
-                    clearable
-                    @clear="clearSelectedOrganisation"
-                    data-testid="organisation-select"
-                    density="compact"
-                    id="organisation-select"
-                    ref="organisation-select"
-                    :items="organisationen"
-                    item-value="value"
-                    item-text="title"
-                    :no-data-text="$t('noDataFound')"
-                    :placeholder="$t('admin.organisation.selectOrganisation')"
-                    required="true"
-                    @update:search="updateOrganisationSearch"
-                    variant="outlined"
-                    v-bind="selectedOrganisationProps"
-                    v-model="selectedOrganisation"
-                  ></v-autocomplete>
-                </FormRow>
-                <div v-if="selectedOrganisation">
-                  <!-- Rollenzuordnung -->
-                  <FormRow
-                    :errorLabel="selectedRolleProps['error']"
-                    labelForId="rolle-select"
-                    :isRequired="true"
-                    :label="$t('admin.rolle.rolle')"
-                  >
-                    <v-autocomplete
-                      autocomplete="off"
-                      clearable
-                      @clear="clearSelectedRolle"
-                      data-testid="rolle-select"
-                      density="compact"
-                      id="rolle-select"
-                      ref="rolle-select"
-                      :items="filteredRollen"
-                      item-value="value"
-                      item-text="title"
-                      :no-data-text="$t('noDataFound')"
-                      :placeholder="$t('admin.rolle.selectRolle')"
-                      required="true"
-                      @update:search="updateRollenSearch"
-                      variant="outlined"
-                      v-bind="selectedRolleProps"
-                      v-model="selectedRolle"
-                    ></v-autocomplete>
-                  </FormRow>
-                  <!-- Klasse zuordnen -->
-                  <FormRow
-                    v-if="isLernRolle(selectedRolle) && selectedOrganisation"
-                    :errorLabel="selectedKlasseProps['error']"
-                    :isRequired="true"
-                    labelForId="klasse-select"
-                    :label="$t('admin.klasse.klasse')"
-                  >
-                    <v-autocomplete
-                      autocomplete="off"
-                      clearable
-                      data-testid="klasse-select"
-                      density="compact"
-                      id="klasse-select"
-                      ref="klasse-select"
-                      :items="klassen"
-                      item-value="value"
-                      item-text="title"
-                      :no-data-text="$t('noDataFound')"
-                      :placeholder="$t('admin.klasse.selectKlasse')"
-                      @update:search="updateKlassenSearch"
-                      variant="outlined"
-                      v-bind="selectedKlasseProps"
-                      v-model="selectedKlasse"
-                    ></v-autocomplete>
-                  </FormRow>
-                </div>
+                <!-- Organisation, Rolle, Klasse zuordnen -->
+                <PersonenkontextCreate
+                  :showHeadline="false"
+                  :organisationen="organisationen"
+                  :rollen="filteredRollen"
+                  :klassen="klassen"
+                  :selectedOrganisationProps="selectedOrganisationProps"
+                  :selectedRolleProps="selectedRolleProps"
+                  :selectedKlasseProps="selectedKlasseProps"
+                  v-model:selectedOrganisation="selectedOrganisation"
+                  v-model:selectedRolle="selectedRolle"
+                  v-model:selectedKlasse="selectedKlasse"
+                  @update:selectedOrganisation="(value: string) => (selectedOrganisation = value)"
+                  @update:selectedRolle="(value: string | undefined) => (selectedRolle = value)"
+                  @update:selectedKlasse="(value: string) => (selectedKlasse = value)"
+                  @update:canCommit="canCommit = $event"
+                  @fieldReset="handleFieldReset"
+                />
               </v-container>
               <v-row class="py-3 px-2 justify-center">
                 <v-spacer class="hidden-sm-and-down"></v-spacer>
