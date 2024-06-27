@@ -20,6 +20,7 @@ import {
   type PersonenkontexteUpdateResponse,
   type PersonenkontextStore,
   type PersonenkontextWorkflowResponse,
+  type Zuordnung,
 } from './PersonenkontextStore';
 import { usePersonStore, type PersonStore } from './PersonStore';
 
@@ -212,73 +213,77 @@ describe('PersonenkontextStore', () => {
           } as DBiamPersonenkontextResponse,
         ],
       };
-
-      const updateParams: DbiamUpdatePersonenkontexteBodyParams = {
-        lastModified: '2024-06-24T16:35:32.711Z',
-        count: 1,
-        personenkontexte: [
-          {
-            personId: '12345',
-            organisationId: '67890',
-            rolleId: '54321',
-          },
-        ],
-      };
-
+  
+      const mockZuordnungen: Zuordnung[] = [
+        {
+          sskId: '67890',
+          rolleId: '54321',
+          sskName: 'some ssk name',
+          sskDstNr: '123',
+          rolle: 'some role',
+          administriertVon: 'some admin',
+          typ: OrganisationsTyp.Schule,
+          editable: true,
+        },
+      ];
+  
       mockadapter.onPut('/api/personenkontext-workflow/1').replyOnce(200, mockResponse);
-
+  
       const updatePersonenkontextePromise: Promise<PersonenkontexteUpdateResponse> =
-        personenkontextStore.updatePersonenkontexte(updateParams, '1');
+        personenkontextStore.updatePersonenkontexte(mockZuordnungen, '1');
       expect(personenkontextStore.loading).toBe(true);
       const response: PersonenkontexteUpdateResponse = await updatePersonenkontextePromise;
       expect(response).toEqual(mockResponse);
       expect(personenkontextStore.loading).toBe(false);
     });
-
+  
     it('should handle string error', async () => {
-      const updateParams: DbiamUpdatePersonenkontexteBodyParams = {
-        lastModified: '2024-06-24T16:35:32.711Z',
-        count: 1,
-        personenkontexte: [
-          {
-            personId: '1',
-            organisationId: '67890',
-            rolleId: '54321',
-          },
-        ],
-      };
-
+      const mockZuordnungen: Zuordnung[] = [
+        {
+          sskId: '67890',
+          rolleId: '54321',
+          sskName: 'some ssk name',
+          sskDstNr: '123',
+          rolle: 'some role',
+          administriertVon: 'some admin',
+          typ: OrganisationsTyp.Schule,
+          editable: true,
+        },
+      ];
+  
       mockadapter.onPut('/api/personenkontext-workflow/1').replyOnce(500, 'some error');
       const updatePersonenkontextePromise: Promise<PersonenkontexteUpdateResponse> =
-        personenkontextStore.updatePersonenkontexte(updateParams, '1');
+        personenkontextStore.updatePersonenkontexte(mockZuordnungen, '1');
       expect(personenkontextStore.loading).toBe(true);
       await rejects(updatePersonenkontextePromise);
       expect(personenkontextStore.errorCode).toEqual('PERSONENKONTEXTE_UPDATE_ERROR');
       expect(personenkontextStore.loading).toBe(false);
     });
-
+  
     it('should handle error code', async () => {
-      const updateParams: DbiamUpdatePersonenkontexteBodyParams = {
-        lastModified: '2024-06-24T16:35:32.711Z',
-        count: 1,
-        personenkontexte: [
-          {
-            personId: '1',
-            organisationId: '67890',
-            rolleId: '54321',
-          },
-        ],
-      };
-
+      const mockZuordnungen: Zuordnung[] = [
+        {
+          sskId: '67890',
+          rolleId: '54321',
+          sskName: 'some ssk name',
+          sskDstNr: '123',
+          rolle: 'some role',
+          administriertVon: 'some admin',
+          typ: OrganisationsTyp.Schule,
+          editable: true,
+        },
+      ];
+  
       mockadapter.onPut('/api/personenkontext-workflow/1').replyOnce(500, { i18nKey: 'SOME_MOCK_SERVER_ERROR' });
       const updatePersonenkontextePromise: Promise<PersonenkontexteUpdateResponse> =
-        personenkontextStore.updatePersonenkontexte(updateParams, '1');
+        personenkontextStore.updatePersonenkontexte(mockZuordnungen, '1');
       expect(personenkontextStore.loading).toBe(true);
       await rejects(updatePersonenkontextePromise);
       expect(personenkontextStore.errorCode).toEqual('SOME_MOCK_SERVER_ERROR');
       expect(personenkontextStore.loading).toBe(false);
     });
   });
+  
   describe('createPersonenkontextForSchule', () => {
     it('should create a Personenkontext for the Schule', async () => {
       const mockPersonenkontext: DBiamPersonenkontextResponse = {
