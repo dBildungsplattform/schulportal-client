@@ -998,6 +998,7 @@
       <LayoutCard
         :closable="true"
         :header="$t('person.editZuordnungen')"
+         @onCloseClicked="closeDeleteSuccessDialog"
       >
         <v-card-text>
           <v-container>
@@ -1039,6 +1040,7 @@
       <LayoutCard
         :closable="true"
         :header="$t('person.editZuordnungen')"
+         @onCloseClicked="closeCreateSuccessDialog"
       >
         <v-card-text>
           <v-container>
@@ -1080,6 +1082,7 @@
       <LayoutCard
         :closable="true"
         :header="$t('person.editZuordnungen')"
+          @onCloseClicked="cancelAddition"
       >
         <v-card-text>
           <v-container>
@@ -1134,6 +1137,7 @@
       <LayoutCard
         :closable="true"
         :header="$t('person.editZuordnungen')"
+          @onCloseClicked="closeCannotDeleteDialog"
       >
         <v-card-text>
           <v-container>

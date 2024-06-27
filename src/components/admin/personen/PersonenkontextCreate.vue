@@ -85,25 +85,29 @@
     );
     return !!rolle && rolle.Rollenart === RollenArt.Lern;
   }
+
+  // Watcher for selectedOrganisation to fetch roles and classes
   watch(selectedOrganisation, (newValue: string | undefined, oldValue: string | undefined) => {
     if (newValue && newValue !== oldValue) {
-      // This is mainly to fetch the rollen after selecting the orga
+      // Fetch the roles after selecting the organization
       personenkontextStore.processWorkflowStep({
         organisationId: newValue,
         limit: 25,
       });
-      // Call fetch with an empty string to get the initial organizations for the selected role without any filter
+
+      // Fetch all classes for the selected organization without any filter
       organisationStore.getKlassenByOrganisationId(newValue);
     } else if (!newValue) {
-      // If the organisation is flushed then clear the Rolle and Klasse by emitting undefined values for them
+      // If the organization is cleared, reset selectedRolle and selectedKlasse
       selectedRolle.value = undefined;
       selectedKlasse.value = undefined;
       emits('fieldReset', 'selectedRolle');
       emits('fieldReset', 'selectedKlasse');
     }
-    // Emit the new selected Organisation to the parent
+    // Emit the new selected organization to the parent component
     emits('update:selectedOrganisation', newValue);
   });
+
   watch(selectedRolle, async (newValue: string | undefined, oldValue: string | undefined) => {
     if (newValue && newValue !== oldValue) {
       // Call fetch with an empty string to get the initial organizations for the selected role without any filter
@@ -131,7 +135,8 @@
 
   function updateOrganisationSearch(searchValue: string): void {
     clearTimeout(timerId.value);
-    // If searchValue is empty and selectedOrganisation does not have a value, fetch data without getKlassenByOrganisationId
+
+    // If searchValue is empty and selectedOrganisation does not have a value, fetch initial data
     if (searchValue === '' && !selectedOrganisation.value) {
       timerId.value = setTimeout(async () => {
         await personenkontextStore.processWorkflowStep({
@@ -139,14 +144,23 @@
         });
       }, 500);
     } else if (searchValue && searchValue !== selectedOrganisationTitle.value) {
+      // If searchValue is not empty and different from the current title, proceed with the search
+      // Reset selectedRolle only if it's a new search and not when selecting an organization
       selectedRolle.value = undefined;
       emits('fieldReset', 'selectedRolle');
       emits('update:selectedRolle', undefined);
-      // If searchValue is not empty and different from the current title, proceed with the search
-      // (This stops an extra request being made once a value is selected)
+
       timerId.value = setTimeout(async () => {
         await personenkontextStore.processWorkflowStep({
           organisationName: searchValue,
+          limit: 25,
+        });
+      }, 500);
+    } else if (searchValue === '' && selectedOrganisation.value) {
+      // If searchValue is empty and an organization is selected, fetch roles for the selected organization
+      timerId.value = setTimeout(async () => {
+        await personenkontextStore.processWorkflowStep({
+          organisationId: selectedOrganisation.value,
           limit: 25,
         });
       }, 500);
@@ -170,6 +184,15 @@
         personenkontextStore.processWorkflowStep({
           organisationId: selectedOrganisation.value,
           rolleName: searchValue,
+          limit: 25,
+        });
+      }, 500);
+    }
+    else if (searchValue === '' && selectedRolle.value) {
+      // If searchValue is empty and an organization is selected, fetch roles for the selected organization
+      timerId.value = setTimeout(() => {
+        personenkontextStore.processWorkflowStep({
+          organisationId: selectedOrganisation.value,
           limit: 25,
         });
       }, 500);
