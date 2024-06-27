@@ -16,7 +16,6 @@ import { rejects } from 'assert';
 import {
   PersonenKontextTyp,
   usePersonenkontextStore,
-  type DbiamUpdatePersonenkontexteBodyParams,
   type PersonenkontexteUpdateResponse,
   type PersonenkontextStore,
   type PersonenkontextWorkflowResponse,
