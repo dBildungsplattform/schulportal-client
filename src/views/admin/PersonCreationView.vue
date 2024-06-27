@@ -304,7 +304,7 @@
           v-model:selectedKlasse="selectedKlasse"
           @update:selectedOrganisation="(value: string) => (selectedOrganisation = value)"
           @update:selectedRolle="(value: string | undefined) => (selectedRolle = value)"
-          @update:selectedKlasse="(value: string) => (selectedKlasse = value)"
+          @update:selectedKlasse="(value: string | undefined) => (selectedKlasse = value)"
           @update:canCommit="canCommit = $event"
           @fieldReset="handleFieldReset"
         />

@@ -24,53 +24,68 @@
     title: string;
   };
 
-  const props = defineProps({
-    organisationen: { type: Array<TranslatedObject>, required: true },
-    rollen: { type: Array<RolleWithRollenart>, required: true },
-    klassen: { type: Array<TranslatedObject>, required: true },
-    selectedOrganisationProps: { type: Object, required: true },
-    selectedRolleProps: { type: Object, required: true },
-    selectedKlasseProps: { type: Object, required: true },
-    selectedOrganisation: { type: String, required: true },
-    selectedRolle: { type: String, required: true },
-    selectedKlasse: { type: String, required: false },
-    showHeadline: { type: Boolean, required: true },
-  });
+  type Props = {
+    organisationen: TranslatedObject[] | undefined;
+    rollen: RolleWithRollenart[] | undefined;
+    klassen: TranslatedObject[] | undefined;
+    selectedOrganisationProps: {
+      modelValue: string;
+      error: boolean;
+      'error-messages': string[];
+    };
+    selectedRolleProps: {
+      modelValue: string;
+      error: boolean;
+      'error-messages': string[];
+    };
+    selectedKlasseProps: {
+      modelValue: string;
+      error: boolean;
+      'error-messages': string[];
+    };
+    selectedOrganisation: string | undefined;
+    selectedRolle: string | undefined;
+    selectedKlasse?: string | undefined;
+    showHeadline: boolean;
+  };
 
-  const emits = defineEmits([
-    'update:selectedOrganisation',
-    'update:selectedRolle',
-    'update:selectedKlasse',
-    'update:canCommit',
-    'fieldReset',
-  ]);
+  const props: Props = defineProps<Props>();
 
-  const selectedOrganisation: Ref<string> = ref(props.selectedOrganisation);
+  type Emits = {
+    (event: 'update:selectedOrganisation', value: string | undefined): void;
+    (event: 'update:selectedRolle', value: string | undefined): void;
+    (event: 'update:selectedKlasse', value: string | undefined): void;
+    (event: 'update:canCommit', value: boolean): void;
+    (event: 'fieldReset', field: 'selectedOrganisation' | 'selectedRolle' | 'selectedKlasse'): void;
+  };
+  const emits: Emits = defineEmits<Emits>();
+
+  const selectedOrganisation: Ref<string | undefined> = ref(props.selectedOrganisation);
   const selectedRolle: Ref<string | undefined> = ref(props.selectedRolle);
   const selectedKlasse: Ref<string | undefined> = ref(props.selectedKlasse);
 
   // Computed property to get the title of the selected organisation
   const selectedOrganisationTitle: ComputedRef<string | undefined> = computed(() => {
-    return props.organisationen.find((org: TranslatedObject) => org.value === selectedOrganisation.value)?.title;
+    return props.organisationen?.find((org: TranslatedObject) => org.value === selectedOrganisation.value)?.title;
   });
 
   // Computed property to get the title of the selected role
   const selectedRolleTitle: ComputedRef<string | undefined> = computed(() => {
-    return props.rollen.find((rolle: TranslatedObject) => rolle.value === selectedRolle.value)?.title;
+    return props.rollen?.find((rolle: TranslatedObject) => rolle.value === selectedRolle.value)?.title;
   });
 
   // Computed property to get the title of the selected class
   const selectedKlasseTitle: ComputedRef<string | undefined> = computed(() => {
-    return props.klassen.find((klasse: TranslatedObject | undefined) => klasse?.value === selectedKlasse.value)?.title;
+    return props.klassen?.find((klasse: TranslatedObject | undefined) => klasse?.value === selectedKlasse.value)?.title;
   });
 
   function isLernRolle(selectedRolleId: string | undefined): boolean {
-    const rolle: RolleWithRollenart | undefined = props.rollen.find(
+    const rolle: RolleWithRollenart | undefined = props.rollen?.find(
       (r: RolleWithRollenart) => r.value === selectedRolleId,
     );
     return !!rolle && rolle.Rollenart === RollenArt.Lern;
   }
-  watch(selectedOrganisation, (newValue: string, oldValue: string) => {
+  watch(selectedOrganisation, (newValue: string | undefined, oldValue: string | undefined) => {
     if (newValue && newValue !== oldValue) {
       // This is mainly to fetch the rollen after selecting the orga
       personenkontextStore.processWorkflowStep({
@@ -126,7 +141,7 @@
     } else if (searchValue && searchValue !== selectedOrganisationTitle.value) {
       selectedRolle.value = undefined;
       emits('fieldReset', 'selectedRolle');
-      emits('update:selectedRolle', null);
+      emits('update:selectedRolle', undefined);
       // If searchValue is not empty and different from the current title, proceed with the search
       // (This stops an extra request being made once a value is selected)
       timerId.value = setTimeout(async () => {
@@ -163,17 +178,22 @@
 
   function updateKlassenSearch(searchValue: string): void {
     clearTimeout(timerId.value);
+    const organisationId: string | undefined = selectedOrganisation.value;
+
+    if (!organisationId) {
+      return;
+    }
     // If searchValue is empty, fetch all roles for the organisationId
     if (searchValue === '' && !selectedKlasse.value) {
       timerId.value = setTimeout(() => {
-        organisationStore.getKlassenByOrganisationId(selectedOrganisation.value, searchValue);
+        organisationStore.getKlassenByOrganisationId(organisationId, searchValue);
       }, 500);
     } else if (searchValue && searchValue !== selectedKlasseTitle.value) {
       /* cancel pending call */
       clearTimeout(timerId.value);
       /* delay new call 500ms */
       timerId.value = setTimeout(() => {
-        organisationStore.getKlassenByOrganisationId(selectedOrganisation.value, searchValue);
+        organisationStore.getKlassenByOrganisationId(organisationId, searchValue);
       }, 500);
     }
   }
