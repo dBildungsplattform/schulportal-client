@@ -89,7 +89,6 @@
     // Emit the new selected Organisation to the parent
     emits('update:selectedOrganisation', newValue);
   });
-
   watch(selectedRolle, async (newValue: string | undefined, oldValue: string | undefined) => {
     if (newValue && newValue !== oldValue) {
       // Call fetch with an empty string to get the initial organizations for the selected role without any filter

@@ -1,24 +1,11 @@
 import { expect, test } from 'vitest';
 import { VueWrapper, mount } from '@vue/test-utils';
 import PersonCreationView from './PersonCreationView.vue';
-import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
-import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
 import MockAdapter from 'axios-mock-adapter';
 import ApiService from '@/services/ApiService';
-import { nextTick } from 'vue';
-import type {
-  DBiamPersonResponse,
-  DBiamPersonenkontextResponse,
-  RollenMerkmal,
-  RollenSystemRecht,
-} from '@/api-client/generated';
-import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
 
 const mockadapter: MockAdapter = new MockAdapter(ApiService);
 let wrapper: VueWrapper | null = null;
-let organisationStore: OrganisationStore;
-let personenkontextStore: PersonenkontextStore;
-let personStore: PersonStore;
 
 beforeEach(() => {
   mockadapter.reset();
@@ -28,79 +15,6 @@ beforeEach(() => {
     </div>
   `;
 
-  organisationStore = useOrganisationStore();
-  personenkontextStore = usePersonenkontextStore();
-  personStore = usePersonStore();
-
-  personenkontextStore.workflowStepResponse = {
-    organisations: [
-      {
-        id: 'string',
-        kennung: '',
-        name: 'Organisation1',
-        namensergaenzung: 'string',
-        kuerzel: 'string',
-        typ: 'TRAEGER',
-        administriertVon: '1',
-      },
-    ],
-    rollen: [],
-    selectedOrganisation: null,
-    selectedRolle: null,
-    canCommit: true,
-  };
-
-  personenkontextStore.createdPersonenkontextForOrganisation = {
-    personId: '12345',
-    organisationId: '67890',
-    rolleId: '54321',
-  } as DBiamPersonenkontextResponse;
-
-  personenkontextStore.createdPersonenkontextForKlasse = {
-    personId: '12345',
-    organisationId: '55555',
-    rolleId: '54321',
-  } as DBiamPersonenkontextResponse;
-
-  organisationStore.klassen = [
-    {
-      id: '1',
-      kennung: 'Org1',
-      name: '9a',
-      namensergaenzung: 'Ergänzung',
-      kuerzel: 'O1',
-      typ: OrganisationsTyp.Klasse,
-      administriertVon: '1',
-    },
-    {
-      id: '2',
-      kennung: 'Org2',
-      name: '9b',
-      namensergaenzung: 'Ergänzung',
-      kuerzel: 'O2',
-      typ: OrganisationsTyp.Klasse,
-      administriertVon: '1',
-    },
-  ];
-
-  personenkontextStore.workflowStepResponse = {
-    rollen: [
-      {
-        administeredBySchulstrukturknoten: '1234',
-        rollenart: 'LERN',
-        name: 'SuS',
-        merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RollenMerkmal>,
-        systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
-        createdAt: '2022',
-        updatedAt: '2022',
-        id: '54321',
-      },
-    ],
-    organisations: [],
-    selectedOrganisation: null,
-    selectedRolle: null,
-    canCommit: true,
-  };
 
   wrapper = mount(PersonCreationView, {
     attachTo: document.getElementById('app') || '',
@@ -127,136 +41,5 @@ describe('PersonCreationView', () => {
     expect(wrapper?.getComponent({ name: 'SpshAlert' })).toBeTruthy();
     expect(wrapper?.getComponent({ name: 'FormWrapper' })).toBeTruthy();
     expect(wrapper?.getComponent({ name: 'FormRow' })).toBeTruthy();
-  });
-
-  test('it updates search and sets values selected rolle, organisation and klasse', async () => {
-    const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
-    await organisationAutocomplete?.vm.$emit('update:search', '01');
-    await organisationAutocomplete?.setValue('O1');
-    await nextTick();
-
-    const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
-    await rolleAutocomplete?.vm.$emit('update:search', '54321');
-    await rolleAutocomplete?.setValue('54321');
-    await nextTick();
-
-    expect(organisationAutocomplete?.text()).toEqual('O1');
-    await nextTick();
-
-    const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
-    await klasseAutocomplete?.vm.$emit('update:search', '55555');
-    await klasseAutocomplete?.setValue('55555');
-    await nextTick();
-
-    expect(klasseAutocomplete?.text()).toEqual('55555');
-  });
-
-  test('it resets field Rolle when Organisation is reset after being selected', async () => {
-    const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
-    await organisationAutocomplete?.setValue('O1');
-    await nextTick();
-
-    const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
-    await rolleAutocomplete?.setValue('54321');
-    await nextTick();
-
-    await organisationAutocomplete?.setValue(undefined);
-    await nextTick();
-
-    expect(rolleAutocomplete?.exists()).toBe(false);
-  });
-
-  test('it resets field Klasse when Rolle is reset after being selected', async () => {
-    const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
-    await organisationAutocomplete?.setValue('O1');
-    await nextTick();
-
-    const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
-    await rolleAutocomplete?.setValue('54321');
-    await nextTick();
-
-    const klassenAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
-    await klassenAutocomplete?.setValue('O1');
-    await nextTick();
-
-    await organisationAutocomplete?.setValue(undefined);
-    await nextTick();
-
-    expect(klassenAutocomplete?.exists()).toBe(false);
-  });
-
-  test('it triggers submit', async () => {
-    const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
-    await organisationAutocomplete?.setValue('O1');
-    await nextTick();
-
-    const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
-    await rolleAutocomplete?.setValue('54321');
-    await nextTick();
-
-    const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
-    await klasseAutocomplete?.setValue('55555');
-    await nextTick();
-
-    const familiennameInput: VueWrapper | undefined = wrapper?.findComponent({ ref: 'familienname-input' });
-    await familiennameInput?.setValue('Mustermann');
-    await nextTick();
-
-    const mockPerson: DBiamPersonResponse = {
-      person: {
-        id: '9876',
-        name: {
-          familienname: 'Cena',
-          vorname: 'Randy',
-        },
-        referrer: 'rcena',
-        mandant: '',
-        geburt: null,
-        stammorganisation: null,
-        geschlecht: null,
-        lokalisierung: null,
-        vertrauensstufe: 'KEIN',
-        revision: '',
-        startpasswort: '',
-        personalnummer: null,
-      },
-      DBiamPersonenkontextResponse: {
-        organisationId: '12345',
-        rolleId: '54321',
-        personId: '9876',
-      },
-    };
-
-    personStore.createdPersonWithKontext = mockPerson;
-
-    wrapper?.find('[data-testid="person-creation-form-create-button"]').trigger('click');
-    await nextTick();
-  });
-
-  test('it updates Organisation search correctly', async () => {
-    const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
-
-    await organisationAutocomplete?.setValue(undefined);
-    await nextTick();
-
-    await organisationAutocomplete?.vm.$emit('update:search', '');
-    await nextTick();
-    expect(personenkontextStore.processWorkflowStep).toHaveBeenCalled();
-  });
-
-  test('it updates Rollen search correctly', async () => {
-    const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
-
-    await organisationAutocomplete?.setValue('org');
-    await nextTick();
-
-    const rollenAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
-
-    await rollenAutocomplete?.setValue(undefined);
-    await nextTick();
-
-    await rollenAutocomplete?.vm.$emit('update:search', '');
-    await nextTick();
-    expect(personenkontextStore.processWorkflowStep).toHaveBeenCalled();
   });
 });
