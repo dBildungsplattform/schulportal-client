@@ -15,6 +15,7 @@ beforeEach(() => {
     attachTo: document.getElementById('app') || '',
     props: {
       id: 'test-form-wrapper',
+      canCommit: true,
       confirmUnsavedChangesAction: () => vi.fn(),
       createButtonLabel: 'what a label',
       discardButtonLabel: 'another label',

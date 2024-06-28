@@ -82,7 +82,7 @@
                 </p>
               </v-col>
             </v-row>
-            <v-row class="text-body bold px-md-16">
+            <v-row class="text-body bold">
               <v-col
                 v-if="zuordnungCount == 1"
                 offset="2"

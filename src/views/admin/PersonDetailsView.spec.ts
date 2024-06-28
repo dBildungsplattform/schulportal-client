@@ -5,11 +5,14 @@ import routes from '@/router/routes';
 import PersonDetailsView from './PersonDetailsView.vue';
 import { type Personendatensatz, type PersonStore, usePersonStore } from '@/stores/PersonStore';
 import { usePersonenkontextStore, type PersonenkontextStore, type Uebersicht } from '@/stores/PersonenkontextStore';
-import { OrganisationsTyp } from '@/stores/OrganisationStore';
+import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
+import { RollenMerkmal, RollenSystemRecht } from '@/stores/RolleStore';
+import { nextTick } from 'vue';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
 
+const organisationStore: OrganisationStore = useOrganisationStore();
 const personStore: PersonStore = usePersonStore();
 const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
 
@@ -63,6 +66,47 @@ const mockPersonenuebersicht: Uebersicht = {
   ],
 };
 
+personenkontextStore.workflowStepResponse = {
+  organisations: [
+    {
+      id: 'string',
+      administriertVon: 'string',
+      kennung: 'string',
+      name: 'string',
+      namensergaenzung: 'string',
+      kuerzel: 'string',
+      typ: 'ROOT',
+    },
+  ],
+  rollen: [
+    {
+      id: '54321',
+      createdAt: '2024-06-25T13:03:53.802Z',
+      updatedAt: '2024-06-25T13:03:53.802Z',
+      name: 'string',
+      administeredBySchulstrukturknoten: 'string',
+      rollenart: 'LERN',
+      merkmale: RollenMerkmal.BefristungPflicht as unknown as Set<RollenMerkmal>,
+      systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
+    },
+  ],
+  selectedOrganisation: 'string',
+  selectedRolle: 'string',
+  canCommit: true,
+};
+
+organisationStore.klassen = [
+  {
+    id: '1',
+    kennung: '1234567',
+    name: 'Klasse 1',
+    namensergaenzung: 'Ergänzung',
+    kuerzel: 'K1',
+    typ: OrganisationsTyp.Klasse,
+    administriertVon: '1',
+  },
+];
+
 personStore.currentPerson = mockPerson;
 personenkontextStore.personenuebersicht = mockPersonenuebersicht;
 
@@ -108,5 +152,17 @@ describe('PersonDetailsView', () => {
     );
     await wrapper?.find('[data-testid="close-layout-card-button"]').trigger('click');
     expect(push).toHaveBeenCalledTimes(1);
+  });
+
+  test('It cancels editing', async () => {
+    await wrapper?.find('[data-testid="zuordnung-edit-button"]').trigger('click');
+    await nextTick();
+
+    const zuordnungCreateButton: VueWrapper | undefined = wrapper?.findComponent({ ref: 'zuordnung-create-button' });
+
+    await wrapper?.find('[data-testid="zuordnung-edit-cancel"]').trigger('click');
+    await nextTick();
+
+    expect(zuordnungCreateButton?.exists()).toBe(false);
   });
 });
