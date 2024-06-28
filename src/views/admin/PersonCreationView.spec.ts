@@ -41,5 +41,6 @@ describe('PersonCreationView', () => {
     expect(wrapper?.getComponent({ name: 'SpshAlert' })).toBeTruthy();
     expect(wrapper?.getComponent({ name: 'FormWrapper' })).toBeTruthy();
     expect(wrapper?.getComponent({ name: 'FormRow' })).toBeTruthy();
+    expect(wrapper?.getComponent({ name: 'PersonenkontextCreate' })).toBeTruthy();
   });
 });
