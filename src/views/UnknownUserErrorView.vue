@@ -2,10 +2,10 @@
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import { useRouter, type Router } from 'vue-router';
 
-  const route: Router = useRouter();
+  const router: Router = useRouter();
 
   function backToStart(): void {
-    route.replace('/');
+    router.replace('/');
   }
 </script>
 
