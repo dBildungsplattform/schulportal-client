@@ -1,25 +1,43 @@
 <script setup lang="ts">
   import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import { ref, onMounted } from 'vue';
+  import { ref, type Ref, onBeforeMount } from 'vue';
   import { useI18n } from 'vue-i18n';
-
+  import { type RouteLocationNormalizedLoaded, useRoute } from 'vue-router';
+  const route: RouteLocationNormalizedLoaded = useRoute();
   const { t }: { t: Function } = useI18n();
   type LabelValue = {
     label: string;
     value: string;
   };
 
-import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
-import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
-  import { useAuthStore } from '@/stores/AuthStore';
+  import { usePersonStore, type Person, type PersonStore } from '@/stores/PersonStore';
+  import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
+  import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
+
+  type SchoolData = {
+    title: string;
+    info?: string | null;
+    schoolAdmins?: string[];
+    labelAndValues: LabelValue[];
+  };
 
   const personStore: PersonStore = usePersonStore();
-  const authStore = useAuthStore();
-  const personalData = ref<LabelValue[]>([]);
-const schoolData = ref<LabelValue[]>([]);
+  const authStore: AuthStore = useAuthStore();
+  const personalData: Ref = ref<LabelValue[]>([]);
+  const schoolDatas: Ref = ref<SchoolData[]>([]);
   const personenKontextStore: PersonenkontextStore = usePersonenkontextStore();
+  const redirectToUpdatePassword = (): void => {
+    const keycloakUrl: string = 'http://localhost:8080/realms/SPSH/protocol/openid-connect/auth';
+    const clientId: string = 'spsh';
+    const redirectUri = `${window.location.origin}${route.fullPath}`;
+    const responseType = 'code';
+    const scope = 'openid';
+    const kcAction = 'UPDATE_PASSWORD';
+    const url = `${keycloakUrl}?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=${responseType}&scope=${scope}&kc_action=${kcAction}`;
+    window.location.href = url;
+  };
 
-  onMounted(async () => {
+  onBeforeMount(async () => {
     await authStore.initializeAuthStatus();
     const userId: string | null | undefined = authStore.currentUser?.personId;
 
@@ -27,25 +45,42 @@ const schoolData = ref<LabelValue[]>([]);
       return;
     }
 
-    await personStore.getPersonById(userId);
-    await personenKontextStore.getPersonenuebersichtById(userId);
-    console.log(personenKontextStore.personenuebersicht);
-    if (!personStore.currentPerson) return;
+    await Promise.all([personStore.getPersonById(userId), personenKontextStore.getPersonenuebersichtById(userId)]);
+    const currentPerson: Person | null | undefined = personStore.currentPerson?.person as Person | undefined;
+    const uebersicht = personenKontextStore.personenuebersicht;
+
+    if (!currentPerson) return;
     personalData.value = [
       {
         label: 'Vor- und Nachname',
-        value: personStore.currentPerson.person.name.vorname + ' ' + personStore.currentPerson.person.name.familienname,
+        value: currentPerson.name.vorname + ' ' + currentPerson.name.familienname,
       },
-      { label: 'Benutzername', value: 'username dummy' },
-      { label: 'Benutzerkennung', value: 'kennung dummy' },
-      { label: 'E-Mail-Adresse', value: 'email@dummy.okay' },
-      { label: 'KoPers-Nr.', value: personStore.currentPerson.person.personalnummer ?? '' },
+      { label: 'Benutzername', value: currentPerson.referrer ?? '' },
+      { label: 'Benutzerkennung', value: '[todo]' },
     ];
-    schoolData.value = [
-      { label: t('profile.school'), value: 'Humbold Realschule' },
-      { label: t('profile.schoolNumber'), value: '746787565' },
-      { label: t('admin.rolle.rolle'), value: 'Lehrkraft' },
-    ];
+
+    if (currentPerson.email) {
+      personalData.value.push({ label: 'E-Mail-Adresse', value: currentPerson.email });
+    }
+
+    if (currentPerson.personalnummer) {
+      personalData.value.push({ label: 'Personalnummer', value: currentPerson.personalnummer });
+    }
+
+    for (const zuordnung of uebersicht?.zuordnungen ?? []) {
+      const tempSchoolData: SchoolData = {
+        title: t('profile.school'),
+        info: t('profile.yourSchoolAdminsAre'),
+        schoolAdmins: ['[todo]'],
+        labelAndValues: [
+          { label: t('profile.school'), value: zuordnung.sskName },
+          { label: t('profile.schoolNumber'), value: zuordnung.sskDstNr },
+          { label: t('admin.rolle.rolle'), value: zuordnung.rolle },
+        ],
+      };
+      console.log('tempSchoolData', tempSchoolData);
+      schoolDatas.value.push(tempSchoolData);
+    }
   });
 </script>
 
@@ -57,88 +92,127 @@ const schoolData = ref<LabelValue[]>([]);
     >
       {{ $t('nav.profile') }}
     </h1>
-    <div class="padding">
-      <v-row>
-        <v-col
-          cols="12"
-          sm="12"
-          md="6"
-        >
-          <div class="padding">
-            <LayoutCard :header="$t('profile.personalData')">
-              <v-row
-                align="center"
-                class="ma-3"
+    <v-row>
+      <v-col
+        cols="12"
+        sm="12"
+        md="6"
+      >
+        <LayoutCard :header="$t('profile.personalData')">
+          <v-row class="ma-3 padding">
+            <v-col cols="12">
+              <p>
+                <v-icon
+                  class="mr-2"
+                  icon="mdi-alert-circle-outline"
+                ></v-icon>
+                {{ $t('profile.infoAboutChangeabilityFromPersonalData') }}
+              </p>
+              <v-simple-table>
+                <template v-slot:default>
+                  <tbody>
+                    <tr
+                      v-for="item in personalData"
+                      :key="item.label"
+                    >
+                      <td class="right padding">
+                        <strong>{{ item.label }}:</strong>
+                      </td>
+                      <td>{{ item.value }}</td>
+                    </tr>
+                  </tbody>
+                </template>
+              </v-simple-table>
+            </v-col>
+          </v-row>
+        </LayoutCard>
+      </v-col>
+      <v-col
+        v-for="schoolData in schoolDatas"
+        :key="schoolData.title"
+        cols="12"
+        sm="12"
+        md="6"
+      >
+        <LayoutCard :header="schoolData.title">
+          <v-row class="ma-3 padding">
+            <v-col cols="12">
+              <p>
+                <v-icon
+                  class="mr-2"
+                  icon="mdi-alert-circle-outline"
+                ></v-icon>
+                {{ schoolData.info + ' ' + schoolData.schoolAdmins?.join(', ') }}
+              </p>
+              <v-simple-table>
+                <template v-slot:default>
+                  <tbody>
+                    <tr
+                      v-for="item in schoolData.labelAndValues"
+                      :key="item.label"
+                    >
+                      <td class="right padding">
+                        <strong>{{ item.label }}:</strong>
+                      </td>
+                      <td>{{ item.value }}</td>
+                    </tr>
+                  </tbody>
+                </template>
+              </v-simple-table>
+            </v-col>
+          </v-row>
+        </LayoutCard>
+      </v-col>
+      <v-col
+        cols="12"
+        sm="12"
+        md="6"
+      >
+        <LayoutCard :header="$t('login.password')">
+          <v-row class="ma-3 d-flex align-content-center justify-center ga-4">
+            <v-icon
+              size="x-large"
+              class="full-width"
+              icon="mdi-key-alert-outline"
+            ></v-icon>
+            <p>Ihr Passwort wurde zuletzt am [todo] geändert.</p>
+            <div>
+              <v-btn
+                color="primary"
+                @click="redirectToUpdatePassword"
               >
-                <v-col cols="12">
-                  <p>
-                    <v-icon
-                      class="mr-2"
-                      icon="mdi-alert-circle-outline"
-                    ></v-icon>
-                    {{ $t('profile.infoAboutChangeabilityFromPersonalData') }}
-                  </p>
-                  <v-simple-table>
-                    <template v-slot:default>
-                      <tbody>
-                        <tr
-                          v-for="item in personalData"
-                          :key="item.label"
-                        >
-                          <td class="right padding">
-                            <strong>{{ item.label }}:</strong>
-                          </td>
-                          <td>{{ item.value }}</td>
-                        </tr>
-                      </tbody>
-                    </template>
-                  </v-simple-table>
-                </v-col>
-              </v-row>
-            </LayoutCard>
-          </div>
-        </v-col>
-        <v-col
-          cols="12"
-          sm="12"
-          md="6"
-        >
-          <div class="padding">
-            <LayoutCard :header="$t('profile.school')">
-              <v-row
-                align="center"
-                class="ma-3"
+                Passwort ändern
+              </v-btn>
+            </div>
+          </v-row>
+        </LayoutCard>
+      </v-col>
+
+      <v-col
+        cols="12"
+        sm="12"
+        md="6"
+      >
+        <LayoutCard :header="$t('profile.twoFactorAuth')">
+          <v-row class="ma-3 d-flex align-content-center justify-center ga-4">
+            <v-icon
+              size="x-large"
+              class="full-width"
+              icon="mdi-shield-account-outline"
+            ></v-icon>
+            <p>Es wurde noch kein zweiter Faktor fuer Sie eingerichtet.</p>
+            <div>
+              <v-btn
+                color="primary"
+                disabled
               >
-                <v-col cols="12">
-                  <p>
-                    <v-icon
-                      class="mr-2"
-                      icon="mdi-alert-circle-outline"
-                    ></v-icon>
-                    {{ $t('profile.infoAboutChangeabilityFromPersonalData') }}
-                  </p>
-                  <v-simple-table>
-                    <template v-slot:default>
-                      <tbody>
-                        <tr
-                          v-for="item in schoolData"
-                          :key="item.label"
-                        >
-                          <td class="right padding">
-                            <strong>{{ item.label }}:</strong>
-                          </td>
-                          <td>{{ item.value }}</td>
-                        </tr>
-                      </tbody>
-                    </template>
-                  </v-simple-table>
-                </v-col>
-              </v-row>
-            </LayoutCard>
-          </div>
-        </v-col>
-      </v-row>
-    </div>
+                2-FA einrichten
+              </v-btn>
+            </div>
+          </v-row>
+        </LayoutCard>
+      </v-col>
+    </v-row>
   </div>
 </template>
 
@@ -155,7 +229,22 @@ const schoolData = ref<LabelValue[]>([]);
     text-align: right;
   }
 
+  .center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    gap: 5px;
+  }
+
   .padding {
     padding: 8px;
+  }
+
+  .full-width {
+    width: 100%;
+  }
+
+  .gap-5 {
   }
 </style>

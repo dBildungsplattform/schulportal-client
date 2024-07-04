@@ -295,7 +295,7 @@
   "person": {
     "addZuordnung": "Schulzuordnung hinzufügen",
     "addZuordnungNotAllowed": "Diese Aktion ist nach Auswahl einer Schulzuordnung nicht ausführbar.",
-    "cannotDeleteOwnZuordnung": "Sie dürfen sich selbst keine Zuordnungen entziehen.",
+    "cannotDeleteOwnZuordnung": "Sie dürfen ich selbst keine Zuordnungen entziehen.",
     "checkAndSave": "Bitte prüfen und abschließend speichern, um die Aktion auszuführen",
     "changeRolle": "Rolle ändern",
     "changeRolleDescription": "Ändert die Rolle des Benutzers an der Schule ohne ihn zu entfernen.",
@@ -333,6 +333,8 @@
     "schoolNumber": "Schulnummer",
     "password": "Passwort",
     "changePassword": "Passwort ändern",
+    "saveNewPassword": "Neues Passwort speichern",
+    "setNewPassword": "Neues Passwort setzen",
     "twoFactorAuth": "Zwei-Faktor-Authentifizierung",
     "setupTwoFactorAuth": "2-FA einrichten",
     "infoAboutChangeabilityFromPersonalData": "Persönliche Daten sind nur durch Ihre schulischen Administratorinnen oder Administratoren veränderbar",
