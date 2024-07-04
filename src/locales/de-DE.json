@@ -17,7 +17,7 @@
       "noKoPersNumber": "Keine KoPers-Nr vorhanden"
     },
     "klasse": {
-      "addNew":"Neue Klasse hinzufügen",
+      "addNew": "Neue Klasse hinzufügen",
       "assignKlasse": "Klasse zuordnen",
       "backToCreateKlasse": "Zurück zur Klassenanlage",
       "create": "Klasse anlegen",
@@ -130,7 +130,7 @@
       "enterRollenname": "Rollenname eingeben",
       "errors": {
         "ADD_SYSTEMRECHT_ERROR": "Das Systemrecht konnte nicht hinzugefügt werden.",
-        "ROLLE_ERROR":  "Die Rolle konnte nicht angelegt werden."
+        "ROLLE_ERROR": "Die Rolle konnte nicht angelegt werden."
       },
       "isAllowedToManageRollen": "Darf Rollen verwalten",
       "management": "Rollenverwaltung",
@@ -183,12 +183,12 @@
       "selectMerkmale": "Merkmale auswählen",
       "selectRolle": "Rolle auswählen",
       "selectRollenart": "Rollenart auswählen",
-      "selectSystemrechte":"Systemrechte auswählen",
+      "selectSystemrechte": "Systemrechte auswählen",
       "showAll": "Alle Rollen anzeigen",
       "systemrechte": "Systemrechte",
       "userDataLoadingErrorText": "Es konnten keine Benutzerdaten geladen werden."
     },
-    "searchResultTable":"Ergebnisliste durchsuchen",
+    "searchResultTable": "Ergebnisliste durchsuchen",
     "schule": {
       "addNew": "Neue Schule hinzufügen",
       "administratingSchultraeger": "Verwaltender Schulträger",
@@ -282,7 +282,8 @@
     "logout": "Abmelden",
     "navigation": "Navigation",
     "openMobileMenu": "Mobiles Menü öffnen",
-    "help": "Hilfe"
+    "help": "Hilfe",
+    "profile": "Mein Profil"
   },
   "no": "Nein",
   "noDataFound": "Keine Daten gefunden.",
@@ -307,7 +308,8 @@
     "enterFirstName": "Vorname eingeben",
     "enterLastName": "Nachname eingeben",
     "firstName": "Vorname",
-    "firstNameLastNameReferrerKopersNr":"Vor-/Nachname/Benutzername/KoPers-Nr.",
+    "firstNameLastNameReferrerKopersNr": "Vor-/Nachname/Benutzername/KoPers-Nr.",
+    "firstAndLastName": "Vor- und Nachname",
     "finishEditFirst": "Bitte beenden Sie zunächst Ihre aktuelle Bearbeitung.",
     "klasse": "Klasse",
     "kopersnr": "Kopers-Nr",
@@ -324,6 +326,17 @@
     "saveChanges": "Änderungen speichern",
     "willBeRemoved": "wird entfernt",
     "zuordnungen": "Schulzuordnung(en)"
+  },
+  "profile": {
+    "personalData": "Persönliche Daten",
+    "school": "Schule",
+    "schoolNumber": "Schulnummer",
+    "password": "Passwort",
+    "changePassword": "Passwort ändern",
+    "twoFactorAuth": "Zwei-Faktor-Authentifizierung",
+    "setupTwoFactorAuth": "2-FA einrichten",
+    "infoAboutChangeabilityFromPersonalData": "Persönliche Daten sind nur durch Ihre schulischen Administratorinnen oder Administratoren veränderbar",
+    "yourSchoolAdminsAre": "Ihre schulischen Admins sind:"
   },
   "save": "Speichern",
   "resetFilter": "Filter zurücksetzen",

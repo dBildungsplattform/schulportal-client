@@ -110,6 +110,15 @@ const routes: readonly RouteRecordRaw[] = [
     },
   },
   {
+    path: '/profile',
+    name: 'profile',
+    component: () => import('../views/ProfileView.vue'),
+    meta: {
+      layout: 'DefaultLayout',
+      requiresAuth: true,
+    },
+  },
+  {
     path: '/:pathMatch(.*)*',
     name: 'not-found',
     component: () => import('../views/NotFoundView.vue'),

@@ -94,9 +94,22 @@
     </v-toolbar-items>
 
     <v-toolbar-items v-if="auth.isAuthed">
-      <v-col class="align-self-center mr-2">
+      <v-col class="d-flex align-self-center mr-2">
         <a
-          class="primary"
+          class="primary d-flex"
+          data-testid="nav-profile-button"
+          href="/profile"
+        >
+          <v-icon
+            class="mr-2"
+            icon="mdi-account-outline"
+          ></v-icon>
+          <span class="hidden-sm-and-down nowrap">{{ $t('nav.profile') }}</span>
+        </a>
+      </v-col>
+      <v-col class="align-self-center mr-2 d-flex">
+        <a
+          class="primary d-flex"
           data-testid="nav-logout-button"
           href="/api/auth/logout"
         >
@@ -111,4 +124,8 @@
   </v-app-bar>
 </template>
 
-<style scoped></style>
+<style scoped>
+  .nowrap {
+    white-space: nowrap;
+  }
+</style>
