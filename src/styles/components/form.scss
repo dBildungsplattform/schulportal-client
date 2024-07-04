@@ -17,6 +17,9 @@ label[required='true']:after {
   opacity: 1;
 }
 
-.v-field--disabled .v-chip--variant-tonal .v-chip__underlay {
-  opacity: 0.25;
+.v-field.v-field--disabled {
+  opacity: 0.7;
+  .v-chip--variant-tonal .v-chip__underlay {
+    opacity: 0.25;
+  }
 }
