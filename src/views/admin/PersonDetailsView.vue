@@ -257,7 +257,7 @@
       />
 
       <template v-if="!personStore.errorCode">
-        <v-container class="personal-info">
+        <v-container>
           <v-row class="ml-md-16">
             <v-col>
               <h3 class="subtitle-1">
