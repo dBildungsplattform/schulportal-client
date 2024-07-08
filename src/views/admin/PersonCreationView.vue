@@ -139,7 +139,8 @@
     () =>
       organisationen.value?.find(
         (organisation: TranslatedObject) =>
-          organisation.value === personStore.createdPersonWithKontext?.DBiamPersonenkontextResponse.organisationId,
+          organisation.value ===
+          personenkontextStore.createdPersonWithKontext?.DBiamPersonenkontextResponse.organisationId,
       )?.title || '',
   );
 
@@ -147,7 +148,7 @@
     () =>
       rollen.value?.find(
         (rolle: TranslatedObject) =>
-          rolle.value === personStore.createdPersonWithKontext?.DBiamPersonenkontextResponse.rolleId,
+          rolle.value === personenkontextStore.createdPersonWithKontext?.DBiamPersonenkontextResponse.rolleId,
       )?.title || '',
   );
 
@@ -167,7 +168,7 @@
 
   async function navigateToPersonTable(): Promise<void> {
     await router.push({ name: 'person-management' });
-    personStore.createdPersonWithKontext = null;
+    personenkontextStore.createdPersonWithKontext = null;
     personenkontextStore.createdPersonenkontextForKlasse = null;
   }
 
@@ -187,12 +188,12 @@
       rolleId: selectedRolle.value ?? '',
     };
 
-    await personStore.createPersonWithKontext(bodyParams);
-    if (personStore.createdPersonWithKontext) {
+    await personenkontextStore.createPersonWithKontext(bodyParams);
+    if (personenkontextStore.createdPersonWithKontext) {
       // Build the context for the Klasse and save it only if the the Klasse was selected
       if (selectedKlasse.value) {
         const unpersistedKlassePersonenkontext: CreatedPersonenkontext = {
-          personId: personStore.createdPersonWithKontext.person.id,
+          personId: personenkontextStore.createdPersonWithKontext.person.id,
           organisationId: selectedKlasse.value,
           rolleId: selectedRolle.value ?? '',
         };
@@ -216,7 +217,7 @@
   }
 
   const handleCreateAnotherPerson = (): void => {
-    personStore.createdPersonWithKontext = null;
+    personenkontextStore.createdPersonWithKontext = null;
     personenkontextStore.createdPersonenkontextForKlasse = null;
     resetForm();
     router.push({ name: 'create-person' });
@@ -245,7 +246,7 @@
   onMounted(async () => {
     await personenkontextStore.processWorkflowStep();
     personStore.errorCode = '';
-    personStore.createdPersonWithKontext = null;
+    personenkontextStore.createdPersonWithKontext = null;
     personenkontextStore.createdPersonenkontextForKlasse = null;
 
     /* listen for browser changes and prevent them when form is dirty */
@@ -278,7 +279,7 @@
     />
 
     <!-- The form to create a new Person  -->
-    <template v-if="!personStore.createdPersonWithKontext && !personStore.errorCode">
+    <template v-if="!personenkontextStore.createdPersonWithKontext && !personStore.errorCode">
       <FormWrapper
         :canCommit="canCommit"
         :confirmUnsavedChangesAction="handleConfirmUnsavedChanges"
@@ -357,7 +358,7 @@
     </template>
 
     <!-- Result template on success after submit  -->
-    <template v-if="personStore.createdPersonWithKontext && !personStore.errorCode">
+    <template v-if="personenkontextStore.createdPersonWithKontext && !personStore.errorCode">
       <v-container>
         <v-row justify="center">
           <v-col
@@ -367,8 +368,8 @@
             <span data-testid="person-success-text">
               {{
                 $t('admin.person.addedSuccessfully', {
-                  firstname: personStore.createdPersonWithKontext.person.name.vorname,
-                  lastname: personStore.createdPersonWithKontext.person.name.familienname,
+                  firstname: personenkontextStore.createdPersonWithKontext.person.name.vorname,
+                  lastname: personenkontextStore.createdPersonWithKontext.person.name.familienname,
                 })
               }}
             </span>
@@ -397,7 +398,7 @@
           <v-col class="text-body bold text-right"> {{ $t('person.firstName') }}: </v-col>
           <v-col class="text-body"
             ><span data-testid="created-person-vorname">{{
-              personStore.createdPersonWithKontext.person.name.vorname
+              personenkontextStore.createdPersonWithKontext.person.name.vorname
             }}</span></v-col
           >
         </v-row>
@@ -405,7 +406,7 @@
           <v-col class="text-body bold text-right"> {{ $t('person.lastName') }}: </v-col>
           <v-col class="text-body"
             ><span data-testid="created-person-familienname">{{
-              personStore.createdPersonWithKontext.person.name.familienname
+              personenkontextStore.createdPersonWithKontext.person.name.familienname
             }}</span></v-col
           >
         </v-row>
@@ -413,14 +414,16 @@
           <v-col class="text-body bold text-right"> {{ $t('person.userName') }}: </v-col>
           <v-col class="text-body"
             ><span data-testid="created-person-username">{{
-              personStore.createdPersonWithKontext.person.referrer
+              personenkontextStore.createdPersonWithKontext.person.referrer
             }}</span></v-col
           >
         </v-row>
         <v-row class="align-center">
           <v-col class="text-body bold text-right pb-8">{{ $t('admin.person.startPassword') }}: </v-col>
           <v-col class="text-body">
-            <PasswordOutput :password="personStore.createdPersonWithKontext.person.startpasswort"></PasswordOutput>
+            <PasswordOutput
+              :password="personenkontextStore.createdPersonWithKontext.person.startpasswort"
+            ></PasswordOutput>
           </v-col>
         </v-row>
         <v-row>

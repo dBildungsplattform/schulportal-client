@@ -1022,66 +1022,6 @@
                 ]
             }
         },
-        "/api/dbiam/personen": {
-            "post": {
-                "operationId": "DBiamPersonController_createPersonWithKontext",
-                "parameters": [],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/DbiamCreatePersonWithContextBodyParams"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "201": {
-                        "description": "Person with Personenkontext was successfully created.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/DBiamPersonResponse"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "The person and the personenkontext could not be created, may due to unsatisfied specifications.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/DbiamPersonenkontextError"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Not authorized to create person with personenkontext."
-                    },
-                    "403": {
-                        "description": "Insufficient permission to create person with personenkontext."
-                    },
-                    "500": {
-                        "description": "Internal server error while creating person with personenkontext."
-                    }
-                },
-                "tags": [
-                    "dbiam-personen"
-                ],
-                "security": [
-                    {
-                        "oauth2": [
-                            "openid"
-                        ]
-                    },
-                    {
-                        "bearer": []
-                    }
-                ]
-            }
-        },
         "/api/organisationen": {
             "post": {
                 "operationId": "OrganisationController_createOrganisation",
@@ -2903,7 +2843,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Initialize or process data from the person creation form. \n                      Valid combinations:\n                      - Both organisationId and rolleId are undefined: Fetch all possible organisations.\n                      - organisationId is provided, but rolleId is undefined: Fetch Rollen for the given organisation.\n                      - Both organisationId and rolleId are provided: Check if the Rolle can be committed for the organisation.\n                      Note: Providing rolleId without organisationId is invalid.",
+                        "description": "Initialize or process data from the person creation form.\n                      Valid combinations:\n                      - Both organisationId and rolleId are undefined: Fetch all possible organisations.\n                      - organisationId is provided, but rolleId is undefined: Fetch Rollen for the given organisation.\n                      - Both organisationId and rolleId are provided: Check if the Rolle can be committed for the organisation.\n                      Note: Providing rolleId without organisationId is invalid.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -3125,6 +3065,66 @@
                     },
                     "500": {
                         "description": "Internal server error while getting schulstrukturknoten for personenkontexte."
+                    }
+                },
+                "tags": [
+                    "personenkontext"
+                ],
+                "security": [
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
+        "/api/personenkontext-workflow": {
+            "post": {
+                "operationId": "DbiamPersonenkontextWorkflowController_createPersonWithKontext",
+                "parameters": [],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DbiamCreatePersonWithContextBodyParams"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Person with Personenkontext was successfully created.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DBiamPersonResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "The person and the personenkontext could not be created, may due to unsatisfied specifications.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DbiamPersonenkontextError"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Not authorized to create person with personenkontext."
+                    },
+                    "403": {
+                        "description": "Insufficient permission to create person with personenkontext."
+                    },
+                    "500": {
+                        "description": "Internal server error while creating person with personenkontext."
                     }
                 },
                 "tags": [
@@ -3985,87 +3985,6 @@
                     "gruppen"
                 ]
             },
-            "DbiamCreatePersonWithContextBodyParams": {
-                "type": "object",
-                "properties": {
-                    "familienname": {
-                        "type": "string"
-                    },
-                    "vorname": {
-                        "type": "string"
-                    },
-                    "organisationId": {
-                        "type": "string"
-                    },
-                    "rolleId": {
-                        "type": "string"
-                    }
-                },
-                "required": [
-                    "familienname",
-                    "vorname",
-                    "organisationId",
-                    "rolleId"
-                ]
-            },
-            "DBiamPersonenkontextResponse": {
-                "type": "object",
-                "properties": {
-                    "personId": {
-                        "type": "string"
-                    },
-                    "organisationId": {
-                        "type": "string"
-                    },
-                    "rolleId": {
-                        "type": "string"
-                    }
-                },
-                "required": [
-                    "personId",
-                    "organisationId",
-                    "rolleId"
-                ]
-            },
-            "DBiamPersonResponse": {
-                "type": "object",
-                "properties": {
-                    "person": {
-                        "$ref": "#/components/schemas/PersonResponse"
-                    },
-                    "DBiamPersonenkontextResponse": {
-                        "$ref": "#/components/schemas/DBiamPersonenkontextResponse"
-                    }
-                },
-                "required": [
-                    "person",
-                    "DBiamPersonenkontextResponse"
-                ]
-            },
-            "DbiamPersonenkontextError": {
-                "type": "object",
-                "properties": {
-                    "i18nKey": {
-                        "type": "string",
-                        "enum": [
-                            "PERSONENKONTEXT_SPECIFICATION_ERROR",
-                            "NUR_LEHR_UND_LERN_AN_KLASSE",
-                            "GLEICHE_ROLLE_AN_KLASSE_WIE_SCHULE",
-                            "ORGANISATION_MATCHES_ROLLENART",
-                            "PERSONENKONTEXT_ANLAGE_ERROR",
-                            "ROLLE_NUR_AN_PASSENDE_ORGANISATION"
-                        ]
-                    },
-                    "code": {
-                        "type": "number",
-                        "description": "Corresponds to HTTP Status code like 200, 404, 500"
-                    }
-                },
-                "required": [
-                    "i18nKey",
-                    "code"
-                ]
-            },
             "TraegerschaftTyp": {
                 "type": "string",
                 "enum": [
@@ -4705,6 +4624,25 @@
                     "revision"
                 ]
             },
+            "DBiamPersonenkontextResponse": {
+                "type": "object",
+                "properties": {
+                    "personId": {
+                        "type": "string"
+                    },
+                    "organisationId": {
+                        "type": "string"
+                    },
+                    "rolleId": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "personId",
+                    "organisationId",
+                    "rolleId"
+                ]
+            },
             "DbiamPersonenkontextBodyParams": {
                 "type": "object",
                 "properties": {
@@ -4722,6 +4660,30 @@
                     "personId",
                     "organisationId",
                     "rolleId"
+                ]
+            },
+            "DbiamPersonenkontextError": {
+                "type": "object",
+                "properties": {
+                    "i18nKey": {
+                        "type": "string",
+                        "enum": [
+                            "PERSONENKONTEXT_SPECIFICATION_ERROR",
+                            "NUR_LEHR_UND_LERN_AN_KLASSE",
+                            "GLEICHE_ROLLE_AN_KLASSE_WIE_SCHULE",
+                            "ORGANISATION_MATCHES_ROLLENART",
+                            "PERSONENKONTEXT_ANLAGE_ERROR",
+                            "ROLLE_NUR_AN_PASSENDE_ORGANISATION"
+                        ]
+                    },
+                    "code": {
+                        "type": "number",
+                        "description": "Corresponds to HTTP Status code like 200, 404, 500"
+                    }
+                },
+                "required": [
+                    "i18nKey",
+                    "code"
                 ]
             },
             "DbiamUpdatePersonenkontexteBodyParams": {
@@ -4863,6 +4825,44 @@
                 "required": [
                     "moeglicheSsks",
                     "total"
+                ]
+            },
+            "DbiamCreatePersonWithContextBodyParams": {
+                "type": "object",
+                "properties": {
+                    "familienname": {
+                        "type": "string"
+                    },
+                    "vorname": {
+                        "type": "string"
+                    },
+                    "organisationId": {
+                        "type": "string"
+                    },
+                    "rolleId": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "familienname",
+                    "vorname",
+                    "organisationId",
+                    "rolleId"
+                ]
+            },
+            "DBiamPersonResponse": {
+                "type": "object",
+                "properties": {
+                    "person": {
+                        "$ref": "#/components/schemas/PersonResponse"
+                    },
+                    "DBiamPersonenkontextResponse": {
+                        "$ref": "#/components/schemas/DBiamPersonenkontextResponse"
+                    }
+                },
+                "required": [
+                    "person",
+                    "DBiamPersonenkontextResponse"
                 ]
             }
         }

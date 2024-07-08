@@ -21,7 +21,7 @@ import {
   type PersonenkontextWorkflowResponse,
   type Zuordnung,
 } from './PersonenkontextStore';
-import { usePersonStore, type PersonStore } from './PersonStore';
+import { usePersonStore, type PersonendatensatzResponse, type PersonStore } from './PersonStore';
 
 const mockadapter: MockAdapter = new MockAdapter(ApiService);
 
@@ -604,6 +604,62 @@ describe('PersonenkontextStore', () => {
       const getAllPersonenuebersichtenPromise: Promise<void> = personenkontextStore.getAllPersonenuebersichten();
       expect(personenkontextStore.loading).toBe(true);
       await getAllPersonenuebersichtenPromise;
+      expect(personenkontextStore.errorCode).toEqual('some mock server error');
+      expect(personenkontextStore.loading).toBe(false);
+    });
+  });
+  describe('createPersonWithKontext', () => {
+    it('should create a Person', async () => {
+      const mockPerson: PersonendatensatzResponse = {
+        person: {
+          id: '9876',
+          name: {
+            familienname: 'Cena',
+            vorname: 'Randy',
+          },
+          referrer: 'rcena',
+        },
+      } as PersonendatensatzResponse;
+
+      const mockResponse: PersonendatensatzResponse = mockPerson;
+
+      mockadapter.onPost('/api/personenkontext-workflow').replyOnce(201, mockResponse);
+      const createPersonPromise: Promise<PersonendatensatzResponse> = personenkontextStore.createPersonWithKontext({
+        familienname: 'Cena',
+        vorname: 'Randy',
+        organisationId: '1234',
+        rolleId: '5678',
+      });
+      expect(personenkontextStore.loading).toBe(true);
+      const createdPerson: PersonendatensatzResponse = await createPersonPromise;
+      expect(createdPerson).toEqual(mockPerson);
+      expect(personenkontextStore.loading).toBe(false);
+    });
+
+    it('should handle string error', async () => {
+      mockadapter.onPost('/api/personenkontext-workflow').replyOnce(500, 'some error');
+      const createPersonPromise: Promise<PersonendatensatzResponse> = personenkontextStore.createPersonWithKontext({
+        familienname: 'Copeland',
+        vorname: 'Christian',
+        organisationId: '',
+        rolleId: '5678',
+      });
+      expect(personenkontextStore.loading).toBe(true);
+      await rejects(createPersonPromise);
+      expect(personenkontextStore.errorCode).toEqual('UNSPECIFIED_ERROR');
+      expect(personenkontextStore.loading).toBe(false);
+    });
+
+    it('should handle error code', async () => {
+      mockadapter.onPost('/api/personenkontext-workflow').replyOnce(500, { code: 'some mock server error' });
+      const createPersonPromise: Promise<PersonendatensatzResponse> = personenkontextStore.createPersonWithKontext({
+        familienname: 'Copeland',
+        vorname: 'Christian',
+        organisationId: '1234',
+        rolleId: '',
+      });
+      expect(personenkontextStore.loading).toBe(true);
+      await rejects(createPersonPromise);
       expect(personenkontextStore.errorCode).toEqual('some mock server error');
       expect(personenkontextStore.loading).toBe(false);
     });

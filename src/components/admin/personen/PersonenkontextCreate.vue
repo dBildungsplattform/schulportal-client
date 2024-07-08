@@ -190,8 +190,7 @@
           limit: 25,
         });
       }, 500);
-    }
-    else if (searchValue === '' && selectedRolle.value) {
+    } else if (searchValue === '' && selectedRolle.value) {
       // If searchValue is empty and an organization is selected, fetch roles for the selected organization
       timerId.value = setTimeout(() => {
         personenkontextStore.processWorkflowStep({

@@ -680,7 +680,7 @@
           <template v-if="!isZuordnungFormActive">
             <v-row class="ml-md-16">
               <v-col
-                v-if="!pendingDeletion"
+                v-if="!pendingDeletion && !pendingCreation"
                 cols="12"
                 sm="auto"
               >
@@ -696,7 +696,7 @@
               "
             >
               <v-col
-                v-if="pendingDeletion"
+                v-if="pendingDeletion || pendingCreation"
                 cols="12"
                 sm="auto"
               >
