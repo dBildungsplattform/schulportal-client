@@ -120,6 +120,11 @@ const routes: readonly RouteRecordRaw[] = [
     },
   },
   {
+    path: '/login-error',
+    name: 'login-error',
+    component: () => import('../views/UnknownUserErrorView.vue'),
+  },
+  {
     path: '/:pathMatch(.*)*',
     name: 'not-found',
     component: () => import('../views/NotFoundView.vue'),
