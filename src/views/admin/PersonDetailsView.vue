@@ -31,7 +31,7 @@
   import { useRollen } from '@/composables/useRollen';
   import { useKlassen } from '@/composables/useKlassen';
   import PersonenkontextCreate from '@/components/admin/personen/PersonenkontextCreate.vue';
-  
+
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
   const { t }: Composer = useI18n({ useScope: 'global' });
@@ -66,6 +66,8 @@
   const createZuordnungConfirmationDialogMessage: Ref<string> = ref('');
 
   const canCommit: Ref<boolean> = ref(false);
+
+  const creationErrorText: Ref<string> = ref('');
 
   function navigateToPersonTable(): void {
     router.push({ name: 'person-management' });
@@ -126,6 +128,7 @@
       cannotDeleteDialogVisible.value = true;
       return;
     }
+
     // The remaining Zuordnungen that were not selected
     const remainingZuordnungen: Zuordnung[] | undefined = zuordnungenResult.value?.filter(
       (zuordnung: Zuordnung) => !selectedZuordnungen.value.includes(zuordnung),
@@ -148,32 +151,37 @@
     // Combine remaining Zuordnungen and filtered Klassen Zuordnungen
     const combinedZuordnungen: Zuordnung[] | undefined = remainingZuordnungen?.concat(filteredKlassenZuordnungen || []);
 
-    await personenkontextStore.updatePersonenkontexte(combinedZuordnungen, currentPersonId);
-    zuordnungenResult.value = combinedZuordnungen;
-    selectedZuordnungen.value = [];
+    try {
+      await personenkontextStore.updatePersonenkontexte(combinedZuordnungen, currentPersonId);
+      zuordnungenResult.value = combinedZuordnungen;
+      selectedZuordnungen.value = [];
 
-    // Filter out Zuordnungen with editable === false
-    const editableZuordnungen: Zuordnung[] | undefined = combinedZuordnungen?.filter(
-      (zuordnung: Zuordnung) => zuordnung.editable,
-    );
+      // Filter out Zuordnungen with editable === false
+      const editableZuordnungen: Zuordnung[] | undefined = combinedZuordnungen?.filter(
+        (zuordnung: Zuordnung) => zuordnung.editable,
+      );
 
-    deleteSuccessDialogVisible.value = true;
+      deleteSuccessDialogVisible.value = true;
 
-    if (!editableZuordnungen || editableZuordnungen.length === 0) {
-      // If no editable Zuordnungen are left, navigate to person table after the dialog is closed
-      closeDeleteSuccessDialog = (): void => {
-        deleteSuccessDialogVisible.value = false;
-        navigateToPersonTable();
-      };
-    } else {
-      closeDeleteSuccessDialog = (): void => {
-        deleteSuccessDialogVisible.value = false;
-        router.push(route).then(() => {
-          router.go(0);
-        });
-      };
+      if (!editableZuordnungen || editableZuordnungen.length === 0) {
+        // If no editable Zuordnungen are left, navigate to person table after the dialog is closed
+        closeDeleteSuccessDialog = (): void => {
+          deleteSuccessDialogVisible.value = false;
+          navigateToPersonTable();
+        };
+      } else {
+        closeDeleteSuccessDialog = (): void => {
+          deleteSuccessDialogVisible.value = false;
+          router.push(route).then(() => {
+            router.go(0);
+          });
+        };
+      }
+    } catch {
+      creationErrorText.value = t(`admin.personenkontext.errors.${personenkontextStore.errorCode}`);
     }
   };
+
   function getSskName(sskDstNr: string, sskName: string): string {
     /* truncate ssk name */
     const truncatededSskName: string = sskName.length > 30 ? `${sskName.substring(0, 30)}...` : sskName;
@@ -326,9 +334,13 @@
 
   // This will send the updated list of Zuordnungen to the Backend on TOP of the new added one through the form.
   const confirmAddition = async (): Promise<void> => {
-    await personenkontextStore.updatePersonenkontexte(finalZuordnungen.value, currentPersonId);
-    createSuccessDialogVisible.value = true;
-    resetForm();
+    try {
+      await personenkontextStore.updatePersonenkontexte(finalZuordnungen.value, currentPersonId);
+      createSuccessDialogVisible.value = true;
+      resetForm();
+    } catch {
+      creationErrorText.value = t(`admin.personenkontext.errors.${personenkontextStore.errorCode}`);
+    }
   };
 
   // The save button will act according to what kind of pending action we have.
@@ -353,7 +365,6 @@
         !existingZuordnungen?.some((zuordnung: Zuordnung) => zuordnung.rolleId === rolle.value),
     );
   });
-
 
   // Computed property to get the title of the selected role
   const selectedRolleTitle: ComputedRef<string | undefined> = computed(() => {
@@ -469,20 +480,33 @@
       :padded="true"
       :showCloseText="true"
     >
-      <!-- Error Message Display if the personStore throws any kind of error -->
+      <!-- Error Message Display if the personStore throws any kind of error (Not being able to load the person) -->
       <SpshAlert
-        :buttonAction="navigateToPersonTable"
         :model-value="!!personStore.errorCode"
-        :title="$t('admin.person.loadingErrorTitle')"
         :type="'error'"
         :closable="false"
         :text="$t('admin.person.loadingErrorText')"
         :showButton="true"
         :buttonText="$t('nav.backToList')"
+        :buttonAction="navigateToPersonTable"
+        :title="$t('admin.person.loadingErrorTitle')"
         @update:modelValue="handleAlertClose"
       />
 
-      <template v-if="!personStore.errorCode">
+      <!-- Error Message Display if the personenkontextStore throws any kind of error (Not being able to load the person) -->
+      <SpshAlert
+        :model-value="!!personenkontextStore.errorCode"
+        :type="'error'"
+        :closable="false"
+        :text="creationErrorText"
+        :showButton="true"
+        :buttonText="$t('refreshPage')"
+        :buttonAction="() => router.go(0)"
+        :title="$t('admin.personenkontext.loadingErrorTitle')"
+        @update:modelValue="handleAlertClose"
+      />
+
+      <template v-if="!personStore.errorCode && !personenkontextStore.errorCode">
         <v-container class="personal-info">
           <v-row class="ml-md-16">
             <v-col>
@@ -668,7 +692,6 @@
           <v-row v-else>
             <v-col
               cols="10"
-              offset-lg="2"
               offset="1"
             >
               <h3 class="text-body">{{ $t('person.noZuordnungenFound') }}</h3>
@@ -998,7 +1021,7 @@
       <LayoutCard
         :closable="true"
         :header="$t('person.editZuordnungen')"
-         @onCloseClicked="closeDeleteSuccessDialog"
+        @onCloseClicked="closeDeleteSuccessDialog"
       >
         <v-card-text>
           <v-container>
@@ -1040,7 +1063,7 @@
       <LayoutCard
         :closable="true"
         :header="$t('person.editZuordnungen')"
-         @onCloseClicked="closeCreateSuccessDialog"
+        @onCloseClicked="closeCreateSuccessDialog"
       >
         <v-card-text>
           <v-container>
@@ -1082,7 +1105,7 @@
       <LayoutCard
         :closable="true"
         :header="$t('person.editZuordnungen')"
-          @onCloseClicked="cancelAddition"
+        @onCloseClicked="cancelAddition"
       >
         <v-card-text>
           <v-container>
@@ -1137,7 +1160,7 @@
       <LayoutCard
         :closable="true"
         :header="$t('person.editZuordnungen')"
-          @onCloseClicked="closeCannotDeleteDialog"
+        @onCloseClicked="closeCannotDeleteDialog"
       >
         <v-card-text>
           <v-container>
