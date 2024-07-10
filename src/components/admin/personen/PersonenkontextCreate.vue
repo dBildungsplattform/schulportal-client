@@ -15,6 +15,8 @@
   const canCommit: Ref<boolean> = ref(false);
   const hasAutoselectedSchule: Ref<boolean> = ref(false);
 
+  let isSearching: boolean = false;
+
   type RolleWithRollenart = {
     value: string;
     title: string;
@@ -137,6 +139,7 @@
 
   function updateOrganisationSearch(searchValue: string): void {
     clearTimeout(timerId.value);
+    isSearching = !!searchValue;
 
     // If searchValue is empty and selectedOrganisation does not have a value, fetch initial data
     if (searchValue === '' && !selectedOrganisation.value) {
@@ -239,7 +242,7 @@
   watch(
     () => props.organisationen,
     async (newOrganisations: TranslatedObject[] | undefined, _oldOrganisations: TranslatedObject[] | undefined) => {
-      if (newOrganisations && newOrganisations.length === 1) {
+      if (!isSearching && newOrganisations && newOrganisations.length === 1) {
         hasAutoselectedSchule.value = true;
         selectedOrganisation.value = newOrganisations[0]?.value;
         emits('update:selectedOrganisation', selectedOrganisation.value);

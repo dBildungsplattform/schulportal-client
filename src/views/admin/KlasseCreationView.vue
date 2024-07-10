@@ -11,24 +11,22 @@
   import { useForm, type TypedSchema, type BaseFieldProps } from 'vee-validate';
   import { toTypedSchema } from '@vee-validate/yup';
   import { object, string } from 'yup';
-  import {
-    useOrganisationStore,
-    type OrganisationStore,
-    type Organisation,
-    OrganisationsTyp,
-  } from '@/stores/OrganisationStore';
+  import { useOrganisationStore, type OrganisationStore, OrganisationsTyp } from '@/stores/OrganisationStore';
   import { DIN_91379A_EXT } from '@/utils/validation';
   import FormRow from '@/components/form/FormRow.vue';
   import FormWrapper from '@/components/form/FormWrapper.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import { useDisplay } from 'vuetify';
+  import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
+  import { useOrganisationen } from '@/composables/useOrganisationen';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
   const { t }: Composer = useI18n({ useScope: 'global' });
   const router: Router = useRouter();
   const organisationStore: OrganisationStore = useOrganisationStore();
+  const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
 
   const validationSchema: TypedSchema = toTypedSchema(
     object({
@@ -74,16 +72,7 @@
 
   const searchInputSchule: Ref<string> = ref('');
 
-  const schulen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
-    return organisationStore.allOrganisationen
-      .slice(0, 25)
-      .filter((org: Organisation) => org.typ === OrganisationsTyp.Schule)
-      .map((org: Organisation) => ({
-        value: org.id,
-        title: org.kennung ? `${org.kennung} (${org.name.trim()})` : org.name,
-      }))
-      .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
-  });
+  const schulen: ComputedRef<TranslatedObject[] | undefined> = useOrganisationen();
 
   const translatedSchulname: ComputedRef<string> = computed(
     () =>
@@ -160,7 +149,7 @@
   });
 
   onMounted(async () => {
-    organisationStore.getAllOrganisationen({ systemrechte: ['KLASSEN_VERWALTEN'] });
+    await personenkontextStore.processWorkflowStep();
     /* listen for browser changes and prevent them when form is dirty */
     window.addEventListener('beforeunload', preventNavigation);
   });
