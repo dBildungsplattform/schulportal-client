@@ -31,11 +31,6 @@
   import { useRollen } from '@/composables/useRollen';
   import { useKlassen } from '@/composables/useKlassen';
   import PersonenkontextCreate from '@/components/admin/personen/PersonenkontextCreate.vue';
-<<<<<<< HEAD
-
-=======
-  
->>>>>>> a94e2cd44d6ff4c6d5a3f457d13b7098756f85b9
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
   const { t }: Composer = useI18n({ useScope: 'global' });
@@ -70,11 +65,8 @@
   const createZuordnungConfirmationDialogMessage: Ref<string> = ref('');
 
   const canCommit: Ref<boolean> = ref(false);
-<<<<<<< HEAD
 
   const creationErrorText: Ref<string> = ref('');
-=======
->>>>>>> a94e2cd44d6ff4c6d5a3f457d13b7098756f85b9
 
   function navigateToPersonTable(): void {
     router.push({ name: 'person-management' });
@@ -158,7 +150,6 @@
     // Combine remaining Zuordnungen and filtered Klassen Zuordnungen
     const combinedZuordnungen: Zuordnung[] | undefined = remainingZuordnungen?.concat(filteredKlassenZuordnungen || []);
 
-<<<<<<< HEAD
     try {
       await personenkontextStore.updatePersonenkontexte(combinedZuordnungen, currentPersonId);
       zuordnungenResult.value = combinedZuordnungen;
@@ -168,15 +159,9 @@
       const editableZuordnungen: Zuordnung[] | undefined = combinedZuordnungen?.filter(
         (zuordnung: Zuordnung) => zuordnung.editable,
       );
-=======
-    await personenkontextStore.updatePersonenkontexte(combinedZuordnungen, currentPersonId);
-    zuordnungenResult.value = combinedZuordnungen;
-    selectedZuordnungen.value = [];
->>>>>>> a94e2cd44d6ff4c6d5a3f457d13b7098756f85b9
 
       deleteSuccessDialogVisible.value = true;
 
-<<<<<<< HEAD
       if (!editableZuordnungen || editableZuordnungen.length === 0) {
         // If no editable Zuordnungen are left, navigate to person table after the dialog is closed
         closeDeleteSuccessDialog = (): void => {
@@ -193,23 +178,6 @@
       }
     } catch {
       creationErrorText.value = t(`admin.personenkontext.errors.${personenkontextStore.errorCode}`);
-=======
-    deleteSuccessDialogVisible.value = true;
-
-    if (!editableZuordnungen || editableZuordnungen.length === 0) {
-      // If no editable Zuordnungen are left, navigate to person table after the dialog is closed
-      closeDeleteSuccessDialog = (): void => {
-        deleteSuccessDialogVisible.value = false;
-        navigateToPersonTable();
-      };
-    } else {
-      closeDeleteSuccessDialog = (): void => {
-        deleteSuccessDialogVisible.value = false;
-        router.push(route).then(() => {
-          router.go(0);
-        });
-      };
->>>>>>> a94e2cd44d6ff4c6d5a3f457d13b7098756f85b9
     }
   };
   function getSskName(sskDstNr: string, sskName: string): string {
@@ -364,7 +332,6 @@
 
   // This will send the updated list of Zuordnungen to the Backend on TOP of the new added one through the form.
   const confirmAddition = async (): Promise<void> => {
-<<<<<<< HEAD
     try {
       await personenkontextStore.updatePersonenkontexte(finalZuordnungen.value, currentPersonId);
       createSuccessDialogVisible.value = true;
@@ -372,11 +339,6 @@
     } catch {
       creationErrorText.value = t(`admin.personenkontext.errors.${personenkontextStore.errorCode}`);
     }
-=======
-    await personenkontextStore.updatePersonenkontexte(finalZuordnungen.value, currentPersonId);
-    createSuccessDialogVisible.value = true;
-    resetForm();
->>>>>>> a94e2cd44d6ff4c6d5a3f457d13b7098756f85b9
   };
 
   // The save button will act according to what kind of pending action we have.
@@ -402,10 +364,6 @@
     );
   });
 
-<<<<<<< HEAD
-=======
-
->>>>>>> a94e2cd44d6ff4c6d5a3f457d13b7098756f85b9
   // Computed property to get the title of the selected role
   const selectedRolleTitle: ComputedRef<string | undefined> = computed(() => {
     return rollen.value?.find((rolle: TranslatedObject) => rolle.value === selectedRolle.value)?.title;
@@ -520,11 +478,7 @@
       :padded="true"
       :showCloseText="true"
     >
-<<<<<<< HEAD
       <!-- Error Message Display if the personStore throws any kind of error (Not being able to load the person) -->
-=======
-      <!-- Error Message Display if the personStore throws any kind of error -->
->>>>>>> a94e2cd44d6ff4c6d5a3f457d13b7098756f85b9
       <SpshAlert
         :model-value="!!personStore.errorCode"
         :type="'error'"
@@ -537,11 +491,9 @@
         @update:modelValue="handleAlertClose"
       />
 
-<<<<<<< HEAD
       <!-- Error Message Display if the personenkontextStore throws any kind of error (Not being able to load the person) -->
       <SpshAlert
         :model-value="!!personenkontextStore.errorCode"
-        :type="'error'"
         :closable="false"
         :text="creationErrorText"
         :showButton="true"
@@ -553,17 +505,6 @@
 
       <template v-if="!personStore.errorCode && !personenkontextStore.errorCode">
         <v-container class="personal-info">
-=======
-      <template v-if="!personStore.errorCode">
-        <v-container>
->>>>>>> a94e2cd44d6ff4c6d5a3f457d13b7098756f85b9
-          <v-row class="ml-md-16">
-            <v-col>
-              <h3 class="subtitle-1">
-                {{ $t('admin.person.personalInfo') }}
-              </h3></v-col
-            >
-          </v-row>
           <div v-if="personStore.currentPerson?.person">
             <!-- Vorname -->
             <v-row class="mt-0">
@@ -1070,11 +1011,7 @@
       <LayoutCard
         :closable="true"
         :header="$t('person.editZuordnungen')"
-<<<<<<< HEAD
         @onCloseClicked="closeDeleteSuccessDialog"
-=======
-         @onCloseClicked="closeDeleteSuccessDialog"
->>>>>>> a94e2cd44d6ff4c6d5a3f457d13b7098756f85b9
       >
         <v-card-text>
           <v-container>
@@ -1116,11 +1053,7 @@
       <LayoutCard
         :closable="true"
         :header="$t('person.editZuordnungen')"
-<<<<<<< HEAD
         @onCloseClicked="closeCreateSuccessDialog"
-=======
-         @onCloseClicked="closeCreateSuccessDialog"
->>>>>>> a94e2cd44d6ff4c6d5a3f457d13b7098756f85b9
       >
         <v-card-text>
           <v-container>
@@ -1162,11 +1095,7 @@
       <LayoutCard
         :closable="true"
         :header="$t('person.editZuordnungen')"
-<<<<<<< HEAD
         @onCloseClicked="cancelAddition"
-=======
-          @onCloseClicked="cancelAddition"
->>>>>>> a94e2cd44d6ff4c6d5a3f457d13b7098756f85b9
       >
         <v-card-text>
           <v-container>
@@ -1221,11 +1150,7 @@
       <LayoutCard
         :closable="true"
         :header="$t('person.editZuordnungen')"
-<<<<<<< HEAD
         @onCloseClicked="closeCannotDeleteDialog"
-=======
-          @onCloseClicked="closeCannotDeleteDialog"
->>>>>>> a94e2cd44d6ff4c6d5a3f457d13b7098756f85b9
       >
         <v-card-text>
           <v-container>
