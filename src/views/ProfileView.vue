@@ -12,7 +12,7 @@
   };
 
   import { usePersonStore, type Person, type PersonStore } from '@/stores/PersonStore';
-  import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
+  import { usePersonenkontextStore, type PersonenkontextStore, type Zuordnung } from '@/stores/PersonenkontextStore';
   import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
 
   type SchoolData = {
@@ -30,16 +30,71 @@
   const redirectToUpdatePassword = (): void => {
     const keycloakUrl: string = 'http://localhost:8080/realms/SPSH/protocol/openid-connect/auth'; // Todo: Replace with dynamic url value
     const clientId: string = 'spsh';
-    const redirectUri = `${window.location.origin}${route.fullPath}`;
-    const responseType = 'code';
-    const scope = 'openid';
-    const kcAction = 'UPDATE_PASSWORD';
-    const url = `${keycloakUrl}?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=${responseType}&scope=${scope}&kc_action=${kcAction}`;
+    const redirectUri: string = `${window.location.origin}${route.fullPath}`;
+    const responseType: string = 'code';
+    const scope: string = 'openid';
+    const kcAction: string = 'UPDATE_PASSWORD';
+    const url: string = `${keycloakUrl}?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=${responseType}&scope=${scope}&kc_action=${kcAction}`;
     window.location.href = url;
   };
 
   function handleGoToPreviousPage(): void {
     window.history.back();
+  }
+
+  function groupZuordnungenBySskId(zuordnungen: Zuordnung[]): Map<string, Zuordnung[]> {
+    const groupedZuordnungen: Map<string, Zuordnung[]> = new Map();
+    for (const zuordnung of zuordnungen) {
+      if (groupedZuordnungen.has(zuordnung.sskId)) {
+        groupedZuordnungen.get(zuordnung.sskId)?.push(zuordnung);
+      } else {
+        groupedZuordnungen.set(zuordnung.sskId, [zuordnung]);
+      }
+    }
+    return groupedZuordnungen;
+  }
+
+  function createComposedZuordnungen(groupedZuordnungen: Map<string, Zuordnung[]>): Zuordnung[] {
+    const composedZuordnungen: Zuordnung[] = [];
+    for (const [key, zuordnungen] of groupedZuordnungen) {
+      if (zuordnungen.length > 1) {
+        const aggregatedRoles: string[] = zuordnungen.map((z: Zuordnung) => z.rolle);
+        const composedRolles: string = aggregatedRoles.join(', ');
+
+        const composedZuordnung: Zuordnung = { ...zuordnungen[0], rolle: composedRolles };
+        composedZuordnungen.push(composedZuordnung);
+      } else {
+        if (zuordnungen.length === 1) composedZuordnungen.push(zuordnungen[0]!);
+      }
+    }
+
+    return composedZuordnungen;
+  }
+
+  function createZuordnungsSchoolData(zuordnungen: Zuordnung[]): SchoolData[] {
+    const result: SchoolData[] = [];
+    for (const zuordnung of zuordnungen) {
+      const tempSchoolData: SchoolData = {
+        title: zuordnung.sskName,
+        info: t('profile.yourSchoolAdminsAre'),
+        schoolAdmins: ['[todo]'],
+        labelAndValues: [
+          { label: t('profile.school'), value: zuordnung.sskName },
+          { label: t('admin.rolle.rolle'), value: zuordnung.rolle },
+        ],
+      };
+
+      if (zuordnung.sskDstNr) {
+        tempSchoolData.labelAndValues.push({
+          label: t('profile.schoolNumber'),
+          labelAbbr: t('profile.schoolNumberAbbr'),
+          value: zuordnung.sskDstNr,
+        });
+      }
+      result.push(tempSchoolData);
+    }
+
+    return result;
   }
 
   onBeforeMount(async () => {
@@ -52,7 +107,7 @@
 
     await Promise.all([personStore.getPersonById(userId), personenKontextStore.getPersonenuebersichtById(userId)]);
     const currentPerson: Person | null | undefined = personStore.currentPerson?.person as Person | undefined;
-    const uebersicht = personenKontextStore.personenuebersicht;
+    const zuordnungen: Zuordnung[] | undefined = personenKontextStore.personenuebersicht?.zuordnungen;
 
     if (!currentPerson) return;
     personalData.value = [
@@ -69,23 +124,16 @@
     }
 
     if (currentPerson.personalnummer) {
-      personalData.value.push({ label: 'Personalnummer', value: currentPerson.personalnummer });
+      personalData.value.push({
+        label: t('profile.personalNummer'),
+        labelAbbr: t('profile.personalNummerAbbr'),
+        value: currentPerson.personalnummer,
+      });
     }
 
-    for (const zuordnung of uebersicht?.zuordnungen ?? []) {
-      const tempSchoolData: SchoolData = {
-        title: t('profile.school'),
-        info: t('profile.yourSchoolAdminsAre'),
-        schoolAdmins: ['[todo]'],
-        labelAndValues: [
-          { label: t('profile.school'), value: zuordnung.sskName },
-          { label: t('profile.schoolNumber'), labelAbbr: t('profile.schoolNumberAbbr'), value: zuordnung.sskDstNr },
-          { label: t('admin.rolle.rolle'), value: zuordnung.rolle },
-        ],
-      };
-      console.log('tempSchoolData', tempSchoolData);
-      schoolDatas.value.push(tempSchoolData);
-    }
+    const groupedZuordnungen: Map<string, Zuordnung[]> = groupZuordnungenBySskId(zuordnungen ?? []);
+    const composedZuordnungen: Zuordnung[] = createComposedZuordnungen(groupedZuordnungen);
+    schoolDatas.value = createZuordnungsSchoolData(composedZuordnungen);
   });
 </script>
 
@@ -128,7 +176,12 @@
                       :key="item.label"
                     >
                       <td class="right padding">
-                        <strong>{{ item.label }}:</strong>
+                        <span v-if="item.labelAbbr"
+                          ><abbr :title="item.label"
+                            ><strong>{{ item.labelAbbr }}</strong></abbr
+                          >:</span
+                        >
+                        <strong v-else>{{ item.label }}:</strong>
                       </td>
                       <td>{{ item.value }}</td>
                     </tr>
@@ -164,8 +217,10 @@
                       :key="item.label"
                     >
                       <td class="right padding">
-                        <strong v-if="item.labelAbbr"
-                          ><abbr :title="item.label">{{ item.labelAbbr }}</abbr> :</strong
+                        <span v-if="item.labelAbbr"
+                          ><abbr :title="item.label"
+                            ><strong>{{ item.labelAbbr }}</strong></abbr
+                          >:</span
                         >
                         <strong v-else>{{ item.label }}:</strong>
                       </td>

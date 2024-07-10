@@ -16,7 +16,7 @@
     >
       <v-col cols="auto">
         <h2
-          class="text-left headline-2"
+          class="text-left headline-2 container"
           data-testid="layout-card-headline"
         >
           {{ header }}
@@ -70,4 +70,10 @@
   </v-card>
 </template>
 
-<style></style>
+<style>
+.container {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+</style>

@@ -340,7 +340,9 @@
     "twoFactorAuth": "Zwei-Faktor-Authentifizierung",
     "setupTwoFactorAuth": "2-FA einrichten",
     "infoAboutChangeabilityFromPersonalData": "Persönliche Daten sind nur durch Ihre schulischen Administratorinnen oder Administratoren veränderbar",
-    "yourSchoolAdminsAre": "Ihre schulischen Admins sind:"
+    "yourSchoolAdminsAre": "Ihre schulischen Admins sind:",
+    "personalNummer": "Personalnummer",
+    "personalNummerAbbr": "KoPers.-Nr."
   },
   "save": "Speichern",
   "resetFilter": "Filter zurücksetzen",
