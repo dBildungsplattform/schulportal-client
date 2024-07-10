@@ -35,7 +35,7 @@ describe('OrganisationStore', () => {
         },
       ];
 
-      mockadapter.onGet('/api/organisationen').replyOnce(200, mockResponse);
+      mockadapter.onGet('/api/organisationen?limit=25').replyOnce(200, mockResponse);
       const getAllOrganisationenPromise: Promise<void> = organisationStore.getAllOrganisationen();
       await getAllOrganisationenPromise;
       expect(organisationStore.allOrganisationen).toEqual(mockResponse);
@@ -43,7 +43,7 @@ describe('OrganisationStore', () => {
     });
 
     it('should handle string error', async () => {
-      mockadapter.onGet('/api/organisationen').replyOnce(500, 'some mock server error');
+      mockadapter.onGet('/api/organisationen?limit=25').replyOnce(500, 'some mock server error');
       const getAllOrganisationenPromise: Promise<void> = organisationStore.getAllOrganisationen();
       expect(organisationStore.loading).toBe(true);
       await getAllOrganisationenPromise;
@@ -53,7 +53,7 @@ describe('OrganisationStore', () => {
     });
 
     it('should handle error code', async () => {
-      mockadapter.onGet('/api/organisationen').replyOnce(500, { code: 'some mock server error' });
+      mockadapter.onGet('/api/organisationen?limit=25').replyOnce(500, { code: 'some mock server error' });
       const getAllOrganisationenPromise: Promise<void> = organisationStore.getAllOrganisationen();
       expect(organisationStore.loading).toBe(true);
       await getAllOrganisationenPromise;
@@ -75,7 +75,7 @@ describe('OrganisationStore', () => {
       ];
 
       mockadapter
-        .onGet('/api/organisationen?searchString=searchString&systemrechte=ROLLEN_VERWALTEN')
+        .onGet('/api/organisationen?limit=25&searchString=searchString&systemrechte=ROLLEN_VERWALTEN')
         .replyOnce(200, mockResponse);
       const getAllOrganisationenPromise: Promise<void> = organisationStore.getAllOrganisationen({
         searchString: 'searchString',
@@ -97,7 +97,7 @@ describe('OrganisationStore', () => {
         },
       ];
 
-      mockadapter.onGet('/api/organisationen?typ=KLASSE').replyOnce(200, mockResponse);
+      mockadapter.onGet('/api/organisationen?limit=25&typ=KLASSE').replyOnce(200, mockResponse);
       const getAllOrganisationenPromise: Promise<void> = organisationStore.getAllOrganisationen({
         includeTyp: OrganisationsTyp.Klasse,
       });
@@ -293,7 +293,7 @@ describe('OrganisationStore', () => {
         ];
 
         mockadapter
-          .onGet('/api/organisationen?searchString=klasse&typ=KLASSE&administriertVon=1')
+          .onGet('/api/organisationen?limit=25&searchString=klasse&typ=KLASSE&administriertVon=1')
           .replyOnce(200, mockResponse, { 'x-paging-total': '1' });
         const getFilteredKlassenPromise: Promise<void> = organisationStore.getFilteredKlassen({
           searchString: 'klasse',
@@ -309,7 +309,7 @@ describe('OrganisationStore', () => {
 
       it('should handle string error', async () => {
         mockadapter
-          .onGet('/api/organisationen?searchString=klasse&typ=KLASSE&administriertVon=1')
+          .onGet('/api/organisationen?limit=25&searchString=klasse&typ=KLASSE&administriertVon=1')
           .replyOnce(500, 'some mock server error');
         const getFilteredKlassenPromise: Promise<void> = organisationStore.getFilteredKlassen({
           searchString: 'klasse',
@@ -324,7 +324,7 @@ describe('OrganisationStore', () => {
 
       it('should handle error code', async () => {
         mockadapter
-          .onGet('/api/organisationen?searchString=hund&typ=KLASSE&administriertVon=100')
+          .onGet('/api/organisationen?limit=25&searchString=hund&typ=KLASSE&administriertVon=100')
           .replyOnce(500, { code: 'some mock server error' });
         const getFilteredKlassenPromise: Promise<void> = organisationStore.getFilteredKlassen({
           searchString: 'hund',
