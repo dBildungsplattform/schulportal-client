@@ -248,7 +248,7 @@
   watch(
     () => props.organisationen,
     async (newOrganisations: TranslatedObject[] | undefined, _oldOrganisations: TranslatedObject[] | undefined) => {
-      if (newOrganisations && newOrganisations.length === 1) {
+      if (!isSearching && newOrganisations && newOrganisations.length === 1) {
         hasAutoselectedSchule.value = true;
         selectedOrganisation.value = newOrganisations[0]?.value;
         emits('update:selectedOrganisation', selectedOrganisation.value);
