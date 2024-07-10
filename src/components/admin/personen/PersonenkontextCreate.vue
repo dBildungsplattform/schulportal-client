@@ -263,8 +263,7 @@
     >
       <v-autocomplete
         autocomplete="off"
-        class="filter-dropdown mb-4"
-        :class="{ selected: selectedOrganisation }"
+        :class="[{ 'filter-dropdown mb-4': hasAutoselectedSchule }, { selected: selectedOrganisation }]"
         clearable
         :click:clear="clearSelectedOrganisation"
         data-testid="organisation-select"
