@@ -331,7 +331,8 @@
   "profile": {
     "personalData": "Persönliche Daten",
     "school": "Schule",
-    "schoolNumber": "Schulnummer",
+    "schoolNumber": "Dienststellennummer",
+    "schoolNumberAbbr": "DStNr.",
     "password": "Passwort",
     "changePassword": "Passwort ändern",
     "saveNewPassword": "Neues Passwort speichern",

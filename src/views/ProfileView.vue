@@ -7,6 +7,7 @@
   const { t }: { t: Function } = useI18n();
   type LabelValue = {
     label: string;
+    labelAbbr?: string;
     value: string;
   };
 
@@ -78,7 +79,7 @@
         schoolAdmins: ['[todo]'],
         labelAndValues: [
           { label: t('profile.school'), value: zuordnung.sskName },
-          { label: t('profile.schoolNumber'), value: zuordnung.sskDstNr },
+          { label: t('profile.schoolNumber'), labelAbbr: t('profile.schoolNumberAbbr'), value: zuordnung.sskDstNr },
           { label: t('admin.rolle.rolle'), value: zuordnung.rolle },
         ],
       };
@@ -163,7 +164,10 @@
                       :key="item.label"
                     >
                       <td class="right padding">
-                        <strong>{{ item.label }}:</strong>
+                        <strong v-if="item.labelAbbr"
+                          ><abbr :title="item.label">{{ item.labelAbbr }}</abbr> :</strong
+                        >
+                        <strong v-else>{{ item.label }}:</strong>
                       </td>
                       <td>{{ item.value }}</td>
                     </tr>
