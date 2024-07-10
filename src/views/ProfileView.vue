@@ -56,11 +56,11 @@
 
   function createComposedZuordnungen(groupedZuordnungen: Map<string, Zuordnung[]>): Zuordnung[] {
     const composedZuordnungen: Zuordnung[] = [];
-    for (const [key, zuordnungen] of groupedZuordnungen) {
+    for (const [, zuordnungen] of groupedZuordnungen) {
       if (zuordnungen.length > 1) {
         const aggregatedRoles: string[] = zuordnungen.map((z: Zuordnung) => z.rolle);
         const composedRolles: string = aggregatedRoles.join(', ');
-
+        if (!zuordnungen[0]) continue;
         const composedZuordnung: Zuordnung = { ...zuordnungen[0], rolle: composedRolles };
         composedZuordnungen.push(composedZuordnung);
       } else {
