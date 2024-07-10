@@ -19,6 +19,7 @@
   import { OrganisationsTyp } from '@/stores/OrganisationStore';
   import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
   import { useDisplay } from 'vuetify';
+import TwoFactorAuthenticationSetUp from '@/components/admin/personen/TwoFactorAuthenticationSetUp.vue';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
@@ -369,6 +370,34 @@
                   :password="password"
                 >
                 </PasswordReset>
+              </div>
+            </v-col>
+            <v-col v-else-if="personStore.loading"> <v-progress-circular indeterminate></v-progress-circular></v-col
+          ></v-row>
+        </v-container>
+        <v-divider
+          class="border-opacity-100 rounded my-6 mx-4"
+          color="#E5EAEF"
+          thickness="6"
+        ></v-divider>
+        <v-container class="two-factor-authentication-set-up">
+          <v-row class="ml-md-16">
+            <v-col>
+              <h3 class="subtitle-1">{{ $t('person.twoFactorAuthenticationSetUpHeader') }}</h3>
+            </v-col>
+            <v-col
+              class="mr-lg-13"
+              cols="12"
+              md="auto"
+              v-if="personStore.currentPerson"
+            >
+              <div class="d-flex justify-sm-end">
+                <TwoFactorAuthenticationSetUp
+                  :errorCode="personStore.errorCode"
+                  :disabled="isEditActive"
+                  :person="personStore.currentPerson"
+                >
+                </TwoFactorAuthenticationSetUp>
               </div>
             </v-col>
             <v-col v-else-if="personStore.loading"> <v-progress-circular indeterminate></v-progress-circular></v-col
