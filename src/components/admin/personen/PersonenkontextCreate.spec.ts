@@ -18,7 +18,12 @@ beforeEach(() => {
     props: {
       errorCode: '',
       disabled: false,
-      organisationen: [],
+      organisationen: [
+        {
+          title: 'orga',
+          value: '1133',
+        },
+      ],
       rollen: [
         {
           value: '54321',
@@ -204,6 +209,18 @@ describe('PersonenkontextCreate', () => {
 
     await rollenAutocomplete?.vm.$emit('update:search', '');
     await nextTick();
+    expect(personenkontextStore.processWorkflowStep).toHaveBeenCalled();
+  });
+
+  test('it does nothing if the oldValue is equal to what is selected on Organisation', async () => {
+    const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
+
+    await organisationAutocomplete?.setValue('1133');
+    await nextTick();
+
+    await organisationAutocomplete?.vm.$emit('update:search', 'orga');
+    await nextTick();
+
     expect(personenkontextStore.processWorkflowStep).toHaveBeenCalled();
   });
 });
