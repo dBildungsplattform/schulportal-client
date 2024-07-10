@@ -293,7 +293,7 @@ describe('OrganisationStore', () => {
         ];
 
         mockadapter
-          .onGet('/api/organisationen?searchString=klasse&typ=KLASSE&administriertVon=1')
+          .onGet('/api/organisationen?limit=25&searchString=klasse&typ=KLASSE&administriertVon=1')
           .replyOnce(200, mockResponse, { 'x-paging-total': '1' });
         const getFilteredKlassenPromise: Promise<void> = organisationStore.getFilteredKlassen({
           searchString: 'klasse',
@@ -309,7 +309,7 @@ describe('OrganisationStore', () => {
 
       it('should handle string error', async () => {
         mockadapter
-          .onGet('/api/organisationen?searchString=klasse&typ=KLASSE&administriertVon=1')
+          .onGet('/api/organisationen?limit=25&searchString=klasse&typ=KLASSE&administriertVon=1')
           .replyOnce(500, 'some mock server error');
         const getFilteredKlassenPromise: Promise<void> = organisationStore.getFilteredKlassen({
           searchString: 'klasse',
@@ -324,7 +324,7 @@ describe('OrganisationStore', () => {
 
       it('should handle error code', async () => {
         mockadapter
-          .onGet('/api/organisationen?searchString=hund&typ=KLASSE&administriertVon=100')
+          .onGet('/api/organisationen?limit=25&searchString=hund&typ=KLASSE&administriertVon=100')
           .replyOnce(500, { code: 'some mock server error' });
         const getFilteredKlassenPromise: Promise<void> = organisationStore.getFilteredKlassen({
           searchString: 'hund',
