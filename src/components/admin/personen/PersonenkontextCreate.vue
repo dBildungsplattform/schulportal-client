@@ -15,6 +15,11 @@
   const canCommit: Ref<boolean> = ref(false);
   const hasAutoselectedSchule: Ref<boolean> = ref(false);
 
+  const searchInputOrganisation: Ref<string> = ref('');
+  const searchInputRolle: Ref<string> = ref('');
+
+  let isSearching: boolean = false;
+
   type RolleWithRollenart = {
     value: string;
     title: string;
@@ -135,17 +140,21 @@
     emits('update:selectedKlasse', newValue);
   });
 
-  function updateOrganisationSearch(searchValue: string): void {
+  // Using a watcher instead of modelUpdate since we need the old Value as well.
+  // Default behavior of the autocomplete is to reset the newValue to empty string and that causes another request to be made
+  watch(searchInputOrganisation, async (newValue: string, oldValue: string) => {
     clearTimeout(timerId.value);
+    if (oldValue === selectedOrganisationTitle.value) return;
+    isSearching = !!newValue;
 
     // If searchValue is empty and selectedOrganisation does not have a value, fetch initial data
-    if (searchValue === '' && !selectedOrganisation.value) {
+    if (newValue === '' && !selectedOrganisation.value) {
       timerId.value = setTimeout(async () => {
         await personenkontextStore.processWorkflowStep({
           limit: 25,
         });
       }, 500);
-    } else if (searchValue && searchValue !== selectedOrganisationTitle.value) {
+    } else if (newValue && newValue !== selectedOrganisationTitle.value) {
       // If searchValue is not empty and different from the current title, proceed with the search
       // Reset selectedRolle only if it's a new search and not when selecting an organization
       selectedRolle.value = undefined;
@@ -154,14 +163,11 @@
 
       timerId.value = setTimeout(async () => {
         await personenkontextStore.processWorkflowStep({
-          organisationName: searchValue,
+          organisationName: newValue,
           limit: 25,
         });
       }, 500);
-      // Necessary since clearing the field manually until an empty searchValue should retrieve all organisations again
-      // PS: By default the autocomplete's searchValue defaults to empty string as soon as the input field is unfocused and so this will be triggered again
-      // resulting in a request (Makes no difference though as we send the orgaId and receive the Rollen again)
-    } else if (searchValue === '' && selectedOrganisation.value) {
+    } else if (newValue === '' && selectedOrganisation.value) {
       // If searchValue is empty and an organization is selected, fetch roles for the selected organization
       timerId.value = setTimeout(async () => {
         await personenkontextStore.processWorkflowStep({
@@ -170,12 +176,15 @@
         });
       }, 500);
     }
-  }
+  });
 
-  function updateRollenSearch(searchValue: string): void {
+  watch(searchInputRolle, async (newValue: string, oldValue: string) => {
     clearTimeout(timerId.value);
+
+    // If the oldValue (What has been in the searchValue beforing losing focus) is equal to the selected Rolle.title then do nothing
+    if (oldValue === selectedRolleTitle.value) return;
     // If searchValue is empty, fetch all roles for the organisationId
-    if (searchValue === '' && !selectedRolle.value) {
+    if (newValue === '' && !selectedRolle.value) {
       timerId.value = setTimeout(() => {
         personenkontextStore.processWorkflowStep({
           organisationId: selectedOrganisation.value,
@@ -184,15 +193,15 @@
       }, 500);
       // Else fetch the Rollen that correspond to the orgaId
       // (This stops an extra request being made once a value is selected since we check if model !== searchValue)
-    } else if (searchValue && searchValue !== selectedRolleTitle.value) {
+    } else if (newValue && newValue !== selectedRolleTitle.value) {
       timerId.value = setTimeout(() => {
         personenkontextStore.processWorkflowStep({
           organisationId: selectedOrganisation.value,
-          rolleName: searchValue,
+          rolleName: newValue,
           limit: 25,
         });
       }, 500);
-    } else if (searchValue === '' && selectedRolle.value) {
+    } else if (newValue === '' && selectedRolle.value) {
       // If searchValue is empty and an organization is selected, fetch roles for the selected organization
       timerId.value = setTimeout(() => {
         personenkontextStore.processWorkflowStep({
@@ -201,7 +210,7 @@
         });
       }, 500);
     }
-  }
+  });
 
   function updateKlassenSearch(searchValue: string): void {
     clearTimeout(timerId.value);
@@ -278,10 +287,10 @@
         :no-data-text="$t('noDataFound')"
         :placeholder="$t('admin.organisation.selectOrganisation')"
         required="true"
-        @update:search="updateOrganisationSearch"
         variant="outlined"
         v-bind="selectedOrganisationProps"
         v-model="selectedOrganisation"
+        v-model:search="searchInputOrganisation"
       ></v-autocomplete>
     </FormRow>
 
@@ -310,10 +319,10 @@
           :no-data-text="$t('noDataFound')"
           :placeholder="$t('admin.rolle.selectRolle')"
           required="true"
-          @update:search="updateRollenSearch"
           variant="outlined"
           v-bind="selectedRolleProps"
           v-model="selectedRolle"
+          v-model:search="searchInputRolle"
         ></v-autocomplete>
       </FormRow>
       <!-- Klasse zuordnen -->
