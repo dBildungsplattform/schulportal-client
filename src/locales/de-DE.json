@@ -283,7 +283,8 @@
     "navigation": "Navigation",
     "openMobileMenu": "Mobiles Menü öffnen",
     "help": "Hilfe",
-    "profile": "Mein Profil"
+    "profile": "Mein Profil",
+    "backToPreviousPage": "Zurück zur vorherigen Seite"
   },
   "no": "Nein",
   "noDataFound": "Keine Daten gefunden.",

@@ -27,7 +27,7 @@
   const schoolDatas: Ref = ref<SchoolData[]>([]);
   const personenKontextStore: PersonenkontextStore = usePersonenkontextStore();
   const redirectToUpdatePassword = (): void => {
-    const keycloakUrl: string = 'http://localhost:8080/realms/SPSH/protocol/openid-connect/auth';
+    const keycloakUrl: string = 'http://localhost:8080/realms/SPSH/protocol/openid-connect/auth'; // Todo: Replace with dynamic url value
     const clientId: string = 'spsh';
     const redirectUri = `${window.location.origin}${route.fullPath}`;
     const responseType = 'code';
@@ -36,6 +36,10 @@
     const url = `${keycloakUrl}?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=${responseType}&scope=${scope}&kc_action=${kcAction}`;
     window.location.href = url;
   };
+
+  function handleGoToPreviousPage(): void {
+    window.history.back();
+  }
 
   onBeforeMount(async () => {
     await authStore.initializeAuthStatus();
@@ -86,6 +90,13 @@
 
 <template>
   <div class="profile">
+    <a @click="handleGoToPreviousPage()"
+      ><v-icon
+        class="mr-2"
+        icon="mdi-arrow-left-thin"
+      />
+      {{ $t('nav.backToPreviousPage') }}</a
+    >
     <h1
       class="text-center headline"
       data-testid="profile-headline"
