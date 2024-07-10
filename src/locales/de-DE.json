@@ -72,9 +72,15 @@
       "addedSuccessfully": "{firstname} {lastname} wurde erfolgreich hinzugefügt.",
       "addNew": "Neuen Benutzer hinzufügen",
       "changePassword": "Passwort ändern",
-      "twoFactorAuthentication": "2FA einrichten",
-      "twoFactorAuthenticationSetUp": "Zwei-Faktor-Authentifizierung einrichten",
-      "twoFactorAuthenticationSetUpHeader": "Zwei-Faktor-Authentifizierung (2FA)",
+      "twoFactorAuthentication":{
+        "setUpShort": "2FA einrichten",
+        "setUpLong": "Zwei-Faktor-Authentifizierung einrichten",
+        "header": "Zwei-Faktor-Authentifizierung (2FA)",
+        "softwareTokenOption":"Software-Token einrichten",
+        "softwareTokenText": "(i) Ein QR-Code wird generiert, welcher direkt eingescannt oder ausgedruckt werden kann.",
+        "hardwareTokenOption":"Hardware-Token zuordnen",
+        "hardwareTokenText": "(i) Der Hardware-Token muss vorliegen und funktionieren. Bitte notieren Sie, wem Sie den Token gegeben haben."
+      },
       "copyPasswordError": "Passwort konnte nicht in die Zwischenablage kopiert werden",
       "copyPasswordSuccess": "Passwort in Zwischenablage kopiert",
       "create": "Benutzer anlegen",
@@ -255,6 +261,7 @@
     "status": "Status"
   },
   "cancel": "Abbrechen",
+  "proceed": "Weiter",
   "close": "Schließen",
   "edit": "Bearbeiten",
   "errors": {

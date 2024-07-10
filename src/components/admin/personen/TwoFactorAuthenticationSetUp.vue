@@ -1,14 +1,14 @@
 <script setup lang="ts">
-  import { type Ref } from 'vue';
+  import { ref, type Ref } from 'vue';
   import { type Personendatensatz } from '@/stores/PersonStore';
   import { type Composer, useI18n } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import PasswordOutput from '@/components/form/PasswordOutput.vue';
   import SpshTooltip from '@/components/admin/SpshTooltip.vue';
 
   const { t }: Composer = useI18n({ useScope: 'global' });
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
+  const selectedOption = ref('one')
 
   type Props = {
     errorCode: string;
@@ -20,6 +20,7 @@
 
   async function close2FADialog(isActive: Ref<boolean>): Promise<void> {
     isActive.value = false;
+    selectedOption.value = "software";
   }
 </script>
 
@@ -34,7 +35,7 @@
         <SpshTooltip
           :enabledCondition="!disabled"
           :disabledText="$t('person.finishEditFirst')"
-          :enabledText="$t('admin.person.twoFactorAuthentication')"
+          :enabledText="$t('admin.person.twoFactorAuthentication.setUpShort')"
           position="start"
         >
           <v-btn
@@ -44,7 +45,7 @@
             :disabled="disabled"
             v-bind="props"
           >
-            {{ $t('admin.person.twoFactorAuthentication') }}
+            {{ $t('admin.person.twoFactorAuthentication.setUpShort') }}
           </v-btn>
         </SpshTooltip>
       </v-col>
@@ -53,37 +54,23 @@
     <template v-slot:default="{ isActive }">
       <LayoutCard
         :closable="true"
-        :header="$t('admin.person.twoFactorAuthenticationSetUp')"
+        :header="$t('admin.person.twoFactorAuthentication.setUpLong')"
         @onCloseClicked="close2FADialog(isActive)"
       >
         <v-card-text>
           <v-container>
-            <v-row
-              v-if="errorMessage || errorCode"
-              class="text-body text-error"
-            >
-              <v-col
-                class="text-right"
-                cols="1"
-              >
-                <v-icon icon="mdi-alert"></v-icon>
-              </v-col>
-              <v-col>
-                <p data-testid="error-text">
-                  {{ errorMessage || errorCode }}
-                </p>
-              </v-col>
-            </v-row>
             <v-row class="text-body bold px-md-16">
               <v-col>
-                <p data-testid="two-factor-authentication-info-text">
-                  {{ twoFactorAuthenticationInformationMessage }}
-                </p>
+                <v-radio-group v-model="selectedOption">
+                  <v-radio :label="$t('admin.person.twoFactorAuthentication.softwareTokenOption')" value="software"></v-radio>
+                  <v-radio :label="$t('admin.person.twoFactorAuthentication.hardwareTokenOption')" value="hardware"></v-radio>
+                </v-radio-group>
               </v-col>
             </v-row>
             <v-row>
               <v-col cols="12">
-                <PasswordOutput :password="password"></PasswordOutput>
+                <p v-if="selectedOption === 'software'"> {{ $t('admin.person.twoFactorAuthentication.softwareTokenText') }}</p>
+                <p v-if="selectedOption === 'hardware'"> {{ $t('admin.person.twoFactorAuthentication.hardwareTokenText') }}</p>
               </v-col>
             </v-row>
           </v-container>
@@ -101,7 +88,7 @@
                 @click.stop="close2FADialog(isActive)"
                 data-testid="close-password-reset-dialog-button"
               >
-                {{ !!password ? $t('close') : $t('cancel') }}
+                {{ $t('cancel')}}
               </v-btn>
             </v-col>
             <v-col
@@ -112,11 +99,8 @@
               <v-btn
                 :block="mdAndDown"
                 class="primary button"
-                @click.stop="$emit('onResetPassword', person.person.id)"
-                data-testid="password-reset-button"
-                :disabled="!!password"
-              >
-                {{ $t('admin.person.resetPassword') }}
+                data-testid="two-way-authentification-set-up-button"              >
+                {{ $t('proceed') }}
               </v-btn>
             </v-col>
           </v-row>
