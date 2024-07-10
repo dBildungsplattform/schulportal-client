@@ -16,3 +16,10 @@ label[required='true']:after {
 .v-field__clearable > i.v-icon {
   opacity: 1;
 }
+
+.v-field.v-field--disabled {
+  opacity: 0.7;
+  .v-chip--variant-tonal .v-chip__underlay {
+    opacity: 0.25;
+  }
+}

@@ -263,6 +263,10 @@
       includeTyp: OrganisationsTyp.Schule,
       systemrechte: ['PERSONEN_VERWALTEN'],
     });
+    await organisationStore.getFilteredKlassen({
+      includeTyp: OrganisationsTyp.Klasse,
+      systemrechte: ['KLASSEN_VERWALTEN'],
+    });
     await personenkontextStore.getAllPersonenuebersichten();
     await rolleStore.getAllRollen('');
 

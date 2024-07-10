@@ -262,7 +262,7 @@
   onMounted(async () => {
     await organisationStore.getAllOrganisationen({
       includeTyp: OrganisationsTyp.Schule,
-      systemrechte: ['KLASSEN_VERWALTEN'],
+      systemrechte: ['SCHULEN_VERWALTEN'],
     });
     await organisationStore.getAllOrganisationen({
       includeTyp: OrganisationsTyp.Klasse,

@@ -9,6 +9,7 @@
     canCommit: boolean;
     createButtonLabel: string;
     discardButtonLabel: string;
+    hideActions?: boolean;
     id: string;
     onDiscard: () => void;
     onSubmit: () => void;
@@ -61,8 +62,12 @@
       class="border-opacity-100 rounded"
       color="#E5EAEF"
       thickness="5px"
+      v-if="!hideActions"
     ></v-divider>
-    <v-row class="py-3 px-2 justify-center">
+    <v-row
+      class="py-3 px-2 justify-center"
+      v-if="!hideActions"
+    >
       <v-spacer class="hidden-sm-and-down"></v-spacer>
       <v-col
         cols="12"
