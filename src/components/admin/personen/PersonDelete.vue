@@ -165,9 +165,9 @@
                 </p>
               </v-col>
             </v-row>
-            <v-row class="text-body bold px-md-16">
+            <v-row class="text-body bold">
               <v-col
-                offset="1"
+                offset="2"
                 cols="10"
               >
                 <span data-testid="person-delete-confirmation-text">

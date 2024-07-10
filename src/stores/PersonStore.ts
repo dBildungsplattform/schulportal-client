@@ -1,23 +1,19 @@
 import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import { isAxiosError, type AxiosResponse } from 'axios';
 import {
-  DbiamPersonenApiFactory,
   PersonenApiFactory,
   PersonenFrontendApiFactory,
-  type DbiamPersonenkontextBodyParams,
   type DbiamCreatePersonWithContextBodyParams,
-  type DbiamPersonenApiInterface,
-  type DBiamPersonResponse,
   type PersonenApiInterface,
   type PersonendatensatzResponse,
   type PersonenFrontendApiInterface,
   type PersonFrontendControllerFindPersons200Response,
 } from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
+import type { DbiamPersonenkontextBodyParams } from './PersonenkontextStore';
 
 const personenApi: PersonenApiInterface = PersonenApiFactory(undefined, '', axiosApiInstance);
 const personenFrontendApi: PersonenFrontendApiInterface = PersonenFrontendApiFactory(undefined, '', axiosApiInstance);
-const dbiamPersonenApi: DbiamPersonenApiInterface = DbiamPersonenApiFactory(undefined, '', axiosApiInstance);
 
 export type Person = {
   id: string;
@@ -40,7 +36,6 @@ export type { PersonendatensatzResponse };
 
 type PersonState = {
   allPersons: Array<Personendatensatz>;
-  createdPersonWithKontext: DBiamPersonResponse | null;
   errorCode: string;
   loading: boolean;
   totalPersons: number;
@@ -55,7 +50,6 @@ export type PersonFilter = {
 
 type PersonGetters = {};
 type PersonActions = {
-  createPersonWithKontext: (params: DbiamCreatePersonWithContextBodyParams) => Promise<PersonendatensatzResponse>;
   getAllPersons: (filter: PersonFilter) => Promise<void>;
   getPersonById: (personId: string) => Promise<Personendatensatz>;
   resetPassword: (personId: string) => Promise<string>;
@@ -69,7 +63,6 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
   state: (): PersonState => {
     return {
       allPersons: [],
-      createdPersonWithKontext: null,
       errorCode: '',
       loading: false,
       totalPersons: 0,
@@ -77,23 +70,6 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
     };
   },
   actions: {
-    async createPersonWithKontext(params: DbiamCreatePersonWithContextBodyParams): Promise<DBiamPersonResponse> {
-      this.loading = true;
-      try {
-        const { data }: { data: DBiamPersonResponse } =
-          await dbiamPersonenApi.dBiamPersonControllerCreatePersonWithKontext(params);
-        this.createdPersonWithKontext = data;
-        return data;
-      } catch (error: unknown) {
-        this.errorCode = 'UNSPECIFIED_ERROR';
-        if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
-        }
-        return await Promise.reject(this.errorCode);
-      } finally {
-        this.loading = false;
-      }
-    },
     async getAllPersons(filter: PersonFilter) {
       this.loading = true;
       try {
