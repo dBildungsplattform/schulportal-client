@@ -453,6 +453,7 @@
     }
   }
   onBeforeMount(async () => {
+    personenkontextStore.errorCode = '';
     await personStore.getPersonById(currentPersonId);
     await personenkontextStore.getPersonenuebersichtById(currentPersonId);
   });
@@ -494,10 +495,11 @@
       <!-- Error Message Display if the personenkontextStore throws any kind of error (Not being able to load the person) -->
       <SpshAlert
         :model-value="!!personenkontextStore.errorCode"
+        :type="'error'"
         :closable="false"
         :text="creationErrorText"
         :showButton="true"
-        :buttonText="$t('refreshPage')"
+        :buttonText="$t('refreshData')"
         :buttonAction="() => router.go(0)"
         :title="$t('admin.personenkontext.loadingErrorTitle')"
         @update:modelValue="handleAlertClose"
