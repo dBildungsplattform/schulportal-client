@@ -4,9 +4,11 @@ import PersonenkontextCreate from './PersonenkontextCreate.vue';
 import { nextTick } from 'vue';
 import { RollenArt, RollenMerkmal, RollenSystemRecht, type DBiamPersonenkontextResponse } from '@/api-client/generated';
 import { type PersonenkontextStore, usePersonenkontextStore } from '@/stores/PersonenkontextStore';
+import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
 
 let wrapper: VueWrapper | null = null;
 let personenkontextStore: PersonenkontextStore;
+let organisationStore: OrganisationStore;
 beforeEach(() => {
   document.body.innerHTML = `
     <div>
@@ -74,6 +76,7 @@ beforeEach(() => {
   });
 
   personenkontextStore = usePersonenkontextStore();
+  organisationStore = useOrganisationStore();
 
   personenkontextStore.workflowStepResponse = {
     organisations: [
@@ -183,6 +186,22 @@ describe('PersonenkontextCreate', () => {
     await nextTick();
 
     expect(klassenAutocomplete?.exists()).toBe(false);
+  });
+
+  test('Fetches all Klassen if the searchValue is empty', async () => {
+    const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
+    await organisationAutocomplete?.setValue('O1');
+    await nextTick();
+
+    const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
+    await rolleAutocomplete?.setValue('54321');
+    await nextTick();
+
+    const klassenAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
+    await klassenAutocomplete?.vm.$emit('update:search', '');
+    await nextTick();
+
+    expect(organisationStore.getKlassenByOrganisationId).toHaveBeenCalled();
   });
 
   test('it updates Organisation search correctly', async () => {
