@@ -570,9 +570,11 @@ export interface DbiamPersonenkontexteUpdateError {
 export const DbiamPersonenkontexteUpdateErrorI18nKeyEnum = {
     PersonenkontexteUpdateError: 'PERSONENKONTEXTE_UPDATE_ERROR',
     PersonenkontextNotFound: 'PERSONENKONTEXT_NOT_FOUND',
-    CountMismatchingError: 'COUNT_MISMATCHING_ERROR',
+    CountMismatching: 'COUNT_MISMATCHING',
     NewerVersionOfPersonenkontexteAvailable: 'NEWER_VERSION_OF_PERSONENKONTEXTE_AVAILABLE',
-    PersonIdMismatchError: 'PERSON_ID_MISMATCH_ERROR'
+    InvalidLastModifiedValue: 'INVALID_LAST_MODIFIED_VALUE',
+    PersonIdMismatch: 'PERSON_ID_MISMATCH',
+    PersonNotFound: 'PERSON_NOT_FOUND'
 } as const;
 
 export type DbiamPersonenkontexteUpdateErrorI18nKeyEnum = typeof DbiamPersonenkontexteUpdateErrorI18nKeyEnum[keyof typeof DbiamPersonenkontexteUpdateErrorI18nKeyEnum];
