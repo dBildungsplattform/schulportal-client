@@ -20,6 +20,9 @@ import {
   type PersonenkontexteUpdateResponse,
   type DbiamPersonenkontextBodyParams,
   type PersonenkontextWorkflowResponse,
+  type DbiamCreatePersonWithContextBodyParams,
+  type DBiamPersonResponse,
+  type PersonendatensatzResponse,
 } from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
 
@@ -89,6 +92,7 @@ type PersonenkontextState = {
   personenuebersicht: DBiamPersonenuebersichtResponse | null;
   createdPersonenkontextForOrganisation: DBiamPersonenkontextResponse | null;
   createdPersonenkontextForKlasse: DBiamPersonenkontextResponse | null;
+  createdPersonWithKontext: DBiamPersonResponse | null;
   errorCode: string;
   loading: boolean;
 };
@@ -109,6 +113,7 @@ type PersonenkontextActions = {
   ) => Promise<DBiamPersonenkontextResponse>;
   getPersonenuebersichtById: (personId: string) => Promise<void>;
   getAllPersonenuebersichten: () => Promise<void>;
+  createPersonWithKontext: (params: DbiamCreatePersonWithContextBodyParams) => Promise<PersonendatensatzResponse>;
 };
 
 export type {
@@ -150,6 +155,7 @@ export const usePersonenkontextStore: StoreDefinition<
       personenuebersicht: null,
       createdPersonenkontextForOrganisation: null,
       createdPersonenkontextForKlasse: null,
+      createdPersonWithKontext: null,
       errorCode: '',
       loading: false,
     };
@@ -316,6 +322,23 @@ export const usePersonenkontextStore: StoreDefinition<
         if (isAxiosError(error)) {
           this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
         }
+      } finally {
+        this.loading = false;
+      }
+    },
+    async createPersonWithKontext(params: DbiamCreatePersonWithContextBodyParams): Promise<DBiamPersonResponse> {
+      this.loading = true;
+      try {
+        const { data }: { data: DBiamPersonResponse } =
+          await personenKontextApi.dbiamPersonenkontextWorkflowControllerCreatePersonWithKontext(params);
+        this.createdPersonWithKontext = data;
+        return data;
+      } catch (error: unknown) {
+        this.errorCode = 'UNSPECIFIED_ERROR';
+        if (isAxiosError(error)) {
+          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
+        }
+        return await Promise.reject(this.errorCode);
       } finally {
         this.loading = false;
       }

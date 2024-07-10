@@ -13,6 +13,8 @@
 
   const timerId: Ref<ReturnType<typeof setTimeout> | undefined> = ref<ReturnType<typeof setTimeout>>();
   const canCommit: Ref<boolean> = ref(false);
+  const hasAutoselectedSchule: Ref<boolean> = ref(false);
+
   type RolleWithRollenart = {
     value: string;
     title: string;
@@ -190,8 +192,7 @@
           limit: 25,
         });
       }, 500);
-    }
-    else if (searchValue === '' && selectedRolle.value) {
+    } else if (searchValue === '' && selectedRolle.value) {
       // If searchValue is empty and an organization is selected, fetch roles for the selected organization
       timerId.value = setTimeout(() => {
         personenkontextStore.processWorkflowStep({
@@ -234,6 +235,18 @@
   function clearSelectedRolle(): void {
     emits('fieldReset', 'selectedRolle');
   }
+
+  watch(
+    () => props.organisationen,
+    async (newOrganisations: TranslatedObject[] | undefined, _oldOrganisations: TranslatedObject[] | undefined) => {
+      if (newOrganisations && newOrganisations.length === 1) {
+        hasAutoselectedSchule.value = true;
+        selectedOrganisation.value = newOrganisations[0]?.value;
+        emits('update:selectedOrganisation', selectedOrganisation.value);
+      }
+    },
+    { immediate: true },
+  );
 </script>
 
 <template>
@@ -250,12 +263,16 @@
     >
       <v-autocomplete
         autocomplete="off"
+        class="filter-dropdown mb-4"
+        :class="{ selected: selectedOrganisation }"
         clearable
         :click:clear="clearSelectedOrganisation"
         data-testid="organisation-select"
         density="compact"
+        :disabled="hasAutoselectedSchule"
         id="organisation-select"
         ref="organisation-select"
+        hide-details
         :items="organisationen"
         item-value="value"
         item-text="title"
