@@ -67,6 +67,7 @@
   const canCommit: Ref<boolean> = ref(false);
 
   const creationErrorText: Ref<string> = ref('');
+  const creationErrorTitle: Ref<string> = ref(''); 
 
   function navigateToPersonTable(): void {
     router.push({ name: 'person-management' });
@@ -178,6 +179,7 @@
       }
     } catch {
       creationErrorText.value = t(`admin.personenkontext.errors.${personenkontextStore.errorCode}`);
+      creationErrorTitle.value = t(`admin.personenkontext.title.${personenkontextStore.errorCode}`);
     }
   };
   function getSskName(sskDstNr: string, sskName: string): string {
@@ -338,6 +340,7 @@
       resetForm();
     } catch {
       creationErrorText.value = t(`admin.personenkontext.errors.${personenkontextStore.errorCode}`);
+      creationErrorTitle.value = t(`admin.personenkontext.title.${personenkontextStore.errorCode}`);
     }
   };
 
@@ -501,7 +504,7 @@
         :showButton="true"
         :buttonText="$t('refreshData')"
         :buttonAction="() => router.go(0)"
-        :title="$t('admin.personenkontext.loadingErrorTitle')"
+        :title="creationErrorTitle"
         @update:modelValue="handleAlertClose"
       />
 
