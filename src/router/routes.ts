@@ -63,7 +63,17 @@ const routes: readonly RouteRecordRaw[] = [
   {
     path: '/admin/rollen/new',
     name: 'create-rolle',
-    component: () => import('../views/admin/RolleCreationView.vue'),
+    component: () => import('../views/admin/rollen/RolleCreationView.vue'),
+    meta: {
+      layout: 'AdminLayout',
+      requiresAuth: true,
+      requiresPermission: 'rollenverwaltung',
+    },
+  },
+  {
+    path: '/admin/rollen/:id',
+    name: 'rolle-details',
+    component: () => import('../views/admin/rollen/RolleDetailsView.vue'),
     meta: {
       layout: 'AdminLayout',
       requiresAuth: true,
@@ -73,7 +83,7 @@ const routes: readonly RouteRecordRaw[] = [
   {
     path: '/admin/rollen',
     name: 'rolle-management',
-    component: () => import('../views/admin/RolleManagementView.vue'),
+    component: () => import('../views/admin/rollen/RolleManagementView.vue'),
     meta: {
       layout: 'AdminLayout',
       requiresAuth: true,
@@ -108,6 +118,11 @@ const routes: readonly RouteRecordRaw[] = [
       layout: 'DefaultLayout',
       requiresAuth: true,
     },
+  },
+  {
+    path: '/login-error',
+    name: 'login-error',
+    component: () => import('../views/UnknownUserErrorView.vue'),
   },
   {
     path: '/:pathMatch(.*)*',

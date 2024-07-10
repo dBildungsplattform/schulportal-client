@@ -86,7 +86,7 @@
       "edit": "Benutzer bearbeiten",
       "generatedPassword": "Generiertes Passwort",
       "loadingErrorText": "Es konnten keine Benutzerdaten geladen werden.",
-      "loadingErrorTitle": "Fehler beim Laden des Benutzers.",
+      "loadingErrorTitle": "Fehler beim Laden des Benutzers",
       "management": "Benutzerverwaltung",
       "personalInfo": "Persönliche Informationen",
       "resetPasswordConfirmation": "Sind Sie sicher, dass Sie das Passwort für {firstname} {lastname} zurücksetzen möchten?",
@@ -127,12 +127,15 @@
       "createAnother": "Weitere Rolle anlegen",
       "createNew": "Neue Rolle anlegen",
       "discard": "Rolle verwerfen",
+      "edit": "Rolle bearbeiten",
       "enterRollenname": "Rollenname eingeben",
       "errors": {
         "ADD_SYSTEMRECHT_ERROR": "Das Systemrecht konnte nicht hinzugefügt werden.",
         "ROLLE_ERROR":  "Die Rolle konnte nicht angelegt werden."
       },
       "isAllowedToManageRollen": "Darf Rollen verwalten",
+      "loadingErrorText": "Es konnten keine Rollendaten geladen werden.",
+      "loadingErrorTitle": "Fehler beim Laden der Rolle",
       "management": "Rollenverwaltung",
       "mappingFrontBackEnd": {
         "systemrechte": {
@@ -162,6 +165,7 @@
       "rolleCreateErrorTitle": "Fehler beim Anlegen der Rolle",
       "rolleCreateErrorText": "Die Rolle konnte nicht angelegt werden.",
       "rolleFound": "{total} Rolle gefunden",
+      "rolleInfo": "Rolleninformationen",
       "rollenart": "Rollenart",
       "rollenFound": "{count} Rolle gefunden | {count} Rollen gefunden",
       "rollenname": "Rollenname",
@@ -254,7 +258,11 @@
     "KEYCLOAK_CLIENT_ERROR": "Die Anmeldung ist momentan nicht möglich.",
     "UNSPECIFIED_ERROR": "Es ist ein Fehler aufgetreten.",
     "USER_AUTHENTICATION_FAILED_ERROR": "Ihr Benutzername oder Ihr Passwort war falsch. Versuchen Sie es erneut oder wenden Sie sich an Ihre schulischen Administratorinnen und Administratoren.",
-    "NOT_FOUND": "Die aufgerufene Seite wurde nicht gefunden."
+    "NOT_FOUND": "Die aufgerufene Seite wurde nicht gefunden.",
+    "UNKNOWN_USER": {
+      "title": "Unbekannter Benutzer",
+      "text": "Der Benutzer ist im Schulportal SH nicht bekannt."
+    }
   },
   "footer": {
     "accessibility": "Barrierefreiheit",

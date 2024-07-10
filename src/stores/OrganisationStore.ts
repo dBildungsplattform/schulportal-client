@@ -94,7 +94,7 @@ export const useOrganisationStore: StoreDefinition<
       try {
         const response: AxiosResponse<Organisation[]> = await organisationApi.organisationControllerFindOrganizations(
           undefined,
-          undefined,
+          25,
           undefined,
           undefined,
           filter?.searchString,
@@ -126,7 +126,7 @@ export const useOrganisationStore: StoreDefinition<
       try {
         const response: AxiosResponse<Organisation[]> = await organisationApi.organisationControllerFindOrganizations(
           undefined,
-          undefined,
+          25,
           undefined,
           undefined,
           filter?.searchString,
