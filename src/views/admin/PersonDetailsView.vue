@@ -383,7 +383,7 @@ import TwoFactorAuthenticationSetUp from '@/components/admin/personen/TwoFactorA
         <v-container class="two-factor-authentication-set-up">
           <v-row class="ml-md-16">
             <v-col>
-              <h3 class="subtitle-1">{{ $t('person.twoFactorAuthentication.header') }}</h3>
+              <h3 class="subtitle-1">{{ $t('admin.person.twoFactorAuthentication.header') }}</h3>
             </v-col>
             <v-col
               class="mr-lg-13"
