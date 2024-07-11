@@ -311,6 +311,9 @@
   "pleaseSelect": "Bitte auswählen",
   "person": {
     "addZuordnung": "Schulzuordnung hinzufügen",
+    "addZuordnungSuccess": "Die Zuordnung wurde erfolgreich hinzugefügt.",
+    "addZuordnungConfirmation": "Wollen Sie die Schulzuordnung als {rollenname} hinzufügen?",
+    "addZuordnungKlasseConfirmation": "Wollen Sie die Schulzuordnung als {rollenname} in Klasse {klassenname} hinzufügen?",
     "addZuordnungNotAllowed": "Diese Aktion ist nach Auswahl einer Schulzuordnung nicht ausführbar.",
     "cannotDeleteOwnZuordnung": "Sie dürfen sich selbst keine Zuordnungen entziehen.",
     "checkAndSave": "Bitte prüfen und abschließend speichern, um die Aktion auszuführen",
@@ -341,6 +344,7 @@
     "rolle": "Rolle",
     "userName": "Benutzername",
     "saveChanges": "Änderungen speichern",
+    "willBeCreated": "wird hinzugefügt",
     "willBeRemoved": "wird entfernt",
     "zuordnungen": "Schulzuordnung(en)"
   },
