@@ -104,6 +104,12 @@
 
       // Fetch all classes for the selected organization without any filter
       organisationStore.getKlassenByOrganisationId(newValue);
+
+      // Reset the selectedRolle field only if oldValue was not undefined
+      if (oldValue !== undefined) {
+        selectedRolle.value = undefined;
+        emits('fieldReset', 'selectedRolle');
+      }
     } else if (!newValue) {
       // If the organization is cleared, reset selectedRolle and selectedKlasse
       selectedRolle.value = undefined;
