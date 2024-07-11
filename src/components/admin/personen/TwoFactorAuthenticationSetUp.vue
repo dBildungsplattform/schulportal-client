@@ -1,14 +1,12 @@
 <script setup lang="ts">
   import { ref, type Ref } from 'vue';
   import { type Personendatensatz } from '@/stores/PersonStore';
-  import { type Composer, useI18n } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import SpshTooltip from '@/components/admin/SpshTooltip.vue';
 
-  const { t }: Composer = useI18n({ useScope: 'global' });
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
-  const selectedOption = ref('one')
+  const selectedOption = ref('software')
 
   type Props = {
     errorCode: string;
@@ -16,7 +14,7 @@
     person: Personendatensatz;
   };
 
-  const props: Props = defineProps<Props>();
+  defineProps<Props>();
 
   async function close2FADialog(isActive: Ref<boolean>): Promise<void> {
     isActive.value = false;
