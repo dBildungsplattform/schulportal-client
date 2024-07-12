@@ -8,7 +8,7 @@
   import SpshTooltip from '@/components/admin/SpshTooltip.vue';
   import PersonDelete from '@/components/admin/personen/PersonDelete.vue';
   import PersonenkontextDelete from '@/components/admin/personen/PersonenkontextDelete.vue';
-  import TwoFactorAuthenticationSetUp from '@/components/admin/personen/TwoFactorAuthenticationSetUp.vue';
+  import TwoFactorAuthenticationSetUp from '@/components/cards/two-factor-authentication/TwoFactorAuthenticationSetUp.vue';
   import {
     usePersonenkontextStore,
     type PersonenkontextStore,
@@ -353,7 +353,6 @@
         !existingZuordnungen?.some((zuordnung: Zuordnung) => zuordnung.rolleId === rolle.value),
     );
   });
-
 
   // Computed property to get the title of the selected role
   const selectedRolleTitle: ComputedRef<string | undefined> = computed(() => {
@@ -1026,7 +1025,7 @@
       <LayoutCard
         :closable="true"
         :header="$t('person.editZuordnungen')"
-         @onCloseClicked="closeDeleteSuccessDialog"
+        @onCloseClicked="closeDeleteSuccessDialog"
       >
         <v-card-text>
           <v-container>
@@ -1068,7 +1067,7 @@
       <LayoutCard
         :closable="true"
         :header="$t('person.editZuordnungen')"
-         @onCloseClicked="closeCreateSuccessDialog"
+        @onCloseClicked="closeCreateSuccessDialog"
       >
         <v-card-text>
           <v-container>
@@ -1110,7 +1109,7 @@
       <LayoutCard
         :closable="true"
         :header="$t('person.editZuordnungen')"
-          @onCloseClicked="cancelAddition"
+        @onCloseClicked="cancelAddition"
       >
         <v-card-text>
           <v-container>
@@ -1165,7 +1164,7 @@
       <LayoutCard
         :closable="true"
         :header="$t('person.editZuordnungen')"
-          @onCloseClicked="closeCannotDeleteDialog"
+        @onCloseClicked="closeCannotDeleteDialog"
       >
         <v-card-text>
           <v-container>
