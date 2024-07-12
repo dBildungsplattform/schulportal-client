@@ -410,6 +410,7 @@ describe('PersonenkontextStore', () => {
         vorname: 'string',
         nachname: 'string',
         benutzername: 'string',
+        lastModifiedZuordnungen: '08.02.2024',
         zuordnungen: [
           {
             sskId: 'string',
@@ -567,6 +568,7 @@ describe('PersonenkontextStore', () => {
             vorname: 'Samuel',
             nachname: 'Vimes',
             benutzername: 'string',
+            lastModifiedZuordnungen: '08.02.2024',
             zuordnungen: [
               {
                 sskId: 'string',
