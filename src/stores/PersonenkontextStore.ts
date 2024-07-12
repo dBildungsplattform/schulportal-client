@@ -62,7 +62,7 @@ export type Uebersicht =
       vorname: string;
       nachname: string;
       benutzername: string;
-      lastModified: string;
+      lastModifiedZuordnungen: string | null;
       zuordnungen: {
         klasse?: string | undefined;
         sskId: string;
