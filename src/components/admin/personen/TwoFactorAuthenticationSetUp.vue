@@ -6,7 +6,7 @@
   import SpshTooltip from '@/components/admin/SpshTooltip.vue';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
-  const selectedOption = ref('software')
+  const selectedOption: Ref<'software' | 'hardware'> = ref('software');
 
   type Props = {
     errorCode: string;
@@ -67,8 +67,8 @@
             </v-row>
             <v-row>
               <v-col cols="12">
-                <p v-if="selectedOption === 'software'"> {{ $t('admin.person.twoFactorAuthentication.softwareTokenText') }}</p>
-                <p v-if="selectedOption === 'hardware'"> {{ $t('admin.person.twoFactorAuthentication.hardwareTokenText') }}</p>
+                <p class="text-body" v-if="selectedOption === 'software'"> {{ $t('admin.person.twoFactorAuthentication.softwareTokenText') }}</p>
+                <p class="text-body" v-if="selectedOption === 'hardware'"> {{ $t('admin.person.twoFactorAuthentication.hardwareTokenText') }}</p>
               </v-col>
             </v-row>
           </v-container>
@@ -84,7 +84,7 @@
                 :block="mdAndDown"
                 class="secondary button"
                 @click.stop="close2FADialog(isActive)"
-                data-testid="close-password-reset-dialog-button"
+                data-testid="close-two-way-authentification-dialog-button"
               >
                 {{ $t('cancel')}}
               </v-btn>
