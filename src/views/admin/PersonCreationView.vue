@@ -235,6 +235,7 @@
   }
 
   onBeforeRouteLeave((_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
+    personenkontextStore.workflowStepResponse = null;
     if (isFormDirty()) {
       showUnsavedChangesDialog.value = true;
       blockedNext = next;
@@ -255,11 +256,6 @@
 
   onUnmounted(() => {
     window.removeEventListener('beforeunload', preventNavigation);
-  });
-
-  // Clear the store on leaving the route
-  onBeforeRouteLeave(() => {
-    personenkontextStore.workflowStepResponse = null;
   });
 </script>
 
