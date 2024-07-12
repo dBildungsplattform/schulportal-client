@@ -1,13 +1,16 @@
 import { expect, test } from 'vitest';
 import { VueWrapper, mount } from '@vue/test-utils';
 import PersonCreationView from './PersonCreationView.vue';
+import PersonManagementView from './PersonManagementView.vue';
 import MockAdapter from 'axios-mock-adapter';
 import ApiService from '@/services/ApiService';
+import { createRouter, createWebHistory, type Router } from 'vue-router';
 
 const mockadapter: MockAdapter = new MockAdapter(ApiService);
 let wrapper: VueWrapper | null = null;
+let router: Router;
 
-beforeEach(() => {
+beforeEach(async () => {
   mockadapter.reset();
   document.body.innerHTML = `
     <div>
@@ -15,20 +18,22 @@ beforeEach(() => {
     </div>
   `;
 
+  router = createRouter({
+    history: createWebHistory(),
+    routes: [
+      { path: '/', component: PersonCreationView, meta: { layout: 'DefaultLayout' }  },
+      { path: '/admin/personen', component: PersonManagementView, meta: { layout: 'DefaultLayout' } },
+    ],
+  });
 
   wrapper = mount(PersonCreationView, {
     attachTo: document.getElementById('app') || '',
     global: {
-      components: {
-        PersonCreationView,
-      },
-      mocks: {
-        route: {
-          fullPath: 'full/path',
-        },
-      },
+      plugins: [router],
     },
   });
+  router.push('/');
+  await router.isReady();
 });
 
 describe('PersonCreationView', () => {
@@ -43,4 +48,5 @@ describe('PersonCreationView', () => {
     expect(wrapper?.getComponent({ name: 'FormRow' })).toBeTruthy();
     expect(wrapper?.getComponent({ name: 'PersonenkontextCreate' })).toBeTruthy();
   });
+
 });
