@@ -207,14 +207,6 @@
           limit: 25,
         });
       }, 500);
-    } else if (newValue === '' && selectedRolle.value) {
-      // If searchValue is empty and an organization is selected, fetch roles for the selected organization
-      timerId.value = setTimeout(() => {
-        personenkontextStore.processWorkflowStep({
-          organisationId: selectedOrganisation.value,
-          limit: 25,
-        });
-      }, 500);
     }
   });
 
