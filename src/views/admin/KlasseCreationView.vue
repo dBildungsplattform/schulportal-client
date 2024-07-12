@@ -209,6 +209,11 @@
   onUnmounted(() => {
     window.removeEventListener('beforeunload', preventNavigation);
   });
+
+  // Clear the store on leaving the route
+  onBeforeRouteLeave(() => {
+    personenkontextStore.workflowStepResponse = null;
+  });
 </script>
 
 <template>
@@ -257,7 +262,6 @@
             <v-autocomplete
               autocomplete="off"
               clearable
-              class="filter-dropdown"
               :class="[{ 'filter-dropdown mb-4': hasAutoselectedSchule }, { selected: selectedSchule }]"
               data-testid="schule-select"
               density="compact"

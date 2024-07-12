@@ -256,6 +256,11 @@
   onUnmounted(() => {
     window.removeEventListener('beforeunload', preventNavigation);
   });
+
+  // Clear the store on leaving the route
+  onBeforeRouteLeave(() => {
+    personenkontextStore.workflowStepResponse = null;
+  });
 </script>
 
 <template>

@@ -5,6 +5,7 @@
   import FormRow from '@/components/form/FormRow.vue';
   import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
   import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
+  import { onBeforeRouteLeave } from 'vue-router';
 
   useI18n({ useScope: 'global' });
 
@@ -262,6 +263,11 @@
     },
     { immediate: true },
   );
+
+  // Clear the store on leaving the route
+  onBeforeRouteLeave(() => {
+    personenkontextStore.workflowStepResponse = null;
+  });
 </script>
 
 <template>
