@@ -298,6 +298,7 @@ describe('PersonenkontextCreate', () => {
     await nextTick();
 
     expect(rolleAutocomplete?.text()).toEqual('');
+    expect(personenkontextStore.processWorkflowStep).toHaveBeenCalledWith({ organisationId: '1133', limit: 25 });
   });
   test('it sends a request if the newValue is empty and the selected Organisation is not defined', async () => {
     const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
@@ -315,5 +316,37 @@ describe('PersonenkontextCreate', () => {
     await nextTick();
 
     expect(organisationAutocomplete?.text()).toEqual('');
+  });
+  test('it sends a request if the newValue is empty and the selected Organisation is defined', async () => {
+    const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
+
+    await organisationAutocomplete?.setValue('1133');
+    await nextTick();
+
+    await organisationAutocomplete?.vm.$emit('update:search', 'Lern');
+    await nextTick();
+
+    await organisationAutocomplete?.vm.$emit('update:search', '');
+    await nextTick();
+
+    expect(organisationAutocomplete?.text()).toEqual('orga');
+  });
+  test('Do nothing with Klassen if the orga was reset', async () => {
+    const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
+    await organisationAutocomplete?.setValue('O1');
+    await nextTick();
+
+    const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
+    await rolleAutocomplete?.setValue('54321');
+    await nextTick();
+
+    const klassenAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
+    await klassenAutocomplete?.vm.$emit('update:search', '');
+    await nextTick();
+
+    await organisationAutocomplete?.setValue(undefined);
+    await nextTick();
+
+    expect(klassenAutocomplete?.text()).toBeFalsy();
   });
 });
