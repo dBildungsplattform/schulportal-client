@@ -188,7 +188,6 @@
 
   watch(searchInputRolle, async (newValue: string, oldValue: string) => {
     clearTimeout(timerId.value);
-
     // If the oldValue (What has been in the searchValue beforing losing focus) is equal to the selected Rolle.title then do nothing
     if (oldValue === selectedRolleTitle.value) return;
     // If searchValue is empty, fetch all roles for the organisationId
