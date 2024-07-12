@@ -159,7 +159,6 @@ describe('KlasseCreationView', () => {
     expect(personenkontextStore.processWorkflowStep).toHaveBeenCalled();
   });
   test('it handles search input for Schule when searchValue is empty', async () => {
-    // Setting a value that matches selectedSchuleTitle
     personenkontextStore.workflowStepResponse = {
       organisations: [
         {

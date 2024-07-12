@@ -150,7 +150,9 @@
   // Default behavior of the autocomplete is to reset the newValue to empty string and that causes another request to be made
   watch(searchInputOrganisation, async (newValue: string, oldValue: string) => {
     clearTimeout(timerId.value);
-    if (oldValue === selectedOrganisationTitle.value) return;
+    if (oldValue === selectedOrganisationTitle.value) {
+      return;
+    }
     isSearching = !!newValue;
 
     // If searchValue is empty and selectedOrganisation does not have a value, fetch initial data

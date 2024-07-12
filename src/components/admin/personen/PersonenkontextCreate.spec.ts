@@ -25,6 +25,10 @@ beforeEach(() => {
           title: 'orga',
           value: '1133',
         },
+        {
+          title: 'orga1',
+          value: '1133',
+        },
       ],
       rollen: [
         {
@@ -234,12 +238,40 @@ describe('PersonenkontextCreate', () => {
   test('it does nothing if the oldValue is equal to what is selected on Organisation', async () => {
     const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
 
+    // Set a value in orga that will match with something given by the props and so the component will calculate the selectedOrganisationTitle
     await organisationAutocomplete?.setValue('1133');
     await nextTick();
 
+    // Set the searchValue to 'orga' which matches the title before
     await organisationAutocomplete?.vm.$emit('update:search', 'orga');
     await nextTick();
 
-    expect(personenkontextStore.processWorkflowStep).toHaveBeenCalled();
+    // Set the newValue to '' and the oldValue is in this case 'orga' and so the method should just return
+    await organisationAutocomplete?.vm.$emit('update:search', '');
+    await nextTick();
+
+    expect(organisationAutocomplete?.text()).toEqual('orga');
+  });
+
+  test('it does nothing if the oldValue is equal to what is selected on Rolle', async () => {
+    const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
+
+    await organisationAutocomplete?.setValue('1133');
+    await nextTick();
+
+    // Set a value in orga that will match with something given by the props and so the component will calculate the selectedRolleTitle
+    const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
+    await rolleAutocomplete?.setValue('54321');
+    await nextTick();
+
+    // Set the searchValue to 'Lern' which matches the title before
+    await rolleAutocomplete?.vm.$emit('update:search', 'Lern');
+    await nextTick();
+
+    // Set the newValue to '' and the oldValue is in this case 'Lern' and so the method should just return
+    await rolleAutocomplete?.vm.$emit('update:search', '');
+    await nextTick();
+
+    expect(rolleAutocomplete?.text()).toEqual('Lern');
   });
 });
