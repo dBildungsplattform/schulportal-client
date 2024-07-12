@@ -326,7 +326,9 @@
     "userName": "Benutzername",
     "saveChanges": "Änderungen speichern",
     "willBeRemoved": "wird entfernt",
-    "zuordnungen": "Schulzuordnung(en)"
+    "zuordnungen": "Schulzuordnung(en)",
+    "zuordnung": "Schulzuordnung"
+
   },
   "profile": {
     "personalData": "Persönliche Daten",
@@ -339,7 +341,7 @@
     "setNewPassword": "Neues Passwort setzen",
     "twoFactorAuth": "Zwei-Faktor-Authentifizierung",
     "setupTwoFactorAuth": "2-FA einrichten",
-    "infoAboutChangeabilityFromPersonalData": "Persönliche Daten sind nur durch Ihre schulischen Administratorinnen oder Administratoren veränderbar",
+    "infoAboutChangeabilityFromPersonalData": "Persönliche Daten sind nur durch Ihre schulischen Admins veränderbar",
     "yourSchoolAdminsAre": "Ihre schulischen Admins sind:",
     "personalNummer": "Personalnummer",
     "personalNummerAbbr": "KoPers.-Nr."

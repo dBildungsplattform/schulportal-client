@@ -161,13 +161,6 @@
         <LayoutCard :header="$t('profile.personalData')">
           <v-row class="ma-3 padding">
             <v-col cols="12">
-              <p>
-                <v-icon
-                  class="mr-2"
-                  icon="mdi-alert-circle-outline"
-                ></v-icon>
-                {{ $t('profile.infoAboutChangeabilityFromPersonalData') }}
-              </p>
               <v-simple-table>
                 <template v-slot:default>
                   <tbody>
@@ -175,7 +168,7 @@
                       v-for="item in personalData"
                       :key="item.label"
                     >
-                      <td class="right padding">
+                      <td class="padding">
                         <span v-if="item.labelAbbr"
                           ><abbr :title="item.label"
                             ><strong>{{ item.labelAbbr }}</strong></abbr
@@ -188,27 +181,27 @@
                   </tbody>
                 </template>
               </v-simple-table>
+              <p class="info">
+                <v-icon
+                  class="mr-2"
+                  icon="mdi-information-slab-circle-outline"
+                ></v-icon>
+                {{ $t('profile.infoAboutChangeabilityFromPersonalData') }}
+              </p>
             </v-col>
           </v-row>
         </LayoutCard>
       </v-col>
       <v-col
-        v-for="schoolData in schoolDatas"
+        v-for="(schoolData, index) in schoolDatas"
         :key="schoolData.title"
         cols="12"
         sm="12"
         md="6"
       >
-        <LayoutCard :header="schoolData.title">
+        <LayoutCard :header="$t('person.zuordnung') + ' ' + (schoolDatas.length > 1 ? (index + 1).toString() : '')">
           <v-row class="ma-3 padding">
             <v-col cols="12">
-              <p>
-                <v-icon
-                  class="mr-2"
-                  icon="mdi-alert-circle-outline"
-                ></v-icon>
-                {{ schoolData.info + ' ' + schoolData.schoolAdmins?.join(', ') }}
-              </p>
               <v-simple-table>
                 <template v-slot:default>
                   <tbody>
@@ -216,7 +209,7 @@
                       v-for="item in schoolData.labelAndValues"
                       :key="item.label"
                     >
-                      <td class="right padding">
+                      <td class="padding">
                         <span v-if="item.labelAbbr"
                           ><abbr :title="item.label"
                             ><strong>{{ item.labelAbbr }}</strong></abbr
@@ -229,6 +222,13 @@
                   </tbody>
                 </template>
               </v-simple-table>
+              <p class="info">
+                <v-icon
+                  class="mr-2"
+                  icon="mdi-information-slab-circle-outline"
+                ></v-icon>
+                {{ schoolData.info + ' ' + schoolData.schoolAdmins?.join(', ') }}
+              </p>
             </v-col>
           </v-row>
         </LayoutCard>
@@ -315,6 +315,9 @@
     width: 100%;
   }
 
-  .gap-5 {
+  .info {
+    padding-top: 20px;
+    text-align: center;
+    color: grey;
   }
 </style>
