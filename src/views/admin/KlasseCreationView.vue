@@ -161,8 +161,8 @@
   };
 
   async function navigateBackToKlasseForm(): Promise<void> {
-    await router.push({ name: 'create-klasse' });
     organisationStore.errorCode = '';
+    await router.push({ name: 'create-klasse' });
   }
 
   async function navigateToKlasseManagement(): Promise<void> {

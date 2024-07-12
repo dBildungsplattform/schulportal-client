@@ -122,6 +122,12 @@ describe('KlasseCreationView', () => {
     await nextTick();
 
     expect(wrapper?.find('[data-testid="alert-title"]').isVisible()).toBe(true);
+
+    wrapper?.find('[data-testid="alert-button"]').trigger('click');
+    await nextTick();
+
+    expect(organisationStore.errorCode).toBe('');
+
   });
 
   test('it handles search input for Schule when searchValue is not equal to selectedSchuleTitle', async () => {
@@ -178,7 +184,7 @@ describe('KlasseCreationView', () => {
     await nextTick();
     expect(personenkontextStore.processWorkflowStep).toHaveBeenCalled();
   });
-  test.only('it handles search input for Schule when searchValue is empty and selected Schule is present', async () => {
+  test('it handles search input for Schule when searchValue is empty and selected Schule is present', async () => {
     // Setting a value that matches selectedSchuleTitle
     personenkontextStore.workflowStepResponse = {
       organisations: [
