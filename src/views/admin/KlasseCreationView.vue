@@ -33,7 +33,7 @@
   const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
 
   const timerId: Ref<ReturnType<typeof setTimeout> | undefined> = ref<ReturnType<typeof setTimeout>>();
-  const isSearching: Ref<boolean> = ref(false);
+  let isSearching: boolean = false;
   const hasAutoselectedSchule: Ref<boolean> = ref(false);
 
   const validationSchema: TypedSchema = toTypedSchema(
@@ -106,7 +106,7 @@
   watch(searchInputSchule, async (newValue: string, oldValue: string) => {
     clearTimeout(timerId.value);
     if (oldValue === selectedSchuleTitle.value) return;
-    isSearching.value = !!newValue;
+    isSearching = !!newValue;
 
     if (newValue === '' && !selectedSchule.value) {
       timerId.value = setTimeout(async () => {
@@ -192,7 +192,7 @@
   watch(
     () => schulen.value,
     (newSchulen: TranslatedObject[] | undefined) => {
-      if (newSchulen && newSchulen.length === 1) {
+      if (!isSearching && newSchulen && newSchulen.length === 1) {
         hasAutoselectedSchule.value = true;
         selectedSchule.value = newSchulen[0]?.value || '';
       }
