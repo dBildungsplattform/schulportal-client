@@ -209,4 +209,47 @@ describe('KlasseCreationView', () => {
 
     expect(personenkontextStore.processWorkflowStep).toHaveBeenCalled();
   });
+  test('it does nothing if the oldValue is equal to what is selected on Schule', async () => {
+    personenkontextStore.workflowStepResponse = {
+      organisations: [
+        {
+          id: '1133',
+          kennung: '',
+          name: 'orga1',
+          namensergaenzung: 'string',
+          kuerzel: 'string',
+          typ: 'TRAEGER',
+          administriertVon: '1',
+        },
+        {
+          id: '1133',
+          kennung: '',
+          name: 'orga',
+          namensergaenzung: 'string',
+          kuerzel: 'string',
+          typ: 'TRAEGER',
+          administriertVon: '1',
+        },
+      ],
+      rollen: [],
+      selectedOrganisation: null,
+      selectedRolle: null,
+      canCommit: true,
+    };
+    const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
+
+    // Set a value in orga that will match with something given by the props and so the component will calculate the selectedOrganisationTitle
+    await organisationAutocomplete?.setValue('1133');
+    await nextTick();
+
+    // Set the searchValue to 'orga' which matches the title before
+    await organisationAutocomplete?.vm.$emit('update:search', 'orga');
+    await nextTick();
+
+    // Set the newValue to '' and the oldValue is in this case 'orga' and so the method should just return
+    await organisationAutocomplete?.vm.$emit('update:search', '');
+    await nextTick();
+
+    expect(organisationAutocomplete?.text()).toEqual('1133');
+  });
 });
