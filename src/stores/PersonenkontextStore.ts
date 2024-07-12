@@ -62,6 +62,7 @@ export type Uebersicht =
       vorname: string;
       nachname: string;
       benutzername: string;
+      lastModified: string;
       zuordnungen: {
         klasse?: string | undefined;
         sskId: string;
@@ -275,7 +276,7 @@ export const usePersonenkontextStore: StoreDefinition<
       this.loading = true;
       try {
         const updateParams: DbiamUpdatePersonenkontexteBodyParams = {
-          lastModified: new Date().toISOString(),
+          lastModified: this.personenuebersicht?.lastModifiedZuordnungen ?? new Date().toISOString(),
           count: this.personenuebersicht?.zuordnungen.length ?? 0,
           personenkontexte: combinedZuordnungen?.map((zuordnung: Zuordnung) => ({
             personId: personId,

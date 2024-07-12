@@ -361,6 +361,12 @@ export interface DBiamPersonenuebersichtResponse {
      */
     'benutzername': string;
     /**
+     * Date of the most recent changed personenkontext in the Zuordnungen
+     * @type {string}
+     * @memberof DBiamPersonenuebersichtResponse
+     */
+    'lastModifiedZuordnungen': string | null;
+    /**
      * 
      * @type {Array<DBiamPersonenzuordnungResponse>}
      * @memberof DBiamPersonenuebersichtResponse

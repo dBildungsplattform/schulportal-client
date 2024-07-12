@@ -3802,6 +3802,12 @@
                     "benutzername": {
                         "type": "string"
                     },
+                    "lastModifiedZuordnungen": {
+                        "format": "date-time",
+                        "type": "string",
+                        "nullable": true,
+                        "description": "Date of the most recent changed personenkontext in the Zuordnungen"
+                    },
                     "zuordnungen": {
                         "type": "array",
                         "items": {
@@ -3814,6 +3820,7 @@
                     "vorname",
                     "nachname",
                     "benutzername",
+                    "lastModifiedZuordnungen",
                     "zuordnungen"
                 ]
             },
