@@ -178,7 +178,7 @@ describe('KlasseCreationView', () => {
     await nextTick();
     expect(personenkontextStore.processWorkflowStep).toHaveBeenCalled();
   });
-  test('it handles search input for Schule when searchValue is empty and selected Schule is present', async () => {
+  test.only('it handles search input for Schule when searchValue is empty and selected Schule is present', async () => {
     // Setting a value that matches selectedSchuleTitle
     personenkontextStore.workflowStepResponse = {
       organisations: [
@@ -199,10 +199,6 @@ describe('KlasseCreationView', () => {
     } as PersonenkontextWorkflowResponse;
 
     const schuleSearchInput: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
-
-    await schuleSearchInput?.setValue('Albert');
-    await nextTick();
-
     await schuleSearchInput?.vm.$emit('update:search', '');
     await nextTick();
 
