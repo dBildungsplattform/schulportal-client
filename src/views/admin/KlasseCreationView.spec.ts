@@ -1,15 +1,17 @@
-import { expect, test, type MockInstance } from 'vitest';
+import { expect, test, type MockInstance, vi, describe, beforeEach } from 'vitest';
 import { VueWrapper, mount } from '@vue/test-utils';
 import KlasseCreationView from './KlasseCreationView.vue';
 import { createRouter, createWebHistory, type NavigationFailure, type RouteLocationRaw, type Router } from 'vue-router';
 import routes from '@/router/routes';
 import { nextTick } from 'vue';
 import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
-import type { OrganisationResponse } from '@/api-client/generated';
+import type { OrganisationResponse, PersonenkontextWorkflowResponse } from '@/api-client/generated';
+import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
 let organisationStore: OrganisationStore;
+const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
 
 beforeEach(async () => {
   document.body.innerHTML = `
@@ -54,6 +56,12 @@ beforeEach(async () => {
       plugins: [router],
     },
   });
+});
+
+afterEach(() => {
+  // Reset the organisationStore state after each test
+  organisationStore.errorCode = '';
+  organisationStore.createdKlasse = null;
 });
 
 describe('KlasseCreationView', () => {
@@ -114,5 +122,90 @@ describe('KlasseCreationView', () => {
     await nextTick();
 
     expect(wrapper?.find('[data-testid="alert-title"]').isVisible()).toBe(true);
+  });
+
+  test('it handles search input for Schule when searchValue is not equal to selectedSchuleTitle', async () => {
+    // Setting a value that matches selectedSchuleTitle
+    personenkontextStore.workflowStepResponse = {
+      organisations: [
+        {
+          id: 'Albert',
+          name: 'Albert-Emil-Hansebrot-Gymnasium',
+          kennung: '9356494',
+          namensergaenzung: 'Schule',
+          kuerzel: 'aehg',
+          typ: 'SCHULE',
+          administriertVon: '1',
+        },
+      ],
+      rollen: [],
+      selectedOrganisation: '1',
+      selectedRolle: 'someRolle',
+      canCommit: true,
+    } as PersonenkontextWorkflowResponse;
+
+    const schuleSearchInput: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
+
+    // Triggering search with a value
+    await schuleSearchInput?.setValue('Albert');
+    await schuleSearchInput?.vm.$emit('update:search', 'Albert');
+    await nextTick();
+    expect(personenkontextStore.processWorkflowStep).toHaveBeenCalled();
+  });
+  test('it handles search input for Schule when searchValue is empty', async () => {
+    // Setting a value that matches selectedSchuleTitle
+    personenkontextStore.workflowStepResponse = {
+      organisations: [
+        {
+          id: 'Hohver',
+          name: 'Hohver-Gymnasium',
+          kennung: '9356495',
+          namensergaenzung: 'Schule',
+          kuerzel: 'aehg',
+          typ: 'SCHULE',
+          administriertVon: '1',
+        },
+      ],
+      rollen: [],
+      selectedOrganisation: '1',
+      selectedRolle: 'someRolle',
+      canCommit: true,
+    } as PersonenkontextWorkflowResponse;
+
+    const schuleSearchInput: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
+
+    await schuleSearchInput?.vm.$emit('update:search', '');
+    await nextTick();
+    expect(personenkontextStore.processWorkflowStep).toHaveBeenCalled();
+  });
+  test('it handles search input for Schule when searchValue is empty and selected Schule is present', async () => {
+    // Setting a value that matches selectedSchuleTitle
+    personenkontextStore.workflowStepResponse = {
+      organisations: [
+        {
+          id: 'Albert',
+          name: 'Albert-Gymnasium',
+          kennung: '9356495',
+          namensergaenzung: 'Schule',
+          kuerzel: 'aehg',
+          typ: 'SCHULE',
+          administriertVon: '1',
+        },
+      ],
+      rollen: [],
+      selectedOrganisation: '1',
+      selectedRolle: 'someRolle',
+      canCommit: true,
+    } as PersonenkontextWorkflowResponse;
+
+    const schuleSearchInput: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
+
+    await schuleSearchInput?.setValue('Albert');
+    await nextTick();
+
+    await schuleSearchInput?.vm.$emit('update:search', '');
+    await nextTick();
+
+    expect(personenkontextStore.processWorkflowStep).toHaveBeenCalled();
   });
 });
