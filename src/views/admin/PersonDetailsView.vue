@@ -67,7 +67,7 @@
   const canCommit: Ref<boolean> = ref(false);
 
   const creationErrorText: Ref<string> = ref('');
-  const creationErrorTitle: Ref<string> = ref(''); 
+  const creationErrorTitle: Ref<string> = ref('');
 
   function navigateToPersonTable(): void {
     router.push({ name: 'person-management' });
@@ -182,6 +182,14 @@
       creationErrorTitle.value = t(`admin.personenkontext.title.${personenkontextStore.errorCode}`);
     }
   };
+
+  const alertButtonText: ComputedRef<string> = computed(() => {
+    return personenkontextStore.errorCode === 'PERSON_NOT_FOUND' ? t('nav.backToList') : t('refreshData');
+  });
+
+  const alertButtonAction: ComputedRef<() => void> = computed(() => {
+    return personenkontextStore.errorCode === 'PERSON_NOT_FOUND' ? navigateToPersonTable : (): void => router.go(0);
+  });
   function getSskName(sskDstNr: string, sskName: string): string {
     /* truncate ssk name */
     const truncatededSskName: string = sskName.length > 30 ? `${sskName.substring(0, 30)}...` : sskName;
@@ -497,16 +505,16 @@
 
       <!-- Error Message Display if the personenkontextStore throws any kind of error (Not being able to load the person) -->
       <SpshAlert
-        :model-value="!!personenkontextStore.errorCode"
-        :type="'error'"
-        :closable="false"
-        :text="creationErrorText"
-        :showButton="true"
-        :buttonText="$t('refreshData')"
-        :buttonAction="() => router.go(0)"
-        :title="creationErrorTitle"
-        @update:modelValue="handleAlertClose"
-      />
+  :model-value="!!personenkontextStore.errorCode"
+  :type="'error'"
+  :closable="false"
+  :text="creationErrorText"
+  :showButton="true"
+  :buttonText="alertButtonText"
+  :buttonAction="alertButtonAction"
+  :title="creationErrorTitle"
+  @update:modelValue="handleAlertClose"
+/>
 
       <template v-if="!personStore.errorCode && !personenkontextStore.errorCode">
         <v-container class="personal-info">
