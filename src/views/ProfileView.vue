@@ -110,13 +110,13 @@
     const zuordnungen: Zuordnung[] | undefined = personenKontextStore.personenuebersicht?.zuordnungen;
 
     if (!currentPerson) return;
+
     personalData.value = [
       {
         label: 'Vor- und Nachname',
         value: currentPerson.name.vorname + ' ' + currentPerson.name.familienname,
       },
       { label: 'Benutzername', value: currentPerson.referrer ?? '' },
-      { label: 'Benutzerkennung', value: '[todo]' },
     ];
 
     if (currentPerson.email) {
@@ -245,7 +245,7 @@
               class="full-width"
               icon="mdi-key-alert-outline"
             ></v-icon>
-            <p>Ihr Passwort wurde zuletzt am [todo] geändert.</p>
+            <p>Ihr Passwort wurde zuletzt am 10.03.2024 geändert.</p>
             <div>
               <v-btn
                 color="primary"
@@ -270,7 +270,7 @@
               class="full-width"
               icon="mdi-shield-account-outline"
             ></v-icon>
-            <p>Es wurde noch kein zweiter Faktor fuer Sie eingerichtet.</p>
+            <p>Es wurde noch kein zweiter Faktor für Sie eingerichtet.</p>
             <div>
               <v-btn
                 color="primary"
