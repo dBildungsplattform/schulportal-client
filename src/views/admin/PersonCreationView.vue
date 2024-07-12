@@ -235,7 +235,6 @@
   }
 
   onBeforeRouteLeave((_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
-    personenkontextStore.workflowStepResponse = null;
     if (isFormDirty()) {
       showUnsavedChangesDialog.value = true;
       blockedNext = next;
