@@ -199,7 +199,7 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
       } catch (error) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
+          this.errorCode = error.response?.data.i18nKey || 'ROLLE_ERROR';
         }
         return await Promise.reject(this.errorCode);
       } finally {

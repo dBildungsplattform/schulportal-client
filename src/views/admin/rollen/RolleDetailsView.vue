@@ -23,7 +23,7 @@
   import { type Composer, useI18n } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
   import { type BaseFieldProps, type TypedSchema, useForm } from 'vee-validate';
-  import { getValidationSchema, getVuetifyConfig } from '@/utils/validationRolle'
+  import { getValidationSchema, getVuetifyConfig } from '@/utils/validationRolle';
 
   const route: RouteLocationNormalizedLoaded = useRoute();
   const router: Router = useRouter();
@@ -36,8 +36,10 @@
   const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
 
   const currentRolleId: string = route.params['id'] as string;
-
   const isEditActive: Ref<boolean> = ref(false);
+
+  const creationErrorText: Ref<string> = ref('');
+  const creationErrorTitle: Ref<string> = ref('');
 
   type TranslatedObject = {
     value: string;
@@ -188,13 +190,18 @@
           ? []
           : selectedServiceProviders.value?.filter((s: string) => s !== '---') || [];
       if (rolleStore.currentRolle) {
-        await rolleStore.updateRolle(
-          rolleStore.currentRolle.id,
-          selectedRollenName.value,
-          merkmaleToSubmit,
-          systemrechteToSubmit,
-          serviceProvidersToSubmit,
-        );
+        try {
+          await rolleStore.updateRolle(
+            rolleStore.currentRolle.id,
+            selectedRollenName.value,
+            merkmaleToSubmit,
+            systemrechteToSubmit,
+            serviceProvidersToSubmit,
+          );
+        } catch {
+          creationErrorText.value = t(`admin.rolle.errors.${rolleStore.errorCode}`);
+          creationErrorTitle.value = t(`admin.rolle.title.${rolleStore.errorCode}`);
+        }
       }
       resetForm();
     }
@@ -274,6 +281,7 @@
   };
 
   onBeforeMount(async () => {
+    rolleStore.errorCode = '';
     await rolleStore.getRolleById(currentRolleId);
     await organisationStore.getOrganisationById(rolleStore.currentRolle?.administeredBySchulstrukturknoten || '');
     await serviceProviderStore.getAllServiceProviders();
@@ -296,7 +304,6 @@
       }
     });
 
-    // Set the initial values using the computed properties
     // Set the initial values using the computed properties
     setFieldValue('selectedAdministrationsebene', translatedOrgName.value);
     setFieldValue('selectedRollenArt', translatedRollenart.value);
@@ -355,10 +362,10 @@
       <!-- Error Message Display -->
       <SpshAlert
         :model-value="!!rolleStore.errorCode"
-        :title="$t('admin.rolle.loadingErrorTitle')"
+        :title="creationErrorTitle || $t('admin.rolle.loadingErrorTitle')"
         :type="'error'"
         :closable="false"
-        :text="$t('admin.rolle.loadingErrorText')"
+        :text="creationErrorText || $t('admin.rolle.loadingErrorText')"
         :showButton="true"
         :buttonText="$t('nav.backToList')"
         :buttonAction="handleAlertClose"
