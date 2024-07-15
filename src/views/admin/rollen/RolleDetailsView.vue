@@ -23,7 +23,7 @@
   import { type Composer, useI18n } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
   import { type BaseFieldProps, type TypedSchema, useForm } from 'vee-validate';
-  import { getValidationSchema, getVuetifyConfig } from '@/utils/validationRolle';
+  import { getValidationSchema, getVuetifyConfig } from '@/utils/validationRolle'
 
   const route: RouteLocationNormalizedLoaded = useRoute();
   const router: Router = useRouter();
@@ -101,11 +101,11 @@
     }));
   });
 
-  const validationSchema: TypedSchema = getValidationSchema();
+  const validationSchema: TypedSchema = getValidationSchema(t);
 
-const vuetifyConfig = (state: {
-  errors: Array<string>;
-}): { props: { error: boolean; 'error-messages': Array<string> } } => getVuetifyConfig(state);
+  const vuetifyConfig = (state: {
+    errors: Array<string>;
+  }): { props: { error: boolean; 'error-messages': Array<string> } } => getVuetifyConfig(state);
 
   // eslint-disable-next-line @typescript-eslint/typedef
   const { defineField, handleSubmit, isFieldDirty, resetForm, setFieldValue } = useForm({

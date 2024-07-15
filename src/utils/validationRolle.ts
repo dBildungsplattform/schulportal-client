@@ -1,11 +1,7 @@
-// validationUtils.ts
 import { object, string } from 'yup';
 import { toTypedSchema } from '@vee-validate/yup';
 import { DIN_91379A_EXT } from '@/utils/validation';
-import { useI18n, type Composer } from 'vue-i18n';
 import type { TypedSchema } from 'vee-validate';
-
-const { t }: Composer = useI18n({ useScope: 'global' });
 
 interface ValidationSchema {
   selectedRollenArt: string;
@@ -13,7 +9,8 @@ interface ValidationSchema {
   selectedAdministrationsebene: string;
 }
 
-export const getValidationSchema = (): TypedSchema<ValidationSchema> => {
+
+export const getValidationSchema = (t: (key: string) => string): TypedSchema<ValidationSchema> => {
   return toTypedSchema(
     object({
       selectedRollenArt: string().required(t('admin.rolle.rules.rollenart.required')),
