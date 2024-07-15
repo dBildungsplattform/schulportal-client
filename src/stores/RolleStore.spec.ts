@@ -272,7 +272,7 @@ describe('rolleStore', () => {
       );
       expect(rolleStore.loading).toBe(true);
       await rejects(updateRollePromise);
-      expect(rolleStore.errorCode).toEqual('UNSPECIFIED_ERROR');
+      expect(rolleStore.errorCode).toEqual('ROLLE_ERROR');
       expect(rolleStore.updatedRolle).toEqual(null);
       expect(rolleStore.loading).toBe(false);
     });
@@ -288,7 +288,7 @@ describe('rolleStore', () => {
       );
       expect(rolleStore.loading).toBe(true);
       await rejects(updateRollePromise);
-      expect(rolleStore.errorCode).toEqual('some mock server error');
+      expect(rolleStore.errorCode).toEqual('ROLLE_ERROR');
       expect(rolleStore.updatedRolle).toEqual(null);
       expect(rolleStore.loading).toBe(false);
     });
