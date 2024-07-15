@@ -171,6 +171,7 @@
       "rollenname": "Rollenname",
       "rollenSelected": "{count} Rollen ausgewählt",
       "rolleAddedSuccessfully": "Die Rolle wurde erfolgreich hinzugefügt.",
+      "rolleUpdatedSuccessfully": "Die Rolle wurde erfolgreich geändert.",
       "rules": {
         "rolle": {
           "required": "Die Rolle muss ausgewählt werden."
@@ -283,6 +284,7 @@
   "nav": {
     "admin": "Schulportal-Administration",
     "backToList": "Zurück zur Ergebnisliste",
+    "backToDetails": "Zurück zur Gesamtübersicht",
     "back": "Zurück",
     "backToStart": "Zurück zur Startseite",
     "closeMobileMenu": "Mobiles Menü schließen",

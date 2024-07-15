@@ -5,6 +5,7 @@
     useServiceProviderStore,
     type ServiceProvider,
     type ServiceProviderStore,
+    type ServiceProviderIdNameResponse,
   } from '@/stores/ServiceProviderStore';
   import { computed, onBeforeMount, onUnmounted, ref, type ComputedRef, type Ref } from 'vue';
   import {
@@ -40,6 +41,11 @@
 
   const isEditActive: Ref<boolean> = ref(false);
 
+  type TranslatedObject = {
+    value: string;
+    title: string;
+  };
+
   type TranslatedMerkmal = { value: RollenMerkmal; title: string };
   const allMerkmale: Ref<TranslatedMerkmal[]> = ref([]);
 
@@ -47,15 +53,6 @@
   const allSystemrechte: Ref<TranslatedSystemrecht[]> = ref([]);
 
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
-
-  function navigateToRolleTable(): void {
-    router.push({ name: 'rolle-management' });
-  }
-
-  const handleAlertClose = (): void => {
-    rolleStore.errorCode = '';
-    navigateToRolleTable();
-  };
 
   const translatedOrgName: ComputedRef<string | undefined> = computed(() => {
     if (!rolleStore.currentRolle?.administeredBySchulstrukturknoten) {
@@ -74,34 +71,36 @@
     return t(`admin.rolle.mappingFrontBackEnd.rollenarten.${rolleStore.currentRolle.rollenart}`);
   });
 
-  const translatedProviderNames: ComputedRef<string[]> = computed(() => {
+  const translatedProviderNames: ComputedRef<TranslatedObject[]> = computed(() => {
     if (!rolleStore.currentRolle?.serviceProviders?.length) {
-      return ['---'];
+      return [{ value: '---', title: '---' }];
     }
-
-    return rolleStore.currentRolle.serviceProviders.map((provider: ServiceProvider) => provider.name);
+    return rolleStore.currentRolle.serviceProviders.map((provider: ServiceProvider) => ({
+      value: provider.id,
+      title: provider.name,
+    }));
   });
 
-  const translatedMerkmale: ComputedRef<string[]> = computed(() => {
+  const translatedMerkmale: ComputedRef<TranslatedObject[]> = computed(() => {
     const merkmale: Array<RollenMerkmal> = Array.from(rolleStore.currentRolle?.merkmale || []);
-
     if (!merkmale.length) {
-      return ['---'];
+      return [{ value: '---', title: '---' }];
     }
-
-    return merkmale.map((merkmalKey: RollenMerkmal) => t(`admin.rolle.mappingFrontBackEnd.merkmale.${merkmalKey}`));
+    return merkmale.map((merkmalKey: RollenMerkmal) => ({
+      value: merkmalKey,
+      title: t(`admin.rolle.mappingFrontBackEnd.merkmale.${merkmalKey}`),
+    }));
   });
 
-  const translatedSystemrechte: ComputedRef<string[]> = computed(() => {
+  const translatedSystemrechte: ComputedRef<TranslatedObject[]> = computed(() => {
     const systemrechte: Array<RollenSystemRecht> = Array.from(rolleStore.currentRolle?.systemrechte || []);
-
     if (!systemrechte.length) {
-      return ['---'];
+      return [{ value: '---', title: '---' }];
     }
-
-    return systemrechte.map((systemrechtKey: RollenSystemRecht) =>
-      t(`admin.rolle.mappingFrontBackEnd.systemrechte.${systemrechtKey}`),
-    );
+    return systemrechte.map((systemrechtKey: RollenSystemRecht) => ({
+      value: systemrechtKey,
+      title: t(`admin.rolle.mappingFrontBackEnd.systemrechte.${systemrechtKey}`),
+    }));
   });
 
   const validationSchema: TypedSchema = toTypedSchema(
@@ -145,21 +144,23 @@
   ] = defineField('selectedRollenName', vuetifyConfig);
 
   const [selectedMerkmale, selectedMerkmaleProps]: [
-    Ref<RollenMerkmal[] | null>,
+    Ref<RollenMerkmal[] | null | '---'>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedMerkmale', vuetifyConfig);
 
   const [selectedServiceProviders, selectedServiceProvidersProps]: [
-    Ref<string[] | null>,
+    Ref<string[] | null | '---'>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedServiceProviders', vuetifyConfig);
 
   const [selectedSystemRechte, selectedSystemRechteProps]: [
-    Ref<RollenSystemRecht[] | null>,
+    Ref<RollenSystemRecht[] | null | '---'>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedSystemRechte', vuetifyConfig);
 
   function isFormDirty(): boolean {
+    // Only check for dirtiness if the form is in edit mode
+    if (!isEditActive.value) return false;
     return (
       isFieldDirty('selectedAdministrationsebene') ||
       isFieldDirty('selectedRollenArt') ||
@@ -183,9 +184,10 @@
   );
 
   function handleConfirmUnsavedChanges(): void {
+    isEditActive.value = false;
+    showUnsavedChangesDialog.value = false;
     blockedNext();
   }
-
   async function navigateToRolleManagement(): Promise<void> {
     await router.push({ name: 'rolle-management' });
     rolleStore.createdRolle = null;
@@ -193,11 +195,20 @@
 
   const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = handleSubmit(async () => {
     if (selectedRollenName.value && selectedAdministrationsebene.value && selectedRollenArt.value) {
-      const merkmaleToSubmit: RollenMerkmal[] = selectedMerkmale.value?.map((m: RollenMerkmal) => m) || [];
+      const merkmaleToSubmit: RollenMerkmal[] =
+        selectedMerkmale.value === '---'
+          ? []
+          : selectedMerkmale.value?.filter((m: RollenMerkmal | '---') => m !== '---') || [];
       const systemrechteToSubmit: RollenSystemRecht[] =
-        selectedSystemRechte.value?.map((m: RollenSystemRecht) => m) || [];
-      const serviceProvidersToSubmit: string[] = selectedServiceProviders.value?.map((s: string) => s) || [];
+        selectedSystemRechte.value === '---'
+          ? []
+          : selectedSystemRechte.value?.filter((m: RollenSystemRecht | '---') => m !== '---') || [];
+      const serviceProvidersToSubmit: string[] =
+        selectedServiceProviders.value === '---'
+          ? []
+          : selectedServiceProviders.value?.filter((s: string) => s !== '---') || [];
 
+          console.log(selectedServiceProviders.value)
       if (rolleStore.currentRolle) {
         await rolleStore.updateRolle(
           rolleStore.currentRolle.id,
@@ -211,6 +222,45 @@
     }
   });
 
+  const translatedUpdatedRolleMerkmale: ComputedRef<string> = computed(() => {
+    if (!rolleStore.updatedRolle?.merkmale || Array.from(rolleStore.updatedRolle.merkmale).length === 0) {
+      return '---';
+    }
+
+    return Array.from(rolleStore.updatedRolle.merkmale)
+      .map((merkmalKey: string) => {
+        return t(`admin.rolle.mappingFrontBackEnd.merkmale.${merkmalKey}`);
+      })
+      .join(', ');
+  });
+
+  const translatedUpdatedAngebote: ComputedRef<string> = computed(() => {
+    if (
+      !rolleStore.updatedRolle?.serviceProviders ||
+      Array.from(rolleStore.updatedRolle.serviceProviders).length === 0
+    ) {
+      return '---';
+    }
+
+    return rolleStore.updatedRolle.serviceProviders
+      .map((serviceProvider: ServiceProviderIdNameResponse) => {
+        return serviceProvider.name;
+      })
+      .join(', ');
+  });
+
+  const translatedUpdatedSystemrecht: ComputedRef<string> = computed(() => {
+    if (!rolleStore.updatedRolle?.systemrechte || Array.from(rolleStore.updatedRolle.systemrechte).length === 0) {
+      return '---';
+    }
+
+    return Array.from(rolleStore.updatedRolle.systemrechte)
+      .map((systemrechtKey: string) => {
+        return t(`admin.rolle.mappingFrontBackEnd.systemrechte.${systemrechtKey}`);
+      })
+      .join(', ');
+  });
+
   function activateEditing(): void {
     isEditActive.value = true;
   }
@@ -219,12 +269,32 @@
     isEditActive.value = false;
   }
 
+  function handleCancel(next: NavigationGuardNext): void {
+    if (isFormDirty()) {
+      showUnsavedChangesDialog.value = true;
+      blockedNext = next;
+    } else {
+      cancelEdit();
+    }
+  }
+
   function preventNavigation(event: BeforeUnloadEvent): void {
     if (!isFormDirty()) return;
     event.preventDefault();
     /* Chrome requires returnValue to be set. */
     event.returnValue = '';
   }
+
+  function navigateToRolleTable(): void {
+    resetForm();
+    rolleStore.updatedRolle = null;
+    router.push({ name: 'rolle-management' });
+  }
+
+  const handleAlertClose = (): void => {
+    rolleStore.errorCode = '';
+    navigateToRolleTable();
+  };
 
   onBeforeMount(async () => {
     await rolleStore.getRolleById(currentRolleId);
@@ -250,12 +320,22 @@
     });
 
     // Set the initial values using the computed properties
+    // Set the initial values using the computed properties
     setFieldValue('selectedAdministrationsebene', translatedOrgName.value);
     setFieldValue('selectedRollenArt', translatedRollenart.value);
     setFieldValue('selectedRollenName', rolleStore.currentRolle?.name);
-    setFieldValue('selectedMerkmale', translatedMerkmale.value);
-    setFieldValue('selectedServiceProviders', translatedProviderNames.value);
-    setFieldValue('selectedSystemRechte', translatedSystemrechte.value);
+    setFieldValue(
+      'selectedMerkmale',
+      translatedMerkmale.value.map((obj: TranslatedObject) => obj.value),
+    );
+    setFieldValue(
+      'selectedServiceProviders',
+      translatedProviderNames.value.map((obj: TranslatedObject) => obj.value),
+    );
+    setFieldValue(
+      'selectedSystemRechte',
+      translatedSystemrechte.value.map((obj: TranslatedObject) => obj.value),
+    );
 
     /* listen for browser changes and prevent them when form is dirty */
     window.addEventListener('beforeunload', preventNavigation);
@@ -304,10 +384,11 @@
         :text="$t('admin.rolle.loadingErrorText')"
         :showButton="true"
         :buttonText="$t('nav.backToList')"
+        :buttonAction="handleAlertClose"
         @update:modelValue="handleAlertClose"
       />
 
-      <template v-if="!rolleStore.errorCode">
+      <template v-if="!rolleStore.updatedRolle && !rolleStore.errorCode">
         <v-container>
           <div v-if="rolleStore.currentRolle">
             <RolleForm
@@ -374,7 +455,7 @@
                   <v-btn
                     class="secondary"
                     data-testid="zuordnung-edit-cancel"
-                    @click="cancelEdit"
+                    @click="handleCancel"
                     :block="mdAndDown"
                   >
                     {{ $t('cancel') }}
@@ -388,6 +469,7 @@
                   <v-btn
                     class="primary"
                     data-testid="zuordnung-changes-save"
+                    @Click="onSubmit"
                     :block="mdAndDown"
                   >
                     {{ $t('save') }}
@@ -399,6 +481,81 @@
           <div v-else-if="rolleStore.loading">
             <v-progress-circular indeterminate></v-progress-circular>
           </div>
+        </v-container>
+      </template>
+      <!-- Result template on success after submit  -->
+      <template v-if="rolleStore.updatedRolle && !rolleStore.errorCode">
+        <v-container>
+          <v-row justify="center">
+            <v-col
+              class="subtitle-1"
+              cols="auto"
+            >
+              <span data-testid="rolle-success-text">{{ $t('admin.rolle.rolleUpdatedSuccessfully') }}</span>
+            </v-col>
+          </v-row>
+          <v-row justify="center">
+            <v-col cols="auto">
+              <v-icon
+                small
+                color="#1EAE9C"
+                icon="mdi-check-circle"
+              >
+              </v-icon>
+            </v-col>
+          </v-row>
+          <v-row justify="center">
+            <v-col
+              class="subtitle-2"
+              cols="auto"
+            >
+              {{ $t('admin.followingDataCreated') }}
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col class="text-body bold text-right"> {{ $t('admin.rolle.rollenname') }}:</v-col>
+            <v-col class="text-body"
+              ><span data-testid="created-rolle-name">{{ rolleStore.updatedRolle.name }}</span></v-col
+            >
+          </v-row>
+          <v-row>
+            <v-col class="text-body bold text-right"> {{ $t('admin.rolle.merkmale') }}:</v-col>
+            <v-col class="text-body"
+              ><span data-testid="created-rolle-merkmale">{{ translatedUpdatedRolleMerkmale }}</span></v-col
+            ></v-row
+          >
+          <v-row>
+            <v-col class="text-body bold text-right"> {{ $t('admin.serviceProvider.assignedServiceProvider') }}:</v-col>
+            <v-col class="text-body">
+              <span data-testid="created-rolle-angebote">{{ translatedUpdatedAngebote }}</span>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col class="text-body bold text-right"> {{ $t('admin.rolle.systemrechte') }}:</v-col>
+            <v-col class="text-body"
+              ><span data-testid="created-rolle-systemrecht">{{ translatedUpdatedSystemrecht }}</span></v-col
+            ></v-row
+          >
+          <v-divider
+            class="border-opacity-100 rounded my-6"
+            color="#E5EAEF"
+            thickness="6"
+          ></v-divider>
+          <v-row justify="end">
+            <v-col
+              cols="12"
+              sm="6"
+              md="auto"
+            >
+              <v-btn
+                class="secondary"
+                data-testid="back-to-list-button"
+                :block="mdAndDown"
+                @click="() => router.go(0)"
+                >{{ $t('nav.backToDetails') }}</v-btn
+              >
+            </v-col>
+          </v-row>
         </v-container>
       </template>
     </LayoutCard>
