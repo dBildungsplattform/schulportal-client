@@ -343,6 +343,7 @@
           :onHandleDiscard="navigateToRolleManagement"
           :onShowDialogChange="(value: boolean) => (showUnsavedChangesDialog = value)"
           :onSubmit="onSubmit"
+          :isEditActive="true"
           ref="rolle-creation-form"
           v-model:selectedAdministrationsebene="selectedAdministrationsebene"
           :selectedAdministrationsebeneProps="selectedAdministrationsebeneProps"

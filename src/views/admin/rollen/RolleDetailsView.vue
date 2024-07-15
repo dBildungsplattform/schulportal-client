@@ -1,21 +1,50 @@
 <script setup lang="ts">
-  import { type RolleStore, useRolleStore, RollenMerkmal, RollenSystemRecht } from '@/stores/RolleStore';
+  import { type RolleStore, useRolleStore, RollenMerkmal, RollenSystemRecht, RollenArt } from '@/stores/RolleStore';
   import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
-  import { type ServiceProvider } from '@/stores/ServiceProviderStore';
-  import { computed, onBeforeMount, ref, type ComputedRef, type Ref } from 'vue';
-  import { type Router, useRouter, type RouteLocationNormalizedLoaded, useRoute } from 'vue-router';
+  import {
+    useServiceProviderStore,
+    type ServiceProvider,
+    type ServiceProviderStore,
+  } from '@/stores/ServiceProviderStore';
+  import { computed, onBeforeMount, onUnmounted, ref, type ComputedRef, type Ref } from 'vue';
+  import {
+    type Router,
+    useRouter,
+    type RouteLocationNormalizedLoaded,
+    useRoute,
+    onBeforeRouteLeave,
+    type RouteLocationNormalized,
+    type NavigationGuardNext,
+  } from 'vue-router';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import RolleForm from '@/components/form/RolleForm.vue';
   import { type Composer, useI18n } from 'vue-i18n';
+  import { useDisplay } from 'vuetify';
+  import { type BaseFieldProps, type TypedSchema, useForm } from 'vee-validate';
+  import { object, string } from 'yup';
+  import { toTypedSchema } from '@vee-validate/yup';
+  import { DIN_91379A_EXT } from '@/utils/validation';
 
   const route: RouteLocationNormalizedLoaded = useRoute();
   const router: Router = useRouter();
   const { t }: Composer = useI18n({ useScope: 'global' });
 
+  const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
+
   const rolleStore: RolleStore = useRolleStore();
   const organisationStore: OrganisationStore = useOrganisationStore();
+  const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
+
   const currentRolleId: string = route.params['id'] as string;
+
+  const isEditActive: Ref<boolean> = ref(false);
+
+  type TranslatedMerkmal = { value: RollenMerkmal; title: string };
+  const allMerkmale: Ref<TranslatedMerkmal[]> = ref([]);
+
+  type TranslatedSystemrecht = { value: RollenSystemRecht; title: string };
+  const allSystemrechte: Ref<TranslatedSystemrecht[]> = ref([]);
 
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
 
@@ -75,8 +104,86 @@
     );
   });
 
+  const validationSchema: TypedSchema = toTypedSchema(
+    object({
+      selectedRollenArt: string().required(t('admin.rolle.rules.rollenart.required')),
+      selectedRollenName: string()
+        .max(200, t('admin.rolle.rules.rollenname.length'))
+        .matches(DIN_91379A_EXT, t('admin.rolle.rules.rollenname.matches'))
+        .required(t('admin.rolle.rules.rollenname.required')),
+      selectedAdministrationsebene: string().required(t('admin.administrationsebene.rules.required')),
+    }),
+  );
+
+  const vuetifyConfig = (state: {
+    errors: Array<string>;
+  }): { props: { error: boolean; 'error-messages': Array<string> } } => ({
+    props: {
+      error: !!state.errors.length,
+      'error-messages': state.errors,
+    },
+  });
+
+  // eslint-disable-next-line @typescript-eslint/typedef
+  const { defineField, handleSubmit, isFieldDirty, resetForm, setFieldValue } = useForm({
+    validationSchema,
+  });
+
+  const [selectedAdministrationsebene, selectedAdministrationsebeneProps]: [
+    Ref<string>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = defineField('selectedAdministrationsebene', vuetifyConfig);
+
+  const [selectedRollenArt, selectedRollenArtProps]: [
+    Ref<RollenArt | null>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = defineField('selectedRollenArt', vuetifyConfig);
+
+  const [selectedRollenName, selectedRollenNameProps]: [
+    Ref<string>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = defineField('selectedRollenName', vuetifyConfig);
+
+  const [selectedMerkmale, selectedMerkmaleProps]: [
+    Ref<RollenMerkmal[] | null>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = defineField('selectedMerkmale', vuetifyConfig);
+
+  const [selectedServiceProviders, selectedServiceProvidersProps]: [
+    Ref<string[] | null>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = defineField('selectedServiceProviders', vuetifyConfig);
+
+  const [selectedSystemRechte, selectedSystemRechteProps]: [
+    Ref<RollenSystemRecht[] | null>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = defineField('selectedSystemRechte', vuetifyConfig);
+
+  function isFormDirty(): boolean {
+    return (
+      isFieldDirty('selectedAdministrationsebene') ||
+      isFieldDirty('selectedRollenArt') ||
+      isFieldDirty('selectedRollenName') ||
+      isFieldDirty('selectedMerkmale') ||
+      isFieldDirty('selectedSystemRechte')
+    );
+  }
+  let blockedNext: () => void = () => {};
+
+  const serviceProviders: ComputedRef<
+    {
+      value: string;
+      title: string;
+    }[]
+  > = computed(() =>
+    serviceProviderStore.allServiceProviders.map((provider: ServiceProvider) => ({
+      value: provider.id,
+      title: provider.name,
+    })),
+  );
+
   function handleConfirmUnsavedChanges(): void {
-    return;
+    blockedNext();
   }
 
   async function navigateToRolleManagement(): Promise<void> {
@@ -84,13 +191,87 @@
     rolleStore.createdRolle = null;
   }
 
-  function onSubmit(): void {
-    return;
+  const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = handleSubmit(async () => {
+    if (selectedRollenName.value && selectedAdministrationsebene.value && selectedRollenArt.value) {
+      const merkmaleToSubmit: RollenMerkmal[] = selectedMerkmale.value?.map((m: RollenMerkmal) => m) || [];
+      const systemrechteToSubmit: RollenSystemRecht[] =
+        selectedSystemRechte.value?.map((m: RollenSystemRecht) => m) || [];
+      const serviceProvidersToSubmit: string[] = selectedServiceProviders.value?.map((s: string) => s) || [];
+
+      if (rolleStore.currentRolle) {
+        await rolleStore.updateRolle(
+          rolleStore.currentRolle.id,
+          selectedRollenName.value,
+          merkmaleToSubmit,
+          systemrechteToSubmit,
+          serviceProvidersToSubmit,
+        );
+      }
+      resetForm();
+    }
+  });
+
+  function activateEditing(): void {
+    isEditActive.value = true;
+  }
+
+  function cancelEdit(): void {
+    isEditActive.value = false;
+  }
+
+  function preventNavigation(event: BeforeUnloadEvent): void {
+    if (!isFormDirty()) return;
+    event.preventDefault();
+    /* Chrome requires returnValue to be set. */
+    event.returnValue = '';
   }
 
   onBeforeMount(async () => {
     await rolleStore.getRolleById(currentRolleId);
     await organisationStore.getOrganisationById(rolleStore.currentRolle?.administeredBySchulstrukturknoten || '');
+    await serviceProviderStore.getAllServiceProviders();
+
+    Object.values(RollenMerkmal).forEach((enumValue: RollenMerkmal) => {
+      const i18nPath: string = `admin.rolle.mappingFrontBackEnd.merkmale.${enumValue}`;
+      allMerkmale.value.push({
+        value: enumValue,
+        title: t(i18nPath),
+      });
+    });
+
+    Object.values(RollenSystemRecht).forEach((enumValue: RollenSystemRecht) => {
+      if (enumValue !== RollenSystemRecht.MigrationDurchfuehren) {
+        const i18nPath: string = `admin.rolle.mappingFrontBackEnd.systemrechte.${enumValue}`;
+        allSystemrechte.value.push({
+          value: enumValue,
+          title: t(i18nPath),
+        });
+      }
+    });
+
+    // Set the initial values using the computed properties
+    setFieldValue('selectedAdministrationsebene', translatedOrgName.value);
+    setFieldValue('selectedRollenArt', translatedRollenart.value);
+    setFieldValue('selectedRollenName', rolleStore.currentRolle?.name);
+    setFieldValue('selectedMerkmale', translatedMerkmale.value);
+    setFieldValue('selectedServiceProviders', translatedProviderNames.value);
+    setFieldValue('selectedSystemRechte', translatedSystemrechte.value);
+
+    /* listen for browser changes and prevent them when form is dirty */
+    window.addEventListener('beforeunload', preventNavigation);
+  });
+
+  onBeforeRouteLeave((_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
+    if (isFormDirty()) {
+      showUnsavedChangesDialog.value = true;
+      blockedNext = next;
+    } else {
+      next();
+    }
+  });
+
+  onUnmounted(() => {
+    window.removeEventListener('beforeunload', preventNavigation);
   });
 </script>
 
@@ -134,15 +315,86 @@
               :onHandleDiscard="navigateToRolleManagement"
               :onShowDialogChange="(value: boolean) => (showUnsavedChangesDialog = value)"
               :onSubmit="onSubmit"
+              :isEditActive="isEditActive"
               :readonly="true"
               ref="rolle-form"
-              v-model:selectedAdministrationsebene="translatedOrgName"
-              v-model:selectedRollenArt="translatedRollenart"
-              v-model:selectedRollenName="rolleStore.currentRolle.name"
-              v-model:selectedMerkmale="translatedMerkmale"
-              v-model:selectedServiceProviders="translatedProviderNames"
-              v-model:selectedSystemRechte="translatedSystemrechte"
+              v-model:selectedAdministrationsebene="selectedAdministrationsebene"
+              :selectedAdministrationsebeneProps="selectedAdministrationsebeneProps"
+              v-model:selectedRollenArt="selectedRollenArt"
+              :selectedRollenArtProps="selectedRollenArtProps"
+              v-model:selectedRollenName="selectedRollenName"
+              :selectedRollenNameProps="selectedRollenNameProps"
+              v-model:selectedMerkmale="selectedMerkmale"
+              :selectedMerkmaleProps="selectedMerkmaleProps"
+              v-model:selectedServiceProviders="selectedServiceProviders"
+              :selectedServiceProvidersProps="selectedServiceProvidersProps"
+              v-model:selectedSystemRechte="selectedSystemRechte"
+              :selectedSystemRechteProps="selectedSystemRechteProps"
+              :serviceProviders="serviceProviders"
+              :translatedMerkmale="allMerkmale"
+              :translatedSystemrechte="allSystemrechte"
+              :showUnsavedChangesDialog="showUnsavedChangesDialog"
             ></RolleForm>
+            <v-divider
+              v-if="isEditActive"
+              class="border-opacity-100 rounded"
+              color="#E5EAEF"
+              thickness="5px"
+            ></v-divider>
+            <div
+              v-if="!isEditActive"
+              class="d-flex justify-sm-end"
+            >
+              <v-col
+                cols="12"
+                sm="6"
+                md="auto"
+              >
+                <v-btn
+                  class="primary ml-lg-8"
+                  data-testid="zuordnung-edit-button"
+                  @Click="activateEditing"
+                  :block="mdAndDown"
+                >
+                  {{ $t('edit') }}
+                </v-btn>
+              </v-col>
+            </div>
+            <div
+              v-else
+              class="d-flex justify-end"
+            >
+              <v-row class="pt-3 px-2 save-cancel-row justify-end">
+                <v-col
+                  class="cancel-col"
+                  cols="12"
+                  sm="6"
+                  md="auto"
+                >
+                  <v-btn
+                    class="secondary"
+                    data-testid="zuordnung-edit-cancel"
+                    @click="cancelEdit"
+                    :block="mdAndDown"
+                  >
+                    {{ $t('cancel') }}
+                  </v-btn>
+                </v-col>
+                <v-col
+                  cols="12"
+                  sm="6"
+                  md="auto"
+                >
+                  <v-btn
+                    class="primary"
+                    data-testid="zuordnung-changes-save"
+                    :block="mdAndDown"
+                  >
+                    {{ $t('save') }}
+                  </v-btn>
+                </v-col>
+              </v-row>
+            </div>
           </div>
           <div v-else-if="rolleStore.loading">
             <v-progress-circular indeterminate></v-progress-circular>
