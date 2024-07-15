@@ -188,10 +188,6 @@
     showUnsavedChangesDialog.value = false;
     blockedNext();
   }
-  async function navigateToRolleManagement(): Promise<void> {
-    await router.push({ name: 'rolle-management' });
-    rolleStore.createdRolle = null;
-  }
 
   const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = handleSubmit(async () => {
     if (selectedRollenName.value && selectedAdministrationsebene.value && selectedRollenArt.value) {
@@ -284,7 +280,6 @@
   }
 
   function navigateToRolleTable(): void {
-    resetForm();
     rolleStore.updatedRolle = null;
     router.push({ name: 'rolle-management' });
   }
@@ -391,7 +386,7 @@
           <div v-if="rolleStore.currentRolle">
             <RolleForm
               :onHandleConfirmUnsavedChanges="handleConfirmUnsavedChanges"
-              :onHandleDiscard="navigateToRolleManagement"
+              :onHandleDiscard="navigateToRolleTable"
               :onShowDialogChange="(value: boolean) => (showUnsavedChangesDialog = value)"
               :onSubmit="onSubmit"
               :isEditActive="isEditActive"
@@ -431,7 +426,7 @@
               >
                 <v-btn
                   class="primary ml-lg-8"
-                  data-testid="zuordnung-edit-button"
+                  data-testid="rolle-edit-button"
                   @Click="activateEditing"
                   :block="mdAndDown"
                 >
@@ -452,7 +447,7 @@
                 >
                   <v-btn
                     class="secondary"
-                    data-testid="zuordnung-edit-cancel"
+                    data-testid="rolle-edit-cancel"
                     @click="handleCancel"
                     :block="mdAndDown"
                   >
@@ -466,7 +461,7 @@
                 >
                   <v-btn
                     class="primary"
-                    data-testid="zuordnung-changes-save"
+                    data-testid="rolle-changes-save"
                     @Click="onSubmit"
                     :block="mdAndDown"
                   >
@@ -513,25 +508,25 @@
           <v-row>
             <v-col class="text-body bold text-right"> {{ $t('admin.rolle.rollenname') }}:</v-col>
             <v-col class="text-body"
-              ><span data-testid="created-rolle-name">{{ rolleStore.updatedRolle.name }}</span></v-col
+              ><span data-testid="updated-rolle-name">{{ rolleStore.updatedRolle.name }}</span></v-col
             >
           </v-row>
           <v-row>
             <v-col class="text-body bold text-right"> {{ $t('admin.rolle.merkmale') }}:</v-col>
             <v-col class="text-body"
-              ><span data-testid="created-rolle-merkmale">{{ translatedUpdatedRolleMerkmale }}</span></v-col
+              ><span data-testid="updated-rolle-merkmale">{{ translatedUpdatedRolleMerkmale }}</span></v-col
             ></v-row
           >
           <v-row>
             <v-col class="text-body bold text-right"> {{ $t('admin.serviceProvider.assignedServiceProvider') }}:</v-col>
             <v-col class="text-body">
-              <span data-testid="created-rolle-angebote">{{ translatedUpdatedAngebote }}</span>
+              <span data-testid="updated-rolle-angebote">{{ translatedUpdatedAngebote }}</span>
             </v-col>
           </v-row>
           <v-row>
             <v-col class="text-body bold text-right"> {{ $t('admin.rolle.systemrechte') }}:</v-col>
             <v-col class="text-body"
-              ><span data-testid="created-rolle-systemrecht">{{ translatedUpdatedSystemrecht }}</span></v-col
+              ><span data-testid="updated-rolle-systemrecht">{{ translatedUpdatedSystemrecht }}</span></v-col
             ></v-row
           >
           <v-divider
@@ -547,7 +542,7 @@
             >
               <v-btn
                 class="secondary"
-                data-testid="back-to-list-button"
+                data-testid="back-to-details-button"
                 :block="mdAndDown"
                 @click="() => router.go(0)"
                 >{{ $t('nav.backToDetails') }}</v-btn
