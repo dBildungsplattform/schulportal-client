@@ -23,9 +23,7 @@
   import { type Composer, useI18n } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
   import { type BaseFieldProps, type TypedSchema, useForm } from 'vee-validate';
-  import { object, string } from 'yup';
-  import { toTypedSchema } from '@vee-validate/yup';
-  import { DIN_91379A_EXT } from '@/utils/validation';
+  import { getValidationSchema, getVuetifyConfig } from '@/utils/validationRolle';
 
   const route: RouteLocationNormalizedLoaded = useRoute();
   const router: Router = useRouter();
@@ -103,25 +101,11 @@
     }));
   });
 
-  const validationSchema: TypedSchema = toTypedSchema(
-    object({
-      selectedRollenArt: string().required(t('admin.rolle.rules.rollenart.required')),
-      selectedRollenName: string()
-        .max(200, t('admin.rolle.rules.rollenname.length'))
-        .matches(DIN_91379A_EXT, t('admin.rolle.rules.rollenname.matches'))
-        .required(t('admin.rolle.rules.rollenname.required')),
-      selectedAdministrationsebene: string().required(t('admin.administrationsebene.rules.required')),
-    }),
-  );
+  const validationSchema: TypedSchema = getValidationSchema();
 
-  const vuetifyConfig = (state: {
-    errors: Array<string>;
-  }): { props: { error: boolean; 'error-messages': Array<string> } } => ({
-    props: {
-      error: !!state.errors.length,
-      'error-messages': state.errors,
-    },
-  });
+const vuetifyConfig = (state: {
+  errors: Array<string>;
+}): { props: { error: boolean; 'error-messages': Array<string> } } => getVuetifyConfig(state);
 
   // eslint-disable-next-line @typescript-eslint/typedef
   const { defineField, handleSubmit, isFieldDirty, resetForm, setFieldValue } = useForm({
