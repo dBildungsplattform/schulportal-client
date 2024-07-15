@@ -207,8 +207,6 @@
         selectedServiceProviders.value === '---'
           ? []
           : selectedServiceProviders.value?.filter((s: string) => s !== '---') || [];
-
-          console.log(selectedServiceProviders.value)
       if (rolleStore.currentRolle) {
         await rolleStore.updateRolle(
           rolleStore.currentRolle.id,
