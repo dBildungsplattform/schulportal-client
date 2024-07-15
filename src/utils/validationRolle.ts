@@ -3,7 +3,7 @@ import { toTypedSchema } from '@vee-validate/yup';
 import { DIN_91379A_EXT } from '@/utils/validation';
 import type { TypedSchema } from 'vee-validate';
 
-interface ValidationSchema {
+type ValidationSchema = {
   selectedRollenArt: string;
   selectedRollenName: string;
   selectedAdministrationsebene: string;
