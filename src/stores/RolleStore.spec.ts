@@ -292,5 +292,33 @@ describe('rolleStore', () => {
       expect(rolleStore.updatedRolle).toEqual(null);
       expect(rolleStore.loading).toBe(false);
     });
+
+    describe('deleteRolle', () => {
+      it('should delete Rolle and update state', async () => {
+        mockadapter.onDelete('/api/rolle/1').replyOnce(200);
+        const deleteRollePromise: Promise<void> = rolleStore.deleteRolleById('1');
+        expect(rolleStore.loading).toBe(true);
+        await deleteRollePromise;
+        expect(rolleStore.loading).toBe(false);
+      });
+
+      it('should handle string error on update', async () => {
+        mockadapter.onDelete('/api/rolle/1').replyOnce(500, 'some mock server error');
+        const deleteRollePromise: Promise<void> = rolleStore.deleteRolleById('1');
+        expect(rolleStore.loading).toBe(true);
+        await rejects(deleteRollePromise);
+        expect(rolleStore.errorCode).toEqual('ROLLE_ERROR');
+        expect(rolleStore.loading).toBe(false);
+      });
+
+      it('should handle error code on update', async () => {
+        mockadapter.onDelete('/api/rolle/1').replyOnce(500, { code: 'some mock server error' });
+        const deleteRollePromise: Promise<void> = rolleStore.deleteRolleById('1');
+        expect(rolleStore.loading).toBe(true);
+        await rejects(deleteRollePromise);
+        expect(rolleStore.errorCode).toEqual('ROLLE_ERROR');
+        expect(rolleStore.loading).toBe(false);
+      });
+    });
   });
 });
