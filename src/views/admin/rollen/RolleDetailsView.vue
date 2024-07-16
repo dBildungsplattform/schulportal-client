@@ -264,9 +264,9 @@
     }
   }
 
-  function deleteRolle(rolleId: string): void {
+  async function deleteRolle(rolleId: string): Promise<void> {
     try {
-      rolleStore.deleteRolleById(rolleId);
+      await rolleStore.deleteRolleById(rolleId);
     } catch {
       creationErrorText.value = t(`admin.rolle.errors.${rolleStore.errorCode}`);
       creationErrorTitle.value = t(`admin.rolle.title.${rolleStore.errorCode}`);

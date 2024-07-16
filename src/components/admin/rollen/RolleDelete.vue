@@ -12,7 +12,6 @@
   const router: Router = useRouter();
 
   type Props = {
-    disabled: boolean;
     errorCode: string;
     rolle: Rolle;
   };
@@ -92,7 +91,6 @@
       <v-btn
         class="secondary button"
         data-testid="open-rolle-delete-dialog-icon"
-        :disabled="disabled"
         v-bind="props"
         :block="mdAndDown"
       >

@@ -148,7 +148,8 @@
         "UPDATE_MERKMALE_ERROR": "Die gewünschte Bearbeitung kann nicht ausgeführt werden, da die Rolle noch Benutzern zugeordnet ist. Nehmen Sie bitte zunächst alle Zuordnungen zurück."
       },
       "title": {
-        "UPDATE_MERKMALE_ERROR": "Bearbeitung nicht möglich."
+        "UPDATE_MERKMALE_ERROR": "Bearbeitung nicht möglich.",
+        "ROLLE_HAT_PERSONENKONTEXTE_ERROR": "Löschen nicht möglich."
       },
       "isAllowedToManageRollen": "Darf Rollen verwalten",
       "loadingErrorText": "Es konnten keine Rollendaten geladen werden.",
