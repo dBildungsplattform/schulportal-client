@@ -265,7 +265,12 @@
   }
 
   function deleteRolle(rolleId: string): void {
-    rolleStore.deleteRolleById(rolleId);
+    try {
+      rolleStore.deleteRolleById(rolleId);
+    } catch {
+      creationErrorText.value = t(`admin.rolle.errors.${rolleStore.errorCode}`);
+      creationErrorTitle.value = t(`admin.rolle.title.${rolleStore.errorCode}`);
+    }
   }
 
   function preventNavigation(event: BeforeUnloadEvent): void {
