@@ -270,6 +270,7 @@
       :label="$t('admin.organisation.organisation')"
     >
       <v-autocomplete
+        class="mb-5"
         autocomplete="off"
         :class="[{ 'filter-dropdown mb-4': hasAutoselectedSchule }, { selected: selectedOrganisation }]"
         clearable

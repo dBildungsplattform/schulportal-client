@@ -24,6 +24,7 @@
   import { useDisplay } from 'vuetify';
   import { type BaseFieldProps, type TypedSchema, useForm } from 'vee-validate';
   import { getValidationSchema, getVuetifyConfig } from '@/utils/validationRolle';
+  import RolleDelete from '@/components/admin/rollen/RolleDelete.vue';
 
   const route: RouteLocationNormalizedLoaded = useRoute();
   const router: Router = useRouter();
@@ -263,6 +264,10 @@
     }
   }
 
+  function deleteRolle(rolleId: string): void {
+    rolleStore.deleteRolleById(rolleId);
+  }
+
   function preventNavigation(event: BeforeUnloadEvent): void {
     if (!isFormDirty()) return;
     event.preventDefault();
@@ -410,20 +415,36 @@
               v-if="!isEditActive"
               class="d-flex justify-sm-end"
             >
-              <v-col
-                cols="12"
-                sm="6"
-                md="auto"
-              >
-                <v-btn
-                  class="primary ml-lg-8"
-                  data-testid="rolle-edit-button"
-                  @Click="activateEditing"
-                  :block="mdAndDown"
+              <v-row class="pt-3 px-2 justify-end">
+                <v-col
+                  cols="12"
+                  md="auto"
+                  sm="6"
                 >
-                  {{ $t('edit') }}
-                </v-btn>
-              </v-col>
+                  <div class="d-flex justify-sm-end">
+                    <RolleDelete
+                      :errorCode="rolleStore.errorCode"
+                      :rolle="rolleStore.currentRolle"
+                      @onDeleteRolle="deleteRolle(currentRolleId)"
+                    >
+                    </RolleDelete>
+                  </div>
+                </v-col>
+                <v-col
+                  cols="12"
+                  sm="6"
+                  md="auto"
+                >
+                  <v-btn
+                    class="primary"
+                    data-testid="rolle-edit-button"
+                    @Click="activateEditing"
+                    :block="mdAndDown"
+                  >
+                    {{ $t('edit') }}
+                  </v-btn>
+                </v-col>
+              </v-row>
             </div>
             <div
               v-else

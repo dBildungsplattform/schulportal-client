@@ -580,6 +580,34 @@ export type DbiamPersonenkontexteUpdateErrorI18nKeyEnum = typeof DbiamPersonenko
 /**
  * 
  * @export
+ * @interface DbiamRolleError
+ */
+export interface DbiamRolleError {
+    /**
+     * 
+     * @type {string}
+     * @memberof DbiamRolleError
+     */
+    'i18nKey': DbiamRolleErrorI18nKeyEnum;
+    /**
+     * Corresponds to HTTP Status code like 200, 404, 500
+     * @type {number}
+     * @memberof DbiamRolleError
+     */
+    'code': number;
+}
+
+export const DbiamRolleErrorI18nKeyEnum = {
+    RolleError: 'ROLLE_ERROR',
+    AddSystemrechtError: 'ADD_SYSTEMRECHT_ERROR',
+    RolleHatPersonenkontexteError: 'ROLLE_HAT_PERSONENKONTEXTE_ERROR'
+} as const;
+
+export type DbiamRolleErrorI18nKeyEnum = typeof DbiamRolleErrorI18nKeyEnum[keyof typeof DbiamRolleErrorI18nKeyEnum];
+
+/**
+ * 
+ * @export
  * @interface DbiamUpdatePersonenkontexteBodyParams
  */
 export interface DbiamUpdatePersonenkontexteBodyParams {
@@ -6730,6 +6758,48 @@ export const RolleApiAxiosParamCreator = function (configuration?: Configuration
             };
         },
         /**
+         * Delete a role by id.
+         * @summary 
+         * @param {string} rolleId The id for the rolle.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rolleControllerDeleteRolle: async (rolleId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'rolleId' is not null or undefined
+            assertParamExists('rolleControllerDeleteRolle', 'rolleId', rolleId)
+            const localVarPath = `/api/rolle/{rolleId}`
+                .replace(`{${"rolleId"}}`, encodeURIComponent(String(rolleId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Get rolle by id.
          * @summary 
          * @param {string} rolleId The id for the rolle.
@@ -7009,6 +7079,17 @@ export const RolleApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
+         * Delete a role by id.
+         * @summary 
+         * @param {string} rolleId The id for the rolle.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async rolleControllerDeleteRolle(rolleId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.rolleControllerDeleteRolle(rolleId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
          * Get rolle by id.
          * @summary 
          * @param {string} rolleId The id for the rolle.
@@ -7110,6 +7191,16 @@ export const RolleApiFactory = function (configuration?: Configuration, basePath
             return localVarFp.rolleControllerCreateRolle(createRolleBodyParams, options).then((request) => request(axios, basePath));
         },
         /**
+         * Delete a role by id.
+         * @summary 
+         * @param {string} rolleId The id for the rolle.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rolleControllerDeleteRolle(rolleId: string, options?: any): AxiosPromise<void> {
+            return localVarFp.rolleControllerDeleteRolle(rolleId, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Get rolle by id.
          * @summary 
          * @param {string} rolleId The id for the rolle.
@@ -7203,6 +7294,16 @@ export interface RolleApiInterface {
      * @memberof RolleApiInterface
      */
     rolleControllerCreateRolle(createRolleBodyParams: CreateRolleBodyParams, options?: AxiosRequestConfig): AxiosPromise<RolleResponse>;
+
+    /**
+     * Delete a role by id.
+     * @summary 
+     * @param {string} rolleId The id for the rolle.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RolleApiInterface
+     */
+    rolleControllerDeleteRolle(rolleId: string, options?: AxiosRequestConfig): AxiosPromise<void>;
 
     /**
      * Get rolle by id.
@@ -7303,6 +7404,18 @@ export class RolleApi extends BaseAPI implements RolleApiInterface {
      */
     public rolleControllerCreateRolle(createRolleBodyParams: CreateRolleBodyParams, options?: AxiosRequestConfig) {
         return RolleApiFp(this.configuration).rolleControllerCreateRolle(createRolleBodyParams, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Delete a role by id.
+     * @summary 
+     * @param {string} rolleId The id for the rolle.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RolleApi
+     */
+    public rolleControllerDeleteRolle(rolleId: string, options?: AxiosRequestConfig) {
+        return RolleApiFp(this.configuration).rolleControllerDeleteRolle(rolleId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

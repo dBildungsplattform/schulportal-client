@@ -1981,7 +1981,14 @@
                         }
                     },
                     "400": {
-                        "description": "The input was not valid."
+                        "description": "The input was not valid.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DbiamRolleError"
+                                }
+                            }
+                        }
                     },
                     "401": {
                         "description": "Not authorized to update the rolle."
@@ -1991,6 +1998,47 @@
                     },
                     "500": {
                         "description": "Internal server error while updating the rolle."
+                    }
+                },
+                "tags": [
+                    "rolle"
+                ],
+                "security": [
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
+                    {
+                        "bearer": []
+                    }
+                ]
+            },
+            "delete": {
+                "operationId": "RolleController_deleteRolle",
+                "summary": "",
+                "description": "Delete a role by id.",
+                "parameters": [
+                    {
+                        "name": "rolleId",
+                        "required": true,
+                        "in": "path",
+                        "description": "The id for the rolle.",
+                        "schema": {
+                            "nullable": false,
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Role was deleted successfully."
+                    },
+                    "401": {
+                        "description": "Not authorized to delete the role."
+                    },
+                    "404": {
+                        "description": "The rolle that should be deleted does not exist."
                     }
                 },
                 "tags": [
@@ -4570,6 +4618,27 @@
                     "merkmale",
                     "systemrechte",
                     "serviceProviderIds"
+                ]
+            },
+            "DbiamRolleError": {
+                "type": "object",
+                "properties": {
+                    "i18nKey": {
+                        "type": "string",
+                        "enum": [
+                            "ROLLE_ERROR",
+                            "ADD_SYSTEMRECHT_ERROR",
+                            "ROLLE_HAT_PERSONENKONTEXTE_ERROR"
+                        ]
+                    },
+                    "code": {
+                        "type": "number",
+                        "description": "Corresponds to HTTP Status code like 200, 404, 500"
+                    }
+                },
+                "required": [
+                    "i18nKey",
+                    "code"
                 ]
             },
             "PersonResponseAutomapper": {
