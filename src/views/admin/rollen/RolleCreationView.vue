@@ -30,11 +30,9 @@
   } from 'vue-router';
   import { useDisplay } from 'vuetify';
   import { type BaseFieldProps, type TypedSchema, useForm } from 'vee-validate';
-  import { object, string } from 'yup';
-  import { toTypedSchema } from '@vee-validate/yup';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import RolleForm from '@/components/form/RolleForm.vue';
-  import { DIN_91379A_EXT } from '@/utils/validation';
+  import { getValidationSchema, getVuetifyConfig } from '@/utils/validationRolle';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
   const rolleStore: RolleStore = useRolleStore();
@@ -53,25 +51,11 @@
   type TranslatedSystemrecht = { value: RollenSystemRecht; title: string };
   const translatedSystemrechte: Ref<TranslatedSystemrecht[]> = ref([]);
 
-  const validationSchema: TypedSchema = toTypedSchema(
-    object({
-      selectedRollenArt: string().required(t('admin.rolle.rules.rollenart.required')),
-      selectedRollenName: string()
-        .max(200, t('admin.rolle.rules.rollenname.length'))
-        .matches(DIN_91379A_EXT, t('admin.rolle.rules.rollenname.matches'))
-        .required(t('admin.rolle.rules.rollenname.required')),
-      selectedAdministrationsebene: string().required(t('admin.administrationsebene.rules.required')),
-    }),
-  );
+  const validationSchema: TypedSchema = getValidationSchema(t);
 
   const vuetifyConfig = (state: {
     errors: Array<string>;
-  }): { props: { error: boolean; 'error-messages': Array<string> } } => ({
-    props: {
-      error: !!state.errors.length,
-      'error-messages': state.errors,
-    },
-  });
+  }): { props: { error: boolean; 'error-messages': Array<string> } } => getVuetifyConfig(state);
 
   type RolleCreationFormType = {
     selectedAdministrationsebene: string;
@@ -343,6 +327,7 @@
           :onHandleDiscard="navigateToRolleManagement"
           :onShowDialogChange="(value: boolean) => (showUnsavedChangesDialog = value)"
           :onSubmit="onSubmit"
+          :isEditActive="true"
           ref="rolle-creation-form"
           v-model:selectedAdministrationsebene="selectedAdministrationsebene"
           :selectedAdministrationsebeneProps="selectedAdministrationsebeneProps"

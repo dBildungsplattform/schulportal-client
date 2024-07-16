@@ -4,6 +4,11 @@
   import FormWrapper from '@/components/form/FormWrapper.vue';
   import FormRow from '@/components/form/FormRow.vue';
 
+  type TranslatedObject = {
+    value: string;
+    title: string;
+  };
+
   type Props = {
     administrationsebenen?: Array<{ value: string; title: string }>;
     readonly?: boolean;
@@ -15,9 +20,10 @@
     selectedSystemRechteProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     serviceProviders?: Array<{ value: string; title: string }>;
     showUnsavedChangesDialog?: boolean;
-    translatedRollenarten?: Array<{ value: string; title: string }>;
-    translatedMerkmale?: Array<{ value: string; title: string }>;
-    translatedSystemrechte?: Array<{ value: string; title: string }>;
+    translatedRollenarten?: TranslatedObject[];
+    translatedMerkmale?: TranslatedObject[];
+    translatedSystemrechte?: TranslatedObject[];
+    isEditActive?: boolean;
     onHandleConfirmUnsavedChanges: () => void;
     onHandleDiscard: () => void;
     onShowDialogChange: (value: boolean) => void;
@@ -26,12 +32,15 @@
 
   defineProps<Props>();
 
+  // Define the V-model for each field so the parent component can pass in the values for it.
   const selectedAdministrationsebene: ModelRef<unknown, string> = defineModel('selectedAdministrationsebene');
   const selectedRollenArt: ModelRef<unknown, string> = defineModel('selectedRollenArt');
   const selectedRollenName: ModelRef<unknown, string> = defineModel('selectedRollenName');
-  const selectedMerkmale: ModelRef<Array<string> | undefined, string> = defineModel('selectedMerkmale');
-  const selectedServiceProviders: ModelRef<Array<string> | undefined, string> = defineModel('selectedServiceProviders');
-  const selectedSystemRechte: ModelRef<Array<string> | undefined, string> = defineModel('selectedSystemRechte');
+  const selectedMerkmale: ModelRef<Array<TranslatedObject> | undefined, string> = defineModel('selectedMerkmale');
+  const selectedServiceProviders: ModelRef<Array<TranslatedObject> | undefined, string> =
+    defineModel('selectedServiceProviders');
+  const selectedSystemRechte: ModelRef<Array<TranslatedObject> | undefined, string> =
+    defineModel('selectedSystemRechte');
 </script>
 
 <template data-test-id="rolle-form">
@@ -119,7 +128,7 @@
           clearable
           data-testid="rollenname-input"
           density="compact"
-          :disabled="readonly"
+          :disabled="!isEditActive"
           id="rollenname-input"
           :placeholder="$t('admin.rolle.enterRollenname')"
           ref="rollenname-input"
@@ -144,7 +153,7 @@
           clearable
           data-testid="merkmale-select"
           density="compact"
-          :disabled="readonly"
+          :disabled="!isEditActive"
           id="merkmale-select"
           :items="translatedMerkmale"
           item-value="value"
@@ -173,7 +182,7 @@
           clearable
           data-testid="service-provider-select"
           density="compact"
-          :disabled="readonly"
+          :disabled="!isEditActive"
           id="service-provider-select"
           :items="serviceProviders"
           item-value="value"
@@ -203,7 +212,7 @@
           clearable
           data-testid="systemrechte-select"
           density="compact"
-          :disabled="readonly"
+          :disabled="!isEditActive"
           id="systemrechte-select"
           :items="translatedSystemrechte"
           item-value="value"
