@@ -110,7 +110,7 @@ type PersonenkontextGetters = {};
 type PersonenkontextActions = {
   hasSystemrecht: (personId: string, systemrecht: 'ROLLEN_VERWALTEN') => Promise<SystemrechtResponse>;
   processWorkflowStep: (filter?: WorkflowFilter) => Promise<PersonenkontextWorkflowResponse>;
-  getPersonenkontextRolleWithFilter: (rolleName: string, limit: number) => Promise<void>;
+  getPersonenkontextRolleWithFilter: (rolleName: string, limit?: number) => Promise<void>;
   getPersonenkontextAdministrationsebeneWithFilter: (rolleId: string, sskName: string, limit: number) => Promise<void>;
   updatePersonenkontexte: (
     combinedZuordnungen: Zuordnung[] | undefined,
