@@ -144,6 +144,7 @@
       "errors": {
         "ADD_SYSTEMRECHT_ERROR": "Das Systemrecht konnte nicht hinzugefügt werden.",
         "ROLLE_ERROR":  "Die Rolle konnte nicht angelegt werden.",
+        "ROLLE_HAT_PERSONENKONTEXTE_ERROR": "Die Rolle kann nicht gelöscht werden, da die sie noch Benutzern zugeordnet ist. Nehmen Sie bitte zunächst alle Zuordnungen zurück.",
         "UPDATE_MERKMALE_ERROR": "Die gewünschte Bearbeitung kann nicht ausgeführt werden, da die Rolle noch Benutzern zugeordnet ist. Nehmen Sie bitte zunächst alle Zuordnungen zurück."
       },
       "title": {
