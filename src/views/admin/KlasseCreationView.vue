@@ -154,7 +154,8 @@
     }
   });
 
-  const handleCreateAnotherKlasse = (): void => {
+  const handleCreateAnotherKlasse = async (): Promise<void> => {
+    await personenkontextStore.processWorkflowStep();
     organisationStore.createdKlasse = null;
     resetForm();
     router.push({ name: 'create-klasse' });
@@ -202,6 +203,8 @@
 
   onMounted(async () => {
     await personenkontextStore.processWorkflowStep();
+    organisationStore.createdKlasse = null;
+    organisationStore.errorCode = '';
     /* listen for browser changes and prevent them when form is dirty */
     window.addEventListener('beforeunload', preventNavigation);
   });
