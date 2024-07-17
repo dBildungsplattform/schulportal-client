@@ -33,7 +33,7 @@
         <SpshTooltip
           :enabledCondition="!disabled"
           :disabledText="$t('person.finishEditFirst')"
-          :enabledText="$t('admin.person.twoFactorAuthentication.setUpShort')"
+          :enabledText="$t('admin.person.twoFactorAuthentification.setUpShort')"
           position="start"
         >
           <v-btn
@@ -43,7 +43,7 @@
             :disabled="disabled"
             v-bind="props"
           >
-            {{ $t('admin.person.twoFactorAuthentication.setUpShort') }}
+            {{ $t('admin.person.twoFactorAuthentification.setUpShort') }}
           </v-btn>
         </SpshTooltip>
       </v-col>
@@ -52,7 +52,7 @@
     <template v-slot:default="{ isActive }">
       <LayoutCard
         :closable="true"
-        :header="$t('admin.person.twoFactorAuthentication.setUpLong')"
+        :header="$t('admin.person.twoFactorAuthentification.setUpLong')"
         @onCloseClicked="close2FADialog(isActive)"
       >
         <v-card-text>
@@ -60,15 +60,15 @@
             <v-row class="text-body bold px-md-16">
               <v-col>
                 <v-radio-group v-model="selectedOption">
-                  <v-radio :label="$t('admin.person.twoFactorAuthentication.softwareTokenOption')" value="software"></v-radio>
-                  <v-radio :label="$t('admin.person.twoFactorAuthentication.hardwareTokenOption')" value="hardware"></v-radio>
+                  <v-radio :label="$t('admin.person.twoFactorAuthentification.softwareTokenOption')" value="software"></v-radio>
+                  <v-radio :label="$t('admin.person.twoFactorAuthentification.hardwareTokenOption')" value="hardware"></v-radio>
                 </v-radio-group>
               </v-col>
             </v-row>
             <v-row>
               <v-col cols="12">
-                <p class="text-body" v-if="selectedOption === 'software'"> {{ $t('admin.person.twoFactorAuthentication.softwareTokenText') }}</p>
-                <p class="text-body" v-if="selectedOption === 'hardware'"> {{ $t('admin.person.twoFactorAuthentication.hardwareTokenText') }}</p>
+                <p class="text-body" v-if="selectedOption === 'software'"> {{ $t('admin.person.twoFactorAuthentification.softwareTokenText') }}</p>
+                <p class="text-body" v-if="selectedOption === 'hardware'"> {{ $t('admin.person.twoFactorAuthentification.hardwareTokenText') }}</p>
               </v-col>
             </v-row>
           </v-container>

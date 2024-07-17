@@ -72,14 +72,24 @@
       "addedSuccessfully": "{firstname} {lastname} wurde erfolgreich hinzugefügt.",
       "addNew": "Neuen Benutzer hinzufügen",
       "changePassword": "Passwort ändern",
-      "twoFactorAuthentication":{
+      "twoFactorAuthentification":{
         "setUpShort": "2FA einrichten",
         "setUpLong": "Zwei-Faktor-Authentifizierung einrichten",
         "header": "Zwei-Faktor-Authentifizierung (2FA)",
         "softwareTokenOption":"Software-Token einrichten",
         "softwareTokenText": "(i) Ein QR-Code wird generiert, welcher direkt eingescannt oder ausgedruckt werden kann.",
         "hardwareTokenOption":"Hardware-Token zuordnen",
-        "hardwareTokenText": "(i) Der Hardware-Token muss vorliegen und funktionieren. Bitte notieren Sie, wem Sie den Token gegeben haben."
+        "hardwareTokenText": "(i) Der Hardware-Token muss vorliegen und funktionieren. Bitte notieren Sie, wem Sie den Token gegeben haben.",
+        "tokenResetHeader": "Token zurücksetzen",
+        "tokenResetHardwareErrorHeader": "Fehler beim Zurücksetzen des Hardware-Tokens",
+        "tokenResetSoftwareErrorHeader": "Fehler beim Zurücksetzen des Software-Tokens",
+        "tokenResetDescription": "Sind Sie sicher, dass Sie den Token zurücksetzen möchten? \nDie 2FA wird damit für diesen Benutzer deaktiviert, bis ein neuer Token eingerichtet wurde.",
+        "tokenResetTokenLost": "Token ist verloren gegangen (Token wird gesperrt).",
+        "tokenResetButton": "Zurücksetzen",
+        "tokenResetSuccessSoftware": "Token wurde erfolgreich zurückgesetzt. Der Benutzer kann sich nun selbstständig einen neuen QR-Code erzeugen.",
+        "tokenResetSuccessHardware": "Token wurde erfolgreich zurückgesetzt. Der Hardware-Token kann nun neu zugeordnet werden.",
+        "tokenResetSuccessTokenLost": "Token wurde erfolgreich zurückgesetzt und gesperrt.",
+        "tokenResetError": "Beim Zurücksetzen des Tokens ist ein Fehler aufgetreten: <Fehler>. \nBitte versuchen Sie es später erneut."
       },
       "copyPasswordError": "Passwort konnte nicht in die Zwischenablage kopiert werden",
       "copyPasswordSuccess": "Passwort in Zwischenablage kopiert",

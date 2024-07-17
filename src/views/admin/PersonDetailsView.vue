@@ -32,6 +32,7 @@
   import { useRollen } from '@/composables/useRollen';
   import { useKlassen } from '@/composables/useKlassen';
   import PersonenkontextCreate from '@/components/admin/personen/PersonenkontextCreate.vue';
+import TokenReset from '@/components/cards/two-factor-authentifaction/TokenReset.vue';
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
   const { t }: Composer = useI18n({ useScope: 'global' });
@@ -609,7 +610,7 @@
         <v-container class="two-factor-authentication-set-up">
           <v-row class="ml-md-16">
             <v-col>
-              <h3 class="subtitle-1">{{ $t('admin.person.twoFactorAuthentication.header') }}</h3>
+              <h3 class="subtitle-1">{{ $t('admin.person.twoFactorAuthentification.header') }}</h3>
             </v-col>
             <v-col
               class="mr-lg-13"
@@ -624,6 +625,30 @@
                   :person="personStore.currentPerson"
                 >
                 </TwoFactorAuthenticationSetUp>
+              </div>
+            </v-col>
+            <v-col v-else-if="personStore.loading"> <v-progress-circular indeterminate></v-progress-circular></v-col
+          ></v-row>
+        </v-container>
+        <v-container class="token-reset">
+          <v-row class="ml-md-16">
+            <v-col>
+              <h3 class="subtitle-1">Token-Reset Test</h3>
+            </v-col>
+            <v-col
+              class="mr-lg-13"
+              cols="12"
+              md="auto"
+              v-if="personStore.currentPerson"
+            >
+              <div class="d-flex justify-sm-end">
+                <TokenReset
+                  :errorCode="personStore.errorCode"
+                  :disabled="isEditActive"
+                  :person="personStore.currentPerson"
+                  :tokenType="'hardware'" 
+                >
+                </TokenReset>
               </div>
             </v-col>
             <v-col v-else-if="personStore.loading"> <v-progress-circular indeterminate></v-progress-circular></v-col
