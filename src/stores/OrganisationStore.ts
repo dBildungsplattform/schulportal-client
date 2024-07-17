@@ -7,6 +7,7 @@ import {
   type OrganisationenApiInterface,
   type CreateOrganisationBodyParams,
   type RollenSystemRecht,
+  type UpdateOrganisationBodyParams,
 } from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
 
@@ -26,6 +27,7 @@ type OrganisationState = {
   allOrganisationen: Array<Organisation>;
   allKlassen: Array<Organisation>;
   currentOrganisation: Organisation | null;
+  updatedOrganisation: Organisation | null;
   createdKlasse: Organisation | null;
   createdSchule: Organisation | null;
   totalKlassen: number;
@@ -60,6 +62,7 @@ type OrganisationActions = {
     administriertVon?: string,
     zugehoerigZu?: string,
   ) => Promise<Organisation>;
+  updateOrganisation: (organisationId: string, name: string) => Promise<Organisation>;
 };
 
 export { OrganisationsTyp };
@@ -77,6 +80,7 @@ export const useOrganisationStore: StoreDefinition<
       allOrganisationen: [],
       allKlassen: [],
       currentOrganisation: null,
+      updatedOrganisation: null,
       createdKlasse: null,
       createdSchule: null,
       totalKlassen: 0,
@@ -224,6 +228,30 @@ export const useOrganisationStore: StoreDefinition<
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
           this.errorCode = error.response?.data.i18nKey || 'ORGANISATION_SPECIFICATION_ERROR';
+        }
+        return await Promise.reject(this.errorCode);
+      } finally {
+        this.loading = false;
+      }
+    },
+    async updateOrganisation(organisationId: string, name: string) {
+      this.errorCode = '';
+      this.loading = true;
+      try {
+        const updateOrganisationBodyParams: UpdateOrganisationBodyParams = {
+          name: name,
+          typ: OrganisationsTyp.Klasse,
+        };
+        const { data }: { data: Organisation } = await organisationApi.organisationControllerUpdateOrganisation(
+          organisationId,
+          updateOrganisationBodyParams,
+        );
+        this.updatedOrganisation = data;
+        return data;
+      } catch (error: unknown) {
+        this.errorCode = 'UNSPECIFIED_ERROR';
+        if (isAxiosError(error)) {
+          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
         }
         return await Promise.reject(this.errorCode);
       } finally {

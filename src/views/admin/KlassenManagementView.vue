@@ -12,10 +12,13 @@
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import type { UserinfoPersonenkontext } from '@/stores/PersonenkontextStore';
   import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
+  import { useRouter, type Router } from 'vue-router';
 
   const organisationStore: OrganisationStore = useOrganisationStore();
   const authStore: AuthStore = useAuthStore();
   const { t }: Composer = useI18n({ useScope: 'global' });
+
+  const router: Router = useRouter();
 
   type ReadonlyHeaders = VDataTableServer['$props']['headers'];
   type UnwrapReadonlyArray<A> = A extends Readonly<Array<infer I>> ? I : never;
@@ -259,6 +262,10 @@
     }
   }
 
+  function navigateToKlassenDetails(_$event: PointerEvent, { item }: { item: Organisation }): void {
+    console.log('Navigating to klasse-details with id:', item.id); 
+    router.push({ name: 'klasse-details', params: { id: item.id } });
+  }
   onMounted(async () => {
     await organisationStore.getAllOrganisationen({
       includeTyp: OrganisationsTyp.Schule,
@@ -442,9 +449,9 @@
             systemrechte: ['KLASSEN_VERWALTEN'],
           })
         "
+        @onHandleRowClick="navigateToKlassenDetails"
         :totalItems="organisationStore.allKlassen.length"
         item-value-path="id"
-        :disableRowClick="true"
       >
         <template v-slot:[`item.schuleDetails`]="{ item }">
           <div

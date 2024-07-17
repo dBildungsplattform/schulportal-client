@@ -486,7 +486,8 @@ export const DbiamOrganisationErrorI18nKeyEnum = {
     ZyklusInOrganisation: 'ZYKLUS_IN_ORGANISATION',
     RootOrganisationImmutable: 'ROOT_ORGANISATION_IMMUTABLE',
     KlasseNurVonSchuleAdministriert: 'KLASSE_NUR_VON_SCHULE_ADMINISTRIERT',
-    KlassennameAnSchuleEindeutig: 'KLASSENNAME_AN_SCHULE_EINDEUTIG'
+    KlassennameAnSchuleEindeutig: 'KLASSENNAME_AN_SCHULE_EINDEUTIG',
+    NameRequiredForKlasse: 'NAME_REQUIRED_FOR_KLASSE'
 } as const;
 
 export type DbiamOrganisationErrorI18nKeyEnum = typeof DbiamOrganisationErrorI18nKeyEnum[keyof typeof DbiamOrganisationErrorI18nKeyEnum];
@@ -716,6 +717,19 @@ export interface OrganisationByIdBodyParams {
      * @memberof OrganisationByIdBodyParams
      */
     'organisationId': string;
+}
+/**
+ * 
+ * @export
+ * @interface OrganisationByNameBodyParams
+ */
+export interface OrganisationByNameBodyParams {
+    /**
+     * 
+     * @type {string}
+     * @memberof OrganisationByNameBodyParams
+     */
+    'name': string;
 }
 /**
  * 
@@ -3596,6 +3610,53 @@ export const OrganisationenApiAxiosParamCreator = function (configuration?: Conf
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * 
+         * @param {string} organisationId The id of an organization
+         * @param {OrganisationByNameBodyParams} organisationByNameBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        organisationControllerUpdateOrganisationName: async (organisationId: string, organisationByNameBodyParams: OrganisationByNameBodyParams, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'organisationId' is not null or undefined
+            assertParamExists('organisationControllerUpdateOrganisationName', 'organisationId', organisationId)
+            // verify required parameter 'organisationByNameBodyParams' is not null or undefined
+            assertParamExists('organisationControllerUpdateOrganisationName', 'organisationByNameBodyParams', organisationByNameBodyParams)
+            const localVarPath = `/api/organisationen/{organisationId}/name`
+                .replace(`{${"organisationId"}}`, encodeURIComponent(String(organisationId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(organisationByNameBodyParams, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -3716,6 +3777,17 @@ export const OrganisationenApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.organisationControllerUpdateOrganisation(organisationId, updateOrganisationBodyParams, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
+        /**
+         * 
+         * @param {string} organisationId The id of an organization
+         * @param {OrganisationByNameBodyParams} organisationByNameBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async organisationControllerUpdateOrganisationName(organisationId: string, organisationByNameBodyParams: OrganisationByNameBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.organisationControllerUpdateOrganisationName(organisationId, organisationByNameBodyParams, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
     }
 };
 
@@ -3826,6 +3898,16 @@ export const OrganisationenApiFactory = function (configuration?: Configuration,
         organisationControllerUpdateOrganisation(organisationId: string, updateOrganisationBodyParams: UpdateOrganisationBodyParams, options?: any): AxiosPromise<OrganisationResponseLegacy> {
             return localVarFp.organisationControllerUpdateOrganisation(organisationId, updateOrganisationBodyParams, options).then((request) => request(axios, basePath));
         },
+        /**
+         * 
+         * @param {string} organisationId The id of an organization
+         * @param {OrganisationByNameBodyParams} organisationByNameBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        organisationControllerUpdateOrganisationName(organisationId: string, organisationByNameBodyParams: OrganisationByNameBodyParams, options?: any): AxiosPromise<void> {
+            return localVarFp.organisationControllerUpdateOrganisationName(organisationId, organisationByNameBodyParams, options).then((request) => request(axios, basePath));
+        },
     };
 };
 
@@ -3934,6 +4016,16 @@ export interface OrganisationenApiInterface {
      * @memberof OrganisationenApiInterface
      */
     organisationControllerUpdateOrganisation(organisationId: string, updateOrganisationBodyParams: UpdateOrganisationBodyParams, options?: AxiosRequestConfig): AxiosPromise<OrganisationResponseLegacy>;
+
+    /**
+     * 
+     * @param {string} organisationId The id of an organization
+     * @param {OrganisationByNameBodyParams} organisationByNameBodyParams 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OrganisationenApiInterface
+     */
+    organisationControllerUpdateOrganisationName(organisationId: string, organisationByNameBodyParams: OrganisationByNameBodyParams, options?: AxiosRequestConfig): AxiosPromise<void>;
 
 }
 
@@ -4062,6 +4154,18 @@ export class OrganisationenApi extends BaseAPI implements OrganisationenApiInter
      */
     public organisationControllerUpdateOrganisation(organisationId: string, updateOrganisationBodyParams: UpdateOrganisationBodyParams, options?: AxiosRequestConfig) {
         return OrganisationenApiFp(this.configuration).organisationControllerUpdateOrganisation(organisationId, updateOrganisationBodyParams, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {string} organisationId The id of an organization
+     * @param {OrganisationByNameBodyParams} organisationByNameBodyParams 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OrganisationenApi
+     */
+    public organisationControllerUpdateOrganisationName(organisationId: string, organisationByNameBodyParams: OrganisationByNameBodyParams, options?: AxiosRequestConfig) {
+        return OrganisationenApiFp(this.configuration).organisationControllerUpdateOrganisationName(organisationId, organisationByNameBodyParams, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
