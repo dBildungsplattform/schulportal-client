@@ -12,7 +12,7 @@
   const selectedOption: Ref<'software' | 'hardware'> = ref('software');
   const personStore: PersonStore = usePersonStore();
 
-  let qrImage = '';
+  let qrCodeImageBase64 = '';
 
   const proceeded: Ref<boolean> = ref(false);
 
@@ -36,7 +36,7 @@
   async function proceed(): Promise<void> {
     try {
       if (props.person.person.referrer == null) return;
-      qrImage = await personStore.get2FASoftwareQRCode(props.person.person.referrer);
+      qrCodeImageBase64 = await personStore.get2FASoftwareQRCode(props.person.person.referrer);
       console.log(props.person.person.referrer);
       proceeded.value = true;
     } catch (error) {}
@@ -117,7 +117,7 @@
         <v-container v-if="proceeded">
           <SoftwareTokenWorkflow
             v-if="selectedOption === 'software'"
-            :image="qrImage"
+            :qrCodeImageBase64="qrCodeImageBase64"
             @updateHeader="handleHeaderUpdate"
             @onCloseClicked="close2FADialog(isActive)"
           ></SoftwareTokenWorkflow>
