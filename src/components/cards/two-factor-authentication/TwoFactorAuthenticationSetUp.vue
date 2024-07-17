@@ -1,17 +1,22 @@
 <script setup lang="ts">
   import { ref, type Ref } from 'vue';
-  import { type Personendatensatz } from '@/stores/PersonStore';
+  import { usePersonStore, type PersonStore, type Personendatensatz } from '@/stores/PersonStore';
   import { useDisplay } from 'vuetify';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import SpshTooltip from '@/components/admin/SpshTooltip.vue';
   import SoftwareTokenWorkflow from './SoftwareTokenWorkflow.vue';
+  import { useI18n, type Composer } from 'vue-i18n';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
+  const { t }: Composer = useI18n({ useScope: 'global' });
   const selectedOption: Ref<'software' | 'hardware'> = ref('software');
+  const personStore: PersonStore = usePersonStore();
+
+  let qrImage = '';
 
   const proceeded: Ref<boolean> = ref(false);
 
-  const dialogHeader = ref('default');
+  const dialogHeader = ref(t('admin.person.twoFactorAuthentication.setUpLong'));
 
   type Props = {
     errorCode: string;
@@ -19,17 +24,22 @@
     person: Personendatensatz;
   };
 
-  defineProps<Props>();
+  const props = defineProps<Props>();
 
   async function close2FADialog(isActive: Ref<boolean>): Promise<void> {
     isActive.value = false;
     proceeded.value = false;
     selectedOption.value = 'software';
-    dialogHeader.value = 'default';
+    dialogHeader.value = t('admin.person.twoFactorAuthentication.setUpLong');
   }
 
-  async function incWorkflow(): Promise<void> {
-    proceeded.value = true;
+  async function proceed(): Promise<void> {
+    try {
+      if (props.person.person.referrer == null) return;
+      qrImage = await personStore.get2FASoftwareQRCode(props.person.person.referrer);
+      console.log(props.person.person.referrer);
+      proceeded.value = true;
+    } catch (error) {}
   }
 
   async function handleHeaderUpdate(header: string): Promise<void> {
@@ -107,7 +117,9 @@
         <v-container v-if="proceeded">
           <SoftwareTokenWorkflow
             v-if="selectedOption === 'software'"
+            :image="qrImage"
             @updateHeader="handleHeaderUpdate"
+            @onCloseClicked="close2FADialog(isActive)"
           ></SoftwareTokenWorkflow>
         </v-container>
         <v-card-actions
@@ -137,7 +149,7 @@
               <v-btn
                 :block="mdAndDown"
                 class="primary button"
-                @click.stop="incWorkflow()"
+                @click.stop="proceed()"
                 data-testid="two-way-authentification-set-up-button"
               >
                 {{ $t('proceed') }}

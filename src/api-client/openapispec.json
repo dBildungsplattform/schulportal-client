@@ -3141,6 +3141,17 @@
           }
         ]
       }
+    },
+    "/api/pi": {
+      "get": {
+        "operationId": "PrivacyIdeaAdministrationController_initializeSoftwareToken",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
     }
   },
   "info": {

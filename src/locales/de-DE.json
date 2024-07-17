@@ -79,7 +79,11 @@
         "softwareTokenOption":"Software-Token einrichten",
         "softwareTokenText": "(i) Ein QR-Code wird generiert, welcher direkt eingescannt oder ausgedruckt werden kann.",
         "hardwareTokenOption":"Hardware-Token zuordnen",
-        "hardwareTokenText": "(i) Der Hardware-Token muss vorliegen und funktionieren. Bitte notieren Sie, wem Sie den Token gegeben haben."
+        "hardwareTokenText": "(i) Der Hardware-Token muss vorliegen und funktionieren. Bitte notieren Sie, wem Sie den Token gegeben haben.",
+        "scanOrPrint": "QR-Code scannen oder ausdrucken.",
+        "notSetUp": "(i) Für diesen Benutzer ist aktuell keine 2FA eingerichtet.",
+        "softwareTokenIsSetUp" : "Für diesen Benutzer ist aktuell ein Software-Token eingerichtet.",
+        "resetInfo" : "(i) Um einen neuen Token einzurichten, muss der aktuelle Token durch die schulischen Administratorinnen und Administratoren zurückgesetzt werden."
       },
       "copyPasswordError": "Passwort konnte nicht in die Zwischenablage kopiert werden",
       "copyPasswordSuccess": "Passwort in Zwischenablage kopiert",

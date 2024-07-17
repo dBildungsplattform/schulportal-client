@@ -67,6 +67,9 @@
 
   const canCommit: Ref<boolean> = ref(false);
 
+  const secondFactorSet: Ref<boolean | undefined> = ref(undefined);
+  const secondFactorType: Ref<'software' | 'hardware' | undefined> = ref(undefined);
+
   function navigateToPersonTable(): void {
     router.push({ name: 'person-management' });
   }
@@ -605,38 +608,38 @@
           color="#E5EAEF"
           thickness="6"
         ></v-divider>
+        <!-- Two Factor Authentication -->
         <v-container class="two-factor-authentication-set-up">
           <v-row class="ml-md-16">
             <v-col>
               <h3 class="subtitle-1">{{ $t('admin.person.twoFactorAuthentication.header') }}</h3>
-            </v-col>
-            <v-col
-              class="mr-lg-13"
-              cols="12"
-              md="auto"
-              v-if="personStore.currentPerson"
-            >
-              <div class="d-flex justify-sm-end">
-                <TwoFactorAuthenticationSetUp
-                  :errorCode="personStore.errorCode"
-                  :disabled="isEditActive"
-                  :person="personStore.currentPerson"
+              <v-row class="ml-4 mt-4">
+                <v-icon
+                  icon="mdi-check"
+                  color="green"
+                  class="mr-2"
+                  v-if="secondFactorSet"
+                ></v-icon>
+                <p
+                  v-if="secondFactorSet && secondFactorType === 'software'"
+                  class="text-body"
                 >
-                </TwoFactorAuthenticationSetUp>
-              </div>
-            </v-col>
-            <v-col v-else-if="personStore.loading"> <v-progress-circular indeterminate></v-progress-circular></v-col
-          ></v-row>
-        </v-container>
-        <v-divider
-          class="border-opacity-100 rounded my-6 mx-4"
-          color="#E5EAEF"
-          thickness="6"
-        ></v-divider>
-        <v-container class="two-factor-authentication-set-up">
-          <v-row class="ml-md-16">
-            <v-col>
-              <h3 class="subtitle-1">{{ $t('admin.person.twoFactorAuthentication.header') }}</h3>
+                  {{ $t('admin.person.twoFactorAuthentication.softwareTokenIsSetUp') }}
+                </p>
+                <p
+                  v-if="secondFactorSet"
+                  class="text-body mt-4"
+                >
+                  {{ $t('admin.person.twoFactorAuthentication.resetInfo') }}
+                </p>
+
+                <p
+                  v-if="secondFactorSet === false"
+                  class="text-body"
+                >
+                  {{ $t('admin.person.twoFactorAuthentication.notSetUp') }}
+                </p>
+              </v-row>
             </v-col>
             <v-col
               class="mr-lg-13"
