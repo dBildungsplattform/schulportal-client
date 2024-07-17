@@ -448,6 +448,17 @@
   onBeforeMount(async () => {
     await personStore.getPersonById(currentPersonId);
     await personenkontextStore.getPersonenuebersichtById(currentPersonId);
+
+    const result = await personStore.get2FAState(personStore.currentPerson?.person.referrer ?? '');
+
+    secondFactorSet.value = result !== '';
+    if (secondFactorSet.value) {
+      if (result === 'hardware') {
+        secondFactorType.value = 'hardware';
+      } else if (result === 'software') {
+        secondFactorType.value = 'software';
+      }
+    }
   });
 </script>
 
@@ -649,11 +660,13 @@
             >
               <div class="d-flex justify-sm-end">
                 <TwoFactorAuthenticationSetUp
+                  v-if="!secondFactorSet"
                   :errorCode="personStore.errorCode"
                   :disabled="isEditActive"
                   :person="personStore.currentPerson"
                 >
                 </TwoFactorAuthenticationSetUp>
+                <!-- Re with v-if="!secondFactorSet"-->
               </div>
             </v-col>
             <v-col v-else-if="personStore.loading"> <v-progress-circular indeterminate></v-progress-circular></v-col

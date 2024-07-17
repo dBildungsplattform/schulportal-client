@@ -1,7 +1,7 @@
 import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import { isAxiosError, type AxiosResponse } from 'axios';
 import {
-  DefaultApiFactory,
+  Class2FAApiFactory,
   PersonenApiFactory,
   PersonenFrontendApiFactory,
   type DbiamCreatePersonWithContextBodyParams,
@@ -16,7 +16,7 @@ import { type DbiamPersonenkontextBodyParams } from './PersonenkontextStore';
 const personenApi: PersonenApiInterface = PersonenApiFactory(undefined, '', axiosApiInstance);
 const personenFrontendApi: PersonenFrontendApiInterface = PersonenFrontendApiFactory(undefined, '', axiosApiInstance);
 
-const defaultApi = DefaultApiFactory(undefined, '', axiosApiInstance);
+const twoFactorApi = Class2FAApiFactory(undefined, '', axiosApiInstance);
 
 export type Person = {
   id: string;
@@ -51,12 +51,37 @@ export type PersonFilter = {
   searchFilter?: string;
 };
 
+type InitSoftwareTokenResponse = {
+  detail: {
+      googleurl: {
+          description: string;
+          img: string;
+          value: string;
+      };
+      oathurl: {
+          description: string;
+          img: string;
+          value: string;
+      };
+      otpkey: {
+          description: string;
+          img: string;
+          value: string;
+          value_b32: string;
+      };
+      rollout_state: string;
+      serial: string;
+      threadid: number;
+  };
+};
+
 type PersonGetters = {};
 type PersonActions = {
   getAllPersons: (filter: PersonFilter) => Promise<void>;
   getPersonById: (personId: string) => Promise<Personendatensatz>;
   resetPassword: (personId: string) => Promise<string>;
   deletePerson: (personId: string) => Promise<void>;
+  get2FAState: (personUserName:string) => Promise<string>;
   get2FASoftwareQRCode: (personUserName: string) => Promise<string>;
 };
 
@@ -151,43 +176,22 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
       }
     },
 
+    async get2FAState (personUserName:string){
+
+      return "";
+    },
+
     async get2FASoftwareQRCode(personUserName: string) {
       this.loading = true;
       try {
 
-        type InitSoftwareTokenResponse = {
-          detail: {
-              googleurl: {
-                  description: string;
-                  img: string;
-                  value: string;
-              };
-              oathurl: {
-                  description: string;
-                  img: string;
-                  value: string;
-              };
-              otpkey: {
-                  description: string;
-                  img: string;
-                  value: string;
-                  value_b32: string;
-              };
-              rollout_state: string;
-              serial: string;
-              threadid: number;
-          };
-      };
+          let response : InitSoftwareTokenResponse = (await twoFactorApi.privacyIdeaAdministrationControllerInitializeSoftwareToken(personUserName)).data
 
-          let response : InitSoftwareTokenResponse = (await defaultApi.privacyIdeaAdministrationControllerInitializeSoftwareToken()).data
-          console.log(response)
-          console.log("Seed: ", response.detail.otpkey.value)
-
-          let base64 = response.detail.otpkey.img?.split(',')[1];
-          if(base64 === undefined){
+          let qrCodeImageBase64 = response.detail.googleurl.img
+          if(qrCodeImageBase64 === undefined){
             //TODO throw exception
           }
-          return base64;
+          return qrCodeImageBase64;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {

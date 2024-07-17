@@ -8,16 +8,12 @@
   const { t }: Composer = useI18n({ useScope: 'global' });
 
   type Props = {
-    image: string;
+    qrCodeImageBase64: string;
   };
 
-  const props = defineProps<Props>();
+  defineProps<Props>();
 
   let workflowStep: number = 0;
-
-  function getImageUrl() {
-    return `data:image/png;base64,${props.image}`;
-  }
 
   emits('updateHeader', t('admin.person.twoFactorAuthentication.softwareTokenOption'));
 
@@ -37,7 +33,7 @@
       <v-row class="justify-center">
         <v-img
           class="printableContent image-width"
-          :src="getImageUrl()"
+          :src="qrCodeImageBase64"
           max-width="250"
         />
       </v-row>
