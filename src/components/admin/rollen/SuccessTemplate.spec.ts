@@ -1,16 +1,8 @@
 import { expect, test } from 'vitest';
 import { VueWrapper, mount } from '@vue/test-utils';
 import SuccessTemplate from './SuccessTemplate.vue';
-import { computed, type ComputedRef } from 'vue';
-import { useRolleStore, type RolleStore } from '@/stores/RolleStore';
 
 let wrapper: VueWrapper | null = null;
-
-const rolleStore: RolleStore = useRolleStore();
-
-const translatedUpdatedRolleMerkmale: ComputedRef<string> = computed(() => 'Merkmal 1');
-const translatedUpdatedAngebote: ComputedRef<string> = computed(() => 'Service Provider 1');
-const translatedUpdatedSystemrecht: ComputedRef<string> = computed(() => 'Systemrecht 1');
 
 beforeEach(() => {
   document.body.innerHTML = `
@@ -22,10 +14,17 @@ beforeEach(() => {
   wrapper = mount(SuccessTemplate, {
     attachTo: document.getElementById('app') || '',
     props: {
-      rolleStore,
-      translatedUpdatedRolleMerkmale,
-      translatedUpdatedAngebote,
-      translatedUpdatedSystemrecht,
+      successMessage: 'Role updated successfully',
+      followingDataCreated: 'The following data was created',
+      createdData: [
+        { label: 'Role Name', value: 'Test Role', testId: 'updated-rolle-name' },
+        { label: 'Merkmale', value: 'Merkmal 1, Merkmal 2', testId: 'updated-rolle-merkmale' },
+        { label: 'Assigned Service Providers', value: 'Service Provider 1', testId: 'updated-rolle-angebote' },
+        { label: 'System Rights', value: 'Systemrecht 1', testId: 'updated-rolle-systemrecht' },
+      ],
+      backButtonText: 'Back to List',
+      createAnotherButtonText: 'Create Another',
+      showCreateAnotherButton: true,
     },
     global: {
       components: {
@@ -37,6 +36,6 @@ beforeEach(() => {
 
 describe('SuccessTemplate', () => {
   test('it displays the success message and data correctly', () => {
-    expect(wrapper?.get('[data-testid="rolle-success-text"]').text()).toBe('Die Rolle wurde erfolgreich geändert.');
+    expect(wrapper?.get('[data-testid="success-text"]').text()).toBe('Role updated successfully');
   });
 });
