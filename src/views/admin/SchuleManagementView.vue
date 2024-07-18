@@ -1,15 +1,10 @@
 <script setup lang="ts">
-  import { computed, onMounted, type ComputedRef } from 'vue';
+  import { onMounted } from 'vue';
   import ResultTable from '@/components/admin/ResultTable.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { type Composer, useI18n } from 'vue-i18n';
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
-  import {
-    OrganisationsTyp,
-    useOrganisationStore,
-    type Organisation,
-    type OrganisationStore,
-  } from '@/stores/OrganisationStore';
+  import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
 
   const organisationStore: OrganisationStore = useOrganisationStore();
 
@@ -25,15 +20,11 @@
     { title: t('admin.schule.schulname'), key: 'name', align: 'start' },
   ];
 
-  const filteredOrganisationen: ComputedRef<Organisation[]> = computed(() => {
-    // filter the organisations to only include the ones from Typ "Schule"
-    return organisationStore.allOrganisationen.filter(
-      (organisation: Organisation) => organisation.typ === OrganisationsTyp.Schule,
-    );
-  });
-
   onMounted(async () => {
-    await organisationStore.getAllOrganisationen({ systemrechte: ['SCHULEN_VERWALTEN'] });
+    await organisationStore.getAllOrganisationen({
+      includeTyp: OrganisationsTyp.Schule,
+      systemrechte: ['SCHULEN_VERWALTEN'],
+    });
   });
 </script>
 
@@ -48,7 +39,7 @@
     <LayoutCard :header="$t('admin.schule.management')">
       <ResultTable
         data-testid="schule-table"
-        :items="filteredOrganisationen || []"
+        :items="organisationStore.allOrganisationen || []"
         :loading="organisationStore.loading"
         :headers="headers"
         @onUpdateTable="organisationStore.getAllOrganisationen({ systemrechte: ['SCHULEN_VERWALTEN'] })"
