@@ -155,9 +155,8 @@
   });
 
   const handleCreateAnotherKlasse = async (): Promise<void> => {
-    await personenkontextStore.processWorkflowStep();
     organisationStore.createdKlasse = null;
-    resetForm();
+    await personenkontextStore.processWorkflowStep();
     router.push({ name: 'create-klasse' });
   };
 
