@@ -72,6 +72,15 @@
       "addedSuccessfully": "{firstname} {lastname} wurde erfolgreich hinzugefügt.",
       "addNew": "Neuen Benutzer hinzufügen",
       "changePassword": "Passwort ändern",
+      "twoFactorAuthentication":{
+        "setUpShort": "2FA einrichten",
+        "setUpLong": "Zwei-Faktor-Authentifizierung einrichten",
+        "header": "Zwei-Faktor-Authentifizierung (2FA)",
+        "softwareTokenOption":"Software-Token einrichten",
+        "softwareTokenText": "(i) Ein QR-Code wird generiert, welcher direkt eingescannt oder ausgedruckt werden kann.",
+        "hardwareTokenOption":"Hardware-Token zuordnen",
+        "hardwareTokenText": "(i) Der Hardware-Token muss vorliegen und funktionieren. Bitte notieren Sie, wem Sie den Token gegeben haben."
+      },
       "copyPasswordError": "Passwort konnte nicht in die Zwischenablage kopiert werden",
       "copyPasswordSuccess": "Passwort in Zwischenablage kopiert",
       "create": "Benutzer anlegen",
@@ -86,7 +95,7 @@
       "edit": "Benutzer bearbeiten",
       "generatedPassword": "Generiertes Passwort",
       "loadingErrorText": "Es konnten keine Benutzerdaten geladen werden.",
-      "loadingErrorTitle": "Fehler beim Laden des Benutzers.",
+      "loadingErrorTitle": "Fehler beim Laden des Benutzers",
       "management": "Benutzerverwaltung",
       "personalInfo": "Persönliche Informationen",
       "resetPasswordConfirmation": "Sind Sie sicher, dass Sie das Passwort für {firstname} {lastname} zurücksetzen möchten?",
@@ -127,12 +136,15 @@
       "createAnother": "Weitere Rolle anlegen",
       "createNew": "Neue Rolle anlegen",
       "discard": "Rolle verwerfen",
+      "edit": "Rolle bearbeiten",
       "enterRollenname": "Rollenname eingeben",
       "errors": {
         "ADD_SYSTEMRECHT_ERROR": "Das Systemrecht konnte nicht hinzugefügt werden.",
         "ROLLE_ERROR": "Die Rolle konnte nicht angelegt werden."
       },
       "isAllowedToManageRollen": "Darf Rollen verwalten",
+      "loadingErrorText": "Es konnten keine Rollendaten geladen werden.",
+      "loadingErrorTitle": "Fehler beim Laden der Rolle",
       "management": "Rollenverwaltung",
       "mappingFrontBackEnd": {
         "systemrechte": {
@@ -162,6 +174,7 @@
       "rolleCreateErrorTitle": "Fehler beim Anlegen der Rolle",
       "rolleCreateErrorText": "Die Rolle konnte nicht angelegt werden.",
       "rolleFound": "{total} Rolle gefunden",
+      "rolleInfo": "Rolleninformationen",
       "rollenart": "Rollenart",
       "rollenFound": "{count} Rolle gefunden | {count} Rollen gefunden",
       "rollenname": "Rollenname",
@@ -248,13 +261,18 @@
     "status": "Status"
   },
   "cancel": "Abbrechen",
+  "proceed": "Weiter",
   "close": "Schließen",
   "edit": "Bearbeiten",
   "errors": {
     "KEYCLOAK_CLIENT_ERROR": "Die Anmeldung ist momentan nicht möglich.",
     "UNSPECIFIED_ERROR": "Es ist ein Fehler aufgetreten.",
     "USER_AUTHENTICATION_FAILED_ERROR": "Ihr Benutzername oder Ihr Passwort war falsch. Versuchen Sie es erneut oder wenden Sie sich an Ihre schulischen Administratorinnen und Administratoren.",
-    "NOT_FOUND": "Die aufgerufene Seite wurde nicht gefunden."
+    "NOT_FOUND": "Die aufgerufene Seite wurde nicht gefunden.",
+    "UNKNOWN_USER": {
+      "title": "Unbekannter Benutzer",
+      "text": "Der Benutzer ist im Schulportal SH nicht bekannt."
+    }
   },
   "footer": {
     "accessibility": "Barrierefreiheit",
@@ -295,6 +313,9 @@
   "pleaseSelect": "Bitte auswählen",
   "person": {
     "addZuordnung": "Schulzuordnung hinzufügen",
+    "addZuordnungSuccess": "Die Zuordnung wurde erfolgreich hinzugefügt.",
+    "addZuordnungConfirmation": "Wollen Sie die Schulzuordnung als {rollenname} hinzufügen?",
+    "addZuordnungKlasseConfirmation": "Wollen Sie die Schulzuordnung als {rollenname} in Klasse {klassenname} hinzufügen?",
     "addZuordnungNotAllowed": "Diese Aktion ist nach Auswahl einer Schulzuordnung nicht ausführbar.",
     "cannotDeleteOwnZuordnung": "Sie dürfen ich selbst keine Zuordnungen entziehen.",
     "checkAndSave": "Bitte prüfen und abschließend speichern, um die Aktion auszuführen",
@@ -320,11 +341,13 @@
     "noChangesToSave": "Es liegen keine zu speichernden Änderungen vor.",
     "noZuordnungenFound": "Keine Schulzuordnungen gefunden.",
     "password": "Passwort",
+    "twoFactorAuthenticationSetUpHeader": "Zwei-Faktor-Authentifizierung (2FA)",
     "removeZuordnung": "Schulzuordnung entfernen",
     "removeZuordnungDescription": "Entfernt den Benutzer von der Schule.",
     "rolle": "Rolle",
     "userName": "Benutzername",
     "saveChanges": "Änderungen speichern",
+    "willBeCreated": "wird hinzugefügt",
     "willBeRemoved": "wird entfernt",
     "zuordnungen": "Schulzuordnung(en)",
     "zuordnung": "Schulzuordnung"

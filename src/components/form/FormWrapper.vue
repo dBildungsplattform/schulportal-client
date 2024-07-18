@@ -3,17 +3,27 @@
   import { useDisplay } from 'vuetify';
   import LayoutCard from '../cards/LayoutCard.vue';
 
+  // Define the type for the props
   type Props = {
     confirmUnsavedChangesAction: () => void;
+    canCommit: boolean;
     createButtonLabel: string;
     discardButtonLabel: string;
+    hideActions?: boolean;
     id: string;
     onDiscard: () => void;
     onSubmit: () => void;
     showUnsavedChangesDialog?: boolean;
   };
+  // Type annotation for props
+  type PropsWithDefaults = Props & {
+    canCommit: boolean;
+  };
 
-  const props: Props = defineProps<Props>();
+  // Explicitly type the props with default values
+  const props: PropsWithDefaults = withDefaults(defineProps<Props>(), {
+    canCommit: true,
+  });
 
   const emit: (event: 'onShowDialogChange', ...args: unknown[]) => void = defineEmits(['onShowDialogChange']);
 
@@ -52,8 +62,12 @@
       class="border-opacity-100 rounded"
       color="#E5EAEF"
       thickness="5px"
+      v-if="!hideActions"
     ></v-divider>
-    <v-row class="py-3 px-2 justify-center">
+    <v-row
+      class="py-3 px-2 justify-center"
+      v-if="!hideActions"
+    >
       <v-spacer class="hidden-sm-and-down"></v-spacer>
       <v-col
         cols="12"
@@ -77,6 +91,7 @@
           :block="mdAndDown"
           class="primary"
           :data-testid="`${id}-create-button`"
+          :disabled="!canCommit"
           type="submit"
           >{{ createButtonLabel }}</v-btn
         >

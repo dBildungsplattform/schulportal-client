@@ -140,6 +140,8 @@
 
   async function setSchuleFilter(newValue: Array<string>): Promise<void> {
     await searchFilterStore.setSchuleFilter(newValue);
+    await searchFilterStore.setKlasseFilter([]);
+    selectedKlassen.value = [];
     if (selectedSchulen.value.length) {
       await organisationStore.getFilteredKlassen({
         administriertVon: selectedSchulen.value,
@@ -260,6 +262,10 @@
     await organisationStore.getAllOrganisationen({
       includeTyp: OrganisationsTyp.Schule,
       systemrechte: ['PERSONEN_VERWALTEN'],
+    });
+    await organisationStore.getFilteredKlassen({
+      includeTyp: OrganisationsTyp.Klasse,
+      systemrechte: ['KLASSEN_VERWALTEN'],
     });
     await personenkontextStore.getAllPersonenuebersichten();
     await rolleStore.getAllRollen('');

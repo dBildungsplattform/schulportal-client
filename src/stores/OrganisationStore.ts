@@ -94,7 +94,7 @@ export const useOrganisationStore: StoreDefinition<
       try {
         const response: AxiosResponse<Organisation[]> = await organisationApi.organisationControllerFindOrganizations(
           undefined,
-          undefined,
+          25,
           undefined,
           undefined,
           filter?.searchString,
@@ -126,7 +126,7 @@ export const useOrganisationStore: StoreDefinition<
       try {
         const response: AxiosResponse<Organisation[]> = await organisationApi.organisationControllerFindOrganizations(
           undefined,
-          undefined,
+          25,
           undefined,
           undefined,
           filter?.searchString,
@@ -173,7 +173,10 @@ export const useOrganisationStore: StoreDefinition<
       try {
         const response: AxiosResponse<Organisation[]> =
           await organisationApi.organisationControllerGetAdministrierteOrganisationen(organisationId, searchFilter);
-        this.klassen = response.data;
+        const getFilteredKlassen: Organisation[] = response.data.filter(
+          (orga: Organisation) => orga.typ === OrganisationsTyp.Klasse,
+        );
+        this.klassen = getFilteredKlassen;
         this.totalKlassen = +response.headers['x-paging-total'];
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';

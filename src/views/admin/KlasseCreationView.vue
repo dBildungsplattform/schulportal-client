@@ -23,12 +23,18 @@
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import { useDisplay } from 'vuetify';
+  import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
   const { t }: Composer = useI18n({ useScope: 'global' });
   const router: Router = useRouter();
   const organisationStore: OrganisationStore = useOrganisationStore();
+  const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
+
+  const timerId: Ref<ReturnType<typeof setTimeout> | undefined> = ref<ReturnType<typeof setTimeout>>();
+  let isSearching: boolean = false;
+  const hasAutoselectedSchule: Ref<boolean> = ref(false);
 
   const validationSchema: TypedSchema = toTypedSchema(
     object({
@@ -59,7 +65,7 @@
   };
 
   // eslint-disable-next-line @typescript-eslint/typedef
-  const { defineField, handleSubmit, isFieldDirty, resetForm } = useForm<KlasseCreationForm>({
+  const { defineField, handleSubmit, isFieldDirty, resetForm, resetField } = useForm<KlasseCreationForm>({
     validationSchema,
   });
 
@@ -75,7 +81,7 @@
   const searchInputSchule: Ref<string> = ref('');
 
   const schulen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
-    return organisationStore.allOrganisationen
+    return personenkontextStore.workflowStepResponse?.organisations
       .slice(0, 25)
       .filter((org: Organisation) => org.typ === OrganisationsTyp.Schule)
       .map((org: Organisation) => ({
@@ -92,13 +98,36 @@
       )?.title || '',
   );
 
+  const selectedSchuleTitle: ComputedRef<string> = computed(() => {
+    return schulen.value?.find((schule: TranslatedObject) => schule.value === selectedSchule.value)?.title || '';
+  });
+
   // Watcher to detect when the search input for Organisationen is triggered.
-  watch(searchInputSchule, async (newValue: string, _oldValue: string) => {
-    if (newValue.length >= 3) {
-      organisationStore.getAllOrganisationen({ searchString: newValue, systemrechte: ['KLASSEN_VERWALTEN'] });
-    } else {
-      // If newValue has less than 3 characters, use an empty string instead of newValue to show all organisationen under the selectedRolle.
-      organisationStore.getAllOrganisationen({ systemrechte: ['KLASSEN_VERWALTEN'] });
+  watch(searchInputSchule, async (newValue: string, oldValue: string) => {
+    clearTimeout(timerId.value);
+    if (oldValue === selectedSchuleTitle.value) return;
+    isSearching = !!newValue;
+
+    if (newValue === '' && !selectedSchule.value) {
+      timerId.value = setTimeout(async () => {
+        await personenkontextStore.processWorkflowStep({
+          limit: 25,
+        });
+      }, 500);
+    } else if (newValue && newValue !== selectedSchuleTitle.value) {
+      resetField('selectedSchule');
+      timerId.value = setTimeout(async () => {
+        await personenkontextStore.processWorkflowStep({
+          organisationName: newValue,
+          limit: 25,
+        });
+      }, 500);
+    } else if (newValue === '' && selectedSchule.value) {
+      timerId.value = setTimeout(async () => {
+        await personenkontextStore.processWorkflowStep({
+          limit: 25,
+        });
+      }, 500);
     }
   });
 
@@ -132,8 +161,8 @@
   };
 
   async function navigateBackToKlasseForm(): Promise<void> {
-    await router.push({ name: 'create-klasse' });
     organisationStore.errorCode = '';
+    await router.push({ name: 'create-klasse' });
   }
 
   async function navigateToKlasseManagement(): Promise<void> {
@@ -159,14 +188,31 @@
     resetForm();
   });
 
+  // Watcher for schulen to auto-select if there is only one
+  watch(
+    () => schulen.value,
+    (newSchulen: TranslatedObject[] | undefined) => {
+      if (!isSearching && newSchulen && newSchulen.length === 1) {
+        hasAutoselectedSchule.value = true;
+        selectedSchule.value = newSchulen[0]?.value || '';
+      }
+    },
+    { immediate: true },
+  );
+
   onMounted(async () => {
-    organisationStore.getAllOrganisationen({ systemrechte: ['KLASSEN_VERWALTEN'] });
+    await personenkontextStore.processWorkflowStep();
     /* listen for browser changes and prevent them when form is dirty */
     window.addEventListener('beforeunload', preventNavigation);
   });
 
   onUnmounted(() => {
     window.removeEventListener('beforeunload', preventNavigation);
+  });
+
+  // Clear the store on leaving the route
+  onBeforeRouteLeave(() => {
+    personenkontextStore.workflowStepResponse = null;
   });
 </script>
 
@@ -216,8 +262,11 @@
             <v-autocomplete
               autocomplete="off"
               clearable
+              :class="[{ 'filter-dropdown mb-4': hasAutoselectedSchule }, { selected: selectedSchule }]"
               data-testid="schule-select"
               density="compact"
+              :disabled="hasAutoselectedSchule"
+              hide-details
               id="schule-select"
               :items="schulen"
               item-value="value"
