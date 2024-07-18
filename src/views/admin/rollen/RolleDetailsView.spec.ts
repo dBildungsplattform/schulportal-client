@@ -46,7 +46,6 @@ beforeEach(async () => {
     routes,
   });
 
-
   router.push('/');
   await router.isReady();
 
@@ -93,5 +92,46 @@ describe('RolleDetailsView', () => {
     await nextTick();
 
     expect(wrapper?.find('[data-testid="rolle-changes-save"]').isVisible()).toBe(true);
+  });
+
+  test('submits the form and shows the success template', async () => {
+    rolleStore.updatedRolle = null;
+    rolleStore.errorCode = '';
+
+    await wrapper?.find('[data-testid="rolle-edit-button"]').trigger('click');
+    await nextTick();
+
+    const rolleFormWrapper: VueWrapper<never, never> | undefined = wrapper?.findComponent({ name: 'RolleForm' });
+
+    // Set the administrationsebene and rollenart first
+    await rolleFormWrapper?.findComponent({ ref: 'administrationsebene-select' }).setValue('1');
+    await nextTick();
+
+    await rolleFormWrapper?.findComponent({ ref: 'rollenart-select' }).setValue('LEHR');
+    await nextTick();
+
+    await rolleFormWrapper?.findComponent({ ref: 'rollenname-input' }).setValue('Updated Lehrer');
+    await nextTick();
+
+    await wrapper?.find('[data-testid="rolle-changes-save"]').trigger('click');
+    await nextTick();
+
+    rolleStore.updatedRolle = {
+      administeredBySchulstrukturknoten: '1234',
+      rollenart: 'LEHR',
+      name: 'Updated Lehrer',
+      merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RollenMerkmal>,
+      systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
+      createdAt: '2022',
+      updatedAt: '2023',
+      id: '1',
+      serviceProviders: [{ id: 'sp1', name: 'ServiceProvider1' }],
+    };
+    await nextTick();
+
+
+    const successTemplate: VueWrapper<never, never> | undefined = wrapper?.findComponent({ name: 'SuccessTemplate' });
+
+    expect(successTemplate?.find('[data-testid="success-text"]').text()).toBe('Die Rolle wurde erfolgreich geändert.');
   });
 });
