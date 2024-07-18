@@ -1,26 +1,24 @@
-<!-- SuccessTemplate.vue -->
 <script setup lang="ts">
-  import { defineProps } from 'vue';
-  import { useRouter, type Router } from 'vue-router';
-  import type { ComputedRef, Ref } from 'vue';
-  import type { RolleStore } from '@/stores/RolleStore';
+  import { defineProps, defineEmits, type Ref } from 'vue';
+  import { useI18n } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
-  import { type Composer, useI18n } from 'vue-i18n';
 
   defineProps<{
-    rolleStore: RolleStore;
-    translatedUpdatedRolleMerkmale: ComputedRef<string>;
-    translatedUpdatedAngebote: ComputedRef<string>;
-    translatedUpdatedSystemrecht: ComputedRef<string>;
+    successMessage: string;
+    followingDataCreated: string;
+    createdData: Array<{ label: string; value: string; testId: string }>;
+    backButtonText: string;
+    createAnotherButtonText: string;
+    showCreateAnotherButton: boolean;
   }>();
 
-  const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
-  const { t }: Composer = useI18n({ useScope: 'global' });
-  const router: Router = useRouter();
+  const emit = defineEmits(['navigateBack', 'createAnother']);
 
-  const backToDetails = (): void => {
-    router.go(0);
-  };
+  const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
+  useI18n({ useScope: 'global' });
+
+  const navigateBack = (): void => emit('navigateBack');
+  const createAnother = (): void => emit('createAnother');
 </script>
 
 <template>
@@ -30,7 +28,7 @@
         class="subtitle-1"
         cols="auto"
       >
-        <span data-testid="rolle-success-text">{{ t('admin.rolle.rolleUpdatedSuccessfully') }}</span>
+        <span data-testid="success-text">{{ successMessage }}</span>
       </v-col>
     </v-row>
     <v-row justify="center">
@@ -47,31 +45,16 @@
         class="subtitle-2"
         cols="auto"
       >
-        {{ t('admin.followingDataCreated') }}
+        {{ followingDataCreated }}
       </v-col>
     </v-row>
-    <v-row>
-      <v-col class="text-body bold text-right">{{ t('admin.rolle.rollenname') }}:</v-col>
+    <v-row
+      v-for="(item, index) in createdData"
+      :key="index"
+    >
+      <v-col class="text-body bold text-right">{{ item.label }}:</v-col>
       <v-col class="text-body">
-        <span data-testid="updated-rolle-name">{{ rolleStore.updatedRolle?.name }}</span>
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col class="text-body bold text-right">{{ t('admin.rolle.merkmale') }}:</v-col>
-      <v-col class="text-body">
-        <span data-testid="updated-rolle-merkmale">{{ translatedUpdatedRolleMerkmale }}</span>
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col class="text-body bold text-right">{{ t('admin.serviceProvider.assignedServiceProvider') }}:</v-col>
-      <v-col class="text-body">
-        <span data-testid="updated-rolle-angebote">{{ translatedUpdatedAngebote }}</span>
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col class="text-body bold text-right">{{ t('admin.rolle.systemrechte') }}:</v-col>
-      <v-col class="text-body">
-        <span data-testid="updated-rolle-systemrecht">{{ translatedUpdatedSystemrecht }}</span>
+        <span :data-testid="item.testId">{{ item.value }}</span>
       </v-col>
     </v-row>
     <v-divider
@@ -87,12 +70,23 @@
       >
         <v-btn
           class="secondary"
-          data-testid="back-to-details-button"
           :block="mdAndDown"
-          @click="backToDetails"
+          @click="navigateBack"
+          >{{ backButtonText }}</v-btn
         >
-          {{ t('nav.backToDetails') }}
-        </v-btn>
+      </v-col>
+      <v-col
+        cols="12"
+        sm="6"
+        md="auto"
+        v-if="showCreateAnotherButton"
+      >
+        <v-btn
+          class="primary button"
+          :block="mdAndDown"
+          @click="createAnother"
+          >{{ createAnotherButtonText }}</v-btn
+        >
       </v-col>
     </v-row>
   </v-container>

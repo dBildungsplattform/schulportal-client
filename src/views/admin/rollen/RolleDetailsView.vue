@@ -327,6 +327,7 @@
   });
 
   onBeforeRouteLeave((_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
+    rolleStore.errorCode = '';
     if (isFormDirty()) {
       showUnsavedChangesDialog.value = true;
       blockedNext = next;
@@ -471,10 +472,30 @@
       <!-- Result template on success after submit  -->
       <template v-if="rolleStore.updatedRolle && !rolleStore.errorCode">
         <SuccessTemplate
-          :rolleStore="rolleStore"
-          :translatedUpdatedRolleMerkmale="translatedUpdatedRolleMerkmale"
-          :translatedUpdatedAngebote="translatedUpdatedAngebote"
-          :translatedUpdatedSystemrecht="translatedUpdatedSystemrecht"
+          :successMessage="$t('admin.rolle.rolleUpdatedSuccessfully')"
+          :followingDataCreated="$t('admin.followingDataCreated')"
+          :createdData="[
+            { label: $t('admin.rolle.rollenname'), value: rolleStore.updatedRolle?.name, testId: 'updated-rolle-name' },
+            {
+              label: $t('admin.rolle.merkmale'),
+              value: translatedUpdatedRolleMerkmale,
+              testId: 'updated-rolle-merkmale',
+            },
+            {
+              label: $t('admin.serviceProvider.assignedServiceProvider'),
+              value: translatedUpdatedAngebote,
+              testId: 'updated-rolle-angebote',
+            },
+            {
+              label: $t('admin.rolle.systemrechte'),
+              value: translatedUpdatedSystemrecht,
+              testId: 'updated-rolle-systemrecht',
+            },
+          ]"
+          :backButtonText="$t('nav.backToDetails')"
+          :createAnotherButtonText="$t('admin.rolle.createAnother')"
+          :showCreateAnotherButton="false"
+          @navigateBack="router.go(0)"
         />
       </template>
     </LayoutCard>
