@@ -1,7 +1,7 @@
 <!-- SuccessTemplate.vue -->
 <script setup lang="ts">
   import { defineProps } from 'vue';
-  import { Router, useRouter } from 'vue-router';
+  import { useRouter, type Router } from 'vue-router';
   import type { ComputedRef, Ref } from 'vue';
   import type { RolleStore } from '@/stores/RolleStore';
   import { useDisplay } from 'vuetify';
