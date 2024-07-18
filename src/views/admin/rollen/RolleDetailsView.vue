@@ -495,7 +495,7 @@
           :backButtonText="$t('nav.backToDetails')"
           :createAnotherButtonText="$t('admin.rolle.createAnother')"
           :showCreateAnotherButton="false"
-          @navigateBack="router.go(0)"
+          @onNavigateBack="router.go(0)"
         />
       </template>
     </LayoutCard>

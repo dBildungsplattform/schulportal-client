@@ -12,13 +12,18 @@
     showCreateAnotherButton: boolean;
   }>();
 
-  const emit = defineEmits(['navigateBack', 'createAnother']);
+  type Emits = {
+    (event: 'OnNavigateBack'): void;
+    (event: 'OnCreateAnother'): void;
+  };
+
+  const emit: Emits = defineEmits<Emits>();
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
   useI18n({ useScope: 'global' });
 
-  const navigateBack = (): void => emit('navigateBack');
-  const createAnother = (): void => emit('createAnother');
+  const navigateBack = (): void => emit('OnNavigateBack');
+  const createAnother = (): void => emit('OnCreateAnother');
 </script>
 
 <template>

@@ -387,8 +387,8 @@
           :backButtonText="$t('nav.backToList')"
           :createAnotherButtonText="$t('admin.rolle.createAnother')"
           :showCreateAnotherButton="true"
-          @navigateBack="navigateToRolleManagement"
-          @createAnother="handleCreateAnotherRolle"
+          @OnNavigateBack="navigateToRolleManagement"
+          @OnCreateAnother="handleCreateAnotherRolle"
         />
       </template>
     </LayoutCard>
