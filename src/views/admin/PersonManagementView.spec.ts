@@ -74,6 +74,7 @@ beforeEach(() => {
         vorname: 'Samuel',
         nachname: 'Vimes',
         benutzername: 'string',
+        lastModifiedZuordnungen: null,
         zuordnungen: [
           {
             sskId: 'string',
