@@ -151,36 +151,30 @@
 
     // Combine remaining Zuordnungen and filtered Klassen Zuordnungen
     const combinedZuordnungen: Zuordnung[] | undefined = remainingZuordnungen?.concat(filteredKlassenZuordnungen || []);
+    await personenkontextStore.updatePersonenkontexte(combinedZuordnungen, currentPersonId);
+    zuordnungenResult.value = combinedZuordnungen;
+    selectedZuordnungen.value = [];
 
-    try {
-      await personenkontextStore.updatePersonenkontexte(combinedZuordnungen, currentPersonId);
-      zuordnungenResult.value = combinedZuordnungen;
-      selectedZuordnungen.value = [];
+    // Filter out Zuordnungen with editable === false
+    const editableZuordnungen: Zuordnung[] | undefined = combinedZuordnungen?.filter(
+      (zuordnung: Zuordnung) => zuordnung.editable,
+    );
 
-      // Filter out Zuordnungen with editable === false
-      const editableZuordnungen: Zuordnung[] | undefined = combinedZuordnungen?.filter(
-        (zuordnung: Zuordnung) => zuordnung.editable,
-      );
+    deleteSuccessDialogVisible.value = !personenkontextStore.errorCode;
 
-      deleteSuccessDialogVisible.value = true;
-
-      if (!editableZuordnungen || editableZuordnungen.length === 0) {
-        // If no editable Zuordnungen are left, navigate to person table after the dialog is closed
-        closeDeleteSuccessDialog = (): void => {
-          deleteSuccessDialogVisible.value = false;
-          navigateToPersonTable();
-        };
-      } else {
-        closeDeleteSuccessDialog = (): void => {
-          deleteSuccessDialogVisible.value = false;
-          router.push(route).then(() => {
-            router.go(0);
-          });
-        };
-      }
-    } catch {
-      creationErrorText.value = t(`admin.personenkontext.errors.${personenkontextStore.errorCode}`);
-      creationErrorTitle.value = t(`admin.personenkontext.title.${personenkontextStore.errorCode}`);
+    if (!editableZuordnungen || editableZuordnungen.length === 0) {
+      // If no editable Zuordnungen are left, navigate to person table after the dialog is closed
+      closeDeleteSuccessDialog = (): void => {
+        deleteSuccessDialogVisible.value = false;
+        navigateToPersonTable();
+      };
+    } else {
+      closeDeleteSuccessDialog = (): void => {
+        deleteSuccessDialogVisible.value = false;
+        router.push(route).then(() => {
+          router.go(0);
+        });
+      };
     }
   };
 
@@ -341,17 +335,22 @@
       : undefined;
   };
 
-  // This will send the updated list of Zuordnungen to the Backend on TOP of the new added one through the form.
-  const confirmAddition = async (): Promise<void> => {
-    try {
-      await personenkontextStore.updatePersonenkontexte(finalZuordnungen.value, currentPersonId);
-      createSuccessDialogVisible.value = true;
-      resetForm();
-    } catch {
+  function handleStoreUpdates(): void {
+    if (personenkontextStore.errorCode) {
       creationErrorText.value = t(`admin.personenkontext.errors.${personenkontextStore.errorCode}`);
       creationErrorTitle.value = t(`admin.personenkontext.title.${personenkontextStore.errorCode}`);
     }
-  };
+  }
+
+  watch(() => personenkontextStore.errorCode, handleStoreUpdates);
+  watch(() => personenkontextStore.loading, handleStoreUpdates);
+
+  // This will send the updated list of Zuordnungen to the Backend on TOP of the new added one through the form.
+  async function confirmAddition(): Promise<void> {
+    await personenkontextStore.updatePersonenkontexte(finalZuordnungen.value, currentPersonId);
+    createSuccessDialogVisible.value = !personenkontextStore.errorCode;
+    resetForm();
+  }
 
   // The save button will act according to what kind of pending action we have.
   const handleSaveClick = (): void => {
@@ -506,16 +505,16 @@
 
       <!-- Error Message Display if the personenkontextStore throws any kind of error (Not being able to load the person) -->
       <SpshAlert
-  :model-value="!!personenkontextStore.errorCode"
-  :type="'error'"
-  :closable="false"
-  :text="creationErrorText"
-  :showButton="true"
-  :buttonText="alertButtonText"
-  :buttonAction="alertButtonAction"
-  :title="creationErrorTitle"
-  @update:modelValue="handleAlertClose"
-/>
+        :model-value="!!personenkontextStore.errorCode"
+        :type="'error'"
+        :closable="false"
+        :text="creationErrorText"
+        :showButton="true"
+        :buttonText="alertButtonText"
+        :buttonAction="alertButtonAction"
+        :title="creationErrorTitle"
+        @update:modelValue="handleAlertClose"
+      />
 
       <template v-if="!personStore.errorCode && !personenkontextStore.errorCode">
         <v-container class="personal-info">

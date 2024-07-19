@@ -104,10 +104,7 @@ type PersonenkontextActions = {
   processWorkflowStep: (filter?: WorkflowFilter) => Promise<PersonenkontextWorkflowResponse>;
   getPersonenkontextRolleWithFilter: (rolleName: string, limit: number) => Promise<void>;
   getPersonenkontextAdministrationsebeneWithFilter: (rolleId: string, sskName: string, limit: number) => Promise<void>;
-  updatePersonenkontexte: (
-    combinedZuordnungen: Zuordnung[] | undefined,
-    personId: string,
-  ) => Promise<PersonenkontexteUpdateResponse>;
+  updatePersonenkontexte: (combinedZuordnungen: Zuordnung[] | undefined, personId: string) => Promise<void>;
   createPersonenkontext: (
     personenkontext: DbiamPersonenkontextBodyParams,
     personenKontextTyp: PersonenKontextTyp,
@@ -269,11 +266,9 @@ export const usePersonenkontextStore: StoreDefinition<
         this.loading = false;
       }
     },
-    async updatePersonenkontexte(
-      combinedZuordnungen: Zuordnung[] | undefined,
-      personId: string,
-    ): Promise<PersonenkontexteUpdateResponse> {
+    async updatePersonenkontexte(combinedZuordnungen: Zuordnung[] | undefined, personId: string): Promise<void> {
       this.loading = true;
+      this.errorCode = '';
       try {
         const updateParams: DbiamUpdatePersonenkontexteBodyParams = {
           lastModified: this.personenuebersicht?.lastModifiedZuordnungen ?? new Date().toISOString(),
@@ -284,15 +279,12 @@ export const usePersonenkontextStore: StoreDefinition<
             rolleId: zuordnung.rolleId,
           })) as DbiamPersonenkontextBodyParams[],
         };
-        const { data }: { data: PersonenkontexteUpdateResponse } =
-          await personenKontextApi.dbiamPersonenkontextWorkflowControllerCommit(personId, updateParams);
-        return data;
+        await personenKontextApi.dbiamPersonenkontextWorkflowControllerCommit(personId, updateParams);
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
           this.errorCode = error.response?.data.i18nKey || 'PERSONENKONTEXTE_UPDATE_ERROR';
         }
-        return await Promise.reject(this.errorCode);
       } finally {
         this.loading = false;
       }
