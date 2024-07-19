@@ -132,9 +132,9 @@
   });
 
   function isFormDirty(): boolean {
-    return isFieldDirty('selectedSchule') || isFieldDirty('selectedKlassenname');
+    const schuleDirty: boolean = hasAutoselectedSchule.value ? false : isFieldDirty('selectedSchule');
+    return schuleDirty || isFieldDirty('selectedKlassenname');
   }
-
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
   let blockedNext: () => void = () => {};
 
