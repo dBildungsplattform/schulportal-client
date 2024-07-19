@@ -387,6 +387,8 @@
           :backButtonText="$t('nav.backToList')"
           :createAnotherButtonText="$t('admin.rolle.createAnother')"
           :showCreateAnotherButton="true"
+          backButtonTestId="back-to-list-button"
+          createAnotherButtonTestId="create-another-rolle-button"
           @OnNavigateBack="navigateToRolleManagement"
           @OnCreateAnother="handleCreateAnotherRolle"
         />

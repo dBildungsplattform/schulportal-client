@@ -10,6 +10,8 @@
     backButtonText: string;
     createAnotherButtonText: string;
     showCreateAnotherButton: boolean;
+    backButtonTestId: string;
+    createAnotherButtonTestId: string;
   }>();
 
   type Emits = {
@@ -75,6 +77,7 @@
       >
         <v-btn
           class="secondary"
+          :data-testid="backButtonTestId"
           :block="mdAndDown"
           @click="navigateBack"
           >{{ backButtonText }}</v-btn
@@ -88,6 +91,7 @@
       >
         <v-btn
           class="primary button"
+           :data-testid="createAnotherButtonTestId"
           :block="mdAndDown"
           @click="createAnother"
           >{{ createAnotherButtonText }}</v-btn
