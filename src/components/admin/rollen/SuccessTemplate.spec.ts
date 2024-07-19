@@ -38,6 +38,6 @@ beforeEach(() => {
 
 describe('SuccessTemplate', () => {
   test('it displays the success message and data correctly', () => {
-    expect(wrapper?.get('[data-testid="success-text"]').text()).toBe('Role updated successfully');
+    expect(wrapper?.get('[data-testid="rolle-success-text"]').text()).toBe('Role updated successfully');
   });
 });
