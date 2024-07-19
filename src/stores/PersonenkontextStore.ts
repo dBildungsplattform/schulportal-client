@@ -87,6 +87,7 @@ export type WorkflowFilter = {
 
 type PersonenkontextState = {
   allUebersichten: DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response | null;
+  updatedPersonenkontexte: PersonenkontexteUpdateResponse | null;
   workflowStepResponse: PersonenkontextWorkflowResponse | null;
   filteredRollen: FindRollenResponse | null;
   filteredOrganisationen: FindSchulstrukturknotenResponse | null;
@@ -148,6 +149,7 @@ export const usePersonenkontextStore: StoreDefinition<
     return {
       allUebersichten: null,
       workflowStepResponse: null,
+      updatedPersonenkontexte: null,
       filteredRollen: null,
       filteredOrganisationen: null,
       personenuebersicht: null,
@@ -279,7 +281,9 @@ export const usePersonenkontextStore: StoreDefinition<
             rolleId: zuordnung.rolleId,
           })) as DbiamPersonenkontextBodyParams[],
         };
-        await personenKontextApi.dbiamPersonenkontextWorkflowControllerCommit(personId, updateParams);
+        const { data }: { data: PersonenkontexteUpdateResponse } =
+          await personenKontextApi.dbiamPersonenkontextWorkflowControllerCommit(personId, updateParams);
+        this.updatedPersonenkontexte = data;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
