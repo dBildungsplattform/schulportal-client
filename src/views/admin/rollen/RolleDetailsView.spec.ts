@@ -129,9 +129,10 @@ describe('RolleDetailsView', () => {
     };
     await nextTick();
 
-
     const successTemplate: VueWrapper<never, never> | undefined = wrapper?.findComponent({ name: 'SuccessTemplate' });
 
-    expect(successTemplate?.find('[data-testid="success-text"]').text()).toBe('Die Rolle wurde erfolgreich geändert.');
+    expect(successTemplate?.find('[data-testid="rolle-success-text"]').text()).toBe(
+      'Die Rolle wurde erfolgreich geändert.',
+    );
   });
 });

@@ -35,7 +35,7 @@
         class="subtitle-1"
         cols="auto"
       >
-        <span data-testid="success-text">{{ successMessage }}</span>
+        <span data-testid="rolle-success-text">{{ successMessage }}</span>
       </v-col>
     </v-row>
     <v-row justify="center">
@@ -91,7 +91,7 @@
       >
         <v-btn
           class="primary button"
-           :data-testid="createAnotherButtonTestId"
+          :data-testid="createAnotherButtonTestId"
           :block="mdAndDown"
           @click="createAnother"
           >{{ createAnotherButtonText }}</v-btn
