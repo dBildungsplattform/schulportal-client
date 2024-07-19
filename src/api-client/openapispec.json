@@ -4699,7 +4699,7 @@
                     "lastModified": {
                         "format": "date-time",
                         "type": "string",
-                        "nullable": false,
+                        "nullable": true,
                         "description": "Date of the most recent changed personenkontext"
                     },
                     "count": {
@@ -4716,7 +4716,6 @@
                     }
                 },
                 "required": [
-                    "lastModified",
                     "count",
                     "personenkontexte"
                 ]

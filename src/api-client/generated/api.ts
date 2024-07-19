@@ -596,7 +596,7 @@ export interface DbiamUpdatePersonenkontexteBodyParams {
      * @type {string}
      * @memberof DbiamUpdatePersonenkontexteBodyParams
      */
-    'lastModified': string;
+    'lastModified'?: string | null;
     /**
      * The amount of personenkontexte
      * @type {number}

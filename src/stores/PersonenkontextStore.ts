@@ -271,7 +271,7 @@ export const usePersonenkontextStore: StoreDefinition<
       this.errorCode = '';
       try {
         const updateParams: DbiamUpdatePersonenkontexteBodyParams = {
-          lastModified: this.personenuebersicht?.lastModifiedZuordnungen ?? new Date().toISOString(),
+          lastModified: this.personenuebersicht?.lastModifiedZuordnungen ?? undefined,
           count: this.personenuebersicht?.zuordnungen.length ?? 0,
           personenkontexte: combinedZuordnungen?.map((zuordnung: Zuordnung) => ({
             personId: personId,
