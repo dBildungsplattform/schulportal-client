@@ -25,6 +25,8 @@ beforeEach(() => {
       backButtonText: 'Back to List',
       createAnotherButtonText: 'Create Another',
       showCreateAnotherButton: true,
+      backButtonTestId: 'back-to-details-button',
+      createAnotherButtonTestId: 'create-another-rolle-button',
     },
     global: {
       components: {
