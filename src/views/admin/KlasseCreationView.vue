@@ -18,12 +18,11 @@
     OrganisationsTyp,
   } from '@/stores/OrganisationStore';
   import { DIN_91379A_EXT } from '@/utils/validation';
-  import FormRow from '@/components/form/FormRow.vue';
-  import FormWrapper from '@/components/form/FormWrapper.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import { useDisplay } from 'vuetify';
   import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
+  import KlasseForm from '@/components/form/KlasseForm.vue';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
@@ -239,71 +238,20 @@
 
       <!-- The form to create a new Klasse -->
       <template v-if="!organisationStore.createdKlasse && !organisationStore.errorCode">
-        <FormWrapper
-          :confirmUnsavedChangesAction="handleConfirmUnsavedChanges"
-          :createButtonLabel="$t('admin.klasse.create')"
-          :discardButtonLabel="$t('admin.klasse.discard')"
-          id="klasse-creation-form"
-          :onDiscard="navigateToKlasseManagement"
-          @onShowDialogChange="(value: boolean) => (showUnsavedChangesDialog = value)"
-          :onSubmit="onSubmit"
+        <KlasseForm
+          :schulen="schulen"
+          :readonly="false"
+          :selectedSchuleProps="selectedSchuleProps"
+          :selectedKlassennameProps="selectedKlassennameProps"
           :showUnsavedChangesDialog="showUnsavedChangesDialog"
-        >
-          <!-- Schule -->
-          <v-row>
-            <h3 class="headline-3">1. {{ $t('admin.schule.assignSchule') }}</h3>
-          </v-row>
-          <FormRow
-            :errorLabel="selectedSchuleProps['error']"
-            labelForId="schule-select"
-            :isRequired="true"
-            :label="$t('admin.schule.schule')"
-          >
-            <v-autocomplete
-              autocomplete="off"
-              clearable
-              :class="[{ 'filter-dropdown mb-4': hasAutoselectedSchule }, { selected: selectedSchule }]"
-              data-testid="schule-select"
-              density="compact"
-              :disabled="hasAutoselectedSchule"
-              hide-details
-              id="schule-select"
-              :items="schulen"
-              item-value="value"
-              item-text="title"
-              :placeholder="$t('admin.schule.assignSchule')"
-              ref="schule-select"
-              required="true"
-              variant="outlined"
-              v-bind="selectedSchuleProps"
-              v-model="selectedSchule"
-              v-model:search="searchInputSchule"
-              :no-data-text="$t('noDataFound')"
-            ></v-autocomplete>
-          </FormRow>
-
-          <!-- Klassenname -->
-          <v-row>
-            <h3 class="headline-3">2. {{ $t('admin.klasse.enterKlassenname') }}</h3>
-          </v-row>
-          <FormRow
-            :errorLabel="selectedKlassennameProps['error']"
-            labelForId="klassenname-input"
-            :isRequired="true"
-            :label="$t('admin.klasse.klassenname')"
-          >
-            <v-text-field
-              data-testid="klassenname-input"
-              v-bind="selectedKlassennameProps"
-              v-model="selectedKlassenname"
-              :placeholder="$t('admin.klasse.enterKlassenname')"
-              ref="klassenname-input"
-              variant="outlined"
-              density="compact"
-              required
-            ></v-text-field>
-          </FormRow>
-        </FormWrapper>
+          :onHandleConfirmUnsavedChanges="handleConfirmUnsavedChanges"
+          :onHandleDiscard="navigateToKlasseManagement"
+          :onShowDialogChange="(value: boolean) => (showUnsavedChangesDialog = value)"
+          :onSubmit="onSubmit"
+          ref="klasse-creation-form"
+          v-model:selectedSchule="selectedSchule"
+          v-model:selectedKlassenname="selectedKlassenname"
+        />
       </template>
 
       <!-- Result template on success after submit  -->

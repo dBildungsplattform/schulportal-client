@@ -12,13 +12,13 @@
   } from 'vue-router';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
-  import RolleForm from '@/components/form/RolleForm.vue';
   import { type Composer, useI18n } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
   import { type BaseFieldProps, type TypedSchema, useForm } from 'vee-validate';
   import { toTypedSchema } from '@vee-validate/yup';
   import { object, string } from 'yup';
   import { DIN_91379A_EXT } from '@/utils/validation';
+  import KlasseForm from '@/components/form/KlasseForm.vue';
 
   const route: RouteLocationNormalizedLoaded = useRoute();
   const router: Router = useRouter();
@@ -69,11 +69,9 @@
   };
 
   // eslint-disable-next-line @typescript-eslint/typedef
-  const { defineField, handleSubmit, isFieldDirty, resetForm, resetField, setFieldValue } = useForm<KlasseCreationForm>(
-    {
-      validationSchema,
-    },
-  );
+  const { defineField, handleSubmit, isFieldDirty, resetForm, setFieldValue } = useForm<KlasseCreationForm>({
+    validationSchema,
+  });
 
   const [selectedSchule, selectedSchuleProps]: [
     Ref<string>,
@@ -129,6 +127,20 @@
     organisationStore.errorCode = '';
     navigateToKlasseManagement();
   };
+
+  const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = handleSubmit(async () => {
+    if (selectedSchule.value && selectedKlassenname.value) {
+      if (organisationStore.currentOrganisation) {
+        try {
+          await organisationStore.updateOrganisation(currentOrganisationId, selectedKlassenname.value);
+        } catch {
+          creationErrorText.value = t(`admin.rolle.errors.${organisationStore.errorCode}`);
+          creationErrorTitle.value = t(`admin.rolle.title.${organisationStore.errorCode}`);
+        }
+      }
+      resetForm();
+    }
+  });
 
   onBeforeMount(async () => {
     organisationStore.errorCode = '';
@@ -192,20 +204,19 @@
       <template v-if="!organisationStore.updatedOrganisation && !organisationStore.errorCode">
         <v-container>
           <div v-if="organisationStore.currentOrganisation">
-            <RolleForm
+            <KlasseForm
+              :readonly="true"
+              :selectedSchuleProps="selectedSchuleProps"
+              :selectedKlassennameProps="selectedKlassennameProps"
+              :showUnsavedChangesDialog="showUnsavedChangesDialog"
               :onHandleConfirmUnsavedChanges="handleConfirmUnsavedChanges"
               :onHandleDiscard="navigateToKlasseManagement"
               :onShowDialogChange="(value: boolean) => (showUnsavedChangesDialog = value)"
               :onSubmit="onSubmit"
-              :isEditActive="isEditActive"
-              :readonly="true"
-              ref="rolle-form"
+              ref="klasse-creation-form"
               v-model:selectedSchule="selectedSchule"
-              :selectedSchuleProps="selectedSchuleProps"
               v-model:selectedKlassenname="selectedKlassenname"
-              :selectedKlassennameProps="selectedKlassennameProps"
-              :showUnsavedChangesDialog="showUnsavedChangesDialog"
-            ></RolleForm>
+            />
             <v-divider
               v-if="isEditActive"
               class="border-opacity-100 rounded"
