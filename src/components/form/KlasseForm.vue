@@ -10,6 +10,7 @@
     selectedSchuleProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     selectedKlassennameProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     showUnsavedChangesDialog?: boolean;
+    isEditActive?: boolean;
     onHandleConfirmUnsavedChanges: () => void;
     onHandleDiscard: () => void;
     onShowDialogChange: (value: boolean) => void;
@@ -77,7 +78,7 @@
         clearable
         data-testid="klassenname-input"
         density="compact"
-        :disabled="readonly"
+        :disabled="!isEditActive"
         id="klassenname-input"
         :placeholder="$t('admin.klasse.enterKlassenname')"
         ref="klassenname-input"

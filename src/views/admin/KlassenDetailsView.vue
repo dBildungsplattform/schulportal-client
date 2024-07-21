@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
+  import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
   import { computed, onBeforeMount, onUnmounted, ref, type ComputedRef, type Ref } from 'vue';
   import {
     type Router,
@@ -83,7 +83,9 @@
   ] = defineField('selectedKlassenname', vuetifyConfig);
 
   function isFormDirty(): boolean {
-    return isFieldDirty('selectedSchule') || isFieldDirty('selectedKlassenname');
+    // Only check for dirtiness if the form is in edit mode
+    if (!isEditActive.value) return false;
+    else return isFieldDirty('selectedSchule') || isFieldDirty('selectedKlassenname');
   }
 
   let blockedNext: () => void = () => {};
@@ -144,11 +146,19 @@
 
   onBeforeMount(async () => {
     organisationStore.errorCode = '';
-    await organisationStore.getOrganisationById(currentOrganisationId);
+    // Retrieves the Klasse using the Id in the route since that's all we have
+    await organisationStore.getOrganisationById(currentOrganisationId, OrganisationsTyp.Klasse);
+    // Retrieves the parent Organisation of the Klasse using the same endpoint but with a different parameter
+    if (organisationStore.currentKlasse?.administriertVon) {
+      await organisationStore.getOrganisationById(
+        organisationStore.currentKlasse.administriertVon,
+        OrganisationsTyp.Schule,
+      );
+    }
 
     // Set the initial values using the computed properties
     setFieldValue('selectedSchule', translatedSchulname.value || '');
-    setFieldValue('selectedKlassenname', organisationStore.currentOrganisation?.name || '');
+    setFieldValue('selectedKlassenname', organisationStore.currentKlasse?.name || '');
 
     /* listen for browser changes and prevent them when form is dirty */
     window.addEventListener('beforeunload', preventNavigation);
@@ -205,6 +215,7 @@
         <v-container>
           <div v-if="organisationStore.currentOrganisation">
             <KlasseForm
+              :isEditActive="isEditActive"
               :readonly="true"
               :selectedSchuleProps="selectedSchuleProps"
               :selectedKlassennameProps="selectedKlassennameProps"

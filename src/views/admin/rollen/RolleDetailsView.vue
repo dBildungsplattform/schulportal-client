@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import { type RolleStore, useRolleStore, RollenMerkmal, RollenSystemRecht } from '@/stores/RolleStore';
-  import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
+  import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
   import { type ServiceProvider } from '@/stores/ServiceProviderStore';
   import { computed, onBeforeMount, ref, type ComputedRef, type Ref } from 'vue';
   import { type Router, useRouter, type RouteLocationNormalizedLoaded, useRoute } from 'vue-router';
@@ -90,7 +90,10 @@
 
   onBeforeMount(async () => {
     await rolleStore.getRolleById(currentRolleId);
-    await organisationStore.getOrganisationById(rolleStore.currentRolle?.administeredBySchulstrukturknoten || '');
+    await organisationStore.getOrganisationById(
+      rolleStore.currentRolle?.administeredBySchulstrukturknoten || '',
+      OrganisationsTyp.Schule,
+    );
   });
 </script>
 

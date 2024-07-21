@@ -308,7 +308,10 @@
       resetForm();
 
       if (rolleStore.createdRolle) {
-        await organisationStore.getOrganisationById(rolleStore.createdRolle.administeredBySchulstrukturknoten);
+        await organisationStore.getOrganisationById(
+          rolleStore.createdRolle.administeredBySchulstrukturknoten,
+          OrganisationsTyp.Schule,
+        );
       }
     }
   });

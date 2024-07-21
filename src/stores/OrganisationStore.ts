@@ -27,6 +27,7 @@ type OrganisationState = {
   allOrganisationen: Array<Organisation>;
   allKlassen: Array<Organisation>;
   currentOrganisation: Organisation | null;
+  currentKlasse: Organisation | null;
   updatedOrganisation: Organisation | null;
   createdKlasse: Organisation | null;
   createdSchule: Organisation | null;
@@ -51,7 +52,7 @@ type OrganisationActions = {
   getAllOrganisationen: (filter?: OrganisationenFilter) => Promise<void>;
   getFilteredKlassen(filter?: OrganisationenFilter): Promise<void>;
   getKlassenByOrganisationId: (organisationId: string, searchFilter?: string) => Promise<void>;
-  getOrganisationById: (organisationId: string) => Promise<Organisation>;
+  getOrganisationById: (organisationId: string, organisationsTyp: OrganisationsTyp) => Promise<Organisation>;
   createOrganisation: (
     kennung: string,
     name: string,
@@ -80,6 +81,7 @@ export const useOrganisationStore: StoreDefinition<
       allOrganisationen: [],
       allKlassen: [],
       currentOrganisation: null,
+      currentKlasse: null,
       updatedOrganisation: null,
       createdKlasse: null,
       createdSchule: null,
@@ -152,13 +154,18 @@ export const useOrganisationStore: StoreDefinition<
       }
     },
 
-    async getOrganisationById(organisationId: string) {
+    async getOrganisationById(organisationId: string, organisationsTyp: OrganisationsTyp) {
       this.errorCode = '';
       this.loading = true;
       try {
         const { data }: { data: Organisation } =
           await organisationApi.organisationControllerFindOrganisationById(organisationId);
-        this.currentOrganisation = data;
+        if (organisationsTyp === OrganisationsTyp.Klasse) {
+          this.currentKlasse = data;
+        } else {
+          this.currentOrganisation = data;
+        }
+
         return data;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
