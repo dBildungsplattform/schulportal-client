@@ -33,6 +33,7 @@
       "klasse": "Klasse",
       "klassen": "Klasse(n)",
       "klasseAddedSuccessfully": "Die Klasse wurde erfolgreich hinzugefügt.",
+      "klasseUpdatedSuccessfully": "Die Klasse wurde erfolgreich geändert. ",
       "klasseCreateErrorTitle": "Fehler beim Anlegen der Klasse",
       "klassenname": "Klassenname",
       "klassenFound": "{count} Klasse gefunden | {count} Klassen gefunden",
@@ -292,6 +293,7 @@
   },
   "nav": {
     "admin": "Schulportal-Administration",
+    "backToDetails": "Zurück zur Gesamtübersicht",
     "backToList": "Zurück zur Ergebnisliste",
     "back": "Zurück",
     "backToStart": "Zurück zur Startseite",

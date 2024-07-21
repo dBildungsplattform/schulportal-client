@@ -3784,7 +3784,7 @@ export const OrganisationenApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async organisationControllerUpdateOrganisationName(organisationId: string, organisationByNameBodyParams: OrganisationByNameBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+        async organisationControllerUpdateOrganisationName(organisationId: string, organisationByNameBodyParams: OrganisationByNameBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<OrganisationResponseLegacy>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.organisationControllerUpdateOrganisationName(organisationId, organisationByNameBodyParams, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -3905,7 +3905,7 @@ export const OrganisationenApiFactory = function (configuration?: Configuration,
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        organisationControllerUpdateOrganisationName(organisationId: string, organisationByNameBodyParams: OrganisationByNameBodyParams, options?: any): AxiosPromise<void> {
+        organisationControllerUpdateOrganisationName(organisationId: string, organisationByNameBodyParams: OrganisationByNameBodyParams, options?: any): AxiosPromise<OrganisationResponseLegacy> {
             return localVarFp.organisationControllerUpdateOrganisationName(organisationId, organisationByNameBodyParams, options).then((request) => request(axios, basePath));
         },
     };
@@ -4025,7 +4025,7 @@ export interface OrganisationenApiInterface {
      * @throws {RequiredError}
      * @memberof OrganisationenApiInterface
      */
-    organisationControllerUpdateOrganisationName(organisationId: string, organisationByNameBodyParams: OrganisationByNameBodyParams, options?: AxiosRequestConfig): AxiosPromise<void>;
+    organisationControllerUpdateOrganisationName(organisationId: string, organisationByNameBodyParams: OrganisationByNameBodyParams, options?: AxiosRequestConfig): AxiosPromise<OrganisationResponseLegacy>;
 
 }
 

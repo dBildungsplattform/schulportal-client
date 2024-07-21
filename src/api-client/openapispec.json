@@ -1722,8 +1722,26 @@
                     }
                 },
                 "responses": {
-                    "201": {
-                        "description": "The organisation was successfully updated."
+                    "200": {
+                        "description": "The organizations were successfully updated.",
+                        "headers": {
+                            "X-Paging-Offset": {
+                                "description": "The offset of the first item from the list. List starts with index 0."
+                            },
+                            "X-Paging-Limit": {
+                                "description": "The maximum amount of items returned in one request."
+                            },
+                            "X-Paging-Total": {
+                                "description": "The total amount of items in the list."
+                            }
+                        },
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OrganisationResponseLegacy"
+                                }
+                            }
+                        }
                     },
                     "400": {
                         "description": "The organisation could not be modified.",

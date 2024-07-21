@@ -7,7 +7,7 @@ import {
   type OrganisationenApiInterface,
   type CreateOrganisationBodyParams,
   type RollenSystemRecht,
-  type UpdateOrganisationBodyParams,
+  type OrganisationByNameBodyParams,
 } from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
 
@@ -245,13 +245,12 @@ export const useOrganisationStore: StoreDefinition<
       this.errorCode = '';
       this.loading = true;
       try {
-        const updateOrganisationBodyParams: UpdateOrganisationBodyParams = {
+        const organisationByNameBodyParams: OrganisationByNameBodyParams = {
           name: name,
-          typ: OrganisationsTyp.Klasse,
         };
-        const { data }: { data: Organisation } = await organisationApi.organisationControllerUpdateOrganisation(
+        const { data }: { data: Organisation } = await organisationApi.organisationControllerUpdateOrganisationName(
           organisationId,
-          updateOrganisationBodyParams,
+          organisationByNameBodyParams,
         );
         this.updatedOrganisation = data;
         return data;
