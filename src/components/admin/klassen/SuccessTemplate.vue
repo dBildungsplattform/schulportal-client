@@ -34,7 +34,7 @@
         class="subtitle-1"
         cols="auto"
       >
-        <span data-testid="success-text">{{ successMessage }}</span>
+        <span data-testid="klasse-success-text">{{ successMessage }}</span>
       </v-col>
     </v-row>
     <v-row justify="center">

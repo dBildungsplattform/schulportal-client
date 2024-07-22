@@ -87,13 +87,13 @@ describe('KlasseCreationView', () => {
 
   test('it fills form and triggers submit', async () => {
     const schuleSelect: VueWrapper | undefined = wrapper
-      ?.findComponent({ ref: 'rolle-creation-form' })
+      ?.findComponent({ ref: 'klasse-creation-form' })
       .findComponent({ ref: 'schule-select' });
     await schuleSelect?.setValue('1');
     await nextTick();
 
     const klassennameInput: VueWrapper | undefined = wrapper
-      ?.findComponent({ ref: 'rolle-creation-form' })
+      ?.findComponent({ ref: 'klasse-creation-form' })
       .findComponent({ ref: 'klassenname-input' });
     await klassennameInput?.setValue('11b');
     await nextTick();
@@ -154,7 +154,7 @@ describe('KlasseCreationView', () => {
     } as PersonenkontextWorkflowResponse;
 
     const schuleSearchInput: VueWrapper | undefined = wrapper
-      ?.findComponent({ ref: 'rolle-creation-form' })
+      ?.findComponent({ ref: 'klasse-creation-form' })
       .findComponent({ ref: 'schule-select' });
 
     // Triggering search with a value
@@ -183,7 +183,7 @@ describe('KlasseCreationView', () => {
     } as PersonenkontextWorkflowResponse;
 
     const schuleSearchInput: VueWrapper | undefined = wrapper
-      ?.findComponent({ ref: 'rolle-creation-form' })
+      ?.findComponent({ ref: 'klasse-creation-form' })
       .findComponent({ ref: 'schule-select' });
 
     await schuleSearchInput?.vm.$emit('update:search', '');
@@ -211,7 +211,7 @@ describe('KlasseCreationView', () => {
     } as PersonenkontextWorkflowResponse;
 
     const schuleSearchInput: VueWrapper | undefined = wrapper
-      ?.findComponent({ ref: 'rolle-creation-form' })
+      ?.findComponent({ ref: 'klasse-creation-form' })
       .findComponent({ ref: 'schule-select' });
     await schuleSearchInput?.vm.$emit('update:search', '');
     await nextTick();
@@ -246,7 +246,7 @@ describe('KlasseCreationView', () => {
       canCommit: true,
     };
     const organisationAutocomplete: VueWrapper | undefined = wrapper
-      ?.findComponent({ ref: 'rolle-creation-form' })
+      ?.findComponent({ ref: 'klasse-creation-form' })
       .findComponent({ ref: 'schule-select' });
 
     // Set a value in orga that will match with something given by the props and so the component will calculate the selectedOrganisationTitle
