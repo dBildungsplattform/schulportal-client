@@ -137,8 +137,8 @@
         try {
           await organisationStore.updateOrganisation(currentOrganisationId, selectedKlassenname.value);
         } catch {
-          creationErrorText.value = t(`admin.rolle.errors.${organisationStore.errorCode}`);
-          creationErrorTitle.value = t(`admin.rolle.title.${organisationStore.errorCode}`);
+          creationErrorText.value = t(`admin.klasse.errors.${organisationStore.errorCode}`);
+          creationErrorTitle.value = t(`admin.klasse.title.${organisationStore.errorCode}`);
         }
       }
       resetForm();
@@ -172,6 +172,7 @@
     } else {
       next();
     }
+    organisationStore.errorCode = '';
   });
 
   onUnmounted(() => {
@@ -193,8 +194,8 @@
     </v-row>
     <LayoutCard
       :closable="true"
-      data-testid="rolle-details-card"
-      :header="$t('admin.rolle.edit')"
+      data-testid="klasse-details-card"
+      :header="$t('admin.klasse.edit')"
       @onCloseClicked="navigateToKlasseManagement"
       :padded="true"
       :showCloseText="true"
@@ -202,10 +203,10 @@
       <!-- Error Message Display -->
       <SpshAlert
         :model-value="!!organisationStore.errorCode"
-        :title="creationErrorTitle || $t('admin.rolle.loadingErrorTitle')"
+        :title="creationErrorTitle || $t('admin.klasse.klasseUpdateErrorTitle')"
         :type="'error'"
         :closable="false"
-        :text="creationErrorText || $t('admin.rolle.loadingErrorText')"
+        :text="organisationStore.errorCode ? $t(`admin.klasse.errors.${organisationStore.errorCode}`) : ''"
         :showButton="true"
         :buttonText="$t('nav.backToList')"
         :buttonAction="handleAlertClose"
@@ -246,7 +247,7 @@
               >
                 <v-btn
                   class="primary ml-lg-8"
-                  data-testid="rolle-edit-button"
+                  data-testid="klasse-edit-button"
                   @Click="activateEditing"
                   :block="mdAndDown"
                 >
@@ -267,7 +268,7 @@
                 >
                   <v-btn
                     class="secondary"
-                    data-testid="rolle-edit-cancel"
+                    data-testid="klasse-edit-cancel"
                     @click="handleCancel"
                     :block="mdAndDown"
                   >
@@ -281,7 +282,7 @@
                 >
                   <v-btn
                     class="primary"
-                    data-testid="rolle-changes-save"
+                    data-testid="klasse-changes-save"
                     @Click="onSubmit"
                     :block="mdAndDown"
                   >

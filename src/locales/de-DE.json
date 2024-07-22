@@ -24,6 +24,10 @@
       "createAnother": "Weitere Klasse anlegen",
       "createNew": "Neue Klasse anlegen",
       "discard": "Klasse verwerfen",
+      "edit": "Klasse bearbeiten",
+      "title": {
+        "KLASSENNAME_AN_SCHULE_EINDEUTIG": "Fehler bei Änderung der Klasse."
+      },
       "errors": {
         "KLASSE_NUR_VON_SCHULE_ADMINISTRIERT": "Klassen dürfen nur von einer Schule administriert werden.",
         "KLASSENNAME_AN_SCHULE_EINDEUTIG": "Der Klassenname existiert bereits an dieser Schule.",
