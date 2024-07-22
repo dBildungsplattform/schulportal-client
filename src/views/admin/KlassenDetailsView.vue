@@ -203,10 +203,10 @@
       <!-- Error Message Display -->
       <SpshAlert
         :model-value="!!organisationStore.errorCode"
-        :title="creationErrorTitle || $t('admin.klasse.klasseUpdateErrorTitle')"
+        :title="$t('admin.klasse.klasseUpdateErrorTitle')"
         :type="'error'"
         :closable="false"
-        :text="organisationStore.errorCode ? $t(`admin.klasse.errors.${organisationStore.errorCode}`) : ''"
+        :text="$t(`admin.klasse.errors.${organisationStore.errorCode}`)"
         :showButton="true"
         :buttonText="$t('nav.backToList')"
         :buttonAction="handleAlertClose"
