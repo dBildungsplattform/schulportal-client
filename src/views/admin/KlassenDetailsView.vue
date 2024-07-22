@@ -19,6 +19,7 @@
   import { object, string } from 'yup';
   import { DIN_91379A_EXT } from '@/utils/validation';
   import KlasseForm from '@/components/form/KlasseForm.vue';
+  import SuccessTemplate from '@/components/admin/klassen/SuccessTemplate.vue';
 
   const route: RouteLocationNormalizedLoaded = useRoute();
   const router: Router = useRouter();
@@ -296,71 +297,25 @@
         </v-container>
       </template>
       <!-- Result template on success after submit  -->
+      <!-- Result template on success after submit -->
       <template v-if="organisationStore.updatedOrganisation && !organisationStore.errorCode">
-        <v-container>
-          <v-row justify="center">
-            <v-col
-              class="subtitle-1"
-              cols="auto"
-            >
-              <span data-testid="klasse-success-text">{{ $t('admin.klasse.klasseUpdatedSuccessfully') }}</span>
-            </v-col>
-          </v-row>
-          <v-row justify="center">
-            <v-col cols="auto">
-              <v-icon
-                aria-hidden="true"
-                color="#1EAE9C"
-                icon="mdi-check-circle"
-                small
-              >
-              </v-icon>
-            </v-col>
-          </v-row>
-          <v-row justify="center">
-            <v-col
-              class="subtitle-2"
-              cols="auto"
-            >
-              {{ $t('admin.followingDataCreated') }}
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col class="text-body bold text-right"> {{ $t('admin.schule.schule') }}: </v-col>
-            <v-col class="text-body">
-              <span data-testid="created-klasse-schule">
-                {{ translatedSchulname }}
-              </span>
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col class="text-body bold text-right"> {{ $t('admin.klasse.klassenname') }}: </v-col>
-            <v-col class="text-body"
-              ><span data-testid="upadted-klasse-name">{{ organisationStore.updatedOrganisation?.name }}</span></v-col
-            >
-          </v-row>
-          <v-divider
-            class="border-opacity-100 rounded my-6"
-            color="#E5EAEF"
-            thickness="6"
-          ></v-divider>
-          <v-row justify="end">
-            <v-col
-              cols="12"
-              sm="6"
-              md="auto"
-            >
-              <v-btn
-                class="secondary"
-                @click="() => router.go(0)"
-                data-testid="back-to-list-button"
-                :block="mdAndDown"
-              >
-                {{ $t('nav.backToDetails') }}
-              </v-btn>
-            </v-col>
-          </v-row>
-        </v-container>
+        <SuccessTemplate
+          :successMessage="$t('admin.klasse.klasseUpdatedSuccessfully')"
+          :followingDataCreated="$t('admin.followingDataCreated')"
+          :createdData="[
+            { label: $t('admin.schule.schule'), value: translatedSchulname, testId: 'created-klasse-schule' },
+            {
+              label: $t('admin.klasse.klassenname'),
+              value: organisationStore.updatedOrganisation?.name,
+              testId: 'created-klasse-name',
+            },
+          ]"
+          :backButtonText="$t('nav.backToDetails')"
+          :createAnotherButtonText="$t('admin.klasse.createAnother')"
+          :showCreateAnotherButton="false"
+          :backButtonTestId="'back-to-details-button'"
+          @OnNavigateBack="router.go(0)"
+        />
       </template>
     </LayoutCard>
   </div>
