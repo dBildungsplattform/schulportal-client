@@ -322,10 +322,18 @@
       <!-- Error Message Display -->
       <SpshAlert
         :model-value="!!organisationStore.errorCode"
-        :title="$t(`admin.klasse.title.${organisationStore.errorCode}`)"
+        :title="
+          organisationStore.errorCode === 'UNSPECIFIED_ERROR'
+            ? $t('admin.klasse.loadingErrorTitle')
+            : $t(`admin.klasse.title.${organisationStore.errorCode}`)
+        "
         :type="'error'"
         :closable="false"
-        :text="$t(`admin.klasse.errors.${organisationStore.errorCode}`)"
+        :text="
+          organisationStore.errorCode === 'UNSPECIFIED_ERROR'
+            ? $t('admin.klasse.loadingErrorText')
+            : $t(`admin.klasse.errors.${organisationStore.errorCode}`)
+        "
         :showButton="true"
         :buttonText="$t('nav.backToList')"
         :buttonAction="handleAlertClose"

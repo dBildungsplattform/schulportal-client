@@ -48,6 +48,8 @@
       "klassenname": "Klassenname",
       "klassenFound": "{count} Klasse gefunden | {count} Klassen gefunden",
       "klassenSelected": "{count} Klassen ausgewählt",
+      "loadingErrorText": "Es konnten keine Klassendaten geladen werden.",
+      "loadingErrorTitle": "Fehler beim Laden der Klassen",
       "management": "Klassenverwaltung",
       "selectKlasse": "Klasse auswählen",
       "rules": {
