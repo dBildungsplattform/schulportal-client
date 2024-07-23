@@ -346,5 +346,33 @@ describe('OrganisationStore', () => {
         expect(organisationStore.loadingKlassen).toBe(false);
       });
     });
+    describe('deleteOrganisationById', () => {
+      it('should delete organisation and update state', async () => {
+        mockadapter.onDelete('/api/organisationen/1/klasse').replyOnce(200);
+        const deleteOrganisationPromise: Promise<void> = organisationStore.deleteOrganisationById('1');
+        expect(organisationStore.loading).toBe(true);
+        await deleteOrganisationPromise;
+        expect(organisationStore.loading).toBe(false);
+        expect(organisationStore.errorCode).toEqual('');
+      });
+
+      it('should handle string error', async () => {
+        mockadapter.onDelete('/api/organisationen/1/klasse').replyOnce(500, 'some mock server error');
+        const deleteOrganisationPromise: Promise<void> = organisationStore.deleteOrganisationById('1');
+        expect(organisationStore.loading).toBe(true);
+        await deleteOrganisationPromise;
+        expect(organisationStore.loading).toBe(false);
+        expect(organisationStore.errorCode).toEqual('KLASSE_ERROR');
+      });
+
+      it('should handle error code', async () => {
+        mockadapter.onDelete('/api/organisationen/1/klasse').replyOnce(500, { i18nKey: 'KLASSE_ERROR' });
+        const deleteOrganisationPromise: Promise<void> = organisationStore.deleteOrganisationById('1');
+        expect(organisationStore.loading).toBe(true);
+        await deleteOrganisationPromise;
+        expect(organisationStore.loading).toBe(false);
+        expect(organisationStore.errorCode).toEqual('KLASSE_ERROR');
+      });
+    });
   });
 });
