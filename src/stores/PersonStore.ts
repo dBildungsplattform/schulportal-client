@@ -1,6 +1,7 @@
 import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import { isAxiosError, type AxiosResponse } from 'axios';
 import {
+  Class2FAApiFactory,
   PersonenApiFactory,
   PersonenFrontendApiFactory,
   type DbiamCreatePersonWithContextBodyParams,
@@ -14,6 +15,7 @@ import type { DbiamPersonenkontextBodyParams } from './PersonenkontextStore';
 
 const personenApi: PersonenApiInterface = PersonenApiFactory(undefined, '', axiosApiInstance);
 const personenFrontendApi: PersonenFrontendApiInterface = PersonenFrontendApiFactory(undefined, '', axiosApiInstance);
+const twoFactorApi = Class2FAApiFactory(undefined, '', axiosApiInstance);
 
 export type Person = {
   id: string;
@@ -149,7 +151,8 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
     async resetToken(referrer: string): Promise<void> {
       this.loading = true;
       try {
-        //TODO: API request call for token reset
+        const response = await twoFactorApi.privacyIdeaAdministrationControllerResetToken(referrer);
+        console.log('Response from backend:', response.data);
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {

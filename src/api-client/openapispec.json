@@ -3141,6 +3141,162 @@
           }
         ]
       }
+    },
+    "/api/2fa-token/init": {
+      "post": {
+        "operationId": "PrivacyIdeaAdministrationController_initializeSoftwareToken",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The token was successfully created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PrivacyIdeaAdministrationService"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "A username was not given or not found."
+          },
+          "401": {
+            "description": "Not authorized to create token."
+          },
+          "403": {
+            "description": "Insufficient permissions to create token."
+          },
+          "404": {
+            "description": "Insufficient permissions to create token."
+          },
+          "500": {
+            "description": "Internal server error while creating a token."
+          }
+        },
+        "tags": [
+          "2FA"
+        ],
+        "security": [
+          {
+            "oauth2": [
+              "openid"
+            ]
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/2fa-token/state": {
+      "get": {
+        "operationId": "PrivacyIdeaAdministrationController_getTwoAuthState",
+        "parameters": [
+          {
+            "name": "userName",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "The token was successfully created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PrivacyIdeaAdministrationService"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "A username was not given or not found."
+          },
+          "401": {
+            "description": "Not authorized to create token."
+          },
+          "403": {
+            "description": "Insufficient permissions to create token."
+          },
+          "404": {
+            "description": "Insufficient permissions to create token."
+          },
+          "500": {
+            "description": "Internal server error while creating a token."
+          }
+        },
+        "tags": [
+          "2FA"
+        ],
+        "security": [
+          {
+            "oauth2": [
+              "openid"
+            ]
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/2fa-token/reset": {
+      "get": {
+        "operationId": "PrivacyIdeaAdministrationController_resetToken",
+        "parameters": [
+          {
+            "name": "userName",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "The token was successfully reset.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PrivacyIdeaAdministrationService"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "A username was not given or not found."
+          },
+          "401": {
+            "description": "Not authorized to reset token."
+          },
+          "403": {
+            "description": "Insufficient permissions to reset token."
+          },
+          "404": {
+            "description": "Insufficient permissions to reset token."
+          },
+          "500": {
+            "description": "Internal server error while reseting a token."
+          }
+        },
+        "tags": [
+          "2FA"
+        ],
+        "security": [
+          {
+            "oauth2": [
+              "openid"
+            ]
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
     }
   },
   "info": {
@@ -4870,6 +5026,12 @@
           "person",
           "DBiamPersonenkontextResponse"
         ]
+      },
+      "PrivacyIdeaAdministrationService": {
+        "type": "object",
+        "properties": {
+
+        }
       }
     }
   }

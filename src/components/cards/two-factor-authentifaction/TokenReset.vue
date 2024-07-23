@@ -10,9 +10,8 @@
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
   const proceeded : Ref<boolean> = ref(false);
   const isTokenResetSuccessful  : Ref<boolean> = ref(false);
-  const isTokenLost : Ref<boolean> = ref(false);
+  //const isTokenLost : Ref<boolean> = ref(false);
   const personStore: PersonStore = usePersonStore();
-
 
   type Props = {
     errorCode: string;
@@ -24,7 +23,7 @@
   const props = defineProps<Props>();
     async function closeTokenResetDialog(isActive: Ref<boolean>): Promise<void> {
     isActive.value = false;
-    isTokenLost.value = false;
+    //isTokenLost.value = false;
     isTokenResetSuccessful.value = false;
     proceeded.value = false;
   }
@@ -61,10 +60,10 @@
     text: t('admin.person.twoFactorAuthentification.tokenResetError')
   }
 
-  const tokenLostContent: DialogContent = {
-    header: t('admin.person.twoFactorAuthentification.tokenResetHeader'),
-    text: t('admin.person.twoFactorAuthentification.tokenResetSuccessTokenLost')
-  }
+  // const tokenLostContent: DialogContent = {
+  //   header: t('admin.person.twoFactorAuthentification.tokenResetHeader'),
+  //   text: t('admin.person.twoFactorAuthentification.tokenResetSuccessTokenLost')
+  // }
   const tokenResetSoftwareContent: DialogContent = {
     header: t('admin.person.twoFactorAuthentification.tokenResetHeader'),
     text: t('admin.person.twoFactorAuthentification.tokenResetSuccessSoftware')
@@ -81,9 +80,11 @@
         return errorHardwareContent;
       }else if(!isTokenResetSuccessful.value && props.tokenType === "software"){
         return errorSoftwareContent;
-      }else if(isTokenLost.value){
-        return tokenLostContent;
-      } else if(props.tokenType === "software"){
+      }
+      //else if(isTokenLost.value){
+      //  return tokenLostContent;
+      //} 
+      else if(props.tokenType === "software"){
         return tokenResetSoftwareContent
       } else if(props.tokenType === "hardware"){
         return tokenResetHardwareContent
@@ -133,7 +134,7 @@
                     {{$t('admin.person.twoFactorAuthentification.tokenResetDescription')}}
                 </v-col>
             </v-row>
-            <v-row class="text-body px-md-16"> 
+            <!-- <v-row class="text-body px-md-16"> 
                 <v-col>
                     <v-checkbox
                       v-model="isTokenLost"
@@ -144,7 +145,7 @@
                         </template>
                     </v-checkbox>
                 </v-col>
-            </v-row>
+            </v-row> -->
           </v-container>
           <v-container v-if="proceeded">
             <v-row class="text-body px-md-16">
