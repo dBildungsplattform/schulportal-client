@@ -20,6 +20,7 @@
   import { DIN_91379A_EXT } from '@/utils/validation';
   import KlasseForm from '@/components/form/KlasseForm.vue';
   import SuccessTemplate from '@/components/admin/klassen/SuccessTemplate.vue';
+  import KlasseDelete from '@/components/admin/klassen/KlasseDelete.vue'
 
   const route: RouteLocationNormalizedLoaded = useRoute();
   const router: Router = useRouter();
@@ -145,6 +146,15 @@
     }
   });
 
+  async function deleteKlasse(organisationId: string): Promise<void> {
+    try {
+      await organisationStore.deleteOrganisationById(organisationId);
+    } catch {
+      creationErrorText.value = t(`admin.rolle.errors.${organisationStore.errorCode}`);
+      creationErrorTitle.value = t(`admin.rolle.title.${organisationStore.errorCode}`);
+    }
+  }
+
   onBeforeMount(async () => {
     organisationStore.errorCode = '';
     // Retrieves the Klasse using the Id in the route since that's all we have
@@ -240,20 +250,36 @@
               v-if="!isEditActive"
               class="d-flex justify-sm-end"
             >
-              <v-col
-                cols="12"
-                sm="6"
-                md="auto"
-              >
-                <v-btn
-                  class="primary ml-lg-8"
-                  data-testid="klasse-edit-button"
-                  @Click="activateEditing"
-                  :block="mdAndDown"
+              <v-row class="pt-3 px-2 justify-end">
+                <v-col
+                  cols="12"
+                  md="auto"
+                  sm="6"
                 >
-                  {{ $t('edit') }}
-                </v-btn>
-              </v-col>
+                  <div class="d-flex justify-sm-end">
+                    <KlasseDelete
+                      :errorCode="organisationStore.errorCode"
+                      :klasse="organisationStore.currentKlasse"
+                      @onDeleteKlasse="deleteKlasse(currentOrganisationId)"
+                    >
+                    </KlasseDelete>
+                  </div>
+                </v-col>
+                <v-col
+                  cols="12"
+                  sm="6"
+                  md="auto"
+                >
+                  <v-btn
+                    class="primary ml-lg-8"
+                    data-testid="klasse-edit-button"
+                    @Click="activateEditing"
+                    :block="mdAndDown"
+                  >
+                    {{ $t('edit') }}
+                  </v-btn>
+                </v-col>
+              </v-row>
             </div>
             <div
               v-else

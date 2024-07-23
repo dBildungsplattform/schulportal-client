@@ -487,6 +487,7 @@ export const DbiamOrganisationErrorI18nKeyEnum = {
     RootOrganisationImmutable: 'ROOT_ORGANISATION_IMMUTABLE',
     KlasseNurVonSchuleAdministriert: 'KLASSE_NUR_VON_SCHULE_ADMINISTRIERT',
     KlassennameAnSchuleEindeutig: 'KLASSENNAME_AN_SCHULE_EINDEUTIG',
+    OrganisationIstBereitsZugewiesenError: 'ORGANISATION_IST_BEREITS_ZUGEWIESEN_ERROR',
     NameRequiredForKlasse: 'NAME_REQUIRED_FOR_KLASSE'
 } as const;
 
@@ -3280,6 +3281,48 @@ export const OrganisationenApiAxiosParamCreator = function (configuration?: Conf
             };
         },
         /**
+         * Delete an organisation of type Klasse by id.
+         * @summary 
+         * @param {string} organisationId The id of an organization
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        organisationControllerDeleteKlasse: async (organisationId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'organisationId' is not null or undefined
+            assertParamExists('organisationControllerDeleteKlasse', 'organisationId', organisationId)
+            const localVarPath = `/api/organisationen/{organisationId}/klasse`
+                .replace(`{${"organisationId"}}`, encodeURIComponent(String(organisationId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 
          * @param {string} organisationId The id of an organization
          * @param {*} [options] Override http request option.
@@ -3700,6 +3743,17 @@ export const OrganisationenApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
+         * Delete an organisation of type Klasse by id.
+         * @summary 
+         * @param {string} organisationId The id of an organization
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async organisationControllerDeleteKlasse(organisationId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.organisationControllerDeleteKlasse(organisationId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
          * 
          * @param {string} organisationId The id of an organization
          * @param {*} [options] Override http request option.
@@ -3828,6 +3882,16 @@ export const OrganisationenApiFactory = function (configuration?: Configuration,
             return localVarFp.organisationControllerCreateOrganisation(createOrganisationBodyParams, options).then((request) => request(axios, basePath));
         },
         /**
+         * Delete an organisation of type Klasse by id.
+         * @summary 
+         * @param {string} organisationId The id of an organization
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        organisationControllerDeleteKlasse(organisationId: string, options?: any): AxiosPromise<void> {
+            return localVarFp.organisationControllerDeleteKlasse(organisationId, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 
          * @param {string} organisationId The id of an organization
          * @param {*} [options] Override http request option.
@@ -3945,6 +4009,16 @@ export interface OrganisationenApiInterface {
      * @memberof OrganisationenApiInterface
      */
     organisationControllerCreateOrganisation(createOrganisationBodyParams: CreateOrganisationBodyParams, options?: AxiosRequestConfig): AxiosPromise<OrganisationResponseLegacy>;
+
+    /**
+     * Delete an organisation of type Klasse by id.
+     * @summary 
+     * @param {string} organisationId The id of an organization
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OrganisationenApiInterface
+     */
+    organisationControllerDeleteKlasse(organisationId: string, options?: AxiosRequestConfig): AxiosPromise<void>;
 
     /**
      * 
@@ -4072,6 +4146,18 @@ export class OrganisationenApi extends BaseAPI implements OrganisationenApiInter
     }
 
     /**
+     * Delete an organisation of type Klasse by id.
+     * @summary 
+     * @param {string} organisationId The id of an organization
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OrganisationenApi
+     */
+    public organisationControllerDeleteKlasse(organisationId: string, options?: AxiosRequestConfig) {
+        return OrganisationenApiFp(this.configuration).organisationControllerDeleteKlasse(organisationId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 
      * @param {string} organisationId The id of an organization
      * @param {*} [options] Override http request option.
@@ -4166,6 +4252,142 @@ export class OrganisationenApi extends BaseAPI implements OrganisationenApiInter
      */
     public organisationControllerUpdateOrganisationName(organisationId: string, organisationByNameBodyParams: OrganisationByNameBodyParams, options?: AxiosRequestConfig) {
         return OrganisationenApiFp(this.configuration).organisationControllerUpdateOrganisationName(organisationId, organisationByNameBodyParams, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+/**
+ * PersonAdministrationApi - axios parameter creator
+ * @export
+ */
+export const PersonAdministrationApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * 
+         * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
+         * @param {number} [limit] The limit of items for the request.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        personAdministrationControllerFindRollen: async (rolleName?: string, limit?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/person-administration/rollen`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+            if (rolleName !== undefined) {
+                localVarQueryParameter['rolleName'] = rolleName;
+            }
+
+            if (limit !== undefined) {
+                localVarQueryParameter['limit'] = limit;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * PersonAdministrationApi - functional programming interface
+ * @export
+ */
+export const PersonAdministrationApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = PersonAdministrationApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * 
+         * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
+         * @param {number} [limit] The limit of items for the request.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async personAdministrationControllerFindRollen(rolleName?: string, limit?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<FindRollenResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.personAdministrationControllerFindRollen(rolleName, limit, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+    }
+};
+
+/**
+ * PersonAdministrationApi - factory interface
+ * @export
+ */
+export const PersonAdministrationApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = PersonAdministrationApiFp(configuration)
+    return {
+        /**
+         * 
+         * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
+         * @param {number} [limit] The limit of items for the request.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        personAdministrationControllerFindRollen(rolleName?: string, limit?: number, options?: any): AxiosPromise<FindRollenResponse> {
+            return localVarFp.personAdministrationControllerFindRollen(rolleName, limit, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * PersonAdministrationApi - interface
+ * @export
+ * @interface PersonAdministrationApi
+ */
+export interface PersonAdministrationApiInterface {
+    /**
+     * 
+     * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
+     * @param {number} [limit] The limit of items for the request.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PersonAdministrationApiInterface
+     */
+    personAdministrationControllerFindRollen(rolleName?: string, limit?: number, options?: AxiosRequestConfig): AxiosPromise<FindRollenResponse>;
+
+}
+
+/**
+ * PersonAdministrationApi - object-oriented interface
+ * @export
+ * @class PersonAdministrationApi
+ * @extends {BaseAPI}
+ */
+export class PersonAdministrationApi extends BaseAPI implements PersonAdministrationApiInterface {
+    /**
+     * 
+     * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
+     * @param {number} [limit] The limit of items for the request.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PersonAdministrationApi
+     */
+    public personAdministrationControllerFindRollen(rolleName?: string, limit?: number, options?: AxiosRequestConfig) {
+        return PersonAdministrationApiFp(this.configuration).personAdministrationControllerFindRollen(rolleName, limit, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
@@ -5425,53 +5647,6 @@ export const PersonenkontextApiAxiosParamCreator = function (configuration?: Con
         },
         /**
          * 
-         * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
-         * @param {number} [limit] The limit of items for the request.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        dbiamPersonenkontextWorkflowControllerFindRollen: async (rolleName?: string, limit?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/personenkontext-workflow/rollen`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication bearer required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            // authentication oauth2 required
-            // oauth required
-            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
-
-            if (rolleName !== undefined) {
-                localVarQueryParameter['rolleName'] = rolleName;
-            }
-
-            if (limit !== undefined) {
-                localVarQueryParameter['limit'] = limit;
-            }
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
          * @param {string} rolleId RolleId used to filter for schulstrukturknoten in personenkontext.
          * @param {string} [sskName] Organisation/SSK name used to filter for schulstrukturknoten in personenkontext.
          * @param {number} [limit] The limit of items for the request.
@@ -5619,17 +5794,6 @@ export const PersonenkontextApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
-         * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
-         * @param {number} [limit] The limit of items for the request.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async dbiamPersonenkontextWorkflowControllerFindRollen(rolleName?: string, limit?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<FindRollenResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.dbiamPersonenkontextWorkflowControllerFindRollen(rolleName, limit, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
-         * 
          * @param {string} rolleId RolleId used to filter for schulstrukturknoten in personenkontext.
          * @param {string} [sskName] Organisation/SSK name used to filter for schulstrukturknoten in personenkontext.
          * @param {number} [limit] The limit of items for the request.
@@ -5685,16 +5849,6 @@ export const PersonenkontextApiFactory = function (configuration?: Configuration
         },
         /**
          * 
-         * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
-         * @param {number} [limit] The limit of items for the request.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        dbiamPersonenkontextWorkflowControllerFindRollen(rolleName?: string, limit?: number, options?: any): AxiosPromise<FindRollenResponse> {
-            return localVarFp.dbiamPersonenkontextWorkflowControllerFindRollen(rolleName, limit, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
          * @param {string} rolleId RolleId used to filter for schulstrukturknoten in personenkontext.
          * @param {string} [sskName] Organisation/SSK name used to filter for schulstrukturknoten in personenkontext.
          * @param {number} [limit] The limit of items for the request.
@@ -5744,16 +5898,6 @@ export interface PersonenkontextApiInterface {
      * @memberof PersonenkontextApiInterface
      */
     dbiamPersonenkontextWorkflowControllerCreatePersonWithKontext(dbiamCreatePersonWithContextBodyParams: DbiamCreatePersonWithContextBodyParams, options?: AxiosRequestConfig): AxiosPromise<DBiamPersonResponse>;
-
-    /**
-     * 
-     * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
-     * @param {number} [limit] The limit of items for the request.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof PersonenkontextApiInterface
-     */
-    dbiamPersonenkontextWorkflowControllerFindRollen(rolleName?: string, limit?: number, options?: AxiosRequestConfig): AxiosPromise<FindRollenResponse>;
 
     /**
      * 
@@ -5809,18 +5953,6 @@ export class PersonenkontextApi extends BaseAPI implements PersonenkontextApiInt
      */
     public dbiamPersonenkontextWorkflowControllerCreatePersonWithKontext(dbiamCreatePersonWithContextBodyParams: DbiamCreatePersonWithContextBodyParams, options?: AxiosRequestConfig) {
         return PersonenkontextApiFp(this.configuration).dbiamPersonenkontextWorkflowControllerCreatePersonWithKontext(dbiamCreatePersonWithContextBodyParams, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
-     * @param {number} [limit] The limit of items for the request.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof PersonenkontextApi
-     */
-    public dbiamPersonenkontextWorkflowControllerFindRollen(rolleName?: string, limit?: number, options?: AxiosRequestConfig) {
-        return PersonenkontextApiFp(this.configuration).dbiamPersonenkontextWorkflowControllerFindRollen(rolleName, limit, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

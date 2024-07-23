@@ -1696,6 +1696,59 @@
                 ]
             }
         },
+        "/api/organisationen/{organisationId}/klasse": {
+            "delete": {
+                "operationId": "OrganisationController_deleteKlasse",
+                "summary": "",
+                "description": "Delete an organisation of type Klasse by id.",
+                "parameters": [
+                    {
+                        "name": "organisationId",
+                        "required": true,
+                        "in": "path",
+                        "description": "The id of an organization",
+                        "schema": {
+                            "nullable": false,
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The organisation was deleted successfully."
+                    },
+                    "400": {
+                        "description": "The input was not valid.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DbiamOrganisationError"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Not authorized to delete the organisation."
+                    },
+                    "404": {
+                        "description": "The organisation that should be deleted does not exist."
+                    }
+                },
+                "tags": [
+                    "organisationen"
+                ],
+                "security": [
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
         "/api/organisationen/{organisationId}/name": {
             "patch": {
                 "operationId": "OrganisationController_updateOrganisationName",
@@ -3032,67 +3085,6 @@
                 ]
             }
         },
-        "/api/personenkontext-workflow/rollen": {
-            "get": {
-                "operationId": "DbiamPersonenkontextWorkflowController_findRollen",
-                "parameters": [
-                    {
-                        "name": "rolleName",
-                        "required": false,
-                        "in": "query",
-                        "description": "Rolle name used to filter for rollen in personenkontext.",
-                        "schema": {
-                            "nullable": false,
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "limit",
-                        "required": false,
-                        "in": "query",
-                        "description": "The limit of items for the request.",
-                        "schema": {
-                            "nullable": false,
-                            "type": "number"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "The rollen for a personenkontext were successfully returned.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/FindRollenResponse"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Not authorized to get available rolen for personenkontexte."
-                    },
-                    "403": {
-                        "description": "Insufficient permission to get rollen for personenkontext."
-                    },
-                    "500": {
-                        "description": "Internal server error while getting rollen for personenkontexte."
-                    }
-                },
-                "tags": [
-                    "personenkontext"
-                ],
-                "security": [
-                    {
-                        "oauth2": [
-                            "openid"
-                        ]
-                    },
-                    {
-                        "bearer": []
-                    }
-                ]
-            }
-        },
         "/api/personenkontext-workflow/schulstrukturknoten": {
             "get": {
                 "operationId": "DbiamPersonenkontextWorkflowController_findSchulstrukturknoten",
@@ -3211,6 +3203,67 @@
                 },
                 "tags": [
                     "personenkontext"
+                ],
+                "security": [
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
+        "/api/person-administration/rollen": {
+            "get": {
+                "operationId": "PersonAdministrationController_findRollen",
+                "parameters": [
+                    {
+                        "name": "rolleName",
+                        "required": false,
+                        "in": "query",
+                        "description": "Rolle name used to filter for rollen in personenkontext.",
+                        "schema": {
+                            "nullable": false,
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "required": false,
+                        "in": "query",
+                        "description": "The limit of items for the request.",
+                        "schema": {
+                            "nullable": false,
+                            "type": "number"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The rollen for the logged-in user were successfully returned.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/FindRollenResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Not authorized to get available rollen for the logged-in user."
+                    },
+                    "403": {
+                        "description": "Insufficient permission to get rollen for the logged-in user."
+                    },
+                    "500": {
+                        "description": "Internal server error while getting rollen for the logged-in user."
+                    }
+                },
+                "tags": [
+                    "person-administration"
                 ],
                 "security": [
                     {
@@ -4167,6 +4220,7 @@
                             "ROOT_ORGANISATION_IMMUTABLE",
                             "KLASSE_NUR_VON_SCHULE_ADMINISTRIERT",
                             "KLASSENNAME_AN_SCHULE_EINDEUTIG",
+                            "ORGANISATION_IST_BEREITS_ZUGEWIESEN_ERROR",
                             "NAME_REQUIRED_FOR_KLASSE"
                         ]
                     },
@@ -4885,24 +4939,6 @@
                     "canCommit"
                 ]
             },
-            "FindRollenResponse": {
-                "type": "object",
-                "properties": {
-                    "moeglicheRollen": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/RolleResponse"
-                        }
-                    },
-                    "total": {
-                        "type": "number"
-                    }
-                },
-                "required": [
-                    "moeglicheRollen",
-                    "total"
-                ]
-            },
             "FindSchulstrukturknotenResponse": {
                 "type": "object",
                 "properties": {
@@ -4957,6 +4993,24 @@
                 "required": [
                     "person",
                     "DBiamPersonenkontextResponse"
+                ]
+            },
+            "FindRollenResponse": {
+                "type": "object",
+                "properties": {
+                    "moeglicheRollen": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/RolleResponse"
+                        }
+                    },
+                    "total": {
+                        "type": "number"
+                    }
+                },
+                "required": [
+                    "moeglicheRollen",
+                    "total"
                 ]
             }
         }

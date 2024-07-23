@@ -64,6 +64,7 @@ type OrganisationActions = {
     zugehoerigZu?: string,
   ) => Promise<Organisation>;
   updateOrganisation: (organisationId: string, name: string) => Promise<Organisation>;
+  deleteOrganisationById: (organisationId: string) => Promise<void>;
 };
 
 export { OrganisationsTyp };
@@ -260,6 +261,20 @@ export const useOrganisationStore: StoreDefinition<
           this.errorCode = error.response?.data.i18nKey || 'KLASSE_ERROR';
         }
         return await Promise.reject(this.errorCode);
+      } finally {
+        this.loading = false;
+      }
+    },
+    async deleteOrganisationById(organisationId: string): Promise<void> {
+      this.errorCode = '';
+      this.loading = true;
+      try {
+        await organisationApi.organisationControllerDeleteKlasse(organisationId);
+      } catch (error: unknown) {
+        this.errorCode = 'UNSPECIFIED_ERROR';
+        if (isAxiosError(error)) {
+          this.errorCode = error.response?.data.i18nKey || 'KLASSE_ERROR';
+        }
       } finally {
         this.loading = false;
       }
