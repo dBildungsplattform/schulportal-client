@@ -213,7 +213,7 @@
       <!-- Error Message Display -->
       <SpshAlert
         :model-value="!!organisationStore.errorCode"
-        :title="$t('admin.klasse.klasseUpdateErrorTitle')"
+        :title="$t(`admin.klasse.title.${organisationStore.errorCode}`)"
         :type="'error'"
         :closable="false"
         :text="$t(`admin.klasse.errors.${organisationStore.errorCode}`)"
