@@ -13,6 +13,8 @@
   import type { UserinfoPersonenkontext } from '@/stores/PersonenkontextStore';
   import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
   import { useRouter, type Router } from 'vue-router';
+  import KlasseDelete from '@/components/admin/klassen/KlasseDelete.vue';
+  import SpshAlert from '@/components/alert/SpshAlert.vue';
 
   const organisationStore: OrganisationStore = useOrganisationStore();
   const authStore: AuthStore = useAuthStore();
@@ -34,6 +36,11 @@
       title: t('admin.klasse.klasse'),
       key: 'name',
       align: 'start',
+    } as DataTableHeader,
+    {
+      title: t('action'),
+      key: 'actions',
+      align: 'center',
     } as DataTableHeader,
   ]);
 
@@ -263,7 +270,6 @@
   }
 
   function navigateToKlassenDetails(_$event: PointerEvent, { item }: { item: Organisation }): void {
-    console.log('Navigating to klasse-details with id:', item.id); 
     router.push({ name: 'klasse-details', params: { id: item.id } });
   }
   onMounted(async () => {
@@ -293,6 +299,15 @@
       ...getSchuleDetails(klasse),
     }));
   });
+
+  async function deleteKlasse(organisationId: string): Promise<void> {
+    await organisationStore.deleteOrganisationById(organisationId);
+  }
+
+  const handleAlertClose = (): void => {
+    organisationStore.errorCode = '';
+    router.go(0);
+  };
 </script>
 
 <template>
@@ -304,164 +319,187 @@
       {{ $t('admin.headline') }}
     </h1>
     <LayoutCard :header="$t('admin.klasse.management')">
-      <v-row
-        align="center"
-        class="ma-3"
-        justify="end"
-      >
-        <v-col
-          cols="12"
-          md="2"
-          class="py-md-0 text-md-right"
+      <!-- Error Message Display -->
+      <SpshAlert
+        :model-value="!!organisationStore.errorCode"
+        :title="$t(`admin.klasse.title.${organisationStore.errorCode}`)"
+        :type="'error'"
+        :closable="false"
+        :text="$t(`admin.klasse.errors.${organisationStore.errorCode}`)"
+        :showButton="true"
+        :buttonText="$t('nav.backToList')"
+        :buttonAction="handleAlertClose"
+        @update:modelValue="handleAlertClose"
+      />
+      <template v-if="!organisationStore.errorCode">
+        <v-row
+          align="center"
+          class="ma-3"
+          justify="end"
         >
-          <v-btn
-            class="px-0 reset-filter"
-            data-testid="reset-filter-button"
-            :disabled="!filterActive"
-            @click="resetSearchAndFilter()"
-            size="x-small"
-            variant="text"
-            width="auto"
+          <v-col
+            cols="12"
+            md="2"
+            class="py-md-0 text-md-right"
           >
-            {{ $t('resetFilter') }}
-          </v-btn>
-        </v-col>
-        <v-col
-          md="3"
-          cols="12"
-          class="py-md-0"
+            <v-btn
+              class="px-0 reset-filter"
+              data-testid="reset-filter-button"
+              :disabled="!filterActive"
+              @click="resetSearchAndFilter()"
+              size="x-small"
+              variant="text"
+              width="auto"
+            >
+              {{ $t('resetFilter') }}
+            </v-btn>
+          </v-col>
+          <v-col
+            md="3"
+            cols="12"
+            class="py-md-0"
+          >
+            <v-autocomplete
+              autocomplete="off"
+              class="filter-dropdown"
+              :class="{ selected: selectedSchule }"
+              clearable
+              data-testid="schule-select"
+              density="compact"
+              :disabled="hasAutoselectedSchule"
+              hide-details
+              id="schule-select"
+              :items="schulen"
+              item-value="value"
+              item-text="title"
+              :no-data-text="$t('noDataFound')"
+              :placeholder="$t('admin.schule.schule')"
+              ref="schule-select"
+              required="true"
+              @update:search="updateSchulenSearch"
+              variant="outlined"
+              @update:modelValue="updateSelectedSchule"
+              v-model="selectedSchule"
+              v-model:search="searchInputSchulen"
+            >
+              <template v-slot:prepend-item>
+                <v-list-item>
+                  <v-progress-circular
+                    indeterminate
+                    v-if="organisationStore.loading"
+                  ></v-progress-circular>
+                  <span
+                    v-else
+                    class="filter-header"
+                    >{{
+                      $t(
+                        'admin.schule.schulenFound',
+                        { count: organisationStore.totalOrganisationen },
+                        organisationStore.totalOrganisationen,
+                      )
+                    }}</span
+                  >
+                </v-list-item>
+              </template>
+            </v-autocomplete>
+          </v-col>
+          <v-col
+            md="3"
+            cols="12"
+            class="py-md-0"
+          >
+            <v-tooltip
+              :disabled="!!selectedSchule"
+              location="top"
+            >
+              <template v-slot:activator="{ props }">
+                <div v-bind="props">
+                  <v-autocomplete
+                    autocomplete="off"
+                    chips
+                    class="filter-dropdown"
+                    :class="{ selected: selectedKlassen.length > 0 }"
+                    clearable
+                    data-testid="klasse-select"
+                    density="compact"
+                    :disabled="!selectedSchule"
+                    hide-details
+                    id="klasse-select"
+                    ref="klasse-select"
+                    :items="klassenOptions"
+                    item-value="value"
+                    item-text="title"
+                    multiple
+                    :no-data-text="$t('noDataFound')"
+                    :placeholder="$t('admin.klasse.klassen')"
+                    required="true"
+                    @update:search="updateKlassenSearch"
+                    variant="outlined"
+                    @update:modelValue="updateSelectedKlassen"
+                    v-model="selectedKlassen"
+                    v-model:search="searchInputKlassen"
+                  >
+                    <template v-slot:prepend-item>
+                      <v-list-item>
+                        <v-progress-circular
+                          indeterminate
+                          v-if="organisationStore.loading"
+                        ></v-progress-circular>
+                        <span
+                          v-else
+                          class="filter-header"
+                          >{{
+                            $t(
+                              'admin.klasse.klassenFound',
+                              { count: organisationStore.totalKlassen },
+                              organisationStore.totalKlassen,
+                            )
+                          }}</span
+                        >
+                      </v-list-item>
+                    </template>
+                  </v-autocomplete>
+                </div>
+              </template>
+              <span>{{ $t('admin.schule.selectSchuleFirst') }}</span>
+            </v-tooltip>
+          </v-col>
+        </v-row>
+        <ResultTable
+          data-testid="klasse-table"
+          :header="$t('admin.klasse.management')"
+          :items="finalKlassen || []"
+          :loading="organisationStore.loading"
+          :headers="headers"
+          @onUpdateTable="
+            organisationStore.getAllOrganisationen({
+              includeTyp: OrganisationsTyp.Klasse,
+              systemrechte: ['KLASSEN_VERWALTEN'],
+            })
+          "
+          @onHandleRowClick="navigateToKlassenDetails"
+          :totalItems="organisationStore.allKlassen.length"
+          item-value-path="id"
         >
-          <v-autocomplete
-            autocomplete="off"
-            class="filter-dropdown"
-            :class="{ selected: selectedSchule }"
-            clearable
-            data-testid="schule-select"
-            density="compact"
-            :disabled="hasAutoselectedSchule"
-            hide-details
-            id="schule-select"
-            :items="schulen"
-            item-value="value"
-            item-text="title"
-            :no-data-text="$t('noDataFound')"
-            :placeholder="$t('admin.schule.schule')"
-            ref="schule-select"
-            required="true"
-            @update:search="updateSchulenSearch"
-            variant="outlined"
-            @update:modelValue="updateSelectedSchule"
-            v-model="selectedSchule"
-            v-model:search="searchInputSchulen"
-          >
-            <template v-slot:prepend-item>
-              <v-list-item>
-                <v-progress-circular
-                  indeterminate
-                  v-if="organisationStore.loading"
-                ></v-progress-circular>
-                <span
-                  v-else
-                  class="filter-header"
-                  >{{
-                    $t(
-                      'admin.schule.schulenFound',
-                      { count: organisationStore.totalOrganisationen },
-                      organisationStore.totalOrganisationen,
-                    )
-                  }}</span
-                >
-              </v-list-item>
-            </template>
-          </v-autocomplete>
-        </v-col>
-        <v-col
-          md="3"
-          cols="12"
-          class="py-md-0"
-        >
-          <v-tooltip
-            :disabled="!!selectedSchule"
-            location="top"
-          >
-            <template v-slot:activator="{ props }">
-              <div v-bind="props">
-                <v-autocomplete
-                  autocomplete="off"
-                  chips
-                  class="filter-dropdown"
-                  :class="{ selected: selectedKlassen.length > 0 }"
-                  clearable
-                  data-testid="klasse-select"
-                  density="compact"
-                  :disabled="!selectedSchule"
-                  hide-details
-                  id="klasse-select"
-                  ref="klasse-select"
-                  :items="klassenOptions"
-                  item-value="value"
-                  item-text="title"
-                  multiple
-                  :no-data-text="$t('noDataFound')"
-                  :placeholder="$t('admin.klasse.klassen')"
-                  required="true"
-                  @update:search="updateKlassenSearch"
-                  variant="outlined"
-                  @update:modelValue="updateSelectedKlassen"
-                  v-model="selectedKlassen"
-                  v-model:search="searchInputKlassen"
-                >
-                  <template v-slot:prepend-item>
-                    <v-list-item>
-                      <v-progress-circular
-                        indeterminate
-                        v-if="organisationStore.loading"
-                      ></v-progress-circular>
-                      <span
-                        v-else
-                        class="filter-header"
-                        >{{
-                          $t(
-                            'admin.klasse.klassenFound',
-                            { count: organisationStore.totalKlassen },
-                            organisationStore.totalKlassen,
-                          )
-                        }}</span
-                      >
-                    </v-list-item>
-                  </template>
-                </v-autocomplete>
-              </div>
-            </template>
-            <span>{{ $t('admin.schule.selectSchuleFirst') }}</span>
-          </v-tooltip>
-        </v-col>
-      </v-row>
-      <ResultTable
-        data-testid="klasse-table"
-        :header="$t('admin.klasse.management')"
-        :items="finalKlassen || []"
-        :loading="organisationStore.loading"
-        :headers="headers"
-        @onUpdateTable="
-          organisationStore.getAllOrganisationen({
-            includeTyp: OrganisationsTyp.Klasse,
-            systemrechte: ['KLASSEN_VERWALTEN'],
-          })
-        "
-        @onHandleRowClick="navigateToKlassenDetails"
-        :totalItems="organisationStore.allKlassen.length"
-        item-value-path="id"
-      >
-        <template v-slot:[`item.schuleDetails`]="{ item }">
-          <div
-            class="ellipsis-wrapper"
-            :title="item.schuleDetails"
-          >
-            {{ item.schuleDetails }}
-          </div>
-        </template></ResultTable
-      >
+          <template v-slot:[`item.schuleDetails`]="{ item }">
+            <div
+              class="ellipsis-wrapper"
+              :title="item.schuleDetails"
+            >
+              {{ item.schuleDetails }}
+            </div>
+          </template>
+          <template v-slot:[`item.actions`]="{ item }">
+            <KlasseDelete
+              :errorCode="organisationStore.errorCode"
+              :klassenname="item.name"
+              :klassenId="item.id"
+              :useIconActivator="true"
+              @onDeleteKlasse="deleteKlasse(item.id)"
+            >
+            </KlasseDelete></template
+        ></ResultTable>
+      </template>
     </LayoutCard>
   </div>
 </template>

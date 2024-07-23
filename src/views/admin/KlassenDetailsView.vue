@@ -259,7 +259,9 @@
                   <div class="d-flex justify-sm-end">
                     <KlasseDelete
                       :errorCode="organisationStore.errorCode"
-                      :klasse="organisationStore.currentKlasse"
+                      :klassenname="organisationStore.currentKlasse?.name"
+                      :klassenId="organisationStore.currentKlasse?.id"
+                      :useIconActivator="false"
                       @onDeleteKlasse="deleteKlasse(currentOrganisationId)"
                     >
                     </KlasseDelete>

@@ -3,7 +3,6 @@
   import { useI18n, type Composer } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import { type Organisation } from '@/stores/OrganisationStore';
   import { type Router, useRouter } from 'vue-router';
 
   const { t }: Composer = useI18n({ useScope: 'global' });
@@ -12,7 +11,9 @@
   const router: Router = useRouter();
   type Props = {
     errorCode: string;
-    klasse: Organisation;
+    klassenname: string;
+    klassenId: string;
+    useIconActivator: boolean;
   };
 
   type Emits = {
@@ -37,15 +38,20 @@
 
   async function closeSuccessDialogAndPushToManagent(): Promise<void> {
     successDialogVisible.value = false;
-    router.push({ name: 'klasse-management' });
+    if (router.currentRoute.value.name === 'klasse-management') {
+      router.go(0);
+    } else {
+      router.push({ name: 'klasse-management' });
+    }
   }
+
   const deleteKlasseConfirmationMessage: ComputedRef<string> = computed(() => {
     if (errorMessage.value || props.errorCode) {
       return '';
     }
     let message: string = '';
     message += `${t('admin.klasse.deleteKlasseConfirmation', {
-      name: props.klasse.name,
+      name: props.klassenname,
     })}`;
     return message;
   });
@@ -56,7 +62,7 @@
     }
     let message: string = '';
     message += `${t('admin.klasse.deleteKlasseSuccessMessage', {
-      name: props.klasse.name,
+      name: props.klassenname,
     })}`;
     return message;
   });
@@ -112,13 +118,22 @@
   >
     <template v-slot:activator="{ props }">
       <v-btn
+        v-if="!useIconActivator"
         class="secondary button"
-        data-testid="open-klasse-delete-dialog-icon"
+        data-testid="open-klasse-delete-dialog-button"
         v-bind="props"
         :block="mdAndDown"
       >
         {{ $t('admin.klasse.deleteKlasse') }}
       </v-btn>
+      <v-icon
+        v-else
+        :title="$t('admin.klasse.deleteKlasse')"
+        data-testid="open-klasse-delete-dialog-icon"
+        icon="mdi-delete"
+        size="small"
+        v-bind="props"
+      ></v-icon>
     </template>
 
     <template
@@ -184,7 +199,7 @@
               <v-btn
                 :block="mdAndDown"
                 class="primary button"
-                @click.stop="handleKlasseDelete(klasse.id)"
+                @click.stop="handleKlasseDelete(klassenId)"
                 data-testid="klasse-delete-button"
               >
                 {{ $t('admin.klasse.deleteKlasse') }}

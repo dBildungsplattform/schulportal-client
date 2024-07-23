@@ -25,6 +25,7 @@ beforeEach(() => {
         typ: OrganisationsTyp.Klasse,
         administriertVon: '1',
       },
+      useIconActivator: true,
     },
     global: {
       components: {
