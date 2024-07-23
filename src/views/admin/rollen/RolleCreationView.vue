@@ -120,6 +120,7 @@
     } else {
       next();
     }
+    rolleStore.createdRolle = null;
   });
 
   const handleCreateAnotherRolle = (): void => {

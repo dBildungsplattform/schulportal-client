@@ -327,13 +327,14 @@
   });
 
   onBeforeRouteLeave((_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
-    rolleStore.errorCode = '';
     if (isFormDirty()) {
       showUnsavedChangesDialog.value = true;
       blockedNext = next;
     } else {
       next();
     }
+    rolleStore.errorCode = '';
+    rolleStore.createdRolle = null;
   });
 
   onUnmounted(() => {
