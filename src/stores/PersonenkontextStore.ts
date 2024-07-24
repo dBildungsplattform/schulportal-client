@@ -23,6 +23,8 @@ import {
   type DbiamCreatePersonWithContextBodyParams,
   type DBiamPersonResponse,
   type PersonendatensatzResponse,
+  type PersonAdministrationApiInterface,
+  PersonAdministrationApiFactory,
 } from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
 
@@ -34,6 +36,12 @@ const dbiamPersonenkontexteApi: DbiamPersonenkontexteApiInterface = DbiamPersone
   axiosApiInstance,
 );
 const personenuebersichtApi: DbiamPersonenuebersichtApiInterface = DbiamPersonenuebersichtApiFactory(
+  undefined,
+  '',
+  axiosApiInstance,
+);
+
+const personAdministrationApi: PersonAdministrationApiInterface = PersonAdministrationApiFactory(
   undefined,
   '',
   axiosApiInstance,
@@ -97,13 +105,14 @@ type PersonenkontextState = {
   createdPersonWithKontext: DBiamPersonResponse | null;
   errorCode: string;
   loading: boolean;
+  totalFilteredRollen: number;
 };
 
 type PersonenkontextGetters = {};
 type PersonenkontextActions = {
   hasSystemrecht: (personId: string, systemrecht: 'ROLLEN_VERWALTEN') => Promise<SystemrechtResponse>;
   processWorkflowStep: (filter?: WorkflowFilter) => Promise<PersonenkontextWorkflowResponse>;
-  getPersonenkontextRolleWithFilter: (rolleName: string, limit: number) => Promise<void>;
+  getPersonenkontextRolleWithFilter: (rolleName: string, limit?: number) => Promise<void>;
   getPersonenkontextAdministrationsebeneWithFilter: (rolleId: string, sskName: string, limit: number) => Promise<void>;
   updatePersonenkontexte: (combinedZuordnungen: Zuordnung[] | undefined, personId: string) => Promise<void>;
   createPersonenkontext: (
@@ -158,6 +167,7 @@ export const usePersonenkontextStore: StoreDefinition<
       createdPersonWithKontext: null,
       errorCode: '',
       loading: false,
+      totalFilteredRollen: 0,
     };
   },
   actions: {
@@ -202,12 +212,13 @@ export const usePersonenkontextStore: StoreDefinition<
       }
     },
 
-    async getPersonenkontextRolleWithFilter(rolleName: string, limit: number) {
+    async getPersonenkontextRolleWithFilter(rolleName: string, limit?: number) {
       this.loading = true;
       try {
         const { data }: { data: FindRollenResponse } =
-          await personenKontextApi.dbiamPersonenkontextWorkflowControllerFindRollen(rolleName, limit);
+          await personAdministrationApi.personAdministrationControllerFindRollen(rolleName, limit);
         this.filteredRollen = data;
+        this.totalFilteredRollen = this.filteredRollen.total;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {

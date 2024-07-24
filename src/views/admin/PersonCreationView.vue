@@ -163,7 +163,13 @@
   const creationErrorText: Ref<string> = ref('');
 
   function isFormDirty(): boolean {
-    return isFieldDirty('selectedVorname') || isFieldDirty('selectedFamilienname');
+    return (
+      isFieldDirty('selectedOrganisation') ||
+      isFieldDirty('selectedRolle') ||
+      isFieldDirty('selectedKlasse') ||
+      isFieldDirty('selectedVorname') ||
+      isFieldDirty('selectedFamilienname')
+    );
   }
 
   async function navigateToPersonTable(): Promise<void> {
