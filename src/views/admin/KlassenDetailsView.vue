@@ -32,9 +32,6 @@
   const currentOrganisationId: string = route.params['id'] as string;
   const isEditActive: Ref<boolean> = ref(false);
 
-  const creationErrorText: Ref<string> = ref('');
-  const creationErrorTitle: Ref<string> = ref('');
-
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
 
   const translatedSchulname: ComputedRef<string | undefined> = computed(() => {
@@ -134,12 +131,7 @@
   const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = handleSubmit(async () => {
     if (selectedSchule.value && selectedKlassenname.value) {
       if (organisationStore.currentOrganisation) {
-        try {
-          await organisationStore.updateOrganisation(currentOrganisationId, selectedKlassenname.value);
-        } catch {
-          creationErrorText.value = t(`admin.klasse.errors.${organisationStore.errorCode}`);
-          creationErrorTitle.value = t(`admin.klasse.title.${organisationStore.errorCode}`);
-        }
+        await organisationStore.updateOrganisation(currentOrganisationId, selectedKlassenname.value);
       }
       resetForm();
     }
@@ -203,10 +195,18 @@
       <!-- Error Message Display -->
       <SpshAlert
         :model-value="!!organisationStore.errorCode"
-        :title="$t('admin.klasse.klasseUpdateErrorTitle')"
+        :title="
+          organisationStore.errorCode === 'UNSPECIFIED_ERROR'
+            ? $t('admin.klasse.loadingErrorTitle')
+            : $t(`admin.klasse.title.${organisationStore.errorCode}`)
+        "
         :type="'error'"
         :closable="false"
-        :text="$t(`admin.klasse.errors.${organisationStore.errorCode}`)"
+        :text="
+          organisationStore.errorCode === 'UNSPECIFIED_ERROR'
+            ? $t('admin.klasse.loadingErrorText')
+            : $t(`admin.klasse.errors.${organisationStore.errorCode}`)
+        "
         :showButton="true"
         :buttonText="$t('nav.backToList')"
         :buttonAction="handleAlertClose"
