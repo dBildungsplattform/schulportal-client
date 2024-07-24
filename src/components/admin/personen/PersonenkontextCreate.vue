@@ -5,7 +5,7 @@
   import FormRow from '@/components/form/FormRow.vue';
   import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
   import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
-  import { type TranslatedObject } from '@/types';
+  import { type TranslatedObject } from '@/types.d';
 
   useI18n({ useScope: 'global' });
 

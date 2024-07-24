@@ -32,7 +32,7 @@
   import { useRollen } from '@/composables/useRollen';
   import { useKlassen } from '@/composables/useKlassen';
   import PersonenkontextCreate from '@/components/admin/personen/PersonenkontextCreate.vue';
-  import { type TranslatedObject } from '@/types';
+  import { type TranslatedObject } from '@/types.d';
   
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 

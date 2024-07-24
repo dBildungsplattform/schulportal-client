@@ -12,7 +12,7 @@
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import type { UserinfoPersonenkontext } from '@/stores/PersonenkontextStore';
   import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
-  import { type TranslatedObject } from '@/types';
+  import { type TranslatedObject } from '@/types.d';
 
   const organisationStore: OrganisationStore = useOrganisationStore();
   const authStore: AuthStore = useAuthStore();

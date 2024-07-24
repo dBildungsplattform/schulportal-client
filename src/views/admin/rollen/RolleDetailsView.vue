@@ -25,7 +25,7 @@
   import { type BaseFieldProps, type TypedSchema, useForm } from 'vee-validate';
   import { getValidationSchema, getVuetifyConfig } from '@/utils/validationRolle';
   import RolleDelete from '@/components/admin/rollen/RolleDelete.vue';
-  import { type TranslatedObject } from '@/types';
+  import { type TranslatedObject } from '@/types.d';
 
   const route: RouteLocationNormalizedLoaded = useRoute();
   const router: Router = useRouter();

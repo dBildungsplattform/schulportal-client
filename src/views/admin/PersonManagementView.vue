@@ -21,7 +21,7 @@
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import ResultTable from '@/components/admin/ResultTable.vue';
   import SearchField from '@/components/admin/SearchField.vue';
-  import { type TranslatedObject } from '@/types';
+  import { type TranslatedObject } from '@/types.d';
   
   const searchFieldComponent: Ref = ref();
 

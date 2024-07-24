@@ -24,7 +24,7 @@
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import { useDisplay } from 'vuetify';
   import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
-  import { type TranslatedObject } from '@/types';
+  import { type TranslatedObject } from '@/types.d';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
