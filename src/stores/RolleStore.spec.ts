@@ -306,7 +306,7 @@ describe('rolleStore', () => {
         mockadapter.onDelete('/api/rolle/1').replyOnce(500, 'some mock server error');
         const deleteRollePromise: Promise<void> = rolleStore.deleteRolleById('1');
         expect(rolleStore.loading).toBe(true);
-        await rejects(deleteRollePromise);
+        await deleteRollePromise;
         expect(rolleStore.errorCode).toEqual('ROLLE_ERROR');
         expect(rolleStore.loading).toBe(false);
       });
@@ -315,7 +315,7 @@ describe('rolleStore', () => {
         mockadapter.onDelete('/api/rolle/1').replyOnce(500, { code: 'some mock server error' });
         const deleteRollePromise: Promise<void> = rolleStore.deleteRolleById('1');
         expect(rolleStore.loading).toBe(true);
-        await rejects(deleteRollePromise);
+        await deleteRollePromise;
         expect(rolleStore.errorCode).toEqual('ROLLE_ERROR');
         expect(rolleStore.loading).toBe(false);
       });
