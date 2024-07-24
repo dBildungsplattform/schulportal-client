@@ -9,7 +9,9 @@ import {
   type RolleApiInterface,
   type RolleResponse,
   type RolleServiceProviderQueryParams,
+  type RolleWithServiceProvidersResponse,
   type ServiceProviderResponse,
+  type UpdateRolleBodyParams,
 } from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
 
@@ -17,6 +19,7 @@ const rolleApi: RolleApiInterface = RolleApiFactory(undefined, '', axiosApiInsta
 
 type RolleState = {
   createdRolle: Rolle | null;
+  updatedRolle: RolleWithServiceProvidersResponse | null;
   currentRolle: Rolle | null;
   allRollen: Array<RolleResponse>;
   errorCode: string;
@@ -39,6 +42,13 @@ type RolleActions = {
   ) => Promise<RolleResponse>;
   getAllRollen: (searchString: string) => Promise<void>;
   getRolleById: (rolleId: string) => Promise<Rolle>;
+  updateRolle: (
+    rolleId: string,
+    rollenName: string,
+    merkmale: RollenMerkmal[],
+    systemrechte: RollenSystemRecht[],
+    serviceProviderIds: string[],
+  ) => Promise<RolleWithServiceProvidersResponse>;
 };
 
 export { RollenArt };
@@ -63,6 +73,7 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
   state: (): RolleState => {
     return {
       createdRolle: null,
+      updatedRolle: null,
       currentRolle: null,
       allRollen: [],
       errorCode: '',
@@ -157,6 +168,38 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
           this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
+        }
+        return await Promise.reject(this.errorCode);
+      } finally {
+        this.loading = false;
+      }
+    },
+    async updateRolle(
+      rolleId: string,
+      rollenName: string,
+      merkmale: RollenMerkmal[],
+      systemrechte: RollenSystemRecht[],
+      serviceProviderIds: string[],
+    ): Promise<RolleWithServiceProvidersResponse> {
+      this.loading = true;
+      this.errorCode = '';
+      try {
+        const updateRolleBodyParams: UpdateRolleBodyParams = {
+          name: rollenName,
+          merkmale: merkmale as unknown as Set<RollenMerkmal>,
+          systemrechte: systemrechte as unknown as Set<RollenSystemRecht>,
+          serviceProviderIds: serviceProviderIds as unknown as Set<string>
+        };
+        const { data }: { data: RolleWithServiceProvidersResponse } = await rolleApi.rolleControllerUpdateRolle(
+          rolleId,
+          updateRolleBodyParams,
+        );
+        this.updatedRolle = data;
+        return data;
+      } catch (error) {
+        this.errorCode = 'UNSPECIFIED_ERROR';
+        if (isAxiosError(error)) {
+          this.errorCode = error.response?.data.i18nKey || 'ROLLE_ERROR';
         }
         return await Promise.reject(this.errorCode);
       } finally {
