@@ -11,12 +11,7 @@
   import { useForm, type TypedSchema, type BaseFieldProps } from 'vee-validate';
   import { toTypedSchema } from '@vee-validate/yup';
   import { object, string } from 'yup';
-  import {
-    useOrganisationStore,
-    type OrganisationStore,
-    type Organisation,
-    OrganisationsTyp,
-  } from '@/stores/OrganisationStore';
+  import { useOrganisationStore, type OrganisationStore, OrganisationsTyp, type Organisation } from '@/stores/OrganisationStore';
   import { DIN_91379A_EXT } from '@/utils/validation';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';

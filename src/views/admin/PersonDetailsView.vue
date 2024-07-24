@@ -67,6 +67,9 @@
 
   const canCommit: Ref<boolean> = ref(false);
 
+  const creationErrorText: Ref<string> = ref('');
+  const creationErrorTitle: Ref<string> = ref('');
+
   function navigateToPersonTable(): void {
     router.push({ name: 'person-management' });
   }
@@ -126,6 +129,7 @@
       cannotDeleteDialogVisible.value = true;
       return;
     }
+
     // The remaining Zuordnungen that were not selected
     const remainingZuordnungen: Zuordnung[] | undefined = zuordnungenResult.value?.filter(
       (zuordnung: Zuordnung) => !selectedZuordnungen.value.includes(zuordnung),
@@ -147,7 +151,6 @@
 
     // Combine remaining Zuordnungen and filtered Klassen Zuordnungen
     const combinedZuordnungen: Zuordnung[] | undefined = remainingZuordnungen?.concat(filteredKlassenZuordnungen || []);
-
     await personenkontextStore.updatePersonenkontexte(combinedZuordnungen, currentPersonId);
     zuordnungenResult.value = combinedZuordnungen;
     selectedZuordnungen.value = [];
@@ -157,7 +160,7 @@
       (zuordnung: Zuordnung) => zuordnung.editable,
     );
 
-    deleteSuccessDialogVisible.value = true;
+    deleteSuccessDialogVisible.value = !personenkontextStore.errorCode;
 
     if (!editableZuordnungen || editableZuordnungen.length === 0) {
       // If no editable Zuordnungen are left, navigate to person table after the dialog is closed
@@ -174,6 +177,14 @@
       };
     }
   };
+
+  const alertButtonText: ComputedRef<string> = computed(() => {
+    return personenkontextStore.errorCode === 'PERSON_NOT_FOUND' ? t('nav.backToList') : t('refreshData');
+  });
+
+  const alertButtonAction: ComputedRef<() => void> = computed(() => {
+    return personenkontextStore.errorCode === 'PERSON_NOT_FOUND' ? navigateToPersonTable : (): void => router.go(0);
+  });
   function getSskName(sskDstNr: string, sskName: string): string {
     /* truncate ssk name */
     const truncatededSskName: string = sskName.length > 30 ? `${sskName.substring(0, 30)}...` : sskName;
@@ -324,12 +335,22 @@
       : undefined;
   };
 
+  function handleStoreUpdates(): void {
+    if (personenkontextStore.errorCode) {
+      creationErrorText.value = t(`admin.personenkontext.errors.${personenkontextStore.errorCode}`);
+      creationErrorTitle.value = t(`admin.personenkontext.title.${personenkontextStore.errorCode}`);
+    }
+  }
+
+  watch(() => personenkontextStore.errorCode, handleStoreUpdates);
+  watch(() => personenkontextStore.loading, handleStoreUpdates);
+
   // This will send the updated list of Zuordnungen to the Backend on TOP of the new added one through the form.
-  const confirmAddition = async (): Promise<void> => {
+  async function confirmAddition(): Promise<void> {
     await personenkontextStore.updatePersonenkontexte(finalZuordnungen.value, currentPersonId);
-    createSuccessDialogVisible.value = true;
+    createSuccessDialogVisible.value = !personenkontextStore.errorCode;
     resetForm();
-  };
+  }
 
   // The save button will act according to what kind of pending action we have.
   const handleSaveClick = (): void => {
@@ -353,7 +374,6 @@
         !existingZuordnungen?.some((zuordnung: Zuordnung) => zuordnung.rolleId === rolle.value),
     );
   });
-
 
   // Computed property to get the title of the selected role
   const selectedRolleTitle: ComputedRef<string | undefined> = computed(() => {
@@ -444,6 +464,7 @@
     }
   }
   onBeforeMount(async () => {
+    personenkontextStore.errorCode = '';
     await personStore.getPersonById(currentPersonId);
     await personenkontextStore.getPersonenuebersichtById(currentPersonId);
   });
@@ -469,28 +490,34 @@
       :padded="true"
       :showCloseText="true"
     >
-      <!-- Error Message Display if the personStore throws any kind of error -->
+      <!-- Error Message Display if the personStore throws any kind of error (Not being able to load the person) -->
       <SpshAlert
-        :buttonAction="navigateToPersonTable"
         :model-value="!!personStore.errorCode"
-        :title="$t('admin.person.loadingErrorTitle')"
         :type="'error'"
         :closable="false"
         :text="$t('admin.person.loadingErrorText')"
         :showButton="true"
         :buttonText="$t('nav.backToList')"
+        :buttonAction="navigateToPersonTable"
+        :title="$t('admin.person.loadingErrorTitle')"
         @update:modelValue="handleAlertClose"
       />
 
-      <template v-if="!personStore.errorCode">
-        <v-container>
-          <v-row class="ml-md-16">
-            <v-col>
-              <h3 class="subtitle-1">
-                {{ $t('admin.person.personalInfo') }}
-              </h3></v-col
-            >
-          </v-row>
+      <!-- Error Message Display if the personenkontextStore throws any kind of error (Not being able to load the person) -->
+      <SpshAlert
+        :model-value="!!personenkontextStore.errorCode"
+        :type="'error'"
+        :closable="false"
+        :text="creationErrorText"
+        :showButton="true"
+        :buttonText="alertButtonText"
+        :buttonAction="alertButtonAction"
+        :title="creationErrorTitle"
+        @update:modelValue="handleAlertClose"
+      />
+
+      <template v-if="!personStore.errorCode && !personenkontextStore.errorCode">
+        <v-container class="personal-info">
           <div v-if="personStore.currentPerson?.person">
             <!-- Vorname -->
             <v-row class="mt-0">
@@ -696,7 +723,6 @@
           <v-row v-else>
             <v-col
               cols="10"
-              offset-lg="2"
               offset="1"
             >
               <h3 class="text-body">{{ $t('person.noZuordnungenFound') }}</h3>
@@ -718,10 +744,7 @@
             <!-- Check if 'zuordnungen' array exists and has length > 0 -->
             <v-row
               class="checkbox-row ml-md-16 mb-12"
-              v-if="
-                personenkontextStore.personenuebersicht?.zuordnungen &&
-                personenkontextStore.personenuebersicht?.zuordnungen.length > 0
-              "
+
             >
               <v-col
                 v-if="pendingDeletion || pendingCreation"
@@ -745,10 +768,11 @@
                       :value="zuordnung"
                     >
                       <template v-slot:label>
-                        <span class="text-body">
+                        <span  class="text-body">
                           {{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
                           {{ zuordnung.klasse }}
                         </span>
+
                       </template>
                     </v-checkbox>
                   </div>
@@ -866,11 +890,13 @@
                 </v-col>
               </v-col>
             </v-row>
-            <v-row v-else>
+            <v-row v-if="
+                personenkontextStore.personenuebersicht?.zuordnungen &&
+                personenkontextStore.personenuebersicht?.zuordnungen.length === 0 && !pendingCreation && !pendingDeletion
+              ">
               <v-col
-                class="mb-14"
+                class="mt-n12 mb-16"
                 cols="10"
-                offset-lg="2"
                 offset="1"
               >
                 <h3 class="text-body">{{ $t('person.noZuordnungenFound') }}</h3>
@@ -1026,7 +1052,7 @@
       <LayoutCard
         :closable="true"
         :header="$t('person.editZuordnungen')"
-         @onCloseClicked="closeDeleteSuccessDialog"
+        @onCloseClicked="closeDeleteSuccessDialog"
       >
         <v-card-text>
           <v-container>
@@ -1068,7 +1094,7 @@
       <LayoutCard
         :closable="true"
         :header="$t('person.editZuordnungen')"
-         @onCloseClicked="closeCreateSuccessDialog"
+        @onCloseClicked="closeCreateSuccessDialog"
       >
         <v-card-text>
           <v-container>
@@ -1110,7 +1136,7 @@
       <LayoutCard
         :closable="true"
         :header="$t('person.editZuordnungen')"
-          @onCloseClicked="cancelAddition"
+        @onCloseClicked="cancelAddition"
       >
         <v-card-text>
           <v-container>
@@ -1165,7 +1191,7 @@
       <LayoutCard
         :closable="true"
         :header="$t('person.editZuordnungen')"
-          @onCloseClicked="closeCannotDeleteDialog"
+        @onCloseClicked="closeCannotDeleteDialog"
       >
         <v-card-text>
           <v-container>

@@ -32,6 +32,7 @@ const mockPersonenuebersicht: Uebersicht = {
   vorname: 'John',
   nachname: 'Orton',
   benutzername: 'jorton',
+  lastModifiedZuordnungen: Date.now().toLocaleString(),
   zuordnungen: [
     {
       sskId: '1',
