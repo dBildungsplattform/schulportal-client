@@ -1,8 +1,13 @@
 import ApiService from '@/services/ApiService';
 import MockAdapter from 'axios-mock-adapter';
 import { setActivePinia, createPinia } from 'pinia';
-import { useRolleStore, type RolleStore } from './RolleStore';
-import { RollenMerkmal, RollenSystemRecht, type RolleResponse } from '../api-client/generated/api';
+import { useRolleStore, type Rolle, type RolleStore } from './RolleStore';
+import {
+  RollenMerkmal,
+  RollenSystemRecht,
+  type RolleResponse,
+  type RolleWithServiceProvidersResponse,
+} from '../api-client/generated/api';
 import { rejects } from 'assert';
 import type { ServiceProvider } from './ServiceProviderStore';
 
@@ -181,6 +186,110 @@ describe('rolleStore', () => {
       await addServiceProviderToRollePromise;
       expect(rolleStore.errorCode).toEqual('some mock server error');
       expect(rolleStore.allRollen).toEqual([]);
+      expect(rolleStore.loading).toBe(false);
+    });
+  });
+  describe('getRolleById', () => {
+    it('should load Rolle and update state', async () => {
+      const mockResponse: RolleResponse[] = [
+        {
+          administeredBySchulstrukturknoten: '1234',
+          rollenart: 'LEHR',
+          name: 'Lehrer',
+          // TODO: remove type casting when generator is fixed
+          merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RollenMerkmal>,
+          systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
+          createdAt: '2022',
+          updatedAt: '2022',
+          id: '1',
+        },
+      ];
+
+      mockadapter.onGet('/api/rolle/1').replyOnce(200, mockResponse, {});
+      const getRolleByIdPromise: Promise<Rolle> = rolleStore.getRolleById('1');
+      expect(rolleStore.loading).toBe(true);
+      await getRolleByIdPromise;
+      expect(rolleStore.currentRolle).toEqual([...mockResponse]);
+      expect(rolleStore.loading).toBe(false);
+    });
+
+    it('should handle string error', async () => {
+      mockadapter.onGet('/api/rolle/1').replyOnce(500, 'some mock server error');
+      const getRolleByIdPromise: Promise<Rolle> = rolleStore.getRolleById('1');
+      expect(rolleStore.loading).toBe(true);
+      await rejects(getRolleByIdPromise);
+      expect(rolleStore.errorCode).toEqual('UNSPECIFIED_ERROR');
+      expect(rolleStore.currentRolle).toEqual(null);
+      expect(rolleStore.loading).toBe(false);
+    });
+
+    it('should handle error code', async () => {
+      mockadapter.onGet('/api/rolle/1').replyOnce(500, { code: 'some mock server error' });
+      const getRolleByIdPromise: Promise<Rolle> = rolleStore.getRolleById('1');
+      expect(rolleStore.loading).toBe(true);
+      await rejects(getRolleByIdPromise);
+      expect(rolleStore.errorCode).toEqual('some mock server error');
+      expect(rolleStore.currentRolle).toEqual(null);
+      expect(rolleStore.loading).toBe(false);
+    });
+  });
+  describe('updateRolle', () => {
+    it('should update Rolle and update state', async () => {
+      const mockResponse: RolleWithServiceProvidersResponse = {
+        administeredBySchulstrukturknoten: '1234',
+        rollenart: 'LEHR',
+        name: 'Updated Lehrer',
+        merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RollenMerkmal>,
+        systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
+        createdAt: '2022',
+        updatedAt: '2023',
+        id: '1',
+        serviceProviders: [{ id: 'sp1', name: 'ServiceProvider1' }],
+      };
+
+      mockadapter.onPut('/api/rolle/1').replyOnce(200, mockResponse);
+      const updateRollePromise: Promise<RolleWithServiceProvidersResponse> = rolleStore.updateRolle(
+        '1',
+        'Updated Lehrer',
+        ['KOPERS_PFLICHT'],
+        ['ROLLEN_VERWALTEN'],
+        ['sp1'],
+      );
+      expect(rolleStore.loading).toBe(true);
+      await updateRollePromise;
+      expect(rolleStore.updatedRolle).toEqual(mockResponse);
+      expect(rolleStore.loading).toBe(false);
+    });
+
+    it('should handle string error on update', async () => {
+      mockadapter.onPut('/api/rolle/1').replyOnce(500, 'some mock server error');
+      const updateRollePromise: Promise<RolleWithServiceProvidersResponse> = rolleStore.updateRolle(
+        '1',
+        'Updated Lehrer',
+        ['KOPERS_PFLICHT'],
+        ['ROLLEN_VERWALTEN'],
+        ['sp1'],
+      );
+      expect(rolleStore.loading).toBe(true);
+      await rejects(updateRollePromise);
+      expect(rolleStore.errorCode).toEqual('ROLLE_ERROR');
+      expect(rolleStore.updatedRolle).toEqual(null);
+      expect(rolleStore.loading).toBe(false);
+    });
+
+    it('should handle error code on update', async () => {
+      mockadapter.onPut('/api/rolle/1').replyOnce(500, { code: 'some mock server error' });
+      const updateRollePromise: Promise<RolleWithServiceProvidersResponse> = rolleStore.updateRolle(
+        '1',
+        'Updated Lehrer',
+        ['KOPERS_PFLICHT'],
+        ['ROLLEN_VERWALTEN'],
+        ['sp1'],
+      );
+      expect(rolleStore.loading).toBe(true);
+      await rejects(updateRollePromise);
+      expect(rolleStore.errorCode).toEqual('ROLLE_ERROR');
+      expect(rolleStore.updatedRolle).toEqual(null);
       expect(rolleStore.loading).toBe(false);
     });
   });
