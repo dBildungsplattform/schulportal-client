@@ -1,7 +1,6 @@
 import { expect, test } from 'vitest';
 import { VueWrapper, mount } from '@vue/test-utils';
 import KlasseDelete from './KlasseDelete.vue';
-import { OrganisationsTyp } from '@/stores/OrganisationStore';
 
 let wrapper: VueWrapper | null = null;
 
