@@ -2724,77 +2724,6 @@
                         "bearer": []
                     }
                 ]
-            },
-            "put": {
-                "operationId": "DBiamPersonenkontextController_updatePersonenkontexte",
-                "parameters": [
-                    {
-                        "name": "personId",
-                        "required": true,
-                        "in": "path",
-                        "description": "The ID for the person.",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/DbiamUpdatePersonenkontexteBodyParams"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Add or remove personenkontexte as one operation. Returns the Personenkontexte existing after update.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/PersonenkontexteUpdateResponse"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "The personenkontexte could not be updated, may due to unsatisfied specifications.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/DbiamPersonenkontexteUpdateError"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Not authorized to update personenkontexte."
-                    },
-                    "403": {
-                        "description": "Insufficient permission to update personenkontexte."
-                    },
-                    "409": {
-                        "description": "Changes are conflicting with current state of personenkontexte."
-                    },
-                    "500": {
-                        "description": "Internal server error while updating personenkontexte."
-                    }
-                },
-                "tags": [
-                    "dbiam-personenkontexte"
-                ],
-                "security": [
-                    {
-                        "oauth2": [
-                            "openid"
-                        ]
-                    },
-                    {
-                        "bearer": []
-                    }
-                ]
             }
         },
         "/api/dbiam/personenkontext": {
@@ -3873,6 +3802,12 @@
                     "benutzername": {
                         "type": "string"
                     },
+                    "lastModifiedZuordnungen": {
+                        "format": "date-time",
+                        "type": "string",
+                        "nullable": true,
+                        "description": "Date of the most recent changed personenkontext in the Zuordnungen"
+                    },
                     "zuordnungen": {
                         "type": "array",
                         "items": {
@@ -3885,6 +3820,7 @@
                     "vorname",
                     "nachname",
                     "benutzername",
+                    "lastModifiedZuordnungen",
                     "zuordnungen"
                 ]
             },
@@ -4813,71 +4749,6 @@
                     "code"
                 ]
             },
-            "DbiamUpdatePersonenkontexteBodyParams": {
-                "type": "object",
-                "properties": {
-                    "lastModified": {
-                        "format": "date-time",
-                        "type": "string",
-                        "nullable": false,
-                        "description": "Date of the most recent changed personenkontext"
-                    },
-                    "count": {
-                        "type": "number",
-                        "nullable": false,
-                        "description": "The amount of personenkontexte"
-                    },
-                    "personenkontexte": {
-                        "nullable": false,
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/DbiamPersonenkontextBodyParams"
-                        }
-                    }
-                },
-                "required": [
-                    "lastModified",
-                    "count",
-                    "personenkontexte"
-                ]
-            },
-            "PersonenkontexteUpdateResponse": {
-                "type": "object",
-                "properties": {
-                    "dBiamPersonenkontextResponses": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/DBiamPersonenkontextResponse"
-                        }
-                    }
-                },
-                "required": [
-                    "dBiamPersonenkontextResponses"
-                ]
-            },
-            "DbiamPersonenkontexteUpdateError": {
-                "type": "object",
-                "properties": {
-                    "i18nKey": {
-                        "type": "string",
-                        "enum": [
-                            "PERSONENKONTEXTE_UPDATE_ERROR",
-                            "PERSONENKONTEXT_NOT_FOUND",
-                            "COUNT_MISMATCHING_ERROR",
-                            "NEWER_VERSION_OF_PERSONENKONTEXTE_AVAILABLE",
-                            "PERSON_ID_MISMATCH_ERROR"
-                        ]
-                    },
-                    "code": {
-                        "type": "number",
-                        "description": "Corresponds to HTTP Status code like 200, 404, 500"
-                    }
-                },
-                "required": [
-                    "i18nKey",
-                    "code"
-                ]
-            },
             "PersonenkontextWorkflowResponse": {
                 "type": "object",
                 "properties": {
@@ -4916,6 +4787,72 @@
                     "selectedOrganisation",
                     "selectedRolle",
                     "canCommit"
+                ]
+            },
+            "DbiamUpdatePersonenkontexteBodyParams": {
+                "type": "object",
+                "properties": {
+                    "lastModified": {
+                        "format": "date-time",
+                        "type": "string",
+                        "nullable": true,
+                        "description": "Date of the most recent changed personenkontext"
+                    },
+                    "count": {
+                        "type": "number",
+                        "nullable": false,
+                        "description": "The amount of personenkontexte"
+                    },
+                    "personenkontexte": {
+                        "nullable": false,
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/DbiamPersonenkontextBodyParams"
+                        }
+                    }
+                },
+                "required": [
+                    "count",
+                    "personenkontexte"
+                ]
+            },
+            "PersonenkontexteUpdateResponse": {
+                "type": "object",
+                "properties": {
+                    "dBiamPersonenkontextResponses": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/DBiamPersonenkontextResponse"
+                        }
+                    }
+                },
+                "required": [
+                    "dBiamPersonenkontextResponses"
+                ]
+            },
+            "DbiamPersonenkontexteUpdateError": {
+                "type": "object",
+                "properties": {
+                    "i18nKey": {
+                        "type": "string",
+                        "enum": [
+                            "PERSONENKONTEXTE_UPDATE_ERROR",
+                            "PERSONENKONTEXT_NOT_FOUND",
+                            "COUNT_MISMATCHING",
+                            "NEWER_VERSION_OF_PERSONENKONTEXTE_AVAILABLE",
+                            "INVALID_LAST_MODIFIED_VALUE",
+                            "PERSON_ID_MISMATCH",
+                            "PERSON_NOT_FOUND"
+                        ]
+                    },
+                    "code": {
+                        "type": "number",
+                        "description": "Corresponds to HTTP Status code like 200, 404, 500"
+                    }
+                },
+                "required": [
+                    "i18nKey",
+                    "code"
                 ]
             },
             "FindSchulstrukturknotenResponse": {
