@@ -26,6 +26,7 @@
   import { getValidationSchema, getVuetifyConfig } from '@/utils/validationRolle';
   import RolleDelete from '@/components/admin/rollen/RolleDelete.vue';
   import { type TranslatedObject } from '@/types.d';
+  import SuccessTemplate from '@/components/admin/rollen/SuccessTemplate.vue';
 
   const route: RouteLocationNormalizedLoaded = useRoute();
   const router: Router = useRouter();
@@ -338,6 +339,8 @@
     } else {
       next();
     }
+    rolleStore.errorCode = '';
+    rolleStore.createdRolle = null;
   });
 
   onUnmounted(() => {
@@ -491,78 +494,34 @@
       </template>
       <!-- Result template on success after submit  -->
       <template v-if="rolleStore.updatedRolle && !rolleStore.errorCode">
-        <v-container>
-          <v-row justify="center">
-            <v-col
-              class="subtitle-1"
-              cols="auto"
-            >
-              <span data-testid="rolle-success-text">{{ $t('admin.rolle.rolleUpdatedSuccessfully') }}</span>
-            </v-col>
-          </v-row>
-          <v-row justify="center">
-            <v-col cols="auto">
-              <v-icon
-                small
-                color="#1EAE9C"
-                icon="mdi-check-circle"
-              >
-              </v-icon>
-            </v-col>
-          </v-row>
-          <v-row justify="center">
-            <v-col
-              class="subtitle-2"
-              cols="auto"
-            >
-              {{ $t('admin.followingDataCreated') }}
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col class="text-body bold text-right"> {{ $t('admin.rolle.rollenname') }}:</v-col>
-            <v-col class="text-body"
-              ><span data-testid="updated-rolle-name">{{ rolleStore.updatedRolle.name }}</span></v-col
-            >
-          </v-row>
-          <v-row>
-            <v-col class="text-body bold text-right"> {{ $t('admin.rolle.merkmale') }}:</v-col>
-            <v-col class="text-body"
-              ><span data-testid="updated-rolle-merkmale">{{ translatedUpdatedRolleMerkmale }}</span></v-col
-            ></v-row
-          >
-          <v-row>
-            <v-col class="text-body bold text-right"> {{ $t('admin.serviceProvider.assignedServiceProvider') }}:</v-col>
-            <v-col class="text-body">
-              <span data-testid="updated-rolle-angebote">{{ translatedUpdatedAngebote }}</span>
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col class="text-body bold text-right"> {{ $t('admin.rolle.systemrechte') }}:</v-col>
-            <v-col class="text-body"
-              ><span data-testid="updated-rolle-systemrecht">{{ translatedUpdatedSystemrecht }}</span></v-col
-            ></v-row
-          >
-          <v-divider
-            class="border-opacity-100 rounded my-6"
-            color="#E5EAEF"
-            thickness="6"
-          ></v-divider>
-          <v-row justify="end">
-            <v-col
-              cols="12"
-              sm="6"
-              md="auto"
-            >
-              <v-btn
-                class="secondary"
-                data-testid="back-to-details-button"
-                :block="mdAndDown"
-                @click="() => router.go(0)"
-                >{{ $t('nav.backToDetails') }}</v-btn
-              >
-            </v-col>
-          </v-row>
-        </v-container>
+        <SuccessTemplate
+          :successMessage="$t('admin.rolle.rolleUpdatedSuccessfully')"
+          :followingDataCreated="$t('admin.followingDataCreated')"
+          :createdData="[
+            { label: $t('admin.rolle.rollenname'), value: rolleStore.updatedRolle?.name, testId: 'updated-rolle-name' },
+            {
+              label: $t('admin.rolle.merkmale'),
+              value: translatedUpdatedRolleMerkmale,
+              testId: 'updated-rolle-merkmale',
+            },
+            {
+              label: $t('admin.serviceProvider.assignedServiceProvider'),
+              value: translatedUpdatedAngebote,
+              testId: 'updated-rolle-angebote',
+            },
+            {
+              label: $t('admin.rolle.systemrechte'),
+              value: translatedUpdatedSystemrecht,
+              testId: 'updated-rolle-systemrecht',
+            },
+          ]"
+          :backButtonText="$t('nav.backToDetails')"
+          :createAnotherButtonText="$t('admin.rolle.createAnother')"
+          :showCreateAnotherButton="false"
+          backButtonTestId="back-to-details-button"
+          createAnotherButtonTestId="create-another-rolle-button"
+          @onNavigateBack="router.go(0)"
+        />
       </template>
     </LayoutCard>
   </div>

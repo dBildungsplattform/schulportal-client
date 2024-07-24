@@ -5,6 +5,11 @@
   import FormRow from '@/components/form/FormRow.vue';
   import { type TranslatedObject } from '@/types.d';
 
+  type TranslatedObject = {
+    value: string;
+    title: string;
+  };
+
   type Props = {
     administrationsebenen?: Array<{ value: string; title: string }>;
     readonly?: boolean;

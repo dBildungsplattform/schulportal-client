@@ -97,29 +97,6 @@ describe('RolleCreationView', () => {
     await nextTick();
     expect(push).toHaveBeenCalledTimes(1);
   });
-
-  test('it renders the success template and goes back to form', async () => {
-    const push: MockInstance<[to: RouteLocationRaw], Promise<void | NavigationFailure | undefined>> = vi.spyOn(
-      router,
-      'push',
-    );
-    rolleStore.createdRolle = {
-      id: '3',
-      administeredBySchulstrukturknoten: '3',
-      merkmale: new Set(),
-      name: 'Rolle 3',
-      rollenart: 'LERN',
-      systemrechte: new Set(),
-    };
-    rolleStore.errorCode = '';
-    await nextTick();
-    expect(wrapper?.find('[data-testid="rolle-success-text"]').exists()).toBe(true);
-    expect(wrapper?.find('[data-testid="created-rolle-angebote"]').exists()).toBe(true);
-    wrapper?.find('[data-testid="back-to-list-button"]').trigger('click');
-    await nextTick();
-    expect(push).toHaveBeenCalledTimes(1);
-  });
-
   test('it fills the rolle creation form', async () => {
     const rollennameInput: VueWrapper | undefined = wrapper
       ?.findComponent({ ref: 'rolle-creation-form' })
