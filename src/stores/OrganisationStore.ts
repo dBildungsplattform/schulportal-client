@@ -52,7 +52,7 @@ type OrganisationActions = {
   getAllOrganisationen: (filter?: OrganisationenFilter) => Promise<void>;
   getFilteredKlassen(filter?: OrganisationenFilter): Promise<void>;
   getKlassenByOrganisationId: (organisationId: string, searchFilter?: string) => Promise<void>;
-  getOrganisationById: (organisationId: string, organisationsTyp: OrganisationsTyp) => Promise<Organisation>;
+  getOrganisationById: (organisationId: string, organisationsTyp: OrganisationsTyp) => Promise<void>;
   createOrganisation: (
     kennung: string,
     name: string,
@@ -165,14 +165,11 @@ export const useOrganisationStore: StoreDefinition<
         } else {
           this.currentOrganisation = data;
         }
-
-        return data;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
           this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
         }
-        return await Promise.reject(this.errorCode);
       } finally {
         this.loading = false;
       }
