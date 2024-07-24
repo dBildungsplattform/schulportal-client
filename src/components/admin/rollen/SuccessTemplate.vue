@@ -5,18 +5,18 @@
 
   defineProps<{
     successMessage: string;
-    followingDataCreated: string;
-    createdData: Array<{ label: string; value: string; testId: string }>;
+    followingRolleDataCreated: string;
+    createdRolleData: Array<{ label: string; value: string; testId: string }>;
     backButtonText: string;
-    createAnotherButtonText: string;
-    showCreateAnotherButton: boolean;
+    createAnotherRolleButtonText: string;
+    showCreateAnotherRolleButton: boolean;
     backButtonTestId: string;
     createAnotherButtonTestId: string;
   }>();
 
   type Emits = {
-    (event: 'OnNavigateBack'): void;
-    (event: 'OnCreateAnother'): void;
+    (event: 'OnNavigateBackToRolleManagement'): void;
+    (event: 'OnCreateAnotherRolle'): void;
   };
 
   const emit: Emits = defineEmits<Emits>();
@@ -24,8 +24,8 @@
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
   useI18n({ useScope: 'global' });
 
-  const navigateBack = (): void => emit('OnNavigateBack');
-  const createAnother = (): void => emit('OnCreateAnother');
+  const navigateBack = (): void => emit('OnNavigateBackToRolleManagement');
+  const createAnother = (): void => emit('OnCreateAnotherRolle');
 </script>
 
 <template>
@@ -52,11 +52,11 @@
         class="subtitle-2"
         cols="auto"
       >
-        {{ followingDataCreated }}
+        {{ followingRolleDataCreated }}
       </v-col>
     </v-row>
     <v-row
-      v-for="(item, index) in createdData"
+      v-for="(item, index) in createdRolleData"
       :key="index"
     >
       <v-col class="text-body bold text-right">{{ item.label }}:</v-col>
@@ -87,14 +87,14 @@
         cols="12"
         sm="6"
         md="auto"
-        v-if="showCreateAnotherButton"
+        v-if="showCreateAnotherRolleButton"
       >
         <v-btn
           class="primary button"
           :data-testid="createAnotherButtonTestId"
           :block="mdAndDown"
           @click="createAnother"
-          >{{ createAnotherButtonText }}</v-btn
+          >{{ createAnotherRolleButtonText }}</v-btn
         >
       </v-col>
     </v-row>
