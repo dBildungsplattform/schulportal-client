@@ -2,8 +2,12 @@ import {
   type DBiamPersonenkontextResponse,
   type DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response,
   type DBiamPersonenuebersichtResponse,
+  type FindRollenResponse,
+  type FindSchulstrukturknotenResponse,
   type SystemrechtResponse,
   OrganisationsTyp,
+  RollenMerkmal,
+  RollenSystemRecht,
 } from '@/api-client/generated';
 import ApiService from '@/services/ApiService';
 import MockAdapter from 'axios-mock-adapter';

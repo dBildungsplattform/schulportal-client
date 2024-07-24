@@ -16,15 +16,8 @@ beforeEach(() => {
     attachTo: document.getElementById('app') || '',
     props: {
       errorCode: '',
-      klasse: {
-        id: '1',
-        kennung: '1234567',
-        name: 'Klasse 1',
-        namensergaenzung: 'Ergänzung',
-        kuerzel: 'K1',
-        typ: OrganisationsTyp.Klasse,
-        administriertVon: '1',
-      },
+      klassenId: '1',
+      klassenname: '1A',
       useIconActivator: true,
     },
     global: {
