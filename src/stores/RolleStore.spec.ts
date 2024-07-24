@@ -248,7 +248,7 @@ describe('rolleStore', () => {
       };
 
       mockadapter.onPut('/api/rolle/1').replyOnce(200, mockResponse);
-      const updateRollePromise: Promise<RolleWithServiceProvidersResponse> = rolleStore.updateRolle(
+      const updateRollePromise: Promise<void> = rolleStore.updateRolle(
         '1',
         'Updated Lehrer',
         ['KOPERS_PFLICHT'],
@@ -263,7 +263,7 @@ describe('rolleStore', () => {
 
     it('should handle string error on update', async () => {
       mockadapter.onPut('/api/rolle/1').replyOnce(500, 'some mock server error');
-      const updateRollePromise: Promise<RolleWithServiceProvidersResponse> = rolleStore.updateRolle(
+      const updateRollePromise: Promise<void> = rolleStore.updateRolle(
         '1',
         'Updated Lehrer',
         ['KOPERS_PFLICHT'],
@@ -271,7 +271,7 @@ describe('rolleStore', () => {
         ['sp1'],
       );
       expect(rolleStore.loading).toBe(true);
-      await rejects(updateRollePromise);
+      await updateRollePromise;
       expect(rolleStore.errorCode).toEqual('ROLLE_ERROR');
       expect(rolleStore.updatedRolle).toEqual(null);
       expect(rolleStore.loading).toBe(false);
@@ -279,7 +279,7 @@ describe('rolleStore', () => {
 
     it('should handle error code on update', async () => {
       mockadapter.onPut('/api/rolle/1').replyOnce(500, { code: 'some mock server error' });
-      const updateRollePromise: Promise<RolleWithServiceProvidersResponse> = rolleStore.updateRolle(
+      const updateRollePromise: Promise<void> = rolleStore.updateRolle(
         '1',
         'Updated Lehrer',
         ['KOPERS_PFLICHT'],
@@ -287,7 +287,7 @@ describe('rolleStore', () => {
         ['sp1'],
       );
       expect(rolleStore.loading).toBe(true);
-      await rejects(updateRollePromise);
+      await updateRollePromise;
       expect(rolleStore.errorCode).toEqual('ROLLE_ERROR');
       expect(rolleStore.updatedRolle).toEqual(null);
       expect(rolleStore.loading).toBe(false);

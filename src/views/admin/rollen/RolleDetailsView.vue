@@ -262,12 +262,7 @@
   }
 
   async function deleteRolle(rolleId: string): Promise<void> {
-    try {
-      await rolleStore.deleteRolleById(rolleId);
-    } catch {
-      creationErrorText.value = t(`admin.rolle.errors.${rolleStore.errorCode}`);
-      creationErrorTitle.value = t(`admin.rolle.title.${rolleStore.errorCode}`);
-    }
+    await rolleStore.deleteRolleById(rolleId);
   }
 
   function preventNavigation(event: BeforeUnloadEvent): void {
@@ -371,10 +366,18 @@
       <!-- Error Message Display -->
       <SpshAlert
         :model-value="!!rolleStore.errorCode"
-        :title="creationErrorTitle || $t('admin.rolle.loadingErrorTitle')"
+        :title="
+          organisationStore.errorCode === 'UNSPECIFIED_ERROR'
+            ? $t('admin.rolle.loadingErrorTitle')
+            : $t(`admin.rolle.title.${rolleStore.errorCode}`)
+        "
         :type="'error'"
         :closable="false"
-        :text="creationErrorText || $t('admin.rolle.loadingErrorText')"
+        :text="
+          rolleStore.errorCode === 'UNSPECIFIED_ERROR'
+            ? $t('admin.rolle.loadingErrorText')
+            : $t(`admin.rolle.errors.${rolleStore.errorCode}`)
+        "
         :showButton="true"
         :buttonText="$t('nav.backToList')"
         :buttonAction="handleAlertClose"
