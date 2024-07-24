@@ -65,13 +65,13 @@
     },
   });
 
-  type KlasseCreationForm = {
+  type KlasseEditForm = {
     selectedSchule: string;
     selectedKlassenname: string;
   };
 
   // eslint-disable-next-line @typescript-eslint/typedef
-  const { defineField, handleSubmit, isFieldDirty, resetForm, setFieldValue } = useForm<KlasseCreationForm>({
+  const { defineField, handleSubmit, isFieldDirty, resetForm, setFieldValue } = useForm<KlasseEditForm>({
     validationSchema,
   });
 

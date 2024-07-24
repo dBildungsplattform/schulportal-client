@@ -88,7 +88,7 @@
   });
 
   const rollen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
-    return rolleStore.allRollen
+    return personenkontextStore.filteredRollen?.moeglicheRollen
       .slice(0, 25)
       .map((rolle: RolleResponse) => ({
         value: rolle.id,
@@ -247,7 +247,7 @@
 
     /* delay new call 500ms */
     timerId = setTimeout(() => {
-      rolleStore.getAllRollen(searchValue);
+      personenkontextStore.getPersonenkontextRolleWithFilter(searchValue);
     }, 500);
   }
 
@@ -268,7 +268,7 @@
       systemrechte: ['KLASSEN_VERWALTEN'],
     });
     await personenkontextStore.getAllPersonenuebersichten();
-    await rolleStore.getAllRollen('');
+    await personenkontextStore.getPersonenkontextRolleWithFilter('');
 
     autoSelectSchule();
   });
@@ -402,7 +402,7 @@
                 <span
                   v-else
                   class="filter-header"
-                  >{{ $t('admin.rolle.rollenFound', { count: rolleStore.totalRollen }, rolleStore.totalRollen) }}</span
+                  >{{ $t('admin.rolle.rollenFound', { count: personenkontextStore.totalFilteredRollen }, personenkontextStore.totalFilteredRollen) }}</span
                 >
               </v-list-item>
             </template>

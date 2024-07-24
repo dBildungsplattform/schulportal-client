@@ -153,7 +153,11 @@
       "enterRollenname": "Rollenname eingeben",
       "errors": {
         "ADD_SYSTEMRECHT_ERROR": "Das Systemrecht konnte nicht hinzugefügt werden.",
-        "ROLLE_ERROR":  "Die Rolle konnte nicht angelegt werden."
+        "ROLLE_ERROR":  "Die Rolle konnte nicht angelegt werden.",
+        "UPDATE_MERKMALE_ERROR": "Die gewünschte Bearbeitung kann nicht ausgeführt werden, da die Rolle noch Benutzern zugeordnet ist. Nehmen Sie bitte zunächst alle Zuordnungen zurück."
+      },
+      "title": {
+        "UPDATE_MERKMALE_ERROR": "Bearbeitung nicht möglich."
       },
       "isAllowedToManageRollen": "Darf Rollen verwalten",
       "loadingErrorText": "Es konnten keine Rollendaten geladen werden.",
@@ -193,6 +197,7 @@
       "rollenname": "Rollenname",
       "rollenSelected": "{count} Rollen ausgewählt",
       "rolleAddedSuccessfully": "Die Rolle wurde erfolgreich hinzugefügt.",
+      "rolleUpdatedSuccessfully": "Die Rolle wurde erfolgreich geändert.",
       "rules": {
         "rolle": {
           "required": "Die Rolle muss ausgewählt werden."
@@ -307,6 +312,7 @@
     "admin": "Schulportal-Administration",
     "backToDetails": "Zurück zur Gesamtübersicht",
     "backToList": "Zurück zur Ergebnisliste",
+    "backToDetails": "Zurück zur Gesamtübersicht",
     "back": "Zurück",
     "backToStart": "Zurück zur Startseite",
     "closeMobileMenu": "Mobiles Menü schließen",
