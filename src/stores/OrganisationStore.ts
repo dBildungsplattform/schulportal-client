@@ -63,7 +63,7 @@ type OrganisationActions = {
     administriertVon?: string,
     zugehoerigZu?: string,
   ) => Promise<Organisation>;
-  updateOrganisation: (organisationId: string, name: string) => Promise<Organisation>;
+  updateOrganisation: (organisationId: string, name: string) => Promise<void>;
 };
 
 export { OrganisationsTyp };
@@ -241,7 +241,7 @@ export const useOrganisationStore: StoreDefinition<
         this.loading = false;
       }
     },
-    async updateOrganisation(organisationId: string, name: string) {
+    async updateOrganisation(organisationId: string, name: string): Promise<void> {
       this.errorCode = '';
       this.loading = true;
       try {
@@ -253,13 +253,11 @@ export const useOrganisationStore: StoreDefinition<
           organisationByNameBodyParams,
         );
         this.updatedOrganisation = data;
-        return data;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
           this.errorCode = error.response?.data.i18nKey || 'KLASSE_ERROR';
         }
-        return await Promise.reject(this.errorCode);
       } finally {
         this.loading = false;
       }
