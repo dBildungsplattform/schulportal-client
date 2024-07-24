@@ -36,6 +36,7 @@
   import { useRollen } from '@/composables/useRollen';
   import { useKlassen } from '@/composables/useKlassen';
   import PersonenkontextCreate from '@/components/admin/personen/PersonenkontextCreate.vue';
+  import { type TranslatedObject } from '@/types';
 
   const router: Router = useRouter();
   const personStore: PersonStore = usePersonStore();
@@ -98,11 +99,6 @@
     selectedFamilienname: string;
     selectedOrganisation: string;
     selectedKlasse: string;
-  };
-
-  type TranslatedObject = {
-    value: string;
-    title: string;
   };
 
   // eslint-disable-next-line @typescript-eslint/typedef

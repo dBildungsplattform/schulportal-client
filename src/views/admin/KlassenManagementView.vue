@@ -12,6 +12,7 @@
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import type { UserinfoPersonenkontext } from '@/stores/PersonenkontextStore';
   import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
+  import { type TranslatedObject } from '@/types';
 
   const organisationStore: OrganisationStore = useOrganisationStore();
   const authStore: AuthStore = useAuthStore();
@@ -33,11 +34,6 @@
       align: 'start',
     } as DataTableHeader,
   ]);
-
-  type TranslatedObject = {
-    value: string;
-    title: string;
-  };
 
   const selectedSchule: Ref<string | null> = ref(null);
   const selectedKlassen: Ref<Array<string>> = ref([]);

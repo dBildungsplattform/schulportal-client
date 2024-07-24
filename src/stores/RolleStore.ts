@@ -217,7 +217,6 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
         if (isAxiosError(error)) {
           this.errorCode = error.response?.data.i18nKey || 'ROLLE_ERROR';
         }
-        return await Promise.reject(this.errorCode);
       } finally {
         this.loading = false;
       }

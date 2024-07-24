@@ -24,6 +24,7 @@
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import { useDisplay } from 'vuetify';
   import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
+  import { type TranslatedObject } from '@/types';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
@@ -57,11 +58,6 @@
   type KlasseCreationForm = {
     selectedSchule: string;
     selectedKlassenname: string;
-  };
-
-  type TranslatedObject = {
-    value: string;
-    title: string;
   };
 
   // eslint-disable-next-line @typescript-eslint/typedef

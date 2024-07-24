@@ -25,6 +25,7 @@
   import { type BaseFieldProps, type TypedSchema, useForm } from 'vee-validate';
   import { getValidationSchema, getVuetifyConfig } from '@/utils/validationRolle';
   import RolleDelete from '@/components/admin/rollen/RolleDelete.vue';
+  import { type TranslatedObject } from '@/types';
 
   const route: RouteLocationNormalizedLoaded = useRoute();
   const router: Router = useRouter();
@@ -41,11 +42,6 @@
 
   const creationErrorText: Ref<string> = ref('');
   const creationErrorTitle: Ref<string> = ref('');
-
-  type TranslatedObject = {
-    value: string;
-    title: string;
-  };
 
   type TranslatedMerkmal = { value: RollenMerkmal; title: string };
   const allMerkmale: Ref<TranslatedMerkmal[]> = ref([]);

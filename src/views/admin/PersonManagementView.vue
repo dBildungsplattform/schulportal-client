@@ -21,7 +21,8 @@
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import ResultTable from '@/components/admin/ResultTable.vue';
   import SearchField from '@/components/admin/SearchField.vue';
-
+  import { type TranslatedObject } from '@/types';
+  
   const searchFieldComponent: Ref = ref();
 
   const router: Router = useRouter();
@@ -52,11 +53,6 @@
     klassen: string;
     person: Person;
   }[];
-
-  type TranslatedObject = {
-    value: string;
-    title: string;
-  };
 
   const searchInputKlassen: Ref<string> = ref('');
   const searchInputRollen: Ref<string> = ref('');
