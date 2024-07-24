@@ -580,6 +580,34 @@ export type DbiamPersonenkontexteUpdateErrorI18nKeyEnum = typeof DbiamPersonenko
 /**
  * 
  * @export
+ * @interface DbiamRolleError
+ */
+export interface DbiamRolleError {
+    /**
+     * 
+     * @type {string}
+     * @memberof DbiamRolleError
+     */
+    'i18nKey': DbiamRolleErrorI18nKeyEnum;
+    /**
+     * Corresponds to HTTP Status code like 200, 404, 500
+     * @type {number}
+     * @memberof DbiamRolleError
+     */
+    'code': number;
+}
+
+export const DbiamRolleErrorI18nKeyEnum = {
+    RolleError: 'ROLLE_ERROR',
+    AddSystemrechtError: 'ADD_SYSTEMRECHT_ERROR',
+    UpdateMerkmaleError: 'UPDATE_MERKMALE_ERROR'
+} as const;
+
+export type DbiamRolleErrorI18nKeyEnum = typeof DbiamRolleErrorI18nKeyEnum[keyof typeof DbiamRolleErrorI18nKeyEnum];
+
+/**
+ * 
+ * @export
  * @interface DbiamUpdatePersonenkontexteBodyParams
  */
 export interface DbiamUpdatePersonenkontexteBodyParams {
