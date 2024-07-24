@@ -125,10 +125,20 @@
     },
     "personenkontext": {
       "creationErrorText": "Bei der Zuordnung des Personenkontextes ist ein Fehler aufgetreten. Bitte prüfen Sie die Zuordnungen am Benutzer.",
+      "title": {
+        "COUNT_MISMATCHING": "Geänderte Daten.",
+        "NEWER_VERSION_OF_PERSONENKONTEXTE_AVAILABLE": "Geänderte Daten.",
+        "PERSONENKONTEXTE_UPDATE_ERROR": "Geänderte Daten.",
+        "PERSON_NOT_FOUND": "Benutzer gelöscht."
+      },
       "errors": {
+        "COUNT_MISMATCHING": "Der Benutzer wurde zwischenzeitlich durch einen anderen Administrator bearbeitet. Bitte aktualisieren Sie die Daten und versuchen Sie es erneut.",
+        "NEWER_VERSION_OF_PERSONENKONTEXTE_AVAILABLE": "Der Benutzer wurde zwischenzeitlich durch einen anderen Administrator bearbeitet. Bitte aktualisieren Sie die Daten und versuchen Sie es erneut.",
         "GLEICHE_ROLLE_AN_KLASSE_WIE_SCHULE": "Mindestens eine Rolle des Benutzers ist an der Schule nicht bekannt.",
         "NUR_LEHR_UND_LERN_AN_KLASSE": "Nur Schüler dürfen einer Klasse zugeordnet werden.",
-        "PERSONENKONTEXT_SPECIFICATION_ERROR": "Die Zuordnung konnte nicht angelegt werden."
+        "PERSONENKONTEXT_SPECIFICATION_ERROR": "Die Zuordnung konnte nicht angelegt werden.",
+        "PERSONENKONTEXTE_UPDATE_ERROR": "Die Zuordnung konnte nicht aktualisiert werden. Bitte versuchen Sie es später erneut.",
+        "PERSON_NOT_FOUND" : "Der Benutzer wurde seit Ihrer letzten Änderung gelöscht und kann nicht mehr bearbeitet werden."
       }
     },
     "rolle": {
@@ -362,6 +372,7 @@
     "zuordnungen": "Schulzuordnung(en)"
   },
   "save": "Speichern",
+  "refreshData": "Daten aktualisieren",
   "resetFilter": "Filter zurücksetzen",
   "search": "Suchen",
   "start": {

@@ -70,6 +70,7 @@ export type Uebersicht =
       vorname: string;
       nachname: string;
       benutzername: string;
+      lastModifiedZuordnungen: string | null;
       zuordnungen: {
         klasse?: string | undefined;
         sskId: string;
@@ -94,6 +95,7 @@ export type WorkflowFilter = {
 
 type PersonenkontextState = {
   allUebersichten: DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response | null;
+  updatedPersonenkontexte: PersonenkontexteUpdateResponse | null;
   workflowStepResponse: PersonenkontextWorkflowResponse | null;
   filteredRollen: FindRollenResponse | null;
   filteredOrganisationen: FindSchulstrukturknotenResponse | null;
@@ -112,10 +114,7 @@ type PersonenkontextActions = {
   processWorkflowStep: (filter?: WorkflowFilter) => Promise<PersonenkontextWorkflowResponse>;
   getPersonenkontextRolleWithFilter: (rolleName: string, limit?: number) => Promise<void>;
   getPersonenkontextAdministrationsebeneWithFilter: (rolleId: string, sskName: string, limit: number) => Promise<void>;
-  updatePersonenkontexte: (
-    combinedZuordnungen: Zuordnung[] | undefined,
-    personId: string,
-  ) => Promise<PersonenkontexteUpdateResponse>;
+  updatePersonenkontexte: (combinedZuordnungen: Zuordnung[] | undefined, personId: string) => Promise<void>;
   createPersonenkontext: (
     personenkontext: DbiamPersonenkontextBodyParams,
     personenKontextTyp: PersonenKontextTyp,
@@ -159,6 +158,7 @@ export const usePersonenkontextStore: StoreDefinition<
     return {
       allUebersichten: null,
       workflowStepResponse: null,
+      updatedPersonenkontexte: null,
       filteredRollen: null,
       filteredOrganisationen: null,
       personenuebersicht: null,
@@ -279,14 +279,12 @@ export const usePersonenkontextStore: StoreDefinition<
         this.loading = false;
       }
     },
-    async updatePersonenkontexte(
-      combinedZuordnungen: Zuordnung[] | undefined,
-      personId: string,
-    ): Promise<PersonenkontexteUpdateResponse> {
+    async updatePersonenkontexte(combinedZuordnungen: Zuordnung[] | undefined, personId: string): Promise<void> {
       this.loading = true;
+      this.errorCode = '';
       try {
         const updateParams: DbiamUpdatePersonenkontexteBodyParams = {
-          lastModified: new Date().toISOString(),
+          lastModified: this.personenuebersicht?.lastModifiedZuordnungen ?? undefined,
           count: this.personenuebersicht?.zuordnungen.length ?? 0,
           personenkontexte: combinedZuordnungen?.map((zuordnung: Zuordnung) => ({
             personId: personId,
@@ -296,13 +294,12 @@ export const usePersonenkontextStore: StoreDefinition<
         };
         const { data }: { data: PersonenkontexteUpdateResponse } =
           await personenKontextApi.dbiamPersonenkontextWorkflowControllerCommit(personId, updateParams);
-        return data;
+        this.updatedPersonenkontexte = data;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
           this.errorCode = error.response?.data.i18nKey || 'PERSONENKONTEXTE_UPDATE_ERROR';
         }
-        return await Promise.reject(this.errorCode);
       } finally {
         this.loading = false;
       }
