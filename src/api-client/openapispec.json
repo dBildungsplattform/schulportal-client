@@ -1981,7 +1981,14 @@
                         }
                     },
                     "400": {
-                        "description": "The input was not valid."
+                        "description": "The input was not valid.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DbiamRolleError"
+                                }
+                            }
+                        }
                     },
                     "401": {
                         "description": "Not authorized to update the rolle."
@@ -3014,67 +3021,6 @@
                 ]
             }
         },
-        "/api/personenkontext-workflow/rollen": {
-            "get": {
-                "operationId": "DbiamPersonenkontextWorkflowController_findRollen",
-                "parameters": [
-                    {
-                        "name": "rolleName",
-                        "required": false,
-                        "in": "query",
-                        "description": "Rolle name used to filter for rollen in personenkontext.",
-                        "schema": {
-                            "nullable": false,
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "limit",
-                        "required": false,
-                        "in": "query",
-                        "description": "The limit of items for the request.",
-                        "schema": {
-                            "nullable": false,
-                            "type": "number"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "The rollen for a personenkontext were successfully returned.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/FindRollenResponse"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Not authorized to get available rolen for personenkontexte."
-                    },
-                    "403": {
-                        "description": "Insufficient permission to get rollen for personenkontext."
-                    },
-                    "500": {
-                        "description": "Internal server error while getting rollen for personenkontexte."
-                    }
-                },
-                "tags": [
-                    "personenkontext"
-                ],
-                "security": [
-                    {
-                        "oauth2": [
-                            "openid"
-                        ]
-                    },
-                    {
-                        "bearer": []
-                    }
-                ]
-            }
-        },
         "/api/personenkontext-workflow/schulstrukturknoten": {
             "get": {
                 "operationId": "DbiamPersonenkontextWorkflowController_findSchulstrukturknoten",
@@ -3193,6 +3139,67 @@
                 },
                 "tags": [
                     "personenkontext"
+                ],
+                "security": [
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
+        "/api/person-administration/rollen": {
+            "get": {
+                "operationId": "PersonAdministrationController_findRollen",
+                "parameters": [
+                    {
+                        "name": "rolleName",
+                        "required": false,
+                        "in": "query",
+                        "description": "Rolle name used to filter for rollen in personenkontext.",
+                        "schema": {
+                            "nullable": false,
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "required": false,
+                        "in": "query",
+                        "description": "The limit of items for the request.",
+                        "schema": {
+                            "nullable": false,
+                            "type": "number"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The rollen for the logged-in user were successfully returned.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/FindRollenResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Not authorized to get available rollen for the logged-in user."
+                    },
+                    "403": {
+                        "description": "Insufficient permission to get rollen for the logged-in user."
+                    },
+                    "500": {
+                        "description": "Internal server error while getting rollen for the logged-in user."
+                    }
+                },
+                "tags": [
+                    "person-administration"
                 ],
                 "security": [
                     {
@@ -4572,6 +4579,27 @@
                     "serviceProviderIds"
                 ]
             },
+            "DbiamRolleError": {
+                "type": "object",
+                "properties": {
+                    "i18nKey": {
+                        "type": "string",
+                        "enum": [
+                            "ROLLE_ERROR",
+                            "ADD_SYSTEMRECHT_ERROR",
+                            "UPDATE_MERKMALE_ERROR"
+                        ]
+                    },
+                    "code": {
+                        "type": "number",
+                        "description": "Corresponds to HTTP Status code like 200, 404, 500"
+                    }
+                },
+                "required": [
+                    "i18nKey",
+                    "code"
+                ]
+            },
             "PersonResponseAutomapper": {
                 "type": "object",
                 "properties": {
@@ -4890,24 +4918,6 @@
                     "canCommit"
                 ]
             },
-            "FindRollenResponse": {
-                "type": "object",
-                "properties": {
-                    "moeglicheRollen": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/RolleResponse"
-                        }
-                    },
-                    "total": {
-                        "type": "number"
-                    }
-                },
-                "required": [
-                    "moeglicheRollen",
-                    "total"
-                ]
-            },
             "FindSchulstrukturknotenResponse": {
                 "type": "object",
                 "properties": {
@@ -4962,6 +4972,24 @@
                 "required": [
                     "person",
                     "DBiamPersonenkontextResponse"
+                ]
+            },
+            "FindRollenResponse": {
+                "type": "object",
+                "properties": {
+                    "moeglicheRollen": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/RolleResponse"
+                        }
+                    },
+                    "total": {
+                        "type": "number"
+                    }
+                },
+                "required": [
+                    "moeglicheRollen",
+                    "total"
                 ]
             }
         }

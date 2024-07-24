@@ -9,6 +9,7 @@ import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '
 import { nextTick } from 'vue';
 import { useRolleStore, type RolleResponse, type RolleStore } from '@/stores/RolleStore';
 import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
+import type { FindRollenResponse } from '@/api-client/generated/api';
 
 const mockadapter: MockAdapter = new MockAdapter(ApiService);
 let wrapper: VueWrapper | null = null;
@@ -109,7 +110,8 @@ beforeEach(() => {
       },
     },
   ] as PersonendatensatzResponse[];
-  rolleStore.allRollen = [
+  personenkontextStore.filteredRollen = {
+      moeglicheRollen: [
     {
       id: '1',
       administeredBySchulstrukturknoten: '1',
@@ -118,7 +120,9 @@ beforeEach(() => {
       rollenart: 'LERN',
       systemrechte: new Set(),
     },
-  ] as RolleResponse[];
+  ] as RolleResponse[],
+  total: 1
+} as FindRollenResponse;
 
   wrapper = mount(PersonManagementView, {
     attachTo: document.getElementById('app') || '',
