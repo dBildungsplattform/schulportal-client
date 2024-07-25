@@ -9,16 +9,18 @@
   } from 'vue-router';
   import { type Composer, useI18n } from 'vue-i18n';
   import { useForm, type TypedSchema, type BaseFieldProps } from 'vee-validate';
-  import { toTypedSchema } from '@vee-validate/yup';
-  import { object, string } from 'yup';
-  import { useOrganisationStore, type OrganisationStore, OrganisationsTyp, type Organisation } from '@/stores/OrganisationStore';
-  import { DIN_91379A_EXT } from '@/utils/validation';
+  import {
+    useOrganisationStore,
+    type OrganisationStore,
+    OrganisationsTyp,
+    type Organisation,
+  } from '@/stores/OrganisationStore';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
   import KlasseForm from '@/components/form/KlasseForm.vue';
   import SuccessTemplate from '@/components/admin/klassen/SuccessTemplate.vue';
-
+  import { getValidationSchema, getVuetifyConfig } from '@/utils/validationKlasse';
 
   const { t }: Composer = useI18n({ useScope: 'global' });
   const router: Router = useRouter();
@@ -29,23 +31,11 @@
   let isSearching: boolean = false;
   const hasAutoselectedSchule: Ref<boolean> = ref(false);
 
-  const validationSchema: TypedSchema = toTypedSchema(
-    object({
-      selectedSchule: string().required(t('admin.klasse.rules.schule.required')),
-      selectedKlassenname: string()
-        .matches(DIN_91379A_EXT, t('admin.klasse.rules.klassenname.matches'))
-        .required(t('admin.klasse.rules.klassenname.required')),
-    }),
-  );
+  const validationSchema: TypedSchema = getValidationSchema(t);
 
   const vuetifyConfig = (state: {
     errors: Array<string>;
-  }): { props: { error: boolean; 'error-messages': Array<string> } } => ({
-    props: {
-      error: !!state.errors.length,
-      'error-messages': state.errors,
-    },
-  });
+  }): { props: { error: boolean; 'error-messages': Array<string> } } => getVuetifyConfig(state);
 
   type KlasseCreationForm = {
     selectedSchule: string;
