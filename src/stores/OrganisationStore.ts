@@ -25,10 +25,12 @@ export type Organisation = {
 type OrganisationState = {
   allOrganisationen: Array<Organisation>;
   allKlassen: Array<Organisation>;
+  allSchulen: Array<Organisation>;
   currentOrganisation: Organisation | null;
   createdKlasse: Organisation | null;
   createdSchule: Organisation | null;
   totalKlassen: number;
+  totalSchulen: number;
   totalOrganisationen: number;
   klassen: Array<Organisation>;
   errorCode: string;
@@ -37,6 +39,8 @@ type OrganisationState = {
 };
 
 export type OrganisationenFilter = {
+  limit?: number;
+  offset?: number;
   searchString?: string;
   systemrechte?: RollenSystemRecht[];
   includeTyp?: OrganisationsTyp;
@@ -76,10 +80,12 @@ export const useOrganisationStore: StoreDefinition<
     return {
       allOrganisationen: [],
       allKlassen: [],
+      allSchulen: [],
       currentOrganisation: null,
       createdKlasse: null,
       createdSchule: null,
       totalKlassen: 0,
+      totalSchulen: 0,
       totalOrganisationen: 0,
       klassen: [],
       errorCode: '',
@@ -93,8 +99,8 @@ export const useOrganisationStore: StoreDefinition<
       this.loading = true;
       try {
         const response: AxiosResponse<Organisation[]> = await organisationApi.organisationControllerFindOrganizations(
-          undefined,
-          25,
+          filter?.offset,
+          filter?.limit,
           undefined,
           undefined,
           filter?.searchString,
@@ -106,6 +112,9 @@ export const useOrganisationStore: StoreDefinition<
         if (filter?.includeTyp === OrganisationsTyp.Klasse) {
           this.allKlassen = response.data;
           this.totalKlassen = +response.headers['x-paging-total'];
+        } else if (filter?.includeTyp === OrganisationsTyp.Schule) {
+          this.allSchulen = response.data;
+          this.totalSchulen = +response.headers['x-paging-total'];
         } else {
           this.allOrganisationen = response.data;
           this.totalOrganisationen = +response.headers['x-paging-total'];

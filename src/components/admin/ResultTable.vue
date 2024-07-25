@@ -54,7 +54,7 @@
     :items="items"
     :items-length="totalItems"
     :items-per-page="itemsPerPage"
-    :items-per-page-options="[30, 50, 100, 500]"
+    :items-per-page-options="[30, 50, 100, 300]"
     :items-per-page-text="$t('itemsPerPage')"
     :item-value="itemValuePath"
     select-strategy="page"
