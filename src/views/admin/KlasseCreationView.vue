@@ -11,8 +11,13 @@
   import { useForm, type TypedSchema, type BaseFieldProps } from 'vee-validate';
   import { toTypedSchema } from '@vee-validate/yup';
   import { object, string } from 'yup';
-  import { useOrganisationStore, type OrganisationStore, OrganisationsTyp, type Organisation } from '@/stores/OrganisationStore';
-  import { DIN_91379A_EXT } from '@/utils/validation';
+  import {
+    useOrganisationStore,
+    type OrganisationStore,
+    OrganisationsTyp,
+    type Organisation,
+  } from '@/stores/OrganisationStore';
+  import { DIN_91379A_EXT, NO_LEADING_TRAILING_SPACES } from '@/utils/validation';
   import FormRow from '@/components/form/FormRow.vue';
   import FormWrapper from '@/components/form/FormWrapper.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
@@ -36,6 +41,7 @@
       selectedSchule: string().required(t('admin.klasse.rules.schule.required')),
       selectedKlassenname: string()
         .matches(DIN_91379A_EXT, t('admin.klasse.rules.klassenname.matches'))
+        .matches(NO_LEADING_TRAILING_SPACES, t('admin.klasse.rules.klassenname.noLeadingTrailingSpaces'))
         .required(t('admin.klasse.rules.klassenname.required')),
     }),
   );
@@ -286,6 +292,7 @@
             :label="$t('admin.klasse.klassenname')"
           >
             <v-text-field
+              clearable
               data-testid="klassenname-input"
               v-bind="selectedKlassennameProps"
               v-model="selectedKlassenname"
