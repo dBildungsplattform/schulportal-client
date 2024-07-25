@@ -478,7 +478,7 @@
         <SuccessTemplate
           :successMessage="$t('admin.rolle.rolleUpdatedSuccessfully')"
           :followingRolleDataCreated="$t('admin.followingDataCreated')"
-          :createdData="[
+          :createdRolleData="[
             { label: $t('admin.rolle.rollenname'), value: rolleStore.updatedRolle?.name, testId: 'updated-rolle-name' },
             {
               label: $t('admin.rolle.merkmale'),
