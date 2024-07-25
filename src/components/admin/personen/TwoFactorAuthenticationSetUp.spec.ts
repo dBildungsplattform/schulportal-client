@@ -39,5 +39,4 @@ describe('set up two-factor authentication', () => {
   test('it opens the dialog', async () => {
     wrapper?.get('[data-testid="open-2FA-dialog-icon"]').trigger('click');
   });
-
-})
+});

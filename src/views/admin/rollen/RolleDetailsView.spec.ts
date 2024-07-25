@@ -8,7 +8,7 @@ import { type Router, createRouter, createWebHistory } from 'vue-router';
 let wrapper: VueWrapper | null = null;
 let router: Router;
 
-beforeEach( async() => {
+beforeEach(async () => {
   setActivePinia(createPinia());
   document.body.innerHTML = `
     <div>

@@ -112,6 +112,30 @@
 
   const statuses: Array<string> = ['Aktiv', 'Inaktiv'];
 
+  const personenPerPage: Ref<number> = ref(10);
+  const personenPage: Ref<number> = ref(1);
+
+  function getPaginatedPersonen(page: number): void {
+    personenPage.value = page || 1;
+    personStore.getAllPersons({
+      offset: (personenPage.value - 1) * personenPerPage.value,
+      limit: personenPerPage.value,
+    });
+  }
+
+  function getPaginatedPersonenWithLimit(limit: number): void {
+    /* reset page to 1 if entries are equal to or less than selected limit */
+    if (personStore.totalPersons <= limit) {
+      personenPage.value = 1;
+    }
+
+    personenPerPage.value = limit || 1;
+    personStore.getAllPersons({
+      offset: (personenPage.value - 1) * personenPerPage.value,
+      limit: personenPerPage.value,
+    });
+  }
+
   function autoSelectSchule(): void {
     // Autoselect the Schule for the current user that only has 1 Schule assigned to him.
     if (organisationStore.allOrganisationen.length === 1) {
@@ -122,6 +146,8 @@
 
   function applySearchAndFilters(organisations?: Array<string>): void {
     personStore.getAllPersons({
+      offset: (personenPage.value - 1) * personenPerPage.value,
+      limit: personenPerPage.value,
       organisationIDs: organisations ? organisations : selectedSchulen.value,
       rolleIDs: selectedRollen.value,
       searchFilter: searchFilter.value,
@@ -168,7 +194,12 @@
     selectedRollen.value = [];
     selectedKlassen.value = [];
     selectedStatus.value = null;
-    personStore.getAllPersons({});
+    personenPage.value = 1;
+    personStore.getAllPersons({
+      offset: (personenPage.value - 1) * personenPerPage.value,
+      limit: personenPerPage.value,
+      searchFilter: '',
+    });
   }
 
   // Maps over allPersons, finds the corresponding zuordnungen for each person by matching the personId, and then extracts and combines
@@ -252,9 +283,7 @@
   }
 
   onMounted(async () => {
-    if (!filterOrSearchActive.value) {
-      await personStore.getAllPersons({});
-    } else {
+    if (filterOrSearchActive.value) {
       selectedSchulen.value = searchFilterStore.selectedSchulen || [];
       selectedRollen.value = searchFilterStore.selectedRollen || [];
     }
@@ -402,7 +431,13 @@
                 <span
                   v-else
                   class="filter-header"
-                  >{{ $t('admin.rolle.rollenFound', { count: personenkontextStore.totalFilteredRollen }, personenkontextStore.totalFilteredRollen) }}</span
+                  >{{
+                    $t(
+                      'admin.rolle.rollenFound',
+                      { count: personenkontextStore.totalFilteredRollen },
+                      personenkontextStore.totalFilteredRollen,
+                    )
+                  }}</span
                 >
               </v-list-item>
             </template>
@@ -524,10 +559,12 @@
       <ResultTable
         data-testid="person-table"
         :items="personenWithUebersicht || []"
+        :itemsPerPage="personenPerPage"
         :loading="personStore.loading"
         :headers="headers"
         @onHandleRowClick="navigateToPersonDetails"
-        @onUpdateTable="personStore.getAllPersons({})"
+        @onItemsPerPageUpdate="getPaginatedPersonenWithLimit"
+        @onPageUpdate="getPaginatedPersonen"
         :totalItems="personStore.totalPersons"
         item-value-path="person.id"
         ><template v-slot:[`item.rollen`]="{ item }">

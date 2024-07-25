@@ -354,7 +354,6 @@
     );
   });
 
-
   // Computed property to get the title of the selected role
   const selectedRolleTitle: ComputedRef<string | undefined> = computed(() => {
     return rollen.value?.find((rolle: TranslatedObject) => rolle.value === selectedRolle.value)?.title;
@@ -1026,7 +1025,7 @@
       <LayoutCard
         :closable="true"
         :header="$t('person.editZuordnungen')"
-         @onCloseClicked="closeDeleteSuccessDialog"
+        @onCloseClicked="closeDeleteSuccessDialog"
       >
         <v-card-text>
           <v-container>
@@ -1068,7 +1067,7 @@
       <LayoutCard
         :closable="true"
         :header="$t('person.editZuordnungen')"
-         @onCloseClicked="closeCreateSuccessDialog"
+        @onCloseClicked="closeCreateSuccessDialog"
       >
         <v-card-text>
           <v-container>
@@ -1110,7 +1109,7 @@
       <LayoutCard
         :closable="true"
         :header="$t('person.editZuordnungen')"
-          @onCloseClicked="cancelAddition"
+        @onCloseClicked="cancelAddition"
       >
         <v-card-text>
           <v-container>
@@ -1165,7 +1164,7 @@
       <LayoutCard
         :closable="true"
         :header="$t('person.editZuordnungen')"
-          @onCloseClicked="closeCannotDeleteDialog"
+        @onCloseClicked="closeCannotDeleteDialog"
       >
         <v-card-text>
           <v-container>
