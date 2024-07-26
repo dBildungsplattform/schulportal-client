@@ -23,6 +23,8 @@ import {
   type DbiamCreatePersonWithContextBodyParams,
   type DBiamPersonResponse,
   type PersonendatensatzResponse,
+  type PersonAdministrationApiInterface,
+  PersonAdministrationApiFactory,
 } from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
 
@@ -34,6 +36,12 @@ const dbiamPersonenkontexteApi: DbiamPersonenkontexteApiInterface = DbiamPersone
   axiosApiInstance,
 );
 const personenuebersichtApi: DbiamPersonenuebersichtApiInterface = DbiamPersonenuebersichtApiFactory(
+  undefined,
+  '',
+  axiosApiInstance,
+);
+
+const personAdministrationApi: PersonAdministrationApiInterface = PersonAdministrationApiFactory(
   undefined,
   '',
   axiosApiInstance,
@@ -62,6 +70,7 @@ export type Uebersicht =
       vorname: string;
       nachname: string;
       benutzername: string;
+      lastModifiedZuordnungen: string | null;
       zuordnungen: {
         klasse?: string | undefined;
         sskId: string;
@@ -86,6 +95,7 @@ export type WorkflowFilter = {
 
 type PersonenkontextState = {
   allUebersichten: DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response | null;
+  updatedPersonenkontexte: PersonenkontexteUpdateResponse | null;
   workflowStepResponse: PersonenkontextWorkflowResponse | null;
   filteredRollen: FindRollenResponse | null;
   filteredOrganisationen: FindSchulstrukturknotenResponse | null;
@@ -95,18 +105,16 @@ type PersonenkontextState = {
   createdPersonWithKontext: DBiamPersonResponse | null;
   errorCode: string;
   loading: boolean;
+  totalFilteredRollen: number;
 };
 
 type PersonenkontextGetters = {};
 type PersonenkontextActions = {
   hasSystemrecht: (personId: string, systemrecht: 'ROLLEN_VERWALTEN') => Promise<SystemrechtResponse>;
   processWorkflowStep: (filter?: WorkflowFilter) => Promise<PersonenkontextWorkflowResponse>;
-  getPersonenkontextRolleWithFilter: (rolleName: string, limit: number) => Promise<void>;
+  getPersonenkontextRolleWithFilter: (rolleName: string, limit?: number) => Promise<void>;
   getPersonenkontextAdministrationsebeneWithFilter: (rolleId: string, sskName: string, limit: number) => Promise<void>;
-  updatePersonenkontexte: (
-    combinedZuordnungen: Zuordnung[] | undefined,
-    personId: string,
-  ) => Promise<PersonenkontexteUpdateResponse>;
+  updatePersonenkontexte: (combinedZuordnungen: Zuordnung[] | undefined, personId: string) => Promise<void>;
   createPersonenkontext: (
     personenkontext: DbiamPersonenkontextBodyParams,
     personenKontextTyp: PersonenKontextTyp,
@@ -150,6 +158,7 @@ export const usePersonenkontextStore: StoreDefinition<
     return {
       allUebersichten: null,
       workflowStepResponse: null,
+      updatedPersonenkontexte: null,
       filteredRollen: null,
       filteredOrganisationen: null,
       personenuebersicht: null,
@@ -158,6 +167,7 @@ export const usePersonenkontextStore: StoreDefinition<
       createdPersonWithKontext: null,
       errorCode: '',
       loading: false,
+      totalFilteredRollen: 0,
     };
   },
   actions: {
@@ -202,12 +212,13 @@ export const usePersonenkontextStore: StoreDefinition<
       }
     },
 
-    async getPersonenkontextRolleWithFilter(rolleName: string, limit: number) {
+    async getPersonenkontextRolleWithFilter(rolleName: string, limit?: number) {
       this.loading = true;
       try {
         const { data }: { data: FindRollenResponse } =
-          await personenKontextApi.dbiamPersonenkontextWorkflowControllerFindRollen(rolleName, limit);
+          await personAdministrationApi.personAdministrationControllerFindRollen(rolleName, limit);
         this.filteredRollen = data;
+        this.totalFilteredRollen = this.filteredRollen.total;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
@@ -268,14 +279,12 @@ export const usePersonenkontextStore: StoreDefinition<
         this.loading = false;
       }
     },
-    async updatePersonenkontexte(
-      combinedZuordnungen: Zuordnung[] | undefined,
-      personId: string,
-    ): Promise<PersonenkontexteUpdateResponse> {
+    async updatePersonenkontexte(combinedZuordnungen: Zuordnung[] | undefined, personId: string): Promise<void> {
       this.loading = true;
+      this.errorCode = '';
       try {
         const updateParams: DbiamUpdatePersonenkontexteBodyParams = {
-          lastModified: new Date().toISOString(),
+          lastModified: this.personenuebersicht?.lastModifiedZuordnungen ?? undefined,
           count: this.personenuebersicht?.zuordnungen.length ?? 0,
           personenkontexte: combinedZuordnungen?.map((zuordnung: Zuordnung) => ({
             personId: personId,
@@ -285,13 +294,12 @@ export const usePersonenkontextStore: StoreDefinition<
         };
         const { data }: { data: PersonenkontexteUpdateResponse } =
           await personenKontextApi.dbiamPersonenkontextWorkflowControllerCommit(personId, updateParams);
-        return data;
+        this.updatedPersonenkontexte = data;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
           this.errorCode = error.response?.data.i18nKey || 'PERSONENKONTEXTE_UPDATE_ERROR';
         }
-        return await Promise.reject(this.errorCode);
       } finally {
         this.loading = false;
       }

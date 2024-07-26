@@ -11,12 +11,7 @@
   import { useForm, type TypedSchema, type BaseFieldProps } from 'vee-validate';
   import { toTypedSchema } from '@vee-validate/yup';
   import { object, string } from 'yup';
-  import {
-    useOrganisationStore,
-    type OrganisationStore,
-    type Organisation,
-    OrganisationsTyp,
-  } from '@/stores/OrganisationStore';
+  import { useOrganisationStore, type OrganisationStore, OrganisationsTyp, type Organisation } from '@/stores/OrganisationStore';
   import { DIN_91379A_EXT } from '@/utils/validation';
   import FormRow from '@/components/form/FormRow.vue';
   import FormWrapper from '@/components/form/FormWrapper.vue';
@@ -132,9 +127,9 @@
   });
 
   function isFormDirty(): boolean {
-    return isFieldDirty('selectedSchule') || isFieldDirty('selectedKlassenname');
+    const schuleDirty: boolean = hasAutoselectedSchule.value ? false : isFieldDirty('selectedSchule');
+    return schuleDirty || isFieldDirty('selectedKlassenname');
   }
-
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
   let blockedNext: () => void = () => {};
 
@@ -154,9 +149,9 @@
     }
   });
 
-  const handleCreateAnotherKlasse = (): void => {
+  const handleCreateAnotherKlasse = async (): Promise<void> => {
     organisationStore.createdKlasse = null;
-    resetForm();
+    await personenkontextStore.processWorkflowStep();
     router.push({ name: 'create-klasse' });
   };
 
@@ -202,17 +197,15 @@
 
   onMounted(async () => {
     await personenkontextStore.processWorkflowStep();
+    organisationStore.createdKlasse = null;
+    organisationStore.errorCode = '';
     /* listen for browser changes and prevent them when form is dirty */
     window.addEventListener('beforeunload', preventNavigation);
   });
 
   onUnmounted(() => {
-    window.removeEventListener('beforeunload', preventNavigation);
-  });
-
-  // Clear the store on leaving the route
-  onBeforeRouteLeave(() => {
     personenkontextStore.workflowStepResponse = null;
+    window.removeEventListener('beforeunload', preventNavigation);
   });
 </script>
 
