@@ -25,6 +25,11 @@
         return '/admin/klassen';
       }
     }
+
+    if (target === 'EMAIL') {
+      return 'https://de.wikipedia.org/wiki/E-Mail';
+    }
+
     return '';
   }
 </script>
