@@ -12,6 +12,9 @@
   import { usePersonInfoStore, type PersonInfoStore, type PersonInfoResponse } from '@/stores/PersonInfoStore';
   import { usePersonenkontextStore, type Zuordnung, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
   import { OrganisationsTyp } from '@/stores/OrganisationStore';
+  import { type RouteLocationNormalizedLoaded, useRoute } from 'vue-router';
+
+  const route: RouteLocationNormalizedLoaded = useRoute();
 
   export type SchoolData = {
     title: string;
@@ -28,6 +31,8 @@
   function handleGoToPreviousPage(): void {
     window.history.back();
   }
+
+  const windowOrigin: string = window.location.origin;
 
   function groupZuordnungen(zuordnungen: Zuordnung[]): Map<string, Zuordnung[]> {
     const groupedZuordnungen: Map<string, Zuordnung[]> = new Map();
@@ -248,10 +253,11 @@
             ></v-icon>
             <div>
               <v-btn
-                color="primary"
-                disabled
+                data-testid="set-new-password-button"
+                class="primary"
+                :href="`/api/auth/set-new-password?redirectUrl=${windowOrigin}${route.fullPath}`"
               >
-                Passwort ändern
+                {{ $t('profile.setNewPassword') }}
               </v-btn>
             </div>
           </v-row>
