@@ -402,7 +402,13 @@
                 <span
                   v-else
                   class="filter-header"
-                  >{{ $t('admin.rolle.rollenFound', { count: personenkontextStore.totalFilteredRollen }, personenkontextStore.totalFilteredRollen) }}</span
+                  >{{
+                    $t(
+                      'admin.rolle.rollenFound',
+                      { count: personenkontextStore.totalFilteredRollen },
+                      personenkontextStore.totalFilteredRollen,
+                    )
+                  }}</span
                 >
               </v-list-item>
             </template>
