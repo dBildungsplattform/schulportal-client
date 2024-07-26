@@ -23,7 +23,6 @@ export type Person = {
   };
   referrer: string | null;
   personalnummer?: string | null;
-  email?: string | null;
 };
 
 export type CreatePersonBodyParams = DbiamCreatePersonWithContextBodyParams;

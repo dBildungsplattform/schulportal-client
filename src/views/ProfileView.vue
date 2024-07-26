@@ -2,8 +2,6 @@
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { ref, type Ref, onBeforeMount } from 'vue';
   import { useI18n } from 'vue-i18n';
-  import { type RouteLocationNormalizedLoaded, useRoute } from 'vue-router';
-  const route: RouteLocationNormalizedLoaded = useRoute();
   const { t }: { t: Function } = useI18n();
   type LabelValue = {
     label: string;
@@ -11,44 +9,33 @@
     value: string;
   };
 
-  import { usePersonStore, type Person, type PersonStore } from '@/stores/PersonStore';
-  import { usePersonenkontextStore, type PersonenkontextStore, type Zuordnung } from '@/stores/PersonenkontextStore';
-  import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
+  import { usePersonInfoStore, type PersonInfoStore, type PersonInfoResponse } from '@/stores/PersonInfoStore';
+  import { usePersonenkontextStore, type Zuordnung, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
+  import { OrganisationsTyp } from '@/stores/OrganisationStore';
 
-  type SchoolData = {
+  export type SchoolData = {
     title: string;
     info?: string | null;
     schoolAdmins?: string[];
     labelAndValues: LabelValue[];
   };
 
-  const personStore: PersonStore = usePersonStore();
-  const authStore: AuthStore = useAuthStore();
+  const personInfoStore: PersonInfoStore = usePersonInfoStore();
+  const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
   const personalData: Ref = ref<LabelValue[]>([]);
   const schoolDatas: Ref = ref<SchoolData[]>([]);
-  const personenKontextStore: PersonenkontextStore = usePersonenkontextStore();
-  const redirectToUpdatePassword = (): void => {
-    const keycloakUrl: string = 'http://localhost:8080/realms/SPSH/protocol/openid-connect/auth'; // Todo: Replace with dynamic url value
-    const clientId: string = 'spsh';
-    const redirectUri: string = `${window.location.origin}${route.fullPath}`;
-    const responseType: string = 'code';
-    const scope: string = 'openid';
-    const kcAction: string = 'UPDATE_PASSWORD';
-    const url: string = `${keycloakUrl}?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=${responseType}&scope=${scope}&kc_action=${kcAction}`;
-    window.location.href = url;
-  };
 
   function handleGoToPreviousPage(): void {
     window.history.back();
   }
 
-  function groupZuordnungenBySskId(zuordnungen: Zuordnung[]): Map<string, Zuordnung[]> {
+  function groupZuordnungen(zuordnungen: Zuordnung[]): Map<string, Zuordnung[]> {
     const groupedZuordnungen: Map<string, Zuordnung[]> = new Map();
     for (const zuordnung of zuordnungen) {
-      if (groupedZuordnungen.has(zuordnung.sskId)) {
-        groupedZuordnungen.get(zuordnung.sskId)?.push(zuordnung);
+      if (groupedZuordnungen.has(zuordnung.sskDstNr)) {
+        groupedZuordnungen.get(zuordnung.sskDstNr)?.push(zuordnung);
       } else {
-        groupedZuordnungen.set(zuordnung.sskId, [zuordnung]);
+        groupedZuordnungen.set(zuordnung.sskDstNr, [zuordnung]);
       }
     }
     return groupedZuordnungen;
@@ -59,12 +46,19 @@
     for (const [, zuordnungen] of groupedZuordnungen) {
       if (zuordnungen.length > 1) {
         const aggregatedRoles: string[] = zuordnungen.map((z: Zuordnung) => z.rolle);
-        const composedRolles: string = aggregatedRoles.join(', ');
+        const klasse: string | null =
+          zuordnungen.filter((z: Zuordnung) => z.typ === OrganisationsTyp.Klasse).at(0)?.sskName ?? null;
+        const schule: string | null =
+          zuordnungen.filter((z: Zuordnung) => z.typ === OrganisationsTyp.Schule).at(0)?.sskName ?? null;
+        const uniqueRoles: string[] = [...new Set(aggregatedRoles)];
+        const composedRoles: string = uniqueRoles.join(', ');
         if (!zuordnungen[0]) continue;
-        const composedZuordnung: Zuordnung = { ...zuordnungen[0], rolle: composedRolles };
+        const composedZuordnung: Zuordnung = { ...zuordnungen[0], rolle: composedRoles };
+        if (schule) composedZuordnung.sskName = schule;
+        if (klasse) composedZuordnung.klasse = klasse;
         composedZuordnungen.push(composedZuordnung);
       } else {
-        if (zuordnungen.length === 1) composedZuordnungen.push(zuordnungen[0]!);
+        if (zuordnungen.length === 1 && zuordnungen[0]) composedZuordnungen.push(zuordnungen[0]);
       }
     }
 
@@ -77,12 +71,18 @@
       const tempSchoolData: SchoolData = {
         title: zuordnung.sskName,
         info: t('profile.yourSchoolAdminsAre'),
-        schoolAdmins: ['[todo]'],
-        labelAndValues: [
-          { label: t('profile.school'), value: zuordnung.sskName },
-          { label: t('admin.rolle.rolle'), value: zuordnung.rolle },
-        ],
+        schoolAdmins: [], // Hierfuer muss ein API-Endpunkt implementiert werden
+        labelAndValues: [{ label: t('profile.school'), value: zuordnung.sskName }],
       };
+
+      if (zuordnung.klasse) {
+        tempSchoolData.labelAndValues.push({
+          label: t('profile.class'),
+          value: zuordnung.klasse,
+        });
+      }
+
+      tempSchoolData.labelAndValues.push({ label: t('admin.rolle.rolle'), value: zuordnung.rolle });
 
       if (zuordnung.sskDstNr) {
         tempSchoolData.labelAndValues.push({
@@ -91,6 +91,7 @@
           value: zuordnung.sskDstNr,
         });
       }
+
       result.push(tempSchoolData);
     }
 
@@ -98,40 +99,37 @@
   }
 
   onBeforeMount(async () => {
-    await authStore.initializeAuthStatus();
-    const userId: string | null | undefined = authStore.currentUser?.personId;
-
-    if (!userId) {
-      return;
-    }
-
-    await Promise.all([personStore.getPersonById(userId), personenKontextStore.getPersonenuebersichtById(userId)]);
-    const currentPerson: Person | null | undefined = personStore.currentPerson?.person as Person | undefined;
-    const zuordnungen: Zuordnung[] | undefined = personenKontextStore.personenuebersicht?.zuordnungen;
-
-    if (!currentPerson) return;
+    await personInfoStore.initPersonInfo();
+    await personenkontextStore.getPersonenuebersichtById(personInfoStore.personInfo?.person.id ?? '');
+    const personInfo: PersonInfoResponse = personInfoStore.personInfo as PersonInfoResponse;
+    const personenZuordnungen: Zuordnung[] = personenkontextStore.personenuebersicht?.zuordnungen ?? [];
 
     personalData.value = [
       {
         label: 'Vor- und Nachname',
-        value: currentPerson.name.vorname + ' ' + currentPerson.name.familienname,
+        value: personInfo.person.name.vorname + ' ' + personInfo.person.name.familiennamen,
       },
-      { label: 'Benutzername', value: currentPerson.referrer ?? '' },
+      { label: 'Benutzername', value: personInfo.person.referrer },
     ];
 
-    if (currentPerson.email) {
-      personalData.value.push({ label: 'E-Mail-Adresse', value: currentPerson.email });
-    }
-
-    if (currentPerson.personalnummer) {
+    if (personInfo.person.personalnummer) {
       personalData.value.push({
         label: t('profile.personalNummer'),
         labelAbbr: t('profile.personalNummerAbbr'),
-        value: currentPerson.personalnummer,
+        value: personInfo.person.personalnummer,
       });
     }
+    const groupedZuordnungen: Map<string, Zuordnung[]> = groupZuordnungen(
+      personenZuordnungen.map(
+        (z: Zuordnung) =>
+          ({
+            ...z,
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+            sskDstNr: z.sskDstNr?.split('-')[0], // die Klasse wird durch einen Bindestrich an die Schulnummer angehangen. Um nach der Schule zu gruppieren, wird nur die Schulnummer verwendet.
+          }) as Zuordnung,
+      ),
+    );
 
-    const groupedZuordnungen: Map<string, Zuordnung[]> = groupZuordnungenBySskId(zuordnungen ?? []);
     const composedZuordnungen: Zuordnung[] = createComposedZuordnungen(groupedZuordnungen);
     schoolDatas.value = createZuordnungsSchoolData(composedZuordnungen);
   });
@@ -222,7 +220,10 @@
                   </tbody>
                 </template>
               </v-simple-table>
-              <p class="info">
+              <p
+                v-if="schoolData.schoolAdmins.length > 0"
+                class="info"
+              >
                 <v-icon
                   class="mr-2"
                   icon="mdi-information-slab-circle-outline"
@@ -245,11 +246,10 @@
               class="full-width"
               icon="mdi-key-alert-outline"
             ></v-icon>
-            <p>Ihr Passwort wurde zuletzt am 10.03.2024 geändert.</p>
             <div>
               <v-btn
                 color="primary"
-                @click="redirectToUpdatePassword"
+                disabled
               >
                 Passwort ändern
               </v-btn>
@@ -270,7 +270,6 @@
               class="full-width"
               icon="mdi-shield-account-outline"
             ></v-icon>
-            <p>Es wurde noch kein zweiter Faktor für Sie eingerichtet.</p>
             <div>
               <v-btn
                 color="primary"

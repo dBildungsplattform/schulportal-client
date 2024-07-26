@@ -367,7 +367,10 @@
     "infoAboutChangeabilityFromPersonalData": "Persönliche Daten sind nur durch Ihre schulischen Admins veränderbar",
     "yourSchoolAdminsAre": "Ihre schulischen Admins sind:",
     "personalNummer": "Personalnummer",
-    "personalNummerAbbr": "KoPers.-Nr."
+    "personalNummerAbbr": "KoPers.-Nr.",
+    "class": "Klasse",
+    "error": "Fehler",
+    "errorMessage": "Es ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut."
   },
   "save": "Speichern",
   "resetFilter": "Filter zurücksetzen",
