@@ -30,6 +30,7 @@ export type { PersonInfoResponse };
 type PersonInfoState = {
   personInfo: PersonInfoResponse | null;
   errorCode: string;
+  errorMessage: string;
   loading: boolean;
 };
 
@@ -52,6 +53,7 @@ export const usePersonInfoStore: StoreDefinition<
     return {
       personInfo: null,
       errorCode: '',
+      errorMessage: '',
       loading: false,
     };
   },
@@ -63,7 +65,8 @@ export const usePersonInfoStore: StoreDefinition<
         this.personInfo = data;
       } catch (error) {
         if (isAxiosError(error)) {
-          this.errorCode = error.response?.data?.message || '';
+          this.errorCode = error.response?.data?.code || '';
+          this.errorMessage = error.response?.data?.message || '';
         }
       } finally {
         this.loading = false;

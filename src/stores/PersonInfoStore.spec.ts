@@ -62,22 +62,22 @@ describe('PersonInfoStore', () => {
     });
 
     it('should handle string error', async () => {
-      mockadapter.onGet('/api/person-info').replyOnce(500, 'some mock server error');
+      mockadapter.onGet('/api/person-info').replyOnce(500, { message: 'some mock server error' });
       const initPersonInfoPromise: Promise<void> = personInfoStore.initPersonInfo();
       expect(personInfoStore.loading).toBe(true);
       await initPersonInfoPromise;
       expect(personInfoStore.personInfo).toBeNull();
-      expect(personInfoStore.errorCode).toEqual('UNSPECIFIED_ERROR');
+      expect(personInfoStore.errorMessage).toEqual('some mock server error');
       expect(personInfoStore.loading).toBe(false);
     });
 
     it('should handle error code', async () => {
-      mockadapter.onGet('/api/person-info').replyOnce(500, { code: 'some mock server error' });
+      mockadapter.onGet('/api/person-info').replyOnce(500, { message: 'some mock server error', code: '500' });
       const initPersonInfoPromise: Promise<void> = personInfoStore.initPersonInfo();
       expect(personInfoStore.loading).toBe(true);
       await initPersonInfoPromise;
       expect(personInfoStore.personInfo).toBeNull();
-      expect(personInfoStore.errorCode).toEqual('some mock server error');
+      expect(personInfoStore.errorCode).toEqual('500');
       expect(personInfoStore.loading).toBe(false);
     });
   });
