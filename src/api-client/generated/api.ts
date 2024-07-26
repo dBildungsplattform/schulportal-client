@@ -167,6 +167,12 @@ export interface CreatePersonBodyParams {
      * @memberof CreatePersonBodyParams
      */
     'username'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreatePersonBodyParams
+     */
+    'personalnummer'?: string;
 }
 
 
@@ -360,6 +366,12 @@ export interface DBiamPersonenuebersichtResponse {
      * @memberof DBiamPersonenuebersichtResponse
      */
     'benutzername': string;
+    /**
+     * Date of the most recent changed personenkontext in the Zuordnungen
+     * @type {string}
+     * @memberof DBiamPersonenuebersichtResponse
+     */
+    'lastModifiedZuordnungen': string | null;
     /**
      * 
      * @type {Array<DBiamPersonenzuordnungResponse>}
@@ -570,12 +582,42 @@ export interface DbiamPersonenkontexteUpdateError {
 export const DbiamPersonenkontexteUpdateErrorI18nKeyEnum = {
     PersonenkontexteUpdateError: 'PERSONENKONTEXTE_UPDATE_ERROR',
     PersonenkontextNotFound: 'PERSONENKONTEXT_NOT_FOUND',
-    CountMismatchingError: 'COUNT_MISMATCHING_ERROR',
+    CountMismatching: 'COUNT_MISMATCHING',
     NewerVersionOfPersonenkontexteAvailable: 'NEWER_VERSION_OF_PERSONENKONTEXTE_AVAILABLE',
-    PersonIdMismatchError: 'PERSON_ID_MISMATCH_ERROR'
+    InvalidLastModifiedValue: 'INVALID_LAST_MODIFIED_VALUE',
+    PersonIdMismatch: 'PERSON_ID_MISMATCH',
+    PersonNotFound: 'PERSON_NOT_FOUND'
 } as const;
 
 export type DbiamPersonenkontexteUpdateErrorI18nKeyEnum = typeof DbiamPersonenkontexteUpdateErrorI18nKeyEnum[keyof typeof DbiamPersonenkontexteUpdateErrorI18nKeyEnum];
+
+/**
+ * 
+ * @export
+ * @interface DbiamRolleError
+ */
+export interface DbiamRolleError {
+    /**
+     * 
+     * @type {string}
+     * @memberof DbiamRolleError
+     */
+    'i18nKey': DbiamRolleErrorI18nKeyEnum;
+    /**
+     * Corresponds to HTTP Status code like 200, 404, 500
+     * @type {number}
+     * @memberof DbiamRolleError
+     */
+    'code': number;
+}
+
+export const DbiamRolleErrorI18nKeyEnum = {
+    RolleError: 'ROLLE_ERROR',
+    AddSystemrechtError: 'ADD_SYSTEMRECHT_ERROR',
+    UpdateMerkmaleError: 'UPDATE_MERKMALE_ERROR'
+} as const;
+
+export type DbiamRolleErrorI18nKeyEnum = typeof DbiamRolleErrorI18nKeyEnum[keyof typeof DbiamRolleErrorI18nKeyEnum];
 
 /**
  * 
@@ -588,7 +630,7 @@ export interface DbiamUpdatePersonenkontexteBodyParams {
      * @type {string}
      * @memberof DbiamUpdatePersonenkontexteBodyParams
      */
-    'lastModified': string;
+    'lastModified'?: string | null;
     /**
      * The amount of personenkontexte
      * @type {number}
@@ -2195,6 +2237,37 @@ export interface UpdatePersonenkontextBodyParams {
 /**
  * 
  * @export
+ * @interface UpdateRolleBodyParams
+ */
+export interface UpdateRolleBodyParams {
+    /**
+     * 
+     * @type {string}
+     * @memberof UpdateRolleBodyParams
+     */
+    'name': string;
+    /**
+     * 
+     * @type {Set<RollenMerkmal>}
+     * @memberof UpdateRolleBodyParams
+     */
+    'merkmale': Set<RollenMerkmal>;
+    /**
+     * 
+     * @type {Set<RollenSystemRecht>}
+     * @memberof UpdateRolleBodyParams
+     */
+    'systemrechte': Set<RollenSystemRecht>;
+    /**
+     * 
+     * @type {Set<string>}
+     * @memberof UpdateRolleBodyParams
+     */
+    'serviceProviderIds': Set<string>;
+}
+/**
+ * 
+ * @export
  * @interface UserinfoResponse
  */
 export interface UserinfoResponse {
@@ -2615,207 +2688,6 @@ export class AuthApi extends BaseAPI implements AuthApiInterface {
 
 
 /**
- * Class2FAApi - axios parameter creator
- * @export
- */
-export const Class2FAApiAxiosParamCreator = function (configuration?: Configuration) {
-    return {
-        /**
-         * 
-         * @param {string} userName 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        privacyIdeaAdministrationControllerGetTwoAuthState: async (userName: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'userName' is not null or undefined
-            assertParamExists('privacyIdeaAdministrationControllerGetTwoAuthState', 'userName', userName)
-            const localVarPath = `/api/2fa-token/state`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication bearer required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            // authentication oauth2 required
-            // oauth required
-            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
-
-            if (userName !== undefined) {
-                localVarQueryParameter['userName'] = userName;
-            }
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        privacyIdeaAdministrationControllerInitializeSoftwareToken: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/2fa-token/init`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication bearer required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            // authentication oauth2 required
-            // oauth required
-            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-    }
-};
-
-/**
- * Class2FAApi - functional programming interface
- * @export
- */
-export const Class2FAApiFp = function(configuration?: Configuration) {
-    const localVarAxiosParamCreator = Class2FAApiAxiosParamCreator(configuration)
-    return {
-        /**
-         * 
-         * @param {string} userName 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async privacyIdeaAdministrationControllerGetTwoAuthState(userName: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<object>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.privacyIdeaAdministrationControllerGetTwoAuthState(userName, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
-         * 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async privacyIdeaAdministrationControllerInitializeSoftwareToken(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<object>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.privacyIdeaAdministrationControllerInitializeSoftwareToken(options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-    }
-};
-
-/**
- * Class2FAApi - factory interface
- * @export
- */
-export const Class2FAApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
-    const localVarFp = Class2FAApiFp(configuration)
-    return {
-        /**
-         * 
-         * @param {string} userName 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        privacyIdeaAdministrationControllerGetTwoAuthState(userName: string, options?: any): AxiosPromise<object> {
-            return localVarFp.privacyIdeaAdministrationControllerGetTwoAuthState(userName, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        privacyIdeaAdministrationControllerInitializeSoftwareToken(options?: any): AxiosPromise<object> {
-            return localVarFp.privacyIdeaAdministrationControllerInitializeSoftwareToken(options).then((request) => request(axios, basePath));
-        },
-    };
-};
-
-/**
- * Class2FAApi - interface
- * @export
- * @interface Class2FAApi
- */
-export interface Class2FAApiInterface {
-    /**
-     * 
-     * @param {string} userName 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof Class2FAApiInterface
-     */
-    privacyIdeaAdministrationControllerGetTwoAuthState(userName: string, options?: AxiosRequestConfig): AxiosPromise<object>;
-
-    /**
-     * 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof Class2FAApiInterface
-     */
-    privacyIdeaAdministrationControllerInitializeSoftwareToken(options?: AxiosRequestConfig): AxiosPromise<object>;
-
-}
-
-/**
- * Class2FAApi - object-oriented interface
- * @export
- * @class Class2FAApi
- * @extends {BaseAPI}
- */
-export class Class2FAApi extends BaseAPI implements Class2FAApiInterface {
-    /**
-     * 
-     * @param {string} userName 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof Class2FAApi
-     */
-    public privacyIdeaAdministrationControllerGetTwoAuthState(userName: string, options?: AxiosRequestConfig) {
-        return Class2FAApiFp(this.configuration).privacyIdeaAdministrationControllerGetTwoAuthState(userName, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof Class2FAApi
-     */
-    public privacyIdeaAdministrationControllerInitializeSoftwareToken(options?: AxiosRequestConfig) {
-        return Class2FAApiFp(this.configuration).privacyIdeaAdministrationControllerInitializeSoftwareToken(options).then((request) => request(this.axios, this.basePath));
-    }
-}
-
-
-/**
  * DbiamPersonenkontexteApi - axios parameter creator
  * @export
  */
@@ -2905,53 +2777,6 @@ export const DbiamPersonenkontexteApiAxiosParamCreator = function (configuration
                 options: localVarRequestOptions,
             };
         },
-        /**
-         * 
-         * @param {string} personId The ID for the person.
-         * @param {DbiamUpdatePersonenkontexteBodyParams} dbiamUpdatePersonenkontexteBodyParams 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        dBiamPersonenkontextControllerUpdatePersonenkontexte: async (personId: string, dbiamUpdatePersonenkontexteBodyParams: DbiamUpdatePersonenkontexteBodyParams, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'personId' is not null or undefined
-            assertParamExists('dBiamPersonenkontextControllerUpdatePersonenkontexte', 'personId', personId)
-            // verify required parameter 'dbiamUpdatePersonenkontexteBodyParams' is not null or undefined
-            assertParamExists('dBiamPersonenkontextControllerUpdatePersonenkontexte', 'dbiamUpdatePersonenkontexteBodyParams', dbiamUpdatePersonenkontexteBodyParams)
-            const localVarPath = `/api/dbiam/personenkontext/{personId}`
-                .replace(`{${"personId"}}`, encodeURIComponent(String(personId)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication bearer required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            // authentication oauth2 required
-            // oauth required
-            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
-
-
-    
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(dbiamUpdatePersonenkontexteBodyParams, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
     }
 };
 
@@ -2982,17 +2807,6 @@ export const DbiamPersonenkontexteApiFp = function(configuration?: Configuration
             const localVarAxiosArgs = await localVarAxiosParamCreator.dBiamPersonenkontextControllerFindPersonenkontextsByPerson(personId, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
-        /**
-         * 
-         * @param {string} personId The ID for the person.
-         * @param {DbiamUpdatePersonenkontexteBodyParams} dbiamUpdatePersonenkontexteBodyParams 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async dBiamPersonenkontextControllerUpdatePersonenkontexte(personId: string, dbiamUpdatePersonenkontexteBodyParams: DbiamUpdatePersonenkontexteBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonenkontexteUpdateResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.dBiamPersonenkontextControllerUpdatePersonenkontexte(personId, dbiamUpdatePersonenkontexteBodyParams, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
     }
 };
 
@@ -3021,16 +2835,6 @@ export const DbiamPersonenkontexteApiFactory = function (configuration?: Configu
         dBiamPersonenkontextControllerFindPersonenkontextsByPerson(personId: string, options?: any): AxiosPromise<Array<DBiamPersonenkontextResponse>> {
             return localVarFp.dBiamPersonenkontextControllerFindPersonenkontextsByPerson(personId, options).then((request) => request(axios, basePath));
         },
-        /**
-         * 
-         * @param {string} personId The ID for the person.
-         * @param {DbiamUpdatePersonenkontexteBodyParams} dbiamUpdatePersonenkontexteBodyParams 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        dBiamPersonenkontextControllerUpdatePersonenkontexte(personId: string, dbiamUpdatePersonenkontexteBodyParams: DbiamUpdatePersonenkontexteBodyParams, options?: any): AxiosPromise<PersonenkontexteUpdateResponse> {
-            return localVarFp.dBiamPersonenkontextControllerUpdatePersonenkontexte(personId, dbiamUpdatePersonenkontexteBodyParams, options).then((request) => request(axios, basePath));
-        },
     };
 };
 
@@ -3057,16 +2861,6 @@ export interface DbiamPersonenkontexteApiInterface {
      * @memberof DbiamPersonenkontexteApiInterface
      */
     dBiamPersonenkontextControllerFindPersonenkontextsByPerson(personId: string, options?: AxiosRequestConfig): AxiosPromise<Array<DBiamPersonenkontextResponse>>;
-
-    /**
-     * 
-     * @param {string} personId The ID for the person.
-     * @param {DbiamUpdatePersonenkontexteBodyParams} dbiamUpdatePersonenkontexteBodyParams 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof DbiamPersonenkontexteApiInterface
-     */
-    dBiamPersonenkontextControllerUpdatePersonenkontexte(personId: string, dbiamUpdatePersonenkontexteBodyParams: DbiamUpdatePersonenkontexteBodyParams, options?: AxiosRequestConfig): AxiosPromise<PersonenkontexteUpdateResponse>;
 
 }
 
@@ -3097,18 +2891,6 @@ export class DbiamPersonenkontexteApi extends BaseAPI implements DbiamPersonenko
      */
     public dBiamPersonenkontextControllerFindPersonenkontextsByPerson(personId: string, options?: AxiosRequestConfig) {
         return DbiamPersonenkontexteApiFp(this.configuration).dBiamPersonenkontextControllerFindPersonenkontextsByPerson(personId, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @param {string} personId The ID for the person.
-     * @param {DbiamUpdatePersonenkontexteBodyParams} dbiamUpdatePersonenkontexteBodyParams 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof DbiamPersonenkontexteApi
-     */
-    public dBiamPersonenkontextControllerUpdatePersonenkontexte(personId: string, dbiamUpdatePersonenkontexteBodyParams: DbiamUpdatePersonenkontexteBodyParams, options?: AxiosRequestConfig) {
-        return DbiamPersonenkontexteApiFp(this.configuration).dBiamPersonenkontextControllerUpdatePersonenkontexte(personId, dbiamUpdatePersonenkontexteBodyParams, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
@@ -4269,6 +4051,142 @@ export class OrganisationenApi extends BaseAPI implements OrganisationenApiInter
      */
     public organisationControllerUpdateOrganisation(organisationId: string, updateOrganisationBodyParams: UpdateOrganisationBodyParams, options?: AxiosRequestConfig) {
         return OrganisationenApiFp(this.configuration).organisationControllerUpdateOrganisation(organisationId, updateOrganisationBodyParams, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+/**
+ * PersonAdministrationApi - axios parameter creator
+ * @export
+ */
+export const PersonAdministrationApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * 
+         * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
+         * @param {number} [limit] The limit of items for the request.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        personAdministrationControllerFindRollen: async (rolleName?: string, limit?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/person-administration/rollen`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+            if (rolleName !== undefined) {
+                localVarQueryParameter['rolleName'] = rolleName;
+            }
+
+            if (limit !== undefined) {
+                localVarQueryParameter['limit'] = limit;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * PersonAdministrationApi - functional programming interface
+ * @export
+ */
+export const PersonAdministrationApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = PersonAdministrationApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * 
+         * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
+         * @param {number} [limit] The limit of items for the request.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async personAdministrationControllerFindRollen(rolleName?: string, limit?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<FindRollenResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.personAdministrationControllerFindRollen(rolleName, limit, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+    }
+};
+
+/**
+ * PersonAdministrationApi - factory interface
+ * @export
+ */
+export const PersonAdministrationApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = PersonAdministrationApiFp(configuration)
+    return {
+        /**
+         * 
+         * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
+         * @param {number} [limit] The limit of items for the request.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        personAdministrationControllerFindRollen(rolleName?: string, limit?: number, options?: any): AxiosPromise<FindRollenResponse> {
+            return localVarFp.personAdministrationControllerFindRollen(rolleName, limit, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * PersonAdministrationApi - interface
+ * @export
+ * @interface PersonAdministrationApi
+ */
+export interface PersonAdministrationApiInterface {
+    /**
+     * 
+     * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
+     * @param {number} [limit] The limit of items for the request.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PersonAdministrationApiInterface
+     */
+    personAdministrationControllerFindRollen(rolleName?: string, limit?: number, options?: AxiosRequestConfig): AxiosPromise<FindRollenResponse>;
+
+}
+
+/**
+ * PersonAdministrationApi - object-oriented interface
+ * @export
+ * @class PersonAdministrationApi
+ * @extends {BaseAPI}
+ */
+export class PersonAdministrationApi extends BaseAPI implements PersonAdministrationApiInterface {
+    /**
+     * 
+     * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
+     * @param {number} [limit] The limit of items for the request.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PersonAdministrationApi
+     */
+    public personAdministrationControllerFindRollen(rolleName?: string, limit?: number, options?: AxiosRequestConfig) {
+        return PersonAdministrationApiFp(this.configuration).personAdministrationControllerFindRollen(rolleName, limit, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
@@ -5528,53 +5446,6 @@ export const PersonenkontextApiAxiosParamCreator = function (configuration?: Con
         },
         /**
          * 
-         * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
-         * @param {number} [limit] The limit of items for the request.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        dbiamPersonenkontextWorkflowControllerFindRollen: async (rolleName?: string, limit?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/personenkontext-workflow/rollen`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication bearer required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            // authentication oauth2 required
-            // oauth required
-            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
-
-            if (rolleName !== undefined) {
-                localVarQueryParameter['rolleName'] = rolleName;
-            }
-
-            if (limit !== undefined) {
-                localVarQueryParameter['limit'] = limit;
-            }
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
          * @param {string} rolleId RolleId used to filter for schulstrukturknoten in personenkontext.
          * @param {string} [sskName] Organisation/SSK name used to filter for schulstrukturknoten in personenkontext.
          * @param {number} [limit] The limit of items for the request.
@@ -5722,17 +5593,6 @@ export const PersonenkontextApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
-         * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
-         * @param {number} [limit] The limit of items for the request.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async dbiamPersonenkontextWorkflowControllerFindRollen(rolleName?: string, limit?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<FindRollenResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.dbiamPersonenkontextWorkflowControllerFindRollen(rolleName, limit, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
-         * 
          * @param {string} rolleId RolleId used to filter for schulstrukturknoten in personenkontext.
          * @param {string} [sskName] Organisation/SSK name used to filter for schulstrukturknoten in personenkontext.
          * @param {number} [limit] The limit of items for the request.
@@ -5788,16 +5648,6 @@ export const PersonenkontextApiFactory = function (configuration?: Configuration
         },
         /**
          * 
-         * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
-         * @param {number} [limit] The limit of items for the request.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        dbiamPersonenkontextWorkflowControllerFindRollen(rolleName?: string, limit?: number, options?: any): AxiosPromise<FindRollenResponse> {
-            return localVarFp.dbiamPersonenkontextWorkflowControllerFindRollen(rolleName, limit, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
          * @param {string} rolleId RolleId used to filter for schulstrukturknoten in personenkontext.
          * @param {string} [sskName] Organisation/SSK name used to filter for schulstrukturknoten in personenkontext.
          * @param {number} [limit] The limit of items for the request.
@@ -5847,16 +5697,6 @@ export interface PersonenkontextApiInterface {
      * @memberof PersonenkontextApiInterface
      */
     dbiamPersonenkontextWorkflowControllerCreatePersonWithKontext(dbiamCreatePersonWithContextBodyParams: DbiamCreatePersonWithContextBodyParams, options?: AxiosRequestConfig): AxiosPromise<DBiamPersonResponse>;
-
-    /**
-     * 
-     * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
-     * @param {number} [limit] The limit of items for the request.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof PersonenkontextApiInterface
-     */
-    dbiamPersonenkontextWorkflowControllerFindRollen(rolleName?: string, limit?: number, options?: AxiosRequestConfig): AxiosPromise<FindRollenResponse>;
 
     /**
      * 
@@ -5912,18 +5752,6 @@ export class PersonenkontextApi extends BaseAPI implements PersonenkontextApiInt
      */
     public dbiamPersonenkontextWorkflowControllerCreatePersonWithKontext(dbiamCreatePersonWithContextBodyParams: DbiamCreatePersonWithContextBodyParams, options?: AxiosRequestConfig) {
         return PersonenkontextApiFp(this.configuration).dbiamPersonenkontextWorkflowControllerCreatePersonWithKontext(dbiamCreatePersonWithContextBodyParams, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
-     * @param {number} [limit] The limit of items for the request.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof PersonenkontextApi
-     */
-    public dbiamPersonenkontextWorkflowControllerFindRollen(rolleName?: string, limit?: number, options?: AxiosRequestConfig) {
-        return PersonenkontextApiFp(this.configuration).dbiamPersonenkontextWorkflowControllerFindRollen(rolleName, limit, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -7091,6 +6919,54 @@ export const RolleApiAxiosParamCreator = function (configuration?: Configuration
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * Update rolle.
+         * @summary 
+         * @param {string} rolleId The id for the rolle.
+         * @param {UpdateRolleBodyParams} updateRolleBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rolleControllerUpdateRolle: async (rolleId: string, updateRolleBodyParams: UpdateRolleBodyParams, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'rolleId' is not null or undefined
+            assertParamExists('rolleControllerUpdateRolle', 'rolleId', rolleId)
+            // verify required parameter 'updateRolleBodyParams' is not null or undefined
+            assertParamExists('rolleControllerUpdateRolle', 'updateRolleBodyParams', updateRolleBodyParams)
+            const localVarPath = `/api/rolle/{rolleId}`
+                .replace(`{${"rolleId"}}`, encodeURIComponent(String(rolleId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(updateRolleBodyParams, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -7183,6 +7059,18 @@ export const RolleApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.rolleControllerRemoveServiceProviderById(rolleId, serviceProviderId, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
+        /**
+         * Update rolle.
+         * @summary 
+         * @param {string} rolleId The id for the rolle.
+         * @param {UpdateRolleBodyParams} updateRolleBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async rolleControllerUpdateRolle(rolleId: string, updateRolleBodyParams: UpdateRolleBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RolleWithServiceProvidersResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.rolleControllerUpdateRolle(rolleId, updateRolleBodyParams, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
     }
 };
 
@@ -7268,6 +7156,17 @@ export const RolleApiFactory = function (configuration?: Configuration, basePath
         rolleControllerRemoveServiceProviderById(rolleId: string, serviceProviderId: string, options?: any): AxiosPromise<void> {
             return localVarFp.rolleControllerRemoveServiceProviderById(rolleId, serviceProviderId, options).then((request) => request(axios, basePath));
         },
+        /**
+         * Update rolle.
+         * @summary 
+         * @param {string} rolleId The id for the rolle.
+         * @param {UpdateRolleBodyParams} updateRolleBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rolleControllerUpdateRolle(rolleId: string, updateRolleBodyParams: UpdateRolleBodyParams, options?: any): AxiosPromise<RolleWithServiceProvidersResponse> {
+            return localVarFp.rolleControllerUpdateRolle(rolleId, updateRolleBodyParams, options).then((request) => request(axios, basePath));
+        },
     };
 };
 
@@ -7351,6 +7250,17 @@ export interface RolleApiInterface {
      * @memberof RolleApiInterface
      */
     rolleControllerRemoveServiceProviderById(rolleId: string, serviceProviderId: string, options?: AxiosRequestConfig): AxiosPromise<void>;
+
+    /**
+     * Update rolle.
+     * @summary 
+     * @param {string} rolleId The id for the rolle.
+     * @param {UpdateRolleBodyParams} updateRolleBodyParams 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RolleApiInterface
+     */
+    rolleControllerUpdateRolle(rolleId: string, updateRolleBodyParams: UpdateRolleBodyParams, options?: AxiosRequestConfig): AxiosPromise<RolleWithServiceProvidersResponse>;
 
 }
 
@@ -7448,6 +7358,19 @@ export class RolleApi extends BaseAPI implements RolleApiInterface {
      */
     public rolleControllerRemoveServiceProviderById(rolleId: string, serviceProviderId: string, options?: AxiosRequestConfig) {
         return RolleApiFp(this.configuration).rolleControllerRemoveServiceProviderById(rolleId, serviceProviderId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Update rolle.
+     * @summary 
+     * @param {string} rolleId The id for the rolle.
+     * @param {UpdateRolleBodyParams} updateRolleBodyParams 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RolleApi
+     */
+    public rolleControllerUpdateRolle(rolleId: string, updateRolleBodyParams: UpdateRolleBodyParams, options?: AxiosRequestConfig) {
+        return RolleApiFp(this.configuration).rolleControllerUpdateRolle(rolleId, updateRolleBodyParams, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
