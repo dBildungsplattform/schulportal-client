@@ -371,9 +371,10 @@
   },
   "profile": {
     "personalData": "Persönliche Daten",
-    "school": "Schule",
-    "schoolNumber": "Dienststellennummer",
-    "schoolNumberAbbr": "DStNr.",
+    "fullName": "Vor- und Nachname",
+    "schule": "Schule",
+    "schulNummer": "Dienststellennummer",
+    "schulNummerAbbr": "DStNr.",
     "password": "Passwort",
     "changePassword": "Passwort ändern",
     "saveNewPassword": "Neues Passwort speichern",

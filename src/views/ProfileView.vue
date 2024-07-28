@@ -13,7 +13,7 @@
   import { usePersonenkontextStore, type Zuordnung, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
   import { OrganisationsTyp } from '@/stores/OrganisationStore';
 
-  export type SchuleDate = {
+  export type SchulDaten = {
     title: string;
     info?: string | null;
     schoolAdmins?: string[];
@@ -23,7 +23,7 @@
   let personInfoStore: PersonInfoStore = usePersonInfoStore();
   let personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
   const personalData: Ref = ref<LabelValue[]>([]);
-  const schoolDatas: Ref = ref<SchuleDate[]>([]);
+  const schulDaten: Ref = ref<SchulDaten[]>([]);
 
   function handleGoToPreviousPage(): void {
     window.history.back();
@@ -77,7 +77,8 @@
             .filter((z: Zuordnung) => z.typ === OrganisationsTyp.Klasse)
             .map((z: Zuordnung) => z.sskName)
             .join(', ') || null;
-        const schule: string | null = zuordnungen.find((z) => z.typ === OrganisationsTyp.Schule)?.sskName || null;
+        const schule: string | null =
+          zuordnungen.find((z: Zuordnung) => z.typ === OrganisationsTyp.Schule)?.sskName || null;
         const composedZuordnung: Zuordnung = { ...zuordnungen[0], rolle: composedRoles };
         if (schule) composedZuordnung.sskName = schule;
         if (klasse) composedZuordnung.klasse = klasse;
@@ -89,34 +90,34 @@
     return composedZuordnungen;
   }
 
-  function createZuordnungsSchoolData(zuordnungen: Zuordnung[]): SchuleDate[] {
-    const result: SchuleDate[] = [];
+  function createZuordnungsSchuleDaten(zuordnungen: Zuordnung[]): SchulDaten[] {
+    const result: SchulDaten[] = [];
     for (const zuordnung of zuordnungen) {
-      const tempSchoolData: SchuleDate = {
+      const tempSchulDaten: SchulDaten = {
         title: zuordnung.sskName,
         info: t('profile.yourSchuleAdminsAre'),
         schoolAdmins: [], // Hierfuer muss ein API-Endpunkt implementiert werden
-        labelAndValues: [{ label: t('profile.school'), value: zuordnung.sskName }],
+        labelAndValues: [{ label: t('profile.schule'), value: zuordnung.sskName }],
       };
 
       if (zuordnung.klasse) {
-        tempSchoolData.labelAndValues.push({
+        tempSchulDaten.labelAndValues.push({
           label: t('profile.klasse'),
           value: zuordnung.klasse,
         });
       }
 
-      tempSchoolData.labelAndValues.push({ label: t('admin.rolle.rolle'), value: zuordnung.rolle });
+      tempSchulDaten.labelAndValues.push({ label: t('admin.rolle.rolle'), value: zuordnung.rolle });
 
       if (zuordnung.sskDstNr) {
-        tempSchoolData.labelAndValues.push({
-          label: t('profile.schoolNumber'),
-          labelAbbr: t('profile.schoolNumberAbbr'),
+        tempSchulDaten.labelAndValues.push({
+          label: t('profile.schulNummer'),
+          labelAbbr: t('profile.schulNummerAbbr'),
           value: zuordnung.sskDstNr,
         });
       }
 
-      result.push(tempSchoolData);
+      result.push(tempSchulDaten);
     }
 
     return result;
@@ -134,10 +135,10 @@
     const personInfo: PersonInfoResponse = personInfoStore.personInfo;
     personalData.value = [
       {
-        label: 'Vor- und Nachname',
+        label: t('profile.fullName'),
         value: personInfo.person.name.vorname + ' ' + personInfo.person.name.familiennamen,
       },
-      { label: 'Benutzername', value: personInfo.person.referrer },
+      { label: t('person.userName'), value: personInfo.person.referrer },
     ];
 
     if (personInfo.person.personalnummer) {
@@ -164,7 +165,7 @@
     );
 
     const composedZuordnungen: Zuordnung[] = createComposedZuordnungen(groupedZuordnungen);
-    schoolDatas.value = createZuordnungsSchoolData(composedZuordnungen);
+    schulDaten.value = createZuordnungsSchuleDaten(composedZuordnungen);
   }
 
   onBeforeMount(async () => {
@@ -176,12 +177,12 @@
 
 <template>
   <div class="profile">
-    <a @click="handleGoToPreviousPage()"
-      ><v-icon
+    <v-btn @click="handleGoToPreviousPage()">
+      <v-icon
         class="mr-2"
         icon="mdi-arrow-left-thin"
       />
-      {{ $t('nav.backToPreviousPage') }}</a
+      {{ $t('nav.backToPreviousPage') }}</v-btn
     >
     <h1
       class="text-center headline"
@@ -230,20 +231,20 @@
         </LayoutCard>
       </v-col>
       <v-col
-        v-for="(schoolData, index) in schoolDatas"
-        :key="schoolData.title"
+        v-for="(schuleData, index) in schulDaten"
+        :key="schuleData.title"
         cols="12"
         sm="12"
         md="6"
       >
-        <LayoutCard :header="$t('person.zuordnung') + ' ' + (schoolDatas.length > 1 ? (index + 1).toString() : '')">
+        <LayoutCard :header="$t('person.zuordnung') + ' ' + (schulDaten.length > 1 ? (index + 1).toString() : '')">
           <v-row class="ma-3 padding">
             <v-col cols="12">
               <v-simple-table>
                 <template v-slot:default>
                   <tbody>
                     <tr
-                      v-for="item in schoolData.labelAndValues"
+                      v-for="item in schuleData.labelAndValues"
                       :key="item.label"
                     >
                       <td class="padding">
@@ -260,14 +261,14 @@
                 </template>
               </v-simple-table>
               <p
-                v-if="schoolData.schoolAdmins.length > 0"
+                v-if="schuleData.schoolAdmins.length > 0"
                 class="info"
               >
                 <v-icon
                   class="mr-2"
                   icon="mdi-information-slab-circle-outline"
                 ></v-icon>
-                {{ schoolData.info + ' ' + schoolData.schoolAdmins?.join(', ') }}
+                {{ schuleData.info + ' ' + schuleData.schoolAdmins?.join(', ') }}
               </p>
             </v-col>
           </v-row>
@@ -324,7 +325,7 @@
   </div>
 </template>
 
-<style scoped>
+<style>
   .profile {
     margin: 20px;
   }
