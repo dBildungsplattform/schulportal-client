@@ -477,8 +477,8 @@
       <template v-if="rolleStore.updatedRolle && !rolleStore.errorCode">
         <SuccessTemplate
           :successMessage="$t('admin.rolle.rolleUpdatedSuccessfully')"
-          :followingDataCreated="$t('admin.followingDataCreated')"
-          :createdData="[
+          :followingRolleDataCreated="$t('admin.followingDataCreated')"
+          :createdRolleData="[
             { label: $t('admin.rolle.rollenname'), value: rolleStore.updatedRolle?.name, testId: 'updated-rolle-name' },
             {
               label: $t('admin.rolle.merkmale'),
@@ -497,11 +497,11 @@
             },
           ]"
           :backButtonText="$t('nav.backToDetails')"
-          :createAnotherButtonText="$t('admin.rolle.createAnother')"
-          :showCreateAnotherButton="false"
+          :createAnotherRolleButtonText="$t('admin.rolle.createAnother')"
+          :showCreateAnotherRolleButton="false"
           backButtonTestId="back-to-details-button"
           createAnotherButtonTestId="create-another-rolle-button"
-          @onNavigateBack="router.go(0)"
+          @OnNavigateBackToRolleManagement="router.go(0)"
         />
       </template>
     </LayoutCard>
