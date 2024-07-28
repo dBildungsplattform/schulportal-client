@@ -18,7 +18,7 @@
 
   async function close2FADialog(isActive: Ref<boolean>): Promise<void> {
     isActive.value = false;
-    selectedOption.value = "software";
+    selectedOption.value = 'software';
   }
 </script>
 
@@ -60,15 +60,31 @@
             <v-row class="text-body bold px-md-16">
               <v-col>
                 <v-radio-group v-model="selectedOption">
-                  <v-radio :label="$t('admin.person.twoFactorAuthentication.softwareTokenOption')" value="software"></v-radio>
-                  <v-radio :label="$t('admin.person.twoFactorAuthentication.hardwareTokenOption')" value="hardware"></v-radio>
+                  <v-radio
+                    :label="$t('admin.person.twoFactorAuthentication.softwareTokenOption')"
+                    value="software"
+                  ></v-radio>
+                  <v-radio
+                    :label="$t('admin.person.twoFactorAuthentication.hardwareTokenOption')"
+                    value="hardware"
+                  ></v-radio>
                 </v-radio-group>
               </v-col>
             </v-row>
             <v-row>
               <v-col cols="12">
-                <p class="text-body" v-if="selectedOption === 'software'"> {{ $t('admin.person.twoFactorAuthentication.softwareTokenText') }}</p>
-                <p class="text-body" v-if="selectedOption === 'hardware'"> {{ $t('admin.person.twoFactorAuthentication.hardwareTokenText') }}</p>
+                <p
+                  class="text-body"
+                  v-if="selectedOption === 'software'"
+                >
+                  {{ $t('admin.person.twoFactorAuthentication.softwareTokenText') }}
+                </p>
+                <p
+                  class="text-body"
+                  v-if="selectedOption === 'hardware'"
+                >
+                  {{ $t('admin.person.twoFactorAuthentication.hardwareTokenText') }}
+                </p>
               </v-col>
             </v-row>
           </v-container>
@@ -86,7 +102,7 @@
                 @click.stop="close2FADialog(isActive)"
                 data-testid="close-two-way-authentification-dialog-button"
               >
-                {{ $t('cancel')}}
+                {{ $t('cancel') }}
               </v-btn>
             </v-col>
             <v-col
@@ -97,7 +113,8 @@
               <v-btn
                 :block="mdAndDown"
                 class="primary button"
-                data-testid="two-way-authentification-set-up-button"              >
+                data-testid="two-way-authentification-set-up-button"
+              >
                 {{ $t('proceed') }}
               </v-btn>
             </v-col>
