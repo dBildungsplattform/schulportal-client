@@ -46,6 +46,7 @@ const mockUebersicht: Uebersicht = {
   vorname: 'Samuel',
   nachname: 'Vimes',
   benutzername: 'samuelvimes',
+  lastModifiedZuordnungen: '2021-09-01T12:00:00Z',
   zuordnungen: [
     {
       klasse: '10A',
@@ -100,7 +101,7 @@ describe('ProfileView', () => {
     }
   });
 
-  test('it displays school data', async () => {
+  test('it displays Schule data', async () => {
     await nextTick();
     const schoolCards = wrapper?.findAllComponents({ name: 'LayoutCard' });
     expect(schoolCards?.length).toBeGreaterThan(0);
