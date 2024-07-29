@@ -71,7 +71,7 @@
 </template>
 
 <style>
-.container {
+  .container {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;

@@ -16,17 +16,17 @@
 
   const route: RouteLocationNormalizedLoaded = useRoute();
 
-  export type SchoolData = {
+  export type SchulDaten = {
     title: string;
     info?: string | null;
     schoolAdmins?: string[];
     labelAndValues: LabelValue[];
   };
 
-  const personInfoStore: PersonInfoStore = usePersonInfoStore();
-  const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
+  let personInfoStore: PersonInfoStore = usePersonInfoStore();
+  let personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
   const personalData: Ref = ref<LabelValue[]>([]);
-  const schoolDatas: Ref = ref<SchoolData[]>([]);
+  const schulDaten: Ref = ref<SchulDaten[]>([]);
 
   function handleGoToPreviousPage(): void {
     window.history.back();
@@ -34,6 +34,17 @@
 
   const windowOrigin: string = window.location.origin;
 
+  /**
+   * Gruppiert eine Liste von Zuordnungen nach dem Wert der Eigenschaft 'sskDstNr'.
+   *
+   * Diese Funktion nimmt ein Array von Zuordnungen entgegen und organisiert diese
+   * in einer Map, wobei der Schlüssel der Wert der Eigenschaft 'sskDstNr' ist
+   * und der Wert ein Array von Zuordnungen mit diesem Schlüssel.
+   *
+   * @param zuordnungen - Ein Array von Zuordnungen, die gruppiert werden sollen.
+   * @returns Eine Map, in der jeder Schlüssel ein Wert von 'sskDstNr' ist und
+   *          jeder Wert ein Array von Zuordnungen mit diesem Schlüssel.
+   */
   function groupZuordnungen(zuordnungen: Zuordnung[]): Map<string, Zuordnung[]> {
     const groupedZuordnungen: Map<string, Zuordnung[]> = new Map();
     for (const zuordnung of zuordnungen) {
@@ -46,75 +57,93 @@
     return groupedZuordnungen;
   }
 
+  /**
+   * Erstellt eine Liste von zusammengesetzten Zuordnungen aus einer gruppierten Map von Zuordnungen.
+   *
+   * Diese Funktion nimmt eine Map von gruppierten Zuordnungen entgegen und erstellt eine neue Liste von
+   * Zuordnungen. Wenn es mehrere Zuordnungen in einer Gruppe gibt, werden die Rollen aggregiert und
+   * zusammengeführt. Für Zuordnungen des Typs "Klasse" oder "Schule" wird der Name der Klasse oder
+   * der Schule entsprechend gesetzt. Einzelne Zuordnungen ohne Gruppierung werden direkt übernommen.
+   *
+   * @param groupedZuordnungen - Eine Map, in der jeder Schlüssel ein Wert von 'sskDstNr' ist und
+   *                             jeder Wert ein Array von Zuordnungen mit diesem Schlüssel.
+   * @returns Ein Array von zusammengesetzten Zuordnungen.
+   */
   function createComposedZuordnungen(groupedZuordnungen: Map<string, Zuordnung[]>): Zuordnung[] {
     const composedZuordnungen: Zuordnung[] = [];
     for (const [, zuordnungen] of groupedZuordnungen) {
+      if (zuordnungen.length === 0 || zuordnungen[0] === undefined) continue;
       if (zuordnungen.length > 1) {
         const aggregatedRoles: string[] = zuordnungen.map((z: Zuordnung) => z.rolle);
-        const klasse: string | null =
-          zuordnungen.filter((z: Zuordnung) => z.typ === OrganisationsTyp.Klasse).at(0)?.sskName ?? null;
-        const schule: string | null =
-          zuordnungen.filter((z: Zuordnung) => z.typ === OrganisationsTyp.Schule).at(0)?.sskName ?? null;
         const uniqueRoles: string[] = [...new Set(aggregatedRoles)];
         const composedRoles: string = uniqueRoles.join(', ');
-        if (!zuordnungen[0]) continue;
+        const klasse: string | null =
+          zuordnungen
+            .filter((z: Zuordnung) => z.typ === OrganisationsTyp.Klasse)
+            .map((z: Zuordnung) => z.sskName)
+            .join(', ') || null;
+        const schule: string | null =
+          zuordnungen.find((z: Zuordnung) => z.typ === OrganisationsTyp.Schule)?.sskName || null;
         const composedZuordnung: Zuordnung = { ...zuordnungen[0], rolle: composedRoles };
         if (schule) composedZuordnung.sskName = schule;
         if (klasse) composedZuordnung.klasse = klasse;
         composedZuordnungen.push(composedZuordnung);
       } else {
-        if (zuordnungen.length === 1 && zuordnungen[0]) composedZuordnungen.push(zuordnungen[0]);
+        composedZuordnungen.push(zuordnungen[0]);
       }
     }
-
     return composedZuordnungen;
   }
 
-  function createZuordnungsSchoolData(zuordnungen: Zuordnung[]): SchoolData[] {
-    const result: SchoolData[] = [];
+  function createZuordnungsSchuleDaten(zuordnungen: Zuordnung[]): SchulDaten[] {
+    const result: SchulDaten[] = [];
     for (const zuordnung of zuordnungen) {
-      const tempSchoolData: SchoolData = {
+      const tempSchulDaten: SchulDaten = {
         title: zuordnung.sskName,
-        info: t('profile.yourSchoolAdminsAre'),
+        info: t('profile.yourSchuleAdminsAre'),
         schoolAdmins: [], // Hierfuer muss ein API-Endpunkt implementiert werden
-        labelAndValues: [{ label: t('profile.school'), value: zuordnung.sskName }],
+        labelAndValues: [{ label: t('profile.schule'), value: zuordnung.sskName }],
       };
 
       if (zuordnung.klasse) {
-        tempSchoolData.labelAndValues.push({
-          label: t('profile.class'),
+        tempSchulDaten.labelAndValues.push({
+          label: t('profile.klasse'),
           value: zuordnung.klasse,
         });
       }
 
-      tempSchoolData.labelAndValues.push({ label: t('admin.rolle.rolle'), value: zuordnung.rolle });
+      tempSchulDaten.labelAndValues.push({ label: t('admin.rolle.rolle'), value: zuordnung.rolle });
 
       if (zuordnung.sskDstNr) {
-        tempSchoolData.labelAndValues.push({
-          label: t('profile.schoolNumber'),
-          labelAbbr: t('profile.schoolNumberAbbr'),
+        tempSchulDaten.labelAndValues.push({
+          label: t('profile.schulNummer'),
+          labelAbbr: t('profile.schulNummerAbbr'),
           value: zuordnung.sskDstNr,
         });
       }
 
-      result.push(tempSchoolData);
+      result.push(tempSchulDaten);
     }
 
     return result;
   }
 
-  onBeforeMount(async () => {
+  async function initializeStores(): Promise<void> {
+    personInfoStore = usePersonInfoStore();
+    personenkontextStore = usePersonenkontextStore();
     await personInfoStore.initPersonInfo();
     await personenkontextStore.getPersonenuebersichtById(personInfoStore.personInfo?.person.id ?? '');
-    const personInfo: PersonInfoResponse = personInfoStore.personInfo as PersonInfoResponse;
-    const personenZuordnungen: Zuordnung[] = personenkontextStore.personenuebersicht?.zuordnungen ?? [];
+  }
 
+  function setupPersonalData(): void {
+    if (!personInfoStore.personInfo) return;
+    const personInfo: PersonInfoResponse = personInfoStore.personInfo;
     personalData.value = [
       {
-        label: 'Vor- und Nachname',
+        label: t('profile.fullName'),
         value: personInfo.person.name.vorname + ' ' + personInfo.person.name.familiennamen,
       },
-      { label: 'Benutzername', value: personInfo.person.referrer },
+      { label: t('person.userName'), value: personInfo.person.referrer },
     ];
 
     if (personInfo.person.personalnummer) {
@@ -124,6 +153,11 @@
         value: personInfo.person.personalnummer,
       });
     }
+  }
+
+  function setupSchuleData(): void {
+    if (!personenkontextStore.personenuebersicht) return;
+    const personenZuordnungen: Zuordnung[] = personenkontextStore.personenuebersicht.zuordnungen;
     const groupedZuordnungen: Map<string, Zuordnung[]> = groupZuordnungen(
       personenZuordnungen.map(
         (z: Zuordnung) =>
@@ -136,18 +170,24 @@
     );
 
     const composedZuordnungen: Zuordnung[] = createComposedZuordnungen(groupedZuordnungen);
-    schoolDatas.value = createZuordnungsSchoolData(composedZuordnungen);
+    schulDaten.value = createZuordnungsSchuleDaten(composedZuordnungen);
+  }
+
+  onBeforeMount(async () => {
+    await initializeStores();
+    setupPersonalData();
+    setupSchuleData();
   });
 </script>
 
 <template>
   <div class="profile">
-    <a @click="handleGoToPreviousPage()"
-      ><v-icon
+    <v-btn @click="handleGoToPreviousPage()">
+      <v-icon
         class="mr-2"
         icon="mdi-arrow-left-thin"
       />
-      {{ $t('nav.backToPreviousPage') }}</a
+      {{ $t('nav.backToPreviousPage') }}</v-btn
     >
     <h1
       class="text-center headline"
@@ -196,20 +236,20 @@
         </LayoutCard>
       </v-col>
       <v-col
-        v-for="(schoolData, index) in schoolDatas"
-        :key="schoolData.title"
+        v-for="(schuleData, index) in schulDaten"
+        :key="schuleData.title"
         cols="12"
         sm="12"
         md="6"
       >
-        <LayoutCard :header="$t('person.zuordnung') + ' ' + (schoolDatas.length > 1 ? (index + 1).toString() : '')">
+        <LayoutCard :header="$t('person.zuordnung') + ' ' + (schulDaten.length > 1 ? (index + 1).toString() : '')">
           <v-row class="ma-3 padding">
             <v-col cols="12">
               <v-simple-table>
                 <template v-slot:default>
                   <tbody>
                     <tr
-                      v-for="item in schoolData.labelAndValues"
+                      v-for="item in schuleData.labelAndValues"
                       :key="item.label"
                     >
                       <td class="padding">
@@ -226,14 +266,14 @@
                 </template>
               </v-simple-table>
               <p
-                v-if="schoolData.schoolAdmins.length > 0"
+                v-if="schuleData.schoolAdmins.length > 0"
                 class="info"
               >
                 <v-icon
                   class="mr-2"
                   icon="mdi-information-slab-circle-outline"
                 ></v-icon>
-                {{ schoolData.info + ' ' + schoolData.schoolAdmins?.join(', ') }}
+                {{ schuleData.info + ' ' + schuleData.schoolAdmins?.join(', ') }}
               </p>
             </v-col>
           </v-row>
@@ -291,7 +331,7 @@
   </div>
 </template>
 
-<style scoped>
+<style>
   .profile {
     margin: 20px;
   }

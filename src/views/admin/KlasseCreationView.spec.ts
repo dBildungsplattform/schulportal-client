@@ -127,7 +127,6 @@ describe('KlasseCreationView', () => {
     await nextTick();
 
     expect(organisationStore.errorCode).toBe('');
-
   });
 
   test('it handles search input for Schule when searchValue is not equal to selectedSchuleTitle', async () => {
