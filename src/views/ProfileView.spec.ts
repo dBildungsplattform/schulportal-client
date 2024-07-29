@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/typedef */
 import { expect, test, beforeEach, describe } from 'vitest';
 import { VueWrapper, mount } from '@vue/test-utils';
-import ProfileView from './ProfileView.vue'; // Ersetze dies durch den korrekten Pfad zu deiner Komponente
+import ProfileView from './ProfileView.vue';
 import { usePersonInfoStore, type PersonInfoResponse, type PersonInfoStore } from '@/stores/PersonInfoStore';
 import { usePersonenkontextStore, type PersonenkontextStore, type Uebersicht } from '@/stores/PersonenkontextStore';
 import { nextTick } from 'vue';
