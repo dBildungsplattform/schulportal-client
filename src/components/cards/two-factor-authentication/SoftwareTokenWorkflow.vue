@@ -36,7 +36,10 @@
   <v-card-text v-if="workflowStep == 0">
     <v-container>
       <v-row>
-        <p class="text-body">
+        <p
+          class="text-body"
+          data-testid="software-token-dialog-text"
+        >
           {{ $t('admin.person.twoFactorAuthentication.scanOrPrint') }}
         </p>
       </v-row>
@@ -45,6 +48,7 @@
           class="printableContent image-width"
           :src="qrCodeImageBase64"
           max-width="250"
+          data-testid="software-token-dialog-qr-code"
         />
       </v-row>
     </v-container>
@@ -58,7 +62,7 @@
       >
         <v-btn
           class="primary button"
-          data-testid="close-two-way-authentification-dialog-button"
+          data-testid="print-software-token-dialog-button"
           :block="mdAndDown"
           @click="printPage"
         >
@@ -72,7 +76,7 @@
       >
         <v-btn
           class="primary button"
-          data-testid="two-way-authentification-set-up-button"
+          data-testid="close-software-token-dialog-button"
           :block="mdAndDown"
           @click="$emit('onCloseClicked')"
         >
