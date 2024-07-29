@@ -32,6 +32,7 @@
   import { useRollen } from '@/composables/useRollen';
   import { useKlassen } from '@/composables/useKlassen';
   import PersonenkontextCreate from '@/components/admin/personen/PersonenkontextCreate.vue';
+  import type { TokenStateResponse } from '@/api-client/generated';
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
   const { t }: Composer = useI18n({ useScope: 'global' });
@@ -446,16 +447,16 @@
     }
   }
 
-  async function check2FAState() {
+  async function check2FAState(): Promise<void> {
     secondFactorSet.value = undefined;
     secondFactorType.value = undefined;
 
-    const referrer = personStore.currentPerson?.person.referrer;
+    const referrer: string | null | undefined = personStore.currentPerson?.person.referrer;
 
     if (!referrer) {
       return;
     }
-    const result = await personStore.get2FAState(referrer);
+    const result: TokenStateResponse = await personStore.get2FAState(referrer);
     secondFactorSet.value = result.hasToken;
     if (secondFactorSet.value) {
       if (result.tokenKind === 'hardware') {
