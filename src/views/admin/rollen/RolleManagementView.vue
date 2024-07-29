@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import { RollenMerkmal, useRolleStore, type Rolle, type RolleResponse, type RolleStore } from '@/stores/RolleStore';
-  import { computed, onMounted, type ComputedRef } from 'vue';
+  import { computed, onMounted, ref, type ComputedRef, type Ref } from 'vue';
   import ResultTable from '@/components/admin/ResultTable.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { type Composer, useI18n } from 'vue-i18n';
@@ -68,13 +68,31 @@
     });
   });
 
+  const rollenPerPage: Ref<number> = ref(10);
+  const rollenPage: Ref<number> = ref(1);
+
   function navigateToRolleDetails(_$event: PointerEvent, { item }: { item: Rolle }): void {
     router.push({ name: 'rolle-details', params: { id: item.id } });
   }
 
+  function getPaginatedRollen(page: number): void {
+    rollenPage.value = page || 1;
+    rolleStore.getAllRollen({ offset: (rollenPage.value - 1) * rollenPerPage.value, limit: rollenPerPage.value, searchString: '' });
+  }
+
+  function getPaginatedRollenWithLimit(limit: number): void {
+    /* reset page to 1 if entries are equal to or less than selected limit */
+    if (rolleStore.totalRollen <= limit) {
+      rollenPage.value = 1;
+    }
+
+    rollenPerPage.value = limit || 1;
+    rolleStore.getAllRollen({ offset: (rollenPage.value - 1) * rollenPerPage.value, limit: rollenPerPage.value, searchString: '' });
+  }
+
   onMounted(async () => {
-    await rolleStore.getAllRollen('');
     await organisationStore.getAllOrganisationen();
+    await rolleStore.getAllRollen({ offset: (rollenPage.value - 1) * rollenPerPage.value, limit: rollenPerPage.value, searchString: '' });
   });
 </script>
 
@@ -90,11 +108,13 @@
       <ResultTable
         data-testid="role-table"
         :items="transformedRollenAndMerkmale || []"
+        :itemsPerPage="rollenPerPage"
         :loading="rolleStore.loading"
         :headers="headers"
         @onHandleRowClick="navigateToRolleDetails"
-        @onUpdateTable="rolleStore.getAllRollen('')"
-        :totalItems="rolleStore.allRollen.length"
+        @onItemsPerPageUpdate="getPaginatedRollenWithLimit"
+        @onPageUpdate="getPaginatedRollen"
+        :totalItems="rolleStore.totalRollen"
         item-value-path="id"
       >
         <template v-slot:[`item.serviceProviders`]="{ item }">
