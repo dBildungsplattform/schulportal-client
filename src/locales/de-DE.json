@@ -157,10 +157,12 @@
       "errors": {
         "ADD_SYSTEMRECHT_ERROR": "Das Systemrecht konnte nicht hinzugefügt werden.",
         "ROLLE_ERROR":  "Die Rolle konnte nicht angelegt werden.",
+        "ROLLE_UPDATE_ERROR": "Die Rolle konnte nicht bearbeitet werden.",
         "UPDATE_MERKMALE_ERROR": "Die gewünschte Bearbeitung kann nicht ausgeführt werden, da die Rolle noch Benutzern zugeordnet ist. Nehmen Sie bitte zunächst alle Zuordnungen zurück."
       },
       "title": {
         "ROLLE_ERROR":  "Fehler bei Erstellung der Rolle.",
+        "ROLLE_UPDATE_ERROR": "Bearbeitung nicht möglich.",
         "UPDATE_MERKMALE_ERROR": "Bearbeitung nicht möglich."
       },
       "isAllowedToManageRollen": "Darf Rollen verwalten",

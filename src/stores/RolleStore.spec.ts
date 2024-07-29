@@ -272,7 +272,7 @@ describe('rolleStore', () => {
       );
       expect(rolleStore.loading).toBe(true);
       await rejects(updateRollePromise);
-      expect(rolleStore.errorCode).toEqual('UPDATE_MERKMALE_ERROR');
+      expect(rolleStore.errorCode).toEqual('ROLLE_UPDATE_ERROR');
       expect(rolleStore.updatedRolle).toEqual(null);
       expect(rolleStore.loading).toBe(false);
     });
@@ -288,7 +288,7 @@ describe('rolleStore', () => {
       );
       expect(rolleStore.loading).toBe(true);
       await rejects(updateRollePromise);
-      expect(rolleStore.errorCode).toEqual('UPDATE_MERKMALE_ERROR');
+      expect(rolleStore.errorCode).toEqual('ROLLE_UPDATE_ERROR');
       expect(rolleStore.updatedRolle).toEqual(null);
       expect(rolleStore.loading).toBe(false);
     });
