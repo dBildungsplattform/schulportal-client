@@ -4,7 +4,17 @@
   import { useDisplay } from 'vuetify';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
-  const emits = defineEmits(['updateHeader', 'onCloseClicked']);
+
+  type Emits = {
+    (event: 'updateHeader', header: string): void;
+    (event: 'onCloseClicked'): void;
+  };
+
+  const emits: Emits = defineEmits<{
+    (event: 'updateHeader', header: string): void;
+    (event: 'onCloseClicked'): void;
+  }>();
+
   const { t }: Composer = useI18n({ useScope: 'global' });
 
   type Props = {
@@ -17,7 +27,7 @@
 
   emits('updateHeader', t('admin.person.twoFactorAuthentication.softwareTokenOption'));
 
-  const printPage = () => {
+  const printPage = (): void => {
     window.print();
   };
 </script>

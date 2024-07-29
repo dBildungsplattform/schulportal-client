@@ -8,6 +8,7 @@ import { usePersonenkontextStore, type PersonenkontextStore, type Uebersicht } f
 import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
 import { RollenMerkmal, RollenSystemRecht } from '@/stores/RolleStore';
 import { nextTick } from 'vue';
+import type { TokenStateResponse } from '@/api-client/generated';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
@@ -135,6 +136,11 @@ beforeEach(async () => {
       plugins: [router],
     },
   });
+
+  vi.spyOn(personStore, 'get2FAState').mockResolvedValue({
+    hasToken: true,
+    tokenKind: 'hardware',
+  } as TokenStateResponse);
 });
 
 describe('PersonDetailsView', () => {

@@ -12,13 +12,19 @@
   const selectedOption: Ref<'software' | 'hardware'> = ref('software');
   const personStore: PersonStore = usePersonStore();
 
-  let qrCodeImageBase64 = '';
+  let qrCodeImageBase64: string = '';
 
   const proceeded: Ref<boolean> = ref(false);
 
-  const dialogHeader = ref(t('admin.person.twoFactorAuthentication.setUpLong'));
+  const dialogHeader: Ref<string> = ref(t('admin.person.twoFactorAuthentication.setUpLong'));
 
-  const emit = defineEmits(['dialogClosed']);
+  type Emits = {
+    (event: 'dialogClosed'): void;
+  };
+
+  const emits: Emits = defineEmits<{
+    (event: 'dialogClosed'): void;
+  }>();
 
   type Props = {
     errorCode: string;
@@ -26,11 +32,11 @@
     person: Personendatensatz;
   };
 
-  const props = defineProps<Props>();
+  const props: Props = defineProps<Props>();
 
   async function close2FADialog(isActive: Ref<boolean>): Promise<void> {
     if (proceeded.value) {
-      emit('dialogClosed');
+      emits('dialogClosed');
     }
 
     isActive.value = false;
@@ -40,11 +46,9 @@
   }
 
   async function proceed(): Promise<void> {
-    try {
-      if (props.person.person.referrer == null) return;
-      qrCodeImageBase64 = await personStore.get2FASoftwareQRCode(props.person.person.referrer);
-      proceeded.value = true;
-    } catch (error) {}
+    if (props.person.person.referrer == null) return;
+    qrCodeImageBase64 = await personStore.get2FASoftwareQRCode(props.person.person.referrer);
+    proceeded.value = true;
   }
 
   async function handleHeaderUpdate(header: string): Promise<void> {
@@ -84,6 +88,7 @@
         :closable="true"
         :header="dialogHeader"
         @onCloseClicked="close2FADialog(isActive)"
+        data-testid="two-factor-authentication-dialog"
       >
         <v-card-text v-if="!proceeded">
           <v-container>
@@ -92,10 +97,12 @@
                 <v-radio-group v-model="selectedOption">
                   <v-radio
                     :label="$t('admin.person.twoFactorAuthentication.softwareTokenOption')"
+                    data-testid="software-token-option"
                     value="software"
                   ></v-radio>
                   <v-radio
                     :label="$t('admin.person.twoFactorAuthentication.hardwareTokenOption')"
+                    data-testid="hardware-token-option"
                     value="hardware"
                   ></v-radio>
                 </v-radio-group>
@@ -135,6 +142,7 @@
             :qrCodeImageBase64="qrCodeImageBase64"
             @updateHeader="handleHeaderUpdate"
             @onCloseClicked="close2FADialog(isActive)"
+            data-testid="software-token-workflow"
           ></SoftwareTokenWorkflow>
         </v-container>
         <v-card-actions
@@ -151,7 +159,7 @@
                 :block="mdAndDown"
                 class="secondary button"
                 @click.stop="close2FADialog(isActive)"
-                data-testid="close-two-way-authentification-dialog-button"
+                data-testid="close-two-factor-authentication-dialog"
               >
                 {{ $t('cancel') }}
               </v-btn>
@@ -165,7 +173,7 @@
                 :block="mdAndDown"
                 class="primary button"
                 @click.stop="proceed()"
-                data-testid="two-way-authentification-set-up-button"
+                data-testid="proceed-two-factor-authentication-dialog"
               >
                 {{ $t('proceed') }}
               </v-btn>
