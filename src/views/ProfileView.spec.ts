@@ -81,6 +81,11 @@ beforeEach(() => {
       components: {
         ProfileView,
       },
+      mocks: {
+        route: {
+          fullPath: 'full/path',
+        },
+      },
     },
   });
 });
