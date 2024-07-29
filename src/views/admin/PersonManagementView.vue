@@ -78,7 +78,7 @@
   );
 
   const schulen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
-    return organisationStore.allOrganisationen
+    return organisationStore.allSchulen
       .slice(0, 25)
       .map((org: Organisation) => ({
         value: org.id,
@@ -120,6 +120,9 @@
     personStore.getAllPersons({
       offset: (personenPage.value - 1) * personenPerPage.value,
       limit: personenPerPage.value,
+      organisationIDs: searchFilterStore.selectedSchulen || selectedSchulen.value,
+      rolleIDs: searchFilterStore.selectedRollen || selectedRollen.value,
+      searchFilter: searchFilterStore.searchFilter || searchFilter.value,
     });
   }
 
@@ -133,6 +136,9 @@
     personStore.getAllPersons({
       offset: (personenPage.value - 1) * personenPerPage.value,
       limit: personenPerPage.value,
+      organisationIDs: searchFilterStore.selectedSchulen || selectedSchulen.value,
+      rolleIDs: searchFilterStore.selectedRollen || selectedRollen.value,
+      searchFilter: searchFilterStore.searchFilter || searchFilter.value,
     });
   }
 
@@ -375,8 +381,8 @@
                   >{{
                     $t(
                       'admin.schule.schulenFound',
-                      { count: organisationStore.totalOrganisationen },
-                      organisationStore.totalOrganisationen,
+                      { count: organisationStore.totalSchulen },
+                      organisationStore.totalSchulen,
                     )
                   }}</span
                 >

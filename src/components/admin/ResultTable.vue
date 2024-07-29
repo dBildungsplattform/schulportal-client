@@ -16,6 +16,7 @@
     itemValuePath: string;
     disableRowClick?: boolean;
   };
+
   const props: Props = defineProps<Props>();
 
   type Emits = {
