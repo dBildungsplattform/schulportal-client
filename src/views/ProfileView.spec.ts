@@ -6,6 +6,7 @@ import { usePersonInfoStore, type PersonInfoResponse, type PersonInfoStore } fro
 import { usePersonenkontextStore, type PersonenkontextStore, type Uebersicht } from '@/stores/PersonenkontextStore';
 import { nextTick } from 'vue';
 import { OrganisationsTyp } from '@/stores/OrganisationStore';
+import type { RouteLocationNormalizedLoaded } from 'vue-router';
 
 let wrapper: VueWrapper | null = null;
 let personInfoStore: PersonInfoStore;
@@ -62,6 +63,20 @@ const mockUebersicht: Uebersicht = {
   ],
 };
 
+vi.mock('vue-router', () => ({
+  useRoute: (): RouteLocationNormalizedLoaded => ({
+    fullPath: 'full/path',
+    matched: [],
+    query: {},
+    hash: '',
+    redirectedFrom: undefined,
+    name: undefined,
+    path: '',
+    params: {},
+    meta: {},
+  }),
+}));
+
 beforeEach(() => {
   document.body.innerHTML = `
     <div>
@@ -80,11 +95,6 @@ beforeEach(() => {
     global: {
       components: {
         ProfileView,
-      },
-      mocks: {
-        route: {
-          fullPath: 'full/path',
-        },
       },
     },
   });
