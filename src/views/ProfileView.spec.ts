@@ -59,6 +59,7 @@ const mockUebersicht: Uebersicht = {
       editable: true,
     },
   ],
+  lastModifiedZuordnungen: '2021-09-01T12:00:00Z',
 };
 
 beforeEach(() => {
@@ -79,6 +80,11 @@ beforeEach(() => {
     global: {
       components: {
         ProfileView,
+      },
+      mocks: {
+        route: {
+          fullPath: 'full/path',
+        },
       },
     },
   });
