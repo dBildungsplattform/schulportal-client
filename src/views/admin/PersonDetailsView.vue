@@ -445,20 +445,31 @@
       selectedKlasse.value = undefined;
     }
   }
-  onBeforeMount(async () => {
-    await personStore.getPersonById(currentPersonId);
-    await personenkontextStore.getPersonenuebersichtById(currentPersonId);
 
-    const result = await personStore.get2FAState(personStore.currentPerson?.person.referrer ?? '');
+  async function check2FAState() {
+    secondFactorSet.value = undefined;
+    secondFactorType.value = undefined;
 
-    secondFactorSet.value = result !== '';
+    const referrer = personStore.currentPerson?.person.referrer;
+
+    if (!referrer) {
+      return;
+    }
+    const result = await personStore.get2FAState(referrer);
+    secondFactorSet.value = result.hasToken;
     if (secondFactorSet.value) {
-      if (result === 'hardware') {
+      if (result.tokenKind === 'hardware') {
         secondFactorType.value = 'hardware';
-      } else if (result === 'software') {
+      } else if (result.tokenKind === 'software') {
         secondFactorType.value = 'software';
       }
     }
+  }
+
+  onBeforeMount(async () => {
+    await personStore.getPersonById(currentPersonId);
+    await personenkontextStore.getPersonenuebersichtById(currentPersonId);
+    check2FAState();
   });
 </script>
 
@@ -624,32 +635,46 @@
           <v-row class="ml-md-16">
             <v-col>
               <h3 class="subtitle-1">{{ $t('admin.person.twoFactorAuthentication.header') }}</h3>
-              <v-row class="ml-4 mt-4">
-                <v-icon
-                  icon="mdi-check"
-                  color="green"
-                  class="mr-2"
-                  v-if="secondFactorSet"
-                ></v-icon>
-                <p
-                  v-if="secondFactorSet && secondFactorType === 'software'"
-                  class="text-body"
+              <v-row
+                class="mt-4 text-body"
+                v-if="secondFactorSet && secondFactorType === 'software'"
+              >
+                <v-col
+                  class="text-right"
+                  cols="1"
                 >
-                  {{ $t('admin.person.twoFactorAuthentication.softwareTokenIsSetUp') }}
-                </p>
-                <p
-                  v-if="secondFactorSet"
-                  class="text-body mt-4"
+                  <v-icon
+                    icon="mdi-check-circle"
+                    color="green"
+                    v-if="secondFactorSet"
+                  ></v-icon>
+                </v-col>
+                <div class="v-col">
+                  <p>
+                    {{ $t('admin.person.twoFactorAuthentication.softwareTokenIsSetUp') }}
+                  </p>
+                </div>
+              </v-row>
+              <v-row class="mt-4 text-body">
+                <v-col
+                  class="text-right"
+                  cols="1"
                 >
-                  {{ $t('admin.person.twoFactorAuthentication.resetInfo') }}
-                </p>
-
-                <p
-                  v-if="secondFactorSet === false"
-                  class="text-body"
-                >
-                  {{ $t('admin.person.twoFactorAuthentication.notSetUp') }}
-                </p>
+                  <v-icon
+                    class="mb-2"
+                    icon="mdi-information"
+                    v-if="secondFactorSet != undefined"
+                  >
+                  </v-icon>
+                </v-col>
+                <div class="v-col">
+                  <p v-if="secondFactorSet">
+                    {{ $t('admin.person.twoFactorAuthentication.resetInfo') }}
+                  </p>
+                  <p v-if="secondFactorSet === false">
+                    {{ $t('admin.person.twoFactorAuthentication.notSetUp') }}
+                  </p>
+                </div>
               </v-row>
             </v-col>
             <v-col
@@ -658,15 +683,34 @@
               md="auto"
               v-if="personStore.currentPerson"
             >
-              <div class="d-flex justify-sm-end">
+              <div
+                class="d-flex justify-sm-end"
+                v-if="secondFactorSet === false"
+              >
                 <TwoFactorAuthenticationSetUp
-                  v-if="!secondFactorSet"
                   :errorCode="personStore.errorCode"
                   :disabled="isEditActive"
                   :person="personStore.currentPerson"
+                  @dialogClosed="check2FAState"
                 >
                 </TwoFactorAuthenticationSetUp>
-                <!-- Re with v-if="!secondFactorSet"-->
+              </div>
+              <div
+                class="d-flex justify-sm-end"
+                v-if="secondFactorSet"
+              >
+                <v-col
+                  cols="12"
+                  sm="6"
+                  md="auto"
+                >
+                  <v-btn
+                    class="primary"
+                    :disabled="isEditActive"
+                  >
+                    {{ $t('admin.person.twoFactorAuthentication.tokenReset') }}</v-btn
+                  ></v-col
+                >
               </div>
             </v-col>
             <v-col v-else-if="personStore.loading"> <v-progress-circular indeterminate></v-progress-circular></v-col

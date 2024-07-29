@@ -18,6 +18,8 @@
 
   const dialogHeader = ref(t('admin.person.twoFactorAuthentication.setUpLong'));
 
+  const emit = defineEmits(['dialogClosed']);
+
   type Props = {
     errorCode: string;
     disabled: boolean;
@@ -27,6 +29,10 @@
   const props = defineProps<Props>();
 
   async function close2FADialog(isActive: Ref<boolean>): Promise<void> {
+    if (proceeded.value) {
+      emit('dialogClosed');
+    }
+
     isActive.value = false;
     proceeded.value = false;
     selectedOption.value = 'software';
@@ -37,7 +43,6 @@
     try {
       if (props.person.person.referrer == null) return;
       qrCodeImageBase64 = await personStore.get2FASoftwareQRCode(props.person.person.referrer);
-      console.log(props.person.person.referrer);
       proceeded.value = true;
     } catch (error) {}
   }
@@ -96,8 +101,18 @@
                 </v-radio-group>
               </v-col>
             </v-row>
-            <v-row>
-              <v-col cols="12">
+            <v-row class="text-body px-md-13">
+              <v-col
+                class="text-right"
+                cols="1"
+              >
+                <v-icon
+                  class="mb-2"
+                  icon="mdi-information"
+                >
+                </v-icon>
+              </v-col>
+              <div class="v-col">
                 <p
                   class="text-body"
                   v-if="selectedOption === 'software'"
@@ -110,7 +125,7 @@
                 >
                   {{ $t('admin.person.twoFactorAuthentication.hardwareTokenText') }}
                 </p>
-              </v-col>
+              </div>
             </v-row>
           </v-container>
         </v-card-text>

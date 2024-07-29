@@ -9,6 +9,8 @@ import {
   type PersonendatensatzResponse,
   type PersonenFrontendApiInterface,
   type PersonFrontendControllerFindPersons200Response,
+  type TokenInitBodyParams,
+  type TokenStateResponse,
 } from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
 import { type DbiamPersonenkontextBodyParams } from './PersonenkontextStore';
@@ -51,42 +53,17 @@ export type PersonFilter = {
   searchFilter?: string;
 };
 
-type InitSoftwareTokenResponse = {
-  detail: {
-      googleurl: {
-          description: string;
-          img: string;
-          value: string;
-      };
-      oathurl: {
-          description: string;
-          img: string;
-          value: string;
-      };
-      otpkey: {
-          description: string;
-          img: string;
-          value: string;
-          value_b32: string;
-      };
-      rollout_state: string;
-      serial: string;
-      threadid: number;
-  };
-};
-
 type PersonGetters = {};
 type PersonActions = {
   getAllPersons: (filter: PersonFilter) => Promise<void>;
   getPersonById: (personId: string) => Promise<Personendatensatz>;
   resetPassword: (personId: string) => Promise<string>;
   deletePerson: (personId: string) => Promise<void>;
-  get2FAState: (personUserName:string) => Promise<string>;
+  get2FAState: (personUserName: string) => Promise<TokenStateResponse>;
   get2FASoftwareQRCode: (personUserName: string) => Promise<string>;
 };
 
 export type PersonStore = Store<'personStore', PersonState, PersonGetters, PersonActions>;
-
 
 export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonGetters, PersonActions> = defineStore({
   id: 'personStore',
@@ -176,22 +153,36 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
       }
     },
 
-    async get2FAState (personUserName:string){
-
-      return "";
-    },
-
-    async get2FASoftwareQRCode(personUserName: string) {
+    async get2FAState(userName: string) {
       this.loading = true;
       try {
+        const token: TokenStateResponse = (
+          await twoFactorApi.privacyIdeaAdministrationControllerGetTwoAuthState(userName)
+        ).data;
 
-          let response : InitSoftwareTokenResponse = (await twoFactorApi.privacyIdeaAdministrationControllerInitializeSoftwareToken(personUserName)).data
+        return token;
+      } catch (error: unknown) {
+        this.errorCode = 'UNSPECIFIED_ERROR';
+        if (isAxiosError(error)) {
+          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
+        }
+        return await Promise.reject(this.errorCode);
+      } finally {
+        this.loading = false;
+      }
+    },
 
-          let qrCodeImageBase64 = response.detail.googleurl.img
-          if(qrCodeImageBase64 === undefined){
-            //TODO throw exception
-          }
-          return qrCodeImageBase64;
+    async get2FASoftwareQRCode(userName: string) {
+      this.loading = true;
+      try {
+        const bodyParams: TokenInitBodyParams = {
+          userName: userName,
+        };
+        let qrCodeImageBase64: string = (
+          await twoFactorApi.privacyIdeaAdministrationControllerInitializeSoftwareToken(bodyParams)
+        ).data;
+
+        return qrCodeImageBase64;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
