@@ -111,8 +111,8 @@
 
       if (zuordnung.sskDstNr) {
         tempSchulDaten.labelAndValues.push({
-          label: t('profile.schulNummer'),
-          labelAbbr: t('profile.schulNummerAbbr'),
+          label: t('profile.dienstStellenNummer'),
+          labelAbbr: t('profile.dienstStellenNummerAbbr'),
           value: zuordnung.sskDstNr,
         });
       }
@@ -143,8 +143,8 @@
 
     if (personInfo.person.personalnummer) {
       personalData.value.push({
-        label: t('profile.personalNummer'),
-        labelAbbr: t('profile.personalNummerAbbr'),
+        label: t('profile.koPersNummer'),
+        labelAbbr: t('profile.koPersNummerAbbr'),
         value: personInfo.person.personalnummer,
       });
     }
@@ -176,7 +176,7 @@
 </script>
 
 <template>
-  <div class="profile">
+  <div class="m-4">
     <v-btn @click="handleGoToPreviousPage()">
       <v-icon
         class="mr-2"
@@ -185,7 +185,7 @@
       {{ $t('nav.backToPreviousPage') }}</v-btn
     >
     <h1
-      class="text-center headline"
+      class="text-center pb-4"
       data-testid="profile-headline"
     >
       {{ $t('nav.profile') }}
@@ -197,16 +197,16 @@
         md="6"
       >
         <LayoutCard :header="$t('profile.personalData')">
-          <v-row class="ma-3 padding">
+          <v-row class="ma-4">
             <v-col cols="12">
-              <v-simple-table>
+              <v-table class="text-body-1">
                 <template v-slot:default>
                   <tbody>
                     <tr
                       v-for="item in personalData"
                       :key="item.label"
                     >
-                      <td class="padding">
+                      <td>
                         <span v-if="item.labelAbbr"
                           ><abbr :title="item.label"
                             ><strong>{{ item.labelAbbr }}</strong></abbr
@@ -218,8 +218,8 @@
                     </tr>
                   </tbody>
                 </template>
-              </v-simple-table>
-              <p class="info">
+              </v-table>
+              <p class="pt-4 text-center text-body-1 text-medium-emphasis">
                 <v-icon
                   class="mr-2"
                   icon="mdi-information-slab-circle-outline"
@@ -238,16 +238,16 @@
         md="6"
       >
         <LayoutCard :header="$t('person.zuordnung') + ' ' + (schulDaten.length > 1 ? (index + 1).toString() : '')">
-          <v-row class="ma-3 padding">
+          <v-row class="ma-3 p-4">
             <v-col cols="12">
-              <v-simple-table>
+              <v-table class="text-body-1">
                 <template v-slot:default>
                   <tbody>
                     <tr
                       v-for="item in schuleData.labelAndValues"
                       :key="item.label"
                     >
-                      <td class="padding">
+                      <td>
                         <span v-if="item.labelAbbr"
                           ><abbr :title="item.label"
                             ><strong>{{ item.labelAbbr }}</strong></abbr
@@ -259,10 +259,10 @@
                     </tr>
                   </tbody>
                 </template>
-              </v-simple-table>
+              </v-table>
               <p
+                class="pt-4 text-center text-body-1"
                 v-if="schuleData.schoolAdmins.length > 0"
-                class="info"
               >
                 <v-icon
                   class="mr-2"
@@ -283,7 +283,7 @@
           <v-row class="ma-3 d-flex align-content-center justify-center ga-4">
             <v-icon
               size="x-large"
-              class="full-width"
+              class="w-100"
               icon="mdi-key-alert-outline"
             ></v-icon>
             <div>
@@ -291,7 +291,7 @@
                 color="primary"
                 disabled
               >
-                Passwort ändern
+                {{ $t('profile.setNewPassword') }}
               </v-btn>
             </div>
           </v-row>
@@ -307,7 +307,7 @@
           <v-row class="ma-3 d-flex align-content-center justify-center ga-4">
             <v-icon
               size="x-large"
-              class="full-width"
+              class="w-100"
               icon="mdi-shield-account-outline"
             ></v-icon>
             <div>
@@ -315,7 +315,7 @@
                 color="primary"
                 disabled
               >
-                2-FA einrichten
+                {{ $t('profile.setupTwoFactorAuth') }}
               </v-btn>
             </div>
           </v-row>
@@ -324,39 +324,3 @@
     </v-row>
   </div>
 </template>
-
-<style>
-  .profile {
-    margin: 20px;
-  }
-
-  .headline {
-    margin-bottom: 20px;
-  }
-
-  .right {
-    text-align: right;
-  }
-
-  .center {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    gap: 5px;
-  }
-
-  .padding {
-    padding: 8px;
-  }
-
-  .full-width {
-    width: 100%;
-  }
-
-  .info {
-    padding-top: 20px;
-    text-align: center;
-    color: grey;
-  }
-</style>
