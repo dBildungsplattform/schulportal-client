@@ -118,7 +118,7 @@
     </h1>
     <LayoutCard :header="$t('admin.rolle.management')">
       <ResultTable
-        data-testid="role-table"
+        data-testid="rolle-table"
         :items="transformedRollenAndMerkmale || []"
         :itemsPerPage="rollenPerPage"
         :loading="rolleStore.loading"

@@ -58,6 +58,7 @@
     :items-per-page-options="[30, 50, 100, 300]"
     :items-per-page-text="$t('itemsPerPage')"
     :item-value="itemValuePath"
+    ref="v-data-table-server"
     select-strategy="page"
     show-select
     @update:options="$emit('onTableUpdate')"

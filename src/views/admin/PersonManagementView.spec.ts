@@ -110,6 +110,8 @@ beforeEach(() => {
     },
   ] as PersonendatensatzResponse[];
 
+  personStore.totalPersons = 2;
+
   personenkontextStore.filteredRollen = {
     moeglicheRollen: [
       {
@@ -147,9 +149,28 @@ beforeEach(() => {
 });
 
 describe('PersonManagementView', () => {
-  test('it renders the person management table', () => {
+  test('it renders person management table', () => {
+    expect(wrapper?.getComponent({ name: 'ResultTable' })).toBeTruthy();
     expect(wrapper?.find('[data-testid="person-table"]').isVisible()).toBe(true);
     expect(wrapper?.findAll('.v-data-table__tr').length).toBe(2);
+  });
+
+  test('it reloads data after changing page', async () => {
+    expect(wrapper?.find('.v-pagination__next button.v-btn--disabled').isVisible()).toBe(true);
+    expect(wrapper?.find('.v-data-table-footer__info').text()).toContain('1-2');
+
+    personStore.totalPersons = 50;
+    await nextTick();
+
+    expect(wrapper?.find('.v-data-table-footer__info').text()).toContain('1-30');
+    expect(wrapper?.find('.v-pagination__next button:not(.v-btn--disabled)').isVisible()).toBe(true);
+    await wrapper?.find('.v-pagination__next button:not(.v-btn--disabled)').trigger('click');
+    expect(wrapper?.find('.v-data-table-footer__info').text()).toContain('31-50');
+  });
+
+  test('it reloads data after changing limit', () => {
+    expect(wrapper?.find('.v-data-table-footer__items-per-page').isVisible()).toBe(true);
+    expect(wrapper?.find('.v-data-table-footer__items-per-page').text()).toContain('30');
   });
 
   test('it sets filters', async () => {

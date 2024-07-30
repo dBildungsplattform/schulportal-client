@@ -55,6 +55,7 @@ export { RollenArt };
 export { RollenMerkmal };
 export { RollenSystemRecht };
 export type { RolleResponse };
+export type { RolleWithServiceProvidersResponse };
 
 export type Rolle = {
   administeredBySchulstrukturknoten: string;

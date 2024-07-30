@@ -76,6 +76,7 @@
         :disableRowClick="true"
         @onItemsPerPageUpdate="getPaginatedSchulenWithLimit"
         @onPageUpdate="getPaginatedSchulen"
+        ref="result-table"
         :totalItems="organisationStore.totalSchulen"
         :itemsPerPage="schulenPerPage"
       >
