@@ -1,12 +1,10 @@
-/* eslint-disable @typescript-eslint/typedef */
 import { expect, test, beforeEach, describe } from 'vitest';
-import { VueWrapper, mount } from '@vue/test-utils';
-import ProfileView from './ProfileView.vue';
+import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
+import ProfileView from './ProfileView.vue'; // Ersetze dies durch den korrekten Pfad zu deiner Komponente
 import { usePersonInfoStore, type PersonInfoResponse, type PersonInfoStore } from '@/stores/PersonInfoStore';
 import { usePersonenkontextStore, type PersonenkontextStore, type Uebersicht } from '@/stores/PersonenkontextStore';
 import { nextTick } from 'vue';
 import { OrganisationsTyp } from '@/stores/OrganisationStore';
-import type { RouteLocationNormalizedLoaded } from 'vue-router';
 
 let wrapper: VueWrapper | null = null;
 let personInfoStore: PersonInfoStore;
@@ -63,20 +61,6 @@ const mockUebersicht: Uebersicht = {
   ],
 };
 
-vi.mock('vue-router', () => ({
-  useRoute: (): RouteLocationNormalizedLoaded => ({
-    fullPath: 'full/path',
-    matched: [],
-    query: {},
-    hash: '',
-    redirectedFrom: undefined,
-    name: undefined,
-    path: '',
-    params: {},
-    meta: {},
-  }),
-}));
-
 beforeEach(() => {
   document.body.innerHTML = `
     <div>
@@ -96,6 +80,11 @@ beforeEach(() => {
       components: {
         ProfileView,
       },
+      mocks: {
+        route: {
+          fullPath: 'full/path',
+        },
+      },
     },
   });
 });
@@ -106,8 +95,7 @@ describe('ProfileView', () => {
   });
 
   test('it displays personal data', () => {
-    // eslint-disable-next-line @typescript-eslint/typedef
-    const personalData = wrapper?.findAll('tr');
+    const personalData: DOMWrapper<HTMLTableRowElement>[] | undefined = wrapper?.findAll('tr');
     expect(personalData?.length).toBeGreaterThan(0);
     expect(personalData?.at(0)?.text()).toContain('Vor- und Nachname:Samuel Vimes');
     expect(personalData?.at(1)?.text()).toContain('Benutzername:samuelvimes');
@@ -118,14 +106,13 @@ describe('ProfileView', () => {
 
   test('it displays Schule data', async () => {
     await nextTick();
-    const schoolCards = wrapper?.findAllComponents({ name: 'LayoutCard' });
-    expect(schoolCards?.length).toBeGreaterThan(0);
-    const schoolCard = schoolCards?.at(1);
-    if (schoolCard) {
-      const schoolCardText = schoolCard.text();
-      expect(schoolCardText).toContain('Muster-Schule');
-      expect(schoolCardText).toContain('Lehrer');
-      expect(schoolCardText).toContain('10A');
-    }
+    if (!wrapper) return;
+    const schoolCards: VueWrapper[] = wrapper.findAllComponents({ name: 'LayoutCard' }) as VueWrapper[];
+    expect(schoolCards.length).toBeGreaterThan(0);
+    const schoolCard: VueWrapper = schoolCards[1] as VueWrapper;
+    const schoolCardText: string = schoolCard.text();
+    expect(schoolCardText).toContain('Muster-Schule');
+    expect(schoolCardText).toContain('Lehrer');
+    expect(schoolCardText).toContain('10A');
   });
 });
