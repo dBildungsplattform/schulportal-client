@@ -32,15 +32,7 @@
     window.history.back();
   }
 
-  function sanitizeUrl(url: string): string {
-    const parser: HTMLAnchorElement = document.createElement('a');
-    parser.href = url;
-    return parser.origin + parser.pathname;
-  }
-
-  const sanitizedOrigin: string = sanitizeUrl(window.location.origin);
-  const sanitizedPath: string = sanitizeUrl(route.fullPath);
-  const setPasswordUrl: string = `/api/auth/set-new-password?redirectUrl=${sanitizedOrigin}${sanitizedPath}`;
+  const windowOrigin: string = window.location.origin;
 
   /**
    * Gruppiert eine Liste von Zuordnungen nach dem Wert der Eigenschaft 'sskDstNr'.
@@ -310,7 +302,7 @@
               <v-btn
                 data-testid="set-new-password-button"
                 class="primary"
-                :href="setPasswordUrl"
+                :href="`/api/auth/set-new-password?redirectUrl=${windowOrigin}${route.fullPath}`"
               >
                 {{ $t('profile.setNewPassword') }}
               </v-btn>
