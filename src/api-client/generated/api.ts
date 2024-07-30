@@ -167,6 +167,12 @@ export interface CreatePersonBodyParams {
      * @memberof CreatePersonBodyParams
      */
     'username'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreatePersonBodyParams
+     */
+    'personalnummer'?: string;
 }
 
 
@@ -966,6 +972,12 @@ export interface Person {
      * @memberof Person
      */
     'revision': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Person
+     */
+    'personalnummer': string | null;
 }
 
 

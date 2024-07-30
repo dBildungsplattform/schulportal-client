@@ -7,8 +7,7 @@ type ValidationSchema = {
   selectedRollenArt: string;
   selectedRollenName: string;
   selectedAdministrationsebene: string;
-}
-
+};
 
 export const getValidationSchema = (t: (key: string) => string): TypedSchema<ValidationSchema> => {
   return toTypedSchema(
