@@ -112,7 +112,7 @@
 
   const statuses: Array<string> = ['Aktiv', 'Inaktiv'];
 
-  const personenPerPage: Ref<number> = ref(10);
+  const personenPerPage: Ref<number> = ref(30);
   const personenPage: Ref<number> = ref(1);
 
   function getPaginatedPersonen(page: number): void {

@@ -20,7 +20,7 @@
     { title: t('admin.schule.schulname'), key: 'name', align: 'start' },
   ];
 
-  const schulenPerPage: Ref<number> = ref(10);
+  const schulenPerPage: Ref<number> = ref(30);
   const schulenPage: Ref<number> = ref(1);
 
   function getPaginatedSchulen(page: number): void {

@@ -68,7 +68,7 @@
     });
   });
 
-  const rollenPerPage: Ref<number> = ref(10);
+  const rollenPerPage: Ref<number> = ref(30);
   const rollenPage: Ref<number> = ref(1);
 
   function navigateToRolleDetails(_$event: PointerEvent, { item }: { item: Rolle }): void {
@@ -77,7 +77,11 @@
 
   function getPaginatedRollen(page: number): void {
     rollenPage.value = page || 1;
-    rolleStore.getAllRollen({ offset: (rollenPage.value - 1) * rollenPerPage.value, limit: rollenPerPage.value, searchString: '' });
+    rolleStore.getAllRollen({
+      offset: (rollenPage.value - 1) * rollenPerPage.value,
+      limit: rollenPerPage.value,
+      searchString: '',
+    });
   }
 
   function getPaginatedRollenWithLimit(limit: number): void {
@@ -87,12 +91,20 @@
     }
 
     rollenPerPage.value = limit || 1;
-    rolleStore.getAllRollen({ offset: (rollenPage.value - 1) * rollenPerPage.value, limit: rollenPerPage.value, searchString: '' });
+    rolleStore.getAllRollen({
+      offset: (rollenPage.value - 1) * rollenPerPage.value,
+      limit: rollenPerPage.value,
+      searchString: '',
+    });
   }
 
   onMounted(async () => {
     await organisationStore.getAllOrganisationen();
-    await rolleStore.getAllRollen({ offset: (rollenPage.value - 1) * rollenPerPage.value, limit: rollenPerPage.value, searchString: '' });
+    await rolleStore.getAllRollen({
+      offset: (rollenPage.value - 1) * rollenPerPage.value,
+      limit: rollenPerPage.value,
+      searchString: '',
+    });
   });
 </script>
 

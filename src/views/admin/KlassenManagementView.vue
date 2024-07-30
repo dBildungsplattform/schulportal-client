@@ -61,8 +61,16 @@
       .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
   });
 
-  const klassenPerPage: Ref<number> = ref(10);
+  const klassenPerPage: Ref<number> = ref(30);
   const klassenPage: Ref<number> = ref(1);
+
+  // Retrieve the parent Schule from the Klasse using the map's key
+  function getSchuleDetails(klasse: Organisation): { schuleDetails: string } {
+    const schuleDetails: string | undefined = schuleMap.value.get(klasse.administriertVon || '') ?? '---';
+    return {
+      schuleDetails,
+    };
+  }
 
   async function getPaginatedKlassen(page: number): Promise<void> {
     klassenPage.value = page || 1;
@@ -96,7 +104,7 @@
     finalKlassen.value = organisationStore.allKlassen.map((klasse: Organisation) => ({
       ...klasse,
       ...getSchuleDetails(klasse),
-    }));  
+    }));
   }
 
   // Create a map that holds all Schulen with their id, kennung and name
@@ -108,13 +116,6 @@
     return new Map(
       organisationStore.allOrganisationen.map((org: Organisation) => [org.id, `${org.kennung} (${org.name.trim()})`]),
     );
-  }
-  // Retrieve the parent Schule from the Klasse using the map's key
-  function getSchuleDetails(klasse: Organisation): { schuleDetails: string } {
-    const schuleDetails: string | undefined = schuleMap.value.get(klasse.administriertVon || '') ?? '---';
-    return {
-      schuleDetails,
-    };
   }
 
   async function updateSelectedSchule(newValue: string | null): Promise<void> {

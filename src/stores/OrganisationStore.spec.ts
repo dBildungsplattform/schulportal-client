@@ -35,16 +35,22 @@ describe('OrganisationStore', () => {
         },
       ];
 
-      mockadapter.onGet('/api/organisationen?limit=25').replyOnce(200, mockResponse);
-      const getAllOrganisationenPromise: Promise<void> = organisationStore.getAllOrganisationen();
+      mockadapter.onGet('/api/organisationen?offset=0&limit=30').replyOnce(200, mockResponse);
+      const getAllOrganisationenPromise: Promise<void> = organisationStore.getAllOrganisationen({
+        offset: 0,
+        limit: 30,
+      });
       await getAllOrganisationenPromise;
       expect(organisationStore.allOrganisationen).toEqual(mockResponse);
       expect(organisationStore.loading).toBe(false);
     });
 
     it('should handle string error', async () => {
-      mockadapter.onGet('/api/organisationen?limit=25').replyOnce(500, 'some mock server error');
-      const getAllOrganisationenPromise: Promise<void> = organisationStore.getAllOrganisationen();
+      mockadapter.onGet('/api/organisationen?offset=0&limit=30').replyOnce(500, 'some mock server error');
+      const getAllOrganisationenPromise: Promise<void> = organisationStore.getAllOrganisationen({
+        offset: 0,
+        limit: 30,
+      });
       expect(organisationStore.loading).toBe(true);
       await getAllOrganisationenPromise;
       expect(organisationStore.allOrganisationen).toEqual([]);
@@ -53,8 +59,11 @@ describe('OrganisationStore', () => {
     });
 
     it('should handle error code', async () => {
-      mockadapter.onGet('/api/organisationen?limit=25').replyOnce(500, { code: 'some mock server error' });
-      const getAllOrganisationenPromise: Promise<void> = organisationStore.getAllOrganisationen();
+      mockadapter.onGet('/api/organisationen?offset=0&limit=30').replyOnce(500, { code: 'some mock server error' });
+      const getAllOrganisationenPromise: Promise<void> = organisationStore.getAllOrganisationen({
+        offset: 0,
+        limit: 30,
+      });
       expect(organisationStore.loading).toBe(true);
       await getAllOrganisationenPromise;
       expect(organisationStore.allOrganisationen).toEqual([]);
@@ -75,9 +84,11 @@ describe('OrganisationStore', () => {
       ];
 
       mockadapter
-        .onGet('/api/organisationen?limit=25&searchString=searchString&systemrechte=ROLLEN_VERWALTEN')
+        .onGet('/api/organisationen?offset=0&limit=30&searchString=searchString&systemrechte=ROLLEN_VERWALTEN')
         .replyOnce(200, mockResponse);
       const getAllOrganisationenPromise: Promise<void> = organisationStore.getAllOrganisationen({
+        offset: 0,
+        limit: 30,
         searchString: 'searchString',
         systemrechte: ['ROLLEN_VERWALTEN'],
       });
@@ -97,8 +108,10 @@ describe('OrganisationStore', () => {
         },
       ];
 
-      mockadapter.onGet('/api/organisationen?limit=25&typ=KLASSE').replyOnce(200, mockResponse);
+      mockadapter.onGet('/api/organisationen?offset=0&limit=30&typ=KLASSE').replyOnce(200, mockResponse);
       const getAllOrganisationenPromise: Promise<void> = organisationStore.getAllOrganisationen({
+        offset: 0,
+        limit: 30,
         includeTyp: OrganisationsTyp.Klasse,
       });
       await getAllOrganisationenPromise;

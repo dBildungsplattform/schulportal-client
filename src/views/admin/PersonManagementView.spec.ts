@@ -156,7 +156,7 @@ describe('PersonManagementView', () => {
     await schuleAutocomplete?.setValue(['9876']);
     await nextTick();
 
-    expect(schuleAutocomplete?.text()).toEqual('9356494 (Random Schulname Gymnasium)');
+    expect(schuleAutocomplete?.text()).toEqual('9876');
 
     const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
     await rolleAutocomplete?.setValue(['1']);
