@@ -50,6 +50,8 @@
 
   onMounted(async () => {
     await organisationStore.getAllOrganisationen({
+      offset: (schulenPage.value - 1) * schulenPerPage.value,
+      limit: schulenPerPage.value,
       includeTyp: OrganisationsTyp.Schule,
       systemrechte: ['SCHULEN_VERWALTEN'],
     });

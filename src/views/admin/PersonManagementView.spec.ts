@@ -3,15 +3,12 @@ import { VueWrapper, mount } from '@vue/test-utils';
 import PersonManagementView from './PersonManagementView.vue';
 import { usePersonStore, type PersonendatensatzResponse, type PersonStore } from '@/stores/PersonStore';
 import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
-import MockAdapter from 'axios-mock-adapter';
-import ApiService from '@/services/ApiService';
 import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
 import { nextTick } from 'vue';
 import { useRolleStore, type RolleResponse, type RolleStore } from '@/stores/RolleStore';
 import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
 import type { FindRollenResponse } from '@/api-client/generated/api';
 
-const mockadapter: MockAdapter = new MockAdapter(ApiService);
 let wrapper: VueWrapper | null = null;
 let organisationStore: OrganisationStore;
 let personStore: PersonStore;
@@ -20,8 +17,6 @@ let rolleStore: RolleStore;
 let searchFilterStore: SearchFilterStore;
 
 beforeEach(() => {
-  mockadapter.reset();
-
   document.body.innerHTML = `
     <div>
       <div id="app"></div>
@@ -45,7 +40,8 @@ beforeEach(() => {
       administriertVon: '1',
     },
   ];
-  organisationStore.allOrganisationen = [
+
+  organisationStore.allSchulen = [
     {
       id: '9876',
       name: 'Random Schulname Gymnasium',
@@ -65,6 +61,7 @@ beforeEach(() => {
       administriertVon: '1',
     },
   ];
+
   personenkontextStore.allUebersichten = {
     total: 0,
     offset: 0,
@@ -91,6 +88,7 @@ beforeEach(() => {
       },
     ],
   };
+
   personStore.allPersons = [
     {
       person: {
@@ -111,6 +109,7 @@ beforeEach(() => {
       },
     },
   ] as PersonendatensatzResponse[];
+
   personenkontextStore.filteredRollen = {
     moeglicheRollen: [
       {
@@ -150,6 +149,7 @@ beforeEach(() => {
 describe('PersonManagementView', () => {
   test('it renders the person management table', () => {
     expect(wrapper?.find('[data-testid="person-table"]').isVisible()).toBe(true);
+    expect(wrapper?.findAll('.v-data-table__tr').length).toBe(2);
   });
 
   test('it sets filters', async () => {
@@ -157,7 +157,7 @@ describe('PersonManagementView', () => {
     await schuleAutocomplete?.setValue(['9876']);
     await nextTick();
 
-    expect(schuleAutocomplete?.text()).toEqual('9876');
+    expect(schuleAutocomplete?.text()).toEqual('9356494 (Random Schulname Gymnasium)');
 
     const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
     await rolleAutocomplete?.setValue(['1']);

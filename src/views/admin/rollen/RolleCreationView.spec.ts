@@ -4,7 +4,13 @@ import { flushPromises, mount, VueWrapper } from '@vue/test-utils';
 import RolleCreationView from './RolleCreationView.vue';
 import { createRouter, createWebHistory, type NavigationFailure, type RouteLocationRaw, type Router } from 'vue-router';
 import routes from '@/router/routes';
-import { RollenMerkmal, RollenSystemRecht, type RolleResponse, type RolleStore, useRolleStore } from '@/stores/RolleStore';
+import {
+  RollenMerkmal,
+  RollenSystemRecht,
+  type RolleResponse,
+  type RolleStore,
+  useRolleStore,
+} from '@/stores/RolleStore';
 import { type OrganisationStore, useOrganisationStore } from '@/stores/OrganisationStore';
 
 let wrapper: VueWrapper | null = null;

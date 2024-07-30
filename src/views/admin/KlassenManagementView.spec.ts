@@ -1,13 +1,9 @@
 import { expect, test } from 'vitest';
 import { mount, VueWrapper } from '@vue/test-utils';
-
-import MockAdapter from 'axios-mock-adapter';
-import ApiService from '@/services/ApiService';
 import KlassenManagementView from './KlassenManagementView.vue';
 import { nextTick } from 'vue';
 import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
 
-const mockadapter: MockAdapter = new MockAdapter(ApiService);
 let wrapper: VueWrapper | null = null;
 const organisationStore: OrganisationStore = useOrganisationStore();
 
@@ -52,8 +48,6 @@ organisationStore.allOrganisationen = [
   },
 ];
 beforeEach(() => {
-  mockadapter.reset();
-
   document.body.innerHTML = `
     <div>
       <div id="app"></div>
