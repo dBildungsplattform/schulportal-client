@@ -13,7 +13,7 @@
   import { usePersonenkontextStore, type Zuordnung, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
   import { OrganisationsTyp } from '@/stores/OrganisationStore';
 
-  export type SchulDaten = {
+  type SchulDaten = {
     title: string;
     info?: string | null;
     schoolAdmins?: string[];
@@ -158,8 +158,7 @@
         (z: Zuordnung) =>
           ({
             ...z,
-            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-            sskDstNr: z.sskDstNr?.split('-')[0], // die Klasse wird durch einen Bindestrich an die Schulnummer angehangen. Um nach der Schule zu gruppieren, wird nur die Schulnummer verwendet.
+            sskDstNr: z.sskDstNr.split('-')[0], // die Klasse wird durch einen Bindestrich an die Schulnummer angehangen. Um nach der Schule zu gruppieren, wird nur die Schulnummer verwendet.
           }) as Zuordnung,
       ),
     );
@@ -191,7 +190,7 @@
       <v-col cols="auto">
         <h2
           class="headline-1"
-          data-testid="start-card-headline"
+          data-testid="profile-headline"
         >
           {{ $t('nav.profile') }}
         </h2>
