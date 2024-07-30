@@ -28,15 +28,12 @@
     type NavigationGuardNext,
     type RouteLocationNormalized,
   } from 'vue-router';
-  import { useDisplay } from 'vuetify';
   import { type BaseFieldProps, type TypedSchema, useForm } from 'vee-validate';
-  import { object, string } from 'yup';
-  import { toTypedSchema } from '@vee-validate/yup';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import RolleForm from '@/components/form/RolleForm.vue';
-  import { DIN_91379A_EXT } from '@/utils/validation';
+  import { getValidationSchema, getVuetifyConfig } from '@/utils/validationRolle';
+  import SuccessTemplate from '@/components/admin/rollen/SuccessTemplate.vue';
 
-  const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
   const rolleStore: RolleStore = useRolleStore();
   const organisationStore: OrganisationStore = useOrganisationStore();
   const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
@@ -53,25 +50,11 @@
   type TranslatedSystemrecht = { value: RollenSystemRecht; title: string };
   const translatedSystemrechte: Ref<TranslatedSystemrecht[]> = ref([]);
 
-  const validationSchema: TypedSchema = toTypedSchema(
-    object({
-      selectedRollenArt: string().required(t('admin.rolle.rules.rollenart.required')),
-      selectedRollenName: string()
-        .max(200, t('admin.rolle.rules.rollenname.length'))
-        .matches(DIN_91379A_EXT, t('admin.rolle.rules.rollenname.matches'))
-        .required(t('admin.rolle.rules.rollenname.required')),
-      selectedAdministrationsebene: string().required(t('admin.administrationsebene.rules.required')),
-    }),
-  );
+  const validationSchema: TypedSchema = getValidationSchema(t);
 
   const vuetifyConfig = (state: {
     errors: Array<string>;
-  }): { props: { error: boolean; 'error-messages': Array<string> } } => ({
-    props: {
-      error: !!state.errors.length,
-      'error-messages': state.errors,
-    },
-  });
+  }): { props: { error: boolean; 'error-messages': Array<string> } } => getVuetifyConfig(state);
 
   type RolleCreationFormType = {
     selectedAdministrationsebene: string;
@@ -137,6 +120,7 @@
     } else {
       next();
     }
+    rolleStore.createdRolle = null;
   });
 
   const handleCreateAnotherRolle = (): void => {
@@ -343,6 +327,7 @@
           :onHandleDiscard="navigateToRolleManagement"
           :onShowDialogChange="(value: boolean) => (showUnsavedChangesDialog = value)"
           :onSubmit="onSubmit"
+          :isEditActive="true"
           ref="rolle-creation-form"
           v-model:selectedAdministrationsebene="selectedAdministrationsebene"
           :selectedAdministrationsebeneProps="selectedAdministrationsebeneProps"
@@ -366,115 +351,48 @@
 
       <!-- Result template on success after submit  -->
       <template v-if="rolleStore.createdRolle && !rolleStore.errorCode">
-        <v-container>
-          <v-row justify="center">
-            <v-col
-              class="subtitle-1"
-              cols="auto"
-            >
-              <span data-testid="rolle-success-text">{{ $t('admin.rolle.rolleAddedSuccessfully') }}</span>
-            </v-col>
-          </v-row>
-          <v-row justify="center">
-            <v-col cols="auto">
-              <v-icon
-                small
-                color="#1EAE9C"
-                icon="mdi-check-circle"
-              >
-              </v-icon>
-            </v-col>
-          </v-row>
-          <v-row justify="center">
-            <v-col
-              class="subtitle-2"
-              cols="auto"
-            >
-              {{ $t('admin.followingDataCreated') }}
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col class="text-body bold text-right">
-              {{ $t('admin.administrationsebene.administrationsebene') }}:
-            </v-col>
-            <v-col class="text-body">
-              <span data-testid="created-rolle-administrationsebene">
-                {{
-                  getSskName(
-                    organisationStore.currentOrganisation?.kennung,
-                    organisationStore.currentOrganisation?.name,
-                  )
-                }}
-              </span>
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col class="text-body bold text-right"> {{ $t('admin.rolle.rollenart') }}: </v-col>
-            <v-col class="text-body">
-              <span data-testid="created-rolle-rollenart">
-                {{ $t(`admin.rolle.mappingFrontBackEnd.rollenarten.${rolleStore.createdRolle.rollenart}`) }}
-              </span>
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col class="text-body bold text-right"> {{ $t('admin.rolle.rollenname') }}:</v-col>
-            <v-col class="text-body"
-              ><span data-testid="created-rolle-name">{{ rolleStore.createdRolle.name }}</span></v-col
-            >
-          </v-row>
-          <v-row>
-            <v-col class="text-body bold text-right"> {{ $t('admin.rolle.merkmale') }}:</v-col>
-            <v-col class="text-body"
-              ><span data-testid="created-rolle-merkmale">{{ translatedCreatedRolleMerkmale }}</span></v-col
-            ></v-row
-          >
-          <v-row>
-            <v-col class="text-body bold text-right"> {{ $t('admin.serviceProvider.assignedServiceProvider') }}:</v-col>
-            <v-col class="text-body">
-              <span data-testid="created-rolle-angebote">{{ translatedCreatedAngebote }}</span>
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col class="text-body bold text-right"> {{ $t('admin.rolle.systemrechte') }}:</v-col>
-            <v-col class="text-body"
-              ><span data-testid="created-rolle-systemrecht">{{ translatedCreatedSystemrecht }}</span></v-col
-            ></v-row
-          >
-          <v-divider
-            class="border-opacity-100 rounded my-6"
-            color="#E5EAEF"
-            thickness="6"
-          ></v-divider>
-          <v-row justify="end">
-            <v-col
-              cols="12"
-              sm="6"
-              md="auto"
-            >
-              <v-btn
-                class="secondary"
-                data-testid="back-to-list-button"
-                :block="mdAndDown"
-                @click="navigateToRolleManagement"
-                >{{ $t('nav.backToList') }}</v-btn
-              >
-            </v-col>
-            <v-col
-              cols="12"
-              sm="6"
-              md="auto"
-            >
-              <v-btn
-                class="primary button"
-                data-testid="create-another-rolle-button"
-                @click="handleCreateAnotherRolle"
-                :block="mdAndDown"
-              >
-                {{ $t('admin.rolle.createAnother') }}
-              </v-btn>
-            </v-col>
-          </v-row>
-        </v-container>
+        <SuccessTemplate
+          :successMessage="$t('admin.rolle.rolleAddedSuccessfully')"
+          :followingDataCreated="$t('admin.followingDataCreated')"
+          :createdData="[
+            {
+              label: $t('admin.administrationsebene.administrationsebene'),
+              value: getSskName(
+                organisationStore.currentOrganisation?.kennung,
+                organisationStore.currentOrganisation?.name,
+              ),
+              testId: 'created-rolle-administrationsebene',
+            },
+            {
+              label: $t('admin.rolle.rollenart'),
+              value: $t(`admin.rolle.mappingFrontBackEnd.rollenarten.${rolleStore.createdRolle.rollenart}`),
+              testId: 'created-rolle-rollenart',
+            },
+            { label: $t('admin.rolle.rollenname'), value: rolleStore.createdRolle.name, testId: 'created-rolle-name' },
+            {
+              label: $t('admin.rolle.merkmale'),
+              value: translatedCreatedRolleMerkmale,
+              testId: 'created-rolle-merkmale',
+            },
+            {
+              label: $t('admin.serviceProvider.assignedServiceProvider'),
+              value: translatedCreatedAngebote,
+              testId: 'created-rolle-angebote',
+            },
+            {
+              label: $t('admin.rolle.systemrechte'),
+              value: translatedCreatedSystemrecht,
+              testId: 'created-rolle-systemrecht',
+            },
+          ]"
+          :backButtonText="$t('nav.backToList')"
+          :createAnotherButtonText="$t('admin.rolle.createAnother')"
+          :showCreateAnotherButton="true"
+          backButtonTestId="back-to-list-button"
+          createAnotherButtonTestId="create-another-rolle-button"
+          @OnNavigateBack="navigateToRolleManagement"
+          @OnCreateAnother="handleCreateAnotherRolle"
+        />
       </template>
     </LayoutCard>
   </div>

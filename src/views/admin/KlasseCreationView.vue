@@ -14,8 +14,8 @@
   import {
     useOrganisationStore,
     type OrganisationStore,
-    type Organisation,
     OrganisationsTyp,
+    type Organisation,
   } from '@/stores/OrganisationStore';
   import { DIN_91379A_EXT } from '@/utils/validation';
   import FormRow from '@/components/form/FormRow.vue';

@@ -228,11 +228,13 @@ describe('PersonenkontextStore', () => {
 
       mockadapter.onPut('/api/personenkontext-workflow/1').replyOnce(200, mockResponse);
 
-      const updatePersonenkontextePromise: Promise<PersonenkontexteUpdateResponse> =
-        personenkontextStore.updatePersonenkontexte(mockZuordnungen, '1');
+      const updatePersonenkontextePromise: Promise<void> = personenkontextStore.updatePersonenkontexte(
+        mockZuordnungen,
+        '1',
+      );
       expect(personenkontextStore.loading).toBe(true);
-      const response: PersonenkontexteUpdateResponse = await updatePersonenkontextePromise;
-      expect(response).toEqual(mockResponse);
+      await updatePersonenkontextePromise;
+      expect(personenkontextStore.updatedPersonenkontexte).toEqual(mockResponse);
       expect(personenkontextStore.loading).toBe(false);
     });
 
@@ -251,10 +253,12 @@ describe('PersonenkontextStore', () => {
       ];
 
       mockadapter.onPut('/api/personenkontext-workflow/1').replyOnce(500, 'some error');
-      const updatePersonenkontextePromise: Promise<PersonenkontexteUpdateResponse> =
-        personenkontextStore.updatePersonenkontexte(mockZuordnungen, '1');
+      const updatePersonenkontextePromise: Promise<void> = personenkontextStore.updatePersonenkontexte(
+        mockZuordnungen,
+        '1',
+      );
       expect(personenkontextStore.loading).toBe(true);
-      await rejects(updatePersonenkontextePromise);
+      await updatePersonenkontextePromise;
       expect(personenkontextStore.errorCode).toEqual('PERSONENKONTEXTE_UPDATE_ERROR');
       expect(personenkontextStore.loading).toBe(false);
     });
@@ -274,10 +278,12 @@ describe('PersonenkontextStore', () => {
       ];
 
       mockadapter.onPut('/api/personenkontext-workflow/1').replyOnce(500, { i18nKey: 'SOME_MOCK_SERVER_ERROR' });
-      const updatePersonenkontextePromise: Promise<PersonenkontexteUpdateResponse> =
-        personenkontextStore.updatePersonenkontexte(mockZuordnungen, '1');
+      const updatePersonenkontextePromise: Promise<void> = personenkontextStore.updatePersonenkontexte(
+        mockZuordnungen,
+        '1',
+      );
       expect(personenkontextStore.loading).toBe(true);
-      await rejects(updatePersonenkontextePromise);
+      await updatePersonenkontextePromise;
       expect(personenkontextStore.errorCode).toEqual('SOME_MOCK_SERVER_ERROR');
       expect(personenkontextStore.loading).toBe(false);
     });
@@ -410,6 +416,7 @@ describe('PersonenkontextStore', () => {
         vorname: 'string',
         nachname: 'string',
         benutzername: 'string',
+        lastModifiedZuordnungen: '08.02.2024',
         zuordnungen: [
           {
             sskId: 'string',
@@ -567,6 +574,7 @@ describe('PersonenkontextStore', () => {
             vorname: 'Samuel',
             nachname: 'Vimes',
             benutzername: 'string',
+            lastModifiedZuordnungen: '08.02.2024',
             zuordnungen: [
               {
                 sskId: 'string',
