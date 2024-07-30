@@ -614,6 +614,7 @@ export interface DbiamRolleError {
 export const DbiamRolleErrorI18nKeyEnum = {
     RolleError: 'ROLLE_ERROR',
     AddSystemrechtError: 'ADD_SYSTEMRECHT_ERROR',
+    RolleHatPersonenkontexteError: 'ROLLE_HAT_PERSONENKONTEXTE_ERROR',
     UpdateMerkmaleError: 'UPDATE_MERKMALE_ERROR'
 } as const;
 
@@ -2533,10 +2534,10 @@ export const AuthApiAxiosParamCreator = function (configuration?: Configuration)
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        authenticationControllerSetNewPassword: async (redirectUrl: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        authenticationControllerResetPassword: async (redirectUrl: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'redirectUrl' is not null or undefined
-            assertParamExists('authenticationControllerSetNewPassword', 'redirectUrl', redirectUrl)
-            const localVarPath = `/api/auth/set-new-password`;
+            assertParamExists('authenticationControllerResetPassword', 'redirectUrl', redirectUrl)
+            const localVarPath = `/api/auth/resetPassword`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -2611,8 +2612,8 @@ export const AuthApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async authenticationControllerSetNewPassword(redirectUrl: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.authenticationControllerSetNewPassword(redirectUrl, options);
+        async authenticationControllerResetPassword(redirectUrl: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.authenticationControllerResetPassword(redirectUrl, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -2660,8 +2661,8 @@ export const AuthApiFactory = function (configuration?: Configuration, basePath?
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        authenticationControllerSetNewPassword(redirectUrl: string, options?: any): AxiosPromise<void> {
-            return localVarFp.authenticationControllerSetNewPassword(redirectUrl, options).then((request) => request(axios, basePath));
+        authenticationControllerResetPassword(redirectUrl: string, options?: any): AxiosPromise<void> {
+            return localVarFp.authenticationControllerResetPassword(redirectUrl, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -2708,7 +2709,7 @@ export interface AuthApiInterface {
      * @throws {RequiredError}
      * @memberof AuthApiInterface
      */
-    authenticationControllerSetNewPassword(redirectUrl: string, options?: AxiosRequestConfig): AxiosPromise<void>;
+    authenticationControllerResetPassword(redirectUrl: string, options?: AxiosRequestConfig): AxiosPromise<void>;
 
 }
 
@@ -2761,8 +2762,8 @@ export class AuthApi extends BaseAPI implements AuthApiInterface {
      * @throws {RequiredError}
      * @memberof AuthApi
      */
-    public authenticationControllerSetNewPassword(redirectUrl: string, options?: AxiosRequestConfig) {
-        return AuthApiFp(this.configuration).authenticationControllerSetNewPassword(redirectUrl, options).then((request) => request(this.axios, this.basePath));
+    public authenticationControllerResetPassword(redirectUrl: string, options?: AxiosRequestConfig) {
+        return AuthApiFp(this.configuration).authenticationControllerResetPassword(redirectUrl, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
@@ -6814,6 +6815,48 @@ export const RolleApiAxiosParamCreator = function (configuration?: Configuration
             };
         },
         /**
+         * Delete a role by id.
+         * @summary 
+         * @param {string} rolleId The id for the rolle.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rolleControllerDeleteRolle: async (rolleId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'rolleId' is not null or undefined
+            assertParamExists('rolleControllerDeleteRolle', 'rolleId', rolleId)
+            const localVarPath = `/api/rolle/{rolleId}`
+                .replace(`{${"rolleId"}}`, encodeURIComponent(String(rolleId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Get rolle by id.
          * @summary 
          * @param {string} rolleId The id for the rolle.
@@ -7093,6 +7136,17 @@ export const RolleApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
+         * Delete a role by id.
+         * @summary 
+         * @param {string} rolleId The id for the rolle.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async rolleControllerDeleteRolle(rolleId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.rolleControllerDeleteRolle(rolleId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
          * Get rolle by id.
          * @summary 
          * @param {string} rolleId The id for the rolle.
@@ -7194,6 +7248,16 @@ export const RolleApiFactory = function (configuration?: Configuration, basePath
             return localVarFp.rolleControllerCreateRolle(createRolleBodyParams, options).then((request) => request(axios, basePath));
         },
         /**
+         * Delete a role by id.
+         * @summary 
+         * @param {string} rolleId The id for the rolle.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rolleControllerDeleteRolle(rolleId: string, options?: any): AxiosPromise<void> {
+            return localVarFp.rolleControllerDeleteRolle(rolleId, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Get rolle by id.
          * @summary 
          * @param {string} rolleId The id for the rolle.
@@ -7287,6 +7351,16 @@ export interface RolleApiInterface {
      * @memberof RolleApiInterface
      */
     rolleControllerCreateRolle(createRolleBodyParams: CreateRolleBodyParams, options?: AxiosRequestConfig): AxiosPromise<RolleResponse>;
+
+    /**
+     * Delete a role by id.
+     * @summary 
+     * @param {string} rolleId The id for the rolle.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RolleApiInterface
+     */
+    rolleControllerDeleteRolle(rolleId: string, options?: AxiosRequestConfig): AxiosPromise<void>;
 
     /**
      * Get rolle by id.
@@ -7387,6 +7461,18 @@ export class RolleApi extends BaseAPI implements RolleApiInterface {
      */
     public rolleControllerCreateRolle(createRolleBodyParams: CreateRolleBodyParams, options?: AxiosRequestConfig) {
         return RolleApiFp(this.configuration).rolleControllerCreateRolle(createRolleBodyParams, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Delete a role by id.
+     * @summary 
+     * @param {string} rolleId The id for the rolle.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RolleApi
+     */
+    public rolleControllerDeleteRolle(rolleId: string, options?: AxiosRequestConfig) {
+        return RolleApiFp(this.configuration).rolleControllerDeleteRolle(rolleId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

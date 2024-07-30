@@ -300,9 +300,9 @@
             ></v-icon>
             <div>
               <v-btn
-                data-testid="set-new-password-button"
+                data-testid="reset-password-button"
                 class="primary"
-                :href="`/api/auth/set-new-password?redirectUrl=${windowOrigin}${route.fullPath}`"
+                :href="`/api/auth/resetPassword?redirectUrl=${windowOrigin}${route.fullPath}`"
               >
                 {{ $t('profile.setNewPassword') }}
               </v-btn>
