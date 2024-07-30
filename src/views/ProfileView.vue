@@ -196,7 +196,7 @@
       <v-col cols="auto">
         <h2
           class="headline-1"
-          data-testid="start-card-headline"
+          data-testid="profile-headline"
         >
           {{ $t('nav.profile') }}
         </h2>
