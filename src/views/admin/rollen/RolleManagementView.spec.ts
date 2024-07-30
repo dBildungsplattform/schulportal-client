@@ -1,4 +1,4 @@
-import { expect, test } from 'vitest';
+import { expect, test, type MockInstance } from 'vitest';
 import { VueWrapper, mount } from '@vue/test-utils';
 import RolleManagementView from './RolleManagementView.vue';
 import {
@@ -9,9 +9,14 @@ import {
   type RolleWithServiceProvidersResponse,
 } from '@/stores/RolleStore';
 import { nextTick } from 'vue';
+import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
+import { createRouter, createWebHistory, type NavigationFailure, type RouteLocationRaw, type Router } from 'vue-router';
+import routes from '@/router/routes';
 
 let wrapper: VueWrapper | null = null;
+let router: Router;
 let rolleStore: RolleStore;
+let organisationStore: OrganisationStore;
 
 beforeEach(() => {
   document.body.innerHTML = `
@@ -20,7 +25,34 @@ beforeEach(() => {
     </div>
   `;
 
+  router = createRouter({
+    history: createWebHistory(),
+    routes,
+  });
+
+  organisationStore = useOrganisationStore();
   rolleStore = useRolleStore();
+
+  organisationStore.allOrganisationen = [
+    {
+      id: '9876',
+      name: 'Random Schulname Gymnasium',
+      kennung: '9356494',
+      namensergaenzung: 'Schule',
+      kuerzel: 'rsg',
+      typ: 'SCHULE',
+      administriertVon: '1',
+    },
+    {
+      id: '1123',
+      name: 'Albert-Emil-Hansebrot-Gymnasium',
+      kennung: '2745475',
+      namensergaenzung: 'Schule',
+      kuerzel: 'aehg',
+      typ: 'SCHULE',
+      administriertVon: '1',
+    },
+  ];
 
   rolleStore.allRollen = [
     {
@@ -76,6 +108,7 @@ beforeEach(() => {
           fullPath: 'full/path',
         },
       },
+      plugins: [router],
     },
   });
 });
@@ -103,5 +136,17 @@ describe('RolleManagementView', () => {
   test('it reloads data after changing limit', () => {
     expect(wrapper?.find('.v-data-table-footer__items-per-page').isVisible()).toBe(true);
     expect(wrapper?.find('.v-data-table-footer__items-per-page').text()).toContain('30');
+  });
+
+  test('it routes to rolle details page', async () => {
+    const push: MockInstance<[to: RouteLocationRaw], Promise<void | NavigationFailure | undefined>> = vi.spyOn(
+      router,
+      'push',
+    );
+
+    await wrapper?.find('.v-data-table__tr').trigger('click');
+    await nextTick();
+
+    expect(push).toHaveBeenCalledTimes(1);
   });
 });

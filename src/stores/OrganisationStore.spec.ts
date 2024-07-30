@@ -96,6 +96,7 @@ describe('OrganisationStore', () => {
       expect(organisationStore.allOrganisationen).toEqual(mockResponse);
       expect(organisationStore.loading).toBe(false);
     });
+
     it('should accept filter for typ Klasse', async () => {
       const mockResponse: Organisation[] = [
         {
@@ -118,7 +119,34 @@ describe('OrganisationStore', () => {
       expect(organisationStore.allKlassen).toEqual(mockResponse);
       expect(organisationStore.loading).toBe(false);
     });
+
+    it('should accept filter for typ Schule', async () => {
+      const mockResponse: Organisation[] = [
+        {
+          id: '1',
+          kennung: 'Org1',
+          name: 'Organisation 1',
+          namensergaenzung: 'Ergänzung',
+          kuerzel: 'O1',
+          typ: OrganisationsTyp.Schule,
+        },
+      ];
+
+      mockadapter.onGet('/api/organisationen?offset=0&limit=30&typ=SCHULE').replyOnce(200, mockResponse, {
+        'x-paging-total': '1',
+      });
+      const getAllOrganisationenPromise: Promise<void> = organisationStore.getAllOrganisationen({
+        offset: 0,
+        limit: 30,
+        includeTyp: OrganisationsTyp.Schule,
+      });
+      await getAllOrganisationenPromise;
+      expect(organisationStore.allSchulen).toEqual(mockResponse);
+      expect(organisationStore.totalSchulen).toEqual(1);
+      expect(organisationStore.loading).toBe(false);
+    });
   });
+
   describe('getOrganisationById', () => {
     it('should load the Organisation and update state', async () => {
       const mockResponse: Organisation[] = [
