@@ -12,6 +12,7 @@ import { nextTick } from 'vue';
 import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
 import { createRouter, createWebHistory, type NavigationFailure, type RouteLocationRaw, type Router } from 'vue-router';
 import routes from '@/router/routes';
+import type WrapperLike from '@vue/test-utils/dist/interfaces/wrapperLike';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
@@ -41,7 +42,7 @@ beforeEach(() => {
       namensergaenzung: 'Schule',
       kuerzel: 'rsg',
       typ: 'SCHULE',
-      administriertVon: '1',
+      administriertVon: '1234',
     },
     {
       id: '1123',
@@ -50,6 +51,15 @@ beforeEach(() => {
       namensergaenzung: 'Schule',
       kuerzel: 'aehg',
       typ: 'SCHULE',
+      administriertVon: '1234',
+    },
+    {
+      id: '1234',
+      name: 'Land SH',
+      kennung: '',
+      namensergaenzung: 'land',
+      kuerzel: 'LSH',
+      typ: 'TRAEGER',
       administriertVon: '1',
     },
   ];
@@ -133,9 +143,13 @@ describe('RolleManagementView', () => {
     expect(wrapper?.find('.v-data-table-footer__info').text()).toContain('31-50');
   });
 
-  test('it reloads data after changing limit', () => {
+  test('it reloads data after changing limit', async () => {
     expect(wrapper?.find('.v-data-table-footer__items-per-page').isVisible()).toBe(true);
     expect(wrapper?.find('.v-data-table-footer__items-per-page').text()).toContain('30');
+
+    const component: WrapperLike | undefined = wrapper?.findComponent('.v-data-table-footer__items-per-page .v-select');
+    await component?.setValue(50);
+    expect(wrapper?.find('.v-data-table-footer__items-per-page').text()).toContain('50');
   });
 
   test('it routes to rolle details page', async () => {

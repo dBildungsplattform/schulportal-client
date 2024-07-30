@@ -3,6 +3,7 @@ import { VueWrapper, mount } from '@vue/test-utils';
 import SchuleManagementView from './SchuleManagementView.vue';
 import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
 import { nextTick } from 'vue';
+import type WrapperLike from '@vue/test-utils/dist/interfaces/wrapperLike';
 
 let wrapper: VueWrapper | null = null;
 let organisationStore: OrganisationStore;
@@ -77,8 +78,12 @@ describe('SchuleManagementView', () => {
     expect(wrapper?.find('.v-data-table-footer__info').text()).toContain('31-50');
   });
 
-  test('it reloads data after changing limit', () => {
+  test('it reloads data after changing limit', async () => {
     expect(wrapper?.find('.v-data-table-footer__items-per-page').isVisible()).toBe(true);
     expect(wrapper?.find('.v-data-table-footer__items-per-page').text()).toContain('30');
+
+    const component: WrapperLike | undefined = wrapper?.findComponent('.v-data-table-footer__items-per-page .v-select');
+    await component?.setValue(50);
+    expect(wrapper?.find('.v-data-table-footer__items-per-page').text()).toContain('50');
   });
 });

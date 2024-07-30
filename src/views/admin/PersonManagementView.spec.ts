@@ -8,6 +8,7 @@ import { nextTick } from 'vue';
 import { useRolleStore, type RolleResponse, type RolleStore } from '@/stores/RolleStore';
 import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
 import type { FindRollenResponse } from '@/api-client/generated/api';
+import type WrapperLike from '@vue/test-utils/dist/interfaces/wrapperLike';
 
 let wrapper: VueWrapper | null = null;
 let organisationStore: OrganisationStore;
@@ -168,9 +169,13 @@ describe('PersonManagementView', () => {
     expect(wrapper?.find('.v-data-table-footer__info').text()).toContain('31-50');
   });
 
-  test('it reloads data after changing limit', () => {
+  test('it reloads data after changing limit', async () => {
     expect(wrapper?.find('.v-data-table-footer__items-per-page').isVisible()).toBe(true);
     expect(wrapper?.find('.v-data-table-footer__items-per-page').text()).toContain('30');
+
+    const component: WrapperLike | undefined = wrapper?.findComponent('.v-data-table-footer__items-per-page .v-select');
+    await component?.setValue(50);
+    expect(wrapper?.find('.v-data-table-footer__items-per-page').text()).toContain('50');
   });
 
   test('it sets filters', async () => {
