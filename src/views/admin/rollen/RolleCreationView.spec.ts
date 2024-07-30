@@ -134,7 +134,7 @@ describe('RolleCreationView', () => {
 
     rolleStore.createdRolle = mockRolle;
 
-    wrapper?.find('[data-testid="rolle-creation-form-create-button"]').trigger('click');
+    wrapper?.find('[data-testid="rolle-form-create-button"]').trigger('click');
     await nextTick();
 
     expect(wrapper?.find('[data-testid="create-another-rolle-button"]').isVisible()).toBe(true);
