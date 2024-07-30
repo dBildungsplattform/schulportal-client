@@ -176,20 +176,27 @@
 </script>
 
 <template>
-  <div class="m-4">
-    <v-btn @click="handleGoToPreviousPage()">
-      <v-icon
-        class="mr-2"
-        icon="mdi-arrow-left-thin"
-      />
-      {{ $t('nav.backToPreviousPage') }}</v-btn
-    >
-    <h1
-      class="text-center pb-4"
-      data-testid="profile-headline"
-    >
-      {{ $t('nav.profile') }}
-    </h1>
+  <v-btn
+    class="mt-8"
+    @click="handleGoToPreviousPage()"
+  >
+    <v-icon
+      class="mr-2"
+      icon="mdi-arrow-left-thin"
+    />
+    {{ $t('nav.backToPreviousPage') }}</v-btn
+  >
+  <div class="my-8">
+    <v-row class="flex-nowrap mb-1 justify-center">
+      <v-col cols="auto">
+        <h2
+          class="headline-1"
+          data-testid="start-card-headline"
+        >
+          {{ $t('nav.profile') }}
+        </h2>
+      </v-col>
+    </v-row>
     <v-row>
       <v-col
         cols="12"
