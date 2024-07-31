@@ -40,7 +40,7 @@ type RolleActions = {
     merkmale: RollenMerkmal[],
     systemrechte: RollenSystemRecht[],
   ) => Promise<RolleResponse>;
-  getAllRollen: (searchString: string) => Promise<void>;
+  getAllRollen: (filter: RolleFilter) => Promise<void>;
   getRolleById: (rolleId: string) => Promise<Rolle>;
   updateRolle: (
     rolleId: string,
@@ -55,6 +55,7 @@ export { RollenArt };
 export { RollenMerkmal };
 export { RollenSystemRecht };
 export type { RolleResponse };
+export type { RolleWithServiceProvidersResponse };
 
 export type Rolle = {
   administeredBySchulstrukturknoten: string;
@@ -64,6 +65,12 @@ export type Rolle = {
   rollenart: RollenArt;
   systemrechte?: Set<RollenSystemRecht>;
   serviceProviders?: Array<ServiceProviderResponse>;
+};
+
+export type RolleFilter = {
+  limit?: number;
+  offset?: number;
+  searchString?: string;
 };
 
 export type RolleStore = Store<'rolleStore', RolleState, RolleGetters, RolleActions>;
@@ -136,13 +143,13 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
       }
     },
 
-    async getAllRollen(searchString: string = '') {
+    async getAllRollen(filter: RolleFilter) {
       this.loading = true;
       try {
         const response: AxiosResponse<Array<RolleResponse>> = await rolleApi.rolleControllerFindRollen(
-          undefined,
-          undefined,
-          searchString,
+          filter.offset,
+          filter.limit,
+          filter.searchString,
         );
         this.allRollen = response.data;
         this.totalRollen = +response.headers['x-paging-total'];

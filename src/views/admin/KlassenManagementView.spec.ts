@@ -1,64 +1,63 @@
 import { expect, test } from 'vitest';
 import { mount, VueWrapper } from '@vue/test-utils';
-
-import MockAdapter from 'axios-mock-adapter';
-import ApiService from '@/services/ApiService';
 import KlassenManagementView from './KlassenManagementView.vue';
 import { nextTick } from 'vue';
 import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
+import type WrapperLike from '@vue/test-utils/dist/interfaces/wrapperLike';
 
-const mockadapter: MockAdapter = new MockAdapter(ApiService);
 let wrapper: VueWrapper | null = null;
 const organisationStore: OrganisationStore = useOrganisationStore();
 
-organisationStore.allKlassen = [
-  {
-    id: '1',
-    name: '9a',
-    kennung: '9356494-9a',
-    namensergaenzung: 'Klasse',
-    kuerzel: 'aehg',
-    typ: 'KLASSE',
-    administriertVon: '1',
-  },
-  {
-    id: '1',
-    name: '9b',
-    kennung: '9356494-9b',
-    namensergaenzung: 'Klasse',
-    kuerzel: 'aehg',
-    typ: 'KLASSE',
-    administriertVon: '1',
-  },
-];
-organisationStore.allOrganisationen = [
-  {
-    id: '1',
-    name: '9a',
-    kennung: '9356494-9a',
-    namensergaenzung: 'Klasse',
-    kuerzel: 'aehg',
-    typ: 'SCHULE',
-    administriertVon: '1',
-  },
-  {
-    id: '1',
-    name: '9b',
-    kennung: '9356494-9b',
-    namensergaenzung: 'Klasse',
-    kuerzel: 'aehg',
-    typ: 'SCHULE',
-    administriertVon: '1',
-  },
-];
 beforeEach(() => {
-  mockadapter.reset();
-
   document.body.innerHTML = `
     <div>
       <div id="app"></div>
     </div>
   `;
+
+  organisationStore.allKlassen = [
+    {
+      id: '1',
+      name: '9a',
+      kennung: '9356494-9a',
+      namensergaenzung: 'Klasse',
+      kuerzel: 'aehg',
+      typ: 'KLASSE',
+      administriertVon: '1',
+    },
+    {
+      id: '1',
+      name: '9b',
+      kennung: '9356494-9b',
+      namensergaenzung: 'Klasse',
+      kuerzel: 'aehg',
+      typ: 'KLASSE',
+      administriertVon: '1',
+    },
+  ];
+
+  organisationStore.allOrganisationen = [
+    {
+      id: '1',
+      name: '9a',
+      kennung: '9356494-9a',
+      namensergaenzung: 'Klasse',
+      kuerzel: 'aehg',
+      typ: 'SCHULE',
+      administriertVon: '1',
+    },
+    {
+      id: '1',
+      name: '9b',
+      kennung: '9356494-9b',
+      namensergaenzung: 'Klasse',
+      kuerzel: 'aehg',
+      typ: 'SCHULE',
+      administriertVon: '1',
+    },
+  ];
+
+  organisationStore.totalKlassen = 2;
 
   wrapper = mount(KlassenManagementView, {
     attachTo: document.getElementById('app') || '',
@@ -76,8 +75,32 @@ beforeEach(() => {
 });
 
 describe('KlassenManagementView', () => {
-  test('it renders the klassen management table', () => {
+  test('it renders klasse management view', () => {
+    expect(wrapper?.getComponent({ name: 'ResultTable' })).toBeTruthy();
     expect(wrapper?.find('[data-testid="klasse-table"]').isVisible()).toBe(true);
+    expect(wrapper?.findAll('.v-data-table__tr').length).toBe(2);
+  });
+
+  test('it reloads data after changing page', async () => {
+    expect(wrapper?.find('.v-pagination__next button.v-btn--disabled').isVisible()).toBe(true);
+    expect(wrapper?.find('.v-data-table-footer__info').text()).toContain('1-2');
+
+    organisationStore.totalKlassen = 50;
+    await nextTick();
+
+    expect(wrapper?.find('.v-data-table-footer__info').text()).toContain('1-30');
+    expect(wrapper?.find('.v-pagination__next button:not(.v-btn--disabled)').isVisible()).toBe(true);
+    await wrapper?.find('.v-pagination__next button:not(.v-btn--disabled)').trigger('click');
+    expect(wrapper?.find('.v-data-table-footer__info').text()).toContain('31-50');
+  });
+
+  test('it reloads data after changing limit', async () => {
+    expect(wrapper?.find('.v-data-table-footer__items-per-page').isVisible()).toBe(true);
+    expect(wrapper?.find('.v-data-table-footer__items-per-page').text()).toContain('30');
+
+    const component: WrapperLike | undefined = wrapper?.findComponent('.v-data-table-footer__items-per-page .v-select');
+    await component?.setValue(50);
+    expect(wrapper?.find('.v-data-table-footer__items-per-page').text()).toContain('50');
   });
 
   test('it calls watchers for selected Schule and klasse with value', async () => {

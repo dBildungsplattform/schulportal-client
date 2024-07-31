@@ -4,7 +4,13 @@ import { flushPromises, mount, VueWrapper } from '@vue/test-utils';
 import RolleCreationView from './RolleCreationView.vue';
 import { createRouter, createWebHistory, type NavigationFailure, type RouteLocationRaw, type Router } from 'vue-router';
 import routes from '@/router/routes';
-import { type RolleStore, useRolleStore } from '@/stores/RolleStore';
+import {
+  RollenMerkmal,
+  RollenSystemRecht,
+  type RolleResponse,
+  type RolleStore,
+  useRolleStore,
+} from '@/stores/RolleStore';
 import { type OrganisationStore, useOrganisationStore } from '@/stores/OrganisationStore';
 
 let wrapper: VueWrapper | null = null;
@@ -97,7 +103,8 @@ describe('RolleCreationView', () => {
     await nextTick();
     expect(push).toHaveBeenCalledTimes(1);
   });
-  test('it fills the rolle creation form', async () => {
+
+  test('it fills form and triggers submit', async () => {
     const rollennameInput: VueWrapper | undefined = wrapper
       ?.findComponent({ ref: 'rolle-creation-form' })
       .findComponent({ ref: 'rollenname-input' });
@@ -119,14 +126,28 @@ describe('RolleCreationView', () => {
     expect(orgSelect?.text()).toEqual('9356494 (Albert-Emil-Hansebrot-Gymnasium)');
     expect(rollenartSelect?.text()).toEqual('Lern');
 
-    // TODO: meaningfully expand this test
+    const mockRolle: RolleResponse = {
+      administeredBySchulstrukturknoten: '1234',
+      rollenart: 'LEHR',
+      name: 'Lehrer',
+      // TODO: remove type casting when generator is fixed
+      merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RollenMerkmal>,
+      systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
+      createdAt: '2022',
+      updatedAt: '2022',
+      id: '1',
+    };
 
-    // expect(rollennameInput?.exists()).toBe(true);
+    rolleStore.createdRolle = mockRolle;
 
-    wrapper?.find('[data-testid="close-layout-card-button"]').trigger('click');
+    wrapper?.find('[data-testid="rolle-form-create-button"]').trigger('click');
     await nextTick();
 
-    // const unsavedChangesDialog: VueWrapper | undefined = wrapper?.findComponent({ ref: 'unsaved-changes-dialog' });
-    // console.log('****', unsavedChangesDialog);
+    expect(wrapper?.find('[data-testid="create-another-rolle-button"]').isVisible()).toBe(true);
+
+    wrapper?.find('[data-testid="create-another-rolle-button"]').trigger('click');
+    await nextTick();
+
+    expect(rolleStore.createdRolle).toBe(null);
   });
 });
