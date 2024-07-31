@@ -2095,6 +2095,57 @@
                         "bearer": []
                     }
                 ]
+            },
+            "delete": {
+                "operationId": "RolleController_deleteRolle",
+                "summary": "",
+                "description": "Delete a role by id.",
+                "parameters": [
+                    {
+                        "name": "rolleId",
+                        "required": true,
+                        "in": "path",
+                        "description": "The id for the rolle.",
+                        "schema": {
+                            "nullable": false,
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Role was deleted successfully."
+                    },
+                    "400": {
+                        "description": "The input was not valid.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DbiamRolleError"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Not authorized to delete the role."
+                    },
+                    "404": {
+                        "description": "The rolle that should be deleted does not exist."
+                    }
+                },
+                "tags": [
+                    "rolle"
+                ],
+                "security": [
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
+                    {
+                        "bearer": []
+                    }
+                ]
             }
         },
         "/api/rolle/{rolleId}/serviceProviders": {
@@ -4617,6 +4668,7 @@
                         "enum": [
                             "ROLLE_ERROR",
                             "ADD_SYSTEMRECHT_ERROR",
+                            "ROLLE_HAT_PERSONENKONTEXTE_ERROR",
                             "UPDATE_MERKMALE_ERROR"
                         ]
                     },

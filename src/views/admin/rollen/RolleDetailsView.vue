@@ -24,6 +24,8 @@
   import { useDisplay } from 'vuetify';
   import { type BaseFieldProps, type TypedSchema, useForm } from 'vee-validate';
   import { getValidationSchema, getVuetifyConfig } from '@/utils/validationRolle';
+  import RolleDelete from '@/components/admin/rollen/RolleDelete.vue';
+  import { type TranslatedObject } from '@/types.d';
   import SuccessTemplate from '@/components/admin/rollen/SuccessTemplate.vue';
 
   const route: RouteLocationNormalizedLoaded = useRoute();
@@ -41,11 +43,6 @@
 
   const creationErrorText: Ref<string> = ref('');
   const creationErrorTitle: Ref<string> = ref('');
-
-  type TranslatedObject = {
-    value: string;
-    title: string;
-  };
 
   type TranslatedMerkmal = { value: RollenMerkmal; title: string };
   const allMerkmale: Ref<TranslatedMerkmal[]> = ref([]);
@@ -264,6 +261,10 @@
     }
   }
 
+  async function deleteRolle(rolleId: string): Promise<void> {
+    await rolleStore.deleteRolleById(rolleId);
+  }
+
   function preventNavigation(event: BeforeUnloadEvent): void {
     if (!isFormDirty()) return;
     event.preventDefault();
@@ -368,10 +369,18 @@
       <!-- Error Message Display -->
       <SpshAlert
         :model-value="!!rolleStore.errorCode"
-        :title="creationErrorTitle || $t('admin.rolle.loadingErrorTitle')"
+        :title="
+          organisationStore.errorCode === 'UNSPECIFIED_ERROR'
+            ? $t('admin.rolle.loadingErrorTitle')
+            : $t(`admin.rolle.title.${rolleStore.errorCode}`)
+        "
         :type="'error'"
         :closable="false"
-        :text="creationErrorText || $t('admin.rolle.loadingErrorText')"
+        :text="
+          rolleStore.errorCode === 'UNSPECIFIED_ERROR'
+            ? $t('admin.rolle.loadingErrorText')
+            : $t(`admin.rolle.errors.${rolleStore.errorCode}`)
+        "
         :showButton="true"
         :buttonText="$t('nav.backToList')"
         :buttonAction="handleAlertClose"
@@ -416,20 +425,36 @@
               v-if="!isEditActive"
               class="d-flex justify-sm-end"
             >
-              <v-col
-                cols="12"
-                sm="6"
-                md="auto"
-              >
-                <v-btn
-                  class="primary ml-lg-8"
-                  data-testid="rolle-edit-button"
-                  @Click="activateEditing"
-                  :block="mdAndDown"
+              <v-row class="pt-3 px-2 justify-end">
+                <v-col
+                  cols="12"
+                  md="auto"
+                  sm="6"
                 >
-                  {{ $t('edit') }}
-                </v-btn>
-              </v-col>
+                  <div class="d-flex justify-sm-end">
+                    <RolleDelete
+                      :errorCode="rolleStore.errorCode"
+                      :rolle="rolleStore.currentRolle"
+                      @onDeleteRolle="deleteRolle(currentRolleId)"
+                    >
+                    </RolleDelete>
+                  </div>
+                </v-col>
+                <v-col
+                  cols="12"
+                  sm="6"
+                  md="auto"
+                >
+                  <v-btn
+                    class="primary"
+                    data-testid="rolle-edit-button"
+                    @Click="activateEditing"
+                    :block="mdAndDown"
+                  >
+                    {{ $t('edit') }}
+                  </v-btn>
+                </v-col>
+              </v-row>
             </div>
             <div
               v-else
