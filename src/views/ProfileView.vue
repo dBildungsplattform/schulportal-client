@@ -302,7 +302,7 @@
               <v-btn
                 data-testid="reset-password-button"
                 class="primary"
-                :href="`/api/auth/resetPassword?redirectUrl=${windowOrigin}${route.fullPath}`"
+                :href="`/api/auth/reset-password?redirectUrl=${windowOrigin}${route.fullPath}`"
               >
                 {{ $t('profile.setNewPassword') }}
               </v-btn>

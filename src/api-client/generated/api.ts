@@ -2537,7 +2537,7 @@ export const AuthApiAxiosParamCreator = function (configuration?: Configuration)
         authenticationControllerResetPassword: async (redirectUrl: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'redirectUrl' is not null or undefined
             assertParamExists('authenticationControllerResetPassword', 'redirectUrl', redirectUrl)
-            const localVarPath = `/api/auth/resetPassword`;
+            const localVarPath = `/api/auth/reset-password`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;

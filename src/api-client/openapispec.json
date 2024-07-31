@@ -88,7 +88,7 @@
         ]
       }
     },
-    "/api/auth/resetPassword": {
+    "/api/auth/reset-password": {
       "get": {
         "operationId": "AuthenticationController_resetPassword",
         "summary": "Redirect to Keycloak password reset.",
