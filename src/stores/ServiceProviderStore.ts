@@ -18,7 +18,7 @@ export type ServiceProvider = {
 export type ServiceProviderIdNameResponse = {
   id: string;
   name: string;
-}
+};
 
 type ServiceProviderState = {
   allServiceProviders: ServiceProvider[];

@@ -742,10 +742,7 @@
               </v-col>
             </v-row>
             <!-- Check if 'zuordnungen' array exists and has length > 0 -->
-            <v-row
-              class="checkbox-row ml-md-16 mb-12"
-
-            >
+            <v-row class="checkbox-row ml-md-16 mb-12">
               <v-col
                 v-if="pendingDeletion || pendingCreation"
                 cols="12"
@@ -768,11 +765,10 @@
                       :value="zuordnung"
                     >
                       <template v-slot:label>
-                        <span  class="text-body">
+                        <span class="text-body">
                           {{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
                           {{ zuordnung.klasse }}
                         </span>
-
                       </template>
                     </v-checkbox>
                   </div>
@@ -890,10 +886,14 @@
                 </v-col>
               </v-col>
             </v-row>
-            <v-row v-if="
+            <v-row
+              v-if="
                 personenkontextStore.personenuebersicht?.zuordnungen &&
-                personenkontextStore.personenuebersicht?.zuordnungen.length === 0 && !pendingCreation && !pendingDeletion
-              ">
+                personenkontextStore.personenuebersicht?.zuordnungen.length === 0 &&
+                !pendingCreation &&
+                !pendingDeletion
+              "
+            >
               <v-col
                 class="mt-n12 mb-16"
                 cols="10"

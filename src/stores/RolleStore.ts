@@ -188,7 +188,7 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
           name: rollenName,
           merkmale: merkmale as unknown as Set<RollenMerkmal>,
           systemrechte: systemrechte as unknown as Set<RollenSystemRecht>,
-          serviceProviderIds: serviceProviderIds as unknown as Set<string>
+          serviceProviderIds: serviceProviderIds as unknown as Set<string>,
         };
         const { data }: { data: RolleWithServiceProvidersResponse } = await rolleApi.rolleControllerUpdateRolle(
           rolleId,
