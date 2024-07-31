@@ -390,7 +390,7 @@ describe('OrganisationStore', () => {
         'Updated Organisation 1',
       );
       expect(organisationStore.loading).toBe(true);
-      await updateOrganisationPromise
+      await updateOrganisationPromise;
       expect(organisationStore.updatedOrganisation).toEqual(null);
       expect(organisationStore.errorCode).toEqual('UPDATE_ERROR');
       expect(organisationStore.loading).toBe(false);

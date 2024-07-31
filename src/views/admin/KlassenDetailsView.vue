@@ -17,7 +17,7 @@
   import { type BaseFieldProps, type TypedSchema, useForm } from 'vee-validate';
   import KlasseForm from '@/components/form/KlasseForm.vue';
   import SuccessTemplate from '@/components/admin/klassen/SuccessTemplate.vue';
-import { getValidationSchema, getVuetifyConfig } from '@/utils/validationKlasse';
+  import { getValidationSchema, getVuetifyConfig } from '@/utils/validationKlasse';
 
   const route: RouteLocationNormalizedLoaded = useRoute();
   const router: Router = useRouter();

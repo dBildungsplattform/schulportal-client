@@ -263,7 +263,6 @@
   }
 
   function navigateToKlassenDetails(_$event: PointerEvent, { item }: { item: Organisation }): void {
-    console.log('Navigating to klasse-details with id:', item.id); 
     router.push({ name: 'klasse-details', params: { id: item.id } });
   }
   onMounted(async () => {
