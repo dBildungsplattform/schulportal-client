@@ -15,6 +15,7 @@
   import { useRouter, type Router } from 'vue-router';
   import KlasseDelete from '@/components/admin/klassen/KlasseDelete.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
+  import { type TranslatedObject } from '@/types.d';
 
   const organisationStore: OrganisationStore = useOrganisationStore();
   const authStore: AuthStore = useAuthStore();
@@ -43,11 +44,6 @@
       align: 'center',
     } as DataTableHeader,
   ]);
-
-  type TranslatedObject = {
-    value: string;
-    title: string;
-  };
 
   const selectedSchule: Ref<string | null> = ref(null);
   const selectedKlassen: Ref<Array<string>> = ref([]);

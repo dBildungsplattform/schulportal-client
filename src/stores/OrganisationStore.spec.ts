@@ -375,4 +375,53 @@ describe('OrganisationStore', () => {
       });
     });
   });
+  describe('updateOrganisation', () => {
+    it('should update the organisation and update state', async () => {
+      const mockResponse: Organisation = {
+        id: '1',
+        kennung: 'Org1',
+        name: 'Updated Organisation 1',
+        namensergaenzung: 'Ergänzung',
+        kuerzel: 'O1',
+        typ: OrganisationsTyp.Schule,
+        administriertVon: '1',
+      };
+
+      mockadapter.onPatch('/api/organisationen/1/name').replyOnce(200, mockResponse);
+      const updateOrganisationPromise: Promise<void> = organisationStore.updateOrganisation(
+        '1',
+        'Updated Organisation 1',
+      );
+      expect(organisationStore.loading).toBe(true);
+      await updateOrganisationPromise;
+      expect(organisationStore.updatedOrganisation).toEqual(mockResponse);
+      expect(organisationStore.loading).toBe(false);
+    });
+
+    it('should handle string error', async () => {
+      mockadapter.onPatch('/api/organisationen/1/name').replyOnce(500, 'some mock server error');
+      const updateOrganisationPromise: Promise<void> = organisationStore.updateOrganisation(
+        '1',
+        'Updated Organisation 1',
+      );
+      expect(organisationStore.loading).toBe(true);
+      await updateOrganisationPromise;
+      expect(organisationStore.updatedOrganisation).toEqual(null);
+      expect(organisationStore.errorCode).toEqual('KLASSE_ERROR');
+      expect(organisationStore.loading).toBe(false);
+    });
+
+    it('should handle error code', async () => {
+      mockadapter.onPatch('/api/organisationen/1/name').replyOnce(500, { i18nKey: 'UPDATE_ERROR' });
+      const updateOrganisationPromise: Promise<void> = organisationStore.updateOrganisation(
+        '1',
+        'Updated Organisation 1',
+      );
+      expect(organisationStore.loading).toBe(true);
+      await updateOrganisationPromise;
+      expect(organisationStore.updatedOrganisation).toEqual(null);
+      expect(organisationStore.errorCode).toEqual('UPDATE_ERROR');
+      expect(organisationStore.loading).toBe(false);
+    });
+  });
 });

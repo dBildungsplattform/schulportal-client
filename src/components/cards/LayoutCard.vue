@@ -69,5 +69,3 @@
     </div>
   </v-card>
 </template>
-
-<style></style>

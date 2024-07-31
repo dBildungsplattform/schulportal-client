@@ -21,6 +21,7 @@
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import ResultTable from '@/components/admin/ResultTable.vue';
   import SearchField from '@/components/admin/SearchField.vue';
+  import { type TranslatedObject } from '@/types.d';
 
   const searchFieldComponent: Ref = ref();
 
@@ -52,11 +53,6 @@
     klassen: string;
     person: Person;
   }[];
-
-  type TranslatedObject = {
-    value: string;
-    title: string;
-  };
 
   const searchInputKlassen: Ref<string> = ref('');
   const searchInputRollen: Ref<string> = ref('');
@@ -402,7 +398,13 @@
                 <span
                   v-else
                   class="filter-header"
-                  >{{ $t('admin.rolle.rollenFound', { count: personenkontextStore.totalFilteredRollen }, personenkontextStore.totalFilteredRollen) }}</span
+                  >{{
+                    $t(
+                      'admin.rolle.rollenFound',
+                      { count: personenkontextStore.totalFilteredRollen },
+                      personenkontextStore.totalFilteredRollen,
+                    )
+                  }}</span
                 >
               </v-list-item>
             </template>

@@ -17,7 +17,7 @@
       "noKoPersNumber": "Keine KoPers-Nr vorhanden"
     },
     "klasse": {
-      "addNew":"Neue Klasse hinzufügen",
+      "addNew": "Neue Klasse hinzufügen",
       "assignKlasse": "Klasse zuordnen",
       "backToCreateKlasse": "Zurück zur Klassenanlage",
       "create": "Klasse anlegen",
@@ -158,16 +158,23 @@
       "create": "Rolle anlegen",
       "createAnother": "Weitere Rolle anlegen",
       "createNew": "Neue Rolle anlegen",
+      "deleteRolle": "Rolle löschen",
+      "deleteRolleConfirmation": "Wollen Sie die Rolle sofort und endgültig löschen?",
+      "deleteRolleSuccessMessage": "Die Rolle wurde erfolgreich gelöscht",
       "discard": "Rolle verwerfen",
       "edit": "Rolle bearbeiten",
       "enterRollenname": "Rollenname eingeben",
       "errors": {
         "ADD_SYSTEMRECHT_ERROR": "Das Systemrecht konnte nicht hinzugefügt werden.",
         "ROLLE_ERROR":  "Die Rolle konnte nicht angelegt werden.",
+        "ROLLE_HAT_PERSONENKONTEXTE_ERROR": "Die Rolle kann nicht gelöscht werden, da die sie noch Benutzern zugeordnet ist. Nehmen Sie bitte zunächst alle Zuordnungen zurück.",
         "UPDATE_MERKMALE_ERROR": "Die gewünschte Bearbeitung kann nicht ausgeführt werden, da die Rolle noch Benutzern zugeordnet ist. Nehmen Sie bitte zunächst alle Zuordnungen zurück."
       },
       "title": {
-        "UPDATE_MERKMALE_ERROR": "Bearbeitung nicht möglich."
+        "ROLLE_ERROR":  "Fehler bei Erstellung der Rolle.",
+        "ROLLE_HAT_PERSONENKONTEXTE_ERROR": "Löschen nicht möglich.",
+        "ROLLE_UPDATE_ERROR": "Die Rolle konnte nicht bearbeitet werden.",
+        "UPDATE_MERKMALE_ERROR": "Die gewünschte Bearbeitung kann nicht ausgeführt werden, da die Rolle noch Benutzern zugeordnet ist. Nehmen Sie bitte zunächst alle Zuordnungen zurück."
       },
       "isAllowedToManageRollen": "Darf Rollen verwalten",
       "loadingErrorText": "Es konnten keine Rollendaten geladen werden.",
@@ -224,12 +231,12 @@
       "selectMerkmale": "Merkmale auswählen",
       "selectRolle": "Rolle auswählen",
       "selectRollenart": "Rollenart auswählen",
-      "selectSystemrechte":"Systemrechte auswählen",
+      "selectSystemrechte": "Systemrechte auswählen",
       "showAll": "Alle Rollen anzeigen",
       "systemrechte": "Systemrechte",
       "userDataLoadingErrorText": "Es konnten keine Benutzerdaten geladen werden."
     },
-    "searchResultTable":"Ergebnisliste durchsuchen",
+    "searchResultTable": "Ergebnisliste durchsuchen",
     "schule": {
       "addNew": "Neue Schule hinzufügen",
       "administratingSchultraeger": "Verwaltender Schulträger",
@@ -322,7 +329,6 @@
     "admin": "Schulportal-Administration",
     "backToDetails": "Zurück zur Gesamtübersicht",
     "backToList": "Zurück zur Ergebnisliste",
-    "backToDetails": "Zurück zur Gesamtübersicht",
     "back": "Zurück",
     "backToStart": "Zurück zur Startseite",
     "closeMobileMenu": "Mobiles Menü schließen",
@@ -330,7 +336,9 @@
     "logout": "Abmelden",
     "navigation": "Navigation",
     "openMobileMenu": "Mobiles Menü öffnen",
-    "help": "Hilfe"
+    "help": "Hilfe",
+    "profile": "Mein Profil",
+    "backToPreviousPage": "Zurück zur vorherigen Seite"
   },
   "no": "Nein",
   "noDataFound": "Keine Daten gefunden.",
@@ -358,7 +366,8 @@
     "enterFirstName": "Vorname eingeben",
     "enterLastName": "Nachname eingeben",
     "firstName": "Vorname",
-    "firstNameLastNameReferrerKopersNr":"Vor-/Nachname/Benutzername/KoPers-Nr.",
+    "firstNameLastNameReferrerKopersNr": "Vor-/Nachname/Benutzername/KoPers-Nr.",
+    "firstAndLastName": "Vor- und Nachname",
     "finishEditFirst": "Bitte beenden Sie zunächst Ihre aktuelle Bearbeitung.",
     "klasse": "Klasse",
     "kopersnr": "Kopers-Nr",
@@ -376,7 +385,29 @@
     "saveChanges": "Änderungen speichern",
     "willBeCreated": "wird hinzugefügt",
     "willBeRemoved": "wird entfernt",
-    "zuordnungen": "Schulzuordnung(en)"
+    "zuordnungen": "Schulzuordnung(en)",
+    "zuordnung": "Schulzuordnung"
+
+  },
+  "profile": {
+    "personalData": "Persönliche Daten",
+    "fullName": "Vor- und Nachname",
+    "schule": "Schule",
+    "dienstStellenNummer": "Dienststellennummer",
+    "dienstStellenNummerAbbr": "DStNr.",
+    "password": "Passwort",
+    "changePassword": "Passwort ändern",
+    "saveNewPassword": "Neues Passwort speichern",
+    "setNewPassword": "Neues Passwort setzen",
+    "twoFactorAuth": "Zwei-Faktor-Authentifizierung",
+    "setupTwoFactorAuth": "2-FA einrichten",
+    "infoAboutChangeabilityFromPersonalData": "Persönliche Daten sind nur durch Ihre schulischen Admins veränderbar",
+    "yourSchuleAdminsAre": "Ihre schulischen Admins sind:",
+    "koPersNummer": "Personalnummer",
+    "koPersNummerAbbr": "KoPers.-Nr.",
+    "klasse": "Klasse",
+    "error": "Fehler",
+    "errorMessage": "Es ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut."
   },
   "save": "Speichern",
   "refreshData": "Daten aktualisieren",

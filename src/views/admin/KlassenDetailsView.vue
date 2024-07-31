@@ -267,7 +267,7 @@
                   md="auto"
                 >
                   <v-btn
-                    class="primary"
+                    class="primary ml-lg-8"
                     data-testid="klasse-edit-button"
                     @Click="activateEditing"
                     :block="mdAndDown"
