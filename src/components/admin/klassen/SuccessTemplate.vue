@@ -5,27 +5,26 @@
 
   defineProps<{
     successMessage: string;
-    followingRolleDataCreated: string;
-    createdRolleData: Array<{ label: string; value: string; testId: string }>;
+    followingDataCreated: string;
+    createdData: Array<{ label: string; value: string; testId: string }>;
     backButtonText: string;
-    createAnotherRolleButtonText: string;
-    showCreateAnotherRolleButton: boolean;
+    createAnotherButtonText: string;
+    showCreateAnotherButton: boolean;
     backButtonTestId: string;
     createAnotherButtonTestId: string;
   }>();
 
   type Emits = {
-    (event: 'OnNavigateBackToRolleManagement'): void;
-    (event: 'OnCreateAnotherRolle'): void;
+    (event: 'OnNavigateBack'): void;
+    (event: 'OnCreateAnother'): void;
   };
 
   const emit: Emits = defineEmits<Emits>();
-
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
   useI18n({ useScope: 'global' });
 
-  const navigateBack = (): void => emit('OnNavigateBackToRolleManagement');
-  const createAnother = (): void => emit('OnCreateAnotherRolle');
+  const navigateBack = (): void => emit('OnNavigateBack');
+  const createAnother = (): void => emit('OnCreateAnother');
 </script>
 
 <template>
@@ -35,7 +34,7 @@
         class="subtitle-1"
         cols="auto"
       >
-        <span data-testid="rolle-success-text">{{ successMessage }}</span>
+        <span data-testid="klasse-success-text">{{ successMessage }}</span>
       </v-col>
     </v-row>
     <v-row justify="center">
@@ -52,11 +51,11 @@
         class="subtitle-2"
         cols="auto"
       >
-        {{ followingRolleDataCreated }}
+        {{ followingDataCreated }}
       </v-col>
     </v-row>
     <v-row
-      v-for="(item, index) in createdRolleData"
+      v-for="(item, index) in createdData"
       :key="index"
     >
       <v-col class="text-body bold text-right">{{ item.label }}:</v-col>
@@ -80,22 +79,24 @@
           :data-testid="backButtonTestId"
           :block="mdAndDown"
           @click="navigateBack"
-          >{{ backButtonText }}</v-btn
         >
+          {{ backButtonText }}
+        </v-btn>
       </v-col>
       <v-col
         cols="12"
         sm="6"
         md="auto"
-        v-if="showCreateAnotherRolleButton"
+        v-if="showCreateAnotherButton"
       >
         <v-btn
           class="primary button"
           :data-testid="createAnotherButtonTestId"
           :block="mdAndDown"
           @click="createAnother"
-          >{{ createAnotherRolleButtonText }}</v-btn
         >
+          {{ createAnotherButtonText }}
+        </v-btn>
       </v-col>
     </v-row>
   </v-container>

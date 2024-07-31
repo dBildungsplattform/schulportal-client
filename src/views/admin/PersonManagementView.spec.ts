@@ -75,6 +75,7 @@ beforeEach(() => {
         vorname: 'Samuel',
         nachname: 'Vimes',
         benutzername: 'string',
+        lastModifiedZuordnungen: null,
         zuordnungen: [
           {
             sskId: 'string',
@@ -111,18 +112,18 @@ beforeEach(() => {
     },
   ] as PersonendatensatzResponse[];
   personenkontextStore.filteredRollen = {
-      moeglicheRollen: [
-    {
-      id: '1',
-      administeredBySchulstrukturknoten: '1',
-      merkmale: new Set(),
-      name: 'Rolle 1',
-      rollenart: 'LERN',
-      systemrechte: new Set(),
-    },
-  ] as RolleResponse[],
-  total: 1
-} as FindRollenResponse;
+    moeglicheRollen: [
+      {
+        id: '1',
+        administeredBySchulstrukturknoten: '1',
+        merkmale: new Set(),
+        name: 'Rolle 1',
+        rollenart: 'LERN',
+        systemrechte: new Set(),
+      },
+    ] as RolleResponse[],
+    total: 1,
+  } as FindRollenResponse;
 
   wrapper = mount(PersonManagementView, {
     attachTo: document.getElementById('app') || '',

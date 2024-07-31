@@ -271,8 +271,8 @@ describe('rolleStore', () => {
         ['sp1'],
       );
       expect(rolleStore.loading).toBe(true);
-      await updateRollePromise;
-      expect(rolleStore.errorCode).toEqual('ROLLE_ERROR');
+      await rejects(updateRollePromise);
+      expect(rolleStore.errorCode).toEqual('ROLLE_UPDATE_ERROR');
       expect(rolleStore.updatedRolle).toEqual(null);
       expect(rolleStore.loading).toBe(false);
     });
@@ -287,8 +287,8 @@ describe('rolleStore', () => {
         ['sp1'],
       );
       expect(rolleStore.loading).toBe(true);
-      await updateRollePromise;
-      expect(rolleStore.errorCode).toEqual('ROLLE_ERROR');
+      await rejects(updateRollePromise);
+      expect(rolleStore.errorCode).toEqual('ROLLE_UPDATE_ERROR');
       expect(rolleStore.updatedRolle).toEqual(null);
       expect(rolleStore.loading).toBe(false);
     });

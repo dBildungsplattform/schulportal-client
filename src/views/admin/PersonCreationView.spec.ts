@@ -21,7 +21,7 @@ beforeEach(async () => {
   router = createRouter({
     history: createWebHistory(),
     routes: [
-      { path: '/', component: PersonCreationView, meta: { layout: 'DefaultLayout' }  },
+      { path: '/', component: PersonCreationView, meta: { layout: 'DefaultLayout' } },
       { path: '/admin/personen', component: PersonManagementView, meta: { layout: 'DefaultLayout' } },
     ],
   });
@@ -48,5 +48,4 @@ describe('PersonCreationView', () => {
     expect(wrapper?.getComponent({ name: 'FormRow' })).toBeTruthy();
     expect(wrapper?.getComponent({ name: 'PersonenkontextCreate' })).toBeTruthy();
   });
-
 });

@@ -46,7 +46,6 @@ beforeEach(async () => {
     routes,
   });
 
-
   router.push('/');
   await router.isReady();
 
