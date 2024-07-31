@@ -15,6 +15,11 @@ export type ServiceProvider = {
   target: string;
 };
 
+export type ServiceProviderIdNameResponse = {
+  id: string;
+  name: string;
+};
+
 type ServiceProviderState = {
   allServiceProviders: ServiceProvider[];
   availableServiceProviders: ServiceProvider[];
