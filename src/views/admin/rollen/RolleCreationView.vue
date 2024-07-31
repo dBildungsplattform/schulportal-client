@@ -292,7 +292,10 @@
       resetForm();
 
       if (rolleStore.createdRolle) {
-        await organisationStore.getOrganisationById(rolleStore.createdRolle.administeredBySchulstrukturknoten);
+        await organisationStore.getOrganisationById(
+          rolleStore.createdRolle.administeredBySchulstrukturknoten,
+          OrganisationsTyp.Schule,
+        );
       }
     }
   });
@@ -353,8 +356,8 @@
       <template v-if="rolleStore.createdRolle && !rolleStore.errorCode">
         <SuccessTemplate
           :successMessage="$t('admin.rolle.rolleAddedSuccessfully')"
-          :followingDataCreated="$t('admin.followingDataCreated')"
-          :createdData="[
+          :followingRolleDataCreated="$t('admin.followingDataCreated')"
+          :createdRolleData="[
             {
               label: $t('admin.administrationsebene.administrationsebene'),
               value: getSskName(
@@ -386,12 +389,12 @@
             },
           ]"
           :backButtonText="$t('nav.backToList')"
-          :createAnotherButtonText="$t('admin.rolle.createAnother')"
-          :showCreateAnotherButton="true"
+          :createAnotherRolleButtonText="$t('admin.rolle.createAnother')"
+          :showCreateAnotherRolleButton="true"
           backButtonTestId="back-to-list-button"
           createAnotherButtonTestId="create-another-rolle-button"
-          @OnNavigateBack="navigateToRolleManagement"
-          @OnCreateAnother="handleCreateAnotherRolle"
+          @OnNavigateBackToRolleManagement="navigateToRolleManagement"
+          @OnCreateAnotherRolle="handleCreateAnotherRolle"
         />
       </template>
     </LayoutCard>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import { type RolleStore, useRolleStore, RollenMerkmal, RollenSystemRecht, RollenArt } from '@/stores/RolleStore';
-  import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
+  import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
   import {
     useServiceProviderStore,
     type ServiceProvider,
@@ -284,7 +284,10 @@
   onBeforeMount(async () => {
     rolleStore.errorCode = '';
     await rolleStore.getRolleById(currentRolleId);
-    await organisationStore.getOrganisationById(rolleStore.currentRolle?.administeredBySchulstrukturknoten || '');
+    await organisationStore.getOrganisationById(
+      rolleStore.currentRolle?.administeredBySchulstrukturknoten || '',
+      OrganisationsTyp.Schule,
+    );
     await serviceProviderStore.getAllServiceProviders();
 
     Object.values(RollenMerkmal).forEach((enumValue: RollenMerkmal) => {
@@ -474,8 +477,8 @@
       <template v-if="rolleStore.updatedRolle && !rolleStore.errorCode">
         <SuccessTemplate
           :successMessage="$t('admin.rolle.rolleUpdatedSuccessfully')"
-          :followingDataCreated="$t('admin.followingDataCreated')"
-          :createdData="[
+          :followingRolleDataCreated="$t('admin.followingDataCreated')"
+          :createdRolleData="[
             { label: $t('admin.rolle.rollenname'), value: rolleStore.updatedRolle?.name, testId: 'updated-rolle-name' },
             {
               label: $t('admin.rolle.merkmale'),
@@ -494,11 +497,11 @@
             },
           ]"
           :backButtonText="$t('nav.backToDetails')"
-          :createAnotherButtonText="$t('admin.rolle.createAnother')"
-          :showCreateAnotherButton="false"
+          :createAnotherRolleButtonText="$t('admin.rolle.createAnother')"
+          :showCreateAnotherRolleButton="false"
           backButtonTestId="back-to-details-button"
           createAnotherButtonTestId="create-another-rolle-button"
-          @onNavigateBack="router.go(0)"
+          @OnNavigateBackToRolleManagement="router.go(0)"
         />
       </template>
     </LayoutCard>
