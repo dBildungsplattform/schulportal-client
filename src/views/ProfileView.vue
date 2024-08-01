@@ -19,7 +19,7 @@
   export type SchulDaten = {
     title: string;
     info?: string | null;
-    schoolAdmins?: string[];
+    schulAdmins?: string[];
     labelAndValues: LabelValue[];
   };
 
@@ -101,7 +101,7 @@
       const tempSchulDaten: SchulDaten = {
         title: zuordnung.sskName,
         info: t('profile.yourSchuleAdminsAre'),
-        schoolAdmins: [], // Hierfuer muss ein API-Endpunkt implementiert werden
+        schulAdmins: [], // Hierfuer muss ein API-Endpunkt implementiert werden
         labelAndValues: [{ label: t('profile.schule'), value: zuordnung.sskName }],
       };
 
@@ -163,8 +163,7 @@
         (z: Zuordnung) =>
           ({
             ...z,
-            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-            sskDstNr: z.sskDstNr?.split('-')[0], // die Klasse wird durch einen Bindestrich an die Schulnummer angehangen. Um nach der Schule zu gruppieren, wird nur die Schulnummer verwendet.
+            sskDstNr: z.sskDstNr.split('-')[0], // die Klasse wird durch einen Bindestrich an die Schulnummer angehangen. Um nach der Schule zu gruppieren, wird nur die Schulnummer verwendet.
           }) as Zuordnung,
       ),
     );
