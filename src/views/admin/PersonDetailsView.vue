@@ -33,6 +33,7 @@
   import { useKlassen } from '@/composables/useKlassen';
   import PersonenkontextCreate from '@/components/admin/personen/PersonenkontextCreate.vue';
   import { type TranslatedObject } from '@/types.d';
+  import PersonLock from '@/components/admin/personen/PersonLock.vue';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
@@ -80,6 +81,16 @@
     personStore.resetPassword(personId).then((newPassword?: string) => {
       password.value = newPassword || '';
     });
+  }
+
+  function lockPerson(personId: string): void {
+    console.log('Locking person with id:', personId);
+    personStore.lockPerson(personId);
+  }
+
+  function unlockPerson(personId: string): void {
+    console.log('Unlocking person with id:', personId);
+    personStore.unlockPerson(personId);
   }
 
   const handleAlertClose = (): void => {
@@ -1004,6 +1015,49 @@
               </v-row>
             </v-form>
           </template>
+        </v-container>
+        <v-divider
+          class="border-opacity-100 rounded my-6 mx-4"
+          color="#E5EAEF"
+          thickness="6"
+        ></v-divider>
+        <!-- Lock User -->
+        <v-container>
+          <v-row class="ml-md-16">
+            <v-col>
+              <h3 class="subtitle-1">{{ $t('person.lockUser') }}</h3>
+            </v-col>
+            <v-col
+              class="mr-lg-13"
+              cols="12"
+              md="auto"
+              v-if="personStore.currentPerson"
+            >
+              <div class="d-flex justify-sm-end">
+                <PersonLock
+                  :errorCode="personStore.errorCode"
+                  :disabled="isEditActive"
+                  :person="personStore.currentPerson"
+                  @onClearPassword="password = ''"
+                  @onResetPassword="lockPerson(currentPersonId)"
+                  :password="password"
+                >
+                </PersonLock>
+              </div>
+              <div class="d-flex justify-sm-end">
+                <PersonLock
+                  :errorCode="personStore.errorCode"
+                  :disabled="isEditActive"
+                  :person="personStore.currentPerson"
+                  @onClearPassword="password = ''"
+                  @onResetPassword="unlockPerson(currentPersonId)"
+                  :password="password"
+                >
+                </PersonLock>
+              </div>
+            </v-col>
+            <v-col v-else-if="personStore.loading"> <v-progress-circular indeterminate></v-progress-circular></v-col
+          ></v-row>
         </v-container>
         <v-divider
           class="border-opacity-100 rounded my-6 mx-4"
