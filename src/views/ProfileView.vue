@@ -273,13 +273,13 @@
               </v-table>
               <p
                 class="pt-4 text-center text-body-1"
-                v-if="schuleData.schoolAdmins.length > 0"
+                v-if="schuleData.schulAdmins.length > 0"
               >
                 <v-icon
                   class="mr-2"
                   icon="mdi-information-slab-circle-outline"
                 ></v-icon>
-                {{ schuleData.info + ' ' + schuleData.schoolAdmins?.join(', ') }}
+                {{ schuleData.info + ' ' + schuleData.schulAdmins?.join(', ') }}
               </p>
             </v-col>
           </v-row>
