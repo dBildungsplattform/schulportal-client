@@ -18,6 +18,7 @@
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
+  import { type TranslatedObject } from '@/types.d';
   import KlasseForm from '@/components/form/KlasseForm.vue';
   import SuccessTemplate from '@/components/admin/klassen/SuccessTemplate.vue';
   import { getValidationSchema, getVuetifyConfig } from '@/utils/validationKlasse';
@@ -40,11 +41,6 @@
   type KlasseCreationForm = {
     selectedSchule: string;
     selectedKlassenname: string;
-  };
-
-  type TranslatedObject = {
-    value: string;
-    title: string;
   };
 
   // eslint-disable-next-line @typescript-eslint/typedef

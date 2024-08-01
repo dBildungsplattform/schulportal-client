@@ -48,7 +48,8 @@ type RolleActions = {
     merkmale: RollenMerkmal[],
     systemrechte: RollenSystemRecht[],
     serviceProviderIds: string[],
-  ) => Promise<RolleWithServiceProvidersResponse>;
+  ) => Promise<void>;
+  deleteRolleById: (rolleId: string) => Promise<void>;
 };
 
 export { RollenArt };
@@ -180,7 +181,7 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
       merkmale: RollenMerkmal[],
       systemrechte: RollenSystemRecht[],
       serviceProviderIds: string[],
-    ): Promise<RolleWithServiceProvidersResponse> {
+    ): Promise<void> {
       this.loading = true;
       this.errorCode = '';
       try {
@@ -195,13 +196,25 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
           updateRolleBodyParams,
         );
         this.updatedRolle = data;
-        return data;
       } catch (error) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
           this.errorCode = error.response?.data.i18nKey || 'ROLLE_UPDATE_ERROR';
         }
-        return await Promise.reject(this.errorCode);
+      } finally {
+        this.loading = false;
+      }
+    },
+    async deleteRolleById(rolleId: string): Promise<void> {
+      this.loading = true;
+      this.errorCode = '';
+      try {
+        await rolleApi.rolleControllerDeleteRolle(rolleId);
+      } catch (error) {
+        this.errorCode = 'UNSPECIFIED_ERROR';
+        if (isAxiosError(error)) {
+          this.errorCode = error.response?.data.i18nKey || 'ROLLE_ERROR';
+        }
       } finally {
         this.loading = false;
       }
