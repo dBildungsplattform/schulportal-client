@@ -27,9 +27,9 @@
   }>();
 
   type Props = {
-    errorCode: string;
-    disabled: boolean;
-    person: Personendatensatz;
+    errorCode?: string;
+    disabled?: boolean;
+    person?: Personendatensatz;
   };
 
   const props: Props = defineProps<Props>();
@@ -46,7 +46,7 @@
   }
 
   async function proceed(): Promise<void> {
-    if (props.person.person.referrer == null) return;
+    if (props.person?.person.referrer == null) return;
     qrCodeImageBase64 = await personStore.get2FASoftwareQRCode(props.person.person.referrer);
     proceeded.value = true;
   }

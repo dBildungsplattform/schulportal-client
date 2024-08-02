@@ -12,6 +12,9 @@
   import { usePersonInfoStore, type PersonInfoStore, type PersonInfoResponse } from '@/stores/PersonInfoStore';
   import { usePersonenkontextStore, type Zuordnung, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
   import { OrganisationsTyp } from '@/stores/OrganisationStore';
+  import SelfServiceWorkflow from '@/components/cards/two-factor-authentication/SelfServiceWorkflow.vue';
+  import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
+  import type { TokenStateResponse } from '@/api-client/generated';
 
   type SchulDaten = {
     title: string;
@@ -22,8 +25,13 @@
 
   let personInfoStore: PersonInfoStore = usePersonInfoStore();
   let personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
+  const personStore: PersonStore = usePersonStore();
+
   const personalData: Ref = ref<LabelValue[]>([]);
   const schulDaten: Ref = ref<SchulDaten[]>([]);
+
+  const secondFactorSet: Ref<boolean | undefined> = ref(true);
+  const secondFactorType: Ref<'software' | 'hardware' | undefined> = ref('hardware');
 
   function handleGoToPreviousPage(): void {
     window.history.back();
@@ -128,6 +136,7 @@
     personenkontextStore = usePersonenkontextStore();
     await personInfoStore.initPersonInfo();
     await personenkontextStore.getPersonenuebersichtById(personInfoStore.personInfo?.person.id ?? '');
+    await personStore.getPersonById(personInfoStore.personInfo?.person.id ?? '');
   }
 
   function setupPersonalData(): void {
@@ -158,7 +167,7 @@
         (z: Zuordnung) =>
           ({
             ...z,
-            sskDstNr: z.sskDstNr.split('-')[0], // die Klasse wird durch einen Bindestrich an die Schulnummer angehangen. Um nach der Schule zu gruppieren, wird nur die Schulnummer verwendet.
+            sskDstNr: z.sskDstNr?.split('-')[0], // die Klasse wird durch einen Bindestrich an die Schulnummer angehangen. Um nach der Schule zu gruppieren, wird nur die Schulnummer verwendet.
           }) as Zuordnung,
       ),
     );
@@ -167,10 +176,31 @@
     schulDaten.value = createZuordnungsSchuleDaten(composedZuordnungen);
   }
 
+  async function check2FAState(): Promise<void> {
+    secondFactorSet.value = undefined;
+    secondFactorType.value = undefined;
+
+    const referrer: string | null | undefined = personInfoStore.personInfo?.person.referrer;
+
+    if (!referrer) {
+      return;
+    }
+    const result: TokenStateResponse = await personStore.get2FAState(referrer);
+    secondFactorSet.value = result.hasToken;
+    if (secondFactorSet.value) {
+      if (result.tokenKind === 'hardware') {
+        secondFactorType.value = 'hardware';
+      } else if (result.tokenKind === 'software') {
+        secondFactorType.value = 'software';
+      }
+    }
+  }
+
   onBeforeMount(async () => {
     await initializeStores();
     setupPersonalData();
     setupSchuleData();
+    check2FAState();
   });
 </script>
 
@@ -310,21 +340,72 @@
         md="6"
       >
         <LayoutCard :header="$t('profile.twoFactorAuth')">
-          <v-row class="ma-3 d-flex align-content-center justify-center ga-4">
+          <v-row
+            v-if="secondFactorSet === false"
+            class="ma-3 d-flex align-content-center justify-center ga-4"
+          >
             <v-icon
               size="x-large"
               class="w-100"
               icon="mdi-shield-account-outline"
             ></v-icon>
             <div>
-              <v-btn
-                color="primary"
-                disabled
+              <SelfServiceWorkflow
+                v-if="personInfoStore.personInfo?.person.referrer"
+                :referrer="personInfoStore.personInfo?.person.referrer"
               >
-                {{ $t('profile.setupTwoFactorAuth') }}
-              </v-btn>
+              </SelfServiceWorkflow>
             </div>
           </v-row>
+          <v-row
+            v-if="secondFactorSet === true"
+            class="ma-3 d-flex align-content-center justify-center ga-4"
+          >
+            <v-col>
+              <v-row class="text-body">
+                <v-col
+                  class="text-right"
+                  cols="1"
+                >
+                  <v-icon
+                    icon="mdi-check-circle"
+                    color="green"
+                  ></v-icon>
+                </v-col>
+                <div class="v-col">
+                  <p v-if="secondFactorType === 'software'">
+                    {{ $t('admin.person.twoFactorAuthentication.softwareTokenIsSetUpSelfService') }}
+                  </p>
+                  <p v-else-if="secondFactorType === 'hardware'">
+                    {{
+                      $t('admin.person.twoFactorAuthentication.hardwareTokenIsSetUpSelfService', {
+                        serialNumber: secondFactorType,
+                      })
+                    }}
+                  </p>
+                </div>
+              </v-row>
+              <v-row class="mt-4 text-body">
+                <v-col
+                  class="text-right"
+                  cols="1"
+                >
+                  <v-icon
+                    class="mb-2"
+                    icon="mdi-information"
+                  >
+                  </v-icon>
+                </v-col>
+                <div class="v-col">
+                  <p>
+                    {{ $t('admin.person.twoFactorAuthentication.questionsProblems') }}
+                  </p>
+                </div>
+              </v-row>
+            </v-col>
+            <v-col v-if="secondFactorSet === undefined">
+              <v-progress-circular indeterminate></v-progress-circular></v-col
+          ></v-row>
         </LayoutCard>
       </v-col>
     </v-row>

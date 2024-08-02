@@ -83,8 +83,15 @@
         "scanOrPrint": "QR-Code scannen oder ausdrucken.",
         "notSetUp": "Für diesen Benutzer ist aktuell keine 2FA eingerichtet.",
         "softwareTokenIsSetUp": "Für diesen Benutzer ist aktuell ein Software-Token eingerichtet.",
+        "softwareTokenIsSetUpSelfService": "Für diesen Account ist aktuell eine 2FA über ein Software-Token eingerichtet (Authentifizierung über Endgerät).",
+        "hardwareTokenIsSetUpSelfService": "Aktuell ist eine 2FA über ein Hardware-Token eingerichtet. \nSeriennummer: {serialNumber}",
         "resetInfo": "Um einen neuen Token einzurichten, muss der aktuelle Token durch die schulischen Administratorinnen und Administratoren zurückgesetzt werden.",
-        "tokenReset": "Token zurücksetzen"
+        "questionsProblems": "Bitte wenden Sie sich bei Fragen und Problemen an ihre schulischen Administratorinnen und Administratoren.",
+        "tokenReset": "Token zurücksetzen",
+        "qrCodeInfo": "Im folgenden wird ein QR-Code generiert, mit dem Sie auf Ihrem Endgerät eine Zwei-Faktor-Authentifizierung einrichten können.",
+        "softwareOnDevice": "Stellen Sie, bevor Sie fortfahren, sicher, dass einen entsprechende Software auf Ihrem Endgerät installiert ist (z.B. FreeOTP).",
+        "pleaseScan": "Bitte scannen Sie den QR-Code mit Ihrer 2FA-App (z.B. FreeOTP).",
+        "enterOtp": "Bitte geben Sie das angezeigte Einmal-Passwort ein, um die Einrichtung abzuschließen."
       },
       "copyPasswordError": "Passwort konnte nicht in die Zwischenablage kopiert werden",
       "copyPasswordSuccess": "Passwort in Zwischenablage kopiert",
