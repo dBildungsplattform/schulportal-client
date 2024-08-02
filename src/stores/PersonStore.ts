@@ -23,6 +23,8 @@ export type Person = {
   };
   referrer: string | null;
   personalnummer?: string | null;
+  isLocked?: boolean;
+  attributes?: Record<string, string | string[]>;
 };
 
 export type CreatePersonBodyParams = DbiamCreatePersonWithContextBodyParams;
@@ -149,7 +151,8 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
     async lockPerson(personId: string, lock: boolean) {
       this.loading = true;
       try {
-        await personenApi.personControllerLockPerson(personId, { lock: lock });
+        const response = await personenApi.personControllerLockPerson(personId, { lock: lock });
+        console.log(response);
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {

@@ -1,9 +1,10 @@
 <script setup lang="ts">
   import { ref, type Ref } from 'vue';
+  import { type Composer, useI18n } from 'vue-i18n';
   import { type Personendatensatz } from '@/stores/PersonStore';
   import { useDisplay } from 'vuetify';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
-
+  const { t }: Composer = useI18n({ useScope: 'global' });
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
   type Props = {
@@ -12,14 +13,29 @@
     person: Personendatensatz;
   };
 
-  type Emits = (event: 'onlockUser', id: string, lock: boolean) => void;
+  type Emits = (event: 'onLockUser', id: string, lock: boolean) => void;
 
   const props: Props = defineProps<Props>();
   const emit: Emits = defineEmits<Emits>();
   const errorMessage: Ref<string> = ref('');
+  const successMessage: Ref<string> = ref('');
+  const isLockedTemp: Ref<boolean> = ref(props.isLocked);
 
   async function closeLockPersonDialog(isActive: Ref<boolean>): Promise<void> {
     isActive.value = false;
+    errorMessage.value = '';
+    successMessage.value = '';
+    isLockedTemp.value = !isLockedTemp.value;
+  }
+
+  async function handleOnLockUser(id: string, lock: boolean): Promise<void> {
+    console.log('props', props);
+    try {
+      await emit('onLockUser', id, lock);
+      successMessage.value = !lock ? t('person.lockUserSuccess') : t('person.unlockUserSuccess');
+    } catch (error) {
+      errorMessage.value = props.isLocked ? t('person.lockUserError') : t('person.unlockUserError');
+    }
   }
 </script>
 
@@ -37,7 +53,7 @@
           :block="mdAndDown"
           v-bind="props"
         >
-          {{ isLocked ? $t('person.lockUser') : $t('person.unlockUser') }}
+          {{ isLockedTemp ? $t('person.lockUser') : $t('person.unlockUser') }}
         </v-btn>
       </v-col>
     </template>
@@ -45,7 +61,7 @@
     <template v-slot:default="{ isActive }">
       <LayoutCard
         :closable="true"
-        :header="$t('person.lockUser')"
+        :header="isLockedTemp ? $t('person.lockUser') : $t('person.unlockUser')"
         @onCloseClicked="closeLockPersonDialog(isActive)"
       >
         <v-card-text>
@@ -69,10 +85,18 @@
             <v-row class="text-body bold px-md-16">
               <v-col>
                 <p
+                  v-if="successMessage"
+                  class="text-success"
+                  data-testid="lock-user-info-text"
+                >
+                  {{ successMessage }}
+                </p>
+                <p
+                  v-else
                   data-testid="lock-user-info-text"
                   class="text-body"
                 >
-                  {{ props.isLocked ? $t('person.lockUserInfoText') : $t('person.unLockUserInfoText') }}
+                  {{ isLockedTemp ? $t('person.lockUserInfoText') : $t('person.unLockUserInfoText') }}
                 </p>
               </v-col>
             </v-row>
@@ -91,7 +115,7 @@
                 @click.stop="closeLockPersonDialog(isActive)"
                 data-testid="close-lock-user-dialog-button"
               >
-                {{ $t('cancel') }}
+                {{ !successMessage ? $t('cancel') : $t('close') }}
               </v-btn>
             </v-col>
             <v-col
@@ -100,12 +124,13 @@
               md="4"
             >
               <v-btn
+                v-if="!successMessage"
                 :block="mdAndDown"
                 class="primary button"
-                @click.stop="emit('onlockUser', props.person.person.id, !props.isLocked)"
+                @click.stop="handleOnLockUser(props.person.person.id, !isLockedTemp)"
                 data-testid="lock-user-button"
               >
-                {{ props.isLocked ? $t('person.lockUser') : $t('person.unlockUser') }}
+                {{ isLockedTemp ? $t('person.lockUser') : $t('person.unlockUser') }}
               </v-btn>
             </v-col>
           </v-row>

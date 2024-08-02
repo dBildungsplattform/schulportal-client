@@ -726,6 +726,16 @@
           "200": {
             "description": "User has been successfully updated."
           },
+          "202": {
+            "description": "User has been successfully updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
           "403": {
             "description": "Insufficient permissions to perform operation."
           },
@@ -3676,6 +3686,14 @@
           "personalnummer": {
             "type": "string",
             "nullable": true
+          },
+          "isLocked": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "attributes": {
+            "type": "object",
+            "nullable": true
           }
         },
         "required": [
@@ -3690,7 +3708,9 @@
           "vertrauensstufe",
           "revision",
           "startpasswort",
-          "personalnummer"
+          "personalnummer",
+          "isLocked",
+          "attributes"
         ]
       },
       "PersonendatensatzResponse": {

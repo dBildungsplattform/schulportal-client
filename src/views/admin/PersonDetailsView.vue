@@ -83,7 +83,7 @@
     });
   }
 
-  function onlockUser(personId: string, lock: boolean): void {
+  function onLockUser(personId: string, lock: boolean): void {
     personStore.lockPerson(personId, lock);
   }
 
@@ -105,6 +105,33 @@
   // Deletes the person and all kontexte
   async function deletePerson(personId: string): Promise<void> {
     await personStore.deletePerson(personId);
+  }
+
+  function keyMapper(key: string): string {
+    switch (key) {
+      case 'locked_from':
+        return t('person.lockedFrom');
+      case 'timestamp':
+        return t('person.lockedSince');
+      default:
+        return key;
+    }
+  }
+
+  function keyValueMapper(key: string, value: string): string {
+    switch (key) {
+      case 'timestamp':
+        return new Intl.DateTimeFormat('de-DE', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+        }).format(new Date(value));
+      default:
+        return value;
+    }
   }
 
   let closeCannotDeleteDialog = (): void => {
@@ -750,8 +777,8 @@
                 cols="12"
                 sm="auto"
               >
-                <h3 class="subtitle-1">{{ $t('person.checkAndSave') }}:</h3></v-col
-              >
+                <h3 class="subtitle-1">{{ $t('person.checkAndSave') }}:</h3>
+              </v-col>
               <v-col
                 cols="12"
                 v-for="zuordnung in getZuordnungen?.filter((zuordnung) => zuordnung.editable)"
@@ -954,8 +981,8 @@
                   cols="12"
                   sm="auto"
                 >
-                  <h3 class="subtitle-1">{{ $t('person.addZuordnung') }}:</h3></v-col
-                >
+                  <h3 class="subtitle-1">{{ $t('person.addZuordnung') }}:</h3>
+                </v-col>
               </v-row>
               <v-container class="px-lg-16">
                 <!-- Organisation, Rolle, Klasse zuordnen -->
@@ -1015,7 +1042,7 @@
           color="#E5EAEF"
           thickness="6"
         ></v-divider>
-        <!-- Delete person -->
+        <!-- Delete lock and unlock person -->
         <v-container
           v-if="authStore.hasPersonenLoeschenPermission"
           class="person-delete"
@@ -1023,6 +1050,12 @@
           <v-row class="ml-md-16">
             <v-col>
               <h3 class="subtitle-1">{{ $t('admin.person.status') }}</h3>
+              <div
+                v-for="(attribute, key) in personStore.currentPerson?.person.attributes"
+                :key="key"
+              >
+                <p>{{ keyMapper(key) }} {{ keyValueMapper(key, attribute.toString()) }}</p>
+              </div>
             </v-col>
             <v-col
               class="mr-lg-13"
@@ -1033,18 +1066,9 @@
               <div class="d-flex justify-sm-end">
                 <PersonLock
                   :errorCode="personStore.errorCode"
-                  :isLocked="true"
+                  :isLocked="personStore.currentPerson.person.isLocked || false"
                   :person="personStore.currentPerson"
-                  @onlockUser="onlockUser(currentPersonId, true)"
-                >
-                </PersonLock>
-              </div>
-              <div class="d-flex justify-sm-end">
-                <PersonLock
-                  :errorCode="personStore.errorCode"
-                  :isLocked="false"
-                  :person="personStore.currentPerson"
-                  @onlockUser="onlockUser(currentPersonId, false)"
+                  @onLockUser="onLockUser(currentPersonId, !(personStore.currentPerson.person.isLocked || false))"
                 >
                 </PersonLock>
               </div>
@@ -1252,6 +1276,7 @@
     .save-cancel-row {
       margin-top: -40px;
     }
+
     .cancel-col {
       margin-bottom: -15px;
     }

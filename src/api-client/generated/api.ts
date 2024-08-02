@@ -1378,6 +1378,18 @@ export interface PersonResponse {
      * @memberof PersonResponse
      */
     'personalnummer': string | null;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof PersonResponse
+     */
+    'isLocked': boolean | null;
+    /**
+     * 
+     * @type {object}
+     * @memberof PersonResponse
+     */
+    'attributes': object | null;
 }
 
 
