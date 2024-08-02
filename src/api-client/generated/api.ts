@@ -738,6 +738,19 @@ export type Jahrgangsstufe = typeof Jahrgangsstufe[keyof typeof Jahrgangsstufe];
 /**
  * 
  * @export
+ * @interface LockUserDto
+ */
+export interface LockUserDto {
+    /**
+     * 
+     * @type {boolean}
+     * @memberof LockUserDto
+     */
+    'lock': boolean;
+}
+/**
+ * 
+ * @export
  * @interface LoeschungResponse
  */
 export interface LoeschungResponse {
@@ -4558,88 +4571,6 @@ export const PersonenApiAxiosParamCreator = function (configuration?: Configurat
         },
         /**
          * 
-         * @param {string} personId 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        personControllerDisablePerson: async (personId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'personId' is not null or undefined
-            assertParamExists('personControllerDisablePerson', 'personId', personId)
-            const localVarPath = `/api/personen/{personId}/disable`
-                .replace(`{${"personId"}}`, encodeURIComponent(String(personId)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication bearer required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            // authentication oauth2 required
-            // oauth required
-            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @param {string} personId 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        personControllerEnablePerson: async (personId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'personId' is not null or undefined
-            assertParamExists('personControllerEnablePerson', 'personId', personId)
-            const localVarPath = `/api/personen/{personId}/enable`
-                .replace(`{${"personId"}}`, encodeURIComponent(String(personId)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication bearer required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            // authentication oauth2 required
-            // oauth required
-            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
          * @param {string} personId The id for the account.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -4834,6 +4765,53 @@ export const PersonenApiAxiosParamCreator = function (configuration?: Configurat
         },
         /**
          * 
+         * @param {string} personId 
+         * @param {LockUserDto} lockUserDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        personControllerLockPerson: async (personId: string, lockUserDto: LockUserDto, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'personId' is not null or undefined
+            assertParamExists('personControllerLockPerson', 'personId', personId)
+            // verify required parameter 'lockUserDto' is not null or undefined
+            assertParamExists('personControllerLockPerson', 'lockUserDto', lockUserDto)
+            const localVarPath = `/api/personen/{personId}/lock-user`
+                .replace(`{${"personId"}}`, encodeURIComponent(String(personId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(lockUserDto, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @param {string} personId The id for the account.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -4963,26 +4941,6 @@ export const PersonenApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
-         * @param {string} personId 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async personControllerDisablePerson(personId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.personControllerDisablePerson(personId, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
-         * 
-         * @param {string} personId 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async personControllerEnablePerson(personId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.personControllerEnablePerson(personId, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
-         * 
          * @param {string} personId The id for the account.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -5023,6 +4981,17 @@ export const PersonenApiFp = function(configuration?: Configuration) {
          */
         async personControllerFindPersons(offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', organisationIDs?: Array<string>, rolleIDs?: Array<string>, suchFilter?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<PersonendatensatzResponse>>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.personControllerFindPersons(offset, limit, referrer, familienname, vorname, sichtfreigabe, organisationIDs, rolleIDs, suchFilter, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @param {string} personId 
+         * @param {LockUserDto} lockUserDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async personControllerLockPerson(personId: string, lockUserDto: LockUserDto, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.personControllerLockPerson(personId, lockUserDto, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -5086,24 +5055,6 @@ export const PersonenApiFactory = function (configuration?: Configuration, baseP
         },
         /**
          * 
-         * @param {string} personId 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        personControllerDisablePerson(personId: string, options?: any): AxiosPromise<void> {
-            return localVarFp.personControllerDisablePerson(personId, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @param {string} personId 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        personControllerEnablePerson(personId: string, options?: any): AxiosPromise<void> {
-            return localVarFp.personControllerEnablePerson(personId, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
          * @param {string} personId The id for the account.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -5142,6 +5093,16 @@ export const PersonenApiFactory = function (configuration?: Configuration, baseP
          */
         personControllerFindPersons(offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', organisationIDs?: Array<string>, rolleIDs?: Array<string>, suchFilter?: string, options?: any): AxiosPromise<Array<PersonendatensatzResponse>> {
             return localVarFp.personControllerFindPersons(offset, limit, referrer, familienname, vorname, sichtfreigabe, organisationIDs, rolleIDs, suchFilter, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {string} personId 
+         * @param {LockUserDto} lockUserDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        personControllerLockPerson(personId: string, lockUserDto: LockUserDto, options?: any): AxiosPromise<void> {
+            return localVarFp.personControllerLockPerson(personId, lockUserDto, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -5201,24 +5162,6 @@ export interface PersonenApiInterface {
 
     /**
      * 
-     * @param {string} personId 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof PersonenApiInterface
-     */
-    personControllerDisablePerson(personId: string, options?: AxiosRequestConfig): AxiosPromise<void>;
-
-    /**
-     * 
-     * @param {string} personId 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof PersonenApiInterface
-     */
-    personControllerEnablePerson(personId: string, options?: AxiosRequestConfig): AxiosPromise<void>;
-
-    /**
-     * 
      * @param {string} personId The id for the account.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -5257,6 +5200,16 @@ export interface PersonenApiInterface {
      * @memberof PersonenApiInterface
      */
     personControllerFindPersons(offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', organisationIDs?: Array<string>, rolleIDs?: Array<string>, suchFilter?: string, options?: AxiosRequestConfig): AxiosPromise<Array<PersonendatensatzResponse>>;
+
+    /**
+     * 
+     * @param {string} personId 
+     * @param {LockUserDto} lockUserDto 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PersonenApiInterface
+     */
+    personControllerLockPerson(personId: string, lockUserDto: LockUserDto, options?: AxiosRequestConfig): AxiosPromise<void>;
 
     /**
      * 
@@ -5322,28 +5275,6 @@ export class PersonenApi extends BaseAPI implements PersonenApiInterface {
 
     /**
      * 
-     * @param {string} personId 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof PersonenApi
-     */
-    public personControllerDisablePerson(personId: string, options?: AxiosRequestConfig) {
-        return PersonenApiFp(this.configuration).personControllerDisablePerson(personId, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @param {string} personId 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof PersonenApi
-     */
-    public personControllerEnablePerson(personId: string, options?: AxiosRequestConfig) {
-        return PersonenApiFp(this.configuration).personControllerEnablePerson(personId, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
      * @param {string} personId The id for the account.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -5387,6 +5318,18 @@ export class PersonenApi extends BaseAPI implements PersonenApiInterface {
      */
     public personControllerFindPersons(offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', organisationIDs?: Array<string>, rolleIDs?: Array<string>, suchFilter?: string, options?: AxiosRequestConfig) {
         return PersonenApiFp(this.configuration).personControllerFindPersons(offset, limit, referrer, familienname, vorname, sichtfreigabe, organisationIDs, rolleIDs, suchFilter, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {string} personId 
+     * @param {LockUserDto} lockUserDto 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PersonenApi
+     */
+    public personControllerLockPerson(personId: string, lockUserDto: LockUserDto, options?: AxiosRequestConfig) {
+        return PersonenApiFp(this.configuration).personControllerLockPerson(personId, lockUserDto, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

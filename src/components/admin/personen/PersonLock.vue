@@ -1,33 +1,25 @@
 <script setup lang="ts">
-  import { computed, type ComputedRef, ref, type Ref } from 'vue';
+  import { ref, type Ref } from 'vue';
   import { type Personendatensatz } from '@/stores/PersonStore';
-  import { type Composer, useI18n } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import PasswordOutput from '@/components/form/PasswordOutput.vue';
-  import SpshTooltip from '@/components/admin/SpshTooltip.vue';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
   type Props = {
     errorCode: string;
-    disabled: boolean;
+    isLocked: boolean;
     person: Personendatensatz;
-    password: string;
   };
 
-  type Emits = {
-    (event: 'onClearPassword'): void;
-    (event: 'onResetPassword', id: string): void;
-  };
+  type Emits = (event: 'onlockUser', id: string, lock: boolean) => void;
 
   const props: Props = defineProps<Props>();
   const emit: Emits = defineEmits<Emits>();
   const errorMessage: Ref<string> = ref('');
 
-  async function closePasswordResetDialog(isActive: Ref<boolean>): Promise<void> {
+  async function closeLockPersonDialog(isActive: Ref<boolean>): Promise<void> {
     isActive.value = false;
-    emit('onClearPassword');
   }
 </script>
 
@@ -39,22 +31,14 @@
         sm="6"
         md="auto"
       >
-        <SpshTooltip
-          :enabledCondition="!disabled"
-          :disabledText="$t('person.finishEditFirst')"
-          :enabledText="$t('admin.person.changePassword')"
-          position="start"
+        <v-btn
+          class="primary"
+          data-testid="open-lock-dialog-icon"
+          :block="mdAndDown"
+          v-bind="props"
         >
-          <v-btn
-            class="primary"
-            data-testid="open-password-reset-dialog-icon"
-            :block="mdAndDown"
-            :disabled="disabled"
-            v-bind="props"
-          >
-            {{ $t('person.lockUser') }}
-          </v-btn>
-        </SpshTooltip>
+          {{ isLocked ? $t('person.lockUser') : $t('person.unlockUser') }}
+        </v-btn>
       </v-col>
     </template>
 
@@ -62,12 +46,12 @@
       <LayoutCard
         :closable="true"
         :header="$t('person.lockUser')"
-        @onCloseClicked="closePasswordResetDialog(isActive)"
+        @onCloseClicked="closeLockPersonDialog(isActive)"
       >
         <v-card-text>
           <v-container>
             <v-row
-              v-if="errorMessage || errorCode"
+              v-if="errorMessage || props.errorCode"
               class="text-body text-error"
             >
               <v-col
@@ -78,17 +62,20 @@
               </v-col>
               <v-col>
                 <p data-testid="error-text">
-                  {{ errorMessage || errorCode }}
+                  {{ errorMessage || props.errorCode }}
                 </p>
               </v-col>
             </v-row>
             <v-row class="text-body bold px-md-16">
               <v-col>
-                <p data-testid="password-reset-info-text">
-                  [waehle die Schule aus ] - Select Drop Down
+                <p
+                  data-testid="lock-user-info-text"
+                  class="text-body"
+                >
+                  {{ props.isLocked ? $t('person.lockUserInfoText') : $t('person.unLockUserInfoText') }}
                 </p>
               </v-col>
-            </v-row>            
+            </v-row>
           </v-container>
         </v-card-text>
         <v-card-actions class="justify-center">
@@ -101,10 +88,10 @@
               <v-btn
                 :block="mdAndDown"
                 class="secondary button"
-                @click.stop="closePasswordResetDialog(isActive)"
-                data-testid="close-password-reset-dialog-button"
+                @click.stop="closeLockPersonDialog(isActive)"
+                data-testid="close-lock-user-dialog-button"
               >
-                {{ !!password ? $t('close') : $t('cancel') }}
+                {{ $t('cancel') }}
               </v-btn>
             </v-col>
             <v-col
@@ -115,10 +102,10 @@
               <v-btn
                 :block="mdAndDown"
                 class="primary button"
-                @click.stop="$emit('onResetPassword', person.person.id)"
+                @click.stop="emit('onlockUser', props.person.person.id, !props.isLocked)"
                 data-testid="lock-user-button"
               >
-                {{ $t('person.lockUser') }}
+                {{ props.isLocked ? $t('person.lockUser') : $t('person.unlockUser') }}
               </v-btn>
             </v-col>
           </v-row>
@@ -127,5 +114,3 @@
     </template>
   </v-dialog>
 </template>
-
-<style></style>

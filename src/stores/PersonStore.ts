@@ -54,8 +54,7 @@ type PersonActions = {
   getPersonById: (personId: string) => Promise<Personendatensatz>;
   resetPassword: (personId: string) => Promise<string>;
   deletePerson: (personId: string) => Promise<void>;
-  lockPerson: (personId: string) => Promise<void>;
-  unlockPerson: (personId: string) => Promise<void>;
+  lockPerson: (personId: string, lock: boolean) => Promise<void>;
 };
 
 export type PersonStore = Store<'personStore', PersonState, PersonGetters, PersonActions>;
@@ -147,24 +146,10 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
         this.loading = false;
       }
     },
-    async lockPerson(personId: string) {
+    async lockPerson(personId: string, lock: boolean) {
       this.loading = true;
       try {
-        await personenApi.personControllerDisablePerson(personId);
-      } catch (error: unknown) {
-        this.errorCode = 'UNSPECIFIED_ERROR';
-        if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
-        }
-        return await Promise.reject(this.errorCode);
-      } finally {
-        this.loading = false;
-      }
-    },
-    async unlockPerson(personId: string) {
-      this.loading = true;
-      try {
-        await personenApi.personControllerEnablePerson(personId);
+        await personenApi.personControllerLockPerson(personId, { lock: lock });
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {

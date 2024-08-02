@@ -83,14 +83,8 @@
     });
   }
 
-  function lockPerson(personId: string): void {
-    console.log('Locking person with id:', personId);
-    personStore.lockPerson(personId);
-  }
-
-  function unlockPerson(personId: string): void {
-    console.log('Unlocking person with id:', personId);
-    personStore.unlockPerson(personId);
+  function onlockUser(personId: string, lock: boolean): void {
+    personStore.lockPerson(personId, lock);
   }
 
   const handleAlertClose = (): void => {
@@ -1021,49 +1015,6 @@
           color="#E5EAEF"
           thickness="6"
         ></v-divider>
-        <!-- Lock User -->
-        <v-container>
-          <v-row class="ml-md-16">
-            <v-col>
-              <h3 class="subtitle-1">{{ $t('person.lockUser') }}</h3>
-            </v-col>
-            <v-col
-              class="mr-lg-13"
-              cols="12"
-              md="auto"
-              v-if="personStore.currentPerson"
-            >
-              <div class="d-flex justify-sm-end">
-                <PersonLock
-                  :errorCode="personStore.errorCode"
-                  :disabled="isEditActive"
-                  :person="personStore.currentPerson"
-                  @onClearPassword="password = ''"
-                  @onResetPassword="lockPerson(currentPersonId)"
-                  :password="password"
-                >
-                </PersonLock>
-              </div>
-              <div class="d-flex justify-sm-end">
-                <PersonLock
-                  :errorCode="personStore.errorCode"
-                  :disabled="isEditActive"
-                  :person="personStore.currentPerson"
-                  @onClearPassword="password = ''"
-                  @onResetPassword="unlockPerson(currentPersonId)"
-                  :password="password"
-                >
-                </PersonLock>
-              </div>
-            </v-col>
-            <v-col v-else-if="personStore.loading"> <v-progress-circular indeterminate></v-progress-circular></v-col
-          ></v-row>
-        </v-container>
-        <v-divider
-          class="border-opacity-100 rounded my-6 mx-4"
-          color="#E5EAEF"
-          thickness="6"
-        ></v-divider>
         <!-- Delete person -->
         <v-container
           v-if="authStore.hasPersonenLoeschenPermission"
@@ -1079,6 +1030,24 @@
               md="auto"
               v-if="personStore.currentPerson"
             >
+              <div class="d-flex justify-sm-end">
+                <PersonLock
+                  :errorCode="personStore.errorCode"
+                  :isLocked="true"
+                  :person="personStore.currentPerson"
+                  @onlockUser="onlockUser(currentPersonId, true)"
+                >
+                </PersonLock>
+              </div>
+              <div class="d-flex justify-sm-end">
+                <PersonLock
+                  :errorCode="personStore.errorCode"
+                  :isLocked="false"
+                  :person="personStore.currentPerson"
+                  @onlockUser="onlockUser(currentPersonId, false)"
+                >
+                </PersonLock>
+              </div>
               <div class="d-flex justify-sm-end">
                 <PersonDelete
                   :disabled="isEditActive"
