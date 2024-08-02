@@ -118,7 +118,9 @@
 
   function applySearchAndFilters(): void {
     personStore.getAllPersons({
-      organisationIDs: searchFilterStore.selectedKlassen?.length ? searchFilterStore.selectedKlassen : searchFilterStore.selectedSchulen || [],
+      organisationIDs: searchFilterStore.selectedKlassen?.length
+        ? searchFilterStore.selectedKlassen
+        : searchFilterStore.selectedSchulen || [],
       rolleIDs: searchFilterStore.selectedRollen || [],
       searchFilter: searchFilterStore.searchFilter || '',
     });
