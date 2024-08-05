@@ -289,7 +289,7 @@
         :discardButtonLabel="$t('admin.person.discard')"
         id="person-creation-form"
         :onDiscard="navigateToPersonTable"
-        @onShowDialogChange="(value: boolean) => (showUnsavedChangesDialog = value)"
+        @onShowDialogChange="(value: boolean | undefined) => (showUnsavedChangesDialog = value || false)"
         :onSubmit="onSubmit"
         :showUnsavedChangesDialog="showUnsavedChangesDialog"
       >

@@ -67,6 +67,16 @@ export type Rolle = {
   serviceProviders?: Array<ServiceProviderResponse>;
 };
 
+export type RolleTableItem = {
+  administeredBySchulstrukturknoten: string;
+  id: string;
+  merkmale: string;
+  name: string;
+  rollenart: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type RolleStore = Store<'rolleStore', RolleState, RolleGetters, RolleActions>;
 
 export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGetters, RolleActions> = defineStore({

@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import { computed, type ComputedRef } from 'vue';
   import { type Composer, useI18n } from 'vue-i18n';
+  import {type RolleTableItem } from '@/stores/RolleStore';
 
   /* this block is necessary to introduce a table header type for defining table headers
       watch source for updates: https://stackoverflow.com/a/75993081/4790594
@@ -8,7 +9,7 @@
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
   type ReadonlyHeaders = InstanceType<typeof VDataTableServer>['headers'];
 
-  type TableItem = Record<string, unknown>;
+  type TableItem = RolleTableItem;
 
   type Props = {
     items: TableItem[];

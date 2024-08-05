@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { RollenMerkmal, useRolleStore, type Rolle, type RolleResponse, type RolleStore } from '@/stores/RolleStore';
+  import { RollenMerkmal, useRolleStore, type RolleTableItem, type RolleResponse, type RolleStore } from '@/stores/RolleStore';
   import { computed, onMounted, type ComputedRef } from 'vue';
   import ResultTable from '@/components/admin/ResultTable.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
@@ -27,17 +27,7 @@
     },
   ];
 
-  const transformedRollenAndMerkmale: ComputedRef<
-    {
-      rollenart: string;
-      merkmale: string;
-      id: string;
-      createdAt: string;
-      updatedAt: string;
-      name: string;
-      administeredBySchulstrukturknoten: string;
-    }[]
-  > = computed(() => {
+  const transformedRollenAndMerkmale: ComputedRef<RolleTableItem[]> = computed(() => {
     return rolleStore.allRollen.map((rolle: RolleResponse) => {
       // Find the organization that matches the rolle.administeredBySchulstrukturknoten
       const matchingOrganisation: Organisation | undefined = organisationStore.allOrganisationen.find(
@@ -68,7 +58,7 @@
     });
   });
 
-  function navigateToRolleDetails(_$event: PointerEvent, { item }: { item: Rolle }): void {
+  function navigateToRolleDetails(_$event: PointerEvent, item: RolleTableItem ): void {
     router.push({ name: 'rolle-details', params: { id: item.id } });
   }
 

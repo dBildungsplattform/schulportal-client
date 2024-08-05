@@ -393,7 +393,7 @@
             <RolleForm
               :onHandleConfirmUnsavedChanges="handleConfirmUnsavedChanges"
               :onHandleDiscard="navigateToRolleTable"
-              :onShowDialogChange="(value: boolean) => (showUnsavedChangesDialog = value)"
+              :onShowDialogChange="(value: boolean | undefined) => (showUnsavedChangesDialog = value || false)"
               :onSubmit="onSubmit"
               :isEditActive="isEditActive"
               :readonly="true"
