@@ -83,8 +83,9 @@
     });
   }
 
-  function onLockUser(personId: string, lock: boolean): void {
-    personStore.lockPerson(personId, lock);
+  function onLockUser(personId: string, lock: boolean, schule: string): void {
+    console.log(personId, lock, schule);
+    personStore.lockPerson(personId, lock, authStore.currentUser?.name + ' - ' + schule);
   }
 
   const handleAlertClose = (): void => {
@@ -109,9 +110,9 @@
 
   function keyMapper(key: string): string {
     switch (key) {
-      case 'locked_from':
+      case 'lock_locked_from':
         return t('person.lockedFrom');
-      case 'timestamp':
+      case 'lock_timestamp':
         return t('person.lockedSince');
       default:
         return key;
@@ -120,7 +121,7 @@
 
   function keyValueMapper(key: string, value: string): string {
     switch (key) {
-      case 'timestamp':
+      case 'lock_timestamp':
         return new Intl.DateTimeFormat('de-DE', {
           year: 'numeric',
           month: '2-digit',
@@ -1042,11 +1043,7 @@
           color="#E5EAEF"
           thickness="6"
         ></v-divider>
-        <!-- Delete, lock and unlock person -->
-        <v-container
-          v-if="authStore.hasPersonenLoeschenPermission"
-          class="person-delete"
-        >
+        <v-container class="person-lock">
           <v-row class="ml-md-16">
             <v-col>
               <h3 class="subtitle-1">{{ $t('admin.person.status') }}</h3>
@@ -1068,10 +1065,41 @@
                   :errorCode="personStore.errorCode"
                   :isLocked="personStore.currentPerson.person.isLocked || false"
                   :person="personStore.currentPerson"
-                  @onLockUser="onLockUser(currentPersonId, !(personStore.currentPerson.person.isLocked || false))"
+                  :adminId="authStore.currentUser?.personId!"
+                  @onLockUser="onLockUser"
                 >
                 </PersonLock>
               </div>
+            </v-col>
+            <v-col v-else-if="personStore.loading"> <v-progress-circular indeterminate></v-progress-circular></v-col
+          ></v-row>
+        </v-container>
+        <v-divider
+          class="border-opacity-100 rounded my-6 mx-4"
+          color="#E5EAEF"
+          thickness="6"
+        ></v-divider>
+        <!-- Delete, lock and unlock person -->
+        <v-container
+          v-if="authStore.hasPersonenLoeschenPermission"
+          class="person-delete"
+        >
+          <v-row class="ml-md-16">
+            <v-col>
+              <h3 class="subtitle-1">{{ $t('admin.person.status') }}</h3>
+              <div
+                v-for="(attribute, key) in personStore.currentPerson?.person.attributes"
+                :key="key"
+              >
+                <p>{{ keyMapper(key) }} {{ keyValueMapper(key, attribute.toString()) }}</p>
+              </div>
+            </v-col>
+            <v-col
+              class="mr-lg-13"
+              cols="12"
+              md="auto"
+              v-if="personStore.currentPerson"
+            >
               <div class="d-flex justify-sm-end">
                 <PersonDelete
                   :disabled="isEditActive"

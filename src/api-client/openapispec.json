@@ -717,7 +717,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/LockUserDto"
+                "$ref": "#/components/schemas/LockUserBodyParams"
               }
             }
           }
@@ -3948,16 +3948,21 @@
           "revision"
         ]
       },
-      "LockUserDto": {
+      "LockUserBodyParams": {
         "type": "object",
         "properties": {
           "lock": {
             "type": "boolean",
             "nullable": false
+          },
+          "locked_from": {
+            "type": "string",
+            "nullable": false
           }
         },
         "required": [
-          "lock"
+          "lock",
+          "locked_from"
         ]
       },
       "OrganisationsTyp": {

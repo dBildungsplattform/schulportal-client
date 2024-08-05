@@ -56,7 +56,7 @@ type PersonActions = {
   getPersonById: (personId: string) => Promise<Personendatensatz>;
   resetPassword: (personId: string) => Promise<string>;
   deletePerson: (personId: string) => Promise<void>;
-  lockPerson: (personId: string, lock: boolean) => Promise<void>;
+  lockPerson: (personId: string, lock: boolean, locked_from: string) => Promise<void>;
 };
 
 export type PersonStore = Store<'personStore', PersonState, PersonGetters, PersonActions>;
@@ -148,11 +148,10 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
         this.loading = false;
       }
     },
-    async lockPerson(personId: string, lock: boolean) {
+    async lockPerson(personId: string, lock: boolean, locked_from: string) {
       this.loading = true;
       try {
-        const response = await personenApi.personControllerLockPerson(personId, { lock: lock });
-        console.log(response);
+        await personenApi.personControllerLockPerson(personId, { lock: lock, locked_from: locked_from });
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {

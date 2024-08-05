@@ -738,15 +738,21 @@ export type Jahrgangsstufe = typeof Jahrgangsstufe[keyof typeof Jahrgangsstufe];
 /**
  * 
  * @export
- * @interface LockUserDto
+ * @interface LockUserBodyParams
  */
-export interface LockUserDto {
+export interface LockUserBodyParams {
     /**
      * 
      * @type {boolean}
-     * @memberof LockUserDto
+     * @memberof LockUserBodyParams
      */
     'lock': boolean;
+    /**
+     * 
+     * @type {string}
+     * @memberof LockUserBodyParams
+     */
+    'locked_from': string;
 }
 /**
  * 
@@ -4778,15 +4784,15 @@ export const PersonenApiAxiosParamCreator = function (configuration?: Configurat
         /**
          * 
          * @param {string} personId 
-         * @param {LockUserDto} lockUserDto 
+         * @param {LockUserBodyParams} lockUserBodyParams 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        personControllerLockPerson: async (personId: string, lockUserDto: LockUserDto, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        personControllerLockPerson: async (personId: string, lockUserBodyParams: LockUserBodyParams, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'personId' is not null or undefined
             assertParamExists('personControllerLockPerson', 'personId', personId)
-            // verify required parameter 'lockUserDto' is not null or undefined
-            assertParamExists('personControllerLockPerson', 'lockUserDto', lockUserDto)
+            // verify required parameter 'lockUserBodyParams' is not null or undefined
+            assertParamExists('personControllerLockPerson', 'lockUserBodyParams', lockUserBodyParams)
             const localVarPath = `/api/personen/{personId}/lock-user`
                 .replace(`{${"personId"}}`, encodeURIComponent(String(personId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -4815,7 +4821,7 @@ export const PersonenApiAxiosParamCreator = function (configuration?: Configurat
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(lockUserDto, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(lockUserBodyParams, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -4998,12 +5004,12 @@ export const PersonenApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @param {string} personId 
-         * @param {LockUserDto} lockUserDto 
+         * @param {LockUserBodyParams} lockUserBodyParams 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async personControllerLockPerson(personId: string, lockUserDto: LockUserDto, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.personControllerLockPerson(personId, lockUserDto, options);
+        async personControllerLockPerson(personId: string, lockUserBodyParams: LockUserBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.personControllerLockPerson(personId, lockUserBodyParams, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -5109,12 +5115,12 @@ export const PersonenApiFactory = function (configuration?: Configuration, baseP
         /**
          * 
          * @param {string} personId 
-         * @param {LockUserDto} lockUserDto 
+         * @param {LockUserBodyParams} lockUserBodyParams 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        personControllerLockPerson(personId: string, lockUserDto: LockUserDto, options?: any): AxiosPromise<void> {
-            return localVarFp.personControllerLockPerson(personId, lockUserDto, options).then((request) => request(axios, basePath));
+        personControllerLockPerson(personId: string, lockUserBodyParams: LockUserBodyParams, options?: any): AxiosPromise<void> {
+            return localVarFp.personControllerLockPerson(personId, lockUserBodyParams, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -5216,12 +5222,12 @@ export interface PersonenApiInterface {
     /**
      * 
      * @param {string} personId 
-     * @param {LockUserDto} lockUserDto 
+     * @param {LockUserBodyParams} lockUserBodyParams 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PersonenApiInterface
      */
-    personControllerLockPerson(personId: string, lockUserDto: LockUserDto, options?: AxiosRequestConfig): AxiosPromise<void>;
+    personControllerLockPerson(personId: string, lockUserBodyParams: LockUserBodyParams, options?: AxiosRequestConfig): AxiosPromise<void>;
 
     /**
      * 
@@ -5335,13 +5341,13 @@ export class PersonenApi extends BaseAPI implements PersonenApiInterface {
     /**
      * 
      * @param {string} personId 
-     * @param {LockUserDto} lockUserDto 
+     * @param {LockUserBodyParams} lockUserBodyParams 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PersonenApi
      */
-    public personControllerLockPerson(personId: string, lockUserDto: LockUserDto, options?: AxiosRequestConfig) {
-        return PersonenApiFp(this.configuration).personControllerLockPerson(personId, lockUserDto, options).then((request) => request(this.axios, this.basePath));
+    public personControllerLockPerson(personId: string, lockUserBodyParams: LockUserBodyParams, options?: AxiosRequestConfig) {
+        return PersonenApiFp(this.configuration).personControllerLockPerson(personId, lockUserBodyParams, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
