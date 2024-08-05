@@ -3,11 +3,7 @@
   import type { BaseFieldProps } from 'vee-validate';
   import FormWrapper from '@/components/form/FormWrapper.vue';
   import FormRow from '@/components/form/FormRow.vue';
-
-  type TranslatedObject = {
-    value: string;
-    title: string;
-  };
+  import { type TranslatedObject } from '@/types.d';
 
   type Props = {
     administrationsebenen?: Array<{ value: string; title: string }>;

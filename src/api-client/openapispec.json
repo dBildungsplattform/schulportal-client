@@ -1696,6 +1696,88 @@
                 ]
             }
         },
+        "/api/organisationen/{organisationId}/name": {
+            "patch": {
+                "operationId": "OrganisationController_updateOrganisationName",
+                "parameters": [
+                    {
+                        "name": "organisationId",
+                        "required": true,
+                        "in": "path",
+                        "description": "The id of an organization",
+                        "schema": {
+                            "nullable": false,
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/OrganisationByNameBodyParams"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "The organizations were successfully updated.",
+                        "headers": {
+                            "X-Paging-Offset": {
+                                "description": "The offset of the first item from the list. List starts with index 0."
+                            },
+                            "X-Paging-Limit": {
+                                "description": "The maximum amount of items returned in one request."
+                            },
+                            "X-Paging-Total": {
+                                "description": "The total amount of items in the list."
+                            }
+                        },
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OrganisationResponseLegacy"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "The organisation could not be modified.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DbiamOrganisationError"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Not authorized to modify the organisation."
+                    },
+                    "403": {
+                        "description": "Not permitted to modify the organisation."
+                    },
+                    "500": {
+                        "description": "Internal server error while modifying the organisation."
+                    }
+                },
+                "tags": [
+                    "organisationen"
+                ],
+                "security": [
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
         "/api/rolle": {
             "get": {
                 "operationId": "RolleController_findRollen",
@@ -1998,6 +2080,57 @@
                     },
                     "500": {
                         "description": "Internal server error while updating the rolle."
+                    }
+                },
+                "tags": [
+                    "rolle"
+                ],
+                "security": [
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
+                    {
+                        "bearer": []
+                    }
+                ]
+            },
+            "delete": {
+                "operationId": "RolleController_deleteRolle",
+                "summary": "",
+                "description": "Delete a role by id.",
+                "parameters": [
+                    {
+                        "name": "rolleId",
+                        "required": true,
+                        "in": "path",
+                        "description": "The id for the rolle.",
+                        "schema": {
+                            "nullable": false,
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Role was deleted successfully."
+                    },
+                    "400": {
+                        "description": "The input was not valid.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DbiamRolleError"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Not authorized to delete the role."
+                    },
+                    "404": {
+                        "description": "The rolle that should be deleted does not exist."
                     }
                 },
                 "tags": [
@@ -4091,7 +4224,8 @@
                             "ZYKLUS_IN_ORGANISATION",
                             "ROOT_ORGANISATION_IMMUTABLE",
                             "KLASSE_NUR_VON_SCHULE_ADMINISTRIERT",
-                            "KLASSENNAME_AN_SCHULE_EINDEUTIG"
+                            "KLASSENNAME_AN_SCHULE_EINDEUTIG",
+                            "NAME_REQUIRED_FOR_KLASSE"
                         ]
                     },
                     "code": {
@@ -4218,6 +4352,17 @@
                 },
                 "required": [
                     "organisationId"
+                ]
+            },
+            "OrganisationByNameBodyParams": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "name"
                 ]
             },
             "RollenArt": {
@@ -4523,6 +4668,7 @@
                         "enum": [
                             "ROLLE_ERROR",
                             "ADD_SYSTEMRECHT_ERROR",
+                            "ROLLE_HAT_PERSONENKONTEXTE_ERROR",
                             "UPDATE_MERKMALE_ERROR"
                         ]
                     },
