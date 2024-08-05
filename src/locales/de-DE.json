@@ -251,6 +251,7 @@
         "NAME_REQUIRED_FOR_SCHULE": "Die Angabe eines Namens ist erforderlich.",
         "NUR_KLASSE_UNTER_SCHULE": "Die Klasse muss einer Schule zugeordnet werden.",
         "ORGANISATION_SPECIFICATION_ERROR": "Die Schule konnte nicht angelegt werden.",
+        "SCHULE_KENNUNG_EINDEUTIG": "Die Dienststellennummer existiert bereits.",
         "SCHULE_UNTER_TRAEGER": "Eine Schule darf nicht einer anderen Schule zugeordnet werden."
       },
       "management": "Schulverwaltung",
