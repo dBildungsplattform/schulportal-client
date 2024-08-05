@@ -19,7 +19,7 @@
   const emit: Emits = defineEmits<Emits>();
   const errorMessage: Ref<string> = ref('');
   const successMessage: Ref<string> = ref('');
-  const isLockedTemp: Ref<boolean> = ref(props.isLocked);
+  const isLockedTemp: Ref<boolean> = ref(!props.isLocked);
 
   async function closeLockPersonDialog(isActive: Ref<boolean>): Promise<void> {
     isActive.value = false;
@@ -29,7 +29,6 @@
   }
 
   async function handleOnLockUser(id: string, lock: boolean): Promise<void> {
-    console.log('props', props);
     try {
       await emit('onLockUser', id, lock);
       successMessage.value = !lock ? t('person.lockUserSuccess') : t('person.unlockUserSuccess');

@@ -1042,7 +1042,7 @@
           color="#E5EAEF"
           thickness="6"
         ></v-divider>
-        <!-- Delete lock and unlock person -->
+        <!-- Delete, lock and unlock person -->
         <v-container
           v-if="authStore.hasPersonenLoeschenPermission"
           class="person-delete"
