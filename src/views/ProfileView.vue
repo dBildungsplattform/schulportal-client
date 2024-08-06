@@ -325,17 +325,25 @@
                   @onCloseClicked="closeChangePasswordDialog()"
                 >
                   <v-card-text>
-                    <v-container>
-                      <v-icon
-                        class="w-100 mb-4"
-                        size="x-large"
-                        icon="mdi-information-slab-circle-outline"
-                      ></v-icon>
-                      <p class="text-body">
-                        {{ $t('profile.changePasswordInfo') }}
-                      </p>
+                    <v-container class="d-flex align-center">
+                      <v-col
+                        cols="auto"
+                        class="d-flex justify-center"
+                      >
+                        <v-icon
+                          class="mr-2"
+                          size="x-large"
+                          icon="mdi-information-slab-circle-outline"
+                        ></v-icon>
+                      </v-col>
+                      <v-col>
+                        <p class="text-body">
+                          {{ $t('profile.changePasswordInfo') }}
+                        </p>
+                      </v-col>
                     </v-container>
                   </v-card-text>
+
                   <v-card-actions class="justify-center">
                     <v-row class="justify-center">
                       <v-col
