@@ -4,6 +4,7 @@ import {
   Class2FAApiFactory,
   PersonenApiFactory,
   PersonenFrontendApiFactory,
+  type Class2FAApiInterface,
   type DbiamCreatePersonWithContextBodyParams,
   type PersonenApiInterface,
   type PersonendatensatzResponse,
@@ -18,7 +19,7 @@ import { type DbiamPersonenkontextBodyParams } from './PersonenkontextStore';
 const personenApi: PersonenApiInterface = PersonenApiFactory(undefined, '', axiosApiInstance);
 const personenFrontendApi: PersonenFrontendApiInterface = PersonenFrontendApiFactory(undefined, '', axiosApiInstance);
 
-const twoFactorApi = Class2FAApiFactory(undefined, '', axiosApiInstance);
+const twoFactorApi: Class2FAApiInterface = Class2FAApiFactory(undefined, '', axiosApiInstance);
 
 export type Person = {
   id: string;
@@ -59,8 +60,8 @@ type PersonActions = {
   getPersonById: (personId: string) => Promise<Personendatensatz>;
   resetPassword: (personId: string) => Promise<string>;
   deletePerson: (personId: string) => Promise<void>;
-  get2FAState: (personUserName: string) => Promise<TokenStateResponse>;
-  get2FASoftwareQRCode: (personUserName: string) => Promise<string>;
+  get2FAState: (personId: string) => Promise<TokenStateResponse>;
+  get2FASoftwareQRCode: (personId: string) => Promise<string>;
 };
 
 export type PersonStore = Store<'personStore', PersonState, PersonGetters, PersonActions>;
@@ -153,11 +154,11 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
       }
     },
 
-    async get2FAState(userName: string) {
+    async get2FAState(personId: string) {
       this.loading = true;
       try {
         const token: TokenStateResponse = (
-          await twoFactorApi.privacyIdeaAdministrationControllerGetTwoAuthState(userName)
+          await twoFactorApi.privacyIdeaAdministrationControllerGetTwoAuthState(personId)
         ).data;
 
         return token;
@@ -172,13 +173,13 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
       }
     },
 
-    async get2FASoftwareQRCode(userName: string) {
+    async get2FASoftwareQRCode(personId: string) {
       this.loading = true;
       try {
         const bodyParams: TokenInitBodyParams = {
-          userName: userName,
+          personId: personId,
         };
-        let qrCodeImageBase64: string = (
+        const qrCodeImageBase64: string = (
           await twoFactorApi.privacyIdeaAdministrationControllerInitializeSoftwareToken(bodyParams)
         ).data;
 

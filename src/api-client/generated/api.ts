@@ -498,7 +498,8 @@ export const DbiamOrganisationErrorI18nKeyEnum = {
     ZyklusInOrganisation: 'ZYKLUS_IN_ORGANISATION',
     RootOrganisationImmutable: 'ROOT_ORGANISATION_IMMUTABLE',
     KlasseNurVonSchuleAdministriert: 'KLASSE_NUR_VON_SCHULE_ADMINISTRIERT',
-    KlassennameAnSchuleEindeutig: 'KLASSENNAME_AN_SCHULE_EINDEUTIG'
+    KlassennameAnSchuleEindeutig: 'KLASSENNAME_AN_SCHULE_EINDEUTIG',
+    NameRequiredForKlasse: 'NAME_REQUIRED_FOR_KLASSE'
 } as const;
 
 export type DbiamOrganisationErrorI18nKeyEnum = typeof DbiamOrganisationErrorI18nKeyEnum[keyof typeof DbiamOrganisationErrorI18nKeyEnum];
@@ -614,6 +615,7 @@ export interface DbiamRolleError {
 export const DbiamRolleErrorI18nKeyEnum = {
     RolleError: 'ROLLE_ERROR',
     AddSystemrechtError: 'ADD_SYSTEMRECHT_ERROR',
+    RolleHatPersonenkontexteError: 'ROLLE_HAT_PERSONENKONTEXTE_ERROR',
     UpdateMerkmaleError: 'UPDATE_MERKMALE_ERROR'
 } as const;
 
@@ -758,6 +760,19 @@ export interface OrganisationByIdBodyParams {
      * @memberof OrganisationByIdBodyParams
      */
     'organisationId': string;
+}
+/**
+ * 
+ * @export
+ * @interface OrganisationByNameBodyParams
+ */
+export interface OrganisationByNameBodyParams {
+    /**
+     * 
+     * @type {string}
+     * @memberof OrganisationByNameBodyParams
+     */
+    'name': string;
 }
 /**
  * 
@@ -2074,7 +2089,7 @@ export interface TokenInitBodyParams {
      * @type {string}
      * @memberof TokenInitBodyParams
      */
-    'userName': string;
+    'personId': string;
 }
 /**
  * 
@@ -2727,13 +2742,13 @@ export const Class2FAApiAxiosParamCreator = function (configuration?: Configurat
     return {
         /**
          * 
-         * @param {string} userName 
+         * @param {string} personId 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        privacyIdeaAdministrationControllerGetTwoAuthState: async (userName: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'userName' is not null or undefined
-            assertParamExists('privacyIdeaAdministrationControllerGetTwoAuthState', 'userName', userName)
+        privacyIdeaAdministrationControllerGetTwoAuthState: async (personId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'personId' is not null or undefined
+            assertParamExists('privacyIdeaAdministrationControllerGetTwoAuthState', 'personId', personId)
             const localVarPath = `/api/2fa-token/state`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -2754,8 +2769,8 @@ export const Class2FAApiAxiosParamCreator = function (configuration?: Configurat
             // oauth required
             await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
 
-            if (userName !== undefined) {
-                localVarQueryParameter['userName'] = userName;
+            if (personId !== undefined) {
+                localVarQueryParameter['personId'] = personId;
             }
 
 
@@ -2824,12 +2839,12 @@ export const Class2FAApiFp = function(configuration?: Configuration) {
     return {
         /**
          * 
-         * @param {string} userName 
+         * @param {string} personId 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async privacyIdeaAdministrationControllerGetTwoAuthState(userName: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TokenStateResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.privacyIdeaAdministrationControllerGetTwoAuthState(userName, options);
+        async privacyIdeaAdministrationControllerGetTwoAuthState(personId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TokenStateResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.privacyIdeaAdministrationControllerGetTwoAuthState(personId, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -2854,12 +2869,12 @@ export const Class2FAApiFactory = function (configuration?: Configuration, baseP
     return {
         /**
          * 
-         * @param {string} userName 
+         * @param {string} personId 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        privacyIdeaAdministrationControllerGetTwoAuthState(userName: string, options?: any): AxiosPromise<TokenStateResponse> {
-            return localVarFp.privacyIdeaAdministrationControllerGetTwoAuthState(userName, options).then((request) => request(axios, basePath));
+        privacyIdeaAdministrationControllerGetTwoAuthState(personId: string, options?: any): AxiosPromise<TokenStateResponse> {
+            return localVarFp.privacyIdeaAdministrationControllerGetTwoAuthState(personId, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -2881,12 +2896,12 @@ export const Class2FAApiFactory = function (configuration?: Configuration, baseP
 export interface Class2FAApiInterface {
     /**
      * 
-     * @param {string} userName 
+     * @param {string} personId 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof Class2FAApiInterface
      */
-    privacyIdeaAdministrationControllerGetTwoAuthState(userName: string, options?: AxiosRequestConfig): AxiosPromise<TokenStateResponse>;
+    privacyIdeaAdministrationControllerGetTwoAuthState(personId: string, options?: AxiosRequestConfig): AxiosPromise<TokenStateResponse>;
 
     /**
      * 
@@ -2908,13 +2923,13 @@ export interface Class2FAApiInterface {
 export class Class2FAApi extends BaseAPI implements Class2FAApiInterface {
     /**
      * 
-     * @param {string} userName 
+     * @param {string} personId 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof Class2FAApi
      */
-    public privacyIdeaAdministrationControllerGetTwoAuthState(userName: string, options?: AxiosRequestConfig) {
-        return Class2FAApiFp(this.configuration).privacyIdeaAdministrationControllerGetTwoAuthState(userName, options).then((request) => request(this.axios, this.basePath));
+    public privacyIdeaAdministrationControllerGetTwoAuthState(personId: string, options?: AxiosRequestConfig) {
+        return Class2FAApiFp(this.configuration).privacyIdeaAdministrationControllerGetTwoAuthState(personId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -3828,6 +3843,53 @@ export const OrganisationenApiAxiosParamCreator = function (configuration?: Conf
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * 
+         * @param {string} organisationId The id of an organization
+         * @param {OrganisationByNameBodyParams} organisationByNameBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        organisationControllerUpdateOrganisationName: async (organisationId: string, organisationByNameBodyParams: OrganisationByNameBodyParams, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'organisationId' is not null or undefined
+            assertParamExists('organisationControllerUpdateOrganisationName', 'organisationId', organisationId)
+            // verify required parameter 'organisationByNameBodyParams' is not null or undefined
+            assertParamExists('organisationControllerUpdateOrganisationName', 'organisationByNameBodyParams', organisationByNameBodyParams)
+            const localVarPath = `/api/organisationen/{organisationId}/name`
+                .replace(`{${"organisationId"}}`, encodeURIComponent(String(organisationId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(organisationByNameBodyParams, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -3948,6 +4010,17 @@ export const OrganisationenApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.organisationControllerUpdateOrganisation(organisationId, updateOrganisationBodyParams, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
+        /**
+         * 
+         * @param {string} organisationId The id of an organization
+         * @param {OrganisationByNameBodyParams} organisationByNameBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async organisationControllerUpdateOrganisationName(organisationId: string, organisationByNameBodyParams: OrganisationByNameBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<OrganisationResponseLegacy>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.organisationControllerUpdateOrganisationName(organisationId, organisationByNameBodyParams, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
     }
 };
 
@@ -4058,6 +4131,16 @@ export const OrganisationenApiFactory = function (configuration?: Configuration,
         organisationControllerUpdateOrganisation(organisationId: string, updateOrganisationBodyParams: UpdateOrganisationBodyParams, options?: any): AxiosPromise<OrganisationResponseLegacy> {
             return localVarFp.organisationControllerUpdateOrganisation(organisationId, updateOrganisationBodyParams, options).then((request) => request(axios, basePath));
         },
+        /**
+         * 
+         * @param {string} organisationId The id of an organization
+         * @param {OrganisationByNameBodyParams} organisationByNameBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        organisationControllerUpdateOrganisationName(organisationId: string, organisationByNameBodyParams: OrganisationByNameBodyParams, options?: any): AxiosPromise<OrganisationResponseLegacy> {
+            return localVarFp.organisationControllerUpdateOrganisationName(organisationId, organisationByNameBodyParams, options).then((request) => request(axios, basePath));
+        },
     };
 };
 
@@ -4166,6 +4249,16 @@ export interface OrganisationenApiInterface {
      * @memberof OrganisationenApiInterface
      */
     organisationControllerUpdateOrganisation(organisationId: string, updateOrganisationBodyParams: UpdateOrganisationBodyParams, options?: AxiosRequestConfig): AxiosPromise<OrganisationResponseLegacy>;
+
+    /**
+     * 
+     * @param {string} organisationId The id of an organization
+     * @param {OrganisationByNameBodyParams} organisationByNameBodyParams 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OrganisationenApiInterface
+     */
+    organisationControllerUpdateOrganisationName(organisationId: string, organisationByNameBodyParams: OrganisationByNameBodyParams, options?: AxiosRequestConfig): AxiosPromise<OrganisationResponseLegacy>;
 
 }
 
@@ -4294,6 +4387,18 @@ export class OrganisationenApi extends BaseAPI implements OrganisationenApiInter
      */
     public organisationControllerUpdateOrganisation(organisationId: string, updateOrganisationBodyParams: UpdateOrganisationBodyParams, options?: AxiosRequestConfig) {
         return OrganisationenApiFp(this.configuration).organisationControllerUpdateOrganisation(organisationId, updateOrganisationBodyParams, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {string} organisationId The id of an organization
+     * @param {OrganisationByNameBodyParams} organisationByNameBodyParams 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OrganisationenApi
+     */
+    public organisationControllerUpdateOrganisationName(organisationId: string, organisationByNameBodyParams: OrganisationByNameBodyParams, options?: AxiosRequestConfig) {
+        return OrganisationenApiFp(this.configuration).organisationControllerUpdateOrganisationName(organisationId, organisationByNameBodyParams, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
@@ -6977,6 +7082,48 @@ export const RolleApiAxiosParamCreator = function (configuration?: Configuration
             };
         },
         /**
+         * Delete a role by id.
+         * @summary 
+         * @param {string} rolleId The id for the rolle.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rolleControllerDeleteRolle: async (rolleId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'rolleId' is not null or undefined
+            assertParamExists('rolleControllerDeleteRolle', 'rolleId', rolleId)
+            const localVarPath = `/api/rolle/{rolleId}`
+                .replace(`{${"rolleId"}}`, encodeURIComponent(String(rolleId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Get rolle by id.
          * @summary 
          * @param {string} rolleId The id for the rolle.
@@ -7256,6 +7403,17 @@ export const RolleApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
+         * Delete a role by id.
+         * @summary 
+         * @param {string} rolleId The id for the rolle.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async rolleControllerDeleteRolle(rolleId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.rolleControllerDeleteRolle(rolleId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
          * Get rolle by id.
          * @summary 
          * @param {string} rolleId The id for the rolle.
@@ -7357,6 +7515,16 @@ export const RolleApiFactory = function (configuration?: Configuration, basePath
             return localVarFp.rolleControllerCreateRolle(createRolleBodyParams, options).then((request) => request(axios, basePath));
         },
         /**
+         * Delete a role by id.
+         * @summary 
+         * @param {string} rolleId The id for the rolle.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rolleControllerDeleteRolle(rolleId: string, options?: any): AxiosPromise<void> {
+            return localVarFp.rolleControllerDeleteRolle(rolleId, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Get rolle by id.
          * @summary 
          * @param {string} rolleId The id for the rolle.
@@ -7450,6 +7618,16 @@ export interface RolleApiInterface {
      * @memberof RolleApiInterface
      */
     rolleControllerCreateRolle(createRolleBodyParams: CreateRolleBodyParams, options?: AxiosRequestConfig): AxiosPromise<RolleResponse>;
+
+    /**
+     * Delete a role by id.
+     * @summary 
+     * @param {string} rolleId The id for the rolle.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RolleApiInterface
+     */
+    rolleControllerDeleteRolle(rolleId: string, options?: AxiosRequestConfig): AxiosPromise<void>;
 
     /**
      * Get rolle by id.
@@ -7550,6 +7728,18 @@ export class RolleApi extends BaseAPI implements RolleApiInterface {
      */
     public rolleControllerCreateRolle(createRolleBodyParams: CreateRolleBodyParams, options?: AxiosRequestConfig) {
         return RolleApiFp(this.configuration).rolleControllerCreateRolle(createRolleBodyParams, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Delete a role by id.
+     * @summary 
+     * @param {string} rolleId The id for the rolle.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RolleApi
+     */
+    public rolleControllerDeleteRolle(rolleId: string, options?: AxiosRequestConfig) {
+        return RolleApiFp(this.configuration).rolleControllerDeleteRolle(rolleId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

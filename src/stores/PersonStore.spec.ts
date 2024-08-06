@@ -190,14 +190,14 @@ describe('PersonStore', () => {
 
   describe('get2FAState', () => {
     it('should get 2FA state', async () => {
-      const userName: string = 'testUser';
+      const personId: string = 'testUser';
       const mockResponse: TokenStateResponse = {
         hasToken: true,
         tokenKind: 'software',
       };
 
-      mockadapter.onGet(`/api/2fa-token/state?userName=${userName}`).replyOnce(200, mockResponse);
-      const get2FAStatePromise: Promise<TokenStateResponse> = personStore.get2FAState(userName);
+      mockadapter.onGet(`/api/2fa-token/state?personId=${personId}`).replyOnce(200, mockResponse);
+      const get2FAStatePromise: Promise<TokenStateResponse> = personStore.get2FAState(personId);
       expect(personStore.loading).toBe(true);
       const twoFAState: TokenStateResponse = await get2FAStatePromise;
       expect(twoFAState).toEqual(mockResponse);
@@ -205,10 +205,10 @@ describe('PersonStore', () => {
     });
 
     it('should handle string error', async () => {
-      const userName: string = 'testUser';
+      const personId: string = 'testUser';
 
-      mockadapter.onGet(`/api/2fa-token/state?userName=${userName}`).replyOnce(500, 'some error');
-      const get2FAStatePromise: Promise<TokenStateResponse> = personStore.get2FAState(userName);
+      mockadapter.onGet(`/api/2fa-token/state?personId=${personId}`).replyOnce(500, 'some error');
+      const get2FAStatePromise: Promise<TokenStateResponse> = personStore.get2FAState(personId);
       expect(personStore.loading).toBe(true);
       await rejects(get2FAStatePromise);
       expect(personStore.errorCode).toEqual('UNSPECIFIED_ERROR');
@@ -216,10 +216,10 @@ describe('PersonStore', () => {
     });
 
     it('should handle error code', async () => {
-      const userName: string = 'testUser';
+      const personId: string = 'testUser';
 
-      mockadapter.onGet(`/api/2fa-token/state?userName=${userName}`).replyOnce(500, { code: 'some mock server error' });
-      const get2FAStatePromise: Promise<TokenStateResponse> = personStore.get2FAState(userName);
+      mockadapter.onGet(`/api/2fa-token/state?personId=${personId}`).replyOnce(500, { code: 'some mock server error' });
+      const get2FAStatePromise: Promise<TokenStateResponse> = personStore.get2FAState(personId);
       expect(personStore.loading).toBe(true);
       await rejects(get2FAStatePromise);
       expect(personStore.errorCode).toEqual('some mock server error');
@@ -229,11 +229,11 @@ describe('PersonStore', () => {
 
   describe('get2FASoftwareQRCode', () => {
     it('should get 2FA software QR code', async () => {
-      const userName: string = 'testUser';
+      const personId: string = 'testUser';
       const mockResponse: string = 'fakeQRCode';
 
       mockadapter.onPost(`/api/2fa-token/init`).replyOnce(200, mockResponse);
-      const get2FASoftwareQRCodePromise: Promise<string> = personStore.get2FASoftwareQRCode(userName);
+      const get2FASoftwareQRCodePromise: Promise<string> = personStore.get2FASoftwareQRCode(personId);
       expect(personStore.loading).toBe(true);
       const qrCode: string = await get2FASoftwareQRCodePromise;
       expect(qrCode).toEqual(mockResponse);
@@ -241,10 +241,10 @@ describe('PersonStore', () => {
     });
 
     it('should handle string error', async () => {
-      const userName: string = 'testUser';
+      const personId: string = 'testUser';
 
       mockadapter.onPost(`/api/2fa-token/init`).replyOnce(500, 'some error');
-      const get2FASoftwareQRCodePromise: Promise<string> = personStore.get2FASoftwareQRCode(userName);
+      const get2FASoftwareQRCodePromise: Promise<string> = personStore.get2FASoftwareQRCode(personId);
       expect(personStore.loading).toBe(true);
       await rejects(get2FASoftwareQRCodePromise);
       expect(personStore.errorCode).toEqual('UNSPECIFIED_ERROR');
@@ -252,10 +252,10 @@ describe('PersonStore', () => {
     });
 
     it('should handle error code', async () => {
-      const userName: string = 'testUser';
+      const personId: string = 'testUser';
 
       mockadapter.onPost(`/api/2fa-token/init`).replyOnce(500, { code: 'some mock server error' });
-      const get2FASoftwareQRCodePromise: Promise<string> = personStore.get2FASoftwareQRCode(userName);
+      const get2FASoftwareQRCodePromise: Promise<string> = personStore.get2FASoftwareQRCode(personId);
       expect(personStore.loading).toBe(true);
       await rejects(get2FASoftwareQRCodePromise);
       expect(personStore.errorCode).toEqual('some mock server error');

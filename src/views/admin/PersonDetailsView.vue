@@ -472,12 +472,7 @@
     secondFactorSet.value = undefined;
     secondFactorType.value = undefined;
 
-    const referrer: string | null | undefined = personStore.currentPerson?.person.referrer;
-
-    if (!referrer) {
-      return;
-    }
-    const result: TokenStateResponse = await personStore.get2FAState(referrer);
+    const result: TokenStateResponse = await personStore.get2FAState(currentPersonId);
     secondFactorSet.value = result.hasToken;
     if (secondFactorSet.value) {
       if (result.tokenKind === 'hardware') {
