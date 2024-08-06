@@ -32,6 +32,8 @@
   import { useRollen } from '@/composables/useRollen';
   import { useKlassen } from '@/composables/useKlassen';
   import PersonenkontextCreate from '@/components/admin/personen/PersonenkontextCreate.vue';
+  import { type TranslatedObject } from '@/types.d';
+
   import type { TokenStateResponse } from '@/api-client/generated';
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
@@ -260,11 +262,6 @@
     Rollenart: RollenArt;
   };
 
-  type TranslatedObject = {
-    value: string;
-    title: string;
-  };
-
   type ZuordnungCreationForm = {
     selectedRolle: string;
     selectedOrganisation: string;
@@ -472,12 +469,7 @@
     secondFactorSet.value = undefined;
     secondFactorType.value = undefined;
 
-    const referrer: string | null | undefined = personStore.currentPerson?.person.referrer;
-
-    if (!referrer) {
-      return;
-    }
-    const result: TokenStateResponse = await personStore.get2FAState(referrer);
+    const result: TokenStateResponse = await personStore.get2FAState(currentPersonId);
     secondFactorSet.value = result.hasToken;
     if (secondFactorSet.value) {
       if (result.tokenKind === 'hardware') {

@@ -24,7 +24,12 @@
       "createAnother": "Weitere Klasse anlegen",
       "createNew": "Neue Klasse anlegen",
       "discard": "Klasse verwerfen",
+      "edit": "Klasse bearbeiten",
+      "title": {
+        "KLASSENNAME_AN_SCHULE_EINDEUTIG": "Fehler bei Änderung der Klasse."
+      },
       "errors": {
+        "KLASSE_ERROR": "Die Klasse konnte nicht geändert werden.",
         "KLASSE_NUR_VON_SCHULE_ADMINISTRIERT": "Klassen dürfen nur von einer Schule administriert werden.",
         "KLASSENNAME_AN_SCHULE_EINDEUTIG": "Der Klassenname existiert bereits an dieser Schule.",
         "ORGANISATION_SPECIFICATION_ERROR": "Die Klasse konnte nicht angelegt werden."
@@ -33,6 +38,7 @@
       "klasse": "Klasse",
       "klassen": "Klasse(n)",
       "klasseAddedSuccessfully": "Die Klasse wurde erfolgreich hinzugefügt.",
+      "klasseUpdatedSuccessfully": "Die Klasse wurde erfolgreich geändert. ",
       "klasseCreateErrorTitle": "Fehler beim Anlegen der Klasse",
       "klassenname": "Klassenname",
       "klassenFound": "{count} Klasse gefunden | {count} Klassen gefunden",
@@ -157,16 +163,23 @@
       "create": "Rolle anlegen",
       "createAnother": "Weitere Rolle anlegen",
       "createNew": "Neue Rolle anlegen",
+      "deleteRolle": "Rolle löschen",
+      "deleteRolleConfirmation": "Wollen Sie die Rolle sofort und endgültig löschen?",
+      "deleteRolleSuccessMessage": "Die Rolle wurde erfolgreich gelöscht",
       "discard": "Rolle verwerfen",
       "edit": "Rolle bearbeiten",
       "enterRollenname": "Rollenname eingeben",
       "errors": {
         "ADD_SYSTEMRECHT_ERROR": "Das Systemrecht konnte nicht hinzugefügt werden.",
-        "ROLLE_ERROR": "Die Rolle konnte nicht angelegt werden.",
+        "ROLLE_ERROR":  "Die Rolle konnte nicht angelegt werden.",
+        "ROLLE_HAT_PERSONENKONTEXTE_ERROR": "Die Rolle kann nicht gelöscht werden, da die sie noch Benutzern zugeordnet ist. Nehmen Sie bitte zunächst alle Zuordnungen zurück.",
         "UPDATE_MERKMALE_ERROR": "Die gewünschte Bearbeitung kann nicht ausgeführt werden, da die Rolle noch Benutzern zugeordnet ist. Nehmen Sie bitte zunächst alle Zuordnungen zurück."
       },
       "title": {
-        "UPDATE_MERKMALE_ERROR": "Bearbeitung nicht möglich."
+        "ROLLE_ERROR":  "Fehler bei Erstellung der Rolle.",
+        "ROLLE_HAT_PERSONENKONTEXTE_ERROR": "Löschen nicht möglich.",
+        "ROLLE_UPDATE_ERROR": "Die Rolle konnte nicht bearbeitet werden.",
+        "UPDATE_MERKMALE_ERROR": "Die gewünschte Bearbeitung kann nicht ausgeführt werden, da die Rolle noch Benutzern zugeordnet ist. Nehmen Sie bitte zunächst alle Zuordnungen zurück."
       },
       "isAllowedToManageRollen": "Darf Rollen verwalten",
       "loadingErrorText": "Es konnten keine Rollendaten geladen werden.",
@@ -320,8 +333,8 @@
   },
   "nav": {
     "admin": "Schulportal-Administration",
-    "backToList": "Zurück zur Ergebnisliste",
     "backToDetails": "Zurück zur Gesamtübersicht",
+    "backToList": "Zurück zur Ergebnisliste",
     "back": "Zurück",
     "backToStart": "Zurück zur Startseite",
     "closeMobileMenu": "Mobiles Menü schließen",
