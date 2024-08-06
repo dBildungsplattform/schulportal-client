@@ -10,7 +10,6 @@
 
   type Props = {
     errorCode: string;
-    isLocked: boolean;
     person: Personendatensatz;
     adminId: string;
   };
@@ -24,20 +23,20 @@
   const emit: Emits = defineEmits<Emits>();
   const errorMessage: Ref<string> = ref('');
   const successMessage: Ref<string> = ref('');
-  const isLockedTemp: Ref<boolean> = ref(!props.isLocked);
 
   async function closeLockPersonDialog(isActive: Ref<boolean>): Promise<void> {
     isActive.value = false;
     errorMessage.value = '';
     successMessage.value = '';
-    isLockedTemp.value = !isLockedTemp.value;
   }
   async function handleOnLockUser(id: string): Promise<void> {
     try {
-      await emit('onLockUser', id, isLockedTemp.value, selectedSchule.value);
-      successMessage.value = isLockedTemp.value ? t('person.lockUserSuccess') : t('person.unlockUserSuccess');
+      await emit('onLockUser', id, !props.person.person.isLocked, selectedSchule.value);
+      successMessage.value = !props.person.person.isLocked
+        ? t('person.lockUserSuccess')
+        : t('person.unlockUserSuccess');
     } catch (error) {
-      errorMessage.value = props.isLocked ? t('person.lockUserError') : t('person.unlockUserError');
+      errorMessage.value = !props.person.person.isLocked ? t('person.lockUserError') : t('person.unlockUserError');
     }
   }
 
@@ -47,11 +46,9 @@
 
   onBeforeMount(async () => {
     await personenkontextStore.getPersonenuebersichtById(props.adminId);
-    schulen.value =
-      personenkontextStore.personenuebersicht?.zuordnungen.map((zuordnung: Zuordnung) => ({
-        value: zuordnung.sskName,
-        title: zuordnung.sskName,
-      })) || [];
+    const assignedSchulen: string[] =
+      personenkontextStore.personenuebersicht?.zuordnungen.map((zuordnung: Zuordnung) => zuordnung.sskName) || [];
+    schulen.value = [...new Set(assignedSchulen)];
     if (schulen.value.length === 1) {
       selectedSchule.value = schulen.value[0];
     }
@@ -72,7 +69,7 @@
           :block="mdAndDown"
           v-bind="props"
         >
-          {{ isLockedTemp ? $t('person.lockUser') : $t('person.unlockUser') }}
+          {{ !person.person.isLocked ? $t('person.lockUser') : $t('person.unlockUser') }}
         </v-btn>
       </v-col>
     </template>
@@ -80,7 +77,7 @@
     <template v-slot:default="{ isActive }">
       <LayoutCard
         :closable="true"
-        :header="isLockedTemp ? $t('person.lockUser') : $t('person.unlockUser')"
+        :header="props.person.person.isLocked ? $t('person.lockUser') : $t('person.unlockUser')"
         @onCloseClicked="closeLockPersonDialog(isActive)"
       >
         <v-card-text>
@@ -102,7 +99,7 @@
               </v-col>
             </v-row>
             <v-row
-              v-if="isLockedTemp.valueOf() && !successMessage"
+              v-if="!props.person.person.isLocked && !successMessage"
               class="justify-center w-full"
             >
               <v-col md="10">
@@ -127,6 +124,7 @@
                     ref="schule-select"
                     required="true"
                     variant="outlined"
+                    v-model="selectedSchule"
                   ></v-select>
                 </FormRow>
               </v-col>
@@ -145,7 +143,7 @@
                   data-testid="lock-user-info-text"
                   class="text-body"
                 >
-                  {{ isLockedTemp ? $t('person.lockUserInfoText') : $t('person.unLockUserInfoText') }}
+                  {{ props.person.person.isLocked ? $t('person.lockUserInfoText') : $t('person.unLockUserInfoText') }}
                 </p>
               </v-col>
             </v-row>
@@ -173,24 +171,24 @@
               md="4"
             >
               <v-btn
-                v-if="!successMessage && isLockedTemp"
+                v-if="!successMessage && props.person.person.isLocked"
                 :block="mdAndDown"
                 class="primary button"
                 :disabled="!selectedSchule"
                 @click.stop="handleOnLockUser(props.person.person.id)"
                 data-testid="lock-user-button"
               >
-                {{ isLockedTemp ? $t('person.lockUser') : $t('person.unlockUser') }}
+                {{ !props.person.person.isLocked ? $t('person.lockUser') : $t('person.unlockUser') }}
               </v-btn>
 
               <v-btn
-                v-if="!successMessage && !isLockedTemp"
+                v-if="!successMessage && !props.person.person.isLocked"
                 :block="mdAndDown"
                 class="primary button"
                 @click.stop="handleOnLockUser(props.person.person.id)"
                 data-testid="lock-user-button"
               >
-                {{ isLockedTemp ? $t('person.lockUser') : $t('person.unlockUser') }}
+                {{ !props.person.person.isLocked ? $t('person.lockUser') : $t('person.unlockUser') }}
               </v-btn>
             </v-col>
           </v-row>

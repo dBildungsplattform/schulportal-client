@@ -23,7 +23,7 @@ export type Person = {
   };
   referrer: string | null;
   personalnummer?: string | null;
-  isLocked?: boolean;
+  isLocked: boolean;
   attributes?: Record<string, string | string[]>;
 };
 
@@ -152,6 +152,7 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
       this.loading = true;
       try {
         await personenApi.personControllerLockPerson(personId, { lock: lock, locked_from: locked_from });
+        await this.getPersonById(personId);
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {

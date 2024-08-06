@@ -1043,7 +1043,10 @@
           color="#E5EAEF"
           thickness="6"
         ></v-divider>
-        <v-container class="person-lock">
+        <v-container
+          class="person-lock"
+          v-if="authStore.currentUser?.personId !== personStore.currentPerson?.person.id"
+        >
           <v-row class="ml-md-16">
             <v-col>
               <h3 class="subtitle-1">{{ $t('admin.person.status') }}</h3>
@@ -1063,44 +1066,16 @@
               <div class="d-flex justify-sm-end">
                 <PersonLock
                   :errorCode="personStore.errorCode"
-                  :isLocked="personStore.currentPerson.person.isLocked || false"
                   :person="personStore.currentPerson"
                   :adminId="authStore.currentUser?.personId!"
                   @onLockUser="onLockUser"
                 >
                 </PersonLock>
               </div>
-            </v-col>
-            <v-col v-else-if="personStore.loading"> <v-progress-circular indeterminate></v-progress-circular></v-col
-          ></v-row>
-        </v-container>
-        <v-divider
-          class="border-opacity-100 rounded my-6 mx-4"
-          color="#E5EAEF"
-          thickness="6"
-        ></v-divider>
-        <!-- Delete, lock and unlock person -->
-        <v-container
-          v-if="authStore.hasPersonenLoeschenPermission"
-          class="person-delete"
-        >
-          <v-row class="ml-md-16">
-            <v-col>
-              <h3 class="subtitle-1">{{ $t('admin.person.status') }}</h3>
               <div
-                v-for="(attribute, key) in personStore.currentPerson?.person.attributes"
-                :key="key"
+                class="d-flex justify-sm-end"
+                v-if="authStore.hasPersonenLoeschenPermission"
               >
-                <p>{{ keyMapper(key) }} {{ keyValueMapper(key, attribute.toString()) }}</p>
-              </div>
-            </v-col>
-            <v-col
-              class="mr-lg-13"
-              cols="12"
-              md="auto"
-              v-if="personStore.currentPerson"
-            >
-              <div class="d-flex justify-sm-end">
                 <PersonDelete
                   :disabled="isEditActive"
                   :errorCode="personStore.errorCode"
