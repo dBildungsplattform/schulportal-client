@@ -172,6 +172,16 @@
     schulDaten.value = createZuordnungsSchuleDaten(composedZuordnungen);
   }
 
+  const isPasswordResetDialogActive: Ref<boolean> = ref(false);
+
+  function closeChangePasswordDialog(): void {
+    isPasswordResetDialogActive.value = false;
+  }
+
+  function openChangePasswordDialog(): void {
+    isPasswordResetDialogActive.value = true;
+  }
+
   onBeforeMount(async () => {
     await initializeStores();
     setupPersonalData();
@@ -299,12 +309,65 @@
             ></v-icon>
             <div>
               <v-btn
-                data-testid="reset-password-button"
                 class="primary"
-                :href="`/api/auth/reset-password?redirectUrl=${windowOrigin}${route.fullPath}`"
+                data-testid="open-change-password-dialog"
+                @click="openChangePasswordDialog()"
               >
-                {{ $t('profile.setNewPassword') }}
+                {{ $t('profile.changePassword') }}
               </v-btn>
+              <v-dialog
+                v-model="isPasswordResetDialogActive"
+                persistent
+              >
+                <LayoutCard
+                  :closable="true"
+                  :header="$t('profile.changePassword')"
+                  @onCloseClicked="closeChangePasswordDialog()"
+                >
+                  <v-card-text>
+                    <v-container>
+                      <v-icon
+                        class="w-100 mb-4"
+                        size="x-large"
+                        icon="mdi-information-slab-circle-outline"
+                      ></v-icon>
+                      <p class="text-body">
+                        {{ $t('profile.changePasswordInfo') }}
+                      </p>
+                    </v-container>
+                  </v-card-text>
+                  <v-card-actions class="justify-center">
+                    <v-row class="justify-center">
+                      <v-col
+                        cols="12"
+                        sm="6"
+                        md="4"
+                      >
+                        <v-btn
+                          class="secondary button"
+                          @click.stop="closeChangePasswordDialog()"
+                          data-testid="close-change-password-dialog-button"
+                        >
+                          {{ $t('cancel') }}
+                        </v-btn>
+                      </v-col>
+                      <v-col
+                        cols="12"
+                        sm="6"
+                        md="4"
+                      >
+                        <v-btn
+                          data-testid="change-password-button"
+                          class="primary"
+                          :href="`/api/auth/reset-password?redirectUrl=${windowOrigin}${route.fullPath}`"
+                        >
+                          {{ $t('profile.changePassword') }}
+                        </v-btn>
+                      </v-col>
+                    </v-row>
+                  </v-card-actions>
+                </LayoutCard>
+              </v-dialog>
             </div>
           </v-row>
         </LayoutCard>
