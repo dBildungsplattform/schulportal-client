@@ -1,5 +1,11 @@
 <script setup lang="ts">
-  import { RollenMerkmal, useRolleStore, type RolleTableItem, type RolleResponse, type RolleStore } from '@/stores/RolleStore';
+  import {
+    RollenMerkmal,
+    useRolleStore,
+    type RolleTableItem,
+    type RolleResponse,
+    type RolleStore,
+  } from '@/stores/RolleStore';
   import { computed, onMounted, type ComputedRef } from 'vue';
   import ResultTable from '@/components/admin/ResultTable.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
@@ -58,7 +64,7 @@
     });
   });
 
-  function navigateToRolleDetails(_$event: PointerEvent, item: RolleTableItem ): void {
+  function navigateToRolleDetails(_$event: PointerEvent, item: RolleTableItem): void {
     router.push({ name: 'rolle-details', params: { id: item.id } });
   }
 

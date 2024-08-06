@@ -287,21 +287,21 @@
       <!-- Result template on success after submit -->
       <template v-if="organisationStore.updatedOrganisation && !organisationStore.errorCode">
         <SuccessTemplate
-          :successMessage="$t('admin.klasse.klasseUpdatedSuccessfully')"
-          :followingDataCreated="$t('admin.followingDataCreated')"
+          :backButtonTestId="'back-to-details-button'"
+          :backButtonText="$t('nav.backToDetails')"
+          :createAnotherButtonText="$t('admin.klasse.createAnother')"
           :createdData="[
-            { label: $t('admin.schule.schule'), value: translatedSchulname, testId: 'created-klasse-schule' },
+            { label: $t('admin.schule.schule'), value: translatedSchulname || '', testId: 'created-klasse-schule' },
             {
               label: $t('admin.klasse.klassenname'),
-              value: organisationStore.updatedOrganisation?.name,
+              value: organisationStore.updatedOrganisation?.name || '',
               testId: 'created-klasse-name',
             },
           ]"
-          :backButtonText="$t('nav.backToDetails')"
-          :createAnotherButtonText="$t('admin.klasse.createAnother')"
+          :followingDataCreated="$t('admin.followingDataCreated')"
+          @onNavigateBack="router.go(0)"
           :showCreateAnotherButton="false"
-          :backButtonTestId="'back-to-details-button'"
-          @OnNavigateBack="router.go(0)"
+          :successMessage="$t('admin.klasse.klasseUpdatedSuccessfully')"
         />
       </template>
     </LayoutCard>

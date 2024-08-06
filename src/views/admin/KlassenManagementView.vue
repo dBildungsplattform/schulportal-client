@@ -6,6 +6,7 @@
   import {
     OrganisationsTyp,
     useOrganisationStore,
+    type KlasseTableItem,
     type Organisation,
     type OrganisationStore,
   } from '@/stores/OrganisationStore';
@@ -40,7 +41,7 @@
 
   const selectedSchule: Ref<string | null> = ref(null);
   const selectedKlassen: Ref<Array<string>> = ref([]);
-  const finalKlassen: Ref<Array<Organisation>> = ref([]);
+  const finalKlassen: Ref<Array<KlasseTableItem>> = ref([]);
   const klassenOptions: Ref<TranslatedObject[] | undefined> = ref([]);
 
   const searchInputSchulen: Ref<string> = ref('');

@@ -9,7 +9,13 @@
     type Organisation,
     OrganisationsTyp,
   } from '@/stores/OrganisationStore';
-  import { usePersonStore, type Person, type PersonStore, type Personendatensatz } from '@/stores/PersonStore';
+  import {
+    usePersonStore,
+    type Person,
+    type PersonStore,
+    type PersonTableItem,
+    type Personendatensatz,
+  } from '@/stores/PersonStore';
   import {
     usePersonenkontextStore,
     type PersonenkontextStore,
@@ -147,7 +153,7 @@
     applySearchAndFilters();
   }
 
-  function navigateToPersonDetails(_$event: PointerEvent, { item }: { item: Personendatensatz }): void {
+  function navigateToPersonDetails(_$event: PointerEvent, item: PersonTableItem): void {
     router.push({ name: 'person-details', params: { id: item.person.id } });
   }
 

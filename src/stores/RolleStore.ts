@@ -73,8 +73,8 @@ export type RolleTableItem = {
   merkmale: string;
   name: string;
   rollenart: string;
-  createdAt: string;
-  updatedAt: string;
+  createdAt?: string;
+  updatedAt?: string;
 };
 
 export type RolleStore = Store<'rolleStore', RolleState, RolleGetters, RolleActions>;
