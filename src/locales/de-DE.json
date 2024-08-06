@@ -390,7 +390,7 @@
     "dienstStellenNummerAbbr": "DStNr.",
     "password": "Passwort",
     "changePassword": "Passwort ändern",
-    "changePasswordInfo": "Achtung, die Aktion Passwort ändern kann nicht abgebrochen oder rückgängig gemacht werden! Fahren Sie nur fort, wenn Sie sicher sind, dass Sie ihr Passwort ändern möchten.",
+    "changePasswordInfo": "Um das Passwort zu ändern ist eine erneute Anmeldung erforderlich. Nach erfolgreicher Eingabe Ihres aktuellen Passworts können Sie ein neues festlegen.",
     "saveNewPassword": "Neues Passwort speichern",
     "setNewPassword": "Neues Passwort setzen",
     "twoFactorAuth": "Zwei-Faktor-Authentifizierung",
