@@ -1,4 +1,5 @@
 import type {
+  AssignHardwareTokenResponse,
   PersonFrontendControllerFindPersons200Response,
   PersonendatensatzResponse,
   TokenStateResponse,
@@ -152,38 +153,32 @@ describe('PersonStore', () => {
     });
   });
 
-  describe('resetPassword', () => {
-    it('should reset and return password', async () => {
-      const userId: string = '2345';
-      const mockResponse: string = 'fakePassword';
+  describe('assignHardwareToken', () => {
+    it('should assign hardware token and update state', async () => {
+      const personUserName: string = 'testUser';
+      const serial: string = '123456789';
+      const otp: string = '987654';
+      const mockResponse: AssignHardwareTokenResponse = {
+        id: 1,
+        jsonrpc: '2.0',
+        time: 1622547800,
+        version: '1.0',
+        versionnumber: '1.0.0',
+        signature: 'abcdef123456',
+        dialogText: 'This is a mock dialog text',
+      };
 
-      mockadapter.onPatch(`/api/personen/${userId}/password`).replyOnce(200, mockResponse);
-      const resetPasswordPromise: Promise<string> = personStore.resetPassword(userId);
+      mockadapter.onPost('/api/2fa-token/assign/hardwareToken').reply(200, mockResponse);
+
+      const assignTokenPromise: Promise<AssignHardwareTokenResponse> = personStore.assignHardwareToken(
+        personUserName,
+        serial,
+        otp,
+      );
       expect(personStore.loading).toBe(true);
-      const generatedPassword: string = await resetPasswordPromise;
-      expect(generatedPassword).toEqual(mockResponse);
-      expect(personStore.loading).toBe(false);
-    });
 
-    it('should handle string error', async () => {
-      const userId: string = '2345';
-
-      mockadapter.onPatch(`/api/personen/${userId}/password`).replyOnce(500, 'some error');
-      const resetPasswordPromise: Promise<string> = personStore.resetPassword(userId);
-      expect(personStore.loading).toBe(true);
-      await rejects(resetPasswordPromise);
-      expect(personStore.errorCode).toEqual('UNSPECIFIED_ERROR');
-      expect(personStore.loading).toBe(false);
-    });
-
-    it('should handle error code', async () => {
-      const userId: string = '2345';
-
-      mockadapter.onPatch(`/api/personen/${userId}/password`).replyOnce(500, { code: 'some mock server error' });
-      const resetPasswordPromise: Promise<string> = personStore.resetPassword(userId);
-      expect(personStore.loading).toBe(true);
-      await rejects(resetPasswordPromise);
-      expect(personStore.errorCode).toEqual('some mock server error');
+      const response: AssignHardwareTokenResponse = await assignTokenPromise;
+      expect(response).toEqual(mockResponse);
       expect(personStore.loading).toBe(false);
     });
   });

@@ -5,6 +5,7 @@
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import SpshTooltip from '@/components/admin/SpshTooltip.vue';
   import SoftwareTokenWorkflow from './SoftwareTokenWorkflow.vue';
+  import HardwareTokenWorkflow from './HardwareTokenWorkflow.vue';
   import { useI18n, type Composer } from 'vue-i18n';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
@@ -144,6 +145,14 @@
             @onCloseClicked="close2FADialog(isActive)"
             data-testid="software-token-workflow"
           ></SoftwareTokenWorkflow>
+          <HardwareTokenWorkflow
+            v-if="selectedOption === 'hardware'"
+            @updateHeader="handleHeaderUpdate"
+            @onCloseClicked="close2FADialog(isActive)"
+            :errorCode="props.errorCode"
+            :person="props.person"
+          >
+          </HardwareTokenWorkflow>
         </v-container>
         <v-card-actions
           class="justify-center"

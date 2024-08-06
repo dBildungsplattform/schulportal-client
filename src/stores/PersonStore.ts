@@ -4,6 +4,8 @@ import {
   Class2FAApiFactory,
   PersonenApiFactory,
   PersonenFrontendApiFactory,
+  type AssignHardwareTokenBodyParams,
+  type AssignHardwareTokenResponse,
   type Class2FAApiInterface,
   type DbiamCreatePersonWithContextBodyParams,
   type PersonenApiInterface,
@@ -18,6 +20,7 @@ import { type DbiamPersonenkontextBodyParams } from './PersonenkontextStore';
 
 const personenApi: PersonenApiInterface = PersonenApiFactory(undefined, '', axiosApiInstance);
 const personenFrontendApi: PersonenFrontendApiInterface = PersonenFrontendApiFactory(undefined, '', axiosApiInstance);
+const twoFactorApi = Class2FAApiFactory(undefined, '', axiosApiInstance);
 
 const twoFactorApi: Class2FAApiInterface = Class2FAApiFactory(undefined, '', axiosApiInstance);
 
@@ -62,6 +65,30 @@ export type PersonFilter = {
   searchFilter?: string;
 };
 
+type InitSoftwareTokenResponse = {
+  detail: {
+    googleurl: {
+      description: string;
+      img: string;
+      value: string;
+    };
+    oathurl: {
+      description: string;
+      img: string;
+      value: string;
+    };
+    otpkey: {
+      description: string;
+      img: string;
+      value: string;
+      value_b32: string;
+    };
+    rollout_state: string;
+    serial: string;
+    threadid: number;
+  };
+};
+
 type PersonGetters = {};
 type PersonActions = {
   resetState: () => void;
@@ -71,6 +98,7 @@ type PersonActions = {
   deletePerson: (personId: string) => Promise<void>;
   get2FAState: (personId: string) => Promise<void>;
   get2FASoftwareQRCode: (personId: string) => Promise<void>;
+  assignHardwareToken: (personUserName: string, serial: string, otp: string) => Promise<AssignHardwareTokenResponse>;
 };
 
 export type PersonStore = Store<'personStore', PersonState, PersonGetters, PersonActions>;
@@ -167,6 +195,24 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
           this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
         }
         return await Promise.reject(this.errorCode);
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async assignHardwareToken(
+      personUserName: string,
+      serial: string,
+      otp: string,
+    ): Promise<AssignHardwareTokenResponse> {
+      this.loading = true;
+      const assignTokenPayload: AssignHardwareTokenBodyParams = {
+        serial: serial,
+        otp: otp,
+        user: personUserName,
+      };
+      try {
+        return (await twoFactorApi.privacyIdeaAdministrationControllerAssignHardwareToken(assignTokenPayload)).data;
       } finally {
         this.loading = false;
       }
