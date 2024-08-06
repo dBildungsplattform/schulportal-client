@@ -46,8 +46,7 @@
   }
 
   async function proceed(): Promise<void> {
-    if (props.person.person.referrer == null) return;
-    qrCodeImageBase64 = await personStore.get2FASoftwareQRCode(props.person.person.referrer);
+    qrCodeImageBase64 = await personStore.get2FASoftwareQRCode(props.person.person.id);
     proceeded.value = true;
   }
 
