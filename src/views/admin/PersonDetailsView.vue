@@ -32,6 +32,8 @@
   import { useRollen } from '@/composables/useRollen';
   import { useKlassen } from '@/composables/useKlassen';
   import PersonenkontextCreate from '@/components/admin/personen/PersonenkontextCreate.vue';
+  import { type TranslatedObject } from '@/types.d';
+
   import type { TokenStateResponse } from '@/api-client/generated';
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
@@ -258,11 +260,6 @@
     value: string;
     title: string;
     Rollenart: RollenArt;
-  };
-
-  type TranslatedObject = {
-    value: string;
-    title: string;
   };
 
   type ZuordnungCreationForm = {
