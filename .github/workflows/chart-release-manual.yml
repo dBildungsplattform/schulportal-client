@@ -11,6 +11,10 @@ on:
         type: string
         description: "image tag"
         required: true
+      tag_generation:
+        type: string
+        description: "specify how image_tag is set, default: specified " 
+        required: true
         
 concurrency:
   group: schulportal-client-chart-manual
@@ -28,6 +32,6 @@ jobs:
     with:
       chart_name: schulportal-client
       helm_chart_version_generation: specified 
-      image_tag_generation: specified 
+      image_tag_generation: ${{ inputs.tag_generation }}
       helm_chart_version: ${{ inputs.chart_version }}
       image_tag: ${{ inputs.image_tag }}
