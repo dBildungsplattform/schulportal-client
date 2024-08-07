@@ -4,14 +4,14 @@
   import { useDisplay } from 'vuetify';
 
   defineProps<{
-    successMessage: string;
-    followingDataCreated: string;
-    createdData: Array<{ label: string; value: string; testId: string }>;
-    backButtonText: string;
-    createAnotherButtonText: string;
-    showCreateAnotherButton: boolean;
     backButtonTestId: string;
-    createAnotherButtonTestId: string;
+    backButtonText: string;
+    createAnotherButtonTestId?: string;
+    createAnotherButtonText: string;
+    createdData: Array<{ label: string; value: string; testId: string }>;
+    followingDataCreated: string;
+    showCreateAnotherButton: boolean;
+    successMessage: string;
   }>();
 
   type Emits = {

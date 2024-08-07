@@ -23,6 +23,30 @@ export type Organisation = {
   administriertVon?: string | null;
 };
 
+export type KlasseTableItem = {
+  id: string;
+  kennung?: string | null;
+  name: string;
+  namensergaenzung?: string | null;
+  kuerzel?: string;
+  typ: OrganisationsTyp;
+  administriertVon?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
+export type SchuleTableItem = {
+  id: string;
+  kennung?: string | null;
+  name: string;
+  namensergaenzung?: string | null;
+  kuerzel?: string;
+  typ: OrganisationsTyp;
+  administriertVon?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
 type OrganisationState = {
   allOrganisationen: Array<Organisation>;
   allKlassen: Array<Organisation>;

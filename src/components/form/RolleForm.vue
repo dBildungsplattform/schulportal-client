@@ -22,7 +22,7 @@
     isEditActive?: boolean;
     onHandleConfirmUnsavedChanges: () => void;
     onHandleDiscard: () => void;
-    onShowDialogChange: (value: boolean) => void;
+    onShowDialogChange: (value: boolean | undefined) => void;
     onSubmit: () => void;
   };
 
