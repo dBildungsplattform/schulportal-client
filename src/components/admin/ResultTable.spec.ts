@@ -18,6 +18,7 @@ beforeEach(() => {
     attachTo: document.getElementById('app') || '',
     props: {
       items: [],
+      itemsPerPage: 10,
       loading: false,
       password: 'qwertzuiop',
       totalItems: 25,

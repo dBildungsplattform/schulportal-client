@@ -2,16 +2,11 @@ import { expect, test } from 'vitest';
 import { VueWrapper, mount } from '@vue/test-utils';
 import PersonCreationView from './PersonCreationView.vue';
 import PersonManagementView from './PersonManagementView.vue';
-import MockAdapter from 'axios-mock-adapter';
-import ApiService from '@/services/ApiService';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
-
-const mockadapter: MockAdapter = new MockAdapter(ApiService);
 let wrapper: VueWrapper | null = null;
 let router: Router;
 
 beforeEach(async () => {
-  mockadapter.reset();
   document.body.innerHTML = `
     <div>
       <div id="app"></div>

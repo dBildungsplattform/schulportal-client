@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { onMounted } from 'vue';
+  import { onMounted, type Ref, ref } from 'vue';
   import ResultTable from '@/components/admin/ResultTable.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { type Composer, useI18n } from 'vue-i18n';
@@ -20,8 +20,38 @@
     { title: t('admin.schule.schulname'), key: 'name', align: 'start' },
   ];
 
+  const schulenPerPage: Ref<number> = ref(30);
+  const schulenPage: Ref<number> = ref(1);
+
+  function getPaginatedSchulen(page: number): void {
+    schulenPage.value = page || 1;
+    organisationStore.getAllOrganisationen({
+      offset: (schulenPage.value - 1) * schulenPerPage.value,
+      limit: schulenPerPage.value,
+      includeTyp: OrganisationsTyp.Schule,
+      systemrechte: ['SCHULEN_VERWALTEN'],
+    });
+  }
+
+  function getPaginatedSchulenWithLimit(limit: number): void {
+    /* reset page to 1 if entries are equal to or less than selected limit */
+    if (organisationStore.totalOrganisationen <= limit) {
+      schulenPage.value = 1;
+    }
+
+    schulenPerPage.value = limit || 1;
+    organisationStore.getAllOrganisationen({
+      offset: (schulenPage.value - 1) * schulenPerPage.value,
+      limit: schulenPerPage.value,
+      includeTyp: OrganisationsTyp.Schule,
+      systemrechte: ['SCHULEN_VERWALTEN'],
+    });
+  }
+
   onMounted(async () => {
     await organisationStore.getAllOrganisationen({
+      offset: (schulenPage.value - 1) * schulenPerPage.value,
+      limit: schulenPerPage.value,
       includeTyp: OrganisationsTyp.Schule,
       systemrechte: ['SCHULEN_VERWALTEN'],
     });
@@ -39,13 +69,16 @@
     <LayoutCard :header="$t('admin.schule.management')">
       <ResultTable
         data-testid="schule-table"
-        :items="organisationStore.allOrganisationen || []"
+        :items="organisationStore.allSchulen || []"
         :loading="organisationStore.loading"
         :headers="headers"
-        @onUpdateTable="organisationStore.getAllOrganisationen({ systemrechte: ['SCHULEN_VERWALTEN'] })"
-        :totalItems="organisationStore.allOrganisationen.length"
         item-value-path="id"
         :disableRowClick="true"
+        @onItemsPerPageUpdate="getPaginatedSchulenWithLimit"
+        @onPageUpdate="getPaginatedSchulen"
+        ref="result-table"
+        :totalItems="organisationStore.totalSchulen"
+        :itemsPerPage="schulenPerPage"
       >
         <template v-slot:[`item.name`]="{ item }">
           <div
