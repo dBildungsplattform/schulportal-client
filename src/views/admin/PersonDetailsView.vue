@@ -8,7 +8,7 @@
   import SpshTooltip from '@/components/admin/SpshTooltip.vue';
   import PersonDelete from '@/components/admin/personen/PersonDelete.vue';
   import PersonenkontextDelete from '@/components/admin/personen/PersonenkontextDelete.vue';
-  import TwoFactorAuthenticationSetUp from '@/components/cards/two-factor-authentication/TwoFactorAuthenticationSetUp.vue';
+  import TwoFactorAuthenticationSetUp from '@/components/two-factor-authentication/TwoFactorAuthenticationSetUp.vue';
   import {
     usePersonenkontextStore,
     type PersonenkontextStore,

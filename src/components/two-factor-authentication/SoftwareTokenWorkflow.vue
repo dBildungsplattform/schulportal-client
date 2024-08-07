@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { defineEmits, type Ref } from 'vue';
+  import { defineEmits, onMounted, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
 
@@ -23,9 +23,9 @@
 
   defineProps<Props>();
 
-  let workflowStep: number = 0;
-
-  emits('updateHeader', t('admin.person.twoFactorAuthentication.softwareTokenOption'));
+  onMounted(() => {
+    emits('updateHeader', t('admin.person.twoFactorAuthentication.softwareTokenOption'));
+  });
 
   const printPage = (): void => {
     window.print();
@@ -33,7 +33,7 @@
 </script>
 
 <template>
-  <v-card-text v-if="workflowStep == 0">
+  <v-card-text>
     <v-container>
       <v-row>
         <p

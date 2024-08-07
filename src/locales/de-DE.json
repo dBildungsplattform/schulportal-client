@@ -89,7 +89,7 @@
         "scanOrPrint": "QR-Code scannen oder ausdrucken.",
         "notSetUp": "Für diesen Benutzer ist aktuell keine 2FA eingerichtet.",
         "softwareTokenIsSetUp": "Für diesen Benutzer ist aktuell ein Software-Token eingerichtet.",
-        "resetInfo": "Um einen neuen Token einzurichten, muss der aktuelle Token durch die schulischen Administratorinnen und Administratoren zurückgesetzt werden.",
+        "resetInfo": "Um einen neuen Token einzurichten, muss der aktuelle Token durch die Schuladmins zurückgesetzt werden.",
         "tokenReset": "Token zurücksetzen"
       },
       "copyPasswordError": "Passwort konnte nicht in die Zwischenablage kopiert werden",
@@ -164,12 +164,12 @@
       "enterRollenname": "Rollenname eingeben",
       "errors": {
         "ADD_SYSTEMRECHT_ERROR": "Das Systemrecht konnte nicht hinzugefügt werden.",
-        "ROLLE_ERROR":  "Die Rolle konnte nicht angelegt werden.",
+        "ROLLE_ERROR": "Die Rolle konnte nicht angelegt werden.",
         "ROLLE_HAT_PERSONENKONTEXTE_ERROR": "Die Rolle kann nicht gelöscht werden, da die sie noch Benutzern zugeordnet ist. Nehmen Sie bitte zunächst alle Zuordnungen zurück.",
         "UPDATE_MERKMALE_ERROR": "Die gewünschte Bearbeitung kann nicht ausgeführt werden, da die Rolle noch Benutzern zugeordnet ist. Nehmen Sie bitte zunächst alle Zuordnungen zurück."
       },
       "title": {
-        "ROLLE_ERROR":  "Fehler bei Erstellung der Rolle.",
+        "ROLLE_ERROR": "Fehler bei Erstellung der Rolle.",
         "ROLLE_HAT_PERSONENKONTEXTE_ERROR": "Löschen nicht möglich.",
         "ROLLE_UPDATE_ERROR": "Die Rolle konnte nicht bearbeitet werden.",
         "UPDATE_MERKMALE_ERROR": "Die gewünschte Bearbeitung kann nicht ausgeführt werden, da die Rolle noch Benutzern zugeordnet ist. Nehmen Sie bitte zunächst alle Zuordnungen zurück."

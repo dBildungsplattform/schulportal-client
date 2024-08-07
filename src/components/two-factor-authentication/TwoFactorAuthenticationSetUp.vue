@@ -12,9 +12,9 @@
   const selectedOption: Ref<'software' | 'hardware'> = ref('software');
   const personStore: PersonStore = usePersonStore();
 
-  let qrCodeImageBase64: string = '';
+  const qrCodeImageBase64: Ref<string> = ref('');
 
-  const proceeded: Ref<boolean> = ref(false);
+  const requestedSoftwareToken: Ref<boolean> = ref(false);
 
   const dialogHeader: Ref<string> = ref(t('admin.person.twoFactorAuthentication.setUpLong'));
 
@@ -35,19 +35,19 @@
   const props: Props = defineProps<Props>();
 
   async function close2FADialog(isActive: Ref<boolean>): Promise<void> {
-    if (proceeded.value) {
+    if (requestedSoftwareToken.value) {
       emits('dialogClosed');
     }
 
     isActive.value = false;
-    proceeded.value = false;
+    requestedSoftwareToken.value = false;
     selectedOption.value = 'software';
     dialogHeader.value = t('admin.person.twoFactorAuthentication.setUpLong');
   }
 
-  async function proceed(): Promise<void> {
-    qrCodeImageBase64 = await personStore.get2FASoftwareQRCode(props.person.person.id);
-    proceeded.value = true;
+  async function requestSoftwareToken(): Promise<void> {
+    qrCodeImageBase64.value = await personStore.get2FASoftwareQRCode(props.person.person.id);
+    requestedSoftwareToken.value = true;
   }
 
   async function handleHeaderUpdate(header: string): Promise<void> {
@@ -89,7 +89,7 @@
         @onCloseClicked="close2FADialog(isActive)"
         data-testid="two-factor-authentication-dialog"
       >
-        <v-card-text v-if="!proceeded">
+        <v-card-text v-if="!requestedSoftwareToken">
           <v-container>
             <v-row class="text-body bold px-md-16">
               <v-col>
@@ -135,7 +135,7 @@
             </v-row>
           </v-container>
         </v-card-text>
-        <v-container v-if="proceeded">
+        <v-container v-if="requestedSoftwareToken">
           <SoftwareTokenWorkflow
             v-if="selectedOption === 'software'"
             :qrCodeImageBase64="qrCodeImageBase64"
@@ -146,7 +146,7 @@
         </v-container>
         <v-card-actions
           class="justify-center"
-          v-if="!proceeded"
+          v-if="!requestedSoftwareToken"
         >
           <v-row class="justify-center">
             <v-col
@@ -171,7 +171,7 @@
               <v-btn
                 :block="mdAndDown"
                 class="primary button"
-                @click.stop="proceed()"
+                @click.stop="requestSoftwareToken()"
                 data-testid="proceed-two-factor-authentication-dialog"
               >
                 {{ $t('proceed') }}
