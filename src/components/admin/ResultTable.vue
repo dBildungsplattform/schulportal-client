@@ -9,6 +9,13 @@
 
   type ReadonlyHeaders = InstanceType<typeof VDataTableServer>['headers'];
 
+  // Mutable headers
+  type ReadonlyHeadersMutable = VDataTableServer['$props']['headers'];
+  type UnwrapReadonlyArray<A> = A extends Readonly<Array<infer I>> ? I : never;
+  type ReadonlyDataTableHeader = UnwrapReadonlyArray<ReadonlyHeadersMutable>;
+  type DeepMutable<T> = { -readonly [P in keyof T]: DeepMutable<T[P]> };
+  type Headers = DeepMutable<ReadonlyDataTableHeader>;
+
   export type TableItem = Record<string, unknown>;
   export type TableRow<T> = {
     item: T;
@@ -18,7 +25,7 @@
     items: TableItem[];
     loading: boolean;
     totalItems: number;
-    headers: ReadonlyHeaders;
+    headers: ReadonlyHeaders | Headers;
     itemValuePath: string;
     disableRowClick?: boolean;
   };
