@@ -1,6 +1,6 @@
 import { object, string } from 'yup';
 import { toTypedSchema } from '@vee-validate/yup';
-import { DIN_91379A_EXT } from '@/utils/validation';
+import { DIN_91379A_EXT, NO_LEADING_TRAILING_SPACES } from '@/utils/validation';
 import type { TypedSchema } from 'vee-validate';
 
 type ValidationSchema = {
@@ -16,6 +16,7 @@ export const getValidationSchema = (t: (key: string) => string): TypedSchema<Val
       selectedRollenName: string()
         .max(200, t('admin.rolle.rules.rollenname.length'))
         .matches(DIN_91379A_EXT, t('admin.rolle.rules.rollenname.matches'))
+        .matches(NO_LEADING_TRAILING_SPACES, t('admin.rolle.rules.rollenname.noLeadingTrailingSpaces'))
         .required(t('admin.rolle.rules.rollenname.required')),
       selectedAdministrationsebene: string().required(t('admin.administrationsebene.rules.required')),
     }),
