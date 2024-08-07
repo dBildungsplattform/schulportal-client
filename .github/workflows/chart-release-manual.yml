@@ -3,6 +3,10 @@ name: Push Charts to helm-charts-registry manually with specified version
 on:
   workflow_dispatch:
     inputs:
+      chart_version_generation:
+        type: string
+        description: "Chart Version Source: chart_yaml (default), specified, ticket_from_branch_short_hash, short_hash, ticket_from_branch_timestamp, timestamp"
+        required: true
       chart_version:
         type: string
         description: "Chart version"
@@ -13,7 +17,7 @@ on:
         required: true
       tag_generation:
         type: string
-        description: "specify how image_tag is set, default: specified " 
+        description: "image_tag source: ticket_from_branch(default), commit_hash or version_git_tag, specified, chart_yaml (to use appVersion field in Chart.yaml)" 
         required: true
         
 concurrency:
@@ -31,7 +35,7 @@ jobs:
     secrets: inherit
     with:
       chart_name: schulportal-client
-      helm_chart_version_generation: specified 
+      helm_chart_version_generation: ${{ inputs.tag_generation }} 
       image_tag_generation: ${{ inputs.tag_generation }}
       helm_chart_version: ${{ inputs.chart_version }}
       image_tag: ${{ inputs.image_tag }}
