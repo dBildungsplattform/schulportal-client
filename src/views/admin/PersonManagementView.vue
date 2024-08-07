@@ -70,7 +70,9 @@
       selectedRollen.value.length > 0 ||
       !!searchFilterStore.selectedSchulen?.length ||
       !!searchFilterStore.selectedRollen?.length ||
-      searchFilter.value.length > 0,
+      !!searchFilterStore.searchFilter ||
+      selectedKlassen.value.length > 0 ||
+      !!selectedStatus.value,
   );
 
   const schulen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
