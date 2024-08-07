@@ -1,6 +1,6 @@
 import { object, string } from 'yup';
 import { toTypedSchema } from '@vee-validate/yup';
-import { DIN_91379A_EXT } from '@/utils/validation';
+import { DIN_91379A_EXT, NO_LEADING_TRAILING_SPACES } from '@/utils/validation';
 import type { TypedSchema } from 'vee-validate';
 
 type ValidationSchema = {
@@ -14,6 +14,7 @@ export const getValidationSchema = (t: (key: string) => string): TypedSchema<Val
       selectedSchule: string().required(t('admin.klasse.rules.schule.required')),
       selectedKlassenname: string()
         .matches(DIN_91379A_EXT, t('admin.klasse.rules.klassenname.matches'))
+        .matches(NO_LEADING_TRAILING_SPACES, t('admin.klasse.rules.klassenname.noLeadingTrailingSpaces'))
         .required(t('admin.klasse.rules.klassenname.required')),
     }),
   );
