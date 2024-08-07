@@ -35,7 +35,7 @@ jobs:
     secrets: inherit
     with:
       chart_name: schulportal-client
-      helm_chart_version_generation: ${{ inputs.tag_generation }} 
+      helm_chart_version_generation: ${{ inputs.chart_version_generation }} 
       image_tag_generation: ${{ inputs.tag_generation }}
       helm_chart_version: ${{ inputs.chart_version }}
       image_tag: ${{ inputs.image_tag }}
