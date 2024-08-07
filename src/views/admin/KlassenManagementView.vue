@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import { computed, onMounted, ref, type ComputedRef, type Ref } from 'vue';
-  import ResultTable from '@/components/admin/ResultTable.vue';
+  import ResultTable, { type TableRow } from '@/components/admin/ResultTable.vue';
   import { type Composer, useI18n } from 'vue-i18n';
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
   import {
@@ -445,7 +445,10 @@
             systemrechte: ['KLASSEN_VERWALTEN'],
           })
         "
-        @onHandleRowClick="navigateToKlassenDetails"
+        @onHandleRowClick="
+          (event: PointerEvent, item: TableRow<unknown>) =>
+            navigateToKlassenDetails(event, item as TableRow<Organisation>)
+        "
         :totalItems="organisationStore.allKlassen.length"
         item-value-path="id"
       >

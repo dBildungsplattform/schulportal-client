@@ -9,13 +9,7 @@
     type Organisation,
     OrganisationsTyp,
   } from '@/stores/OrganisationStore';
-  import {
-    usePersonStore,
-    type Person,
-    type PersonStore,
-    type PersonTableItem,
-    type Personendatensatz,
-  } from '@/stores/PersonStore';
+  import { usePersonStore, type Person, type PersonStore, type Personendatensatz } from '@/stores/PersonStore';
   import {
     usePersonenkontextStore,
     type PersonenkontextStore,
@@ -25,7 +19,7 @@
   import { useRolleStore, type RolleStore, type RolleResponse } from '@/stores/RolleStore';
   import { type SearchFilterStore, useSearchFilterStore } from '@/stores/SearchFilterStore';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import ResultTable from '@/components/admin/ResultTable.vue';
+  import ResultTable, { type TableRow } from '@/components/admin/ResultTable.vue';
   import SearchField from '@/components/admin/SearchField.vue';
   import { type TranslatedObject } from '@/types.d';
 
@@ -153,7 +147,7 @@
     applySearchAndFilters();
   }
 
-  function navigateToPersonDetails(_$event: PointerEvent, item: PersonTableItem): void {
+  function navigateToPersonDetails(_$event: PointerEvent, { item }: { item: Personendatensatz }): void {
     router.push({ name: 'person-details', params: { id: item.person.id } });
   }
 
@@ -534,7 +528,9 @@
         :items="personenWithUebersicht || []"
         :loading="personStore.loading"
         :headers="headers"
-        @onHandleRowClick="navigateToPersonDetails"
+        @onHandleRowClick="
+          (event: PointerEvent, item: TableRow<unknown>) => navigateToPersonDetails(event, item as TableRow<Personendatensatz>)
+        "
         @onUpdateTable="personStore.getAllPersons({})"
         :totalItems="personStore.totalPersons"
         item-value-path="person.id"

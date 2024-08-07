@@ -7,7 +7,7 @@
     type RolleStore,
   } from '@/stores/RolleStore';
   import { computed, onMounted, type ComputedRef } from 'vue';
-  import ResultTable from '@/components/admin/ResultTable.vue';
+  import ResultTable, { type TableRow } from '@/components/admin/ResultTable.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { type Composer, useI18n } from 'vue-i18n';
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
@@ -64,7 +64,7 @@
     });
   });
 
-  function navigateToRolleDetails(_$event: PointerEvent, item: RolleTableItem): void {
+  function navigateToRolleDetails(_$event: PointerEvent, { item }: { item: RolleTableItem }): void {
     router.push({ name: 'rolle-details', params: { id: item.id } });
   }
 
@@ -88,7 +88,10 @@
         :items="transformedRollenAndMerkmale || []"
         :loading="rolleStore.loading"
         :headers="headers"
-        @onHandleRowClick="navigateToRolleDetails"
+        @onHandleRowClick="
+          (event: PointerEvent, item: TableRow<unknown>) =>
+            navigateToRolleDetails(event, item as TableRow<RolleTableItem>)
+        "
         @onUpdateTable="rolleStore.getAllRollen('')"
         :totalItems="rolleStore.allRollen.length"
         item-value-path="id"

@@ -1,17 +1,18 @@
 <script setup lang="ts">
   import { computed, type ComputedRef } from 'vue';
   import { type Composer, useI18n } from 'vue-i18n';
-  import { type PersonTableItem } from '@/stores/PersonStore';
-  import { type RolleTableItem } from '@/stores/RolleStore';
-  import { type SchuleTableItem } from '@/stores/OrganisationStore';
 
   /* this block is necessary to introduce a table header type for defining table headers
       watch source for updates: https://stackoverflow.com/a/75993081/4790594
    */
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
+
   type ReadonlyHeaders = InstanceType<typeof VDataTableServer>['headers'];
 
-  type TableItem = RolleTableItem | SchuleTableItem | PersonTableItem;
+  export type TableItem = Record<string, unknown>;
+  export type TableRow<T> = {
+    item: T;
+  };
 
   type Props = {
     items: TableItem[];
@@ -39,15 +40,15 @@
   });
 
   type Emits = {
-    (event: 'onHandleRowClick', eventPayload: PointerEvent, item: TableItem): void;
+    (event: 'onHandleRowClick', eventPayload: PointerEvent, item: TableRow<unknown>): void;
     (event: 'onTableUpdate'): void;
   };
   const emit: Emits = defineEmits<{
-    (event: 'onHandleRowClick', eventPayload: PointerEvent, item: TableItem): void;
+    (event: 'onHandleRowClick', eventPayload: PointerEvent, item: TableRow<unknown>): void;
     (event: 'onTableUpdate'): void;
   }>();
 
-  function handleRowClick(event: PointerEvent, item: TableItem): void {
+  function handleRowClick(event: PointerEvent, item: TableRow<unknown>): void {
     if (!props.disableRowClick) {
       emit('onHandleRowClick', event, item);
     }
