@@ -18,12 +18,12 @@ concurrency:
 
 jobs:
   scan:
-    uses: dBildungsplattform/dbp-github-workflows/.github/workflows/check-helm-kics.yaml@5
+    uses: dBildungsplattform/dbp-github-workflows/.github/workflows/check-helm-kics.yaml@OPS-6636-Allow-adding-dependencies-chart-release
     permissions:
       contents: read
   release:
     needs: scan
-    uses: dBildungsplattform/dbp-github-workflows/.github/workflows/chart-release.yaml@5
+    uses: dBildungsplattform/dbp-github-workflows/.github/workflows/chart-release.yaml@OPS-6636-Allow-adding-dependencies-chart-release
     secrets: inherit
     with:
       chart_name: schulportal-client
