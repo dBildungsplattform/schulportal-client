@@ -529,7 +529,8 @@
         :loading="personStore.loading"
         :headers="headers"
         @onHandleRowClick="
-          (event: PointerEvent, item: TableRow<unknown>) => navigateToPersonDetails(event, item as TableRow<Personendatensatz>)
+          (event: PointerEvent, item: TableRow<unknown>) =>
+            navigateToPersonDetails(event, item as TableRow<Personendatensatz>)
         "
         @onUpdateTable="personStore.getAllPersons({})"
         :totalItems="personStore.totalPersons"

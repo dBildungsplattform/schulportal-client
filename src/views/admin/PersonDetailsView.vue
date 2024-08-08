@@ -303,7 +303,7 @@
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedRolle', vuetifyConfig);
   const [selectedOrganisation, selectedOrganisationProps]: [
-    Ref<string>,
+    Ref<string | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedOrganisation', vuetifyConfig);
   const [selectedKlasse, selectedKlasseProps]: [
@@ -965,9 +965,9 @@
                   v-model:selectedOrganisation="selectedOrganisation"
                   v-model:selectedRolle="selectedRolle"
                   v-model:selectedKlasse="selectedKlasse"
-                  @update:selectedOrganisation="(value: string) => (selectedOrganisation = value)"
+                  @update:selectedOrganisation="(value: string | undefined) => (selectedOrganisation = value)"
                   @update:selectedRolle="(value: string | undefined) => (selectedRolle = value)"
-                  @update:selectedKlasse="(value: string) => (selectedKlasse = value)"
+                  @update:selectedKlasse="(value: string | undefined) => (selectedKlasse = value)"
                   @update:canCommit="canCommit = $event"
                   @fieldReset="handleFieldReset"
                 />

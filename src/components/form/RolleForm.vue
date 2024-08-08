@@ -156,7 +156,7 @@
           item-text="title"
           multiple
           :no-data-text="$t('noDataFound')"
-          :placeholder="$t('admin.rolle.selectMerkmale')"
+          :placeholder="isEditActive ? $t('admin.rolle.selectMerkmale') : '---'"
           variant="outlined"
           v-bind="selectedMerkmaleProps"
           v-model="selectedMerkmale"
@@ -185,7 +185,7 @@
           item-text="title"
           multiple
           :no-data-text="$t('noDataFound')"
-          :placeholder="$t('admin.serviceProvider.selectServiceProvider')"
+          :placeholder="isEditActive ? $t('admin.serviceProvider.selectServiceProvider') : '---'"
           variant="outlined"
           v-bind="selectedServiceProvidersProps"
           v-model="selectedServiceProviders"
@@ -215,7 +215,7 @@
           item-text="title"
           multiple
           :no-data-text="$t('noDataFound')"
-          :placeholder="$t('admin.rolle.selectSystemrechte')"
+          :placeholder="isEditActive ? $t('admin.rolle.selectSystemrechte') : '---'"
           variant="outlined"
           v-bind="selectedSystemRechteProps"
           v-model="selectedSystemRechte"

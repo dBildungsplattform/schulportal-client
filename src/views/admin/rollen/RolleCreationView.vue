@@ -33,6 +33,7 @@
   import RolleForm from '@/components/form/RolleForm.vue';
   import { getValidationSchema, getVuetifyConfig } from '@/utils/validationRolle';
   import SuccessTemplate from '@/components/admin/rollen/SuccessTemplate.vue';
+  import { type TranslatedObject } from '@/types.d';
 
   const rolleStore: RolleStore = useRolleStore();
   const organisationStore: OrganisationStore = useOrganisationStore();
@@ -76,7 +77,7 @@
   ] = defineField('selectedAdministrationsebene', vuetifyConfig);
 
   const [selectedRollenArt, selectedRollenArtProps]: [
-    Ref<RollenArt | null>,
+    Ref<RollenArt | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedRollenArt', vuetifyConfig);
 
@@ -86,7 +87,7 @@
   ] = defineField('selectedRollenName', vuetifyConfig);
 
   const [selectedMerkmale, selectedMerkmaleProps]: [
-    Ref<RollenMerkmal[] | null>,
+    Ref<RollenMerkmal[]>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedMerkmale', vuetifyConfig);
 
@@ -96,7 +97,7 @@
   ] = defineField('selectedServiceProviders', vuetifyConfig);
 
   const [selectedSystemRechte, selectedSystemRechteProps]: [
-    Ref<RollenSystemRecht[] | null>,
+    Ref<RollenSystemRecht[]>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedSystemRechte', vuetifyConfig);
 
@@ -191,6 +192,20 @@
       .join(', ');
   });
 
+  const translatedSelectedMerkmale: ComputedRef<TranslatedObject[]> = computed(() => {
+    return selectedMerkmale.value.map((merkmalKey: RollenMerkmal) => ({
+      value: merkmalKey,
+      title: t(`admin.rolle.mappingFrontBackEnd.merkmale.${merkmalKey}`),
+    }));
+  });
+
+  const translatedSelectedSystemrechte: ComputedRef<TranslatedObject[]> = computed(() => {
+    return selectedSystemRechte.value.map((systemrechtKey: RollenSystemRecht) => ({
+      value: systemrechtKey,
+      title: t(`admin.rolle.mappingFrontBackEnd.systemrechte.${systemrechtKey}`),
+    }));
+  });
+
   const administrationsebenen: ComputedRef<
     {
       value: string;
@@ -269,9 +284,9 @@
 
   const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = handleSubmit(async () => {
     if (selectedRollenName.value && selectedAdministrationsebene.value && selectedRollenArt.value) {
-      const merkmaleToSubmit: RollenMerkmal[] = selectedMerkmale.value?.map((m: RollenMerkmal) => m) || [];
+      const merkmaleToSubmit: RollenMerkmal[] = selectedMerkmale.value.map((m: RollenMerkmal) => m) || [];
       const systemrechteToSubmit: RollenSystemRecht[] =
-        selectedSystemRechte.value?.map((m: RollenSystemRecht) => m) || [];
+        selectedSystemRechte.value.map((m: RollenSystemRecht) => m) || [];
       await rolleStore
         .createRolle(
           selectedRollenName.value,
@@ -338,11 +353,11 @@
           :selectedRollenArtProps="selectedRollenArtProps"
           v-model:selectedRollenName="selectedRollenName"
           :selectedRollenNameProps="selectedRollenNameProps"
-          v-model:selectedMerkmale="selectedMerkmale"
+          v-model:selectedMerkmale="translatedSelectedMerkmale"
           :selectedMerkmaleProps="selectedMerkmaleProps"
           v-model:selectedServiceProviders="selectedServiceProviders"
           :selectedServiceProvidersProps="selectedServiceProvidersProps"
-          v-model:selectedSystemRechte="selectedSystemRechte"
+          v-model:selectedSystemRechte="translatedSelectedSystemrechte"
           :selectedSystemRechteProps="selectedSystemRechteProps"
           :serviceProviders="serviceProviders"
           :showUnsavedChangesDialog="showUnsavedChangesDialog"
