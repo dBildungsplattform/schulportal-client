@@ -116,17 +116,19 @@
     }
   }
 
-  function applySearchAndFilters(organisations?: Array<string>): void {
+  function applySearchAndFilters(): void {
     personStore.getAllPersons({
-      organisationIDs: organisations ? organisations : selectedSchulen.value,
-      rolleIDs: selectedRollen.value,
-      searchFilter: searchFilter.value,
+      organisationIDs: searchFilterStore.selectedKlassen?.length
+        ? searchFilterStore.selectedKlassen
+        : searchFilterStore.selectedSchulen || [],
+      rolleIDs: searchFilterStore.selectedRollen || [],
+      searchFilter: searchFilterStore.searchFilter || '',
     });
   }
 
   async function setKlasseFilter(newValue: Array<string>): Promise<void> {
     await searchFilterStore.setKlasseFilter(newValue);
-    applySearchAndFilters(newValue);
+    applySearchAndFilters();
   }
 
   async function setRolleFilter(newValue: Array<string>): Promise<void> {
@@ -529,7 +531,6 @@
         :loading="personStore.loading"
         :headers="headers"
         @onHandleRowClick="navigateToPersonDetails"
-        @onUpdateTable="personStore.getAllPersons({})"
         :totalItems="personStore.totalPersons"
         item-value-path="person.id"
         ><template v-slot:[`item.rollen`]="{ item }">
