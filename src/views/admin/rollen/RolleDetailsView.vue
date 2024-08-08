@@ -120,37 +120,37 @@
   ] = defineField('selectedRollenName', vuetifyConfig);
 
   const [selectedMerkmale, selectedMerkmaleProps]: [
-    Ref<RollenMerkmal[]>,
+    Ref<RollenMerkmal[] | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedMerkmale', vuetifyConfig);
 
   const [selectedServiceProviders, selectedServiceProvidersProps]: [
-    Ref<string[]>,
+    Ref<string[] | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedServiceProviders', vuetifyConfig);
 
   const [selectedSystemRechte, selectedSystemRechteProps]: [
-    Ref<RollenSystemRecht[]>,
+    Ref<RollenSystemRecht[] | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedSystemRechte', vuetifyConfig);
 
-  const translatedSelectedMerkmale: ComputedRef<TranslatedObject[]> = computed(() => {
-    return selectedMerkmale.value.map((merkmalKey: RollenMerkmal) => ({
+  const translatedSelectedMerkmale: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
+    return selectedMerkmale.value?.map((merkmalKey: RollenMerkmal) => ({
       value: merkmalKey,
       title: t(`admin.rolle.mappingFrontBackEnd.merkmale.${merkmalKey}`),
     }));
   });
 
-  const translatedSelectedSystemrechte: ComputedRef<TranslatedObject[]> = computed(() => {
-    return selectedSystemRechte.value.map((systemrechtKey: RollenSystemRecht) => ({
+  const translatedSelectedSystemrechte: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
+    return selectedSystemRechte.value?.map((systemrechtKey: RollenSystemRecht) => ({
       value: systemrechtKey,
       title: t(`admin.rolle.mappingFrontBackEnd.systemrechte.${systemrechtKey}`),
     }));
   });
 
-  const translatedSelectedServiceProviders: ComputedRef<TranslatedObject[]> = computed(() => {
+  const translatedSelectedServiceProviders: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
     const serviceProviders: Array<ServiceProvider> = Array.from(rolleStore.currentRolle?.serviceProviders || []);
-    return selectedServiceProviders.value.map((providerId: string) => {
+    return selectedServiceProviders.value?.map((providerId: string) => {
       const matchedProvider: ServiceProvider = serviceProviders.find(
         (provider: ServiceProvider) => provider.id === providerId,
       ) as ServiceProvider;
@@ -199,9 +199,9 @@
           await rolleStore.updateRolle(
             rolleStore.currentRolle.id,
             selectedRollenName.value,
-            selectedMerkmale.value,
-            selectedSystemRechte.value,
-            selectedServiceProviders.value,
+            selectedMerkmale.value || [],
+            selectedSystemRechte.value || [],
+            selectedServiceProviders.value || [],
           );
         } catch {
           creationErrorText.value = t(`admin.rolle.errors.${rolleStore.errorCode}`);
