@@ -4793,12 +4793,9 @@
         "properties": {
           "personId": {
             "type": "string"
-          },
-          "selfService": {
-            "type": "boolean"
           }
         },
-        "required": ["personId", "selfService"]
+        "required": ["personId"]
       },
       "TokenStateResponse": {
         "type": "object",

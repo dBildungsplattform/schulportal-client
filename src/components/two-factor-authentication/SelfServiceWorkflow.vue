@@ -60,7 +60,7 @@
     switch (workflowStep.value) {
       case 'start':
         workflowStep.value = 'qrcode';
-        qrCodeImageBase64.value = await personStore.get2FASoftwareQRCode(props.personId, true);
+        qrCodeImageBase64.value = await personStore.get2FASoftwareQRCode(props.personId);
         break;
       case 'qrcode':
         workflowStep.value = 'verify';

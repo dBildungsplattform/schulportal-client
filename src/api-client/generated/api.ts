@@ -2090,12 +2090,6 @@ export interface TokenInitBodyParams {
      * @memberof TokenInitBodyParams
      */
     'personId': string;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof TokenInitBodyParams
-     */
-    'selfService': boolean;
 }
 /**
  * 

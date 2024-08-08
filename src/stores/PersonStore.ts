@@ -61,7 +61,7 @@ type PersonActions = {
   resetPassword: (personId: string) => Promise<string>;
   deletePerson: (personId: string) => Promise<void>;
   get2FAState: (personId: string) => Promise<TokenStateResponse>;
-  get2FASoftwareQRCode: (personId: string, selfService: boolean) => Promise<string>;
+  get2FASoftwareQRCode: (personId: string) => Promise<string>;
   verify2FAToken: (personId: string, token: string) => Promise<boolean>;
 };
 
@@ -170,12 +170,11 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
       }
     },
 
-    async get2FASoftwareQRCode(personId: string, selfService: boolean) {
+    async get2FASoftwareQRCode(personId: string) {
       this.loading = true;
       try {
         const bodyParams: TokenInitBodyParams = {
           personId: personId,
-          selfService: selfService,
         };
         const qrCodeImageBase64: string = (
           await twoFactorApi.privacyIdeaAdministrationControllerInitializeSoftwareToken(bodyParams)
