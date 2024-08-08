@@ -163,10 +163,6 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
 
         return token;
       } catch (error: unknown) {
-        this.errorCode = 'UNSPECIFIED_ERROR';
-        if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
-        }
         return await Promise.reject(this.errorCode);
       } finally {
         this.loading = false;
