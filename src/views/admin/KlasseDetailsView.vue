@@ -255,6 +255,7 @@
                       :errorCode="organisationStore.errorCode"
                       :klassenname="organisationStore.currentKlasse?.name"
                       :klassenId="organisationStore.currentKlasse?.id"
+                      ref="klasse-delete"
                       :schulname="selectedSchule"
                       :useIconActivator="false"
                       @onDeleteKlasse="deleteKlasse(currentOrganisationId)"
@@ -321,7 +322,6 @@
         </v-container>
       </template>
       <!-- Result template on success after submit  -->
-      <!-- Result template on success after submit -->
       <template v-if="organisationStore.updatedOrganisation && !organisationStore.errorCode">
         <SuccessTemplate
           :successMessage="$t('admin.klasse.klasseUpdatedSuccessfully')"
