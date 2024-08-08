@@ -92,7 +92,7 @@
   ] = defineField('selectedMerkmale', vuetifyConfig);
 
   const [selectedServiceProviders, selectedServiceProvidersProps]: [
-    Ref<RollenMerkmal[] | null>,
+    Ref<string[]>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedServiceProviders', vuetifyConfig);
 
@@ -206,6 +206,21 @@
     }));
   });
 
+  const translatedSelectedServiceProviders: ComputedRef<TranslatedObject[]> = computed(() => {
+    const serviceProviders: Array<ServiceProvider> = Array.from(rolleStore.currentRolle?.serviceProviders || []);
+    return (
+      selectedServiceProviders.value.map((providerId: string) => {
+        const matchedProvider: ServiceProvider = serviceProviders.find(
+          (provider: ServiceProvider) => provider.id === providerId,
+        ) as ServiceProvider;
+        return {
+          value: providerId,
+          title: matchedProvider.name,
+        };
+      }) || []
+    );
+  });
+
   const administrationsebenen: ComputedRef<
     {
       value: string;
@@ -296,13 +311,11 @@
           systemrechteToSubmit,
         )
         .then(async (rolleResponse: RolleResponse) => {
-          if (selectedServiceProviders.value) {
-            selectedServiceProviders.value.forEach(async (serviceProviderId: string) => {
-              await rolleStore.addServiceProviderToRolle(rolleResponse.id, {
-                serviceProviderId,
-              });
+          selectedServiceProviders.value.forEach(async (serviceProviderId: string) => {
+            await rolleStore.addServiceProviderToRolle(rolleResponse.id, {
+              serviceProviderId,
             });
-          }
+          });
         });
       resetForm();
 
@@ -355,7 +368,7 @@
           :selectedRollenNameProps="selectedRollenNameProps"
           v-model:selectedMerkmale="translatedSelectedMerkmale"
           :selectedMerkmaleProps="selectedMerkmaleProps"
-          v-model:selectedServiceProviders="selectedServiceProviders"
+          v-model:selectedServiceProviders="translatedSelectedServiceProviders"
           :selectedServiceProvidersProps="selectedServiceProvidersProps"
           v-model:selectedSystemRechte="translatedSelectedSystemrechte"
           :selectedSystemRechteProps="selectedSystemRechteProps"

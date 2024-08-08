@@ -119,7 +119,7 @@
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedFamilienname', vuetifyConfig);
   const [selectedOrganisation, selectedOrganisationProps]: [
-    Ref<string>,
+    Ref<string | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedOrganisation', vuetifyConfig);
   const [selectedKlasse, selectedKlasseProps]: [
@@ -186,7 +186,7 @@
     const bodyParams: CreatePersonBodyParams = {
       familienname: selectedFamilienname.value as string,
       vorname: selectedVorname.value as string,
-      organisationId: selectedOrganisation.value,
+      organisationId: selectedOrganisation.value as string,
       rolleId: selectedRolle.value ?? '',
     };
 
@@ -305,7 +305,7 @@
           v-model:selectedOrganisation="selectedOrganisation"
           v-model:selectedRolle="selectedRolle"
           v-model:selectedKlasse="selectedKlasse"
-          @update:selectedOrganisation="(value: string) => (selectedOrganisation = value)"
+          @update:selectedOrganisation="(value: string | undefined) => (selectedOrganisation = value)"
           @update:selectedRolle="(value: string | undefined) => (selectedRolle = value)"
           @update:selectedKlasse="(value: string | undefined) => (selectedKlasse = value)"
           @update:canCommit="canCommit = $event"

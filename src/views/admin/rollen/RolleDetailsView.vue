@@ -148,6 +148,21 @@
     }));
   });
 
+  const translatedSelectedServiceProviders: ComputedRef<TranslatedObject[]> = computed(() => {
+    const serviceProviders: Array<ServiceProvider> = Array.from(rolleStore.currentRolle?.serviceProviders || []);
+    return (
+      selectedServiceProviders.value.map((providerId: string) => {
+        const matchedProvider: ServiceProvider = serviceProviders.find(
+          (provider: ServiceProvider) => provider.id === providerId,
+        ) as ServiceProvider;
+        return {
+          value: providerId,
+          title: matchedProvider.name,
+        };
+      }) || []
+    );
+  });
+
   function isFormDirty(): boolean {
     // Only check for dirtiness if the form is in edit mode
     if (!isEditActive.value) return false;
@@ -400,7 +415,7 @@
               :selectedRollenNameProps="selectedRollenNameProps"
               v-model:selectedMerkmale="translatedSelectedMerkmale"
               :selectedMerkmaleProps="selectedMerkmaleProps"
-              v-model:selectedServiceProviders="selectedServiceProviders"
+              v-model:selectedServiceProviders="translatedSelectedServiceProviders"
               :selectedServiceProvidersProps="selectedServiceProvidersProps"
               v-model:selectedSystemRechte="translatedSelectedSystemrechte"
               :selectedSystemRechteProps="selectedSystemRechteProps"
