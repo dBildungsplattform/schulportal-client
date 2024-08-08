@@ -33,6 +33,7 @@
   import { useKlassen } from '@/composables/useKlassen';
   import PersonenkontextCreate from '@/components/admin/personen/PersonenkontextCreate.vue';
   import { type TranslatedObject } from '@/types.d';
+  import KlasseForm from '@/components/form/KlasseForm.vue';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
@@ -57,9 +58,11 @@
 
   const isEditActive: Ref<boolean> = ref(false);
   const isZuordnungFormActive: Ref<boolean> = ref(false);
+  const isChangeKlasseFormActive: Ref<boolean> = ref(false);
 
   const pendingDeletion: Ref<boolean> = ref(false);
   const pendingCreation: Ref<boolean> = ref(false);
+  const pendingChangeKlasse: Ref<boolean> = ref(false);
 
   const deleteSuccessDialogVisible: Ref<boolean> = ref(false);
   const createSuccessDialogVisible: Ref<boolean> = ref(false);
@@ -119,9 +122,15 @@
     });
   };
 
+  // Triggers the template to add a new Zuordnung
   const triggerAddZuordnung = async (): Promise<void> => {
     await personenkontextStore.processWorkflowStep();
     isZuordnungFormActive.value = true;
+  };
+
+  // Triggers the template to change the Klasse
+  const triggerChangeKlasse = async (): Promise<void> => {
+    isChangeKlasseFormActive.value = true;
   };
 
   // This will send the updated list of Zuordnungen to the Backend WITHOUT the selected Zuordnungen.
@@ -324,8 +333,10 @@
     isEditActive.value = false;
     pendingDeletion.value = false;
     pendingCreation.value = false;
+    pendingChangeKlasse.value = false;
     selectedZuordnungen.value = [];
     isZuordnungFormActive.value = false;
+    isChangeKlasseFormActive.value = false;
     resetForm();
     zuordnungenResult.value = originalZuordnungenResult.value
       ? JSON.parse(JSON.stringify(originalZuordnungenResult.value))
@@ -728,7 +739,7 @@
         </v-container>
         <!-- Show this template if the edit button is triggered-->
         <v-container v-if="isEditActive">
-          <template v-if="!isZuordnungFormActive">
+          <template v-if="!isZuordnungFormActive && !isChangeKlasseFormActive">
             <v-row class="ml-md-16">
               <v-col
                 v-if="!pendingDeletion && !pendingCreation"
@@ -814,7 +825,7 @@
               </v-col>
               <v-spacer></v-spacer>
               <v-col
-                v-if="!pendingDeletion && !pendingCreation"
+                v-if="!pendingDeletion && !pendingCreation && !pendingChangeKlasse"
                 class="button-container"
                 cols="12"
                 md="auto"
@@ -880,6 +891,22 @@
                       {{ $t('person.modifyBefristung') }}
                     </v-btn>
                   </SpshTooltip>
+                  <SpshTooltip
+                    :enabledCondition="selectedZuordnungen.length > 0"
+                    :disabledText="$t('person.chooseZuordnungFirst')"
+                    :enabledText="$t('person.changeKlasseDescription')"
+                    position="start"
+                  >
+                    <v-btn
+                      class="primary mt-2"
+                      @Click="triggerChangeKlasse"
+                      data-testid="klasse-change-button"
+                      :disabled="selectedZuordnungen.length === 0"
+                      :block="mdAndDown"
+                    >
+                      {{ $t('person.changeKlasse') }}
+                    </v-btn>
+                  </SpshTooltip>
                 </v-col>
               </v-col>
             </v-row>
@@ -938,8 +965,8 @@
               </v-col>
             </v-row>
           </template>
+          <!-- Form to add Zuordnung -->
           <template v-if="isZuordnungFormActive && !pendingDeletion">
-            <!-- Formwrapper geht hier nicht, eigene Komponente hier einrichten?-->
             <v-form
               data-testid="zuordnung-creation-form"
               @submit="onSubmit"
@@ -971,6 +998,68 @@
                   @update:canCommit="canCommit = $event"
                   @fieldReset="handleFieldReset"
                 />
+              </v-container>
+              <v-row class="py-3 px-2 justify-center">
+                <v-spacer class="hidden-sm-and-down"></v-spacer>
+                <v-col
+                  cols="12"
+                  sm="6"
+                  md="auto"
+                >
+                  <v-btn
+                    :block="mdAndDown"
+                    class="secondary"
+                    @Click="cancelEdit"
+                    data-testid="zuordnung-creation-discard-button"
+                    >{{ $t('cancel') }}</v-btn
+                  >
+                </v-col>
+                <v-col
+                  cols="12"
+                  sm="6"
+                  md="auto"
+                >
+                  <v-btn
+                    :block="mdAndDown"
+                    :disabled="!canCommit"
+                    class="primary"
+                    data-testid="zuordnung-creation-submit-button"
+                    type="submit"
+                    >{{ $t('person.addZuordnung') }}</v-btn
+                  >
+                </v-col>
+              </v-row>
+            </v-form>
+          </template>
+          <!-- Form to change Klasse -->
+          <template v-if="isChangeKlasseFormActive && !pendingChangeKlasse">
+            <v-form
+              data-testid="zuordnung-creation-form"
+              @submit="onSubmit"
+            >
+              <v-row class="ml-md-16">
+                <v-col
+                  cols="12"
+                  sm="auto"
+                >
+                  <h3 class="subtitle-1">{{ $t('person.changeKlasse') }}:</h3></v-col
+                >
+              </v-row>
+              <v-container class="px-lg-16">
+                <KlasseForm
+              :isEditActive="isEditActive"
+              :readonly="true"
+              :selectedSchuleProps="selectedSchuleProps"
+              :selectedKlassennameProps="selectedKlassennameProps"
+              :showUnsavedChangesDialog="showUnsavedChangesDialog"
+              :onHandleConfirmUnsavedChanges="handleConfirmUnsavedChanges"
+              :onHandleDiscard="navigateToKlasseManagement"
+              :onShowDialogChange="(value: boolean) => (showUnsavedChangesDialog = value)"
+              :onSubmit="onSubmit"
+              ref="klasse-change-form"
+              v-model:selectedSchule="selectedSchule"
+              v-model:selectedKlassenname="selectedKlassenname"
+            />
               </v-container>
               <v-row class="py-3 px-2 justify-center">
                 <v-spacer class="hidden-sm-and-down"></v-spacer>
