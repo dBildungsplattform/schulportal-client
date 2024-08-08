@@ -89,7 +89,7 @@
         "scanOrPrint": "QR-Code scannen oder ausdrucken.",
         "notSetUp": "Für diesen Benutzer ist aktuell keine 2FA eingerichtet.",
         "softwareTokenIsSetUp": "Für diesen Benutzer ist aktuell ein Software-Token eingerichtet.",
-        "resetInfo": "Um einen neuen Token einzurichten, muss der aktuelle Token durch die Schuladmins zurückgesetzt werden.",
+        "resetInfo": "Um einen neuen Token einzurichten, muss der aktuelle Token durch die schulischen Admins zurückgesetzt werden.",
         "tokenReset": "Token zurücksetzen"
       },
       "copyPasswordError": "Passwort konnte nicht in die Zwischenablage kopiert werden",
