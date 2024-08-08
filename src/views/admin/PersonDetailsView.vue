@@ -8,7 +8,7 @@
   import SpshTooltip from '@/components/admin/SpshTooltip.vue';
   import PersonDelete from '@/components/admin/personen/PersonDelete.vue';
   import PersonenkontextDelete from '@/components/admin/personen/PersonenkontextDelete.vue';
-  import TwoFactorAuthenticationSetUp from '@/components/cards/two-factor-authentication/TwoFactorAuthenticationSetUp.vue';
+  import TwoFactorAuthenticationSetUp from '@/components/two-factor-authentication/TwoFactorAuthenticationSetUp.vue';
   import {
     usePersonenkontextStore,
     type PersonenkontextStore,
@@ -469,15 +469,22 @@
     secondFactorSet.value = undefined;
     secondFactorType.value = undefined;
 
-    const result: TokenStateResponse = await personStore.get2FAState(currentPersonId);
-    secondFactorSet.value = result.hasToken;
-    if (secondFactorSet.value) {
-      if (result.tokenKind === 'hardware') {
-        secondFactorType.value = 'hardware';
-      } else if (result.tokenKind === 'software') {
-        secondFactorType.value = 'software';
-      }
-    }
+    await personStore
+      .get2FAState(currentPersonId)
+      .then((response: TokenStateResponse) => {
+        secondFactorSet.value = response.hasToken;
+        if (secondFactorSet.value) {
+          if (response.tokenKind === 'hardware') {
+            secondFactorType.value = 'hardware';
+          } else if (response.tokenKind === 'software') {
+            secondFactorType.value = 'software';
+          }
+        }
+      })
+      .catch(() => {
+        secondFactorSet.value = undefined;
+        return;
+      });
   }
 
   onBeforeMount(async () => {
@@ -652,7 +659,10 @@
           thickness="6"
         ></v-divider>
         <!-- Two Factor Authentication -->
-        <v-container class="two-factor-authentication-set-up">
+        <v-container
+          v-if="secondFactorSet != undefined"
+          class="two-factor-authentication-set-up"
+        >
           <v-row class="ml-md-16">
             <v-col>
               <h3 class="subtitle-1">{{ $t('admin.person.twoFactorAuthentication.header') }}</h3>
@@ -738,6 +748,7 @@
           ></v-row>
         </v-container>
         <v-divider
+          v-if="secondFactorSet != undefined"
           class="border-opacity-100 rounded my-6 mx-4"
           color="#E5EAEF"
           thickness="6"
