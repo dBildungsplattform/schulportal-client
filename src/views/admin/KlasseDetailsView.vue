@@ -122,7 +122,7 @@
     if (selectedSchule.value && selectedKlassenname.value) {
       if (organisationStore.currentOrganisation) {
         try {
-          await organisationStore.updateOrganisation(currentOrganisationId, selectedKlassenname.value);
+          await organisationStore.updateOrganisationById(currentOrganisationId, selectedKlassenname.value);
         } catch {
           creationErrorText.value = t(`admin.klasse.errors.${organisationStore.errorCode}`);
           creationErrorTitle.value = t(`admin.klasse.title.${organisationStore.errorCode}`);

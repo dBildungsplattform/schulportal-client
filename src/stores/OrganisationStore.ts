@@ -64,7 +64,7 @@ type OrganisationActions = {
     zugehoerigZu?: string,
   ) => Promise<Organisation>;
   deleteOrganisationById: (organisationId: string) => Promise<void>;
-  updateOrganisation: (organisationId: string, name: string) => Promise<void>;
+  updateOrganisationById: (organisationId: string, name: string) => Promise<void>;
 };
 
 export { OrganisationsTyp };
@@ -242,7 +242,7 @@ export const useOrganisationStore: StoreDefinition<
         this.loading = false;
       }
     },
-    async updateOrganisation(organisationId: string, name: string): Promise<void> {
+    async updateOrganisationById(organisationId: string, name: string): Promise<void> {
       this.errorCode = '';
       this.loading = true;
       try {

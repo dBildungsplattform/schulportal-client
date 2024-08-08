@@ -131,6 +131,7 @@
       </v-btn>
       <v-icon
         v-else
+        class="mr-14"
         :title="$t('admin.klasse.deleteKlasse')"
         data-testid="open-klasse-delete-dialog-icon"
         icon="mdi-delete"
