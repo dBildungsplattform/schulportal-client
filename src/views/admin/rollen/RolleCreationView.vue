@@ -208,37 +208,25 @@
 
   const translatedSelectedServiceProviders: ComputedRef<TranslatedObject[]> = computed(() => {
     const serviceProviders: Array<ServiceProvider> = Array.from(rolleStore.currentRolle?.serviceProviders || []);
-    return (
-      selectedServiceProviders.value.map((providerId: string) => {
-        const matchedProvider: ServiceProvider = serviceProviders.find(
-          (provider: ServiceProvider) => provider.id === providerId,
-        ) as ServiceProvider;
-        return {
-          value: providerId,
-          title: matchedProvider.name,
-        };
-      }) || []
-    );
+    return selectedServiceProviders.value.map((providerId: string) => {
+      const matchedProvider: ServiceProvider = serviceProviders.find(
+        (provider: ServiceProvider) => provider.id === providerId,
+      ) as ServiceProvider;
+      return {
+        value: providerId,
+        title: matchedProvider.name,
+      };
+    });
   });
 
-  const administrationsebenen: ComputedRef<
-    {
-      value: string;
-      title: string;
-    }[]
-  > = computed(() =>
+  const administrationsebenen: ComputedRef<TranslatedObject[]> = computed(() =>
     organisationStore.allOrganisationen.map((org: Organisation) => ({
       value: org.id,
       title: org.kennung ? `${org.kennung} (${org.name})` : org.name,
     })),
   );
 
-  const serviceProviders: ComputedRef<
-    {
-      value: string;
-      title: string;
-    }[]
-  > = computed(() =>
+  const serviceProviders: ComputedRef<TranslatedObject[]> = computed(() =>
     serviceProviderStore.allServiceProviders.map((provider: ServiceProvider) => ({
       value: provider.id,
       title: provider.name,
@@ -299,9 +287,8 @@
 
   const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = handleSubmit(async () => {
     if (selectedRollenName.value && selectedAdministrationsebene.value && selectedRollenArt.value) {
-      const merkmaleToSubmit: RollenMerkmal[] = selectedMerkmale.value.map((m: RollenMerkmal) => m) || [];
-      const systemrechteToSubmit: RollenSystemRecht[] =
-        selectedSystemRechte.value.map((m: RollenSystemRecht) => m) || [];
+      const merkmaleToSubmit: RollenMerkmal[] = selectedMerkmale.value.map((m: RollenMerkmal) => m);
+      const systemrechteToSubmit: RollenSystemRecht[] = selectedSystemRechte.value.map((m: RollenSystemRecht) => m);
       await rolleStore
         .createRolle(
           selectedRollenName.value,

@@ -150,17 +150,15 @@
 
   const translatedSelectedServiceProviders: ComputedRef<TranslatedObject[]> = computed(() => {
     const serviceProviders: Array<ServiceProvider> = Array.from(rolleStore.currentRolle?.serviceProviders || []);
-    return (
-      selectedServiceProviders.value.map((providerId: string) => {
-        const matchedProvider: ServiceProvider = serviceProviders.find(
-          (provider: ServiceProvider) => provider.id === providerId,
-        ) as ServiceProvider;
-        return {
-          value: providerId,
-          title: matchedProvider.name,
-        };
-      }) || []
-    );
+    return selectedServiceProviders.value.map((providerId: string) => {
+      const matchedProvider: ServiceProvider = serviceProviders.find(
+        (provider: ServiceProvider) => provider.id === providerId,
+      ) as ServiceProvider;
+      return {
+        value: providerId,
+        title: matchedProvider.name,
+      };
+    });
   });
 
   function isFormDirty(): boolean {
