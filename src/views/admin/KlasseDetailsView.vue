@@ -255,6 +255,7 @@
                       :errorCode="organisationStore.errorCode"
                       :klassenname="organisationStore.currentKlasse?.name"
                       :klassenId="organisationStore.currentKlasse?.id"
+                      :schulname="selectedSchule"
                       :useIconActivator="false"
                       @onDeleteKlasse="deleteKlasse(currentOrganisationId)"
                     >

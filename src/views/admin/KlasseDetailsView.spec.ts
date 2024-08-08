@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest';
 import { VueWrapper, mount } from '@vue/test-utils';
-import KlassenDetailsView from './KlassenDetailsView.vue';
+import KlassenDetailsView from './KlasseDetailsView.vue';
 import { setActivePinia, createPinia } from 'pinia';
 import routes from '@/router/routes';
 import { type Router, createRouter, createWebHistory } from 'vue-router';

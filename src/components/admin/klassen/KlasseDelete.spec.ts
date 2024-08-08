@@ -17,6 +17,7 @@ beforeEach(() => {
       errorCode: '',
       klassenId: '1',
       klassenname: '1A',
+      schulname: 'schule',
       useIconActivator: true,
     },
     global: {

@@ -13,6 +13,7 @@
     errorCode: string;
     klassenname: string;
     klassenId: string;
+    schulname: string;
     useIconActivator: boolean;
   };
 
@@ -51,7 +52,8 @@
     }
     let message: string = '';
     message += `${t('admin.klasse.deleteKlasseConfirmation', {
-      name: props.klassenname,
+      klassenname: props.klassenname,
+      schulname: props.schulname,
     })}`;
     return message;
   });
@@ -62,7 +64,8 @@
     }
     let message: string = '';
     message += `${t('admin.klasse.deleteKlasseSuccessMessage', {
-      name: props.klassenname,
+      klassenname: props.klassenname,
+      schulname: props.schulname,
     })}`;
     return message;
   });
@@ -82,7 +85,7 @@
         <v-container>
           <v-row class="text-body bold px-md-16">
             <v-col
-              offset="3"
+              offset="1"
               cols="10"
             >
               <span data-testid="klasse-delete-success-text">
@@ -163,9 +166,9 @@
                 </p>
               </v-col>
             </v-row>
-            <v-row class="text-body bold">
+            <v-row class="text-body bold ml-2">
               <v-col
-                offset="3"
+                offset="1"
                 cols="10"
               >
                 <span data-testid="klasse-delete-confirmation-text">

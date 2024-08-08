@@ -25,8 +25,8 @@
       "createNew": "Neue Klasse anlegen",
       "discard": "Klasse verwerfen",
       "deleteKlasse": "Klasse löschen",
-      "deleteKlasseConfirmation": "Wollen Sie die Klasse {name} wirklich entfernen?",
-      "deleteKlasseSuccessMessage": "Die Klasse {name} wurde erfolgreich gelöscht.",
+      "deleteKlasseConfirmation": "Wollen Sie die Klasse {klassenname} an der Schule {schulname} wirklich entfernen?",
+      "deleteKlasseSuccessMessage": "Die Klasse {klassenname} an der Schule {schulname} wurde erfolgreich gelöscht.",
       "edit": "Klasse bearbeiten",
       "title": {
         "KLASSENNAME_AN_SCHULE_EINDEUTIG": "Fehler bei Änderung der Klasse.",

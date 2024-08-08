@@ -498,6 +498,7 @@
               :errorCode="organisationStore.errorCode"
               :klassenname="item.name"
               :klassenId="item.id"
+              :schulname="item.schuleDetails"
               :useIconActivator="true"
               @onDeleteKlasse="deleteKlasse(item.id)"
             >
