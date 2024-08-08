@@ -66,7 +66,7 @@ afterEach(() => {
 
 describe('KlasseCreationView', () => {
   test('it renders the klasse creation form', () => {
-    expect(wrapper?.find('[data-testid="klasse-creation-form"]').isVisible()).toBe(true);
+    expect(wrapper?.find('[data-testid="klasse-form"]').isVisible()).toBe(true);
   });
 
   test('it renders all child components', () => {
@@ -110,7 +110,7 @@ describe('KlasseCreationView', () => {
 
     organisationStore.createdKlasse = mockKlasse;
 
-    wrapper?.find('[data-testid="klasse-creation-form-create-button"]').trigger('click');
+    wrapper?.find('[data-testid="klasse-form-create-button"]').trigger('click');
     await nextTick();
 
     expect(wrapper?.find('[data-testid="create-another-klasse-button"]').isVisible()).toBe(true);

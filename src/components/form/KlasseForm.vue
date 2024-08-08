@@ -29,7 +29,7 @@
     :createButtonLabel="$t('admin.klasse.create')"
     :discardButtonLabel="$t('admin.klasse.discard')"
     :hideActions="readonly"
-    id="klasse-creation-form"
+    id="klasse-form"
     :onDiscard="onHandleDiscard"
     @onShowDialogChange="onShowDialogChange"
     :onSubmit="onSubmit"
