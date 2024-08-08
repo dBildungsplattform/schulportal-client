@@ -3167,6 +3167,58 @@
           }
         ]
       }
+    },
+    "/api/2fa-token/verify": {
+      "post": {
+        "operationId": "PrivacyIdeaAdministrationController_verifyToken",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TokenVerifyBodyParams"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The token was successfully verified.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "A username was not given or not found."
+          },
+          "401": {
+            "description": "Not authorized to verify token."
+          },
+          "403": {
+            "description": "Insufficient permissions to verify token."
+          },
+          "404": {
+            "description": "Insufficient permissions to verify token."
+          },
+          "500": {
+            "description": "Internal server error while verifying a token."
+          }
+        },
+        "tags": ["2FA"],
+        "security": [
+          {
+            "oauth2": ["openid"]
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
     }
   },
   "info": {
@@ -4741,9 +4793,12 @@
         "properties": {
           "personId": {
             "type": "string"
+          },
+          "selfService": {
+            "type": "boolean"
           }
         },
-        "required": ["personId"]
+        "required": ["personId", "selfService"]
       },
       "TokenStateResponse": {
         "type": "object",
@@ -4753,9 +4808,24 @@
           },
           "tokenKind": {
             "type": "string"
+          },
+          "tokenSerial": {
+            "type": "string"
           }
         },
-        "required": ["hasToken", "tokenKind"]
+        "required": ["hasToken", "tokenKind", "tokenSerial"]
+      },
+      "TokenVerifyBodyParams": {
+        "type": "object",
+        "properties": {
+          "personId": {
+            "type": "string"
+          },
+          "otp": {
+            "type": "string"
+          }
+        },
+        "required": ["personId", "otp"]
       }
     }
   }

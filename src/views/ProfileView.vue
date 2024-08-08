@@ -180,12 +180,12 @@
     secondFactorSet.value = undefined;
     secondFactorType.value = undefined;
 
-    const referrer: string | null | undefined = personInfoStore.personInfo?.person.referrer;
+    const personId: string | null | undefined = personInfoStore.personInfo?.person.id;
 
-    if (!referrer) {
+    if (!personId) {
       return;
     }
-    const result: TokenStateResponse = await personStore.get2FAState(referrer);
+    const result: TokenStateResponse = await personStore.get2FAState(personId);
     secondFactorSet.value = result.hasToken;
     if (secondFactorSet.value) {
       if (result.tokenKind === 'hardware') {
@@ -350,11 +350,7 @@
               icon="mdi-shield-account-outline"
             ></v-icon>
             <div>
-              <SelfServiceWorkflow
-                v-if="personInfoStore.personInfo?.person.referrer"
-                :referrer="personInfoStore.personInfo?.person.referrer"
-              >
-              </SelfServiceWorkflow>
+              <SelfServiceWorkflow :personId="personStore.currentPerson?.person.id ?? ''"> </SelfServiceWorkflow>
             </div>
           </v-row>
           <v-row

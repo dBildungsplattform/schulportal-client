@@ -37,7 +37,7 @@
   }>();
 
   type Props = {
-    referrer: string;
+    personId: string;
   };
 
   const props: Props = defineProps<Props>();
@@ -45,28 +45,28 @@
   async function close2FADialog(isActive: Ref<boolean>): Promise<void> {
     if (workflowStep.value !== 'start') {
       emits('dialogClosed');
+      qrCodeImageBase64.value = '';
     }
 
     isActive.value = false;
     workflowStep.value = 'start';
   }
 
-  function validateOTP(): boolean {
-    return false;
+  async function validateOTP(): Promise<boolean> {
+    return personStore.verify2FAToken(props.personId, otp.value);
   }
 
   async function proceed(isActive: Ref<boolean>): Promise<void> {
     switch (workflowStep.value) {
       case 'start':
         workflowStep.value = 'qrcode';
-        qrCodeImageBase64.value = await personStore.get2FASoftwareQRCode(props.referrer);
+        qrCodeImageBase64.value = await personStore.get2FASoftwareQRCode(props.personId, true);
         break;
       case 'qrcode':
         workflowStep.value = 'verify';
         break;
       case 'verify':
-        if (validateOTP()) {
-          qrCodeImageBase64.value = '';
+        if (await validateOTP()) {
           close2FADialog(isActive);
         } else {
           otp.value = '';

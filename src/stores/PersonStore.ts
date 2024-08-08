@@ -61,7 +61,8 @@ type PersonActions = {
   resetPassword: (personId: string) => Promise<string>;
   deletePerson: (personId: string) => Promise<void>;
   get2FAState: (personId: string) => Promise<TokenStateResponse>;
-  get2FASoftwareQRCode: (personId: string) => Promise<string>;
+  get2FASoftwareQRCode: (personId: string, selfService: boolean) => Promise<string>;
+  verify2FAToken: (personId: string, token: string) => Promise<boolean>;
 };
 
 export type PersonStore = Store<'personStore', PersonState, PersonGetters, PersonActions>;
@@ -173,17 +174,39 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
       }
     },
 
-    async get2FASoftwareQRCode(personId: string) {
+    async get2FASoftwareQRCode(personId: string, selfService: boolean) {
       this.loading = true;
       try {
         const bodyParams: TokenInitBodyParams = {
           personId: personId,
+          selfService: selfService,
         };
         const qrCodeImageBase64: string = (
           await twoFactorApi.privacyIdeaAdministrationControllerInitializeSoftwareToken(bodyParams)
         ).data;
 
         return qrCodeImageBase64;
+      } catch (error: unknown) {
+        this.errorCode = 'UNSPECIFIED_ERROR';
+        if (isAxiosError(error)) {
+          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
+        }
+        return await Promise.reject(this.errorCode);
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async verify2FAToken(personId: string, token: string): Promise<boolean> {
+      this.loading = true;
+      try {
+        const success: boolean = (
+          await twoFactorApi.privacyIdeaAdministrationControllerVerifyToken({
+            personId: personId,
+            otp: token,
+          })
+        ).data;
+        return success;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {

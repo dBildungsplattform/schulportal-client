@@ -2090,6 +2090,12 @@ export interface TokenInitBodyParams {
      * @memberof TokenInitBodyParams
      */
     'personId': string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof TokenInitBodyParams
+     */
+    'selfService': boolean;
 }
 /**
  * 
@@ -2109,6 +2115,31 @@ export interface TokenStateResponse {
      * @memberof TokenStateResponse
      */
     'tokenKind': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof TokenStateResponse
+     */
+    'tokenSerial': string;
+}
+/**
+ * 
+ * @export
+ * @interface TokenVerifyBodyParams
+ */
+export interface TokenVerifyBodyParams {
+    /**
+     * 
+     * @type {string}
+     * @memberof TokenVerifyBodyParams
+     */
+    'personId': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof TokenVerifyBodyParams
+     */
+    'otp': string;
 }
 /**
  * 
@@ -2827,6 +2858,49 @@ export const Class2FAApiAxiosParamCreator = function (configuration?: Configurat
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * 
+         * @param {TokenVerifyBodyParams} tokenVerifyBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        privacyIdeaAdministrationControllerVerifyToken: async (tokenVerifyBodyParams: TokenVerifyBodyParams, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'tokenVerifyBodyParams' is not null or undefined
+            assertParamExists('privacyIdeaAdministrationControllerVerifyToken', 'tokenVerifyBodyParams', tokenVerifyBodyParams)
+            const localVarPath = `/api/2fa-token/verify`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(tokenVerifyBodyParams, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -2857,6 +2931,16 @@ export const Class2FAApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.privacyIdeaAdministrationControllerInitializeSoftwareToken(tokenInitBodyParams, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
+        /**
+         * 
+         * @param {TokenVerifyBodyParams} tokenVerifyBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async privacyIdeaAdministrationControllerVerifyToken(tokenVerifyBodyParams: TokenVerifyBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<boolean>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.privacyIdeaAdministrationControllerVerifyToken(tokenVerifyBodyParams, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
     }
 };
 
@@ -2885,6 +2969,15 @@ export const Class2FAApiFactory = function (configuration?: Configuration, baseP
         privacyIdeaAdministrationControllerInitializeSoftwareToken(tokenInitBodyParams: TokenInitBodyParams, options?: any): AxiosPromise<string> {
             return localVarFp.privacyIdeaAdministrationControllerInitializeSoftwareToken(tokenInitBodyParams, options).then((request) => request(axios, basePath));
         },
+        /**
+         * 
+         * @param {TokenVerifyBodyParams} tokenVerifyBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        privacyIdeaAdministrationControllerVerifyToken(tokenVerifyBodyParams: TokenVerifyBodyParams, options?: any): AxiosPromise<boolean> {
+            return localVarFp.privacyIdeaAdministrationControllerVerifyToken(tokenVerifyBodyParams, options).then((request) => request(axios, basePath));
+        },
     };
 };
 
@@ -2911,6 +3004,15 @@ export interface Class2FAApiInterface {
      * @memberof Class2FAApiInterface
      */
     privacyIdeaAdministrationControllerInitializeSoftwareToken(tokenInitBodyParams: TokenInitBodyParams, options?: AxiosRequestConfig): AxiosPromise<string>;
+
+    /**
+     * 
+     * @param {TokenVerifyBodyParams} tokenVerifyBodyParams 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof Class2FAApiInterface
+     */
+    privacyIdeaAdministrationControllerVerifyToken(tokenVerifyBodyParams: TokenVerifyBodyParams, options?: AxiosRequestConfig): AxiosPromise<boolean>;
 
 }
 
@@ -2941,6 +3043,17 @@ export class Class2FAApi extends BaseAPI implements Class2FAApiInterface {
      */
     public privacyIdeaAdministrationControllerInitializeSoftwareToken(tokenInitBodyParams: TokenInitBodyParams, options?: AxiosRequestConfig) {
         return Class2FAApiFp(this.configuration).privacyIdeaAdministrationControllerInitializeSoftwareToken(tokenInitBodyParams, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {TokenVerifyBodyParams} tokenVerifyBodyParams 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof Class2FAApi
+     */
+    public privacyIdeaAdministrationControllerVerifyToken(tokenVerifyBodyParams: TokenVerifyBodyParams, options?: AxiosRequestConfig) {
+        return Class2FAApiFp(this.configuration).privacyIdeaAdministrationControllerVerifyToken(tokenVerifyBodyParams, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
