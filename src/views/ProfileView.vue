@@ -12,7 +12,7 @@
   import { usePersonInfoStore, type PersonInfoStore, type PersonInfoResponse } from '@/stores/PersonInfoStore';
   import { usePersonenkontextStore, type Zuordnung, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
   import { OrganisationsTyp } from '@/stores/OrganisationStore';
-  import SelfServiceWorkflow from '@/components/cards/two-factor-authentication/SelfServiceWorkflow.vue';
+  import SelfServiceWorkflow from '@/components/two-factor-authentication/SelfServiceWorkflow.vue';
   import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
   import type { TokenStateResponse } from '@/api-client/generated';
 
@@ -30,8 +30,8 @@
   const personalData: Ref = ref<LabelValue[]>([]);
   const schulDaten: Ref = ref<SchulDaten[]>([]);
 
-  const secondFactorSet: Ref<boolean | undefined> = ref(true);
-  const secondFactorType: Ref<'software' | 'hardware' | undefined> = ref('hardware');
+  const secondFactorSet: Ref<boolean | undefined> = ref(undefined);
+  const secondFactorType: Ref<'software' | 'hardware' | undefined> = ref(undefined);
 
   function handleGoToPreviousPage(): void {
     window.history.back();
@@ -339,7 +339,10 @@
         sm="12"
         md="6"
       >
-        <LayoutCard :header="$t('profile.twoFactorAuth')">
+        <LayoutCard
+          :header="$t('profile.twoFactorAuth')"
+          v-if="secondFactorSet != undefined"
+        >
           <v-row
             v-if="secondFactorSet === false"
             class="ma-3 d-flex align-content-center justify-center ga-4"
@@ -350,7 +353,11 @@
               icon="mdi-shield-account-outline"
             ></v-icon>
             <div>
-              <SelfServiceWorkflow :personId="personStore.currentPerson?.person.id ?? ''"> </SelfServiceWorkflow>
+              <SelfServiceWorkflow
+                :personId="personStore.currentPerson?.person.id ?? ''"
+                @dialogClosed="check2FAState"
+              >
+              </SelfServiceWorkflow>
             </div>
           </v-row>
           <v-row
