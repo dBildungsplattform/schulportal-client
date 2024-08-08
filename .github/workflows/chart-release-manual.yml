@@ -11,6 +11,10 @@ on:
         type: string
         description: "image tag"
         required: true
+      helm_repo_list:
+        type: string
+        description: "List of helm repos "
+        required: true
         
 concurrency:
   group: schulportal-client-chart-manual
