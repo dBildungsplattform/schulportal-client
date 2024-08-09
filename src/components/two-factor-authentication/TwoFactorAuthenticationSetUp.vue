@@ -12,8 +12,6 @@
   const selectedOption: Ref<'software' | 'hardware'> = ref('software');
   const personStore: PersonStore = usePersonStore();
 
-  const qrCodeImageBase64: Ref<string> = ref('');
-
   const requestedSoftwareToken: Ref<boolean> = ref(false);
 
   const dialogHeader: Ref<string> = ref(t('admin.person.twoFactorAuthentication.setUpLong'));
@@ -40,13 +38,14 @@
     }
 
     isActive.value = false;
+    personStore.twoFactorState.qrCode = '';
     requestedSoftwareToken.value = false;
     selectedOption.value = 'software';
     dialogHeader.value = t('admin.person.twoFactorAuthentication.setUpLong');
   }
 
   async function requestSoftwareToken(): Promise<void> {
-    qrCodeImageBase64.value = await personStore.get2FASoftwareQRCode(props.person.person.id);
+    await personStore.get2FASoftwareQRCode(props.person.person.id);
     requestedSoftwareToken.value = true;
   }
 
@@ -138,7 +137,7 @@
         <v-container v-if="requestedSoftwareToken">
           <SoftwareTokenWorkflow
             v-if="selectedOption === 'software'"
-            :qrCodeImageBase64="qrCodeImageBase64"
+            :qrCodeImageBase64="personStore.twoFactorState.qrCode"
             @updateHeader="handleHeaderUpdate"
             @onCloseClicked="close2FADialog(isActive)"
             data-testid="software-token-workflow"
