@@ -6,7 +6,7 @@
   // Define the type for the props
   type Props = {
     confirmUnsavedChangesAction: () => void;
-    canCommit: boolean;
+    canCommit?: boolean;
     createButtonLabel: string;
     discardButtonLabel: string;
     hideActions?: boolean;
