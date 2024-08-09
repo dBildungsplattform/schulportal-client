@@ -1,5 +1,11 @@
 <script setup lang="ts">
-  import { type RolleStore, useRolleStore, RollenMerkmal, RollenSystemRecht, RollenArt } from '@/stores/RolleStore';
+  import {
+    type RolleStore,
+    useRolleStore,
+    RollenMerkmal,
+    RollenSystemRecht,
+    type RolleFormType,
+  } from '@/stores/RolleStore';
   import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
   import {
     useServiceProviderStore,
@@ -22,8 +28,8 @@
   import RolleForm from '@/components/form/RolleForm.vue';
   import { type Composer, useI18n } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
-  import { type BaseFieldProps, type TypedSchema, useForm } from 'vee-validate';
-  import { getValidationSchema, getVuetifyConfig } from '@/utils/validationRolle';
+  import { useForm, type TypedSchema } from 'vee-validate';
+  import { getRolleFieldDefinitions, getValidationSchema } from '@/utils/validationRolle';
   import RolleDelete from '@/components/admin/rollen/RolleDelete.vue';
   import { type TranslatedObject } from '@/types.d';
   import SuccessTemplate from '@/components/admin/rollen/SuccessTemplate.vue';
@@ -31,6 +37,7 @@
   const route: RouteLocationNormalizedLoaded = useRoute();
   const router: Router = useRouter();
   const { t }: Composer = useI18n({ useScope: 'global' });
+  const validationSchema: TypedSchema = getValidationSchema(t);
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
@@ -93,46 +100,25 @@
     }));
   });
 
-  const validationSchema: TypedSchema = getValidationSchema(t);
-
-  const vuetifyConfig = (state: {
-    errors: Array<string>;
-  }): { props: { error: boolean; 'error-messages': Array<string> } } => getVuetifyConfig(state);
-
   // eslint-disable-next-line @typescript-eslint/typedef
-  const { defineField, handleSubmit, isFieldDirty, resetForm, setFieldValue } = useForm({
+  const { defineField, handleSubmit, isFieldDirty, resetForm, setFieldValue } = useForm<RolleFormType>({
     validationSchema,
   });
 
-  const [selectedAdministrationsebene, selectedAdministrationsebeneProps]: [
-    Ref<string>,
-    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineField('selectedAdministrationsebene', vuetifyConfig);
-
-  const [selectedRollenArt, selectedRollenArtProps]: [
-    Ref<RollenArt | undefined>,
-    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineField('selectedRollenArt', vuetifyConfig);
-
-  const [selectedRollenName, selectedRollenNameProps]: [
-    Ref<string>,
-    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineField('selectedRollenName', vuetifyConfig);
-
-  const [selectedMerkmale, selectedMerkmaleProps]: [
-    Ref<RollenMerkmal[] | undefined>,
-    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineField('selectedMerkmale', vuetifyConfig);
-
-  const [selectedServiceProviders, selectedServiceProvidersProps]: [
-    Ref<string[] | undefined>,
-    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineField('selectedServiceProviders', vuetifyConfig);
-
-  const [selectedSystemRechte, selectedSystemRechteProps]: [
-    Ref<RollenSystemRecht[] | undefined>,
-    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineField('selectedSystemRechte', vuetifyConfig);
+  const {
+    selectedAdministrationsebene,
+    selectedAdministrationsebeneProps,
+    selectedRollenArt,
+    selectedRollenArtProps,
+    selectedRollenName,
+    selectedRollenNameProps,
+    selectedMerkmale,
+    selectedMerkmaleProps,
+    selectedServiceProviders,
+    selectedServiceProvidersProps,
+    selectedSystemRechte,
+    selectedSystemRechteProps,
+  } = getRolleFieldDefinitions(defineField);
 
   const translatedSelectedMerkmale: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
     return selectedMerkmale.value?.map((merkmalKey: RollenMerkmal) => ({

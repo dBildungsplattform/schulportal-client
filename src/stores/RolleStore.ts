@@ -14,6 +14,7 @@ import {
   type UpdateRolleBodyParams,
 } from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
+import type { ServiceProvider } from './ServiceProviderStore';
 
 const rolleApi: RolleApiInterface = RolleApiFactory(undefined, '', axiosApiInstance);
 
@@ -75,6 +76,15 @@ export type RolleTableItem = {
   rollenart: string;
   createdAt?: string;
   updatedAt?: string;
+};
+
+export type RolleFormType = {
+  selectedAdministrationsebene: string | undefined;
+  selectedRollenArt: RollenArt | string;
+  selectedRollenName: string | undefined;
+  selectedMerkmale: RollenMerkmal[] | string[];
+  selectedServiceProviders: ServiceProvider[] | string[];
+  selectedSystemRechte: RollenSystemRecht[] | string[];
 };
 
 export type RolleStore = Store<'rolleStore', RolleState, RolleGetters, RolleActions>;
