@@ -197,6 +197,9 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
         }
       } catch (error: unknown) {
         this.twoFactorState.errorCode = 'UNSPECIFIED_ERROR';
+        if (isAxiosError(error)) {
+          this.twoFactorState.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
+        }
         return await Promise.reject(this.errorCode);
       } finally {
         this.loading = false;
