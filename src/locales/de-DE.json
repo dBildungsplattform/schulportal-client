@@ -51,6 +51,7 @@
         },
         "klassenname": {
           "matches": "Der Klassenname darf keine ungültigen Zeichen beinhalten.",
+          "noLeadingTrailingSpaces": "Der Klassenname darf nicht mit Leerzeichen beginnen oder enden.",
           "required": "Der Klassenname muss angegeben werden."
         },
         "schule": {
@@ -114,14 +115,16 @@
       "resetPassword": "Passwort zurücksetzen",
       "rules": {
         "vorname": {
-          "matches": "Der Vorname darf keine ungültigen Zeichen beinhalten.",
-          "min": "Der Vorname muss aus mindestens 2 Zeichen bestehen.",
-          "required": "Der Vorname muss angegeben werden."
+          "matches": "Der Vorname enthält ungültige Zeichen.",
+          "noLeadingTrailingSpaces": "Der Vorname darf nicht mit Leerzeichen beginnen oder enden.",
+          "min": "Der Vorname muss mindestens 2 Zeichen lang sein.",
+          "required": "Der Vorname ist erforderlich."
         },
         "familienname": {
-          "matches": "Der Nachname darf keine ungültigen Zeichen beinhalten.",
-          "min": "Der Nachname muss aus mindestens 2 Zeichen bestehen.",
-          "required": "Der Nachname muss angegeben werden."
+          "matches": "Der Familienname enthält ungültige Zeichen.",
+          "noLeadingTrailingSpaces": "Der Familienname darf nicht mit Leerzeichen beginnen oder enden.",
+          "min": "Der Familienname muss mindestens 2 Zeichen lang sein.",
+          "required": "Der Familienname ist erforderlich."
         }
       },
       "showAll": "Alle Benutzer anzeigen",
@@ -223,6 +226,7 @@
         "rollenname": {
           "length": "Der Rollenname darf nicht länger als 200 Zeichen sein.",
           "matches": "Der Rollenname darf keine ungültigen Zeichen beinhalten.",
+          "noLeadingTrailingSpaces": "Der Rollenname darf nicht mit Leerzeichen beginnen oder enden.",
           "required": "Der Rollenname muss ausgewählt werden."
         }
       },
@@ -256,16 +260,19 @@
         "NAME_REQUIRED_FOR_SCHULE": "Die Angabe eines Namens ist erforderlich.",
         "NUR_KLASSE_UNTER_SCHULE": "Die Klasse muss einer Schule zugeordnet werden.",
         "ORGANISATION_SPECIFICATION_ERROR": "Die Schule konnte nicht angelegt werden.",
+        "SCHULE_KENNUNG_EINDEUTIG": "Die Dienststellennummer existiert bereits.",
         "SCHULE_UNTER_TRAEGER": "Eine Schule darf nicht einer anderen Schule zugeordnet werden."
       },
       "management": "Schulverwaltung",
       "publicSchule": "Öffentliche Schule",
       "rules": {
         "dienststellennummer": {
+          "noLeadingTrailingSpaces": "Die Dienststellennummer darf nicht mit Leerzeichen beginnen oder enden.",
           "required": "Die Dienststellennummer muss angegeben werden."
         },
         "schulname": {
           "matches": "Der Schulname darf keine ungültigen Zeichen beinhalten.",
+          "noLeadingTrailingSpaces": "Der Schulname darf nicht mit Leerzeichen beginnen oder enden.",
           "required": "Der Schulname muss angegeben werden."
         }
       },
