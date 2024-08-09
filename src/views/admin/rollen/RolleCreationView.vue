@@ -32,7 +32,7 @@
   import { useForm, type TypedSchema } from 'vee-validate';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import RolleForm from '@/components/form/RolleForm.vue';
-  import { getRolleFieldDefinitions, getValidationSchema } from '@/utils/validationRolle';
+  import { getRolleFieldDefinitions, getValidationSchema, type RolleFieldDefinitions } from '@/utils/validationRolle';
   import SuccessTemplate from '@/components/admin/rollen/SuccessTemplate.vue';
   import { type TranslatedObject } from '@/types.d';
 
@@ -54,7 +54,7 @@
   const translatedSystemrechte: Ref<TranslatedSystemrecht[]> = ref([]);
 
   // eslint-disable-next-line @typescript-eslint/typedef
-  const { defineField, handleSubmit, isFieldDirty, resetForm } = useForm<RolleFormType>({
+  const { handleSubmit, isFieldDirty, resetForm } = useForm<RolleFormType>({
     validationSchema,
   });
 
@@ -71,7 +71,7 @@
     selectedServiceProvidersProps,
     selectedSystemRechte,
     selectedSystemRechteProps,
-  } = getRolleFieldDefinitions(defineField);
+  }: RolleFieldDefinitions = getRolleFieldDefinitions();
 
   function isFormDirty(): boolean {
     return (

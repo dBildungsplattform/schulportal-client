@@ -2,13 +2,28 @@ import type { Ref } from 'vue';
 import { object, string } from 'yup';
 import { toTypedSchema } from '@vee-validate/yup';
 import { DIN_91379A_EXT } from '@/utils/validation';
-import { type BaseFieldProps, type TypedSchema } from 'vee-validate';
-import type { RollenArt, RollenMerkmal, RollenSystemRecht } from '@/stores/RolleStore';
+import { useForm, type BaseFieldProps, type TypedSchema } from 'vee-validate';
+import type { RolleFormType, RollenArt, RollenMerkmal, RollenSystemRecht } from '@/stores/RolleStore';
 
 type ValidationSchema = {
   selectedRollenArt: string;
   selectedRollenName: string;
   selectedAdministrationsebene: string;
+};
+
+export type RolleFieldDefinitions = {
+  selectedAdministrationsebene: Ref<string | undefined>;
+  selectedAdministrationsebeneProps: Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>;
+  selectedRollenArt: Ref<RollenArt | undefined>;
+  selectedRollenArtProps: Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>;
+  selectedRollenName: Ref<string | undefined>;
+  selectedRollenNameProps: Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>;
+  selectedMerkmale: Ref<RollenMerkmal[] | undefined>;
+  selectedMerkmaleProps: Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>;
+  selectedServiceProviders: Ref<string[] | undefined>;
+  selectedServiceProvidersProps: Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>;
+  selectedSystemRechte: Ref<RollenSystemRecht[] | undefined>;
+  selectedSystemRechteProps: Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>;
 };
 
 export const getValidationSchema = (t: (key: string) => string): TypedSchema<ValidationSchema> => {
@@ -37,7 +52,11 @@ const vuetifyConfig = (state: {
   errors: Array<string>;
 }): { props: { error: boolean; 'error-messages': Array<string> } } => getVuetifyConfig(state);
 
-export const getRolleFieldDefinitions = (defineField) => {
+export const getRolleFieldDefinitions = (): RolleFieldDefinitions => {
+  // eslint-disable-next-line @typescript-eslint/typedef
+  const { defineField } = useForm<RolleFormType>({
+    validationSchema: getValidationSchema,
+  });
   const [selectedAdministrationsebene, selectedAdministrationsebeneProps]: [
     Ref<string | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
