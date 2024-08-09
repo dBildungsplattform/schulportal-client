@@ -35,10 +35,12 @@
   async function close2FADialog(isActive: Ref<boolean>): Promise<void> {
     if (requestedSoftwareToken.value) {
       emits('dialogClosed');
+      personStore.twoFactorState.qrCode = '';
+      personStore.twoFactorState.hasToken = null;
+      personStore.twoFactorState.tokenKind = null;
     }
 
     isActive.value = false;
-    personStore.twoFactorState.qrCode = '';
     requestedSoftwareToken.value = false;
     selectedOption.value = 'software';
     dialogHeader.value = t('admin.person.twoFactorAuthentication.setUpLong');
