@@ -41,7 +41,6 @@
     }
 
     isActive.value = false;
-    personStore.twoFactorState.qrCode = '';
     requestedSoftwareToken.value = false;
     selectedOption.value = 'software';
     dialogHeader.value = t('admin.person.twoFactorAuthentication.setUpLong');
