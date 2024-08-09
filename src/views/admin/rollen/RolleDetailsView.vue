@@ -29,7 +29,7 @@
   import { type Composer, useI18n } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
   import { useForm, type TypedSchema } from 'vee-validate';
-  import { getRolleFieldDefinitions, getValidationSchema } from '@/utils/validationRolle';
+  import { getRolleFieldDefinitions, getValidationSchema, type RolleFieldDefinitions } from '@/utils/validationRolle';
   import RolleDelete from '@/components/admin/rollen/RolleDelete.vue';
   import { type TranslatedObject } from '@/types.d';
   import SuccessTemplate from '@/components/admin/rollen/SuccessTemplate.vue';
@@ -101,7 +101,7 @@
   });
 
   // eslint-disable-next-line @typescript-eslint/typedef
-  const { defineField, handleSubmit, isFieldDirty, resetForm, setFieldValue } = useForm<RolleFormType>({
+  const { handleSubmit, isFieldDirty, resetForm, setFieldValue } = useForm<RolleFormType>({
     validationSchema,
   });
 
@@ -118,7 +118,7 @@
     selectedServiceProvidersProps,
     selectedSystemRechte,
     selectedSystemRechteProps,
-  } = getRolleFieldDefinitions(defineField);
+  }: RolleFieldDefinitions = getRolleFieldDefinitions();
 
   const translatedSelectedMerkmale: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
     return selectedMerkmale.value?.map((merkmalKey: RollenMerkmal) => ({
