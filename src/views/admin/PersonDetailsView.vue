@@ -33,7 +33,7 @@
   import { useKlassen } from '@/composables/useKlassen';
   import PersonenkontextCreate from '@/components/admin/personen/PersonenkontextCreate.vue';
   import { type TranslatedObject } from '@/types.d';
-  import KlasseForm from '@/components/form/KlasseForm.vue';
+  import KlasseChange from '@/components/admin/klassen/KlasseChange.vue';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
@@ -99,6 +99,11 @@
     pendingCreation.value = true;
     isZuordnungFormActive.value = false;
   };
+  // Triggers the template to prepare the change of Klasse
+  const prepareChangeKlasse = (): void => {
+    pendingChangeKlasse.value = true;
+    isChangeKlasseFormActive.value = false;
+  };
 
   // Deletes the person and all kontexte
   async function deletePerson(personId: string): Promise<void> {
@@ -126,11 +131,6 @@
   const triggerAddZuordnung = async (): Promise<void> => {
     await personenkontextStore.processWorkflowStep();
     isZuordnungFormActive.value = true;
-  };
-
-  // Triggers the template to change the Klasse
-  const triggerChangeKlasse = async (): Promise<void> => {
-    isChangeKlasseFormActive.value = true;
   };
 
   // This will send the updated list of Zuordnungen to the Backend WITHOUT the selected Zuordnungen.
@@ -273,6 +273,11 @@
     selectedKlasse: string;
   };
 
+  type ChangeKlasseForm = {
+    selectedSchule: string;
+    selectedNewKlasse: string;
+  };
+
   // Define a method to check if the selected Rolle is of type "Lern"
   function isLernRolle(selectedRolleId: string): boolean {
     const rolle: RolleWithRollenart | undefined = rollen.value?.find(
@@ -280,6 +285,21 @@
     );
     return !!rolle && rolle.Rollenart === RollenArt.Lern;
   }
+
+  // Check if the button to change the Klasse should be active or not. Activate only if there is 1 selected Zuordnung and if it is of type LERN.
+  const canChangeKlasse: ComputedRef<boolean> = computed(() => {
+    const hasOneSelectedZuordnung: boolean = selectedZuordnungen.value.length === 1;
+
+    const organisationId: string | undefined = selectedZuordnungen.value[0]?.sskId;
+    const rolleId: string | undefined = selectedZuordnungen.value[0]?.rolleId;
+
+    personenkontextStore.processWorkflowStep({ organisationId: organisationId, rolleId: rolleId });
+    // Check if rolleId exists and if it's of type LERN
+    if (rolleId && isLernRolle(rolleId) && hasOneSelectedZuordnung) {
+      return true;
+    }
+    return false;
+  });
 
   const validationSchema: TypedSchema = toTypedSchema(
     object({
@@ -290,6 +310,7 @@
         then: (schema: StringSchema<string | undefined, AnyObject, undefined, ''>) =>
           schema.required(t('admin.klasse.rules.klasse.required')),
       }),
+      selectedNewKlasse: string().required(t('admin.klasse.rules.klasse.required')),
     }),
   );
 
@@ -303,10 +324,11 @@
   });
 
   // eslint-disable-next-line @typescript-eslint/typedef
-  const { defineField, handleSubmit, resetForm } = useForm<ZuordnungCreationForm>({
+  const { defineField, handleSubmit, resetForm } = useForm<ZuordnungCreationForm | ChangeKlasseForm>({
     validationSchema,
   });
 
+  // Add Zuordnung Form
   const [selectedRolle, selectedRolleProps]: [
     Ref<string | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
@@ -320,12 +342,32 @@
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedKlasse', vuetifyConfig);
 
+  // Change Klasse Form
+  const [selectedSchule, selectedSchuleProps]: [
+    Ref<string | undefined>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = defineField('selectedSchule', vuetifyConfig);
+  const [selectedNewKlasse, selectedNewKlasseProps]: [
+    Ref<string | undefined>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = defineField('selectedNewKlasse', vuetifyConfig);
+
   // Triggers the template to start editing
   const triggerEdit = (): void => {
     isEditActive.value = true;
     // Deep copy of the zuordnungenResult to keep track of the Zuordnungen before any changes were done.
     // This is necessary if a user cancels the editing at some point and the zuordnungenResult was mutated at the time.
     originalZuordnungenResult.value = JSON.parse(JSON.stringify(zuordnungenResult.value));
+  };
+
+  // Triggers the template to change the Klasse. Also pre-select the Schule and Klasse.
+  const triggerChangeKlasse = async (): Promise<void> => {
+    selectedSchule.value = selectedZuordnungen.value[0]?.sskId;
+    selectedNewKlasse.value = selectedZuordnungen.value[0]?.klasse;
+    if (selectedZuordnungen.value[0]?.sskId) {
+      await organisationStore.getKlassenByOrganisationId(selectedZuordnungen.value[0]?.sskId);
+    }
+    isChangeKlasseFormActive.value = true;
   };
 
   // Cancels editing
@@ -369,8 +411,10 @@
     }
   };
 
-  // The save button is always disabled if there is no pending creation nor deletion.
-  const isSaveButtonDisabled: ComputedRef<boolean> = computed(() => !pendingCreation.value && !pendingDeletion.value);
+  // The save button is always disabled if there is no pending creation, deletion nor changeKlasse.
+  const isSaveButtonDisabled: ComputedRef<boolean> = computed(
+    () => !pendingCreation.value && !pendingDeletion.value && !pendingChangeKlasse.value,
+  );
 
   // Filter out the Rollen in case the admin chooses an organisation that the user has already a kontext in
   const filteredRollen: ComputedRef<RolleWithRollenart[] | undefined> = computed(() => {
@@ -383,12 +427,12 @@
     );
   });
 
-  // Computed property to get the title of the selected role
+  // Computed property to get the title of the selected rolle
   const selectedRolleTitle: ComputedRef<string | undefined> = computed(() => {
     return rollen.value?.find((rolle: TranslatedObject) => rolle.value === selectedRolle.value)?.title;
   });
 
-  // Computed property to get the title of the selected class
+  // Computed property to get the title of the selected klasse
   const selectedKlasseTitle: ComputedRef<string | undefined> = computed(() => {
     return klassen.value?.find((klasse: TranslatedObject) => klasse.value === selectedKlasse.value)?.title;
   });
@@ -475,6 +519,7 @@
     personenkontextStore.errorCode = '';
     await personStore.getPersonById(currentPersonId);
     await personenkontextStore.getPersonenuebersichtById(currentPersonId);
+    await personenkontextStore.processWorkflowStep();
   });
 </script>
 
@@ -742,17 +787,16 @@
           <template v-if="!isZuordnungFormActive && !isChangeKlasseFormActive">
             <v-row class="ml-md-16">
               <v-col
-                v-if="!pendingDeletion && !pendingCreation"
+                v-if="!pendingDeletion && !pendingCreation && !pendingChangeKlasse"
                 cols="12"
                 sm="auto"
               >
                 <h3 class="subtitle-1">{{ $t('person.editZuordnungen') }}: {{ $t('pleaseSelect') }}</h3>
               </v-col>
             </v-row>
-            <!-- Check if 'zuordnungen' array exists and has length > 0 -->
-            <v-row class="checkbox-row ml-md-16 mb-12">
+            <v-row class="ml-md-16 mb-12">
               <v-col
-                v-if="pendingDeletion || pendingCreation"
+                v-if="pendingDeletion || pendingCreation || pendingChangeKlasse"
                 cols="12"
                 sm="auto"
               >
@@ -766,7 +810,7 @@
                 :title="zuordnung.sskName"
                 class="py-0 d-flex align-items-center"
               >
-                <template v-if="!pendingDeletion && !pendingCreation">
+                <template v-if="!pendingDeletion && !pendingCreation && !pendingChangeKlasse">
                   <div class="checkbox-div">
                     <v-checkbox
                       v-model="selectedZuordnungen"
@@ -806,6 +850,23 @@
                   </span>
                 </template>
                 <template v-else-if="pendingDeletion">
+                  <span
+                    class="text-body my-3 ml-5"
+                    :class="{
+                      'text-red': selectedZuordnungen.includes(zuordnung),
+                    }"
+                  >
+                    {{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
+                    {{ zuordnung.klasse }}
+                    <span
+                      v-if="selectedZuordnungen.includes(zuordnung)"
+                      class="text-body text-red"
+                    >
+                      ({{ $t('person.willBeRemoved') }})</span
+                    >
+                  </span>
+                </template>
+                <template v-else-if="pendingChangeKlasse">
                   <span
                     class="text-body my-3 ml-5"
                     :class="{
@@ -892,7 +953,7 @@
                     </v-btn>
                   </SpshTooltip>
                   <SpshTooltip
-                    :enabledCondition="selectedZuordnungen.length > 0"
+                    :enabledCondition="canChangeKlasse"
                     :disabledText="$t('person.chooseZuordnungFirst')"
                     :enabledText="$t('person.changeKlasseDescription')"
                     position="start"
@@ -901,7 +962,7 @@
                       class="primary mt-2"
                       @Click="triggerChangeKlasse"
                       data-testid="klasse-change-button"
-                      :disabled="selectedZuordnungen.length === 0"
+                      :disabled="!canChangeKlasse"
                       :block="mdAndDown"
                     >
                       {{ $t('person.changeKlasse') }}
@@ -926,7 +987,7 @@
                 <h3 class="text-body">{{ $t('person.noZuordnungenFound') }}</h3>
               </v-col>
             </v-row>
-            <v-row class="save-cancel-row ml-md-16 mb-3">
+            <v-row class="save-cancel-row ml-md-16 mb-3 pt-14">
               <v-col
                 class="cancel-col"
                 cols="12"
@@ -966,7 +1027,7 @@
             </v-row>
           </template>
           <!-- Form to add Zuordnung -->
-          <template v-if="isZuordnungFormActive && !pendingDeletion">
+          <template v-if="isZuordnungFormActive && !pendingDeletion && !pendingChangeKlasse">
             <v-form
               data-testid="zuordnung-creation-form"
               @submit="onSubmit"
@@ -1046,20 +1107,18 @@
                 >
               </v-row>
               <v-container class="px-lg-16">
-                <KlasseForm
-              :isEditActive="isEditActive"
-              :readonly="true"
-              :selectedSchuleProps="selectedSchuleProps"
-              :selectedKlassennameProps="selectedKlassennameProps"
-              :showUnsavedChangesDialog="showUnsavedChangesDialog"
-              :onHandleConfirmUnsavedChanges="handleConfirmUnsavedChanges"
-              :onHandleDiscard="navigateToKlasseManagement"
-              :onShowDialogChange="(value: boolean) => (showUnsavedChangesDialog = value)"
-              :onSubmit="onSubmit"
-              ref="klasse-change-form"
-              v-model:selectedSchule="selectedSchule"
-              v-model:selectedKlassenname="selectedKlassenname"
-            />
+                <KlasseChange
+                  :isEditActive="isEditActive"
+                  :readonly="true"
+                  :schulen="organisationen"
+                  :klassen="klassen"
+                  :selectedSchuleProps="selectedSchuleProps"
+                  :selectedNewKlasseProps="selectedNewKlasseProps"
+                  :onSubmit="onSubmit"
+                  ref="klasse-change-form"
+                  v-model:selectedSchule="selectedSchule"
+                  v-model:selectedNewKlasse="selectedNewKlasse"
+                ></KlasseChange>
               </v-container>
               <v-row class="py-3 px-2 justify-center">
                 <v-spacer class="hidden-sm-and-down"></v-spacer>
@@ -1083,11 +1142,11 @@
                 >
                   <v-btn
                     :block="mdAndDown"
-                    :disabled="!canCommit"
                     class="primary"
+                    @Click="prepareChangeKlasse"
                     data-testid="zuordnung-creation-submit-button"
                     type="submit"
-                    >{{ $t('person.addZuordnung') }}</v-btn
+                    >{{ $t('person.changeKlasse') }}</v-btn
                   >
                 </v-col>
               </v-row>
