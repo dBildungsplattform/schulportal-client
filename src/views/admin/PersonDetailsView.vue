@@ -84,7 +84,6 @@
   }
 
   function onLockUser(personId: string, lock: boolean, schule: string): void {
-    console.log(personId, lock, schule);
     personStore.lockPerson(personId, lock, authStore.currentUser?.name + ' - ' + schule);
   }
 
@@ -1039,6 +1038,7 @@
           </template>
         </v-container>
         <v-divider
+          v-if="authStore.currentUser?.personId !== personStore.currentPerson?.person.id"
           class="border-opacity-100 rounded my-6 mx-4"
           color="#E5EAEF"
           thickness="6"
@@ -1069,6 +1069,7 @@
                   :person="personStore.currentPerson"
                   :adminId="authStore.currentUser?.personId!"
                   @onLockUser="onLockUser"
+                  @differentSchoolAdmin="differentSchoolAdmin"
                 >
                 </PersonLock>
               </div>

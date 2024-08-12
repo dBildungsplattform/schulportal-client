@@ -151,7 +151,10 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
     async lockPerson(personId: string, lock: boolean, locked_from: string) {
       this.loading = true;
       try {
-        await personenApi.personControllerLockPerson(personId, { lock: lock, locked_from: locked_from });
+        await personenApi.personControllerLockPerson(personId, {
+          lock: lock,
+          locked_from: locked_from,
+        });
         await this.getPersonById(personId);
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';

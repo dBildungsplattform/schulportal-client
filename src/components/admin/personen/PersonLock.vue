@@ -17,7 +17,10 @@
   const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
   const schulen: Ref = ref<Array<{ value: string; title: string }>>([]);
   const selectedSchule: Ref = ref<string | null>(null);
-  type Emits = (event: 'onLockUser', id: string, lock: boolean, schule: string) => void;
+  type Emits = {
+    (event: 'onLockUser', id: string, lock: boolean, schule: string): void;
+    (event: 'differentSchoolAdmin', isDifferentSchoolAdmin: boolean): void;
+  };
 
   const props: Props = defineProps<Props>();
   const emit: Emits = defineEmits<Emits>();
@@ -46,16 +49,25 @@
 
   onBeforeMount(async () => {
     await personenkontextStore.getPersonenuebersichtById(props.adminId);
-    const assignedSchulen: string[] =
+    const assignedAdminSchulen: string[] =
       personenkontextStore.personenuebersicht?.zuordnungen.map((zuordnung: Zuordnung) => zuordnung.sskName) || [];
-    schulen.value = [...new Set(assignedSchulen)];
+
+    await personenkontextStore.getPersonenuebersichtById(props.person.person.id);
+    const assignedUserSchulen: string[] =
+      personenkontextStore.personenuebersicht?.zuordnungen.map((zuordnung: Zuordnung) => zuordnung.sskName) || [];
+
+    const assignedSchulenIntersection: string[] = assignedAdminSchulen.filter((schule: string) =>
+      assignedUserSchulen.includes(schule),
+    );
+
+    schulen.value = [...new Set(assignedSchulenIntersection)];
     if (schulen.value.length === 1) {
       selectedSchule.value = schulen.value[0];
     }
   });
 </script>
 
-<template>
+<template v-if="assignedSchulenIntersection.length > 0">
   <v-dialog persistent>
     <template v-slot:activator="{ props }">
       <v-col
@@ -185,6 +197,7 @@
                 v-if="!successMessage && !props.person.person.isLocked"
                 :block="mdAndDown"
                 class="primary button"
+                :disabled="!selectedSchule"
                 @click.stop="handleOnLockUser(props.person.person.id)"
                 data-testid="lock-user-button"
               >
