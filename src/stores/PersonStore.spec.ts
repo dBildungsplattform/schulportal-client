@@ -1,4 +1,8 @@
-import type { PersonFrontendControllerFindPersons200Response, PersonendatensatzResponse } from '@/api-client/generated';
+import type {
+  PersonFrontendControllerFindPersons200Response,
+  PersonLockResponse,
+  PersonendatensatzResponse,
+} from '@/api-client/generated';
 import { usePersonStore, type PersonStore, type Personendatensatz } from './PersonStore';
 import ApiService from '@/services/ApiService';
 import MockAdapter from 'axios-mock-adapter';
@@ -199,46 +203,48 @@ describe('PersonStore', () => {
         },
       } as PersonendatensatzResponse;
 
-      const mockResponse: { message: string } = {
+      const mockResponse: PersonLockResponse = {
         message: 'User has been successfully locked.',
       };
 
       mockadapter.onPut(`/api/personen/${mockPerson.person.id}/lock-user`).replyOnce(200, mockResponse);
       mockadapter.onGet(`/api/personen/${mockPerson.person.id}`).replyOnce(200, mockPerson);
 
-      //const lockPersonPromise: Promise<void> = personStore.lockPerson(mockPerson.person.id, lock, lockedFrom);
+      const lockPersonPromise: Promise<PersonLockResponse> = personStore.lockPerson(
+        mockPerson.person.id,
+        lock,
+        lockedFrom,
+      );
       expect(personStore.loading).toBe(true);
-      //const response: { message: string } = await lockPersonPromise;
+      const response: PersonLockResponse = await lockPersonPromise;
+      expect(mockResponse).toEqual(response);
       expect(personStore.loading).toBe(false);
-
-      const currentPerson: Personendatensatz = await personStore.getPersonById(mockPerson.person.id);
-      expect(currentPerson).toEqual(mockPerson);
     });
 
-    // it('should handle string error', async () => {
-    //   const personId: string = '1234';
-    //   const lock: boolean = true;
-    //   const lockedFrom: string = 'admin';
+    it('should handle string error', async () => {
+      const personId: string = '1234';
+      const lock: boolean = true;
+      const lockedFrom: string = 'admin';
 
-    //   mockadapter.onPost(`/api/personen/${personId}/lock`).replyOnce(500, 'some mock server error');
-    //   const lockPersonPromise: Promise<void> = personStore.lockPerson(personId, lock, locked_from);
-    //   expect(personStore.loading).toBe(true);
-    //   await rejects(lockPersonPromise);
-    //   expect(personStore.errorCode).toEqual('UNSPECIFIED_ERROR');
-    //   expect(personStore.loading).toBe(false);
-    // });
+      mockadapter.onPut(`/api/personen/${personId}/lock-user`).replyOnce(500, 'some mock server error');
+      const lockPersonPromise: Promise<PersonLockResponse> = personStore.lockPerson(personId, lock, lockedFrom);
+      expect(personStore.loading).toBe(true);
+      await rejects(lockPersonPromise);
+      expect(personStore.errorCode).toEqual('UNSPECIFIED_ERROR');
+      expect(personStore.loading).toBe(false);
+    });
 
-    // it('should handle error code', async () => {
-    //   const personId: string = '1234';
-    //   const lock: boolean = true;
-    //   const locked_from: string = 'admin';
+    it('should handle error code', async () => {
+      const personId: string = '1234';
+      const lock: boolean = true;
+      const lockedFrom: string = 'admin';
 
-    //   mockadapter.onPost(`/api/personen/${personId}/lock`).replyOnce(500, { code: 'some mock server error' });
-    //   const lockPersonPromise: Promise<void> = personStore.lockPerson(personId, lock, locked_from);
-    //   expect(personStore.loading).toBe(true);
-    //   await rejects(lockPersonPromise);
-    //   expect(personStore.errorCode).toEqual('some mock server error');
-    //   expect(personStore.loading).toBe(false);
-    // });
+      mockadapter.onPut(`/api/personen/${personId}/lock-user`).replyOnce(500, { code: 'some mock server error' });
+      const lockPersonPromise: Promise<PersonLockResponse> = personStore.lockPerson(personId, lock, lockedFrom);
+      expect(personStore.loading).toBe(true);
+      await rejects(lockPersonPromise);
+      expect(personStore.errorCode).toEqual('some mock server error');
+      expect(personStore.loading).toBe(false);
+    });
   });
 });

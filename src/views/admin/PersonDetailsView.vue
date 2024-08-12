@@ -1069,7 +1069,6 @@
                   :person="personStore.currentPerson"
                   :adminId="authStore.currentUser?.personId!"
                   @onLockUser="onLockUser"
-                  @differentSchoolAdmin="differentSchoolAdmin"
                 >
                 </PersonLock>
               </div>

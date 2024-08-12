@@ -8,6 +8,7 @@ import {
   type PersonendatensatzResponse,
   type PersonenFrontendApiInterface,
   type PersonFrontendControllerFindPersons200Response,
+  type PersonLockResponse,
 } from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
 import type { DbiamPersonenkontextBodyParams } from './PersonenkontextStore';
@@ -56,7 +57,7 @@ type PersonActions = {
   getPersonById: (personId: string) => Promise<Personendatensatz>;
   resetPassword: (personId: string) => Promise<string>;
   deletePerson: (personId: string) => Promise<void>;
-  lockPerson: (personId: string, lock: boolean, locked_from: string) => Promise<void>;
+  lockPerson: (personId: string, lock: boolean, locked_from: string) => Promise<PersonLockResponse>;
 };
 
 export type PersonStore = Store<'personStore', PersonState, PersonGetters, PersonActions>;
@@ -148,14 +149,15 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
         this.loading = false;
       }
     },
-    async lockPerson(personId: string, lock: boolean, locked_from: string) {
+    async lockPerson(personId: string, lock: boolean, locked_from: string): Promise<PersonLockResponse> {
       this.loading = true;
       try {
-        await personenApi.personControllerLockPerson(personId, {
+        const result: AxiosResponse<PersonLockResponse> = await personenApi.personControllerLockPerson(personId, {
           lock: lock,
           locked_from: locked_from,
         });
         await this.getPersonById(personId);
+        return result.data;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
