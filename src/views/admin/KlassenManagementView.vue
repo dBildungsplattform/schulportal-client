@@ -114,7 +114,7 @@
       systemrechte: ['KLASSEN_VERWALTEN'],
     });
     return new Map(
-      organisationStore.allOrganisationen.map((org: Organisation) => [org.id, `${org.kennung} (${org.name.trim()})`]),
+      organisationStore.allSchulen.map((org: Organisation) => [org.id, `${org.kennung} (${org.name.trim()})`]),
     );
   }
 
