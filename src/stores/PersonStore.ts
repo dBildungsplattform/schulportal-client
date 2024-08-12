@@ -38,6 +38,13 @@ export type Personendatensatz = {
   person: Person;
 };
 
+export type TwoFactorState = {
+  errorCode: string;
+  hasToken: boolean | null;
+  tokenKind: 'hardware' | 'software' | null;
+  qrCode: string;
+};
+
 export type { PersonendatensatzResponse };
 
 type PersonState = {
@@ -46,6 +53,7 @@ type PersonState = {
   loading: boolean;
   totalPersons: number;
   currentPerson: Personendatensatz | null;
+  twoFactorState: TwoFactorState;
 };
 
 export type PersonFilter = {
@@ -56,12 +64,13 @@ export type PersonFilter = {
 
 type PersonGetters = {};
 type PersonActions = {
+  resetState: () => void;
   getAllPersons: (filter: PersonFilter) => Promise<void>;
   getPersonById: (personId: string) => Promise<Personendatensatz>;
   resetPassword: (personId: string) => Promise<string>;
   deletePerson: (personId: string) => Promise<void>;
-  get2FAState: (personId: string) => Promise<TokenStateResponse>;
-  get2FASoftwareQRCode: (personId: string) => Promise<string>;
+  get2FAState: (personId: string) => Promise<void>;
+  get2FASoftwareQRCode: (personId: string) => Promise<void>;
   verify2FAToken: (personId: string, token: string) => Promise<boolean>;
 };
 
@@ -76,9 +85,18 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
       loading: false,
       totalPersons: 0,
       currentPerson: null,
+      twoFactorState: {
+        errorCode: '',
+        hasToken: null,
+        tokenKind: null,
+        qrCode: '',
+      },
     };
   },
   actions: {
+    resetState() {
+      this.$reset();
+    },
     async getAllPersons(filter: PersonFilter) {
       this.loading = true;
       try {
@@ -158,12 +176,31 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
     async get2FAState(personId: string) {
       this.loading = true;
       try {
-        const token: TokenStateResponse = (
+        const twoFactorState: TokenStateResponse = (
           await twoFactorApi.privacyIdeaAdministrationControllerGetTwoAuthState(personId)
         ).data;
 
-        return token;
+        this.twoFactorState.hasToken = twoFactorState.hasToken;
+
+        if (!twoFactorState.hasToken) {
+          return;
+        }
+
+        switch (twoFactorState.tokenKind) {
+          case 'hardware':
+            this.twoFactorState.tokenKind = 'hardware';
+            break;
+          case 'software':
+            this.twoFactorState.tokenKind = 'software';
+            break;
+          default:
+            this.twoFactorState.tokenKind = null;
+        }
       } catch (error: unknown) {
+        this.twoFactorState.errorCode = 'UNSPECIFIED_ERROR';
+        if (isAxiosError(error)) {
+          this.twoFactorState.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
+        }
         return await Promise.reject(this.errorCode);
       } finally {
         this.loading = false;
@@ -180,7 +217,7 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
           await twoFactorApi.privacyIdeaAdministrationControllerInitializeSoftwareToken(bodyParams)
         ).data;
 
-        return qrCodeImageBase64;
+        this.twoFactorState.qrCode = qrCodeImageBase64;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {

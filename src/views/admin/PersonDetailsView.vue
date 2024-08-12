@@ -34,7 +34,6 @@
   import PersonenkontextCreate from '@/components/admin/personen/PersonenkontextCreate.vue';
   import { type TranslatedObject } from '@/types.d';
 
-  import type { TokenStateResponse } from '@/api-client/generated';
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
   const { t }: Composer = useI18n({ useScope: 'global' });
@@ -72,9 +71,6 @@
 
   const creationErrorText: Ref<string> = ref('');
   const creationErrorTitle: Ref<string> = ref('');
-
-  const secondFactorSet: Ref<boolean | undefined> = ref(undefined);
-  const secondFactorType: Ref<'software' | 'hardware' | undefined> = ref(undefined);
 
   function navigateToPersonTable(): void {
     router.push({ name: 'person-management' });
@@ -465,33 +461,12 @@
     }
   }
 
-  async function check2FAState(): Promise<void> {
-    secondFactorSet.value = undefined;
-    secondFactorType.value = undefined;
-
-    await personStore
-      .get2FAState(currentPersonId)
-      .then((response: TokenStateResponse) => {
-        secondFactorSet.value = response.hasToken;
-        if (secondFactorSet.value) {
-          if (response.tokenKind === 'hardware') {
-            secondFactorType.value = 'hardware';
-          } else if (response.tokenKind === 'software') {
-            secondFactorType.value = 'software';
-          }
-        }
-      })
-      .catch(() => {
-        secondFactorSet.value = undefined;
-        return;
-      });
-  }
-
   onBeforeMount(async () => {
+    personStore.resetState();
     personenkontextStore.errorCode = '';
     await personStore.getPersonById(currentPersonId);
     await personenkontextStore.getPersonenuebersichtById(currentPersonId);
-    check2FAState();
+    await personStore.get2FAState(currentPersonId);
   });
 </script>
 
@@ -660,7 +635,7 @@
         ></v-divider>
         <!-- Two Factor Authentication -->
         <v-container
-          v-if="secondFactorSet != undefined"
+          v-if="personStore.twoFactorState.hasToken != undefined"
           class="two-factor-authentication-set-up"
         >
           <v-row class="ml-md-16">
@@ -668,7 +643,7 @@
               <h3 class="subtitle-1">{{ $t('admin.person.twoFactorAuthentication.header') }}</h3>
               <v-row
                 class="mt-4 text-body"
-                v-if="secondFactorSet && secondFactorType === 'software'"
+                v-if="personStore.twoFactorState.hasToken && personStore.twoFactorState.tokenKind === 'software'"
               >
                 <v-col
                   class="text-right"
@@ -677,7 +652,7 @@
                   <v-icon
                     icon="mdi-check-circle"
                     color="green"
-                    v-if="secondFactorSet"
+                    v-if="personStore.twoFactorState.hasToken"
                   ></v-icon>
                 </v-col>
                 <div class="v-col">
@@ -694,15 +669,14 @@
                   <v-icon
                     class="mb-2"
                     icon="mdi-information"
-                    v-if="secondFactorSet != undefined"
                   >
                   </v-icon>
                 </v-col>
                 <div class="v-col">
-                  <p v-if="secondFactorSet">
+                  <p v-if="personStore.twoFactorState.hasToken">
                     {{ $t('admin.person.twoFactorAuthentication.resetInfo') }}
                   </p>
-                  <p v-if="secondFactorSet === false">
+                  <p v-if="!personStore.twoFactorState.hasToken">
                     {{ $t('admin.person.twoFactorAuthentication.notSetUp') }}
                   </p>
                 </div>
@@ -716,19 +690,19 @@
             >
               <div
                 class="d-flex justify-sm-end"
-                v-if="secondFactorSet === false"
+                v-if="!personStore.twoFactorState.hasToken"
               >
                 <TwoFactorAuthenticationSetUp
-                  :errorCode="personStore.errorCode"
+                  :errorCode="personStore.twoFactorState.errorCode"
                   :disabled="isEditActive"
                   :person="personStore.currentPerson"
-                  @dialogClosed="check2FAState"
+                  @dialogClosed="personStore.get2FAState(currentPersonId)"
                 >
                 </TwoFactorAuthenticationSetUp>
               </div>
               <div
                 class="d-flex justify-sm-end"
-                v-if="secondFactorSet"
+                v-if="personStore.twoFactorState.hasToken"
               >
                 <v-col
                   cols="12"
@@ -748,7 +722,7 @@
           ></v-row>
         </v-container>
         <v-divider
-          v-if="secondFactorSet != undefined"
+          v-if="personStore.twoFactorState.hasToken != undefined"
           class="border-opacity-100 rounded my-6 mx-4"
           color="#E5EAEF"
           thickness="6"
