@@ -200,7 +200,12 @@
   }
 
   // Checks if the filter is active or not
-  const filterActive: Ref<boolean> = computed(() => !!selectedSchule.value || selectedKlassen.value.length > 0);
+  const filterActive: Ref<boolean> = computed(() => {
+    if (hasAutoselectedSchule.value) {
+      return selectedKlassen.value.length > 0;
+    }
+    return !!selectedSchule.value || selectedKlassen.value.length > 0;
+  });
 
   // Function to reset search and filter
   async function resetSearchAndFilter(): Promise<void> {
