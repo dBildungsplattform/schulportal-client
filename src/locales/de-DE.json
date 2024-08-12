@@ -357,6 +357,7 @@
     "checkAndSave": "Bitte prüfen und abschließend speichern, um die Aktion auszuführen",
     "changeRolle": "Rolle ändern",
     "changeKlasse": "Klasse ändern",
+    "changeKlassennameSuccess": "Der Klassenname wurde erfolgreich geändert.",
     "changeRolleDescription": "Ändert die Rolle des Benutzers an der Schule ohne ihn zu entfernen.",
     "changeKlasseDescription": "Ändert die Klasse des Benutzers an der Schule.",
     "chooseZuordnungFirst": "Wählen Sie bitte zuerst eine Schulzuordnung aus.",

@@ -66,6 +66,7 @@
 
   const deleteSuccessDialogVisible: Ref<boolean> = ref(false);
   const createSuccessDialogVisible: Ref<boolean> = ref(false);
+  const changeKlasseSuccessDialogVisible: Ref<boolean> = ref(false);
   const cannotDeleteDialogVisible: Ref<boolean> = ref(false);
   const createZuordnungConfirmationDialogVisible: Ref<boolean> = ref(false);
   const createZuordnungConfirmationDialogMessage: Ref<string> = ref('');
@@ -122,6 +123,13 @@
 
   let closeDeleteSuccessDialog = (): void => {
     deleteSuccessDialogVisible.value = false;
+    router.push(route).then(() => {
+      router.go(0);
+    });
+  };
+
+  let closeChangeKlasseSuccessDialog = (): void => {
+    changeKlasseSuccessDialogVisible.value = false;
     router.push(route).then(() => {
       router.go(0);
     });
@@ -406,12 +414,21 @@
     resetForm();
   }
 
+  // This will send the updated list of Zuordnungen to the Backend with the selected Zuordnung but with the new Klasse.
+  async function confirmChangeKlasse(): Promise<void> {
+    await personenkontextStore.updatePersonenkontexte(finalZuordnungen.value, currentPersonId);
+    changeKlasseSuccessDialogVisible.value = !personenkontextStore.errorCode;
+    resetForm();
+  }
+
   // The save button will act according to what kind of pending action we have.
   const handleSaveClick = (): void => {
     if (pendingCreation.value) {
       confirmAddition();
     } else if (pendingDeletion.value) {
       confirmDeletion();
+    } else if (pendingChangeKlasse.value) {
+      confirmChangeKlasse();
     }
   };
 
@@ -457,6 +474,7 @@
     }
   });
 
+  // When the button "Yes" from the Dialog after filling the form for creating a new Zuordnung is clicked
   const confirmDialogAddition = async (): Promise<void> => {
     createZuordnungConfirmationDialogVisible.value = false;
     const organisation: Organisation | undefined = personenkontextStore.workflowStepResponse?.organisations.find(
@@ -500,59 +518,67 @@
     prepareCreation();
   };
 
+  // When the button "Yes" from the Dialog after filling the form for changing the Klasse is clicked
   const confirmDialogChangeKlasse = async (): Promise<void> => {
+    const organisation: Organisation | undefined = personenkontextStore.workflowStepResponse?.organisations.find(
+      (orga: Organisation) => orga.id === selectedSchule.value,
+    );
 
-  const organisation: Organisation | undefined = personenkontextStore.workflowStepResponse?.organisations.find(
-    (orga: Organisation) => orga.id === selectedSchule.value,
-  );
+    const newKlasse: Organisation | undefined = organisationStore.klassen.find(
+      (k: Organisation) => k.id === selectedNewKlasse.value,
+    );
 
-  const newKlasse: Organisation | undefined = organisationStore.klassen.find(
-    (k: Organisation) => k.id === selectedNewKlasse.value,
-  );
+    if (organisation) {
+      // Create a new Zuordnung with the updated Klasse
+      newZuordnung.value = {
+        sskId: organisation.id,
+        rolleId: selectedZuordnungen.value[0]?.rolleId ?? '',
+        klasse: newKlasse?.name,
+        sskDstNr: organisation.kennung ?? '',
+        sskName: organisation.name,
+        rolle:
+          rollen.value?.find((rolle: RolleWithRollenart) => rolle.value === selectedZuordnungen.value[0]?.rolleId)
+            ?.title || '',
+        administriertVon: organisation.administriertVon ?? '',
+        editable: true,
+        typ: OrganisationsTyp.Schule,
+      };
 
-  if (organisation) {
-    // Create a new Zuordnung with the updated Klasse
-    newZuordnung.value = {
-      sskId: organisation.id,
-      rolleId: selectedZuordnungen.value[0]?.rolleId ?? '',
-      klasse: newKlasse?.name,
-      sskDstNr: organisation.kennung ?? '',
-      sskName: organisation.name,
-      rolle: rollen.value?.find((rolle: RolleWithRollenart) => rolle.value === selectedZuordnungen.value[0]?.rolleId)?.title || '',
-      administriertVon: organisation.administriertVon ?? '',
-      editable: true,
-      typ: OrganisationsTyp.Schule,
-    };
-
-    // Add the new Zuordnung to the finalZuordnungen list and remove the old Zuordnung if it exists
-      finalZuordnungen.value = finalZuordnungen.value.filter(
-        (zuordnung: Zuordnung) => !(zuordnung.sskId === selectedZuordnungen.value[0]?.sskId && zuordnung.rolleId === selectedZuordnungen.value[0]?.rolleId)
-      );
-      
       // Push the new Zuordnung to the final list
       finalZuordnungen.value.push(newZuordnung);
 
-    // Add the new Klasse Zuordnung
-    if (newKlasse) {
-      finalZuordnungen.value.push({
-        sskId: newKlasse.id,
-        rolleId: selectedZuordnungen.value[0]?.rolleId ?? '',
-        sskDstNr: newKlasse.kennung ?? '',
-        sskName: newKlasse.name,
-        rolle: rollen.value?.find((rolle: RolleWithRollenart) => rolle.value === selectedZuordnungen.value[0]?.rolleId)?.title || '',
-        administriertVon: newKlasse.administriertVon ?? '',
-        editable: true,
-        typ: OrganisationsTyp.Klasse,
-      });
+      // Remove the old Zuordnung from the list if it exists
+      finalZuordnungen.value = finalZuordnungen.value.filter(
+        (zuordnung: Zuordnung) =>
+          !(
+            zuordnung.sskId === selectedZuordnungen.value[0]?.sskId &&
+            zuordnung.rolleId === selectedZuordnungen.value[0]?.rolleId
+          ),
+      );
+
+      // Add the new Klasse Zuordnung
+      if (newKlasse) {
+        finalZuordnungen.value.push({
+          sskId: newKlasse.id,
+          rolleId: selectedZuordnungen.value[0]?.rolleId ?? '',
+          sskDstNr: newKlasse.kennung ?? '',
+          sskName: newKlasse.name,
+          rolle:
+            rollen.value?.find((rolle: RolleWithRollenart) => rolle.value === selectedZuordnungen.value[0]?.rolleId)
+              ?.title || '',
+          administriertVon: newKlasse.administriertVon ?? '',
+          editable: true,
+          typ: OrganisationsTyp.Klasse,
+        });
+      }
     }
-  }
+    zuordnungenResult.value = zuordnungenResult.value?.filter(
+      (zuordnung: Zuordnung) => zuordnung.typ !== OrganisationsTyp.Klasse,
+    );
 
-  // Update the zuordnungenResult to reflect changes
-  zuordnungenResult.value = finalZuordnungen.value;
-
-  // Proceed with the pending change Klasse operation
-  prepareChangeKlasse();
-};
+    // Proceed with the pending change Klasse operation
+    prepareChangeKlasse();
+  };
 
   const cancelAddition = (): void => {
     createZuordnungConfirmationDialogVisible.value = false;
@@ -614,7 +640,7 @@
         @update:modelValue="handleAlertClose"
       />
 
-      <!-- Error Message Display if the personenkontextStore throws any kind of error (Not being able to load the person) -->
+      <!-- Error Message Display if the personenkontextStore throws any kind of error (Not being able to load the kontext) -->
       <SpshAlert
         :model-value="!!personenkontextStore.errorCode"
         :type="'error'"
@@ -883,6 +909,7 @@
                     </v-checkbox>
                   </div>
                 </template>
+                <!-- Template  to show when the creation of a Zuordnung is pending -->
                 <template v-else-if="pendingCreation && !pendingDeletion">
                   <span
                     class="text-body my-3 ml-5"
@@ -907,6 +934,7 @@
                     >
                   </span>
                 </template>
+                <!-- Template  to show when the deletion of a Zuordnung is pending -->
                 <template v-else-if="pendingDeletion">
                   <span
                     class="text-body my-3 ml-5"
@@ -924,48 +952,48 @@
                     >
                   </span>
                 </template>
+                <!-- Template  to show when the change Klasse is pending -->
                 <template v-else-if="pendingChangeKlasse">
-                  <v-row>
-                  <span
-                    class="text-body my-3 ml-5"
-                    :class="{
-                      'text-red': selectedZuordnungen.includes(zuordnung),
-                    }"
-                  >
-                    {{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
-                    {{ zuordnung.klasse }}
+                  <div class="d-flex flex-column">
                     <span
-                      v-if="selectedZuordnungen.includes(zuordnung)"
-                      class="text-body text-red"
+                      class="text-body my-3 ml-5"
+                      :class="{
+                        'text-red': selectedZuordnungen.includes(zuordnung),
+                      }"
                     >
-                      ({{ $t('person.willBeRemoved') }})</span
-                    >
-                  </span>
-                 </v-row>
-                 <v-row>
-                  <span
-                    class="text-body my-3 ml-5"
-                    :class="{
-                      'text-green':
-                        newZuordnung &&
-                        zuordnung.sskId === newZuordnung.sskId &&
-                        zuordnung.rolleId === newZuordnung.rolleId,
-                    }"
-                  >
-                    {{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
-                    {{ zuordnung.klasse }}
+                      {{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
+                      {{ zuordnung.klasse }}
+                      <span
+                        v-if="selectedZuordnungen.includes(zuordnung)"
+                        class="text-body text-red"
+                      >
+                        ({{ $t('person.willBeRemoved') }})
+                      </span>
+                    </span>
+
                     <span
-                      v-if="
-                        newZuordnung &&
-                        zuordnung.sskId === newZuordnung.sskId &&
-                        zuordnung.rolleId === newZuordnung.rolleId
-                      "
-                      class="text-body text-green"
+                      class="text-body my-3 ml-5"
+                      :class="{
+                        'text-green':
+                          newZuordnung &&
+                          zuordnung.sskId === newZuordnung.sskId &&
+                          zuordnung.rolleId === newZuordnung.rolleId,
+                      }"
                     >
-                      ({{ $t('person.willBeCreated') }})</span
-                    >
-                  </span>
-                 </v-row>
+                      {{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
+                      {{ newZuordnung?.klasse }}
+                      <span
+                        v-if="
+                          newZuordnung &&
+                          zuordnung.sskId === newZuordnung.sskId &&
+                          zuordnung.rolleId === newZuordnung.rolleId
+                        "
+                        class="text-body text-green"
+                      >
+                        ({{ $t('person.willBeCreated') }})
+                      </span>
+                    </span>
+                  </div>
                 </template>
               </v-col>
               <v-spacer></v-spacer>
@@ -1227,7 +1255,6 @@
                   <v-btn
                     :block="mdAndDown"
                     class="primary"
-                    @Click="prepareChangeKlasse"
                     data-testid="zuordnung-creation-submit-button"
                     type="submit"
                     >{{ $t('person.changeKlasse') }}</v-btn
@@ -1356,7 +1383,48 @@
         </v-card-actions>
       </LayoutCard>
     </v-dialog>
-
+    <!-- Success Dialog after chagning the name of the Klasse-->
+    <v-dialog
+      v-model="changeKlasseSuccessDialogVisible"
+      persistent
+      max-width="600px"
+    >
+      <LayoutCard
+        :closable="true"
+        :header="$t('person.editZuordnungen')"
+        @onCloseClicked="closeChangeKlasseSuccessDialog"
+      >
+        <v-card-text>
+          <v-container>
+            <v-row class="text-body bold px-md-16">
+              <v-col
+                offset="1"
+                cols="10"
+              >
+                <span>{{ $t('person.changeKlassennameSuccess') }}</span>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card-text>
+        <v-card-actions class="justify-center">
+          <v-row class="justify-center">
+            <v-col
+              cols="12"
+              sm="6"
+              md="4"
+            >
+              <v-btn
+                :block="mdAndDown"
+                class="primary"
+                @click.stop="closeCreateSuccessDialog"
+              >
+                {{ $t('close') }}
+              </v-btn>
+            </v-col>
+          </v-row>
+        </v-card-actions>
+      </LayoutCard>
+    </v-dialog>
     <v-dialog
       v-model="createZuordnungConfirmationDialogVisible"
       persistent
