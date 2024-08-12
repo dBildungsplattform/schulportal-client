@@ -310,7 +310,11 @@
         then: (schema: StringSchema<string | undefined, AnyObject, undefined, ''>) =>
           schema.required(t('admin.klasse.rules.klasse.required')),
       }),
-      selectedNewKlasse: string().required(t('admin.klasse.rules.klasse.required')),
+      selectedNewKlasse: string().when('selectedSchule', {
+        is: (selectedSchule: string) => selectedSchule,
+        then: (schema: StringSchema<string | undefined, AnyObject, undefined, ''>) =>
+          schema.required(t('admin.klasse.rules.klasse.required')),
+      }),
     }),
   );
 
