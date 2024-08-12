@@ -115,4 +115,14 @@ describe('ProfileView', () => {
     expect(schoolCardText).toContain('Lehrer');
     expect(schoolCardText).toContain('10A');
   });
+
+  test('it displays 2FA data', async () => {
+    await nextTick();
+    if (!wrapper) return;
+    const cards: VueWrapper[] = wrapper.findAllComponents({ name: 'LayoutCard' }) as VueWrapper[];
+    const twoFactorCard: VueWrapper | undefined = cards.find((card: VueWrapper) =>
+      card.text().includes('Zwei-Faktor-Authentifizierung'),
+    );
+    expect(twoFactorCard).toBeDefined();
+  });
 });

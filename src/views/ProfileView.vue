@@ -25,6 +25,8 @@
   const personalData: Ref = ref<LabelValue[]>([]);
   const schulDaten: Ref = ref<SchulDaten[]>([]);
 
+  let isTwoFactorAuthConnected: boolean = false;
+
   function handleGoToPreviousPage(): void {
     window.history.back();
   }
@@ -316,13 +318,22 @@
               class="w-100"
               icon="mdi-shield-account-outline"
             ></v-icon>
-            <div>
+            <div v-if="isTwoFactorAuthConnected">
               <v-btn
                 color="primary"
                 disabled
               >
                 {{ $t('profile.setupTwoFactorAuth') }}
               </v-btn>
+            </div>
+            <div v-else>
+              <p class="pt-4 text-center text-body-1 text-medium-emphasis">
+                <v-icon
+                  color="warning"
+                  icon="mdi-alert-outline"
+                ></v-icon>
+                {{ $t('profile.twoFactorAuthenticationConnectionError') }}
+              </p>
             </div>
           </v-row>
         </LayoutCard>
