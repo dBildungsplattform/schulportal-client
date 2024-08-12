@@ -69,6 +69,7 @@ describe('RolleDetailsView', () => {
   test('it renders the role details view', () => {
     expect(wrapper?.find('[data-testid="rolle-details-card"]').isVisible()).toBe(true);
   });
+
   test('activates editing mode', async () => {
     rolleStore.updatedRolle = null;
     rolleStore.errorCode = '';

@@ -29,7 +29,12 @@
   import { type Composer, useI18n } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
   import { useForm, type TypedSchema } from 'vee-validate';
-  import { getRolleFieldDefinitions, getValidationSchema, type RolleFieldDefinitions } from '@/utils/validationRolle';
+  import {
+    getDirtyState,
+    getRolleFieldDefinitions,
+    getValidationSchema,
+    type RolleFieldDefinitions,
+  } from '@/utils/validationRolle';
   import RolleDelete from '@/components/admin/rollen/RolleDelete.vue';
   import { type TranslatedObject } from '@/types.d';
   import SuccessTemplate from '@/components/admin/rollen/SuccessTemplate.vue';
@@ -101,7 +106,7 @@
   });
 
   // eslint-disable-next-line @typescript-eslint/typedef
-  const { handleSubmit, isFieldDirty, resetForm, setFieldValue } = useForm<RolleFormType>({
+  const { handleSubmit, resetForm, setFieldValue } = useForm<RolleFormType>({
     validationSchema,
   });
 
@@ -147,17 +152,8 @@
     });
   });
 
-  function isFormDirty(): boolean {
-    // Only check for dirtiness if the form is in edit mode
-    if (!isEditActive.value) return false;
-    return (
-      isFieldDirty('selectedAdministrationsebene') ||
-      isFieldDirty('selectedRollenArt') ||
-      isFieldDirty('selectedRollenName') ||
-      isFieldDirty('selectedMerkmale') ||
-      isFieldDirty('selectedSystemRechte')
-    );
-  }
+  const isFormDirty: boolean = !isEditActive.value ? getDirtyState() : false;
+
   let blockedNext: () => void = () => {};
 
   const serviceProviders: ComputedRef<
@@ -246,7 +242,7 @@
   }
 
   function handleCancel(next: NavigationGuardNext): void {
-    if (isFormDirty()) {
+    if (isFormDirty) {
       showUnsavedChangesDialog.value = true;
       blockedNext = next;
     } else {
@@ -259,7 +255,7 @@
   }
 
   function preventNavigation(event: BeforeUnloadEvent): void {
-    if (!isFormDirty()) return;
+    if (!isFormDirty) return;
     event.preventDefault();
     /* Chrome requires returnValue to be set. */
     event.returnValue = '';
@@ -324,7 +320,7 @@
   });
 
   onBeforeRouteLeave((_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
-    if (isFormDirty()) {
+    if (isFormDirty) {
       showUnsavedChangesDialog.value = true;
       blockedNext = next;
     } else {

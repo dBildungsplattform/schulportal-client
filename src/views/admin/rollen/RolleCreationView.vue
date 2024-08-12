@@ -32,7 +32,12 @@
   import { useForm, type TypedSchema } from 'vee-validate';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import RolleForm from '@/components/form/RolleForm.vue';
-  import { getRolleFieldDefinitions, getValidationSchema, type RolleFieldDefinitions } from '@/utils/validationRolle';
+  import {
+    getDirtyState,
+    getRolleFieldDefinitions,
+    getValidationSchema,
+    type RolleFieldDefinitions,
+  } from '@/utils/validationRolle';
   import SuccessTemplate from '@/components/admin/rollen/SuccessTemplate.vue';
   import { type TranslatedObject } from '@/types.d';
 
@@ -54,7 +59,7 @@
   const translatedSystemrechte: Ref<TranslatedSystemrecht[]> = ref([]);
 
   // eslint-disable-next-line @typescript-eslint/typedef
-  const { handleSubmit, isFieldDirty, resetForm } = useForm<RolleFormType>({
+  const { handleSubmit, resetForm } = useForm<RolleFormType>({
     validationSchema,
   });
 
@@ -73,21 +78,13 @@
     selectedSystemRechteProps,
   }: RolleFieldDefinitions = getRolleFieldDefinitions();
 
-  function isFormDirty(): boolean {
-    return (
-      isFieldDirty('selectedAdministrationsebene') ||
-      isFieldDirty('selectedRollenArt') ||
-      isFieldDirty('selectedRollenName') ||
-      isFieldDirty('selectedMerkmale') ||
-      isFieldDirty('selectedSystemRechte')
-    );
-  }
+  const isFormDirty: boolean = getDirtyState();
 
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
   let blockedNext: () => void = () => {};
 
   onBeforeRouteLeave((_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
-    if (isFormDirty()) {
+    if (isFormDirty) {
       showUnsavedChangesDialog.value = true;
       blockedNext = next;
     } else {
@@ -206,7 +203,7 @@
   );
 
   function preventNavigation(event: BeforeUnloadEvent): void {
-    if (!isFormDirty()) return;
+    if (!isFormDirty) return;
     event.preventDefault();
     /* Chrome requires returnValue to be set. */
     event.returnValue = '';

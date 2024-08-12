@@ -57,6 +57,7 @@ export const getRolleFieldDefinitions = (): RolleFieldDefinitions => {
   const { defineField } = useForm<RolleFormType>({
     validationSchema: getValidationSchema,
   });
+
   const [selectedAdministrationsebene, selectedAdministrationsebeneProps]: [
     Ref<string | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
@@ -101,4 +102,19 @@ export const getRolleFieldDefinitions = (): RolleFieldDefinitions => {
     selectedSystemRechte,
     selectedSystemRechteProps,
   };
+};
+
+export const getDirtyState = (): boolean => {
+  // eslint-disable-next-line @typescript-eslint/typedef
+  const { isFieldDirty } = useForm<RolleFormType>({
+    validationSchema: getValidationSchema,
+  });
+
+  return (
+    isFieldDirty('selectedAdministrationsebene') ||
+    isFieldDirty('selectedRollenArt') ||
+    isFieldDirty('selectedRollenName') ||
+    isFieldDirty('selectedMerkmale') ||
+    isFieldDirty('selectedSystemRechte')
+  );
 };
