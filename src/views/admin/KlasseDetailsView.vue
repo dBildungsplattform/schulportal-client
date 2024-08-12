@@ -132,7 +132,7 @@
     }
   });
 
-  async function deleteKlasse(organisationId: string): Promise<void> {
+  async function deleteKlasseById(organisationId: string): Promise<void> {
     try {
       await organisationStore.deleteOrganisationById(organisationId);
     } catch {
@@ -258,7 +258,7 @@
                       ref="klasse-delete"
                       :schulname="selectedSchule"
                       :useIconActivator="false"
-                      @onDeleteKlasse="deleteKlasse(currentOrganisationId)"
+                      @onDeleteKlasse="deleteKlasseById(currentOrganisationId)"
                     >
                     </KlasseDelete>
                   </div>

@@ -28,7 +28,7 @@
   const errorMessage: Ref<string> = ref('');
   const successDialogVisible: Ref<boolean> = ref(false);
 
-  async function closePasswordResetDialog(isActive: Ref<boolean>): Promise<void> {
+  async function closeKlasseDeleteDialog(isActive: Ref<boolean>): Promise<void> {
     isActive.value = false;
   }
 
@@ -37,7 +37,7 @@
     successDialogVisible.value = true;
   }
 
-  async function closeSuccessDialogAndPushToManagent(): Promise<void> {
+  async function closeSuccessDialogAndPushToManagement(): Promise<void> {
     successDialogVisible.value = false;
     if (router.currentRoute.value.name === 'klasse-management') {
       router.go(0);
@@ -105,7 +105,7 @@
             <v-btn
               :block="mdAndDown"
               class="primary"
-              @click.stop="closeSuccessDialogAndPushToManagent()"
+              @click.stop="closeSuccessDialogAndPushToManagement()"
               data-testid="close-klasse-delete-success-dialog-button"
             >
               {{ $t('close') }}
@@ -147,7 +147,7 @@
       <LayoutCard
         :closable="true"
         :header="$t('admin.klasse.deleteKlasse')"
-        @onCloseClicked="closePasswordResetDialog(isActive)"
+        @onCloseClicked="closeKlasseDeleteDialog(isActive)"
       >
         <v-card-text>
           <v-container>
@@ -189,7 +189,7 @@
               <v-btn
                 :block="mdAndDown"
                 class="secondary button"
-                @click.stop="closePasswordResetDialog(isActive)"
+                @click.stop="closeKlasseDeleteDialog(isActive)"
                 data-testid="close-klasse-delete-dialog-button"
               >
                 {{ $t('cancel') }}
