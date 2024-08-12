@@ -500,6 +500,60 @@
     prepareCreation();
   };
 
+  const confirmDialogChangeKlasse = async (): Promise<void> => {
+
+  const organisation: Organisation | undefined = personenkontextStore.workflowStepResponse?.organisations.find(
+    (orga: Organisation) => orga.id === selectedSchule.value,
+  );
+
+  const newKlasse: Organisation | undefined = organisationStore.klassen.find(
+    (k: Organisation) => k.id === selectedNewKlasse.value,
+  );
+
+  if (organisation) {
+    // Create a new Zuordnung with the updated Klasse
+    newZuordnung.value = {
+      sskId: organisation.id,
+      rolleId: selectedZuordnungen.value[0]?.rolleId ?? '',
+      klasse: newKlasse?.name,
+      sskDstNr: organisation.kennung ?? '',
+      sskName: organisation.name,
+      rolle: rollen.value?.find((rolle: RolleWithRollenart) => rolle.value === selectedZuordnungen.value[0]?.rolleId)?.title || '',
+      administriertVon: organisation.administriertVon ?? '',
+      editable: true,
+      typ: OrganisationsTyp.Schule,
+    };
+
+    // Add the new Zuordnung to the finalZuordnungen list and remove the old Zuordnung if it exists
+      finalZuordnungen.value = finalZuordnungen.value.filter(
+        (zuordnung: Zuordnung) => !(zuordnung.sskId === selectedZuordnungen.value[0]?.sskId && zuordnung.rolleId === selectedZuordnungen.value[0]?.rolleId)
+      );
+      
+      // Push the new Zuordnung to the final list
+      finalZuordnungen.value.push(newZuordnung);
+
+    // Add the new Klasse Zuordnung
+    if (newKlasse) {
+      finalZuordnungen.value.push({
+        sskId: newKlasse.id,
+        rolleId: selectedZuordnungen.value[0]?.rolleId ?? '',
+        sskDstNr: newKlasse.kennung ?? '',
+        sskName: newKlasse.name,
+        rolle: rollen.value?.find((rolle: RolleWithRollenart) => rolle.value === selectedZuordnungen.value[0]?.rolleId)?.title || '',
+        administriertVon: newKlasse.administriertVon ?? '',
+        editable: true,
+        typ: OrganisationsTyp.Klasse,
+      });
+    }
+  }
+
+  // Update the zuordnungenResult to reflect changes
+  zuordnungenResult.value = finalZuordnungen.value;
+
+  // Proceed with the pending change Klasse operation
+  prepareChangeKlasse();
+};
+
   const cancelAddition = (): void => {
     createZuordnungConfirmationDialogVisible.value = false;
   };
@@ -871,6 +925,7 @@
                   </span>
                 </template>
                 <template v-else-if="pendingChangeKlasse">
+                  <v-row>
                   <span
                     class="text-body my-3 ml-5"
                     :class="{
@@ -886,6 +941,31 @@
                       ({{ $t('person.willBeRemoved') }})</span
                     >
                   </span>
+                 </v-row>
+                 <v-row>
+                  <span
+                    class="text-body my-3 ml-5"
+                    :class="{
+                      'text-green':
+                        newZuordnung &&
+                        zuordnung.sskId === newZuordnung.sskId &&
+                        zuordnung.rolleId === newZuordnung.rolleId,
+                    }"
+                  >
+                    {{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
+                    {{ zuordnung.klasse }}
+                    <span
+                      v-if="
+                        newZuordnung &&
+                        zuordnung.sskId === newZuordnung.sskId &&
+                        zuordnung.rolleId === newZuordnung.rolleId
+                      "
+                      class="text-body text-green"
+                    >
+                      ({{ $t('person.willBeCreated') }})</span
+                    >
+                  </span>
+                 </v-row>
                 </template>
               </v-col>
               <v-spacer></v-spacer>
@@ -1100,7 +1180,7 @@
           <template v-if="isChangeKlasseFormActive && !pendingChangeKlasse">
             <v-form
               data-testid="zuordnung-creation-form"
-              @submit="onSubmit"
+              @submit="confirmDialogChangeKlasse"
             >
               <v-row class="ml-md-16">
                 <v-col
