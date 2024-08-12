@@ -11,7 +11,6 @@
   const personStore: PersonStore = usePersonStore();
 
   const workflowStep: Ref<'start' | 'qrcode' | 'verify'> = ref('start');
-  const qrCodeImageBase64: Ref<string> = ref('');
   const errorMessage: Ref<string> = ref('');
   const otp: Ref<string> = ref('');
 
@@ -45,7 +44,6 @@
   async function close2FADialog(isActive: Ref<boolean>): Promise<void> {
     if (workflowStep.value !== 'start') {
       emits('dialogClosed');
-      qrCodeImageBase64.value = '';
     }
 
     isActive.value = false;
@@ -60,7 +58,7 @@
     switch (workflowStep.value) {
       case 'start':
         workflowStep.value = 'qrcode';
-        qrCodeImageBase64.value = await personStore.get2FASoftwareQRCode(props.personId);
+        await personStore.get2FASoftwareQRCode(props.personId);
         break;
       case 'qrcode':
         workflowStep.value = 'verify';
@@ -135,7 +133,7 @@
               </div>
             </v-row>
             <v-row
-              v-if="qrCodeImageBase64.length === 0"
+              v-if="personStore.twoFactorState.qrCode.length === 0"
               class="justify-center"
             >
               <v-progress-circular
@@ -146,12 +144,12 @@
               </v-progress-circular>
             </v-row>
             <v-row
-              v-if="qrCodeImageBase64.length > 0"
+              v-if="personStore.twoFactorState.qrCode.length > 0"
               class="justify-center"
             >
               <v-img
                 class="printableContent image-width"
-                :src="qrCodeImageBase64"
+                :src="personStore.twoFactorState.qrCode"
                 max-width="250"
                 data-testid="software-token-dialog-qr-code"
               />

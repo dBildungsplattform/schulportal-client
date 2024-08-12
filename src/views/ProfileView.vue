@@ -14,7 +14,6 @@
   import { OrganisationsTyp } from '@/stores/OrganisationStore';
   import SelfServiceWorkflow from '@/components/two-factor-authentication/SelfServiceWorkflow.vue';
   import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
-  import type { TokenStateResponse } from '@/api-client/generated';
 
   type SchulDaten = {
     title: string;
@@ -29,9 +28,6 @@
 
   const personalData: Ref = ref<LabelValue[]>([]);
   const schulDaten: Ref = ref<SchulDaten[]>([]);
-
-  const secondFactorSet: Ref<boolean | undefined> = ref(undefined);
-  const secondFactorType: Ref<'software' | 'hardware' | undefined> = ref(undefined);
 
   function handleGoToPreviousPage(): void {
     window.history.back();
@@ -176,31 +172,13 @@
     schulDaten.value = createZuordnungsSchuleDaten(composedZuordnungen);
   }
 
-  async function check2FAState(): Promise<void> {
-    secondFactorSet.value = undefined;
-    secondFactorType.value = undefined;
-
-    const personId: string | null | undefined = personInfoStore.personInfo?.person.id;
-
-    if (!personId) {
-      return;
-    }
-    const result: TokenStateResponse = await personStore.get2FAState(personId);
-    secondFactorSet.value = result.hasToken;
-    if (secondFactorSet.value) {
-      if (result.tokenKind === 'hardware') {
-        secondFactorType.value = 'hardware';
-      } else if (result.tokenKind === 'software') {
-        secondFactorType.value = 'software';
-      }
-    }
-  }
-
   onBeforeMount(async () => {
     await initializeStores();
     setupPersonalData();
     setupSchuleData();
-    check2FAState();
+    if (personStore.currentPerson?.person.id) {
+      await personStore.get2FAState(personStore.currentPerson.person.id);
+    }
   });
 </script>
 
@@ -341,10 +319,10 @@
       >
         <LayoutCard
           :header="$t('profile.twoFactorAuth')"
-          v-if="secondFactorSet != undefined"
+          v-if="personStore.twoFactorState.hasToken != undefined"
         >
           <v-row
-            v-if="secondFactorSet === false"
+            v-if="personStore.twoFactorState.hasToken === false"
             class="ma-3 d-flex align-content-center justify-center ga-4"
           >
             <v-icon
@@ -355,13 +333,13 @@
             <div>
               <SelfServiceWorkflow
                 :personId="personStore.currentPerson?.person.id ?? ''"
-                @dialogClosed="check2FAState"
+                @dialogClosed="personStore.get2FAState(personStore.currentPerson?.person.id ?? '')"
               >
               </SelfServiceWorkflow>
             </div>
           </v-row>
           <v-row
-            v-if="secondFactorSet === true"
+            v-if="personStore.twoFactorState.hasToken === true"
             class="ma-3 d-flex align-content-center justify-center ga-4"
           >
             <v-col>
@@ -376,13 +354,13 @@
                   ></v-icon>
                 </v-col>
                 <div class="v-col">
-                  <p v-if="secondFactorType === 'software'">
+                  <p v-if="personStore.twoFactorState.tokenKind === 'software'">
                     {{ $t('admin.person.twoFactorAuthentication.softwareTokenIsSetUpSelfService') }}
                   </p>
-                  <p v-else-if="secondFactorType === 'hardware'">
+                  <p v-else-if="personStore.twoFactorState.tokenKind === 'hardware'">
                     {{
                       $t('admin.person.twoFactorAuthentication.hardwareTokenIsSetUpSelfService', {
-                        serialNumber: secondFactorType,
+                        serialNumber: personStore.twoFactorState.tokenKind,
                       })
                     }}
                   </p>
@@ -406,9 +384,7 @@
                 </div>
               </v-row>
             </v-col>
-            <v-col v-if="secondFactorSet === undefined">
-              <v-progress-circular indeterminate></v-progress-circular></v-col
-          ></v-row>
+          </v-row>
         </LayoutCard>
       </v-col>
     </v-row>
