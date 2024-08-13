@@ -4,6 +4,8 @@ import {
   Class2FAApiFactory,
   PersonenApiFactory,
   PersonenFrontendApiFactory,
+  type AssignHardwareTokenBodyParams,
+  type AssignHardwareTokenResponse,
   type Class2FAApiInterface,
   type DbiamCreatePersonWithContextBodyParams,
   type PersonenApiInterface,
@@ -71,6 +73,7 @@ type PersonActions = {
   deletePerson: (personId: string) => Promise<void>;
   get2FAState: (personId: string) => Promise<void>;
   get2FASoftwareQRCode: (personId: string) => Promise<void>;
+  assignHardwareToken: (personUserName: string, serial: string, otp: string) => Promise<AssignHardwareTokenResponse>;
 };
 
 export type PersonStore = Store<'personStore', PersonState, PersonGetters, PersonActions>;
@@ -223,6 +226,23 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
           this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
         }
         return await Promise.reject(this.errorCode);
+      } finally {
+        this.loading = false;
+      }
+    },
+    async assignHardwareToken(
+      personUserName: string,
+      serial: string,
+      otp: string,
+    ): Promise<AssignHardwareTokenResponse> {
+      this.loading = true;
+      const assignTokenPayload: AssignHardwareTokenBodyParams = {
+        serial: serial,
+        otp: otp,
+        user: personUserName,
+      };
+      try {
+        return (await twoFactorApi.privacyIdeaAdministrationControllerAssignHardwareToken(assignTokenPayload)).data;
       } finally {
         this.loading = false;
       }

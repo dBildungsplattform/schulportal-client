@@ -514,6 +514,15 @@
             }
           },
           {
+            "name": "personId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
+          },
+          {
             "name": "referrer",
             "required": false,
             "in": "query",
@@ -972,7 +981,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/OrganisationResponseLegacy"
+                  "$ref": "#/components/schemas/OrganisationResponse"
                 }
               }
             }
@@ -1174,7 +1183,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/OrganisationResponseLegacy"
+                  "$ref": "#/components/schemas/OrganisationResponse"
                 }
               }
             }
@@ -1232,7 +1241,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/OrganisationResponseLegacy"
+                  "$ref": "#/components/schemas/OrganisationResponse"
                 }
               }
             }
@@ -1270,26 +1279,26 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "The organization was successfully pulled.",
+            "description": "The root organization was successfully retrieved.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/OrganisationResponseLegacy"
+                  "$ref": "#/components/schemas/OrganisationResponse"
                 }
               }
             }
           },
           "401": {
-            "description": "Not authorized to get the organization."
+            "description": "Not authorized to get the root organization."
           },
           "403": {
-            "description": "Insufficient permissions to get the organization."
+            "description": "Insufficient permissions to get the root organization."
           },
           "404": {
-            "description": "The organization does not exist."
+            "description": "The root organization does not exist."
           },
           "500": {
-            "description": "Internal server error while getting the organization."
+            "description": "Internal server error while getting the root organization."
           }
         },
         "tags": ["organisationen"],
@@ -1382,7 +1391,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/OrganisationResponseLegacy"
+                    "$ref": "#/components/schemas/OrganisationResponse"
                   }
                 }
               }
@@ -1501,7 +1510,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/OrganisationResponseLegacy"
+                    "$ref": "#/components/schemas/OrganisationResponse"
                   }
                 }
               }
@@ -2490,6 +2499,15 @@
             }
           },
           {
+            "name": "personId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
+          },
+          {
             "name": "referrer",
             "required": false,
             "in": "query",
@@ -2542,7 +2560,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/PersonendatensatzResponseAutomapper"
+                    "$ref": "#/components/schemas/PersonenkontextdatensatzResponse"
                   }
                 }
               }
@@ -3167,6 +3185,58 @@
           }
         ]
       }
+    },
+    "/api/2fa-token/assign/hardwareToken": {
+      "post": {
+        "operationId": "PrivacyIdeaAdministrationController_assignHardwareToken",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignHardwareTokenBodyParams"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The hardware token was successfully assigned.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssignHardwareTokenResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Not found."
+          },
+          "401": {
+            "description": "Not authorized to assign hardware token."
+          },
+          "403": {
+            "description": "Insufficient permissions to reset token."
+          },
+          "404": {
+            "description": "Insufficient permissions to assign hardware token."
+          },
+          "500": {
+            "description": "Internal server error while assigning a hardware token."
+          }
+        },
+        "tags": ["2FA"],
+        "security": [
+          {
+            "oauth2": ["openid"]
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
     }
   },
   "info": {
@@ -3571,7 +3641,7 @@
         },
         "required": ["total", "offset", "limit", "items"]
       },
-      "CreatedPersonenkontextOrganisationDto": {
+      "CreatedPersonenkontextOrganisation": {
         "type": "object",
         "properties": {}
       },
@@ -3599,11 +3669,11 @@
             "type": "string"
           },
           "organisation": {
-            "$ref": "#/components/schemas/CreatedPersonenkontextOrganisationDto"
+            "$ref": "#/components/schemas/CreatedPersonenkontextOrganisation"
           },
-          "rolle": {
+          "roleName": {
             "type": "string",
-            "enum": ["LERN", "LEHR", "EXTERN", "ORGADMIN", "LEIT", "SYSADMIN"]
+            "nullable": true
           },
           "personenstatus": {
             "type": "string",
@@ -3637,7 +3707,7 @@
           "referrer",
           "mandant",
           "organisation",
-          "rolle",
+          "roleName",
           "personenstatus",
           "jahrgangsstufe",
           "sichtfreigabe",
@@ -3956,7 +4026,7 @@
         },
         "required": ["name", "typ"]
       },
-      "OrganisationResponseLegacy": {
+      "OrganisationResponse": {
         "type": "object",
         "properties": {
           "id": {
@@ -3982,9 +4052,12 @@
           },
           "typ": {
             "$ref": "#/components/schemas/OrganisationsTyp"
+          },
+          "traegerschaft": {
+            "$ref": "#/components/schemas/TraegerschaftTyp"
           }
         },
-        "required": ["id", "administriertVon", "kennung", "name", "namensergaenzung", "kuerzel", "typ"]
+        "required": ["id", "administriertVon", "kennung", "name", "namensergaenzung", "kuerzel", "typ", "traegerschaft"]
       },
       "DbiamOrganisationError": {
         "type": "object",
@@ -4003,7 +4076,9 @@
               "ROOT_ORGANISATION_IMMUTABLE",
               "KLASSE_NUR_VON_SCHULE_ADMINISTRIERT",
               "KLASSENNAME_AN_SCHULE_EINDEUTIG",
-              "NAME_REQUIRED_FOR_KLASSE"
+              "NAME_REQUIRED_FOR_KLASSE",
+              "NAME_ENTHAELT_LEERZEICHEN",
+              "KENNUNG_ENTHAELT_LEERZEICHEN"
             ]
           },
           "code": {
@@ -4043,39 +4118,6 @@
           }
         },
         "required": ["name", "typ"]
-      },
-      "OrganisationResponse": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "administriertVon": {
-            "type": "string",
-            "nullable": true
-          },
-          "kennung": {
-            "type": "string",
-            "nullable": true
-          },
-          "name": {
-            "type": "string"
-          },
-          "namensergaenzung": {
-            "type": "string",
-            "nullable": true
-          },
-          "kuerzel": {
-            "type": "string"
-          },
-          "typ": {
-            "$ref": "#/components/schemas/OrganisationsTyp"
-          },
-          "traegerschaft": {
-            "$ref": "#/components/schemas/TraegerschaftTyp"
-          }
-        },
-        "required": ["id", "administriertVon", "kennung", "name", "namensergaenzung", "kuerzel", "typ", "traegerschaft"]
       },
       "OrganisationRootChildrenResponse": {
         "type": "object",
@@ -4120,6 +4162,36 @@
           }
         },
         "required": ["name"]
+      },
+      "OrganisationResponseLegacy": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "administriertVon": {
+            "type": "string",
+            "nullable": true
+          },
+          "kennung": {
+            "type": "string",
+            "nullable": true
+          },
+          "name": {
+            "type": "string"
+          },
+          "namensergaenzung": {
+            "type": "string",
+            "nullable": true
+          },
+          "kuerzel": {
+            "type": "string"
+          },
+          "typ": {
+            "$ref": "#/components/schemas/OrganisationsTyp"
+          }
+        },
+        "required": ["id", "administriertVon", "kennung", "name", "namensergaenzung", "kuerzel", "typ"]
       },
       "RollenArt": {
         "type": "string",
@@ -4309,7 +4381,7 @@
       },
       "ServiceProviderTarget": {
         "type": "string",
-        "enum": ["URL", "SCHULPORTAL_ADMINISTRATION"]
+        "enum": ["URL", "EMAIL", "SCHULPORTAL_ADMINISTRATION"]
       },
       "ServiceProviderKategorie": {
         "type": "string",
@@ -4379,7 +4451,8 @@
               "ROLLE_ERROR",
               "ADD_SYSTEMRECHT_ERROR",
               "ROLLE_HAT_PERSONENKONTEXTE_ERROR",
-              "UPDATE_MERKMALE_ERROR"
+              "UPDATE_MERKMALE_ERROR",
+              "ROLLENNAME_ENTHAELT_LEERZEICHEN"
             ]
           },
           "code": {
@@ -4450,6 +4523,30 @@
         "properties": {
           "person": {
             "$ref": "#/components/schemas/PersonResponseAutomapper"
+          },
+          "personenkontexte": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PersonenkontextResponse"
+            }
+          }
+        },
+        "required": ["person", "personenkontexte"]
+      },
+      "PersonIdResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": ["id"]
+      },
+      "PersonenkontextdatensatzResponse": {
+        "type": "object",
+        "properties": {
+          "person": {
+            "$ref": "#/components/schemas/PersonIdResponse"
           },
           "personenkontexte": {
             "type": "array",
@@ -4756,6 +4853,48 @@
           }
         },
         "required": ["hasToken", "tokenKind"]
+      },
+      "AssignHardwareTokenBodyParams": {
+        "type": "object",
+        "properties": {
+          "serial": {
+            "type": "string"
+          },
+          "otp": {
+            "type": "string"
+          },
+          "user": {
+            "type": "string"
+          }
+        },
+        "required": ["serial", "otp", "user"]
+      },
+      "AssignHardwareTokenResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "jsonrpc": {
+            "type": "string"
+          },
+          "time": {
+            "type": "number"
+          },
+          "version": {
+            "type": "string"
+          },
+          "versionnumber": {
+            "type": "string"
+          },
+          "signature": {
+            "type": "string"
+          },
+          "dialogText": {
+            "type": "string"
+          }
+        },
+        "required": ["id", "jsonrpc", "time", "version", "versionnumber", "signature", "dialogText"]
       }
     }
   }
