@@ -52,11 +52,10 @@ const vuetifyConfig = (state: {
   errors: Array<string>;
 }): { props: { error: boolean; 'error-messages': Array<string> } } => getVuetifyConfig(state);
 
-export const getRolleFieldDefinitions = (): RolleFieldDefinitions => {
+export const getRolleFieldDefinitions = (formContext: ReturnType<typeof useForm>): RolleFieldDefinitions => {
+
   // eslint-disable-next-line @typescript-eslint/typedef
-  const { defineField } = useForm<RolleFormType>({
-    validationSchema: getValidationSchema,
-  });
+  const { defineField } = formContext;
 
   const [selectedAdministrationsebene, selectedAdministrationsebeneProps]: [
     Ref<string | undefined>,

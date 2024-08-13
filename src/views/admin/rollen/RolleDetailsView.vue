@@ -106,9 +106,7 @@
   });
 
   // eslint-disable-next-line @typescript-eslint/typedef
-  const { handleSubmit, resetForm, setFieldValue } = useForm<RolleFormType>({
-    validationSchema,
-  });
+  const { handleSubmit, resetForm, setFieldValue, ...formContext } = useForm<RolleFormType>({ validationSchema });
 
   const {
     selectedAdministrationsebene,
@@ -123,7 +121,7 @@
     selectedServiceProvidersProps,
     selectedSystemRechte,
     selectedSystemRechteProps,
-  }: RolleFieldDefinitions = getRolleFieldDefinitions();
+  }: RolleFieldDefinitions = getRolleFieldDefinitions(formContext as unknown as ReturnType<typeof useForm>);
 
   const translatedSelectedMerkmale: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
     return selectedMerkmale.value?.map((merkmalKey: RollenMerkmal) => ({

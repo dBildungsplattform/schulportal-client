@@ -59,9 +59,7 @@
   const translatedSystemrechte: Ref<TranslatedSystemrecht[]> = ref([]);
 
   // eslint-disable-next-line @typescript-eslint/typedef
-  const { handleSubmit, resetForm } = useForm<RolleFormType>({
-    validationSchema,
-  });
+  const { handleSubmit, resetForm, ...formContext } = useForm<RolleFormType>({ validationSchema });
 
   const {
     selectedAdministrationsebene,
@@ -76,7 +74,7 @@
     selectedServiceProvidersProps,
     selectedSystemRechte,
     selectedSystemRechteProps,
-  }: RolleFieldDefinitions = getRolleFieldDefinitions();
+  }: RolleFieldDefinitions = getRolleFieldDefinitions(formContext as unknown as ReturnType<typeof useForm>);
 
   const isFormDirty: boolean = getDirtyState();
 
