@@ -67,6 +67,7 @@
     </h1>
     <LayoutCard :header="$t('admin.schule.management')">
       <ResultTable
+        :currentPage="searchFilterStore.schulenPage"
         data-testid="schule-table"
         :items="organisationStore.allSchulen || []"
         :loading="organisationStore.loading"

@@ -37,7 +37,7 @@ export const useSearchFilterStore: StoreDefinition<
     klassenPage: 1,
     klassenPerPage: 30,
     personenPage: 1,
-    personenPerPage: 10,
+    personenPerPage: 30,
     rollenPage: 1,
     rollenPerPage: 30,
     schulenPage: 1,

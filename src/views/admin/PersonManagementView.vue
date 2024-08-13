@@ -561,6 +561,7 @@
         ></SearchField>
       </v-row>
       <ResultTable
+        :currentPage="searchFilterStore.personenPage"
         data-testid="person-table"
         :items="personenWithUebersicht || []"
         :itemsPerPage="searchFilterStore.personenPerPage"

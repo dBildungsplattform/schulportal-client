@@ -8,13 +8,14 @@
   type TableItem = Record<string, unknown>;
 
   type Props = {
+    currentPage?: number;
+    disableRowClick?: boolean;
+    headers: ReadonlyHeaders;
     items: TableItem[];
     itemsPerPage: number;
+    itemValuePath: string;
     loading: boolean;
     totalItems: number;
-    headers: ReadonlyHeaders;
-    itemValuePath: string;
-    disableRowClick?: boolean;
   };
 
   const props: Props = defineProps<Props>();
@@ -58,6 +59,7 @@
     :items-per-page-options="[30, 50, 100, 300]"
     :items-per-page-text="$t('itemsPerPage')"
     :item-value="itemValuePath"
+    :page="currentPage"
     ref="v-data-table-server"
     select-strategy="page"
     show-select

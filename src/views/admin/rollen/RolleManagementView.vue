@@ -117,6 +117,7 @@
     </h1>
     <LayoutCard :header="$t('admin.rolle.management')">
       <ResultTable
+        :currentPage="searchFilterStore.rollenPage"
         data-testid="rolle-table"
         :items="transformedRollenAndMerkmale || []"
         :itemsPerPage="searchFilterStore.rollenPerPage"
