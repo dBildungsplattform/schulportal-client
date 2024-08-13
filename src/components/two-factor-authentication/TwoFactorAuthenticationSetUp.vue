@@ -97,12 +97,12 @@
                 <v-radio-group v-model="selectedOption">
                   <v-radio
                     :label="$t('admin.person.twoFactorAuthentication.softwareTokenOption')"
-                    data-testid="software-token-option"
+                    data-testid="software-token-radio-button"
                     value="software"
                   ></v-radio>
                   <v-radio
                     :label="$t('admin.person.twoFactorAuthentication.hardwareTokenOption')"
-                    data-testid="hardware-token-option"
+                    data-testid="hardware-token-radio-button"
                     value="hardware"
                   ></v-radio>
                 </v-radio-group>
@@ -159,7 +159,7 @@
                 :block="mdAndDown"
                 class="secondary button"
                 @click.stop="close2FADialog(isActive)"
-                data-testid="close-two-factor-authentication-dialog"
+                data-testid="close-two-factor-authentication-dialog-button"
               >
                 {{ $t('cancel') }}
               </v-btn>
@@ -173,7 +173,7 @@
                 :block="mdAndDown"
                 class="primary button"
                 @click.stop="requestSoftwareToken()"
-                data-testid="proceed-two-factor-authentication-dialog"
+                data-testid="proceed-two-factor-authentication-dialog-button"
               >
                 {{ $t('proceed') }}
               </v-btn>

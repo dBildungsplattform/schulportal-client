@@ -634,10 +634,7 @@
           thickness="6"
         ></v-divider>
         <!-- Two Factor Authentication -->
-        <v-container
-          v-if="personStore.twoFactorState.hasToken != undefined"
-          class="two-factor-authentication-set-up"
-        >
+        <v-container v-if="personStore.twoFactorState.hasToken != undefined">
           <v-row class="ml-md-16">
             <v-col>
               <h3 class="subtitle-1">{{ $t('admin.person.twoFactorAuthentication.header') }}</h3>
