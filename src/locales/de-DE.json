@@ -98,7 +98,11 @@
         "notSetUp": "Für diesen Benutzer ist aktuell keine 2FA eingerichtet.",
         "softwareTokenIsSetUp": "Für diesen Benutzer ist aktuell ein Software-Token eingerichtet.",
         "resetInfo": "Um einen neuen Token einzurichten, muss der aktuelle Token durch die schulischen Admins zurückgesetzt werden.",
-        "tokenReset": "Token zurücksetzen"
+        "tokenReset": "Token zurücksetzen",
+        "hardwareTokenIsSetUp": "Für diesen Benutzer ist aktuell ein Hardware-Token eingerichtet.",
+        "hardwareTokenSetUpSuccess": "Token wurde erfolgreich zugeordnet.",
+        "hardwareTokenSetUpFailure": "Fehler bei Zuordnung des Hardware-Tokens",
+        "hardwareTokenSetUpButton": "Einrichten"
       },
       "copyPasswordError": "Passwort konnte nicht in die Zwischenablage kopiert werden",
       "copyPasswordSuccess": "Passwort in Zwischenablage kopiert",

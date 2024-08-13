@@ -903,7 +903,7 @@
               <h3 class="subtitle-1">{{ $t('admin.person.twoFactorAuthentication.header') }}</h3>
               <v-row
                 class="mt-4 text-body"
-                v-if="personStore.twoFactorState.hasToken && personStore.twoFactorState.tokenKind === 'software'"
+                v-if="personStore.twoFactorState.hasToken"
               >
                 <v-col
                   class="text-right"
@@ -916,8 +916,11 @@
                   ></v-icon>
                 </v-col>
                 <div class="v-col">
-                  <p>
+                  <p v-if="personStore.twoFactorState.tokenKind === 'software'">
                     {{ $t('admin.person.twoFactorAuthentication.softwareTokenIsSetUp') }}
+                  </p>
+                  <p v-if="personStore.twoFactorState.tokenKind === 'hardware'">
+                    {{ $t('admin.person.twoFactorAuthentication.hardwareTokenIsSetUp') }}
                   </p>
                 </div>
               </v-row>

@@ -5,6 +5,7 @@
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import SpshTooltip from '@/components/admin/SpshTooltip.vue';
   import SoftwareTokenWorkflow from './SoftwareTokenWorkflow.vue';
+  import HardwareTokenWorkflow from './HardwareTokenWorkflow.vue';
   import { useI18n, type Composer } from 'vue-i18n';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
@@ -12,7 +13,7 @@
   const selectedOption: Ref<'software' | 'hardware'> = ref('software');
   const personStore: PersonStore = usePersonStore();
 
-  const requestedSoftwareToken: Ref<boolean> = ref(false);
+  const requestingToken: Ref<boolean> = ref(false);
 
   const dialogHeader: Ref<string> = ref(t('admin.person.twoFactorAuthentication.setUpLong'));
 
@@ -33,7 +34,7 @@
   const props: Props = defineProps<Props>();
 
   async function close2FADialog(isActive: Ref<boolean>): Promise<void> {
-    if (requestedSoftwareToken.value) {
+    if (requestingToken.value) {
       emits('dialogClosed');
       personStore.twoFactorState.qrCode = '';
       personStore.twoFactorState.hasToken = null;
@@ -41,14 +42,16 @@
     }
 
     isActive.value = false;
-    requestedSoftwareToken.value = false;
+    requestingToken.value = false;
     selectedOption.value = 'software';
     dialogHeader.value = t('admin.person.twoFactorAuthentication.setUpLong');
   }
 
   async function requestSoftwareToken(): Promise<void> {
-    await personStore.get2FASoftwareQRCode(props.person.person.id);
-    requestedSoftwareToken.value = true;
+    if (selectedOption.value === 'software') {
+      await personStore.get2FASoftwareQRCode(props.person.person.id);
+    }
+    requestingToken.value = true;
   }
 
   async function handleHeaderUpdate(header: string): Promise<void> {
@@ -90,7 +93,7 @@
         @onCloseClicked="close2FADialog(isActive)"
         data-testid="two-factor-authentication-dialog"
       >
-        <v-card-text v-if="!requestedSoftwareToken">
+        <v-card-text v-if="!requestingToken">
           <v-container>
             <v-row class="text-body bold px-md-16">
               <v-col>
@@ -136,7 +139,7 @@
             </v-row>
           </v-container>
         </v-card-text>
-        <v-container v-if="requestedSoftwareToken">
+        <v-container v-if="requestingToken">
           <SoftwareTokenWorkflow
             v-if="selectedOption === 'software'"
             :qrCodeImageBase64="personStore.twoFactorState.qrCode"
@@ -144,10 +147,18 @@
             @onCloseClicked="close2FADialog(isActive)"
             data-testid="software-token-workflow"
           ></SoftwareTokenWorkflow>
+          <HardwareTokenWorkflow
+            v-if="selectedOption === 'hardware'"
+            @updateHeader="handleHeaderUpdate"
+            @onCloseClicked="close2FADialog(isActive)"
+            :errorCode="props.errorCode"
+            :person="props.person"
+          >
+          </HardwareTokenWorkflow>
         </v-container>
         <v-card-actions
           class="justify-center"
-          v-if="!requestedSoftwareToken"
+          v-if="!requestingToken"
         >
           <v-row class="justify-center">
             <v-col
