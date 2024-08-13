@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { ref, type Ref, onMounted, onUnmounted, computed, type ComputedRef, watch } from 'vue';
+  import { ref, type Ref, onMounted, onUnmounted, computed, type ComputedRef } from 'vue';
   import {
     useOrganisationStore,
     type OrganisationStore,
