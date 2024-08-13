@@ -42,6 +42,7 @@
       title: t('action'),
       key: 'actions',
       align: 'center',
+      sortable: false,
     } as DataTableHeader,
   ]);
 

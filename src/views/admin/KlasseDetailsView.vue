@@ -271,7 +271,7 @@
                   <v-btn
                     class="primary ml-lg-8"
                     data-testid="klasse-edit-button"
-                    @Click="activateEditing"
+                    @click="activateEditing"
                     :block="mdAndDown"
                   >
                     {{ $t('edit') }}
