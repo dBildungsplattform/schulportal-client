@@ -29,7 +29,7 @@
     type NavigationGuardNext,
     type RouteLocationNormalized,
   } from 'vue-router';
-  import { useForm, type TypedSchema } from 'vee-validate';
+  import { useForm, type FormContext, type TypedSchema } from 'vee-validate';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import RolleForm from '@/components/form/RolleForm.vue';
   import {
@@ -58,8 +58,7 @@
   type TranslatedSystemrecht = { value: RollenSystemRecht; title: string };
   const translatedSystemrechte: Ref<TranslatedSystemrecht[]> = ref([]);
 
-  // eslint-disable-next-line @typescript-eslint/typedef
-  const { handleSubmit, resetForm, ...formContext } = useForm<RolleFormType>({ validationSchema });
+  const formContext: FormContext<RolleFormType, RolleFormType> = useForm<RolleFormType>({ validationSchema });
 
   const {
     selectedAdministrationsebene,
@@ -74,7 +73,7 @@
     selectedServiceProvidersProps,
     selectedSystemRechte,
     selectedSystemRechteProps,
-  }: RolleFieldDefinitions = getRolleFieldDefinitions(formContext as unknown as ReturnType<typeof useForm>);
+  }: RolleFieldDefinitions = getRolleFieldDefinitions(formContext);
 
   const isFormDirty: boolean = getDirtyState();
 
@@ -93,7 +92,7 @@
 
   const handleCreateAnotherRolle = (): void => {
     rolleStore.createdRolle = null;
-    resetForm();
+    formContext.resetForm();
     router.push({ name: 'create-rolle' });
   };
 
@@ -225,7 +224,7 @@
     window.removeEventListener('beforeunload', preventNavigation);
   });
 
-  const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = handleSubmit(async () => {
+  const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = formContext.handleSubmit(async () => {
     if (selectedRollenName.value && selectedAdministrationsebene.value && selectedRollenArt.value) {
       const merkmaleToSubmit: RollenMerkmal[] = selectedMerkmale.value?.map((m: RollenMerkmal) => m) || [];
       const systemrechteToSubmit: RollenSystemRecht[] =
@@ -245,7 +244,7 @@
             });
           });
         });
-      resetForm();
+      formContext.resetForm();
 
       if (rolleStore.createdRolle) {
         await organisationStore.getOrganisationById(

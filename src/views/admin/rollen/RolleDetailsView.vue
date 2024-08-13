@@ -28,7 +28,7 @@
   import RolleForm from '@/components/form/RolleForm.vue';
   import { type Composer, useI18n } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
-  import { useForm, type TypedSchema } from 'vee-validate';
+  import { useForm, type FormContext, type TypedSchema } from 'vee-validate';
   import {
     getDirtyState,
     getRolleFieldDefinitions,
@@ -105,8 +105,7 @@
     }));
   });
 
-  // eslint-disable-next-line @typescript-eslint/typedef
-  const { handleSubmit, resetForm, setFieldValue, ...formContext } = useForm<RolleFormType>({ validationSchema });
+  const formContext: FormContext<RolleFormType, RolleFormType> = useForm<RolleFormType>({ validationSchema });
 
   const {
     selectedAdministrationsebene,
@@ -121,7 +120,7 @@
     selectedServiceProvidersProps,
     selectedSystemRechte,
     selectedSystemRechteProps,
-  }: RolleFieldDefinitions = getRolleFieldDefinitions(formContext as unknown as ReturnType<typeof useForm>);
+  }: RolleFieldDefinitions = getRolleFieldDefinitions(formContext);
 
   const isFormDirty: boolean = !isEditActive.value ? getDirtyState() : false;
 
@@ -145,7 +144,7 @@
     blockedNext();
   }
 
-  const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = handleSubmit(async () => {
+  const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = formContext.handleSubmit(async () => {
     if (selectedRollenName.value && selectedAdministrationsebene.value && selectedRollenArt.value) {
       if (rolleStore.currentRolle) {
         try {
@@ -161,7 +160,7 @@
           creationErrorTitle.value = t(`admin.rolle.title.${rolleStore.errorCode}`);
         }
       }
-      resetForm();
+      formContext.resetForm();
     }
   });
 
@@ -270,18 +269,18 @@
     });
 
     // Set the initial values using the computed properties
-    setFieldValue('selectedAdministrationsebene', translatedOrgName.value);
-    setFieldValue('selectedRollenArt', translatedRollenart.value);
-    setFieldValue('selectedRollenName', rolleStore.currentRolle?.name);
-    setFieldValue(
+    formContext.setFieldValue('selectedAdministrationsebene', translatedOrgName.value);
+    formContext.setFieldValue('selectedRollenArt', translatedRollenart.value);
+    formContext.setFieldValue('selectedRollenName', rolleStore.currentRolle?.name);
+    formContext.setFieldValue(
       'selectedMerkmale',
       translatedMerkmale.value.map((obj: TranslatedObject) => obj.value),
     );
-    setFieldValue(
+    formContext.setFieldValue(
       'selectedServiceProviders',
       translatedProviderNames.value.map((obj: TranslatedObject) => obj.value),
     );
-    setFieldValue(
+    formContext.setFieldValue(
       'selectedSystemRechte',
       translatedSystemrechte.value.map((obj: TranslatedObject) => obj.value),
     );
