@@ -6,7 +6,7 @@
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
   import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
   import { type SearchFilterStore, useSearchFilterStore } from '@/stores/SearchFilterStore';
-  
+
   const organisationStore: OrganisationStore = useOrganisationStore();
   const searchFilterStore: SearchFilterStore = useSearchFilterStore();
 
