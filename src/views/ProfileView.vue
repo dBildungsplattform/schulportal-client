@@ -25,11 +25,6 @@
     labelAndValues: LabelValue[];
   };
 
-  function handleCloseChangedPasswordDialog(): void {
-    showChangedPasswordDialog.value = false;
-    router.replace({path: route.fullPath, query: { }});
-  }
-
   let personInfoStore: PersonInfoStore = usePersonInfoStore();
   let personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
   const personalData: Ref = ref<LabelValue[]>([]);
@@ -188,6 +183,11 @@
 
   function openChangePasswordDialog(): void {
     isPasswordResetDialogActive.value = true;
+  }
+
+  function handleCloseChangedPasswordDialog(): void {
+    showChangedPasswordDialog.value = false;
+    router.replace({ path: route.fullPath, query: {} });
   }
 
   onBeforeMount(async () => {
