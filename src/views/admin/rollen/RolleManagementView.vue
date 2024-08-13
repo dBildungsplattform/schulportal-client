@@ -1,15 +1,17 @@
 <script setup lang="ts">
   import { RollenMerkmal, useRolleStore, type Rolle, type RolleResponse, type RolleStore } from '@/stores/RolleStore';
-  import { computed, onMounted, ref, type ComputedRef, type Ref } from 'vue';
+  import { computed, onMounted, type ComputedRef } from 'vue';
   import ResultTable from '@/components/admin/ResultTable.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { type Composer, useI18n } from 'vue-i18n';
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
   import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
   import { useRouter, type Router } from 'vue-router';
+  import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
 
   const rolleStore: RolleStore = useRolleStore();
   const organisationStore: OrganisationStore = useOrganisationStore();
+  const searchFilterStore: SearchFilterStore = useSearchFilterStore();
 
   const router: Router = useRouter();
   const { t }: Composer = useI18n({ useScope: 'global' });
@@ -68,18 +70,15 @@
     });
   });
 
-  const rollenPerPage: Ref<number> = ref(30);
-  const rollenPage: Ref<number> = ref(1);
-
   function navigateToRolleDetails(_$event: PointerEvent, { item }: { item: Rolle }): void {
     router.push({ name: 'rolle-details', params: { id: item.id } });
   }
 
   function getPaginatedRollen(page: number): void {
-    rollenPage.value = page || 1;
+    searchFilterStore.rollenPage = page;
     rolleStore.getAllRollen({
-      offset: (rollenPage.value - 1) * rollenPerPage.value,
-      limit: rollenPerPage.value,
+      offset: (searchFilterStore.rollenPage - 1) * searchFilterStore.rollenPerPage,
+      limit: searchFilterStore.rollenPerPage,
       searchString: '',
     });
   }
@@ -87,13 +86,13 @@
   function getPaginatedRollenWithLimit(limit: number): void {
     /* reset page to 1 if entries are equal to or less than selected limit */
     if (rolleStore.totalRollen <= limit) {
-      rollenPage.value = 1;
+      searchFilterStore.rollenPage = 1;
     }
 
-    rollenPerPage.value = limit || 1;
+    searchFilterStore.rollenPerPage = limit;
     rolleStore.getAllRollen({
-      offset: (rollenPage.value - 1) * rollenPerPage.value,
-      limit: rollenPerPage.value,
+      offset: (searchFilterStore.rollenPage - 1) * searchFilterStore.rollenPerPage,
+      limit: searchFilterStore.rollenPerPage,
       searchString: '',
     });
   }
@@ -101,8 +100,8 @@
   onMounted(async () => {
     await organisationStore.getAllOrganisationen();
     await rolleStore.getAllRollen({
-      offset: (rollenPage.value - 1) * rollenPerPage.value,
-      limit: rollenPerPage.value,
+      offset: (searchFilterStore.rollenPage - 1) * searchFilterStore.rollenPerPage,
+      limit: searchFilterStore.rollenPerPage,
       searchString: '',
     });
   });
@@ -120,7 +119,7 @@
       <ResultTable
         data-testid="rolle-table"
         :items="transformedRollenAndMerkmale || []"
-        :itemsPerPage="rollenPerPage"
+        :itemsPerPage="searchFilterStore.rollenPerPage"
         :loading="rolleStore.loading"
         :headers="headers"
         @onHandleRowClick="navigateToRolleDetails"

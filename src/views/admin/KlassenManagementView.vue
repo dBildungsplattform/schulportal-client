@@ -10,11 +10,13 @@
     type OrganisationStore,
   } from '@/stores/OrganisationStore';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import type { UserinfoPersonenkontext } from '@/stores/PersonenkontextStore';
   import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
+  import type { UserinfoPersonenkontext } from '@/stores/PersonenkontextStore';
+  import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
 
-  const organisationStore: OrganisationStore = useOrganisationStore();
   const authStore: AuthStore = useAuthStore();
+  const organisationStore: OrganisationStore = useOrganisationStore();
+  const searchFilterStore: SearchFilterStore = useSearchFilterStore();
   const { t }: Composer = useI18n({ useScope: 'global' });
 
   type ReadonlyHeaders = VDataTableServer['$props']['headers'];
@@ -61,9 +63,6 @@
       .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
   });
 
-  const klassenPerPage: Ref<number> = ref(30);
-  const klassenPage: Ref<number> = ref(1);
-
   // Retrieve the parent Schule from the Klasse using the map's key
   function getSchuleDetails(klasse: Organisation): { schuleDetails: string } {
     const schuleDetails: string | undefined = schuleMap.value.get(klasse.administriertVon || '') ?? '---';
@@ -73,10 +72,10 @@
   }
 
   async function getPaginatedKlassen(page: number): Promise<void> {
-    klassenPage.value = page || 1;
+    searchFilterStore.klassenPage = page || 1;
     await organisationStore.getAllOrganisationen({
-      offset: (klassenPage.value - 1) * klassenPerPage.value,
-      limit: klassenPerPage.value,
+      offset: (searchFilterStore.klassenPage - 1) * searchFilterStore.klassenPerPage,
+      limit: searchFilterStore.klassenPerPage,
       includeTyp: OrganisationsTyp.Klasse,
       systemrechte: ['KLASSEN_VERWALTEN'],
     });
@@ -90,13 +89,13 @@
   async function getPaginatedKlassenWithLimit(limit: number): Promise<void> {
     /* reset page to 1 if entries are equal to or less than selected limit */
     if (organisationStore.totalOrganisationen <= limit) {
-      klassenPage.value = 1;
+      searchFilterStore.klassenPage = 1;
     }
 
-    klassenPerPage.value = limit || 1;
+    searchFilterStore.klassenPerPage = limit || 1;
     await organisationStore.getAllOrganisationen({
-      offset: (klassenPage.value - 1) * klassenPerPage.value,
-      limit: klassenPerPage.value,
+      offset: (searchFilterStore.klassenPage - 1) * searchFilterStore.klassenPerPage,
+      limit: searchFilterStore.klassenPerPage,
       includeTyp: OrganisationsTyp.Klasse,
       systemrechte: ['KLASSEN_VERWALTEN'],
     });
@@ -141,8 +140,8 @@
 
       // Fetch all Klassen when no Schule is selected
       await organisationStore.getAllOrganisationen({
-        offset: (klassenPage.value - 1) * klassenPerPage.value,
-        limit: klassenPerPage.value,
+        offset: (searchFilterStore.klassenPage - 1) * searchFilterStore.klassenPerPage,
+        limit: searchFilterStore.klassenPerPage,
         includeTyp: OrganisationsTyp.Klasse,
         systemrechte: ['KLASSEN_VERWALTEN'],
       });
@@ -177,8 +176,8 @@
     } else {
       // If no Klassen and no Schule are selected, show all Klassen
       await organisationStore.getAllOrganisationen({
-        offset: (klassenPage.value - 1) * klassenPerPage.value,
-        limit: klassenPerPage.value,
+        offset: (searchFilterStore.klassenPage - 1) * searchFilterStore.klassenPerPage,
+        limit: searchFilterStore.klassenPerPage,
         includeTyp: OrganisationsTyp.Klasse,
         systemrechte: ['KLASSEN_VERWALTEN'],
       });
@@ -210,8 +209,8 @@
     if (searchValue.length >= 1 && selectedSchule.value !== null) {
       // Fetch Klassen matching the search string and selected schule
       await organisationStore.getAllOrganisationen({
-        offset: (klassenPage.value - 1) * klassenPerPage.value,
-        limit: klassenPerPage.value,
+        offset: (searchFilterStore.klassenPage - 1) * searchFilterStore.klassenPerPage,
+        limit: searchFilterStore.klassenPerPage,
         administriertVon: [selectedSchule.value],
         searchString: searchValue,
         includeTyp: OrganisationsTyp.Klasse,
@@ -219,24 +218,24 @@
       });
     } else if (searchValue.length >= 1 && selectedSchule.value === null) {
       await organisationStore.getAllOrganisationen({
-        offset: (klassenPage.value - 1) * klassenPerPage.value,
-        limit: klassenPerPage.value,
+        offset: (searchFilterStore.klassenPage - 1) * searchFilterStore.klassenPerPage,
+        limit: searchFilterStore.klassenPerPage,
         searchString: searchValue,
         includeTyp: OrganisationsTyp.Klasse,
         systemrechte: ['KLASSEN_VERWALTEN'],
       });
     } else if (searchValue.length < 1 && selectedSchule.value === null) {
       await organisationStore.getAllOrganisationen({
-        offset: (klassenPage.value - 1) * klassenPerPage.value,
-        limit: klassenPerPage.value,
+        offset: (searchFilterStore.klassenPage - 1) * searchFilterStore.klassenPerPage,
+        limit: searchFilterStore.klassenPerPage,
         includeTyp: OrganisationsTyp.Klasse,
         systemrechte: ['KLASSEN_VERWALTEN'],
       });
     } else if (selectedSchule.value !== null) {
       // Fetch all Klassen for the selected Schule when the search string is cleared
       await organisationStore.getAllOrganisationen({
-        offset: (klassenPage.value - 1) * klassenPerPage.value,
-        limit: klassenPerPage.value,
+        offset: (searchFilterStore.klassenPage - 1) * searchFilterStore.klassenPerPage,
+        limit: searchFilterStore.klassenPerPage,
         administriertVon: [selectedSchule.value],
         includeTyp: OrganisationsTyp.Klasse,
         systemrechte: ['KLASSEN_VERWALTEN'],
@@ -276,8 +275,8 @@
         systemrechte: ['KLASSEN_VERWALTEN'],
       });
       await organisationStore.getAllOrganisationen({
-        offset: (klassenPage.value - 1) * klassenPerPage.value,
-        limit: klassenPerPage.value,
+        offset: (searchFilterStore.klassenPage - 1) * searchFilterStore.klassenPerPage,
+        limit: searchFilterStore.klassenPerPage,
         includeTyp: OrganisationsTyp.Klasse,
         systemrechte: ['KLASSEN_VERWALTEN'],
       });
@@ -314,8 +313,8 @@
 
   onMounted(async () => {
     await organisationStore.getAllOrganisationen({
-      offset: (klassenPage.value - 1) * klassenPerPage.value,
-      limit: klassenPerPage.value,
+      offset: (searchFilterStore.klassenPage - 1) * searchFilterStore.klassenPerPage,
+      limit: searchFilterStore.klassenPerPage,
       includeTyp: OrganisationsTyp.Klasse,
       systemrechte: ['KLASSEN_VERWALTEN'],
     });
@@ -490,7 +489,7 @@
         @onItemsPerPageUpdate="getPaginatedKlassenWithLimit"
         @onPageUpdate="getPaginatedKlassen"
         :totalItems="organisationStore.totalKlassen"
-        :itemsPerPage="klassenPerPage"
+        :itemsPerPage="searchFilterStore.klassenPerPage"
         item-value-path="id"
         :disableRowClick="true"
       >

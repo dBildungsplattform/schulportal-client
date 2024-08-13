@@ -1,6 +1,14 @@
 import { defineStore, type Store, type StoreDefinition } from 'pinia';
 
 type SearchFilterState = {
+  klassenPage: number;
+  klassenPerPage: number;
+  personenPage: number;
+  personenPerPage: number;
+  rollenPage: number;
+  rollenPerPage: number;
+  schulenPage: number;
+  schulenPerPage: number;
   searchFilter: string | null;
   selectedKlassen: Array<string> | null;
   selectedRollen: Array<string> | null;
@@ -26,6 +34,14 @@ export const useSearchFilterStore: StoreDefinition<
 > = defineStore({
   id: 'searchFilterStore',
   state: (): SearchFilterState => ({
+    klassenPage: 1,
+    klassenPerPage: 30,
+    personenPage: 1,
+    personenPerPage: 10,
+    rollenPage: 1,
+    rollenPerPage: 30,
+    schulenPage: 1,
+    schulenPerPage: 30,
     searchFilter: '',
     selectedKlassen: [],
     selectedRollen: [],

@@ -112,14 +112,11 @@
 
   const statuses: Array<string> = ['Aktiv', 'Inaktiv'];
 
-  const personenPerPage: Ref<number> = ref(30);
-  const personenPage: Ref<number> = ref(1);
-
   function getPaginatedPersonen(page: number): void {
-    personenPage.value = page || 1;
+    searchFilterStore.personenPage = page;
     personStore.getAllPersons({
-      offset: (personenPage.value - 1) * personenPerPage.value,
-      limit: personenPerPage.value,
+      offset: (searchFilterStore.personenPage - 1) * searchFilterStore.personenPerPage,
+      limit: searchFilterStore.personenPerPage,
       organisationIDs: searchFilterStore.selectedSchulen || selectedSchulen.value,
       rolleIDs: searchFilterStore.selectedRollen || selectedRollen.value,
       searchFilter: searchFilterStore.searchFilter || searchFilter.value,
@@ -129,13 +126,13 @@
   function getPaginatedPersonenWithLimit(limit: number): void {
     /* reset page to 1 if entries are equal to or less than selected limit */
     if (personStore.totalPersons <= limit) {
-      personenPage.value = 1;
+      searchFilterStore.personenPage = 1;
     }
 
-    personenPerPage.value = limit || 1;
+    searchFilterStore.personenPerPage = limit;
     personStore.getAllPersons({
-      offset: (personenPage.value - 1) * personenPerPage.value,
-      limit: personenPerPage.value,
+      offset: (searchFilterStore.personenPage - 1) * searchFilterStore.personenPerPage,
+      limit: searchFilterStore.personenPerPage,
       organisationIDs: searchFilterStore.selectedSchulen || selectedSchulen.value,
       rolleIDs: searchFilterStore.selectedRollen || selectedRollen.value,
       searchFilter: searchFilterStore.searchFilter || searchFilter.value,
@@ -152,8 +149,8 @@
 
   function applySearchAndFilters(organisations?: Array<string>): void {
     personStore.getAllPersons({
-      offset: (personenPage.value - 1) * personenPerPage.value,
-      limit: personenPerPage.value,
+      offset: (searchFilterStore.personenPage - 1) * searchFilterStore.personenPerPage,
+      limit: searchFilterStore.personenPerPage,
       organisationIDs: organisations ? organisations : selectedSchulen.value,
       rolleIDs: selectedRollen.value,
       searchFilter: searchFilter.value,
@@ -200,10 +197,11 @@
     selectedRollen.value = [];
     selectedKlassen.value = [];
     selectedStatus.value = null;
-    personenPage.value = 1;
+    searchFilterStore.personenPage = 1;
+    searchFilterStore.personenPerPage = 30;
     personStore.getAllPersons({
-      offset: (personenPage.value - 1) * personenPerPage.value,
-      limit: personenPerPage.value,
+      offset: (searchFilterStore.personenPage - 1) * searchFilterStore.personenPerPage,
+      limit: searchFilterStore.personenPerPage,
       searchFilter: '',
     });
   }
@@ -565,7 +563,7 @@
       <ResultTable
         data-testid="person-table"
         :items="personenWithUebersicht || []"
-        :itemsPerPage="personenPerPage"
+        :itemsPerPage="searchFilterStore.personenPerPage"
         :loading="personStore.loading"
         :headers="headers"
         @onHandleRowClick="navigateToPersonDetails"
