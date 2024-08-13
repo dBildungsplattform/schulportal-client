@@ -7,6 +7,7 @@ import {
   type OrganisationenApiInterface,
   type CreateOrganisationBodyParams,
   type RollenSystemRecht,
+  type OrganisationByNameBodyParams,
 } from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
 
@@ -27,6 +28,8 @@ type OrganisationState = {
   allKlassen: Array<Organisation>;
   allSchulen: Array<Organisation>;
   currentOrganisation: Organisation | null;
+  currentKlasse: Organisation | null;
+  updatedOrganisation: Organisation | null;
   createdKlasse: Organisation | null;
   createdSchule: Organisation | null;
   totalKlassen: number;
@@ -53,7 +56,7 @@ type OrganisationActions = {
   getAllOrganisationen: (filter?: OrganisationenFilter) => Promise<void>;
   getFilteredKlassen(filter?: OrganisationenFilter): Promise<void>;
   getKlassenByOrganisationId: (organisationId: string, searchFilter?: string) => Promise<void>;
-  getOrganisationById: (organisationId: string) => Promise<Organisation>;
+  getOrganisationById: (organisationId: string, organisationsTyp: OrganisationsTyp) => Promise<void>;
   createOrganisation: (
     kennung: string,
     name: string,
@@ -64,6 +67,7 @@ type OrganisationActions = {
     administriertVon?: string,
     zugehoerigZu?: string,
   ) => Promise<Organisation>;
+  updateOrganisation: (organisationId: string, name: string) => Promise<void>;
 };
 
 export { OrganisationsTyp };
@@ -82,6 +86,8 @@ export const useOrganisationStore: StoreDefinition<
       allKlassen: [],
       allSchulen: [],
       currentOrganisation: null,
+      currentKlasse: null,
+      updatedOrganisation: null,
       createdKlasse: null,
       createdSchule: null,
       totalKlassen: 0,
@@ -157,20 +163,22 @@ export const useOrganisationStore: StoreDefinition<
       }
     },
 
-    async getOrganisationById(organisationId: string) {
+    async getOrganisationById(organisationId: string, organisationsTyp: OrganisationsTyp) {
       this.errorCode = '';
       this.loading = true;
       try {
         const { data }: { data: Organisation } =
           await organisationApi.organisationControllerFindOrganisationById(organisationId);
-        this.currentOrganisation = data;
-        return data;
+        if (organisationsTyp === OrganisationsTyp.Klasse) {
+          this.currentKlasse = data;
+        } else {
+          this.currentOrganisation = data;
+        }
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
           this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
         }
-        return await Promise.reject(this.errorCode);
       } finally {
         this.loading = false;
       }
@@ -235,6 +243,27 @@ export const useOrganisationStore: StoreDefinition<
           this.errorCode = error.response?.data.i18nKey || 'ORGANISATION_SPECIFICATION_ERROR';
         }
         return await Promise.reject(this.errorCode);
+      } finally {
+        this.loading = false;
+      }
+    },
+    async updateOrganisation(organisationId: string, name: string): Promise<void> {
+      this.errorCode = '';
+      this.loading = true;
+      try {
+        const organisationByNameBodyParams: OrganisationByNameBodyParams = {
+          name: name,
+        };
+        const { data }: { data: Organisation } = await organisationApi.organisationControllerUpdateOrganisationName(
+          organisationId,
+          organisationByNameBodyParams,
+        );
+        this.updatedOrganisation = data;
+      } catch (error: unknown) {
+        this.errorCode = 'UNSPECIFIED_ERROR';
+        if (isAxiosError(error)) {
+          this.errorCode = error.response?.data.i18nKey || 'KLASSE_ERROR';
+        }
       } finally {
         this.loading = false;
       }

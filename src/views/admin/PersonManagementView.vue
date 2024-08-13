@@ -21,6 +21,7 @@
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import ResultTable from '@/components/admin/ResultTable.vue';
   import SearchField from '@/components/admin/SearchField.vue';
+  import { type TranslatedObject } from '@/types.d';
 
   const searchFieldComponent: Ref = ref();
 
@@ -53,11 +54,6 @@
     person: Person;
   }[];
 
-  type TranslatedObject = {
-    value: string;
-    title: string;
-  };
-
   const searchInputKlassen: Ref<string> = ref('');
   const searchInputRollen: Ref<string> = ref('');
   const searchInputSchulen: Ref<string> = ref('');
@@ -74,7 +70,9 @@
       selectedRollen.value.length > 0 ||
       !!searchFilterStore.selectedSchulen?.length ||
       !!searchFilterStore.selectedRollen?.length ||
-      searchFilter.value.length > 0,
+      !!searchFilterStore.searchFilter ||
+      selectedKlassen.value.length > 0 ||
+      !!selectedStatus.value,
   );
 
   const schulen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
@@ -147,19 +145,21 @@
     }
   }
 
-  function applySearchAndFilters(organisations?: Array<string>): void {
+  function applySearchAndFilters(): void {
     personStore.getAllPersons({
       offset: (searchFilterStore.personenPage - 1) * searchFilterStore.personenPerPage,
       limit: searchFilterStore.personenPerPage,
-      organisationIDs: organisations ? organisations : selectedSchulen.value,
-      rolleIDs: selectedRollen.value,
-      searchFilter: searchFilter.value,
+      organisationIDs: searchFilterStore.selectedKlassen?.length
+        ? searchFilterStore.selectedKlassen
+        : searchFilterStore.selectedSchulen || [],
+      rolleIDs: searchFilterStore.selectedRollen || [],
+      searchFilter: searchFilterStore.searchFilter || '',
     });
   }
 
   async function setKlasseFilter(newValue: Array<string>): Promise<void> {
     await searchFilterStore.setKlasseFilter(newValue);
-    applySearchAndFilters(newValue);
+    applySearchAndFilters();
   }
 
   async function setRolleFilter(newValue: Array<string>): Promise<void> {

@@ -4,21 +4,18 @@ import { DIN_91379A_EXT, NO_LEADING_TRAILING_SPACES } from '@/utils/validation';
 import type { TypedSchema } from 'vee-validate';
 
 type ValidationSchema = {
-  selectedRollenArt: string;
-  selectedRollenName: string;
-  selectedAdministrationsebene: string;
+  selectedSchule: string;
+  selectedKlassenname: string;
 };
 
 export const getValidationSchema = (t: (key: string) => string): TypedSchema<ValidationSchema> => {
   return toTypedSchema(
     object({
-      selectedRollenArt: string().required(t('admin.rolle.rules.rollenart.required')),
-      selectedRollenName: string()
-        .max(200, t('admin.rolle.rules.rollenname.length'))
-        .matches(DIN_91379A_EXT, t('admin.rolle.rules.rollenname.matches'))
-        .matches(NO_LEADING_TRAILING_SPACES, t('admin.rolle.rules.rollenname.noLeadingTrailingSpaces'))
-        .required(t('admin.rolle.rules.rollenname.required')),
-      selectedAdministrationsebene: string().required(t('admin.administrationsebene.rules.required')),
+      selectedSchule: string().required(t('admin.klasse.rules.schule.required')),
+      selectedKlassenname: string()
+        .matches(DIN_91379A_EXT, t('admin.klasse.rules.klassenname.matches'))
+        .matches(NO_LEADING_TRAILING_SPACES, t('admin.klasse.rules.klassenname.noLeadingTrailingSpaces'))
+        .required(t('admin.klasse.rules.klassenname.required')),
     }),
   );
 };

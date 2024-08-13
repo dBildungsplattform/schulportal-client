@@ -13,11 +13,15 @@
   import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
   import type { UserinfoPersonenkontext } from '@/stores/PersonenkontextStore';
   import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
+  import { type TranslatedObject } from '@/types.d';
+  import { useRouter, type Router } from 'vue-router';
 
   const authStore: AuthStore = useAuthStore();
   const organisationStore: OrganisationStore = useOrganisationStore();
   const searchFilterStore: SearchFilterStore = useSearchFilterStore();
   const { t }: Composer = useI18n({ useScope: 'global' });
+
+  const router: Router = useRouter();
 
   type ReadonlyHeaders = VDataTableServer['$props']['headers'];
   type UnwrapReadonlyArray<A> = A extends Readonly<Array<infer I>> ? I : never;
@@ -35,11 +39,6 @@
       align: 'start',
     } as DataTableHeader,
   ]);
-
-  type TranslatedObject = {
-    value: string;
-    title: string;
-  };
 
   const selectedSchule: Ref<string | null> = ref(null);
   const selectedKlassen: Ref<Array<string>> = ref([]);
@@ -244,7 +243,12 @@
   }
 
   // Checks if the filter is active or not
-  const filterActive: Ref<boolean> = computed(() => !!selectedSchule.value || selectedKlassen.value.length > 0);
+  const filterActive: Ref<boolean> = computed(() => {
+    if (hasAutoselectedSchule.value) {
+      return selectedKlassen.value.length > 0;
+    }
+    return !!selectedSchule.value || selectedKlassen.value.length > 0;
+  });
 
   // Function to reset search and filter
   async function resetSearchAndFilter(): Promise<void> {
@@ -311,6 +315,9 @@
     }
   }
 
+  function navigateToKlassenDetails(_$event: PointerEvent, { item }: { item: Organisation }): void {
+    router.push({ name: 'klasse-details', params: { id: item.id } });
+  }
   onMounted(async () => {
     await organisationStore.getAllOrganisationen({
       offset: (searchFilterStore.klassenPage - 1) * searchFilterStore.klassenPerPage,
@@ -487,12 +494,12 @@
         :items="finalKlassen || []"
         :loading="organisationStore.loading"
         :headers="headers"
+        @onHandleRowClick="navigateToKlassenDetails"
         @onItemsPerPageUpdate="getPaginatedKlassenWithLimit"
         @onPageUpdate="getPaginatedKlassen"
         :totalItems="organisationStore.totalKlassen"
         :itemsPerPage="searchFilterStore.klassenPerPage"
         item-value-path="id"
-        :disableRowClick="true"
       >
         <template v-slot:[`item.schuleDetails`]="{ item }">
           <div
