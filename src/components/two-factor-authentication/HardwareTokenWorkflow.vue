@@ -2,9 +2,9 @@
   import { useDisplay } from 'vuetify';
   import FormRow from '@/components/form/FormRow.vue';
   import { ref, type Ref } from 'vue';
-  import { useI18n, type Composer } from 'vue-i18n';
   import { usePersonStore, type Personendatensatz, type PersonStore } from '@/stores/PersonStore';
   import axios from 'axios';
+  import { useI18n, type Composer } from 'vue-i18n';
 
   const { t }: Composer = useI18n({ useScope: 'global' });
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
@@ -44,6 +44,7 @@
       dialogText.value = '';
       proceeded.value = false;
       errorThrown.value = false;
+      emits('updateHeader', 'Hardware-Token zuordnen');
     } else {
       emits('onCloseClicked');
     }
@@ -51,12 +52,12 @@
 
   async function assignHardwareToken(): Promise<void> {
     const referrer: string | null = props.person.person.referrer;
-    if (!referrer) return; // TBD
+    if (!referrer) return;
     try {
       await personStore.assignHardwareToken(referrer, serial.value, otp.value);
-      dialogText.value = 'Token wurde erfolgreich zugeordnet.';
+      dialogText.value = t('admin.person.twoFactorAuthentication.hardwareTokenSetUpSuccess');
     } catch (error) {
-      emits('updateHeader', 'Fehler bei Zuordnung des Hardware-Tokens');
+      emits('updateHeader', t('admin.person.twoFactorAuthentication.hardwareTokenSetUpFailure'));
       handleApiError(error);
     } finally {
       proceeded.value = true;
@@ -123,7 +124,7 @@
           @click="cancelCheck()"
           data-testid="close-two-way-authentification-dialog-button"
         >
-          {{ proceeded ? 'Schließen' : $t('cancel') }}
+          {{ proceeded ? $t('close') : $t('cancel') }}
         </v-btn>
       </v-col>
       <v-col
@@ -139,7 +140,7 @@
           @click="assignHardwareToken()"
           :disabled="!serial || !otp"
         >
-          Einrichten
+          {{ $t('admin.person.twoFactorAuthentication.hardwareTokenSetUpButton') }}
         </v-btn>
       </v-col>
     </v-row>

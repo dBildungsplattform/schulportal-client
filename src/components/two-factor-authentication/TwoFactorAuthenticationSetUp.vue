@@ -13,7 +13,7 @@
   const selectedOption: Ref<'software' | 'hardware'> = ref('software');
   const personStore: PersonStore = usePersonStore();
 
-  const requestedSoftwareToken: Ref<boolean> = ref(false);
+  const requestingToken: Ref<boolean> = ref(false);
 
   const dialogHeader: Ref<string> = ref(t('admin.person.twoFactorAuthentication.setUpLong'));
 
@@ -34,7 +34,7 @@
   const props: Props = defineProps<Props>();
 
   async function close2FADialog(isActive: Ref<boolean>): Promise<void> {
-    if (requestedSoftwareToken.value) {
+    if (requestingToken.value) {
       emits('dialogClosed');
       personStore.twoFactorState.qrCode = '';
       personStore.twoFactorState.hasToken = null;
@@ -42,14 +42,16 @@
     }
 
     isActive.value = false;
-    requestedSoftwareToken.value = false;
+    requestingToken.value = false;
     selectedOption.value = 'software';
     dialogHeader.value = t('admin.person.twoFactorAuthentication.setUpLong');
   }
 
-  async function requestSoftwareToken(): Promise<void> {
-    await personStore.get2FASoftwareQRCode(props.person.person.id);
-    requestedSoftwareToken.value = true;
+  async function proceedTokenWorkflow(): Promise<void> {
+    if (selectedOption.value === 'software') {
+      await personStore.get2FASoftwareQRCode(props.person.person.id);
+    }
+    requestingToken.value = true;
   }
 
   async function handleHeaderUpdate(header: string): Promise<void> {
@@ -137,7 +139,7 @@
             </v-row>
           </v-container>
         </v-card-text>
-        <v-container v-if="requestedSoftwareToken">
+        <v-container v-if="requestingToken">
           <SoftwareTokenWorkflow
             v-if="selectedOption === 'software'"
             :qrCodeImageBase64="personStore.twoFactorState.qrCode"
@@ -156,7 +158,7 @@
         </v-container>
         <v-card-actions
           class="justify-center"
-          v-if="!requestedSoftwareToken"
+          v-if="!requestingToken"
         >
           <v-row class="justify-center">
             <v-col
@@ -181,8 +183,8 @@
               <v-btn
                 :block="mdAndDown"
                 class="primary button"
-                @click.stop="requestSoftwareToken()"
-                data-testid="proceed-two-factor-authentication-dialog-button"
+                @click.stop="proceedTokenWorkflow()"
+                data-testid="proceed-two-factor-authentication-dialog"
               >
                 {{ $t('proceed') }}
               </v-btn>

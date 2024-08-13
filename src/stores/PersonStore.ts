@@ -20,8 +20,6 @@ import { type DbiamPersonenkontextBodyParams } from './PersonenkontextStore';
 
 const personenApi: PersonenApiInterface = PersonenApiFactory(undefined, '', axiosApiInstance);
 const personenFrontendApi: PersonenFrontendApiInterface = PersonenFrontendApiFactory(undefined, '', axiosApiInstance);
-const twoFactorApi = Class2FAApiFactory(undefined, '', axiosApiInstance);
-
 const twoFactorApi: Class2FAApiInterface = Class2FAApiFactory(undefined, '', axiosApiInstance);
 
 export type Person = {
