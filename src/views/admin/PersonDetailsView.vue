@@ -529,7 +529,7 @@
     );
 
     if (organisation) {
-      // Create a new Zuordnung with the updated Klasse
+
       newZuordnung.value = {
         sskId: organisation.id,
         rolleId: selectedZuordnungen.value[0]?.rolleId ?? '',
@@ -544,17 +544,9 @@
         typ: OrganisationsTyp.Schule,
       };
 
-      // Push the new Zuordnung to the final list
-      finalZuordnungen.value.push(newZuordnung);
-
-      // Remove the old Zuordnung from the list if it exists
-      finalZuordnungen.value = finalZuordnungen.value.filter(
-        (zuordnung: Zuordnung) =>
-          !(
-            zuordnung.sskId === selectedZuordnungen.value[0]?.sskId &&
-            zuordnung.rolleId === selectedZuordnungen.value[0]?.rolleId
-          ),
-      );
+      if (zuordnungenResult.value) {
+        finalZuordnungen.value = zuordnungenResult.value;
+      }
 
       // Add the new Klasse Zuordnung
       if (newKlasse) {
@@ -575,7 +567,6 @@
     zuordnungenResult.value = zuordnungenResult.value?.filter(
       (zuordnung: Zuordnung) => zuordnung.typ !== OrganisationsTyp.Klasse,
     );
-
     // Proceed with the pending change Klasse operation
     prepareChangeKlasse();
   };
