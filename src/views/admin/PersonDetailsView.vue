@@ -69,8 +69,9 @@
   const changeKlasseSuccessDialogVisible: Ref<boolean> = ref(false);
   const cannotDeleteDialogVisible: Ref<boolean> = ref(false);
   const createZuordnungConfirmationDialogVisible: Ref<boolean> = ref(false);
+  const changeKlasseConfirmationDialogVisible: Ref<boolean> = ref(false);
   const createZuordnungConfirmationDialogMessage: Ref<string> = ref('');
-
+  const changeKlasseConfirmationDialogMessage: Ref<string> = ref('');
   const canCommit: Ref<boolean> = ref(false);
 
   const creationErrorText: Ref<string> = ref('');
@@ -309,7 +310,7 @@
     return false;
   });
 
-  const validationSchema: TypedSchema = toTypedSchema(
+  const zuordnungFormValidationSchema: TypedSchema = toTypedSchema(
     object({
       selectedRolle: string().required(t('admin.rolle.rules.rolle.required')),
       selectedOrganisation: string().required(t('admin.organisation.rules.organisation.required')),
@@ -318,6 +319,16 @@
         then: (schema: StringSchema<string | undefined, AnyObject, undefined, ''>) =>
           schema.required(t('admin.klasse.rules.klasse.required')),
       }),
+      selectedNewKlasse: string().when('selectedSchule', {
+        is: (selectedSchule: string) => selectedSchule,
+        then: (schema: StringSchema<string | undefined, AnyObject, undefined, ''>) =>
+          schema.required(t('admin.klasse.rules.klasse.required')),
+      }),
+    }),
+  );
+
+  const changeKlasseValidationSchema: TypedSchema = toTypedSchema(
+    object({
       selectedNewKlasse: string().when('selectedSchule', {
         is: (selectedSchule: string) => selectedSchule,
         then: (schema: StringSchema<string | undefined, AnyObject, undefined, ''>) =>
@@ -336,33 +347,46 @@
   });
 
   // eslint-disable-next-line @typescript-eslint/typedef
-  const { defineField, handleSubmit, resetForm } = useForm<ZuordnungCreationForm | ChangeKlasseForm>({
-    validationSchema,
+  const {
+    defineField: defineFieldZuordnung,
+    handleSubmit: handleSubmitZuordnungForm,
+    resetForm: resetZuordnungForm,
+  } = useForm<ZuordnungCreationForm>({
+    validationSchema: zuordnungFormValidationSchema,
+  });
+
+  // eslint-disable-next-line @typescript-eslint/typedef
+  const {
+    defineField: defineFieldChangeKlasse,
+    handleSubmit: handleSubmitChangeKlasse,
+    resetForm: resetChangeKlasseForm,
+  } = useForm<ChangeKlasseForm>({
+    validationSchema: changeKlasseValidationSchema,
   });
 
   // Add Zuordnung Form
   const [selectedRolle, selectedRolleProps]: [
     Ref<string | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineField('selectedRolle', vuetifyConfig);
+  ] = defineFieldZuordnung('selectedRolle', vuetifyConfig);
   const [selectedOrganisation, selectedOrganisationProps]: [
     Ref<string>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineField('selectedOrganisation', vuetifyConfig);
+  ] = defineFieldZuordnung('selectedOrganisation', vuetifyConfig);
   const [selectedKlasse, selectedKlasseProps]: [
     Ref<string | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineField('selectedKlasse', vuetifyConfig);
+  ] = defineFieldZuordnung('selectedKlasse', vuetifyConfig);
 
   // Change Klasse Form
   const [selectedSchule, selectedSchuleProps]: [
     Ref<string | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineField('selectedSchule', vuetifyConfig);
+  ] = defineFieldChangeKlasse('selectedSchule', vuetifyConfig);
   const [selectedNewKlasse, selectedNewKlasseProps]: [
     Ref<string | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineField('selectedNewKlasse', vuetifyConfig);
+  ] = defineFieldChangeKlasse('selectedNewKlasse', vuetifyConfig);
 
   // Triggers the template to start editing
   const triggerEdit = (): void => {
@@ -375,7 +399,6 @@
   // Triggers the template to change the Klasse. Also pre-select the Schule and Klasse.
   const triggerChangeKlasse = async (): Promise<void> => {
     selectedSchule.value = selectedZuordnungen.value[0]?.sskId;
-    selectedNewKlasse.value = selectedZuordnungen.value[0]?.klasse;
     if (selectedZuordnungen.value[0]?.sskId) {
       await organisationStore.getKlassenByOrganisationId(selectedZuordnungen.value[0]?.sskId);
     }
@@ -391,7 +414,8 @@
     selectedZuordnungen.value = [];
     isZuordnungFormActive.value = false;
     isChangeKlasseFormActive.value = false;
-    resetForm();
+    resetZuordnungForm();
+    resetChangeKlasseForm();
     zuordnungenResult.value = originalZuordnungenResult.value
       ? JSON.parse(JSON.stringify(originalZuordnungenResult.value))
       : undefined;
@@ -411,14 +435,14 @@
   async function confirmAddition(): Promise<void> {
     await personenkontextStore.updatePersonenkontexte(finalZuordnungen.value, currentPersonId);
     createSuccessDialogVisible.value = !personenkontextStore.errorCode;
-    resetForm();
+    resetZuordnungForm();
   }
 
   // This will send the updated list of Zuordnungen to the Backend with the selected Zuordnung but with the new Klasse.
   async function confirmChangeKlasse(): Promise<void> {
     await personenkontextStore.updatePersonenkontexte(finalZuordnungen.value, currentPersonId);
     changeKlasseSuccessDialogVisible.value = !personenkontextStore.errorCode;
-    resetForm();
+    resetChangeKlasseForm();
   }
 
   // The save button will act according to what kind of pending action we have.
@@ -458,21 +482,40 @@
     return klassen.value?.find((klasse: TranslatedObject) => klasse.value === selectedKlasse.value)?.title;
   });
 
-  const onSubmit: (e?: Event | undefined) => Promise<void | undefined> = handleSubmit(() => {
-    if (selectedRolle.value) {
-      if (isLernRolle(selectedRolle.value)) {
-        createZuordnungConfirmationDialogMessage.value = t('person.addZuordnungKlasseConfirmation', {
-          rollenname: selectedRolleTitle.value,
-          klassenname: selectedKlasseTitle.value,
-        });
-      } else {
-        createZuordnungConfirmationDialogMessage.value = t('person.addZuordnungConfirmation', {
-          rollenname: selectedRolleTitle.value,
-        });
-      }
-      createZuordnungConfirmationDialogVisible.value = true;
-    }
+  // Computed property to get the title of the selected new klasse
+  const selectedNewKlasseTitle: ComputedRef<string | undefined> = computed(() => {
+    return klassen.value?.find((klasse: TranslatedObject) => klasse.value === selectedNewKlasse.value)?.title;
   });
+
+  // Computed property to get the title of the selected new klasse
+  const isSubmitDisabled: ComputedRef<boolean> = computed(() => {
+    return selectedNewKlasseTitle.value === selectedZuordnungen.value[0]?.klasse;
+  });
+
+  const onSubmitChangeKlasse: (e?: Event | undefined) => Promise<void | undefined> = handleSubmitChangeKlasse(() => {
+    changeKlasseConfirmationDialogMessage.value = t('person.changeKlasseConfirmation', {
+      newKlasse: selectedNewKlasseTitle.value,
+    });
+    changeKlasseConfirmationDialogVisible.value = true;
+  });
+
+  const onSubmitCreateZuordnung: (e?: Event | undefined) => Promise<void | undefined> = handleSubmitZuordnungForm(
+    () => {
+      if (selectedRolle.value) {
+        if (isLernRolle(selectedRolle.value)) {
+          createZuordnungConfirmationDialogMessage.value = t('person.addZuordnungKlasseConfirmation', {
+            rollenname: selectedRolleTitle.value,
+            klassenname: selectedKlasseTitle.value,
+          });
+        } else {
+          createZuordnungConfirmationDialogMessage.value = t('person.addZuordnungConfirmation', {
+            rollenname: selectedRolleTitle.value,
+          });
+        }
+        createZuordnungConfirmationDialogVisible.value = true;
+      }
+    },
+  );
 
   // When the button "Yes" from the Dialog after filling the form for creating a new Zuordnung is clicked
   const confirmDialogAddition = async (): Promise<void> => {
@@ -520,16 +563,21 @@
 
   // When the button "Yes" from the Dialog after filling the form for changing the Klasse is clicked
   const confirmDialogChangeKlasse = async (): Promise<void> => {
+    changeKlasseConfirmationDialogVisible.value = false;
+    // Find the Orga object for the selected Schule (unchangeable anyways)
     const organisation: Organisation | undefined = personenkontextStore.workflowStepResponse?.organisations.find(
       (orga: Organisation) => orga.id === selectedSchule.value,
     );
 
+    // Find the Orga object for the selected new Klasse
     const newKlasse: Organisation | undefined = organisationStore.klassen.find(
       (k: Organisation) => k.id === selectedNewKlasse.value,
     );
 
     if (organisation) {
-
+      // Used to build the Zuordnung of type Schule and keep track of it (Only use it in the template)
+      // This is basically the old Zuordnung in the Schule but since it is already available in ZuordnungenResult we won't be adding this to the finalZuordnungen
+      // It's just better to use this since using an array of Zuordnung (selectedZuordnungen) in the template is not so fun
       newZuordnung.value = {
         sskId: organisation.id,
         rolleId: selectedZuordnungen.value[0]?.rolleId ?? '',
@@ -564,6 +612,8 @@
         });
       }
     }
+
+    // zuordnungenResult is what we show in the UI and so Zuordnungne of type Klasse shouldn't show up (since they are merged with the ones of type Schule already)
     zuordnungenResult.value = zuordnungenResult.value?.filter(
       (zuordnung: Zuordnung) => zuordnung.typ !== OrganisationsTyp.Klasse,
     );
@@ -573,6 +623,10 @@
 
   const cancelAddition = (): void => {
     createZuordnungConfirmationDialogVisible.value = false;
+  };
+
+  const cancelChangeKlasse = (): void => {
+    changeKlasseConfirmationDialogVisible.value = false;
   };
 
   watch(
@@ -1133,7 +1187,7 @@
           <template v-if="isZuordnungFormActive && !pendingDeletion && !pendingChangeKlasse">
             <v-form
               data-testid="zuordnung-creation-form"
-              @submit="onSubmit"
+              @submit="onSubmitCreateZuordnung"
             >
               <v-row class="ml-md-16">
                 <v-col
@@ -1198,8 +1252,8 @@
           <!-- Form to change Klasse -->
           <template v-if="isChangeKlasseFormActive && !pendingChangeKlasse">
             <v-form
-              data-testid="zuordnung-creation-form"
-              @submit="confirmDialogChangeKlasse"
+              data-testid="klasse-change-form"
+              @submit="onSubmitChangeKlasse"
             >
               <v-row class="ml-md-16">
                 <v-col
@@ -1217,7 +1271,7 @@
                   :klassen="klassen"
                   :selectedSchuleProps="selectedSchuleProps"
                   :selectedNewKlasseProps="selectedNewKlasseProps"
-                  :onSubmit="onSubmit"
+                  :onSubmit="onSubmitChangeKlasse"
                   ref="klasse-change-form"
                   v-model:selectedSchule="selectedSchule"
                   v-model:selectedNewKlasse="selectedNewKlasse"
@@ -1234,7 +1288,7 @@
                     :block="mdAndDown"
                     class="secondary"
                     @Click="cancelEdit"
-                    data-testid="zuordnung-creation-discard-button"
+                    data-testid="klasse-change-discard-button"
                     >{{ $t('cancel') }}</v-btn
                   >
                 </v-col>
@@ -1243,13 +1297,21 @@
                   sm="6"
                   md="auto"
                 >
+                <SpshTooltip
+                    :enabledCondition="!isSubmitDisabled"
+                    :disabledText="$t('person.changeKlasseNotDisabledDescription')"
+                    :enabledText="$t('person.changeKlasse')"
+                    position="start"
+                  >
                   <v-btn
                     :block="mdAndDown"
                     class="primary"
-                    data-testid="zuordnung-creation-submit-button"
+                    data-testid="klasse-change-submit-button"
+                    :disabled="isSubmitDisabled"
                     type="submit"
                     >{{ $t('person.changeKlasse') }}</v-btn
                   >
+                  </SpshTooltip>
                 </v-col>
               </v-row>
             </v-form>
@@ -1416,6 +1478,7 @@
         </v-card-actions>
       </LayoutCard>
     </v-dialog>
+    <!-- Confirmation Dialog after filling the form and adding the Zuordnung-->
     <v-dialog
       v-model="createZuordnungConfirmationDialogVisible"
       persistent
@@ -1462,6 +1525,61 @@
                 :block="mdAndDown"
                 class="secondary"
                 @click.stop="cancelAddition"
+              >
+                {{ $t('no') }}
+              </v-btn>
+            </v-col>
+          </v-row>
+        </v-card-actions>
+      </LayoutCard>
+    </v-dialog>
+    <!-- Confirmation Dialog after filling the form to change Klasse-->
+    <v-dialog
+      v-model="changeKlasseConfirmationDialogVisible"
+      persistent
+      max-width="600px"
+    >
+      <LayoutCard
+        :closable="true"
+        :header="$t('person.changeKlasse')"
+        @onCloseClicked="cancelChangeKlasse"
+      >
+        <v-card-text>
+          <v-container>
+            <v-row class="text-body bold px-md-16">
+              <v-col
+                offset="1"
+                cols="10"
+              >
+                <span>{{ changeKlasseConfirmationDialogMessage }}</span>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card-text>
+        <v-card-actions class="justify-center">
+          <v-row class="justify-center">
+            <v-col
+              cols="12"
+              sm="6"
+              md="4"
+            >
+              <v-btn
+                :block="mdAndDown"
+                class="primary"
+                @click.stop="confirmDialogChangeKlasse"
+              >
+                {{ $t('yes') }}
+              </v-btn>
+            </v-col>
+            <v-col
+              cols="12"
+              sm="6"
+              md="4"
+            >
+              <v-btn
+                :block="mdAndDown"
+                class="secondary"
+                @click.stop="cancelChangeKlasse"
               >
                 {{ $t('no') }}
               </v-btn>
