@@ -93,7 +93,7 @@
         @onCloseClicked="close2FADialog(isActive)"
         data-testid="two-factor-authentication-dialog"
       >
-        <v-card-text v-if="!requestedSoftwareToken">
+        <v-card-text v-if="!requestingToken">
           <v-container>
             <v-row class="text-body bold px-md-16">
               <v-col>
