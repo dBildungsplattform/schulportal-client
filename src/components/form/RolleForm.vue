@@ -32,11 +32,9 @@
   const selectedAdministrationsebene: ModelRef<unknown, string> = defineModel('selectedAdministrationsebene');
   const selectedRollenArt: ModelRef<unknown, string> = defineModel('selectedRollenArt');
   const selectedRollenName: ModelRef<unknown, string> = defineModel('selectedRollenName');
-  const selectedMerkmale: ModelRef<Array<TranslatedObject> | undefined, string> = defineModel('selectedMerkmale');
-  const selectedServiceProviders: ModelRef<Array<TranslatedObject> | undefined, string> =
-    defineModel('selectedServiceProviders');
-  const selectedSystemRechte: ModelRef<Array<TranslatedObject> | undefined, string> =
-    defineModel('selectedSystemRechte');
+  const selectedMerkmale: ModelRef<unknown | undefined, string> = defineModel('selectedMerkmale');
+  const selectedServiceProviders: ModelRef<unknown | undefined, string> = defineModel('selectedServiceProviders');
+  const selectedSystemRechte: ModelRef<unknown | undefined, string> = defineModel('selectedSystemRechte');
 </script>
 
 <template data-test-id="rolle-form">

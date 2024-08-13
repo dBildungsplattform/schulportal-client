@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { ref, type Ref, onMounted, onUnmounted, computed, type ComputedRef } from 'vue';
+  import { ref, type Ref, onMounted, onUnmounted, computed, type ComputedRef, watch } from 'vue';
   import {
     useOrganisationStore,
     type OrganisationStore,
@@ -159,33 +159,6 @@
       .join(', ');
   });
 
-  const translatedSelectedMerkmale: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
-    return selectedMerkmale.value?.map((merkmalKey: RollenMerkmal) => ({
-      value: merkmalKey,
-      title: t(`admin.rolle.mappingFrontBackEnd.merkmale.${merkmalKey}`),
-    }));
-  });
-
-  const translatedSelectedSystemrechte: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
-    return selectedSystemRechte.value?.map((systemrechtKey: RollenSystemRecht) => ({
-      value: systemrechtKey,
-      title: t(`admin.rolle.mappingFrontBackEnd.systemrechte.${systemrechtKey}`),
-    }));
-  });
-
-  const translatedSelectedServiceProviders: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
-    const serviceProviders: Array<ServiceProvider> = Array.from(rolleStore.currentRolle?.serviceProviders || []);
-    return selectedServiceProviders.value?.map((providerId: string) => {
-      const matchedProvider: ServiceProvider = serviceProviders.find(
-        (provider: ServiceProvider) => provider.id === providerId,
-      ) as ServiceProvider;
-      return {
-        value: providerId,
-        title: matchedProvider.name,
-      };
-    });
-  });
-
   const administrationsebenen: ComputedRef<TranslatedObject[]> = computed(() =>
     organisationStore.allOrganisationen.map((org: Organisation) => ({
       value: org.id,
@@ -321,11 +294,11 @@
           :selectedRollenArtProps="selectedRollenArtProps"
           v-model:selectedRollenName="selectedRollenName"
           :selectedRollenNameProps="selectedRollenNameProps"
-          v-model:selectedMerkmale="translatedSelectedMerkmale"
+          v-model:selectedMerkmale="selectedMerkmale"
           :selectedMerkmaleProps="selectedMerkmaleProps"
-          v-model:selectedServiceProviders="translatedSelectedServiceProviders"
+          v-model:selectedServiceProviders="selectedServiceProviders"
           :selectedServiceProvidersProps="selectedServiceProvidersProps"
-          v-model:selectedSystemRechte="translatedSelectedSystemrechte"
+          v-model:selectedSystemRechte="selectedSystemRechte"
           :selectedSystemRechteProps="selectedSystemRechteProps"
           :serviceProviders="serviceProviders"
           :showUnsavedChangesDialog="showUnsavedChangesDialog"
