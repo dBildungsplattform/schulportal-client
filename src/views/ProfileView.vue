@@ -12,9 +12,11 @@
   import { usePersonInfoStore, type PersonInfoStore, type PersonInfoResponse } from '@/stores/PersonInfoStore';
   import { usePersonenkontextStore, type Zuordnung, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
   import { OrganisationsTyp } from '@/stores/OrganisationStore';
-  import { type RouteLocationNormalizedLoaded, useRoute } from 'vue-router';
+  import { type RouteLocationNormalizedLoaded, type Router, useRoute, useRouter } from 'vue-router';
 
   const route: RouteLocationNormalizedLoaded = useRoute();
+  const router: Router = useRouter();
+  const kcActionStatus: string | null = route.query['kc_action_status'] as string | null;
 
   export type SchulDaten = {
     title: string;
@@ -22,6 +24,11 @@
     schulAdmins?: string[];
     labelAndValues: LabelValue[];
   };
+
+  function handleCloseChangedPasswordDialog(): void {
+    showChangedPasswordDialog.value = false;
+    router.replace({path: route.fullPath, query: { }});
+  }
 
   let personInfoStore: PersonInfoStore = usePersonInfoStore();
   let personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
@@ -173,6 +180,7 @@
   }
 
   const isPasswordResetDialogActive: Ref<boolean> = ref(false);
+  const showChangedPasswordDialog: Ref<boolean> = ref(true);
 
   function closeChangePasswordDialog(): void {
     isPasswordResetDialogActive.value = false;
@@ -367,7 +375,7 @@
                         <v-btn
                           data-testid="change-password-button"
                           class="primary"
-                          :href="`/api/auth/reset-password?redirectUrl=${windowOrigin}${route.fullPath}`"
+                          :href="`/api/auth/reset-password?redirectUrl=${windowOrigin}${route.fullPath}&login_hint=${personInfoStore.personInfo?.person.referrer}`"
                         >
                           {{ $t('profile.changePassword') }}
                         </v-btn>
@@ -406,4 +414,59 @@
       </v-col>
     </v-row>
   </div>
+
+  <template v-if="kcActionStatus && kcActionStatus != 'cancelled'">
+    <v-dialog
+      v-model="showChangedPasswordDialog"
+      persistent
+    >
+      <LayoutCard
+        :closable="true"
+        :header="kcActionStatus == 'success' ? $t('profile.success') : $t('profile.error')"
+        @onCloseClicked="closeChangePasswordDialog()"
+      >
+        <v-card-text>
+          <v-container class="d-flex align-center">
+            <v-col
+              cols="auto"
+              class="d-flex justify-center"
+            >
+              <v-icon
+                class="mr-2"
+                size="x-large"
+                icon="mdi-information-slab-circle-outline"
+              ></v-icon>
+            </v-col>
+            <v-col>
+              <p class="text-body">
+                {{
+                  kcActionStatus == 'success'
+                    ? $t('profile.successFullPasswordChange')
+                    : $t('profile.errorPasswordChange')
+                }}
+              </p>
+            </v-col>
+          </v-container>
+        </v-card-text>
+
+        <v-card-actions class="justify-center">
+          <v-row class="justify-center">
+            <v-col
+              cols="12"
+              sm="6"
+              md="4"
+            >
+              <v-btn
+                class="secondary button"
+                @click.stop="handleCloseChangedPasswordDialog()"
+                data-testid="close-change-password-dialog-button"
+              >
+                {{ $t('close') }}
+              </v-btn>
+            </v-col>
+          </v-row>
+        </v-card-actions>
+      </LayoutCard>
+    </v-dialog>
+  </template>
 </template>
