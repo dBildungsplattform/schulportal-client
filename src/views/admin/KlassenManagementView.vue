@@ -70,19 +70,41 @@
     };
   }
 
-  async function getPaginatedKlassen(page: number): Promise<void> {
-    searchFilterStore.klassenPage = page || 1;
-    await organisationStore.getAllOrganisationen({
-      offset: (searchFilterStore.klassenPage - 1) * searchFilterStore.klassenPerPage,
-      limit: searchFilterStore.klassenPerPage,
-      includeTyp: OrganisationsTyp.Klasse,
-      systemrechte: ['KLASSEN_VERWALTEN'],
-    });
+  async function fetchKlassenBySelectedSchuleId(schuleId: string | null): Promise<void> {
+    // Fetch Klassen related to the selected Schule
+    await organisationStore.getKlassenByOrganisationId(schuleId || '');
 
-    finalKlassen.value = organisationStore.allKlassen.map((klasse: Organisation) => ({
+    // Update the klassenOptions for the dropdown
+    klassenOptions.value = organisationStore.klassen.map((org: Organisation) => ({
+      value: org.id,
+      title: org.name,
+    }));
+
+    // Update finalKlassen to show in the table
+    finalKlassen.value = organisationStore.klassen.map((klasse: Organisation) => ({
       ...klasse,
       ...getSchuleDetails(klasse),
     }));
+  }
+
+  async function getPaginatedKlassen(page: number): Promise<void> {
+    searchFilterStore.klassenPage = page || 1;
+
+    if (selectedSchule.value) {
+      fetchKlassenBySelectedSchuleId(selectedSchule.value);
+    } else {
+      await organisationStore.getAllOrganisationen({
+        offset: (searchFilterStore.klassenPage - 1) * searchFilterStore.klassenPerPage,
+        limit: searchFilterStore.klassenPerPage,
+        includeTyp: OrganisationsTyp.Klasse,
+        systemrechte: ['KLASSEN_VERWALTEN'],
+      });
+
+      finalKlassen.value = organisationStore.allKlassen.map((klasse: Organisation) => ({
+        ...klasse,
+        ...getSchuleDetails(klasse),
+      }));
+    }
   }
 
   async function getPaginatedKlassenWithLimit(limit: number): Promise<void> {
@@ -118,19 +140,7 @@
 
   async function updateSelectedSchule(newValue: string | null): Promise<void> {
     if (newValue !== null) {
-      // Fetch Klassen related to the selected Schule
-      await organisationStore.getKlassenByOrganisationId(newValue);
-      // Update the klassenOptions for the dropdown
-      klassenOptions.value = organisationStore.klassen.map((org: Organisation) => ({
-        value: org.id,
-        title: org.name,
-      }));
-
-      // Update finalKlassen to show in the table
-      finalKlassen.value = organisationStore.klassen.map((klasse: Organisation) => ({
-        ...klasse,
-        ...getSchuleDetails(klasse),
-      }));
+      fetchKlassenBySelectedSchuleId(newValue);
     } else {
       // Reset selectedKlassen and klassenOptions when Schule is unselected
       selectedKlassen.value = [];
