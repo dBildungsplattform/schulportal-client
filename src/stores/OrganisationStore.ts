@@ -56,7 +56,7 @@ type OrganisationActions = {
   getAllOrganisationen: (filter?: OrganisationenFilter) => Promise<void>;
   getFilteredKlassen(filter?: OrganisationenFilter): Promise<void>;
   getKlassenByOrganisationId: (organisationId: string, searchFilter?: string) => Promise<void>;
-  getOrganisationById: (organisationId: string, organisationsTyp: OrganisationsTyp) => Promise<void>;
+  getOrganisationById: (organisationId: string, organisationsTyp: OrganisationsTyp) => Promise<Organisation>;
   createOrganisation: (
     kennung: string,
     name: string,
@@ -67,7 +67,8 @@ type OrganisationActions = {
     administriertVon?: string,
     zugehoerigZu?: string,
   ) => Promise<Organisation>;
-  updateOrganisation: (organisationId: string, name: string) => Promise<void>;
+  deleteOrganisationById: (organisationId: string) => Promise<void>;
+  updateOrganisationById: (organisationId: string, name: string) => Promise<void>;
 };
 
 export { OrganisationsTyp };
@@ -174,11 +175,14 @@ export const useOrganisationStore: StoreDefinition<
         } else {
           this.currentOrganisation = data;
         }
+
+        return data;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
           this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
         }
+        return await Promise.reject(this.errorCode);
       } finally {
         this.loading = false;
       }
@@ -247,7 +251,7 @@ export const useOrganisationStore: StoreDefinition<
         this.loading = false;
       }
     },
-    async updateOrganisation(organisationId: string, name: string): Promise<void> {
+    async updateOrganisationById(organisationId: string, name: string): Promise<void> {
       this.errorCode = '';
       this.loading = true;
       try {
@@ -259,6 +263,20 @@ export const useOrganisationStore: StoreDefinition<
           organisationByNameBodyParams,
         );
         this.updatedOrganisation = data;
+      } catch (error: unknown) {
+        this.errorCode = 'UNSPECIFIED_ERROR';
+        if (isAxiosError(error)) {
+          this.errorCode = error.response?.data.i18nKey || 'KLASSE_ERROR';
+        }
+      } finally {
+        this.loading = false;
+      }
+    },
+    async deleteOrganisationById(organisationId: string): Promise<void> {
+      this.errorCode = '';
+      this.loading = true;
+      try {
+        await organisationApi.organisationControllerDeleteKlasse(organisationId);
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
