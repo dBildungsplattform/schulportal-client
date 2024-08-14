@@ -17,7 +17,6 @@
   const route: RouteLocationNormalizedLoaded = useRoute();
   const router: Router = useRouter();
   const kcActionStatus: string | null = route.query['kc_action_status'] as string | null;
-  const passwordResetRoute: Ref = ref<string>('');
 
   export type SchulDaten = {
     title: string;
@@ -136,7 +135,6 @@
     personenkontextStore = usePersonenkontextStore();
     await personInfoStore.initPersonInfo();
     await personenkontextStore.getPersonenuebersichtById(personInfoStore.personInfo?.person.id ?? '');
-    passwordResetRoute.value = `/api/auth/reset-password?redirectUrl=${windowOrigin}${route.fullPath}&login_hint=${personInfoStore.personInfo?.person.referrer}`;
   }
 
   function setupPersonalData(): void {
@@ -190,6 +188,13 @@
   function handleCloseChangedPasswordDialog(): void {
     showChangedPasswordDialog.value = false;
     router.replace({ path: route.fullPath, query: {} });
+  }
+
+  function handleClickOnPasswortChangeButton(): void {
+    const url: URL = new URL(window.origin + '/api/auth/reset-password');
+    url.searchParams.set('redirectUrl', windowOrigin + route.fullPath);
+    url.searchParams.set('login_hint', personInfoStore.personInfo?.person.referrer ?? '');
+    window.location.href = url.toString();
   }
 
   onBeforeMount(async () => {
@@ -375,9 +380,9 @@
                         md="4"
                       >
                         <v-btn
-                          data-testid="change-password-button"
+                          @click.stop="handleClickOnPasswortChangeButton()"
                           class="primary"
-                          :href="passwordResetRoute"
+                          data-testid="change-password-button"
                         >
                           {{ $t('profile.changePassword') }}
                         </v-btn>
