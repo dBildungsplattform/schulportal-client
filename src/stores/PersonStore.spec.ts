@@ -194,6 +194,7 @@ describe('PersonStore', () => {
       const mockResponse: TokenStateResponse = {
         hasToken: true,
         tokenKind: 'software',
+        tokenSerial: '1234',
       };
 
       mockadapter.onGet(`/api/2fa-token/state?personId=${personId}`).replyOnce(200, mockResponse);
@@ -259,6 +260,45 @@ describe('PersonStore', () => {
       const get2FASoftwareQRCodePromise: Promise<void> = personStore.get2FASoftwareQRCode(personId);
       expect(personStore.loading).toBe(true);
       await rejects(get2FASoftwareQRCodePromise);
+      expect(personStore.errorCode).toEqual('some mock server error');
+      expect(personStore.loading).toBe(false);
+    });
+  });
+
+  describe('verify2FAToken', () => {
+    it('should verify token', async () => {
+      const personId: string = 'testUser';
+      const otp: string = '123456';
+      const mockResponse: boolean = true;
+
+      mockadapter.onPost(`/api/2fa-token/verify`).replyOnce(200, mockResponse);
+      const verifiedPromise: Promise<boolean> = personStore.verify2FAToken(personId, otp);
+      expect(personStore.loading).toBe(true);
+      const verified: boolean = await verifiedPromise;
+      expect(verified).toEqual(mockResponse);
+      expect(personStore.loading).toBe(false);
+    });
+
+    it('should handle string error', async () => {
+      const personId: string = 'testUser';
+      const otp: string = '123456';
+
+      mockadapter.onPost(`/api/2fa-token/verify`).replyOnce(500, 'some error');
+      const verified: Promise<boolean> = personStore.verify2FAToken(personId, otp);
+      expect(personStore.loading).toBe(true);
+      await rejects(verified);
+      expect(personStore.errorCode).toEqual('UNSPECIFIED_ERROR');
+      expect(personStore.loading).toBe(false);
+    });
+
+    it('should handle error code', async () => {
+      const personId: string = 'testUser';
+      const otp: string = '123456';
+
+      mockadapter.onPost(`/api/2fa-token/verify`).replyOnce(500, { code: 'some mock server error' });
+      const verified: Promise<boolean> = personStore.verify2FAToken(personId, otp);
+      expect(personStore.loading).toBe(true);
+      await rejects(verified);
       expect(personStore.errorCode).toEqual('some mock server error');
       expect(personStore.loading).toBe(false);
     });
