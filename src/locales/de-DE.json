@@ -24,15 +24,20 @@
       "createAnother": "Weitere Klasse anlegen",
       "createNew": "Neue Klasse anlegen",
       "discard": "Klasse verwerfen",
+      "deleteKlasse": "Klasse löschen",
+      "deleteKlasseConfirmation": "Wollen Sie die Klasse {klassenname} an der Schule {schulname} wirklich entfernen?",
+      "deleteKlasseSuccessMessage": "Die Klasse {klassenname} an der Schule {schulname} wurde erfolgreich gelöscht.",
       "edit": "Klasse bearbeiten",
       "title": {
-        "KLASSENNAME_AN_SCHULE_EINDEUTIG": "Fehler bei Änderung der Klasse."
+        "KLASSENNAME_AN_SCHULE_EINDEUTIG": "Fehler bei Änderung der Klasse.",
+        "ORGANISATION_IST_BEREITS_ZUGEWIESEN_ERROR": "Fehler beim Löschen."
       },
       "errors": {
         "KLASSE_ERROR": "Die Klasse konnte nicht geändert werden.",
         "KLASSE_NUR_VON_SCHULE_ADMINISTRIERT": "Klassen dürfen nur von einer Schule administriert werden.",
         "KLASSENNAME_AN_SCHULE_EINDEUTIG": "Der Klassenname existiert bereits an dieser Schule.",
-        "ORGANISATION_SPECIFICATION_ERROR": "Die Klasse konnte nicht angelegt werden."
+        "ORGANISATION_SPECIFICATION_ERROR": "Die Klasse konnte nicht angelegt werden.",
+        "ORGANISATION_IST_BEREITS_ZUGEWIESEN_ERROR": "Die Klasse ist bereits zugewiesen und kann nicht gelöscht werden."
       },
       "enterKlassenname": "Klassenname eingeben",
       "klasse": "Klasse",
@@ -43,6 +48,8 @@
       "klassenname": "Klassenname",
       "klassenFound": "{count} Klasse gefunden | {count} Klassen gefunden",
       "klassenSelected": "{count} Klassen ausgewählt",
+      "loadingErrorText": "Es konnten keine Klassendaten geladen werden.",
+      "loadingErrorTitle": "Fehler beim Laden der Klassen",
       "management": "Klassenverwaltung",
       "selectKlasse": "Klasse auswählen",
       "rules": {
