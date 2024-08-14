@@ -5,6 +5,7 @@
   import FormRow from '@/components/form/FormRow.vue';
   import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
   import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
+  import { type TranslatedObject } from '@/types.d';
 
   useI18n({ useScope: 'global' });
 
@@ -24,11 +25,6 @@
     value: string;
     title: string;
     Rollenart: RollenArt;
-  };
-
-  type TranslatedObject = {
-    value: string;
-    title: string;
   };
 
   type Props = {
@@ -269,6 +265,7 @@
       :label="$t('admin.organisation.organisation')"
     >
       <v-autocomplete
+        class="mb-5"
         autocomplete="off"
         :class="[{ 'filter-dropdown mb-4': hasAutoselectedSchule }, { selected: selectedOrganisation }]"
         clearable

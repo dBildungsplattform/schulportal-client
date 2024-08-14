@@ -61,6 +61,16 @@ const routes: readonly RouteRecordRaw[] = [
     },
   },
   {
+    path: '/admin/klassen/:id',
+    name: 'klasse-details',
+    component: () => import('../views/admin/KlasseDetailsView.vue'),
+    meta: {
+      layout: 'AdminLayout',
+      requiresAuth: true,
+      requiresPermission: 'klassenverwaltung',
+    },
+  },
+  {
     path: '/admin/rollen/new',
     name: 'create-rolle',
     component: () => import('../views/admin/rollen/RolleCreationView.vue'),
@@ -123,6 +133,15 @@ const routes: readonly RouteRecordRaw[] = [
     path: '/login-error',
     name: 'login-error',
     component: () => import('../views/UnknownUserErrorView.vue'),
+  },
+  {
+    path: '/profile',
+    name: 'profile',
+    component: () => import('../views/ProfileView.vue'),
+    meta: {
+      layout: 'DefaultLayout',
+      requiresAuth: true,
+    },
   },
   {
     path: '/:pathMatch(.*)*',

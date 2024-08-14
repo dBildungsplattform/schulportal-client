@@ -66,7 +66,7 @@ afterEach(() => {
 
 describe('KlasseCreationView', () => {
   test('it renders the klasse creation form', () => {
-    expect(wrapper?.find('[data-testid="klasse-creation-form"]').isVisible()).toBe(true);
+    expect(wrapper?.find('[data-testid="klasse-form"]').isVisible()).toBe(true);
   });
 
   test('it renders all child components', () => {
@@ -86,11 +86,15 @@ describe('KlasseCreationView', () => {
   });
 
   test('it fills form and triggers submit', async () => {
-    const schuleSelect: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
+    const schuleSelect: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'klasse-creation-form' })
+      .findComponent({ ref: 'schule-select' });
     await schuleSelect?.setValue('1');
     await nextTick();
 
-    const klassennameInput: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klassenname-input' });
+    const klassennameInput: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'klasse-creation-form' })
+      .findComponent({ ref: 'klassenname-input' });
     await klassennameInput?.setValue('11b');
     await nextTick();
 
@@ -106,7 +110,7 @@ describe('KlasseCreationView', () => {
 
     organisationStore.createdKlasse = mockKlasse;
 
-    wrapper?.find('[data-testid="klasse-creation-form-create-button"]').trigger('click');
+    wrapper?.find('[data-testid="klasse-form-create-button"]').trigger('click');
     await nextTick();
 
     expect(wrapper?.find('[data-testid="create-another-klasse-button"]').isVisible()).toBe(true);
@@ -127,7 +131,6 @@ describe('KlasseCreationView', () => {
     await nextTick();
 
     expect(organisationStore.errorCode).toBe('');
-
   });
 
   test('it handles search input for Schule when searchValue is not equal to selectedSchuleTitle', async () => {
@@ -150,7 +153,9 @@ describe('KlasseCreationView', () => {
       canCommit: true,
     } as PersonenkontextWorkflowResponse;
 
-    const schuleSearchInput: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
+    const schuleSearchInput: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'klasse-creation-form' })
+      .findComponent({ ref: 'schule-select' });
 
     // Triggering search with a value
     await schuleSearchInput?.setValue('Albert');
@@ -177,7 +182,9 @@ describe('KlasseCreationView', () => {
       canCommit: true,
     } as PersonenkontextWorkflowResponse;
 
-    const schuleSearchInput: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
+    const schuleSearchInput: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'klasse-creation-form' })
+      .findComponent({ ref: 'schule-select' });
 
     await schuleSearchInput?.vm.$emit('update:search', '');
     await nextTick();
@@ -203,7 +210,9 @@ describe('KlasseCreationView', () => {
       canCommit: true,
     } as PersonenkontextWorkflowResponse;
 
-    const schuleSearchInput: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
+    const schuleSearchInput: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'klasse-creation-form' })
+      .findComponent({ ref: 'schule-select' });
     await schuleSearchInput?.vm.$emit('update:search', '');
     await nextTick();
 
@@ -236,7 +245,9 @@ describe('KlasseCreationView', () => {
       selectedRolle: null,
       canCommit: true,
     };
-    const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
+    const organisationAutocomplete: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'klasse-creation-form' })
+      .findComponent({ ref: 'schule-select' });
 
     // Set a value in orga that will match with something given by the props and so the component will calculate the selectedOrganisationTitle
     await organisationAutocomplete?.setValue('1133');

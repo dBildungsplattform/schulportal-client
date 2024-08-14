@@ -9,18 +9,19 @@
   } from 'vue-router';
   import { type Composer, useI18n } from 'vue-i18n';
   import { useForm, type TypedSchema, type BaseFieldProps } from 'vee-validate';
-  import { toTypedSchema } from '@vee-validate/yup';
-  import { object, string } from 'yup';
-  import { useOrganisationStore, type OrganisationStore, OrganisationsTyp, type Organisation } from '@/stores/OrganisationStore';
-  import { DIN_91379A_EXT } from '@/utils/validation';
-  import FormRow from '@/components/form/FormRow.vue';
-  import FormWrapper from '@/components/form/FormWrapper.vue';
+  import {
+    useOrganisationStore,
+    type OrganisationStore,
+    OrganisationsTyp,
+    type Organisation,
+  } from '@/stores/OrganisationStore';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
-  import { useDisplay } from 'vuetify';
   import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
-
-  const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
+  import { type TranslatedObject } from '@/types.d';
+  import KlasseForm from '@/components/form/KlasseForm.vue';
+  import SuccessTemplate from '@/components/admin/klassen/SuccessTemplate.vue';
+  import { getValidationSchema, getVuetifyConfig } from '@/utils/validationKlasse';
 
   const { t }: Composer = useI18n({ useScope: 'global' });
   const router: Router = useRouter();
@@ -31,32 +32,15 @@
   let isSearching: boolean = false;
   const hasAutoselectedSchule: Ref<boolean> = ref(false);
 
-  const validationSchema: TypedSchema = toTypedSchema(
-    object({
-      selectedSchule: string().required(t('admin.klasse.rules.schule.required')),
-      selectedKlassenname: string()
-        .matches(DIN_91379A_EXT, t('admin.klasse.rules.klassenname.matches'))
-        .required(t('admin.klasse.rules.klassenname.required')),
-    }),
-  );
+  const validationSchema: TypedSchema = getValidationSchema(t);
 
   const vuetifyConfig = (state: {
     errors: Array<string>;
-  }): { props: { error: boolean; 'error-messages': Array<string> } } => ({
-    props: {
-      error: !!state.errors.length,
-      'error-messages': state.errors,
-    },
-  });
+  }): { props: { error: boolean; 'error-messages': Array<string> } } => getVuetifyConfig(state);
 
   type KlasseCreationForm = {
     selectedSchule: string;
     selectedKlassenname: string;
-  };
-
-  type TranslatedObject = {
-    value: string;
-    title: string;
   };
 
   // eslint-disable-next-line @typescript-eslint/typedef
@@ -232,153 +216,44 @@
 
       <!-- The form to create a new Klasse -->
       <template v-if="!organisationStore.createdKlasse && !organisationStore.errorCode">
-        <FormWrapper
-          :confirmUnsavedChangesAction="handleConfirmUnsavedChanges"
-          :createButtonLabel="$t('admin.klasse.create')"
-          :discardButtonLabel="$t('admin.klasse.discard')"
-          id="klasse-creation-form"
-          :onDiscard="navigateToKlasseManagement"
-          @onShowDialogChange="(value: boolean) => (showUnsavedChangesDialog = value)"
-          :onSubmit="onSubmit"
+        <KlasseForm
+          :schulen="schulen"
+          :isEditActive="true"
+          :readonly="false"
+          :selectedSchuleProps="selectedSchuleProps"
+          :selectedKlassennameProps="selectedKlassennameProps"
           :showUnsavedChangesDialog="showUnsavedChangesDialog"
-        >
-          <!-- Schule -->
-          <v-row>
-            <h3 class="headline-3">1. {{ $t('admin.schule.assignSchule') }}</h3>
-          </v-row>
-          <FormRow
-            :errorLabel="selectedSchuleProps['error']"
-            labelForId="schule-select"
-            :isRequired="true"
-            :label="$t('admin.schule.schule')"
-          >
-            <v-autocomplete
-              autocomplete="off"
-              clearable
-              :class="[{ 'filter-dropdown mb-4': hasAutoselectedSchule }, { selected: selectedSchule }]"
-              data-testid="schule-select"
-              density="compact"
-              :disabled="hasAutoselectedSchule"
-              hide-details
-              id="schule-select"
-              :items="schulen"
-              item-value="value"
-              item-text="title"
-              :placeholder="$t('admin.schule.assignSchule')"
-              ref="schule-select"
-              required="true"
-              variant="outlined"
-              v-bind="selectedSchuleProps"
-              v-model="selectedSchule"
-              v-model:search="searchInputSchule"
-              :no-data-text="$t('noDataFound')"
-            ></v-autocomplete>
-          </FormRow>
-
-          <!-- Klassenname -->
-          <v-row>
-            <h3 class="headline-3">2. {{ $t('admin.klasse.enterKlassenname') }}</h3>
-          </v-row>
-          <FormRow
-            :errorLabel="selectedKlassennameProps['error']"
-            labelForId="klassenname-input"
-            :isRequired="true"
-            :label="$t('admin.klasse.klassenname')"
-          >
-            <v-text-field
-              data-testid="klassenname-input"
-              v-bind="selectedKlassennameProps"
-              v-model="selectedKlassenname"
-              :placeholder="$t('admin.klasse.enterKlassenname')"
-              ref="klassenname-input"
-              variant="outlined"
-              density="compact"
-              required
-            ></v-text-field>
-          </FormRow>
-        </FormWrapper>
+          :onHandleConfirmUnsavedChanges="handleConfirmUnsavedChanges"
+          :onHandleDiscard="navigateToKlasseManagement"
+          :onShowDialogChange="(value: boolean) => (showUnsavedChangesDialog = value)"
+          :onSubmit="onSubmit"
+          ref="klasse-creation-form"
+          v-model:selectedSchule="selectedSchule"
+          v-model:selectedKlassenname="selectedKlassenname"
+        />
       </template>
 
-      <!-- Result template on success after submit  -->
+      <!-- Result template on success after submit -->
       <template v-if="organisationStore.createdKlasse && !organisationStore.errorCode">
-        <v-container>
-          <v-row justify="center">
-            <v-col
-              class="subtitle-1"
-              cols="auto"
-            >
-              <span data-testid="klasse-success-text">{{ $t('admin.klasse.klasseAddedSuccessfully') }}</span>
-            </v-col>
-          </v-row>
-          <v-row justify="center">
-            <v-col cols="auto">
-              <v-icon
-                aria-hidden="true"
-                color="#1EAE9C"
-                icon="mdi-check-circle"
-                small
-              >
-              </v-icon>
-            </v-col>
-          </v-row>
-          <v-row justify="center">
-            <v-col
-              class="subtitle-2"
-              cols="auto"
-            >
-              {{ $t('admin.followingDataCreated') }}
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col class="text-body bold text-right"> {{ $t('admin.schule.schule') }}: </v-col>
-            <v-col class="text-body">
-              <span data-testid="created-klasse-schule">
-                {{ translatedSchulname }}
-              </span>
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col class="text-body bold text-right"> {{ $t('admin.klasse.klassenname') }}: </v-col>
-            <v-col class="text-body"
-              ><span data-testid="created-klasse-name">{{ organisationStore.createdKlasse?.name }}</span></v-col
-            >
-          </v-row>
-          <v-divider
-            class="border-opacity-100 rounded my-6"
-            color="#E5EAEF"
-            thickness="6"
-          ></v-divider>
-          <v-row justify="end">
-            <v-col
-              cols="12"
-              sm="6"
-              md="auto"
-            >
-              <v-btn
-                class="secondary"
-                @click.stop="navigateToKlasseManagement"
-                data-testid="back-to-list-button"
-                :block="mdAndDown"
-              >
-                {{ $t('nav.backToList') }}
-              </v-btn>
-            </v-col>
-            <v-col
-              cols="12"
-              sm="6"
-              md="auto"
-            >
-              <v-btn
-                class="primary button"
-                @click="handleCreateAnotherKlasse"
-                data-testid="create-another-klasse-button"
-                :block="mdAndDown"
-              >
-                {{ $t('admin.klasse.createAnother') }}
-              </v-btn>
-            </v-col>
-          </v-row>
-        </v-container>
+        <SuccessTemplate
+          :successMessage="$t('admin.klasse.klasseAddedSuccessfully')"
+          :followingDataCreated="$t('admin.followingDataCreated')"
+          :createdData="[
+            { label: $t('admin.schule.schule'), value: translatedSchulname, testId: 'created-klasse-schule' },
+            {
+              label: $t('admin.klasse.klassenname'),
+              value: organisationStore.createdKlasse?.name,
+              testId: 'created-klasse-name',
+            },
+          ]"
+          :backButtonText="$t('nav.backToList')"
+          :createAnotherButtonText="$t('admin.klasse.createAnother')"
+          :showCreateAnotherButton="true"
+          :backButtonTestId="'back-to-list-button'"
+          :createAnotherButtonTestId="'create-another-klasse-button'"
+          @OnNavigateBack="navigateToKlasseManagement"
+          @OnCreateAnother="handleCreateAnotherKlasse"
+        />
       </template>
     </LayoutCard>
   </div>
