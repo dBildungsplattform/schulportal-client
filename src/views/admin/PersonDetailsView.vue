@@ -364,15 +364,32 @@
   // The save button is always disabled if there is no pending creation nor deletion.
   const isSaveButtonDisabled: ComputedRef<boolean> = computed(() => !pendingCreation.value && !pendingDeletion.value);
 
-  // Filter out the Rollen in case the admin chooses an organisation that the user has already a kontext in
+  // Filter out the Rollen based on the user's existing Zuordnungen and selected organization
   const filteredRollen: ComputedRef<RolleWithRollenart[] | undefined> = computed(() => {
-    const existingZuordnungen: Zuordnung[] | undefined = personenkontextStore.personenuebersicht?.zuordnungen.filter(
-      (zuordnung: Zuordnung) => zuordnung.sskId === selectedOrganisation.value,
-    );
-    return rollen.value?.filter(
-      (rolle: RolleWithRollenart) =>
-        !existingZuordnungen?.some((zuordnung: Zuordnung) => zuordnung.rolleId === rolle.value),
-    );
+    const existingZuordnungen: Zuordnung[] | undefined = personenkontextStore.personenuebersicht?.zuordnungen;
+    const selectedOrgaId: string | undefined = selectedOrganisation.value; 
+
+    // Determine if the user already has any LERN roles
+    const hasLernRolle: boolean =
+      existingZuordnungen?.some((zuordnung: Zuordnung) => isLernRolle(zuordnung.rolleId)) ?? false;
+
+    // Filter out Rollen that the user already has in the selected organization
+    return rollen.value?.filter((rolle: RolleWithRollenart) => {
+      // Check if the user already has this role in the selected organization
+      const alreadyHasRoleInSelectedOrga: boolean =
+        existingZuordnungen?.some(
+          (zuordnung: Zuordnung) => zuordnung.rolleId === rolle.value && zuordnung.sskId === selectedOrgaId,
+        ) ?? false;
+
+      // If the user has any LERN roles, only allow LERN roles to be selected
+      if (hasLernRolle) {
+        // Allow LERN roles in other organizations, but filter them out for the selected organization
+        return !alreadyHasRoleInSelectedOrga && rolle.Rollenart === RollenArt.Lern;
+      }
+
+      // If the user doesn't have any LERN roles, allow any role that hasn't been assigned yet in the selected organization
+      return !alreadyHasRoleInSelectedOrga;
+    });
   });
 
   // Computed property to get the title of the selected role
@@ -463,6 +480,7 @@
       selectedKlasse.value = undefined;
     }
   }
+
   onBeforeMount(async () => {
     personenkontextStore.errorCode = '';
     await personStore.getPersonById(currentPersonId);
@@ -742,10 +760,7 @@
               </v-col>
             </v-row>
             <!-- Check if 'zuordnungen' array exists and has length > 0 -->
-            <v-row
-              class="checkbox-row ml-md-16 mb-12"
-
-            >
+            <v-row class="checkbox-row ml-md-16 mb-12">
               <v-col
                 v-if="pendingDeletion || pendingCreation"
                 cols="12"
@@ -768,11 +783,10 @@
                       :value="zuordnung"
                     >
                       <template v-slot:label>
-                        <span  class="text-body">
+                        <span class="text-body">
                           {{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
                           {{ zuordnung.klasse }}
                         </span>
-
                       </template>
                     </v-checkbox>
                   </div>
@@ -890,10 +904,14 @@
                 </v-col>
               </v-col>
             </v-row>
-            <v-row v-if="
+            <v-row
+              v-if="
                 personenkontextStore.personenuebersicht?.zuordnungen &&
-                personenkontextStore.personenuebersicht?.zuordnungen.length === 0 && !pendingCreation && !pendingDeletion
-              ">
+                personenkontextStore.personenuebersicht?.zuordnungen.length === 0 &&
+                !pendingCreation &&
+                !pendingDeletion
+              "
+            >
               <v-col
                 class="mt-n12 mb-16"
                 cols="10"
