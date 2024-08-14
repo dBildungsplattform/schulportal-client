@@ -189,11 +189,11 @@ describe('PersonStore', () => {
   });
 
   describe('get2FAState', () => {
-    it('should get 2FA state', async () => {
+    it.each(['software', 'hardware'])('should get 2FA state with token', async (tokenKind: string) => {
       const personId: string = 'testUser';
       const mockResponse: TokenStateResponse = {
         hasToken: true,
-        tokenKind: 'software',
+        tokenKind: tokenKind,
         tokenSerial: '1234',
       };
 
@@ -203,6 +203,40 @@ describe('PersonStore', () => {
       await get2FAStatePromise;
       expect(personStore.twoFactorState.hasToken).toEqual(mockResponse.hasToken);
       expect(personStore.twoFactorState.tokenKind).toEqual(mockResponse.tokenKind);
+      expect(personStore.loading).toBe(false);
+    });
+
+    it('should get 2FA state without token', async () => {
+      const personId: string = 'testUser';
+      const mockResponse: TokenStateResponse = {
+        hasToken: false,
+        tokenKind: '',
+        tokenSerial: '',
+      };
+
+      mockadapter.onGet(`/api/2fa-token/state?personId=${personId}`).replyOnce(200, mockResponse);
+      const get2FAStatePromise: Promise<void> = personStore.get2FAState(personId);
+      expect(personStore.loading).toBe(true);
+      await get2FAStatePromise;
+      expect(personStore.twoFactorState.hasToken).toEqual(mockResponse.hasToken);
+      expect(personStore.twoFactorState.tokenKind).toEqual(null);
+      expect(personStore.loading).toBe(false);
+    });
+
+    it('unknown tokenkind maps to null', async () => {
+      const personId: string = 'testUser';
+      const mockResponse: TokenStateResponse = {
+        hasToken: true,
+        tokenKind: 'abc',
+        tokenSerial: '1234',
+      };
+
+      mockadapter.onGet(`/api/2fa-token/state?personId=${personId}`).replyOnce(200, mockResponse);
+      const get2FAStatePromise: Promise<void> = personStore.get2FAState(personId);
+      expect(personStore.loading).toBe(true);
+      await get2FAStatePromise;
+      expect(personStore.twoFactorState.hasToken).toEqual(mockResponse.hasToken);
+      expect(personStore.twoFactorState.tokenKind).toEqual(null);
       expect(personStore.loading).toBe(false);
     });
 
@@ -301,6 +335,88 @@ describe('PersonStore', () => {
       await rejects(verified);
       expect(personStore.errorCode).toEqual('some mock server error');
       expect(personStore.loading).toBe(false);
+    });
+  });
+
+  describe('deletePerson', () => {
+    it('should delete person', async () => {
+      const personId: string = 'testUser';
+
+      mockadapter.onDelete(`/api/personen/${personId}`).replyOnce(200, {});
+      const deletionPromise: Promise<void> = personStore.deletePerson(personId);
+      expect(personStore.loading).toBe(true);
+      await deletionPromise;
+      expect(personStore.loading).toBe(false);
+    });
+
+    it('should handle string error', async () => {
+      const personId: string = 'testUser';
+
+      mockadapter.onDelete(`/api/personen/${personId}`).replyOnce(500, 'some error');
+      const deletionPromise: Promise<void> = personStore.deletePerson(personId);
+      expect(personStore.loading).toBe(true);
+      await rejects(deletionPromise);
+      expect(personStore.errorCode).toEqual('UNSPECIFIED_ERROR');
+      expect(personStore.loading).toBe(false);
+    });
+
+    it('should handle error code', async () => {
+      const personId: string = 'testUser';
+
+      mockadapter.onDelete(`/api/personen/${personId}`).replyOnce(500, { code: 'some mock server error' });
+      const deletionPromise: Promise<void> = personStore.deletePerson(personId);
+      expect(personStore.loading).toBe(true);
+      await rejects(deletionPromise);
+      expect(personStore.errorCode).toEqual('some mock server error');
+      expect(personStore.loading).toBe(false);
+    });
+  });
+
+  describe('resetState', () => {
+    it('should reset state', () => {
+      personStore.allPersons = [
+        {
+          person: {
+            id: '1234',
+            name: {
+              familienname: 'Vimes',
+              vorname: 'Samuel',
+            },
+          },
+        },
+      ] as PersonendatensatzResponse[];
+
+      personStore.errorCode = 'some error';
+      personStore.loading = true;
+      personStore.totalPersons = 1;
+      personStore.currentPerson = {
+        person: {
+          id: '1234',
+          name: {
+            familienname: 'Vimes',
+            vorname: 'Samuel',
+          },
+        },
+      } as PersonendatensatzResponse;
+      personStore.twoFactorState = {
+        hasToken: true,
+        tokenKind: 'software',
+        qrCode: 'fakeQRCode',
+        errorCode: 'some error',
+      };
+
+      personStore.resetState();
+      expect(personStore.allPersons).toEqual([]);
+      expect(personStore.errorCode).toEqual('');
+      expect(personStore.loading).toBe(false);
+      expect(personStore.totalPersons).toBe(0);
+      expect(personStore.currentPerson).toBe(null);
+      expect(personStore.twoFactorState).toEqual({
+        hasToken: null,
+        tokenKind: null,
+        qrCode: '',
+        errorCode: '',
+      });
     });
   });
 });
