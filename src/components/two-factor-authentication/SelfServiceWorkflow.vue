@@ -44,6 +44,9 @@
   async function close2FADialog(isActive: Ref<boolean>): Promise<void> {
     if (workflowStep.value !== 'start') {
       emits('dialogClosed');
+      personStore.twoFactorState.qrCode = '';
+      personStore.twoFactorState.hasToken = null;
+      personStore.twoFactorState.tokenKind = null;
     }
 
     isActive.value = false;
@@ -68,7 +71,7 @@
           close2FADialog(isActive);
         } else {
           otp.value = '';
-          errorMessage.value = 'Ungültiges Einmal-Passwort';
+          errorMessage.value = t('admin.person.twoFactorAuthentication.invalidOtp');
         }
     }
   }
