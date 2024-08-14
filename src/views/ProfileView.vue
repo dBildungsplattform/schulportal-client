@@ -17,6 +17,7 @@
   const route: RouteLocationNormalizedLoaded = useRoute();
   const router: Router = useRouter();
   const kcActionStatus: string | null = route.query['kc_action_status'] as string | null;
+  const passwordResetRoute: Ref = ref<string>('');
 
   export type SchulDaten = {
     title: string;
@@ -135,6 +136,7 @@
     personenkontextStore = usePersonenkontextStore();
     await personInfoStore.initPersonInfo();
     await personenkontextStore.getPersonenuebersichtById(personInfoStore.personInfo?.person.id ?? '');
+    passwordResetRoute.value = `/api/auth/reset-password?redirectUrl=${windowOrigin}${route.fullPath}&login_hint=${personInfoStore.personInfo?.person.referrer}`;
   }
 
   function setupPersonalData(): void {
@@ -375,7 +377,7 @@
                         <v-btn
                           data-testid="change-password-button"
                           class="primary"
-                          :href="`/api/auth/reset-password?redirectUrl=${windowOrigin}${route.fullPath}&login_hint=${personInfoStore.personInfo?.person.referrer}`"
+                          :href="passwordResetRoute"
                         >
                           {{ $t('profile.changePassword') }}
                         </v-btn>
