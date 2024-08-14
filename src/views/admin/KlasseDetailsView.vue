@@ -17,6 +17,7 @@
   import { type BaseFieldProps, type TypedSchema, useForm } from 'vee-validate';
   import KlasseForm from '@/components/form/KlasseForm.vue';
   import SuccessTemplate from '@/components/admin/klassen/SuccessTemplate.vue';
+  import KlasseDelete from '@/components/admin/klassen/KlasseDelete.vue';
   import { getValidationSchema, getVuetifyConfig } from '@/utils/validationKlasse';
 
   const route: RouteLocationNormalizedLoaded = useRoute();
@@ -29,6 +30,9 @@
 
   const currentOrganisationId: string = route.params['id'] as string;
   const isEditActive: Ref<boolean> = ref(false);
+
+  const creationErrorText: Ref<string> = ref('');
+  const creationErrorTitle: Ref<string> = ref('');
 
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
 
@@ -117,11 +121,25 @@
   const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = handleSubmit(async () => {
     if (selectedSchule.value && selectedKlassenname.value) {
       if (organisationStore.currentOrganisation) {
-        await organisationStore.updateOrganisation(currentOrganisationId, selectedKlassenname.value);
+        try {
+          await organisationStore.updateOrganisationById(currentOrganisationId, selectedKlassenname.value);
+        } catch {
+          creationErrorText.value = t(`admin.klasse.errors.${organisationStore.errorCode}`);
+          creationErrorTitle.value = t(`admin.klasse.title.${organisationStore.errorCode}`);
+        }
       }
       resetForm();
     }
   });
+
+  async function deleteKlasseById(organisationId: string): Promise<void> {
+    try {
+      await organisationStore.deleteOrganisationById(organisationId);
+    } catch {
+      creationErrorText.value = t(`admin.rolle.errors.${organisationStore.errorCode}`);
+      creationErrorTitle.value = t(`admin.rolle.title.${organisationStore.errorCode}`);
+    }
+  }
 
   onBeforeMount(async () => {
     organisationStore.errorCode = '';
@@ -226,20 +244,40 @@
               v-if="!isEditActive"
               class="d-flex justify-sm-end"
             >
-              <v-col
-                cols="12"
-                sm="6"
-                md="auto"
-              >
-                <v-btn
-                  class="primary ml-lg-8"
-                  data-testid="klasse-edit-button"
-                  @Click="activateEditing"
-                  :block="mdAndDown"
+              <v-row class="pt-3 px-2 justify-end">
+                <v-col
+                  cols="12"
+                  md="auto"
+                  sm="6"
                 >
-                  {{ $t('edit') }}
-                </v-btn>
-              </v-col>
+                  <div class="d-flex justify-sm-end">
+                    <KlasseDelete
+                      :errorCode="organisationStore.errorCode"
+                      :klassenname="organisationStore.currentKlasse?.name"
+                      :klassenId="organisationStore.currentKlasse?.id"
+                      ref="klasse-delete"
+                      :schulname="selectedSchule"
+                      :useIconActivator="false"
+                      @onDeleteKlasse="deleteKlasseById(currentOrganisationId)"
+                    >
+                    </KlasseDelete>
+                  </div>
+                </v-col>
+                <v-col
+                  cols="12"
+                  sm="6"
+                  md="auto"
+                >
+                  <v-btn
+                    class="primary ml-lg-8"
+                    data-testid="klasse-edit-button"
+                    @click="activateEditing"
+                    :block="mdAndDown"
+                  >
+                    {{ $t('edit') }}
+                  </v-btn>
+                </v-col>
+              </v-row>
             </div>
             <div
               v-else
@@ -284,7 +322,6 @@
         </v-container>
       </template>
       <!-- Result template on success after submit  -->
-      <!-- Result template on success after submit -->
       <template v-if="organisationStore.updatedOrganisation && !organisationStore.errorCode">
         <SuccessTemplate
           :successMessage="$t('admin.klasse.klasseUpdatedSuccessfully')"
