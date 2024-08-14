@@ -1,6 +1,6 @@
 import { VueWrapper, mount } from '@vue/test-utils';
 import TwoFactorAuthenticationSetUp from './TwoFactorAuthenticationSetUp.vue';
-// import { VDialog } from 'vuetify/lib/components/index.mjs'
+import { nextTick } from 'vue';
 
 let wrapper: VueWrapper | null = null;
 
@@ -38,6 +38,12 @@ beforeEach(() => {
 describe('set up two-factor authentication', () => {
   test('it opens the dialog', async () => {
     wrapper?.get('[data-testid="open-2FA-dialog-icon"]').trigger('click');
+    await nextTick();
+    expect(document.querySelector('[data-testid="software-token-radio-button"]')).not.toBeNull();
+    expect(document.querySelector('[data-testid="hardware-token-radio-button"]')).not.toBeNull();
   });
+});
 
-})
+afterEach(() => {
+  wrapper?.unmount();
+});

@@ -48,7 +48,8 @@ type RolleActions = {
     merkmale: RollenMerkmal[],
     systemrechte: RollenSystemRecht[],
     serviceProviderIds: string[],
-  ) => Promise<RolleWithServiceProvidersResponse>;
+  ) => Promise<void>;
+  deleteRolleById: (rolleId: string) => Promise<void>;
 };
 
 export { RollenArt };
@@ -180,7 +181,7 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
       merkmale: RollenMerkmal[],
       systemrechte: RollenSystemRecht[],
       serviceProviderIds: string[],
-    ): Promise<RolleWithServiceProvidersResponse> {
+    ): Promise<void> {
       this.loading = true;
       this.errorCode = '';
       try {
@@ -188,20 +189,32 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
           name: rollenName,
           merkmale: merkmale as unknown as Set<RollenMerkmal>,
           systemrechte: systemrechte as unknown as Set<RollenSystemRecht>,
-          serviceProviderIds: serviceProviderIds as unknown as Set<string>
+          serviceProviderIds: serviceProviderIds as unknown as Set<string>,
         };
         const { data }: { data: RolleWithServiceProvidersResponse } = await rolleApi.rolleControllerUpdateRolle(
           rolleId,
           updateRolleBodyParams,
         );
         this.updatedRolle = data;
-        return data;
+      } catch (error) {
+        this.errorCode = 'UNSPECIFIED_ERROR';
+        if (isAxiosError(error)) {
+          this.errorCode = error.response?.data.i18nKey || 'ROLLE_UPDATE_ERROR';
+        }
+      } finally {
+        this.loading = false;
+      }
+    },
+    async deleteRolleById(rolleId: string): Promise<void> {
+      this.loading = true;
+      this.errorCode = '';
+      try {
+        await rolleApi.rolleControllerDeleteRolle(rolleId);
       } catch (error) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
           this.errorCode = error.response?.data.i18nKey || 'ROLLE_ERROR';
         }
-        return await Promise.reject(this.errorCode);
       } finally {
         this.loading = false;
       }
