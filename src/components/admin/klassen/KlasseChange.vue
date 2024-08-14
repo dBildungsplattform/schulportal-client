@@ -5,7 +5,7 @@
 
   type Props = {
     schulen?: Array<{ value: string; title: string }>;
-    klassen?: Array<{ value: string; title: string }>;
+    klassen: Array<{ value: string; title: string }> | undefined;
     readonly?: boolean;
     selectedSchuleProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     selectedNewKlasseProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };

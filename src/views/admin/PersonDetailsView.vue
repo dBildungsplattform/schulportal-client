@@ -494,6 +494,7 @@
 
   const onSubmitChangeKlasse: (e?: Event | undefined) => Promise<void | undefined> = handleSubmitChangeKlasse(() => {
     changeKlasseConfirmationDialogMessage.value = t('person.changeKlasseConfirmation', {
+      oldKlasse: selectedZuordnungen.value[0]?.klasse,
       newKlasse: selectedNewKlasseTitle.value,
     });
     changeKlasseConfirmationDialogVisible.value = true;
@@ -613,7 +614,7 @@
       }
     }
 
-    // zuordnungenResult is what we show in the UI and so Zuordnungne of type Klasse shouldn't show up (since they are merged with the ones of type Schule already)
+    // zuordnungenResult is what we show in the UI and so Zuordnungen of type Klasse shouldn't show up (since they are merged with the ones of type Schule already)
     zuordnungenResult.value = zuordnungenResult.value?.filter(
       (zuordnung: Zuordnung) => zuordnung.typ !== OrganisationsTyp.Klasse,
     );
@@ -1520,7 +1521,7 @@
                 offset="1"
                 cols="10"
               >
-                <span>{{ $t('person.changeKlassennameSuccess') }}</span>
+                <span>{{ $t('person.changeKlasseSuccess') }}</span>
               </v-col>
             </v-row>
           </v-container>
