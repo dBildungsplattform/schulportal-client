@@ -376,7 +376,7 @@
     // Filter out Rollen that the user already has in the selected organization
     return rollen.value?.filter((rolle: RolleWithRollenart) => {
       // Check if the user already has this role in the selected organization
-      const alreadyHasRoleInSelectedOrga: boolean =
+      const alreadyHasRolleInSelectedOrga: boolean =
         existingZuordnungen?.some(
           (zuordnung: Zuordnung) => zuordnung.rolleId === rolle.value && zuordnung.sskId === selectedOrgaId,
         ) ?? false;
@@ -384,11 +384,11 @@
       // If the user has any LERN roles, only allow LERN roles to be selected
       if (hasLernRolle) {
         // Allow LERN roles in other organizations, but filter them out for the selected organization
-        return !alreadyHasRoleInSelectedOrga && rolle.Rollenart === RollenArt.Lern;
+        return !alreadyHasRolleInSelectedOrga && rolle.Rollenart === RollenArt.Lern;
       }
 
       // If the user doesn't have any LERN roles, allow any role that hasn't been assigned yet in the selected organization
-      return !alreadyHasRoleInSelectedOrga;
+      return !alreadyHasRolleInSelectedOrga;
     });
   });
 
