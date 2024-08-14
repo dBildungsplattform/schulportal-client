@@ -1050,12 +1050,14 @@
           <v-row class="ml-md-16">
             <v-col>
               <h3 class="subtitle-1">{{ $t('admin.person.status') }}</h3>
-              <div
+              <template
                 v-for="(attribute, key) in personStore.currentPerson?.person.attributes"
                 :key="key"
               >
-                <p>{{ keyMapper(key) }} {{ keyValueMapper(key, attribute.toString()) }}</p>
-              </div>
+                <p v-if="key.startsWith('lock_')">
+                  {{ keyMapper(key) }} {{ keyValueMapper(key, attribute.toString()) }}
+                </p>
+              </template>
             </v-col>
             <v-col
               class="mr-lg-13"
