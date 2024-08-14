@@ -8,7 +8,7 @@
   import SpshTooltip from '@/components/admin/SpshTooltip.vue';
   import PersonDelete from '@/components/admin/personen/PersonDelete.vue';
   import PersonenkontextDelete from '@/components/admin/personen/PersonenkontextDelete.vue';
-  import TwoFactorAuthenticationSetUp from '@/components/admin/personen/TwoFactorAuthenticationSetUp.vue';
+  import TwoFactorAuthenticationSetUp from '@/components/two-factor-authentication/TwoFactorAuthenticationSetUp.vue';
   import {
     usePersonenkontextStore,
     type PersonenkontextStore,
@@ -460,10 +460,13 @@
       selectedKlasse.value = undefined;
     }
   }
+
   onBeforeMount(async () => {
+    personStore.resetState();
     personenkontextStore.errorCode = '';
     await personStore.getPersonById(currentPersonId);
     await personenkontextStore.getPersonenuebersichtById(currentPersonId);
+    await personStore.get2FAState(currentPersonId);
   });
 </script>
 
@@ -630,10 +633,51 @@
           color="#E5EAEF"
           thickness="6"
         ></v-divider>
-        <v-container class="two-factor-authentication-set-up">
+        <!-- Two Factor Authentication -->
+        <v-container v-if="personStore.twoFactorState.hasToken != undefined">
           <v-row class="ml-md-16">
             <v-col>
               <h3 class="subtitle-1">{{ $t('admin.person.twoFactorAuthentication.header') }}</h3>
+              <v-row
+                class="mt-4 text-body"
+                v-if="personStore.twoFactorState.hasToken && personStore.twoFactorState.tokenKind === 'software'"
+              >
+                <v-col
+                  class="text-right"
+                  cols="1"
+                >
+                  <v-icon
+                    icon="mdi-check-circle"
+                    color="green"
+                    v-if="personStore.twoFactorState.hasToken"
+                  ></v-icon>
+                </v-col>
+                <div class="v-col">
+                  <p>
+                    {{ $t('admin.person.twoFactorAuthentication.softwareTokenIsSetUp') }}
+                  </p>
+                </div>
+              </v-row>
+              <v-row class="mt-4 text-body">
+                <v-col
+                  class="text-right"
+                  cols="1"
+                >
+                  <v-icon
+                    class="mb-2"
+                    icon="mdi-information"
+                  >
+                  </v-icon>
+                </v-col>
+                <div class="v-col">
+                  <p v-if="personStore.twoFactorState.hasToken">
+                    {{ $t('admin.person.twoFactorAuthentication.resetInfo') }}
+                  </p>
+                  <p v-if="!personStore.twoFactorState.hasToken">
+                    {{ $t('admin.person.twoFactorAuthentication.notSetUp') }}
+                  </p>
+                </div>
+              </v-row>
             </v-col>
             <v-col
               class="mr-lg-13"
@@ -641,19 +685,41 @@
               md="auto"
               v-if="personStore.currentPerson"
             >
-              <div class="d-flex justify-sm-end">
+              <div
+                class="d-flex justify-sm-end"
+                v-if="!personStore.twoFactorState.hasToken"
+              >
                 <TwoFactorAuthenticationSetUp
-                  :errorCode="personStore.errorCode"
+                  :errorCode="personStore.twoFactorState.errorCode"
                   :disabled="isEditActive"
                   :person="personStore.currentPerson"
+                  @dialogClosed="personStore.get2FAState(currentPersonId)"
                 >
                 </TwoFactorAuthenticationSetUp>
+              </div>
+              <div
+                class="d-flex justify-sm-end"
+                v-if="personStore.twoFactorState.hasToken"
+              >
+                <v-col
+                  cols="12"
+                  sm="6"
+                  md="auto"
+                >
+                  <v-btn
+                    class="primary"
+                    :disabled="isEditActive"
+                  >
+                    {{ $t('admin.person.twoFactorAuthentication.tokenReset') }}</v-btn
+                  ></v-col
+                >
               </div>
             </v-col>
             <v-col v-else-if="personStore.loading"> <v-progress-circular indeterminate></v-progress-circular></v-col
           ></v-row>
         </v-container>
         <v-divider
+          v-if="personStore.twoFactorState.hasToken != undefined"
           class="border-opacity-100 rounded my-6 mx-4"
           color="#E5EAEF"
           thickness="6"

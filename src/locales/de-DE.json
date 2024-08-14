@@ -86,14 +86,19 @@
       "addedSuccessfully": "{firstname} {lastname} wurde erfolgreich hinzugefügt.",
       "addNew": "Neuen Benutzer hinzufügen",
       "changePassword": "Passwort ändern",
-      "twoFactorAuthentication":{
+      "twoFactorAuthentication": {
         "setUpShort": "2FA einrichten",
         "setUpLong": "Zwei-Faktor-Authentifizierung einrichten",
         "header": "Zwei-Faktor-Authentifizierung (2FA)",
-        "softwareTokenOption":"Software-Token einrichten",
-        "softwareTokenText": "(i) Ein QR-Code wird generiert, welcher direkt eingescannt oder ausgedruckt werden kann.",
-        "hardwareTokenOption":"Hardware-Token zuordnen",
-        "hardwareTokenText": "(i) Der Hardware-Token muss vorliegen und funktionieren. Bitte notieren Sie, wem Sie den Token gegeben haben."
+        "softwareTokenOption": "Software-Token einrichten",
+        "softwareTokenText": "Ein QR-Code wird generiert, welcher direkt eingescannt oder ausgedruckt werden kann.",
+        "hardwareTokenOption": "Hardware-Token zuordnen",
+        "hardwareTokenText": "Der Hardware-Token muss vorliegen und funktionieren. Bitte notieren Sie, wem Sie den Token gegeben haben.",
+        "scanOrPrint": "QR-Code scannen oder ausdrucken.",
+        "notSetUp": "Für diesen Benutzer ist aktuell keine 2FA eingerichtet.",
+        "softwareTokenIsSetUp": "Für diesen Benutzer ist aktuell ein Software-Token eingerichtet.",
+        "resetInfo": "Um einen neuen Token einzurichten, muss der aktuelle Token durch die schulischen Admins zurückgesetzt werden.",
+        "tokenReset": "Token zurücksetzen"
       },
       "copyPasswordError": "Passwort konnte nicht in die Zwischenablage kopiert werden",
       "copyPasswordSuccess": "Passwort in Zwischenablage kopiert",
@@ -148,7 +153,7 @@
         "NUR_LEHR_UND_LERN_AN_KLASSE": "Nur Schüler dürfen einer Klasse zugeordnet werden.",
         "PERSONENKONTEXT_SPECIFICATION_ERROR": "Die Zuordnung konnte nicht angelegt werden.",
         "PERSONENKONTEXTE_UPDATE_ERROR": "Die Zuordnung konnte nicht aktualisiert werden. Bitte versuchen Sie es später erneut.",
-        "PERSON_NOT_FOUND" : "Der Benutzer wurde seit Ihrer letzten Änderung gelöscht und kann nicht mehr bearbeitet werden."
+        "PERSON_NOT_FOUND": "Der Benutzer wurde seit Ihrer letzten Änderung gelöscht und kann nicht mehr bearbeitet werden."
       }
     },
     "rolle": {
@@ -169,12 +174,12 @@
       "enterRollenname": "Rollenname eingeben",
       "errors": {
         "ADD_SYSTEMRECHT_ERROR": "Das Systemrecht konnte nicht hinzugefügt werden.",
-        "ROLLE_ERROR":  "Die Rolle konnte nicht angelegt werden.",
+        "ROLLE_ERROR": "Die Rolle konnte nicht angelegt werden.",
         "ROLLE_HAT_PERSONENKONTEXTE_ERROR": "Die Rolle kann nicht gelöscht werden, da die sie noch Benutzern zugeordnet ist. Nehmen Sie bitte zunächst alle Zuordnungen zurück.",
         "UPDATE_MERKMALE_ERROR": "Die gewünschte Bearbeitung kann nicht ausgeführt werden, da die Rolle noch Benutzern zugeordnet ist. Nehmen Sie bitte zunächst alle Zuordnungen zurück."
       },
       "title": {
-        "ROLLE_ERROR":  "Fehler bei Erstellung der Rolle.",
+        "ROLLE_ERROR": "Fehler bei Erstellung der Rolle.",
         "ROLLE_HAT_PERSONENKONTEXTE_ERROR": "Löschen nicht möglich.",
         "ROLLE_UPDATE_ERROR": "Die Rolle konnte nicht bearbeitet werden.",
         "UPDATE_MERKMALE_ERROR": "Die gewünschte Bearbeitung kann nicht ausgeführt werden, da die Rolle noch Benutzern zugeordnet ist. Nehmen Sie bitte zunächst alle Zuordnungen zurück."
@@ -306,6 +311,7 @@
   "proceed": "Weiter",
   "close": "Schließen",
   "edit": "Bearbeiten",
+  "print": "Drucken",
   "errors": {
     "KEYCLOAK_CLIENT_ERROR": "Die Anmeldung ist momentan nicht möglich.",
     "UNSPECIFIED_ERROR": "Es ist ein Fehler aufgetreten.",
@@ -394,7 +400,6 @@
     "willBeRemoved": "wird entfernt",
     "zuordnungen": "Schulzuordnung(en)",
     "zuordnung": "Schulzuordnung"
-
   },
   "profile": {
     "personalData": "Persönliche Daten",
