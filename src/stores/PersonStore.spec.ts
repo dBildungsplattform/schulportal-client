@@ -263,4 +263,41 @@ describe('PersonStore', () => {
       expect(personStore.loading).toBe(false);
     });
   });
+  describe('resetToken', () => {
+    it('should reset token successfully', async () => {
+      const referrer: string = 'testReferrer';
+
+      mockadapter.onPut(`/api/2fa-token/reset?userName=${referrer}`).replyOnce(200);
+
+      const resetTokenPromise: Promise<void> = personStore.resetToken(referrer);
+      expect(personStore.loading).toBe(true);
+      await resetTokenPromise;
+      expect(personStore.loading).toBe(false);
+      expect(personStore.errorCode).toEqual('');
+    });
+
+    it('should handle string error', async () => {
+      const referrer: string = 'testReferrer';
+
+      mockadapter.onPut(`/api/2fa-token/reset?userName=${referrer}`).replyOnce(500, 'some error');
+
+      const resetTokenPromise: Promise<void> = personStore.resetToken(referrer);
+      expect(personStore.loading).toBe(true);
+      await rejects(resetTokenPromise);
+      expect(personStore.errorCode).toEqual('UNSPECIFIED_ERROR');
+      expect(personStore.loading).toBe(false);
+    });
+
+    it('should handle error code', async () => {
+      const referrer: string = 'testReferrer';
+
+      mockadapter.onPut(`/api/2fa-token/reset?userName=${referrer}`).replyOnce(500, { code: 'some mock server error' });
+
+      const resetTokenPromise: Promise<void> = personStore.resetToken(referrer);
+      expect(personStore.loading).toBe(true);
+      await rejects(resetTokenPromise);
+      expect(personStore.errorCode).toEqual('some mock server error');
+      expect(personStore.loading).toBe(false);
+    });
+  });
 });

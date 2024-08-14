@@ -91,7 +91,16 @@
         "notSetUp": "Für diesen Benutzer ist aktuell keine 2FA eingerichtet.",
         "softwareTokenIsSetUp": "Für diesen Benutzer ist aktuell ein Software-Token eingerichtet.",
         "resetInfo": "Um einen neuen Token einzurichten, muss der aktuelle Token durch die schulischen Admins zurückgesetzt werden.",
-        "tokenReset": "Token zurücksetzen"
+        "tokenReset": "Token zurücksetzen",
+        "tokenResetHardwareErrorHeader": "Fehler beim Zurücksetzen des Hardware-Tokens",
+        "tokenResetSoftwareErrorHeader": "Fehler beim Zurücksetzen des Software-Tokens",
+        "tokenResetDescription": "Sind Sie sicher, dass Sie den Token zurücksetzen möchten? \nDie 2FA wird damit für diesen Benutzer deaktiviert, bis ein neuer Token eingerichtet wurde.",
+        "tokenResetTokenLost": "Token ist verloren gegangen (Token wird gesperrt).",
+        "tokenResetButton": "Zurücksetzen",
+        "tokenResetSuccessSoftware": "Token wurde erfolgreich zurückgesetzt. Der Benutzer kann sich nun selbstständig einen neuen QR-Code erzeugen.",
+        "tokenResetSuccessHardware": "Token wurde erfolgreich zurückgesetzt. Der Hardware-Token kann nun neu zugeordnet werden.",
+        "tokenResetSuccessTokenLost": "Token wurde erfolgreich zurückgesetzt und gesperrt.",
+        "tokenResetError": "Beim Zurücksetzen des Tokens ist ein Fehler aufgetreten: <Fehler>. \nBitte versuchen Sie es später erneut."
       },
       "copyPasswordError": "Passwort konnte nicht in die Zwischenablage kopiert werden",
       "copyPasswordSuccess": "Passwort in Zwischenablage kopiert",

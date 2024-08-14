@@ -33,6 +33,7 @@
   import { useKlassen } from '@/composables/useKlassen';
   import PersonenkontextCreate from '@/components/admin/personen/PersonenkontextCreate.vue';
   import { type TranslatedObject } from '@/types.d';
+  import TokenReset from '@/components/two-factor-authentication/TokenReset.vue';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
@@ -706,13 +707,15 @@
                   sm="6"
                   md="auto"
                 >
-                  <v-btn
-                    class="primary"
+                  <TokenReset
+                    :errorCode="personStore.twoFactorState.errorCode"
                     :disabled="isEditActive"
-                  >
-                    {{ $t('admin.person.twoFactorAuthentication.tokenReset') }}</v-btn
-                  ></v-col
-                >
+                    :person="personStore.currentPerson"
+                    :tokenType="personStore.twoFactorState.tokenKind"
+                    :personId="currentPersonId"
+                    @dialogClosed="personStore.get2FAState(currentPersonId)"
+                  ></TokenReset>
+                </v-col>
               </div>
             </v-col>
             <v-col v-else-if="personStore.loading"> <v-progress-circular indeterminate></v-progress-circular></v-col
