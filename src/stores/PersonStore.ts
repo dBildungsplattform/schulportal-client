@@ -75,7 +75,9 @@ type PersonActions = {
   deletePerson: (personId: string) => Promise<void>;
   get2FAState: (personId: string) => Promise<void>;
   get2FASoftwareQRCode: (personId: string) => Promise<void>;
-  assignHardwareToken: (personUserName: string, serial: string, otp: string) => Promise<AssignHardwareTokenResponse>;
+  assignHardwareToken: (
+    assignHardwareTokenBodyParams: AssignHardwareTokenBodyParams,
+  ) => Promise<AssignHardwareTokenResponse>;
 };
 
 export type PersonStore = Store<'personStore', PersonState, PersonGetters, PersonActions>;
@@ -233,18 +235,14 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
       }
     },
     async assignHardwareToken(
-      personUserName: string,
-      serial: string,
-      otp: string,
+      assignHardwareTokenBodyParams: AssignHardwareTokenBodyParams,
     ): Promise<AssignHardwareTokenResponse> {
       this.loading = true;
-      const assignTokenPayload: AssignHardwareTokenBodyParams = {
-        serial: serial,
-        otp: otp,
-        user: personUserName,
-      };
       try {
-        return (await twoFactorApi.privacyIdeaAdministrationControllerAssignHardwareToken(assignTokenPayload)).data;
+        const data: AssignHardwareTokenResponse = (
+          await twoFactorApi.privacyIdeaAdministrationControllerAssignHardwareToken(assignHardwareTokenBodyParams)
+        ).data;
+        return data;
       } finally {
         this.loading = false;
       }

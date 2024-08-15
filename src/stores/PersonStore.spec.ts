@@ -1,4 +1,5 @@
 import type {
+  AssignHardwareTokenResponse,
   PersonFrontendControllerFindPersons200Response,
   PersonendatensatzResponse,
   TokenStateResponse,
@@ -260,6 +261,35 @@ describe('PersonStore', () => {
       expect(personStore.loading).toBe(true);
       await rejects(get2FASoftwareQRCodePromise);
       expect(personStore.errorCode).toEqual('some mock server error');
+      expect(personStore.loading).toBe(false);
+    });
+  });
+  describe('assignHardwareToken', () => {
+    it('should assign hardware token and update state', async () => {
+      const personUserName: string = 'testUser';
+      const serial: string = '123456789';
+      const otp: string = '987654';
+      const mockResponse: AssignHardwareTokenResponse = {
+        id: 1,
+        jsonrpc: '2.0',
+        time: 1622547800,
+        version: '1.0',
+        versionnumber: '1.0.0',
+        signature: 'abcdef123456',
+        dialogText: 'This is a mock dialog text',
+      };
+
+      mockadapter.onPost('/api/2fa-token/assign/hardwareToken').reply(200, mockResponse);
+
+      const assignTokenPromise: Promise<AssignHardwareTokenResponse> = personStore.assignHardwareToken(
+        personUserName,
+        serial,
+        otp,
+      );
+      expect(personStore.loading).toBe(true);
+
+      const response: AssignHardwareTokenResponse = await assignTokenPromise;
+      expect(response).toEqual(mockResponse);
       expect(personStore.loading).toBe(false);
     });
   });
