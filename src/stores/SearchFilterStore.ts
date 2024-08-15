@@ -35,7 +35,7 @@ export const useSearchFilterStore: StoreDefinition<
   id: 'searchFilterStore',
   state: (): SearchFilterState => ({
     klassenPage: 1,
-    klassenPerPage: 10,
+    klassenPerPage: 30,
     personenPage: 1,
     personenPerPage: 30,
     rollenPage: 1,
