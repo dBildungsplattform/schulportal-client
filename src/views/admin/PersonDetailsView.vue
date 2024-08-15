@@ -305,6 +305,7 @@
     personenkontextStore.processWorkflowStep({ organisationId: organisationId, rolleId: rolleId });
     // Check if rolleId exists and if it's of type LERN
     if (rolleId && isLernRolle(rolleId) && hasOneSelectedZuordnung) {
+
       return true;
     }
     return false;
@@ -1050,7 +1051,7 @@
                 <template v-if="!pendingDeletion && !pendingCreation && !pendingChangeKlasse">
                   <div class="checkbox-div">
                     <v-checkbox
-                    data-testid="checkbox"
+                    :ref="`checkbox-zuordnung-${zuordnung.sskId}`"
                       v-model="selectedZuordnungen"
                       :value="zuordnung"
                     >
