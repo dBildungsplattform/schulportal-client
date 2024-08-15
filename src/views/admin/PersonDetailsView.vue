@@ -1605,7 +1605,7 @@
                 offset="1"
                 cols="10"
               >
-                <span data-testid="create-zuordnung-confirmation-dialog-message">{{
+                <span>{{
                   createZuordnungConfirmationDialogMessage
                 }}</span>
               </v-col>
@@ -1622,7 +1622,6 @@
               <v-btn
                 :block="mdAndDown"
                 class="primary"
-                data-testid="confirm-dialog-addition-button"
                 @click.stop="confirmDialogAddition"
               >
                 {{ $t('yes') }}

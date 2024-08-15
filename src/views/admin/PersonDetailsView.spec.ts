@@ -195,4 +195,15 @@ describe('PersonDetailsView', () => {
     );
     expect(confirmationMessage?.exists()).toBe(false);
   });
+  test('It triggers change Klasse', async () => {
+    await wrapper?.find('[data-testid="zuordnung-edit-button"]').trigger('click');
+    await nextTick();
+
+    const zuordnungCreateButton: VueWrapper | undefined = wrapper?.findComponent({ ref: 'zuordnung-create-button' });
+
+    await wrapper?.find('[data-testid="zuordnung-edit-cancel"]').trigger('click');
+    await nextTick();
+
+    expect(zuordnungCreateButton?.exists()).toBe(false);
+  });
 });
