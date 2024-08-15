@@ -176,7 +176,7 @@ describe('PersonDetailsView', () => {
 
     expect(zuordnungCreateButton?.exists()).toBe(false);
   });
-  test.only('It triggers change Klasse and selects the first checkbox', async () => {
+  test('It triggers change Klasse and selects the first checkbox', async () => {
     // Trigger edit mode
     await wrapper?.find('[data-testid="zuordnung-edit-button"]').trigger('click');
     await nextTick();
