@@ -369,9 +369,8 @@
     "cannotDeleteOwnZuordnung": "Sie dürfen sich selbst keine Zuordnungen entziehen.",
     "checkAndSave": "Bitte prüfen und abschließend speichern, um die Aktion auszuführen",
     "changeRolle": "Rolle ändern",
-    "changeKlasse": "Klasse versetzen",
     "changeKlasseConfirmation": "Wollen Sie den Schüler/die Schülerin aus Klasse {oldKlasse} in Klasse {newKlasse} versetzen?",
-    "changeKlasseSuccess": "Die Klasse wurde erfolgreich geändert.",
+    "changeKlasseSuccess": "Der Schüler/die Schülerin wurde erfoglreich versetzt.",
     "changeRolleDescription": "Ändert die Rolle des Benutzers an der Schule ohne ihn zu entfernen.",
     "changeKlasseDescription": "Ändert die Klasse des Benutzers an der Schule.",
     "changeKlasseNotDisabledDescription": "Bitte wählen Sie eine neue Klasse aus.",
@@ -439,6 +438,7 @@
       "workEmail": "Dienstliche E-Mail"
     }
   },
+  "transfer":"Versetzen",
   "unsavedChanges": {
     "message": "Sie haben nicht gespeicherte Änderungen vorgenommen. Wollen Sie die Seite trotzdem verlassen?",
     "title": "Änderungen vorgenommen"

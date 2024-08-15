@@ -1079,7 +1079,7 @@
                         v-if="selectedZuordnungen.includes(zuordnung)"
                         class="text-body text-red"
                       >
-                        ({{ $t('person.willBeRemoved') }})
+                        ({{ $t('willBeRemoved') }})
                       </span>
                     </span>
 
@@ -1189,7 +1189,7 @@
                       :disabled="!canChangeKlasse"
                       :block="mdAndDown"
                     >
-                      {{ $t('person.changeKlasse') }}
+                      {{ $t('transfer') }}
                     </v-btn>
                   </SpshTooltip>
                 </v-col>
@@ -1327,7 +1327,7 @@
                   cols="12"
                   sm="auto"
                 >
-                  <h3 class="subtitle-1">{{ $t('person.changeKlasse') }}:</h3></v-col
+                  <h3 class="subtitle-1">{{ $t('transfer') }}:</h3></v-col
                 >
               </v-row>
               <v-container class="px-lg-16">
@@ -1367,7 +1367,7 @@
                   <SpshTooltip
                     :enabledCondition="!isSubmitDisabled"
                     :disabledText="$t('person.changeKlasseNotDisabledDescription')"
-                    :enabledText="$t('person.changeKlasse')"
+                    :enabledText="$t('transfer')"
                     position="start"
                   >
                     <v-btn
@@ -1376,7 +1376,7 @@
                       data-testid="klasse-change-submit-button"
                       :disabled="isSubmitDisabled"
                       type="submit"
-                      >{{ $t('person.changeKlasse') }}</v-btn
+                      >{{ $t('transfer') }}</v-btn
                     >
                   </SpshTooltip>
                 </v-col>
@@ -1516,7 +1516,7 @@
       >
         <v-card-text>
           <v-container>
-            <v-row class="text-body bold px-md-16">
+            <v-row class="text-body bold ">
               <v-col
                 offset="1"
                 cols="10"
@@ -1608,12 +1608,12 @@
     >
       <LayoutCard
         :closable="true"
-        :header="$t('person.changeKlasse')"
+        :header="$t('transfer')"
         @onCloseClicked="cancelChangeKlasse"
       >
         <v-card-text>
           <v-container>
-            <v-row class="text-body bold px-md-16">
+            <v-row class="text-body bold">
               <v-col
                 offset="1"
                 cols="10"
