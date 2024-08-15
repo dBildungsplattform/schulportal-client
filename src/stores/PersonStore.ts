@@ -1,19 +1,25 @@
 import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import { isAxiosError, type AxiosResponse } from 'axios';
 import {
+  Class2FAApiFactory,
   PersonenApiFactory,
   PersonenFrontendApiFactory,
+  type Class2FAApiInterface,
   type DbiamCreatePersonWithContextBodyParams,
   type PersonenApiInterface,
   type PersonendatensatzResponse,
   type PersonenFrontendApiInterface,
   type PersonFrontendControllerFindPersons200Response,
+  type TokenInitBodyParams,
+  type TokenStateResponse,
 } from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
-import type { DbiamPersonenkontextBodyParams } from './PersonenkontextStore';
+import { type DbiamPersonenkontextBodyParams } from './PersonenkontextStore';
 
 const personenApi: PersonenApiInterface = PersonenApiFactory(undefined, '', axiosApiInstance);
 const personenFrontendApi: PersonenFrontendApiInterface = PersonenFrontendApiFactory(undefined, '', axiosApiInstance);
+
+const twoFactorApi: Class2FAApiInterface = Class2FAApiFactory(undefined, '', axiosApiInstance);
 
 export type Person = {
   id: string;
@@ -32,6 +38,13 @@ export type Personendatensatz = {
   person: Person;
 };
 
+export type TwoFactorState = {
+  errorCode: string;
+  hasToken: boolean | null;
+  tokenKind: 'hardware' | 'software' | null;
+  qrCode: string;
+};
+
 export type { PersonendatensatzResponse };
 
 type PersonState = {
@@ -40,6 +53,7 @@ type PersonState = {
   loading: boolean;
   totalPersons: number;
   currentPerson: Personendatensatz | null;
+  twoFactorState: TwoFactorState;
 };
 
 export type PersonFilter = {
@@ -52,10 +66,13 @@ export type PersonFilter = {
 
 type PersonGetters = {};
 type PersonActions = {
+  resetState: () => void;
   getAllPersons: (filter: PersonFilter) => Promise<void>;
   getPersonById: (personId: string) => Promise<Personendatensatz>;
   resetPassword: (personId: string) => Promise<string>;
   deletePerson: (personId: string) => Promise<void>;
+  get2FAState: (personId: string) => Promise<void>;
+  get2FASoftwareQRCode: (personId: string) => Promise<void>;
 };
 
 export type PersonStore = Store<'personStore', PersonState, PersonGetters, PersonActions>;
@@ -69,9 +86,18 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
       loading: false,
       totalPersons: 0,
       currentPerson: null,
+      twoFactorState: {
+        errorCode: '',
+        hasToken: null,
+        tokenKind: null,
+        qrCode: '',
+      },
     };
   },
   actions: {
+    resetState() {
+      this.$reset();
+    },
     async getAllPersons(filter: PersonFilter) {
       this.loading = true;
       try {
@@ -137,6 +163,62 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
       this.loading = true;
       try {
         await personenApi.personControllerDeletePersonById(personId);
+      } catch (error: unknown) {
+        this.errorCode = 'UNSPECIFIED_ERROR';
+        if (isAxiosError(error)) {
+          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
+        }
+        return await Promise.reject(this.errorCode);
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async get2FAState(personId: string) {
+      this.loading = true;
+      try {
+        const twoFactorState: TokenStateResponse = (
+          await twoFactorApi.privacyIdeaAdministrationControllerGetTwoAuthState(personId)
+        ).data;
+
+        this.twoFactorState.hasToken = twoFactorState.hasToken;
+
+        if (!twoFactorState.hasToken) {
+          return;
+        }
+
+        switch (twoFactorState.tokenKind) {
+          case 'hardware':
+            this.twoFactorState.tokenKind = 'hardware';
+            break;
+          case 'software':
+            this.twoFactorState.tokenKind = 'software';
+            break;
+          default:
+            this.twoFactorState.tokenKind = null;
+        }
+      } catch (error: unknown) {
+        this.twoFactorState.errorCode = 'UNSPECIFIED_ERROR';
+        if (isAxiosError(error)) {
+          this.twoFactorState.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
+        }
+        return await Promise.reject(this.errorCode);
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async get2FASoftwareQRCode(personId: string) {
+      this.loading = true;
+      try {
+        const bodyParams: TokenInitBodyParams = {
+          personId: personId,
+        };
+        const qrCodeImageBase64: string = (
+          await twoFactorApi.privacyIdeaAdministrationControllerInitializeSoftwareToken(bodyParams)
+        ).data;
+
+        this.twoFactorState.qrCode = qrCodeImageBase64;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
