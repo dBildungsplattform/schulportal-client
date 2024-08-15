@@ -24,15 +24,20 @@
       "createAnother": "Weitere Klasse anlegen",
       "createNew": "Neue Klasse anlegen",
       "discard": "Klasse verwerfen",
+      "deleteKlasse": "Klasse löschen",
+      "deleteKlasseConfirmation": "Wollen Sie die Klasse {klassenname} an der Schule {schulname} wirklich entfernen?",
+      "deleteKlasseSuccessMessage": "Die Klasse {klassenname} an der Schule {schulname} wurde erfolgreich gelöscht.",
       "edit": "Klasse bearbeiten",
       "title": {
-        "KLASSENNAME_AN_SCHULE_EINDEUTIG": "Fehler bei Änderung der Klasse."
+        "KLASSENNAME_AN_SCHULE_EINDEUTIG": "Fehler bei Änderung der Klasse.",
+        "ORGANISATION_IST_BEREITS_ZUGEWIESEN_ERROR": "Fehler beim Löschen."
       },
       "errors": {
         "KLASSE_ERROR": "Die Klasse konnte nicht geändert werden.",
         "KLASSE_NUR_VON_SCHULE_ADMINISTRIERT": "Klassen dürfen nur von einer Schule administriert werden.",
         "KLASSENNAME_AN_SCHULE_EINDEUTIG": "Der Klassenname existiert bereits an dieser Schule.",
-        "ORGANISATION_SPECIFICATION_ERROR": "Die Klasse konnte nicht angelegt werden."
+        "ORGANISATION_SPECIFICATION_ERROR": "Die Klasse konnte nicht angelegt werden.",
+        "ORGANISATION_IST_BEREITS_ZUGEWIESEN_ERROR": "Die Klasse ist bereits zugewiesen und kann nicht gelöscht werden."
       },
       "enterKlassenname": "Klassenname eingeben",
       "klasse": "Klasse",
@@ -43,6 +48,8 @@
       "klassenname": "Klassenname",
       "klassenFound": "{count} Klasse gefunden | {count} Klassen gefunden",
       "klassenSelected": "{count} Klassen ausgewählt",
+      "loadingErrorText": "Es konnten keine Klassendaten geladen werden.",
+      "loadingErrorTitle": "Fehler beim Laden der Klassen",
       "management": "Klassenverwaltung",
       "selectKlasse": "Klasse auswählen",
       "rules": {
@@ -51,6 +58,7 @@
         },
         "klassenname": {
           "matches": "Der Klassenname darf keine ungültigen Zeichen beinhalten.",
+          "noLeadingTrailingSpaces": "Der Klassenname darf nicht mit Leerzeichen beginnen oder enden.",
           "required": "Der Klassenname muss angegeben werden."
         },
         "schule": {
@@ -78,14 +86,19 @@
       "addedSuccessfully": "{firstname} {lastname} wurde erfolgreich hinzugefügt.",
       "addNew": "Neuen Benutzer hinzufügen",
       "changePassword": "Passwort ändern",
-      "twoFactorAuthentication":{
+      "twoFactorAuthentication": {
         "setUpShort": "2FA einrichten",
         "setUpLong": "Zwei-Faktor-Authentifizierung einrichten",
         "header": "Zwei-Faktor-Authentifizierung (2FA)",
-        "softwareTokenOption":"Software-Token einrichten",
-        "softwareTokenText": "(i) Ein QR-Code wird generiert, welcher direkt eingescannt oder ausgedruckt werden kann.",
-        "hardwareTokenOption":"Hardware-Token zuordnen",
-        "hardwareTokenText": "(i) Der Hardware-Token muss vorliegen und funktionieren. Bitte notieren Sie, wem Sie den Token gegeben haben."
+        "softwareTokenOption": "Software-Token einrichten",
+        "softwareTokenText": "Ein QR-Code wird generiert, welcher direkt eingescannt oder ausgedruckt werden kann.",
+        "hardwareTokenOption": "Hardware-Token zuordnen",
+        "hardwareTokenText": "Der Hardware-Token muss vorliegen und funktionieren. Bitte notieren Sie, wem Sie den Token gegeben haben.",
+        "scanOrPrint": "QR-Code scannen oder ausdrucken.",
+        "notSetUp": "Für diesen Benutzer ist aktuell keine 2FA eingerichtet.",
+        "softwareTokenIsSetUp": "Für diesen Benutzer ist aktuell ein Software-Token eingerichtet.",
+        "resetInfo": "Um einen neuen Token einzurichten, muss der aktuelle Token durch die schulischen Admins zurückgesetzt werden.",
+        "tokenReset": "Token zurücksetzen"
       },
       "copyPasswordError": "Passwort konnte nicht in die Zwischenablage kopiert werden",
       "copyPasswordSuccess": "Passwort in Zwischenablage kopiert",
@@ -109,14 +122,16 @@
       "resetPassword": "Passwort zurücksetzen",
       "rules": {
         "vorname": {
-          "matches": "Der Vorname darf keine ungültigen Zeichen beinhalten.",
-          "min": "Der Vorname muss aus mindestens 2 Zeichen bestehen.",
-          "required": "Der Vorname muss angegeben werden."
+          "matches": "Der Vorname enthält ungültige Zeichen.",
+          "noLeadingTrailingSpaces": "Der Vorname darf nicht mit Leerzeichen beginnen oder enden.",
+          "min": "Der Vorname muss mindestens 2 Zeichen lang sein.",
+          "required": "Der Vorname ist erforderlich."
         },
         "familienname": {
-          "matches": "Der Nachname darf keine ungültigen Zeichen beinhalten.",
-          "min": "Der Nachname muss aus mindestens 2 Zeichen bestehen.",
-          "required": "Der Nachname muss angegeben werden."
+          "matches": "Der Familienname enthält ungültige Zeichen.",
+          "noLeadingTrailingSpaces": "Der Familienname darf nicht mit Leerzeichen beginnen oder enden.",
+          "min": "Der Familienname muss mindestens 2 Zeichen lang sein.",
+          "required": "Der Familienname ist erforderlich."
         }
       },
       "showAll": "Alle Benutzer anzeigen",
@@ -138,7 +153,7 @@
         "NUR_LEHR_UND_LERN_AN_KLASSE": "Nur Schüler dürfen einer Klasse zugeordnet werden.",
         "PERSONENKONTEXT_SPECIFICATION_ERROR": "Die Zuordnung konnte nicht angelegt werden.",
         "PERSONENKONTEXTE_UPDATE_ERROR": "Die Zuordnung konnte nicht aktualisiert werden. Bitte versuchen Sie es später erneut.",
-        "PERSON_NOT_FOUND" : "Der Benutzer wurde seit Ihrer letzten Änderung gelöscht und kann nicht mehr bearbeitet werden."
+        "PERSON_NOT_FOUND": "Der Benutzer wurde seit Ihrer letzten Änderung gelöscht und kann nicht mehr bearbeitet werden."
       }
     },
     "rolle": {
@@ -159,12 +174,12 @@
       "enterRollenname": "Rollenname eingeben",
       "errors": {
         "ADD_SYSTEMRECHT_ERROR": "Das Systemrecht konnte nicht hinzugefügt werden.",
-        "ROLLE_ERROR":  "Die Rolle konnte nicht angelegt werden.",
+        "ROLLE_ERROR": "Die Rolle konnte nicht angelegt werden.",
         "ROLLE_HAT_PERSONENKONTEXTE_ERROR": "Die Rolle kann nicht gelöscht werden, da die sie noch Benutzern zugeordnet ist. Nehmen Sie bitte zunächst alle Zuordnungen zurück.",
         "UPDATE_MERKMALE_ERROR": "Die gewünschte Bearbeitung kann nicht ausgeführt werden, da die Rolle noch Benutzern zugeordnet ist. Nehmen Sie bitte zunächst alle Zuordnungen zurück."
       },
       "title": {
-        "ROLLE_ERROR":  "Fehler bei Erstellung der Rolle.",
+        "ROLLE_ERROR": "Fehler bei Erstellung der Rolle.",
         "ROLLE_HAT_PERSONENKONTEXTE_ERROR": "Löschen nicht möglich.",
         "ROLLE_UPDATE_ERROR": "Die Rolle konnte nicht bearbeitet werden.",
         "UPDATE_MERKMALE_ERROR": "Die gewünschte Bearbeitung kann nicht ausgeführt werden, da die Rolle noch Benutzern zugeordnet ist. Nehmen Sie bitte zunächst alle Zuordnungen zurück."
@@ -218,6 +233,7 @@
         "rollenname": {
           "length": "Der Rollenname darf nicht länger als 200 Zeichen sein.",
           "matches": "Der Rollenname darf keine ungültigen Zeichen beinhalten.",
+          "noLeadingTrailingSpaces": "Der Rollenname darf nicht mit Leerzeichen beginnen oder enden.",
           "required": "Der Rollenname muss ausgewählt werden."
         }
       },
@@ -251,16 +267,19 @@
         "NAME_REQUIRED_FOR_SCHULE": "Die Angabe eines Namens ist erforderlich.",
         "NUR_KLASSE_UNTER_SCHULE": "Die Klasse muss einer Schule zugeordnet werden.",
         "ORGANISATION_SPECIFICATION_ERROR": "Die Schule konnte nicht angelegt werden.",
+        "SCHULE_KENNUNG_EINDEUTIG": "Die Dienststellennummer existiert bereits.",
         "SCHULE_UNTER_TRAEGER": "Eine Schule darf nicht einer anderen Schule zugeordnet werden."
       },
       "management": "Schulverwaltung",
       "publicSchule": "Öffentliche Schule",
       "rules": {
         "dienststellennummer": {
+          "noLeadingTrailingSpaces": "Die Dienststellennummer darf nicht mit Leerzeichen beginnen oder enden.",
           "required": "Die Dienststellennummer muss angegeben werden."
         },
         "schulname": {
           "matches": "Der Schulname darf keine ungültigen Zeichen beinhalten.",
+          "noLeadingTrailingSpaces": "Der Schulname darf nicht mit Leerzeichen beginnen oder enden.",
           "required": "Der Schulname muss angegeben werden."
         }
       },
@@ -292,6 +311,7 @@
   "proceed": "Weiter",
   "close": "Schließen",
   "edit": "Bearbeiten",
+  "print": "Drucken",
   "errors": {
     "KEYCLOAK_CLIENT_ERROR": "Die Anmeldung ist momentan nicht möglich.",
     "UNSPECIFIED_ERROR": "Es ist ein Fehler aufgetreten.",
@@ -380,7 +400,6 @@
     "willBeRemoved": "wird entfernt",
     "zuordnungen": "Schulzuordnung(en)",
     "zuordnung": "Schulzuordnung"
-
   },
   "profile": {
     "personalData": "Persönliche Daten",

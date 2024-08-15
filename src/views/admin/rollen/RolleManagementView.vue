@@ -13,9 +13,11 @@
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
   import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
   import { useRouter, type Router } from 'vue-router';
+  import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
 
   const rolleStore: RolleStore = useRolleStore();
   const organisationStore: OrganisationStore = useOrganisationStore();
+  const searchFilterStore: SearchFilterStore = useSearchFilterStore();
 
   const router: Router = useRouter();
   const { t }: Composer = useI18n({ useScope: 'global' });
@@ -68,9 +70,36 @@
     router.push({ name: 'rolle-details', params: { id: item.id } });
   }
 
+  function getPaginatedRollen(page: number): void {
+    searchFilterStore.rollenPage = page;
+    rolleStore.getAllRollen({
+      offset: (searchFilterStore.rollenPage - 1) * searchFilterStore.rollenPerPage,
+      limit: searchFilterStore.rollenPerPage,
+      searchString: '',
+    });
+  }
+
+  function getPaginatedRollenWithLimit(limit: number): void {
+    /* reset page to 1 if entries are equal to or less than selected limit */
+    if (rolleStore.totalRollen <= limit) {
+      searchFilterStore.rollenPage = 1;
+    }
+
+    searchFilterStore.rollenPerPage = limit;
+    rolleStore.getAllRollen({
+      offset: (searchFilterStore.rollenPage - 1) * searchFilterStore.rollenPerPage,
+      limit: searchFilterStore.rollenPerPage,
+      searchString: '',
+    });
+  }
+
   onMounted(async () => {
-    await rolleStore.getAllRollen('');
     await organisationStore.getAllOrganisationen();
+    await rolleStore.getAllRollen({
+      offset: (searchFilterStore.rollenPage - 1) * searchFilterStore.rollenPerPage,
+      limit: searchFilterStore.rollenPerPage,
+      searchString: '',
+    });
   });
 </script>
 
@@ -84,16 +113,19 @@
     </h1>
     <LayoutCard :header="$t('admin.rolle.management')">
       <ResultTable
-        data-testid="role-table"
+        :currentPage="searchFilterStore.rollenPage"
+        data-testid="rolle-table"
         :items="transformedRollenAndMerkmale || []"
+        :itemsPerPage="searchFilterStore.rollenPerPage"
         :loading="rolleStore.loading"
         :headers="headers"
         @onHandleRowClick="
           (event: PointerEvent, item: TableRow<unknown>) =>
             navigateToRolleDetails(event, item as TableRow<RolleTableItem>)
         "
-        @onUpdateTable="rolleStore.getAllRollen('')"
-        :totalItems="rolleStore.allRollen.length"
+        @onItemsPerPageUpdate="getPaginatedRollenWithLimit"
+        @onPageUpdate="getPaginatedRollen"
+        :totalItems="rolleStore.totalRollen"
         item-value-path="id"
       >
         <template v-slot:[`item.serviceProviders`]="{ item }">

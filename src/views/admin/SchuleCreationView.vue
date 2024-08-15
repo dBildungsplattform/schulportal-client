@@ -17,7 +17,7 @@
   import FormRow from '@/components/form/FormRow.vue';
   import { object, string } from 'yup';
   import { toTypedSchema } from '@vee-validate/yup';
-  import { DIN_91379A_EXT } from '@/utils/validation';
+  import { DIN_91379A_EXT, NO_LEADING_TRAILING_SPACES } from '@/utils/validation';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
@@ -27,9 +27,12 @@
 
   const validationSchema: TypedSchema = toTypedSchema(
     object({
-      selectedDienststellennummer: string().required(t('admin.schule.rules.dienststellennummer.required')),
+      selectedDienststellennummer: string()
+        .matches(NO_LEADING_TRAILING_SPACES, t('admin.schule.rules.dienststellennummer.noLeadingTrailingSpaces'))
+        .required(t('admin.schule.rules.dienststellennummer.required')),
       selectedSchulname: string()
         .matches(DIN_91379A_EXT, t('admin.schule.rules.schulname.matches'))
+        .matches(NO_LEADING_TRAILING_SPACES, t('admin.schule.rules.schulname.noLeadingTrailingSpaces'))
         .required(t('admin.schule.rules.schulname.required')),
     }),
   );
@@ -228,6 +231,7 @@
             :label="$t('admin.schule.dienststellennummer')"
           >
             <v-text-field
+              clearable
               data-testid="dienststellennummer-input"
               v-bind="selectedDienststellennummerProps"
               v-model="selectedDienststellennummer"
@@ -250,6 +254,7 @@
             :label="$t('admin.schule.schulname')"
           >
             <v-text-field
+              clearable
               data-testid="schulname-input"
               v-bind="selectedSchulnameProps"
               v-model="selectedSchulname"
