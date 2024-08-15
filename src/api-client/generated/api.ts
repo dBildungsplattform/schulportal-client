@@ -3707,11 +3707,13 @@ export const OrganisationenApiAxiosParamCreator = function (configuration?: Conf
         /**
          * 
          * @param {string} organisationId The id of an organization
+         * @param {number} [offset] The offset of the paginated list.
+         * @param {number} [limit] The requested limit for the page size.
          * @param {string} [searchFilter] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        organisationControllerGetAdministrierteOrganisationen: async (organisationId: string, searchFilter?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        organisationControllerGetAdministrierteOrganisationen: async (organisationId: string, offset?: number, limit?: number, searchFilter?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'organisationId' is not null or undefined
             assertParamExists('organisationControllerGetAdministrierteOrganisationen', 'organisationId', organisationId)
             const localVarPath = `/api/organisationen/{organisationId}/administriert`
@@ -3734,6 +3736,14 @@ export const OrganisationenApiAxiosParamCreator = function (configuration?: Conf
             // authentication oauth2 required
             // oauth required
             await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+            if (offset !== undefined) {
+                localVarQueryParameter['offset'] = offset;
+            }
+
+            if (limit !== undefined) {
+                localVarQueryParameter['limit'] = limit;
+            }
 
             if (searchFilter !== undefined) {
                 localVarQueryParameter['searchFilter'] = searchFilter;
@@ -4043,12 +4053,14 @@ export const OrganisationenApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @param {string} organisationId The id of an organization
+         * @param {number} [offset] The offset of the paginated list.
+         * @param {number} [limit] The requested limit for the page size.
          * @param {string} [searchFilter] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async organisationControllerGetAdministrierteOrganisationen(organisationId: string, searchFilter?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<OrganisationResponse>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.organisationControllerGetAdministrierteOrganisationen(organisationId, searchFilter, options);
+        async organisationControllerGetAdministrierteOrganisationen(organisationId: string, offset?: number, limit?: number, searchFilter?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<OrganisationResponse>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.organisationControllerGetAdministrierteOrganisationen(organisationId, offset, limit, searchFilter, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -4179,12 +4191,14 @@ export const OrganisationenApiFactory = function (configuration?: Configuration,
         /**
          * 
          * @param {string} organisationId The id of an organization
+         * @param {number} [offset] The offset of the paginated list.
+         * @param {number} [limit] The requested limit for the page size.
          * @param {string} [searchFilter] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        organisationControllerGetAdministrierteOrganisationen(organisationId: string, searchFilter?: string, options?: any): AxiosPromise<Array<OrganisationResponse>> {
-            return localVarFp.organisationControllerGetAdministrierteOrganisationen(organisationId, searchFilter, options).then((request) => request(axios, basePath));
+        organisationControllerGetAdministrierteOrganisationen(organisationId: string, offset?: number, limit?: number, searchFilter?: string, options?: any): AxiosPromise<Array<OrganisationResponse>> {
+            return localVarFp.organisationControllerGetAdministrierteOrganisationen(organisationId, offset, limit, searchFilter, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -4308,12 +4322,14 @@ export interface OrganisationenApiInterface {
     /**
      * 
      * @param {string} organisationId The id of an organization
+     * @param {number} [offset] The offset of the paginated list.
+     * @param {number} [limit] The requested limit for the page size.
      * @param {string} [searchFilter] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrganisationenApiInterface
      */
-    organisationControllerGetAdministrierteOrganisationen(organisationId: string, searchFilter?: string, options?: AxiosRequestConfig): AxiosPromise<Array<OrganisationResponse>>;
+    organisationControllerGetAdministrierteOrganisationen(organisationId: string, offset?: number, limit?: number, searchFilter?: string, options?: AxiosRequestConfig): AxiosPromise<Array<OrganisationResponse>>;
 
     /**
      * 
@@ -4449,13 +4465,15 @@ export class OrganisationenApi extends BaseAPI implements OrganisationenApiInter
     /**
      * 
      * @param {string} organisationId The id of an organization
+     * @param {number} [offset] The offset of the paginated list.
+     * @param {number} [limit] The requested limit for the page size.
      * @param {string} [searchFilter] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrganisationenApi
      */
-    public organisationControllerGetAdministrierteOrganisationen(organisationId: string, searchFilter?: string, options?: AxiosRequestConfig) {
-        return OrganisationenApiFp(this.configuration).organisationControllerGetAdministrierteOrganisationen(organisationId, searchFilter, options).then((request) => request(this.axios, this.basePath));
+    public organisationControllerGetAdministrierteOrganisationen(organisationId: string, offset?: number, limit?: number, searchFilter?: string, options?: AxiosRequestConfig) {
+        return OrganisationenApiFp(this.configuration).organisationControllerGetAdministrierteOrganisationen(organisationId, offset, limit, searchFilter, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
