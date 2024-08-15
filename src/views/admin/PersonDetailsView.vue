@@ -525,15 +525,21 @@
     },
   );
 
-  // When the button "Yes" from the Dialog after filling the form for creating a new Zuordnung is clicked
   const confirmDialogAddition = async (): Promise<void> => {
     createZuordnungConfirmationDialogVisible.value = false;
     const organisation: Organisation | undefined = personenkontextStore.workflowStepResponse?.organisations.find(
       (orga: Organisation) => orga.id === selectedOrganisation.value,
     );
+
+    // The existing Klassenzuordnungen that the person has already
+    const existingKlassen: Zuordnung[] | undefined = personenkontextStore.personenuebersicht?.zuordnungen.filter(
+      (zuordnung: Zuordnung) => zuordnung.typ === OrganisationsTyp.Klasse,
+    );
+    // The new selected Klasse to add as a separate Zuordnung
     const klasse: Organisation | undefined = organisationStore.klassen.find(
       (k: Organisation) => k.id === selectedKlasse.value,
     );
+
     if (organisation) {
       newZuordnung.value = {
         sskId: organisation.id,
@@ -550,6 +556,8 @@
         finalZuordnungen.value = zuordnungenResult.value;
         finalZuordnungen.value.push(newZuordnung.value);
       }
+
+      // Add the new selected Klasse to finalZuordnungen
       if (klasse) {
         finalZuordnungen.value.push({
           sskId: klasse.id,
@@ -562,10 +570,29 @@
           typ: OrganisationsTyp.Klasse,
         });
       }
+
+      // Add all existing Klassenzuordnungen to finalZuordnungen
+      if (existingKlassen) {
+        existingKlassen.forEach((existingKlasse: Zuordnung) => {
+          finalZuordnungen.value.push({
+            sskId: existingKlasse.sskId,
+            rolleId: existingKlasse.rolleId,
+            sskDstNr: existingKlasse.sskDstNr,
+            sskName: existingKlasse.sskName,
+            rolle: existingKlasse.rolle,
+            administriertVon: existingKlasse.administriertVon,
+            editable: true,
+            typ: OrganisationsTyp.Klasse,
+          });
+        });
+      }
     }
+
+    // Filter out existing Klassen from zuordnungenResult
     zuordnungenResult.value = zuordnungenResult.value?.filter(
       (zuordnung: Zuordnung) => zuordnung.typ !== OrganisationsTyp.Klasse,
     );
+
     prepareCreation();
   };
 
