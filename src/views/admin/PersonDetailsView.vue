@@ -1037,8 +1037,8 @@
               </v-row>
               <v-container class="px-lg-16">
                 <!-- Organisation, Rolle, Klasse zuordnen -->
-                <PersonenkontextCreate   
-                  data-testid="personenkontext-creation-form"    
+                <PersonenkontextCreate
+                  ref="personenkontext-creation-form"
                   :showHeadline="false"
                   :organisationen="organisationen"
                   :rollen="filteredRollen"
