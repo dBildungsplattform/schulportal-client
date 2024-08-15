@@ -369,8 +369,8 @@
     "cannotDeleteOwnZuordnung": "Sie dürfen sich selbst keine Zuordnungen entziehen.",
     "checkAndSave": "Bitte prüfen und abschließend speichern, um die Aktion auszuführen",
     "changeRolle": "Rolle ändern",
-    "changeKlasse": "Klasse ändern",
-    "changeKlasseConfirmation": "Wollen Sie die Klasse von {oldKlasse} in {newKlasse} ändern?",
+    "changeKlasse": "Klasse versetzen",
+    "changeKlasseConfirmation": "Wollen Sie den Schüler/die Schülerin aus Klasse {oldKlasse} in Klasse {newKlasse} versetzen?",
     "changeKlasseSuccess": "Die Klasse wurde erfolgreich geändert.",
     "changeRolleDescription": "Ändert die Rolle des Benutzers an der Schule ohne ihn zu entfernen.",
     "changeKlasseDescription": "Ändert die Klasse des Benutzers an der Schule.",
@@ -401,8 +401,6 @@
     "rolle": "Rolle",
     "userName": "Benutzername",
     "saveChanges": "Änderungen speichern",
-    "willBeCreated": "wird hinzugefügt",
-    "willBeRemoved": "wird entfernt",
     "zuordnungen": "Schulzuordnung(en)",
     "zuordnung": "Schulzuordnung"
   },
@@ -445,5 +443,7 @@
     "message": "Sie haben nicht gespeicherte Änderungen vorgenommen. Wollen Sie die Seite trotzdem verlassen?",
     "title": "Änderungen vorgenommen"
   },
-  "yes": "Ja"
+  "yes": "Ja",
+  "willBeCreated": "wird hinzugefügt",
+  "willBeRemoved": "wird entfernt"
 }

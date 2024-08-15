@@ -1042,7 +1042,7 @@
                       "
                       class="text-body text-green"
                     >
-                      ({{ $t('person.willBeCreated') }})</span
+                      ({{ $t('willBeCreated') }})</span
                     >
                   </span>
                 </template>
@@ -1060,7 +1060,7 @@
                       v-if="selectedZuordnungen.includes(zuordnung)"
                       class="text-body text-red"
                     >
-                      ({{ $t('person.willBeRemoved') }})</span
+                      ({{ $t('willBeRemoved') }})</span
                     >
                   </span>
                 </template>
@@ -1102,7 +1102,7 @@
                         "
                         class="text-body text-green"
                       >
-                        ({{ $t('person.willBeCreated') }})
+                        ({{ $t('willBeCreated') }})
                       </span>
                     </span>
                   </div>
@@ -1127,7 +1127,7 @@
                     :disabled="selectedZuordnungen.length === 0"
                     :zuordnungCount="zuordnungenResult?.filter((zuordnung) => zuordnung.editable).length"
                     @onDeletePersonenkontext="prepareDeletion"
-               >
+                  >
                   </PersonenkontextDelete>
                   <SpshTooltip
                     :enabledCondition="selectedZuordnungen.length === 0"
@@ -1364,20 +1364,20 @@
                   sm="6"
                   md="auto"
                 >
-                <SpshTooltip
+                  <SpshTooltip
                     :enabledCondition="!isSubmitDisabled"
                     :disabledText="$t('person.changeKlasseNotDisabledDescription')"
                     :enabledText="$t('person.changeKlasse')"
                     position="start"
                   >
-                  <v-btn
-                    :block="mdAndDown"
-                    class="primary"
-                    data-testid="klasse-change-submit-button"
-                    :disabled="isSubmitDisabled"
-                    type="submit"
-                    >{{ $t('person.changeKlasse') }}</v-btn
-                  >
+                    <v-btn
+                      :block="mdAndDown"
+                      class="primary"
+                      data-testid="klasse-change-submit-button"
+                      :disabled="isSubmitDisabled"
+                      type="submit"
+                      >{{ $t('person.changeKlasse') }}</v-btn
+                    >
                   </SpshTooltip>
                 </v-col>
               </v-row>
