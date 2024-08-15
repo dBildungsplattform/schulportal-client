@@ -37,7 +37,7 @@
         "KLASSE_NUR_VON_SCHULE_ADMINISTRIERT": "Klassen dürfen nur von einer Schule administriert werden.",
         "KLASSENNAME_AN_SCHULE_EINDEUTIG": "Der Klassenname existiert bereits an dieser Schule.",
         "ORGANISATION_SPECIFICATION_ERROR": "Die Klasse konnte nicht angelegt werden.",
-        "ORGANISATION_IST_BEREITS_ZUGEWIESEN_ERROR": "Die Klasse ist bereits zugewiesen und kann nicht gelöscht werden."
+        "ORGANISATION_IST_BEREITS_ZUGEWIESEN_ERROR": "Der Klasse sind noch Benutzer zugewiesen und kann nicht gelöscht werden."
       },
       "enterKlassenname": "Klassenname eingeben",
       "klasse": "Klasse",

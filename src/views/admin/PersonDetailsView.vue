@@ -364,7 +364,7 @@
   // Filter out the Rollen based on the user's existing Zuordnungen and selected organization
   const filteredRollen: ComputedRef<RolleWithRollenart[] | undefined> = computed(() => {
     const existingZuordnungen: Zuordnung[] | undefined = personenkontextStore.personenuebersicht?.zuordnungen;
-    const selectedOrgaId: string | undefined = selectedOrganisation.value; 
+    const selectedOrgaId: string | undefined = selectedOrganisation.value;
 
     // Determine if the user already has any LERN roles
     const hasLernRolle: boolean =
