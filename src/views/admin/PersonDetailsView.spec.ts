@@ -212,7 +212,7 @@ describe('PersonDetailsView', () => {
     await nextTick();
 
     const orgaSearchInput: VueWrapper | undefined = wrapper
-      ?.findComponent({ ref: 'personenkontext-creation-form' })
+      ?.find('[data-testid="personenkontext-creation-form"]')
       .findComponent({ ref: 'organisation-select' });
 
     await orgaSearchInput?.vm.$emit('update:search', '2');
@@ -220,7 +220,7 @@ describe('PersonDetailsView', () => {
     await nextTick();
 
     const rolleSearchInput: VueWrapper | undefined = wrapper
-      ?.findComponent({ ref: 'personenkontext-creation-form' })
+      ?.find('[data-testid="personenkontext-creation-form"]')
       .findComponent({ ref: 'rolle-select' });
 
     await rolleSearchInput?.vm.$emit('update:search', '54321');
