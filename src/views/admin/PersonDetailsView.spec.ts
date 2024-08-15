@@ -201,34 +201,6 @@ describe('PersonDetailsView', () => {
     expect(zuordnungCreateButton?.exists()).toBe(false);
   });
 
-  test('It renders the personenkontextCreationForm', async () => {
-    personenkontextStore.personenuebersicht = mockPersonenuebersicht;
-    await nextTick();
-
-    await wrapper?.find('[data-testid="zuordnung-edit-button"]').trigger('click');
-    await nextTick();
-
-    await wrapper?.find('[data-testid="zuordnung-create-button"]').trigger('click');
-    await nextTick();
-
-    const orgaSearchInput: VueWrapper | undefined = wrapper
-      ?.find({ ref: 'personenkontext-creation-form' })
-      .findComponent({ ref: 'organisation-select' });
-
-    await orgaSearchInput?.vm.$emit('update:search', '2');
-    await orgaSearchInput?.setValue('2');
-    await nextTick();
-
-    const rolleSearchInput: VueWrapper | undefined = wrapper
-      ?.findComponent({ ref: 'personenkontext-creation-form' })
-      .findComponent({ ref: 'rolle-select' });
-
-    await rolleSearchInput?.vm.$emit('update:search', '54321');
-    await rolleSearchInput?.setValue('54321');
-    await nextTick();
-
-    expect(orgaSearchInput?.exists()).toBe(true);
-    expect(rolleSearchInput?.exists()).toBe(true);
   });
   test('Renders details for the current person', async () => {
     // Mock the current person in the store

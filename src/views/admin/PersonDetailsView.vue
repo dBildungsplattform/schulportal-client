@@ -1038,7 +1038,6 @@
               <v-container class="px-lg-16">
                 <!-- Organisation, Rolle, Klasse zuordnen -->
                 <PersonenkontextCreate
-                  ref="personenkontext-creation-form"
                   :showHeadline="false"
                   :organisationen="organisationen"
                   :rollen="filteredRollen"
