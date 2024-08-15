@@ -1,5 +1,5 @@
 import { expect, test, type MockInstance } from 'vitest';
-import { VueWrapper, mount } from '@vue/test-utils';
+import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
 import { createRouter, createWebHistory, type NavigationFailure, type RouteLocationRaw, type Router } from 'vue-router';
 import routes from '@/router/routes';
 import PersonDetailsView from './PersonDetailsView.vue';
@@ -165,5 +165,34 @@ describe('PersonDetailsView', () => {
     await nextTick();
 
     expect(zuordnungCreateButton?.exists()).toBe(false);
+  });
+  test('It does not trigger addition because orga and rolle dont match', async () => {
+    await wrapper?.find('[data-testid="zuordnung-edit-button"]').trigger('click');
+    await nextTick();
+
+    await wrapper?.find('[data-testid="zuordnung-create-button"]').trigger('click');
+    await nextTick();
+
+    const organisationAutocomplete: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'personenkontext-creation-form' })
+      .findComponent({ ref: 'organisation-select' });
+    await organisationAutocomplete?.vm.$emit('update:search', 'e6c08273-5bc9-4754-988f-02eedfd0d523');
+    await organisationAutocomplete?.setValue('e6c08273-5bc9-4754-988f-02eedfd0d523');
+    await nextTick();
+
+    const rolleAutocomplete: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'personenkontext-creation-form' })
+      .findComponent({ ref: 'rolle-select' });
+    await rolleAutocomplete?.vm.$emit('update:search', 'ab3c76c5-54c4-412b-b97a-4b1a161932f3');
+    await rolleAutocomplete?.setValue('ab3c76c5-54c4-412b-b97a-4b1a161932f3');
+    await nextTick();
+
+    await wrapper?.find('[data-testid="zuordnung-creation-submit-button"]').trigger('click');
+    await nextTick();
+
+    const confirmationMessage: DOMWrapper<Element> | undefined = wrapper?.find(
+      '[data-testid="create-zuordnung-confirmation-dialog-message"]',
+    );
+    expect(confirmationMessage?.exists()).toBe(false);
   });
 });

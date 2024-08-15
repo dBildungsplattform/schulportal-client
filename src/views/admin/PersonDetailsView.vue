@@ -1323,6 +1323,7 @@
                   @update:selectedKlasse="(value: string) => (selectedKlasse = value)"
                   @update:canCommit="canCommit = $event"
                   @fieldReset="handleFieldReset"
+                  ref="personenkontext-creation-form"
                 />
               </v-container>
               <v-row class="py-3 px-2 justify-center">
@@ -1604,7 +1605,9 @@
                 offset="1"
                 cols="10"
               >
-                <span>{{ createZuordnungConfirmationDialogMessage }}</span>
+                <span data-testid="create-zuordnung-confirmation-dialog-message">{{
+                  createZuordnungConfirmationDialogMessage
+                }}</span>
               </v-col>
             </v-row>
           </v-container>
@@ -1619,6 +1622,7 @@
               <v-btn
                 :block="mdAndDown"
                 class="primary"
+                data-testid="confirm-dialog-addition-button"
                 @click.stop="confirmDialogAddition"
               >
                 {{ $t('yes') }}
