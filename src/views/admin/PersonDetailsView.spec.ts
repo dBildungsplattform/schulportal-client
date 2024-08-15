@@ -64,6 +64,16 @@ const mockPersonenuebersicht: Uebersicht = {
       administriertVon: '1',
       editable: true,
     },
+    {
+      sskId: '2',
+      rolleId: '54321',
+      sskName: '9a',
+      sskDstNr: '123459',
+      rolle: 'SuS',
+      typ: OrganisationsTyp.Klasse,
+      administriertVon: '1',
+      editable: true,
+    },
   ],
 };
 
@@ -107,6 +117,25 @@ organisationStore.klassen = [
     administriertVon: '1',
   },
 ];
+
+personenkontextStore.workflowStepResponse = {
+  rollen: [
+    {
+      administeredBySchulstrukturknoten: '1234',
+      rollenart: 'LERN',
+      name: 'SuS',
+      merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RollenMerkmal>,
+      systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
+      createdAt: '2022',
+      updatedAt: '2022',
+      id: '54321',
+    },
+  ],
+  organisations: [],
+  selectedOrganisation: null,
+  selectedRolle: null,
+  canCommit: true,
+};
 
 personStore.currentPerson = mockPerson;
 personenkontextStore.personenuebersicht = mockPersonenuebersicht;
@@ -165,5 +194,32 @@ describe('PersonDetailsView', () => {
     await nextTick();
 
     expect(zuordnungCreateButton?.exists()).toBe(false);
+  });
+
+  test('It renders the personenkontextCreationForm', async () => {
+    await wrapper?.find('[data-testid="zuordnung-edit-button"]').trigger('click');
+    await nextTick();
+
+    await wrapper?.find('[data-testid="zuordnung-create-button"]').trigger('click');
+    await nextTick();
+
+    const orgaSearchInput: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'personenkontext-creation-form' })
+      .findComponent({ ref: 'organisation-select' });
+
+    await orgaSearchInput?.vm.$emit('update:search', '2');
+    await orgaSearchInput?.setValue('2');
+    await nextTick();
+
+    const rolleSearchInput: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'personenkontext-creation-form' })
+      .findComponent({ ref: 'rolle-select' });
+
+    await rolleSearchInput?.vm.$emit('update:search', '54321');
+    await rolleSearchInput?.setValue('54321');
+    await nextTick();
+
+    expect(orgaSearchInput?.exists()).toBe(true);
+    expect(rolleSearchInput?.exists()).toBe(true);
   });
 });
