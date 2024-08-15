@@ -201,7 +201,6 @@ describe('PersonDetailsView', () => {
     expect(zuordnungCreateButton?.exists()).toBe(false);
   });
 
-  });
   test('Renders details for the current person', async () => {
     // Mock the current person in the store
     personStore.currentPerson = {
