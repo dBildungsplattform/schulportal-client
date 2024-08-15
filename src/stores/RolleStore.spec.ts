@@ -29,7 +29,7 @@ describe('rolleStore', () => {
   });
 
   describe('createRolle', () => {
-    it('should create role and update state', async () => {
+    it('should create rolle and update state', async () => {
       const mockResponse: RolleResponse[] = [
         {
           administeredBySchulstrukturknoten: '1234',
@@ -106,8 +106,8 @@ describe('rolleStore', () => {
         },
       ];
 
-      mockadapter.onGet('/api/rolle?searchStr=').replyOnce(200, mockResponse, {});
-      const getAllRollenPromise: Promise<void> = rolleStore.getAllRollen('');
+      mockadapter.onGet('/api/rolle?offset=0&limit=30&searchStr=').replyOnce(200, mockResponse, {});
+      const getAllRollenPromise: Promise<void> = rolleStore.getAllRollen({ offset: 0, limit: 30, searchString: '' });
       expect(rolleStore.loading).toBe(true);
       await getAllRollenPromise;
       expect(rolleStore.allRollen).toEqual([...mockResponse]);
@@ -115,8 +115,8 @@ describe('rolleStore', () => {
     });
 
     it('should handle string error', async () => {
-      mockadapter.onGet('/api/rolle?searchStr=').replyOnce(500, 'some mock server error');
-      const getAllRollenPromise: Promise<void> = rolleStore.getAllRollen('');
+      mockadapter.onGet('/api/rolle?offset=0&limit=30&searchStr=').replyOnce(500, 'some mock server error');
+      const getAllRollenPromise: Promise<void> = rolleStore.getAllRollen({ offset: 0, limit: 30, searchString: '' });
       expect(rolleStore.loading).toBe(true);
       await getAllRollenPromise;
       expect(rolleStore.errorCode).toEqual('UNSPECIFIED_ERROR');
@@ -125,8 +125,8 @@ describe('rolleStore', () => {
     });
 
     it('should handle error code', async () => {
-      mockadapter.onGet('/api/rolle?searchStr=').replyOnce(500, { code: 'some mock server error' });
-      const getAllRollenPromise: Promise<void> = rolleStore.getAllRollen('');
+      mockadapter.onGet('/api/rolle?offset=0&limit=30&searchStr=').replyOnce(500, { code: 'some mock server error' });
+      const getAllRollenPromise: Promise<void> = rolleStore.getAllRollen({ offset: 0, limit: 30, searchString: '' });
       expect(rolleStore.loading).toBe(true);
       await getAllRollenPromise;
       expect(rolleStore.errorCode).toEqual('some mock server error');
