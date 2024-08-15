@@ -99,7 +99,9 @@
         "softwareOnDevice": "Stellen Sie, bevor Sie fortfahren, sicher, dass einen entsprechende Software auf Ihrem Endgerät installiert ist (z.B. FreeOTP).",
         "pleaseScan": "Bitte scannen Sie den QR-Code mit Ihrer 2FA-App (z.B. FreeOTP).",
         "enterOtp": "Bitte geben Sie das angezeigte Einmal-Passwort ein, um die Einrichtung abzuschließen.",
-        "invalidOtp": "Ungültiger Code. Bitte versuchen Sie es erneut."
+        "invalidOtp": "Ungültiger Code. Bitte versuchen Sie es erneut.",
+        "otp": "Einmal-Passwort",
+        "SecondFactorNotSet": "Es wurde noch kein zweiter Faktor für Sie eingerichtet."
       },
       "copyPasswordError": "Passwort konnte nicht in die Zwischenablage kopiert werden",
       "copyPasswordSuccess": "Passwort in Zwischenablage kopiert",

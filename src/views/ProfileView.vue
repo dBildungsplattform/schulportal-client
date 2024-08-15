@@ -330,6 +330,15 @@
               class="w-100"
               icon="mdi-shield-account-outline"
             ></v-icon>
+            <v-row class="mt-4 text-body align-content-center justify-center">
+              <v-icon
+                icon="mdi-alert-circle"
+                color="orange"
+              ></v-icon>
+              <p class="ml-2">
+                {{ $t('admin.person.twoFactorAuthentication.SecondFactorNotSet') }}
+              </p>
+            </v-row>
             <div>
               <SelfServiceWorkflow
                 :personId="personStore.currentPerson?.person.id ?? ''"

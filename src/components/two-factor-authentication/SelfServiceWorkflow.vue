@@ -120,7 +120,10 @@
             </v-row>
             <v-row class="text-body px-md-16 mt-6">
               <v-col class="d-flex">
-                <v-icon icon="mdi-information"> </v-icon>
+                <v-icon
+                  icon="mdi-alert-circle"
+                  color="orange"
+                ></v-icon>
                 <span class="ml-4">
                   {{ $t('admin.person.twoFactorAuthentication.softwareOnDevice') }}
                 </span>
@@ -201,7 +204,7 @@
                   v-if="errorMessage.length === 0"
                   class="text-body justify-center"
                 >
-                  <p class="justify-center">Einmal-Passwort</p>
+                  <p class="justify-center">´{{ $t('admin.person.twoFactorAuthentication.otp') }}</p>
                 </v-row>
               </v-col>
             </v-row>
