@@ -1050,6 +1050,7 @@
                 <template v-if="!pendingDeletion && !pendingCreation && !pendingChangeKlasse">
                   <div class="checkbox-div">
                     <v-checkbox
+                    data-testid="checkbox"
                       v-model="selectedZuordnungen"
                       :value="zuordnung"
                     >
@@ -1323,7 +1324,6 @@
                   @update:selectedKlasse="(value: string) => (selectedKlasse = value)"
                   @update:canCommit="canCommit = $event"
                   @fieldReset="handleFieldReset"
-                  ref="personenkontext-creation-form"
                 />
               </v-container>
               <v-row class="py-3 px-2 justify-center">
