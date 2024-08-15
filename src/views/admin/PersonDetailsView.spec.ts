@@ -13,7 +13,6 @@ import { usePersonenkontextStore, type PersonenkontextStore, type Uebersicht } f
 import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
 import { RollenMerkmal, RollenSystemRecht } from '@/stores/RolleStore';
 import { nextTick } from 'vue';
-import type WrapperLike from '@vue/test-utils/dist/interfaces/wrapperLike';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
