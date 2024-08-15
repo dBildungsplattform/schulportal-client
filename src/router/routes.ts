@@ -63,7 +63,7 @@ const routes: readonly RouteRecordRaw[] = [
   {
     path: '/admin/klassen/:id',
     name: 'klasse-details',
-    component: () => import('../views/admin/KlassenDetailsView.vue'),
+    component: () => import('../views/admin/KlasseDetailsView.vue'),
     meta: {
       layout: 'AdminLayout',
       requiresAuth: true,
