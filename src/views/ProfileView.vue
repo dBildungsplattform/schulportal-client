@@ -352,7 +352,7 @@
                         ></v-icon>
                       </v-col>
                       <v-col>
-                        <p class="text-body">
+                        <p class="text-body bold">
                           {{ $t('profile.changePasswordInfo') }}
                         </p>
                       </v-col>
@@ -429,7 +429,7 @@
     >
       <LayoutCard
         :closable="true"
-        :header="kcActionStatus == 'success' ? $t('profile.success') : $t('profile.error')"
+        :header="$t('profile.changePassword')"
         @onCloseClicked="closeChangePasswordDialog()"
       >
         <v-card-text>
@@ -445,7 +445,7 @@
               ></v-icon>
             </v-col>
             <v-col>
-              <p class="text-body">
+              <p class="text-body bold">
                 {{
                   kcActionStatus == 'success'
                     ? $t('profile.successFullPasswordChange')

@@ -397,7 +397,7 @@
     "dienstStellenNummerAbbr": "DStNr.",
     "password": "Passwort",
     "changePassword": "Passwort ändern",
-    "changePasswordInfo": "Um das Passwort zu ändern ist eine erneute Anmeldung erforderlich. Nach erfolgreicher Eingabe Ihres aktuellen Passworts können Sie ein neues festlegen.",
+    "changePasswordInfo": "Um das Passwort zu ändern, ist eine erneute Anmeldung erforderlich. Nach erfolgreicher Eingabe Ihres aktuellen Passworts können Sie ein Neues festlegen.",
     "saveNewPassword": "Neues Passwort speichern",
     "setNewPassword": "Neues Passwort setzen",
     "twoFactorAuth": "Zwei-Faktor-Authentifizierung",
