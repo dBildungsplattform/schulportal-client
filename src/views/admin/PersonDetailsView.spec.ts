@@ -202,6 +202,9 @@ describe('PersonDetailsView', () => {
   });
 
   test('It renders the personenkontextCreationForm', async () => {
+    personenkontextStore.personenuebersicht = mockPersonenuebersicht;
+    await nextTick();
+
     await wrapper?.find('[data-testid="zuordnung-edit-button"]').trigger('click');
     await nextTick();
 
