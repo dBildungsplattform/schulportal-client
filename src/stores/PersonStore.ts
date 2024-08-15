@@ -99,7 +99,6 @@ type PersonState = {
   loading: boolean;
   totalPersons: number;
   currentPerson: Personendatensatz | null;
-  twoFactorState: TwoFactorState;
   personenWithUebersicht: PersonenWithRolleAndZuordnung | null;
   personenuebersicht: DBiamPersonenuebersichtResponse | null;
 };

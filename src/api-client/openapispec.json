@@ -1595,6 +1595,55 @@
         ]
       }
     },
+    "/api/organisationen/{organisationId}/klasse": {
+      "delete": {
+        "operationId": "OrganisationController_deleteKlasse",
+        "summary": "",
+        "description": "Delete an organisation of type Klasse by id.",
+        "parameters": [
+          {
+            "name": "organisationId",
+            "required": true,
+            "in": "path",
+            "description": "The id of an organization",
+            "schema": {
+              "nullable": false,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The organisation was deleted successfully."
+          },
+          "400": {
+            "description": "The input was not valid.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DbiamOrganisationError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authorized to delete the organisation."
+          },
+          "404": {
+            "description": "The organisation that should be deleted does not exist."
+          }
+        },
+        "tags": ["organisationen"],
+        "security": [
+          {
+            "oauth2": ["openid"]
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/organisationen/{organisationId}/name": {
       "patch": {
         "operationId": "OrganisationController_updateOrganisationName",
@@ -1988,7 +2037,7 @@
           }
         ],
         "responses": {
-          "200": {
+          "204": {
             "description": "Role was deleted successfully."
           },
           "400": {
@@ -4076,6 +4125,7 @@
               "ROOT_ORGANISATION_IMMUTABLE",
               "KLASSE_NUR_VON_SCHULE_ADMINISTRIERT",
               "KLASSENNAME_AN_SCHULE_EINDEUTIG",
+              "ORGANISATION_IST_BEREITS_ZUGEWIESEN_ERROR",
               "NAME_REQUIRED_FOR_KLASSE",
               "NAME_ENTHAELT_LEERZEICHEN",
               "KENNUNG_ENTHAELT_LEERZEICHEN"
@@ -4863,11 +4913,14 @@
           "otp": {
             "type": "string"
           },
-          "user": {
+          "referrer": {
+            "type": "string"
+          },
+          "userId": {
             "type": "string"
           }
         },
-        "required": ["serial", "otp", "user"]
+        "required": ["serial", "otp", "referrer", "userId"]
       },
       "AssignHardwareTokenResponse": {
         "type": "object",

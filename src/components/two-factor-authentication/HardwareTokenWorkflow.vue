@@ -5,15 +5,24 @@
   import { usePersonStore, type Personendatensatz, type PersonStore } from '@/stores/PersonStore';
   import axios from 'axios';
   import { useI18n, type Composer } from 'vue-i18n';
+  import type { AssignHardwareTokenBodyParams } from '@/api-client/generated';
 
   const { t }: Composer = useI18n({ useScope: 'global' });
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
   const dialogText: Ref<string> = ref('');
-  const proceeded: Ref<boolean> = ref(false);
+  const hardwareTokenIsAssigned: Ref<boolean> = ref(false);
   const errorThrown: Ref<boolean> = ref(false);
   const personStore: PersonStore = usePersonStore();
-  // eslint-disable-next-line @typescript-eslint/typedef
-  const emits = defineEmits(['updateHeader', 'onCloseClicked']);
+
+  type Emits = {
+    (event: 'updateHeader', header: string): void;
+    (event: 'onCloseClicked'): void;
+  };
+
+  const emits: Emits = defineEmits<{
+    (event: 'updateHeader', header: string): void;
+    (event: 'onCloseClicked'): void;
+  }>();
   emits('updateHeader', 'Hardware-Token zuordnen');
 
   const serial: Ref<string> = ref('');
@@ -42,7 +51,7 @@
       serial.value = '';
       otp.value = '';
       dialogText.value = '';
-      proceeded.value = false;
+      hardwareTokenIsAssigned.value = false;
       errorThrown.value = false;
       emits('updateHeader', 'Hardware-Token zuordnen');
     } else {
@@ -51,22 +60,27 @@
   }
 
   async function assignHardwareToken(): Promise<void> {
-    const referrer: string | null = props.person.person.referrer;
-    if (!referrer) return;
+    if (!props.person.person.referrer) return;
     try {
-      await personStore.assignHardwareToken(referrer, serial.value, otp.value);
+      const assignHardwareTokenBodyParams: AssignHardwareTokenBodyParams = {
+        serial: serial.value,
+        otp: otp.value,
+        referrer: props.person.person.referrer,
+        userId: props.person.person.id,
+      };
+      await personStore.assignHardwareToken(assignHardwareTokenBodyParams);
       dialogText.value = t('admin.person.twoFactorAuthentication.hardwareTokenSetUpSuccess');
     } catch (error) {
       emits('updateHeader', t('admin.person.twoFactorAuthentication.hardwareTokenSetUpFailure'));
       handleApiError(error);
     } finally {
-      proceeded.value = true;
+      hardwareTokenIsAssigned.value = true;
     }
   }
 </script>
 
 <template v-slot:activator="{ props }">
-  <v-container v-if="!proceeded">
+  <v-container v-if="!hardwareTokenIsAssigned">
     <v-col md="10">
       <FormRow
         :errorLabel="''"
@@ -76,12 +90,12 @@
       >
         <v-text-field
           clearable
-          data-testid="rollenname-input"
+          data-testid="hardwareToken-input"
           density="compact"
           :disabled="false"
-          id="rollenname-input"
+          id="hardwareToken-input"
           :placeholder="'Seriennummer'"
-          ref="rollenname-input"
+          ref="hardwareToken-input"
           required="true"
           variant="outlined"
           v-model="serial"
@@ -95,12 +109,12 @@
       >
         <v-text-field
           clearable
-          data-testid="rollenname-input"
+          data-testid="hardwareToken-input"
           density="compact"
           :disabled="false"
-          id="rollenname-input"
+          id="hardwareToken-input"
           :placeholder="'Code'"
-          ref="rollenname-input"
+          ref="hardwareToken-input"
           required="true"
           variant="outlined"
           v-model="otp"
@@ -108,7 +122,7 @@
       </FormRow>
     </v-col>
   </v-container>
-  <v-container v-if="proceeded">
+  <v-container v-if="hardwareTokenIsAssigned">
     <v-row class="justify-center">{{ dialogText }}</v-row>
   </v-container>
   <v-card-actions class="justify-center">
@@ -120,15 +134,15 @@
       >
         <v-btn
           :block="mdAndDown"
-          :class="proceeded ? 'primary button' : 'secondary button'"
+          :class="hardwareTokenIsAssigned ? 'primary button' : 'secondary button'"
           @click="cancelCheck()"
           data-testid="close-two-way-authentification-dialog-button"
         >
-          {{ proceeded ? $t('close') : $t('cancel') }}
+          {{ hardwareTokenIsAssigned ? $t('close') : $t('cancel') }}
         </v-btn>
       </v-col>
       <v-col
-        v-if="!proceeded"
+        v-if="!hardwareTokenIsAssigned"
         cols="12"
         sm="6"
         md="4"
@@ -140,7 +154,7 @@
           @click="assignHardwareToken()"
           :disabled="!serial || !otp"
         >
-          {{ $t('admin.person.twoFactorAuthentication.hardwareTokenSetUpButton') }}
+          {{ $t('admin.person.twoFactorAuthentication.setUp') }}
         </v-btn>
       </v-col>
     </v-row>
