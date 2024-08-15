@@ -398,7 +398,14 @@
 
   // Triggers the template to change the Klasse. Also pre-select the Schule and Klasse.
   const triggerChangeKlasse = async (): Promise<void> => {
+    // Auto select the new Schule
     selectedSchule.value = selectedZuordnungen.value[0]?.sskId;
+    // Retrieves the new Klasse from the selected Zuordnung
+    const newKlasse: Organisation | undefined = organisationStore.klassen.find(
+      (k: Organisation) => k.name === selectedZuordnungen.value[0]?.klasse,
+    );
+    // Auto select the new Klasse
+    selectedNewKlasse.value = newKlasse?.id;
     if (selectedZuordnungen.value[0]?.sskId) {
       await organisationStore.getKlassenByOrganisationId(selectedZuordnungen.value[0]?.sskId);
     }
