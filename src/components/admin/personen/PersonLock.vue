@@ -155,6 +155,8 @@
                   data-testid="lock-user-info-text"
                   class="text-body"
                 >
+                  <v-icon icon="mdi-information-slab-circle-outline"></v-icon>
+
                   {{ !person.person.isLocked ? $t('person.lockUserInfoText') : $t('person.unLockUserInfoText') }}
                 </p>
               </v-col>
