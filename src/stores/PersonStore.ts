@@ -57,6 +57,8 @@ type PersonState = {
 };
 
 export type PersonFilter = {
+  limit?: number;
+  offset?: number;
   organisationIDs?: Array<string>;
   rolleIDs?: Array<string>;
   searchFilter?: string;
@@ -102,8 +104,8 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
       try {
         const { data }: AxiosResponse<PersonFrontendControllerFindPersons200Response> =
           await personenFrontendApi.personFrontendControllerFindPersons(
-            undefined,
-            undefined,
+            filter.offset,
+            filter.limit,
             undefined,
             undefined,
             undefined,
