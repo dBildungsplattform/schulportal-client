@@ -1564,7 +1564,7 @@
     >
       <LayoutCard
         :closable="true"
-        :header="$t('person.editZuordnungen')"
+        :header="$t('transfer')"
         @onCloseClicked="closeChangeKlasseSuccessDialog"
       >
         <v-card-text>
