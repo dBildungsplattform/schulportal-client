@@ -14,6 +14,7 @@
     onDiscard: () => void;
     onSubmit: () => void;
     showUnsavedChangesDialog?: boolean;
+    centerButtons?: boolean;
   };
   // Type annotation for props
   type PropsWithDefaults = Props & {
@@ -68,7 +69,11 @@
       class="py-3 px-2 justify-center"
       v-if="!hideActions"
     >
-      <v-spacer class="hidden-sm-and-down"></v-spacer>
+      <v-spacer
+        class="hidden-sm-and-down"
+        v-if="!centerButtons"
+      >
+      </v-spacer>
       <v-col
         cols="12"
         sm="6"

@@ -1,18 +1,27 @@
 <script setup lang="ts">
-  import { useDisplay } from 'vuetify';
   import FormRow from '@/components/form/FormRow.vue';
-  import { ref, type Ref } from 'vue';
-  import { usePersonStore, type Personendatensatz, type PersonStore } from '@/stores/PersonStore';
+  import { onMounted, onUnmounted, ref, type Ref } from 'vue';
   import axios from 'axios';
   import { useI18n, type Composer } from 'vue-i18n';
   import type { AssignHardwareTokenBodyParams } from '@/api-client/generated';
+  import { object, string } from 'yup';
+  import { toTypedSchema } from '@vee-validate/yup';
+  import { useForm, type BaseFieldProps, type TypedSchema } from 'vee-validate';
+  import { onBeforeRouteLeave, type RouteLocationNormalized, type NavigationGuardNext } from 'vue-router';
+  import FormWrapper from '@/components/form/FormWrapper.vue';
+  import {
+    useTwoFactorAuthentificationStore,
+    type TwoFactorAuthentificationStore,
+  } from '@/stores/TwoFactorAuthentificationStore';
+  import { useDisplay } from 'vuetify';
+  import type { Personendatensatz } from '@/stores/PersonStore';
 
   const { t }: Composer = useI18n({ useScope: 'global' });
-  const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
   const dialogText: Ref<string> = ref('');
   const hardwareTokenIsAssigned: Ref<boolean> = ref(false);
   const errorThrown: Ref<boolean> = ref(false);
-  const personStore: PersonStore = usePersonStore();
+  const twoFactoreAuthentificationStore: TwoFactorAuthentificationStore = useTwoFactorAuthentificationStore();
+  const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
   type Emits = {
     (event: 'updateHeader', header: string): void;
@@ -25,20 +34,25 @@
   }>();
   emits('updateHeader', 'Hardware-Token zuordnen');
 
-  const serial: Ref<string> = ref('');
-  const otp: Ref<string> = ref('');
-
   type Props = {
     errorCode: string;
     person: Personendatensatz;
   };
+
+  type HardwareTokenFormType = {
+    selectedSeriennummer: string;
+    selectedOtp: string;
+  };
+
   const props: Props = defineProps<Props>();
 
   function handleApiError(error: unknown): void {
     errorThrown.value = true;
     if (axios.isAxiosError(error)) {
-      if (error.response && error.response.data) {
-        const message: string = error.response.data.message || 'An unexpected error occurred.';
+      if (error.response && error.response.data.i18nKey) {
+        const message: string =
+          t('admin.person.twoFactorAuthentication.errors.' + error.response.data.i18nKey) ||
+          'An unexpected error occurred.';
         dialogText.value = message;
       } else {
         dialogText.value = 'An unexpected error occurred.';
@@ -48,27 +62,98 @@
 
   function cancelCheck(): void {
     if (errorThrown.value) {
-      serial.value = '';
-      otp.value = '';
       dialogText.value = '';
       hardwareTokenIsAssigned.value = false;
       errorThrown.value = false;
-      emits('updateHeader', 'Hardware-Token zuordnen');
+      emits('updateHeader', 'admin.person.twoFactorAuthentication.hardwareTokenOption');
     } else {
       emits('onCloseClicked');
     }
   }
 
+  const validationSchema: TypedSchema = toTypedSchema(
+    object({
+      selectedSeriennummer: string().required(t('admin.person.twoFactorAuthentication.serialNotSelected')),
+      selectedOtp: string()
+        .required(t('admin.person.twoFactorAuthentication.otpNotSelected'))
+        .max(6, t('admin.person.twoFactorAuthentication.otpLengthInvalid')),
+    }),
+  );
+
+  // eslint-disable-next-line @typescript-eslint/typedef
+  const { defineField, handleSubmit, isFieldDirty, resetForm } = useForm<HardwareTokenFormType>({
+    validationSchema,
+  });
+
+  const getVuetifyConfig = (state: {
+    errors: Array<string>;
+  }): { props: { error: boolean; 'error-messages': Array<string> } } => ({
+    props: {
+      error: !!state.errors.length,
+      'error-messages': state.errors,
+    },
+  });
+
+  const vuetifyConfig = (state: {
+    errors: Array<string>;
+  }): { props: { error: boolean; 'error-messages': Array<string> } } => getVuetifyConfig(state);
+
+  const [selectedSeriennummer, selectedSeriennummerProps]: [
+    Ref<string>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = defineField('selectedSeriennummer', vuetifyConfig);
+
+  const [selectedOtp, selectedOtpProps]: [
+    Ref<string>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = defineField('selectedOtp', vuetifyConfig);
+
+  function isFormDirty(): boolean {
+    return isFieldDirty('selectedSeriennummer') || isFieldDirty('selectedOtp');
+  }
+
+  function preventNavigation(event: BeforeUnloadEvent): void {
+    if (!isFormDirty()) return;
+    event.preventDefault();
+    /* Chrome requires returnValue to be set. */
+    event.returnValue = '';
+  }
+
+  const showUnsavedChangesDialog: Ref<boolean> = ref(false);
+  let blockedNext: () => void = () => {};
+
+  onBeforeRouteLeave((_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
+    if (isFormDirty()) {
+      showUnsavedChangesDialog.value = true;
+      blockedNext = next;
+    } else {
+      next();
+    }
+  });
+
+  function handleConfirmUnsavedChanges(): void {
+    blockedNext();
+  }
+
+  onMounted(async () => {
+    /* listen for browser changes and prevent them when form is dirty */
+    window.addEventListener('beforeunload', preventNavigation);
+  });
+
+  onUnmounted(() => {
+    window.removeEventListener('beforeunload', preventNavigation);
+  });
+
   async function assignHardwareToken(): Promise<void> {
     if (!props.person.person.referrer) return;
     try {
       const assignHardwareTokenBodyParams: AssignHardwareTokenBodyParams = {
-        serial: serial.value,
-        otp: otp.value,
+        serial: selectedSeriennummer.value,
+        otp: selectedOtp.value,
         referrer: props.person.person.referrer,
         userId: props.person.person.id,
       };
-      await personStore.assignHardwareToken(assignHardwareTokenBodyParams);
+      await twoFactoreAuthentificationStore.assignHardwareToken(assignHardwareTokenBodyParams);
       dialogText.value = t('admin.person.twoFactorAuthentication.hardwareTokenSetUpSuccess');
     } catch (error) {
       emits('updateHeader', t('admin.person.twoFactorAuthentication.hardwareTokenSetUpFailure'));
@@ -77,16 +162,31 @@
       hardwareTokenIsAssigned.value = true;
     }
   }
+
+  const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = handleSubmit(async () => {
+    assignHardwareToken();
+    resetForm();
+  });
 </script>
 
 <template v-slot:activator="{ props }">
   <v-container v-if="!hardwareTokenIsAssigned">
-    <v-col md="10">
+    <FormWrapper
+      :confirmUnsavedChangesAction="handleConfirmUnsavedChanges"
+      :createButtonLabel="$t('admin.person.twoFactorAuthentication.setUp')"
+      :discardButtonLabel="$t('cancel')"
+      id="schule-creation-form"
+      :onDiscard="cancelCheck"
+      @onShowDialogChange="(value: boolean) => (showUnsavedChangesDialog = value)"
+      :centerButtons="true"
+      :onSubmit="onSubmit"
+      :showUnsavedChangesDialog="showUnsavedChangesDialog"
+    >
       <FormRow
         :errorLabel="''"
         labelForId="serial-input"
         :isRequired="true"
-        :label="'Seriennummer'"
+        :label="t('admin.person.twoFactorAuthentication.serial')"
       >
         <v-text-field
           clearable
@@ -94,18 +194,19 @@
           density="compact"
           :disabled="false"
           id="hardwareToken-input"
-          :placeholder="'Seriennummer'"
+          :placeholder="t('admin.person.twoFactorAuthentication.serial')"
           ref="hardwareToken-input"
           required="true"
           variant="outlined"
-          v-model="serial"
+          v-model="selectedSeriennummer"
+          v-bind="selectedSeriennummerProps"
         ></v-text-field>
       </FormRow>
       <FormRow
         :errorLabel="''"
         labelForId="otp-input"
         :isRequired="true"
-        :label="'Aktuell angezeigter Code'"
+        :label="t('admin.person.twoFactorAuthentication.currentOtp')"
       >
         <v-text-field
           clearable
@@ -113,19 +214,23 @@
           density="compact"
           :disabled="false"
           id="hardwareToken-input"
-          :placeholder="'Code'"
+          :placeholder="t('admin.person.twoFactorAuthentication.Code')"
           ref="hardwareToken-input"
           required="true"
           variant="outlined"
-          v-model="otp"
+          v-model="selectedOtp"
+          v-bind="selectedOtpProps"
         ></v-text-field>
       </FormRow>
-    </v-col>
+    </FormWrapper>
   </v-container>
   <v-container v-if="hardwareTokenIsAssigned">
-    <v-row class="justify-center">{{ dialogText }}</v-row>
+    <v-row class="justify-center text-body bold">{{ dialogText }}</v-row>
   </v-container>
-  <v-card-actions class="justify-center">
+  <v-card-actions
+    class="justify-center"
+    v-if="errorThrown"
+  >
     <v-row class="justify-center">
       <v-col
         cols="12"
@@ -134,27 +239,11 @@
       >
         <v-btn
           :block="mdAndDown"
-          :class="hardwareTokenIsAssigned ? 'primary button' : 'secondary button'"
+          class="primary button"
           @click="cancelCheck()"
           data-testid="close-two-way-authentification-dialog-button"
         >
           {{ hardwareTokenIsAssigned ? $t('close') : $t('cancel') }}
-        </v-btn>
-      </v-col>
-      <v-col
-        v-if="!hardwareTokenIsAssigned"
-        cols="12"
-        sm="6"
-        md="4"
-      >
-        <v-btn
-          class="primary button"
-          :block="mdAndDown"
-          data-testid="two-way-authentification-set-up-button"
-          @click="assignHardwareToken()"
-          :disabled="!serial || !otp"
-        >
-          {{ $t('admin.person.twoFactorAuthentication.setUp') }}
         </v-btn>
       </v-col>
     </v-row>
