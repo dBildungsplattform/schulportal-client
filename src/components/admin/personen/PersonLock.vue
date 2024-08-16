@@ -89,7 +89,7 @@
     <template v-slot:default="{ isActive }">
       <LayoutCard
         :closable="true"
-        :header="props.person.person.isLocked ? $t('person.lockUser') : $t('person.unlockUser')"
+        :header="!person.person.isLocked ? $t('person.lockUser') : $t('person.unlockUser')"
         @onCloseClicked="closeLockPersonDialog(isActive)"
       >
         <v-card-text>
@@ -155,7 +155,7 @@
                   data-testid="lock-user-info-text"
                   class="text-body"
                 >
-                  {{ props.person.person.isLocked ? $t('person.lockUserInfoText') : $t('person.unLockUserInfoText') }}
+                  {{ !person.person.isLocked ? $t('person.lockUserInfoText') : $t('person.unLockUserInfoText') }}
                 </p>
               </v-col>
             </v-row>
@@ -183,18 +183,7 @@
               md="4"
             >
               <v-btn
-                v-if="!successMessage && props.person.person.isLocked"
-                :block="mdAndDown"
-                class="primary button"
-                :disabled="!selectedSchule"
-                @click.stop="handleOnLockUser(props.person.person.id)"
-                data-testid="lock-user-button"
-              >
-                {{ !props.person.person.isLocked ? $t('person.lockUser') : $t('person.unlockUser') }}
-              </v-btn>
-
-              <v-btn
-                v-if="!successMessage && !props.person.person.isLocked"
+                v-if="!successMessage"
                 :block="mdAndDown"
                 class="primary button"
                 :disabled="!selectedSchule"
