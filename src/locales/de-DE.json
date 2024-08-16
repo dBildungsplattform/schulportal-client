@@ -375,6 +375,7 @@
     "changeKlasseDescription": "Ändert die Klasse des Benutzers an der Schule.",
     "changeKlasseNotDisabledDescription": "Bitte wählen Sie eine neue Klasse aus.",
     "chooseZuordnungFirst": "Wählen Sie bitte zuerst eine Schulzuordnung aus.",
+    "chooseKlasseZuordnungFirst": "Wählen Sie bitte zunächst eine Schulzuordnung mit einer Klasse aus.",
     "deleteZuordnungConfirmation": "Wollen Sie die Schulzuordnung wirklich entfernen?",
     "deleteLastZuordnungConfirmation": "Dies ist die letzte Zuordnung des Benutzers zu dieser Schule. Wollen Sie die Schulzuordnung wirklich entfernen?",
     "deleteZuordnungSuccess": "Die Schulzuordnung wurde erfolgreich entfernt.",

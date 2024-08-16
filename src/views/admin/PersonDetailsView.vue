@@ -55,6 +55,7 @@
   const newZuordnung: Ref<Zuordnung | undefined> = ref<Zuordnung | undefined>(undefined);
   const finalZuordnungen: Ref<Zuordnung[]> = ref<Zuordnung[]>([]);
   const originalZuordnungenResult: Ref<Zuordnung[] | undefined> = ref(undefined);
+  const hasKlassenZuordnung: Ref<boolean | undefined> = ref(false);
 
   const isEditActive: Ref<boolean> = ref(false);
   const isZuordnungFormActive: Ref<boolean> = ref(false);
@@ -687,6 +688,8 @@
     await personStore.getPersonById(currentPersonId);
     await personenkontextStore.getPersonenuebersichtById(currentPersonId);
     await personenkontextStore.processWorkflowStep();
+    hasKlassenZuordnung.value = personenkontextStore.personenuebersicht?.zuordnungen.some((zuordnung: Zuordnung) => zuordnung.typ === OrganisationsTyp.Klasse);
+
     await personStore.get2FAState(currentPersonId);
   });
 </script>
@@ -1220,8 +1223,9 @@
                     </v-btn>
                   </SpshTooltip>
                   <SpshTooltip
+                   v-if="hasKlassenZuordnung"
                     :enabledCondition="canChangeKlasse"
-                    :disabledText="$t('person.chooseZuordnungFirst')"
+                    :disabledText="$t('person.chooseKlasseZuordnungFirst')"
                     :enabledText="$t('person.changeKlasseDescription')"
                     position="start"
                   >
