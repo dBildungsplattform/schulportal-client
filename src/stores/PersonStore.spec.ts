@@ -267,7 +267,7 @@ describe('PersonStore', () => {
     it('should reset token successfully', async () => {
       const referrer: string = 'testReferrer';
 
-      mockadapter.onPut(`/api/2fa-token/reset?userName=${referrer}`).replyOnce(200);
+      mockadapter.onPut(`/api/2fa-token/reset?personId=${referrer}`).replyOnce(200);
 
       const resetTokenPromise: Promise<void> = personStore.resetToken(referrer);
       expect(personStore.loading).toBe(true);
@@ -279,7 +279,7 @@ describe('PersonStore', () => {
     it('should handle string error', async () => {
       const referrer: string = 'testReferrer';
 
-      mockadapter.onPut(`/api/2fa-token/reset?userName=${referrer}`).replyOnce(500, 'some error');
+      mockadapter.onPut(`/api/2fa-token/reset?personId=${referrer}`).replyOnce(500, 'some error');
 
       const resetTokenPromise: Promise<void> = personStore.resetToken(referrer);
       expect(personStore.loading).toBe(true);
@@ -291,7 +291,7 @@ describe('PersonStore', () => {
     it('should handle error code', async () => {
       const referrer: string = 'testReferrer';
 
-      mockadapter.onPut(`/api/2fa-token/reset?userName=${referrer}`).replyOnce(500, { code: 'some mock server error' });
+      mockadapter.onPut(`/api/2fa-token/reset?personId=${referrer}`).replyOnce(500, { code: 'some mock server error' });
 
       const resetTokenPromise: Promise<void> = personStore.resetToken(referrer);
       expect(personStore.loading).toBe(true);

@@ -37,9 +37,7 @@
 
   async function tokenReset(): Promise<void> {
     try {
-      const referrer: string | null = props.person.person.referrer;
-      if (!referrer) return;
-      await personStore.resetToken(referrer);
+      await personStore.resetToken(props.person.person.id);
       isTokenResetSuccessful.value = true;
     } finally {
       proceeded.value = true;

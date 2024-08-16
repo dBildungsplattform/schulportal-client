@@ -499,6 +499,7 @@ export const DbiamOrganisationErrorI18nKeyEnum = {
     RootOrganisationImmutable: 'ROOT_ORGANISATION_IMMUTABLE',
     KlasseNurVonSchuleAdministriert: 'KLASSE_NUR_VON_SCHULE_ADMINISTRIERT',
     KlassennameAnSchuleEindeutig: 'KLASSENNAME_AN_SCHULE_EINDEUTIG',
+    OrganisationIstBereitsZugewiesenError: 'ORGANISATION_IST_BEREITS_ZUGEWIESEN_ERROR',
     NameRequiredForKlasse: 'NAME_REQUIRED_FOR_KLASSE',
     NameEnthaeltLeerzeichen: 'NAME_ENTHAELT_LEERZEICHEN',
     KennungEnthaeltLeerzeichen: 'KENNUNG_ENTHAELT_LEERZEICHEN'
@@ -2855,13 +2856,13 @@ export const Class2FAApiAxiosParamCreator = function (configuration?: Configurat
         },
         /**
          * 
-         * @param {string} userName 
+         * @param {string} personId 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        privacyIdeaAdministrationControllerResetToken: async (userName: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'userName' is not null or undefined
-            assertParamExists('privacyIdeaAdministrationControllerResetToken', 'userName', userName)
+        privacyIdeaAdministrationControllerResetToken: async (personId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'personId' is not null or undefined
+            assertParamExists('privacyIdeaAdministrationControllerResetToken', 'personId', personId)
             const localVarPath = `/api/2fa-token/reset`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -2882,8 +2883,8 @@ export const Class2FAApiAxiosParamCreator = function (configuration?: Configurat
             // oauth required
             await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
 
-            if (userName !== undefined) {
-                localVarQueryParameter['userName'] = userName;
+            if (personId !== undefined) {
+                localVarQueryParameter['personId'] = personId;
             }
 
 
@@ -2929,12 +2930,12 @@ export const Class2FAApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
-         * @param {string} userName 
+         * @param {string} personId 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async privacyIdeaAdministrationControllerResetToken(userName: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<object>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.privacyIdeaAdministrationControllerResetToken(userName, options);
+        async privacyIdeaAdministrationControllerResetToken(personId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<boolean>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.privacyIdeaAdministrationControllerResetToken(personId, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -2967,12 +2968,12 @@ export const Class2FAApiFactory = function (configuration?: Configuration, baseP
         },
         /**
          * 
-         * @param {string} userName 
+         * @param {string} personId 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        privacyIdeaAdministrationControllerResetToken(userName: string, options?: any): AxiosPromise<object> {
-            return localVarFp.privacyIdeaAdministrationControllerResetToken(userName, options).then((request) => request(axios, basePath));
+        privacyIdeaAdministrationControllerResetToken(personId: string, options?: any): AxiosPromise<boolean> {
+            return localVarFp.privacyIdeaAdministrationControllerResetToken(personId, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -3003,12 +3004,12 @@ export interface Class2FAApiInterface {
 
     /**
      * 
-     * @param {string} userName 
+     * @param {string} personId 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof Class2FAApiInterface
      */
-    privacyIdeaAdministrationControllerResetToken(userName: string, options?: AxiosRequestConfig): AxiosPromise<object>;
+    privacyIdeaAdministrationControllerResetToken(personId: string, options?: AxiosRequestConfig): AxiosPromise<boolean>;
 
 }
 
@@ -3043,13 +3044,13 @@ export class Class2FAApi extends BaseAPI implements Class2FAApiInterface {
 
     /**
      * 
-     * @param {string} userName 
+     * @param {string} personId 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof Class2FAApi
      */
-    public privacyIdeaAdministrationControllerResetToken(userName: string, options?: AxiosRequestConfig) {
-        return Class2FAApiFp(this.configuration).privacyIdeaAdministrationControllerResetToken(userName, options).then((request) => request(this.axios, this.basePath));
+    public privacyIdeaAdministrationControllerResetToken(personId: string, options?: AxiosRequestConfig) {
+        return Class2FAApiFp(this.configuration).privacyIdeaAdministrationControllerResetToken(personId, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
@@ -3622,6 +3623,48 @@ export const OrganisationenApiAxiosParamCreator = function (configuration?: Conf
             };
         },
         /**
+         * Delete an organisation of type Klasse by id.
+         * @summary 
+         * @param {string} organisationId The id of an organization
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        organisationControllerDeleteKlasse: async (organisationId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'organisationId' is not null or undefined
+            assertParamExists('organisationControllerDeleteKlasse', 'organisationId', organisationId)
+            const localVarPath = `/api/organisationen/{organisationId}/klasse`
+                .replace(`{${"organisationId"}}`, encodeURIComponent(String(organisationId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 
          * @param {string} organisationId The id of an organization
          * @param {*} [options] Override http request option.
@@ -4042,6 +4085,17 @@ export const OrganisationenApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
+         * Delete an organisation of type Klasse by id.
+         * @summary 
+         * @param {string} organisationId The id of an organization
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async organisationControllerDeleteKlasse(organisationId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.organisationControllerDeleteKlasse(organisationId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
          * 
          * @param {string} organisationId The id of an organization
          * @param {*} [options] Override http request option.
@@ -4170,6 +4224,16 @@ export const OrganisationenApiFactory = function (configuration?: Configuration,
             return localVarFp.organisationControllerCreateOrganisation(createOrganisationBodyParams, options).then((request) => request(axios, basePath));
         },
         /**
+         * Delete an organisation of type Klasse by id.
+         * @summary 
+         * @param {string} organisationId The id of an organization
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        organisationControllerDeleteKlasse(organisationId: string, options?: any): AxiosPromise<void> {
+            return localVarFp.organisationControllerDeleteKlasse(organisationId, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 
          * @param {string} organisationId The id of an organization
          * @param {*} [options] Override http request option.
@@ -4287,6 +4351,16 @@ export interface OrganisationenApiInterface {
      * @memberof OrganisationenApiInterface
      */
     organisationControllerCreateOrganisation(createOrganisationBodyParams: CreateOrganisationBodyParams, options?: AxiosRequestConfig): AxiosPromise<OrganisationResponse>;
+
+    /**
+     * Delete an organisation of type Klasse by id.
+     * @summary 
+     * @param {string} organisationId The id of an organization
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OrganisationenApiInterface
+     */
+    organisationControllerDeleteKlasse(organisationId: string, options?: AxiosRequestConfig): AxiosPromise<void>;
 
     /**
      * 
@@ -4411,6 +4485,18 @@ export class OrganisationenApi extends BaseAPI implements OrganisationenApiInter
      */
     public organisationControllerCreateOrganisation(createOrganisationBodyParams: CreateOrganisationBodyParams, options?: AxiosRequestConfig) {
         return OrganisationenApiFp(this.configuration).organisationControllerCreateOrganisation(createOrganisationBodyParams, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Delete an organisation of type Klasse by id.
+     * @summary 
+     * @param {string} organisationId The id of an organization
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OrganisationenApi
+     */
+    public organisationControllerDeleteKlasse(organisationId: string, options?: AxiosRequestConfig) {
+        return OrganisationenApiFp(this.configuration).organisationControllerDeleteKlasse(organisationId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

@@ -228,10 +228,10 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
         this.loading = false;
       }
     },
-    async resetToken(referrer: string): Promise<void> {
+    async resetToken(personId: string): Promise<void> {
       this.loading = true;
       try {
-        await twoFactorApi.privacyIdeaAdministrationControllerResetToken(referrer);
+        await twoFactorApi.privacyIdeaAdministrationControllerResetToken(personId);
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
