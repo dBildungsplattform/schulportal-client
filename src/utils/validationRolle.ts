@@ -3,7 +3,7 @@ import { object, string } from 'yup';
 import { toTypedSchema } from '@vee-validate/yup';
 import { DIN_91379A_EXT, NO_LEADING_TRAILING_SPACES } from '@/utils/validation';
 import { useForm, type BaseFieldProps, type TypedSchema } from 'vee-validate';
-import type { RolleFormType, RollenArt, RollenMerkmal, RollenSystemRecht } from '@/stores/RolleStore';
+import type { RollenArt, RollenMerkmal, RollenSystemRecht } from '@/stores/RolleStore';
 
 type ValidationSchema = {
   selectedRollenArt: string;
@@ -103,17 +103,13 @@ export const getRolleFieldDefinitions = (formContext: ReturnType<typeof useForm>
   };
 };
 
-export const getDirtyState = (): boolean => {
-  // eslint-disable-next-line @typescript-eslint/typedef
-  const { isFieldDirty } = useForm<RolleFormType>({
-    validationSchema: getValidationSchema,
-  });
+export const getDirtyState = (formContext: ReturnType<typeof useForm>): boolean => {
 
   return (
-    isFieldDirty('selectedAdministrationsebene') ||
-    isFieldDirty('selectedRollenArt') ||
-    isFieldDirty('selectedRollenName') ||
-    isFieldDirty('selectedMerkmale') ||
-    isFieldDirty('selectedSystemRechte')
+    formContext.isFieldDirty('selectedAdministrationsebene') ||
+    formContext.isFieldDirty('selectedRollenArt') ||
+    formContext.isFieldDirty('selectedRollenName') ||
+    formContext.isFieldDirty('selectedMerkmale') ||
+    formContext.isFieldDirty('selectedSystemRechte')
   );
 };

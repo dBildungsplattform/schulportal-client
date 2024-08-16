@@ -122,7 +122,7 @@
     selectedSystemRechteProps,
   }: RolleFieldDefinitions = getRolleFieldDefinitions(formContext);
 
-  const isFormDirty: boolean = !isEditActive.value ? getDirtyState() : false;
+  const isFormDirty: boolean = !isEditActive.value ? getDirtyState(formContext) : false;
 
   let blockedNext: () => void = () => {};
 

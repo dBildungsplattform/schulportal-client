@@ -75,13 +75,13 @@
     selectedSystemRechteProps,
   }: RolleFieldDefinitions = getRolleFieldDefinitions(formContext);
 
-  const isFormDirty: boolean = getDirtyState();
+  const isFormDirty: ComputedRef<boolean> = computed(() => getDirtyState(formContext));
 
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
   let blockedNext: () => void = () => {};
 
   onBeforeRouteLeave((_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
-    if (isFormDirty) {
+    if (isFormDirty.value) {
       showUnsavedChangesDialog.value = true;
       blockedNext = next;
     } else {
@@ -173,7 +173,7 @@
   );
 
   function preventNavigation(event: BeforeUnloadEvent): void {
-    if (!isFormDirty) return;
+    if (!isFormDirty.value) return;
     event.preventDefault();
     /* Chrome requires returnValue to be set. */
     event.returnValue = '';
