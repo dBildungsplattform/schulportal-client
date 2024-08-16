@@ -1050,6 +1050,9 @@
           <v-row class="ml-md-16">
             <v-col>
               <h3 class="subtitle-1">{{ $t('admin.person.status') }}</h3>
+              <p v-if="!personStore.loading">
+                {{ personStore.currentPerson?.person.isLocked ? t('person.userIsLocked') : t('person.userIsUnlocked') }}
+              </p>
               <template
                 v-for="(attribute, key) in personStore.currentPerson?.person.attributes"
                 :key="key"

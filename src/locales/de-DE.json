@@ -366,6 +366,8 @@
     "klasse": "Klasse",
     "kopersnr": "Kopers-Nr",
     "lastName": "Nachname",
+    "userIsLocked": "Dieser Benutzer ist gesperrt.",
+    "userIsUnlocked": "Dieser Benutzer ist aktiv.",
     "lockUser": "Benutzer sperren",
     "lockUserInfoText": "Für die Dauer der Sperre hat der Benutzer keinen Zugriff mehr auf das Schulportal SH und die daran angeschlossenen Dienste.",
     "lockUserSuccess": "Der Benutzer wurde erfolgreich gesperrt.",
