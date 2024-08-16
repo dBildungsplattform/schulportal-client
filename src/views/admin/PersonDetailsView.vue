@@ -400,6 +400,10 @@
 
   // Triggers the template to change the Klasse. Also pre-select the Schule and Klasse.
   const triggerChangeKlasse = async (): Promise<void> => {
+    // Get the Klasse from the parent
+    if (selectedZuordnungen.value[0]?.sskId) {
+      await organisationStore.getKlassenByOrganisationId(selectedZuordnungen.value[0]?.sskId);
+    }
     // Auto select the new Schule
     selectedSchule.value = selectedZuordnungen.value[0]?.sskId;
     // Retrieves the new Klasse from the selected Zuordnung
@@ -408,9 +412,6 @@
     );
     // Auto select the new Klasse
     selectedNewKlasse.value = newKlasse?.id;
-    if (selectedZuordnungen.value[0]?.sskId) {
-      await organisationStore.getKlassenByOrganisationId(selectedZuordnungen.value[0]?.sskId);
-    }
     isChangeKlasseFormActive.value = true;
   };
 
@@ -1130,6 +1131,11 @@
                     </span>
 
                     <span
+                    v-if="
+                          newZuordnung &&
+                          zuordnung.sskId === newZuordnung.sskId &&
+                          zuordnung.rolleId === newZuordnung.rolleId
+                        "
                       class="text-body my-3 ml-5"
                       :class="{
                         'text-green':
