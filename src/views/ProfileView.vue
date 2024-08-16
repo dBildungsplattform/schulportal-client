@@ -185,12 +185,12 @@
     isPasswordResetDialogActive.value = true;
   }
 
-  function handleCloseChangedPasswordDialog(): void {
+  function closePasswordChangedDialogAndClearQuery(): void {
     showChangedPasswordDialog.value = false;
     router.replace({ path: route.fullPath, query: {} });
   }
 
-  function handleClickOnPasswortChangeButton(): void {
+  function navigateToPasswordChange(): void {
     const url: URL = new URL(window.origin + '/api/auth/reset-password');
     url.searchParams.set('redirectUrl', windowOrigin + route.fullPath);
     url.searchParams.set('login_hint', personInfoStore.personInfo?.person.referrer ?? '');
@@ -380,7 +380,7 @@
                         md="4"
                       >
                         <v-btn
-                          @click.stop="handleClickOnPasswortChangeButton()"
+                          @click.stop="navigateToPasswordChange()"
                           class="primary"
                           data-testid="change-password-button"
                         >
@@ -465,8 +465,8 @@
             >
               <v-btn
                 class="secondary button"
-                @click.stop="handleCloseChangedPasswordDialog()"
-                data-testid="close-change-password-dialog-button"
+                @click.stop="closePasswordChangedDialogAndClearQuery()"
+                data-testid="close-password-changed-dialog-button"
               >
                 {{ $t('close') }}
               </v-btn>
