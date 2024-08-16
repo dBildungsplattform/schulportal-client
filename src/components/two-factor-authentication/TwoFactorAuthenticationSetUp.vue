@@ -145,7 +145,7 @@
         <v-container v-if="tokenIsRequested">
           <SoftwareTokenWorkflow
             v-if="selectedOption === TokenKind.software"
-            :qrCodeImageBase64="twoFactorAuthentificationS.twoFactorState.qrCode"
+            :qrCodeImageBase64="twoFactorAuthentificationStore.qrCode"
             @updateHeader="handleHeaderUpdate"
             @onCloseClicked="close2FADialog(isActive)"
             data-testid="software-token-workflow"
