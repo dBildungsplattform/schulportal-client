@@ -173,7 +173,7 @@
           :discardButtonLabel="$t('admin.schule.discard')"
           id="schule-creation-form"
           :onDiscard="navigateToSchuleManagement"
-          @onShowDialogChange="(value: boolean | undefined) => (showUnsavedChangesDialog = value || false)"
+          @onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
           :onSubmit="onSubmit"
           :showUnsavedChangesDialog="showUnsavedChangesDialog"
         >

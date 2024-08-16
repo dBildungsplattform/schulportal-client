@@ -228,7 +228,7 @@
               :showUnsavedChangesDialog="showUnsavedChangesDialog"
               :onHandleConfirmUnsavedChanges="handleConfirmUnsavedChanges"
               :onHandleDiscard="navigateToKlasseManagement"
-              :onShowDialogChange="(value: boolean | undefined) => (showUnsavedChangesDialog = value || false)"
+              :onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
               :onSubmit="onSubmit"
               ref="klasse-creation-form"
               v-model:selectedSchule="selectedSchule"

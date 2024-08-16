@@ -25,7 +25,7 @@
     canCommit: true,
   });
 
-  const emit: (event: 'onShowDialogChange', value: boolean | undefined) => void = defineEmits(['onShowDialogChange']);
+  const emit: (event: 'onShowDialogChange', value?: boolean) => void = defineEmits(['onShowDialogChange']);
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 

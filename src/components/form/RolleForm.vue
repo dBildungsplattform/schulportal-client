@@ -4,6 +4,7 @@
   import FormWrapper from '@/components/form/FormWrapper.vue';
   import FormRow from '@/components/form/FormRow.vue';
   import { type TranslatedObject } from '@/types.d';
+  import type { RollenArt, RollenMerkmal, RollenSystemRecht } from '@/stores/RolleStore';
 
   type Props = {
     administrationsebenen?: Array<{ value: string; title: string }>;
@@ -22,19 +23,20 @@
     isEditActive?: boolean;
     onHandleConfirmUnsavedChanges: () => void;
     onHandleDiscard: () => void;
-    onShowDialogChange: (value: boolean | undefined) => void;
+    onShowDialogChange: (value?: boolean) => void;
     onSubmit: () => void;
   };
 
   defineProps<Props>();
 
   // Define the V-model for each field so the parent component can pass in the values for it.
-  const selectedAdministrationsebene: ModelRef<unknown, string> = defineModel('selectedAdministrationsebene');
-  const selectedRollenArt: ModelRef<unknown, string> = defineModel('selectedRollenArt');
-  const selectedRollenName: ModelRef<unknown, string> = defineModel('selectedRollenName');
-  const selectedMerkmale: ModelRef<unknown | undefined, string> = defineModel('selectedMerkmale');
-  const selectedServiceProviders: ModelRef<unknown | undefined, string> = defineModel('selectedServiceProviders');
-  const selectedSystemRechte: ModelRef<unknown | undefined, string> = defineModel('selectedSystemRechte');
+  const selectedAdministrationsebene: ModelRef<string | undefined, string> =
+    defineModel('selectedAdministrationsebene');
+  const selectedRollenArt: ModelRef<RollenArt | undefined, string> = defineModel('selectedRollenArt');
+  const selectedRollenName: ModelRef<string | undefined, string> = defineModel('selectedRollenName');
+  const selectedMerkmale: ModelRef<RollenMerkmal[] | undefined, string> = defineModel('selectedMerkmale');
+  const selectedServiceProviders: ModelRef<string[] | undefined, string> = defineModel('selectedServiceProviders');
+  const selectedSystemRechte: ModelRef<RollenSystemRecht[] | undefined, string> = defineModel('selectedSystemRechte');
 </script>
 
 <template data-test-id="rolle-form">
