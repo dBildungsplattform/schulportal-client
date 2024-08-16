@@ -283,7 +283,7 @@
           :administrationsebenen="administrationsebenen"
           :onHandleConfirmUnsavedChanges="handleConfirmUnsavedChanges"
           :onHandleDiscard="navigateToRolleManagement"
-          :onShowDialogChange="(value: boolean | undefined) => (showUnsavedChangesDialog = value || false)"
+          :onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
           :onSubmit="onSubmit"
           :isEditActive="true"
           ref="rolle-creation-form"
