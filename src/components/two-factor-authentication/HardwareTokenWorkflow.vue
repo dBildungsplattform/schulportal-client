@@ -214,7 +214,7 @@
           density="compact"
           :disabled="false"
           id="hardwareToken-input"
-          :placeholder="t('admin.person.twoFactorAuthentication.Code')"
+          :placeholder="t('admin.person.twoFactorAuthentication.otpPlaceholder')"
           ref="hardwareToken-input"
           required="true"
           variant="outlined"
