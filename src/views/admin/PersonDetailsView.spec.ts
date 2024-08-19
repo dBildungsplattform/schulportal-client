@@ -11,7 +11,7 @@ import {
 } from '@/stores/PersonStore';
 import { usePersonenkontextStore, type PersonenkontextStore, type Uebersicht } from '@/stores/PersonenkontextStore';
 import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
-import { RollenArt, RollenMerkmal, RollenSystemRecht } from '@/stores/RolleStore';
+import { RollenMerkmal, RollenSystemRecht } from '@/stores/RolleStore';
 import { nextTick, type ComputedRef, type DefineComponent } from 'vue';
 
 let wrapper: VueWrapper | null = null;
