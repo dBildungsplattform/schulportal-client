@@ -134,6 +134,17 @@
     }
   }
 
+  const getLockInfo: ComputedRef<{ key: string; attribute: string }[]> = computed(() => {
+    if (!personStore.currentPerson?.person.isLocked) return [];
+    const attributes: Record<string, string | string[]> = personStore.currentPerson.person.attributes ?? {};
+    return Object.keys(attributes)
+      .filter((key: string) => key.startsWith('lock_'))
+      .map((key: string) => ({
+        key: keyMapper(key),
+        attribute: keyValueMapper(key, (attributes[key] ?? '').toString()),
+      }));
+  });
+
   let closeCannotDeleteDialog = (): void => {
     cannotDeleteDialogVisible.value = false;
   };
@@ -1097,15 +1108,10 @@
             <v-col
               cols="10"
               offset="1"
-              v-for="(attribute, key) in personStore.currentPerson?.person.attributes"
+              v-for="{ key, attribute } of getLockInfo"
               :key="key"
             >
-              <span
-                class="text-body"
-                v-if="key.startsWith('lock_')"
-              >
-                {{ keyMapper(key) }} {{ keyValueMapper(key, attribute.toString()) }}
-              </span>
+              <span class="text-body"> {{ key }} {{ attribute }} </span>
             </v-col>
           </v-row>
         </v-container>
