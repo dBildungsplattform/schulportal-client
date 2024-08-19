@@ -25,19 +25,15 @@
   const props: Props = defineProps<Props>();
   const emit: Emits = defineEmits<Emits>();
   const errorMessage: Ref<string> = ref('');
-  const successMessage: Ref<string> = ref('');
 
   async function closeLockPersonDialog(isActive: Ref<boolean>): Promise<void> {
     isActive.value = false;
     errorMessage.value = '';
-    successMessage.value = '';
   }
-  async function handleOnLockUser(id: string): Promise<void> {
+  async function handleOnLockUser(id: string, isActive: Ref<boolean>): Promise<void> {
     try {
       await emit('onLockUser', id, !props.person.person.isLocked, selectedSchule.value);
-      successMessage.value = !props.person.person.isLocked
-        ? t('person.lockUserSuccess')
-        : t('person.unlockUserSuccess');
+      await closeLockPersonDialog(isActive);
     } catch (error) {
       errorMessage.value = !props.person.person.isLocked ? t('person.lockUserError') : t('person.unlockUserError');
     }
@@ -111,7 +107,7 @@
               </v-col>
             </v-row>
             <v-row
-              v-if="!props.person.person.isLocked && !successMessage"
+              v-if="!props.person.person.isLocked"
               class="justify-center w-full"
             >
               <v-col md="10">
@@ -144,14 +140,6 @@
             <v-row class="text-body bold px-md-16">
               <v-col>
                 <p
-                  v-if="successMessage"
-                  class="text-success"
-                  data-testid="lock-user-info-text"
-                >
-                  {{ successMessage }}
-                </p>
-                <p
-                  v-else
                   data-testid="lock-user-info-text"
                   class="text-body"
                 >
@@ -172,24 +160,9 @@
             >
               <v-btn
                 :block="mdAndDown"
-                class="secondary button"
-                @click.stop="closeLockPersonDialog(isActive)"
-                data-testid="close-lock-user-dialog-button"
-              >
-                {{ !successMessage ? $t('cancel') : $t('close') }}
-              </v-btn>
-            </v-col>
-            <v-col
-              cols="12"
-              sm="6"
-              md="4"
-            >
-              <v-btn
-                v-if="!successMessage"
-                :block="mdAndDown"
                 class="primary button"
                 :disabled="!selectedSchule"
-                @click.stop="handleOnLockUser(props.person.person.id)"
+                @click.stop="handleOnLockUser(props.person.person.id, isActive)"
                 data-testid="lock-user-button"
               >
                 {{ !props.person.person.isLocked ? $t('person.lockUser') : $t('person.unlockUser') }}
