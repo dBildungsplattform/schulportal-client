@@ -3,7 +3,12 @@ import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
 import { createRouter, createWebHistory, type NavigationFailure, type RouteLocationRaw, type Router } from 'vue-router';
 import routes from '@/router/routes';
 import PersonDetailsView from './PersonDetailsView.vue';
-import { type Personendatensatz, type PersonendatensatzResponse, type PersonStore, usePersonStore } from '@/stores/PersonStore';
+import {
+  type Personendatensatz,
+  type PersonendatensatzResponse,
+  type PersonStore,
+  usePersonStore,
+} from '@/stores/PersonStore';
 import { usePersonenkontextStore, type PersonenkontextStore, type Uebersicht } from '@/stores/PersonenkontextStore';
 import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
 import { RollenMerkmal, RollenSystemRecht } from '@/stores/RolleStore';
@@ -226,5 +231,31 @@ describe('PersonDetailsView', () => {
 
     // Check if the element exists and has the correct text content
     expect(vornameElement?.text()).toBe('Samuel');
+  });
+  test('It renders the personenkontextCreationForm', async () => {
+    await wrapper?.find('[data-testid="zuordnung-edit-button"]').trigger('click');
+    await nextTick();
+
+    await wrapper?.find('[data-testid="zuordnung-create-button"]').trigger('click');
+    await nextTick();
+
+    const orgaSearchInput: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'personenkontext-creation-form' })
+      .findComponent({ ref: 'organisation-select' });
+
+    await orgaSearchInput?.vm.$emit('update:search', '4');
+    await orgaSearchInput?.setValue('4');
+    await nextTick();
+
+    const rolleSearchInput: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'personenkontext-creation-form' })
+      .findComponent({ ref: 'rolle-select' });
+
+    await rolleSearchInput?.vm.$emit('update:search', '54321');
+    await rolleSearchInput?.setValue('54321');
+    await nextTick();
+
+    expect(orgaSearchInput?.exists()).toBe(true);
+    expect(rolleSearchInput?.exists()).toBe(true);
   });
 });

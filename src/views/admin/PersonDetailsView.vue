@@ -306,7 +306,6 @@
     personenkontextStore.processWorkflowStep({ organisationId: organisationId, rolleId: rolleId });
     // Check if rolleId exists and if it's of type LERN
     if (rolleId && isLernRolle(rolleId) && hasOneSelectedZuordnung) {
-
       return true;
     }
     return false;
@@ -474,8 +473,9 @@
   // Filter out the Rollen based on the user's existing Zuordnungen and selected organization
   const filteredRollen: ComputedRef<RolleWithRollenart[] | undefined> = computed(() => {
     const existingZuordnungen: Zuordnung[] | undefined = personenkontextStore.personenuebersicht?.zuordnungen;
-    const selectedOrgaId: string | undefined = selectedOrganisation.value;
 
+    const selectedOrgaId: string | undefined = selectedOrganisation.value;
+ 
     // Determine if the user already has any LERN roles
     const hasLernRolle: boolean =
       existingZuordnungen?.some((zuordnung: Zuordnung) => isLernRolle(zuordnung.rolleId)) ?? false;
@@ -1337,6 +1337,7 @@
               <v-container class="px-lg-16">
                 <!-- Organisation, Rolle, Klasse zuordnen -->
                 <PersonenkontextCreate
+                  ref='personenkontext-creation-form'
                   :showHeadline="false"
                   :organisationen="organisationen"
                   :rollen="filteredRollen"
