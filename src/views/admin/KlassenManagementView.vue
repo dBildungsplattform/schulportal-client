@@ -209,7 +209,7 @@
   }
 
   async function updateSchulenSearch(searchValue: string): Promise<void> {
-    if (searchValue.length >= 1) {
+    if (searchValue?.length >= 1) {
       // Fetch Schulen matching the search string when it has 3 or more characters
       await organisationStore.getAllOrganisationen({
         searchString: searchValue,
