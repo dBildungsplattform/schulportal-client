@@ -1,51 +1,39 @@
 <script setup lang="ts">
   import { defineProps, type ModelRef } from 'vue';
   import { type BaseFieldProps } from 'vee-validate';
-  import FormWrapper from '@/components/form/FormWrapper.vue';
   import FormRow from '@/components/form/FormRow.vue';
 
   type Props = {
     schulen?: Array<{ value: string; title: string }>;
+    klassen: Array<{ value: string; title: string }> | undefined;
     readonly?: boolean;
     selectedSchuleProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
-    selectedKlassennameProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
-    showUnsavedChangesDialog?: boolean;
+    selectedNewKlasseProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     isEditActive?: boolean;
-    onHandleConfirmUnsavedChanges: () => void;
-    onHandleDiscard: () => void;
-    onShowDialogChange: (value?: boolean) => void;
     onSubmit: () => void;
   };
 
   defineProps<Props>();
 
   const selectedSchule: ModelRef<unknown, string> = defineModel('selectedSchule');
-  const selectedKlassenname: ModelRef<unknown, string> = defineModel('selectedKlassenname');
+  const selectedNewKlasse: ModelRef<unknown, string> = defineModel('selectedNewKlasse');
 </script>
 
-<template data-test-id="klasse-form">
-  <FormWrapper
-    :confirmUnsavedChangesAction="onHandleConfirmUnsavedChanges"
-    :createButtonLabel="$t('admin.klasse.create')"
-    :discardButtonLabel="$t('admin.klasse.discard')"
-    :hideActions="readonly"
-    id="klasse-form"
-    :onDiscard="onHandleDiscard"
-    @onShowDialogChange="onShowDialogChange"
+<template data-test-id="klasse-change-form">
+  <v-form
+    id="klasse-change-form"
     :onSubmit="onSubmit"
-    :showUnsavedChangesDialog="showUnsavedChangesDialog"
   >
     <!-- Schule zuordnen -->
-    <v-row>
-      <h3 class="headline-3">1. {{ $t('admin.schule.assignSchule') }}</h3>
-    </v-row>
     <FormRow
       :errorLabel="selectedSchuleProps?.error || ''"
       labelForId="schule-select"
       :isRequired="true"
       :label="$t('admin.schule.schule')"
     >
-      <v-select
+      <v-autocomplete
+        :class="[{ 'filter-dropdown mb-4': true }, { selected: selectedSchule }]"
+        autocomplete="off"
         clearable
         data-testid="schule-select"
         density="compact"
@@ -57,38 +45,40 @@
         :no-data-text="$t('noDataFound')"
         :placeholder="$t('admin.schule.assignSchule')"
         ref="schule-select"
+        hide-details
         required="true"
         variant="outlined"
         v-bind="selectedSchuleProps"
         v-model="selectedSchule"
-      ></v-select>
+      ></v-autocomplete>
     </FormRow>
 
-    <!-- Klassenname eingeben -->
-    <v-row>
-      <h3 class="headline-3">2. {{ $t('admin.klasse.enterKlassenname') }}</h3>
-    </v-row>
+    <!-- Klasse auswählen -->
     <FormRow
-      :errorLabel="selectedKlassennameProps?.error || ''"
-      labelForId="klassenname-input"
+      :errorLabel="selectedNewKlasseProps?.error || ''"
+      labelForId="klasse-select"
       :isRequired="true"
-      :label="$t('admin.klasse.klassenname')"
+      :label="$t('admin.klasse.klasse')"
     >
-      <v-text-field
+      <v-autocomplete
         clearable
+        autocomplete="off"
         data-testid="klassenname-input"
         density="compact"
         :disabled="!isEditActive"
-        id="klassenname-input"
-        :placeholder="$t('admin.klasse.enterKlassenname')"
-        ref="klassenname-input"
+        id="klasse-select"
+        :items="klassen"
+        item-value="value"
+        item-text="title"
+        :placeholder="$t('admin.klasse.selectKlasse')"
+        ref="klasse-select"
         required="true"
         variant="outlined"
-        v-bind="selectedKlassennameProps"
-        v-model="selectedKlassenname"
-      ></v-text-field>
+        v-bind="selectedNewKlasseProps"
+        v-model="selectedNewKlasse"
+      ></v-autocomplete>
     </FormRow>
-  </FormWrapper>
+  </v-form>
 </template>
 
 <style scoped></style>

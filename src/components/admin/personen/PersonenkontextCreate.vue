@@ -6,6 +6,7 @@
   import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
   import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
   import { type TranslatedObject } from '@/types.d';
+  import type { BaseFieldProps } from 'vee-validate';
 
   useI18n({ useScope: 'global' });
 
@@ -31,21 +32,9 @@
     organisationen: TranslatedObject[] | undefined;
     rollen: RolleWithRollenart[] | undefined;
     klassen: TranslatedObject[] | undefined;
-    selectedOrganisationProps: {
-      modelValue: string;
-      error: boolean;
-      'error-messages': string[];
-    };
-    selectedRolleProps: {
-      modelValue: string;
-      error: boolean;
-      'error-messages': string[];
-    };
-    selectedKlasseProps: {
-      modelValue: string;
-      error: boolean;
-      'error-messages': string[];
-    };
+    selectedOrganisationProps: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
+    selectedRolleProps: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
+    selectedKlasseProps: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     selectedOrganisation: string | undefined;
     selectedRolle: string | undefined;
     selectedKlasse?: string | undefined;
