@@ -19,7 +19,7 @@ function getPersonendatensatz(locked: boolean): Personendatensatz {
           lock_locked_from: 'Amanda Admin',
           lock_timestamp: Date.now().toString(),
         }
-      : undefined,
+      : null,
   };
   return { person };
 }

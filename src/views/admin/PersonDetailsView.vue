@@ -133,7 +133,10 @@
 
   const getLockInfo: ComputedRef<{ key: string; attribute: string }[]> = computed(() => {
     if (!personStore.currentPerson?.person.isLocked) return [];
-    const attributes: Record<string, string | string[]> = personStore.currentPerson.person.attributes ?? {};
+    const attributes: Record<string, string | string[]> = (personStore.currentPerson.person.attributes ?? {}) as Record<
+      string,
+      string | string[]
+    >;
     return Object.keys(attributes)
       .filter((key: string) => key.startsWith('lock_'))
       .map((key: string) => ({
@@ -869,7 +872,7 @@
                     :errorCode="personStore.errorCode"
                     :person="personStore.currentPerson"
                     :disabled="selectedZuordnungen.length === 0"
-                    :zuordnungCount="zuordnungenResult?.filter((zuordnung) => zuordnung.editable).length"
+                    :zuordnungCount="zuordnungenResult?.filter((zuordnung) => zuordnung.editable).length ?? 0"
                     @onDeletePersonenkontext="prepareDeletion"
                   >
                   </PersonenkontextDelete>

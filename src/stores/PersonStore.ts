@@ -9,6 +9,7 @@ import {
   type PersonenFrontendApiInterface,
   type PersonFrontendControllerFindPersons200Response,
   type PersonLockResponse,
+  type PersonResponse,
 } from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
 import type { DbiamPersonenkontextBodyParams } from './PersonenkontextStore';
@@ -16,17 +17,7 @@ import type { DbiamPersonenkontextBodyParams } from './PersonenkontextStore';
 const personenApi: PersonenApiInterface = PersonenApiFactory(undefined, '', axiosApiInstance);
 const personenFrontendApi: PersonenFrontendApiInterface = PersonenFrontendApiFactory(undefined, '', axiosApiInstance);
 
-export type Person = {
-  id: string;
-  name: {
-    familienname: string;
-    vorname: string;
-  };
-  referrer: string | null;
-  personalnummer?: string | null;
-  isLocked: boolean;
-  attributes?: Record<string, string | string[]>;
-};
+export type Person = Pick<PersonResponse, 'id' | 'name' | 'referrer' | 'personalnummer' | 'isLocked' | 'attributes'>;
 
 export type CreatePersonBodyParams = DbiamCreatePersonWithContextBodyParams;
 export type CreatedPersonenkontext = DbiamPersonenkontextBodyParams;

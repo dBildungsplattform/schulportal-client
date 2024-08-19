@@ -24,6 +24,9 @@ const mockPerson: Personendatensatz = {
       vorname: 'John',
     },
     referrer: 'jorton',
+    personalnummer: null,
+    isLocked: null,
+    attributes: null,
   },
 };
 
