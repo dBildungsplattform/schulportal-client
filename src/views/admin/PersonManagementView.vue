@@ -172,7 +172,7 @@
     await searchFilterStore.setKlasseFilter([]);
     selectedKlassen.value = [];
     if (selectedSchulen.value.length) {
-      await organisationStore.getFilteredKlassenById({
+      await organisationStore.getFilteredKlassen({
         administriertVon: selectedSchulen.value,
         searchString: searchInputKlassen.value,
       });
@@ -258,7 +258,7 @@
 
     /* delay new call 500ms */
     timerId = setTimeout(() => {
-      organisationStore.getFilteredKlassenById({ searchString: searchValue, administriertVon: selectedSchulen.value });
+      organisationStore.getFilteredKlassen({ searchString: searchValue, administriertVon: selectedSchulen.value });
     }, 500);
   }
 
@@ -296,7 +296,7 @@
       includeTyp: OrganisationsTyp.Schule,
       systemrechte: ['PERSONEN_VERWALTEN'],
     });
-    await organisationStore.getFilteredKlassenById({
+    await organisationStore.getFilteredKlassen({
       includeTyp: OrganisationsTyp.Klasse,
       systemrechte: ['KLASSEN_VERWALTEN'],
     });

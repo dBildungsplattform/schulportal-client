@@ -345,7 +345,7 @@ describe('OrganisationStore', () => {
         mockadapter
           .onGet('/api/organisationen?limit=25&searchString=klasse&typ=KLASSE&administriertVon=1')
           .replyOnce(200, mockResponse, { 'x-paging-total': '1' });
-        const getFilteredKlassenPromise: Promise<void> = organisationStore.getFilteredKlassenById({
+        const getFilteredKlassenPromise: Promise<void> = organisationStore.getFilteredKlassen({
           searchString: 'klasse',
           administriertVon: ['1'],
         });
@@ -361,7 +361,7 @@ describe('OrganisationStore', () => {
         mockadapter
           .onGet('/api/organisationen?limit=25&searchString=klasse&typ=KLASSE&administriertVon=1')
           .replyOnce(500, 'some mock server error');
-        const getFilteredKlassenPromise: Promise<void> = organisationStore.getFilteredKlassenById({
+        const getFilteredKlassenPromise: Promise<void> = organisationStore.getFilteredKlassen({
           searchString: 'klasse',
           administriertVon: ['1'],
         });
@@ -376,7 +376,7 @@ describe('OrganisationStore', () => {
         mockadapter
           .onGet('/api/organisationen?limit=25&searchString=hund&typ=KLASSE&administriertVon=100')
           .replyOnce(500, { code: 'some mock server error' });
-        const getFilteredKlassenPromise: Promise<void> = organisationStore.getFilteredKlassenById({
+        const getFilteredKlassenPromise: Promise<void> = organisationStore.getFilteredKlassen({
           searchString: 'hund',
           administriertVon: ['100'],
         });

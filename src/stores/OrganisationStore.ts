@@ -78,7 +78,7 @@ export type OrganisationenFilter = {
 type OrganisationGetters = {};
 type OrganisationActions = {
   getAllOrganisationen: (filter?: OrganisationenFilter) => Promise<void>;
-  getFilteredKlassenById(filter?: OrganisationenFilter): Promise<void>;
+  getFilteredKlassen(filter?: OrganisationenFilter): Promise<void>;
   getKlassenByOrganisationId: (organisationId: string, searchFilter?: string) => Promise<void>;
   getOrganisationById: (organisationId: string, organisationsTyp: OrganisationsTyp) => Promise<Organisation>;
   createOrganisation: (
@@ -161,7 +161,7 @@ export const useOrganisationStore: StoreDefinition<
       }
     },
 
-    async getFilteredKlassenById(filter?: OrganisationenFilter) {
+    async getFilteredKlassen(filter?: OrganisationenFilter) {
       this.loadingKlassen = true;
       try {
         const response: AxiosResponse<Organisation[]> = await organisationApi.organisationControllerFindOrganizations(
