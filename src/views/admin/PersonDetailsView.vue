@@ -1050,18 +1050,8 @@
           <v-row class="ml-md-16">
             <v-col>
               <h3 class="subtitle-1">{{ $t('admin.person.status') }}</h3>
-              <p v-if="!personStore.loading">
-                {{ personStore.currentPerson?.person.isLocked ? t('person.userIsLocked') : t('person.userIsUnlocked') }}
-              </p>
-              <template
-                v-for="(attribute, key) in personStore.currentPerson?.person.attributes"
-                :key="key"
-              >
-                <p v-if="key.startsWith('lock_')">
-                  {{ keyMapper(key) }} {{ keyValueMapper(key, attribute.toString()) }}
-                </p>
-              </template>
             </v-col>
+            <v-spacer></v-spacer>
             <v-col
               class="mr-lg-13"
               cols="12"
@@ -1090,8 +1080,34 @@
                 </PersonDelete>
               </div>
             </v-col>
-            <v-col v-else-if="personStore.loading"> <v-progress-circular indeterminate></v-progress-circular></v-col
-          ></v-row>
+            <v-col v-else-if="personStore.loading"> <v-progress-circular indeterminate></v-progress-circular></v-col>
+          </v-row>
+          <v-row
+            class="ml-md-3 mt-md-n8"
+            v-if="!personStore.loading"
+          >
+            <v-col
+              cols="10"
+              offset="1"
+            >
+              <span class="text-body">
+                {{ personStore.currentPerson?.person.isLocked ? t('person.userIsLocked') : t('person.userIsUnlocked') }}
+              </span>
+            </v-col>
+            <v-col
+              cols="10"
+              offset="1"
+              v-for="(attribute, key) in personStore.currentPerson?.person.attributes"
+              :key="key"
+            >
+              <span
+                class="text-body"
+                v-if="key.startsWith('lock_')"
+              >
+                {{ keyMapper(key) }} {{ keyValueMapper(key, attribute.toString()) }}
+              </span>
+            </v-col>
+          </v-row>
         </v-container>
       </template>
     </LayoutCard>
