@@ -1,5 +1,5 @@
 import { expect, test, type MockInstance } from 'vitest';
-import { DOMWrapper, VueWrapper, mount, shallowMount } from '@vue/test-utils';
+import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
 import { createRouter, createWebHistory, type NavigationFailure, type RouteLocationRaw, type Router } from 'vue-router';
 import routes from '@/router/routes';
 import PersonDetailsView from './PersonDetailsView.vue';
@@ -231,23 +231,5 @@ describe('PersonDetailsView', () => {
 
     // Check if the element exists and has the correct text content
     expect(vornameElement?.text()).toBe('Samuel');
-  });
-
-  test('It sets the organisationId and triggers filteredRollen', async () => {
-    // Mount the parent component with stubs
-    const wrapper1: VueWrapper | null = shallowMount(PersonDetailsView, {
-      global: {
-        plugins: [router],
-        stubs: {
-          PersonenkontextCreate: {
-            template: '<div></div>',
-          },
-        },
-      },
-    });
-
-    // Simulate emitting the event from the stubbed child component
-    await wrapper1.vm.$emit('update:selectedOrganisation', '54321');
-    await wrapper1.vm.$nextTick();
   });
 });
