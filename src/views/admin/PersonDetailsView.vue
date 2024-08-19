@@ -303,7 +303,7 @@
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedRolle', vuetifyConfig);
   const [selectedOrganisation, selectedOrganisationProps]: [
-    Ref<string>,
+    Ref<string | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedOrganisation', vuetifyConfig);
   const [selectedKlasse, selectedKlasseProps]: [
@@ -895,7 +895,7 @@
                     :errorCode="personStore.errorCode"
                     :person="personStore.currentPerson"
                     :disabled="selectedZuordnungen.length === 0"
-                    :zuordnungCount="zuordnungenResult?.filter((zuordnung) => zuordnung.editable).length"
+                    :zuordnungCount="zuordnungenResult?.filter((zuordnung) => zuordnung.editable).length || 0"
                     @onDeletePersonenkontext="prepareDeletion"
                   >
                   </PersonenkontextDelete>
@@ -1031,9 +1031,9 @@
                   v-model:selectedOrganisation="selectedOrganisation"
                   v-model:selectedRolle="selectedRolle"
                   v-model:selectedKlasse="selectedKlasse"
-                  @update:selectedOrganisation="(value: string) => (selectedOrganisation = value)"
-                  @update:selectedRolle="(value: string | undefined) => (selectedRolle = value)"
-                  @update:selectedKlasse="(value: string) => (selectedKlasse = value)"
+                  @update:selectedOrganisation="(value?: string) => (selectedOrganisation = value)"
+                  @update:selectedRolle="(value?: string) => (selectedRolle = value)"
+                  @update:selectedKlasse="(value?: string) => (selectedKlasse = value)"
                   @update:canCommit="canCommit = $event"
                   @fieldReset="handleFieldReset"
                 />

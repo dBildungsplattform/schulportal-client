@@ -69,6 +69,7 @@ describe('RolleDetailsView', () => {
   test('it renders the role details view', () => {
     expect(wrapper?.find('[data-testid="rolle-details-card"]').isVisible()).toBe(true);
   });
+
   test('activates editing mode', async () => {
     rolleStore.updatedRolle = null;
     rolleStore.errorCode = '';
@@ -81,7 +82,7 @@ describe('RolleDetailsView', () => {
     expect(wrapper?.find('[data-testid="rolle-changes-save"]').isVisible()).toBe(true);
   });
 
-  test('cancels editing mode', async () => {
+  test('Does not cancel editing because of unsaved changes', async () => {
     rolleStore.updatedRolle = null;
     rolleStore.errorCode = '';
 
@@ -91,7 +92,7 @@ describe('RolleDetailsView', () => {
     await wrapper?.find('[data-testid="rolle-edit-cancel"]').trigger('click');
     await nextTick();
 
-    expect(wrapper?.find('[data-testid="rolle-changes-save"]').isVisible()).toBe(true);
+    expect(wrapper?.find('[data-testid="rolle-edit-button"]').exists()).toBe(false);
   });
 
   test('submits the form and shows the success template', async () => {
