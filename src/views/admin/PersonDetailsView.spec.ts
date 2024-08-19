@@ -233,7 +233,7 @@ describe('PersonDetailsView', () => {
     expect(vornameElement?.text()).toBe('Samuel');
   });
 
-  test.only('It sets the organisationId and triggers filteredRollen', async () => {
+  test('It sets the organisationId and triggers filteredRollen', async () => {
     // Mount the parent component with stubs
     const wrapper1: VueWrapper | null = shallowMount(PersonDetailsView, {
       global: {
