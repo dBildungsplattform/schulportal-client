@@ -3,12 +3,7 @@ import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
 import { createRouter, createWebHistory, type NavigationFailure, type RouteLocationRaw, type Router } from 'vue-router';
 import routes from '@/router/routes';
 import PersonDetailsView from './PersonDetailsView.vue';
-import {
-  type Personendatensatz,
-  type PersonendatensatzResponse,
-  type PersonStore,
-  usePersonStore,
-} from '@/stores/PersonStore';
+import { type Personendatensatz, type PersonendatensatzResponse, type PersonStore, usePersonStore } from '@/stores/PersonStore';
 import { usePersonenkontextStore, type PersonenkontextStore, type Uebersicht } from '@/stores/PersonenkontextStore';
 import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
 import { RollenMerkmal, RollenSystemRecht } from '@/stores/RolleStore';
@@ -62,16 +57,6 @@ const mockPersonenuebersicht: Uebersicht = {
     {
       sskId: '2',
       rolleId: '1',
-      sskName: '9a',
-      sskDstNr: '123459',
-      rolle: 'SuS',
-      typ: OrganisationsTyp.Klasse,
-      administriertVon: '1',
-      editable: true,
-    },
-    {
-      sskId: '2',
-      rolleId: '54321',
       sskName: '9a',
       sskDstNr: '123459',
       rolle: 'SuS',
@@ -133,25 +118,6 @@ organisationStore.klassen = [
   },
 ];
 
-personenkontextStore.workflowStepResponse = {
-  rollen: [
-    {
-      administeredBySchulstrukturknoten: '1234',
-      rollenart: 'LERN',
-      name: 'SuS',
-      merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RollenMerkmal>,
-      systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
-      createdAt: '2022',
-      updatedAt: '2022',
-      id: '54321',
-    },
-  ],
-  organisations: [],
-  selectedOrganisation: null,
-  selectedRolle: null,
-  canCommit: true,
-};
-
 personStore.currentPerson = mockPerson;
 personenkontextStore.personenuebersicht = mockPersonenuebersicht;
 
@@ -210,26 +176,6 @@ describe('PersonDetailsView', () => {
 
     expect(zuordnungCreateButton?.exists()).toBe(false);
   });
-
-  test('Renders details for the current person', async () => {
-    // Mock the current person in the store
-    personStore.currentPerson = {
-      person: {
-        id: '1234',
-        name: {
-          familienname: 'Vimes',
-          vorname: 'Samuel',
-        },
-      },
-    } as PersonendatensatzResponse;
-
-    await nextTick();
-
-    const vornameElement: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="person-vorname"]');
-
-    // Check if the element exists and has the correct text content
-    expect(vornameElement?.text()).toBe('Samuel');
-  });
   test('It triggers change Klasse and selects the first checkbox', async () => {
     // Trigger edit mode
     await wrapper?.find('[data-testid="zuordnung-edit-button"]').trigger('click');
@@ -261,5 +207,24 @@ describe('PersonDetailsView', () => {
     const klasseChangeFormComponent: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-change-form' });
 
     expect(klasseChangeFormComponent?.exists()).toBe(true);
+  });
+  test('Renders details for the current person', async () => {
+    // Mock the current person in the store
+    personStore.currentPerson = {
+      person: {
+        id: '1234',
+        name: {
+          familienname: 'Vimes',
+          vorname: 'Samuel',
+        },
+      },
+    } as PersonendatensatzResponse;
+
+    await nextTick();
+
+    const vornameElement: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="person-vorname"]');
+
+    // Check if the element exists and has the correct text content
+    expect(vornameElement?.text()).toBe('Samuel');
   });
 });
