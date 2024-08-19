@@ -475,7 +475,7 @@
     const existingZuordnungen: Zuordnung[] | undefined = personenkontextStore.personenuebersicht?.zuordnungen;
 
     const selectedOrgaId: string | undefined = selectedOrganisation.value;
- 
+
     // Determine if the user already has any LERN roles
     const hasLernRolle: boolean =
       existingZuordnungen?.some((zuordnung: Zuordnung) => isLernRolle(zuordnung.rolleId)) ?? false;
