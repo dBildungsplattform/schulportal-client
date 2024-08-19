@@ -296,7 +296,7 @@
       includeTyp: OrganisationsTyp.Schule,
       systemrechte: ['PERSONEN_VERWALTEN'],
     });
-    await organisationStore.getFilteredKlassen({
+    await organisationStore.getFilteredKlassenById({
       includeTyp: OrganisationsTyp.Klasse,
       systemrechte: ['KLASSEN_VERWALTEN'],
     });
