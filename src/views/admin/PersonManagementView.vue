@@ -172,7 +172,7 @@
     await searchFilterStore.setKlasseFilter([]);
     selectedKlassen.value = [];
     if (selectedSchulen.value.length) {
-      await organisationStore.getFilteredKlassen({
+      await organisationStore.getFilteredKlassenById({
         administriertVon: selectedSchulen.value,
         searchString: searchInputKlassen.value,
       });
@@ -258,7 +258,7 @@
 
     /* delay new call 500ms */
     timerId = setTimeout(() => {
-      organisationStore.getFilteredKlassen({ searchString: searchValue, administriertVon: selectedSchulen.value });
+      organisationStore.getFilteredKlassenById({ searchString: searchValue, administriertVon: selectedSchulen.value });
     }, 500);
   }
 
