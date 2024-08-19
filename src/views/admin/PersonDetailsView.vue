@@ -271,7 +271,7 @@
 
   const klassen: ComputedRef<TranslatedObject[] | undefined> = useKlassen();
 
-  type RolleWithRollenart = {
+  export type RolleWithRollenart = {
     value: string;
     title: string;
     Rollenart: RollenArt;
