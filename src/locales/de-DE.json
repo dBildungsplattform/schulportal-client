@@ -450,7 +450,7 @@
       "workEmail": "Dienstliche E-Mail"
     }
   },
-  "transfer":"Versetzen",
+  "transfer": "Versetzen",
   "unsavedChanges": {
     "message": "Sie haben nicht gespeicherte Änderungen vorgenommen. Wollen Sie die Seite trotzdem verlassen?",
     "title": "Änderungen vorgenommen"

@@ -349,7 +349,6 @@
     personenkontextStore.processWorkflowStep({ organisationId: organisationId, rolleId: rolleId });
     // Check if rolleId exists and if it's of type LERN
     if (rolleId && isLernRolle(rolleId) && hasOneSelectedZuordnung) {
-
       return true;
     }
     return false;
@@ -732,7 +731,9 @@
     await personStore.getPersonById(currentPersonId);
     await personenkontextStore.getPersonenuebersichtById(currentPersonId);
     await personenkontextStore.processWorkflowStep();
-    hasKlassenZuordnung.value = personenkontextStore.personenuebersicht?.zuordnungen.some((zuordnung: Zuordnung) => zuordnung.typ === OrganisationsTyp.Klasse);
+    hasKlassenZuordnung.value = personenkontextStore.personenuebersicht?.zuordnungen.some(
+      (zuordnung: Zuordnung) => zuordnung.typ === OrganisationsTyp.Klasse,
+    );
 
     await personStore.get2FAState(currentPersonId);
   });
@@ -1098,7 +1099,7 @@
                 <template v-if="!pendingDeletion && !pendingCreation && !pendingChangeKlasse">
                   <div class="checkbox-div">
                     <v-checkbox
-                    :ref="`checkbox-zuordnung-${zuordnung.sskId}`"
+                      :ref="`checkbox-zuordnung-${zuordnung.sskId}`"
                       v-model="selectedZuordnungen"
                       :value="zuordnung"
                     >
@@ -1174,11 +1175,11 @@
                     </span>
 
                     <span
-                    v-if="
-                          newZuordnung &&
-                          zuordnung.sskId === newZuordnung.sskId &&
-                          zuordnung.rolleId === newZuordnung.rolleId
-                        "
+                      v-if="
+                        newZuordnung &&
+                        zuordnung.sskId === newZuordnung.sskId &&
+                        zuordnung.rolleId === newZuordnung.rolleId
+                      "
                       class="text-body my-3 ml-5"
                       :class="{
                         'text-green':
@@ -1272,7 +1273,7 @@
                     </v-btn>
                   </SpshTooltip>
                   <SpshTooltip
-                   v-if="hasKlassenZuordnung"
+                    v-if="hasKlassenZuordnung"
                     :enabledCondition="canChangeKlasse"
                     :disabledText="$t('person.chooseKlasseZuordnungFirst')"
                     :enabledText="$t('person.changeKlasseDescription')"
@@ -1693,9 +1694,7 @@
                 offset="1"
                 cols="10"
               >
-                <span>{{
-                  createZuordnungConfirmationDialogMessage
-                }}</span>
+                <span>{{ createZuordnungConfirmationDialogMessage }}</span>
               </v-col>
             </v-row>
           </v-container>
