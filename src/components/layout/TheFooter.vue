@@ -29,17 +29,17 @@
     {
       text: t('footer.legalNotice'),
       href: '/impressum_datenschutzerklaerung.html',
-      external: true,
+      external: false,
     },
     {
       text: t('footer.privacyPolicy'),
       href: '/impressum_datenschutzerklaerung.html#privacy_policy',
-      external: true,
+      external: false,
     },
     {
       text: t('footer.accessibility'),
       href: '/impressum_datenschutzerklaerung.html#accessibility',
-      external: true,
+      external: false,
     },
   ]);
 

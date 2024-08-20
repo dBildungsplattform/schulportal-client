@@ -1,54 +1,55 @@
 <script setup lang="ts">
-  import { computed, type ComputedRef } from 'vue';
-  import { type Composer, useI18n } from 'vue-i18n';
-
   /* this block is necessary to introduce a table header type for defining table headers
       watch source for updates: https://stackoverflow.com/a/75993081/4790594
    */
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
+
   type ReadonlyHeaders = InstanceType<typeof VDataTableServer>['headers'];
 
-  type TableItem = Record<string, unknown>;
+  // Mutable headers
+  type ReadonlyHeadersMutable = VDataTableServer['$props']['headers'];
+  type UnwrapReadonlyArray<A> = A extends Readonly<Array<infer I>> ? I : never;
+  type ReadonlyDataTableHeader = UnwrapReadonlyArray<ReadonlyHeadersMutable>;
+  type DeepMutable<T> = { -readonly [P in keyof T]: DeepMutable<T[P]> };
+  type Headers = DeepMutable<ReadonlyDataTableHeader>;
+
+  export type TableItem = Record<string, unknown>;
+  export type TableRow<T> = {
+    item: T;
+  };
 
   type Props = {
+    currentPage?: number;
+    disableRowClick?: boolean;
+    headers: ReadonlyHeaders | Headers;
     items: TableItem[];
+    itemsPerPage: number;
+    itemValuePath: string;
     loading: boolean;
     totalItems: number;
-    headers: ReadonlyHeaders;
-    itemValuePath: string;
-    disableRowClick?: boolean;
   };
+
   const props: Props = defineProps<Props>();
 
-  const { t }: Composer = useI18n({ useScope: 'global' });
-
-  // TODO: these two values will come from the API in the future
-  const itemsPerPage: number = 25;
-  const page: number = 1;
-
-  const pageText: ComputedRef<string> = computed<string>(() => {
-    const totalItems: number = props.items.length;
-    const firstPageItem: number = (page - 1) * itemsPerPage + 1;
-    const lastPageItem: number = Math.min(page * itemsPerPage, totalItems);
-    const interval: string = `${firstPageItem} - ${lastPageItem}`;
-
-    return t('pagination.pageText', { interval: interval, total: totalItems });
-  });
-
   type Emits = {
-    (event: 'onHandleRowClick', eventPayload: PointerEvent, item: TableItem): void;
+    (event: 'onHandleRowClick', eventPayload: PointerEvent, item: TableRow<unknown>): void;
     (event: 'onTableUpdate'): void;
+    (event: 'onItemsPerPageUpdate', limit: number): void;
+    (event: 'onPageUpdate', page: number): void;
   };
   const emit: Emits = defineEmits<{
-    (event: 'onHandleRowClick', eventPayload: PointerEvent, item: TableItem): void;
+    (event: 'onHandleRowClick', eventPayload: PointerEvent, item: TableRow<unknown>): void;
     (event: 'onTableUpdate'): void;
+    (event: 'onItemsPerPageUpdate', limit: number): void;
+    (event: 'onPageUpdate', page: number): void;
   }>();
 
-  function handleRowClick(event: PointerEvent, item: TableItem): void {
+  function handleRowClick(event: PointerEvent, item: TableRow<unknown>): void {
     if (!props.disableRowClick) {
       emit('onHandleRowClick', event, item);
     }
   }
+
   interface Slots {
     default: (props: { default: string }) => string;
     top: (props: { top: number }) => string;
@@ -65,13 +66,17 @@
     :headers="headers"
     :items="items"
     :items-length="totalItems"
-    :items-per-page-options="[{ value: -1, title: $t('pagination.all') }]"
+    :items-per-page="itemsPerPage"
+    :items-per-page-options="[30, 50, 100, 300]"
     :items-per-page-text="$t('itemsPerPage')"
     :item-value="itemValuePath"
-    :page-text="pageText"
+    :page="currentPage"
+    ref="v-data-table-server"
     select-strategy="page"
     show-select
     @update:options="$emit('onTableUpdate')"
+    @update:page="(page: number) => $emit('onPageUpdate', page)"
+    @update:itemsPerPage="(limit: number) => $emit('onItemsPerPageUpdate', limit)"
     :no-data-text="$t('noDataFound')"
   >
     <template

@@ -24,15 +24,20 @@
       "createAnother": "Weitere Klasse anlegen",
       "createNew": "Neue Klasse anlegen",
       "discard": "Klasse verwerfen",
+      "deleteKlasse": "Klasse löschen",
+      "deleteKlasseConfirmation": "Wollen Sie die Klasse {klassenname} an der Schule {schulname} wirklich entfernen?",
+      "deleteKlasseSuccessMessage": "Die Klasse {klassenname} an der Schule {schulname} wurde erfolgreich gelöscht.",
       "edit": "Klasse bearbeiten",
       "title": {
-        "KLASSENNAME_AN_SCHULE_EINDEUTIG": "Fehler bei Änderung der Klasse."
+        "KLASSENNAME_AN_SCHULE_EINDEUTIG": "Fehler bei Änderung der Klasse.",
+        "ORGANISATION_IST_BEREITS_ZUGEWIESEN_ERROR": "Fehler beim Löschen."
       },
       "errors": {
         "KLASSE_ERROR": "Die Klasse konnte nicht geändert werden.",
         "KLASSE_NUR_VON_SCHULE_ADMINISTRIERT": "Klassen dürfen nur von einer Schule administriert werden.",
         "KLASSENNAME_AN_SCHULE_EINDEUTIG": "Der Klassenname existiert bereits an dieser Schule.",
-        "ORGANISATION_SPECIFICATION_ERROR": "Die Klasse konnte nicht angelegt werden."
+        "ORGANISATION_SPECIFICATION_ERROR": "Die Klasse konnte nicht angelegt werden.",
+        "ORGANISATION_IST_BEREITS_ZUGEWIESEN_ERROR": "Die Klasse kann nicht gelöscht werden, da noch Benutzer zugeordnet sind."
       },
       "enterKlassenname": "Klassenname eingeben",
       "klasse": "Klasse",
@@ -43,6 +48,8 @@
       "klassenname": "Klassenname",
       "klassenFound": "{count} Klasse gefunden | {count} Klassen gefunden",
       "klassenSelected": "{count} Klassen ausgewählt",
+      "loadingErrorText": "Es konnten keine Klassendaten geladen werden.",
+      "loadingErrorTitle": "Fehler beim Laden der Klassen",
       "management": "Klassenverwaltung",
       "selectKlasse": "Klasse auswählen",
       "rules": {
@@ -51,6 +58,7 @@
         },
         "klassenname": {
           "matches": "Der Klassenname darf keine ungültigen Zeichen beinhalten.",
+          "noLeadingTrailingSpaces": "Der Klassenname darf nicht mit Leerzeichen beginnen oder enden.",
           "required": "Der Klassenname muss angegeben werden."
         },
         "schule": {
@@ -83,9 +91,14 @@
         "setUpLong": "Zwei-Faktor-Authentifizierung einrichten",
         "header": "Zwei-Faktor-Authentifizierung (2FA)",
         "softwareTokenOption": "Software-Token einrichten",
-        "softwareTokenText": "(i) Ein QR-Code wird generiert, welcher direkt eingescannt oder ausgedruckt werden kann.",
+        "softwareTokenText": "Ein QR-Code wird generiert, welcher direkt eingescannt oder ausgedruckt werden kann.",
         "hardwareTokenOption": "Hardware-Token zuordnen",
-        "hardwareTokenText": "(i) Der Hardware-Token muss vorliegen und funktionieren. Bitte notieren Sie, wem Sie den Token gegeben haben."
+        "hardwareTokenText": "Der Hardware-Token muss vorliegen und funktionieren. Bitte notieren Sie, wem Sie den Token gegeben haben.",
+        "scanOrPrint": "QR-Code scannen oder ausdrucken.",
+        "notSetUp": "Für diesen Benutzer ist aktuell keine 2FA eingerichtet.",
+        "softwareTokenIsSetUp": "Für diesen Benutzer ist aktuell ein Software-Token eingerichtet.",
+        "resetInfo": "Um einen neuen Token einzurichten, muss der aktuelle Token durch die schulischen Admins zurückgesetzt werden.",
+        "tokenReset": "Token zurücksetzen"
       },
       "copyPasswordError": "Passwort konnte nicht in die Zwischenablage kopiert werden",
       "copyPasswordSuccess": "Passwort in Zwischenablage kopiert",
@@ -110,14 +123,16 @@
       "resetPassword": "Passwort zurücksetzen",
       "rules": {
         "vorname": {
-          "matches": "Der Vorname darf keine ungültigen Zeichen beinhalten.",
-          "min": "Der Vorname muss aus mindestens 2 Zeichen bestehen.",
-          "required": "Der Vorname muss angegeben werden."
+          "matches": "Der Vorname enthält ungültige Zeichen.",
+          "noLeadingTrailingSpaces": "Der Vorname darf nicht mit Leerzeichen beginnen oder enden.",
+          "min": "Der Vorname muss mindestens 2 Zeichen lang sein.",
+          "required": "Der Vorname ist erforderlich."
         },
         "familienname": {
-          "matches": "Der Nachname darf keine ungültigen Zeichen beinhalten.",
-          "min": "Der Nachname muss aus mindestens 2 Zeichen bestehen.",
-          "required": "Der Nachname muss angegeben werden."
+          "matches": "Der Familienname enthält ungültige Zeichen.",
+          "noLeadingTrailingSpaces": "Der Familienname darf nicht mit Leerzeichen beginnen oder enden.",
+          "min": "Der Familienname muss mindestens 2 Zeichen lang sein.",
+          "required": "Der Familienname ist erforderlich."
         }
       },
       "showAll": "Alle Benutzer anzeigen",
@@ -219,6 +234,7 @@
         "rollenname": {
           "length": "Der Rollenname darf nicht länger als 200 Zeichen sein.",
           "matches": "Der Rollenname darf keine ungültigen Zeichen beinhalten.",
+          "noLeadingTrailingSpaces": "Der Rollenname darf nicht mit Leerzeichen beginnen oder enden.",
           "required": "Der Rollenname muss ausgewählt werden."
         }
       },
@@ -252,16 +268,19 @@
         "NAME_REQUIRED_FOR_SCHULE": "Die Angabe eines Namens ist erforderlich.",
         "NUR_KLASSE_UNTER_SCHULE": "Die Klasse muss einer Schule zugeordnet werden.",
         "ORGANISATION_SPECIFICATION_ERROR": "Die Schule konnte nicht angelegt werden.",
+        "SCHULE_KENNUNG_EINDEUTIG": "Die Dienststellennummer existiert bereits.",
         "SCHULE_UNTER_TRAEGER": "Eine Schule darf nicht einer anderen Schule zugeordnet werden."
       },
       "management": "Schulverwaltung",
       "publicSchule": "Öffentliche Schule",
       "rules": {
         "dienststellennummer": {
+          "noLeadingTrailingSpaces": "Die Dienststellennummer darf nicht mit Leerzeichen beginnen oder enden.",
           "required": "Die Dienststellennummer muss angegeben werden."
         },
         "schulname": {
           "matches": "Der Schulname darf keine ungültigen Zeichen beinhalten.",
+          "noLeadingTrailingSpaces": "Der Schulname darf nicht mit Leerzeichen beginnen oder enden.",
           "required": "Der Schulname muss angegeben werden."
         }
       },
@@ -293,6 +312,7 @@
   "proceed": "Weiter",
   "close": "Schließen",
   "edit": "Bearbeiten",
+  "print": "Drucken",
   "errors": {
     "KEYCLOAK_CLIENT_ERROR": "Die Anmeldung ist momentan nicht möglich.",
     "UNSPECIFIED_ERROR": "Es ist ein Fehler aufgetreten.",
@@ -350,8 +370,13 @@
     "cannotDeleteOwnZuordnung": "Sie dürfen sich selbst keine Zuordnungen entziehen.",
     "checkAndSave": "Bitte prüfen und abschließend speichern, um die Aktion auszuführen",
     "changeRolle": "Rolle ändern",
+    "changeKlasseConfirmation": "Wollen Sie den Schüler/die Schülerin aus Klasse {oldKlasse} in Klasse {newKlasse} versetzen?",
+    "changeKlasseSuccess": "Der Schüler/die Schülerin wurde erfoglreich versetzt.",
     "changeRolleDescription": "Ändert die Rolle des Benutzers an der Schule ohne ihn zu entfernen.",
+    "changeKlasseDescription": "Ändert die Klasse des Benutzers an der Schule.",
+    "changeKlasseNotDisabledDescription": "Bitte wählen Sie eine neue Klasse aus.",
     "chooseZuordnungFirst": "Wählen Sie bitte zuerst eine Schulzuordnung aus.",
+    "chooseKlasseZuordnungFirst": "Wählen Sie bitte zunächst eine Schulzuordnung mit einer Klasse aus.",
     "deleteZuordnungConfirmation": "Wollen Sie die Schulzuordnung wirklich entfernen?",
     "deleteLastZuordnungConfirmation": "Dies ist die letzte Zuordnung des Benutzers zu dieser Schule. Wollen Sie die Schulzuordnung wirklich entfernen?",
     "deleteZuordnungSuccess": "Die Schulzuordnung wurde erfolgreich entfernt.",
@@ -387,8 +412,6 @@
     "rolle": "Rolle",
     "userName": "Benutzername",
     "saveChanges": "Änderungen speichern",
-    "willBeCreated": "wird hinzugefügt",
-    "willBeRemoved": "wird entfernt",
     "zuordnungen": "Schulzuordnung(en)",
     "zuordnung": "Schulzuordnung"
   },
@@ -427,9 +450,12 @@
       "workEmail": "Dienstliche E-Mail"
     }
   },
+  "transfer":"Versetzen",
   "unsavedChanges": {
     "message": "Sie haben nicht gespeicherte Änderungen vorgenommen. Wollen Sie die Seite trotzdem verlassen?",
     "title": "Änderungen vorgenommen"
   },
-  "yes": "Ja"
+  "yes": "Ja",
+  "willBeCreated": "wird hinzugefügt",
+  "willBeRemoved": "wird entfernt"
 }

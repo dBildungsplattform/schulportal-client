@@ -31,7 +31,7 @@
   import { useDisplay } from 'vuetify';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
-  import { DIN_91379A } from '@/utils/validation';
+  import { DIN_91379A, NO_LEADING_TRAILING_SPACES } from '@/utils/validation';
   import { useOrganisationen } from '@/composables/useOrganisationen';
   import { useRollen } from '@/composables/useRollen';
   import { useKlassen } from '@/composables/useKlassen';
@@ -69,10 +69,12 @@
       selectedRolle: string().required(t('admin.rolle.rules.rolle.required')),
       selectedVorname: string()
         .matches(DIN_91379A, t('admin.person.rules.vorname.matches'))
+        .matches(NO_LEADING_TRAILING_SPACES, t('admin.person.rules.vorname.noLeadingTrailingSpaces'))
         .min(2, t('admin.person.rules.vorname.min'))
         .required(t('admin.person.rules.vorname.required')),
       selectedFamilienname: string()
         .matches(DIN_91379A, t('admin.person.rules.familienname.matches'))
+        .matches(NO_LEADING_TRAILING_SPACES, t('admin.person.rules.familienname.noLeadingTrailingSpaces'))
         .min(2, t('admin.person.rules.familienname.min'))
         .required(t('admin.person.rules.familienname.required')),
       selectedOrganisation: string().required(t('admin.organisation.rules.organisation.required')),
@@ -119,7 +121,7 @@
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedFamilienname', vuetifyConfig);
   const [selectedOrganisation, selectedOrganisationProps]: [
-    Ref<string>,
+    Ref<string | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedOrganisation', vuetifyConfig);
   const [selectedKlasse, selectedKlasseProps]: [
@@ -186,7 +188,7 @@
     const bodyParams: CreatePersonBodyParams = {
       familienname: selectedFamilienname.value as string,
       vorname: selectedVorname.value as string,
-      organisationId: selectedOrganisation.value,
+      organisationId: selectedOrganisation.value as string,
       rolleId: selectedRolle.value ?? '',
     };
 
@@ -289,7 +291,7 @@
         :discardButtonLabel="$t('admin.person.discard')"
         id="person-creation-form"
         :onDiscard="navigateToPersonTable"
-        @onShowDialogChange="(value: boolean) => (showUnsavedChangesDialog = value)"
+        @onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
         :onSubmit="onSubmit"
         :showUnsavedChangesDialog="showUnsavedChangesDialog"
       >
@@ -305,9 +307,9 @@
           v-model:selectedOrganisation="selectedOrganisation"
           v-model:selectedRolle="selectedRolle"
           v-model:selectedKlasse="selectedKlasse"
-          @update:selectedOrganisation="(value: string) => (selectedOrganisation = value)"
-          @update:selectedRolle="(value: string | undefined) => (selectedRolle = value)"
-          @update:selectedKlasse="(value: string | undefined) => (selectedKlasse = value)"
+          @update:selectedOrganisation="(value?: string) => (selectedOrganisation = value)"
+          @update:selectedRolle="(value?: string) => (selectedRolle = value)"
+          @update:selectedKlasse="(value?: string) => (selectedKlasse = value)"
           @update:canCommit="canCommit = $event"
           @fieldReset="handleFieldReset"
         />

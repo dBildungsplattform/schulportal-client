@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest';
 import { VueWrapper, mount } from '@vue/test-utils';
-import RolleForm from './RolleForm.vue';
+import KlasseForm from './KlasseForm.vue';
 
 let wrapper: VueWrapper | null = null;
 
@@ -11,7 +11,7 @@ beforeEach(() => {
     </div>
   `;
 
-  wrapper = mount(RolleForm, {
+  wrapper = mount(KlasseForm, {
     attachTo: document.getElementById('app') || '',
     props: {
       onHandleConfirmUnsavedChanges: () => '',
@@ -21,14 +21,14 @@ beforeEach(() => {
     },
     global: {
       components: {
-        RolleForm,
+        KlasseForm,
       },
     },
   });
 });
 
 describe('RolleForm', () => {
-  test('it renders the rolle form', () => {
-    expect(wrapper?.find('[data-testid="rolle-form"]').isVisible()).toBe(true);
+  test('it renders the Klasse form', () => {
+    expect(wrapper?.find('[data-testid="klasse-form"]').isVisible()).toBe(true);
   });
 });

@@ -48,7 +48,7 @@ const mockPersonenuebersicht: Uebersicht = {
       editable: true,
     },
     {
-      sskId: '1',
+      sskId: '3',
       rolleId: '4',
       sskName: 'Testschule London',
       sskDstNr: '123459',
@@ -89,6 +89,16 @@ personenkontextStore.workflowStepResponse = {
       updatedAt: '2024-06-25T13:03:53.802Z',
       name: 'string',
       administeredBySchulstrukturknoten: 'string',
+      rollenart: 'LERN',
+      merkmale: RollenMerkmal.BefristungPflicht as unknown as Set<RollenMerkmal>,
+      systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
+    },
+    {
+      id: '1',
+      createdAt: '2024-06-25T13:03:53.802Z',
+      updatedAt: '2024-06-25T13:03:53.802Z',
+      name: 'SuS',
+      administeredBySchulstrukturknoten: '1',
       rollenart: 'LERN',
       merkmale: RollenMerkmal.BefristungPflicht as unknown as Set<RollenMerkmal>,
       systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
@@ -168,5 +178,37 @@ describe('PersonDetailsView', () => {
     await nextTick();
 
     expect(zuordnungCreateButton?.exists()).toBe(false);
+  });
+  test('It triggers change Klasse and selects the first checkbox', async () => {
+    // Trigger edit mode
+    await wrapper?.find('[data-testid="zuordnung-edit-button"]').trigger('click');
+    await nextTick();
+
+    // Find the first checkbox
+    const firstCheckbox: VueWrapper | undefined = wrapper?.findComponent({ ref: 'checkbox-zuordnung-1' });
+
+    // Explicitly set the value of the checkbox via v-model
+    await firstCheckbox?.setValue([
+      {
+        sskId: '1',
+        rolleId: '1',
+        sskName: 'Testschule Birmingham',
+        sskDstNr: '123456',
+        rolle: 'SuS',
+        typ: OrganisationsTyp.Schule,
+        administriertVon: '2',
+        editable: true,
+      },
+    ]);
+    await nextTick();
+
+    // Trigger the Klasse change button
+    await wrapper?.find('[data-testid="klasse-change-button"]').trigger('click');
+    await nextTick();
+
+    // Assert that the Klasse change form is displayed
+    const klasseChangeFormComponent: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-change-form' });
+
+    expect(klasseChangeFormComponent?.exists()).toBe(true);
   });
 });
