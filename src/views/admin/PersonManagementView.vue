@@ -19,7 +19,7 @@
   import { useRolleStore, type RolleStore, type RolleResponse } from '@/stores/RolleStore';
   import { type SearchFilterStore, useSearchFilterStore } from '@/stores/SearchFilterStore';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import ResultTable from '@/components/admin/ResultTable.vue';
+  import ResultTable, { type TableRow } from '@/components/admin/ResultTable.vue';
   import SearchField from '@/components/admin/SearchField.vue';
   import { type TranslatedObject } from '@/types.d';
 
@@ -567,7 +567,10 @@
         :itemsPerPage="searchFilterStore.personenPerPage"
         :loading="personStore.loading"
         :headers="headers"
-        @onHandleRowClick="navigateToPersonDetails"
+        @onHandleRowClick="
+          (event: PointerEvent, item: TableRow<unknown>) =>
+            navigateToPersonDetails(event, item as TableRow<Personendatensatz>)
+        "
         @onItemsPerPageUpdate="getPaginatedPersonenWithLimit"
         @onPageUpdate="getPaginatedPersonen"
         :totalItems="personStore.totalPersons"

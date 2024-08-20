@@ -4,6 +4,7 @@
   import FormWrapper from '@/components/form/FormWrapper.vue';
   import FormRow from '@/components/form/FormRow.vue';
   import { type TranslatedObject } from '@/types.d';
+  import type { RollenArt, RollenMerkmal, RollenSystemRecht } from '@/stores/RolleStore';
 
   type Props = {
     administrationsebenen?: Array<{ value: string; title: string }>;
@@ -22,21 +23,20 @@
     isEditActive?: boolean;
     onHandleConfirmUnsavedChanges: () => void;
     onHandleDiscard: () => void;
-    onShowDialogChange: (value: boolean) => void;
+    onShowDialogChange: (value?: boolean) => void;
     onSubmit: () => void;
   };
 
   defineProps<Props>();
 
   // Define the V-model for each field so the parent component can pass in the values for it.
-  const selectedAdministrationsebene: ModelRef<unknown, string> = defineModel('selectedAdministrationsebene');
-  const selectedRollenArt: ModelRef<unknown, string> = defineModel('selectedRollenArt');
-  const selectedRollenName: ModelRef<unknown, string> = defineModel('selectedRollenName');
-  const selectedMerkmale: ModelRef<Array<TranslatedObject> | undefined, string> = defineModel('selectedMerkmale');
-  const selectedServiceProviders: ModelRef<Array<TranslatedObject> | undefined, string> =
-    defineModel('selectedServiceProviders');
-  const selectedSystemRechte: ModelRef<Array<TranslatedObject> | undefined, string> =
-    defineModel('selectedSystemRechte');
+  const selectedAdministrationsebene: ModelRef<string | undefined, string> =
+    defineModel('selectedAdministrationsebene');
+  const selectedRollenArt: ModelRef<RollenArt | undefined, string> = defineModel('selectedRollenArt');
+  const selectedRollenName: ModelRef<string | undefined, string> = defineModel('selectedRollenName');
+  const selectedMerkmale: ModelRef<RollenMerkmal[] | undefined, string> = defineModel('selectedMerkmale');
+  const selectedServiceProviders: ModelRef<string[] | undefined, string> = defineModel('selectedServiceProviders');
+  const selectedSystemRechte: ModelRef<RollenSystemRecht[] | undefined, string> = defineModel('selectedSystemRechte');
 </script>
 
 <template data-test-id="rolle-form">
@@ -156,7 +156,7 @@
           item-text="title"
           multiple
           :no-data-text="$t('noDataFound')"
-          :placeholder="$t('admin.rolle.selectMerkmale')"
+          :placeholder="isEditActive ? $t('admin.rolle.selectMerkmale') : '---'"
           variant="outlined"
           v-bind="selectedMerkmaleProps"
           v-model="selectedMerkmale"
@@ -185,7 +185,7 @@
           item-text="title"
           multiple
           :no-data-text="$t('noDataFound')"
-          :placeholder="$t('admin.serviceProvider.selectServiceProvider')"
+          :placeholder="isEditActive ? $t('admin.serviceProvider.selectServiceProvider') : '---'"
           variant="outlined"
           v-bind="selectedServiceProvidersProps"
           v-model="selectedServiceProviders"
@@ -215,7 +215,7 @@
           item-text="title"
           multiple
           :no-data-text="$t('noDataFound')"
-          :placeholder="$t('admin.rolle.selectSystemrechte')"
+          :placeholder="isEditActive ? $t('admin.rolle.selectSystemrechte') : '---'"
           variant="outlined"
           v-bind="selectedSystemRechteProps"
           v-model="selectedSystemRechte"

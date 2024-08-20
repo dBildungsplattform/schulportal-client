@@ -7,14 +7,14 @@
 
 <template>
   <SpshAlert
-    :modelValue="true"
-    :title="404"
-    :type="'error'"
-    :closable="false"
-    :showButton="true"
-    :buttonText="$t('nav.back')"
     :buttonAction="goBack"
+    :buttonText="$t('nav.back')"
+    :closable="false"
+    :modelValue="true"
+    :showButton="true"
     :text="$t('errors.NOT_FOUND')"
+    title="404"
+    type="error"
   />
 </template>
 
