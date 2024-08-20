@@ -7,6 +7,8 @@
     label: string;
     labelAbbr?: string;
     value: string;
+    testIdLabel: string;
+    testIdValue: string;
   };
 
   import { usePersonInfoStore, type PersonInfoStore, type PersonInfoResponse } from '@/stores/PersonInfoStore';
@@ -92,28 +94,44 @@
 
   function createZuordnungsSchuleDaten(zuordnungen: Zuordnung[]): SchulDaten[] {
     const result: SchulDaten[] = [];
-    for (const zuordnung of zuordnungen) {
+    for (const [index, zuordnung] of zuordnungen.entries()) {
       const tempSchulDaten: SchulDaten = {
         title: zuordnung.sskName,
         info: t('profile.yourSchuleAdminsAre'),
         schoolAdmins: [], // Hierfuer muss ein API-Endpunkt implementiert werden
-        labelAndValues: [{ label: t('profile.schule'), value: zuordnung.sskName }],
+        labelAndValues: [
+          {
+            label: t('profile.schule'),
+            value: zuordnung.sskName,
+            testIdLabel: 'schule-label-' + index,
+            testIdValue: 'schule-value-' + index,
+          },
+        ],
       };
 
       if (zuordnung.klasse) {
         tempSchulDaten.labelAndValues.push({
           label: t('profile.klasse'),
           value: zuordnung.klasse,
+          testIdLabel: 'klasse-label-' + index,
+          testIdValue: 'klasse-value-' + index,
         });
       }
 
-      tempSchulDaten.labelAndValues.push({ label: t('admin.rolle.rolle'), value: zuordnung.rolle });
+      tempSchulDaten.labelAndValues.push({
+        label: t('admin.rolle.rolle'),
+        value: zuordnung.rolle,
+        testIdLabel: 'rolle-label-' + index,
+        testIdValue: 'rolle-value-' + index,
+      });
 
       if (zuordnung.sskDstNr) {
         tempSchulDaten.labelAndValues.push({
           label: t('profile.dienstStellenNummer'),
           labelAbbr: t('profile.dienstStellenNummerAbbr'),
           value: zuordnung.sskDstNr,
+          testIdLabel: 'dienstStellenNummer-label-' + index,
+          testIdValue: 'dienstStellenNummer-value-' + index,
         });
       }
 
@@ -137,8 +155,15 @@
       {
         label: t('profile.fullName'),
         value: personInfo.person.name.vorname + ' ' + personInfo.person.name.familiennamen,
+        testIdLabel: 'fullName-label',
+        testIdValue: 'fullName-value',
       },
-      { label: t('person.userName'), value: personInfo.person.referrer },
+      {
+        label: t('person.userName'),
+        value: personInfo.person.referrer,
+        testIdLabel: 'userName-label',
+        testIdValue: 'userName-value',
+      },
     ];
 
     if (personInfo.person.personalnummer) {
@@ -146,6 +171,8 @@
         label: t('profile.koPersNummer'),
         labelAbbr: t('profile.koPersNummerAbbr'),
         value: personInfo.person.personalnummer,
+        testIdLabel: 'koPersNummer-label',
+        testIdValue: 'koPersNummer-value',
       });
     }
   }
@@ -215,22 +242,32 @@
                       <td>
                         <span v-if="item.labelAbbr"
                           ><abbr :title="item.label"
-                            ><strong>{{ item.labelAbbr }}</strong></abbr
+                            ><strong :data-testid="item.testIdLabel">{{ item.labelAbbr }}</strong></abbr
                           >:</span
                         >
-                        <strong v-else>{{ item.label }}:</strong>
+                        <strong
+                          :data-testid="item.testIdLabel"
+                          v-else
+                          >{{ item.label }}:</strong
+                        >
                       </td>
-                      <td>{{ item.value }}</td>
+                      <td :data-testid="item.testIdValue">{{ item.value }}</td>
                     </tr>
                   </tbody>
                 </template>
               </v-table>
-              <p class="pt-4 text-center text-body-1 text-medium-emphasis">
+              <p
+                class="pt-4 text-center text-body-1 text-medium-emphasis"
+                data-testid="info-text-with-icon"
+              >
                 <v-icon
                   class="mr-2"
                   icon="mdi-information-slab-circle-outline"
+                  data-testid="info-icon"
                 ></v-icon>
-                {{ $t('profile.infoAboutChangeabilityFromPersonalData') }}
+                <template data-testid="info-text">
+                  {{ $t('profile.infoAboutChangeabilityFromPersonalData') }}
+                </template>
               </p>
             </v-col>
           </v-row>
@@ -243,7 +280,10 @@
         sm="12"
         md="6"
       >
-        <LayoutCard :header="$t('person.zuordnung') + ' ' + (schulDaten.length > 1 ? (index + 1).toString() : '')">
+        <LayoutCard
+          :header="$t('person.zuordnung') + ' ' + (schulDaten.length > 1 ? (index + 1).toString() : '')"
+          data-testid="zuordung-card-${index}"
+        >
           <v-row class="ma-3 p-4">
             <v-col cols="12">
               <v-table class="text-body-1">
@@ -256,12 +296,16 @@
                       <td>
                         <span v-if="item.labelAbbr"
                           ><abbr :title="item.label"
-                            ><strong>{{ item.labelAbbr }}</strong></abbr
+                            ><strong :data-testid="item.testIdLabel">{{ item.labelAbbr }}</strong></abbr
                           >:</span
                         >
-                        <strong v-else>{{ item.label }}:</strong>
+                        <strong
+                          :data-testid="item.testIdLabel"
+                          v-else
+                          >{{ item.label }}:</strong
+                        >
                       </td>
-                      <td>{{ item.value }}</td>
+                      <td :data-testid="item.testIdValue">{{ item.value }}</td>
                     </tr>
                   </tbody>
                 </template>
@@ -269,10 +313,12 @@
               <p
                 class="pt-4 text-center text-body-1"
                 v-if="schuleData.schoolAdmins.length > 0"
+                data-testid="school-admins-${index}"
               >
                 <v-icon
                   class="mr-2"
                   icon="mdi-information-slab-circle-outline"
+                  data-testid="school-admins-icon"
                 ></v-icon>
                 {{ schuleData.info + ' ' + schuleData.schoolAdmins?.join(', ') }}
               </p>
@@ -285,17 +331,22 @@
         sm="12"
         md="6"
       >
-        <LayoutCard :header="$t('login.password')">
+        <LayoutCard
+          data-testid="new-password-card"
+          :header="$t('login.password')"
+        >
           <v-row class="ma-3 d-flex align-content-center justify-center ga-4">
             <v-icon
               size="x-large"
               class="w-100"
               icon="mdi-key-alert-outline"
+              data-testid="password-icon"
             ></v-icon>
             <div>
               <v-btn
                 color="primary"
                 disabled
+                data-testid="set-new-password-button"
               >
                 {{ $t('profile.setNewPassword') }}
               </v-btn>
@@ -309,17 +360,22 @@
         sm="12"
         md="6"
       >
-        <LayoutCard :header="$t('profile.twoFactorAuth')">
+        <LayoutCard
+          data-testid="two-factor-card"
+          :header="$t('profile.twoFactorAuth')"
+        >
           <v-row class="ma-3 d-flex align-content-center justify-center ga-4">
             <v-icon
               size="x-large"
               class="w-100"
               icon="mdi-shield-account-outline"
+              data-testid="two-factor-icon"
             ></v-icon>
             <div>
               <v-btn
                 color="primary"
                 disabled
+                data-testid="setup-two-factor-button"
               >
                 {{ $t('profile.setupTwoFactorAuth') }}
               </v-btn>
