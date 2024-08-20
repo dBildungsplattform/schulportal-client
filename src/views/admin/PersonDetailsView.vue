@@ -494,8 +494,8 @@
         return !alreadyHasRolleInSelectedOrga && rolle.Rollenart === RollenArt.Lern;
       }
 
-      // If the user doesn't have any LERN roles, allow any role that hasn't been assigned yet in the selected organization
-      return !alreadyHasRolleInSelectedOrga;
+      // If the user doesn't have any LERN roles, allow any role that hasn't been assigned yet in the selected organization besides LERN. 
+      return !alreadyHasRolleInSelectedOrga && rolle.Rollenart !== RollenArt.Lern;
     });
   });
 
