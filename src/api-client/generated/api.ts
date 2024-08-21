@@ -459,6 +459,12 @@ export interface DbiamCreatePersonWithContextBodyParams {
      * @type {string}
      * @memberof DbiamCreatePersonWithContextBodyParams
      */
+    'personalnummer'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof DbiamCreatePersonWithContextBodyParams
+     */
     'organisationId': string;
     /**
      * 
@@ -2604,12 +2610,15 @@ export const AuthApiAxiosParamCreator = function (configuration?: Configuration)
          * 
          * @summary Redirect to Keycloak password reset.
          * @param {string} redirectUrl 
+         * @param {string} loginHint 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        authenticationControllerResetPassword: async (redirectUrl: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        authenticationControllerResetPassword: async (redirectUrl: string, loginHint: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'redirectUrl' is not null or undefined
             assertParamExists('authenticationControllerResetPassword', 'redirectUrl', redirectUrl)
+            // verify required parameter 'loginHint' is not null or undefined
+            assertParamExists('authenticationControllerResetPassword', 'loginHint', loginHint)
             const localVarPath = `/api/auth/reset-password`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -2624,6 +2633,10 @@ export const AuthApiAxiosParamCreator = function (configuration?: Configuration)
 
             if (redirectUrl !== undefined) {
                 localVarQueryParameter['redirectUrl'] = redirectUrl;
+            }
+
+            if (loginHint !== undefined) {
+                localVarQueryParameter['login_hint'] = loginHint;
             }
 
 
@@ -2682,11 +2695,12 @@ export const AuthApiFp = function(configuration?: Configuration) {
          * 
          * @summary Redirect to Keycloak password reset.
          * @param {string} redirectUrl 
+         * @param {string} loginHint 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async authenticationControllerResetPassword(redirectUrl: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.authenticationControllerResetPassword(redirectUrl, options);
+        async authenticationControllerResetPassword(redirectUrl: string, loginHint: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.authenticationControllerResetPassword(redirectUrl, loginHint, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -2731,11 +2745,12 @@ export const AuthApiFactory = function (configuration?: Configuration, basePath?
          * 
          * @summary Redirect to Keycloak password reset.
          * @param {string} redirectUrl 
+         * @param {string} loginHint 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        authenticationControllerResetPassword(redirectUrl: string, options?: any): AxiosPromise<void> {
-            return localVarFp.authenticationControllerResetPassword(redirectUrl, options).then((request) => request(axios, basePath));
+        authenticationControllerResetPassword(redirectUrl: string, loginHint: string, options?: any): AxiosPromise<void> {
+            return localVarFp.authenticationControllerResetPassword(redirectUrl, loginHint, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -2778,11 +2793,12 @@ export interface AuthApiInterface {
      * 
      * @summary Redirect to Keycloak password reset.
      * @param {string} redirectUrl 
+     * @param {string} loginHint 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof AuthApiInterface
      */
-    authenticationControllerResetPassword(redirectUrl: string, options?: AxiosRequestConfig): AxiosPromise<void>;
+    authenticationControllerResetPassword(redirectUrl: string, loginHint: string, options?: AxiosRequestConfig): AxiosPromise<void>;
 
 }
 
@@ -2831,12 +2847,13 @@ export class AuthApi extends BaseAPI implements AuthApiInterface {
      * 
      * @summary Redirect to Keycloak password reset.
      * @param {string} redirectUrl 
+     * @param {string} loginHint 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof AuthApi
      */
-    public authenticationControllerResetPassword(redirectUrl: string, options?: AxiosRequestConfig) {
-        return AuthApiFp(this.configuration).authenticationControllerResetPassword(redirectUrl, options).then((request) => request(this.axios, this.basePath));
+    public authenticationControllerResetPassword(redirectUrl: string, loginHint: string, options?: AxiosRequestConfig) {
+        return AuthApiFp(this.configuration).authenticationControllerResetPassword(redirectUrl, loginHint, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
