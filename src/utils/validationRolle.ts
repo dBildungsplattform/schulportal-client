@@ -104,7 +104,6 @@ export const getRolleFieldDefinitions = (formContext: ReturnType<typeof useForm>
 };
 
 export const getDirtyState = (formContext: ReturnType<typeof useForm>): boolean => {
-
   return (
     formContext.isFieldDirty('selectedAdministrationsebene') ||
     formContext.isFieldDirty('selectedRollenArt') ||
