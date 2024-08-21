@@ -13,8 +13,8 @@
     "followingDataCreated": "Folgende Daten wurden gespeichert:",
     "headline": "Administrationsbereich",
     "koPers": {
-      "koPersNumber": "KoPers-Nr",
-      "noKoPersNumber": "Keine KoPers-Nr vorhanden"
+      "koPersNumber": "KoPers.-Nr.",
+      "noKoPersNumber": "Keine KoPers.-Nr. vorhanden"
     },
     "klasse": {
       "addNew": "Neue Klasse hinzufügen",
@@ -207,7 +207,7 @@
         },
         "merkmale": {
           "BEFRISTUNG_PFLICHT": "Befristung ist Pflichtangabe",
-          "KOPERS_PFLICHT": "KoPers-Nr. ist Pflichtangabe"
+          "KOPERS_PFLICHT": "KoPers.-Nr. ist Pflichtangabe"
         }
       },
       "merkmale": "Merkmale",
@@ -384,11 +384,11 @@
     "enterFirstName": "Vorname eingeben",
     "enterLastName": "Nachname eingeben",
     "firstName": "Vorname",
-    "firstNameLastNameReferrerKopersNr": "Vor-/Nachname/Benutzername/KoPers-Nr.",
+    "firstNameLastNameReferrerKopersNr": "Vor-/Nachname/Benutzername/KoPers.-Nr.",
     "firstAndLastName": "Vor- und Nachname",
     "finishEditFirst": "Bitte beenden Sie zunächst Ihre aktuelle Bearbeitung.",
     "klasse": "Klasse",
-    "kopersnr": "Kopers-Nr",
+    "kopersnr": "KoPers.-Nr.",
     "lastName": "Nachname",
     "modifyBefristung": "Befristung bearbeiten",
     "modifyBefristungDescription": "Ändert die Befristung der Zuordnung des Benutzers zu dieser Schule.",

@@ -798,7 +798,7 @@
                 <span class="text-body">{{ personStore.currentPerson.person.referrer }} </span>
               </v-col>
             </v-row>
-            <!-- Kopers-Nr -->
+            <!-- KoPers.-Nr. -->
             <v-row class="mt-0">
               <v-col cols="1"></v-col>
               <v-col
