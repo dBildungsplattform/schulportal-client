@@ -5,6 +5,7 @@
   import { useDisplay } from 'vuetify';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { usePersonenkontextStore, type PersonenkontextStore, type Zuordnung } from '@/stores/PersonenkontextStore';
+  import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
   const { t }: Composer = useI18n({ useScope: 'global' });
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
@@ -15,6 +16,7 @@
   };
 
   const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
+  const organisationStore: OrganisationStore = useOrganisationStore();
   const schulen: Ref = ref<Array<{ value: string; title: string }>>([]);
   const selectedSchule: Ref = ref<string | null>(null);
   type Emits = {
@@ -45,18 +47,22 @@
 
   onBeforeMount(async () => {
     await personenkontextStore.getPersonenuebersichtById(props.adminId);
-    const assignedAdminSchulen: string[] =
-      personenkontextStore.personenuebersicht?.zuordnungen.map((zuordnung: Zuordnung) => zuordnung.sskName) || [];
-
+    const assignedAdminSchulen: Zuordnung['sskId'][] = (personenkontextStore.personenuebersicht?.zuordnungen || []).map(
+      ({ sskId }: Zuordnung) => sskId,
+    );
     await personenkontextStore.getPersonenuebersichtById(props.person.person.id);
-    const assignedUserSchulen: string[] =
-      personenkontextStore.personenuebersicht?.zuordnungen.map((zuordnung: Zuordnung) => zuordnung.sskName) || [];
-
-    const assignedSchulenIntersection: string[] = assignedAdminSchulen.filter((schule: string) =>
-      assignedUserSchulen.includes(schule),
+    const assignedUserSchulen: Zuordnung['sskId'][] = (personenkontextStore.personenuebersicht?.zuordnungen || []).map(
+      ({ sskId }: Zuordnung) => sskId,
     );
 
-    schulen.value = [...new Set(assignedSchulenIntersection)];
+    const intersectingOrganisations: Set<Organisation> = new Set<Organisation>(
+      (await organisationStore.getParentOrganisationsByIds(assignedUserSchulen)).filter((userOrg: Organisation) =>
+        assignedAdminSchulen.find((sskId: Zuordnung['sskId']) => userOrg.id === sskId),
+      ),
+    );
+    schulen.value = [...intersectingOrganisations].map(
+      (organisation: Organisation) => `(${organisation.kennung ?? ''}) ${organisation.name}`,
+    );
     if (schulen.value.length === 1) {
       selectedSchule.value = schulen.value[0];
     }

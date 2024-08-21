@@ -8,6 +8,7 @@ import {
   type CreateOrganisationBodyParams,
   type RollenSystemRecht,
   type OrganisationByNameBodyParams,
+  type OrganisationParentsResponse,
 } from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
 
@@ -81,6 +82,7 @@ type OrganisationActions = {
   getFilteredKlassen(filter?: OrganisationenFilter): Promise<void>;
   getKlassenByOrganisationId: (organisationId: string, searchFilter?: string) => Promise<void>;
   getOrganisationById: (organisationId: string, organisationsTyp: OrganisationsTyp) => Promise<Organisation>;
+  getParentOrganisationsByIds: (organisationIds: string[]) => Promise<Organisation[]>;
   createOrganisation: (
     kennung: string,
     name: string,
@@ -201,6 +203,24 @@ export const useOrganisationStore: StoreDefinition<
         }
 
         return data;
+      } catch (error: unknown) {
+        this.errorCode = 'UNSPECIFIED_ERROR';
+        if (isAxiosError(error)) {
+          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
+        }
+        return await Promise.reject(this.errorCode);
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async getParentOrganisationsByIds(organisationIds: string[]) {
+      this.errorCode = '';
+      this.loading = true;
+      try {
+        const { data }: { data: OrganisationParentsResponse } =
+          await organisationApi.organisationControllerGetParentsByIds({ organisationIds: organisationIds });
+        return data.parents;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {

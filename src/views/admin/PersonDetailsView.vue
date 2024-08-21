@@ -89,8 +89,8 @@
     });
   }
 
-  function onLockUser(personId: string, lock: boolean, schule: string): void {
-    personStore.lockPerson(personId, lock, authStore.currentUser?.name + ' - ' + schule);
+  function onLockUser(personId: string, lock: boolean, organisation: string): void {
+    personStore.lockPerson(personId, lock, organisation);
   }
 
   const handleAlertClose = (): void => {

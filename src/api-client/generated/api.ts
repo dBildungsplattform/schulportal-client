@@ -800,6 +800,19 @@ export interface OrganisationByNameBodyParams {
 /**
  * 
  * @export
+ * @interface OrganisationParentsResponse
+ */
+export interface OrganisationParentsResponse {
+    /**
+     * 
+     * @type {Array<OrganisationResponse>}
+     * @memberof OrganisationParentsResponse
+     */
+    'parents': Array<OrganisationResponse>;
+}
+/**
+ * 
+ * @export
  * @interface OrganisationResponse
  */
 export interface OrganisationResponse {
@@ -944,6 +957,19 @@ export const OrganisationsTyp = {
 export type OrganisationsTyp = typeof OrganisationsTyp[keyof typeof OrganisationsTyp];
 
 
+/**
+ * 
+ * @export
+ * @interface ParentOrganisationsByIdsBodyParams
+ */
+export interface ParentOrganisationsByIdsBodyParams {
+    /**
+     * The ids of organizations
+     * @type {Array<string>}
+     * @memberof ParentOrganisationsByIdsBodyParams
+     */
+    'organisationIds': Array<string>;
+}
 /**
  * 
  * @export
@@ -2648,12 +2674,15 @@ export const AuthApiAxiosParamCreator = function (configuration?: Configuration)
          * 
          * @summary Redirect to Keycloak password reset.
          * @param {string} redirectUrl 
+         * @param {string} loginHint 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        authenticationControllerResetPassword: async (redirectUrl: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        authenticationControllerResetPassword: async (redirectUrl: string, loginHint: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'redirectUrl' is not null or undefined
             assertParamExists('authenticationControllerResetPassword', 'redirectUrl', redirectUrl)
+            // verify required parameter 'loginHint' is not null or undefined
+            assertParamExists('authenticationControllerResetPassword', 'loginHint', loginHint)
             const localVarPath = `/api/auth/reset-password`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -2668,6 +2697,10 @@ export const AuthApiAxiosParamCreator = function (configuration?: Configuration)
 
             if (redirectUrl !== undefined) {
                 localVarQueryParameter['redirectUrl'] = redirectUrl;
+            }
+
+            if (loginHint !== undefined) {
+                localVarQueryParameter['login_hint'] = loginHint;
             }
 
 
@@ -2726,11 +2759,12 @@ export const AuthApiFp = function(configuration?: Configuration) {
          * 
          * @summary Redirect to Keycloak password reset.
          * @param {string} redirectUrl 
+         * @param {string} loginHint 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async authenticationControllerResetPassword(redirectUrl: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.authenticationControllerResetPassword(redirectUrl, options);
+        async authenticationControllerResetPassword(redirectUrl: string, loginHint: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.authenticationControllerResetPassword(redirectUrl, loginHint, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -2775,11 +2809,12 @@ export const AuthApiFactory = function (configuration?: Configuration, basePath?
          * 
          * @summary Redirect to Keycloak password reset.
          * @param {string} redirectUrl 
+         * @param {string} loginHint 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        authenticationControllerResetPassword(redirectUrl: string, options?: any): AxiosPromise<void> {
-            return localVarFp.authenticationControllerResetPassword(redirectUrl, options).then((request) => request(axios, basePath));
+        authenticationControllerResetPassword(redirectUrl: string, loginHint: string, options?: any): AxiosPromise<void> {
+            return localVarFp.authenticationControllerResetPassword(redirectUrl, loginHint, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -2822,11 +2857,12 @@ export interface AuthApiInterface {
      * 
      * @summary Redirect to Keycloak password reset.
      * @param {string} redirectUrl 
+     * @param {string} loginHint 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof AuthApiInterface
      */
-    authenticationControllerResetPassword(redirectUrl: string, options?: AxiosRequestConfig): AxiosPromise<void>;
+    authenticationControllerResetPassword(redirectUrl: string, loginHint: string, options?: AxiosRequestConfig): AxiosPromise<void>;
 
 }
 
@@ -2875,12 +2911,13 @@ export class AuthApi extends BaseAPI implements AuthApiInterface {
      * 
      * @summary Redirect to Keycloak password reset.
      * @param {string} redirectUrl 
+     * @param {string} loginHint 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof AuthApi
      */
-    public authenticationControllerResetPassword(redirectUrl: string, options?: AxiosRequestConfig) {
-        return AuthApiFp(this.configuration).authenticationControllerResetPassword(redirectUrl, options).then((request) => request(this.axios, this.basePath));
+    public authenticationControllerResetPassword(redirectUrl: string, loginHint: string, options?: AxiosRequestConfig) {
+        return AuthApiFp(this.configuration).authenticationControllerResetPassword(redirectUrl, loginHint, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
@@ -3876,6 +3913,49 @@ export const OrganisationenApiAxiosParamCreator = function (configuration?: Conf
         },
         /**
          * 
+         * @param {ParentOrganisationsByIdsBodyParams} parentOrganisationsByIdsBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        organisationControllerGetParentsByIds: async (parentOrganisationsByIdsBodyParams: ParentOrganisationsByIdsBodyParams, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'parentOrganisationsByIdsBodyParams' is not null or undefined
+            assertParamExists('organisationControllerGetParentsByIds', 'parentOrganisationsByIdsBodyParams', parentOrganisationsByIdsBodyParams)
+            const localVarPath = `/api/organisationen/parents-by-ids`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(parentOrganisationsByIdsBodyParams, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -4177,6 +4257,16 @@ export const OrganisationenApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @param {ParentOrganisationsByIdsBodyParams} parentOrganisationsByIdsBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async organisationControllerGetParentsByIds(parentOrganisationsByIdsBodyParams: ParentOrganisationsByIdsBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<OrganisationParentsResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.organisationControllerGetParentsByIds(parentOrganisationsByIdsBodyParams, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -4312,6 +4402,15 @@ export const OrganisationenApiFactory = function (configuration?: Configuration,
         },
         /**
          * 
+         * @param {ParentOrganisationsByIdsBodyParams} parentOrganisationsByIdsBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        organisationControllerGetParentsByIds(parentOrganisationsByIdsBodyParams: ParentOrganisationsByIdsBodyParams, options?: any): AxiosPromise<OrganisationParentsResponse> {
+            return localVarFp.organisationControllerGetParentsByIds(parentOrganisationsByIdsBodyParams, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -4438,6 +4537,15 @@ export interface OrganisationenApiInterface {
      * @memberof OrganisationenApiInterface
      */
     organisationControllerGetAdministrierteOrganisationen(organisationId: string, searchFilter?: string, options?: AxiosRequestConfig): AxiosPromise<Array<OrganisationResponse>>;
+
+    /**
+     * 
+     * @param {ParentOrganisationsByIdsBodyParams} parentOrganisationsByIdsBodyParams 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OrganisationenApiInterface
+     */
+    organisationControllerGetParentsByIds(parentOrganisationsByIdsBodyParams: ParentOrganisationsByIdsBodyParams, options?: AxiosRequestConfig): AxiosPromise<OrganisationParentsResponse>;
 
     /**
      * 
@@ -4580,6 +4688,17 @@ export class OrganisationenApi extends BaseAPI implements OrganisationenApiInter
      */
     public organisationControllerGetAdministrierteOrganisationen(organisationId: string, searchFilter?: string, options?: AxiosRequestConfig) {
         return OrganisationenApiFp(this.configuration).organisationControllerGetAdministrierteOrganisationen(organisationId, searchFilter, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {ParentOrganisationsByIdsBodyParams} parentOrganisationsByIdsBodyParams 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OrganisationenApi
+     */
+    public organisationControllerGetParentsByIds(parentOrganisationsByIdsBodyParams: ParentOrganisationsByIdsBodyParams, options?: AxiosRequestConfig) {
+        return OrganisationenApiFp(this.configuration).organisationControllerGetParentsByIds(parentOrganisationsByIdsBodyParams, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
