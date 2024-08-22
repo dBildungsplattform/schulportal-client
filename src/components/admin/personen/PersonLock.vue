@@ -61,7 +61,7 @@
       ),
     );
     schulen.value = [...intersectingOrganisations].map(
-      (organisation: Organisation) => `(${organisation.kennung ?? ''}) ${organisation.name}`,
+      (organisation: Organisation) => `${organisation.kennung ?? ''} (${organisation.name})`,
     );
     if (schulen.value.length === 1) {
       selectedSchule.value = schulen.value[0];
