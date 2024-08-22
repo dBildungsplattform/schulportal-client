@@ -229,7 +229,10 @@
         sm="12"
         md="6"
       >
-        <LayoutCard :header="$t('profile.personalData')">
+        <LayoutCard
+          :header="$t('profile.personalData')"
+          :headline-test-id="'layout-card-headline-persoenliche-daten'"
+        >
           <v-row class="ma-4">
             <v-col cols="12">
               <v-table class="text-body-1">
@@ -282,7 +285,7 @@
       >
         <LayoutCard
           :header="$t('person.zuordnung') + ' ' + (schulDaten.length > 1 ? (index + 1).toString() : '')"
-          data-testid="zuordung-card-${index}"
+          :headline-test-id="'zuordung-card-' + index"
         >
           <v-row class="ma-3 p-4">
             <v-col cols="12">
@@ -332,7 +335,7 @@
         md="6"
       >
         <LayoutCard
-          data-testid="new-password-card"
+          :headline-test-id="'new-password-card'"
           :header="$t('login.password')"
         >
           <v-row class="ma-3 d-flex align-content-center justify-center ga-4">
@@ -361,7 +364,7 @@
         md="6"
       >
         <LayoutCard
-          data-testid="two-factor-card"
+          :headline-test-id="'two-factor-card'"
           :header="$t('profile.twoFactorAuth')"
         >
           <v-row class="ma-3 d-flex align-content-center justify-center ga-4">
