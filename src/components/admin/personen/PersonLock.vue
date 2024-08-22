@@ -45,21 +45,26 @@
     selectedSchule.value = value;
   }
 
-  onBeforeMount(async () => {
-    await personenkontextStore.getPersonenuebersichtById(props.adminId);
-    const assignedAdminSchulen: Zuordnung['sskId'][] = (personenkontextStore.personenuebersicht?.zuordnungen || []).map(
-      ({ sskId }: Zuordnung) => sskId,
-    );
-    await personenkontextStore.getPersonenuebersichtById(props.person.person.id);
-    const assignedUserSchulen: Zuordnung['sskId'][] = (personenkontextStore.personenuebersicht?.zuordnungen || []).map(
-      ({ sskId }: Zuordnung) => sskId,
-    );
+  async function getAssignedOrganisationIds(id: string): Promise<Zuordnung['sskId'][]> {
+    await personenkontextStore.getPersonenuebersichtById(id);
+    return (personenkontextStore.personenuebersicht?.zuordnungen || []).map(({ sskId }: Zuordnung) => sskId);
+  }
 
-    const intersectingOrganisations: Set<Organisation> = new Set<Organisation>(
-      (await organisationStore.getParentOrganisationsByIds(assignedUserSchulen)).filter((userOrg: Organisation) =>
-        assignedAdminSchulen.find((sskId: Zuordnung['sskId']) => userOrg.id === sskId),
+  async function getOrganisationIntersection(): Promise<Set<Organisation>> {
+    const adminAssignedOrganisationIds: Zuordnung['sskId'][] = await getAssignedOrganisationIds(props.adminId);
+    const userAssignedOrganisationIds: Zuordnung['sskId'][] = await getAssignedOrganisationIds(props.person.person.id);
+
+    await organisationStore.getParentOrganisationsByIds(userAssignedOrganisationIds);
+    const userParentOrganisationen: Organisation[] = organisationStore.parentOrganisationen;
+    return new Set<Organisation>(
+      userParentOrganisationen.filter((userOrg: Organisation) =>
+        adminAssignedOrganisationIds.find((sskId: Zuordnung['sskId']) => userOrg.id === sskId),
       ),
     );
+  }
+
+  onBeforeMount(async () => {
+    const intersectingOrganisations: Set<Organisation> = await getOrganisationIntersection();
     schulen.value = [...intersectingOrganisations].map(
       (organisation: Organisation) => `${organisation.kennung ?? ''} (${organisation.name})`,
     );
@@ -69,7 +74,7 @@
   });
 </script>
 
-<template v-if="assignedSchulenIntersection.length > 0">
+<template v-if="schulen.length > 0">
   <v-dialog persistent>
     <template v-slot:activator="{ props }">
       <v-col

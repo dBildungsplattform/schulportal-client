@@ -8,7 +8,7 @@ import {
   type CreateOrganisationBodyParams,
   type RollenSystemRecht,
   type OrganisationByNameBodyParams,
-  type OrganisationParentsResponse,
+  type ParentOrganisationenResponse,
 } from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
 
@@ -64,6 +64,7 @@ type OrganisationState = {
   errorCode: string;
   loading: boolean;
   loadingKlassen: boolean;
+  parentOrganisationen: Array<Organisation>;
 };
 
 export type OrganisationenFilter = {
@@ -124,6 +125,7 @@ export const useOrganisationStore: StoreDefinition<
       errorCode: '',
       loading: false,
       loadingKlassen: false,
+      parentOrganisationen: [],
     };
   },
 
@@ -218,9 +220,11 @@ export const useOrganisationStore: StoreDefinition<
       this.errorCode = '';
       this.loading = true;
       try {
-        const { data }: { data: OrganisationParentsResponse } =
+        const response: AxiosResponse<ParentOrganisationenResponse, unknown> =
           await organisationApi.organisationControllerGetParentsByIds({ organisationIds: organisationIds });
-        return data.parents;
+        const { parents }: ParentOrganisationenResponse = response.data;
+        this.parentOrganisationen = parents;
+        return parents;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
