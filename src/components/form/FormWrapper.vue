@@ -6,7 +6,7 @@
   // Define the type for the props
   type Props = {
     confirmUnsavedChangesAction: () => void;
-    canCommit: boolean;
+    canCommit?: boolean;
     createButtonLabel: string;
     discardButtonLabel: string;
     hideActions?: boolean;
@@ -25,7 +25,7 @@
     canCommit: true,
   });
 
-  const emit: (event: 'onShowDialogChange', ...args: unknown[]) => void = defineEmits(['onShowDialogChange']);
+  const emit: (event: 'onShowDialogChange', value?: boolean) => void = defineEmits(['onShowDialogChange']);
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 

@@ -3,14 +3,25 @@
       watch source for updates: https://stackoverflow.com/a/75993081/4790594
    */
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
+
   type ReadonlyHeaders = InstanceType<typeof VDataTableServer>['headers'];
 
-  type TableItem = Record<string, unknown>;
+  // Mutable headers
+  type ReadonlyHeadersMutable = VDataTableServer['$props']['headers'];
+  type UnwrapReadonlyArray<A> = A extends Readonly<Array<infer I>> ? I : never;
+  type ReadonlyDataTableHeader = UnwrapReadonlyArray<ReadonlyHeadersMutable>;
+  type DeepMutable<T> = { -readonly [P in keyof T]: DeepMutable<T[P]> };
+  type Headers = DeepMutable<ReadonlyDataTableHeader>;
+
+  export type TableItem = Record<string, unknown>;
+  export type TableRow<T> = {
+    item: T;
+  };
 
   type Props = {
     currentPage?: number;
     disableRowClick?: boolean;
-    headers: ReadonlyHeaders;
+    headers: ReadonlyHeaders | Headers;
     items: TableItem[];
     itemsPerPage: number;
     itemValuePath: string;
@@ -21,19 +32,19 @@
   const props: Props = defineProps<Props>();
 
   type Emits = {
-    (event: 'onHandleRowClick', eventPayload: PointerEvent, item: TableItem): void;
+    (event: 'onHandleRowClick', eventPayload: PointerEvent, item: TableRow<unknown>): void;
     (event: 'onTableUpdate'): void;
     (event: 'onItemsPerPageUpdate', limit: number): void;
     (event: 'onPageUpdate', page: number): void;
   };
   const emit: Emits = defineEmits<{
-    (event: 'onHandleRowClick', eventPayload: PointerEvent, item: TableItem): void;
+    (event: 'onHandleRowClick', eventPayload: PointerEvent, item: TableRow<unknown>): void;
     (event: 'onTableUpdate'): void;
     (event: 'onItemsPerPageUpdate', limit: number): void;
     (event: 'onPageUpdate', page: number): void;
   }>();
 
-  function handleRowClick(event: PointerEvent, item: TableItem): void {
+  function handleRowClick(event: PointerEvent, item: TableRow<unknown>): void {
     if (!props.disableRowClick) {
       emit('onHandleRowClick', event, item);
     }

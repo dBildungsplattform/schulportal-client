@@ -31,6 +31,12 @@ export type Person = {
   personalnummer?: string | null;
 };
 
+export type PersonTableItem = {
+  person: Person;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
 export type CreatePersonBodyParams = DbiamCreatePersonWithContextBodyParams;
 export type CreatedPersonenkontext = DbiamPersonenkontextBodyParams;
 

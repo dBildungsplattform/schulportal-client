@@ -16,7 +16,7 @@ beforeEach(() => {
     props: {
       onHandleConfirmUnsavedChanges: () => '',
       onHandleDiscard: () => '',
-      onShowDialogChange: (value: boolean) => value,
+      onShowDialogChange: (value: boolean | undefined) => value,
       onSubmit: () => '',
     },
     global: {
