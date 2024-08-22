@@ -5,7 +5,12 @@ import routes from '@/router/routes';
 import PersonDetailsView from './PersonDetailsView.vue';
 import { type Personendatensatz, type PersonStore, usePersonStore } from '@/stores/PersonStore';
 import { usePersonenkontextStore, type PersonenkontextStore, type Uebersicht } from '@/stores/PersonenkontextStore';
-import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
+import {
+  OrganisationsTyp,
+  useOrganisationStore,
+  type Organisation,
+  type OrganisationStore,
+} from '@/stores/OrganisationStore';
 import { RollenMerkmal, RollenSystemRecht } from '@/stores/RolleStore';
 import { nextTick } from 'vue';
 
@@ -120,6 +125,8 @@ organisationStore.klassen = [
     administriertVon: '1',
   },
 ];
+
+organisationStore.getParentOrganisationsByIds = async (_organisationIds: string[]): Promise<Organisation[]> => [];
 
 personStore.currentPerson = mockPerson;
 personenkontextStore.personenuebersicht = mockPersonenuebersicht;
