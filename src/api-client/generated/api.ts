@@ -800,19 +800,6 @@ export interface OrganisationByNameBodyParams {
 /**
  * 
  * @export
- * @interface OrganisationParentsResponse
- */
-export interface OrganisationParentsResponse {
-    /**
-     * 
-     * @type {Array<OrganisationResponse>}
-     * @memberof OrganisationParentsResponse
-     */
-    'parents': Array<OrganisationResponse>;
-}
-/**
- * 
- * @export
  * @interface OrganisationResponse
  */
 export interface OrganisationResponse {
@@ -957,6 +944,19 @@ export const OrganisationsTyp = {
 export type OrganisationsTyp = typeof OrganisationsTyp[keyof typeof OrganisationsTyp];
 
 
+/**
+ * 
+ * @export
+ * @interface ParentOrganisationenResponse
+ */
+export interface ParentOrganisationenResponse {
+    /**
+     * 
+     * @type {Array<OrganisationResponse>}
+     * @memberof ParentOrganisationenResponse
+     */
+    'parents': Array<OrganisationResponse>;
+}
 /**
  * 
  * @export
@@ -4261,7 +4261,7 @@ export const OrganisationenApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async organisationControllerGetParentsByIds(parentOrganisationsByIdsBodyParams: ParentOrganisationsByIdsBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<OrganisationParentsResponse>> {
+        async organisationControllerGetParentsByIds(parentOrganisationsByIdsBodyParams: ParentOrganisationsByIdsBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ParentOrganisationenResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.organisationControllerGetParentsByIds(parentOrganisationsByIdsBodyParams, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -4406,7 +4406,7 @@ export const OrganisationenApiFactory = function (configuration?: Configuration,
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        organisationControllerGetParentsByIds(parentOrganisationsByIdsBodyParams: ParentOrganisationsByIdsBodyParams, options?: any): AxiosPromise<OrganisationParentsResponse> {
+        organisationControllerGetParentsByIds(parentOrganisationsByIdsBodyParams: ParentOrganisationsByIdsBodyParams, options?: any): AxiosPromise<ParentOrganisationenResponse> {
             return localVarFp.organisationControllerGetParentsByIds(parentOrganisationsByIdsBodyParams, options).then((request) => request(axios, basePath));
         },
         /**
@@ -4545,7 +4545,7 @@ export interface OrganisationenApiInterface {
      * @throws {RequiredError}
      * @memberof OrganisationenApiInterface
      */
-    organisationControllerGetParentsByIds(parentOrganisationsByIdsBodyParams: ParentOrganisationsByIdsBodyParams, options?: AxiosRequestConfig): AxiosPromise<OrganisationParentsResponse>;
+    organisationControllerGetParentsByIds(parentOrganisationsByIdsBodyParams: ParentOrganisationsByIdsBodyParams, options?: AxiosRequestConfig): AxiosPromise<ParentOrganisationenResponse>;
 
     /**
      * 
