@@ -29,7 +29,7 @@
   import { RollenArt } from '@/stores/RolleStore';
   import { type Composer, useI18n } from 'vue-i18n';
   import { useOrganisationen } from '@/composables/useOrganisationen';
-  import { useRollen } from '@/composables/useRollen';
+  import { useRollen, type TranslatedRolleWithAttrs } from '@/composables/useRollen';
   import { useKlassen } from '@/composables/useKlassen';
   import PersonenkontextCreate from '@/components/admin/personen/PersonenkontextCreate.vue';
   import { type TranslatedObject } from '@/types.d';
@@ -265,17 +265,11 @@
     return result;
   }
 
-  const rollen: ComputedRef<RolleWithRollenart[] | undefined> = useRollen();
+  const rollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = useRollen();
 
   const organisationen: ComputedRef<TranslatedObject[] | undefined> = useOrganisationen();
 
   const klassen: ComputedRef<TranslatedObject[] | undefined> = useKlassen();
-
-  type RolleWithRollenart = {
-    value: string;
-    title: string;
-    Rollenart: RollenArt;
-  };
 
   type ZuordnungCreationForm = {
     selectedRolle: string;
@@ -290,10 +284,10 @@
 
   // Define a method to check if the selected Rolle is of type "Lern"
   function isLernRolle(selectedRolleId: string): boolean {
-    const rolle: RolleWithRollenart | undefined = rollen.value?.find(
-      (r: RolleWithRollenart) => r.value === selectedRolleId,
+    const rolle: TranslatedRolleWithAttrs | undefined = rollen.value?.find(
+      (r: TranslatedRolleWithAttrs) => r.value === selectedRolleId,
     );
-    return !!rolle && rolle.Rollenart === RollenArt.Lern;
+    return !!rolle && rolle.rollenart === RollenArt.Lern;
   }
 
   // Check if the button to change the Klasse should be active or not. Activate only if there is 1 selected Zuordnung and if it is of type LERN.
@@ -306,7 +300,6 @@
     personenkontextStore.processWorkflowStep({ organisationId: organisationId, rolleId: rolleId });
     // Check if rolleId exists and if it's of type LERN
     if (rolleId && isLernRolle(rolleId) && hasOneSelectedZuordnung) {
-
       return true;
     }
     return false;
@@ -472,12 +465,12 @@
   );
 
   // Filter out the Rollen in case the admin chooses an organisation that the user has already a kontext in
-  const filteredRollen: ComputedRef<RolleWithRollenart[] | undefined> = computed(() => {
+  const filteredRollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = computed(() => {
     const existingZuordnungen: Zuordnung[] | undefined = personenkontextStore.personenuebersicht?.zuordnungen.filter(
       (zuordnung: Zuordnung) => zuordnung.sskId === selectedOrganisation.value,
     );
     return rollen.value?.filter(
-      (rolle: RolleWithRollenart) =>
+      (rolle: TranslatedRolleWithAttrs) =>
         !existingZuordnungen?.some((zuordnung: Zuordnung) => zuordnung.rolleId === rolle.value),
     );
   });
@@ -550,7 +543,8 @@
         klasse: klasse?.name,
         sskDstNr: organisation.kennung ?? '',
         sskName: organisation.name,
-        rolle: rollen.value?.find((rolle: RolleWithRollenart) => rolle.value === selectedRolle.value)?.title || '',
+        rolle:
+          rollen.value?.find((rolle: TranslatedRolleWithAttrs) => rolle.value === selectedRolle.value)?.title || '',
         administriertVon: organisation.administriertVon ?? '',
         editable: true,
         typ: OrganisationsTyp.Schule,
@@ -567,7 +561,8 @@
           rolleId: selectedRolle.value ?? '',
           sskDstNr: klasse.kennung ?? '',
           sskName: klasse.name,
-          rolle: rollen.value?.find((rolle: RolleWithRollenart) => rolle.value === selectedRolle.value)?.title || '',
+          rolle:
+            rollen.value?.find((rolle: TranslatedRolleWithAttrs) => rolle.value === selectedRolle.value)?.title || '',
           administriertVon: klasse.administriertVon ?? '',
           editable: true,
           typ: OrganisationsTyp.Klasse,
@@ -623,7 +618,7 @@
         sskDstNr: organisation.kennung ?? '',
         sskName: organisation.name,
         rolle:
-          rollen.value?.find((rolle: RolleWithRollenart) => rolle.value === selectedZuordnungen.value[0]?.rolleId)
+          rollen.value?.find((rolle: TranslatedRolleWithAttrs) => rolle.value === selectedZuordnungen.value[0]?.rolleId)
             ?.title || '',
         administriertVon: organisation.administriertVon ?? '',
         editable: true,
@@ -642,8 +637,9 @@
           sskDstNr: newKlasse.kennung ?? '',
           sskName: newKlasse.name,
           rolle:
-            rollen.value?.find((rolle: RolleWithRollenart) => rolle.value === selectedZuordnungen.value[0]?.rolleId)
-              ?.title || '',
+            rollen.value?.find(
+              (rolle: TranslatedRolleWithAttrs) => rolle.value === selectedZuordnungen.value[0]?.rolleId,
+            )?.title || '',
           administriertVon: newKlasse.administriertVon ?? '',
           editable: true,
           typ: OrganisationsTyp.Klasse,
@@ -689,7 +685,9 @@
     await personStore.getPersonById(currentPersonId);
     await personenkontextStore.getPersonenuebersichtById(currentPersonId);
     await personenkontextStore.processWorkflowStep();
-    hasKlassenZuordnung.value = personenkontextStore.personenuebersicht?.zuordnungen.some((zuordnung: Zuordnung) => zuordnung.typ === OrganisationsTyp.Klasse);
+    hasKlassenZuordnung.value = personenkontextStore.personenuebersicht?.zuordnungen.some(
+      (zuordnung: Zuordnung) => zuordnung.typ === OrganisationsTyp.Klasse,
+    );
 
     await personStore.get2FAState(currentPersonId);
   });
@@ -1055,7 +1053,7 @@
                 <template v-if="!pendingDeletion && !pendingCreation && !pendingChangeKlasse">
                   <div class="checkbox-div">
                     <v-checkbox
-                    :ref="`checkbox-zuordnung-${zuordnung.sskId}`"
+                      :ref="`checkbox-zuordnung-${zuordnung.sskId}`"
                       v-model="selectedZuordnungen"
                       :value="zuordnung"
                     >
@@ -1131,11 +1129,11 @@
                     </span>
 
                     <span
-                    v-if="
-                          newZuordnung &&
-                          zuordnung.sskId === newZuordnung.sskId &&
-                          zuordnung.rolleId === newZuordnung.rolleId
-                        "
+                      v-if="
+                        newZuordnung &&
+                        zuordnung.sskId === newZuordnung.sskId &&
+                        zuordnung.rolleId === newZuordnung.rolleId
+                      "
                       class="text-body my-3 ml-5"
                       :class="{
                         'text-green':
@@ -1229,7 +1227,7 @@
                     </v-btn>
                   </SpshTooltip>
                   <SpshTooltip
-                   v-if="hasKlassenZuordnung"
+                    v-if="hasKlassenZuordnung"
                     :enabledCondition="canChangeKlasse"
                     :disabledText="$t('person.chooseKlasseZuordnungFirst')"
                     :enabledText="$t('person.changeKlasseDescription')"
@@ -1616,9 +1614,7 @@
                 offset="1"
                 cols="10"
               >
-                <span>{{
-                  createZuordnungConfirmationDialogMessage
-                }}</span>
+                <span>{{ createZuordnungConfirmationDialogMessage }}</span>
               </v-col>
             </v-row>
           </v-container>

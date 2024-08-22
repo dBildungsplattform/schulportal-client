@@ -5,7 +5,7 @@
     type CreatedPersonenkontext,
     type PersonStore,
   } from '@/stores/PersonStore';
-  import { RollenArt } from '@/stores/RolleStore';
+  import { RollenArt, RollenMerkmal } from '@/stores/RolleStore';
   import { type ComputedRef, computed, onMounted, onUnmounted, type Ref, ref } from 'vue';
   import {
     onBeforeRouteLeave,
@@ -33,7 +33,7 @@
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
   import { DIN_91379A, NO_LEADING_TRAILING_SPACES } from '@/utils/validation';
   import { useOrganisationen } from '@/composables/useOrganisationen';
-  import { useRollen } from '@/composables/useRollen';
+  import { useRollen, type TranslatedRolleWithAttrs } from '@/composables/useRollen';
   import { useKlassen } from '@/composables/useKlassen';
   import PersonenkontextCreate from '@/components/admin/personen/PersonenkontextCreate.vue';
   import { type TranslatedObject } from '@/types.d';
@@ -48,20 +48,14 @@
 
   const canCommit: Ref<boolean> = ref(false);
 
-  type RolleWithRollenart = {
-    value: string;
-    title: string;
-    Rollenart: RollenArt;
-  };
-
-  const rollen: ComputedRef<RolleWithRollenart[] | undefined> = useRollen();
+  const rollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = useRollen();
 
   // Define a method to check if the selected Rolle is of type "Lern"
   function isLernRolle(selectedRolleId: string): boolean {
-    const rolle: RolleWithRollenart | undefined = rollen.value?.find(
-      (r: RolleWithRollenart) => r.value === selectedRolleId,
+    const rolle: TranslatedRolleWithAttrs | undefined = rollen.value?.find(
+      (r: TranslatedRolleWithAttrs) => r.value === selectedRolleId,
     );
-    return !!rolle && rolle.Rollenart === RollenArt.Lern;
+    return !!rolle && rolle.rollenart === RollenArt.Lern;
   }
 
   const validationSchema: TypedSchema = toTypedSchema(

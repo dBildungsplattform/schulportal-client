@@ -34,12 +34,13 @@ beforeEach(() => {
         {
           value: '54321',
           title: 'Lern',
-          Rollenart: RollenArt.Lern,
+          rollenart: RollenArt.Lern,
         },
         {
           value: '54329',
           title: 'Lehr',
-          Rollenart: RollenArt.Lehr,
+          merkmale: new Set<RollenMerkmal>(['KOPERS_PFLICHT']),
+          rollenart: RollenArt.Lehr,
         },
       ],
       klassen: [
