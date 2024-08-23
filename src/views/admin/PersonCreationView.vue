@@ -47,8 +47,16 @@
   let blockedNext: () => void = () => {};
 
   const canCommit: Ref<boolean> = ref(false);
+  const hasNoKopersNr: Ref<boolean> = ref(false);
 
   const rollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = useRollen();
+
+  function isKopersRolle(selectedRolleId: string | undefined): boolean {
+    const rolle: TranslatedRolleWithAttrs | undefined = rollen.value?.find(
+      (r: TranslatedRolleWithAttrs) => r.value === selectedRolleId,
+    );
+    return !!rolle && !!rolle.merkmale && rolle.merkmale.has(RollenMerkmal.KopersPflicht);
+  }
 
   // Define a method to check if the selected Rolle is of type "Lern"
   function isLernRolle(selectedRolleId: string): boolean {
@@ -77,6 +85,11 @@
         then: (schema: StringSchema<string | undefined, AnyObject, undefined, ''>) =>
           schema.required(t('admin.klasse.rules.klasse.required')),
       }),
+      selectedKopersNr: string().when('selectedRolle', {
+        is: (selectedRolleId: string) => isKopersRolle(selectedRolleId) && !hasNoKopersNr.value,
+        then: (schema: StringSchema<string | undefined, AnyObject, undefined, ''>) =>
+          schema.required(t('admin.person.rules.kopersNr.required')),
+      }),
     }),
   );
 
@@ -95,6 +108,7 @@
     selectedFamilienname: string;
     selectedOrganisation: string;
     selectedKlasse: string;
+    selectedKopersNr: string;
   };
 
   // eslint-disable-next-line @typescript-eslint/typedef
@@ -106,6 +120,10 @@
     Ref<string | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedRolle', vuetifyConfig);
+  const [selectedKopersNr, selectedKopersNrProps]: [
+    Ref<string | undefined>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = defineField('selectedKopersNr', vuetifyConfig);
   const [selectedVorname, selectedVornameProps]: [
     Ref<string>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
@@ -159,6 +177,7 @@
       isFieldDirty('selectedOrganisation') ||
       isFieldDirty('selectedRolle') ||
       isFieldDirty('selectedKlasse') ||
+      isFieldDirty('selectedKopersNr') ||
       isFieldDirty('selectedVorname') ||
       isFieldDirty('selectedFamilienname')
     );
@@ -182,6 +201,7 @@
     const bodyParams: CreatePersonBodyParams = {
       familienname: selectedFamilienname.value as string,
       vorname: selectedVorname.value as string,
+      personalnummer: selectedKopersNr.value,
       organisationId: selectedOrganisation.value as string,
       rolleId: selectedRolle.value ?? '',
     };
@@ -202,6 +222,7 @@
           });
       }
       resetForm();
+      hasNoKopersNr.value = false;
     }
   }
 
@@ -218,6 +239,7 @@
     personenkontextStore.createdPersonWithKontext = null;
     personenkontextStore.createdPersonenkontextForKlasse = null;
     resetForm();
+    hasNoKopersNr.value = false;
     router.push({ name: 'create-person' });
   };
 
@@ -331,6 +353,7 @@
               v-model="selectedVorname"
             ></v-text-field>
           </FormRow>
+
           <!-- Nachname -->
           <FormRow
             :errorLabel="selectedFamiliennameProps['error']"
@@ -349,6 +372,49 @@
               variant="outlined"
               v-bind="selectedFamiliennameProps"
               v-model="selectedFamilienname"
+            ></v-text-field>
+          </FormRow>
+
+          <!-- No KoPers.-Nr. available checkbox
+              We don't use the form row here to avoid margins and paddings -->
+          <v-row
+            class="align-center"
+            v-if="isKopersRolle(selectedRolle) && selectedOrganisation"
+          >
+            <v-col
+              class="py-0 pb-sm-8 pt-sm-3 text-sm-right"
+              cols="12"
+              sm="5"
+            ></v-col>
+            <v-checkbox
+              class=""
+              data-testid="has-no-kopersnr-checkbox"
+              :disabled="!!selectedKopersNr"
+              hide-details
+              :label="$t('admin.person.noKopersNr')"
+              v-model="hasNoKopersNr"
+            ></v-checkbox>
+          </v-row>
+
+          <!-- KoPers.-Nr. -->
+          <FormRow
+            v-if="isKopersRolle(selectedRolle) && selectedOrganisation && !hasNoKopersNr"
+            :errorLabel="selectedKopersNrProps?.error || ''"
+            labelForId="kopersnr-input"
+            :isRequired="!hasNoKopersNr"
+            :label="$t('person.kopersNr')"
+          >
+            <v-text-field
+              clearable
+              data-testid="kopersnr-input"
+              density="compact"
+              id="kopersnr-input"
+              ref="kopersnr-input"
+              :placeholder="$t('person.enterKopersNr')"
+              :required="!hasNoKopersNr"
+              variant="outlined"
+              v-bind="selectedKopersNrProps"
+              v-model="selectedKopersNr"
             ></v-text-field>
           </FormRow>
         </div>
@@ -405,6 +471,16 @@
           <v-col class="text-body"
             ><span data-testid="created-person-familienname">{{
               personenkontextStore.createdPersonWithKontext.person.name.familienname
+            }}</span></v-col
+          >
+        </v-row>
+        <v-row>
+          <v-col class="text-body bold text-right"> {{ $t('person.kopersNr') }}: </v-col>
+          <v-col class="text-body"
+            ><span data-testid="created-person-kopersNr">{{
+              personenkontextStore.createdPersonWithKontext.person.personalnummer
+                ? personenkontextStore.createdPersonWithKontext.person.personalnummer
+                : '---'
             }}</span></v-col
           >
         </v-row>

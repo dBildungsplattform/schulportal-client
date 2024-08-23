@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import { computed, type ComputedRef, type Ref, ref, watch } from 'vue';
-  import { RollenArt, RollenMerkmal } from '@/stores/RolleStore';
+  import { RollenArt } from '@/stores/RolleStore';
   import { useI18n } from 'vue-i18n';
   import FormRow from '@/components/form/FormRow.vue';
   import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
@@ -17,7 +17,6 @@
   const timerId: Ref<ReturnType<typeof setTimeout> | undefined> = ref<ReturnType<typeof setTimeout>>();
   const canCommit: Ref<boolean> = ref(false);
   const hasAutoselectedSchule: Ref<boolean> = ref(false);
-
   const searchInputOrganisation: Ref<string> = ref('');
   const searchInputRolle: Ref<string> = ref('');
 
@@ -304,6 +303,7 @@
           v-model:search="searchInputRolle"
         ></v-autocomplete>
       </FormRow>
+
       <!-- Klasse zuordnen -->
       <FormRow
         v-if="isLernRolle(selectedRolle) && selectedOrganisation"

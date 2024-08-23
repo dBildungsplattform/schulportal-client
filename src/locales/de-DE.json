@@ -113,6 +113,7 @@
       "discard": "Benutzer verwerfen",
       "edit": "Benutzer bearbeiten",
       "generatedPassword": "Generiertes Passwort",
+      "noKopersNr": "KoPers.-Nr. nicht vorhanden",
       "loadingErrorText": "Es konnten keine Benutzerdaten geladen werden.",
       "loadingErrorTitle": "Fehler beim Laden des Benutzers",
       "management": "Benutzerverwaltung",
@@ -132,6 +133,9 @@
           "noLeadingTrailingSpaces": "Der Familienname darf nicht mit Leerzeichen beginnen oder enden.",
           "min": "Der Familienname muss mindestens 2 Zeichen lang sein.",
           "required": "Der Familienname ist erforderlich."
+        },
+        "kopersNr": {
+          "required": "Die KoPers.-Nr. ist erforderlich."
         }
       },
       "showAll": "Alle Benutzer anzeigen",
@@ -382,13 +386,14 @@
     "editZuordnungen": "Schulzuordnungen bearbeiten",
     "email": "E-Mail",
     "enterFirstName": "Vorname eingeben",
+    "enterKopersNr": "KoPers.-Nr. eingeben",
     "enterLastName": "Nachname eingeben",
     "firstName": "Vorname",
     "firstNameLastNameReferrerKopersNr": "Vor-/Nachname/Benutzername/KoPers.-Nr.",
     "firstAndLastName": "Vor- und Nachname",
     "finishEditFirst": "Bitte beenden Sie zunächst Ihre aktuelle Bearbeitung.",
     "klasse": "Klasse",
-    "kopersnr": "KoPers.-Nr.",
+    "kopersNr": "KoPers.-Nr.",
     "lastName": "Nachname",
     "modifyBefristung": "Befristung bearbeiten",
     "modifyBefristungDescription": "Ändert die Befristung der Zuordnung des Benutzers zu dieser Schule.",

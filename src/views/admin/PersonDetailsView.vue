@@ -805,7 +805,7 @@
                 sm="3"
                 cols="5"
               >
-                <span class="subtitle-2"> {{ $t('person.kopersnr') }}: </span>
+                <span class="subtitle-2"> {{ $t('person.kopersNr') }}: </span>
               </v-col>
               <v-col
                 cols="auto"
