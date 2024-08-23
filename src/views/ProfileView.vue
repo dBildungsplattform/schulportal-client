@@ -255,7 +255,7 @@
                   </tbody>
                 </template>
               </v-table>
-              <p class="pt-4 text-center text-body-1 text-medium-emphasis">
+              <p class="pt-4 text-center text-body-1 text-medium-emphasis wrap-text">
                 <v-icon
                   class="mr-2"
                   icon="mdi-information-slab-circle-outline"

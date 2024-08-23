@@ -79,7 +79,7 @@ type OrganisationGetters = {};
 type OrganisationActions = {
   getAllOrganisationen: (filter?: OrganisationenFilter) => Promise<void>;
   getFilteredKlassen(filter?: OrganisationenFilter): Promise<void>;
-  getKlassenByOrganisationId: (organisationId: string, searchFilter?: string) => Promise<void>;
+  getKlassenByOrganisationId: (organisationId: string, filter?: OrganisationenFilter) => Promise<void>;
   getOrganisationById: (organisationId: string, organisationsTyp: OrganisationsTyp) => Promise<Organisation>;
   createOrganisation: (
     kennung: string,
@@ -212,12 +212,17 @@ export const useOrganisationStore: StoreDefinition<
       }
     },
 
-    async getKlassenByOrganisationId(organisationId: string, searchFilter?: string) {
+    async getKlassenByOrganisationId(organisationId: string, filter?: OrganisationenFilter) {
       this.errorCode = '';
       this.loadingKlassen = true;
       try {
         const response: AxiosResponse<Organisation[]> =
-          await organisationApi.organisationControllerGetAdministrierteOrganisationen(organisationId, searchFilter);
+          await organisationApi.organisationControllerGetAdministrierteOrganisationen(
+            organisationId,
+            filter?.offset,
+            filter?.limit,
+            filter?.searchString,
+          );
         const getFilteredKlassen: Organisation[] = response.data.filter(
           (orga: Organisation) => orga.typ === OrganisationsTyp.Klasse,
         );
