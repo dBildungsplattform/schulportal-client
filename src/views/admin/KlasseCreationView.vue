@@ -135,7 +135,7 @@
 
   const handleCreateAnotherKlasse = async (): Promise<void> => {
     organisationStore.createdKlasse = null;
-    await personenkontextStore.processWorkflowStep();
+    await personenkontextStore.processWorkflowStep({ limit: 25 });
     router.push({ name: 'create-klasse' });
   };
 
@@ -180,7 +180,7 @@
   );
 
   onMounted(async () => {
-    await personenkontextStore.processWorkflowStep();
+    await personenkontextStore.processWorkflowStep({ limit: 25 });
     organisationStore.createdKlasse = null;
     organisationStore.errorCode = '';
     /* listen for browser changes and prevent them when form is dirty */
