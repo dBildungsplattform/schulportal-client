@@ -412,6 +412,7 @@
     "dienstStellenNummerAbbr": "DStNr.",
     "password": "Passwort",
     "changePassword": "Passwort ändern",
+    "changePasswordInfo": "Um Ihr Passwort zu ändern, werden Sie zunächst zu einer erneuten Anmeldung weitergeleitet. Nach erfolgreicher Eingabe Ihres aktuellen Passworts können Sie dann ein neues festlegen.",
     "saveNewPassword": "Neues Passwort speichern",
     "setNewPassword": "Neues Passwort setzen",
     "twoFactorAuth": "Zwei-Faktor-Authentifizierung",
@@ -422,7 +423,10 @@
     "koPersNummerAbbr": "KoPers.-Nr.",
     "klasse": "Klasse",
     "error": "Fehler",
-    "errorMessage": "Es ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut."
+    "success": "Erfolg",
+    "errorMessage": "Es ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut.",
+    "successFullPasswordChange": "Ihr Passwort wurde erfolgreich geändert.",
+    "errorPasswordChange": "Ihr Passwort konnte nicht geändert werden. Bitte versuchen Sie es später erneut."
   },
   "save": "Speichern",
   "refreshData": "Daten aktualisieren",

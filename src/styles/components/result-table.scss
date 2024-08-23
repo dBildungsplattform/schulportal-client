@@ -33,15 +33,22 @@
   .v-data-table-footer {
     font-size: 12px;
 
+    .v-btn {
+      font-size: 14px;
+
+      &.v-btn--variant-plain:not(.v-btn--disabled) {
+        opacity: 0.75;
+      }
+    }
+
     .v-field {
       font-size: 12px;
 
       .v-field__input {
-        max-height: 12px;
-        min-height: 12px;
-        padding-bottom: 3px;
-        padding-left: 15px;
-        padding-top: 3px;
+        max-height: 28px;
+        min-height: 28px;
+        padding-top: 6px;
+        padding-bottom: 6px;
       }
     }
   }
