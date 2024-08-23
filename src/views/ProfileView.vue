@@ -105,7 +105,7 @@
       const tempSchulDaten: SchulDaten = {
         title: zuordnung.sskName,
         info: t('profile.yourSchuleAdminsAre'),
-        schoolAdmins: [], // Hierfuer muss ein API-Endpunkt implementiert werden
+        schulAdmins: [], // Hierfuer muss ein API-Endpunkt implementiert werden
         labelAndValues: [
           {
             label: t('profile.schule'),
