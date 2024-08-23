@@ -235,6 +235,7 @@
   <v-btn
     class="mt-8"
     @click="handleGoToPreviousPage()"
+    data-testid="button_ZurueckVorherigeSeite"
   >
     <v-icon
       class="mr-2"
@@ -275,7 +276,7 @@
                       <td>
                         <span v-if="item.labelAbbr"
                           ><abbr :title="item.label"
-                            ><strong :data-testid="item.testIdLabel">{{ item.labelAbbr }}</strong></abbr
+                            ><strong :data-testid="item.testIdLabel">{{ item.labelAbbr }}:</strong></abbr
                           >:</span
                         >
                         <strong
@@ -329,7 +330,7 @@
                       <td>
                         <span v-if="item.labelAbbr"
                           ><abbr :title="item.label"
-                            ><strong :data-testid="item.testIdLabel">{{ item.labelAbbr }}</strong></abbr
+                            ><strong :data-testid="item.testIdLabel">{{ item.labelAbbr }}:</strong></abbr
                           >:</span
                         >
                         <strong
