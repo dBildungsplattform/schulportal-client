@@ -2604,12 +2604,15 @@ export const AuthApiAxiosParamCreator = function (configuration?: Configuration)
          * 
          * @summary Redirect to Keycloak password reset.
          * @param {string} redirectUrl 
+         * @param {string} loginHint 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        authenticationControllerResetPassword: async (redirectUrl: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        authenticationControllerResetPassword: async (redirectUrl: string, loginHint: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'redirectUrl' is not null or undefined
             assertParamExists('authenticationControllerResetPassword', 'redirectUrl', redirectUrl)
+            // verify required parameter 'loginHint' is not null or undefined
+            assertParamExists('authenticationControllerResetPassword', 'loginHint', loginHint)
             const localVarPath = `/api/auth/reset-password`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -2624,6 +2627,10 @@ export const AuthApiAxiosParamCreator = function (configuration?: Configuration)
 
             if (redirectUrl !== undefined) {
                 localVarQueryParameter['redirectUrl'] = redirectUrl;
+            }
+
+            if (loginHint !== undefined) {
+                localVarQueryParameter['login_hint'] = loginHint;
             }
 
 
@@ -2682,11 +2689,12 @@ export const AuthApiFp = function(configuration?: Configuration) {
          * 
          * @summary Redirect to Keycloak password reset.
          * @param {string} redirectUrl 
+         * @param {string} loginHint 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async authenticationControllerResetPassword(redirectUrl: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.authenticationControllerResetPassword(redirectUrl, options);
+        async authenticationControllerResetPassword(redirectUrl: string, loginHint: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.authenticationControllerResetPassword(redirectUrl, loginHint, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -2731,11 +2739,12 @@ export const AuthApiFactory = function (configuration?: Configuration, basePath?
          * 
          * @summary Redirect to Keycloak password reset.
          * @param {string} redirectUrl 
+         * @param {string} loginHint 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        authenticationControllerResetPassword(redirectUrl: string, options?: any): AxiosPromise<void> {
-            return localVarFp.authenticationControllerResetPassword(redirectUrl, options).then((request) => request(axios, basePath));
+        authenticationControllerResetPassword(redirectUrl: string, loginHint: string, options?: any): AxiosPromise<void> {
+            return localVarFp.authenticationControllerResetPassword(redirectUrl, loginHint, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -2778,11 +2787,12 @@ export interface AuthApiInterface {
      * 
      * @summary Redirect to Keycloak password reset.
      * @param {string} redirectUrl 
+     * @param {string} loginHint 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof AuthApiInterface
      */
-    authenticationControllerResetPassword(redirectUrl: string, options?: AxiosRequestConfig): AxiosPromise<void>;
+    authenticationControllerResetPassword(redirectUrl: string, loginHint: string, options?: AxiosRequestConfig): AxiosPromise<void>;
 
 }
 
@@ -2831,12 +2841,13 @@ export class AuthApi extends BaseAPI implements AuthApiInterface {
      * 
      * @summary Redirect to Keycloak password reset.
      * @param {string} redirectUrl 
+     * @param {string} loginHint 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof AuthApi
      */
-    public authenticationControllerResetPassword(redirectUrl: string, options?: AxiosRequestConfig) {
-        return AuthApiFp(this.configuration).authenticationControllerResetPassword(redirectUrl, options).then((request) => request(this.axios, this.basePath));
+    public authenticationControllerResetPassword(redirectUrl: string, loginHint: string, options?: AxiosRequestConfig) {
+        return AuthApiFp(this.configuration).authenticationControllerResetPassword(redirectUrl, loginHint, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
@@ -3787,11 +3798,13 @@ export const OrganisationenApiAxiosParamCreator = function (configuration?: Conf
         /**
          * 
          * @param {string} organisationId The id of an organization
+         * @param {number} [offset] The offset of the paginated list.
+         * @param {number} [limit] The requested limit for the page size.
          * @param {string} [searchFilter] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        organisationControllerGetAdministrierteOrganisationen: async (organisationId: string, searchFilter?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        organisationControllerGetAdministrierteOrganisationen: async (organisationId: string, offset?: number, limit?: number, searchFilter?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'organisationId' is not null or undefined
             assertParamExists('organisationControllerGetAdministrierteOrganisationen', 'organisationId', organisationId)
             const localVarPath = `/api/organisationen/{organisationId}/administriert`
@@ -3814,6 +3827,14 @@ export const OrganisationenApiAxiosParamCreator = function (configuration?: Conf
             // authentication oauth2 required
             // oauth required
             await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+            if (offset !== undefined) {
+                localVarQueryParameter['offset'] = offset;
+            }
+
+            if (limit !== undefined) {
+                localVarQueryParameter['limit'] = limit;
+            }
 
             if (searchFilter !== undefined) {
                 localVarQueryParameter['searchFilter'] = searchFilter;
@@ -4123,12 +4144,14 @@ export const OrganisationenApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @param {string} organisationId The id of an organization
+         * @param {number} [offset] The offset of the paginated list.
+         * @param {number} [limit] The requested limit for the page size.
          * @param {string} [searchFilter] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async organisationControllerGetAdministrierteOrganisationen(organisationId: string, searchFilter?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<OrganisationResponse>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.organisationControllerGetAdministrierteOrganisationen(organisationId, searchFilter, options);
+        async organisationControllerGetAdministrierteOrganisationen(organisationId: string, offset?: number, limit?: number, searchFilter?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<OrganisationResponse>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.organisationControllerGetAdministrierteOrganisationen(organisationId, offset, limit, searchFilter, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -4259,12 +4282,14 @@ export const OrganisationenApiFactory = function (configuration?: Configuration,
         /**
          * 
          * @param {string} organisationId The id of an organization
+         * @param {number} [offset] The offset of the paginated list.
+         * @param {number} [limit] The requested limit for the page size.
          * @param {string} [searchFilter] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        organisationControllerGetAdministrierteOrganisationen(organisationId: string, searchFilter?: string, options?: any): AxiosPromise<Array<OrganisationResponse>> {
-            return localVarFp.organisationControllerGetAdministrierteOrganisationen(organisationId, searchFilter, options).then((request) => request(axios, basePath));
+        organisationControllerGetAdministrierteOrganisationen(organisationId: string, offset?: number, limit?: number, searchFilter?: string, options?: any): AxiosPromise<Array<OrganisationResponse>> {
+            return localVarFp.organisationControllerGetAdministrierteOrganisationen(organisationId, offset, limit, searchFilter, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -4388,12 +4413,14 @@ export interface OrganisationenApiInterface {
     /**
      * 
      * @param {string} organisationId The id of an organization
+     * @param {number} [offset] The offset of the paginated list.
+     * @param {number} [limit] The requested limit for the page size.
      * @param {string} [searchFilter] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrganisationenApiInterface
      */
-    organisationControllerGetAdministrierteOrganisationen(organisationId: string, searchFilter?: string, options?: AxiosRequestConfig): AxiosPromise<Array<OrganisationResponse>>;
+    organisationControllerGetAdministrierteOrganisationen(organisationId: string, offset?: number, limit?: number, searchFilter?: string, options?: AxiosRequestConfig): AxiosPromise<Array<OrganisationResponse>>;
 
     /**
      * 
@@ -4529,13 +4556,15 @@ export class OrganisationenApi extends BaseAPI implements OrganisationenApiInter
     /**
      * 
      * @param {string} organisationId The id of an organization
+     * @param {number} [offset] The offset of the paginated list.
+     * @param {number} [limit] The requested limit for the page size.
      * @param {string} [searchFilter] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrganisationenApi
      */
-    public organisationControllerGetAdministrierteOrganisationen(organisationId: string, searchFilter?: string, options?: AxiosRequestConfig) {
-        return OrganisationenApiFp(this.configuration).organisationControllerGetAdministrierteOrganisationen(organisationId, searchFilter, options).then((request) => request(this.axios, this.basePath));
+    public organisationControllerGetAdministrierteOrganisationen(organisationId: string, offset?: number, limit?: number, searchFilter?: string, options?: AxiosRequestConfig) {
+        return OrganisationenApiFp(this.configuration).organisationControllerGetAdministrierteOrganisationen(organisationId, offset, limit, searchFilter, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

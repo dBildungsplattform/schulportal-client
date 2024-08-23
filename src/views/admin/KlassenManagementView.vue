@@ -81,7 +81,10 @@
 
   async function fetchKlassenBySelectedSchuleId(schuleId: string | null): Promise<void> {
     // Fetch Klassen related to the selected Schule
-    await organisationStore.getKlassenByOrganisationId(schuleId || '');
+    await organisationStore.getKlassenByOrganisationId(schuleId || '', {
+      offset: (searchFilterStore.klassenPage - 1) * searchFilterStore.klassenPerPage,
+      limit: searchFilterStore.klassenPerPage,
+    });
 
     // Update the klassenOptions for the dropdown
     klassenOptions.value = organisationStore.klassen.map((org: Organisation) => ({
