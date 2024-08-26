@@ -121,7 +121,7 @@
   function keyMapper(key: string): string {
     switch (key) {
       case 'lock_locked_from':
-        return t('person.lockedFrom');
+        return t('person.lockedBy');
       case 'lock_timestamp':
         return t('person.lockedSince');
       default:
@@ -1566,7 +1566,7 @@
               v-for="{ key, attribute } of getLockInfo"
               :key="key"
             >
-              <span class="text-body"> {{ key }} {{ attribute }} </span>
+              <span class="text-body"> {{ key }}: {{ attribute }} </span>
             </v-col>
           </v-row>
         </v-container>

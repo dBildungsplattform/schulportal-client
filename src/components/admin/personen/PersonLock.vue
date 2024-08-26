@@ -139,7 +139,7 @@
                     item-value="value"
                     item-text="title"
                     :no-data-text="$t('noDataFound')"
-                    :placeholder="$t('admin.schule.assignSchule')"
+                    :placeholder="$t('person.lockedBy')"
                     ref="schule-select"
                     required="true"
                     variant="outlined"
