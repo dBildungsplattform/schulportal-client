@@ -167,18 +167,6 @@
     resetForm();
   });
 
-  // Watcher for schulen to auto-select if there is only one
-  watch(
-    () => schulen.value,
-    (newSchulen: TranslatedObject[] | undefined) => {
-      if (!isSearching && newSchulen && newSchulen.length === 1) {
-        hasAutoselectedSchule.value = true;
-        selectedSchule.value = newSchulen[0]?.value || '';
-      }
-    },
-    { immediate: true },
-  );
-
   onMounted(async () => {
     await personenkontextStore.processWorkflowStep({ limit: 25 });
     organisationStore.createdKlasse = null;
@@ -219,6 +207,7 @@
         <KlasseForm
           :schulen="schulen"
           :isEditActive="true"
+          :isSearching="isSearching"
           :readonly="false"
           :selectedSchuleProps="selectedSchuleProps"
           :selectedKlassennameProps="selectedKlassennameProps"
