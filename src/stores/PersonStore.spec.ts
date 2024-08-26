@@ -189,6 +189,37 @@ describe('PersonStore', () => {
     });
   });
 
+  describe('deletePerson', () => {
+    const userId: string = '2345';
+    const url: string = `/api/personen/${userId}`;
+
+    it('should reset and return password', async () => {
+      mockadapter.onDelete(url).replyOnce(200);
+      const deletePersonPromise: Promise<void> = personStore.deletePerson(userId);
+      expect(personStore.loading).toBe(true);
+      await deletePersonPromise;
+      expect(personStore.loading).toBe(false);
+    });
+
+    it('should handle string error', async () => {
+      mockadapter.onDelete(url).replyOnce(500, 'some error');
+      const deletePersonPromise: Promise<void> = personStore.deletePerson(userId);
+      expect(personStore.loading).toBe(true);
+      await rejects(deletePersonPromise);
+      expect(personStore.errorCode).toEqual('UNSPECIFIED_ERROR');
+      expect(personStore.loading).toBe(false);
+    });
+
+    it('should handle error code', async () => {
+      mockadapter.onDelete(url).replyOnce(500, { code: 'some mock server error' });
+      const deletePersonPromise: Promise<void> = personStore.deletePerson(userId);
+      expect(personStore.loading).toBe(true);
+      await rejects(deletePersonPromise);
+      expect(personStore.errorCode).toEqual('some mock server error');
+      expect(personStore.loading).toBe(false);
+    });
+  });
+
   describe('get2FAState', () => {
     it('should get 2FA state', async () => {
       const personId: string = 'testUser';
