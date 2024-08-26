@@ -315,6 +315,7 @@
         <PersonenkontextCreate
           :showHeadline="true"
           :organisationen="organisationen"
+          ref="personenkontext-create"
           :rollen="rollen"
           :klassen="klassen"
           :selectedOrganisationProps="selectedOrganisationProps"

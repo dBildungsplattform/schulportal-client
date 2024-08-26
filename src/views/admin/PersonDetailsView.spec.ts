@@ -200,6 +200,14 @@ describe('PersonDetailsView', () => {
     expect(push).toHaveBeenCalledTimes(1);
   });
 
+  test('it shows an error if error code exists', async () => {
+    personStore.errorCode = 'UNSPECIFIED_ERROR';
+    await nextTick();
+
+    expect(wrapper?.find('[data-testid="alert-title"]').text()).toBe('Fehler beim Laden des Benutzers');
+    personStore.errorCode = '';
+  });
+
   test('It cancels editing', async () => {
     await wrapper?.find('[data-testid="zuordnung-edit-button"]').trigger('click');
     await nextTick();
@@ -211,6 +219,7 @@ describe('PersonDetailsView', () => {
 
     expect(zuordnungCreateButton?.exists()).toBe(false);
   });
+
   test('It triggers change Klasse and selects the first checkbox', async () => {
     // Trigger edit mode
     await wrapper?.find('[data-testid="zuordnung-edit-button"]').trigger('click');
