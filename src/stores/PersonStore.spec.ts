@@ -1,8 +1,4 @@
-import type {
-  PersonFrontendControllerFindPersons200Response,
-  PersonendatensatzResponse,
-  TokenStateResponse,
-} from '@/api-client/generated';
+import type { PersonFrontendControllerFindPersons200Response, PersonendatensatzResponse } from '@/api-client/generated';
 import { usePersonStore, type PersonStore, type Personendatensatz } from './PersonStore';
 import ApiService from '@/services/ApiService';
 import MockAdapter from 'axios-mock-adapter';
