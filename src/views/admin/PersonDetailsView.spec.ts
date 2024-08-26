@@ -8,10 +8,12 @@ import { usePersonenkontextStore, type PersonenkontextStore, type Uebersicht } f
 import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
 import { RollenMerkmal, RollenSystemRecht } from '@/stores/RolleStore';
 import { nextTick } from 'vue';
+import { useAuthStore, type AuthStore, type UserInfo } from '@/stores/AuthStore';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
 
+const authStore: AuthStore = useAuthStore();
 const organisationStore: OrganisationStore = useOrganisationStore();
 const personStore: PersonStore = usePersonStore();
 const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
@@ -25,6 +27,37 @@ const mockPerson: Personendatensatz = {
     },
     referrer: 'jorton',
   },
+};
+
+const mockCurrentUser: UserInfo = {
+  middle_name: null,
+  nickname: null,
+  profile: null,
+  picture: null,
+  website: null,
+  gender: null,
+  birthdate: null,
+  zoneinfo: null,
+  locale: null,
+  phone_number: null,
+  updated_at: null,
+  personId: '2',
+  email: 'albert@test.de',
+  email_verified: true,
+  family_name: 'Test',
+  given_name: 'Albert',
+  name: 'Albert Test',
+  preferred_username: 'albert',
+  sub: 'c71be903-d0ec-4207-b653-40c114680b63',
+  personenkontexte: [
+    {
+      organisationsId: '123456',
+      rolle: {
+        systemrechte: ['ROLLEN_VERWALTEN', 'SCHULEN_VERWALTEN'],
+        serviceProviderIds: ['789897798'],
+      },
+    },
+  ],
 };
 
 const mockPersonenuebersicht: Uebersicht = {
@@ -118,6 +151,7 @@ organisationStore.klassen = [
   },
 ];
 
+authStore.currentUser = mockCurrentUser;
 personStore.currentPerson = mockPerson;
 personenkontextStore.personenuebersicht = mockPersonenuebersicht;
 
@@ -154,6 +188,7 @@ describe('PersonDetailsView', () => {
     expect(wrapper?.find('[data-testid="person-familienname"]').text()).toBe('Orton');
     expect(wrapper?.find('[data-testid="person-username"]').text()).toBe('jorton');
     expect(wrapper?.find('[data-testid="person-zuordnung-1"]').text()).toBe('123456 (Testschule Birmingham): SuS 9a');
+    expect(wrapper?.getComponent({ name: 'PasswordReset' })).toBeTruthy();
   });
 
   test('it navigates back to user table', async () => {
