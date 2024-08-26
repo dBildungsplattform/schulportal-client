@@ -7,7 +7,13 @@ import { createRouter, createWebHistory, type Router } from 'vue-router';
 import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
 import { Vertrauensstufe, type DBiamPersonResponse } from '@/api-client/generated';
 import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
-import { RollenMerkmal, RollenSystemRecht, useRolleStore, type RolleStore, type RolleWithServiceProvidersResponse } from '@/stores/RolleStore';
+import {
+  RollenMerkmal,
+  RollenSystemRecht,
+  useRolleStore,
+  type RolleStore,
+  type RolleWithServiceProvidersResponse,
+} from '@/stores/RolleStore';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
@@ -15,7 +21,6 @@ let router: Router;
 const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
 const organisationStore: OrganisationStore = useOrganisationStore();
 const rolleStore: RolleStore = useRolleStore();
-
 
 const mockCreatedPersonWithKontext: DBiamPersonResponse = {
   person: {
@@ -157,7 +162,7 @@ describe('PersonCreationView', () => {
       .findComponent({ ref: 'organisation-select' });
     await organisationSelect?.setValue('9876');
     await nextTick();
-  
+
     const rolleSelect: VueWrapper | undefined = wrapper
       ?.findComponent({ ref: 'personenkontext-create' })
       .findComponent({ ref: 'rolle-select' });
