@@ -62,6 +62,7 @@
     :page="currentPage"
     ref="v-data-table-server"
     select-strategy="page"
+    :showCurrentPage="true"
     show-select
     @update:options="$emit('onTableUpdate')"
     @update:page="(page: number) => $emit('onPageUpdate', page)"
