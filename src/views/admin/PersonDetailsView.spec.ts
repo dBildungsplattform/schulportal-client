@@ -1,13 +1,18 @@
 import { expect, test, type MockInstance } from 'vitest';
-import { VueWrapper, mount } from '@vue/test-utils';
+import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
 import { createRouter, createWebHistory, type NavigationFailure, type RouteLocationRaw, type Router } from 'vue-router';
 import routes from '@/router/routes';
-import PersonDetailsView from './PersonDetailsView.vue';
-import { type Personendatensatz, type PersonStore, usePersonStore } from '@/stores/PersonStore';
+import PersonDetailsView, { type RolleWithRollenart } from './PersonDetailsView.vue';
+import {
+  type Personendatensatz,
+  type PersonendatensatzResponse,
+  type PersonStore,
+  usePersonStore,
+} from '@/stores/PersonStore';
 import { usePersonenkontextStore, type PersonenkontextStore, type Uebersicht } from '@/stores/PersonenkontextStore';
 import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
 import { RollenMerkmal, RollenSystemRecht } from '@/stores/RolleStore';
-import { nextTick } from 'vue';
+import { nextTick, type ComputedRef, type DefineComponent } from 'vue';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
@@ -207,5 +212,45 @@ describe('PersonDetailsView', () => {
     const klasseChangeFormComponent: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-change-form' });
 
     expect(klasseChangeFormComponent?.exists()).toBe(true);
+  });
+  test('Renders details for the current person', async () => {
+    // Mock the current person in the store
+    personStore.currentPerson = {
+      person: {
+        id: '1234',
+        name: {
+          familienname: 'Vimes',
+          vorname: 'Samuel',
+        },
+      },
+    } as PersonendatensatzResponse;
+
+    await nextTick();
+
+    const vornameElement: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="person-vorname"]');
+
+    // Check if the element exists and has the correct text content
+    expect(vornameElement?.text()).toBe('Samuel');
+  });
+  test('filteredRollen returns correct roles based on person context and selection', async () => {
+    interface PersonDetailsViewType extends DefineComponent {
+      filteredRollen: ComputedRef<RolleWithRollenart[] | undefined>;
+    }
+    const vm: PersonDetailsViewType = wrapper?.vm as unknown as PersonDetailsViewType;
+    const filteredRollen: ComputedRef<RolleWithRollenart[] | undefined> = vm.filteredRollen;
+
+    // Verify that filteredRollen contains only roles that are not already assigned and filtered correctly
+    expect(filteredRollen).toEqual([
+      {
+        value: '54321',
+        title: 'string',
+        Rollenart: 'LERN',
+      },
+      {
+        value: '1',
+        title: 'SuS',
+        Rollenart: 'LERN',
+      },
+    ]);
   });
 });
