@@ -37,7 +37,7 @@
         "KLASSE_NUR_VON_SCHULE_ADMINISTRIERT": "Klassen dürfen nur von einer Schule administriert werden.",
         "KLASSENNAME_AN_SCHULE_EINDEUTIG": "Der Klassenname existiert bereits an dieser Schule.",
         "ORGANISATION_SPECIFICATION_ERROR": "Die Klasse konnte nicht angelegt werden.",
-        "ORGANISATION_IST_BEREITS_ZUGEWIESEN_ERROR": "Die Klasse ist bereits zugewiesen und kann nicht gelöscht werden."
+        "ORGANISATION_IST_BEREITS_ZUGEWIESEN_ERROR": "Die Klasse kann nicht gelöscht werden, da noch Benutzer zugeordnet sind."
       },
       "enterKlassenname": "Klassenname eingeben",
       "klasse": "Klasse",
@@ -385,8 +385,13 @@
     "cannotDeleteOwnZuordnung": "Sie dürfen sich selbst keine Zuordnungen entziehen.",
     "checkAndSave": "Bitte prüfen und abschließend speichern, um die Aktion auszuführen",
     "changeRolle": "Rolle ändern",
+    "changeKlasseConfirmation": "Wollen Sie den Schüler/die Schülerin aus Klasse {oldKlasse} in Klasse {newKlasse} versetzen?",
+    "changeKlasseSuccess": "Der Schüler/die Schülerin wurde erfoglreich versetzt.",
     "changeRolleDescription": "Ändert die Rolle des Benutzers an der Schule ohne ihn zu entfernen.",
+    "changeKlasseDescription": "Ändert die Klasse des Benutzers an der Schule.",
+    "changeKlasseNotDisabledDescription": "Bitte wählen Sie eine neue Klasse aus.",
     "chooseZuordnungFirst": "Wählen Sie bitte zuerst eine Schulzuordnung aus.",
+    "chooseKlasseZuordnungFirst": "Wählen Sie bitte zunächst eine Schulzuordnung mit einer Klasse aus.",
     "deleteZuordnungConfirmation": "Wollen Sie die Schulzuordnung wirklich entfernen?",
     "deleteLastZuordnungConfirmation": "Dies ist die letzte Zuordnung des Benutzers zu dieser Schule. Wollen Sie die Schulzuordnung wirklich entfernen?",
     "deleteZuordnungSuccess": "Die Schulzuordnung wurde erfolgreich entfernt.",
@@ -436,7 +441,10 @@
     "koPersNummerAbbr": "KoPers.-Nr.",
     "klasse": "Klasse",
     "error": "Fehler",
-    "errorMessage": "Es ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut."
+    "errorMessage": "Es ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut.",
+    "success": "Erfolg",
+    "successFullPasswordChange": "Ihr Passwort wurde erfolgreich geändert.",
+    "errorPasswordChange": "Ihr Passwort konnte nicht geändert werden. Bitte versuchen Sie es später erneut."
   },
   "save": "Speichern",
   "refreshData": "Daten aktualisieren",
@@ -453,9 +461,12 @@
       "workEmail": "Dienstliche E-Mail"
     }
   },
+  "transfer":"Versetzen",
   "unsavedChanges": {
     "message": "Sie haben nicht gespeicherte Änderungen vorgenommen. Wollen Sie die Seite trotzdem verlassen?",
     "title": "Änderungen vorgenommen"
   },
-  "yes": "Ja"
+  "yes": "Ja",
+  "willBeCreated": "wird hinzugefügt",
+  "willBeRemoved": "wird entfernt"
 }
