@@ -1,8 +1,5 @@
 import { expect, test } from 'vitest';
 import { VueWrapper, mount } from '@vue/test-utils';
-import { createVuetify } from 'vuetify';
-import * as components from 'vuetify/components';
-import * as directives from 'vuetify/directives';
 import { createTestingPinia } from '@pinia/testing';
 import PersonLock from './PersonLock.vue';
 import type { Person, Personendatensatz } from '@/stores/PersonStore';
@@ -14,11 +11,6 @@ import {
   type OrganisationStore,
 } from '@/stores/OrganisationStore';
 import type { DBiamPersonenuebersichtResponse, DBiamPersonenzuordnungResponse } from '@/api-client/generated/api';
-
-const vuetify = createVuetify({
-  components,
-  directives,
-});
 
 let wrapper: VueWrapper | null = null;
 let personenkontextStore: PersonenkontextStore | null = null;
