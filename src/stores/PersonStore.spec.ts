@@ -189,32 +189,36 @@ describe('PersonStore', () => {
     });
   });
 
-  describe('deletePerson', () => {
-    const userId: string = '2345';
-    const url: string = `/api/personen/${userId}`;
+  describe('deletePersonById', () => {
+    it('should delete a person and update state', async () => {
+      const personId: string = '1234';
 
-    it('should reset and return password', async () => {
-      mockadapter.onDelete(url).replyOnce(200);
-      const deletePersonPromise: Promise<void> = personStore.deletePerson(userId);
-      expect(personStore.loading).toBe(true);
-      await deletePersonPromise;
+      mockadapter.onDelete(`/api/personen/${personId}`).replyOnce(204);
+
+      await personStore.deletePersonById(personId);
+
       expect(personStore.loading).toBe(false);
+      expect(personStore.errorCode).toEqual('');
     });
 
     it('should handle string error', async () => {
-      mockadapter.onDelete(url).replyOnce(500, 'some error');
-      const deletePersonPromise: Promise<void> = personStore.deletePerson(userId);
-      expect(personStore.loading).toBe(true);
-      await rejects(deletePersonPromise);
+      const personId: string = '1234';
+
+      mockadapter.onDelete(`/api/personen/${personId}`).replyOnce(500, 'some error');
+
+      await rejects(personStore.deletePersonById(personId));
+
       expect(personStore.errorCode).toEqual('UNSPECIFIED_ERROR');
       expect(personStore.loading).toBe(false);
     });
 
     it('should handle error code', async () => {
-      mockadapter.onDelete(url).replyOnce(500, { code: 'some mock server error' });
-      const deletePersonPromise: Promise<void> = personStore.deletePerson(userId);
-      expect(personStore.loading).toBe(true);
-      await rejects(deletePersonPromise);
+      const personId: string = '1234';
+
+      mockadapter.onDelete(`/api/personen/${personId}`).replyOnce(500, { code: 'some mock server error' });
+
+      await rejects(personStore.deletePersonById(personId));
+
       expect(personStore.errorCode).toEqual('some mock server error');
       expect(personStore.loading).toBe(false);
     });

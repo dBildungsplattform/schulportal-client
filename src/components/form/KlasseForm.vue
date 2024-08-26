@@ -1,8 +1,11 @@
 <script setup lang="ts">
-  import { defineProps, type ModelRef } from 'vue';
+  import { defineProps, ref, watch, type ModelRef, type Ref } from 'vue';
   import { type BaseFieldProps } from 'vee-validate';
   import FormWrapper from '@/components/form/FormWrapper.vue';
   import FormRow from '@/components/form/FormRow.vue';
+  import type { TranslatedObject } from '@/types';
+
+  const hasAutoselectedSchule: Ref<boolean> = ref(false);
 
   type Props = {
     schulen?: Array<{ value: string; title: string }>;
@@ -11,16 +14,29 @@
     selectedKlassennameProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     showUnsavedChangesDialog?: boolean;
     isEditActive?: boolean;
+    isSearching?: boolean;
     onHandleConfirmUnsavedChanges: () => void;
     onHandleDiscard: () => void;
     onShowDialogChange: (value?: boolean) => void;
     onSubmit: () => void;
   };
 
-  defineProps<Props>();
+  const props: Props = defineProps<Props>();
 
   const selectedSchule: ModelRef<unknown, string> = defineModel('selectedSchule');
   const selectedKlassenname: ModelRef<unknown, string> = defineModel('selectedKlassenname');
+
+  // Watcher for schulen to auto-select if there is only one
+  watch(
+    () => props.schulen,
+    (newSchulen: TranslatedObject[] | undefined) => {
+      if (!props.isSearching && newSchulen && newSchulen.length === 1) {
+        hasAutoselectedSchule.value = true;
+        selectedSchule.value = newSchulen[0]?.value || '';
+      }
+    },
+    { immediate: true },
+  );
 </script>
 
 <template data-test-id="klasse-form">
@@ -45,11 +61,12 @@
       :isRequired="true"
       :label="$t('admin.schule.schule')"
     >
-      <v-select
+      <v-autocomplete
+        :class="[{ 'filter-dropdown mb-4': hasAutoselectedSchule }, { selected: selectedSchule }]"
         clearable
         data-testid="schule-select"
         density="compact"
-        :disabled="readonly"
+        :disabled="hasAutoselectedSchule || readonly"
         id="schule-select"
         :items="schulen"
         item-value="value"
@@ -61,7 +78,8 @@
         variant="outlined"
         v-bind="selectedSchuleProps"
         v-model="selectedSchule"
-      ></v-select>
+        hide-details
+      ></v-autocomplete>
     </FormRow>
 
     <!-- Klassenname eingeben -->
