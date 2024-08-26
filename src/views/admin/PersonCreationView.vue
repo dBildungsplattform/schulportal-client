@@ -248,7 +248,7 @@
   });
 
   onMounted(async () => {
-    await personenkontextStore.processWorkflowStep();
+    await personenkontextStore.processWorkflowStep({ limit: 25 });
     personStore.errorCode = '';
     personenkontextStore.createdPersonWithKontext = null;
     personenkontextStore.createdPersonenkontextForKlasse = null;

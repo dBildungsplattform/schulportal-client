@@ -139,7 +139,7 @@
 
   // Triggers the template to add a new Zuordnung
   const triggerAddZuordnung = async (): Promise<void> => {
-    await personenkontextStore.processWorkflowStep();
+    await personenkontextStore.processWorkflowStep({ limit: 25 });
     isZuordnungFormActive.value = true;
   };
 
@@ -303,7 +303,7 @@
     const organisationId: string | undefined = selectedZuordnungen.value[0]?.sskId;
     const rolleId: string | undefined = selectedZuordnungen.value[0]?.rolleId;
 
-    personenkontextStore.processWorkflowStep({ organisationId: organisationId, rolleId: rolleId });
+    personenkontextStore.processWorkflowStep({ organisationId: organisationId, rolleId: rolleId, limit: 25 });
     // Check if rolleId exists and if it's of type LERN
     if (rolleId && isLernRolle(rolleId) && hasOneSelectedZuordnung) {
       return true;
@@ -708,7 +708,7 @@
     personenkontextStore.errorCode = '';
     await personStore.getPersonById(currentPersonId);
     await personenkontextStore.getPersonenuebersichtById(currentPersonId);
-    await personenkontextStore.processWorkflowStep();
+    await personenkontextStore.processWorkflowStep({ limit: 25 });
     hasKlassenZuordnung.value = personenkontextStore.personenuebersicht?.zuordnungen.some(
       (zuordnung: Zuordnung) => zuordnung.typ === OrganisationsTyp.Klasse,
     );
