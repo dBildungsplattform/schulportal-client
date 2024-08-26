@@ -2,8 +2,8 @@ import { expect, test } from 'vitest';
 import { VueWrapper, mount } from '@vue/test-utils';
 import { nextTick } from 'vue';
 import PersonCreationView from './PersonCreationView.vue';
-import PersonManagementView from './PersonManagementView.vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
+import routes from '@/router/routes';
 import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
 import { Vertrauensstufe, type DBiamPersonResponse } from '@/api-client/generated';
 import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
@@ -127,11 +127,11 @@ beforeEach(async () => {
 
   router = createRouter({
     history: createWebHistory(),
-    routes: [
-      { path: '/', component: PersonCreationView, meta: { layout: 'DefaultLayout' } },
-      { path: '/admin/personen', component: PersonManagementView, meta: { layout: 'DefaultLayout' } },
-    ],
+    routes,
   });
+
+  router.push('/');
+  await router.isReady();
 
   wrapper = mount(PersonCreationView, {
     attachTo: document.getElementById('app') || '',
@@ -139,8 +139,6 @@ beforeEach(async () => {
       plugins: [router],
     },
   });
-  router.push('/');
-  await router.isReady();
 });
 
 describe('PersonCreationView', () => {
@@ -169,29 +167,25 @@ describe('PersonCreationView', () => {
     await rolleSelect?.setValue('1');
     await nextTick();
 
-    // const vornameInput: VueWrapper | undefined = wrapper
-    //   ?.findComponent({ ref: 'personenkontext-create' })
-    //   .findComponent({ ref: 'vorname-input' });
-    // await vornameInput?.setValue('Randy');
-    // await nextTick();
+    const vornameInput: VueWrapper | undefined = wrapper?.findComponent({ ref: 'vorname-input' });
+    await vornameInput?.setValue('Randy');
+    await nextTick();
 
-    // const nachnameInput: VueWrapper | undefined = wrapper
-    //   ?.findComponent({ ref: 'personenkontext-create' })
-    //   .findComponent({ ref: 'nachname-input' });
-    // await nachnameInput?.setValue('Cena');
-    // await nextTick();
+    const nachnameInput: VueWrapper | undefined = wrapper?.findComponent({ ref: 'familienname-input' });
+    await nachnameInput?.setValue('Cena');
+    await nextTick();
 
-    // personenkontextStore.createdPersonWithKontext = mockCreatedPersonWithKontext;
+    personenkontextStore.createdPersonWithKontext = mockCreatedPersonWithKontext;
 
-    // wrapper?.find('[data-testid="person-creation-form-create-button"]').trigger('click');
-    // await nextTick();
+    wrapper?.find('[data-testid="person-creation-form-create-button"]').trigger('click');
+    await nextTick();
 
-    // expect(wrapper?.find('[data-testid="create-another-person-button"]').isVisible()).toBe(true);
+    expect(wrapper?.find('[data-testid="create-another-person-button"]').isVisible()).toBe(true);
 
-    // wrapper?.find('[data-testid="create-another-person-button"]').trigger('click');
-    // await nextTick();
+    wrapper?.find('[data-testid="create-another-person-button"]').trigger('click');
+    await nextTick();
 
-    // expect(personenkontextStore.createPersonWithKontext).toBe(null);
+    expect(personenkontextStore.createdPersonWithKontext).toBe(null);
   });
 
   test('it renders success template', async () => {
