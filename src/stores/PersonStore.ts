@@ -76,7 +76,7 @@ type PersonActions = {
   getAllPersons: (filter: PersonFilter) => Promise<void>;
   getPersonById: (personId: string) => Promise<Personendatensatz>;
   resetPassword: (personId: string) => Promise<string>;
-  deletePerson: (personId: string) => Promise<void>;
+  deletePersonById: (personId: string) => Promise<void>;
   get2FAState: (personId: string) => Promise<void>;
   get2FASoftwareQRCode: (personId: string) => Promise<void>;
   resetToken: (referrer: string) => Promise<void>;
@@ -166,7 +166,7 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
         this.loading = false;
       }
     },
-    async deletePerson(personId: string) {
+    async deletePersonById(personId: string) {
       this.loading = true;
       try {
         await personenApi.personControllerDeletePersonById(personId);

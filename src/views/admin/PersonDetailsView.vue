@@ -111,7 +111,7 @@
 
   // Deletes the person and all kontexte
   async function deletePerson(personId: string): Promise<void> {
-    await personStore.deletePerson(personId);
+    await personStore.deletePersonById(personId);
   }
 
   let closeCannotDeleteDialog = (): void => {
@@ -140,7 +140,7 @@
 
   // Triggers the template to add a new Zuordnung
   const triggerAddZuordnung = async (): Promise<void> => {
-    await personenkontextStore.processWorkflowStep();
+    await personenkontextStore.processWorkflowStep({ limit: 25 });
     isZuordnungFormActive.value = true;
   };
 
@@ -272,7 +272,7 @@
 
   const klassen: ComputedRef<TranslatedObject[] | undefined> = useKlassen();
 
-  type RolleWithRollenart = {
+  export type RolleWithRollenart = {
     value: string;
     title: string;
     Rollenart: RollenArt;
@@ -304,10 +304,9 @@
     const organisationId: string | undefined = selectedZuordnungen.value[0]?.sskId;
     const rolleId: string | undefined = selectedZuordnungen.value[0]?.rolleId;
 
-    personenkontextStore.processWorkflowStep({ organisationId: organisationId, rolleId: rolleId });
+    personenkontextStore.processWorkflowStep({ organisationId: organisationId, rolleId: rolleId, limit: 25 });
     // Check if rolleId exists and if it's of type LERN
     if (rolleId && isLernRolle(rolleId) && hasOneSelectedZuordnung) {
-
       return true;
     }
     return false;
@@ -472,15 +471,36 @@
     () => !pendingCreation.value && !pendingDeletion.value && !pendingChangeKlasse.value,
   );
 
-  // Filter out the Rollen in case the admin chooses an organisation that the user has already a kontext in
+  // Filter out the Rollen based on the user's existing Zuordnungen and selected organization
   const filteredRollen: ComputedRef<RolleWithRollenart[] | undefined> = computed(() => {
-    const existingZuordnungen: Zuordnung[] | undefined = personenkontextStore.personenuebersicht?.zuordnungen.filter(
-      (zuordnung: Zuordnung) => zuordnung.sskId === selectedOrganisation.value,
-    );
-    return rollen.value?.filter(
-      (rolle: RolleWithRollenart) =>
-        !existingZuordnungen?.some((zuordnung: Zuordnung) => zuordnung.rolleId === rolle.value),
-    );
+    const existingZuordnungen: Zuordnung[] | undefined = personenkontextStore.personenuebersicht?.zuordnungen;
+
+    // If no existing Zuordnungen then just show all roles
+    if (!existingZuordnungen || existingZuordnungen.length === 0) {
+      return rollen.value;
+    }
+
+    const selectedOrgaId: string | undefined = selectedOrganisation.value;
+
+    // Determine if the user already has any LERN roles
+    const hasLernRolle: boolean = existingZuordnungen.some((zuordnung: Zuordnung) => isLernRolle(zuordnung.rolleId));
+
+    // Filter out Rollen that the user already has in the selected organization
+    return rollen.value?.filter((rolle: RolleWithRollenart) => {
+      // Check if the user already has this role in the selected organization
+      const alreadyHasRolleInSelectedOrga: boolean = existingZuordnungen.some(
+        (zuordnung: Zuordnung) => zuordnung.rolleId === rolle.value && zuordnung.sskId === selectedOrgaId,
+      );
+
+      // If the user has any LERN roles, only allow LERN roles to be selected
+      if (hasLernRolle) {
+        // Allow LERN roles in other organizations, but filter them out for the selected organization
+        return !alreadyHasRolleInSelectedOrga && rolle.Rollenart === RollenArt.Lern;
+      }
+
+      // If the user doesn't have any LERN roles, allow any role that hasn't been assigned yet in the selected organization besides LERN.
+      return !alreadyHasRolleInSelectedOrga && rolle.Rollenart !== RollenArt.Lern;
+    });
   });
 
   // Computed property to get the title of the selected rolle
@@ -689,8 +709,10 @@
     personenkontextStore.errorCode = '';
     await personStore.getPersonById(currentPersonId);
     await personenkontextStore.getPersonenuebersichtById(currentPersonId);
-    await personenkontextStore.processWorkflowStep();
-    hasKlassenZuordnung.value = personenkontextStore.personenuebersicht?.zuordnungen.some((zuordnung: Zuordnung) => zuordnung.typ === OrganisationsTyp.Klasse);
+    await personenkontextStore.processWorkflowStep({ limit: 25 });
+    hasKlassenZuordnung.value = personenkontextStore.personenuebersicht?.zuordnungen.some(
+      (zuordnung: Zuordnung) => zuordnung.typ === OrganisationsTyp.Klasse,
+    );
 
     await personStore.get2FAState(currentPersonId);
   });
@@ -1051,7 +1073,7 @@
                 <template v-if="!pendingDeletion && !pendingCreation && !pendingChangeKlasse">
                   <div class="checkbox-div">
                     <v-checkbox
-                    :ref="`checkbox-zuordnung-${zuordnung.sskId}`"
+                      :ref="`checkbox-zuordnung-${zuordnung.sskId}`"
                       v-model="selectedZuordnungen"
                       :value="zuordnung"
                     >
@@ -1127,11 +1149,11 @@
                     </span>
 
                     <span
-                    v-if="
-                          newZuordnung &&
-                          zuordnung.sskId === newZuordnung.sskId &&
-                          zuordnung.rolleId === newZuordnung.rolleId
-                        "
+                      v-if="
+                        newZuordnung &&
+                        zuordnung.sskId === newZuordnung.sskId &&
+                        zuordnung.rolleId === newZuordnung.rolleId
+                      "
                       class="text-body my-3 ml-5"
                       :class="{
                         'text-green':
@@ -1225,7 +1247,7 @@
                     </v-btn>
                   </SpshTooltip>
                   <SpshTooltip
-                   v-if="hasKlassenZuordnung"
+                    v-if="hasKlassenZuordnung"
                     :enabledCondition="canChangeKlasse"
                     :disabledText="$t('person.chooseKlasseZuordnungFirst')"
                     :enabledText="$t('person.changeKlasseDescription')"
@@ -1316,6 +1338,7 @@
               <v-container class="px-lg-16">
                 <!-- Organisation, Rolle, Klasse zuordnen -->
                 <PersonenkontextCreate
+                  ref="personenkontext-creation-form"
                   :showHeadline="false"
                   :organisationen="organisationen"
                   :rollen="filteredRollen"
@@ -1612,9 +1635,7 @@
                 offset="1"
                 cols="10"
               >
-                <span>{{
-                  createZuordnungConfirmationDialogMessage
-                }}</span>
+                <span>{{ createZuordnungConfirmationDialogMessage }}</span>
               </v-col>
             </v-row>
           </v-container>

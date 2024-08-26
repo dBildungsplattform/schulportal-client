@@ -188,6 +188,41 @@ describe('PersonStore', () => {
     });
   });
 
+  describe('deletePersonById', () => {
+    it('should delete a person and update state', async () => {
+      const personId: string = '1234';
+
+      mockadapter.onDelete(`/api/personen/${personId}`).replyOnce(204);
+
+      await personStore.deletePersonById(personId);
+
+      expect(personStore.loading).toBe(false);
+      expect(personStore.errorCode).toEqual('');
+    });
+
+    it('should handle string error', async () => {
+      const personId: string = '1234';
+
+      mockadapter.onDelete(`/api/personen/${personId}`).replyOnce(500, 'some error');
+
+      await rejects(personStore.deletePersonById(personId));
+
+      expect(personStore.errorCode).toEqual('UNSPECIFIED_ERROR');
+      expect(personStore.loading).toBe(false);
+    });
+
+    it('should handle error code', async () => {
+      const personId: string = '1234';
+
+      mockadapter.onDelete(`/api/personen/${personId}`).replyOnce(500, { code: 'some mock server error' });
+
+      await rejects(personStore.deletePersonById(personId));
+
+      expect(personStore.errorCode).toEqual('some mock server error');
+      expect(personStore.loading).toBe(false);
+    });
+  });
+
   describe('get2FAState', () => {
     it('should get 2FA state', async () => {
       const personId: string = 'testUser';

@@ -135,7 +135,7 @@
 
   const handleCreateAnotherKlasse = async (): Promise<void> => {
     organisationStore.createdKlasse = null;
-    await personenkontextStore.processWorkflowStep();
+    await personenkontextStore.processWorkflowStep({ limit: 25 });
     router.push({ name: 'create-klasse' });
   };
 
@@ -167,20 +167,8 @@
     resetForm();
   });
 
-  // Watcher for schulen to auto-select if there is only one
-  watch(
-    () => schulen.value,
-    (newSchulen: TranslatedObject[] | undefined) => {
-      if (!isSearching && newSchulen && newSchulen.length === 1) {
-        hasAutoselectedSchule.value = true;
-        selectedSchule.value = newSchulen[0]?.value || '';
-      }
-    },
-    { immediate: true },
-  );
-
   onMounted(async () => {
-    await personenkontextStore.processWorkflowStep();
+    await personenkontextStore.processWorkflowStep({ limit: 25 });
     organisationStore.createdKlasse = null;
     organisationStore.errorCode = '';
     /* listen for browser changes and prevent them when form is dirty */
@@ -219,6 +207,7 @@
         <KlasseForm
           :schulen="schulen"
           :isEditActive="true"
+          :isSearching="isSearching"
           :readonly="false"
           :selectedSchuleProps="selectedSchuleProps"
           :selectedKlassennameProps="selectedKlassennameProps"

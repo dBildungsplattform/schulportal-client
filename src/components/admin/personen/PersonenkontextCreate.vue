@@ -205,14 +205,14 @@
     // If searchValue is empty, fetch all roles for the organisationId
     if (searchValue === '' && !selectedKlasse.value) {
       timerId.value = setTimeout(() => {
-        organisationStore.getKlassenByOrganisationId(organisationId, searchValue);
+        organisationStore.getKlassenByOrganisationId(organisationId, { searchString: searchValue });
       }, 500);
     } else if (searchValue && searchValue !== selectedKlasseTitle.value) {
       /* cancel pending call */
       clearTimeout(timerId.value);
       /* delay new call 500ms */
       timerId.value = setTimeout(() => {
-        organisationStore.getKlassenByOrganisationId(organisationId, searchValue);
+        organisationStore.getKlassenByOrganisationId(organisationId, { searchString: searchValue });
       }, 500);
     }
   }
