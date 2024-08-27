@@ -16,7 +16,7 @@
     type Uebersicht,
     type Zuordnung,
   } from '@/stores/PersonenkontextStore';
-  import { useRolleStore, type RolleStore, type RolleResponse } from '@/stores/RolleStore';
+  import { useRolleStore, type RolleStore, type RolleResponse, RollenMerkmal } from '@/stores/RolleStore';
   import { type SearchFilterStore, useSearchFilterStore } from '@/stores/SearchFilterStore';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import ResultTable, { type TableRow } from '@/components/admin/ResultTable.vue';
@@ -226,8 +226,19 @@
         );
       const administrationsebenen: string =
         uniqueAdministrationsebenen.size > 0 ? Array.from(uniqueAdministrationsebenen).join(', ') : '---';
-      // Check if personalnummer is null, if so, replace it with "---"
-      const personalnummer: string = person.person.personalnummer ?? '---';
+
+      // Check if person has Kopers-Rolle and show personalnummer or "fehlt", if not show "---"
+      const hasKopersRolle: boolean = !!uebersicht?.zuordnungen.find((zuordnung: Zuordnung) =>
+        zuordnung.merkmale?.includes(RollenMerkmal.KopersPflicht),
+      );
+      let personalnummer: string;
+
+      if (hasKopersRolle) {
+        personalnummer = person.person.personalnummer ?? 'fehlt';
+      } else {
+        personalnummer = '---';
+      }
+
       // Check if the uebersicht has a zuordnung of type "Klasse" if no then show directly "---" without filtering or mapping
       const klassenZuordnungen: string = uebersicht?.zuordnungen.some(
         (zuordnung: Zuordnung) => zuordnung.typ === OrganisationsTyp.Klasse,
