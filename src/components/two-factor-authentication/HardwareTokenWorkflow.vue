@@ -177,7 +177,7 @@
       :discardButtonLabel="$t('cancel')"
       id="schule-creation-form"
       :onDiscard="cancelCheck"
-      @onShowDialogChange="(value: boolean) => (showUnsavedChangesDialog = value)"
+      @onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value ?? false)"
       :centerButtons="true"
       :onSubmit="onSubmit"
       :showUnsavedChangesDialog="showUnsavedChangesDialog"
