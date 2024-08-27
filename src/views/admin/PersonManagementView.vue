@@ -22,6 +22,7 @@
   import ResultTable, { type TableRow } from '@/components/admin/ResultTable.vue';
   import SearchField from '@/components/admin/SearchField.vue';
   import { type TranslatedObject } from '@/types.d';
+  import { setPreviousUrl } from '@/utils/routing';
 
   const searchFieldComponent: Ref = ref();
 
@@ -287,6 +288,7 @@
   }
 
   onMounted(async () => {
+    setPreviousUrl();
     if (filterOrSearchActive.value) {
       selectedSchulen.value = searchFilterStore.selectedSchulen || [];
       selectedRollen.value = searchFilterStore.selectedRollen || [];

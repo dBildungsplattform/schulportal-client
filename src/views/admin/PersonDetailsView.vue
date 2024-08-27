@@ -34,6 +34,7 @@
   import PersonenkontextCreate from '@/components/admin/personen/PersonenkontextCreate.vue';
   import { type TranslatedObject } from '@/types.d';
   import KlasseChange from '@/components/admin/klassen/KlasseChange.vue';
+  import { setPreviousUrl } from '@/utils/routing';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
@@ -704,6 +705,7 @@
   }
 
   onBeforeMount(async () => {
+    setPreviousUrl();
     personStore.resetState();
     personenkontextStore.errorCode = '';
     await personStore.getPersonById(currentPersonId);

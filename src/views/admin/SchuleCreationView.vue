@@ -18,6 +18,7 @@
   import { object, string } from 'yup';
   import { toTypedSchema } from '@vee-validate/yup';
   import { DIN_91379A_EXT, NO_LEADING_TRAILING_SPACES } from '@/utils/validation';
+  import { setPreviousUrl } from '@/utils/routing';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
@@ -134,6 +135,7 @@
   }
 
   onMounted(async () => {
+    setPreviousUrl();
     organisationStore.createdSchule = null;
     /* listen for browser changes and prevent them when form is dirty */
     window.addEventListener('beforeunload', preventNavigation);

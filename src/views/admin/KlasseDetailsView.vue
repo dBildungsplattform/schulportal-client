@@ -19,6 +19,7 @@
   import SuccessTemplate from '@/components/admin/klassen/SuccessTemplate.vue';
   import KlasseDelete from '@/components/admin/klassen/KlasseDelete.vue';
   import { getValidationSchema, getVuetifyConfig } from '@/utils/validationKlasse';
+import { setPreviousUrl } from '@/utils/routing';
 
   const route: RouteLocationNormalizedLoaded = useRoute();
   const router: Router = useRouter();
@@ -142,6 +143,7 @@
   }
 
   onBeforeMount(async () => {
+    setPreviousUrl();
     organisationStore.errorCode = '';
     // Retrieves the Klasse using the Id in the route since that's all we have
     await organisationStore.getOrganisationById(currentOrganisationId, OrganisationsTyp.Klasse);

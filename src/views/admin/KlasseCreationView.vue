@@ -22,6 +22,7 @@
   import KlasseForm from '@/components/form/KlasseForm.vue';
   import SuccessTemplate from '@/components/admin/klassen/SuccessTemplate.vue';
   import { getValidationSchema, getVuetifyConfig } from '@/utils/validationKlasse';
+import { setPreviousUrl } from '@/utils/routing';
 
   const { t }: Composer = useI18n({ useScope: 'global' });
   const router: Router = useRouter();
@@ -168,6 +169,7 @@
   });
 
   onMounted(async () => {
+    setPreviousUrl();
     await personenkontextStore.processWorkflowStep({ limit: 25 });
     organisationStore.createdKlasse = null;
     organisationStore.errorCode = '';

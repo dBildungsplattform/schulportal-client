@@ -40,6 +40,7 @@
   } from '@/utils/validationRolle';
   import SuccessTemplate from '@/components/admin/rollen/SuccessTemplate.vue';
   import { type TranslatedObject } from '@/types.d';
+  import { setPreviousUrl } from '@/utils/routing';
 
   const rolleStore: RolleStore = useRolleStore();
   const organisationStore: OrganisationStore = useOrganisationStore();
@@ -180,6 +181,7 @@
   }
 
   onMounted(async () => {
+    setPreviousUrl();
     rolleStore.createdRolle = null;
     await organisationStore.getAllOrganisationen({
       systemrechte: ['ROLLEN_VERWALTEN'],
@@ -217,7 +219,7 @@
     });
 
     /* listen for browser changes and prevent them when form is dirty */
-    window.addEventListener('beforeunload', preventNavigation);
+    window.addEventListener('beforeunload', preventNavigation); 
   });
 
   onUnmounted(() => {

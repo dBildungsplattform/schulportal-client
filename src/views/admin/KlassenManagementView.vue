@@ -18,6 +18,7 @@
   import { useRouter, type Router } from 'vue-router';
   import KlasseDelete from '@/components/admin/klassen/KlasseDelete.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
+import { setPreviousUrl } from '@/utils/routing';
 
   const authStore: AuthStore = useAuthStore();
   const organisationStore: OrganisationStore = useOrganisationStore();
@@ -341,6 +342,7 @@
     router.push({ name: 'klasse-details', params: { id: item.id } });
   }
   onMounted(async () => {
+    setPreviousUrl();
     await organisationStore.getAllOrganisationen({
       offset: (searchFilterStore.klassenPage - 1) * searchFilterStore.klassenPerPage,
       limit: searchFilterStore.klassenPerPage,

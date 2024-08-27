@@ -37,6 +37,7 @@
   import { useKlassen } from '@/composables/useKlassen';
   import PersonenkontextCreate from '@/components/admin/personen/PersonenkontextCreate.vue';
   import { type TranslatedObject } from '@/types.d';
+import { setPreviousUrl } from '@/utils/routing';
 
   const router: Router = useRouter();
   const personStore: PersonStore = usePersonStore();
@@ -248,6 +249,7 @@
   });
 
   onMounted(async () => {
+    setPreviousUrl();
     await personenkontextStore.processWorkflowStep({ limit: 25 });
     personStore.errorCode = '';
     personenkontextStore.createdPersonWithKontext = null;
