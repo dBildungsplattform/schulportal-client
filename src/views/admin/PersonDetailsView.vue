@@ -29,7 +29,7 @@
   import { RollenArt } from '@/stores/RolleStore';
   import { type Composer, useI18n } from 'vue-i18n';
   import { useOrganisationen } from '@/composables/useOrganisationen';
-  import { useRollen } from '@/composables/useRollen';
+  import { useRollen, type TranslatedRolleWithAttrs } from '@/composables/useRollen';
   import { useKlassen } from '@/composables/useKlassen';
   import PersonenkontextCreate from '@/components/admin/personen/PersonenkontextCreate.vue';
   import { type TranslatedObject } from '@/types.d';
@@ -265,17 +265,11 @@
     return result;
   }
 
-  const rollen: ComputedRef<RolleWithRollenart[] | undefined> = useRollen();
+  const rollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = useRollen();
 
   const organisationen: ComputedRef<TranslatedObject[] | undefined> = useOrganisationen();
 
   const klassen: ComputedRef<TranslatedObject[] | undefined> = useKlassen();
-
-  export type RolleWithRollenart = {
-    value: string;
-    title: string;
-    Rollenart: RollenArt;
-  };
 
   type ZuordnungCreationForm = {
     selectedRolle: string;
@@ -290,10 +284,10 @@
 
   // Define a method to check if the selected Rolle is of type "Lern"
   function isLernRolle(selectedRolleId: string): boolean {
-    const rolle: RolleWithRollenart | undefined = rollen.value?.find(
-      (r: RolleWithRollenart) => r.value === selectedRolleId,
+    const rolle: TranslatedRolleWithAttrs | undefined = rollen.value?.find(
+      (r: TranslatedRolleWithAttrs) => r.value === selectedRolleId,
     );
-    return !!rolle && rolle.Rollenart === RollenArt.Lern;
+    return !!rolle && rolle.rollenart === RollenArt.Lern;
   }
 
   // Check if the button to change the Klasse should be active or not. Activate only if there is 1 selected Zuordnung and if it is of type LERN.
@@ -471,7 +465,7 @@
   );
 
   // Filter out the Rollen based on the user's existing Zuordnungen and selected organization
-  const filteredRollen: ComputedRef<RolleWithRollenart[] | undefined> = computed(() => {
+  const filteredRollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = computed(() => {
     const existingZuordnungen: Zuordnung[] | undefined = personenkontextStore.personenuebersicht?.zuordnungen;
 
     // If no existing Zuordnungen then just show all roles
@@ -485,7 +479,7 @@
     const hasLernRolle: boolean = existingZuordnungen.some((zuordnung: Zuordnung) => isLernRolle(zuordnung.rolleId));
 
     // Filter out Rollen that the user already has in the selected organization
-    return rollen.value?.filter((rolle: RolleWithRollenart) => {
+    return rollen.value?.filter((rolle: TranslatedRolleWithAttrs) => {
       // Check if the user already has this role in the selected organization
       const alreadyHasRolleInSelectedOrga: boolean = existingZuordnungen.some(
         (zuordnung: Zuordnung) => zuordnung.rolleId === rolle.value && zuordnung.sskId === selectedOrgaId,
@@ -494,11 +488,11 @@
       // If the user has any LERN roles, only allow LERN roles to be selected
       if (hasLernRolle) {
         // Allow LERN roles in other organizations, but filter them out for the selected organization
-        return !alreadyHasRolleInSelectedOrga && rolle.Rollenart === RollenArt.Lern;
+        return !alreadyHasRolleInSelectedOrga && rolle.rollenart === RollenArt.Lern;
       }
 
       // If the user doesn't have any LERN roles, allow any role that hasn't been assigned yet in the selected organization besides LERN.
-      return !alreadyHasRolleInSelectedOrga && rolle.Rollenart !== RollenArt.Lern;
+      return !alreadyHasRolleInSelectedOrga && rolle.rollenart !== RollenArt.Lern;
     });
   });
 
@@ -570,7 +564,7 @@
         klasse: klasse?.name,
         sskDstNr: organisation.kennung ?? '',
         sskName: organisation.name,
-        rolle: rollen.value?.find((rolle: RolleWithRollenart) => rolle.value === selectedRolle.value)?.title || '',
+        rolle: rollen.value?.find((rolle: TranslatedRolleWithAttrs) => rolle.value === selectedRolle.value)?.title || '',
         administriertVon: organisation.administriertVon ?? '',
         editable: true,
         typ: OrganisationsTyp.Schule,
@@ -587,7 +581,7 @@
           rolleId: selectedRolle.value ?? '',
           sskDstNr: klasse.kennung ?? '',
           sskName: klasse.name,
-          rolle: rollen.value?.find((rolle: RolleWithRollenart) => rolle.value === selectedRolle.value)?.title || '',
+          rolle: rollen.value?.find((rolle: TranslatedRolleWithAttrs) => rolle.value === selectedRolle.value)?.title || '',
           administriertVon: klasse.administriertVon ?? '',
           editable: true,
           typ: OrganisationsTyp.Klasse,
@@ -643,7 +637,7 @@
         sskDstNr: organisation.kennung ?? '',
         sskName: organisation.name,
         rolle:
-          rollen.value?.find((rolle: RolleWithRollenart) => rolle.value === selectedZuordnungen.value[0]?.rolleId)
+          rollen.value?.find((rolle: TranslatedRolleWithAttrs) => rolle.value === selectedZuordnungen.value[0]?.rolleId)
             ?.title || '',
         administriertVon: organisation.administriertVon ?? '',
         editable: true,
@@ -662,7 +656,7 @@
           sskDstNr: newKlasse.kennung ?? '',
           sskName: newKlasse.name,
           rolle:
-            rollen.value?.find((rolle: RolleWithRollenart) => rolle.value === selectedZuordnungen.value[0]?.rolleId)
+            rollen.value?.find((rolle: TranslatedRolleWithAttrs) => rolle.value === selectedZuordnungen.value[0]?.rolleId)
               ?.title || '',
           administriertVon: newKlasse.administriertVon ?? '',
           editable: true,

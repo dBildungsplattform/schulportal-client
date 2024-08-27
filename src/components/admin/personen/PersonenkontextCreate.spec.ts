@@ -34,12 +34,12 @@ beforeEach(() => {
         {
           value: '54321',
           title: 'Lern',
-          Rollenart: RollenArt.Lern,
+          rollenart: RollenArt.Lern,
         },
         {
           value: '54329',
           title: 'Lehr',
-          Rollenart: RollenArt.Lehr,
+          rollenart: RollenArt.Lehr,
         },
       ],
       klassen: [

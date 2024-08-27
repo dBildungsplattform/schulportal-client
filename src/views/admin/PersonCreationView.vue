@@ -398,10 +398,10 @@
           <!-- Radio buttons for Befristung options -->
           <v-row class="align-center">
             <v-col
-              class="py-0"
+              class="py-0 mt-n1"
               cols="12"
               sm="7"
-              offset="5"
+              offset-sm="5"
             >
               <v-radio-group
                 v-model="befristungOption"
