@@ -398,7 +398,7 @@
     "lockedBy": "Gesperrt durch",
     "lockedSince": "Seit",
     "unlockUser": "Benutzer entsperren",
-    "unLockUserInfoText": "Ich bestätige, dass ich mit der Schulleitung der sperrenden Schule geklärt habe, dass die Sperre aufgehoben werden darf.",
+    "unLockUserInfoText": "Ich bestätige, dass ich mit der sperrenden Stelle geklärt habe, dass die Sperre aufgehoben werden darf.",
     "lockError": "Der Benutzer konnte nicht gesperrt werden.",
     "unlockError": "Der Benutzer konnte nicht entsperrt werden.",
     "modifyBefristung": "Befristung bearbeiten",
