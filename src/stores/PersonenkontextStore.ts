@@ -25,6 +25,7 @@ import {
   type PersonendatensatzResponse,
   type PersonAdministrationApiInterface,
   PersonAdministrationApiFactory,
+  RollenMerkmal,
 } from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
 
@@ -62,6 +63,7 @@ export type Zuordnung = {
   administriertVon: string;
   typ: OrganisationsTyp;
   editable: boolean;
+  merkmale?: Array<RollenMerkmal>;
 };
 
 export type Uebersicht =
@@ -81,6 +83,7 @@ export type Uebersicht =
         administriertVon: string;
         typ: OrganisationsTyp;
         editable: boolean;
+        merkmale?: Array<RollenMerkmal>;
       }[];
     }
   | undefined;
