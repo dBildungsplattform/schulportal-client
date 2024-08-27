@@ -41,6 +41,86 @@ export interface AddSystemrechtBodyParams {
 /**
  * 
  * @export
+ * @interface AssignHardwareTokenBodyParams
+ */
+export interface AssignHardwareTokenBodyParams {
+    /**
+     * 
+     * @type {string}
+     * @memberof AssignHardwareTokenBodyParams
+     */
+    'serial': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof AssignHardwareTokenBodyParams
+     */
+    'otp': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof AssignHardwareTokenBodyParams
+     */
+    'referrer': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof AssignHardwareTokenBodyParams
+     */
+    'userId': string;
+}
+/**
+ * 
+ * @export
+ * @interface AssignHardwareTokenResponse
+ */
+export interface AssignHardwareTokenResponse {
+    /**
+     * 
+     * @type {number}
+     * @memberof AssignHardwareTokenResponse
+     */
+    'id': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof AssignHardwareTokenResponse
+     */
+    'jsonrpc': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof AssignHardwareTokenResponse
+     */
+    'time': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof AssignHardwareTokenResponse
+     */
+    'version': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof AssignHardwareTokenResponse
+     */
+    'versionnumber': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof AssignHardwareTokenResponse
+     */
+    'signature': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof AssignHardwareTokenResponse
+     */
+    'dialogText': string;
+}
+/**
+ * 
+ * @export
  * @interface CreateOrganisationBodyParams
  */
 export interface CreateOrganisationBodyParams {
@@ -590,7 +670,8 @@ export const DbiamPersonenkontexteUpdateErrorI18nKeyEnum = {
     NewerVersionOfPersonenkontexteAvailable: 'NEWER_VERSION_OF_PERSONENKONTEXTE_AVAILABLE',
     InvalidLastModifiedValue: 'INVALID_LAST_MODIFIED_VALUE',
     PersonIdMismatch: 'PERSON_ID_MISMATCH',
-    PersonNotFound: 'PERSON_NOT_FOUND'
+    PersonNotFound: 'PERSON_NOT_FOUND',
+    InvalidPersonenkontextForPersonWithRollenartLern: 'INVALID_PERSONENKONTEXT_FOR_PERSON_WITH_ROLLENART_LERN'
 } as const;
 
 export type DbiamPersonenkontexteUpdateErrorI18nKeyEnum = typeof DbiamPersonenkontexteUpdateErrorI18nKeyEnum[keyof typeof DbiamPersonenkontexteUpdateErrorI18nKeyEnum];
@@ -2860,6 +2941,49 @@ export const Class2FAApiAxiosParamCreator = function (configuration?: Configurat
     return {
         /**
          * 
+         * @param {AssignHardwareTokenBodyParams} assignHardwareTokenBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        privacyIdeaAdministrationControllerAssignHardwareToken: async (assignHardwareTokenBodyParams: AssignHardwareTokenBodyParams, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'assignHardwareTokenBodyParams' is not null or undefined
+            assertParamExists('privacyIdeaAdministrationControllerAssignHardwareToken', 'assignHardwareTokenBodyParams', assignHardwareTokenBodyParams)
+            const localVarPath = `/api/2fa-token/assign/hardwareToken`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(assignHardwareTokenBodyParams, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @param {string} personId 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -2957,6 +3081,16 @@ export const Class2FAApiFp = function(configuration?: Configuration) {
     return {
         /**
          * 
+         * @param {AssignHardwareTokenBodyParams} assignHardwareTokenBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async privacyIdeaAdministrationControllerAssignHardwareToken(assignHardwareTokenBodyParams: AssignHardwareTokenBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AssignHardwareTokenResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.privacyIdeaAdministrationControllerAssignHardwareToken(assignHardwareTokenBodyParams, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
          * @param {string} personId 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -2987,6 +3121,15 @@ export const Class2FAApiFactory = function (configuration?: Configuration, baseP
     return {
         /**
          * 
+         * @param {AssignHardwareTokenBodyParams} assignHardwareTokenBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        privacyIdeaAdministrationControllerAssignHardwareToken(assignHardwareTokenBodyParams: AssignHardwareTokenBodyParams, options?: any): AxiosPromise<AssignHardwareTokenResponse> {
+            return localVarFp.privacyIdeaAdministrationControllerAssignHardwareToken(assignHardwareTokenBodyParams, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @param {string} personId 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -3014,6 +3157,15 @@ export const Class2FAApiFactory = function (configuration?: Configuration, baseP
 export interface Class2FAApiInterface {
     /**
      * 
+     * @param {AssignHardwareTokenBodyParams} assignHardwareTokenBodyParams 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof Class2FAApiInterface
+     */
+    privacyIdeaAdministrationControllerAssignHardwareToken(assignHardwareTokenBodyParams: AssignHardwareTokenBodyParams, options?: AxiosRequestConfig): AxiosPromise<AssignHardwareTokenResponse>;
+
+    /**
+     * 
      * @param {string} personId 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -3039,6 +3191,17 @@ export interface Class2FAApiInterface {
  * @extends {BaseAPI}
  */
 export class Class2FAApi extends BaseAPI implements Class2FAApiInterface {
+    /**
+     * 
+     * @param {AssignHardwareTokenBodyParams} assignHardwareTokenBodyParams 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof Class2FAApi
+     */
+    public privacyIdeaAdministrationControllerAssignHardwareToken(assignHardwareTokenBodyParams: AssignHardwareTokenBodyParams, options?: AxiosRequestConfig) {
+        return Class2FAApiFp(this.configuration).privacyIdeaAdministrationControllerAssignHardwareToken(assignHardwareTokenBodyParams, options).then((request) => request(this.axios, this.basePath));
+    }
+
     /**
      * 
      * @param {string} personId 
