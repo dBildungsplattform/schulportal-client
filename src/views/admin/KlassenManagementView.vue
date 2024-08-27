@@ -1,11 +1,12 @@
 <script setup lang="ts">
   import { computed, onMounted, ref, type ComputedRef, type Ref } from 'vue';
-  import ResultTable from '@/components/admin/ResultTable.vue';
+  import ResultTable, { type TableRow } from '@/components/admin/ResultTable.vue';
   import { type Composer, useI18n } from 'vue-i18n';
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
   import {
     OrganisationsTyp,
     useOrganisationStore,
+    type KlasseTableItem,
     type Organisation,
     type OrganisationStore,
   } from '@/stores/OrganisationStore';
@@ -50,7 +51,7 @@
 
   const selectedSchule: Ref<string | null> = ref(null);
   const selectedKlassen: Ref<Array<string>> = ref([]);
-  const finalKlassen: Ref<Array<Organisation>> = ref([]);
+  const finalKlassen: Ref<Array<KlasseTableItem>> = ref([]);
   const klassenOptions: Ref<TranslatedObject[] | undefined> = ref([]);
 
   const searchInputSchulen: Ref<string> = ref('');
@@ -80,7 +81,10 @@
 
   async function fetchKlassenBySelectedSchuleId(schuleId: string | null): Promise<void> {
     // Fetch Klassen related to the selected Schule
-    await organisationStore.getKlassenByOrganisationId(schuleId || '');
+    await organisationStore.getKlassenByOrganisationId(schuleId || '', {
+      offset: (searchFilterStore.klassenPage - 1) * searchFilterStore.klassenPerPage,
+      limit: searchFilterStore.klassenPerPage,
+    });
 
     // Update the klassenOptions for the dropdown
     klassenOptions.value = organisationStore.klassen.map((org: Organisation) => ({
@@ -542,7 +546,10 @@
           :items="finalKlassen || []"
           :loading="organisationStore.loading"
           :headers="headers"
-          @onHandleRowClick="navigateToKlassenDetails"
+          @onHandleRowClick="
+            (event: PointerEvent, item: TableRow<unknown>) =>
+              navigateToKlassenDetails(event, item as TableRow<Organisation>)
+          "
           @onItemsPerPageUpdate="getPaginatedKlassenWithLimit"
           @onPageUpdate="getPaginatedKlassen"
           :totalItems="organisationStore.totalKlassen"

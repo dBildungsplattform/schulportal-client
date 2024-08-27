@@ -1,4 +1,8 @@
-import type { PersonFrontendControllerFindPersons200Response, PersonendatensatzResponse } from '@/api-client/generated';
+import type {
+  PersonFrontendControllerFindPersons200Response,
+  PersonendatensatzResponse,
+  TokenStateResponse,
+} from '@/api-client/generated';
 import { usePersonStore, type PersonStore, type Personendatensatz } from './PersonStore';
 import ApiService from '@/services/ApiService';
 import MockAdapter from 'axios-mock-adapter';
@@ -179,6 +183,41 @@ describe('PersonStore', () => {
       const resetPasswordPromise: Promise<string> = personStore.resetPassword(userId);
       expect(personStore.loading).toBe(true);
       await rejects(resetPasswordPromise);
+      expect(personStore.errorCode).toEqual('some mock server error');
+      expect(personStore.loading).toBe(false);
+    });
+  });
+
+  describe('deletePersonById', () => {
+    it('should delete a person and update state', async () => {
+      const personId: string = '1234';
+
+      mockadapter.onDelete(`/api/personen/${personId}`).replyOnce(204);
+
+      await personStore.deletePersonById(personId);
+
+      expect(personStore.loading).toBe(false);
+      expect(personStore.errorCode).toEqual('');
+    });
+
+    it('should handle string error', async () => {
+      const personId: string = '1234';
+
+      mockadapter.onDelete(`/api/personen/${personId}`).replyOnce(500, 'some error');
+
+      await rejects(personStore.deletePersonById(personId));
+
+      expect(personStore.errorCode).toEqual('UNSPECIFIED_ERROR');
+      expect(personStore.loading).toBe(false);
+    });
+
+    it('should handle error code', async () => {
+      const personId: string = '1234';
+
+      mockadapter.onDelete(`/api/personen/${personId}`).replyOnce(500, { code: 'some mock server error' });
+
+      await rejects(personStore.deletePersonById(personId));
+
       expect(personStore.errorCode).toEqual('some mock server error');
       expect(personStore.loading).toBe(false);
     });

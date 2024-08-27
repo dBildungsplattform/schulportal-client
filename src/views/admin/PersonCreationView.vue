@@ -121,7 +121,7 @@
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedFamilienname', vuetifyConfig);
   const [selectedOrganisation, selectedOrganisationProps]: [
-    Ref<string>,
+    Ref<string | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedOrganisation', vuetifyConfig);
   const [selectedKlasse, selectedKlasseProps]: [
@@ -188,7 +188,7 @@
     const bodyParams: CreatePersonBodyParams = {
       familienname: selectedFamilienname.value as string,
       vorname: selectedVorname.value as string,
-      organisationId: selectedOrganisation.value,
+      organisationId: selectedOrganisation.value as string,
       rolleId: selectedRolle.value ?? '',
     };
 
@@ -248,7 +248,7 @@
   });
 
   onMounted(async () => {
-    await personenkontextStore.processWorkflowStep();
+    await personenkontextStore.processWorkflowStep({ limit: 25 });
     personStore.errorCode = '';
     personenkontextStore.createdPersonWithKontext = null;
     personenkontextStore.createdPersonenkontextForKlasse = null;
@@ -291,7 +291,7 @@
         :discardButtonLabel="$t('admin.person.discard')"
         id="person-creation-form"
         :onDiscard="navigateToPersonTable"
-        @onShowDialogChange="(value: boolean) => (showUnsavedChangesDialog = value)"
+        @onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
         :onSubmit="onSubmit"
         :showUnsavedChangesDialog="showUnsavedChangesDialog"
       >
@@ -307,9 +307,9 @@
           v-model:selectedOrganisation="selectedOrganisation"
           v-model:selectedRolle="selectedRolle"
           v-model:selectedKlasse="selectedKlasse"
-          @update:selectedOrganisation="(value: string) => (selectedOrganisation = value)"
-          @update:selectedRolle="(value: string | undefined) => (selectedRolle = value)"
-          @update:selectedKlasse="(value: string | undefined) => (selectedKlasse = value)"
+          @update:selectedOrganisation="(value?: string) => (selectedOrganisation = value)"
+          @update:selectedRolle="(value?: string) => (selectedRolle = value)"
+          @update:selectedKlasse="(value?: string) => (selectedKlasse = value)"
           @update:canCommit="canCommit = $event"
           @fieldReset="handleFieldReset"
         />

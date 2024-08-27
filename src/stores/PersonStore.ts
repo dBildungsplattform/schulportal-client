@@ -25,6 +25,12 @@ export type Person = {
   personalnummer?: string | null;
 };
 
+export type PersonTableItem = {
+  person: Person;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
 export type CreatePersonBodyParams = DbiamCreatePersonWithContextBodyParams;
 export type CreatedPersonenkontext = DbiamPersonenkontextBodyParams;
 
@@ -56,7 +62,7 @@ type PersonActions = {
   getAllPersons: (filter: PersonFilter) => Promise<void>;
   getPersonById: (personId: string) => Promise<Personendatensatz>;
   resetPassword: (personId: string) => Promise<string>;
-  deletePerson: (personId: string) => Promise<void>;
+  deletePersonById: (personId: string) => Promise<void>;
 };
 
 export type PersonStore = Store<'personStore', PersonState, PersonGetters, PersonActions>;
@@ -137,7 +143,7 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
         this.loading = false;
       }
     },
-    async deletePerson(personId: string) {
+    async deletePersonById(personId: string) {
       this.loading = true;
       try {
         await personenApi.personControllerDeletePersonById(personId);
