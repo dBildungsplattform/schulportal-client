@@ -388,7 +388,6 @@
               sm="5"
             ></v-col>
             <v-checkbox
-              class=""
               data-testid="has-no-kopersnr-checkbox"
               :disabled="!!selectedKopersNr"
               hide-details
@@ -401,9 +400,10 @@
           <FormRow
             v-if="isKopersRolle(selectedRolle) && selectedOrganisation && !hasNoKopersNr"
             :errorLabel="selectedKopersNrProps?.error || ''"
-            labelForId="kopersnr-input"
             :isRequired="!hasNoKopersNr"
             :label="$t('person.kopersNr')"
+            labelForId="kopersnr-input"
+            :noTopMargin="true"
           >
             <v-text-field
               clearable
