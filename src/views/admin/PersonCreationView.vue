@@ -5,7 +5,7 @@
     type CreatedPersonenkontext,
     type PersonStore,
   } from '@/stores/PersonStore';
-  import { RollenArt } from '@/stores/RolleStore';
+  import { RollenArt, RollenMerkmal } from '@/stores/RolleStore';
   import { type ComputedRef, computed, onMounted, onUnmounted, type Ref, ref } from 'vue';
   import {
     onBeforeRouteLeave,
@@ -33,7 +33,7 @@
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
   import { DIN_91379A, NO_LEADING_TRAILING_SPACES } from '@/utils/validation';
   import { useOrganisationen } from '@/composables/useOrganisationen';
-  import { useRollen } from '@/composables/useRollen';
+  import { useRollen, type TranslatedRolleWithAttrs } from '@/composables/useRollen';
   import { useKlassen } from '@/composables/useKlassen';
   import PersonenkontextCreate from '@/components/admin/personen/PersonenkontextCreate.vue';
   import { type TranslatedObject } from '@/types.d';
@@ -48,20 +48,22 @@
 
   const canCommit: Ref<boolean> = ref(false);
 
-  type RolleWithRollenart = {
-    value: string;
-    title: string;
-    Rollenart: RollenArt;
-  };
-
-  const rollen: ComputedRef<RolleWithRollenart[] | undefined> = useRollen();
+  const rollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = useRollen();
 
   // Define a method to check if the selected Rolle is of type "Lern"
   function isLernRolle(selectedRolleId: string): boolean {
-    const rolle: RolleWithRollenart | undefined = rollen.value?.find(
-      (r: RolleWithRollenart) => r.value === selectedRolleId,
+    const rolle: TranslatedRolleWithAttrs | undefined = rollen.value?.find(
+      (r: TranslatedRolleWithAttrs) => r.value === selectedRolleId,
     );
-    return !!rolle && rolle.Rollenart === RollenArt.Lern;
+    return !!rolle && rolle.rollenart === RollenArt.Lern;
+  }
+
+  // Checks if the selected Rolle is Befristungspflicht
+  function isBefristungspflichtRolle(selectedRolleId: string | undefined): boolean {
+    const rolle: TranslatedRolleWithAttrs | undefined = rollen.value?.find(
+      (r: TranslatedRolleWithAttrs) => r.value === selectedRolleId,
+    );
+    return !!rolle && !!rolle.merkmale && rolle.merkmale.has(RollenMerkmal.BefristungPflicht);
   }
 
   const validationSchema: TypedSchema = toTypedSchema(
@@ -83,6 +85,11 @@
         then: (schema: StringSchema<string | undefined, AnyObject, undefined, ''>) =>
           schema.required(t('admin.klasse.rules.klasse.required')),
       }),
+      selectedBefristung: string().when('selectedRolle', {
+        is: (selectedRolleId: string) => isBefristungspflichtRolle(selectedRolleId),
+        then: (schema: StringSchema<string | undefined, AnyObject, undefined, ''>) =>
+          schema.required(t('admin.befristung.rules.required')),
+      }),
     }),
   );
 
@@ -101,6 +108,7 @@
     selectedFamilienname: string;
     selectedOrganisation: string;
     selectedKlasse: string;
+    selectedBefristung: Date;
   };
 
   // eslint-disable-next-line @typescript-eslint/typedef
@@ -128,6 +136,10 @@
     Ref<string | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedKlasse', vuetifyConfig);
+  const [selectedBefristung, selectedBefristungProps]: [
+    Ref<string | undefined>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = defineField('selectedBefristung', vuetifyConfig);
 
   const organisationen: ComputedRef<TranslatedObject[] | undefined> = useOrganisationen();
 
@@ -166,7 +178,8 @@
       isFieldDirty('selectedRolle') ||
       isFieldDirty('selectedKlasse') ||
       isFieldDirty('selectedVorname') ||
-      isFieldDirty('selectedFamilienname')
+      isFieldDirty('selectedFamilienname') ||
+      isFieldDirty('selectedBefristung')
     );
   }
 
@@ -357,6 +370,57 @@
               v-model="selectedFamilienname"
             ></v-text-field>
           </FormRow>
+        </div>
+        <div
+          class="mt-4"
+          v-if="isBefristungspflichtRolle(selectedRolle) && selectedOrganisation"
+        >
+          <v-row>
+            <h3 class="headline-3">3. {{ $t('admin.befristung.assignBefristung') }}</h3>
+          </v-row>
+          <FormRow
+            :errorLabel="selectedBefristungProps?.error || ''"
+            labelForId="befristung-select"
+            :isRequired="true"
+            :label="$t('admin.befristung.befristung')"
+          >
+            <v-date-input
+              v-model="selectedBefristung"
+              v-bind="selectedBefristungProps"
+              prepend-icon=""
+              append-inner-icon="$calendar"
+              variant="outlined"
+              clearable
+              placeholder="TT.MM.JJJJ"
+              color="primary"
+            ></v-date-input>
+          </FormRow>
+          <!-- Radio buttons for Befristung options -->
+          <v-row class="align-center">
+            <v-col
+              class="py-0"
+              cols="12"
+              sm="7"
+              offset="5"
+            >
+              <v-radio-group
+                v-model="befristungOption"
+                @change="handleBefristungOptionChange"
+                row
+              >
+                <v-radio
+                  label="Bis Schuljahresende"
+                  value="schuljahresende"
+                  :color="'primary'"
+                ></v-radio>
+                <v-radio
+                  label="Unbefristet"
+                  value="unbefristet"
+                  :color="'primary'"
+                ></v-radio>
+              </v-radio-group>
+            </v-col>
+          </v-row>
         </div>
       </FormWrapper>
     </template>

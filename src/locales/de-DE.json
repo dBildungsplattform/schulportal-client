@@ -8,6 +8,14 @@
         "required": "Die Administrationsebene muss ausgewählt werden."
       }
     },
+    "befristung": {
+      "assignBefristung": "Befristung zuordnen",
+      "befristung": "Befristung",
+      "rules": {
+        "required": "Die Befristung muss ausgewählt werden."
+      },
+      "selectBefristung": "Befristung auswählen"
+    },
     "mandatoryFieldsNotice": "Mit * markierte Felder sind Pflichtangaben.",
     "backToForm": "Zurück zum Formular",
     "followingDataCreated": "Folgende Daten wurden gespeichert:",

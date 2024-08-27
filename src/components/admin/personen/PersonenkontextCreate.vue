@@ -7,6 +7,7 @@
   import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
   import { type TranslatedObject } from '@/types.d';
   import type { BaseFieldProps } from 'vee-validate';
+  import type { TranslatedRolleWithAttrs } from '@/composables/useRollen';
 
   useI18n({ useScope: 'global' });
 
@@ -22,15 +23,9 @@
 
   let isSearching: boolean = false;
 
-  type RolleWithRollenart = {
-    value: string;
-    title: string;
-    Rollenart: RollenArt;
-  };
-
   type Props = {
     organisationen: TranslatedObject[] | undefined;
-    rollen: RolleWithRollenart[] | undefined;
+    rollen: TranslatedRolleWithAttrs[] | undefined;
     klassen: TranslatedObject[] | undefined;
     selectedOrganisationProps: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     selectedRolleProps: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
@@ -72,10 +67,10 @@
   });
 
   function isLernRolle(selectedRolleId: string | undefined): boolean {
-    const rolle: RolleWithRollenart | undefined = props.rollen?.find(
-      (r: RolleWithRollenart) => r.value === selectedRolleId,
+    const rolle: TranslatedRolleWithAttrs | undefined = props.rollen?.find(
+      (r: TranslatedRolleWithAttrs) => r.value === selectedRolleId,
     );
-    return !!rolle && rolle.Rollenart === RollenArt.Lern;
+    return !!rolle && rolle.rollenart === RollenArt.Lern;
   }
 
   // Watcher for selectedOrganisation to fetch roles and classes

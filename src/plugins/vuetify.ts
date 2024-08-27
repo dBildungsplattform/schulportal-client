@@ -5,6 +5,7 @@ import i18n from '@/plugins/i18n';
 import '@mdi/font/css/materialdesignicons.css';
 import { aliases, mdi } from 'vuetify/iconsets/mdi';
 import '@/styles/main.scss';
+import { VDateInput } from 'vuetify/lib/labs/components.mjs';
 
 // eslint-disable-next-line no-var
 declare var cspNonce: string;
@@ -42,6 +43,9 @@ const vuetifyConfig: VuetifyOptions = {
     themes: {
       shTheme,
     },
+  },
+  components: {
+    VDateInput,
   },
 };
 
