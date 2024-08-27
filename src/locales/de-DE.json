@@ -342,6 +342,7 @@
     "password": "Passwort",
     "username": "Benutzername"
   },
+  "missing": "fehlt",
   "nav": {
     "admin": "Schulportal-Administration",
     "backToDetails": "Zurück zur Gesamtübersicht",

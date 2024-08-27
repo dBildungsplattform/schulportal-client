@@ -475,13 +475,18 @@
             }}</span></v-col
           >
         </v-row>
-        <v-row>
-          <v-col class="text-body bold text-right"> {{ $t('person.kopersNr') }}: </v-col>
-          <v-col class="text-body"
+        <v-row v-if="isKopersRolle(personenkontextStore.createdPersonWithKontext.DBiamPersonenkontextResponse.rolleId)">
+          <v-col
+            :class="`${isKopersRolle(personenkontextStore.createdPersonWithKontext.DBiamPersonenkontextResponse.rolleId) && personenkontextStore.createdPersonWithKontext.person.personalnummer ? 'text-body bold text-right' : 'text-body bold text-right text-red'}`"
+          >
+            {{ $t('person.kopersNr') }}:
+          </v-col>
+          <v-col
+            :class="`${isKopersRolle(personenkontextStore.createdPersonWithKontext.DBiamPersonenkontextResponse.rolleId) && personenkontextStore.createdPersonWithKontext.person.personalnummer ? 'text-body' : 'text-body text-red'}`"
             ><span data-testid="created-person-kopersNr">{{
               personenkontextStore.createdPersonWithKontext.person.personalnummer
                 ? personenkontextStore.createdPersonWithKontext.person.personalnummer
-                : '---'
+                : $t('missing')
             }}</span></v-col
           >
         </v-row>
