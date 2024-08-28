@@ -34,6 +34,11 @@
   import PersonenkontextCreate from '@/components/admin/personen/PersonenkontextCreate.vue';
   import { type TranslatedObject } from '@/types.d';
   import KlasseChange from '@/components/admin/klassen/KlasseChange.vue';
+  import {
+    useServiceProviderStore,
+    type ServiceProvider,
+    type ServiceProviderStore,
+  } from '@/stores/ServiceProviderStore';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
@@ -46,6 +51,7 @@
   const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
   const authStore: AuthStore = useAuthStore();
   const organisationStore: OrganisationStore = useOrganisationStore();
+  const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
 
   const password: Ref<string> = ref('');
 
@@ -703,6 +709,11 @@
     }
   }
 
+  let is2faAllowed: Ref<boolean> = ref(false);
+  let show2faBlock: ComputedRef<boolean> = computed(() => {
+    return is2faAllowed.value && personStore.twoFactorState.hasToken != undefined;
+  });
+
   onBeforeMount(async () => {
     personStore.resetState();
     personenkontextStore.errorCode = '';
@@ -712,8 +723,11 @@
     hasKlassenZuordnung.value = personenkontextStore.personenuebersicht?.zuordnungen.some(
       (zuordnung: Zuordnung) => zuordnung.typ === OrganisationsTyp.Klasse,
     );
-
     await personStore.get2FAState(currentPersonId);
+    await serviceProviderStore.getAvailableServiceProvidersForPerson(currentPersonId);
+    is2faAllowed.value = serviceProviderStore.availableServiceProvidersForPerson.some(
+      (sp: ServiceProvider) => sp.requires2fa,
+    );
   });
 </script>
 
@@ -973,7 +987,7 @@
           ></v-row>
         </v-container>
         <v-divider
-          v-if="personStore.twoFactorState.hasToken != undefined"
+          v-if="show2faBlock"
           class="border-opacity-100 rounded my-6 mx-4"
           color="#E5EAEF"
           thickness="6"
