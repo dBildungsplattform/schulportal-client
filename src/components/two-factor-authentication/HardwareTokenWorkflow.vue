@@ -52,10 +52,10 @@
       if (error.response && error.response.data.i18nKey) {
         const message: string =
           t('admin.person.twoFactorAuthentication.errors.' + error.response.data.i18nKey) ||
-          t('admin.person.twoFactorAuthentication.errors.UNKOWN_ERROR');
+          t('admin.person.twoFactorAuthentication.errors.UNKNOWN_ERROR');
         dialogText.value = message;
       } else {
-        dialogText.value = t('admin.person.twoFactorAuthentication.errors.UNKOWN_ERROR');
+        dialogText.value = t('admin.person.twoFactorAuthentication.errors.UNKNOWN_ERROR');
       }
     }
   }
@@ -193,9 +193,9 @@
           data-testid="hardware-token-input"
           density="compact"
           :disabled="false"
-          id="hardwareToken-input"
+          id="hardware-token-input"
           :placeholder="t('admin.person.twoFactorAuthentication.serial')"
-          ref="hardwareToken-input"
+          ref="hardware-token-input"
           required="true"
           variant="outlined"
           v-model="selectedSeriennummer"
@@ -210,12 +210,12 @@
       >
         <v-text-field
           clearable
-          data-testid="hardwareToken-input"
+          data-testid="hardware-token-input"
           density="compact"
           :disabled="false"
-          id="hardwareToken-input"
+          id="hardware-token-input"
           :placeholder="t('admin.person.twoFactorAuthentication.otpPlaceholder')"
-          ref="hardwareToken-input"
+          ref="hardware-token-input"
           required="true"
           variant="outlined"
           v-model="selectedOtp"
