@@ -14,7 +14,6 @@
   import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
   import { useRouter, type Router } from 'vue-router';
   import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
-import { setPreviousUrl } from '@/utils/routing';
 
   const rolleStore: RolleStore = useRolleStore();
   const organisationStore: OrganisationStore = useOrganisationStore();
@@ -95,7 +94,6 @@ import { setPreviousUrl } from '@/utils/routing';
   }
 
   onMounted(async () => {
-    setPreviousUrl();
     await organisationStore.getAllOrganisationen();
     await rolleStore.getAllRollen({
       offset: (searchFilterStore.rollenPage - 1) * searchFilterStore.rollenPerPage,

@@ -38,7 +38,6 @@
   import RolleDelete from '@/components/admin/rollen/RolleDelete.vue';
   import { type TranslatedObject } from '@/types.d';
   import SuccessTemplate from '@/components/admin/rollen/SuccessTemplate.vue';
-import { setPreviousUrl } from '@/utils/routing';
 
   const route: RouteLocationNormalizedLoaded = useRoute();
   const router: Router = useRouter();
@@ -243,7 +242,6 @@ import { setPreviousUrl } from '@/utils/routing';
   };
 
   onBeforeMount(async () => {
-    setPreviousUrl();
     rolleStore.errorCode = '';
     await rolleStore.getRolleById(currentRolleId);
     await organisationStore.getOrganisationById(

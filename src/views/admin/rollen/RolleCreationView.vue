@@ -40,7 +40,6 @@
   } from '@/utils/validationRolle';
   import SuccessTemplate from '@/components/admin/rollen/SuccessTemplate.vue';
   import { type TranslatedObject } from '@/types.d';
-  import { setPreviousUrl } from '@/utils/routing';
 
   const rolleStore: RolleStore = useRolleStore();
   const organisationStore: OrganisationStore = useOrganisationStore();
@@ -181,7 +180,6 @@
   }
 
   onMounted(async () => {
-    setPreviousUrl();
     rolleStore.createdRolle = null;
     await organisationStore.getAllOrganisationen({
       systemrechte: ['ROLLEN_VERWALTEN'],

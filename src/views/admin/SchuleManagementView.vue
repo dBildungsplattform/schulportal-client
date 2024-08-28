@@ -6,7 +6,6 @@
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
   import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
   import { type SearchFilterStore, useSearchFilterStore } from '@/stores/SearchFilterStore';
-  import { setPreviousUrl } from '@/utils/routing';
 
   const organisationStore: OrganisationStore = useOrganisationStore();
   const searchFilterStore: SearchFilterStore = useSearchFilterStore();
@@ -49,7 +48,6 @@
   }
 
   onMounted(async () => {
-    setPreviousUrl();
     await organisationStore.getAllOrganisationen({
       offset: (searchFilterStore.schulenPage - 1) * searchFilterStore.schulenPerPage,
       limit: searchFilterStore.schulenPerPage,
