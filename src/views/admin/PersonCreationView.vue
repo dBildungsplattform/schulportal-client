@@ -35,6 +35,7 @@
   import { useOrganisationen } from '@/composables/useOrganisationen';
   import { useRollen, type TranslatedRolleWithAttrs } from '@/composables/useRollen';
   import { useKlassen } from '@/composables/useKlassen';
+  import KopersInput from '@/components/admin/personen/KopersInput.vue';
   import PersonenkontextCreate from '@/components/admin/personen/PersonenkontextCreate.vue';
   import { type TranslatedObject } from '@/types.d';
 
@@ -375,49 +376,13 @@
               v-model="selectedFamilienname"
             ></v-text-field>
           </FormRow>
-
-          <!-- No KoPers.-Nr. available checkbox
-              We don't use the form row here to avoid margins and paddings -->
-          <v-row
-            class="align-center"
+          <KopersInput
             v-if="isKopersRolle(selectedRolle) && selectedOrganisation"
-          >
-            <v-col
-              class="py-0 pb-sm-8 pt-sm-3 text-sm-right"
-              cols="12"
-              sm="5"
-            ></v-col>
-            <v-checkbox
-              data-testid="has-no-kopersnr-checkbox"
-              :disabled="!!selectedKopersNr"
-              hide-details
-              :label="$t('admin.person.noKopersNr')"
-              v-model="hasNoKopersNr"
-            ></v-checkbox>
-          </v-row>
-
-          <!-- KoPers.-Nr. -->
-          <FormRow
-            v-if="isKopersRolle(selectedRolle) && selectedOrganisation && !hasNoKopersNr"
-            :errorLabel="selectedKopersNrProps?.error || ''"
-            :isRequired="!hasNoKopersNr"
-            :label="$t('person.kopersNr')"
-            labelForId="kopersnr-input"
-            :noTopMargin="true"
-          >
-            <v-text-field
-              clearable
-              data-testid="kopersnr-input"
-              density="compact"
-              id="kopersnr-input"
-              ref="kopersnr-input"
-              :placeholder="$t('person.enterKopersNr')"
-              :required="!hasNoKopersNr"
-              variant="outlined"
-              v-bind="selectedKopersNrProps"
-              v-model="selectedKopersNr"
-            ></v-text-field>
-          </FormRow>
+            :hasNoKopersNr="hasNoKopersNr"
+            v-model:selectedKopersNr="selectedKopersNr"
+            :selectedKopersNrProps="selectedKopersNrProps"
+            @update:selectedKopersNr="(value?: string) => (selectedKopersNr = value)"
+          ></KopersInput>
         </div>
       </FormWrapper>
     </template>
