@@ -12,9 +12,12 @@
       "assignBefristung": "Befristung zuordnen",
       "befristung": "Befristung",
       "rules": {
-        "required": "Die Befristung muss ausgewählt werden."
+        "required": "Die Befristung muss ausgewählt werden.",
+        "format": "Die eingegebene Befristung hat nicht das richtige Format DD.MM.JJJJ."
       },
-      "selectBefristung": "Befristung auswählen"
+      "selectBefristung": "Befristung auswählen",
+      "unlimited": "Unbefristet",
+      "untilEndOfSchoolYear": "Bis Schuljahresende"
     },
     "mandatoryFieldsNotice": "Mit * markierte Felder sind Pflichtangaben.",
     "backToForm": "Zurück zum Formular",
