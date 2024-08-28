@@ -433,6 +433,12 @@ export interface DBiamPersonenzuordnungResponse {
      * @memberof DBiamPersonenzuordnungResponse
      */
     'editable': boolean;
+    /**
+     * 
+     * @type {string}
+     * @memberof DBiamPersonenzuordnungResponse
+     */
+    'befristung': string;
 }
 
 
@@ -454,6 +460,12 @@ export interface DbiamCreatePersonWithContextBodyParams {
      * @memberof DbiamCreatePersonWithContextBodyParams
      */
     'vorname': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof DbiamCreatePersonWithContextBodyParams
+     */
+    'befristung'?: string;
     /**
      * 
      * @type {string}
@@ -531,6 +543,12 @@ export interface DbiamPersonenkontextBodyParams {
      * @memberof DbiamPersonenkontextBodyParams
      */
     'rolleId': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof DbiamPersonenkontextBodyParams
+     */
+    'befristung': string;
 }
 /**
  * 
@@ -590,7 +608,9 @@ export const DbiamPersonenkontexteUpdateErrorI18nKeyEnum = {
     NewerVersionOfPersonenkontexteAvailable: 'NEWER_VERSION_OF_PERSONENKONTEXTE_AVAILABLE',
     InvalidLastModifiedValue: 'INVALID_LAST_MODIFIED_VALUE',
     PersonIdMismatch: 'PERSON_ID_MISMATCH',
-    PersonNotFound: 'PERSON_NOT_FOUND'
+    PersonNotFound: 'PERSON_NOT_FOUND',
+    InvalidPersonenkontextForPersonWithRollenartLern: 'INVALID_PERSONENKONTEXT_FOR_PERSON_WITH_ROLLENART_LERN',
+    BefristungRequiredForPersonenkontext: ' BEFRISTUNG_REQUIRED_FOR_PERSONENKONTEXT'
 } as const;
 
 export type DbiamPersonenkontexteUpdateErrorI18nKeyEnum = typeof DbiamPersonenkontexteUpdateErrorI18nKeyEnum[keyof typeof DbiamPersonenkontexteUpdateErrorI18nKeyEnum];

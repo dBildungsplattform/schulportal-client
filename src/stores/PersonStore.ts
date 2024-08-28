@@ -40,6 +40,12 @@ export type PersonTableItem = {
 export type CreatePersonBodyParams = DbiamCreatePersonWithContextBodyParams;
 export type CreatedPersonenkontext = DbiamPersonenkontextBodyParams;
 
+export type CreatedPersonenkontextKlasse = {
+  personId: string;
+  organisationId: string;
+  rolleId: string;
+};
+
 export type Personendatensatz = {
   person: Person;
 };

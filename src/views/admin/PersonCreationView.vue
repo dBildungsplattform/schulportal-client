@@ -211,28 +211,64 @@
   }
 
   async function createPerson(): Promise<void> {
+    // Function to format a date in dd.MM.yyyy format to ISO 8601
+    function formatDateToISO1(date: string | undefined): string | undefined {
+      if (date) {
+        // Split the date by '.' to extract day, month, and year
+        // eslint-disable-next-line @typescript-eslint/typedef
+        const [day, month, year] = date.split('.').map(Number);
+
+        if (day && month && year) {
+          // Create a new Date object with the extracted parts
+          const d: Date = new Date(year, month - 1, day);
+
+          // Return the ISO string
+          return d.toISOString();
+        }
+      }
+      return;
+    }
+
+    const befristungDate: string | undefined = selectedBefristung.value
+      ? selectedBefristung.value
+      : formatDateToISO1(calculatedBefristung.value);
+
+    // Function to format a date from the vuetify default format to ISO 8601
+    function formatDateToISO(date: string): string {
+      const d: Date = new Date(date);
+      return d.toISOString();
+    }
+
+    // Format the date in ISO 8601 format if it exists
+    const formattedBefristung: string | undefined = befristungDate ? formatDateToISO(befristungDate) : undefined;
+
     const bodyParams: CreatePersonBodyParams = {
       familienname: selectedFamilienname.value as string,
       vorname: selectedVorname.value as string,
       organisationId: selectedOrganisation.value as string,
       rolleId: selectedRolle.value ?? '',
+      befristung: formattedBefristung, // Include the formatted befristung date
     };
 
     await personenkontextStore.createPersonWithKontext(bodyParams);
+
     if (personenkontextStore.createdPersonWithKontext) {
-      // Build the context for the Klasse and save it only if the the Klasse was selected
+      // Build the context for the Klasse and save it only if the Klasse was selected
       if (selectedKlasse.value) {
         const unpersistedKlassePersonenkontext: CreatedPersonenkontext = {
           personId: personenkontextStore.createdPersonWithKontext.person.id,
           organisationId: selectedKlasse.value,
           rolleId: selectedRolle.value ?? '',
+          befristung: formattedBefristung ?? '',
         };
+
         await personenkontextStore
           .createPersonenkontext(unpersistedKlassePersonenkontext, PersonenKontextTyp.Klasse)
           .catch(() => {
             creationErrorText.value = t(`admin.personenkontext.errors.${personenkontextStore.errorCode}`);
           });
       }
+
       resetForm();
     }
   }
