@@ -210,7 +210,7 @@ describe('OrganisationStore', () => {
       },
     ];
     const requestIds: string[] = mockOrganisationen.map((o: Organisation) => o.id);
-    const mockResponse: { parents: Organisation[]} = {
+    const mockResponse: { parents: Organisation[] } = {
       parents: mockOrganisationen,
     };
 
