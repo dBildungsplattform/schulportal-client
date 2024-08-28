@@ -13,6 +13,8 @@
   import { usePersonenkontextStore, type Zuordnung, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
   import { OrganisationsTyp } from '@/stores/OrganisationStore';
   import { type RouteLocationNormalizedLoaded, type Router, useRoute, useRouter } from 'vue-router';
+  import { useServiceProviderStore, type ServiceProviderStore } from '@/stores/ServiceProviderStore';
+import type { ServiceProvider } from '@/stores/ServiceProviderStore';
 
   const route: RouteLocationNormalizedLoaded = useRoute();
   const router: Router = useRouter();
@@ -27,6 +29,8 @@
 
   let personInfoStore: PersonInfoStore = usePersonInfoStore();
   let personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
+  let serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
+
   const personalData: Ref = ref<LabelValue[]>([]);
   const schulDaten: Ref = ref<SchulDaten[]>([]);
 
@@ -133,8 +137,10 @@
   async function initializeStores(): Promise<void> {
     personInfoStore = usePersonInfoStore();
     personenkontextStore = usePersonenkontextStore();
+    serviceProviderStore = useServiceProviderStore();
     await personInfoStore.initPersonInfo();
     await personenkontextStore.getPersonenuebersichtById(personInfoStore.personInfo?.person.id ?? '');
+    await serviceProviderStore.getAvailableServiceProviders();
   }
 
   function setupPersonalData(): void {
@@ -195,6 +201,10 @@
     url.searchParams.set('redirectUrl', windowOrigin + route.fullPath);
     url.searchParams.set('login_hint', personInfoStore.personInfo?.person.referrer ?? '');
     window.location.href = url.toString();
+  }
+
+  function requires2fa(): boolean {
+    return serviceProviderStore.availableServiceProviders.some((sp: ServiceProvider) => sp.requires2fa);
   }
 
   onBeforeMount(async () => {
@@ -397,6 +407,7 @@
       </v-col>
 
       <v-col
+        v-if="requires2fa()"
         cols="12"
         sm="12"
         md="6"

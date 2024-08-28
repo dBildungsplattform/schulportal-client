@@ -590,7 +590,8 @@ export const DbiamPersonenkontexteUpdateErrorI18nKeyEnum = {
     NewerVersionOfPersonenkontexteAvailable: 'NEWER_VERSION_OF_PERSONENKONTEXTE_AVAILABLE',
     InvalidLastModifiedValue: 'INVALID_LAST_MODIFIED_VALUE',
     PersonIdMismatch: 'PERSON_ID_MISMATCH',
-    PersonNotFound: 'PERSON_NOT_FOUND'
+    PersonNotFound: 'PERSON_NOT_FOUND',
+    InvalidPersonenkontextForPersonWithRollenartLern: 'INVALID_PERSONENKONTEXT_FOR_PERSON_WITH_ROLLENART_LERN'
 } as const;
 
 export type DbiamPersonenkontexteUpdateErrorI18nKeyEnum = typeof DbiamPersonenkontexteUpdateErrorI18nKeyEnum[keyof typeof DbiamPersonenkontexteUpdateErrorI18nKeyEnum];
@@ -2036,6 +2037,12 @@ export interface ServiceProviderResponse {
      * @memberof ServiceProviderResponse
      */
     'hasLogo': boolean;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof ServiceProviderResponse
+     */
+    'requires2fa': boolean;
 }
 
 
