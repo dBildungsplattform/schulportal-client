@@ -114,7 +114,7 @@
           "SERIENNUMMER_IN_VERWENDUNG": "Die eingegebene Seriennummer wird bereits aktiv verwendet. Bitte überprüfen Sie ihre Eingabe und versuchen Sie es erneut.",
           "OTP_NICHT_GUELTIG": "Ungültiger Code. Bitte versuchen Sie es erneut.",
           "HARDWARE_TOKEN_SERVICE_FEHLER": "Leider konnte ihr Hardware-Token aus technischen Gründen nicht aktiviert werden. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut. Falls das Problem bestehen bleibt, stellen Sie bitte eine Anfrage über den IQSH Helpdesk.--Link: https://www.secure-lernnetz.de/helpdesk/",
-          "UNKOWN_ERROR": "Ein unbekannter Fehler ist aufgetreten."
+          "UNKNOWN_ERROR": "Ein unbekannter Fehler ist aufgetreten."
         }
       },
       "copyPasswordError": "Passwort konnte nicht in die Zwischenablage kopiert werden",
