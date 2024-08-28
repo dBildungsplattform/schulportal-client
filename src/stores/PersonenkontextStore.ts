@@ -347,7 +347,7 @@ export const usePersonenkontextStore: StoreDefinition<
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
+          this.errorCode = error.response?.data.i18nKey || 'UNSPECIFIED_ERROR';
         }
         return await Promise.reject(this.errorCode);
       } finally {

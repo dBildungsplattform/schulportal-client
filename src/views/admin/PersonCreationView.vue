@@ -240,6 +240,7 @@
   async function navigateBackToPersonForm(): Promise<void> {
     await router.push({ name: 'create-person' });
     personStore.errorCode = '';
+    personenkontextStore.errorCode = '';
   }
 
   const handleCreateAnotherPerson = (): void => {
@@ -293,20 +294,34 @@
     :padded="true"
     :showCloseText="true"
   >
-    <!-- Error Message Display -->
+    <!-- Error Message Display for error messages from the personStore -->
     <SpshAlert
       :model-value="!!personStore.errorCode"
       :title="$t('admin.person.creationErrorTitle')"
       :type="'error'"
       :closable="false"
       :showButton="true"
-      :buttonText="$t('admin.backToForm')"
+      :buttonText="$t('admin.person.backToCreatePerson')"
       :buttonAction="navigateBackToPersonForm"
       :text="creationErrorText"
     />
 
+    <!-- Error Message Display for error messages from the personenkontextStore -->
+    <SpshAlert
+      :model-value="!!personenkontextStore.errorCode"
+      :type="'error'"
+      :closable="false"
+      :text="t(`admin.personenkontext.errors.${personenkontextStore.errorCode}`)"
+      :showButton="true"
+      :buttonText="$t('admin.person.backToCreatePerson')"
+      :buttonAction="navigateBackToPersonForm"
+      :title="t(`admin.personenkontext.title.${personenkontextStore.errorCode}`)"
+    />
+
     <!-- The form to create a new Person  -->
-    <template v-if="!personenkontextStore.createdPersonWithKontext && !personStore.errorCode">
+    <template
+      v-if="!personenkontextStore.createdPersonWithKontext && !personStore.errorCode && !personenkontextStore.errorCode"
+    >
       <FormWrapper
         :canCommit="canCommit"
         :confirmUnsavedChangesAction="handleConfirmUnsavedChanges"
@@ -430,7 +445,9 @@
     </template>
 
     <!-- Result template on success after submit  -->
-    <template v-if="personenkontextStore.createdPersonWithKontext && !personStore.errorCode">
+    <template
+      v-if="personenkontextStore.createdPersonWithKontext && !personStore.errorCode && !personenkontextStore.errorCode"
+    >
       <v-container>
         <v-row justify="center">
           <v-col
