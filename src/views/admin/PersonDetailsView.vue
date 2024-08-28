@@ -960,12 +960,19 @@
                   sm="6"
                   md="auto"
                 >
-                  <v-btn
-                    class="primary"
-                    :disabled="isEditActive"
+                  <SpshTooltip
+                    :enabledCondition="twoFactorAuthentificationStore.hasToken"
+                    :disabledText="$t('person.finishEditFirst')"
+                    :enabledText="$t('admin.person.twoFactorAuthentication.tokenReset')"
+                    position="start"
                   >
-                    {{ $t('admin.person.twoFactorAuthentication.tokenReset') }}</v-btn
-                  ></v-col
+                    <v-btn
+                      class="primary"
+                      :disabled="isEditActive"
+                    >
+                      {{ $t('admin.person.twoFactorAuthentication.tokenReset') }}</v-btn
+                    >
+                  </SpshTooltip></v-col
                 >
               </div>
             </v-col>
