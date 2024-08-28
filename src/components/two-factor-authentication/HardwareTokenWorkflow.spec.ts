@@ -33,7 +33,7 @@ beforeEach(() => {
 
 describe('hardware token workflow', () => {
   test('it opens the dialog', async () => {
-    await document.querySelector('[data-testid="hardwareToken-input"]');
-    expect(document.querySelector('[data-testid="hardwareToken-input"]')).not.toBeNull();
+    await document.querySelector('[data-testid="hardware-token-input"]');
+    expect(document.querySelector('[data-testid="hardware-token-input"]')).not.toBeNull();
   });
 });
