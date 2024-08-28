@@ -977,7 +977,7 @@
                   md="auto"
                 >
                   <SpshTooltip
-                    :enabledCondition="personStore.twoFactorState.hasToken"
+                    :enabledCondition="twoFactorAuthentificationStore.hasToken"
                     :disabledText="$t('person.finishEditFirst')"
                     :enabledText="$t('admin.person.twoFactorAuthentication.tokenReset')"
                     position="start"
