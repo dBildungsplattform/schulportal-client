@@ -190,7 +190,7 @@
       >
         <v-text-field
           clearable
-          data-testid="hardwareToken-input"
+          data-testid="hardware-token-input"
           density="compact"
           :disabled="false"
           id="hardwareToken-input"
