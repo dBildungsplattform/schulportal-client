@@ -32,7 +32,7 @@
     (event: 'updateHeader', header: string): void;
     (event: 'onCloseClicked'): void;
   }>();
-  emits('updateHeader', 'Hardware-Token zuordnen');
+  emits('updateHeader', t('admin.person.twoFactorAuthentication.hardwareTokenOption'));
 
   type Props = {
     errorCode: string;
@@ -52,10 +52,10 @@
       if (error.response && error.response.data.i18nKey) {
         const message: string =
           t('admin.person.twoFactorAuthentication.errors.' + error.response.data.i18nKey) ||
-          'An unexpected error occurred.';
+          t('admin.person.twoFactorAuthentication.errors.UNKOWN_ERROR');
         dialogText.value = message;
       } else {
-        dialogText.value = 'An unexpected error occurred.';
+        dialogText.value = t('admin.person.twoFactorAuthentication.errors.UNKOWN_ERROR');
       }
     }
   }
