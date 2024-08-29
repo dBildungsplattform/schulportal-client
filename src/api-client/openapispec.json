@@ -5116,12 +5116,16 @@
                     },
                     "rolleId": {
                         "type": "string"
+                    },
+                    "befristung": {
+                        "type": "string"
                     }
                 },
                 "required": [
                     "personId",
                     "organisationId",
-                    "rolleId"
+                    "rolleId",
+                    "befristung"
                 ]
             },
             "DbiamPersonenkontextBodyParams": {

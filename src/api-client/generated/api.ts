@@ -291,6 +291,12 @@ export interface DBiamPersonenkontextResponse {
      * @memberof DBiamPersonenkontextResponse
      */
     'rolleId': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof DBiamPersonenkontextResponse
+     */
+    'befristung': string;
 }
 /**
  * 

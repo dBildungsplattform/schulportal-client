@@ -70,6 +70,7 @@
     const rolle: TranslatedRolleWithAttrs | undefined = rollen.value?.find(
       (r: TranslatedRolleWithAttrs) => r.value === selectedRolleId,
     );
+
     return !!rolle && !!rolle.merkmale && rolle.merkmale.has(RollenMerkmal.BefristungPflicht);
   }
 
@@ -185,6 +186,15 @@
       )?.title || '',
   );
 
+  
+  const translatedBefristung: ComputedRef<string> = computed(
+    () =>
+      rollen.value?.find(
+        (rolle: TranslatedObject) =>
+          rolle.value === personenkontextStore.createdPersonWithKontext?.DBiamPersonenkontextResponse.befristung,
+      )?.title || t('admin.befristung.unlimited'),
+  );
+
   const creationErrorText: Ref<string> = ref('');
 
   function isFormDirty(): boolean {
@@ -214,7 +224,7 @@
 
   async function createPerson(): Promise<void> {
     // Function to format a date in dd.MM.yyyy format to ISO 8601
-    function formatDateToISO1(date: string | undefined): string | undefined {
+    function formatDateToISO(date: string | undefined): string | undefined {
       if (date) {
         // Split the date by '.' to extract day, month, and year
         // eslint-disable-next-line @typescript-eslint/typedef
@@ -233,13 +243,7 @@
 
     const befristungDate: string | undefined = selectedBefristung.value
       ? selectedBefristung.value
-      : formatDateToISO1(calculatedBefristung.value);
-
-    // Function to format a date from the vuetify default format to ISO 8601
-    function formatDateToISO(date: string): string {
-      const d: Date = new Date(date);
-      return d.toISOString();
-    }
+      : calculatedBefristung.value;
 
     // Format the date in ISO 8601 format if it exists
     const formattedBefristung: string | undefined = befristungDate ? formatDateToISO(befristungDate) : undefined;
@@ -249,7 +253,7 @@
       vorname: selectedVorname.value as string,
       organisationId: selectedOrganisation.value as string,
       rolleId: selectedRolle.value ?? '',
-      befristung: formattedBefristung, // Include the formatted befristung date
+      befristung: formattedBefristung,
     };
 
     await personenkontextStore.createPersonWithKontext(bodyParams);
@@ -333,9 +337,23 @@
     { immediate: true },
   );
 
-  function handleManualDate(value: string): void {
-    selectedBefristung.value = value;
-  }
+  // Watcher to set an initial value for the radio buttons depending on the selected Rolle
+  watch(
+    selectedRolle,
+    (newValue: string | undefined) => {
+      if (isBefristungspflichtRolle(newValue)) {
+        selectedBefristungOption.value = BefristungOption.SCHULJAHRESENDE;
+      } else {
+        selectedBefristungOption.value = BefristungOption.UNBEFRISTET;
+      }
+    },
+    { immediate: true },
+  );
+
+  // Computed property to check if the second radio button should be disabled
+  const isUnbefristetButtonDisabled: ComputedRef<boolean> = computed(() => {
+    return isBefristungspflichtRolle(selectedRolle.value);
+  });
 
   function handleConfirmUnsavedChanges(): void {
     blockedNext();
@@ -471,7 +489,7 @@
         <!-- Befristung -->
         <div
           class="mt-4"
-          v-if="isBefristungspflichtRolle(selectedRolle) && selectedOrganisation"
+          v-if="selectedOrganisation && selectedRolle"
         >
           <v-row>
             <h3 class="headline-3">3. {{ $t('admin.befristung.assignBefristung') }}</h3>
@@ -491,7 +509,6 @@
               clearable
               placeholder="TT.MM.JJJJ"
               color="primary"
-              @update:modelValue="handleManualDate"
             ></v-text-field>
           </FormRow>
           <!-- Radio buttons for Befristung options -->
@@ -516,6 +533,7 @@
                   :label="$t('admin.befristung.unlimited')"
                   :value="BefristungOption.UNBEFRISTET"
                   :color="'primary'"
+                  :disabled="isUnbefristetButtonDisabled"
                 ></v-radio>
               </v-radio-group>
             </v-col>
@@ -592,6 +610,12 @@
               :password="personenkontextStore.createdPersonWithKontext.person.startpasswort"
             ></PasswordOutput>
           </v-col>
+        </v-row>     
+        <v-row>
+          <v-col class="text-body bold text-right"> {{ $t('admin.organisation.organisation') }}: </v-col>
+          <v-col class="text-body"
+            ><span data-testid="created-person-organisation">{{ translatedOrganisationsname }}</span></v-col
+          >
         </v-row>
         <v-row>
           <v-col class="text-body bold text-right"> {{ $t('admin.rolle.rolle') }}: </v-col>
@@ -600,9 +624,9 @@
           >
         </v-row>
         <v-row>
-          <v-col class="text-body bold text-right"> {{ $t('admin.organisation.organisation') }}: </v-col>
+          <v-col class="text-body bold text-right"> {{ $t('admin.befristung.befristung') }}: </v-col>
           <v-col class="text-body"
-            ><span data-testid="created-person-organisation">{{ translatedOrganisationsname }}</span></v-col
+            ><span data-testid="created-person-befristung">{{ translatedBefristung }}</span></v-col
           >
         </v-row>
         <v-row>
