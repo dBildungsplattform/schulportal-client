@@ -12,7 +12,7 @@
       "assignBefristung": "Befristung zuordnen",
       "befristung": "Befristung",
       "rules": {
-        "required": "Die Befristung muss ausgewählt werden.",
+        "required": "Die Befristung muss eingegeben werden.",
         "format": "Die eingegebene Befristung hat nicht das richtige Format DD.MM.JJJJ."
       },
       "selectBefristung": "Befristung auswählen",

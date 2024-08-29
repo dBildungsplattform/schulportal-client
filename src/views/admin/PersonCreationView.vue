@@ -31,7 +31,7 @@
   import { useDisplay } from 'vuetify';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
-  import { DIN_91379A, NO_LEADING_TRAILING_SPACES } from '@/utils/validation';
+  import { DDMMYYYY_REGEX, DIN_91379A, NO_LEADING_TRAILING_SPACES } from '@/utils/validation';
   import { useOrganisationen } from '@/composables/useOrganisationen';
   import { useRollen, type TranslatedRolleWithAttrs } from '@/composables/useRollen';
   import { useKlassen } from '@/composables/useKlassen';
@@ -92,12 +92,14 @@
         then: (schema: StringSchema<string | undefined, AnyObject, undefined, ''>) =>
           schema.required(t('admin.klasse.rules.klasse.required')),
       }),
-      selectedBefristung: string().when(['selectedRolle', 'selectedBefristungOption'], {
-        is: (selectedRolleId: string, selectedBefristungOption: string | undefined) =>
-          isBefristungspflichtRolle(selectedRolleId) && selectedBefristungOption === undefined,
-        then: (schema: StringSchema<string | undefined, AnyObject, undefined, ''>) =>
-          schema.required(t('admin.befristung.rules.required')),
-      }),
+      selectedBefristung: string()
+        .matches(DDMMYYYY_REGEX, t('admin.befristung.rules.format'))
+        .when(['selectedRolle', 'selectedBefristungOption'], {
+          is: (selectedRolleId: string, selectedBefristungOption: string | undefined) =>
+            isBefristungspflichtRolle(selectedRolleId) && selectedBefristungOption === undefined,
+          then: (schema: StringSchema<string | undefined, AnyObject, undefined, ''>) =>
+            schema.required(t('admin.befristung.rules.required')),
+        }),
     }),
   );
 
@@ -330,6 +332,11 @@
     },
     { immediate: true },
   );
+
+  function handleManualDate(value: string): void {
+    selectedBefristung.value = value;
+  }
+
   function handleConfirmUnsavedChanges(): void {
     blockedNext();
   }
@@ -475,7 +482,7 @@
             :isRequired="true"
             :label="$t('admin.befristung.befristung')"
           >
-            <v-date-input
+            <v-text-field
               v-model="selectedBefristung"
               v-bind="selectedBefristungProps"
               prepend-icon=""
@@ -484,8 +491,8 @@
               clearable
               placeholder="TT.MM.JJJJ"
               color="primary"
-              readonly
-            ></v-date-input>
+              @update:modelValue="handleManualDate"
+            ></v-text-field>
           </FormRow>
           <!-- Radio buttons for Befristung options -->
           <v-row class="align-center">
