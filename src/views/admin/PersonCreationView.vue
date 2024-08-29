@@ -194,7 +194,21 @@
     if (!ISOFormattedDate) {
       return t('admin.befristung.unlimited');
     }
-    return new Date(ISOFormattedDate).toLocaleDateString('de-DE');
+
+    // Parse the UTC date
+    const utcDate: Date = new Date(ISOFormattedDate);
+
+    // Subtract one day. The reason to substract it here is because when the UTC time from the backend gets converted back to the local german date here, it shows the next day
+    // It's logical since we send the date in the first place as "31-07-2024 22H" UTC TIME which is "01-08-2024" 00H of the next day in MESZ (summer german time)
+    // but the user obviously doesn't want to know that.
+    if (utcDate.getTimezoneOffset() === -120) {
+      // Check if the timezone offset is 2 hours (indicating MESZ)
+      // Subtract one day if in summer time (MESZ)
+      utcDate.setDate(utcDate.getDate() - 1);
+    }
+    const germanDate: string = utcDate.toLocaleDateString('de-DE');
+
+    return germanDate;
   });
 
   const creationErrorText: Ref<string> = ref('');
@@ -234,7 +248,7 @@
 
         if (day && month && year) {
           // Create a new Date object with the extracted parts
-          const d: Date = new Date(year, month - 1, day);
+          const d: Date = new Date(year, month - 1, day + 1);
 
           // Return the ISO string
           return d.toISOString();
@@ -302,11 +316,11 @@
   function getNextJuly31st(): string {
     const today: Date = new Date();
     const currentYear: number = today.getFullYear();
-    const july31stThisYear: Date = new Date(currentYear, 7, 1); // July is month 6 (0-indexed)
+    const july31stThisYear: Date = new Date(currentYear, 6, 31); // July is month 6 (0-indexed)
 
     // If today's date is after July 31st this year, return July 31st of next year
     if (today > july31stThisYear) {
-      return new Date(currentYear + 1, 7, 1).toLocaleDateString('de-DE');
+      return new Date(currentYear + 1, 6, 31).toLocaleDateString('de-DE');
     }
 
     // Otherwise, return July 31st of this year
