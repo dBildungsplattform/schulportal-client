@@ -60,6 +60,7 @@ const mockUebersicht: Uebersicht = {
       administriertVon: 'Admin',
       typ: OrganisationsTyp.Schule,
       editable: true,
+      befristung: '2024-03-03',
     },
   ],
 };

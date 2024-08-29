@@ -306,6 +306,7 @@ describe('PersonenkontextStore', () => {
             personId: '12345',
             organisationId: '67890',
             rolleId: '54321',
+            befristung: '2024-03-03',
           },
           PersonenKontextTyp.Organisation,
         );
@@ -323,6 +324,7 @@ describe('PersonenkontextStore', () => {
             personId: '12345',
             organisationId: '67890',
             rolleId: '54321',
+            befristung: '2024-03-03',
           },
           PersonenKontextTyp.Organisation,
         );
@@ -340,6 +342,7 @@ describe('PersonenkontextStore', () => {
             personId: '12345',
             organisationId: '67890',
             rolleId: '54321',
+            befristung: '2024-03-03',
           },
           PersonenKontextTyp.Organisation,
         );
@@ -366,6 +369,7 @@ describe('PersonenkontextStore', () => {
             personId: '12345',
             organisationId: '67890',
             rolleId: '54321',
+            befristung: '2024-03-03',
           },
           PersonenKontextTyp.Klasse,
         );
@@ -383,6 +387,7 @@ describe('PersonenkontextStore', () => {
             personId: '12345',
             organisationId: '67890',
             rolleId: '54321',
+            befristung: '2024-03-03',
           },
           PersonenKontextTyp.Klasse,
         );
@@ -400,6 +405,7 @@ describe('PersonenkontextStore', () => {
             personId: '12345',
             organisationId: '67890',
             rolleId: '54321',
+            befristung: '2024-03-03',
           },
           PersonenKontextTyp.Klasse,
         );
@@ -427,6 +433,7 @@ describe('PersonenkontextStore', () => {
             typ: OrganisationsTyp.Klasse,
             administriertVon: 'string',
             editable: true,
+            befristung: '2024-03-03',
           },
         ],
       };
@@ -585,6 +592,7 @@ describe('PersonenkontextStore', () => {
                 typ: OrganisationsTyp.Klasse,
                 administriertVon: 'string',
                 editable: true,
+                befristung: '2024-03-03',
               },
             ],
           },
