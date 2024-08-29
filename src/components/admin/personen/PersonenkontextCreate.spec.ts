@@ -39,6 +39,10 @@ beforeEach(() => {
         {
           value: '54329',
           title: 'Lehr',
+<<<<<<< HEAD
+=======
+          merkmale: new Set<RollenMerkmal>(['KOPERS_PFLICHT']),
+>>>>>>> af721d740ae6a56d96d89fa1d2841137fb6d7d46
           rollenart: RollenArt.Lehr,
         },
       ],
@@ -142,6 +146,7 @@ describe('PersonenkontextCreate', () => {
   test('it renders the component', () => {
     expect(wrapper?.find('[data-testid="organisation-select"]').isVisible()).toBe(true);
   });
+
   test('it updates search and sets values selected rolle, organisation and klasse', async () => {
     const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
     await organisationAutocomplete?.vm.$emit('update:search', '01');
@@ -306,6 +311,7 @@ describe('PersonenkontextCreate', () => {
     expect(rolleAutocomplete?.text()).toEqual('');
     expect(personenkontextStore.processWorkflowStep).toHaveBeenCalledWith({ organisationId: '1133', limit: 25 });
   });
+
   test('it sends a request if the newValue is empty and the selected Organisation is not defined', async () => {
     const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
 
@@ -323,6 +329,7 @@ describe('PersonenkontextCreate', () => {
 
     expect(organisationAutocomplete?.text()).toEqual('');
   });
+
   test('it sends a request if the newValue is empty and the selected Organisation is defined', async () => {
     const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
 
@@ -337,6 +344,7 @@ describe('PersonenkontextCreate', () => {
 
     expect(organisationAutocomplete?.text()).toEqual('orga');
   });
+
   test('Do nothing with Klassen if the orga was reset', async () => {
     const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
     await organisationAutocomplete?.setValue('O1');

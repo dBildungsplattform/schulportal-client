@@ -17,7 +17,6 @@
   const timerId: Ref<ReturnType<typeof setTimeout> | undefined> = ref<ReturnType<typeof setTimeout>>();
   const canCommit: Ref<boolean> = ref(false);
   const hasAutoselectedSchule: Ref<boolean> = ref(false);
-
   const searchInputOrganisation: Ref<string> = ref('');
   const searchInputRolle: Ref<string> = ref('');
 
@@ -304,6 +303,7 @@
           v-model:search="searchInputRolle"
         ></v-autocomplete>
       </FormRow>
+
       <!-- Klasse zuordnen -->
       <FormRow
         v-if="isLernRolle(selectedRolle) && selectedOrganisation"

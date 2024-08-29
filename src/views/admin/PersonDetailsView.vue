@@ -26,7 +26,7 @@
   import { object, string, StringSchema, type AnyObject } from 'yup';
   import { toTypedSchema } from '@vee-validate/yup';
   import { useForm, type BaseFieldProps, type TypedSchema } from 'vee-validate';
-  import { RollenArt } from '@/stores/RolleStore';
+  import { RollenArt, RollenMerkmal } from '@/stores/RolleStore';
   import { type Composer, useI18n } from 'vue-i18n';
   import { useOrganisationen } from '@/composables/useOrganisationen';
   import { useRollen, type TranslatedRolleWithAttrs } from '@/composables/useRollen';
@@ -289,6 +289,14 @@
     );
     return !!rolle && rolle.rollenart === RollenArt.Lern;
   }
+
+  const hasKopersRolle: ComputedRef<boolean> = computed(() => {
+    return (
+      !!zuordnungenResult.value?.find((zuordnung: Zuordnung) => {
+        return zuordnung.merkmale?.includes(RollenMerkmal.KopersPflicht);
+      }) || false
+    );
+  });
 
   // Check if the button to change the Klasse should be active or not. Activate only if there is 1 selected Zuordnung and if it is of type LERN.
   const canChangeKlasse: ComputedRef<boolean> = computed(() => {
@@ -817,8 +825,11 @@
                 <span class="text-body">{{ personStore.currentPerson.person.referrer }} </span>
               </v-col>
             </v-row>
-            <!-- Kopers-Nr -->
-            <v-row class="mt-0">
+            <!-- KoPers.-Nr. -->
+            <v-row
+              class="mt-0"
+              v-if="hasKopersRolle"
+            >
               <v-col cols="1"></v-col>
               <v-col
                 class="text-right"
@@ -826,13 +837,21 @@
                 sm="3"
                 cols="5"
               >
-                <span class="subtitle-2"> {{ $t('person.kopersnr') }}: </span>
+                <span
+                  :class="`${hasKopersRolle && personStore.currentPerson.person.personalnummer ? 'subtitle-2' : 'subtitle-2 text-red'}`"
+                >
+                  {{ $t('person.kopersNr') }}:
+                </span>
               </v-col>
               <v-col
                 cols="auto"
                 data-testid="person-kopersnr"
               >
-                <span class="text-body">{{ personStore.currentPerson.person.personalnummer ?? '---' }} </span>
+                <span
+                  :class="`${hasKopersRolle && personStore.currentPerson.person.personalnummer ? 'text-body' : 'text-body text-red'}`"
+                >
+                  {{ personStore.currentPerson.person.personalnummer ?? $t('missing') }}
+                </span>
               </v-col>
             </v-row>
           </div>

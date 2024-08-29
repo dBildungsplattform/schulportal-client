@@ -4108,6 +4108,13 @@
                     "UNBESTAETIGT"
                 ]
             },
+            "RollenMerkmal": {
+                "type": "string",
+                "enum": [
+                    "BEFRISTUNG_PFLICHT",
+                    "KOPERS_PFLICHT"
+                ]
+            },
             "DBiamPersonenzuordnungResponse": {
                 "type": "object",
                 "properties": {
@@ -4139,6 +4146,10 @@
                     "befristung": {
                         "format": "date-time",
                         "type": "string"
+                    },
+                    "merkmale": {
+                        "nullable": true,
+                        "$ref": "#/components/schemas/RollenMerkmal"
                     }
                 },
                 "required": [
@@ -4150,7 +4161,8 @@
                     "administriertVon",
                     "typ",
                     "editable",
-                    "befristung"
+                    "befristung",
+                    "merkmale"
                 ]
             },
             "DBiamPersonenuebersichtResponse": {
@@ -4615,13 +4627,6 @@
                     "ORGADMIN",
                     "LEIT",
                     "SYSADMIN"
-                ]
-            },
-            "RollenMerkmal": {
-                "type": "string",
-                "enum": [
-                    "BEFRISTUNG_PFLICHT",
-                    "KOPERS_PFLICHT"
                 ]
             },
             "ServiceProviderIdNameResponse": {
@@ -5163,7 +5168,8 @@
                             "GLEICHE_ROLLE_AN_KLASSE_WIE_SCHULE",
                             "ORGANISATION_MATCHES_ROLLENART",
                             "PERSONENKONTEXT_ANLAGE_ERROR",
-                            "ROLLE_NUR_AN_PASSENDE_ORGANISATION"
+                            "ROLLE_NUR_AN_PASSENDE_ORGANISATION",
+                            "PERSONALNUMMER_NICHT_EINDEUTIG"
                         ]
                     },
                     "code": {
@@ -5313,6 +5319,9 @@
                     },
                     "befristung": {
                         "format": "date-time",
+                        "type": "string"
+                    },
+                    "personalnummer": {
                         "type": "string"
                     },
                     "organisationId": {

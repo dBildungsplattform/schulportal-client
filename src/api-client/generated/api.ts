@@ -445,6 +445,12 @@ export interface DBiamPersonenzuordnungResponse {
      * @memberof DBiamPersonenzuordnungResponse
      */
     'befristung': string;
+    /**
+     * 
+     * @type {RollenMerkmal}
+     * @memberof DBiamPersonenzuordnungResponse
+     */
+    'merkmale': RollenMerkmal;
 }
 
 
@@ -472,6 +478,12 @@ export interface DbiamCreatePersonWithContextBodyParams {
      * @memberof DbiamCreatePersonWithContextBodyParams
      */
     'befristung'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof DbiamCreatePersonWithContextBodyParams
+     */
+    'personalnummer'?: string;
     /**
      * 
      * @type {string}
@@ -582,7 +594,8 @@ export const DbiamPersonenkontextErrorI18nKeyEnum = {
     GleicheRolleAnKlasseWieSchule: 'GLEICHE_ROLLE_AN_KLASSE_WIE_SCHULE',
     OrganisationMatchesRollenart: 'ORGANISATION_MATCHES_ROLLENART',
     PersonenkontextAnlageError: 'PERSONENKONTEXT_ANLAGE_ERROR',
-    RolleNurAnPassendeOrganisation: 'ROLLE_NUR_AN_PASSENDE_ORGANISATION'
+    RolleNurAnPassendeOrganisation: 'ROLLE_NUR_AN_PASSENDE_ORGANISATION',
+    PersonalnummerNichtEindeutig: 'PERSONALNUMMER_NICHT_EINDEUTIG'
 } as const;
 
 export type DbiamPersonenkontextErrorI18nKeyEnum = typeof DbiamPersonenkontextErrorI18nKeyEnum[keyof typeof DbiamPersonenkontextErrorI18nKeyEnum];
