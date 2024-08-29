@@ -49,6 +49,7 @@ const mockPersonenuebersicht: Uebersicht = {
       typ: OrganisationsTyp.Schule,
       administriertVon: '2',
       editable: true,
+      befristung: '2024-05-06',
     },
     {
       sskId: '3',
@@ -59,6 +60,7 @@ const mockPersonenuebersicht: Uebersicht = {
       typ: OrganisationsTyp.Schule,
       administriertVon: '2',
       editable: true,
+      befristung: '2024-05-06',
     },
     {
       sskId: '2',
@@ -69,6 +71,7 @@ const mockPersonenuebersicht: Uebersicht = {
       typ: OrganisationsTyp.Klasse,
       administriertVon: '1',
       editable: true,
+      befristung: '2024-05-06',
     },
   ],
 };

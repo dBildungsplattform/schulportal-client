@@ -81,6 +81,7 @@ export type Uebersicht =
         administriertVon: string;
         typ: OrganisationsTyp;
         editable: boolean;
+        befristung: string;
       }[];
     }
   | undefined;
