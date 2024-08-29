@@ -114,7 +114,7 @@
       "edit": "Benutzer bearbeiten",
       "generatedPassword": "Generiertes Passwort",
       "noKopersNr": "KoPers.-Nr. nicht vorhanden",
-      "noKopersNrConfirmationDialogMessage": "Bitte beachten Sie, dass ein Lehrkraftkonto ohne KoPers.-Nr. nach 8 Wochen automatisch gesperrt wird. Tragen Sie die KoPers.-Nr. bitte in der Gesamtübersicht des Benutzers nach, sobald sie Ihnen vorliegt.",
+      "noKopersNrConfirmationDialogMessage": "Bitte beachten Sie, dass ein Benutzerkonto ohne KoPers.-Nr. nach 8 Wochen automatisch gesperrt wird. Tragen Sie daher die KoPers.-Nr. bitte in der Gesamtübersicht des Benutzers nach, sobald diese Ihnen vorliegt.",
       "loadingErrorText": "Es konnten keine Benutzerdaten geladen werden.",
       "loadingErrorTitle": "Fehler beim Laden des Benutzers",
       "management": "Benutzerverwaltung",
