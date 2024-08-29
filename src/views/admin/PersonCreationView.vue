@@ -248,6 +248,8 @@
 
         if (day && month && year) {
           // Create a new Date object with the extracted parts
+          // Alwyays adding 1 day to the date because for example if the Befristung is chosen as 20.05.2024 then it should be guilty until 20.05.2024 23:59
+          // Also the UTC ISO formatted send date will be 20-05-2024 22H which is basically 21.05.2024 in german summer time.
           const d: Date = new Date(year, month - 1, day + 1);
 
           // Return the ISO string
