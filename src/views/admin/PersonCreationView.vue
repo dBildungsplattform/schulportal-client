@@ -6,7 +6,7 @@
     type PersonStore,
   } from '@/stores/PersonStore';
   import { RollenArt, RollenMerkmal } from '@/stores/RolleStore';
-  import { type ComputedRef, computed, onMounted, onUnmounted, type Ref, ref } from 'vue';
+  import { type ComputedRef, computed, onMounted, onUnmounted, type Ref, ref, watch } from 'vue';
   import {
     onBeforeRouteLeave,
     type Router,
@@ -49,6 +49,7 @@
 
   const canCommit: Ref<boolean> = ref(false);
   const hasNoKopersNr: Ref<boolean> = ref(false);
+  const showNoKopersNrConfirmationDialog: Ref<boolean> = ref(false);
 
   const rollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = useRollen();
 
@@ -227,6 +228,12 @@
     }
   }
 
+  watch(hasNoKopersNr, async (newValue: boolean) => {
+    if (newValue) {
+      showNoKopersNrConfirmationDialog.value = true;
+    }
+  });
+
   const onSubmit: (e?: Event | undefined) => Promise<void | undefined> = handleSubmit(() => {
     createPerson();
   });
@@ -234,6 +241,7 @@
   async function navigateBackToPersonForm(): Promise<void> {
     await router.push({ name: 'create-person' });
     personStore.errorCode = '';
+    personenkontextStore.errorCode = '';
   }
 
   const handleCreateAnotherPerson = (): void => {
@@ -287,20 +295,34 @@
     :padded="true"
     :showCloseText="true"
   >
-    <!-- Error Message Display -->
+    <!-- Error Message Display for error messages from the personStore -->
     <SpshAlert
       :model-value="!!personStore.errorCode"
       :title="$t('admin.person.creationErrorTitle')"
       :type="'error'"
       :closable="false"
       :showButton="true"
-      :buttonText="$t('admin.backToForm')"
+      :buttonText="$t('admin.person.backToCreatePerson')"
       :buttonAction="navigateBackToPersonForm"
       :text="creationErrorText"
     />
 
+    <!-- Error Message Display for error messages from the personenkontextStore -->
+    <SpshAlert
+      :model-value="!!personenkontextStore.errorCode"
+      :type="'error'"
+      :closable="false"
+      :text="t(`admin.personenkontext.errors.${personenkontextStore.errorCode}`)"
+      :showButton="true"
+      :buttonText="$t('admin.person.backToCreatePerson')"
+      :buttonAction="navigateBackToPersonForm"
+      :title="t(`admin.personenkontext.title.${personenkontextStore.errorCode}`)"
+    />
+
     <!-- The form to create a new Person  -->
-    <template v-if="!personenkontextStore.createdPersonWithKontext && !personStore.errorCode">
+    <template
+      v-if="!personenkontextStore.createdPersonWithKontext && !personStore.errorCode && !personenkontextStore.errorCode"
+    >
       <FormWrapper
         :canCommit="canCommit"
         :confirmUnsavedChangesAction="handleConfirmUnsavedChanges"
@@ -388,7 +410,9 @@
     </template>
 
     <!-- Result template on success after submit  -->
-    <template v-if="personenkontextStore.createdPersonWithKontext && !personStore.errorCode">
+    <template
+      v-if="personenkontextStore.createdPersonWithKontext && !personStore.errorCode && !personenkontextStore.errorCode"
+    >
       <v-container>
         <v-row justify="center">
           <v-col
@@ -529,6 +553,67 @@
       </v-container>
     </template>
   </LayoutCard>
+
+  <v-dialog
+    v-model="showNoKopersNrConfirmationDialog"
+    persistent
+  >
+    <LayoutCard
+      v-if="showNoKopersNrConfirmationDialog"
+      :closable="false"
+      :header="$t('admin.person.noKopersNr')"
+    >
+      <v-card-text>
+        <v-container>
+          <v-row class="text-body bold px-md-16">
+            <v-col
+              offset="1"
+              cols="10"
+            >
+              <span data-testid="no-kopersnr-confirmation-text">
+                {{ $t('admin.person.noKopersNrConfirmationDialogMessage') }}
+              </span>
+            </v-col>
+          </v-row>
+        </v-container>
+      </v-card-text>
+      <v-card-actions class="justify-center">
+        <v-row class="justify-center">
+          <v-col
+            cols="12"
+            sm="6"
+            md="4"
+          >
+            <v-btn
+              :block="mdAndDown"
+              class="secondary"
+              @click.stop="
+                showNoKopersNrConfirmationDialog = false;
+                hasNoKopersNr = false;
+              "
+              data-testid="cancel-no-kopersnr-button"
+            >
+              {{ $t('cancel') }}
+            </v-btn>
+          </v-col>
+          <v-col
+            cols="12"
+            sm="6"
+            md="4"
+          >
+            <v-btn
+              :block="mdAndDown"
+              class="primary"
+              @click.stop="showNoKopersNrConfirmationDialog = false"
+              data-testid="confirm-no-kopersnr-button"
+            >
+              {{ $t('proceed') }}
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-card-actions>
+    </LayoutCard>
+  </v-dialog>
 </template>
 
 <style></style>
