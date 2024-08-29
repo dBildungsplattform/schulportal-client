@@ -85,7 +85,7 @@ beforeEach(() => {
             administriertVon: 'string',
             editable: true,
             befristung: '2024-03-03',
-            merkmale: RollenMerkmal.KopersPflicht
+            merkmale: RollenMerkmal.KopersPflicht,
           },
         ],
       },

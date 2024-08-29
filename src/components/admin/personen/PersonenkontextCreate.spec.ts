@@ -39,10 +39,7 @@ beforeEach(() => {
         {
           value: '54329',
           title: 'Lehr',
-<<<<<<< HEAD
-=======
           merkmale: new Set<RollenMerkmal>(['KOPERS_PFLICHT']),
->>>>>>> af721d740ae6a56d96d89fa1d2841137fb6d7d46
           rollenart: RollenArt.Lehr,
         },
       ],
