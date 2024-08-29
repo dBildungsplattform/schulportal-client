@@ -5,7 +5,7 @@
 
   type Props = {
     hasNoKopersNr: boolean;
-    selectedKopersNr: string;
+    selectedKopersNr: string | undefined;
     selectedKopersNrProps: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
   };
 
