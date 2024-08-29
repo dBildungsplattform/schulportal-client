@@ -241,6 +241,6 @@ describe('PersonDetailsView', () => {
     const filteredRollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = vm.filteredRollen;
 
     // Verify that filteredRollen contains only roles that are not already assigned and filtered correctly
-    expect(filteredRollen).toBeDefined()
+    expect(filteredRollen).toBeDefined();
   });
 });

@@ -564,7 +564,8 @@
         klasse: klasse?.name,
         sskDstNr: organisation.kennung ?? '',
         sskName: organisation.name,
-        rolle: rollen.value?.find((rolle: TranslatedRolleWithAttrs) => rolle.value === selectedRolle.value)?.title || '',
+        rolle:
+          rollen.value?.find((rolle: TranslatedRolleWithAttrs) => rolle.value === selectedRolle.value)?.title || '',
         administriertVon: organisation.administriertVon ?? '',
         editable: true,
         typ: OrganisationsTyp.Schule,
@@ -581,7 +582,8 @@
           rolleId: selectedRolle.value ?? '',
           sskDstNr: klasse.kennung ?? '',
           sskName: klasse.name,
-          rolle: rollen.value?.find((rolle: TranslatedRolleWithAttrs) => rolle.value === selectedRolle.value)?.title || '',
+          rolle:
+            rollen.value?.find((rolle: TranslatedRolleWithAttrs) => rolle.value === selectedRolle.value)?.title || '',
           administriertVon: klasse.administriertVon ?? '',
           editable: true,
           typ: OrganisationsTyp.Klasse,
@@ -656,8 +658,9 @@
           sskDstNr: newKlasse.kennung ?? '',
           sskName: newKlasse.name,
           rolle:
-            rollen.value?.find((rolle: TranslatedRolleWithAttrs) => rolle.value === selectedZuordnungen.value[0]?.rolleId)
-              ?.title || '',
+            rollen.value?.find(
+              (rolle: TranslatedRolleWithAttrs) => rolle.value === selectedZuordnungen.value[0]?.rolleId,
+            )?.title || '',
           administriertVon: newKlasse.administriertVon ?? '',
           editable: true,
           typ: OrganisationsTyp.Klasse,

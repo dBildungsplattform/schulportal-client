@@ -186,14 +186,16 @@
       )?.title || '',
   );
 
-  
-  const translatedBefristung: ComputedRef<string> = computed(
-    () =>
-      rollen.value?.find(
-        (rolle: TranslatedObject) =>
-          rolle.value === personenkontextStore.createdPersonWithKontext?.DBiamPersonenkontextResponse.befristung,
-      )?.title || t('admin.befristung.unlimited'),
-  );
+  // Converts the ISO UTC formatted Befristung to the german local format, also ISO.
+  const translatedBefristung: ComputedRef<string> = computed(() => {
+    const ISOFormattedDate: string | undefined =
+      personenkontextStore.createdPersonWithKontext?.DBiamPersonenkontextResponse.befristung;
+
+    if (!ISOFormattedDate) {
+      return t('admin.befristung.unlimited');
+    }
+    return new Date(ISOFormattedDate).toLocaleDateString('de-DE');
+  });
 
   const creationErrorText: Ref<string> = ref('');
 
@@ -296,14 +298,15 @@
   };
 
   // Calculates the next 31st of July (End of school year)
+  // Time here is in german iso format but will later be converted to UCT
   function getNextJuly31st(): string {
     const today: Date = new Date();
     const currentYear: number = today.getFullYear();
-    const july31stThisYear: Date = new Date(currentYear, 6, 31); // July is month 6 (0-indexed)
+    const july31stThisYear: Date = new Date(currentYear, 7, 1); // July is month 6 (0-indexed)
 
     // If today's date is after July 31st this year, return July 31st of next year
     if (today > july31stThisYear) {
-      return new Date(currentYear + 1, 6, 31).toLocaleDateString('de-DE');
+      return new Date(currentYear + 1, 7, 1).toLocaleDateString('de-DE');
     }
 
     // Otherwise, return July 31st of this year
@@ -343,8 +346,10 @@
     (newValue: string | undefined) => {
       if (isBefristungspflichtRolle(newValue)) {
         selectedBefristungOption.value = BefristungOption.SCHULJAHRESENDE;
+        calculatedBefristung.value = getNextJuly31st();
       } else {
         selectedBefristungOption.value = BefristungOption.UNBEFRISTET;
+        calculatedBefristung.value = undefined;
       }
     },
     { immediate: true },
@@ -610,7 +615,7 @@
               :password="personenkontextStore.createdPersonWithKontext.person.startpasswort"
             ></PasswordOutput>
           </v-col>
-        </v-row>     
+        </v-row>
         <v-row>
           <v-col class="text-body bold text-right"> {{ $t('admin.organisation.organisation') }}: </v-col>
           <v-col class="text-body"
