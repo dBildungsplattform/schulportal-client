@@ -54,7 +54,7 @@ function getPersonendatensatz(locked: boolean): Personendatensatz {
     referrer: null,
     personalnummer: null,
     isLocked: locked,
-    attributes: locked
+    lockInfo: locked
       ? {
           lock_locked_from: 'Amanda Admin',
           lock_timestamp: Date.now().toString(),

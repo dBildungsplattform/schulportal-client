@@ -1452,7 +1452,7 @@ export interface PersonResponse {
      * @type {object}
      * @memberof PersonResponse
      */
-    'attributes': object | null;
+    'lockInfo': object | null;
 }
 
 

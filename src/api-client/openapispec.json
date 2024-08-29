@@ -3966,7 +3966,7 @@
                         "type": "boolean",
                         "nullable": true
                     },
-                    "attributes": {
+                    "lockInfo": {
                         "type": "object",
                         "nullable": true
                     }
@@ -3985,7 +3985,7 @@
                     "startpasswort",
                     "personalnummer",
                     "isLocked",
-                    "attributes"
+                    "lockInfo"
                 ]
             },
             "PersonendatensatzResponse": {

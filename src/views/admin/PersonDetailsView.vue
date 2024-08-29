@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import { type Ref, ref, onBeforeMount, computed, type ComputedRef, watch } from 'vue';
   import { type Router, type RouteLocationNormalizedLoaded, useRoute, useRouter } from 'vue-router';
-  import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
+  import { usePersonStore, type PersonStore, type Person, LockKeys } from '@/stores/PersonStore';
   import PasswordReset from '@/components/admin/personen/PasswordReset.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
@@ -144,15 +144,13 @@
 
   const getLockInfo: ComputedRef<{ key: string; attribute: string }[]> = computed(() => {
     if (!personStore.currentPerson?.person.isLocked) return [];
-    const attributes: Record<string, string | string[]> = (personStore.currentPerson.person.attributes ?? {}) as Record<
-      string,
-      string | string[]
-    >;
-    return Object.keys(attributes)
-      .filter((key: string) => key.startsWith('lock_'))
-      .map((key: string) => ({
+    const { lockInfo }: Person = personStore.currentPerson.person;
+    if (!lockInfo) return [];
+    return Object.entries(lockInfo)
+      .filter(([key, value]: [string, string]) => key in LockKeys && value !== '')
+      .map(([key, value]: [string, string]) => ({
         key: keyMapper(key),
-        attribute: keyValueMapper(key, (attributes[key] ?? '').toString()),
+        attribute: keyValueMapper(key, value.toString()),
       }));
   });
 

@@ -1,8 +1,9 @@
-import type {
-  PersonFrontendControllerFindPersons200Response,
-  PersonLockResponse,
-  PersonendatensatzResponse,
-  TokenStateResponse,
+import {
+  Vertrauensstufe,
+  type PersonFrontendControllerFindPersons200Response,
+  type PersonLockResponse,
+  type PersonendatensatzResponse,
+  type TokenStateResponse,
 } from '@/api-client/generated';
 import { usePersonStore, type PersonStore, type Personendatensatz } from './PersonStore';
 import ApiService from '@/services/ApiService';
@@ -11,6 +12,36 @@ import { setActivePinia, createPinia } from 'pinia';
 import { rejects } from 'assert';
 
 const mockadapter: MockAdapter = new MockAdapter(ApiService);
+function getMockPersonendatensatz(): Personendatensatz {
+  return {
+    person: {
+      id: '123456',
+      name: {
+        familienname: 'Vimes',
+        vorname: 'Susan',
+      },
+      referrer: '6978',
+      personalnummer: '9183756',
+      isLocked: false,
+      lockInfo: null,
+    },
+  };
+}
+function getMockPersonendatensatzResponse(): PersonendatensatzResponse {
+  return {
+    person: {
+      ...getMockPersonendatensatz().person,
+      mandant: '',
+      geburt: {},
+      stammorganisation: '',
+      geschlecht: '',
+      lokalisierung: '',
+      vertrauensstufe: Vertrauensstufe.Teil,
+      revision: '',
+      startpasswort: '',
+    },
+  };
+}
 
 describe('PersonStore', () => {
   let personStore: PersonStore;
@@ -29,24 +60,8 @@ describe('PersonStore', () => {
   describe('getAllPersons', () => {
     it('should load Persons and update state', async () => {
       const mockPersons: PersonendatensatzResponse[] = [
-        {
-          person: {
-            id: '1234',
-            name: {
-              familienname: 'Vimes',
-              vorname: 'Samuel',
-            },
-          },
-        },
-        {
-          person: {
-            id: '5678',
-            name: {
-              familienname: 'von Lipwig',
-              vorname: 'Moist',
-            },
-          },
-        },
+        getMockPersonendatensatz(),
+        getMockPersonendatensatz(),
       ] as PersonendatensatzResponse[];
 
       const mockResponse: PersonFrontendControllerFindPersons200Response = {
@@ -64,17 +79,8 @@ describe('PersonStore', () => {
     });
 
     it('should load persons according to filter', async () => {
-      const mockPersonsWithFilter: PersonendatensatzResponse[] = [
-        {
-          person: {
-            id: '123456',
-            name: {
-              familienname: 'Vimes',
-              vorname: 'Susan',
-            },
-          },
-        },
-      ] as PersonendatensatzResponse[];
+      const mockPersonendatensatz: Personendatensatz = getMockPersonendatensatz();
+      const mockPersonsWithFilter: PersonendatensatzResponse[] = [getMockPersonendatensatzResponse()];
 
       const mockResponseWithFilter: PersonFrontendControllerFindPersons200Response = {
         offset: 0,
@@ -87,7 +93,7 @@ describe('PersonStore', () => {
       const getAllPersonPromise: Promise<void> = personStore.getAllPersons({ searchFilter: 'Sus' });
       expect(personStore.loading).toBe(true);
       await getAllPersonPromise;
-      expect(personStore.allPersons).toEqual([...mockPersonsWithFilter]);
+      expect(personStore.allPersons).toEqual([mockPersonendatensatz]);
       expect(personStore.loading).toBe(false);
     });
 
@@ -114,17 +120,8 @@ describe('PersonStore', () => {
 
   describe('getPersonById', () => {
     it('should load Person and update state', async () => {
-      const mockPerson: PersonendatensatzResponse = {
-        person: {
-          id: '1234',
-          name: {
-            familienname: 'Vimes',
-            vorname: 'Samuel',
-          },
-        },
-      } as PersonendatensatzResponse;
-
-      const mockResponse: PersonendatensatzResponse = mockPerson;
+      const mockPerson: Personendatensatz = getMockPersonendatensatz();
+      const mockResponse: PersonendatensatzResponse = getMockPersonendatensatzResponse();
 
       mockadapter.onGet('/api/personen/1234').replyOnce(200, mockResponse);
       const getPersonByIdPromise: Promise<Personendatensatz> = personStore.getPersonById('1234');
@@ -305,15 +302,7 @@ describe('PersonStore', () => {
       const lock: boolean = true;
       const lockedFrom: string = 'admin';
 
-      const mockPerson: PersonendatensatzResponse = {
-        person: {
-          id: '1234',
-          name: {
-            familienname: 'Vimes',
-            vorname: 'Samuel',
-          },
-        },
-      } as PersonendatensatzResponse;
+      const mockPerson: PersonendatensatzResponse = getMockPersonendatensatzResponse();
 
       const mockResponse: PersonLockResponse = {
         message: 'User has been successfully locked.',

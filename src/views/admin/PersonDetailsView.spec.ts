@@ -4,6 +4,7 @@ import { createRouter, createWebHistory, type NavigationFailure, type RouteLocat
 import routes from '@/router/routes';
 import PersonDetailsView, { type RolleWithRollenart } from './PersonDetailsView.vue';
 import {
+  mapPersonendatensatzResponseToPersonendatensatz,
   type Personendatensatz,
   type PersonendatensatzResponse,
   type PersonStore,
@@ -36,7 +37,7 @@ const mockPerson: Personendatensatz = {
     referrer: 'jorton',
     personalnummer: null,
     isLocked: null,
-    attributes: null,
+    lockInfo: null,
   },
 };
 
@@ -225,7 +226,7 @@ describe('PersonDetailsView', () => {
   });
   test('Renders details for the current person', async () => {
     // Mock the current person in the store
-    personStore.currentPerson = {
+    personStore.currentPerson = mapPersonendatensatzResponseToPersonendatensatz({
       person: {
         id: '1234',
         name: {
@@ -233,7 +234,7 @@ describe('PersonDetailsView', () => {
           vorname: 'Samuel',
         },
       },
-    } as PersonendatensatzResponse;
+    } as PersonendatensatzResponse);
 
     await nextTick();
 

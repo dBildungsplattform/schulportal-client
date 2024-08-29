@@ -23,8 +23,20 @@ const personenFrontendApi: PersonenFrontendApiInterface = PersonenFrontendApiFac
 
 const twoFactorApi: Class2FAApiInterface = Class2FAApiFactory(undefined, '', axiosApiInstance);
 
-export type Person = Pick<PersonResponse, 'id' | 'name' | 'referrer' | 'personalnummer' | 'isLocked' | 'attributes'>;
+export enum LockKeys {
+  LockedFrom = 'lock_locked_from',
+  Timestamp = 'lock_timestamp',
+}
+export type LockInfo = Record<LockKeys, string>;
 
+export type Person = {
+  id: PersonResponse['id'];
+  name: PersonResponse['name'];
+  referrer: PersonResponse['referrer'];
+  personalnummer: PersonResponse['personalnummer'];
+  isLocked: PersonResponse['isLocked'];
+  lockInfo: LockInfo | null;
+};
 export type PersonTableItem = {
   person: Person;
   createdAt?: string;
@@ -33,6 +45,29 @@ export type PersonTableItem = {
 
 export type CreatePersonBodyParams = DbiamCreatePersonWithContextBodyParams;
 export type CreatedPersonenkontext = DbiamPersonenkontextBodyParams;
+
+export function parseLockInfo(unparsed: object): LockInfo | null {
+  if (!Object.keys(LockKeys).every((key: string) => key in unparsed)) return null;
+  return {
+    lock_locked_from: LockKeys.LockedFrom in unparsed ? '' + unparsed[LockKeys.LockedFrom] : '',
+    lock_timestamp: LockKeys.Timestamp in unparsed ? '' + unparsed[LockKeys.Timestamp] : '',
+  };
+}
+
+export function mapPersonendatensatzResponseToPersonendatensatz(
+  response: PersonendatensatzResponse,
+): Personendatensatz {
+  const lockInfo: LockInfo | null = parseLockInfo(response.person.lockInfo ?? {});
+  const person: Person = {
+    id: response.person.id,
+    name: response.person.name,
+    referrer: response.person.referrer,
+    personalnummer: response.person.personalnummer,
+    isLocked: response.person.isLocked,
+    lockInfo: lockInfo,
+  };
+  return { person };
+}
 
 export type Personendatensatz = {
   person: Person;
@@ -115,7 +150,7 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
             filter.searchFilter,
           );
 
-        this.allPersons = data.items;
+        this.allPersons = data.items.map(mapPersonendatensatzResponseToPersonendatensatz);
         this.totalPersons = +data.total;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
@@ -131,9 +166,10 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
       this.loading = true;
       this.errorCode = '';
       try {
-        const { data }: { data: Personendatensatz } = await personenApi.personControllerFindPersonById(personId);
-        this.currentPerson = data;
-        return data;
+        const { data }: AxiosResponse<PersonendatensatzResponse, unknown> =
+          await personenApi.personControllerFindPersonById(personId);
+        this.currentPerson = mapPersonendatensatzResponseToPersonendatensatz(data);
+        return this.currentPerson;
       } catch (error) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
