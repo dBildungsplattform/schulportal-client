@@ -118,28 +118,26 @@
     await personStore.deletePersonById(personId);
   }
 
-  function keyMapper(key: string): string {
+  function keyMapper(key: LockKeys): string {
     switch (key) {
-      case 'lock_locked_from':
+      case LockKeys.LockedFrom:
         return t('person.lockedBy');
-      case 'lock_timestamp':
+      case LockKeys.Timestamp:
         return t('person.lockedSince');
       default:
         return key;
     }
   }
 
-  function keyValueMapper(key: string, value: string): string {
-    switch (key) {
-      case 'lock_timestamp':
-        return new Intl.DateTimeFormat('de-DE', {
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit',
-        }).format(new Date(value));
-      default:
-        return value;
+  function keyValueMapper(key: LockKeys, value: string): string {
+    if (key === LockKeys.Timestamp) {
+      return new Intl.DateTimeFormat('de-DE', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+      }).format(new Date(value));
     }
+    return value;
   }
 
   const getLockInfo: ComputedRef<{ key: string; attribute: string }[]> = computed(() => {
