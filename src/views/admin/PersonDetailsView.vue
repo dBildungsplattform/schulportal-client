@@ -118,7 +118,7 @@
     await personStore.deletePersonById(personId);
   }
 
-  function keyMapper(key: LockKeys): string {
+  function keyMapper(key: string): string {
     switch (key) {
       case LockKeys.LockedFrom:
         return t('person.lockedBy');
@@ -129,7 +129,7 @@
     }
   }
 
-  function keyValueMapper(key: LockKeys, value: string): string {
+  function keyValueMapper(key: string, value: string): string {
     if (key === LockKeys.Timestamp) {
       return new Intl.DateTimeFormat('de-DE', {
         year: 'numeric',
