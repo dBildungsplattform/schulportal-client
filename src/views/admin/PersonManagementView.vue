@@ -110,31 +110,37 @@
 
   const statuses: Array<string> = ['Aktiv', 'Inaktiv'];
 
-  function getPaginatedPersonen(page: number): void {
+  async function getPaginatedPersonen(page: number): Promise<void> {
     searchFilterStore.personenPage = page;
-    personStore.getAllPersons({
+    await personStore.getAllPersons({
       offset: (searchFilterStore.personenPage - 1) * searchFilterStore.personenPerPage,
       limit: searchFilterStore.personenPerPage,
       organisationIDs: searchFilterStore.selectedSchulen || selectedSchulen.value,
       rolleIDs: searchFilterStore.selectedRollen || selectedRollen.value,
       searchFilter: searchFilterStore.searchFilter || searchFilter.value,
     });
+    await personenkontextStore.getAllPersonenuebersichten(
+      personStore.allPersons.map((person: Personendatensatz) => person.person.id),
+    );
   }
 
-  function getPaginatedPersonenWithLimit(limit: number): void {
+  async function getPaginatedPersonenWithLimit(limit: number): Promise<void> {
     /* reset page to 1 if entries are equal to or less than selected limit */
     if (personStore.totalPersons <= limit) {
       searchFilterStore.personenPage = 1;
     }
 
     searchFilterStore.personenPerPage = limit;
-    personStore.getAllPersons({
+    await personStore.getAllPersons({
       offset: (searchFilterStore.personenPage - 1) * searchFilterStore.personenPerPage,
       limit: searchFilterStore.personenPerPage,
       organisationIDs: searchFilterStore.selectedSchulen || selectedSchulen.value,
       rolleIDs: searchFilterStore.selectedRollen || selectedRollen.value,
       searchFilter: searchFilterStore.searchFilter || searchFilter.value,
     });
+    await personenkontextStore.getAllPersonenuebersichten(
+      personStore.allPersons.map((person: Personendatensatz) => person.person.id),
+    );
   }
 
   function autoSelectSchule(): void {
@@ -300,7 +306,10 @@
       includeTyp: OrganisationsTyp.Klasse,
       systemrechte: ['KLASSEN_VERWALTEN'],
     });
-    await personenkontextStore.getAllPersonenuebersichten();
+    await getPaginatedPersonen(searchFilterStore.personenPage);
+    await personenkontextStore.getAllPersonenuebersichten(
+      personStore.allPersons.map((person: Personendatensatz) => person.person.id),
+    );
     await personenkontextStore.getPersonenkontextRolleWithFilter('');
 
     autoSelectSchule();

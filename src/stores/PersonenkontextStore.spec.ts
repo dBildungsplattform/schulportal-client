@@ -596,7 +596,7 @@ describe('PersonenkontextStore', () => {
         ],
       };
       mockadapter.onGet('/api/dbiam/personenuebersicht').replyOnce(200, mockResponse);
-      const getAllPersonenuebersichtenPromise: Promise<void> = personenkontextStore.getAllPersonenuebersichten();
+      const getAllPersonenuebersichtenPromise: Promise<void> = personenkontextStore.getAllPersonenuebersichten([]);
       expect(personenkontextStore.loading).toBe(true);
       await getAllPersonenuebersichtenPromise;
       expect(personenkontextStore.allUebersichten).toEqual(mockResponse);
@@ -605,7 +605,7 @@ describe('PersonenkontextStore', () => {
 
     it('should handle string error', async () => {
       mockadapter.onGet('/api/dbiam/personenuebersicht').replyOnce(500, 'some error');
-      const getAllPersonenuebersichtenPromise: Promise<void> = personenkontextStore.getAllPersonenuebersichten();
+      const getAllPersonenuebersichtenPromise: Promise<void> = personenkontextStore.getAllPersonenuebersichten([]);
       expect(personenkontextStore.loading).toBe(true);
       await getAllPersonenuebersichtenPromise;
       expect(personenkontextStore.errorCode).toEqual('UNSPECIFIED_ERROR');
@@ -614,7 +614,7 @@ describe('PersonenkontextStore', () => {
 
     it('should handle error code', async () => {
       mockadapter.onGet('/api/dbiam/personenuebersicht').replyOnce(500, { code: 'some mock server error' });
-      const getAllPersonenuebersichtenPromise: Promise<void> = personenkontextStore.getAllPersonenuebersichten();
+      const getAllPersonenuebersichtenPromise: Promise<void> = personenkontextStore.getAllPersonenuebersichten([]);
       expect(personenkontextStore.loading).toBe(true);
       await getAllPersonenuebersichtenPromise;
       expect(personenkontextStore.errorCode).toEqual('some mock server error');

@@ -123,7 +123,7 @@ type PersonenkontextActions = {
     personenKontextTyp: PersonenKontextTyp,
   ) => Promise<DBiamPersonenkontextResponse>;
   getPersonenuebersichtById: (personId: string) => Promise<void>;
-  getAllPersonenuebersichten: () => Promise<void>;
+  getAllPersonenuebersichten: (personIds: string[]) => Promise<void>;
   createPersonWithKontext: (params: DbiamCreatePersonWithContextBodyParams) => Promise<PersonendatensatzResponse>;
 };
 
@@ -322,11 +322,11 @@ export const usePersonenkontextStore: StoreDefinition<
         this.loading = false;
       }
     },
-    async getAllPersonenuebersichten(): Promise<void> {
+    async getAllPersonenuebersichten(personIds: string[]): Promise<void> {
       this.loading = true;
       try {
         const { data }: { data: DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response } =
-          await personenuebersichtApi.dBiamPersonenuebersichtControllerFindPersonenuebersichten();
+          await personenuebersichtApi.dBiamPersonenuebersichtControllerFindPersonenuebersichten(personIds);
         this.allUebersichten = data;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
