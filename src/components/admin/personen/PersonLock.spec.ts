@@ -137,3 +137,55 @@ describe('Unlock user', () => {
     expect(button).not.toBeNull();
   });
 });
+
+describe('Error handling', () => {
+  describe('if an error occurs', () => {
+    beforeEach(() => {
+      wrapper = mount(PersonLock, {
+        attachTo: document.getElementById('app') || '',
+        props: {
+          errorCode: 'TEST_ERROR',
+          person: getPersonendatensatz(true),
+          adminId: 'adminid',
+        },
+        global: {
+          components: {
+            PersonLock,
+          },
+        },
+      });
+    });
+
+    test('it displays an error message', async () => {
+      await openDialog();
+
+      const errorText: HTMLElement = document.querySelector('[data-testid="error-text"]') as HTMLElement;
+      expect(errorText).not.toBeNull();
+    });
+  });
+
+  describe('if no error occurs', () => {
+    beforeEach(() => {
+      wrapper = mount(PersonLock, {
+        attachTo: document.getElementById('app') || '',
+        props: {
+          errorCode: '',
+          person: getPersonendatensatz(true),
+          adminId: 'adminid',
+        },
+        global: {
+          components: {
+            PersonLock,
+          },
+        },
+      });
+    });
+
+    test('it displays no error message', async () => {
+      await openDialog();
+
+      const errorText: HTMLElement = document.querySelector('[data-testid="error-text"]') as HTMLElement;
+      expect(errorText).toBeNull();
+    });
+  });
+});

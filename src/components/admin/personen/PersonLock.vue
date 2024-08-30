@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { onBeforeMount, ref, type Ref } from 'vue';
+  import { computed, onBeforeMount, ref, type ComputedRef, type Ref } from 'vue';
   import { type Composer, useI18n } from 'vue-i18n';
   import { type Personendatensatz } from '@/stores/PersonStore';
   import { useDisplay } from 'vuetify';
@@ -25,19 +25,24 @@
 
   const props: Props = defineProps<Props>();
   const emit: Emits = defineEmits<Emits>();
-  const errorMessage: Ref<string> = ref('');
+  const errorMessage: ComputedRef<string> = computed(() => {
+    let errorCode: string = '';
+    if (errorCode === '') errorCode = props.errorCode;
+    if (errorCode === '') errorCode = personenkontextStore.errorCode;
+    if (errorCode === '') errorCode = organisationStore.errorCode;
+    if (!errorCode) return '';
+    let message: string = t(`errors.${errorCode}`);
+    if (message === '')
+      message = !props.person.person.isLocked ? t('person.lockUserError') : t('person.unlockUserError');
+    return message;
+  });
 
-  async function closeLockPersonDialog(isActive: Ref<boolean>): Promise<void> {
+  function closeLockPersonDialog(isActive: Ref<boolean>): void {
     isActive.value = false;
-    errorMessage.value = '';
   }
-  async function handleOnLockUser(id: string, isActive: Ref<boolean>): Promise<void> {
-    try {
-      await emit('onLockUser', id, !props.person.person.isLocked, selectedSchule.value);
-      await closeLockPersonDialog(isActive);
-    } catch (error) {
-      errorMessage.value = !props.person.person.isLocked ? t('person.lockUserError') : t('person.unlockUserError');
-    }
+  function handleOnLockUser(id: string, isActive: Ref<boolean>): void {
+    emit('onLockUser', id, !props.person.person.isLocked, selectedSchule.value);
+    closeLockPersonDialog(isActive);
   }
 
   function handleChangeSchule(value: string): void {
@@ -101,7 +106,7 @@
         <v-card-text>
           <v-container>
             <v-row
-              v-if="errorMessage || props.errorCode"
+              v-if="errorMessage"
               class="text-body text-error"
             >
               <v-col
@@ -112,7 +117,7 @@
               </v-col>
               <v-col>
                 <p data-testid="error-text">
-                  {{ errorMessage || props.errorCode }}
+                  {{ errorMessage }}
                 </p>
               </v-col>
             </v-row>
