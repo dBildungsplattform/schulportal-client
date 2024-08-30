@@ -1,7 +1,7 @@
 import { expect, test } from 'vitest';
 import { VueWrapper, mount } from '@vue/test-utils';
 import PersonManagementView from './PersonManagementView.vue';
-import { usePersonStore, type PersonendatensatzResponse, type PersonStore } from '@/stores/PersonStore';
+import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
 import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
 import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
 import { nextTick } from 'vue';
@@ -90,27 +90,6 @@ beforeEach(() => {
       },
     ],
   };
-
-  personStore.allPersons = [
-    {
-      person: {
-        id: '1234',
-        name: {
-          familienname: 'Vimes',
-          vorname: 'Samuel',
-        },
-      },
-    },
-    {
-      person: {
-        id: '5678',
-        name: {
-          familienname: 'von Lipwig',
-          vorname: 'Moist',
-        },
-      },
-    },
-  ] as PersonendatensatzResponse[];
 
   personStore.totalPersons = 2;
 
