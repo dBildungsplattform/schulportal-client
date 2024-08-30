@@ -40,8 +40,6 @@ const personAdministrationApi: PersonAdministrationApiInterface = PersonAdminist
   axiosApiInstance,
 );
 
-const personStore: PersonStore = usePersonStore();
-
 export enum PersonenKontextTyp {
   Organisation = 'ORGANISATION',
   Klasse = 'KLASSE',
@@ -251,6 +249,7 @@ export const usePersonenkontextStore: StoreDefinition<
       }
     },
     async updatePersonenkontexte(combinedZuordnungen: Zuordnung[] | undefined, personId: string): Promise<void> {
+      const personStore: PersonStore = usePersonStore();
       this.loading = true;
       this.errorCode = '';
       try {

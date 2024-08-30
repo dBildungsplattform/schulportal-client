@@ -34,7 +34,7 @@ describe('PersonenkontextStore', () => {
   });
 
   it('should initalize state correctly', () => {
-    expect(personStore.allPersons).toEqual([]);
+    expect(personStore.personenWithUebersicht).toEqual(null);
     expect(personenkontextStore.errorCode).toEqual('');
     expect(personenkontextStore.loading).toBe(false);
   });
