@@ -91,6 +91,35 @@ beforeEach(() => {
     ],
   };
 
+  personStore.personenWithUebersicht = [
+    {
+      rollen: 'Admin',
+      administrationsebenen: 'Level1',
+      klassen: 'Class1',
+      person: {
+        id: '1234',
+        name: {
+          familienname: 'Vimes',
+          vorname: 'Samuel',
+        },
+        referrer: '123',
+      },
+    },
+    {
+      rollen: 'User',
+      administrationsebenen: 'Level2',
+      klassen: 'Class2',
+      person: {
+        id: '5678',
+        name: {
+          familienname: 'von Lipwig',
+          vorname: 'Moist',
+        },
+        referrer: '1234',
+      },
+    },
+  ];
+
   personStore.totalPersons = 2;
 
   personenkontextStore.filteredRollen = {
