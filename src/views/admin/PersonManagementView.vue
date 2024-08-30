@@ -229,7 +229,7 @@
 
       // Check if person has Kopers-Rolle and show personalnummer or "fehlt", if not show "---"
       const hasKopersRolle: boolean = !!uebersicht?.zuordnungen.find((zuordnung: Zuordnung) =>
-        zuordnung.merkmale?.includes(RollenMerkmal.KopersPflicht),
+        zuordnung.merkmale.includes(RollenMerkmal.KopersPflicht),
       );
       let personalnummer: string;
 
