@@ -63,7 +63,7 @@ export type Zuordnung = {
   administriertVon: string;
   typ: OrganisationsTyp;
   editable: boolean;
-  merkmale?: Array<RollenMerkmal>;
+  merkmale: RollenMerkmal;
 };
 
 export type Uebersicht =
@@ -83,7 +83,7 @@ export type Uebersicht =
         administriertVon: string;
         typ: OrganisationsTyp;
         editable: boolean;
-        merkmale?: Array<RollenMerkmal>;
+        merkmale: RollenMerkmal;
       }[];
     }
   | undefined;

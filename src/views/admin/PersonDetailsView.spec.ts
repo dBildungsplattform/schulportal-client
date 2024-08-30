@@ -77,6 +77,7 @@ const mockPersonenuebersicht: Uebersicht = {
       typ: OrganisationsTyp.Schule,
       administriertVon: '2',
       editable: true,
+      merkmale: [] as unknown as RollenMerkmal,
     },
     {
       sskId: '3',
@@ -87,6 +88,7 @@ const mockPersonenuebersicht: Uebersicht = {
       typ: OrganisationsTyp.Schule,
       administriertVon: '2',
       editable: true,
+      merkmale: [] as unknown as RollenMerkmal,
     },
     {
       sskId: '2',
@@ -97,6 +99,7 @@ const mockPersonenuebersicht: Uebersicht = {
       typ: OrganisationsTyp.Klasse,
       administriertVon: '1',
       editable: true,
+      merkmale: [] as unknown as RollenMerkmal,
     },
   ],
 };
