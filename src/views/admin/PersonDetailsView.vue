@@ -123,7 +123,7 @@
       case LockKeys.LockedFrom:
         return t('person.lockedBy');
       case LockKeys.Timestamp:
-        return t('person.lockedSince');
+        return t('since');
       default:
         return key;
     }
