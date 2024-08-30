@@ -177,7 +177,9 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
 
         // Aggregate the personen with their uebersichten
         this.personenWithUebersicht = this.allPersons.map((person: Personendatensatz) => {
-          const uebersicht: Uebersicht = this.allUebersichten?.items.find((ueb) => ueb.personId === person.person.id);
+          const uebersicht: Uebersicht = this.allUebersichten?.items.find(
+            (ueb: Uebersicht) => ueb?.personId === person.person.id,
+          );
 
           const uniqueRollen: Set<string> = new Set<string>();
           uebersicht?.zuordnungen.forEach((zuordnung: Zuordnung) => uniqueRollen.add(zuordnung.rolle));
