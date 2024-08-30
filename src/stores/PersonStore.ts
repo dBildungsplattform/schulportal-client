@@ -11,6 +11,7 @@ import {
   type DbiamCreatePersonWithContextBodyParams,
   type DbiamPersonenuebersichtApiInterface,
   type DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response,
+  type DBiamPersonenuebersichtResponse,
   type PersonenApiInterface,
   type PersonendatensatzResponse,
   type PersonenFrontendApiInterface,
@@ -48,7 +49,7 @@ type PersonenWithRolleAndZuordnung = {
   person: Person;
 }[];
 
-export type Uebersicht =
+export type PersonWithUebersicht =
   | {
       personId: string;
       vorname: string;
@@ -93,14 +94,13 @@ export type TwoFactorState = {
 export type { PersonendatensatzResponse };
 
 type PersonState = {
-  allPersons: Array<Personendatensatz>;
   errorCode: string;
   loading: boolean;
   totalPersons: number;
   currentPerson: Personendatensatz | null;
   twoFactorState: TwoFactorState;
-  allUebersichten: DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response | null;
   personenWithUebersicht: PersonenWithRolleAndZuordnung | null;
+  personenuebersicht: DBiamPersonenuebersichtResponse | null;
 };
 
 export type PersonFilter = {
@@ -120,7 +120,7 @@ type PersonActions = {
   deletePersonById: (personId: string) => Promise<void>;
   get2FAState: (personId: string) => Promise<void>;
   get2FASoftwareQRCode: (personId: string) => Promise<void>;
-  getAllPersonenuebersichten: (personIds: string[]) => Promise<void>;
+  getPersonenuebersichtById: (personId: string) => Promise<void>;
 };
 
 export type PersonStore = Store<'personStore', PersonState, PersonGetters, PersonActions>;
@@ -129,9 +129,8 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
   id: 'personStore',
   state: (): PersonState => {
     return {
-      allPersons: [],
-      allUebersichten: null,
       personenWithUebersicht: null,
+      personenuebersicht: null,
       errorCode: '',
       loading: false,
       totalPersons: 0,
@@ -166,19 +165,19 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
           );
 
         // Store the fetched persons
-        this.allPersons = data.items;
+        const allPersons: PersonendatensatzResponse[] = data.items;
         this.totalPersons = +data.total;
 
         // Fetch overviews for all persons
         const personIds: string[] = data.items.map((person: PersonendatensatzResponse) => person.person.id);
         const { data: uebersichten }: { data: DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response } =
           await personenuebersichtApi.dBiamPersonenuebersichtControllerFindPersonenuebersichten(personIds);
-        this.allUebersichten = uebersichten;
+        const allUebersichten: DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response = uebersichten;
 
         // Aggregate the personen with their uebersichten
-        this.personenWithUebersicht = this.allPersons.map((person: Personendatensatz) => {
-          const uebersicht: Uebersicht = this.allUebersichten?.items.find(
-            (ueb: Uebersicht) => ueb?.personId === person.person.id,
+        this.personenWithUebersicht = allPersons.map((person: Personendatensatz) => {
+          const uebersicht: PersonWithUebersicht = allUebersichten.items.find(
+            (ueb: PersonWithUebersicht) => ueb?.personId === person.person.id,
           );
 
           const uniqueRollen: Set<string> = new Set<string>();
@@ -326,12 +325,12 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
         this.loading = false;
       }
     },
-    async getAllPersonenuebersichten(personIds: string[]): Promise<void> {
+    async getPersonenuebersichtById(personId: string): Promise<void> {
       this.loading = true;
       try {
-        const { data }: { data: DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response } =
-          await personenuebersichtApi.dBiamPersonenuebersichtControllerFindPersonenuebersichten(personIds);
-        this.allUebersichten = data;
+        const { data }: { data: DBiamPersonenuebersichtResponse } =
+          await personenuebersichtApi.dBiamPersonenuebersichtControllerFindPersonenuebersichtenByPerson(personId);
+        this.personenuebersicht = data;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
