@@ -433,6 +433,12 @@ export interface DBiamPersonenzuordnungResponse {
      * @memberof DBiamPersonenzuordnungResponse
      */
     'editable': boolean;
+    /**
+     * 
+     * @type {RollenMerkmal}
+     * @memberof DBiamPersonenzuordnungResponse
+     */
+    'merkmale': RollenMerkmal;
 }
 
 
@@ -564,7 +570,8 @@ export const DbiamPersonenkontextErrorI18nKeyEnum = {
     GleicheRolleAnKlasseWieSchule: 'GLEICHE_ROLLE_AN_KLASSE_WIE_SCHULE',
     OrganisationMatchesRollenart: 'ORGANISATION_MATCHES_ROLLENART',
     PersonenkontextAnlageError: 'PERSONENKONTEXT_ANLAGE_ERROR',
-    RolleNurAnPassendeOrganisation: 'ROLLE_NUR_AN_PASSENDE_ORGANISATION'
+    RolleNurAnPassendeOrganisation: 'ROLLE_NUR_AN_PASSENDE_ORGANISATION',
+    PersonalnummerNichtEindeutig: 'PERSONALNUMMER_NICHT_EINDEUTIG'
 } as const;
 
 export type DbiamPersonenkontextErrorI18nKeyEnum = typeof DbiamPersonenkontextErrorI18nKeyEnum[keyof typeof DbiamPersonenkontextErrorI18nKeyEnum];
@@ -596,7 +603,8 @@ export const DbiamPersonenkontexteUpdateErrorI18nKeyEnum = {
     NewerVersionOfPersonenkontexteAvailable: 'NEWER_VERSION_OF_PERSONENKONTEXTE_AVAILABLE',
     InvalidLastModifiedValue: 'INVALID_LAST_MODIFIED_VALUE',
     PersonIdMismatch: 'PERSON_ID_MISMATCH',
-    PersonNotFound: 'PERSON_NOT_FOUND'
+    PersonNotFound: 'PERSON_NOT_FOUND',
+    InvalidPersonenkontextForPersonWithRollenartLern: 'INVALID_PERSONENKONTEXT_FOR_PERSON_WITH_ROLLENART_LERN'
 } as const;
 
 export type DbiamPersonenkontexteUpdateErrorI18nKeyEnum = typeof DbiamPersonenkontexteUpdateErrorI18nKeyEnum[keyof typeof DbiamPersonenkontexteUpdateErrorI18nKeyEnum];
