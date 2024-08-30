@@ -21,7 +21,6 @@
   const selectedSchule: Ref = ref<string | null>(null);
   type Emits = {
     (event: 'onLockUser', id: string, lock: boolean, schule: string): void;
-    (event: 'differentSchoolAdmin', isDifferentSchoolAdmin: boolean): void;
   };
 
   const props: Props = defineProps<Props>();
