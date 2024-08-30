@@ -66,28 +66,6 @@ export type Zuordnung = {
   merkmale: RollenMerkmal;
 };
 
-export type Uebersicht =
-  | {
-      personId: string;
-      vorname: string;
-      nachname: string;
-      benutzername: string;
-      lastModifiedZuordnungen: string | null;
-      zuordnungen: {
-        klasse?: string | undefined;
-        sskId: string;
-        rolleId: string;
-        sskName: string;
-        sskDstNr: string;
-        rolle: string;
-        administriertVon: string;
-        typ: OrganisationsTyp;
-        editable: boolean;
-        merkmale: RollenMerkmal;
-      }[];
-    }
-  | undefined;
-
 export type WorkflowFilter = {
   organisationId?: string;
   rolleId?: string;
@@ -123,7 +101,6 @@ type PersonenkontextActions = {
     personenKontextTyp: PersonenKontextTyp,
   ) => Promise<DBiamPersonenkontextResponse>;
   getPersonenuebersichtById: (personId: string) => Promise<void>;
-  getAllPersonenuebersichten: (personIds: string[]) => Promise<void>;
   createPersonWithKontext: (params: DbiamCreatePersonWithContextBodyParams) => Promise<PersonendatensatzResponse>;
 };
 
@@ -313,21 +290,6 @@ export const usePersonenkontextStore: StoreDefinition<
         const { data }: { data: DBiamPersonenuebersichtResponse } =
           await personenuebersichtApi.dBiamPersonenuebersichtControllerFindPersonenuebersichtenByPerson(personId);
         this.personenuebersicht = data;
-      } catch (error: unknown) {
-        this.errorCode = 'UNSPECIFIED_ERROR';
-        if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
-        }
-      } finally {
-        this.loading = false;
-      }
-    },
-    async getAllPersonenuebersichten(personIds: string[]): Promise<void> {
-      this.loading = true;
-      try {
-        const { data }: { data: DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response } =
-          await personenuebersichtApi.dBiamPersonenuebersichtControllerFindPersonenuebersichten(personIds);
-        this.allUebersichten = data;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {

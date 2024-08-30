@@ -2,10 +2,15 @@ import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import { isAxiosError, type AxiosResponse } from 'axios';
 import {
   Class2FAApiFactory,
+  DbiamPersonenuebersichtApiFactory,
+  OrganisationsTyp,
   PersonenApiFactory,
   PersonenFrontendApiFactory,
+  RollenMerkmal,
   type Class2FAApiInterface,
   type DbiamCreatePersonWithContextBodyParams,
+  type DbiamPersonenuebersichtApiInterface,
+  type DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response,
   type PersonenApiInterface,
   type PersonendatensatzResponse,
   type PersonenFrontendApiInterface,
@@ -14,10 +19,15 @@ import {
   type TokenStateResponse,
 } from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
-import { type DbiamPersonenkontextBodyParams } from './PersonenkontextStore';
+import { type DbiamPersonenkontextBodyParams, type Zuordnung } from './PersonenkontextStore';
 
 const personenApi: PersonenApiInterface = PersonenApiFactory(undefined, '', axiosApiInstance);
 const personenFrontendApi: PersonenFrontendApiInterface = PersonenFrontendApiFactory(undefined, '', axiosApiInstance);
+const personenuebersichtApi: DbiamPersonenuebersichtApiInterface = DbiamPersonenuebersichtApiFactory(
+  undefined,
+  '',
+  axiosApiInstance,
+);
 
 const twoFactorApi: Class2FAApiInterface = Class2FAApiFactory(undefined, '', axiosApiInstance);
 
@@ -30,6 +40,35 @@ export type Person = {
   referrer: string | null;
   personalnummer?: string | null;
 };
+
+type PersonenWithRolleAndZuordnung = {
+  rollen: string;
+  administrationsebenen: string;
+  klassen: string;
+  person: Person;
+}[];
+
+export type Uebersicht =
+  | {
+      personId: string;
+      vorname: string;
+      nachname: string;
+      benutzername: string;
+      lastModifiedZuordnungen: string | null;
+      zuordnungen: {
+        klasse?: string | undefined;
+        sskId: string;
+        rolleId: string;
+        sskName: string;
+        sskDstNr: string;
+        rolle: string;
+        administriertVon: string;
+        typ: OrganisationsTyp;
+        editable: boolean;
+        merkmale: RollenMerkmal;
+      }[];
+    }
+  | undefined;
 
 export type PersonTableItem = {
   person: Person;
@@ -60,6 +99,8 @@ type PersonState = {
   totalPersons: number;
   currentPerson: Personendatensatz | null;
   twoFactorState: TwoFactorState;
+  allUebersichten: DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response | null;
+  personenWithUebersicht: PersonenWithRolleAndZuordnung | null;
 };
 
 export type PersonFilter = {
@@ -79,6 +120,7 @@ type PersonActions = {
   deletePersonById: (personId: string) => Promise<void>;
   get2FAState: (personId: string) => Promise<void>;
   get2FASoftwareQRCode: (personId: string) => Promise<void>;
+  getAllPersonenuebersichten: (personIds: string[]) => Promise<void>;
 };
 
 export type PersonStore = Store<'personStore', PersonState, PersonGetters, PersonActions>;
@@ -88,6 +130,8 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
   state: (): PersonState => {
     return {
       allPersons: [],
+      allUebersichten: null,
+      personenWithUebersicht: null,
       errorCode: '',
       loading: false,
       totalPersons: 0,
@@ -107,6 +151,7 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
     async getAllPersons(filter: PersonFilter) {
       this.loading = true;
       try {
+        // Fetch all persons
         const { data }: AxiosResponse<PersonFrontendControllerFindPersons200Response> =
           await personenFrontendApi.personFrontendControllerFindPersons(
             filter.offset,
@@ -120,8 +165,52 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
             filter.searchFilter,
           );
 
+        // Store the fetched persons
         this.allPersons = data.items;
         this.totalPersons = +data.total;
+
+        // Fetch overviews for all persons
+        const personIds: string[] = data.items.map((person: PersonendatensatzResponse) => person.person.id);
+        const { data: uebersichten }: { data: DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response } =
+          await personenuebersichtApi.dBiamPersonenuebersichtControllerFindPersonenuebersichten(personIds);
+        this.allUebersichten = uebersichten;
+
+        // Aggregate the personen with their uebersichten
+        this.personenWithUebersicht = this.allPersons.map((person: Personendatensatz) => {
+          const uebersicht: Uebersicht = this.allUebersichten?.items.find((ueb) => ueb.personId === person.person.id);
+
+          const uniqueRollen: Set<string> = new Set<string>();
+          uebersicht?.zuordnungen.forEach((zuordnung: Zuordnung) => uniqueRollen.add(zuordnung.rolle));
+          const rollenZuordnungen: string = uniqueRollen.size > 0 ? Array.from(uniqueRollen).join(', ') : '---';
+
+          const uniqueAdministrationsebenen: Set<string> = new Set<string>();
+          uebersicht?.zuordnungen
+            .filter((zuordnung: Zuordnung) => zuordnung.typ !== OrganisationsTyp.Klasse)
+            .forEach((zuordnung: Zuordnung) =>
+              uniqueAdministrationsebenen.add(zuordnung.sskDstNr ? zuordnung.sskDstNr : zuordnung.sskName),
+            );
+          const administrationsebenen: string =
+            uniqueAdministrationsebenen.size > 0 ? Array.from(uniqueAdministrationsebenen).join(', ') : '---';
+
+          const klassenZuordnungen: string = uebersicht?.zuordnungen.some(
+            (zuordnung: Zuordnung) => zuordnung.typ === OrganisationsTyp.Klasse,
+          )
+            ? uebersicht.zuordnungen
+                .filter((zuordnung: Zuordnung) => zuordnung.typ === OrganisationsTyp.Klasse)
+                .map((zuordnung: Zuordnung) => (zuordnung.sskName.length ? zuordnung.sskName : '---'))
+                .join(', ')
+            : '---';
+
+          const personalnummer: string = person.person.personalnummer ?? '---';
+
+          return {
+            ...person,
+            rollen: rollenZuordnungen,
+            administrationsebenen: administrationsebenen,
+            klassen: klassenZuordnungen,
+            person: { ...person.person, personalnummer: personalnummer },
+          };
+        });
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
@@ -231,6 +320,21 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
           this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
         }
         return await Promise.reject(this.errorCode);
+      } finally {
+        this.loading = false;
+      }
+    },
+    async getAllPersonenuebersichten(personIds: string[]): Promise<void> {
+      this.loading = true;
+      try {
+        const { data }: { data: DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response } =
+          await personenuebersichtApi.dBiamPersonenuebersichtControllerFindPersonenuebersichten(personIds);
+        this.allUebersichten = data;
+      } catch (error: unknown) {
+        this.errorCode = 'UNSPECIFIED_ERROR';
+        if (isAxiosError(error)) {
+          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
+        }
       } finally {
         this.loading = false;
       }
