@@ -9,12 +9,11 @@
       }
     },
     "mandatoryFieldsNotice": "Mit * markierte Felder sind Pflichtangaben.",
-    "backToForm": "Zurück zum Formular",
     "followingDataCreated": "Folgende Daten wurden gespeichert:",
     "headline": "Administrationsbereich",
     "koPers": {
-      "koPersNumber": "KoPers-Nr",
-      "noKoPersNumber": "Keine KoPers-Nr vorhanden"
+      "koPersNumber": "KoPers.-Nr.",
+      "noKoPersNumber": "Keine KoPers.-Nr. vorhanden"
     },
     "klasse": {
       "addNew": "Neue Klasse hinzufügen",
@@ -85,6 +84,7 @@
     "person": {
       "addedSuccessfully": "{firstname} {lastname} wurde erfolgreich hinzugefügt.",
       "addNew": "Neuen Benutzer hinzufügen",
+      "backToCreatePerson": "Zurück zur Benutzeranlage",
       "changePassword": "Passwort ändern",
       "twoFactorAuthentication": {
         "setUpShort": "2FA einrichten",
@@ -113,6 +113,8 @@
       "discard": "Benutzer verwerfen",
       "edit": "Benutzer bearbeiten",
       "generatedPassword": "Generiertes Passwort",
+      "noKopersNr": "KoPers.-Nr. nicht vorhanden",
+      "noKopersNrConfirmationDialogMessage": "Bitte beachten Sie, dass ein Benutzerkonto ohne KoPers.-Nr. nach 8 Wochen automatisch gesperrt wird. Tragen Sie daher die KoPers.-Nr. bitte in der Gesamtübersicht des Benutzers nach, sobald diese Ihnen vorliegt.",
       "loadingErrorText": "Es konnten keine Benutzerdaten geladen werden.",
       "loadingErrorTitle": "Fehler beim Laden des Benutzers",
       "management": "Benutzerverwaltung",
@@ -132,6 +134,9 @@
           "noLeadingTrailingSpaces": "Der Familienname darf nicht mit Leerzeichen beginnen oder enden.",
           "min": "Der Familienname muss mindestens 2 Zeichen lang sein.",
           "required": "Der Familienname ist erforderlich."
+        },
+        "kopersNr": {
+          "required": "Die KoPers.-Nr. ist erforderlich."
         }
       },
       "showAll": "Alle Benutzer anzeigen",
@@ -143,6 +148,7 @@
       "title": {
         "COUNT_MISMATCHING": "Geänderte Daten.",
         "NEWER_VERSION_OF_PERSONENKONTEXTE_AVAILABLE": "Geänderte Daten.",
+        "PERSONALNUMMER_NICHT_EINDEUTIG": "KoPers.-Nr. nicht eindeutig",
         "PERSONENKONTEXTE_UPDATE_ERROR": "Geänderte Daten.",
         "PERSON_NOT_FOUND": "Benutzer gelöscht."
       },
@@ -151,6 +157,7 @@
         "NEWER_VERSION_OF_PERSONENKONTEXTE_AVAILABLE": "Der Benutzer wurde zwischenzeitlich durch einen anderen Administrator bearbeitet. Bitte aktualisieren Sie die Daten und versuchen Sie es erneut.",
         "GLEICHE_ROLLE_AN_KLASSE_WIE_SCHULE": "Mindestens eine Rolle des Benutzers ist an der Schule nicht bekannt.",
         "NUR_LEHR_UND_LERN_AN_KLASSE": "Nur Schüler dürfen einer Klasse zugeordnet werden.",
+        "PERSONALNUMMER_NICHT_EINDEUTIG": "Die eingegebene KoPers.-Nr. ist bereits vergeben. Bitte korrigieren Sie Ihre Eingabe.",
         "PERSONENKONTEXT_SPECIFICATION_ERROR": "Die Zuordnung konnte nicht angelegt werden.",
         "PERSONENKONTEXTE_UPDATE_ERROR": "Die Zuordnung konnte nicht aktualisiert werden. Bitte versuchen Sie es später erneut.",
         "PERSON_NOT_FOUND": "Der Benutzer wurde seit Ihrer letzten Änderung gelöscht und kann nicht mehr bearbeitet werden."
@@ -207,7 +214,7 @@
         },
         "merkmale": {
           "BEFRISTUNG_PFLICHT": "Befristung ist Pflichtangabe",
-          "KOPERS_PFLICHT": "KoPers-Nr. ist Pflichtangabe"
+          "KOPERS_PFLICHT": "KoPers.-Nr. ist Pflichtangabe"
         }
       },
       "merkmale": "Merkmale",
@@ -338,6 +345,7 @@
     "password": "Passwort",
     "username": "Benutzername"
   },
+  "missing": "fehlt",
   "nav": {
     "admin": "Schulportal-Administration",
     "backToDetails": "Zurück zur Gesamtübersicht",
@@ -382,13 +390,14 @@
     "editZuordnungen": "Schulzuordnungen bearbeiten",
     "email": "E-Mail",
     "enterFirstName": "Vorname eingeben",
+    "enterKopersNr": "KoPers.-Nr. eingeben",
     "enterLastName": "Nachname eingeben",
     "firstName": "Vorname",
-    "firstNameLastNameReferrerKopersNr": "Vor-/Nachname/Benutzername/KoPers-Nr.",
+    "firstNameLastNameReferrerKopersNr": "Vor-/Nachname/Benutzername/KoPers.-Nr.",
     "firstAndLastName": "Vor- und Nachname",
     "finishEditFirst": "Bitte beenden Sie zunächst Ihre aktuelle Bearbeitung.",
     "klasse": "Klasse",
-    "kopersnr": "Kopers-Nr",
+    "kopersNr": "KoPers.-Nr.",
     "lastName": "Nachname",
     "modifyBefristung": "Befristung bearbeiten",
     "modifyBefristungDescription": "Ändert die Befristung der Zuordnung des Benutzers zu dieser Schule.",

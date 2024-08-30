@@ -459,6 +459,12 @@ export interface DbiamCreatePersonWithContextBodyParams {
      * @type {string}
      * @memberof DbiamCreatePersonWithContextBodyParams
      */
+    'personalnummer'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof DbiamCreatePersonWithContextBodyParams
+     */
     'organisationId': string;
     /**
      * 

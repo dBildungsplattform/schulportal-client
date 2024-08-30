@@ -34,12 +34,13 @@ beforeEach(() => {
         {
           value: '54321',
           title: 'Lern',
-          Rollenart: RollenArt.Lern,
+          rollenart: RollenArt.Lern,
         },
         {
           value: '54329',
           title: 'Lehr',
-          Rollenart: RollenArt.Lehr,
+          merkmale: new Set<RollenMerkmal>(['KOPERS_PFLICHT']),
+          rollenart: RollenArt.Lehr,
         },
       ],
       klassen: [
@@ -142,6 +143,7 @@ describe('PersonenkontextCreate', () => {
   test('it renders the component', () => {
     expect(wrapper?.find('[data-testid="organisation-select"]').isVisible()).toBe(true);
   });
+
   test('it updates search and sets values selected rolle, organisation and klasse', async () => {
     const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
     await organisationAutocomplete?.vm.$emit('update:search', '01');
@@ -306,6 +308,7 @@ describe('PersonenkontextCreate', () => {
     expect(rolleAutocomplete?.text()).toEqual('');
     expect(personenkontextStore.processWorkflowStep).toHaveBeenCalledWith({ organisationId: '1133', limit: 25 });
   });
+
   test('it sends a request if the newValue is empty and the selected Organisation is not defined', async () => {
     const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
 
@@ -323,6 +326,7 @@ describe('PersonenkontextCreate', () => {
 
     expect(organisationAutocomplete?.text()).toEqual('');
   });
+
   test('it sends a request if the newValue is empty and the selected Organisation is defined', async () => {
     const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
 
@@ -337,6 +341,7 @@ describe('PersonenkontextCreate', () => {
 
     expect(organisationAutocomplete?.text()).toEqual('orga');
   });
+
   test('Do nothing with Klassen if the orga was reset', async () => {
     const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
     await organisationAutocomplete?.setValue('O1');
