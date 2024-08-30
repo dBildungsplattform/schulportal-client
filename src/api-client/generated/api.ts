@@ -5950,10 +5950,11 @@ export const PersonenkontextApiAxiosParamCreator = function (configuration?: Con
          * 
          * @param {string} personId The ID for the person.
          * @param {DbiamUpdatePersonenkontexteBodyParams} dbiamUpdatePersonenkontexteBodyParams 
+         * @param {string} [personalnummer] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        dbiamPersonenkontextWorkflowControllerCommit: async (personId: string, dbiamUpdatePersonenkontexteBodyParams: DbiamUpdatePersonenkontexteBodyParams, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        dbiamPersonenkontextWorkflowControllerCommit: async (personId: string, dbiamUpdatePersonenkontexteBodyParams: DbiamUpdatePersonenkontexteBodyParams, personalnummer?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'personId' is not null or undefined
             assertParamExists('dbiamPersonenkontextWorkflowControllerCommit', 'personId', personId)
             // verify required parameter 'dbiamUpdatePersonenkontexteBodyParams' is not null or undefined
@@ -5978,6 +5979,10 @@ export const PersonenkontextApiAxiosParamCreator = function (configuration?: Con
             // authentication oauth2 required
             // oauth required
             await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+            if (personalnummer !== undefined) {
+                localVarQueryParameter['personalnummer'] = personalnummer;
+            }
 
 
     
@@ -6166,11 +6171,12 @@ export const PersonenkontextApiFp = function(configuration?: Configuration) {
          * 
          * @param {string} personId The ID for the person.
          * @param {DbiamUpdatePersonenkontexteBodyParams} dbiamUpdatePersonenkontexteBodyParams 
+         * @param {string} [personalnummer] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async dbiamPersonenkontextWorkflowControllerCommit(personId: string, dbiamUpdatePersonenkontexteBodyParams: DbiamUpdatePersonenkontexteBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonenkontexteUpdateResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.dbiamPersonenkontextWorkflowControllerCommit(personId, dbiamUpdatePersonenkontexteBodyParams, options);
+        async dbiamPersonenkontextWorkflowControllerCommit(personId: string, dbiamUpdatePersonenkontexteBodyParams: DbiamUpdatePersonenkontexteBodyParams, personalnummer?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonenkontexteUpdateResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.dbiamPersonenkontextWorkflowControllerCommit(personId, dbiamUpdatePersonenkontexteBodyParams, personalnummer, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -6223,11 +6229,12 @@ export const PersonenkontextApiFactory = function (configuration?: Configuration
          * 
          * @param {string} personId The ID for the person.
          * @param {DbiamUpdatePersonenkontexteBodyParams} dbiamUpdatePersonenkontexteBodyParams 
+         * @param {string} [personalnummer] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        dbiamPersonenkontextWorkflowControllerCommit(personId: string, dbiamUpdatePersonenkontexteBodyParams: DbiamUpdatePersonenkontexteBodyParams, options?: any): AxiosPromise<PersonenkontexteUpdateResponse> {
-            return localVarFp.dbiamPersonenkontextWorkflowControllerCommit(personId, dbiamUpdatePersonenkontexteBodyParams, options).then((request) => request(axios, basePath));
+        dbiamPersonenkontextWorkflowControllerCommit(personId: string, dbiamUpdatePersonenkontexteBodyParams: DbiamUpdatePersonenkontexteBodyParams, personalnummer?: string, options?: any): AxiosPromise<PersonenkontexteUpdateResponse> {
+            return localVarFp.dbiamPersonenkontextWorkflowControllerCommit(personId, dbiamUpdatePersonenkontexteBodyParams, personalnummer, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -6275,11 +6282,12 @@ export interface PersonenkontextApiInterface {
      * 
      * @param {string} personId The ID for the person.
      * @param {DbiamUpdatePersonenkontexteBodyParams} dbiamUpdatePersonenkontexteBodyParams 
+     * @param {string} [personalnummer] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PersonenkontextApiInterface
      */
-    dbiamPersonenkontextWorkflowControllerCommit(personId: string, dbiamUpdatePersonenkontexteBodyParams: DbiamUpdatePersonenkontexteBodyParams, options?: AxiosRequestConfig): AxiosPromise<PersonenkontexteUpdateResponse>;
+    dbiamPersonenkontextWorkflowControllerCommit(personId: string, dbiamUpdatePersonenkontexteBodyParams: DbiamUpdatePersonenkontexteBodyParams, personalnummer?: string, options?: AxiosRequestConfig): AxiosPromise<PersonenkontexteUpdateResponse>;
 
     /**
      * 
@@ -6327,12 +6335,13 @@ export class PersonenkontextApi extends BaseAPI implements PersonenkontextApiInt
      * 
      * @param {string} personId The ID for the person.
      * @param {DbiamUpdatePersonenkontexteBodyParams} dbiamUpdatePersonenkontexteBodyParams 
+     * @param {string} [personalnummer] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PersonenkontextApi
      */
-    public dbiamPersonenkontextWorkflowControllerCommit(personId: string, dbiamUpdatePersonenkontexteBodyParams: DbiamUpdatePersonenkontexteBodyParams, options?: AxiosRequestConfig) {
-        return PersonenkontextApiFp(this.configuration).dbiamPersonenkontextWorkflowControllerCommit(personId, dbiamUpdatePersonenkontexteBodyParams, options).then((request) => request(this.axios, this.basePath));
+    public dbiamPersonenkontextWorkflowControllerCommit(personId: string, dbiamUpdatePersonenkontexteBodyParams: DbiamUpdatePersonenkontexteBodyParams, personalnummer?: string, options?: AxiosRequestConfig) {
+        return PersonenkontextApiFp(this.configuration).dbiamPersonenkontextWorkflowControllerCommit(personId, dbiamUpdatePersonenkontexteBodyParams, personalnummer, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
