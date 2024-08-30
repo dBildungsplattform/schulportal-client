@@ -65,7 +65,7 @@
       dialogText.value = '';
       hardwareTokenIsAssigned.value = false;
       errorThrown.value = false;
-      emits('updateHeader', 'admin.person.twoFactorAuthentication.hardwareTokenOption');
+      emits('updateHeader', t('admin.person.twoFactorAuthentication.hardwareTokenOption'));
     } else {
       emits('onCloseClicked');
     }
