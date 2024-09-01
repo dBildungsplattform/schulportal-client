@@ -37,6 +37,8 @@
   import { useKlassen } from '@/composables/useKlassen';
   import PersonenkontextCreate from '@/components/admin/personen/PersonenkontextCreate.vue';
   import { type TranslatedObject } from '@/types.d';
+  import SpshTooltip from '@/components/admin/SpshTooltip.vue';
+  import { parse, isValid, isBefore } from 'date-fns';
 
   const router: Router = useRouter();
   const personStore: PersonStore = usePersonStore();
@@ -82,6 +84,14 @@
     return !!rolle && !!rolle.merkmale && rolle.merkmale.has(RollenMerkmal.BefristungPflicht);
   }
 
+  // Custom validation function to check if the date is in the past
+  const notInPast = (value: string | undefined): boolean => {
+    if (!value) return true;
+
+    const parsedDate: Date = parse(value, 'dd.MM.yyyy', new Date());
+    return isValid(parsedDate) && !isBefore(parsedDate, new Date());
+  };
+
   const validationSchema: TypedSchema = toTypedSchema(
     object({
       selectedRolle: string().required(t('admin.rolle.rules.rolle.required')),
@@ -108,6 +118,7 @@
       }),
       selectedBefristung: string()
         .matches(DDMMYYYY_REGEX, t('admin.befristung.rules.format'))
+        .test('notInPast', t('admin.befristung.rules.pastDateNotAllowed'), notInPast)
         .when(['selectedRolle', 'selectedBefristungOption'], {
           is: (selectedRolleId: string, selectedBefristungOption: string | undefined) =>
             isBefristungspflichtRolle(selectedRolleId) && selectedBefristungOption === undefined,
@@ -638,12 +649,18 @@
                   :value="BefristungOption.SCHULJAHRESENDE"
                   :color="'primary'"
                 ></v-radio>
-                <v-radio
-                  :label="$t('admin.befristung.unlimited')"
-                  :value="BefristungOption.UNBEFRISTET"
-                  :color="'primary'"
-                  :disabled="isUnbefristetButtonDisabled"
-                ></v-radio>
+                <SpshTooltip
+                  :enabledCondition="!isUnbefristetButtonDisabled"
+                  :disabledText="$t('admin.befristung.unlimitedInactive')"
+                  position="start"
+                >
+                  <v-radio
+                    :label="$t('admin.befristung.unlimited')"
+                    :value="BefristungOption.UNBEFRISTET"
+                    :color="'primary'"
+                    :disabled="isUnbefristetButtonDisabled"
+                  ></v-radio>
+                </SpshTooltip>
               </v-radio-group>
             </v-col>
           </v-row>
