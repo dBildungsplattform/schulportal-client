@@ -172,6 +172,7 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
         const personIds: string[] = data.items.map((person: PersonendatensatzResponse) => person.person.id);
         if (personIds.length === 0) {
           this.personenWithUebersicht = null;
+          return;
         }
         const { data: uebersichten }: { data: DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response } =
           await personenuebersichtApi.dBiamPersonenuebersichtControllerFindPersonenuebersichten(personIds);
