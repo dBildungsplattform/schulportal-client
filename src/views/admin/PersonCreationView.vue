@@ -626,7 +626,6 @@
               prepend-icon=""
               append-inner-icon="$calendar"
               variant="outlined"
-              clearable
               placeholder="TT.MM.JJJJ"
               color="primary"
             ></v-text-field>
