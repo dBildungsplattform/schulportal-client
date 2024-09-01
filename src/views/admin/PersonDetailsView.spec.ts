@@ -77,8 +77,8 @@ const mockPersonenuebersicht: Uebersicht = {
       typ: OrganisationsTyp.Schule,
       administriertVon: '2',
       editable: true,
+      merkmale: [] as unknown as RollenMerkmal,
       befristung: '2024-05-06',
-      merkmale: RollenMerkmal.BefristungPflicht,
     },
     {
       sskId: '3',
@@ -89,8 +89,8 @@ const mockPersonenuebersicht: Uebersicht = {
       typ: OrganisationsTyp.Schule,
       administriertVon: '2',
       editable: true,
+      merkmale: [] as unknown as RollenMerkmal,
       befristung: '2024-05-06',
-      merkmale: RollenMerkmal.BefristungPflicht,
     },
     {
       sskId: '2',
@@ -101,8 +101,8 @@ const mockPersonenuebersicht: Uebersicht = {
       typ: OrganisationsTyp.Klasse,
       administriertVon: '1',
       editable: true,
+      merkmale: [] as unknown as RollenMerkmal,
       befristung: '2024-05-06',
-      merkmale: RollenMerkmal.BefristungPflicht,
     },
   ],
 };

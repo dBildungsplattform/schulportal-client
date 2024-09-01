@@ -5,7 +5,7 @@ import { usePersonStore, type PersonendatensatzResponse, type PersonStore } from
 import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
 import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
 import { nextTick } from 'vue';
-import { RollenMerkmal, useRolleStore, type RolleResponse, type RolleStore } from '@/stores/RolleStore';
+import { useRolleStore, type RolleResponse, type RolleStore, type RollenMerkmal } from '@/stores/RolleStore';
 import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
 import type { FindRollenResponse } from '@/api-client/generated/api';
 import type WrapperLike from '@vue/test-utils/dist/interfaces/wrapperLike';
@@ -84,8 +84,8 @@ beforeEach(() => {
             typ: OrganisationsTyp.Klasse,
             administriertVon: 'string',
             editable: true,
-            befristung: '2024-03-03',
-            merkmale: RollenMerkmal.KopersPflicht,
+            merkmale: [] as unknown as RollenMerkmal,
+            befristung: '2024-05-06',
           },
         ],
       },

@@ -7,6 +7,7 @@ import { nextTick } from 'vue';
 import { OrganisationsTyp } from '@/stores/OrganisationStore';
 import { createRouter, createMemoryHistory, type Router } from 'vue-router';
 import { useRoute } from 'vue-router';
+import type { RollenMerkmal } from '@/stores/RolleStore';
 
 let wrapper: VueWrapper | null = null;
 let personInfoStore: PersonInfoStore;
@@ -60,7 +61,8 @@ const mockUebersicht: Uebersicht = {
       administriertVon: 'Admin',
       typ: OrganisationsTyp.Schule,
       editable: true,
-      befristung: '2024-03-03',
+      merkmale: ['KOPERS_PFLICHT'] as unknown as RollenMerkmal,
+      befristung: '2024-05-06',
     },
   ],
 };
