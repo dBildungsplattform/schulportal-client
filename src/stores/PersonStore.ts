@@ -171,7 +171,7 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
         // Fetch overviews for all persons
         const personIds: string[] = data.items.map((person: PersonendatensatzResponse) => person.person.id);
         if (personIds.length === 0) {
-          return;
+          this.personenWithUebersicht = null;
         }
         const { data: uebersichten }: { data: DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response } =
           await personenuebersichtApi.dBiamPersonenuebersichtControllerFindPersonenuebersichten(personIds);
