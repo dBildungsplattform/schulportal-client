@@ -217,7 +217,7 @@
     });
 
     /* listen for browser changes and prevent them when form is dirty */
-    window.addEventListener('beforeunload', preventNavigation); 
+    window.addEventListener('beforeunload', preventNavigation);
   });
 
   onUnmounted(() => {
