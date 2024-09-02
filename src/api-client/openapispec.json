@@ -1793,6 +1793,25 @@
         "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
       }
     },
+    "/api/2fa-token/reset": {
+      "put": {
+        "operationId": "PrivacyIdeaAdministrationController_resetToken",
+        "parameters": [{ "name": "personId", "required": true, "in": "query", "schema": { "type": "string" } }],
+        "responses": {
+          "201": {
+            "description": "The token was successfully reset.",
+            "content": { "application/json": { "schema": { "type": "boolean" } } }
+          },
+          "400": { "description": "A username was not given or not found." },
+          "401": { "description": "Not authorized to reset token." },
+          "403": { "description": "Insufficient permissions to reset token." },
+          "404": { "description": "Insufficient permissions to reset token." },
+          "500": { "description": "Internal server error while reseting a token." }
+        },
+        "tags": ["2FA"],
+        "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
+      }
+    },
     "/api/2fa-token/assign/hardwareToken": {
       "post": {
         "operationId": "PrivacyIdeaAdministrationController_assignHardwareToken",

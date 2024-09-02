@@ -1,16 +1,20 @@
 <script setup lang="ts">
   import { ref, type Ref } from 'vue';
-  import { usePersonStore, type Personendatensatz, type PersonStore } from '@/stores/PersonStore';
   import { useDisplay } from 'vuetify';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import SpshTooltip from '@/components/admin/SpshTooltip.vue';
   import { useI18n, type Composer } from 'vue-i18n';
+  import {
+    useTwoFactorAuthentificationStore,
+    type TwoFactorAuthentificationStore,
+  } from '@/stores/TwoFactorAuthentificationStore';
+  import type { Personendatensatz } from '@/stores/PersonStore';
 
   const { t }: Composer = useI18n({ useScope: 'global' });
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
   const proceeded: Ref<boolean> = ref(false);
   const isTokenResetSuccessful: Ref<boolean> = ref(false);
-  const personStore: PersonStore = usePersonStore();
+  const twoFactorAuthenticationStore: TwoFactorAuthentificationStore = useTwoFactorAuthentificationStore();
 
   type Emits = {
     (event: 'dialogClosed'): void;
@@ -37,7 +41,7 @@
 
   async function tokenReset(): Promise<void> {
     try {
-      await personStore.resetToken(props.person.person.id);
+      await twoFactorAuthenticationStore.resetToken(props.person.person.id);
       isTokenResetSuccessful.value = true;
     } finally {
       proceeded.value = true;

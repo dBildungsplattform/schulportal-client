@@ -988,22 +988,15 @@
                     :enabledText="$t('admin.person.twoFactorAuthentication.tokenReset')"
                     position="start"
                   >
-                    <v-btn
-                      class="primary"
+                    <TokenReset
+                      :errorCode="twoFactorAuthentificationStore.errorCode"
                       :disabled="isEditActive"
-                    >
-                      {{ $t('admin.person.twoFactorAuthentication.tokenReset') }}</v-btn
-                    >
-                  </SpshTooltip></v-col
-                >
-                  <TokenReset
-                    :errorCode="personStore.twoFactorState.errorCode"
-                    :disabled="isEditActive"
-                    :person="personStore.currentPerson"
-                    :tokenType="personStore.twoFactorState.tokenKind"
-                    :personId="currentPersonId"
-                    @dialogClosed="personStore.get2FAState(currentPersonId)"
-                  ></TokenReset>
+                      :person="personStore.currentPerson"
+                      :tokenType="twoFactorAuthentificationStore.tokenKind"
+                      :personId="currentPersonId"
+                      @dialogClosed="twoFactorAuthentificationStore.get2FAState(currentPersonId)"
+                    ></TokenReset>
+                  </SpshTooltip>
                 </v-col>
               </div>
             </v-col>

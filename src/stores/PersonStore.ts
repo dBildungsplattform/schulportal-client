@@ -63,8 +63,6 @@ type PersonActions = {
   getPersonById: (personId: string) => Promise<Personendatensatz>;
   resetPassword: (personId: string) => Promise<string>;
   deletePersonById: (personId: string) => Promise<void>;
-  get2FAState: (personId: string) => Promise<void>;
-  get2FASoftwareQRCode: (personId: string) => Promise<void>;
 };
 
 export type PersonStore = Store<'personStore', PersonState, PersonGetters, PersonActions>;
@@ -149,20 +147,6 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
       this.loading = true;
       try {
         await personenApi.personControllerDeletePersonById(personId);
-      } catch (error: unknown) {
-        this.errorCode = 'UNSPECIFIED_ERROR';
-        if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
-        }
-        return await Promise.reject(this.errorCode);
-      } finally {
-        this.loading = false;
-      }
-    }
-    async resetToken(personId: string): Promise<void> {
-      this.loading = true;
-      try {
-        await twoFactorApi.privacyIdeaAdministrationControllerResetToken(personId);
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
