@@ -5153,8 +5153,7 @@
                 "required": [
                     "personId",
                     "organisationId",
-                    "rolleId",
-                    "befristung"
+                    "rolleId"
                 ]
             },
             "DbiamPersonenkontextError": {

@@ -566,7 +566,7 @@ export interface DbiamPersonenkontextBodyParams {
      * @type {string}
      * @memberof DbiamPersonenkontextBodyParams
      */
-    'befristung': string;
+    'befristung'?: string;
 }
 /**
  * 

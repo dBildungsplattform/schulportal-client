@@ -314,7 +314,7 @@
           personId: personenkontextStore.createdPersonWithKontext.person.id,
           organisationId: selectedKlasse.value,
           rolleId: selectedRolle.value ?? '',
-          befristung: formattedBefristung ?? '',
+          befristung: formattedBefristung,
         };
 
         await personenkontextStore
