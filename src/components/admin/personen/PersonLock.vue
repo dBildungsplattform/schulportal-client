@@ -141,6 +141,7 @@
                   <v-select
                     clearable
                     :disabled="!(schulen.length > 1)"
+                    :class="[{ selected: selectedSchule }]"
                     data-testid="schule-select"
                     density="compact"
                     id="schule-select"
