@@ -3,8 +3,8 @@ import { VueWrapper, /* mount */ shallowMount } from '@vue/test-utils';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import routes from '@/router/routes';
 import PersonDetailsView from './PersonDetailsView.vue';
-import { type Personendatensatz, type PersonStore, usePersonStore } from '@/stores/PersonStore';
-import { usePersonenkontextStore, type PersonenkontextStore, type Uebersicht } from '@/stores/PersonenkontextStore';
+import { type Personendatensatz, type PersonStore, type PersonWithUebersicht, usePersonStore } from '@/stores/PersonStore';
+import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
 import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
 import { RollenMerkmal, RollenSystemRecht } from '@/stores/RolleStore';
 import { useAuthStore, type AuthStore, type UserInfo } from '@/stores/AuthStore';
@@ -61,7 +61,7 @@ const mockCurrentUser: UserInfo = {
   ],
 };
 
-const mockPersonenuebersicht: Uebersicht = {
+const mockPersonenuebersicht: PersonWithUebersicht = {
   personId: '1',
   vorname: 'John',
   nachname: 'Orton',
@@ -157,7 +157,7 @@ organisationStore.klassen = [
 
 authStore.currentUser = mockCurrentUser;
 personStore.currentPerson = mockPerson;
-personenkontextStore.personenuebersicht = mockPersonenuebersicht;
+personStore.personenuebersicht = mockPersonenuebersicht;
 
 beforeEach(async () => {
   document.body.innerHTML = `
