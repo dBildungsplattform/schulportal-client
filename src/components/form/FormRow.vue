@@ -1,16 +1,17 @@
 <script setup lang="ts">
   type Props = {
     errorLabel: string | boolean;
-    labelForId: string;
-    isRequired?: boolean;
     label: string;
+    isRequired?: boolean;
+    labelForId: string;
+    noTopMargin?: boolean;
   };
 
   defineProps<Props>();
 </script>
 
 <template>
-  <v-row class="align-center mt-8">
+  <v-row :class="`${noTopMargin ? 'align-center' : 'align-center mt-8'}`">
     <v-col
       class="py-0 pb-sm-8 pt-sm-3 text-sm-right"
       cols="12"

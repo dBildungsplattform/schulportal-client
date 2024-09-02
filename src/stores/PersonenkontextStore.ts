@@ -25,6 +25,7 @@ import {
   type PersonendatensatzResponse,
   type PersonAdministrationApiInterface,
   PersonAdministrationApiFactory,
+  RollenMerkmal,
 } from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
 
@@ -62,6 +63,7 @@ export type Zuordnung = {
   administriertVon: string;
   typ: OrganisationsTyp;
   editable: boolean;
+  merkmale: RollenMerkmal;
 };
 
 export type Uebersicht =
@@ -81,6 +83,7 @@ export type Uebersicht =
         administriertVon: string;
         typ: OrganisationsTyp;
         editable: boolean;
+        merkmale: RollenMerkmal;
       }[];
     }
   | undefined;
@@ -344,7 +347,7 @@ export const usePersonenkontextStore: StoreDefinition<
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
+          this.errorCode = error.response?.data.i18nKey || 'UNSPECIFIED_ERROR';
         }
         return await Promise.reject(this.errorCode);
       } finally {

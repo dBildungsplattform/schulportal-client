@@ -26,15 +26,19 @@
   import { object, string, StringSchema, type AnyObject } from 'yup';
   import { toTypedSchema } from '@vee-validate/yup';
   import { useForm, type BaseFieldProps, type TypedSchema } from 'vee-validate';
-  import { RollenArt } from '@/stores/RolleStore';
+  import { RollenArt, RollenMerkmal } from '@/stores/RolleStore';
   import { type Composer, useI18n } from 'vue-i18n';
   import { useOrganisationen } from '@/composables/useOrganisationen';
-  import { useRollen } from '@/composables/useRollen';
+  import { useRollen, type TranslatedRolleWithAttrs } from '@/composables/useRollen';
   import { useKlassen } from '@/composables/useKlassen';
   import PersonenkontextCreate from '@/components/admin/personen/PersonenkontextCreate.vue';
   import { type TranslatedObject } from '@/types.d';
   import KlasseChange from '@/components/admin/klassen/KlasseChange.vue';
   import TokenReset from '@/components/two-factor-authentication/TokenReset.vue';
+  import {
+    useTwoFactorAuthentificationStore,
+    type TwoFactorAuthentificationStore,
+  } from '@/stores/TwoFactorAuthentificationStore';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
@@ -47,6 +51,7 @@
   const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
   const authStore: AuthStore = useAuthStore();
   const organisationStore: OrganisationStore = useOrganisationStore();
+  const twoFactorAuthentificationStore: TwoFactorAuthentificationStore = useTwoFactorAuthentificationStore();
 
   const password: Ref<string> = ref('');
 
@@ -266,17 +271,11 @@
     return result;
   }
 
-  const rollen: ComputedRef<RolleWithRollenart[] | undefined> = useRollen();
+  const rollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = useRollen();
 
   const organisationen: ComputedRef<TranslatedObject[] | undefined> = useOrganisationen();
 
   const klassen: ComputedRef<TranslatedObject[] | undefined> = useKlassen();
-
-  export type RolleWithRollenart = {
-    value: string;
-    title: string;
-    Rollenart: RollenArt;
-  };
 
   type ZuordnungCreationForm = {
     selectedRolle: string;
@@ -291,11 +290,19 @@
 
   // Define a method to check if the selected Rolle is of type "Lern"
   function isLernRolle(selectedRolleId: string): boolean {
-    const rolle: RolleWithRollenart | undefined = rollen.value?.find(
-      (r: RolleWithRollenart) => r.value === selectedRolleId,
+    const rolle: TranslatedRolleWithAttrs | undefined = rollen.value?.find(
+      (r: TranslatedRolleWithAttrs) => r.value === selectedRolleId,
     );
-    return !!rolle && rolle.Rollenart === RollenArt.Lern;
+    return !!rolle && rolle.rollenart === RollenArt.Lern;
   }
+
+  const hasKopersRolle: ComputedRef<boolean> = computed(() => {
+    return (
+      !!zuordnungenResult.value?.find((zuordnung: Zuordnung) => {
+        return zuordnung.merkmale.includes(RollenMerkmal.KopersPflicht);
+      }) || false
+    );
+  });
 
   // Check if the button to change the Klasse should be active or not. Activate only if there is 1 selected Zuordnung and if it is of type LERN.
   const canChangeKlasse: ComputedRef<boolean> = computed(() => {
@@ -472,7 +479,7 @@
   );
 
   // Filter out the Rollen based on the user's existing Zuordnungen and selected organization
-  const filteredRollen: ComputedRef<RolleWithRollenart[] | undefined> = computed(() => {
+  const filteredRollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = computed(() => {
     const existingZuordnungen: Zuordnung[] | undefined = personenkontextStore.personenuebersicht?.zuordnungen;
 
     // If no existing Zuordnungen then just show all roles
@@ -486,7 +493,7 @@
     const hasLernRolle: boolean = existingZuordnungen.some((zuordnung: Zuordnung) => isLernRolle(zuordnung.rolleId));
 
     // Filter out Rollen that the user already has in the selected organization
-    return rollen.value?.filter((rolle: RolleWithRollenart) => {
+    return rollen.value?.filter((rolle: TranslatedRolleWithAttrs) => {
       // Check if the user already has this role in the selected organization
       const alreadyHasRolleInSelectedOrga: boolean = existingZuordnungen.some(
         (zuordnung: Zuordnung) => zuordnung.rolleId === rolle.value && zuordnung.sskId === selectedOrgaId,
@@ -495,11 +502,11 @@
       // If the user has any LERN roles, only allow LERN roles to be selected
       if (hasLernRolle) {
         // Allow LERN roles in other organizations, but filter them out for the selected organization
-        return !alreadyHasRolleInSelectedOrga && rolle.Rollenart === RollenArt.Lern;
+        return !alreadyHasRolleInSelectedOrga && rolle.rollenart === RollenArt.Lern;
       }
 
       // If the user doesn't have any LERN roles, allow any role that hasn't been assigned yet in the selected organization besides LERN.
-      return !alreadyHasRolleInSelectedOrga && rolle.Rollenart !== RollenArt.Lern;
+      return !alreadyHasRolleInSelectedOrga && rolle.rollenart !== RollenArt.Lern;
     });
   });
 
@@ -571,9 +578,11 @@
         klasse: klasse?.name,
         sskDstNr: organisation.kennung ?? '',
         sskName: organisation.name,
-        rolle: rollen.value?.find((rolle: RolleWithRollenart) => rolle.value === selectedRolle.value)?.title || '',
+        rolle:
+          rollen.value?.find((rolle: TranslatedRolleWithAttrs) => rolle.value === selectedRolle.value)?.title || '',
         administriertVon: organisation.administriertVon ?? '',
         editable: true,
+        merkmale: [] as unknown as RollenMerkmal,
         typ: OrganisationsTyp.Schule,
       };
       if (zuordnungenResult.value) {
@@ -588,10 +597,12 @@
           rolleId: selectedRolle.value ?? '',
           sskDstNr: klasse.kennung ?? '',
           sskName: klasse.name,
-          rolle: rollen.value?.find((rolle: RolleWithRollenart) => rolle.value === selectedRolle.value)?.title || '',
+          rolle:
+            rollen.value?.find((rolle: TranslatedRolleWithAttrs) => rolle.value === selectedRolle.value)?.title || '',
           administriertVon: klasse.administriertVon ?? '',
           editable: true,
           typ: OrganisationsTyp.Klasse,
+          merkmale: [] as unknown as RollenMerkmal,
         });
       }
 
@@ -606,6 +617,7 @@
             rolle: existingKlasse.rolle,
             administriertVon: existingKlasse.administriertVon,
             editable: true,
+            merkmale: [] as unknown as RollenMerkmal,
             typ: OrganisationsTyp.Klasse,
           });
         });
@@ -644,10 +656,11 @@
         sskDstNr: organisation.kennung ?? '',
         sskName: organisation.name,
         rolle:
-          rollen.value?.find((rolle: RolleWithRollenart) => rolle.value === selectedZuordnungen.value[0]?.rolleId)
+          rollen.value?.find((rolle: TranslatedRolleWithAttrs) => rolle.value === selectedZuordnungen.value[0]?.rolleId)
             ?.title || '',
         administriertVon: organisation.administriertVon ?? '',
         editable: true,
+        merkmale: [] as unknown as RollenMerkmal,
         typ: OrganisationsTyp.Schule,
       };
 
@@ -663,10 +676,12 @@
           sskDstNr: newKlasse.kennung ?? '',
           sskName: newKlasse.name,
           rolle:
-            rollen.value?.find((rolle: RolleWithRollenart) => rolle.value === selectedZuordnungen.value[0]?.rolleId)
-              ?.title || '',
+            rollen.value?.find(
+              (rolle: TranslatedRolleWithAttrs) => rolle.value === selectedZuordnungen.value[0]?.rolleId,
+            )?.title || '',
           administriertVon: newKlasse.administriertVon ?? '',
           editable: true,
+          merkmale: [] as unknown as RollenMerkmal,
           typ: OrganisationsTyp.Klasse,
         });
       }
@@ -713,8 +728,7 @@
     hasKlassenZuordnung.value = personenkontextStore.personenuebersicht?.zuordnungen.some(
       (zuordnung: Zuordnung) => zuordnung.typ === OrganisationsTyp.Klasse,
     );
-
-    await personStore.get2FAState(currentPersonId);
+    await twoFactorAuthentificationStore.get2FAState(currentPersonId);
   });
 </script>
 
@@ -821,8 +835,11 @@
                 <span class="text-body">{{ personStore.currentPerson.person.referrer }} </span>
               </v-col>
             </v-row>
-            <!-- Kopers-Nr -->
-            <v-row class="mt-0">
+            <!-- KoPers.-Nr. -->
+            <v-row
+              class="mt-0"
+              v-if="hasKopersRolle"
+            >
               <v-col cols="1"></v-col>
               <v-col
                 class="text-right"
@@ -830,13 +847,21 @@
                 sm="3"
                 cols="5"
               >
-                <span class="subtitle-2"> {{ $t('person.kopersnr') }}: </span>
+                <span
+                  :class="`${hasKopersRolle && personStore.currentPerson.person.personalnummer ? 'subtitle-2' : 'subtitle-2 text-red'}`"
+                >
+                  {{ $t('person.kopersNr') }}:
+                </span>
               </v-col>
               <v-col
                 cols="auto"
                 data-testid="person-kopersnr"
               >
-                <span class="text-body">{{ personStore.currentPerson.person.personalnummer ?? '---' }} </span>
+                <span
+                  :class="`${hasKopersRolle && personStore.currentPerson.person.personalnummer ? 'text-body' : 'text-body text-red'}`"
+                >
+                  {{ personStore.currentPerson.person.personalnummer ?? $t('missing') }}
+                </span>
               </v-col>
             </v-row>
           </div>
@@ -882,13 +907,13 @@
           thickness="6"
         ></v-divider>
         <!-- Two Factor Authentication -->
-        <v-container v-if="personStore.twoFactorState.hasToken != undefined">
+        <v-container v-if="twoFactorAuthentificationStore.hasToken != undefined">
           <v-row class="ml-md-16">
             <v-col>
               <h3 class="subtitle-1">{{ $t('admin.person.twoFactorAuthentication.header') }}</h3>
               <v-row
                 class="mt-4 text-body"
-                v-if="personStore.twoFactorState.hasToken && personStore.twoFactorState.tokenKind === 'software'"
+                v-if="twoFactorAuthentificationStore.hasToken"
               >
                 <v-col
                   class="text-right"
@@ -897,12 +922,15 @@
                   <v-icon
                     icon="mdi-check-circle"
                     color="green"
-                    v-if="personStore.twoFactorState.hasToken"
+                    v-if="twoFactorAuthentificationStore.hasToken"
                   ></v-icon>
                 </v-col>
                 <div class="v-col">
-                  <p>
+                  <p v-if="twoFactorAuthentificationStore.tokenKind === 'software'">
                     {{ $t('admin.person.twoFactorAuthentication.softwareTokenIsSetUp') }}
+                  </p>
+                  <p v-if="twoFactorAuthentificationStore.tokenKind === 'hardware'">
+                    {{ $t('admin.person.twoFactorAuthentication.hardwareTokenIsSetUp') }}
                   </p>
                 </div>
               </v-row>
@@ -918,10 +946,10 @@
                   </v-icon>
                 </v-col>
                 <div class="v-col">
-                  <p v-if="personStore.twoFactorState.hasToken">
+                  <p v-if="twoFactorAuthentificationStore.hasToken">
                     {{ $t('admin.person.twoFactorAuthentication.resetInfo') }}
                   </p>
-                  <p v-if="!personStore.twoFactorState.hasToken">
+                  <p v-if="!twoFactorAuthentificationStore.hasToken">
                     {{ $t('admin.person.twoFactorAuthentication.notSetUp') }}
                   </p>
                 </div>
@@ -935,24 +963,38 @@
             >
               <div
                 class="d-flex justify-sm-end"
-                v-if="!personStore.twoFactorState.hasToken"
+                v-if="!twoFactorAuthentificationStore.hasToken"
               >
                 <TwoFactorAuthenticationSetUp
-                  :errorCode="personStore.twoFactorState.errorCode"
+                  :errorCode="twoFactorAuthentificationStore.errorCode"
                   :disabled="isEditActive"
                   :person="personStore.currentPerson"
-                  @dialogClosed="personStore.get2FAState(currentPersonId)"
+                  @dialogClosed="twoFactorAuthentificationStore.get2FAState(currentPersonId)"
                 >
                 </TwoFactorAuthenticationSetUp>
               </div>
               <div
                 class="d-flex justify-sm-end"
-                v-if="personStore.twoFactorState.hasToken"
+                v-if="twoFactorAuthentificationStore.hasToken"
               >
                 <v-col
                   cols="12"
                   sm="6"
                   md="auto"
+                >
+                  <SpshTooltip
+                    :enabledCondition="twoFactorAuthentificationStore.hasToken"
+                    :disabledText="$t('person.finishEditFirst')"
+                    :enabledText="$t('admin.person.twoFactorAuthentication.tokenReset')"
+                    position="start"
+                  >
+                    <v-btn
+                      class="primary"
+                      :disabled="isEditActive"
+                    >
+                      {{ $t('admin.person.twoFactorAuthentication.tokenReset') }}</v-btn
+                    >
+                  </SpshTooltip></v-col
                 >
                   <TokenReset
                     :errorCode="personStore.twoFactorState.errorCode"
@@ -969,7 +1011,7 @@
           ></v-row>
         </v-container>
         <v-divider
-          v-if="personStore.twoFactorState.hasToken != undefined"
+          v-if="twoFactorAuthentificationStore.hasToken != undefined"
           class="border-opacity-100 rounded my-6 mx-4"
           color="#E5EAEF"
           thickness="6"

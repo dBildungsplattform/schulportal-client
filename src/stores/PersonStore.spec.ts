@@ -1,8 +1,4 @@
-import type {
-  PersonFrontendControllerFindPersons200Response,
-  PersonendatensatzResponse,
-  TokenStateResponse,
-} from '@/api-client/generated';
+import type { PersonFrontendControllerFindPersons200Response, PersonendatensatzResponse } from '@/api-client/generated';
 import { usePersonStore, type PersonStore, type Personendatensatz } from './PersonStore';
 import ApiService from '@/services/ApiService';
 import MockAdapter from 'axios-mock-adapter';
@@ -218,82 +214,6 @@ describe('PersonStore', () => {
 
       await rejects(personStore.deletePersonById(personId));
 
-      expect(personStore.errorCode).toEqual('some mock server error');
-      expect(personStore.loading).toBe(false);
-    });
-  });
-
-  describe('get2FAState', () => {
-    it('should get 2FA state', async () => {
-      const personId: string = 'testUser';
-      const mockResponse: TokenStateResponse = {
-        hasToken: true,
-        tokenKind: 'software',
-      };
-
-      mockadapter.onGet(`/api/2fa-token/state?personId=${personId}`).replyOnce(200, mockResponse);
-      const get2FAStatePromise: Promise<void> = personStore.get2FAState(personId);
-      expect(personStore.loading).toBe(true);
-      await get2FAStatePromise;
-      expect(personStore.twoFactorState.hasToken).toEqual(mockResponse.hasToken);
-      expect(personStore.twoFactorState.tokenKind).toEqual(mockResponse.tokenKind);
-      expect(personStore.loading).toBe(false);
-    });
-
-    it('should handle string error', async () => {
-      const personId: string = 'testUser';
-
-      mockadapter.onGet(`/api/2fa-token/state?personId=${personId}`).replyOnce(500, 'some error');
-      const get2FAStatePromise: Promise<void> = personStore.get2FAState(personId);
-      expect(personStore.loading).toBe(true);
-      await rejects(get2FAStatePromise);
-      expect(personStore.twoFactorState.errorCode).toEqual('UNSPECIFIED_ERROR');
-      expect(personStore.loading).toBe(false);
-    });
-
-    it('should handle error code', async () => {
-      const personId: string = 'testUser';
-
-      mockadapter.onGet(`/api/2fa-token/state?personId=${personId}`).replyOnce(500, { code: 'some mock server error' });
-      const get2FAStatePromise: Promise<void> = personStore.get2FAState(personId);
-      expect(personStore.loading).toBe(true);
-      await rejects(get2FAStatePromise);
-      expect(personStore.twoFactorState.errorCode).toEqual('some mock server error');
-      expect(personStore.loading).toBe(false);
-    });
-  });
-
-  describe('get2FASoftwareQRCode', () => {
-    it('should get 2FA software QR code', async () => {
-      const personId: string = 'testUser';
-      const mockResponse: string = 'fakeQRCode';
-
-      mockadapter.onPost(`/api/2fa-token/init`).replyOnce(200, mockResponse);
-      const get2FASoftwareQRCodePromise: Promise<void> = personStore.get2FASoftwareQRCode(personId);
-      expect(personStore.loading).toBe(true);
-      await get2FASoftwareQRCodePromise;
-      expect(personStore.twoFactorState.qrCode).toEqual(mockResponse);
-      expect(personStore.loading).toBe(false);
-    });
-
-    it('should handle string error', async () => {
-      const personId: string = 'testUser';
-
-      mockadapter.onPost(`/api/2fa-token/init`).replyOnce(500, 'some error');
-      const get2FASoftwareQRCodePromise: Promise<void> = personStore.get2FASoftwareQRCode(personId);
-      expect(personStore.loading).toBe(true);
-      await rejects(get2FASoftwareQRCodePromise);
-      expect(personStore.errorCode).toEqual('UNSPECIFIED_ERROR');
-      expect(personStore.loading).toBe(false);
-    });
-
-    it('should handle error code', async () => {
-      const personId: string = 'testUser';
-
-      mockadapter.onPost(`/api/2fa-token/init`).replyOnce(500, { code: 'some mock server error' });
-      const get2FASoftwareQRCodePromise: Promise<void> = personStore.get2FASoftwareQRCode(personId);
-      expect(personStore.loading).toBe(true);
-      await rejects(get2FASoftwareQRCodePromise);
       expect(personStore.errorCode).toEqual('some mock server error');
       expect(personStore.loading).toBe(false);
     });
