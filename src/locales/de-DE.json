@@ -87,7 +87,6 @@
       "backToCreatePerson": "Zurück zur Benutzeranlage",
       "changePassword": "Passwort ändern",
       "twoFactorAuthentication": {
-      "twoFactorAuthentication": {
         "setUpShort": "2FA einrichten",
         "setUpLong": "Zwei-Faktor-Authentifizierung einrichten",
         "header": "Zwei-Faktor-Authentifizierung (2FA)",
@@ -463,7 +462,7 @@
       "workEmail": "Dienstliche E-Mail"
     }
   },
-  "transfer":"Versetzen",
+  "transfer": "Versetzen",
   "unsavedChanges": {
     "message": "Sie haben nicht gespeicherte Änderungen vorgenommen. Wollen Sie die Seite trotzdem verlassen?",
     "title": "Änderungen vorgenommen"
