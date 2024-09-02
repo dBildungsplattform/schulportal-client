@@ -17,8 +17,8 @@
 
   const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
   const organisationStore: OrganisationStore = useOrganisationStore();
-  const schulen: Ref = ref<Array<{ value: string; title: string }>>([]);
-  const selectedSchule: Ref = ref<string | null>(null);
+  const schulen: Ref<Array<{ value: string; title: string }>> = ref([]);
+  const selectedSchule: Ref<string | null> = ref(null);
   type Emits = {
     (event: 'onLockUser', id: string, lock: boolean, schule: string): void;
   };
