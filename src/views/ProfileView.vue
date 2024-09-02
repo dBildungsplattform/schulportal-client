@@ -31,7 +31,8 @@
   const schulDaten: Ref = ref<SchulDaten[]>([]);
 
   function handleGoToPreviousPage(): void {
-    window.history.back();
+    const previousUrl: string | null = sessionStorage.getItem('previousUrl');
+    router.push(previousUrl ?? '/start');
   }
 
   const windowOrigin: string = window.location.origin;
