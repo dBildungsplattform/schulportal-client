@@ -15,6 +15,7 @@ import {
   type PersonenApiInterface,
   type PersonendatensatzResponse,
   type PersonenFrontendApiInterface,
+  type PersonenuebersichtBodyParams,
   type PersonFrontendControllerFindPersons200Response,
   type TokenInitBodyParams,
   type TokenStateResponse,
@@ -174,8 +175,12 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
           this.personenWithUebersicht = null;
           return;
         }
+        const bodyParams: PersonenuebersichtBodyParams = {
+          personIds: personIds
+        }
         const { data: uebersichten }: { data: DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response } =
-          await personenuebersichtApi.dBiamPersonenuebersichtControllerFindPersonenuebersichten(personIds);
+
+          await personenuebersichtApi.dBiamPersonenuebersichtControllerFindPersonenuebersichten(bodyParams);
         const allUebersichten: DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response = uebersichten;
 
         // Aggregate the personen with their uebersichten

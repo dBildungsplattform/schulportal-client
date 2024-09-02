@@ -1710,6 +1710,31 @@ export type Personenstatus = typeof Personenstatus[keyof typeof Personenstatus];
 /**
  * 
  * @export
+ * @interface PersonenuebersichtBodyParams
+ */
+export interface PersonenuebersichtBodyParams {
+    /**
+     * The offset of the paginated list.
+     * @type {number}
+     * @memberof PersonenuebersichtBodyParams
+     */
+    'offset'?: number;
+    /**
+     * The requested limit for the page size.
+     * @type {number}
+     * @memberof PersonenuebersichtBodyParams
+     */
+    'limit'?: number;
+    /**
+     * An array of IDs for the persons.
+     * @type {Array<string>}
+     * @memberof PersonenuebersichtBodyParams
+     */
+    'personIds': Array<string>;
+}
+/**
+ * 
+ * @export
  * @interface RawPagedResponse
  */
 export interface RawPagedResponse {
@@ -3293,15 +3318,13 @@ export const DbiamPersonenuebersichtApiAxiosParamCreator = function (configurati
     return {
         /**
          * 
-         * @param {Array<string>} personIds An array of IDs for the persons.
-         * @param {number} [offset] The offset of the paginated list.
-         * @param {number} [limit] The requested limit for the page size.
+         * @param {PersonenuebersichtBodyParams} personenuebersichtBodyParams 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        dBiamPersonenuebersichtControllerFindPersonenuebersichten: async (personIds: Array<string>, offset?: number, limit?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'personIds' is not null or undefined
-            assertParamExists('dBiamPersonenuebersichtControllerFindPersonenuebersichten', 'personIds', personIds)
+        dBiamPersonenuebersichtControllerFindPersonenuebersichten: async (personenuebersichtBodyParams: PersonenuebersichtBodyParams, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'personenuebersichtBodyParams' is not null or undefined
+            assertParamExists('dBiamPersonenuebersichtControllerFindPersonenuebersichten', 'personenuebersichtBodyParams', personenuebersichtBodyParams)
             const localVarPath = `/api/dbiam/personenuebersicht`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -3310,7 +3333,7 @@ export const DbiamPersonenuebersichtApiAxiosParamCreator = function (configurati
                 baseOptions = configuration.baseOptions;
             }
 
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
@@ -3322,23 +3345,14 @@ export const DbiamPersonenuebersichtApiAxiosParamCreator = function (configurati
             // oauth required
             await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
 
-            if (offset !== undefined) {
-                localVarQueryParameter['offset'] = offset;
-            }
-
-            if (limit !== undefined) {
-                localVarQueryParameter['limit'] = limit;
-            }
-
-            if (personIds) {
-                localVarQueryParameter['personIds'] = personIds;
-            }
-
 
     
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(personenuebersichtBodyParams, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -3398,14 +3412,12 @@ export const DbiamPersonenuebersichtApiFp = function(configuration?: Configurati
     return {
         /**
          * 
-         * @param {Array<string>} personIds An array of IDs for the persons.
-         * @param {number} [offset] The offset of the paginated list.
-         * @param {number} [limit] The requested limit for the page size.
+         * @param {PersonenuebersichtBodyParams} personenuebersichtBodyParams 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async dBiamPersonenuebersichtControllerFindPersonenuebersichten(personIds: Array<string>, offset?: number, limit?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.dBiamPersonenuebersichtControllerFindPersonenuebersichten(personIds, offset, limit, options);
+        async dBiamPersonenuebersichtControllerFindPersonenuebersichten(personenuebersichtBodyParams: PersonenuebersichtBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.dBiamPersonenuebersichtControllerFindPersonenuebersichten(personenuebersichtBodyParams, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -3430,14 +3442,12 @@ export const DbiamPersonenuebersichtApiFactory = function (configuration?: Confi
     return {
         /**
          * 
-         * @param {Array<string>} personIds An array of IDs for the persons.
-         * @param {number} [offset] The offset of the paginated list.
-         * @param {number} [limit] The requested limit for the page size.
+         * @param {PersonenuebersichtBodyParams} personenuebersichtBodyParams 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        dBiamPersonenuebersichtControllerFindPersonenuebersichten(personIds: Array<string>, offset?: number, limit?: number, options?: any): AxiosPromise<DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response> {
-            return localVarFp.dBiamPersonenuebersichtControllerFindPersonenuebersichten(personIds, offset, limit, options).then((request) => request(axios, basePath));
+        dBiamPersonenuebersichtControllerFindPersonenuebersichten(personenuebersichtBodyParams: PersonenuebersichtBodyParams, options?: any): AxiosPromise<DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response> {
+            return localVarFp.dBiamPersonenuebersichtControllerFindPersonenuebersichten(personenuebersichtBodyParams, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -3459,14 +3469,12 @@ export const DbiamPersonenuebersichtApiFactory = function (configuration?: Confi
 export interface DbiamPersonenuebersichtApiInterface {
     /**
      * 
-     * @param {Array<string>} personIds An array of IDs for the persons.
-     * @param {number} [offset] The offset of the paginated list.
-     * @param {number} [limit] The requested limit for the page size.
+     * @param {PersonenuebersichtBodyParams} personenuebersichtBodyParams 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DbiamPersonenuebersichtApiInterface
      */
-    dBiamPersonenuebersichtControllerFindPersonenuebersichten(personIds: Array<string>, offset?: number, limit?: number, options?: AxiosRequestConfig): AxiosPromise<DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response>;
+    dBiamPersonenuebersichtControllerFindPersonenuebersichten(personenuebersichtBodyParams: PersonenuebersichtBodyParams, options?: AxiosRequestConfig): AxiosPromise<DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response>;
 
     /**
      * 
@@ -3488,15 +3496,13 @@ export interface DbiamPersonenuebersichtApiInterface {
 export class DbiamPersonenuebersichtApi extends BaseAPI implements DbiamPersonenuebersichtApiInterface {
     /**
      * 
-     * @param {Array<string>} personIds An array of IDs for the persons.
-     * @param {number} [offset] The offset of the paginated list.
-     * @param {number} [limit] The requested limit for the page size.
+     * @param {PersonenuebersichtBodyParams} personenuebersichtBodyParams 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DbiamPersonenuebersichtApi
      */
-    public dBiamPersonenuebersichtControllerFindPersonenuebersichten(personIds: Array<string>, offset?: number, limit?: number, options?: AxiosRequestConfig) {
-        return DbiamPersonenuebersichtApiFp(this.configuration).dBiamPersonenuebersichtControllerFindPersonenuebersichten(personIds, offset, limit, options).then((request) => request(this.axios, this.basePath));
+    public dBiamPersonenuebersichtControllerFindPersonenuebersichten(personenuebersichtBodyParams: PersonenuebersichtBodyParams, options?: AxiosRequestConfig) {
+        return DbiamPersonenuebersichtApiFp(this.configuration).dBiamPersonenuebersichtControllerFindPersonenuebersichten(personenuebersichtBodyParams, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

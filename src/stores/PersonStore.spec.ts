@@ -91,18 +91,17 @@ describe('PersonStore', () => {
 
       mockadapter.onGet('/api/personen-frontend').replyOnce(200, mockPersonsResponse);
 
-      const queryString: string = mockPersons
-        .map((person: PersonendatensatzResponse) => `personIds=${person.person.id}`)
-        .join('&');
-      mockadapter.onGet(`/api/dbiam/personenuebersicht?${queryString}`).replyOnce(200, mockUebersichten);
+      // Update the mock POST request with the appropriate body
+      const personIds = mockPersons.map((person) => person.person.id);
+      mockadapter.onPost('/api/dbiam/personenuebersicht', { personIds }).replyOnce(200, mockUebersichten);
 
       const getAllPersonsPromise: Promise<void> = personStore.getAllPersons({});
       expect(personStore.loading).toBe(true);
       await getAllPersonsPromise;
       expect(personStore.loading).toBe(false);
     });
+
     it('should handle string error response', async () => {
-      // Mock data for persons
       const mockPersons: PersonendatensatzResponse[] = [
         {
           person: {
@@ -124,7 +123,6 @@ describe('PersonStore', () => {
         },
       ] as PersonendatensatzResponse[];
 
-      // Mock response for persons
       const mockPersonsResponse: PersonFrontendControllerFindPersons200Response = {
         offset: 0,
         limit: 2,
@@ -134,10 +132,8 @@ describe('PersonStore', () => {
 
       mockadapter.onGet('/api/personen-frontend').replyOnce(200, mockPersonsResponse);
 
-      const queryString: string = mockPersons
-        .map((person: PersonendatensatzResponse) => `personIds=${person.person.id}`)
-        .join('&');
-      mockadapter.onGet(`/api/dbiam/personenuebersicht?${queryString}`).replyOnce(500, 'Some error occurred');
+      const personIds: string[] = mockPersons.map((person) => person.person.id);
+      mockadapter.onPost('/api/dbiam/personenuebersicht', { personIds }).replyOnce(500, 'Some error occurred');
 
       const getAllPersonsPromise: Promise<void> = personStore.getAllPersons({});
       expect(personStore.loading).toBe(true);
@@ -147,7 +143,6 @@ describe('PersonStore', () => {
     });
 
     it('should handle error code in response', async () => {
-      // Mock data for persons
       const mockPersons: PersonendatensatzResponse[] = [
         {
           person: {
@@ -169,7 +164,6 @@ describe('PersonStore', () => {
         },
       ] as PersonendatensatzResponse[];
 
-      // Mock response for persons
       const mockPersonsResponse: PersonFrontendControllerFindPersons200Response = {
         offset: 0,
         limit: 2,
@@ -179,10 +173,8 @@ describe('PersonStore', () => {
 
       mockadapter.onGet('/api/personen-frontend').replyOnce(200, mockPersonsResponse);
 
-      const queryString: string = mockPersons
-        .map((person: PersonendatensatzResponse) => `personIds=${person.person.id}`)
-        .join('&');
-      mockadapter.onGet(`/api/dbiam/personenuebersicht?${queryString}`).replyOnce(500, { code: 'SERVER_ERROR' });
+      const personIds: string[] = mockPersons.map((person) => person.person.id);
+      mockadapter.onPost('/api/dbiam/personenuebersicht', { personIds }).replyOnce(500, { code: 'SERVER_ERROR' });
 
       const getAllPersonsPromise: Promise<void> = personStore.getAllPersons({});
       expect(personStore.loading).toBe(true);
