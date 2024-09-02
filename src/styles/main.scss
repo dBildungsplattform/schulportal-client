@@ -62,6 +62,11 @@ label.v-label {
   text-wrap: nowrap;
 }
 
+.wrap-text {
+  white-space: normal;
+  word-break: break-word;
+}
+
 .ellipsis-wrapper {
   text-overflow: ellipsis;
   overflow: hidden;

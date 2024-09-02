@@ -6,6 +6,8 @@
   import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
   import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
   import { type TranslatedObject } from '@/types.d';
+  import type { BaseFieldProps } from 'vee-validate';
+  import type { TranslatedRolleWithAttrs } from '@/composables/useRollen';
 
   useI18n({ useScope: 'global' });
 
@@ -15,37 +17,18 @@
   const timerId: Ref<ReturnType<typeof setTimeout> | undefined> = ref<ReturnType<typeof setTimeout>>();
   const canCommit: Ref<boolean> = ref(false);
   const hasAutoselectedSchule: Ref<boolean> = ref(false);
-
   const searchInputOrganisation: Ref<string> = ref('');
   const searchInputRolle: Ref<string> = ref('');
 
   let isSearching: boolean = false;
 
-  type RolleWithRollenart = {
-    value: string;
-    title: string;
-    Rollenart: RollenArt;
-  };
-
   type Props = {
     organisationen: TranslatedObject[] | undefined;
-    rollen: RolleWithRollenart[] | undefined;
+    rollen: TranslatedRolleWithAttrs[] | undefined;
     klassen: TranslatedObject[] | undefined;
-    selectedOrganisationProps: {
-      modelValue: string;
-      error: boolean;
-      'error-messages': string[];
-    };
-    selectedRolleProps: {
-      modelValue: string;
-      error: boolean;
-      'error-messages': string[];
-    };
-    selectedKlasseProps: {
-      modelValue: string;
-      error: boolean;
-      'error-messages': string[];
-    };
+    selectedOrganisationProps: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
+    selectedRolleProps: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
+    selectedKlasseProps: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     selectedOrganisation: string | undefined;
     selectedRolle: string | undefined;
     selectedKlasse?: string | undefined;
@@ -83,10 +66,10 @@
   });
 
   function isLernRolle(selectedRolleId: string | undefined): boolean {
-    const rolle: RolleWithRollenart | undefined = props.rollen?.find(
-      (r: RolleWithRollenart) => r.value === selectedRolleId,
+    const rolle: TranslatedRolleWithAttrs | undefined = props.rollen?.find(
+      (r: TranslatedRolleWithAttrs) => r.value === selectedRolleId,
     );
-    return !!rolle && rolle.Rollenart === RollenArt.Lern;
+    return !!rolle && rolle.rollenart === RollenArt.Lern;
   }
 
   // Watcher for selectedOrganisation to fetch roles and classes
@@ -216,14 +199,14 @@
     // If searchValue is empty, fetch all roles for the organisationId
     if (searchValue === '' && !selectedKlasse.value) {
       timerId.value = setTimeout(() => {
-        organisationStore.getKlassenByOrganisationId(organisationId, searchValue);
+        organisationStore.getKlassenByOrganisationId(organisationId, { searchString: searchValue });
       }, 500);
     } else if (searchValue && searchValue !== selectedKlasseTitle.value) {
       /* cancel pending call */
       clearTimeout(timerId.value);
       /* delay new call 500ms */
       timerId.value = setTimeout(() => {
-        organisationStore.getKlassenByOrganisationId(organisationId, searchValue);
+        organisationStore.getKlassenByOrganisationId(organisationId, { searchString: searchValue });
       }, 500);
     }
   }
@@ -320,6 +303,7 @@
           v-model:search="searchInputRolle"
         ></v-autocomplete>
       </FormRow>
+
       <!-- Klasse zuordnen -->
       <FormRow
         v-if="isLernRolle(selectedRolle) && selectedOrganisation"

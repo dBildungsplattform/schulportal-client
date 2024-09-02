@@ -13,6 +13,7 @@
     RollenSystemRecht,
     RollenArt,
     type RolleResponse,
+    type RolleFormType,
   } from '@/stores/RolleStore';
   import {
     useServiceProviderStore,
@@ -28,11 +29,17 @@
     type NavigationGuardNext,
     type RouteLocationNormalized,
   } from 'vue-router';
-  import { type BaseFieldProps, type TypedSchema, useForm } from 'vee-validate';
+  import { useForm, type FormContext, type TypedSchema } from 'vee-validate';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import RolleForm from '@/components/form/RolleForm.vue';
-  import { getValidationSchema, getVuetifyConfig } from '@/utils/validationRolle';
+  import {
+    getDirtyState,
+    getRolleFieldDefinitions,
+    getValidationSchema,
+    type RolleFieldDefinitions,
+  } from '@/utils/validationRolle';
   import SuccessTemplate from '@/components/admin/rollen/SuccessTemplate.vue';
+  import { type TranslatedObject } from '@/types.d';
 
   const rolleStore: RolleStore = useRolleStore();
   const organisationStore: OrganisationStore = useOrganisationStore();
@@ -40,6 +47,7 @@
 
   const { t }: Composer = useI18n({ useScope: 'global' });
   const router: Router = useRouter();
+  const validationSchema: TypedSchema = getValidationSchema(t);
 
   type TranslatedRollenArt = { value: RollenArt; title: string };
   const translatedRollenarten: Ref<TranslatedRollenArt[]> = ref([]);
@@ -50,71 +58,30 @@
   type TranslatedSystemrecht = { value: RollenSystemRecht; title: string };
   const translatedSystemrechte: Ref<TranslatedSystemrecht[]> = ref([]);
 
-  const validationSchema: TypedSchema = getValidationSchema(t);
+  const formContext: FormContext<RolleFormType, RolleFormType> = useForm<RolleFormType>({ validationSchema });
 
-  const vuetifyConfig = (state: {
-    errors: Array<string>;
-  }): { props: { error: boolean; 'error-messages': Array<string> } } => getVuetifyConfig(state);
+  const {
+    selectedAdministrationsebene,
+    selectedAdministrationsebeneProps,
+    selectedRollenArt,
+    selectedRollenArtProps,
+    selectedRollenName,
+    selectedRollenNameProps,
+    selectedMerkmale,
+    selectedMerkmaleProps,
+    selectedServiceProviders,
+    selectedServiceProvidersProps,
+    selectedSystemRechte,
+    selectedSystemRechteProps,
+  }: RolleFieldDefinitions = getRolleFieldDefinitions(formContext);
 
-  type RolleCreationFormType = {
-    selectedAdministrationsebene: string;
-    selectedRollenArt: RollenArt;
-    selectedRollenName: string;
-    selectedMerkmale: RollenMerkmal[];
-    selectedServiceProviders: ServiceProvider[];
-    selectedSystemRechte: RollenSystemRecht[];
-  };
-
-  // eslint-disable-next-line @typescript-eslint/typedef
-  const { defineField, handleSubmit, isFieldDirty, resetForm } = useForm<RolleCreationFormType>({
-    validationSchema,
-  });
-
-  const [selectedAdministrationsebene, selectedAdministrationsebeneProps]: [
-    Ref<string>,
-    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineField('selectedAdministrationsebene', vuetifyConfig);
-
-  const [selectedRollenArt, selectedRollenArtProps]: [
-    Ref<RollenArt | null>,
-    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineField('selectedRollenArt', vuetifyConfig);
-
-  const [selectedRollenName, selectedRollenNameProps]: [
-    Ref<string>,
-    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineField('selectedRollenName', vuetifyConfig);
-
-  const [selectedMerkmale, selectedMerkmaleProps]: [
-    Ref<RollenMerkmal[] | null>,
-    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineField('selectedMerkmale', vuetifyConfig);
-
-  const [selectedServiceProviders, selectedServiceProvidersProps]: [
-    Ref<RollenMerkmal[] | null>,
-    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineField('selectedServiceProviders', vuetifyConfig);
-
-  const [selectedSystemRechte, selectedSystemRechteProps]: [
-    Ref<RollenSystemRecht[] | null>,
-    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineField('selectedSystemRechte', vuetifyConfig);
-
-  function isFormDirty(): boolean {
-    return (
-      isFieldDirty('selectedAdministrationsebene') ||
-      isFieldDirty('selectedRollenArt') ||
-      isFieldDirty('selectedRollenName') ||
-      isFieldDirty('selectedMerkmale') ||
-      isFieldDirty('selectedSystemRechte')
-    );
-  }
+  const isFormDirty: ComputedRef<boolean> = computed(() => getDirtyState(formContext));
 
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
   let blockedNext: () => void = () => {};
 
   onBeforeRouteLeave((_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
-    if (isFormDirty()) {
+    if (isFormDirty.value) {
       showUnsavedChangesDialog.value = true;
       blockedNext = next;
     } else {
@@ -125,7 +92,7 @@
 
   const handleCreateAnotherRolle = (): void => {
     rolleStore.createdRolle = null;
-    resetForm();
+    formContext.resetForm();
     router.push({ name: 'create-rolle' });
   };
 
@@ -191,24 +158,14 @@
       .join(', ');
   });
 
-  const administrationsebenen: ComputedRef<
-    {
-      value: string;
-      title: string;
-    }[]
-  > = computed(() =>
+  const administrationsebenen: ComputedRef<TranslatedObject[]> = computed(() =>
     organisationStore.allOrganisationen.map((org: Organisation) => ({
       value: org.id,
       title: org.kennung ? `${org.kennung} (${org.name})` : org.name,
     })),
   );
 
-  const serviceProviders: ComputedRef<
-    {
-      value: string;
-      title: string;
-    }[]
-  > = computed(() =>
+  const serviceProviders: ComputedRef<TranslatedObject[]> = computed(() =>
     serviceProviderStore.allServiceProviders.map((provider: ServiceProvider) => ({
       value: provider.id,
       title: provider.name,
@@ -216,7 +173,7 @@
   );
 
   function preventNavigation(event: BeforeUnloadEvent): void {
-    if (!isFormDirty()) return;
+    if (!isFormDirty.value) return;
     event.preventDefault();
     /* Chrome requires returnValue to be set. */
     event.returnValue = '';
@@ -267,7 +224,7 @@
     window.removeEventListener('beforeunload', preventNavigation);
   });
 
-  const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = handleSubmit(async () => {
+  const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = formContext.handleSubmit(async () => {
     if (selectedRollenName.value && selectedAdministrationsebene.value && selectedRollenArt.value) {
       const merkmaleToSubmit: RollenMerkmal[] = selectedMerkmale.value?.map((m: RollenMerkmal) => m) || [];
       const systemrechteToSubmit: RollenSystemRecht[] =
@@ -281,15 +238,13 @@
           systemrechteToSubmit,
         )
         .then(async (rolleResponse: RolleResponse) => {
-          if (selectedServiceProviders.value) {
-            selectedServiceProviders.value.forEach(async (serviceProviderId: string) => {
-              await rolleStore.addServiceProviderToRolle(rolleResponse.id, {
-                serviceProviderId,
-              });
+          selectedServiceProviders.value?.forEach(async (serviceProviderId: string) => {
+            await rolleStore.addServiceProviderToRolle(rolleResponse.id, {
+              serviceProviderId,
             });
-          }
+          });
         });
-      resetForm();
+      formContext.resetForm();
 
       if (rolleStore.createdRolle) {
         await organisationStore.getOrganisationById(
@@ -328,7 +283,7 @@
           :administrationsebenen="administrationsebenen"
           :onHandleConfirmUnsavedChanges="handleConfirmUnsavedChanges"
           :onHandleDiscard="navigateToRolleManagement"
-          :onShowDialogChange="(value: boolean) => (showUnsavedChangesDialog = value)"
+          :onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
           :onSubmit="onSubmit"
           :isEditActive="true"
           ref="rolle-creation-form"
