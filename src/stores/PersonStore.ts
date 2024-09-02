@@ -47,7 +47,7 @@ export type CreatePersonBodyParams = DbiamCreatePersonWithContextBodyParams;
 export type CreatedPersonenkontext = DbiamPersonenkontextBodyParams;
 
 export function parseLockInfo(unparsed: object): LockInfo | null {
-  if (!Object.keys(LockKeys).every((key: string) => key in unparsed)) return null;
+  if (!Object.values(LockKeys).every((key: string) => key in unparsed)) return null;
   return {
     lock_locked_from: LockKeys.LockedFrom in unparsed ? '' + unparsed[LockKeys.LockedFrom] : '',
     lock_timestamp: LockKeys.Timestamp in unparsed ? '' + unparsed[LockKeys.Timestamp] : '',

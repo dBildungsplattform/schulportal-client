@@ -144,12 +144,10 @@
     if (!personStore.currentPerson?.person.isLocked) return [];
     const { lockInfo }: Person = personStore.currentPerson.person;
     if (!lockInfo) return [];
-    return Object.entries(lockInfo)
-      .filter(([key, value]: [string, string]) => key in LockKeys && value !== '')
-      .map(([key, value]: [string, string]) => ({
-        key: keyMapper(key),
-        attribute: keyValueMapper(key, value.toString()),
-      }));
+    return Object.entries(lockInfo).map(([key, value]: [string, string]) => ({
+      key: keyMapper(key),
+      attribute: keyValueMapper(key, value.toString()),
+    }));
   });
 
   let closeCannotDeleteDialog = (): void => {
@@ -751,7 +749,6 @@
     hasKlassenZuordnung.value = personenkontextStore.personenuebersicht?.zuordnungen.some(
       (zuordnung: Zuordnung) => zuordnung.typ === OrganisationsTyp.Klasse,
     );
-
     await personStore.get2FAState(currentPersonId);
   });
 </script>
@@ -1547,6 +1544,7 @@
           <v-row
             class="ml-md-3 mt-md-n8"
             v-if="!personStore.loading"
+            data-testid="person-lock-info"
           >
             <v-col
               cols="10"

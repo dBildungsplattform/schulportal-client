@@ -41,8 +41,10 @@
     isActive.value = false;
   }
   function handleOnLockUser(id: string, isActive: Ref<boolean>): void {
-    emit('onLockUser', id, !props.person.person.isLocked, selectedSchule.value);
-    closeLockPersonDialog(isActive);
+    if (selectedSchule.value) {
+      emit('onLockUser', id, !props.person.person.isLocked, selectedSchule.value);
+      closeLockPersonDialog(isActive);
+    }
   }
 
   function handleChangeSchule(value: string): void {
@@ -69,11 +71,15 @@
 
   onBeforeMount(async () => {
     const intersectingOrganisations: Set<Organisation> = await getOrganisationIntersection();
-    schulen.value = [...intersectingOrganisations].map(
-      (organisation: Organisation) => `${organisation.kennung ?? ''} (${organisation.name})`,
-    );
+    schulen.value = [...intersectingOrganisations].map((organisation: Organisation) => {
+      const v: string = `${organisation.kennung ?? ''} (${organisation.name})`;
+      return {
+        value: v,
+        title: v,
+      };
+    });
     if (schulen.value.length === 1) {
-      selectedSchule.value = schulen.value[0];
+      selectedSchule.value = schulen.value[0]?.value ?? null;
     }
   });
 </script>

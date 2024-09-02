@@ -5,6 +5,7 @@ import routes from '@/router/routes';
 import PersonDetailsView, { type RolleWithRollenart } from './PersonDetailsView.vue';
 import {
   mapPersonendatensatzResponseToPersonendatensatz,
+  type Person,
   type Personendatensatz,
   type PersonendatensatzResponse,
   type PersonStore,
@@ -225,6 +226,12 @@ describe('PersonDetailsView', () => {
     expect(klasseChangeFormComponent?.exists()).toBe(true);
   });
   test('Renders details for the current person', async () => {
+    const date: string = '01.01.2024';
+    const datetime: string = `${date} 12:34:00`;
+    const lockInfo: Person['lockInfo'] = {
+      lock_locked_from: 'test',
+      lock_timestamp: datetime,
+    };
     // Mock the current person in the store
     personStore.currentPerson = mapPersonendatensatzResponseToPersonendatensatz({
       person: {
@@ -233,15 +240,20 @@ describe('PersonDetailsView', () => {
           familienname: 'Vimes',
           vorname: 'Samuel',
         },
+        isLocked: true,
+        lockInfo,
       },
     } as PersonendatensatzResponse);
 
     await nextTick();
 
     const vornameElement: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="person-vorname"]');
+    const lockInfoContainer: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="person-lock-info"]');
 
     // Check if the element exists and has the correct text content
     expect(vornameElement?.text()).toBe('Samuel');
+    expect(lockInfoContainer?.html()).toContain(lockInfo.lock_locked_from);
+    expect(lockInfoContainer?.html()).toContain(date);
   });
   test('filteredRollen returns correct roles based on person context and selection', async () => {
     interface PersonDetailsViewType extends DefineComponent {
