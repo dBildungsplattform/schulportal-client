@@ -166,7 +166,7 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
         this.loading = false;
       }
     },
-    async deletePersonById(personId: string) {
+    async deletePerson(personId: string) {
       this.loading = true;
       try {
         await personenApi.personControllerDeletePersonById(personId);
