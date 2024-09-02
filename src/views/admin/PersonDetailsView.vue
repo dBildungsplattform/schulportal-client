@@ -293,7 +293,7 @@
   const hasKopersRolle: ComputedRef<boolean> = computed(() => {
     return (
       !!zuordnungenResult.value?.find((zuordnung: Zuordnung) => {
-        return zuordnung.merkmale?.includes(RollenMerkmal.KopersPflicht);
+        return zuordnung.merkmale.includes(RollenMerkmal.KopersPflicht);
       }) || false
     );
   });
@@ -576,6 +576,7 @@
           rollen.value?.find((rolle: TranslatedRolleWithAttrs) => rolle.value === selectedRolle.value)?.title || '',
         administriertVon: organisation.administriertVon ?? '',
         editable: true,
+        merkmale: [] as unknown as RollenMerkmal,
         typ: OrganisationsTyp.Schule,
       };
       if (zuordnungenResult.value) {
@@ -595,6 +596,7 @@
           administriertVon: klasse.administriertVon ?? '',
           editable: true,
           typ: OrganisationsTyp.Klasse,
+          merkmale: [] as unknown as RollenMerkmal,
         });
       }
 
@@ -609,6 +611,7 @@
             rolle: existingKlasse.rolle,
             administriertVon: existingKlasse.administriertVon,
             editable: true,
+            merkmale: [] as unknown as RollenMerkmal,
             typ: OrganisationsTyp.Klasse,
           });
         });
@@ -651,6 +654,7 @@
             ?.title || '',
         administriertVon: organisation.administriertVon ?? '',
         editable: true,
+        merkmale: [] as unknown as RollenMerkmal,
         typ: OrganisationsTyp.Schule,
       };
 
@@ -671,6 +675,7 @@
             )?.title || '',
           administriertVon: newKlasse.administriertVon ?? '',
           editable: true,
+          merkmale: [] as unknown as RollenMerkmal,
           typ: OrganisationsTyp.Klasse,
         });
       }

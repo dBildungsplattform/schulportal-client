@@ -223,6 +223,7 @@ describe('PersonenkontextStore', () => {
           administriertVon: 'some admin',
           typ: OrganisationsTyp.Schule,
           editable: true,
+          merkmale: [] as unknown as RollenMerkmal,
         },
       ];
 
@@ -249,6 +250,7 @@ describe('PersonenkontextStore', () => {
           administriertVon: 'some admin',
           typ: OrganisationsTyp.Schule,
           editable: true,
+          merkmale: [] as unknown as RollenMerkmal,
         },
       ];
 
@@ -274,6 +276,7 @@ describe('PersonenkontextStore', () => {
           administriertVon: 'some admin',
           typ: OrganisationsTyp.Schule,
           editable: true,
+          merkmale: [] as unknown as RollenMerkmal,
         },
       ];
 
@@ -427,6 +430,7 @@ describe('PersonenkontextStore', () => {
             typ: OrganisationsTyp.Klasse,
             administriertVon: 'string',
             editable: true,
+            merkmale: [] as unknown as RollenMerkmal,
           },
         ],
       };
@@ -585,6 +589,7 @@ describe('PersonenkontextStore', () => {
                 typ: OrganisationsTyp.Klasse,
                 administriertVon: 'string',
                 editable: true,
+                merkmale: [] as unknown as RollenMerkmal,
               },
             ],
           },
