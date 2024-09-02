@@ -223,6 +223,7 @@ describe('PersonenkontextStore', () => {
           administriertVon: 'some admin',
           typ: OrganisationsTyp.Schule,
           editable: true,
+          merkmale: [] as unknown as RollenMerkmal,
         },
       ];
 
@@ -249,6 +250,7 @@ describe('PersonenkontextStore', () => {
           administriertVon: 'some admin',
           typ: OrganisationsTyp.Schule,
           editable: true,
+          merkmale: [] as unknown as RollenMerkmal,
         },
       ];
 
@@ -274,6 +276,7 @@ describe('PersonenkontextStore', () => {
           administriertVon: 'some admin',
           typ: OrganisationsTyp.Schule,
           editable: true,
+          merkmale: [] as unknown as RollenMerkmal,
         },
       ];
 
@@ -427,6 +430,7 @@ describe('PersonenkontextStore', () => {
             typ: OrganisationsTyp.Klasse,
             administriertVon: 'string',
             editable: true,
+            merkmale: [] as unknown as RollenMerkmal,
           },
         ],
       };
@@ -585,6 +589,7 @@ describe('PersonenkontextStore', () => {
                 typ: OrganisationsTyp.Klasse,
                 administriertVon: 'string',
                 editable: true,
+                merkmale: [] as unknown as RollenMerkmal,
               },
             ],
           },
@@ -659,7 +664,7 @@ describe('PersonenkontextStore', () => {
     });
 
     it('should handle error code', async () => {
-      mockadapter.onPost('/api/personenkontext-workflow').replyOnce(500, { code: 'some mock server error' });
+      mockadapter.onPost('/api/personenkontext-workflow').replyOnce(500, { i18nKey: 'SOME_MOCK_SERVER_ERROR' });
       const createPersonPromise: Promise<PersonendatensatzResponse> = personenkontextStore.createPersonWithKontext({
         familienname: 'Copeland',
         vorname: 'Christian',
@@ -668,7 +673,7 @@ describe('PersonenkontextStore', () => {
       });
       expect(personenkontextStore.loading).toBe(true);
       await rejects(createPersonPromise);
-      expect(personenkontextStore.errorCode).toEqual('some mock server error');
+      expect(personenkontextStore.errorCode).toEqual('SOME_MOCK_SERVER_ERROR');
       expect(personenkontextStore.loading).toBe(false);
     });
   });
