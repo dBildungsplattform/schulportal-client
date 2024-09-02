@@ -110,7 +110,7 @@
 
   // Deletes the person and all kontexte
   async function deletePerson(personId: string): Promise<void> {
-    await personStore.deletePersonById(personId);
+    await personStore.deletePerson(personId);
   }
 
   let closeCannotDeleteDialog = (): void => {
