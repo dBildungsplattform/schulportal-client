@@ -1526,48 +1526,58 @@
           v-if="authStore.currentUser?.personId !== personStore.currentPerson?.person.id"
         >
           <v-row class="ml-md-16">
-            <v-col
-              v-if="!personStore.loading"
-              data-testid="person-lock-info"
-            >
+            <v-col data-testid="person-lock-info">
               <h3 class="subtitle-1">{{ $t('admin.person.status') }}</h3>
-              <v-row class="mt-4 text-body">
-                <v-col
-                  class="text-right"
-                  cols="1"
+              <template v-if="!personStore.loading">
+                <v-row class="mt-4 text-body">
+                  <v-col
+                    class="text-right"
+                    cols="1"
+                  >
+                    <v-icon
+                      v-if="personStore.currentPerson?.person.isLocked"
+                      icon="mdi-lock"
+                      color="red"
+                    ></v-icon>
+                  </v-col>
+                  <v-col cols="10">
+                    <span>
+                      {{
+                        personStore.currentPerson?.person.isLocked
+                          ? t('person.userIsLocked')
+                          : t('person.userIsUnlocked')
+                      }}
+                    </span>
+                  </v-col>
+                </v-row>
+                <v-row
+                  class="mt-0"
+                  v-for="{ key, attribute } of getLockInfo"
+                  :key="key"
+                  cols="10"
                 >
-                  <v-icon
-                    v-if="personStore.currentPerson?.person.isLocked"
-                    icon="mdi-lock"
-                    color="red"
-                  ></v-icon>
-                </v-col>
-                <v-col cols="10">
-                  <span>
-                    {{
-                      personStore.currentPerson?.person.isLocked ? t('person.userIsLocked') : t('person.userIsUnlocked')
-                    }}
-                  </span>
-                </v-col>
-              </v-row>
-              <v-row
-                class="mt-0"
-                v-for="{ key, attribute } of getLockInfo"
-                :key="key"
-                cols="10"
-              >
-                <v-col
-                  class="text-right"
-                  cols="4"
-                >
-                  <span class="subtitle-2"> {{ key }}: </span>
-                </v-col>
-                <v-col cols="5">
-                  <span class="text-body">
-                    {{ attribute }}
-                  </span>
-                </v-col>
-              </v-row>
+                  <v-col
+                    class="text-right"
+                    cols="4"
+                  >
+                    <span class="subtitle-2"> {{ key }}: </span>
+                  </v-col>
+                  <v-col
+                    cols="5"
+                    class="ellipsis-wrapper"
+                  >
+                    <span
+                      class="text-body"
+                      :title="attribute.length > 30 ? attribute : ''"
+                    >
+                      {{ attribute }}
+                    </span>
+                  </v-col>
+                </v-row>
+              </template>
+              <template v-else-if="personStore.loading">
+                <v-col> <v-progress-circular indeterminate></v-progress-circular></v-col>
+              </template>
             </v-col>
             <v-col
               class="mr-lg-13"
