@@ -1507,10 +1507,49 @@
           v-if="authStore.currentUser?.personId !== personStore.currentPerson?.person.id"
         >
           <v-row class="ml-md-16">
-            <v-col>
+            <v-col
+              v-if="!personStore.loading"
+              data-testid="person-lock-info"
+            >
               <h3 class="subtitle-1">{{ $t('admin.person.status') }}</h3>
+              <v-row class="mt-4 text-body">
+                <v-col
+                  class="text-right"
+                  cols="1"
+                >
+                  <v-icon
+                    v-if="personStore.currentPerson?.person.isLocked"
+                    icon="mdi-lock"
+                    color="red"
+                  ></v-icon>
+                </v-col>
+                <v-col cols="10">
+                  <span>
+                    {{
+                      personStore.currentPerson?.person.isLocked ? t('person.userIsLocked') : t('person.userIsUnlocked')
+                    }}
+                  </span>
+                </v-col>
+              </v-row>
+              <v-row
+                class="mt-0"
+                v-for="{ key, attribute } of getLockInfo"
+                :key="key"
+                cols="10"
+              >
+                <v-col
+                  class="text-right"
+                  cols="4"
+                >
+                  <span class="subtitle-2"> {{ key }}: </span>
+                </v-col>
+                <v-col cols="5">
+                  <span class="text-body">
+                    {{ attribute }}
+                  </span>
+                </v-col>
+              </v-row>
             </v-col>
-            <v-spacer></v-spacer>
             <v-col
               class="mr-lg-13"
               cols="12"
@@ -1526,42 +1565,19 @@
                 >
                 </PersonLock>
               </div>
-              <div
-                class="d-flex justify-sm-end"
-                v-if="authStore.hasPersonenLoeschenPermission"
-              >
-                <PersonDelete
-                  :disabled="isEditActive"
-                  :errorCode="personStore.errorCode"
-                  :person="personStore.currentPerson"
-                  @onDeletePerson="deletePerson(currentPersonId)"
-                >
-                </PersonDelete>
+              <div class="d-flex justify-sm-end">
+                <template v-if="authStore.hasPersonenLoeschenPermission">
+                  <PersonDelete
+                    :disabled="isEditActive"
+                    :errorCode="personStore.errorCode"
+                    :person="personStore.currentPerson"
+                    @onDeletePerson="deletePerson(currentPersonId)"
+                  >
+                  </PersonDelete>
+                </template>
               </div>
             </v-col>
             <v-col v-else-if="personStore.loading"> <v-progress-circular indeterminate></v-progress-circular></v-col>
-          </v-row>
-          <v-row
-            class="ml-md-3 mt-md-n8"
-            v-if="!personStore.loading"
-            data-testid="person-lock-info"
-          >
-            <v-col
-              cols="10"
-              offset="1"
-            >
-              <span class="text-body">
-                {{ personStore.currentPerson?.person.isLocked ? t('person.userIsLocked') : t('person.userIsUnlocked') }}
-              </span>
-            </v-col>
-            <v-col
-              cols="10"
-              offset="1"
-              v-for="{ key, attribute } of getLockInfo"
-              :key="key"
-            >
-              <span class="text-body"> {{ key }}: {{ attribute }} </span>
-            </v-col>
           </v-row>
         </v-container>
       </template>
