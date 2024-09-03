@@ -176,10 +176,9 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
           return;
         }
         const bodyParams: PersonenuebersichtBodyParams = {
-          personIds: personIds
-        }
+          personIds: personIds,
+        };
         const { data: uebersichten }: { data: DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response } =
-
           await personenuebersichtApi.dBiamPersonenuebersichtControllerFindPersonenuebersichten(bodyParams);
         const allUebersichten: DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response = uebersichten;
 
