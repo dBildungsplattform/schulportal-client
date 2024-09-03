@@ -12,9 +12,10 @@
   };
 
   import { usePersonInfoStore, type PersonInfoStore, type PersonInfoResponse } from '@/stores/PersonInfoStore';
-  import { usePersonenkontextStore, type Zuordnung, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
+  import { type Zuordnung } from '@/stores/PersonenkontextStore';
   import { OrganisationsTyp } from '@/stores/OrganisationStore';
   import { type RouteLocationNormalizedLoaded, type Router, useRoute, useRouter } from 'vue-router';
+  import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
 
   const route: RouteLocationNormalizedLoaded = useRoute();
   const router: Router = useRouter();
@@ -28,12 +29,13 @@
   };
 
   let personInfoStore: PersonInfoStore = usePersonInfoStore();
-  let personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
+  let personStore: PersonStore = usePersonStore();
   const personalData: Ref = ref<LabelValue[]>([]);
   const schulDaten: Ref = ref<SchulDaten[]>([]);
 
   function handleGoToPreviousPage(): void {
-    window.history.back();
+    const previousUrl: string | null = sessionStorage.getItem('previousUrl');
+    router.push(previousUrl ?? '/start');
   }
 
   const windowOrigin: string = window.location.origin;
@@ -150,9 +152,9 @@
 
   async function initializeStores(): Promise<void> {
     personInfoStore = usePersonInfoStore();
-    personenkontextStore = usePersonenkontextStore();
+    personStore = usePersonStore();
     await personInfoStore.initPersonInfo();
-    await personenkontextStore.getPersonenuebersichtById(personInfoStore.personInfo?.person.id ?? '');
+    await personStore.getPersonenuebersichtById(personInfoStore.personInfo?.person.id ?? '');
   }
 
   function setupPersonalData(): void {
@@ -185,8 +187,8 @@
   }
 
   function setupSchuleData(): void {
-    if (!personenkontextStore.personenuebersicht) return;
-    const personenZuordnungen: Zuordnung[] = personenkontextStore.personenuebersicht.zuordnungen;
+    if (!personStore.personenuebersicht) return;
+    const personenZuordnungen: Zuordnung[] = personStore.personenuebersicht.zuordnungen;
     const groupedZuordnungen: Map<string, Zuordnung[]> = groupZuordnungen(
       personenZuordnungen.map(
         (z: Zuordnung) =>
