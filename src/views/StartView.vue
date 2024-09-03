@@ -49,6 +49,7 @@
         provider.logoUrl = logoUrl;
       }
     }
+    sessionStorage.setItem('previousUrl', window.location.pathname + window.location.search);
   });
 </script>
 

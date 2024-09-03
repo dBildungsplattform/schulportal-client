@@ -2,16 +2,16 @@ import { expect, test, beforeEach, describe } from 'vitest';
 import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
 import ProfileView from './ProfileView.vue';
 import { usePersonInfoStore, type PersonInfoResponse, type PersonInfoStore } from '@/stores/PersonInfoStore';
-import { usePersonenkontextStore, type PersonenkontextStore, type Uebersicht } from '@/stores/PersonenkontextStore';
 import { nextTick } from 'vue';
 import { OrganisationsTyp } from '@/stores/OrganisationStore';
 import { createRouter, createMemoryHistory, type Router } from 'vue-router';
 import { useRoute } from 'vue-router';
 import type { RollenMerkmal } from '@/stores/RolleStore';
+import { usePersonStore, type PersonStore, type PersonWithUebersicht } from '@/stores/PersonStore';
 
 let wrapper: VueWrapper | null = null;
 let personInfoStore: PersonInfoStore;
-let personenkontextStore: PersonenkontextStore;
+let personStore: PersonStore;
 let router: Router;
 
 const mockPersonInfo: PersonInfoResponse = {
@@ -44,7 +44,7 @@ const mockPersonInfo: PersonInfoResponse = {
   gruppen: [],
 };
 
-const mockUebersicht: Uebersicht = {
+const mockUebersicht: PersonWithUebersicht = {
   personId: '1234',
   vorname: 'Samuel',
   nachname: 'Vimes',
@@ -75,10 +75,10 @@ beforeEach(async () => {
   `;
 
   personInfoStore = usePersonInfoStore();
-  personenkontextStore = usePersonenkontextStore();
+  personStore = usePersonStore();
 
   personInfoStore.personInfo = mockPersonInfo;
-  personenkontextStore.personenuebersicht = mockUebersicht;
+  personStore.personenuebersicht = mockUebersicht;
 
   router = createRouter({
     history: createMemoryHistory(),
