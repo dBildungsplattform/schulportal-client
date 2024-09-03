@@ -5,8 +5,8 @@
     type CreatedPersonenkontext,
     type PersonStore,
   } from '@/stores/PersonStore';
-  import { RollenArt } from '@/stores/RolleStore';
-  import { type ComputedRef, computed, onMounted, onUnmounted, type Ref, ref } from 'vue';
+  import { RollenArt, RollenMerkmal } from '@/stores/RolleStore';
+  import { type ComputedRef, computed, onMounted, onUnmounted, type Ref, ref, watch } from 'vue';
   import {
     onBeforeRouteLeave,
     type Router,
@@ -33,7 +33,7 @@
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
   import { DIN_91379A, NO_LEADING_TRAILING_SPACES } from '@/utils/validation';
   import { useOrganisationen } from '@/composables/useOrganisationen';
-  import { useRollen } from '@/composables/useRollen';
+  import { useRollen, type TranslatedRolleWithAttrs } from '@/composables/useRollen';
   import { useKlassen } from '@/composables/useKlassen';
   import PersonenkontextCreate from '@/components/admin/personen/PersonenkontextCreate.vue';
   import { type TranslatedObject } from '@/types.d';
@@ -47,21 +47,24 @@
   let blockedNext: () => void = () => {};
 
   const canCommit: Ref<boolean> = ref(false);
+  const hasNoKopersNr: Ref<boolean> = ref(false);
+  const showNoKopersNrConfirmationDialog: Ref<boolean> = ref(false);
 
-  type RolleWithRollenart = {
-    value: string;
-    title: string;
-    Rollenart: RollenArt;
-  };
+  const rollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = useRollen();
 
-  const rollen: ComputedRef<RolleWithRollenart[] | undefined> = useRollen();
+  function isKopersRolle(selectedRolleId: string | undefined): boolean {
+    const rolle: TranslatedRolleWithAttrs | undefined = rollen.value?.find(
+      (r: TranslatedRolleWithAttrs) => r.value === selectedRolleId,
+    );
+    return !!rolle && !!rolle.merkmale && rolle.merkmale.has(RollenMerkmal.KopersPflicht);
+  }
 
   // Define a method to check if the selected Rolle is of type "Lern"
   function isLernRolle(selectedRolleId: string): boolean {
-    const rolle: RolleWithRollenart | undefined = rollen.value?.find(
-      (r: RolleWithRollenart) => r.value === selectedRolleId,
+    const rolle: TranslatedRolleWithAttrs | undefined = rollen.value?.find(
+      (r: TranslatedRolleWithAttrs) => r.value === selectedRolleId,
     );
-    return !!rolle && rolle.Rollenart === RollenArt.Lern;
+    return !!rolle && rolle.rollenart === RollenArt.Lern;
   }
 
   const validationSchema: TypedSchema = toTypedSchema(
@@ -83,6 +86,11 @@
         then: (schema: StringSchema<string | undefined, AnyObject, undefined, ''>) =>
           schema.required(t('admin.klasse.rules.klasse.required')),
       }),
+      selectedKopersNr: string().when('selectedRolle', {
+        is: (selectedRolleId: string) => isKopersRolle(selectedRolleId) && !hasNoKopersNr.value,
+        then: (schema: StringSchema<string | undefined, AnyObject, undefined, ''>) =>
+          schema.required(t('admin.person.rules.kopersNr.required')),
+      }),
     }),
   );
 
@@ -101,6 +109,7 @@
     selectedFamilienname: string;
     selectedOrganisation: string;
     selectedKlasse: string;
+    selectedKopersNr: string;
   };
 
   // eslint-disable-next-line @typescript-eslint/typedef
@@ -112,6 +121,10 @@
     Ref<string | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedRolle', vuetifyConfig);
+  const [selectedKopersNr, selectedKopersNrProps]: [
+    Ref<string | undefined>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = defineField('selectedKopersNr', vuetifyConfig);
   const [selectedVorname, selectedVornameProps]: [
     Ref<string>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
@@ -165,6 +178,7 @@
       isFieldDirty('selectedOrganisation') ||
       isFieldDirty('selectedRolle') ||
       isFieldDirty('selectedKlasse') ||
+      isFieldDirty('selectedKopersNr') ||
       isFieldDirty('selectedVorname') ||
       isFieldDirty('selectedFamilienname')
     );
@@ -188,6 +202,7 @@
     const bodyParams: CreatePersonBodyParams = {
       familienname: selectedFamilienname.value as string,
       vorname: selectedVorname.value as string,
+      personalnummer: selectedKopersNr.value,
       organisationId: selectedOrganisation.value as string,
       rolleId: selectedRolle.value ?? '',
     };
@@ -208,8 +223,15 @@
           });
       }
       resetForm();
+      hasNoKopersNr.value = false;
     }
   }
+
+  watch(hasNoKopersNr, async (newValue: boolean) => {
+    if (newValue) {
+      showNoKopersNrConfirmationDialog.value = true;
+    }
+  });
 
   const onSubmit: (e?: Event | undefined) => Promise<void | undefined> = handleSubmit(() => {
     createPerson();
@@ -218,12 +240,14 @@
   async function navigateBackToPersonForm(): Promise<void> {
     await router.push({ name: 'create-person' });
     personStore.errorCode = '';
+    personenkontextStore.errorCode = '';
   }
 
   const handleCreateAnotherPerson = (): void => {
     personenkontextStore.createdPersonWithKontext = null;
     personenkontextStore.createdPersonenkontextForKlasse = null;
     resetForm();
+    hasNoKopersNr.value = false;
     router.push({ name: 'create-person' });
   };
 
@@ -248,7 +272,7 @@
   });
 
   onMounted(async () => {
-    await personenkontextStore.processWorkflowStep();
+    await personenkontextStore.processWorkflowStep({ limit: 25 });
     personStore.errorCode = '';
     personenkontextStore.createdPersonWithKontext = null;
     personenkontextStore.createdPersonenkontextForKlasse = null;
@@ -270,20 +294,34 @@
     :padded="true"
     :showCloseText="true"
   >
-    <!-- Error Message Display -->
+    <!-- Error Message Display for error messages from the personStore -->
     <SpshAlert
       :model-value="!!personStore.errorCode"
       :title="$t('admin.person.creationErrorTitle')"
       :type="'error'"
       :closable="false"
       :showButton="true"
-      :buttonText="$t('admin.backToForm')"
+      :buttonText="$t('admin.person.backToCreatePerson')"
       :buttonAction="navigateBackToPersonForm"
       :text="creationErrorText"
     />
 
+    <!-- Error Message Display for error messages from the personenkontextStore -->
+    <SpshAlert
+      :model-value="!!personenkontextStore.errorCode"
+      :type="'error'"
+      :closable="false"
+      :text="t(`admin.personenkontext.errors.${personenkontextStore.errorCode}`)"
+      :showButton="true"
+      :buttonText="$t('admin.person.backToCreatePerson')"
+      :buttonAction="navigateBackToPersonForm"
+      :title="t(`admin.personenkontext.title.${personenkontextStore.errorCode}`)"
+    />
+
     <!-- The form to create a new Person  -->
-    <template v-if="!personenkontextStore.createdPersonWithKontext && !personStore.errorCode">
+    <template
+      v-if="!personenkontextStore.createdPersonWithKontext && !personStore.errorCode && !personenkontextStore.errorCode"
+    >
       <FormWrapper
         :canCommit="canCommit"
         :confirmUnsavedChangesAction="handleConfirmUnsavedChanges"
@@ -299,6 +337,7 @@
         <PersonenkontextCreate
           :showHeadline="true"
           :organisationen="organisationen"
+          ref="personenkontext-create"
           :rollen="rollen"
           :klassen="klassen"
           :selectedOrganisationProps="selectedOrganisationProps"
@@ -337,6 +376,7 @@
               v-model="selectedVorname"
             ></v-text-field>
           </FormRow>
+
           <!-- Nachname -->
           <FormRow
             :errorLabel="selectedFamiliennameProps['error']"
@@ -357,12 +397,57 @@
               v-model="selectedFamilienname"
             ></v-text-field>
           </FormRow>
+
+          <!-- No KoPers.-Nr. available checkbox
+              We don't use the form row here to avoid margins and paddings -->
+          <v-row
+            class="align-center"
+            v-if="isKopersRolle(selectedRolle) && selectedOrganisation"
+          >
+            <v-col
+              class="py-0 pb-sm-8 pt-sm-3 text-sm-right"
+              cols="12"
+              sm="5"
+            ></v-col>
+            <v-checkbox
+              data-testid="has-no-kopersnr-checkbox"
+              :disabled="!!selectedKopersNr"
+              hide-details
+              :label="$t('admin.person.noKopersNr')"
+              v-model="hasNoKopersNr"
+            ></v-checkbox>
+          </v-row>
+
+          <!-- KoPers.-Nr. -->
+          <FormRow
+            v-if="isKopersRolle(selectedRolle) && selectedOrganisation && !hasNoKopersNr"
+            :errorLabel="selectedKopersNrProps?.error || ''"
+            :isRequired="!hasNoKopersNr"
+            :label="$t('person.kopersNr')"
+            labelForId="kopersnr-input"
+            :noTopMargin="true"
+          >
+            <v-text-field
+              clearable
+              data-testid="kopersnr-input"
+              density="compact"
+              id="kopersnr-input"
+              ref="kopersnr-input"
+              :placeholder="$t('person.enterKopersNr')"
+              :required="!hasNoKopersNr"
+              variant="outlined"
+              v-bind="selectedKopersNrProps"
+              v-model="selectedKopersNr"
+            ></v-text-field>
+          </FormRow>
         </div>
       </FormWrapper>
     </template>
 
     <!-- Result template on success after submit  -->
-    <template v-if="personenkontextStore.createdPersonWithKontext && !personStore.errorCode">
+    <template
+      v-if="personenkontextStore.createdPersonWithKontext && !personStore.errorCode && !personenkontextStore.errorCode"
+    >
       <v-container>
         <v-row justify="center">
           <v-col
@@ -411,6 +496,21 @@
           <v-col class="text-body"
             ><span data-testid="created-person-familienname">{{
               personenkontextStore.createdPersonWithKontext.person.name.familienname
+            }}</span></v-col
+          >
+        </v-row>
+        <v-row v-if="isKopersRolle(personenkontextStore.createdPersonWithKontext.DBiamPersonenkontextResponse.rolleId)">
+          <v-col
+            :class="`${isKopersRolle(personenkontextStore.createdPersonWithKontext.DBiamPersonenkontextResponse.rolleId) && personenkontextStore.createdPersonWithKontext.person.personalnummer ? 'text-body bold text-right' : 'text-body bold text-right text-red'}`"
+          >
+            {{ $t('person.kopersNr') }}:
+          </v-col>
+          <v-col
+            :class="`${isKopersRolle(personenkontextStore.createdPersonWithKontext.DBiamPersonenkontextResponse.rolleId) && personenkontextStore.createdPersonWithKontext.person.personalnummer ? 'text-body' : 'text-body text-red'}`"
+            ><span data-testid="created-person-kopersNr">{{
+              personenkontextStore.createdPersonWithKontext.person.personalnummer
+                ? personenkontextStore.createdPersonWithKontext.person.personalnummer
+                : $t('missing')
             }}</span></v-col
           >
         </v-row>
@@ -488,6 +588,67 @@
       </v-container>
     </template>
   </LayoutCard>
+
+  <v-dialog
+    v-model="showNoKopersNrConfirmationDialog"
+    persistent
+  >
+    <LayoutCard
+      v-if="showNoKopersNrConfirmationDialog"
+      :closable="false"
+      :header="$t('admin.person.noKopersNr')"
+    >
+      <v-card-text>
+        <v-container>
+          <v-row class="text-body bold px-md-16">
+            <v-col
+              offset="1"
+              cols="10"
+            >
+              <span data-testid="no-kopersnr-confirmation-text">
+                {{ $t('admin.person.noKopersNrConfirmationDialogMessage') }}
+              </span>
+            </v-col>
+          </v-row>
+        </v-container>
+      </v-card-text>
+      <v-card-actions class="justify-center">
+        <v-row class="justify-center">
+          <v-col
+            cols="12"
+            sm="6"
+            md="4"
+          >
+            <v-btn
+              :block="mdAndDown"
+              class="secondary"
+              @click.stop="
+                showNoKopersNrConfirmationDialog = false;
+                hasNoKopersNr = false;
+              "
+              data-testid="cancel-no-kopersnr-button"
+            >
+              {{ $t('cancel') }}
+            </v-btn>
+          </v-col>
+          <v-col
+            cols="12"
+            sm="6"
+            md="4"
+          >
+            <v-btn
+              :block="mdAndDown"
+              class="primary"
+              @click.stop="showNoKopersNrConfirmationDialog = false"
+              data-testid="confirm-no-kopersnr-button"
+            >
+              {{ $t('proceed') }}
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-card-actions>
+    </LayoutCard>
+  </v-dialog>
 </template>
 
 <style></style>
