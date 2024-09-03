@@ -36,6 +36,9 @@
       message = !props.person.person.isLocked ? t('person.lockUserError') : t('person.unlockUserError');
     return message;
   });
+  const hasSingleSelection: ComputedRef<boolean> = computed(() => {
+    return schulen.value.length <= 1;
+  });
 
   function closeLockPersonDialog(isActive: Ref<boolean>): void {
     isActive.value = false;
@@ -91,6 +94,7 @@
         cols="12"
         sm="6"
         md="auto"
+        class="pb-0"
       >
         <v-btn
           class="primary"
@@ -139,9 +143,10 @@
                   :label="$t('admin.schule.schule')"
                 >
                   <v-select
-                    clearable
-                    :disabled="!(schulen.length > 1)"
-                    :class="[{ selected: selectedSchule }]"
+                    :clearable="!hasSingleSelection"
+                    :disabled="hasSingleSelection"
+                    :hide-details="hasSingleSelection"
+                    :class="[{ 'filter-dropdown mb-4': hasSingleSelection }, { selected: selectedSchule }]"
                     data-testid="schule-select"
                     density="compact"
                     id="schule-select"
