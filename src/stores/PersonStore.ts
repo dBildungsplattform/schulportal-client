@@ -81,12 +81,6 @@ export type PersonTableItem = {
 export type CreatePersonBodyParams = DbiamCreatePersonWithContextBodyParams;
 export type CreatedPersonenkontext = DbiamPersonenkontextBodyParams;
 
-export type CreatedPersonenkontextKlasse = {
-  personId: string;
-  organisationId: string;
-  rolleId: string;
-};
-
 export type Personendatensatz = {
   person: Person;
 };
@@ -182,10 +176,9 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
           return;
         }
         const bodyParams: PersonenuebersichtBodyParams = {
-          personIds: personIds
-        }
+          personIds: personIds,
+        };
         const { data: uebersichten }: { data: DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response } =
-
           await personenuebersichtApi.dBiamPersonenuebersichtControllerFindPersonenuebersichten(bodyParams);
         const allUebersichten: DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response = uebersichten;
 

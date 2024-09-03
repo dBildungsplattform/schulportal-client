@@ -18,4 +18,4 @@ export const NO_LEADING_TRAILING_SPACES: RegExp = /^(?! ).*(?<! )$/;
 /**
  * Date Format für Befristung
  */
-export const DDMMYYYY_REGEX: RegExp = /^(0[1-9]|[12][0-9]|3[01])\.(0[1-9]|1[0-2])\.(19|20)\d{2}$/;
+export const DDMMYYYY: RegExp = /^(0[1-9]|[12][0-9]|3[01])\.(0[1-9]|1[0-2])\.(19|20)\d{2}$/;

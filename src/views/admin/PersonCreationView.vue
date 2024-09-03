@@ -31,7 +31,7 @@
   import { useDisplay } from 'vuetify';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
-  import { DDMMYYYY_REGEX, DIN_91379A, NO_LEADING_TRAILING_SPACES } from '@/utils/validation';
+  import { DDMMYYYY, DIN_91379A, NO_LEADING_TRAILING_SPACES } from '@/utils/validation';
   import { useOrganisationen } from '@/composables/useOrganisationen';
   import { useRollen, type TranslatedRolleWithAttrs } from '@/composables/useRollen';
   import { useKlassen } from '@/composables/useKlassen';
@@ -75,7 +75,7 @@
     return !!rolle && rolle.rollenart === RollenArt.Lern;
   }
 
-  // Checks if the selected Rolle is Befristungspflicht
+  // Checks if the selected Rolle has Befristungspflicht
   function isBefristungspflichtRolle(selectedRolleId: string | undefined): boolean {
     const rolle: TranslatedRolleWithAttrs | undefined = rollen.value?.find(
       (r: TranslatedRolleWithAttrs) => r.value === selectedRolleId,
@@ -117,7 +117,7 @@
           schema.required(t('admin.person.rules.kopersNr.required')),
       }),
       selectedBefristung: string()
-        .matches(DDMMYYYY_REGEX, t('admin.befristung.rules.format'))
+        .matches(DDMMYYYY, t('admin.befristung.rules.format'))
         .test('notInPast', t('admin.befristung.rules.pastDateNotAllowed'), notInPast)
         .when(['selectedRolle', 'selectedBefristungOption'], {
           is: (selectedRolleId: string, selectedBefristungOption: string | undefined) =>
@@ -221,7 +221,7 @@
       personenkontextStore.createdPersonWithKontext?.DBiamPersonenkontextResponse.befristung;
 
     if (!ISOFormattedDate) {
-      return t('admin.befristung.unlimited');
+      return t('admin.befristung.unlimitedSuccessTemplate');
     }
 
     // Parse the UTC date
@@ -273,12 +273,11 @@
     function formatDateToISO(date: string | undefined): string | undefined {
       if (date) {
         // Split the date by '.' to extract day, month, and year
-        // eslint-disable-next-line @typescript-eslint/typedef
-        const [day, month, year] = date.split('.').map(Number);
+        const [day, month, year]: (number | undefined)[] = date.split('.').map(Number);
 
         if (day && month && year) {
           // Create a new Date object with the extracted parts
-          // Alwyays adding 1 day to the date because for example if the Befristung is chosen as 20.05.2024 then it should be guilty until 20.05.2024 23:59
+          // Alwyays adding 1 day to the date because for example if the Befristung is chosen as 20.05.2024 then it should be valid until 20.05.2024 23:59
           // Also the UTC ISO formatted send date will be 20-05-2024 22H which is basically 21.05.2024 in german summer time.
           const d: Date = new Date(year, month - 1, day + 1);
 
@@ -355,7 +354,7 @@
 
   // Calculates the next 31st of July (End of school year)
   // Time here is in german iso format but will later be converted to UCT
-  function getNextJuly31st(): string {
+  function getNextSchuljahresende(): string {
     const today: Date = new Date();
     const currentYear: number = today.getFullYear();
     const july31stThisYear: Date = new Date(currentYear, 6, 31); // July is month 6 (0-indexed)
@@ -374,7 +373,7 @@
   function handleBefristungOptionChange(value: string | undefined): void {
     switch (value) {
       case BefristungOption.SCHULJAHRESENDE: {
-        calculatedBefristung.value = getNextJuly31st();
+        calculatedBefristung.value = getNextSchuljahresende();
         resetField('selectedBefristung'); // Reset the date picker
         break;
       }
@@ -402,7 +401,7 @@
     (newValue: string | undefined) => {
       if (isBefristungspflichtRolle(newValue)) {
         selectedBefristungOption.value = BefristungOption.SCHULJAHRESENDE;
-        calculatedBefristung.value = getNextJuly31st();
+        calculatedBefristung.value = getNextSchuljahresende();
       } else {
         selectedBefristungOption.value = BefristungOption.UNBEFRISTET;
         calculatedBefristung.value = undefined;
@@ -649,6 +648,7 @@
                   :color="'primary'"
                 ></v-radio>
                 <SpshTooltip
+                  v-if="isUnbefristetButtonDisabled"
                   :enabledCondition="!isUnbefristetButtonDisabled"
                   :disabledText="$t('admin.befristung.unlimitedInactive')"
                   position="start"
@@ -660,6 +660,13 @@
                     :disabled="isUnbefristetButtonDisabled"
                   ></v-radio>
                 </SpshTooltip>
+                <v-radio
+                  v-else
+                  :label="$t('admin.befristung.unlimited')"
+                  :value="BefristungOption.UNBEFRISTET"
+                  :color="'primary'"
+                  :disabled="isUnbefristetButtonDisabled"
+                ></v-radio>
               </v-radio-group>
             </v-col>
           </v-row>

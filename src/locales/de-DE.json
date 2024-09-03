@@ -13,12 +13,13 @@
       "befristung": "Befristung",
       "rules": {
         "required": "Die Befristung muss eingegeben werden.",
-        "format": "Die eingegebene Befristung hat nicht das richtige Format DD.MM.JJJJ.",
-        "pastDateNotAllowed": "Datum in der Vergangenheit ist nicht erlaubt."
+        "format": "Die Befristung muss im Format DD.MM.JJJJ. eingegeben werden.",
+        "pastDateNotAllowed": "Das eingegebene Datum darf nicht in der Vergangenheit liegen."
       },
       "selectBefristung": "Befristung auswählen",
       "unlimited": "Unbefristet",
-      "unlimitedInactive": "Diese Option kann nicht ausgewählt werden, weil die Rolle Befristungspflicht ist.",
+      "unlimitedSuccessTemplate": "unbefristet",
+      "unlimitedInactive": "Diese Option kann für Rollen mit Befristungspflicht nicht ausgewählt werden.",
       "untilEndOfSchoolYear": "Bis Schuljahresende"
     },
     "mandatoryFieldsNotice": "Mit * markierte Felder sind Pflichtangaben.",
