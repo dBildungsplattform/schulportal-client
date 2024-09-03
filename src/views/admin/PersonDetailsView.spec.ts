@@ -3,7 +3,12 @@ import { VueWrapper, /* mount */ shallowMount } from '@vue/test-utils';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import routes from '@/router/routes';
 import PersonDetailsView from './PersonDetailsView.vue';
-import { type Personendatensatz, type PersonStore, type PersonWithUebersicht, usePersonStore } from '@/stores/PersonStore';
+import {
+  type Personendatensatz,
+  type PersonStore,
+  type PersonWithUebersicht,
+  usePersonStore,
+} from '@/stores/PersonStore';
 import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
 import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
 import { RollenMerkmal, RollenSystemRecht } from '@/stores/RolleStore';
