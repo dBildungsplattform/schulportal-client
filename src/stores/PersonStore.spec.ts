@@ -514,14 +514,10 @@ describe('PersonStore', () => {
       mockadapter.onPut(`/api/personen/${mockPerson.person.id}/lock-user`).replyOnce(200, mockResponse);
       mockadapter.onGet(`/api/personen/${mockPerson.person.id}`).replyOnce(200, mockPerson);
 
-      const lockPersonPromise: Promise<PersonLockResponse> = personStore.lockPerson(
-        mockPerson.person.id,
-        lock,
-        lockedFrom,
-      );
+      const lockPersonPromise: Promise<void> = personStore.lockPerson(mockPerson.person.id, lock, lockedFrom);
       expect(personStore.loading).toBe(true);
-      const response: PersonLockResponse = await lockPersonPromise;
-      expect(mockResponse).toEqual(response);
+      expect(lockPersonPromise).resolves.toBeUndefined();
+      await lockPersonPromise;
       expect(personStore.loading).toBe(false);
     });
 
@@ -531,7 +527,7 @@ describe('PersonStore', () => {
       const lockedFrom: string = 'admin';
 
       mockadapter.onPut(`/api/personen/${personId}/lock-user`).replyOnce(500, 'some mock server error');
-      const lockPersonPromise: Promise<PersonLockResponse> = personStore.lockPerson(personId, lock, lockedFrom);
+      const lockPersonPromise: Promise<void> = personStore.lockPerson(personId, lock, lockedFrom);
       expect(personStore.loading).toBe(true);
       await rejects(lockPersonPromise);
       expect(personStore.errorCode).toEqual('UNSPECIFIED_ERROR');
@@ -544,7 +540,7 @@ describe('PersonStore', () => {
       const lockedFrom: string = 'admin';
 
       mockadapter.onPut(`/api/personen/${personId}/lock-user`).replyOnce(500, { code: 'some mock server error' });
-      const lockPersonPromise: Promise<PersonLockResponse> = personStore.lockPerson(personId, lock, lockedFrom);
+      const lockPersonPromise: Promise<void> = personStore.lockPerson(personId, lock, lockedFrom);
       expect(personStore.loading).toBe(true);
       await rejects(lockPersonPromise);
       expect(personStore.errorCode).toEqual('some mock server error');
