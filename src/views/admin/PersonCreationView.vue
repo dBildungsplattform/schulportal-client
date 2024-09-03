@@ -778,7 +778,7 @@
             ><span data-testid="created-person-befristung">{{ translatedBefristung }}</span></v-col
           >
         </v-row>
-        <v-row>
+        <v-row v-if="isLernRolle(personenkontextStore.createdPersonWithKontext.DBiamPersonenkontextResponse.rolleId)">
           <v-col class="text-body bold text-right"> {{ $t('admin.klasse.klasse') }}: </v-col>
           <v-col class="text-body"
             ><span data-testid="created-person-klasse">{{
