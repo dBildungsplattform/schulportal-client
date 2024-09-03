@@ -348,7 +348,7 @@
               </v-table>
               <p
                 class="pt-4 text-center text-body-1"
-                v-if="schuleData.schoolAdmins.length > 0"
+                v-if="schuleData.schoolAdmins?.length > 0"
                 data-testid="school-admins-${index}"
               >
                 <v-icon
