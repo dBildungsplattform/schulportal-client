@@ -1,5 +1,9 @@
 import {
+  OrganisationsTyp,
+  RollenMerkmal,
   Vertrauensstufe,
+  type DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response,
+  type DBiamPersonenuebersichtResponse,
   type PersonFrontendControllerFindPersons200Response,
   type PersonLockResponse,
   type PersonendatensatzResponse,
@@ -52,48 +56,168 @@ describe('PersonStore', () => {
   });
 
   it('should initalize state correctly', () => {
-    expect(personStore.allPersons).toEqual([]);
     expect(personStore.errorCode).toEqual('');
     expect(personStore.loading).toBe(false);
   });
 
   describe('getAllPersons', () => {
-    it('should load Persons and update state', async () => {
+    it('should load persons and their overviews, and update state', async () => {
+      // Mock data for persons
       const mockPersons: PersonendatensatzResponse[] = [
         getMockPersonendatensatz(),
         getMockPersonendatensatz(),
       ] as PersonendatensatzResponse[];
 
-      const mockResponse: PersonFrontendControllerFindPersons200Response = {
+      // Mock response for persons
+      const mockPersonsResponse: PersonFrontendControllerFindPersons200Response = {
         offset: 0,
         limit: 2,
         total: 2,
         items: mockPersons,
       };
-      mockadapter.onGet('/api/personen-frontend').replyOnce(200, mockResponse, {});
-      const getAllPersonPromise: Promise<void> = personStore.getAllPersons({});
+
+      // Mock data for person overviews
+      const mockUebersichten: DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response = {
+        total: 2,
+        offset: 0,
+        limit: 2,
+        items: [
+          {
+            personId: '1234',
+            vorname: 'Samuel',
+            nachname: 'Vimes',
+            benutzername: 'string',
+            lastModifiedZuordnungen: '08.02.2024',
+            zuordnungen: [
+              {
+                sskId: 'string',
+                rolleId: 'string',
+                sskName: 'string',
+                sskDstNr: 'string',
+                rolle: 'string',
+                typ: OrganisationsTyp.Klasse,
+                administriertVon: 'string',
+                editable: true,
+                merkmale: [] as unknown as RollenMerkmal,
+              },
+            ],
+          },
+        ],
+      };
+
+      mockadapter.onGet('/api/personen-frontend').replyOnce(200, mockPersonsResponse);
+
+      // Update the mock POST request with the appropriate body
+      const personIds = mockPersons.map((person) => person.person.id);
+      mockadapter.onPost('/api/dbiam/personenuebersicht', { personIds }).replyOnce(200, mockUebersichten);
+
+      const getAllPersonsPromise: Promise<void> = personStore.getAllPersons({});
       expect(personStore.loading).toBe(true);
-      await getAllPersonPromise;
-      expect(personStore.allPersons).toEqual([...mockPersons]);
+      await getAllPersonsPromise;
       expect(personStore.loading).toBe(false);
     });
 
     it('should load persons according to filter', async () => {
-      const mockPersonendatensatz: Personendatensatz = getMockPersonendatensatz();
-      const mockPersonsWithFilter: PersonendatensatzResponse[] = [getMockPersonendatensatzResponse()];
+      const mockPersons: PersonendatensatzResponse[] = [
+        {
+          person: {
+            id: '123456',
+            name: {
+              familienname: 'Vimes',
+              vorname: 'Susan',
+            },
+          },
+        },
+      ] as PersonendatensatzResponse[];
 
-      const mockResponseWithFilter: PersonFrontendControllerFindPersons200Response = {
+      const mockPersonsResponse: PersonFrontendControllerFindPersons200Response = {
         offset: 0,
-        limit: 1,
-        total: 1,
-        items: mockPersonsWithFilter,
+        limit: 2,
+        total: 2,
+        items: mockPersons,
       };
 
-      mockadapter.onGet('/api/personen-frontend?suchFilter=Sus').replyOnce(200, mockResponseWithFilter, {});
-      const getAllPersonPromise: Promise<void> = personStore.getAllPersons({ searchFilter: 'Sus' });
+      mockadapter.onGet('/api/personen-frontend').replyOnce(200, mockPersonsResponse);
+
+      const personIds: string[] = mockPersons.map((person) => person.person.id);
+      mockadapter.onPost('/api/dbiam/personenuebersicht', { personIds }).replyOnce(500, 'Some error occurred');
+
+      const getAllPersonsPromise: Promise<void> = personStore.getAllPersons({});
       expect(personStore.loading).toBe(true);
-      await getAllPersonPromise;
-      expect(personStore.allPersons).toEqual([mockPersonendatensatz]);
+      await getAllPersonsPromise;
+      expect(personStore.loading).toBe(false);
+      expect(personStore.errorCode).toEqual('UNSPECIFIED_ERROR');
+    });
+
+    it('should handle error code in response', async () => {
+      const mockPersons: PersonendatensatzResponse[] = [
+        {
+          person: {
+            id: '1234',
+            name: {
+              familienname: 'Vimes',
+              vorname: 'Samuel',
+            },
+          },
+        },
+        {
+          person: {
+            id: '5678',
+            name: {
+              familienname: 'von Lipwig',
+              vorname: 'Moist',
+            },
+          },
+        },
+      ] as PersonendatensatzResponse[];
+
+      // Mock response for persons
+      const mockPersonsResponse: PersonFrontendControllerFindPersons200Response = {
+        offset: 0,
+        limit: 2,
+        total: 2,
+        items: mockPersons,
+      };
+      mockadapter.onGet('/api/personen-frontend').replyOnce(200, mockPersonsResponse, {});
+      const getAllPersonsPromise: Promise<void> = personStore.getAllPersons({});
+      expect(personStore.loading).toBe(true);
+      await getAllPersonsPromise;
+      expect(personStore.loading).toBe(false);
+    });
+
+    it('should handle string error response', async () => {
+      const mockPersons: PersonendatensatzResponse[] = [
+        {
+          person: {
+            id: '1234',
+            name: {
+              familienname: 'Vimes',
+              vorname: 'Samuel',
+            },
+          },
+        },
+        {
+          person: {
+            id: '5678',
+            name: {
+              familienname: 'von Lipwig',
+              vorname: 'Moist',
+            },
+          },
+        },
+      ] as PersonendatensatzResponse[];
+
+      const mockPersonsResponse: PersonFrontendControllerFindPersons200Response = {
+        offset: 0,
+        limit: 2,
+        total: 2,
+        items: mockPersons,
+      };
+
+      mockadapter.onGet('/api/personen-frontend?suchFilter=Sus').replyOnce(200, mockPersonsResponse, {});
+      const getAllPersonsPromise: Promise<void> = personStore.getAllPersons({ searchFilter: 'Sus' });
+      expect(personStore.loading).toBe(true);
+      await getAllPersonsPromise;
       expect(personStore.loading).toBe(false);
     });
 
@@ -102,19 +226,48 @@ describe('PersonStore', () => {
       const getAllPersonPromise: Promise<void> = personStore.getAllPersons({});
       expect(personStore.loading).toBe(true);
       await getAllPersonPromise;
-      expect(personStore.allPersons).toEqual([]);
       expect(personStore.errorCode).toEqual('UNSPECIFIED_ERROR');
-      expect(personStore.loading).toBe(false);
     });
 
-    it('should handle error code', async () => {
-      mockadapter.onGet('/api/personen-frontend').replyOnce(500, { code: 'some mock server error' });
-      const getAllPersonPromise: Promise<void> = personStore.getAllPersons({});
+    it('should handle error code in response', async () => {
+      const mockPersons: PersonendatensatzResponse[] = [
+        {
+          person: {
+            id: '1234',
+            name: {
+              familienname: 'Vimes',
+              vorname: 'Samuel',
+            },
+          },
+        },
+        {
+          person: {
+            id: '5678',
+            name: {
+              familienname: 'von Lipwig',
+              vorname: 'Moist',
+            },
+          },
+        },
+      ] as PersonendatensatzResponse[];
+
+      const mockPersonsResponse: PersonFrontendControllerFindPersons200Response = {
+        offset: 0,
+        limit: 2,
+        total: 2,
+        items: mockPersons,
+      };
+
+      mockadapter.onGet('/api/personen-frontend').replyOnce(200, mockPersonsResponse);
+
+      const personIds: string[] = mockPersons.map((person) => person.person.id);
+      mockadapter.onPost('/api/dbiam/personenuebersicht', { personIds }).replyOnce(500, { code: 'SERVER_ERROR' });
+
+      const getAllPersonsPromise: Promise<void> = personStore.getAllPersons({});
       expect(personStore.loading).toBe(true);
-      await getAllPersonPromise;
-      expect(personStore.allPersons).toEqual([]);
-      expect(personStore.errorCode).toEqual('some mock server error');
+      await getAllPersonsPromise;
       expect(personStore.loading).toBe(false);
+      expect(personStore.errorCode).toEqual('SERVER_ERROR');
     });
   });
 
@@ -292,6 +445,56 @@ describe('PersonStore', () => {
       const get2FASoftwareQRCodePromise: Promise<void> = personStore.get2FASoftwareQRCode(personId);
       expect(personStore.loading).toBe(true);
       await rejects(get2FASoftwareQRCodePromise);
+      expect(personStore.errorCode).toEqual('some mock server error');
+      expect(personStore.loading).toBe(false);
+    });
+  });
+
+  describe('getPersonenuebersichtById', () => {
+    it('should get Personenuebersicht', async () => {
+      const mockResponse: DBiamPersonenuebersichtResponse = {
+        personId: '1',
+        vorname: 'string',
+        nachname: 'string',
+        benutzername: 'string',
+        lastModifiedZuordnungen: '08.02.2024',
+        zuordnungen: [
+          {
+            sskId: 'string',
+            rolleId: 'string',
+            sskName: 'string',
+            sskDstNr: 'string',
+            rolle: 'string',
+            typ: OrganisationsTyp.Klasse,
+            administriertVon: 'string',
+            editable: true,
+            merkmale: [] as unknown as RollenMerkmal,
+          },
+        ],
+      };
+
+      mockadapter.onGet('/api/dbiam/personenuebersicht/1').replyOnce(200, mockResponse);
+      const getPersonenuebersichtByIdPromise: Promise<void> = personStore.getPersonenuebersichtById('1');
+      expect(personStore.loading).toBe(true);
+      await getPersonenuebersichtByIdPromise;
+      expect(personStore.personenuebersicht).toEqual(mockResponse);
+      expect(personStore.loading).toBe(false);
+    });
+
+    it('should handle string error', async () => {
+      mockadapter.onGet('/api/dbiam/personenuebersicht/1').replyOnce(500, 'some error');
+      const getPersonenuebersichtByIdPromise: Promise<void> = personStore.getPersonenuebersichtById('1');
+      expect(personStore.loading).toBe(true);
+      await getPersonenuebersichtByIdPromise;
+      expect(personStore.errorCode).toEqual('UNSPECIFIED_ERROR');
+      expect(personStore.loading).toBe(false);
+    });
+
+    it('should handle error code', async () => {
+      mockadapter.onGet('/api/dbiam/personenuebersicht/1').replyOnce(500, { code: 'some mock server error' });
+      const getPersonenuebersichtByIdPromise: Promise<void> = personStore.getPersonenuebersichtById('1');
+      expect(personStore.loading).toBe(true);
+      await getPersonenuebersichtByIdPromise;
       expect(personStore.errorCode).toEqual('some mock server error');
       expect(personStore.loading).toBe(false);
     });

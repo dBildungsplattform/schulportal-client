@@ -11,7 +11,7 @@ router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormal
   const authStore: AuthStore = useAuthStore();
 
   await authStore.initializeAuthStatus();
-
+  if (to.path != '/profile') sessionStorage.setItem('previousUrl', to.path);
   // Redirect authenticated users trying to access the login page to the start page
   if (to.path === '/' && authStore.isAuthed) {
     return { path: '/start' };
@@ -49,7 +49,6 @@ router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormal
         return { path: 'not-found' };
     }
   }
-
   return true;
 });
 
