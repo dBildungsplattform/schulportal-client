@@ -9,13 +9,8 @@
     type Organisation,
     OrganisationsTyp,
   } from '@/stores/OrganisationStore';
-  import { usePersonStore, type Person, type PersonStore, type Personendatensatz } from '@/stores/PersonStore';
-  import {
-    usePersonenkontextStore,
-    type PersonenkontextStore,
-    type Uebersicht,
-    type Zuordnung,
-  } from '@/stores/PersonenkontextStore';
+  import { usePersonStore, type PersonStore, type Personendatensatz } from '@/stores/PersonStore';
+  import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
   import { useRolleStore, type RolleStore, type RolleResponse } from '@/stores/RolleStore';
   import { type SearchFilterStore, useSearchFilterStore } from '@/stores/SearchFilterStore';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
@@ -41,18 +36,11 @@
     { title: t('person.lastName'), key: 'person.name.familienname', align: 'start' },
     { title: t('person.firstName'), key: 'person.name.vorname', align: 'start' },
     { title: t('person.userName'), key: 'person.referrer', align: 'start' },
-    { title: t('person.kopersnr'), key: 'person.personalnummer', align: 'start' },
+    { title: t('person.kopersNr'), key: 'person.personalnummer', align: 'start' },
     { title: t('person.rolle'), key: 'rollen', align: 'start' },
     { title: t('person.zuordnungen'), key: 'administrationsebenen', align: 'start' },
     { title: t('person.klasse'), key: 'klassen', align: 'start' },
   ];
-
-  type PersonenWithRolleAndZuordnung = {
-    rollen: string;
-    administrationsebenen: string;
-    klassen: string;
-    person: Person;
-  }[];
 
   const searchInputKlassen: Ref<string> = ref('');
   const searchInputRollen: Ref<string> = ref('');
@@ -110,9 +98,9 @@
 
   const statuses: Array<string> = ['Aktiv', 'Inaktiv'];
 
-  function getPaginatedPersonen(page: number): void {
+  async function getPaginatedPersonen(page: number): Promise<void> {
     searchFilterStore.personenPage = page;
-    personStore.getAllPersons({
+    await personStore.getAllPersons({
       offset: (searchFilterStore.personenPage - 1) * searchFilterStore.personenPerPage,
       limit: searchFilterStore.personenPerPage,
       organisationIDs: searchFilterStore.selectedSchulen || selectedSchulen.value,
@@ -121,14 +109,14 @@
     });
   }
 
-  function getPaginatedPersonenWithLimit(limit: number): void {
+  async function getPaginatedPersonenWithLimit(limit: number): Promise<void> {
     /* reset page to 1 if entries are equal to or less than selected limit */
     if (personStore.totalPersons <= limit) {
       searchFilterStore.personenPage = 1;
     }
 
     searchFilterStore.personenPerPage = limit;
-    personStore.getAllPersons({
+    await personStore.getAllPersons({
       offset: (searchFilterStore.personenPage - 1) * searchFilterStore.personenPerPage,
       limit: searchFilterStore.personenPerPage,
       organisationIDs: searchFilterStore.selectedSchulen || selectedSchulen.value,
@@ -206,47 +194,6 @@
     });
   }
 
-  // Maps over allPersons, finds the corresponding zuordnungen for each person by matching the personId, and then extracts and combines
-  // the rolle values into a single comma separated string. The result is merged with the original person data, adding a new role property.
-  const personenWithUebersicht: ComputedRef<PersonenWithRolleAndZuordnung> = computed(() => {
-    return personStore.allPersons.map((person: Personendatensatz) => {
-      const uebersicht: Uebersicht = personenkontextStore.allUebersichten?.items.find(
-        (ueb: Uebersicht) => ueb?.personId === person.person.id,
-      );
-      const uniqueRollen: Set<string> = new Set<string>();
-      uebersicht?.zuordnungen.forEach((zuordnung: Zuordnung) => uniqueRollen.add(zuordnung.rolle));
-      const rollenZuordnungen: string = uniqueRollen.size > 0 ? Array.from(uniqueRollen).join(', ') : '---';
-
-      // Collect unique administrationsebenen
-      const uniqueAdministrationsebenen: Set<string> = new Set<string>();
-      uebersicht?.zuordnungen
-        .filter((zuordnung: Zuordnung) => zuordnung.typ !== OrganisationsTyp.Klasse)
-        .forEach((zuordnung: Zuordnung) =>
-          uniqueAdministrationsebenen.add(zuordnung.sskDstNr ? zuordnung.sskDstNr : zuordnung.sskName),
-        );
-      const administrationsebenen: string =
-        uniqueAdministrationsebenen.size > 0 ? Array.from(uniqueAdministrationsebenen).join(', ') : '---';
-      // Check if personalnummer is null, if so, replace it with "---"
-      const personalnummer: string = person.person.personalnummer ?? '---';
-      // Check if the uebersicht has a zuordnung of type "Klasse" if no then show directly "---" without filtering or mapping
-      const klassenZuordnungen: string = uebersicht?.zuordnungen.some(
-        (zuordnung: Zuordnung) => zuordnung.typ === OrganisationsTyp.Klasse,
-      )
-        ? uebersicht.zuordnungen
-            .filter((zuordnung: Zuordnung) => zuordnung.typ === OrganisationsTyp.Klasse)
-            .map((zuordnung: Zuordnung) => (zuordnung.sskName.length ? zuordnung.sskName : '---'))
-            .join(', ')
-        : '---';
-      return {
-        ...person,
-        rollen: rollenZuordnungen,
-        administrationsebenen: administrationsebenen,
-        klassen: klassenZuordnungen,
-        person: { ...person.person, personalnummer: personalnummer },
-      };
-    });
-  });
-
   const handleSearchFilter = (filter: string): void => {
     searchFilter.value = filter;
     applySearchAndFilters();
@@ -300,7 +247,7 @@
       includeTyp: OrganisationsTyp.Klasse,
       systemrechte: ['KLASSEN_VERWALTEN'],
     });
-    await personenkontextStore.getAllPersonenuebersichten();
+    await getPaginatedPersonen(searchFilterStore.personenPage);
     await personenkontextStore.getPersonenkontextRolleWithFilter('');
 
     autoSelectSchule();
@@ -563,7 +510,7 @@
       <ResultTable
         :currentPage="searchFilterStore.personenPage"
         data-testid="person-table"
-        :items="personenWithUebersicht || []"
+        :items="personStore.personenWithUebersicht || []"
         :itemsPerPage="searchFilterStore.personenPerPage"
         :loading="personStore.loading"
         :headers="headers"

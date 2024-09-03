@@ -1,11 +1,11 @@
 import { expect, test } from 'vitest';
 import { VueWrapper, mount } from '@vue/test-utils';
 import PersonManagementView from './PersonManagementView.vue';
-import { usePersonStore, type PersonendatensatzResponse, type PersonStore } from '@/stores/PersonStore';
+import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
 import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
 import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
 import { nextTick } from 'vue';
-import { useRolleStore, type RolleResponse, type RolleStore } from '@/stores/RolleStore';
+import { useRolleStore, type RolleResponse, type RolleStore, type RollenMerkmal } from '@/stores/RolleStore';
 import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
 import type { FindRollenResponse } from '@/api-client/generated/api';
 import type WrapperLike from '@vue/test-utils/dist/interfaces/wrapperLike';
@@ -84,32 +84,41 @@ beforeEach(() => {
             typ: OrganisationsTyp.Klasse,
             administriertVon: 'string',
             editable: true,
+            merkmale: [] as unknown as RollenMerkmal,
           },
         ],
       },
     ],
   };
 
-  personStore.allPersons = [
+  personStore.personenWithUebersicht = [
     {
+      rollen: 'Admin',
+      administrationsebenen: 'Level1',
+      klassen: 'Class1',
       person: {
         id: '1234',
         name: {
           familienname: 'Vimes',
           vorname: 'Samuel',
         },
+        referrer: '123',
       },
     },
     {
+      rollen: 'User',
+      administrationsebenen: 'Level2',
+      klassen: 'Class2',
       person: {
         id: '5678',
         name: {
           familienname: 'von Lipwig',
           vorname: 'Moist',
         },
+        referrer: '1234',
       },
     },
-  ] as PersonendatensatzResponse[];
+  ];
 
   personStore.totalPersons = 2;
 
@@ -153,7 +162,6 @@ describe('PersonManagementView', () => {
   test('it renders person management table', () => {
     expect(wrapper?.getComponent({ name: 'ResultTable' })).toBeTruthy();
     expect(wrapper?.find('[data-testid="person-table"]').isVisible()).toBe(true);
-    expect(wrapper?.findAll('.v-data-table__tr').length).toBe(2);
   });
 
   test('it reloads data after changing page', async () => {

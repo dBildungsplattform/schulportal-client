@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import { ref, type Ref, onBeforeMount } from 'vue';
+  import { onBeforeMount, ref, type Ref } from 'vue';
   import { useI18n } from 'vue-i18n';
   const { t }: { t: Function } = useI18n();
   type LabelValue = {
@@ -9,12 +9,16 @@
     value: string;
   };
 
-  import { usePersonInfoStore, type PersonInfoStore, type PersonInfoResponse } from '@/stores/PersonInfoStore';
-  import { usePersonenkontextStore, type Zuordnung, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
   import { OrganisationsTyp } from '@/stores/OrganisationStore';
-  import { type RouteLocationNormalizedLoaded, type Router, useRoute, useRouter } from 'vue-router';
-  import { useServiceProviderStore, type ServiceProviderStore } from '@/stores/ServiceProviderStore';
-import type { ServiceProvider } from '@/stores/ServiceProviderStore';
+  import { usePersonInfoStore, type PersonInfoResponse, type PersonInfoStore } from '@/stores/PersonInfoStore';
+  import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
+  import { type Zuordnung } from '@/stores/PersonenkontextStore';
+  import {
+    type ServiceProvider,
+    type ServiceProviderStore,
+    useServiceProviderStore,
+  } from '@/stores/ServiceProviderStore';
+  import { useRoute, useRouter, type RouteLocationNormalizedLoaded, type Router } from 'vue-router';
 
   const route: RouteLocationNormalizedLoaded = useRoute();
   const router: Router = useRouter();
@@ -28,14 +32,15 @@ import type { ServiceProvider } from '@/stores/ServiceProviderStore';
   };
 
   let personInfoStore: PersonInfoStore = usePersonInfoStore();
-  let personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
   let serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
 
+  let personStore: PersonStore = usePersonStore();
   const personalData: Ref = ref<LabelValue[]>([]);
   const schulDaten: Ref = ref<SchulDaten[]>([]);
 
   function handleGoToPreviousPage(): void {
-    window.history.back();
+    const previousUrl: string | null = sessionStorage.getItem('previousUrl');
+    router.push(previousUrl ?? '/start');
   }
 
   const windowOrigin: string = window.location.origin;
@@ -136,11 +141,12 @@ import type { ServiceProvider } from '@/stores/ServiceProviderStore';
 
   async function initializeStores(): Promise<void> {
     personInfoStore = usePersonInfoStore();
-    personenkontextStore = usePersonenkontextStore();
     serviceProviderStore = useServiceProviderStore();
+    personStore = usePersonStore();
     await personInfoStore.initPersonInfo();
-    await personenkontextStore.getPersonenuebersichtById(personInfoStore.personInfo?.person.id ?? '');
+    await personStore.getPersonenuebersichtById(personInfoStore.personInfo?.person.id ?? '');
     await serviceProviderStore.getAvailableServiceProviders();
+    await personStore.getPersonenuebersichtById(personInfoStore.personInfo?.person.id ?? '');
   }
 
   function setupPersonalData(): void {
@@ -164,8 +170,8 @@ import type { ServiceProvider } from '@/stores/ServiceProviderStore';
   }
 
   function setupSchuleData(): void {
-    if (!personenkontextStore.personenuebersicht) return;
-    const personenZuordnungen: Zuordnung[] = personenkontextStore.personenuebersicht.zuordnungen;
+    if (!personStore.personenuebersicht) return;
+    const personenZuordnungen: Zuordnung[] = personStore.personenuebersicht.zuordnungen;
     const groupedZuordnungen: Map<string, Zuordnung[]> = groupZuordnungen(
       personenZuordnungen.map(
         (z: Zuordnung) =>
