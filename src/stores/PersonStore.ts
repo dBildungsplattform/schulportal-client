@@ -68,6 +68,7 @@ export type PersonWithUebersicht =
         typ: OrganisationsTyp;
         editable: boolean;
         merkmale: RollenMerkmal;
+        befristung: string;
       }[];
     }
   | undefined;
