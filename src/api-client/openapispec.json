@@ -2726,8 +2726,12 @@
       },
       "TokenStateResponse": {
         "type": "object",
-        "properties": { "hasToken": { "type": "boolean" }, "tokenKind": { "type": "string" } },
-        "required": ["hasToken", "tokenKind"]
+        "properties": {
+          "hasToken": { "type": "boolean" },
+          "tokenKind": { "type": "string" },
+          "serial": { "type": "string" }
+        },
+        "required": ["hasToken", "tokenKind", "serial"]
       },
       "AssignHardwareTokenBodyParams": {
         "type": "object",

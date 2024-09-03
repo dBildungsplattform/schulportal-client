@@ -2230,6 +2230,12 @@ export interface TokenStateResponse {
      * @memberof TokenStateResponse
      */
     'tokenKind': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof TokenStateResponse
+     */
+    'serial': string;
 }
 /**
  * 
