@@ -112,8 +112,8 @@
           {
             label: t('profile.schule'),
             value: zuordnung.sskName,
-            testIdLabel: 'schule-label-' + index,
-            testIdValue: 'schule-value-' + index,
+            testIdLabel: 'schule-label-' + (index + 1),
+            testIdValue: 'schule-value-' + (index + 1),
           },
         ],
       };
@@ -122,16 +122,16 @@
         tempSchulDaten.labelAndValues.push({
           label: t('profile.klasse'),
           value: zuordnung.klasse,
-          testIdLabel: 'klasse-label-' + index,
-          testIdValue: 'klasse-value-' + index,
+          testIdLabel: 'klasse-label-' + (index + 1),
+          testIdValue: 'klasse-value-' + (index + 1),
         });
       }
 
       tempSchulDaten.labelAndValues.push({
         label: t('admin.rolle.rolle'),
         value: zuordnung.rolle,
-        testIdLabel: 'rolle-label-' + index,
-        testIdValue: 'rolle-value-' + index,
+        testIdLabel: 'rolle-label-' + (index + 1),
+        testIdValue: 'rolle-value-' + (index + 1),
       });
 
       if (zuordnung.sskDstNr) {
@@ -139,8 +139,8 @@
           label: t('profile.dienstStellenNummer'),
           labelAbbr: t('profile.dienstStellenNummerAbbr'),
           value: zuordnung.sskDstNr,
-          testIdLabel: 'dienstStellenNummer-label-' + index,
-          testIdValue: 'dienstStellenNummer-value-' + index,
+          testIdLabel: 'dienststellennummer-label-' + (index + 1),
+          testIdValue: 'dienststellennummer-value-' + (index + 1),
         });
       }
 
@@ -180,8 +180,8 @@
         label: t('profile.koPersNummer'),
         labelAbbr: t('profile.koPersNummerAbbr'),
         value: personInfo.person.personalnummer,
-        testIdLabel: 'koPersNummer-label',
-        testIdValue: 'koPersNummer-value',
+        testIdLabel: 'kopersnummer-label',
+        testIdValue: 'kopersnummer-value',
       });
     }
   }
@@ -237,7 +237,7 @@
   <v-btn
     class="mt-8"
     @click="handleGoToPreviousPage()"
-    data-testid="button_ZurueckVorherigeSeite"
+    data-testid="back-to-previous-page-button"
   >
     <v-icon
       class="mr-2"
@@ -279,7 +279,7 @@
                         <span v-if="item.labelAbbr"
                           ><abbr :title="item.label"
                             ><strong :data-testid="item.testIdLabel">{{ item.labelAbbr }}:</strong></abbr
-                          >:</span
+                          ></span
                         >
                         <strong
                           :data-testid="item.testIdLabel"
@@ -318,7 +318,7 @@
       >
         <LayoutCard
           :header="$t('person.zuordnung') + ' ' + (schulDaten.length > 1 ? (index + 1).toString() : '')"
-          :headline-test-id="'zuordung-card-' + index"
+          :headline-test-id="'zuordung-card-' + (index + 1)"
         >
           <v-row class="ma-3 p-4">
             <v-col cols="12">
@@ -333,7 +333,7 @@
                         <span v-if="item.labelAbbr"
                           ><abbr :title="item.label"
                             ><strong :data-testid="item.testIdLabel">{{ item.labelAbbr }}:</strong></abbr
-                          >:</span
+                          ></span
                         >
                         <strong
                           :data-testid="item.testIdLabel"
