@@ -1,11 +1,11 @@
 <script setup lang="ts">
   import { computed, onBeforeMount, ref, type ComputedRef, type Ref } from 'vue';
   import { type Composer, useI18n } from 'vue-i18n';
-  import { type Personendatensatz } from '@/stores/PersonStore';
+  import { type Personendatensatz, usePersonStore, type PersonStore } from '@/stores/PersonStore';
   import { useDisplay } from 'vuetify';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import { usePersonenkontextStore, type PersonenkontextStore, type Zuordnung } from '@/stores/PersonenkontextStore';
   import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
+  import { type Zuordnung } from '@/stores/PersonenkontextStore';
   const { t }: Composer = useI18n({ useScope: 'global' });
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
@@ -15,7 +15,7 @@
     adminId: string;
   };
 
-  const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
+  const personStore: PersonStore = usePersonStore();
   const organisationStore: OrganisationStore = useOrganisationStore();
   const schulen: Ref<Array<{ value: string; title: string }>> = ref([]);
   const selectedSchule: Ref<string | null> = ref(null);
@@ -28,7 +28,7 @@
   const errorMessage: ComputedRef<string> = computed(() => {
     let errorCode: string = '';
     if (errorCode === '') errorCode = props.errorCode;
-    if (errorCode === '') errorCode = personenkontextStore.errorCode;
+    if (errorCode === '') errorCode = personStore.errorCode;
     if (errorCode === '') errorCode = organisationStore.errorCode;
     if (!errorCode) return '';
     let message: string = t(`errors.${errorCode}`);
@@ -55,8 +55,8 @@
   }
 
   async function getAssignedOrganisationIds(id: string): Promise<Zuordnung['sskId'][]> {
-    await personenkontextStore.getPersonenuebersichtById(id);
-    return (personenkontextStore.personenuebersicht?.zuordnungen || []).map(({ sskId }: Zuordnung) => sskId);
+    await personStore.getPersonenuebersichtById(id);
+    return (personStore.personenuebersicht?.zuordnungen || []).map(({ sskId }: Zuordnung) => sskId);
   }
 
   async function getOrganisationIntersection(): Promise<Set<Organisation>> {

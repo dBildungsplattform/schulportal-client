@@ -256,7 +256,7 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
+          this.errorCode = error.response?.data?.code || 'UNSPECIFIED_ERROR';
         }
       } finally {
         this.loading = false;

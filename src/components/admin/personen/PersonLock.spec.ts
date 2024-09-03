@@ -2,18 +2,21 @@ import { expect, test } from 'vitest';
 import { VueWrapper, mount } from '@vue/test-utils';
 import { createTestingPinia } from '@pinia/testing';
 import PersonLock from './PersonLock.vue';
-import type { Person, Personendatensatz } from '@/stores/PersonStore';
-import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
+import { usePersonStore, type Person, type Personendatensatz, type PersonStore } from '@/stores/PersonStore';
 import {
   OrganisationsTyp,
   useOrganisationStore,
   type Organisation,
   type OrganisationStore,
 } from '@/stores/OrganisationStore';
-import type { DBiamPersonenuebersichtResponse, DBiamPersonenzuordnungResponse } from '@/api-client/generated/api';
+import {
+  RollenMerkmal,
+  type DBiamPersonenuebersichtResponse,
+  type DBiamPersonenzuordnungResponse,
+} from '@/api-client/generated/api';
 
 let wrapper: VueWrapper | null = null;
-let personenkontextStore: PersonenkontextStore | null = null;
+let personStore: PersonStore | null = null;
 let organisationStore: OrganisationStore | null = null;
 
 const zuordnung: DBiamPersonenzuordnungResponse = {
@@ -25,6 +28,7 @@ const zuordnung: DBiamPersonenzuordnungResponse = {
   administriertVon: 'administriertVon',
   typ: OrganisationsTyp.Schule,
   editable: false,
+  merkmale: RollenMerkmal.KopersPflicht,
 };
 const parentOrganisation: Organisation = {
   id: zuordnung.sskId,
@@ -92,10 +96,10 @@ describe('Lock user', () => {
         plugins: [createTestingPinia()],
       },
     });
-    personenkontextStore = usePersonenkontextStore();
+    personStore = usePersonStore();
     organisationStore = useOrganisationStore();
 
-    personenkontextStore!.personenuebersicht = personenuebersicht;
+    personStore!.personenuebersicht = personenuebersicht;
     organisationStore!.parentOrganisationen = [parentOrganisation];
   });
 
