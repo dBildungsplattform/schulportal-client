@@ -926,6 +926,11 @@
                   <p v-if="twoFactorAuthentificationStore.tokenKind === 'hardware'">
                     {{ $t('admin.person.twoFactorAuthentication.hardwareTokenIsSetUp') }}
                   </p>
+                  <p v-if="twoFactorAuthentificationStore.serial">
+                    {{
+                      $t('admin.person.twoFactorAuthentication.serial') + ': ' + twoFactorAuthentificationStore.serial
+                    }}
+                  </p>
                 </div>
               </v-row>
               <v-row class="mt-4 text-body">

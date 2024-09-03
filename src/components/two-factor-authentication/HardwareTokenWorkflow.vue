@@ -229,7 +229,7 @@
   </v-container>
   <v-card-actions
     class="justify-center"
-    v-if="errorThrown"
+    v-if="errorThrown || hardwareTokenIsAssigned"
   >
     <v-row class="justify-center">
       <v-col
