@@ -108,7 +108,7 @@ describe('PersonStore', () => {
       mockadapter.onGet('/api/personen-frontend').replyOnce(200, mockPersonsResponse);
 
       // Update the mock POST request with the appropriate body
-      const personIds = mockPersons.map((person) => person.person.id);
+      const personIds: Array<string> = mockPersons.map((person: PersonendatensatzResponse) => person.person.id);
       mockadapter.onPost('/api/dbiam/personenuebersicht', { personIds }).replyOnce(200, mockUebersichten);
 
       const getAllPersonsPromise: Promise<void> = personStore.getAllPersons({});
@@ -139,7 +139,7 @@ describe('PersonStore', () => {
 
       mockadapter.onGet('/api/personen-frontend').replyOnce(200, mockPersonsResponse);
 
-      const personIds: string[] = mockPersons.map((person) => person.person.id);
+      const personIds: string[] = mockPersons.map((person: PersonendatensatzResponse) => person.person.id);
       mockadapter.onPost('/api/dbiam/personenuebersicht', { personIds }).replyOnce(500, 'Some error occurred');
 
       const getAllPersonsPromise: Promise<void> = personStore.getAllPersons({});
@@ -260,7 +260,7 @@ describe('PersonStore', () => {
 
       mockadapter.onGet('/api/personen-frontend').replyOnce(200, mockPersonsResponse);
 
-      const personIds: string[] = mockPersons.map((person) => person.person.id);
+      const personIds: string[] = mockPersons.map((person: PersonendatensatzResponse) => person.person.id);
       mockadapter.onPost('/api/dbiam/personenuebersicht', { personIds }).replyOnce(500, { code: 'SERVER_ERROR' });
 
       const getAllPersonsPromise: Promise<void> = personStore.getAllPersons({});
