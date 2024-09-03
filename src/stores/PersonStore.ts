@@ -17,7 +17,6 @@ import {
   type PersonenFrontendApiInterface,
   type PersonenuebersichtBodyParams,
   type PersonFrontendControllerFindPersons200Response,
-  type PersonLockResponse,
   type PersonResponse,
   type TokenInitBodyParams,
   type TokenStateResponse,
@@ -149,7 +148,7 @@ type PersonActions = {
   getPersonById: (personId: string) => Promise<Personendatensatz>;
   resetPassword: (personId: string) => Promise<string>;
   deletePersonById: (personId: string) => Promise<void>;
-  lockPerson: (personId: string, lock: boolean, locked_from: string) => Promise<PersonLockResponse>;
+  lockPerson: (personId: string, lock: boolean, locked_from: string) => Promise<void>;
   get2FAState: (personId: string) => Promise<void>;
   get2FASoftwareQRCode: (personId: string) => Promise<void>;
   getPersonenuebersichtById: (personId: string) => Promise<void>;
@@ -311,15 +310,14 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
         this.loading = false;
       }
     },
-    async lockPerson(personId: string, lock: boolean, locked_from: string): Promise<PersonLockResponse> {
+    async lockPerson(personId: string, lock: boolean, locked_from: string): Promise<void> {
       this.loading = true;
       try {
-        const result: AxiosResponse<PersonLockResponse> = await personenApi.personControllerLockPerson(personId, {
+        await personenApi.personControllerLockPerson(personId, {
           lock: lock,
           locked_from: locked_from,
         });
         await this.getPersonById(personId);
-        return result.data;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
