@@ -214,8 +214,12 @@ describe('PersonStore', () => {
         items: mockPersons,
       };
 
-      mockadapter.onGet('/api/personen-frontend?suchFilter=Sus').replyOnce(200, mockPersonsResponse, {});
-      const getAllPersonsPromise: Promise<void> = personStore.getAllPersons({ searchFilter: 'Sus' });
+      mockadapter.onGet('/api/personen-frontend').replyOnce(200, mockPersonsResponse);
+
+      const personIds: Array<string> = mockPersons.map((person: PersonendatensatzResponse) => person.person.id);
+      mockadapter.onPost('/api/dbiam/personenuebersicht', { personIds }).replyOnce(500, 'Some error occurred');
+
+      const getAllPersonsPromise: Promise<void> = personStore.getAllPersons({});
       expect(personStore.loading).toBe(true);
       await getAllPersonsPromise;
       expect(personStore.loading).toBe(false);
@@ -260,7 +264,7 @@ describe('PersonStore', () => {
 
       mockadapter.onGet('/api/personen-frontend').replyOnce(200, mockPersonsResponse);
 
-      const personIds: string[] = mockPersons.map((person: PersonendatensatzResponse) => person.person.id);
+      const personIds: Array<string> = mockPersons.map((person: PersonendatensatzResponse) => person.person.id);
       mockadapter.onPost('/api/dbiam/personenuebersicht', { personIds }).replyOnce(500, { code: 'SERVER_ERROR' });
 
       const getAllPersonsPromise: Promise<void> = personStore.getAllPersons({});
