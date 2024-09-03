@@ -8,17 +8,14 @@ import {
   type OrganisationStore,
 } from '@/stores/OrganisationStore';
 import {
-  mapPersonendatensatzResponseToPersonendatensatz,
   usePersonStore,
-  type Person,
   type Personendatensatz,
-  type PersonendatensatzResponse,
   type PersonStore,
   type PersonWithUebersicht,
 } from '@/stores/PersonStore';
 import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
 import { RollenMerkmal, RollenSystemRecht } from '@/stores/RolleStore';
-import { /* mount */ DOMWrapper, shallowMount, VueWrapper } from '@vue/test-utils';
+import { shallowMount, VueWrapper } from '@vue/test-utils';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import PersonDetailsView from './PersonDetailsView.vue';
 // import { nextTick, type ComputedRef, type DefineComponent } from 'vue';
