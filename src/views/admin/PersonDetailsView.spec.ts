@@ -1,7 +1,12 @@
 // import { expect, test } from 'vitest';
 import routes from '@/router/routes';
 import { useAuthStore, type AuthStore, type UserInfo } from '@/stores/AuthStore';
-import { OrganisationsTyp, useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
+import {
+  OrganisationsTyp,
+  useOrganisationStore,
+  type Organisation,
+  type OrganisationStore,
+} from '@/stores/OrganisationStore';
 import {
   usePersonStore,
   type Personendatensatz,
