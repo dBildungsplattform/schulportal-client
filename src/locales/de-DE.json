@@ -114,7 +114,8 @@
           "SERIENNUMMER_IN_VERWENDUNG": "Die eingegebene Seriennummer wird bereits aktiv verwendet. Bitte überprüfen Sie ihre Eingabe und versuchen Sie es erneut.",
           "OTP_NICHT_GUELTIG": "Ungültiger Code. Bitte versuchen Sie es erneut.",
           "HARDWARE_TOKEN_SERVICE_FEHLER": "Leider konnte ihr Hardware-Token aus technischen Gründen nicht aktiviert werden. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut. Falls das Problem bestehen bleibt, stellen Sie bitte eine Anfrage über den IQSH Helpdesk.--Link: https://www.secure-lernnetz.de/helpdesk/",
-          "UNKNOWN_ERROR": "Ein unbekannter Fehler ist aufgetreten."
+          "UNKNOWN_ERROR": "Ein unbekannter Fehler ist aufgetreten.",
+          "TOKEN_RESET_ERROR": "Leider konnten wir Ihren Token aufgrund von technischen Problemen nicht zurücksetzen. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut. Falls das Problem bestehen bleibt, stellen Sie bitte eine Anfrage über den IQSH Helpdesk.  Link: https://www.secure-lernnetz.de/helpdesk/"
         },
         "tokenResetHardwareErrorHeader": "Fehler beim Zurücksetzen des Hardware-Tokens",
         "tokenResetSoftwareErrorHeader": "Fehler beim Zurücksetzen des Software-Tokens",
@@ -480,7 +481,7 @@
       "workEmail": "Dienstliche E-Mail"
     }
   },
-  "transfer":"Versetzen",
+  "transfer": "Versetzen",
   "unsavedChanges": {
     "message": "Sie haben nicht gespeicherte Änderungen vorgenommen. Wollen Sie die Seite trotzdem verlassen?",
     "title": "Änderungen vorgenommen"

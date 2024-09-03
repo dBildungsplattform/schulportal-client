@@ -9,12 +9,15 @@
     type TwoFactorAuthentificationStore,
   } from '@/stores/TwoFactorAuthentificationStore';
   import type { Personendatensatz } from '@/stores/PersonStore';
+  import axios from 'axios';
 
   const { t }: Composer = useI18n({ useScope: 'global' });
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
-  const proceeded: Ref<boolean> = ref(false);
-  const isTokenResetSuccessful: Ref<boolean> = ref(false);
+  const isTokenResetRequested: Ref<boolean> = ref(false);
+  const errorThrown: Ref<boolean> = ref(false);
   const twoFactorAuthenticationStore: TwoFactorAuthentificationStore = useTwoFactorAuthentificationStore();
+  const dialogText: Ref<String> = ref('');
+  const dialogHeader: Ref<String> = ref(t('admin.person.twoFactorAuthentication.tokenReset'));
 
   type Emits = {
     (event: 'dialogClosed'): void;
@@ -34,63 +37,48 @@
   const props: Props = defineProps<Props>();
   async function closeTokenResetDialog(isActive: Ref<boolean>): Promise<void> {
     isActive.value = false;
-    isTokenResetSuccessful.value = false;
-    proceeded.value = false;
+    errorThrown.value = false;
+    isTokenResetRequested.value = false;
     emits('dialogClosed');
+  }
+
+  function handleApiError(error: unknown): void {
+    errorThrown.value = true;
+    if (axios.isAxiosError(error)) {
+      if (error.response && error.response.data.i18nKey) {
+        const message: string =
+          t('admin.person.twoFactorAuthentication.errors.' + error.response.data.i18nKey) ||
+          t('admin.person.twoFactorAuthentication.errors.UNKNOWN_ERROR');
+        dialogText.value = message;
+        dialogHeader.value =
+          props.tokenType === 'hardware'
+            ? t('admin.person.twoFactorAuthentication.tokenResetHardwareErrorHeader')
+            : t('admin.person.twoFactorAuthentication.tokenResetSoftwareErrorHeader');
+      } else {
+        dialogText.value = t('admin.person.twoFactorAuthentication.errors.UNKNOWN_ERROR');
+      }
+    }
+  }
+
+  function createDialogueText(): void {
+    dialogHeader.value = t('admin.person.twoFactorAuthentication.tokenReset');
+    if (props.tokenType === 'hardware') {
+      dialogText.value = t('admin.person.twoFactorAuthentication.tokenResetSuccessHardware');
+    } else {
+      dialogText.value = t('admin.person.twoFactorAuthentication.tokenResetSuccessSoftware');
+    }
   }
 
   async function tokenReset(): Promise<void> {
     try {
       await twoFactorAuthenticationStore.resetToken(props.person.person.id);
-      isTokenResetSuccessful.value = true;
+      createDialogueText();
+    } catch (error) {
+      handleApiError(error);
     } finally {
-      proceeded.value = true;
+      isTokenResetRequested.value = true;
     }
   }
-
-  type DialogContent = {
-    header: string;
-    text: string;
-  };
-
-  const defaultContent: DialogContent = {
-    header: t('admin.person.twoFactorAuthentication.tokenReset'),
-    text: '',
-  };
-  const errorHardwareContent: DialogContent = {
-    header: t('admin.person.twoFactorAuthentication.tokenResetHardwareErrorHeader'),
-    text: t('admin.person.twoFactorAuthentication.tokenResetError'),
-  };
-
-  const errorSoftwareContent: DialogContent = {
-    header: t('admin.person.twoFactorAuthentication.tokenResetSoftwareErrorHeader'),
-    text: t('admin.person.twoFactorAuthentication.tokenResetError'),
-  };
-
-  const tokenResetSoftwareContent: DialogContent = {
-    header: t('admin.person.twoFactorAuthentication.tokenReset'),
-    text: t('admin.person.twoFactorAuthentication.tokenResetSuccessSoftware'),
-  };
-
-  const tokenResetHardwareContent: DialogContent = {
-    header: t('admin.person.twoFactorAuthentication.tokenReset'),
-    text: t('admin.person.twoFactorAuthentication.tokenResetSuccessHardware'),
-  };
-
-  const createDialogueText: () => DialogContent = () => {
-    if (proceeded.value) {
-      if (!isTokenResetSuccessful.value && props.tokenType === 'hardware') {
-        return errorHardwareContent;
-      } else if (!isTokenResetSuccessful.value && props.tokenType === 'software') {
-        return errorSoftwareContent;
-      } else if (props.tokenType === 'software') {
-        return tokenResetSoftwareContent;
-      } else if (props.tokenType === 'hardware') {
-        return tokenResetHardwareContent;
-      }
-    }
-    return defaultContent;
-  };
 </script>
 <template>
   <v-dialog persistent>
@@ -122,21 +110,21 @@
     <template v-slot:default="{ isActive }">
       <LayoutCard
         :closable="true"
-        :header="createDialogueText().header"
+        :header="dialogHeader"
         @onCloseClicked="closeTokenResetDialog(isActive)"
       >
         <v-card-text>
-          <v-container v-if="!proceeded">
+          <v-container v-if="!isTokenResetRequested">
             <v-row class="text-body px-md-16">
               <v-col class="whiteSpace">
                 {{ $t('admin.person.twoFactorAuthentication.tokenResetDescription') }}
               </v-col>
             </v-row>
           </v-container>
-          <v-container v-if="proceeded">
+          <v-container v-if="isTokenResetRequested">
             <v-row class="text-body px-md-16">
               <v-col class="whiteSpace">
-                {{ createDialogueText().text }}
+                {{ dialogText }}
               </v-col>
             </v-row>
           </v-container>
@@ -144,7 +132,7 @@
         <v-card-actions class="justify-center">
           <v-row class="justify-center">
             <v-col
-              v-if="!proceeded"
+              v-if="!isTokenResetRequested"
               cols="12"
               sm="6"
               md="4"
@@ -159,7 +147,7 @@
               </v-btn>
             </v-col>
             <v-col
-              v-if="!proceeded"
+              v-if="!isTokenResetRequested"
               cols="12"
               sm="6"
               md="4"
@@ -174,7 +162,7 @@
               </v-btn>
             </v-col>
             <v-col
-              v-if="proceeded"
+              v-if="isTokenResetRequested"
               cols="12"
               sm="6"
               md="4"
