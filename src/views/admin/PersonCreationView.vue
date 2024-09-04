@@ -643,7 +643,7 @@
                 @update:modelValue="handleBefristungOptionChange"
               >
                 <v-radio
-                  :label="`${t('admin.befristung.untilEndOfSchoolYear')} ${getNextSchuljahresende()}`"
+                  :label="`${t('admin.befristung.untilEndOfSchoolYear')} (${getNextSchuljahresende()})`"
                   :value="BefristungOption.SCHULJAHRESENDE"
                   :color="'primary'"
                 ></v-radio>
