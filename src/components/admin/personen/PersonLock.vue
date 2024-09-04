@@ -188,6 +188,20 @@
             >
               <v-btn
                 :block="mdAndDown"
+                class="secondary button"
+                @click.stop="closeLockPersonDialog(isActive)"
+                data-testid="close-lock-person-dialog-button"
+              >
+                {{ !selectedSchule ? $t('close') : $t('cancel') }}
+              </v-btn>
+            </v-col>
+            <v-col
+              cols="12"
+              sm="6"
+              md="4"
+            >
+              <v-btn
+                :block="mdAndDown"
                 class="primary button"
                 :disabled="!selectedSchule"
                 @click.stop="handleOnLockUser(props.person.person.id, isActive)"
