@@ -8,17 +8,18 @@ const router: Router = createRouter({
 });
 
 router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormalized) => {
+  console.log('to', to);
   const authStore: AuthStore = useAuthStore();
 
   await authStore.initializeAuthStatus();
-  if (to.path != '/profile') sessionStorage.setItem('previousUrl', to.path);
+
   // Redirect authenticated users trying to access the login page to the start page
   if (to.path === '/' && authStore.isAuthed) {
     return { path: '/start' };
   }
 
   if (to.meta['requiresAuth'] && !authStore.isAuthed) {
-    window.location.href = `/api/auth/login?redirectUrl=${to.fullPath}`;
+    window.location.href = `/api/auth/login?redirectUrl=${to.fullPath}&stepUp=${to.meta['requiresStepUp']}`;
     return false;
   }
 
@@ -49,6 +50,7 @@ router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormal
         return { path: 'not-found' };
     }
   }
+
   return true;
 });
 

@@ -8,6 +8,7 @@ const routes: readonly RouteRecordRaw[] = [
     meta: {
       layout: 'DefaultLayout',
       requiresAuth: false,
+      requiresStepUp: false,
     },
   },
   {
@@ -17,6 +18,7 @@ const routes: readonly RouteRecordRaw[] = [
     meta: {
       layout: 'AdminLayout',
       requiresAuth: true,
+      requiresStepUp: true,
       requiresPermission: 'personenverwaltung',
     },
   },
@@ -27,6 +29,7 @@ const routes: readonly RouteRecordRaw[] = [
     meta: {
       layout: 'AdminLayout',
       requiresAuth: true,
+      requiresStepUp: true,
       requiresPermission: 'personenverwaltung',
     },
   },
@@ -37,6 +40,7 @@ const routes: readonly RouteRecordRaw[] = [
     meta: {
       layout: 'AdminLayout',
       requiresAuth: true,
+      requiresStepUp: true,
       requiresPermission: 'personenverwaltung',
     },
   },
@@ -47,6 +51,7 @@ const routes: readonly RouteRecordRaw[] = [
     meta: {
       requiresAuth: true,
       layout: 'AdminLayout',
+      requiresStepUp: true,
       requiresPermission: 'klassenverwaltung',
     },
   },
@@ -57,6 +62,7 @@ const routes: readonly RouteRecordRaw[] = [
     meta: {
       layout: 'AdminLayout',
       requiresAuth: true,
+      requiresStepUp: true,
       requiresPermission: 'klassenverwaltung',
     },
   },
@@ -67,6 +73,7 @@ const routes: readonly RouteRecordRaw[] = [
     meta: {
       layout: 'AdminLayout',
       requiresAuth: true,
+      requiresStepUp: true,
       requiresPermission: 'klassenverwaltung',
     },
   },
@@ -77,6 +84,7 @@ const routes: readonly RouteRecordRaw[] = [
     meta: {
       layout: 'AdminLayout',
       requiresAuth: true,
+      requiresStepUp: true,
       requiresPermission: 'rollenverwaltung',
     },
   },
@@ -87,6 +95,7 @@ const routes: readonly RouteRecordRaw[] = [
     meta: {
       layout: 'AdminLayout',
       requiresAuth: true,
+      requiresStepUp: true,
       requiresPermission: 'rollenverwaltung',
     },
   },
@@ -97,6 +106,7 @@ const routes: readonly RouteRecordRaw[] = [
     meta: {
       layout: 'AdminLayout',
       requiresAuth: true,
+      requiresStepUp: true,
       requiresPermission: 'rollenverwaltung',
     },
   },
@@ -107,6 +117,7 @@ const routes: readonly RouteRecordRaw[] = [
     meta: {
       layout: 'AdminLayout',
       requiresAuth: true,
+      requiresStepUp: true,
       requiresPermission: 'schulverwaltung',
     },
   },
@@ -117,6 +128,7 @@ const routes: readonly RouteRecordRaw[] = [
     meta: {
       layout: 'AdminLayout',
       requiresAuth: true,
+      requiresStepUp: true,
       requiresPermission: 'schulverwaltung',
     },
   },
@@ -127,6 +139,7 @@ const routes: readonly RouteRecordRaw[] = [
     meta: {
       layout: 'DefaultLayout',
       requiresAuth: true,
+      requiresStepUp: false,
     },
   },
   {
@@ -141,6 +154,7 @@ const routes: readonly RouteRecordRaw[] = [
     meta: {
       layout: 'DefaultLayout',
       requiresAuth: true,
+      requiresStepUp: false,
     },
   },
   {
