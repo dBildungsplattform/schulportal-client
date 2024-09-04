@@ -262,10 +262,10 @@ export interface DBiamPersonResponse {
     'person': PersonResponse;
     /**
      * 
-     * @type {DBiamPersonenkontextResponse}
+     * @type {Array<DBiamPersonenkontextResponse>}
      * @memberof DBiamPersonResponse
      */
-    'DBiamPersonenkontextResponse': DBiamPersonenkontextResponse;
+    'dBiamPersonenkontextResponses': Array<DBiamPersonenkontextResponse>;
 }
 /**
  * 
@@ -445,37 +445,50 @@ export interface DBiamPersonenzuordnungResponse {
 /**
  * 
  * @export
- * @interface DbiamCreatePersonWithContextBodyParams
+ * @interface DbiamCreatePersonWithPersonenkontexteBodyParams
  */
-export interface DbiamCreatePersonWithContextBodyParams {
+export interface DbiamCreatePersonWithPersonenkontexteBodyParams {
     /**
      * 
      * @type {string}
-     * @memberof DbiamCreatePersonWithContextBodyParams
+     * @memberof DbiamCreatePersonWithPersonenkontexteBodyParams
      */
     'familienname': string;
     /**
      * 
      * @type {string}
-     * @memberof DbiamCreatePersonWithContextBodyParams
+     * @memberof DbiamCreatePersonWithPersonenkontexteBodyParams
      */
     'vorname': string;
     /**
      * 
      * @type {string}
-     * @memberof DbiamCreatePersonWithContextBodyParams
+     * @memberof DbiamCreatePersonWithPersonenkontexteBodyParams
      */
     'personalnummer'?: string;
     /**
      * 
+     * @type {Array<DbiamCreatePersonenkontextBodyParams>}
+     * @memberof DbiamCreatePersonWithPersonenkontexteBodyParams
+     */
+    'createPersonenkontexte': Array<DbiamCreatePersonenkontextBodyParams>;
+}
+/**
+ * 
+ * @export
+ * @interface DbiamCreatePersonenkontextBodyParams
+ */
+export interface DbiamCreatePersonenkontextBodyParams {
+    /**
+     * 
      * @type {string}
-     * @memberof DbiamCreatePersonWithContextBodyParams
+     * @memberof DbiamCreatePersonenkontextBodyParams
      */
     'organisationId': string;
     /**
      * 
      * @type {string}
-     * @memberof DbiamCreatePersonWithContextBodyParams
+     * @memberof DbiamCreatePersonenkontextBodyParams
      */
     'rolleId': string;
 }
@@ -6012,13 +6025,13 @@ export const PersonenkontextApiAxiosParamCreator = function (configuration?: Con
         },
         /**
          * 
-         * @param {DbiamCreatePersonWithContextBodyParams} dbiamCreatePersonWithContextBodyParams 
+         * @param {DbiamCreatePersonWithPersonenkontexteBodyParams} dbiamCreatePersonWithPersonenkontexteBodyParams 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        dbiamPersonenkontextWorkflowControllerCreatePersonWithKontext: async (dbiamCreatePersonWithContextBodyParams: DbiamCreatePersonWithContextBodyParams, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'dbiamCreatePersonWithContextBodyParams' is not null or undefined
-            assertParamExists('dbiamPersonenkontextWorkflowControllerCreatePersonWithKontext', 'dbiamCreatePersonWithContextBodyParams', dbiamCreatePersonWithContextBodyParams)
+        dbiamPersonenkontextWorkflowControllerCreatePersonWithPersonenkontexte: async (dbiamCreatePersonWithPersonenkontexteBodyParams: DbiamCreatePersonWithPersonenkontexteBodyParams, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'dbiamCreatePersonWithPersonenkontexteBodyParams' is not null or undefined
+            assertParamExists('dbiamPersonenkontextWorkflowControllerCreatePersonWithPersonenkontexte', 'dbiamCreatePersonWithPersonenkontexteBodyParams', dbiamCreatePersonWithPersonenkontexteBodyParams)
             const localVarPath = `/api/personenkontext-workflow`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -6046,7 +6059,7 @@ export const PersonenkontextApiAxiosParamCreator = function (configuration?: Con
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(dbiamCreatePersonWithContextBodyParams, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(dbiamCreatePersonWithPersonenkontexteBodyParams, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -6192,12 +6205,12 @@ export const PersonenkontextApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
-         * @param {DbiamCreatePersonWithContextBodyParams} dbiamCreatePersonWithContextBodyParams 
+         * @param {DbiamCreatePersonWithPersonenkontexteBodyParams} dbiamCreatePersonWithPersonenkontexteBodyParams 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async dbiamPersonenkontextWorkflowControllerCreatePersonWithKontext(dbiamCreatePersonWithContextBodyParams: DbiamCreatePersonWithContextBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DBiamPersonResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.dbiamPersonenkontextWorkflowControllerCreatePersonWithKontext(dbiamCreatePersonWithContextBodyParams, options);
+        async dbiamPersonenkontextWorkflowControllerCreatePersonWithPersonenkontexte(dbiamCreatePersonWithPersonenkontexteBodyParams: DbiamCreatePersonWithPersonenkontexteBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DBiamPersonResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.dbiamPersonenkontextWorkflowControllerCreatePersonWithPersonenkontexte(dbiamCreatePersonWithPersonenkontexteBodyParams, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -6248,12 +6261,12 @@ export const PersonenkontextApiFactory = function (configuration?: Configuration
         },
         /**
          * 
-         * @param {DbiamCreatePersonWithContextBodyParams} dbiamCreatePersonWithContextBodyParams 
+         * @param {DbiamCreatePersonWithPersonenkontexteBodyParams} dbiamCreatePersonWithPersonenkontexteBodyParams 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        dbiamPersonenkontextWorkflowControllerCreatePersonWithKontext(dbiamCreatePersonWithContextBodyParams: DbiamCreatePersonWithContextBodyParams, options?: any): AxiosPromise<DBiamPersonResponse> {
-            return localVarFp.dbiamPersonenkontextWorkflowControllerCreatePersonWithKontext(dbiamCreatePersonWithContextBodyParams, options).then((request) => request(axios, basePath));
+        dbiamPersonenkontextWorkflowControllerCreatePersonWithPersonenkontexte(dbiamCreatePersonWithPersonenkontexteBodyParams: DbiamCreatePersonWithPersonenkontexteBodyParams, options?: any): AxiosPromise<DBiamPersonResponse> {
+            return localVarFp.dbiamPersonenkontextWorkflowControllerCreatePersonWithPersonenkontexte(dbiamCreatePersonWithPersonenkontexteBodyParams, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -6300,12 +6313,12 @@ export interface PersonenkontextApiInterface {
 
     /**
      * 
-     * @param {DbiamCreatePersonWithContextBodyParams} dbiamCreatePersonWithContextBodyParams 
+     * @param {DbiamCreatePersonWithPersonenkontexteBodyParams} dbiamCreatePersonWithPersonenkontexteBodyParams 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PersonenkontextApiInterface
      */
-    dbiamPersonenkontextWorkflowControllerCreatePersonWithKontext(dbiamCreatePersonWithContextBodyParams: DbiamCreatePersonWithContextBodyParams, options?: AxiosRequestConfig): AxiosPromise<DBiamPersonResponse>;
+    dbiamPersonenkontextWorkflowControllerCreatePersonWithPersonenkontexte(dbiamCreatePersonWithPersonenkontexteBodyParams: DbiamCreatePersonWithPersonenkontexteBodyParams, options?: AxiosRequestConfig): AxiosPromise<DBiamPersonResponse>;
 
     /**
      * 
@@ -6354,13 +6367,13 @@ export class PersonenkontextApi extends BaseAPI implements PersonenkontextApiInt
 
     /**
      * 
-     * @param {DbiamCreatePersonWithContextBodyParams} dbiamCreatePersonWithContextBodyParams 
+     * @param {DbiamCreatePersonWithPersonenkontexteBodyParams} dbiamCreatePersonWithPersonenkontexteBodyParams 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PersonenkontextApi
      */
-    public dbiamPersonenkontextWorkflowControllerCreatePersonWithKontext(dbiamCreatePersonWithContextBodyParams: DbiamCreatePersonWithContextBodyParams, options?: AxiosRequestConfig) {
-        return PersonenkontextApiFp(this.configuration).dbiamPersonenkontextWorkflowControllerCreatePersonWithKontext(dbiamCreatePersonWithContextBodyParams, options).then((request) => request(this.axios, this.basePath));
+    public dbiamPersonenkontextWorkflowControllerCreatePersonWithPersonenkontexte(dbiamCreatePersonWithPersonenkontexteBodyParams: DbiamCreatePersonWithPersonenkontexteBodyParams, options?: AxiosRequestConfig) {
+        return PersonenkontextApiFp(this.configuration).dbiamPersonenkontextWorkflowControllerCreatePersonWithPersonenkontexte(dbiamCreatePersonWithPersonenkontexteBodyParams, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
