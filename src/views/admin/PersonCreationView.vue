@@ -1,10 +1,5 @@
 <script setup lang="ts">
-  import {
-    usePersonStore,
-    type CreatePersonBodyParams,
-    type CreatedPersonenkontext,
-    type PersonStore,
-  } from '@/stores/PersonStore';
+  import { usePersonStore, type CreatePersonBodyParams, type PersonStore } from '@/stores/PersonStore';
   import { RollenArt, RollenMerkmal } from '@/stores/RolleStore';
   import { type ComputedRef, computed, onMounted, onUnmounted, type Ref, ref, watch } from 'vue';
   import {
@@ -23,11 +18,7 @@
   import PasswordOutput from '@/components/form/PasswordOutput.vue';
   import FormWrapper from '@/components/form/FormWrapper.vue';
   import FormRow from '@/components/form/FormRow.vue';
-  import {
-    PersonenKontextTyp,
-    usePersonenkontextStore,
-    type PersonenkontextStore,
-  } from '@/stores/PersonenkontextStore';
+  import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
   import { useDisplay } from 'vuetify';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
@@ -151,7 +142,7 @@
       organisationen.value?.find(
         (organisation: TranslatedObject) =>
           organisation.value ===
-          personenkontextStore.createdPersonWithKontext?.DBiamPersonenkontextResponse.organisationId,
+          personenkontextStore.createdPersonWithKontext?.dBiamPersonenkontextResponses[0]?.organisationId,
       )?.title || '',
   );
 
@@ -159,7 +150,7 @@
     () =>
       rollen.value?.find(
         (rolle: TranslatedObject) =>
-          rolle.value === personenkontextStore.createdPersonWithKontext?.DBiamPersonenkontextResponse.rolleId,
+          rolle.value === personenkontextStore.createdPersonWithKontext?.dBiamPersonenkontextResponses[0]?.rolleId,
       )?.title || '',
   );
 
@@ -167,7 +158,8 @@
     () =>
       klassen.value?.find(
         (klasse: TranslatedObject) =>
-          klasse.value === personenkontextStore.createdPersonenkontextForKlasse?.organisationId,
+          klasse.value ===
+          personenkontextStore.createdPersonWithKontext?.dBiamPersonenkontextResponses[1]?.organisationId,
       )?.title || '',
   );
 
@@ -203,28 +195,25 @@
       familienname: selectedFamilienname.value as string,
       vorname: selectedVorname.value as string,
       personalnummer: selectedKopersNr.value,
-      organisationId: selectedOrganisation.value as string,
-      rolleId: selectedRolle.value ?? '',
+      createPersonenkontexte: [
+        {
+          organisationId: selectedOrganisation.value as string,
+          rolleId: selectedRolle.value ?? '',
+        },
+      ],
     };
 
-    await personenkontextStore.createPersonWithKontext(bodyParams);
-    if (personenkontextStore.createdPersonWithKontext) {
-      // Build the context for the Klasse and save it only if the the Klasse was selected
-      if (selectedKlasse.value) {
-        const unpersistedKlassePersonenkontext: CreatedPersonenkontext = {
-          personId: personenkontextStore.createdPersonWithKontext.person.id,
-          organisationId: selectedKlasse.value,
-          rolleId: selectedRolle.value ?? '',
-        };
-        await personenkontextStore
-          .createPersonenkontext(unpersistedKlassePersonenkontext, PersonenKontextTyp.Klasse)
-          .catch(() => {
-            creationErrorText.value = t(`admin.personenkontext.errors.${personenkontextStore.errorCode}`);
-          });
-      }
-      resetForm();
-      hasNoKopersNr.value = false;
+    if (selectedKlasse.value) {
+      bodyParams.createPersonenkontexte.push({
+        organisationId: selectedKlasse.value,
+        rolleId: selectedRolle.value ?? '',
+      });
     }
+
+    await personenkontextStore.createPersonWithKontexte(bodyParams);
+
+    resetForm();
+    hasNoKopersNr.value = false;
   }
 
   watch(hasNoKopersNr, async (newValue: boolean) => {
@@ -499,14 +488,16 @@
             }}</span></v-col
           >
         </v-row>
-        <v-row v-if="isKopersRolle(personenkontextStore.createdPersonWithKontext.DBiamPersonenkontextResponse.rolleId)">
+        <v-row
+          v-if="isKopersRolle(personenkontextStore.createdPersonWithKontext.dBiamPersonenkontextResponses[0]?.rolleId)"
+        >
           <v-col
-            :class="`${isKopersRolle(personenkontextStore.createdPersonWithKontext.DBiamPersonenkontextResponse.rolleId) && personenkontextStore.createdPersonWithKontext.person.personalnummer ? 'text-body bold text-right' : 'text-body bold text-right text-red'}`"
+            :class="`${isKopersRolle(personenkontextStore.createdPersonWithKontext.dBiamPersonenkontextResponses[0]?.rolleId) && personenkontextStore.createdPersonWithKontext.person.personalnummer ? 'text-body bold text-right' : 'text-body bold text-right text-red'}`"
           >
             {{ $t('person.kopersNr') }}:
           </v-col>
           <v-col
-            :class="`${isKopersRolle(personenkontextStore.createdPersonWithKontext.DBiamPersonenkontextResponse.rolleId) && personenkontextStore.createdPersonWithKontext.person.personalnummer ? 'text-body' : 'text-body text-red'}`"
+            :class="`${isKopersRolle(personenkontextStore.createdPersonWithKontext.dBiamPersonenkontextResponses[0]?.rolleId) && personenkontextStore.createdPersonWithKontext.person.personalnummer ? 'text-body' : 'text-body text-red'}`"
             ><span data-testid="created-person-kopersNr">{{
               personenkontextStore.createdPersonWithKontext.person.personalnummer
                 ? personenkontextStore.createdPersonWithKontext.person.personalnummer
@@ -542,7 +533,13 @@
             ><span data-testid="created-person-organisation">{{ translatedOrganisationsname }}</span></v-col
           >
         </v-row>
-        <v-row v-if="isLernRolle(personenkontextStore.createdPersonWithKontext.DBiamPersonenkontextResponse.rolleId)">
+        <v-row
+          v-if="
+            isLernRolle(
+              personenkontextStore.createdPersonWithKontext.dBiamPersonenkontextResponses[1]?.rolleId as string,
+            )
+          "
+        >
           <v-col class="text-body bold text-right"> {{ $t('admin.klasse.klasse') }}: </v-col>
           <v-col class="text-body"
             ><span data-testid="created-person-klasse">{{

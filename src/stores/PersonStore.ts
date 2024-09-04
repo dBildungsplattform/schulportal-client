@@ -8,7 +8,7 @@ import {
   PersonenFrontendApiFactory,
   RollenMerkmal,
   type Class2FAApiInterface,
-  type DbiamCreatePersonWithContextBodyParams,
+  type DbiamCreatePersonWithPersonenkontexteBodyParams,
   type DbiamPersonenuebersichtApiInterface,
   type DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response,
   type DBiamPersonenuebersichtResponse,
@@ -78,7 +78,7 @@ export type PersonTableItem = {
   updatedAt?: string;
 };
 
-export type CreatePersonBodyParams = DbiamCreatePersonWithContextBodyParams;
+export type CreatePersonBodyParams = DbiamCreatePersonWithPersonenkontexteBodyParams;
 export type CreatedPersonenkontext = DbiamPersonenkontextBodyParams;
 
 export type Personendatensatz = {
