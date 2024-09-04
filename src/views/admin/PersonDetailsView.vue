@@ -1568,7 +1568,7 @@
                   >
                     <span
                       class="text-body"
-                      :title="attribute.length > 30 ? attribute : ''"
+                      :title="attribute"
                     >
                       {{ attribute }}
                     </span>
