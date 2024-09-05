@@ -127,8 +127,8 @@
 
   function autoSelectSchule(): void {
     // Autoselect the Schule for the current user that only has 1 Schule assigned to him.
-    if (organisationStore.allOrganisationen.length === 1) {
-      selectedSchulen.value = [organisationStore.allOrganisationen[0]?.id || ''];
+    if (organisationStore.allSchulen.length === 1) {
+      selectedSchulen.value = [organisationStore.allSchulen[0]?.id || ''];
       hasAutoselectedSchule.value = true;
     }
   }
