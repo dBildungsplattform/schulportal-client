@@ -216,12 +216,14 @@
       await organisationStore.getAllOrganisationen({
         searchString: searchValue,
         includeTyp: OrganisationsTyp.Schule,
+        limit: 25,
         systemrechte: ['KLASSEN_VERWALTEN'],
       });
     } else {
       // Fetch all Schulen when the search string is less than 3 characters
       await organisationStore.getAllOrganisationen({
         includeTyp: OrganisationsTyp.Schule,
+        limit: 25,
         systemrechte: ['KLASSEN_VERWALTEN'],
       });
     }
@@ -299,6 +301,7 @@
       // Refetch all data
       await organisationStore.getAllOrganisationen({
         includeTyp: OrganisationsTyp.Schule,
+        limit: 25,
         systemrechte: ['KLASSEN_VERWALTEN'],
       });
       await organisationStore.getAllOrganisationen({
