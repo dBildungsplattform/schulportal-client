@@ -427,6 +427,8 @@
     "rolle": "Rolle",
     "userName": "Benutzername",
     "saveChanges": "Änderungen speichern",
+    "willBeCreated": "wird hinzugefügt",
+    "willBeRemoved": "wird entfernt",
     "zuordnungen": "Schulzuordnung(en)",
     "zuordnung": "Schulzuordnung"
   },

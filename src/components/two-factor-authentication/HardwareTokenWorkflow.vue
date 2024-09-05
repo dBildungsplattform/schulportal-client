@@ -60,20 +60,6 @@
     }
   }
 
-  function cancelCheck(): void {
-    if (errorThrown.value) {
-      dialogText.value = '';
-      hardwareTokenIsAssigned.value = false;
-      errorThrown.value = false;
-      selectedOtp.value = '';
-      selectedOtpProps.value.error = false;
-      selectedOtpProps.value['error-messages'] = [];
-      emits('updateHeader', t('admin.person.twoFactorAuthentication.hardwareTokenOption'));
-    } else {
-      emits('onCloseClicked');
-    }
-  }
-
   const validationSchema: TypedSchema = toTypedSchema(
     object({
       selectedSeriennummer: string().required(t('admin.person.twoFactorAuthentication.serialNotSelected')),
@@ -110,6 +96,20 @@
     Ref<string>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedOtp', vuetifyConfig);
+
+  function cancelCheck(): void {
+    if (errorThrown.value) {
+      dialogText.value = '';
+      hardwareTokenIsAssigned.value = false;
+      errorThrown.value = false;
+      selectedOtp.value = '';
+      selectedOtpProps.value.error = false;
+      selectedOtpProps.value['error-messages'] = [];
+      emits('updateHeader', t('admin.person.twoFactorAuthentication.hardwareTokenOption'));
+    } else {
+      emits('onCloseClicked');
+    }
+  }
 
   function isFormDirty(): boolean {
     return isFieldDirty('selectedSeriennummer') || isFieldDirty('selectedOtp');
