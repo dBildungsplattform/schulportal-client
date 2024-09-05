@@ -5,7 +5,6 @@ import {
   type DBiamPersonenuebersichtResponse,
   type PersonFrontendControllerFindPersons200Response,
   type PersonendatensatzResponse,
-  type TokenStateResponse,
 } from '@/api-client/generated';
 import { usePersonStore, type PersonStore, type Personendatensatz } from './PersonStore';
 import ApiService from '@/services/ApiService';
