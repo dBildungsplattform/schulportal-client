@@ -56,6 +56,7 @@ export default defineConfig({
     include: ['src/**/*.spec.ts'],
     setupFiles: 'vitest.setup.ts',
     coverage: {
+      provider: 'istanbul',
       reporter: ['text', 'lcov'],
       include: ['src/**'],
       exclude: [
