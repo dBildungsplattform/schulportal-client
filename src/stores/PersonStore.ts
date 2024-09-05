@@ -1,13 +1,11 @@
 import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import { isAxiosError, type AxiosResponse } from 'axios';
 import {
-  Class2FAApiFactory,
   DbiamPersonenuebersichtApiFactory,
   OrganisationsTyp,
   PersonenApiFactory,
   PersonenFrontendApiFactory,
   RollenMerkmal,
-  type Class2FAApiInterface,
   type DbiamCreatePersonWithContextBodyParams,
   type DbiamPersonenuebersichtApiInterface,
   type DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response,
@@ -88,6 +86,8 @@ type PersonState = {
   loading: boolean;
   totalPersons: number;
   currentPerson: Personendatensatz | null;
+  personenWithUebersicht: PersonenWithRolleAndZuordnung | null;
+  personenuebersicht: DBiamPersonenuebersichtResponse | null;
 };
 
 export type PersonFilter = {
@@ -105,6 +105,7 @@ type PersonActions = {
   getPersonById: (personId: string) => Promise<Personendatensatz>;
   resetPassword: (personId: string) => Promise<string>;
   deletePersonById: (personId: string) => Promise<void>;
+  getPersonenuebersichtById: (personId: string) => Promise<void>;
 };
 
 export type PersonStore = Store<'personStore', PersonState, PersonGetters, PersonActions>;
@@ -153,10 +154,9 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
           return;
         }
         const bodyParams: PersonenuebersichtBodyParams = {
-          personIds: personIds
-        }
+          personIds: personIds,
+        };
         const { data: uebersichten }: { data: DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response } =
-
           await personenuebersichtApi.dBiamPersonenuebersichtControllerFindPersonenuebersichten(bodyParams);
         const allUebersichten: DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response = uebersichten;
 
@@ -251,6 +251,21 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
           this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
         }
         return await Promise.reject(this.errorCode);
+      } finally {
+        this.loading = false;
+      }
+    },
+    async getPersonenuebersichtById(personId: string): Promise<void> {
+      this.loading = true;
+      try {
+        const { data }: { data: DBiamPersonenuebersichtResponse } =
+          await personenuebersichtApi.dBiamPersonenuebersichtControllerFindPersonenuebersichtenByPerson(personId);
+        this.personenuebersicht = data;
+      } catch (error: unknown) {
+        this.errorCode = 'UNSPECIFIED_ERROR';
+        if (isAxiosError(error)) {
+          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
+        }
       } finally {
         this.loading = false;
       }

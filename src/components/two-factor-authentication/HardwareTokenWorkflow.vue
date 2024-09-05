@@ -60,17 +60,6 @@
     }
   }
 
-  function cancelCheck(): void {
-    if (errorThrown.value) {
-      dialogText.value = '';
-      hardwareTokenIsAssigned.value = false;
-      errorThrown.value = false;
-      emits('updateHeader', t('admin.person.twoFactorAuthentication.hardwareTokenOption'));
-    } else {
-      emits('onCloseClicked');
-    }
-  }
-
   const validationSchema: TypedSchema = toTypedSchema(
     object({
       selectedSeriennummer: string().required(t('admin.person.twoFactorAuthentication.serialNotSelected')),
@@ -107,6 +96,20 @@
     Ref<string>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedOtp', vuetifyConfig);
+
+  function cancelCheck(): void {
+    if (errorThrown.value) {
+      dialogText.value = '';
+      hardwareTokenIsAssigned.value = false;
+      errorThrown.value = false;
+      selectedOtp.value = '';
+      selectedOtpProps.value.error = false;
+      selectedOtpProps.value['error-messages'] = [];
+      emits('updateHeader', t('admin.person.twoFactorAuthentication.hardwareTokenOption'));
+    } else {
+      emits('onCloseClicked');
+    }
+  }
 
   function isFormDirty(): boolean {
     return isFieldDirty('selectedSeriennummer') || isFieldDirty('selectedOtp');
@@ -155,6 +158,7 @@
       };
       await twoFactoreAuthentificationStore.assignHardwareToken(assignHardwareTokenBodyParams);
       dialogText.value = t('admin.person.twoFactorAuthentication.hardwareTokenSetUpSuccess');
+      resetForm();
     } catch (error) {
       emits('updateHeader', t('admin.person.twoFactorAuthentication.hardwareTokenSetUpFailure'));
       handleApiError(error);
@@ -162,10 +166,8 @@
       hardwareTokenIsAssigned.value = true;
     }
   }
-
   const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = handleSubmit(async () => {
     assignHardwareToken();
-    resetForm();
   });
 </script>
 
@@ -229,7 +231,7 @@
   </v-container>
   <v-card-actions
     class="justify-center"
-    v-if="errorThrown"
+    v-if="errorThrown || hardwareTokenIsAssigned"
   >
     <v-row class="justify-center">
       <v-col

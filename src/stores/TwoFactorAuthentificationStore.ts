@@ -18,6 +18,7 @@ type TwoFactorState = {
   hasToken: boolean | null;
   tokenKind: 'hardware' | 'software' | null;
   qrCode: string;
+  serial: string;
 };
 
 type TwoFactorGetters = {};
@@ -57,6 +58,7 @@ export const useTwoFactorAuthentificationStore: StoreDefinition<
       hasToken: null,
       tokenKind: null,
       qrCode: '',
+      serial: '',
     };
   },
   actions: {
@@ -86,6 +88,7 @@ export const useTwoFactorAuthentificationStore: StoreDefinition<
           default:
             this.tokenKind = null;
         }
+        this.serial = twoFactorState.serial;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
