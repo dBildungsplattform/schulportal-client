@@ -241,10 +241,12 @@
 
     await organisationStore.getAllOrganisationen({
       includeTyp: OrganisationsTyp.Schule,
+      limit: 25,
       systemrechte: ['PERSONEN_VERWALTEN'],
     });
     await organisationStore.getFilteredKlassen({
       includeTyp: OrganisationsTyp.Klasse,
+      limit: 25,
       systemrechte: ['KLASSEN_VERWALTEN'],
     });
     await getPaginatedPersonen(searchFilterStore.personenPage);

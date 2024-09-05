@@ -143,6 +143,7 @@
   async function fetchSchuleMap(): Promise<Map<string, string>> {
     await organisationStore.getAllOrganisationen({
       includeTyp: OrganisationsTyp.Schule,
+      limit: 25,
       systemrechte: ['KLASSEN_VERWALTEN'],
     });
     return new Map(
