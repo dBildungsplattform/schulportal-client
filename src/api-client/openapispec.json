@@ -450,24 +450,15 @@
       }
     },
     "/api/dbiam/personenuebersicht": {
-      "get": {
+      "post": {
         "operationId": "DBiamPersonenuebersichtController_findPersonenuebersichten",
-        "parameters": [
-          {
-            "name": "offset",
-            "required": false,
-            "in": "query",
-            "description": "The offset of the paginated list.",
-            "schema": { "type": "number" }
-          },
-          {
-            "name": "limit",
-            "required": false,
-            "in": "query",
-            "description": "The requested limit for the page size.",
-            "schema": { "type": "number" }
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/PersonenuebersichtBodyParams" } }
           }
-        ],
+        },
         "responses": {
           "200": {
             "description": "The personenuebersichten were successfully returned.",
@@ -2129,6 +2120,19 @@
           "zuordnungen": { "type": "array", "items": { "$ref": "#/components/schemas/DBiamPersonenzuordnungResponse" } }
         },
         "required": ["personId", "vorname", "nachname", "benutzername", "lastModifiedZuordnungen", "zuordnungen"]
+      },
+      "PersonenuebersichtBodyParams": {
+        "type": "object",
+        "properties": {
+          "offset": { "type": "number", "description": "The offset of the paginated list." },
+          "limit": { "type": "number", "description": "The requested limit for the page size." },
+          "personIds": {
+            "description": "An array of IDs for the persons.",
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        },
+        "required": ["personIds"]
       },
       "PersonNameResponse": {
         "type": "object",
