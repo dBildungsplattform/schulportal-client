@@ -469,8 +469,8 @@
                     >{{
                       $t(
                         'admin.schule.schulenFound',
-                        { count: organisationStore.totalSchulen },
-                        organisationStore.totalSchulen,
+                        { count: organisationStore.totalPaginatedSchulen },
+                        organisationStore.totalPaginatedSchulen,
                       )
                     }}</span
                   >
