@@ -300,6 +300,10 @@
     return !!rolle && !!rolle.merkmale && rolle.merkmale.has(RollenMerkmal.KopersPflicht);
   }
 
+  const hasKopersNummer: ComputedRef<boolean> = computed(() => {
+    return !!personStore.currentPerson?.person.personalnummer;
+  });
+
   const hasKopersRolle: ComputedRef<boolean> = computed(() => {
     return (
       !!zuordnungenResult.value?.find((zuordnung: Zuordnung) => {
@@ -1395,7 +1399,7 @@
                   @fieldReset="handleFieldReset"
                 />
                 <KopersInput
-                  v-if="!hasKopersRolle && isKopersRolle(selectedRolle) && selectedOrganisation"
+                  v-if="!hasKopersNummer && isKopersRolle(selectedRolle) && selectedOrganisation"
                   :hasNoKopersNr="hasNoKopersNr"
                   v-model:selectedKopersNr="selectedKopersNr"
                   :selectedKopersNrProps="selectedKopersNrProps"

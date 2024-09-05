@@ -62,6 +62,7 @@
       :label="$t('admin.schule.schule')"
     >
       <v-autocomplete
+        autocomplete="off"
         :class="[{ 'filter-dropdown mb-4': hasAutoselectedSchule }, { selected: selectedSchule }]"
         clearable
         data-testid="schule-select"
