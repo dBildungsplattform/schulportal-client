@@ -1,11 +1,11 @@
-import { expect, MockInstance, test } from 'vitest';
+import { expect, type MockInstance, test } from 'vitest';
 import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
-import { createRouter, createWebHistory, NavigationFailure, RouteLocationRaw, type Router } from 'vue-router';
+import { createRouter, createWebHistory, type NavigationFailure, type RouteLocationRaw, type Router } from 'vue-router';
 import routes from '@/router/routes';
 import PersonDetailsView from './PersonDetailsView.vue';
 import {
   type Personendatensatz,
-  PersonendatensatzResponse,
+  type PersonendatensatzResponse,
   type PersonStore,
   type PersonWithUebersicht,
   usePersonStore,
