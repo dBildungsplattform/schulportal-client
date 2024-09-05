@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import { type Ref, ref, onBeforeMount, computed, type ComputedRef, watch } from 'vue';
   import { type Router, type RouteLocationNormalizedLoaded, useRoute, useRouter } from 'vue-router';
-  import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
+  import { usePersonStore, type PersonStore, type PersonWithUebersicht } from '@/stores/PersonStore';
   import PasswordReset from '@/components/admin/personen/PasswordReset.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
@@ -9,12 +9,7 @@
   import PersonDelete from '@/components/admin/personen/PersonDelete.vue';
   import PersonenkontextDelete from '@/components/admin/personen/PersonenkontextDelete.vue';
   import TwoFactorAuthenticationSetUp from '@/components/two-factor-authentication/TwoFactorAuthenticationSetUp.vue';
-  import {
-    usePersonenkontextStore,
-    type PersonenkontextStore,
-    type Uebersicht,
-    type Zuordnung,
-  } from '@/stores/PersonenkontextStore';
+  import { usePersonenkontextStore, type PersonenkontextStore, type Zuordnung } from '@/stores/PersonenkontextStore';
   import {
     OrganisationsTyp,
     useOrganisationStore,
@@ -159,7 +154,7 @@
     );
 
     // Extract Zuordnungen of type "Klasse"
-    const klassenZuordnungen: Zuordnung[] | undefined = personenkontextStore.personenuebersicht?.zuordnungen.filter(
+    const klassenZuordnungen: Zuordnung[] | undefined = personStore.personenuebersicht?.zuordnungen.filter(
       (zuordnung: Zuordnung) => zuordnung.typ === OrganisationsTyp.Klasse,
     );
 
@@ -221,7 +216,7 @@
   }
 
   // Add the Klasse to it's corresponding Schule
-  function computeZuordnungen(personenuebersicht: Uebersicht | null): Zuordnung[] | undefined {
+  function computeZuordnungen(personenuebersicht: PersonWithUebersicht | null): Zuordnung[] | undefined {
     const zuordnungen: Zuordnung[] | undefined = personenuebersicht?.zuordnungen;
 
     if (!zuordnungen) return;
@@ -492,7 +487,7 @@
 
   // Filter out the Rollen based on the user's existing Zuordnungen and selected organization
   const filteredRollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = computed(() => {
-    const existingZuordnungen: Zuordnung[] | undefined = personenkontextStore.personenuebersicht?.zuordnungen;
+    const existingZuordnungen: Zuordnung[] | undefined = personStore.personenuebersicht?.zuordnungen;
 
     // If no existing Zuordnungen then just show all roles
     if (!existingZuordnungen || existingZuordnungen.length === 0) {
@@ -575,7 +570,7 @@
     );
 
     // The existing Klassenzuordnungen that the person has already
-    const existingKlassen: Zuordnung[] | undefined = personenkontextStore.personenuebersicht?.zuordnungen.filter(
+    const existingKlassen: Zuordnung[] | undefined = personStore.personenuebersicht?.zuordnungen.filter(
       (zuordnung: Zuordnung) => zuordnung.typ === OrganisationsTyp.Klasse,
     );
     // The new selected Klasse to add as a separate Zuordnung
@@ -716,8 +711,8 @@
   };
 
   watch(
-    () => personenkontextStore.personenuebersicht,
-    (newValue: Uebersicht | null) => {
+    () => personStore.personenuebersicht,
+    (newValue: PersonWithUebersicht | null) => {
       zuordnungenResult.value = computeZuordnungen(newValue);
     },
     { immediate: true },
@@ -735,9 +730,9 @@
     personStore.resetState();
     personenkontextStore.errorCode = '';
     await personStore.getPersonById(currentPersonId);
-    await personenkontextStore.getPersonenuebersichtById(currentPersonId);
+    await personStore.getPersonenuebersichtById(currentPersonId);
     await personenkontextStore.processWorkflowStep({ limit: 25 });
-    hasKlassenZuordnung.value = personenkontextStore.personenuebersicht?.zuordnungen.some(
+    hasKlassenZuordnung.value = personStore.personenuebersicht?.zuordnungen.some(
       (zuordnung: Zuordnung) => zuordnung.typ === OrganisationsTyp.Klasse,
     );
 
@@ -1056,10 +1051,7 @@
           <!-- Check if 'zuordnungen' array exists and has length > 0 -->
           <v-row
             class="ml-md-3 mt-md-n8"
-            v-if="
-              personenkontextStore.personenuebersicht?.zuordnungen &&
-              personenkontextStore.personenuebersicht?.zuordnungen.length > 0
-            "
+            v-if="personStore.personenuebersicht?.zuordnungen && personStore.personenuebersicht?.zuordnungen.length > 0"
           >
             <v-col
               cols="10"
@@ -1311,8 +1303,8 @@
             </v-row>
             <v-row
               v-if="
-                personenkontextStore.personenuebersicht?.zuordnungen &&
-                personenkontextStore.personenuebersicht?.zuordnungen.length === 0 &&
+                personStore.personenuebersicht?.zuordnungen &&
+                personStore.personenuebersicht?.zuordnungen.length === 0 &&
                 !pendingCreation &&
                 !pendingDeletion
               "
