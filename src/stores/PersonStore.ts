@@ -1,13 +1,11 @@
 import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import { isAxiosError, type AxiosResponse } from 'axios';
 import {
-  Class2FAApiFactory,
   DbiamPersonenuebersichtApiFactory,
   OrganisationsTyp,
   PersonenApiFactory,
   PersonenFrontendApiFactory,
   RollenMerkmal,
-  type Class2FAApiInterface,
   type DbiamCreatePersonWithContextBodyParams,
   type DbiamPersonenuebersichtApiInterface,
   type DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response,
