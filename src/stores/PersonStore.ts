@@ -104,7 +104,6 @@ type PersonActions = {
   getAllPersons: (filter: PersonFilter) => Promise<void>;
   getPersonById: (personId: string) => Promise<Personendatensatz>;
   resetPassword: (personId: string) => Promise<string>;
-  deletePerson: (personId: string) => Promise<void>;
   deletePersonById: (personId: string) => Promise<void>;
   getPersonenuebersichtById: (personId: string) => Promise<void>;
 };
