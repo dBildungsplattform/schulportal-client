@@ -166,15 +166,16 @@
               </v-col>
             </v-row>
             <v-row class="text-body bold px-md-16">
-              <v-col>
-                <p
+              <v-col cols="1">
+                <v-icon icon="mdi-information-slab-circle-outline"></v-icon>
+              </v-col>
+              <v-col cols="11">
+                <span
                   data-testid="lock-user-info-text"
                   class="text-body"
                 >
-                  <v-icon icon="mdi-information-slab-circle-outline"></v-icon>
-
                   {{ !person.person.isLocked ? $t('person.lockUserInfoText') : $t('person.unLockUserInfoText') }}
-                </p>
+                </span>
               </v-col>
             </v-row>
           </v-container>
