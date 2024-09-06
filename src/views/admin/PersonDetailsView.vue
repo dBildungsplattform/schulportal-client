@@ -33,6 +33,9 @@
     useTwoFactorAuthentificationStore,
     type TwoFactorAuthentificationStore,
   } from '@/stores/TwoFactorAuthentificationStore';
+  import FormRow from '@/components/form/FormRow.vue';
+  import { DDMMYYYY } from '@/utils/validation';
+  import { isBefore, isValid, parse } from 'date-fns';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
@@ -77,6 +80,8 @@
 
   const creationErrorText: Ref<string> = ref('');
   const creationErrorTitle: Ref<string> = ref('');
+
+  const calculatedBefristung: Ref<string | undefined> = ref('');
 
   function navigateToPersonTable(): void {
     router.push({ name: 'person-management' });
@@ -275,6 +280,8 @@
     selectedRolle: string;
     selectedOrganisation: string;
     selectedKlasse: string;
+    selectedBefristung: Date;
+    selectedBefristungOption: string;
   };
 
   type ChangeKlasseForm = {
@@ -313,6 +320,23 @@
     return false;
   });
 
+  // Custom validation function to check if the date is in the past
+  const notInPast = (value: string | undefined): boolean => {
+    if (!value) return true;
+
+    const parsedDate: Date = parse(value, 'dd.MM.yyyy', new Date());
+    return isValid(parsedDate) && !isBefore(parsedDate, new Date());
+  };
+
+  // Checks if the selected Rolle has Befristungspflicht
+  function isBefristungspflichtRolle(selectedRolleId: string | undefined): boolean {
+    const rolle: TranslatedRolleWithAttrs | undefined = rollen.value?.find(
+      (r: TranslatedRolleWithAttrs) => r.value === selectedRolleId,
+    );
+
+    return !!rolle && !!rolle.merkmale && rolle.merkmale.has(RollenMerkmal.BefristungPflicht);
+  }
+
   const zuordnungFormValidationSchema: TypedSchema = toTypedSchema(
     object({
       selectedRolle: string().required(t('admin.rolle.rules.rolle.required')),
@@ -327,6 +351,15 @@
         then: (schema: StringSchema<string | undefined, AnyObject, undefined, ''>) =>
           schema.required(t('admin.klasse.rules.klasse.required')),
       }),
+      selectedBefristung: string()
+        .matches(DDMMYYYY, t('admin.befristung.rules.format'))
+        .test('notInPast', t('admin.befristung.rules.pastDateNotAllowed'), notInPast)
+        .when(['selectedRolle', 'selectedBefristungOption'], {
+          is: (selectedRolleId: string, selectedBefristungOption: string | undefined) =>
+            isBefristungspflichtRolle(selectedRolleId) && selectedBefristungOption === undefined,
+          then: (schema: StringSchema<string | undefined, AnyObject, undefined, ''>) =>
+            schema.required(t('admin.befristung.rules.required')),
+        }),
     }),
   );
 
@@ -354,6 +387,7 @@
     defineField: defineFieldZuordnung,
     handleSubmit: handleSubmitZuordnungForm,
     resetForm: resetZuordnungForm,
+    resetField: resetFieldZuordnungForm,
   } = useForm<ZuordnungCreationForm>({
     validationSchema: zuordnungFormValidationSchema,
   });
@@ -380,6 +414,15 @@
     Ref<string | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineFieldZuordnung('selectedKlasse', vuetifyConfig);
+
+  const [selectedBefristung, selectedBefristungProps]: [
+    Ref<string | undefined>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = defineFieldZuordnung('selectedBefristung', vuetifyConfig);
+  const [selectedBefristungOption, selectedBefristungOptionProps]: [
+    Ref<string | undefined>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = defineFieldZuordnung('selectedBefristungOption', vuetifyConfig);
 
   // Change Klasse Form
   const [selectedSchule, selectedSchuleProps]: [
@@ -445,6 +488,7 @@
   // This will send the updated list of Zuordnungen to the Backend on TOP of the new added one through the form.
   async function confirmAddition(): Promise<void> {
     await personenkontextStore.updatePersonenkontexte(finalZuordnungen.value, currentPersonId);
+    console.log(finalZuordnungen.value)
     createSuccessDialogVisible.value = !personenkontextStore.errorCode;
     resetZuordnungForm();
   }
@@ -578,6 +622,7 @@
         editable: true,
         merkmale: [] as unknown as RollenMerkmal,
         typ: OrganisationsTyp.Schule,
+        befristung: selectedBefristung.value,
       };
       if (zuordnungenResult.value) {
         finalZuordnungen.value = zuordnungenResult.value;
@@ -597,6 +642,7 @@
           editable: true,
           typ: OrganisationsTyp.Klasse,
           merkmale: [] as unknown as RollenMerkmal,
+          befristung: selectedBefristung.value,
         });
       }
 
@@ -613,6 +659,7 @@
             editable: true,
             merkmale: [] as unknown as RollenMerkmal,
             typ: OrganisationsTyp.Klasse,
+            befristung: existingKlasse.befristung,
           });
         });
       }
@@ -712,6 +759,59 @@
       selectedKlasse.value = undefined;
     }
   }
+
+  enum BefristungOption {
+    SCHULJAHRESENDE = 'schuljahresende',
+    UNBEFRISTET = 'unbefristet',
+  }
+
+  // Calculates the next 31st of July (End of school year)
+  // Time here is in german iso format but will later be converted to UCT
+  function getNextSchuljahresende(): string {
+    const today: Date = new Date();
+    const currentYear: number = today.getFullYear();
+    const july31stThisYear: Date = new Date(currentYear, 6, 31); // July is month 6 (0-indexed)
+
+    // If today's date is after July 31st this year, return July 31st of next year
+    if (today > july31stThisYear) {
+      return new Date(currentYear + 1, 6, 31).toLocaleDateString('de-DE');
+    }
+
+    // Otherwise, return July 31st of this year
+    return july31stThisYear.toLocaleDateString('de-DE');
+  }
+
+  // Calculates the Befristung depending on the selected radio button. Each radio button illustrates a date (Either 31st July or undefined)
+  // The backend will receive the calculatedBefristung.
+  function handleBefristungOptionChange(value: string | undefined): void {
+    switch (value) {
+      case BefristungOption.SCHULJAHRESENDE: {
+        calculatedBefristung.value = getNextSchuljahresende();
+        resetFieldZuordnungForm('selectedBefristung'); // Reset the date picker
+        break;
+      }
+      case BefristungOption.UNBEFRISTET: {
+        calculatedBefristung.value = undefined;
+        resetFieldZuordnungForm('selectedBefristung');
+        break;
+      }
+    }
+  }
+  // Watcher to reset the radio button in case the date was picked using date-input
+  watch(
+    selectedBefristung,
+    (newValue: string | undefined) => {
+      if (newValue) {
+        selectedBefristungOption.value = undefined;
+      }
+    },
+    { immediate: true },
+  );
+
+  // Computed property to check if the second radio button should be disabled
+  const isUnbefristetButtonDisabled: ComputedRef<boolean> = computed(() => {
+    return isBefristungspflichtRolle(selectedRolle.value);
+  });
 
   onBeforeMount(async () => {
     personStore.resetState();
@@ -1384,6 +1484,65 @@
                   @update:canCommit="canCommit = $event"
                   @fieldReset="handleFieldReset"
                 />
+                <!-- Befristung -->
+                <div v-if="selectedOrganisation && selectedRolle">
+                  <FormRow
+                    :errorLabel="selectedBefristungProps?.error || ''"
+                    labelForId="befristung-select"
+                    :isRequired="true"
+                    :label="$t('admin.befristung.befristung')"
+                  >
+                    <v-text-field
+                      v-model="selectedBefristung"
+                      v-bind="selectedBefristungProps"
+                      prepend-icon=""
+                      variant="outlined"
+                      placeholder="TT.MM.JJJJ"
+                      color="primary"
+                    ></v-text-field>
+                  </FormRow>
+                  <!-- Radio buttons for Befristung options -->
+                  <v-row class="align-center">
+                    <v-col
+                      class="py-0 mt-n1"
+                      cols="12"
+                      sm="7"
+                      offset-sm="5"
+                    >
+                      <v-radio-group
+                        v-model="selectedBefristungOption"
+                        v-bind="selectedBefristungOptionProps"
+                        @update:modelValue="handleBefristungOptionChange"
+                      >
+                        <v-radio
+                          :label="`${t('admin.befristung.untilEndOfSchoolYear')} (${getNextSchuljahresende()})`"
+                          :value="BefristungOption.SCHULJAHRESENDE"
+                          :color="'primary'"
+                        ></v-radio>
+                        <SpshTooltip
+                          v-if="isUnbefristetButtonDisabled"
+                          :enabledCondition="!isUnbefristetButtonDisabled"
+                          :disabledText="$t('admin.befristung.unlimitedInactive')"
+                          position="start"
+                        >
+                          <v-radio
+                            :label="$t('admin.befristung.unlimited')"
+                            :value="BefristungOption.UNBEFRISTET"
+                            :color="'primary'"
+                            :disabled="isUnbefristetButtonDisabled"
+                          ></v-radio>
+                        </SpshTooltip>
+                        <v-radio
+                          v-else
+                          :label="$t('admin.befristung.unlimited')"
+                          :value="BefristungOption.UNBEFRISTET"
+                          :color="'primary'"
+                          :disabled="isUnbefristetButtonDisabled"
+                        ></v-radio>
+                      </v-radio-group>
+                    </v-col>
+                  </v-row>
+                </div>
               </v-container>
               <v-row class="py-3 px-2 justify-center">
                 <v-spacer class="hidden-sm-and-down"></v-spacer>

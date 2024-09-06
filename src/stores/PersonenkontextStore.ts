@@ -56,6 +56,7 @@ export type Zuordnung = {
   typ: OrganisationsTyp;
   editable: boolean;
   merkmale: RollenMerkmal;
+  befristung?: string;
 };
 
 export type WorkflowFilter = {
