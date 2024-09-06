@@ -220,7 +220,6 @@
         limit: 25,
         systemrechte: ['PERSONEN_VERWALTEN'],
         organisationIds: selectedSchulen.value,
-        offset: selectedSchulen.value.length,
       });
     }, 500);
   }
