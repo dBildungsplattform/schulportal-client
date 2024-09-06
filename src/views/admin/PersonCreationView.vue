@@ -404,6 +404,7 @@
             v-model:selectedKopersNr="selectedKopersNr"
             :selectedKopersNrProps="selectedKopersNrProps"
             @update:selectedKopersNr="(value?: string) => (selectedKopersNr = value)"
+            @update:hasNoKopersNr="(value: boolean) => (hasNoKopersNr = value)"
           ></KopersInput>
         </div>
       </FormWrapper>

@@ -10,7 +10,7 @@
   };
 
   type Emits = {
-    (event: 'update:hasNoKopersNr', value: boolean | undefined): void;
+    (event: 'update:hasNoKopersNr', value: boolean): void;
     (event: 'update:selectedKopersNr', value: string | undefined): void;
   };
 

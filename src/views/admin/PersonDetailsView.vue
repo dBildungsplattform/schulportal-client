@@ -1396,6 +1396,7 @@
                   v-model:selectedKopersNr="selectedKopersNr"
                   :selectedKopersNrProps="selectedKopersNrProps"
                   @update:selectedKopersNr="(value?: string) => (selectedKopersNr = value)"
+                  @update:hasNoKopersNr="(value: boolean) => (hasNoKopersNr = value)"
                 ></KopersInput>
               </v-container>
               <v-row class="py-3 px-2 justify-center">
