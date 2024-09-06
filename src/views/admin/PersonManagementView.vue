@@ -65,7 +65,6 @@
 
   const schulen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
     return organisationStore.allSchulen
-      .slice(0, 25)
       .map((org: Organisation) => ({
         value: org.id,
         title: `${org.kennung} (${org.name})`,
@@ -218,7 +217,10 @@
       organisationStore.getAllOrganisationen({
         searchString: searchValue,
         includeTyp: OrganisationsTyp.Schule,
+        limit: 25,
         systemrechte: ['PERSONEN_VERWALTEN'],
+        organisationIds: selectedSchulen.value,
+        offset: selectedSchulen.value.length,
       });
     }, 500);
   }
@@ -242,10 +244,12 @@
     await organisationStore.getAllOrganisationen({
       includeTyp: OrganisationsTyp.Schule,
       systemrechte: ['PERSONEN_VERWALTEN'],
+      limit: 25,
     });
     await organisationStore.getFilteredKlassen({
       includeTyp: OrganisationsTyp.Klasse,
       systemrechte: ['KLASSEN_VERWALTEN'],
+      limit: 25,
     });
     await getPaginatedPersonen(searchFilterStore.personenPage);
     await personenkontextStore.getPersonenkontextRolleWithFilter('');
