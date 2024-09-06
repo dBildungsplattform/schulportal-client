@@ -154,7 +154,7 @@ const routes: readonly RouteRecordRaw[] = [
     meta: {
       layout: 'DefaultLayout',
       requiresAuth: true,
-      requiresStepUp: false,
+      requiresHighLoa: true,
     },
   },
   {

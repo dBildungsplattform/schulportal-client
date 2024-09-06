@@ -23,6 +23,11 @@ router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormal
     return false;
   }
 
+  if (to.meta['requiresHighLoa'] && authStore.acr !== 'gold') {
+    debugger;
+    window.location.href = `/api/auth/login?redirectUrl=${to.fullPath}&stepUp=true`;
+  }
+
   if (to.meta['requiresPermission']) {
     /* check if the user has person management permissions */
     switch (to.meta['requiresPermission']) {

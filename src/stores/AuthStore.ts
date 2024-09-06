@@ -41,7 +41,7 @@ type AuthState = {
   hasSchulverwaltungPermission: boolean;
   hasSchultraegerverwaltungPermission: boolean;
   isAuthed: boolean;
-  isStepUp: boolean;
+  acr: string;
 };
 
 type AuthActions = {
@@ -66,7 +66,7 @@ export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, 
     hasSchulverwaltungPermission: false,
     hasSchultraegerverwaltungPermission: false,
     isAuthed: false,
-    isStepUp: false,
+    acr: '',
   }),
   actions: {
     async initializeAuthStatus() {
@@ -77,8 +77,8 @@ export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, 
           });
 
         this.isAuthed = loginStatus >= 200 && loginStatus < 400;
-        this.isStepUp = false;
         this.currentUser = data;
+        this.acr = data.acr;
 
         /* extract all system permissions from current user's personenkontexte */
         const personenkontexte: Array<UserinfoPersonenkontext> | null = this.currentUser.personenkontexte;
@@ -99,7 +99,6 @@ export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, 
       } catch {
         // If user info can't be retrieved, consider the user unauthenticated.
         this.isAuthed = false;
-        this.isStepUp = false;
       }
     },
   },
