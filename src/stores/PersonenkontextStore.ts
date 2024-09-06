@@ -261,6 +261,7 @@ export const usePersonenkontextStore: StoreDefinition<
             personId: personId,
             organisationId: zuordnung.sskId,
             rolleId: zuordnung.rolleId,
+            befristung: zuordnung.befristung,
           })) as DbiamPersonenkontextBodyParams[],
         };
         const { data }: { data: PersonenkontexteUpdateResponse } =

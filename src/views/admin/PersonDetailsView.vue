@@ -488,7 +488,7 @@
   // This will send the updated list of Zuordnungen to the Backend on TOP of the new added one through the form.
   async function confirmAddition(): Promise<void> {
     await personenkontextStore.updatePersonenkontexte(finalZuordnungen.value, currentPersonId);
-    console.log(finalZuordnungen.value)
+    console.log(finalZuordnungen.value);
     createSuccessDialogVisible.value = !personenkontextStore.errorCode;
     resetZuordnungForm();
   }
@@ -609,6 +609,32 @@
       (k: Organisation) => k.id === selectedKlasse.value,
     );
 
+    // Function to format a date in dd.MM.yyyy format to ISO 8601
+    function formatDateToISO(date: string | undefined): string | undefined {
+      if (date) {
+        // Split the date by '.' to extract day, month, and year
+        const [day, month, year]: (number | undefined)[] = date.split('.').map(Number);
+
+        if (day && month && year) {
+          // Create a new Date object with the extracted parts
+          // Alwyays adding 1 day to the date because for example if the Befristung is chosen as 20.05.2024 then it should be valid until 20.05.2024 23:59
+          // Also the UTC ISO formatted send date will be 20-05-2024 22H which is basically 21.05.2024 in german summer time.
+          const d: Date = new Date(year, month - 1, day + 1);
+
+          // Return the ISO string
+          return d.toISOString();
+        }
+      }
+      return;
+    }
+
+    const befristungDate: string | undefined = selectedBefristung.value
+      ? selectedBefristung.value
+      : calculatedBefristung.value;
+
+    // Format the date in ISO 8601 format if it exists
+    const formattedBefristung: string | undefined = befristungDate ? formatDateToISO(befristungDate) : undefined;
+
     if (organisation) {
       newZuordnung.value = {
         sskId: organisation.id,
@@ -622,7 +648,7 @@
         editable: true,
         merkmale: [] as unknown as RollenMerkmal,
         typ: OrganisationsTyp.Schule,
-        befristung: selectedBefristung.value,
+        befristung: formattedBefristung,
       };
       if (zuordnungenResult.value) {
         finalZuordnungen.value = zuordnungenResult.value;
@@ -642,7 +668,7 @@
           editable: true,
           typ: OrganisationsTyp.Klasse,
           merkmale: [] as unknown as RollenMerkmal,
-          befristung: selectedBefristung.value,
+          befristung: formattedBefristung,
         });
       }
 
