@@ -3,7 +3,6 @@
   import { type Composer, useI18n } from 'vue-i18n';
   import { type Personendatensatz, usePersonStore, type PersonStore } from '@/stores/PersonStore';
   import { useDisplay } from 'vuetify';
-  import FormRow from '@/components/form/FormRow.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
   import { type Zuordnung } from '@/stores/PersonenkontextStore';
