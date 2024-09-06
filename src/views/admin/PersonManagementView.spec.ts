@@ -205,4 +205,15 @@ describe('PersonManagementView', () => {
 
     expect(klasseAutocomplete?.text()).toEqual('11b');
   });
+
+  test('it updates Organisation search correctly', async () => {
+    const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
+
+    await organisationAutocomplete?.setValue('org');
+    await nextTick();
+
+    await organisationAutocomplete?.vm.$emit('update:search', '2');
+    await nextTick();
+    expect(organisationStore.getAllOrganisationen).toHaveBeenCalled();
+  });
 });
