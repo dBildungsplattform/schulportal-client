@@ -16,8 +16,8 @@
   const isTokenResetRequested: Ref<boolean> = ref(false);
   const errorThrown: Ref<boolean> = ref(false);
   const twoFactorAuthenticationStore: TwoFactorAuthentificationStore = useTwoFactorAuthentificationStore();
-  const dialogText: Ref<String> = ref('');
-  const dialogHeader: Ref<String> = ref(t('admin.person.twoFactorAuthentication.tokenReset'));
+  const dialogText: Ref<string> = ref('');
+  const dialogHeader: Ref<string> = ref(t('admin.person.twoFactorAuthentication.tokenReset'));
 
   type Emits = {
     (event: 'dialogClosed'): void;
