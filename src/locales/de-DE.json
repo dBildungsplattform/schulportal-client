@@ -8,6 +8,20 @@
         "required": "Die Administrationsebene muss ausgewählt werden."
       }
     },
+    "befristung": {
+      "assignBefristung": "Befristung zuordnen",
+      "befristung": "Befristung",
+      "rules": {
+        "required": "Die Befristung muss eingegeben werden.",
+        "format": "Die Befristung muss im Format DD.MM.JJJJ. eingegeben werden.",
+        "pastDateNotAllowed": "Das eingegebene Datum darf nicht in der Vergangenheit liegen."
+      },
+      "selectBefristung": "Befristung auswählen",
+      "unlimited": "Unbefristet",
+      "unlimitedSuccessTemplate": "unbefristet",
+      "unlimitedInactive": "Diese Option kann für Rollen mit Befristungspflicht nicht ausgewählt werden.",
+      "untilEndOfSchoolYear": "Bis Schuljahresende"
+    },
     "mandatoryFieldsNotice": "Mit * markierte Felder sind Pflichtangaben.",
     "followingDataCreated": "Folgende Daten wurden gespeichert:",
     "headline": "Administrationsbereich",
