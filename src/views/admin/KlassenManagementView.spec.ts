@@ -7,7 +7,6 @@ import type WrapperLike from '@vue/test-utils/dist/interfaces/wrapperLike';
 
 let wrapper: VueWrapper | null = null;
 const organisationStore: OrganisationStore = useOrganisationStore();
-
 beforeEach(() => {
   document.body.innerHTML = `
     <div>
@@ -154,5 +153,34 @@ describe('KlassenManagementView', () => {
     await nextTick();
 
     expect(klasseAutocomplete?.text()).toEqual('');
+  });
+
+  test('it updates Organisation search correctly', async () => {
+    const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
+
+    await organisationAutocomplete?.setValue(undefined);
+    await nextTick();
+
+    await organisationAutocomplete?.vm.$emit('update:search', '');
+    await nextTick();
+    expect(organisationStore.getAllOrganisationen).toHaveBeenCalled();
+  });
+
+  test('it does nothing if the oldValue is equal to what is selected on Organisation', async () => {
+    const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
+
+    // Set a value in orga that will match with something given by the props and so the component will calculate the selectedOrganisationTitle
+    await organisationAutocomplete?.setValue('1133');
+    await nextTick();
+
+    // Set the searchValue to 'orga' which matches the title before
+    await organisationAutocomplete?.vm.$emit('update:search', 'orga');
+    await nextTick();
+
+    // Set the newValue to '' and the oldValue is in this case 'orga' and so the method should just return
+    await organisationAutocomplete?.vm.$emit('update:search', '');
+    await nextTick();
+
+    expect(organisationAutocomplete?.text()).toEqual('1133');
   });
 });
