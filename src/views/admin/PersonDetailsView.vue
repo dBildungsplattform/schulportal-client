@@ -834,6 +834,21 @@
     { immediate: true },
   );
 
+  // Watcher to set an initial value for the radio buttons depending on the selected Rolle
+  watch(
+    selectedRolle,
+    (newValue: string | undefined) => {
+      if (isBefristungspflichtRolle(newValue)) {
+        selectedBefristungOption.value = BefristungOption.SCHULJAHRESENDE;
+        calculatedBefristung.value = getNextSchuljahresende();
+      } else {
+        selectedBefristungOption.value = BefristungOption.UNBEFRISTET;
+        calculatedBefristung.value = undefined;
+      }
+    },
+    { immediate: true },
+  );
+
   // Computed property to check if the second radio button should be disabled
   const isUnbefristetButtonDisabled: ComputedRef<boolean> = computed(() => {
     return isBefristungspflichtRolle(selectedRolle.value);
