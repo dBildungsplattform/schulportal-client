@@ -371,12 +371,6 @@ export interface DBiamPersonenkontextResponse {
      * @memberof DBiamPersonenkontextResponse
      */
     'rolleId': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof DBiamPersonenkontextResponse
-     */
-    'befristung': string;
 }
 /**
  * 
@@ -521,12 +515,6 @@ export interface DBiamPersonenzuordnungResponse {
     'editable': boolean;
     /**
      * 
-     * @type {string}
-     * @memberof DBiamPersonenzuordnungResponse
-     */
-    'befristung': string;
-    /**
-     * 
      * @type {RollenMerkmal}
      * @memberof DBiamPersonenzuordnungResponse
      */
@@ -552,12 +540,6 @@ export interface DbiamCreatePersonWithContextBodyParams {
      * @memberof DbiamCreatePersonWithContextBodyParams
      */
     'vorname': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof DbiamCreatePersonWithContextBodyParams
-     */
-    'befristung'?: string;
     /**
      * 
      * @type {string}
@@ -641,12 +623,6 @@ export interface DbiamPersonenkontextBodyParams {
      * @memberof DbiamPersonenkontextBodyParams
      */
     'rolleId': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof DbiamPersonenkontextBodyParams
-     */
-    'befristung'?: string;
 }
 /**
  * 
@@ -708,8 +684,7 @@ export const DbiamPersonenkontexteUpdateErrorI18nKeyEnum = {
     InvalidLastModifiedValue: 'INVALID_LAST_MODIFIED_VALUE',
     PersonIdMismatch: 'PERSON_ID_MISMATCH',
     PersonNotFound: 'PERSON_NOT_FOUND',
-    InvalidPersonenkontextForPersonWithRollenartLern: 'INVALID_PERSONENKONTEXT_FOR_PERSON_WITH_ROLLENART_LERN',
-    BefristungRequiredForPersonenkontext: ' BEFRISTUNG_REQUIRED_FOR_PERSONENKONTEXT'
+    InvalidPersonenkontextForPersonWithRollenartLern: 'INVALID_PERSONENKONTEXT_FOR_PERSON_WITH_ROLLENART_LERN'
 } as const;
 
 export type DbiamPersonenkontexteUpdateErrorI18nKeyEnum = typeof DbiamPersonenkontexteUpdateErrorI18nKeyEnum[keyof typeof DbiamPersonenkontexteUpdateErrorI18nKeyEnum];
@@ -1940,6 +1915,18 @@ export interface RolleResponse {
      * @memberof RolleResponse
      */
     'systemrechte': Set<RollenSystemRecht>;
+    /**
+     * 
+     * @type {string}
+     * @memberof RolleResponse
+     */
+    'administeredBySchulstrukturknotenName': string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof RolleResponse
+     */
+    'administeredBySchulstrukturknotenKennung': string | null;
 }
 
 
@@ -2023,6 +2010,18 @@ export interface RolleWithServiceProvidersResponse {
      * @memberof RolleWithServiceProvidersResponse
      */
     'systemrechte': Set<RollenSystemRecht>;
+    /**
+     * 
+     * @type {string}
+     * @memberof RolleWithServiceProvidersResponse
+     */
+    'administeredBySchulstrukturknotenName': string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof RolleWithServiceProvidersResponse
+     */
+    'administeredBySchulstrukturknotenKennung': string | null;
     /**
      * 
      * @type {Array<ServiceProviderIdNameResponse>}
