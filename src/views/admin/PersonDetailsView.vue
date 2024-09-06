@@ -846,7 +846,7 @@
             <!-- KoPers.-Nr. -->
             <v-row
               class="mt-0"
-              v-if="hasKopersRolle"
+              v-if="hasKopersRolle || personStore.currentPerson.person.personalnummer"
             >
               <v-col cols="1"></v-col>
               <v-col
