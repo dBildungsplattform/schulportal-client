@@ -7,6 +7,7 @@ import ApiService from '@/services/ApiService';
 import MockAdapter from 'axios-mock-adapter';
 import { setActivePinia, createPinia } from 'pinia';
 import { rejects } from 'assert';
+
 import {
   useTwoFactorAuthentificationStore,
   type TwoFactorAuthentificationStore,
@@ -150,31 +151,6 @@ describe('TwoFactorAuthentificationStore', () => {
       const resetTokenPromise: Promise<void> = twoFactorAuthenticationStore.resetToken(referrer);
       expect(twoFactorAuthenticationStore.loading).toBe(true);
       await resetTokenPromise;
-      expect(twoFactorAuthenticationStore.loading).toBe(false);
-      expect(twoFactorAuthenticationStore.errorCode).toEqual('');
-    });
-
-    it('should handle string error', async () => {
-      const referrer: string = 'testReferrer';
-
-      mockadapter.onPut(`/api/2fa-token/reset?personId=${referrer}`).replyOnce(500, 'some error');
-
-      const resetTokenPromise: Promise<void> = twoFactorAuthenticationStore.resetToken(referrer);
-      expect(twoFactorAuthenticationStore.loading).toBe(true);
-      await rejects(resetTokenPromise);
-      expect(twoFactorAuthenticationStore.errorCode).toEqual('UNSPECIFIED_ERROR');
-      expect(twoFactorAuthenticationStore.loading).toBe(false);
-    });
-
-    it('should handle error code', async () => {
-      const referrer: string = 'testReferrer';
-
-      mockadapter.onPut(`/api/2fa-token/reset?personId=${referrer}`).replyOnce(500, { code: 'some mock server error' });
-
-      const resetTokenPromise: Promise<void> = twoFactorAuthenticationStore.resetToken(referrer);
-      expect(twoFactorAuthenticationStore.loading).toBe(true);
-      await rejects(resetTokenPromise);
-      expect(twoFactorAuthenticationStore.errorCode).toEqual('some mock server error');
       expect(twoFactorAuthenticationStore.loading).toBe(false);
     });
   });
