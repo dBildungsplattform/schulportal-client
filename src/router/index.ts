@@ -1,16 +1,13 @@
 import { createRouter, createWebHistory, type RouteLocationNormalized, type Router } from 'vue-router';
 import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
-import routes from './routes';
-
+import routes, { StepUpLevel } from './routes';
 const router: Router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
 });
 
 router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormalized) => {
-  console.log('to', to);
   const authStore: AuthStore = useAuthStore();
-
   await authStore.initializeAuthStatus();
 
   // Redirect authenticated users trying to access the login page to the start page
@@ -19,13 +16,12 @@ router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormal
   }
 
   if (to.meta['requiresAuth'] && !authStore.isAuthed) {
-    window.location.href = `/api/auth/login?redirectUrl=${to.fullPath}&stepUp=${to.meta['requiresStepUp']}`;
+    window.location.href = `/api/auth/login?redirectUrl=${to.fullPath}`;
     return false;
   }
 
-  if (to.meta['requiresHighLoa'] && authStore.acr !== 'gold') {
-    debugger;
-    window.location.href = `/api/auth/login?redirectUrl=${to.fullPath}&stepUp=true`;
+  if (to.meta['requiredStepUpLevel'] === StepUpLevel.GOLD && authStore.acr !== StepUpLevel.GOLD) {
+    window.location.href = `/api/auth/login?redirectUrl=${to.fullPath}&requiredStepUpLevel=${StepUpLevel.GOLD}`;
   }
 
   if (to.meta['requiresPermission']) {

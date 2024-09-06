@@ -7,6 +7,7 @@ import {
 } from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
 import type { UserinfoPersonenkontext } from './PersonenkontextStore';
+import { StepUpLevel } from '@/router/routes';
 
 export type UserInfo = {
   sub: string;
@@ -41,7 +42,7 @@ type AuthState = {
   hasSchulverwaltungPermission: boolean;
   hasSchultraegerverwaltungPermission: boolean;
   isAuthed: boolean;
-  acr: string;
+  acr: StepUpLevel;
 };
 
 type AuthActions = {
@@ -66,7 +67,7 @@ export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, 
     hasSchulverwaltungPermission: false,
     hasSchultraegerverwaltungPermission: false,
     isAuthed: false,
-    acr: '',
+    acr: StepUpLevel.NONE,
   }),
   actions: {
     async initializeAuthStatus() {
@@ -78,7 +79,7 @@ export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, 
 
         this.isAuthed = loginStatus >= 200 && loginStatus < 400;
         this.currentUser = data;
-        this.acr = data.acr;
+        this.acr = data.acr as StepUpLevel;
 
         /* extract all system permissions from current user's personenkontexte */
         const personenkontexte: Array<UserinfoPersonenkontext> | null = this.currentUser.personenkontexte;

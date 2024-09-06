@@ -1,5 +1,11 @@
 import type { RouteRecordRaw } from 'vue-router';
 
+export enum StepUpLevel {
+  NONE = 'none',
+  SILVER = 'silver',
+  GOLD = 'gold',
+}
+
 const routes: readonly RouteRecordRaw[] = [
   {
     path: '/',
@@ -8,7 +14,7 @@ const routes: readonly RouteRecordRaw[] = [
     meta: {
       layout: 'DefaultLayout',
       requiresAuth: false,
-      requiresStepUp: false,
+      requiredStepUpLevel: StepUpLevel.NONE,
     },
   },
   {
@@ -18,7 +24,7 @@ const routes: readonly RouteRecordRaw[] = [
     meta: {
       layout: 'AdminLayout',
       requiresAuth: true,
-      requiresStepUp: true,
+      requiredStepUpLevel: StepUpLevel.GOLD,
       requiresPermission: 'personenverwaltung',
     },
   },
@@ -29,7 +35,7 @@ const routes: readonly RouteRecordRaw[] = [
     meta: {
       layout: 'AdminLayout',
       requiresAuth: true,
-      requiresStepUp: true,
+      requiredStepUpLevel: StepUpLevel.GOLD,
       requiresPermission: 'personenverwaltung',
     },
   },
@@ -40,7 +46,7 @@ const routes: readonly RouteRecordRaw[] = [
     meta: {
       layout: 'AdminLayout',
       requiresAuth: true,
-      requiresStepUp: true,
+      requiredStepUpLevel: StepUpLevel.GOLD,
       requiresPermission: 'personenverwaltung',
     },
   },
@@ -51,7 +57,7 @@ const routes: readonly RouteRecordRaw[] = [
     meta: {
       requiresAuth: true,
       layout: 'AdminLayout',
-      requiresStepUp: true,
+      requiredStepUpLevel: StepUpLevel.GOLD,
       requiresPermission: 'klassenverwaltung',
     },
   },
@@ -62,7 +68,7 @@ const routes: readonly RouteRecordRaw[] = [
     meta: {
       layout: 'AdminLayout',
       requiresAuth: true,
-      requiresStepUp: true,
+      requiredStepUpLevel: StepUpLevel.GOLD,
       requiresPermission: 'klassenverwaltung',
     },
   },
@@ -73,7 +79,7 @@ const routes: readonly RouteRecordRaw[] = [
     meta: {
       layout: 'AdminLayout',
       requiresAuth: true,
-      requiresStepUp: true,
+      requiredStepUpLevel: StepUpLevel.GOLD,
       requiresPermission: 'klassenverwaltung',
     },
   },
@@ -84,7 +90,7 @@ const routes: readonly RouteRecordRaw[] = [
     meta: {
       layout: 'AdminLayout',
       requiresAuth: true,
-      requiresStepUp: true,
+      requiredStepUpLevel: StepUpLevel.GOLD,
       requiresPermission: 'rollenverwaltung',
     },
   },
@@ -95,7 +101,7 @@ const routes: readonly RouteRecordRaw[] = [
     meta: {
       layout: 'AdminLayout',
       requiresAuth: true,
-      requiresStepUp: true,
+      requiredStepUpLevel: StepUpLevel.GOLD,
       requiresPermission: 'rollenverwaltung',
     },
   },
@@ -106,7 +112,7 @@ const routes: readonly RouteRecordRaw[] = [
     meta: {
       layout: 'AdminLayout',
       requiresAuth: true,
-      requiresStepUp: true,
+      requiredStepUpLevel: StepUpLevel.GOLD,
       requiresPermission: 'rollenverwaltung',
     },
   },
@@ -117,7 +123,7 @@ const routes: readonly RouteRecordRaw[] = [
     meta: {
       layout: 'AdminLayout',
       requiresAuth: true,
-      requiresStepUp: true,
+      requiredStepUpLevel: StepUpLevel.GOLD,
       requiresPermission: 'schulverwaltung',
     },
   },
@@ -128,7 +134,7 @@ const routes: readonly RouteRecordRaw[] = [
     meta: {
       layout: 'AdminLayout',
       requiresAuth: true,
-      requiresStepUp: true,
+      requiredStepUpLevel: StepUpLevel.GOLD,
       requiresPermission: 'schulverwaltung',
     },
   },
@@ -139,7 +145,7 @@ const routes: readonly RouteRecordRaw[] = [
     meta: {
       layout: 'DefaultLayout',
       requiresAuth: true,
-      requiresStepUp: false,
+      requiredStepUpLevel: StepUpLevel.SILVER,
     },
   },
   {
@@ -154,7 +160,7 @@ const routes: readonly RouteRecordRaw[] = [
     meta: {
       layout: 'DefaultLayout',
       requiresAuth: true,
-      requiresHighLoa: true,
+      requiredStepUpLevel: StepUpLevel.SILVER,
     },
   },
   {
