@@ -3497,6 +3497,62 @@
                     }
                 ]
             }
+        },
+        "/api/2fa-token/assign/hardwareToken": {
+            "post": {
+                "operationId": "PrivacyIdeaAdministrationController_assignHardwareToken",
+                "parameters": [],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AssignHardwareTokenBodyParams"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "The hardware token was successfully assigned.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AssignHardwareTokenResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Not found."
+                    },
+                    "401": {
+                        "description": "Not authorized to assign hardware token."
+                    },
+                    "403": {
+                        "description": "Insufficient permissions to reset token."
+                    },
+                    "404": {
+                        "description": "Insufficient permissions to assign hardware token."
+                    },
+                    "500": {
+                        "description": "Internal server error while assigning a hardware token."
+                    }
+                },
+                "tags": [
+                    "2FA"
+                ],
+                "security": [
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
         }
     },
     "info": {
@@ -5403,11 +5459,73 @@
                     },
                     "tokenKind": {
                         "type": "string"
+                    },
+                    "serial": {
+                        "type": "string"
                     }
                 },
                 "required": [
                     "hasToken",
-                    "tokenKind"
+                    "tokenKind",
+                    "serial"
+                ]
+            },
+            "AssignHardwareTokenBodyParams": {
+                "type": "object",
+                "properties": {
+                    "serial": {
+                        "type": "string"
+                    },
+                    "otp": {
+                        "type": "string"
+                    },
+                    "referrer": {
+                        "type": "string"
+                    },
+                    "userId": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "serial",
+                    "otp",
+                    "referrer",
+                    "userId"
+                ]
+            },
+            "AssignHardwareTokenResponse": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "number"
+                    },
+                    "jsonrpc": {
+                        "type": "string"
+                    },
+                    "time": {
+                        "type": "number"
+                    },
+                    "version": {
+                        "type": "string"
+                    },
+                    "versionnumber": {
+                        "type": "string"
+                    },
+                    "signature": {
+                        "type": "string"
+                    },
+                    "dialogText": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "id",
+                    "jsonrpc",
+                    "time",
+                    "version",
+                    "versionnumber",
+                    "signature",
+                    "dialogText"
                 ]
             }
         }
