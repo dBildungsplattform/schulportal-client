@@ -56,6 +56,28 @@ beforeEach(() => {
     },
   ];
 
+  
+  organisationStore.allSchulen = [
+    {
+      id: '1133',
+      name: 'orga',
+      kennung: '9356494-9a',
+      namensergaenzung: 'Klasse',
+      kuerzel: 'aehg',
+      typ: 'SCHULE',
+      administriertVon: '1',
+    },
+    {
+      id: '1',
+      name: '9b',
+      kennung: '9356494-9b',
+      namensergaenzung: 'Klasse',
+      kuerzel: 'aehg',
+      typ: 'SCHULE',
+      administriertVon: '1',
+    },
+  ];
+
   organisationStore.totalKlassen = 2;
 
   wrapper = mount(KlassenManagementView, {
@@ -181,6 +203,6 @@ describe('KlassenManagementView', () => {
     await organisationAutocomplete?.vm.$emit('update:search', '');
     await nextTick();
 
-    expect(organisationAutocomplete?.text()).toEqual('1133');
+    expect(organisationAutocomplete?.text()).toEqual('9356494-9a (orga)');
   });
 });
