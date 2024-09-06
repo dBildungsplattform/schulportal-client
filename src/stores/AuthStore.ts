@@ -29,6 +29,7 @@ export type UserInfo = {
   updated_at: number | null;
   personId: string | null;
   personenkontexte: Array<PersonenkontextRolleFieldsResponse> | null;
+  password_updated_at: number | null;
 };
 
 type AuthState = {

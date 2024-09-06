@@ -3641,6 +3641,10 @@
                         "type": "number",
                         "nullable": true
                     },
+                    "password_updated_at": {
+                        "type": "number",
+                        "nullable": true
+                    },
                     "personenkontexte": {
                         "type": "array",
                         "items": {
@@ -3668,6 +3672,7 @@
                     "locale",
                     "phone_number",
                     "updated_at",
+                    "password_updated_at",
                     "personenkontexte"
                 ]
             },

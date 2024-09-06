@@ -2500,6 +2500,12 @@ export interface UserinfoResponse {
     'updated_at': number | null;
     /**
      * 
+     * @type {number}
+     * @memberof UserinfoResponse
+     */
+    'password_updated_at': number | null;
+    /**
+     * 
      * @type {Array<PersonenkontextRolleFieldsResponse>}
      * @memberof UserinfoResponse
      */

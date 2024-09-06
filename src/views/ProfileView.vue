@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import { ref, type Ref, onBeforeMount } from 'vue';
+  import { ref, type Ref, onBeforeMount, ComputedRef } from 'vue';
   import { useI18n } from 'vue-i18n';
   const { t }: { t: Function } = useI18n();
   type LabelValue = {
@@ -14,6 +14,8 @@
   import { OrganisationsTyp } from '@/stores/OrganisationStore';
   import { type RouteLocationNormalizedLoaded, type Router, useRoute, useRouter } from 'vue-router';
   import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
+  import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
+  import { computed } from 'vue';
 
   const route: RouteLocationNormalizedLoaded = useRoute();
   const router: Router = useRouter();
@@ -28,8 +30,18 @@
 
   let personInfoStore: PersonInfoStore = usePersonInfoStore();
   let personStore: PersonStore = usePersonStore();
+  let authStore: AuthStore = useAuthStore();
   const personalData: Ref = ref<LabelValue[]>([]);
   const schulDaten: Ref = ref<SchulDaten[]>([]);
+  const lastPasswordChangeDate: ComputedRef<string> = computed(() => {
+    const date: Date = new Date(authStore.currentUser?.password_updated_at ?? '');
+    if (date.toString() == 'Invalid Date') return '';
+    return new Intl.DateTimeFormat('de-DE', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).format(date);
+  });
 
   function handleGoToPreviousPage(): void {
     const previousUrl: string | null = sessionStorage.getItem('previousUrl');
@@ -135,6 +147,7 @@
   async function initializeStores(): Promise<void> {
     personInfoStore = usePersonInfoStore();
     personStore = usePersonStore();
+    authStore = useAuthStore();
     await personInfoStore.initPersonInfo();
     await personStore.getPersonenuebersichtById(personInfoStore.personInfo?.person.id ?? '');
   }
@@ -324,6 +337,12 @@
               class="w-100"
               icon="mdi-key-alert-outline"
             ></v-icon>
+            <p
+              class="w-100 text-center text-body"
+              v-if="lastPasswordChangeDate"
+            >
+              {{ t('profile.lastPasswordChange', { date: lastPasswordChangeDate }) }}
+            </p>
             <div>
               <v-btn
                 class="primary"
