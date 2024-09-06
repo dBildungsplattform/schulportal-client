@@ -623,7 +623,6 @@
               v-model="selectedBefristung"
               v-bind="selectedBefristungProps"
               prepend-icon=""
-              append-inner-icon="$calendar"
               variant="outlined"
               placeholder="TT.MM.JJJJ"
               color="primary"
