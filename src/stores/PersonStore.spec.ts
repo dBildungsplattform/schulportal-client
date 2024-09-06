@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/typedef */
 import {
   OrganisationsTyp,
   RollenMerkmal,
@@ -82,6 +83,7 @@ describe('PersonStore', () => {
                 administriertVon: 'string',
                 editable: true,
                 merkmale: [] as unknown as RollenMerkmal,
+                befristung: '2025-04-05',
               },
             ],
           },
@@ -91,7 +93,7 @@ describe('PersonStore', () => {
       mockadapter.onGet('/api/personen-frontend').replyOnce(200, mockPersonsResponse);
 
       // Update the mock POST request with the appropriate body
-      const personIds: Array<string> = mockPersons.map((person: PersonendatensatzResponse) => person.person.id);
+      const personIds: string[] = mockPersons.map((person: PersonendatensatzResponse) => person.person.id);
       mockadapter.onPost('/api/dbiam/personenuebersicht', { personIds }).replyOnce(200, mockUebersichten);
 
       const getAllPersonsPromise: Promise<void> = personStore.getAllPersons({});
@@ -314,6 +316,7 @@ describe('PersonStore', () => {
             administriertVon: 'string',
             editable: true,
             merkmale: [] as unknown as RollenMerkmal,
+            befristung: '2025-04-05',
           },
         ],
       };
