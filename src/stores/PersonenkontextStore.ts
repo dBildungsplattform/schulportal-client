@@ -40,6 +40,11 @@ const personAdministrationApi: PersonAdministrationApiInterface = PersonAdminist
   axiosApiInstance,
 );
 
+export enum BefristungOption {
+  SCHULJAHRESENDE = 'schuljahresende',
+  UNBEFRISTET = 'unbefristet',
+}
+
 export enum PersonenKontextTyp {
   Organisation = 'ORGANISATION',
   Klasse = 'KLASSE',

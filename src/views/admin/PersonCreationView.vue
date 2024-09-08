@@ -24,6 +24,7 @@
   import FormWrapper from '@/components/form/FormWrapper.vue';
   import FormRow from '@/components/form/FormRow.vue';
   import {
+    BefristungOption,
     PersonenKontextTyp,
     usePersonenkontextStore,
     type PersonenkontextStore,
@@ -37,8 +38,8 @@
   import { useKlassen } from '@/composables/useKlassen';
   import PersonenkontextCreate from '@/components/admin/personen/PersonenkontextCreate.vue';
   import { type TranslatedObject } from '@/types.d';
-  import SpshTooltip from '@/components/admin/SpshTooltip.vue';
   import { parse, isValid, isBefore } from 'date-fns';
+  import BefristungComponent from '@/components/admin/personen/BefristungComponent.vue';
 
   const router: Router = useRouter();
   const personStore: PersonStore = usePersonStore();
@@ -56,10 +57,6 @@
 
   const rollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = useRollen();
 
-  enum BefristungOption {
-    SCHULJAHRESENDE = 'schuljahresende',
-    UNBEFRISTET = 'unbefristet',
-  }
   function isKopersRolle(selectedRolleId: string | undefined): boolean {
     const rolle: TranslatedRolleWithAttrs | undefined = rollen.value?.find(
       (r: TranslatedRolleWithAttrs) => r.value === selectedRolleId,
@@ -384,6 +381,16 @@
       }
     }
   }
+
+  const handleBefristungUpdate = (value: string | undefined): void => {
+    selectedBefristung.value = value;
+    calculatedBefristung.value = value;
+  };
+
+  const handleBefristungOptionUpdate = (value: string | undefined): void => {
+    selectedBefristungOption.value = value;
+    handleBefristungOptionChange(value);
+  };
   // Watcher to reset the radio button in case the date was picked using date-input
   watch(
     selectedBefristung,
@@ -610,65 +617,18 @@
           class="mt-4"
           v-if="selectedOrganisation && selectedRolle"
         >
-          <v-row>
-            <h3 class="headline-3">3. {{ $t('admin.befristung.assignBefristung') }}</h3>
-          </v-row>
-          <FormRow
-            :errorLabel="selectedBefristungProps?.error || ''"
-            labelForId="befristung-select"
-            :isRequired="true"
-            :label="$t('admin.befristung.befristung')"
-          >
-            <v-text-field
-              v-model="selectedBefristung"
-              v-bind="selectedBefristungProps"
-              prepend-icon=""
-              variant="outlined"
-              placeholder="TT.MM.JJJJ"
-              color="primary"
-            ></v-text-field>
-          </FormRow>
-          <!-- Radio buttons for Befristung options -->
-          <v-row class="align-center">
-            <v-col
-              class="py-0 mt-n1"
-              cols="12"
-              sm="7"
-              offset-sm="5"
-            >
-              <v-radio-group
-                v-model="selectedBefristungOption"
-                v-bind="selectedBefristungOptionProps"
-                @update:modelValue="handleBefristungOptionChange"
-              >
-                <v-radio
-                  :label="`${t('admin.befristung.untilEndOfSchoolYear')} (${getNextSchuljahresende()})`"
-                  :value="BefristungOption.SCHULJAHRESENDE"
-                  :color="'primary'"
-                ></v-radio>
-                <SpshTooltip
-                  v-if="isUnbefristetButtonDisabled"
-                  :enabledCondition="!isUnbefristetButtonDisabled"
-                  :disabledText="$t('admin.befristung.unlimitedInactive')"
-                  position="start"
-                >
-                  <v-radio
-                    :label="$t('admin.befristung.unlimited')"
-                    :value="BefristungOption.UNBEFRISTET"
-                    :color="'primary'"
-                    :disabled="isUnbefristetButtonDisabled"
-                  ></v-radio>
-                </SpshTooltip>
-                <v-radio
-                  v-else
-                  :label="$t('admin.befristung.unlimited')"
-                  :value="BefristungOption.UNBEFRISTET"
-                  :color="'primary'"
-                  :disabled="isUnbefristetButtonDisabled"
-                ></v-radio>
-              </v-radio-group>
-            </v-col>
-          </v-row>
+          <BefristungComponent
+            v-if="selectedOrganisation && selectedRolle"
+            :befristungProps="selectedBefristungProps"
+            :befristungOptionProps="selectedBefristungOptionProps"
+            :isUnbefristetDisabled="isUnbefristetButtonDisabled"
+            :isBefristungRequired="isBefristungspflichtRolle(selectedRolle)"
+            :nextSchuljahresende="getNextSchuljahresende()"
+            :befristung="selectedBefristung"
+            :befristungOption="selectedBefristungOption"
+            @update:befristung="handleBefristungUpdate"
+            @update:befristungOption="handleBefristungOptionUpdate"
+          />
         </div>
       </FormWrapper>
     </template>

@@ -9,7 +9,12 @@
   import PersonDelete from '@/components/admin/personen/PersonDelete.vue';
   import PersonenkontextDelete from '@/components/admin/personen/PersonenkontextDelete.vue';
   import TwoFactorAuthenticationSetUp from '@/components/two-factor-authentication/TwoFactorAuthenticationSetUp.vue';
-  import { usePersonenkontextStore, type PersonenkontextStore, type Zuordnung } from '@/stores/PersonenkontextStore';
+  import {
+    BefristungOption,
+    usePersonenkontextStore,
+    type PersonenkontextStore,
+    type Zuordnung,
+  } from '@/stores/PersonenkontextStore';
   import {
     OrganisationsTyp,
     useOrganisationStore,
@@ -33,9 +38,9 @@
     useTwoFactorAuthentificationStore,
     type TwoFactorAuthentificationStore,
   } from '@/stores/TwoFactorAuthentificationStore';
-  import FormRow from '@/components/form/FormRow.vue';
   import { DDMMYYYY } from '@/utils/validation';
   import { isBefore, isValid, parse } from 'date-fns';
+  import BefristungComponent from '@/components/admin/personen/BefristungComponent.vue';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
@@ -488,7 +493,6 @@
   // This will send the updated list of Zuordnungen to the Backend on TOP of the new added one through the form.
   async function confirmAddition(): Promise<void> {
     await personenkontextStore.updatePersonenkontexte(finalZuordnungen.value, currentPersonId);
-    console.log(finalZuordnungen.value);
     createSuccessDialogVisible.value = !personenkontextStore.errorCode;
     resetZuordnungForm();
   }
@@ -786,11 +790,6 @@
     }
   }
 
-  enum BefristungOption {
-    SCHULJAHRESENDE = 'schuljahresende',
-    UNBEFRISTET = 'unbefristet',
-  }
-
   // Calculates the next 31st of July (End of school year)
   // Time here is in german iso format but will later be converted to UCT
   function getNextSchuljahresende(): string {
@@ -823,6 +822,17 @@
       }
     }
   }
+
+  const handleBefristungUpdate = (value: string | undefined): void => {
+    selectedBefristung.value = value;
+    calculatedBefristung.value = value;
+  };
+
+  const handleBefristungOptionUpdate = (value: string | undefined): void => {
+    selectedBefristungOption.value = value;
+    handleBefristungOptionChange(value);
+  };
+
   // Watcher to reset the radio button in case the date was picked using date-input
   watch(
     selectedBefristung,
@@ -1527,62 +1537,18 @@
                 />
                 <!-- Befristung -->
                 <div v-if="selectedOrganisation && selectedRolle">
-                  <FormRow
-                    :errorLabel="selectedBefristungProps?.error || ''"
-                    labelForId="befristung-select"
-                    :isRequired="true"
-                    :label="$t('admin.befristung.befristung')"
-                  >
-                    <v-text-field
-                      v-model="selectedBefristung"
-                      v-bind="selectedBefristungProps"
-                      prepend-icon=""
-                      variant="outlined"
-                      placeholder="TT.MM.JJJJ"
-                      color="primary"
-                    ></v-text-field>
-                  </FormRow>
-                  <!-- Radio buttons for Befristung options -->
-                  <v-row class="align-center">
-                    <v-col
-                      class="py-0 mt-n1"
-                      cols="12"
-                      sm="7"
-                      offset-sm="5"
-                    >
-                      <v-radio-group
-                        v-model="selectedBefristungOption"
-                        v-bind="selectedBefristungOptionProps"
-                        @update:modelValue="handleBefristungOptionChange"
-                      >
-                        <v-radio
-                          :label="`${t('admin.befristung.untilEndOfSchoolYear')} (${getNextSchuljahresende()})`"
-                          :value="BefristungOption.SCHULJAHRESENDE"
-                          :color="'primary'"
-                        ></v-radio>
-                        <SpshTooltip
-                          v-if="isUnbefristetButtonDisabled"
-                          :enabledCondition="!isUnbefristetButtonDisabled"
-                          :disabledText="$t('admin.befristung.unlimitedInactive')"
-                          position="start"
-                        >
-                          <v-radio
-                            :label="$t('admin.befristung.unlimited')"
-                            :value="BefristungOption.UNBEFRISTET"
-                            :color="'primary'"
-                            :disabled="isUnbefristetButtonDisabled"
-                          ></v-radio>
-                        </SpshTooltip>
-                        <v-radio
-                          v-else
-                          :label="$t('admin.befristung.unlimited')"
-                          :value="BefristungOption.UNBEFRISTET"
-                          :color="'primary'"
-                          :disabled="isUnbefristetButtonDisabled"
-                        ></v-radio>
-                      </v-radio-group>
-                    </v-col>
-                  </v-row>
+                  <BefristungComponent
+                    v-if="selectedOrganisation && selectedRolle"
+                    :befristungProps="selectedBefristungProps"
+                    :befristungOptionProps="selectedBefristungOptionProps"
+                    :isUnbefristetDisabled="isUnbefristetButtonDisabled"
+                    :isBefristungRequired="isBefristungspflichtRolle(selectedRolle)"
+                    :nextSchuljahresende="getNextSchuljahresende()"
+                    :befristung="selectedBefristung"
+                    :befristungOption="selectedBefristungOption"
+                    @update:befristung="handleBefristungUpdate"
+                    @update:befristungOption="handleBefristungOptionUpdate"
+                  />
                 </div>
               </v-container>
               <v-row class="py-3 px-2 justify-center">
