@@ -65,9 +65,6 @@
 
 <template>
   <div>
-    <v-row>
-      <h3 class="headline-3">{{ $t('admin.befristung.assignBefristung') }}</h3>
-    </v-row>
     <FormRow
       :errorLabel="befristungProps?.error || ''"
       labelForId="befristung-select"
