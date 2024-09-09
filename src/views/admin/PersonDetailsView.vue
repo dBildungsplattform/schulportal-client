@@ -33,11 +33,10 @@
     useTwoFactorAuthentificationStore,
     type TwoFactorAuthentificationStore,
   } from '@/stores/TwoFactorAuthentificationStore';
-  import { DDMMYYYY } from '@/utils/validation';
-  import { isBefore, isValid, parse } from 'date-fns';
   import BefristungComponent from '@/components/admin/personen/BefristungComponent.vue';
   import { getNextSchuljahresende, formatDateToISO } from '@/utils/dateUtils';
   import { isBefristungspflichtRolle, useBefristungUtils, type BefristungUtilsType } from '@/utils/befristungUtils';
+  import { getPersonenkontextFieldDefinitions, getValidationSchema, isLernRolle, type PersonenkontextFieldDefinitions } from '@/utils/validationPersonenkontext';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
@@ -290,15 +289,6 @@
     selectedSchule: string;
     selectedNewKlasse: string;
   };
-
-  // Define a method to check if the selected Rolle is of type "Lern"
-  function isLernRolle(selectedRolleId: string): boolean {
-    const rolle: TranslatedRolleWithAttrs | undefined = rollen.value?.find(
-      (r: TranslatedRolleWithAttrs) => r.value === selectedRolleId,
-    );
-    return !!rolle && rolle.rollenart === RollenArt.Lern;
-  }
-
   const hasKopersRolle: ComputedRef<boolean> = computed(() => {
     return (
       !!zuordnungenResult.value?.find((zuordnung: Zuordnung) => {
@@ -322,40 +312,6 @@
     return false;
   });
 
-  // Custom validation function to check if the date is in the past
-  const notInPast = (value: string | undefined): boolean => {
-    if (!value) return true;
-
-    const parsedDate: Date = parse(value, 'dd.MM.yyyy', new Date());
-    return isValid(parsedDate) && !isBefore(parsedDate, new Date());
-  };
-
-  const zuordnungFormValidationSchema: TypedSchema = toTypedSchema(
-    object({
-      selectedRolle: string().required(t('admin.rolle.rules.rolle.required')),
-      selectedOrganisation: string().required(t('admin.organisation.rules.organisation.required')),
-      selectedKlasse: string().when('selectedRolle', {
-        is: (selectedRolleId: string) => isLernRolle(selectedRolleId),
-        then: (schema: StringSchema<string | undefined, AnyObject, undefined, ''>) =>
-          schema.required(t('admin.klasse.rules.klasse.required')),
-      }),
-      selectedNewKlasse: string().when('selectedSchule', {
-        is: (selectedSchule: string) => selectedSchule,
-        then: (schema: StringSchema<string | undefined, AnyObject, undefined, ''>) =>
-          schema.required(t('admin.klasse.rules.klasse.required')),
-      }),
-      selectedBefristung: string()
-        .matches(DDMMYYYY, t('admin.befristung.rules.format'))
-        .test('notInPast', t('admin.befristung.rules.pastDateNotAllowed'), notInPast)
-        .when(['selectedRolle', 'selectedBefristungOption'], {
-          is: (selectedRolleId: string, selectedBefristungOption: string | undefined) =>
-            isBefristungspflichtRolle(selectedRolleId) && selectedBefristungOption === undefined,
-          then: (schema: StringSchema<string | undefined, AnyObject, undefined, ''>) =>
-            schema.required(t('admin.befristung.rules.required')),
-        }),
-    }),
-  );
-
   const changeKlasseValidationSchema: TypedSchema = toTypedSchema(
     object({
       selectedNewKlasse: string().when('selectedSchule', {
@@ -375,9 +331,22 @@
     },
   });
 
-  const formContext: FormContext<ZuordnungCreationForm, ZuordnungCreationForm> = useForm<ZuordnungCreationForm>({
-    validationSchema: zuordnungFormValidationSchema,
+  const formContext: FormContext<ZuordnungCreationForm, ZuordnungCreationForm> = useForm({
+    validationSchema: getValidationSchema(t),
   });
+
+  const {
+    selectedRolle,
+    selectedRolleProps,
+    selectedOrganisation,
+    selectedOrganisationProps,
+    selectedKlasse,
+    selectedKlasseProps,
+    selectedBefristung,
+    selectedBefristungProps,
+    selectedBefristungOption,
+    selectedBefristungOptionProps,
+  }: PersonenkontextFieldDefinitions = getPersonenkontextFieldDefinitions(formContext);
 
   // eslint-disable-next-line @typescript-eslint/typedef
   const {
@@ -387,29 +356,6 @@
   } = useForm<ChangeKlasseForm>({
     validationSchema: changeKlasseValidationSchema,
   });
-
-  // Add Zuordnung Form
-  const [selectedRolle, selectedRolleProps]: [
-    Ref<string | undefined>,
-    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = formContext.defineField('selectedRolle', vuetifyConfig);
-  const [selectedOrganisation, selectedOrganisationProps]: [
-    Ref<string | undefined>,
-    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = formContext.defineField('selectedOrganisation', vuetifyConfig);
-  const [selectedKlasse, selectedKlasseProps]: [
-    Ref<string | undefined>,
-    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = formContext.defineField('selectedKlasse', vuetifyConfig);
-
-  const [selectedBefristung, selectedBefristungProps]: [
-    Ref<string | undefined>,
-    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = formContext.defineField('selectedBefristung', vuetifyConfig);
-  const [selectedBefristungOption, selectedBefristungOptionProps]: [
-    Ref<string | undefined>,
-    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = formContext.defineField('selectedBefristungOption', vuetifyConfig);
 
   // Change Klasse Form
   const [selectedSchule, selectedSchuleProps]: [
