@@ -9,12 +9,7 @@
   import PersonDelete from '@/components/admin/personen/PersonDelete.vue';
   import PersonenkontextDelete from '@/components/admin/personen/PersonenkontextDelete.vue';
   import TwoFactorAuthenticationSetUp from '@/components/two-factor-authentication/TwoFactorAuthenticationSetUp.vue';
-  import {
-    BefristungOption,
-    usePersonenkontextStore,
-    type PersonenkontextStore,
-    type Zuordnung,
-  } from '@/stores/PersonenkontextStore';
+  import { usePersonenkontextStore, type PersonenkontextStore, type Zuordnung } from '@/stores/PersonenkontextStore';
   import {
     OrganisationsTyp,
     useOrganisationStore,
@@ -42,7 +37,7 @@
   import { isBefore, isValid, parse } from 'date-fns';
   import BefristungComponent from '@/components/admin/personen/BefristungComponent.vue';
   import { getNextSchuljahresende, formatDateToISO } from '@/utils/dateUtils';
-  import { useBefristungUtils, type BefristungUtilsType } from '@/utils/befristungUtils';
+  import { isBefristungspflichtRolle, useBefristungUtils, type BefristungUtilsType } from '@/utils/befristungUtils';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
@@ -335,15 +330,6 @@
     return isValid(parsedDate) && !isBefore(parsedDate, new Date());
   };
 
-  // Checks if the selected Rolle has Befristungspflicht
-  function isBefristungspflichtRolle(selectedRolleId: string | undefined): boolean {
-    const rolle: TranslatedRolleWithAttrs | undefined = rollen.value?.find(
-      (r: TranslatedRolleWithAttrs) => r.value === selectedRolleId,
-    );
-
-    return !!rolle && !!rolle.merkmale && rolle.merkmale.has(RollenMerkmal.BefristungPflicht);
-  }
-
   const zuordnungFormValidationSchema: TypedSchema = toTypedSchema(
     object({
       selectedRolle: string().required(t('admin.rolle.rules.rolle.required')),
@@ -389,10 +375,9 @@
     },
   });
 
-  const formContext: FormContext<ZuordnungCreationForm, ZuordnungCreationForm> =
-    useForm<ZuordnungCreationForm>({
-      validationSchema: zuordnungFormValidationSchema,
-    });
+  const formContext: FormContext<ZuordnungCreationForm, ZuordnungCreationForm> = useForm<ZuordnungCreationForm>({
+    validationSchema: zuordnungFormValidationSchema,
+  });
 
   // eslint-disable-next-line @typescript-eslint/typedef
   const {
@@ -436,13 +421,14 @@
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineFieldChangeKlasse('selectedNewKlasse', vuetifyConfig);
 
-  const { handleBefristungUpdate, handleBefristungOptionUpdate }: BefristungUtilsType = useBefristungUtils({
-    formContext,
-    selectedBefristung,
-    selectedBefristungOption,
-    calculatedBefristung,
-    selectedRolle,
-  });
+  const { handleBefristungUpdate, handleBefristungOptionUpdate, setupWatchers }: BefristungUtilsType =
+    useBefristungUtils({
+      formContext,
+      selectedBefristung,
+      selectedBefristungOption,
+      calculatedBefristung,
+      selectedRolle,
+    });
 
   // Triggers the template to start editing
   const triggerEdit = (): void => {
@@ -585,22 +571,21 @@
     changeKlasseConfirmationDialogVisible.value = true;
   });
 
-  const onSubmitCreateZuordnung: (e?: Event | undefined) => Promise<void | undefined> =
-    formContext.handleSubmit(() => {
-      if (selectedRolle.value) {
-        if (isLernRolle(selectedRolle.value)) {
-          createZuordnungConfirmationDialogMessage.value = t('person.addZuordnungKlasseConfirmation', {
-            rollenname: selectedRolleTitle.value,
-            klassenname: selectedKlasseTitle.value,
-          });
-        } else {
-          createZuordnungConfirmationDialogMessage.value = t('person.addZuordnungConfirmation', {
-            rollenname: selectedRolleTitle.value,
-          });
-        }
-        createZuordnungConfirmationDialogVisible.value = true;
+  const onSubmitCreateZuordnung: (e?: Event | undefined) => Promise<void | undefined> = formContext.handleSubmit(() => {
+    if (selectedRolle.value) {
+      if (isLernRolle(selectedRolle.value)) {
+        createZuordnungConfirmationDialogMessage.value = t('person.addZuordnungKlasseConfirmation', {
+          rollenname: selectedRolleTitle.value,
+          klassenname: selectedKlasseTitle.value,
+        });
+      } else {
+        createZuordnungConfirmationDialogMessage.value = t('person.addZuordnungConfirmation', {
+          rollenname: selectedRolleTitle.value,
+        });
       }
-    });
+      createZuordnungConfirmationDialogVisible.value = true;
+    }
+  });
 
   const confirmDialogAddition = async (): Promise<void> => {
     createZuordnungConfirmationDialogVisible.value = false;
@@ -775,31 +760,7 @@
     }
   }
 
-  // Watcher to reset the radio button in case the date was picked using date-input
-  watch(
-    selectedBefristung,
-    (newValue: string | undefined) => {
-      if (newValue) {
-        selectedBefristungOption.value = undefined;
-      }
-    },
-    { immediate: true },
-  );
-
-  // Watcher to set an initial value for the radio buttons depending on the selected Rolle
-  watch(
-    selectedRolle,
-    (newValue: string | undefined) => {
-      if (isBefristungspflichtRolle(newValue)) {
-        selectedBefristungOption.value = BefristungOption.SCHULJAHRESENDE;
-        calculatedBefristung.value = getNextSchuljahresende();
-      } else {
-        selectedBefristungOption.value = BefristungOption.UNBEFRISTET;
-        calculatedBefristung.value = undefined;
-      }
-    },
-    { immediate: true },
-  );
+  setupWatchers();
 
   // Computed property to check if the second radio button should be disabled
   const isUnbefristetButtonDisabled: ComputedRef<boolean> = computed(() => {

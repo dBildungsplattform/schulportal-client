@@ -175,13 +175,16 @@
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = formContext.defineField('selectedBefristungOption', vuetifyConfig);
 
-  const { handleBefristungUpdate, handleBefristungOptionUpdate }: BefristungUtilsType = useBefristungUtils({
-    formContext,
-    selectedBefristung,
-    selectedBefristungOption,
-    calculatedBefristung,
-    selectedRolle,
-  });
+  const { handleBefristungUpdate, handleBefristungOptionUpdate, setupWatchers }: BefristungUtilsType =
+    useBefristungUtils({
+      formContext,
+      selectedBefristung,
+      selectedBefristungOption,
+      calculatedBefristung,
+      selectedRolle,
+    });
+
+  setupWatchers();
 
   const organisationen: ComputedRef<TranslatedObject[] | undefined> = useOrganisationen();
 
