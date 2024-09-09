@@ -62,6 +62,7 @@ const mockUebersicht: PersonWithUebersicht = {
       typ: OrganisationsTyp.Schule,
       editable: true,
       merkmale: ['KOPERS_PFLICHT'] as unknown as RollenMerkmal,
+      befristung: '2024-05-06',
     },
   ],
 };
