@@ -46,6 +46,7 @@ const mockPersonInfo: PersonInfoResponse = {
   gruppen: [],
 };
 
+const passwordUpdatedAt: Date = new Date(2024, 9, 9);
 const mockCurrentUser: UserInfo = {
   sub: mockPersonInfo.person.id,
   name: null,
@@ -67,7 +68,7 @@ const mockCurrentUser: UserInfo = {
   updated_at: null,
   personId: null,
   personenkontexte: null,
-  password_updated_at: 1725874280767,
+  password_updated_at: passwordUpdatedAt.toISOString(),
 };
 
 const mockUebersicht: PersonWithUebersicht = {
@@ -169,7 +170,9 @@ describe('ProfileView', () => {
     if (!wrapper) return;
     const container: DOMWrapper<Element> = wrapper.find('[data-testid="password-card"]');
     const passwordCardText: string = container.text();
-    expect(passwordCardText).toContain('09.09.2024');
+    expect(passwordCardText).toContain(passwordUpdatedAt.getDay());
+    expect(passwordCardText).toContain(passwordUpdatedAt.getMonth());
+    expect(passwordCardText).toContain(passwordUpdatedAt.getFullYear());
   });
 
   test('it does not display password data if there is none', async () => {
@@ -178,6 +181,8 @@ describe('ProfileView', () => {
     if (!wrapper) return;
     const container: DOMWrapper<Element> = wrapper.find('[data-testid="password-card"]');
     const passwordCardText: string = container.text();
-    expect(passwordCardText).not.toContain('09.09.2024');
+    expect(passwordCardText).not.toContain(passwordUpdatedAt.getDay());
+    expect(passwordCardText).not.toContain(passwordUpdatedAt.getMonth());
+    expect(passwordCardText).not.toContain(passwordUpdatedAt.getFullYear());
   });
 });
