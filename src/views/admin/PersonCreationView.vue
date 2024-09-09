@@ -41,7 +41,7 @@
   import { parse, isValid, isBefore } from 'date-fns';
   import BefristungComponent from '@/components/admin/personen/BefristungComponent.vue';
   import { getNextSchuljahresende, formatDateToISO } from '@/utils/dateUtils';
-  import { useBefristungUtils, type BefristungUtilsType } from '@/utils/befristungUtils';
+  import { isBefristungspflichtRolle, useBefristungUtils, type BefristungUtilsType } from '@/utils/befristungUtils';
 
   const router: Router = useRouter();
   const personStore: PersonStore = usePersonStore();
@@ -72,15 +72,6 @@
       (r: TranslatedRolleWithAttrs) => r.value === selectedRolleId,
     );
     return !!rolle && rolle.rollenart === RollenArt.Lern;
-  }
-
-  // Checks if the selected Rolle has Befristungspflicht
-  function isBefristungspflichtRolle(selectedRolleId: string | undefined): boolean {
-    const rolle: TranslatedRolleWithAttrs | undefined = rollen.value?.find(
-      (r: TranslatedRolleWithAttrs) => r.value === selectedRolleId,
-    );
-
-    return !!rolle && !!rolle.merkmale && rolle.merkmale.has(RollenMerkmal.BefristungPflicht);
   }
 
   // Custom validation function to check if the date is in the past
