@@ -463,6 +463,7 @@
     "yourSchuleAdminsAre": "Ihre schulischen Admins sind:",
     "koPersNummer": "Personalnummer",
     "koPersNummerAbbr": "KoPers.-Nr.",
+    "koPersNummerMissing": "Bitte beachten Sie, dass Ihr Benutzerkonto ohne KoPers.-Nr. nur für einen Übergangszeitraum gültig ist und danach gesperrt wird! Lassen Sie die KoPers.-Nr. bitte durch Ihren schulischen Administrator/Ihre schulische Administratorin nachtragen, sobald diese Ihnen vorliegt.",
     "klasse": "Klasse",
     "error": "Fehler",
     "success": "Erfolg",
