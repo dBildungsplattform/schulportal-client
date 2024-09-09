@@ -64,6 +64,7 @@ const mockCurrentUser: UserInfo = {
       },
     },
   ],
+  password_updated_at: null,
 };
 
 const mockPersonenuebersicht: PersonWithUebersicht = {

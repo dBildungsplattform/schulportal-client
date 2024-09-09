@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import { ref, type Ref, onBeforeMount, ComputedRef } from 'vue';
+  import { ref, type Ref, onBeforeMount, type ComputedRef } from 'vue';
   import { useI18n } from 'vue-i18n';
   const { t }: { t: Function } = useI18n();
   type LabelValue = {
