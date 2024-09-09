@@ -244,6 +244,7 @@
       includeTyp: OrganisationsTyp.Schule,
       systemrechte: ['PERSONEN_VERWALTEN'],
       limit: 25,
+      organisationIds: selectedSchulen.value,
     });
     await organisationStore.getFilteredKlassen({
       includeTyp: OrganisationsTyp.Klasse,
