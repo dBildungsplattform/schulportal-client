@@ -5,11 +5,11 @@
   import SpshTooltip from '@/components/admin/SpshTooltip.vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import {
+    TokenKind,
     useTwoFactorAuthentificationStore,
     type TwoFactorAuthentificationStore,
   } from '@/stores/TwoFactorAuthentificationStore';
   import type { Personendatensatz } from '@/stores/PersonStore';
-  import axios from 'axios';
 
   const { t }: Composer = useI18n({ useScope: 'global' });
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
@@ -42,41 +42,33 @@
     emits('dialogClosed');
   }
 
-  function handleApiError(error: unknown): void {
-    errorThrown.value = true;
-    if (axios.isAxiosError(error)) {
-      if (error.response && error.response.data.i18nKey) {
-        const message: string =
-          t('admin.person.twoFactorAuthentication.errors.' + error.response.data.i18nKey) ||
-          t('admin.person.twoFactorAuthentication.errors.UNKNOWN_ERROR');
-        dialogText.value = message;
-        dialogHeader.value =
-          props.tokenType === 'hardware'
-            ? t('admin.person.twoFactorAuthentication.tokenResetHardwareErrorHeader')
-            : t('admin.person.twoFactorAuthentication.tokenResetSoftwareErrorHeader');
-      } else {
-        dialogText.value = t('admin.person.twoFactorAuthentication.errors.UNKNOWN_ERROR');
-      }
-    }
-  }
-
   function createDialogueText(): void {
-    dialogHeader.value = t('admin.person.twoFactorAuthentication.tokenReset');
-    if (props.tokenType === 'hardware') {
-      dialogText.value = t('admin.person.twoFactorAuthentication.tokenResetSuccessHardware');
+    if (twoFactorAuthenticationStore.errorCode !== '') {
+      const message: string = t(
+        'admin.person.twoFactorAuthentication.errors.' + twoFactorAuthenticationStore.errorCode,
+      );
+      dialogText.value = message;
+      dialogHeader.value =
+        props.tokenType === TokenKind.hardware
+          ? t('admin.person.twoFactorAuthentication.tokenResetHardwareErrorHeader')
+          : t('admin.person.twoFactorAuthentication.tokenResetSoftwareErrorHeader');
     } else {
-      dialogText.value = t('admin.person.twoFactorAuthentication.tokenResetSuccessSoftware');
+      dialogHeader.value = t('admin.person.twoFactorAuthentication.tokenReset');
+      if (props.tokenType === 'hardware') {
+        dialogText.value = t('admin.person.twoFactorAuthentication.tokenResetSuccessHardware');
+      } else {
+        dialogText.value = t('admin.person.twoFactorAuthentication.tokenResetSuccessSoftware');
+      }
     }
   }
 
   async function tokenReset(): Promise<void> {
     try {
       await twoFactorAuthenticationStore.resetToken(props.person.person.id);
-      createDialogueText();
-    } catch (error) {
-      handleApiError(error);
     } finally {
+      createDialogueText();
       isTokenResetRequested.value = true;
+      twoFactorAuthenticationStore.errorCode = '';
     }
   }
 </script>
@@ -122,7 +114,7 @@
             </v-row>
           </v-container>
           <v-container v-if="isTokenResetRequested">
-            <v-row class="text-body px-md-16">
+            <v-row class="text-body px-md-16 bold">
               <v-col class="whiteSpace">
                 {{ dialogText }}
               </v-col>

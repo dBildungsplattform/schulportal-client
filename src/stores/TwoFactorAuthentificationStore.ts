@@ -138,6 +138,12 @@ export const useTwoFactorAuthentificationStore: StoreDefinition<
       this.loading = true;
       try {
         await twoFactorApi.privacyIdeaAdministrationControllerResetToken(personId);
+      } catch (error: unknown) {
+        this.errorCode = 'UNSPECIFIED_ERROR';
+        if (isAxiosError(error)) {
+          this.errorCode = error.response?.data.i18nKey || 'UNSPECIFIED_ERROR';
+        }
+        return await Promise.reject(this.errorCode);
       } finally {
         this.loading = false;
       }

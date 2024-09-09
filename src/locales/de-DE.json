@@ -138,8 +138,7 @@
         "tokenResetButton": "Zurücksetzen",
         "tokenResetSuccessSoftware": "Token wurde erfolgreich zurückgesetzt. Der Benutzer kann sich nun selbstständig einen neuen QR-Code erzeugen.",
         "tokenResetSuccessHardware": "Token wurde erfolgreich zurückgesetzt. Der Hardware-Token kann nun neu zugeordnet werden.",
-        "tokenResetSuccessTokenLost": "Token wurde erfolgreich zurückgesetzt und gesperrt.",
-        "tokenResetError": "Beim Zurücksetzen des Tokens ist ein Fehler aufgetreten: <Fehler>. \nBitte versuchen Sie es später erneut."
+        "tokenResetSuccessTokenLost": "Token wurde erfolgreich zurückgesetzt und gesperrt."
       },
       "copyPasswordError": "Passwort konnte nicht in die Zwischenablage kopiert werden",
       "copyPasswordSuccess": "Passwort in Zwischenablage kopiert",
