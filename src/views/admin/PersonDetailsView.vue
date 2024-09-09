@@ -1,43 +1,38 @@
 <script setup lang="ts">
-  import { type Ref, ref, onBeforeMount, computed, type ComputedRef, watch } from 'vue';
-  import { type Router, type RouteLocationNormalizedLoaded, useRoute, useRouter } from 'vue-router';
-  import { usePersonStore, type PersonStore, type PersonWithUebersicht } from '@/stores/PersonStore';
-  import PasswordReset from '@/components/admin/personen/PasswordReset.vue';
-  import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import SpshAlert from '@/components/alert/SpshAlert.vue';
   import SpshTooltip from '@/components/admin/SpshTooltip.vue';
+  import KlasseChange from '@/components/admin/klassen/KlasseChange.vue';
+  import PasswordReset from '@/components/admin/personen/PasswordReset.vue';
   import PersonDelete from '@/components/admin/personen/PersonDelete.vue';
+  import PersonenkontextCreate from '@/components/admin/personen/PersonenkontextCreate.vue';
   import PersonenkontextDelete from '@/components/admin/personen/PersonenkontextDelete.vue';
+  import SpshAlert from '@/components/alert/SpshAlert.vue';
+  import LayoutCard from '@/components/cards/LayoutCard.vue';
   import TwoFactorAuthenticationSetUp from '@/components/two-factor-authentication/TwoFactorAuthenticationSetUp.vue';
-  import { usePersonenkontextStore, type PersonenkontextStore, type Zuordnung } from '@/stores/PersonenkontextStore';
+  import { useKlassen } from '@/composables/useKlassen';
+  import { useOrganisationen } from '@/composables/useOrganisationen';
+  import { useRollen, type TranslatedRolleWithAttrs } from '@/composables/useRollen';
+  import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
   import {
     OrganisationsTyp,
     useOrganisationStore,
     type Organisation,
     type OrganisationStore,
   } from '@/stores/OrganisationStore';
-  import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
-  import { useDisplay } from 'vuetify';
-  import { object, string, StringSchema, type AnyObject } from 'yup';
-  import { toTypedSchema } from '@vee-validate/yup';
-  import { useForm, type BaseFieldProps, type TypedSchema } from 'vee-validate';
+  import { usePersonStore, type PersonStore, type PersonWithUebersicht } from '@/stores/PersonStore';
+  import { usePersonenkontextStore, type PersonenkontextStore, type Zuordnung } from '@/stores/PersonenkontextStore';
   import { RollenArt, RollenMerkmal } from '@/stores/RolleStore';
-  import { type Composer, useI18n } from 'vue-i18n';
-  import { useOrganisationen } from '@/composables/useOrganisationen';
-  import { useRollen, type TranslatedRolleWithAttrs } from '@/composables/useRollen';
-  import { useKlassen } from '@/composables/useKlassen';
-  import PersonenkontextCreate from '@/components/admin/personen/PersonenkontextCreate.vue';
-  import { type TranslatedObject } from '@/types.d';
-  import KlasseChange from '@/components/admin/klassen/KlasseChange.vue';
-  import {
-    useServiceProviderStore,
-    type ServiceProvider,
-    type ServiceProviderStore,
-  } from '@/stores/ServiceProviderStore';
   import {
     useTwoFactorAuthentificationStore,
     type TwoFactorAuthentificationStore,
   } from '@/stores/TwoFactorAuthentificationStore';
+  import { type TranslatedObject } from '@/types.d';
+  import { toTypedSchema } from '@vee-validate/yup';
+  import { useForm, type BaseFieldProps, type TypedSchema } from 'vee-validate';
+  import { computed, onBeforeMount, ref, watch, type ComputedRef, type Ref } from 'vue';
+  import { useI18n, type Composer } from 'vue-i18n';
+  import { useRoute, useRouter, type RouteLocationNormalizedLoaded, type Router } from 'vue-router';
+  import { useDisplay } from 'vuetify';
+  import { object, string, StringSchema, type AnyObject } from 'yup';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
@@ -50,7 +45,6 @@
   const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
   const authStore: AuthStore = useAuthStore();
   const organisationStore: OrganisationStore = useOrganisationStore();
-  const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
   const twoFactorAuthentificationStore: TwoFactorAuthentificationStore = useTwoFactorAuthentificationStore();
 
   const password: Ref<string> = ref('');
@@ -719,11 +713,6 @@
     }
   }
 
-  let is2faAllowed: Ref<boolean> = ref(false);
-  let show2faBlock: ComputedRef<boolean> = computed(() => {
-    return is2faAllowed.value && twoFactorAuthentificationStore.hasToken != undefined;
-  });
-
   onBeforeMount(async () => {
     personStore.resetState();
     personenkontextStore.errorCode = '';
@@ -734,10 +723,6 @@
       (zuordnung: Zuordnung) => zuordnung.typ === OrganisationsTyp.Klasse,
     );
     await twoFactorAuthentificationStore.get2FAState(currentPersonId);
-    await serviceProviderStore.getAvailableServiceProvidersForPerson(currentPersonId);
-    is2faAllowed.value = serviceProviderStore.availableServiceProvidersForPerson.some(
-      (sp: ServiceProvider) => sp.requires2fa,
-    );
   });
 </script>
 
@@ -916,7 +901,7 @@
           thickness="6"
         ></v-divider>
         <!-- Two Factor Authentication -->
-        <v-container v-if="show2faBlock">
+        <v-container v-if="twoFactorAuthentificationStore.required">
           <v-row class="ml-md-16">
             <v-col>
               <h3 class="subtitle-1">{{ $t('admin.person.twoFactorAuthentication.header') }}</h3>
@@ -1016,7 +1001,7 @@
           ></v-row>
         </v-container>
         <v-divider
-          v-if="show2faBlock"
+          v-if="twoFactorAuthentificationStore.required"
           class="border-opacity-100 rounded my-6 mx-4"
           color="#E5EAEF"
           thickness="6"

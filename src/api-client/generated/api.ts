@@ -2292,6 +2292,12 @@ export interface TokenStateResponse {
      * @memberof TokenStateResponse
      */
     'serial': string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof TokenStateResponse
+     */
+    'required': boolean;
 }
 /**
  * 
@@ -7207,48 +7213,6 @@ export const ProviderApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
-         * Get service-providers available for specified user.
-         * @summary 
-         * @param {string} personId The id of a person
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        providerControllerGetAvailableServiceProvidersForPerson: async (personId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'personId' is not null or undefined
-            assertParamExists('providerControllerGetAvailableServiceProvidersForPerson', 'personId', personId)
-            const localVarPath = `/api/provider/person/{personId}`
-                .replace(`{${"personId"}}`, encodeURIComponent(String(personId)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication bearer required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            // authentication oauth2 required
-            // oauth required
-            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
          * 
          * @param {string} angebotId The id of the service provider
          * @param {*} [options] Override http request option.
@@ -7320,17 +7284,6 @@ export const ProviderApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * Get service-providers available for specified user.
-         * @summary 
-         * @param {string} personId The id of a person
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async providerControllerGetAvailableServiceProvidersForPerson(personId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<ServiceProviderResponse>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.providerControllerGetAvailableServiceProvidersForPerson(personId, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
          * 
          * @param {string} angebotId The id of the service provider
          * @param {*} [options] Override http request option.
@@ -7369,16 +7322,6 @@ export const ProviderApiFactory = function (configuration?: Configuration, baseP
             return localVarFp.providerControllerGetAvailableServiceProviders(options).then((request) => request(axios, basePath));
         },
         /**
-         * Get service-providers available for specified user.
-         * @summary 
-         * @param {string} personId The id of a person
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        providerControllerGetAvailableServiceProvidersForPerson(personId: string, options?: any): AxiosPromise<Array<ServiceProviderResponse>> {
-            return localVarFp.providerControllerGetAvailableServiceProvidersForPerson(personId, options).then((request) => request(axios, basePath));
-        },
-        /**
          * 
          * @param {string} angebotId The id of the service provider
          * @param {*} [options] Override http request option.
@@ -7413,16 +7356,6 @@ export interface ProviderApiInterface {
      * @memberof ProviderApiInterface
      */
     providerControllerGetAvailableServiceProviders(options?: AxiosRequestConfig): AxiosPromise<Array<ServiceProviderResponse>>;
-
-    /**
-     * Get service-providers available for specified user.
-     * @summary 
-     * @param {string} personId The id of a person
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof ProviderApiInterface
-     */
-    providerControllerGetAvailableServiceProvidersForPerson(personId: string, options?: AxiosRequestConfig): AxiosPromise<Array<ServiceProviderResponse>>;
 
     /**
      * 
@@ -7462,18 +7395,6 @@ export class ProviderApi extends BaseAPI implements ProviderApiInterface {
      */
     public providerControllerGetAvailableServiceProviders(options?: AxiosRequestConfig) {
         return ProviderApiFp(this.configuration).providerControllerGetAvailableServiceProviders(options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * Get service-providers available for specified user.
-     * @summary 
-     * @param {string} personId The id of a person
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof ProviderApi
-     */
-    public providerControllerGetAvailableServiceProvidersForPerson(personId: string, options?: AxiosRequestConfig) {
-        return ProviderApiFp(this.configuration).providerControllerGetAvailableServiceProvidersForPerson(personId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

@@ -19,6 +19,7 @@ type TwoFactorState = {
   tokenKind: 'hardware' | 'software' | null;
   qrCode: string;
   serial: string;
+  required: boolean;
 };
 
 type TwoFactorGetters = {};
@@ -58,6 +59,7 @@ export const useTwoFactorAuthentificationStore: StoreDefinition<
       tokenKind: null,
       qrCode: '',
       serial: '',
+      required: false,
     };
   },
   actions: {
@@ -72,6 +74,7 @@ export const useTwoFactorAuthentificationStore: StoreDefinition<
         ).data;
 
         this.hasToken = twoFactorState.hasToken;
+        this.required = twoFactorState.required;
 
         if (!twoFactorState.hasToken) {
           return;

@@ -2506,62 +2506,6 @@
                 ]
             }
         },
-        "/api/provider/person/{personId}": {
-            "get": {
-                "operationId": "ProviderController_getAvailableServiceProvidersForPerson",
-                "summary": "",
-                "description": "Get service-providers available for specified user.",
-                "parameters": [
-                    {
-                        "name": "personId",
-                        "required": true,
-                        "in": "path",
-                        "description": "The id of a person",
-                        "schema": {
-                            "nullable": false,
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "The service-providers were successfully returned.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/ServiceProviderResponse"
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Not authorized to get available service providers."
-                    },
-                    "403": {
-                        "description": "Insufficient permissions to get service-providers."
-                    },
-                    "500": {
-                        "description": "Internal server error while getting all service-providers."
-                    }
-                },
-                "tags": [
-                    "provider"
-                ],
-                "security": [
-                    {
-                        "bearer": []
-                    },
-                    {
-                        "oauth2": [
-                            "openid"
-                        ]
-                    }
-                ]
-            }
-        },
         "/api/provider/{angebotId}/logo": {
             "get": {
                 "operationId": "ProviderController_getServiceProviderLogo",
@@ -5522,12 +5466,16 @@
                     },
                     "serial": {
                         "type": "string"
+                    },
+                    "required": {
+                        "type": "boolean"
                     }
                 },
                 "required": [
                     "hasToken",
                     "tokenKind",
-                    "serial"
+                    "serial",
+                    "required"
                 ]
             },
             "AssignHardwareTokenBodyParams": {
