@@ -124,11 +124,17 @@
     });
   }
 
-  function autoSelectSchule(): void {
+  async function autoSelectSchule(): Promise<void> {
     // Autoselect the Schule for the current user that only has 1 Schule assigned to him.
     if (organisationStore.allSchulen.length === 1) {
       selectedSchulen.value = [organisationStore.allSchulen[0]?.id || ''];
       hasAutoselectedSchule.value = true;
+      if (selectedSchulen.value.length) {
+        await organisationStore.getFilteredKlassen({
+          administriertVon: selectedSchulen.value,
+          searchString: searchInputKlassen.value,
+        });
+      }
     }
   }
 
