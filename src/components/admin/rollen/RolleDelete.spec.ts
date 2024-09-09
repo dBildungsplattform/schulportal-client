@@ -1,16 +1,28 @@
-import { expect, test } from 'vitest';
+import { expect, test, type MockInstance } from 'vitest';
+import { nextTick } from 'vue';
 import { VueWrapper, mount } from '@vue/test-utils';
 import RolleDelete from './RolleDelete.vue';
 import { RollenMerkmal, RollenSystemRecht } from '@/stores/RolleStore';
+import { createRouter, createWebHistory, type NavigationFailure, type RouteLocationRaw, type Router } from 'vue-router';
+import routes from '@/router/routes';
 
 let wrapper: VueWrapper | null = null;
+let router: Router;
 
-beforeEach(() => {
+beforeEach( async() => {
   document.body.innerHTML = `
     <div>
       <div id="app"></div>
     </div>
   `;
+
+  router = createRouter({
+    history: createWebHistory(),
+    routes,
+  });
+
+  router.push('/');
+  await router.isReady();
 
   wrapper = mount(RolleDelete, {
     attachTo: document.getElementById('app') || '',
@@ -29,14 +41,49 @@ beforeEach(() => {
       components: {
         RolleDelete,
       },
+      plugins: [router],
     },
   });
 });
 
-describe('Delete Rolle', () => {
-  test('it opens the dialog', async () => {
-    wrapper?.get('[data-testid="open-rolle-delete-dialog-icon"]').trigger('click');
+describe('delete rolle', () => {
+  test('it opens and closes the dialog', async () => {
+    wrapper?.find('[data-testid="open-rolle-delete-dialog-button"]').trigger('click');
+    await nextTick();
+
     await document.querySelector('[data-testid="rolle-delete-confirmation-text"]');
     expect(document.querySelector('[data-testid="rolle-delete-confirmation-text"]')).not.toBeNull();
+
+    let cancelDeleteButton: HTMLElement | undefined = document.querySelectorAll<HTMLElement>('[data-testid="cancel-rolle-delete-button"]')[0];
+    cancelDeleteButton?.click();
+    await nextTick();
+
+    expect(document.querySelector('[data-testid="close-rolle-delete-dialog-button"]')).toBeNull();
+  });
+
+  test('it deletes a rolle and navigates back to management', async () => {
+    const push: MockInstance<[to: RouteLocationRaw], Promise<void | NavigationFailure | undefined>> = vi.spyOn(
+      router,
+      'push',
+    );
+
+    wrapper?.find('[data-testid="open-rolle-delete-dialog-button"]').trigger('click');
+    await nextTick();
+
+    await document.querySelector('[data-testid="rolle-delete-confirmation-text"]');
+    expect(document.querySelector('[data-testid="rolle-delete-confirmation-text"]')).not.toBeNull();
+  
+    let rolleDeleteButton: HTMLElement | undefined = document.querySelectorAll<HTMLElement>('[data-testid="rolle-delete-button"]')[0];
+    rolleDeleteButton?.click();
+    await nextTick();
+
+    await document.querySelector('[data-testid="rolle-delete-success-text"]');
+    expect(document.querySelector('[data-testid="rolle-delete-success-text"]')).not.toBeNull();
+  
+    let closeDialogButton: HTMLElement | undefined = document.querySelectorAll<HTMLElement>('[data-testid="close-rolle-delete-success-dialog-button"]')[0];
+    closeDialogButton?.click();
+    await nextTick();
+
+    expect(push).toHaveBeenCalledTimes(1);
   });
 });
