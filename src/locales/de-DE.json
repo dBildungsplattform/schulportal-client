@@ -8,6 +8,20 @@
         "required": "Die Administrationsebene muss ausgewählt werden."
       }
     },
+    "befristung": {
+      "assignBefristung": "Befristung zuordnen",
+      "befristung": "Befristung",
+      "rules": {
+        "required": "Die Befristung muss eingegeben werden.",
+        "format": "Die Befristung muss im Format DD.MM.JJJJ. eingegeben werden.",
+        "pastDateNotAllowed": "Das eingegebene Datum darf nicht in der Vergangenheit liegen."
+      },
+      "selectBefristung": "Befristung auswählen",
+      "unlimited": "Unbefristet",
+      "unlimitedSuccessTemplate": "unbefristet",
+      "unlimitedInactive": "Diese Option kann für Rollen mit Befristungspflicht nicht ausgewählt werden.",
+      "untilEndOfSchoolYear": "Bis Schuljahresende"
+    },
     "mandatoryFieldsNotice": "Mit * markierte Felder sind Pflichtangaben.",
     "followingDataCreated": "Folgende Daten wurden gespeichert:",
     "headline": "Administrationsbereich",
@@ -98,7 +112,24 @@
         "notSetUp": "Für diesen Benutzer ist aktuell keine 2FA eingerichtet.",
         "softwareTokenIsSetUp": "Für diesen Benutzer ist aktuell ein Software-Token eingerichtet.",
         "resetInfo": "Um einen neuen Token einzurichten, muss der aktuelle Token durch die schulischen Admins zurückgesetzt werden.",
-        "tokenReset": "Token zurücksetzen"
+        "tokenReset": "Token zurücksetzen",
+        "hardwareTokenIsSetUp": "Für diesen Benutzer ist aktuell ein Hardware-Token eingerichtet.",
+        "hardwareTokenSetUpSuccess": "Token wurde erfolgreich zugeordnet.",
+        "hardwareTokenSetUpFailure": "Fehler bei Zuordnung des Hardware-Tokens",
+        "setUp": "Einrichten",
+        "serialNotSelected": "Die Seriennummer muss angegeben werden.",
+        "otpNotSelected": "Das Einmalpasswort muss angegeben werden.",
+        "otpLengthInvalid": "Das Einmalpasswort darf maximal 6 Zeichen lang sein.",
+        "currentOtp": "Einmalpasswort",
+        "serial": "Seriennummer",
+        "otpPlaceholder": "Einmalpasswort",
+        "errors": {
+          "SERIENNUMMER_NICHT_GEFUNDEN": "Die eingegebene Seriennummer konnte leider nicht gefunden werden. Vergewissern Sie sich bitte, das Sie eine korrekte Seriennummer eingegeben haben.",
+          "SERIENNUMMER_IN_VERWENDUNG": "Die eingegebene Seriennummer gehört zu einem Token, der bereits einem Benutzer zugeordnet ist. Bitte überprüfen Sie Ihre Eingaben und versuchen Sie es erneut.",
+          "OTP_NICHT_GUELTIG": "Ungültiges Einmalpasswort. Bitte versuchen Sie es erneut.",
+          "HARDWARE_TOKEN_SERVICE_FEHLER": "Leider konnte ihr Hardware-Token aus technischen Gründen nicht aktiviert werden. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut. Falls das Problem bestehen bleibt, stellen Sie bitte eine Anfrage über den IQSH Helpdesk.--Link: https://www.secure-lernnetz.de/helpdesk/",
+          "UNKNOWN_ERROR": "Ein unbekannter Fehler ist aufgetreten."
+        }
       },
       "copyPasswordError": "Passwort konnte nicht in die Zwischenablage kopiert werden",
       "copyPasswordSuccess": "Passwort in Zwischenablage kopiert",
@@ -410,6 +441,8 @@
     "rolle": "Rolle",
     "userName": "Benutzername",
     "saveChanges": "Änderungen speichern",
+    "willBeCreated": "wird hinzugefügt",
+    "willBeRemoved": "wird entfernt",
     "zuordnungen": "Schulzuordnung(en)",
     "zuordnung": "Schulzuordnung"
   },
@@ -453,7 +486,7 @@
       "workEmail": "Dienstliche E-Mail"
     }
   },
-  "transfer":"Versetzen",
+  "transfer": "Versetzen",
   "unsavedChanges": {
     "message": "Sie haben nicht gespeicherte Änderungen vorgenommen. Wollen Sie die Seite trotzdem verlassen?",
     "title": "Änderungen vorgenommen"
