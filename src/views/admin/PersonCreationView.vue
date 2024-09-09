@@ -31,12 +31,14 @@
   import { useDisplay } from 'vuetify';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
-  import { DIN_91379A, NO_LEADING_TRAILING_SPACES } from '@/utils/validation';
+  import { DDMMYYYY, DIN_91379A, NO_LEADING_TRAILING_SPACES } from '@/utils/validation';
   import { useOrganisationen } from '@/composables/useOrganisationen';
   import { useRollen, type TranslatedRolleWithAttrs } from '@/composables/useRollen';
   import { useKlassen } from '@/composables/useKlassen';
   import PersonenkontextCreate from '@/components/admin/personen/PersonenkontextCreate.vue';
   import { type TranslatedObject } from '@/types.d';
+  import SpshTooltip from '@/components/admin/SpshTooltip.vue';
+  import { parse, isValid, isBefore } from 'date-fns';
 
   const router: Router = useRouter();
   const personStore: PersonStore = usePersonStore();
@@ -50,8 +52,14 @@
   const hasNoKopersNr: Ref<boolean> = ref(false);
   const showNoKopersNrConfirmationDialog: Ref<boolean> = ref(false);
 
+  const calculatedBefristung: Ref<string | undefined> = ref('');
+
   const rollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = useRollen();
 
+  enum BefristungOption {
+    SCHULJAHRESENDE = 'schuljahresende',
+    UNBEFRISTET = 'unbefristet',
+  }
   function isKopersRolle(selectedRolleId: string | undefined): boolean {
     const rolle: TranslatedRolleWithAttrs | undefined = rollen.value?.find(
       (r: TranslatedRolleWithAttrs) => r.value === selectedRolleId,
@@ -66,6 +74,23 @@
     );
     return !!rolle && rolle.rollenart === RollenArt.Lern;
   }
+
+  // Checks if the selected Rolle has Befristungspflicht
+  function isBefristungspflichtRolle(selectedRolleId: string | undefined): boolean {
+    const rolle: TranslatedRolleWithAttrs | undefined = rollen.value?.find(
+      (r: TranslatedRolleWithAttrs) => r.value === selectedRolleId,
+    );
+
+    return !!rolle && !!rolle.merkmale && rolle.merkmale.has(RollenMerkmal.BefristungPflicht);
+  }
+
+  // Custom validation function to check if the date is in the past
+  const notInPast = (value: string | undefined): boolean => {
+    if (!value) return true;
+
+    const parsedDate: Date = parse(value, 'dd.MM.yyyy', new Date());
+    return isValid(parsedDate) && !isBefore(parsedDate, new Date());
+  };
 
   const validationSchema: TypedSchema = toTypedSchema(
     object({
@@ -91,6 +116,15 @@
         then: (schema: StringSchema<string | undefined, AnyObject, undefined, ''>) =>
           schema.required(t('admin.person.rules.kopersNr.required')),
       }),
+      selectedBefristung: string()
+        .matches(DDMMYYYY, t('admin.befristung.rules.format'))
+        .test('notInPast', t('admin.befristung.rules.pastDateNotAllowed'), notInPast)
+        .when(['selectedRolle', 'selectedBefristungOption'], {
+          is: (selectedRolleId: string, selectedBefristungOption: string | undefined) =>
+            isBefristungspflichtRolle(selectedRolleId) && selectedBefristungOption === undefined,
+          then: (schema: StringSchema<string | undefined, AnyObject, undefined, ''>) =>
+            schema.required(t('admin.befristung.rules.required')),
+        }),
     }),
   );
 
@@ -109,11 +143,13 @@
     selectedFamilienname: string;
     selectedOrganisation: string;
     selectedKlasse: string;
+    selectedBefristung: Date;
+    selectedBefristungOption: string;
     selectedKopersNr: string;
   };
 
   // eslint-disable-next-line @typescript-eslint/typedef
-  const { defineField, handleSubmit, isFieldDirty, resetForm } = useForm<PersonCreationForm>({
+  const { defineField, handleSubmit, isFieldDirty, resetForm, resetField } = useForm<PersonCreationForm>({
     validationSchema,
   });
 
@@ -141,6 +177,14 @@
     Ref<string | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedKlasse', vuetifyConfig);
+  const [selectedBefristung, selectedBefristungProps]: [
+    Ref<string | undefined>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = defineField('selectedBefristung', vuetifyConfig);
+  const [selectedBefristungOption, selectedBefristungOptionProps]: [
+    Ref<string | undefined>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = defineField('selectedBefristungOption', vuetifyConfig);
 
   const organisationen: ComputedRef<TranslatedObject[] | undefined> = useOrganisationen();
 
@@ -171,6 +215,31 @@
       )?.title || '',
   );
 
+  // Converts the ISO UTC formatted Befristung to the german local format, also ISO.
+  const translatedBefristung: ComputedRef<string> = computed(() => {
+    const ISOFormattedDate: string | undefined =
+      personenkontextStore.createdPersonWithKontext?.DBiamPersonenkontextResponse.befristung;
+
+    if (!ISOFormattedDate) {
+      return t('admin.befristung.unlimitedSuccessTemplate');
+    }
+
+    // Parse the UTC date
+    const utcDate: Date = new Date(ISOFormattedDate);
+
+    // Subtract one day. The reason to substract it here is because when the UTC time from the backend gets converted back to the local german date here, it shows the next day
+    // It's logical since we send the date in the first place as "31-07-2024 22H" UTC TIME which is "01-08-2024" 00H of the next day in MESZ (summer german time)
+    // but the user obviously doesn't want to know that.
+    if (utcDate.getTimezoneOffset() >= -120) {
+      // Check if the timezone offset is 2 hours (indicating MESZ)
+      // Subtract one day if in summer time (MESZ)
+      utcDate.setDate(utcDate.getDate() - 1);
+    }
+    const germanDate: string = utcDate.toLocaleDateString('de-DE');
+
+    return germanDate;
+  });
+
   const creationErrorText: Ref<string> = ref('');
 
   function isFormDirty(): boolean {
@@ -180,7 +249,8 @@
       isFieldDirty('selectedKlasse') ||
       isFieldDirty('selectedKopersNr') ||
       isFieldDirty('selectedVorname') ||
-      isFieldDirty('selectedFamilienname')
+      isFieldDirty('selectedFamilienname') ||
+      isFieldDirty('selectedBefristung')
     );
   }
 
@@ -199,29 +269,60 @@
   }
 
   async function createPerson(): Promise<void> {
+    // Function to format a date in dd.MM.yyyy format to ISO 8601
+    function formatDateToISO(date: string | undefined): string | undefined {
+      if (date) {
+        // Split the date by '.' to extract day, month, and year
+        const [day, month, year]: (number | undefined)[] = date.split('.').map(Number);
+
+        if (day && month && year) {
+          // Create a new Date object with the extracted parts
+          // Alwyays adding 1 day to the date because for example if the Befristung is chosen as 20.05.2024 then it should be valid until 20.05.2024 23:59
+          // Also the UTC ISO formatted send date will be 20-05-2024 22H which is basically 21.05.2024 in german summer time.
+          const d: Date = new Date(year, month - 1, day + 1);
+
+          // Return the ISO string
+          return d.toISOString();
+        }
+      }
+      return;
+    }
+
+    const befristungDate: string | undefined = selectedBefristung.value
+      ? selectedBefristung.value
+      : calculatedBefristung.value;
+
+    // Format the date in ISO 8601 format if it exists
+    const formattedBefristung: string | undefined = befristungDate ? formatDateToISO(befristungDate) : undefined;
+
     const bodyParams: CreatePersonBodyParams = {
       familienname: selectedFamilienname.value as string,
       vorname: selectedVorname.value as string,
       personalnummer: selectedKopersNr.value,
       organisationId: selectedOrganisation.value as string,
       rolleId: selectedRolle.value ?? '',
+      befristung: formattedBefristung,
     };
 
     await personenkontextStore.createPersonWithKontext(bodyParams);
+
     if (personenkontextStore.createdPersonWithKontext) {
-      // Build the context for the Klasse and save it only if the the Klasse was selected
+      // Build the context for the Klasse and save it only if the Klasse was selected
       if (selectedKlasse.value) {
         const unpersistedKlassePersonenkontext: CreatedPersonenkontext = {
           personId: personenkontextStore.createdPersonWithKontext.person.id,
           organisationId: selectedKlasse.value,
           rolleId: selectedRolle.value ?? '',
+          befristung: formattedBefristung,
         };
+
         await personenkontextStore
           .createPersonenkontext(unpersistedKlassePersonenkontext, PersonenKontextTyp.Klasse)
           .catch(() => {
             creationErrorText.value = t(`admin.personenkontext.errors.${personenkontextStore.errorCode}`);
           });
       }
+
       resetForm();
       hasNoKopersNr.value = false;
     }
@@ -250,6 +351,69 @@
     hasNoKopersNr.value = false;
     router.push({ name: 'create-person' });
   };
+
+  // Calculates the next 31st of July (End of school year)
+  // Time here is in german iso format but will later be converted to UCT
+  function getNextSchuljahresende(): string {
+    const today: Date = new Date();
+    const currentYear: number = today.getFullYear();
+    const july31stThisYear: Date = new Date(currentYear, 6, 31); // July is month 6 (0-indexed)
+
+    // If today's date is after July 31st this year, return July 31st of next year
+    if (today > july31stThisYear) {
+      return new Date(currentYear + 1, 6, 31).toLocaleDateString('de-DE');
+    }
+
+    // Otherwise, return July 31st of this year
+    return july31stThisYear.toLocaleDateString('de-DE');
+  }
+
+  // Calculates the Befristung depending on the selected radio button. Each radio button illustrates a date (Either 31st July or undefined)
+  // The backend will receive the calculatedBefristung.
+  function handleBefristungOptionChange(value: string | undefined): void {
+    switch (value) {
+      case BefristungOption.SCHULJAHRESENDE: {
+        calculatedBefristung.value = getNextSchuljahresende();
+        resetField('selectedBefristung'); // Reset the date picker
+        break;
+      }
+      case BefristungOption.UNBEFRISTET: {
+        calculatedBefristung.value = undefined;
+        resetField('selectedBefristung');
+        break;
+      }
+    }
+  }
+  // Watcher to reset the radio button in case the date was picked using date-input
+  watch(
+    selectedBefristung,
+    (newValue: string | undefined) => {
+      if (newValue) {
+        selectedBefristungOption.value = undefined;
+      }
+    },
+    { immediate: true },
+  );
+
+  // Watcher to set an initial value for the radio buttons depending on the selected Rolle
+  watch(
+    selectedRolle,
+    (newValue: string | undefined) => {
+      if (isBefristungspflichtRolle(newValue)) {
+        selectedBefristungOption.value = BefristungOption.SCHULJAHRESENDE;
+        calculatedBefristung.value = getNextSchuljahresende();
+      } else {
+        selectedBefristungOption.value = BefristungOption.UNBEFRISTET;
+        calculatedBefristung.value = undefined;
+      }
+    },
+    { immediate: true },
+  );
+
+  // Computed property to check if the second radio button should be disabled
+  const isUnbefristetButtonDisabled: ComputedRef<boolean> = computed(() => {
+    return isBefristungspflichtRolle(selectedRolle.value);
+  });
 
   function handleConfirmUnsavedChanges(): void {
     blockedNext();
@@ -441,6 +605,71 @@
             ></v-text-field>
           </FormRow>
         </div>
+        <!-- Befristung -->
+        <div
+          class="mt-4"
+          v-if="selectedOrganisation && selectedRolle"
+        >
+          <v-row>
+            <h3 class="headline-3">3. {{ $t('admin.befristung.assignBefristung') }}</h3>
+          </v-row>
+          <FormRow
+            :errorLabel="selectedBefristungProps?.error || ''"
+            labelForId="befristung-select"
+            :isRequired="true"
+            :label="$t('admin.befristung.befristung')"
+          >
+            <v-text-field
+              v-model="selectedBefristung"
+              v-bind="selectedBefristungProps"
+              prepend-icon=""
+              variant="outlined"
+              placeholder="TT.MM.JJJJ"
+              color="primary"
+            ></v-text-field>
+          </FormRow>
+          <!-- Radio buttons for Befristung options -->
+          <v-row class="align-center">
+            <v-col
+              class="py-0 mt-n1"
+              cols="12"
+              sm="7"
+              offset-sm="5"
+            >
+              <v-radio-group
+                v-model="selectedBefristungOption"
+                v-bind="selectedBefristungOptionProps"
+                @update:modelValue="handleBefristungOptionChange"
+              >
+                <v-radio
+                  :label="`${t('admin.befristung.untilEndOfSchoolYear')} (${getNextSchuljahresende()})`"
+                  :value="BefristungOption.SCHULJAHRESENDE"
+                  :color="'primary'"
+                ></v-radio>
+                <SpshTooltip
+                  v-if="isUnbefristetButtonDisabled"
+                  :enabledCondition="!isUnbefristetButtonDisabled"
+                  :disabledText="$t('admin.befristung.unlimitedInactive')"
+                  position="start"
+                >
+                  <v-radio
+                    :label="$t('admin.befristung.unlimited')"
+                    :value="BefristungOption.UNBEFRISTET"
+                    :color="'primary'"
+                    :disabled="isUnbefristetButtonDisabled"
+                  ></v-radio>
+                </SpshTooltip>
+                <v-radio
+                  v-else
+                  :label="$t('admin.befristung.unlimited')"
+                  :value="BefristungOption.UNBEFRISTET"
+                  :color="'primary'"
+                  :disabled="isUnbefristetButtonDisabled"
+                ></v-radio>
+              </v-radio-group>
+            </v-col>
+          </v-row>
+        </div>
       </FormWrapper>
     </template>
 
@@ -531,15 +760,21 @@
           </v-col>
         </v-row>
         <v-row>
+          <v-col class="text-body bold text-right"> {{ $t('admin.organisation.organisation') }}: </v-col>
+          <v-col class="text-body"
+            ><span data-testid="created-person-organisation">{{ translatedOrganisationsname }}</span></v-col
+          >
+        </v-row>
+        <v-row>
           <v-col class="text-body bold text-right"> {{ $t('admin.rolle.rolle') }}: </v-col>
           <v-col class="text-body"
             ><span data-testid="created-person-rolle">{{ translatedRollenname }}</span></v-col
           >
         </v-row>
         <v-row>
-          <v-col class="text-body bold text-right"> {{ $t('admin.organisation.organisation') }}: </v-col>
+          <v-col class="text-body bold text-right"> {{ $t('admin.befristung.befristung') }}: </v-col>
           <v-col class="text-body"
-            ><span data-testid="created-person-organisation">{{ translatedOrganisationsname }}</span></v-col
+            ><span data-testid="created-person-befristung">{{ translatedBefristung }}</span></v-col
           >
         </v-row>
         <v-row v-if="isLernRolle(personenkontextStore.createdPersonWithKontext.DBiamPersonenkontextResponse.rolleId)">

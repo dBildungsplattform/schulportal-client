@@ -91,6 +91,7 @@ const mockPersonenuebersicht: PersonWithUebersicht = {
       administriertVon: '2',
       editable: true,
       merkmale: [] as unknown as RollenMerkmal,
+      befristung: '2024-05-06',
     },
     {
       sskId: '3',
@@ -102,6 +103,7 @@ const mockPersonenuebersicht: PersonWithUebersicht = {
       administriertVon: '2',
       editable: true,
       merkmale: [] as unknown as RollenMerkmal,
+      befristung: '2024-05-06',
     },
     {
       sskId: '2',
@@ -113,6 +115,7 @@ const mockPersonenuebersicht: PersonWithUebersicht = {
       administriertVon: '1',
       editable: true,
       merkmale: [] as unknown as RollenMerkmal,
+      befristung: '2024-05-06',
     },
   ],
 };
