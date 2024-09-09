@@ -2605,16 +2605,16 @@ export interface UserinfoResponse {
     'phone_number': string | null;
     /**
      * 
-     * @type {number}
+     * @type {string}
      * @memberof UserinfoResponse
      */
-    'updated_at': number | null;
+    'updated_at': string | null;
     /**
      * 
-     * @type {number}
+     * @type {string}
      * @memberof UserinfoResponse
      */
-    'password_updated_at': number | null;
+    'password_updated_at': string | null;
     /**
      * 
      * @type {Array<PersonenkontextRolleFieldsResponse>}

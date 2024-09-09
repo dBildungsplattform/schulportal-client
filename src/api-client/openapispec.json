@@ -3694,11 +3694,11 @@
                         "nullable": true
                     },
                     "updated_at": {
-                        "type": "number",
+                        "type": "string",
                         "nullable": true
                     },
                     "password_updated_at": {
-                        "type": "number",
+                        "type": "string",
                         "nullable": true
                     },
                     "personenkontexte": {
