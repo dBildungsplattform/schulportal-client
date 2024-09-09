@@ -92,7 +92,7 @@
         >
           <v-btn
             class="primary"
-            data-testid="open-2FA-dialog-icon"
+            data-testid="open-2FA-self-service-dialog-icon"
             :block="mdAndDown"
             v-bind="props"
           >
@@ -113,7 +113,10 @@
           <v-container v-if="workflowStep === 'start'">
             <v-row class="text-body px-md-16">
               <div class="v-col">
-                <p class="text-body">
+                <p
+                  class="text-body"
+                  data-testid="self-service-dialog-info-text"
+                >
                   {{ $t('admin.person.twoFactorAuthentication.qrCodeInfo') }}
                 </p>
               </div>
@@ -124,7 +127,10 @@
                   icon="mdi-alert-circle"
                   color="orange"
                 ></v-icon>
-                <span class="ml-4">
+                <span
+                  class="ml-4"
+                  data-testid="self-service-dialog-warning-text"
+                >
                   {{ $t('admin.person.twoFactorAuthentication.softwareOnDevice') }}
                 </span>
               </v-col>

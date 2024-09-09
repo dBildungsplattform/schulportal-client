@@ -198,7 +198,7 @@ describe('TwoFactorAuthentificationStore', () => {
       const verified: Promise<void> = twoFactorAuthenticationStore.verify2FAToken(personId, otp);
       expect(twoFactorAuthenticationStore.loading).toBe(true);
       await rejects(verified);
-      expect(twoFactorAuthenticationStore.errorCode).toEqual('UNSPECIFIED_ERROR');
+      expect(twoFactorAuthenticationStore.errorCode).toEqual('SOFTWARE_TOKEN_VERIFICATION_ERROR');
       expect(twoFactorAuthenticationStore.loading).toBe(false);
     });
 
@@ -214,6 +214,25 @@ describe('TwoFactorAuthentificationStore', () => {
       await rejects(verified);
       expect(twoFactorAuthenticationStore.errorCode).toEqual('OTP_NICHT_GUELTIG');
       expect(twoFactorAuthenticationStore.loading).toBe(false);
+    });
+  });
+
+  describe('resetState', () => {
+    it('should reset state', () => {
+      twoFactorAuthenticationStore.errorCode = 'some error';
+      twoFactorAuthenticationStore.loading = true;
+      twoFactorAuthenticationStore.hasToken = true;
+      twoFactorAuthenticationStore.tokenKind = 'software';
+      twoFactorAuthenticationStore.qrCode = 'fakeQRCode';
+      twoFactorAuthenticationStore.serial = '1234';
+
+      twoFactorAuthenticationStore.resetState();
+      expect(twoFactorAuthenticationStore.errorCode).toEqual('');
+      expect(twoFactorAuthenticationStore.loading).toBe(false);
+      expect(twoFactorAuthenticationStore.hasToken).toBe(null);
+      expect(twoFactorAuthenticationStore.tokenKind).toBe(null);
+      expect(twoFactorAuthenticationStore.qrCode).toBe('');
+      expect(twoFactorAuthenticationStore.serial).toBe('');
     });
   });
 });
