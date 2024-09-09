@@ -110,7 +110,7 @@
 
   // Deletes the person and all kontexte
   async function deletePerson(personId: string): Promise<void> {
-    await personStore.deletePerson(personId);
+    await personStore.deletePersonById(personId);
   }
 
   let closeCannotDeleteDialog = (): void => {
@@ -715,6 +715,7 @@
 
   onBeforeMount(async () => {
     personStore.resetState();
+    twoFactorAuthentificationStore.resetState();
     personenkontextStore.errorCode = '';
     await personStore.getPersonById(currentPersonId);
     await personStore.getPersonenuebersichtById(currentPersonId);
@@ -926,7 +927,11 @@
                   <p v-if="twoFactorAuthentificationStore.tokenKind === 'hardware'">
                     {{ $t('admin.person.twoFactorAuthentication.hardwareTokenIsSetUp') }}
                   </p>
-                  <p v-if="twoFactorAuthentificationStore.serial">
+                  <p
+                    v-if="
+                      twoFactorAuthentificationStore.tokenKind === 'hardware' && twoFactorAuthentificationStore.serial
+                    "
+                  >
                     {{
                       $t('admin.person.twoFactorAuthentication.serial') + ': ' + twoFactorAuthentificationStore.serial
                     }}
