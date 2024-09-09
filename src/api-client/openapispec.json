@@ -5,8 +5,21 @@
       "get": {
         "operationId": "AuthenticationController_login",
         "summary": "Used to start OIDC authentication.",
-        "parameters": [{ "required": false, "name": "redirectUrl", "in": "query", "schema": { "type": "string" } }],
-        "responses": { "302": { "description": "Redirection to orchestrate OIDC flow." } },
+        "parameters": [
+          {
+            "required": false,
+            "name": "redirectUrl",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "302": {
+            "description": "Redirection to orchestrate OIDC flow."
+          }
+        },
         "tags": ["auth"]
       }
     },
@@ -16,11 +29,22 @@
         "summary": "Used to log out the current user.",
         "parameters": [],
         "responses": {
-          "302": { "description": "Redirect to logout." },
-          "500": { "description": "Internal server error while trying to log out." }
+          "302": {
+            "description": "Redirect to logout."
+          },
+          "500": {
+            "description": "Internal server error while trying to log out."
+          }
         },
         "tags": ["auth"],
-        "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
+        "security": [
+          {
+            "oauth2": ["openid"]
+          },
+          {
+            "bearer": []
+          }
+        ]
       }
     },
     "/api/auth/logininfo": {
@@ -31,12 +55,27 @@
         "responses": {
           "200": {
             "description": "Returns info about the logged in user.",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UserinfoResponse" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserinfoResponse"
+                }
+              }
+            }
           },
-          "401": { "description": "User is not logged in." }
+          "401": {
+            "description": "User is not logged in."
+          }
         },
         "tags": ["auth"],
-        "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
+        "security": [
+          {
+            "oauth2": ["openid"]
+          },
+          {
+            "bearer": []
+          }
+        ]
       }
     },
     "/api/auth/reset-password": {
@@ -44,10 +83,28 @@
         "operationId": "AuthenticationController_resetPassword",
         "summary": "Redirect to Keycloak password reset.",
         "parameters": [
-          { "name": "redirectUrl", "required": true, "in": "query", "schema": { "type": "string" } },
-          { "name": "login_hint", "required": true, "in": "query", "schema": { "type": "string" } }
+          {
+            "name": "redirectUrl",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "login_hint",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
         ],
-        "responses": { "302": { "description": "Redirect to Keycloak password reset page." } },
+        "responses": {
+          "302": {
+            "description": "Redirect to Keycloak password reset page."
+          }
+        },
         "tags": ["auth"]
       }
     },
@@ -57,23 +114,50 @@
         "parameters": [],
         "requestBody": {
           "required": true,
-          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CreatePersonBodyParams" } } }
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePersonBodyParams"
+              }
+            }
+          }
         },
         "responses": {
           "201": {
             "description": "The person was successfully created.",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/PersonendatensatzResponse" } }
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PersonendatensatzResponse"
+                }
+              }
             }
           },
-          "400": { "description": "A username was given. Creation with username is not supported." },
-          "401": { "description": "Not authorized to create the person." },
-          "403": { "description": "Insufficient permissions to create the person." },
-          "404": { "description": "Insufficient permissions to create the person." },
-          "500": { "description": "Internal server error while creating the person." }
+          "400": {
+            "description": "A username was given. Creation with username is not supported."
+          },
+          "401": {
+            "description": "Not authorized to create the person."
+          },
+          "403": {
+            "description": "Insufficient permissions to create the person."
+          },
+          "404": {
+            "description": "Insufficient permissions to create the person."
+          },
+          "500": {
+            "description": "Internal server error while creating the person."
+          }
         },
         "tags": ["personen"],
-        "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
+        "security": [
+          {
+            "oauth2": ["openid"]
+          },
+          {
+            "bearer": []
+          }
+        ]
       },
       "get": {
         "operationId": "PersonController_findPersons",
@@ -83,49 +167,90 @@
             "required": false,
             "in": "query",
             "description": "The offset of the paginated list.",
-            "schema": { "type": "number" }
+            "schema": {
+              "type": "number"
+            }
           },
           {
             "name": "limit",
             "required": false,
             "in": "query",
             "description": "The requested limit for the page size.",
-            "schema": { "type": "number" }
+            "schema": {
+              "type": "number"
+            }
           },
-          { "name": "referrer", "required": false, "in": "query", "schema": { "nullable": true, "type": "string" } },
+          {
+            "name": "referrer",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
+          },
           {
             "name": "familienname",
             "required": false,
             "in": "query",
-            "schema": { "nullable": true, "type": "string" }
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
           },
-          { "name": "vorname", "required": false, "in": "query", "schema": { "nullable": true, "type": "string" } },
+          {
+            "name": "vorname",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
+          },
           {
             "name": "sichtfreigabe",
             "required": false,
             "in": "query",
-            "schema": { "nullable": true, "default": "nein", "enum": ["ja", "nein"], "type": "string" }
+            "schema": {
+              "nullable": true,
+              "default": "nein",
+              "enum": ["ja", "nein"],
+              "type": "string"
+            }
           },
           {
             "name": "organisationIDs",
             "required": false,
             "in": "query",
             "description": "List of Organisation ID used to filter for Persons.",
-            "schema": { "type": "array", "items": { "type": "string" } }
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
           },
           {
             "name": "rolleIDs",
             "required": false,
             "in": "query",
             "description": "List of Role ID used to filter for Persons.",
-            "schema": { "type": "array", "items": { "type": "string" } }
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
           },
           {
             "name": "suchFilter",
             "required": false,
             "in": "query",
             "description": "Search filter used to filter for Persons. It could be the vorname, familienname, referrer or the personalnummer.",
-            "schema": { "nullable": true, "type": "string" }
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -135,21 +260,43 @@
               "X-Paging-Offset": {
                 "description": "The offset of the first item from the list. List starts with index 0."
               },
-              "X-Paging-Limit": { "description": "The maximum amount of items returned in one request." },
-              "X-Paging-Total": { "description": "The total amount of items in the list." }
+              "X-Paging-Limit": {
+                "description": "The maximum amount of items returned in one request."
+              },
+              "X-Paging-Total": {
+                "description": "The total amount of items in the list."
+              }
             },
             "content": {
               "application/json": {
-                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/PersonendatensatzResponse" } }
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PersonendatensatzResponse"
+                  }
+                }
               }
             }
           },
-          "401": { "description": "Not authorized to get persons." },
-          "403": { "description": "Insufficient permissions to get persons." },
-          "500": { "description": "Internal server error while getting all persons." }
+          "401": {
+            "description": "Not authorized to get persons."
+          },
+          "403": {
+            "description": "Insufficient permissions to get persons."
+          },
+          "500": {
+            "description": "Internal server error while getting all persons."
+          }
         },
         "tags": ["personen"],
-        "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
+        "security": [
+          {
+            "oauth2": ["openid"]
+          },
+          {
+            "bearer": []
+          }
+        ]
       }
     },
     "/api/personen/{personId}": {
@@ -161,19 +308,41 @@
             "required": true,
             "in": "path",
             "description": "The id for the account.",
-            "schema": { "nullable": false, "type": "string" }
+            "schema": {
+              "nullable": false,
+              "type": "string"
+            }
           }
         ],
         "responses": {
-          "204": { "description": "The person and all their kontexte were successfully deleted." },
-          "400": { "description": "Request has wrong format." },
-          "401": { "description": "Request is not authorized." },
-          "403": { "description": "Insufficient permissions to perform operation." },
-          "404": { "description": "The person was not found." },
-          "500": { "description": "An internal server error occurred." }
+          "204": {
+            "description": "The person and all their kontexte were successfully deleted."
+          },
+          "400": {
+            "description": "Request has wrong format."
+          },
+          "401": {
+            "description": "Request is not authorized."
+          },
+          "403": {
+            "description": "Insufficient permissions to perform operation."
+          },
+          "404": {
+            "description": "The person was not found."
+          },
+          "500": {
+            "description": "An internal server error occurred."
+          }
         },
         "tags": ["personen"],
-        "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
+        "security": [
+          {
+            "oauth2": ["openid"]
+          },
+          {
+            "bearer": []
+          }
+        ]
       },
       "get": {
         "operationId": "PersonController_findPersonById",
@@ -183,24 +352,48 @@
             "required": true,
             "in": "path",
             "description": "The id for the account.",
-            "schema": { "nullable": false, "type": "string" }
+            "schema": {
+              "nullable": false,
+              "type": "string"
+            }
           }
         ],
         "responses": {
           "200": {
             "description": "The person was successfully returned.",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/PersonendatensatzResponse" } }
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PersonendatensatzResponse"
+                }
+              }
             }
           },
-          "400": { "description": "Person ID is required" },
-          "401": { "description": "Not authorized to get the person." },
-          "403": { "description": "Insufficient permissions to get the person." },
-          "404": { "description": "The person does not exist or insufficient permissions." },
-          "500": { "description": "Internal server error while getting the person." }
+          "400": {
+            "description": "Person ID is required"
+          },
+          "401": {
+            "description": "Not authorized to get the person."
+          },
+          "403": {
+            "description": "Insufficient permissions to get the person."
+          },
+          "404": {
+            "description": "The person does not exist or insufficient permissions."
+          },
+          "500": {
+            "description": "Internal server error while getting the person."
+          }
         },
         "tags": ["personen"],
-        "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
+        "security": [
+          {
+            "oauth2": ["openid"]
+          },
+          {
+            "bearer": []
+          }
+        ]
       },
       "put": {
         "operationId": "PersonController_updatePerson",
@@ -210,28 +403,58 @@
             "required": true,
             "in": "path",
             "description": "The id for the account.",
-            "schema": { "nullable": false, "type": "string" }
+            "schema": {
+              "nullable": false,
+              "type": "string"
+            }
           }
         ],
         "requestBody": {
           "required": true,
-          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UpdatePersonBodyParams" } } }
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePersonBodyParams"
+              }
+            }
+          }
         },
         "responses": {
           "200": {
             "description": "The person was successfully updated.",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/PersonendatensatzResponse" } }
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PersonendatensatzResponse"
+                }
+              }
             }
           },
-          "400": { "description": "Request has wrong format." },
-          "401": { "description": "Request is not authorized." },
-          "403": { "description": "Insufficient permissions to perform operation." },
-          "404": { "description": "The person was not found or insufficient permissions to update person." },
-          "500": { "description": "An internal server error occurred." }
+          "400": {
+            "description": "Request has wrong format."
+          },
+          "401": {
+            "description": "Request is not authorized."
+          },
+          "403": {
+            "description": "Insufficient permissions to perform operation."
+          },
+          "404": {
+            "description": "The person was not found or insufficient permissions to update person."
+          },
+          "500": {
+            "description": "An internal server error occurred."
+          }
         },
         "tags": ["personen"],
-        "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
+        "security": [
+          {
+            "oauth2": ["openid"]
+          },
+          {
+            "bearer": []
+          }
+        ]
       }
     },
     "/api/personen/{personId}/personenkontexte": {
@@ -243,25 +466,51 @@
             "required": true,
             "in": "path",
             "description": "The id for the account.",
-            "schema": { "nullable": false, "type": "string" }
+            "schema": {
+              "nullable": false,
+              "type": "string"
+            }
           }
         ],
         "requestBody": {
           "required": true,
           "content": {
-            "application/json": { "schema": { "$ref": "#/components/schemas/CreatePersonenkontextBodyParams" } }
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePersonenkontextBodyParams"
+              }
+            }
           }
         },
         "responses": {
-          "200": { "description": "The personenkontext was successfully created." },
-          "400": { "description": "The personenkontext already exists." },
-          "401": { "description": "Not authorized to create the personenkontext." },
-          "403": { "description": "Not permitted to create the personenkontext." },
-          "404": { "description": "Insufficient permissions to create personenkontext for person." },
-          "500": { "description": "Internal server error while creating the personenkontext." }
+          "200": {
+            "description": "The personenkontext was successfully created."
+          },
+          "400": {
+            "description": "The personenkontext already exists."
+          },
+          "401": {
+            "description": "Not authorized to create the personenkontext."
+          },
+          "403": {
+            "description": "Not permitted to create the personenkontext."
+          },
+          "404": {
+            "description": "Insufficient permissions to create personenkontext for person."
+          },
+          "500": {
+            "description": "Internal server error while creating the personenkontext."
+          }
         },
         "tags": ["personen"],
-        "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
+        "security": [
+          {
+            "oauth2": ["openid"]
+          },
+          {
+            "bearer": []
+          }
+        ]
       },
       "get": {
         "operationId": "PersonController_findPersonenkontexte",
@@ -271,36 +520,70 @@
             "required": true,
             "in": "path",
             "description": "The id for the account.",
-            "schema": { "nullable": false, "type": "string" }
+            "schema": {
+              "nullable": false,
+              "type": "string"
+            }
           },
           {
             "name": "offset",
             "required": false,
             "in": "query",
             "description": "The offset of the paginated list.",
-            "schema": { "type": "number" }
+            "schema": {
+              "type": "number"
+            }
           },
           {
             "name": "limit",
             "required": false,
             "in": "query",
             "description": "The requested limit for the page size.",
-            "schema": { "type": "number" }
+            "schema": {
+              "type": "number"
+            }
           },
-          { "name": "personId", "required": false, "in": "query", "schema": { "nullable": true, "type": "string" } },
-          { "name": "referrer", "required": false, "in": "query", "schema": { "nullable": true, "type": "string" } },
-          { "name": "rolle", "required": false, "in": "query", "schema": { "$ref": "#/components/schemas/Rolle" } },
+          {
+            "name": "personId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
+          },
+          {
+            "name": "referrer",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
+          },
+          {
+            "name": "rolle",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Rolle"
+            }
+          },
           {
             "name": "personenstatus",
             "required": false,
             "in": "query",
-            "schema": { "$ref": "#/components/schemas/Personenstatus" }
+            "schema": {
+              "$ref": "#/components/schemas/Personenstatus"
+            }
           },
           {
             "name": "sichtfreigabe",
             "required": false,
             "in": "query",
-            "schema": { "$ref": "#/components/schemas/Sichtfreigabe" }
+            "schema": {
+              "$ref": "#/components/schemas/Sichtfreigabe"
+            }
           }
         ],
         "responses": {
@@ -310,20 +593,28 @@
               "X-Paging-Offset": {
                 "description": "The offset of the first item from the list. List starts with index 0."
               },
-              "X-Paging-Limit": { "description": "The maximum amount of items returned in one request." },
-              "X-Paging-Total": { "description": "The total amount of items in the list." }
+              "X-Paging-Limit": {
+                "description": "The maximum amount of items returned in one request."
+              },
+              "X-Paging-Total": {
+                "description": "The total amount of items in the list."
+              }
             },
             "content": {
               "application/json": {
                 "schema": {
                   "allOf": [
-                    { "$ref": "#/components/schemas/RawPagedResponse" },
+                    {
+                      "$ref": "#/components/schemas/RawPagedResponse"
+                    },
                     {
                       "required": ["items"],
                       "properties": {
                         "items": {
                           "type": "array",
-                          "items": { "$ref": "#/components/schemas/PersonenkontextResponse" }
+                          "items": {
+                            "$ref": "#/components/schemas/PersonenkontextResponse"
+                          }
                         }
                       }
                     }
@@ -332,13 +623,28 @@
               }
             }
           },
-          "401": { "description": "Not authorized to get personenkontexte." },
-          "403": { "description": "Insufficient permissions to get personenkontexte." },
-          "404": { "description": "No personenkontexte were found." },
-          "500": { "description": "Internal server error while getting all personenkontexte." }
+          "401": {
+            "description": "Not authorized to get personenkontexte."
+          },
+          "403": {
+            "description": "Insufficient permissions to get personenkontexte."
+          },
+          "404": {
+            "description": "No personenkontexte were found."
+          },
+          "500": {
+            "description": "Internal server error while getting all personenkontexte."
+          }
         },
         "tags": ["personen"],
-        "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
+        "security": [
+          {
+            "oauth2": ["openid"]
+          },
+          {
+            "bearer": []
+          }
+        ]
       }
     },
     "/api/personen/{personId}/password": {
@@ -350,19 +656,39 @@
             "required": true,
             "in": "path",
             "description": "The id for the account.",
-            "schema": { "nullable": false, "type": "string" }
+            "schema": {
+              "nullable": false,
+              "type": "string"
+            }
           }
         ],
         "responses": {
           "202": {
             "description": "Password for person was successfully reset.",
-            "content": { "application/json": { "schema": { "type": "string" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           },
-          "404": { "description": "The person does not exist or insufficient permissions to update person." },
-          "500": { "description": "Internal server error." }
+          "404": {
+            "description": "The person does not exist or insufficient permissions to update person."
+          },
+          "500": {
+            "description": "Internal server error."
+          }
         },
         "tags": ["personen"],
-        "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
+        "security": [
+          {
+            "oauth2": ["openid"]
+          },
+          {
+            "bearer": []
+          }
+        ]
       }
     },
     "/api/personen-frontend": {
@@ -374,49 +700,90 @@
             "required": false,
             "in": "query",
             "description": "The offset of the paginated list.",
-            "schema": { "type": "number" }
+            "schema": {
+              "type": "number"
+            }
           },
           {
             "name": "limit",
             "required": false,
             "in": "query",
             "description": "The requested limit for the page size.",
-            "schema": { "type": "number" }
+            "schema": {
+              "type": "number"
+            }
           },
-          { "name": "referrer", "required": false, "in": "query", "schema": { "nullable": true, "type": "string" } },
+          {
+            "name": "referrer",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
+          },
           {
             "name": "familienname",
             "required": false,
             "in": "query",
-            "schema": { "nullable": true, "type": "string" }
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
           },
-          { "name": "vorname", "required": false, "in": "query", "schema": { "nullable": true, "type": "string" } },
+          {
+            "name": "vorname",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
+          },
           {
             "name": "sichtfreigabe",
             "required": false,
             "in": "query",
-            "schema": { "nullable": true, "default": "nein", "enum": ["ja", "nein"], "type": "string" }
+            "schema": {
+              "nullable": true,
+              "default": "nein",
+              "enum": ["ja", "nein"],
+              "type": "string"
+            }
           },
           {
             "name": "organisationIDs",
             "required": false,
             "in": "query",
             "description": "List of Organisation ID used to filter for Persons.",
-            "schema": { "type": "array", "items": { "type": "string" } }
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
           },
           {
             "name": "rolleIDs",
             "required": false,
             "in": "query",
             "description": "List of Role ID used to filter for Persons.",
-            "schema": { "type": "array", "items": { "type": "string" } }
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
           },
           {
             "name": "suchFilter",
             "required": false,
             "in": "query",
             "description": "Search filter used to filter for Persons. It could be the vorname, familienname, referrer or the personalnummer.",
-            "schema": { "nullable": true, "type": "string" }
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -426,13 +793,17 @@
               "application/json": {
                 "schema": {
                   "allOf": [
-                    { "$ref": "#/components/schemas/RawPagedResponse" },
+                    {
+                      "$ref": "#/components/schemas/RawPagedResponse"
+                    },
                     {
                       "required": ["items"],
                       "properties": {
                         "items": {
                           "type": "array",
-                          "items": { "$ref": "#/components/schemas/PersonendatensatzResponse" }
+                          "items": {
+                            "$ref": "#/components/schemas/PersonendatensatzResponse"
+                          }
                         }
                       }
                     }
@@ -441,33 +812,41 @@
               }
             }
           },
-          "401": { "description": "Not authorized to get persons." },
-          "403": { "description": "Insufficient permissions to get persons." },
-          "500": { "description": "Internal server error while getting all persons." }
+          "401": {
+            "description": "Not authorized to get persons."
+          },
+          "403": {
+            "description": "Insufficient permissions to get persons."
+          },
+          "500": {
+            "description": "Internal server error while getting all persons."
+          }
         },
         "tags": ["personen-frontend"],
-        "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
+        "security": [
+          {
+            "oauth2": ["openid"]
+          },
+          {
+            "bearer": []
+          }
+        ]
       }
     },
     "/api/dbiam/personenuebersicht": {
-      "get": {
+      "post": {
         "operationId": "DBiamPersonenuebersichtController_findPersonenuebersichten",
-        "parameters": [
-          {
-            "name": "offset",
-            "required": false,
-            "in": "query",
-            "description": "The offset of the paginated list.",
-            "schema": { "type": "number" }
-          },
-          {
-            "name": "limit",
-            "required": false,
-            "in": "query",
-            "description": "The requested limit for the page size.",
-            "schema": { "type": "number" }
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PersonenuebersichtBodyParams"
+              }
+            }
           }
-        ],
+        },
         "responses": {
           "200": {
             "description": "The personenuebersichten were successfully returned.",
@@ -475,20 +854,28 @@
               "X-Paging-Offset": {
                 "description": "The offset of the first item from the list. List starts with index 0."
               },
-              "X-Paging-Limit": { "description": "The maximum amount of items returned in one request." },
-              "X-Paging-Total": { "description": "The total amount of items in the list." }
+              "X-Paging-Limit": {
+                "description": "The maximum amount of items returned in one request."
+              },
+              "X-Paging-Total": {
+                "description": "The total amount of items in the list."
+              }
             },
             "content": {
               "application/json": {
                 "schema": {
                   "allOf": [
-                    { "$ref": "#/components/schemas/RawPagedResponse" },
+                    {
+                      "$ref": "#/components/schemas/RawPagedResponse"
+                    },
                     {
                       "required": ["items"],
                       "properties": {
                         "items": {
                           "type": "array",
-                          "items": { "$ref": "#/components/schemas/DBiamPersonenuebersichtResponse" }
+                          "items": {
+                            "$ref": "#/components/schemas/DBiamPersonenuebersichtResponse"
+                          }
                         }
                       }
                     }
@@ -497,12 +884,25 @@
               }
             }
           },
-          "401": { "description": "Not authorized to get personenuebersichten." },
-          "403": { "description": "Insufficient permission to get personenuebersichten." },
-          "500": { "description": "Internal server error while getting personenuebersichten." }
+          "401": {
+            "description": "Not authorized to get personenuebersichten."
+          },
+          "403": {
+            "description": "Insufficient permission to get personenuebersichten."
+          },
+          "500": {
+            "description": "Internal server error while getting personenuebersichten."
+          }
         },
         "tags": ["dbiam-personenuebersicht"],
-        "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
+        "security": [
+          {
+            "oauth2": ["openid"]
+          },
+          {
+            "bearer": []
+          }
+        ]
       }
     },
     "/api/dbiam/personenuebersicht/{personId}": {
@@ -514,22 +914,41 @@
             "required": true,
             "in": "path",
             "description": "The ID for the person.",
-            "schema": { "type": "string" }
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
           "200": {
             "description": "The personenuebersichten were successfully returned.",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/DBiamPersonenuebersichtResponse" } }
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DBiamPersonenuebersichtResponse"
+                }
+              }
             }
           },
-          "401": { "description": "Not authorized to get personenuebersicht." },
-          "403": { "description": "Insufficient permission to get personenuebersicht." },
-          "500": { "description": "Internal server error while getting personenuebersicht." }
+          "401": {
+            "description": "Not authorized to get personenuebersicht."
+          },
+          "403": {
+            "description": "Insufficient permission to get personenuebersicht."
+          },
+          "500": {
+            "description": "Internal server error while getting personenuebersicht."
+          }
         },
         "tags": ["dbiam-personenuebersicht"],
-        "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
+        "security": [
+          {
+            "oauth2": ["openid"]
+          },
+          {
+            "bearer": []
+          }
+        ]
       }
     },
     "/api/person-info": {
@@ -540,12 +959,27 @@
         "responses": {
           "200": {
             "description": "Returns info about the person.",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PersonInfoResponse" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PersonInfoResponse"
+                }
+              }
+            }
           },
-          "401": { "description": "person is not logged in." }
+          "401": {
+            "description": "person is not logged in."
+          }
         },
         "tags": ["person-info"],
-        "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
+        "security": [
+          {
+            "oauth2": ["openid"]
+          },
+          {
+            "bearer": []
+          }
+        ]
       }
     },
     "/api/organisationen": {
@@ -555,24 +989,53 @@
         "requestBody": {
           "required": true,
           "content": {
-            "application/json": { "schema": { "$ref": "#/components/schemas/CreateOrganisationBodyParams" } }
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateOrganisationBodyParams"
+              }
+            }
           }
         },
         "responses": {
           "201": {
             "description": "The organisation was successfully created.",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/OrganisationResponse" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganisationResponse"
+                }
+              }
+            }
           },
           "400": {
             "description": "The organisation already exists.",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DbiamOrganisationError" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DbiamOrganisationError"
+                }
+              }
+            }
           },
-          "401": { "description": "Not authorized to create the organisation." },
-          "403": { "description": "Not permitted to create the organisation." },
-          "500": { "description": "Internal server error while creating the organisation." }
+          "401": {
+            "description": "Not authorized to create the organisation."
+          },
+          "403": {
+            "description": "Not permitted to create the organisation."
+          },
+          "500": {
+            "description": "Internal server error while creating the organisation."
+          }
         },
         "tags": ["organisationen"],
-        "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
+        "security": [
+          {
+            "oauth2": ["openid"]
+          },
+          {
+            "bearer": []
+          }
+        ]
       },
       "get": {
         "operationId": "OrganisationController_findOrganizations",
@@ -582,46 +1045,86 @@
             "required": false,
             "in": "query",
             "description": "The offset of the paginated list.",
-            "schema": { "type": "number" }
+            "schema": {
+              "type": "number"
+            }
           },
           {
             "name": "limit",
             "required": false,
             "in": "query",
             "description": "The requested limit for the page size.",
-            "schema": { "type": "number" }
+            "schema": {
+              "type": "number"
+            }
           },
-          { "name": "kennung", "required": false, "in": "query", "schema": { "nullable": true, "type": "string" } },
-          { "name": "name", "required": false, "in": "query", "schema": { "nullable": true, "type": "string" } },
+          {
+            "name": "kennung",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
+          },
+          {
+            "name": "name",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
+          },
           {
             "name": "searchString",
             "required": false,
             "in": "query",
-            "schema": { "nullable": true, "type": "string" }
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
           },
           {
             "name": "typ",
             "required": false,
             "in": "query",
-            "schema": { "$ref": "#/components/schemas/OrganisationsTyp" }
+            "schema": {
+              "$ref": "#/components/schemas/OrganisationsTyp"
+            }
           },
           {
             "name": "systemrechte",
             "required": false,
             "in": "query",
-            "schema": { "type": "array", "items": { "$ref": "#/components/schemas/RollenSystemRecht" } }
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/RollenSystemRecht"
+              }
+            }
           },
           {
             "name": "excludeTyp",
             "required": false,
             "in": "query",
-            "schema": { "type": "array", "items": { "$ref": "#/components/schemas/OrganisationsTyp" } }
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/OrganisationsTyp"
+              }
+            }
           },
           {
             "name": "administriertVon",
             "required": false,
             "in": "query",
-            "schema": { "type": "array", "items": { "type": "string" } }
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
           }
         ],
         "responses": {
@@ -631,21 +1134,43 @@
               "X-Paging-Offset": {
                 "description": "The offset of the first item from the list. List starts with index 0."
               },
-              "X-Paging-Limit": { "description": "The maximum amount of items returned in one request." },
-              "X-Paging-Total": { "description": "The total amount of items in the list." }
+              "X-Paging-Limit": {
+                "description": "The maximum amount of items returned in one request."
+              },
+              "X-Paging-Total": {
+                "description": "The total amount of items in the list."
+              }
             },
             "content": {
               "application/json": {
-                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/OrganisationResponse" } }
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OrganisationResponse"
+                  }
+                }
               }
             }
           },
-          "401": { "description": "Not authorized to get organizations." },
-          "403": { "description": "Insufficient permissions to get organizations." },
-          "500": { "description": "Internal server error while getting all organizations." }
+          "401": {
+            "description": "Not authorized to get organizations."
+          },
+          "403": {
+            "description": "Insufficient permissions to get organizations."
+          },
+          "500": {
+            "description": "Internal server error while getting all organizations."
+          }
         },
         "tags": ["organisationen"],
-        "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
+        "security": [
+          {
+            "oauth2": ["openid"]
+          },
+          {
+            "bearer": []
+          }
+        ]
       }
     },
     "/api/organisationen/{organisationId}": {
@@ -657,31 +1182,65 @@
             "required": true,
             "in": "path",
             "description": "The id of an organization",
-            "schema": { "nullable": false, "type": "string" }
+            "schema": {
+              "nullable": false,
+              "type": "string"
+            }
           }
         ],
         "requestBody": {
           "required": true,
           "content": {
-            "application/json": { "schema": { "$ref": "#/components/schemas/UpdateOrganisationBodyParams" } }
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateOrganisationBodyParams"
+              }
+            }
           }
         },
         "responses": {
           "200": {
             "description": "The organisation was successfully updated.",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/OrganisationResponse" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganisationResponse"
+                }
+              }
+            }
           },
           "400": {
             "description": "Request has wrong format.",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DbiamOrganisationError" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DbiamOrganisationError"
+                }
+              }
+            }
           },
-          "401": { "description": "Request is not authorized." },
-          "403": { "description": "Insufficient permissions to perform operation." },
-          "404": { "description": "The organisation was not found." },
-          "500": { "description": "An internal server error occurred." }
+          "401": {
+            "description": "Request is not authorized."
+          },
+          "403": {
+            "description": "Insufficient permissions to perform operation."
+          },
+          "404": {
+            "description": "The organisation was not found."
+          },
+          "500": {
+            "description": "An internal server error occurred."
+          }
         },
         "tags": ["organisationen"],
-        "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
+        "security": [
+          {
+            "oauth2": ["openid"]
+          },
+          {
+            "bearer": []
+          }
+        ]
       },
       "get": {
         "operationId": "OrganisationController_findOrganisationById",
@@ -691,22 +1250,48 @@
             "required": true,
             "in": "path",
             "description": "The id of an organization",
-            "schema": { "nullable": false, "type": "string" }
+            "schema": {
+              "nullable": false,
+              "type": "string"
+            }
           }
         ],
         "responses": {
           "200": {
             "description": "The organization was successfully pulled.",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/OrganisationResponse" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganisationResponse"
+                }
+              }
+            }
           },
-          "400": { "description": "Organization ID is required" },
-          "401": { "description": "Not authorized to get the organization." },
-          "403": { "description": "Insufficient permissions to get the organization." },
-          "404": { "description": "The organization does not exist." },
-          "500": { "description": "Internal server error while getting the organization." }
+          "400": {
+            "description": "Organization ID is required"
+          },
+          "401": {
+            "description": "Not authorized to get the organization."
+          },
+          "403": {
+            "description": "Insufficient permissions to get the organization."
+          },
+          "404": {
+            "description": "The organization does not exist."
+          },
+          "500": {
+            "description": "Internal server error while getting the organization."
+          }
         },
         "tags": ["organisationen"],
-        "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
+        "security": [
+          {
+            "oauth2": ["openid"]
+          },
+          {
+            "bearer": []
+          }
+        ]
       }
     },
     "/api/organisationen/root": {
@@ -716,15 +1301,36 @@
         "responses": {
           "200": {
             "description": "The root organization was successfully retrieved.",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/OrganisationResponse" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganisationResponse"
+                }
+              }
+            }
           },
-          "401": { "description": "Not authorized to get the root organization." },
-          "403": { "description": "Insufficient permissions to get the root organization." },
-          "404": { "description": "The root organization does not exist." },
-          "500": { "description": "Internal server error while getting the root organization." }
+          "401": {
+            "description": "Not authorized to get the root organization."
+          },
+          "403": {
+            "description": "Insufficient permissions to get the root organization."
+          },
+          "404": {
+            "description": "The root organization does not exist."
+          },
+          "500": {
+            "description": "Internal server error while getting the root organization."
+          }
         },
         "tags": ["organisationen"],
-        "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
+        "security": [
+          {
+            "oauth2": ["openid"]
+          },
+          {
+            "bearer": []
+          }
+        ]
       }
     },
     "/api/organisationen/root/children": {
@@ -735,15 +1341,32 @@
           "200": {
             "description": "The root organizations were successfully pulled.",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/OrganisationRootChildrenResponse" } }
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganisationRootChildrenResponse"
+                }
+              }
             }
           },
-          "401": { "description": "Not authorized to get the organizations." },
-          "403": { "description": "Insufficient permissions to get the organizations." },
-          "500": { "description": "Internal server error while getting the organization." }
+          "401": {
+            "description": "Not authorized to get the organizations."
+          },
+          "403": {
+            "description": "Insufficient permissions to get the organizations."
+          },
+          "500": {
+            "description": "Internal server error while getting the organization."
+          }
         },
         "tags": ["organisationen"],
-        "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
+        "security": [
+          {
+            "oauth2": ["openid"]
+          },
+          {
+            "bearer": []
+          }
+        ]
       }
     },
     "/api/organisationen/{organisationId}/administriert": {
@@ -755,23 +1378,38 @@
             "required": true,
             "in": "path",
             "description": "The id of an organization",
-            "schema": { "nullable": false, "type": "string" }
+            "schema": {
+              "nullable": false,
+              "type": "string"
+            }
           },
           {
             "name": "offset",
             "required": false,
             "in": "query",
             "description": "The offset of the paginated list.",
-            "schema": { "type": "number" }
+            "schema": {
+              "type": "number"
+            }
           },
           {
             "name": "limit",
             "required": false,
             "in": "query",
             "description": "The requested limit for the page size.",
-            "schema": { "type": "number" }
+            "schema": {
+              "type": "number"
+            }
           },
-          { "name": "searchFilter", "required": false, "in": "query", "schema": { "nullable": true, "type": "string" } }
+          {
+            "name": "searchFilter",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
+          }
         ],
         "responses": {
           "200": {
@@ -780,21 +1418,43 @@
               "X-Paging-Offset": {
                 "description": "The offset of the first item from the list. List starts with index 0."
               },
-              "X-Paging-Limit": { "description": "The maximum amount of items returned in one request." },
-              "X-Paging-Total": { "description": "The total amount of items in the list." }
+              "X-Paging-Limit": {
+                "description": "The maximum amount of items returned in one request."
+              },
+              "X-Paging-Total": {
+                "description": "The total amount of items in the list."
+              }
             },
             "content": {
               "application/json": {
-                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/OrganisationResponse" } }
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OrganisationResponse"
+                  }
+                }
               }
             }
           },
-          "401": { "description": "Not authorized to get organizations." },
-          "403": { "description": "Insufficient permissions to get organizations." },
-          "500": { "description": "Internal server error while getting all organizations." }
+          "401": {
+            "description": "Not authorized to get organizations."
+          },
+          "403": {
+            "description": "Insufficient permissions to get organizations."
+          },
+          "500": {
+            "description": "Internal server error while getting all organizations."
+          }
         },
         "tags": ["organisationen"],
-        "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
+        "security": [
+          {
+            "oauth2": ["openid"]
+          },
+          {
+            "bearer": []
+          }
+        ]
       },
       "post": {
         "operationId": "OrganisationController_addAdministrierteOrganisation",
@@ -804,25 +1464,55 @@
             "required": true,
             "in": "path",
             "description": "The id of an organization",
-            "schema": { "nullable": false, "type": "string" }
+            "schema": {
+              "nullable": false,
+              "type": "string"
+            }
           }
         ],
         "requestBody": {
           "required": true,
-          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/OrganisationByIdBodyParams" } } }
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrganisationByIdBodyParams"
+              }
+            }
+          }
         },
         "responses": {
-          "201": { "description": "The organisation was successfully updated." },
+          "201": {
+            "description": "The organisation was successfully updated."
+          },
           "400": {
             "description": "The organisation could not be modified.",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DbiamOrganisationError" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DbiamOrganisationError"
+                }
+              }
+            }
           },
-          "401": { "description": "Not authorized to modify the organisation." },
-          "403": { "description": "Not permitted to modify the organisation." },
-          "500": { "description": "Internal server error while modifying the organisation." }
+          "401": {
+            "description": "Not authorized to modify the organisation."
+          },
+          "403": {
+            "description": "Not permitted to modify the organisation."
+          },
+          "500": {
+            "description": "Internal server error while modifying the organisation."
+          }
         },
         "tags": ["organisationen"],
-        "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
+        "security": [
+          {
+            "oauth2": ["openid"]
+          },
+          {
+            "bearer": []
+          }
+        ]
       }
     },
     "/api/organisationen/{organisationId}/zugehoerig": {
@@ -834,7 +1524,10 @@
             "required": true,
             "in": "path",
             "description": "The id of an organization",
-            "schema": { "nullable": false, "type": "string" }
+            "schema": {
+              "nullable": false,
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -844,21 +1537,43 @@
               "X-Paging-Offset": {
                 "description": "The offset of the first item from the list. List starts with index 0."
               },
-              "X-Paging-Limit": { "description": "The maximum amount of items returned in one request." },
-              "X-Paging-Total": { "description": "The total amount of items in the list." }
+              "X-Paging-Limit": {
+                "description": "The maximum amount of items returned in one request."
+              },
+              "X-Paging-Total": {
+                "description": "The total amount of items in the list."
+              }
             },
             "content": {
               "application/json": {
-                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/OrganisationResponse" } }
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OrganisationResponse"
+                  }
+                }
               }
             }
           },
-          "401": { "description": "Not authorized to get organizations." },
-          "403": { "description": "Insufficient permissions to get organizations." },
-          "500": { "description": "Internal server error while getting all organizations." }
+          "401": {
+            "description": "Not authorized to get organizations."
+          },
+          "403": {
+            "description": "Insufficient permissions to get organizations."
+          },
+          "500": {
+            "description": "Internal server error while getting all organizations."
+          }
         },
         "tags": ["organisationen"],
-        "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
+        "security": [
+          {
+            "oauth2": ["openid"]
+          },
+          {
+            "bearer": []
+          }
+        ]
       },
       "post": {
         "operationId": "OrganisationController_addZugehoerigeOrganisation",
@@ -868,25 +1583,55 @@
             "required": true,
             "in": "path",
             "description": "The id of an organization",
-            "schema": { "nullable": false, "type": "string" }
+            "schema": {
+              "nullable": false,
+              "type": "string"
+            }
           }
         ],
         "requestBody": {
           "required": true,
-          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/OrganisationByIdBodyParams" } } }
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrganisationByIdBodyParams"
+              }
+            }
+          }
         },
         "responses": {
-          "201": { "description": "The organisation was successfully updated." },
+          "201": {
+            "description": "The organisation was successfully updated."
+          },
           "400": {
             "description": "The organisation could not be modified.",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DbiamOrganisationError" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DbiamOrganisationError"
+                }
+              }
+            }
           },
-          "401": { "description": "Not authorized to modify the organisation." },
-          "403": { "description": "Not permitted to modify the organisation." },
-          "500": { "description": "Internal server error while modifying the organisation." }
+          "401": {
+            "description": "Not authorized to modify the organisation."
+          },
+          "403": {
+            "description": "Not permitted to modify the organisation."
+          },
+          "500": {
+            "description": "Internal server error while modifying the organisation."
+          }
         },
         "tags": ["organisationen"],
-        "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
+        "security": [
+          {
+            "oauth2": ["openid"]
+          },
+          {
+            "bearer": []
+          }
+        ]
       }
     },
     "/api/organisationen/{organisationId}/klasse": {
@@ -900,20 +1645,42 @@
             "required": true,
             "in": "path",
             "description": "The id of an organization",
-            "schema": { "nullable": false, "type": "string" }
+            "schema": {
+              "nullable": false,
+              "type": "string"
+            }
           }
         ],
         "responses": {
-          "204": { "description": "The organisation was deleted successfully." },
+          "204": {
+            "description": "The organisation was deleted successfully."
+          },
           "400": {
             "description": "The input was not valid.",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DbiamOrganisationError" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DbiamOrganisationError"
+                }
+              }
+            }
           },
-          "401": { "description": "Not authorized to delete the organisation." },
-          "404": { "description": "The organisation that should be deleted does not exist." }
+          "401": {
+            "description": "Not authorized to delete the organisation."
+          },
+          "404": {
+            "description": "The organisation that should be deleted does not exist."
+          }
         },
         "tags": ["organisationen"],
-        "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
+        "security": [
+          {
+            "oauth2": ["openid"]
+          },
+          {
+            "bearer": []
+          }
+        ]
       }
     },
     "/api/organisationen/{organisationId}/name": {
@@ -925,13 +1692,20 @@
             "required": true,
             "in": "path",
             "description": "The id of an organization",
-            "schema": { "nullable": false, "type": "string" }
+            "schema": {
+              "nullable": false,
+              "type": "string"
+            }
           }
         ],
         "requestBody": {
           "required": true,
           "content": {
-            "application/json": { "schema": { "$ref": "#/components/schemas/OrganisationByNameBodyParams" } }
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrganisationByNameBodyParams"
+              }
+            }
           }
         },
         "responses": {
@@ -941,23 +1715,50 @@
               "X-Paging-Offset": {
                 "description": "The offset of the first item from the list. List starts with index 0."
               },
-              "X-Paging-Limit": { "description": "The maximum amount of items returned in one request." },
-              "X-Paging-Total": { "description": "The total amount of items in the list." }
+              "X-Paging-Limit": {
+                "description": "The maximum amount of items returned in one request."
+              },
+              "X-Paging-Total": {
+                "description": "The total amount of items in the list."
+              }
             },
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/OrganisationResponseLegacy" } }
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganisationResponseLegacy"
+                }
+              }
             }
           },
           "400": {
             "description": "The organisation could not be modified.",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DbiamOrganisationError" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DbiamOrganisationError"
+                }
+              }
+            }
           },
-          "401": { "description": "Not authorized to modify the organisation." },
-          "403": { "description": "Not permitted to modify the organisation." },
-          "500": { "description": "Internal server error while modifying the organisation." }
+          "401": {
+            "description": "Not authorized to modify the organisation."
+          },
+          "403": {
+            "description": "Not permitted to modify the organisation."
+          },
+          "500": {
+            "description": "Internal server error while modifying the organisation."
+          }
         },
         "tags": ["organisationen"],
-        "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
+        "security": [
+          {
+            "oauth2": ["openid"]
+          },
+          {
+            "bearer": []
+          }
+        ]
       }
     },
     "/api/rolle": {
@@ -971,21 +1772,28 @@
             "required": false,
             "in": "query",
             "description": "The offset of the paginated list.",
-            "schema": { "type": "number" }
+            "schema": {
+              "type": "number"
+            }
           },
           {
             "name": "limit",
             "required": false,
             "in": "query",
             "description": "The requested limit for the page size.",
-            "schema": { "type": "number" }
+            "schema": {
+              "type": "number"
+            }
           },
           {
             "name": "searchStr",
             "required": false,
             "in": "query",
             "description": "The name for the role.",
-            "schema": { "nullable": false, "type": "string" }
+            "schema": {
+              "nullable": false,
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -995,24 +1803,43 @@
               "X-Paging-Offset": {
                 "description": "The offset of the first item from the list. List starts with index 0."
               },
-              "X-Paging-Limit": { "description": "The maximum amount of items returned in one request." },
-              "X-Paging-Total": { "description": "The total amount of items in the list." }
+              "X-Paging-Limit": {
+                "description": "The maximum amount of items returned in one request."
+              },
+              "X-Paging-Total": {
+                "description": "The total amount of items in the list."
+              }
             },
             "content": {
               "application/json": {
                 "schema": {
                   "type": "array",
-                  "items": { "$ref": "#/components/schemas/RolleWithServiceProvidersResponse" }
+                  "items": {
+                    "$ref": "#/components/schemas/RolleWithServiceProvidersResponse"
+                  }
                 }
               }
             }
           },
-          "401": { "description": "Not authorized to get rollen." },
-          "403": { "description": "Insufficient permissions to get rollen." },
-          "500": { "description": "Internal server error while getting all rollen." }
+          "401": {
+            "description": "Not authorized to get rollen."
+          },
+          "403": {
+            "description": "Insufficient permissions to get rollen."
+          },
+          "500": {
+            "description": "Internal server error while getting all rollen."
+          }
         },
         "tags": ["rolle"],
-        "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
+        "security": [
+          {
+            "oauth2": ["openid"]
+          },
+          {
+            "bearer": []
+          }
+        ]
       },
       "post": {
         "operationId": "RolleController_createRolle",
@@ -1021,20 +1848,47 @@
         "parameters": [],
         "requestBody": {
           "required": true,
-          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CreateRolleBodyParams" } } }
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRolleBodyParams"
+              }
+            }
+          }
         },
         "responses": {
           "201": {
             "description": "The rolle was successfully created.",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RolleResponse" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RolleResponse"
+                }
+              }
+            }
           },
-          "400": { "description": "The input was not valid." },
-          "401": { "description": "Not authorized to create the rolle." },
-          "403": { "description": "Insufficient permissions to create the rolle." },
-          "500": { "description": "Internal server error while creating the rolle." }
+          "400": {
+            "description": "The input was not valid."
+          },
+          "401": {
+            "description": "Not authorized to create the rolle."
+          },
+          "403": {
+            "description": "Insufficient permissions to create the rolle."
+          },
+          "500": {
+            "description": "Internal server error while creating the rolle."
+          }
         },
         "tags": ["rolle"],
-        "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
+        "security": [
+          {
+            "oauth2": ["openid"]
+          },
+          {
+            "bearer": []
+          }
+        ]
       }
     },
     "/api/rolle/{rolleId}": {
@@ -1048,22 +1902,42 @@
             "required": true,
             "in": "path",
             "description": "The id for the rolle.",
-            "schema": { "nullable": false, "type": "string" }
+            "schema": {
+              "nullable": false,
+              "type": "string"
+            }
           }
         ],
         "responses": {
           "200": {
             "description": "The rolle was successfully returned.",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/RolleWithServiceProvidersResponse" } }
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RolleWithServiceProvidersResponse"
+                }
+              }
             }
           },
-          "401": { "description": "Not authorized to get rolle by id." },
-          "403": { "description": "Insufficient permission to get rolle by id." },
-          "500": { "description": "Internal server error while getting rolle by id." }
+          "401": {
+            "description": "Not authorized to get rolle by id."
+          },
+          "403": {
+            "description": "Insufficient permission to get rolle by id."
+          },
+          "500": {
+            "description": "Internal server error while getting rolle by id."
+          }
         },
         "tags": ["rolle"],
-        "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
+        "security": [
+          {
+            "oauth2": ["openid"]
+          },
+          {
+            "bearer": []
+          }
+        ]
       },
       "patch": {
         "operationId": "RolleController_addSystemRecht",
@@ -1075,22 +1949,48 @@
             "required": true,
             "in": "path",
             "description": "The id for the rolle.",
-            "schema": { "nullable": false, "type": "string" }
+            "schema": {
+              "nullable": false,
+              "type": "string"
+            }
           }
         ],
         "requestBody": {
           "required": true,
-          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AddSystemrechtBodyParams" } } }
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddSystemrechtBodyParams"
+              }
+            }
+          }
         },
         "responses": {
-          "200": { "description": "The systemrecht was successfully added to rolle." },
-          "400": { "description": "The input was not valid." },
-          "401": { "description": "Not authorized to create the rolle." },
-          "403": { "description": "Insufficient permissions to create the rolle." },
-          "500": { "description": "Internal server error while adding systemrecht to rolle." }
+          "200": {
+            "description": "The systemrecht was successfully added to rolle."
+          },
+          "400": {
+            "description": "The input was not valid."
+          },
+          "401": {
+            "description": "Not authorized to create the rolle."
+          },
+          "403": {
+            "description": "Insufficient permissions to create the rolle."
+          },
+          "500": {
+            "description": "Internal server error while adding systemrecht to rolle."
+          }
         },
         "tags": ["rolle"],
-        "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
+        "security": [
+          {
+            "oauth2": ["openid"]
+          },
+          {
+            "bearer": []
+          }
+        ]
       },
       "put": {
         "operationId": "RolleController_updateRolle",
@@ -1102,30 +2002,62 @@
             "required": true,
             "in": "path",
             "description": "The id for the rolle.",
-            "schema": { "nullable": false, "type": "string" }
+            "schema": {
+              "nullable": false,
+              "type": "string"
+            }
           }
         ],
         "requestBody": {
           "required": true,
-          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UpdateRolleBodyParams" } } }
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateRolleBodyParams"
+              }
+            }
+          }
         },
         "responses": {
           "200": {
             "description": "The rolle was successfully updated.",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/RolleWithServiceProvidersResponse" } }
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RolleWithServiceProvidersResponse"
+                }
+              }
             }
           },
           "400": {
             "description": "The input was not valid.",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DbiamRolleError" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DbiamRolleError"
+                }
+              }
+            }
           },
-          "401": { "description": "Not authorized to update the rolle." },
-          "403": { "description": "Insufficient permissions to update the rolle." },
-          "500": { "description": "Internal server error while updating the rolle." }
+          "401": {
+            "description": "Not authorized to update the rolle."
+          },
+          "403": {
+            "description": "Insufficient permissions to update the rolle."
+          },
+          "500": {
+            "description": "Internal server error while updating the rolle."
+          }
         },
         "tags": ["rolle"],
-        "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
+        "security": [
+          {
+            "oauth2": ["openid"]
+          },
+          {
+            "bearer": []
+          }
+        ]
       },
       "delete": {
         "operationId": "RolleController_deleteRolle",
@@ -1137,20 +2069,42 @@
             "required": true,
             "in": "path",
             "description": "The id for the rolle.",
-            "schema": { "nullable": false, "type": "string" }
+            "schema": {
+              "nullable": false,
+              "type": "string"
+            }
           }
         ],
         "responses": {
-          "204": { "description": "Role was deleted successfully." },
+          "204": {
+            "description": "Role was deleted successfully."
+          },
           "400": {
             "description": "The input was not valid.",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DbiamRolleError" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DbiamRolleError"
+                }
+              }
+            }
           },
-          "401": { "description": "Not authorized to delete the role." },
-          "404": { "description": "The rolle that should be deleted does not exist." }
+          "401": {
+            "description": "Not authorized to delete the role."
+          },
+          "404": {
+            "description": "The rolle that should be deleted does not exist."
+          }
         },
         "tags": ["rolle"],
-        "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
+        "security": [
+          {
+            "oauth2": ["openid"]
+          },
+          {
+            "bearer": []
+          }
+        ]
       }
     },
     "/api/rolle/{rolleId}/serviceProviders": {
@@ -1164,21 +2118,39 @@
             "required": true,
             "in": "path",
             "description": "The id for the rolle.",
-            "schema": { "nullable": false, "type": "string" }
+            "schema": {
+              "nullable": false,
+              "type": "string"
+            }
           }
         ],
         "responses": {
           "200": {
             "description": "Returns a list of service-provider ids.",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/RolleServiceProviderResponse" } }
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RolleServiceProviderResponse"
+                }
+              }
             }
           },
-          "401": { "description": "Not authorized to retrieve service-providers for rolle." },
-          "404": { "description": "The rolle does not exist." }
+          "401": {
+            "description": "Not authorized to retrieve service-providers for rolle."
+          },
+          "404": {
+            "description": "The rolle does not exist."
+          }
         },
         "tags": ["rolle"],
-        "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
+        "security": [
+          {
+            "oauth2": ["openid"]
+          },
+          {
+            "bearer": []
+          }
+        ]
       },
       "post": {
         "operationId": "RolleController_addServiceProviderById",
@@ -1190,29 +2162,55 @@
             "required": true,
             "in": "path",
             "description": "The id for the rolle.",
-            "schema": { "nullable": false, "type": "string" }
+            "schema": {
+              "nullable": false,
+              "type": "string"
+            }
           }
         ],
         "requestBody": {
           "required": true,
           "content": {
-            "application/json": { "schema": { "$ref": "#/components/schemas/RolleServiceProviderQueryParams" } }
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RolleServiceProviderQueryParams"
+              }
+            }
           }
         },
         "responses": {
           "200": {
             "description": "Adding service-provider finished successfully.",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ServiceProviderResponse" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceProviderResponse"
+                }
+              }
+            }
           },
-          "400": { "description": "The service-provider is already attached to rolle." },
-          "401": { "description": "Not authorized to retrieve service-providers for rolle." },
-          "404": { "description": "The rolle or the service-provider to add does not exist." },
+          "400": {
+            "description": "The service-provider is already attached to rolle."
+          },
+          "401": {
+            "description": "Not authorized to retrieve service-providers for rolle."
+          },
+          "404": {
+            "description": "The rolle or the service-provider to add does not exist."
+          },
           "500": {
             "description": "Internal server error, the service-provider may could not be found after attaching to rolle."
           }
         },
         "tags": ["rolle"],
-        "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
+        "security": [
+          {
+            "oauth2": ["openid"]
+          },
+          {
+            "bearer": []
+          }
+        ]
       },
       "delete": {
         "operationId": "RolleController_removeServiceProviderById",
@@ -1224,23 +2222,42 @@
             "required": true,
             "in": "path",
             "description": "The id for the rolle.",
-            "schema": { "nullable": false, "type": "string" }
+            "schema": {
+              "nullable": false,
+              "type": "string"
+            }
           },
           {
             "name": "serviceProviderId",
             "required": true,
             "in": "query",
             "description": "The id for the rolle.",
-            "schema": { "nullable": false, "type": "string" }
+            "schema": {
+              "nullable": false,
+              "type": "string"
+            }
           }
         ],
         "responses": {
-          "200": { "description": "Removing service-provider finished successfully." },
-          "401": { "description": "Not authorized to retrieve service-providers for rolle." },
-          "404": { "description": "The rolle or the service-provider that should be removed does not exist." }
+          "200": {
+            "description": "Removing service-provider finished successfully."
+          },
+          "401": {
+            "description": "Not authorized to retrieve service-providers for rolle."
+          },
+          "404": {
+            "description": "The rolle or the service-provider that should be removed does not exist."
+          }
         },
         "tags": ["rolle"],
-        "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
+        "security": [
+          {
+            "oauth2": ["openid"]
+          },
+          {
+            "bearer": []
+          }
+        ]
       }
     },
     "/api/provider/all": {
@@ -1254,16 +2271,34 @@
             "description": "The service-providers were successfully returned.",
             "content": {
               "application/json": {
-                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/ServiceProviderResponse" } }
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ServiceProviderResponse"
+                  }
+                }
               }
             }
           },
-          "401": { "description": "Not authorized to get available service providers." },
-          "403": { "description": "Insufficient permissions to get service-providers." },
-          "500": { "description": "Internal server error while getting all service-providers." }
+          "401": {
+            "description": "Not authorized to get available service providers."
+          },
+          "403": {
+            "description": "Insufficient permissions to get service-providers."
+          },
+          "500": {
+            "description": "Internal server error while getting all service-providers."
+          }
         },
         "tags": ["provider"],
-        "security": [{ "bearer": [] }, { "oauth2": ["openid"] }]
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "oauth2": ["openid"]
+          }
+        ]
       }
     },
     "/api/provider": {
@@ -1277,16 +2312,34 @@
             "description": "The service-providers were successfully returned.",
             "content": {
               "application/json": {
-                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/ServiceProviderResponse" } }
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ServiceProviderResponse"
+                  }
+                }
               }
             }
           },
-          "401": { "description": "Not authorized to get available service providers." },
-          "403": { "description": "Insufficient permissions to get service-providers." },
-          "500": { "description": "Internal server error while getting all service-providers." }
+          "401": {
+            "description": "Not authorized to get available service providers."
+          },
+          "403": {
+            "description": "Insufficient permissions to get service-providers."
+          },
+          "500": {
+            "description": "Internal server error while getting all service-providers."
+          }
         },
         "tags": ["provider"],
-        "security": [{ "bearer": [] }, { "oauth2": ["openid"] }]
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "oauth2": ["openid"]
+          }
+        ]
       }
     },
     "/api/provider/{angebotId}/logo": {
@@ -1298,22 +2351,49 @@
             "required": true,
             "in": "path",
             "description": "The id of the service provider",
-            "schema": { "nullable": false, "type": "string" }
+            "schema": {
+              "nullable": false,
+              "type": "string"
+            }
           }
         ],
         "responses": {
           "200": {
             "description": "The logo for the service provider was successfully returned.",
-            "content": { "image/*": { "schema": { "type": "file", "format": "binary" } } }
+            "content": {
+              "image/*": {
+                "schema": {
+                  "type": "file",
+                  "format": "binary"
+                }
+              }
+            }
           },
-          "400": { "description": "Angebot ID is required." },
-          "401": { "description": "Not authorized to get service provider logo." },
-          "403": { "description": "Insufficient permissions to get the logo." },
-          "404": { "description": "The service-provider does not exist or has no logo." },
-          "500": { "description": "Internal server error while getting the logo." }
+          "400": {
+            "description": "Angebot ID is required."
+          },
+          "401": {
+            "description": "Not authorized to get service provider logo."
+          },
+          "403": {
+            "description": "Insufficient permissions to get the logo."
+          },
+          "404": {
+            "description": "The service-provider does not exist or has no logo."
+          },
+          "500": {
+            "description": "Internal server error while getting the logo."
+          }
         },
         "tags": ["provider"],
-        "security": [{ "bearer": [] }, { "oauth2": ["openid"] }]
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "oauth2": ["openid"]
+          }
+        ]
       }
     },
     "/api/personenkontexte/{personenkontextId}": {
@@ -1325,24 +2405,48 @@
             "required": true,
             "in": "path",
             "description": "The id for the personenkontext.",
-            "schema": { "nullable": false, "type": "string" }
+            "schema": {
+              "nullable": false,
+              "type": "string"
+            }
           }
         ],
         "responses": {
           "200": {
             "description": "The personenkontext was successfully returned.",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/PersonendatensatzResponseAutomapper" } }
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PersonendatensatzResponseAutomapper"
+                }
+              }
             }
           },
-          "400": { "description": "Request has wrong format." },
-          "401": { "description": "Request is not authorized." },
-          "403": { "description": "Insufficient permissions to perform operation." },
-          "404": { "description": "The personenkontext was not found." },
-          "500": { "description": "An internal server error occurred." }
+          "400": {
+            "description": "Request has wrong format."
+          },
+          "401": {
+            "description": "Request is not authorized."
+          },
+          "403": {
+            "description": "Insufficient permissions to perform operation."
+          },
+          "404": {
+            "description": "The personenkontext was not found."
+          },
+          "500": {
+            "description": "An internal server error occurred."
+          }
         },
         "tags": ["personenkontexte"],
-        "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
+        "security": [
+          {
+            "oauth2": ["openid"]
+          },
+          {
+            "bearer": []
+          }
+        ]
       },
       "put": {
         "operationId": "PersonenkontextController_updatePersonenkontextWithId",
@@ -1352,28 +2456,58 @@
             "required": true,
             "in": "path",
             "description": "The id for the personenkontext.",
-            "schema": { "nullable": false, "type": "string" }
+            "schema": {
+              "nullable": false,
+              "type": "string"
+            }
           }
         ],
         "requestBody": {
           "required": true,
           "content": {
-            "application/json": { "schema": { "$ref": "#/components/schemas/UpdatePersonenkontextBodyParams" } }
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePersonenkontextBodyParams"
+              }
+            }
           }
         },
         "responses": {
           "200": {
             "description": "The personenkontext was successfully updated.",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PersonenkontextResponse" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PersonenkontextResponse"
+                }
+              }
+            }
           },
-          "400": { "description": "Request has wrong format." },
-          "401": { "description": "Request is not authorized." },
-          "403": { "description": "Insufficient permissions to perform operation." },
-          "404": { "description": "The personenkontext was not found." },
-          "500": { "description": "An internal server error occurred." }
+          "400": {
+            "description": "Request has wrong format."
+          },
+          "401": {
+            "description": "Request is not authorized."
+          },
+          "403": {
+            "description": "Insufficient permissions to perform operation."
+          },
+          "404": {
+            "description": "The personenkontext was not found."
+          },
+          "500": {
+            "description": "An internal server error occurred."
+          }
         },
         "tags": ["personenkontexte"],
-        "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
+        "security": [
+          {
+            "oauth2": ["openid"]
+          },
+          {
+            "bearer": []
+          }
+        ]
       },
       "delete": {
         "operationId": "PersonenkontextController_deletePersonenkontextById",
@@ -1383,23 +2517,51 @@
             "required": true,
             "in": "path",
             "description": "The id for the personenkontext.",
-            "schema": { "nullable": false, "type": "string" }
+            "schema": {
+              "nullable": false,
+              "type": "string"
+            }
           }
         ],
         "requestBody": {
           "required": true,
-          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DeleteRevisionBodyParams" } } }
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeleteRevisionBodyParams"
+              }
+            }
+          }
         },
         "responses": {
-          "204": { "description": "The personenkontext was successfully deleted." },
-          "400": { "description": "Request has wrong format." },
-          "401": { "description": "Request is not authorized." },
-          "403": { "description": "Insufficient permissions to perform operation." },
-          "404": { "description": "The personenkontext was not found." },
-          "500": { "description": "An internal server error occurred." }
+          "204": {
+            "description": "The personenkontext was successfully deleted."
+          },
+          "400": {
+            "description": "Request has wrong format."
+          },
+          "401": {
+            "description": "Request is not authorized."
+          },
+          "403": {
+            "description": "Insufficient permissions to perform operation."
+          },
+          "404": {
+            "description": "The personenkontext was not found."
+          },
+          "500": {
+            "description": "An internal server error occurred."
+          }
         },
         "tags": ["personenkontexte"],
-        "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
+        "security": [
+          {
+            "oauth2": ["openid"]
+          },
+          {
+            "bearer": []
+          }
+        ]
       }
     },
     "/api/personenkontexte": {
@@ -1411,29 +2573,60 @@
             "required": false,
             "in": "query",
             "description": "The offset of the paginated list.",
-            "schema": { "type": "number" }
+            "schema": {
+              "type": "number"
+            }
           },
           {
             "name": "limit",
             "required": false,
             "in": "query",
             "description": "The requested limit for the page size.",
-            "schema": { "type": "number" }
+            "schema": {
+              "type": "number"
+            }
           },
-          { "name": "personId", "required": false, "in": "query", "schema": { "nullable": true, "type": "string" } },
-          { "name": "referrer", "required": false, "in": "query", "schema": { "nullable": true, "type": "string" } },
-          { "name": "rolle", "required": false, "in": "query", "schema": { "$ref": "#/components/schemas/Rolle" } },
+          {
+            "name": "personId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
+          },
+          {
+            "name": "referrer",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
+          },
+          {
+            "name": "rolle",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Rolle"
+            }
+          },
           {
             "name": "personenstatus",
             "required": false,
             "in": "query",
-            "schema": { "$ref": "#/components/schemas/Personenstatus" }
+            "schema": {
+              "$ref": "#/components/schemas/Personenstatus"
+            }
           },
           {
             "name": "sichtfreigabe",
             "required": false,
             "in": "query",
-            "schema": { "$ref": "#/components/schemas/Sichtfreigabe" }
+            "schema": {
+              "$ref": "#/components/schemas/Sichtfreigabe"
+            }
           }
         ],
         "responses": {
@@ -1443,26 +2636,49 @@
               "X-Paging-Offset": {
                 "description": "The offset of the first item from the list. List starts with index 0."
               },
-              "X-Paging-Limit": { "description": "The maximum amount of items returned in one request." },
-              "X-Paging-Total": { "description": "The total amount of items in the list." }
+              "X-Paging-Limit": {
+                "description": "The maximum amount of items returned in one request."
+              },
+              "X-Paging-Total": {
+                "description": "The total amount of items in the list."
+              }
             },
             "content": {
               "application/json": {
                 "schema": {
                   "type": "array",
-                  "items": { "$ref": "#/components/schemas/PersonenkontextdatensatzResponse" }
+                  "items": {
+                    "$ref": "#/components/schemas/PersonenkontextdatensatzResponse"
+                  }
                 }
               }
             }
           },
-          "400": { "description": "Request has wrong format." },
-          "401": { "description": "Request is not authorized." },
-          "403": { "description": "Insufficient permissions to perform operation." },
-          "404": { "description": "The personenkontexte were not found." },
-          "500": { "description": "An internal server error occurred." }
+          "400": {
+            "description": "Request has wrong format."
+          },
+          "401": {
+            "description": "Request is not authorized."
+          },
+          "403": {
+            "description": "Insufficient permissions to perform operation."
+          },
+          "404": {
+            "description": "The personenkontexte were not found."
+          },
+          "500": {
+            "description": "An internal server error occurred."
+          }
         },
         "tags": ["personenkontexte"],
-        "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
+        "security": [
+          {
+            "oauth2": ["openid"]
+          },
+          {
+            "bearer": []
+          }
+        ]
       }
     },
     "/api/personenkontexte/{personId}/hatSystemrecht": {
@@ -1474,24 +2690,44 @@
             "required": true,
             "in": "path",
             "description": "The id for the account.",
-            "schema": { "nullable": false, "type": "string" }
+            "schema": {
+              "nullable": false,
+              "type": "string"
+            }
           },
           {
             "name": "systemRecht",
             "required": true,
             "in": "query",
-            "schema": { "$ref": "#/components/schemas/RollenSystemRecht" }
+            "schema": {
+              "$ref": "#/components/schemas/RollenSystemRecht"
+            }
           }
         ],
         "responses": {
           "200": {
             "description": "The SchulStrukturKnoten associated with this personId and systemrecht. Can return empty list",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SystemrechtResponse" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SystemrechtResponse"
+                }
+              }
+            }
           },
-          "404": { "description": "The systemrecht could not be found (does not exist as type of systemrecht)." }
+          "404": {
+            "description": "The systemrecht could not be found (does not exist as type of systemrecht)."
+          }
         },
         "tags": ["personenkontexte"],
-        "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
+        "security": [
+          {
+            "oauth2": ["openid"]
+          },
+          {
+            "bearer": []
+          }
+        ]
       }
     },
     "/api/dbiam/personenkontext/{personId}": {
@@ -1503,7 +2739,9 @@
             "required": true,
             "in": "path",
             "description": "The ID for the person.",
-            "schema": { "type": "string" }
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -1511,16 +2749,34 @@
             "description": "The personenkontexte were successfully returned.",
             "content": {
               "application/json": {
-                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/DBiamPersonenkontextResponse" } }
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DBiamPersonenkontextResponse"
+                  }
+                }
               }
             }
           },
-          "401": { "description": "Not authorized to get available personenkontexte." },
-          "403": { "description": "Insufficient permission to get personenkontexte for this user." },
-          "500": { "description": "Internal server error while getting personenkontexte." }
+          "401": {
+            "description": "Not authorized to get available personenkontexte."
+          },
+          "403": {
+            "description": "Insufficient permission to get personenkontexte for this user."
+          },
+          "500": {
+            "description": "Internal server error while getting personenkontexte."
+          }
         },
         "tags": ["dbiam-personenkontexte"],
-        "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
+        "security": [
+          {
+            "oauth2": ["openid"]
+          },
+          {
+            "bearer": []
+          }
+        ]
       }
     },
     "/api/dbiam/personenkontext": {
@@ -1530,28 +2786,53 @@
         "requestBody": {
           "required": true,
           "content": {
-            "application/json": { "schema": { "$ref": "#/components/schemas/DbiamPersonenkontextBodyParams" } }
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DbiamPersonenkontextBodyParams"
+              }
+            }
           }
         },
         "responses": {
           "201": {
             "description": "Personenkontext was successfully created.",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/DBiamPersonenkontextResponse" } }
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DBiamPersonenkontextResponse"
+                }
+              }
             }
           },
           "400": {
             "description": "The personenkontext could not be created, may due to unsatisfied specifications.",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/DbiamPersonenkontextError" } }
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DbiamPersonenkontextError"
+                }
+              }
             }
           },
-          "401": { "description": "Not authorized to create personenkontext." },
-          "403": { "description": "Insufficient permission to create personenkontext." },
-          "500": { "description": "Internal server error while creating personenkontext." }
+          "401": {
+            "description": "Not authorized to create personenkontext."
+          },
+          "403": {
+            "description": "Insufficient permission to create personenkontext."
+          },
+          "500": {
+            "description": "Internal server error while creating personenkontext."
+          }
         },
         "tags": ["dbiam-personenkontexte"],
-        "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
+        "security": [
+          {
+            "oauth2": ["openid"]
+          },
+          {
+            "bearer": []
+          }
+        ]
       }
     },
     "/api/personenkontext-workflow/step": {
@@ -1563,50 +2844,82 @@
             "required": false,
             "in": "query",
             "description": "ID of the organisation to filter the rollen later",
-            "schema": { "nullable": true, "type": "string" }
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
           },
           {
             "name": "rolleId",
             "required": false,
             "in": "query",
             "description": "ID of the rolle.",
-            "schema": { "nullable": true, "type": "string" }
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
           },
           {
             "name": "rolleName",
             "required": false,
             "in": "query",
             "description": "Rolle name used to filter for rollen in personenkontext.",
-            "schema": { "nullable": true, "type": "string" }
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
           },
           {
             "name": "organisationName",
             "required": false,
             "in": "query",
             "description": "Organisation/SSK name used to filter for schulstrukturknoten in personenkontext.",
-            "schema": { "nullable": true, "type": "string" }
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
           },
           {
             "name": "limit",
             "required": false,
             "in": "query",
             "description": "The limit of items for the request.",
-            "schema": { "nullable": false, "type": "number" }
+            "schema": {
+              "nullable": false,
+              "type": "number"
+            }
           }
         ],
         "responses": {
           "200": {
             "description": "Initialize or process data from the person creation form.\n                      Valid combinations:\n                      - Both organisationId and rolleId are undefined: Fetch all possible organisations.\n                      - organisationId is provided, but rolleId is undefined: Fetch Rollen for the given organisation.\n                      - Both organisationId and rolleId are provided: Check if the Rolle can be committed for the organisation.\n                      Note: Providing rolleId without organisationId is invalid.",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/PersonenkontextWorkflowResponse" } }
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PersonenkontextWorkflowResponse"
+                }
+              }
             }
           },
-          "401": { "description": "Not authorized to get available data for personenkontext." },
-          "403": { "description": "Insufficient permission to get data for personenkontext." },
-          "500": { "description": "Internal server error while getting data for personenkontext." }
+          "401": {
+            "description": "Not authorized to get available data for personenkontext."
+          },
+          "403": {
+            "description": "Insufficient permission to get data for personenkontext."
+          },
+          "500": {
+            "description": "Internal server error while getting data for personenkontext."
+          }
         },
         "tags": ["personenkontext"],
-        "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
+        "security": [
+          {
+            "oauth2": ["openid"]
+          },
+          {
+            "bearer": []
+          }
+        ]
       }
     },
     "/api/personenkontext-workflow/{personId}": {
@@ -1618,35 +2931,64 @@
             "required": true,
             "in": "path",
             "description": "The ID for the person.",
-            "schema": { "type": "string" }
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "requestBody": {
           "required": true,
           "content": {
-            "application/json": { "schema": { "$ref": "#/components/schemas/DbiamUpdatePersonenkontexteBodyParams" } }
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DbiamUpdatePersonenkontexteBodyParams"
+              }
+            }
           }
         },
         "responses": {
           "200": {
             "description": "Add or remove personenkontexte as one operation. Returns the Personenkontexte existing after update.",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/PersonenkontexteUpdateResponse" } }
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PersonenkontexteUpdateResponse"
+                }
+              }
             }
           },
           "400": {
             "description": "The personenkontexte could not be updated, may due to unsatisfied specifications.",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/DbiamPersonenkontexteUpdateError" } }
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DbiamPersonenkontexteUpdateError"
+                }
+              }
             }
           },
-          "401": { "description": "Not authorized to update personenkontexte." },
-          "403": { "description": "Insufficient permission to update personenkontexte." },
-          "409": { "description": "Changes are conflicting with current state of personenkontexte." },
-          "500": { "description": "Internal server error while updating personenkontexte." }
+          "401": {
+            "description": "Not authorized to update personenkontexte."
+          },
+          "403": {
+            "description": "Insufficient permission to update personenkontexte."
+          },
+          "409": {
+            "description": "Changes are conflicting with current state of personenkontexte."
+          },
+          "500": {
+            "description": "Internal server error while updating personenkontexte."
+          }
         },
         "tags": ["personenkontext"],
-        "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
+        "security": [
+          {
+            "oauth2": ["openid"]
+          },
+          {
+            "bearer": []
+          }
+        ]
       }
     },
     "/api/personenkontext-workflow/schulstrukturknoten": {
@@ -1658,36 +3000,62 @@
             "required": true,
             "in": "query",
             "description": "RolleId used to filter for schulstrukturknoten in personenkontext.",
-            "schema": { "nullable": false, "type": "string" }
+            "schema": {
+              "nullable": false,
+              "type": "string"
+            }
           },
           {
             "name": "sskName",
             "required": false,
             "in": "query",
             "description": "Organisation/SSK name used to filter for schulstrukturknoten in personenkontext.",
-            "schema": { "nullable": true, "type": "string" }
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
           },
           {
             "name": "limit",
             "required": false,
             "in": "query",
             "description": "The limit of items for the request.",
-            "schema": { "nullable": false, "type": "number" }
+            "schema": {
+              "nullable": false,
+              "type": "number"
+            }
           }
         ],
         "responses": {
           "200": {
             "description": "The schulstrukturknoten for a personenkontext were successfully returned.",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/FindSchulstrukturknotenResponse" } }
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FindSchulstrukturknotenResponse"
+                }
+              }
             }
           },
-          "401": { "description": "Not authorized to get available schulstrukturknoten for personenkontexte." },
-          "403": { "description": "Insufficient permission to get schulstrukturknoten for personenkontext." },
-          "500": { "description": "Internal server error while getting schulstrukturknoten for personenkontexte." }
+          "401": {
+            "description": "Not authorized to get available schulstrukturknoten for personenkontexte."
+          },
+          "403": {
+            "description": "Insufficient permission to get schulstrukturknoten for personenkontext."
+          },
+          "500": {
+            "description": "Internal server error while getting schulstrukturknoten for personenkontexte."
+          }
         },
         "tags": ["personenkontext"],
-        "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
+        "security": [
+          {
+            "oauth2": ["openid"]
+          },
+          {
+            "bearer": []
+          }
+        ]
       }
     },
     "/api/personenkontext-workflow": {
@@ -1697,26 +3065,53 @@
         "requestBody": {
           "required": true,
           "content": {
-            "application/json": { "schema": { "$ref": "#/components/schemas/DbiamCreatePersonWithContextBodyParams" } }
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DbiamCreatePersonWithContextBodyParams"
+              }
+            }
           }
         },
         "responses": {
           "201": {
             "description": "Person with Personenkontext was successfully created.",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DBiamPersonResponse" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DBiamPersonResponse"
+                }
+              }
+            }
           },
           "400": {
             "description": "The person and the personenkontext could not be created, may due to unsatisfied specifications.",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/DbiamPersonenkontextError" } }
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DbiamPersonenkontextError"
+                }
+              }
             }
           },
-          "401": { "description": "Not authorized to create person with personenkontext." },
-          "403": { "description": "Insufficient permission to create person with personenkontext." },
-          "500": { "description": "Internal server error while creating person with personenkontext." }
+          "401": {
+            "description": "Not authorized to create person with personenkontext."
+          },
+          "403": {
+            "description": "Insufficient permission to create person with personenkontext."
+          },
+          "500": {
+            "description": "Internal server error while creating person with personenkontext."
+          }
         },
         "tags": ["personenkontext"],
-        "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
+        "security": [
+          {
+            "oauth2": ["openid"]
+          },
+          {
+            "bearer": []
+          }
+        ]
       }
     },
     "/api/person-administration/rollen": {
@@ -1728,27 +3123,52 @@
             "required": false,
             "in": "query",
             "description": "Rolle name used to filter for rollen in personenkontext.",
-            "schema": { "nullable": false, "type": "string" }
+            "schema": {
+              "nullable": false,
+              "type": "string"
+            }
           },
           {
             "name": "limit",
             "required": false,
             "in": "query",
             "description": "The limit of items for the request.",
-            "schema": { "nullable": false, "type": "number" }
+            "schema": {
+              "nullable": false,
+              "type": "number"
+            }
           }
         ],
         "responses": {
           "200": {
             "description": "The rollen for the logged-in user were successfully returned.",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/FindRollenResponse" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FindRollenResponse"
+                }
+              }
+            }
           },
-          "401": { "description": "Not authorized to get available rollen for the logged-in user." },
-          "403": { "description": "Insufficient permission to get rollen for the logged-in user." },
-          "500": { "description": "Internal server error while getting rollen for the logged-in user." }
+          "401": {
+            "description": "Not authorized to get available rollen for the logged-in user."
+          },
+          "403": {
+            "description": "Insufficient permission to get rollen for the logged-in user."
+          },
+          "500": {
+            "description": "Internal server error while getting rollen for the logged-in user."
+          }
         },
         "tags": ["person-administration"],
-        "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
+        "security": [
+          {
+            "oauth2": ["openid"]
+          },
+          {
+            "bearer": []
+          }
+        ]
       }
     },
     "/api/2fa-token/init": {
@@ -1757,40 +3177,198 @@
         "parameters": [],
         "requestBody": {
           "required": true,
-          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TokenInitBodyParams" } } }
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TokenInitBodyParams"
+              }
+            }
+          }
         },
         "responses": {
           "201": {
             "description": "The token was successfully created.",
-            "content": { "application/json": { "schema": { "type": "string" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           },
-          "400": { "description": "A username was not given or not found." },
-          "401": { "description": "Not authorized to create token." },
-          "403": { "description": "Insufficient permissions to create token." },
-          "404": { "description": "Insufficient permissions to create token." },
-          "500": { "description": "Internal server error while creating a token." }
+          "400": {
+            "description": "A username was not given or not found."
+          },
+          "401": {
+            "description": "Not authorized to create token."
+          },
+          "403": {
+            "description": "Insufficient permissions to create token."
+          },
+          "404": {
+            "description": "Insufficient permissions to create token."
+          },
+          "500": {
+            "description": "Internal server error while creating a token."
+          }
         },
         "tags": ["2FA"],
-        "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
+        "security": [
+          {
+            "oauth2": ["openid"]
+          },
+          {
+            "bearer": []
+          }
+        ]
       }
     },
     "/api/2fa-token/state": {
       "get": {
         "operationId": "PrivacyIdeaAdministrationController_getTwoAuthState",
-        "parameters": [{ "name": "personId", "required": true, "in": "query", "schema": { "type": "string" } }],
+        "parameters": [
+          {
+            "name": "personId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "201": {
             "description": "The token was successfully created.",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TokenStateResponse" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenStateResponse"
+                }
+              }
+            }
           },
-          "400": { "description": "A username was not given or not found." },
-          "401": { "description": "Not authorized to create token." },
-          "403": { "description": "Insufficient permissions to create token." },
-          "404": { "description": "Insufficient permissions to create token." },
-          "500": { "description": "Internal server error while creating a token." }
+          "400": {
+            "description": "A username was not given or not found."
+          },
+          "401": {
+            "description": "Not authorized to create token."
+          },
+          "403": {
+            "description": "Insufficient permissions to create token."
+          },
+          "404": {
+            "description": "Insufficient permissions to create token."
+          },
+          "500": {
+            "description": "Internal server error while creating a token."
+          }
         },
         "tags": ["2FA"],
-        "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
+        "security": [
+          {
+            "oauth2": ["openid"]
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/2fa-token/assign/hardwareToken": {
+      "post": {
+        "operationId": "PrivacyIdeaAdministrationController_assignHardwareToken",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignHardwareTokenBodyParams"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The hardware token was successfully assigned.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssignHardwareTokenResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Not found."
+          },
+          "401": {
+            "description": "Not authorized to assign hardware token."
+          },
+          "403": {
+            "description": "Insufficient permissions to reset token."
+          },
+          "404": {
+            "description": "Insufficient permissions to assign hardware token."
+          },
+          "500": {
+            "description": "Internal server error while assigning a hardware token."
+          }
+        },
+        "tags": ["2FA"],
+        "security": [
+          {
+            "oauth2": ["openid"]
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/2fa-token/verify": {
+      "post": {
+        "operationId": "PrivacyIdeaAdministrationController_verifyToken",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TokenVerifyBodyParams"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The token was successfully verified."
+          },
+          "400": {
+            "description": "A username was not given or not found."
+          },
+          "401": {
+            "description": "Not authorized to verify token."
+          },
+          "403": {
+            "description": "Insufficient permissions to verify token."
+          },
+          "404": {
+            "description": "Insufficient permissions to verify token."
+          },
+          "500": {
+            "description": "Internal server error while verifying a token."
+          }
+        },
+        "tags": ["2FA"],
+        "security": [
+          {
+            "oauth2": ["openid"]
+          },
+          {
+            "bearer": []
+          }
+        ]
       }
     }
   },
@@ -1815,50 +3393,126 @@
           }
         }
       },
-      "bearer": { "scheme": "bearer", "bearerFormat": "JWT", "type": "http" }
+      "bearer": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
+      }
     },
     "schemas": {
       "RollenSystemRechtServiceProviderIDResponse": {
         "type": "object",
         "properties": {
-          "systemrechte": { "type": "array", "items": { "type": "string" } },
-          "serviceProviderIds": { "type": "array", "items": { "type": "string" } }
+          "systemrechte": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "serviceProviderIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
         },
         "required": ["systemrechte", "serviceProviderIds"]
       },
       "PersonenkontextRolleFieldsResponse": {
         "type": "object",
         "properties": {
-          "organisationsId": { "type": "string" },
-          "rolle": { "$ref": "#/components/schemas/RollenSystemRechtServiceProviderIDResponse" }
+          "organisationsId": {
+            "type": "string"
+          },
+          "rolle": {
+            "$ref": "#/components/schemas/RollenSystemRechtServiceProviderIDResponse"
+          }
         },
         "required": ["organisationsId", "rolle"]
       },
       "UserinfoResponse": {
         "type": "object",
         "properties": {
-          "sub": { "type": "string" },
-          "personId": { "type": "string", "nullable": true },
-          "name": { "type": "string", "nullable": true },
-          "given_name": { "type": "string", "nullable": true },
-          "family_name": { "type": "string", "nullable": true },
-          "middle_name": { "type": "string", "nullable": true },
-          "nickname": { "type": "string", "nullable": true },
-          "preferred_username": { "type": "string", "nullable": true },
-          "profile": { "type": "string", "nullable": true },
-          "picture": { "type": "string", "nullable": true },
-          "website": { "type": "string", "nullable": true },
-          "email": { "type": "string", "nullable": true },
-          "email_verified": { "type": "boolean", "nullable": true },
-          "gender": { "type": "string", "nullable": true },
-          "birthdate": { "type": "string", "nullable": true },
-          "zoneinfo": { "type": "string", "nullable": true },
-          "locale": { "type": "string", "nullable": true },
-          "phone_number": { "type": "string", "nullable": true },
-          "updated_at": { "type": "number", "nullable": true },
+          "sub": {
+            "type": "string"
+          },
+          "personId": {
+            "type": "string",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "given_name": {
+            "type": "string",
+            "nullable": true
+          },
+          "family_name": {
+            "type": "string",
+            "nullable": true
+          },
+          "middle_name": {
+            "type": "string",
+            "nullable": true
+          },
+          "nickname": {
+            "type": "string",
+            "nullable": true
+          },
+          "preferred_username": {
+            "type": "string",
+            "nullable": true
+          },
+          "profile": {
+            "type": "string",
+            "nullable": true
+          },
+          "picture": {
+            "type": "string",
+            "nullable": true
+          },
+          "website": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "email_verified": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "gender": {
+            "type": "string",
+            "nullable": true
+          },
+          "birthdate": {
+            "type": "string",
+            "nullable": true
+          },
+          "zoneinfo": {
+            "type": "string",
+            "nullable": true
+          },
+          "locale": {
+            "type": "string",
+            "nullable": true
+          },
+          "phone_number": {
+            "type": "string",
+            "nullable": true
+          },
+          "updated_at": {
+            "type": "number",
+            "nullable": true
+          },
           "personenkontexte": {
             "type": "array",
-            "items": { "$ref": "#/components/schemas/PersonenkontextRolleFieldsResponse" }
+            "items": {
+              "$ref": "#/components/schemas/PersonenkontextRolleFieldsResponse"
+            }
           }
         },
         "required": [
@@ -1887,61 +3541,161 @@
       "PersonNameParams": {
         "type": "object",
         "properties": {
-          "familienname": { "type": "string" },
-          "vorname": { "type": "string" },
-          "initialenfamilienname": { "type": "string" },
-          "initialenvorname": { "type": "string" },
-          "rufname": { "type": "string" },
-          "titel": { "type": "string" },
-          "anrede": { "type": "array", "items": { "type": "string" } },
-          "namenssuffix": { "type": "array", "items": { "type": "string" } },
-          "namenspraefix": { "type": "array", "items": { "type": "string" } },
-          "sortierindex": { "type": "string" }
+          "familienname": {
+            "type": "string"
+          },
+          "vorname": {
+            "type": "string"
+          },
+          "initialenfamilienname": {
+            "type": "string"
+          },
+          "initialenvorname": {
+            "type": "string"
+          },
+          "rufname": {
+            "type": "string"
+          },
+          "titel": {
+            "type": "string"
+          },
+          "anrede": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "namenssuffix": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "namenspraefix": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "sortierindex": {
+            "type": "string"
+          }
         },
         "required": ["familienname", "vorname"]
       },
       "PersonBirthParams": {
         "type": "object",
-        "properties": { "datum": { "format": "date-time", "type": "string" }, "geburtsort": { "type": "string" } }
+        "properties": {
+          "datum": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "geburtsort": {
+            "type": "string"
+          }
+        }
       },
-      "Geschlecht": { "type": "string", "enum": ["m", "w", "d", "x"] },
-      "Vertrauensstufe": { "type": "string", "enum": ["KEIN", "UNBE", "TEIL", "VOLL"] },
+      "Geschlecht": {
+        "type": "string",
+        "enum": ["m", "w", "d", "x"]
+      },
+      "Vertrauensstufe": {
+        "type": "string",
+        "enum": ["KEIN", "UNBE", "TEIL", "VOLL"]
+      },
       "CreatePersonBodyParams": {
         "type": "object",
         "properties": {
-          "email": { "type": "string" },
-          "referrer": { "type": "string" },
-          "stammorganisation": { "type": "string" },
-          "name": { "$ref": "#/components/schemas/PersonNameParams" },
-          "geburt": { "$ref": "#/components/schemas/PersonBirthParams" },
-          "geschlecht": { "$ref": "#/components/schemas/Geschlecht" },
-          "lokalisierung": { "type": "string" },
-          "vertrauensstufe": { "$ref": "#/components/schemas/Vertrauensstufe" },
-          "auskunftssperre": { "type": "boolean" },
-          "hashedPassword": { "type": "string" },
-          "username": { "type": "string" },
-          "personalnummer": { "type": "string" }
+          "email": {
+            "type": "string"
+          },
+          "referrer": {
+            "type": "string"
+          },
+          "stammorganisation": {
+            "type": "string"
+          },
+          "name": {
+            "$ref": "#/components/schemas/PersonNameParams"
+          },
+          "geburt": {
+            "$ref": "#/components/schemas/PersonBirthParams"
+          },
+          "geschlecht": {
+            "$ref": "#/components/schemas/Geschlecht"
+          },
+          "lokalisierung": {
+            "type": "string"
+          },
+          "vertrauensstufe": {
+            "$ref": "#/components/schemas/Vertrauensstufe"
+          },
+          "auskunftssperre": {
+            "type": "boolean"
+          },
+          "hashedPassword": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "personalnummer": {
+            "type": "string"
+          }
         },
         "required": ["name"]
       },
       "PersonResponse": {
         "type": "object",
         "properties": {
-          "id": { "type": "string" },
-          "referrer": { "type": "string", "nullable": true },
-          "mandant": { "type": "string" },
-          "name": { "$ref": "#/components/schemas/PersonNameParams" },
-          "geburt": { "nullable": true, "allOf": [{ "$ref": "#/components/schemas/PersonBirthParams" }] },
-          "stammorganisation": { "type": "string", "nullable": true },
-          "geschlecht": { "type": "string", "nullable": true },
-          "lokalisierung": { "type": "string", "nullable": true },
-          "vertrauensstufe": { "nullable": true, "$ref": "#/components/schemas/Vertrauensstufe" },
-          "revision": { "type": "string" },
+          "id": {
+            "type": "string"
+          },
+          "referrer": {
+            "type": "string",
+            "nullable": true
+          },
+          "mandant": {
+            "type": "string"
+          },
+          "name": {
+            "$ref": "#/components/schemas/PersonNameParams"
+          },
+          "geburt": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PersonBirthParams"
+              }
+            ]
+          },
+          "stammorganisation": {
+            "type": "string",
+            "nullable": true
+          },
+          "geschlecht": {
+            "type": "string",
+            "nullable": true
+          },
+          "lokalisierung": {
+            "type": "string",
+            "nullable": true
+          },
+          "vertrauensstufe": {
+            "nullable": true,
+            "$ref": "#/components/schemas/Vertrauensstufe"
+          },
+          "revision": {
+            "type": "string"
+          },
           "startpasswort": {
             "type": "string",
             "description": "Initiales Benutzerpasswort, muss nach der ersten Anmeldung geändert werden"
           },
-          "personalnummer": { "type": "string", "nullable": true }
+          "personalnummer": {
+            "type": "string",
+            "nullable": true
+          }
         },
         "required": [
           "id",
@@ -1960,10 +3714,17 @@
       },
       "PersonendatensatzResponse": {
         "type": "object",
-        "properties": { "person": { "$ref": "#/components/schemas/PersonResponse" } },
+        "properties": {
+          "person": {
+            "$ref": "#/components/schemas/PersonResponse"
+          }
+        },
         "required": ["person"]
       },
-      "Rolle": { "type": "string", "enum": ["LERN", "LEHR", "EXTERN", "ORGADMIN", "LEIT", "SYSADMIN"] },
+      "Rolle": {
+        "type": "string",
+        "enum": ["LERN", "LEHR", "EXTERN", "ORGADMIN", "LEIT", "SYSADMIN"]
+      },
       "Personenstatus": {
         "type": "string",
         "description": "The new personenstatus of the personenkontext.",
@@ -1977,46 +3738,102 @@
       "CreatePersonenkontextBodyParams": {
         "type": "object",
         "properties": {
-          "referrer": { "type": "string" },
-          "rolle": { "$ref": "#/components/schemas/Rolle" },
-          "personenstatus": { "$ref": "#/components/schemas/Personenstatus" },
-          "jahrgangsstufe": { "$ref": "#/components/schemas/Jahrgangsstufe" }
+          "referrer": {
+            "type": "string"
+          },
+          "rolle": {
+            "$ref": "#/components/schemas/Rolle"
+          },
+          "personenstatus": {
+            "$ref": "#/components/schemas/Personenstatus"
+          },
+          "jahrgangsstufe": {
+            "$ref": "#/components/schemas/Jahrgangsstufe"
+          }
         },
         "required": ["rolle"]
       },
       "RawPagedResponse": {
         "type": "object",
         "properties": {
-          "total": { "type": "number" },
-          "offset": { "type": "number" },
-          "limit": { "type": "number" },
-          "items": { "type": "array", "items": { "type": "string" } }
+          "total": {
+            "type": "number"
+          },
+          "offset": {
+            "type": "number"
+          },
+          "limit": {
+            "type": "number"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
         },
         "required": ["total", "offset", "limit", "items"]
       },
-      "CreatedPersonenkontextOrganisation": { "type": "object", "properties": {} },
+      "CreatedPersonenkontextOrganisation": {
+        "type": "object",
+        "properties": {}
+      },
       "LoeschungResponse": {
         "type": "object",
-        "properties": { "zeitpunkt": { "format": "date-time", "type": "string" } },
+        "properties": {
+          "zeitpunkt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
         "required": ["zeitpunkt"]
       },
       "PersonenkontextResponse": {
         "type": "object",
         "properties": {
-          "id": { "type": "string" },
-          "referrer": { "type": "string", "nullable": true },
-          "mandant": { "type": "string" },
-          "organisation": { "$ref": "#/components/schemas/CreatedPersonenkontextOrganisation" },
-          "roleName": { "type": "string", "nullable": true },
-          "personenstatus": { "type": "string", "enum": ["AKTIV"], "nullable": true },
+          "id": {
+            "type": "string"
+          },
+          "referrer": {
+            "type": "string",
+            "nullable": true
+          },
+          "mandant": {
+            "type": "string"
+          },
+          "organisation": {
+            "$ref": "#/components/schemas/CreatedPersonenkontextOrganisation"
+          },
+          "roleName": {
+            "type": "string",
+            "nullable": true
+          },
+          "personenstatus": {
+            "type": "string",
+            "enum": ["AKTIV"],
+            "nullable": true
+          },
           "jahrgangsstufe": {
             "type": "string",
             "enum": ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10"],
             "nullable": true
           },
-          "sichtfreigabe": { "type": "string", "enum": ["ja", "nein"], "nullable": true },
-          "loeschung": { "nullable": true, "allOf": [{ "$ref": "#/components/schemas/LoeschungResponse" }] },
-          "revision": { "type": "string" }
+          "sichtfreigabe": {
+            "type": "string",
+            "enum": ["ja", "nein"],
+            "nullable": true
+          },
+          "loeschung": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/LoeschungResponse"
+              }
+            ]
+          },
+          "revision": {
+            "type": "string"
+          }
         },
         "required": [
           "id",
@@ -2031,19 +3848,40 @@
           "revision"
         ]
       },
-      "Sichtfreigabe": { "type": "string", "enum": ["ja", "nein"] },
+      "Sichtfreigabe": {
+        "type": "string",
+        "enum": ["ja", "nein"]
+      },
       "UpdatePersonBodyParams": {
         "type": "object",
         "properties": {
-          "referrer": { "type": "string" },
-          "stammorganisation": { "type": "string" },
-          "name": { "$ref": "#/components/schemas/PersonNameParams" },
-          "geburt": { "$ref": "#/components/schemas/PersonBirthParams" },
-          "geschlecht": { "$ref": "#/components/schemas/Geschlecht" },
-          "lokalisierung": { "type": "string" },
-          "vertrauensstufe": { "$ref": "#/components/schemas/Vertrauensstufe" },
-          "auskunftssperre": { "type": "boolean" },
-          "revision": { "type": "string" }
+          "referrer": {
+            "type": "string"
+          },
+          "stammorganisation": {
+            "type": "string"
+          },
+          "name": {
+            "$ref": "#/components/schemas/PersonNameParams"
+          },
+          "geburt": {
+            "$ref": "#/components/schemas/PersonBirthParams"
+          },
+          "geschlecht": {
+            "$ref": "#/components/schemas/Geschlecht"
+          },
+          "lokalisierung": {
+            "type": "string"
+          },
+          "vertrauensstufe": {
+            "$ref": "#/components/schemas/Vertrauensstufe"
+          },
+          "auskunftssperre": {
+            "type": "boolean"
+          },
+          "revision": {
+            "type": "string"
+          }
         },
         "required": ["name", "revision"]
       },
@@ -2060,19 +3898,42 @@
           "UNBESTAETIGT"
         ]
       },
-      "RollenMerkmal": { "type": "string", "enum": ["BEFRISTUNG_PFLICHT", "KOPERS_PFLICHT"] },
+      "RollenMerkmal": {
+        "type": "string",
+        "enum": ["BEFRISTUNG_PFLICHT", "KOPERS_PFLICHT"]
+      },
       "DBiamPersonenzuordnungResponse": {
         "type": "object",
         "properties": {
-          "sskId": { "type": "string" },
-          "rolleId": { "type": "string" },
-          "sskName": { "type": "string" },
-          "sskDstNr": { "type": "string" },
-          "rolle": { "type": "string" },
-          "administriertVon": { "type": "string" },
-          "typ": { "nullable": true, "$ref": "#/components/schemas/OrganisationsTyp" },
-          "editable": { "type": "boolean" },
-          "merkmale": { "nullable": true, "$ref": "#/components/schemas/RollenMerkmal" }
+          "sskId": {
+            "type": "string"
+          },
+          "rolleId": {
+            "type": "string"
+          },
+          "sskName": {
+            "type": "string"
+          },
+          "sskDstNr": {
+            "type": "string"
+          },
+          "rolle": {
+            "type": "string"
+          },
+          "administriertVon": {
+            "type": "string"
+          },
+          "typ": {
+            "nullable": true,
+            "$ref": "#/components/schemas/OrganisationsTyp"
+          },
+          "editable": {
+            "type": "boolean"
+          },
+          "merkmale": {
+            "nullable": true,
+            "$ref": "#/components/schemas/RollenMerkmal"
+          }
         },
         "required": [
           "sskId",
@@ -2089,33 +3950,104 @@
       "DBiamPersonenuebersichtResponse": {
         "type": "object",
         "properties": {
-          "personId": { "type": "string" },
-          "vorname": { "type": "string" },
-          "nachname": { "type": "string" },
-          "benutzername": { "type": "string" },
+          "personId": {
+            "type": "string"
+          },
+          "vorname": {
+            "type": "string"
+          },
+          "nachname": {
+            "type": "string"
+          },
+          "benutzername": {
+            "type": "string"
+          },
           "lastModifiedZuordnungen": {
             "format": "date-time",
             "type": "string",
             "nullable": true,
             "description": "Date of the most recent changed personenkontext in the Zuordnungen"
           },
-          "zuordnungen": { "type": "array", "items": { "$ref": "#/components/schemas/DBiamPersonenzuordnungResponse" } }
+          "zuordnungen": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DBiamPersonenzuordnungResponse"
+            }
+          }
         },
         "required": ["personId", "vorname", "nachname", "benutzername", "lastModifiedZuordnungen", "zuordnungen"]
+      },
+      "PersonenuebersichtBodyParams": {
+        "type": "object",
+        "properties": {
+          "offset": {
+            "type": "number",
+            "description": "The offset of the paginated list."
+          },
+          "limit": {
+            "type": "number",
+            "description": "The requested limit for the page size."
+          },
+          "personIds": {
+            "description": "An array of IDs for the persons.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": ["personIds"]
       },
       "PersonNameResponse": {
         "type": "object",
         "properties": {
-          "familiennamen": { "type": "string" },
-          "vorname": { "type": "string" },
-          "initialenfamilienname": { "type": "string", "nullable": true },
-          "initialenvorname": { "type": "string", "nullable": true },
-          "rufname": { "type": "string", "nullable": true },
-          "titel": { "type": "string", "nullable": true },
-          "anrede": { "nullable": true, "type": "array", "items": { "type": "string" } },
-          "namenspraefix": { "nullable": true, "type": "array", "items": { "type": "string" } },
-          "namenssuffix": { "nullable": true, "type": "array", "items": { "type": "string" } },
-          "sortierindex": { "type": "string", "nullable": true }
+          "familiennamen": {
+            "type": "string"
+          },
+          "vorname": {
+            "type": "string"
+          },
+          "initialenfamilienname": {
+            "type": "string",
+            "nullable": true
+          },
+          "initialenvorname": {
+            "type": "string",
+            "nullable": true
+          },
+          "rufname": {
+            "type": "string",
+            "nullable": true
+          },
+          "titel": {
+            "type": "string",
+            "nullable": true
+          },
+          "anrede": {
+            "nullable": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "namenspraefix": {
+            "nullable": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "namenssuffix": {
+            "nullable": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "sortierindex": {
+            "type": "string",
+            "nullable": true
+          }
         },
         "required": [
           "familiennamen",
@@ -2133,25 +4065,65 @@
       "PersonBirthResponse": {
         "type": "object",
         "properties": {
-          "datum": { "format": "date-time", "type": "string", "nullable": true },
-          "geburtsort": { "type": "string", "nullable": true }
+          "datum": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          },
+          "geburtsort": {
+            "type": "string",
+            "nullable": true
+          }
         },
         "required": ["datum", "geburtsort"]
       },
       "Person": {
         "type": "object",
         "properties": {
-          "id": { "type": "string" },
-          "referrer": { "type": "string", "nullable": true },
-          "mandant": { "type": "string" },
-          "name": { "$ref": "#/components/schemas/PersonNameResponse" },
-          "geburt": { "nullable": true, "allOf": [{ "$ref": "#/components/schemas/PersonBirthResponse" }] },
-          "stammorganisation": { "type": "string", "nullable": true },
-          "geschlecht": { "type": "string", "nullable": true },
-          "lokalisierung": { "type": "string", "nullable": true },
-          "vertrauensstufe": { "nullable": true, "$ref": "#/components/schemas/Vertrauensstufe" },
-          "revision": { "type": "string" },
-          "personalnummer": { "type": "string", "nullable": true }
+          "id": {
+            "type": "string"
+          },
+          "referrer": {
+            "type": "string",
+            "nullable": true
+          },
+          "mandant": {
+            "type": "string"
+          },
+          "name": {
+            "$ref": "#/components/schemas/PersonNameResponse"
+          },
+          "geburt": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PersonBirthResponse"
+              }
+            ]
+          },
+          "stammorganisation": {
+            "type": "string",
+            "nullable": true
+          },
+          "geschlecht": {
+            "type": "string",
+            "nullable": true
+          },
+          "lokalisierung": {
+            "type": "string",
+            "nullable": true
+          },
+          "vertrauensstufe": {
+            "nullable": true,
+            "$ref": "#/components/schemas/Vertrauensstufe"
+          },
+          "revision": {
+            "type": "string"
+          },
+          "personalnummer": {
+            "type": "string",
+            "nullable": true
+          }
         },
         "required": [
           "id",
@@ -2170,39 +4142,92 @@
       "PersonInfoResponse": {
         "type": "object",
         "properties": {
-          "pid": { "type": "string" },
-          "person": { "$ref": "#/components/schemas/Person" },
-          "personenkontexte": { "type": "array", "items": { "$ref": "#/components/schemas/PersonenkontextResponse" } },
-          "gruppen": { "type": "array", "items": { "type": "string" } }
+          "pid": {
+            "type": "string"
+          },
+          "person": {
+            "$ref": "#/components/schemas/Person"
+          },
+          "personenkontexte": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PersonenkontextResponse"
+            }
+          },
+          "gruppen": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
         },
         "required": ["pid", "person", "personenkontexte", "gruppen"]
       },
-      "TraegerschaftTyp": { "type": "string", "enum": ["01", "02", "03", "04", "05", "06"] },
+      "TraegerschaftTyp": {
+        "type": "string",
+        "enum": ["01", "02", "03", "04", "05", "06"]
+      },
       "CreateOrganisationBodyParams": {
         "type": "object",
         "properties": {
-          "administriertVon": { "type": "string" },
-          "zugehoerigZu": { "type": "string" },
-          "kennung": { "type": "string", "description": "Required, if `typ` is equal to `SCHULE`" },
-          "name": { "type": "string" },
-          "namensergaenzung": { "type": "string" },
-          "kuerzel": { "type": "string" },
-          "typ": { "$ref": "#/components/schemas/OrganisationsTyp" },
-          "traegerschaft": { "$ref": "#/components/schemas/TraegerschaftTyp" }
+          "administriertVon": {
+            "type": "string"
+          },
+          "zugehoerigZu": {
+            "type": "string"
+          },
+          "kennung": {
+            "type": "string",
+            "description": "Required, if `typ` is equal to `SCHULE`"
+          },
+          "name": {
+            "type": "string"
+          },
+          "namensergaenzung": {
+            "type": "string"
+          },
+          "kuerzel": {
+            "type": "string"
+          },
+          "typ": {
+            "$ref": "#/components/schemas/OrganisationsTyp"
+          },
+          "traegerschaft": {
+            "$ref": "#/components/schemas/TraegerschaftTyp"
+          }
         },
         "required": ["name", "typ"]
       },
       "OrganisationResponse": {
         "type": "object",
         "properties": {
-          "id": { "type": "string" },
-          "administriertVon": { "type": "string", "nullable": true },
-          "kennung": { "type": "string", "nullable": true },
-          "name": { "type": "string" },
-          "namensergaenzung": { "type": "string", "nullable": true },
-          "kuerzel": { "type": "string" },
-          "typ": { "$ref": "#/components/schemas/OrganisationsTyp" },
-          "traegerschaft": { "$ref": "#/components/schemas/TraegerschaftTyp" }
+          "id": {
+            "type": "string"
+          },
+          "administriertVon": {
+            "type": "string",
+            "nullable": true
+          },
+          "kennung": {
+            "type": "string",
+            "nullable": true
+          },
+          "name": {
+            "type": "string"
+          },
+          "namensergaenzung": {
+            "type": "string",
+            "nullable": true
+          },
+          "kuerzel": {
+            "type": "string"
+          },
+          "typ": {
+            "$ref": "#/components/schemas/OrganisationsTyp"
+          },
+          "traegerschaft": {
+            "$ref": "#/components/schemas/TraegerschaftTyp"
+          }
         },
         "required": ["id", "administriertVon", "kennung", "name", "namensergaenzung", "kuerzel", "typ", "traegerschaft"]
       },
@@ -2229,29 +4254,53 @@
               "KENNUNG_ENTHAELT_LEERZEICHEN"
             ]
           },
-          "code": { "type": "number", "description": "Corresponds to HTTP Status code like 200, 404, 500" }
+          "code": {
+            "type": "number",
+            "description": "Corresponds to HTTP Status code like 200, 404, 500"
+          }
         },
         "required": ["i18nKey", "code"]
       },
       "UpdateOrganisationBodyParams": {
         "type": "object",
         "properties": {
-          "administriertVon": { "type": "string" },
-          "zugehoerigZu": { "type": "string" },
-          "kennung": { "type": "string", "description": "Required, if `typ` is equal to `SCHULE`" },
-          "name": { "type": "string" },
-          "namensergaenzung": { "type": "string" },
-          "kuerzel": { "type": "string" },
-          "typ": { "$ref": "#/components/schemas/OrganisationsTyp" },
-          "traegerschaft": { "$ref": "#/components/schemas/TraegerschaftTyp" }
+          "administriertVon": {
+            "type": "string"
+          },
+          "zugehoerigZu": {
+            "type": "string"
+          },
+          "kennung": {
+            "type": "string",
+            "description": "Required, if `typ` is equal to `SCHULE`"
+          },
+          "name": {
+            "type": "string"
+          },
+          "namensergaenzung": {
+            "type": "string"
+          },
+          "kuerzel": {
+            "type": "string"
+          },
+          "typ": {
+            "$ref": "#/components/schemas/OrganisationsTyp"
+          },
+          "traegerschaft": {
+            "$ref": "#/components/schemas/TraegerschaftTyp"
+          }
         },
         "required": ["name", "typ"]
       },
       "OrganisationRootChildrenResponse": {
         "type": "object",
         "properties": {
-          "oeffentlich": { "$ref": "#/components/schemas/OrganisationResponse" },
-          "ersatz": { "$ref": "#/components/schemas/OrganisationResponse" }
+          "oeffentlich": {
+            "$ref": "#/components/schemas/OrganisationResponse"
+          },
+          "ersatz": {
+            "$ref": "#/components/schemas/OrganisationResponse"
+          }
         },
         "required": ["oeffentlich", "ersatz"]
       },
@@ -2270,56 +4319,111 @@
       "OrganisationByIdBodyParams": {
         "type": "object",
         "properties": {
-          "organisationId": { "type": "string", "description": "The id of an organization", "nullable": false }
+          "organisationId": {
+            "type": "string",
+            "description": "The id of an organization",
+            "nullable": false
+          }
         },
         "required": ["organisationId"]
       },
       "OrganisationByNameBodyParams": {
         "type": "object",
-        "properties": { "name": { "type": "string" } },
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
         "required": ["name"]
       },
       "OrganisationResponseLegacy": {
         "type": "object",
         "properties": {
-          "id": { "type": "string" },
-          "administriertVon": { "type": "string", "nullable": true },
-          "kennung": { "type": "string", "nullable": true },
-          "name": { "type": "string" },
-          "namensergaenzung": { "type": "string", "nullable": true },
-          "kuerzel": { "type": "string" },
-          "typ": { "$ref": "#/components/schemas/OrganisationsTyp" }
+          "id": {
+            "type": "string"
+          },
+          "administriertVon": {
+            "type": "string",
+            "nullable": true
+          },
+          "kennung": {
+            "type": "string",
+            "nullable": true
+          },
+          "name": {
+            "type": "string"
+          },
+          "namensergaenzung": {
+            "type": "string",
+            "nullable": true
+          },
+          "kuerzel": {
+            "type": "string"
+          },
+          "typ": {
+            "$ref": "#/components/schemas/OrganisationsTyp"
+          }
         },
         "required": ["id", "administriertVon", "kennung", "name", "namensergaenzung", "kuerzel", "typ"]
       },
-      "RollenArt": { "type": "string", "enum": ["LERN", "LEHR", "EXTERN", "ORGADMIN", "LEIT", "SYSADMIN"] },
+      "RollenArt": {
+        "type": "string",
+        "enum": ["LERN", "LEHR", "EXTERN", "ORGADMIN", "LEIT", "SYSADMIN"]
+      },
       "ServiceProviderIdNameResponse": {
         "type": "object",
-        "properties": { "id": { "type": "string" }, "name": { "type": "string" } },
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
         "required": ["id", "name"]
       },
       "RolleWithServiceProvidersResponse": {
         "type": "object",
         "properties": {
-          "id": { "type": "string" },
-          "createdAt": { "format": "date-time", "type": "string" },
-          "updatedAt": { "format": "date-time", "type": "string" },
-          "name": { "type": "string" },
-          "administeredBySchulstrukturknoten": { "type": "string" },
-          "rollenart": { "$ref": "#/components/schemas/RollenArt" },
+          "id": {
+            "type": "string"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "administeredBySchulstrukturknoten": {
+            "type": "string"
+          },
+          "rollenart": {
+            "$ref": "#/components/schemas/RollenArt"
+          },
           "merkmale": {
             "type": "array",
             "uniqueItems": true,
-            "items": { "$ref": "#/components/schemas/RollenMerkmal" }
+            "items": {
+              "$ref": "#/components/schemas/RollenMerkmal"
+            }
           },
           "systemrechte": {
             "type": "array",
             "uniqueItems": true,
-            "items": { "$ref": "#/components/schemas/RollenSystemRecht" }
+            "items": {
+              "$ref": "#/components/schemas/RollenSystemRecht"
+            }
           },
           "serviceProviders": {
             "type": "array",
-            "items": { "$ref": "#/components/schemas/ServiceProviderIdNameResponse" }
+            "items": {
+              "$ref": "#/components/schemas/ServiceProviderIdNameResponse"
+            }
           }
         },
         "required": [
@@ -2337,18 +4441,28 @@
       "CreateRolleBodyParams": {
         "type": "object",
         "properties": {
-          "name": { "type": "string" },
-          "administeredBySchulstrukturknoten": { "type": "string" },
-          "rollenart": { "$ref": "#/components/schemas/RollenArt" },
+          "name": {
+            "type": "string"
+          },
+          "administeredBySchulstrukturknoten": {
+            "type": "string"
+          },
+          "rollenart": {
+            "$ref": "#/components/schemas/RollenArt"
+          },
           "merkmale": {
             "type": "array",
             "uniqueItems": true,
-            "items": { "$ref": "#/components/schemas/RollenMerkmal" }
+            "items": {
+              "$ref": "#/components/schemas/RollenMerkmal"
+            }
           },
           "systemrechte": {
             "type": "array",
             "uniqueItems": true,
-            "items": { "$ref": "#/components/schemas/RollenSystemRecht" }
+            "items": {
+              "$ref": "#/components/schemas/RollenSystemRecht"
+            }
           }
         },
         "required": ["name", "administeredBySchulstrukturknoten", "rollenart", "merkmale", "systemrechte"]
@@ -2356,21 +4470,39 @@
       "RolleResponse": {
         "type": "object",
         "properties": {
-          "id": { "type": "string" },
-          "createdAt": { "format": "date-time", "type": "string" },
-          "updatedAt": { "format": "date-time", "type": "string" },
-          "name": { "type": "string" },
-          "administeredBySchulstrukturknoten": { "type": "string" },
-          "rollenart": { "$ref": "#/components/schemas/RollenArt" },
+          "id": {
+            "type": "string"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "administeredBySchulstrukturknoten": {
+            "type": "string"
+          },
+          "rollenart": {
+            "$ref": "#/components/schemas/RollenArt"
+          },
           "merkmale": {
             "type": "array",
             "uniqueItems": true,
-            "items": { "$ref": "#/components/schemas/RollenMerkmal" }
+            "items": {
+              "$ref": "#/components/schemas/RollenMerkmal"
+            }
           },
           "systemrechte": {
             "type": "array",
             "uniqueItems": true,
-            "items": { "$ref": "#/components/schemas/RollenSystemRecht" }
+            "items": {
+              "$ref": "#/components/schemas/RollenSystemRecht"
+            }
           }
         },
         "required": [
@@ -2386,22 +4518,40 @@
       },
       "AddSystemrechtBodyParams": {
         "type": "object",
-        "properties": { "systemRecht": { "$ref": "#/components/schemas/RollenSystemRecht" } },
+        "properties": {
+          "systemRecht": {
+            "$ref": "#/components/schemas/RollenSystemRecht"
+          }
+        },
         "required": ["systemRecht"]
       },
       "RolleServiceProviderResponse": {
         "type": "object",
-        "properties": { "serviceProviderIds": { "type": "array", "items": { "type": "string" } } },
+        "properties": {
+          "serviceProviderIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
         "required": ["serviceProviderIds"]
       },
       "RolleServiceProviderQueryParams": {
         "type": "object",
         "properties": {
-          "serviceProviderId": { "type": "string", "description": "The id for the rolle.", "nullable": false }
+          "serviceProviderId": {
+            "type": "string",
+            "description": "The id for the rolle.",
+            "nullable": false
+          }
         },
         "required": ["serviceProviderId"]
       },
-      "ServiceProviderTarget": { "type": "string", "enum": ["URL", "EMAIL", "SCHULPORTAL_ADMINISTRATION"] },
+      "ServiceProviderTarget": {
+        "type": "string",
+        "enum": ["URL", "EMAIL", "SCHULPORTAL_ADMINISTRATION"]
+      },
       "ServiceProviderKategorie": {
         "type": "string",
         "enum": ["EMAIL", "UNTERRICHT", "VERWALTUNG", "HINWEISE", "ANGEBOTE"]
@@ -2409,30 +4559,55 @@
       "ServiceProviderResponse": {
         "type": "object",
         "properties": {
-          "id": { "type": "string" },
-          "name": { "type": "string" },
-          "target": { "$ref": "#/components/schemas/ServiceProviderTarget" },
-          "url": { "type": "string", "description": "Can be undefined, if `target` is not equal to `URL`" },
-          "kategorie": { "$ref": "#/components/schemas/ServiceProviderKategorie" },
-          "hasLogo": { "type": "boolean" }
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "target": {
+            "$ref": "#/components/schemas/ServiceProviderTarget"
+          },
+          "url": {
+            "type": "string",
+            "description": "Can be undefined, if `target` is not equal to `URL`"
+          },
+          "kategorie": {
+            "$ref": "#/components/schemas/ServiceProviderKategorie"
+          },
+          "hasLogo": {
+            "type": "boolean"
+          }
         },
         "required": ["id", "name", "target", "url", "kategorie", "hasLogo"]
       },
       "UpdateRolleBodyParams": {
         "type": "object",
         "properties": {
-          "name": { "type": "string" },
+          "name": {
+            "type": "string"
+          },
           "merkmale": {
             "type": "array",
             "uniqueItems": true,
-            "items": { "$ref": "#/components/schemas/RollenMerkmal" }
+            "items": {
+              "$ref": "#/components/schemas/RollenMerkmal"
+            }
           },
           "systemrechte": {
             "type": "array",
             "uniqueItems": true,
-            "items": { "$ref": "#/components/schemas/RollenSystemRecht" }
+            "items": {
+              "$ref": "#/components/schemas/RollenSystemRecht"
+            }
           },
-          "serviceProviderIds": { "uniqueItems": true, "type": "array", "items": { "type": "string" } }
+          "serviceProviderIds": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
         },
         "required": ["name", "merkmale", "systemrechte", "serviceProviderIds"]
       },
@@ -2449,28 +4624,53 @@
               "ROLLENNAME_ENTHAELT_LEERZEICHEN"
             ]
           },
-          "code": { "type": "number", "description": "Corresponds to HTTP Status code like 200, 404, 500" }
+          "code": {
+            "type": "number",
+            "description": "Corresponds to HTTP Status code like 200, 404, 500"
+          }
         },
         "required": ["i18nKey", "code"]
       },
       "PersonResponseAutomapper": {
         "type": "object",
         "properties": {
-          "id": { "type": "string" },
-          "referrer": { "type": "string" },
-          "mandant": { "type": "string" },
-          "name": { "$ref": "#/components/schemas/PersonNameParams" },
-          "geburt": { "$ref": "#/components/schemas/PersonBirthParams" },
-          "stammorganisation": { "type": "string" },
-          "geschlecht": { "type": "string" },
-          "lokalisierung": { "type": "string" },
-          "vertrauensstufe": { "$ref": "#/components/schemas/Vertrauensstufe" },
-          "revision": { "type": "string" },
+          "id": {
+            "type": "string"
+          },
+          "referrer": {
+            "type": "string"
+          },
+          "mandant": {
+            "type": "string"
+          },
+          "name": {
+            "$ref": "#/components/schemas/PersonNameParams"
+          },
+          "geburt": {
+            "$ref": "#/components/schemas/PersonBirthParams"
+          },
+          "stammorganisation": {
+            "type": "string"
+          },
+          "geschlecht": {
+            "type": "string"
+          },
+          "lokalisierung": {
+            "type": "string"
+          },
+          "vertrauensstufe": {
+            "$ref": "#/components/schemas/Vertrauensstufe"
+          },
+          "revision": {
+            "type": "string"
+          },
           "startpasswort": {
             "type": "string",
             "description": "Initiales Benutzerpasswort, muss nach der ersten Anmeldung geändert werden"
           },
-          "personalnummer": { "type": "string" }
+          "personalnummer": {
+            "type": "string"
+          }
         },
         "required": [
           "id",
@@ -2490,17 +4690,39 @@
       "PersonendatensatzResponseAutomapper": {
         "type": "object",
         "properties": {
-          "person": { "$ref": "#/components/schemas/PersonResponseAutomapper" },
-          "personenkontexte": { "type": "array", "items": { "$ref": "#/components/schemas/PersonenkontextResponse" } }
+          "person": {
+            "$ref": "#/components/schemas/PersonResponseAutomapper"
+          },
+          "personenkontexte": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PersonenkontextResponse"
+            }
+          }
         },
         "required": ["person", "personenkontexte"]
       },
-      "PersonIdResponse": { "type": "object", "properties": { "id": { "type": "string" } }, "required": ["id"] },
+      "PersonIdResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": ["id"]
+      },
       "PersonenkontextdatensatzResponse": {
         "type": "object",
         "properties": {
-          "person": { "$ref": "#/components/schemas/PersonIdResponse" },
-          "personenkontexte": { "type": "array", "items": { "$ref": "#/components/schemas/PersonenkontextResponse" } }
+          "person": {
+            "$ref": "#/components/schemas/PersonIdResponse"
+          },
+          "personenkontexte": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PersonenkontextResponse"
+            }
+          }
         },
         "required": ["person", "personenkontexte"]
       },
@@ -2509,23 +4731,33 @@
         "properties": {
           "ROLLEN_VERWALTEN": {
             "type": "array",
-            "items": { "$ref": "#/components/schemas/OrganisationResponseLegacy" }
+            "items": {
+              "$ref": "#/components/schemas/OrganisationResponseLegacy"
+            }
           },
           "KLASSEN_VERWALTEN": {
             "type": "array",
-            "items": { "$ref": "#/components/schemas/OrganisationResponseLegacy" }
+            "items": {
+              "$ref": "#/components/schemas/OrganisationResponseLegacy"
+            }
           },
           "SCHULEN_VERWALTEN": {
             "type": "array",
-            "items": { "$ref": "#/components/schemas/OrganisationResponseLegacy" }
+            "items": {
+              "$ref": "#/components/schemas/OrganisationResponseLegacy"
+            }
           },
           "PERSONEN_VERWALTEN": {
             "type": "array",
-            "items": { "$ref": "#/components/schemas/OrganisationResponseLegacy" }
+            "items": {
+              "$ref": "#/components/schemas/OrganisationResponseLegacy"
+            }
           },
           "SCHULTRAEGER_VERWALTEN": {
             "type": "array",
-            "items": { "$ref": "#/components/schemas/OrganisationResponseLegacy" }
+            "items": {
+              "$ref": "#/components/schemas/OrganisationResponseLegacy"
+            }
           }
         },
         "required": [
@@ -2539,35 +4771,61 @@
       "UpdatePersonenkontextBodyParams": {
         "type": "object",
         "properties": {
-          "referrer": { "type": "string", "description": "The new referrer of the personenkontext." },
-          "personenstatus": { "$ref": "#/components/schemas/Personenstatus" },
-          "jahrgangsstufe": { "$ref": "#/components/schemas/Jahrgangsstufe" },
-          "revision": { "type": "string", "description": "The revision of the personenkontext." }
+          "referrer": {
+            "type": "string",
+            "description": "The new referrer of the personenkontext."
+          },
+          "personenstatus": {
+            "$ref": "#/components/schemas/Personenstatus"
+          },
+          "jahrgangsstufe": {
+            "$ref": "#/components/schemas/Jahrgangsstufe"
+          },
+          "revision": {
+            "type": "string",
+            "description": "The revision of the personenkontext."
+          }
         },
         "required": ["revision"]
       },
       "DeleteRevisionBodyParams": {
         "type": "object",
         "properties": {
-          "revision": { "type": "string", "description": "The revision of a personenkontext.", "nullable": false }
+          "revision": {
+            "type": "string",
+            "description": "The revision of a personenkontext.",
+            "nullable": false
+          }
         },
         "required": ["revision"]
       },
       "DBiamPersonenkontextResponse": {
         "type": "object",
         "properties": {
-          "personId": { "type": "string" },
-          "organisationId": { "type": "string" },
-          "rolleId": { "type": "string" }
+          "personId": {
+            "type": "string"
+          },
+          "organisationId": {
+            "type": "string"
+          },
+          "rolleId": {
+            "type": "string"
+          }
         },
         "required": ["personId", "organisationId", "rolleId"]
       },
       "DbiamPersonenkontextBodyParams": {
         "type": "object",
         "properties": {
-          "personId": { "type": "string" },
-          "organisationId": { "type": "string" },
-          "rolleId": { "type": "string" }
+          "personId": {
+            "type": "string"
+          },
+          "organisationId": {
+            "type": "string"
+          },
+          "rolleId": {
+            "type": "string"
+          }
         },
         "required": ["personId", "organisationId", "rolleId"]
       },
@@ -2586,7 +4844,10 @@
               "PERSONALNUMMER_NICHT_EINDEUTIG"
             ]
           },
-          "code": { "type": "number", "description": "Corresponds to HTTP Status code like 200, 404, 500" }
+          "code": {
+            "type": "number",
+            "description": "Corresponds to HTTP Status code like 200, 404, 500"
+          }
         },
         "required": ["i18nKey", "code"]
       },
@@ -2596,16 +4857,31 @@
           "organisations": {
             "description": "List of available organisations.",
             "type": "array",
-            "items": { "$ref": "#/components/schemas/OrganisationResponseLegacy" }
+            "items": {
+              "$ref": "#/components/schemas/OrganisationResponseLegacy"
+            }
           },
           "rollen": {
             "description": "List of available roles.",
             "type": "array",
-            "items": { "$ref": "#/components/schemas/RolleResponse" }
+            "items": {
+              "$ref": "#/components/schemas/RolleResponse"
+            }
           },
-          "selectedOrganisation": { "type": "string", "description": "Selected organisation.", "nullable": true },
-          "selectedRolle": { "type": "string", "description": "Selected rolle.", "nullable": true },
-          "canCommit": { "type": "boolean", "description": "Indicates whether the commit action can be performed." }
+          "selectedOrganisation": {
+            "type": "string",
+            "description": "Selected organisation.",
+            "nullable": true
+          },
+          "selectedRolle": {
+            "type": "string",
+            "description": "Selected rolle.",
+            "nullable": true
+          },
+          "canCommit": {
+            "type": "boolean",
+            "description": "Indicates whether the commit action can be performed."
+          }
         },
         "required": ["organisations", "rollen", "selectedOrganisation", "selectedRolle", "canCommit"]
       },
@@ -2618,11 +4894,17 @@
             "nullable": true,
             "description": "Date of the most recent changed personenkontext"
           },
-          "count": { "type": "number", "nullable": false, "description": "The amount of personenkontexte" },
+          "count": {
+            "type": "number",
+            "nullable": false,
+            "description": "The amount of personenkontexte"
+          },
           "personenkontexte": {
             "nullable": false,
             "type": "array",
-            "items": { "$ref": "#/components/schemas/DbiamPersonenkontextBodyParams" }
+            "items": {
+              "$ref": "#/components/schemas/DbiamPersonenkontextBodyParams"
+            }
           }
         },
         "required": ["count", "personenkontexte"]
@@ -2632,7 +4914,9 @@
         "properties": {
           "dBiamPersonenkontextResponses": {
             "type": "array",
-            "items": { "$ref": "#/components/schemas/DBiamPersonenkontextResponse" }
+            "items": {
+              "$ref": "#/components/schemas/DBiamPersonenkontextResponse"
+            }
           }
         },
         "required": ["dBiamPersonenkontextResponses"]
@@ -2653,54 +4937,156 @@
               "INVALID_PERSONENKONTEXT_FOR_PERSON_WITH_ROLLENART_LERN"
             ]
           },
-          "code": { "type": "number", "description": "Corresponds to HTTP Status code like 200, 404, 500" }
+          "code": {
+            "type": "number",
+            "description": "Corresponds to HTTP Status code like 200, 404, 500"
+          }
         },
         "required": ["i18nKey", "code"]
       },
       "FindSchulstrukturknotenResponse": {
         "type": "object",
         "properties": {
-          "moeglicheSsks": { "type": "array", "items": { "$ref": "#/components/schemas/OrganisationResponseLegacy" } },
-          "total": { "type": "number" }
+          "moeglicheSsks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrganisationResponseLegacy"
+            }
+          },
+          "total": {
+            "type": "number"
+          }
         },
         "required": ["moeglicheSsks", "total"]
       },
       "DbiamCreatePersonWithContextBodyParams": {
         "type": "object",
         "properties": {
-          "familienname": { "type": "string" },
-          "vorname": { "type": "string" },
-          "personalnummer": { "type": "string" },
-          "organisationId": { "type": "string" },
-          "rolleId": { "type": "string" }
+          "familienname": {
+            "type": "string"
+          },
+          "vorname": {
+            "type": "string"
+          },
+          "personalnummer": {
+            "type": "string"
+          },
+          "organisationId": {
+            "type": "string"
+          },
+          "rolleId": {
+            "type": "string"
+          }
         },
         "required": ["familienname", "vorname", "organisationId", "rolleId"]
       },
       "DBiamPersonResponse": {
         "type": "object",
         "properties": {
-          "person": { "$ref": "#/components/schemas/PersonResponse" },
-          "DBiamPersonenkontextResponse": { "$ref": "#/components/schemas/DBiamPersonenkontextResponse" }
+          "person": {
+            "$ref": "#/components/schemas/PersonResponse"
+          },
+          "DBiamPersonenkontextResponse": {
+            "$ref": "#/components/schemas/DBiamPersonenkontextResponse"
+          }
         },
         "required": ["person", "DBiamPersonenkontextResponse"]
       },
       "FindRollenResponse": {
         "type": "object",
         "properties": {
-          "moeglicheRollen": { "type": "array", "items": { "$ref": "#/components/schemas/RolleResponse" } },
-          "total": { "type": "number" }
+          "moeglicheRollen": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RolleResponse"
+            }
+          },
+          "total": {
+            "type": "number"
+          }
         },
         "required": ["moeglicheRollen", "total"]
       },
       "TokenInitBodyParams": {
         "type": "object",
-        "properties": { "personId": { "type": "string" } },
+        "properties": {
+          "personId": {
+            "type": "string"
+          }
+        },
         "required": ["personId"]
       },
       "TokenStateResponse": {
         "type": "object",
-        "properties": { "hasToken": { "type": "boolean" }, "tokenKind": { "type": "string" } },
-        "required": ["hasToken", "tokenKind"]
+        "properties": {
+          "hasToken": {
+            "type": "boolean"
+          },
+          "tokenKind": {
+            "type": "string"
+          },
+          "serial": {
+            "type": "string"
+          }
+        },
+        "required": ["hasToken", "tokenKind", "serial"]
+      },
+      "AssignHardwareTokenBodyParams": {
+        "type": "object",
+        "properties": {
+          "serial": {
+            "type": "string"
+          },
+          "otp": {
+            "type": "string"
+          },
+          "referrer": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          }
+        },
+        "required": ["serial", "otp", "referrer", "userId"]
+      },
+      "AssignHardwareTokenResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "jsonrpc": {
+            "type": "string"
+          },
+          "time": {
+            "type": "number"
+          },
+          "version": {
+            "type": "string"
+          },
+          "versionnumber": {
+            "type": "string"
+          },
+          "signature": {
+            "type": "string"
+          },
+          "dialogText": {
+            "type": "string"
+          }
+        },
+        "required": ["id", "jsonrpc", "time", "version", "versionnumber", "signature", "dialogText"]
+      },
+      "TokenVerifyBodyParams": {
+        "type": "object",
+        "properties": {
+          "personId": {
+            "type": "string"
+          },
+          "otp": {
+            "type": "string"
+          }
+        },
+        "required": ["personId", "otp"]
       }
     }
   }
