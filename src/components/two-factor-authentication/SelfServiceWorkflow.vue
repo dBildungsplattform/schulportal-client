@@ -1,14 +1,17 @@
 <script setup lang="ts">
   import { computed, ref, type ComputedRef, type Ref } from 'vue';
-  import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
   import { useDisplay } from 'vuetify';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import SpshTooltip from '@/components/admin/SpshTooltip.vue';
   import { useI18n, type Composer } from 'vue-i18n';
+  import {
+    useTwoFactorAuthentificationStore,
+    type TwoFactorAuthentificationStore,
+  } from '@/stores/TwoFactorAuthentificationStore';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
   const { t }: Composer = useI18n({ useScope: 'global' });
-  const personStore: PersonStore = usePersonStore();
+  const twoFactorStore: TwoFactorAuthentificationStore = useTwoFactorAuthentificationStore();
 
   const workflowStep: Ref<'start' | 'qrcode' | 'verify'> = ref('start');
   const errorMessage: Ref<string> = ref('');
@@ -44,34 +47,31 @@
   async function close2FADialog(isActive: Ref<boolean>): Promise<void> {
     if (workflowStep.value !== 'start') {
       emits('dialogClosed');
-      personStore.twoFactorState.qrCode = '';
-      personStore.twoFactorState.hasToken = null;
-      personStore.twoFactorState.tokenKind = null;
+      twoFactorStore.qrCode = '';
+      twoFactorStore.hasToken = null;
+      twoFactorStore.tokenKind = null;
     }
 
     isActive.value = false;
     workflowStep.value = 'start';
   }
 
-  async function validateOTP(): Promise<boolean> {
-    return personStore.verify2FAToken(props.personId, otp.value);
-  }
-
   async function proceed(isActive: Ref<boolean>): Promise<void> {
     switch (workflowStep.value) {
       case 'start':
         workflowStep.value = 'qrcode';
-        await personStore.get2FASoftwareQRCode(props.personId);
+        await twoFactorStore.get2FASoftwareQRCode(props.personId);
         break;
       case 'qrcode':
         workflowStep.value = 'verify';
         break;
       case 'verify':
-        if (await validateOTP()) {
+        try {
+          await twoFactorStore.verify2FAToken(props.personId, otp.value);
           close2FADialog(isActive);
-        } else {
+        } catch (error) {
           otp.value = '';
-          errorMessage.value = t('admin.person.twoFactorAuthentication.invalidOtp');
+          errorMessage.value = t(`admin.person.twoFactorAuthentication.errors.${twoFactorStore.errorCode}`);
         }
     }
   }
@@ -139,7 +139,7 @@
               </div>
             </v-row>
             <v-row
-              v-if="personStore.twoFactorState.qrCode.length === 0"
+              v-if="twoFactorStore.qrCode.length === 0"
               class="justify-center"
             >
               <v-progress-circular
@@ -150,12 +150,12 @@
               </v-progress-circular>
             </v-row>
             <v-row
-              v-if="personStore.twoFactorState.qrCode.length > 0"
+              v-if="twoFactorStore.qrCode.length > 0"
               class="justify-center"
             >
               <v-img
                 class="printableContent image-width"
-                :src="personStore.twoFactorState.qrCode"
+                :src="twoFactorStore.qrCode"
                 max-width="250"
                 data-testid="software-token-dialog-qr-code"
               />
@@ -204,7 +204,7 @@
                   v-if="errorMessage.length === 0"
                   class="text-body justify-center"
                 >
-                  <p class="justify-center">´{{ $t('admin.person.twoFactorAuthentication.otp') }}</p>
+                  <p class="justify-center">{{ $t('admin.person.twoFactorAuthentication.otp') }}</p>
                 </v-row>
               </v-col>
             </v-row>

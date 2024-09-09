@@ -13,9 +13,12 @@
   import { type Zuordnung } from '@/stores/PersonenkontextStore';
   import { OrganisationsTyp } from '@/stores/OrganisationStore';
   import SelfServiceWorkflow from '@/components/two-factor-authentication/SelfServiceWorkflow.vue';
-  import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
   import { type RouteLocationNormalizedLoaded, type Router, useRoute, useRouter } from 'vue-router';
   import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
+  import {
+    useTwoFactorAuthentificationStore,
+    type TwoFactorAuthentificationStore,
+  } from '@/stores/TwoFactorAuthentificationStore';
 
   const route: RouteLocationNormalizedLoaded = useRoute();
   const router: Router = useRouter();
@@ -28,8 +31,9 @@
     labelAndValues: LabelValue[];
   };
 
-  let personInfoStore: PersonInfoStore = usePersonInfoStore();
-  let personStore: PersonStore = usePersonStore();
+  const personInfoStore: PersonInfoStore = usePersonInfoStore();
+  const personStore: PersonStore = usePersonStore();
+  const twoFactorAuthentificationStore: TwoFactorAuthentificationStore = useTwoFactorAuthentificationStore();
   const personalData: Ref = ref<LabelValue[]>([]);
   const schulDaten: Ref = ref<SchulDaten[]>([]);
 
@@ -135,9 +139,8 @@
   }
 
   async function initializeStores(): Promise<void> {
-    personInfoStore = usePersonInfoStore();
-    personStore = usePersonStore();
     await personInfoStore.initPersonInfo();
+    await personStore.getPersonById(personInfoStore.personInfo?.person.id ?? '');
     await personStore.getPersonenuebersichtById(personInfoStore.personInfo?.person.id ?? '');
   }
 
@@ -169,7 +172,7 @@
         (z: Zuordnung) =>
           ({
             ...z,
-            sskDstNr: z.sskDstNr?.split('-')[0], // die Klasse wird durch einen Bindestrich an die Schulnummer angehangen. Um nach der Schule zu gruppieren, wird nur die Schulnummer verwendet.
+            sskDstNr: z.sskDstNr.split('-')[0], // die Klasse wird durch einen Bindestrich an die Schulnummer angehangen. Um nach der Schule zu gruppieren, wird nur die Schulnummer verwendet.
           }) as Zuordnung,
       ),
     );
@@ -206,7 +209,7 @@
     setupPersonalData();
     setupSchuleData();
     if (personStore.currentPerson?.person.id) {
-      await personStore.get2FAState(personStore.currentPerson.person.id);
+      await twoFactorAuthentificationStore.get2FAState(personStore.currentPerson.person.id);
     }
   });
 </script>
@@ -410,10 +413,10 @@
       >
         <LayoutCard
           :header="$t('profile.twoFactorAuth')"
-          v-if="personStore.twoFactorState.hasToken != undefined"
+          v-if="twoFactorAuthentificationStore.hasToken != undefined"
         >
           <v-row
-            v-if="personStore.twoFactorState.hasToken === false"
+            v-if="twoFactorAuthentificationStore.hasToken === false"
             class="ma-3 d-flex align-content-center justify-center ga-4"
           >
             <v-icon
@@ -433,13 +436,13 @@
             <div>
               <SelfServiceWorkflow
                 :personId="personStore.currentPerson?.person.id ?? ''"
-                @dialogClosed="personStore.get2FAState(personStore.currentPerson?.person.id ?? '')"
+                @dialogClosed="twoFactorAuthentificationStore.get2FAState(personStore.currentPerson?.person.id ?? '')"
               >
               </SelfServiceWorkflow>
             </div>
           </v-row>
           <v-row
-            v-if="personStore.twoFactorState.hasToken === true"
+            v-if="twoFactorAuthentificationStore.hasToken === true"
             class="ma-3 d-flex align-content-center justify-center ga-4"
           >
             <v-col>
@@ -454,13 +457,13 @@
                   ></v-icon>
                 </v-col>
                 <div class="v-col">
-                  <p v-if="personStore.twoFactorState.tokenKind === 'software'">
+                  <p v-if="twoFactorAuthentificationStore.tokenKind === 'software'">
                     {{ $t('admin.person.twoFactorAuthentication.softwareTokenIsSetUpSelfService') }}
                   </p>
-                  <p v-else-if="personStore.twoFactorState.tokenKind === 'hardware'">
+                  <p v-else-if="twoFactorAuthentificationStore.tokenKind === 'hardware'">
                     {{
                       $t('admin.person.twoFactorAuthentication.hardwareTokenIsSetUpSelfService', {
-                        serialNumber: personStore.twoFactorState.tokenKind,
+                        serialNumber: twoFactorAuthentificationStore.tokenKind,
                       })
                     }}
                   </p>
