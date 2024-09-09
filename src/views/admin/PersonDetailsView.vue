@@ -25,7 +25,7 @@
   import { useDisplay } from 'vuetify';
   import { object, string, StringSchema, type AnyObject } from 'yup';
   import { toTypedSchema } from '@vee-validate/yup';
-  import { useForm, type BaseFieldProps, type TypedSchema } from 'vee-validate';
+  import { useForm, type BaseFieldProps, type FormContext, type TypedSchema } from 'vee-validate';
   import { RollenArt, RollenMerkmal } from '@/stores/RolleStore';
   import { type Composer, useI18n } from 'vue-i18n';
   import { useOrganisationen } from '@/composables/useOrganisationen';
@@ -42,6 +42,7 @@
   import { isBefore, isValid, parse } from 'date-fns';
   import BefristungComponent from '@/components/admin/personen/BefristungComponent.vue';
   import { getNextSchuljahresende, formatDateToISO } from '@/utils/dateUtils';
+  import { useBefristungUtils, type BefristungUtilsType } from '@/utils/befristungUtils';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
@@ -388,15 +389,10 @@
     },
   });
 
-  // eslint-disable-next-line @typescript-eslint/typedef
-  const {
-    defineField: defineFieldZuordnung,
-    handleSubmit: handleSubmitZuordnungForm,
-    resetForm: resetZuordnungForm,
-    resetField: resetFieldZuordnungForm,
-  } = useForm<ZuordnungCreationForm>({
-    validationSchema: zuordnungFormValidationSchema,
-  });
+  const formContext: FormContext<ZuordnungCreationForm, ZuordnungCreationForm> =
+    useForm<ZuordnungCreationForm>({
+      validationSchema: zuordnungFormValidationSchema,
+    });
 
   // eslint-disable-next-line @typescript-eslint/typedef
   const {
@@ -411,24 +407,24 @@
   const [selectedRolle, selectedRolleProps]: [
     Ref<string | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineFieldZuordnung('selectedRolle', vuetifyConfig);
+  ] = formContext.defineField('selectedRolle', vuetifyConfig);
   const [selectedOrganisation, selectedOrganisationProps]: [
     Ref<string | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineFieldZuordnung('selectedOrganisation', vuetifyConfig);
+  ] = formContext.defineField('selectedOrganisation', vuetifyConfig);
   const [selectedKlasse, selectedKlasseProps]: [
     Ref<string | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineFieldZuordnung('selectedKlasse', vuetifyConfig);
+  ] = formContext.defineField('selectedKlasse', vuetifyConfig);
 
   const [selectedBefristung, selectedBefristungProps]: [
     Ref<string | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineFieldZuordnung('selectedBefristung', vuetifyConfig);
+  ] = formContext.defineField('selectedBefristung', vuetifyConfig);
   const [selectedBefristungOption, selectedBefristungOptionProps]: [
     Ref<string | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineFieldZuordnung('selectedBefristungOption', vuetifyConfig);
+  ] = formContext.defineField('selectedBefristungOption', vuetifyConfig);
 
   // Change Klasse Form
   const [selectedSchule, selectedSchuleProps]: [
@@ -439,6 +435,14 @@
     Ref<string | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineFieldChangeKlasse('selectedNewKlasse', vuetifyConfig);
+
+  const { handleBefristungUpdate, handleBefristungOptionUpdate }: BefristungUtilsType = useBefristungUtils({
+    formContext,
+    selectedBefristung,
+    selectedBefristungOption,
+    calculatedBefristung,
+    selectedRolle,
+  });
 
   // Triggers the template to start editing
   const triggerEdit = (): void => {
@@ -474,7 +478,7 @@
     selectedZuordnungen.value = [];
     isZuordnungFormActive.value = false;
     isChangeKlasseFormActive.value = false;
-    resetZuordnungForm();
+    formContext.resetForm();
     resetChangeKlasseForm();
     zuordnungenResult.value = originalZuordnungenResult.value
       ? JSON.parse(JSON.stringify(originalZuordnungenResult.value))
@@ -495,7 +499,7 @@
   async function confirmAddition(): Promise<void> {
     await personenkontextStore.updatePersonenkontexte(finalZuordnungen.value, currentPersonId);
     createSuccessDialogVisible.value = !personenkontextStore.errorCode;
-    resetZuordnungForm();
+    formContext.resetForm();
   }
 
   // This will send the updated list of Zuordnungen to the Backend with the selected Zuordnung but with the new Klasse.
@@ -581,8 +585,8 @@
     changeKlasseConfirmationDialogVisible.value = true;
   });
 
-  const onSubmitCreateZuordnung: (e?: Event | undefined) => Promise<void | undefined> = handleSubmitZuordnungForm(
-    () => {
+  const onSubmitCreateZuordnung: (e?: Event | undefined) => Promise<void | undefined> =
+    formContext.handleSubmit(() => {
       if (selectedRolle.value) {
         if (isLernRolle(selectedRolle.value)) {
           createZuordnungConfirmationDialogMessage.value = t('person.addZuordnungKlasseConfirmation', {
@@ -596,8 +600,7 @@
         }
         createZuordnungConfirmationDialogVisible.value = true;
       }
-    },
-  );
+    });
 
   const confirmDialogAddition = async (): Promise<void> => {
     createZuordnungConfirmationDialogVisible.value = false;
@@ -771,33 +774,6 @@
       selectedKlasse.value = undefined;
     }
   }
-
-  // Calculates the Befristung depending on the selected radio button. Each radio button illustrates a date (Either 31st July or undefined)
-  // The backend will receive the calculatedBefristung.
-  function handleBefristungOptionChange(value: string | undefined): void {
-    switch (value) {
-      case BefristungOption.SCHULJAHRESENDE: {
-        calculatedBefristung.value = getNextSchuljahresende();
-        resetFieldZuordnungForm('selectedBefristung'); // Reset the date picker
-        break;
-      }
-      case BefristungOption.UNBEFRISTET: {
-        calculatedBefristung.value = undefined;
-        resetFieldZuordnungForm('selectedBefristung');
-        break;
-      }
-    }
-  }
-
-  const handleBefristungUpdate = (value: string | undefined): void => {
-    selectedBefristung.value = value;
-    calculatedBefristung.value = value;
-  };
-
-  const handleBefristungOptionUpdate = (value: string | undefined): void => {
-    selectedBefristungOption.value = value;
-    handleBefristungOptionChange(value);
-  };
 
   // Watcher to reset the radio button in case the date was picked using date-input
   watch(

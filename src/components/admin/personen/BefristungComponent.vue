@@ -45,7 +45,7 @@
 
   const handleBefristungOptionChange = (value: string): void => {
     localBefristungOption.value = value;
-    emit('update:befristungOption', undefined);
+    emit('update:befristungOption', value);
   };
 
   watch(

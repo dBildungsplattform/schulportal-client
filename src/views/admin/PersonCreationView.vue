@@ -15,7 +15,7 @@
     type NavigationGuardNext,
   } from 'vue-router';
   import { type Composer, useI18n } from 'vue-i18n';
-  import { useForm, type TypedSchema, type BaseFieldProps } from 'vee-validate';
+  import { useForm, type TypedSchema, type BaseFieldProps, type FormContext } from 'vee-validate';
   import { object, string, StringSchema, type AnyObject } from 'yup';
   import { toTypedSchema } from '@vee-validate/yup';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
@@ -41,6 +41,7 @@
   import { parse, isValid, isBefore } from 'date-fns';
   import BefristungComponent from '@/components/admin/personen/BefristungComponent.vue';
   import { getNextSchuljahresende, formatDateToISO } from '@/utils/dateUtils';
+  import { useBefristungUtils, type BefristungUtilsType } from '@/utils/befristungUtils';
 
   const router: Router = useRouter();
   const personStore: PersonStore = usePersonStore();
@@ -146,43 +147,50 @@
     selectedKopersNr: string;
   };
 
-  // eslint-disable-next-line @typescript-eslint/typedef
-  const { defineField, handleSubmit, isFieldDirty, resetForm, resetField } = useForm<PersonCreationForm>({
+  const formContext: FormContext<PersonCreationForm, PersonCreationForm> = useForm<PersonCreationForm>({
     validationSchema,
   });
 
   const [selectedRolle, selectedRolleProps]: [
     Ref<string | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineField('selectedRolle', vuetifyConfig);
+  ] = formContext.defineField('selectedRolle', vuetifyConfig);
   const [selectedKopersNr, selectedKopersNrProps]: [
     Ref<string | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineField('selectedKopersNr', vuetifyConfig);
+  ] = formContext.defineField('selectedKopersNr', vuetifyConfig);
   const [selectedVorname, selectedVornameProps]: [
     Ref<string>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineField('selectedVorname', vuetifyConfig);
+  ] = formContext.defineField('selectedVorname', vuetifyConfig);
   const [selectedFamilienname, selectedFamiliennameProps]: [
     Ref<string>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineField('selectedFamilienname', vuetifyConfig);
+  ] = formContext.defineField('selectedFamilienname', vuetifyConfig);
   const [selectedOrganisation, selectedOrganisationProps]: [
     Ref<string | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineField('selectedOrganisation', vuetifyConfig);
+  ] = formContext.defineField('selectedOrganisation', vuetifyConfig);
   const [selectedKlasse, selectedKlasseProps]: [
     Ref<string | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineField('selectedKlasse', vuetifyConfig);
+  ] = formContext.defineField('selectedKlasse', vuetifyConfig);
   const [selectedBefristung, selectedBefristungProps]: [
     Ref<string | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineField('selectedBefristung', vuetifyConfig);
+  ] = formContext.defineField('selectedBefristung', vuetifyConfig);
   const [selectedBefristungOption, selectedBefristungOptionProps]: [
     Ref<string | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineField('selectedBefristungOption', vuetifyConfig);
+  ] = formContext.defineField('selectedBefristungOption', vuetifyConfig);
+
+  const { handleBefristungUpdate, handleBefristungOptionUpdate }: BefristungUtilsType = useBefristungUtils({
+    formContext,
+    selectedBefristung,
+    selectedBefristungOption,
+    calculatedBefristung,
+    selectedRolle,
+  });
 
   const organisationen: ComputedRef<TranslatedObject[] | undefined> = useOrganisationen();
 
@@ -242,13 +250,13 @@
 
   function isFormDirty(): boolean {
     return (
-      isFieldDirty('selectedOrganisation') ||
-      isFieldDirty('selectedRolle') ||
-      isFieldDirty('selectedKlasse') ||
-      isFieldDirty('selectedKopersNr') ||
-      isFieldDirty('selectedVorname') ||
-      isFieldDirty('selectedFamilienname') ||
-      isFieldDirty('selectedBefristung')
+      formContext.isFieldDirty('selectedOrganisation') ||
+      formContext.isFieldDirty('selectedRolle') ||
+      formContext.isFieldDirty('selectedKlasse') ||
+      formContext.isFieldDirty('selectedKopersNr') ||
+      formContext.isFieldDirty('selectedVorname') ||
+      formContext.isFieldDirty('selectedFamilienname') ||
+      formContext.isFieldDirty('selectedBefristung')
     );
   }
 
@@ -267,7 +275,6 @@
   }
 
   async function createPerson(): Promise<void> {
-
     const befristungDate: string | undefined = selectedBefristung.value
       ? selectedBefristung.value
       : calculatedBefristung.value;
@@ -303,7 +310,7 @@
           });
       }
 
-      resetForm();
+      formContext.resetForm();
       hasNoKopersNr.value = false;
     }
   }
@@ -314,7 +321,7 @@
     }
   });
 
-  const onSubmit: (e?: Event | undefined) => Promise<void | undefined> = handleSubmit(() => {
+  const onSubmit: (e?: Event | undefined) => Promise<void | undefined> = formContext.handleSubmit(() => {
     createPerson();
   });
 
@@ -327,37 +334,11 @@
   const handleCreateAnotherPerson = (): void => {
     personenkontextStore.createdPersonWithKontext = null;
     personenkontextStore.createdPersonenkontextForKlasse = null;
-    resetForm();
+    formContext.resetForm();
     hasNoKopersNr.value = false;
     router.push({ name: 'create-person' });
   };
 
-  // Calculates the Befristung depending on the selected radio button. Each radio button illustrates a date (Either 31st July or undefined)
-  // The backend will receive the calculatedBefristung.
-  function handleBefristungOptionChange(value: string | undefined): void {
-    switch (value) {
-      case BefristungOption.SCHULJAHRESENDE: {
-        calculatedBefristung.value = getNextSchuljahresende();
-        resetField('selectedBefristung'); // Reset the date picker
-        break;
-      }
-      case BefristungOption.UNBEFRISTET: {
-        calculatedBefristung.value = undefined;
-        resetField('selectedBefristung');
-        break;
-      }
-    }
-  }
-
-  const handleBefristungUpdate = (value: string | undefined): void => {
-    selectedBefristung.value = value;
-    calculatedBefristung.value = value;
-  };
-
-  const handleBefristungOptionUpdate = (value: string | undefined): void => {
-    selectedBefristungOption.value = value;
-    handleBefristungOptionChange(value);
-  };
   // Watcher to reset the radio button in case the date was picked using date-input
   watch(
     selectedBefristung,
