@@ -76,31 +76,30 @@ export function useBefristungUtils(props: {
 
   // Setup the watchers
   const setupWatchers = (): void => {
-    // Watcher to reset the radio button in case the date was picked using date-input
-    watch(
-      selectedBefristung,
-      (newValue: string | undefined) => {
-        if (newValue) {
-          selectedBefristungOption.value = undefined;
-        }
-      },
-      { immediate: true },
-    );
+    const createWatcher = <T>(
+      watchedValue: Ref<T | undefined>,
+      onValueChange: (newValue: T | undefined) => void,
+    ): void => {
+      watch(watchedValue, onValueChange, { immediate: true });
+    };
+
+    // Watcher for resetting radio button when a date is picked using date-input
+    createWatcher(selectedBefristung, (newValue: string | undefined) => {
+      if (newValue) {
+        selectedBefristungOption.value = undefined;
+      }
+    });
 
     // Watcher to set an initial value for the radio buttons depending on the selected Rolle
-    watch(
-      selectedRolle,
-      (newValue: string | undefined) => {
-        if (isBefristungspflichtRolle(newValue)) {
-          selectedBefristungOption.value = BefristungOption.SCHULJAHRESENDE;
-          calculatedBefristung.value = getNextSchuljahresende();
-        } else {
-          selectedBefristungOption.value = BefristungOption.UNBEFRISTET;
-          calculatedBefristung.value = undefined;
-        }
-      },
-      { immediate: true },
-    );
+    createWatcher(selectedRolle, (newValue: string | undefined) => {
+      if (isBefristungspflichtRolle(newValue)) {
+        selectedBefristungOption.value = BefristungOption.SCHULJAHRESENDE;
+        calculatedBefristung.value = getNextSchuljahresende();
+      } else {
+        selectedBefristungOption.value = BefristungOption.UNBEFRISTET;
+        calculatedBefristung.value = undefined;
+      }
+    });
   };
 
   return {

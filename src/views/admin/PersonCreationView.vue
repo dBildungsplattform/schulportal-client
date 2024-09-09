@@ -175,38 +175,16 @@
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = formContext.defineField('selectedBefristungOption', vuetifyConfig);
 
-  const { handleBefristungUpdate, handleBefristungOptionUpdate }: BefristungUtilsType = useBefristungUtils({
-    formContext,
-    selectedBefristung,
-    selectedBefristungOption,
-    calculatedBefristung,
-    selectedRolle,
-  });
+  const { handleBefristungUpdate, handleBefristungOptionUpdate, setupWatchers }: BefristungUtilsType =
+    useBefristungUtils({
+      formContext,
+      selectedBefristung,
+      selectedBefristungOption,
+      calculatedBefristung,
+      selectedRolle,
+    });
 
-  watch(
-    selectedBefristung,
-    (newValue: string | undefined) => {
-      if (newValue) {
-        selectedBefristungOption.value = undefined;
-      }
-    },
-    { immediate: true },
-  );
-
-  // Watcher to set an initial value for the radio buttons depending on the selected Rolle
-  watch(
-    selectedRolle,
-    (newValue: string | undefined) => {
-      if (isBefristungspflichtRolle(newValue)) {
-        selectedBefristungOption.value = BefristungOption.SCHULJAHRESENDE;
-        calculatedBefristung.value = getNextSchuljahresende();
-      } else {
-        selectedBefristungOption.value = BefristungOption.UNBEFRISTET;
-        calculatedBefristung.value = undefined;
-      }
-    },
-    { immediate: true },
-  );
+  setupWatchers();
 
   const organisationen: ComputedRef<TranslatedObject[] | undefined> = useOrganisationen();
 
