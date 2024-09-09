@@ -49,6 +49,7 @@
     :onDiscard="onHandleDiscard"
     @onShowDialogChange="onShowDialogChange"
     :onSubmit="onSubmit"
+    ref="form-wrapper"
     :showUnsavedChangesDialog="showUnsavedChangesDialog"
   >
     <!-- 1. Administrationsebene zuordnen -->

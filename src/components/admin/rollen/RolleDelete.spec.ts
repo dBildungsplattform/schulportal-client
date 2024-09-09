@@ -9,7 +9,7 @@ import routes from '@/router/routes';
 let wrapper: VueWrapper | null = null;
 let router: Router;
 
-beforeEach( async() => {
+beforeEach(async () => {
   document.body.innerHTML = `
     <div>
       <div id="app"></div>
@@ -54,7 +54,9 @@ describe('delete rolle', () => {
     await document.querySelector('[data-testid="rolle-delete-confirmation-text"]');
     expect(document.querySelector('[data-testid="rolle-delete-confirmation-text"]')).not.toBeNull();
 
-    let cancelDeleteButton: HTMLElement | undefined = document.querySelectorAll<HTMLElement>('[data-testid="cancel-rolle-delete-button"]')[0];
+    const cancelDeleteButton: HTMLElement | undefined = document.querySelectorAll<HTMLElement>(
+      '[data-testid="cancel-rolle-delete-button"]',
+    )[0];
     cancelDeleteButton?.click();
     await nextTick();
 
@@ -72,15 +74,19 @@ describe('delete rolle', () => {
 
     await document.querySelector('[data-testid="rolle-delete-confirmation-text"]');
     expect(document.querySelector('[data-testid="rolle-delete-confirmation-text"]')).not.toBeNull();
-  
-    let rolleDeleteButton: HTMLElement | undefined = document.querySelectorAll<HTMLElement>('[data-testid="rolle-delete-button"]')[0];
+
+    const rolleDeleteButton: HTMLElement | undefined = document.querySelectorAll<HTMLElement>(
+      '[data-testid="rolle-delete-button"]',
+    )[0];
     rolleDeleteButton?.click();
     await nextTick();
 
     await document.querySelector('[data-testid="rolle-delete-success-text"]');
     expect(document.querySelector('[data-testid="rolle-delete-success-text"]')).not.toBeNull();
-  
-    let closeDialogButton: HTMLElement | undefined = document.querySelectorAll<HTMLElement>('[data-testid="close-rolle-delete-success-dialog-button"]')[0];
+
+    const closeDialogButton: HTMLElement | undefined = document.querySelectorAll<HTMLElement>(
+      '[data-testid="close-rolle-delete-success-dialog-button"]',
+    )[0];
     closeDialogButton?.click();
     await nextTick();
 
