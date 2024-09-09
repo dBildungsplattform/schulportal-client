@@ -329,6 +329,7 @@
         cols="12"
         sm="12"
         md="6"
+        data-testid="password-card"
       >
         <LayoutCard :header="$t('login.password')">
           <v-row class="ma-3 d-flex align-content-center justify-center ga-4">

@@ -8,10 +8,12 @@ import { createRouter, createMemoryHistory, type Router } from 'vue-router';
 import { useRoute } from 'vue-router';
 import type { RollenMerkmal } from '@/stores/RolleStore';
 import { usePersonStore, type PersonStore, type PersonWithUebersicht } from '@/stores/PersonStore';
+import { useAuthStore, type AuthStore, type UserInfo } from '@/stores/AuthStore';
 
 let wrapper: VueWrapper | null = null;
 let personInfoStore: PersonInfoStore;
 let personStore: PersonStore;
+let authStore: AuthStore;
 let router: Router;
 
 const mockPersonInfo: PersonInfoResponse = {
@@ -42,6 +44,30 @@ const mockPersonInfo: PersonInfoResponse = {
   pid: '',
   personenkontexte: [],
   gruppen: [],
+};
+
+const mockCurrentUser: UserInfo = {
+  sub: mockPersonInfo.person.id,
+  name: null,
+  given_name: null,
+  family_name: null,
+  middle_name: null,
+  nickname: null,
+  preferred_username: null,
+  profile: null,
+  picture: null,
+  website: null,
+  email: null,
+  email_verified: null,
+  gender: null,
+  birthdate: null,
+  zoneinfo: null,
+  locale: null,
+  phone_number: null,
+  updated_at: null,
+  personId: null,
+  personenkontexte: null,
+  password_updated_at: 1725874280767,
 };
 
 const mockUebersicht: PersonWithUebersicht = {
@@ -76,9 +102,12 @@ beforeEach(async () => {
 
   personInfoStore = usePersonInfoStore();
   personStore = usePersonStore();
+  authStore = useAuthStore();
 
   personInfoStore.personInfo = mockPersonInfo;
   personStore.personenuebersicht = mockUebersicht;
+
+  authStore.currentUser = mockCurrentUser;
 
   router = createRouter({
     history: createMemoryHistory(),
@@ -133,5 +162,22 @@ describe('ProfileView', () => {
     expect(schoolCardText).toContain('Muster-Schule');
     expect(schoolCardText).toContain('Lehrer');
     expect(schoolCardText).toContain('10A');
+  });
+
+  test('it displays password data if there is any', async () => {
+    await nextTick();
+    if (!wrapper) return;
+    const container: DOMWrapper<Element> = wrapper.find('[data-testid="password-card"]');
+    const passwordCardText: string = container.text();
+    expect(passwordCardText).toContain('09.09.2024');
+  });
+
+  test('it does not display password data if there is none', async () => {
+    authStore.currentUser!.password_updated_at = null;
+    await nextTick();
+    if (!wrapper) return;
+    const container: DOMWrapper<Element> = wrapper.find('[data-testid="password-card"]');
+    const passwordCardText: string = container.text();
+    expect(passwordCardText).not.toContain('09.09.2024');
   });
 });
