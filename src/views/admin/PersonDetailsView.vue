@@ -721,7 +721,7 @@
 
   let is2faAllowed: Ref<boolean> = ref(false);
   let show2faBlock: ComputedRef<boolean> = computed(() => {
-    return is2faAllowed.value && personStore.twoFactorState.hasToken != undefined;
+    return is2faAllowed.value && twoFactorAuthentificationStore.hasToken != undefined;
   });
 
   onBeforeMount(async () => {
@@ -734,7 +734,6 @@
       (zuordnung: Zuordnung) => zuordnung.typ === OrganisationsTyp.Klasse,
     );
     await twoFactorAuthentificationStore.get2FAState(currentPersonId);
-    await personStore.get2FAState(currentPersonId);
     await serviceProviderStore.getAvailableServiceProvidersForPerson(currentPersonId);
     is2faAllowed.value = serviceProviderStore.availableServiceProvidersForPerson.some(
       (sp: ServiceProvider) => sp.requires2fa,
