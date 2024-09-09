@@ -29,6 +29,7 @@ const zuordnung: DBiamPersonenzuordnungResponse = {
   typ: OrganisationsTyp.Schule,
   editable: false,
   merkmale: RollenMerkmal.KopersPflicht,
+  befristung: 'befristung',
 };
 const parentOrganisation: Organisation = {
   id: zuordnung.sskId,
@@ -99,8 +100,8 @@ describe('Lock user', () => {
     personStore = usePersonStore();
     organisationStore = useOrganisationStore();
 
-    personStore!.personenuebersicht = personenuebersicht;
-    organisationStore!.parentOrganisationen = [parentOrganisation];
+    personStore.personenuebersicht = personenuebersicht;
+    organisationStore.parentOrganisationen = [parentOrganisation];
   });
 
   test('it opens the dialog', async () => {
