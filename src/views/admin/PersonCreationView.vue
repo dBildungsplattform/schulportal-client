@@ -40,6 +40,7 @@
   import { type TranslatedObject } from '@/types.d';
   import { parse, isValid, isBefore } from 'date-fns';
   import BefristungComponent from '@/components/admin/personen/BefristungComponent.vue';
+  import { getNextSchuljahresende, formatDateToISO } from '@/utils/dateUtils';
 
   const router: Router = useRouter();
   const personStore: PersonStore = usePersonStore();
@@ -266,24 +267,6 @@
   }
 
   async function createPerson(): Promise<void> {
-    // Function to format a date in dd.MM.yyyy format to ISO 8601
-    function formatDateToISO(date: string | undefined): string | undefined {
-      if (date) {
-        // Split the date by '.' to extract day, month, and year
-        const [day, month, year]: (number | undefined)[] = date.split('.').map(Number);
-
-        if (day && month && year) {
-          // Create a new Date object with the extracted parts
-          // Alwyays adding 1 day to the date because for example if the Befristung is chosen as 20.05.2024 then it should be valid until 20.05.2024 23:59
-          // Also the UTC ISO formatted send date will be 20-05-2024 22H which is basically 21.05.2024 in german summer time.
-          const d: Date = new Date(year, month - 1, day + 1);
-
-          // Return the ISO string
-          return d.toISOString();
-        }
-      }
-      return;
-    }
 
     const befristungDate: string | undefined = selectedBefristung.value
       ? selectedBefristung.value
@@ -348,22 +331,6 @@
     hasNoKopersNr.value = false;
     router.push({ name: 'create-person' });
   };
-
-  // Calculates the next 31st of July (End of school year)
-  // Time here is in german iso format but will later be converted to UCT
-  function getNextSchuljahresende(): string {
-    const today: Date = new Date();
-    const currentYear: number = today.getFullYear();
-    const july31stThisYear: Date = new Date(currentYear, 6, 31); // July is month 6 (0-indexed)
-
-    // If today's date is after July 31st this year, return July 31st of next year
-    if (today > july31stThisYear) {
-      return new Date(currentYear + 1, 6, 31).toLocaleDateString('de-DE');
-    }
-
-    // Otherwise, return July 31st of this year
-    return july31stThisYear.toLocaleDateString('de-DE');
-  }
 
   // Calculates the Befristung depending on the selected radio button. Each radio button illustrates a date (Either 31st July or undefined)
   // The backend will receive the calculatedBefristung.
