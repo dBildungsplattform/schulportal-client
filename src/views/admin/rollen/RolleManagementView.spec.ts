@@ -72,7 +72,7 @@ beforeEach(() => {
         },
       ],
       administeredBySchulstrukturknotenName: 'Land SH',
-      administeredBySchulstrukturknotenKennung: '',
+      administeredBySchulstrukturknotenKennung: '1234567',
     },
   ] as RolleWithServiceProvidersResponse[];
 
