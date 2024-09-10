@@ -153,6 +153,7 @@ describe('rolleStore', () => {
         target: 'URL',
         kategorie: 'EMAIL',
         hasLogo: true,
+        requires2fa: true,
       };
 
       mockadapter.onPost('/api/rolle/1/serviceProviders').replyOnce(200, mockResponse, {});

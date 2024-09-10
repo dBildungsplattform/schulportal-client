@@ -1,14 +1,14 @@
-import { expect, test } from 'vitest';
-import { VueWrapper, mount } from '@vue/test-utils';
-import StartView from './StartView.vue';
 import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
 import {
   useServiceProviderStore,
   type ServiceProvider,
   type ServiceProviderStore,
 } from '@/stores/ServiceProviderStore';
-import { nextTick } from 'vue';
+import { VueWrapper, mount } from '@vue/test-utils';
 import type WrapperLike from '@vue/test-utils/dist/interfaces/wrapperLike';
+import { expect, test } from 'vitest';
+import { nextTick } from 'vue';
+import StartView from './StartView.vue';
 
 let wrapper: VueWrapper | null = null;
 let authStore: AuthStore;
@@ -22,6 +22,7 @@ const mockProviders: Array<ServiceProvider> = [
     url: 'https://de.wikipedia.org/wiki/SpongeBob_Schwammkopf',
     kategorie: 'EMAIL',
     hasLogo: false,
+    requires2fa: true,
   },
   {
     id: '2',
@@ -30,6 +31,7 @@ const mockProviders: Array<ServiceProvider> = [
     url: '',
     kategorie: 'VERWALTUNG',
     hasLogo: false,
+    requires2fa: false,
   },
 ];
 
