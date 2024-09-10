@@ -30,6 +30,10 @@
   import KopersInput from '@/components/admin/personen/KopersInput.vue';
   import { type TranslatedObject } from '@/types.d';
   import KlasseChange from '@/components/admin/klassen/KlasseChange.vue';
+  import {
+    useTwoFactorAuthentificationStore,
+    type TwoFactorAuthentificationStore,
+  } from '@/stores/TwoFactorAuthentificationStore';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
@@ -42,6 +46,7 @@
   const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
   const authStore: AuthStore = useAuthStore();
   const organisationStore: OrganisationStore = useOrganisationStore();
+  const twoFactorAuthentificationStore: TwoFactorAuthentificationStore = useTwoFactorAuthentificationStore();
 
   const password: Ref<string> = ref('');
 
@@ -735,8 +740,7 @@
     hasKlassenZuordnung.value = personStore.personenuebersicht?.zuordnungen.some(
       (zuordnung: Zuordnung) => zuordnung.typ === OrganisationsTyp.Klasse,
     );
-
-    await personStore.get2FAState(currentPersonId);
+    await twoFactorAuthentificationStore.get2FAState(currentPersonId);
   });
 </script>
 
@@ -915,13 +919,13 @@
           thickness="6"
         ></v-divider>
         <!-- Two Factor Authentication -->
-        <v-container v-if="personStore.twoFactorState.hasToken != undefined">
+        <v-container v-if="twoFactorAuthentificationStore.hasToken != undefined">
           <v-row class="ml-md-16">
             <v-col>
               <h3 class="subtitle-1">{{ $t('admin.person.twoFactorAuthentication.header') }}</h3>
               <v-row
                 class="mt-4 text-body"
-                v-if="personStore.twoFactorState.hasToken && personStore.twoFactorState.tokenKind === 'software'"
+                v-if="twoFactorAuthentificationStore.hasToken"
               >
                 <v-col
                   class="text-right"
@@ -930,12 +934,20 @@
                   <v-icon
                     icon="mdi-check-circle"
                     color="green"
-                    v-if="personStore.twoFactorState.hasToken"
+                    v-if="twoFactorAuthentificationStore.hasToken"
                   ></v-icon>
                 </v-col>
                 <div class="v-col">
-                  <p>
+                  <p v-if="twoFactorAuthentificationStore.tokenKind === 'software'">
                     {{ $t('admin.person.twoFactorAuthentication.softwareTokenIsSetUp') }}
+                  </p>
+                  <p v-if="twoFactorAuthentificationStore.tokenKind === 'hardware'">
+                    {{ $t('admin.person.twoFactorAuthentication.hardwareTokenIsSetUp') }}
+                  </p>
+                  <p v-if="twoFactorAuthentificationStore.serial">
+                    {{
+                      $t('admin.person.twoFactorAuthentication.serial') + ': ' + twoFactorAuthentificationStore.serial
+                    }}
                   </p>
                 </div>
               </v-row>
@@ -951,10 +963,10 @@
                   </v-icon>
                 </v-col>
                 <div class="v-col">
-                  <p v-if="personStore.twoFactorState.hasToken">
+                  <p v-if="twoFactorAuthentificationStore.hasToken">
                     {{ $t('admin.person.twoFactorAuthentication.resetInfo') }}
                   </p>
-                  <p v-if="!personStore.twoFactorState.hasToken">
+                  <p v-if="!twoFactorAuthentificationStore.hasToken">
                     {{ $t('admin.person.twoFactorAuthentication.notSetUp') }}
                   </p>
                 </div>
@@ -968,19 +980,19 @@
             >
               <div
                 class="d-flex justify-sm-end"
-                v-if="!personStore.twoFactorState.hasToken"
+                v-if="!twoFactorAuthentificationStore.hasToken"
               >
                 <TwoFactorAuthenticationSetUp
-                  :errorCode="personStore.twoFactorState.errorCode"
+                  :errorCode="twoFactorAuthentificationStore.errorCode"
                   :disabled="isEditActive"
                   :person="personStore.currentPerson"
-                  @dialogClosed="personStore.get2FAState(currentPersonId)"
+                  @dialogClosed="twoFactorAuthentificationStore.get2FAState(currentPersonId)"
                 >
                 </TwoFactorAuthenticationSetUp>
               </div>
               <div
                 class="d-flex justify-sm-end"
-                v-if="personStore.twoFactorState.hasToken"
+                v-if="twoFactorAuthentificationStore.hasToken"
               >
                 <v-col
                   cols="12"
@@ -988,7 +1000,7 @@
                   md="auto"
                 >
                   <SpshTooltip
-                    :enabledCondition="personStore.twoFactorState.hasToken"
+                    :enabledCondition="twoFactorAuthentificationStore.hasToken"
                     :disabledText="$t('person.finishEditFirst')"
                     :enabledText="$t('admin.person.twoFactorAuthentication.tokenReset')"
                     position="start"
@@ -1007,7 +1019,7 @@
           ></v-row>
         </v-container>
         <v-divider
-          v-if="personStore.twoFactorState.hasToken != undefined"
+          v-if="twoFactorAuthentificationStore.hasToken != undefined"
           class="border-opacity-100 rounded my-6 mx-4"
           color="#E5EAEF"
           thickness="6"
