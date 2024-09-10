@@ -108,7 +108,7 @@
         <v-card-text>
           <v-container v-if="!isTokenResetRequested">
             <v-row class="text-body px-md-16">
-              <v-col class="whiteSpace">
+              <v-col class="whiteSpace text-body bold">
                 {{ $t('admin.person.twoFactorAuthentication.tokenResetDescription') }}
               </v-col>
             </v-row>
