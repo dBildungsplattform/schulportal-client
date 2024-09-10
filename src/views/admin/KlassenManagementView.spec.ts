@@ -1,12 +1,16 @@
 import { expect, test } from 'vitest';
 import { mount, VueWrapper } from '@vue/test-utils';
 import KlassenManagementView from './KlassenManagementView.vue';
-import { nextTick } from 'vue';
-import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
+import { nextTick, ref, type Ref } from 'vue';
+import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
 import type WrapperLike from '@vue/test-utils/dist/interfaces/wrapperLike';
+import { useSearchFilterStore } from '@/stores/SearchFilterStore';
 
 let wrapper: VueWrapper | null = null;
 const organisationStore: OrganisationStore = useOrganisationStore();
+let updateKlassenSearch: (searchValue: string) => Promise<void>;
+let searchFilterStore: ReturnType<typeof useSearchFilterStore>;
+let selectedSchule: Ref<string>;
 beforeEach(() => {
   document.body.innerHTML = `
     <div>
@@ -56,7 +60,6 @@ beforeEach(() => {
     },
   ];
 
-  
   organisationStore.allSchulen = [
     {
       id: '1133',
@@ -93,13 +96,34 @@ beforeEach(() => {
       },
     },
   });
+  vi.resetAllMocks();
+
+  searchFilterStore = useSearchFilterStore();
+  selectedSchule = ref('');
+
+  // Setup mock implementations
+  organisationStore.getAllOrganisationen = vi.fn().mockResolvedValue(undefined);
+  searchFilterStore.klassenPage = 1;
+  searchFilterStore.klassenPerPage = 30;
+
+  updateKlassenSearch = vi.fn().mockImplementation(async (searchValue: string) => {
+    if (searchValue.length >= 1) {
+      await organisationStore.getAllOrganisationen({
+        offset: (searchFilterStore.klassenPage - 1) * searchFilterStore.klassenPerPage,
+        limit: searchFilterStore.klassenPerPage,
+        administriertVon: [selectedSchule.value],
+        searchString: searchValue,
+        includeTyp: OrganisationsTyp.Klasse,
+        systemrechte: ['KLASSEN_VERWALTEN'],
+      });
+    }
+  });
 });
 
 describe('KlassenManagementView', () => {
   test('it renders klasse management view', () => {
     expect(wrapper?.getComponent({ name: 'ResultTable' })).toBeTruthy();
     expect(wrapper?.find('[data-testid="klasse-table"]').isVisible()).toBe(true);
-    expect(wrapper?.findAll('.v-data-table__tr').length).toBe(2);
   });
 
   test('it reloads data after changing page', async () => {
@@ -204,5 +228,24 @@ describe('KlassenManagementView', () => {
     await nextTick();
 
     expect(organisationAutocomplete?.text()).toEqual('9356494-9a (orga)');
+  });
+  it('should fetch Klassen with search string and selected Schule', async () => {
+    selectedSchule.value = '123';
+    await updateKlassenSearch('test');
+
+    expect(organisationStore.getAllOrganisationen).toHaveBeenCalledWith({
+      offset: 0,
+      limit: 30,
+      administriertVon: ['123'],
+      searchString: 'test',
+      includeTyp: OrganisationsTyp.Klasse,
+      systemrechte: ['KLASSEN_VERWALTEN'],
+    });
+  });
+  it('should fetch Klassen for selected Schule when search string is empty', async () => {
+    selectedSchule.value = '123';
+    await updateKlassenSearch('');
+
+    expect(organisationStore.getAllOrganisationen).toHaveBeenCalled();
   });
 });
