@@ -65,7 +65,6 @@
 
   const schulen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
     return organisationStore.allSchulen
-      .slice(0, 25)
       .map((org: Organisation) => ({
         value: org.id,
         title: `${org.kennung} (${org.name})`,
@@ -125,11 +124,17 @@
     });
   }
 
-  function autoSelectSchule(): void {
+  async function autoSelectSchule(): Promise<void> {
     // Autoselect the Schule for the current user that only has 1 Schule assigned to him.
-    if (organisationStore.allOrganisationen.length === 1) {
-      selectedSchulen.value = [organisationStore.allOrganisationen[0]?.id || ''];
+    if (organisationStore.allSchulen.length === 1) {
+      selectedSchulen.value = [organisationStore.allSchulen[0]?.id || ''];
       hasAutoselectedSchule.value = true;
+      if (selectedSchulen.value.length) {
+        await organisationStore.getFilteredKlassen({
+          administriertVon: selectedSchulen.value,
+          searchString: searchInputKlassen.value,
+        });
+      }
     }
   }
 
@@ -178,6 +183,7 @@
     /* do not reset schulen if schule was autoselected */
     if (!hasAutoselectedSchule.value) {
       selectedSchulen.value = [];
+      searchFilterStore.setSchuleFilter([]);
     }
     searchInputSchulen.value = '';
     searchInputRollen.value = '';
@@ -218,7 +224,9 @@
       organisationStore.getAllOrganisationen({
         searchString: searchValue,
         includeTyp: OrganisationsTyp.Schule,
+        limit: 25,
         systemrechte: ['PERSONEN_VERWALTEN'],
+        organisationIds: selectedSchulen.value,
       });
     }, 500);
   }
@@ -242,10 +250,13 @@
     await organisationStore.getAllOrganisationen({
       includeTyp: OrganisationsTyp.Schule,
       systemrechte: ['PERSONEN_VERWALTEN'],
+      limit: 25,
+      organisationIds: selectedSchulen.value,
     });
     await organisationStore.getFilteredKlassen({
       includeTyp: OrganisationsTyp.Klasse,
       systemrechte: ['KLASSEN_VERWALTEN'],
+      limit: 25,
     });
     await getPaginatedPersonen(searchFilterStore.personenPage);
     await personenkontextStore.getPersonenkontextRolleWithFilter('');
