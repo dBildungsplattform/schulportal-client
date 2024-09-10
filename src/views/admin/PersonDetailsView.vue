@@ -1071,10 +1071,11 @@
               :data-testid="`person-zuordnung-${zuordnung.sskId}`"
               :title="zuordnung.sskName"
             >
-              <span class="text-body"
-                >{{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
-                {{ zuordnung.klasse }} ( {{  formatDate(zuordnung.befristung) }})</span
-              >
+            <span class="text-body">
+  {{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
+  {{ zuordnung.klasse }}
+  <span v-if="zuordnung.befristung"> ({{ formatDate(zuordnung.befristung) }})</span>
+</span>
             </v-col>
           </v-row>
           <!-- Display 'Keine Zuordnungen gefunden' if the above condition is false -->
@@ -1143,7 +1144,10 @@
                     }"
                   >
                     {{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
-                    {{ zuordnung.klasse }}  ({{   formatDate(zuordnung.befristung) }})
+                    {{ zuordnung.klasse }}
+                    <span v-if="zuordnung.befristung &&  newZuordnung &&
+                        zuordnung.sskId === newZuordnung.sskId &&
+                        zuordnung.rolleId === newZuordnung.rolleId" class="text-body text-green"> ({{ formatDate(zuordnung.befristung) }})</span>
                     <span
                       v-if="
                         newZuordnung &&
