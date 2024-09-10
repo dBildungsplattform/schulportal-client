@@ -708,6 +708,22 @@
 
   setupWatchers();
 
+  const formatDate = (dateString: string | undefined): string => {
+  if (!dateString) return '';
+  const date: Date = new Date(dateString);
+  
+  // Subtract one day
+  date.setDate(date.getDate() - 1);
+
+  // Return the translated string followed by the formatted date
+  return `${t('admin.befristung.unlimitedUntil')} ${new Intl.DateTimeFormat('de-DE', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  }).format(date)}`;
+};
+
+
   // Computed property to check if the second radio button should be disabled
   const isUnbefristetButtonDisabled: ComputedRef<boolean> = computed(() => {
     return isBefristungspflichtRolle(selectedRolle.value);
@@ -1057,7 +1073,7 @@
             >
               <span class="text-body"
                 >{{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
-                {{ zuordnung.klasse }}</span
+                {{ zuordnung.klasse }} ( {{  formatDate(zuordnung.befristung) }})</span
               >
             </v-col>
           </v-row>
@@ -1127,7 +1143,7 @@
                     }"
                   >
                     {{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
-                    {{ zuordnung.klasse }}
+                    {{ zuordnung.klasse }}  ({{   formatDate(zuordnung.befristung) }})
                     <span
                       v-if="
                         newZuordnung &&

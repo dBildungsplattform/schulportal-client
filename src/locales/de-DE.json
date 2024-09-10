@@ -20,6 +20,7 @@
       "unlimited": "Unbefristet",
       "unlimitedSuccessTemplate": "unbefristet",
       "unlimitedInactive": "Diese Option kann für Rollen mit Befristungspflicht nicht ausgewählt werden.",
+      "unlimitedUntil": "befristet bis",
       "untilEndOfSchoolYear": "Bis Schuljahresende"
     },
     "mandatoryFieldsNotice": "Mit * markierte Felder sind Pflichtangaben.",
