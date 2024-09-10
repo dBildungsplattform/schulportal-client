@@ -170,7 +170,7 @@ describe('ProfileView', () => {
     if (!wrapper) return;
     const container: DOMWrapper<Element> = wrapper.find('[data-testid="password-card"]');
     const passwordCardText: string = container.text();
-    expect(passwordCardText).toContain(passwordUpdatedAt.getDay());
+    expect(passwordCardText).toContain(passwordUpdatedAt.getDate());
     expect(passwordCardText).toContain(passwordUpdatedAt.getMonth());
     expect(passwordCardText).toContain(passwordUpdatedAt.getFullYear());
   });
@@ -181,7 +181,7 @@ describe('ProfileView', () => {
     if (!wrapper) return;
     const container: DOMWrapper<Element> = wrapper.find('[data-testid="password-card"]');
     const passwordCardText: string = container.text();
-    expect(passwordCardText).not.toContain(passwordUpdatedAt.getDay());
+    expect(passwordCardText).not.toContain(passwordUpdatedAt.getDate());
     expect(passwordCardText).not.toContain(passwordUpdatedAt.getMonth());
     expect(passwordCardText).not.toContain(passwordUpdatedAt.getFullYear());
   });
