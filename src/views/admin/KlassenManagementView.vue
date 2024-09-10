@@ -351,8 +351,8 @@
   async function handleUserContext(): Promise<void> {
     const personenkontexte: Array<UserinfoPersonenkontext> | null = authStore.currentUser?.personenkontexte || [];
     if (personenkontexte.length > 0) {
-      if (organisationStore.allOrganisationen.length === 1) {
-        selectedSchule.value = organisationStore.allOrganisationen[0]?.id || null;
+      if (organisationStore.allSchulen.length === 1) {
+        selectedSchule.value = organisationStore.allSchulen[0]?.id || null;
         if (selectedSchule.value) {
           await organisationStore.getKlassenByOrganisationId(selectedSchule.value);
           finalKlassen.value = organisationStore.klassen.map((klasse: Organisation) => ({
@@ -380,6 +380,12 @@
       limit: searchFilterStore.klassenPerPage,
       includeTyp: OrganisationsTyp.Klasse,
       systemrechte: ['KLASSEN_VERWALTEN'],
+    });
+    await organisationStore.getAllOrganisationen({
+      offset: (searchFilterStore.klassenPage - 1) * searchFilterStore.klassenPerPage,
+      limit: searchFilterStore.schulenPerPage,
+      includeTyp: OrganisationsTyp.Schule,
+      systemrechte: ['SCHULEN_VERWALTEN'],
     });
     // Initialize klassenOptions with all classes
     klassenOptions.value = organisationStore.allKlassen.map((org: Organisation) => ({

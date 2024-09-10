@@ -75,6 +75,7 @@ export type OrganisationenFilter = {
   includeTyp?: OrganisationsTyp;
   excludeTyp?: OrganisationsTyp[];
   administriertVon?: Array<string>;
+  organisationIds?: Array<string>;
 };
 
 type OrganisationGetters = {};
@@ -143,6 +144,7 @@ export const useOrganisationStore: StoreDefinition<
           filter?.systemrechte,
           filter?.excludeTyp,
           filter?.administriertVon,
+          filter?.organisationIds,
         );
         if (filter?.includeTyp === OrganisationsTyp.Klasse) {
           this.allKlassen = response.data;
