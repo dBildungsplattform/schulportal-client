@@ -102,7 +102,7 @@
     await personStore.getAllPersons({
       offset: (searchFilterStore.personenPage - 1) * searchFilterStore.personenPerPage,
       limit: searchFilterStore.personenPerPage,
-      organisationIDs: searchFilterStore.selectedSchulen || selectedSchulen.value,
+      organisationIDs: selectedKlassen.value.length ? selectedKlassen.value : selectedSchulen.value,
       rolleIDs: searchFilterStore.selectedRollen || selectedRollen.value,
       searchFilter: searchFilterStore.searchFilter || searchFilter.value,
     });
@@ -245,6 +245,7 @@
     if (filterOrSearchActive.value) {
       selectedSchulen.value = searchFilterStore.selectedSchulen || [];
       selectedRollen.value = searchFilterStore.selectedRollen || [];
+      selectedKlassen.value = searchFilterStore.selectedKlassen || [];
     }
 
     await organisationStore.getAllOrganisationen({
@@ -337,8 +338,8 @@
                   >{{
                     $t(
                       'admin.schule.schulenFound',
-                      { count: organisationStore.totalSchulen },
-                      organisationStore.totalSchulen,
+                      { count: organisationStore.totalPaginatedSchulen },
+                      organisationStore.totalPaginatedSchulen,
                     )
                   }}</span
                 >
@@ -460,8 +461,8 @@
                         >{{
                           $t(
                             'admin.klasse.klassenFound',
-                            { count: organisationStore.totalKlassen },
-                            organisationStore.totalKlassen,
+                            { count: organisationStore.totalPaginatedKlassen },
+                            organisationStore.totalPaginatedKlassen,
                           )
                         }}</span
                       >
