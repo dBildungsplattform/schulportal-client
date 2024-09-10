@@ -613,6 +613,12 @@
             "required": false,
             "in": "query",
             "schema": { "type": "array", "items": { "type": "string" } }
+          },
+          {
+            "name": "organisationIds",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "array", "items": { "type": "string" } }
           }
         ],
         "responses": {
