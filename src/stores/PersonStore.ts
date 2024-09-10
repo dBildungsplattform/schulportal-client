@@ -210,14 +210,19 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
                 .join(', ')
             : '---';
 
-          // Check if person has Kopers-Rolle and show personalnummer or "fehlt", if not show "---"
+          /* Check if person has personalnummer and show it, 
+             if not, check if kopersrolle exists and show "fehlt",
+             if not, show "---"
+           */
           const hasKopersRolle: boolean = !!uebersicht?.zuordnungen.find((zuordnung: Zuordnung) =>
             zuordnung.merkmale.includes(RollenMerkmal.KopersPflicht),
           );
           let personalnummer: string;
 
-          if (hasKopersRolle) {
-            personalnummer = person.person.personalnummer ?? 'fehlt';
+          if (person.person.personalnummer) {
+            personalnummer = person.person.personalnummer;
+          } else if (hasKopersRolle) {
+            personalnummer = 'fehlt';
           } else {
             personalnummer = '---';
           }
