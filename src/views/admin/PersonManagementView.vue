@@ -183,6 +183,7 @@
     /* do not reset schulen if schule was autoselected */
     if (!hasAutoselectedSchule.value) {
       selectedSchulen.value = [];
+      searchFilterStore.setSchuleFilter([]);
     }
     searchInputSchulen.value = '';
     searchInputRollen.value = '';
