@@ -1,4 +1,4 @@
-import { expect, test } from 'vitest';
+import { expect, test, type MockInstance } from 'vitest';
 import { VueWrapper, mount } from '@vue/test-utils';
 import PersonManagementView from './PersonManagementView.vue';
 import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
@@ -166,6 +166,17 @@ describe('PersonManagementView', () => {
   });
 
   test('it reloads data after changing page', async () => {
+    const schuleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
+    await schuleAutocomplete?.setValue(['9876']);
+    await nextTick();
+
+    const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
+    await klasseAutocomplete?.setValue(['123456']);
+    await nextTick();
+
+    // Mock the getAllPersons method to capture its arguments
+    const getAllPersonsSpy: MockInstance = vi.spyOn(personStore, 'getAllPersons');
+
     expect(wrapper?.find('.v-pagination__next button.v-btn--disabled').isVisible()).toBe(true);
     expect(wrapper?.find('.v-data-table-footer__info').text()).toContain('1-2');
 
@@ -176,6 +187,24 @@ describe('PersonManagementView', () => {
     expect(wrapper?.find('.v-pagination__next button:not(.v-btn--disabled)').isVisible()).toBe(true);
     await wrapper?.find('.v-pagination__next button:not(.v-btn--disabled)').trigger('click');
     expect(wrapper?.find('.v-data-table-footer__info').text()).toContain('31-50');
+    // Check if getAllPersons was called with the correct arguments
+    expect(getAllPersonsSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        organisationIDs: ['123456'], // This should be the selectedKlassen value
+      }),
+    );
+    // Clear selectedKlassen and test again
+    await klasseAutocomplete?.setValue([]);
+    await nextTick();
+
+    await wrapper?.find('.v-pagination__prev button:not(.v-btn--disabled)').trigger('click');
+
+    // Now it should use selectedSchulen
+    expect(getAllPersonsSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        organisationIDs: ['9876'], // This should be the selectedSchulen value
+      }),
+    );
   });
 
   test('it reloads data after changing limit', async () => {
