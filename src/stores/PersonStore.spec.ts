@@ -310,7 +310,7 @@ describe('PersonStore', () => {
     });
   });
 
-  describe('deletePerson', () => {
+  describe('deletePersonById', () => {
     it('should delete person', async () => {
       const personId: string = 'testUser';
 
