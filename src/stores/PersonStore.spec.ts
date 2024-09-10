@@ -260,6 +260,41 @@ describe('PersonStore', () => {
     });
   });
 
+  describe('deletePersonById', () => {
+    it('should delete a person and update state', async () => {
+      const personId: string = '1234';
+
+      mockadapter.onDelete(`/api/personen/${personId}`).replyOnce(204);
+
+      await personStore.deletePersonById(personId);
+
+      expect(personStore.loading).toBe(false);
+      expect(personStore.errorCode).toEqual('');
+    });
+
+    it('should handle string error', async () => {
+      const personId: string = '1234';
+
+      mockadapter.onDelete(`/api/personen/${personId}`).replyOnce(500, 'some error');
+
+      await rejects(personStore.deletePersonById(personId));
+
+      expect(personStore.errorCode).toEqual('UNSPECIFIED_ERROR');
+      expect(personStore.loading).toBe(false);
+    });
+
+    it('should handle error code', async () => {
+      const personId: string = '1234';
+
+      mockadapter.onDelete(`/api/personen/${personId}`).replyOnce(500, { code: 'some mock server error' });
+
+      await rejects(personStore.deletePersonById(personId));
+
+      expect(personStore.errorCode).toEqual('some mock server error');
+      expect(personStore.loading).toBe(false);
+    });
+  });
+
   describe('getPersonenuebersichtById', () => {
     it('should get Personenuebersicht', async () => {
       const mockResponse: DBiamPersonenuebersichtResponse = {
@@ -305,40 +340,6 @@ describe('PersonStore', () => {
       const getPersonenuebersichtByIdPromise: Promise<void> = personStore.getPersonenuebersichtById('1');
       expect(personStore.loading).toBe(true);
       await getPersonenuebersichtByIdPromise;
-      expect(personStore.errorCode).toEqual('some mock server error');
-      expect(personStore.loading).toBe(false);
-    });
-  });
-
-  describe('deletePerson', () => {
-    it('should delete person', async () => {
-      const personId: string = 'testUser';
-
-      mockadapter.onDelete(`/api/personen/${personId}`).replyOnce(200, {});
-      const deletionPromise: Promise<void> = personStore.deletePersonById(personId);
-      expect(personStore.loading).toBe(true);
-      await deletionPromise;
-      expect(personStore.loading).toBe(false);
-    });
-
-    it('should handle string error', async () => {
-      const personId: string = 'testUser';
-
-      mockadapter.onDelete(`/api/personen/${personId}`).replyOnce(500, 'some error');
-      const deletionPromise: Promise<void> = personStore.deletePersonById(personId);
-      expect(personStore.loading).toBe(true);
-      await rejects(deletionPromise);
-      expect(personStore.errorCode).toEqual('UNSPECIFIED_ERROR');
-      expect(personStore.loading).toBe(false);
-    });
-
-    it('should handle error code', async () => {
-      const personId: string = 'testUser';
-
-      mockadapter.onDelete(`/api/personen/${personId}`).replyOnce(500, { code: 'some mock server error' });
-      const deletionPromise: Promise<void> = personStore.deletePersonById(personId);
-      expect(personStore.loading).toBe(true);
-      await rejects(deletionPromise);
       expect(personStore.errorCode).toEqual('some mock server error');
       expect(personStore.loading).toBe(false);
     });
