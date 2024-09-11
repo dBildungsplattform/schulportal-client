@@ -1,14 +1,14 @@
-import { expect, test, type MockInstance } from 'vitest';
-import { VueWrapper, mount } from '@vue/test-utils';
-import PersonManagementView from './PersonManagementView.vue';
+import type { FindRollenResponse } from '@/api-client/generated/api';
+import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
 import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
 import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
-import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
-import { nextTick } from 'vue';
 import { useRolleStore, type RolleResponse, type RolleStore, type RollenMerkmal } from '@/stores/RolleStore';
 import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
-import type { FindRollenResponse } from '@/api-client/generated/api';
+import { VueWrapper, mount } from '@vue/test-utils';
 import type WrapperLike from '@vue/test-utils/dist/interfaces/wrapperLike';
+import { expect, test, type MockInstance } from 'vitest';
+import { nextTick } from 'vue';
+import PersonManagementView from './PersonManagementView.vue';
 
 let wrapper: VueWrapper | null = null;
 let organisationStore: OrganisationStore;
@@ -104,6 +104,9 @@ beforeEach(() => {
           vorname: 'Samuel',
         },
         referrer: '123',
+        personalnummer: '46465',
+        isLocked: false,
+        lockInfo: null,
       },
     },
     {
@@ -117,6 +120,9 @@ beforeEach(() => {
           vorname: 'Moist',
         },
         referrer: '1234',
+        personalnummer: '46471',
+        isLocked: false,
+        lockInfo: null,
       },
     },
   ];
