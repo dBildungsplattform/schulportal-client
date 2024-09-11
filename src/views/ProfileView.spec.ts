@@ -44,6 +44,36 @@ const mockPersonInfo: PersonInfoResponse = {
   gruppen: [],
 };
 
+const mockPersonInfo2: PersonInfoResponse = {
+  person: {
+    id: '1234',
+    name: {
+      familiennamen: 'Vimes',
+      vorname: 'Samuel',
+      initialenfamilienname: null,
+      initialenvorname: null,
+      rufname: null,
+      titel: null,
+      anrede: null,
+      namenspraefix: null,
+      namenssuffix: null,
+      sortierindex: null,
+    },
+    referrer: 'samuelvimes',
+    personalnummer: null,
+    mandant: '',
+    geburt: null,
+    stammorganisation: null,
+    geschlecht: null,
+    lokalisierung: null,
+    vertrauensstufe: 'KEIN',
+    revision: '',
+  },
+  pid: '',
+  personenkontexte: [],
+  gruppen: [],
+};
+
 const mockUebersicht: PersonWithUebersicht = {
   personId: '1234',
   vorname: 'Samuel',
@@ -181,7 +211,7 @@ describe('ProfileView', () => {
     expect(schoolCardText).toContain('10A');
   });
   test('it displays Schule data', async () => {
-    personInfoStore.personInfo = mockPersonInfo;
+    personInfoStore.personInfo = mockPersonInfo2;
     personStore.personenuebersicht = mockUebersicht2;
     await nextTick();
     if (!wrapper) return;
