@@ -13,7 +13,7 @@
       "befristung": "Befristung",
       "rules": {
         "required": "Die Befristung muss eingegeben werden.",
-        "format": "Die Befristung muss im Format DD.MM.JJJJ. eingegeben werden.",
+        "format": "Die Befristung muss im Format TT.MM.JJJJ. eingegeben werden.",
         "pastDateNotAllowed": "Das eingegebene Datum darf nicht in der Vergangenheit liegen."
       },
       "selectBefristung": "Befristung auswählen",
