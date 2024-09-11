@@ -78,6 +78,7 @@ type PersonenkontextState = {
   errorCode: string;
   loading: boolean;
   totalFilteredRollen: number;
+  totalPaginatedRollen: number;
 };
 
 type PersonenkontextGetters = {};
@@ -137,6 +138,7 @@ export const usePersonenkontextStore: StoreDefinition<
       errorCode: '',
       loading: false,
       totalFilteredRollen: 0,
+      totalPaginatedRollen: 0,
     };
   },
   actions: {
