@@ -1672,7 +1672,8 @@
             "in": "path",
             "description": "The ID for the person.",
             "schema": { "type": "string" }
-          }
+          },
+          { "name": "personalnummer", "required": false, "in": "query", "schema": { "type": "string" } }
         ],
         "requestBody": {
           "required": true,
