@@ -3,7 +3,7 @@ import { object, string, StringSchema, type AnyObject } from 'yup';
 import { toTypedSchema } from '@vee-validate/yup';
 import { DDMMYYYY } from '@/utils/validation'; // Assuming you have this validation in place
 import { useForm, type BaseFieldProps, type TypedSchema } from 'vee-validate';
-import { isBefristungspflichtRolle } from './befristungUtils';
+import { isBefristungspflichtRolle } from './befristung';
 import { useRollen, type TranslatedRolleWithAttrs } from '@/composables/useRollen';
 import { RollenArt } from '@/stores/RolleStore';
 import { isBefore, isValid, parse } from 'date-fns';

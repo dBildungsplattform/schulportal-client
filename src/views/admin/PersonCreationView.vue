@@ -39,9 +39,9 @@
   import PersonenkontextCreate from '@/components/admin/personen/PersonenkontextCreate.vue';
   import { type TranslatedObject } from '@/types.d';
   import { parse, isValid, isBefore } from 'date-fns';
-  import BefristungComponent from '@/components/admin/personen/BefristungComponent.vue';
-  import { getNextSchuljahresende, formatDateToISO } from '@/utils/dateUtils';
-  import { isBefristungspflichtRolle, useBefristungUtils, type BefristungUtilsType } from '@/utils/befristungUtils';
+  import BefristungInput from '@/components/admin/personen/BefristungInput.vue';
+  import { getNextSchuljahresende, formatDateToISO } from '@/utils/date';
+  import { isBefristungspflichtRolle, useBefristungUtils, type BefristungUtilsType } from '@/utils/befristung';
 
   const router: Router = useRouter();
   const personStore: PersonStore = usePersonStore();
@@ -559,7 +559,7 @@
           class="mt-4"
           v-if="selectedOrganisation && selectedRolle"
         >
-          <BefristungComponent
+          <BefristungInput
             v-if="selectedOrganisation && selectedRolle"
             :befristungProps="selectedBefristungProps"
             :befristungOptionProps="selectedBefristungOptionProps"

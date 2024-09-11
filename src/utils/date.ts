@@ -38,3 +38,24 @@ export function formatDateToISO(date: string | undefined): string | undefined {
   }
   return undefined;
 }
+
+/**
+ * Formats a date string to the German format and prepends it with a translated message.
+ * The input date is adjusted by subtracting one day before formatting.
+ * @param {string | undefined} dateString - The ISO date string to be formatted, or undefined if no date is provided.
+ * @returns {string} The translated string followed by the formatted date in German format (dd.MM.yyyy), or an empty string if the input is invalid.
+ */
+export function formatDate(dateString: string | undefined, t: (key: string) => string): string {
+  if (!dateString) return '';
+  const date: Date = new Date(dateString);
+
+  // Subtract one day
+  date.setDate(date.getDate() - 1);
+
+  // Return the translated string followed by the formatted date
+  return `${t('admin.befristung.unlimitedUntil')} ${new Intl.DateTimeFormat('de-DE', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(date)}`;
+}

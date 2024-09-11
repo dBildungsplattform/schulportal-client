@@ -33,10 +33,15 @@
     useTwoFactorAuthentificationStore,
     type TwoFactorAuthentificationStore,
   } from '@/stores/TwoFactorAuthentificationStore';
-  import BefristungComponent from '@/components/admin/personen/BefristungComponent.vue';
-  import { getNextSchuljahresende, formatDateToISO } from '@/utils/dateUtils';
-  import { isBefristungspflichtRolle, useBefristungUtils, type BefristungUtilsType } from '@/utils/befristungUtils';
-  import { getPersonenkontextFieldDefinitions, getValidationSchema, isLernRolle, type PersonenkontextFieldDefinitions } from '@/utils/validationPersonenkontext';
+  import BefristungInput from '@/components/admin/personen/BefristungInput.vue';
+  import { getNextSchuljahresende, formatDateToISO, formatDate } from '@/utils/date';
+  import { isBefristungspflichtRolle, useBefristungUtils, type BefristungUtilsType } from '@/utils/befristung';
+  import {
+    getPersonenkontextFieldDefinitions,
+    getValidationSchema,
+    isLernRolle,
+    type PersonenkontextFieldDefinitions,
+  } from '@/utils/validationPersonenkontext';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
@@ -708,22 +713,6 @@
 
   setupWatchers();
 
-  const formatDate = (dateString: string | undefined): string => {
-  if (!dateString) return '';
-  const date: Date = new Date(dateString);
-  
-  // Subtract one day
-  date.setDate(date.getDate() - 1);
-
-  // Return the translated string followed by the formatted date
-  return `${t('admin.befristung.unlimitedUntil')} ${new Intl.DateTimeFormat('de-DE', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit'
-  }).format(date)}`;
-};
-
-
   // Computed property to check if the second radio button should be disabled
   const isUnbefristetButtonDisabled: ComputedRef<boolean> = computed(() => {
     return isBefristungspflichtRolle(selectedRolle.value);
@@ -1071,11 +1060,11 @@
               :data-testid="`person-zuordnung-${zuordnung.sskId}`"
               :title="zuordnung.sskName"
             >
-            <span class="text-body">
-  {{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
-  {{ zuordnung.klasse }}
-  <span v-if="zuordnung.befristung"> ({{ formatDate(zuordnung.befristung) }})</span>
-</span>
+              <span class="text-body">
+                {{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
+                {{ zuordnung.klasse }}
+                <span v-if="zuordnung.befristung"> ({{ formatDate(zuordnung.befristung, t) }})</span>
+              </span>
             </v-col>
           </v-row>
           <!-- Display 'Keine Zuordnungen gefunden' if the above condition is false -->
@@ -1145,9 +1134,17 @@
                   >
                     {{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
                     {{ zuordnung.klasse }}
-                    <span v-if="zuordnung.befristung &&  newZuordnung &&
+                    <span
+                      v-if="
+                        zuordnung.befristung &&
+                        newZuordnung &&
                         zuordnung.sskId === newZuordnung.sskId &&
-                        zuordnung.rolleId === newZuordnung.rolleId" class="text-body text-green"> ({{ formatDate(zuordnung.befristung) }})</span>
+                        zuordnung.rolleId === newZuordnung.rolleId
+                      "
+                      class="text-body text-green"
+                    >
+                      ({{ formatDate(zuordnung.befristung, t) }})</span
+                    >
                     <span
                       v-if="
                         newZuordnung &&
@@ -1406,7 +1403,7 @@
                 />
                 <!-- Befristung -->
                 <div v-if="selectedOrganisation && selectedRolle">
-                  <BefristungComponent
+                  <BefristungInput
                     v-if="selectedOrganisation && selectedRolle"
                     :befristungProps="selectedBefristungProps"
                     :befristungOptionProps="selectedBefristungOptionProps"

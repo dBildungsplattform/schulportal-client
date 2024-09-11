@@ -1,5 +1,5 @@
 import { watch, type ComputedRef, type Ref } from 'vue';
-import { getNextSchuljahresende } from './dateUtils';
+import { getNextSchuljahresende } from './date';
 import type { useForm } from 'vee-validate';
 import { useRollen, type TranslatedRolleWithAttrs } from '@/composables/useRollen';
 import { RollenMerkmal } from '@/stores/RolleStore';

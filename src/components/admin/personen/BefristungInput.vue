@@ -74,7 +74,6 @@
       <v-text-field
         v-model="localBefristung"
         v-bind="befristungProps"
-        prepend-icon=""
         variant="outlined"
         placeholder="TT.MM.JJJJ"
         color="primary"
