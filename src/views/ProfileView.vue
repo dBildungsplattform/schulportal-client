@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import { ref, type Ref, onBeforeMount } from 'vue';
+  import { onBeforeMount, ref, type ComputedRef, type Ref } from 'vue';
   import { useI18n } from 'vue-i18n';
   const { t }: { t: Function } = useI18n();
   type LabelValue = {
@@ -9,11 +9,14 @@
     value: string;
   };
 
-  import { usePersonInfoStore, type PersonInfoStore, type PersonInfoResponse } from '@/stores/PersonInfoStore';
-  import { type Zuordnung } from '@/stores/PersonenkontextStore';
   import { OrganisationsTyp } from '@/stores/OrganisationStore';
-  import { type RouteLocationNormalizedLoaded, type Router, useRoute, useRouter } from 'vue-router';
+  import { usePersonInfoStore, type PersonInfoResponse, type PersonInfoStore } from '@/stores/PersonInfoStore';
   import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
+  import { type Zuordnung } from '@/stores/PersonenkontextStore';
+  import type { TwoFactorAuthentificationStore } from '@/stores/TwoFactorAuthentificationStore';
+  import { useTwoFactorAuthentificationStore } from '@/stores/TwoFactorAuthentificationStore';
+  import { computed } from 'vue';
+  import { useRoute, useRouter, type RouteLocationNormalizedLoaded, type Router } from 'vue-router';
 
   const route: RouteLocationNormalizedLoaded = useRoute();
   const router: Router = useRouter();
@@ -28,10 +31,15 @@
 
   let personInfoStore: PersonInfoStore = usePersonInfoStore();
   let personStore: PersonStore = usePersonStore();
+  let twoFactorAuthenticationStore: TwoFactorAuthentificationStore = useTwoFactorAuthentificationStore();
   const personalData: Ref = ref<LabelValue[]>([]);
   const schulDaten: Ref = ref<SchulDaten[]>([]);
 
-  let isTwoFactorAuthConnected: boolean = false;
+  const twoFactorAuthError: ComputedRef<string> = computed(() => {
+    if (twoFactorAuthenticationStore.loading) return '';
+    if (twoFactorAuthenticationStore.errorCode) return t('profile.twoFactorAuthenticationConnectionError');
+    return '';
+  });
 
   function handleGoToPreviousPage(): void {
     const previousUrl: string | null = sessionStorage.getItem('previousUrl');
@@ -412,23 +420,25 @@
               class="w-100"
               icon="mdi-shield-account-outline"
             ></v-icon>
-            <div v-if="isTwoFactorAuthConnected">
+            <v-col>
+              <p
+                v-if="twoFactorAuthError"
+                class="pt-4 text-center text-body-1 text-medium-emphasis"
+              >
+                <v-icon
+                  color="warning"
+                  icon="mdi-alert-outline"
+                ></v-icon>
+                {{ twoFactorAuthError }}
+              </p>
               <v-btn
+                v-else
                 color="primary"
                 disabled
               >
                 {{ $t('profile.setupTwoFactorAuth') }}
               </v-btn>
-            </div>
-            <div v-else>
-              <p class="pt-4 text-center text-body-1 text-medium-emphasis">
-                <v-icon
-                  color="warning"
-                  icon="mdi-alert-outline"
-                ></v-icon>
-                {{ $t('profile.twoFactorAuthenticationConnectionError') }}
-              </p>
-            </div>
+            </v-col>
           </v-row>
         </LayoutCard>
       </v-col>
