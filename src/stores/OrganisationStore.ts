@@ -158,7 +158,7 @@ export const useOrganisationStore: StoreDefinition<
           // The total number of all Schulen before applying pagination (To use in the Result table to show all Einträge)
           this.totalSchulen = +response.headers['x-paging-total'];
           // The paginated total number to show in the autocomplete filters.
-          this.totalPaginatedSchulen = +response.headers['x-paging-pagetotal']
+          this.totalPaginatedSchulen = +response.headers['x-paging-pagetotal'];
         } else {
           this.allOrganisationen = response.data;
           this.totalOrganisationen = +response.headers['x-paging-total'];
@@ -190,7 +190,7 @@ export const useOrganisationStore: StoreDefinition<
         );
         this.klassen = response.data;
         this.totalKlassen = +response.headers['x-paging-total'];
-        this.totalPaginatedKlassen =  +response.headers['x-paging-pagetotal'];
+        this.totalPaginatedKlassen = +response.headers['x-paging-pagetotal'];
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
