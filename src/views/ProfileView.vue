@@ -208,7 +208,7 @@
     window.location.href = url.toString();
   }
 
-  function checkHasPersMerkmal(): void {
+  function hasKoPersMerkmalCheck(): void {
     let zuordnungen: Array<DBiamPersonenzuordnungResponse> | undefined = personStore.personenuebersicht?.zuordnungen;
     if (zuordnungen !== undefined) {
       let result: boolean = !!zuordnungen.find((zuordnung: DBiamPersonenzuordnungResponse) => {
@@ -219,7 +219,7 @@
   }
   onBeforeMount(async () => {
     await initializeStores();
-    checkHasPersMerkmal();
+    hasKoPersMerkmalCheck();
     setupPersonalData();
     setupSchuleData();
   });
