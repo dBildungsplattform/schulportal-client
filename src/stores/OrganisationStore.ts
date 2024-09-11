@@ -8,6 +8,7 @@ import {
   type CreateOrganisationBodyParams,
   type RollenSystemRecht,
   type OrganisationByNameBodyParams,
+  type ParentOrganisationenResponse,
 } from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
 
@@ -65,6 +66,7 @@ type OrganisationState = {
   errorCode: string;
   loading: boolean;
   loadingKlassen: boolean;
+  parentOrganisationen: Array<Organisation>;
 };
 
 export type OrganisationenFilter = {
@@ -84,6 +86,7 @@ type OrganisationActions = {
   getFilteredKlassen(filter?: OrganisationenFilter): Promise<void>;
   getKlassenByOrganisationId: (organisationId: string, filter?: OrganisationenFilter) => Promise<void>;
   getOrganisationById: (organisationId: string, organisationsTyp: OrganisationsTyp) => Promise<Organisation>;
+  getParentOrganisationsByIds: (organisationIds: string[]) => Promise<Organisation[]>;
   createOrganisation: (
     kennung: string,
     name: string,
@@ -127,6 +130,7 @@ export const useOrganisationStore: StoreDefinition<
       errorCode: '',
       loading: false,
       loadingKlassen: false,
+      parentOrganisationen: [],
     };
   },
 
@@ -154,7 +158,7 @@ export const useOrganisationStore: StoreDefinition<
           // The total number of all Schulen before applying pagination (To use in the Result table to show all Einträge)
           this.totalSchulen = +response.headers['x-paging-total'];
           // The paginated total number to show in the autocomplete filters.
-          this.totalPaginatedSchulen = +response.headers['x-paging-pagetotal']
+          this.totalPaginatedSchulen = +response.headers['x-paging-pagetotal'];
         } else {
           this.allOrganisationen = response.data;
           this.totalOrganisationen = +response.headers['x-paging-total'];
@@ -186,7 +190,7 @@ export const useOrganisationStore: StoreDefinition<
         );
         this.klassen = response.data;
         this.totalKlassen = +response.headers['x-paging-total'];
-        this.totalPaginatedKlassen =  +response.headers['x-paging-pagetotal'];
+        this.totalPaginatedKlassen = +response.headers['x-paging-pagetotal'];
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
@@ -211,6 +215,26 @@ export const useOrganisationStore: StoreDefinition<
         }
 
         return data;
+      } catch (error: unknown) {
+        this.errorCode = 'UNSPECIFIED_ERROR';
+        if (isAxiosError(error)) {
+          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
+        }
+        return await Promise.reject(this.errorCode);
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async getParentOrganisationsByIds(organisationIds: string[]) {
+      this.errorCode = '';
+      this.loading = true;
+      try {
+        const response: AxiosResponse<ParentOrganisationenResponse, unknown> =
+          await organisationApi.organisationControllerGetParentsByIds({ organisationIds: organisationIds });
+        const { parents }: ParentOrganisationenResponse = response.data;
+        this.parentOrganisationen = parents;
+        return parents;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
