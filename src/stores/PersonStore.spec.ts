@@ -1,9 +1,12 @@
+/* eslint-disable @typescript-eslint/typedef */
 import {
   OrganisationsTyp,
   RollenMerkmal,
+  Vertrauensstufe,
   type DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response,
   type DBiamPersonenuebersichtResponse,
   type PersonFrontendControllerFindPersons200Response,
+  type PersonLockResponse,
   type PersonendatensatzResponse,
 } from '@/api-client/generated';
 import { usePersonStore, type PersonStore, type Personendatensatz } from './PersonStore';
@@ -13,6 +16,36 @@ import { setActivePinia, createPinia } from 'pinia';
 import { rejects } from 'assert';
 
 const mockadapter: MockAdapter = new MockAdapter(ApiService);
+function getMockPersonendatensatz(): Personendatensatz {
+  return {
+    person: {
+      id: '123456',
+      name: {
+        familienname: 'Vimes',
+        vorname: 'Susan',
+      },
+      referrer: '6978',
+      personalnummer: '9183756',
+      isLocked: false,
+      lockInfo: null,
+    },
+  };
+}
+function getMockPersonendatensatzResponse(): PersonendatensatzResponse {
+  return {
+    person: {
+      ...getMockPersonendatensatz().person,
+      mandant: '',
+      geburt: {},
+      stammorganisation: '',
+      geschlecht: '',
+      lokalisierung: '',
+      vertrauensstufe: Vertrauensstufe.Teil,
+      revision: '',
+      startpasswort: '',
+    },
+  };
+}
 
 describe('PersonStore', () => {
   let personStore: PersonStore;
@@ -31,24 +64,8 @@ describe('PersonStore', () => {
     it('should load persons and their overviews, and update state', async () => {
       // Mock data for persons
       const mockPersons: PersonendatensatzResponse[] = [
-        {
-          person: {
-            id: '1234',
-            name: {
-              familienname: 'Vimes',
-              vorname: 'Samuel',
-            },
-          },
-        },
-        {
-          person: {
-            id: '5678',
-            name: {
-              familienname: 'von Lipwig',
-              vorname: 'Moist',
-            },
-          },
-        },
+        getMockPersonendatensatz(),
+        getMockPersonendatensatz(),
       ] as PersonendatensatzResponse[];
 
       // Mock response for persons
@@ -82,6 +99,7 @@ describe('PersonStore', () => {
                 administriertVon: 'string',
                 editable: true,
                 merkmale: [] as unknown as RollenMerkmal,
+                befristung: '2025-04-05',
               },
             ],
           },
@@ -91,9 +109,77 @@ describe('PersonStore', () => {
       mockadapter.onGet('/api/personen-frontend').replyOnce(200, mockPersonsResponse);
 
       // Update the mock POST request with the appropriate body
-      const personIds: Array<string> = mockPersons.map((person: PersonendatensatzResponse) => person.person.id);
+      const personIds: string[] = mockPersons.map((person: PersonendatensatzResponse) => person.person.id);
       mockadapter.onPost('/api/dbiam/personenuebersicht', { personIds }).replyOnce(200, mockUebersichten);
 
+      const getAllPersonsPromise: Promise<void> = personStore.getAllPersons({});
+      expect(personStore.loading).toBe(true);
+      await getAllPersonsPromise;
+      expect(personStore.loading).toBe(false);
+    });
+
+    it('should load persons according to filter', async () => {
+      const mockPersons: PersonendatensatzResponse[] = [
+        {
+          person: {
+            id: '123456',
+            name: {
+              familienname: 'Vimes',
+              vorname: 'Susan',
+            },
+          },
+        },
+      ] as PersonendatensatzResponse[];
+
+      const mockPersonsResponse: PersonFrontendControllerFindPersons200Response = {
+        offset: 0,
+        limit: 2,
+        total: 2,
+        items: mockPersons,
+      };
+
+      mockadapter.onGet('/api/personen-frontend').replyOnce(200, mockPersonsResponse);
+
+      const personIds: string[] = mockPersons.map((person: PersonendatensatzResponse) => person.person.id);
+      mockadapter.onPost('/api/dbiam/personenuebersicht', { personIds }).replyOnce(500, 'Some error occurred');
+
+      const getAllPersonsPromise: Promise<void> = personStore.getAllPersons({});
+      expect(personStore.loading).toBe(true);
+      await getAllPersonsPromise;
+      expect(personStore.loading).toBe(false);
+      expect(personStore.errorCode).toEqual('UNSPECIFIED_ERROR');
+    });
+
+    it('should handle error code in response', async () => {
+      const mockPersons: PersonendatensatzResponse[] = [
+        {
+          person: {
+            id: '1234',
+            name: {
+              familienname: 'Vimes',
+              vorname: 'Samuel',
+            },
+          },
+        },
+        {
+          person: {
+            id: '5678',
+            name: {
+              familienname: 'von Lipwig',
+              vorname: 'Moist',
+            },
+          },
+        },
+      ] as PersonendatensatzResponse[];
+
+      // Mock response for persons
+      const mockPersonsResponse: PersonFrontendControllerFindPersons200Response = {
+        offset: 0,
+        limit: 2,
+        total: 2,
+        items: mockPersons,
+      };
+      mockadapter.onGet('/api/personen-frontend').replyOnce(200, mockPersonsResponse, {});
       const getAllPersonsPromise: Promise<void> = personStore.getAllPersons({});
       expect(personStore.loading).toBe(true);
       await getAllPersonsPromise;
@@ -138,6 +224,13 @@ describe('PersonStore', () => {
       expect(personStore.loading).toBe(true);
       await getAllPersonsPromise;
       expect(personStore.loading).toBe(false);
+    });
+
+    it('should handle string error', async () => {
+      mockadapter.onGet('/api/personen-frontend').replyOnce(500, 'some mock server error');
+      const getAllPersonPromise: Promise<void> = personStore.getAllPersons({});
+      expect(personStore.loading).toBe(true);
+      await getAllPersonPromise;
       expect(personStore.errorCode).toEqual('UNSPECIFIED_ERROR');
     });
 
@@ -185,17 +278,8 @@ describe('PersonStore', () => {
 
   describe('getPersonById', () => {
     it('should load Person and update state', async () => {
-      const mockPerson: PersonendatensatzResponse = {
-        person: {
-          id: '1234',
-          name: {
-            familienname: 'Vimes',
-            vorname: 'Samuel',
-          },
-        },
-      } as PersonendatensatzResponse;
-
-      const mockResponse: PersonendatensatzResponse = mockPerson;
+      const mockPerson: Personendatensatz = getMockPersonendatensatz();
+      const mockResponse: PersonendatensatzResponse = getMockPersonendatensatzResponse();
 
       mockadapter.onGet('/api/personen/1234').replyOnce(200, mockResponse);
       const getPersonByIdPromise: Promise<Personendatensatz> = personStore.getPersonById('1234');
@@ -314,6 +398,7 @@ describe('PersonStore', () => {
             administriertVon: 'string',
             editable: true,
             merkmale: [] as unknown as RollenMerkmal,
+            befristung: '2025-04-05',
           },
         ],
       };
@@ -345,6 +430,54 @@ describe('PersonStore', () => {
     });
   });
 
+  describe('lockPerson', () => {
+    it('should lock the person and update state', async () => {
+      const lock: boolean = true;
+      const lockedFrom: string = 'admin';
+
+      const mockPerson: PersonendatensatzResponse = getMockPersonendatensatzResponse();
+
+      const mockResponse: PersonLockResponse = {
+        message: 'User has been successfully locked.',
+      };
+
+      mockadapter.onPut(`/api/personen/${mockPerson.person.id}/lock-user`).replyOnce(200, mockResponse);
+      mockadapter.onGet(`/api/personen/${mockPerson.person.id}`).replyOnce(200, mockPerson);
+
+      const lockPersonPromise: Promise<void> = personStore.lockPerson(mockPerson.person.id, lock, lockedFrom);
+      expect(personStore.loading).toBe(true);
+      expect(lockPersonPromise).resolves.toBeUndefined();
+      await lockPersonPromise;
+      expect(personStore.loading).toBe(false);
+    });
+
+    it('should handle string error', async () => {
+      const personId: string = '1234';
+      const lock: boolean = true;
+      const lockedFrom: string = 'admin';
+
+      mockadapter.onPut(`/api/personen/${personId}/lock-user`).replyOnce(500, 'some mock server error');
+      const lockPersonPromise: Promise<void> = personStore.lockPerson(personId, lock, lockedFrom);
+      expect(personStore.loading).toBe(true);
+      await rejects(lockPersonPromise);
+      expect(personStore.errorCode).toEqual('UNSPECIFIED_ERROR');
+      expect(personStore.loading).toBe(false);
+    });
+
+    it('should handle error code', async () => {
+      const personId: string = '1234';
+      const lock: boolean = true;
+      const lockedFrom: string = 'admin';
+
+      mockadapter.onPut(`/api/personen/${personId}/lock-user`).replyOnce(500, { code: 'some mock server error' });
+      const lockPersonPromise: Promise<void> = personStore.lockPerson(personId, lock, lockedFrom);
+      expect(personStore.loading).toBe(true);
+      await rejects(lockPersonPromise);
+      expect(personStore.errorCode).toEqual('some mock server error');
+      expect(personStore.loading).toBe(false);
+    });
+  });
+
   describe('resetState', () => {
     it('should reset state', () => {
       personStore.errorCode = 'some error';
@@ -358,7 +491,7 @@ describe('PersonStore', () => {
             vorname: 'Samuel',
           },
         },
-      } as PersonendatensatzResponse;
+      } as Personendatensatz;
 
       personStore.resetState();
       expect(personStore.errorCode).toEqual('');

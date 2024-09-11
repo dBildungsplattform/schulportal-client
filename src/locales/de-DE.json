@@ -8,6 +8,20 @@
         "required": "Die Administrationsebene muss ausgewählt werden."
       }
     },
+    "befristung": {
+      "assignBefristung": "Befristung zuordnen",
+      "befristung": "Befristung",
+      "rules": {
+        "required": "Die Befristung muss eingegeben werden.",
+        "format": "Die Befristung muss im Format DD.MM.JJJJ. eingegeben werden.",
+        "pastDateNotAllowed": "Das eingegebene Datum darf nicht in der Vergangenheit liegen."
+      },
+      "selectBefristung": "Befristung auswählen",
+      "unlimited": "Unbefristet",
+      "unlimitedSuccessTemplate": "unbefristet",
+      "unlimitedInactive": "Diese Option kann für Rollen mit Befristungspflicht nicht ausgewählt werden.",
+      "untilEndOfSchoolYear": "Bis Schuljahresende"
+    },
     "mandatoryFieldsNotice": "Mit * markierte Felder sind Pflichtangaben.",
     "followingDataCreated": "Folgende Daten wurden gespeichert:",
     "headline": "Administrationsbereich",
@@ -139,6 +153,7 @@
       "deletePersonConfirmation": "Wollen Sie den Benutzer {firstname} {lastname} sofort und endgültig löschen?",
       "deletePersonSuccessMessage": "{firstname} {lastname} wurde erfolgreich gelöscht",
       "discard": "Benutzer verwerfen",
+      "disableUser": "Benutzer sperren",
       "edit": "Benutzer bearbeiten",
       "generatedPassword": "Generiertes Passwort",
       "noKopersNr": "KoPers.-Nr. nicht vorhanden",
@@ -427,6 +442,15 @@
     "klasse": "Klasse",
     "kopersNr": "KoPers.-Nr.",
     "lastName": "Nachname",
+    "userIsLocked": "Dieser Benutzer ist gesperrt.",
+    "userIsUnlocked": "Dieser Benutzer ist aktiv.",
+    "lockUser": "Benutzer sperren",
+    "lockUserInfoText": "Für die Dauer der Sperre hat der Benutzer keinen Zugriff mehr auf das Schulportal SH und die daran angeschlossenen Dienste.",
+    "lockedBy": "Gesperrt durch",
+    "unlockUser": "Benutzer entsperren",
+    "unLockUserInfoText": "Ich bestätige, dass ich mit der sperrenden Stelle geklärt habe, dass die Sperre aufgehoben werden darf.",
+    "lockError": "Der Benutzer konnte nicht gesperrt werden.",
+    "unlockError": "Der Benutzer konnte nicht entsperrt werden.",
     "modifyBefristung": "Befristung bearbeiten",
     "modifyBefristungDescription": "Ändert die Befristung der Zuordnung des Benutzers zu dieser Schule.",
     "noChangesToSave": "Es liegen keine zu speichernden Änderungen vor.",
@@ -468,6 +492,7 @@
     "errorPasswordChange": "Ihr Passwort konnte nicht geändert werden. Bitte versuchen Sie es später erneut."
   },
   "save": "Speichern",
+  "since": "Seit",
   "refreshData": "Daten aktualisieren",
   "resetFilter": "Filter zurücksetzen",
   "search": "Suchen",
