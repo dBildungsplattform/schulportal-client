@@ -64,7 +64,7 @@
   );
 
   const schulen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
-    return organisationStore.allSchulen
+    return organisationStore.allOrganisationen
       .map((org: Organisation) => ({
         value: org.id,
         title: `${org.kennung} (${org.name})`,
@@ -223,7 +223,7 @@
     timerId = setTimeout(() => {
       organisationStore.getAllOrganisationen({
         searchString: searchValue,
-        includeTyp: OrganisationsTyp.Schule,
+        excludeTyp: [OrganisationsTyp.Klasse],
         limit: 25,
         systemrechte: ['PERSONEN_VERWALTEN'],
         organisationIds: selectedSchulen.value,
@@ -249,7 +249,7 @@
     }
 
     await organisationStore.getAllOrganisationen({
-      includeTyp: OrganisationsTyp.Schule,
+      excludeTyp: [OrganisationsTyp.Klasse],
       systemrechte: ['PERSONEN_VERWALTEN'],
       limit: 25,
       organisationIds: selectedSchulen.value,
@@ -338,8 +338,8 @@
                   >{{
                     $t(
                       'admin.schule.schulenFound',
-                      { count: organisationStore.totalPaginatedSchulen },
-                      organisationStore.totalPaginatedSchulen,
+                      { count: organisationStore.totalPaginatedOrganisationen },
+                      organisationStore.totalPaginatedOrganisationen,
                     )
                   }}</span
                 >
