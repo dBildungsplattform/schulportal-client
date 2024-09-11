@@ -1,11 +1,17 @@
 <script setup lang="ts">
-  import { defineProps, ref, watch, type ModelRef, type Ref } from 'vue';
+  import { computed, defineProps, ref, watch, type ComputedRef, type ModelRef, type Ref } from 'vue';
   import { type BaseFieldProps } from 'vee-validate';
   import FormWrapper from '@/components/form/FormWrapper.vue';
   import FormRow from '@/components/form/FormRow.vue';
   import type { TranslatedObject } from '@/types';
+  import { type PersonenkontextStore, usePersonenkontextStore } from '@/stores/PersonenkontextStore';
 
   const hasAutoselectedSchule: Ref<boolean> = ref(false);
+  const searchInputSchule: Ref<string> = ref('');
+  const timerId: Ref<ReturnType<typeof setTimeout> | undefined> = ref<ReturnType<typeof setTimeout>>();
+  let isSearching: boolean = false;
+
+  const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
 
   type Props = {
     schulen?: Array<{ value: string; title: string }>;
@@ -14,7 +20,6 @@
     selectedKlassennameProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     showUnsavedChangesDialog?: boolean;
     isEditActive?: boolean;
-    isSearching?: boolean;
     onHandleConfirmUnsavedChanges: () => void;
     onHandleDiscard: () => void;
     onShowDialogChange: (value?: boolean) => void;
@@ -23,20 +28,53 @@
 
   const props: Props = defineProps<Props>();
 
-  const selectedSchule: ModelRef<unknown, string> = defineModel('selectedSchule');
-  const selectedKlassenname: ModelRef<unknown, string> = defineModel('selectedKlassenname');
+  const selectedSchule: ModelRef<string | undefined, string> = defineModel('selectedSchule');
+  const selectedKlassenname: ModelRef<string | undefined, string> = defineModel('selectedKlassenname');
 
   // Watcher for schulen to auto-select if there is only one
   watch(
     () => props.schulen,
     (newSchulen: TranslatedObject[] | undefined) => {
-      if (!props.isSearching && newSchulen && newSchulen.length === 1) {
+      if (!isSearching && newSchulen && newSchulen.length === 1) {
         hasAutoselectedSchule.value = true;
         selectedSchule.value = newSchulen[0]?.value || '';
       }
     },
     { immediate: true },
   );
+
+  const selectedSchuleTitle: ComputedRef<string> = computed(() => {
+    return props.schulen?.find((schule: TranslatedObject) => schule.value === selectedSchule.value)?.title || '';
+  });
+
+  // Watcher to detect when the search input for Organisationen is triggered.
+  watch(searchInputSchule, async (newValue: string, oldValue: string) => {
+    clearTimeout(timerId.value);
+    isSearching = !!newValue;
+    if (oldValue === selectedSchuleTitle.value) return;
+
+    if (newValue === '' && !selectedSchule.value) {
+      timerId.value = setTimeout(async () => {
+        await personenkontextStore.processWorkflowStep({
+          limit: 25,
+        });
+      }, 500);
+    } else if (newValue && newValue !== selectedSchuleTitle.value) {
+      timerId.value = setTimeout(async () => {
+        await personenkontextStore.processWorkflowStep({
+          organisationName: newValue,
+          limit: 25,
+        });
+      }, 500);
+    } else if (newValue === '' && selectedSchule.value) {
+      timerId.value = setTimeout(async () => {
+        await personenkontextStore.processWorkflowStep({
+          organisationId: selectedSchule.value,
+          limit: 25,
+        });
+      }, 500);
+    }
+  });
 </script>
 
 <template data-test-id="klasse-form">
@@ -78,6 +116,7 @@
         variant="outlined"
         v-bind="selectedSchuleProps"
         v-model="selectedSchule"
+        v-model:search="searchInputSchule"
         hide-details
       ></v-autocomplete>
     </FormRow>

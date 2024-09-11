@@ -740,6 +740,68 @@
                 ]
             }
         },
+        "/api/personen/{personId}/lock-user": {
+            "put": {
+                "operationId": "PersonController_lockPerson",
+                "parameters": [
+                    {
+                        "name": "personId",
+                        "required": true,
+                        "in": "path",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/LockUserBodyParams"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "User has been successfully updated.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PersonLockResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Insufficient permissions to perform operation."
+                    },
+                    "404": {
+                        "description": "The person was not found."
+                    },
+                    "500": {
+                        "description": "An internal server error occurred."
+                    },
+                    "502": {
+                        "description": "A downstream server returned an error."
+                    }
+                },
+                "tags": [
+                    "personen"
+                ],
+                "security": [
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
         "/api/personen-frontend": {
             "get": {
                 "operationId": "PersonFrontendController_findPersons",
@@ -1201,6 +1263,17 @@
                                 "type": "string"
                             }
                         }
+                    },
+                    {
+                        "name": "organisationIds",
+                        "required": false,
+                        "in": "query",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
                     }
                 ],
                 "responses": {
@@ -1436,6 +1509,56 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/OrganisationRootChildrenResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Not authorized to get the organizations."
+                    },
+                    "403": {
+                        "description": "Insufficient permissions to get the organizations."
+                    },
+                    "500": {
+                        "description": "Internal server error while getting the organization."
+                    }
+                },
+                "tags": [
+                    "organisationen"
+                ],
+                "security": [
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
+        "/api/organisationen/parents-by-ids": {
+            "post": {
+                "operationId": "OrganisationController_getParentsByIds",
+                "parameters": [],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ParentOrganisationsByIdsBodyParams"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "The parent organizations were successfully pulled.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ParentOrganisationenResponse"
                                 }
                             }
                         }
@@ -3899,6 +4022,14 @@
                     "personalnummer": {
                         "type": "string",
                         "nullable": true
+                    },
+                    "isLocked": {
+                        "type": "boolean",
+                        "nullable": true
+                    },
+                    "lockInfo": {
+                        "type": "object",
+                        "nullable": true
                     }
                 },
                 "required": [
@@ -3913,7 +4044,9 @@
                     "vertrauensstufe",
                     "revision",
                     "startpasswort",
-                    "personalnummer"
+                    "personalnummer",
+                    "isLocked",
+                    "lockInfo"
                 ]
             },
             "PersonendatensatzResponse": {
@@ -4140,6 +4273,34 @@
                 "required": [
                     "name",
                     "revision"
+                ]
+            },
+            "LockUserBodyParams": {
+                "type": "object",
+                "properties": {
+                    "lock": {
+                        "type": "boolean",
+                        "nullable": false
+                    },
+                    "locked_from": {
+                        "type": "string",
+                        "nullable": false
+                    }
+                },
+                "required": [
+                    "lock",
+                    "locked_from"
+                ]
+            },
+            "PersonLockResponse": {
+                "type": "object",
+                "properties": {
+                    "message": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "message"
                 ]
             },
             "OrganisationsTyp": {
@@ -4612,6 +4773,36 @@
                 "required": [
                     "oeffentlich",
                     "ersatz"
+                ]
+            },
+            "ParentOrganisationsByIdsBodyParams": {
+                "type": "object",
+                "properties": {
+                    "organisationIds": {
+                        "description": "The ids of organizations",
+                        "nullable": false,
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "required": [
+                    "organisationIds"
+                ]
+            },
+            "ParentOrganisationenResponse": {
+                "type": "object",
+                "properties": {
+                    "parents": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/OrganisationResponse"
+                        }
+                    }
+                },
+                "required": [
+                    "parents"
                 ]
             },
             "RollenSystemRecht": {
