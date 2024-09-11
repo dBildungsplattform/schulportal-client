@@ -42,7 +42,7 @@ beforeEach(() => {
     },
   ];
 
-  organisationStore.allSchulen = [
+  organisationStore.allOrganisationen = [
     {
       id: '9876',
       name: 'Random Schulname Gymnasium',
