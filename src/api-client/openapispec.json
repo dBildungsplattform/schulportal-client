@@ -136,7 +136,8 @@
                 "description": "The offset of the first item from the list. List starts with index 0."
               },
               "X-Paging-Limit": { "description": "The maximum amount of items returned in one request." },
-              "X-Paging-Total": { "description": "The total amount of items in the list." }
+              "X-Paging-Total": { "description": "The total amount of items in the list." },
+              "X-Paging-pageTotal": { "description": "The total amount of items in the paginated list." }
             },
             "content": {
               "application/json": {
@@ -311,7 +312,8 @@
                 "description": "The offset of the first item from the list. List starts with index 0."
               },
               "X-Paging-Limit": { "description": "The maximum amount of items returned in one request." },
-              "X-Paging-Total": { "description": "The total amount of items in the list." }
+              "X-Paging-Total": { "description": "The total amount of items in the list." },
+              "X-Paging-pageTotal": { "description": "The total amount of items in the paginated list." }
             },
             "content": {
               "application/json": {
@@ -467,7 +469,8 @@
                 "description": "The offset of the first item from the list. List starts with index 0."
               },
               "X-Paging-Limit": { "description": "The maximum amount of items returned in one request." },
-              "X-Paging-Total": { "description": "The total amount of items in the list." }
+              "X-Paging-Total": { "description": "The total amount of items in the list." },
+              "X-Paging-pageTotal": { "description": "The total amount of items in the paginated list." }
             },
             "content": {
               "application/json": {
@@ -629,7 +632,8 @@
                 "description": "The offset of the first item from the list. List starts with index 0."
               },
               "X-Paging-Limit": { "description": "The maximum amount of items returned in one request." },
-              "X-Paging-Total": { "description": "The total amount of items in the list." }
+              "X-Paging-Total": { "description": "The total amount of items in the list." },
+              "X-Paging-pageTotal": { "description": "The total amount of items in the paginated list." }
             },
             "content": {
               "application/json": {
@@ -778,7 +782,8 @@
                 "description": "The offset of the first item from the list. List starts with index 0."
               },
               "X-Paging-Limit": { "description": "The maximum amount of items returned in one request." },
-              "X-Paging-Total": { "description": "The total amount of items in the list." }
+              "X-Paging-Total": { "description": "The total amount of items in the list." },
+              "X-Paging-pageTotal": { "description": "The total amount of items in the paginated list." }
             },
             "content": {
               "application/json": {
@@ -842,7 +847,8 @@
                 "description": "The offset of the first item from the list. List starts with index 0."
               },
               "X-Paging-Limit": { "description": "The maximum amount of items returned in one request." },
-              "X-Paging-Total": { "description": "The total amount of items in the list." }
+              "X-Paging-Total": { "description": "The total amount of items in the list." },
+              "X-Paging-pageTotal": { "description": "The total amount of items in the paginated list." }
             },
             "content": {
               "application/json": {
@@ -939,7 +945,8 @@
                 "description": "The offset of the first item from the list. List starts with index 0."
               },
               "X-Paging-Limit": { "description": "The maximum amount of items returned in one request." },
-              "X-Paging-Total": { "description": "The total amount of items in the list." }
+              "X-Paging-Total": { "description": "The total amount of items in the list." },
+              "X-Paging-pageTotal": { "description": "The total amount of items in the paginated list." }
             },
             "content": {
               "application/json": { "schema": { "$ref": "#/components/schemas/OrganisationResponseLegacy" } }
@@ -993,7 +1000,8 @@
                 "description": "The offset of the first item from the list. List starts with index 0."
               },
               "X-Paging-Limit": { "description": "The maximum amount of items returned in one request." },
-              "X-Paging-Total": { "description": "The total amount of items in the list." }
+              "X-Paging-Total": { "description": "The total amount of items in the list." },
+              "X-Paging-pageTotal": { "description": "The total amount of items in the paginated list." }
             },
             "content": {
               "application/json": {
@@ -1441,7 +1449,8 @@
                 "description": "The offset of the first item from the list. List starts with index 0."
               },
               "X-Paging-Limit": { "description": "The maximum amount of items returned in one request." },
-              "X-Paging-Total": { "description": "The total amount of items in the list." }
+              "X-Paging-Total": { "description": "The total amount of items in the list." },
+              "X-Paging-pageTotal": { "description": "The total amount of items in the paginated list." }
             },
             "content": {
               "application/json": {

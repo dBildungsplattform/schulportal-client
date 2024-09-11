@@ -29,7 +29,6 @@
   import { usePersonenkontextStore, type PersonenkontextStore, type Zuordnung } from '@/stores/PersonenkontextStore';
   import { RollenArt, RollenMerkmal } from '@/stores/RolleStore';
   import { type TranslatedObject } from '@/types.d';
-  import KlasseChange from '@/components/admin/klassen/KlasseChange.vue';
   import TokenReset from '@/components/two-factor-authentication/TokenReset.vue';
   import { toTypedSchema } from '@vee-validate/yup';
   import { useForm, type BaseFieldProps, type TypedSchema } from 'vee-validate';
