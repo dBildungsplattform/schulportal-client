@@ -1,17 +1,15 @@
-import { expect, test } from 'vitest';
-import { VueWrapper, mount } from '@vue/test-utils';
-import PersonManagementView from './PersonManagementView.vue';
-import { usePersonStore, type PersonendatensatzResponse, type PersonStore } from '@/stores/PersonStore';
-import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
-import MockAdapter from 'axios-mock-adapter';
-import ApiService from '@/services/ApiService';
-import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
-import { nextTick } from 'vue';
-import { useRolleStore, type RolleResponse, type RolleStore } from '@/stores/RolleStore';
-import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
 import type { FindRollenResponse } from '@/api-client/generated/api';
+import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
+import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
+import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
+import { useRolleStore, type RolleResponse, type RolleStore, type RollenMerkmal } from '@/stores/RolleStore';
+import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
+import { VueWrapper, mount } from '@vue/test-utils';
+import type WrapperLike from '@vue/test-utils/dist/interfaces/wrapperLike';
+import { expect, test, type MockInstance } from 'vitest';
+import { nextTick } from 'vue';
+import PersonManagementView from './PersonManagementView.vue';
 
-const mockadapter: MockAdapter = new MockAdapter(ApiService);
 let wrapper: VueWrapper | null = null;
 let organisationStore: OrganisationStore;
 let personStore: PersonStore;
@@ -20,8 +18,6 @@ let rolleStore: RolleStore;
 let searchFilterStore: SearchFilterStore;
 
 beforeEach(() => {
-  mockadapter.reset();
-
   document.body.innerHTML = `
     <div>
       <div id="app"></div>
@@ -45,7 +41,8 @@ beforeEach(() => {
       administriertVon: '1',
     },
   ];
-  organisationStore.allOrganisationen = [
+
+  organisationStore.allSchulen = [
     {
       id: '9876',
       name: 'Random Schulname Gymnasium',
@@ -65,6 +62,7 @@ beforeEach(() => {
       administriertVon: '1',
     },
   ];
+
   personenkontextStore.allUebersichten = {
     total: 0,
     offset: 0,
@@ -86,31 +84,51 @@ beforeEach(() => {
             typ: OrganisationsTyp.Klasse,
             administriertVon: 'string',
             editable: true,
+            merkmale: [] as unknown as RollenMerkmal,
+            befristung: '2024-05-06',
           },
         ],
       },
     ],
   };
-  personStore.allPersons = [
+
+  personStore.personenWithUebersicht = [
     {
+      rollen: 'Admin',
+      administrationsebenen: 'Level1',
+      klassen: 'Class1',
       person: {
         id: '1234',
         name: {
           familienname: 'Vimes',
           vorname: 'Samuel',
         },
+        referrer: '123',
+        personalnummer: '46465',
+        isLocked: false,
+        lockInfo: null,
       },
     },
     {
+      rollen: 'User',
+      administrationsebenen: 'Level2',
+      klassen: 'Class2',
       person: {
         id: '5678',
         name: {
           familienname: 'von Lipwig',
           vorname: 'Moist',
         },
+        referrer: '1234',
+        personalnummer: '46471',
+        isLocked: false,
+        lockInfo: null,
       },
     },
-  ] as PersonendatensatzResponse[];
+  ];
+
+  personStore.totalPersons = 2;
+
   personenkontextStore.filteredRollen = {
     moeglicheRollen: [
       {
@@ -148,8 +166,60 @@ beforeEach(() => {
 });
 
 describe('PersonManagementView', () => {
-  test('it renders the person management table', () => {
+  test('it renders person management table', () => {
+    expect(wrapper?.getComponent({ name: 'ResultTable' })).toBeTruthy();
     expect(wrapper?.find('[data-testid="person-table"]').isVisible()).toBe(true);
+  });
+
+  test('it reloads data after changing page', async () => {
+    const schuleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
+    await schuleAutocomplete?.setValue(['9876']);
+    await nextTick();
+
+    const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
+    await klasseAutocomplete?.setValue(['123456']);
+    await nextTick();
+
+    // Mock the getAllPersons method to capture its arguments
+    const getAllPersonsSpy: MockInstance = vi.spyOn(personStore, 'getAllPersons');
+
+    expect(wrapper?.find('.v-pagination__next button.v-btn--disabled').isVisible()).toBe(true);
+    expect(wrapper?.find('.v-data-table-footer__info').text()).toContain('1-2');
+
+    personStore.totalPersons = 50;
+    await nextTick();
+
+    expect(wrapper?.find('.v-data-table-footer__info').text()).toContain('1-30');
+    expect(wrapper?.find('.v-pagination__next button:not(.v-btn--disabled)').isVisible()).toBe(true);
+    await wrapper?.find('.v-pagination__next button:not(.v-btn--disabled)').trigger('click');
+    expect(wrapper?.find('.v-data-table-footer__info').text()).toContain('31-50');
+    // Check if getAllPersons was called with the correct arguments
+    expect(getAllPersonsSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        organisationIDs: ['123456'], // This should be the selectedKlassen value
+      }),
+    );
+    // Clear selectedKlassen and test again
+    await klasseAutocomplete?.setValue([]);
+    await nextTick();
+
+    await wrapper?.find('.v-pagination__prev button:not(.v-btn--disabled)').trigger('click');
+
+    // Now it should use selectedSchulen
+    expect(getAllPersonsSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        organisationIDs: ['9876'], // This should be the selectedSchulen value
+      }),
+    );
+  });
+
+  test('it reloads data after changing limit', async () => {
+    expect(wrapper?.find('.v-data-table-footer__items-per-page').isVisible()).toBe(true);
+    expect(wrapper?.find('.v-data-table-footer__items-per-page').text()).toContain('30');
+
+    const component: WrapperLike | undefined = wrapper?.findComponent('.v-data-table-footer__items-per-page .v-select');
+    await component?.setValue(50);
+    expect(wrapper?.find('.v-data-table-footer__items-per-page').text()).toContain('50');
   });
 
   test('it sets filters', async () => {
@@ -170,5 +240,16 @@ describe('PersonManagementView', () => {
     await nextTick();
 
     expect(klasseAutocomplete?.text()).toEqual('11b');
+  });
+
+  test('it updates Organisation search correctly', async () => {
+    const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
+
+    await organisationAutocomplete?.setValue('org');
+    await nextTick();
+
+    await organisationAutocomplete?.vm.$emit('update:search', '2');
+    await nextTick();
+    expect(organisationStore.getAllOrganisationen).toHaveBeenCalled();
   });
 });

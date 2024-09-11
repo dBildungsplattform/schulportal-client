@@ -9,17 +9,12 @@
     type Organisation,
     OrganisationsTyp,
   } from '@/stores/OrganisationStore';
-  import { usePersonStore, type Person, type PersonStore, type Personendatensatz } from '@/stores/PersonStore';
-  import {
-    usePersonenkontextStore,
-    type PersonenkontextStore,
-    type Uebersicht,
-    type Zuordnung,
-  } from '@/stores/PersonenkontextStore';
+  import { usePersonStore, type PersonStore, type Personendatensatz } from '@/stores/PersonStore';
+  import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
   import { useRolleStore, type RolleStore, type RolleResponse } from '@/stores/RolleStore';
   import { type SearchFilterStore, useSearchFilterStore } from '@/stores/SearchFilterStore';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import ResultTable from '@/components/admin/ResultTable.vue';
+  import ResultTable, { type TableRow } from '@/components/admin/ResultTable.vue';
   import SearchField from '@/components/admin/SearchField.vue';
   import { type TranslatedObject } from '@/types.d';
 
@@ -41,18 +36,11 @@
     { title: t('person.lastName'), key: 'person.name.familienname', align: 'start' },
     { title: t('person.firstName'), key: 'person.name.vorname', align: 'start' },
     { title: t('person.userName'), key: 'person.referrer', align: 'start' },
-    { title: t('person.kopersnr'), key: 'person.personalnummer', align: 'start' },
+    { title: t('person.kopersNr'), key: 'person.personalnummer', align: 'start' },
     { title: t('person.rolle'), key: 'rollen', align: 'start' },
     { title: t('person.zuordnungen'), key: 'administrationsebenen', align: 'start' },
     { title: t('person.klasse'), key: 'klassen', align: 'start' },
   ];
-
-  type PersonenWithRolleAndZuordnung = {
-    rollen: string;
-    administrationsebenen: string;
-    klassen: string;
-    person: Person;
-  }[];
 
   const searchInputKlassen: Ref<string> = ref('');
   const searchInputRollen: Ref<string> = ref('');
@@ -76,8 +64,7 @@
   );
 
   const schulen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
-    return organisationStore.allOrganisationen
-      .slice(0, 25)
+    return organisationStore.allSchulen
       .map((org: Organisation) => ({
         value: org.id,
         title: `${org.kennung} (${org.name})`,
@@ -110,16 +97,51 @@
 
   const statuses: Array<string> = ['Aktiv', 'Inaktiv'];
 
-  function autoSelectSchule(): void {
+  async function getPaginatedPersonen(page: number): Promise<void> {
+    searchFilterStore.personenPage = page;
+    await personStore.getAllPersons({
+      offset: (searchFilterStore.personenPage - 1) * searchFilterStore.personenPerPage,
+      limit: searchFilterStore.personenPerPage,
+      organisationIDs: selectedKlassen.value.length ? selectedKlassen.value : selectedSchulen.value,
+      rolleIDs: searchFilterStore.selectedRollen || selectedRollen.value,
+      searchFilter: searchFilterStore.searchFilter || searchFilter.value,
+    });
+  }
+
+  async function getPaginatedPersonenWithLimit(limit: number): Promise<void> {
+    /* reset page to 1 if entries are equal to or less than selected limit */
+    if (personStore.totalPersons <= limit) {
+      searchFilterStore.personenPage = 1;
+    }
+
+    searchFilterStore.personenPerPage = limit;
+    await personStore.getAllPersons({
+      offset: (searchFilterStore.personenPage - 1) * searchFilterStore.personenPerPage,
+      limit: searchFilterStore.personenPerPage,
+      organisationIDs: searchFilterStore.selectedSchulen || selectedSchulen.value,
+      rolleIDs: searchFilterStore.selectedRollen || selectedRollen.value,
+      searchFilter: searchFilterStore.searchFilter || searchFilter.value,
+    });
+  }
+
+  async function autoSelectSchule(): Promise<void> {
     // Autoselect the Schule for the current user that only has 1 Schule assigned to him.
-    if (organisationStore.allOrganisationen.length === 1) {
-      selectedSchulen.value = [organisationStore.allOrganisationen[0]?.id || ''];
+    if (organisationStore.allSchulen.length === 1) {
+      selectedSchulen.value = [organisationStore.allSchulen[0]?.id || ''];
       hasAutoselectedSchule.value = true;
+      if (selectedSchulen.value.length) {
+        await organisationStore.getFilteredKlassen({
+          administriertVon: selectedSchulen.value,
+          searchString: searchInputKlassen.value,
+        });
+      }
     }
   }
 
   function applySearchAndFilters(): void {
     personStore.getAllPersons({
+      offset: (searchFilterStore.personenPage - 1) * searchFilterStore.personenPerPage,
+      limit: searchFilterStore.personenPerPage,
       organisationIDs: searchFilterStore.selectedKlassen?.length
         ? searchFilterStore.selectedKlassen
         : searchFilterStore.selectedSchulen || [],
@@ -161,6 +183,7 @@
     /* do not reset schulen if schule was autoselected */
     if (!hasAutoselectedSchule.value) {
       selectedSchulen.value = [];
+      searchFilterStore.setSchuleFilter([]);
     }
     searchInputSchulen.value = '';
     searchInputRollen.value = '';
@@ -168,49 +191,14 @@
     selectedRollen.value = [];
     selectedKlassen.value = [];
     selectedStatus.value = null;
-    personStore.getAllPersons({});
-  }
-
-  // Maps over allPersons, finds the corresponding zuordnungen for each person by matching the personId, and then extracts and combines
-  // the rolle values into a single comma separated string. The result is merged with the original person data, adding a new role property.
-  const personenWithUebersicht: ComputedRef<PersonenWithRolleAndZuordnung> = computed(() => {
-    return personStore.allPersons.map((person: Personendatensatz) => {
-      const uebersicht: Uebersicht = personenkontextStore.allUebersichten?.items.find(
-        (ueb: Uebersicht) => ueb?.personId === person.person.id,
-      );
-      const uniqueRollen: Set<string> = new Set<string>();
-      uebersicht?.zuordnungen.forEach((zuordnung: Zuordnung) => uniqueRollen.add(zuordnung.rolle));
-      const rollenZuordnungen: string = uniqueRollen.size > 0 ? Array.from(uniqueRollen).join(', ') : '---';
-
-      // Collect unique administrationsebenen
-      const uniqueAdministrationsebenen: Set<string> = new Set<string>();
-      uebersicht?.zuordnungen
-        .filter((zuordnung: Zuordnung) => zuordnung.typ !== OrganisationsTyp.Klasse)
-        .forEach((zuordnung: Zuordnung) =>
-          uniqueAdministrationsebenen.add(zuordnung.sskDstNr ? zuordnung.sskDstNr : zuordnung.sskName),
-        );
-      const administrationsebenen: string =
-        uniqueAdministrationsebenen.size > 0 ? Array.from(uniqueAdministrationsebenen).join(', ') : '---';
-      // Check if personalnummer is null, if so, replace it with "---"
-      const personalnummer: string = person.person.personalnummer ?? '---';
-      // Check if the uebersicht has a zuordnung of type "Klasse" if no then show directly "---" without filtering or mapping
-      const klassenZuordnungen: string = uebersicht?.zuordnungen.some(
-        (zuordnung: Zuordnung) => zuordnung.typ === OrganisationsTyp.Klasse,
-      )
-        ? uebersicht.zuordnungen
-            .filter((zuordnung: Zuordnung) => zuordnung.typ === OrganisationsTyp.Klasse)
-            .map((zuordnung: Zuordnung) => (zuordnung.sskName.length ? zuordnung.sskName : '---'))
-            .join(', ')
-        : '---';
-      return {
-        ...person,
-        rollen: rollenZuordnungen,
-        administrationsebenen: administrationsebenen,
-        klassen: klassenZuordnungen,
-        person: { ...person.person, personalnummer: personalnummer },
-      };
+    searchFilterStore.personenPage = 1;
+    searchFilterStore.personenPerPage = 30;
+    personStore.getAllPersons({
+      offset: (searchFilterStore.personenPage - 1) * searchFilterStore.personenPerPage,
+      limit: searchFilterStore.personenPerPage,
+      searchFilter: '',
     });
-  });
+  }
 
   const handleSearchFilter = (filter: string): void => {
     searchFilter.value = filter;
@@ -236,7 +224,9 @@
       organisationStore.getAllOrganisationen({
         searchString: searchValue,
         includeTyp: OrganisationsTyp.Schule,
+        limit: 25,
         systemrechte: ['PERSONEN_VERWALTEN'],
+        organisationIds: selectedSchulen.value,
       });
     }, 500);
   }
@@ -252,22 +242,24 @@
   }
 
   onMounted(async () => {
-    if (!filterOrSearchActive.value) {
-      await personStore.getAllPersons({});
-    } else {
+    if (filterOrSearchActive.value) {
       selectedSchulen.value = searchFilterStore.selectedSchulen || [];
       selectedRollen.value = searchFilterStore.selectedRollen || [];
+      selectedKlassen.value = searchFilterStore.selectedKlassen || [];
     }
 
     await organisationStore.getAllOrganisationen({
       includeTyp: OrganisationsTyp.Schule,
       systemrechte: ['PERSONEN_VERWALTEN'],
+      limit: 25,
+      organisationIds: selectedSchulen.value,
     });
     await organisationStore.getFilteredKlassen({
       includeTyp: OrganisationsTyp.Klasse,
       systemrechte: ['KLASSEN_VERWALTEN'],
+      limit: 25,
     });
-    await personenkontextStore.getAllPersonenuebersichten();
+    await getPaginatedPersonen(searchFilterStore.personenPage);
     await personenkontextStore.getPersonenkontextRolleWithFilter('');
 
     autoSelectSchule();
@@ -346,8 +338,8 @@
                   >{{
                     $t(
                       'admin.schule.schulenFound',
-                      { count: organisationStore.totalOrganisationen },
-                      organisationStore.totalOrganisationen,
+                      { count: organisationStore.totalPaginatedSchulen },
+                      organisationStore.totalPaginatedSchulen,
                     )
                   }}</span
                 >
@@ -469,8 +461,8 @@
                         >{{
                           $t(
                             'admin.klasse.klassenFound',
-                            { count: organisationStore.totalKlassen },
-                            organisationStore.totalKlassen,
+                            { count: organisationStore.totalPaginatedKlassen },
+                            organisationStore.totalPaginatedKlassen,
                           )
                         }}</span
                       >
@@ -528,11 +520,18 @@
         ></SearchField>
       </v-row>
       <ResultTable
+        :currentPage="searchFilterStore.personenPage"
         data-testid="person-table"
-        :items="personenWithUebersicht || []"
+        :items="personStore.personenWithUebersicht || []"
+        :itemsPerPage="searchFilterStore.personenPerPage"
         :loading="personStore.loading"
         :headers="headers"
-        @onHandleRowClick="navigateToPersonDetails"
+        @onHandleRowClick="
+          (event: PointerEvent, item: TableRow<unknown>) =>
+            navigateToPersonDetails(event, item as TableRow<Personendatensatz>)
+        "
+        @onItemsPerPageUpdate="getPaginatedPersonenWithLimit"
+        @onPageUpdate="getPaginatedPersonen"
         :totalItems="personStore.totalPersons"
         item-value-path="person.id"
         ><template v-slot:[`item.rollen`]="{ item }">

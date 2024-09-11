@@ -6,7 +6,7 @@
   // Define the type for the props
   type Props = {
     confirmUnsavedChangesAction: () => void;
-    canCommit: boolean;
+    canCommit?: boolean;
     createButtonLabel: string;
     discardButtonLabel: string;
     hideActions?: boolean;
@@ -14,6 +14,7 @@
     onDiscard: () => void;
     onSubmit: () => void;
     showUnsavedChangesDialog?: boolean;
+    centerButtons?: boolean;
   };
   // Type annotation for props
   type PropsWithDefaults = Props & {
@@ -25,7 +26,7 @@
     canCommit: true,
   });
 
-  const emit: (event: 'onShowDialogChange', ...args: unknown[]) => void = defineEmits(['onShowDialogChange']);
+  const emit: (event: 'onShowDialogChange', value?: boolean) => void = defineEmits(['onShowDialogChange']);
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
@@ -68,7 +69,11 @@
       class="py-3 px-2 justify-center"
       v-if="!hideActions"
     >
-      <v-spacer class="hidden-sm-and-down"></v-spacer>
+      <v-spacer
+        class="hidden-sm-and-down"
+        v-if="!centerButtons"
+      >
+      </v-spacer>
       <v-col
         cols="12"
         sm="6"

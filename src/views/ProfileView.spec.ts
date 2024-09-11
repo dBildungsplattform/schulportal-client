@@ -1,14 +1,18 @@
 import { expect, test, beforeEach, describe } from 'vitest';
 import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
-import ProfileView from './ProfileView.vue'; // Ersetze dies durch den korrekten Pfad zu deiner Komponente
+import ProfileView from './ProfileView.vue';
 import { usePersonInfoStore, type PersonInfoResponse, type PersonInfoStore } from '@/stores/PersonInfoStore';
-import { usePersonenkontextStore, type PersonenkontextStore, type Uebersicht } from '@/stores/PersonenkontextStore';
 import { nextTick } from 'vue';
 import { OrganisationsTyp } from '@/stores/OrganisationStore';
+import { createRouter, createMemoryHistory, type Router } from 'vue-router';
+import { useRoute } from 'vue-router';
+import type { RollenMerkmal } from '@/stores/RolleStore';
+import { usePersonStore, type PersonStore, type PersonWithUebersicht } from '@/stores/PersonStore';
 
 let wrapper: VueWrapper | null = null;
 let personInfoStore: PersonInfoStore;
-let personenkontextStore: PersonenkontextStore;
+let personStore: PersonStore;
+let router: Router;
 
 const mockPersonInfo: PersonInfoResponse = {
   person: {
@@ -40,7 +44,7 @@ const mockPersonInfo: PersonInfoResponse = {
   gruppen: [],
 };
 
-const mockUebersicht: Uebersicht = {
+const mockUebersicht: PersonWithUebersicht = {
   personId: '1234',
   vorname: 'Samuel',
   nachname: 'Vimes',
@@ -57,11 +61,13 @@ const mockUebersicht: Uebersicht = {
       administriertVon: 'Admin',
       typ: OrganisationsTyp.Schule,
       editable: true,
+      merkmale: ['KOPERS_PFLICHT'] as unknown as RollenMerkmal,
+      befristung: '2024-05-06',
     },
   ],
 };
 
-beforeEach(() => {
+beforeEach(async () => {
   document.body.innerHTML = `
     <div>
       <div id="app"></div>
@@ -69,21 +75,34 @@ beforeEach(() => {
   `;
 
   personInfoStore = usePersonInfoStore();
-  personenkontextStore = usePersonenkontextStore();
+  personStore = usePersonStore();
 
   personInfoStore.personInfo = mockPersonInfo;
-  personenkontextStore.personenuebersicht = mockUebersicht;
+  personStore.personenuebersicht = mockUebersicht;
+
+  router = createRouter({
+    history: createMemoryHistory(),
+    routes: [
+      {
+        path: '/profil',
+        component: ProfileView,
+      },
+    ],
+  });
+
+  router.push({
+    path: '/profil',
+    query: { kc_action_status: 'some_status' },
+  });
+
+  await router.isReady();
 
   wrapper = mount(ProfileView, {
     attachTo: document.getElementById('app') || '',
     global: {
-      components: {
-        ProfileView,
-      },
+      plugins: [router],
       mocks: {
-        route: {
-          fullPath: 'full/path',
-        },
+        $route: useRoute(),
       },
     },
   });

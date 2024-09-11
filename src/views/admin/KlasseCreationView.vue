@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { ref, type ComputedRef, type Ref, computed, onMounted, watch, onUnmounted } from 'vue';
+  import { ref, type ComputedRef, type Ref, computed, onMounted, onUnmounted } from 'vue';
   import {
     type Router,
     useRouter,
@@ -28,8 +28,6 @@
   const organisationStore: OrganisationStore = useOrganisationStore();
   const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
 
-  const timerId: Ref<ReturnType<typeof setTimeout> | undefined> = ref<ReturnType<typeof setTimeout>>();
-  let isSearching: boolean = false;
   const hasAutoselectedSchule: Ref<boolean> = ref(false);
 
   const validationSchema: TypedSchema = getValidationSchema(t);
@@ -44,7 +42,7 @@
   };
 
   // eslint-disable-next-line @typescript-eslint/typedef
-  const { defineField, handleSubmit, isFieldDirty, resetForm, resetField } = useForm<KlasseCreationForm>({
+  const { defineField, handleSubmit, isFieldDirty, resetForm } = useForm<KlasseCreationForm>({
     validationSchema,
   });
 
@@ -56,8 +54,6 @@
     Ref<string>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedKlassenname', vuetifyConfig);
-
-  const searchInputSchule: Ref<string> = ref('');
 
   const schulen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
     return personenkontextStore.workflowStepResponse?.organisations
@@ -76,39 +72,6 @@
         (schule: TranslatedObject) => schule.value === organisationStore.createdKlasse?.administriertVon,
       )?.title || '',
   );
-
-  const selectedSchuleTitle: ComputedRef<string> = computed(() => {
-    return schulen.value?.find((schule: TranslatedObject) => schule.value === selectedSchule.value)?.title || '';
-  });
-
-  // Watcher to detect when the search input for Organisationen is triggered.
-  watch(searchInputSchule, async (newValue: string, oldValue: string) => {
-    clearTimeout(timerId.value);
-    if (oldValue === selectedSchuleTitle.value) return;
-    isSearching = !!newValue;
-
-    if (newValue === '' && !selectedSchule.value) {
-      timerId.value = setTimeout(async () => {
-        await personenkontextStore.processWorkflowStep({
-          limit: 25,
-        });
-      }, 500);
-    } else if (newValue && newValue !== selectedSchuleTitle.value) {
-      resetField('selectedSchule');
-      timerId.value = setTimeout(async () => {
-        await personenkontextStore.processWorkflowStep({
-          organisationName: newValue,
-          limit: 25,
-        });
-      }, 500);
-    } else if (newValue === '' && selectedSchule.value) {
-      timerId.value = setTimeout(async () => {
-        await personenkontextStore.processWorkflowStep({
-          limit: 25,
-        });
-      }, 500);
-    }
-  });
 
   function isFormDirty(): boolean {
     const schuleDirty: boolean = hasAutoselectedSchule.value ? false : isFieldDirty('selectedSchule');
@@ -134,8 +97,10 @@
   });
 
   const handleCreateAnotherKlasse = async (): Promise<void> => {
+    resetForm();
     organisationStore.createdKlasse = null;
-    await personenkontextStore.processWorkflowStep();
+    personenkontextStore.workflowStepResponse = null;
+    await personenkontextStore.processWorkflowStep({ limit: 25 });
     router.push({ name: 'create-klasse' });
   };
 
@@ -167,20 +132,8 @@
     resetForm();
   });
 
-  // Watcher for schulen to auto-select if there is only one
-  watch(
-    () => schulen.value,
-    (newSchulen: TranslatedObject[] | undefined) => {
-      if (!isSearching && newSchulen && newSchulen.length === 1) {
-        hasAutoselectedSchule.value = true;
-        selectedSchule.value = newSchulen[0]?.value || '';
-      }
-    },
-    { immediate: true },
-  );
-
   onMounted(async () => {
-    await personenkontextStore.processWorkflowStep();
+    await personenkontextStore.processWorkflowStep({ limit: 25 });
     organisationStore.createdKlasse = null;
     organisationStore.errorCode = '';
     /* listen for browser changes and prevent them when form is dirty */
@@ -225,7 +178,7 @@
           :showUnsavedChangesDialog="showUnsavedChangesDialog"
           :onHandleConfirmUnsavedChanges="handleConfirmUnsavedChanges"
           :onHandleDiscard="navigateToKlasseManagement"
-          :onShowDialogChange="(value: boolean) => (showUnsavedChangesDialog = value)"
+          :onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
           :onSubmit="onSubmit"
           ref="klasse-creation-form"
           v-model:selectedSchule="selectedSchule"
