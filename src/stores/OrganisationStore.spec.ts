@@ -197,6 +197,53 @@ describe('OrganisationStore', () => {
     });
   });
 
+  describe('getParentOrganisationsByIds', () => {
+    const mockOrganisationen: Organisation[] = [
+      {
+        id: '1',
+        kennung: 'Org1',
+        name: 'Organisation 1',
+        namensergaenzung: 'Ergänzung',
+        kuerzel: 'O1',
+        typ: OrganisationsTyp.Schule,
+        administriertVon: '1',
+      },
+    ];
+    const requestIds: string[] = mockOrganisationen.map((o: Organisation) => o.id);
+    const mockResponse: { parents: Organisation[] } = {
+      parents: mockOrganisationen,
+    };
+
+    it('should load the Organisations and update state', async () => {
+      mockadapter.onPost('/api/organisationen/parents-by-ids').replyOnce(200, mockResponse);
+      await organisationStore.getParentOrganisationsByIds(requestIds);
+      expect(organisationStore.parentOrganisationen).toEqual(mockOrganisationen);
+      expect(organisationStore.errorCode).toEqual('');
+      expect(organisationStore.loading).toBe(false);
+    });
+
+    it('should handle string error', async () => {
+      mockadapter.onPost('/api/organisationen/parents-by-ids').replyOnce(500, 'some mock server error');
+      const getParentOrganisationsByIdPromise: Promise<Organisation[]> =
+        organisationStore.getParentOrganisationsByIds(requestIds);
+      await rejects(getParentOrganisationsByIdPromise);
+      expect(organisationStore.parentOrganisationen).toEqual([]);
+      expect(organisationStore.errorCode).toEqual('UNSPECIFIED_ERROR');
+      expect(organisationStore.loading).toBe(false);
+    });
+
+    it('should handle error code', async () => {
+      mockadapter.onPost('/api/organisationen/parents-by-ids').replyOnce(500, { code: 'some mock server error' });
+      const getParentOrganisationsByIdPromise: Promise<Organisation[]> =
+        organisationStore.getParentOrganisationsByIds(requestIds);
+      expect(organisationStore.loading).toBe(true);
+      await rejects(getParentOrganisationsByIdPromise);
+      expect(organisationStore.parentOrganisationen).toEqual([]);
+      expect(organisationStore.errorCode).toEqual('some mock server error');
+      expect(organisationStore.loading).toBe(false);
+    });
+  });
+
   describe('getKlassenByOrganisationId', () => {
     it('should fetch all Klassen and update state', async () => {
       const mockResponse: Organisation[] = [
