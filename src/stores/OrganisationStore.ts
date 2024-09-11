@@ -58,6 +58,8 @@ type OrganisationState = {
   createdSchule: Organisation | null;
   totalKlassen: number;
   totalSchulen: number;
+  totalPaginatedSchulen: number;
+  totalPaginatedKlassen: number;
   totalOrganisationen: number;
   klassen: Array<Organisation>;
   errorCode: string;
@@ -118,6 +120,8 @@ export const useOrganisationStore: StoreDefinition<
       createdSchule: null,
       totalKlassen: 0,
       totalSchulen: 0,
+      totalPaginatedSchulen: 0,
+      totalPaginatedKlassen: 0,
       totalOrganisationen: 0,
       klassen: [],
       errorCode: '',
@@ -147,7 +151,10 @@ export const useOrganisationStore: StoreDefinition<
           this.totalKlassen = +response.headers['x-paging-total'];
         } else if (filter?.includeTyp === OrganisationsTyp.Schule) {
           this.allSchulen = response.data;
+          // The total number of all Schulen before applying pagination (To use in the Result table to show all Einträge)
           this.totalSchulen = +response.headers['x-paging-total'];
+          // The paginated total number to show in the autocomplete filters.
+          this.totalPaginatedSchulen = +response.headers['x-paging-pagetotal']
         } else {
           this.allOrganisationen = response.data;
           this.totalOrganisationen = +response.headers['x-paging-total'];
@@ -179,6 +186,7 @@ export const useOrganisationStore: StoreDefinition<
         );
         this.klassen = response.data;
         this.totalKlassen = +response.headers['x-paging-total'];
+        this.totalPaginatedKlassen =  +response.headers['x-paging-pagetotal'];
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
@@ -230,6 +238,7 @@ export const useOrganisationStore: StoreDefinition<
         );
         this.klassen = getFilteredKlassen;
         this.totalKlassen = +response.headers['x-paging-total'];
+        this.totalPaginatedKlassen = +response.headers['x-paging-pageTotal'];
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
