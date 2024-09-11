@@ -6,6 +6,7 @@ import {
   type AssignHardwareTokenResponse,
   type Class2FAApiInterface,
   type TokenInitBodyParams,
+  type TokenRequiredResponse,
   type TokenStateResponse,
 } from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
@@ -26,6 +27,7 @@ type TwoFactorGetters = {};
 type TwoFactorActions = {
   resetState: () => void;
   get2FAState: (personId: string) => Promise<void>;
+  get2FARequirement: (personId: string) => Promise<void>;
   get2FASoftwareQRCode: (personId: string) => Promise<void>;
   assignHardwareToken: (
     assignHardwareTokenBodyParams: AssignHardwareTokenBodyParams,
@@ -91,6 +93,26 @@ export const useTwoFactorAuthentificationStore: StoreDefinition<
             this.tokenKind = null;
         }
         this.serial = twoFactorState.serial;
+      } catch (error: unknown) {
+        this.errorCode = 'UNSPECIFIED_ERROR';
+        if (isAxiosError(error)) {
+          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
+        }
+        return await Promise.reject(this.errorCode);
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async get2FARequirement(personId: string) {
+      this.loading = true;
+      this.required = false;
+      try {
+        const twoFactorState: TokenRequiredResponse = (
+          await twoFactorApi.privacyIdeaAdministrationControllerRequiresTwoFactorAuthentication(personId)
+        ).data;
+
+        this.required = twoFactorState.required;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {

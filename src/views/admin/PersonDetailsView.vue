@@ -766,6 +766,7 @@
       (zuordnung: Zuordnung) => zuordnung.typ === OrganisationsTyp.Klasse,
     );
     await twoFactorAuthentificationStore.get2FAState(currentPersonId);
+    await twoFactorAuthentificationStore.get2FARequirement(currentPersonId);
   });
 </script>
 

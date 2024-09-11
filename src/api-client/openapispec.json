@@ -284,6 +284,9 @@
                             },
                             "X-Paging-Total": {
                                 "description": "The total amount of items in the list."
+                            },
+                            "X-Paging-pageTotal": {
+                                "description": "The total amount of items in the paginated list."
                             }
                         },
                         "content": {
@@ -637,6 +640,9 @@
                             },
                             "X-Paging-Total": {
                                 "description": "The total amount of items in the list."
+                            },
+                            "X-Paging-pageTotal": {
+                                "description": "The total amount of items in the paginated list."
                             }
                         },
                         "content": {
@@ -979,6 +985,9 @@
                             },
                             "X-Paging-Total": {
                                 "description": "The total amount of items in the list."
+                            },
+                            "X-Paging-pageTotal": {
+                                "description": "The total amount of items in the paginated list."
                             }
                         },
                         "content": {
@@ -1288,6 +1297,9 @@
                             },
                             "X-Paging-Total": {
                                 "description": "The total amount of items in the list."
+                            },
+                            "X-Paging-pageTotal": {
+                                "description": "The total amount of items in the paginated list."
                             }
                         },
                         "content": {
@@ -1642,6 +1654,9 @@
                             },
                             "X-Paging-Total": {
                                 "description": "The total amount of items in the list."
+                            },
+                            "X-Paging-pageTotal": {
+                                "description": "The total amount of items in the paginated list."
                             }
                         },
                         "content": {
@@ -1769,6 +1784,9 @@
                             },
                             "X-Paging-Total": {
                                 "description": "The total amount of items in the list."
+                            },
+                            "X-Paging-pageTotal": {
+                                "description": "The total amount of items in the paginated list."
                             }
                         },
                         "content": {
@@ -1959,6 +1977,9 @@
                             },
                             "X-Paging-Total": {
                                 "description": "The total amount of items in the list."
+                            },
+                            "X-Paging-pageTotal": {
+                                "description": "The total amount of items in the paginated list."
                             }
                         },
                         "content": {
@@ -2051,6 +2072,9 @@
                             },
                             "X-Paging-Total": {
                                 "description": "The total amount of items in the list."
+                            },
+                            "X-Paging-pageTotal": {
+                                "description": "The total amount of items in the paginated list."
                             }
                         },
                         "content": {
@@ -2944,6 +2968,9 @@
                             },
                             "X-Paging-Total": {
                                 "description": "The total amount of items in the list."
+                            },
+                            "X-Paging-pageTotal": {
+                                "description": "The total amount of items in the paginated list."
                             }
                         },
                         "content": {
@@ -3581,7 +3608,7 @@
                 ],
                 "responses": {
                     "201": {
-                        "description": "The token was successfully created.",
+                        "description": "The token state was successfully returned.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -3594,16 +3621,16 @@
                         "description": "A username was not given or not found."
                     },
                     "401": {
-                        "description": "Not authorized to create token."
+                        "description": "Not authorized to get token state."
                     },
                     "403": {
-                        "description": "Insufficient permissions to create token."
+                        "description": "Insufficient permissions to get token state."
                     },
                     "404": {
-                        "description": "Insufficient permissions to create token."
+                        "description": "Insufficient permissions to get token state."
                     },
                     "500": {
-                        "description": "Internal server error while creating a token."
+                        "description": "Internal server error while retrieving token state."
                     }
                 },
                 "tags": [
@@ -3660,6 +3687,61 @@
                     },
                     "500": {
                         "description": "Internal server error while assigning a hardware token."
+                    }
+                },
+                "tags": [
+                    "2FA"
+                ],
+                "security": [
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
+        "/api/2fa-token/required": {
+            "get": {
+                "operationId": "PrivacyIdeaAdministrationController_requiresTwoFactorAuthentication",
+                "parameters": [
+                    {
+                        "name": "personId",
+                        "required": true,
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The requirement was successfully returned.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TokenRequiredResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "A username was not given or not found."
+                    },
+                    "401": {
+                        "description": "Not authorized to get requirement information."
+                    },
+                    "403": {
+                        "description": "Insufficient permissions to get requirement information."
+                    },
+                    "404": {
+                        "description": "Insufficient permissions to get requirement information."
+                    },
+                    "500": {
+                        "description": "Internal server error while getting requirement information."
                     }
                 },
                 "tags": [
@@ -5657,16 +5739,12 @@
                     },
                     "serial": {
                         "type": "string"
-                    },
-                    "required": {
-                        "type": "boolean"
                     }
                 },
                 "required": [
                     "hasToken",
                     "tokenKind",
-                    "serial",
-                    "required"
+                    "serial"
                 ]
             },
             "AssignHardwareTokenBodyParams": {
@@ -5725,6 +5803,17 @@
                     "versionnumber",
                     "signature",
                     "dialogText"
+                ]
+            },
+            "TokenRequiredResponse": {
+                "type": "object",
+                "properties": {
+                    "required": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "required"
                 ]
             }
         }
