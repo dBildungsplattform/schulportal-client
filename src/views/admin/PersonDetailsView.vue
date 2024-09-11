@@ -31,6 +31,7 @@
   import { type TranslatedObject } from '@/types.d';
   import { toTypedSchema } from '@vee-validate/yup';
   import { useForm, type BaseFieldProps, type TypedSchema } from 'vee-validate';
+  import KopersInput from '@/components/admin/personen/KopersInput.vue';
   import { computed, onBeforeMount, ref, watch, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import { useRoute, useRouter, type RouteLocationNormalizedLoaded, type Router } from 'vue-router';
@@ -81,6 +82,7 @@
   const createZuordnungConfirmationDialogMessage: Ref<string> = ref('');
   const changeKlasseConfirmationDialogMessage: Ref<string> = ref('');
   const canCommit: Ref<boolean> = ref(false);
+  const hasNoKopersNr: Ref<boolean> = ref(false);
 
   const creationErrorText: Ref<string> = ref('');
   const creationErrorTitle: Ref<string> = ref('');
@@ -318,6 +320,7 @@
     selectedRolle: string;
     selectedOrganisation: string;
     selectedKlasse: string;
+    selectedKopersNr?: string;
   };
 
   type ChangeKlasseForm = {
@@ -332,6 +335,17 @@
     );
     return !!rolle && rolle.rollenart === RollenArt.Lern;
   }
+
+  function isKopersRolle(selectedRolleId: string | undefined): boolean {
+    const rolle: TranslatedRolleWithAttrs | undefined = rollen.value?.find(
+      (r: TranslatedRolleWithAttrs) => r.value === selectedRolleId,
+    );
+    return !!rolle && !!rolle.merkmale && rolle.merkmale.has(RollenMerkmal.KopersPflicht);
+  }
+
+  const hasKopersNummer: ComputedRef<boolean> = computed(() => {
+    return !!personStore.currentPerson?.person.personalnummer;
+  });
 
   const hasKopersRolle: ComputedRef<boolean> = computed(() => {
     return (
@@ -423,6 +437,10 @@
     Ref<string | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineFieldZuordnung('selectedKlasse', vuetifyConfig);
+  const [selectedKopersNr, selectedKopersNrProps]: [
+    Ref<string | undefined>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = defineFieldZuordnung('selectedKopersNr', vuetifyConfig);
 
   // Change Klasse Form
   const [selectedSchule, selectedSchuleProps]: [
@@ -487,7 +505,7 @@
 
   // This will send the updated list of Zuordnungen to the Backend on TOP of the new added one through the form.
   async function confirmAddition(): Promise<void> {
-    await personenkontextStore.updatePersonenkontexte(finalZuordnungen.value, currentPersonId);
+    await personenkontextStore.updatePersonenkontexte(finalZuordnungen.value, currentPersonId, selectedKopersNr.value);
     createSuccessDialogVisible.value = !personenkontextStore.errorCode;
     resetZuordnungForm();
   }
@@ -875,7 +893,7 @@
             <!-- KoPers.-Nr. -->
             <v-row
               class="mt-0"
-              v-if="hasKopersRolle"
+              v-if="hasKopersRolle || personStore.currentPerson.person.personalnummer"
             >
               <v-col cols="1"></v-col>
               <v-col
@@ -1427,6 +1445,14 @@
                   @update:canCommit="canCommit = $event"
                   @fieldReset="handleFieldReset"
                 />
+                <KopersInput
+                  v-if="!hasKopersNummer && isKopersRolle(selectedRolle) && selectedOrganisation"
+                  :hasNoKopersNr="hasNoKopersNr"
+                  v-model:selectedKopersNr="selectedKopersNr"
+                  :selectedKopersNrProps="selectedKopersNrProps"
+                  @update:selectedKopersNr="(value?: string) => (selectedKopersNr = value)"
+                  @update:hasNoKopersNr="(value: boolean) => (hasNoKopersNr = value)"
+                ></KopersInput>
               </v-container>
               <v-row class="py-3 px-2 justify-center">
                 <v-spacer class="hidden-sm-and-down"></v-spacer>
