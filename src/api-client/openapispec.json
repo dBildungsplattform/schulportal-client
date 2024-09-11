@@ -3284,6 +3284,14 @@
                         "schema": {
                             "type": "string"
                         }
+                    },
+                    {
+                        "name": "personalnummer",
+                        "required": false,
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 ],
                 "requestBody": {
