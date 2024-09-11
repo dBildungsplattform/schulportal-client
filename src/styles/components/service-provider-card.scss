@@ -1,5 +1,5 @@
 .service-provider-card {
-  height: 80px; 
+  height: 80px;
   width: 375px;
 
   &.v-card--variant-elevated {
@@ -10,7 +10,7 @@
     text-wrap: pretty;
     transition: all 0.3s;
   }
-  
+
   &:focus,
   &:hover {
     border: $serviceProviderHoverBorderSize solid $primaryColor;
@@ -27,8 +27,8 @@
   }
 }
 
-@media only screen and (max-width: 960px) {  
+@media only screen and (max-width: 960px) {
   .service-provider-card {
-      width: auto;
+    width: auto;
   }
 }

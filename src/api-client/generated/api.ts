@@ -861,6 +861,25 @@ export type Jahrgangsstufe = typeof Jahrgangsstufe[keyof typeof Jahrgangsstufe];
 /**
  * 
  * @export
+ * @interface LockUserBodyParams
+ */
+export interface LockUserBodyParams {
+    /**
+     * 
+     * @type {boolean}
+     * @memberof LockUserBodyParams
+     */
+    'lock': boolean;
+    /**
+     * 
+     * @type {string}
+     * @memberof LockUserBodyParams
+     */
+    'locked_from': string;
+}
+/**
+ * 
+ * @export
  * @interface LoeschungResponse
  */
 export interface LoeschungResponse {
@@ -1044,6 +1063,32 @@ export const OrganisationsTyp = {
 export type OrganisationsTyp = typeof OrganisationsTyp[keyof typeof OrganisationsTyp];
 
 
+/**
+ * 
+ * @export
+ * @interface ParentOrganisationenResponse
+ */
+export interface ParentOrganisationenResponse {
+    /**
+     * 
+     * @type {Array<OrganisationResponse>}
+     * @memberof ParentOrganisationenResponse
+     */
+    'parents': Array<OrganisationResponse>;
+}
+/**
+ * 
+ * @export
+ * @interface ParentOrganisationsByIdsBodyParams
+ */
+export interface ParentOrganisationsByIdsBodyParams {
+    /**
+     * The ids of organizations
+     * @type {Array<string>}
+     * @memberof ParentOrganisationsByIdsBodyParams
+     */
+    'organisationIds': Array<string>;
+}
 /**
  * 
  * @export
@@ -1292,6 +1337,19 @@ export interface PersonInfoResponse {
 /**
  * 
  * @export
+ * @interface PersonLockResponse
+ */
+export interface PersonLockResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonLockResponse
+     */
+    'message': string;
+}
+/**
+ * 
+ * @export
  * @interface PersonNameParams
  */
 export interface PersonNameParams {
@@ -1501,6 +1559,18 @@ export interface PersonResponse {
      * @memberof PersonResponse
      */
     'personalnummer': string | null;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof PersonResponse
+     */
+    'isLocked': boolean | null;
+    /**
+     * 
+     * @type {object}
+     * @memberof PersonResponse
+     */
+    'lockInfo': object | null;
 }
 
 
@@ -4094,6 +4164,49 @@ export const OrganisationenApiAxiosParamCreator = function (configuration?: Conf
         },
         /**
          * 
+         * @param {ParentOrganisationsByIdsBodyParams} parentOrganisationsByIdsBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        organisationControllerGetParentsByIds: async (parentOrganisationsByIdsBodyParams: ParentOrganisationsByIdsBodyParams, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'parentOrganisationsByIdsBodyParams' is not null or undefined
+            assertParamExists('organisationControllerGetParentsByIds', 'parentOrganisationsByIdsBodyParams', parentOrganisationsByIdsBodyParams)
+            const localVarPath = `/api/organisationen/parents-by-ids`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(parentOrganisationsByIdsBodyParams, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -4398,6 +4511,16 @@ export const OrganisationenApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @param {ParentOrganisationsByIdsBodyParams} parentOrganisationsByIdsBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async organisationControllerGetParentsByIds(parentOrganisationsByIdsBodyParams: ParentOrganisationsByIdsBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ParentOrganisationenResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.organisationControllerGetParentsByIds(parentOrganisationsByIdsBodyParams, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -4536,6 +4659,15 @@ export const OrganisationenApiFactory = function (configuration?: Configuration,
         },
         /**
          * 
+         * @param {ParentOrganisationsByIdsBodyParams} parentOrganisationsByIdsBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        organisationControllerGetParentsByIds(parentOrganisationsByIdsBodyParams: ParentOrganisationsByIdsBodyParams, options?: any): AxiosPromise<ParentOrganisationenResponse> {
+            return localVarFp.organisationControllerGetParentsByIds(parentOrganisationsByIdsBodyParams, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -4665,6 +4797,15 @@ export interface OrganisationenApiInterface {
      * @memberof OrganisationenApiInterface
      */
     organisationControllerGetAdministrierteOrganisationen(organisationId: string, offset?: number, limit?: number, searchFilter?: string, options?: AxiosRequestConfig): AxiosPromise<Array<OrganisationResponse>>;
+
+    /**
+     * 
+     * @param {ParentOrganisationsByIdsBodyParams} parentOrganisationsByIdsBodyParams 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OrganisationenApiInterface
+     */
+    organisationControllerGetParentsByIds(parentOrganisationsByIdsBodyParams: ParentOrganisationsByIdsBodyParams, options?: AxiosRequestConfig): AxiosPromise<ParentOrganisationenResponse>;
 
     /**
      * 
@@ -4810,6 +4951,17 @@ export class OrganisationenApi extends BaseAPI implements OrganisationenApiInter
      */
     public organisationControllerGetAdministrierteOrganisationen(organisationId: string, offset?: number, limit?: number, searchFilter?: string, options?: AxiosRequestConfig) {
         return OrganisationenApiFp(this.configuration).organisationControllerGetAdministrierteOrganisationen(organisationId, offset, limit, searchFilter, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {ParentOrganisationsByIdsBodyParams} parentOrganisationsByIdsBodyParams 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OrganisationenApi
+     */
+    public organisationControllerGetParentsByIds(parentOrganisationsByIdsBodyParams: ParentOrganisationsByIdsBodyParams, options?: AxiosRequestConfig) {
+        return OrganisationenApiFp(this.configuration).organisationControllerGetParentsByIds(parentOrganisationsByIdsBodyParams, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -5466,6 +5618,53 @@ export const PersonenApiAxiosParamCreator = function (configuration?: Configurat
         },
         /**
          * 
+         * @param {string} personId 
+         * @param {LockUserBodyParams} lockUserBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        personControllerLockPerson: async (personId: string, lockUserBodyParams: LockUserBodyParams, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'personId' is not null or undefined
+            assertParamExists('personControllerLockPerson', 'personId', personId)
+            // verify required parameter 'lockUserBodyParams' is not null or undefined
+            assertParamExists('personControllerLockPerson', 'lockUserBodyParams', lockUserBodyParams)
+            const localVarPath = `/api/personen/{personId}/lock-user`
+                .replace(`{${"personId"}}`, encodeURIComponent(String(personId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(lockUserBodyParams, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @param {string} personId The id for the account.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -5640,6 +5839,17 @@ export const PersonenApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @param {string} personId 
+         * @param {LockUserBodyParams} lockUserBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async personControllerLockPerson(personId: string, lockUserBodyParams: LockUserBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonLockResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.personControllerLockPerson(personId, lockUserBodyParams, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
          * @param {string} personId The id for the account.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -5741,6 +5951,16 @@ export const PersonenApiFactory = function (configuration?: Configuration, baseP
         },
         /**
          * 
+         * @param {string} personId 
+         * @param {LockUserBodyParams} lockUserBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        personControllerLockPerson(personId: string, lockUserBodyParams: LockUserBodyParams, options?: any): AxiosPromise<PersonLockResponse> {
+            return localVarFp.personControllerLockPerson(personId, lockUserBodyParams, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @param {string} personId The id for the account.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -5836,6 +6056,16 @@ export interface PersonenApiInterface {
      * @memberof PersonenApiInterface
      */
     personControllerFindPersons(offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', organisationIDs?: Array<string>, rolleIDs?: Array<string>, suchFilter?: string, options?: AxiosRequestConfig): AxiosPromise<Array<PersonendatensatzResponse>>;
+
+    /**
+     * 
+     * @param {string} personId 
+     * @param {LockUserBodyParams} lockUserBodyParams 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PersonenApiInterface
+     */
+    personControllerLockPerson(personId: string, lockUserBodyParams: LockUserBodyParams, options?: AxiosRequestConfig): AxiosPromise<PersonLockResponse>;
 
     /**
      * 
@@ -5945,6 +6175,18 @@ export class PersonenApi extends BaseAPI implements PersonenApiInterface {
      */
     public personControllerFindPersons(offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', organisationIDs?: Array<string>, rolleIDs?: Array<string>, suchFilter?: string, options?: AxiosRequestConfig) {
         return PersonenApiFp(this.configuration).personControllerFindPersons(offset, limit, referrer, familienname, vorname, sichtfreigabe, organisationIDs, rolleIDs, suchFilter, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {string} personId 
+     * @param {LockUserBodyParams} lockUserBodyParams 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PersonenApi
+     */
+    public personControllerLockPerson(personId: string, lockUserBodyParams: LockUserBodyParams, options?: AxiosRequestConfig) {
+        return PersonenApiFp(this.configuration).personControllerLockPerson(personId, lockUserBodyParams, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

@@ -3,6 +3,7 @@
   import KlasseChange from '@/components/admin/klassen/KlasseChange.vue';
   import PasswordReset from '@/components/admin/personen/PasswordReset.vue';
   import PersonDelete from '@/components/admin/personen/PersonDelete.vue';
+  import PersonLock from '@/components/admin/personen/PersonLock.vue';
   import PersonenkontextCreate from '@/components/admin/personen/PersonenkontextCreate.vue';
   import PersonenkontextDelete from '@/components/admin/personen/PersonenkontextDelete.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
@@ -18,7 +19,13 @@
     type Organisation,
     type OrganisationStore,
   } from '@/stores/OrganisationStore';
-  import { usePersonStore, type PersonStore, type PersonWithUebersicht } from '@/stores/PersonStore';
+  import {
+    LockKeys,
+    usePersonStore,
+    type Person,
+    type PersonStore,
+    type PersonWithUebersicht,
+  } from '@/stores/PersonStore';
   import { usePersonenkontextStore, type PersonenkontextStore, type Zuordnung } from '@/stores/PersonenkontextStore';
   import { RollenArt, RollenMerkmal } from '@/stores/RolleStore';
   import {
@@ -88,6 +95,10 @@
     });
   }
 
+  function onLockUser(personId: string, lock: boolean, organisation: string): void {
+    personStore.lockPerson(personId, lock, organisation);
+  }
+
   const handleAlertClose = (): void => {
     personStore.errorCode = '';
     navigateToPersonTable();
@@ -112,6 +123,38 @@
   async function deletePerson(personId: string): Promise<void> {
     await personStore.deletePersonById(personId);
   }
+
+  function keyMapper(key: string): string {
+    switch (key) {
+      case LockKeys.LockedFrom:
+        return t('person.lockedBy');
+      case LockKeys.Timestamp:
+        return t('since');
+      default:
+        return key;
+    }
+  }
+
+  function keyValueMapper(key: string, value: string): string {
+    if (key === LockKeys.Timestamp) {
+      return new Intl.DateTimeFormat('de-DE', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+      }).format(new Date(value));
+    }
+    return value;
+  }
+
+  const getLockInfo: ComputedRef<{ key: string; attribute: string }[]> = computed(() => {
+    if (!personStore.currentPerson?.person.isLocked) return [];
+    const { lockInfo }: Person = personStore.currentPerson.person;
+    if (!lockInfo) return [];
+    return Object.entries(lockInfo).map(([key, value]: [string, string]) => ({
+      key: keyMapper(key),
+      attribute: keyValueMapper(key, value.toString()),
+    }));
+  });
 
   let closeCannotDeleteDialog = (): void => {
     cannotDeleteDialogVisible.value = false;
@@ -1093,8 +1136,8 @@
                 cols="12"
                 sm="auto"
               >
-                <h3 class="subtitle-1">{{ $t('person.checkAndSave') }}:</h3></v-col
-              >
+                <h3 class="subtitle-1">{{ $t('person.checkAndSave') }}:</h3>
+              </v-col>
               <v-col
                 cols="12"
                 v-for="zuordnung in getZuordnungen?.filter((zuordnung) => zuordnung.editable)"
@@ -1228,7 +1271,7 @@
                     :errorCode="personStore.errorCode"
                     :person="personStore.currentPerson"
                     :disabled="selectedZuordnungen.length === 0"
-                    :zuordnungCount="zuordnungenResult?.filter((zuordnung) => zuordnung.editable).length || 0"
+                    :zuordnungCount="zuordnungenResult?.filter((zuordnung) => zuordnung.editable).length ?? 0"
                     @onDeletePersonenkontext="prepareDeletion"
                   >
                   </PersonenkontextDelete>
@@ -1365,8 +1408,8 @@
                   cols="12"
                   sm="auto"
                 >
-                  <h3 class="subtitle-1">{{ $t('person.addZuordnung') }}:</h3></v-col
-                >
+                  <h3 class="subtitle-1">{{ $t('person.addZuordnung') }}:</h3>
+                </v-col>
               </v-row>
               <v-container class="px-lg-16">
                 <!-- Organisation, Rolle, Klasse zuordnen -->
@@ -1490,18 +1533,68 @@
           </template>
         </v-container>
         <v-divider
+          v-if="authStore.currentUser?.personId !== personStore.currentPerson?.person.id"
           class="border-opacity-100 rounded my-6 mx-4"
           color="#E5EAEF"
           thickness="6"
         ></v-divider>
-        <!-- Delete person -->
         <v-container
-          v-if="authStore.hasPersonenLoeschenPermission"
-          class="person-delete"
+          class="person-lock"
+          v-if="authStore.currentUser?.personId !== personStore.currentPerson?.person.id"
         >
           <v-row class="ml-md-16">
-            <v-col>
+            <v-col data-testid="person-lock-info">
               <h3 class="subtitle-1">{{ $t('admin.person.status') }}</h3>
+              <template v-if="!personStore.loading">
+                <v-row class="mt-4 text-body">
+                  <v-col
+                    class="text-right"
+                    cols="1"
+                  >
+                    <v-icon
+                      v-if="personStore.currentPerson?.person.isLocked"
+                      icon="mdi-lock"
+                      color="red"
+                    ></v-icon>
+                  </v-col>
+                  <v-col cols="10">
+                    <span>
+                      {{
+                        personStore.currentPerson?.person.isLocked
+                          ? t('person.userIsLocked')
+                          : t('person.userIsUnlocked')
+                      }}
+                    </span>
+                  </v-col>
+                </v-row>
+                <v-row
+                  class="mt-0"
+                  v-for="{ key, attribute } of getLockInfo"
+                  :key="key"
+                  cols="10"
+                >
+                  <v-col
+                    class="text-right"
+                    cols="4"
+                  >
+                    <span class="subtitle-2"> {{ key }}: </span>
+                  </v-col>
+                  <v-col
+                    cols="5"
+                    class="ellipsis-wrapper"
+                  >
+                    <span
+                      class="text-body"
+                      :title="attribute"
+                    >
+                      {{ attribute }}
+                    </span>
+                  </v-col>
+                </v-row>
+              </template>
+              <template v-else-if="personStore.loading">
+                <v-col> <v-progress-circular indeterminate></v-progress-circular></v-col>
+              </template>
             </v-col>
             <v-col
               class="mr-lg-13"
@@ -1510,17 +1603,28 @@
               v-if="personStore.currentPerson"
             >
               <div class="d-flex justify-sm-end">
-                <PersonDelete
-                  :disabled="isEditActive"
+                <PersonLock
                   :errorCode="personStore.errorCode"
                   :person="personStore.currentPerson"
-                  @onDeletePerson="deletePerson(currentPersonId)"
+                  :adminId="authStore.currentUser?.personId!"
+                  @onLockUser="onLockUser"
                 >
-                </PersonDelete>
+                </PersonLock>
+              </div>
+              <div class="d-flex justify-sm-end">
+                <template v-if="authStore.hasPersonenLoeschenPermission">
+                  <PersonDelete
+                    :disabled="isEditActive"
+                    :errorCode="personStore.errorCode"
+                    :person="personStore.currentPerson"
+                    @onDeletePerson="deletePerson(currentPersonId)"
+                  >
+                  </PersonDelete>
+                </template>
               </div>
             </v-col>
-            <v-col v-else-if="personStore.loading"> <v-progress-circular indeterminate></v-progress-circular></v-col
-          ></v-row>
+            <v-col v-else-if="personStore.loading"> <v-progress-circular indeterminate></v-progress-circular></v-col>
+          </v-row>
         </v-container>
       </template>
     </LayoutCard>
@@ -1810,6 +1914,7 @@
     .save-cancel-row {
       margin-top: -40px;
     }
+
     .cancel-col {
       margin-bottom: -15px;
     }
