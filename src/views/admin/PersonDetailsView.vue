@@ -901,111 +901,115 @@
           thickness="6"
         ></v-divider>
         <!-- Two Factor Authentication -->
-        <v-container v-if="twoFactorAuthentificationStore.required">
-          <v-row class="ml-md-16">
-            <v-col>
-              <h3 class="subtitle-1">{{ $t('admin.person.twoFactorAuthentication.header') }}</h3>
-              <v-row
-                class="mt-4 text-body"
-                v-if="twoFactorAuthentificationStore.hasToken"
-              >
-                <v-col
-                  class="text-right"
-                  cols="1"
+        <template
+          v-if="
+            !twoFactorAuthentificationStore.loading && !personStore.loading && twoFactorAuthentificationStore.required
+          "
+        >
+          <v-container>
+            <v-row class="ml-md-16">
+              <v-col>
+                <h3 class="subtitle-1">{{ $t('admin.person.twoFactorAuthentication.header') }}</h3>
+                <v-row
+                  class="mt-4 text-body"
+                  v-if="twoFactorAuthentificationStore.hasToken"
                 >
-                  <v-icon
-                    icon="mdi-check-circle"
-                    color="green"
-                    v-if="twoFactorAuthentificationStore.hasToken"
-                  ></v-icon>
-                </v-col>
-                <div class="v-col">
-                  <p v-if="twoFactorAuthentificationStore.tokenKind === 'software'">
-                    {{ $t('admin.person.twoFactorAuthentication.softwareTokenIsSetUp') }}
-                  </p>
-                  <p v-if="twoFactorAuthentificationStore.tokenKind === 'hardware'">
-                    {{ $t('admin.person.twoFactorAuthentication.hardwareTokenIsSetUp') }}
-                  </p>
-                  <p v-if="twoFactorAuthentificationStore.serial">
-                    {{
-                      $t('admin.person.twoFactorAuthentication.serial') + ': ' + twoFactorAuthentificationStore.serial
-                    }}
-                  </p>
-                </div>
-              </v-row>
-              <v-row class="mt-4 text-body">
-                <v-col
-                  class="text-right"
-                  cols="1"
-                >
-                  <v-icon
-                    class="mb-2"
-                    icon="mdi-information"
+                  <v-col
+                    class="text-right"
+                    cols="1"
                   >
-                  </v-icon>
-                </v-col>
-                <div class="v-col">
-                  <p v-if="twoFactorAuthentificationStore.hasToken">
-                    {{ $t('admin.person.twoFactorAuthentication.resetInfo') }}
-                  </p>
-                  <p v-if="!twoFactorAuthentificationStore.hasToken">
-                    {{ $t('admin.person.twoFactorAuthentication.notSetUp') }}
-                  </p>
-                </div>
-              </v-row>
-            </v-col>
-            <v-col
-              class="mr-lg-13"
-              cols="12"
-              md="auto"
-              v-if="personStore.currentPerson"
-            >
-              <div
-                class="d-flex justify-sm-end"
-                v-if="!twoFactorAuthentificationStore.hasToken"
-              >
-                <TwoFactorAuthenticationSetUp
-                  :errorCode="twoFactorAuthentificationStore.errorCode"
-                  :disabled="isEditActive"
-                  :person="personStore.currentPerson"
-                  @dialogClosed="twoFactorAuthentificationStore.get2FAState(currentPersonId)"
-                >
-                </TwoFactorAuthenticationSetUp>
-              </div>
-              <div
-                class="d-flex justify-sm-end"
-                v-if="twoFactorAuthentificationStore.hasToken"
-              >
-                <v-col
-                  cols="12"
-                  sm="6"
-                  md="auto"
-                >
-                  <SpshTooltip
-                    :enabledCondition="twoFactorAuthentificationStore.hasToken"
-                    :disabledText="$t('person.finishEditFirst')"
-                    :enabledText="$t('admin.person.twoFactorAuthentication.tokenReset')"
-                    position="start"
+                    <v-icon
+                      icon="mdi-check-circle"
+                      color="green"
+                      v-if="twoFactorAuthentificationStore.hasToken"
+                    ></v-icon>
+                  </v-col>
+                  <v-col>
+                    <p v-if="twoFactorAuthentificationStore.tokenKind === 'software'">
+                      {{ $t('admin.person.twoFactorAuthentication.softwareTokenIsSetUp') }}
+                    </p>
+                    <p v-if="twoFactorAuthentificationStore.tokenKind === 'hardware'">
+                      {{ $t('admin.person.twoFactorAuthentication.hardwareTokenIsSetUp') }}
+                    </p>
+                    <p v-if="twoFactorAuthentificationStore.serial">
+                      {{
+                        $t('admin.person.twoFactorAuthentication.serial') + ': ' + twoFactorAuthentificationStore.serial
+                      }}
+                    </p>
+                  </v-col>
+                </v-row>
+                <v-row class="mt-4 text-body">
+                  <v-col
+                    class="text-right"
+                    cols="1"
                   >
-                    <v-btn
-                      class="primary"
-                      :disabled="isEditActive"
+                    <v-icon
+                      class="mb-2"
+                      icon="mdi-information"
                     >
-                      {{ $t('admin.person.twoFactorAuthentication.tokenReset') }}</v-btn
-                    >
-                  </SpshTooltip></v-col
+                    </v-icon>
+                  </v-col>
+                  <v-col>
+                    <p v-if="twoFactorAuthentificationStore.hasToken">
+                      {{ $t('admin.person.twoFactorAuthentication.resetInfo') }}
+                    </p>
+                    <p v-if="!twoFactorAuthentificationStore.hasToken">
+                      {{ $t('admin.person.twoFactorAuthentication.notSetUp') }}
+                    </p>
+                  </v-col>
+                </v-row>
+              </v-col>
+              <v-col
+                class="mr-lg-13"
+                cols="12"
+                md="auto"
+                v-if="personStore.currentPerson"
+              >
+                <div
+                  class="d-flex justify-sm-end"
+                  v-if="!twoFactorAuthentificationStore.hasToken"
                 >
-              </div>
-            </v-col>
-            <v-col v-else-if="personStore.loading"> <v-progress-circular indeterminate></v-progress-circular></v-col
-          ></v-row>
-        </v-container>
-        <v-divider
-          v-if="twoFactorAuthentificationStore.required"
-          class="border-opacity-100 rounded my-6 mx-4"
-          color="#E5EAEF"
-          thickness="6"
-        ></v-divider>
+                  <TwoFactorAuthenticationSetUp
+                    :errorCode="twoFactorAuthentificationStore.errorCode"
+                    :disabled="isEditActive"
+                    :person="personStore.currentPerson"
+                    @dialogClosed="twoFactorAuthentificationStore.get2FAState(currentPersonId)"
+                  >
+                  </TwoFactorAuthenticationSetUp>
+                </div>
+                <div
+                  class="d-flex justify-sm-end"
+                  v-if="twoFactorAuthentificationStore.hasToken"
+                >
+                  <v-col
+                    cols="12"
+                    sm="6"
+                    md="auto"
+                  >
+                    <SpshTooltip
+                      :enabledCondition="twoFactorAuthentificationStore.hasToken"
+                      :disabledText="$t('person.finishEditFirst')"
+                      :enabledText="$t('admin.person.twoFactorAuthentication.tokenReset')"
+                      position="start"
+                    >
+                      <v-btn
+                        class="primary"
+                        :disabled="isEditActive"
+                      >
+                        {{ $t('admin.person.twoFactorAuthentication.tokenReset') }}</v-btn
+                      >
+                    </SpshTooltip></v-col
+                  >
+                </div>
+              </v-col>
+            </v-row>
+          </v-container>
+          <v-divider
+            class="border-opacity-100 rounded my-6 mx-4"
+            color="#E5EAEF"
+            thickness="6"
+          ></v-divider>
+        </template>
         <!-- Zuordnungen -->
         <v-container
           v-if="!isEditActive"
