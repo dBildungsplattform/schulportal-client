@@ -72,6 +72,7 @@
       :label="$t('admin.befristung.befristung')"
     >
       <v-text-field
+        data-testid="befristung-input"
         v-model="localBefristung"
         v-bind="befristungProps"
         variant="outlined"
@@ -88,11 +89,13 @@
         offset-sm="5"
       >
         <v-radio-group
+          data-testid="befristung-radio-group"
           v-model="localBefristungOption"
           v-bind="befristungOptionProps"
           @update:modelValue="handleBefristungOptionChange"
         >
           <v-radio
+            data-testid="schuljahresende-radio-button"
             :label="`${$t('admin.befristung.untilEndOfSchoolYear')} (${nextSchuljahresende})`"
             :value="BefristungOption.SCHULJAHRESENDE"
             color="primary"
@@ -104,6 +107,7 @@
             position="start"
           >
             <v-radio
+              data-testid="unbefristet-radio-button"
               :label="$t('admin.befristung.unlimited')"
               :value="BefristungOption.UNBEFRISTET"
               :color="'primary'"
@@ -112,6 +116,7 @@
           </SpshTooltip>
           <v-radio
             v-else
+            data-testid="unbefristet-radio-button"
             :label="$t('admin.befristung.unlimited')"
             :value="BefristungOption.UNBEFRISTET"
             :color="'primary'"

@@ -53,7 +53,7 @@ export function formatDate(dateString: string | undefined, t: (key: string) => s
   date.setDate(date.getDate() - 1);
 
   // Return the translated string followed by the formatted date
-  return `${t('admin.befristung.unlimitedUntil')} ${new Intl.DateTimeFormat('de-DE', {
+  return `${t('admin.befristung.limitedUntil')} ${new Intl.DateTimeFormat('de-DE', {
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
