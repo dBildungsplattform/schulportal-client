@@ -52,15 +52,6 @@ beforeEach(() => {
       typ: 'SCHULE',
       administriertVon: '1',
     },
-    {
-      id: '1123',
-      name: 'Albert-Emil-Hansebrot-Gymnasium',
-      kennung: '2745475',
-      namensergaenzung: 'Schule',
-      kuerzel: 'aehg',
-      typ: 'SCHULE',
-      administriertVon: '1',
-    },
   ];
 
   personenkontextStore.allUebersichten = {
