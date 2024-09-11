@@ -99,6 +99,7 @@ type PersonenkontextActions = {
 export type {
   SystemrechtResponse,
   DbiamUpdatePersonenkontexteBodyParams,
+  DBiamPersonenkontextResponse,
   DbiamPersonenkontextBodyParams,
   PersonenkontextWorkflowResponse,
   PersonenkontexteUpdateResponse,
