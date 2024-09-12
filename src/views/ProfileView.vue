@@ -435,7 +435,11 @@
               </p>
             </v-row>
             <div>
+              <v-col v-if="twoFactorAuthentificationStore.loading">
+                <v-progress-circular indeterminate></v-progress-circular
+              ></v-col>
               <SelfServiceWorkflow
+                v-else
                 :personId="personStore.currentPerson?.person.id ?? ''"
                 @dialogClosed="twoFactorAuthentificationStore.get2FAState(personStore.currentPerson?.person.id ?? '')"
               >
