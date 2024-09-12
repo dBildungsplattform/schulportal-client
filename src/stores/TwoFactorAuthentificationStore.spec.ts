@@ -7,6 +7,7 @@ import ApiService from '@/services/ApiService';
 import MockAdapter from 'axios-mock-adapter';
 import { setActivePinia, createPinia } from 'pinia';
 import { rejects } from 'assert';
+
 import {
   useTwoFactorAuthentificationStore,
   type TwoFactorAuthentificationStore,
@@ -138,6 +139,18 @@ describe('TwoFactorAuthentificationStore', () => {
 
       const response: AssignHardwareTokenResponse = await assignTokenPromise;
       expect(response).toEqual(mockResponse);
+      expect(twoFactorAuthenticationStore.loading).toBe(false);
+    });
+  });
+  describe('resetToken', () => {
+    it('should reset token successfully', async () => {
+      const referrer: string = 'testReferrer';
+
+      mockadapter.onPut(`/api/2fa-token/reset?personId=${referrer}`).replyOnce(200);
+
+      const resetTokenPromise: Promise<void> = twoFactorAuthenticationStore.resetToken(referrer);
+      expect(twoFactorAuthenticationStore.loading).toBe(true);
+      await resetTokenPromise;
       expect(twoFactorAuthenticationStore.loading).toBe(false);
     });
   });
