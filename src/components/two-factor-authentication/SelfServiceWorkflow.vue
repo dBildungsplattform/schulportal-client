@@ -13,7 +13,13 @@
   const { t }: Composer = useI18n({ useScope: 'global' });
   const twoFactorStore: TwoFactorAuthentificationStore = useTwoFactorAuthentificationStore();
 
-  const workflowStep: Ref<'start' | 'qrcode' | 'verify'> = ref('start');
+enum TwoFactorSteps {
+  Start = 'start',
+  QRCode = 'qrcode',
+  Verify = 'verify',
+}
+
+const workflowStep: Ref<TwoFactorSteps> = ref(TwoFactorSteps.Start);
   const errorMessage: Ref<string> = ref('');
   const otp: Ref<string> = ref('');
 
