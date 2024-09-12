@@ -13,13 +13,13 @@
   const { t }: Composer = useI18n({ useScope: 'global' });
   const twoFactorStore: TwoFactorAuthentificationStore = useTwoFactorAuthentificationStore();
 
-enum TwoFactorSteps {
-  Start = 'start',
-  QRCode = 'qrcode',
-  Verify = 'verify',
-}
+  enum TwoFactorSteps {
+    Start = 'start',
+    QRCode = 'qrcode',
+    Verify = 'verify',
+  }
 
-const workflowStep: Ref<TwoFactorSteps> = ref(TwoFactorSteps.Start);
+  const workflowStep: Ref<TwoFactorSteps> = ref(TwoFactorSteps.Start);
   const errorMessage: Ref<string> = ref('');
   const otp: Ref<string> = ref('');
 
@@ -59,17 +59,17 @@ const workflowStep: Ref<TwoFactorSteps> = ref(TwoFactorSteps.Start);
     }
 
     isActive.value = false;
-    workflowStep.value = 'start';
+    workflowStep.value = TwoFactorSteps.Start;
   }
 
   async function proceed(isActive: Ref<boolean>): Promise<void> {
     switch (workflowStep.value) {
       case 'start':
-        workflowStep.value = 'qrcode';
+        workflowStep.value = TwoFactorSteps.QRCode;
         await twoFactorStore.get2FASoftwareQRCode(props.personId);
         break;
       case 'qrcode':
-        workflowStep.value = 'verify';
+        workflowStep.value = TwoFactorSteps.Verify;
         break;
       case 'verify':
         try {
