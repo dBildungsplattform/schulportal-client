@@ -61,6 +61,7 @@ type OrganisationState = {
   totalSchulen: number;
   totalPaginatedSchulen: number;
   totalPaginatedKlassen: number;
+  totalPaginatedOrganisationen: number;
   totalOrganisationen: number;
   klassen: Array<Organisation>;
   errorCode: string;
@@ -125,6 +126,7 @@ export const useOrganisationStore: StoreDefinition<
       totalSchulen: 0,
       totalPaginatedSchulen: 0,
       totalPaginatedKlassen: 0,
+      totalPaginatedOrganisationen: 0,
       totalOrganisationen: 0,
       klassen: [],
       errorCode: '',
@@ -162,6 +164,7 @@ export const useOrganisationStore: StoreDefinition<
         } else {
           this.allOrganisationen = response.data;
           this.totalOrganisationen = +response.headers['x-paging-total'];
+          this.totalPaginatedOrganisationen = +response.headers['x-paging-pagetotal'];
         }
         this.loading = false;
       } catch (error: unknown) {
