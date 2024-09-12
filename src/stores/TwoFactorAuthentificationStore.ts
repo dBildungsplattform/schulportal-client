@@ -76,7 +76,6 @@ export const useTwoFactorAuthentificationStore: StoreDefinition<
         ).data;
 
         this.hasToken = twoFactorState.hasToken;
-        this.required = twoFactorState.required;
 
         if (!twoFactorState.hasToken) {
           return;

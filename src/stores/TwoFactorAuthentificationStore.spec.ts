@@ -37,7 +37,6 @@ describe('TwoFactorAuthentificationStore', () => {
         hasToken: true,
         tokenKind: 'software',
         serial: '',
-        required: true,
       };
 
       mockadapter.onGet(`/api/2fa-token/state?personId=${personId}`).replyOnce(200, mockResponse);
