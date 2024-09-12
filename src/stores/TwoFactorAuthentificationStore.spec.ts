@@ -198,7 +198,7 @@ describe('TwoFactorAuthentificationStore', () => {
       mockadapter.onPost(`/api/2fa-token/verify`).replyOnce(500, 'some error');
       const verified: Promise<void> = twoFactorAuthenticationStore.verify2FAToken(personId, otp);
       expect(twoFactorAuthenticationStore.loading).toBe(true);
-      await rejects(verified);
+      await verified;
       expect(twoFactorAuthenticationStore.errorCode).toEqual('SOFTWARE_TOKEN_VERIFICATION_ERROR');
       expect(twoFactorAuthenticationStore.loading).toBe(false);
     });
@@ -212,7 +212,7 @@ describe('TwoFactorAuthentificationStore', () => {
         .replyOnce(500, { code: 'some mock server error', i18nKey: 'OTP_NICHT_GUELTIG' });
       const verified: Promise<void> = twoFactorAuthenticationStore.verify2FAToken(personId, otp);
       expect(twoFactorAuthenticationStore.loading).toBe(true);
-      await rejects(verified);
+      await verified;
       expect(twoFactorAuthenticationStore.errorCode).toEqual('OTP_NICHT_GUELTIG');
       expect(twoFactorAuthenticationStore.loading).toBe(false);
     });
