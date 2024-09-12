@@ -29,6 +29,7 @@
   import { usePersonenkontextStore, type PersonenkontextStore, type Zuordnung } from '@/stores/PersonenkontextStore';
   import { RollenArt, RollenMerkmal } from '@/stores/RolleStore';
   import { type TranslatedObject } from '@/types.d';
+  import TokenReset from '@/components/two-factor-authentication/TokenReset.vue';
   import { toTypedSchema } from '@vee-validate/yup';
   import { useForm, type BaseFieldProps, type TypedSchema } from 'vee-validate';
   import KopersInput from '@/components/admin/personen/KopersInput.vue';
@@ -1048,14 +1049,16 @@
                     :enabledText="$t('admin.person.twoFactorAuthentication.tokenReset')"
                     position="start"
                   >
-                    <v-btn
-                      class="primary"
+                    <TokenReset
+                      :errorCode="twoFactorAuthentificationStore.errorCode"
                       :disabled="isEditActive"
-                    >
-                      {{ $t('admin.person.twoFactorAuthentication.tokenReset') }}</v-btn
-                    >
-                  </SpshTooltip></v-col
-                >
+                      :person="personStore.currentPerson"
+                      :tokenType="twoFactorAuthentificationStore.tokenKind"
+                      :personId="currentPersonId"
+                      @dialogClosed="twoFactorAuthentificationStore.get2FAState(currentPersonId)"
+                    ></TokenReset>
+                  </SpshTooltip>
+                </v-col>
               </div>
             </v-col>
             <v-col v-else-if="personStore.loading"> <v-progress-circular indeterminate></v-progress-circular></v-col
