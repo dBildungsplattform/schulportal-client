@@ -67,7 +67,8 @@
     return organisationStore.allOrganisationen
       .map((org: Organisation) => ({
         value: org.id,
-        title: `${org.kennung} (${org.name})`,
+        // Only concatenate if the organisation type is not "Land"
+        title: org.typ === OrganisationsTyp.Land ? org.name : `${org.kennung} (${org.name})`,
       }))
       .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
   });
