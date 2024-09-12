@@ -274,7 +274,7 @@
                             class="subtitle-2 text-red"
                           >
                             <strong>{{ item.labelAbbr }}</strong>
-                            {{ t('missing') }}</span
+                            :{{ t('missing') }}</span
                           >
                           <strong v-else>{{ item.label }}:</strong>
                         </SpshTooltip>
