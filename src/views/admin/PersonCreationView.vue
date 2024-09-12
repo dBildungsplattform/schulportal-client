@@ -18,7 +18,11 @@
   import PasswordOutput from '@/components/form/PasswordOutput.vue';
   import FormWrapper from '@/components/form/FormWrapper.vue';
   import FormRow from '@/components/form/FormRow.vue';
-  import { usePersonenkontextStore, type DBiamPersonenkontextResponse, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
+  import {
+    usePersonenkontextStore,
+    type DBiamPersonenkontextResponse,
+    type PersonenkontextStore,
+  } from '@/stores/PersonenkontextStore';
   import { useDisplay } from 'vuetify';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
@@ -46,6 +50,10 @@
   const calculatedBefristung: Ref<string | undefined> = ref('');
 
   const rollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = useRollen();
+
+  const selectedOrgaCache: Ref<string | undefined> = ref(undefined);
+  const selectedKlasseCache: Ref<string | undefined> = ref(undefined);
+  const selectedRolleCache: Ref<string | undefined> = ref(undefined);
 
   enum BefristungOption {
     SCHULJAHRESENDE = 'schuljahresende',
@@ -181,52 +189,46 @@
 
   const klassen: ComputedRef<TranslatedObject[] | undefined> = useKlassen();
 
-  const klasseZuordnungFromCreatedKontext: ComputedRef<DBiamPersonenkontextResponse | undefined> = computed(
-    () => {
-      if (!selectedKlasse.value || !selectedRolle.value) return;
-      return personenkontextStore.createdPersonWithKontext?.dBiamPersonenkontextResponses
-        .find((kontext) => kontext.organisationId === selectedKlasse.value && kontext.rolleId === selectedRolle.value)
-    }
-  );
+  const klasseZuordnungFromCreatedKontext: ComputedRef<DBiamPersonenkontextResponse | undefined> = computed(() => {
+    return personenkontextStore.createdPersonWithKontext?.dBiamPersonenkontextResponses.find(
+      (kontext: DBiamPersonenkontextResponse) =>
+        kontext.organisationId === selectedKlasseCache.value && kontext.rolleId === selectedRolleCache.value,
+    );
+  });
 
-  const schuleZuordnungFromCreatedKontext: ComputedRef<DBiamPersonenkontextResponse | undefined> = computed(
-    () => {
-      if (!selectedOrganisation.value || !selectedRolle.value) return;
-      return personenkontextStore.createdPersonWithKontext?.dBiamPersonenkontextResponses
-        .find((kontext) => kontext.organisationId === selectedOrganisation.value && kontext.rolleId === selectedRolle.value)
-    }
-  );
+  const schuleZuordnungFromCreatedKontext: ComputedRef<DBiamPersonenkontextResponse | undefined> = computed(() => {
+    return personenkontextStore.createdPersonWithKontext?.dBiamPersonenkontextResponses.find(
+      (kontext: DBiamPersonenkontextResponse) =>
+        kontext.organisationId === selectedOrgaCache.value && kontext.rolleId === selectedRolleCache.value,
+    );
+  });
 
-  const translatedOrganisationsname: ComputedRef<string> = computed(
-    () => {
-      if (!schuleZuordnungFromCreatedKontext.value) return;
-      return organisationen.value?.find(
+  const translatedOrganisationsname: ComputedRef<string | undefined> = computed(() => {
+    if (!schuleZuordnungFromCreatedKontext.value) return;
+    return (
+      organisationen.value?.find(
         (organisation: TranslatedObject) =>
-        organisation.value ===
-        schuleZuordnungFromCreatedKontext.value?.organisationId,
+          organisation.value === schuleZuordnungFromCreatedKontext.value?.organisationId,
       )?.title || ''
-    }
-  );
+    );
+  });
 
-  const translatedRollenname: ComputedRef<string> = computed(
-    () => {
-      if (!schuleZuordnungFromCreatedKontext.value) return;
-      return rollen.value?.find(
-        (rolle: TranslatedObject) =>
-          rolle.value === schuleZuordnungFromCreatedKontext.value?.rolleId,
-      )?.title || ''
-    }
-  );
+  const translatedRollenname: ComputedRef<string | undefined> = computed(() => {
+    if (!schuleZuordnungFromCreatedKontext.value) return;
+    return (
+      rollen.value?.find((rolle: TranslatedObject) => rolle.value === schuleZuordnungFromCreatedKontext.value?.rolleId)
+        ?.title || ''
+    );
+  });
 
-  const translatedKlassenname: ComputedRef<string> = computed(
-    () => {
-      if (!klasseZuordnungFromCreatedKontext.value) return;
-      return klassen.value?.find(
-        (klasse: TranslatedObject) =>
-          klasse.value === klasseZuordnungFromCreatedKontext.value?.organisationId,
+  const translatedKlassenname: ComputedRef<string | undefined> = computed(() => {
+    if (!klasseZuordnungFromCreatedKontext.value) return;
+    return (
+      klassen.value?.find(
+        (klasse: TranslatedObject) => klasse.value === klasseZuordnungFromCreatedKontext.value?.organisationId,
       )?.title || ''
-    }
-  );
+    );
+  });
 
   // Converts the ISO UTC formatted Befristung to the german local format, also ISO.
   const translatedBefristung: ComputedRef<string> = computed(() => {
@@ -321,14 +323,17 @@
     };
 
     if (selectedKlasse.value) {
+      selectedKlasseCache.value = JSON.parse(JSON.stringify(selectedKlasse.value));
       bodyParams.createPersonenkontexte.push({
         organisationId: selectedKlasse.value,
         rolleId: selectedRolle.value ?? '',
       });
     }
-
+    // We save a copy of the selected values because they are not available anymore since we reset the form right after submitting
+    // This will then be used to display the organisation again in the success template after receiving the orga ID and rolle ID back from the BE.
+    selectedOrgaCache.value = JSON.parse(JSON.stringify(selectedOrganisation.value));
+    selectedRolleCache.value = JSON.parse(JSON.stringify(selectedRolle.value));
     await personenkontextStore.createPersonWithKontexte(bodyParams);
-
     resetForm();
     hasNoKopersNr.value = false;
   }
@@ -733,9 +738,7 @@
             }}</span></v-col
           >
         </v-row>
-        <v-row
-          v-if="isKopersRolle(schuleZuordnungFromCreatedKontext?.rolleId)"
-        >
+        <v-row v-if="isKopersRolle(schuleZuordnungFromCreatedKontext?.rolleId)">
           <v-col
             :class="`${isKopersRolle(schuleZuordnungFromCreatedKontext?.rolleId) && personenkontextStore.createdPersonWithKontext.person.personalnummer ? 'text-body bold text-right' : 'text-body bold text-right text-red'}`"
           >
@@ -784,13 +787,7 @@
             ><span data-testid="created-person-befristung">{{ translatedBefristung }}</span></v-col
           >
         </v-row>
-        <v-row
-          v-if="
-            isLernRolle(
-              klasseZuordnungFromCreatedKontext?.rolleId as string,
-            )
-          "
-        >
+        <v-row v-if="isLernRolle(klasseZuordnungFromCreatedKontext?.rolleId as string)">
           <v-col class="text-body bold text-right"> {{ $t('admin.klasse.klasse') }}: </v-col>
           <v-col class="text-body"
             ><span data-testid="created-person-klasse">{{
