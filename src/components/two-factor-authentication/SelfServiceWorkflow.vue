@@ -117,7 +117,7 @@
       >
         <v-card-text>
           <v-container v-if="workflowStep === 'start'">
-            <v-row class="text-body px-md-16">
+            <v-row class="text-body bold px-md-16">
               <div class="v-col">
                 <p
                   class="text-body"
@@ -127,7 +127,7 @@
                 </p>
               </div>
             </v-row>
-            <v-row class="text-body px-md-16 mt-6">
+            <v-row class="text-body bold px-md-16 mt-6">
               <v-col class="d-flex">
                 <v-icon
                   icon="mdi-alert-circle"
@@ -143,7 +143,7 @@
             </v-row>
           </v-container>
           <v-container v-if="workflowStep === 'qrcode'">
-            <v-row class="text-body px-md-16">
+            <v-row class="text-body bold px-md-16">
               <div class="v-col">
                 <p class="text-body">
                   {{ $t('admin.person.twoFactorAuthentication.pleaseScan') }}
@@ -185,7 +185,7 @@
                 cols="12"
                 md="8"
               >
-                <v-row class="text-body px-md-16 justify-center">
+                <v-row class="text-body bold px-md-16 justify-center">
                   <v-col>
                     <p
                       data-testid="self-service-otp-entry-info-text"
@@ -207,14 +207,14 @@
 
                 <v-row
                   v-if="errorMessage.length > 0"
-                  class="text-body justify-center text-error"
+                  class="text-body bold justify-center text-error"
                 >
                   <p class="justify-center">{{ errorMessage }}</p>
                 </v-row>
 
                 <v-row
                   v-if="errorMessage.length === 0"
-                  class="text-body justify-center"
+                  class="text-body bold justify-center"
                 >
                   <p class="justify-center">{{ $t('admin.person.twoFactorAuthentication.otp') }}</p>
                 </v-row>
