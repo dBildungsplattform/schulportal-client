@@ -188,7 +188,7 @@
                 <v-row class="text-body px-md-16 justify-center">
                   <v-col>
                     <p
-                      data-testid="password-reset-info-text"
+                      data-testid="self-service-otp-entry-info-text"
                       class="text-center"
                     >
                       {{ $t('admin.person.twoFactorAuthentication.enterOtp') }}
