@@ -16,6 +16,7 @@
   import { type RouteLocationNormalizedLoaded, type Router, useRoute, useRouter } from 'vue-router';
   import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
   import {
+    TokenKind,
     useTwoFactorAuthentificationStore,
     type TwoFactorAuthentificationStore,
   } from '@/stores/TwoFactorAuthentificationStore';
@@ -457,10 +458,10 @@
                   ></v-icon>
                 </v-col>
                 <div class="v-col">
-                  <p v-if="twoFactorAuthentificationStore.tokenKind === 'software'">
+                  <p v-if="twoFactorAuthentificationStore.tokenKind === TokenKind.software">
                     {{ $t('admin.person.twoFactorAuthentication.softwareTokenIsSetUpSelfService') }}
                   </p>
-                  <p v-else-if="twoFactorAuthentificationStore.tokenKind === 'hardware'">
+                  <p v-else-if="twoFactorAuthentificationStore.tokenKind === TokenKind.hardware">
                     {{
                       $t('admin.person.twoFactorAuthentication.hardwareTokenIsSetUpSelfService', {
                         serialNumber: twoFactorAuthentificationStore.tokenKind,

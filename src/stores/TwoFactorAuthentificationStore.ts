@@ -16,7 +16,7 @@ type TwoFactorState = {
   errorCode: string;
   loading: boolean;
   hasToken: boolean | null;
-  tokenKind: 'hardware' | 'software' | null;
+  tokenKind: TokenKind | null;
   qrCode: string;
   serial: string;
 };
@@ -80,10 +80,10 @@ export const useTwoFactorAuthentificationStore: StoreDefinition<
 
         switch (twoFactorState.tokenKind) {
           case 'hardware':
-            this.tokenKind = 'hardware';
+            this.tokenKind = TokenKind.hardware;
             break;
           case 'software':
-            this.tokenKind = 'software';
+            this.tokenKind = TokenKind.software;
             break;
           default:
             this.tokenKind = null;

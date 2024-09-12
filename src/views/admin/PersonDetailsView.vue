@@ -37,6 +37,7 @@
   import { useDisplay } from 'vuetify';
   import { object, string, StringSchema, type AnyObject } from 'yup';
   import {
+    TokenKind,
     useTwoFactorAuthentificationStore,
     type TwoFactorAuthentificationStore,
   } from '@/stores/TwoFactorAuthentificationStore';
@@ -964,15 +965,16 @@
                   ></v-icon>
                 </v-col>
                 <div class="v-col">
-                  <p v-if="twoFactorAuthentificationStore.tokenKind === 'software'">
+                  <p v-if="twoFactorAuthentificationStore.tokenKind === TokenKind.software">
                     {{ $t('admin.person.twoFactorAuthentication.softwareTokenIsSetUp') }}
                   </p>
-                  <p v-if="twoFactorAuthentificationStore.tokenKind === 'hardware'">
+                  <p v-if="twoFactorAuthentificationStore.tokenKind === TokenKind.hardware">
                     {{ $t('admin.person.twoFactorAuthentication.hardwareTokenIsSetUp') }}
                   </p>
                   <p
                     v-if="
-                      twoFactorAuthentificationStore.tokenKind === 'hardware' && twoFactorAuthentificationStore.serial
+                      twoFactorAuthentificationStore.tokenKind === TokenKind.hardware &&
+                      twoFactorAuthentificationStore.serial
                     "
                   >
                     {{

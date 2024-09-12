@@ -8,6 +8,7 @@ import MockAdapter from 'axios-mock-adapter';
 import { setActivePinia, createPinia } from 'pinia';
 import { rejects } from 'assert';
 import {
+  TokenKind,
   useTwoFactorAuthentificationStore,
   type TwoFactorAuthentificationStore,
 } from './TwoFactorAuthentificationStore';
@@ -222,7 +223,7 @@ describe('TwoFactorAuthentificationStore', () => {
       twoFactorAuthenticationStore.errorCode = 'some error';
       twoFactorAuthenticationStore.loading = true;
       twoFactorAuthenticationStore.hasToken = true;
-      twoFactorAuthenticationStore.tokenKind = 'software';
+      twoFactorAuthenticationStore.tokenKind = TokenKind.software;
       twoFactorAuthenticationStore.qrCode = 'fakeQRCode';
       twoFactorAuthenticationStore.serial = '1234';
 
