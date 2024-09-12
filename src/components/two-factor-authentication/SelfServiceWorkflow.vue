@@ -74,7 +74,7 @@
       case TwoFactorSteps.Verify:
         await twoFactorStore.verify2FAToken(props.personId, otp.value);
 
-        if (twoFactorStore.errorCode) {
+        if (twoFactorStore.errorCode !== '') {
           otp.value = '';
           errorMessage.value = t(`admin.person.twoFactorAuthentication.errors.${twoFactorStore.errorCode}`);
           return;

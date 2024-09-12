@@ -147,7 +147,6 @@ export const useTwoFactorAuthentificationStore: StoreDefinition<
         if (isAxiosError(error)) {
           this.errorCode = error.response?.data.i18nKey || 'SOFTWARE_TOKEN_VERIFICATION_ERROR';
         }
-        return await Promise.reject(this.errorCode);
       } finally {
         this.loading = false;
       }
