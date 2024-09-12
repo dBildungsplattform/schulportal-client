@@ -25,11 +25,11 @@
 
   const dialogHeader: ComputedRef<string> = computed(() => {
     switch (workflowStep.value) {
-      case 'start':
+      case TwoFactorSteps.Start:
         return t('admin.person.twoFactorAuthentication.setUpLong');
-      case 'qrcode':
+      case TwoFactorSteps.QRCode:
         return t('admin.person.twoFactorAuthentication.softwareTokenOption');
-      case 'verify':
+      case TwoFactorSteps.Verify:
         return t('admin.person.twoFactorAuthentication.header');
       default:
         return t('admin.person.twoFactorAuthentication.setUpLong');
@@ -51,7 +51,7 @@
   const props: Props = defineProps<Props>();
 
   async function close2FADialog(isActive: Ref<boolean>): Promise<void> {
-    if (workflowStep.value !== 'start') {
+    if (workflowStep.value !== TwoFactorSteps.Start) {
       emits('dialogClosed');
       twoFactorStore.qrCode = '';
       twoFactorStore.hasToken = null;
@@ -64,20 +64,22 @@
 
   async function proceed(isActive: Ref<boolean>): Promise<void> {
     switch (workflowStep.value) {
-      case 'start':
+      case TwoFactorSteps.Start:
         workflowStep.value = TwoFactorSteps.QRCode;
         await twoFactorStore.get2FASoftwareQRCode(props.personId);
         break;
-      case 'qrcode':
+      case TwoFactorSteps.QRCode:
         workflowStep.value = TwoFactorSteps.Verify;
         break;
-      case 'verify':
-        try {
-          await twoFactorStore.verify2FAToken(props.personId, otp.value);
-          close2FADialog(isActive);
-        } catch (error) {
+      case TwoFactorSteps.Verify:
+        await twoFactorStore.verify2FAToken(props.personId, otp.value);
+
+        if (twoFactorStore.errorCode) {
           otp.value = '';
           errorMessage.value = t(`admin.person.twoFactorAuthentication.errors.${twoFactorStore.errorCode}`);
+          return;
+        } else {
+          close2FADialog(isActive);
         }
     }
   }
@@ -116,7 +118,7 @@
         data-testid="two-factor-authentication-dialog"
       >
         <v-card-text>
-          <v-container v-if="workflowStep === 'start'">
+          <v-container v-if="workflowStep === TwoFactorSteps.Start">
             <v-row class="text-body bold px-md-16">
               <div class="v-col">
                 <p
@@ -142,7 +144,7 @@
               </v-col>
             </v-row>
           </v-container>
-          <v-container v-if="workflowStep === 'qrcode'">
+          <v-container v-if="workflowStep === TwoFactorSteps.QRCode">
             <v-row class="text-body bold px-md-16">
               <div class="v-col">
                 <p class="text-body">
@@ -174,7 +176,7 @@
             </v-row>
           </v-container>
           <v-container
-            v-if="workflowStep === 'verify'"
+            v-if="workflowStep === TwoFactorSteps.Verify"
             class="fill-height"
           >
             <v-row
