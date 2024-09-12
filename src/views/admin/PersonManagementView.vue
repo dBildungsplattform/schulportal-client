@@ -255,11 +255,7 @@
       limit: 25,
       organisationIds: selectedOrganisation.value,
     });
-    await organisationStore.getFilteredKlassen({
-      includeTyp: OrganisationsTyp.Klasse,
-      systemrechte: ['KLASSEN_VERWALTEN'],
-      limit: 25,
-    });
+
     await getPaginatedPersonen(searchFilterStore.personenPage);
     await personenkontextStore.getPersonenkontextRolleWithFilter('');
 
