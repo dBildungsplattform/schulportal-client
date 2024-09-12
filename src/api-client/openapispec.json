@@ -238,21 +238,9 @@
     "/api/personen/{personId}/personenkontexte": {
       "post": {
         "operationId": "PersonController_createPersonenkontext",
-        "parameters": [
-          {
-            "name": "personId",
-            "required": true,
-            "in": "path",
-            "description": "The id for the account.",
-            "schema": { "nullable": false, "type": "string" }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": { "schema": { "$ref": "#/components/schemas/CreatePersonenkontextBodyParams" } }
-          }
-        },
+        "summary": "",
+        "deprecated": true,
+        "parameters": [{ "name": "personId", "required": true, "in": "path", "schema": { "type": "string" } }],
         "responses": {
           "200": { "description": "The personenkontext was successfully created." },
           "400": { "description": "The personenkontext already exists." },
@@ -1398,21 +1386,9 @@
       },
       "put": {
         "operationId": "PersonenkontextController_updatePersonenkontextWithId",
-        "parameters": [
-          {
-            "name": "personenkontextId",
-            "required": true,
-            "in": "path",
-            "description": "The id for the personenkontext.",
-            "schema": { "nullable": false, "type": "string" }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": { "schema": { "$ref": "#/components/schemas/UpdatePersonenkontextBodyParams" } }
-          }
-        },
+        "summary": "",
+        "deprecated": true,
+        "parameters": [{ "name": "personenkontextId", "required": true, "in": "path", "schema": { "type": "string" } }],
         "responses": {
           "200": {
             "description": "The personenkontext was successfully updated.",
@@ -2067,27 +2043,6 @@
         "properties": { "person": { "$ref": "#/components/schemas/PersonResponse" } },
         "required": ["person"]
       },
-      "Rolle": { "type": "string", "enum": ["LERN", "LEHR", "EXTERN", "ORGADMIN", "LEIT", "SYSADMIN"] },
-      "Personenstatus": {
-        "type": "string",
-        "description": "The new personenstatus of the personenkontext.",
-        "enum": ["AKTIV"]
-      },
-      "Jahrgangsstufe": {
-        "type": "string",
-        "description": "The new jahrgangsstufe of the personenkontext.",
-        "enum": ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10"]
-      },
-      "CreatePersonenkontextBodyParams": {
-        "type": "object",
-        "properties": {
-          "referrer": { "type": "string" },
-          "rolle": { "$ref": "#/components/schemas/Rolle" },
-          "personenstatus": { "$ref": "#/components/schemas/Personenstatus" },
-          "jahrgangsstufe": { "$ref": "#/components/schemas/Jahrgangsstufe" }
-        },
-        "required": ["rolle"]
-      },
       "RawPagedResponse": {
         "type": "object",
         "properties": {
@@ -2135,6 +2090,8 @@
           "revision"
         ]
       },
+      "Rolle": { "type": "string", "enum": ["LERN", "LEHR", "EXTERN", "ORGADMIN", "LEIT", "SYSADMIN"] },
+      "Personenstatus": { "type": "string", "enum": ["AKTIV"] },
       "Sichtfreigabe": { "type": "string", "enum": ["ja", "nein"] },
       "UpdatePersonBodyParams": {
         "type": "object",
@@ -2686,16 +2643,6 @@
           "PERSONEN_VERWALTEN",
           "SCHULTRAEGER_VERWALTEN"
         ]
-      },
-      "UpdatePersonenkontextBodyParams": {
-        "type": "object",
-        "properties": {
-          "referrer": { "type": "string", "description": "The new referrer of the personenkontext." },
-          "personenstatus": { "$ref": "#/components/schemas/Personenstatus" },
-          "jahrgangsstufe": { "$ref": "#/components/schemas/Jahrgangsstufe" },
-          "revision": { "type": "string", "description": "The revision of the personenkontext." }
-        },
-        "required": ["revision"]
       },
       "DeleteRevisionBodyParams": {
         "type": "object",
