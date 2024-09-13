@@ -42,22 +42,13 @@ beforeEach(() => {
     },
   ];
 
-  organisationStore.allSchulen = [
+  organisationStore.allOrganisationen = [
     {
       id: '9876',
       name: 'Random Schulname Gymnasium',
       kennung: '9356494',
       namensergaenzung: 'Schule',
       kuerzel: 'rsg',
-      typ: 'SCHULE',
-      administriertVon: '1',
-    },
-    {
-      id: '1123',
-      name: 'Albert-Emil-Hansebrot-Gymnasium',
-      kennung: '2745475',
-      namensergaenzung: 'Schule',
-      kuerzel: 'aehg',
       typ: 'SCHULE',
       administriertVon: '1',
     },
