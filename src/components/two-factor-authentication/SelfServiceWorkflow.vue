@@ -61,6 +61,11 @@
     workflowStep.value = TwoFactorSteps.Start;
   }
 
+  async function resetErrorMessage(): Promise<void> {
+    errorMessage.value = '';
+    twoFactorStore.errorCode = '';
+  }
+
   async function proceedToNextWorkflowStep(isActive: Ref<boolean>): Promise<void> {
     switch (workflowStep.value) {
       case TwoFactorSteps.Start:
@@ -201,7 +206,7 @@
                   <v-otp-input
                     v-model="otp"
                     :error="errorMessage.length > 0"
-                    @input="errorMessage = ''"
+                    @input="resetErrorMessage()"
                   >
                   </v-otp-input>
                 </v-row>
