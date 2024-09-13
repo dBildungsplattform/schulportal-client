@@ -57,12 +57,11 @@
       twoFactorStore.hasToken = null;
       twoFactorStore.tokenKind = null;
     }
-
     isActive.value = false;
     workflowStep.value = TwoFactorSteps.Start;
   }
 
-  async function proceed(isActive: Ref<boolean>): Promise<void> {
+  async function proceedToNextWorkflowStep(isActive: Ref<boolean>): Promise<void> {
     switch (workflowStep.value) {
       case TwoFactorSteps.Start:
         workflowStep.value = TwoFactorSteps.QRCode;
@@ -248,7 +247,7 @@
               <v-btn
                 :block="mdAndDown"
                 class="primary button"
-                @click.stop="proceed(isActive)"
+                @click.stop="proceedToNextWorkflowStep(isActive)"
                 data-testid="proceed-two-factor-authentication-dialog"
               >
                 {{ $t('proceed') }}
