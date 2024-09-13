@@ -78,6 +78,25 @@ beforeEach(() => {
       selectedRolle: '',
       selectedKlasse: '',
       showHeadline: true,
+      befristungProps: {
+        error: false,
+        'error-messages': [],
+        onBlur: () => vi.fn(),
+        onChange: () => vi.fn(),
+        onInput: () => vi.fn(),
+      },
+      befristungOptionProps: {
+        error: false,
+        'error-messages': [],
+        onBlur: () => vi.fn(),
+        onChange: () => vi.fn(),
+        onInput: () => vi.fn(),
+      },
+      isUnbefristetDisabled: false,
+      isBefristungRequired: false,
+      nextSchuljahresende: '2024-07-31',
+      befristung: undefined,
+      befristungOption: undefined,
     },
     global: {
       components: {
