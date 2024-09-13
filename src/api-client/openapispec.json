@@ -3406,14 +3406,14 @@
         },
         "/api/personenkontext-workflow": {
             "post": {
-                "operationId": "DbiamPersonenkontextWorkflowController_createPersonWithKontext",
+                "operationId": "DbiamPersonenkontextWorkflowController_createPersonWithPersonenkontexte",
                 "parameters": [],
                 "requestBody": {
                     "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/DbiamCreatePersonWithContextBodyParams"
+                                "$ref": "#/components/schemas/DbiamCreatePersonWithPersonenkontexteBodyParams"
                             }
                         }
                     }
@@ -5658,22 +5658,9 @@
                     "total"
                 ]
             },
-            "DbiamCreatePersonWithContextBodyParams": {
+            "DbiamCreatePersonenkontextBodyParams": {
                 "type": "object",
                 "properties": {
-                    "familienname": {
-                        "type": "string"
-                    },
-                    "vorname": {
-                        "type": "string"
-                    },
-                    "befristung": {
-                        "format": "date-time",
-                        "type": "string"
-                    },
-                    "personalnummer": {
-                        "type": "string"
-                    },
                     "organisationId": {
                         "type": "string"
                     },
@@ -5682,10 +5669,38 @@
                     }
                 },
                 "required": [
-                    "familienname",
-                    "vorname",
                     "organisationId",
                     "rolleId"
+                ]
+            },
+            "DbiamCreatePersonWithPersonenkontexteBodyParams": {
+                "type": "object",
+                "properties": {
+                    "familienname": {
+                        "type": "string"
+                    },
+                    "vorname": {
+                        "type": "string"
+                    },
+                    "personalnummer": {
+                        "type": "string"
+                    },
+                    "befristung": {
+                        "format": "date-time",
+                        "type": "string"
+                    },
+                    "createPersonenkontexte": {
+                        "nullable": false,
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/DbiamCreatePersonenkontextBodyParams"
+                        }
+                    }
+                },
+                "required": [
+                    "familienname",
+                    "vorname",
+                    "createPersonenkontexte"
                 ]
             },
             "DBiamPersonResponse": {
@@ -5694,13 +5709,16 @@
                     "person": {
                         "$ref": "#/components/schemas/PersonResponse"
                     },
-                    "DBiamPersonenkontextResponse": {
-                        "$ref": "#/components/schemas/DBiamPersonenkontextResponse"
+                    "dBiamPersonenkontextResponses": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/DBiamPersonenkontextResponse"
+                        }
                     }
                 },
                 "required": [
                     "person",
-                    "DBiamPersonenkontextResponse"
+                    "dBiamPersonenkontextResponses"
                 ]
             },
             "FindRollenResponse": {

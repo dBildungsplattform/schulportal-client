@@ -17,7 +17,7 @@ import {
   type PersonenkontexteUpdateResponse,
   type DbiamPersonenkontextBodyParams,
   type PersonenkontextWorkflowResponse,
-  type DbiamCreatePersonWithContextBodyParams,
+  type DbiamCreatePersonWithPersonenkontexteBodyParams,
   type DBiamPersonResponse,
   type PersonendatensatzResponse,
   type PersonAdministrationApiInterface,
@@ -96,12 +96,15 @@ type PersonenkontextActions = {
     personenkontext: DbiamPersonenkontextBodyParams,
     personenKontextTyp: PersonenKontextTyp,
   ) => Promise<DBiamPersonenkontextResponse>;
-  createPersonWithKontext: (params: DbiamCreatePersonWithContextBodyParams) => Promise<PersonendatensatzResponse>;
+  createPersonWithKontexte: (
+    params: DbiamCreatePersonWithPersonenkontexteBodyParams,
+  ) => Promise<PersonendatensatzResponse>;
 };
 
 export type {
   SystemrechtResponse,
   DbiamUpdatePersonenkontexteBodyParams,
+  DBiamPersonenkontextResponse,
   DbiamPersonenkontextBodyParams,
   PersonenkontextWorkflowResponse,
   PersonenkontexteUpdateResponse,
@@ -284,11 +287,13 @@ export const usePersonenkontextStore: StoreDefinition<
         this.loading = false;
       }
     },
-    async createPersonWithKontext(params: DbiamCreatePersonWithContextBodyParams): Promise<DBiamPersonResponse> {
+    async createPersonWithKontexte(
+      params: DbiamCreatePersonWithPersonenkontexteBodyParams,
+    ): Promise<DBiamPersonResponse> {
       this.loading = true;
       try {
         const { data }: { data: DBiamPersonResponse } =
-          await personenKontextApi.dbiamPersonenkontextWorkflowControllerCreatePersonWithKontext(params);
+          await personenKontextApi.dbiamPersonenkontextWorkflowControllerCreatePersonWithPersonenkontexte(params);
         this.createdPersonWithKontext = data;
         return data;
       } catch (error: unknown) {
