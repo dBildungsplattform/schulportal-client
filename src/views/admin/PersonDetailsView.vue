@@ -29,6 +29,7 @@
   import { usePersonenkontextStore, type PersonenkontextStore, type Zuordnung } from '@/stores/PersonenkontextStore';
   import { RollenArt, RollenMerkmal } from '@/stores/RolleStore';
   import {
+    TokenKind,
     useTwoFactorAuthentificationStore,
     type TwoFactorAuthentificationStore,
   } from '@/stores/TwoFactorAuthentificationStore';
@@ -996,10 +997,10 @@
                     </v-col>
                     <v-col>
                       <template v-if="twoFactorAuthentificationStore.hasToken">
-                        <p v-if="twoFactorAuthentificationStore.tokenKind === 'software'">
+                        <p v-if="twoFactorAuthentificationStore.tokenKind === TokenKind.software">
                           {{ $t('admin.person.twoFactorAuthentication.softwareTokenIsSetUp') }}
                         </p>
-                        <p v-if="twoFactorAuthentificationStore.tokenKind === 'hardware'">
+                        <p v-if="twoFactorAuthentificationStore.tokenKind === TokenKind.hardware">
                           {{ $t('admin.person.twoFactorAuthentication.hardwareTokenIsSetUp') }}
                         </p>
                         <p v-if="twoFactorAuthentificationStore.serial">
