@@ -181,6 +181,8 @@
   function resetSearchAndFilter(): void {
     searchFilter.value = '';
     searchFieldComponent.value.searchFilter = '';
+    searchFilterStore.setKlasseFilter([]);
+    searchFilterStore.setRolleFilter([]);
     /* do not reset orgas if orga was autoselected */
     if (!hasAutoSelectedOrganisation.value) {
       selectedOrganisation.value = [];
