@@ -47,6 +47,8 @@ export type PersonenkontextFieldDefinitions = {
   selectedBefristungProps: Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>;
   selectedBefristungOption: Ref<string | undefined>;
   selectedBefristungOptionProps: Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>;
+  selectedKopersNr: Ref<string | undefined>;
+  selectedKopersNrProps: Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>;
 };
 
 type Schema = StringSchema<string | undefined, AnyObject, undefined, ''>;
@@ -120,6 +122,11 @@ export const getPersonenkontextFieldDefinitions = (
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = formContext.defineField('selectedBefristungOption', getVuetifyConfig);
 
+  const [selectedKopersNr, selectedKopersNrProps]: [
+    Ref<string | undefined>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = formContext.defineField('selectedKopersNr', getVuetifyConfig);
+
   return {
     selectedRolle,
     selectedRolleProps,
@@ -131,6 +138,8 @@ export const getPersonenkontextFieldDefinitions = (
     selectedBefristungProps,
     selectedBefristungOption,
     selectedBefristungOptionProps,
+    selectedKopersNr,
+    selectedKopersNrProps,
   };
 };
 
