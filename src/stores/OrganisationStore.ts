@@ -8,6 +8,7 @@ import {
   type CreateOrganisationBodyParams,
   type RollenSystemRecht,
   type OrganisationByNameBodyParams,
+  type ParentOrganisationenResponse,
 } from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
 
@@ -58,11 +59,15 @@ type OrganisationState = {
   createdSchule: Organisation | null;
   totalKlassen: number;
   totalSchulen: number;
+  totalPaginatedSchulen: number;
+  totalPaginatedKlassen: number;
+  totalPaginatedOrganisationen: number;
   totalOrganisationen: number;
   klassen: Array<Organisation>;
   errorCode: string;
   loading: boolean;
   loadingKlassen: boolean;
+  parentOrganisationen: Array<Organisation>;
 };
 
 export type OrganisationenFilter = {
@@ -82,6 +87,7 @@ type OrganisationActions = {
   getFilteredKlassen(filter?: OrganisationenFilter): Promise<void>;
   getKlassenByOrganisationId: (organisationId: string, filter?: OrganisationenFilter) => Promise<void>;
   getOrganisationById: (organisationId: string, organisationsTyp: OrganisationsTyp) => Promise<Organisation>;
+  getParentOrganisationsByIds: (organisationIds: string[]) => Promise<Organisation[]>;
   createOrganisation: (
     kennung: string,
     name: string,
@@ -118,11 +124,15 @@ export const useOrganisationStore: StoreDefinition<
       createdSchule: null,
       totalKlassen: 0,
       totalSchulen: 0,
+      totalPaginatedSchulen: 0,
+      totalPaginatedKlassen: 0,
+      totalPaginatedOrganisationen: 0,
       totalOrganisationen: 0,
       klassen: [],
       errorCode: '',
       loading: false,
       loadingKlassen: false,
+      parentOrganisationen: [],
     };
   },
 
@@ -147,10 +157,14 @@ export const useOrganisationStore: StoreDefinition<
           this.totalKlassen = +response.headers['x-paging-total'];
         } else if (filter?.includeTyp === OrganisationsTyp.Schule) {
           this.allSchulen = response.data;
+          // The total number of all Schulen before applying pagination (To use in the Result table to show all Einträge)
           this.totalSchulen = +response.headers['x-paging-total'];
+          // The paginated total number to show in the autocomplete filters.
+          this.totalPaginatedSchulen = +response.headers['x-paging-pagetotal'];
         } else {
           this.allOrganisationen = response.data;
           this.totalOrganisationen = +response.headers['x-paging-total'];
+          this.totalPaginatedOrganisationen = +response.headers['x-paging-pagetotal'];
         }
         this.loading = false;
       } catch (error: unknown) {
@@ -179,6 +193,7 @@ export const useOrganisationStore: StoreDefinition<
         );
         this.klassen = response.data;
         this.totalKlassen = +response.headers['x-paging-total'];
+        this.totalPaginatedKlassen = +response.headers['x-paging-pagetotal'];
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
@@ -214,6 +229,26 @@ export const useOrganisationStore: StoreDefinition<
       }
     },
 
+    async getParentOrganisationsByIds(organisationIds: string[]) {
+      this.errorCode = '';
+      this.loading = true;
+      try {
+        const response: AxiosResponse<ParentOrganisationenResponse, unknown> =
+          await organisationApi.organisationControllerGetParentsByIds({ organisationIds: organisationIds });
+        const { parents }: ParentOrganisationenResponse = response.data;
+        this.parentOrganisationen = parents;
+        return parents;
+      } catch (error: unknown) {
+        this.errorCode = 'UNSPECIFIED_ERROR';
+        if (isAxiosError(error)) {
+          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
+        }
+        return await Promise.reject(this.errorCode);
+      } finally {
+        this.loading = false;
+      }
+    },
+
     async getKlassenByOrganisationId(organisationId: string, filter?: OrganisationenFilter) {
       this.errorCode = '';
       this.loadingKlassen = true;
@@ -230,6 +265,7 @@ export const useOrganisationStore: StoreDefinition<
         );
         this.klassen = getFilteredKlassen;
         this.totalKlassen = +response.headers['x-paging-total'];
+        this.totalPaginatedKlassen = +response.headers['x-paging-pageTotal'];
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
