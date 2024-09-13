@@ -273,8 +273,10 @@
                             v-if="item.labelAbbr"
                             class="subtitle-2 text-red"
                           >
-                            <strong>{{ item.labelAbbr }}</strong>
-                            :{{ t('missing') }}</span
+                            <abbr :title="item.label"
+                              ><strong>{{ item.labelAbbr }}</strong></abbr
+                            >
+                            :</span
                           >
                           <strong v-else>{{ item.label }}:</strong>
                         </SpshTooltip>
@@ -287,7 +289,13 @@
                         >
                         <strong v-else>{{ item.label }}:</strong>
                       </td>
-                      <td>{{ item.value }}</td>
+                      <td
+                        v-if="item.type === ItemType.KO_PERS && item.value === null"
+                        class="subtitle-2 text-red"
+                      >
+                        {{ t('missing') }}
+                      </td>
+                      <td v-else>{{ item.value }}</td>
                     </tr>
                   </tbody>
                 </template>
