@@ -9,6 +9,7 @@
   import type { BaseFieldProps } from 'vee-validate';
   import type { TranslatedRolleWithAttrs } from '@/composables/useRollen';
   import BefristungInput from '@/components/admin/personen/BefristungInput.vue';
+  import type { BefristungProps } from '@/components/admin/personen/BefristungInput.vue';
 
   useI18n({ useScope: 'global' });
 
@@ -34,13 +35,7 @@
     selectedRolle: string | undefined;
     selectedKlasse?: string | undefined;
     showHeadline: boolean;
-    befristungProps: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
-    befristungOptionProps: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
-    isUnbefristetDisabled: boolean;
-    isBefristungRequired: boolean;
-    nextSchuljahresende: string;
-    befristung: string | undefined;
-    befristungOption: string | undefined;
+    befristungInputProps: BefristungProps;
   };
 
   const props: Props = defineProps<Props>();
@@ -247,7 +242,7 @@
   const handleBefristungChange = (value: string | undefined): void => {
     emits('update:befristung', value);
     // Reset befristungOption only if a custom date is entered
-    if (value && value !== props.nextSchuljahresende) {
+    if (value && value !== props.befristungInputProps.nextSchuljahresende) {
       emits('update:calculatedBefristungOption', undefined);
     }
   };
@@ -358,13 +353,13 @@
       </v-row>
       <BefristungInput
         v-if="selectedOrganisation && selectedRolle"
-        :befristungProps="befristungProps"
-        :befristungOptionProps="befristungOptionProps"
-        :isUnbefristetDisabled="isUnbefristetDisabled"
-        :isBefristungRequired="isBefristungRequired"
-        :nextSchuljahresende="nextSchuljahresende"
-        :befristung="befristung"
-        :befristungOption="befristungOption"
+        :befristungProps="befristungInputProps.befristungProps"
+        :befristungOptionProps="befristungInputProps.befristungOptionProps"
+        :isUnbefristetDisabled="befristungInputProps.isUnbefristetDisabled"
+        :isBefristungRequired="befristungInputProps.isBefristungRequired"
+        :nextSchuljahresende="befristungInputProps.nextSchuljahresende"
+        :befristung="befristungInputProps.befristung"
+        :befristungOption="befristungInputProps.befristungOption"
         @update:befristung="handleBefristungChange"
         @update:calculatedBefristungOption="handleCalculatedBefristungOptionChange"
       />

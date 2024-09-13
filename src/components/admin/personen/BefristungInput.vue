@@ -9,7 +9,7 @@
 
   useI18n();
 
-  type Props = {
+  export type BefristungProps = {
     befristungProps: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     befristungOptionProps: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     isUnbefristetDisabled: boolean;
@@ -19,7 +19,7 @@
     befristungOption: string | undefined;
   };
 
-  const props: Props = defineProps<Props>();
+  const props: BefristungProps = defineProps<BefristungProps>();
 
   type Emits = {
     (e: 'update:befristung', value: string | undefined): void;
