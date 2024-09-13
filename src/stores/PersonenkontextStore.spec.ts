@@ -429,6 +429,8 @@ describe('PersonenkontextStore', () => {
             rollenart: 'LERN',
             merkmale: ['BEFRISTUNG_PFLICHT'] as unknown as Set<RollenMerkmal>,
             systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
+            administeredBySchulstrukturknotenName: 'Land SH',
+            administeredBySchulstrukturknotenKennung: '',
           },
         ],
         total: 0,

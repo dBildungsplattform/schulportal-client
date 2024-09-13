@@ -41,6 +41,8 @@ describe('rolleStore', () => {
           createdAt: '2022',
           updatedAt: '2022',
           id: '1',
+          administeredBySchulstrukturknotenName: null,
+          administeredBySchulstrukturknotenKennung: null,
         },
       ];
 
@@ -103,6 +105,8 @@ describe('rolleStore', () => {
           createdAt: '2022',
           updatedAt: '2022',
           id: '1',
+          administeredBySchulstrukturknotenName: 'Testschule-15',
+          administeredBySchulstrukturknotenKennung: '1111115',
         },
       ];
 
@@ -203,6 +207,8 @@ describe('rolleStore', () => {
           createdAt: '2022',
           updatedAt: '2022',
           id: '1',
+          administeredBySchulstrukturknotenName: null,
+          administeredBySchulstrukturknotenKennung: null,
         },
       ];
 
@@ -246,6 +252,8 @@ describe('rolleStore', () => {
         updatedAt: '2023',
         id: '1',
         serviceProviders: [{ id: 'sp1', name: 'ServiceProvider1' }],
+        administeredBySchulstrukturknotenName: null,
+        administeredBySchulstrukturknotenKennung: null,
       };
 
       mockadapter.onPut('/api/rolle/1').replyOnce(200, mockResponse);

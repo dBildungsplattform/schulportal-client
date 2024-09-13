@@ -1955,6 +1955,18 @@ export interface RolleResponse {
      * @memberof RolleResponse
      */
     'systemrechte': Set<RollenSystemRecht>;
+    /**
+     * 
+     * @type {string}
+     * @memberof RolleResponse
+     */
+    'administeredBySchulstrukturknotenName': string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof RolleResponse
+     */
+    'administeredBySchulstrukturknotenKennung': string | null;
 }
 
 
@@ -2038,6 +2050,18 @@ export interface RolleWithServiceProvidersResponse {
      * @memberof RolleWithServiceProvidersResponse
      */
     'systemrechte': Set<RollenSystemRecht>;
+    /**
+     * 
+     * @type {string}
+     * @memberof RolleWithServiceProvidersResponse
+     */
+    'administeredBySchulstrukturknotenName': string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof RolleWithServiceProvidersResponse
+     */
+    'administeredBySchulstrukturknotenKennung': string | null;
     /**
      * 
      * @type {Array<ServiceProviderIdNameResponse>}
