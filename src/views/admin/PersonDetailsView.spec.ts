@@ -143,6 +143,8 @@ personenkontextStore.workflowStepResponse = {
       rollenart: 'LERN',
       merkmale: new Set<RollenMerkmal>(['BEFRISTUNG_PFLICHT']),
       systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
+      administeredBySchulstrukturknotenName: 'Land SH',
+      administeredBySchulstrukturknotenKennung: '',
     },
     {
       id: '1',
@@ -153,6 +155,8 @@ personenkontextStore.workflowStepResponse = {
       rollenart: 'LERN',
       merkmale: new Set<RollenMerkmal>(['BEFRISTUNG_PFLICHT']),
       systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
+      administeredBySchulstrukturknotenName: 'Land SH',
+      administeredBySchulstrukturknotenKennung: '',
     },
   ],
   selectedOrganisation: 'string',

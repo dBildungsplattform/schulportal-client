@@ -6,7 +6,7 @@ import {
   PersonenApiFactory,
   PersonenFrontendApiFactory,
   RollenMerkmal,
-  type DbiamCreatePersonWithContextBodyParams,
+  type DbiamCreatePersonWithPersonenkontexteBodyParams,
   type DbiamPersonenuebersichtApiInterface,
   type DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response,
   type DBiamPersonenuebersichtResponse,
@@ -79,7 +79,7 @@ export type PersonTableItem = {
   updatedAt?: string;
 };
 
-export type CreatePersonBodyParams = DbiamCreatePersonWithContextBodyParams;
+export type CreatePersonBodyParams = DbiamCreatePersonWithPersonenkontexteBodyParams;
 export type CreatedPersonenkontext = DbiamPersonenkontextBodyParams;
 
 export function parseLockInfo(unparsed: object): LockInfo | null {
