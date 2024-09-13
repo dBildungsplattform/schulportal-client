@@ -16,19 +16,29 @@
     :closable="false"
     :modelValue="true"
     :showButton="true"
-    :text="$t('admin.person.twoFactorAuthentication.noSecondFactorText')"
+    :text="$t('admin.person.twoFactorAuthentication.requiredSecondFactor')"
     :title="$t('admin.person.twoFactorAuthentication.header')"
     type="error"
   >
-    <v-col cols="auto">
-      <v-btn
-        class="primary"
-        @click="toSecondFactorSetup"
-        data-testid="alert-button"
-      >
-        {{ $t('admin.person.twoFactorAuthentication.toSecondFactorSetup') }}
-      </v-btn>
-    </v-col>
+    <template v-slot:button>
+      <v-col cols="auto">
+        <v-btn
+          class="primary"
+          @click="toSecondFactorSetup"
+          data-testid="alert-button"
+        >
+          {{ $t('admin.person.twoFactorAuthentication.toSecondFactorSetup') }}
+        </v-btn>
+      </v-col>
+    </template>
+    <template v-slot:text>
+      <p>
+        {{ $t('admin.person.twoFactorAuthentication.noSecondFactorText') }}
+      </p>
+      <p class="mt-8">
+        {{ $t('admin.person.twoFactorAuthentication.setUpInfo') }}
+      </p>
+    </template>
   </SpshAlert>
 </template>
 

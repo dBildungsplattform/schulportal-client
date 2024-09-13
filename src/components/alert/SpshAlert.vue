@@ -46,6 +46,7 @@
             cols="auto"
           >
             <span data-testid="alert-text">{{ text }}</span>
+            <slot name="text"></slot>
           </v-col>
         </v-row>
         <v-row justify="center">
@@ -61,7 +62,7 @@
               {{ buttonText }}
             </v-btn>
           </v-col>
-          <slot></slot>
+          <slot name="button"></slot>
         </v-row>
       </v-alert>
     </v-slide-y-transition>
