@@ -27,11 +27,11 @@ const rollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = useRollen();
 
 // Checks if the selected Rolle has Befristungspflicht
 export function isBefristungspflichtRolle(selectedRolleId: string | undefined): boolean {
-  const rolle: TranslatedRolleWithAttrs | undefined = rollen.value?.find(
-    (r: TranslatedRolleWithAttrs) => r.value === selectedRolleId,
+  return (
+    rollen.value?.some(
+      (r: TranslatedRolleWithAttrs) => r.value === selectedRolleId && r.merkmale?.has(RollenMerkmal.BefristungPflicht),
+    ) || false
   );
-
-  return !!rolle && !!rolle.merkmale && rolle.merkmale.has(RollenMerkmal.BefristungPflicht);
 }
 
 /**
@@ -44,34 +44,14 @@ export function useBefristungUtils(props: {
   calculatedBefristung: Ref<string | undefined>;
   selectedRolle: Ref<string | undefined>;
 }): BefristungUtilsType {
-  const { selectedBefristung, selectedBefristungOption, calculatedBefristung, selectedRolle, formContext }: Props =
-    props;
+  const { selectedBefristung, selectedBefristungOption, calculatedBefristung, selectedRolle }: Props = props;
 
   const handleBefristungUpdate = (value: string | undefined): void => {
     selectedBefristung.value = value;
-    calculatedBefristung.value = value;
   };
 
-  // Calculates the Befristung depending on the selected radio button. Each radio button illustrates a date (Either 31st July or undefined)
-  // The backend will receive the calculatedBefristung.
-  function handleBefristungOptionChange(value: string | undefined): void {
-    switch (value) {
-      case BefristungOption.SCHULJAHRESENDE: {
-        calculatedBefristung.value = getNextSchuljahresende();
-        formContext.resetField('selectedBefristung'); // Reset the date picker
-        break;
-      }
-      case BefristungOption.UNBEFRISTET: {
-        calculatedBefristung.value = undefined;
-        formContext.resetField('selectedBefristung');
-        break;
-      }
-    }
-  }
-
   const handleBefristungOptionUpdate = (value: string | undefined): void => {
-    selectedBefristungOption.value = value;
-    handleBefristungOptionChange(value);
+    calculatedBefristung.value = value;
   };
 
   // Setup the watchers
@@ -82,13 +62,6 @@ export function useBefristungUtils(props: {
     ): void => {
       watch(watchedValue, onValueChange, { immediate: true });
     };
-
-    // Watcher for resetting radio button when a date is picked using date-input
-    createWatcher(selectedBefristung, (newValue: string | undefined) => {
-      if (newValue) {
-        selectedBefristungOption.value = undefined;
-      }
-    });
 
     // Watcher to set an initial value for the radio buttons depending on the selected Rolle
     createWatcher(selectedRolle, (newValue: string | undefined) => {

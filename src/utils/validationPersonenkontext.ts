@@ -130,7 +130,7 @@ export const getPersonenkontextFieldDefinitions = (
     selectedBefristung,
     selectedBefristungProps,
     selectedBefristungOption,
-    selectedBefristungOptionProps
+    selectedBefristungOptionProps,
   };
 };
 

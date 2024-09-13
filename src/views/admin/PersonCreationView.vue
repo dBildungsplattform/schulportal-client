@@ -39,7 +39,6 @@
   import PersonenkontextCreate from '@/components/admin/personen/PersonenkontextCreate.vue';
   import { type TranslatedObject } from '@/types.d';
   import { parse, isValid, isBefore } from 'date-fns';
-  import BefristungInput from '@/components/admin/personen/BefristungInput.vue';
   import { getNextSchuljahresende, formatDateToISO } from '@/utils/date';
   import { isBefristungspflichtRolle, useBefristungUtils, type BefristungUtilsType } from '@/utils/befristung';
 
@@ -456,6 +455,13 @@
           :selectedOrganisationProps="selectedOrganisationProps"
           :selectedRolleProps="selectedRolleProps"
           :selectedKlasseProps="selectedKlasseProps"
+          :befristungProps="selectedBefristungProps"
+          :befristungOptionProps="selectedBefristungOptionProps"
+          :befristung="selectedBefristung"
+          :befristungOption="selectedBefristungOption"
+          :isUnbefristetDisabled="isUnbefristetButtonDisabled"
+          :isBefristungRequired="isBefristungspflichtRolle(selectedRolle)"
+          :nextSchuljahresende="getNextSchuljahresende()"
           v-model:selectedOrganisation="selectedOrganisation"
           v-model:selectedRolle="selectedRolle"
           v-model:selectedKlasse="selectedKlasse"
@@ -463,11 +469,13 @@
           @update:selectedRolle="(value?: string) => (selectedRolle = value)"
           @update:selectedKlasse="(value?: string) => (selectedKlasse = value)"
           @update:canCommit="canCommit = $event"
+          @update:befristung="handleBefristungUpdate"
+          @update:calculatedBefristungOption="handleBefristungOptionUpdate"
           @fieldReset="handleFieldReset"
         />
         <div v-if="selectedOrganisation">
           <v-row>
-            <h3 class="headline-3">3. {{ $t('admin.person.personalInfo') }}</h3>
+            <h3 class="headline-3">4. {{ $t('admin.person.personalInfo') }}</h3>
           </v-row>
           <!-- Vorname -->
           <FormRow
@@ -553,24 +561,6 @@
               v-model="selectedKopersNr"
             ></v-text-field>
           </FormRow>
-        </div>
-        <!-- Befristung -->
-        <div
-          class="mt-4"
-          v-if="selectedOrganisation && selectedRolle"
-        >
-          <BefristungInput
-            v-if="selectedOrganisation && selectedRolle"
-            :befristungProps="selectedBefristungProps"
-            :befristungOptionProps="selectedBefristungOptionProps"
-            :isUnbefristetDisabled="isUnbefristetButtonDisabled"
-            :isBefristungRequired="isBefristungspflichtRolle(selectedRolle)"
-            :nextSchuljahresende="getNextSchuljahresende()"
-            :befristung="selectedBefristung"
-            :befristungOption="selectedBefristungOption"
-            @update:befristung="handleBefristungUpdate"
-            @update:befristungOption="handleBefristungOptionUpdate"
-          />
         </div>
       </FormWrapper>
     </template>

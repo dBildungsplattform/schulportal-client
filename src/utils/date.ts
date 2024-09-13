@@ -1,3 +1,5 @@
+import { addDays, parse } from 'date-fns';
+
 /**
  * Calculates the next 31st of July (End of school year)
  * @returns {string} The next end of school year date in German format (dd.MM.yyyy)
@@ -23,22 +25,22 @@ export function getNextSchuljahresende(): string {
  */
 export function formatDateToISO(date: string | undefined): string | undefined {
   if (date) {
-    // Split the date by '.' to extract day, month, and year
-    const [day, month, year]: (number | undefined)[] = date.split('.').map(Number);
+    try {
+      // Parse the date string using date-fns
+      const parsedDate: Date = parse(date, 'dd.MM.yyyy', new Date());
 
-    if (day && month && year) {
-      // Create a new Date object with the extracted parts
-      // Always adding 1 day to the date because for example if the Befristung is chosen as 20.05.2024 then it should be valid until 20.05.2024 23:59
-      // Also the UTC ISO formatted send date will be 20-05-2024 22H which is basically 21.05.2024 in German summer time.
-      const d: Date = new Date(year, month - 1, day + 1);
+      // Add one day to the date
+      const updatedDate: Date = addDays(parsedDate, 1);
 
-      // Return the ISO string
-      return d.toISOString();
+      // Return the date in ISO format
+      return updatedDate.toISOString();
+    } catch (error) {
+      // If parsing fails, return undefined
+      return undefined;
     }
   }
   return undefined;
 }
-
 /**
  * Formats a date string to the German format and prepends it with a translated message.
  * The input date is adjusted by subtracting one day before formatting.

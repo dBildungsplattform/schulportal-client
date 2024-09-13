@@ -8,6 +8,7 @@
   import { type TranslatedObject } from '@/types.d';
   import type { BaseFieldProps } from 'vee-validate';
   import type { TranslatedRolleWithAttrs } from '@/composables/useRollen';
+  import BefristungInput from '@/components/admin/personen/BefristungInput.vue';
 
   useI18n({ useScope: 'global' });
 
@@ -33,11 +34,20 @@
     selectedRolle: string | undefined;
     selectedKlasse?: string | undefined;
     showHeadline: boolean;
+    befristungProps: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
+    befristungOptionProps: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
+    isUnbefristetDisabled: boolean;
+    isBefristungRequired: boolean;
+    nextSchuljahresende: string;
+    befristung: string | undefined;
+    befristungOption: string | undefined;
   };
 
   const props: Props = defineProps<Props>();
 
   type Emits = {
+    (e: 'update:befristung', value: string | undefined): void;
+    (e: 'update:calculatedBefristungOption', value: string | undefined): void;
     (event: 'update:selectedOrganisation', value: string | undefined): void;
     (event: 'update:selectedRolle', value: string | undefined): void;
     (event: 'update:selectedKlasse', value: string | undefined): void;
@@ -233,6 +243,18 @@
     },
     { immediate: true },
   );
+
+  const handleBefristungChange = (value: string | undefined): void => {
+    emits('update:befristung', value);
+    // Reset befristungOption only if a custom date is entered
+    if (value && value !== props.nextSchuljahresende) {
+      emits('update:calculatedBefristungOption', undefined);
+    }
+  };
+
+  const handleCalculatedBefristungOptionChange = (value: string | undefined): void => {
+    emits('update:calculatedBefristungOption', value);
+  };
 </script>
 
 <template>
@@ -330,6 +352,22 @@
           v-model="selectedKlasse"
         ></v-autocomplete>
       </FormRow>
+      <!-- Befristung -->
+      <v-row v-if="selectedOrganisation && selectedRolle">
+        <h3 class="headline-3">3. {{ $t('admin.befristung.assignBefristung') }}</h3>
+      </v-row>
+      <BefristungInput
+        v-if="selectedOrganisation && selectedRolle"
+        :befristungProps="befristungProps"
+        :befristungOptionProps="befristungOptionProps"
+        :isUnbefristetDisabled="isUnbefristetDisabled"
+        :isBefristungRequired="isBefristungRequired"
+        :nextSchuljahresende="nextSchuljahresende"
+        :befristung="befristung"
+        :befristungOption="befristungOption"
+        @update:befristung="handleBefristungChange"
+        @update:calculatedBefristungOption="handleCalculatedBefristungOptionChange"
+      />
     </div>
   </div>
 </template>

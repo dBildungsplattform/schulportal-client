@@ -1427,14 +1427,21 @@
               <v-container class="px-lg-16">
                 <!-- Organisation, Rolle, Klasse zuordnen -->
                 <PersonenkontextCreate
-                  ref="personenkontext-creation-form"
-                  :showHeadline="false"
+                  :showHeadline="true"
                   :organisationen="organisationen"
+                  ref="personenkontext-create"
                   :rollen="filteredRollen"
                   :klassen="klassen"
                   :selectedOrganisationProps="selectedOrganisationProps"
                   :selectedRolleProps="selectedRolleProps"
                   :selectedKlasseProps="selectedKlasseProps"
+                  :befristungProps="selectedBefristungProps"
+                  :befristungOptionProps="selectedBefristungOptionProps"
+                  :befristung="selectedBefristung"
+                  :befristungOption="selectedBefristungOption"
+                  :isUnbefristetDisabled="isUnbefristetButtonDisabled"
+                  :isBefristungRequired="isBefristungspflichtRolle(selectedRolle)"
+                  :nextSchuljahresende="getNextSchuljahresende()"
                   v-model:selectedOrganisation="selectedOrganisation"
                   v-model:selectedRolle="selectedRolle"
                   v-model:selectedKlasse="selectedKlasse"
@@ -1442,23 +1449,10 @@
                   @update:selectedRolle="(value?: string) => (selectedRolle = value)"
                   @update:selectedKlasse="(value?: string) => (selectedKlasse = value)"
                   @update:canCommit="canCommit = $event"
+                  @update:befristung="handleBefristungUpdate"
+                  @update:calculatedBefristungOption="handleBefristungOptionUpdate"
                   @fieldReset="handleFieldReset"
                 />
-                <!-- Befristung -->
-                <div v-if="selectedOrganisation && selectedRolle">
-                  <BefristungInput
-                    v-if="selectedOrganisation && selectedRolle"
-                    :befristungProps="selectedBefristungProps"
-                    :befristungOptionProps="selectedBefristungOptionProps"
-                    :isUnbefristetDisabled="isUnbefristetButtonDisabled"
-                    :isBefristungRequired="isBefristungspflichtRolle(selectedRolle)"
-                    :nextSchuljahresende="getNextSchuljahresende()"
-                    :befristung="selectedBefristung"
-                    :befristungOption="selectedBefristungOption"
-                    @update:befristung="handleBefristungUpdate"
-                    @update:befristungOption="handleBefristungOptionUpdate"
-                  />
-                </div>
               </v-container>
               <v-row class="py-3 px-2 justify-center">
                 <v-spacer class="hidden-sm-and-down"></v-spacer>

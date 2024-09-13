@@ -5,6 +5,7 @@
   import type { BaseFieldProps } from 'vee-validate';
   import { BefristungOption } from '@/stores/PersonenkontextStore';
   import SpshTooltip from '@/components/admin/SpshTooltip.vue';
+  import { getNextSchuljahresende } from '@/utils/date';
 
   useI18n();
 
@@ -22,36 +23,49 @@
 
   type Emits = {
     (e: 'update:befristung', value: string | undefined): void;
-    (e: 'update:befristungOption', value: string | undefined): void;
+    (e: 'update:calculatedBefristungOption', value: string | undefined): void;
   };
   const emit: Emits = defineEmits<{
     (e: 'update:befristung', value: string | undefined): void;
-    (e: 'update:befristungOption', value: string | undefined): void;
+    (e: 'update:calculatedBefristungOption', value: string | undefined): void;
   }>();
 
   const localBefristung: Ref<string | undefined> = ref(props.befristung);
   const localBefristungOption: Ref<string | undefined> = ref<string | undefined>(props.befristungOption);
 
+  // Handles any change related to the befristung radio buttons
+  function handleBefristungOptionChange(value: string | undefined): void {
+    localBefristung.value = undefined;
+    switch (value) {
+      case BefristungOption.SCHULJAHRESENDE: {
+        localBefristungOption.value = value;
+        emit('update:calculatedBefristungOption', getNextSchuljahresende());
+        break;
+      }
+      case BefristungOption.UNBEFRISTET: {
+        localBefristungOption.value = value;
+        emit('update:calculatedBefristungOption', undefined);
+        break;
+      }
+    }
+  }
+
+  // Handles any change related to the befristung input field
   const handleBefristungChange = (value: string | undefined): void => {
     localBefristung.value = value;
     emit('update:befristung', value);
-
     // Reset befristungOption only if a custom date is entered
     if (value && value !== props.nextSchuljahresende) {
       localBefristungOption.value = undefined;
-      emit('update:befristungOption', undefined);
+      emit('update:calculatedBefristungOption', undefined);
     }
-  };
-
-  const handleBefristungOptionChange = (value: string): void => {
-    localBefristungOption.value = value;
-    emit('update:befristungOption', value);
   };
 
   watch(
     () => props.befristung,
     (newValue: string | undefined) => {
       localBefristung.value = newValue;
+      localBefristungOption.value = undefined;
     },
   );
 
@@ -59,6 +73,7 @@
     () => props.befristungOption,
     (newValue: string | undefined) => {
       localBefristungOption.value = newValue;
+      localBefristung.value = undefined;
     },
   );
 </script>
