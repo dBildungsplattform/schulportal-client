@@ -32,6 +32,7 @@ type TwoFactorActions = {
   assignHardwareToken: (
     assignHardwareTokenBodyParams: AssignHardwareTokenBodyParams,
   ) => Promise<AssignHardwareTokenResponse>;
+  resetToken: (personId: string) => Promise<void>;
 };
 
 export type TwoFactorAuthentificationStore = Store<
@@ -153,6 +154,20 @@ export const useTwoFactorAuthentificationStore: StoreDefinition<
           await twoFactorApi.privacyIdeaAdministrationControllerAssignHardwareToken(assignHardwareTokenBodyParams)
         ).data;
         return data;
+      } finally {
+        this.loading = false;
+      }
+    },
+    async resetToken(personId: string): Promise<void> {
+      this.loading = true;
+      try {
+        await twoFactorApi.privacyIdeaAdministrationControllerResetToken(personId);
+      } catch (error: unknown) {
+        this.errorCode = 'UNSPECIFIED_ERROR';
+        if (isAxiosError(error)) {
+          this.errorCode = error.response?.data.i18nKey || 'UNSPECIFIED_ERROR';
+        }
+        return await Promise.reject(this.errorCode);
       } finally {
         this.loading = false;
       }
