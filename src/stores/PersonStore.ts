@@ -6,7 +6,7 @@ import {
   PersonenApiFactory,
   PersonenFrontendApiFactory,
   RollenMerkmal,
-  type DbiamCreatePersonWithContextBodyParams,
+  type DbiamCreatePersonWithPersonenkontexteBodyParams,
   type DbiamPersonenuebersichtApiInterface,
   type DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response,
   type DBiamPersonenuebersichtResponse,
@@ -79,7 +79,7 @@ export type PersonTableItem = {
   updatedAt?: string;
 };
 
-export type CreatePersonBodyParams = DbiamCreatePersonWithContextBodyParams;
+export type CreatePersonBodyParams = DbiamCreatePersonWithPersonenkontexteBodyParams;
 export type CreatedPersonenkontext = DbiamPersonenkontextBodyParams;
 
 export function parseLockInfo(unparsed: object): LockInfo | null {
@@ -221,7 +221,22 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
                   .join(', ')
               : '---';
 
-            const personalnummer: string = person.person.personalnummer ?? '---';
+            /* Check if person has personalnummer and show it, 
+              if not, check if kopersrolle exists and show "fehlt",
+              if not, show "---"
+            */
+            const hasKopersRolle: boolean = !!uebersicht?.zuordnungen.find((zuordnung: Zuordnung) =>
+              zuordnung.merkmale.includes(RollenMerkmal.KopersPflicht),
+            );
+            let personalnummer: string;
+
+            if (person.person.personalnummer) {
+              personalnummer = person.person.personalnummer;
+            } else if (hasKopersRolle) {
+              personalnummer = 'fehlt';
+            } else {
+              personalnummer = '---';
+            }
 
             return {
               ...person,

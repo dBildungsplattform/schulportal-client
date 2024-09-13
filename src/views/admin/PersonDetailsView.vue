@@ -29,8 +29,10 @@
   import { usePersonenkontextStore, type PersonenkontextStore, type Zuordnung } from '@/stores/PersonenkontextStore';
   import { RollenArt, RollenMerkmal } from '@/stores/RolleStore';
   import { type TranslatedObject } from '@/types.d';
+  import TokenReset from '@/components/two-factor-authentication/TokenReset.vue';
   import { toTypedSchema } from '@vee-validate/yup';
   import { useForm, type BaseFieldProps, type FormContext, type TypedSchema } from 'vee-validate';
+  import KopersInput from '@/components/admin/personen/KopersInput.vue';
   import { computed, onBeforeMount, ref, watch, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import { useRoute, useRouter, type RouteLocationNormalizedLoaded, type Router } from 'vue-router';
@@ -40,13 +42,11 @@
     useTwoFactorAuthentificationStore,
     type TwoFactorAuthentificationStore,
   } from '@/stores/TwoFactorAuthentificationStore';
-  import BefristungInput from '@/components/admin/personen/BefristungInput.vue';
   import { getNextSchuljahresende, formatDateToISO, formatDate } from '@/utils/date';
   import { isBefristungspflichtRolle, useBefristungUtils, type BefristungUtilsType } from '@/utils/befristung';
   import {
     getPersonenkontextFieldDefinitions,
     getValidationSchema,
-    isLernRolle,
     type PersonenkontextFieldDefinitions,
   } from '@/utils/validationPersonenkontext';
 
@@ -90,6 +90,7 @@
   const createZuordnungConfirmationDialogMessage: Ref<string> = ref('');
   const changeKlasseConfirmationDialogMessage: Ref<string> = ref('');
   const canCommit: Ref<boolean> = ref(false);
+  const hasNoKopersNr: Ref<boolean> = ref(false);
 
   const creationErrorText: Ref<string> = ref('');
   const creationErrorTitle: Ref<string> = ref('');
@@ -331,12 +332,33 @@
     selectedKlasse: string;
     selectedBefristung: Date;
     selectedBefristungOption: string;
+    selectedKopersNr?: string;
   };
 
   type ChangeKlasseForm = {
     selectedSchule: string;
     selectedNewKlasse: string;
   };
+
+  // Define a method to check if the selected Rolle is of type "Lern"
+  function isLernRolle(selectedRolleId: string): boolean {
+    const rolle: TranslatedRolleWithAttrs | undefined = rollen.value?.find(
+      (r: TranslatedRolleWithAttrs) => r.value === selectedRolleId,
+    );
+    return !!rolle && rolle.rollenart === RollenArt.Lern;
+  }
+
+  function isKopersRolle(selectedRolleId: string | undefined): boolean {
+    const rolle: TranslatedRolleWithAttrs | undefined = rollen.value?.find(
+      (r: TranslatedRolleWithAttrs) => r.value === selectedRolleId,
+    );
+    return !!rolle && !!rolle.merkmale && rolle.merkmale.has(RollenMerkmal.KopersPflicht);
+  }
+
+  const hasKopersNummer: ComputedRef<boolean> = computed(() => {
+    return !!personStore.currentPerson?.person.personalnummer;
+  });
+
   const hasKopersRolle: ComputedRef<boolean> = computed(() => {
     return (
       !!zuordnungenResult.value?.find((zuordnung: Zuordnung) => {
@@ -394,6 +416,8 @@
     selectedBefristungProps,
     selectedBefristungOption,
     selectedBefristungOptionProps,
+    selectedKopersNr,
+    selectedKopersNrProps,
   }: PersonenkontextFieldDefinitions = getPersonenkontextFieldDefinitions(formContext);
 
   // eslint-disable-next-line @typescript-eslint/typedef
@@ -477,7 +501,7 @@
 
   // This will send the updated list of Zuordnungen to the Backend on TOP of the new added one through the form.
   async function confirmAddition(): Promise<void> {
-    await personenkontextStore.updatePersonenkontexte(finalZuordnungen.value, currentPersonId);
+    await personenkontextStore.updatePersonenkontexte(finalZuordnungen.value, currentPersonId, selectedKopersNr.value);
     createSuccessDialogVisible.value = !personenkontextStore.errorCode;
     formContext.resetForm();
   }
@@ -880,7 +904,7 @@
             <!-- KoPers.-Nr. -->
             <v-row
               class="mt-0"
-              v-if="hasKopersRolle"
+              v-if="hasKopersRolle || personStore.currentPerson.person.personalnummer"
             >
               <v-col cols="1"></v-col>
               <v-col
@@ -1035,14 +1059,16 @@
                     :enabledText="$t('admin.person.twoFactorAuthentication.tokenReset')"
                     position="start"
                   >
-                    <v-btn
-                      class="primary"
+                    <TokenReset
+                      :errorCode="twoFactorAuthentificationStore.errorCode"
                       :disabled="isEditActive"
-                    >
-                      {{ $t('admin.person.twoFactorAuthentication.tokenReset') }}</v-btn
-                    >
-                  </SpshTooltip></v-col
-                >
+                      :person="personStore.currentPerson"
+                      :tokenType="twoFactorAuthentificationStore.tokenKind"
+                      :personId="currentPersonId"
+                      @dialogClosed="twoFactorAuthentificationStore.get2FAState(currentPersonId)"
+                    ></TokenReset>
+                  </SpshTooltip>
+                </v-col>
               </div>
             </v-col>
             <v-col v-else-if="personStore.loading"> <v-progress-circular indeterminate></v-progress-circular></v-col
@@ -1453,6 +1479,14 @@
                   @update:calculatedBefristungOption="handleBefristungOptionUpdate"
                   @fieldReset="handleFieldReset"
                 />
+                <KopersInput
+                  v-if="!hasKopersNummer && isKopersRolle(selectedRolle) && selectedOrganisation"
+                  :hasNoKopersNr="hasNoKopersNr"
+                  v-model:selectedKopersNr="selectedKopersNr"
+                  :selectedKopersNrProps="selectedKopersNrProps"
+                  @update:selectedKopersNr="(value?: string) => (selectedKopersNr = value)"
+                  @update:hasNoKopersNr="(value: boolean) => (hasNoKopersNr = value)"
+                ></KopersInput>
               </v-container>
               <v-row class="py-3 px-2 justify-center">
                 <v-spacer class="hidden-sm-and-down"></v-spacer>

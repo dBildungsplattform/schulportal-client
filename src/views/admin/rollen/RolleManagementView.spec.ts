@@ -9,7 +9,6 @@ import {
   type RolleWithServiceProvidersResponse,
 } from '@/stores/RolleStore';
 import { nextTick } from 'vue';
-import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
 import { createRouter, createWebHistory, type NavigationFailure, type RouteLocationRaw, type Router } from 'vue-router';
 import routes from '@/router/routes';
 import type WrapperLike from '@vue/test-utils/dist/interfaces/wrapperLike';
@@ -17,7 +16,6 @@ import type WrapperLike from '@vue/test-utils/dist/interfaces/wrapperLike';
 let wrapper: VueWrapper | null = null;
 let router: Router;
 let rolleStore: RolleStore;
-let organisationStore: OrganisationStore;
 
 beforeEach(() => {
   document.body.innerHTML = `
@@ -31,38 +29,7 @@ beforeEach(() => {
     routes,
   });
 
-  organisationStore = useOrganisationStore();
   rolleStore = useRolleStore();
-
-  organisationStore.allOrganisationen = [
-    {
-      id: '9876',
-      name: 'Random Schulname Gymnasium',
-      kennung: '9356494',
-      namensergaenzung: 'Schule',
-      kuerzel: 'rsg',
-      typ: 'SCHULE',
-      administriertVon: '1234',
-    },
-    {
-      id: '1123',
-      name: 'Albert-Emil-Hansebrot-Gymnasium',
-      kennung: '2745475',
-      namensergaenzung: 'Schule',
-      kuerzel: 'aehg',
-      typ: 'SCHULE',
-      administriertVon: '1234',
-    },
-    {
-      id: '1234',
-      name: 'Land SH',
-      kennung: '',
-      namensergaenzung: 'land',
-      kuerzel: 'LSH',
-      typ: 'TRAEGER',
-      administriertVon: '1',
-    },
-  ];
 
   rolleStore.allRollen = [
     {
@@ -85,6 +52,8 @@ beforeEach(() => {
           name: 'E-Mail',
         },
       ],
+      administeredBySchulstrukturknotenName: 'Land SH',
+      administeredBySchulstrukturknotenKennung: '',
     },
     {
       administeredBySchulstrukturknoten: '1234',
@@ -102,6 +71,8 @@ beforeEach(() => {
           name: 'itslearning',
         },
       ],
+      administeredBySchulstrukturknotenName: 'Land SH',
+      administeredBySchulstrukturknotenKennung: '1234567',
     },
   ] as RolleWithServiceProvidersResponse[];
 

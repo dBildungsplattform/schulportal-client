@@ -149,6 +149,8 @@ beforeEach(() => {
         createdAt: '2022',
         updatedAt: '2022',
         id: '54321',
+        administeredBySchulstrukturknotenName: 'Land SH',
+        administeredBySchulstrukturknotenKennung: '',
       },
     ],
     organisations: [],
