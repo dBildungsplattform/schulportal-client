@@ -48,11 +48,11 @@
             <span data-testid="alert-text">{{ text }}</span>
           </v-col>
         </v-row>
-        <v-row
-          v-if="showButton"
-          justify="center"
-        >
-          <v-col cols="auto">
+        <v-row justify="center">
+          <v-col
+            v-if="showButton"
+            cols="auto"
+          >
             <v-btn
               class="primary"
               @click="buttonAction"
@@ -61,6 +61,7 @@
               {{ buttonText }}
             </v-btn>
           </v-col>
+          <slot></slot>
         </v-row>
       </v-alert>
     </v-slide-y-transition>

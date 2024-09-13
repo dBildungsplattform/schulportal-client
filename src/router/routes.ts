@@ -168,6 +168,11 @@ const routes: readonly RouteRecordRaw[] = [
     name: 'not-found',
     component: () => import('../views/NotFoundView.vue'),
   },
+  {
+    path: '/no-second-factor',
+    name: 'no second factor',
+    component: () => import('../views/NoSecondFactor.vue'),
+  },
 ];
 
 export default routes;

@@ -8,7 +8,7 @@
 
   const isAdminRoute: Ref<boolean> = ref(false);
 
-  router.afterEach((to: RouteLocationNormalized) => {
+  router.beforeEach((to: RouteLocationNormalized) => {
     isAdminRoute.value = to.meta['layout'] === 'AdminLayout';
   });
 </script>

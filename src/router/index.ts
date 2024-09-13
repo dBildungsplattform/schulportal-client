@@ -1,5 +1,9 @@
 import { createRouter, createWebHistory, type RouteLocationNormalized, type Router } from 'vue-router';
 import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
+import {
+  useTwoFactorAuthentificationStore,
+  type TwoFactorAuthentificationStore,
+} from '@/stores/TwoFactorAuthentificationStore';
 import routes, { StepUpLevel } from './routes';
 const router: Router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -9,6 +13,10 @@ const router: Router = createRouter({
 router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormalized) => {
   const authStore: AuthStore = useAuthStore();
   await authStore.initializeAuthStatus();
+  const personId: string | null | undefined = authStore.currentUser?.personId;
+  if (!personId) return false;
+  const twoFactorAuthentificationStore: TwoFactorAuthentificationStore = useTwoFactorAuthentificationStore();
+  await twoFactorAuthentificationStore.get2FAState(personId);
   if (to.path != '/profile') sessionStorage.setItem('previousUrl', to.path);
 
   // Redirect authenticated users trying to access the login page to the start page
@@ -18,6 +26,11 @@ router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormal
 
   if (to.meta['requiresAuth'] && !authStore.isAuthed) {
     window.location.href = `/api/auth/login?redirectUrl=${to.fullPath}`;
+    return false;
+  }
+
+  if (to.meta['requiredStepUpLevel'] === StepUpLevel.GOLD && !twoFactorAuthentificationStore.hasToken) {
+    router.push(`/no-second-factor`);
     return false;
   }
 

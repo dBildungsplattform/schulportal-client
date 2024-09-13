@@ -122,7 +122,9 @@
         "otpLengthInvalid": "Das Einmalpasswort darf maximal 6 Zeichen lang sein.",
         "currentOtp": "Einmalpasswort",
         "serial": "Seriennummer",
-        "otpPlaceholder": "Einmalpasswort",
+        "otpPlaceholder": "Einmalpasswort",        
+        "noSecondFactorText": "Es ist kein zweiter Faktor eingerichtet.",
+        "toSecondFactorSetup" : "Zur 2FA Einrichtung",
         "errors": {
           "SERIENNUMMER_NICHT_GEFUNDEN": "Die eingegebene Seriennummer konnte leider nicht gefunden werden. Vergewissern Sie sich bitte, das Sie eine korrekte Seriennummer eingegeben haben.",
           "SERIENNUMMER_IN_VERWENDUNG": "Die eingegebene Seriennummer gehört zu einem Token, der bereits einem Benutzer zugeordnet ist. Bitte überprüfen Sie Ihre Eingaben und versuchen Sie es erneut.",
