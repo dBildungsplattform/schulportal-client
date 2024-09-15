@@ -343,17 +343,6 @@
     router.push({ name: 'create-person' });
   };
 
-  // Watcher to reset the radio button in case the date was picked using date-input
-  watch(
-    selectedBefristung,
-    (newValue: string | undefined) => {
-      if (newValue) {
-        selectedBefristungOption.value = undefined;
-      }
-    },
-    { immediate: true },
-  );
-
   // Watcher to set an initial value for the radio buttons depending on the selected Rolle
   watch(
     selectedRolle,
