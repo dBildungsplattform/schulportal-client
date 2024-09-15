@@ -466,13 +466,15 @@
           :selectedOrganisationProps="selectedOrganisationProps"
           :selectedRolleProps="selectedRolleProps"
           :selectedKlasseProps="selectedKlasseProps"
-          :befristungProps="selectedBefristungProps"
-          :befristungOptionProps="selectedBefristungOptionProps"
-          :befristung="selectedBefristung"
-          :befristungOption="selectedBefristungOption"
-          :isUnbefristetDisabled="isUnbefristetButtonDisabled"
-          :isBefristungRequired="isBefristungspflichtRolle(selectedRolle)"
-          :nextSchuljahresende="getNextSchuljahresende()"
+          :befristungInputProps="{
+            befristungProps: selectedBefristungProps,
+            befristungOptionProps: selectedBefristungOptionProps,
+            isUnbefristetDisabled: isUnbefristetButtonDisabled,
+            isBefristungRequired: isBefristungspflichtRolle(selectedRolle),
+            nextSchuljahresende: getNextSchuljahresende(),
+            befristung: selectedBefristung,
+            befristungOption: selectedBefristungOption,
+          }"
           v-model:selectedOrganisation="selectedOrganisation"
           v-model:selectedRolle="selectedRolle"
           v-model:selectedKlasse="selectedKlasse"

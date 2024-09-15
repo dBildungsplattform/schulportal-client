@@ -1453,21 +1453,23 @@
               <v-container class="px-lg-16">
                 <!-- Organisation, Rolle, Klasse zuordnen -->
                 <PersonenkontextCreate
-                  :showHeadline="true"
-                  :organisationen="organisationen"
                   ref="personenkontext-create"
+                  :showHeadline="false"
+                  :organisationen="organisationen"
                   :rollen="filteredRollen"
                   :klassen="klassen"
                   :selectedOrganisationProps="selectedOrganisationProps"
                   :selectedRolleProps="selectedRolleProps"
                   :selectedKlasseProps="selectedKlasseProps"
-                  :befristungProps="selectedBefristungProps"
-                  :befristungOptionProps="selectedBefristungOptionProps"
-                  :befristung="selectedBefristung"
-                  :befristungOption="selectedBefristungOption"
-                  :isUnbefristetDisabled="isUnbefristetButtonDisabled"
-                  :isBefristungRequired="isBefristungspflichtRolle(selectedRolle)"
-                  :nextSchuljahresende="getNextSchuljahresende()"
+                  :befristungInputProps="{
+                    befristungProps: selectedBefristungProps,
+                    befristungOptionProps: selectedBefristungOptionProps,
+                    isUnbefristetDisabled: isUnbefristetButtonDisabled,
+                    isBefristungRequired: isBefristungspflichtRolle(selectedRolle),
+                    nextSchuljahresende: getNextSchuljahresende(),
+                    befristung: selectedBefristung,
+                    befristungOption: selectedBefristungOption,
+                  }"
                   v-model:selectedOrganisation="selectedOrganisation"
                   v-model:selectedRolle="selectedRolle"
                   v-model:selectedKlasse="selectedKlasse"
