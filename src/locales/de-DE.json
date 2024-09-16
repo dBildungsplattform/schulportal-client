@@ -13,13 +13,14 @@
       "befristung": "Befristung",
       "rules": {
         "required": "Die Befristung muss eingegeben werden.",
-        "format": "Die Befristung muss im Format DD.MM.JJJJ. eingegeben werden.",
+        "format": "Die Befristung muss im Format TT.MM.JJJJ. eingegeben werden.",
         "pastDateNotAllowed": "Das eingegebene Datum darf nicht in der Vergangenheit liegen."
       },
       "selectBefristung": "Befristung auswählen",
       "unlimited": "Unbefristet",
       "unlimitedSuccessTemplate": "unbefristet",
       "unlimitedInactive": "Diese Option kann für Rollen mit Befristungspflicht nicht ausgewählt werden.",
+      "limitedUntil": "befristet bis",
       "untilEndOfSchoolYear": "Bis Schuljahresende"
     },
     "mandatoryFieldsNotice": "Mit * markierte Felder sind Pflichtangaben.",
@@ -475,6 +476,7 @@
     "password": "Passwort",
     "changePassword": "Passwort ändern",
     "changePasswordInfo": "Um Ihr Passwort zu ändern, werden Sie zunächst zu einer erneuten Anmeldung weitergeleitet. Nach erfolgreicher Eingabe Ihres aktuellen Passworts können Sie dann ein neues festlegen.",
+    "lastPasswordChange": "Ihr Passwort wurde zuletzt am {date} geändert.",
     "saveNewPassword": "Neues Passwort speichern",
     "setNewPassword": "Neues Passwort setzen",
     "twoFactorAuth": "Zwei-Faktor-Authentifizierung",

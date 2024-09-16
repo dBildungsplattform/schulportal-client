@@ -9,6 +9,7 @@ import { setActivePinia, createPinia } from 'pinia';
 import { rejects } from 'assert';
 
 import {
+  TokenKind,
   useTwoFactorAuthentificationStore,
   type TwoFactorAuthentificationStore,
 } from './TwoFactorAuthentificationStore';
@@ -36,7 +37,7 @@ describe('TwoFactorAuthentificationStore', () => {
       const personId: string = 'testUser';
       const mockResponse: TokenStateResponse = {
         hasToken: true,
-        tokenKind: 'software',
+        tokenKind: TokenKind.software,
         serial: '',
       };
 
