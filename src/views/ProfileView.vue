@@ -1,8 +1,16 @@
 <script setup lang="ts">
-  import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import { ref, type Ref, onBeforeMount } from 'vue';
-  import { useI18n } from 'vue-i18n';
+  import type { DBiamPersonenzuordnungResponse } from '@/api-client/generated/api';
   import SpshTooltip from '@/components/admin/SpshTooltip.vue';
+  import LayoutCard from '@/components/cards/LayoutCard.vue';
+  import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
+  import { OrganisationsTyp } from '@/stores/OrganisationStore';
+  import { usePersonInfoStore, type PersonInfoResponse, type PersonInfoStore } from '@/stores/PersonInfoStore';
+  import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
+  import { type Zuordnung } from '@/stores/PersonenkontextStore';
+  import { computed, onBeforeMount, ref, type ComputedRef, type Ref } from 'vue';
+  import { useI18n } from 'vue-i18n';
+  import { useRoute, useRouter, type RouteLocationNormalizedLoaded, type Router } from 'vue-router';
+
   const { t }: { t: Function } = useI18n();
 
   enum ItemType {
@@ -17,13 +25,6 @@
     testIdValue: string;
   };
 
-  import { usePersonInfoStore, type PersonInfoStore, type PersonInfoResponse } from '@/stores/PersonInfoStore';
-  import { type Zuordnung } from '@/stores/PersonenkontextStore';
-  import { OrganisationsTyp } from '@/stores/OrganisationStore';
-  import { type RouteLocationNormalizedLoaded, type Router, useRoute, useRouter } from 'vue-router';
-  import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
-  import type { DBiamPersonenzuordnungResponse } from '@/api-client/generated/api';
-
   const route: RouteLocationNormalizedLoaded = useRoute();
   const router: Router = useRouter();
   const kcActionStatus: string | null = route.query['kc_action_status'] as string | null;
@@ -37,9 +38,21 @@
 
   let personInfoStore: PersonInfoStore = usePersonInfoStore();
   let personStore: PersonStore = usePersonStore();
+  let authStore: AuthStore = useAuthStore();
   const personalData: Ref = ref<LabelValue[]>([]);
   const schulDaten: Ref = ref<SchulDaten[]>([]);
   const hasKoPersMerkmal: Ref = ref<boolean>(false);
+  const lastPasswordChangeDate: ComputedRef<string> = computed(() => {
+    const passwordUpdatedAt: string | null | undefined = authStore.currentUser?.password_updated_at;
+    if (!passwordUpdatedAt) return '';
+    const date: Date = new Date(passwordUpdatedAt);
+    if (isNaN(date.valueOf())) return '';
+    return new Intl.DateTimeFormat('de-DE', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).format(date);
+  });
 
   function handleGoToPreviousPage(): void {
     const previousUrl: string | null = sessionStorage.getItem('previousUrl');
@@ -162,6 +175,7 @@
   async function initializeStores(): Promise<void> {
     personInfoStore = usePersonInfoStore();
     personStore = usePersonStore();
+    authStore = useAuthStore();
     await personInfoStore.initPersonInfo();
     await personStore.getPersonenuebersichtById(personInfoStore.personInfo?.person.id ?? '');
   }
@@ -413,6 +427,7 @@
         cols="12"
         sm="12"
         md="6"
+        data-testid="password-card"
       >
         <LayoutCard
           :headline-test-id="'new-password-card'"
@@ -425,6 +440,12 @@
               icon="mdi-key-alert-outline"
               data-testid="password-icon"
             ></v-icon>
+            <p
+              class="w-100 text-center text-body"
+              v-if="lastPasswordChangeDate"
+            >
+              {{ t('profile.lastPasswordChange', { date: lastPasswordChangeDate }) }}
+            </p>
             <div>
               <v-btn
                 class="primary"
