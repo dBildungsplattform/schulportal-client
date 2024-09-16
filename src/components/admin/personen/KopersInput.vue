@@ -5,7 +5,7 @@
 
   type Props = {
     hasNoKopersNr?: boolean;
-    selectedKopersNr: string | undefined;
+    selectedKopersNr: string | undefined | null;
     selectedKopersNrProps: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     hideCheckbox?: boolean;
   };
@@ -19,7 +19,7 @@
   const emits: Emits = defineEmits<Emits>();
 
   const hasNoKopersNr: Ref<boolean | undefined> = ref(props.hasNoKopersNr);
-  const selectedKopersNr: Ref<string | undefined> = ref(props.selectedKopersNr);
+  const selectedKopersNr: Ref<string | undefined | null> = ref(props.selectedKopersNr);
 
   watch(hasNoKopersNr, (newValue: boolean | undefined, oldValue: boolean | undefined) => {
     if (newValue && newValue !== oldValue) {
@@ -27,7 +27,7 @@
     }
   });
 
-  watch(selectedKopersNr, (newValue: string | undefined, oldValue: string | undefined) => {
+  watch(selectedKopersNr, (newValue: string | undefined | null, oldValue: string | undefined | null) => {
     if (newValue && newValue !== oldValue) {
       emits('update:selectedKopersNr', newValue);
     }
@@ -65,6 +65,7 @@
     :noTopMargin="true"
   >
     <v-text-field
+      autocomplete="off"
       clearable
       data-testid="kopersnr-input"
       density="compact"

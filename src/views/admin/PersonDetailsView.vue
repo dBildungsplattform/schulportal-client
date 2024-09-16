@@ -1045,13 +1045,13 @@
         <v-container v-if="isEditPersonInfoActive">
           <v-form
             data-testid="person-info-form"
-            @submit="onSubmitCreateZuordnung"
+            @submit="onSubmitChangePersonInfo"
           >
             <PersonenInfoChange
               :selectedKopersNrPersonInfoProps="selectedKopersNrPersonInfoProps"
-              :selectedKopersNrPersonInfo="selectedKopersNrPersonInfo"
+              :selectedKopersNrPersonInfo="personStore.currentPerson?.person.personalnummer"
             ></PersonenInfoChange>
-            <v-row class="save-cancel-row ml-md-16 mb-3 pt-14 justify-end">
+            <v-row class="save-cancel-row ml-md-16 pt-5 justify-end">
               <v-col
                 class="cancel-col"
                 cols="12"

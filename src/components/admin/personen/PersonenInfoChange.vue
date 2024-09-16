@@ -7,7 +7,7 @@
 
   type Props = {
     selectedKopersNrPersonInfoProps: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
-    selectedKopersNrPersonInfo: string | undefined;
+    selectedKopersNrPersonInfo: string | null | undefined;
   };
 
   defineProps<Props>();
