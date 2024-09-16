@@ -1,34 +1,47 @@
 <script setup lang="ts">
-  import { type Ref, ref, onBeforeMount, computed, type ComputedRef, watch } from 'vue';
-  import { type Router, type RouteLocationNormalizedLoaded, useRoute, useRouter } from 'vue-router';
-  import { usePersonStore, type PersonStore, type PersonWithUebersicht } from '@/stores/PersonStore';
-  import PasswordReset from '@/components/admin/personen/PasswordReset.vue';
-  import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import SpshAlert from '@/components/alert/SpshAlert.vue';
   import SpshTooltip from '@/components/admin/SpshTooltip.vue';
+  import KlasseChange from '@/components/admin/klassen/KlasseChange.vue';
+  import PasswordReset from '@/components/admin/personen/PasswordReset.vue';
   import PersonDelete from '@/components/admin/personen/PersonDelete.vue';
+  import PersonLock from '@/components/admin/personen/PersonLock.vue';
+  import PersonenkontextCreate from '@/components/admin/personen/PersonenkontextCreate.vue';
   import PersonenkontextDelete from '@/components/admin/personen/PersonenkontextDelete.vue';
+  import SpshAlert from '@/components/alert/SpshAlert.vue';
+  import LayoutCard from '@/components/cards/LayoutCard.vue';
   import TwoFactorAuthenticationSetUp from '@/components/two-factor-authentication/TwoFactorAuthenticationSetUp.vue';
-  import { usePersonenkontextStore, type PersonenkontextStore, type Zuordnung } from '@/stores/PersonenkontextStore';
+  import { useKlassen } from '@/composables/useKlassen';
+  import { useOrganisationen } from '@/composables/useOrganisationen';
+  import { useRollen, type TranslatedRolleWithAttrs } from '@/composables/useRollen';
+  import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
   import {
     OrganisationsTyp,
     useOrganisationStore,
     type Organisation,
     type OrganisationStore,
   } from '@/stores/OrganisationStore';
-  import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
-  import { useDisplay } from 'vuetify';
-  import { object, string, StringSchema, type AnyObject } from 'yup';
+  import {
+    LockKeys,
+    usePersonStore,
+    type Person,
+    type PersonStore,
+    type PersonWithUebersicht,
+  } from '@/stores/PersonStore';
+  import { usePersonenkontextStore, type PersonenkontextStore, type Zuordnung } from '@/stores/PersonenkontextStore';
+  import { RollenArt, RollenMerkmal } from '@/stores/RolleStore';
+  import { type TranslatedObject } from '@/types.d';
+  import TokenReset from '@/components/two-factor-authentication/TokenReset.vue';
   import { toTypedSchema } from '@vee-validate/yup';
   import { useForm, type BaseFieldProps, type TypedSchema } from 'vee-validate';
-  import { RollenArt, RollenMerkmal } from '@/stores/RolleStore';
-  import { type Composer, useI18n } from 'vue-i18n';
-  import { useOrganisationen } from '@/composables/useOrganisationen';
-  import { useRollen, type TranslatedRolleWithAttrs } from '@/composables/useRollen';
-  import { useKlassen } from '@/composables/useKlassen';
-  import PersonenkontextCreate from '@/components/admin/personen/PersonenkontextCreate.vue';
-  import { type TranslatedObject } from '@/types.d';
-  import KlasseChange from '@/components/admin/klassen/KlasseChange.vue';
+  import KopersInput from '@/components/admin/personen/KopersInput.vue';
+  import { computed, onBeforeMount, ref, watch, type ComputedRef, type Ref } from 'vue';
+  import { useI18n, type Composer } from 'vue-i18n';
+  import { useRoute, useRouter, type RouteLocationNormalizedLoaded, type Router } from 'vue-router';
+  import { useDisplay } from 'vuetify';
+  import { object, string, StringSchema, type AnyObject } from 'yup';
+  import {
+    useTwoFactorAuthentificationStore,
+    type TwoFactorAuthentificationStore,
+  } from '@/stores/TwoFactorAuthentificationStore';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
@@ -41,6 +54,7 @@
   const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
   const authStore: AuthStore = useAuthStore();
   const organisationStore: OrganisationStore = useOrganisationStore();
+  const twoFactorAuthentificationStore: TwoFactorAuthentificationStore = useTwoFactorAuthentificationStore();
 
   const password: Ref<string> = ref('');
 
@@ -69,6 +83,7 @@
   const createZuordnungConfirmationDialogMessage: Ref<string> = ref('');
   const changeKlasseConfirmationDialogMessage: Ref<string> = ref('');
   const canCommit: Ref<boolean> = ref(false);
+  const hasNoKopersNr: Ref<boolean> = ref(false);
 
   const creationErrorText: Ref<string> = ref('');
   const creationErrorTitle: Ref<string> = ref('');
@@ -81,6 +96,10 @@
     personStore.resetPassword(personId).then((newPassword?: string) => {
       password.value = newPassword || '';
     });
+  }
+
+  function onLockUser(personId: string, lock: boolean, organisation: string): void {
+    personStore.lockPerson(personId, lock, organisation);
   }
 
   const handleAlertClose = (): void => {
@@ -107,6 +126,38 @@
   async function deletePerson(personId: string): Promise<void> {
     await personStore.deletePersonById(personId);
   }
+
+  function keyMapper(key: string): string {
+    switch (key) {
+      case LockKeys.LockedFrom:
+        return t('person.lockedBy');
+      case LockKeys.Timestamp:
+        return t('since');
+      default:
+        return key;
+    }
+  }
+
+  function keyValueMapper(key: string, value: string): string {
+    if (key === LockKeys.Timestamp) {
+      return new Intl.DateTimeFormat('de-DE', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+      }).format(new Date(value));
+    }
+    return value;
+  }
+
+  const getLockInfo: ComputedRef<{ key: string; attribute: string }[]> = computed(() => {
+    if (!personStore.currentPerson?.person.isLocked) return [];
+    const { lockInfo }: Person = personStore.currentPerson.person;
+    if (!lockInfo) return [];
+    return Object.entries(lockInfo).map(([key, value]: [string, string]) => ({
+      key: keyMapper(key),
+      attribute: keyValueMapper(key, value.toString()),
+    }));
+  });
 
   let closeCannotDeleteDialog = (): void => {
     cannotDeleteDialogVisible.value = false;
@@ -270,6 +321,7 @@
     selectedRolle: string;
     selectedOrganisation: string;
     selectedKlasse: string;
+    selectedKopersNr?: string;
   };
 
   type ChangeKlasseForm = {
@@ -284,6 +336,17 @@
     );
     return !!rolle && rolle.rollenart === RollenArt.Lern;
   }
+
+  function isKopersRolle(selectedRolleId: string | undefined): boolean {
+    const rolle: TranslatedRolleWithAttrs | undefined = rollen.value?.find(
+      (r: TranslatedRolleWithAttrs) => r.value === selectedRolleId,
+    );
+    return !!rolle && !!rolle.merkmale && rolle.merkmale.has(RollenMerkmal.KopersPflicht);
+  }
+
+  const hasKopersNummer: ComputedRef<boolean> = computed(() => {
+    return !!personStore.currentPerson?.person.personalnummer;
+  });
 
   const hasKopersRolle: ComputedRef<boolean> = computed(() => {
     return (
@@ -375,6 +438,10 @@
     Ref<string | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineFieldZuordnung('selectedKlasse', vuetifyConfig);
+  const [selectedKopersNr, selectedKopersNrProps]: [
+    Ref<string | undefined>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = defineFieldZuordnung('selectedKopersNr', vuetifyConfig);
 
   // Change Klasse Form
   const [selectedSchule, selectedSchuleProps]: [
@@ -439,7 +506,7 @@
 
   // This will send the updated list of Zuordnungen to the Backend on TOP of the new added one through the form.
   async function confirmAddition(): Promise<void> {
-    await personenkontextStore.updatePersonenkontexte(finalZuordnungen.value, currentPersonId);
+    await personenkontextStore.updatePersonenkontexte(finalZuordnungen.value, currentPersonId, selectedKopersNr.value);
     createSuccessDialogVisible.value = !personenkontextStore.errorCode;
     resetZuordnungForm();
   }
@@ -717,8 +784,7 @@
     hasKlassenZuordnung.value = personStore.personenuebersicht?.zuordnungen.some(
       (zuordnung: Zuordnung) => zuordnung.typ === OrganisationsTyp.Klasse,
     );
-
-    await personStore.get2FAState(currentPersonId);
+    await twoFactorAuthentificationStore.get2FAState(currentPersonId);
   });
 </script>
 
@@ -828,7 +894,7 @@
             <!-- KoPers.-Nr. -->
             <v-row
               class="mt-0"
-              v-if="hasKopersRolle"
+              v-if="hasKopersRolle || personStore.currentPerson.person.personalnummer"
             >
               <v-col cols="1"></v-col>
               <v-col
@@ -897,13 +963,13 @@
           thickness="6"
         ></v-divider>
         <!-- Two Factor Authentication -->
-        <v-container v-if="personStore.twoFactorState.hasToken != undefined">
+        <v-container v-if="twoFactorAuthentificationStore.hasToken != undefined">
           <v-row class="ml-md-16">
             <v-col>
               <h3 class="subtitle-1">{{ $t('admin.person.twoFactorAuthentication.header') }}</h3>
               <v-row
                 class="mt-4 text-body"
-                v-if="personStore.twoFactorState.hasToken && personStore.twoFactorState.tokenKind === 'software'"
+                v-if="twoFactorAuthentificationStore.hasToken"
               >
                 <v-col
                   class="text-right"
@@ -912,12 +978,20 @@
                   <v-icon
                     icon="mdi-check-circle"
                     color="green"
-                    v-if="personStore.twoFactorState.hasToken"
+                    v-if="twoFactorAuthentificationStore.hasToken"
                   ></v-icon>
                 </v-col>
                 <div class="v-col">
-                  <p>
+                  <p v-if="twoFactorAuthentificationStore.tokenKind === 'software'">
                     {{ $t('admin.person.twoFactorAuthentication.softwareTokenIsSetUp') }}
+                  </p>
+                  <p v-if="twoFactorAuthentificationStore.tokenKind === 'hardware'">
+                    {{ $t('admin.person.twoFactorAuthentication.hardwareTokenIsSetUp') }}
+                  </p>
+                  <p v-if="twoFactorAuthentificationStore.serial">
+                    {{
+                      $t('admin.person.twoFactorAuthentication.serial') + ': ' + twoFactorAuthentificationStore.serial
+                    }}
                   </p>
                 </div>
               </v-row>
@@ -933,10 +1007,10 @@
                   </v-icon>
                 </v-col>
                 <div class="v-col">
-                  <p v-if="personStore.twoFactorState.hasToken">
+                  <p v-if="twoFactorAuthentificationStore.hasToken">
                     {{ $t('admin.person.twoFactorAuthentication.resetInfo') }}
                   </p>
-                  <p v-if="!personStore.twoFactorState.hasToken">
+                  <p v-if="!twoFactorAuthentificationStore.hasToken">
                     {{ $t('admin.person.twoFactorAuthentication.notSetUp') }}
                   </p>
                 </div>
@@ -950,19 +1024,19 @@
             >
               <div
                 class="d-flex justify-sm-end"
-                v-if="!personStore.twoFactorState.hasToken"
+                v-if="!twoFactorAuthentificationStore.hasToken"
               >
                 <TwoFactorAuthenticationSetUp
-                  :errorCode="personStore.twoFactorState.errorCode"
+                  :errorCode="twoFactorAuthentificationStore.errorCode"
                   :disabled="isEditActive"
                   :person="personStore.currentPerson"
-                  @dialogClosed="personStore.get2FAState(currentPersonId)"
+                  @dialogClosed="twoFactorAuthentificationStore.get2FAState(currentPersonId)"
                 >
                 </TwoFactorAuthenticationSetUp>
               </div>
               <div
                 class="d-flex justify-sm-end"
-                v-if="personStore.twoFactorState.hasToken"
+                v-if="twoFactorAuthentificationStore.hasToken"
               >
                 <v-col
                   cols="12"
@@ -970,26 +1044,28 @@
                   md="auto"
                 >
                   <SpshTooltip
-                    :enabledCondition="personStore.twoFactorState.hasToken"
+                    :enabledCondition="twoFactorAuthentificationStore.hasToken"
                     :disabledText="$t('person.finishEditFirst')"
                     :enabledText="$t('admin.person.twoFactorAuthentication.tokenReset')"
                     position="start"
                   >
-                    <v-btn
-                      class="primary"
+                    <TokenReset
+                      :errorCode="twoFactorAuthentificationStore.errorCode"
                       :disabled="isEditActive"
-                    >
-                      {{ $t('admin.person.twoFactorAuthentication.tokenReset') }}</v-btn
-                    >
-                  </SpshTooltip></v-col
-                >
+                      :person="personStore.currentPerson"
+                      :tokenType="twoFactorAuthentificationStore.tokenKind"
+                      :personId="currentPersonId"
+                      @dialogClosed="twoFactorAuthentificationStore.get2FAState(currentPersonId)"
+                    ></TokenReset>
+                  </SpshTooltip>
+                </v-col>
               </div>
             </v-col>
             <v-col v-else-if="personStore.loading"> <v-progress-circular indeterminate></v-progress-circular></v-col
           ></v-row>
         </v-container>
         <v-divider
-          v-if="personStore.twoFactorState.hasToken != undefined"
+          v-if="twoFactorAuthentificationStore.hasToken != undefined"
           class="border-opacity-100 rounded my-6 mx-4"
           color="#E5EAEF"
           thickness="6"
@@ -1077,8 +1153,8 @@
                 cols="12"
                 sm="auto"
               >
-                <h3 class="subtitle-1">{{ $t('person.checkAndSave') }}:</h3></v-col
-              >
+                <h3 class="subtitle-1">{{ $t('person.checkAndSave') }}:</h3>
+              </v-col>
               <v-col
                 cols="12"
                 v-for="zuordnung in getZuordnungen?.filter((zuordnung) => zuordnung.editable)"
@@ -1212,7 +1288,7 @@
                     :errorCode="personStore.errorCode"
                     :person="personStore.currentPerson"
                     :disabled="selectedZuordnungen.length === 0"
-                    :zuordnungCount="zuordnungenResult?.filter((zuordnung) => zuordnung.editable).length || 0"
+                    :zuordnungCount="zuordnungenResult?.filter((zuordnung) => zuordnung.editable).length ?? 0"
                     @onDeletePersonenkontext="prepareDeletion"
                   >
                   </PersonenkontextDelete>
@@ -1349,8 +1425,8 @@
                   cols="12"
                   sm="auto"
                 >
-                  <h3 class="subtitle-1">{{ $t('person.addZuordnung') }}:</h3></v-col
-                >
+                  <h3 class="subtitle-1">{{ $t('person.addZuordnung') }}:</h3>
+                </v-col>
               </v-row>
               <v-container class="px-lg-16">
                 <!-- Organisation, Rolle, Klasse zuordnen -->
@@ -1372,6 +1448,14 @@
                   @update:canCommit="canCommit = $event"
                   @fieldReset="handleFieldReset"
                 />
+                <KopersInput
+                  v-if="!hasKopersNummer && isKopersRolle(selectedRolle) && selectedOrganisation"
+                  :hasNoKopersNr="hasNoKopersNr"
+                  v-model:selectedKopersNr="selectedKopersNr"
+                  :selectedKopersNrProps="selectedKopersNrProps"
+                  @update:selectedKopersNr="(value?: string) => (selectedKopersNr = value)"
+                  @update:hasNoKopersNr="(value: boolean) => (hasNoKopersNr = value)"
+                ></KopersInput>
               </v-container>
               <v-row class="py-3 px-2 justify-center">
                 <v-spacer class="hidden-sm-and-down"></v-spacer>
@@ -1474,18 +1558,68 @@
           </template>
         </v-container>
         <v-divider
+          v-if="authStore.currentUser?.personId !== personStore.currentPerson?.person.id"
           class="border-opacity-100 rounded my-6 mx-4"
           color="#E5EAEF"
           thickness="6"
         ></v-divider>
-        <!-- Delete person -->
         <v-container
-          v-if="authStore.hasPersonenLoeschenPermission"
-          class="person-delete"
+          class="person-lock"
+          v-if="authStore.currentUser?.personId !== personStore.currentPerson?.person.id"
         >
           <v-row class="ml-md-16">
-            <v-col>
+            <v-col data-testid="person-lock-info">
               <h3 class="subtitle-1">{{ $t('admin.person.status') }}</h3>
+              <template v-if="!personStore.loading">
+                <v-row class="mt-4 text-body">
+                  <v-col
+                    class="text-right"
+                    cols="1"
+                  >
+                    <v-icon
+                      v-if="personStore.currentPerson?.person.isLocked"
+                      icon="mdi-lock"
+                      color="red"
+                    ></v-icon>
+                  </v-col>
+                  <v-col cols="10">
+                    <span>
+                      {{
+                        personStore.currentPerson?.person.isLocked
+                          ? t('person.userIsLocked')
+                          : t('person.userIsUnlocked')
+                      }}
+                    </span>
+                  </v-col>
+                </v-row>
+                <v-row
+                  class="mt-0"
+                  v-for="{ key, attribute } of getLockInfo"
+                  :key="key"
+                  cols="10"
+                >
+                  <v-col
+                    class="text-right"
+                    cols="4"
+                  >
+                    <span class="subtitle-2"> {{ key }}: </span>
+                  </v-col>
+                  <v-col
+                    cols="5"
+                    class="ellipsis-wrapper"
+                  >
+                    <span
+                      class="text-body"
+                      :title="attribute"
+                    >
+                      {{ attribute }}
+                    </span>
+                  </v-col>
+                </v-row>
+              </template>
+              <template v-else-if="personStore.loading">
+                <v-col> <v-progress-circular indeterminate></v-progress-circular></v-col>
+              </template>
             </v-col>
             <v-col
               class="mr-lg-13"
@@ -1494,17 +1628,28 @@
               v-if="personStore.currentPerson"
             >
               <div class="d-flex justify-sm-end">
-                <PersonDelete
-                  :disabled="isEditActive"
+                <PersonLock
                   :errorCode="personStore.errorCode"
                   :person="personStore.currentPerson"
-                  @onDeletePerson="deletePerson(currentPersonId)"
+                  :adminId="authStore.currentUser?.personId!"
+                  @onLockUser="onLockUser"
                 >
-                </PersonDelete>
+                </PersonLock>
+              </div>
+              <div class="d-flex justify-sm-end">
+                <template v-if="authStore.hasPersonenLoeschenPermission">
+                  <PersonDelete
+                    :disabled="isEditActive"
+                    :errorCode="personStore.errorCode"
+                    :person="personStore.currentPerson"
+                    @onDeletePerson="deletePerson(currentPersonId)"
+                  >
+                  </PersonDelete>
+                </template>
               </div>
             </v-col>
-            <v-col v-else-if="personStore.loading"> <v-progress-circular indeterminate></v-progress-circular></v-col
-          ></v-row>
+            <v-col v-else-if="personStore.loading"> <v-progress-circular indeterminate></v-progress-circular></v-col>
+          </v-row>
         </v-container>
       </template>
     </LayoutCard>
@@ -1794,6 +1939,7 @@
     .save-cancel-row {
       margin-top: -40px;
     }
+
     .cancel-col {
       margin-bottom: -15px;
     }

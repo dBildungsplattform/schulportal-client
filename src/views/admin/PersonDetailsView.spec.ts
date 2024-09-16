@@ -1,13 +1,23 @@
 // import { expect, test } from 'vitest';
-import { VueWrapper, /* mount */ shallowMount } from '@vue/test-utils';
-import { createRouter, createWebHistory, type Router } from 'vue-router';
 import routes from '@/router/routes';
-import PersonDetailsView from './PersonDetailsView.vue';
-import { type Personendatensatz, type PersonStore, type PersonWithUebersicht, usePersonStore } from '@/stores/PersonStore';
-import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
-import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
-import { RollenMerkmal, RollenSystemRecht } from '@/stores/RolleStore';
 import { useAuthStore, type AuthStore, type UserInfo } from '@/stores/AuthStore';
+import {
+  OrganisationsTyp,
+  useOrganisationStore,
+  type Organisation,
+  type OrganisationStore,
+} from '@/stores/OrganisationStore';
+import {
+  usePersonStore,
+  type Personendatensatz,
+  type PersonStore,
+  type PersonWithUebersicht,
+} from '@/stores/PersonStore';
+import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
+import { RollenMerkmal, RollenSystemRecht } from '@/stores/RolleStore';
+import { shallowMount, VueWrapper } from '@vue/test-utils';
+import { createRouter, createWebHistory, type Router } from 'vue-router';
+import PersonDetailsView from './PersonDetailsView.vue';
 // import { nextTick, type ComputedRef, type DefineComponent } from 'vue';
 // import type { TranslatedRolleWithAttrs } from '@/composables/useRollen';
 
@@ -27,6 +37,9 @@ const mockPerson: Personendatensatz = {
       vorname: 'John',
     },
     referrer: 'jorton',
+    personalnummer: null,
+    isLocked: null,
+    lockInfo: null,
   },
 };
 
@@ -78,6 +91,7 @@ const mockPersonenuebersicht: PersonWithUebersicht = {
       administriertVon: '2',
       editable: true,
       merkmale: [] as unknown as RollenMerkmal,
+      befristung: '2024-05-06',
     },
     {
       sskId: '3',
@@ -89,6 +103,7 @@ const mockPersonenuebersicht: PersonWithUebersicht = {
       administriertVon: '2',
       editable: true,
       merkmale: [] as unknown as RollenMerkmal,
+      befristung: '2024-05-06',
     },
     {
       sskId: '2',
@@ -100,6 +115,7 @@ const mockPersonenuebersicht: PersonWithUebersicht = {
       administriertVon: '1',
       editable: true,
       merkmale: [] as unknown as RollenMerkmal,
+      befristung: '2024-05-06',
     },
   ],
 };
@@ -126,6 +142,8 @@ personenkontextStore.workflowStepResponse = {
       rollenart: 'LERN',
       merkmale: new Set<RollenMerkmal>(['BEFRISTUNG_PFLICHT']),
       systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
+      administeredBySchulstrukturknotenName: 'Land SH',
+      administeredBySchulstrukturknotenKennung: '',
     },
     {
       id: '1',
@@ -136,6 +154,8 @@ personenkontextStore.workflowStepResponse = {
       rollenart: 'LERN',
       merkmale: new Set<RollenMerkmal>(['BEFRISTUNG_PFLICHT']),
       systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
+      administeredBySchulstrukturknotenName: 'Land SH',
+      administeredBySchulstrukturknotenKennung: '',
     },
   ],
   selectedOrganisation: 'string',
@@ -154,6 +174,8 @@ organisationStore.klassen = [
     administriertVon: '1',
   },
 ];
+
+organisationStore.getParentOrganisationsByIds = async (_organisationIds: string[]): Promise<Organisation[]> => [];
 
 authStore.currentUser = mockCurrentUser;
 personStore.currentPerson = mockPerson;
@@ -195,6 +217,35 @@ describe('PersonDetailsView', () => {
     // expect(wrapper?.find('[data-testid="person-zuordnung-1"]').text()).toBe('123456 (Testschule Birmingham): SuS 9a');
     // expect(wrapper?.getComponent({ name: 'PasswordReset' })).toBeTruthy();
   });
+
+  // test('Renders details for the current person', async () => {
+  //   const date: string = '01.01.2024';
+  //   const datetime: string = `${date} 12:34:00`;
+  //   const lockInfo: Person['lockInfo'] = {
+  //     lock_locked_from: 'test',
+  //     lock_timestamp: datetime,
+  //   };
+  //   // Mock the current person in the store
+  //   personStore.currentPerson = mapPersonendatensatzResponseToPersonendatensatz({
+  //     person: {
+  //       id: '1234',
+  //       name: {
+  //         familienname: 'Vimes',
+  //         vorname: 'Samuel',
+  //       },
+  //       isLocked: true,
+  //       lockInfo,
+  //     },
+  //   } as PersonendatensatzResponse);
+
+  //   const vornameElement: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="person-vorname"]');
+  //   const lockInfoContainer: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="person-lock-info"]');
+
+  //   // Check if the element exists and has the correct text content
+  //   expect(vornameElement?.text()).toBe('Samuel');
+  //   expect(lockInfoContainer?.html()).toContain(lockInfo.lock_locked_from);
+  //   expect(lockInfoContainer?.html()).toContain(date);
+  // });
 
   // TODO: how do we fix this test?
   // We have to use shallowMount instead of mount and comment all tests to make sonar accept coverage.

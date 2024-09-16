@@ -1,14 +1,12 @@
 import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import { isAxiosError, type AxiosResponse } from 'axios';
 import {
-  Class2FAApiFactory,
   DbiamPersonenuebersichtApiFactory,
   OrganisationsTyp,
   PersonenApiFactory,
   PersonenFrontendApiFactory,
   RollenMerkmal,
-  type Class2FAApiInterface,
-  type DbiamCreatePersonWithContextBodyParams,
+  type DbiamCreatePersonWithPersonenkontexteBodyParams,
   type DbiamPersonenuebersichtApiInterface,
   type DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response,
   type DBiamPersonenuebersichtResponse,
@@ -17,8 +15,7 @@ import {
   type PersonenFrontendApiInterface,
   type PersonenuebersichtBodyParams,
   type PersonFrontendControllerFindPersons200Response,
-  type TokenInitBodyParams,
-  type TokenStateResponse,
+  type PersonResponse,
 } from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
 import { type DbiamPersonenkontextBodyParams, type Zuordnung } from './PersonenkontextStore';
@@ -31,16 +28,19 @@ const personenuebersichtApi: DbiamPersonenuebersichtApiInterface = DbiamPersonen
   axiosApiInstance,
 );
 
-const twoFactorApi: Class2FAApiInterface = Class2FAApiFactory(undefined, '', axiosApiInstance);
+export enum LockKeys {
+  LockedFrom = 'lock_locked_from',
+  Timestamp = 'lock_timestamp',
+}
+export type LockInfo = Record<LockKeys, string>;
 
 export type Person = {
-  id: string;
-  name: {
-    familienname: string;
-    vorname: string;
-  };
-  referrer: string | null;
-  personalnummer?: string | null;
+  id: PersonResponse['id'];
+  name: PersonResponse['name'];
+  referrer: PersonResponse['referrer'];
+  personalnummer: PersonResponse['personalnummer'];
+  isLocked: PersonResponse['isLocked'];
+  lockInfo: LockInfo | null;
 };
 
 type PersonenWithRolleAndZuordnung = {
@@ -68,6 +68,7 @@ export type PersonWithUebersicht =
         typ: OrganisationsTyp;
         editable: boolean;
         merkmale: RollenMerkmal;
+        befristung: string;
       }[];
     }
   | undefined;
@@ -78,18 +79,34 @@ export type PersonTableItem = {
   updatedAt?: string;
 };
 
-export type CreatePersonBodyParams = DbiamCreatePersonWithContextBodyParams;
+export type CreatePersonBodyParams = DbiamCreatePersonWithPersonenkontexteBodyParams;
 export type CreatedPersonenkontext = DbiamPersonenkontextBodyParams;
+
+export function parseLockInfo(unparsed: object): LockInfo | null {
+  if (!Object.values(LockKeys).every((key: string) => key in unparsed)) return null;
+  return {
+    lock_locked_from: LockKeys.LockedFrom in unparsed ? '' + unparsed[LockKeys.LockedFrom] : '',
+    lock_timestamp: LockKeys.Timestamp in unparsed ? '' + unparsed[LockKeys.Timestamp] : '',
+  };
+}
+
+export function mapPersonendatensatzResponseToPersonendatensatz(
+  response: PersonendatensatzResponse,
+): Personendatensatz {
+  const lockInfo: LockInfo | null = parseLockInfo(response.person.lockInfo ?? {});
+  const person: Person = {
+    id: response.person.id,
+    name: response.person.name,
+    referrer: response.person.referrer,
+    personalnummer: response.person.personalnummer,
+    isLocked: response.person.isLocked,
+    lockInfo: lockInfo,
+  };
+  return { person };
+}
 
 export type Personendatensatz = {
   person: Person;
-};
-
-export type TwoFactorState = {
-  errorCode: string;
-  hasToken: boolean | null;
-  tokenKind: 'hardware' | 'software' | null;
-  qrCode: string;
 };
 
 export type { PersonendatensatzResponse };
@@ -99,7 +116,6 @@ type PersonState = {
   loading: boolean;
   totalPersons: number;
   currentPerson: Personendatensatz | null;
-  twoFactorState: TwoFactorState;
   personenWithUebersicht: PersonenWithRolleAndZuordnung | null;
   personenuebersicht: DBiamPersonenuebersichtResponse | null;
 };
@@ -119,8 +135,7 @@ type PersonActions = {
   getPersonById: (personId: string) => Promise<Personendatensatz>;
   resetPassword: (personId: string) => Promise<string>;
   deletePersonById: (personId: string) => Promise<void>;
-  get2FAState: (personId: string) => Promise<void>;
-  get2FASoftwareQRCode: (personId: string) => Promise<void>;
+  lockPerson: (personId: string, lock: boolean, locked_from: string) => Promise<void>;
   getPersonenuebersichtById: (personId: string) => Promise<void>;
 };
 
@@ -136,12 +151,6 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
       loading: false,
       totalPersons: 0,
       currentPerson: null,
-      twoFactorState: {
-        errorCode: '',
-        hasToken: null,
-        tokenKind: null,
-        qrCode: '',
-      },
     };
   },
   actions: {
@@ -176,55 +185,71 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
           return;
         }
         const bodyParams: PersonenuebersichtBodyParams = {
-          personIds: personIds
-        }
+          personIds: personIds,
+        };
         const { data: uebersichten }: { data: DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response } =
-
           await personenuebersichtApi.dBiamPersonenuebersichtControllerFindPersonenuebersichten(bodyParams);
         const allUebersichten: DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response = uebersichten;
 
         // Aggregate the personen with their uebersichten
-        this.personenWithUebersicht = allPersons.map((person: Personendatensatz) => {
-          const uebersicht: PersonWithUebersicht = allUebersichten.items.find(
-            (ueb: PersonWithUebersicht) => ueb?.personId === person.person.id,
-          );
-
-          const uniqueRollen: Set<string> = new Set<string>();
-          uebersicht?.zuordnungen.forEach((zuordnung: Zuordnung) => uniqueRollen.add(zuordnung.rolle));
-          const rollenZuordnungen: string = uniqueRollen.size > 0 ? Array.from(uniqueRollen).join(', ') : '---';
-
-          const uniqueAdministrationsebenen: Set<string> = new Set<string>();
-          uebersicht?.zuordnungen
-            .filter((zuordnung: Zuordnung) => zuordnung.typ !== OrganisationsTyp.Klasse)
-            .forEach((zuordnung: Zuordnung) =>
-              uniqueAdministrationsebenen.add(zuordnung.sskDstNr ? zuordnung.sskDstNr : zuordnung.sskName),
+        this.personenWithUebersicht = allPersons
+          .map(mapPersonendatensatzResponseToPersonendatensatz)
+          .map((person: Personendatensatz) => {
+            const uebersicht: PersonWithUebersicht = allUebersichten.items.find(
+              (ueb: PersonWithUebersicht) => ueb?.personId === person.person.id,
             );
-          const administrationsebenen: string =
-            uniqueAdministrationsebenen.size > 0 ? Array.from(uniqueAdministrationsebenen).join(', ') : '---';
 
-          const klassenZuordnungen: string = uebersicht?.zuordnungen.some(
-            (zuordnung: Zuordnung) => zuordnung.typ === OrganisationsTyp.Klasse,
-          )
-            ? uebersicht.zuordnungen
-                .filter((zuordnung: Zuordnung) => zuordnung.typ === OrganisationsTyp.Klasse)
-                .map((zuordnung: Zuordnung) => (zuordnung.sskName.length ? zuordnung.sskName : '---'))
-                .join(', ')
-            : '---';
+            const uniqueRollen: Set<string> = new Set<string>();
+            uebersicht?.zuordnungen.forEach((zuordnung: Zuordnung) => uniqueRollen.add(zuordnung.rolle));
+            const rollenZuordnungen: string = uniqueRollen.size > 0 ? Array.from(uniqueRollen).join(', ') : '---';
 
-          const personalnummer: string = person.person.personalnummer ?? '---';
+            const uniqueAdministrationsebenen: Set<string> = new Set<string>();
+            uebersicht?.zuordnungen
+              .filter((zuordnung: Zuordnung) => zuordnung.typ !== OrganisationsTyp.Klasse)
+              .forEach((zuordnung: Zuordnung) =>
+                uniqueAdministrationsebenen.add(zuordnung.sskDstNr ? zuordnung.sskDstNr : zuordnung.sskName),
+              );
+            const administrationsebenen: string =
+              uniqueAdministrationsebenen.size > 0 ? Array.from(uniqueAdministrationsebenen).join(', ') : '---';
 
-          return {
-            ...person,
-            rollen: rollenZuordnungen,
-            administrationsebenen: administrationsebenen,
-            klassen: klassenZuordnungen,
-            person: { ...person.person, personalnummer: personalnummer },
-          };
-        });
+            const klassenZuordnungen: string = uebersicht?.zuordnungen.some(
+              (zuordnung: Zuordnung) => zuordnung.typ === OrganisationsTyp.Klasse,
+            )
+              ? uebersicht.zuordnungen
+                  .filter((zuordnung: Zuordnung) => zuordnung.typ === OrganisationsTyp.Klasse)
+                  .map((zuordnung: Zuordnung) => (zuordnung.sskName.length ? zuordnung.sskName : '---'))
+                  .join(', ')
+              : '---';
+
+            /* Check if person has personalnummer and show it, 
+              if not, check if kopersrolle exists and show "fehlt",
+              if not, show "---"
+            */
+            const hasKopersRolle: boolean = !!uebersicht?.zuordnungen.find((zuordnung: Zuordnung) =>
+              zuordnung.merkmale.includes(RollenMerkmal.KopersPflicht),
+            );
+            let personalnummer: string;
+
+            if (person.person.personalnummer) {
+              personalnummer = person.person.personalnummer;
+            } else if (hasKopersRolle) {
+              personalnummer = 'fehlt';
+            } else {
+              personalnummer = '---';
+            }
+
+            return {
+              ...person,
+              rollen: rollenZuordnungen,
+              administrationsebenen: administrationsebenen,
+              klassen: klassenZuordnungen,
+              person: { ...person.person, personalnummer: personalnummer },
+            };
+          });
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
+          this.errorCode = error.response?.data?.code || 'UNSPECIFIED_ERROR';
         }
       } finally {
         this.loading = false;
@@ -235,9 +260,10 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
       this.loading = true;
       this.errorCode = '';
       try {
-        const { data }: { data: Personendatensatz } = await personenApi.personControllerFindPersonById(personId);
-        this.currentPerson = data;
-        return data;
+        const { data }: AxiosResponse<PersonendatensatzResponse, unknown> =
+          await personenApi.personControllerFindPersonById(personId);
+        this.currentPerson = mapPersonendatensatzResponseToPersonendatensatz(data);
+        return this.currentPerson;
       } catch (error) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
@@ -278,52 +304,14 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
         this.loading = false;
       }
     },
-
-    async get2FAState(personId: string) {
+    async lockPerson(personId: string, lock: boolean, locked_from: string): Promise<void> {
       this.loading = true;
       try {
-        const twoFactorState: TokenStateResponse = (
-          await twoFactorApi.privacyIdeaAdministrationControllerGetTwoAuthState(personId)
-        ).data;
-
-        this.twoFactorState.hasToken = twoFactorState.hasToken;
-
-        if (!twoFactorState.hasToken) {
-          return;
-        }
-
-        switch (twoFactorState.tokenKind) {
-          case 'hardware':
-            this.twoFactorState.tokenKind = 'hardware';
-            break;
-          case 'software':
-            this.twoFactorState.tokenKind = 'software';
-            break;
-          default:
-            this.twoFactorState.tokenKind = null;
-        }
-      } catch (error: unknown) {
-        this.twoFactorState.errorCode = 'UNSPECIFIED_ERROR';
-        if (isAxiosError(error)) {
-          this.twoFactorState.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
-        }
-        return await Promise.reject(this.errorCode);
-      } finally {
-        this.loading = false;
-      }
-    },
-
-    async get2FASoftwareQRCode(personId: string) {
-      this.loading = true;
-      try {
-        const bodyParams: TokenInitBodyParams = {
-          personId: personId,
-        };
-        const qrCodeImageBase64: string = (
-          await twoFactorApi.privacyIdeaAdministrationControllerInitializeSoftwareToken(bodyParams)
-        ).data;
-
-        this.twoFactorState.qrCode = qrCodeImageBase64;
+        await personenApi.personControllerLockPerson(personId, {
+          lock: lock,
+          locked_from: locked_from,
+        });
+        await this.getPersonById(personId);
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
@@ -334,6 +322,7 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
         this.loading = false;
       }
     },
+
     async getPersonenuebersichtById(personId: string): Promise<void> {
       this.loading = true;
       try {

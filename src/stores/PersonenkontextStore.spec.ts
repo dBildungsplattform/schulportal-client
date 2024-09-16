@@ -307,6 +307,7 @@ describe('PersonenkontextStore', () => {
             personId: '12345',
             organisationId: '67890',
             rolleId: '54321',
+            befristung: '2024-03-03',
           },
           PersonenKontextTyp.Organisation,
         );
@@ -324,6 +325,7 @@ describe('PersonenkontextStore', () => {
             personId: '12345',
             organisationId: '67890',
             rolleId: '54321',
+            befristung: '2024-03-03',
           },
           PersonenKontextTyp.Organisation,
         );
@@ -341,6 +343,7 @@ describe('PersonenkontextStore', () => {
             personId: '12345',
             organisationId: '67890',
             rolleId: '54321',
+            befristung: '2024-03-03',
           },
           PersonenKontextTyp.Organisation,
         );
@@ -367,6 +370,7 @@ describe('PersonenkontextStore', () => {
             personId: '12345',
             organisationId: '67890',
             rolleId: '54321',
+            befristung: '2024-03-03',
           },
           PersonenKontextTyp.Klasse,
         );
@@ -384,6 +388,7 @@ describe('PersonenkontextStore', () => {
             personId: '12345',
             organisationId: '67890',
             rolleId: '54321',
+            befristung: '2024-03-03',
           },
           PersonenKontextTyp.Klasse,
         );
@@ -401,6 +406,7 @@ describe('PersonenkontextStore', () => {
             personId: '12345',
             organisationId: '67890',
             rolleId: '54321',
+            befristung: '2024-03-03',
           },
           PersonenKontextTyp.Klasse,
         );
@@ -423,6 +429,8 @@ describe('PersonenkontextStore', () => {
             rollenart: 'LERN',
             merkmale: ['BEFRISTUNG_PFLICHT'] as unknown as Set<RollenMerkmal>,
             systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
+            administeredBySchulstrukturknotenName: 'Land SH',
+            administeredBySchulstrukturknotenKennung: '',
           },
         ],
         total: 0,
@@ -513,7 +521,7 @@ describe('PersonenkontextStore', () => {
       expect(personenkontextStore.loading).toBe(false);
     });
   });
-  describe('createPersonWithKontext', () => {
+  describe('createPersonWithKontexte', () => {
     it('should create a Person', async () => {
       const mockPerson: PersonendatensatzResponse = {
         person: {
@@ -529,11 +537,15 @@ describe('PersonenkontextStore', () => {
       const mockResponse: PersonendatensatzResponse = mockPerson;
 
       mockadapter.onPost('/api/personenkontext-workflow').replyOnce(201, mockResponse);
-      const createPersonPromise: Promise<PersonendatensatzResponse> = personenkontextStore.createPersonWithKontext({
+      const createPersonPromise: Promise<PersonendatensatzResponse> = personenkontextStore.createPersonWithKontexte({
         familienname: 'Cena',
         vorname: 'Randy',
-        organisationId: '1234',
-        rolleId: '5678',
+        createPersonenkontexte: [
+          {
+            organisationId: '1234',
+            rolleId: '5678',
+          },
+        ],
       });
       expect(personenkontextStore.loading).toBe(true);
       const createdPerson: PersonendatensatzResponse = await createPersonPromise;
@@ -543,11 +555,15 @@ describe('PersonenkontextStore', () => {
 
     it('should handle string error', async () => {
       mockadapter.onPost('/api/personenkontext-workflow').replyOnce(500, 'some error');
-      const createPersonPromise: Promise<PersonendatensatzResponse> = personenkontextStore.createPersonWithKontext({
+      const createPersonPromise: Promise<PersonendatensatzResponse> = personenkontextStore.createPersonWithKontexte({
         familienname: 'Copeland',
         vorname: 'Christian',
-        organisationId: '',
-        rolleId: '5678',
+        createPersonenkontexte: [
+          {
+            organisationId: '',
+            rolleId: '5678',
+          },
+        ],
       });
       expect(personenkontextStore.loading).toBe(true);
       await rejects(createPersonPromise);
@@ -557,11 +573,15 @@ describe('PersonenkontextStore', () => {
 
     it('should handle error code', async () => {
       mockadapter.onPost('/api/personenkontext-workflow').replyOnce(500, { i18nKey: 'SOME_MOCK_SERVER_ERROR' });
-      const createPersonPromise: Promise<PersonendatensatzResponse> = personenkontextStore.createPersonWithKontext({
+      const createPersonPromise: Promise<PersonendatensatzResponse> = personenkontextStore.createPersonWithKontexte({
         familienname: 'Copeland',
         vorname: 'Christian',
-        organisationId: '1234',
-        rolleId: '',
+        createPersonenkontexte: [
+          {
+            organisationId: '1234',
+            rolleId: '',
+          },
+        ],
       });
       expect(personenkontextStore.loading).toBe(true);
       await rejects(createPersonPromise);

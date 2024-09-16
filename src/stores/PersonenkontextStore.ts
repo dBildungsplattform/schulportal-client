@@ -17,7 +17,7 @@ import {
   type PersonenkontexteUpdateResponse,
   type DbiamPersonenkontextBodyParams,
   type PersonenkontextWorkflowResponse,
-  type DbiamCreatePersonWithContextBodyParams,
+  type DbiamCreatePersonWithPersonenkontexteBodyParams,
   type DBiamPersonResponse,
   type PersonendatensatzResponse,
   type PersonAdministrationApiInterface,
@@ -78,6 +78,7 @@ type PersonenkontextState = {
   errorCode: string;
   loading: boolean;
   totalFilteredRollen: number;
+  totalPaginatedRollen: number;
 };
 
 type PersonenkontextGetters = {};
@@ -86,17 +87,24 @@ type PersonenkontextActions = {
   processWorkflowStep: (filter?: WorkflowFilter) => Promise<PersonenkontextWorkflowResponse>;
   getPersonenkontextRolleWithFilter: (rolleName: string, limit?: number) => Promise<void>;
   getPersonenkontextAdministrationsebeneWithFilter: (rolleId: string, sskName: string, limit: number) => Promise<void>;
-  updatePersonenkontexte: (combinedZuordnungen: Zuordnung[] | undefined, personId: string) => Promise<void>;
+  updatePersonenkontexte: (
+    combinedZuordnungen: Zuordnung[] | undefined,
+    personId: string,
+    personalnummer?: string,
+  ) => Promise<void>;
   createPersonenkontext: (
     personenkontext: DbiamPersonenkontextBodyParams,
     personenKontextTyp: PersonenKontextTyp,
   ) => Promise<DBiamPersonenkontextResponse>;
-  createPersonWithKontext: (params: DbiamCreatePersonWithContextBodyParams) => Promise<PersonendatensatzResponse>;
+  createPersonWithKontexte: (
+    params: DbiamCreatePersonWithPersonenkontexteBodyParams,
+  ) => Promise<PersonendatensatzResponse>;
 };
 
 export type {
   SystemrechtResponse,
   DbiamUpdatePersonenkontexteBodyParams,
+  DBiamPersonenkontextResponse,
   DbiamPersonenkontextBodyParams,
   PersonenkontextWorkflowResponse,
   PersonenkontexteUpdateResponse,
@@ -137,6 +145,7 @@ export const usePersonenkontextStore: StoreDefinition<
       errorCode: '',
       loading: false,
       totalFilteredRollen: 0,
+      totalPaginatedRollen: 0,
     };
   },
   actions: {
@@ -248,7 +257,11 @@ export const usePersonenkontextStore: StoreDefinition<
         this.loading = false;
       }
     },
-    async updatePersonenkontexte(combinedZuordnungen: Zuordnung[] | undefined, personId: string): Promise<void> {
+    async updatePersonenkontexte(
+      combinedZuordnungen: Zuordnung[] | undefined,
+      personId: string,
+      personalnummer?: string,
+    ): Promise<void> {
       const personStore: PersonStore = usePersonStore();
       this.loading = true;
       this.errorCode = '';
@@ -263,7 +276,7 @@ export const usePersonenkontextStore: StoreDefinition<
           })) as DbiamPersonenkontextBodyParams[],
         };
         const { data }: { data: PersonenkontexteUpdateResponse } =
-          await personenKontextApi.dbiamPersonenkontextWorkflowControllerCommit(personId, updateParams);
+          await personenKontextApi.dbiamPersonenkontextWorkflowControllerCommit(personId, updateParams, personalnummer);
         this.updatedPersonenkontexte = data;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
@@ -274,11 +287,13 @@ export const usePersonenkontextStore: StoreDefinition<
         this.loading = false;
       }
     },
-    async createPersonWithKontext(params: DbiamCreatePersonWithContextBodyParams): Promise<DBiamPersonResponse> {
+    async createPersonWithKontexte(
+      params: DbiamCreatePersonWithPersonenkontexteBodyParams,
+    ): Promise<DBiamPersonResponse> {
       this.loading = true;
       try {
         const { data }: { data: DBiamPersonResponse } =
-          await personenKontextApi.dbiamPersonenkontextWorkflowControllerCreatePersonWithKontext(params);
+          await personenKontextApi.dbiamPersonenkontextWorkflowControllerCreatePersonWithPersonenkontexte(params);
         this.createdPersonWithKontext = data;
         return data;
       } catch (error: unknown) {

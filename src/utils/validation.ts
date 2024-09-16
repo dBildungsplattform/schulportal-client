@@ -14,3 +14,8 @@ export const DIN_91379A_EXT: RegExp =
  * Keine Leerzeichen am Anfang oder Ende
  */
 export const NO_LEADING_TRAILING_SPACES: RegExp = /^(?! ).*(?<! )$/;
+
+/**
+ * Date Format für Befristung
+ */
+export const DDMMYYYY: RegExp = /^(0[1-9]|[12][0-9]|3[01])\.(0[1-9]|1[0-2])\.(19|20)\d{2}$/;
