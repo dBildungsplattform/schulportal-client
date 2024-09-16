@@ -2,11 +2,17 @@
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { ref, type Ref, onBeforeMount } from 'vue';
   import { useI18n } from 'vue-i18n';
+  import SpshTooltip from '@/components/admin/SpshTooltip.vue';
   const { t }: { t: Function } = useI18n();
+
+  enum ItemType {
+    KO_PERS = 'KO_PERS',
+  }
   type LabelValue = {
     label: string;
     labelAbbr?: string;
     value: string;
+    type?: ItemType;
     testIdLabel: string;
     testIdValue: string;
   };
@@ -16,6 +22,7 @@
   import { OrganisationsTyp } from '@/stores/OrganisationStore';
   import { type RouteLocationNormalizedLoaded, type Router, useRoute, useRouter } from 'vue-router';
   import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
+  import type { DBiamPersonenzuordnungResponse } from '@/api-client/generated/api';
 
   const route: RouteLocationNormalizedLoaded = useRoute();
   const router: Router = useRouter();
@@ -32,6 +39,7 @@
   let personStore: PersonStore = usePersonStore();
   const personalData: Ref = ref<LabelValue[]>([]);
   const schulDaten: Ref = ref<SchulDaten[]>([]);
+  const hasKoPersMerkmal: Ref = ref<boolean>(false);
 
   function handleGoToPreviousPage(): void {
     const previousUrl: string | null = sessionStorage.getItem('previousUrl');
@@ -175,11 +183,12 @@
       },
     ];
 
-    if (personInfo.person.personalnummer) {
+    if (personInfo.person.personalnummer || hasKoPersMerkmal.value) {
       personalData.value.push({
         label: t('profile.koPersNummer'),
         labelAbbr: t('profile.koPersNummerAbbr'),
         value: personInfo.person.personalnummer,
+        type: ItemType.KO_PERS,
         testIdLabel: 'kopersnummer-label',
         testIdValue: 'kopersnummer-value',
       });
@@ -226,8 +235,18 @@
     window.location.href = url.toString();
   }
 
+  function hasKoPersMerkmalCheck(): void {
+    let zuordnungen: Array<DBiamPersonenzuordnungResponse> | undefined = personStore.personenuebersicht?.zuordnungen;
+    if (zuordnungen !== undefined) {
+      let result: boolean = !!zuordnungen.find((zuordnung: DBiamPersonenzuordnungResponse) => {
+        return zuordnung.merkmale.includes('KOPERS_PFLICHT');
+      });
+      hasKoPersMerkmal.value = result;
+    }
+  }
   onBeforeMount(async () => {
     await initializeStores();
+    hasKoPersMerkmalCheck();
     setupPersonalData();
     setupSchuleData();
   });
@@ -275,7 +294,22 @@
                       v-for="item in personalData"
                       :key="item.label"
                     >
-                      <td>
+                      <td v-if="item.type === ItemType.KO_PERS && item.value === null">
+                        <SpshTooltip
+                          :disabledText="t('profile.koPersNummerMissing')"
+                          :enabledText="t('profile.koPersNummerMissing')"
+                          position="top"
+                        >
+                          <span
+                            v-if="item.labelAbbr"
+                            class="text-red"
+                          >
+                            <strong>{{ item.labelAbbr }}</strong> :</span
+                          >
+                          <strong v-else>{{ item.label }}:</strong>
+                        </SpshTooltip>
+                      </td>
+                      <td v-else>
                         <span v-if="item.labelAbbr"
                           ><abbr :title="item.label"
                             ><strong :data-testid="item.testIdLabel">{{ item.labelAbbr }}:</strong></abbr
@@ -287,7 +321,19 @@
                           >{{ item.label }}:</strong
                         >
                       </td>
-                      <td :data-testid="item.testIdValue">{{ item.value }}</td>
+                      <td
+                        :data-testid="item.testIdValue"
+                        v-if="item.type === ItemType.KO_PERS && item.value === null"
+                        class="text-red"
+                      >
+                        {{ t('missing') }}
+                      </td>
+                      <td
+                        :data-testid="item.testIdValue"
+                        v-else
+                      >
+                        {{ item.value }}
+                      </td>
                     </tr>
                   </tbody>
                 </template>
