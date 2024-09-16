@@ -322,14 +322,18 @@
                         >
                       </td>
                       <td
-                      :data-testid="item.testIdValue"
+                        :data-testid="item.testIdValue"
                         v-if="item.type === ItemType.KO_PERS && item.value === null"
                         class="text-red"
                       >
                         {{ t('missing') }}
                       </td>
-                      <td :data-testid="item.testIdValue"
-                      v-else>{{ item.value }}</td>
+                      <td
+                        :data-testid="item.testIdValue"
+                        v-else
+                      >
+                        {{ item.value }}
+                      </td>
                     </tr>
                   </tbody>
                 </template>
