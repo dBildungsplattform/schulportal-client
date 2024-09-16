@@ -54,26 +54,18 @@
   const handleBefristungChange = (value: string | undefined): void => {
     localBefristung.value = value;
     emit('update:befristung', value);
-    // Reset befristungOption only if a custom date is entered
-    if (value && value !== props.nextSchuljahresende) {
-      localBefristungOption.value = undefined;
-      emit('update:calculatedBefristungOption', undefined);
-    }
+    localBefristungOption.value = undefined;
   };
 
+  // If the befristung is required then autoselect Schuljahresende, otherwise Unbefristet
   watch(
-    () => props.befristung,
-    (newValue: string | undefined) => {
-      localBefristung.value = newValue;
-      localBefristungOption.value = undefined;
-    },
-  );
-
-  watch(
-    () => props.befristungOption,
-    (newValue: string | undefined) => {
-      localBefristungOption.value = newValue;
-      localBefristung.value = undefined;
+    () => props.isBefristungRequired,
+    (newValue: boolean) => {
+      if (newValue) {
+        localBefristungOption.value = BefristungOption.SCHULJAHRESENDE;
+      } else {
+        localBefristungOption.value = BefristungOption.UNBEFRISTET;
+      }
     },
   );
 </script>

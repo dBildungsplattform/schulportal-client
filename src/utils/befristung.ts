@@ -44,7 +44,8 @@ export function useBefristungUtils(props: {
   calculatedBefristung: Ref<string | undefined>;
   selectedRolle: Ref<string | undefined>;
 }): BefristungUtilsType {
-  const { selectedBefristung, selectedBefristungOption, calculatedBefristung, selectedRolle }: Props = props;
+  const { selectedBefristung, selectedBefristungOption, calculatedBefristung, selectedRolle, formContext }: Props =
+    props;
 
   const handleBefristungUpdate = (value: string | undefined): void => {
     selectedBefristung.value = value;
@@ -52,6 +53,10 @@ export function useBefristungUtils(props: {
 
   const handleBefristungOptionUpdate = (value: string | undefined): void => {
     calculatedBefristung.value = value;
+    if (!value) {
+      selectedBefristungOption.value = BefristungOption.UNBEFRISTET;
+    }
+    selectedBefristungOption.value = BefristungOption.SCHULJAHRESENDE;
   };
 
   // Setup the watchers
@@ -62,6 +67,20 @@ export function useBefristungUtils(props: {
     ): void => {
       watch(watchedValue, onValueChange, { immediate: true });
     };
+
+    // Watcher for resetting radio button when a date is picked using date-input
+    createWatcher(selectedBefristung, (newValue: string | undefined) => {
+      if (newValue) {
+        selectedBefristungOption.value = undefined;
+      }
+    });
+
+    // Watcher for resetting the text input for date if a radio button was selected
+    createWatcher(selectedBefristungOption, (newValue: string | undefined) => {
+      if (newValue) {
+        formContext.resetField('selectedBefristung');
+      }
+    });
 
     // Watcher to set an initial value for the radio buttons depending on the selected Rolle
     createWatcher(selectedRolle, (newValue: string | undefined) => {

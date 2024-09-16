@@ -241,10 +241,6 @@
 
   const handleBefristungChange = (value: string | undefined): void => {
     emits('update:befristung', value);
-    // Reset befristungOption only if a custom date is entered
-    if (value && value !== props.befristungInputProps.nextSchuljahresende) {
-      emits('update:calculatedBefristungOption', undefined);
-    }
   };
 
   const handleCalculatedBefristungOptionChange = (value: string | undefined): void => {
