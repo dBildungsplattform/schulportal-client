@@ -35,7 +35,6 @@
 
   const transformedRollenAndMerkmale: ComputedRef<RolleTableItem[]> = computed(() => {
     return rolleStore.allRollen.map((rolle: RolleResponse) => {
-
       // If the name administeredBySchulstrukturknoten exists, format the administeredBySchulstrukturknoten field accordingly
       let administeredBySchulstrukturknoten: string = '';
       if (rolle.administeredBySchulstrukturknotenName) {
