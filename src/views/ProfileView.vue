@@ -52,10 +52,11 @@
   function groupZuordnungen(zuordnungen: Zuordnung[]): Map<string, Zuordnung[]> {
     const groupedZuordnungen: Map<string, Zuordnung[]> = new Map();
     for (const zuordnung of zuordnungen) {
-      if (groupedZuordnungen.has(zuordnung.sskDstNr)) {
-        groupedZuordnungen.get(zuordnung.sskDstNr)?.push(zuordnung);
+      const key: string = zuordnung.sskDstNr ?? zuordnung.sskId;
+      if (groupedZuordnungen.has(key)) {
+        groupedZuordnungen.get(key)?.push(zuordnung);
       } else {
-        groupedZuordnungen.set(zuordnung.sskDstNr, [zuordnung]);
+        groupedZuordnungen.set(key, [zuordnung]);
       }
     }
     return groupedZuordnungen;
@@ -167,7 +168,7 @@
         (z: Zuordnung) =>
           ({
             ...z,
-            sskDstNr: z.sskDstNr.split('-')[0], // die Klasse wird durch einen Bindestrich an die Schulnummer angehangen. Um nach der Schule zu gruppieren, wird nur die Schulnummer verwendet.
+            sskDstNr: z.sskDstNr?.split('-')[0], // die Klasse wird durch einen Bindestrich an die Schulnummer angehangen. Um nach der Schule zu gruppieren, wird nur die Schulnummer verwendet.
           }) as Zuordnung,
       ),
     );
