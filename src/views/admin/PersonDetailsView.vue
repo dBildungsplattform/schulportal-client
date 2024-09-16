@@ -33,15 +33,24 @@
   import { toTypedSchema } from '@vee-validate/yup';
   import { useForm, type BaseFieldProps, type TypedSchema } from 'vee-validate';
   import KopersInput from '@/components/admin/personen/KopersInput.vue';
-  import { computed, onBeforeMount, ref, watch, type ComputedRef, type Ref } from 'vue';
+  import { computed, onBeforeMount, onMounted, onUnmounted, ref, watch, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
-  import { useRoute, useRouter, type RouteLocationNormalizedLoaded, type Router } from 'vue-router';
+  import {
+    onBeforeRouteLeave,
+    useRoute,
+    useRouter,
+    type NavigationGuardNext,
+    type RouteLocationNormalized,
+    type RouteLocationNormalizedLoaded,
+    type Router,
+  } from 'vue-router';
   import { useDisplay } from 'vuetify';
   import { object, string, StringSchema, type AnyObject } from 'yup';
   import {
     useTwoFactorAuthentificationStore,
     type TwoFactorAuthentificationStore,
   } from '@/stores/TwoFactorAuthentificationStore';
+  import FormWrapper from '@/components/form/FormWrapper.vue';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
@@ -70,6 +79,8 @@
   const isZuordnungFormActive: Ref<boolean> = ref(false);
   const isChangeKlasseFormActive: Ref<boolean> = ref(false);
 
+  const isEditPersonInfoActive: Ref<boolean> = ref(false);
+
   const pendingDeletion: Ref<boolean> = ref(false);
   const pendingCreation: Ref<boolean> = ref(false);
   const pendingChangeKlasse: Ref<boolean> = ref(false);
@@ -87,6 +98,9 @@
 
   const creationErrorText: Ref<string> = ref('');
   const creationErrorTitle: Ref<string> = ref('');
+
+  const showUnsavedChangesDialog: Ref<boolean> = ref(false);
+  let blockedNext: () => void = () => {};
 
   function navigateToPersonTable(): void {
     router.push({ name: 'person-management' });
@@ -329,6 +343,10 @@
     selectedNewKlasse: string;
   };
 
+  type ChangePersonInfoForm = {
+    selectedKopersNrPersonInfo: string;
+  };
+
   // Define a method to check if the selected Rolle is of type "Lern"
   function isLernRolle(selectedRolleId: string): boolean {
     const rolle: TranslatedRolleWithAttrs | undefined = rollen.value?.find(
@@ -425,6 +443,16 @@
     validationSchema: changeKlasseValidationSchema,
   });
 
+  // eslint-disable-next-line @typescript-eslint/typedef
+  const {
+    defineField: defineFieldChangePersonInfo,
+    handleSubmit: handleSubmitChangePersonInfo,
+    resetForm: resetFormChangePersonInfo,
+    isFieldDirty: isFieldDirtyChangePersonInfo,
+  } = useForm<ChangePersonInfoForm>({
+    validationSchema: changeKlasseValidationSchema,
+  });
+
   // Add Zuordnung Form
   const [selectedRolle, selectedRolleProps]: [
     Ref<string | undefined>,
@@ -452,6 +480,12 @@
     Ref<string | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineFieldChangeKlasse('selectedNewKlasse', vuetifyConfig);
+
+  // Change Person Info Form
+  const [selectedKopersNrPersonInfo, selectedKopersNrPersonInfoProps]: [
+    Ref<string | undefined>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = defineFieldChangePersonInfo('selectedKopersNrPersonInfo', vuetifyConfig);
 
   // Triggers the template to start editing
   const triggerEdit = (): void => {
@@ -775,6 +809,45 @@
     }
   }
 
+  // Triggers the template to start editing the person informations
+  const triggerPersonInfoEdit = (): void => {
+    isEditPersonInfoActive.value = true;
+  };
+
+  const cancelEditPersonInfo = (): void => {
+    isEditPersonInfoActive.value = false;
+    resetFormChangePersonInfo();
+  };
+
+  const onSubmitChangePersonInfo: (e?: Event | undefined) => Promise<void | undefined> = handleSubmitChangePersonInfo(() => {
+    return;
+  });
+
+
+  function isFormDirty(): boolean {
+    return isFieldDirtyChangePersonInfo('selectedKopersNrPersonInfo');
+  }
+
+  function handleConfirmUnsavedChanges(): void {
+    blockedNext();
+  }
+
+  function preventNavigation(event: BeforeUnloadEvent): void {
+    if (!isFormDirty()) return;
+    event.preventDefault();
+    /* Chrome requires returnValue to be set. */
+    event.returnValue = '';
+  }
+
+  onBeforeRouteLeave((_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
+    if (isFormDirty()) {
+      showUnsavedChangesDialog.value = true;
+      blockedNext = next;
+    } else {
+      next();
+    }
+  });
+
   onBeforeMount(async () => {
     personStore.resetState();
     personenkontextStore.errorCode = '';
@@ -785,6 +858,15 @@
       (zuordnung: Zuordnung) => zuordnung.typ === OrganisationsTyp.Klasse,
     );
     await twoFactorAuthentificationStore.get2FAState(currentPersonId);
+  });
+
+  onMounted(async () => {
+    /* listen for browser changes and prevent them when form is dirty */
+    window.addEventListener('beforeunload', preventNavigation);
+  });
+
+  onUnmounted(() => {
+    window.removeEventListener('beforeunload', preventNavigation);
   });
 </script>
 
@@ -836,7 +918,30 @@
 
       <template v-if="!personStore.errorCode && !personenkontextStore.errorCode">
         <v-container class="personal-info">
-          <div v-if="personStore.currentPerson?.person">
+          <div v-if="personStore.currentPerson?.person && !isEditPersonInfoActive">
+            <!-- Befristung -->
+            <v-col
+              cols="12"
+              md="auto"
+              class="mt-1 button-container"
+            >
+              <div class="d-flex justify-sm-end">
+                <v-col
+                  cols="12"
+                  sm="6"
+                  md="auto"
+                >
+                  <v-btn
+                    class="primary ml-lg-8"
+                    data-testid="zuordnung-edit-button"
+                    @Click="triggerPersonInfoEdit"
+                    :block="mdAndDown"
+                  >
+                    {{ $t('edit') }}
+                  </v-btn>
+                </v-col>
+              </div>
+            </v-col>
             <!-- Vorname -->
             <v-row class="mt-0">
               <v-col cols="1"></v-col>
@@ -924,6 +1029,27 @@
           <div v-else-if="personStore.loading">
             <v-progress-circular indeterminate></v-progress-circular>
           </div>
+        </v-container>
+        <v-container v-if="isEditPersonInfoActive">
+          <FormWrapper
+            :canCommit="canCommit"
+            :confirmUnsavedChangesAction="handleConfirmUnsavedChanges"
+            :createButtonLabel="$t('admin.person.create')"
+            :discardButtonLabel="$t('admin.person.discard')"
+            id="person-creation-form"
+            :onDiscard="cancelEditPersonInfo"
+            @onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
+            :onSubmit="onSubmitChangePersonInfo"
+            :showUnsavedChangesDialog="showUnsavedChangesDialog"
+          >
+            <KopersInput
+              :hasNoKopersNr="hasNoKopersNr"
+              v-model:selectedKopersNr="selectedKopersNrPersonInfo"
+              :selectedKopersNrProps="selectedKopersNrPersonInfoProps"
+              @update:selectedKopersNr="(value?: string) => (selectedKopersNrPersonInfo = value)"
+              @update:hasNoKopersNr="(value: boolean) => (hasNoKopersNr = value)"
+            ></KopersInput>
+          </FormWrapper>
         </v-container>
         <v-divider
           class="border-opacity-100 rounded my-6 mx-4"
