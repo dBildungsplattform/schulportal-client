@@ -1,8 +1,10 @@
 {
   "name": "schulportal-client",
   "version": "0.3.0",
+  "author": "Dataport AöR",
   "private": true,
   "type": "module",
+  "license": "EUPL-1.2",
   "scripts": {
     "build": "run-p type-check build-only",
     "build-only": "vite build",
