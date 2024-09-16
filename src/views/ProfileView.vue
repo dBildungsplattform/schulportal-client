@@ -7,6 +7,11 @@
   import { usePersonInfoStore, type PersonInfoResponse, type PersonInfoStore } from '@/stores/PersonInfoStore';
   import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
   import { type Zuordnung } from '@/stores/PersonenkontextStore';
+  import {
+    TokenKind,
+    useTwoFactorAuthentificationStore,
+    type TwoFactorAuthentificationStore,
+  } from '@/stores/TwoFactorAuthentificationStore';
   import { computed, onBeforeMount, ref, type ComputedRef, type Ref } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { useRoute, useRouter, type RouteLocationNormalizedLoaded, type Router } from 'vue-router';
@@ -24,13 +29,6 @@
     testIdLabel: string;
     testIdValue: string;
   };
-
-  import { usePersonInfoStore, type PersonInfoStore, type PersonInfoResponse } from '@/stores/PersonInfoStore';
-  import { type Zuordnung } from '@/stores/PersonenkontextStore';
-  import { OrganisationsTyp } from '@/stores/OrganisationStore';
-  import { type RouteLocationNormalizedLoaded, type Router, useRoute, useRouter } from 'vue-router';
-  import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
-  import type { DBiamPersonenzuordnungResponse } from '@/api-client/generated/api';
 
   const route: RouteLocationNormalizedLoaded = useRoute();
   const router: Router = useRouter();
@@ -181,9 +179,6 @@
   }
 
   async function initializeStores(): Promise<void> {
-    personInfoStore = usePersonInfoStore();
-    personStore = usePersonStore();
-    authStore = useAuthStore();
     await personInfoStore.initPersonInfo();
     await personStore.getPersonById(personInfoStore.personInfo?.person.id ?? '');
     await personStore.getPersonenuebersichtById(personInfoStore.personInfo?.person.id ?? '');
