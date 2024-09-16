@@ -11,12 +11,10 @@
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { type Composer, useI18n } from 'vue-i18n';
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
-  import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
   import { useRouter, type Router } from 'vue-router';
   import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
 
   const rolleStore: RolleStore = useRolleStore();
-  const organisationStore: OrganisationStore = useOrganisationStore();
   const searchFilterStore: SearchFilterStore = useSearchFilterStore();
 
   const router: Router = useRouter();
@@ -37,17 +35,13 @@
 
   const transformedRollenAndMerkmale: ComputedRef<RolleTableItem[]> = computed(() => {
     return rolleStore.allRollen.map((rolle: RolleResponse) => {
-      // Find the organization that matches the rolle.administeredBySchulstrukturknoten
-      const matchingOrganisation: Organisation | undefined = organisationStore.allOrganisationen.find(
-        (organisation: Organisation) => organisation.id === rolle.administeredBySchulstrukturknoten,
-      );
 
-      // If a matching organization is found, format the administeredBySchulstrukturknoten field accordingly
+      // If the name administeredBySchulstrukturknoten exists, format the administeredBySchulstrukturknoten field accordingly
       let administeredBySchulstrukturknoten: string = '';
-      if (matchingOrganisation) {
-        administeredBySchulstrukturknoten = matchingOrganisation.kennung
-          ? `${matchingOrganisation.kennung} (${matchingOrganisation.name})`
-          : matchingOrganisation.name;
+      if (rolle.administeredBySchulstrukturknotenName) {
+        administeredBySchulstrukturknoten = rolle.administeredBySchulstrukturknotenKennung
+          ? `${rolle.administeredBySchulstrukturknotenKennung} (${rolle.administeredBySchulstrukturknotenName})`
+          : rolle.administeredBySchulstrukturknotenName;
       }
 
       const formattedMerkmale: string =
@@ -94,7 +88,6 @@
   }
 
   onMounted(async () => {
-    await organisationStore.getAllOrganisationen();
     await rolleStore.getAllRollen({
       offset: (searchFilterStore.rollenPage - 1) * searchFilterStore.rollenPerPage,
       limit: searchFilterStore.rollenPerPage,

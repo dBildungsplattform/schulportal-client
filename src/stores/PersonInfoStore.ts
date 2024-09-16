@@ -2,7 +2,7 @@ import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import { isAxiosError, type AxiosResponse } from 'axios';
 import {
   PersonInfoApiFactory,
-  type DbiamCreatePersonWithContextBodyParams,
+  type DbiamCreatePersonWithPersonenkontexteBodyParams,
   type PersonInfoApiInterface,
   type PersonInfoResponse,
 } from '../api-client/generated/api';
@@ -19,7 +19,7 @@ export type Person = {
   personalnummer?: string | null;
 };
 
-export type CreatePersonBodyParams = DbiamCreatePersonWithContextBodyParams;
+export type CreatePersonBodyParams = DbiamCreatePersonWithPersonenkontexteBodyParams;
 
 export type Personendatensatz = {
   person: Person;
