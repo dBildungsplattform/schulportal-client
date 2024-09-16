@@ -6,7 +6,7 @@ import {
 } from '@/stores/ServiceProviderStore';
 import { VueWrapper, mount } from '@vue/test-utils';
 import type WrapperLike from '@vue/test-utils/dist/interfaces/wrapperLike';
-import { expect, test } from 'vitest';
+import { expect, test, type Mock } from 'vitest';
 import { nextTick } from 'vue';
 import StartView from './StartView.vue';
 
@@ -34,6 +34,13 @@ const mockProviders: Array<ServiceProvider> = [
     requires2fa: false,
   },
 ];
+
+const locationMock: Mock = vi.fn(() => ({
+  pathname: 'test',
+  search: '?query',
+}));
+
+vi.stubGlobal('location', locationMock);
 
 beforeEach(() => {
   document.body.innerHTML = `

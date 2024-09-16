@@ -40,6 +40,11 @@ const personAdministrationApi: PersonAdministrationApiInterface = PersonAdminist
   axiosApiInstance,
 );
 
+export enum BefristungOption {
+  SCHULJAHRESENDE = 'schuljahresende',
+  UNBEFRISTET = 'unbefristet',
+}
+
 export enum PersonenKontextTyp {
   Organisation = 'ORGANISATION',
   Klasse = 'KLASSE',
@@ -50,12 +55,13 @@ export type Zuordnung = {
   sskId: string;
   rolleId: string;
   sskName: string;
-  sskDstNr: string;
+  sskDstNr?: string;
   rolle: string;
   administriertVon: string;
   typ: OrganisationsTyp;
   editable: boolean;
   merkmale: RollenMerkmal;
+  befristung?: string;
 };
 
 export type WorkflowFilter = {
@@ -273,6 +279,7 @@ export const usePersonenkontextStore: StoreDefinition<
             personId: personId,
             organisationId: zuordnung.sskId,
             rolleId: zuordnung.rolleId,
+            befristung: zuordnung.befristung,
           })) as DbiamPersonenkontextBodyParams[],
         };
         const { data }: { data: PersonenkontexteUpdateResponse } =
