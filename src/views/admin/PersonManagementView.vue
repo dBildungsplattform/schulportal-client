@@ -67,7 +67,8 @@
     return organisationStore.allOrganisationen
       .map((org: Organisation) => ({
         value: org.id,
-        title: `${org.kennung} (${org.name})`,
+        // Only concatenate if the kennung is present (Should not be for LAND)
+        title: org.kennung ? `${org.kennung} (${org.name})` : org.name,
       }))
       .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
   });
@@ -180,6 +181,8 @@
   function resetSearchAndFilter(): void {
     searchFilter.value = '';
     searchFieldComponent.value.searchFilter = '';
+    searchFilterStore.setKlasseFilter([]);
+    searchFilterStore.setRolleFilter([]);
     /* do not reset orgas if orga was autoselected */
     if (!hasAutoSelectedOrganisation.value) {
       selectedOrganisation.value = [];
@@ -254,11 +257,7 @@
       limit: 25,
       organisationIds: selectedOrganisation.value,
     });
-    await organisationStore.getFilteredKlassen({
-      includeTyp: OrganisationsTyp.Klasse,
-      systemrechte: ['KLASSEN_VERWALTEN'],
-      limit: 25,
-    });
+
     await getPaginatedPersonen(searchFilterStore.personenPage);
     await personenkontextStore.getPersonenkontextRolleWithFilter('');
 

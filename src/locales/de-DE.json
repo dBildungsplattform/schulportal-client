@@ -13,13 +13,14 @@
       "befristung": "Befristung",
       "rules": {
         "required": "Die Befristung muss eingegeben werden.",
-        "format": "Die Befristung muss im Format DD.MM.JJJJ. eingegeben werden.",
+        "format": "Die Befristung muss im Format TT.MM.JJJJ. eingegeben werden.",
         "pastDateNotAllowed": "Das eingegebene Datum darf nicht in der Vergangenheit liegen."
       },
       "selectBefristung": "Befristung auswählen",
       "unlimited": "Unbefristet",
       "unlimitedSuccessTemplate": "unbefristet",
       "unlimitedInactive": "Diese Option kann für Rollen mit Befristungspflicht nicht ausgewählt werden.",
+      "limitedUntil": "befristet bis",
       "untilEndOfSchoolYear": "Bis Schuljahresende"
     },
     "mandatoryFieldsNotice": "Mit * markierte Felder sind Pflichtangaben.",
@@ -494,6 +495,7 @@
     "yourSchuleAdminsAre": "Ihre schulischen Admins sind:",
     "koPersNummer": "Personalnummer",
     "koPersNummerAbbr": "KoPers.-Nr.",
+    "koPersNummerMissing": "Bitte beachten Sie, dass Ihr Benutzerkonto ohne KoPers.-Nr. nur für einen Übergangszeitraum gültig ist und danach gesperrt wird! Lassen Sie die KoPers.-Nr. bitte durch Ihre schulischen Admins nachtragen, sobald diese Ihnen vorliegt.",
     "klasse": "Klasse",
     "error": "Fehler",
     "success": "Erfolg",

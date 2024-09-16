@@ -2,11 +2,19 @@
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { ref, type Ref, onBeforeMount } from 'vue';
   import { useI18n } from 'vue-i18n';
+  import SpshTooltip from '@/components/admin/SpshTooltip.vue';
   const { t }: { t: Function } = useI18n();
+
+  enum ItemType {
+    KO_PERS = 'KO_PERS',
+  }
   type LabelValue = {
     label: string;
     labelAbbr?: string;
     value: string;
+    type?: ItemType;
+    testIdLabel: string;
+    testIdValue: string;
   };
 
   import { usePersonInfoStore, type PersonInfoStore, type PersonInfoResponse } from '@/stores/PersonInfoStore';
@@ -20,6 +28,7 @@
     useTwoFactorAuthentificationStore,
     type TwoFactorAuthentificationStore,
   } from '@/stores/TwoFactorAuthentificationStore';
+  import type { DBiamPersonenzuordnungResponse } from '@/api-client/generated/api';
 
   const route: RouteLocationNormalizedLoaded = useRoute();
   const router: Router = useRouter();
@@ -37,6 +46,7 @@
   const twoFactorAuthentificationStore: TwoFactorAuthentificationStore = useTwoFactorAuthentificationStore();
   const personalData: Ref = ref<LabelValue[]>([]);
   const schulDaten: Ref = ref<SchulDaten[]>([]);
+  const hasKoPersMerkmal: Ref = ref<boolean>(false);
 
   function handleGoToPreviousPage(): void {
     const previousUrl: string | null = sessionStorage.getItem('previousUrl');
@@ -59,10 +69,11 @@
   function groupZuordnungen(zuordnungen: Zuordnung[]): Map<string, Zuordnung[]> {
     const groupedZuordnungen: Map<string, Zuordnung[]> = new Map();
     for (const zuordnung of zuordnungen) {
-      if (groupedZuordnungen.has(zuordnung.sskDstNr)) {
-        groupedZuordnungen.get(zuordnung.sskDstNr)?.push(zuordnung);
+      const key: string = zuordnung.sskDstNr ?? zuordnung.sskId;
+      if (groupedZuordnungen.has(key)) {
+        groupedZuordnungen.get(key)?.push(zuordnung);
       } else {
-        groupedZuordnungen.set(zuordnung.sskDstNr, [zuordnung]);
+        groupedZuordnungen.set(key, [zuordnung]);
       }
     }
     return groupedZuordnungen;
@@ -108,28 +119,44 @@
 
   function createZuordnungsSchuleDaten(zuordnungen: Zuordnung[]): SchulDaten[] {
     const result: SchulDaten[] = [];
-    for (const zuordnung of zuordnungen) {
+    for (const [index, zuordnung] of zuordnungen.entries()) {
       const tempSchulDaten: SchulDaten = {
         title: zuordnung.sskName,
         info: t('profile.yourSchuleAdminsAre'),
         schulAdmins: [], // Hierfuer muss ein API-Endpunkt implementiert werden
-        labelAndValues: [{ label: t('profile.schule'), value: zuordnung.sskName }],
+        labelAndValues: [
+          {
+            label: t('profile.schule'),
+            value: zuordnung.sskName,
+            testIdLabel: 'schule-label-' + (index + 1),
+            testIdValue: 'schule-value-' + (index + 1),
+          },
+        ],
       };
 
       if (zuordnung.klasse) {
         tempSchulDaten.labelAndValues.push({
           label: t('profile.klasse'),
           value: zuordnung.klasse,
+          testIdLabel: 'klasse-label-' + (index + 1),
+          testIdValue: 'klasse-value-' + (index + 1),
         });
       }
 
-      tempSchulDaten.labelAndValues.push({ label: t('admin.rolle.rolle'), value: zuordnung.rolle });
+      tempSchulDaten.labelAndValues.push({
+        label: t('admin.rolle.rolle'),
+        value: zuordnung.rolle,
+        testIdLabel: 'rolle-label-' + (index + 1),
+        testIdValue: 'rolle-value-' + (index + 1),
+      });
 
       if (zuordnung.sskDstNr) {
         tempSchulDaten.labelAndValues.push({
           label: t('profile.dienstStellenNummer'),
           labelAbbr: t('profile.dienstStellenNummerAbbr'),
           value: zuordnung.sskDstNr,
+          testIdLabel: 'dienststellennummer-label-' + (index + 1),
+          testIdValue: 'dienststellennummer-value-' + (index + 1),
         });
       }
 
@@ -152,15 +179,25 @@
       {
         label: t('profile.fullName'),
         value: personInfo.person.name.vorname + ' ' + personInfo.person.name.familiennamen,
+        testIdLabel: 'fullName-label',
+        testIdValue: 'fullName-value',
       },
-      { label: t('person.userName'), value: personInfo.person.referrer },
+      {
+        label: t('person.userName'),
+        value: personInfo.person.referrer,
+        testIdLabel: 'userName-label',
+        testIdValue: 'userName-value',
+      },
     ];
 
-    if (personInfo.person.personalnummer) {
+    if (personInfo.person.personalnummer || hasKoPersMerkmal.value) {
       personalData.value.push({
         label: t('profile.koPersNummer'),
         labelAbbr: t('profile.koPersNummerAbbr'),
         value: personInfo.person.personalnummer,
+        type: ItemType.KO_PERS,
+        testIdLabel: 'kopersnummer-label',
+        testIdValue: 'kopersnummer-value',
       });
     }
   }
@@ -173,7 +210,7 @@
         (z: Zuordnung) =>
           ({
             ...z,
-            sskDstNr: z.sskDstNr.split('-')[0], // die Klasse wird durch einen Bindestrich an die Schulnummer angehangen. Um nach der Schule zu gruppieren, wird nur die Schulnummer verwendet.
+            sskDstNr: z.sskDstNr?.split('-')[0], // die Klasse wird durch einen Bindestrich an die Schulnummer angehangen. Um nach der Schule zu gruppieren, wird nur die Schulnummer verwendet.
           }) as Zuordnung,
       ),
     );
@@ -205,8 +242,18 @@
     window.location.href = url.toString();
   }
 
+  function hasKoPersMerkmalCheck(): void {
+    let zuordnungen: Array<DBiamPersonenzuordnungResponse> | undefined = personStore.personenuebersicht?.zuordnungen;
+    if (zuordnungen !== undefined) {
+      let result: boolean = !!zuordnungen.find((zuordnung: DBiamPersonenzuordnungResponse) => {
+        return zuordnung.merkmale.includes('KOPERS_PFLICHT');
+      });
+      hasKoPersMerkmal.value = result;
+    }
+  }
   onBeforeMount(async () => {
     await initializeStores();
+    hasKoPersMerkmalCheck();
     setupPersonalData();
     setupSchuleData();
     if (personStore.currentPerson?.person.id) {
@@ -219,6 +266,7 @@
   <v-btn
     class="mt-8"
     @click="handleGoToPreviousPage()"
+    data-testid="back-to-previous-page-button"
   >
     <v-icon
       class="mr-2"
@@ -243,7 +291,10 @@
         sm="12"
         md="6"
       >
-        <LayoutCard :header="$t('profile.personalData')">
+        <LayoutCard
+          :header="$t('profile.personalData')"
+          :headline-test-id="'layout-card-headline-persoenliche-daten'"
+        >
           <v-row class="ma-4">
             <v-col cols="12">
               <v-table class="text-body-1">
@@ -253,25 +304,62 @@
                       v-for="item in personalData"
                       :key="item.label"
                     >
-                      <td>
+                      <td v-if="item.type === ItemType.KO_PERS && item.value === null">
+                        <SpshTooltip
+                          :disabledText="t('profile.koPersNummerMissing')"
+                          :enabledText="t('profile.koPersNummerMissing')"
+                          position="top"
+                        >
+                          <span
+                            v-if="item.labelAbbr"
+                            class="text-red"
+                          >
+                            <strong>{{ item.labelAbbr }}</strong> :</span
+                          >
+                          <strong v-else>{{ item.label }}:</strong>
+                        </SpshTooltip>
+                      </td>
+                      <td v-else>
                         <span v-if="item.labelAbbr"
                           ><abbr :title="item.label"
-                            ><strong>{{ item.labelAbbr }}</strong></abbr
-                          >:</span
+                            ><strong :data-testid="item.testIdLabel">{{ item.labelAbbr }}:</strong></abbr
+                          ></span
                         >
-                        <strong v-else>{{ item.label }}:</strong>
+                        <strong
+                          :data-testid="item.testIdLabel"
+                          v-else
+                          >{{ item.label }}:</strong
+                        >
                       </td>
-                      <td>{{ item.value }}</td>
+                      <td
+                        :data-testid="item.testIdValue"
+                        v-if="item.type === ItemType.KO_PERS && item.value === null"
+                        class="text-red"
+                      >
+                        {{ t('missing') }}
+                      </td>
+                      <td
+                        :data-testid="item.testIdValue"
+                        v-else
+                      >
+                        {{ item.value }}
+                      </td>
                     </tr>
                   </tbody>
                 </template>
               </v-table>
-              <p class="pt-4 text-center text-body-1 text-medium-emphasis wrap-text">
+              <p
+                class="pt-4 text-center text-body-1 text-medium-emphasis"
+                data-testid="info-text-with-icon"
+              >
                 <v-icon
                   class="mr-2"
                   icon="mdi-information-slab-circle-outline"
+                  data-testid="info-icon"
                 ></v-icon>
-                {{ $t('profile.infoAboutChangeabilityFromPersonalData') }}
+                <span data-testid="info-text">
+                  {{ $t('profile.infoAboutChangeabilityFromPersonalData') }}
+                </span>
               </p>
             </v-col>
           </v-row>
@@ -284,7 +372,10 @@
         sm="12"
         md="6"
       >
-        <LayoutCard :header="$t('person.zuordnung') + ' ' + (schulDaten.length > 1 ? (index + 1).toString() : '')">
+        <LayoutCard
+          :header="$t('person.zuordnung') + ' ' + (schulDaten.length > 1 ? (index + 1).toString() : '')"
+          :headline-test-id="'zuordung-card-' + (index + 1)"
+        >
           <v-row class="ma-3 p-4">
             <v-col cols="12">
               <v-table class="text-body-1">
@@ -297,23 +388,29 @@
                       <td>
                         <span v-if="item.labelAbbr"
                           ><abbr :title="item.label"
-                            ><strong>{{ item.labelAbbr }}</strong></abbr
-                          >:</span
+                            ><strong :data-testid="item.testIdLabel">{{ item.labelAbbr }}:</strong></abbr
+                          ></span
                         >
-                        <strong v-else>{{ item.label }}:</strong>
+                        <strong
+                          :data-testid="item.testIdLabel"
+                          v-else
+                          >{{ item.label }}:</strong
+                        >
                       </td>
-                      <td>{{ item.value }}</td>
+                      <td :data-testid="item.testIdValue">{{ item.value }}</td>
                     </tr>
                   </tbody>
                 </template>
               </v-table>
               <p
                 class="pt-4 text-center text-body-1"
-                v-if="schuleData.schulAdmins.length > 0"
+                v-if="schuleData.schoolAdmins?.length > 0"
+                data-testid="school-admins-${index}"
               >
                 <v-icon
                   class="mr-2"
                   icon="mdi-information-slab-circle-outline"
+                  data-testid="school-admins-icon"
                 ></v-icon>
                 {{ schuleData.info + ' ' + schuleData.schulAdmins?.join(', ') }}
               </p>
@@ -326,12 +423,16 @@
         sm="12"
         md="6"
       >
-        <LayoutCard :header="$t('login.password')">
+        <LayoutCard
+          :headline-test-id="'new-password-card'"
+          :header="$t('login.password')"
+        >
           <v-row class="ma-3 d-flex align-content-center justify-center ga-4">
             <v-icon
               size="x-large"
               class="w-100"
               icon="mdi-key-alert-outline"
+              data-testid="password-icon"
             ></v-icon>
             <div>
               <v-btn
@@ -424,6 +525,7 @@
               size="x-large"
               class="w-100"
               icon="mdi-shield-account-outline"
+              data-testid="two-factor-icon"
             ></v-icon>
             <v-row class="mt-4 text-body align-content-center justify-center">
               <v-icon

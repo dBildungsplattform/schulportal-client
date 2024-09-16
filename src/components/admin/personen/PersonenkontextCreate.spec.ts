@@ -5,6 +5,7 @@ import { nextTick } from 'vue';
 import { RollenArt, RollenMerkmal, RollenSystemRecht, type DBiamPersonenkontextResponse } from '@/api-client/generated';
 import { type PersonenkontextStore, usePersonenkontextStore } from '@/stores/PersonenkontextStore';
 import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
+import type { BefristungProps } from './BefristungInput.vue';
 
 let wrapper: VueWrapper | null = null;
 let personenkontextStore: PersonenkontextStore;
@@ -78,6 +79,27 @@ beforeEach(() => {
       selectedRolle: '',
       selectedKlasse: '',
       showHeadline: true,
+      befristungInputProps: {
+        befristungProps: {
+          error: false,
+          'error-messages': [],
+          onBlur: () => vi.fn(),
+          onChange: () => vi.fn(),
+          onInput: () => vi.fn(),
+        },
+        befristungOptionProps: {
+          error: false,
+          'error-messages': [],
+          onBlur: () => vi.fn(),
+          onChange: () => vi.fn(),
+          onInput: () => vi.fn(),
+        },
+        isUnbefristetDisabled: false,
+        isBefristungRequired: false,
+        nextSchuljahresende: '2024-07-31',
+        befristung: undefined,
+        befristungOption: undefined,
+      } as BefristungProps,
     },
     global: {
       components: {
@@ -130,6 +152,8 @@ beforeEach(() => {
         createdAt: '2022',
         updatedAt: '2022',
         id: '54321',
+        administeredBySchulstrukturknotenName: 'Land SH',
+        administeredBySchulstrukturknotenKennung: '',
       },
     ],
     organisations: [],
