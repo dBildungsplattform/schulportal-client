@@ -50,7 +50,7 @@ export type Zuordnung = {
   sskId: string;
   rolleId: string;
   sskName: string;
-  sskDstNr: string;
+  sskDstNr?: string;
   rolle: string;
   administriertVon: string;
   typ: OrganisationsTyp;

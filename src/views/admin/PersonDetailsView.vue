@@ -252,7 +252,7 @@
   const alertButtonAction: ComputedRef<() => void> = computed(() => {
     return personenkontextStore.errorCode === 'PERSON_NOT_FOUND' ? navigateToPersonTable : (): void => router.go(0);
   });
-  function getSskName(sskDstNr: string, sskName: string): string {
+  function getSskName(sskDstNr: string | undefined, sskName: string): string {
     /* truncate ssk name */
     const truncatededSskName: string = sskName.length > 30 ? `${sskName.substring(0, 30)}...` : sskName;
 
@@ -306,8 +306,11 @@
     result
       .sort((a: Zuordnung, b: Zuordnung) => (a.klasse && b.klasse ? a.klasse.localeCompare(b.klasse) : 0))
       .sort((a: Zuordnung, b: Zuordnung) => a.rolle.localeCompare(b.rolle))
-      .sort((a: Zuordnung, b: Zuordnung) => a.sskDstNr.localeCompare(b.sskDstNr));
-
+      .sort((a: Zuordnung, b: Zuordnung) => {
+        if (a.sskDstNr === undefined) return 1;
+        if (b.sskDstNr === undefined) return -1;
+        return a.sskDstNr.localeCompare(b.sskDstNr);
+      });
     return result;
   }
 
