@@ -275,8 +275,7 @@
                           >
                             <abbr :title="item.label"
                               ><strong>{{ item.labelAbbr }}</strong></abbr
-                            >
-                            :</span
+                            >:</span
                           >
                           <strong v-else>{{ item.label }}:</strong>
                         </SpshTooltip>
