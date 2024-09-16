@@ -337,6 +337,7 @@
     return !!rolle && rolle.rollenart === RollenArt.Lern;
   }
 
+  // Used for the form
   function isKopersRolle(selectedRolleId: string | undefined): boolean {
     const rolle: TranslatedRolleWithAttrs | undefined = rollen.value?.find(
       (r: TranslatedRolleWithAttrs) => r.value === selectedRolleId,
@@ -348,6 +349,7 @@
     return !!personStore.currentPerson?.person.personalnummer;
   });
 
+  // Used on mount to check the retrieved Zuordnungen and if any of them has a Koperspflicht Merkmal
   const hasKopersRolle: ComputedRef<boolean> = computed(() => {
     return (
       !!zuordnungenResult.value?.find((zuordnung: Zuordnung) => {
@@ -904,7 +906,10 @@
                 cols="5"
               >
                 <span
-                  :class="`${hasKopersRolle && personStore.currentPerson.person.personalnummer ? 'subtitle-2' : 'subtitle-2 text-red'}`"
+                  :class="{
+                    'subtitle-2': true,
+                    'text-red': hasKopersRolle && !personStore.currentPerson.person.personalnummer,
+                  }"
                 >
                   {{ $t('person.kopersNr') }}:
                 </span>
@@ -914,7 +919,10 @@
                 data-testid="person-kopersnr"
               >
                 <span
-                  :class="`${hasKopersRolle && personStore.currentPerson.person.personalnummer ? 'text-body' : 'text-body text-red'}`"
+                  :class="{
+                    'text-body': true,
+                    'text-red': hasKopersRolle && !personStore.currentPerson.person.personalnummer,
+                  }"
                 >
                   {{ personStore.currentPerson.person.personalnummer ?? $t('missing') }}
                 </span>
