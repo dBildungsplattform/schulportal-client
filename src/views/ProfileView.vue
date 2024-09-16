@@ -1,24 +1,23 @@
 <script setup lang="ts">
   import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import { onBeforeMount, ref, type Ref } from 'vue';
+  import { OrganisationsTyp } from '@/stores/OrganisationStore';
+  import { usePersonInfoStore, type PersonInfoResponse, type PersonInfoStore } from '@/stores/PersonInfoStore';
+  import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
+  import { type Zuordnung } from '@/stores/PersonenkontextStore';
+  import {
+    useServiceProviderStore,
+    type ServiceProvider,
+    type ServiceProviderStore,
+  } from '@/stores/ServiceProviderStore';
+  import { computed, onBeforeMount, ref, type ComputedRef, type Ref } from 'vue';
   import { useI18n } from 'vue-i18n';
+  import { useRoute, useRouter, type RouteLocationNormalizedLoaded, type Router } from 'vue-router';
   const { t }: { t: Function } = useI18n();
   type LabelValue = {
     label: string;
     labelAbbr?: string;
     value: string;
   };
-
-  import { OrganisationsTyp } from '@/stores/OrganisationStore';
-  import { usePersonInfoStore, type PersonInfoResponse, type PersonInfoStore } from '@/stores/PersonInfoStore';
-  import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
-  import { type Zuordnung } from '@/stores/PersonenkontextStore';
-  import {
-    type ServiceProvider,
-    type ServiceProviderStore,
-    useServiceProviderStore,
-  } from '@/stores/ServiceProviderStore';
-  import { useRoute, useRouter, type RouteLocationNormalizedLoaded, type Router } from 'vue-router';
 
   const route: RouteLocationNormalizedLoaded = useRoute();
   const router: Router = useRouter();
@@ -209,9 +208,9 @@
     window.location.href = url.toString();
   }
 
-  function requires2fa(): boolean {
+  const requires2fa: ComputedRef<boolean> = computed(() => {
     return serviceProviderStore.availableServiceProviders.some((sp: ServiceProvider) => sp.requires2fa);
-  }
+  });
 
   onBeforeMount(async () => {
     await initializeStores();
@@ -413,7 +412,7 @@
       </v-col>
 
       <v-col
-        v-if="requires2fa()"
+        v-if="requires2fa"
         cols="12"
         sm="12"
         md="6"
