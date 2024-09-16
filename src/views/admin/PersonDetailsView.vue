@@ -963,14 +963,11 @@
           thickness="6"
         ></v-divider>
         <!-- Two Factor Authentication -->
-        <v-container v-if="twoFactorAuthentificationStore.hasToken != undefined">
+        <v-container>
           <v-row class="ml-md-16">
             <v-col>
               <h3 class="subtitle-1">{{ $t('admin.person.twoFactorAuthentication.header') }}</h3>
-              <v-row
-                class="mt-4 text-body"
-                v-if="twoFactorAuthentificationStore.hasToken"
-              >
+              <v-row class="mt-4 text-body">
                 <v-col
                   class="text-right"
                   cols="1"
@@ -980,40 +977,43 @@
                     color="green"
                     v-if="twoFactorAuthentificationStore.hasToken"
                   ></v-icon>
-                </v-col>
-                <div class="v-col">
-                  <p v-if="twoFactorAuthentificationStore.tokenKind === 'software'">
-                    {{ $t('admin.person.twoFactorAuthentication.softwareTokenIsSetUp') }}
-                  </p>
-                  <p v-if="twoFactorAuthentificationStore.tokenKind === 'hardware'">
-                    {{ $t('admin.person.twoFactorAuthentication.hardwareTokenIsSetUp') }}
-                  </p>
-                  <p v-if="twoFactorAuthentificationStore.serial">
-                    {{
-                      $t('admin.person.twoFactorAuthentication.serial') + ': ' + twoFactorAuthentificationStore.serial
-                    }}
-                  </p>
-                </div>
-              </v-row>
-              <v-row class="mt-4 text-body">
-                <v-col
-                  class="text-right"
-                  cols="1"
-                >
+                  <v-icon
+                    color="warning"
+                    icon="mdi-alert-outline"
+                    v-else-if="twoFactorAuthentificationStore.errorCode"
+                  ></v-icon>
                   <v-icon
                     class="mb-2"
                     icon="mdi-information"
+                    v-else
                   >
                   </v-icon>
                 </v-col>
-                <div class="v-col">
-                  <p v-if="twoFactorAuthentificationStore.hasToken">
-                    {{ $t('admin.person.twoFactorAuthentication.resetInfo') }}
-                  </p>
-                  <p v-if="!twoFactorAuthentificationStore.hasToken">
-                    {{ $t('admin.person.twoFactorAuthentication.notSetUp') }}
-                  </p>
-                </div>
+                <v-col>
+                  <template v-if="twoFactorAuthentificationStore.errorCode">
+                    {{ t('admin.person.twoFactorAuthentication.errors.connection') }}
+                  </template>
+                  <template v-else>
+                    <p v-if="twoFactorAuthentificationStore.tokenKind === 'software'">
+                      {{ $t('admin.person.twoFactorAuthentication.softwareTokenIsSetUp') }}
+                    </p>
+                    <p v-if="twoFactorAuthentificationStore.tokenKind === 'hardware'">
+                      {{ $t('admin.person.twoFactorAuthentication.hardwareTokenIsSetUp') }}
+                    </p>
+                    <p v-if="twoFactorAuthentificationStore.serial">
+                      {{
+                        $t('admin.person.twoFactorAuthentication.serial') + ': ' + twoFactorAuthentificationStore.serial
+                      }}
+                    </p>
+                    <p>
+                      {{
+                        twoFactorAuthentificationStore.hasToken
+                          ? $t('admin.person.twoFactorAuthentication.resetInfo')
+                          : $t('admin.person.twoFactorAuthentication.notSetUp')
+                      }}
+                    </p>
+                  </template>
+                </v-col>
               </v-row>
             </v-col>
             <v-col
@@ -1061,8 +1061,8 @@
                 </v-col>
               </div>
             </v-col>
-            <v-col v-else-if="personStore.loading"> <v-progress-circular indeterminate></v-progress-circular></v-col
-          ></v-row>
+            <v-col v-else-if="personStore.loading"> <v-progress-circular indeterminate></v-progress-circular></v-col>
+          </v-row>
         </v-container>
         <v-divider
           v-if="twoFactorAuthentificationStore.hasToken != undefined"
