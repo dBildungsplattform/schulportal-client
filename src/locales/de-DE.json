@@ -487,6 +487,7 @@
     "password": "Passwort",
     "changePassword": "Passwort ändern",
     "changePasswordInfo": "Um Ihr Passwort zu ändern, werden Sie zunächst zu einer erneuten Anmeldung weitergeleitet. Nach erfolgreicher Eingabe Ihres aktuellen Passworts können Sie dann ein neues festlegen.",
+    "lastPasswordChange": "Ihr Passwort wurde zuletzt am {date} geändert.",
     "saveNewPassword": "Neues Passwort speichern",
     "setNewPassword": "Neues Passwort setzen",
     "twoFactorAuth": "Zwei-Faktor-Authentifizierung",
