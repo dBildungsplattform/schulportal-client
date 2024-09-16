@@ -348,9 +348,9 @@
                   icon="mdi-information-slab-circle-outline"
                   data-testid="info-icon"
                 ></v-icon>
-                <template data-testid="info-text">
+                <span data-testid="info-text">
                   {{ $t('profile.infoAboutChangeabilityFromPersonalData') }}
-                </template>
+                </span>
               </p>
             </v-col>
           </v-row>
