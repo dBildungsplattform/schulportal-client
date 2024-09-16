@@ -1,12 +1,13 @@
 import type {
-  AssignHardwareTokenResponse,
-  TokenStateResponse,
   AssignHardwareTokenBodyParams,
+  AssignHardwareTokenResponse,
+  TokenRequiredResponse,
+  TokenStateResponse,
 } from '@/api-client/generated';
 import ApiService from '@/services/ApiService';
-import MockAdapter from 'axios-mock-adapter';
-import { setActivePinia, createPinia } from 'pinia';
 import { rejects } from 'assert';
+import MockAdapter from 'axios-mock-adapter';
+import { createPinia, setActivePinia } from 'pinia';
 
 import {
   TokenKind,
@@ -73,6 +74,47 @@ describe('TwoFactorAuthentificationStore', () => {
     });
   });
 
+  describe('get2FARequirement', () => {
+    const personId: string = 'testUser';
+    const url: string = `/api/2fa-token/required?personId=${personId}`;
+
+    it('should get 2FA requirement', async () => {
+      const mockResponse: TokenRequiredResponse = {
+        required: true,
+      };
+      mockadapter.onGet(url).replyOnce(200, mockResponse);
+
+      const get2FAStatePromise: Promise<void> = twoFactorAuthenticationStore.get2FARequirement(personId);
+      expect(twoFactorAuthenticationStore.loading).toBe(true);
+      await get2FAStatePromise;
+
+      expect(twoFactorAuthenticationStore.required).toEqual(mockResponse.required);
+      expect(twoFactorAuthenticationStore.loading).toBe(false);
+    });
+
+    it('should handle string error', async () => {
+      mockadapter.onGet(url).replyOnce(500, 'some error');
+
+      const get2FAStatePromise: Promise<void> = twoFactorAuthenticationStore.get2FARequirement(personId);
+
+      expect(twoFactorAuthenticationStore.loading).toBe(true);
+      await rejects(get2FAStatePromise);
+      expect(twoFactorAuthenticationStore.errorCode).toEqual('UNSPECIFIED_ERROR');
+      expect(twoFactorAuthenticationStore.loading).toBe(false);
+    });
+
+    it('should handle error code', async () => {
+      mockadapter.onGet(url).replyOnce(500, { code: 'some mock server error' });
+
+      const get2FAStatePromise: Promise<void> = twoFactorAuthenticationStore.get2FARequirement(personId);
+
+      expect(twoFactorAuthenticationStore.loading).toBe(true);
+      await rejects(get2FAStatePromise);
+      expect(twoFactorAuthenticationStore.errorCode).toEqual('some mock server error');
+      expect(twoFactorAuthenticationStore.loading).toBe(false);
+    });
+  });
+
   describe('get2FASoftwareQRCode', () => {
     it('should get 2FA software QR code', async () => {
       const personId: string = 'testUser';
@@ -109,40 +151,41 @@ describe('TwoFactorAuthentificationStore', () => {
     });
   });
   describe('assignHardwareToken', () => {
+    const personId: string = 'testUser';
+    const url: string = '/api/2fa-token/assign/hardwareToken';
+    const personUserName: string = 'testUserName';
+    const serial: string = '123456789';
+    const otp: string = '987654';
+    const mockResponse: AssignHardwareTokenResponse = {
+      id: 1,
+      jsonrpc: '2.0',
+      time: 1622547800,
+      version: '1.0',
+      versionnumber: '1.0.0',
+      signature: 'abcdef123456',
+      dialogText: 'This is a mock dialog text',
+    };
+
+    const bodyParams: AssignHardwareTokenBodyParams = {
+      userId: personId,
+      referrer: personUserName,
+      serial,
+      otp,
+    };
+
     it('should assign hardware token and update state', async () => {
-      const personId: string = 'testUser';
-
-      const personUserName: string = 'testUserName';
-      const serial: string = '123456789';
-      const otp: string = '987654';
-      const mockResponse: AssignHardwareTokenResponse = {
-        id: 1,
-        jsonrpc: '2.0',
-        time: 1622547800,
-        version: '1.0',
-        versionnumber: '1.0.0',
-        signature: 'abcdef123456',
-        dialogText: 'This is a mock dialog text',
-      };
-
-      const bodyParams: AssignHardwareTokenBodyParams = {
-        userId: personId,
-        referrer: personUserName,
-        serial,
-        otp,
-      };
-
-      mockadapter.onPost('/api/2fa-token/assign/hardwareToken').reply(200, mockResponse);
+      mockadapter.onPost(url).reply(200, mockResponse);
 
       const assignTokenPromise: Promise<AssignHardwareTokenResponse> =
         twoFactorAuthenticationStore.assignHardwareToken(bodyParams);
-      expect(twoFactorAuthenticationStore.loading).toBe(true);
 
+      expect(twoFactorAuthenticationStore.loading).toBe(true);
       const response: AssignHardwareTokenResponse = await assignTokenPromise;
       expect(response).toEqual(mockResponse);
       expect(twoFactorAuthenticationStore.loading).toBe(false);
     });
   });
+
   describe('resetToken', () => {
     it('should reset token successfully', async () => {
       const referrer: string = 'testReferrer';

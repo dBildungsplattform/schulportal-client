@@ -1,5 +1,6 @@
-import { defineStore, type Store, type StoreDefinition } from 'pinia';
+import axiosApiInstance from '@/services/ApiService';
 import { isAxiosError } from 'axios';
+import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import {
   Class2FAApiFactory,
   type AssignHardwareTokenBodyParams,
@@ -9,7 +10,6 @@ import {
   type TokenRequiredResponse,
   type TokenStateResponse,
 } from '../api-client/generated/api';
-import axiosApiInstance from '@/services/ApiService';
 
 const twoFactorApi: Class2FAApiInterface = Class2FAApiFactory(undefined, '', axiosApiInstance);
 
