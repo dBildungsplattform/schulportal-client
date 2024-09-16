@@ -5,13 +5,13 @@
   import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
   import { type Zuordnung } from '@/stores/PersonenkontextStore';
   import {
-    useServiceProviderStore,
-    type ServiceProvider,
-    type ServiceProviderStore,
-  } from '@/stores/ServiceProviderStore';
-  import { computed, onBeforeMount, ref, type ComputedRef, type Ref } from 'vue';
+    useTwoFactorAuthentificationStore,
+    type TwoFactorAuthentificationStore,
+  } from '@/stores/TwoFactorAuthentificationStore';
+  import { onBeforeMount, ref, type Ref } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { useRoute, useRouter, type RouteLocationNormalizedLoaded, type Router } from 'vue-router';
+
   const { t }: { t: Function } = useI18n();
   type LabelValue = {
     label: string;
@@ -31,7 +31,7 @@
   };
 
   let personInfoStore: PersonInfoStore = usePersonInfoStore();
-  let serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
+  let twoFactorAuthenticationStore: TwoFactorAuthentificationStore = useTwoFactorAuthentificationStore();
 
   let personStore: PersonStore = usePersonStore();
   const personalData: Ref = ref<LabelValue[]>([]);
@@ -140,11 +140,11 @@
 
   async function initializeStores(): Promise<void> {
     personInfoStore = usePersonInfoStore();
-    serviceProviderStore = useServiceProviderStore();
+    twoFactorAuthenticationStore = useTwoFactorAuthentificationStore();
     personStore = usePersonStore();
     await personInfoStore.initPersonInfo();
     await personStore.getPersonenuebersichtById(personInfoStore.personInfo?.person.id ?? '');
-    await serviceProviderStore.getAvailableServiceProviders();
+    await twoFactorAuthenticationStore.get2FARequirement(personInfoStore.personInfo?.person.id ?? '');
     await personStore.getPersonenuebersichtById(personInfoStore.personInfo?.person.id ?? '');
   }
 
@@ -207,10 +207,6 @@
     url.searchParams.set('login_hint', personInfoStore.personInfo?.person.referrer ?? '');
     window.location.href = url.toString();
   }
-
-  const requires2fa: ComputedRef<boolean> = computed(() => {
-    return serviceProviderStore.availableServiceProviders.some((sp: ServiceProvider) => sp.requires2fa);
-  });
 
   onBeforeMount(async () => {
     await initializeStores();
@@ -412,7 +408,7 @@
       </v-col>
 
       <v-col
-        v-if="requires2fa"
+        v-if="!twoFactorAuthenticationStore.loading && twoFactorAuthenticationStore.required"
         cols="12"
         sm="12"
         md="6"
