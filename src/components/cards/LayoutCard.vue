@@ -4,6 +4,7 @@
     header: string;
     padded?: boolean;
     showCloseText?: boolean;
+    headlineTestId?: string;
   }>();
 </script>
 
@@ -17,7 +18,7 @@
       <v-col cols="auto">
         <h2
           class="text-left headline-2"
-          data-testid="layout-card-headline"
+          :data-testid="headlineTestId ?? 'layout-card-headline'"
         >
           {{ header }}
         </h2>
