@@ -50,7 +50,7 @@
     useTwoFactorAuthentificationStore,
     type TwoFactorAuthentificationStore,
   } from '@/stores/TwoFactorAuthentificationStore';
-  import FormWrapper from '@/components/form/FormWrapper.vue';
+  import PersonenInfoChange from '@/components/admin/personen/PersonenInfoChange.vue';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
@@ -819,10 +819,14 @@
     resetFormChangePersonInfo();
   };
 
-  const onSubmitChangePersonInfo: (e?: Event | undefined) => Promise<void | undefined> = handleSubmitChangePersonInfo(() => {
-    return;
-  });
-
+  // Submit the form for changing person informations (Vorname, Nachname, KopersNr.)
+  const onSubmitChangePersonInfo: (e?: Event | undefined) => Promise<void | undefined> = handleSubmitChangePersonInfo(
+    () => {
+      if (selectedKopersNr.value) {
+        personStore.changePersonInfoById(currentPersonId, selectedKopersNr.value);
+      }
+    },
+  );
 
   function isFormDirty(): boolean {
     return isFieldDirtyChangePersonInfo('selectedKopersNrPersonInfo');
@@ -931,14 +935,22 @@
                   sm="6"
                   md="auto"
                 >
-                  <v-btn
-                    class="primary ml-lg-8"
-                    data-testid="zuordnung-edit-button"
-                    @Click="triggerPersonInfoEdit"
-                    :block="mdAndDown"
+                  <SpshTooltip
+                    :enabledCondition="!isEditActive"
+                    :disabledText="$t('person.finishEditFirst')"
+                    :enabledText="$t('admin.person.deletePerson')"
+                    position="start"
                   >
-                    {{ $t('edit') }}
-                  </v-btn>
+                    <v-btn
+                      :disabled="isEditActive"
+                      class="primary ml-lg-8"
+                      data-testid="zuordnung-edit-button"
+                      @Click="triggerPersonInfoEdit"
+                      :block="mdAndDown"
+                    >
+                      {{ $t('edit') }}
+                    </v-btn>
+                  </SpshTooltip>
                 </v-col>
               </div>
             </v-col>
@@ -1031,25 +1043,46 @@
           </div>
         </v-container>
         <v-container v-if="isEditPersonInfoActive">
-          <FormWrapper
-            :canCommit="canCommit"
-            :confirmUnsavedChangesAction="handleConfirmUnsavedChanges"
-            :createButtonLabel="$t('admin.person.create')"
-            :discardButtonLabel="$t('admin.person.discard')"
-            id="person-creation-form"
-            :onDiscard="cancelEditPersonInfo"
-            @onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
-            :onSubmit="onSubmitChangePersonInfo"
-            :showUnsavedChangesDialog="showUnsavedChangesDialog"
+          <v-form
+            data-testid="person-info-form"
+            @submit="onSubmitCreateZuordnung"
           >
-            <KopersInput
-              :hasNoKopersNr="hasNoKopersNr"
-              v-model:selectedKopersNr="selectedKopersNrPersonInfo"
-              :selectedKopersNrProps="selectedKopersNrPersonInfoProps"
-              @update:selectedKopersNr="(value?: string) => (selectedKopersNrPersonInfo = value)"
-              @update:hasNoKopersNr="(value: boolean) => (hasNoKopersNr = value)"
-            ></KopersInput>
-          </FormWrapper>
+            <PersonenInfoChange
+              :selectedKopersNrPersonInfoProps="selectedKopersNrPersonInfoProps"
+              :selectedKopersNrPersonInfo="selectedKopersNrPersonInfo"
+            ></PersonenInfoChange>
+            <v-row class="save-cancel-row ml-md-16 mb-3 pt-14 justify-end">
+              <v-col
+                class="cancel-col"
+                cols="12"
+                sm="6"
+                md="auto"
+              >
+                <v-btn
+                  class="secondary small"
+                  data-testid="person-info-edit-cancel"
+                  @click="cancelEditPersonInfo"
+                  :block="mdAndDown"
+                >
+                  {{ $t('cancel') }}
+                </v-btn>
+              </v-col>
+              <v-col
+                cols="12"
+                sm="6"
+                md="auto"
+              >
+                <v-btn
+                  class="primary small"
+                  data-testid="person-info-edit-save"
+                  @click="handleSaveClick"
+                  :block="mdAndDown"
+                >
+                  {{ $t('save') }}
+                </v-btn>
+              </v-col>
+            </v-row>
+          </v-form>
         </v-container>
         <v-divider
           class="border-opacity-100 rounded my-6 mx-4"
@@ -1071,7 +1104,7 @@
               <div class="d-flex justify-sm-end">
                 <PasswordReset
                   :errorCode="personStore.errorCode"
-                  :disabled="isEditActive"
+                  :disabled="isEditActive || isEditPersonInfoActive"
                   :person="personStore.currentPerson"
                   @onClearPassword="password = ''"
                   @onResetPassword="resetPassword(currentPersonId)"
@@ -1154,7 +1187,7 @@
               >
                 <TwoFactorAuthenticationSetUp
                   :errorCode="twoFactorAuthentificationStore.errorCode"
-                  :disabled="isEditActive"
+                  :disabled="isEditActive || isEditPersonInfoActive"
                   :person="personStore.currentPerson"
                   @dialogClosed="twoFactorAuthentificationStore.get2FAState(currentPersonId)"
                 >
@@ -1177,7 +1210,7 @@
                   >
                     <TokenReset
                       :errorCode="twoFactorAuthentificationStore.errorCode"
-                      :disabled="isEditActive"
+                      :disabled="isEditActive || isEditPersonInfoActive"
                       :person="personStore.currentPerson"
                       :tokenType="twoFactorAuthentificationStore.tokenKind"
                       :personId="currentPersonId"
@@ -1220,14 +1253,22 @@
                   sm="6"
                   md="auto"
                 >
-                  <v-btn
-                    class="primary ml-lg-8"
-                    data-testid="zuordnung-edit-button"
-                    @Click="triggerEdit"
-                    :block="mdAndDown"
+                  <SpshTooltip
+                    :enabledCondition="selectedZuordnungen.length === 0 && !isEditPersonInfoActive"
+                    :disabledText="$t('person.finishEditFirst')"
+                    :enabledText="$t('person.editZuordnungen')"
+                    position="start"
                   >
-                    {{ $t('edit') }}
-                  </v-btn>
+                    <v-btn
+                      class="primary ml-lg-8"
+                      data-testid="zuordnung-edit-button"
+                      :disabled="isEditPersonInfoActive"
+                      @Click="triggerEdit"
+                      :block="mdAndDown"
+                    >
+                      {{ $t('edit') }}
+                    </v-btn>
+                  </SpshTooltip>
                 </v-col>
               </div>
             </v-col>
@@ -1755,6 +1796,7 @@
             >
               <div class="d-flex justify-sm-end">
                 <PersonLock
+                  :disabled="isEditActive || isEditPersonInfoActive"
                   :errorCode="personStore.errorCode"
                   :person="personStore.currentPerson"
                   :adminId="authStore.currentUser?.personId!"
@@ -1765,7 +1807,7 @@
               <div class="d-flex justify-sm-end">
                 <template v-if="authStore.hasPersonenLoeschenPermission">
                   <PersonDelete
-                    :disabled="isEditActive"
+                    :disabled="isEditActive || isEditPersonInfoActive"
                     :errorCode="personStore.errorCode"
                     :person="personStore.currentPerson"
                     @onDeletePerson="deletePerson(currentPersonId)"

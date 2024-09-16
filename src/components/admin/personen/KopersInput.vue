@@ -4,9 +4,10 @@
   import FormRow from '@/components/form/FormRow.vue';
 
   type Props = {
-    hasNoKopersNr: boolean;
+    hasNoKopersNr?: boolean;
     selectedKopersNr: string | undefined;
     selectedKopersNrProps: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
+    hideCheckbox?: boolean;
   };
 
   type Emits = {
@@ -36,7 +37,10 @@
 <template>
   <!-- No KoPers.-Nr. available checkbox
        We don't use the form row here to avoid margins and paddings -->
-  <v-row class="align-center">
+  <v-row
+    v-if="!hideCheckbox"
+    class="align-center"
+  >
     <v-col
       class="py-0 pb-sm-8 pt-sm-3 text-sm-right"
       cols="12"

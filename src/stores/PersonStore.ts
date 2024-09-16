@@ -6,10 +6,11 @@ import {
   PersonenApiFactory,
   PersonenFrontendApiFactory,
   RollenMerkmal,
-  type DbiamCreatePersonWithPersonenkontexteBodyParams,
+  type DbiamCreatePersonWithContextBodyParams,
   type DbiamPersonenuebersichtApiInterface,
   type DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response,
   type DBiamPersonenuebersichtResponse,
+  type PersonByPersonalnummerBodyParams,
   type PersonenApiInterface,
   type PersonendatensatzResponse,
   type PersonenFrontendApiInterface,
@@ -79,7 +80,7 @@ export type PersonTableItem = {
   updatedAt?: string;
 };
 
-export type CreatePersonBodyParams = DbiamCreatePersonWithPersonenkontexteBodyParams;
+export type CreatePersonBodyParams = DbiamCreatePersonWithContextBodyParams;
 export type CreatedPersonenkontext = DbiamPersonenkontextBodyParams;
 
 export function parseLockInfo(unparsed: object): LockInfo | null {
@@ -137,6 +138,7 @@ type PersonActions = {
   deletePersonById: (personId: string) => Promise<void>;
   lockPerson: (personId: string, lock: boolean, locked_from: string) => Promise<void>;
   getPersonenuebersichtById: (personId: string) => Promise<void>;
+  changePersonInfoById: (personId: string, personalnummer: string) => Promise<void>;
 };
 
 export type PersonStore = Store<'personStore', PersonState, PersonGetters, PersonActions>;
@@ -329,6 +331,24 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
         const { data }: { data: DBiamPersonenuebersichtResponse } =
           await personenuebersichtApi.dBiamPersonenuebersichtControllerFindPersonenuebersichtenByPerson(personId);
         this.personenuebersicht = data;
+      } catch (error: unknown) {
+        this.errorCode = 'UNSPECIFIED_ERROR';
+        if (isAxiosError(error)) {
+          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
+        }
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async changePersonInfoById(personId: string, personalnummer: string): Promise<void> {
+      this.loading = true;
+      try {
+        const personByPersonalnummerBodyParams: PersonByPersonalnummerBodyParams = {
+          personalnummer: personalnummer,
+          revision: '',
+        };
+        await personenApi.personControllerUpdatePersonalnummer(personId, personByPersonalnummerBodyParams);
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
