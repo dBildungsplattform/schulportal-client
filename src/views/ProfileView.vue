@@ -1,23 +1,29 @@
 <script setup lang="ts">
+  import type { DBiamPersonenzuordnungResponse } from '@/api-client/generated/api';
+  import SpshTooltip from '@/components/admin/SpshTooltip.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import { onBeforeMount, ref, type ComputedRef, type Ref } from 'vue';
-  import { useI18n } from 'vue-i18n';
-  const { t }: { t: Function } = useI18n();
-  type LabelValue = {
-    label: string;
-    labelAbbr?: string;
-    value: string;
-    testIdLabel: string;
-    testIdValue: string;
-  };
-
   import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
   import { OrganisationsTyp } from '@/stores/OrganisationStore';
   import { usePersonInfoStore, type PersonInfoResponse, type PersonInfoStore } from '@/stores/PersonInfoStore';
   import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
   import { type Zuordnung } from '@/stores/PersonenkontextStore';
-  import { computed } from 'vue';
+  import { computed, onBeforeMount, ref, type ComputedRef, type Ref } from 'vue';
+  import { useI18n } from 'vue-i18n';
   import { useRoute, useRouter, type RouteLocationNormalizedLoaded, type Router } from 'vue-router';
+
+  const { t }: { t: Function } = useI18n();
+
+  enum ItemType {
+    KO_PERS = 'KO_PERS',
+  }
+  type LabelValue = {
+    label: string;
+    labelAbbr?: string;
+    value: string;
+    type?: ItemType;
+    testIdLabel: string;
+    testIdValue: string;
+  };
 
   const route: RouteLocationNormalizedLoaded = useRoute();
   const router: Router = useRouter();
@@ -35,6 +41,7 @@
   let authStore: AuthStore = useAuthStore();
   const personalData: Ref = ref<LabelValue[]>([]);
   const schulDaten: Ref = ref<SchulDaten[]>([]);
+  const hasKoPersMerkmal: Ref = ref<boolean>(false);
   const lastPasswordChangeDate: ComputedRef<string> = computed(() => {
     const passwordUpdatedAt: string | null | undefined = authStore.currentUser?.password_updated_at;
     if (!passwordUpdatedAt) return '';
@@ -68,10 +75,11 @@
   function groupZuordnungen(zuordnungen: Zuordnung[]): Map<string, Zuordnung[]> {
     const groupedZuordnungen: Map<string, Zuordnung[]> = new Map();
     for (const zuordnung of zuordnungen) {
-      if (groupedZuordnungen.has(zuordnung.sskDstNr)) {
-        groupedZuordnungen.get(zuordnung.sskDstNr)?.push(zuordnung);
+      const key: string = zuordnung.sskDstNr ?? zuordnung.sskId;
+      if (groupedZuordnungen.has(key)) {
+        groupedZuordnungen.get(key)?.push(zuordnung);
       } else {
-        groupedZuordnungen.set(zuordnung.sskDstNr, [zuordnung]);
+        groupedZuordnungen.set(key, [zuordnung]);
       }
     }
     return groupedZuordnungen;
@@ -190,11 +198,12 @@
       },
     ];
 
-    if (personInfo.person.personalnummer) {
+    if (personInfo.person.personalnummer || hasKoPersMerkmal.value) {
       personalData.value.push({
         label: t('profile.koPersNummer'),
         labelAbbr: t('profile.koPersNummerAbbr'),
         value: personInfo.person.personalnummer,
+        type: ItemType.KO_PERS,
         testIdLabel: 'kopersnummer-label',
         testIdValue: 'kopersnummer-value',
       });
@@ -241,8 +250,18 @@
     window.location.href = url.toString();
   }
 
+  function hasKoPersMerkmalCheck(): void {
+    let zuordnungen: Array<DBiamPersonenzuordnungResponse> | undefined = personStore.personenuebersicht?.zuordnungen;
+    if (zuordnungen !== undefined) {
+      let result: boolean = !!zuordnungen.find((zuordnung: DBiamPersonenzuordnungResponse) => {
+        return zuordnung.merkmale.includes('KOPERS_PFLICHT');
+      });
+      hasKoPersMerkmal.value = result;
+    }
+  }
   onBeforeMount(async () => {
     await initializeStores();
+    hasKoPersMerkmalCheck();
     setupPersonalData();
     setupSchuleData();
   });
@@ -290,7 +309,22 @@
                       v-for="item in personalData"
                       :key="item.label"
                     >
-                      <td>
+                      <td v-if="item.type === ItemType.KO_PERS && item.value === null">
+                        <SpshTooltip
+                          :disabledText="t('profile.koPersNummerMissing')"
+                          :enabledText="t('profile.koPersNummerMissing')"
+                          position="top"
+                        >
+                          <span
+                            v-if="item.labelAbbr"
+                            class="text-red"
+                          >
+                            <strong>{{ item.labelAbbr }}</strong> :</span
+                          >
+                          <strong v-else>{{ item.label }}:</strong>
+                        </SpshTooltip>
+                      </td>
+                      <td v-else>
                         <span v-if="item.labelAbbr"
                           ><abbr :title="item.label"
                             ><strong :data-testid="item.testIdLabel">{{ item.labelAbbr }}:</strong></abbr
@@ -302,7 +336,19 @@
                           >{{ item.label }}:</strong
                         >
                       </td>
-                      <td :data-testid="item.testIdValue">{{ item.value }}</td>
+                      <td
+                        :data-testid="item.testIdValue"
+                        v-if="item.type === ItemType.KO_PERS && item.value === null"
+                        class="text-red"
+                      >
+                        {{ t('missing') }}
+                      </td>
+                      <td
+                        :data-testid="item.testIdValue"
+                        v-else
+                      >
+                        {{ item.value }}
+                      </td>
                     </tr>
                   </tbody>
                 </template>
@@ -316,9 +362,9 @@
                   icon="mdi-information-slab-circle-outline"
                   data-testid="info-icon"
                 ></v-icon>
-                <template data-testid="info-text">
+                <span data-testid="info-text">
                   {{ $t('profile.infoAboutChangeabilityFromPersonalData') }}
-                </template>
+                </span>
               </p>
             </v-col>
           </v-row>

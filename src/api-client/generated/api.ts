@@ -524,13 +524,13 @@ export interface DbiamCreatePersonWithPersonenkontexteBodyParams {
      * @type {string}
      * @memberof DbiamCreatePersonWithPersonenkontexteBodyParams
      */
-    'befristung'?: string;
+    'personalnummer'?: string;
     /**
      * 
      * @type {string}
-     * @memberof DbiamCreatePersonWithContextBodyParams
+     * @memberof DbiamCreatePersonWithPersonenkontexteBodyParams
      */
-    'personalnummer'?: string;
+    'befristung'?: string;
     /**
      * 
      * @type {Array<DbiamCreatePersonenkontextBodyParams>}
