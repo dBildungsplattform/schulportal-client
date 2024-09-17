@@ -11,7 +11,7 @@
   };
 
   type Emits = {
-    (event: 'update:hasNoKopersNr', value: boolean): void;
+    (event: 'update:hasNoKopersNr', value: boolean | undefined): void;
     (event: 'update:selectedKopersNr', value: string | undefined | null): void;
   };
 
@@ -21,10 +21,8 @@
   const hasNoKopersNr: Ref<boolean | undefined> = ref(props.hasNoKopersNr);
   const selectedKopersNr: Ref<string | undefined | null> = ref(props.selectedKopersNr);
 
-  watch(hasNoKopersNr, (newValue: boolean | undefined, oldValue: boolean | undefined) => {
-    if (newValue && newValue !== oldValue) {
-      emits('update:hasNoKopersNr', newValue);
-    }
+  watch(hasNoKopersNr, (newValue: boolean | undefined) => {
+    emits('update:hasNoKopersNr', newValue);
   });
 
   watch(selectedKopersNr, (newValue: string | undefined | null) => {

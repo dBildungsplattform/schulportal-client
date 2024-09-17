@@ -102,7 +102,7 @@
   const createZuordnungConfirmationDialogMessage: Ref<string> = ref('');
   const changeKlasseConfirmationDialogMessage: Ref<string> = ref('');
   const canCommit: Ref<boolean> = ref(false);
-  const hasNoKopersNr: Ref<boolean> = ref(false);
+  const hasNoKopersNr: Ref<boolean | undefined> = ref(false);
   const changePersonInfoSuccessVisible: Ref<boolean> = ref(false);
 
   const showNoKopersNrConfirmationDialog: Ref<boolean> = ref(false);
@@ -443,7 +443,7 @@
   });
 
   const formContext: FormContext<ZuordnungCreationForm, ZuordnungCreationForm> = useForm({
-    validationSchema: getValidationSchema(t, hasKopersNummer),
+    validationSchema: getValidationSchema(t, hasNoKopersNr),
   });
 
   const {
@@ -897,7 +897,7 @@
 
   setupWatchers();
 
-  watch(hasNoKopersNr, async (newValue: boolean) => {
+  watch(hasNoKopersNr, async (newValue: boolean | undefined) => {
     if (newValue) {
       showNoKopersNrConfirmationDialog.value = true;
     }
@@ -1711,7 +1711,7 @@
                   v-model:selectedKopersNr="selectedKopersNr"
                   :selectedKopersNrProps="selectedKopersNrProps"
                   @update:selectedKopersNr="(value?: string | null) => (selectedKopersNr = value)"
-                  @update:hasNoKopersNr="(value: boolean) => (hasNoKopersNr = value)"
+                  @update:hasNoKopersNr="(value: boolean | undefined) => (hasNoKopersNr = value)"
                 ></KopersInput>
               </v-container>
               <v-row class="py-3 px-2 justify-center">
