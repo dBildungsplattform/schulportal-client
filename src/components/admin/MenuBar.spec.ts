@@ -35,6 +35,7 @@ authStore.currentUser = {
       },
     },
   ],
+  password_updated_at: null,
 };
 
 beforeEach(() => {

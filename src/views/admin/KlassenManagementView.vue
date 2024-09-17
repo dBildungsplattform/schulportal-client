@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { computed, onMounted, ref, type ComputedRef, type Ref } from 'vue';
+  import { computed, onMounted, ref, watch, type ComputedRef, type Ref } from 'vue';
   import ResultTable, { type TableRow } from '@/components/admin/ResultTable.vue';
   import { type Composer, useI18n } from 'vue-i18n';
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
@@ -57,6 +57,7 @@
   const searchInputSchulen: Ref<string> = ref('');
   const searchInputKlassen: Ref<string> = ref('');
   const hasAutoselectedSchule: Ref<boolean> = ref(false);
+  const timerId: Ref<ReturnType<typeof setTimeout> | undefined> = ref<ReturnType<typeof setTimeout>>();
 
   const schuleMap: Ref<
     Map<string, string | null | undefined> & Omit<Map<string, string | null | undefined>, keyof Map<never, never>>
@@ -143,6 +144,7 @@
   async function fetchSchuleMap(): Promise<Map<string, string>> {
     await organisationStore.getAllOrganisationen({
       includeTyp: OrganisationsTyp.Schule,
+      limit: 25,
       systemrechte: ['KLASSEN_VERWALTEN'],
     });
     return new Map(
@@ -152,6 +154,7 @@
 
   async function updateSelectedSchule(newValue: string | null): Promise<void> {
     if (newValue !== null) {
+      selectedKlassen.value = [];
       fetchKlassenBySelectedSchuleId(newValue);
     } else {
       // Reset selectedKlassen and klassenOptions when Schule is unselected
@@ -209,22 +212,52 @@
     }
   }
 
-  async function updateSchulenSearch(searchValue: string): Promise<void> {
-    if (searchValue.length >= 1) {
-      // Fetch Schulen matching the search string when it has 3 or more characters
-      await organisationStore.getAllOrganisationen({
-        searchString: searchValue,
-        includeTyp: OrganisationsTyp.Schule,
-        systemrechte: ['KLASSEN_VERWALTEN'],
-      });
-    } else {
-      // Fetch all Schulen when the search string is less than 3 characters
-      await organisationStore.getAllOrganisationen({
-        includeTyp: OrganisationsTyp.Schule,
-        systemrechte: ['KLASSEN_VERWALTEN'],
-      });
+  // Computed property to get the title of the selected organisation
+  const selectedOrganisationTitle: ComputedRef<string | undefined> = computed(() => {
+    return schulen.value?.find((org: TranslatedObject) => org.value === selectedSchule.value)?.title;
+  });
+
+  // Using a watcher instead of modelUpdate since we need the old Value as well.
+  // Default behavior of the autocomplete is to reset the newValue to empty string and that causes another request to be made
+  watch(searchInputSchulen, async (newValue: string, oldValue: string) => {
+    clearTimeout(timerId.value);
+
+    if (oldValue === selectedOrganisationTitle.value) {
+      return;
     }
-  }
+    // If searchValue is empty and selectedOrganisation does not have a value, fetch initial data
+    if (newValue === '' && !selectedSchule.value) {
+      timerId.value = setTimeout(async () => {
+        // Fetch Schulen matching the search string when it has 3 or more characters
+        await organisationStore.getAllOrganisationen({
+          includeTyp: OrganisationsTyp.Schule,
+          limit: 25,
+          systemrechte: ['SCHULEN_VERWALTEN'],
+        });
+      }, 500);
+    } else if (newValue && newValue !== selectedOrganisationTitle.value) {
+      // If searchValue is not empty and different from the current title, proceed with the search
+      timerId.value = setTimeout(async () => {
+        // Fetch Schulen matching the search string when it has 3 or more characters
+        await organisationStore.getAllOrganisationen({
+          searchString: newValue,
+          includeTyp: OrganisationsTyp.Schule,
+          limit: 25,
+          systemrechte: ['SCHULEN_VERWALTEN'],
+        });
+      }, 500);
+    } else if (newValue === '' && selectedSchule.value) {
+      // If searchValue is empty and an organization is selected, fetch roles for the selected organization
+      timerId.value = setTimeout(async () => {
+        await organisationStore.getAllOrganisationen({
+          searchString: newValue,
+          includeTyp: OrganisationsTyp.Schule,
+          limit: 25,
+          systemrechte: ['SCHULEN_VERWALTEN'],
+        });
+      }, 500);
+    }
+  });
 
   async function updateKlassenSearch(searchValue: string): Promise<void> {
     if (searchValue.length >= 1 && selectedSchule.value !== null) {
@@ -298,6 +331,7 @@
       // Refetch all data
       await organisationStore.getAllOrganisationen({
         includeTyp: OrganisationsTyp.Schule,
+        limit: 25,
         systemrechte: ['KLASSEN_VERWALTEN'],
       });
       await organisationStore.getAllOrganisationen({
@@ -317,8 +351,8 @@
   async function handleUserContext(): Promise<void> {
     const personenkontexte: Array<UserinfoPersonenkontext> | null = authStore.currentUser?.personenkontexte || [];
     if (personenkontexte.length > 0) {
-      if (organisationStore.allOrganisationen.length === 1) {
-        selectedSchule.value = organisationStore.allOrganisationen[0]?.id || null;
+      if (organisationStore.allSchulen.length === 1) {
+        selectedSchule.value = organisationStore.allSchulen[0]?.id || null;
         if (selectedSchule.value) {
           await organisationStore.getKlassenByOrganisationId(selectedSchule.value);
           finalKlassen.value = organisationStore.klassen.map((klasse: Organisation) => ({
@@ -346,6 +380,12 @@
       limit: searchFilterStore.klassenPerPage,
       includeTyp: OrganisationsTyp.Klasse,
       systemrechte: ['KLASSEN_VERWALTEN'],
+    });
+    await organisationStore.getAllOrganisationen({
+      offset: (searchFilterStore.klassenPage - 1) * searchFilterStore.klassenPerPage,
+      limit: searchFilterStore.schulenPerPage,
+      includeTyp: OrganisationsTyp.Schule,
+      systemrechte: ['SCHULEN_VERWALTEN'],
     });
     // Initialize klassenOptions with all classes
     klassenOptions.value = organisationStore.allKlassen.map((org: Organisation) => ({
@@ -450,7 +490,6 @@
               :placeholder="$t('admin.schule.schule')"
               ref="schule-select"
               required="true"
-              @update:search="updateSchulenSearch"
               variant="outlined"
               @update:modelValue="updateSelectedSchule"
               v-model="selectedSchule"
@@ -468,8 +507,8 @@
                     >{{
                       $t(
                         'admin.schule.schulenFound',
-                        { count: organisationStore.totalSchulen },
-                        organisationStore.totalSchulen,
+                        { count: organisationStore.totalPaginatedSchulen },
+                        organisationStore.totalPaginatedSchulen,
                       )
                     }}</span
                   >

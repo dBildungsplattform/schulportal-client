@@ -1,10 +1,5 @@
 <script setup lang="ts">
-  import {
-    usePersonStore,
-    type CreatePersonBodyParams,
-    type CreatedPersonenkontext,
-    type PersonStore,
-  } from '@/stores/PersonStore';
+  import { usePersonStore, type CreatePersonBodyParams, type PersonStore } from '@/stores/PersonStore';
   import { RollenArt, RollenMerkmal } from '@/stores/RolleStore';
   import { type ComputedRef, computed, onMounted, onUnmounted, type Ref, ref, watch } from 'vue';
   import {
@@ -15,7 +10,7 @@
     type NavigationGuardNext,
   } from 'vue-router';
   import { type Composer, useI18n } from 'vue-i18n';
-  import { useForm, type TypedSchema, type BaseFieldProps } from 'vee-validate';
+  import { useForm, type TypedSchema, type BaseFieldProps, type FormContext } from 'vee-validate';
   import { object, string, StringSchema, type AnyObject } from 'yup';
   import { toTypedSchema } from '@vee-validate/yup';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
@@ -24,8 +19,8 @@
   import FormWrapper from '@/components/form/FormWrapper.vue';
   import FormRow from '@/components/form/FormRow.vue';
   import {
-    PersonenKontextTyp,
     usePersonenkontextStore,
+    type DBiamPersonenkontextResponse,
     type PersonenkontextStore,
   } from '@/stores/PersonenkontextStore';
   import { useDisplay } from 'vuetify';
@@ -35,10 +30,12 @@
   import { useOrganisationen } from '@/composables/useOrganisationen';
   import { useRollen, type TranslatedRolleWithAttrs } from '@/composables/useRollen';
   import { useKlassen } from '@/composables/useKlassen';
+  import KopersInput from '@/components/admin/personen/KopersInput.vue';
   import PersonenkontextCreate from '@/components/admin/personen/PersonenkontextCreate.vue';
   import { type TranslatedObject } from '@/types.d';
-  import SpshTooltip from '@/components/admin/SpshTooltip.vue';
   import { parse, isValid, isBefore } from 'date-fns';
+  import { getNextSchuljahresende, formatDateToISO } from '@/utils/date';
+  import { isBefristungspflichtRolle, useBefristungUtils, type BefristungUtilsType } from '@/utils/befristung';
 
   const router: Router = useRouter();
   const personStore: PersonStore = usePersonStore();
@@ -56,10 +53,10 @@
 
   const rollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = useRollen();
 
-  enum BefristungOption {
-    SCHULJAHRESENDE = 'schuljahresende',
-    UNBEFRISTET = 'unbefristet',
-  }
+  const selectedOrgaCache: Ref<string | undefined> = ref(undefined);
+  const selectedKlasseCache: Ref<string | undefined> = ref(undefined);
+  const selectedRolleCache: Ref<string | undefined> = ref(undefined);
+
   function isKopersRolle(selectedRolleId: string | undefined): boolean {
     const rolle: TranslatedRolleWithAttrs | undefined = rollen.value?.find(
       (r: TranslatedRolleWithAttrs) => r.value === selectedRolleId,
@@ -73,15 +70,6 @@
       (r: TranslatedRolleWithAttrs) => r.value === selectedRolleId,
     );
     return !!rolle && rolle.rollenart === RollenArt.Lern;
-  }
-
-  // Checks if the selected Rolle has Befristungspflicht
-  function isBefristungspflichtRolle(selectedRolleId: string | undefined): boolean {
-    const rolle: TranslatedRolleWithAttrs | undefined = rollen.value?.find(
-      (r: TranslatedRolleWithAttrs) => r.value === selectedRolleId,
-    );
-
-    return !!rolle && !!rolle.merkmale && rolle.merkmale.has(RollenMerkmal.BefristungPflicht);
   }
 
   // Custom validation function to check if the date is in the past
@@ -148,77 +136,102 @@
     selectedKopersNr: string;
   };
 
-  // eslint-disable-next-line @typescript-eslint/typedef
-  const { defineField, handleSubmit, isFieldDirty, resetForm, resetField } = useForm<PersonCreationForm>({
+  const formContext: FormContext<PersonCreationForm, PersonCreationForm> = useForm<PersonCreationForm>({
     validationSchema,
   });
 
   const [selectedRolle, selectedRolleProps]: [
     Ref<string | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineField('selectedRolle', vuetifyConfig);
+  ] = formContext.defineField('selectedRolle', vuetifyConfig);
   const [selectedKopersNr, selectedKopersNrProps]: [
     Ref<string | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineField('selectedKopersNr', vuetifyConfig);
+  ] = formContext.defineField('selectedKopersNr', vuetifyConfig);
   const [selectedVorname, selectedVornameProps]: [
     Ref<string>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineField('selectedVorname', vuetifyConfig);
+  ] = formContext.defineField('selectedVorname', vuetifyConfig);
   const [selectedFamilienname, selectedFamiliennameProps]: [
     Ref<string>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineField('selectedFamilienname', vuetifyConfig);
+  ] = formContext.defineField('selectedFamilienname', vuetifyConfig);
   const [selectedOrganisation, selectedOrganisationProps]: [
     Ref<string | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineField('selectedOrganisation', vuetifyConfig);
+  ] = formContext.defineField('selectedOrganisation', vuetifyConfig);
   const [selectedKlasse, selectedKlasseProps]: [
     Ref<string | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineField('selectedKlasse', vuetifyConfig);
+  ] = formContext.defineField('selectedKlasse', vuetifyConfig);
   const [selectedBefristung, selectedBefristungProps]: [
     Ref<string | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineField('selectedBefristung', vuetifyConfig);
+  ] = formContext.defineField('selectedBefristung', vuetifyConfig);
   const [selectedBefristungOption, selectedBefristungOptionProps]: [
     Ref<string | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineField('selectedBefristungOption', vuetifyConfig);
+  ] = formContext.defineField('selectedBefristungOption', vuetifyConfig);
+
+  const { handleBefristungUpdate, handleBefristungOptionUpdate, setupWatchers }: BefristungUtilsType =
+    useBefristungUtils({
+      formContext,
+      selectedBefristung,
+      selectedBefristungOption,
+      calculatedBefristung,
+      selectedRolle,
+    });
+
+  setupWatchers();
 
   const organisationen: ComputedRef<TranslatedObject[] | undefined> = useOrganisationen();
 
   const klassen: ComputedRef<TranslatedObject[] | undefined> = useKlassen();
 
-  const translatedOrganisationsname: ComputedRef<string> = computed(
-    () =>
+  const klasseZuordnungFromCreatedKontext: ComputedRef<DBiamPersonenkontextResponse | undefined> = computed(() => {
+    return personenkontextStore.createdPersonWithKontext?.dBiamPersonenkontextResponses.find(
+      (kontext: DBiamPersonenkontextResponse) =>
+        kontext.organisationId === selectedKlasseCache.value && kontext.rolleId === selectedRolleCache.value,
+    );
+  });
+
+  const schuleZuordnungFromCreatedKontext: ComputedRef<DBiamPersonenkontextResponse | undefined> = computed(() => {
+    return personenkontextStore.createdPersonWithKontext?.dBiamPersonenkontextResponses.find(
+      (kontext: DBiamPersonenkontextResponse) =>
+        kontext.organisationId === selectedOrgaCache.value && kontext.rolleId === selectedRolleCache.value,
+    );
+  });
+
+  const translatedOrganisationsname: ComputedRef<string | undefined> = computed(() => {
+    if (!schuleZuordnungFromCreatedKontext.value) return;
+    return (
       organisationen.value?.find(
         (organisation: TranslatedObject) =>
-          organisation.value ===
-          personenkontextStore.createdPersonWithKontext?.DBiamPersonenkontextResponse.organisationId,
-      )?.title || '',
-  );
+          organisation.value === schuleZuordnungFromCreatedKontext.value?.organisationId,
+      )?.title || ''
+    );
+  });
 
-  const translatedRollenname: ComputedRef<string> = computed(
-    () =>
-      rollen.value?.find(
-        (rolle: TranslatedObject) =>
-          rolle.value === personenkontextStore.createdPersonWithKontext?.DBiamPersonenkontextResponse.rolleId,
-      )?.title || '',
-  );
+  const translatedRollenname: ComputedRef<string | undefined> = computed(() => {
+    if (!schuleZuordnungFromCreatedKontext.value) return;
+    return (
+      rollen.value?.find((rolle: TranslatedObject) => rolle.value === schuleZuordnungFromCreatedKontext.value?.rolleId)
+        ?.title || ''
+    );
+  });
 
-  const translatedKlassenname: ComputedRef<string> = computed(
-    () =>
+  const translatedKlassenname: ComputedRef<string | undefined> = computed(() => {
+    if (!klasseZuordnungFromCreatedKontext.value) return;
+    return (
       klassen.value?.find(
-        (klasse: TranslatedObject) =>
-          klasse.value === personenkontextStore.createdPersonenkontextForKlasse?.organisationId,
-      )?.title || '',
-  );
+        (klasse: TranslatedObject) => klasse.value === klasseZuordnungFromCreatedKontext.value?.organisationId,
+      )?.title || ''
+    );
+  });
 
   // Converts the ISO UTC formatted Befristung to the german local format, also ISO.
   const translatedBefristung: ComputedRef<string> = computed(() => {
-    const ISOFormattedDate: string | undefined =
-      personenkontextStore.createdPersonWithKontext?.DBiamPersonenkontextResponse.befristung;
+    const ISOFormattedDate: string | undefined = schuleZuordnungFromCreatedKontext.value?.befristung;
 
     if (!ISOFormattedDate) {
       return t('admin.befristung.unlimitedSuccessTemplate');
@@ -244,13 +257,13 @@
 
   function isFormDirty(): boolean {
     return (
-      isFieldDirty('selectedOrganisation') ||
-      isFieldDirty('selectedRolle') ||
-      isFieldDirty('selectedKlasse') ||
-      isFieldDirty('selectedKopersNr') ||
-      isFieldDirty('selectedVorname') ||
-      isFieldDirty('selectedFamilienname') ||
-      isFieldDirty('selectedBefristung')
+      formContext.isFieldDirty('selectedOrganisation') ||
+      formContext.isFieldDirty('selectedRolle') ||
+      formContext.isFieldDirty('selectedKlasse') ||
+      formContext.isFieldDirty('selectedKopersNr') ||
+      formContext.isFieldDirty('selectedVorname') ||
+      formContext.isFieldDirty('selectedFamilienname') ||
+      formContext.isFieldDirty('selectedBefristung')
     );
   }
 
@@ -269,25 +282,6 @@
   }
 
   async function createPerson(): Promise<void> {
-    // Function to format a date in dd.MM.yyyy format to ISO 8601
-    function formatDateToISO(date: string | undefined): string | undefined {
-      if (date) {
-        // Split the date by '.' to extract day, month, and year
-        const [day, month, year]: (number | undefined)[] = date.split('.').map(Number);
-
-        if (day && month && year) {
-          // Create a new Date object with the extracted parts
-          // Alwyays adding 1 day to the date because for example if the Befristung is chosen as 20.05.2024 then it should be valid until 20.05.2024 23:59
-          // Also the UTC ISO formatted send date will be 20-05-2024 22H which is basically 21.05.2024 in german summer time.
-          const d: Date = new Date(year, month - 1, day + 1);
-
-          // Return the ISO string
-          return d.toISOString();
-        }
-      }
-      return;
-    }
-
     const befristungDate: string | undefined = selectedBefristung.value
       ? selectedBefristung.value
       : calculatedBefristung.value;
@@ -299,33 +293,29 @@
       familienname: selectedFamilienname.value as string,
       vorname: selectedVorname.value as string,
       personalnummer: selectedKopersNr.value,
-      organisationId: selectedOrganisation.value as string,
-      rolleId: selectedRolle.value ?? '',
       befristung: formattedBefristung,
+      createPersonenkontexte: [
+        {
+          organisationId: selectedOrganisation.value as string,
+          rolleId: selectedRolle.value ?? '',
+        },
+      ],
     };
 
-    await personenkontextStore.createPersonWithKontext(bodyParams);
-
-    if (personenkontextStore.createdPersonWithKontext) {
-      // Build the context for the Klasse and save it only if the Klasse was selected
-      if (selectedKlasse.value) {
-        const unpersistedKlassePersonenkontext: CreatedPersonenkontext = {
-          personId: personenkontextStore.createdPersonWithKontext.person.id,
-          organisationId: selectedKlasse.value,
-          rolleId: selectedRolle.value ?? '',
-          befristung: formattedBefristung,
-        };
-
-        await personenkontextStore
-          .createPersonenkontext(unpersistedKlassePersonenkontext, PersonenKontextTyp.Klasse)
-          .catch(() => {
-            creationErrorText.value = t(`admin.personenkontext.errors.${personenkontextStore.errorCode}`);
-          });
-      }
-
-      resetForm();
-      hasNoKopersNr.value = false;
+    if (selectedKlasse.value) {
+      selectedKlasseCache.value = JSON.parse(JSON.stringify(selectedKlasse.value));
+      bodyParams.createPersonenkontexte.push({
+        organisationId: selectedKlasse.value,
+        rolleId: selectedRolle.value ?? '',
+      });
     }
+    // We save a copy of the selected values because they are not available anymore since we reset the form right after submitting
+    // This will then be used to display the organisation again in the success template after receiving the orga ID and rolle ID back from the BE.
+    selectedOrgaCache.value = JSON.parse(JSON.stringify(selectedOrganisation.value));
+    selectedRolleCache.value = JSON.parse(JSON.stringify(selectedRolle.value));
+    await personenkontextStore.createPersonWithKontexte(bodyParams);
+    formContext.resetForm();
+    hasNoKopersNr.value = false;
   }
 
   watch(hasNoKopersNr, async (newValue: boolean) => {
@@ -334,7 +324,7 @@
     }
   });
 
-  const onSubmit: (e?: Event | undefined) => Promise<void | undefined> = handleSubmit(() => {
+  const onSubmit: (e?: Event | undefined) => Promise<void | undefined> = formContext.handleSubmit(() => {
     createPerson();
   });
 
@@ -347,68 +337,10 @@
   const handleCreateAnotherPerson = (): void => {
     personenkontextStore.createdPersonWithKontext = null;
     personenkontextStore.createdPersonenkontextForKlasse = null;
-    resetForm();
+    formContext.resetForm();
     hasNoKopersNr.value = false;
     router.push({ name: 'create-person' });
   };
-
-  // Calculates the next 31st of July (End of school year)
-  // Time here is in german iso format but will later be converted to UCT
-  function getNextSchuljahresende(): string {
-    const today: Date = new Date();
-    const currentYear: number = today.getFullYear();
-    const july31stThisYear: Date = new Date(currentYear, 6, 31); // July is month 6 (0-indexed)
-
-    // If today's date is after July 31st this year, return July 31st of next year
-    if (today > july31stThisYear) {
-      return new Date(currentYear + 1, 6, 31).toLocaleDateString('de-DE');
-    }
-
-    // Otherwise, return July 31st of this year
-    return july31stThisYear.toLocaleDateString('de-DE');
-  }
-
-  // Calculates the Befristung depending on the selected radio button. Each radio button illustrates a date (Either 31st July or undefined)
-  // The backend will receive the calculatedBefristung.
-  function handleBefristungOptionChange(value: string | undefined): void {
-    switch (value) {
-      case BefristungOption.SCHULJAHRESENDE: {
-        calculatedBefristung.value = getNextSchuljahresende();
-        resetField('selectedBefristung'); // Reset the date picker
-        break;
-      }
-      case BefristungOption.UNBEFRISTET: {
-        calculatedBefristung.value = undefined;
-        resetField('selectedBefristung');
-        break;
-      }
-    }
-  }
-  // Watcher to reset the radio button in case the date was picked using date-input
-  watch(
-    selectedBefristung,
-    (newValue: string | undefined) => {
-      if (newValue) {
-        selectedBefristungOption.value = undefined;
-      }
-    },
-    { immediate: true },
-  );
-
-  // Watcher to set an initial value for the radio buttons depending on the selected Rolle
-  watch(
-    selectedRolle,
-    (newValue: string | undefined) => {
-      if (isBefristungspflichtRolle(newValue)) {
-        selectedBefristungOption.value = BefristungOption.SCHULJAHRESENDE;
-        calculatedBefristung.value = getNextSchuljahresende();
-      } else {
-        selectedBefristungOption.value = BefristungOption.UNBEFRISTET;
-        calculatedBefristung.value = undefined;
-      }
-    },
-    { immediate: true },
-  );
 
   // Computed property to check if the second radio button should be disabled
   const isUnbefristetButtonDisabled: ComputedRef<boolean> = computed(() => {
@@ -507,6 +439,15 @@
           :selectedOrganisationProps="selectedOrganisationProps"
           :selectedRolleProps="selectedRolleProps"
           :selectedKlasseProps="selectedKlasseProps"
+          :befristungInputProps="{
+            befristungProps: selectedBefristungProps,
+            befristungOptionProps: selectedBefristungOptionProps,
+            isUnbefristetDisabled: isUnbefristetButtonDisabled,
+            isBefristungRequired: isBefristungspflichtRolle(selectedRolle),
+            nextSchuljahresende: getNextSchuljahresende(),
+            befristung: selectedBefristung,
+            befristungOption: selectedBefristungOption,
+          }"
           v-model:selectedOrganisation="selectedOrganisation"
           v-model:selectedRolle="selectedRolle"
           v-model:selectedKlasse="selectedKlasse"
@@ -514,11 +455,13 @@
           @update:selectedRolle="(value?: string) => (selectedRolle = value)"
           @update:selectedKlasse="(value?: string) => (selectedKlasse = value)"
           @update:canCommit="canCommit = $event"
+          @update:befristung="handleBefristungUpdate"
+          @update:calculatedBefristungOption="handleBefristungOptionUpdate"
           @fieldReset="handleFieldReset"
         />
         <div v-if="selectedOrganisation">
           <v-row>
-            <h3 class="headline-3">3. {{ $t('admin.person.personalInfo') }}</h3>
+            <h3 class="headline-3">4. {{ $t('admin.person.personalInfo') }}</h3>
           </v-row>
           <!-- Vorname -->
           <FormRow
@@ -561,114 +504,14 @@
               v-model="selectedFamilienname"
             ></v-text-field>
           </FormRow>
-
-          <!-- No KoPers.-Nr. available checkbox
-              We don't use the form row here to avoid margins and paddings -->
-          <v-row
-            class="align-center"
+          <KopersInput
             v-if="isKopersRolle(selectedRolle) && selectedOrganisation"
-          >
-            <v-col
-              class="py-0 pb-sm-8 pt-sm-3 text-sm-right"
-              cols="12"
-              sm="5"
-            ></v-col>
-            <v-checkbox
-              data-testid="has-no-kopersnr-checkbox"
-              :disabled="!!selectedKopersNr"
-              hide-details
-              :label="$t('admin.person.noKopersNr')"
-              v-model="hasNoKopersNr"
-            ></v-checkbox>
-          </v-row>
-
-          <!-- KoPers.-Nr. -->
-          <FormRow
-            v-if="isKopersRolle(selectedRolle) && selectedOrganisation && !hasNoKopersNr"
-            :errorLabel="selectedKopersNrProps?.error || ''"
-            :isRequired="!hasNoKopersNr"
-            :label="$t('person.kopersNr')"
-            labelForId="kopersnr-input"
-            :noTopMargin="true"
-          >
-            <v-text-field
-              clearable
-              data-testid="kopersnr-input"
-              density="compact"
-              id="kopersnr-input"
-              ref="kopersnr-input"
-              :placeholder="$t('person.enterKopersNr')"
-              :required="!hasNoKopersNr"
-              variant="outlined"
-              v-bind="selectedKopersNrProps"
-              v-model="selectedKopersNr"
-            ></v-text-field>
-          </FormRow>
-        </div>
-        <!-- Befristung -->
-        <div
-          class="mt-4"
-          v-if="selectedOrganisation && selectedRolle"
-        >
-          <v-row>
-            <h3 class="headline-3">3. {{ $t('admin.befristung.assignBefristung') }}</h3>
-          </v-row>
-          <FormRow
-            :errorLabel="selectedBefristungProps?.error || ''"
-            labelForId="befristung-select"
-            :isRequired="true"
-            :label="$t('admin.befristung.befristung')"
-          >
-            <v-text-field
-              v-model="selectedBefristung"
-              v-bind="selectedBefristungProps"
-              prepend-icon=""
-              variant="outlined"
-              placeholder="TT.MM.JJJJ"
-              color="primary"
-            ></v-text-field>
-          </FormRow>
-          <!-- Radio buttons for Befristung options -->
-          <v-row class="align-center">
-            <v-col
-              class="py-0 mt-n1"
-              cols="12"
-              sm="7"
-              offset-sm="5"
-            >
-              <v-radio-group
-                v-model="selectedBefristungOption"
-                v-bind="selectedBefristungOptionProps"
-                @update:modelValue="handleBefristungOptionChange"
-              >
-                <v-radio
-                  :label="`${t('admin.befristung.untilEndOfSchoolYear')} (${getNextSchuljahresende()})`"
-                  :value="BefristungOption.SCHULJAHRESENDE"
-                  :color="'primary'"
-                ></v-radio>
-                <SpshTooltip
-                  v-if="isUnbefristetButtonDisabled"
-                  :enabledCondition="!isUnbefristetButtonDisabled"
-                  :disabledText="$t('admin.befristung.unlimitedInactive')"
-                  position="start"
-                >
-                  <v-radio
-                    :label="$t('admin.befristung.unlimited')"
-                    :value="BefristungOption.UNBEFRISTET"
-                    :color="'primary'"
-                    :disabled="isUnbefristetButtonDisabled"
-                  ></v-radio>
-                </SpshTooltip>
-                <v-radio
-                  v-else
-                  :label="$t('admin.befristung.unlimited')"
-                  :value="BefristungOption.UNBEFRISTET"
-                  :color="'primary'"
-                  :disabled="isUnbefristetButtonDisabled"
-                ></v-radio>
-              </v-radio-group>
-            </v-col>
-          </v-row>
+            :hasNoKopersNr="hasNoKopersNr"
+            v-model:selectedKopersNr="selectedKopersNr"
+            :selectedKopersNrProps="selectedKopersNrProps"
+            @update:selectedKopersNr="(value?: string) => (selectedKopersNr = value)"
+            @update:hasNoKopersNr="(value: boolean) => (hasNoKopersNr = value)"
+          ></KopersInput>
         </div>
       </FormWrapper>
     </template>
@@ -728,14 +571,14 @@
             }}</span></v-col
           >
         </v-row>
-        <v-row v-if="isKopersRolle(personenkontextStore.createdPersonWithKontext.DBiamPersonenkontextResponse.rolleId)">
+        <v-row v-if="isKopersRolle(schuleZuordnungFromCreatedKontext?.rolleId)">
           <v-col
-            :class="`${isKopersRolle(personenkontextStore.createdPersonWithKontext.DBiamPersonenkontextResponse.rolleId) && personenkontextStore.createdPersonWithKontext.person.personalnummer ? 'text-body bold text-right' : 'text-body bold text-right text-red'}`"
+            :class="`${isKopersRolle(schuleZuordnungFromCreatedKontext?.rolleId) && personenkontextStore.createdPersonWithKontext.person.personalnummer ? 'text-body bold text-right' : 'text-body bold text-right text-red'}`"
           >
             {{ $t('person.kopersNr') }}:
           </v-col>
           <v-col
-            :class="`${isKopersRolle(personenkontextStore.createdPersonWithKontext.DBiamPersonenkontextResponse.rolleId) && personenkontextStore.createdPersonWithKontext.person.personalnummer ? 'text-body' : 'text-body text-red'}`"
+            :class="`${isKopersRolle(schuleZuordnungFromCreatedKontext?.rolleId) && personenkontextStore.createdPersonWithKontext.person.personalnummer ? 'text-body' : 'text-body text-red'}`"
             ><span data-testid="created-person-kopersNr">{{
               personenkontextStore.createdPersonWithKontext.person.personalnummer
                 ? personenkontextStore.createdPersonWithKontext.person.personalnummer
@@ -777,7 +620,7 @@
             ><span data-testid="created-person-befristung">{{ translatedBefristung }}</span></v-col
           >
         </v-row>
-        <v-row v-if="isLernRolle(personenkontextStore.createdPersonWithKontext.DBiamPersonenkontextResponse.rolleId)">
+        <v-row v-if="isLernRolle(klasseZuordnungFromCreatedKontext?.rolleId as string)">
           <v-col class="text-body bold text-right"> {{ $t('admin.klasse.klasse') }}: </v-col>
           <v-col class="text-body"
             ><span data-testid="created-person-klasse">{{

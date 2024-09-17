@@ -29,7 +29,7 @@
   const { t }: Composer = useI18n({ useScope: 'global' });
 
   let timerId: ReturnType<typeof setTimeout>;
-  const hasAutoselectedSchule: Ref<boolean> = ref(false);
+  const hasAutoSelectedOrganisation: Ref<boolean> = ref(false);
 
   type ReadonlyHeaders = InstanceType<typeof VDataTableServer>['headers'];
   const headers: ReadonlyHeaders = [
@@ -44,31 +44,31 @@
 
   const searchInputKlassen: Ref<string> = ref('');
   const searchInputRollen: Ref<string> = ref('');
-  const searchInputSchulen: Ref<string> = ref('');
+  const searchInputOrganisationen: Ref<string> = ref('');
 
   const selectedKlassen: Ref<Array<string>> = ref([]);
   const selectedRollen: Ref<Array<string>> = ref([]);
-  const selectedSchulen: Ref<Array<string>> = ref([]);
+  const selectedOrganisation: Ref<Array<string>> = ref([]);
   const selectedStatus: Ref<string | null> = ref(null);
   const searchFilter: Ref<string> = ref('');
 
   const filterOrSearchActive: Ref<boolean> = computed(
     () =>
-      (!hasAutoselectedSchule.value && selectedSchulen.value.length > 0) ||
+      (!hasAutoSelectedOrganisation.value && selectedOrganisation.value.length > 0) ||
       selectedRollen.value.length > 0 ||
-      !!searchFilterStore.selectedSchulen?.length ||
+      !!searchFilterStore.selectedOrganisationen?.length ||
       !!searchFilterStore.selectedRollen?.length ||
       !!searchFilterStore.searchFilter ||
       selectedKlassen.value.length > 0 ||
       !!selectedStatus.value,
   );
 
-  const schulen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
-    return organisationStore.allSchulen
-      .slice(0, 25)
+  const organisationen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
+    return organisationStore.allOrganisationen
       .map((org: Organisation) => ({
         value: org.id,
-        title: `${org.kennung} (${org.name})`,
+        // Only concatenate if the kennung is present (Should not be for LAND)
+        title: org.kennung ? `${org.kennung} (${org.name})` : org.name,
       }))
       .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
   });
@@ -84,7 +84,7 @@
   });
 
   const klassen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
-    if (selectedSchulen.value.length) {
+    if (selectedOrganisation.value.length) {
       return organisationStore.klassen
         .slice(0, 25)
         .map((org: Organisation) => ({
@@ -103,7 +103,7 @@
     await personStore.getAllPersons({
       offset: (searchFilterStore.personenPage - 1) * searchFilterStore.personenPerPage,
       limit: searchFilterStore.personenPerPage,
-      organisationIDs: searchFilterStore.selectedSchulen || selectedSchulen.value,
+      organisationIDs: selectedKlassen.value.length ? selectedKlassen.value : selectedOrganisation.value,
       rolleIDs: searchFilterStore.selectedRollen || selectedRollen.value,
       searchFilter: searchFilterStore.searchFilter || searchFilter.value,
     });
@@ -119,17 +119,23 @@
     await personStore.getAllPersons({
       offset: (searchFilterStore.personenPage - 1) * searchFilterStore.personenPerPage,
       limit: searchFilterStore.personenPerPage,
-      organisationIDs: searchFilterStore.selectedSchulen || selectedSchulen.value,
+      organisationIDs: searchFilterStore.selectedOrganisationen || selectedOrganisation.value,
       rolleIDs: searchFilterStore.selectedRollen || selectedRollen.value,
       searchFilter: searchFilterStore.searchFilter || searchFilter.value,
     });
   }
 
-  function autoSelectSchule(): void {
-    // Autoselect the Schule for the current user that only has 1 Schule assigned to him.
+  async function autoSelectOrganisation(): Promise<void> {
+    // Autoselect the Orga for the current user that only has 1 Orga assigned to him.
     if (organisationStore.allOrganisationen.length === 1) {
-      selectedSchulen.value = [organisationStore.allOrganisationen[0]?.id || ''];
-      hasAutoselectedSchule.value = true;
+      selectedOrganisation.value = [organisationStore.allOrganisationen[0]?.id || ''];
+      hasAutoSelectedOrganisation.value = true;
+      if (selectedOrganisation.value.length) {
+        await organisationStore.getFilteredKlassen({
+          administriertVon: selectedOrganisation.value,
+          searchString: searchInputKlassen.value,
+        });
+      }
     }
   }
 
@@ -139,7 +145,7 @@
       limit: searchFilterStore.personenPerPage,
       organisationIDs: searchFilterStore.selectedKlassen?.length
         ? searchFilterStore.selectedKlassen
-        : searchFilterStore.selectedSchulen || [],
+        : searchFilterStore.selectedOrganisationen || [],
       rolleIDs: searchFilterStore.selectedRollen || [],
       searchFilter: searchFilterStore.searchFilter || '',
     });
@@ -155,13 +161,13 @@
     applySearchAndFilters();
   }
 
-  async function setSchuleFilter(newValue: Array<string>): Promise<void> {
-    await searchFilterStore.setSchuleFilter(newValue);
+  async function setOrganisationFilter(newValue: Array<string>): Promise<void> {
+    await searchFilterStore.setOrganisationFilter(newValue);
     await searchFilterStore.setKlasseFilter([]);
     selectedKlassen.value = [];
-    if (selectedSchulen.value.length) {
+    if (selectedOrganisation.value.length) {
       await organisationStore.getFilteredKlassen({
-        administriertVon: selectedSchulen.value,
+        administriertVon: selectedOrganisation.value,
         searchString: searchInputKlassen.value,
       });
     }
@@ -175,11 +181,14 @@
   function resetSearchAndFilter(): void {
     searchFilter.value = '';
     searchFieldComponent.value.searchFilter = '';
-    /* do not reset schulen if schule was autoselected */
-    if (!hasAutoselectedSchule.value) {
-      selectedSchulen.value = [];
+    searchFilterStore.setKlasseFilter([]);
+    searchFilterStore.setRolleFilter([]);
+    /* do not reset orgas if orga was autoselected */
+    if (!hasAutoSelectedOrganisation.value) {
+      selectedOrganisation.value = [];
+      searchFilterStore.setOrganisationFilter([]);
     }
-    searchInputSchulen.value = '';
+    searchInputOrganisationen.value = '';
     searchInputRollen.value = '';
     searchInputKlassen.value = '';
     selectedRollen.value = [];
@@ -205,11 +214,11 @@
 
     /* delay new call 500ms */
     timerId = setTimeout(() => {
-      organisationStore.getFilteredKlassen({ searchString: searchValue, administriertVon: selectedSchulen.value });
+      organisationStore.getFilteredKlassen({ searchString: searchValue, administriertVon: selectedOrganisation.value });
     }, 500);
   }
 
-  function updateSchulenSearch(searchValue: string): void {
+  function updateOrganisationSearch(searchValue: string): void {
     /* cancel pending call */
     clearTimeout(timerId);
 
@@ -217,8 +226,10 @@
     timerId = setTimeout(() => {
       organisationStore.getAllOrganisationen({
         searchString: searchValue,
-        includeTyp: OrganisationsTyp.Schule,
+        excludeTyp: [OrganisationsTyp.Klasse],
+        limit: 25,
         systemrechte: ['PERSONEN_VERWALTEN'],
+        organisationIds: selectedOrganisation.value,
       });
     }, 500);
   }
@@ -235,22 +246,22 @@
 
   onMounted(async () => {
     if (filterOrSearchActive.value) {
-      selectedSchulen.value = searchFilterStore.selectedSchulen || [];
+      selectedOrganisation.value = searchFilterStore.selectedOrganisationen || [];
       selectedRollen.value = searchFilterStore.selectedRollen || [];
+      selectedKlassen.value = searchFilterStore.selectedKlassen || [];
     }
 
     await organisationStore.getAllOrganisationen({
-      includeTyp: OrganisationsTyp.Schule,
+      excludeTyp: [OrganisationsTyp.Klasse],
       systemrechte: ['PERSONEN_VERWALTEN'],
+      limit: 25,
+      organisationIds: selectedOrganisation.value,
     });
-    await organisationStore.getFilteredKlassen({
-      includeTyp: OrganisationsTyp.Klasse,
-      systemrechte: ['KLASSEN_VERWALTEN'],
-    });
+
     await getPaginatedPersonen(searchFilterStore.personenPage);
     await personenkontextStore.getPersonenkontextRolleWithFilter('');
 
-    autoSelectSchule();
+    autoSelectOrganisation();
   });
 </script>
 
@@ -293,14 +304,14 @@
           <v-autocomplete
             autocomplete="off"
             class="filter-dropdown"
-            :class="{ selected: selectedSchulen.length > 0 }"
+            :class="{ selected: selectedOrganisation.length > 0 }"
             clearable
             data-testid="schule-select"
             density="compact"
-            :disabled="hasAutoselectedSchule"
+            :disabled="hasAutoSelectedOrganisation"
             hide-details
             id="schule-select"
-            :items="schulen"
+            :items="organisationen"
             item-value="value"
             item-text="title"
             multiple
@@ -308,11 +319,11 @@
             :placeholder="$t('admin.schule.schule')"
             ref="schule-select"
             required="true"
-            @update:modelValue="setSchuleFilter"
-            @update:search="updateSchulenSearch"
+            @update:modelValue="setOrganisationFilter"
+            @update:search="updateOrganisationSearch"
             variant="outlined"
-            v-model="selectedSchulen"
-            v-model:search="searchInputSchulen"
+            v-model="selectedOrganisation"
+            v-model:search="searchInputOrganisationen"
           >
             <template v-slot:prepend-item>
               <v-list-item>
@@ -326,8 +337,8 @@
                   >{{
                     $t(
                       'admin.schule.schulenFound',
-                      { count: organisationStore.totalSchulen },
-                      organisationStore.totalSchulen,
+                      { count: organisationStore.totalPaginatedOrganisationen },
+                      organisationStore.totalPaginatedOrganisationen,
                     )
                   }}</span
                 >
@@ -335,12 +346,12 @@
             </template>
             <template v-slot:selection="{ item, index }">
               <span
-                v-if="selectedSchulen.length < 2"
+                v-if="selectedOrganisation.length < 2"
                 class="v-autocomplete__selection-text"
                 >{{ item.title }}</span
               >
               <div v-else-if="index === 0">
-                {{ $t('admin.schule.schulenSelected', { count: selectedSchulen.length }) }}
+                {{ $t('admin.schule.schulenSelected', { count: selectedOrganisation.length }) }}
               </div>
             </template>
           </v-autocomplete>
@@ -408,7 +419,7 @@
           class="py-md-0"
         >
           <v-tooltip
-            :disabled="!!selectedSchulen.length"
+            :disabled="!!selectedOrganisation.length"
             location="top"
           >
             <template v-slot:activator="{ props }">
@@ -420,7 +431,7 @@
                   clearable
                   data-testid="klasse-select"
                   density="compact"
-                  :disabled="!selectedSchulen.length"
+                  :disabled="!selectedOrganisation.length"
                   hide-details
                   id="klasse-select"
                   :items="klassen"
@@ -449,8 +460,8 @@
                         >{{
                           $t(
                             'admin.klasse.klassenFound',
-                            { count: organisationStore.totalKlassen },
-                            organisationStore.totalKlassen,
+                            { count: organisationStore.totalPaginatedKlassen },
+                            organisationStore.totalPaginatedKlassen,
                           )
                         }}</span
                       >
