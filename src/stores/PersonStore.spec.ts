@@ -28,6 +28,8 @@ function getMockPersonendatensatz(): Personendatensatz {
       personalnummer: '9183756',
       isLocked: false,
       lockInfo: null,
+      revision: '1',
+      lastModified: '2024-12-22',
     },
   };
 }
