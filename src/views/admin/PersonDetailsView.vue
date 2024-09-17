@@ -449,6 +449,7 @@
     handleSubmit: handleSubmitChangePersonInfo,
     resetForm: resetFormChangePersonInfo,
     isFieldDirty: isFieldDirtyChangePersonInfo,
+    setFieldValue: setFieldValueChangePersonInfo,
   } = useForm<ChangePersonInfoForm>({
     validationSchema: changeKlasseValidationSchema,
   });
@@ -812,6 +813,8 @@
   // Triggers the template to start editing the person informations
   const triggerPersonInfoEdit = (): void => {
     isEditPersonInfoActive.value = true;
+    const personalnummer: string | null | undefined = personStore.currentPerson?.person.personalnummer;
+    setFieldValueChangePersonInfo('selectedKopersNrPersonInfo', personalnummer ?? '');
   };
 
   const cancelEditPersonInfo = (): void => {
@@ -819,11 +822,16 @@
     resetFormChangePersonInfo();
   };
 
+  // Handles the value emitted by PersonenInfoChange for the selectedKopersNr
+  function handleSelectedKopersNrUpdate(value: string | undefined): void {
+    selectedKopersNrPersonInfo.value = value;
+  }
+
   // Submit the form for changing person informations (Vorname, Nachname, KopersNr.)
   const onSubmitChangePersonInfo: (e?: Event | undefined) => Promise<void | undefined> = handleSubmitChangePersonInfo(
     () => {
-      if (selectedKopersNr.value) {
-        personStore.changePersonInfoById(currentPersonId, selectedKopersNr.value);
+      if (selectedKopersNrPersonInfo.value) {
+        personStore.changePersonInfoById(currentPersonId, selectedKopersNrPersonInfo.value);
       }
     },
   );
@@ -901,8 +909,8 @@
         :closable="false"
         :text="$t('admin.person.loadingErrorText')"
         :showButton="true"
-        :buttonText="$t('nav.backToList')"
-        :buttonAction="navigateToPersonTable"
+        :buttonText="alertButtonText"
+        :buttonAction="handleAlertClose"
         :title="$t('admin.person.loadingErrorTitle')"
         @update:modelValue="handleAlertClose"
       />
@@ -1048,8 +1056,12 @@
             @submit="onSubmitChangePersonInfo"
           >
             <PersonenInfoChange
+              :confirmUnsavedChangesAction="handleConfirmUnsavedChanges"
               :selectedKopersNrPersonInfoProps="selectedKopersNrPersonInfoProps"
               :selectedKopersNrPersonInfo="personStore.currentPerson?.person.personalnummer"
+              :showUnsavedChangesDialog="showUnsavedChangesDialog"
+              @update:selectedKopersNrPersonInfo="handleSelectedKopersNrUpdate"
+              @onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
             ></PersonenInfoChange>
             <v-row class="save-cancel-row ml-md-16 pt-5 justify-end">
               <v-col
@@ -1077,6 +1089,7 @@
                   data-testid="person-info-edit-save"
                   @click="handleSaveClick"
                   :block="mdAndDown"
+                  type="submit"
                 >
                   {{ $t('save') }}
                 </v-btn>
