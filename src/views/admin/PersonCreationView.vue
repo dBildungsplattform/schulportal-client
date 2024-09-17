@@ -145,7 +145,7 @@
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = formContext.defineField('selectedRolle', vuetifyConfig);
   const [selectedKopersNr, selectedKopersNrProps]: [
-    Ref<string | undefined>,
+    Ref<string | undefined | null>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = formContext.defineField('selectedKopersNr', vuetifyConfig);
   const [selectedVorname, selectedVornameProps]: [
@@ -292,7 +292,7 @@
     const bodyParams: CreatePersonBodyParams = {
       familienname: selectedFamilienname.value as string,
       vorname: selectedVorname.value as string,
-      personalnummer: selectedKopersNr.value,
+      personalnummer: selectedKopersNr.value as string,
       befristung: formattedBefristung,
       createPersonenkontexte: [
         {
@@ -509,7 +509,7 @@
             :hasNoKopersNr="hasNoKopersNr"
             v-model:selectedKopersNr="selectedKopersNr"
             :selectedKopersNrProps="selectedKopersNrProps"
-            @update:selectedKopersNr="(value?: string) => (selectedKopersNr = value)"
+            @update:selectedKopersNr="(value?: string | null) => (selectedKopersNr = value)"
             @update:hasNoKopersNr="(value: boolean) => (hasNoKopersNr = value)"
           ></KopersInput>
         </div>

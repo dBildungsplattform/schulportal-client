@@ -21,12 +21,12 @@
   const props: Props = defineProps<Props>();
 
   type Emits = {
-    (event: 'update:selectedKopersNrPersonInfo', value: string | undefined): void;
+    (event: 'update:selectedKopersNrPersonInfo', value: string | undefined | null): void;
     (event: 'onShowDialogChange', value?: boolean): void;
   };
   const emits: Emits = defineEmits<Emits>();
 
-  function handleSelectedKopersNrUpdate(value: string | undefined): void {
+  function handleSelectedKopersNrUpdate(value: string | undefined | null): void {
     emits('update:selectedKopersNrPersonInfo', value);
   }
 

@@ -12,7 +12,7 @@
 
   type Emits = {
     (event: 'update:hasNoKopersNr', value: boolean): void;
-    (event: 'update:selectedKopersNr', value: string | undefined): void;
+    (event: 'update:selectedKopersNr', value: string | undefined | null): void;
   };
 
   const props: Props = defineProps<Props>();
@@ -27,10 +27,8 @@
     }
   });
 
-  watch(selectedKopersNr, (newValue: string | undefined | null, oldValue: string | undefined | null) => {
-    if (newValue && newValue !== oldValue) {
-      emits('update:selectedKopersNr', newValue);
-    }
+  watch(selectedKopersNr, (newValue: string | undefined | null) => {
+    emits('update:selectedKopersNr', newValue);
   });
 </script>
 

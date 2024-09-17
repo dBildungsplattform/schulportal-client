@@ -103,6 +103,9 @@
   const changeKlasseConfirmationDialogMessage: Ref<string> = ref('');
   const canCommit: Ref<boolean> = ref(false);
   const hasNoKopersNr: Ref<boolean> = ref(false);
+  const changePersonInfoSuccessVisible: Ref<boolean> = ref(false);
+
+  const showNoKopersNrConfirmationDialog: Ref<boolean> = ref(false);
 
   const creationErrorText: Ref<string> = ref('');
   const creationErrorTitle: Ref<string> = ref('');
@@ -201,6 +204,13 @@
 
   let closeChangeKlasseSuccessDialog = (): void => {
     changeKlasseSuccessDialogVisible.value = false;
+    router.push(route).then(() => {
+      router.go(0);
+    });
+  };
+
+  let closeChangePersonInfoSuccessDialog = (): void => {
+    changePersonInfoSuccessVisible.value = false;
     router.push(route).then(() => {
       router.go(0);
     });
@@ -405,6 +415,7 @@
     return false;
   });
 
+  // Validation schema for the form for changing the Klasse (Versetzen)
   const changeKlasseValidationSchema: TypedSchema = toTypedSchema(
     object({
       selectedNewKlasse: string().when('selectedSchule', {
@@ -412,6 +423,13 @@
         then: (schema: StringSchema<string | undefined, AnyObject, undefined, ''>) =>
           schema.required(t('admin.klasse.rules.klasse.required')),
       }),
+    }),
+  );
+
+  // Validation schema for the form for changing KopersNr
+  const changePersonInfoValidationSchema: TypedSchema = toTypedSchema(
+    object({
+      selectedKopersNrPersonInfo: string().required(t('admin.person.rules.kopersNr.required')),
     }),
   );
 
@@ -425,7 +443,7 @@
   });
 
   const formContext: FormContext<ZuordnungCreationForm, ZuordnungCreationForm> = useForm({
-    validationSchema: getValidationSchema(t),
+    validationSchema: getValidationSchema(t, hasKopersNummer),
   });
 
   const {
@@ -460,7 +478,7 @@
     isFieldDirty: isFieldDirtyChangePersonInfo,
     setFieldValue: setFieldValueChangePersonInfo,
   } = useForm<ChangePersonInfoForm>({
-    validationSchema: changeKlasseValidationSchema,
+    validationSchema: changePersonInfoValidationSchema,
   });
 
   // Change Klasse Form
@@ -475,10 +493,11 @@
 
   // Change Person Info Form
   const [selectedKopersNrPersonInfo, selectedKopersNrPersonInfoProps]: [
-    Ref<string | undefined>,
+    Ref<string | undefined | null>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineFieldChangePersonInfo('selectedKopersNrPersonInfo', vuetifyConfig);
 
+  // Methods from utils that handle the Befristung events and sets up watchers
   const { handleBefristungUpdate, handleBefristungOptionUpdate, setupWatchers }: BefristungUtilsType =
     useBefristungUtils({
       formContext,
@@ -541,7 +560,13 @@
 
   // This will send the updated list of Zuordnungen to the Backend on TOP of the new added one through the form.
   async function confirmAddition(): Promise<void> {
-    await personenkontextStore.updatePersonenkontexte(finalZuordnungen.value, currentPersonId, selectedKopersNr.value);
+    if (selectedKopersNr.value !== null) {
+      await personenkontextStore.updatePersonenkontexte(
+        finalZuordnungen.value,
+        currentPersonId,
+        selectedKopersNr.value,
+      );
+    }
     createSuccessDialogVisible.value = !personenkontextStore.errorCode;
     formContext.resetForm();
   }
@@ -831,15 +856,17 @@
   };
 
   // Handles the value emitted by PersonenInfoChange for the selectedKopersNr
-  function handleSelectedKopersNrUpdate(value: string | undefined): void {
+  function handleSelectedKopersNrUpdate(value: string | undefined | null): void {
     selectedKopersNrPersonInfo.value = value;
   }
 
   // Submit the form for changing person informations (Vorname, Nachname, KopersNr.)
-  const onSubmitChangePersonInfo: (e?: Event | undefined) => Promise<void | undefined> = handleSubmitChangePersonInfo(
-    () => {
+  const onSubmitChangePersonInfo: (e?: Event) => Promise<Promise<void> | undefined> = handleSubmitChangePersonInfo(
+    async () => {
       if (selectedKopersNrPersonInfo.value) {
-        personStore.changePersonInfoById(currentPersonId, selectedKopersNrPersonInfo.value);
+        await personStore.changePersonInfoById(currentPersonId, selectedKopersNrPersonInfo.value);
+        changePersonInfoSuccessVisible.value = !personStore.errorCode;
+        resetFormChangePersonInfo();
       }
     },
   );
@@ -865,10 +892,16 @@
       blockedNext = next;
     } else {
       next();
-    };
+    }
   });
 
   setupWatchers();
+
+  watch(hasNoKopersNr, async (newValue: boolean) => {
+    if (newValue) {
+      showNoKopersNrConfirmationDialog.value = true;
+    }
+  });
 
   // Computed property to check if the second radio button should be disabled
   const isUnbefristetButtonDisabled: ComputedRef<boolean> = computed(() => {
@@ -924,7 +957,7 @@
         :closable="false"
         :text="$t('admin.person.loadingErrorText')"
         :showButton="true"
-        :buttonText="alertButtonText"
+        :buttonText="$t('nav.backToList')"
         :buttonAction="handleAlertClose"
         :title="$t('admin.person.loadingErrorTitle')"
         @update:modelValue="handleAlertClose"
@@ -1677,7 +1710,7 @@
                   :hasNoKopersNr="hasNoKopersNr"
                   v-model:selectedKopersNr="selectedKopersNr"
                   :selectedKopersNrProps="selectedKopersNrProps"
-                  @update:selectedKopersNr="(value?: string) => (selectedKopersNr = value)"
+                  @update:selectedKopersNr="(value?: string | null) => (selectedKopersNr = value)"
                   @update:hasNoKopersNr="(value: boolean) => (hasNoKopersNr = value)"
                 ></KopersInput>
               </v-container>
@@ -2004,6 +2037,48 @@
         </v-card-actions>
       </LayoutCard>
     </v-dialog>
+    <!-- Success Dialog after changing the Person Infos-->
+    <v-dialog
+      v-model="changePersonInfoSuccessVisible"
+      persistent
+      max-width="600px"
+    >
+      <LayoutCard
+        :closable="true"
+        :header="$t('admin.person.personalInfo')"
+        @onCloseClicked="closeChangePersonInfoSuccessDialog"
+      >
+        <v-card-text>
+          <v-container>
+            <v-row class="text-body bold px-md-12">
+              <v-col
+                offset="1"
+                cols="10"
+              >
+                <span>{{ $t('admin.person.personalInfoSuccessDialogMessage') }}</span>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card-text>
+        <v-card-actions class="justify-center">
+          <v-row class="justify-center">
+            <v-col
+              cols="12"
+              sm="6"
+              md="4"
+            >
+              <v-btn
+                :block="mdAndDown"
+                class="primary"
+                @click.stop="closeChangePersonInfoSuccessDialog"
+              >
+                {{ $t('close') }}
+              </v-btn>
+            </v-col>
+          </v-row>
+        </v-card-actions>
+      </LayoutCard>
+    </v-dialog>
     <!-- Confirmation Dialog after filling the form and adding the Zuordnung-->
     <v-dialog
       v-model="createZuordnungConfirmationDialogVisible"
@@ -2150,6 +2225,67 @@
                 @click.stop="closeCannotDeleteDialog"
               >
                 {{ $t('close') }}
+              </v-btn>
+            </v-col>
+          </v-row>
+        </v-card-actions>
+      </LayoutCard>
+    </v-dialog>
+
+    <v-dialog
+      v-model="showNoKopersNrConfirmationDialog"
+      persistent
+    >
+      <LayoutCard
+        v-if="showNoKopersNrConfirmationDialog"
+        :closable="false"
+        :header="$t('admin.person.noKopersNr')"
+      >
+        <v-card-text>
+          <v-container>
+            <v-row class="text-body bold px-md-16">
+              <v-col
+                offset="1"
+                cols="10"
+              >
+                <span data-testid="no-kopersnr-confirmation-text">
+                  {{ $t('admin.person.noKopersNrConfirmationDialogMessage') }}
+                </span>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card-text>
+        <v-card-actions class="justify-center">
+          <v-row class="justify-center">
+            <v-col
+              cols="12"
+              sm="6"
+              md="4"
+            >
+              <v-btn
+                :block="mdAndDown"
+                class="secondary"
+                @click.stop="
+                  showNoKopersNrConfirmationDialog = false;
+                  hasNoKopersNr = false;
+                "
+                data-testid="cancel-no-kopersnr-button"
+              >
+                {{ $t('cancel') }}
+              </v-btn>
+            </v-col>
+            <v-col
+              cols="12"
+              sm="6"
+              md="4"
+            >
+              <v-btn
+                :block="mdAndDown"
+                class="primary"
+                @click.stop="showNoKopersNrConfirmationDialog = false"
+                data-testid="confirm-no-kopersnr-button"
+              >
+                {{ $t('proceed') }}
               </v-btn>
             </v-col>
           </v-row>
