@@ -7,7 +7,12 @@ import {
 } from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
 import type { UserinfoPersonenkontext } from './PersonenkontextStore';
-import { StepUpLevel } from '@/router/routes';
+
+export enum StepUpLevel {
+  NONE = 'none',
+  SILVER = 'silver',
+  GOLD = 'gold',
+}
 
 export type UserInfo = {
   sub: string;

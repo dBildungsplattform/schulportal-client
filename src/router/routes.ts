@@ -1,10 +1,5 @@
+import { StepUpLevel } from '@/stores/AuthStore';
 import type { RouteRecordRaw } from 'vue-router';
-
-export enum StepUpLevel {
-  NONE = 'none',
-  SILVER = 'silver',
-  GOLD = 'gold',
-}
 
 const routes: readonly RouteRecordRaw[] = [
   {

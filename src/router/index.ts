@@ -1,10 +1,10 @@
 import { createRouter, createWebHistory, type RouteLocationNormalized, type Router } from 'vue-router';
-import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
+import { StepUpLevel, useAuthStore, type AuthStore } from '@/stores/AuthStore';
 import {
   useTwoFactorAuthentificationStore,
   type TwoFactorAuthentificationStore,
 } from '@/stores/TwoFactorAuthentificationStore';
-import routes, { StepUpLevel } from './routes';
+import routes from './routes';
 const router: Router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
