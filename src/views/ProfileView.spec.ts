@@ -1,17 +1,18 @@
-import { expect, test, beforeEach, describe } from 'vitest';
-import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
-import ProfileView from './ProfileView.vue';
-import { usePersonInfoStore, type PersonInfoResponse, type PersonInfoStore } from '@/stores/PersonInfoStore';
-import { nextTick } from 'vue';
+import { useAuthStore, type AuthStore, type UserInfo } from '@/stores/AuthStore';
 import { OrganisationsTyp } from '@/stores/OrganisationStore';
-import { createRouter, createMemoryHistory, type Router } from 'vue-router';
-import { useRoute } from 'vue-router';
-import type { RollenMerkmal } from '@/stores/RolleStore';
+import { usePersonInfoStore, type PersonInfoResponse, type PersonInfoStore } from '@/stores/PersonInfoStore';
 import { usePersonStore, type PersonStore, type PersonWithUebersicht } from '@/stores/PersonStore';
+import type { RollenMerkmal } from '@/stores/RolleStore';
+import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
+import { beforeEach, describe, expect, test } from 'vitest';
+import { nextTick } from 'vue';
+import { createMemoryHistory, createRouter, useRoute, type Router } from 'vue-router';
+import ProfileView from './ProfileView.vue';
 
 let wrapper: VueWrapper | null = null;
 let personInfoStore: PersonInfoStore;
 let personStore: PersonStore;
+let authStore: AuthStore;
 let router: Router;
 
 const mockPersonInfo: PersonInfoResponse = {
@@ -72,6 +73,31 @@ const mockPersonInfo2: PersonInfoResponse = {
   pid: '',
   personenkontexte: [],
   gruppen: [],
+};
+
+const passwordUpdatedAt: Date = new Date(2024, 9, 9);
+const mockCurrentUser: UserInfo = {
+  sub: mockPersonInfo.person.id,
+  name: null,
+  given_name: null,
+  family_name: null,
+  middle_name: null,
+  nickname: null,
+  preferred_username: null,
+  profile: null,
+  picture: null,
+  website: null,
+  email: null,
+  email_verified: null,
+  gender: null,
+  birthdate: null,
+  zoneinfo: null,
+  locale: null,
+  phone_number: null,
+  updated_at: null,
+  personId: null,
+  personenkontexte: null,
+  password_updated_at: passwordUpdatedAt.toISOString(),
 };
 
 const mockUebersicht: PersonWithUebersicht = {
@@ -150,6 +176,12 @@ beforeEach(async () => {
 
   personInfoStore = usePersonInfoStore();
   personStore = usePersonStore();
+  authStore = useAuthStore();
+
+  personInfoStore.personInfo = mockPersonInfo;
+  personStore.personenuebersicht = mockUebersicht;
+
+  authStore.currentUser = mockCurrentUser;
 
   router = createRouter({
     history: createMemoryHistory(),
@@ -235,6 +267,27 @@ describe('ProfileView', () => {
     expect(schoolCardText).toContain('Muster-Schule');
     expect(schoolCardText).toContain('Lehrer');
     expect(schoolCardText).toContain('10A');
+  });
+
+  test('it displays password data if there is any', async () => {
+    await nextTick();
+    if (!wrapper) return;
+    const container: DOMWrapper<Element> = wrapper.find('[data-testid="password-card"]');
+    const passwordCardText: string = container.text();
+    expect(passwordCardText).toContain(passwordUpdatedAt.getDate());
+    expect(passwordCardText).toContain(passwordUpdatedAt.getMonth());
+    expect(passwordCardText).toContain(passwordUpdatedAt.getFullYear());
+  });
+
+  test('it does not display password data if there is none', async () => {
+    authStore.currentUser!.password_updated_at = null;
+    await nextTick();
+    if (!wrapper) return;
+    const container: DOMWrapper<Element> = wrapper.find('[data-testid="password-card"]');
+    const passwordCardText: string = container.text();
+    expect(passwordCardText).not.toContain(passwordUpdatedAt.getDate());
+    expect(passwordCardText).not.toContain(passwordUpdatedAt.getMonth());
+    expect(passwordCardText).not.toContain(passwordUpdatedAt.getFullYear());
   });
 
   test('it displays 2FA data', async () => {
