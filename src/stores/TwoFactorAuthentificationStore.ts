@@ -4,7 +4,6 @@ import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import {
   Class2FAApiFactory,
   type AssignHardwareTokenBodyParams,
-  type AssignHardwareTokenResponse,
   type Class2FAApiInterface,
   type TokenInitBodyParams,
   type TokenRequiredResponse,
@@ -29,9 +28,7 @@ type TwoFactorActions = {
   get2FAState: (personId: string) => Promise<void>;
   get2FARequirement: (personId: string) => Promise<void>;
   get2FASoftwareQRCode: (personId: string) => Promise<void>;
-  assignHardwareToken: (
-    assignHardwareTokenBodyParams: AssignHardwareTokenBodyParams,
-  ) => Promise<AssignHardwareTokenResponse>;
+  assignHardwareToken: (assignHardwareTokenBodyParams: AssignHardwareTokenBodyParams) => Promise<void>;
   resetToken: (personId: string) => Promise<void>;
 };
 

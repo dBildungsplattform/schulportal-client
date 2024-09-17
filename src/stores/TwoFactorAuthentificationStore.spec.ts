@@ -1,9 +1,4 @@
-import type {
-  AssignHardwareTokenBodyParams,
-  AssignHardwareTokenResponse,
-  TokenRequiredResponse,
-  TokenStateResponse,
-} from '@/api-client/generated';
+import type { AssignHardwareTokenBodyParams, TokenRequiredResponse, TokenStateResponse } from '@/api-client/generated';
 import ApiService from '@/services/ApiService';
 import MockAdapter from 'axios-mock-adapter';
 import { createPinia, setActivePinia } from 'pinia';
@@ -166,8 +161,7 @@ describe('TwoFactorAuthentificationStore', () => {
     it('should assign hardware token and update state', async () => {
       mockadapter.onPost(url).reply(200);
 
-      const assignTokenPromise: Promise<AssignHardwareTokenResponse> =
-        twoFactorAuthenticationStore.assignHardwareToken(bodyParams);
+      const assignTokenPromise: Promise<void> = twoFactorAuthenticationStore.assignHardwareToken(bodyParams);
 
       expect(twoFactorAuthenticationStore.loading).toBe(true);
       await assignTokenPromise;
