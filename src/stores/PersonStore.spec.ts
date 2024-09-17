@@ -43,9 +43,9 @@ function getMockPersonendatensatzResponse(): PersonendatensatzResponse {
       geschlecht: '',
       lokalisierung: '',
       vertrauensstufe: Vertrauensstufe.Teil,
-      revision: '',
+      revision: '1',
       startpasswort: '',
-      lastModified: '2024-04-02',
+      lastModified: '2024-12-22',
     },
   };
 }
