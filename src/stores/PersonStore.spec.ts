@@ -43,6 +43,7 @@ function getMockPersonendatensatzResponse(): PersonendatensatzResponse {
       vertrauensstufe: Vertrauensstufe.Teil,
       revision: '',
       startpasswort: '',
+      lastModified: '2024-04-02',
     },
   };
 }
