@@ -2,6 +2,7 @@
   import type { DBiamPersonenzuordnungResponse } from '@/api-client/generated/api';
   import SpshTooltip from '@/components/admin/SpshTooltip.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
+  import SelfServiceWorkflow from '@/components/two-factor-authentication/SelfServiceWorkflow.vue';
   import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
   import { OrganisationsTyp } from '@/stores/OrganisationStore';
   import { usePersonInfoStore, type PersonInfoResponse, type PersonInfoStore } from '@/stores/PersonInfoStore';
@@ -586,7 +587,7 @@
                   <p v-else-if="twoFactorAuthentificationStore.tokenKind === TokenKind.hardware">
                     {{
                       $t('admin.person.twoFactorAuthentication.hardwareTokenIsSetUpSelfService', {
-                        serialNumber: twoFactorAuthentificationStore.tokenKind,
+                        serialNumber: twoFactorAuthentificationStore.serial,
                       })
                     }}
                   </p>
