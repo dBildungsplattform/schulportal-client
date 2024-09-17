@@ -83,10 +83,10 @@ export const useTwoFactorAuthentificationStore: StoreDefinition<
         }
 
         switch (twoFactorState.tokenKind) {
-          case 'hardware':
+          case TokenKind.hardware:
             this.tokenKind = TokenKind.hardware;
             break;
-          case 'software':
+          case TokenKind.software:
             this.tokenKind = TokenKind.software;
             break;
           default:
@@ -142,19 +142,16 @@ export const useTwoFactorAuthentificationStore: StoreDefinition<
         this.loading = false;
       }
     },
-    async assignHardwareToken(
-      assignHardwareTokenBodyParams: AssignHardwareTokenBodyParams,
-    ): Promise<AssignHardwareTokenResponse> {
+
+    async assignHardwareToken(assignHardwareTokenBodyParams: AssignHardwareTokenBodyParams): Promise<void> {
       this.loading = true;
       try {
-        const data: AssignHardwareTokenResponse = (
-          await twoFactorApi.privacyIdeaAdministrationControllerAssignHardwareToken(assignHardwareTokenBodyParams)
-        ).data;
-        return data;
+        await twoFactorApi.privacyIdeaAdministrationControllerAssignHardwareToken(assignHardwareTokenBodyParams);
       } finally {
         this.loading = false;
       }
     },
+
     async resetToken(personId: string): Promise<void> {
       this.loading = true;
       try {
