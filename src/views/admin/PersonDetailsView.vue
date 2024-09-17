@@ -31,7 +31,7 @@
   import { type TranslatedObject } from '@/types.d';
   import TokenReset from '@/components/two-factor-authentication/TokenReset.vue';
   import { toTypedSchema } from '@vee-validate/yup';
-  import { useForm, type BaseFieldProps, type TypedSchema } from 'vee-validate';
+  import { useForm, type BaseFieldProps, type FormContext, type TypedSchema } from 'vee-validate';
   import KopersInput from '@/components/admin/personen/KopersInput.vue';
   import { computed, onBeforeMount, onMounted, onUnmounted, ref, watch, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
@@ -47,10 +47,18 @@
   import { useDisplay } from 'vuetify';
   import { object, string, StringSchema, type AnyObject } from 'yup';
   import {
+    TokenKind,
     useTwoFactorAuthentificationStore,
     type TwoFactorAuthentificationStore,
   } from '@/stores/TwoFactorAuthentificationStore';
   import PersonenInfoChange from '@/components/admin/personen/PersonenInfoChange.vue';
+  import { getNextSchuljahresende, formatDateToISO, formatDate } from '@/utils/date';
+  import { isBefristungspflichtRolle, useBefristungUtils, type BefristungUtilsType } from '@/utils/befristung';
+  import {
+    getPersonenkontextFieldDefinitions,
+    getValidationSchema,
+    type PersonenkontextFieldDefinitions,
+  } from '@/utils/validationPersonenkontext';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
@@ -101,6 +109,7 @@
 
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
   let blockedNext: () => void = () => {};
+  const calculatedBefristung: Ref<string | undefined> = ref('');
 
   function navigateToPersonTable(): void {
     router.push({ name: 'person-management' });
@@ -266,7 +275,7 @@
   const alertButtonAction: ComputedRef<() => void> = computed(() => {
     return personenkontextStore.errorCode === 'PERSON_NOT_FOUND' ? navigateToPersonTable : (): void => router.go(0);
   });
-  function getSskName(sskDstNr: string, sskName: string): string {
+  function getSskName(sskDstNr: string | undefined, sskName: string): string {
     /* truncate ssk name */
     const truncatededSskName: string = sskName.length > 30 ? `${sskName.substring(0, 30)}...` : sskName;
 
@@ -320,8 +329,11 @@
     result
       .sort((a: Zuordnung, b: Zuordnung) => (a.klasse && b.klasse ? a.klasse.localeCompare(b.klasse) : 0))
       .sort((a: Zuordnung, b: Zuordnung) => a.rolle.localeCompare(b.rolle))
-      .sort((a: Zuordnung, b: Zuordnung) => a.sskDstNr.localeCompare(b.sskDstNr));
-
+      .sort((a: Zuordnung, b: Zuordnung) => {
+        if (a.sskDstNr === undefined) return 1;
+        if (b.sskDstNr === undefined) return -1;
+        return a.sskDstNr.localeCompare(b.sskDstNr);
+      });
     return result;
   }
 
@@ -335,6 +347,8 @@
     selectedRolle: string;
     selectedOrganisation: string;
     selectedKlasse: string;
+    selectedBefristung: Date;
+    selectedBefristungOption: string;
     selectedKopersNr?: string;
   };
 
@@ -355,6 +369,7 @@
     return !!rolle && rolle.rollenart === RollenArt.Lern;
   }
 
+  // Used for the form
   function isKopersRolle(selectedRolleId: string | undefined): boolean {
     const rolle: TranslatedRolleWithAttrs | undefined = rollen.value?.find(
       (r: TranslatedRolleWithAttrs) => r.value === selectedRolleId,
@@ -366,6 +381,7 @@
     return !!personStore.currentPerson?.person.personalnummer;
   });
 
+  // Used on mount to check the retrieved Zuordnungen and if any of them has a Koperspflicht Merkmal
   const hasKopersRolle: ComputedRef<boolean> = computed(() => {
     return (
       !!zuordnungenResult.value?.find((zuordnung: Zuordnung) => {
@@ -389,23 +405,6 @@
     return false;
   });
 
-  const zuordnungFormValidationSchema: TypedSchema = toTypedSchema(
-    object({
-      selectedRolle: string().required(t('admin.rolle.rules.rolle.required')),
-      selectedOrganisation: string().required(t('admin.organisation.rules.organisation.required')),
-      selectedKlasse: string().when('selectedRolle', {
-        is: (selectedRolleId: string) => isLernRolle(selectedRolleId),
-        then: (schema: StringSchema<string | undefined, AnyObject, undefined, ''>) =>
-          schema.required(t('admin.klasse.rules.klasse.required')),
-      }),
-      selectedNewKlasse: string().when('selectedSchule', {
-        is: (selectedSchule: string) => selectedSchule,
-        then: (schema: StringSchema<string | undefined, AnyObject, undefined, ''>) =>
-          schema.required(t('admin.klasse.rules.klasse.required')),
-      }),
-    }),
-  );
-
   const changeKlasseValidationSchema: TypedSchema = toTypedSchema(
     object({
       selectedNewKlasse: string().when('selectedSchule', {
@@ -425,14 +424,24 @@
     },
   });
 
-  // eslint-disable-next-line @typescript-eslint/typedef
-  const {
-    defineField: defineFieldZuordnung,
-    handleSubmit: handleSubmitZuordnungForm,
-    resetForm: resetZuordnungForm,
-  } = useForm<ZuordnungCreationForm>({
-    validationSchema: zuordnungFormValidationSchema,
+  const formContext: FormContext<ZuordnungCreationForm, ZuordnungCreationForm> = useForm({
+    validationSchema: getValidationSchema(t),
   });
+
+  const {
+    selectedRolle,
+    selectedRolleProps,
+    selectedOrganisation,
+    selectedOrganisationProps,
+    selectedKlasse,
+    selectedKlasseProps,
+    selectedBefristung,
+    selectedBefristungProps,
+    selectedBefristungOption,
+    selectedBefristungOptionProps,
+    selectedKopersNr,
+    selectedKopersNrProps,
+  }: PersonenkontextFieldDefinitions = getPersonenkontextFieldDefinitions(formContext);
 
   // eslint-disable-next-line @typescript-eslint/typedef
   const {
@@ -454,24 +463,6 @@
     validationSchema: changeKlasseValidationSchema,
   });
 
-  // Add Zuordnung Form
-  const [selectedRolle, selectedRolleProps]: [
-    Ref<string | undefined>,
-    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineFieldZuordnung('selectedRolle', vuetifyConfig);
-  const [selectedOrganisation, selectedOrganisationProps]: [
-    Ref<string | undefined>,
-    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineFieldZuordnung('selectedOrganisation', vuetifyConfig);
-  const [selectedKlasse, selectedKlasseProps]: [
-    Ref<string | undefined>,
-    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineFieldZuordnung('selectedKlasse', vuetifyConfig);
-  const [selectedKopersNr, selectedKopersNrProps]: [
-    Ref<string | undefined>,
-    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineFieldZuordnung('selectedKopersNr', vuetifyConfig);
-
   // Change Klasse Form
   const [selectedSchule, selectedSchuleProps]: [
     Ref<string | undefined>,
@@ -487,6 +478,15 @@
     Ref<string | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineFieldChangePersonInfo('selectedKopersNrPersonInfo', vuetifyConfig);
+
+  const { handleBefristungUpdate, handleBefristungOptionUpdate, setupWatchers }: BefristungUtilsType =
+    useBefristungUtils({
+      formContext,
+      selectedBefristung,
+      selectedBefristungOption,
+      calculatedBefristung,
+      selectedRolle,
+    });
 
   // Triggers the template to start editing
   const triggerEdit = (): void => {
@@ -522,7 +522,7 @@
     selectedZuordnungen.value = [];
     isZuordnungFormActive.value = false;
     isChangeKlasseFormActive.value = false;
-    resetZuordnungForm();
+    formContext.resetForm();
     resetChangeKlasseForm();
     zuordnungenResult.value = originalZuordnungenResult.value
       ? JSON.parse(JSON.stringify(originalZuordnungenResult.value))
@@ -543,7 +543,7 @@
   async function confirmAddition(): Promise<void> {
     await personenkontextStore.updatePersonenkontexte(finalZuordnungen.value, currentPersonId, selectedKopersNr.value);
     createSuccessDialogVisible.value = !personenkontextStore.errorCode;
-    resetZuordnungForm();
+    formContext.resetForm();
   }
 
   // This will send the updated list of Zuordnungen to the Backend with the selected Zuordnung but with the new Klasse.
@@ -629,23 +629,21 @@
     changeKlasseConfirmationDialogVisible.value = true;
   });
 
-  const onSubmitCreateZuordnung: (e?: Event | undefined) => Promise<void | undefined> = handleSubmitZuordnungForm(
-    () => {
-      if (selectedRolle.value) {
-        if (isLernRolle(selectedRolle.value)) {
-          createZuordnungConfirmationDialogMessage.value = t('person.addZuordnungKlasseConfirmation', {
-            rollenname: selectedRolleTitle.value,
-            klassenname: selectedKlasseTitle.value,
-          });
-        } else {
-          createZuordnungConfirmationDialogMessage.value = t('person.addZuordnungConfirmation', {
-            rollenname: selectedRolleTitle.value,
-          });
-        }
-        createZuordnungConfirmationDialogVisible.value = true;
+  const onSubmitCreateZuordnung: (e?: Event | undefined) => Promise<void | undefined> = formContext.handleSubmit(() => {
+    if (selectedRolle.value) {
+      if (isLernRolle(selectedRolle.value)) {
+        createZuordnungConfirmationDialogMessage.value = t('person.addZuordnungKlasseConfirmation', {
+          rollenname: selectedRolleTitle.value,
+          klassenname: selectedKlasseTitle.value,
+        });
+      } else {
+        createZuordnungConfirmationDialogMessage.value = t('person.addZuordnungConfirmation', {
+          rollenname: selectedRolleTitle.value,
+        });
       }
-    },
-  );
+      createZuordnungConfirmationDialogVisible.value = true;
+    }
+  });
 
   const confirmDialogAddition = async (): Promise<void> => {
     createZuordnungConfirmationDialogVisible.value = false;
@@ -662,6 +660,13 @@
       (k: Organisation) => k.id === selectedKlasse.value,
     );
 
+    const befristungDate: string | undefined = selectedBefristung.value
+      ? selectedBefristung.value
+      : calculatedBefristung.value;
+
+    // Format the date in ISO 8601 format if it exists
+    const formattedBefristung: string | undefined = befristungDate ? formatDateToISO(befristungDate) : undefined;
+
     if (organisation) {
       newZuordnung.value = {
         sskId: organisation.id,
@@ -675,6 +680,7 @@
         editable: true,
         merkmale: [] as unknown as RollenMerkmal,
         typ: OrganisationsTyp.Schule,
+        befristung: formattedBefristung,
       };
       if (zuordnungenResult.value) {
         finalZuordnungen.value = zuordnungenResult.value;
@@ -694,6 +700,7 @@
           editable: true,
           typ: OrganisationsTyp.Klasse,
           merkmale: [] as unknown as RollenMerkmal,
+          befristung: formattedBefristung,
         });
       }
 
@@ -710,6 +717,7 @@
             editable: true,
             merkmale: [] as unknown as RollenMerkmal,
             typ: OrganisationsTyp.Klasse,
+            befristung: existingKlasse.befristung,
           });
         });
       }
@@ -857,7 +865,14 @@
       blockedNext = next;
     } else {
       next();
-    }
+    };
+  });
+
+  setupWatchers();
+
+  // Computed property to check if the second radio button should be disabled
+  const isUnbefristetButtonDisabled: ComputedRef<boolean> = computed(() => {
+    return isBefristungspflichtRolle(selectedRolle.value);
   });
 
   onBeforeMount(async () => {
@@ -1029,7 +1044,10 @@
                 cols="5"
               >
                 <span
-                  :class="`${hasKopersRolle && personStore.currentPerson.person.personalnummer ? 'subtitle-2' : 'subtitle-2 text-red'}`"
+                  :class="{
+                    'subtitle-2': true,
+                    'text-red': hasKopersRolle && !personStore.currentPerson.person.personalnummer,
+                  }"
                 >
                   {{ $t('person.kopersNr') }}:
                 </span>
@@ -1039,7 +1057,10 @@
                 data-testid="person-kopersnr"
               >
                 <span
-                  :class="`${hasKopersRolle && personStore.currentPerson.person.personalnummer ? 'text-body' : 'text-body text-red'}`"
+                  :class="{
+                    'text-body': true,
+                    'text-red': hasKopersRolle && !personStore.currentPerson.person.personalnummer,
+                  }"
                 >
                   {{ personStore.currentPerson.person.personalnummer ?? $t('missing') }}
                 </span>
@@ -1154,10 +1175,10 @@
                   ></v-icon>
                 </v-col>
                 <div class="v-col">
-                  <p v-if="twoFactorAuthentificationStore.tokenKind === 'software'">
+                  <p v-if="twoFactorAuthentificationStore.tokenKind === TokenKind.software">
                     {{ $t('admin.person.twoFactorAuthentication.softwareTokenIsSetUp') }}
                   </p>
-                  <p v-if="twoFactorAuthentificationStore.tokenKind === 'hardware'">
+                  <p v-if="twoFactorAuthentificationStore.tokenKind === TokenKind.hardware">
                     {{ $t('admin.person.twoFactorAuthentication.hardwareTokenIsSetUp') }}
                   </p>
                   <p v-if="twoFactorAuthentificationStore.serial">
@@ -1299,10 +1320,11 @@
               :data-testid="`person-zuordnung-${zuordnung.sskId}`"
               :title="zuordnung.sskName"
             >
-              <span class="text-body"
-                >{{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
-                {{ zuordnung.klasse }}</span
-              >
+              <span class="text-body">
+                {{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
+                {{ zuordnung.klasse }}
+                <span v-if="zuordnung.befristung"> ({{ formatDate(zuordnung.befristung, t) }})</span>
+              </span>
             </v-col>
           </v-row>
           <!-- Display 'Keine Zuordnungen gefunden' if the above condition is false -->
@@ -1372,6 +1394,17 @@
                   >
                     {{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
                     {{ zuordnung.klasse }}
+                    <span
+                      v-if="
+                        zuordnung.befristung &&
+                        newZuordnung &&
+                        zuordnung.sskId === newZuordnung.sskId &&
+                        zuordnung.rolleId === newZuordnung.rolleId
+                      "
+                      class="text-body text-green"
+                    >
+                      ({{ formatDate(zuordnung.befristung, t) }})</span
+                    >
                     <span
                       v-if="
                         newZuordnung &&
@@ -1611,7 +1644,7 @@
               <v-container class="px-lg-16">
                 <!-- Organisation, Rolle, Klasse zuordnen -->
                 <PersonenkontextCreate
-                  ref="personenkontext-creation-form"
+                  ref="personenkontext-create"
                   :showHeadline="false"
                   :organisationen="organisationen"
                   :rollen="filteredRollen"
@@ -1619,6 +1652,15 @@
                   :selectedOrganisationProps="selectedOrganisationProps"
                   :selectedRolleProps="selectedRolleProps"
                   :selectedKlasseProps="selectedKlasseProps"
+                  :befristungInputProps="{
+                    befristungProps: selectedBefristungProps,
+                    befristungOptionProps: selectedBefristungOptionProps,
+                    isUnbefristetDisabled: isUnbefristetButtonDisabled,
+                    isBefristungRequired: isBefristungspflichtRolle(selectedRolle),
+                    nextSchuljahresende: getNextSchuljahresende(),
+                    befristung: selectedBefristung,
+                    befristungOption: selectedBefristungOption,
+                  }"
                   v-model:selectedOrganisation="selectedOrganisation"
                   v-model:selectedRolle="selectedRolle"
                   v-model:selectedKlasse="selectedKlasse"
@@ -1626,6 +1668,8 @@
                   @update:selectedRolle="(value?: string) => (selectedRolle = value)"
                   @update:selectedKlasse="(value?: string) => (selectedKlasse = value)"
                   @update:canCommit="canCommit = $event"
+                  @update:befristung="handleBefristungUpdate"
+                  @update:calculatedBefristungOption="handleBefristungOptionUpdate"
                   @fieldReset="handleFieldReset"
                 />
                 <KopersInput

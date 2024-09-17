@@ -1,4 +1,4 @@
-import { expect, test } from 'vitest';
+import { expect, test, type Mock } from 'vitest';
 import { VueWrapper, mount } from '@vue/test-utils';
 import StartView from './StartView.vue';
 import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
@@ -32,6 +32,13 @@ const mockProviders: Array<ServiceProvider> = [
     hasLogo: false,
   },
 ];
+
+const locationMock: Mock = vi.fn(() => ({
+  pathname: 'test',
+  search: '?query',
+}));
+
+vi.stubGlobal('location', locationMock);
 
 beforeEach(() => {
   document.body.innerHTML = `
