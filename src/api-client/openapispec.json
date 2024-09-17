@@ -3653,6 +3653,10 @@
             "items": {
               "$ref": "#/components/schemas/PersonenkontextRolleFieldsResponse"
             }
+          },
+          "acr": {
+            "type": "string",
+            "nullable": false
           }
         },
         "required": [
@@ -3676,7 +3680,8 @@
           "phone_number",
           "updated_at",
           "password_updated_at",
-          "personenkontexte"
+          "personenkontexte",
+          "acr"
         ]
       },
       "PersonNameParams": {
