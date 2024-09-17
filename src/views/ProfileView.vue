@@ -186,7 +186,6 @@
     await personInfoStore.initPersonInfo();
     await personStore.getPersonenuebersichtById(personInfoStore.personInfo?.person.id ?? '');
     await twoFactorAuthenticationStore.get2FARequirement(personInfoStore.personInfo?.person.id ?? '');
-    await personStore.getPersonenuebersichtById(personInfoStore.personInfo?.person.id ?? '');
   }
 
   function setupPersonalData(): void {
