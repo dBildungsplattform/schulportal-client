@@ -460,7 +460,7 @@
   });
 
   const formContext: FormContext<ZuordnungCreationForm, ZuordnungCreationForm> = useForm({
-    validationSchema: getValidationSchema(t, hasNoKopersNr),
+    validationSchema: getValidationSchema(t, hasNoKopersNr, hasKopersNummer),
   });
 
   const {
@@ -920,6 +920,15 @@
     }
   });
 
+  // Checks if the entered KopersNr is the same one that is already assigned to the user.
+  // This is used to disable the save button in that case (To avoid errors).
+  const hasSameKopersNr: ComputedRef<boolean> = computed(() => {
+      if(selectedKopersNrPersonInfo.value === personStore.currentPerson?.person.personalnummer) {
+        return true;
+      }
+      return false;
+  });
+
   // Computed property to check if the second radio button should be disabled
   const isUnbefristetButtonDisabled: ComputedRef<boolean> = computed(() => {
     return isBefristungspflichtRolle(selectedRolle.value);
@@ -1155,8 +1164,15 @@
                 sm="6"
                 md="auto"
               >
+              <SpshTooltip
+                    :enabledCondition="!hasSameKopersNr"
+                    :disabledText="$t('person.changeKopersDisabledDescription')" 
+                    :enabledText="$t('save')"
+                    position="start"
+                  >
                 <v-btn
                   class="primary small"
+                  :disabled ="hasSameKopersNr"
                   data-testid="person-info-edit-save"
                   @click="handleSaveClick"
                   :block="mdAndDown"
@@ -1164,6 +1180,7 @@
                 >
                   {{ $t('save') }}
                 </v-btn>
+                </SpshTooltip>
               </v-col>
             </v-row>
           </v-form>

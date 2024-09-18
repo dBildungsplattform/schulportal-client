@@ -65,6 +65,7 @@ function isKopersRolle(selectedRolleId: string | undefined): boolean {
 export const getValidationSchema = (
   t: (key: string) => string,
   hasNoKopersNr: Ref<boolean | undefined>,
+  hasKopersNummer: Ref<boolean>,
 ): TypedSchema<ZuordnungCreationForm> => {
   return toTypedSchema(
     object({
@@ -80,7 +81,8 @@ export const getValidationSchema = (
           schema.required(t('admin.klasse.rules.klasse.required')),
       }),
       selectedKopersNr: string().when('selectedRolle', {
-        is: (selectedRolleId: string) => isKopersRolle(selectedRolleId) && !hasNoKopersNr.value,
+        is: (selectedRolleId: string) =>
+          isKopersRolle(selectedRolleId) && !hasNoKopersNr.value && !hasKopersNummer.value,
         then: (schema: StringSchema<string | undefined, AnyObject, undefined, ''>) =>
           schema.required(t('admin.person.rules.kopersNr.required')),
       }),
