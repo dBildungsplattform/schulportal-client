@@ -181,7 +181,6 @@
 
   async function initializeStores(): Promise<void> {
     await personInfoStore.initPersonInfo();
-    await personStore.getPersonById(personInfoStore.personInfo?.person.id ?? '');
     await personStore.getPersonenuebersichtById(personInfoStore.personInfo?.person.id ?? '');
   }
 
@@ -269,8 +268,8 @@
     hasKoPersMerkmalCheck();
     setupPersonalData();
     setupSchuleData();
-    if (personStore.currentPerson?.person.id) {
-      await twoFactorAuthentificationStore.get2FAState(personStore.currentPerson.person.id);
+    if (personInfoStore.personInfo?.person.id) {
+      await twoFactorAuthentificationStore.get2FAState(personInfoStore.personInfo.person.id);
     }
   });
 </script>
@@ -559,8 +558,8 @@
             </v-row>
             <div>
               <SelfServiceWorkflow
-                :personId="personStore.currentPerson?.person.id ?? ''"
-                @dialogClosed="twoFactorAuthentificationStore.get2FAState(personStore.currentPerson?.person.id ?? '')"
+                :personId="personInfoStore.personInfo?.person.id ?? ''"
+                @dialogClosed="twoFactorAuthentificationStore.get2FAState(personInfoStore.personInfo?.person.id ?? '')"
               >
               </SelfServiceWorkflow>
             </div>
