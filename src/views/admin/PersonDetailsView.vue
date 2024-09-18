@@ -1013,7 +1013,9 @@
                 </v-col>
                 <v-col>
                   <template v-if="twoFactorAuthentificationStore.errorCode">
-                    {{ t('admin.person.twoFactorAuthentication.errors.connection') }}
+                    <p class="mr-lg-13">
+                      {{ t('admin.person.twoFactorAuthentication.errors.connection') }}
+                    </p>
                   </template>
                   <template v-else>
                     <p v-if="twoFactorAuthentificationStore.tokenKind === TokenKind.software">
