@@ -1812,14 +1812,14 @@
         "parameters": [{ "name": "personId", "required": true, "in": "query", "schema": { "type": "string" } }],
         "responses": {
           "201": {
-            "description": "The token was successfully created.",
+            "description": "The token state was successfully returned.",
             "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TokenStateResponse" } } }
           },
           "400": { "description": "A username was not given or not found." },
-          "401": { "description": "Not authorized to create token." },
-          "403": { "description": "Insufficient permissions to create token." },
-          "404": { "description": "Insufficient permissions to create token." },
-          "500": { "description": "Internal server error while creating a token." }
+          "401": { "description": "Not authorized to get token state." },
+          "403": { "description": "Insufficient permissions to get token state." },
+          "404": { "description": "Insufficient permissions to get token state." },
+          "500": { "description": "Internal server error while retrieving token state." }
         },
         "tags": ["2FA"],
         "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
@@ -1866,6 +1866,25 @@
           "403": { "description": "Insufficient permissions to reset token." },
           "404": { "description": "Insufficient permissions to assign hardware token." },
           "500": { "description": "Internal server error while assigning a hardware token." }
+        },
+        "tags": ["2FA"],
+        "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
+      }
+    },
+    "/api/2fa-token/required": {
+      "get": {
+        "operationId": "PrivacyIdeaAdministrationController_requiresTwoFactorAuthentication",
+        "parameters": [{ "name": "personId", "required": true, "in": "query", "schema": { "type": "string" } }],
+        "responses": {
+          "200": {
+            "description": "The requirement was successfully returned.",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TokenRequiredResponse" } } }
+          },
+          "400": { "description": "A username was not given or not found." },
+          "401": { "description": "Not authorized to get requirement information." },
+          "403": { "description": "Insufficient permissions to get requirement information." },
+          "404": { "description": "Insufficient permissions to get requirement information." },
+          "500": { "description": "Internal server error while getting requirement information." }
         },
         "tags": ["2FA"],
         "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
@@ -2534,9 +2553,10 @@
           "target": { "$ref": "#/components/schemas/ServiceProviderTarget" },
           "url": { "type": "string", "description": "Can be undefined, if `target` is not equal to `URL`" },
           "kategorie": { "$ref": "#/components/schemas/ServiceProviderKategorie" },
-          "hasLogo": { "type": "boolean" }
+          "hasLogo": { "type": "boolean" },
+          "requires2fa": { "type": "boolean" }
         },
-        "required": ["id", "name", "target", "url", "kategorie", "hasLogo"]
+        "required": ["id", "name", "target", "url", "kategorie", "hasLogo", "requires2fa"]
       },
       "UpdateRolleBodyParams": {
         "type": "object",
@@ -2853,6 +2873,11 @@
           "dialogText": { "type": "string" }
         },
         "required": ["id", "jsonrpc", "time", "version", "versionnumber", "signature", "dialogText"]
+      },
+      "TokenRequiredResponse": {
+        "type": "object",
+        "properties": { "required": { "type": "boolean" } },
+        "required": ["required"]
       }
     }
   }
