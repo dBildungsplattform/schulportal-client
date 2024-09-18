@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { computed, ref, type ComputedRef, type Ref } from 'vue';
+  import { computed, nextTick, ref, type ComputedRef, type Ref } from 'vue';
   import { useDisplay } from 'vuetify';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import SpshTooltip from '@/components/admin/SpshTooltip.vue';
@@ -19,6 +19,7 @@
     Verify = 'verify',
   }
 
+  const otpInput: Ref<HTMLElement | null> = ref<HTMLElement | null>(null);
   const workflowStep: Ref<TwoFactorSteps> = ref(TwoFactorSteps.Start);
   const errorMessage: Ref<string> = ref('');
   const otp: Ref<string> = ref('');
@@ -74,6 +75,9 @@
         break;
       case TwoFactorSteps.QRCode:
         workflowStep.value = TwoFactorSteps.Verify;
+        nextTick(() => {
+          otpInput.value?.focus();
+        });
         break;
       case TwoFactorSteps.Verify:
         await twoFactorStore.verify2FAToken(props.personId, otp.value);
@@ -204,9 +208,11 @@
 
                 <v-row class="justify-center">
                   <v-otp-input
+                    ref="otpInput"
                     v-model="otp"
                     :error="errorMessage.length > 0"
                     @input="resetErrorMessage()"
+                    @keydown.enter="proceedToNextWorkflowStep(isActive)"
                   >
                   </v-otp-input>
                 </v-row>
