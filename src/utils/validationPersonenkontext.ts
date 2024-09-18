@@ -81,10 +81,15 @@ export const getValidationSchema = (
           schema.required(t('admin.klasse.rules.klasse.required')),
       }),
       selectedKopersNr: string().when('selectedRolle', {
-        is: (selectedRolleId: string) =>
-          isKopersRolle(selectedRolleId) && !hasNoKopersNr.value && !hasKopersNummer.value,
+        is: (selectedRolleId: string) => {
+          // Check if the selected role requires a KopersNr
+          return isKopersRolle(selectedRolleId) && !hasKopersNummer.value;
+        },
+        // Now apply the conditional logic based on `hasNoKopersNr`
         then: (schema: StringSchema<string | undefined, AnyObject, undefined, ''>) =>
-          schema.required(t('admin.person.rules.kopersNr.required')),
+          hasNoKopersNr.value
+            ? schema // If the user checked "I don't have one" checkbox, KopersNr is not required
+            : schema.required(t('admin.person.rules.kopersNr.required')), // KopersNr is required if "I don't have one" is not checked
       }),
       selectedBefristung: string()
         .matches(DDMMYYYY, t('admin.befristung.rules.format')) // Ensure the date matches the DDMMYYYY format
