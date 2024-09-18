@@ -40,11 +40,11 @@
     labelAndValues: LabelValue[];
   };
 
-  let personInfoStore: PersonInfoStore = usePersonInfoStore();
-  let twoFactorAuthenticationStore: TwoFactorAuthentificationStore = useTwoFactorAuthentificationStore();
+  const personInfoStore: PersonInfoStore = usePersonInfoStore();
+  const twoFactorAuthenticationStore: TwoFactorAuthentificationStore = useTwoFactorAuthentificationStore();
+  const personStore: PersonStore = usePersonStore();
+  const authStore: AuthStore = useAuthStore();
 
-  let personStore: PersonStore = usePersonStore();
-  let authStore: AuthStore = useAuthStore();
   const personalData: Ref = ref<LabelValue[]>([]);
   const schulDaten: Ref = ref<SchulDaten[]>([]);
   const hasKoPersMerkmal: Ref = ref<boolean>(false);
@@ -179,10 +179,6 @@
   }
 
   async function initializeStores(): Promise<void> {
-    personInfoStore = usePersonInfoStore();
-    twoFactorAuthenticationStore = useTwoFactorAuthentificationStore();
-    personStore = usePersonStore();
-    authStore = useAuthStore();
     await personInfoStore.initPersonInfo();
     await personStore.getPersonenuebersichtById(personInfoStore.personInfo?.person.id ?? '');
     await twoFactorAuthenticationStore.get2FARequirement(personInfoStore.personInfo?.person.id ?? '');
