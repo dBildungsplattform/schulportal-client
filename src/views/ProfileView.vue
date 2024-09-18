@@ -40,10 +40,11 @@
     labelAndValues: LabelValue[];
   };
 
-  let personInfoStore: PersonInfoStore = usePersonInfoStore();
-  let personStore: PersonStore = usePersonStore();
-  let authStore: AuthStore = useAuthStore();
-  let twoFactorAuthenticationStore: TwoFactorAuthentificationStore = useTwoFactorAuthentificationStore();
+  const personInfoStore: PersonInfoStore = usePersonInfoStore();
+  const personStore: PersonStore = usePersonStore();
+  const authStore: AuthStore = useAuthStore();
+  const twoFactorAuthenticationStore: TwoFactorAuthentificationStore = useTwoFactorAuthentificationStore();
+
   const personalData: Ref = ref<LabelValue[]>([]);
   const schulDaten: Ref = ref<SchulDaten[]>([]);
   const hasKoPersMerkmal: Ref = ref<boolean>(false);
@@ -184,11 +185,9 @@
   }
 
   async function initializeStores(): Promise<void> {
-    personInfoStore = usePersonInfoStore();
-    personStore = usePersonStore();
-    authStore = useAuthStore();
     await personInfoStore.initPersonInfo();
     await personStore.getPersonenuebersichtById(personInfoStore.personInfo?.person.id ?? '');
+    await twoFactorAuthenticationStore.get2FAState(personInfoStore.personInfo?.person.id ?? '');
   }
 
   function setupPersonalData(): void {
@@ -540,33 +539,40 @@
           :headline-test-id="'two-factor-card'"
           :header="$t('profile.twoFactorAuth')"
         >
-          <v-row class="ma-3 d-flex align-content-center justify-center ga-4">
+          <v-row
+            align="center"
+            justify="center"
+            class="ma-3 ga-4"
+          >
             <v-icon
               size="x-large"
-              class="w-100"
               icon="mdi-shield-account-outline"
               data-testid="two-factor-icon"
             ></v-icon>
-            <v-col>
-              <p
-                v-if="twoFactorAuthError"
-                class="pt-4 text-center text-body-1 text-medium-emphasis"
-              >
-                <v-icon
-                  color="warning"
-                  icon="mdi-alert-outline"
-                ></v-icon>
-                {{ twoFactorAuthError }}
-              </p>
-              <v-btn
-                v-else
-                color="primary"
-                disabled
-                data-testid="setup-two-factor-button"
-              >
-                {{ $t('profile.setupTwoFactorAuth') }}
-              </v-btn>
-            </v-col>
+          </v-row>
+          <v-row
+            align="center"
+            justify="center"
+            class="ma-3 ga-4"
+          >
+            <p
+              v-if="twoFactorAuthError"
+              class="pt-4 text-center text-body-1 text-medium-emphasis"
+            >
+              <v-icon
+                color="warning"
+                icon="mdi-alert-outline"
+              ></v-icon>
+              {{ twoFactorAuthError }}
+            </p>
+            <v-btn
+              v-else
+              color="primary"
+              disabled
+              data-testid="setup-two-factor-button"
+            >
+              {{ $t('profile.setupTwoFactorAuth') }}
+            </v-btn>
           </v-row>
         </LayoutCard>
       </v-col>

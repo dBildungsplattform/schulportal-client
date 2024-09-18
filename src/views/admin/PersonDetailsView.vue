@@ -1042,7 +1042,7 @@
               class="mr-lg-13"
               cols="12"
               md="auto"
-              v-if="personStore.currentPerson"
+              v-if="personStore.currentPerson && !twoFactorAuthentificationStore.errorCode"
             >
               <div
                 class="d-flex justify-sm-end"
@@ -1087,7 +1087,6 @@
           </v-row>
         </v-container>
         <v-divider
-          v-if="twoFactorAuthentificationStore.hasToken != undefined"
           class="border-opacity-100 rounded my-6 mx-4"
           color="#E5EAEF"
           thickness="6"
