@@ -156,6 +156,7 @@
       "discard": "Benutzer verwerfen",
       "disableUser": "Benutzer sperren",
       "edit": "Benutzer bearbeiten",
+      "editPersonalInfo": "Persönliche Informationen bearbeiten",
       "generatedPassword": "Generiertes Passwort",
       "noKopersNr": "KoPers.-Nr. nicht vorhanden",
       "noKopersNrConfirmationDialogMessage": "Bitte beachten Sie, dass ein Benutzerkonto ohne KoPers.-Nr. nach 8 Wochen automatisch gesperrt wird. Tragen Sie daher die KoPers.-Nr. bitte in der Gesamtübersicht des Benutzers nach, sobald diese Ihnen vorliegt.",

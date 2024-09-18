@@ -1020,7 +1020,7 @@
                   <SpshTooltip
                     :enabledCondition="!isEditActive"
                     :disabledText="$t('person.finishEditFirst')"
-                    :enabledText="$t('admin.person.deletePerson')"
+                    :enabledText="$t('admin.person.editPersonalInfo')"
                     position="start"
                   >
                     <v-btn
