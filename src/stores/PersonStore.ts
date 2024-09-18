@@ -357,7 +357,7 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.i18nKey || 'UNSPECIFIED_ERROR';
+          this.errorCode = error.response?.data.i18nKey || 'ERROR_LOADING_USER';
         }
       } finally {
         this.loading = false;

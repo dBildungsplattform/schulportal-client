@@ -277,6 +277,10 @@
       };
     }
   };
+  async function navigateBackToKopersForm(): Promise<void> {
+    personStore.errorCode = '';
+    personenkontextStore.errorCode = '';
+  }
 
   const alertButtonText: ComputedRef<string> = computed(() => {
     return personenkontextStore.errorCode === 'PERSON_NOT_FOUND' ? t('nav.backToList') : t('refreshData');
@@ -285,6 +289,19 @@
   const alertButtonAction: ComputedRef<() => void> = computed(() => {
     return personenkontextStore.errorCode === 'PERSON_NOT_FOUND' ? navigateToPersonTable : (): void => router.go(0);
   });
+
+  const alertButtonTextKopers: ComputedRef<string> = computed(() => {
+    return personStore.errorCode === 'PERSONALNUMMER_NICHT_EINDEUTIG'
+      ? t('admin.person.backToForm')
+      : t('nav.backToList');
+  });
+
+  const alertButtonActionKopers: ComputedRef<() => void> = computed(() => {
+    return personStore.errorCode === 'PERSONALNUMMER_NICHT_EINDEUTIG'
+      ? navigateBackToKopersForm
+      : navigateToPersonTable;
+  });
+
   function getSskName(sskDstNr: string | undefined, sskName: string): string {
     /* truncate ssk name */
     const truncatededSskName: string = sskName.length > 30 ? `${sskName.substring(0, 30)}...` : sskName;
@@ -955,11 +972,11 @@
         :model-value="!!personStore.errorCode"
         :type="'error'"
         :closable="false"
-        :text="$t('admin.person.loadingErrorText')"
+        :text="$t(`admin.person.errors.${personStore.errorCode}`)"
         :showButton="true"
-        :buttonText="$t('nav.backToList')"
-        :buttonAction="handleAlertClose"
-        :title="$t('admin.person.loadingErrorTitle')"
+        :buttonText="alertButtonTextKopers"
+        :buttonAction="alertButtonActionKopers"
+        :title="$t(`admin.person.title.${personStore.errorCode}`)"
         @update:modelValue="handleAlertClose"
       />
 

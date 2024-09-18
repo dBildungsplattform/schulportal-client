@@ -100,6 +100,7 @@
       "addedSuccessfully": "{firstname} {lastname} wurde erfolgreich hinzugefügt.",
       "addNew": "Neuen Benutzer hinzufügen",
       "backToCreatePerson": "Zurück zur Benutzeranlage",
+      "backToForm": "Zurück zur Form",
       "changePassword": "Passwort ändern",
       "twoFactorAuthentication": {
         "setUpShort": "2FA einrichten",
@@ -182,6 +183,15 @@
         "kopersNr": {
           "required": "Die KoPers.-Nr. ist erforderlich."
         }
+      },
+      "title": {
+        "ERROR_LOADING_USER": "Fehler beim Laden des Benutzers.",
+        "PERSONALNUMMER_NICHT_EINDEUTIG": "KoPers.-Nr. nicht eindeutig",
+        "PERSON_NOT_FOUND": "Benutzer gelöscht."
+      },
+      "errors": {
+        "PERSONALNUMMER_NICHT_EINDEUTIG": "Die eingegebene KoPers.-Nr. ist bereits vergeben. Bitte korrigieren Sie Ihre Eingabe.",
+        "ERROR_LOADING_USER": "Es konnten keine Benutzerdaten geladen werden."
       },
       "showAll": "Alle Benutzer anzeigen",
       "startPassword": "Einstiegs-Passwort",
