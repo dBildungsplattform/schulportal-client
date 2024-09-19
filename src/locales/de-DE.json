@@ -437,7 +437,7 @@
     "changeRolleDescription": "Ändert die Rolle des Benutzers an der Schule ohne ihn zu entfernen.",
     "changeKlasseDescription": "Ändert die Klasse des Benutzers an der Schule.",
     "changeKlasseNotDisabledDescription": "Bitte wählen Sie eine neue Klasse aus.",
-    "changeKopersDisabledDescription": "Bitte wählen Sie eine neue Kopers.-Nr. aus.",
+    "changeKopersDisabledDescription": "Bitte geben Sie eine neue Kopers.-Nr. ein.",
     "chooseZuordnungFirst": "Wählen Sie bitte zuerst eine Schulzuordnung aus.",
     "chooseKlasseZuordnungFirst": "Wählen Sie bitte zunächst eine Schulzuordnung mit einer Klasse aus.",
     "deleteZuordnungConfirmation": "Wollen Sie die Schulzuordnung wirklich entfernen?",

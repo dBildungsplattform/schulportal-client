@@ -6,7 +6,6 @@
   import { useDisplay } from 'vuetify';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
 
-
   useI18n({ useScope: 'global' });
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
