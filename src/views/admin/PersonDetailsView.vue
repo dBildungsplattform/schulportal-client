@@ -793,6 +793,7 @@
 
   onBeforeMount(async () => {
     personStore.resetState();
+    twoFactorAuthentificationStore.resetState();
     personenkontextStore.errorCode = '';
     await personStore.getPersonById(currentPersonId);
     await personStore.getPersonenuebersichtById(currentPersonId);
@@ -1010,7 +1011,12 @@
                   <p v-if="twoFactorAuthentificationStore.tokenKind === TokenKind.hardware">
                     {{ $t('admin.person.twoFactorAuthentication.hardwareTokenIsSetUp') }}
                   </p>
-                  <p v-if="twoFactorAuthentificationStore.serial">
+                  <p
+                    v-if="
+                      twoFactorAuthentificationStore.tokenKind === TokenKind.hardware &&
+                      twoFactorAuthentificationStore.serial
+                    "
+                  >
                     {{
                       $t('admin.person.twoFactorAuthentication.serial') + ': ' + twoFactorAuthentificationStore.serial
                     }}

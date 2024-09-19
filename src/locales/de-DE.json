@@ -112,6 +112,8 @@
         "scanOrPrint": "QR-Code scannen oder ausdrucken.",
         "notSetUp": "Für diesen Benutzer ist aktuell keine 2FA eingerichtet.",
         "softwareTokenIsSetUp": "Für diesen Benutzer ist aktuell ein Software-Token eingerichtet.",
+        "softwareTokenIsSetUpSelfService": "Für diesen Account ist aktuell eine 2FA über ein Software-Token eingerichtet (Authentifizierung über Endgerät).",
+        "hardwareTokenIsSetUpSelfService": "Aktuell ist eine 2FA über ein Hardware-Token eingerichtet. \nSeriennummer: {serialNumber}",
         "resetInfo": "Um einen neuen Token einzurichten, muss der aktuelle Token durch die schulischen Admins zurückgesetzt werden.",
         "tokenReset": "Token zurücksetzen",
         "hardwareTokenIsSetUp": "Für diesen Benutzer ist aktuell ein Hardware-Token eingerichtet.",
@@ -131,7 +133,8 @@
           "HARDWARE_TOKEN_SERVICE_FEHLER": "Leider konnte ihr Hardware-Token aus technischen Gründen nicht aktiviert werden. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut. Falls das Problem bestehen bleibt, stellen Sie bitte eine Anfrage über den IQSH Helpdesk.--Link: https://www.secure-lernnetz.de/helpdesk/",
           "UNKNOWN_ERROR": "Ein unbekannter Fehler ist aufgetreten.",
           "TOKEN_RESET_ERROR": "Leider konnten wir Ihren Token aufgrund von technischen Problemen nicht zurücksetzen. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut. Falls das Problem bestehen bleibt, stellen Sie bitte eine Anfrage über den IQSH Helpdesk.  Link: https://www.secure-lernnetz.de/helpdesk/",
-          "500": "Ein unbekannter Fehler ist aufgetreten. Bitte versuchen Sie es erneut."
+          "500": "Ein unbekannter Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
+          "SOFTWARE_TOKEN_VERIFICATION_ERROR": "Beim Verifizieren Ihres Tokens ist leider ein Problem aufgetreten."
         },
         "tokenResetHardwareErrorHeader": "Fehler beim Zurücksetzen des Hardware-Tokens",
         "tokenResetSoftwareErrorHeader": "Fehler beim Zurücksetzen des Software-Tokens",
@@ -140,7 +143,15 @@
         "tokenResetButton": "Zurücksetzen",
         "tokenResetSuccessSoftware": "Token wurde erfolgreich zurückgesetzt. Der Benutzer kann sich nun selbstständig einen neuen QR-Code erzeugen.",
         "tokenResetSuccessHardware": "Token wurde erfolgreich zurückgesetzt. Der Hardware-Token kann nun neu zugeordnet werden.",
-        "tokenResetSuccessTokenLost": "Token wurde erfolgreich zurückgesetzt und gesperrt."
+        "tokenResetSuccessTokenLost": "Token wurde erfolgreich zurückgesetzt und gesperrt.",
+        "questionsProblems": "Bitte wenden Sie sich bei Fragen und Problemen an ihre schulischen Admins.",
+        "qrCodeInfo": "Im Folgenden wird ein QR-Code generiert, mit dem Sie auf Ihrem Endgerät eine Zwei-Faktor-Authentifizierung einrichten können.",
+        "softwareOnDevice": "Bitte stellen Sie vor dem Fortfahren sicher, dass eine entsprechende Software auf Ihrem Endgerät installiert ist. Für Ihr Lehrkräfte-Endgerät finden Sie entsprechend genehmigte Anwendungen im Software-Hub.",
+        "pleaseScan": "Bitte scannen Sie den QR-Code mit Ihrer 2FA-App (z.B. FreeOTP).",
+        "enterOtp": "Bitte geben Sie das angezeigte Einmalpasswort ein, um die Einrichtung abzuschließen.",
+        "invalidOtp": "Ungültiger Code. Bitte versuchen Sie es erneut.",
+        "otp": "Einmalpasswort",
+        "SecondFactorNotSet": "Es wurde noch kein zweiter Faktor für Sie eingerichtet."
       },
       "copyPasswordError": "Passwort konnte nicht in die Zwischenablage kopiert werden",
       "copyPasswordSuccess": "Passwort in Zwischenablage kopiert",
