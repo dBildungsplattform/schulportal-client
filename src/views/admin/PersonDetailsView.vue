@@ -1006,10 +1006,11 @@
         <v-container class="personal-info">
           <div v-if="personStore.currentPerson?.person && !isEditPersonInfoActive">
             <!-- Befristung -->
+            <v-row class="ml-md-16">
             <v-col
               cols="12"
               md="auto"
-              class="mt-1 button-container"
+              class="mt-1 edit-container"
             >
               <div class="d-flex justify-sm-end">
                 <v-col
@@ -1036,8 +1037,9 @@
                 </v-col>
               </div>
             </v-col>
+          </v-row>
             <!-- Vorname -->
-            <v-row class="mt-0">
+            <v-row class="mt-2">
               <v-col cols="1"></v-col>
               <v-col
                 class="text-right"
