@@ -4,24 +4,24 @@
   import FormRow from '@/components/form/FormRow.vue';
 
   type Props = {
-    hasNoKopersNr?: boolean;
+    hasNoKopersNr: boolean;
     selectedKopersNr: string | undefined | null;
     selectedKopersNrProps: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     hideCheckbox?: boolean;
   };
 
   type Emits = {
-    (event: 'update:hasNoKopersNr', value: boolean | undefined): void;
+    (event: 'update:hasNoKopersNr', value: boolean): void;
     (event: 'update:selectedKopersNr', value: string | undefined | null): void;
   };
 
   const props: Props = defineProps<Props>();
   const emits: Emits = defineEmits<Emits>();
 
-  const hasNoKopersNr: Ref<boolean | undefined> = ref(props.hasNoKopersNr);
+  const hasNoKopersNr: Ref<boolean> = ref(props.hasNoKopersNr);
   const selectedKopersNr: Ref<string | undefined | null> = ref(props.selectedKopersNr);
 
-  watch(hasNoKopersNr, (newValue: boolean | undefined) => {
+  watch(hasNoKopersNr, (newValue: boolean) => {
     emits('update:hasNoKopersNr', newValue);
   });
 

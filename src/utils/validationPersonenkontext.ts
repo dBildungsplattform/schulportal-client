@@ -64,7 +64,7 @@ function isKopersRolle(selectedRolleId: string | undefined): boolean {
 // Define the validation schema for Personenkontext form fields
 export const getValidationSchema = (
   t: (key: string) => string,
-  hasNoKopersNr: Ref<boolean | undefined>,
+  hasNoKopersNr: Ref<boolean>,
   hasKopersNummer: Ref<boolean>,
 ): TypedSchema<ZuordnungCreationForm> => {
   return toTypedSchema(
