@@ -1026,7 +1026,7 @@
                     </p>
                     <p v-if="twoFactorAuthentificationStore.serial">
                       {{
-                        $t('admin.person.twoFactorAuthentication.serial') + ': ' + twoFactorAuthentificationStore.serial
+                        `${$t('admin.person.twoFactorAuthentication.serial')}: ${twoFactorAuthentificationStore.serial}`
                       }}
                     </p>
                     <p>

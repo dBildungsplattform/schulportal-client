@@ -3,6 +3,10 @@ import { OrganisationsTyp } from '@/stores/OrganisationStore';
 import { usePersonInfoStore, type PersonInfoResponse, type PersonInfoStore } from '@/stores/PersonInfoStore';
 import { usePersonStore, type PersonStore, type PersonWithUebersicht } from '@/stores/PersonStore';
 import type { RollenMerkmal } from '@/stores/RolleStore';
+import {
+  useTwoFactorAuthentificationStore,
+  type TwoFactorAuthentificationStore,
+} from '@/stores/TwoFactorAuthentificationStore';
 import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
 import { beforeEach, describe, expect, test } from 'vitest';
 import { nextTick } from 'vue';
@@ -13,6 +17,7 @@ let wrapper: VueWrapper | null = null;
 let personInfoStore: PersonInfoStore;
 let personStore: PersonStore;
 let authStore: AuthStore;
+let twoFactorAuthenticationStore: TwoFactorAuthentificationStore;
 let router: Router;
 
 const mockPersonInfo: PersonInfoResponse = {
@@ -177,6 +182,7 @@ beforeEach(async () => {
   personInfoStore = usePersonInfoStore();
   personStore = usePersonStore();
   authStore = useAuthStore();
+  twoFactorAuthenticationStore = useTwoFactorAuthentificationStore();
 
   personInfoStore.personInfo = mockPersonInfo;
   personStore.personenuebersicht = mockUebersicht;
@@ -298,5 +304,21 @@ describe('ProfileView', () => {
       card.text().includes('Zwei-Faktor-Authentifizierung'),
     );
     expect(twoFactorCard).toBeDefined();
+    expect(wrapper.find('[data-testid="setup-two-factor-button"]')).toBeDefined();
+  });
+
+  test('it displays 2FA connection error', async () => {
+    twoFactorAuthenticationStore.loading = false;
+    twoFactorAuthenticationStore.errorCode = 'something';
+    await nextTick();
+    if (!wrapper) return;
+    const cards: VueWrapper[] = wrapper.findAllComponents({ name: 'LayoutCard' }) as VueWrapper[];
+    const twoFactorCard: VueWrapper | undefined = cards.find((card: VueWrapper) =>
+      card.text().includes('Zwei-Faktor-Authentifizierung'),
+    );
+    expect(twoFactorCard).toBeDefined();
+    expect(twoFactorCard?.text()).toContain(
+      'Der Server für die Zwei-Faktor-Authentifizierung kann aktuell nicht erreicht werden. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut.',
+    );
   });
 });

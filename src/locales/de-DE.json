@@ -482,7 +482,6 @@
     "setNewPassword": "Neues Passwort setzen",
     "twoFactorAuth": "Zwei-Faktor-Authentifizierung",
     "setupTwoFactorAuth": "2-FA einrichten",
-    "twoFactorAuthenticationConnectionError": "Der Server für die Zwei-Faktor-Authentifizierung kann aktuell nicht erreicht werden. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut.",
     "infoAboutChangeabilityFromPersonalData": "Persönliche Daten sind nur durch Ihre schulischen Admins veränderbar",
     "yourSchuleAdminsAre": "Ihre schulischen Admins sind:",
     "koPersNummer": "Personalnummer",

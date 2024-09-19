@@ -62,7 +62,7 @@
 
   const twoFactorAuthError: ComputedRef<string> = computed(() => {
     if (twoFactorAuthenticationStore.loading) return '';
-    if (twoFactorAuthenticationStore.errorCode) return t('profile.twoFactorAuthenticationConnectionError');
+    if (twoFactorAuthenticationStore.errorCode) return t('admin.person.twoFactorAuthentication.errors.connection');
     return '';
   });
 
