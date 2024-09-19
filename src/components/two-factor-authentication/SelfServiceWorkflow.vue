@@ -38,11 +38,11 @@
   });
 
   type Emits = {
-    (event: 'dialogClosed'): void;
+    (event: 'updateState'): void;
   };
 
   const emits: Emits = defineEmits<{
-    (event: 'dialogClosed'): void;
+    (event: 'updateState'): void;
   }>();
 
   type Props = {
@@ -52,13 +52,8 @@
   const props: Props = defineProps<Props>();
 
   async function close2FADialog(isActive: Ref<boolean>): Promise<void> {
-    if (workflowStep.value !== TwoFactorSteps.Start) {
-      emits('dialogClosed');
-      twoFactorStore.qrCode = '';
-      twoFactorStore.hasToken = null;
-      twoFactorStore.tokenKind = null;
-    }
     isActive.value = false;
+    twoFactorStore.qrCode = '';
     workflowStep.value = TwoFactorSteps.Start;
   }
 
@@ -87,7 +82,9 @@
           errorMessage.value = t(`admin.person.twoFactorAuthentication.errors.${twoFactorStore.errorCode}`);
           return;
         } else {
+          twoFactorStore.resetState();
           close2FADialog(isActive);
+          emits('updateState');
         }
     }
   }

@@ -559,7 +559,7 @@
             <div>
               <SelfServiceWorkflow
                 :personId="personInfoStore.personInfo?.person.id ?? ''"
-                @dialogClosed="twoFactorAuthentificationStore.get2FAState(personInfoStore.personInfo?.person.id ?? '')"
+                @updateState="twoFactorAuthentificationStore.get2FAState(personInfoStore.personInfo?.person.id ?? '')"
               >
               </SelfServiceWorkflow>
             </div>
