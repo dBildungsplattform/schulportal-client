@@ -1039,7 +1039,7 @@
             </v-col>
           </v-row>
             <!-- Vorname -->
-            <v-row class="mt-2">
+            <v-row class="mt-md-6">
               <v-col cols="1"></v-col>
               <v-col
                 class="text-right"
