@@ -46,7 +46,7 @@
   let blockedNext: () => void = () => {};
 
   const canCommit: Ref<boolean> = ref(false);
-  const hasNoKopersNr: Ref<boolean> = ref(false);
+  const hasNoKopersNr: Ref<boolean | undefined> = ref(false);
   const showNoKopersNrConfirmationDialog: Ref<boolean> = ref(false);
 
   const calculatedBefristung: Ref<string | undefined> = ref('');
@@ -510,7 +510,7 @@
             v-model:selectedKopersNr="selectedKopersNr"
             :selectedKopersNrProps="selectedKopersNrProps"
             @update:selectedKopersNr="(value?: string | null) => (selectedKopersNr = value)"
-            @update:hasNoKopersNr="(value: boolean) => (hasNoKopersNr = value)"
+            @update:hasNoKopersNr="(value: boolean | undefined) => (hasNoKopersNr = value)"
           ></KopersInput>
         </div>
       </FormWrapper>
