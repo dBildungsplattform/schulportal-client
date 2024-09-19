@@ -477,4 +477,27 @@ describe('PersonStore', () => {
       expect(personStore.loading).toBe(false);
     });
   });
+
+  describe('resetState', () => {
+    it('should reset state', () => {
+      personStore.errorCode = 'some error';
+      personStore.loading = true;
+      personStore.totalPersons = 1;
+      personStore.currentPerson = {
+        person: {
+          id: '1234',
+          name: {
+            familienname: 'Vimes',
+            vorname: 'Samuel',
+          },
+        },
+      } as Personendatensatz;
+
+      personStore.resetState();
+      expect(personStore.errorCode).toEqual('');
+      expect(personStore.loading).toBe(false);
+      expect(personStore.totalPersons).toBe(0);
+      expect(personStore.currentPerson).toBe(null);
+    });
+  });
 });
