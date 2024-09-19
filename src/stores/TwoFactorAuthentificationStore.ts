@@ -94,7 +94,6 @@ export const useTwoFactorAuthentificationStore: StoreDefinition<
         if (isAxiosError(error)) {
           this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
         }
-        return await Promise.reject(this.errorCode);
       } finally {
         this.loading = false;
       }
@@ -116,7 +115,6 @@ export const useTwoFactorAuthentificationStore: StoreDefinition<
         if (isAxiosError(error)) {
           this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
         }
-        return await Promise.reject(this.errorCode);
       } finally {
         this.loading = false;
       }
@@ -143,7 +141,6 @@ export const useTwoFactorAuthentificationStore: StoreDefinition<
         if (isAxiosError(error)) {
           this.errorCode = error.response?.data.i18nKey || 'UNSPECIFIED_ERROR';
         }
-        return await Promise.reject(this.errorCode);
       } finally {
         this.loading = false;
       }
