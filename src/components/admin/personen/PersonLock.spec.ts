@@ -1,19 +1,19 @@
-import { expect, test } from 'vitest';
-import { VueWrapper, mount } from '@vue/test-utils';
-import { createTestingPinia } from '@pinia/testing';
-import PersonLock from './PersonLock.vue';
-import { usePersonStore, type Person, type Personendatensatz, type PersonStore } from '@/stores/PersonStore';
+import {
+  RollenMerkmal,
+  type DBiamPersonenuebersichtResponse,
+  type DBiamPersonenzuordnungResponse,
+} from '@/api-client/generated/api';
 import {
   OrganisationsTyp,
   useOrganisationStore,
   type Organisation,
   type OrganisationStore,
 } from '@/stores/OrganisationStore';
-import {
-  RollenMerkmal,
-  type DBiamPersonenuebersichtResponse,
-  type DBiamPersonenzuordnungResponse,
-} from '@/api-client/generated/api';
+import { usePersonStore, type Person, type Personendatensatz, type PersonStore } from '@/stores/PersonStore';
+import { createTestingPinia } from '@pinia/testing';
+import { mount, VueWrapper } from '@vue/test-utils';
+import { expect, test } from 'vitest';
+import PersonLock from './PersonLock.vue';
 
 let wrapper: VueWrapper | null = null;
 let personStore: PersonStore | null = null;
@@ -68,6 +68,10 @@ function getPersonendatensatz(locked: boolean): Personendatensatz {
   };
   return { person };
 }
+function getIntersectingOrganisations(): Set<Organisation> {
+  return new Set([parentOrganisation]);
+}
+
 async function openDialog(): Promise<void> {
   wrapper?.get('[data-testid="open-lock-dialog-icon"]').trigger('click');
 }
@@ -88,6 +92,7 @@ describe('Lock user', () => {
         errorCode: '',
         person: getPersonendatensatz(false),
         adminId: 'adminid',
+        intersectingOrganisations: getIntersectingOrganisations(),
       },
       global: {
         components: {
@@ -124,6 +129,7 @@ describe('Unlock user', () => {
         errorCode: '',
         person: getPersonendatensatz(true),
         adminId: 'adminid',
+        intersectingOrganisations: getIntersectingOrganisations(),
       },
       global: {
         components: {
@@ -152,6 +158,7 @@ describe('Error handling', () => {
           errorCode: 'TEST_ERROR',
           person: getPersonendatensatz(true),
           adminId: 'adminid',
+          intersectingOrganisations: getIntersectingOrganisations(),
         },
         global: {
           components: {
@@ -177,6 +184,7 @@ describe('Error handling', () => {
           errorCode: '',
           person: getPersonendatensatz(true),
           adminId: 'adminid',
+          intersectingOrganisations: getIntersectingOrganisations(),
         },
         global: {
           components: {

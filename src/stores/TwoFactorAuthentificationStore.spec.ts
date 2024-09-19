@@ -1,8 +1,7 @@
-import type { AssignHardwareTokenBodyParams, TokenRequiredResponse, TokenStateResponse } from '@/api-client/generated';
+import type { AssignHardwareTokenBodyParams, TokenStateResponse } from '@/api-client/generated';
 import ApiService from '@/services/ApiService';
 import MockAdapter from 'axios-mock-adapter';
-import { setActivePinia, createPinia } from 'pinia';
-import { rejects } from 'assert';
+import { createPinia, setActivePinia } from 'pinia';
 import {
   TokenKind,
   useTwoFactorAuthentificationStore,
@@ -24,7 +23,6 @@ describe('TwoFactorAuthentificationStore', () => {
     expect(twoFactorAuthenticationStore.tokenKind).toEqual(null);
     expect(twoFactorAuthenticationStore.errorCode).toEqual('');
     expect(twoFactorAuthenticationStore.loading).toBe(false);
-    expect(twoFactorAuthenticationStore.required).toBe(false);
     expect(twoFactorAuthenticationStore.qrCode).toBe('');
   });
 

@@ -1,6 +1,8 @@
 <script setup lang="ts">
+  import type { PersonenkontextRolleFieldsResponse } from '@/api-client/generated/api';
   import SpshTooltip from '@/components/admin/SpshTooltip.vue';
   import KlasseChange from '@/components/admin/klassen/KlasseChange.vue';
+  import KopersInput from '@/components/admin/personen/KopersInput.vue';
   import PasswordReset from '@/components/admin/personen/PasswordReset.vue';
   import PersonDelete from '@/components/admin/personen/PersonDelete.vue';
   import PersonLock from '@/components/admin/personen/PersonLock.vue';
@@ -8,6 +10,7 @@
   import PersonenkontextDelete from '@/components/admin/personen/PersonenkontextDelete.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
+  import TokenReset from '@/components/two-factor-authentication/TokenReset.vue';
   import TwoFactorAuthenticationSetUp from '@/components/two-factor-authentication/TwoFactorAuthenticationSetUp.vue';
   import { useKlassen } from '@/composables/useKlassen';
   import { useOrganisationen } from '@/composables/useOrganisationen';
@@ -28,28 +31,26 @@
   } from '@/stores/PersonStore';
   import { usePersonenkontextStore, type PersonenkontextStore, type Zuordnung } from '@/stores/PersonenkontextStore';
   import { RollenArt, RollenMerkmal } from '@/stores/RolleStore';
-  import { type TranslatedObject } from '@/types.d';
-  import TokenReset from '@/components/two-factor-authentication/TokenReset.vue';
-  import { toTypedSchema } from '@vee-validate/yup';
-  import { useForm, type BaseFieldProps, type FormContext, type TypedSchema } from 'vee-validate';
-  import KopersInput from '@/components/admin/personen/KopersInput.vue';
-  import { computed, onBeforeMount, ref, watch, type ComputedRef, type Ref } from 'vue';
-  import { useI18n, type Composer } from 'vue-i18n';
-  import { useRoute, useRouter, type RouteLocationNormalizedLoaded, type Router } from 'vue-router';
-  import { useDisplay } from 'vuetify';
-  import { object, string, StringSchema, type AnyObject } from 'yup';
   import {
     TokenKind,
     useTwoFactorAuthentificationStore,
     type TwoFactorAuthentificationStore,
   } from '@/stores/TwoFactorAuthentificationStore';
-  import { getNextSchuljahresende, formatDateToISO, formatDate } from '@/utils/date';
+  import { type TranslatedObject } from '@/types.d';
   import { isBefristungspflichtRolle, useBefristungUtils, type BefristungUtilsType } from '@/utils/befristung';
+  import { formatDate, formatDateToISO, getNextSchuljahresende } from '@/utils/date';
   import {
     getPersonenkontextFieldDefinitions,
     getValidationSchema,
     type PersonenkontextFieldDefinitions,
   } from '@/utils/validationPersonenkontext';
+  import { toTypedSchema } from '@vee-validate/yup';
+  import { useForm, type BaseFieldProps, type FormContext, type TypedSchema } from 'vee-validate';
+  import { computed, onBeforeMount, ref, watch, type ComputedRef, type Ref } from 'vue';
+  import { useI18n, type Composer } from 'vue-i18n';
+  import { useRoute, useRouter, type RouteLocationNormalizedLoaded, type Router } from 'vue-router';
+  import { useDisplay } from 'vuetify';
+  import { object, string, StringSchema, type AnyObject } from 'yup';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
@@ -770,8 +771,12 @@
 
   watch(
     () => personStore.personenuebersicht,
-    (newValue: PersonWithUebersicht | null) => {
+    async (newValue: PersonWithUebersicht | null) => {
       zuordnungenResult.value = computeZuordnungen(newValue);
+      const organisationIds: Array<string> = [
+        ...new Set(personStore.personenuebersicht?.zuordnungen.map((z: Zuordnung) => z.sskId)),
+      ];
+      if (organisationIds.length > 0) await organisationStore.getParentOrganisationsByIds(organisationIds);
     },
     { immediate: true },
   );
@@ -789,6 +794,15 @@
   // Computed property to check if the second radio button should be disabled
   const isUnbefristetButtonDisabled: ComputedRef<boolean> = computed(() => {
     return isBefristungspflichtRolle(selectedRolle.value);
+  });
+
+  const intersectingOrganisations: ComputedRef<Set<Organisation>> = computed(() => {
+    const adminOrganisationIds: Set<string> = new Set(
+      authStore.currentUser?.personenkontexte?.map((pk: PersonenkontextRolleFieldsResponse) => pk.organisationsId),
+    );
+    return new Set<Organisation>(
+      organisationStore.parentOrganisationen.filter((userOrg: Organisation) => adminOrganisationIds.has(userOrg.id)),
+    );
   });
 
   onBeforeMount(async () => {
@@ -1677,6 +1691,7 @@
                   :errorCode="personStore.errorCode"
                   :person="personStore.currentPerson"
                   :adminId="authStore.currentUser?.personId!"
+                  :intersecting-organisations="intersectingOrganisations"
                   @onLockUser="onLockUser"
                 >
                 </PersonLock>
