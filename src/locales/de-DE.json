@@ -146,7 +146,7 @@
         "tokenResetSuccessTokenLost": "Token wurde erfolgreich zurückgesetzt und gesperrt.",
         "questionsProblems": "Bitte wenden Sie sich bei Fragen und Problemen an ihre schulischen Admins.",
         "qrCodeInfo": "Im Folgenden wird ein QR-Code generiert, mit dem Sie auf Ihrem Endgerät eine Zwei-Faktor-Authentifizierung einrichten können.",
-        "softwareOnDevice": "Bitte stellen Sie vor dem Fortfahren sicher, dass eine entsprechende Software auf ihrem Endgerät installiert ist. Für Ihr Lehrkräfte-Endgerät finden Sie entsprechend genehmigte Anwendungen im Software-Hub.",
+        "softwareOnDevice": "Bitte stellen Sie vor dem Fortfahren sicher, dass eine entsprechende Software auf Ihrem Endgerät installiert ist. Für Ihr Lehrkräfte-Endgerät finden Sie entsprechend genehmigte Anwendungen im Software-Hub.",
         "pleaseScan": "Bitte scannen Sie den QR-Code mit Ihrer 2FA-App (z.B. FreeOTP).",
         "enterOtp": "Bitte geben Sie das angezeigte Einmalpasswort ein, um die Einrichtung abzuschließen.",
         "invalidOtp": "Ungültiger Code. Bitte versuchen Sie es erneut.",
