@@ -793,6 +793,7 @@
 
   onBeforeMount(async () => {
     personStore.resetState();
+    twoFactorAuthentificationStore.resetState();
     personenkontextStore.errorCode = '';
     await personStore.getPersonById(currentPersonId);
     await personStore.getPersonenuebersichtById(currentPersonId);
@@ -1011,9 +1012,9 @@
                   >
                   </v-icon>
                 </v-col>
-                <v-col>
+                <v-col class="mr-lg-13">
                   <template v-if="twoFactorAuthentificationStore.errorCode">
-                    <p class="mr-lg-13">
+                    <p>
                       {{ t('admin.person.twoFactorAuthentication.errors.connection') }}
                     </p>
                   </template>
@@ -1021,14 +1022,16 @@
                     <p v-if="twoFactorAuthentificationStore.tokenKind === TokenKind.software">
                       {{ $t('admin.person.twoFactorAuthentication.softwareTokenIsSetUp') }}
                     </p>
-                    <p v-if="twoFactorAuthentificationStore.tokenKind === TokenKind.hardware">
-                      {{ $t('admin.person.twoFactorAuthentication.hardwareTokenIsSetUp') }}
-                    </p>
-                    <p v-if="twoFactorAuthentificationStore.serial">
-                      {{
-                        `${$t('admin.person.twoFactorAuthentication.serial')}: ${twoFactorAuthentificationStore.serial}`
-                      }}
-                    </p>
+                    <template v-else-if="twoFactorAuthentificationStore.tokenKind === TokenKind.hardware">
+                      <p>
+                        {{ $t('admin.person.twoFactorAuthentication.hardwareTokenIsSetUp') }}
+                      </p>
+                      <p v-if="twoFactorAuthentificationStore.serial">
+                        {{
+                          `${$t('admin.person.twoFactorAuthentication.serial')}: ${twoFactorAuthentificationStore.serial}`
+                        }}
+                      </p>
+                    </template>
                     <p>
                       {{
                         twoFactorAuthentificationStore.hasToken

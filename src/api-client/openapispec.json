@@ -3746,6 +3746,55 @@
                     }
                 ]
             }
+        },
+        "/api/2fa-token/verify": {
+            "post": {
+                "operationId": "PrivacyIdeaAdministrationController_verifyToken",
+                "parameters": [],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TokenVerifyBodyParams"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "The token was successfully verified."
+                    },
+                    "400": {
+                        "description": "A username was not given or not found."
+                    },
+                    "401": {
+                        "description": "Not authorized to verify token."
+                    },
+                    "403": {
+                        "description": "Insufficient permissions to verify token."
+                    },
+                    "404": {
+                        "description": "Insufficient permissions to verify token."
+                    },
+                    "500": {
+                        "description": "Internal server error while verifying a token."
+                    }
+                },
+                "tags": [
+                    "2FA"
+                ],
+                "security": [
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
         }
     },
     "info": {
@@ -5771,6 +5820,21 @@
                     "versionnumber",
                     "signature",
                     "dialogText"
+                ]
+            },
+            "TokenVerifyBodyParams": {
+                "type": "object",
+                "properties": {
+                    "personId": {
+                        "type": "string"
+                    },
+                    "otp": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "personId",
+                    "otp"
                 ]
             }
         }

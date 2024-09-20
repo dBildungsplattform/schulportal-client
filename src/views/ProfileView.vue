@@ -2,12 +2,14 @@
   import type { DBiamPersonenzuordnungResponse } from '@/api-client/generated/api';
   import SpshTooltip from '@/components/admin/SpshTooltip.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
+  import SelfServiceWorkflow from '@/components/two-factor-authentication/SelfServiceWorkflow.vue';
   import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
   import { OrganisationsTyp } from '@/stores/OrganisationStore';
   import { usePersonInfoStore, type PersonInfoResponse, type PersonInfoStore } from '@/stores/PersonInfoStore';
   import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
   import { type Zuordnung } from '@/stores/PersonenkontextStore';
   import {
+    TokenKind,
     useTwoFactorAuthentificationStore,
     type TwoFactorAuthentificationStore,
   } from '@/stores/TwoFactorAuthentificationStore';
@@ -274,6 +276,9 @@
     hasKoPersMerkmalCheck();
     setupPersonalData();
     setupSchuleData();
+    if (personInfoStore.personInfo?.person.id) {
+      await twoFactorAuthenticationStore.get2FAState(personInfoStore.personInfo.person.id);
+    }
   });
 </script>
 
@@ -538,8 +543,10 @@
         <LayoutCard
           :headline-test-id="'two-factor-card'"
           :header="$t('profile.twoFactorAuth')"
+          v-if="twoFactorAuthenticationStore.hasToken != undefined"
         >
           <v-row
+            v-if="twoFactorAuthenticationStore.hasToken === false"
             align="center"
             justify="center"
             class="ma-3 ga-4"
@@ -553,26 +560,94 @@
           <v-row
             align="center"
             justify="center"
-            class="ma-3 ga-4"
+            class="ma-3 text-body"
           >
-            <p
-              v-if="twoFactorAuthError"
-              class="pt-4 text-center text-body-1 text-medium-emphasis"
+            <v-col
+              :sm="twoFactorAuthenticationStore.hasToken === false ? 6 : null"
+              :md="twoFactorAuthenticationStore.hasToken === false ? 'auto' : null"
+              cols="12"
             >
-              <v-icon
-                color="warning"
-                icon="mdi-alert-outline"
-              ></v-icon>
-              {{ twoFactorAuthError }}
-            </p>
-            <v-btn
-              v-else
-              color="primary"
-              disabled
-              data-testid="setup-two-factor-button"
+              <v-row :justify="twoFactorAuthenticationStore.hasToken === false ? 'center' : null">
+                <v-col
+                  cols="1"
+                  align-self="center"
+                  class="text-right"
+                >
+                  <v-icon
+                    v-if="twoFactorAuthError"
+                    color="warning"
+                    icon="mdi-alert-outline"
+                  ></v-icon>
+                  <v-icon
+                    v-else-if="twoFactorAuthenticationStore.hasToken === false"
+                    color="warning"
+                    icon="mdi-alert-circle"
+                  ></v-icon>
+                  <v-icon
+                    v-else
+                    color="green"
+                    icon="mdi-check-circle"
+                  ></v-icon>
+                </v-col>
+                <v-col>
+                  <p>
+                    <template v-if="twoFactorAuthError">
+                      {{ twoFactorAuthError }}
+                    </template>
+                    <template v-else-if="twoFactorAuthenticationStore.hasToken === false">
+                      {{ $t('admin.person.twoFactorAuthentication.SecondFactorNotSet') }}
+                    </template>
+                    <template v-else-if="twoFactorAuthenticationStore.hasToken === true">
+                      <template v-if="twoFactorAuthenticationStore.tokenKind === TokenKind.software">
+                        {{ $t('admin.person.twoFactorAuthentication.softwareTokenIsSetUpSelfService') }}
+                      </template>
+                      <template v-else-if="twoFactorAuthenticationStore.tokenKind === TokenKind.hardware">
+                        {{
+                          $t('admin.person.twoFactorAuthentication.hardwareTokenIsSetUpSelfService', {
+                            serialNumber: twoFactorAuthenticationStore.serial,
+                          })
+                        }}
+                      </template>
+                    </template>
+                  </p>
+                </v-col>
+              </v-row>
+            </v-col>
+            <v-col
+              cols="12"
+              v-if="!twoFactorAuthError"
             >
-              {{ $t('profile.setupTwoFactorAuth') }}
-            </v-btn>
+              <v-row
+                align="center"
+                justify="center"
+              >
+                <template v-if="twoFactorAuthenticationStore.hasToken === false">
+                  <SelfServiceWorkflow
+                    :personId="personInfoStore.personInfo?.person.id ?? ''"
+                    @updateState="twoFactorAuthenticationStore.get2FAState(personInfoStore.personInfo?.person.id ?? '')"
+                  >
+                  </SelfServiceWorkflow>
+                </template>
+                <template v-else-if="twoFactorAuthenticationStore.hasToken === true">
+                  <v-col
+                    cols="1"
+                    align-self="center"
+                    class="text-right"
+                  >
+                    <v-icon
+                      class="mb-2"
+                      icon="mdi-information"
+                    >
+                    </v-icon>
+                  </v-col>
+                  <v-col>
+                    <p>
+                      {{ $t('admin.person.twoFactorAuthentication.questionsProblems') }}
+                    </p>
+                  </v-col>
+                </template>
+              </v-row>
+            </v-col>
           </v-row>
         </LayoutCard>
       </v-col>
