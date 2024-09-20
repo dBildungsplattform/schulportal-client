@@ -180,6 +180,7 @@
           density="compact"
           :disabled="!isEditActive"
           id="service-provider-select"
+          ref="service-provider-select"
           :items="serviceProviders"
           item-value="value"
           item-text="title"

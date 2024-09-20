@@ -105,11 +105,6 @@ describe('RolleCreationView', () => {
   });
 
   test('it fills form and triggers submit', async () => {
-    const rollennameInput: VueWrapper | undefined = wrapper
-      ?.findComponent({ ref: 'rolle-creation-form' })
-      .findComponent({ ref: 'rollenname-input' });
-    expect(rollennameInput?.exists()).toBe(false);
-
     const orgSelect: VueWrapper | undefined = wrapper
       ?.findComponent({ ref: 'rolle-creation-form' })
       .findComponent({ ref: 'administrationsebene-select' });
@@ -121,7 +116,19 @@ describe('RolleCreationView', () => {
       .findComponent({ ref: 'rollenart-select' });
     rollenartSelect?.setValue('LERN');
     await nextTick();
-    await flushPromises();
+
+    const rollennameInput: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'rolle-creation-form' })
+      .findComponent({ ref: 'rollenname-input' });
+
+    rollennameInput?.setValue('NewRolle');
+    await nextTick();
+
+    const providerSelect: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'rolle-creation-form' })
+      .findComponent({ ref: 'service-provider-select' });
+    providerSelect?.setValue(['1']);
+    await nextTick();
 
     expect(orgSelect?.text()).toEqual('9356494 (Albert-Emil-Hansebrot-Gymnasium)');
     expect(rollenartSelect?.text()).toEqual('Lern');
@@ -144,6 +151,8 @@ describe('RolleCreationView', () => {
 
     wrapper?.find('[data-testid="rolle-form-create-button"]').trigger('click');
     await nextTick();
+
+    await flushPromises();
 
     rolleStore.createdRolle = mockRolle;
     await nextTick();
