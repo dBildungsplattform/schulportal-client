@@ -30,7 +30,7 @@ type RolleState = {
 
 type RolleGetters = {};
 type RolleActions = {
-  addServiceProviderToRolle: (
+  updateServiceProviderInRolle: (
     rolleId: string,
     rolleServiceProviderQueryParams: RolleServiceProviderQueryParams,
   ) => Promise<void>;
@@ -110,16 +110,16 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
     };
   },
   actions: {
-    async addServiceProviderToRolle(rolleId: string, rolleServiceProviderQueryParams: RolleServiceProviderQueryParams) {
+    async updateServiceProviderInRolle(
+      rolleId: string,
+      rolleServiceProviderQueryParams: RolleServiceProviderQueryParams,
+    ) {
       this.loading = true;
       try {
-        const { data }: AxiosResponse<ServiceProviderResponse> = await rolleApi.rolleControllerAddServiceProviderById(
-          rolleId,
-          rolleServiceProviderQueryParams,
-        );
+        const { data }: AxiosResponse<ServiceProviderResponse[]> =
+          await rolleApi.rolleControllerUpdateServiceProvidersById(rolleId, rolleServiceProviderQueryParams);
         if (this.createdRolle) {
-          this.createdRolle.serviceProviders = this.createdRolle.serviceProviders || [];
-          this.createdRolle.serviceProviders.push(data);
+          this.createdRolle.serviceProviders = data;
         }
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';

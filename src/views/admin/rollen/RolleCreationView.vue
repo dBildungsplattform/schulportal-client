@@ -238,11 +238,11 @@
           systemrechteToSubmit,
         )
         .then(async (rolleResponse: RolleResponse) => {
-          selectedServiceProviders.value?.forEach(async (serviceProviderId: string) => {
-            await rolleStore.addServiceProviderToRolle(rolleResponse.id, {
-              serviceProviderId,
+          if (selectedServiceProviders.value && selectedServiceProviders.value.length > 0) {
+            await rolleStore.updateServiceProviderInRolle(rolleResponse.id, {
+              serviceProviderIds: selectedServiceProviders.value,
             });
-          });
+          }
         });
       formContext.resetForm();
 
