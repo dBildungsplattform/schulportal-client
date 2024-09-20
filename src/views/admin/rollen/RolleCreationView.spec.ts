@@ -140,9 +140,12 @@ describe('RolleCreationView', () => {
       administeredBySchulstrukturknotenKennung: '',
     };
 
-    rolleStore.createdRolle = mockRolle;
+    expect(wrapper?.find('[data-testid="rolle-form-create-button"]').isVisible()).toBe(true);
 
     wrapper?.find('[data-testid="rolle-form-create-button"]').trigger('click');
+    await nextTick();
+
+    rolleStore.createdRolle = mockRolle;
     await nextTick();
 
     expect(wrapper?.find('[data-testid="create-another-rolle-button"]').isVisible()).toBe(true);
