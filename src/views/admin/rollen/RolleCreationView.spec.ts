@@ -12,6 +12,11 @@ import {
   useRolleStore,
 } from '@/stores/RolleStore';
 import { type OrganisationStore, useOrganisationStore } from '@/stores/OrganisationStore';
+import {
+  ServiceProviderKategorie,
+  ServiceProviderTarget,
+  type ServiceProviderResponse,
+} from '@/api-client/generated/api';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
@@ -165,6 +170,86 @@ describe('RolleCreationView', () => {
     await flushPromises();
 
     rolleStore.createdRolle = mockRolle;
+    await nextTick();
+
+    expect(wrapper?.find('[data-testid="create-another-rolle-button"]').isVisible()).toBe(true);
+
+    wrapper?.find('[data-testid="create-another-rolle-button"]').trigger('click');
+    await nextTick();
+
+    expect(rolleStore.createdRolle).toBe(null);
+  });
+
+  test('It display the success template with no systemrechte nor merkmale', async () => {
+    const mockRolle: RolleResponse = {
+      administeredBySchulstrukturknoten: '1234',
+      rollenart: 'LEHR',
+      name: 'Lehrer',
+      // TODO: remove type casting when generator is fixed
+      merkmale: new Set<RollenMerkmal>(),
+      systemrechte: new Set<RollenSystemRecht>(),
+      createdAt: '2022',
+      updatedAt: '2022',
+      id: '1',
+      administeredBySchulstrukturknotenName: 'Land SH',
+      administeredBySchulstrukturknotenKennung: '',
+    };
+
+    rolleStore.createdRolle = mockRolle;
+    rolleStore.createdRolle.serviceProviders = [];
+    await nextTick();
+
+    expect(wrapper?.find('[data-testid="create-another-rolle-button"]').isVisible()).toBe(true);
+
+    wrapper?.find('[data-testid="create-another-rolle-button"]').trigger('click');
+    await nextTick();
+
+    expect(rolleStore.createdRolle).toBe(null);
+  });
+  test('it displays the success template with service providers', async () => {
+    const mockRolle: RolleResponse = {
+      administeredBySchulstrukturknoten: '1234',
+      rollenart: 'LEHR',
+      name: 'Lehrer',
+      // TODO: remove type casting when generator is fixed
+      merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RollenMerkmal>,
+      systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
+      createdAt: '2022',
+      updatedAt: '2022',
+      id: '1',
+      administeredBySchulstrukturknotenName: 'Land SH',
+      administeredBySchulstrukturknotenKennung: '',
+    };
+
+    rolleStore.createdRolle = mockRolle;
+
+    const testServiceProviders: Array<ServiceProviderResponse> = [
+      {
+        id: 'sp001',
+        name: 'Provider One',
+        target: ServiceProviderTarget.Email,
+        url: 'https://provider-one.com',
+        kategorie: ServiceProviderKategorie.Email,
+        hasLogo: true,
+      },
+      {
+        id: 'sp002',
+        name: 'Provider Two',
+        target: ServiceProviderTarget.Email,
+        url: 'https://provider-three.com',
+        kategorie: ServiceProviderKategorie.Email,
+        hasLogo: false,
+      },
+      {
+        id: 'sp003',
+        name: 'Provider Three',
+        target: ServiceProviderTarget.Email,
+        url: 'https://provider-three.com',
+        kategorie: ServiceProviderKategorie.Email,
+        hasLogo: true,
+      },
+    ];
+    rolleStore.createdRolle.serviceProviders = testServiceProviders;
     await nextTick();
 
     expect(wrapper?.find('[data-testid="create-another-rolle-button"]').isVisible()).toBe(true);
