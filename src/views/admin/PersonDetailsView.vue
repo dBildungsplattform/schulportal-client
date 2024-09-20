@@ -992,12 +992,12 @@
               <h3 class="subtitle-1">{{ $t('admin.person.twoFactorAuthentication.header') }}</h3>
               <v-row class="mt-4 text-body">
                 <v-col
-                  class="text-right"
+                  class="align-self-center text-right"
                   cols="1"
                 >
                   <v-icon
-                    icon="mdi-check-circle"
                     color="green"
+                    icon="mdi-check-circle"
                     v-if="twoFactorAuthentificationStore.hasToken"
                   ></v-icon>
                   <v-icon
@@ -1006,7 +1006,6 @@
                     v-else-if="twoFactorAuthentificationStore.errorCode"
                   ></v-icon>
                   <v-icon
-                    class="mb-2"
                     icon="mdi-information"
                     v-else
                   >
