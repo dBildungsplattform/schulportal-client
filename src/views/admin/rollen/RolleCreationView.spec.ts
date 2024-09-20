@@ -121,7 +121,8 @@ describe('RolleCreationView', () => {
       ?.findComponent({ ref: 'rolle-creation-form' })
       .findComponent({ ref: 'rollenname-input' });
 
-    rollennameInput?.setValue('NewRolle');
+    expect(rollennameInput?.exists()).toBe(true);
+    await rollennameInput?.find('input').setValue('NewRolle');
     await nextTick();
 
     const providerSelect: VueWrapper | undefined = wrapper
@@ -147,9 +148,18 @@ describe('RolleCreationView', () => {
       administeredBySchulstrukturknotenKennung: '',
     };
 
-    expect(wrapper?.find('[data-testid="rolle-form-create-button"]').isVisible()).toBe(true);
+    expect(
+      wrapper
+        ?.findComponent({ ref: 'rolle-creation-form' })
+        .find('[data-testid="rolle-form-create-button"]')
+        .isVisible(),
+    ).toBe(true);
 
-    wrapper?.find('[data-testid="rolle-form-create-button"]').trigger('click');
+    wrapper
+      ?.findComponent({ ref: 'rolle-creation-form' })
+      .findComponent({ ref: 'formwrapper' })
+      .find('[data-testid="rolle-form-create-button"]')
+      .trigger('click');
     await nextTick();
 
     await flushPromises();
