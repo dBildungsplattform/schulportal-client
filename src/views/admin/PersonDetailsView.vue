@@ -773,9 +773,7 @@
     () => personStore.personenuebersicht,
     async (newValue: PersonWithUebersicht | null) => {
       zuordnungenResult.value = computeZuordnungen(newValue);
-      const organisationIds: Array<string> = [
-        ...new Set(personStore.personenuebersicht?.zuordnungen.map((z: Zuordnung) => z.sskId)),
-      ];
+      const organisationIds: Array<string> = [...new Set(newValue?.zuordnungen.map((z: Zuordnung) => z.sskId))];
       if (organisationIds.length > 0) await organisationStore.getParentOrganisationsByIds(organisationIds);
     },
     { immediate: true },

@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
-  import { usePersonStore, type Personendatensatz, type PersonStore } from '@/stores/PersonStore';
+  import { type Organisation } from '@/stores/OrganisationStore';
+  import { type Personendatensatz } from '@/stores/PersonStore';
   import { computed, ref, watch, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
@@ -24,8 +24,6 @@
   const props: Props = defineProps<Props>();
   const emit: Emits = defineEmits<Emits>();
 
-  const personStore: PersonStore = usePersonStore();
-  const organisationStore: OrganisationStore = useOrganisationStore();
   const schulen: Ref<Array<SelectItem>> = computed(() => {
     return [...props.intersectingOrganisations].map((organisation: Organisation) => {
       const v: string = `${organisation.kennung ?? ''} (${organisation.name})`;
@@ -37,15 +35,8 @@
   });
   const selectedSchule: Ref<string | null> = ref(null);
   const errorMessage: ComputedRef<string> = computed(() => {
-    let errorCode: string = '';
-    if (errorCode === '') errorCode = props.errorCode;
-    if (errorCode === '') errorCode = personStore.errorCode;
-    if (errorCode === '') errorCode = organisationStore.errorCode;
-    if (!errorCode) return '';
-    let message: string = t(`errors.${errorCode}`);
-    if (message === '')
-      message = !props.person.person.isLocked ? t('person.lockUserError') : t('person.unlockUserError');
-    return message;
+    if (!props.errorCode) return '';
+    return !props.person.person.isLocked ? t('person.lockUserError') : t('person.unlockUserError');
   });
   const hasSingleSelection: ComputedRef<boolean> = computed(() => {
     return schulen.value.length <= 1;
