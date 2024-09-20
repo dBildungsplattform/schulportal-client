@@ -1210,7 +1210,7 @@ export interface PersonByPersonalnummerBodyParams {
      * @type {string}
      * @memberof PersonByPersonalnummerBodyParams
      */
-    'lastModified'?: string;
+    'lastModified': string;
     /**
      * 
      * @type {string}
@@ -1592,7 +1592,7 @@ export interface PersonResponse {
      * @type {string}
      * @memberof PersonResponse
      */
-    'lastModified': string | null;
+    'lastModified': string;
 }
 
 
