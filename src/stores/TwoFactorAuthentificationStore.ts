@@ -30,6 +30,7 @@ type TwoFactorActions = {
   get2FASoftwareQRCode: (personId: string) => Promise<void>;
   assignHardwareToken: (assignHardwareTokenBodyParams: AssignHardwareTokenBodyParams) => Promise<void>;
   resetToken: (personId: string) => Promise<void>;
+  verify2FAToken: (personId: string, token: string) => Promise<void>;
 };
 
 export type TwoFactorAuthentificationStore = Store<
@@ -157,6 +158,23 @@ export const useTwoFactorAuthentificationStore: StoreDefinition<
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
           this.errorCode = error.response?.data.i18nKey || 'UNSPECIFIED_ERROR';
+        }
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async verify2FAToken(personId: string, token: string): Promise<void> {
+      this.loading = true;
+      try {
+        await twoFactorApi.privacyIdeaAdministrationControllerVerifyToken({
+          personId: personId,
+          otp: token,
+        });
+      } catch (error: unknown) {
+        this.errorCode = 'UNSPECIFIED_ERROR';
+        if (isAxiosError(error)) {
+          this.errorCode = error.response?.data.i18nKey || 'SOFTWARE_TOKEN_VERIFICATION_ERROR';
         }
       } finally {
         this.loading = false;

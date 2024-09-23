@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import SpshTooltip from '@/components/admin/SpshTooltip.vue';
   import KlasseChange from '@/components/admin/klassen/KlasseChange.vue';
+  import KopersInput from '@/components/admin/personen/KopersInput.vue';
   import PasswordReset from '@/components/admin/personen/PasswordReset.vue';
   import PersonDelete from '@/components/admin/personen/PersonDelete.vue';
   import PersonLock from '@/components/admin/personen/PersonLock.vue';
@@ -8,6 +9,7 @@
   import PersonenkontextDelete from '@/components/admin/personen/PersonenkontextDelete.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
+  import TokenReset from '@/components/two-factor-authentication/TokenReset.vue';
   import TwoFactorAuthenticationSetUp from '@/components/two-factor-authentication/TwoFactorAuthenticationSetUp.vue';
   import { useKlassen } from '@/composables/useKlassen';
   import { useOrganisationen } from '@/composables/useOrganisationen';
@@ -34,22 +36,20 @@
     type TwoFactorAuthentificationStore,
   } from '@/stores/TwoFactorAuthentificationStore';
   import { type TranslatedObject } from '@/types.d';
-  import TokenReset from '@/components/two-factor-authentication/TokenReset.vue';
-  import { toTypedSchema } from '@vee-validate/yup';
-  import { useForm, type BaseFieldProps, type FormContext, type TypedSchema } from 'vee-validate';
-  import KopersInput from '@/components/admin/personen/KopersInput.vue';
-  import { computed, onBeforeMount, ref, watch, type ComputedRef, type Ref } from 'vue';
-  import { useI18n, type Composer } from 'vue-i18n';
-  import { useRoute, useRouter, type RouteLocationNormalizedLoaded, type Router } from 'vue-router';
-  import { useDisplay } from 'vuetify';
-  import { object, string, StringSchema, type AnyObject } from 'yup';
-  import { getNextSchuljahresende, formatDateToISO, formatDate } from '@/utils/date';
   import { isBefristungspflichtRolle, useBefristungUtils, type BefristungUtilsType } from '@/utils/befristung';
+  import { formatDate, formatDateToISO, getNextSchuljahresende } from '@/utils/date';
   import {
     getPersonenkontextFieldDefinitions,
     getValidationSchema,
     type PersonenkontextFieldDefinitions,
   } from '@/utils/validationPersonenkontext';
+  import { toTypedSchema } from '@vee-validate/yup';
+  import { useForm, type BaseFieldProps, type FormContext, type TypedSchema } from 'vee-validate';
+  import { computed, onBeforeMount, ref, watch, type ComputedRef, type Ref } from 'vue';
+  import { useI18n, type Composer } from 'vue-i18n';
+  import { useRoute, useRouter, type RouteLocationNormalizedLoaded, type Router } from 'vue-router';
+  import { useDisplay } from 'vuetify';
+  import { object, string, StringSchema, type AnyObject } from 'yup';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
@@ -1069,7 +1069,8 @@
                           :tokenType="twoFactorAuthentificationStore.tokenKind"
                           :personId="currentPersonId"
                           @dialogClosed="twoFactorAuthentificationStore.get2FAState(currentPersonId)"
-                        ></TokenReset>
+                        >
+                        </TokenReset>
                       </SpshTooltip>
                       <TwoFactorAuthenticationSetUp
                         v-else
@@ -1544,8 +1545,8 @@
                   cols="12"
                   sm="auto"
                 >
-                  <h3 class="subtitle-1">{{ $t('transfer') }}:</h3></v-col
-                >
+                  <h3 class="subtitle-1">{{ $t('transfer') }}:</h3>
+                </v-col>
               </v-row>
               <v-container class="px-lg-16">
                 <KlasseChange

@@ -339,6 +339,9 @@
     personenkontextStore.createdPersonenkontextForKlasse = null;
     formContext.resetForm();
     hasNoKopersNr.value = false;
+    // Re-trigger the watchers after resetting the form to auto-select the Befristung since the component isn't remounted
+    // Because we navigate to the same route.
+    setupWatchers();
     router.push({ name: 'create-person' });
   };
 
