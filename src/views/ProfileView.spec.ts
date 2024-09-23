@@ -296,28 +296,24 @@ describe('ProfileView', () => {
     expect(passwordCardText).not.toContain(passwordUpdatedAt.getFullYear());
   });
 
-  test('it displays 2FA data', async () => {
+  test('it displays 2FA section', async () => {
+    twoFactorAuthenticationStore.hasToken = false;
     await nextTick();
     if (!wrapper) return;
-    const cards: VueWrapper[] = wrapper.findAllComponents({ name: 'LayoutCard' }) as VueWrapper[];
-    const twoFactorCard: VueWrapper | undefined = cards.find((card: VueWrapper) =>
-      card.text().includes('Zwei-Faktor-Authentifizierung'),
-    );
+    const twoFactorCard: DOMWrapper<Element> = wrapper.find('[data-testid="two-factor-card"]');
     expect(twoFactorCard).toBeDefined();
     expect(wrapper.find('[data-testid="setup-two-factor-button"]')).toBeDefined();
   });
 
   test('it displays 2FA connection error', async () => {
+    twoFactorAuthenticationStore.hasToken = false;
     twoFactorAuthenticationStore.loading = false;
     twoFactorAuthenticationStore.errorCode = 'something';
     await nextTick();
     if (!wrapper) return;
-    const cards: VueWrapper[] = wrapper.findAllComponents({ name: 'LayoutCard' }) as VueWrapper[];
-    const twoFactorCard: VueWrapper | undefined = cards.find((card: VueWrapper) =>
-      card.text().includes('Zwei-Faktor-Authentifizierung'),
-    );
+    const twoFactorCard: DOMWrapper<Element> = wrapper.find('[data-testid="two-factor-info"]');
     expect(twoFactorCard).toBeDefined();
-    expect(twoFactorCard?.text()).toContain(
+    expect(twoFactorCard.text()).toContain(
       'Der Server für die Zwei-Faktor-Authentifizierung kann aktuell nicht erreicht werden. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut.',
     );
   });

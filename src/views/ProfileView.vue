@@ -590,7 +590,7 @@
                   ></v-icon>
                 </v-col>
                 <v-col>
-                  <p>
+                  <p data-testid="two-factor-info">
                     <template v-if="twoFactorAuthError">
                       {{ twoFactorAuthError }}
                     </template>
