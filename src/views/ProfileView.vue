@@ -1,11 +1,11 @@
 <script setup lang="ts">
-  import type { DBiamPersonenzuordnungResponse } from '@/api-client/generated/api';
+  import { RollenMerkmal, type DBiamPersonenzuordnungResponse } from '@/api-client/generated/api';
   import SpshTooltip from '@/components/admin/SpshTooltip.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import SelfServiceWorkflow from '@/components/two-factor-authentication/SelfServiceWorkflow.vue';
   import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
   import { OrganisationsTyp } from '@/stores/OrganisationStore';
-  import { usePersonInfoStore, type PersonInfoResponse, type PersonInfoStore } from '@/stores/PersonInfoStore';
+  import { usePersonInfoStore, type PersonInfoStore } from '@/stores/PersonInfoStore';
   import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
   import { type Zuordnung } from '@/stores/PersonenkontextStore';
   import {
@@ -13,7 +13,7 @@
     useTwoFactorAuthentificationStore,
     type TwoFactorAuthentificationStore,
   } from '@/stores/TwoFactorAuthentificationStore';
-  import { computed, onBeforeMount, ref, type ComputedRef, type Ref } from 'vue';
+  import { computed, onBeforeMount, ref, watchEffect, type ComputedRef, type Ref } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { useRoute, useRouter, type RouteLocationNormalizedLoaded, type Router } from 'vue-router';
 
@@ -30,50 +30,21 @@
     testIdLabel: string;
     testIdValue: string;
   };
-
-  const route: RouteLocationNormalizedLoaded = useRoute();
-  const router: Router = useRouter();
-  const kcActionStatus: string | null = route.query['kc_action_status'] as string | null;
-
-  export type SchulDaten = {
+  type SchulDaten = {
     title: string;
     info?: string | null;
     schulAdmins?: string[];
     labelAndValues: LabelValue[];
   };
 
+  const route: RouteLocationNormalizedLoaded = useRoute();
+  const router: Router = useRouter();
+  const kcActionStatus: string | null = route.query['kc_action_status'] as string | null;
+
   const personInfoStore: PersonInfoStore = usePersonInfoStore();
   const personStore: PersonStore = usePersonStore();
   const authStore: AuthStore = useAuthStore();
   const twoFactorAuthenticationStore: TwoFactorAuthentificationStore = useTwoFactorAuthentificationStore();
-
-  const personalData: Ref = ref<LabelValue[]>([]);
-  const schulDaten: Ref = ref<SchulDaten[]>([]);
-  const hasKoPersMerkmal: Ref = ref<boolean>(false);
-  const lastPasswordChangeDate: ComputedRef<string> = computed(() => {
-    const passwordUpdatedAt: string | null | undefined = authStore.currentUser?.password_updated_at;
-    if (!passwordUpdatedAt) return '';
-    const date: Date = new Date(passwordUpdatedAt);
-    if (isNaN(date.valueOf())) return '';
-    return new Intl.DateTimeFormat('de-DE', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-    }).format(date);
-  });
-
-  const twoFactorAuthError: ComputedRef<string> = computed(() => {
-    if (twoFactorAuthenticationStore.loading) return '';
-    if (twoFactorAuthenticationStore.errorCode) return t('admin.person.twoFactorAuthentication.errors.connection');
-    return '';
-  });
-
-  function handleGoToPreviousPage(): void {
-    const previousUrl: string | null = sessionStorage.getItem('previousUrl');
-    router.push(previousUrl ?? '/start');
-  }
-
-  const windowOrigin: string = window.location.origin;
 
   /**
    * Gruppiert eine Liste von Zuordnungen nach dem Wert der Eigenschaft 'sskDstNr'.
@@ -186,44 +157,46 @@
     return result;
   }
 
-  async function initializeStores(): Promise<void> {
-    await personInfoStore.initPersonInfo();
-    await personStore.getPersonenuebersichtById(personInfoStore.personInfo?.person.id ?? '');
-    await twoFactorAuthenticationStore.get2FAState(personInfoStore.personInfo?.person.id ?? '');
-  }
+  const hasKoPersMerkmal: ComputedRef<boolean> = computed(() => {
+    return (
+      personStore.personenuebersicht?.zuordnungen.find((zuordnung: DBiamPersonenzuordnungResponse) => {
+        return zuordnung.merkmale.includes(RollenMerkmal.KopersPflicht);
+      }) !== undefined
+    );
+  });
 
-  function setupPersonalData(): void {
-    if (!personInfoStore.personInfo) return;
-    const personInfo: PersonInfoResponse = personInfoStore.personInfo;
-    personalData.value = [
-      {
-        label: t('profile.fullName'),
-        value: personInfo.person.name.vorname + ' ' + personInfo.person.name.familiennamen,
-        testIdLabel: 'fullName-label',
-        testIdValue: 'fullName-value',
-      },
-      {
+  const personalData: ComputedRef<LabelValue[]> = computed(() => {
+    const data: LabelValue[] = [];
+    if (!personInfoStore.personInfo) return data;
+    data.push({
+      label: t('profile.fullName'),
+      value:
+        personInfoStore.personInfo.person.name.vorname + ' ' + personInfoStore.personInfo.person.name.familiennamen,
+      testIdLabel: 'fullName-label',
+      testIdValue: 'fullName-value',
+    });
+    if (personInfoStore.personInfo.person.referrer)
+      data.push({
         label: t('person.userName'),
-        value: personInfo.person.referrer,
+        value: personInfoStore.personInfo.person.referrer,
         testIdLabel: 'userName-label',
         testIdValue: 'userName-value',
-      },
-    ];
-
-    if (personInfo.person.personalnummer || hasKoPersMerkmal.value) {
-      personalData.value.push({
-        label: t('profile.koPersNummer'),
-        labelAbbr: t('profile.koPersNummerAbbr'),
-        value: personInfo.person.personalnummer,
-        type: ItemType.KO_PERS,
-        testIdLabel: 'kopersnummer-label',
-        testIdValue: 'kopersnummer-value',
       });
-    }
-  }
 
-  function setupSchuleData(): void {
-    if (!personStore.personenuebersicht) return;
+    if (!(personInfoStore.personInfo.person.personalnummer && hasKoPersMerkmal.value)) return data;
+    data.push({
+      label: t('profile.koPersNummer'),
+      labelAbbr: t('profile.koPersNummerAbbr'),
+      value: personInfoStore.personInfo.person.personalnummer,
+      type: ItemType.KO_PERS,
+      testIdLabel: 'kopersnummer-label',
+      testIdValue: 'kopersnummer-value',
+    });
+    return data;
+  });
+
+  const schulDaten: ComputedRef<SchulDaten[]> = computed(() => {
+    if (!personStore.personenuebersicht) return [];
     const personenZuordnungen: Zuordnung[] = personStore.personenuebersicht.zuordnungen;
     const groupedZuordnungen: Map<string, Zuordnung[]> = groupZuordnungen(
       personenZuordnungen.map(
@@ -236,7 +209,36 @@
     );
 
     const composedZuordnungen: Zuordnung[] = createComposedZuordnungen(groupedZuordnungen);
-    schulDaten.value = createZuordnungsSchuleDaten(composedZuordnungen);
+    return createZuordnungsSchuleDaten(composedZuordnungen);
+  });
+
+  const lastPasswordChangeDate: ComputedRef<string> = computed(() => {
+    const passwordUpdatedAt: string | null | undefined = authStore.currentUser?.password_updated_at;
+    if (!passwordUpdatedAt) return '';
+    const date: Date = new Date(passwordUpdatedAt);
+    if (isNaN(date.valueOf())) return '';
+    return new Intl.DateTimeFormat('de-DE', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).format(date);
+  });
+
+  const twoFactorAuthError: ComputedRef<string> = computed(() => {
+    if (twoFactorAuthenticationStore.loading) return '';
+    if (twoFactorAuthenticationStore.errorCode) return t('admin.person.twoFactorAuthentication.errors.connection');
+    return '';
+  });
+
+  function handleGoToPreviousPage(): void {
+    const previousUrl: string | null = sessionStorage.getItem('previousUrl');
+    router.push(previousUrl ?? '/start');
+  }
+
+  const windowOrigin: string = window.location.origin;
+
+  async function initializeStores(): Promise<void> {
+    await personInfoStore.initPersonInfo();
   }
 
   const isPasswordResetDialogActive: Ref<boolean> = ref(false);
@@ -262,23 +264,14 @@
     window.location.href = url.toString();
   }
 
-  function hasKoPersMerkmalCheck(): void {
-    let zuordnungen: Array<DBiamPersonenzuordnungResponse> | undefined = personStore.personenuebersicht?.zuordnungen;
-    if (zuordnungen !== undefined) {
-      let result: boolean = !!zuordnungen.find((zuordnung: DBiamPersonenzuordnungResponse) => {
-        return zuordnung.merkmale.includes('KOPERS_PFLICHT');
-      });
-      hasKoPersMerkmal.value = result;
-    }
-  }
+  watchEffect(async () => {
+    if (!personInfoStore.personInfo?.person.id) return;
+    await personStore.getPersonenuebersichtById(personInfoStore.personInfo.person.id);
+    await twoFactorAuthenticationStore.get2FAState(personInfoStore.personInfo.person.id);
+  });
+
   onBeforeMount(async () => {
     await initializeStores();
-    hasKoPersMerkmalCheck();
-    setupPersonalData();
-    setupSchuleData();
-    if (personInfoStore.personInfo?.person.id) {
-      await twoFactorAuthenticationStore.get2FAState(personInfoStore.personInfo.person.id);
-    }
   });
 </script>
 
