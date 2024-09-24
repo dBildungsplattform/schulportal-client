@@ -31,7 +31,7 @@
     errorCode: string;
     disabled: boolean;
     person: Personendatensatz;
-    tokenType: string | null;
+    tokenType: TokenKind | null;
   };
 
   const props: Props = defineProps<Props>();
@@ -54,7 +54,7 @@
           : t('admin.person.twoFactorAuthentication.tokenResetSoftwareErrorHeader');
     } else {
       dialogHeader.value = t('admin.person.twoFactorAuthentication.tokenReset');
-      if (props.tokenType === 'hardware') {
+      if (props.tokenType === TokenKind.hardware) {
         dialogText.value = t('admin.person.twoFactorAuthentication.tokenResetSuccessHardware');
       } else {
         dialogText.value = t('admin.person.twoFactorAuthentication.tokenResetSuccessSoftware');
