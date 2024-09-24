@@ -1,6 +1,4 @@
 .v-btn {
-  width: 340px;
-
   .v-btn__content {
     font-weight: bold;
   }
@@ -22,6 +20,7 @@
   }
 
   &.primary {
+    width: $buttonWidth;
     background: $primaryButtonBackgroundColor;
     border: $primaryButtonBorderSize solid $primaryButtonBorderColor;
     color: $primaryButtonColor;
@@ -36,9 +35,30 @@
     &:active {
       color: $primaryButtonColor;
     }
+
+    /* small screen */
+    @media only screen and (max-width: 600px) {
+      font-size: $smallButtonFontSize;
+
+      &:focus,
+      &:hover {
+        transform: $smallButtonTransformScale;
+      }
+    }
+
+    /* medium screen */
+    @media only screen and (min-width: 601px) and (max-width: 1280px) {
+      font-size: $mediumButtonFontSize;
+    }
+
+    /* big screen */
+    @media only screen and (min-width: 1281px) {
+      font-size: $bigButtonFontSize;
+    }
   }
 
   &.secondary {
+    width: $buttonWidth;
     background: $secondaryButtonBackgroundColor;
     border: $secondaryButtonBorderSize solid $secondaryButtonBorderColor;
     color: $secondaryButtonColor;
@@ -47,29 +67,29 @@
     &:hover {
       border: $secondaryButtonHoverBorderSize solid $secondaryButtonBorderColor;
     }
+
+    /* small screen */
+    @media only screen and (max-width: 600px) {
+      font-size: $smallButtonFontSize;
+
+      &:focus,
+      &:hover {
+        transform: $smallButtonTransformScale;
+      }
+    }
+
+    /* medium screen */
+    @media only screen and (min-width: 601px) and (max-width: 1280px) {
+      font-size: $mediumButtonFontSize;
+    }
+
+    /* big screen */
+    @media only screen and (min-width: 1281px) {
+      font-size: $bigButtonFontSize;
+    }
   }
 
   &.small {
     width: 220px;
-  }
-
-  /* small screen */
-  @media only screen and (max-width: 600px) {
-    font-size: $smallButtonFontSize;
-
-    &:focus,
-    &:hover {
-      transform: $smallButtonTransformScale;
-    }
-  }
-
-  /* medium screen */
-  @media only screen and (min-width: 601px) and (max-width: 1280px) {
-    font-size: $mediumButtonFontSize;
-  }
-
-  /* big screen */
-  @media only screen and (min-width: 1281px) {
-    font-size: $bigButtonFontSize;
   }
 }

@@ -834,6 +834,12 @@ export interface LockUserBodyParams {
      * @memberof LockUserBodyParams
      */
     'locked_from': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof LockUserBodyParams
+     */
+    'locked_until': string | null;
 }
 /**
  * 
@@ -1528,7 +1534,7 @@ export interface PersonResponse {
      * @type {object}
      * @memberof PersonResponse
      */
-    'lockInfo': object | null;
+    'userLock': object | null;
 }
 
 

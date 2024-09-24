@@ -10,6 +10,7 @@ import {
   type DbiamPersonenuebersichtApiInterface,
   type DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response,
   type DBiamPersonenuebersichtResponse,
+  type LockUserBodyParams,
   type PersonenApiInterface,
   type PersonendatensatzResponse,
   type PersonenFrontendApiInterface,
@@ -29,10 +30,15 @@ const personenuebersichtApi: DbiamPersonenuebersichtApiInterface = DbiamPersonen
 );
 
 export enum LockKeys {
-  LockedFrom = 'lock_locked_from',
-  Timestamp = 'lock_timestamp',
+  PersonId = 'personId',
+  LockedFrom = 'locked_from',
+  LockedUntil = 'locked_until',
 }
-export type LockInfo = Record<LockKeys, string>;
+export type UserLock = {
+  personId: string;
+  locked_from: string;
+  locked_until: string;
+};
 
 export type Person = {
   id: PersonResponse['id'];
@@ -40,7 +46,7 @@ export type Person = {
   referrer: PersonResponse['referrer'];
   personalnummer: PersonResponse['personalnummer'];
   isLocked: PersonResponse['isLocked'];
-  lockInfo: LockInfo | null;
+  userLock: UserLock | null;
 };
 
 type PersonenWithRolleAndZuordnung = {
@@ -82,25 +88,26 @@ export type PersonTableItem = {
 export type CreatePersonBodyParams = DbiamCreatePersonWithPersonenkontexteBodyParams;
 export type CreatedPersonenkontext = DbiamPersonenkontextBodyParams;
 
-export function parseLockInfo(unparsed: object): LockInfo | null {
+export function parseUserLock(unparsed: object): UserLock | null {
   if (!Object.values(LockKeys).every((key: string) => key in unparsed)) return null;
   return {
-    lock_locked_from: LockKeys.LockedFrom in unparsed ? '' + unparsed[LockKeys.LockedFrom] : '',
-    lock_timestamp: LockKeys.Timestamp in unparsed ? '' + unparsed[LockKeys.Timestamp] : '',
+    personId: LockKeys.PersonId in unparsed ? '' + unparsed[LockKeys.PersonId] : '',
+    locked_from: LockKeys.LockedFrom in unparsed ? '' + unparsed[LockKeys.LockedFrom] : '',
+    locked_until: LockKeys.LockedUntil in unparsed ? '' + unparsed[LockKeys.LockedUntil] : '',
   };
 }
 
 export function mapPersonendatensatzResponseToPersonendatensatz(
   response: PersonendatensatzResponse,
 ): Personendatensatz {
-  const lockInfo: LockInfo | null = parseLockInfo(response.person.lockInfo ?? {});
+  const userLock: UserLock | null = parseUserLock(response.person.userLock ?? {});
   const person: Person = {
     id: response.person.id,
     name: response.person.name,
     referrer: response.person.referrer,
     personalnummer: response.person.personalnummer,
     isLocked: response.person.isLocked,
-    lockInfo: lockInfo,
+    userLock: userLock,
   };
   return { person };
 }
@@ -135,7 +142,7 @@ type PersonActions = {
   getPersonById: (personId: string) => Promise<Personendatensatz>;
   resetPassword: (personId: string) => Promise<string>;
   deletePersonById: (personId: string) => Promise<void>;
-  lockPerson: (personId: string, lock: boolean, locked_from: string) => Promise<void>;
+  lockPerson: (personId: string, bodyParams: LockUserBodyParams) => Promise<void>;
   getPersonenuebersichtById: (personId: string) => Promise<void>;
 };
 
@@ -304,13 +311,10 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
         this.loading = false;
       }
     },
-    async lockPerson(personId: string, lock: boolean, locked_from: string): Promise<void> {
+    async lockPerson(personId: string, bodyParams: LockUserBodyParams): Promise<void> {
       this.loading = true;
       try {
-        await personenApi.personControllerLockPerson(personId, {
-          lock: lock,
-          locked_from: locked_from,
-        });
+        await personenApi.personControllerLockPerson(personId, bodyParams);
         await this.getPersonById(personId);
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';

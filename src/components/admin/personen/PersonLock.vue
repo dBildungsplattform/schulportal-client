@@ -15,12 +15,14 @@
     adminId: string;
   };
 
+  const date: Ref<Date | null> = ref(null);
+  const selectedLockOption: Ref<string> = ref('');
   const personStore: PersonStore = usePersonStore();
   const organisationStore: OrganisationStore = useOrganisationStore();
   const schulen: Ref<Array<{ value: string; title: string }>> = ref([]);
   const selectedSchule: Ref<string | null> = ref(null);
   type Emits = {
-    (event: 'onLockUser', id: string, lock: boolean, schule: string): void;
+    (event: 'onLockUser', id: string, lock: boolean, schule: string, date: string | null): void;
   };
 
   const props: Props = defineProps<Props>();
@@ -45,7 +47,8 @@
   }
   function handleOnLockUser(id: string, isActive: Ref<boolean>): void {
     if (selectedSchule.value) {
-      emit('onLockUser', id, !props.person.person.isLocked, selectedSchule.value);
+      let dateString: string | null = date.value?.toISOString() ?? null;
+      emit('onLockUser', id, !props.person.person.isLocked, selectedSchule.value, dateString);
       closeLockPersonDialog(isActive);
     }
   }
@@ -71,7 +74,6 @@
       ),
     );
   }
-
   onBeforeMount(async () => {
     const intersectingOrganisations: Set<Organisation> = await getOrganisationIntersection();
     schulen.value = [...intersectingOrganisations].map((organisation: Organisation) => {
@@ -171,6 +173,41 @@
                   variant="outlined"
                   v-model="selectedSchule"
                 ></v-select>
+              </v-col>
+            </v-row>
+            <v-row class="justify-center w-full">
+              <v-col
+                class="text-body"
+                cols="12"
+                sm="6"
+                md="2"
+              >
+                Dauer der Sperre
+              </v-col>
+              <v-col
+                cols="12"
+                sm="6"
+                md="6"
+                class="text-sm-center text-body"
+              >
+                <v-radio-group v-model="selectedLockOption">
+                  <v-row>
+                    <v-radio
+                      :label="'bis auf Widerruf'"
+                      :value="'default'"
+                    ></v-radio>
+                  </v-row>
+                  <v-row>
+                    <v-radio
+                      label="befristet bis"
+                      value="defined-until"
+                    ></v-radio>
+                    <v-date-input
+                      v-model="date"
+                      placeholder="TT.MM.JJJJ"
+                    ></v-date-input>
+                  </v-row>
+                </v-radio-group>
               </v-col>
             </v-row>
             <v-row class="text-body bold px-md-16">

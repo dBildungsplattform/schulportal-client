@@ -50,6 +50,7 @@
   import { useRoute, useRouter, type RouteLocationNormalizedLoaded, type Router } from 'vue-router';
   import { useDisplay } from 'vuetify';
   import { object, string, StringSchema, type AnyObject } from 'yup';
+  import type { LockUserBodyParams } from '@/api-client/generated';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
@@ -108,8 +109,13 @@
     });
   }
 
-  function onLockUser(personId: string, lock: boolean, organisation: string): void {
-    personStore.lockPerson(personId, lock, organisation);
+  function onLockUser(personId: string, lock: boolean, lockedFrom: string, date: string | null): void {
+    let bodyParams: LockUserBodyParams = {
+      lock: lock,
+      locked_from: lockedFrom,
+      locked_until: date,
+    };
+    personStore.lockPerson(personId, bodyParams);
   }
 
   const handleAlertClose = (): void => {
@@ -141,7 +147,7 @@
     switch (key) {
       case LockKeys.LockedFrom:
         return t('person.lockedBy');
-      case LockKeys.Timestamp:
+      case LockKeys.LockedUntil:
         return t('since');
       default:
         return key;
@@ -149,7 +155,7 @@
   }
 
   function keyValueMapper(key: string, value: string): string {
-    if (key === LockKeys.Timestamp) {
+    if (key === LockKeys.LockedUntil) {
       return new Intl.DateTimeFormat('de-DE', {
         year: 'numeric',
         month: '2-digit',
@@ -159,11 +165,11 @@
     return value;
   }
 
-  const getLockInfo: ComputedRef<{ key: string; attribute: string }[]> = computed(() => {
+  const getUserLock: ComputedRef<{ key: string; attribute: string }[]> = computed(() => {
     if (!personStore.currentPerson?.person.isLocked) return [];
-    const { lockInfo }: Person = personStore.currentPerson.person;
-    if (!lockInfo) return [];
-    return Object.entries(lockInfo).map(([key, value]: [string, string]) => ({
+    const { userLock }: Person = personStore.currentPerson.person;
+    if (!userLock) return [];
+    return Object.entries(userLock).map(([key, value]: [string, string]) => ({
       key: keyMapper(key),
       attribute: keyValueMapper(key, value.toString()),
     }));
@@ -1639,7 +1645,7 @@
                 </v-row>
                 <v-row
                   class="mt-0"
-                  v-for="{ key, attribute } of getLockInfo"
+                  v-for="{ key, attribute } of getUserLock"
                   :key="key"
                   cols="10"
                 >
