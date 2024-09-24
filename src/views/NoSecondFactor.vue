@@ -25,7 +25,7 @@
         <v-btn
           class="primary"
           @click="toSecondFactorSetup"
-          data-testid="alert-button"
+          data-testid="toSecondFactorSetup-button"
         >
           {{ $t('admin.person.twoFactorAuthentication.toSecondFactorSetup') }}
         </v-btn>
