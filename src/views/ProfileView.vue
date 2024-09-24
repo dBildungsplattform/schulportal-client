@@ -543,7 +543,6 @@
         <LayoutCard
           :headline-test-id="'two-factor-card'"
           :header="$t('profile.twoFactorAuth')"
-          v-if="twoFactorAuthenticationStore.hasToken != undefined"
         >
           <v-row
             v-if="twoFactorAuthenticationStore.hasToken === false"
