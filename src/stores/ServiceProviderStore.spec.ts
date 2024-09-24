@@ -1,7 +1,7 @@
 import ApiService from '@/services/ApiService';
 import MockAdapter from 'axios-mock-adapter';
-import { setActivePinia, createPinia } from 'pinia';
-import { useServiceProviderStore, type ServiceProviderStore, type ServiceProvider } from './ServiceProviderStore';
+import { createPinia, setActivePinia } from 'pinia';
+import { useServiceProviderStore, type ServiceProvider, type ServiceProviderStore } from './ServiceProviderStore';
 
 const mockadapter: MockAdapter = new MockAdapter(ApiService);
 
@@ -29,6 +29,7 @@ describe('serviceProviderStore', () => {
           target: 'URL',
           kategorie: 'EMAIL',
           hasLogo: true,
+          requires2fa: true,
         },
         {
           id: '5678',
@@ -37,6 +38,7 @@ describe('serviceProviderStore', () => {
           target: 'URL',
           kategorie: 'VERWALTUNG',
           hasLogo: true,
+          requires2fa: false,
         },
       ];
 
@@ -79,6 +81,7 @@ describe('serviceProviderStore', () => {
           kategorie: 'EMAIL',
           hasLogo: true,
           target: 'URL',
+          requires2fa: true,
         },
         {
           id: '5678',
@@ -87,6 +90,7 @@ describe('serviceProviderStore', () => {
           kategorie: 'VERWALTUNG',
           hasLogo: true,
           target: 'URL',
+          requires2fa: false,
         },
       ];
 
