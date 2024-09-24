@@ -2232,6 +2232,12 @@ export interface ServiceProviderResponse {
      * @memberof ServiceProviderResponse
      */
     'hasLogo': boolean;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof ServiceProviderResponse
+     */
+    'requires2fa': boolean;
 }
 
 
@@ -2313,6 +2319,19 @@ export interface TokenInitBodyParams {
      * @memberof TokenInitBodyParams
      */
     'personId': string;
+}
+/**
+ * 
+ * @export
+ * @interface TokenRequiredResponse
+ */
+export interface TokenRequiredResponse {
+    /**
+     * 
+     * @type {boolean}
+     * @memberof TokenRequiredResponse
+     */
+    'required': boolean;
 }
 /**
  * 
@@ -3188,6 +3207,50 @@ export const Class2FAApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
+        privacyIdeaAdministrationControllerRequiresTwoFactorAuthentication: async (personId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'personId' is not null or undefined
+            assertParamExists('privacyIdeaAdministrationControllerRequiresTwoFactorAuthentication', 'personId', personId)
+            const localVarPath = `/api/2fa-token/required`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+            if (personId !== undefined) {
+                localVarQueryParameter['personId'] = personId;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {string} personId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
         privacyIdeaAdministrationControllerResetToken: async (personId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'personId' is not null or undefined
             assertParamExists('privacyIdeaAdministrationControllerResetToken', 'personId', personId)
@@ -3315,6 +3378,16 @@ export const Class2FAApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
+        async privacyIdeaAdministrationControllerRequiresTwoFactorAuthentication(personId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TokenRequiredResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.privacyIdeaAdministrationControllerRequiresTwoFactorAuthentication(personId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @param {string} personId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
         async privacyIdeaAdministrationControllerResetToken(personId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<boolean>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.privacyIdeaAdministrationControllerResetToken(personId, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
@@ -3365,6 +3438,15 @@ export const Class2FAApiFactory = function (configuration?: Configuration, baseP
          */
         privacyIdeaAdministrationControllerInitializeSoftwareToken(tokenInitBodyParams: TokenInitBodyParams, options?: any): AxiosPromise<string> {
             return localVarFp.privacyIdeaAdministrationControllerInitializeSoftwareToken(tokenInitBodyParams, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {string} personId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        privacyIdeaAdministrationControllerRequiresTwoFactorAuthentication(personId: string, options?: any): AxiosPromise<TokenRequiredResponse> {
+            return localVarFp.privacyIdeaAdministrationControllerRequiresTwoFactorAuthentication(personId, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -3427,6 +3509,15 @@ export interface Class2FAApiInterface {
      * @throws {RequiredError}
      * @memberof Class2FAApiInterface
      */
+    privacyIdeaAdministrationControllerRequiresTwoFactorAuthentication(personId: string, options?: AxiosRequestConfig): AxiosPromise<TokenRequiredResponse>;
+
+    /**
+     * 
+     * @param {string} personId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof Class2FAApiInterface
+     */
     privacyIdeaAdministrationControllerResetToken(personId: string, options?: AxiosRequestConfig): AxiosPromise<boolean>;
 
     /**
@@ -3478,6 +3569,17 @@ export class Class2FAApi extends BaseAPI implements Class2FAApiInterface {
      */
     public privacyIdeaAdministrationControllerInitializeSoftwareToken(tokenInitBodyParams: TokenInitBodyParams, options?: AxiosRequestConfig) {
         return Class2FAApiFp(this.configuration).privacyIdeaAdministrationControllerInitializeSoftwareToken(tokenInitBodyParams, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {string} personId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof Class2FAApi
+     */
+    public privacyIdeaAdministrationControllerRequiresTwoFactorAuthentication(personId: string, options?: AxiosRequestConfig) {
+        return Class2FAApiFp(this.configuration).privacyIdeaAdministrationControllerRequiresTwoFactorAuthentication(personId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
