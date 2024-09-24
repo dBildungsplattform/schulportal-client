@@ -47,10 +47,19 @@
   import { useForm, type BaseFieldProps, type FormContext, type TypedSchema } from 'vee-validate';
   import { computed, onBeforeMount, onMounted, onUnmounted, ref, watch, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
-  import { onBeforeRouteLeave, useRoute, useRouter, type NavigationGuardNext, type RouteLocationNormalized, type RouteLocationNormalizedLoaded, type Router } from 'vue-router';
+  import {
+    onBeforeRouteLeave,
+    useRoute,
+    useRouter,
+    type NavigationGuardNext,
+    type RouteLocationNormalized,
+    type RouteLocationNormalizedLoaded,
+    type Router,
+  } from 'vue-router';
   import { useDisplay } from 'vuetify';
   import { object, string, StringSchema, type AnyObject } from 'yup';
-import type { TranslatedObject } from '@/types';
+  import type { TranslatedObject } from '@/types';
+  import { DIN_91379A, NO_LEADING_TRAILING_SPACES } from '@/utils/validation';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
@@ -377,6 +386,8 @@ import type { TranslatedObject } from '@/types';
   };
 
   type ChangePersonInfoForm = {
+    selectedVorname: string;
+    selectedFamilienname: string;
     selectedKopersNrPersonInfo: string;
   };
 
@@ -439,6 +450,16 @@ import type { TranslatedObject } from '@/types';
   const changePersonInfoValidationSchema: TypedSchema = toTypedSchema(
     object({
       selectedKopersNrPersonInfo: string().required(t('admin.person.rules.kopersNr.required')),
+      selectedVorname: string()
+        .matches(DIN_91379A, t('admin.person.rules.vorname.matches'))
+        .matches(NO_LEADING_TRAILING_SPACES, t('admin.person.rules.vorname.noLeadingTrailingSpaces'))
+        .min(2, t('admin.person.rules.vorname.min'))
+        .required(t('admin.person.rules.vorname.required')),
+      selectedFamilienname: string()
+        .matches(DIN_91379A, t('admin.person.rules.familienname.matches'))
+        .matches(NO_LEADING_TRAILING_SPACES, t('admin.person.rules.familienname.noLeadingTrailingSpaces'))
+        .min(2, t('admin.person.rules.familienname.min'))
+        .required(t('admin.person.rules.familienname.required')),
     }),
   );
 
@@ -501,6 +522,14 @@ import type { TranslatedObject } from '@/types';
   ] = defineFieldChangeKlasse('selectedNewKlasse', vuetifyConfig);
 
   // Change Person Info Form
+  const [selectedVorname, selectedVornameProps]: [
+    Ref<string | undefined>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = defineFieldChangePersonInfo('selectedVorname', vuetifyConfig);
+  const [selectedFamilienname, selectedFamiliennameProps]: [
+    Ref<string | undefined>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = defineFieldChangePersonInfo('selectedFamilienname', vuetifyConfig);
   const [selectedKopersNrPersonInfo, selectedKopersNrPersonInfoProps]: [
     Ref<string | undefined | null>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
@@ -856,7 +885,12 @@ import type { TranslatedObject } from '@/types';
   const triggerPersonInfoEdit = (): void => {
     isEditPersonInfoActive.value = true;
     const personalnummer: string | null | undefined = personStore.currentPerson?.person.personalnummer;
+    const vorname: string | undefined = personStore.currentPerson?.person.name.vorname;
+    const familienname: string | undefined = personStore.currentPerson?.person.name.familienname;
+
     setFieldValueChangePersonInfo('selectedKopersNrPersonInfo', personalnummer ?? '');
+    setFieldValueChangePersonInfo('selectedVorname', vorname ?? '');
+    setFieldValueChangePersonInfo('selectedFamilienname', familienname ?? '');
   };
 
   const cancelEditPersonInfo = (): void => {
@@ -869,14 +903,28 @@ import type { TranslatedObject } from '@/types';
     selectedKopersNrPersonInfo.value = value;
   }
 
+    // Handles the value emitted by PersonenInfoChange for the selectedVorname
+  function handleSelectedVorname(value: string | undefined): void {
+      selectedVorname.value = value;
+  }
+
+    // Handles the value emitted by PersonenInfoChange for the selectedFamilienname
+  function handleSelectedFamilienname(value: string | undefined): void {
+      selectedFamilienname.value = value;
+  }
+
   // Submit the form for changing person informations (Vorname, Nachname, KopersNr.)
   const onSubmitChangePersonInfo: (e?: Event) => Promise<Promise<void> | undefined> = handleSubmitChangePersonInfo(
     async () => {
-      if (selectedKopersNrPersonInfo.value) {
-        await personStore.changePersonInfoById(currentPersonId, selectedKopersNrPersonInfo.value);
-        changePersonInfoSuccessVisible.value = !personStore.errorCode;
-        resetFormChangePersonInfo();
+      if (selectedKopersNrPersonInfo.value && selectedVorname.value && selectedFamilienname.value) {
+        await personStore.changePersonInfoById(currentPersonId, selectedKopersNrPersonInfo.value, selectedVorname.value, selectedFamilienname.value);
+
       }
+      else if (selectedVorname.value && selectedFamilienname.value){
+        await personStore.changePersonInfoById(currentPersonId, selectedVorname.value, selectedFamilienname.value);
+      }
+      changePersonInfoSuccessVisible.value = !personStore.errorCode;
+      resetFormChangePersonInfo();
     },
   );
 
@@ -915,10 +963,10 @@ import type { TranslatedObject } from '@/types';
   // Checks if the entered KopersNr is the same one that is already assigned to the user.
   // This is used to disable the save button in that case (To avoid errors).
   const hasSameKopersNr: ComputedRef<boolean> = computed(() => {
-      if(selectedKopersNrPersonInfo.value === personStore.currentPerson?.person.personalnummer) {
-        return true;
-      }
-      return false;
+    if (selectedKopersNrPersonInfo.value === personStore.currentPerson?.person.personalnummer) {
+      return true;
+    }
+    return false;
   });
 
   // Computed property to check if the second radio button should be disabled
@@ -1004,37 +1052,40 @@ import type { TranslatedObject } from '@/types';
           <div v-if="personStore.currentPerson?.person && !isEditPersonInfoActive">
             <!-- Befristung -->
             <v-row class="ml-md-16">
-            <v-col
-              cols="12"
-              md="auto"
-              class="mt-1 edit-container"
-            >
-              <div v-if ="hasKopersRolle" class="d-flex justify-sm-end">
-                <v-col
-                  cols="12"
-                  sm="6"
-                  md="auto"
+              <v-col
+                cols="12"
+                md="auto"
+                class="mt-1 edit-container"
+              >
+                <div
+                  v-if="hasKopersRolle"
+                  class="d-flex justify-sm-end"
                 >
-                  <SpshTooltip
-                    :enabledCondition="!isEditActive"
-                    :disabledText="$t('person.finishEditFirst')"
-                    :enabledText="$t('admin.person.editPersonalInfo')"
-                    position="start"
+                  <v-col
+                    cols="12"
+                    sm="6"
+                    md="auto"
                   >
-                    <v-btn
-                      :disabled="isEditActive"
-                      class="primary ml-lg-8"
-                      data-testid="zuordnung-edit-button"
-                      @Click="triggerPersonInfoEdit"
-                      :block="mdAndDown"
+                    <SpshTooltip
+                      :enabledCondition="!isEditActive"
+                      :disabledText="$t('person.finishEditFirst')"
+                      :enabledText="$t('admin.person.editPersonalInfo')"
+                      position="start"
                     >
-                      {{ $t('edit') }}
-                    </v-btn>
-                  </SpshTooltip>
-                </v-col>
-              </div>
-            </v-col>
-          </v-row>
+                      <v-btn
+                        :disabled="isEditActive"
+                        class="primary ml-lg-8"
+                        data-testid="zuordnung-edit-button"
+                        @Click="triggerPersonInfoEdit"
+                        :block="mdAndDown"
+                      >
+                        {{ $t('edit') }}
+                      </v-btn>
+                    </SpshTooltip>
+                  </v-col>
+                </div>
+              </v-col>
+            </v-row>
             <!-- Vorname -->
             <v-row class="mt-md-6">
               <v-col cols="1"></v-col>
@@ -1136,13 +1187,19 @@ import type { TranslatedObject } from '@/types';
           >
             <PersonenInfoChange
               :confirmUnsavedChangesAction="handleConfirmUnsavedChanges"
+              :selectedVornameProps="selectedVornameProps"
+              :selectedVorname="personStore.currentPerson?.person.name.vorname"
+              :selectedFamiliennameProps="selectedFamiliennameProps"
+              :selectedFamilienname="personStore.currentPerson?.person.name.familienname"
               :selectedKopersNrPersonInfoProps="selectedKopersNrPersonInfoProps"
               :selectedKopersNrPersonInfo="personStore.currentPerson?.person.personalnummer"
               :showUnsavedChangesDialog="showUnsavedChangesDialog"
               @update:selectedKopersNrPersonInfo="handleSelectedKopersNrUpdate"
+              @update:selectedVorname="handleSelectedVorname"
+              @update:selectedFamilienname="handleSelectedFamilienname"
               @onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
             ></PersonenInfoChange>
-            <v-row class="save-cancel-row ml-md-16 pt-5 justify-end">
+            <v-row class="save-cancel-row ml-md-16 pt-md-5 pt-12 justify-end">
               <v-col
                 class="cancel-col"
                 cols="12"
@@ -1163,22 +1220,22 @@ import type { TranslatedObject } from '@/types';
                 sm="6"
                 md="auto"
               >
-              <SpshTooltip
-                    :enabledCondition="!hasSameKopersNr"
-                    :disabledText="$t('person.changeKopersDisabledDescription')" 
-                    :enabledText="$t('save')"
-                    position="start"
-                  >
-                <v-btn
-                  class="primary small"
-                  :disabled ="hasSameKopersNr"
-                  data-testid="person-info-edit-save"
-                  @click="handleSaveClick"
-                  :block="mdAndDown"
-                  type="submit"
+                <SpshTooltip
+                  :enabledCondition="!hasSameKopersNr"
+                  :disabledText="$t('person.changeKopersDisabledDescription')"
+                  :enabledText="$t('save')"
+                  position="start"
                 >
-                  {{ $t('save') }}
-                </v-btn>
+                  <v-btn
+                    class="primary small"
+                    :disabled="hasSameKopersNr"
+                    data-testid="person-info-edit-save"
+                    @click="handleSaveClick"
+                    :block="mdAndDown"
+                    type="submit"
+                  >
+                    {{ $t('save') }}
+                  </v-btn>
                 </SpshTooltip>
               </v-col>
             </v-row>

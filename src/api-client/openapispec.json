@@ -798,9 +798,9 @@
                 ]
             }
         },
-        "/api/personen/{personId}/personalnummer": {
+        "/api/personen/{personId}/metadata": {
             "patch": {
-                "operationId": "PersonController_updatePersonalnummer",
+                "operationId": "PersonController_updateMetadata",
                 "parameters": [
                     {
                         "name": "personId",
@@ -818,14 +818,21 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/PersonByPersonalnummerBodyParams"
+                                "$ref": "#/components/schemas/PersonMetadataBodyParams"
                             }
                         }
                     }
                 },
                 "responses": {
-                    "204": {
-                        "description": "The personalnummer was successfully updated."
+                    "200": {
+                        "description": "The metadata for user was successfully updated.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PersonendatensatzResponse"
+                                }
+                            }
+                        }
                     },
                     "400": {
                         "description": "Request has a wrong format.",
@@ -838,13 +845,13 @@
                         }
                     },
                     "401": {
-                        "description": "Not authorized to update the personalnummer."
+                        "description": "Not authorized to update the metadata."
                     },
                     "403": {
-                        "description": "Not permitted to update the personalnummer."
+                        "description": "Not permitted to update the metadata."
                     },
                     "500": {
-                        "description": "Internal server error while updating the personalnummer."
+                        "description": "Internal server error while updating the metadata for user."
                     }
                 },
                 "tags": [
@@ -4222,6 +4229,7 @@
                     "lastModified": {
                         "format": "date-time",
                         "type": "string",
+                        "nullable": true,
                         "description": "Date of the most recent changes for the person"
                     }
                 },
@@ -4460,9 +4468,15 @@
                     "message"
                 ]
             },
-            "PersonByPersonalnummerBodyParams": {
+            "PersonMetadataBodyParams": {
                 "type": "object",
                 "properties": {
+                    "familienname": {
+                        "type": "string"
+                    },
+                    "vorname": {
+                        "type": "string"
+                    },
                     "personalnummer": {
                         "type": "string"
                     },
@@ -4476,8 +4490,8 @@
                     }
                 },
                 "required": [
-                    "personalnummer",
-                    "lastModified",
+                    "familienname",
+                    "vorname",
                     "revision"
                 ]
             },
@@ -4492,8 +4506,8 @@
                             "FAMILIENNAME_ENTHAELT_LEERZEICHEN",
                             "PERSON_NOT_FOUND",
                             "DOWNSTREAM_UNREACHABLE",
-                            "PERSONALNUMMER_REQUIRED",
-                            "NEWER_VERSION_OF_PERSONALNUMMER_AVAILABLE",
+                            "PERSONALNUMMER_OR_VORNAME_OR_FAMILIENNAME_REQUIRED",
+                            "NEWER_VERSION_OF_PERSON_AVAILABLE",
                             "PERSONALNUMMER_NICHT_EINDEUTIG"
                         ]
                     },

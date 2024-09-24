@@ -10,12 +10,12 @@ import {
   type DbiamPersonenuebersichtApiInterface,
   type DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response,
   type DBiamPersonenuebersichtResponse,
-  type PersonByPersonalnummerBodyParams,
   type PersonenApiInterface,
   type PersonendatensatzResponse,
   type PersonenFrontendApiInterface,
   type PersonenuebersichtBodyParams,
   type PersonFrontendControllerFindPersons200Response,
+  type PersonMetadataBodyParams,
   type PersonResponse,
 } from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
@@ -142,7 +142,12 @@ type PersonActions = {
   deletePersonById: (personId: string) => Promise<void>;
   lockPerson: (personId: string, lock: boolean, locked_from: string) => Promise<void>;
   getPersonenuebersichtById: (personId: string) => Promise<void>;
-  changePersonInfoById: (personId: string, personalnummer: string) => Promise<void>;
+  changePersonInfoById: (
+    personId: string,
+    vorname: string,
+    familienname: string,
+    personalnummer?: string,
+  ) => Promise<void>;
 };
 
 export type PersonStore = Store<'personStore', PersonState, PersonGetters, PersonActions>;
@@ -345,15 +350,22 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
       }
     },
 
-    async changePersonInfoById(personId: string, personalnummer: string): Promise<void> {
+    async changePersonInfoById(
+      personId: string,
+      vorname: string,
+      familienname: string,
+      personalnummer?: string,
+    ): Promise<void> {
       this.loading = true;
       try {
-        const personByPersonalnummerBodyParams: PersonByPersonalnummerBodyParams = {
+        const personByPersonalnummerBodyParams: PersonMetadataBodyParams = {
+          vorname: vorname,
+          familienname: familienname,
           personalnummer: personalnummer,
           revision: this.currentPerson?.person.revision ?? '',
           lastModified: this.currentPerson?.person.lastModified ?? '',
         };
-        await personenApi.personControllerUpdatePersonalnummer(personId, personByPersonalnummerBodyParams);
+        await personenApi.personControllerUpdateMetadata(personId, personByPersonalnummerBodyParams);
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
