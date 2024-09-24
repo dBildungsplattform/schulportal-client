@@ -1013,7 +1013,7 @@
               md="auto"
               class="mt-1 edit-container"
             >
-              <div class="d-flex justify-sm-end">
+              <div v-if ="hasKopersRolle" class="d-flex justify-sm-end">
                 <v-col
                   cols="12"
                   sm="6"
