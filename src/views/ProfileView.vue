@@ -583,7 +583,7 @@
                     icon="mdi-alert-circle"
                   ></v-icon>
                   <v-icon
-                    v-else
+                    v-else-if="twoFactorAuthenticationStore.hasToken === true"
                     color="green"
                     icon="mdi-check-circle"
                   ></v-icon>
