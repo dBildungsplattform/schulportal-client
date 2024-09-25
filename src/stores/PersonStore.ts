@@ -123,6 +123,7 @@ type PersonState = {
   currentPerson: Personendatensatz | null;
   personenWithUebersicht: PersonenWithRolleAndZuordnung | null;
   personenuebersicht: DBiamPersonenuebersichtResponse | null;
+  patchedPerson: PersonendatensatzResponse | null;
 };
 
 export type PersonFilter = {
@@ -162,6 +163,7 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
       loading: false,
       totalPersons: 0,
       currentPerson: null,
+      patchedPerson: null,
     };
   },
   actions: {
@@ -365,7 +367,12 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
           revision: this.currentPerson?.person.revision ?? '',
           lastModified: this.currentPerson?.person.lastModified ?? '',
         };
-        await personenApi.personControllerUpdateMetadata(personId, personByPersonalnummerBodyParams);
+        const { data } : { data: PersonendatensatzResponse } = await personenApi.personControllerUpdateMetadata(
+          personId,
+          personByPersonalnummerBodyParams,
+        );
+
+        this.patchedPerson = data;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {

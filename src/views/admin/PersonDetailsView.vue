@@ -105,6 +105,7 @@
   const canCommit: Ref<boolean> = ref(false);
   const hasNoKopersNr: Ref<boolean | undefined> = ref(false);
   const changePersonInfoSuccessVisible: Ref<boolean> = ref(false);
+  const changePersonInfoSuccessMessage: Ref<string> = ref('');
 
   const showNoKopersNrConfirmationDialog: Ref<boolean> = ref(false);
 
@@ -934,6 +935,14 @@
       } else if (!selectedKopersNrPersonInfo.value && selectedVorname.value && selectedFamilienname.value) {
         await personStore.changePersonInfoById(currentPersonId, selectedVorname.value, selectedFamilienname.value);
       }
+      // Success message changes depending on if the username changed or not.
+      if (personStore.currentPerson?.person.referrer !== personStore.patchedPerson?.person.referrer) {
+        changePersonInfoSuccessMessage.value = `${t('admin.person.personalInfoSuccessDialogMessageWithUsername', {
+          username: personStore.patchedPerson?.person.referrer,
+        })}`;
+      } else {
+        changePersonInfoSuccessMessage.value = t('admin.person.personalInfoSuccessDialogMessage');
+      }
       changePersonInfoSuccessVisible.value = !personStore.errorCode;
       resetFormChangePersonInfo();
     },
@@ -1237,7 +1246,7 @@
               >
                 <SpshTooltip
                   :enabledCondition="!hasSameMetaDeta"
-                  :disabledText="$t('person.changeKopersDisabledDescription')"
+                  :disabledText="$t('person.changePersonInfoDisabledDescription')"
                   :enabledText="$t('save')"
                   position="start"
                 >
