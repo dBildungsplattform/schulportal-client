@@ -100,6 +100,7 @@
       "addedSuccessfully": "{firstname} {lastname} wurde erfolgreich hinzugefügt.",
       "addNew": "Neuen Benutzer hinzufügen",
       "backToCreatePerson": "Zurück zur Benutzeranlage",
+      "backToForm": "Zurück zur Form",
       "changePassword": "Passwort ändern",
       "twoFactorAuthentication": {
         "setUpShort": "2FA einrichten",
@@ -166,6 +167,7 @@
       "discard": "Benutzer verwerfen",
       "disableUser": "Benutzer sperren",
       "edit": "Benutzer bearbeiten",
+      "editPersonalInfo": "Persönliche Informationen bearbeiten",
       "generatedPassword": "Generiertes Passwort",
       "noKopersNr": "KoPers.-Nr. nicht vorhanden",
       "noKopersNrConfirmationDialogMessage": "Bitte beachten Sie, dass ein Benutzerkonto ohne KoPers.-Nr. nach 8 Wochen automatisch gesperrt wird. Tragen Sie daher die KoPers.-Nr. bitte in der Gesamtübersicht des Benutzers nach, sobald diese Ihnen vorliegt.",
@@ -173,6 +175,7 @@
       "loadingErrorTitle": "Fehler beim Laden des Benutzers",
       "management": "Benutzerverwaltung",
       "personalInfo": "Persönliche Informationen",
+      "personalInfoSuccessDialogMessage": "Die Stammdaten wurden erfolgreich geändert.",
       "resetPasswordConfirmation": "Sind Sie sicher, dass Sie das Passwort für {firstname} {lastname} zurücksetzen möchten?",
       "resetPasswordInformation": "Bitte teilen Sie dem Benutzer das temporäre Passwort mit. Nach dem Schließen des Dialogs wird es aus Sicherheitsgründen nicht mehr angezeigt.",
       "resetPassword": "Passwort zurücksetzen",
@@ -192,6 +195,15 @@
         "kopersNr": {
           "required": "Die KoPers.-Nr. ist erforderlich."
         }
+      },
+      "title": {
+        "ERROR_LOADING_USER": "Fehler beim Laden des Benutzers.",
+        "PERSONALNUMMER_NICHT_EINDEUTIG": "KoPers.-Nr. nicht eindeutig.",
+        "PERSON_NOT_FOUND": "Benutzer gelöscht."
+      },
+      "errors": {
+        "PERSONALNUMMER_NICHT_EINDEUTIG": "Die eingegebene KoPers.-Nr. ist bereits vergeben. Bitte korrigieren Sie Ihre Eingabe.",
+        "ERROR_LOADING_USER": "Es konnten keine Benutzerdaten geladen werden."
       },
       "showAll": "Alle Benutzer anzeigen",
       "startPassword": "Einstiegs-Passwort",
@@ -436,6 +448,7 @@
     "changeRolleDescription": "Ändert die Rolle des Benutzers an der Schule ohne ihn zu entfernen.",
     "changeKlasseDescription": "Ändert die Klasse des Benutzers an der Schule.",
     "changeKlasseNotDisabledDescription": "Bitte wählen Sie eine neue Klasse aus.",
+    "changeKopersDisabledDescription": "Bitte geben Sie eine neue KoPers.-Nr. ein.",
     "chooseZuordnungFirst": "Wählen Sie bitte zuerst eine Schulzuordnung aus.",
     "chooseKlasseZuordnungFirst": "Wählen Sie bitte zunächst eine Schulzuordnung mit einer Klasse aus.",
     "deleteZuordnungConfirmation": "Wollen Sie die Schulzuordnung wirklich entfernen?",

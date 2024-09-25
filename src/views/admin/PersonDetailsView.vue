@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import SpshTooltip from '@/components/admin/SpshTooltip.vue';
   import KlasseChange from '@/components/admin/klassen/KlasseChange.vue';
+  import KopersInput from '@/components/admin/personen/KopersInput.vue';
   import PasswordReset from '@/components/admin/personen/PasswordReset.vue';
   import PersonDelete from '@/components/admin/personen/PersonDelete.vue';
   import PersonLock from '@/components/admin/personen/PersonLock.vue';
@@ -8,6 +9,7 @@
   import PersonenkontextDelete from '@/components/admin/personen/PersonenkontextDelete.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
+  import TokenReset from '@/components/two-factor-authentication/TokenReset.vue';
   import TwoFactorAuthenticationSetUp from '@/components/two-factor-authentication/TwoFactorAuthenticationSetUp.vue';
   import { useKlassen } from '@/composables/useKlassen';
   import { useOrganisationen } from '@/composables/useOrganisationen';
@@ -28,21 +30,12 @@
   } from '@/stores/PersonStore';
   import { usePersonenkontextStore, type PersonenkontextStore, type Zuordnung } from '@/stores/PersonenkontextStore';
   import { RollenArt, RollenMerkmal } from '@/stores/RolleStore';
-  import { type TranslatedObject } from '@/types.d';
-  import TokenReset from '@/components/two-factor-authentication/TokenReset.vue';
-  import { toTypedSchema } from '@vee-validate/yup';
-  import { useForm, type BaseFieldProps, type FormContext, type TypedSchema } from 'vee-validate';
-  import KopersInput from '@/components/admin/personen/KopersInput.vue';
-  import { computed, onBeforeMount, ref, watch, type ComputedRef, type Ref } from 'vue';
-  import { useI18n, type Composer } from 'vue-i18n';
-  import { useRoute, useRouter, type RouteLocationNormalizedLoaded, type Router } from 'vue-router';
-  import { useDisplay } from 'vuetify';
-  import { object, string, StringSchema, type AnyObject } from 'yup';
   import {
     TokenKind,
     useTwoFactorAuthentificationStore,
     type TwoFactorAuthentificationStore,
   } from '@/stores/TwoFactorAuthentificationStore';
+  import PersonenInfoChange from '@/components/admin/personen/PersonenInfoChange.vue';
   import { getNextSchuljahresende, formatDateToISO, formatDate } from '@/utils/date';
   import { isBefristungspflichtRolle, useBefristungUtils, type BefristungUtilsType } from '@/utils/befristung';
   import {
@@ -50,6 +43,22 @@
     getValidationSchema,
     type PersonenkontextFieldDefinitions,
   } from '@/utils/validationPersonenkontext';
+  import { toTypedSchema } from '@vee-validate/yup';
+  import { useForm, type BaseFieldProps, type FormContext, type TypedSchema } from 'vee-validate';
+  import { computed, onBeforeMount, onMounted, onUnmounted, ref, watch, type ComputedRef, type Ref } from 'vue';
+  import { useI18n, type Composer } from 'vue-i18n';
+  import {
+    onBeforeRouteLeave,
+    useRoute,
+    useRouter,
+    type NavigationGuardNext,
+    type RouteLocationNormalized,
+    type RouteLocationNormalizedLoaded,
+    type Router,
+  } from 'vue-router';
+  import { useDisplay } from 'vuetify';
+  import { object, string, StringSchema, type AnyObject } from 'yup';
+  import type { TranslatedObject } from '@/types';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
@@ -78,6 +87,8 @@
   const isZuordnungFormActive: Ref<boolean> = ref(false);
   const isChangeKlasseFormActive: Ref<boolean> = ref(false);
 
+  const isEditPersonInfoActive: Ref<boolean> = ref(false);
+
   const pendingDeletion: Ref<boolean> = ref(false);
   const pendingCreation: Ref<boolean> = ref(false);
   const pendingChangeKlasse: Ref<boolean> = ref(false);
@@ -91,11 +102,16 @@
   const createZuordnungConfirmationDialogMessage: Ref<string> = ref('');
   const changeKlasseConfirmationDialogMessage: Ref<string> = ref('');
   const canCommit: Ref<boolean> = ref(false);
-  const hasNoKopersNr: Ref<boolean> = ref(false);
+  const hasNoKopersNr: Ref<boolean | undefined> = ref(false);
+  const changePersonInfoSuccessVisible: Ref<boolean> = ref(false);
+
+  const showNoKopersNrConfirmationDialog: Ref<boolean> = ref(false);
 
   const creationErrorText: Ref<string> = ref('');
   const creationErrorTitle: Ref<string> = ref('');
 
+  const showUnsavedChangesDialog: Ref<boolean> = ref(false);
+  let blockedNext: () => void = () => {};
   const calculatedBefristung: Ref<string | undefined> = ref('');
 
   function navigateToPersonTable(): void {
@@ -104,7 +120,7 @@
 
   function resetPassword(personId: string): void {
     personStore.resetPassword(personId);
-      password.value = personStore.newPassword || '';
+    password.value = personStore.newPassword || '';
   }
 
   function onLockUser(personId: string, lock: boolean, organisation: string): void {
@@ -192,6 +208,13 @@
     });
   };
 
+  let closeChangePersonInfoSuccessDialog = (): void => {
+    changePersonInfoSuccessVisible.value = false;
+    router.push(route).then(() => {
+      router.go(0);
+    });
+  };
+
   // Triggers the template to add a new Zuordnung
   const triggerAddZuordnung = async (): Promise<void> => {
     await personenkontextStore.processWorkflowStep({ limit: 25 });
@@ -253,6 +276,10 @@
       };
     }
   };
+  async function navigateBackToKopersForm(): Promise<void> {
+    personStore.errorCode = '';
+    personenkontextStore.errorCode = '';
+  }
 
   const alertButtonText: ComputedRef<string> = computed(() => {
     return personenkontextStore.errorCode === 'PERSON_NOT_FOUND' ? t('nav.backToList') : t('refreshData');
@@ -261,6 +288,19 @@
   const alertButtonAction: ComputedRef<() => void> = computed(() => {
     return personenkontextStore.errorCode === 'PERSON_NOT_FOUND' ? navigateToPersonTable : (): void => router.go(0);
   });
+
+  const alertButtonTextKopers: ComputedRef<string> = computed(() => {
+    return personStore.errorCode === 'PERSONALNUMMER_NICHT_EINDEUTIG'
+      ? t('admin.person.backToForm')
+      : t('nav.backToList');
+  });
+
+  const alertButtonActionKopers: ComputedRef<() => void> = computed(() => {
+    return personStore.errorCode === 'PERSONALNUMMER_NICHT_EINDEUTIG'
+      ? navigateBackToKopersForm
+      : navigateToPersonTable;
+  });
+
   function getSskName(sskDstNr: string | undefined, sskName: string): string {
     /* truncate ssk name */
     const truncatededSskName: string = sskName.length > 30 ? `${sskName.substring(0, 30)}...` : sskName;
@@ -343,6 +383,10 @@
     selectedNewKlasse: string;
   };
 
+  type ChangePersonInfoForm = {
+    selectedKopersNrPersonInfo: string;
+  };
+
   // Define a method to check if the selected Rolle is of type "Lern"
   function isLernRolle(selectedRolleId: string): boolean {
     const rolle: TranslatedRolleWithAttrs | undefined = rollen.value?.find(
@@ -387,6 +431,7 @@
     return false;
   });
 
+  // Validation schema for the form for changing the Klasse (Versetzen)
   const changeKlasseValidationSchema: TypedSchema = toTypedSchema(
     object({
       selectedNewKlasse: string().when('selectedSchule', {
@@ -394,6 +439,13 @@
         then: (schema: StringSchema<string | undefined, AnyObject, undefined, ''>) =>
           schema.required(t('admin.klasse.rules.klasse.required')),
       }),
+    }),
+  );
+
+  // Validation schema for the form for changing KopersNr
+  const changePersonInfoValidationSchema: TypedSchema = toTypedSchema(
+    object({
+      selectedKopersNrPersonInfo: string().required(t('admin.person.rules.kopersNr.required')),
     }),
   );
 
@@ -407,7 +459,7 @@
   });
 
   const formContext: FormContext<ZuordnungCreationForm, ZuordnungCreationForm> = useForm({
-    validationSchema: getValidationSchema(t),
+    validationSchema: getValidationSchema(t, hasNoKopersNr, hasKopersNummer),
   });
 
   const {
@@ -434,6 +486,17 @@
     validationSchema: changeKlasseValidationSchema,
   });
 
+  // eslint-disable-next-line @typescript-eslint/typedef
+  const {
+    defineField: defineFieldChangePersonInfo,
+    handleSubmit: handleSubmitChangePersonInfo,
+    resetForm: resetFormChangePersonInfo,
+    isFieldDirty: isFieldDirtyChangePersonInfo,
+    setFieldValue: setFieldValueChangePersonInfo,
+  } = useForm<ChangePersonInfoForm>({
+    validationSchema: changePersonInfoValidationSchema,
+  });
+
   // Change Klasse Form
   const [selectedSchule, selectedSchuleProps]: [
     Ref<string | undefined>,
@@ -444,6 +507,13 @@
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineFieldChangeKlasse('selectedNewKlasse', vuetifyConfig);
 
+  // Change Person Info Form
+  const [selectedKopersNrPersonInfo, selectedKopersNrPersonInfoProps]: [
+    Ref<string | undefined | null>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = defineFieldChangePersonInfo('selectedKopersNrPersonInfo', vuetifyConfig);
+
+  // Methods from utils that handle the Befristung events and sets up watchers
   const { handleBefristungUpdate, handleBefristungOptionUpdate, setupWatchers }: BefristungUtilsType =
     useBefristungUtils({
       formContext,
@@ -506,7 +576,13 @@
 
   // This will send the updated list of Zuordnungen to the Backend on TOP of the new added one through the form.
   async function confirmAddition(): Promise<void> {
-    await personenkontextStore.updatePersonenkontexte(finalZuordnungen.value, currentPersonId, selectedKopersNr.value);
+    if (selectedKopersNr.value !== null) {
+      await personenkontextStore.updatePersonenkontexte(
+        finalZuordnungen.value,
+        currentPersonId,
+        selectedKopersNr.value,
+      );
+    }
     createSuccessDialogVisible.value = !personenkontextStore.errorCode;
     formContext.resetForm();
   }
@@ -783,7 +859,74 @@
     }
   }
 
+  // Triggers the template to start editing the person informations
+  const triggerPersonInfoEdit = (): void => {
+    isEditPersonInfoActive.value = true;
+    const personalnummer: string | null | undefined = personStore.currentPerson?.person.personalnummer;
+    setFieldValueChangePersonInfo('selectedKopersNrPersonInfo', personalnummer ?? '');
+  };
+
+  const cancelEditPersonInfo = (): void => {
+    isEditPersonInfoActive.value = false;
+    resetFormChangePersonInfo();
+  };
+
+  // Handles the value emitted by PersonenInfoChange for the selectedKopersNr
+  function handleSelectedKopersNrUpdate(value: string | undefined | null): void {
+    selectedKopersNrPersonInfo.value = value;
+  }
+
+  // Submit the form for changing person informations (Vorname, Nachname, KopersNr.)
+  const onSubmitChangePersonInfo: (e?: Event) => Promise<Promise<void> | undefined> = handleSubmitChangePersonInfo(
+    async () => {
+      if (selectedKopersNrPersonInfo.value) {
+        await personStore.changePersonInfoById(currentPersonId, selectedKopersNrPersonInfo.value);
+        changePersonInfoSuccessVisible.value = !personStore.errorCode;
+        resetFormChangePersonInfo();
+      }
+    },
+  );
+
+  function isFormDirty(): boolean {
+    return isFieldDirtyChangePersonInfo('selectedKopersNrPersonInfo');
+  }
+
+  function handleConfirmUnsavedChanges(): void {
+    blockedNext();
+  }
+
+  function preventNavigation(event: BeforeUnloadEvent): void {
+    if (!isFormDirty()) return;
+    event.preventDefault();
+    /* Chrome requires returnValue to be set. */
+    event.returnValue = '';
+  }
+
+  onBeforeRouteLeave((_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
+    if (isFormDirty()) {
+      showUnsavedChangesDialog.value = true;
+      blockedNext = next;
+    } else {
+      next();
+    }
+  });
+
   setupWatchers();
+
+  watch(hasNoKopersNr, async (newValue: boolean | undefined) => {
+    if (newValue) {
+      showNoKopersNrConfirmationDialog.value = true;
+    }
+  });
+
+  // Checks if the entered KopersNr is the same one that is already assigned to the user.
+  // This is used to disable the save button in that case (To avoid errors).
+  const hasSameKopersNr: ComputedRef<boolean> = computed(() => {
+    if (selectedKopersNrPersonInfo.value === personStore.currentPerson?.person.personalnummer) {
+      return true;
+    }
+    return false;
+  });
 
   // Computed property to check if the second radio button should be disabled
   const isUnbefristetButtonDisabled: ComputedRef<boolean> = computed(() => {
@@ -793,6 +936,9 @@
   onBeforeMount(async () => {
     personStore.resetState();
     twoFactorAuthentificationStore.resetState();
+
+    await twoFactorAuthentificationStore.get2FARequirement(currentPersonId);
+
     personenkontextStore.errorCode = '';
     await personStore.getPersonById(currentPersonId);
     await personStore.getPersonenuebersichtById(currentPersonId);
@@ -800,7 +946,17 @@
     hasKlassenZuordnung.value = personStore.personenuebersicht?.zuordnungen.some(
       (zuordnung: Zuordnung) => zuordnung.typ === OrganisationsTyp.Klasse,
     );
+
     await twoFactorAuthentificationStore.get2FAState(currentPersonId);
+  });
+
+  onMounted(async () => {
+    /* listen for browser changes and prevent them when form is dirty */
+    window.addEventListener('beforeunload', preventNavigation);
+  });
+
+  onUnmounted(() => {
+    window.removeEventListener('beforeunload', preventNavigation);
   });
 </script>
 
@@ -829,11 +985,11 @@
         :model-value="!!personStore.errorCode"
         :type="'error'"
         :closable="false"
-        :text="$t('admin.person.loadingErrorText')"
+        :text="$t(`admin.person.errors.${personStore.errorCode}`)"
         :showButton="true"
-        :buttonText="$t('nav.backToList')"
-        :buttonAction="navigateToPersonTable"
-        :title="$t('admin.person.loadingErrorTitle')"
+        :buttonText="alertButtonTextKopers"
+        :buttonAction="alertButtonActionKopers"
+        :title="$t(`admin.person.title.${personStore.errorCode}`)"
         @update:modelValue="handleAlertClose"
       />
 
@@ -852,9 +1008,45 @@
 
       <template v-if="!personStore.errorCode && !personenkontextStore.errorCode">
         <v-container class="personal-info">
-          <div v-if="personStore.currentPerson?.person">
+          <div v-if="personStore.currentPerson?.person && !isEditPersonInfoActive">
+            <!-- Befristung -->
+            <v-row class="ml-md-16">
+              <v-col
+                cols="12"
+                md="auto"
+                class="mt-1 edit-container"
+              >
+                <div
+                  v-if="hasKopersRolle"
+                  class="d-flex justify-sm-end"
+                >
+                  <v-col
+                    cols="12"
+                    sm="6"
+                    md="auto"
+                  >
+                    <SpshTooltip
+                      :enabledCondition="!isEditActive"
+                      :disabledText="$t('person.finishEditFirst')"
+                      :enabledText="$t('admin.person.editPersonalInfo')"
+                      position="start"
+                    >
+                      <v-btn
+                        :disabled="isEditActive"
+                        class="primary ml-lg-8"
+                        data-testid="zuordnung-edit-button"
+                        @Click="triggerPersonInfoEdit"
+                        :block="mdAndDown"
+                      >
+                        {{ $t('edit') }}
+                      </v-btn>
+                    </SpshTooltip>
+                  </v-col>
+                </div>
+              </v-col>
+            </v-row>
             <!-- Vorname -->
-            <v-row class="mt-0">
+            <v-row class="mt-md-6">
               <v-col cols="1"></v-col>
               <v-col
                 class="text-right"
@@ -947,6 +1139,61 @@
             <v-progress-circular indeterminate></v-progress-circular>
           </div>
         </v-container>
+        <v-container v-if="isEditPersonInfoActive">
+          <v-form
+            data-testid="person-info-form"
+            @submit="onSubmitChangePersonInfo"
+          >
+            <PersonenInfoChange
+              :confirmUnsavedChangesAction="handleConfirmUnsavedChanges"
+              :selectedKopersNrPersonInfoProps="selectedKopersNrPersonInfoProps"
+              :selectedKopersNrPersonInfo="personStore.currentPerson?.person.personalnummer"
+              :showUnsavedChangesDialog="showUnsavedChangesDialog"
+              @update:selectedKopersNrPersonInfo="handleSelectedKopersNrUpdate"
+              @onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
+            ></PersonenInfoChange>
+            <v-row class="save-cancel-row ml-md-16 pt-5 justify-end">
+              <v-col
+                class="cancel-col"
+                cols="12"
+                sm="6"
+                md="auto"
+              >
+                <v-btn
+                  class="secondary small"
+                  data-testid="person-info-edit-cancel"
+                  @click="cancelEditPersonInfo"
+                  :block="mdAndDown"
+                >
+                  {{ $t('cancel') }}
+                </v-btn>
+              </v-col>
+              <v-col
+                cols="12"
+                sm="6"
+                md="auto"
+              >
+                <SpshTooltip
+                  :enabledCondition="!hasSameKopersNr"
+                  :disabledText="$t('person.changeKopersDisabledDescription')"
+                  :enabledText="$t('save')"
+                  position="start"
+                >
+                  <v-btn
+                    class="primary small"
+                    :disabled="hasSameKopersNr"
+                    data-testid="person-info-edit-save"
+                    @click="handleSaveClick"
+                    :block="mdAndDown"
+                    type="submit"
+                  >
+                    {{ $t('save') }}
+                  </v-btn>
+                </SpshTooltip>
+              </v-col>
+            </v-row>
+          </v-form>
+        </v-container>
         <v-divider
           class="border-opacity-100 rounded my-6 mx-4"
           color="#E5EAEF"
@@ -967,7 +1214,7 @@
               <div class="d-flex justify-sm-end">
                 <PasswordReset
                   :errorCode="personStore.errorCode"
-                  :disabled="isEditActive"
+                  :disabled="isEditActive || isEditPersonInfoActive"
                   :person="personStore.currentPerson"
                   @onClearPassword="password = ''"
                   @onResetPassword="resetPassword(currentPersonId)"
@@ -985,118 +1232,108 @@
           thickness="6"
         ></v-divider>
         <!-- Two Factor Authentication -->
-        <v-container v-if="twoFactorAuthentificationStore.hasToken != undefined">
-          <v-row class="ml-md-16">
-            <v-col>
-              <h3 class="subtitle-1">{{ $t('admin.person.twoFactorAuthentication.header') }}</h3>
-              <v-row
-                class="mt-4 text-body"
-                v-if="twoFactorAuthentificationStore.hasToken"
-              >
-                <v-col
-                  class="text-right"
-                  cols="1"
-                >
-                  <v-icon
-                    icon="mdi-check-circle"
-                    color="green"
-                    v-if="twoFactorAuthentificationStore.hasToken"
-                  ></v-icon>
+        <template v-if="twoFactorAuthentificationStore.required">
+          <v-container>
+            <v-row class="ml-md-16">
+              <v-col v-if="personStore.loading || twoFactorAuthentificationStore.loading">
+                <v-progress-circular indeterminate></v-progress-circular>
+              </v-col>
+              <template v-else>
+                <v-col>
+                  <h3 class="subtitle-1">{{ $t('admin.person.twoFactorAuthentication.header') }}</h3>
+                  <v-row class="mt-4 text-body">
+                    <v-col
+                      class="text-right"
+                      cols="1"
+                    >
+                      <v-icon
+                        v-if="twoFactorAuthentificationStore.hasToken"
+                        icon="mdi-check-circle"
+                        color="green"
+                      ></v-icon>
+                      <v-icon
+                        v-else
+                        class="mb-2"
+                        icon="mdi-information"
+                      >
+                      </v-icon>
+                    </v-col>
+                    <v-col>
+                      <template v-if="twoFactorAuthentificationStore.hasToken">
+                        <p v-if="twoFactorAuthentificationStore.tokenKind === TokenKind.software">
+                          {{ $t('admin.person.twoFactorAuthentication.softwareTokenIsSetUp') }}
+                        </p>
+                        <p v-if="twoFactorAuthentificationStore.tokenKind === TokenKind.hardware">
+                          {{ $t('admin.person.twoFactorAuthentication.hardwareTokenIsSetUp') }}
+                        </p>
+                        <p v-if="twoFactorAuthentificationStore.serial">
+                          {{
+                            $t('admin.person.twoFactorAuthentication.serial') +
+                            ': ' +
+                            twoFactorAuthentificationStore.serial
+                          }}
+                        </p>
+                      </template>
+                      <template v-else>
+                        <p v-if="twoFactorAuthentificationStore.hasToken">
+                          {{ $t('admin.person.twoFactorAuthentication.resetInfo') }}
+                        </p>
+                        <p v-else>
+                          {{ $t('admin.person.twoFactorAuthentication.notSetUp') }}
+                        </p>
+                      </template>
+                    </v-col>
+                  </v-row>
                 </v-col>
-                <div class="v-col">
-                  <p v-if="twoFactorAuthentificationStore.tokenKind === TokenKind.software">
-                    {{ $t('admin.person.twoFactorAuthentication.softwareTokenIsSetUp') }}
-                  </p>
-                  <p v-if="twoFactorAuthentificationStore.tokenKind === TokenKind.hardware">
-                    {{ $t('admin.person.twoFactorAuthentication.hardwareTokenIsSetUp') }}
-                  </p>
-                  <p
-                    v-if="
-                      twoFactorAuthentificationStore.tokenKind === TokenKind.hardware &&
-                      twoFactorAuthentificationStore.serial
-                    "
-                  >
-                    {{
-                      $t('admin.person.twoFactorAuthentication.serial') + ': ' + twoFactorAuthentificationStore.serial
-                    }}
-                  </p>
-                </div>
-              </v-row>
-              <v-row class="mt-4 text-body">
                 <v-col
-                  class="text-right"
-                  cols="1"
-                >
-                  <v-icon
-                    class="mb-2"
-                    icon="mdi-information"
-                  >
-                  </v-icon>
-                </v-col>
-                <div class="v-col">
-                  <p v-if="twoFactorAuthentificationStore.hasToken">
-                    {{ $t('admin.person.twoFactorAuthentication.resetInfo') }}
-                  </p>
-                  <p v-if="!twoFactorAuthentificationStore.hasToken">
-                    {{ $t('admin.person.twoFactorAuthentication.notSetUp') }}
-                  </p>
-                </div>
-              </v-row>
-            </v-col>
-            <v-col
-              class="mr-lg-13"
-              cols="12"
-              md="auto"
-              v-if="personStore.currentPerson"
-            >
-              <div
-                class="d-flex justify-sm-end"
-                v-if="!twoFactorAuthentificationStore.hasToken"
-              >
-                <TwoFactorAuthenticationSetUp
-                  :errorCode="twoFactorAuthentificationStore.errorCode"
-                  :disabled="isEditActive"
-                  :person="personStore.currentPerson"
-                  @dialogClosed="twoFactorAuthentificationStore.get2FAState(currentPersonId)"
-                >
-                </TwoFactorAuthenticationSetUp>
-              </div>
-              <div
-                class="d-flex justify-sm-end"
-                v-if="twoFactorAuthentificationStore.hasToken"
-              >
-                <v-col
+                  class="mr-lg-13"
                   cols="12"
-                  sm="6"
                   md="auto"
+                  v-if="personStore.currentPerson"
                 >
-                  <SpshTooltip
-                    :enabledCondition="twoFactorAuthentificationStore.hasToken"
-                    :disabledText="$t('person.finishEditFirst')"
-                    :enabledText="$t('admin.person.twoFactorAuthentication.tokenReset')"
-                    position="start"
-                  >
-                    <TokenReset
-                      :errorCode="twoFactorAuthentificationStore.errorCode"
-                      :disabled="isEditActive"
-                      :person="personStore.currentPerson"
-                      :tokenType="twoFactorAuthentificationStore.tokenKind"
-                      :personId="currentPersonId"
-                      @dialogClosed="twoFactorAuthentificationStore.get2FAState(currentPersonId)"
-                    ></TokenReset>
-                  </SpshTooltip>
+                  <div class="d-flex justify-sm-end">
+                    <v-col
+                      cols="12"
+                      sm="6"
+                      md="auto"
+                    >
+                      <SpshTooltip
+                        v-if="twoFactorAuthentificationStore.hasToken"
+                        :enabledCondition="twoFactorAuthentificationStore.hasToken"
+                        :disabledText="$t('person.finishEditFirst')"
+                        :enabledText="$t('admin.person.twoFactorAuthentication.tokenReset')"
+                        position="start"
+                      >
+                        <TokenReset
+                          :errorCode="twoFactorAuthentificationStore.errorCode"
+                          :disabled="isEditActive"
+                          :person="personStore.currentPerson"
+                          :tokenType="twoFactorAuthentificationStore.tokenKind"
+                          :personId="currentPersonId"
+                          @dialogClosed="twoFactorAuthentificationStore.get2FAState(currentPersonId)"
+                        >
+                        </TokenReset>
+                      </SpshTooltip>
+                      <TwoFactorAuthenticationSetUp
+                        v-else
+                        :errorCode="twoFactorAuthentificationStore.errorCode"
+                        :disabled="isEditActive"
+                        :person="personStore.currentPerson"
+                        @dialogClosed="twoFactorAuthentificationStore.get2FAState(currentPersonId)"
+                      >
+                      </TwoFactorAuthenticationSetUp>
+                    </v-col>
+                  </div>
                 </v-col>
-              </div>
-            </v-col>
-            <v-col v-else-if="personStore.loading"> <v-progress-circular indeterminate></v-progress-circular></v-col
-          ></v-row>
-        </v-container>
-        <v-divider
-          v-if="twoFactorAuthentificationStore.hasToken != undefined"
-          class="border-opacity-100 rounded my-6 mx-4"
-          color="#E5EAEF"
-          thickness="6"
-        ></v-divider>
+              </template>
+            </v-row>
+          </v-container>
+          <v-divider
+            class="border-opacity-100 rounded my-6 mx-4"
+            color="#E5EAEF"
+            thickness="6"
+          ></v-divider>
+        </template>
         <!-- Zuordnungen -->
         <v-container
           v-if="!isEditActive"
@@ -1121,14 +1358,22 @@
                   sm="6"
                   md="auto"
                 >
-                  <v-btn
-                    class="primary ml-lg-8"
-                    data-testid="zuordnung-edit-button"
-                    @Click="triggerEdit"
-                    :block="mdAndDown"
+                  <SpshTooltip
+                    :enabledCondition="selectedZuordnungen.length === 0 && !isEditPersonInfoActive"
+                    :disabledText="$t('person.finishEditFirst')"
+                    :enabledText="$t('person.editZuordnungen')"
+                    position="start"
                   >
-                    {{ $t('edit') }}
-                  </v-btn>
+                    <v-btn
+                      class="primary ml-lg-8"
+                      data-testid="zuordnung-edit-button"
+                      :disabled="isEditPersonInfoActive"
+                      @Click="triggerEdit"
+                      :block="mdAndDown"
+                    >
+                      {{ $t('edit') }}
+                    </v-btn>
+                  </SpshTooltip>
                 </v-col>
               </div>
             </v-col>
@@ -1503,8 +1748,8 @@
                   :hasNoKopersNr="hasNoKopersNr"
                   v-model:selectedKopersNr="selectedKopersNr"
                   :selectedKopersNrProps="selectedKopersNrProps"
-                  @update:selectedKopersNr="(value?: string) => (selectedKopersNr = value)"
-                  @update:hasNoKopersNr="(value: boolean) => (hasNoKopersNr = value)"
+                  @update:selectedKopersNr="(value?: string | null) => (selectedKopersNr = value)"
+                  @update:hasNoKopersNr="(value: boolean | undefined) => (hasNoKopersNr = value)"
                 ></KopersInput>
               </v-container>
               <v-row class="py-3 px-2 justify-center">
@@ -1550,8 +1795,8 @@
                   cols="12"
                   sm="auto"
                 >
-                  <h3 class="subtitle-1">{{ $t('transfer') }}:</h3></v-col
-                >
+                  <h3 class="subtitle-1">{{ $t('transfer') }}:</h3>
+                </v-col>
               </v-row>
               <v-container class="px-lg-16">
                 <KlasseChange
@@ -1679,6 +1924,7 @@
             >
               <div class="d-flex justify-sm-end">
                 <PersonLock
+                  :disabled="isEditActive || isEditPersonInfoActive"
                   :errorCode="personStore.errorCode"
                   :person="personStore.currentPerson"
                   :adminId="authStore.currentUser?.personId!"
@@ -1689,7 +1935,7 @@
               <div class="d-flex justify-sm-end">
                 <template v-if="authStore.hasPersonenLoeschenPermission">
                   <PersonDelete
-                    :disabled="isEditActive"
+                    :disabled="isEditActive || isEditPersonInfoActive"
                     :errorCode="personStore.errorCode"
                     :person="personStore.currentPerson"
                     @onDeletePerson="deletePerson(currentPersonId)"
@@ -1821,6 +2067,48 @@
                 :block="mdAndDown"
                 class="primary"
                 @click.stop="closeCreateSuccessDialog"
+              >
+                {{ $t('close') }}
+              </v-btn>
+            </v-col>
+          </v-row>
+        </v-card-actions>
+      </LayoutCard>
+    </v-dialog>
+    <!-- Success Dialog after changing the Person Infos-->
+    <v-dialog
+      v-model="changePersonInfoSuccessVisible"
+      persistent
+      max-width="600px"
+    >
+      <LayoutCard
+        :closable="true"
+        :header="$t('admin.person.personalInfo')"
+        @onCloseClicked="closeChangePersonInfoSuccessDialog"
+      >
+        <v-card-text>
+          <v-container>
+            <v-row class="text-body bold px-md-12">
+              <v-col
+                offset="1"
+                cols="10"
+              >
+                <span>{{ $t('admin.person.personalInfoSuccessDialogMessage') }}</span>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card-text>
+        <v-card-actions class="justify-center">
+          <v-row class="justify-center">
+            <v-col
+              cols="12"
+              sm="6"
+              md="4"
+            >
+              <v-btn
+                :block="mdAndDown"
+                class="primary"
+                @click.stop="closeChangePersonInfoSuccessDialog"
               >
                 {{ $t('close') }}
               </v-btn>
@@ -1975,6 +2263,67 @@
                 @click.stop="closeCannotDeleteDialog"
               >
                 {{ $t('close') }}
+              </v-btn>
+            </v-col>
+          </v-row>
+        </v-card-actions>
+      </LayoutCard>
+    </v-dialog>
+
+    <v-dialog
+      v-model="showNoKopersNrConfirmationDialog"
+      persistent
+    >
+      <LayoutCard
+        v-if="showNoKopersNrConfirmationDialog"
+        :closable="false"
+        :header="$t('admin.person.noKopersNr')"
+      >
+        <v-card-text>
+          <v-container>
+            <v-row class="text-body bold px-md-16">
+              <v-col
+                offset="1"
+                cols="10"
+              >
+                <span data-testid="no-kopersnr-confirmation-text">
+                  {{ $t('admin.person.noKopersNrConfirmationDialogMessage') }}
+                </span>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card-text>
+        <v-card-actions class="justify-center">
+          <v-row class="justify-center">
+            <v-col
+              cols="12"
+              sm="6"
+              md="4"
+            >
+              <v-btn
+                :block="mdAndDown"
+                class="secondary"
+                @click.stop="
+                  showNoKopersNrConfirmationDialog = false;
+                  hasNoKopersNr = false;
+                "
+                data-testid="cancel-no-kopersnr-button"
+              >
+                {{ $t('cancel') }}
+              </v-btn>
+            </v-col>
+            <v-col
+              cols="12"
+              sm="6"
+              md="4"
+            >
+              <v-btn
+                :block="mdAndDown"
+                class="primary"
+                @click.stop="showNoKopersNrConfirmationDialog = false"
+                data-testid="confirm-no-kopersnr-button"
+              >
+                {{ $t('proceed') }}
               </v-btn>
             </v-col>
           </v-row>

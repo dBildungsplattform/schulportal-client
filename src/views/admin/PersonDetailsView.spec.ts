@@ -40,6 +40,8 @@ const mockPerson: Personendatensatz = {
     personalnummer: null,
     isLocked: null,
     lockInfo: null,
+    revision: '1',
+    lastModified: '2024-05-22',
   },
 };
 

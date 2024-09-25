@@ -158,13 +158,12 @@ describe('rolleStore', () => {
           target: 'URL',
           kategorie: 'EMAIL',
           hasLogo: true,
+          requires2fa: true,
         },
       ];
 
       mockadapter.onPut('/api/rolle/1/serviceProviders').replyOnce(200, mockResponse, {});
-      const addServiceProviderToRollePromise: Promise<void> = rolleStore.updateServiceProviderInRolle('1', {
-        serviceProviderIds: ['1234'],
-      });
+      const addServiceProviderToRollePromise: Promise<void> = rolleStore.updateServiceProviderInRolle('1', ['1234']);
       expect(rolleStore.loading).toBe(true);
       await addServiceProviderToRollePromise;
       expect(rolleStore.createdRolle.serviceProviders).toEqual(mockResponse);
@@ -173,9 +172,7 @@ describe('rolleStore', () => {
 
     it('should handle string error', async () => {
       mockadapter.onPut('/api/rolle/1/serviceProviders').replyOnce(500, 'some mock server error');
-      const addServiceProviderToRollePromise: Promise<void> = rolleStore.updateServiceProviderInRolle('1', {
-        serviceProviderIds: ['1'],
-      });
+      const addServiceProviderToRollePromise: Promise<void> = rolleStore.updateServiceProviderInRolle('1', ['1']);
       expect(rolleStore.loading).toBe(true);
       await addServiceProviderToRollePromise;
       expect(rolleStore.errorCode).toEqual('UNSPECIFIED_ERROR');
@@ -185,9 +182,7 @@ describe('rolleStore', () => {
 
     it('should handle error code', async () => {
       mockadapter.onPut('/api/rolle/1/serviceProviders').replyOnce(500, { code: 'some mock server error' });
-      const addServiceProviderToRollePromise: Promise<void> = rolleStore.updateServiceProviderInRolle('1', {
-        serviceProviderIds: ['1'],
-      });
+      const addServiceProviderToRollePromise: Promise<void> = rolleStore.updateServiceProviderInRolle('1', ['1']);
       expect(rolleStore.loading).toBe(true);
       await addServiceProviderToRollePromise;
       expect(rolleStore.errorCode).toEqual('some mock server error');

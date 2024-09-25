@@ -46,7 +46,7 @@
   let blockedNext: () => void = () => {};
 
   const canCommit: Ref<boolean> = ref(false);
-  const hasNoKopersNr: Ref<boolean> = ref(false);
+  const hasNoKopersNr: Ref<boolean | undefined> = ref(false);
   const showNoKopersNrConfirmationDialog: Ref<boolean> = ref(false);
 
   const calculatedBefristung: Ref<string | undefined> = ref('');
@@ -145,7 +145,7 @@
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = formContext.defineField('selectedRolle', vuetifyConfig);
   const [selectedKopersNr, selectedKopersNrProps]: [
-    Ref<string | undefined>,
+    Ref<string | undefined | null>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = formContext.defineField('selectedKopersNr', vuetifyConfig);
   const [selectedVorname, selectedVornameProps]: [
@@ -292,7 +292,7 @@
     const bodyParams: CreatePersonBodyParams = {
       familienname: selectedFamilienname.value as string,
       vorname: selectedVorname.value as string,
-      personalnummer: selectedKopersNr.value,
+      personalnummer: selectedKopersNr.value as string,
       befristung: formattedBefristung,
       createPersonenkontexte: [
         {
@@ -318,7 +318,7 @@
     hasNoKopersNr.value = false;
   }
 
-  watch(hasNoKopersNr, async (newValue: boolean) => {
+  watch(hasNoKopersNr, async (newValue: boolean | undefined) => {
     if (newValue) {
       showNoKopersNrConfirmationDialog.value = true;
     }
@@ -512,8 +512,8 @@
             :hasNoKopersNr="hasNoKopersNr"
             v-model:selectedKopersNr="selectedKopersNr"
             :selectedKopersNrProps="selectedKopersNrProps"
-            @update:selectedKopersNr="(value?: string) => (selectedKopersNr = value)"
-            @update:hasNoKopersNr="(value: boolean) => (hasNoKopersNr = value)"
+            @update:selectedKopersNr="(value?: string | null) => (selectedKopersNr = value)"
+            @update:hasNoKopersNr="(value: boolean | undefined) => (hasNoKopersNr = value)"
           ></KopersInput>
         </div>
       </FormWrapper>
