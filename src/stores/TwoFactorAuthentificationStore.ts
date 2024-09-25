@@ -65,7 +65,9 @@ export const useTwoFactorAuthentificationStore: StoreDefinition<
   },
   actions: {
     resetState() {
+      const tempRequired: boolean = this.required;
       this.$reset();
+      this.required = tempRequired;
     },
     async get2FAState(personId: string) {
       this.loading = true;
