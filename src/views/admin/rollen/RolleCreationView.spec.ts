@@ -231,6 +231,7 @@ describe('RolleCreationView', () => {
         url: 'https://provider-one.com',
         kategorie: ServiceProviderKategorie.Email,
         hasLogo: true,
+        requires2fa: false,
       },
       {
         id: 'sp002',
@@ -239,6 +240,7 @@ describe('RolleCreationView', () => {
         url: 'https://provider-three.com',
         kategorie: ServiceProviderKategorie.Email,
         hasLogo: false,
+        requires2fa: false,
       },
       {
         id: 'sp003',
@@ -247,6 +249,7 @@ describe('RolleCreationView', () => {
         url: 'https://provider-three.com',
         kategorie: ServiceProviderKategorie.Email,
         hasLogo: true,
+        requires2fa: false,
       },
     ];
     rolleStore.createdRolle.serviceProviders = testServiceProviders;
