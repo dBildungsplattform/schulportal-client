@@ -990,10 +990,10 @@
           thickness="6"
         ></v-divider>
         <!-- Two Factor Authentication -->
-        <template v-if="twoFactorAuthentificationStore.required">
+        <template v-if="twoFactorAuthentificationStore.required && twoFactorAuthentificationStore.hasToken != null">
           <v-container>
             <v-row class="ml-md-16">
-              <v-col v-if="personStore.loading || twoFactorAuthentificationStore.loading">
+              <v-col v-if="personStore.loading">
                 <v-progress-circular indeterminate></v-progress-circular>
               </v-col>
               <template v-else>
@@ -1009,38 +1009,47 @@
                         icon="mdi-check-circle"
                         color="green"
                       ></v-icon>
+                    </v-col>
+                    <div class="v-col">
+                      <p v-if="twoFactorAuthentificationStore.tokenKind === TokenKind.software">
+                        {{ $t('admin.person.twoFactorAuthentication.softwareTokenIsSetUp') }}
+                      </p>
+                      <p v-if="twoFactorAuthentificationStore.tokenKind === TokenKind.hardware">
+                        {{ $t('admin.person.twoFactorAuthentication.hardwareTokenIsSetUp') }}
+                      </p>
+                      <p
+                        v-if="
+                          twoFactorAuthentificationStore.tokenKind === TokenKind.hardware &&
+                          twoFactorAuthentificationStore.serial
+                        "
+                      >
+                        {{
+                          $t('admin.person.twoFactorAuthentication.serial') +
+                          ': ' +
+                          twoFactorAuthentificationStore.serial
+                        }}
+                      </p>
+                    </div>
+                  </v-row>
+                  <v-row class="mt-4 text-body">
+                    <v-col
+                      class="text-right"
+                      cols="1"
+                    >
                       <v-icon
-                        v-else
                         class="mb-2"
                         icon="mdi-information"
                       >
                       </v-icon>
                     </v-col>
-                    <v-col>
-                      <template v-if="twoFactorAuthentificationStore.hasToken">
-                        <p v-if="twoFactorAuthentificationStore.tokenKind === TokenKind.software">
-                          {{ $t('admin.person.twoFactorAuthentication.softwareTokenIsSetUp') }}
-                        </p>
-                        <p v-if="twoFactorAuthentificationStore.tokenKind === TokenKind.hardware">
-                          {{ $t('admin.person.twoFactorAuthentication.hardwareTokenIsSetUp') }}
-                        </p>
-                        <p v-if="twoFactorAuthentificationStore.serial">
-                          {{
-                            $t('admin.person.twoFactorAuthentication.serial') +
-                            ': ' +
-                            twoFactorAuthentificationStore.serial
-                          }}
-                        </p>
-                      </template>
-                      <template v-else>
-                        <p v-if="twoFactorAuthentificationStore.hasToken">
-                          {{ $t('admin.person.twoFactorAuthentication.resetInfo') }}
-                        </p>
-                        <p v-else>
-                          {{ $t('admin.person.twoFactorAuthentication.notSetUp') }}
-                        </p>
-                      </template>
-                    </v-col>
+                    <div class="v-col">
+                      <p v-if="twoFactorAuthentificationStore.hasToken">
+                        {{ $t('admin.person.twoFactorAuthentication.resetInfo') }}
+                      </p>
+                      <p v-else>
+                        {{ $t('admin.person.twoFactorAuthentication.notSetUp') }}
+                      </p>
+                    </div>
                   </v-row>
                 </v-col>
                 <v-col
