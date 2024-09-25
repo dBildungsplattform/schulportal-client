@@ -21,7 +21,7 @@ let authStore: AuthStore;
 let twoFactorAuthenticationStore: TwoFactorAuthentificationStore;
 let router: Router;
 
-const mockPersonInfo: PersonInfoResponse = {
+const mockLehrer: PersonInfoResponse = {
   person: {
     id: '1234',
     name: {
@@ -51,7 +51,7 @@ const mockPersonInfo: PersonInfoResponse = {
   gruppen: [],
 };
 
-const mockPersonInfo2: PersonInfoResponse = {
+const mockSchueler: PersonInfoResponse = {
   person: {
     id: '1234',
     name: {
@@ -83,7 +83,7 @@ const mockPersonInfo2: PersonInfoResponse = {
 
 const passwordUpdatedAt: Date = new Date(2024, 9, 9);
 const mockCurrentUser: UserInfo = {
-  sub: mockPersonInfo.person.id,
+  sub: mockLehrer.person.id,
   name: null,
   given_name: null,
   family_name: null,
@@ -106,7 +106,7 @@ const mockCurrentUser: UserInfo = {
   password_updated_at: passwordUpdatedAt.toISOString(),
 };
 
-const mockUebersicht: PersonWithUebersicht = {
+const mockLehrerUebersicht: PersonWithUebersicht = {
   personId: '1234',
   vorname: 'Samuel',
   nachname: 'Vimes',
@@ -118,7 +118,7 @@ const mockUebersicht: PersonWithUebersicht = {
       sskId: '1',
       rolleId: '1',
       sskName: 'Muster-Schule',
-      sskDstNr: '123-456',
+      sskDstNr: '123456',
       rolle: 'Lehrer',
       administriertVon: 'Admin',
       typ: OrganisationsTyp.Schule,
@@ -129,7 +129,7 @@ const mockUebersicht: PersonWithUebersicht = {
   ],
 };
 
-const mockUebersicht2: PersonWithUebersicht = {
+const mockLehrerUebersichtWith2Zuordnungen: PersonWithUebersicht = {
   personId: '1234',
   vorname: 'Samuel',
   nachname: 'Vimes',
@@ -137,11 +137,10 @@ const mockUebersicht2: PersonWithUebersicht = {
   lastModifiedZuordnungen: '2021-09-01T12:00:00Z',
   zuordnungen: [
     {
-      klasse: '10A',
       sskId: '1',
       rolleId: '1',
       sskName: 'Muster-Schule',
-      sskDstNr: '123-456',
+      sskDstNr: '123456',
       rolle: 'Lehrer',
       administriertVon: 'Admin',
       typ: OrganisationsTyp.Schule,
@@ -150,11 +149,10 @@ const mockUebersicht2: PersonWithUebersicht = {
       befristung: '2024-05-06',
     },
     {
-      klasse: '9A',
       sskId: '1',
       rolleId: '1',
-      sskName: 'Muster-Schule',
-      sskDstNr: '123-457',
+      sskName: 'Anders-Sonderlich-Schule',
+      sskDstNr: '789101112',
       rolle: 'Lehrer',
       administriertVon: 'Admin',
       typ: OrganisationsTyp.Schule,
@@ -164,7 +162,42 @@ const mockUebersicht2: PersonWithUebersicht = {
     },
   ],
 };
-const mockUebersicht3: PersonWithUebersicht = {
+
+const mockSchuelerUebersicht: PersonWithUebersicht = {
+  personId: '1234',
+  vorname: 'Samuel',
+  nachname: 'Vimes',
+  benutzername: 'samuelvimes',
+  lastModifiedZuordnungen: '2021-09-01T12:00:00Z',
+  zuordnungen: [
+    {
+      sskId: '1',
+      rolleId: '1',
+      sskName: 'Astrid-Lindgren-Schule',
+      sskDstNr: '123456',
+      rolle: 'SuS',
+      administriertVon: 'Admin',
+      typ: OrganisationsTyp.Schule,
+      editable: true,
+      merkmale: [] as unknown as RollenMerkmal,
+      befristung: '2024-05-06',
+    },
+    {
+      klasse: '9A',
+      sskId: '2',
+      rolleId: '1',
+      sskName: '9A',
+      sskDstNr: '123456-9A',
+      rolle: 'SuS',
+      administriertVon: 'Admin',
+      typ: OrganisationsTyp.Klasse,
+      editable: true,
+      merkmale: [] as unknown as RollenMerkmal,
+      befristung: '2024-05-06',
+    },
+  ],
+};
+const uebersichtWithoutZuordnungen: PersonWithUebersicht = {
   personId: '1234',
   vorname: 'Samuel',
   nachname: 'Vimes',
@@ -198,8 +231,8 @@ describe('ProfileView', () => {
     </div>
   `;
 
-    personInfoStore.personInfo = mockPersonInfo;
-    personStore.personenuebersicht = mockUebersicht;
+    personInfoStore.personInfo = mockLehrer;
+    personStore.personenuebersicht = mockLehrerUebersicht;
 
     authStore.currentUser = mockCurrentUser;
 
@@ -222,41 +255,60 @@ describe('ProfileView', () => {
   });
 
   test('it renders the profile headline', () => {
-    personInfoStore.personInfo = mockPersonInfo;
-    personStore.personenuebersicht = mockUebersicht;
+    personInfoStore.personInfo = mockLehrer;
+    personStore.personenuebersicht = mockLehrerUebersicht;
     expect(wrapper?.find('[data-testid="profile-headline"]').isVisible()).toBe(true);
   });
 
   test('it displays personal data', () => {
-    personInfoStore.personInfo = mockPersonInfo;
-    personStore.personenuebersicht = mockUebersicht;
+    personInfoStore.personInfo = mockLehrer;
+    personStore.personenuebersicht = mockLehrerUebersicht;
     const personalData: DOMWrapper<HTMLTableRowElement>[] | undefined = wrapper?.findAll('tr');
     expect(personalData?.length).toBeGreaterThan(0);
     expect(personalData?.at(0)?.text()).toContain('Vor- und Nachname:Samuel Vimes');
     expect(personalData?.at(1)?.text()).toContain('Benutzername:samuelvimes');
-    if (mockPersonInfo.person.personalnummer) {
-      expect(personalData?.at(2)?.text()).toContain(mockPersonInfo.person.personalnummer);
+    if (mockLehrer.person.personalnummer) {
+      expect(personalData?.at(2)?.text()).toContain(mockLehrer.person.personalnummer);
     }
   });
 
   test.each([
-    [mockPersonInfo, mockUebersicht],
-    [mockPersonInfo2, mockUebersicht2],
-    [mockPersonInfo, mockUebersicht3],
-  ])('it displays Schule data', async (personInfo: PersonInfoResponse, uebersicht: PersonWithUebersicht) => {
-    personInfoStore.personInfo = personInfo;
-    personStore.personenuebersicht = uebersicht!;
+    { personInfo: mockLehrer, uebersicht: mockLehrerUebersicht },
+    { personInfo: mockLehrer, uebersicht: mockLehrerUebersichtWith2Zuordnungen },
+    { personInfo: mockLehrer, uebersicht: uebersichtWithoutZuordnungen },
+  ])(
+    'it displays Schule data with zuordnungen $uebersicht.zuordnungen',
+    async ({ personInfo, uebersicht }: { personInfo: PersonInfoResponse; uebersicht: PersonWithUebersicht }) => {
+      personInfoStore.personInfo = personInfo;
+      personStore.personenuebersicht = uebersicht!;
+      await nextTick();
+      if (!wrapper) return;
+      uebersicht!.zuordnungen.forEach((mockZuordnung: Zuordnung, index: number) => {
+        expect(wrapper?.find(`[data-testid="schule-value-${index + 1}"]`).text()).toContain(mockZuordnung.sskName);
+        expect(wrapper?.find(`[data-testid="rolle-value-${index + 1}"]`).text()).toContain(mockZuordnung.rolle);
+        expect(wrapper?.find(`[data-testid="dienststellennummer-value-${index + 1}"]`).text()).toContain(
+          mockZuordnung.sskDstNr,
+        );
+      });
+    },
+  );
+
+  test('it displays Schule data for SuS', async () => {
+    personInfoStore.personInfo = mockSchueler;
+    personStore.personenuebersicht = mockSchuelerUebersicht;
     await nextTick();
     if (!wrapper) return;
-    uebersicht!.zuordnungen.forEach((mockZuordnung: Zuordnung) => {
-      expect(wrapper?.text()).toContain(mockZuordnung.sskName);
-      expect(wrapper?.text()).toContain(mockZuordnung.rolle);
-      // TODO: in test the cards dont update, when the store data changes and thus these fail
-      // if (mockZuordnung.klasse) expect(wrapper?.text()).toContain(mockZuordnung.klasse);
-      // else expect(wrapper?.text()).not.toContain(mockZuordnung.klasse);
-      // if (mockZuordnung.klasse) expect(wrapper?.text()).toContain(mockZuordnung.sskDstNr);
-      // else expect(wrapper?.text()).not.toContain(mockZuordnung.sskDstNr);
-    });
+    const klasse: Zuordnung = mockSchuelerUebersicht.zuordnungen.find(
+      (z: Zuordnung) => z.typ == OrganisationsTyp.Klasse,
+    )!;
+    const schule: Zuordnung = mockSchuelerUebersicht.zuordnungen.find(
+      (z: Zuordnung) => z.typ == OrganisationsTyp.Schule,
+    )!;
+    expect(wrapper.find('[data-testid="schule-value-1"]').text()).toContain(schule.sskName);
+    expect(wrapper.find('[data-testid="rolle-value-1"]').text()).toContain(schule.rolle);
+    expect(wrapper.find('[data-testid="dienststellennummer-value-1"]').text()).toContain(schule.sskDstNr);
+    expect(wrapper.find('[data-testid="klasse-value-1"]').text()).toContain(klasse.sskName);
+    expect(wrapper.find('[data-testid="rolle-value-1"]').text()).toContain(klasse.rolle);
   });
 
   test('it displays password data if there is any', async () => {
