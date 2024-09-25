@@ -103,9 +103,8 @@
   }
 
   function resetPassword(personId: string): void {
-    personStore.resetPassword(personId).then((newPassword?: string) => {
-      password.value = newPassword || '';
-    });
+    personStore.resetPassword(personId);
+      password.value = personStore.newPassword || '';
   }
 
   function onLockUser(personId: string, lock: boolean, organisation: string): void {
