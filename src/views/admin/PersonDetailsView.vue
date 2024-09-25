@@ -446,10 +446,14 @@
     }),
   );
 
-  // Validation schema for the form for changing KopersNr
+  // Validation schema for the form for changing person metadata
   const changePersonInfoValidationSchema: TypedSchema = toTypedSchema(
     object({
-      selectedKopersNrPersonInfo: string().required(t('admin.person.rules.kopersNr.required')),
+      selectedKopersNrPersonInfo: string().when([], {
+        is: () => personStore.currentPerson?.person.personalnummer,
+        then: (schema: StringSchema) => schema.required(t('admin.person.rules.kopersNr.required')),
+        otherwise: (schema: StringSchema) => schema.notRequired(),
+      }),
       selectedVorname: string()
         .matches(DIN_91379A, t('admin.person.rules.vorname.matches'))
         .matches(NO_LEADING_TRAILING_SPACES, t('admin.person.rules.vorname.noLeadingTrailingSpaces'))
@@ -903,24 +907,31 @@
     selectedKopersNrPersonInfo.value = value;
   }
 
-    // Handles the value emitted by PersonenInfoChange for the selectedVorname
+  // Handles the value emitted by PersonenInfoChange for the selectedVorname
   function handleSelectedVorname(value: string | undefined): void {
-      selectedVorname.value = value;
+    selectedVorname.value = value;
   }
 
-    // Handles the value emitted by PersonenInfoChange for the selectedFamilienname
+  // Handles the value emitted by PersonenInfoChange for the selectedFamilienname
   function handleSelectedFamilienname(value: string | undefined): void {
-      selectedFamilienname.value = value;
+    selectedFamilienname.value = value;
   }
 
   // Submit the form for changing person informations (Vorname, Nachname, KopersNr.)
   const onSubmitChangePersonInfo: (e?: Event) => Promise<Promise<void> | undefined> = handleSubmitChangePersonInfo(
     async () => {
       if (selectedKopersNrPersonInfo.value && selectedVorname.value && selectedFamilienname.value) {
-        await personStore.changePersonInfoById(currentPersonId, selectedKopersNrPersonInfo.value, selectedVorname.value, selectedFamilienname.value);
-
-      }
-      else if (selectedVorname.value && selectedFamilienname.value){
+        if (selectedKopersNrPersonInfo.value === personStore.currentPerson?.person.personalnummer) {
+          await personStore.changePersonInfoById(currentPersonId, selectedVorname.value, selectedFamilienname.value);
+        } else {
+          await personStore.changePersonInfoById(
+            currentPersonId,
+            selectedVorname.value,
+            selectedFamilienname.value,
+            selectedKopersNrPersonInfo.value,
+          );
+        }
+      } else if (!selectedKopersNrPersonInfo.value && selectedVorname.value && selectedFamilienname.value) {
         await personStore.changePersonInfoById(currentPersonId, selectedVorname.value, selectedFamilienname.value);
       }
       changePersonInfoSuccessVisible.value = !personStore.errorCode;
@@ -962,8 +973,12 @@
 
   // Checks if the entered KopersNr is the same one that is already assigned to the user.
   // This is used to disable the save button in that case (To avoid errors).
-  const hasSameKopersNr: ComputedRef<boolean> = computed(() => {
-    if (selectedKopersNrPersonInfo.value === personStore.currentPerson?.person.personalnummer) {
+  const hasSameMetaDeta: ComputedRef<boolean> = computed(() => {
+    if (
+      selectedKopersNrPersonInfo.value === personStore.currentPerson?.person.personalnummer &&
+      selectedFamilienname.value === personStore.currentPerson?.person.name.familienname &&
+      selectedVorname.value === personStore.currentPerson?.person.name.vorname
+    ) {
       return true;
     }
     return false;
@@ -1221,16 +1236,15 @@
                 md="auto"
               >
                 <SpshTooltip
-                  :enabledCondition="!hasSameKopersNr"
+                  :enabledCondition="!hasSameMetaDeta"
                   :disabledText="$t('person.changeKopersDisabledDescription')"
                   :enabledText="$t('save')"
                   position="start"
                 >
                   <v-btn
                     class="primary small"
-                    :disabled="hasSameKopersNr"
+                    :disabled="hasSameMetaDeta"
                     data-testid="person-info-edit-save"
-                    @click="handleSaveClick"
                     :block="mdAndDown"
                     type="submit"
                   >
