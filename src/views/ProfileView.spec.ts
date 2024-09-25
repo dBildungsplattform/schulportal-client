@@ -235,6 +235,10 @@ describe('ProfileView', () => {
     personStore.personenuebersicht = mockLehrerUebersicht;
 
     authStore.currentUser = mockCurrentUser;
+    twoFactorAuthenticationStore.errorCode = '';
+    twoFactorAuthenticationStore.loading = false;
+    twoFactorAuthenticationStore.hasToken = true;
+    twoFactorAuthenticationStore.required = true;
 
     router.push({
       path: '/profil',
@@ -336,21 +340,32 @@ describe('ProfileView', () => {
     twoFactorAuthenticationStore.hasToken = false;
     await nextTick();
     if (!wrapper) return;
-    const twoFactorCard: DOMWrapper<Element> = wrapper.find('[data-testid="two-factor-card"]');
-    expect(twoFactorCard).toBeDefined();
-    expect(wrapper.find('[data-testid="setup-two-factor-button"]')).toBeDefined();
+
+    expect(document.querySelector('[data-testid="two-factor-card"]')).not.toBeNull();
+    expect(wrapper.text()).not.toContain('Bitte wenden Sie sich bei Fragen und Problemen an ihre schulischen Admins.');
+
+    twoFactorAuthenticationStore.hasToken = true;
+    await nextTick();
+    expect(wrapper.text()).toContain('Bitte wenden Sie sich bei Fragen und Problemen an ihre schulischen Admins.');
+  });
+
+  test('it does not display 2FA section if not required', async () => {
+    twoFactorAuthenticationStore.hasToken = false;
+    twoFactorAuthenticationStore.required = false;
+    await nextTick();
+    if (!wrapper) return;
+    expect(document.querySelector('[data-testid="two-factor-card"]')).toBeNull();
+    expect(document.querySelector('[data-testid="open-2FA-self-service-dialog-icon"]')).toBeNull();
   });
 
   test('it displays 2FA connection error', async () => {
-    twoFactorAuthenticationStore.hasToken = false;
-    twoFactorAuthenticationStore.loading = false;
     twoFactorAuthenticationStore.errorCode = 'something';
     await nextTick();
     if (!wrapper) return;
     const twoFactorCard: DOMWrapper<Element> = wrapper.find('[data-testid="two-factor-info"]');
-    expect(twoFactorCard).toBeDefined();
     expect(twoFactorCard.text()).toContain(
       'Der Server für die Zwei-Faktor-Authentifizierung kann aktuell nicht erreicht werden. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut.',
     );
+    expect(document.querySelector('[data-testid="open-2FA-self-service-dialog-icon"]')).toBeNull();
   });
 });
