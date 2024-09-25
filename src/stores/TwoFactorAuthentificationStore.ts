@@ -1,14 +1,14 @@
-import { defineStore, type Store, type StoreDefinition } from 'pinia';
+import axiosApiInstance from '@/services/ApiService';
 import { isAxiosError } from 'axios';
+import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import {
   Class2FAApiFactory,
   type AssignHardwareTokenBodyParams,
-  type AssignHardwareTokenResponse,
   type Class2FAApiInterface,
   type TokenInitBodyParams,
+  type TokenRequiredResponse,
   type TokenStateResponse,
 } from '../api-client/generated/api';
-import axiosApiInstance from '@/services/ApiService';
 
 const twoFactorApi: Class2FAApiInterface = Class2FAApiFactory(undefined, '', axiosApiInstance);
 
@@ -19,16 +19,16 @@ type TwoFactorState = {
   tokenKind: TokenKind | null;
   qrCode: string;
   serial: string;
+  required: boolean;
 };
 
 type TwoFactorGetters = {};
 type TwoFactorActions = {
   resetState: () => void;
   get2FAState: (personId: string) => Promise<void>;
+  get2FARequirement: (personId: string) => Promise<void>;
   get2FASoftwareQRCode: (personId: string) => Promise<void>;
-  assignHardwareToken: (
-    assignHardwareTokenBodyParams: AssignHardwareTokenBodyParams,
-  ) => Promise<AssignHardwareTokenResponse>;
+  assignHardwareToken: (assignHardwareTokenBodyParams: AssignHardwareTokenBodyParams) => Promise<void>;
   resetToken: (personId: string) => Promise<void>;
   verify2FAToken: (personId: string, token: string) => Promise<void>;
 };
@@ -60,6 +60,7 @@ export const useTwoFactorAuthentificationStore: StoreDefinition<
       tokenKind: null,
       qrCode: '',
       serial: '',
+      required: false,
     };
   },
   actions: {
@@ -80,10 +81,10 @@ export const useTwoFactorAuthentificationStore: StoreDefinition<
         }
 
         switch (twoFactorState.tokenKind) {
-          case 'hardware':
+          case TokenKind.hardware:
             this.tokenKind = TokenKind.hardware;
             break;
-          case 'software':
+          case TokenKind.software:
             this.tokenKind = TokenKind.software;
             break;
           default:
@@ -95,7 +96,25 @@ export const useTwoFactorAuthentificationStore: StoreDefinition<
         if (isAxiosError(error)) {
           this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
         }
-        return await Promise.reject(this.errorCode);
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async get2FARequirement(personId: string) {
+      this.loading = true;
+      this.required = false;
+      try {
+        const twoFactorState: TokenRequiredResponse = (
+          await twoFactorApi.privacyIdeaAdministrationControllerRequiresTwoFactorAuthentication(personId)
+        ).data;
+
+        this.required = twoFactorState.required;
+      } catch (error: unknown) {
+        this.errorCode = 'UNSPECIFIED_ERROR';
+        if (isAxiosError(error)) {
+          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
+        }
       } finally {
         this.loading = false;
       }
@@ -117,24 +136,20 @@ export const useTwoFactorAuthentificationStore: StoreDefinition<
         if (isAxiosError(error)) {
           this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
         }
-        return await Promise.reject(this.errorCode);
       } finally {
         this.loading = false;
       }
     },
-    async assignHardwareToken(
-      assignHardwareTokenBodyParams: AssignHardwareTokenBodyParams,
-    ): Promise<AssignHardwareTokenResponse> {
+
+    async assignHardwareToken(assignHardwareTokenBodyParams: AssignHardwareTokenBodyParams): Promise<void> {
       this.loading = true;
       try {
-        const data: AssignHardwareTokenResponse = (
-          await twoFactorApi.privacyIdeaAdministrationControllerAssignHardwareToken(assignHardwareTokenBodyParams)
-        ).data;
-        return data;
+        await twoFactorApi.privacyIdeaAdministrationControllerAssignHardwareToken(assignHardwareTokenBodyParams);
       } finally {
         this.loading = false;
       }
     },
+
     async resetToken(personId: string): Promise<void> {
       this.loading = true;
       try {
@@ -144,7 +159,6 @@ export const useTwoFactorAuthentificationStore: StoreDefinition<
         if (isAxiosError(error)) {
           this.errorCode = error.response?.data.i18nKey || 'UNSPECIFIED_ERROR';
         }
-        return await Promise.reject(this.errorCode);
       } finally {
         this.loading = false;
       }

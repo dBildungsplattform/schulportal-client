@@ -5,7 +5,7 @@ import { DDMMYYYY } from '@/utils/validation'; // Assuming you have this validat
 import { useForm, type BaseFieldProps, type TypedSchema } from 'vee-validate';
 import { isBefristungspflichtRolle } from './befristung';
 import { useRollen, type TranslatedRolleWithAttrs } from '@/composables/useRollen';
-import { RollenArt } from '@/stores/RolleStore';
+import { RollenArt, RollenMerkmal } from '@/stores/RolleStore';
 import { isBefore, isValid, parse } from 'date-fns';
 
 // Define the form validation schema for the Personenkontext
@@ -47,14 +47,26 @@ export type PersonenkontextFieldDefinitions = {
   selectedBefristungProps: Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>;
   selectedBefristungOption: Ref<string | undefined>;
   selectedBefristungOptionProps: Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>;
-  selectedKopersNr: Ref<string | undefined>;
+  selectedKopersNr: Ref<string | undefined | null>;
   selectedKopersNrProps: Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>;
 };
 
 type Schema = StringSchema<string | undefined, AnyObject, undefined, ''>;
 
+// Used for the form
+function isKopersRolle(selectedRolleId: string | undefined): boolean {
+  const rolle: TranslatedRolleWithAttrs | undefined = rollen.value?.find(
+    (r: TranslatedRolleWithAttrs) => r.value === selectedRolleId,
+  );
+  return !!rolle && !!rolle.merkmale && rolle.merkmale.has(RollenMerkmal.KopersPflicht);
+}
+
 // Define the validation schema for Personenkontext form fields
-export const getValidationSchema = (t: (key: string) => string): TypedSchema<ZuordnungCreationForm> => {
+export const getValidationSchema = (
+  t: (key: string) => string,
+  hasNoKopersNr: Ref<boolean | undefined>,
+  hasKopersNummer: Ref<boolean>,
+): TypedSchema<ZuordnungCreationForm> => {
   return toTypedSchema(
     object({
       selectedRolle: string().required(t('admin.rolle.rules.rolle.required')),
@@ -67,6 +79,17 @@ export const getValidationSchema = (t: (key: string) => string): TypedSchema<Zuo
         is: (selectedSchule: string) => selectedSchule,
         then: (schema: StringSchema<string | undefined, AnyObject, undefined, ''>) =>
           schema.required(t('admin.klasse.rules.klasse.required')),
+      }),
+      selectedKopersNr: string().when('selectedRolle', {
+        is: (selectedRolleId: string) => {
+          // Check if the selected role requires a KopersNr
+          return isKopersRolle(selectedRolleId) && !hasKopersNummer.value;
+        },
+        // Now apply the conditional logic based on `hasNoKopersNr`
+        then: (schema: StringSchema<string | undefined, AnyObject, undefined, ''>) =>
+          hasNoKopersNr.value
+            ? schema // If the user checked "I don't have one" checkbox, KopersNr is not required
+            : schema.required(t('admin.person.rules.kopersNr.required')), // KopersNr is required if "I don't have one" is not checked
       }),
       selectedBefristung: string()
         .matches(DDMMYYYY, t('admin.befristung.rules.format')) // Ensure the date matches the DDMMYYYY format

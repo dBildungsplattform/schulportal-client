@@ -41,10 +41,12 @@
   const router: Router = useRouter();
   const kcActionStatus: string | null = route.query['kc_action_status'] as string | null;
 
+  const authStore: AuthStore = useAuthStore();
   const personInfoStore: PersonInfoStore = usePersonInfoStore();
   const personStore: PersonStore = usePersonStore();
-  const authStore: AuthStore = useAuthStore();
   const twoFactorAuthenticationStore: TwoFactorAuthentificationStore = useTwoFactorAuthentificationStore();
+
+  const windowOrigin: string = window.location.origin;
 
   /**
    * Gruppiert eine Liste von Zuordnungen nach dem Wert der Eigenschaft 'sskDstNr'.
@@ -234,8 +236,6 @@
     const previousUrl: string | null = sessionStorage.getItem('previousUrl');
     router.push(previousUrl ?? '/start');
   }
-
-  const windowOrigin: string = window.location.origin;
 
   async function initializeStores(): Promise<void> {
     await personInfoStore.initPersonInfo();
@@ -529,6 +529,7 @@
       </v-col>
 
       <v-col
+        v-if="!twoFactorAuthenticationStore.loading && twoFactorAuthenticationStore.required"
         cols="12"
         sm="12"
         md="6"
