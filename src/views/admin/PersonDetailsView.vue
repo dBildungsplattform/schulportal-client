@@ -46,6 +46,7 @@
   } from '@/utils/validationPersonenkontext';
   import { toTypedSchema } from '@vee-validate/yup';
   import { useForm, type BaseFieldProps, type FormContext, type TypedSchema } from 'vee-validate';
+  import { watchEffect } from 'vue';
   import { computed, onBeforeMount, ref, watch, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import { useRoute, useRouter, type RouteLocationNormalizedLoaded, type Router } from 'vue-router';
@@ -99,6 +100,10 @@
 
   const calculatedBefristung: Ref<string | undefined> = ref('');
 
+  const rollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = useRollen();
+  const organisationen: ComputedRef<TranslatedObject[] | undefined> = useOrganisationen();
+  const klassen: ComputedRef<TranslatedObject[] | undefined> = useKlassen();
+
   function navigateToPersonTable(): void {
     router.push({ name: 'person-management' });
   }
@@ -138,36 +143,47 @@
     await personStore.deletePersonById(personId);
   }
 
-  function keyMapper(key: string): string {
-    switch (key) {
-      case LockKeys.LockedFrom:
-        return t('person.lockedBy');
-      case LockKeys.Timestamp:
-        return t('since');
-      default:
-        return key;
-    }
+  function getOrganisationDisplayName(organisation: Organisation): string {
+    return organisation.kennung ? `${organisation.kennung} (${organisation.name})` : organisation.name;
   }
 
-  function keyValueMapper(key: string, value: string): string {
-    if (key === LockKeys.Timestamp) {
-      return new Intl.DateTimeFormat('de-DE', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-      }).format(new Date(value));
-    }
-    return value;
-  }
-
+  // translate keys and format attributes for display
   const getLockInfo: ComputedRef<{ key: string; attribute: string }[]> = computed(() => {
     if (!personStore.currentPerson?.person.isLocked) return [];
+
     const { lockInfo }: Person = personStore.currentPerson.person;
     if (!lockInfo) return [];
-    return Object.entries(lockInfo).map(([key, value]: [string, string]) => ({
-      key: keyMapper(key),
-      attribute: keyValueMapper(key, value.toString()),
-    }));
+
+    return Object.entries(lockInfo).map(([key, attribute]: [string, string]) => {
+      switch (key) {
+        case LockKeys.LockedFrom:
+          return {
+            key: t('person.lockedBy'),
+            attribute: organisationStore.lockingOrganisation
+              ? getOrganisationDisplayName(organisationStore.lockingOrganisation)
+              : t('admin.organisation.unknown'),
+          };
+
+        case LockKeys.Timestamp:
+          return {
+            key: t('since'),
+            attribute: new Intl.DateTimeFormat('de-DE', {
+              year: 'numeric',
+              month: '2-digit',
+              day: '2-digit',
+            }).format(new Date(attribute)),
+          };
+
+        default:
+          return { key, attribute };
+      }
+    });
+  });
+
+  watchEffect(() => {
+    if (!personStore.currentPerson?.person.isLocked) return;
+    if (!personStore.currentPerson.person.lockInfo) return;
+    organisationStore.getLockingOrganisationById(personStore.currentPerson.person.lockInfo.lock_locked_from);
   });
 
   let closeCannotDeleteDialog = (): void => {
@@ -324,12 +340,6 @@
       });
     return result;
   }
-
-  const rollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = useRollen();
-
-  const organisationen: ComputedRef<TranslatedObject[] | undefined> = useOrganisationen();
-
-  const klassen: ComputedRef<TranslatedObject[] | undefined> = useKlassen();
 
   type ZuordnungCreationForm = {
     selectedRolle: string;
@@ -1695,7 +1705,8 @@
                   :errorCode="personStore.errorCode"
                   :person="personStore.currentPerson"
                   :adminId="authStore.currentUser?.personId!"
-                  :intersecting-organisations="intersectingOrganisations"
+                  :formatOrganisationName="getOrganisationDisplayName"
+                  :intersectingOrganisations="intersectingOrganisations"
                   @onLockUser="onLockUser"
                 >
                 </PersonLock>

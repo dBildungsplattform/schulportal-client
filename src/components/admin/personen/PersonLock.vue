@@ -2,6 +2,7 @@
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { type Organisation } from '@/stores/OrganisationStore';
   import { type Personendatensatz } from '@/stores/PersonStore';
+  import type { TranslatedObject } from '@/types';
   import { computed, ref, watch, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
@@ -12,53 +13,58 @@
     errorCode: string;
     person: Personendatensatz;
     adminId: string;
+    formatOrganisationName: (org: Organisation) => string;
     intersectingOrganisations: Set<Organisation>;
   };
   type Emits = {
     (event: 'onLockUser', id: string, lock: boolean, schule: string): void;
   };
-  type SelectItem = {
-    value: string;
-    title: string;
-  };
   const props: Props = defineProps<Props>();
   const emit: Emits = defineEmits<Emits>();
 
-  const schulen: Ref<Array<SelectItem>> = computed(() => {
+  const organisations: Ref<Array<TranslatedObject>> = computed(() => {
     return [...props.intersectingOrganisations].map((organisation: Organisation) => {
-      const v: string = `${organisation.kennung ?? ''} (${organisation.name})`;
+      const organisationDisplayName: string = props.formatOrganisationName(organisation);
       return {
-        value: v,
-        title: v,
+        value: organisationDisplayName,
+        title: organisationDisplayName,
       };
     });
   });
-  const selectedSchule: Ref<string | null> = ref(null);
+  const selectedOrganisation: Ref<string | null> = ref(null);
   const errorMessage: ComputedRef<string> = computed(() => {
     if (!props.errorCode) return '';
     return !props.person.person.isLocked ? t('person.lockUserError') : t('person.unlockUserError');
   });
   const hasSingleSelection: ComputedRef<boolean> = computed(() => {
-    return schulen.value.length <= 1;
+    return organisations.value.length <= 1;
+  });
+  const selectedOrganisationId: ComputedRef<string | null> = computed(() => {
+    if (!selectedOrganisation.value) return null;
+    const organisation: Organisation | undefined = Array.from(props.intersectingOrganisations).find(
+      (org: Organisation) => props.formatOrganisationName(org) === selectedOrganisation.value,
+    );
+    return organisation ? organisation.id : null;
   });
 
   function closeLockPersonDialog(isActive: Ref<boolean>): void {
     isActive.value = false;
   }
+
   function handleOnLockUser(id: string, isActive: Ref<boolean>): void {
-    if (selectedSchule.value) {
-      emit('onLockUser', id, !props.person.person.isLocked, selectedSchule.value);
+    if (selectedOrganisationId.value) {
+      emit('onLockUser', id, !props.person.person.isLocked, selectedOrganisationId.value);
       closeLockPersonDialog(isActive);
     }
   }
 
   function handleChangeSchule(value: string): void {
-    selectedSchule.value = value;
+    selectedOrganisation.value = value;
   }
 
-  watch(schulen, (newSchulen: Array<SelectItem>) => {
+  watch(organisations, (newSchulen: Array<TranslatedObject>) => {
     if (newSchulen.length === 1) {
-      selectedSchule.value = schulen.value[0]?.value ?? null;
+      selectedOrganisation.value = organisations.value[0]?.value ?? null;
     }
   });
 </script>
@@ -130,13 +136,13 @@
                   :hide-details="hasSingleSelection"
                   :class="[
                     { 'filter-dropdown': hasSingleSelection },
-                    { selected: selectedSchule },
+                    { selected: selectedOrganisation },
                     { 'align-center': true },
                   ]"
                   data-testid="schule-select"
                   density="compact"
                   id="schule-select"
-                  :items="schulen"
+                  :items="organisations"
                   @update:modelValue="handleChangeSchule"
                   item-value="value"
                   item-text="title"
@@ -145,7 +151,7 @@
                   ref="schule-select"
                   required="true"
                   variant="outlined"
-                  v-model="selectedSchule"
+                  v-model="selectedOrganisation"
                 ></v-select>
               </v-col>
             </v-row>
@@ -176,7 +182,7 @@
                   @click.stop="closeLockPersonDialog(isActive)"
                   data-testid="close-lock-person-dialog-button"
                 >
-                  {{ !selectedSchule ? $t('close') : $t('cancel') }}
+                  {{ !selectedOrganisation ? $t('close') : $t('cancel') }}
                 </v-btn>
               </v-col>
               <v-col
@@ -187,7 +193,7 @@
                 <v-btn
                   :block="mdAndDown"
                   class="primary button"
-                  :disabled="!selectedSchule"
+                  :disabled="!selectedOrganisation"
                   @click.stop="handleOnLockUser(props.person.person.id, isActive)"
                   data-testid="lock-user-button"
                 >
