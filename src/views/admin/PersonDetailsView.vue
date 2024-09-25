@@ -937,9 +937,9 @@
       }
       // Success message changes depending on if the username changed or not.
       if (personStore.currentPerson?.person.referrer !== personStore.patchedPerson?.person.referrer) {
-        changePersonInfoSuccessMessage.value = `${t('admin.person.personalInfoSuccessDialogMessageWithUsername', {
+        changePersonInfoSuccessMessage.value = t('admin.person.personalInfoSuccessDialogMessageWithUsername', {
           username: personStore.patchedPerson?.person.referrer,
-        })}`;
+        });
       } else {
         changePersonInfoSuccessMessage.value = t('admin.person.personalInfoSuccessDialogMessage');
       }
@@ -2158,12 +2158,12 @@
       >
         <v-card-text>
           <v-container>
-            <v-row class="text-body bold px-md-12">
+            <v-row class="whiteSpace text-body bold px-md-12">
               <v-col
                 offset="1"
                 cols="10"
               >
-                <span>{{ $t('admin.person.personalInfoSuccessDialogMessage') }}</span>
+                <span>{{ changePersonInfoSuccessMessage }}</span>
               </v-col>
             </v-row>
           </v-container>

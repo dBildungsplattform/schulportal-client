@@ -367,7 +367,7 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
           revision: this.currentPerson?.person.revision ?? '',
           lastModified: this.currentPerson?.person.lastModified ?? '',
         };
-        const { data } : { data: PersonendatensatzResponse } = await personenApi.personControllerUpdateMetadata(
+        const { data }: { data: PersonendatensatzResponse } = await personenApi.personControllerUpdateMetadata(
           personId,
           personByPersonalnummerBodyParams,
         );

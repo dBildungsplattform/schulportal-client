@@ -176,7 +176,7 @@
       "management": "Benutzerverwaltung",
       "personalInfo": "Persönliche Informationen",
       "personalInfoSuccessDialogMessage": "Die Stammdaten wurden erfolgreich geändert.",
-      "personalInfoSuccessDialogMessageWithUsername": "Die Stammdaten wurden erfolgreich geändert. Der neue Benutzername lautet: {username}. Das Passwort wurde nicht verändert und kann wie zuvor verwendet werden.Bitte teilen Sie der betroffenen Person die Stammdatenänderung mit. Bitte schicken Sie die Information nicht an die dienstliche E-Mail-Adresse (…@schule-sh.de) der betroffenen Person, da der neue Benutzername für die Anmeldung im Schulportal (und somit auch den Zugriff auf das E-Mail-Postfach) benötigt wird.",
+      "personalInfoSuccessDialogMessageWithUsername": "Die Stammdaten wurden erfolgreich geändert. \n\nDer neue Benutzername lautet: {username}. \n\nDas Passwort wurde nicht verändert und kann wie zuvor verwendet werden. \n\nBitte teilen Sie der betroffenen Person die Stammdatenänderung mit. \n\nBitte schicken Sie die Information nicht an die dienstliche E-Mail-Adresse (...schule-sh.de) der betroffenen Person, da der neue Benutzername für die Anmeldung im Schulportal (und somit auch den Zugriff auf das E-Mail-Postfach) benötigt wird.",
       "resetPasswordConfirmation": "Sind Sie sicher, dass Sie das Passwort für {firstname} {lastname} zurücksetzen möchten?",
       "resetPasswordInformation": "Bitte teilen Sie dem Benutzer das temporäre Passwort mit. Nach dem Schließen des Dialogs wird es aus Sicherheitsgründen nicht mehr angezeigt.",
       "resetPassword": "Passwort zurücksetzen",
