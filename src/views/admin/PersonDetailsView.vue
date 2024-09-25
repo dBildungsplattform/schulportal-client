@@ -2158,7 +2158,7 @@
       >
         <v-card-text>
           <v-container>
-            <v-row class="whiteSpace text-body bold px-md-12">
+            <v-row class="text-body bold px-md-12">
               <v-col
                 offset="1"
                 cols="10"

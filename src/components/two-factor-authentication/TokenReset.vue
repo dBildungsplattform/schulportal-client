@@ -175,7 +175,7 @@
   </v-dialog>
 </template>
 
-<style>
+<style scoped>
   .whiteSpace {
     white-space: pre-line;
   }
