@@ -344,7 +344,7 @@
         ></v-autocomplete>
       </FormRow>
       <!-- Befristung -->
-      <v-row v-if="selectedOrganisation && selectedRolle">
+      <v-row v-if="selectedOrganisation && selectedRolle && showHeadline">
         <h3 class="headline-3">3. {{ $t('admin.befristung.assignBefristung') }}</h3>
       </v-row>
       <BefristungInput

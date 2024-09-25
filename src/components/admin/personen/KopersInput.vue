@@ -4,39 +4,39 @@
   import FormRow from '@/components/form/FormRow.vue';
 
   type Props = {
-    hasNoKopersNr: boolean;
-    selectedKopersNr: string | undefined;
+    hasNoKopersNr?: boolean;
+    selectedKopersNr: string | undefined | null;
     selectedKopersNrProps: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
+    hideCheckbox?: boolean;
   };
 
   type Emits = {
-    (event: 'update:hasNoKopersNr', value: boolean): void;
-    (event: 'update:selectedKopersNr', value: string | undefined): void;
+    (event: 'update:hasNoKopersNr', value: boolean | undefined): void;
+    (event: 'update:selectedKopersNr', value: string | undefined | null): void;
   };
 
   const props: Props = defineProps<Props>();
   const emits: Emits = defineEmits<Emits>();
 
   const hasNoKopersNr: Ref<boolean | undefined> = ref(props.hasNoKopersNr);
-  const selectedKopersNr: Ref<string | undefined> = ref(props.selectedKopersNr);
+  const selectedKopersNr: Ref<string | undefined | null> = ref(props.selectedKopersNr);
 
-  watch(hasNoKopersNr, (newValue: boolean | undefined, oldValue: boolean | undefined) => {
-    if (newValue && newValue !== oldValue) {
-      emits('update:hasNoKopersNr', newValue);
-    }
+  watch(hasNoKopersNr, (newValue: boolean | undefined) => {
+    emits('update:hasNoKopersNr', newValue);
   });
 
-  watch(selectedKopersNr, (newValue: string | undefined, oldValue: string | undefined) => {
-    if (newValue && newValue !== oldValue) {
-      emits('update:selectedKopersNr', newValue);
-    }
+  watch(selectedKopersNr, (newValue: string | undefined | null) => {
+    emits('update:selectedKopersNr', newValue);
   });
 </script>
 
 <template>
   <!-- No KoPers.-Nr. available checkbox
        We don't use the form row here to avoid margins and paddings -->
-  <v-row class="align-center">
+  <v-row
+    v-if="!hideCheckbox"
+    class="align-center"
+  >
     <v-col
       class="py-0 pb-sm-8 pt-sm-3 text-sm-right"
       cols="12"
@@ -61,6 +61,7 @@
     :noTopMargin="true"
   >
     <v-text-field
+      autocomplete="off"
       clearable
       data-testid="kopersnr-input"
       density="compact"

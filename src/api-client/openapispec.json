@@ -798,6 +798,70 @@
                 ]
             }
         },
+        "/api/personen/{personId}/personalnummer": {
+            "patch": {
+                "operationId": "PersonController_updatePersonalnummer",
+                "parameters": [
+                    {
+                        "name": "personId",
+                        "required": true,
+                        "in": "path",
+                        "description": "The id for the account.",
+                        "schema": {
+                            "nullable": false,
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PersonByPersonalnummerBodyParams"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "204": {
+                        "description": "The personalnummer was successfully updated."
+                    },
+                    "400": {
+                        "description": "Request has a wrong format.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DbiamPersonError"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Not authorized to update the personalnummer."
+                    },
+                    "403": {
+                        "description": "Not permitted to update the personalnummer."
+                    },
+                    "500": {
+                        "description": "Internal server error while updating the personalnummer."
+                    }
+                },
+                "tags": [
+                    "personen"
+                ],
+                "security": [
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
         "/api/personen-frontend": {
             "get": {
                 "operationId": "PersonFrontendController_findPersons",
@@ -4209,6 +4273,11 @@
                     "lockInfo": {
                         "type": "object",
                         "nullable": true
+                    },
+                    "lastModified": {
+                        "format": "date-time",
+                        "type": "string",
+                        "description": "Date of the most recent changes for the person"
                     }
                 },
                 "required": [
@@ -4225,7 +4294,8 @@
                     "startpasswort",
                     "personalnummer",
                     "isLocked",
-                    "lockInfo"
+                    "lockInfo",
+                    "lastModified"
                 ]
             },
             "PersonendatensatzResponse": {
@@ -4443,6 +4513,53 @@
                 },
                 "required": [
                     "message"
+                ]
+            },
+            "PersonByPersonalnummerBodyParams": {
+                "type": "object",
+                "properties": {
+                    "personalnummer": {
+                        "type": "string"
+                    },
+                    "lastModified": {
+                        "format": "date-time",
+                        "type": "string",
+                        "description": "Date of the most recent changed Personalnummer"
+                    },
+                    "revision": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "personalnummer",
+                    "lastModified",
+                    "revision"
+                ]
+            },
+            "DbiamPersonError": {
+                "type": "object",
+                "properties": {
+                    "i18nKey": {
+                        "type": "string",
+                        "enum": [
+                            "PERSON_ERROR",
+                            "VORNAME_ENTHAELT_LEERZEICHEN",
+                            "FAMILIENNAME_ENTHAELT_LEERZEICHEN",
+                            "PERSON_NOT_FOUND",
+                            "DOWNSTREAM_UNREACHABLE",
+                            "PERSONALNUMMER_REQUIRED",
+                            "NEWER_VERSION_OF_PERSONALNUMMER_AVAILABLE",
+                            "PERSONALNUMMER_NICHT_EINDEUTIG"
+                        ]
+                    },
+                    "code": {
+                        "type": "number",
+                        "description": "Corresponds to HTTP Status code like 200, 404, 500"
+                    }
+                },
+                "required": [
+                    "i18nKey",
+                    "code"
                 ]
             },
             "OrganisationsTyp": {
