@@ -266,6 +266,7 @@
 
   watchEffect(async () => {
     if (!personInfoStore.personInfo?.person.id) return;
+    await twoFactorAuthenticationStore.get2FARequirement(personInfoStore.personInfo.person.id);
     await personStore.getPersonenuebersichtById(personInfoStore.personInfo.person.id);
     await twoFactorAuthenticationStore.get2FAState(personInfoStore.personInfo.person.id);
   });
