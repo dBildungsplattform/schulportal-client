@@ -59,6 +59,8 @@ function getPersonendatensatz(locked: boolean): Personendatensatz {
     referrer: null,
     personalnummer: null,
     isLocked: locked,
+    revision: '1',
+    lastModified: '2024-05-22',
     lockInfo: locked
       ? {
           lock_locked_from: 'Amanda Admin',
@@ -85,6 +87,7 @@ describe('Lock user', () => {
     wrapper = mount(PersonLock, {
       attachTo: document.getElementById('app') || '',
       props: {
+        disabled: false,
         errorCode: '',
         person: getPersonendatensatz(false),
         adminId: 'adminid',
@@ -121,6 +124,7 @@ describe('Unlock user', () => {
     wrapper = mount(PersonLock, {
       attachTo: document.getElementById('app') || '',
       props: {
+        disabled: false,
         errorCode: '',
         person: getPersonendatensatz(true),
         adminId: 'adminid',
@@ -149,6 +153,7 @@ describe('Error handling', () => {
       wrapper = mount(PersonLock, {
         attachTo: document.getElementById('app') || '',
         props: {
+          disabled: false,
           errorCode: 'TEST_ERROR',
           person: getPersonendatensatz(true),
           adminId: 'adminid',
@@ -174,6 +179,7 @@ describe('Error handling', () => {
       wrapper = mount(PersonLock, {
         attachTo: document.getElementById('app') || '',
         props: {
+          disabled: false,
           errorCode: '',
           person: getPersonendatensatz(true),
           adminId: 'adminid',

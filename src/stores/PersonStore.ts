@@ -11,6 +11,7 @@ import {
   type DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response,
   type DBiamPersonenuebersichtResponse,
   type LockUserBodyParams,
+  type PersonByPersonalnummerBodyParams,
   type PersonenApiInterface,
   type PersonendatensatzResponse,
   type PersonenFrontendApiInterface,
@@ -44,9 +45,11 @@ export type Person = {
   id: PersonResponse['id'];
   name: PersonResponse['name'];
   referrer: PersonResponse['referrer'];
+  revision: PersonResponse['revision'];
   personalnummer: PersonResponse['personalnummer'];
   isLocked: PersonResponse['isLocked'];
   userLock: UserLock | null;
+  lastModified: PersonResponse['lastModified'];
 };
 
 type PersonenWithRolleAndZuordnung = {
@@ -105,9 +108,11 @@ export function mapPersonendatensatzResponseToPersonendatensatz(
     id: response.person.id,
     name: response.person.name,
     referrer: response.person.referrer,
+    revision: response.person.revision,
     personalnummer: response.person.personalnummer,
     isLocked: response.person.isLocked,
     userLock: userLock,
+    lastModified: response.person.lastModified,
   };
   return { person };
 }
@@ -144,6 +149,7 @@ type PersonActions = {
   deletePersonById: (personId: string) => Promise<void>;
   lockPerson: (personId: string, bodyParams: LockUserBodyParams) => Promise<void>;
   getPersonenuebersichtById: (personId: string) => Promise<void>;
+  changePersonInfoById: (personId: string, personalnummer: string) => Promise<void>;
 };
 
 export type PersonStore = Store<'personStore', PersonState, PersonGetters, PersonActions>;
@@ -337,6 +343,25 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
           this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
+        }
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async changePersonInfoById(personId: string, personalnummer: string): Promise<void> {
+      this.loading = true;
+      try {
+        const personByPersonalnummerBodyParams: PersonByPersonalnummerBodyParams = {
+          personalnummer: personalnummer,
+          revision: this.currentPerson?.person.revision ?? '',
+          lastModified: this.currentPerson?.person.lastModified ?? '',
+        };
+        await personenApi.personControllerUpdatePersonalnummer(personId, personByPersonalnummerBodyParams);
+      } catch (error: unknown) {
+        this.errorCode = 'UNSPECIFIED_ERROR';
+        if (isAxiosError(error)) {
+          this.errorCode = error.response?.data.i18nKey || 'ERROR_LOADING_USER';
         }
       } finally {
         this.loading = false;

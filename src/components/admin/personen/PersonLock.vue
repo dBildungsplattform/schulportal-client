@@ -6,6 +6,8 @@
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
   import { type Zuordnung } from '@/stores/PersonenkontextStore';
+  import SpshTooltip from '@/components/admin/SpshTooltip.vue';
+
   const { t }: Composer = useI18n({ useScope: 'global' });
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
@@ -13,6 +15,7 @@
     errorCode: string;
     person: Personendatensatz;
     adminId: string;
+    disabled: boolean;
   };
 
   const date: Ref<Date | null> = ref(null);
@@ -98,14 +101,22 @@
         md="auto"
         class="pb-0"
       >
-        <v-btn
-          class="primary"
-          data-testid="open-lock-dialog-icon"
-          :block="mdAndDown"
-          v-bind="props"
+        <SpshTooltip
+          :enabledCondition="!disabled"
+          :disabledText="$t('person.finishEditFirst')"
+          :enabledText="$t('person.lockUser')"
+          position="start"
         >
-          {{ !person.person.isLocked ? $t('person.lockUser') : $t('person.unlockUser') }}
-        </v-btn>
+          <v-btn
+            class="primary"
+            data-testid="open-lock-dialog-icon"
+            :disabled="disabled"
+            :block="mdAndDown"
+            v-bind="props"
+          >
+            {{ !person.person.isLocked ? $t('person.lockUser') : $t('person.unlockUser') }}
+          </v-btn>
+        </SpshTooltip>
       </v-col>
     </template>
 

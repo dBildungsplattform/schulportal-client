@@ -98,6 +98,8 @@ beforeEach(() => {
         personalnummer: '46465',
         isLocked: false,
         lockInfo: null,
+        revision: '1',
+        lastModified: '2024-05-22',
       },
     },
     {
@@ -114,6 +116,8 @@ beforeEach(() => {
         personalnummer: '46471',
         isLocked: false,
         lockInfo: null,
+        revision: '1',
+        lastModified: '2024-05-22',
       },
     },
   ];
