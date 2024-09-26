@@ -934,6 +934,19 @@
     return isBefristungspflichtRolle(selectedRolle.value);
   });
 
+  const twoFactorAuthenticationConnectionError: ComputedRef<string> = computed(() => {
+    if (
+      twoFactorAuthentificationStore.errorCode == '500' ||
+      twoFactorAuthentificationStore.errorCode == '502' ||
+      twoFactorAuthentificationStore.errorCode == '503' ||
+      twoFactorAuthentificationStore.errorCode == '504' ||
+      twoFactorAuthentificationStore.errorCode == 'UNSPECIFIED_ERROR'
+    ) {
+      return t('admin.person.twoFactorAuthentication.errors.connection');
+    }
+    return '';
+  });
+
   onBeforeMount(async () => {
     personStore.resetState();
     twoFactorAuthentificationStore.resetState();
@@ -1255,7 +1268,7 @@
                       <v-icon
                         color="warning"
                         icon="mdi-alert-outline"
-                        v-else-if="twoFactorAuthentificationStore.errorCode"
+                        v-else-if="twoFactorAuthenticationConnectionError"
                       ></v-icon>
                       <v-icon
                         v-else
@@ -1265,9 +1278,9 @@
                       </v-icon>
                     </v-col>
                     <v-col>
-                      <template v-if="twoFactorAuthentificationStore.errorCode">
+                      <template v-if="twoFactorAuthenticationConnectionError">
                         <p>
-                          {{ t('admin.person.twoFactorAuthentication.errors.connection') }}
+                          {{ twoFactorAuthenticationConnectionError }}
                         </p>
                       </template>
                       <template v-else-if="twoFactorAuthentificationStore.hasToken">
@@ -1300,7 +1313,7 @@
                   class="mr-lg-13"
                   cols="12"
                   md="auto"
-                  v-if="personStore.currentPerson && !twoFactorAuthentificationStore.errorCode"
+                  v-if="personStore.currentPerson && !twoFactorAuthenticationConnectionError"
                 >
                   <div class="d-flex justify-sm-end">
                     <v-col
