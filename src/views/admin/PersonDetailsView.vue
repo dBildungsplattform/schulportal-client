@@ -125,10 +125,6 @@
   let blockedNext: () => void = () => {};
   const calculatedBefristung: Ref<string | undefined> = ref('');
 
-  const rollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = useRollen();
-  const organisationen: ComputedRef<TranslatedObject[] | undefined> = useOrganisationen();
-  const klassen: ComputedRef<TranslatedObject[] | undefined> = useKlassen();
-
   function navigateToPersonTable(): void {
     router.push({ name: 'person-management' });
   }
@@ -389,6 +385,10 @@
       });
     return result;
   }
+
+  const rollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = useRollen();
+  const organisationen: ComputedRef<TranslatedObject[] | undefined> = useOrganisationen();
+  const klassen: ComputedRef<TranslatedObject[] | undefined> = useKlassen();
 
   type ZuordnungCreationForm = {
     selectedRolle: string;
