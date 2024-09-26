@@ -145,7 +145,7 @@
 
   function keyMapper(key: string): string {
     switch (key) {
-      case LockKeys.LockedFrom:
+      case LockKeys.LockedBy:
         return t('person.lockedBy');
       case LockKeys.LockedUntil:
         return t('since');

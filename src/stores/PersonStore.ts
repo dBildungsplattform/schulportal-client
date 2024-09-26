@@ -31,7 +31,7 @@ const personenuebersichtApi: DbiamPersonenuebersichtApiInterface = DbiamPersonen
 
 export enum LockKeys {
   PersonId = 'personId',
-  LockedFrom = 'locked_from',
+  LockedBy = 'locked_by',
   LockedUntil = 'locked_until',
 }
 export type UserLock = {
@@ -92,7 +92,7 @@ export function parseUserLock(unparsed: object): UserLock | null {
   if (!Object.values(LockKeys).every((key: string) => key in unparsed)) return null;
   return {
     personId: LockKeys.PersonId in unparsed ? '' + unparsed[LockKeys.PersonId] : '',
-    locked_from: LockKeys.LockedFrom in unparsed ? '' + unparsed[LockKeys.LockedFrom] : '',
+    locked_from: LockKeys.LockedBy in unparsed ? '' + unparsed[LockKeys.LockedBy] : '',
     locked_until: LockKeys.LockedUntil in unparsed ? '' + unparsed[LockKeys.LockedUntil] : '',
   };
 }
