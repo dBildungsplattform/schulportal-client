@@ -12,7 +12,7 @@ import {
 import { usePersonStore, type Person, type Personendatensatz, type PersonStore } from '@/stores/PersonStore';
 import { createTestingPinia } from '@pinia/testing';
 import { mount, VueWrapper } from '@vue/test-utils';
-import { expect, test } from 'vitest';
+import { expect, test, type Mock } from 'vitest';
 import PersonLock from './PersonLock.vue';
 
 let wrapper: VueWrapper | null = null;
@@ -70,6 +70,7 @@ function getPersonendatensatz(locked: boolean): Personendatensatz {
   };
   return { person };
 }
+
 function getIntersectingOrganisations(): Set<Organisation> {
   return new Set([parentOrganisation]);
 }
@@ -87,6 +88,8 @@ beforeEach(() => {
 });
 
 describe('Lock user', () => {
+  const formatOrganisationName: Mock = vi.fn();
+
   beforeEach(() => {
     wrapper = mount(PersonLock, {
       attachTo: document.getElementById('app') || '',
@@ -95,6 +98,7 @@ describe('Lock user', () => {
         errorCode: '',
         person: getPersonendatensatz(false),
         adminId: 'adminid',
+        formatOrganisationName: formatOrganisationName,
         intersectingOrganisations: getIntersectingOrganisations(),
       },
       global: {
@@ -118,13 +122,19 @@ describe('Lock user', () => {
     await openDialog();
 
     expect(document.querySelector('[data-testid="lock-user-info-text"]')).not.toBeNull();
-    expect(document.querySelector('[data-testid="schule-select"]')).not.toBeNull();
+    const selectElement: HTMLSelectElement | null = document.querySelector('[data-testid="schule-select"]');
+    expect(selectElement).not.toBeNull();
+
     const button: HTMLElement = document.querySelector('[data-testid="lock-user-button"]') as HTMLElement;
     expect(button).not.toBeNull();
+
+    expect(formatOrganisationName).toHaveBeenCalled();
   });
 });
 
 describe('Unlock user', () => {
+  const formatOrganisationName: Mock = vi.fn();
+
   beforeEach(() => {
     wrapper = mount(PersonLock, {
       attachTo: document.getElementById('app') || '',
@@ -133,6 +143,7 @@ describe('Unlock user', () => {
         errorCode: '',
         person: getPersonendatensatz(true),
         adminId: 'adminid',
+        formatOrganisationName: formatOrganisationName,
         intersectingOrganisations: getIntersectingOrganisations(),
       },
       global: {
@@ -150,11 +161,14 @@ describe('Unlock user', () => {
     expect(document.querySelector('[data-testid="schule-select"]')).toBeNull();
     const button: HTMLElement = document.querySelector('[data-testid="lock-user-button"]') as HTMLElement;
     expect(button).not.toBeNull();
+    expect(formatOrganisationName).toHaveBeenCalled();
   });
 });
 
 describe('Error handling', () => {
   describe('if an error occurs', () => {
+    const formatOrganisationName: Mock = vi.fn();
+
     beforeEach(() => {
       wrapper = mount(PersonLock, {
         attachTo: document.getElementById('app') || '',
@@ -163,6 +177,7 @@ describe('Error handling', () => {
           errorCode: 'TEST_ERROR',
           person: getPersonendatensatz(true),
           adminId: 'adminid',
+          formatOrganisationName: formatOrganisationName,
           intersectingOrganisations: getIntersectingOrganisations(),
         },
         global: {
@@ -182,6 +197,8 @@ describe('Error handling', () => {
   });
 
   describe('if no error occurs', () => {
+    const formatOrganisationName: Mock = vi.fn();
+
     beforeEach(() => {
       wrapper = mount(PersonLock, {
         attachTo: document.getElementById('app') || '',
@@ -191,6 +208,7 @@ describe('Error handling', () => {
           person: getPersonendatensatz(true),
           adminId: 'adminid',
           intersectingOrganisations: getIntersectingOrganisations(),
+          formatOrganisationName: formatOrganisationName,
         },
         global: {
           components: {
