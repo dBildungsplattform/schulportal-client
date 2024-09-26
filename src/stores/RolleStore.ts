@@ -8,7 +8,7 @@ import {
   type CreateRolleBodyParams,
   type RolleApiInterface,
   type RolleResponse,
-  type RolleServiceProviderQueryParams,
+  type RolleServiceProviderBodyParams,
   type RolleWithServiceProvidersResponse,
   type ServiceProviderResponse,
   type UpdateRolleBodyParams,
@@ -32,7 +32,7 @@ type RolleGetters = {};
 type RolleActions = {
   addServiceProviderToRolle: (
     rolleId: string,
-    rolleServiceProviderQueryParams: RolleServiceProviderQueryParams,
+    rolleServiceProviderQueryParams: RolleServiceProviderBodyParams,
   ) => Promise<void>;
   createRolle: (
     rollenName: string,
@@ -112,7 +112,7 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
     };
   },
   actions: {
-    async addServiceProviderToRolle(rolleId: string, rolleServiceProviderQueryParams: RolleServiceProviderQueryParams) {
+    async addServiceProviderToRolle(rolleId: string, rolleServiceProviderQueryParams: RolleServiceProviderBodyParams) {
       this.loading = true;
       try {
         const { data }: AxiosResponse<ServiceProviderResponse> = await rolleApi.rolleControllerAddServiceProviderById(

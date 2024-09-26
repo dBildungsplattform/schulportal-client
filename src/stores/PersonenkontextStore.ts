@@ -242,7 +242,7 @@ export const usePersonenkontextStore: StoreDefinition<
       this.loading = true;
       try {
         const { data }: { data: DBiamPersonenkontextResponse } =
-          await dbiamPersonenkontexteApi.dBiamPersonenkontextControllerCreatePersonenkontext(personenkontext);
+          await dbiamPersonenkontexteApi.dBiamPersonenkontextControllerCreatePersonenkontextMigration(personenkontext);
         switch (personenKontextTyp) {
           case PersonenKontextTyp.Klasse:
             this.createdPersonenkontextForKlasse = data;

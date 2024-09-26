@@ -166,6 +166,7 @@ describe('rolleStore', () => {
       mockadapter.onPost('/api/rolle/1/serviceProviders').replyOnce(200, mockResponse, {});
       const addServiceProviderToRollePromise: Promise<void> = rolleStore.addServiceProviderToRolle('1', {
         serviceProviderId: '1234',
+        version: 1,
       });
       expect(rolleStore.loading).toBe(true);
       await addServiceProviderToRollePromise;
@@ -177,6 +178,7 @@ describe('rolleStore', () => {
       mockadapter.onPost('/api/rolle/1/serviceProviders').replyOnce(500, 'some mock server error');
       const addServiceProviderToRollePromise: Promise<void> = rolleStore.addServiceProviderToRolle('1', {
         serviceProviderId: '1',
+        version: 1,
       });
       expect(rolleStore.loading).toBe(true);
       await addServiceProviderToRollePromise;
@@ -189,6 +191,7 @@ describe('rolleStore', () => {
       mockadapter.onPost('/api/rolle/1/serviceProviders').replyOnce(500, { code: 'some mock server error' });
       const addServiceProviderToRollePromise: Promise<void> = rolleStore.addServiceProviderToRolle('1', {
         serviceProviderId: '1',
+        version: 1,
       });
       expect(rolleStore.loading).toBe(true);
       await addServiceProviderToRollePromise;

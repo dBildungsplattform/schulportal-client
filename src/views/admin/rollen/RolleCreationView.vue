@@ -241,6 +241,7 @@
           selectedServiceProviders.value?.forEach(async (serviceProviderId: string) => {
             await rolleStore.addServiceProviderToRolle(rolleResponse.id, {
               serviceProviderId,
+              version: rolleResponse.version,
             });
           });
         });
