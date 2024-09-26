@@ -16,7 +16,7 @@
       justify="center"
       no-gutters
     >
-      <v-col cols="auto">
+      <v-col cols="12" md="auto">
         <img
           aria-hidden="true"
           alt="Logo Schulportal"
@@ -32,7 +32,7 @@
       justify="center"
       no-gutters
     >
-      <v-col cols="auto">
+      <v-col cols="12" md="auto">
         <!-- Subtitle/welcome message -->
         <h1
           class="headline-2"
