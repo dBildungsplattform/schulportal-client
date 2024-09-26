@@ -5,6 +5,7 @@ import {
   Vertrauensstufe,
   type DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response,
   type DBiamPersonenuebersichtResponse,
+  type LockUserBodyParams,
   type PersonFrontendControllerFindPersons200Response,
   type PersonLockResponse,
   type PersonendatensatzResponse,
@@ -47,6 +48,14 @@ function getMockPersonendatensatzResponse(): PersonendatensatzResponse {
       startpasswort: '',
       lastModified: '2024-12-22',
     },
+  };
+}
+
+function getUserLockBodyParams(lock: boolean): LockUserBodyParams {
+  return {
+    lock: lock,
+    locked_from: 'Alfred Admin',
+    locked_until: null,
   };
 }
 
@@ -435,9 +444,6 @@ describe('PersonStore', () => {
 
   describe('lockPerson', () => {
     it('should lock the person and update state', async () => {
-      const lock: boolean = true;
-      const lockedFrom: string = 'admin';
-
       const mockPerson: PersonendatensatzResponse = getMockPersonendatensatzResponse();
 
       const mockResponse: PersonLockResponse = {
@@ -447,7 +453,8 @@ describe('PersonStore', () => {
       mockadapter.onPut(`/api/personen/${mockPerson.person.id}/lock-user`).replyOnce(200, mockResponse);
       mockadapter.onGet(`/api/personen/${mockPerson.person.id}`).replyOnce(200, mockPerson);
 
-      const lockPersonPromise: Promise<void> = personStore.lockPerson(mockPerson.person.id, lock, lockedFrom);
+      const lockUserBodyParams: LockUserBodyParams = getUserLockBodyParams(true);
+      const lockPersonPromise: Promise<void> = personStore.lockPerson(mockPerson.person.id, lockUserBodyParams);
       expect(personStore.loading).toBe(true);
       expect(lockPersonPromise).resolves.toBeUndefined();
       await lockPersonPromise;
@@ -456,11 +463,10 @@ describe('PersonStore', () => {
 
     it('should handle string error', async () => {
       const personId: string = '1234';
-      const lock: boolean = true;
-      const lockedFrom: string = 'admin';
 
       mockadapter.onPut(`/api/personen/${personId}/lock-user`).replyOnce(500, 'some mock server error');
-      const lockPersonPromise: Promise<void> = personStore.lockPerson(personId, lock, lockedFrom);
+      const lockUserBodyParams: LockUserBodyParams = getUserLockBodyParams(true);
+      const lockPersonPromise: Promise<void> = personStore.lockPerson(personId, lockUserBodyParams);
       expect(personStore.loading).toBe(true);
       await rejects(lockPersonPromise);
       expect(personStore.errorCode).toEqual('UNSPECIFIED_ERROR');
@@ -469,11 +475,10 @@ describe('PersonStore', () => {
 
     it('should handle error code', async () => {
       const personId: string = '1234';
-      const lock: boolean = true;
-      const lockedFrom: string = 'admin';
 
       mockadapter.onPut(`/api/personen/${personId}/lock-user`).replyOnce(500, { code: 'some mock server error' });
-      const lockPersonPromise: Promise<void> = personStore.lockPerson(personId, lock, lockedFrom);
+      const lockUserBodyParams: LockUserBodyParams = getUserLockBodyParams(true);
+      const lockPersonPromise: Promise<void> = personStore.lockPerson(personId, lockUserBodyParams);
       expect(personStore.loading).toBe(true);
       await rejects(lockPersonPromise);
       expect(personStore.errorCode).toEqual('some mock server error');
