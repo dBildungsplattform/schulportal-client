@@ -42,10 +42,11 @@
     labelAndValues: LabelValue[];
   };
 
+  const authStore: AuthStore = useAuthStore();
   const personInfoStore: PersonInfoStore = usePersonInfoStore();
   const personStore: PersonStore = usePersonStore();
-  const twoFactorAuthentificationStore: TwoFactorAuthentificationStore = useTwoFactorAuthentificationStore();
-  const authStore: AuthStore = useAuthStore();
+  const twoFactorAuthenticationStore: TwoFactorAuthentificationStore = useTwoFactorAuthentificationStore();
+
   const personalData: Ref = ref<LabelValue[]>([]);
   const schulDaten: Ref = ref<SchulDaten[]>([]);
   const hasKoPersMerkmal: Ref = ref<boolean>(false);
@@ -182,6 +183,7 @@
   async function initializeStores(): Promise<void> {
     await personInfoStore.initPersonInfo();
     await personStore.getPersonenuebersichtById(personInfoStore.personInfo?.person.id ?? '');
+    await twoFactorAuthenticationStore.get2FARequirement(personInfoStore.personInfo?.person.id ?? '');
   }
 
   function setupPersonalData(): void {
@@ -269,7 +271,7 @@
     setupPersonalData();
     setupSchuleData();
     if (personInfoStore.personInfo?.person.id) {
-      await twoFactorAuthentificationStore.get2FAState(personInfoStore.personInfo.person.id);
+      await twoFactorAuthenticationStore.get2FAState(personInfoStore.personInfo.person.id);
     }
   });
 </script>
@@ -528,6 +530,7 @@
       </v-col>
 
       <v-col
+        v-if="!twoFactorAuthenticationStore.loading && twoFactorAuthenticationStore.required"
         cols="12"
         sm="12"
         md="6"
@@ -535,10 +538,10 @@
         <LayoutCard
           :headline-test-id="'two-factor-card'"
           :header="$t('profile.twoFactorAuth')"
-          v-if="twoFactorAuthentificationStore.hasToken != undefined"
+          v-if="twoFactorAuthenticationStore.hasToken != undefined"
         >
           <v-row
-            v-if="twoFactorAuthentificationStore.hasToken === false"
+            v-if="twoFactorAuthenticationStore.hasToken === false"
             class="ma-3 d-flex align-content-center justify-center ga-4"
           >
             <v-icon
@@ -559,13 +562,13 @@
             <div>
               <SelfServiceWorkflow
                 :personId="personInfoStore.personInfo?.person.id ?? ''"
-                @updateState="twoFactorAuthentificationStore.get2FAState(personInfoStore.personInfo?.person.id ?? '')"
+                @updateState="twoFactorAuthenticationStore.get2FAState(personInfoStore.personInfo?.person.id ?? '')"
               >
               </SelfServiceWorkflow>
             </div>
           </v-row>
           <v-row
-            v-if="twoFactorAuthentificationStore.hasToken === true"
+            v-if="twoFactorAuthenticationStore.hasToken === true"
             class="ma-3 d-flex align-content-center justify-center ga-4"
           >
             <v-col>
@@ -580,13 +583,13 @@
                   ></v-icon>
                 </v-col>
                 <div class="v-col">
-                  <p v-if="twoFactorAuthentificationStore.tokenKind === TokenKind.software">
+                  <p v-if="twoFactorAuthenticationStore.tokenKind === TokenKind.software">
                     {{ $t('admin.person.twoFactorAuthentication.softwareTokenIsSetUpSelfService') }}
                   </p>
-                  <p v-else-if="twoFactorAuthentificationStore.tokenKind === TokenKind.hardware">
+                  <p v-else-if="twoFactorAuthenticationStore.tokenKind === TokenKind.hardware">
                     {{
                       $t('admin.person.twoFactorAuthentication.hardwareTokenIsSetUpSelfService', {
-                        serialNumber: twoFactorAuthentificationStore.serial,
+                        serialNumber: twoFactorAuthenticationStore.serial,
                       })
                     }}
                   </p>

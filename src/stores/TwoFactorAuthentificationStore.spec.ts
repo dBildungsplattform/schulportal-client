@@ -1,4 +1,4 @@
-import type { AssignHardwareTokenBodyParams, TokenStateResponse } from '@/api-client/generated';
+import type { AssignHardwareTokenBodyParams, TokenRequiredResponse, TokenStateResponse } from '@/api-client/generated';
 import ApiService from '@/services/ApiService';
 import MockAdapter from 'axios-mock-adapter';
 import { createPinia, setActivePinia } from 'pinia';
@@ -23,6 +23,7 @@ describe('TwoFactorAuthentificationStore', () => {
     expect(twoFactorAuthenticationStore.tokenKind).toEqual(null);
     expect(twoFactorAuthenticationStore.errorCode).toEqual('');
     expect(twoFactorAuthenticationStore.loading).toBe(false);
+    expect(twoFactorAuthenticationStore.required).toBe(false);
     expect(twoFactorAuthenticationStore.qrCode).toBe('');
   });
 
@@ -101,6 +102,47 @@ describe('TwoFactorAuthentificationStore', () => {
     });
   });
 
+  describe('get2FARequirement', () => {
+    const personId: string = 'testUser';
+    const url: string = `/api/2fa-token/required?personId=${personId}`;
+
+    it('should get 2FA requirement', async () => {
+      const mockResponse: TokenRequiredResponse = {
+        required: true,
+      };
+      mockadapter.onGet(url).replyOnce(200, mockResponse);
+
+      const get2FAStatePromise: Promise<void> = twoFactorAuthenticationStore.get2FARequirement(personId);
+      expect(twoFactorAuthenticationStore.loading).toBe(true);
+      await get2FAStatePromise;
+
+      expect(twoFactorAuthenticationStore.required).toEqual(mockResponse.required);
+      expect(twoFactorAuthenticationStore.loading).toBe(false);
+    });
+
+    it('should handle string error', async () => {
+      mockadapter.onGet(url).replyOnce(500, 'some error');
+
+      const get2FAStatePromise: Promise<void> = twoFactorAuthenticationStore.get2FARequirement(personId);
+
+      expect(twoFactorAuthenticationStore.loading).toBe(true);
+      await get2FAStatePromise;
+      expect(twoFactorAuthenticationStore.errorCode).toEqual('UNSPECIFIED_ERROR');
+      expect(twoFactorAuthenticationStore.loading).toBe(false);
+    });
+
+    it('should handle error code', async () => {
+      mockadapter.onGet(url).replyOnce(500, { code: 'some mock server error' });
+
+      const get2FAStatePromise: Promise<void> = twoFactorAuthenticationStore.get2FARequirement(personId);
+
+      expect(twoFactorAuthenticationStore.loading).toBe(true);
+      await get2FAStatePromise;
+      expect(twoFactorAuthenticationStore.errorCode).toEqual('some mock server error');
+      expect(twoFactorAuthenticationStore.loading).toBe(false);
+    });
+  });
+
   describe('get2FASoftwareQRCode', () => {
     it('should get 2FA software QR code', async () => {
       const personId: string = 'testUser';
@@ -160,6 +202,7 @@ describe('TwoFactorAuthentificationStore', () => {
       expect(twoFactorAuthenticationStore.loading).toBe(false);
     });
   });
+
   describe('resetToken', () => {
     it('should reset token successfully', async () => {
       const referrer: string = 'testReferrer';

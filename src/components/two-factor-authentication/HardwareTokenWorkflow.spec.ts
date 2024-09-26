@@ -23,6 +23,8 @@ beforeEach(() => {
           personalnummer: '1234',
           isLocked: false,
           lockInfo: null,
+          revision: '1',
+          lastModified: '2024-05-22',
         },
       },
     },

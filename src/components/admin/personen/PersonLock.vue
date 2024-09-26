@@ -1,4 +1,5 @@
 <script setup lang="ts">
+  import SpshTooltip from '@/components/admin/SpshTooltip.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { type Organisation } from '@/stores/OrganisationStore';
   import { type Personendatensatz } from '@/stores/PersonStore';
@@ -6,6 +7,7 @@
   import { computed, ref, watch, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
+
   const { t }: Composer = useI18n({ useScope: 'global' });
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
@@ -15,6 +17,7 @@
     adminId: string;
     formatOrganisationName: (org: Organisation) => string;
     intersectingOrganisations: Set<Organisation>;
+    disabled: boolean;
   };
   type Emits = {
     (event: 'onLockUser', id: string, lock: boolean, schule: string): void;
@@ -78,14 +81,22 @@
         md="auto"
         class="pb-0"
       >
-        <v-btn
-          class="primary"
-          data-testid="open-lock-dialog-icon"
-          :block="mdAndDown"
-          v-bind="props"
+        <SpshTooltip
+          :enabledCondition="!disabled"
+          :disabledText="$t('person.finishEditFirst')"
+          :enabledText="$t('person.lockUser')"
+          position="start"
         >
-          {{ !person.person.isLocked ? $t('person.lockUser') : $t('person.unlockUser') }}
-        </v-btn>
+          <v-btn
+            class="primary"
+            data-testid="open-lock-dialog-icon"
+            :disabled="disabled"
+            :block="mdAndDown"
+            v-bind="props"
+          >
+            {{ !person.person.isLocked ? $t('person.lockUser') : $t('person.unlockUser') }}
+          </v-btn>
+        </SpshTooltip>
       </v-col>
     </template>
 
