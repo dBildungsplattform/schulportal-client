@@ -49,6 +49,7 @@ type RolleActions = {
     merkmale: RollenMerkmal[],
     systemrechte: RollenSystemRecht[],
     serviceProviderIds: string[],
+    version: number,
   ) => Promise<void>;
   deleteRolleById: (rolleId: string) => Promise<void>;
 };
@@ -67,6 +68,7 @@ export type Rolle = {
   rollenart: RollenArt;
   systemrechte?: Set<RollenSystemRecht>;
   serviceProviders?: Array<ServiceProviderResponse>;
+  version: number;
 };
 
 export type RolleTableItem = {
@@ -202,12 +204,14 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
         this.loading = false;
       }
     },
+
     async updateRolle(
       rolleId: string,
       rollenName: string,
       merkmale: RollenMerkmal[],
       systemrechte: RollenSystemRecht[],
       serviceProviderIds: string[],
+      version: number,
     ): Promise<void> {
       this.loading = true;
       this.errorCode = '';
@@ -217,6 +221,7 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
           merkmale: merkmale as unknown as Set<RollenMerkmal>,
           systemrechte: systemrechte as unknown as Set<RollenSystemRecht>,
           serviceProviderIds: serviceProviderIds as unknown as Set<string>,
+          version: version as unknown as number,
         };
         const { data }: { data: RolleWithServiceProvidersResponse } = await rolleApi.rolleControllerUpdateRolle(
           rolleId,
@@ -232,6 +237,7 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
         this.loading = false;
       }
     },
+
     async deleteRolleById(rolleId: string): Promise<void> {
       this.loading = true;
       this.errorCode = '';
