@@ -29,7 +29,7 @@
     "vue": "^3.4.14",
     "vue-i18n": "^9.10.1",
     "vue-router": "^4.4.3",
-    "vuetify": "^3.6.0",
+    "vuetify": "^3.5.9",
     "yup": "^1.4.0"
   },
   "devDependencies": {
