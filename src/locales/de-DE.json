@@ -247,11 +247,13 @@
       "enterRollenname": "Rollenname eingeben",
       "errors": {
         "ADD_SYSTEMRECHT_ERROR": "Das Systemrecht konnte nicht hinzugefügt werden.",
+        "NEWER_VERSION_OF_ROLLE_AVAILABLE": "Die Änderungen wurden nicht gespeichert, da die Rolle in der Zwischenzeit geändert wurde.",
         "ROLLE_ERROR": "Die Rolle konnte nicht angelegt werden.",
         "ROLLE_HAT_PERSONENKONTEXTE_ERROR": "Die Rolle kann nicht gelöscht werden, da die sie noch Benutzern zugeordnet ist. Nehmen Sie bitte zunächst alle Zuordnungen zurück.",
         "UPDATE_MERKMALE_ERROR": "Die gewünschte Bearbeitung kann nicht ausgeführt werden, da die Rolle noch Benutzern zugeordnet ist. Nehmen Sie bitte zunächst alle Zuordnungen zurück."
       },
       "title": {
+        "NEWER_VERSION_OF_ROLLE_AVAILABLE": "Die Rolle konnte nicht bearbeitet werden.",
         "ROLLE_ERROR": "Fehler bei Erstellung der Rolle.",
         "ROLLE_HAT_PERSONENKONTEXTE_ERROR": "Löschen nicht möglich.",
         "ROLLE_UPDATE_ERROR": "Die Rolle konnte nicht bearbeitet werden.",
