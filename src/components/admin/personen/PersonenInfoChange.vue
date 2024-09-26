@@ -13,6 +13,7 @@
 
   type Props = {
     confirmUnsavedChangesAction: () => void;
+    hasKopersRolle: boolean;
     showUnsavedChangesDialog?: boolean;
     selectedKopersNrPersonInfoProps: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     selectedKopersNrPersonInfo: string | null | undefined;
@@ -105,6 +106,7 @@
       ></v-text-field>
     </FormRow>
     <KopersInput
+      v-if="hasKopersRolle"
       :hideCheckbox="true"
       :selectedKopersNr="selectedKopersNrPersonInfo"
       :selectedKopersNrProps="selectedKopersNrPersonInfoProps"

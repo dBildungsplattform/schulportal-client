@@ -1082,7 +1082,6 @@
                 class="mt-1 edit-container"
               >
                 <div
-                  v-if="hasKopersRolle"
                   class="d-flex justify-sm-end"
                 >
                   <v-col
@@ -1218,6 +1217,7 @@
               :selectedKopersNrPersonInfoProps="selectedKopersNrPersonInfoProps"
               :selectedKopersNrPersonInfo="personStore.currentPerson?.person.personalnummer"
               :showUnsavedChangesDialog="showUnsavedChangesDialog"
+              :hasKopersRolle="hasKopersRolle"
               @update:selectedKopersNrPersonInfo="handleSelectedKopersNrUpdate"
               @update:selectedVorname="handleSelectedVorname"
               @update:selectedFamilienname="handleSelectedFamilienname"
