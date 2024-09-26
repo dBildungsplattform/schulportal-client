@@ -431,6 +431,7 @@ describe('PersonenkontextStore', () => {
             systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
             administeredBySchulstrukturknotenName: 'Land SH',
             administeredBySchulstrukturknotenKennung: '',
+            version: 1,
           },
         ],
         total: 0,

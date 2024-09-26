@@ -47,10 +47,18 @@
   import { useForm, type BaseFieldProps, type FormContext, type TypedSchema } from 'vee-validate';
   import { computed, onBeforeMount, onMounted, onUnmounted, ref, watch, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
-  import { onBeforeRouteLeave, useRoute, useRouter, type NavigationGuardNext, type RouteLocationNormalized, type RouteLocationNormalizedLoaded, type Router } from 'vue-router';
+  import {
+    onBeforeRouteLeave,
+    useRoute,
+    useRouter,
+    type NavigationGuardNext,
+    type RouteLocationNormalized,
+    type RouteLocationNormalizedLoaded,
+    type Router,
+  } from 'vue-router';
   import { useDisplay } from 'vuetify';
   import { object, string, StringSchema, type AnyObject } from 'yup';
-import type { TranslatedObject } from '@/types';
+  import type { TranslatedObject } from '@/types';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
@@ -915,10 +923,10 @@ import type { TranslatedObject } from '@/types';
   // Checks if the entered KopersNr is the same one that is already assigned to the user.
   // This is used to disable the save button in that case (To avoid errors).
   const hasSameKopersNr: ComputedRef<boolean> = computed(() => {
-      if(selectedKopersNrPersonInfo.value === personStore.currentPerson?.person.personalnummer) {
-        return true;
-      }
-      return false;
+    if (selectedKopersNrPersonInfo.value === personStore.currentPerson?.person.personalnummer) {
+      return true;
+    }
+    return false;
   });
 
   // Computed property to check if the second radio button should be disabled
@@ -1004,37 +1012,40 @@ import type { TranslatedObject } from '@/types';
           <div v-if="personStore.currentPerson?.person && !isEditPersonInfoActive">
             <!-- Befristung -->
             <v-row class="ml-md-16">
-            <v-col
-              cols="12"
-              md="auto"
-              class="mt-1 edit-container"
-            >
-              <div v-if ="hasKopersRolle" class="d-flex justify-sm-end">
-                <v-col
-                  cols="12"
-                  sm="6"
-                  md="auto"
+              <v-col
+                cols="12"
+                md="auto"
+                class="mt-1 edit-container"
+              >
+                <div
+                  v-if="hasKopersRolle"
+                  class="d-flex justify-sm-end"
                 >
-                  <SpshTooltip
-                    :enabledCondition="!isEditActive"
-                    :disabledText="$t('person.finishEditFirst')"
-                    :enabledText="$t('admin.person.editPersonalInfo')"
-                    position="start"
+                  <v-col
+                    cols="12"
+                    sm="6"
+                    md="auto"
                   >
-                    <v-btn
-                      :disabled="isEditActive"
-                      class="primary ml-lg-8"
-                      data-testid="zuordnung-edit-button"
-                      @Click="triggerPersonInfoEdit"
-                      :block="mdAndDown"
+                    <SpshTooltip
+                      :enabledCondition="!isEditActive"
+                      :disabledText="$t('person.finishEditFirst')"
+                      :enabledText="$t('admin.person.editPersonalInfo')"
+                      position="start"
                     >
-                      {{ $t('edit') }}
-                    </v-btn>
-                  </SpshTooltip>
-                </v-col>
-              </div>
-            </v-col>
-          </v-row>
+                      <v-btn
+                        :disabled="isEditActive"
+                        class="primary ml-lg-8"
+                        data-testid="zuordnung-edit-button"
+                        @Click="triggerPersonInfoEdit"
+                        :block="mdAndDown"
+                      >
+                        {{ $t('edit') }}
+                      </v-btn>
+                    </SpshTooltip>
+                  </v-col>
+                </div>
+              </v-col>
+            </v-row>
             <!-- Vorname -->
             <v-row class="mt-md-6">
               <v-col cols="1"></v-col>
@@ -1163,22 +1174,22 @@ import type { TranslatedObject } from '@/types';
                 sm="6"
                 md="auto"
               >
-              <SpshTooltip
-                    :enabledCondition="!hasSameKopersNr"
-                    :disabledText="$t('person.changeKopersDisabledDescription')" 
-                    :enabledText="$t('save')"
-                    position="start"
-                  >
-                <v-btn
-                  class="primary small"
-                  :disabled ="hasSameKopersNr"
-                  data-testid="person-info-edit-save"
-                  @click="handleSaveClick"
-                  :block="mdAndDown"
-                  type="submit"
+                <SpshTooltip
+                  :enabledCondition="!hasSameKopersNr"
+                  :disabledText="$t('person.changeKopersDisabledDescription')"
+                  :enabledText="$t('save')"
+                  position="start"
                 >
-                  {{ $t('save') }}
-                </v-btn>
+                  <v-btn
+                    class="primary small"
+                    :disabled="hasSameKopersNr"
+                    data-testid="person-info-edit-save"
+                    @click="handleSaveClick"
+                    :block="mdAndDown"
+                    type="submit"
+                  >
+                    {{ $t('save') }}
+                  </v-btn>
                 </SpshTooltip>
               </v-col>
             </v-row>

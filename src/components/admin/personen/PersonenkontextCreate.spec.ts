@@ -154,6 +154,7 @@ beforeEach(() => {
         id: '54321',
         administeredBySchulstrukturknotenName: 'Land SH',
         administeredBySchulstrukturknotenKennung: '',
+        version: 1,
       },
     ],
     organisations: [],

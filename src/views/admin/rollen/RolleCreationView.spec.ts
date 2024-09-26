@@ -138,6 +138,7 @@ describe('RolleCreationView', () => {
       id: '1',
       administeredBySchulstrukturknotenName: 'Land SH',
       administeredBySchulstrukturknotenKennung: '',
+      version: 1,
     };
 
     rolleStore.createdRolle = mockRolle;

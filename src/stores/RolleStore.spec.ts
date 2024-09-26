@@ -43,6 +43,7 @@ describe('rolleStore', () => {
           id: '1',
           administeredBySchulstrukturknotenName: null,
           administeredBySchulstrukturknotenKennung: null,
+          version: 1,
         },
       ];
 
@@ -107,6 +108,7 @@ describe('rolleStore', () => {
           id: '1',
           administeredBySchulstrukturknotenName: 'Testschule-15',
           administeredBySchulstrukturknotenKennung: '1111115',
+          version: 1,
         },
       ];
 
@@ -148,6 +150,7 @@ describe('rolleStore', () => {
         name: 'Rolle 1',
         rollenart: 'LERN',
         systemrechte: new Set(),
+        version: 1,
       };
 
       const mockResponse: ServiceProvider = {
@@ -209,6 +212,7 @@ describe('rolleStore', () => {
           id: '1',
           administeredBySchulstrukturknotenName: null,
           administeredBySchulstrukturknotenKennung: null,
+          version: 1,
         },
       ];
 
@@ -254,6 +258,7 @@ describe('rolleStore', () => {
         serviceProviders: [{ id: 'sp1', name: 'ServiceProvider1' }],
         administeredBySchulstrukturknotenName: null,
         administeredBySchulstrukturknotenKennung: null,
+        version: 1,
       };
 
       mockadapter.onPut('/api/rolle/1').replyOnce(200, mockResponse);
@@ -263,6 +268,7 @@ describe('rolleStore', () => {
         ['KOPERS_PFLICHT'],
         ['ROLLEN_VERWALTEN'],
         ['sp1'],
+        2,
       );
       expect(rolleStore.loading).toBe(true);
       await updateRollePromise;
@@ -278,6 +284,7 @@ describe('rolleStore', () => {
         ['KOPERS_PFLICHT'],
         ['ROLLEN_VERWALTEN'],
         ['sp1'],
+        2,
       );
       expect(rolleStore.loading).toBe(true);
       await updateRollePromise;
@@ -294,6 +301,7 @@ describe('rolleStore', () => {
         ['KOPERS_PFLICHT'],
         ['ROLLEN_VERWALTEN'],
         ['sp1'],
+        2,
       );
       expect(rolleStore.loading).toBe(true);
       await updateRollePromise;
