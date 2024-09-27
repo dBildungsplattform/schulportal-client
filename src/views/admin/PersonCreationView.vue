@@ -1,10 +1,5 @@
 <script setup lang="ts">
-  import {
-    usePersonStore,
-    type CreatePersonBodyParams,
-    type CreatedPersonenkontext,
-    type PersonStore,
-  } from '@/stores/PersonStore';
+  import { usePersonStore, type CreatePersonBodyParams, type PersonStore } from '@/stores/PersonStore';
   import { RollenArt, RollenMerkmal } from '@/stores/RolleStore';
   import { type ComputedRef, computed, onMounted, onUnmounted, type Ref, ref, watch } from 'vue';
   import {
@@ -15,7 +10,7 @@
     type NavigationGuardNext,
   } from 'vue-router';
   import { type Composer, useI18n } from 'vue-i18n';
-  import { useForm, type TypedSchema, type BaseFieldProps } from 'vee-validate';
+  import { useForm, type TypedSchema, type BaseFieldProps, type FormContext } from 'vee-validate';
   import { object, string, StringSchema, type AnyObject } from 'yup';
   import { toTypedSchema } from '@vee-validate/yup';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
@@ -24,19 +19,23 @@
   import FormWrapper from '@/components/form/FormWrapper.vue';
   import FormRow from '@/components/form/FormRow.vue';
   import {
-    PersonenKontextTyp,
     usePersonenkontextStore,
+    type DBiamPersonenkontextResponse,
     type PersonenkontextStore,
   } from '@/stores/PersonenkontextStore';
   import { useDisplay } from 'vuetify';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
-  import { DIN_91379A, NO_LEADING_TRAILING_SPACES } from '@/utils/validation';
+  import { DDMMYYYY, DIN_91379A, NO_LEADING_TRAILING_SPACES } from '@/utils/validation';
   import { useOrganisationen } from '@/composables/useOrganisationen';
   import { useRollen, type TranslatedRolleWithAttrs } from '@/composables/useRollen';
   import { useKlassen } from '@/composables/useKlassen';
+  import KopersInput from '@/components/admin/personen/KopersInput.vue';
   import PersonenkontextCreate from '@/components/admin/personen/PersonenkontextCreate.vue';
   import { type TranslatedObject } from '@/types.d';
+  import { parse, isValid, isBefore } from 'date-fns';
+  import { getNextSchuljahresende, formatDateToISO } from '@/utils/date';
+  import { isBefristungspflichtRolle, useBefristungUtils, type BefristungUtilsType } from '@/utils/befristung';
 
   const router: Router = useRouter();
   const personStore: PersonStore = usePersonStore();
@@ -47,10 +46,16 @@
   let blockedNext: () => void = () => {};
 
   const canCommit: Ref<boolean> = ref(false);
-  const hasNoKopersNr: Ref<boolean> = ref(false);
+  const hasNoKopersNr: Ref<boolean | undefined> = ref(false);
   const showNoKopersNrConfirmationDialog: Ref<boolean> = ref(false);
 
+  const calculatedBefristung: Ref<string | undefined> = ref('');
+
   const rollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = useRollen();
+
+  const selectedOrgaCache: Ref<string | undefined> = ref(undefined);
+  const selectedKlasseCache: Ref<string | undefined> = ref(undefined);
+  const selectedRolleCache: Ref<string | undefined> = ref(undefined);
 
   function isKopersRolle(selectedRolleId: string | undefined): boolean {
     const rolle: TranslatedRolleWithAttrs | undefined = rollen.value?.find(
@@ -66,6 +71,14 @@
     );
     return !!rolle && rolle.rollenart === RollenArt.Lern;
   }
+
+  // Custom validation function to check if the date is in the past
+  const notInPast = (value: string | undefined): boolean => {
+    if (!value) return true;
+
+    const parsedDate: Date = parse(value, 'dd.MM.yyyy', new Date());
+    return isValid(parsedDate) && !isBefore(parsedDate, new Date());
+  };
 
   const validationSchema: TypedSchema = toTypedSchema(
     object({
@@ -91,6 +104,15 @@
         then: (schema: StringSchema<string | undefined, AnyObject, undefined, ''>) =>
           schema.required(t('admin.person.rules.kopersNr.required')),
       }),
+      selectedBefristung: string()
+        .matches(DDMMYYYY, t('admin.befristung.rules.format'))
+        .test('notInPast', t('admin.befristung.rules.pastDateNotAllowed'), notInPast)
+        .when(['selectedRolle', 'selectedBefristungOption'], {
+          is: (selectedRolleId: string, selectedBefristungOption: string | undefined) =>
+            isBefristungspflichtRolle(selectedRolleId) && selectedBefristungOption === undefined,
+          then: (schema: StringSchema<string | undefined, AnyObject, undefined, ''>) =>
+            schema.required(t('admin.befristung.rules.required')),
+        }),
     }),
   );
 
@@ -109,78 +131,139 @@
     selectedFamilienname: string;
     selectedOrganisation: string;
     selectedKlasse: string;
+    selectedBefristung: Date;
+    selectedBefristungOption: string;
     selectedKopersNr: string;
   };
 
-  // eslint-disable-next-line @typescript-eslint/typedef
-  const { defineField, handleSubmit, isFieldDirty, resetForm } = useForm<PersonCreationForm>({
+  const formContext: FormContext<PersonCreationForm, PersonCreationForm> = useForm<PersonCreationForm>({
     validationSchema,
   });
 
   const [selectedRolle, selectedRolleProps]: [
     Ref<string | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineField('selectedRolle', vuetifyConfig);
+  ] = formContext.defineField('selectedRolle', vuetifyConfig);
   const [selectedKopersNr, selectedKopersNrProps]: [
-    Ref<string | undefined>,
+    Ref<string | undefined | null>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineField('selectedKopersNr', vuetifyConfig);
+  ] = formContext.defineField('selectedKopersNr', vuetifyConfig);
   const [selectedVorname, selectedVornameProps]: [
     Ref<string>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineField('selectedVorname', vuetifyConfig);
+  ] = formContext.defineField('selectedVorname', vuetifyConfig);
   const [selectedFamilienname, selectedFamiliennameProps]: [
     Ref<string>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineField('selectedFamilienname', vuetifyConfig);
+  ] = formContext.defineField('selectedFamilienname', vuetifyConfig);
   const [selectedOrganisation, selectedOrganisationProps]: [
     Ref<string | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineField('selectedOrganisation', vuetifyConfig);
+  ] = formContext.defineField('selectedOrganisation', vuetifyConfig);
   const [selectedKlasse, selectedKlasseProps]: [
     Ref<string | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineField('selectedKlasse', vuetifyConfig);
+  ] = formContext.defineField('selectedKlasse', vuetifyConfig);
+  const [selectedBefristung, selectedBefristungProps]: [
+    Ref<string | undefined>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = formContext.defineField('selectedBefristung', vuetifyConfig);
+  const [selectedBefristungOption, selectedBefristungOptionProps]: [
+    Ref<string | undefined>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = formContext.defineField('selectedBefristungOption', vuetifyConfig);
+
+  const { handleBefristungUpdate, handleBefristungOptionUpdate, setupWatchers }: BefristungUtilsType =
+    useBefristungUtils({
+      formContext,
+      selectedBefristung,
+      selectedBefristungOption,
+      calculatedBefristung,
+      selectedRolle,
+    });
+
+  setupWatchers();
 
   const organisationen: ComputedRef<TranslatedObject[] | undefined> = useOrganisationen();
 
   const klassen: ComputedRef<TranslatedObject[] | undefined> = useKlassen();
 
-  const translatedOrganisationsname: ComputedRef<string> = computed(
-    () =>
+  const klasseZuordnungFromCreatedKontext: ComputedRef<DBiamPersonenkontextResponse | undefined> = computed(() => {
+    return personenkontextStore.createdPersonWithKontext?.dBiamPersonenkontextResponses.find(
+      (kontext: DBiamPersonenkontextResponse) =>
+        kontext.organisationId === selectedKlasseCache.value && kontext.rolleId === selectedRolleCache.value,
+    );
+  });
+
+  const schuleZuordnungFromCreatedKontext: ComputedRef<DBiamPersonenkontextResponse | undefined> = computed(() => {
+    return personenkontextStore.createdPersonWithKontext?.dBiamPersonenkontextResponses.find(
+      (kontext: DBiamPersonenkontextResponse) =>
+        kontext.organisationId === selectedOrgaCache.value && kontext.rolleId === selectedRolleCache.value,
+    );
+  });
+
+  const translatedOrganisationsname: ComputedRef<string | undefined> = computed(() => {
+    if (!schuleZuordnungFromCreatedKontext.value) return;
+    return (
       organisationen.value?.find(
         (organisation: TranslatedObject) =>
-          organisation.value ===
-          personenkontextStore.createdPersonWithKontext?.DBiamPersonenkontextResponse.organisationId,
-      )?.title || '',
-  );
+          organisation.value === schuleZuordnungFromCreatedKontext.value?.organisationId,
+      )?.title || ''
+    );
+  });
 
-  const translatedRollenname: ComputedRef<string> = computed(
-    () =>
-      rollen.value?.find(
-        (rolle: TranslatedObject) =>
-          rolle.value === personenkontextStore.createdPersonWithKontext?.DBiamPersonenkontextResponse.rolleId,
-      )?.title || '',
-  );
+  const translatedRollenname: ComputedRef<string | undefined> = computed(() => {
+    if (!schuleZuordnungFromCreatedKontext.value) return;
+    return (
+      rollen.value?.find((rolle: TranslatedObject) => rolle.value === schuleZuordnungFromCreatedKontext.value?.rolleId)
+        ?.title || ''
+    );
+  });
 
-  const translatedKlassenname: ComputedRef<string> = computed(
-    () =>
+  const translatedKlassenname: ComputedRef<string | undefined> = computed(() => {
+    if (!klasseZuordnungFromCreatedKontext.value) return;
+    return (
       klassen.value?.find(
-        (klasse: TranslatedObject) =>
-          klasse.value === personenkontextStore.createdPersonenkontextForKlasse?.organisationId,
-      )?.title || '',
-  );
+        (klasse: TranslatedObject) => klasse.value === klasseZuordnungFromCreatedKontext.value?.organisationId,
+      )?.title || ''
+    );
+  });
+
+  // Converts the ISO UTC formatted Befristung to the german local format, also ISO.
+  const translatedBefristung: ComputedRef<string> = computed(() => {
+    const ISOFormattedDate: string | undefined = schuleZuordnungFromCreatedKontext.value?.befristung;
+
+    if (!ISOFormattedDate) {
+      return t('admin.befristung.unlimitedSuccessTemplate');
+    }
+
+    // Parse the UTC date
+    const utcDate: Date = new Date(ISOFormattedDate);
+
+    // Subtract one day. The reason to substract it here is because when the UTC time from the backend gets converted back to the local german date here, it shows the next day
+    // It's logical since we send the date in the first place as "31-07-2024 22H" UTC TIME which is "01-08-2024" 00H of the next day in MESZ (summer german time)
+    // but the user obviously doesn't want to know that.
+    if (utcDate.getTimezoneOffset() >= -120) {
+      // Check if the timezone offset is 2 hours (indicating MESZ)
+      // Subtract one day if in summer time (MESZ)
+      utcDate.setDate(utcDate.getDate() - 1);
+    }
+    const germanDate: string = utcDate.toLocaleDateString('de-DE');
+
+    return germanDate;
+  });
 
   const creationErrorText: Ref<string> = ref('');
 
   function isFormDirty(): boolean {
     return (
-      isFieldDirty('selectedOrganisation') ||
-      isFieldDirty('selectedRolle') ||
-      isFieldDirty('selectedKlasse') ||
-      isFieldDirty('selectedKopersNr') ||
-      isFieldDirty('selectedVorname') ||
-      isFieldDirty('selectedFamilienname')
+      formContext.isFieldDirty('selectedOrganisation') ||
+      formContext.isFieldDirty('selectedRolle') ||
+      formContext.isFieldDirty('selectedKlasse') ||
+      formContext.isFieldDirty('selectedKopersNr') ||
+      formContext.isFieldDirty('selectedVorname') ||
+      formContext.isFieldDirty('selectedFamilienname') ||
+      formContext.isFieldDirty('selectedBefristung')
     );
   }
 
@@ -199,41 +282,49 @@
   }
 
   async function createPerson(): Promise<void> {
+    const befristungDate: string | undefined = selectedBefristung.value
+      ? selectedBefristung.value
+      : calculatedBefristung.value;
+
+    // Format the date in ISO 8601 format if it exists
+    const formattedBefristung: string | undefined = befristungDate ? formatDateToISO(befristungDate) : undefined;
+
     const bodyParams: CreatePersonBodyParams = {
       familienname: selectedFamilienname.value as string,
       vorname: selectedVorname.value as string,
-      personalnummer: selectedKopersNr.value,
-      organisationId: selectedOrganisation.value as string,
-      rolleId: selectedRolle.value ?? '',
+      personalnummer: selectedKopersNr.value as string,
+      befristung: formattedBefristung,
+      createPersonenkontexte: [
+        {
+          organisationId: selectedOrganisation.value as string,
+          rolleId: selectedRolle.value ?? '',
+        },
+      ],
     };
 
-    await personenkontextStore.createPersonWithKontext(bodyParams);
-    if (personenkontextStore.createdPersonWithKontext) {
-      // Build the context for the Klasse and save it only if the the Klasse was selected
-      if (selectedKlasse.value) {
-        const unpersistedKlassePersonenkontext: CreatedPersonenkontext = {
-          personId: personenkontextStore.createdPersonWithKontext.person.id,
-          organisationId: selectedKlasse.value,
-          rolleId: selectedRolle.value ?? '',
-        };
-        await personenkontextStore
-          .createPersonenkontext(unpersistedKlassePersonenkontext, PersonenKontextTyp.Klasse)
-          .catch(() => {
-            creationErrorText.value = t(`admin.personenkontext.errors.${personenkontextStore.errorCode}`);
-          });
-      }
-      resetForm();
-      hasNoKopersNr.value = false;
+    if (selectedKlasse.value) {
+      selectedKlasseCache.value = JSON.parse(JSON.stringify(selectedKlasse.value));
+      bodyParams.createPersonenkontexte.push({
+        organisationId: selectedKlasse.value,
+        rolleId: selectedRolle.value ?? '',
+      });
     }
+    // We save a copy of the selected values because they are not available anymore since we reset the form right after submitting
+    // This will then be used to display the organisation again in the success template after receiving the orga ID and rolle ID back from the BE.
+    selectedOrgaCache.value = JSON.parse(JSON.stringify(selectedOrganisation.value));
+    selectedRolleCache.value = JSON.parse(JSON.stringify(selectedRolle.value));
+    await personenkontextStore.createPersonWithKontexte(bodyParams);
+    formContext.resetForm();
+    hasNoKopersNr.value = false;
   }
 
-  watch(hasNoKopersNr, async (newValue: boolean) => {
+  watch(hasNoKopersNr, async (newValue: boolean | undefined) => {
     if (newValue) {
       showNoKopersNrConfirmationDialog.value = true;
     }
   });
 
-  const onSubmit: (e?: Event | undefined) => Promise<void | undefined> = handleSubmit(() => {
+  const onSubmit: (e?: Event | undefined) => Promise<void | undefined> = formContext.handleSubmit(() => {
     createPerson();
   });
 
@@ -246,10 +337,18 @@
   const handleCreateAnotherPerson = (): void => {
     personenkontextStore.createdPersonWithKontext = null;
     personenkontextStore.createdPersonenkontextForKlasse = null;
-    resetForm();
+    formContext.resetForm();
     hasNoKopersNr.value = false;
+    // Re-trigger the watchers after resetting the form to auto-select the Befristung since the component isn't remounted
+    // Because we navigate to the same route.
+    setupWatchers();
     router.push({ name: 'create-person' });
   };
+
+  // Computed property to check if the second radio button should be disabled
+  const isUnbefristetButtonDisabled: ComputedRef<boolean> = computed(() => {
+    return isBefristungspflichtRolle(selectedRolle.value);
+  });
 
   function handleConfirmUnsavedChanges(): void {
     blockedNext();
@@ -343,6 +442,15 @@
           :selectedOrganisationProps="selectedOrganisationProps"
           :selectedRolleProps="selectedRolleProps"
           :selectedKlasseProps="selectedKlasseProps"
+          :befristungInputProps="{
+            befristungProps: selectedBefristungProps,
+            befristungOptionProps: selectedBefristungOptionProps,
+            isUnbefristetDisabled: isUnbefristetButtonDisabled,
+            isBefristungRequired: isBefristungspflichtRolle(selectedRolle),
+            nextSchuljahresende: getNextSchuljahresende(),
+            befristung: selectedBefristung,
+            befristungOption: selectedBefristungOption,
+          }"
           v-model:selectedOrganisation="selectedOrganisation"
           v-model:selectedRolle="selectedRolle"
           v-model:selectedKlasse="selectedKlasse"
@@ -350,11 +458,13 @@
           @update:selectedRolle="(value?: string) => (selectedRolle = value)"
           @update:selectedKlasse="(value?: string) => (selectedKlasse = value)"
           @update:canCommit="canCommit = $event"
+          @update:befristung="handleBefristungUpdate"
+          @update:calculatedBefristungOption="handleBefristungOptionUpdate"
           @fieldReset="handleFieldReset"
         />
         <div v-if="selectedOrganisation">
           <v-row>
-            <h3 class="headline-3">3. {{ $t('admin.person.personalInfo') }}</h3>
+            <h3 class="headline-3">4. {{ $t('admin.person.personalInfo') }}</h3>
           </v-row>
           <!-- Vorname -->
           <FormRow
@@ -397,49 +507,14 @@
               v-model="selectedFamilienname"
             ></v-text-field>
           </FormRow>
-
-          <!-- No KoPers.-Nr. available checkbox
-              We don't use the form row here to avoid margins and paddings -->
-          <v-row
-            class="align-center"
+          <KopersInput
             v-if="isKopersRolle(selectedRolle) && selectedOrganisation"
-          >
-            <v-col
-              class="py-0 pb-sm-8 pt-sm-3 text-sm-right"
-              cols="12"
-              sm="5"
-            ></v-col>
-            <v-checkbox
-              data-testid="has-no-kopersnr-checkbox"
-              :disabled="!!selectedKopersNr"
-              hide-details
-              :label="$t('admin.person.noKopersNr')"
-              v-model="hasNoKopersNr"
-            ></v-checkbox>
-          </v-row>
-
-          <!-- KoPers.-Nr. -->
-          <FormRow
-            v-if="isKopersRolle(selectedRolle) && selectedOrganisation && !hasNoKopersNr"
-            :errorLabel="selectedKopersNrProps?.error || ''"
-            :isRequired="!hasNoKopersNr"
-            :label="$t('person.kopersNr')"
-            labelForId="kopersnr-input"
-            :noTopMargin="true"
-          >
-            <v-text-field
-              clearable
-              data-testid="kopersnr-input"
-              density="compact"
-              id="kopersnr-input"
-              ref="kopersnr-input"
-              :placeholder="$t('person.enterKopersNr')"
-              :required="!hasNoKopersNr"
-              variant="outlined"
-              v-bind="selectedKopersNrProps"
-              v-model="selectedKopersNr"
-            ></v-text-field>
-          </FormRow>
+            :hasNoKopersNr="hasNoKopersNr"
+            v-model:selectedKopersNr="selectedKopersNr"
+            :selectedKopersNrProps="selectedKopersNrProps"
+            @update:selectedKopersNr="(value?: string | null) => (selectedKopersNr = value)"
+            @update:hasNoKopersNr="(value: boolean | undefined) => (hasNoKopersNr = value)"
+          ></KopersInput>
         </div>
       </FormWrapper>
     </template>
@@ -499,14 +574,14 @@
             }}</span></v-col
           >
         </v-row>
-        <v-row v-if="isKopersRolle(personenkontextStore.createdPersonWithKontext.DBiamPersonenkontextResponse.rolleId)">
+        <v-row v-if="isKopersRolle(schuleZuordnungFromCreatedKontext?.rolleId)">
           <v-col
-            :class="`${isKopersRolle(personenkontextStore.createdPersonWithKontext.DBiamPersonenkontextResponse.rolleId) && personenkontextStore.createdPersonWithKontext.person.personalnummer ? 'text-body bold text-right' : 'text-body bold text-right text-red'}`"
+            :class="`${isKopersRolle(schuleZuordnungFromCreatedKontext?.rolleId) && personenkontextStore.createdPersonWithKontext.person.personalnummer ? 'text-body bold text-right' : 'text-body bold text-right text-red'}`"
           >
             {{ $t('person.kopersNr') }}:
           </v-col>
           <v-col
-            :class="`${isKopersRolle(personenkontextStore.createdPersonWithKontext.DBiamPersonenkontextResponse.rolleId) && personenkontextStore.createdPersonWithKontext.person.personalnummer ? 'text-body' : 'text-body text-red'}`"
+            :class="`${isKopersRolle(schuleZuordnungFromCreatedKontext?.rolleId) && personenkontextStore.createdPersonWithKontext.person.personalnummer ? 'text-body' : 'text-body text-red'}`"
             ><span data-testid="created-person-kopersNr">{{
               personenkontextStore.createdPersonWithKontext.person.personalnummer
                 ? personenkontextStore.createdPersonWithKontext.person.personalnummer
@@ -531,18 +606,24 @@
           </v-col>
         </v-row>
         <v-row>
+          <v-col class="text-body bold text-right"> {{ $t('admin.organisation.organisation') }}: </v-col>
+          <v-col class="text-body"
+            ><span data-testid="created-person-organisation">{{ translatedOrganisationsname }}</span></v-col
+          >
+        </v-row>
+        <v-row>
           <v-col class="text-body bold text-right"> {{ $t('admin.rolle.rolle') }}: </v-col>
           <v-col class="text-body"
             ><span data-testid="created-person-rolle">{{ translatedRollenname }}</span></v-col
           >
         </v-row>
         <v-row>
-          <v-col class="text-body bold text-right"> {{ $t('admin.organisation.organisation') }}: </v-col>
+          <v-col class="text-body bold text-right"> {{ $t('admin.befristung.befristung') }}: </v-col>
           <v-col class="text-body"
-            ><span data-testid="created-person-organisation">{{ translatedOrganisationsname }}</span></v-col
+            ><span data-testid="created-person-befristung">{{ translatedBefristung }}</span></v-col
           >
         </v-row>
-        <v-row v-if="isLernRolle(personenkontextStore.createdPersonWithKontext.DBiamPersonenkontextResponse.rolleId)">
+        <v-row v-if="isLernRolle(klasseZuordnungFromCreatedKontext?.rolleId as string)">
           <v-col class="text-body bold text-right"> {{ $t('admin.klasse.klasse') }}: </v-col>
           <v-col class="text-body"
             ><span data-testid="created-person-klasse">{{

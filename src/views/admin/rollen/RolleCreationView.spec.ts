@@ -136,6 +136,8 @@ describe('RolleCreationView', () => {
       createdAt: '2022',
       updatedAt: '2022',
       id: '1',
+      administeredBySchulstrukturknotenName: 'Land SH',
+      administeredBySchulstrukturknotenKennung: '',
     };
 
     rolleStore.createdRolle = mockRolle;

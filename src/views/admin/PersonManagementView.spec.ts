@@ -1,14 +1,14 @@
-import { expect, test } from 'vitest';
-import { VueWrapper, mount } from '@vue/test-utils';
-import PersonManagementView from './PersonManagementView.vue';
+import type { FindRollenResponse } from '@/api-client/generated/api';
+import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
 import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
 import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
-import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
-import { nextTick } from 'vue';
 import { useRolleStore, type RolleResponse, type RolleStore, type RollenMerkmal } from '@/stores/RolleStore';
 import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
-import type { FindRollenResponse } from '@/api-client/generated/api';
+import { VueWrapper, mount } from '@vue/test-utils';
 import type WrapperLike from '@vue/test-utils/dist/interfaces/wrapperLike';
+import { expect, test, type MockInstance } from 'vitest';
+import { nextTick } from 'vue';
+import PersonManagementView from './PersonManagementView.vue';
 
 let wrapper: VueWrapper | null = null;
 let organisationStore: OrganisationStore;
@@ -42,22 +42,13 @@ beforeEach(() => {
     },
   ];
 
-  organisationStore.allSchulen = [
+  organisationStore.allOrganisationen = [
     {
       id: '9876',
       name: 'Random Schulname Gymnasium',
       kennung: '9356494',
       namensergaenzung: 'Schule',
       kuerzel: 'rsg',
-      typ: 'SCHULE',
-      administriertVon: '1',
-    },
-    {
-      id: '1123',
-      name: 'Albert-Emil-Hansebrot-Gymnasium',
-      kennung: '2745475',
-      namensergaenzung: 'Schule',
-      kuerzel: 'aehg',
       typ: 'SCHULE',
       administriertVon: '1',
     },
@@ -85,6 +76,7 @@ beforeEach(() => {
             administriertVon: 'string',
             editable: true,
             merkmale: [] as unknown as RollenMerkmal,
+            befristung: '2024-05-06',
           },
         ],
       },
@@ -103,6 +95,11 @@ beforeEach(() => {
           vorname: 'Samuel',
         },
         referrer: '123',
+        personalnummer: '46465',
+        isLocked: false,
+        lockInfo: null,
+        revision: '1',
+        lastModified: '2024-05-22',
       },
     },
     {
@@ -116,6 +113,11 @@ beforeEach(() => {
           vorname: 'Moist',
         },
         referrer: '1234',
+        personalnummer: '46471',
+        isLocked: false,
+        lockInfo: null,
+        revision: '1',
+        lastModified: '2024-05-22',
       },
     },
   ];
@@ -165,6 +167,17 @@ describe('PersonManagementView', () => {
   });
 
   test('it reloads data after changing page', async () => {
+    const schuleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
+    await schuleAutocomplete?.setValue(['9876']);
+    await nextTick();
+
+    const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
+    await klasseAutocomplete?.setValue(['123456']);
+    await nextTick();
+
+    // Mock the getAllPersons method to capture its arguments
+    const getAllPersonsSpy: MockInstance = vi.spyOn(personStore, 'getAllPersons');
+
     expect(wrapper?.find('.v-pagination__next button.v-btn--disabled').isVisible()).toBe(true);
     expect(wrapper?.find('.v-data-table-footer__info').text()).toContain('1-2');
 
@@ -175,6 +188,24 @@ describe('PersonManagementView', () => {
     expect(wrapper?.find('.v-pagination__next button:not(.v-btn--disabled)').isVisible()).toBe(true);
     await wrapper?.find('.v-pagination__next button:not(.v-btn--disabled)').trigger('click');
     expect(wrapper?.find('.v-data-table-footer__info').text()).toContain('31-50');
+    // Check if getAllPersons was called with the correct arguments
+    expect(getAllPersonsSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        organisationIDs: ['123456'], // This should be the selectedKlassen value
+      }),
+    );
+    // Clear selectedKlassen and test again
+    await klasseAutocomplete?.setValue([]);
+    await nextTick();
+
+    await wrapper?.find('.v-pagination__prev button:not(.v-btn--disabled)').trigger('click');
+
+    // Now it should use selectedSchulen
+    expect(getAllPersonsSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        organisationIDs: ['9876'], // This should be the selectedSchulen value
+      }),
+    );
   });
 
   test('it reloads data after changing limit', async () => {
@@ -204,5 +235,16 @@ describe('PersonManagementView', () => {
     await nextTick();
 
     expect(klasseAutocomplete?.text()).toEqual('11b');
+  });
+
+  test('it updates Organisation search correctly', async () => {
+    const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
+
+    await organisationAutocomplete?.setValue('org');
+    await nextTick();
+
+    await organisationAutocomplete?.vm.$emit('update:search', '2');
+    await nextTick();
+    expect(organisationStore.getAllOrganisationen).toHaveBeenCalled();
   });
 });

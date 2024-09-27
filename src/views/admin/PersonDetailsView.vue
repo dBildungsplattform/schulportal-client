@@ -1,34 +1,64 @@
 <script setup lang="ts">
-  import { type Ref, ref, onBeforeMount, computed, type ComputedRef, watch } from 'vue';
-  import { type Router, type RouteLocationNormalizedLoaded, useRoute, useRouter } from 'vue-router';
-  import { usePersonStore, type PersonStore, type PersonWithUebersicht } from '@/stores/PersonStore';
-  import PasswordReset from '@/components/admin/personen/PasswordReset.vue';
-  import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import SpshAlert from '@/components/alert/SpshAlert.vue';
   import SpshTooltip from '@/components/admin/SpshTooltip.vue';
+  import KlasseChange from '@/components/admin/klassen/KlasseChange.vue';
+  import KopersInput from '@/components/admin/personen/KopersInput.vue';
+  import PasswordReset from '@/components/admin/personen/PasswordReset.vue';
   import PersonDelete from '@/components/admin/personen/PersonDelete.vue';
+  import PersonLock from '@/components/admin/personen/PersonLock.vue';
+  import PersonenkontextCreate from '@/components/admin/personen/PersonenkontextCreate.vue';
   import PersonenkontextDelete from '@/components/admin/personen/PersonenkontextDelete.vue';
+  import SpshAlert from '@/components/alert/SpshAlert.vue';
+  import LayoutCard from '@/components/cards/LayoutCard.vue';
+  import TokenReset from '@/components/two-factor-authentication/TokenReset.vue';
   import TwoFactorAuthenticationSetUp from '@/components/two-factor-authentication/TwoFactorAuthenticationSetUp.vue';
-  import { usePersonenkontextStore, type PersonenkontextStore, type Zuordnung } from '@/stores/PersonenkontextStore';
+  import { useKlassen } from '@/composables/useKlassen';
+  import { useOrganisationen } from '@/composables/useOrganisationen';
+  import { useRollen, type TranslatedRolleWithAttrs } from '@/composables/useRollen';
+  import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
   import {
     OrganisationsTyp,
     useOrganisationStore,
     type Organisation,
     type OrganisationStore,
   } from '@/stores/OrganisationStore';
-  import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
+  import {
+    LockKeys,
+    usePersonStore,
+    type Person,
+    type PersonStore,
+    type PersonWithUebersicht,
+  } from '@/stores/PersonStore';
+  import { usePersonenkontextStore, type PersonenkontextStore, type Zuordnung } from '@/stores/PersonenkontextStore';
+  import { RollenArt, RollenMerkmal } from '@/stores/RolleStore';
+  import {
+    TokenKind,
+    useTwoFactorAuthentificationStore,
+    type TwoFactorAuthentificationStore,
+  } from '@/stores/TwoFactorAuthentificationStore';
+  import PersonenInfoChange from '@/components/admin/personen/PersonenInfoChange.vue';
+  import { getNextSchuljahresende, formatDateToISO, formatDate } from '@/utils/date';
+  import { isBefristungspflichtRolle, useBefristungUtils, type BefristungUtilsType } from '@/utils/befristung';
+  import {
+    getPersonenkontextFieldDefinitions,
+    getValidationSchema,
+    type PersonenkontextFieldDefinitions,
+  } from '@/utils/validationPersonenkontext';
+  import { toTypedSchema } from '@vee-validate/yup';
+  import { useForm, type BaseFieldProps, type FormContext, type TypedSchema } from 'vee-validate';
+  import { computed, onBeforeMount, onMounted, onUnmounted, ref, watch, type ComputedRef, type Ref } from 'vue';
+  import { useI18n, type Composer } from 'vue-i18n';
+  import {
+    onBeforeRouteLeave,
+    useRoute,
+    useRouter,
+    type NavigationGuardNext,
+    type RouteLocationNormalized,
+    type RouteLocationNormalizedLoaded,
+    type Router,
+  } from 'vue-router';
   import { useDisplay } from 'vuetify';
   import { object, string, StringSchema, type AnyObject } from 'yup';
-  import { toTypedSchema } from '@vee-validate/yup';
-  import { useForm, type BaseFieldProps, type TypedSchema } from 'vee-validate';
-  import { RollenArt, RollenMerkmal } from '@/stores/RolleStore';
-  import { type Composer, useI18n } from 'vue-i18n';
-  import { useOrganisationen } from '@/composables/useOrganisationen';
-  import { useRollen, type TranslatedRolleWithAttrs } from '@/composables/useRollen';
-  import { useKlassen } from '@/composables/useKlassen';
-  import PersonenkontextCreate from '@/components/admin/personen/PersonenkontextCreate.vue';
-  import { type TranslatedObject } from '@/types.d';
-  import KlasseChange from '@/components/admin/klassen/KlasseChange.vue';
+  import type { TranslatedObject } from '@/types';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
@@ -41,6 +71,7 @@
   const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
   const authStore: AuthStore = useAuthStore();
   const organisationStore: OrganisationStore = useOrganisationStore();
+  const twoFactorAuthentificationStore: TwoFactorAuthentificationStore = useTwoFactorAuthentificationStore();
 
   const password: Ref<string> = ref('');
 
@@ -56,6 +87,8 @@
   const isZuordnungFormActive: Ref<boolean> = ref(false);
   const isChangeKlasseFormActive: Ref<boolean> = ref(false);
 
+  const isEditPersonInfoActive: Ref<boolean> = ref(false);
+
   const pendingDeletion: Ref<boolean> = ref(false);
   const pendingCreation: Ref<boolean> = ref(false);
   const pendingChangeKlasse: Ref<boolean> = ref(false);
@@ -69,9 +102,17 @@
   const createZuordnungConfirmationDialogMessage: Ref<string> = ref('');
   const changeKlasseConfirmationDialogMessage: Ref<string> = ref('');
   const canCommit: Ref<boolean> = ref(false);
+  const hasNoKopersNr: Ref<boolean | undefined> = ref(false);
+  const changePersonInfoSuccessVisible: Ref<boolean> = ref(false);
+
+  const showNoKopersNrConfirmationDialog: Ref<boolean> = ref(false);
 
   const creationErrorText: Ref<string> = ref('');
   const creationErrorTitle: Ref<string> = ref('');
+
+  const showUnsavedChangesDialog: Ref<boolean> = ref(false);
+  let blockedNext: () => void = () => {};
+  const calculatedBefristung: Ref<string | undefined> = ref('');
 
   function navigateToPersonTable(): void {
     router.push({ name: 'person-management' });
@@ -81,6 +122,10 @@
     personStore.resetPassword(personId).then((newPassword?: string) => {
       password.value = newPassword || '';
     });
+  }
+
+  function onLockUser(personId: string, lock: boolean, organisation: string): void {
+    personStore.lockPerson(personId, lock, organisation);
   }
 
   const handleAlertClose = (): void => {
@@ -108,6 +153,38 @@
     await personStore.deletePersonById(personId);
   }
 
+  function keyMapper(key: string): string {
+    switch (key) {
+      case LockKeys.LockedFrom:
+        return t('person.lockedBy');
+      case LockKeys.Timestamp:
+        return t('since');
+      default:
+        return key;
+    }
+  }
+
+  function keyValueMapper(key: string, value: string): string {
+    if (key === LockKeys.Timestamp) {
+      return new Intl.DateTimeFormat('de-DE', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+      }).format(new Date(value));
+    }
+    return value;
+  }
+
+  const getLockInfo: ComputedRef<{ key: string; attribute: string }[]> = computed(() => {
+    if (!personStore.currentPerson?.person.isLocked) return [];
+    const { lockInfo }: Person = personStore.currentPerson.person;
+    if (!lockInfo) return [];
+    return Object.entries(lockInfo).map(([key, value]: [string, string]) => ({
+      key: keyMapper(key),
+      attribute: keyValueMapper(key, value.toString()),
+    }));
+  });
+
   let closeCannotDeleteDialog = (): void => {
     cannotDeleteDialogVisible.value = false;
   };
@@ -127,6 +204,13 @@
 
   let closeChangeKlasseSuccessDialog = (): void => {
     changeKlasseSuccessDialogVisible.value = false;
+    router.push(route).then(() => {
+      router.go(0);
+    });
+  };
+
+  let closeChangePersonInfoSuccessDialog = (): void => {
+    changePersonInfoSuccessVisible.value = false;
     router.push(route).then(() => {
       router.go(0);
     });
@@ -193,6 +277,10 @@
       };
     }
   };
+  async function navigateBackToKopersForm(): Promise<void> {
+    personStore.errorCode = '';
+    personenkontextStore.errorCode = '';
+  }
 
   const alertButtonText: ComputedRef<string> = computed(() => {
     return personenkontextStore.errorCode === 'PERSON_NOT_FOUND' ? t('nav.backToList') : t('refreshData');
@@ -201,7 +289,20 @@
   const alertButtonAction: ComputedRef<() => void> = computed(() => {
     return personenkontextStore.errorCode === 'PERSON_NOT_FOUND' ? navigateToPersonTable : (): void => router.go(0);
   });
-  function getSskName(sskDstNr: string, sskName: string): string {
+
+  const alertButtonTextKopers: ComputedRef<string> = computed(() => {
+    return personStore.errorCode === 'PERSONALNUMMER_NICHT_EINDEUTIG'
+      ? t('admin.person.backToForm')
+      : t('nav.backToList');
+  });
+
+  const alertButtonActionKopers: ComputedRef<() => void> = computed(() => {
+    return personStore.errorCode === 'PERSONALNUMMER_NICHT_EINDEUTIG'
+      ? navigateBackToKopersForm
+      : navigateToPersonTable;
+  });
+
+  function getSskName(sskDstNr: string | undefined, sskName: string): string {
     /* truncate ssk name */
     const truncatededSskName: string = sskName.length > 30 ? `${sskName.substring(0, 30)}...` : sskName;
 
@@ -255,8 +356,11 @@
     result
       .sort((a: Zuordnung, b: Zuordnung) => (a.klasse && b.klasse ? a.klasse.localeCompare(b.klasse) : 0))
       .sort((a: Zuordnung, b: Zuordnung) => a.rolle.localeCompare(b.rolle))
-      .sort((a: Zuordnung, b: Zuordnung) => a.sskDstNr.localeCompare(b.sskDstNr));
-
+      .sort((a: Zuordnung, b: Zuordnung) => {
+        if (a.sskDstNr === undefined) return 1;
+        if (b.sskDstNr === undefined) return -1;
+        return a.sskDstNr.localeCompare(b.sskDstNr);
+      });
     return result;
   }
 
@@ -270,11 +374,18 @@
     selectedRolle: string;
     selectedOrganisation: string;
     selectedKlasse: string;
+    selectedBefristung: Date;
+    selectedBefristungOption: string;
+    selectedKopersNr?: string;
   };
 
   type ChangeKlasseForm = {
     selectedSchule: string;
     selectedNewKlasse: string;
+  };
+
+  type ChangePersonInfoForm = {
+    selectedKopersNrPersonInfo: string;
   };
 
   // Define a method to check if the selected Rolle is of type "Lern"
@@ -285,6 +396,19 @@
     return !!rolle && rolle.rollenart === RollenArt.Lern;
   }
 
+  // Used for the form
+  function isKopersRolle(selectedRolleId: string | undefined): boolean {
+    const rolle: TranslatedRolleWithAttrs | undefined = rollen.value?.find(
+      (r: TranslatedRolleWithAttrs) => r.value === selectedRolleId,
+    );
+    return !!rolle && !!rolle.merkmale && rolle.merkmale.has(RollenMerkmal.KopersPflicht);
+  }
+
+  const hasKopersNummer: ComputedRef<boolean> = computed(() => {
+    return !!personStore.currentPerson?.person.personalnummer;
+  });
+
+  // Used on mount to check the retrieved Zuordnungen and if any of them has a Koperspflicht Merkmal
   const hasKopersRolle: ComputedRef<boolean> = computed(() => {
     return (
       !!zuordnungenResult.value?.find((zuordnung: Zuordnung) => {
@@ -308,15 +432,9 @@
     return false;
   });
 
-  const zuordnungFormValidationSchema: TypedSchema = toTypedSchema(
+  // Validation schema for the form for changing the Klasse (Versetzen)
+  const changeKlasseValidationSchema: TypedSchema = toTypedSchema(
     object({
-      selectedRolle: string().required(t('admin.rolle.rules.rolle.required')),
-      selectedOrganisation: string().required(t('admin.organisation.rules.organisation.required')),
-      selectedKlasse: string().when('selectedRolle', {
-        is: (selectedRolleId: string) => isLernRolle(selectedRolleId),
-        then: (schema: StringSchema<string | undefined, AnyObject, undefined, ''>) =>
-          schema.required(t('admin.klasse.rules.klasse.required')),
-      }),
       selectedNewKlasse: string().when('selectedSchule', {
         is: (selectedSchule: string) => selectedSchule,
         then: (schema: StringSchema<string | undefined, AnyObject, undefined, ''>) =>
@@ -325,13 +443,10 @@
     }),
   );
 
-  const changeKlasseValidationSchema: TypedSchema = toTypedSchema(
+  // Validation schema for the form for changing KopersNr
+  const changePersonInfoValidationSchema: TypedSchema = toTypedSchema(
     object({
-      selectedNewKlasse: string().when('selectedSchule', {
-        is: (selectedSchule: string) => selectedSchule,
-        then: (schema: StringSchema<string | undefined, AnyObject, undefined, ''>) =>
-          schema.required(t('admin.klasse.rules.klasse.required')),
-      }),
+      selectedKopersNrPersonInfo: string().required(t('admin.person.rules.kopersNr.required')),
     }),
   );
 
@@ -344,14 +459,24 @@
     },
   });
 
-  // eslint-disable-next-line @typescript-eslint/typedef
-  const {
-    defineField: defineFieldZuordnung,
-    handleSubmit: handleSubmitZuordnungForm,
-    resetForm: resetZuordnungForm,
-  } = useForm<ZuordnungCreationForm>({
-    validationSchema: zuordnungFormValidationSchema,
+  const formContext: FormContext<ZuordnungCreationForm, ZuordnungCreationForm> = useForm({
+    validationSchema: getValidationSchema(t, hasNoKopersNr, hasKopersNummer),
   });
+
+  const {
+    selectedRolle,
+    selectedRolleProps,
+    selectedOrganisation,
+    selectedOrganisationProps,
+    selectedKlasse,
+    selectedKlasseProps,
+    selectedBefristung,
+    selectedBefristungProps,
+    selectedBefristungOption,
+    selectedBefristungOptionProps,
+    selectedKopersNr,
+    selectedKopersNrProps,
+  }: PersonenkontextFieldDefinitions = getPersonenkontextFieldDefinitions(formContext);
 
   // eslint-disable-next-line @typescript-eslint/typedef
   const {
@@ -362,19 +487,16 @@
     validationSchema: changeKlasseValidationSchema,
   });
 
-  // Add Zuordnung Form
-  const [selectedRolle, selectedRolleProps]: [
-    Ref<string | undefined>,
-    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineFieldZuordnung('selectedRolle', vuetifyConfig);
-  const [selectedOrganisation, selectedOrganisationProps]: [
-    Ref<string | undefined>,
-    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineFieldZuordnung('selectedOrganisation', vuetifyConfig);
-  const [selectedKlasse, selectedKlasseProps]: [
-    Ref<string | undefined>,
-    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineFieldZuordnung('selectedKlasse', vuetifyConfig);
+  // eslint-disable-next-line @typescript-eslint/typedef
+  const {
+    defineField: defineFieldChangePersonInfo,
+    handleSubmit: handleSubmitChangePersonInfo,
+    resetForm: resetFormChangePersonInfo,
+    isFieldDirty: isFieldDirtyChangePersonInfo,
+    setFieldValue: setFieldValueChangePersonInfo,
+  } = useForm<ChangePersonInfoForm>({
+    validationSchema: changePersonInfoValidationSchema,
+  });
 
   // Change Klasse Form
   const [selectedSchule, selectedSchuleProps]: [
@@ -385,6 +507,22 @@
     Ref<string | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineFieldChangeKlasse('selectedNewKlasse', vuetifyConfig);
+
+  // Change Person Info Form
+  const [selectedKopersNrPersonInfo, selectedKopersNrPersonInfoProps]: [
+    Ref<string | undefined | null>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = defineFieldChangePersonInfo('selectedKopersNrPersonInfo', vuetifyConfig);
+
+  // Methods from utils that handle the Befristung events and sets up watchers
+  const { handleBefristungUpdate, handleBefristungOptionUpdate, setupWatchers }: BefristungUtilsType =
+    useBefristungUtils({
+      formContext,
+      selectedBefristung,
+      selectedBefristungOption,
+      calculatedBefristung,
+      selectedRolle,
+    });
 
   // Triggers the template to start editing
   const triggerEdit = (): void => {
@@ -420,7 +558,7 @@
     selectedZuordnungen.value = [];
     isZuordnungFormActive.value = false;
     isChangeKlasseFormActive.value = false;
-    resetZuordnungForm();
+    formContext.resetForm();
     resetChangeKlasseForm();
     zuordnungenResult.value = originalZuordnungenResult.value
       ? JSON.parse(JSON.stringify(originalZuordnungenResult.value))
@@ -439,9 +577,15 @@
 
   // This will send the updated list of Zuordnungen to the Backend on TOP of the new added one through the form.
   async function confirmAddition(): Promise<void> {
-    await personenkontextStore.updatePersonenkontexte(finalZuordnungen.value, currentPersonId);
+    if (selectedKopersNr.value !== null) {
+      await personenkontextStore.updatePersonenkontexte(
+        finalZuordnungen.value,
+        currentPersonId,
+        selectedKopersNr.value,
+      );
+    }
     createSuccessDialogVisible.value = !personenkontextStore.errorCode;
-    resetZuordnungForm();
+    formContext.resetForm();
   }
 
   // This will send the updated list of Zuordnungen to the Backend with the selected Zuordnung but with the new Klasse.
@@ -527,23 +671,21 @@
     changeKlasseConfirmationDialogVisible.value = true;
   });
 
-  const onSubmitCreateZuordnung: (e?: Event | undefined) => Promise<void | undefined> = handleSubmitZuordnungForm(
-    () => {
-      if (selectedRolle.value) {
-        if (isLernRolle(selectedRolle.value)) {
-          createZuordnungConfirmationDialogMessage.value = t('person.addZuordnungKlasseConfirmation', {
-            rollenname: selectedRolleTitle.value,
-            klassenname: selectedKlasseTitle.value,
-          });
-        } else {
-          createZuordnungConfirmationDialogMessage.value = t('person.addZuordnungConfirmation', {
-            rollenname: selectedRolleTitle.value,
-          });
-        }
-        createZuordnungConfirmationDialogVisible.value = true;
+  const onSubmitCreateZuordnung: (e?: Event | undefined) => Promise<void | undefined> = formContext.handleSubmit(() => {
+    if (selectedRolle.value) {
+      if (isLernRolle(selectedRolle.value)) {
+        createZuordnungConfirmationDialogMessage.value = t('person.addZuordnungKlasseConfirmation', {
+          rollenname: selectedRolleTitle.value,
+          klassenname: selectedKlasseTitle.value,
+        });
+      } else {
+        createZuordnungConfirmationDialogMessage.value = t('person.addZuordnungConfirmation', {
+          rollenname: selectedRolleTitle.value,
+        });
       }
-    },
-  );
+      createZuordnungConfirmationDialogVisible.value = true;
+    }
+  });
 
   const confirmDialogAddition = async (): Promise<void> => {
     createZuordnungConfirmationDialogVisible.value = false;
@@ -560,6 +702,13 @@
       (k: Organisation) => k.id === selectedKlasse.value,
     );
 
+    const befristungDate: string | undefined = selectedBefristung.value
+      ? selectedBefristung.value
+      : calculatedBefristung.value;
+
+    // Format the date in ISO 8601 format if it exists
+    const formattedBefristung: string | undefined = befristungDate ? formatDateToISO(befristungDate) : undefined;
+
     if (organisation) {
       newZuordnung.value = {
         sskId: organisation.id,
@@ -573,6 +722,7 @@
         editable: true,
         merkmale: [] as unknown as RollenMerkmal,
         typ: OrganisationsTyp.Schule,
+        befristung: formattedBefristung,
       };
       if (zuordnungenResult.value) {
         finalZuordnungen.value = zuordnungenResult.value;
@@ -592,6 +742,7 @@
           editable: true,
           typ: OrganisationsTyp.Klasse,
           merkmale: [] as unknown as RollenMerkmal,
+          befristung: formattedBefristung,
         });
       }
 
@@ -608,6 +759,7 @@
             editable: true,
             merkmale: [] as unknown as RollenMerkmal,
             typ: OrganisationsTyp.Klasse,
+            befristung: existingKlasse.befristung,
           });
         });
       }
@@ -708,8 +860,99 @@
     }
   }
 
+  // Triggers the template to start editing the person informations
+  const triggerPersonInfoEdit = (): void => {
+    isEditPersonInfoActive.value = true;
+    const personalnummer: string | null | undefined = personStore.currentPerson?.person.personalnummer;
+    setFieldValueChangePersonInfo('selectedKopersNrPersonInfo', personalnummer ?? '');
+  };
+
+  const cancelEditPersonInfo = (): void => {
+    isEditPersonInfoActive.value = false;
+    resetFormChangePersonInfo();
+  };
+
+  // Handles the value emitted by PersonenInfoChange for the selectedKopersNr
+  function handleSelectedKopersNrUpdate(value: string | undefined | null): void {
+    selectedKopersNrPersonInfo.value = value;
+  }
+
+  // Submit the form for changing person informations (Vorname, Nachname, KopersNr.)
+  const onSubmitChangePersonInfo: (e?: Event) => Promise<Promise<void> | undefined> = handleSubmitChangePersonInfo(
+    async () => {
+      if (selectedKopersNrPersonInfo.value) {
+        await personStore.changePersonInfoById(currentPersonId, selectedKopersNrPersonInfo.value);
+        changePersonInfoSuccessVisible.value = !personStore.errorCode;
+        resetFormChangePersonInfo();
+      }
+    },
+  );
+
+  function isFormDirty(): boolean {
+    return isFieldDirtyChangePersonInfo('selectedKopersNrPersonInfo');
+  }
+
+  function handleConfirmUnsavedChanges(): void {
+    blockedNext();
+  }
+
+  function preventNavigation(event: BeforeUnloadEvent): void {
+    if (!isFormDirty()) return;
+    event.preventDefault();
+    /* Chrome requires returnValue to be set. */
+    event.returnValue = '';
+  }
+
+  onBeforeRouteLeave((_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
+    if (isFormDirty()) {
+      showUnsavedChangesDialog.value = true;
+      blockedNext = next;
+    } else {
+      next();
+    }
+  });
+
+  setupWatchers();
+
+  watch(hasNoKopersNr, async (newValue: boolean | undefined) => {
+    if (newValue) {
+      showNoKopersNrConfirmationDialog.value = true;
+    }
+  });
+
+  // Checks if the entered KopersNr is the same one that is already assigned to the user.
+  // This is used to disable the save button in that case (To avoid errors).
+  const hasSameKopersNr: ComputedRef<boolean> = computed(() => {
+    if (selectedKopersNrPersonInfo.value === personStore.currentPerson?.person.personalnummer) {
+      return true;
+    }
+    return false;
+  });
+
+  // Computed property to check if the second radio button should be disabled
+  const isUnbefristetButtonDisabled: ComputedRef<boolean> = computed(() => {
+    return isBefristungspflichtRolle(selectedRolle.value);
+  });
+
+  const twoFactorAuthenticationConnectionError: ComputedRef<string> = computed(() => {
+    if (
+      twoFactorAuthentificationStore.errorCode == '500' ||
+      twoFactorAuthentificationStore.errorCode == '502' ||
+      twoFactorAuthentificationStore.errorCode == '503' ||
+      twoFactorAuthentificationStore.errorCode == '504' ||
+      twoFactorAuthentificationStore.errorCode == 'UNSPECIFIED_ERROR'
+    ) {
+      return t('admin.person.twoFactorAuthentication.errors.connection');
+    }
+    return '';
+  });
+
   onBeforeMount(async () => {
     personStore.resetState();
+    twoFactorAuthentificationStore.resetState();
+
+    await twoFactorAuthentificationStore.get2FARequirement(currentPersonId);
+
     personenkontextStore.errorCode = '';
     await personStore.getPersonById(currentPersonId);
     await personStore.getPersonenuebersichtById(currentPersonId);
@@ -718,7 +961,16 @@
       (zuordnung: Zuordnung) => zuordnung.typ === OrganisationsTyp.Klasse,
     );
 
-    await personStore.get2FAState(currentPersonId);
+    await twoFactorAuthentificationStore.get2FAState(currentPersonId);
+  });
+
+  onMounted(async () => {
+    /* listen for browser changes and prevent them when form is dirty */
+    window.addEventListener('beforeunload', preventNavigation);
+  });
+
+  onUnmounted(() => {
+    window.removeEventListener('beforeunload', preventNavigation);
   });
 </script>
 
@@ -747,11 +999,11 @@
         :model-value="!!personStore.errorCode"
         :type="'error'"
         :closable="false"
-        :text="$t('admin.person.loadingErrorText')"
+        :text="$t(`admin.person.errors.${personStore.errorCode}`)"
         :showButton="true"
-        :buttonText="$t('nav.backToList')"
-        :buttonAction="navigateToPersonTable"
-        :title="$t('admin.person.loadingErrorTitle')"
+        :buttonText="alertButtonTextKopers"
+        :buttonAction="alertButtonActionKopers"
+        :title="$t(`admin.person.title.${personStore.errorCode}`)"
         @update:modelValue="handleAlertClose"
       />
 
@@ -770,9 +1022,45 @@
 
       <template v-if="!personStore.errorCode && !personenkontextStore.errorCode">
         <v-container class="personal-info">
-          <div v-if="personStore.currentPerson?.person">
+          <div v-if="personStore.currentPerson?.person && !isEditPersonInfoActive">
+            <!-- Befristung -->
+            <v-row class="ml-md-16">
+              <v-col
+                cols="12"
+                md="auto"
+                class="mt-1 edit-container"
+              >
+                <div
+                  v-if="hasKopersRolle"
+                  class="d-flex justify-sm-end"
+                >
+                  <v-col
+                    cols="12"
+                    sm="6"
+                    md="auto"
+                  >
+                    <SpshTooltip
+                      :enabledCondition="!isEditActive"
+                      :disabledText="$t('person.finishEditFirst')"
+                      :enabledText="$t('admin.person.editPersonalInfo')"
+                      position="start"
+                    >
+                      <v-btn
+                        :disabled="isEditActive"
+                        class="primary ml-lg-8"
+                        data-testid="zuordnung-edit-button"
+                        @Click="triggerPersonInfoEdit"
+                        :block="mdAndDown"
+                      >
+                        {{ $t('edit') }}
+                      </v-btn>
+                    </SpshTooltip>
+                  </v-col>
+                </div>
+              </v-col>
+            </v-row>
             <!-- Vorname -->
-            <v-row class="mt-0">
+            <v-row class="mt-md-6">
               <v-col cols="1"></v-col>
               <v-col
                 class="text-right"
@@ -828,7 +1116,7 @@
             <!-- KoPers.-Nr. -->
             <v-row
               class="mt-0"
-              v-if="hasKopersRolle"
+              v-if="hasKopersRolle || personStore.currentPerson.person.personalnummer"
             >
               <v-col cols="1"></v-col>
               <v-col
@@ -838,7 +1126,10 @@
                 cols="5"
               >
                 <span
-                  :class="`${hasKopersRolle && personStore.currentPerson.person.personalnummer ? 'subtitle-2' : 'subtitle-2 text-red'}`"
+                  :class="{
+                    'subtitle-2': true,
+                    'text-red': hasKopersRolle && !personStore.currentPerson.person.personalnummer,
+                  }"
                 >
                   {{ $t('person.kopersNr') }}:
                 </span>
@@ -848,7 +1139,10 @@
                 data-testid="person-kopersnr"
               >
                 <span
-                  :class="`${hasKopersRolle && personStore.currentPerson.person.personalnummer ? 'text-body' : 'text-body text-red'}`"
+                  :class="{
+                    'text-body': true,
+                    'text-red': hasKopersRolle && !personStore.currentPerson.person.personalnummer,
+                  }"
                 >
                   {{ personStore.currentPerson.person.personalnummer ?? $t('missing') }}
                 </span>
@@ -858,6 +1152,61 @@
           <div v-else-if="personStore.loading">
             <v-progress-circular indeterminate></v-progress-circular>
           </div>
+        </v-container>
+        <v-container v-if="isEditPersonInfoActive">
+          <v-form
+            data-testid="person-info-form"
+            @submit="onSubmitChangePersonInfo"
+          >
+            <PersonenInfoChange
+              :confirmUnsavedChangesAction="handleConfirmUnsavedChanges"
+              :selectedKopersNrPersonInfoProps="selectedKopersNrPersonInfoProps"
+              :selectedKopersNrPersonInfo="personStore.currentPerson?.person.personalnummer"
+              :showUnsavedChangesDialog="showUnsavedChangesDialog"
+              @update:selectedKopersNrPersonInfo="handleSelectedKopersNrUpdate"
+              @onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
+            ></PersonenInfoChange>
+            <v-row class="save-cancel-row ml-md-16 pt-5 justify-end">
+              <v-col
+                class="cancel-col"
+                cols="12"
+                sm="6"
+                md="auto"
+              >
+                <v-btn
+                  class="secondary small"
+                  data-testid="person-info-edit-cancel"
+                  @click="cancelEditPersonInfo"
+                  :block="mdAndDown"
+                >
+                  {{ $t('cancel') }}
+                </v-btn>
+              </v-col>
+              <v-col
+                cols="12"
+                sm="6"
+                md="auto"
+              >
+                <SpshTooltip
+                  :enabledCondition="!hasSameKopersNr"
+                  :disabledText="$t('person.changeKopersDisabledDescription')"
+                  :enabledText="$t('save')"
+                  position="start"
+                >
+                  <v-btn
+                    class="primary small"
+                    :disabled="hasSameKopersNr"
+                    data-testid="person-info-edit-save"
+                    @click="handleSaveClick"
+                    :block="mdAndDown"
+                    type="submit"
+                  >
+                    {{ $t('save') }}
+                  </v-btn>
+                </SpshTooltip>
+              </v-col>
+            </v-row>
+          </v-form>
         </v-container>
         <v-divider
           class="border-opacity-100 rounded my-6 mx-4"
@@ -879,7 +1228,7 @@
               <div class="d-flex justify-sm-end">
                 <PasswordReset
                   :errorCode="personStore.errorCode"
-                  :disabled="isEditActive"
+                  :disabled="isEditActive || isEditPersonInfoActive"
                   :person="personStore.currentPerson"
                   @onClearPassword="password = ''"
                   @onResetPassword="resetPassword(currentPersonId)"
@@ -897,103 +1246,118 @@
           thickness="6"
         ></v-divider>
         <!-- Two Factor Authentication -->
-        <v-container v-if="personStore.twoFactorState.hasToken != undefined">
-          <v-row class="ml-md-16">
-            <v-col>
-              <h3 class="subtitle-1">{{ $t('admin.person.twoFactorAuthentication.header') }}</h3>
-              <v-row
-                class="mt-4 text-body"
-                v-if="personStore.twoFactorState.hasToken && personStore.twoFactorState.tokenKind === 'software'"
-              >
-                <v-col
-                  class="text-right"
-                  cols="1"
-                >
-                  <v-icon
-                    icon="mdi-check-circle"
-                    color="green"
-                    v-if="personStore.twoFactorState.hasToken"
-                  ></v-icon>
+        <template v-if="twoFactorAuthentificationStore.required">
+          <v-container>
+            <v-row class="ml-md-16">
+              <v-col v-if="personStore.loading || twoFactorAuthentificationStore.loading">
+                <v-progress-circular indeterminate></v-progress-circular>
+              </v-col>
+              <template v-else>
+                <v-col>
+                  <h3 class="subtitle-1">{{ $t('admin.person.twoFactorAuthentication.header') }}</h3>
+                  <v-row class="mt-4 text-body">
+                    <v-col
+                      class="text-right"
+                      cols="1"
+                    >
+                      <v-icon
+                        v-if="twoFactorAuthentificationStore.hasToken"
+                        icon="mdi-check-circle"
+                        color="green"
+                      ></v-icon>
+                      <v-icon
+                        color="warning"
+                        icon="mdi-alert-outline"
+                        v-else-if="twoFactorAuthenticationConnectionError"
+                      ></v-icon>
+                      <v-icon
+                        v-else
+                        class="mb-2"
+                        icon="mdi-information"
+                      >
+                      </v-icon>
+                    </v-col>
+                    <v-col>
+                      <template v-if="twoFactorAuthenticationConnectionError">
+                        <p>
+                          {{ twoFactorAuthenticationConnectionError }}
+                        </p>
+                      </template>
+                      <template v-else-if="twoFactorAuthentificationStore.hasToken">
+                        <p v-if="twoFactorAuthentificationStore.tokenKind === TokenKind.software">
+                          {{ $t('admin.person.twoFactorAuthentication.softwareTokenIsSetUp') }}
+                        </p>
+                        <p v-if="twoFactorAuthentificationStore.tokenKind === TokenKind.hardware">
+                          {{ $t('admin.person.twoFactorAuthentication.hardwareTokenIsSetUp') }}
+                        </p>
+                        <p v-if="twoFactorAuthentificationStore.serial">
+                          {{
+                            $t('admin.person.twoFactorAuthentication.serial') +
+                            ': ' +
+                            twoFactorAuthentificationStore.serial
+                          }}
+                        </p>
+                      </template>
+                      <template v-else>
+                        <p v-if="twoFactorAuthentificationStore.hasToken">
+                          {{ $t('admin.person.twoFactorAuthentication.resetInfo') }}
+                        </p>
+                        <p v-else>
+                          {{ $t('admin.person.twoFactorAuthentication.notSetUp') }}
+                        </p>
+                      </template>
+                    </v-col>
+                  </v-row>
                 </v-col>
-                <div class="v-col">
-                  <p>
-                    {{ $t('admin.person.twoFactorAuthentication.softwareTokenIsSetUp') }}
-                  </p>
-                </div>
-              </v-row>
-              <v-row class="mt-4 text-body">
                 <v-col
-                  class="text-right"
-                  cols="1"
-                >
-                  <v-icon
-                    class="mb-2"
-                    icon="mdi-information"
-                  >
-                  </v-icon>
-                </v-col>
-                <div class="v-col">
-                  <p v-if="personStore.twoFactorState.hasToken">
-                    {{ $t('admin.person.twoFactorAuthentication.resetInfo') }}
-                  </p>
-                  <p v-if="!personStore.twoFactorState.hasToken">
-                    {{ $t('admin.person.twoFactorAuthentication.notSetUp') }}
-                  </p>
-                </div>
-              </v-row>
-            </v-col>
-            <v-col
-              class="mr-lg-13"
-              cols="12"
-              md="auto"
-              v-if="personStore.currentPerson"
-            >
-              <div
-                class="d-flex justify-sm-end"
-                v-if="!personStore.twoFactorState.hasToken"
-              >
-                <TwoFactorAuthenticationSetUp
-                  :errorCode="personStore.twoFactorState.errorCode"
-                  :disabled="isEditActive"
-                  :person="personStore.currentPerson"
-                  @dialogClosed="personStore.get2FAState(currentPersonId)"
-                >
-                </TwoFactorAuthenticationSetUp>
-              </div>
-              <div
-                class="d-flex justify-sm-end"
-                v-if="personStore.twoFactorState.hasToken"
-              >
-                <v-col
+                  class="mr-lg-13"
                   cols="12"
-                  sm="6"
                   md="auto"
+                  v-if="personStore.currentPerson && !twoFactorAuthenticationConnectionError"
                 >
-                  <SpshTooltip
-                    :enabledCondition="personStore.twoFactorState.hasToken"
-                    :disabledText="$t('person.finishEditFirst')"
-                    :enabledText="$t('admin.person.twoFactorAuthentication.tokenReset')"
-                    position="start"
-                  >
-                    <v-btn
-                      class="primary"
-                      :disabled="isEditActive"
+                  <div class="d-flex justify-sm-end">
+                    <v-col
+                      cols="12"
+                      sm="6"
+                      md="auto"
                     >
-                      {{ $t('admin.person.twoFactorAuthentication.tokenReset') }}</v-btn
-                    >
-                  </SpshTooltip></v-col
-                >
-              </div>
-            </v-col>
-            <v-col v-else-if="personStore.loading"> <v-progress-circular indeterminate></v-progress-circular></v-col
-          ></v-row>
-        </v-container>
-        <v-divider
-          v-if="personStore.twoFactorState.hasToken != undefined"
-          class="border-opacity-100 rounded my-6 mx-4"
-          color="#E5EAEF"
-          thickness="6"
-        ></v-divider>
+                      <SpshTooltip
+                        v-if="twoFactorAuthentificationStore.hasToken"
+                        :enabledCondition="twoFactorAuthentificationStore.hasToken"
+                        :disabledText="$t('person.finishEditFirst')"
+                        :enabledText="$t('admin.person.twoFactorAuthentication.tokenReset')"
+                        position="start"
+                      >
+                        <TokenReset
+                          :errorCode="twoFactorAuthentificationStore.errorCode"
+                          :disabled="isEditActive"
+                          :person="personStore.currentPerson"
+                          :tokenType="twoFactorAuthentificationStore.tokenKind"
+                          :personId="currentPersonId"
+                          @dialogClosed="twoFactorAuthentificationStore.get2FAState(currentPersonId)"
+                        >
+                        </TokenReset>
+                      </SpshTooltip>
+                      <TwoFactorAuthenticationSetUp
+                        v-else
+                        :errorCode="twoFactorAuthentificationStore.errorCode"
+                        :disabled="isEditActive"
+                        :person="personStore.currentPerson"
+                        @dialogClosed="twoFactorAuthentificationStore.get2FAState(currentPersonId)"
+                      >
+                      </TwoFactorAuthenticationSetUp>
+                    </v-col>
+                  </div>
+                </v-col>
+              </template>
+            </v-row>
+          </v-container>
+          <v-divider
+            class="border-opacity-100 rounded my-6 mx-4"
+            color="#E5EAEF"
+            thickness="6"
+          ></v-divider>
+        </template>
         <!-- Zuordnungen -->
         <v-container
           v-if="!isEditActive"
@@ -1018,14 +1382,22 @@
                   sm="6"
                   md="auto"
                 >
-                  <v-btn
-                    class="primary ml-lg-8"
-                    data-testid="zuordnung-edit-button"
-                    @Click="triggerEdit"
-                    :block="mdAndDown"
+                  <SpshTooltip
+                    :enabledCondition="selectedZuordnungen.length === 0 && !isEditPersonInfoActive"
+                    :disabledText="$t('person.finishEditFirst')"
+                    :enabledText="$t('person.editZuordnungen')"
+                    position="start"
                   >
-                    {{ $t('edit') }}
-                  </v-btn>
+                    <v-btn
+                      class="primary ml-lg-8"
+                      data-testid="zuordnung-edit-button"
+                      :disabled="isEditPersonInfoActive"
+                      @Click="triggerEdit"
+                      :block="mdAndDown"
+                    >
+                      {{ $t('edit') }}
+                    </v-btn>
+                  </SpshTooltip>
                 </v-col>
               </div>
             </v-col>
@@ -1043,10 +1415,11 @@
               :data-testid="`person-zuordnung-${zuordnung.sskId}`"
               :title="zuordnung.sskName"
             >
-              <span class="text-body"
-                >{{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
-                {{ zuordnung.klasse }}</span
-              >
+              <span class="text-body">
+                {{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
+                {{ zuordnung.klasse }}
+                <span v-if="zuordnung.befristung"> ({{ formatDate(zuordnung.befristung, t) }})</span>
+              </span>
             </v-col>
           </v-row>
           <!-- Display 'Keine Zuordnungen gefunden' if the above condition is false -->
@@ -1077,8 +1450,8 @@
                 cols="12"
                 sm="auto"
               >
-                <h3 class="subtitle-1">{{ $t('person.checkAndSave') }}:</h3></v-col
-              >
+                <h3 class="subtitle-1">{{ $t('person.checkAndSave') }}:</h3>
+              </v-col>
               <v-col
                 cols="12"
                 v-for="zuordnung in getZuordnungen?.filter((zuordnung) => zuordnung.editable)"
@@ -1116,6 +1489,17 @@
                   >
                     {{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
                     {{ zuordnung.klasse }}
+                    <span
+                      v-if="
+                        zuordnung.befristung &&
+                        newZuordnung &&
+                        zuordnung.sskId === newZuordnung.sskId &&
+                        zuordnung.rolleId === newZuordnung.rolleId
+                      "
+                      class="text-body text-green"
+                    >
+                      ({{ formatDate(zuordnung.befristung, t) }})</span
+                    >
                     <span
                       v-if="
                         newZuordnung &&
@@ -1212,7 +1596,7 @@
                     :errorCode="personStore.errorCode"
                     :person="personStore.currentPerson"
                     :disabled="selectedZuordnungen.length === 0"
-                    :zuordnungCount="zuordnungenResult?.filter((zuordnung) => zuordnung.editable).length || 0"
+                    :zuordnungCount="zuordnungenResult?.filter((zuordnung) => zuordnung.editable).length ?? 0"
                     @onDeletePersonenkontext="prepareDeletion"
                   >
                   </PersonenkontextDelete>
@@ -1349,13 +1733,13 @@
                   cols="12"
                   sm="auto"
                 >
-                  <h3 class="subtitle-1">{{ $t('person.addZuordnung') }}:</h3></v-col
-                >
+                  <h3 class="subtitle-1">{{ $t('person.addZuordnung') }}:</h3>
+                </v-col>
               </v-row>
               <v-container class="px-lg-16">
                 <!-- Organisation, Rolle, Klasse zuordnen -->
                 <PersonenkontextCreate
-                  ref="personenkontext-creation-form"
+                  ref="personenkontext-create"
                   :showHeadline="false"
                   :organisationen="organisationen"
                   :rollen="filteredRollen"
@@ -1363,6 +1747,15 @@
                   :selectedOrganisationProps="selectedOrganisationProps"
                   :selectedRolleProps="selectedRolleProps"
                   :selectedKlasseProps="selectedKlasseProps"
+                  :befristungInputProps="{
+                    befristungProps: selectedBefristungProps,
+                    befristungOptionProps: selectedBefristungOptionProps,
+                    isUnbefristetDisabled: isUnbefristetButtonDisabled,
+                    isBefristungRequired: isBefristungspflichtRolle(selectedRolle),
+                    nextSchuljahresende: getNextSchuljahresende(),
+                    befristung: selectedBefristung,
+                    befristungOption: selectedBefristungOption,
+                  }"
                   v-model:selectedOrganisation="selectedOrganisation"
                   v-model:selectedRolle="selectedRolle"
                   v-model:selectedKlasse="selectedKlasse"
@@ -1370,8 +1763,18 @@
                   @update:selectedRolle="(value?: string) => (selectedRolle = value)"
                   @update:selectedKlasse="(value?: string) => (selectedKlasse = value)"
                   @update:canCommit="canCommit = $event"
+                  @update:befristung="handleBefristungUpdate"
+                  @update:calculatedBefristungOption="handleBefristungOptionUpdate"
                   @fieldReset="handleFieldReset"
                 />
+                <KopersInput
+                  v-if="!hasKopersNummer && isKopersRolle(selectedRolle) && selectedOrganisation"
+                  :hasNoKopersNr="hasNoKopersNr"
+                  v-model:selectedKopersNr="selectedKopersNr"
+                  :selectedKopersNrProps="selectedKopersNrProps"
+                  @update:selectedKopersNr="(value?: string | null) => (selectedKopersNr = value)"
+                  @update:hasNoKopersNr="(value: boolean | undefined) => (hasNoKopersNr = value)"
+                ></KopersInput>
               </v-container>
               <v-row class="py-3 px-2 justify-center">
                 <v-spacer class="hidden-sm-and-down"></v-spacer>
@@ -1416,8 +1819,8 @@
                   cols="12"
                   sm="auto"
                 >
-                  <h3 class="subtitle-1">{{ $t('transfer') }}:</h3></v-col
-                >
+                  <h3 class="subtitle-1">{{ $t('transfer') }}:</h3>
+                </v-col>
               </v-row>
               <v-container class="px-lg-16">
                 <KlasseChange
@@ -1474,18 +1877,68 @@
           </template>
         </v-container>
         <v-divider
+          v-if="authStore.currentUser?.personId !== personStore.currentPerson?.person.id"
           class="border-opacity-100 rounded my-6 mx-4"
           color="#E5EAEF"
           thickness="6"
         ></v-divider>
-        <!-- Delete person -->
         <v-container
-          v-if="authStore.hasPersonenLoeschenPermission"
-          class="person-delete"
+          class="person-lock"
+          v-if="authStore.currentUser?.personId !== personStore.currentPerson?.person.id"
         >
           <v-row class="ml-md-16">
-            <v-col>
+            <v-col data-testid="person-lock-info">
               <h3 class="subtitle-1">{{ $t('admin.person.status') }}</h3>
+              <template v-if="!personStore.loading">
+                <v-row class="mt-4 text-body">
+                  <v-col
+                    class="text-right"
+                    cols="1"
+                  >
+                    <v-icon
+                      v-if="personStore.currentPerson?.person.isLocked"
+                      icon="mdi-lock"
+                      color="red"
+                    ></v-icon>
+                  </v-col>
+                  <v-col cols="10">
+                    <span>
+                      {{
+                        personStore.currentPerson?.person.isLocked
+                          ? t('person.userIsLocked')
+                          : t('person.userIsUnlocked')
+                      }}
+                    </span>
+                  </v-col>
+                </v-row>
+                <v-row
+                  class="mt-0"
+                  v-for="{ key, attribute } of getLockInfo"
+                  :key="key"
+                  cols="10"
+                >
+                  <v-col
+                    class="text-right"
+                    cols="4"
+                  >
+                    <span class="subtitle-2"> {{ key }}: </span>
+                  </v-col>
+                  <v-col
+                    cols="5"
+                    class="ellipsis-wrapper"
+                  >
+                    <span
+                      class="text-body"
+                      :title="attribute"
+                    >
+                      {{ attribute }}
+                    </span>
+                  </v-col>
+                </v-row>
+              </template>
+              <template v-else-if="personStore.loading">
+                <v-col> <v-progress-circular indeterminate></v-progress-circular></v-col>
+              </template>
             </v-col>
             <v-col
               class="mr-lg-13"
@@ -1494,17 +1947,29 @@
               v-if="personStore.currentPerson"
             >
               <div class="d-flex justify-sm-end">
-                <PersonDelete
-                  :disabled="isEditActive"
+                <PersonLock
+                  :disabled="isEditActive || isEditPersonInfoActive"
                   :errorCode="personStore.errorCode"
                   :person="personStore.currentPerson"
-                  @onDeletePerson="deletePerson(currentPersonId)"
+                  :adminId="authStore.currentUser?.personId!"
+                  @onLockUser="onLockUser"
                 >
-                </PersonDelete>
+                </PersonLock>
+              </div>
+              <div class="d-flex justify-sm-end">
+                <template v-if="authStore.hasPersonenLoeschenPermission">
+                  <PersonDelete
+                    :disabled="isEditActive || isEditPersonInfoActive"
+                    :errorCode="personStore.errorCode"
+                    :person="personStore.currentPerson"
+                    @onDeletePerson="deletePerson(currentPersonId)"
+                  >
+                  </PersonDelete>
+                </template>
               </div>
             </v-col>
-            <v-col v-else-if="personStore.loading"> <v-progress-circular indeterminate></v-progress-circular></v-col
-          ></v-row>
+            <v-col v-else-if="personStore.loading"> <v-progress-circular indeterminate></v-progress-circular></v-col>
+          </v-row>
         </v-container>
       </template>
     </LayoutCard>
@@ -1626,6 +2091,48 @@
                 :block="mdAndDown"
                 class="primary"
                 @click.stop="closeCreateSuccessDialog"
+              >
+                {{ $t('close') }}
+              </v-btn>
+            </v-col>
+          </v-row>
+        </v-card-actions>
+      </LayoutCard>
+    </v-dialog>
+    <!-- Success Dialog after changing the Person Infos-->
+    <v-dialog
+      v-model="changePersonInfoSuccessVisible"
+      persistent
+      max-width="600px"
+    >
+      <LayoutCard
+        :closable="true"
+        :header="$t('admin.person.personalInfo')"
+        @onCloseClicked="closeChangePersonInfoSuccessDialog"
+      >
+        <v-card-text>
+          <v-container>
+            <v-row class="text-body bold px-md-12">
+              <v-col
+                offset="1"
+                cols="10"
+              >
+                <span>{{ $t('admin.person.personalInfoSuccessDialogMessage') }}</span>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card-text>
+        <v-card-actions class="justify-center">
+          <v-row class="justify-center">
+            <v-col
+              cols="12"
+              sm="6"
+              md="4"
+            >
+              <v-btn
+                :block="mdAndDown"
+                class="primary"
+                @click.stop="closeChangePersonInfoSuccessDialog"
               >
                 {{ $t('close') }}
               </v-btn>
@@ -1786,6 +2293,67 @@
         </v-card-actions>
       </LayoutCard>
     </v-dialog>
+
+    <v-dialog
+      v-model="showNoKopersNrConfirmationDialog"
+      persistent
+    >
+      <LayoutCard
+        v-if="showNoKopersNrConfirmationDialog"
+        :closable="false"
+        :header="$t('admin.person.noKopersNr')"
+      >
+        <v-card-text>
+          <v-container>
+            <v-row class="text-body bold px-md-16">
+              <v-col
+                offset="1"
+                cols="10"
+              >
+                <span data-testid="no-kopersnr-confirmation-text">
+                  {{ $t('admin.person.noKopersNrConfirmationDialogMessage') }}
+                </span>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card-text>
+        <v-card-actions class="justify-center">
+          <v-row class="justify-center">
+            <v-col
+              cols="12"
+              sm="6"
+              md="4"
+            >
+              <v-btn
+                :block="mdAndDown"
+                class="secondary"
+                @click.stop="
+                  showNoKopersNrConfirmationDialog = false;
+                  hasNoKopersNr = false;
+                "
+                data-testid="cancel-no-kopersnr-button"
+              >
+                {{ $t('cancel') }}
+              </v-btn>
+            </v-col>
+            <v-col
+              cols="12"
+              sm="6"
+              md="4"
+            >
+              <v-btn
+                :block="mdAndDown"
+                class="primary"
+                @click.stop="showNoKopersNrConfirmationDialog = false"
+                data-testid="confirm-no-kopersnr-button"
+              >
+                {{ $t('proceed') }}
+              </v-btn>
+            </v-col>
+          </v-row>
+        </v-card-actions>
+      </LayoutCard>
+    </v-dialog>
   </div>
 </template>
 
@@ -1794,6 +2362,7 @@
     .save-cancel-row {
       margin-top: -40px;
     }
+
     .cancel-col {
       margin-bottom: -15px;
     }

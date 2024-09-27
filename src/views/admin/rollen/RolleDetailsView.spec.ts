@@ -31,6 +31,8 @@ rolleStore.updatedRolle = {
   updatedAt: '2023',
   id: '1',
   serviceProviders: [{ id: 'sp1', name: 'ServiceProvider1' }],
+  administeredBySchulstrukturknotenName: 'Land SH',
+  administeredBySchulstrukturknotenKennung: '',
 };
 
 beforeEach(async () => {
@@ -127,6 +129,8 @@ describe('RolleDetailsView', () => {
       updatedAt: '2023',
       id: '1',
       serviceProviders: [{ id: 'sp1', name: 'ServiceProvider1' }],
+      administeredBySchulstrukturknotenName: 'Land SH',
+      administeredBySchulstrukturknotenKennung: '',
     };
     await nextTick();
 

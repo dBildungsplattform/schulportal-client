@@ -8,6 +8,21 @@
         "required": "Die Administrationsebene muss ausgewählt werden."
       }
     },
+    "befristung": {
+      "assignBefristung": "Befristung zuordnen",
+      "befristung": "Befristung",
+      "rules": {
+        "required": "Die Befristung muss eingegeben werden.",
+        "format": "Die Befristung muss im Format TT.MM.JJJJ. eingegeben werden.",
+        "pastDateNotAllowed": "Das eingegebene Datum darf nicht in der Vergangenheit liegen."
+      },
+      "selectBefristung": "Befristung auswählen",
+      "unlimited": "Unbefristet",
+      "unlimitedSuccessTemplate": "unbefristet",
+      "unlimitedInactive": "Diese Option kann für Rollen mit Befristungspflicht nicht ausgewählt werden.",
+      "limitedUntil": "befristet bis",
+      "untilEndOfSchoolYear": "Bis Schuljahresende"
+    },
     "mandatoryFieldsNotice": "Mit * markierte Felder sind Pflichtangaben.",
     "followingDataCreated": "Folgende Daten wurden gespeichert:",
     "headline": "Administrationsbereich",
@@ -85,6 +100,7 @@
       "addedSuccessfully": "{firstname} {lastname} wurde erfolgreich hinzugefügt.",
       "addNew": "Neuen Benutzer hinzufügen",
       "backToCreatePerson": "Zurück zur Benutzeranlage",
+      "backToForm": "Zurück zur Form",
       "changePassword": "Passwort ändern",
       "twoFactorAuthentication": {
         "setUpShort": "2FA einrichten",
@@ -97,8 +113,47 @@
         "scanOrPrint": "QR-Code scannen oder ausdrucken.",
         "notSetUp": "Für diesen Benutzer ist aktuell keine 2FA eingerichtet.",
         "softwareTokenIsSetUp": "Für diesen Benutzer ist aktuell ein Software-Token eingerichtet.",
+        "softwareTokenIsSetUpSelfService": "Für diesen Account ist aktuell eine 2FA über ein Software-Token eingerichtet (Authentifizierung über Endgerät).",
+        "hardwareTokenIsSetUpSelfService": "Aktuell ist eine 2FA über ein Hardware-Token eingerichtet. \nSeriennummer: {serialNumber}",
         "resetInfo": "Um einen neuen Token einzurichten, muss der aktuelle Token durch die schulischen Admins zurückgesetzt werden.",
-        "tokenReset": "Token zurücksetzen"
+        "tokenReset": "Token zurücksetzen",
+        "hardwareTokenIsSetUp": "Für diesen Benutzer ist aktuell ein Hardware-Token eingerichtet.",
+        "hardwareTokenSetUpSuccess": "Token wurde erfolgreich zugeordnet.",
+        "hardwareTokenSetUpFailure": "Fehler bei Zuordnung des Hardware-Tokens",
+        "setUp": "Einrichten",
+        "serialNotSelected": "Die Seriennummer muss angegeben werden.",
+        "otpNotSelected": "Das Einmalpasswort muss angegeben werden.",
+        "otpLengthInvalid": "Das Einmalpasswort darf maximal 6 Zeichen lang sein.",
+        "currentOtp": "Einmalpasswort",
+        "serial": "Seriennummer",
+        "otpPlaceholder": "Einmalpasswort",
+        "errors": {
+          "SERIENNUMMER_NICHT_GEFUNDEN": "Die eingegebene Seriennummer konnte leider nicht gefunden werden. Vergewissern Sie sich bitte, dass Sie eine korrekte Seriennummer eingegeben haben.",
+          "SERIENNUMMER_IN_VERWENDUNG": "Die eingegebene Seriennummer gehört zu einem Token, der bereits einem Benutzer zugeordnet ist. Bitte überprüfen Sie Ihre Eingaben und versuchen Sie es erneut.",
+          "OTP_NICHT_GUELTIG": "Ungültiges Einmalpasswort. Bitte versuchen Sie es erneut.",
+          "HARDWARE_TOKEN_SERVICE_FEHLER": "Leider konnte ihr Hardware-Token aus technischen Gründen nicht aktiviert werden. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut. Falls das Problem bestehen bleibt, stellen Sie bitte eine Anfrage über den IQSH Helpdesk.--Link: https://www.secure-lernnetz.de/helpdesk/",
+          "UNKNOWN_ERROR": "Ein unbekannter Fehler ist aufgetreten.",
+          "TOKEN_RESET_ERROR": "Leider konnten wir Ihren Token aufgrund von technischen Problemen nicht zurücksetzen. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut. Falls das Problem bestehen bleibt, stellen Sie bitte eine Anfrage über den IQSH Helpdesk.  Link: https://www.secure-lernnetz.de/helpdesk/",
+          "500": "Ein unbekannter Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
+          "SOFTWARE_TOKEN_VERIFICATION_ERROR": "Beim Verifizieren Ihres Tokens ist leider ein Problem aufgetreten.",
+          "connection": "Der Server für die Zwei-Faktor-Authentifizierung kann aktuell nicht erreicht werden. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut."
+        },
+        "tokenResetHardwareErrorHeader": "Fehler beim Zurücksetzen des Hardware-Tokens",
+        "tokenResetSoftwareErrorHeader": "Fehler beim Zurücksetzen des Software-Tokens",
+        "tokenResetDescription": "Sind Sie sicher, dass Sie den Token zurücksetzen möchten? \nDie 2FA wird damit für diesen Benutzer deaktiviert, bis ein neuer Token eingerichtet wurde.",
+        "tokenResetTokenLost": "Token ist verloren gegangen (Token wird gesperrt).",
+        "tokenResetButton": "Zurücksetzen",
+        "tokenResetSuccessSoftware": "Token wurde erfolgreich zurückgesetzt. Der Benutzer kann sich nun selbstständig einen neuen QR-Code erzeugen.",
+        "tokenResetSuccessHardware": "Token wurde erfolgreich zurückgesetzt. Der Hardware-Token kann nun neu zugeordnet werden.",
+        "tokenResetSuccessTokenLost": "Token wurde erfolgreich zurückgesetzt und gesperrt.",
+        "questionsProblems": "Bitte wenden Sie sich bei Fragen und Problemen an ihre schulischen Admins.",
+        "qrCodeInfo": "Im Folgenden wird ein QR-Code generiert, mit dem Sie auf Ihrem Endgerät eine Zwei-Faktor-Authentifizierung einrichten können.",
+        "softwareOnDevice": "Bitte stellen Sie vor dem Fortfahren sicher, dass eine entsprechende Software auf Ihrem Endgerät installiert ist. Für Ihr Lehrkräfte-Endgerät finden Sie entsprechend genehmigte Anwendungen im Software-Hub.",
+        "pleaseScan": "Bitte scannen Sie den QR-Code mit Ihrer 2FA-App (z.B. FreeOTP).",
+        "enterOtp": "Bitte geben Sie das angezeigte Einmalpasswort ein, um die Einrichtung abzuschließen.",
+        "invalidOtp": "Ungültiger Code. Bitte versuchen Sie es erneut.",
+        "otp": "Einmalpasswort",
+        "SecondFactorNotSet": "Es wurde noch kein zweiter Faktor für Sie eingerichtet."
       },
       "copyPasswordError": "Passwort konnte nicht in die Zwischenablage kopiert werden",
       "copyPasswordSuccess": "Passwort in Zwischenablage kopiert",
@@ -111,7 +166,9 @@
       "deletePersonConfirmation": "Wollen Sie den Benutzer {firstname} {lastname} sofort und endgültig löschen?",
       "deletePersonSuccessMessage": "{firstname} {lastname} wurde erfolgreich gelöscht",
       "discard": "Benutzer verwerfen",
+      "disableUser": "Benutzer sperren",
       "edit": "Benutzer bearbeiten",
+      "editPersonalInfo": "Persönliche Informationen bearbeiten",
       "generatedPassword": "Generiertes Passwort",
       "noKopersNr": "KoPers.-Nr. nicht vorhanden",
       "noKopersNrConfirmationDialogMessage": "Bitte beachten Sie, dass ein Benutzerkonto ohne KoPers.-Nr. nach 8 Wochen automatisch gesperrt wird. Tragen Sie daher die KoPers.-Nr. bitte in der Gesamtübersicht des Benutzers nach, sobald diese Ihnen vorliegt.",
@@ -119,6 +176,7 @@
       "loadingErrorTitle": "Fehler beim Laden des Benutzers",
       "management": "Benutzerverwaltung",
       "personalInfo": "Persönliche Informationen",
+      "personalInfoSuccessDialogMessage": "Die Stammdaten wurden erfolgreich geändert.",
       "resetPasswordConfirmation": "Sind Sie sicher, dass Sie das Passwort für {firstname} {lastname} zurücksetzen möchten?",
       "resetPasswordInformation": "Bitte teilen Sie dem Benutzer das temporäre Passwort mit. Nach dem Schließen des Dialogs wird es aus Sicherheitsgründen nicht mehr angezeigt.",
       "resetPassword": "Passwort zurücksetzen",
@@ -138,6 +196,15 @@
         "kopersNr": {
           "required": "Die KoPers.-Nr. ist erforderlich."
         }
+      },
+      "title": {
+        "ERROR_LOADING_USER": "Fehler beim Laden des Benutzers.",
+        "PERSONALNUMMER_NICHT_EINDEUTIG": "KoPers.-Nr. nicht eindeutig.",
+        "PERSON_NOT_FOUND": "Benutzer gelöscht."
+      },
+      "errors": {
+        "PERSONALNUMMER_NICHT_EINDEUTIG": "Die eingegebene KoPers.-Nr. ist bereits vergeben. Bitte korrigieren Sie Ihre Eingabe.",
+        "ERROR_LOADING_USER": "Es konnten keine Benutzerdaten geladen werden."
       },
       "showAll": "Alle Benutzer anzeigen",
       "startPassword": "Einstiegs-Passwort",
@@ -382,6 +449,7 @@
     "changeRolleDescription": "Ändert die Rolle des Benutzers an der Schule ohne ihn zu entfernen.",
     "changeKlasseDescription": "Ändert die Klasse des Benutzers an der Schule.",
     "changeKlasseNotDisabledDescription": "Bitte wählen Sie eine neue Klasse aus.",
+    "changeKopersDisabledDescription": "Bitte geben Sie eine neue KoPers.-Nr. ein.",
     "chooseZuordnungFirst": "Wählen Sie bitte zuerst eine Schulzuordnung aus.",
     "chooseKlasseZuordnungFirst": "Wählen Sie bitte zunächst eine Schulzuordnung mit einer Klasse aus.",
     "deleteZuordnungConfirmation": "Wollen Sie die Schulzuordnung wirklich entfernen?",
@@ -399,6 +467,15 @@
     "klasse": "Klasse",
     "kopersNr": "KoPers.-Nr.",
     "lastName": "Nachname",
+    "userIsLocked": "Dieser Benutzer ist gesperrt.",
+    "userIsUnlocked": "Dieser Benutzer ist aktiv.",
+    "lockUser": "Benutzer sperren",
+    "lockUserInfoText": "Für die Dauer der Sperre hat der Benutzer keinen Zugriff mehr auf das Schulportal SH und die daran angeschlossenen Dienste.",
+    "lockedBy": "Gesperrt durch",
+    "unlockUser": "Benutzer entsperren",
+    "unLockUserInfoText": "Ich bestätige, dass ich mit der sperrenden Stelle geklärt habe, dass die Sperre aufgehoben werden darf.",
+    "lockError": "Der Benutzer konnte nicht gesperrt werden.",
+    "unlockError": "Der Benutzer konnte nicht entsperrt werden.",
     "modifyBefristung": "Befristung bearbeiten",
     "modifyBefristungDescription": "Ändert die Befristung der Zuordnung des Benutzers zu dieser Schule.",
     "noChangesToSave": "Es liegen keine zu speichernden Änderungen vor.",
@@ -410,6 +487,8 @@
     "rolle": "Rolle",
     "userName": "Benutzername",
     "saveChanges": "Änderungen speichern",
+    "willBeCreated": "wird hinzugefügt",
+    "willBeRemoved": "wird entfernt",
     "zuordnungen": "Schulzuordnung(en)",
     "zuordnung": "Schulzuordnung"
   },
@@ -422,6 +501,7 @@
     "password": "Passwort",
     "changePassword": "Passwort ändern",
     "changePasswordInfo": "Um Ihr Passwort zu ändern, werden Sie zunächst zu einer erneuten Anmeldung weitergeleitet. Nach erfolgreicher Eingabe Ihres aktuellen Passworts können Sie dann ein neues festlegen.",
+    "lastPasswordChange": "Ihr Passwort wurde zuletzt am {date} geändert.",
     "saveNewPassword": "Neues Passwort speichern",
     "setNewPassword": "Neues Passwort setzen",
     "twoFactorAuth": "Zwei-Faktor-Authentifizierung",
@@ -430,6 +510,7 @@
     "yourSchuleAdminsAre": "Ihre schulischen Admins sind:",
     "koPersNummer": "Personalnummer",
     "koPersNummerAbbr": "KoPers.-Nr.",
+    "koPersNummerMissing": "Bitte beachten Sie, dass Ihr Benutzerkonto ohne KoPers.-Nr. nur für einen Übergangszeitraum gültig ist und danach gesperrt wird! Lassen Sie die KoPers.-Nr. bitte durch Ihre schulischen Admins nachtragen, sobald diese Ihnen vorliegt.",
     "klasse": "Klasse",
     "error": "Fehler",
     "success": "Erfolg",
@@ -438,6 +519,7 @@
     "errorPasswordChange": "Ihr Passwort konnte nicht geändert werden. Bitte versuchen Sie es später erneut."
   },
   "save": "Speichern",
+  "since": "Seit",
   "refreshData": "Daten aktualisieren",
   "resetFilter": "Filter zurücksetzen",
   "search": "Suchen",
@@ -452,7 +534,7 @@
       "workEmail": "Dienstliche E-Mail"
     }
   },
-  "transfer":"Versetzen",
+  "transfer": "Versetzen",
   "unsavedChanges": {
     "message": "Sie haben nicht gespeicherte Änderungen vorgenommen. Wollen Sie die Seite trotzdem verlassen?",
     "title": "Änderungen vorgenommen"

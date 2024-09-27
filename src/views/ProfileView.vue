@@ -1,40 +1,50 @@
 <script setup lang="ts">
+  import { RollenMerkmal, type DBiamPersonenzuordnungResponse } from '@/api-client/generated/api';
+  import SpshTooltip from '@/components/admin/SpshTooltip.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import { ref, type Ref, onBeforeMount } from 'vue';
+  import SelfServiceWorkflow from '@/components/two-factor-authentication/SelfServiceWorkflow.vue';
+  import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
+  import { OrganisationsTyp } from '@/stores/OrganisationStore';
+  import { usePersonInfoStore, type PersonInfoStore } from '@/stores/PersonInfoStore';
+  import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
+  import { type Zuordnung } from '@/stores/PersonenkontextStore';
+  import {
+    TokenKind,
+    useTwoFactorAuthentificationStore,
+    type TwoFactorAuthentificationStore,
+  } from '@/stores/TwoFactorAuthentificationStore';
+  import { computed, onBeforeMount, ref, watchEffect, type ComputedRef, type Ref } from 'vue';
   import { useI18n } from 'vue-i18n';
+  import { useRoute, useRouter, type RouteLocationNormalizedLoaded, type Router } from 'vue-router';
+
   const { t }: { t: Function } = useI18n();
+
+  enum ItemType {
+    KO_PERS = 'KO_PERS',
+  }
   type LabelValue = {
     label: string;
     labelAbbr?: string;
     value: string;
+    type?: ItemType;
+    testIdLabel: string;
+    testIdValue: string;
   };
-
-  import { usePersonInfoStore, type PersonInfoStore, type PersonInfoResponse } from '@/stores/PersonInfoStore';
-  import { type Zuordnung } from '@/stores/PersonenkontextStore';
-  import { OrganisationsTyp } from '@/stores/OrganisationStore';
-  import { type RouteLocationNormalizedLoaded, type Router, useRoute, useRouter } from 'vue-router';
-  import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
-
-  const route: RouteLocationNormalizedLoaded = useRoute();
-  const router: Router = useRouter();
-  const kcActionStatus: string | null = route.query['kc_action_status'] as string | null;
-
-  export type SchulDaten = {
+  type SchulDaten = {
     title: string;
     info?: string | null;
     schulAdmins?: string[];
     labelAndValues: LabelValue[];
   };
 
-  let personInfoStore: PersonInfoStore = usePersonInfoStore();
-  let personStore: PersonStore = usePersonStore();
-  const personalData: Ref = ref<LabelValue[]>([]);
-  const schulDaten: Ref = ref<SchulDaten[]>([]);
+  const route: RouteLocationNormalizedLoaded = useRoute();
+  const router: Router = useRouter();
+  const kcActionStatus: string | null = route.query['kc_action_status'] as string | null;
 
-  function handleGoToPreviousPage(): void {
-    const previousUrl: string | null = sessionStorage.getItem('previousUrl');
-    router.push(previousUrl ?? '/start');
-  }
+  const authStore: AuthStore = useAuthStore();
+  const personInfoStore: PersonInfoStore = usePersonInfoStore();
+  const personStore: PersonStore = usePersonStore();
+  const twoFactorAuthenticationStore: TwoFactorAuthentificationStore = useTwoFactorAuthentificationStore();
 
   const windowOrigin: string = window.location.origin;
 
@@ -52,10 +62,11 @@
   function groupZuordnungen(zuordnungen: Zuordnung[]): Map<string, Zuordnung[]> {
     const groupedZuordnungen: Map<string, Zuordnung[]> = new Map();
     for (const zuordnung of zuordnungen) {
-      if (groupedZuordnungen.has(zuordnung.sskDstNr)) {
-        groupedZuordnungen.get(zuordnung.sskDstNr)?.push(zuordnung);
+      const key: string = zuordnung.sskDstNr ?? zuordnung.sskId;
+      if (groupedZuordnungen.has(key)) {
+        groupedZuordnungen.get(key)?.push(zuordnung);
       } else {
-        groupedZuordnungen.set(zuordnung.sskDstNr, [zuordnung]);
+        groupedZuordnungen.set(key, [zuordnung]);
       }
     }
     return groupedZuordnungen;
@@ -101,28 +112,44 @@
 
   function createZuordnungsSchuleDaten(zuordnungen: Zuordnung[]): SchulDaten[] {
     const result: SchulDaten[] = [];
-    for (const zuordnung of zuordnungen) {
+    for (const [index, zuordnung] of zuordnungen.entries()) {
       const tempSchulDaten: SchulDaten = {
         title: zuordnung.sskName,
         info: t('profile.yourSchuleAdminsAre'),
         schulAdmins: [], // Hierfuer muss ein API-Endpunkt implementiert werden
-        labelAndValues: [{ label: t('profile.schule'), value: zuordnung.sskName }],
+        labelAndValues: [
+          {
+            label: t('profile.schule'),
+            value: zuordnung.sskName,
+            testIdLabel: 'schule-label-' + (index + 1),
+            testIdValue: 'schule-value-' + (index + 1),
+          },
+        ],
       };
 
       if (zuordnung.klasse) {
         tempSchulDaten.labelAndValues.push({
           label: t('profile.klasse'),
           value: zuordnung.klasse,
+          testIdLabel: 'klasse-label-' + (index + 1),
+          testIdValue: 'klasse-value-' + (index + 1),
         });
       }
 
-      tempSchulDaten.labelAndValues.push({ label: t('admin.rolle.rolle'), value: zuordnung.rolle });
+      tempSchulDaten.labelAndValues.push({
+        label: t('admin.rolle.rolle'),
+        value: zuordnung.rolle,
+        testIdLabel: 'rolle-label-' + (index + 1),
+        testIdValue: 'rolle-value-' + (index + 1),
+      });
 
       if (zuordnung.sskDstNr) {
         tempSchulDaten.labelAndValues.push({
           label: t('profile.dienstStellenNummer'),
           labelAbbr: t('profile.dienstStellenNummerAbbr'),
           value: zuordnung.sskDstNr,
+          testIdLabel: 'dienststellennummer-label-' + (index + 1),
+          testIdValue: 'dienststellennummer-value-' + (index + 1),
         });
       }
 
@@ -132,48 +159,86 @@
     return result;
   }
 
-  async function initializeStores(): Promise<void> {
-    personInfoStore = usePersonInfoStore();
-    personStore = usePersonStore();
-    await personInfoStore.initPersonInfo();
-    await personStore.getPersonenuebersichtById(personInfoStore.personInfo?.person.id ?? '');
-  }
+  const hasKoPersMerkmal: ComputedRef<boolean> = computed(() => {
+    return (
+      personStore.personenuebersicht?.zuordnungen.find((zuordnung: DBiamPersonenzuordnungResponse) => {
+        return zuordnung.merkmale.includes(RollenMerkmal.KopersPflicht);
+      }) !== undefined
+    );
+  });
 
-  function setupPersonalData(): void {
-    if (!personInfoStore.personInfo) return;
-    const personInfo: PersonInfoResponse = personInfoStore.personInfo;
-    personalData.value = [
-      {
-        label: t('profile.fullName'),
-        value: personInfo.person.name.vorname + ' ' + personInfo.person.name.familiennamen,
-      },
-      { label: t('person.userName'), value: personInfo.person.referrer },
-    ];
-
-    if (personInfo.person.personalnummer) {
-      personalData.value.push({
-        label: t('profile.koPersNummer'),
-        labelAbbr: t('profile.koPersNummerAbbr'),
-        value: personInfo.person.personalnummer,
+  const personalData: ComputedRef<LabelValue[]> = computed(() => {
+    const data: LabelValue[] = [];
+    if (!personInfoStore.personInfo) return data;
+    data.push({
+      label: t('profile.fullName'),
+      value:
+        personInfoStore.personInfo.person.name.vorname + ' ' + personInfoStore.personInfo.person.name.familiennamen,
+      testIdLabel: 'fullName-label',
+      testIdValue: 'fullName-value',
+    });
+    if (personInfoStore.personInfo.person.referrer)
+      data.push({
+        label: t('person.userName'),
+        value: personInfoStore.personInfo.person.referrer,
+        testIdLabel: 'userName-label',
+        testIdValue: 'userName-value',
       });
-    }
-  }
 
-  function setupSchuleData(): void {
-    if (!personStore.personenuebersicht) return;
+    if (!(personInfoStore.personInfo.person.personalnummer && hasKoPersMerkmal.value)) return data;
+    data.push({
+      label: t('profile.koPersNummer'),
+      labelAbbr: t('profile.koPersNummerAbbr'),
+      value: personInfoStore.personInfo.person.personalnummer,
+      type: ItemType.KO_PERS,
+      testIdLabel: 'kopersnummer-label',
+      testIdValue: 'kopersnummer-value',
+    });
+    return data;
+  });
+
+  const schulDaten: ComputedRef<SchulDaten[]> = computed(() => {
+    if (!personStore.personenuebersicht) return [];
     const personenZuordnungen: Zuordnung[] = personStore.personenuebersicht.zuordnungen;
     const groupedZuordnungen: Map<string, Zuordnung[]> = groupZuordnungen(
       personenZuordnungen.map(
         (z: Zuordnung) =>
           ({
             ...z,
-            sskDstNr: z.sskDstNr.split('-')[0], // die Klasse wird durch einen Bindestrich an die Schulnummer angehangen. Um nach der Schule zu gruppieren, wird nur die Schulnummer verwendet.
+            sskDstNr: z.sskDstNr?.split('-')[0], // die Klasse wird durch einen Bindestrich an die Schulnummer angehangen. Um nach der Schule zu gruppieren, wird nur die Schulnummer verwendet.
           }) as Zuordnung,
       ),
     );
 
     const composedZuordnungen: Zuordnung[] = createComposedZuordnungen(groupedZuordnungen);
-    schulDaten.value = createZuordnungsSchuleDaten(composedZuordnungen);
+    return createZuordnungsSchuleDaten(composedZuordnungen);
+  });
+
+  const lastPasswordChangeDate: ComputedRef<string> = computed(() => {
+    const passwordUpdatedAt: string | null | undefined = authStore.currentUser?.password_updated_at;
+    if (!passwordUpdatedAt) return '';
+    const date: Date = new Date(passwordUpdatedAt);
+    if (isNaN(date.valueOf())) return '';
+    return new Intl.DateTimeFormat('de-DE', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).format(date);
+  });
+
+  const twoFactorAuthError: ComputedRef<string> = computed(() => {
+    if (twoFactorAuthenticationStore.loading) return '';
+    if (twoFactorAuthenticationStore.errorCode) return t('admin.person.twoFactorAuthentication.errors.connection');
+    return '';
+  });
+
+  function handleGoToPreviousPage(): void {
+    const previousUrl: string | null = sessionStorage.getItem('previousUrl');
+    router.push(previousUrl ?? '/start');
+  }
+
+  async function initializeStores(): Promise<void> {
+    await personInfoStore.initPersonInfo();
   }
 
   const isPasswordResetDialogActive: Ref<boolean> = ref(false);
@@ -199,10 +264,15 @@
     window.location.href = url.toString();
   }
 
+  watchEffect(async () => {
+    if (!personInfoStore.personInfo?.person.id) return;
+    await twoFactorAuthenticationStore.get2FARequirement(personInfoStore.personInfo.person.id);
+    await personStore.getPersonenuebersichtById(personInfoStore.personInfo.person.id);
+    await twoFactorAuthenticationStore.get2FAState(personInfoStore.personInfo.person.id);
+  });
+
   onBeforeMount(async () => {
     await initializeStores();
-    setupPersonalData();
-    setupSchuleData();
   });
 </script>
 
@@ -210,6 +280,7 @@
   <v-btn
     class="mt-8"
     @click="handleGoToPreviousPage()"
+    data-testid="back-to-previous-page-button"
   >
     <v-icon
       class="mr-2"
@@ -234,7 +305,10 @@
         sm="12"
         md="6"
       >
-        <LayoutCard :header="$t('profile.personalData')">
+        <LayoutCard
+          :header="$t('profile.personalData')"
+          :headline-test-id="'layout-card-headline-persoenliche-daten'"
+        >
           <v-row class="ma-4">
             <v-col cols="12">
               <v-table class="text-body-1">
@@ -244,25 +318,62 @@
                       v-for="item in personalData"
                       :key="item.label"
                     >
-                      <td>
+                      <td v-if="item.type === ItemType.KO_PERS && item.value === null">
+                        <SpshTooltip
+                          :disabledText="t('profile.koPersNummerMissing')"
+                          :enabledText="t('profile.koPersNummerMissing')"
+                          position="top"
+                        >
+                          <span
+                            v-if="item.labelAbbr"
+                            class="text-red"
+                          >
+                            <strong>{{ item.labelAbbr }}</strong> :</span
+                          >
+                          <strong v-else>{{ item.label }}:</strong>
+                        </SpshTooltip>
+                      </td>
+                      <td v-else>
                         <span v-if="item.labelAbbr"
                           ><abbr :title="item.label"
-                            ><strong>{{ item.labelAbbr }}</strong></abbr
-                          >:</span
+                            ><strong :data-testid="item.testIdLabel">{{ item.labelAbbr }}:</strong></abbr
+                          ></span
                         >
-                        <strong v-else>{{ item.label }}:</strong>
+                        <strong
+                          :data-testid="item.testIdLabel"
+                          v-else
+                          >{{ item.label }}:</strong
+                        >
                       </td>
-                      <td>{{ item.value }}</td>
+                      <td
+                        :data-testid="item.testIdValue"
+                        v-if="item.type === ItemType.KO_PERS && item.value === null"
+                        class="text-red"
+                      >
+                        {{ t('missing') }}
+                      </td>
+                      <td
+                        :data-testid="item.testIdValue"
+                        v-else
+                      >
+                        {{ item.value }}
+                      </td>
                     </tr>
                   </tbody>
                 </template>
               </v-table>
-              <p class="pt-4 text-center text-body-1 text-medium-emphasis wrap-text">
+              <p
+                class="pt-4 text-center text-body-1 text-medium-emphasis"
+                data-testid="info-text-with-icon"
+              >
                 <v-icon
                   class="mr-2"
                   icon="mdi-information-slab-circle-outline"
+                  data-testid="info-icon"
                 ></v-icon>
-                {{ $t('profile.infoAboutChangeabilityFromPersonalData') }}
+                <span data-testid="info-text">
+                  {{ $t('profile.infoAboutChangeabilityFromPersonalData') }}
+                </span>
               </p>
             </v-col>
           </v-row>
@@ -275,7 +386,10 @@
         sm="12"
         md="6"
       >
-        <LayoutCard :header="$t('person.zuordnung') + ' ' + (schulDaten.length > 1 ? (index + 1).toString() : '')">
+        <LayoutCard
+          :header="$t('person.zuordnung') + ' ' + (schulDaten.length > 1 ? (index + 1).toString() : '')"
+          :headline-test-id="'zuordung-card-' + (index + 1)"
+        >
           <v-row class="ma-3 p-4">
             <v-col cols="12">
               <v-table class="text-body-1">
@@ -288,23 +402,29 @@
                       <td>
                         <span v-if="item.labelAbbr"
                           ><abbr :title="item.label"
-                            ><strong>{{ item.labelAbbr }}</strong></abbr
-                          >:</span
+                            ><strong :data-testid="item.testIdLabel">{{ item.labelAbbr }}:</strong></abbr
+                          ></span
                         >
-                        <strong v-else>{{ item.label }}:</strong>
+                        <strong
+                          :data-testid="item.testIdLabel"
+                          v-else
+                          >{{ item.label }}:</strong
+                        >
                       </td>
-                      <td>{{ item.value }}</td>
+                      <td :data-testid="item.testIdValue">{{ item.value }}</td>
                     </tr>
                   </tbody>
                 </template>
               </v-table>
               <p
                 class="pt-4 text-center text-body-1"
-                v-if="schuleData.schulAdmins.length > 0"
+                v-if="schuleData.schulAdmins && schuleData.schulAdmins.length > 0"
+                data-testid="school-admins-${index}"
               >
                 <v-icon
                   class="mr-2"
                   icon="mdi-information-slab-circle-outline"
+                  data-testid="school-admins-icon"
                 ></v-icon>
                 {{ schuleData.info + ' ' + schuleData.schulAdmins?.join(', ') }}
               </p>
@@ -316,14 +436,25 @@
         cols="12"
         sm="12"
         md="6"
+        data-testid="password-card"
       >
-        <LayoutCard :header="$t('login.password')">
+        <LayoutCard
+          :headline-test-id="'new-password-card'"
+          :header="$t('login.password')"
+        >
           <v-row class="ma-3 d-flex align-content-center justify-center ga-4">
             <v-icon
               size="x-large"
               class="w-100"
               icon="mdi-key-alert-outline"
+              data-testid="password-icon"
             ></v-icon>
+            <p
+              class="w-100 text-center text-body"
+              v-if="lastPasswordChangeDate"
+            >
+              {{ t('profile.lastPasswordChange', { date: lastPasswordChangeDate }) }}
+            </p>
             <div>
               <v-btn
                 class="primary"
@@ -399,25 +530,118 @@
       </v-col>
 
       <v-col
+        v-if="!twoFactorAuthenticationStore.loading && twoFactorAuthenticationStore.required"
         cols="12"
         sm="12"
         md="6"
       >
-        <LayoutCard :header="$t('profile.twoFactorAuth')">
-          <v-row class="ma-3 d-flex align-content-center justify-center ga-4">
+        <LayoutCard
+          :headline-test-id="'two-factor-card'"
+          :header="$t('profile.twoFactorAuth')"
+        >
+          <v-row
+            v-if="twoFactorAuthenticationStore.hasToken === false"
+            align="center"
+            justify="center"
+            class="ma-3 ga-4"
+          >
             <v-icon
               size="x-large"
-              class="w-100"
               icon="mdi-shield-account-outline"
+              data-testid="two-factor-icon"
             ></v-icon>
-            <div>
-              <v-btn
-                color="primary"
-                disabled
+          </v-row>
+          <v-row
+            align="center"
+            justify="center"
+            class="ma-3 text-body"
+          >
+            <v-col
+              :sm="twoFactorAuthenticationStore.hasToken === false ? 6 : null"
+              :md="twoFactorAuthenticationStore.hasToken === false ? 'auto' : null"
+              cols="12"
+            >
+              <v-row :justify="twoFactorAuthenticationStore.hasToken === false ? 'center' : null">
+                <v-col
+                  cols="1"
+                  align-self="center"
+                  class="text-right"
+                >
+                  <v-icon
+                    v-if="twoFactorAuthError"
+                    color="warning"
+                    icon="mdi-alert-outline"
+                  ></v-icon>
+                  <v-icon
+                    v-else-if="twoFactorAuthenticationStore.hasToken === false"
+                    color="warning"
+                    icon="mdi-alert-circle"
+                  ></v-icon>
+                  <v-icon
+                    v-else-if="twoFactorAuthenticationStore.hasToken === true"
+                    color="green"
+                    icon="mdi-check-circle"
+                  ></v-icon>
+                </v-col>
+                <v-col>
+                  <p data-testid="two-factor-info">
+                    <template v-if="twoFactorAuthError">
+                      {{ twoFactorAuthError }}
+                    </template>
+                    <template v-else-if="twoFactorAuthenticationStore.hasToken === false">
+                      {{ $t('admin.person.twoFactorAuthentication.SecondFactorNotSet') }}
+                    </template>
+                    <template v-else-if="twoFactorAuthenticationStore.hasToken === true">
+                      <template v-if="twoFactorAuthenticationStore.tokenKind === TokenKind.software">
+                        {{ $t('admin.person.twoFactorAuthentication.softwareTokenIsSetUpSelfService') }}
+                      </template>
+                      <template v-else-if="twoFactorAuthenticationStore.tokenKind === TokenKind.hardware">
+                        {{
+                          $t('admin.person.twoFactorAuthentication.hardwareTokenIsSetUpSelfService', {
+                            serialNumber: twoFactorAuthenticationStore.serial,
+                          })
+                        }}
+                      </template>
+                    </template>
+                  </p>
+                </v-col>
+              </v-row>
+            </v-col>
+            <v-col
+              cols="12"
+              v-if="!twoFactorAuthError"
+            >
+              <v-row
+                align="center"
+                justify="center"
               >
-                {{ $t('profile.setupTwoFactorAuth') }}
-              </v-btn>
-            </div>
+                <template v-if="twoFactorAuthenticationStore.hasToken === false">
+                  <SelfServiceWorkflow
+                    :personId="personInfoStore.personInfo?.person.id ?? ''"
+                    @updateState="twoFactorAuthenticationStore.get2FAState(personInfoStore.personInfo?.person.id ?? '')"
+                  >
+                  </SelfServiceWorkflow>
+                </template>
+                <template v-else-if="twoFactorAuthenticationStore.hasToken === true">
+                  <v-col
+                    cols="1"
+                    align-self="center"
+                    class="text-right"
+                  >
+                    <v-icon
+                      class="mb-2"
+                      icon="mdi-information"
+                    >
+                    </v-icon>
+                  </v-col>
+                  <v-col>
+                    <p>
+                      {{ $t('admin.person.twoFactorAuthentication.questionsProblems') }}
+                    </p>
+                  </v-col>
+                </template>
+              </v-row>
+            </v-col>
           </v-row>
         </LayoutCard>
       </v-col>

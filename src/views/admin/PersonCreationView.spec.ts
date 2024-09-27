@@ -39,12 +39,18 @@ const mockCreatedPersonWithKontext: DBiamPersonResponse = {
     vertrauensstufe: Vertrauensstufe.Kein,
     revision: '',
     startpasswort: '',
+    isLocked: false,
+    lockInfo: null,
+    lastModified: '2024-12-22',
   },
-  DBiamPersonenkontextResponse: {
-    personId: '1',
-    organisationId: '9876',
-    rolleId: '1',
-  },
+  dBiamPersonenkontextResponses: [
+    {
+      befristung: '2024-05-06',
+      personId: '1',
+      organisationId: '9876',
+      rolleId: '1',
+    },
+  ],
 };
 
 organisationStore.allOrganisationen = [

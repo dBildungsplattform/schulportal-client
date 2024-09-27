@@ -1,8 +1,10 @@
 {
   "name": "schulportal-client",
   "version": "0.3.0",
+  "author": "Dataport AöR",
   "private": true,
   "type": "module",
+  "license": "EUPL-1.2",
   "scripts": {
     "build": "run-p type-check build-only",
     "build-only": "vite build",
@@ -20,6 +22,7 @@
     "@mdi/font": "^7.4.47",
     "@vee-validate/yup": "^4.12.6",
     "axios": "^1.6.7",
+    "date-fns": "^3.6.0",
     "pinia": "^2.1.7",
     "vee-validate": "^4.12.5",
     "vite-plugin-vuetify": "^2.0.3",

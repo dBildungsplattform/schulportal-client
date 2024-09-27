@@ -26,9 +26,10 @@ export type UserInfo = {
   zoneinfo: string | null;
   locale: string | null;
   phone_number: string | null;
-  updated_at: number | null;
+  updated_at: string | null;
   personId: string | null;
   personenkontexte: Array<PersonenkontextRolleFieldsResponse> | null;
+  password_updated_at: string | null;
 };
 
 type AuthState = {
