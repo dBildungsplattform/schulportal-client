@@ -1,23 +1,12 @@
-import {
-  RollenMerkmal,
-  type DBiamPersonenuebersichtResponse,
-  type DBiamPersonenzuordnungResponse,
-} from '@/api-client/generated/api';
-import {
-  OrganisationsTyp,
-  useOrganisationStore,
-  type Organisation,
-  type OrganisationStore,
-} from '@/stores/OrganisationStore';
-import { usePersonStore, type Person, type Personendatensatz, type PersonStore } from '@/stores/PersonStore';
-import { createTestingPinia } from '@pinia/testing';
+import { RollenMerkmal, type DBiamPersonenzuordnungResponse } from '@/api-client/generated/api';
+import { OrganisationsTyp, type Organisation } from '@/stores/OrganisationStore';
+import { type Person, type Personendatensatz } from '@/stores/PersonStore';
 import { mount, VueWrapper } from '@vue/test-utils';
 import { expect, test, type Mock } from 'vitest';
+import { nextTick } from 'vue';
 import PersonLock from './PersonLock.vue';
 
 let wrapper: VueWrapper | null = null;
-let personStore: PersonStore | null = null;
-let organisationStore: OrganisationStore | null = null;
 
 const zuordnung: DBiamPersonenzuordnungResponse = {
   sskId: 'sskId',
@@ -39,14 +28,6 @@ const parentOrganisation: Organisation = {
   kuerzel: undefined,
   typ: zuordnung.typ,
   administriertVon: null,
-};
-const personenuebersicht: DBiamPersonenuebersichtResponse = {
-  personId: 'id',
-  vorname: 'firstname',
-  nachname: 'lastname',
-  benutzername: 'flastname',
-  lastModifiedZuordnungen: null,
-  zuordnungen: [zuordnung],
 };
 
 function getPersonendatensatz(locked: boolean): Personendatensatz {
@@ -105,21 +86,15 @@ describe('Lock user', () => {
         components: {
           PersonLock,
         },
-        //plugins: [vuetify, createTestingPinia()],
-        plugins: [createTestingPinia()],
       },
     });
-    personStore = usePersonStore();
-    organisationStore = useOrganisationStore();
-
-    personStore.personenuebersicht = personenuebersicht;
-    organisationStore.parentOrganisationen = [parentOrganisation];
   });
 
   test('it opens the dialog', async () => {
     expect(document.querySelector('[data-testid="lock-user-info-text"]')).toBeNull();
 
     await openDialog();
+    await nextTick();
 
     expect(document.querySelector('[data-testid="lock-user-info-text"]')).not.toBeNull();
     const selectElement: HTMLSelectElement | null = document.querySelector('[data-testid="schule-select"]');
@@ -127,8 +102,8 @@ describe('Lock user', () => {
 
     const button: HTMLElement = document.querySelector('[data-testid="lock-user-button"]') as HTMLElement;
     expect(button).not.toBeNull();
-
-    expect(formatOrganisationName).toHaveBeenCalled();
+    expect(button.attributes.getNamedItem('disabled')?.value).toBe('');
+    expect(formatOrganisationName).toHaveBeenCalledWith(parentOrganisation);
   });
 });
 

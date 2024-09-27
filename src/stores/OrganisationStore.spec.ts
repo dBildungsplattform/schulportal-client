@@ -218,6 +218,44 @@ describe('OrganisationStore', () => {
       expect(organisationStore.loading).toBe(false);
     });
 
+    it('uses parentOrganisationen, if possible', async () => {
+      const mockResponse: Organisation[] = [
+        {
+          id: '1',
+          kennung: 'Org1',
+          name: 'Organisation 1',
+          namensergaenzung: 'Ergänzung',
+          kuerzel: 'O1',
+          typ: OrganisationsTyp.Schule,
+          administriertVon: '1',
+        },
+      ];
+      organisationStore.parentOrganisationen = mockResponse;
+      const promise: Promise<void> = organisationStore.getLockingOrganisationById('1');
+      await promise;
+      expect(organisationStore.lockingOrganisation).toEqual(mockResponse[0]);
+      expect(organisationStore.loading).toBe(false);
+    });
+
+    it('uses allOrganisationen, if possible', async () => {
+      const mockResponse: Organisation[] = [
+        {
+          id: '1',
+          kennung: 'Org1',
+          name: 'Organisation 1',
+          namensergaenzung: 'Ergänzung',
+          kuerzel: 'O1',
+          typ: OrganisationsTyp.Schule,
+          administriertVon: '1',
+        },
+      ];
+      organisationStore.allOrganisationen = mockResponse;
+      const promise: Promise<void> = organisationStore.getLockingOrganisationById('1');
+      await promise;
+      expect(organisationStore.lockingOrganisation).toEqual(mockResponse[0]);
+      expect(organisationStore.loading).toBe(false);
+    });
+
     it('should handle string error', async () => {
       mockadapter.onGet('/api/organisationen/1').replyOnce(500, 'some mock server error');
       const promise: Promise<void> = organisationStore.getLockingOrganisationById('1');
