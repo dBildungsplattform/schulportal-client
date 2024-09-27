@@ -1,8 +1,6 @@
 <script setup lang="ts">
-  import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import { onMounted, onUnmounted, ref, type Ref } from 'vue';
+    import { computed, onMounted, onUnmounted, ref, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
-  import SpshAlert from '@/components/alert/SpshAlert.vue';
   import {
     type Router,
     useRouter,
@@ -11,10 +9,13 @@
     type NavigationGuardNext,
   } from 'vue-router';
   import { useDisplay } from 'vuetify';
-  import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
+  import {
+    OrganisationsTyp,
+    useOrganisationStore,
+    type Organisation,
+    type OrganisationStore,
+  } from '@/stores/OrganisationStore';
   import { useForm, type TypedSchema, type BaseFieldProps } from 'vee-validate';
-  import FormWrapper from '@/components/form/FormWrapper.vue';
-  import FormRow from '@/components/form/FormRow.vue';
   import { object, string } from 'yup';
   import { toTypedSchema } from '@vee-validate/yup';
   import { DIN_91379A_EXT, NO_LEADING_TRAILING_SPACES } from '@/utils/validation';
@@ -57,7 +58,7 @@
     validationSchema,
   });
 
-  const preservedSchulform: Ref<string> = ref<string>('');
+  const preservedSchulform: Ref<string | undefined> = ref<string>('');
 
   const [selectedSchulform]: [Ref<string>, Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>] =
     defineField('selectedSchulform', vuetifyConfig);
@@ -69,6 +70,10 @@
     Ref<string>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedDienststellennummer', vuetifyConfig);
+
+  const schultraegerList: ComputedRef<Organisation[] | undefined> = computed(() => {
+    return organisationStore.schultraeger;
+  });
 
   function isFormDirty(): boolean {
     return (
@@ -93,7 +98,9 @@
   const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = handleSubmit(async () => {
     // TODO: remove this assignment once schulform can be retrieved from the backend.
     // (Necessary here since when we flush the form onSubmit the selectedSchulform won't show up in the success page)
-    preservedSchulform.value = selectedSchulform.value;
+    preservedSchulform.value = schultraegerList.value?.find(
+      (schultraeger: Organisation) => schultraeger.id === selectedSchulform.value,
+    )?.name;
     if (selectedDienststellennummer.value && selectedSchulname.value) {
       await organisationStore.createOrganisation(
         selectedDienststellennummer.value,
@@ -101,6 +108,9 @@
         ' ',
         ' ',
         OrganisationsTyp.Schule,
+        undefined,
+        selectedSchulform.value,
+        selectedSchulform.value,
       );
       resetForm();
     }
@@ -135,6 +145,7 @@
 
   onMounted(async () => {
     organisationStore.createdSchule = null;
+    organisationStore.loadSchultraeger();
     /* listen for browser changes and prevent them when form is dirty */
     window.addEventListener('beforeunload', preventNavigation);
   });
@@ -195,25 +206,16 @@
               data-testid="schulform-radio-group"
             >
               <v-col
+                v-for="schultraeger in schultraegerList"
+                :key="schultraeger.id"
                 cols="12"
                 sm="5"
                 class="pb-0"
               >
                 <v-radio
-                  :label="$t('admin.schule.publicSchule')"
-                  :value="$t('admin.schule.publicSchule')"
-                  data-testid="public-schule-radio-button"
-                ></v-radio>
-              </v-col>
-              <v-col
-                cols="12"
-                sm="5"
-                class="pt-0 pt-sm-3 pb-0"
-              >
-                <v-radio
-                  :label="$t('admin.schule.ersatzschule')"
-                  :value="$t('admin.schule.ersatzschule')"
-                  data-testid="ersatzschule-radio-button"
+                  :label="schultraeger.name"
+                  :value="schultraeger.id"
+                  data-testid="schulform-radio-button-${schultraeger.id}"
                 ></v-radio>
               </v-col>
             </v-radio-group>
