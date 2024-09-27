@@ -1937,7 +1937,7 @@
                 </v-row>
                 <v-row
                   class="mt-0"
-                  v-for="{ key, attribute } of getLockInfo"
+                  v-for="({ key, attribute }, index) of getLockInfo"
                   :key="key"
                   cols="10"
                 >
@@ -1945,7 +1945,12 @@
                     class="text-right"
                     cols="4"
                   >
-                    <span class="subtitle-2"> {{ key }}: </span>
+                    <span
+                      class="subtitle-2"
+                      :data-testid="`lock-info-${index}-key`"
+                    >
+                      {{ key }}:
+                    </span>
                   </v-col>
                   <v-col
                     cols="5"
@@ -1954,6 +1959,7 @@
                     <span
                       class="text-body"
                       :title="attribute"
+                      :data-testid="`lock-info-${index}-attribute`"
                     >
                       {{ attribute }}
                     </span>

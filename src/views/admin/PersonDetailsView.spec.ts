@@ -4,15 +4,18 @@ import { useAuthStore, type AuthStore, type UserInfo } from '@/stores/AuthStore'
 import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
 import {
   usePersonStore,
+  type Person,
   type Personendatensatz,
   type PersonStore,
   type PersonWithUebersicht,
 } from '@/stores/PersonStore';
 import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
 import { RollenMerkmal, RollenSystemRecht } from '@/stores/RolleStore';
-import { shallowMount, VueWrapper } from '@vue/test-utils';
+import { DOMWrapper, mount, VueWrapper } from '@vue/test-utils';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import PersonDetailsView from './PersonDetailsView.vue';
+import { nextTick } from 'vue';
+import type { HttpStatusCode } from 'axios';
 // import { nextTick, type ComputedRef, type DefineComponent } from 'vue';
 // import type { TranslatedRolleWithAttrs } from '@/composables/useRollen';
 
@@ -196,7 +199,7 @@ beforeEach(async () => {
   router.push('/');
   await router.isReady();
 
-  wrapper = shallowMount(PersonDetailsView, {
+  wrapper = mount(PersonDetailsView, {
     attachTo: document.getElementById('app') || '',
     global: {
       components: {
@@ -354,4 +357,49 @@ describe('PersonDetailsView', () => {
   //     },
   //   ]);
   // });
+
+  test('displays lockInfo if there is any', async () => {
+    expect(personStore.currentPerson).toBeDefined();
+    expect(wrapper).toBeDefined();
+    personStore.currentPerson!.person.isLocked = false;
+    await nextTick();
+
+    const activeStatusMessage: DOMWrapper<HTMLDivElement> = wrapper!.find('[data-testid="person-lock-info"]');
+    expect(activeStatusMessage.exists()).toBe(true);
+    expect(activeStatusMessage.text()).toContain('aktiv');
+    expect(wrapper!.find('[data-testid="lock-info-0-key"]').exists()).toBe(false);
+    expect(wrapper!.find('[data-testid="lock-info-0-attribute"]').exists()).toBe(false);
+    expect(wrapper!.find('[data-testid="lock-info-1-key"]').exists()).toBe(false);
+    expect(wrapper!.find('[data-testid="lock-info-1-attribute"]').exists()).toBe(false);
+
+    const lockInfo: Person['lockInfo'] = {
+      lock_locked_from: 'Lady Lock',
+      lock_timestamp: '2024-09-27T11:37:35.663Z',
+    };
+
+    personStore.currentPerson!.person.isLocked = true;
+    personStore.currentPerson!.person.lockInfo = lockInfo;
+    organisationStore.lockingOrganisation = {
+      id: '1234',
+      name: lockInfo.lock_locked_from,
+      typ: OrganisationsTyp.Schule,
+    };
+    await nextTick();
+
+    const lockInfoArray: Array<[string, string]> = [
+      ['Gesperrt durch:', lockInfo.lock_locked_from],
+      ['Seit:', '27.09.2024'],
+    ];
+
+    for (let index: number = 0; index < lockInfoArray.length; index++) {
+      const [keyValue, attributeValue]: [string, string] = lockInfoArray[index]!;
+      const keyElement: DOMWrapper<HTMLSpanElement> = wrapper!.find(`[data-testid="lock-info-${index}-key"]`);
+      const attributeElement: DOMWrapper<HTMLSpanElement> = wrapper!.find(
+        `[data-testid="lock-info-${index}-attribute"]`,
+      );
+      expect(keyElement.exists()).toBe(true);
+      expect(keyElement.text()).toContain(keyValue);
+      expect(attributeElement.text()).toContain(attributeValue);
+    }
+  });
 });
