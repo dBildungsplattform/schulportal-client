@@ -182,7 +182,7 @@
             key: t('person.lockedBy'),
             attribute: organisationStore.lockingOrganisation
               ? getOrganisationDisplayName(organisationStore.lockingOrganisation)
-              : t('admin.organisation.unknown'),
+              : t('admin.organisation.unknownOrganisation'),
           };
 
         case LockKeys.Timestamp:
@@ -201,11 +201,14 @@
     });
   });
 
-  watchEffect(() => {
-    if (!personStore.currentPerson?.person.isLocked) return;
-    if (!personStore.currentPerson.person.lockInfo) return;
-    organisationStore.getLockingOrganisationById(personStore.currentPerson.person.lockInfo.lock_locked_from);
-  });
+  watch(
+    () => personStore.currentPerson,
+    async () => {
+      if (!personStore.currentPerson?.person.isLocked) return;
+      if (!personStore.currentPerson.person.lockInfo) return;
+      await organisationStore.getLockingOrganisationById(personStore.currentPerson.person.lockInfo.lock_locked_from);
+    },
+  );
 
   let closeCannotDeleteDialog = (): void => {
     cannotDeleteDialogVisible.value = false;

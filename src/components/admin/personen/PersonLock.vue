@@ -61,12 +61,12 @@
     }
   }
 
-  function handleChangeSchule(value: string): void {
+  function handleChangeOrganisation(value: string): void {
     selectedOrganisation.value = value;
   }
 
-  watch(organisations, (newSchulen: Array<TranslatedObject>) => {
-    if (newSchulen.length === 1) {
+  watch(organisations, (newOrganisations: Array<TranslatedObject>) => {
+    if (newOrganisations.length === 1) {
       selectedOrganisation.value = organisations.value[0]?.value ?? null;
     }
   });
@@ -154,7 +154,7 @@
                   density="compact"
                   id="schule-select"
                   :items="organisations"
-                  @update:modelValue="handleChangeSchule"
+                  @update:modelValue="handleChangeOrganisation"
                   item-value="value"
                   item-text="title"
                   :no-data-text="$t('noDataFound')"
