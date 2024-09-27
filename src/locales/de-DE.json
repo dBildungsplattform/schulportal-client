@@ -177,10 +177,7 @@
       "management": "Benutzerverwaltung",
       "personalInfo": "Persönliche Informationen",
       "personalInfoSuccessDialogMessage": "Die Stammdaten wurden erfolgreich geändert.",
-<<<<<<< HEAD
       "personalInfoSuccessDialogMessageWithUsername": "Die Stammdaten wurden erfolgreich geändert. \n\nDer neue Benutzername lautet: {username}. \n\nDas Passwort wurde nicht verändert und kann wie zuvor verwendet werden. \n\nBitte teilen Sie der betroffenen Person die Stammdatenänderung mit. \n\nBitte schicken Sie die Information nicht an die dienstliche E-Mail-Adresse (...schule-sh.de) der betroffenen Person, da der neue Benutzername für die Anmeldung im Schulportal (und somit auch den Zugriff auf das E-Mail-Postfach) benötigt wird.",
-=======
->>>>>>> 4bd8010cc1dd548d0db1296a90cdcdd9fe63aa86
       "resetPasswordConfirmation": "Sind Sie sicher, dass Sie das Passwort für {firstname} {lastname} zurücksetzen möchten?",
       "resetPasswordInformation": "Bitte teilen Sie dem Benutzer das temporäre Passwort mit. Nach dem Schließen des Dialogs wird es aus Sicherheitsgründen nicht mehr angezeigt.",
       "resetPassword": "Passwort zurücksetzen",
@@ -453,11 +450,7 @@
     "changeRolleDescription": "Ändert die Rolle des Benutzers an der Schule ohne ihn zu entfernen.",
     "changeKlasseDescription": "Ändert die Klasse des Benutzers an der Schule.",
     "changeKlasseNotDisabledDescription": "Bitte wählen Sie eine neue Klasse aus.",
-<<<<<<< HEAD
     "changePersonInfoDisabledDescription": "Bitte ändern Sie den Vorname, Nachname oder Kopers.-Nr., um fortzufahren.",
-=======
-    "changeKopersDisabledDescription": "Bitte geben Sie eine neue KoPers.-Nr. ein.",
->>>>>>> 4bd8010cc1dd548d0db1296a90cdcdd9fe63aa86
     "chooseZuordnungFirst": "Wählen Sie bitte zuerst eine Schulzuordnung aus.",
     "chooseKlasseZuordnungFirst": "Wählen Sie bitte zunächst eine Schulzuordnung mit einer Klasse aus.",
     "deleteZuordnungConfirmation": "Wollen Sie die Schulzuordnung wirklich entfernen?",
