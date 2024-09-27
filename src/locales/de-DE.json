@@ -201,10 +201,12 @@
       "title": {
         "ERROR_LOADING_USER": "Fehler beim Laden des Benutzers.",
         "PERSONALNUMMER_NICHT_EINDEUTIG": "KoPers.-Nr. nicht eindeutig.",
+        "PERSONALNUMMER_REQUIRED": "Personalnummer erforderlich.",
         "PERSON_NOT_FOUND": "Benutzer gelöscht."
       },
       "errors": {
         "PERSONALNUMMER_NICHT_EINDEUTIG": "Die eingegebene KoPers.-Nr. ist bereits vergeben. Bitte korrigieren Sie Ihre Eingabe.",
+        "PERSONALNUMMER_REQUIRED": "Die Änderungen wurden nicht gespeichert, da keine KoPers.-Nr. eingegeben wurde.",
         "ERROR_LOADING_USER": "Es konnten keine Benutzerdaten geladen werden."
       },
       "showAll": "Alle Benutzer anzeigen",
