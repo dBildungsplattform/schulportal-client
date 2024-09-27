@@ -47,17 +47,7 @@
   } from '@/utils/validationPersonenkontext';
   import { toTypedSchema } from '@vee-validate/yup';
   import { useForm, type BaseFieldProps, type FormContext, type TypedSchema } from 'vee-validate';
-  import {
-    computed,
-    onBeforeMount,
-    onMounted,
-    onUnmounted,
-    ref,
-    watch,
-    watchEffect,
-    type ComputedRef,
-    type Ref,
-  } from 'vue';
+  import { computed, onBeforeMount, onMounted, onUnmounted, ref, watch, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import {
     onBeforeRouteLeave,
@@ -968,6 +958,19 @@
     );
   });
 
+  const twoFactorAuthenticationConnectionError: ComputedRef<string> = computed(() => {
+    if (
+      twoFactorAuthentificationStore.errorCode == '500' ||
+      twoFactorAuthentificationStore.errorCode == '502' ||
+      twoFactorAuthentificationStore.errorCode == '503' ||
+      twoFactorAuthentificationStore.errorCode == '504' ||
+      twoFactorAuthentificationStore.errorCode == 'UNSPECIFIED_ERROR'
+    ) {
+      return t('admin.person.twoFactorAuthentication.errors.connection');
+    }
+    return '';
+  });
+
   onBeforeMount(async () => {
     personStore.resetState();
     twoFactorAuthentificationStore.resetState();
@@ -1287,6 +1290,11 @@
                         color="green"
                       ></v-icon>
                       <v-icon
+                        color="warning"
+                        icon="mdi-alert-outline"
+                        v-else-if="twoFactorAuthenticationConnectionError"
+                      ></v-icon>
+                      <v-icon
                         v-else
                         class="mb-2"
                         icon="mdi-information"
@@ -1294,7 +1302,12 @@
                       </v-icon>
                     </v-col>
                     <v-col>
-                      <template v-if="twoFactorAuthentificationStore.hasToken">
+                      <template v-if="twoFactorAuthenticationConnectionError">
+                        <p>
+                          {{ twoFactorAuthenticationConnectionError }}
+                        </p>
+                      </template>
+                      <template v-else-if="twoFactorAuthentificationStore.hasToken">
                         <p v-if="twoFactorAuthentificationStore.tokenKind === TokenKind.software">
                           {{ $t('admin.person.twoFactorAuthentication.softwareTokenIsSetUp') }}
                         </p>
@@ -1324,7 +1337,7 @@
                   class="mr-lg-13"
                   cols="12"
                   md="auto"
-                  v-if="personStore.currentPerson"
+                  v-if="personStore.currentPerson && !twoFactorAuthenticationConnectionError"
                 >
                   <div class="d-flex justify-sm-end">
                     <v-col

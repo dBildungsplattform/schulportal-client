@@ -53,11 +53,13 @@
     },
     "/api/personen": {
       "post": {
-        "operationId": "PersonController_createPerson",
+        "operationId": "PersonController_createPersonMigration",
         "parameters": [],
         "requestBody": {
           "required": true,
-          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CreatePersonBodyParams" } } }
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/CreatePersonMigrationBodyParams" } }
+          }
         },
         "responses": {
           "201": {
@@ -1586,12 +1588,12 @@
     },
     "/api/dbiam/personenkontext": {
       "post": {
-        "operationId": "DBiamPersonenkontextController_createPersonenkontext",
+        "operationId": "DBiamPersonenkontextController_createPersonenkontextMigration",
         "parameters": [],
         "requestBody": {
           "required": true,
           "content": {
-            "application/json": { "schema": { "$ref": "#/components/schemas/DbiamPersonenkontextBodyParams" } }
+            "application/json": { "schema": { "$ref": "#/components/schemas/DbiamPersonenkontextMigrationBodyParams" } }
           }
         },
         "responses": {
@@ -2035,6 +2037,18 @@
           "personenkontexte"
         ]
       },
+      "CreatePersonMigrationBodyParams": {
+        "type": "object",
+        "properties": {
+          "personId": { "type": "string" },
+          "familienname": { "type": "string" },
+          "vorname": { "type": "string" },
+          "hashedPassword": { "type": "string" },
+          "username": { "type": "string" },
+          "personalnummer": { "type": "string" }
+        },
+        "required": ["personId", "familienname", "vorname"]
+      },
       "PersonNameParams": {
         "type": "object",
         "properties": {
@@ -2055,26 +2069,7 @@
         "type": "object",
         "properties": { "datum": { "format": "date-time", "type": "string" }, "geburtsort": { "type": "string" } }
       },
-      "Geschlecht": { "type": "string", "enum": ["m", "w", "d", "x"] },
       "Vertrauensstufe": { "type": "string", "enum": ["KEIN", "UNBE", "TEIL", "VOLL"] },
-      "CreatePersonBodyParams": {
-        "type": "object",
-        "properties": {
-          "email": { "type": "string" },
-          "referrer": { "type": "string" },
-          "stammorganisation": { "type": "string" },
-          "name": { "$ref": "#/components/schemas/PersonNameParams" },
-          "geburt": { "$ref": "#/components/schemas/PersonBirthParams" },
-          "geschlecht": { "$ref": "#/components/schemas/Geschlecht" },
-          "lokalisierung": { "type": "string" },
-          "vertrauensstufe": { "$ref": "#/components/schemas/Vertrauensstufe" },
-          "auskunftssperre": { "type": "boolean" },
-          "hashedPassword": { "type": "string" },
-          "username": { "type": "string" },
-          "personalnummer": { "type": "string" }
-        },
-        "required": ["name"]
-      },
       "PersonResponse": {
         "type": "object",
         "properties": {
@@ -2174,6 +2169,7 @@
       "Rolle": { "type": "string", "enum": ["LERN", "LEHR", "EXTERN", "ORGADMIN", "LEIT", "SYSADMIN"] },
       "Personenstatus": { "type": "string", "enum": ["AKTIV"] },
       "Sichtfreigabe": { "type": "string", "enum": ["ja", "nein"] },
+      "Geschlecht": { "type": "string", "enum": ["m", "w", "d", "x"] },
       "UpdatePersonBodyParams": {
         "type": "object",
         "properties": {
@@ -2784,13 +2780,14 @@
         },
         "required": ["personId", "organisationId", "rolleId", "befristung"]
       },
-      "DbiamPersonenkontextBodyParams": {
+      "DbiamPersonenkontextMigrationBodyParams": {
         "type": "object",
         "properties": {
           "personId": { "type": "string" },
           "organisationId": { "type": "string" },
           "rolleId": { "type": "string" },
-          "befristung": { "format": "date-time", "type": "string" }
+          "befristung": { "format": "date-time", "type": "string" },
+          "email": { "type": "string" }
         },
         "required": ["personId", "organisationId", "rolleId"]
       },
@@ -2831,6 +2828,16 @@
           "canCommit": { "type": "boolean", "description": "Indicates whether the commit action can be performed." }
         },
         "required": ["organisations", "rollen", "selectedOrganisation", "selectedRolle", "canCommit"]
+      },
+      "DbiamPersonenkontextBodyParams": {
+        "type": "object",
+        "properties": {
+          "personId": { "type": "string" },
+          "organisationId": { "type": "string" },
+          "rolleId": { "type": "string" },
+          "befristung": { "format": "date-time", "type": "string" }
+        },
+        "required": ["personId", "organisationId", "rolleId"]
       },
       "DbiamUpdatePersonenkontexteBodyParams": {
         "type": "object",
