@@ -270,7 +270,6 @@
   async function navigateToPersonTable(): Promise<void> {
     await router.push({ name: 'person-management' });
     personenkontextStore.createdPersonWithKontext = null;
-    personenkontextStore.createdPersonenkontextForKlasse = null;
   }
 
   function handleFieldReset(field: string): void {
@@ -336,7 +335,6 @@
 
   const handleCreateAnotherPerson = (): void => {
     personenkontextStore.createdPersonWithKontext = null;
-    personenkontextStore.createdPersonenkontextForKlasse = null;
     formContext.resetForm();
     hasNoKopersNr.value = false;
     // Re-trigger the watchers after resetting the form to auto-select the Befristung since the component isn't remounted
@@ -374,7 +372,6 @@
     await personenkontextStore.processWorkflowStep({ limit: 25 });
     personStore.errorCode = '';
     personenkontextStore.createdPersonWithKontext = null;
-    personenkontextStore.createdPersonenkontextForKlasse = null;
 
     /* listen for browser changes and prevent them when form is dirty */
     window.addEventListener('beforeunload', preventNavigation);
