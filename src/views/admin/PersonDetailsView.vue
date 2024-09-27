@@ -2186,11 +2186,7 @@
                 offset="1"
                 cols="10"
               >
-<<<<<<< HEAD
                 <span>{{ changePersonInfoSuccessMessage }}</span>
-=======
-                <span>{{ $t('admin.person.personalInfoSuccessDialogMessage') }}</span>
->>>>>>> 4bd8010cc1dd548d0db1296a90cdcdd9fe63aa86
               </v-col>
             </v-row>
           </v-container>
