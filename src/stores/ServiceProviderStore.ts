@@ -13,6 +13,7 @@ export type ServiceProvider = {
   hasLogo: boolean;
   logoUrl?: string;
   target: string;
+  requires2fa: boolean;
 };
 
 export type ServiceProviderIdNameResponse = {

@@ -1,11 +1,11 @@
 <script setup lang="ts">
-  import type { DBiamPersonenzuordnungResponse } from '@/api-client/generated/api';
+  import { RollenMerkmal, type DBiamPersonenzuordnungResponse } from '@/api-client/generated/api';
   import SpshTooltip from '@/components/admin/SpshTooltip.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import SelfServiceWorkflow from '@/components/two-factor-authentication/SelfServiceWorkflow.vue';
   import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
   import { OrganisationsTyp } from '@/stores/OrganisationStore';
-  import { usePersonInfoStore, type PersonInfoResponse, type PersonInfoStore } from '@/stores/PersonInfoStore';
+  import { usePersonInfoStore, type PersonInfoStore } from '@/stores/PersonInfoStore';
   import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
   import { type Zuordnung } from '@/stores/PersonenkontextStore';
   import {
@@ -13,7 +13,7 @@
     useTwoFactorAuthentificationStore,
     type TwoFactorAuthentificationStore,
   } from '@/stores/TwoFactorAuthentificationStore';
-  import { computed, onBeforeMount, ref, type ComputedRef, type Ref } from 'vue';
+  import { computed, onBeforeMount, ref, watchEffect, type ComputedRef, type Ref } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { useRoute, useRouter, type RouteLocationNormalizedLoaded, type Router } from 'vue-router';
 
@@ -30,41 +30,21 @@
     testIdLabel: string;
     testIdValue: string;
   };
-
-  const route: RouteLocationNormalizedLoaded = useRoute();
-  const router: Router = useRouter();
-  const kcActionStatus: string | null = route.query['kc_action_status'] as string | null;
-
-  export type SchulDaten = {
+  type SchulDaten = {
     title: string;
     info?: string | null;
     schulAdmins?: string[];
     labelAndValues: LabelValue[];
   };
 
+  const route: RouteLocationNormalizedLoaded = useRoute();
+  const router: Router = useRouter();
+  const kcActionStatus: string | null = route.query['kc_action_status'] as string | null;
+
+  const authStore: AuthStore = useAuthStore();
   const personInfoStore: PersonInfoStore = usePersonInfoStore();
   const personStore: PersonStore = usePersonStore();
-  const twoFactorAuthentificationStore: TwoFactorAuthentificationStore = useTwoFactorAuthentificationStore();
-  const authStore: AuthStore = useAuthStore();
-  const personalData: Ref = ref<LabelValue[]>([]);
-  const schulDaten: Ref = ref<SchulDaten[]>([]);
-  const hasKoPersMerkmal: Ref = ref<boolean>(false);
-  const lastPasswordChangeDate: ComputedRef<string> = computed(() => {
-    const passwordUpdatedAt: string | null | undefined = authStore.currentUser?.password_updated_at;
-    if (!passwordUpdatedAt) return '';
-    const date: Date = new Date(passwordUpdatedAt);
-    if (isNaN(date.valueOf())) return '';
-    return new Intl.DateTimeFormat('de-DE', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-    }).format(date);
-  });
-
-  function handleGoToPreviousPage(): void {
-    const previousUrl: string | null = sessionStorage.getItem('previousUrl');
-    router.push(previousUrl ?? '/start');
-  }
+  const twoFactorAuthenticationStore: TwoFactorAuthentificationStore = useTwoFactorAuthentificationStore();
 
   const windowOrigin: string = window.location.origin;
 
@@ -179,43 +159,46 @@
     return result;
   }
 
-  async function initializeStores(): Promise<void> {
-    await personInfoStore.initPersonInfo();
-    await personStore.getPersonenuebersichtById(personInfoStore.personInfo?.person.id ?? '');
-  }
+  const hasKoPersMerkmal: ComputedRef<boolean> = computed(() => {
+    return (
+      personStore.personenuebersicht?.zuordnungen.find((zuordnung: DBiamPersonenzuordnungResponse) => {
+        return zuordnung.merkmale.includes(RollenMerkmal.KopersPflicht);
+      }) !== undefined
+    );
+  });
 
-  function setupPersonalData(): void {
-    if (!personInfoStore.personInfo) return;
-    const personInfo: PersonInfoResponse = personInfoStore.personInfo;
-    personalData.value = [
-      {
-        label: t('profile.fullName'),
-        value: personInfo.person.name.vorname + ' ' + personInfo.person.name.familiennamen,
-        testIdLabel: 'fullName-label',
-        testIdValue: 'fullName-value',
-      },
-      {
+  const personalData: ComputedRef<LabelValue[]> = computed(() => {
+    const data: LabelValue[] = [];
+    if (!personInfoStore.personInfo) return data;
+    data.push({
+      label: t('profile.fullName'),
+      value:
+        personInfoStore.personInfo.person.name.vorname + ' ' + personInfoStore.personInfo.person.name.familiennamen,
+      testIdLabel: 'fullName-label',
+      testIdValue: 'fullName-value',
+    });
+    if (personInfoStore.personInfo.person.referrer)
+      data.push({
         label: t('person.userName'),
-        value: personInfo.person.referrer,
+        value: personInfoStore.personInfo.person.referrer,
         testIdLabel: 'userName-label',
         testIdValue: 'userName-value',
-      },
-    ];
-
-    if (personInfo.person.personalnummer || hasKoPersMerkmal.value) {
-      personalData.value.push({
-        label: t('profile.koPersNummer'),
-        labelAbbr: t('profile.koPersNummerAbbr'),
-        value: personInfo.person.personalnummer,
-        type: ItemType.KO_PERS,
-        testIdLabel: 'kopersnummer-label',
-        testIdValue: 'kopersnummer-value',
       });
-    }
-  }
 
-  function setupSchuleData(): void {
-    if (!personStore.personenuebersicht) return;
+    if (!(personInfoStore.personInfo.person.personalnummer && hasKoPersMerkmal.value)) return data;
+    data.push({
+      label: t('profile.koPersNummer'),
+      labelAbbr: t('profile.koPersNummerAbbr'),
+      value: personInfoStore.personInfo.person.personalnummer,
+      type: ItemType.KO_PERS,
+      testIdLabel: 'kopersnummer-label',
+      testIdValue: 'kopersnummer-value',
+    });
+    return data;
+  });
+
+  const schulDaten: ComputedRef<SchulDaten[]> = computed(() => {
+    if (!personStore.personenuebersicht) return [];
     const personenZuordnungen: Zuordnung[] = personStore.personenuebersicht.zuordnungen;
     const groupedZuordnungen: Map<string, Zuordnung[]> = groupZuordnungen(
       personenZuordnungen.map(
@@ -228,7 +211,34 @@
     );
 
     const composedZuordnungen: Zuordnung[] = createComposedZuordnungen(groupedZuordnungen);
-    schulDaten.value = createZuordnungsSchuleDaten(composedZuordnungen);
+    return createZuordnungsSchuleDaten(composedZuordnungen);
+  });
+
+  const lastPasswordChangeDate: ComputedRef<string> = computed(() => {
+    const passwordUpdatedAt: string | null | undefined = authStore.currentUser?.password_updated_at;
+    if (!passwordUpdatedAt) return '';
+    const date: Date = new Date(passwordUpdatedAt);
+    if (isNaN(date.valueOf())) return '';
+    return new Intl.DateTimeFormat('de-DE', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).format(date);
+  });
+
+  const twoFactorAuthError: ComputedRef<string> = computed(() => {
+    if (twoFactorAuthenticationStore.loading) return '';
+    if (twoFactorAuthenticationStore.errorCode) return t('admin.person.twoFactorAuthentication.errors.connection');
+    return '';
+  });
+
+  function handleGoToPreviousPage(): void {
+    const previousUrl: string | null = sessionStorage.getItem('previousUrl');
+    router.push(previousUrl ?? '/start');
+  }
+
+  async function initializeStores(): Promise<void> {
+    await personInfoStore.initPersonInfo();
   }
 
   const isPasswordResetDialogActive: Ref<boolean> = ref(false);
@@ -254,23 +264,15 @@
     window.location.href = url.toString();
   }
 
-  function hasKoPersMerkmalCheck(): void {
-    let zuordnungen: Array<DBiamPersonenzuordnungResponse> | undefined = personStore.personenuebersicht?.zuordnungen;
-    if (zuordnungen !== undefined) {
-      let result: boolean = !!zuordnungen.find((zuordnung: DBiamPersonenzuordnungResponse) => {
-        return zuordnung.merkmale.includes('KOPERS_PFLICHT');
-      });
-      hasKoPersMerkmal.value = result;
-    }
-  }
+  watchEffect(async () => {
+    if (!personInfoStore.personInfo?.person.id) return;
+    await twoFactorAuthenticationStore.get2FARequirement(personInfoStore.personInfo.person.id);
+    await personStore.getPersonenuebersichtById(personInfoStore.personInfo.person.id);
+    await twoFactorAuthenticationStore.get2FAState(personInfoStore.personInfo.person.id);
+  });
+
   onBeforeMount(async () => {
     await initializeStores();
-    hasKoPersMerkmalCheck();
-    setupPersonalData();
-    setupSchuleData();
-    if (personInfoStore.personInfo?.person.id) {
-      await twoFactorAuthentificationStore.get2FAState(personInfoStore.personInfo.person.id);
-    }
   });
 </script>
 
@@ -416,7 +418,7 @@
               </v-table>
               <p
                 class="pt-4 text-center text-body-1"
-                v-if="schuleData.schoolAdmins?.length > 0"
+                v-if="schuleData.schulAdmins && schuleData.schulAdmins.length > 0"
                 data-testid="school-admins-${index}"
               >
                 <v-icon
@@ -528,6 +530,7 @@
       </v-col>
 
       <v-col
+        v-if="!twoFactorAuthenticationStore.loading && twoFactorAuthenticationStore.required"
         cols="12"
         sm="12"
         md="6"
@@ -535,79 +538,108 @@
         <LayoutCard
           :headline-test-id="'two-factor-card'"
           :header="$t('profile.twoFactorAuth')"
-          v-if="twoFactorAuthentificationStore.hasToken != undefined"
         >
           <v-row
-            v-if="twoFactorAuthentificationStore.hasToken === false"
-            class="ma-3 d-flex align-content-center justify-center ga-4"
+            v-if="twoFactorAuthenticationStore.hasToken === false"
+            align="center"
+            justify="center"
+            class="ma-3 ga-4"
           >
             <v-icon
               size="x-large"
-              class="w-100"
               icon="mdi-shield-account-outline"
               data-testid="two-factor-icon"
             ></v-icon>
-            <v-row class="mt-4 text-body align-content-center justify-center">
-              <v-icon
-                icon="mdi-alert-circle"
-                color="orange"
-              ></v-icon>
-              <p class="ml-2">
-                {{ $t('admin.person.twoFactorAuthentication.SecondFactorNotSet') }}
-              </p>
-            </v-row>
-            <div>
-              <SelfServiceWorkflow
-                :personId="personInfoStore.personInfo?.person.id ?? ''"
-                @updateState="twoFactorAuthentificationStore.get2FAState(personInfoStore.personInfo?.person.id ?? '')"
-              >
-              </SelfServiceWorkflow>
-            </div>
           </v-row>
           <v-row
-            v-if="twoFactorAuthentificationStore.hasToken === true"
-            class="ma-3 d-flex align-content-center justify-center ga-4"
+            align="center"
+            justify="center"
+            class="ma-3 text-body"
           >
-            <v-col>
-              <v-row class="text-body">
+            <v-col
+              :sm="twoFactorAuthenticationStore.hasToken === false ? 6 : null"
+              :md="twoFactorAuthenticationStore.hasToken === false ? 'auto' : null"
+              cols="12"
+            >
+              <v-row :justify="twoFactorAuthenticationStore.hasToken === false ? 'center' : null">
                 <v-col
-                  class="text-right"
                   cols="1"
+                  align-self="center"
+                  class="text-right"
                 >
                   <v-icon
-                    icon="mdi-check-circle"
+                    v-if="twoFactorAuthError"
+                    color="warning"
+                    icon="mdi-alert-outline"
+                  ></v-icon>
+                  <v-icon
+                    v-else-if="twoFactorAuthenticationStore.hasToken === false"
+                    color="warning"
+                    icon="mdi-alert-circle"
+                  ></v-icon>
+                  <v-icon
+                    v-else-if="twoFactorAuthenticationStore.hasToken === true"
                     color="green"
+                    icon="mdi-check-circle"
                   ></v-icon>
                 </v-col>
-                <div class="v-col">
-                  <p v-if="twoFactorAuthentificationStore.tokenKind === TokenKind.software">
-                    {{ $t('admin.person.twoFactorAuthentication.softwareTokenIsSetUpSelfService') }}
+                <v-col>
+                  <p data-testid="two-factor-info">
+                    <template v-if="twoFactorAuthError">
+                      {{ twoFactorAuthError }}
+                    </template>
+                    <template v-else-if="twoFactorAuthenticationStore.hasToken === false">
+                      {{ $t('admin.person.twoFactorAuthentication.SecondFactorNotSet') }}
+                    </template>
+                    <template v-else-if="twoFactorAuthenticationStore.hasToken === true">
+                      <template v-if="twoFactorAuthenticationStore.tokenKind === TokenKind.software">
+                        {{ $t('admin.person.twoFactorAuthentication.softwareTokenIsSetUpSelfService') }}
+                      </template>
+                      <template v-else-if="twoFactorAuthenticationStore.tokenKind === TokenKind.hardware">
+                        {{
+                          $t('admin.person.twoFactorAuthentication.hardwareTokenIsSetUpSelfService', {
+                            serialNumber: twoFactorAuthenticationStore.serial,
+                          })
+                        }}
+                      </template>
+                    </template>
                   </p>
-                  <p v-else-if="twoFactorAuthentificationStore.tokenKind === TokenKind.hardware">
-                    {{
-                      $t('admin.person.twoFactorAuthentication.hardwareTokenIsSetUpSelfService', {
-                        serialNumber: twoFactorAuthentificationStore.serial,
-                      })
-                    }}
-                  </p>
-                </div>
-              </v-row>
-              <v-row class="mt-4 text-body">
-                <v-col
-                  class="text-right"
-                  cols="1"
-                >
-                  <v-icon
-                    class="mb-2"
-                    icon="mdi-information"
-                  >
-                  </v-icon>
                 </v-col>
-                <div class="v-col">
-                  <p>
-                    {{ $t('admin.person.twoFactorAuthentication.questionsProblems') }}
-                  </p>
-                </div>
+              </v-row>
+            </v-col>
+            <v-col
+              cols="12"
+              v-if="!twoFactorAuthError"
+            >
+              <v-row
+                align="center"
+                justify="center"
+              >
+                <template v-if="twoFactorAuthenticationStore.hasToken === false">
+                  <SelfServiceWorkflow
+                    :personId="personInfoStore.personInfo?.person.id ?? ''"
+                    @updateState="twoFactorAuthenticationStore.get2FAState(personInfoStore.personInfo?.person.id ?? '')"
+                  >
+                  </SelfServiceWorkflow>
+                </template>
+                <template v-else-if="twoFactorAuthenticationStore.hasToken === true">
+                  <v-col
+                    cols="1"
+                    align-self="center"
+                    class="text-right"
+                  >
+                    <v-icon
+                      class="mb-2"
+                      icon="mdi-information"
+                    >
+                    </v-icon>
+                  </v-col>
+                  <v-col>
+                    <p>
+                      {{ $t('admin.person.twoFactorAuthentication.questionsProblems') }}
+                    </p>
+                  </v-col>
+                </template>
               </v-row>
             </v-col>
           </v-row>
