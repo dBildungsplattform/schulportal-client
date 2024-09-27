@@ -512,23 +512,19 @@ describe('PersonStore', () => {
       const familienname = 'Vimes';
       const personalnummer = '9876';
 
-      const mockCurrentPerson: PersonendatensatzResponse = {
+  const mockCurrentPerson: Personendatensatz = {
         person: {
           id: personId,
           name: {
             familienname: 'Old',
             vorname: 'Name',
           },
-          mandant: '',
-          geburt: {},
-          stammorganisation: '',
-          geschlecht: '',
-          lokalisierung: '',
-          vertrauensstufe: Vertrauensstufe.Teil,
           revision: '1',
-          startpasswort: '',
-          lastModified: '2099-12-22',
-          
+          lastModified: '2099-01-01',
+          referrer: '6978',
+          personalnummer: personalnummer,
+          isLocked: false,
+          lockInfo: null,
         },
       };
 
@@ -543,7 +539,17 @@ describe('PersonStore', () => {
           },
           personalnummer,
           revision: '2',
-          lastModified: '2024-01-02',
+          lastModified: '2099-01-02',
+          referrer: '6978',
+          isLocked: false,
+          lockInfo: null,
+          mandant: '',
+          geburt: {},
+          stammorganisation: '',
+          geschlecht: '',
+          lokalisierung: '',
+          vertrauensstufe: Vertrauensstufe.Teil,
+          startpasswort: '',
         },
       };
 
@@ -552,7 +558,7 @@ describe('PersonStore', () => {
         familienname,
         personalnummer,
         revision: '1',
-        lastModified: '2024-01-01',
+        lastModified: '2099-01-01',
       };
 
       mockadapter.onPatch(`/api/personen/${personId}/metadata`).reply((config) => {
