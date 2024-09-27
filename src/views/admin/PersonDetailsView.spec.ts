@@ -10,6 +10,7 @@ import {
   type OrganisationStore,
 } from '@/stores/OrganisationStore';
 import {
+  type Person,
   usePersonStore,
   type Personendatensatz,
   type PersonStore,
@@ -37,8 +38,8 @@ const mockPerson: Personendatensatz = {
       vorname: 'John',
     },
     referrer: 'jorton',
-    personalnummer: null,
-    isLocked: null,
+    personalnummer: '263578',
+    isLocked: false,
     lockInfo: null,
     revision: '1',
     lastModified: '2024-05-22',
@@ -94,7 +95,7 @@ const mockPersonenuebersicht: PersonWithUebersicht = {
       administriertVon: '2',
       editable: true,
       merkmale: [] as unknown as RollenMerkmal,
-      befristung: '2024-05-06',
+      befristung: '',
     },
     {
       sskId: '3',
@@ -106,7 +107,7 @@ const mockPersonenuebersicht: PersonWithUebersicht = {
       administriertVon: '2',
       editable: true,
       merkmale: [] as unknown as RollenMerkmal,
-      befristung: '2024-05-06',
+      befristung: '',
     },
     {
       sskId: '2',
@@ -118,7 +119,7 @@ const mockPersonenuebersicht: PersonWithUebersicht = {
       administriertVon: '1',
       editable: true,
       merkmale: [] as unknown as RollenMerkmal,
-      befristung: '2024-05-06',
+      befristung: '',
     },
   ],
 };
@@ -221,38 +222,40 @@ describe('PersonDetailsView', () => {
     expect(wrapper?.getComponent({ name: 'PasswordReset' })).toBeTruthy();
   });
 
-  // test('Renders details for the current person', async () => {
-  //   const date: string = '01.01.2024';
-  //   const datetime: string = `${date} 12:34:00`;
-  //   const lockInfo: Person['lockInfo'] = {
-  //     lock_locked_from: 'test',
-  //     lock_timestamp: datetime,
-  //   };
-  //   // Mock the current person in the store
-  //   personStore.currentPerson = mapPersonendatensatzResponseToPersonendatensatz({
-  //     person: {
-  //       id: '1234',
-  //       name: {
-  //         familienname: 'Vimes',
-  //         vorname: 'Samuel',
-  //       },
-  //       isLocked: true,
-  //       lockInfo,
-  //     },
-  //   } as PersonendatensatzResponse);
+  test('it renders details for a locked person', async () => {
+    const date: string = '01.01.2024';
+    const datetime: string = `${date} 12:34:00`;
+    const lockInfo: Person['lockInfo'] = {
+      lock_locked_from: 'test',
+      lock_timestamp: datetime,
+    };
 
-  //   const vornameElement: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="person-vorname"]');
-  //   const lockInfoContainer: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="person-lock-info"]');
+    // Mock the current person in the store
+    personStore.currentPerson = {
+      person: {
+        id: '1234',
+        name: {
+          familienname: 'Vimes',
+          vorname: 'Samuel',
+        },
+        referrer: '6978',
+        personalnummer: '9183756',
+        isLocked: true,
+        lockInfo,
+        revision: '1',
+        lastModified: '2024-12-22',
+      },
+    };
+    await nextTick();
 
-  //   // Check if the element exists and has the correct text content
-  //   expect(vornameElement?.text()).toBe('Samuel');
-  //   expect(lockInfoContainer?.html()).toContain(lockInfo.lock_locked_from);
-  //   expect(lockInfoContainer?.html()).toContain(date);
-  // });
+    const vornameElement: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="person-vorname"]');
+    const lockInfoContainer: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="person-lock-info"]');
 
-  // TODO: how do we fix this test?
-  // We have to use shallowMount instead of mount and comment all tests to make sonar accept coverage.
-  // As soon as we use mount to write meaningful tests, sonar will complain about the coverage.
+    // Check if the element exists and has the correct text content
+    expect(vornameElement?.text()).toBe('Samuel');
+    expect(lockInfoContainer?.html()).toContain(lockInfo.lock_locked_from);
+    expect(lockInfoContainer?.html()).toContain(date);
+  });
 
   test('it navigates back to user table', async () => {
     const push: MockInstance<[to: RouteLocationRaw], Promise<void | NavigationFailure | undefined>> = vi.spyOn(
@@ -264,7 +267,7 @@ describe('PersonDetailsView', () => {
   });
 
   test('it shows an error if error code exists', async () => {
-    personStore.errorCode = 'UNSPECIFIED_ERROR';
+    personStore.errorCode = 'ERROR_LOADING_USER';
     await nextTick();
 
     expect(wrapper?.find('[data-testid="alert-title"]').text()).toBe('Fehler beim Laden des Benutzers');
@@ -315,31 +318,7 @@ describe('PersonDetailsView', () => {
 
     expect(klasseChangeFormComponent?.exists()).toBe(true);
   });
-  test('Renders details for the current person', async () => {
-    // Mock the current person in the store
-    personStore.currentPerson = {
-      person: {
-        id: '1234',
-        name: {
-          familienname: 'Vimes',
-          vorname: 'Samuel',
-        },
-        referrer: '6978',
-        personalnummer: '9183756',
-        isLocked: false,
-        lockInfo: null,
-        revision: '1',
-        lastModified: '2024-12-22',
-      },
-    };
 
-    await nextTick();
-
-    const vornameElement: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="person-vorname"]');
-
-    // Check if the element exists and has the correct text content
-    expect(vornameElement?.text()).toBe('Samuel');
-  });
   test('filteredRollen returns correct roles based on person context and selection', async () => {
     interface PersonDetailsViewType extends DefineComponent {
       filteredRollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined>;

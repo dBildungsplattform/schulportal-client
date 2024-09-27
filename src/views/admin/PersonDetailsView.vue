@@ -1454,7 +1454,7 @@
               </v-col>
               <v-col
                 cols="12"
-                v-for="zuordnung in getZuordnungen?.filter((zuordnung) => zuordnung.editable)"
+                v-for="zuordnung in getZuordnungen?.filter((zuordnung: Zuordnung) => zuordnung.editable)"
                 :key="zuordnung.sskId"
                 :data-testid="`person-zuordnung-${zuordnung.sskId}`"
                 :title="zuordnung.sskName"
@@ -1596,7 +1596,9 @@
                     :errorCode="personStore.errorCode"
                     :person="personStore.currentPerson"
                     :disabled="selectedZuordnungen.length === 0"
-                    :zuordnungCount="zuordnungenResult?.filter((zuordnung) => zuordnung.editable).length ?? 0"
+                    :zuordnungCount="
+                      zuordnungenResult?.filter((zuordnung: Zuordnung) => zuordnung.editable).length ?? 0
+                    "
                     @onDeletePersonenkontext="prepareDeletion"
                   >
                   </PersonenkontextDelete>
