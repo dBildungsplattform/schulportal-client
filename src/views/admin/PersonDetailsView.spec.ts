@@ -12,10 +12,9 @@ import {
 import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
 import { RollenMerkmal, RollenSystemRecht } from '@/stores/RolleStore';
 import { DOMWrapper, mount, VueWrapper } from '@vue/test-utils';
+import { nextTick } from 'vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import PersonDetailsView from './PersonDetailsView.vue';
-import { nextTick } from 'vue';
-import type { HttpStatusCode } from 'axios';
 // import { nextTick, type ComputedRef, type DefineComponent } from 'vue';
 // import type { TranslatedRolleWithAttrs } from '@/composables/useRollen';
 
