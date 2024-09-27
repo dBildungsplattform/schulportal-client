@@ -1,10 +1,10 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { DOMWrapper, mount, VueWrapper } from '@vue/test-utils';
+import { describe, it, expect, beforeEach, vi, type Mock } from 'vitest';
+import { mount, VueWrapper } from '@vue/test-utils';
 import PersonInfoChange from './PersonenInfoChange.vue';
 
 describe('PersonInfoChange', () => {
   let wrapper: VueWrapper;
-  const mockConfirmUnsavedChangesAction = vi.fn();
+  const mockConfirmUnsavedChangesAction: Mock = vi.fn();
 
   beforeEach(() => {
     wrapper = mount(PersonInfoChange, {
