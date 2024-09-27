@@ -178,84 +178,46 @@ export interface CreateOrganisationBodyParams {
 /**
  * 
  * @export
- * @interface CreatePersonBodyParams
+ * @interface CreatePersonMigrationBodyParams
  */
-export interface CreatePersonBodyParams {
+export interface CreatePersonMigrationBodyParams {
     /**
      * 
      * @type {string}
-     * @memberof CreatePersonBodyParams
+     * @memberof CreatePersonMigrationBodyParams
      */
-    'email'?: string;
+    'personId': string;
     /**
      * 
      * @type {string}
-     * @memberof CreatePersonBodyParams
+     * @memberof CreatePersonMigrationBodyParams
      */
-    'referrer'?: string;
+    'familienname': string;
     /**
      * 
      * @type {string}
-     * @memberof CreatePersonBodyParams
+     * @memberof CreatePersonMigrationBodyParams
      */
-    'stammorganisation'?: string;
-    /**
-     * 
-     * @type {PersonNameParams}
-     * @memberof CreatePersonBodyParams
-     */
-    'name': PersonNameParams;
-    /**
-     * 
-     * @type {PersonBirthParams}
-     * @memberof CreatePersonBodyParams
-     */
-    'geburt'?: PersonBirthParams;
-    /**
-     * 
-     * @type {Geschlecht}
-     * @memberof CreatePersonBodyParams
-     */
-    'geschlecht'?: Geschlecht;
+    'vorname': string;
     /**
      * 
      * @type {string}
-     * @memberof CreatePersonBodyParams
-     */
-    'lokalisierung'?: string;
-    /**
-     * 
-     * @type {Vertrauensstufe}
-     * @memberof CreatePersonBodyParams
-     */
-    'vertrauensstufe'?: Vertrauensstufe;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof CreatePersonBodyParams
-     */
-    'auskunftssperre'?: boolean;
-    /**
-     * 
-     * @type {string}
-     * @memberof CreatePersonBodyParams
+     * @memberof CreatePersonMigrationBodyParams
      */
     'hashedPassword'?: string;
     /**
      * 
      * @type {string}
-     * @memberof CreatePersonBodyParams
+     * @memberof CreatePersonMigrationBodyParams
      */
     'username'?: string;
     /**
      * 
      * @type {string}
-     * @memberof CreatePersonBodyParams
+     * @memberof CreatePersonMigrationBodyParams
      */
     'personalnummer'?: string;
 }
-
-
 /**
  * 
  * @export
@@ -623,7 +585,7 @@ export const DbiamPersonErrorI18nKeyEnum = {
     FamiliennameEnthaeltLeerzeichen: 'FAMILIENNAME_ENTHAELT_LEERZEICHEN',
     PersonNotFound: 'PERSON_NOT_FOUND',
     DownstreamUnreachable: 'DOWNSTREAM_UNREACHABLE',
-    PersonalnummerOrVornameOrFamiliennameRequired: 'PERSONALNUMMER_OR_VORNAME_OR_FAMILIENNAME_REQUIRED',
+    PersonalnummerRequired: 'PERSONALNUMMER_REQUIRED',
     NewerVersionOfPersonAvailable: 'NEWER_VERSION_OF_PERSON_AVAILABLE',
     PersonalnummerNichtEindeutig: 'PERSONALNUMMER_NICHT_EINDEUTIG'
 } as const;
@@ -693,6 +655,43 @@ export const DbiamPersonenkontextErrorI18nKeyEnum = {
 
 export type DbiamPersonenkontextErrorI18nKeyEnum = typeof DbiamPersonenkontextErrorI18nKeyEnum[keyof typeof DbiamPersonenkontextErrorI18nKeyEnum];
 
+/**
+ * 
+ * @export
+ * @interface DbiamPersonenkontextMigrationBodyParams
+ */
+export interface DbiamPersonenkontextMigrationBodyParams {
+    /**
+     * 
+     * @type {string}
+     * @memberof DbiamPersonenkontextMigrationBodyParams
+     */
+    'personId': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof DbiamPersonenkontextMigrationBodyParams
+     */
+    'organisationId': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof DbiamPersonenkontextMigrationBodyParams
+     */
+    'rolleId': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof DbiamPersonenkontextMigrationBodyParams
+     */
+    'befristung'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof DbiamPersonenkontextMigrationBodyParams
+     */
+    'email'?: string;
+}
 /**
  * 
  * @export
@@ -1604,7 +1603,7 @@ export interface PersonResponse {
      * @type {string}
      * @memberof PersonResponse
      */
-    'lastModified': string | null;
+    'lastModified': string;
 }
 
 
@@ -3690,13 +3689,13 @@ export const DbiamPersonenkontexteApiAxiosParamCreator = function (configuration
     return {
         /**
          * 
-         * @param {DbiamPersonenkontextBodyParams} dbiamPersonenkontextBodyParams 
+         * @param {DbiamPersonenkontextMigrationBodyParams} dbiamPersonenkontextMigrationBodyParams 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        dBiamPersonenkontextControllerCreatePersonenkontext: async (dbiamPersonenkontextBodyParams: DbiamPersonenkontextBodyParams, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'dbiamPersonenkontextBodyParams' is not null or undefined
-            assertParamExists('dBiamPersonenkontextControllerCreatePersonenkontext', 'dbiamPersonenkontextBodyParams', dbiamPersonenkontextBodyParams)
+        dBiamPersonenkontextControllerCreatePersonenkontextMigration: async (dbiamPersonenkontextMigrationBodyParams: DbiamPersonenkontextMigrationBodyParams, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'dbiamPersonenkontextMigrationBodyParams' is not null or undefined
+            assertParamExists('dBiamPersonenkontextControllerCreatePersonenkontextMigration', 'dbiamPersonenkontextMigrationBodyParams', dbiamPersonenkontextMigrationBodyParams)
             const localVarPath = `/api/dbiam/personenkontext`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -3724,7 +3723,7 @@ export const DbiamPersonenkontexteApiAxiosParamCreator = function (configuration
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(dbiamPersonenkontextBodyParams, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(dbiamPersonenkontextMigrationBodyParams, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -3784,12 +3783,12 @@ export const DbiamPersonenkontexteApiFp = function(configuration?: Configuration
     return {
         /**
          * 
-         * @param {DbiamPersonenkontextBodyParams} dbiamPersonenkontextBodyParams 
+         * @param {DbiamPersonenkontextMigrationBodyParams} dbiamPersonenkontextMigrationBodyParams 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async dBiamPersonenkontextControllerCreatePersonenkontext(dbiamPersonenkontextBodyParams: DbiamPersonenkontextBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DBiamPersonenkontextResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.dBiamPersonenkontextControllerCreatePersonenkontext(dbiamPersonenkontextBodyParams, options);
+        async dBiamPersonenkontextControllerCreatePersonenkontextMigration(dbiamPersonenkontextMigrationBodyParams: DbiamPersonenkontextMigrationBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DBiamPersonenkontextResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.dBiamPersonenkontextControllerCreatePersonenkontextMigration(dbiamPersonenkontextMigrationBodyParams, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -3814,12 +3813,12 @@ export const DbiamPersonenkontexteApiFactory = function (configuration?: Configu
     return {
         /**
          * 
-         * @param {DbiamPersonenkontextBodyParams} dbiamPersonenkontextBodyParams 
+         * @param {DbiamPersonenkontextMigrationBodyParams} dbiamPersonenkontextMigrationBodyParams 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        dBiamPersonenkontextControllerCreatePersonenkontext(dbiamPersonenkontextBodyParams: DbiamPersonenkontextBodyParams, options?: any): AxiosPromise<DBiamPersonenkontextResponse> {
-            return localVarFp.dBiamPersonenkontextControllerCreatePersonenkontext(dbiamPersonenkontextBodyParams, options).then((request) => request(axios, basePath));
+        dBiamPersonenkontextControllerCreatePersonenkontextMigration(dbiamPersonenkontextMigrationBodyParams: DbiamPersonenkontextMigrationBodyParams, options?: any): AxiosPromise<DBiamPersonenkontextResponse> {
+            return localVarFp.dBiamPersonenkontextControllerCreatePersonenkontextMigration(dbiamPersonenkontextMigrationBodyParams, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -3841,12 +3840,12 @@ export const DbiamPersonenkontexteApiFactory = function (configuration?: Configu
 export interface DbiamPersonenkontexteApiInterface {
     /**
      * 
-     * @param {DbiamPersonenkontextBodyParams} dbiamPersonenkontextBodyParams 
+     * @param {DbiamPersonenkontextMigrationBodyParams} dbiamPersonenkontextMigrationBodyParams 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DbiamPersonenkontexteApiInterface
      */
-    dBiamPersonenkontextControllerCreatePersonenkontext(dbiamPersonenkontextBodyParams: DbiamPersonenkontextBodyParams, options?: AxiosRequestConfig): AxiosPromise<DBiamPersonenkontextResponse>;
+    dBiamPersonenkontextControllerCreatePersonenkontextMigration(dbiamPersonenkontextMigrationBodyParams: DbiamPersonenkontextMigrationBodyParams, options?: AxiosRequestConfig): AxiosPromise<DBiamPersonenkontextResponse>;
 
     /**
      * 
@@ -3868,13 +3867,13 @@ export interface DbiamPersonenkontexteApiInterface {
 export class DbiamPersonenkontexteApi extends BaseAPI implements DbiamPersonenkontexteApiInterface {
     /**
      * 
-     * @param {DbiamPersonenkontextBodyParams} dbiamPersonenkontextBodyParams 
+     * @param {DbiamPersonenkontextMigrationBodyParams} dbiamPersonenkontextMigrationBodyParams 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DbiamPersonenkontexteApi
      */
-    public dBiamPersonenkontextControllerCreatePersonenkontext(dbiamPersonenkontextBodyParams: DbiamPersonenkontextBodyParams, options?: AxiosRequestConfig) {
-        return DbiamPersonenkontexteApiFp(this.configuration).dBiamPersonenkontextControllerCreatePersonenkontext(dbiamPersonenkontextBodyParams, options).then((request) => request(this.axios, this.basePath));
+    public dBiamPersonenkontextControllerCreatePersonenkontextMigration(dbiamPersonenkontextMigrationBodyParams: DbiamPersonenkontextMigrationBodyParams, options?: AxiosRequestConfig) {
+        return DbiamPersonenkontexteApiFp(this.configuration).dBiamPersonenkontextControllerCreatePersonenkontextMigration(dbiamPersonenkontextMigrationBodyParams, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -5593,13 +5592,13 @@ export const PersonenApiAxiosParamCreator = function (configuration?: Configurat
     return {
         /**
          * 
-         * @param {CreatePersonBodyParams} createPersonBodyParams 
+         * @param {CreatePersonMigrationBodyParams} createPersonMigrationBodyParams 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        personControllerCreatePerson: async (createPersonBodyParams: CreatePersonBodyParams, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'createPersonBodyParams' is not null or undefined
-            assertParamExists('personControllerCreatePerson', 'createPersonBodyParams', createPersonBodyParams)
+        personControllerCreatePersonMigration: async (createPersonMigrationBodyParams: CreatePersonMigrationBodyParams, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'createPersonMigrationBodyParams' is not null or undefined
+            assertParamExists('personControllerCreatePersonMigration', 'createPersonMigrationBodyParams', createPersonMigrationBodyParams)
             const localVarPath = `/api/personen`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -5627,7 +5626,7 @@ export const PersonenApiAxiosParamCreator = function (configuration?: Configurat
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(createPersonBodyParams, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(createPersonMigrationBodyParams, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -6111,12 +6110,12 @@ export const PersonenApiFp = function(configuration?: Configuration) {
     return {
         /**
          * 
-         * @param {CreatePersonBodyParams} createPersonBodyParams 
+         * @param {CreatePersonMigrationBodyParams} createPersonMigrationBodyParams 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async personControllerCreatePerson(createPersonBodyParams: CreatePersonBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonendatensatzResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.personControllerCreatePerson(createPersonBodyParams, options);
+        async personControllerCreatePersonMigration(createPersonMigrationBodyParams: CreatePersonMigrationBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonendatensatzResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.personControllerCreatePersonMigration(createPersonMigrationBodyParams, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -6241,12 +6240,12 @@ export const PersonenApiFactory = function (configuration?: Configuration, baseP
     return {
         /**
          * 
-         * @param {CreatePersonBodyParams} createPersonBodyParams 
+         * @param {CreatePersonMigrationBodyParams} createPersonMigrationBodyParams 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        personControllerCreatePerson(createPersonBodyParams: CreatePersonBodyParams, options?: any): AxiosPromise<PersonendatensatzResponse> {
-            return localVarFp.personControllerCreatePerson(createPersonBodyParams, options).then((request) => request(axios, basePath));
+        personControllerCreatePersonMigration(createPersonMigrationBodyParams: CreatePersonMigrationBodyParams, options?: any): AxiosPromise<PersonendatensatzResponse> {
+            return localVarFp.personControllerCreatePersonMigration(createPersonMigrationBodyParams, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -6360,12 +6359,12 @@ export const PersonenApiFactory = function (configuration?: Configuration, baseP
 export interface PersonenApiInterface {
     /**
      * 
-     * @param {CreatePersonBodyParams} createPersonBodyParams 
+     * @param {CreatePersonMigrationBodyParams} createPersonMigrationBodyParams 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PersonenApiInterface
      */
-    personControllerCreatePerson(createPersonBodyParams: CreatePersonBodyParams, options?: AxiosRequestConfig): AxiosPromise<PersonendatensatzResponse>;
+    personControllerCreatePersonMigration(createPersonMigrationBodyParams: CreatePersonMigrationBodyParams, options?: AxiosRequestConfig): AxiosPromise<PersonendatensatzResponse>;
 
     /**
      * 
@@ -6479,13 +6478,13 @@ export interface PersonenApiInterface {
 export class PersonenApi extends BaseAPI implements PersonenApiInterface {
     /**
      * 
-     * @param {CreatePersonBodyParams} createPersonBodyParams 
+     * @param {CreatePersonMigrationBodyParams} createPersonMigrationBodyParams 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PersonenApi
      */
-    public personControllerCreatePerson(createPersonBodyParams: CreatePersonBodyParams, options?: AxiosRequestConfig) {
-        return PersonenApiFp(this.configuration).personControllerCreatePerson(createPersonBodyParams, options).then((request) => request(this.axios, this.basePath));
+    public personControllerCreatePersonMigration(createPersonMigrationBodyParams: CreatePersonMigrationBodyParams, options?: AxiosRequestConfig) {
+        return PersonenApiFp(this.configuration).personControllerCreatePersonMigration(createPersonMigrationBodyParams, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
