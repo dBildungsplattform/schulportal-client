@@ -983,13 +983,26 @@
   // Checks if the entered KopersNr is the same one that is already assigned to the user.
   // This is used to disable the save button in that case (To avoid errors).
   const hasSameMetaDeta: ComputedRef<boolean> = computed(() => {
+    // Check if personalnummer does not exist and names are unchanged
+    const isPersonalnummerMissing: boolean = !personStore.currentPerson?.person.personalnummer;
+    const isFamiliennameUnchanged: boolean =
+      selectedFamilienname.value === personStore.currentPerson?.person.name.familienname;
+    const isVornameUnchanged: boolean = selectedVorname.value === personStore.currentPerson?.person.name.vorname;
+
+    // If personalnummer doesn't exist and both names are unchanged, return true
+    if (isPersonalnummerMissing && isFamiliennameUnchanged && isVornameUnchanged) {
+      return true;
+    }
+
+    // Otherwise, return true only if all fields match exactly
     if (
       selectedKopersNrPersonInfo.value === personStore.currentPerson?.person.personalnummer &&
-      selectedFamilienname.value === personStore.currentPerson?.person.name.familienname &&
-      selectedVorname.value === personStore.currentPerson?.person.name.vorname
+      isFamiliennameUnchanged &&
+      isVornameUnchanged
     ) {
       return true;
     }
+
     return false;
   });
 
@@ -1094,9 +1107,7 @@
                 md="auto"
                 class="mt-1 edit-container"
               >
-                <div
-                  class="d-flex justify-sm-end"
-                >
+                <div class="d-flex justify-sm-end">
                   <v-col
                     cols="12"
                     sm="6"
