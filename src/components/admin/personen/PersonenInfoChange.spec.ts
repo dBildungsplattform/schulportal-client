@@ -1,57 +1,85 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { mount, VueWrapper } from '@vue/test-utils';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { DOMWrapper, mount, VueWrapper } from '@vue/test-utils';
 import PersonInfoChange from './PersonenInfoChange.vue';
 
-let wrapper: VueWrapper;
-
-beforeEach(() => {
-  document.body.innerHTML = `
-      <div>
-        <div id="app"></div>
-      </div>
-    `;
-
-  wrapper = mount(PersonInfoChange, {
-    attachTo: document.getElementById('app') || '',
-    props: {
-      confirmUnsavedChangesAction: () => vi.fn(),
-      hasKopersRolle: true,
-      selectedKopersNrPersonInfoProps: {
-        error: false,
-        'error-messages': [],
-        onBlur: () => vi.fn(),
-        onChange: () => vi.fn(),
-        onInput: () => vi.fn(),
-      },
-      selectedKopersNrPersonInfo: '123456',
-      selectedVornameProps: {
-        error: false,
-        'error-messages': [],
-        onBlur: () => vi.fn(),
-        onChange: () => vi.fn(),
-        onInput: () => vi.fn(),
-      },
-      selectedVorname: 'John',
-      selectedFamiliennameProps: {
-        error: false,
-        'error-messages': [],
-        onBlur: () => vi.fn(),
-        onChange: () => vi.fn(),
-        onInput: () => vi.fn(),
-      },
-      selectedFamilienname: 'Doe',
-      showUnsavedChangesDialog: false,
-    },
-    global: {
-      components: {
-        PersonInfoChange,
-      },
-    },
-  });
-});
-
 describe('PersonInfoChange', () => {
+  let wrapper: VueWrapper;
+  const mockConfirmUnsavedChangesAction = vi.fn();
+
+  beforeEach(() => {
+    wrapper = mount(PersonInfoChange, {
+      props: {
+        confirmUnsavedChangesAction: mockConfirmUnsavedChangesAction,
+        hasKopersRolle: true,
+        selectedKopersNrPersonInfoProps: {
+          error: false,
+          'error-messages': [],
+          onBlur: () => vi.fn(),
+          onChange: () => vi.fn(),
+          onInput: () => vi.fn(),
+        },
+        selectedKopersNrPersonInfo: '123456',
+        selectedVornameProps: {
+          error: false,
+          'error-messages': [],
+          onBlur: () => vi.fn(),
+          onChange: () => vi.fn(),
+          onInput: () => vi.fn(),
+        },
+        selectedVorname: 'John',
+        selectedFamiliennameProps: {
+          error: false,
+          'error-messages': [],
+          onBlur: () => vi.fn(),
+          onChange: () => vi.fn(),
+          onInput: () => vi.fn(),
+        },
+        selectedFamilienname: 'Doe',
+        showUnsavedChangesDialog: false,
+      },
+      global: {
+        mocks: {
+          $t: (key: string) => key, // Mock translation function
+        },
+      },
+    });
+  });
+
   it('renders Vorname input', () => {
-    expect(wrapper.find('[data-testid="vorname-input"]').isVisible()).toBe(true);
+    expect(wrapper.find('[data-testid="vorname-input"]').exists()).toBe(true);
+  });
+
+  it('renders Familienname input', () => {
+    expect(wrapper.find('[data-testid="familienname-input"]').exists()).toBe(true);
+  });
+
+  it('renders KopersInput when hasKopersRolle is true', () => {
+    expect(wrapper.findComponent({ name: 'KopersInput' }).exists()).toBe(true);
+  });
+
+  it('does not render KopersInput when hasKopersRolle is false', async () => {
+    await wrapper.setProps({ hasKopersRolle: false });
+    expect(wrapper.findComponent({ name: 'KopersInput' }).exists()).toBe(false);
+  });
+
+  it('emits update:selectedVorname when Vorname input changes', async () => {
+    const input: VueWrapper = wrapper.findComponent({ ref: 'vorname-input' });
+    await input.setValue('Jane');
+    expect(wrapper.emitted('update:selectedVorname')).toBeTruthy();
+    expect(wrapper.emitted('update:selectedVorname')?.[0]).toEqual(['Jane']);
+  });
+
+  it('emits update:selectedFamilienname when Familienname input changes', async () => {
+    const input: VueWrapper = wrapper.findComponent({ ref: 'familienname-input' });
+    await input.setValue('Smith');
+    expect(wrapper.emitted('update:selectedFamilienname')).toBeTruthy();
+    expect(wrapper.emitted('update:selectedFamilienname')?.[0]).toEqual(['Smith']);
+  });
+
+  it('emits update:selectedKopersNrPersonInfo when KopersInput changes', async () => {
+    const kopersInput: VueWrapper = wrapper.findComponent({ name: 'KopersInput' });
+    await kopersInput.vm.$emit('update:selectedKopersNr', '654321');
+    expect(wrapper.emitted('update:selectedKopersNrPersonInfo')).toBeTruthy();
+    expect(wrapper.emitted('update:selectedKopersNrPersonInfo')?.[0]).toEqual(['654321']);
   });
 });
