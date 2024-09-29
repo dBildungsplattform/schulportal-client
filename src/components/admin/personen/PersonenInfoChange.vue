@@ -60,58 +60,79 @@
 
 <template>
   <div>
-    <!-- Vorname -->
-    <FormRow
-      class="mt-n4"
-      :errorLabel="selectedVornameProps['error']"
-      labelForId="vorname-input"
-      :isRequired="true"
-      :label="$t('person.firstName')"
-    >
-      <v-text-field
-        clearable
-        data-testid="vorname-input"
-        density="compact"
-        id="vorname-input"
-        ref="vorname-input"
-        :placeholder="$t('person.enterFirstName')"
-        required="true"
-        variant="outlined"
-        v-bind="selectedVornameProps"
-        v-model="selectedVorname"
-        @update:modelValue="handleSelectedVorname"
-      ></v-text-field>
-    </FormRow>
+    <v-row>
+      <v-col
+        md="5"
+        class="pl-md-14"
+      >
+        <span class="text-body bold">
+          <v-icon
+            aria-hidden="true"
+            class="mr-2"
+            icon="mdi-alert-circle-outline"
+            size="small"
+          ></v-icon>
+          {{ $t('admin.person.personalInfoChangeNotice') }}
+        </span>
+      </v-col>
+      <v-col
+        md="7"
+        class="pr-md-14"
+      >
+        <!-- Vorname -->
+        <FormRow
+          class="mt-n4"
+          :errorLabel="selectedVornameProps['error']"
+          labelForId="vorname-input"
+          :isRequired="true"
+          :label="$t('person.firstName')"
+        >
+          <v-text-field
+            clearable
+            data-testid="vorname-input"
+            density="compact"
+            id="vorname-input"
+            ref="vorname-input"
+            :placeholder="$t('person.enterFirstName')"
+            required="true"
+            variant="outlined"
+            v-bind="selectedVornameProps"
+            v-model="selectedVorname"
+            @update:modelValue="handleSelectedVorname"
+          ></v-text-field>
+        </FormRow>
 
-    <!-- Nachname -->
-    <FormRow
-      class="mb-4"
-      :errorLabel="selectedFamiliennameProps['error']"
-      labelForId="familienname-input"
-      :isRequired="true"
-      :label="$t('person.lastName')"
-    >
-      <v-text-field
-        clearable
-        data-testid="familienname-input"
-        density="compact"
-        id="familienname-input"
-        ref="familienname-input"
-        :placeholder="$t('person.enterLastName')"
-        required="true"
-        variant="outlined"
-        v-bind="selectedFamiliennameProps"
-        v-model="selectedFamilienname"
-        @update:modelValue="handSelectedFamilienname"
-      ></v-text-field>
-    </FormRow>
-    <KopersInput
-      v-if="hasKopersRolle"
-      :hideCheckbox="true"
-      :selectedKopersNr="selectedKopersNrPersonInfo"
-      :selectedKopersNrProps="selectedKopersNrPersonInfoProps"
-      @update:selectedKopersNr="handleSelectedKopersNrUpdate"
-    ></KopersInput>
+        <!-- Nachname -->
+        <FormRow
+          class="mb-4"
+          :errorLabel="selectedFamiliennameProps['error']"
+          labelForId="familienname-input"
+          :isRequired="true"
+          :label="$t('person.lastName')"
+        >
+          <v-text-field
+            clearable
+            data-testid="familienname-input"
+            density="compact"
+            id="familienname-input"
+            ref="familienname-input"
+            :placeholder="$t('person.enterLastName')"
+            required="true"
+            variant="outlined"
+            v-bind="selectedFamiliennameProps"
+            v-model="selectedFamilienname"
+            @update:modelValue="handSelectedFamilienname"
+          ></v-text-field>
+        </FormRow>
+        <KopersInput
+          v-if="hasKopersRolle"
+          :hideCheckbox="true"
+          :selectedKopersNr="selectedKopersNrPersonInfo"
+          :selectedKopersNrProps="selectedKopersNrPersonInfoProps"
+          @update:selectedKopersNr="handleSelectedKopersNrUpdate"
+        ></KopersInput>
+      </v-col>
+    </v-row>
   </div>
   <!-- Warning dialog for unsaved changes -->
   <v-dialog
