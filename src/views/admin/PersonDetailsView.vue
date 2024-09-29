@@ -1421,7 +1421,7 @@
                       <TwoFactorAuthenticationSetUp
                         v-else
                         :errorCode="twoFactorAuthentificationStore.errorCode"
-                        :disabled="isEditActive"
+                        :disabled="isEditActive || isEditPersonInfoActive"
                         :person="personStore.currentPerson"
                         @dialogClosed="twoFactorAuthentificationStore.get2FAState(currentPersonId)"
                       >
