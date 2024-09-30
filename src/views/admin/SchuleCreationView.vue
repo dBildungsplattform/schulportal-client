@@ -19,6 +19,10 @@
   import { object, string } from 'yup';
   import { toTypedSchema } from '@vee-validate/yup';
   import { DIN_91379A_EXT, NO_LEADING_TRAILING_SPACES } from '@/utils/validation';
+  import SpshAlert from '@/components/alert/SpshAlert.vue';
+  import LayoutCard from '@/components/cards/LayoutCard.vue';
+  import FormWrapper from '@/components/form/FormWrapper.vue';
+  import FormRow from '@/components/form/FormRow.vue';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
@@ -195,7 +199,6 @@
             </v-col>
           </v-row>
           <v-row>
-            <!-- Spacer column -->
             <v-col
               cols="4"
               class="d-none d-md-flex"
