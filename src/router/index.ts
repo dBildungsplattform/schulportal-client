@@ -13,7 +13,7 @@ const router: Router = createRouter({
 router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormalized) => {
   const authStore: AuthStore = useAuthStore();
   await authStore.initializeAuthStatus();
-  if (to.path != '/profile') sessionStorage.setItem('previousUrl', to.path);
+  if (to.path != '/profile' && to.path != '/no-second-factor') sessionStorage.setItem('previousUrl', to.path);
 
   // Redirect authenticated users trying to access the login page to the start page
   if (to.path === '/' && authStore.isAuthed) {
