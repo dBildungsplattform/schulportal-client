@@ -46,7 +46,7 @@
   let blockedNext: () => void = () => {};
 
   const canCommit: Ref<boolean> = ref(false);
-  const hasNoKopersNr: Ref<boolean> = ref(false);
+  const hasNoKopersNr: Ref<boolean | undefined> = ref(false);
   const showNoKopersNrConfirmationDialog: Ref<boolean> = ref(false);
 
   const calculatedBefristung: Ref<string | undefined> = ref('');
@@ -145,7 +145,7 @@
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = formContext.defineField('selectedRolle', vuetifyConfig);
   const [selectedKopersNr, selectedKopersNrProps]: [
-    Ref<string | undefined>,
+    Ref<string | undefined | null>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = formContext.defineField('selectedKopersNr', vuetifyConfig);
   const [selectedVorname, selectedVornameProps]: [
@@ -270,7 +270,6 @@
   async function navigateToPersonTable(): Promise<void> {
     await router.push({ name: 'person-management' });
     personenkontextStore.createdPersonWithKontext = null;
-    personenkontextStore.createdPersonenkontextForKlasse = null;
   }
 
   function handleFieldReset(field: string): void {
@@ -292,7 +291,7 @@
     const bodyParams: CreatePersonBodyParams = {
       familienname: selectedFamilienname.value as string,
       vorname: selectedVorname.value as string,
-      personalnummer: selectedKopersNr.value,
+      personalnummer: selectedKopersNr.value as string,
       befristung: formattedBefristung,
       createPersonenkontexte: [
         {
@@ -318,7 +317,7 @@
     hasNoKopersNr.value = false;
   }
 
-  watch(hasNoKopersNr, async (newValue: boolean) => {
+  watch(hasNoKopersNr, async (newValue: boolean | undefined) => {
     if (newValue) {
       showNoKopersNrConfirmationDialog.value = true;
     }
@@ -336,7 +335,6 @@
 
   const handleCreateAnotherPerson = (): void => {
     personenkontextStore.createdPersonWithKontext = null;
-    personenkontextStore.createdPersonenkontextForKlasse = null;
     formContext.resetForm();
     hasNoKopersNr.value = false;
     // Re-trigger the watchers after resetting the form to auto-select the Befristung since the component isn't remounted
@@ -374,7 +372,6 @@
     await personenkontextStore.processWorkflowStep({ limit: 25 });
     personStore.errorCode = '';
     personenkontextStore.createdPersonWithKontext = null;
-    personenkontextStore.createdPersonenkontextForKlasse = null;
 
     /* listen for browser changes and prevent them when form is dirty */
     window.addEventListener('beforeunload', preventNavigation);
@@ -512,8 +509,8 @@
             :hasNoKopersNr="hasNoKopersNr"
             v-model:selectedKopersNr="selectedKopersNr"
             :selectedKopersNrProps="selectedKopersNrProps"
-            @update:selectedKopersNr="(value?: string) => (selectedKopersNr = value)"
-            @update:hasNoKopersNr="(value: boolean) => (hasNoKopersNr = value)"
+            @update:selectedKopersNr="(value?: string | null) => (selectedKopersNr = value)"
+            @update:hasNoKopersNr="(value: boolean | undefined) => (hasNoKopersNr = value)"
           ></KopersInput>
         </div>
       </FormWrapper>

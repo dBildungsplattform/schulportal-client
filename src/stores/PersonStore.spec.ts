@@ -28,6 +28,8 @@ function getMockPersonendatensatz(): Personendatensatz {
       personalnummer: '9183756',
       isLocked: false,
       lockInfo: null,
+      revision: '1',
+      lastModified: '2024-12-22',
     },
   };
 }
@@ -41,8 +43,9 @@ function getMockPersonendatensatzResponse(): PersonendatensatzResponse {
       geschlecht: '',
       lokalisierung: '',
       vertrauensstufe: Vertrauensstufe.Teil,
-      revision: '',
+      revision: '1',
       startpasswort: '',
+      lastModified: '2024-12-22',
     },
   };
 }
@@ -314,10 +317,10 @@ describe('PersonStore', () => {
       const mockResponse: string = 'fakePassword';
 
       mockadapter.onPatch(`/api/personen/${userId}/password`).replyOnce(200, mockResponse);
-      const resetPasswordPromise: Promise<string> = personStore.resetPassword(userId);
+      const resetPasswordPromise: Promise<void> = personStore.resetPassword(userId);
       expect(personStore.loading).toBe(true);
-      const generatedPassword: string = await resetPasswordPromise;
-      expect(generatedPassword).toEqual(mockResponse);
+      await resetPasswordPromise;
+      expect(personStore.newPassword).toEqual(mockResponse);
       expect(personStore.loading).toBe(false);
     });
 
@@ -325,9 +328,9 @@ describe('PersonStore', () => {
       const userId: string = '2345';
 
       mockadapter.onPatch(`/api/personen/${userId}/password`).replyOnce(500, 'some error');
-      const resetPasswordPromise: Promise<string> = personStore.resetPassword(userId);
+      const resetPasswordPromise: Promise<void> = personStore.resetPassword(userId);
       expect(personStore.loading).toBe(true);
-      await rejects(resetPasswordPromise);
+      await resetPasswordPromise;
       expect(personStore.errorCode).toEqual('UNSPECIFIED_ERROR');
       expect(personStore.loading).toBe(false);
     });
@@ -336,9 +339,9 @@ describe('PersonStore', () => {
       const userId: string = '2345';
 
       mockadapter.onPatch(`/api/personen/${userId}/password`).replyOnce(500, { code: 'some mock server error' });
-      const resetPasswordPromise: Promise<string> = personStore.resetPassword(userId);
+      const resetPasswordPromise: Promise<void> = personStore.resetPassword(userId);
       expect(personStore.loading).toBe(true);
-      await rejects(resetPasswordPromise);
+      await resetPasswordPromise;
       expect(personStore.errorCode).toEqual('some mock server error');
       expect(personStore.loading).toBe(false);
     });
