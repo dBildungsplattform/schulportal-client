@@ -1,4 +1,3 @@
-import { RollenMerkmal, type DBiamPersonenzuordnungResponse } from '@/api-client/generated/api';
 import { OrganisationsTyp, type Organisation } from '@/stores/OrganisationStore';
 import { type Person, type Personendatensatz } from '@/stores/PersonStore';
 import { mount, VueWrapper } from '@vue/test-utils';
