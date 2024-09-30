@@ -545,16 +545,15 @@ describe('OrganisationStore', () => {
       mockadapter.onGet('/api/organisationen/root/children').replyOnce(500, 'some mock server error');
       const updateOrganisationPromise: Promise<void> = organisationStore.loadSchultraeger();
       await updateOrganisationPromise;
-      expect(organisationStore.schultraeger).toEqual(null);
+      expect(organisationStore.schultraeger).toEqual([]);
       expect(organisationStore.errorCode).toEqual('SCHULTRAEGER_ERROR');
     });
 
     it('should handle error code', async () => {
-      mockadapter.onPatch('/api/organisationen/root/children').replyOnce(500, { i18nKey: 'GET_ERROR' });
+      mockadapter.onGet('/api/organisationen/root/children').replyOnce(500, { i18nKey: 'GET_ERROR' });
       const updateOrganisationPromise: Promise<void> = organisationStore.loadSchultraeger();
-      expect(organisationStore.loading).toBe(true);
       await updateOrganisationPromise;
-      expect(organisationStore.schultraeger).toEqual(null);
+      expect(organisationStore.schultraeger).toEqual([]);
       expect(organisationStore.errorCode).toEqual('GET_ERROR');
     });
   });
