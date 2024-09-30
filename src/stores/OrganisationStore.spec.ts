@@ -1,4 +1,4 @@
-import { OrganisationsTyp } from '@/api-client/generated';
+import { OrganisationsTyp, TraegerschaftTyp, type OrganisationRootChildrenResponse } from '@/api-client/generated';
 import ApiService from '@/services/ApiService';
 import MockAdapter from 'axios-mock-adapter';
 import { setActivePinia, createPinia } from 'pinia';
@@ -510,6 +510,52 @@ describe('OrganisationStore', () => {
       expect(organisationStore.updatedOrganisation).toEqual(null);
       expect(organisationStore.errorCode).toEqual('UPDATE_ERROR');
       expect(organisationStore.loading).toBe(false);
+    });
+  });
+  describe('loadSchultraeger', () => {
+    it('should update the schultraeger', async () => {
+      const mockResponse: OrganisationRootChildrenResponse = { oeffentlich:{
+        id: '2',
+        name: 'Öffentliche Schulen',
+        namensergaenzung: 'Ergänzung',
+        kennung: null,
+        kuerzel: '',
+        traegerschaft: TraegerschaftTyp._01,
+        typ: OrganisationsTyp.Land,
+        administriertVon: '1',
+      },
+      ersatz: {
+        id: '3',
+        name: 'Ersatzschulen Schulen',
+        namensergaenzung: 'Ergänzung',
+        kennung: null,
+        kuerzel: '',
+        traegerschaft: TraegerschaftTyp._01,
+        typ: OrganisationsTyp.Land,
+        administriertVon: '1',
+      }
+    };
+
+      mockadapter.onGet('/api/organisationen/root/children').replyOnce(200, mockResponse);
+      const updateOrganisationPromise: Promise<void> = organisationStore.loadSchultraeger();
+      await updateOrganisationPromise;
+      expect(organisationStore.schultraeger).toEqual([mockResponse.oeffentlich, mockResponse.ersatz]);
+    });
+    it('should handle string error', async () => {
+      mockadapter.onGet('/api/organisationen/root/children').replyOnce(500, 'some mock server error');
+      const updateOrganisationPromise: Promise<void> = organisationStore.loadSchultraeger();
+      await updateOrganisationPromise;
+      expect(organisationStore.schultraeger).toEqual(null);
+      expect(organisationStore.errorCode).toEqual('SCHULTRAEGER_ERROR');
+    });
+
+    it('should handle error code', async () => {
+      mockadapter.onPatch('/api/organisationen/root/children').replyOnce(500, { i18nKey: 'GET_ERROR' });
+      const updateOrganisationPromise: Promise<void> = organisationStore.loadSchultraeger();
+      expect(organisationStore.loading).toBe(true);
+      await updateOrganisationPromise;
+      expect(organisationStore.schultraeger).toEqual(null);
+      expect(organisationStore.errorCode).toEqual('GET_ERROR');
     });
   });
 });
