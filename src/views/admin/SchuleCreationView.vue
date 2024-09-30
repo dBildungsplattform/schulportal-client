@@ -211,6 +211,7 @@
               <v-col
                 v-for="schultraeger in schultraegerList"
                 :key="schultraeger.id"
+                offset-md="1"
                 cols="12"
                 sm="5"
                 class="pb-0"
