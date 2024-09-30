@@ -3,7 +3,7 @@ import { nextTick } from 'vue';
 import { VueWrapper, mount } from '@vue/test-utils';
 import RolleDelete from './RolleDelete.vue';
 import { RollenMerkmal, RollenSystemRecht } from '@/stores/RolleStore';
-import { createRouter, createWebHistory, type NavigationFailure, type RouteLocationRaw, type Router } from 'vue-router';
+import { createRouter, createWebHistory, type Router } from 'vue-router';
 import routes from '@/router/routes';
 
 let wrapper: VueWrapper | null = null;
@@ -64,10 +64,7 @@ describe('delete rolle', () => {
   });
 
   test('it deletes a rolle and navigates back to management', async () => {
-    const push: MockInstance<[to: RouteLocationRaw], Promise<void | NavigationFailure | undefined>> = vi.spyOn(
-      router,
-      'push',
-    );
+    const push: MockInstance = vi.spyOn(router, 'push');
 
     wrapper?.find('[data-testid="open-rolle-delete-dialog-button"]').trigger('click');
     await nextTick();

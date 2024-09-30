@@ -2,7 +2,7 @@ import { expect, type MockInstance, test } from 'vitest';
 import { nextTick } from 'vue';
 import { VueWrapper, mount } from '@vue/test-utils';
 import KlasseDelete from './KlasseDelete.vue';
-import { createRouter, createWebHistory, type NavigationFailure, type RouteLocationRaw, type Router } from 'vue-router';
+import { createRouter, createWebHistory, type Router } from 'vue-router';
 import routes from '@/router/routes';
 
 let wrapper: VueWrapper | null = null;
@@ -72,10 +72,7 @@ describe('KlasseDelete', () => {
 
   test('it deletes a klasse and navigates back to management', async () => {
     wrapper?.setProps({ useIconActivator: false });
-    const push: MockInstance<[to: RouteLocationRaw], Promise<void | NavigationFailure | undefined>> = vi.spyOn(
-      router,
-      'push',
-    );
+    const push: MockInstance = vi.spyOn(router, 'push');
 
     wrapper?.find('[data-testid="open-klasse-delete-dialog-button"]').trigger('click');
     await nextTick();

@@ -1,6 +1,6 @@
 import { expect, type MockInstance, test } from 'vitest';
 import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
-import { createRouter, createWebHistory, type NavigationFailure, type RouteLocationRaw, type Router } from 'vue-router';
+import { createRouter, createWebHistory, type Router } from 'vue-router';
 import routes from '@/router/routes';
 import { useAuthStore, type AuthStore, type UserInfo } from '@/stores/AuthStore';
 import {
@@ -258,10 +258,7 @@ describe('PersonDetailsView', () => {
   });
 
   test('it navigates back to user table', async () => {
-    const push: MockInstance<[to: RouteLocationRaw], Promise<void | NavigationFailure | undefined>> = vi.spyOn(
-      router,
-      'push',
-    );
+    const push: MockInstance = vi.spyOn(router, 'push');
     await wrapper?.find('[data-testid="close-layout-card-button"]').trigger('click');
     expect(push).toHaveBeenCalledTimes(1);
   });
