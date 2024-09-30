@@ -37,7 +37,7 @@
   const selectedOrganisation: Ref<string | null> = ref(null);
   const errorMessage: ComputedRef<string> = computed(() => {
     if (!props.errorCode) return '';
-    return !props.person.person.isLocked ? t('person.lockUserError') : t('person.unlockUserError');
+    return !props.person.person.isLocked ? t('person.lockError') : t('person.unlockError');
   });
   const hasSingleSelection: ComputedRef<boolean> = computed(() => {
     return organisations.value.length <= 1;
@@ -54,25 +54,31 @@
     isActive.value = false;
   }
 
-  function handleOnLockUser(id: string, isActive: Ref<boolean>): void {
-    if (selectedOrganisationId.value) {
-      emit('onLockUser', id, !props.person.person.isLocked, selectedOrganisationId.value);
-      closeLockPersonDialog(isActive);
-    }
+  function handleOnLockUser(isActive: Ref<boolean>): void {
+    const lockingOrgId: string | null | undefined = props.person.person.isLocked
+      ? props.person.person.lockInfo?.lock_locked_from
+      : selectedOrganisationId.value;
+    if (!lockingOrgId) return;
+    emit('onLockUser', props.person.person.id, !props.person.person.isLocked, lockingOrgId);
+    closeLockPersonDialog(isActive);
   }
 
   function handleChangeOrganisation(value: string): void {
     selectedOrganisation.value = value;
   }
 
-  watch(organisations, (newOrganisations: Array<TranslatedObject>) => {
-    if (newOrganisations.length === 1) {
-      selectedOrganisation.value = organisations.value[0]?.value ?? null;
-    }
-  });
+  watch(
+    organisations,
+    (newOrganisations: Array<TranslatedObject>) => {
+      if (newOrganisations.length === 1) {
+        selectedOrganisation.value = organisations.value[0]?.value ?? null;
+      }
+    },
+    { immediate: true },
+  );
 </script>
 
-<template v-if="schulen.length > 0">
+<template v-if="organisations.length > 0">
   <v-dialog persistent>
     <template v-slot:activator="{ props }">
       <v-col
@@ -102,6 +108,7 @@
 
     <template v-slot:default="{ isActive }">
       <LayoutCard
+        data-testid="person-lock-card"
         :closable="true"
         :header="!person.person.isLocked ? $t('person.lockUser') : $t('person.unlockUser')"
         @onCloseClicked="closeLockPersonDialog(isActive)"
@@ -204,8 +211,8 @@
                 <v-btn
                   :block="mdAndDown"
                   class="primary button"
-                  :disabled="!selectedOrganisation"
-                  @click.stop="handleOnLockUser(props.person.person.id, isActive)"
+                  :disabled="!props.person.person.isLocked && !selectedOrganisation"
+                  @click.stop="handleOnLockUser(isActive)"
                   data-testid="lock-user-button"
                 >
                   {{ !props.person.person.isLocked ? $t('person.lockUser') : $t('person.unlockUser') }}
