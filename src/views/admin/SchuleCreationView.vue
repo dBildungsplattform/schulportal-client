@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import { computed, onMounted, onUnmounted, ref, type ComputedRef, type Ref } from 'vue';
+  import { computed, onMounted, onUnmounted, ref, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import {
     type Router,

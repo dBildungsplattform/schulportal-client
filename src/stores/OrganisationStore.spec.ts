@@ -514,27 +514,28 @@ describe('OrganisationStore', () => {
   });
   describe('loadSchultraeger', () => {
     it('should update the schultraeger', async () => {
-      const mockResponse: OrganisationRootChildrenResponse = { oeffentlich:{
-        id: '2',
-        name: 'Öffentliche Schulen',
-        namensergaenzung: 'Ergänzung',
-        kennung: null,
-        kuerzel: '',
-        traegerschaft: TraegerschaftTyp._01,
-        typ: OrganisationsTyp.Land,
-        administriertVon: '1',
-      },
-      ersatz: {
-        id: '3',
-        name: 'Ersatzschulen Schulen',
-        namensergaenzung: 'Ergänzung',
-        kennung: null,
-        kuerzel: '',
-        traegerschaft: TraegerschaftTyp._01,
-        typ: OrganisationsTyp.Land,
-        administriertVon: '1',
-      }
-    };
+      const mockResponse: OrganisationRootChildrenResponse = {
+        oeffentlich: {
+          id: '2',
+          name: 'Öffentliche Schulen',
+          namensergaenzung: 'Ergänzung',
+          kennung: null,
+          kuerzel: '',
+          traegerschaft: '01',
+          typ: OrganisationsTyp.Land,
+          administriertVon: '1',
+        },
+        ersatz: {
+          id: '3',
+          name: 'Ersatzschulen Schulen',
+          namensergaenzung: 'Ergänzung',
+          kennung: null,
+          kuerzel: '',
+          traegerschaft: '01',
+          typ: OrganisationsTyp.Land,
+          administriertVon: '1',
+        },
+      };
 
       mockadapter.onGet('/api/organisationen/root/children').replyOnce(200, mockResponse);
       const updateOrganisationPromise: Promise<void> = organisationStore.loadSchultraeger();
