@@ -1,4 +1,4 @@
-import { OrganisationsTyp, TraegerschaftTyp, type OrganisationRootChildrenResponse } from '@/api-client/generated';
+import { OrganisationsTyp, type OrganisationRootChildrenResponse } from '@/api-client/generated';
 import ApiService from '@/services/ApiService';
 import MockAdapter from 'axios-mock-adapter';
 import { setActivePinia, createPinia } from 'pinia';
