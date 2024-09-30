@@ -1415,7 +1415,7 @@
                       >
                         <TokenReset
                           :errorCode="twoFactorAuthentificationStore.errorCode"
-                          :disabled="isEditActive"
+                          :disabled="isEditActive || isEditPersonInfoActive"
                           :person="personStore.currentPerson"
                           :tokenType="twoFactorAuthentificationStore.tokenKind"
                           :personId="currentPersonId"
