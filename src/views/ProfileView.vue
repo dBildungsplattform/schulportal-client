@@ -228,6 +228,11 @@
 
   const twoFactorAuthError: ComputedRef<string> = computed(() => {
     if (twoFactorAuthenticationStore.loading) return '';
+    if (
+      twoFactorAuthenticationStore.errorCode === 'SOFTWARE_TOKEN_VERIFICATION_ERROR' ||
+      twoFactorAuthenticationStore.errorCode === 'OTP_NICHT_GUELTIG'
+    )
+      return '';
     if (twoFactorAuthenticationStore.errorCode) return t('admin.person.twoFactorAuthentication.errors.connection');
     return '';
   });
@@ -530,7 +535,7 @@
       </v-col>
 
       <v-col
-        v-if="!twoFactorAuthenticationStore.loading && twoFactorAuthenticationStore.required"
+        v-if="twoFactorAuthenticationStore.required && twoFactorAuthenticationStore.hasToken != null"
         cols="12"
         sm="12"
         md="6"
