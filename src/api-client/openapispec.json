@@ -122,14 +122,14 @@
     },
     "/api/personen": {
       "post": {
-        "operationId": "PersonController_createPerson",
+        "operationId": "PersonController_createPersonMigration",
         "parameters": [],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreatePersonBodyParams"
+                "$ref": "#/components/schemas/CreatePersonMigrationBodyParams"
               }
             }
           }
@@ -781,6 +781,70 @@
           },
           "502": {
             "description": "A downstream server returned an error."
+          }
+        },
+        "tags": [
+          "personen"
+        ],
+        "security": [
+          {
+            "oauth2": [
+              "openid"
+            ]
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/personen/{personId}/personalnummer": {
+      "patch": {
+        "operationId": "PersonController_updatePersonalnummer",
+        "parameters": [
+          {
+            "name": "personId",
+            "required": true,
+            "in": "path",
+            "description": "The id for the account.",
+            "schema": {
+              "nullable": false,
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PersonByPersonalnummerBodyParams"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "The personalnummer was successfully updated."
+          },
+          "400": {
+            "description": "Request has a wrong format.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DbiamPersonError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authorized to update the personalnummer."
+          },
+          "403": {
+            "description": "Not permitted to update the personalnummer."
+          },
+          "500": {
+            "description": "Internal server error while updating the personalnummer."
           }
         },
         "tags": [
@@ -2437,8 +2501,8 @@
           }
         ]
       },
-      "post": {
-        "operationId": "RolleController_addServiceProviderById",
+      "put": {
+        "operationId": "RolleController_updateServiceProvidersById",
         "summary": "",
         "description": "Add a service-provider to a rolle by id.",
         "parameters": [
@@ -2469,7 +2533,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ServiceProviderResponse"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ServiceProviderResponse"
+                  }
                 }
               }
             }
@@ -2517,13 +2584,16 @@
             }
           },
           {
-            "name": "serviceProviderId",
+            "name": "serviceProviderIds",
             "required": true,
             "in": "query",
-            "description": "The id for the rolle.",
+            "description": "An array of ids for the service providers.",
             "schema": {
               "nullable": false,
-              "type": "string"
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
             }
           }
         ],
@@ -3103,14 +3173,14 @@
     },
     "/api/dbiam/personenkontext": {
       "post": {
-        "operationId": "DBiamPersonenkontextController_createPersonenkontext",
+        "operationId": "DBiamPersonenkontextController_createPersonenkontextMigration",
         "parameters": [],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/DbiamPersonenkontextBodyParams"
+                "$ref": "#/components/schemas/DbiamPersonenkontextMigrationBodyParams"
               }
             }
           }
@@ -4038,6 +4108,34 @@
           "acr"
         ]
       },
+      "CreatePersonMigrationBodyParams": {
+        "type": "object",
+        "properties": {
+          "personId": {
+            "type": "string"
+          },
+          "familienname": {
+            "type": "string"
+          },
+          "vorname": {
+            "type": "string"
+          },
+          "hashedPassword": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "personalnummer": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "personId",
+          "familienname",
+          "vorname"
+        ]
+      },
       "PersonNameParams": {
         "type": "object",
         "properties": {
@@ -4098,15 +4196,6 @@
           }
         }
       },
-      "Geschlecht": {
-        "type": "string",
-        "enum": [
-          "m",
-          "w",
-          "d",
-          "x"
-        ]
-      },
       "Vertrauensstufe": {
         "type": "string",
         "enum": [
@@ -4114,50 +4203,6 @@
           "UNBE",
           "TEIL",
           "VOLL"
-        ]
-      },
-      "CreatePersonBodyParams": {
-        "type": "object",
-        "properties": {
-          "email": {
-            "type": "string"
-          },
-          "referrer": {
-            "type": "string"
-          },
-          "stammorganisation": {
-            "type": "string"
-          },
-          "name": {
-            "$ref": "#/components/schemas/PersonNameParams"
-          },
-          "geburt": {
-            "$ref": "#/components/schemas/PersonBirthParams"
-          },
-          "geschlecht": {
-            "$ref": "#/components/schemas/Geschlecht"
-          },
-          "lokalisierung": {
-            "type": "string"
-          },
-          "vertrauensstufe": {
-            "$ref": "#/components/schemas/Vertrauensstufe"
-          },
-          "auskunftssperre": {
-            "type": "boolean"
-          },
-          "hashedPassword": {
-            "type": "string"
-          },
-          "username": {
-            "type": "string"
-          },
-          "personalnummer": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "name"
         ]
       },
       "PersonResponse": {
@@ -4218,6 +4263,11 @@
           "lockInfo": {
             "type": "object",
             "nullable": true
+          },
+          "lastModified": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Date of the most recent changes for the person"
           }
         },
         "required": [
@@ -4234,7 +4284,8 @@
           "startpasswort",
           "personalnummer",
           "isLocked",
-          "lockInfo"
+          "lockInfo",
+          "lastModified"
         ]
       },
       "PersonendatensatzResponse": {
@@ -4392,6 +4443,15 @@
           "nein"
         ]
       },
+      "Geschlecht": {
+        "type": "string",
+        "enum": [
+          "m",
+          "w",
+          "d",
+          "x"
+        ]
+      },
       "UpdatePersonBodyParams": {
         "type": "object",
         "properties": {
@@ -4454,6 +4514,53 @@
         },
         "required": [
           "message"
+        ]
+      },
+      "PersonByPersonalnummerBodyParams": {
+        "type": "object",
+        "properties": {
+          "personalnummer": {
+            "type": "string"
+          },
+          "lastModified": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Date of the most recent changed Personalnummer"
+          },
+          "revision": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "personalnummer",
+          "lastModified",
+          "revision"
+        ]
+      },
+      "DbiamPersonError": {
+        "type": "object",
+        "properties": {
+          "i18nKey": {
+            "type": "string",
+            "enum": [
+              "PERSON_ERROR",
+              "VORNAME_ENTHAELT_LEERZEICHEN",
+              "FAMILIENNAME_ENTHAELT_LEERZEICHEN",
+              "PERSON_NOT_FOUND",
+              "DOWNSTREAM_UNREACHABLE",
+              "PERSONALNUMMER_REQUIRED",
+              "NEWER_VERSION_OF_PERSONALNUMMER_AVAILABLE",
+              "PERSONALNUMMER_NICHT_EINDEUTIG"
+            ]
+          },
+          "code": {
+            "type": "number",
+            "description": "Corresponds to HTTP Status code like 200, 404, 500"
+          }
+        },
+        "required": [
+          "i18nKey",
+          "code"
         ]
       },
       "OrganisationsTyp": {
@@ -4566,14 +4673,6 @@
       "PersonenuebersichtBodyParams": {
         "type": "object",
         "properties": {
-          "offset": {
-            "type": "number",
-            "description": "The offset of the paginated list."
-          },
-          "limit": {
-            "type": "number",
-            "description": "The requested limit for the page size."
-          },
           "personIds": {
             "description": "An array of IDs for the persons.",
             "type": "array",
@@ -5246,14 +5345,17 @@
       "RolleServiceProviderQueryParams": {
         "type": "object",
         "properties": {
-          "serviceProviderId": {
-            "type": "string",
-            "description": "The id for the rolle.",
-            "nullable": false
+          "serviceProviderIds": {
+            "description": "An array of ids for the service providers.",
+            "nullable": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         },
         "required": [
-          "serviceProviderId"
+          "serviceProviderIds"
         ]
       },
       "ServiceProviderTarget": {
@@ -5549,7 +5651,7 @@
           "befristung"
         ]
       },
-      "DbiamPersonenkontextBodyParams": {
+      "DbiamPersonenkontextMigrationBodyParams": {
         "type": "object",
         "properties": {
           "personId": {
@@ -5563,6 +5665,9 @@
           },
           "befristung": {
             "format": "date-time",
+            "type": "string"
+          },
+          "email": {
             "type": "string"
           }
         },
@@ -5635,6 +5740,29 @@
           "selectedOrganisation",
           "selectedRolle",
           "canCommit"
+        ]
+      },
+      "DbiamPersonenkontextBodyParams": {
+        "type": "object",
+        "properties": {
+          "personId": {
+            "type": "string"
+          },
+          "organisationId": {
+            "type": "string"
+          },
+          "rolleId": {
+            "type": "string"
+          },
+          "befristung": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "personId",
+          "organisationId",
+          "rolleId"
         ]
       },
       "DbiamUpdatePersonenkontexteBodyParams": {
