@@ -989,6 +989,11 @@
       selectedFamilienname.value === personStore.currentPerson?.person.name.familienname;
     const isVornameUnchanged: boolean = selectedVorname.value === personStore.currentPerson?.person.name.vorname;
 
+    // If personalnummer is missing but selectedKopersNr has a value, return false
+     if (isPersonalnummerMissing && selectedKopersNrPersonInfo.value) {
+       return false;
+    }
+
     // If personalnummer doesn't exist and both names are unchanged, return true
     if (isPersonalnummerMissing && isFamiliennameUnchanged && isVornameUnchanged) {
       return true;
