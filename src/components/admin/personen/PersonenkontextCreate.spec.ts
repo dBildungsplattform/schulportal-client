@@ -2,7 +2,7 @@ import { expect, test } from 'vitest';
 import { VueWrapper, mount } from '@vue/test-utils';
 import PersonenkontextCreate from './PersonenkontextCreate.vue';
 import { nextTick } from 'vue';
-import { RollenArt, RollenMerkmal, RollenSystemRecht, type DBiamPersonenkontextResponse } from '@/api-client/generated';
+import { RollenArt, RollenMerkmal, RollenSystemRecht } from '@/api-client/generated';
 import { type PersonenkontextStore, usePersonenkontextStore } from '@/stores/PersonenkontextStore';
 import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
 import type { BefristungProps } from './BefristungInput.vue';
@@ -128,18 +128,6 @@ beforeEach(() => {
     selectedRolle: null,
     canCommit: true,
   };
-
-  personenkontextStore.createdPersonenkontextForOrganisation = {
-    personId: '12345',
-    organisationId: '67890',
-    rolleId: '54321',
-  } as DBiamPersonenkontextResponse;
-
-  personenkontextStore.createdPersonenkontextForKlasse = {
-    personId: '12345',
-    organisationId: '55555',
-    rolleId: '54321',
-  } as DBiamPersonenkontextResponse;
 
   personenkontextStore.workflowStepResponse = {
     rollen: [

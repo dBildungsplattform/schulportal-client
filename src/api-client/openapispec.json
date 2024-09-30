@@ -1254,8 +1254,8 @@
         "tags": ["rolle"],
         "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
       },
-      "post": {
-        "operationId": "RolleController_addServiceProviderById",
+      "put": {
+        "operationId": "RolleController_updateServiceProvidersById",
         "summary": "",
         "description": "Add a service-provider to a rolle by id.",
         "parameters": [
@@ -1276,7 +1276,11 @@
         "responses": {
           "200": {
             "description": "Adding service-provider finished successfully.",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ServiceProviderResponse" } } }
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/ServiceProviderResponse" } }
+              }
+            }
           },
           "400": { "description": "The service-provider is already attached to rolle." },
           "401": { "description": "Not authorized to retrieve service-providers for rolle." },
@@ -1301,11 +1305,11 @@
             "schema": { "nullable": false, "type": "string" }
           },
           {
-            "name": "serviceProviderId",
+            "name": "serviceProviderIds",
             "required": true,
             "in": "query",
-            "description": "The id for the rolle.",
-            "schema": { "nullable": false, "type": "string" }
+            "description": "An array of ids for the service providers.",
+            "schema": { "nullable": false, "type": "array", "items": { "type": "string" } }
           }
         ],
         "responses": {
@@ -2292,8 +2296,6 @@
       "PersonenuebersichtBodyParams": {
         "type": "object",
         "properties": {
-          "offset": { "type": "number", "description": "The offset of the paginated list." },
-          "limit": { "type": "number", "description": "The requested limit for the page size." },
           "personIds": {
             "description": "An array of IDs for the persons.",
             "type": "array",
@@ -2623,9 +2625,14 @@
       "RolleServiceProviderQueryParams": {
         "type": "object",
         "properties": {
-          "serviceProviderId": { "type": "string", "description": "The id for the rolle.", "nullable": false }
+          "serviceProviderIds": {
+            "description": "An array of ids for the service providers.",
+            "nullable": false,
+            "type": "array",
+            "items": { "type": "string" }
+          }
         },
-        "required": ["serviceProviderId"]
+        "required": ["serviceProviderIds"]
       },
       "ServiceProviderTarget": { "type": "string", "enum": ["URL", "EMAIL", "SCHULPORTAL_ADMINISTRATION"] },
       "ServiceProviderKategorie": {
