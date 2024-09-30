@@ -34,11 +34,13 @@ export enum LockKeys {
   PersonId = 'personId',
   LockedBy = 'locked_by',
   LockedUntil = 'locked_until',
+  CreatedAt = 'created_at',
 }
 export type UserLock = {
   personId: string;
-  locked_from: string;
+  locked_by: string;
   locked_until: string;
+  created_at: string;
 };
 
 export type Person = {
@@ -92,12 +94,25 @@ export type CreatePersonBodyParams = DbiamCreatePersonWithPersonenkontexteBodyPa
 export type CreatedPersonenkontext = DbiamPersonenkontextBodyParams;
 
 export function parseUserLock(unparsed: object): UserLock | null {
-  if (!Object.values(LockKeys).every((key: string) => key in unparsed)) return null;
-  return {
-    personId: LockKeys.PersonId in unparsed ? '' + unparsed[LockKeys.PersonId] : '',
-    locked_from: LockKeys.LockedBy in unparsed ? '' + unparsed[LockKeys.LockedBy] : '',
-    locked_until: LockKeys.LockedUntil in unparsed ? '' + unparsed[LockKeys.LockedUntil] : '',
-  };
+  const result: Partial<UserLock> = {};
+
+  if (LockKeys.PersonId in unparsed) {
+    result.personId = '' + unparsed[LockKeys.PersonId];
+  }
+
+  if (LockKeys.LockedBy in unparsed) {
+    result.locked_by = '' + unparsed[LockKeys.LockedBy];
+  }
+
+  if (LockKeys.LockedUntil in unparsed) {
+    result.locked_until = '' + unparsed[LockKeys.LockedUntil];
+  }
+
+  if (LockKeys.CreatedAt in unparsed) {
+    result.created_at = '' + unparsed[LockKeys.CreatedAt];
+  }
+
+  return Object.keys(result).length > 0 ? (result as UserLock) : null;
 }
 
 export function mapPersonendatensatzResponseToPersonendatensatz(

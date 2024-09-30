@@ -125,10 +125,10 @@
     });
   }
 
-  function onLockUser(personId: string, lock: boolean, lockedFrom: string, date: string | null): void {
+  function onLockUser(personId: string, lock: boolean, lockedBy: string, date: string | undefined): void {
     let bodyParams: LockUserBodyParams = {
       lock: lock,
-      locked_from: lockedFrom,
+      locked_by: lockedBy,
       locked_until: date,
     };
     personStore.lockPerson(personId, bodyParams);

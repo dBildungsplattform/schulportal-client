@@ -3920,9 +3920,27 @@
         "type": "string",
         "enum": ["KEIN", "UNBE", "TEIL", "VOLL"]
       },
-      "UserLock": {
+      "UserLockParams": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "personId": {
+            "type": "string",
+            "nullable": true
+          },
+          "locked_by": {
+            "type": "string",
+            "nullable": true
+          },
+          "locked_until": {
+            "type": "string",
+            "nullable": true
+          },
+          "created_at": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": ["personId", "locked_by", "locked_until", "created_at"]
       },
       "PersonResponse": {
         "type": "object",
@@ -3983,7 +4001,7 @@
             "nullable": true,
             "allOf": [
               {
-                "$ref": "#/components/schemas/UserLock"
+                "$ref": "#/components/schemas/UserLockParams"
               }
             ]
           },
@@ -4171,17 +4189,17 @@
             "type": "boolean",
             "nullable": false
           },
-          "locked_from": {
+          "locked_by": {
             "type": "string",
             "nullable": false
           },
           "locked_until": {
             "format": "date-time",
             "type": "string",
-            "nullable": true
+            "description": "Required if Befristung is set"
           }
         },
-        "required": ["lock", "locked_from", "locked_until"]
+        "required": ["lock", "locked_by"]
       },
       "PersonLockResponse": {
         "type": "object",

@@ -54,8 +54,8 @@ function getMockPersonendatensatzResponse(): PersonendatensatzResponse {
 function getUserLockBodyParams(lock: boolean): LockUserBodyParams {
   return {
     lock: lock,
-    locked_from: 'Alfred Admin',
-    locked_until: null,
+    locked_by: 'Alfred Admin',
+    locked_until: undefined,
   };
 }
 

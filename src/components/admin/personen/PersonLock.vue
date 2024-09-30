@@ -7,6 +7,19 @@
   import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
   import { type Zuordnung } from '@/stores/PersonenkontextStore';
   import SpshTooltip from '@/components/admin/SpshTooltip.vue';
+  import {
+    useForm,
+    type BaseFieldProps,
+    type FormContext,
+    type FormValidationResult,
+    type TypedSchema,
+  } from 'vee-validate';
+  import { DDMMYYYY } from '@/utils/validation';
+  import { notInPast } from '@/utils/validationPersonenkontext';
+  import { toTypedSchema } from '@vee-validate/yup';
+  import { object, string } from 'yup';
+  import PersonLockInput from './PersonLockInput.vue';
+  import { formatDateToISO } from '@/utils/date';
 
   const { t }: Composer = useI18n({ useScope: 'global' });
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
@@ -17,15 +30,43 @@
     adminId: string;
     disabled: boolean;
   };
+  type PersonLockForm = {
+    selectedBefristung: string;
+  };
+  const vuetifyConfig = (state: {
+    errors: Array<string>;
+  }): { props: { error: boolean; 'error-messages': Array<string> } } => ({
+    props: {
+      error: !!state.errors.length,
+      'error-messages': state.errors,
+    },
+  });
 
-  const date: Ref<Date | null> = ref(null);
-  const selectedLockOption: Ref<string> = ref('');
+  const validationSchema: TypedSchema = toTypedSchema(
+    object({
+      selectedBefristung: string()
+        .required(t('admin.befristung.rules.required')) // Add required rule
+        .matches(DDMMYYYY, t('admin.befristung.rules.format')) // Validate format (DDMMYYYY)
+        .test('notInPast', t('admin.befristung.rules.pastDateNotAllowed'), notInPast), // Validate that the date is not in the past
+    }),
+  );
+
+  const formContext: FormContext<PersonLockForm, PersonLockForm> = useForm<PersonLockForm>({
+    validationSchema,
+  });
+
+  const [selectedBefristung, selectedBefristungProps]: [
+    Ref<string | undefined>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = formContext.defineField('selectedBefristung', vuetifyConfig);
+
   const personStore: PersonStore = usePersonStore();
   const organisationStore: OrganisationStore = useOrganisationStore();
   const schulen: Ref<Array<{ value: string; title: string }>> = ref([]);
   const selectedSchule: Ref<string | null> = ref(null);
+  const isUnbefristet: Ref<boolean> = ref(true);
   type Emits = {
-    (event: 'onLockUser', id: string, lock: boolean, schule: string, date: string | null): void;
+    (event: 'onLockUser', id: string, lock: boolean, schule: string, date: string | undefined): void;
   };
 
   const props: Props = defineProps<Props>();
@@ -45,13 +86,27 @@
     return schulen.value.length <= 1;
   });
 
+  function resetBefristungFields(): void {
+    isUnbefristet.value = true;
+    selectedBefristung.value = '';
+    selectedBefristungProps.value.error = false;
+    selectedBefristungProps.value['error-messages'] = [];
+  }
+
   function closeLockPersonDialog(isActive: Ref<boolean>): void {
+    resetBefristungFields();
     isActive.value = false;
   }
-  function handleOnLockUser(id: string, isActive: Ref<boolean>): void {
+  async function handleOnLockUser(id: string, isActive: Ref<boolean>): Promise<void> {
+    if (!isUnbefristet.value) {
+      let { valid }: FormValidationResult<PersonLockForm, PersonLockForm> = await formContext.validate();
+      if (!valid) return;
+    }
+
     if (selectedSchule.value) {
-      let dateString: string | null = date.value?.toISOString() ?? null;
-      emit('onLockUser', id, !props.person.person.isLocked, selectedSchule.value, dateString);
+      let dateISO: string | undefined = formatDateToISO(selectedBefristung.value);
+
+      emit('onLockUser', id, !props.person.person.isLocked, selectedSchule.value, dateISO);
       closeLockPersonDialog(isActive);
     }
   }
@@ -77,6 +132,19 @@
       ),
     );
   }
+
+  const handleBefristungChange = (value: string | undefined): void => {
+    selectedBefristung.value = value;
+  };
+
+  const selectedRadionButtonChange = (value: boolean): void => {
+    isUnbefristet.value = value;
+    if (isUnbefristet.value) {
+      selectedBefristungProps.value.error = false;
+      selectedBefristungProps.value['error-messages'] = [];
+    }
+  };
+
   onBeforeMount(async () => {
     const intersectingOrganisations: Set<Organisation> = await getOrganisationIntersection();
     schulen.value = [...intersectingOrganisations].map((organisation: Organisation) => {
@@ -201,24 +269,14 @@
                 md="6"
                 class="text-sm-center text-body"
               >
-                <v-radio-group v-model="selectedLockOption">
-                  <v-row>
-                    <v-radio
-                      :label="'bis auf Widerruf'"
-                      :value="'default'"
-                    ></v-radio>
-                  </v-row>
-                  <v-row>
-                    <v-radio
-                      label="befristet bis"
-                      value="defined-until"
-                    ></v-radio>
-                    <v-date-input
-                      v-model="date"
-                      placeholder="TT.MM.JJJJ"
-                    ></v-date-input>
-                  </v-row>
-                </v-radio-group>
+                <PersonLockInput
+                  v-model:befristung="selectedBefristung"
+                  v-bind:befristung-props="selectedBefristungProps"
+                  :is-unbefristet="isUnbefristet"
+                  @update:befristung="handleBefristungChange"
+                  @handleSelectedRadioButtonChange="selectedRadionButtonChange"
+                >
+                </PersonLockInput>
               </v-col>
             </v-row>
             <v-row class="text-body bold px-md-16">
