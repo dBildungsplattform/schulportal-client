@@ -357,4 +357,13 @@ describe('PersonDetailsView', () => {
   //     },
   //   ]);
   // });
+  // test('it renders the person details page and shows person data', async () => {
+  //  interface PersonDetailsViewType extends DefineComponent {
+  //    hasSameMetaDeta: ComputedRef<boolean>;
+  //  }
+  //  const vm: PersonDetailsViewType = wrapper?.vm as unknown as PersonDetailsViewType;
+  //  const hasSameMetaDeta: ComputedRef<boolean> = vm.hasSameMetaDeta;
+
+  //  expect(hasSameMetaDeta).toEqual(false);
+ // });
 });
