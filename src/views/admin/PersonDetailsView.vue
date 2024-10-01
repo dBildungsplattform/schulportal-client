@@ -124,7 +124,12 @@
     password.value = personStore.newPassword || '';
   }
 
-  async function onLockUser(personId: string, lock: boolean, lockedBy: string, date: string | undefined): void {
+  async function onLockUser(
+    personId: string,
+    lock: boolean,
+    lockedBy: string,
+    date: string | undefined,
+  ): Promise<void> {
     let bodyParams: LockUserBodyParams = {
       lock: lock,
       locked_by: lockedBy,
