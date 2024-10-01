@@ -25,7 +25,7 @@ beforeEach(() => {
       administriertVon: '1',
     },
     {
-      id: '1',
+      id: '2',
       name: '9b',
       kennung: '9356494-9b',
       namensergaenzung: 'Klasse',
