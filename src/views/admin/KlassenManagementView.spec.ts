@@ -1,5 +1,5 @@
 import { expect, test, type MockInstance } from 'vitest';
-import { mount, VueWrapper } from '@vue/test-utils';
+import { flushPromises, mount, VueWrapper } from '@vue/test-utils';
 import KlassenManagementView from './KlassenManagementView.vue';
 import { nextTick } from 'vue';
 import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
@@ -96,9 +96,10 @@ beforeEach(() => {
 });
 
 describe('KlassenManagementView', () => {
-  test('it renders klasse management view', () => {
+  test('it renders klasse management view', async () => {
     expect(wrapper?.getComponent({ name: 'ResultTable' })).toBeTruthy();
     expect(wrapper?.find('[data-testid="klasse-table"]').isVisible()).toBe(true);
+    await flushPromises();
     expect(wrapper?.findAll('.v-data-table__tr').length).toBe(2);
   });
 
