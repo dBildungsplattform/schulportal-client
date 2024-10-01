@@ -84,9 +84,9 @@
         class="text-sm-center text-body"
       >
         <v-text-field
+          v-if="!(selectedRadioButton === RadioButtonSelect.FIRST_OPTION)"
           density="compact"
           variant="outlined"
-          :disabled="selectedRadioButton === RadioButtonSelect.FIRST_OPTION"
           data-testid="befristung-input"
           v-model="localBefristung"
           v-bind="befristungProps"
