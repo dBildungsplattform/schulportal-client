@@ -919,8 +919,8 @@
   }
 
   // Submit the form for changing person informations (Vorname, Nachname, KopersNr.)
-  const onSubmitChangePersonMetadata: (e?: Event) => Promise<Promise<void> | undefined> = handleSubmitChangePersonMetadata(
-    async () => {
+  const onSubmitChangePersonMetadata: (e?: Event) => Promise<Promise<void> | undefined> =
+    handleSubmitChangePersonMetadata(async () => {
       if (selectedKopersNrMetadata.value && selectedVorname.value && selectedFamilienname.value) {
         if (selectedKopersNrMetadata.value === personStore.currentPerson?.person.personalnummer) {
           await personStore.changePersonMetadataById(
@@ -949,8 +949,7 @@
       }
       changePersonMetadataSuccessVisible.value = !personStore.errorCode;
       resetFormChangePersonMetadata();
-    },
-  );
+    });
 
   function isFormDirty(): boolean {
     return isFieldDirtyChangePersonMetadata('selectedKopersNrMetadata');

@@ -512,7 +512,7 @@ describe('PersonStore', () => {
       const familienname = 'Vimes';
       const personalnummer = '9876';
 
-  const mockCurrentPerson: Personendatensatz = {
+      const mockCurrentPerson: Personendatensatz = {
         person: {
           id: personId,
           name: {
@@ -599,6 +599,4 @@ describe('PersonStore', () => {
       expect(personStore.errorCode).toEqual('ERROR_LOADING_USER');
     });
   });
-
-  
 });
