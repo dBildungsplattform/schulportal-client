@@ -1,9 +1,14 @@
 <script setup lang="ts">
-  import { defineEmits, onMounted, type Ref } from 'vue';
+  import {
+    type TwoFactorAuthentificationStore,
+    useTwoFactorAuthentificationStore,
+  } from '@/stores/TwoFactorAuthentificationStore';
+  import { computed, defineEmits, onMounted, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
+  const twoFactorStore: TwoFactorAuthentificationStore = useTwoFactorAuthentificationStore();
 
   type Emits = {
     (event: 'updateHeader', header: string): void;
@@ -23,6 +28,16 @@
 
   defineProps<Props>();
 
+  const twoFactorAuthError: ComputedRef<string> = computed(() => {
+    if (twoFactorStore.errorCode === 'SOFTWARE_TOKEN_INITIALIZATION_ERROR') {
+      return t('admin.person.twoFactorAuthentication.errors.softwareTokenInitError');
+    }
+    // Default return, no error
+    return '';
+  });
+
+  const helpDeskUrl: string = t('admin.person.twoFactorAuthentication.errors.helpDeskUrl');
+
   onMounted(() => {
     emits('updateHeader', t('admin.person.twoFactorAuthentication.softwareTokenOption'));
   });
@@ -34,7 +49,7 @@
 
 <template>
   <v-card-text>
-    <v-container>
+    <v-container v-if="!twoFactorStore.errorCode">
       <v-row>
         <p
           class="text-body"
@@ -52,6 +67,23 @@
         />
       </v-row>
     </v-container>
+    <v-container v-else>
+      <v-row>
+        <p
+          class="text-body"
+          data-testid="software-token-dialog-error-text"
+        >
+          {{ twoFactorAuthError }}
+          <a
+            :href="helpDeskUrl"
+            rel="noopener noreferrer"
+            target="_blank"
+            >{{ $t('admin.person.twoFactorAuthentication.errors.iqshHelpdesk') }}</a
+          >
+          .
+        </p>
+      </v-row>
+    </v-container>
   </v-card-text>
   <v-card-actions class="justify-center">
     <v-row class="justify-center">
@@ -59,6 +91,7 @@
         cols="12"
         sm="6"
         md="4"
+        v-if="!twoFactorStore.errorCode"
       >
         <v-btn
           class="primary button"

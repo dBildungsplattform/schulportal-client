@@ -136,7 +136,10 @@
           "TOKEN_RESET_ERROR": "Leider konnten wir Ihren Token aufgrund von technischen Problemen nicht zurücksetzen. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut. Falls das Problem bestehen bleibt, stellen Sie bitte eine Anfrage über den IQSH Helpdesk.  Link: https://www.secure-lernnetz.de/helpdesk/",
           "500": "Ein unbekannter Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
           "SOFTWARE_TOKEN_VERIFICATION_ERROR": "Beim Verifizieren Ihres Tokens ist leider ein Problem aufgetreten.",
-          "connection": "Der Server für die Zwei-Faktor-Authentifizierung kann aktuell nicht erreicht werden. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut."
+          "connection": "Der Server für die Zwei-Faktor-Authentifizierung kann aktuell nicht erreicht werden. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut.",
+          "softwareTokenInitError": "Beim erzeugen Ihres QR-Codes ist leider ein Problem aufgetreten. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut. Falls das Problem bestehen bleibt, stellen Sie bitte eine Anfrage über den",
+          "iqshHelpdesk": "IQSH Helpdesk",
+          "iqshHelpdeskLink": "https://www.secure-lernnetz.de/helpdesk/"
         },
         "tokenResetHardwareErrorHeader": "Fehler beim Zurücksetzen des Hardware-Tokens",
         "tokenResetSoftwareErrorHeader": "Fehler beim Zurücksetzen des Software-Tokens",
