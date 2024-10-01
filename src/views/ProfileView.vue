@@ -227,8 +227,13 @@
   });
 
   const twoFactorAuthError: ComputedRef<string> = computed(() => {
+    // Early return if loading
     if (twoFactorAuthenticationStore.loading) return '';
-    if (twoFactorAuthenticationStore.errorCode) return t('admin.person.twoFactorAuthentication.errors.connection');
+    const ignoredErrorCodes: string[] = ['SOFTWARE_TOKEN_VERIFICATION_ERROR', 'OTP_NICHT_GUELTIG'];
+    if (twoFactorAuthenticationStore.errorCode && !ignoredErrorCodes.includes(twoFactorAuthenticationStore.errorCode)) {
+      return t('admin.person.twoFactorAuthentication.errors.connection');
+    }
+    // Default return, no error
     return '';
   });
 
@@ -530,7 +535,7 @@
       </v-col>
 
       <v-col
-        v-if="!twoFactorAuthenticationStore.loading && twoFactorAuthenticationStore.required"
+        v-if="twoFactorAuthenticationStore.required && twoFactorAuthenticationStore.hasToken != null"
         cols="12"
         sm="12"
         md="6"

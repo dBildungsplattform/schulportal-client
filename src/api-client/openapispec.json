@@ -4669,14 +4669,6 @@
             "PersonenuebersichtBodyParams": {
                 "type": "object",
                 "properties": {
-                    "offset": {
-                        "type": "number",
-                        "description": "The offset of the paginated list."
-                    },
-                    "limit": {
-                        "type": "number",
-                        "description": "The requested limit for the page size."
-                    },
                     "personIds": {
                         "description": "An array of IDs for the persons.",
                         "type": "array",

@@ -120,10 +120,9 @@
     router.push({ name: 'person-management' });
   }
 
-  function resetPassword(personId: string): void {
-    personStore.resetPassword(personId).then((newPassword?: string) => {
-      password.value = newPassword || '';
-    });
+  async function resetPassword(personId: string): Promise<void> {
+    await personStore.resetPassword(personId);
+    password.value = personStore.newPassword || '';
   }
 
   function onLockUser(personId: string, lock: boolean, organisation: string): void {
@@ -1334,10 +1333,10 @@
           thickness="6"
         ></v-divider>
         <!-- Two Factor Authentication -->
-        <template v-if="twoFactorAuthentificationStore.required">
+        <template v-if="twoFactorAuthentificationStore.required && twoFactorAuthentificationStore.hasToken != null">
           <v-container>
             <v-row class="ml-md-16">
-              <v-col v-if="personStore.loading || twoFactorAuthentificationStore.loading">
+              <v-col v-if="personStore.loading">
                 <v-progress-circular indeterminate></v-progress-circular>
               </v-col>
               <template v-else>
@@ -1358,12 +1357,6 @@
                         icon="mdi-alert-outline"
                         v-else-if="twoFactorAuthenticationConnectionError"
                       ></v-icon>
-                      <v-icon
-                        v-else
-                        class="mb-2"
-                        icon="mdi-information"
-                      >
-                      </v-icon>
                     </v-col>
                     <v-col>
                       <template v-if="twoFactorAuthenticationConnectionError">
@@ -1378,7 +1371,12 @@
                         <p v-if="twoFactorAuthentificationStore.tokenKind === TokenKind.hardware">
                           {{ $t('admin.person.twoFactorAuthentication.hardwareTokenIsSetUp') }}
                         </p>
-                        <p v-if="twoFactorAuthentificationStore.serial">
+                        <p
+                          v-if="
+                            twoFactorAuthentificationStore.serial &&
+                            twoFactorAuthentificationStore.tokenKind == TokenKind.hardware
+                          "
+                        >
                           {{
                             $t('admin.person.twoFactorAuthentication.serial') +
                             ': ' +
@@ -1386,15 +1384,27 @@
                           }}
                         </p>
                       </template>
-                      <template v-else>
-                        <p v-if="twoFactorAuthentificationStore.hasToken">
-                          {{ $t('admin.person.twoFactorAuthentication.resetInfo') }}
-                        </p>
-                        <p v-else>
-                          {{ $t('admin.person.twoFactorAuthentication.notSetUp') }}
-                        </p>
-                      </template>
                     </v-col>
+                  </v-row>
+                  <v-row class="text-body">
+                    <v-col
+                      class="text-right"
+                      cols="1"
+                    >
+                      <v-icon
+                        class="mb-2"
+                        icon="mdi-information"
+                      >
+                      </v-icon>
+                    </v-col>
+                    <div class="v-col">
+                      <p v-if="twoFactorAuthentificationStore.hasToken">
+                        {{ $t('admin.person.twoFactorAuthentication.resetInfo') }}
+                      </p>
+                      <p v-if="!twoFactorAuthentificationStore.hasToken">
+                        {{ $t('admin.person.twoFactorAuthentication.notSetUp') }}
+                      </p>
+                    </div>
                   </v-row>
                 </v-col>
                 <v-col
