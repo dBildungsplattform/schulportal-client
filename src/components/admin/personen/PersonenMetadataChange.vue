@@ -26,7 +26,7 @@
   const props: Props = defineProps<Props>();
 
   type Emits = {
-    (event: 'update:selectedKopersNrMetaData', value: string | undefined | null): void;
+    (event: 'update:selectedKopersNrMetadata', value: string | undefined | null): void;
     (event: 'update:selectedVorname', value: string | undefined): void;
     (event: 'update:selectedFamilienname', value: string | undefined): void;
     (event: 'onShowDialogChange', value?: boolean): void;
@@ -37,7 +37,7 @@
   const selectedFamilienname: Ref<string | undefined> = ref(props.selectedFamilienname);
 
   function handleSelectedKopersNrUpdate(value: string | undefined | null): void {
-    emits('update:selectedKopersNrMetaData', value);
+    emits('update:selectedKopersNrMetadata', value);
   }
 
   function handleSelectedVorname(value: string): void {

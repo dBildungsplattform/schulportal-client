@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, vi, type Mock } from 'vitest';
 import { mount, VueWrapper } from '@vue/test-utils';
 import PersonenMetadataChange from './PersonenMetadataChange.vue';
 
-describe('PersonInfoChange', () => {
+describe('PersonenMetadataChange', () => {
   let wrapper: VueWrapper;
   const mockConfirmUnsavedChangesAction: Mock = vi.fn();
 
@@ -76,10 +76,10 @@ describe('PersonInfoChange', () => {
     expect(wrapper.emitted('update:selectedFamilienname')?.[0]).toEqual(['Smith']);
   });
 
-  it('emits update:selectedKopersNrPersonInfo when KopersInput changes', async () => {
+  it('emits update:selectedKopersNrMetadata when KopersInput changes', async () => {
     const kopersInput: VueWrapper = wrapper.findComponent({ name: 'KopersInput' });
     await kopersInput.vm.$emit('update:selectedKopersNr', '654321');
-    expect(wrapper.emitted('update:selectedKopersNrPersonInfo')).toBeTruthy();
-    expect(wrapper.emitted('update:selectedKopersNrPersonInfo')?.[0]).toEqual(['654321']);
+    expect(wrapper.emitted('update:selectedKopersNrMetadata')).toBeTruthy();
+    expect(wrapper.emitted('update:selectedKopersNrMetadata')?.[0]).toEqual(['654321']);
   });
 });
