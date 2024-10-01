@@ -96,10 +96,6 @@ export type CreatedPersonenkontext = DbiamPersonenkontextBodyParams;
 export function parseUserLock(unparsed: object): UserLock | null {
   const result: Partial<UserLock> = {};
 
-  if (LockKeys.PersonId in unparsed) {
-    result.personId = '' + unparsed[LockKeys.PersonId];
-  }
-
   if (LockKeys.LockedBy in unparsed) {
     result.locked_by = '' + unparsed[LockKeys.LockedBy];
   }

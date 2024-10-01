@@ -163,15 +163,17 @@
     switch (key) {
       case LockKeys.LockedBy:
         return t('person.lockedBy');
-      case LockKeys.LockedUntil:
+      case LockKeys.CreatedAt:
         return t('since');
+      case LockKeys.LockedUntil:
+        return t('person.lockedUntil');
       default:
         return key;
     }
   }
 
   function keyValueMapper(key: string, value: string): string {
-    if (key === LockKeys.LockedUntil) {
+    if (key === LockKeys.LockedUntil || key === LockKeys.CreatedAt) {
       return new Intl.DateTimeFormat('de-DE', {
         year: 'numeric',
         month: '2-digit',

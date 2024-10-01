@@ -45,9 +45,9 @@
   const validationSchema: TypedSchema = toTypedSchema(
     object({
       selectedBefristung: string()
-        .required(t('admin.befristung.rules.required')) // Add required rule
-        .matches(DDMMYYYY, t('admin.befristung.rules.format')) // Validate format (DDMMYYYY)
-        .test('notInPast', t('admin.befristung.rules.pastDateNotAllowed'), notInPast), // Validate that the date is not in the past
+        .required(t('admin.befristung.rules.required'))
+        .matches(DDMMYYYY, t('admin.befristung.rules.format'))
+        .test('notInPast', t('admin.befristung.rules.pastDateNotAllowed'), notInPast),
     }),
   );
 
@@ -254,7 +254,10 @@
                 ></v-select>
               </v-col>
             </v-row>
-            <v-row class="justify-center w-full">
+            <v-row
+              class="justify-center w-full"
+              v-if="!props.person.person.isLocked"
+            >
               <v-col
                 class="text-body"
                 cols="12"
