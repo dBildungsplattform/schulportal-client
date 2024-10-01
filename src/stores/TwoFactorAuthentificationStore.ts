@@ -65,7 +65,9 @@ export const useTwoFactorAuthentificationStore: StoreDefinition<
   },
   actions: {
     resetState() {
+      const tempRequired: boolean = this.required;
       this.$reset();
+      this.required = tempRequired;
     },
     async get2FAState(personId: string) {
       this.loading = true;
@@ -172,7 +174,6 @@ export const useTwoFactorAuthentificationStore: StoreDefinition<
           otp: token,
         });
       } catch (error: unknown) {
-        this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
           this.errorCode = error.response?.data.i18nKey || 'SOFTWARE_TOKEN_VERIFICATION_ERROR';
         }
