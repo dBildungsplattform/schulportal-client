@@ -270,6 +270,36 @@
                             "nullable": true,
                             "type": "string"
                         }
+                    },
+                    {
+                        "name": "sortOrder",
+                        "required": false,
+                        "in": "query",
+                        "description": "Order to sort by.",
+                        "schema": {
+                            "nullable": true,
+                            "enum": [
+                                "asc",
+                                "desc"
+                            ],
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "sortField",
+                        "required": false,
+                        "in": "query",
+                        "description": "Field to sort by.",
+                        "schema": {
+                            "nullable": true,
+                            "enum": [
+                                "familienname",
+                                "vorname",
+                                "personalnummer",
+                                "referrer"
+                            ],
+                            "type": "string"
+                        }
                     }
                 ],
                 "responses": {
@@ -956,6 +986,36 @@
                         "description": "Search filter used to filter for Persons. It could be the vorname, familienname, referrer or the personalnummer.",
                         "schema": {
                             "nullable": true,
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "sortOrder",
+                        "required": false,
+                        "in": "query",
+                        "description": "Order to sort by.",
+                        "schema": {
+                            "nullable": true,
+                            "enum": [
+                                "asc",
+                                "desc"
+                            ],
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "sortField",
+                        "required": false,
+                        "in": "query",
+                        "description": "Field to sort by.",
+                        "schema": {
+                            "nullable": true,
+                            "enum": [
+                                "familienname",
+                                "vorname",
+                                "personalnummer",
+                                "referrer"
+                            ],
                             "type": "string"
                         }
                     }
@@ -4662,14 +4722,6 @@
             "PersonenuebersichtBodyParams": {
                 "type": "object",
                 "properties": {
-                    "offset": {
-                        "type": "number",
-                        "description": "The offset of the paginated list."
-                    },
-                    "limit": {
-                        "type": "number",
-                        "description": "The requested limit for the page size."
-                    },
                     "personIds": {
                         "description": "An array of IDs for the persons.",
                         "type": "array",
