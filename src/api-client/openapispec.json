@@ -2341,8 +2341,8 @@
           }
         ]
       },
-      "post": {
-        "operationId": "RolleController_addServiceProviderById",
+      "put": {
+        "operationId": "RolleController_updateServiceProvidersById",
         "summary": "",
         "description": "Add a service-provider to a rolle by id.",
         "parameters": [
@@ -2373,7 +2373,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ServiceProviderResponse"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ServiceProviderResponse"
+                  }
                 }
               }
             }
@@ -2417,13 +2420,16 @@
             }
           },
           {
-            "name": "serviceProviderId",
+            "name": "serviceProviderIds",
             "required": true,
             "in": "query",
-            "description": "The id for the rolle.",
+            "description": "An array of ids for the service providers.",
             "schema": {
               "nullable": false,
-              "type": "string"
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
             }
           }
         ],
@@ -4925,13 +4931,16 @@
       "RolleServiceProviderQueryParams": {
         "type": "object",
         "properties": {
-          "serviceProviderId": {
-            "type": "string",
-            "description": "The id for the rolle.",
-            "nullable": false
+          "serviceProviderIds": {
+            "description": "An array of ids for the service providers.",
+            "nullable": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         },
-        "required": ["serviceProviderId"]
+        "required": ["serviceProviderIds"]
       },
       "ServiceProviderTarget": {
         "type": "string",

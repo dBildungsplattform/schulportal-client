@@ -54,6 +54,7 @@
   async function close2FADialog(isActive: Ref<boolean>): Promise<void> {
     isActive.value = false;
     twoFactorStore.qrCode = '';
+    twoFactorStore.errorCode = '';
     workflowStep.value = TwoFactorSteps.Start;
   }
 
