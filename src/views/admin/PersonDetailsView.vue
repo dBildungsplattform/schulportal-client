@@ -125,13 +125,13 @@
     });
   }
 
-  function onLockUser(personId: string, lock: boolean, lockedBy: string, date: string | undefined): void {
+  async function onLockUser(personId: string, lock: boolean, lockedBy: string, date: string | undefined): void {
     let bodyParams: LockUserBodyParams = {
       lock: lock,
       locked_by: lockedBy,
       locked_until: date,
     };
-    personStore.lockPerson(personId, bodyParams);
+    await personStore.lockPerson(personId, bodyParams);
   }
 
   const handleAlertClose = (): void => {

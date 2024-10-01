@@ -88,6 +88,7 @@
 
   function resetBefristungFields(): void {
     isUnbefristet.value = true;
+    formContext.resetField('selectedBefristung');
     selectedBefristungProps.value.error = false;
     selectedBefristungProps.value['error-messages'] = [];
   }
