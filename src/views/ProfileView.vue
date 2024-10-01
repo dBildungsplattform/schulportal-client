@@ -229,16 +229,15 @@
   const twoFactorAuthError: ComputedRef<string> = computed(() => {
     // Early return if loading
     if (twoFactorAuthenticationStore.loading) return '';
-    const ignoredErrorCodes: string[] = [
-      'SOFTWARE_TOKEN_VERIFICATION_ERROR',
-      'SOFTWARE_TOKEN_INITIALIZATION_ERROR',
-      'OTP_NICHT_GUELTIG',
-    ];
-    if (twoFactorAuthenticationStore.errorCode && !ignoredErrorCodes.includes(twoFactorAuthenticationStore.errorCode)) {
-      return t('admin.person.twoFactorAuthentication.errors.connection');
+
+    switch (twoFactorAuthenticationStore.errorCode) {
+      case 'TOKEN_STATE_ERROR':
+        return t('admin.person.twoFactorAuthentication.errors.tokenStateSelfServiceError');
+      case 'PI_UNAVAILABLE_ERROR':
+        return t('admin.person.twoFactorAuthentication.errors.connection');
+      default:
+        return '';
     }
-    // Default return, no error
-    return '';
   });
 
   function handleGoToPreviousPage(): void {
@@ -539,7 +538,7 @@
       </v-col>
 
       <v-col
-        v-if="twoFactorAuthenticationStore.required && twoFactorAuthenticationStore.hasToken != null"
+        v-if="twoFactorAuthenticationStore.required"
         cols="12"
         sm="12"
         md="6"

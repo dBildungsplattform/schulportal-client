@@ -36,8 +36,6 @@
     return '';
   });
 
-  const helpDeskUrl: string = t('admin.person.twoFactorAuthentication.errors.helpDeskUrl');
-
   onMounted(() => {
     emits('updateHeader', t('admin.person.twoFactorAuthentication.softwareTokenOption'));
   });
@@ -75,7 +73,7 @@
         >
           {{ twoFactorAuthError }}
           <a
-            :href="helpDeskUrl"
+            :href="t('admin.person.twoFactorAuthentication.errors.iqshHelpdeskLink')"
             rel="noopener noreferrer"
             target="_blank"
             >{{ $t('admin.person.twoFactorAuthentication.errors.iqshHelpdesk') }}</a

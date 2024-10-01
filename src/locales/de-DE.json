@@ -140,7 +140,9 @@
           "softwareTokenInitError": "Beim erzeugen Ihres QR-Codes ist leider ein Problem aufgetreten. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut. Falls das Problem bestehen bleibt, stellen Sie bitte eine Anfrage über den",
           "iqshHelpdesk": "IQSH Helpdesk",
           "iqshHelpdeskLink": "https://www.secure-lernnetz.de/helpdesk/",
-          "selfServiceTokenInitError": "Beim erzeugen Ihres QR-Codes ist leider ein Problem aufgetreten. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut. Falls das Problem bestehen bleibt, wenden Sie sich bitte an Ihre schulischen Admins."
+          "selfServiceTokenInitError": "Beim erzeugen Ihres QR-Codes ist leider ein Problem aufgetreten. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut. Falls das Problem bestehen bleibt, wenden Sie sich bitte an Ihre schulischen Admins.",
+          "tokenStateError": "2FA Status des Nutzers konnte nicht ermittelt werden. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut. Falls das Problem bestehen bleibt, stellen Sie bitte eine Anfrage über den",
+          "tokenStateSelfServiceError": "2FA Status des Nutzers konnte nicht ermittelt werden. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut. Falls das Problem bestehen bleibt, wenden Sie sich bitte an Ihre schulischen Admins."
         },
         "tokenResetHardwareErrorHeader": "Fehler beim Zurücksetzen des Hardware-Tokens",
         "tokenResetSoftwareErrorHeader": "Fehler beim Zurücksetzen des Software-Tokens",
