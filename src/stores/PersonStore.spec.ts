@@ -505,8 +505,8 @@ describe('PersonStore', () => {
     });
   });
 
-  describe('changePersonInfoById', () => {
-    it('should update person info and set patchedPerson', async () => {
+  describe('changePersonMetaDataById', () => {
+    it('should update person metadata and set patchedPerson', async () => {
       const personId = '1234';
       const vorname = 'Samuel';
       const familienname = 'Vimes';
@@ -566,7 +566,7 @@ describe('PersonStore', () => {
         return [200, mockResponse];
       });
 
-      await personStore.changePersonInfoById(personId, vorname, familienname, personalnummer);
+      await personStore.changePersonMetaDataById(personId, vorname, familienname, personalnummer);
 
       expect(personStore.loading).toBe(false);
       expect(personStore.patchedPerson).toEqual(mockResponse);
@@ -580,7 +580,7 @@ describe('PersonStore', () => {
 
       mockadapter.onPatch(`/api/personen/${personId}/metadata`).reply(500, { i18nKey: 'ERROR_UPDATING_USER' });
 
-      await personStore.changePersonInfoById(personId, vorname, familienname);
+      await personStore.changePersonMetaDataById(personId, vorname, familienname);
 
       expect(personStore.loading).toBe(false);
       expect(personStore.errorCode).toEqual('ERROR_UPDATING_USER');
@@ -593,7 +593,7 @@ describe('PersonStore', () => {
 
       mockadapter.onPatch(`/api/personen/${personId}/metadata`).reply(500, 'Unknown error');
 
-      await personStore.changePersonInfoById(personId, vorname, familienname);
+      await personStore.changePersonMetaDataById(personId, vorname, familienname);
 
       expect(personStore.loading).toBe(false);
       expect(personStore.errorCode).toEqual('ERROR_LOADING_USER');

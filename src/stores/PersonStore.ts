@@ -143,7 +143,7 @@ type PersonActions = {
   deletePersonById: (personId: string) => Promise<void>;
   lockPerson: (personId: string, lock: boolean, locked_from: string) => Promise<void>;
   getPersonenuebersichtById: (personId: string) => Promise<void>;
-  changePersonInfoById: (
+  changePersonMetadataById: (
     personId: string,
     vorname: string,
     familienname: string,
@@ -352,7 +352,7 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
       }
     },
 
-    async changePersonInfoById(
+    async changePersonMetadataById(
       personId: string,
       vorname: string,
       familienname: string,
@@ -360,7 +360,7 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
     ): Promise<void> {
       this.loading = true;
       try {
-        const personByPersonalnummerBodyParams: PersonMetadataBodyParams = {
+        const personMetadataBodyParams: PersonMetadataBodyParams = {
           vorname: vorname,
           familienname: familienname,
           personalnummer: personalnummer,
@@ -369,7 +369,7 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
         };
         const { data }: { data: PersonendatensatzResponse } = await personenApi.personControllerUpdateMetadata(
           personId,
-          personByPersonalnummerBodyParams,
+          personMetadataBodyParams,
         );
 
         this.patchedPerson = data;

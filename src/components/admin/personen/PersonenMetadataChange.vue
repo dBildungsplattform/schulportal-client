@@ -15,8 +15,8 @@
     confirmUnsavedChangesAction: () => void;
     hasKopersRolle: boolean;
     showUnsavedChangesDialog?: boolean;
-    selectedKopersNrPersonInfoProps: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
-    selectedKopersNrPersonInfo: string | null | undefined;
+    selectedKopersNrMetadataProps: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
+    selectedKopersNrMetadata: string | null | undefined;
     selectedVornameProps: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     selectedVorname: string | undefined;
     selectedFamiliennameProps: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
@@ -26,7 +26,7 @@
   const props: Props = defineProps<Props>();
 
   type Emits = {
-    (event: 'update:selectedKopersNrPersonInfo', value: string | undefined | null): void;
+    (event: 'update:selectedKopersNrMetaData', value: string | undefined | null): void;
     (event: 'update:selectedVorname', value: string | undefined): void;
     (event: 'update:selectedFamilienname', value: string | undefined): void;
     (event: 'onShowDialogChange', value?: boolean): void;
@@ -37,7 +37,7 @@
   const selectedFamilienname: Ref<string | undefined> = ref(props.selectedFamilienname);
 
   function handleSelectedKopersNrUpdate(value: string | undefined | null): void {
-    emits('update:selectedKopersNrPersonInfo', value);
+    emits('update:selectedKopersNrMetaData', value);
   }
 
   function handleSelectedVorname(value: string): void {
@@ -127,8 +127,8 @@
         <KopersInput
           v-if="hasKopersRolle"
           :hideCheckbox="true"
-          :selectedKopersNr="selectedKopersNrPersonInfo"
-          :selectedKopersNrProps="selectedKopersNrPersonInfoProps"
+          :selectedKopersNr="selectedKopersNrMetadata"
+          :selectedKopersNrProps="selectedKopersNrMetadataProps"
           @update:selectedKopersNr="handleSelectedKopersNrUpdate"
         ></KopersInput>
       </v-col>
