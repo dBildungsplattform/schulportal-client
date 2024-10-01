@@ -229,7 +229,11 @@
   const twoFactorAuthError: ComputedRef<string> = computed(() => {
     // Early return if loading
     if (twoFactorAuthenticationStore.loading) return '';
-    const ignoredErrorCodes: string[] = ['SOFTWARE_TOKEN_VERIFICATION_ERROR', 'OTP_NICHT_GUELTIG'];
+    const ignoredErrorCodes: string[] = [
+      'SOFTWARE_TOKEN_VERIFICATION_ERROR',
+      'SOFTWARE_TOKEN_INITIALIZATION_ERROR',
+      'OTP_NICHT_GUELTIG',
+    ];
     if (twoFactorAuthenticationStore.errorCode && !ignoredErrorCodes.includes(twoFactorAuthenticationStore.errorCode)) {
       return t('admin.person.twoFactorAuthentication.errors.connection');
     }

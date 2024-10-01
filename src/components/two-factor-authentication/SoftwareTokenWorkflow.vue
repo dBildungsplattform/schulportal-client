@@ -70,7 +70,7 @@
     <v-container v-else>
       <v-row>
         <p
-          class="text-body"
+          class="text-body bold"
           data-testid="software-token-dialog-error-text"
         >
           {{ twoFactorAuthError }}
