@@ -119,10 +119,9 @@
     router.push({ name: 'person-management' });
   }
 
-  function resetPassword(personId: string): void {
-    personStore.resetPassword(personId).then((newPassword?: string) => {
-      password.value = newPassword || '';
-    });
+  async function resetPassword(personId: string): Promise<void> {
+    await personStore.resetPassword(personId);
+    password.value = personStore.newPassword || '';
   }
 
   async function onLockUser(personId: string, lock: boolean, lockedBy: string, date: string | undefined): void {

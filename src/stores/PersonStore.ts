@@ -141,6 +141,7 @@ type PersonState = {
   currentPerson: Personendatensatz | null;
   personenWithUebersicht: PersonenWithRolleAndZuordnung | null;
   personenuebersicht: DBiamPersonenuebersichtResponse | null;
+  newPassword: string | null;
 };
 
 export type PersonFilter = {
@@ -156,7 +157,7 @@ type PersonActions = {
   resetState: () => void;
   getAllPersons: (filter: PersonFilter) => Promise<void>;
   getPersonById: (personId: string) => Promise<Personendatensatz>;
-  resetPassword: (personId: string) => Promise<string>;
+  resetPassword: (personId: string) => Promise<void>;
   deletePersonById: (personId: string) => Promise<void>;
   lockPerson: (personId: string, bodyParams: LockUserBodyParams) => Promise<void>;
   getPersonenuebersichtById: (personId: string) => Promise<void>;
@@ -175,6 +176,7 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
       loading: false,
       totalPersons: 0,
       currentPerson: null,
+      newPassword: null,
     };
   },
   actions: {
@@ -299,17 +301,16 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
       }
     },
 
-    async resetPassword(personId: string): Promise<string> {
+    async resetPassword(personId: string): Promise<void> {
       this.loading = true;
       try {
         const { data }: { data: string } = await personenApi.personControllerResetPasswordByPersonId(personId);
-        return data;
+        this.newPassword = data;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
           this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
         }
-        return await Promise.reject(this.errorCode);
       } finally {
         this.loading = false;
       }
