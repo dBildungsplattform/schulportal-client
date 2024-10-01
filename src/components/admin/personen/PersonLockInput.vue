@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { ref, watch, type Ref } from 'vue';
+  import { onBeforeMount, ref, watch, type Ref } from 'vue';
   import { useI18n } from 'vue-i18n';
   import type { BaseFieldProps } from 'vee-validate';
 
@@ -39,9 +39,14 @@
   watch(selectedRadioButton, (newVal: string) => {
     if (newVal === RadioButtonSelect.FIRST_OPTION) {
       emit('handleSelectedRadioButtonChange', true);
+      localBefristung.value = '';
     } else if (newVal === RadioButtonSelect.SECOND_OPTION) {
       emit('handleSelectedRadioButtonChange', false);
     }
+  });
+
+  onBeforeMount(async () => {
+    localBefristung.value = '';
   });
 </script>
 
