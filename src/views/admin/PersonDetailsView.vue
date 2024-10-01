@@ -5,6 +5,7 @@
   import PasswordReset from '@/components/admin/personen/PasswordReset.vue';
   import PersonDelete from '@/components/admin/personen/PersonDelete.vue';
   import PersonLock from '@/components/admin/personen/PersonLock.vue';
+  import PersonSync from '@/components/admin/personen/PersonSync.vue';
   import PersonenkontextCreate from '@/components/admin/personen/PersonenkontextCreate.vue';
   import PersonenkontextDelete from '@/components/admin/personen/PersonenkontextDelete.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
@@ -150,6 +151,11 @@
   // Deletes the person and all kontexte
   async function deletePerson(personId: string): Promise<void> {
     await personStore.deletePersonById(personId);
+  }
+
+  // Synchronizes the person with external systems
+  async function syncPerson(personId: string): Promise<void> {
+    await personStore.syncPersonById(personId);
   }
 
   function keyMapper(key: string): string {
@@ -1975,6 +1981,17 @@
                     @onDeletePerson="deletePerson(currentPersonId)"
                   >
                   </PersonDelete>
+                </template>
+              </div>
+              <div class="d-flex justify-sm-end">
+                <template v-if="authStore.hasPersonenSyncPermission">
+                  <PersonSync
+                    :disabled="isEditActive || isEditPersonInfoActive"
+                    :errorCode="personStore.errorCode"
+                    :person="personStore.currentPerson"
+                    @onSyncPerson="syncPerson(currentPersonId)"
+                  >
+                  </PersonSync>
                 </template>
               </div>
             </v-col>

@@ -798,6 +798,51 @@
                 ]
             }
         },
+        "/api/personen/{personId}/sync": {
+            "post": {
+                "operationId": "PersonController_syncPerson",
+                "parameters": [
+                    {
+                        "name": "personId",
+                        "required": true,
+                        "in": "path",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User will be synced."
+                    },
+                    "403": {
+                        "description": "Insufficient permissions to perform operation."
+                    },
+                    "404": {
+                        "description": "The person was not found."
+                    },
+                    "500": {
+                        "description": "An internal server error occurred."
+                    },
+                    "502": {
+                        "description": "A downstream server returned an error."
+                    }
+                },
+                "tags": [
+                    "personen"
+                ],
+                "security": [
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
         "/api/personen/{personId}/personalnummer": {
             "patch": {
                 "operationId": "PersonController_updatePersonalnummer",
@@ -4662,14 +4707,6 @@
             "PersonenuebersichtBodyParams": {
                 "type": "object",
                 "properties": {
-                    "offset": {
-                        "type": "number",
-                        "description": "The offset of the paginated list."
-                    },
-                    "limit": {
-                        "type": "number",
-                        "description": "The requested limit for the page size."
-                    },
                     "personIds": {
                         "description": "An array of IDs for the persons.",
                         "type": "array",
