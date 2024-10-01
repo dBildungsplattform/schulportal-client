@@ -209,7 +209,7 @@
               data-testid="schulform-radio-group"
             >
               <v-col
-                v-for="schultraeger in schultraegerList"
+                v-for="(schultraeger, index) in schultraegerList"
                 :key="schultraeger.id"
                 offset-md="1"
                 cols="12"
@@ -219,7 +219,7 @@
                 <v-radio
                   :label="schultraeger.name"
                   :value="schultraeger.id"
-                  data-testid="schulform-radio-button-${schultraeger.id}"
+                  :data-testid="'schulform-radio-button-' + index"
                 ></v-radio>
               </v-col>
             </v-radio-group>
