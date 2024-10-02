@@ -28,7 +28,7 @@ beforeEach(() => {
           referrer: 'atest',
           personalnummer: null,
           isLocked: null,
-          lockInfo: null,
+          userLock: null,
           revision: '1',
           lastModified: '2024-05-22',
         },

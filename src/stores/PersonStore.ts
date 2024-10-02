@@ -10,6 +10,7 @@ import {
   type DbiamPersonenuebersichtApiInterface,
   type DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response,
   type DBiamPersonenuebersichtResponse,
+  type LockUserBodyParams,
   type PersonByPersonalnummerBodyParams,
   type PersonenApiInterface,
   type PersonendatensatzResponse,
@@ -30,10 +31,17 @@ const personenuebersichtApi: DbiamPersonenuebersichtApiInterface = DbiamPersonen
 );
 
 export enum LockKeys {
-  LockedFrom = 'lock_locked_from',
-  Timestamp = 'lock_timestamp',
+  PersonId = 'personId',
+  LockedBy = 'locked_by',
+  LockedUntil = 'locked_until',
+  CreatedAt = 'created_at',
 }
-export type LockInfo = Record<LockKeys, string>;
+export type UserLock = {
+  personId: string;
+  locked_by: string;
+  locked_until: string;
+  created_at: string;
+};
 
 export type Person = {
   id: PersonResponse['id'];
@@ -42,7 +50,7 @@ export type Person = {
   revision: PersonResponse['revision'];
   personalnummer: PersonResponse['personalnummer'];
   isLocked: PersonResponse['isLocked'];
-  lockInfo: LockInfo | null;
+  userLock: UserLock | null;
   lastModified: PersonResponse['lastModified'];
 };
 
@@ -85,18 +93,28 @@ export type PersonTableItem = {
 export type CreatePersonBodyParams = DbiamCreatePersonWithPersonenkontexteBodyParams;
 export type CreatedPersonenkontext = DbiamPersonenkontextBodyParams;
 
-export function parseLockInfo(unparsed: object): LockInfo | null {
-  if (!Object.values(LockKeys).every((key: string) => key in unparsed)) return null;
-  return {
-    lock_locked_from: LockKeys.LockedFrom in unparsed ? '' + unparsed[LockKeys.LockedFrom] : '',
-    lock_timestamp: LockKeys.Timestamp in unparsed ? '' + unparsed[LockKeys.Timestamp] : '',
-  };
+export function parseUserLock(unparsed: object): UserLock | null {
+  const result: Partial<UserLock> = {};
+
+  if (LockKeys.LockedBy in unparsed) {
+    result.locked_by = '' + unparsed[LockKeys.LockedBy];
+  }
+
+  if (LockKeys.LockedUntil in unparsed) {
+    result.locked_until = '' + unparsed[LockKeys.LockedUntil];
+  }
+
+  if (LockKeys.CreatedAt in unparsed) {
+    result.created_at = '' + unparsed[LockKeys.CreatedAt];
+  }
+
+  return Object.keys(result).length > 0 ? (result as UserLock) : null;
 }
 
 export function mapPersonendatensatzResponseToPersonendatensatz(
   response: PersonendatensatzResponse,
 ): Personendatensatz {
-  const lockInfo: LockInfo | null = parseLockInfo(response.person.lockInfo ?? {});
+  const userLock: UserLock | null = parseUserLock(response.person.userLock ?? {});
   const person: Person = {
     id: response.person.id,
     name: response.person.name,
@@ -104,7 +122,7 @@ export function mapPersonendatensatzResponseToPersonendatensatz(
     revision: response.person.revision,
     personalnummer: response.person.personalnummer,
     isLocked: response.person.isLocked,
-    lockInfo: lockInfo,
+    userLock: userLock,
     lastModified: response.person.lastModified,
   };
   return { person };
@@ -141,7 +159,7 @@ type PersonActions = {
   getPersonById: (personId: string) => Promise<Personendatensatz>;
   resetPassword: (personId: string) => Promise<void>;
   deletePersonById: (personId: string) => Promise<void>;
-  lockPerson: (personId: string, lock: boolean, locked_from: string) => Promise<void>;
+  lockPerson: (personId: string, bodyParams: LockUserBodyParams) => Promise<void>;
   getPersonenuebersichtById: (personId: string) => Promise<void>;
   changePersonInfoById: (personId: string, personalnummer: string) => Promise<void>;
 };
@@ -311,13 +329,10 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
         this.loading = false;
       }
     },
-    async lockPerson(personId: string, lock: boolean, locked_from: string): Promise<void> {
+    async lockPerson(personId: string, bodyParams: LockUserBodyParams): Promise<void> {
       this.loading = true;
       try {
-        await personenApi.personControllerLockPerson(personId, {
-          lock: lock,
-          locked_from: locked_from,
-        });
+        await personenApi.personControllerLockPerson(personId, bodyParams);
         await this.getPersonById(personId);
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';

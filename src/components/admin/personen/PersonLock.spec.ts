@@ -61,10 +61,12 @@ function getPersonendatensatz(locked: boolean): Personendatensatz {
     isLocked: locked,
     revision: '1',
     lastModified: '2024-05-22',
-    lockInfo: locked
+    userLock: locked
       ? {
-          lock_locked_from: 'Amanda Admin',
-          lock_timestamp: Date.now().toString(),
+          personId: '123',
+          locked_by: 'Amanda Admin',
+          locked_until: Date.now().toString(),
+          created_at: Date.now().toString(),
         }
       : null,
   };
