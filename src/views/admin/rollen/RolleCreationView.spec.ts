@@ -156,7 +156,7 @@ describe('RolleCreationView', () => {
 
     wrapper
       ?.findComponent({ ref: 'rolle-creation-form' })
-      .findComponent({ ref: 'formwrapper' })
+      .findComponent({ ref: 'form-wrapper' })
       .find('[data-testid="rolle-form-create-button"]')
       .trigger('click');
     await nextTick();
@@ -200,6 +200,7 @@ describe('RolleCreationView', () => {
 
     expect(rolleStore.createdRolle).toBe(null);
   });
+
   test('it displays the success template with service providers', async () => {
     const mockRolle: RolleResponse = {
       administeredBySchulstrukturknoten: '1234',
