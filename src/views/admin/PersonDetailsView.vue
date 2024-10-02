@@ -951,6 +951,7 @@
     }
     return '';
   });
+  const loading: Ref<boolean> = ref(true);
 
   onBeforeMount(async () => {
     personStore.resetState();
@@ -970,6 +971,7 @@
       workflowStepPromise,
       get2FAStatePromise,
     ]);
+    loading.value = false;
 
     hasKlassenZuordnung.value = personStore.personenuebersicht?.zuordnungen.some(
       (zuordnung: Zuordnung) => zuordnung.typ === OrganisationsTyp.Klasse,
@@ -1873,7 +1875,24 @@
         </v-container>
       </template>
       <!-- Two Factor Authentication -->
-      <template v-if="twoFactorAuthentificationStore.required && twoFactorAuthentificationStore.hasToken != null">
+      <template v-if="loading">
+        <v-divider
+          class="border-opacity-100 rounded my-6 mx-4"
+          color="#E5EAEF"
+          thickness="6"
+        ></v-divider>
+        <v-container>
+          <v-row class="ml-md-16">
+            <v-col> <v-progress-circular indeterminate></v-progress-circular></v-col>
+          </v-row>
+        </v-container>
+        <v-divider
+          class="border-opacity-100 rounded my-6 mx-4"
+          color="#E5EAEF"
+          thickness="6"
+        ></v-divider>
+      </template>
+      <template v-else-if="twoFactorAuthentificationStore.required && twoFactorAuthentificationStore.hasToken != null">
         <v-divider
           class="border-opacity-100 rounded my-6 mx-4"
           color="#E5EAEF"
