@@ -229,7 +229,9 @@ describe('TwoFactorAuthentificationStore', () => {
     it('should handle error code', async () => {
       const referrer: string = 'testReferrer';
 
-      mockadapter.onPut(`/api/2fa-token/reset?personId=${referrer}`).replyOnce(500, { code: 'some mock server error', i18nKey: 'RESET_TOKEN_ERROR' });
+      mockadapter
+        .onPut(`/api/2fa-token/reset?personId=${referrer}`)
+        .replyOnce(500, { code: 'some mock server error', i18nKey: 'RESET_TOKEN_ERROR' });
       const resetTokenPromise: Promise<void> = twoFactorAuthenticationStore.resetToken(referrer);
       expect(twoFactorAuthenticationStore.loading).toBe(true);
       await resetTokenPromise;

@@ -114,12 +114,27 @@ describe('PersonStore', () => {
         },
         {
           person: {
-            id: '3975',
+            id: '3755',
             name: {
               familienname: 'Mardy',
               vorname: 'Hatt',
             },
             referrer: 'hmardy',
+            personalnummer: null,
+            isLocked: false,
+            lockInfo: null,
+            revision: '1',
+            lastModified: '2024-12-22',
+          },
+        },
+        {
+          person: {
+            id: '3975',
+            name: {
+              familienname: 'Jardy',
+              vorname: 'Heff',
+            },
+            referrer: 'hjardy',
             personalnummer: null,
             isLocked: false,
             lockInfo: null,
@@ -159,7 +174,7 @@ describe('PersonStore', () => {
                 typ: OrganisationsTyp.Schule,
                 administriertVon: 'string',
                 editable: true,
-                merkmale: ["KOPERS_PFLICHT"] as unknown as RollenMerkmal,
+                merkmale: ['KOPERS_PFLICHT'] as unknown as RollenMerkmal,
                 befristung: '2025-04-05',
               },
             ],
@@ -180,7 +195,7 @@ describe('PersonStore', () => {
                 typ: OrganisationsTyp.Schule,
                 administriertVon: 'string',
                 editable: true,
-                merkmale: ["KOPERS_PFLICHT"] as unknown as RollenMerkmal,
+                merkmale: ['KOPERS_PFLICHT'] as unknown as RollenMerkmal,
                 befristung: '2025-04-05',
               },
             ],
@@ -194,18 +209,18 @@ describe('PersonStore', () => {
             zuordnungen: [],
           },
           {
-            personId: '5678',
+            personId: '3755',
             vorname: 'Hatt',
             nachname: 'Mardy',
-            benutzername: 'string',
+            benutzername: 'hmardy',
             lastModifiedZuordnungen: '08.02.2024',
             zuordnungen: [
               {
                 sskId: '1',
-                rolleId: 'string',
+                rolleId: '3',
                 sskName: 'Schule A',
                 sskDstNr: '642462',
-                rolle: 'string',
+                rolle: 'SuS',
                 typ: OrganisationsTyp.Schule,
                 administriertVon: 'string',
                 editable: true,
@@ -214,10 +229,43 @@ describe('PersonStore', () => {
               },
               {
                 sskId: '3',
-                rolleId: 'string',
+                rolleId: '3',
                 sskName: '2b',
                 sskDstNr: '642462-2b',
-                rolle: 'string',
+                rolle: 'SuS',
+                typ: OrganisationsTyp.Klasse,
+                administriertVon: '1',
+                editable: true,
+                merkmale: [] as unknown as RollenMerkmal,
+                befristung: '2025-04-05',
+              },
+            ],
+          },
+          {
+            personId: '3975',
+            vorname: 'Heff',
+            nachname: 'Jardy',
+            benutzername: 'hjardy',
+            lastModifiedZuordnungen: '08.02.2024',
+            zuordnungen: [
+              {
+                sskId: '1',
+                rolleId: '3',
+                sskName: 'Schule A',
+                sskDstNr: '642462',
+                rolle: 'SuS',
+                typ: OrganisationsTyp.Schule,
+                administriertVon: 'string',
+                editable: true,
+                merkmale: [] as unknown as RollenMerkmal,
+                befristung: '2025-04-05',
+              },
+              {
+                sskId: '3',
+                rolleId: '3',
+                sskName: '',
+                sskDstNr: '642462-2b',
+                rolle: 'SuS',
                 typ: OrganisationsTyp.Klasse,
                 administriertVon: '1',
                 editable: true,
@@ -253,6 +301,7 @@ describe('PersonStore', () => {
       // check if klassen are displayed correctly
       expect(personStore.personenWithUebersicht?.[0]?.klassen).toEqual('---');
       expect(personStore.personenWithUebersicht?.[3]?.klassen).toEqual('2b');
+      expect(personStore.personenWithUebersicht?.[4]?.klassen).toEqual('---');
     });
 
     it('should return null if no persons were found', async () => {
@@ -501,7 +550,7 @@ describe('PersonStore', () => {
   });
 
   describe('changePersonInfoById', () => {
-    it('should change a person\'s metadata and update state', async () => {
+    it("should change a person's metadata and update state", async () => {
       const personId: string = '1234';
       const personalnummer: string = '1234567';
 
@@ -529,7 +578,9 @@ describe('PersonStore', () => {
       const personId: string = '1234';
       const personalnummer: string = '1234567';
 
-      mockadapter.onPatch(`/api/personen/${personId}/personalnummer`).replyOnce(500, { i18nKey: 'CHANGE_METADATA_ERROR' });
+      mockadapter
+        .onPatch(`/api/personen/${personId}/personalnummer`)
+        .replyOnce(500, { i18nKey: 'CHANGE_METADATA_ERROR' });
 
       await rejects(personStore.changePersonInfoById(personId, personalnummer));
 
