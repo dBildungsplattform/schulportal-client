@@ -65,6 +65,7 @@ export default defineConfig({
         'src/services/**',
         'src/specs/**',
         'src/router/**',
+        'src/**/**.spec.ts',
         'src/App.vue',
         'src/main.ts',
       ],
