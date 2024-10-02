@@ -109,7 +109,10 @@
           </v-container>
           <v-container v-if="isTokenResetRequested">
             <v-row class="text-body px-md-16 bold">
-              <v-col data-testid="dialog-text" class="whiteSpace">
+              <v-col
+                data-testid="dialog-text"
+                class="whiteSpace"
+              >
                 {{ dialogText }}
               </v-col>
             </v-row>
