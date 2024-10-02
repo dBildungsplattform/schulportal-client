@@ -184,7 +184,10 @@
             </v-container>
             <v-container v-else>
               <v-row>
-                <p class="text-body bold">
+                <p
+                  class="text-body bold"
+                  data-testid="self-service-token-init-error-text"
+                >
                   {{ $t('admin.person.twoFactorAuthentication.errors.selfServiceTokenInitError') }}
                 </p>
               </v-row>
@@ -234,6 +237,7 @@
                 <v-row
                   v-if="errorMessage.length === 0"
                   class="text-body bold justify-center"
+                  data-testid="self-service-token-verify-error-text"
                 >
                   <p class="justify-center">{{ $t('admin.person.twoFactorAuthentication.otp') }}</p>
                 </v-row>
