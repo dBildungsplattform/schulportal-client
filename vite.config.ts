@@ -63,6 +63,7 @@ export default defineConfig({
         'src/api-client/**',
         'src/plugins/**',
         'src/services/**',
+        'src/specs/**',
         'src/router/**',
         'src/App.vue',
         'src/main.ts',

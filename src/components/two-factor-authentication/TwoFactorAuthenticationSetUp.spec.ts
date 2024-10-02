@@ -98,7 +98,6 @@ describe('set up two-factor authentication', () => {
     await proceedButtonElement.trigger('click');
     await nextTick();
 
-    console.log(document.body.innerHTML);
     expect(document.querySelector('[data-testid="software-token-workflow"]')).toBeNull();
   });
 
