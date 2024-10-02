@@ -36,7 +36,6 @@
     (e: 'onTableUpdate', options: { sortField: string | undefined; sortOrder: 'asc' | 'desc' }): void;
     (event: 'onItemsPerPageUpdate', limit: number): void;
     (event: 'onPageUpdate', page: number): void;
-    (e: 'update:sortBy', sortBy: SortItem[]): void;
   };
 
   const emit: Emits = defineEmits<Emits>();
@@ -71,16 +70,6 @@
       sortField: sortItem?.key,
       sortOrder: sortItem?.order === 'desc' ? 'desc' : 'asc',
     });
-
-    // Handle pagination
-    if (options.page) {
-      emit('onPageUpdate', options.page);
-    }
-
-    // Handle items per page
-    if (options.itemsPerPage) {
-      emit('onItemsPerPageUpdate', options.itemsPerPage);
-    }
   }
 </script>
 
