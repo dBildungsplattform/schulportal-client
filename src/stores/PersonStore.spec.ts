@@ -33,6 +33,42 @@ function getMockPersonendatensatz(): Personendatensatz {
     },
   };
 }
+
+function getMockLockedPersonendatensatz(): Personendatensatz {
+  return {
+    person: {
+      id: '123456',
+      name: {
+        familienname: 'Vimes',
+        vorname: 'Susan',
+      },
+      referrer: '6978',
+      personalnummer: '9183756',
+      isLocked: true,
+      lockInfo: { lock_locked_from: 'admin', lock_timestamp: '2024-12-22' },
+      revision: '1',
+      lastModified: '2024-12-22',
+    },
+  };
+}
+
+function getMockLockedPersonendatensatzResponse(): PersonendatensatzResponse {
+  return {
+    person: {
+      ...getMockLockedPersonendatensatz().person,
+      mandant: '',
+      geburt: {},
+      stammorganisation: '',
+      geschlecht: '',
+      lokalisierung: '',
+      vertrauensstufe: Vertrauensstufe.Teil,
+      revision: '1',
+      startpasswort: '',
+      lastModified: '2024-12-22',
+    },
+  };
+}
+
 function getMockPersonendatensatzResponse(): PersonendatensatzResponse {
   return {
     person: {
@@ -743,6 +779,52 @@ describe('PersonStore', () => {
       expect(personStore.loading).toBe(false);
       expect(personStore.totalPersons).toBe(0);
       expect(personStore.currentPerson).toBe(null);
+    });
+  });
+  describe('lockPerson', () => {
+    it('should successfully lock the person and update state', async () => {
+      const personId: string = '123456';
+      const lock: boolean = true;
+      const lockedFrom: string = 'admin';
+      personStore.currentPerson = getMockPersonendatensatz();
+      const mockResponse = { message: 'User has been successfully locked.' };
+      const mockPersonResponse: PersonendatensatzResponse = getMockLockedPersonendatensatzResponse();
+      mockadapter.onPut(`/api/personen/${personId}/lock-user`).replyOnce(200, mockResponse);
+      mockadapter.onGet(`/api/personen/${personId}`).replyOnce(200, mockPersonResponse);
+
+      const lockPersonPromise: Promise<void> = personStore.lockPerson(personId, lock, lockedFrom);
+      expect(personStore.loading).toBe(true);
+      await lockPersonPromise;
+      expect(personStore.loading).toBe(false);
+      expect(personStore.errorCode).toBe('');
+      expect(personStore.currentPerson.person.id).toBe(mockPersonResponse.person.id);
+      expect(personStore.currentPerson.person.isLocked).toBe(mockPersonResponse.person.isLocked);
+      expect(personStore.currentPerson.person.lockInfo).toEqual(mockPersonResponse.person.lockInfo);
+      expect(personStore.currentPerson.person.lastModified).toBe(mockPersonResponse.person.lastModified);
+    });
+
+    it('should handle error when locking a person fails with string error', async () => {
+      const personId: string = '123456';
+      const lock: boolean = true;
+      const lockedFrom: string = 'admin';
+      mockadapter.onPut(`/api/personen/${personId}/lock-user`).replyOnce(500, 'mock server error');
+      const lockPersonPromise: Promise<void> = personStore.lockPerson(personId, lock, lockedFrom);
+      expect(personStore.loading).toBe(true);
+      await expect(lockPersonPromise).rejects.toEqual('UNSPECIFIED_ERROR');
+      expect(personStore.loading).toBe(false);
+      expect(personStore.errorCode).toBe('UNSPECIFIED_ERROR');
+    });
+
+    it('should handle error when locking a person fails with error code', async () => {
+      const personId: string = '123456';
+      const lock: boolean = true;
+      const lockedFrom: string = 'admin';
+      mockadapter.onPut(`/api/personen/${personId}/lock-user`).replyOnce(500, { code: 'LOCK_FAILED_ERROR' });
+      const lockPersonPromise: Promise<void> = personStore.lockPerson(personId, lock, lockedFrom);
+      expect(personStore.loading).toBe(true);
+      await expect(lockPersonPromise).rejects.toEqual('LOCK_FAILED_ERROR');
+      expect(personStore.loading).toBe(false);
+      expect(personStore.errorCode).toBe('LOCK_FAILED_ERROR');
     });
   });
 });
