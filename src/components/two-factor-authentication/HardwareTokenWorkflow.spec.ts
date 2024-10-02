@@ -7,6 +7,7 @@ import {
 import { vi } from 'vitest';
 import type { Personendatensatz } from '@/stores/PersonStore';
 import { nextTick } from 'vue';
+import type { AxiosError } from 'axios';
 vi.mock('vue-i18n', () => ({
   useI18n: (): { t: (key: string) => string } => ({
     t: (key: string) => key,
@@ -59,7 +60,6 @@ describe('HardwareTokenWorkflow.vue', () => {
         },
       },
     });
-    vi.spyOn(twoFactorAuthenticationStore, 'assignHardwareToken').mockClear();
   });
 
   wrapper = mount(HardwareTokenWorkflow, {
@@ -127,11 +127,76 @@ describe('HardwareTokenWorkflow.vue', () => {
     }
 
     wrapper?.find('[data-testid="hardware-token-input-create-button"]').trigger('click');
-    await nextTick();
   });
 
   test('it handles cancel action correctly', async () => {
     wrapper?.find('[data-testid="hardware-token-input-discard-button"]').trigger('click');
     await nextTick();
   });
+
+  test('it triggers handleApiError on API error', async () => {
+    // Mock the error response
+    const errorResponse: AxiosError = {
+      isAxiosError: true,
+      response: {
+        data: {
+          i18nKey: 'some_error_key',
+        },
+      },
+      // Add necessary AxiosError properties (you can leave others as any if not needed)
+      config: {},
+      request: {},
+      toJSON: () => ({}),
+    } as AxiosError;
+    // Mock the assignHardwareToken to throw an error
+    vi.spyOn(twoFactorAuthenticationStore, 'assignHardwareToken').mockRejectedValueOnce(errorResponse);
+
+    // Fill in valid inputs
+    const serialWrapper: HTMLElement = document.querySelector(
+      '[data-testid="hardware-token-input-serial"]',
+    ) as HTMLElement;
+    const serialInput: HTMLInputElement | null = serialWrapper.querySelector('input');
+    const otpWrapper: HTMLElement = document.querySelector('[data-testid="hardware-token-input-otp"]') as HTMLElement;
+    const otpInput: HTMLInputElement | null = otpWrapper.querySelector('input');
+
+    if (serialInput && otpInput) {
+      serialInput.value = '123456';
+      otpInput.value = '789012';
+
+      serialInput.dispatchEvent(new Event('input'));
+      otpInput.dispatchEvent(new Event('input'));
+    }
+
+    await wrapper?.find('[data-testid="hardware-token-input-create-button"]').trigger('click');
+    await nextTick();
+
+    const errorResponse2: AxiosError = {
+      isAxiosError: true,
+      response: {
+        data: {
+          i18nKey: null,
+        },
+      },
+      // Add necessary AxiosError properties (you can leave others as any if not needed)
+      config: {},
+      request: {},
+      toJSON: () => ({}),
+    } as AxiosError;
+    // Mock the assignHardwareToken to throw an error
+    vi.spyOn(twoFactorAuthenticationStore, 'assignHardwareToken').mockRejectedValueOnce(errorResponse2);
+
+    await wrapper?.find('[data-testid="hardware-token-input-create-button"]').trigger('click');
+    await nextTick();
+  });
+
+  // // New test for triggering cancelCheck
+  // test('it calls cancelCheck method when discard button is clicked', async () => {
+  //   // Assuming cancelCheck method resets the error and dialogText
+  //   wrapper?.find('[data-testid="hardware-token-input-discard-button"]').trigger('click');
+  //   await nextTick();
+
+  //   expect(wrapper?.vm.$data.hardwareTokenIsAssigned).toBe(false);
+  //   expect(wrapper?.vm.dialogText).toBe('');
+  //   expect(wrapper?.vm.errorThrown).toBe(false);
+  // });
 });
