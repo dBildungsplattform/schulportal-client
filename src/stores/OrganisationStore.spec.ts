@@ -538,13 +538,13 @@ describe('OrganisationStore', () => {
       };
 
       mockadapter.onGet('/api/organisationen/root/children').replyOnce(200, mockResponse);
-      const updateOrganisationPromise: Promise<void> = organisationStore.loadSchultraeger();
+      const updateOrganisationPromise: Promise<void> = organisationStore.getSchultraeger();
       await updateOrganisationPromise;
       expect(organisationStore.schultraeger).toEqual([mockResponse.oeffentlich, mockResponse.ersatz]);
     });
     it('should handle string error', async () => {
       mockadapter.onGet('/api/organisationen/root/children').replyOnce(500, 'some mock server error');
-      const updateOrganisationPromise: Promise<void> = organisationStore.loadSchultraeger();
+      const updateOrganisationPromise: Promise<void> = organisationStore.getSchultraeger();
       await updateOrganisationPromise;
       expect(organisationStore.schultraeger).toEqual([]);
       expect(organisationStore.errorCode).toEqual('SCHULTRAEGER_ERROR');
@@ -552,7 +552,7 @@ describe('OrganisationStore', () => {
 
     it('should handle error code', async () => {
       mockadapter.onGet('/api/organisationen/root/children').replyOnce(500, { i18nKey: 'GET_ERROR' });
-      const updateOrganisationPromise: Promise<void> = organisationStore.loadSchultraeger();
+      const updateOrganisationPromise: Promise<void> = organisationStore.getSchultraeger();
       await updateOrganisationPromise;
       expect(organisationStore.schultraeger).toEqual([]);
       expect(organisationStore.errorCode).toEqual('GET_ERROR');

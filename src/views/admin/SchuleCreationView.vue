@@ -100,8 +100,6 @@
   });
 
   const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = handleSubmit(async () => {
-    // TODO: remove this assignment once schulform can be retrieved from the backend.
-    // (Necessary here since when we flush the form onSubmit the selectedSchulform won't show up in the success page)
     preservedSchulform.value = schultraegerList.value?.find(
       (schultraeger: Organisation) => schultraeger.id === selectedSchulform.value,
     )?.name;
@@ -149,7 +147,7 @@
 
   onMounted(async () => {
     organisationStore.createdSchule = null;
-    organisationStore.loadSchultraeger();
+    organisationStore.getSchultraeger();
     /* listen for browser changes and prevent them when form is dirty */
     window.addEventListener('beforeunload', preventNavigation);
   });

@@ -102,7 +102,7 @@ type OrganisationActions = {
   ) => Promise<Organisation>;
   deleteOrganisationById: (organisationId: string) => Promise<void>;
   updateOrganisationById: (organisationId: string, name: string) => Promise<void>;
-  loadSchultraeger: () => Promise<void>;
+  getSchultraeger: () => Promise<void>;
 };
 
 export { OrganisationsTyp };
@@ -358,11 +358,11 @@ export const useOrganisationStore: StoreDefinition<
       }
     },
 
-    async loadSchultraeger() {
+    async getSchultraeger() {
       try {
         const response: AxiosResponse<OrganisationRootChildrenResponse> =
           await organisationApi.organisationControllerGetRootChildren();
-        this.schultraeger = [response.data.oeffentlich, response.data.ersatz];
+        this.schultraeger = Object.values(response.data);
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
