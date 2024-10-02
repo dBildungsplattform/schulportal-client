@@ -250,11 +250,11 @@
   }
 
   // Define a mapping between complex keys and backend keys
-  const keyMapping: Record<string, string> = {
-    'person.name.familienname': 'familienname',
-    'person.name.vorname': 'vorname',
-    'person.referrer': 'referrer',
-    'person.personalnummer': 'personalnummer',
+  const keyMapping: Record<string, SortField> = {
+    'person.name.familienname': SortField.Familienname,
+    'person.name.vorname': SortField.Vorname,
+    'person.referrer': SortField.Referrer,
+    'person.personalnummer': SortField.Personalnummer,
   };
 
   function mapKeyToBackend(key: string): string {
