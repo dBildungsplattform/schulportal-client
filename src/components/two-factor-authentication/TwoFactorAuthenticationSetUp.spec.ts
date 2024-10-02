@@ -97,24 +97,23 @@ describe('set up two-factor authentication', () => {
     const proceedButtonElement: DOMWrapper<Element> = new DOMWrapper(proceedButton);
     await proceedButtonElement.trigger('click');
     await nextTick();
-
-    console.log(document.body.innerHTML);
-    expect(document.querySelector('[data-testid="software-token-workflow"]')).toBeNull();
+    expect(document.querySelector('[data-testid="layout-card-headline"]')).not.toBeNull();
+    expect(document.querySelector('[data-testid="layout-card-headline"]')?.textContent).toBe(
+      'Software-Token einrichten',
+    );
   });
 
-  test.skip('it closes the dialog when the cancel button is clicked', async () => {
-    const button: Omit<DOMWrapper<Element>, 'exists'> | undefined = wrapper?.get(
-      '[data-testid="open-2FA-dialog-icon"]',
-    );
-    expect(button).not.toBeNull();
-    await button!.trigger('click');
+  test('it closes the dialog when the cancel button is clicked', async () => {
+    const button: DOMWrapper<HTMLButtonElement> = wrapper!.find('[data-testid="open-2FA-dialog-icon"]');
+    expect(button.exists()).toBe(true);
+    await button.trigger('click');
     await nextTick();
+    console.log(document.body.innerHTML);
 
-    const cancelButton: Omit<DOMWrapper<Element>, 'exists'> | undefined = wrapper?.get(
-      '[data-testid="close-two-factor-authentication-dialog-button"]',
-    );
+    const cancelButton: Element | null = document.querySelector('[data-testid="close-two-factor-authentication-dialog-button"]');
     expect(cancelButton).not.toBeNull();
-    await cancelButton!.trigger('click');
+    const cancelButtonElement: DOMWrapper<Element> = new DOMWrapper(cancelButton);
+    await cancelButtonElement.trigger('click');
     await nextTick();
 
     const dialog: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="two-factor-authentication-dialog"]');
