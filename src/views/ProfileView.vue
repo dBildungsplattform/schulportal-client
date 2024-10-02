@@ -47,6 +47,7 @@
   const twoFactorAuthenticationStore: TwoFactorAuthentificationStore = useTwoFactorAuthentificationStore();
 
   const windowOrigin: string = window.location.origin;
+  const loading2FA: Ref<boolean> = ref(false);  
 
   /**
    * Gruppiert eine Liste von Zuordnungen nach dem Wert der Eigenschaft 'sskDstNr'.
@@ -270,10 +271,16 @@
   }
 
   watchEffect(async () => {
-    if (!personInfoStore.personInfo?.person.id) return;
-    await twoFactorAuthenticationStore.get2FARequirement(personInfoStore.personInfo.person.id);
-    await personStore.getPersonenuebersichtById(personInfoStore.personInfo.person.id);
-    await twoFactorAuthenticationStore.get2FAState(personInfoStore.personInfo.person.id);
+    const personId: string | undefined = personInfoStore.personInfo?.person.id;
+    if (!personId) return;
+    loading2FA.value = true;
+
+    const twoFARequirementPromise: Promise<void> = twoFactorAuthenticationStore.get2FARequirement(personId);
+    const personUebersichtPromise: Promise<void> = personStore.getPersonenuebersichtById(personId);
+    const twoFAStatePromise: Promise<void> = twoFactorAuthenticationStore.get2FAState(personId);
+
+    await Promise.all([twoFARequirementPromise, personUebersichtPromise, twoFAStatePromise]);
+    loading2FA.value = false;
   });
 
   onBeforeMount(async () => {
@@ -309,6 +316,7 @@
         cols="12"
         sm="12"
         md="6"
+        class="d-flex flex-column ga-8"
       >
         <LayoutCard
           :header="$t('profile.personalData')"
@@ -383,67 +391,8 @@
             </v-col>
           </v-row>
         </LayoutCard>
-      </v-col>
-      <v-col
-        v-for="(schuleData, index) in schulDaten"
-        :key="schuleData.title"
-        cols="12"
-        sm="12"
-        md="6"
-      >
         <LayoutCard
-          :header="$t('person.zuordnung') + ' ' + (schulDaten.length > 1 ? (index + 1).toString() : '')"
-          :headline-test-id="'zuordung-card-' + (index + 1)"
-        >
-          <v-row class="ma-3 p-4">
-            <v-col cols="12">
-              <v-table class="text-body-1">
-                <template v-slot:default>
-                  <tbody>
-                    <tr
-                      v-for="item in schuleData.labelAndValues"
-                      :key="item.label"
-                    >
-                      <td>
-                        <span v-if="item.labelAbbr"
-                          ><abbr :title="item.label"
-                            ><strong :data-testid="item.testIdLabel">{{ item.labelAbbr }}:</strong></abbr
-                          ></span
-                        >
-                        <strong
-                          :data-testid="item.testIdLabel"
-                          v-else
-                          >{{ item.label }}:</strong
-                        >
-                      </td>
-                      <td :data-testid="item.testIdValue">{{ item.value }}</td>
-                    </tr>
-                  </tbody>
-                </template>
-              </v-table>
-              <p
-                class="pt-4 text-center text-body-1"
-                v-if="schuleData.schulAdmins && schuleData.schulAdmins.length > 0"
-                data-testid="school-admins-${index}"
-              >
-                <v-icon
-                  class="mr-2"
-                  icon="mdi-information-slab-circle-outline"
-                  data-testid="school-admins-icon"
-                ></v-icon>
-                {{ schuleData.info + ' ' + schuleData.schulAdmins?.join(', ') }}
-              </p>
-            </v-col>
-          </v-row>
-        </LayoutCard>
-      </v-col>
-      <v-col
-        cols="12"
-        sm="12"
-        md="6"
-        data-testid="password-card"
-      >
-        <LayoutCard
+          data-testid="password-card"
           :headline-test-id="'new-password-card'"
           :header="$t('login.password')"
         >
@@ -532,15 +481,22 @@
             </div>
           </v-row>
         </LayoutCard>
-      </v-col>
-
-      <v-col
-        v-if="twoFactorAuthenticationStore.required && twoFactorAuthenticationStore.hasToken != null"
-        cols="12"
-        sm="12"
-        md="6"
-      >
+        <template v-if="loading2FA">
+          <v-row
+            align="center"
+            justify="center"
+            class="ma-3"
+          >
+            <v-progress-circular
+              indeterminate
+              size="64"
+              color="primary"
+              data-testid="loading-spinner"
+            ></v-progress-circular>
+          </v-row>
+        </template>
         <LayoutCard
+          v-if="twoFactorAuthenticationStore.required && twoFactorAuthenticationStore.hasToken != null"
           :headline-test-id="'two-factor-card'"
           :header="$t('profile.twoFactorAuth')"
         >
@@ -646,6 +602,60 @@
                   </v-col>
                 </template>
               </v-row>
+            </v-col>
+          </v-row>
+        </LayoutCard>
+      </v-col>
+      <v-col
+        cols="12"
+        sm="12"
+        md="6"
+        class="d-flex flex-column ga-8"
+      >
+        <LayoutCard
+          v-for="(schuleData, index) in schulDaten"
+          :key="schuleData.title"
+          :header="$t('person.zuordnung') + ' ' + (schulDaten.length > 1 ? (index + 1).toString() : '')"
+          :headline-test-id="'zuordung-card-' + (index + 1)"
+        >
+          <v-row class="ma-3 p-4">
+            <v-col cols="12">
+              <v-table class="text-body-1">
+                <template v-slot:default>
+                  <tbody>
+                    <tr
+                      v-for="item in schuleData.labelAndValues"
+                      :key="item.label"
+                    >
+                      <td>
+                        <span v-if="item.labelAbbr"
+                          ><abbr :title="item.label"
+                            ><strong :data-testid="item.testIdLabel">{{ item.labelAbbr }}:</strong></abbr
+                          ></span
+                        >
+                        <strong
+                          :data-testid="item.testIdLabel"
+                          v-else
+                          >{{ item.label }}:</strong
+                        >
+                      </td>
+                      <td :data-testid="item.testIdValue">{{ item.value }}</td>
+                    </tr>
+                  </tbody>
+                </template>
+              </v-table>
+              <p
+                class="pt-4 text-center text-body-1"
+                v-if="schuleData.schulAdmins && schuleData.schulAdmins.length > 0"
+                data-testid="school-admins-${index}"
+              >
+                <v-icon
+                  class="mr-2"
+                  icon="mdi-information-slab-circle-outline"
+                  data-testid="school-admins-icon"
+                ></v-icon>
+                {{ schuleData.info + ' ' + schuleData.schulAdmins?.join(', ') }}
+              </p>
             </v-col>
           </v-row>
         </LayoutCard>
