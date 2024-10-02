@@ -378,6 +378,7 @@
               <p
                 class="pt-4 text-center text-body-1 text-medium-emphasis"
                 data-testid="info-text-with-icon"
+                style="white-space: normal"
               >
                 <v-icon
                   class="mr-2"
