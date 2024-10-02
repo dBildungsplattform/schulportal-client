@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest';
 import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
-import SpshAlert from '@/components/alert/SpshAlert.vue';
+import NotFoundView from './NotFoundView.vue';
 
 let wrapper: VueWrapper | null = null;
 
@@ -11,7 +11,7 @@ beforeEach(() => {
     </div>
   `;
 
-  wrapper = mount(SpshAlert, {
+  wrapper = mount(NotFoundView, {
     props: {
       buttonAction: vi.fn(),
       buttonText: 'Back',
@@ -26,7 +26,7 @@ beforeEach(() => {
   });
 });
 
-describe('SpshAlert', () => {
+describe('NotFoundView', () => {
   test('it renders with the correct title and text', () => {
     expect(wrapper?.text()).toContain('404');
     expect(wrapper?.text()).toContain('Page not found');
