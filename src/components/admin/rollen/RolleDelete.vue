@@ -24,7 +24,7 @@
   const errorMessage: Ref<string> = ref('');
   const successDialogVisible: Ref<boolean> = ref(false);
 
-  async function closePasswordResetDialog(isActive: Ref<boolean>): Promise<void> {
+  async function closeRolleDeleteDialog(isActive: Ref<boolean>): Promise<void> {
     isActive.value = false;
   }
 
@@ -33,7 +33,7 @@
     successDialogVisible.value = true;
   }
 
-  async function closeSuccessDialogAndPushToManagent(): Promise<void> {
+  async function closeSuccessDialogAndPushToManagement(): Promise<void> {
     successDialogVisible.value = false;
     router.push({ name: 'rolle-management' });
   }
@@ -47,7 +47,7 @@
     <LayoutCard
       v-if="successDialogVisible"
       :closable="false"
-      :header="$t('admin.person.deletePerson')"
+      :header="$t('admin.rolle.deleteRolle')"
     >
       <v-card-text>
         <v-container>
@@ -56,7 +56,7 @@
               offset="3"
               cols="10"
             >
-              <span data-testid="person-delete-success-text">
+              <span data-testid="rolle-delete-success-text">
                 {{ $t('admin.rolle.deleteRolleSuccessMessage') }}
               </span>
             </v-col>
@@ -73,7 +73,7 @@
             <v-btn
               :block="mdAndDown"
               class="primary"
-              @click.stop="closeSuccessDialogAndPushToManagent()"
+              @click.stop="closeSuccessDialogAndPushToManagement()"
               data-testid="close-rolle-delete-success-dialog-button"
             >
               {{ $t('close') }}
@@ -90,7 +90,7 @@
     <template v-slot:activator="{ props }">
       <v-btn
         class="secondary button"
-        data-testid="open-rolle-delete-dialog-icon"
+        data-testid="open-rolle-delete-dialog-button"
         v-bind="props"
         :block="mdAndDown"
       >
@@ -105,7 +105,7 @@
       <LayoutCard
         :closable="true"
         :header="$t('admin.rolle.deleteRolle')"
-        @onCloseClicked="closePasswordResetDialog(isActive)"
+        @onCloseClicked="closeRolleDeleteDialog(isActive)"
       >
         <v-card-text>
           <v-container>
@@ -147,8 +147,8 @@
               <v-btn
                 :block="mdAndDown"
                 class="secondary button"
-                @click.stop="closePasswordResetDialog(isActive)"
-                data-testid="close-rolle-delete-dialog-button"
+                @click.stop="closeRolleDeleteDialog(isActive)"
+                data-testid="cancel-rolle-delete-button"
               >
                 {{ $t('cancel') }}
               </v-btn>

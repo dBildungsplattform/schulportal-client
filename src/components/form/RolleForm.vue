@@ -45,11 +45,11 @@
     :createButtonLabel="$t('admin.rolle.create')"
     :discardButtonLabel="$t('admin.rolle.discard')"
     :hideActions="readonly"
-    ref="formwrapper"
     id="rolle-form"
     :onDiscard="onHandleDiscard"
     @onShowDialogChange="onShowDialogChange"
     :onSubmit="onSubmit"
+    ref="form-wrapper"
     :showUnsavedChangesDialog="showUnsavedChangesDialog"
   >
     <!-- 1. Administrationsebene zuordnen -->

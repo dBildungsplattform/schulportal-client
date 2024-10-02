@@ -148,7 +148,7 @@ describe('OrganisationStore', () => {
   });
 
   describe('getOrganisationById', () => {
-    it('should load the Organisation and update state', async () => {
+    it('should load schule and update state', async () => {
       const mockResponse: Organisation[] = [
         {
           id: '1',
@@ -168,6 +168,29 @@ describe('OrganisationStore', () => {
       );
       await getOrganisationByIdPromise;
       expect(organisationStore.currentOrganisation).toEqual(mockResponse);
+      expect(organisationStore.loading).toBe(false);
+    });
+
+    it('should load klasse and update state', async () => {
+      const mockResponse: Organisation[] = [
+        {
+          id: '2',
+          kennung: 'Org2',
+          name: 'Organisation 2',
+          namensergaenzung: 'Ergänzung',
+          kuerzel: 'O2',
+          typ: OrganisationsTyp.Klasse,
+          administriertVon: '1',
+        },
+      ];
+
+      mockadapter.onGet('/api/organisationen/2').replyOnce(200, mockResponse);
+      const getOrganisationByIdPromise: Promise<Organisation> = organisationStore.getOrganisationById(
+        '2',
+        OrganisationsTyp.Klasse,
+      );
+      await getOrganisationByIdPromise;
+      expect(organisationStore.currentKlasse).toEqual(mockResponse);
       expect(organisationStore.loading).toBe(false);
     });
 
