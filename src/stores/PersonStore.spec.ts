@@ -481,6 +481,41 @@ describe('PersonStore', () => {
     });
   });
 
+  describe('syncPersonById', () => {
+    it('should sync a person', async () => {
+      const personId: string = '1234';
+
+      mockadapter.onPost(`/api/personen/${personId}/sync`).replyOnce(200);
+
+      await personStore.syncPersonById(personId);
+
+      expect(personStore.loading).toBe(false);
+      expect(personStore.errorCode).toEqual('');
+    });
+
+    it('should handle string error', async () => {
+      const personId: string = '1234';
+
+      mockadapter.onPost(`/api/personen/${personId}/sync`).replyOnce(500, 'some error');
+
+      await rejects(personStore.syncPersonById(personId));
+
+      expect(personStore.errorCode).toEqual('UNSPECIFIED_ERROR');
+      expect(personStore.loading).toBe(false);
+    });
+
+    it('should handle error code', async () => {
+      const personId: string = '1234';
+
+      mockadapter.onPost(`/api/personen/${personId}/sync`).replyOnce(500, { code: 'some mock server error' });
+
+      await rejects(personStore.syncPersonById(personId));
+
+      expect(personStore.errorCode).toEqual('some mock server error');
+      expect(personStore.loading).toBe(false);
+    });
+  });
+
   describe('resetState', () => {
     it('should reset state', () => {
       personStore.errorCode = 'some error';
