@@ -150,31 +150,29 @@ describe('rolleStore', () => {
         systemrechte: new Set(),
       };
 
-      const mockResponse: ServiceProvider = {
-        id: '1234',
-        name: 'itslearning mock',
-        url: 'example.org/itslearning',
-        target: 'URL',
-        kategorie: 'EMAIL',
-        hasLogo: true,
-        requires2fa: true,
-      };
+      const mockResponse: ServiceProvider[] = [
+        {
+          id: '1234',
+          name: 'itslearning mock',
+          url: 'example.org/itslearning',
+          target: 'URL',
+          kategorie: 'EMAIL',
+          hasLogo: true,
+          requires2fa: true,
+        },
+      ];
 
-      mockadapter.onPost('/api/rolle/1/serviceProviders').replyOnce(200, mockResponse, {});
-      const addServiceProviderToRollePromise: Promise<void> = rolleStore.addServiceProviderToRolle('1', {
-        serviceProviderId: '1234',
-      });
+      mockadapter.onPut('/api/rolle/1/serviceProviders').replyOnce(200, mockResponse, {});
+      const addServiceProviderToRollePromise: Promise<void> = rolleStore.updateServiceProviderInRolle('1', ['1234']);
       expect(rolleStore.loading).toBe(true);
       await addServiceProviderToRollePromise;
-      expect(rolleStore.createdRolle.serviceProviders).toEqual([mockResponse]);
+      expect(rolleStore.createdRolle.serviceProviders).toEqual(mockResponse);
       expect(rolleStore.loading).toBe(false);
     });
 
     it('should handle string error', async () => {
-      mockadapter.onPost('/api/rolle/1/serviceProviders').replyOnce(500, 'some mock server error');
-      const addServiceProviderToRollePromise: Promise<void> = rolleStore.addServiceProviderToRolle('1', {
-        serviceProviderId: '1',
-      });
+      mockadapter.onPut('/api/rolle/1/serviceProviders').replyOnce(500, 'some mock server error');
+      const addServiceProviderToRollePromise: Promise<void> = rolleStore.updateServiceProviderInRolle('1', ['1']);
       expect(rolleStore.loading).toBe(true);
       await addServiceProviderToRollePromise;
       expect(rolleStore.errorCode).toEqual('UNSPECIFIED_ERROR');
@@ -183,10 +181,8 @@ describe('rolleStore', () => {
     });
 
     it('should handle error code', async () => {
-      mockadapter.onPost('/api/rolle/1/serviceProviders').replyOnce(500, { code: 'some mock server error' });
-      const addServiceProviderToRollePromise: Promise<void> = rolleStore.addServiceProviderToRolle('1', {
-        serviceProviderId: '1',
-      });
+      mockadapter.onPut('/api/rolle/1/serviceProviders').replyOnce(500, { code: 'some mock server error' });
+      const addServiceProviderToRollePromise: Promise<void> = rolleStore.updateServiceProviderInRolle('1', ['1']);
       expect(rolleStore.loading).toBe(true);
       await addServiceProviderToRollePromise;
       expect(rolleStore.errorCode).toEqual('some mock server error');
