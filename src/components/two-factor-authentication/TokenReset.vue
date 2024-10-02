@@ -75,28 +75,22 @@
 <template>
   <v-dialog persistent>
     <template v-slot:activator="{ props }">
-      <v-col
-        cols="12"
-        sm="6"
-        md="auto"
+      <SpshTooltip
+        :enabledCondition="!disabled"
+        :disabledText="$t('person.finishEditFirst')"
+        :enabledText="$t('admin.person.twoFactorAuthentication.tokenReset')"
+        position="start"
       >
-        <SpshTooltip
-          :enabledCondition="!disabled"
-          :disabledText="$t('person.finishEditFirst')"
-          :enabledText="$t('admin.person.twoFactorAuthentication.tokenReset')"
-          position="start"
+        <v-btn
+          class="primary"
+          data-testid="open-2FA-dialog-icon"
+          :block="mdAndDown"
+          :disabled="disabled"
+          v-bind="props"
         >
-          <v-btn
-            class="primary"
-            data-testid="open-2FA-dialog-icon"
-            :block="mdAndDown"
-            :disabled="disabled"
-            v-bind="props"
-          >
-            {{ t('admin.person.twoFactorAuthentication.tokenReset') }}
-          </v-btn>
-        </SpshTooltip>
-      </v-col>
+          {{ t('admin.person.twoFactorAuthentication.tokenReset') }}
+        </v-btn>
+      </SpshTooltip>
     </template>
 
     <template v-slot:default="{ isActive }">
@@ -115,7 +109,7 @@
           </v-container>
           <v-container v-if="isTokenResetRequested">
             <v-row class="text-body px-md-16 bold">
-              <v-col class="whiteSpace">
+              <v-col data-testid="dialog-text" class="whiteSpace">
                 {{ dialogText }}
               </v-col>
             </v-row>

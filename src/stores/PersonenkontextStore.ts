@@ -4,8 +4,6 @@ import {
   PersonenkontexteApiFactory,
   type FindRollenResponse,
   type FindSchulstrukturknotenResponse,
-  DbiamPersonenkontexteApiFactory,
-  type DbiamPersonenkontexteApiInterface,
   type DBiamPersonenkontextResponse,
   type DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response,
   type PersonenkontexteApiInterface,
@@ -29,11 +27,6 @@ import { usePersonStore, type PersonStore } from './PersonStore';
 
 const personenKontextApi: PersonenkontextApiInterface = PersonenkontextApiFactory(undefined, '', axiosApiInstance);
 const personenKontexteApi: PersonenkontexteApiInterface = PersonenkontexteApiFactory(undefined, '', axiosApiInstance);
-const dbiamPersonenkontexteApi: DbiamPersonenkontexteApiInterface = DbiamPersonenkontexteApiFactory(
-  undefined,
-  '',
-  axiosApiInstance,
-);
 const personAdministrationApi: PersonAdministrationApiInterface = PersonAdministrationApiFactory(
   undefined,
   '',
@@ -78,8 +71,6 @@ type PersonenkontextState = {
   workflowStepResponse: PersonenkontextWorkflowResponse | null;
   filteredRollen: FindRollenResponse | null;
   filteredOrganisationen: FindSchulstrukturknotenResponse | null;
-  createdPersonenkontextForOrganisation: DBiamPersonenkontextResponse | null;
-  createdPersonenkontextForKlasse: DBiamPersonenkontextResponse | null;
   createdPersonWithKontext: DBiamPersonResponse | null;
   errorCode: string;
   loading: boolean;
@@ -98,10 +89,6 @@ type PersonenkontextActions = {
     personId: string,
     personalnummer?: string,
   ) => Promise<void>;
-  createPersonenkontext: (
-    personenkontext: DbiamPersonenkontextBodyParams,
-    personenKontextTyp: PersonenKontextTyp,
-  ) => Promise<DBiamPersonenkontextResponse>;
   createPersonWithKontexte: (
     params: DbiamCreatePersonWithPersonenkontexteBodyParams,
   ) => Promise<PersonendatensatzResponse>;
@@ -145,8 +132,6 @@ export const usePersonenkontextStore: StoreDefinition<
       updatedPersonenkontexte: null,
       filteredRollen: null,
       filteredOrganisationen: null,
-      createdPersonenkontextForOrganisation: null,
-      createdPersonenkontextForKlasse: null,
       createdPersonWithKontext: null,
       errorCode: '',
       loading: false,
@@ -235,34 +220,6 @@ export const usePersonenkontextStore: StoreDefinition<
       }
     },
 
-    async createPersonenkontext(
-      personenkontext: DbiamPersonenkontextBodyParams,
-      personenKontextTyp: PersonenKontextTyp,
-    ): Promise<DBiamPersonenkontextResponse> {
-      this.loading = true;
-      try {
-        const { data }: { data: DBiamPersonenkontextResponse } =
-          await dbiamPersonenkontexteApi.dBiamPersonenkontextControllerCreatePersonenkontext(personenkontext);
-        switch (personenKontextTyp) {
-          case PersonenKontextTyp.Klasse:
-            this.createdPersonenkontextForKlasse = data;
-            break;
-          case PersonenKontextTyp.Organisation:
-            this.createdPersonenkontextForOrganisation = data;
-            break;
-        }
-        return data;
-      } catch (error: unknown) {
-        /* if an unknown error occurs, set to UNSPECIFIED */
-        this.errorCode = 'UNSPECIFIED_ERROR';
-        if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.i18nKey || 'PERSONENKONTEXT_SPECIFICATION_ERROR';
-        }
-        return await Promise.reject(this.errorCode);
-      } finally {
-        this.loading = false;
-      }
-    },
     async updatePersonenkontexte(
       combinedZuordnungen: Zuordnung[] | undefined,
       personId: string,
