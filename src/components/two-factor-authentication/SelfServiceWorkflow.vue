@@ -153,7 +153,10 @@
           <v-container v-if="workflowStep === TwoFactorSteps.QRCode">
             <v-row class="text-body bold px-md-16">
               <div class="v-col">
-                <p class="text-body">
+                <p
+                  class="text-body"
+                  data-testid="self-service-dialog-qr-info-text"
+                >
                   {{ $t('admin.person.twoFactorAuthentication.pleaseScan') }}
                 </p>
               </div>
@@ -166,6 +169,7 @@
                 size="250"
                 width="250"
                 indeterminate
+                data-testid="software-token-dialog-progress-bar"
               >
               </v-progress-circular>
             </v-row>
@@ -211,6 +215,7 @@
                     :error="errorMessage.length > 0"
                     @input="resetErrorMessage()"
                     @keydown.enter="proceedToNextWorkflowStep(isActive)"
+                    data-testid="self-service-otp-input"
                   >
                   </v-otp-input>
                 </v-row>
@@ -219,7 +224,12 @@
                   v-if="errorMessage.length > 0"
                   class="text-body bold justify-center text-error"
                 >
-                  <p class="justify-center">{{ errorMessage }}</p>
+                  <p
+                    class="justify-center"
+                    data-testid="self-service-otp-error-text"
+                  >
+                    {{ errorMessage }}
+                  </p>
                 </v-row>
 
                 <v-row
