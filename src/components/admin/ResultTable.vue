@@ -33,16 +33,13 @@
 
   type Emits = {
     (event: 'onHandleRowClick', eventPayload: PointerEvent, item: TableRow<unknown>): void;
-    (event: 'onTableUpdate'): void;
+    (e: 'onTableUpdate', options: { sortField: string | undefined; sortOrder: 'asc' | 'desc' }): void;
     (event: 'onItemsPerPageUpdate', limit: number): void;
     (event: 'onPageUpdate', page: number): void;
+    (e: 'update:sortBy', sortBy: SortItem[]): void;
   };
-  const emit: Emits = defineEmits<{
-    (event: 'onHandleRowClick', eventPayload: PointerEvent, item: TableRow<unknown>): void;
-    (event: 'onTableUpdate'): void;
-    (event: 'onItemsPerPageUpdate', limit: number): void;
-    (event: 'onPageUpdate', page: number): void;
-  }>();
+
+  const emit: Emits = defineEmits<Emits>();
 
   function handleRowClick(event: PointerEvent, item: TableRow<unknown>): void {
     if (!props.disableRowClick) {
@@ -54,6 +51,36 @@
     default: (props: { default: string }) => string;
     top: (props: { top: number }) => string;
     bottom: (props: { bottom: boolean }) => string;
+  }
+
+  export type SortItem = {
+    key: string;
+    order?: boolean | 'asc' | 'desc';
+  };
+
+  interface UpdateOptions {
+    page: number;
+    itemsPerPage: number;
+    sortBy: VDataTableServer['sortBy'];
+    groupBy: VDataTableServer['groupBy'];
+  }
+
+  function onUpdateOptions(options: UpdateOptions): void {
+    const sortItem: SortItem | undefined = options.sortBy[0];
+    emit('onTableUpdate', {
+      sortField: sortItem?.key,
+      sortOrder: sortItem?.order === 'desc' ? 'desc' : 'asc',
+    });
+
+    // Handle pagination
+    if (options.page) {
+      emit('onPageUpdate', options.page);
+    }
+
+    // Handle items per page
+    if (options.itemsPerPage) {
+      emit('onItemsPerPageUpdate', options.itemsPerPage);
+    }
   }
 </script>
 
@@ -75,7 +102,7 @@
     select-strategy="page"
     :showCurrentPage="true"
     show-select
-    @update:options="$emit('onTableUpdate')"
+    @update:options="onUpdateOptions"
     @update:page="(page: number) => $emit('onPageUpdate', page)"
     @update:itemsPerPage="(limit: number) => $emit('onItemsPerPageUpdate', limit)"
     :no-data-text="$t('noDataFound')"

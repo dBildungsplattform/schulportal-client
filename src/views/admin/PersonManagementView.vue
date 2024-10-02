@@ -9,7 +9,7 @@
     type Organisation,
     OrganisationsTyp,
   } from '@/stores/OrganisationStore';
-  import { usePersonStore, type PersonStore, type Personendatensatz } from '@/stores/PersonStore';
+  import { SortField, SortOrder, usePersonStore, type PersonStore, type Personendatensatz } from '@/stores/PersonStore';
   import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
   import { useRolleStore, type RolleStore, type RolleResponse } from '@/stores/RolleStore';
   import { type SearchFilterStore, useSearchFilterStore } from '@/stores/SearchFilterStore';
@@ -37,9 +37,9 @@
     { title: t('person.firstName'), key: 'person.name.vorname', align: 'start' },
     { title: t('person.userName'), key: 'person.referrer', align: 'start' },
     { title: t('person.kopersNr'), key: 'person.personalnummer', align: 'start' },
-    { title: t('person.rolle'), key: 'rollen', align: 'start' },
-    { title: t('person.zuordnungen'), key: 'administrationsebenen', align: 'start' },
-    { title: t('person.klasse'), key: 'klassen', align: 'start' },
+    { title: t('person.rolle'), key: 'rollen', align: 'start', sortable: false },
+    { title: t('person.zuordnungen'), key: 'administrationsebenen', align: 'start', sortable: false },
+    { title: t('person.klasse'), key: 'klassen', align: 'start', sortable: false },
   ];
 
   const searchInputKlassen: Ref<string> = ref('');
@@ -51,6 +51,9 @@
   const selectedOrganisation: Ref<Array<string>> = ref([]);
   const selectedStatus: Ref<string | null> = ref(null);
   const searchFilter: Ref<string> = ref('');
+
+  const sortBy: Ref<string | null> = ref(null);
+  const sortDesc: Ref<string | null> = ref(null);
 
   const filterOrSearchActive: Ref<boolean> = computed(
     () =>
@@ -106,6 +109,8 @@
       organisationIDs: selectedKlassen.value.length ? selectedKlassen.value : selectedOrganisation.value,
       rolleIDs: searchFilterStore.selectedRollen || selectedRollen.value,
       searchFilter: searchFilterStore.searchFilter || searchFilter.value,
+      sortField: sortBy.value as SortField,
+      sortOrder: sortDesc.value as SortOrder,
     });
   }
 
@@ -242,6 +247,29 @@
     timerId = setTimeout(() => {
       personenkontextStore.getPersonenkontextRolleWithFilter(searchValue);
     }, 500);
+  }
+
+  // Define a mapping between complex keys and backend keys
+  const keyMapping: Record<string, string> = {
+    'person.name.familienname': 'familienname',
+    'person.name.vorname': 'vorname',
+    'person.referrer': 'referrer',
+    'person.personalnummer': 'personalnummer',
+  };
+
+  function mapKeyToBackend(key: string): string {
+    return keyMapping[key] || key;
+  }
+
+  function handleTableSorting(update: { sortField: string | undefined; sortOrder: 'asc' | 'desc' }): void {
+    if (update.sortField) {
+      sortBy.value = mapKeyToBackend(update.sortField);
+    }
+
+    sortDesc.value = update.sortOrder;
+
+    // Fetch the sorted data
+    getPaginatedPersonen(searchFilterStore.personenPage);
   }
 
   onMounted(async () => {
@@ -531,6 +559,7 @@
         "
         @onItemsPerPageUpdate="getPaginatedPersonenWithLimit"
         @onPageUpdate="getPaginatedPersonen"
+        @onTableUpdate="handleTableSorting"
         :totalItems="personStore.totalPersons"
         item-value-path="person.id"
         ><template v-slot:[`item.rollen`]="{ item }">
