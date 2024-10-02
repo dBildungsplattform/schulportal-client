@@ -9,6 +9,7 @@ import {
   type RollenSystemRecht,
   type OrganisationByNameBodyParams,
   type ParentOrganisationenResponse,
+  type OrganisationRootChildrenResponse,
 } from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
 
@@ -68,6 +69,7 @@ type OrganisationState = {
   loading: boolean;
   loadingKlassen: boolean;
   parentOrganisationen: Array<Organisation>;
+  schultraeger: Array<Organisation>;
 };
 
 export type OrganisationenFilter = {
@@ -100,6 +102,7 @@ type OrganisationActions = {
   ) => Promise<Organisation>;
   deleteOrganisationById: (organisationId: string) => Promise<void>;
   updateOrganisationById: (organisationId: string, name: string) => Promise<void>;
+  getSchultraeger: () => Promise<void>;
 };
 
 export { OrganisationsTyp };
@@ -133,6 +136,7 @@ export const useOrganisationStore: StoreDefinition<
       loading: false,
       loadingKlassen: false,
       parentOrganisationen: [],
+      schultraeger: [],
     };
   },
 
@@ -351,6 +355,19 @@ export const useOrganisationStore: StoreDefinition<
         }
       } finally {
         this.loading = false;
+      }
+    },
+
+    async getSchultraeger() {
+      try {
+        const response: AxiosResponse<OrganisationRootChildrenResponse> =
+          await organisationApi.organisationControllerGetRootChildren();
+        this.schultraeger = Object.values(response.data);
+      } catch (error: unknown) {
+        this.errorCode = 'UNSPECIFIED_ERROR';
+        if (isAxiosError(error)) {
+          this.errorCode = error.response?.data.i18nKey || 'SCHULTRAEGER_ERROR';
+        }
       }
     },
   },
