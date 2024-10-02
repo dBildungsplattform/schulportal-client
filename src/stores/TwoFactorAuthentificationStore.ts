@@ -15,6 +15,7 @@ const twoFactorApi: Class2FAApiInterface = Class2FAApiFactory(undefined, '', axi
 type TwoFactorState = {
   errorCode: string;
   loading: boolean;
+  loadingInitialState: boolean;
   hasToken: boolean | null;
   tokenKind: TokenKind | null;
   qrCode: string;
@@ -56,6 +57,7 @@ export const useTwoFactorAuthentificationStore: StoreDefinition<
     return {
       errorCode: '',
       loading: false,
+      loadingInitialState: false,
       hasToken: null,
       tokenKind: null,
       qrCode: '',
@@ -70,7 +72,7 @@ export const useTwoFactorAuthentificationStore: StoreDefinition<
       this.required = tempRequired;
     },
     async get2FAState(personId: string) {
-      this.loading = true;
+      this.loadingInitialState = true;
       try {
         const twoFactorState: TokenStateResponse = (
           await twoFactorApi.privacyIdeaAdministrationControllerGetTwoAuthState(personId)
@@ -98,12 +100,12 @@ export const useTwoFactorAuthentificationStore: StoreDefinition<
           this.errorCode = error.response?.data.i18nKey || 'TOKEN_STATE_ERROR';
         }
       } finally {
-        this.loading = false;
+        this.loadingInitialState = false;
       }
     },
 
     async get2FARequirement(personId: string) {
-      this.loading = true;
+      this.loadingInitialState = true;
       this.required = false;
       try {
         const twoFactorState: TokenRequiredResponse = (
@@ -117,7 +119,7 @@ export const useTwoFactorAuthentificationStore: StoreDefinition<
           this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
         }
       } finally {
-        this.loading = false;
+        this.loadingInitialState = false;
       }
     },
 

@@ -951,8 +951,6 @@
     personStore.resetState();
     twoFactorAuthentificationStore.resetState();
 
-    await twoFactorAuthentificationStore.get2FARequirement(currentPersonId);
-
     personenkontextStore.errorCode = '';
     await personStore.getPersonById(currentPersonId);
     await personStore.getPersonenuebersichtById(currentPersonId);
@@ -961,6 +959,7 @@
       (zuordnung: Zuordnung) => zuordnung.typ === OrganisationsTyp.Klasse,
     );
 
+    await twoFactorAuthentificationStore.get2FARequirement(currentPersonId);
     await twoFactorAuthentificationStore.get2FAState(currentPersonId);
   });
 
@@ -1246,7 +1245,7 @@
           thickness="6"
         ></v-divider>
         <!-- Two Factor Authentication -->
-        <template v-if="twoFactorAuthentificationStore.required">
+        <template v-if="twoFactorAuthentificationStore.required && !twoFactorAuthentificationStore.loadingInitialState">
           <v-container>
             <v-row class="ml-md-16">
               <v-col v-if="personStore.loading">

@@ -538,7 +538,7 @@
       </v-col>
 
       <v-col
-        v-if="twoFactorAuthenticationStore.required"
+        v-if="twoFactorAuthenticationStore.required && !twoFactorAuthenticationStore.loadingInitialState"
         cols="12"
         sm="12"
         md="6"
