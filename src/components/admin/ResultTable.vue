@@ -2,6 +2,7 @@
   /* this block is necessary to introduce a table header type for defining table headers
       watch source for updates: https://stackoverflow.com/a/75993081/4790594
    */
+  import { onMounted } from 'vue';
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
 
   type ReadonlyHeaders = InstanceType<typeof VDataTableServer>['headers'];
@@ -58,8 +59,6 @@
   };
 
   interface UpdateOptions {
-    page: number;
-    itemsPerPage: number;
     sortBy: VDataTableServer['sortBy'];
     groupBy: VDataTableServer['groupBy'];
   }
@@ -71,6 +70,19 @@
       sortOrder: sortItem?.order === 'desc' ? 'desc' : 'asc',
     });
   }
+
+  // On Mount we sort the table by first column and asc
+  onMounted(() => {
+    const headers: Headers[] = props.headers as Headers[];
+    const firstHeader: Headers = headers[0] as Headers;
+
+    if (firstHeader.key) {
+      emit('onTableUpdate', {
+        sortField: firstHeader.key as string,
+        sortOrder: 'asc',
+      });
+    }
+  });
 </script>
 
 <template>
