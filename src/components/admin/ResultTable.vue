@@ -53,12 +53,12 @@
     bottom: (props: { bottom: boolean }) => string;
   }
 
-  export type SortItem = {
+  type SortItem = {
     key: string;
     order?: boolean | 'asc' | 'desc';
   };
 
-  interface UpdateOptions {
+  type UpdateOptions = {
     sortBy: VDataTableServer['sortBy'];
     groupBy: VDataTableServer['groupBy'];
   }
