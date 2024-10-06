@@ -52,8 +52,8 @@
   const selectedStatus: Ref<string | null> = ref(null);
   const searchFilter: Ref<string> = ref('');
 
-  const sortBy: Ref<string | null> = ref(null);
-  const sortDesc: Ref<string | null> = ref(null);
+  const sortField: Ref<string | null> = ref(null);
+  const sortOrder: Ref<string | null> = ref(null);
 
   const filterOrSearchActive: Ref<boolean> = computed(
     () =>
@@ -62,8 +62,8 @@
       !!searchFilterStore.selectedOrganisationen?.length ||
       !!searchFilterStore.selectedRollen?.length ||
       !!searchFilterStore.searchFilter ||
-      !!sortBy.value || 
-      !!sortDesc.value ||
+      !!searchFilterStore.sortField || 
+      !!searchFilterStore.sortOrder ||
       selectedKlassen.value.length > 0 ||
       !!selectedStatus.value,
   );
@@ -80,7 +80,6 @@
 
   const rollen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
     return personenkontextStore.filteredRollen?.moeglicheRollen
-      .slice(0, 25)
       .map((rolle: RolleResponse) => ({
         value: rolle.id,
         title: rolle.name,
@@ -111,8 +110,8 @@
       organisationIDs: selectedKlassen.value.length ? selectedKlassen.value : selectedOrganisation.value,
       rolleIDs: searchFilterStore.selectedRollen || selectedRollen.value,
       searchFilter: searchFilterStore.searchFilter || searchFilter.value,
-      sortField: sortBy.value as SortField,
-      sortOrder: sortDesc.value as SortOrder,
+      sortField: searchFilterStore.sortField as SortField,
+      sortOrder: searchFilterStore.sortOrder as SortOrder,
     });
   }
 
@@ -203,8 +202,8 @@
     selectedStatus.value = null;
     searchFilterStore.personenPage = 1;
     searchFilterStore.personenPerPage = 30;
-    sortBy.value = null;
-    sortDesc.value = null;
+    searchFilterStore.sortField = '';
+    searchFilterStore.sortOrder = '';
     personStore.getAllPersons({
       offset: (searchFilterStore.personenPage - 1) * searchFilterStore.personenPerPage,
       limit: searchFilterStore.personenPerPage,
@@ -251,7 +250,7 @@
 
     /* delay new call 500ms */
     timerId = setTimeout(() => {
-      personenkontextStore.getPersonenkontextRolleWithFilter(searchValue);
+      personenkontextStore.getPersonenkontextRolleWithFilter(searchValue, 25);
     }, 500);
   }
 
@@ -271,10 +270,14 @@
   // Triggers sorting for the selected column
   function handleTableSorting(update: { sortField: string | undefined; sortOrder: 'asc' | 'desc' }): void {
     if (update.sortField) {
-      sortBy.value = mapKeyToBackend(update.sortField);
+      sortField.value = mapKeyToBackend(update.sortField);
     }
 
-    sortDesc.value = update.sortOrder;
+    sortOrder.value = update.sortOrder;
+
+    // Save the sorting values in the store
+    searchFilterStore.setSortField(sortField.value);
+    searchFilterStore.setSortOrder(sortOrder.value)
 
     // Fetch the sorted data
     getPaginatedPersonen(searchFilterStore.personenPage);
@@ -295,7 +298,7 @@
     });
 
     await getPaginatedPersonen(searchFilterStore.personenPage);
-    await personenkontextStore.getPersonenkontextRolleWithFilter('');
+    await personenkontextStore.getPersonenkontextRolleWithFilter('', 25);
 
     autoSelectOrganisation();
   });

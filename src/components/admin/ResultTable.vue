@@ -2,8 +2,11 @@
   /* this block is necessary to introduce a table header type for defining table headers
       watch source for updates: https://stackoverflow.com/a/75993081/4790594
    */
+  import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
   import { onMounted } from 'vue';
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
+
+  const searchFilterStore: SearchFilterStore = useSearchFilterStore();
 
   type ReadonlyHeaders = InstanceType<typeof VDataTableServer>['headers'];
 
@@ -60,27 +63,34 @@
 
   type UpdateOptions = {
     sortBy: VDataTableServer['sortBy'];
-    groupBy: VDataTableServer['groupBy'];
-  }
+  };
 
+  // This takes the table options as a parameter (the options include the sorting informations) and send an event to the parent to apply the sorting.
   function onUpdateOptions(options: UpdateOptions): void {
-    const sortItem: SortItem | undefined = options.sortBy[0];
-    emit('onTableUpdate', {
-      sortField: sortItem?.key,
-      sortOrder: sortItem?.order === 'desc' ? 'desc' : 'asc',
-    });
+    // Only trigger sorting if the sortBy array is not empty. (By default an array is always present and so it's necessary to check for emptiness)
+    if (options.sortBy.length > 0) {
+      const sortItem: SortItem | undefined = options.sortBy[0];
+
+      emit('onTableUpdate', {
+        sortField: sortItem?.key,
+        sortOrder: sortItem?.order === 'desc' ? 'desc' : 'asc',
+      });
+    }
   }
 
-  // On Mount we sort the table by first column and asc
+  // On Mount we emit an event to the parent to sort the table by first column and ASC.
   onMounted(() => {
-    const headers: Headers[] = props.headers as Headers[];
-    const firstHeader: Headers = headers[0] as Headers;
+    // If the sortField in the store has a value then we don't trigger this logic. This logic should only be triggered when the table was first opened without any changes to sorting.
+    if (searchFilterStore.sortField === null) {
+      const headers: Headers[] = props.headers as Headers[];
+      const firstHeader: Headers = headers[0] as Headers;
 
-    if (firstHeader.key) {
-      emit('onTableUpdate', {
-        sortField: firstHeader.key as string,
-        sortOrder: 'asc',
-      });
+      if (firstHeader.key) {
+        emit('onTableUpdate', {
+          sortField: firstHeader.key as string,
+          sortOrder: 'asc',
+        });
+      }
     }
   });
 </script>
