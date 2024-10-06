@@ -62,6 +62,8 @@
       !!searchFilterStore.selectedOrganisationen?.length ||
       !!searchFilterStore.selectedRollen?.length ||
       !!searchFilterStore.searchFilter ||
+      !!sortBy.value || 
+      !!sortDesc.value ||
       selectedKlassen.value.length > 0 ||
       !!selectedStatus.value,
   );
@@ -201,10 +203,14 @@
     selectedStatus.value = null;
     searchFilterStore.personenPage = 1;
     searchFilterStore.personenPerPage = 30;
+    sortBy.value = null;
+    sortDesc.value = null;
     personStore.getAllPersons({
       offset: (searchFilterStore.personenPage - 1) * searchFilterStore.personenPerPage,
       limit: searchFilterStore.personenPerPage,
       searchFilter: '',
+      sortField: SortField.Familienname,
+      sortOrder: SortOrder.Asc,
     });
   }
 
@@ -249,7 +255,7 @@
     }, 500);
   }
 
-  // Define a mapping between complex keys and backend keys
+  // Define a mapping between complex table keys and expected backend keys
   const keyMapping: Record<string, SortField> = {
     'person.name.familienname': SortField.Familienname,
     'person.name.vorname': SortField.Vorname,
@@ -257,10 +263,12 @@
     'person.personalnummer': SortField.Personalnummer,
   };
 
+  // Helper method that maps the key in the ResultTable to the name of the column in the backend
   function mapKeyToBackend(key: string): string {
     return keyMapping[key] || key;
   }
 
+  // Triggers sorting for the selected column
   function handleTableSorting(update: { sortField: string | undefined; sortOrder: 'asc' | 'desc' }): void {
     if (update.sortField) {
       sortBy.value = mapKeyToBackend(update.sortField);
