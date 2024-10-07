@@ -2465,4 +2465,10 @@
       margin-bottom: -15px;
     }
   }
+
+  span {
+  white-space: pre;
+  /* text-wrap needs to be placed after white-space to overwrite wrapping behaviour */
+  text-wrap: pretty;
+  }
 </style>
