@@ -2,6 +2,7 @@
   /* this block is necessary to introduce a table header type for defining table headers
       watch source for updates: https://stackoverflow.com/a/75993081/4790594
    */
+  import { SortOrder } from '@/stores/PersonStore';
   import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
   import { onMounted } from 'vue';
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
@@ -31,13 +32,14 @@
     itemValuePath: string;
     loading: boolean;
     totalItems: number;
+    currentSort?: { key: string; order: 'asc' | 'desc' } | null;
   };
 
   const props: Props = defineProps<Props>();
 
   type Emits = {
     (event: 'onHandleRowClick', eventPayload: PointerEvent, item: TableRow<unknown>): void;
-    (e: 'onTableUpdate', options: { sortField: string | undefined; sortOrder: 'asc' | 'desc' }): void;
+    (event: 'onTableUpdate', options: { sortField: string | undefined; sortOrder: 'asc' | 'desc' }): void;
     (event: 'onItemsPerPageUpdate', limit: number): void;
     (event: 'onPageUpdate', page: number): void;
   };
@@ -67,28 +69,28 @@
 
   // This takes the table options as a parameter (the options include the sorting informations) and send an event to the parent to apply the sorting.
   function onUpdateOptions(options: UpdateOptions): void {
-    // Only trigger sorting if the sortBy array is not empty. (By default an array is always present and so it's necessary to check for emptiness)
     if (options.sortBy.length > 0) {
       const sortItem: SortItem | undefined = options.sortBy[0];
-
-      emit('onTableUpdate', {
-        sortField: sortItem?.key,
-        sortOrder: sortItem?.order === 'desc' ? 'desc' : 'asc',
-      });
+      if (sortItem?.key !== props.currentSort?.key || sortItem?.order !== props.currentSort?.order) {
+        emit('onTableUpdate', {
+          sortField: sortItem?.key,
+          sortOrder: sortItem?.order === SortOrder.Desc ? SortOrder.Desc : SortOrder.Asc,
+        });
+      }
     }
   }
 
   // On Mount we emit an event to the parent to sort the table by first column and ASC.
   onMounted(() => {
     // If the sortField in the store has a value then we don't trigger this logic. This logic should only be triggered when the table was first opened without any changes to sorting.
-    if (searchFilterStore.sortField === null) {
+    if (searchFilterStore.sortField === '') {
       const headers: Headers[] = props.headers as Headers[];
       const firstHeader: Headers = headers[0] as Headers;
 
       if (firstHeader.key) {
         emit('onTableUpdate', {
           sortField: firstHeader.key as string,
-          sortOrder: 'asc',
+          sortOrder: SortOrder.Asc,
         });
       }
     }
@@ -113,6 +115,7 @@
     select-strategy="page"
     :showCurrentPage="true"
     show-select
+    :sort-by="currentSort ? [currentSort] : []"
     @update:options="onUpdateOptions"
     @update:page="(page: number) => $emit('onPageUpdate', page)"
     @update:itemsPerPage="(limit: number) => $emit('onItemsPerPageUpdate', limit)"

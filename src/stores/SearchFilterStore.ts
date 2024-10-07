@@ -15,6 +15,7 @@ type SearchFilterState = {
   selectedOrganisationen: Array<string> | null;
   sortField: string | null;
   sortOrder: string | null;
+  currentSort: { key: string; order: 'asc' | 'desc' } | null;
 };
 
 type SearchFilterActions = {
@@ -24,6 +25,7 @@ type SearchFilterActions = {
   setSearchFilter: (searchFilter: string | null) => Promise<void>;
   setSortField: (sortField: string | null) => Promise<void>;
   setSortOrder: (sortOrder: string | null) => Promise<void>;
+  setCurrentSort: (currentSort: { key: string; order: 'asc' | 'desc' } | null) => void;
 };
 
 type SearchFilterGetters = {};
@@ -52,6 +54,7 @@ export const useSearchFilterStore: StoreDefinition<
     selectedOrganisationen: [],
     sortField: '',
     sortOrder: '',
+    currentSort: null,
   }),
   actions: {
     async setKlasseFilter(selectedKlassen: Array<string> | null) {
@@ -76,6 +79,10 @@ export const useSearchFilterStore: StoreDefinition<
 
     async setSortOrder(sortOrder: string | null) {
       this.sortOrder = sortOrder;
+    },
+
+    setCurrentSort(currentSort: { key: string; order: 'asc' | 'desc' } | null) {
+      this.currentSort = currentSort;
     },
   },
 });

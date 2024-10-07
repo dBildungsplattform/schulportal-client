@@ -100,7 +100,7 @@
       "addedSuccessfully": "{firstname} {lastname} wurde erfolgreich hinzugefügt.",
       "addNew": "Neuen Benutzer hinzufügen",
       "backToCreatePerson": "Zurück zur Benutzeranlage",
-      "backToForm": "Zurück zur Form",
+      "backToInput": "Zurück zur Eingabe",
       "changePassword": "Passwort ändern",
       "twoFactorAuthentication": {
         "setUpShort": "2FA einrichten",

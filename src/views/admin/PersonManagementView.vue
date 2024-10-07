@@ -53,7 +53,7 @@
   const searchFilter: Ref<string> = ref('');
 
   const sortField: Ref<string | null> = ref(null);
-  const sortOrder: Ref<string | null> = ref(null);
+  const sortOrder: Ref<SortOrder | null> = ref(null);
 
   const filterOrSearchActive: Ref<boolean> = computed(
     () =>
@@ -62,7 +62,7 @@
       !!searchFilterStore.selectedOrganisationen?.length ||
       !!searchFilterStore.selectedRollen?.length ||
       !!searchFilterStore.searchFilter ||
-      !!searchFilterStore.sortField || 
+      !!searchFilterStore.sortField ||
       !!searchFilterStore.sortOrder ||
       selectedKlassen.value.length > 0 ||
       !!selectedStatus.value,
@@ -271,13 +271,18 @@
   function handleTableSorting(update: { sortField: string | undefined; sortOrder: 'asc' | 'desc' }): void {
     if (update.sortField) {
       sortField.value = mapKeyToBackend(update.sortField);
+
+      searchFilterStore.setCurrentSort({
+        key: update.sortField,
+        order: update.sortOrder,
+      });
     }
 
-    sortOrder.value = update.sortOrder;
+    sortOrder.value = update.sortOrder as SortOrder;
 
     // Save the sorting values in the store
     searchFilterStore.setSortField(sortField.value);
-    searchFilterStore.setSortOrder(sortOrder.value)
+    searchFilterStore.setSortOrder(sortOrder.value);
 
     // Fetch the sorted data
     getPaginatedPersonen(searchFilterStore.personenPage);
@@ -564,6 +569,7 @@
         :itemsPerPage="searchFilterStore.personenPerPage"
         :loading="personStore.loading"
         :headers="headers"
+        :currentSort="searchFilterStore.currentSort"
         @onHandleRowClick="
           (event: PointerEvent, item: TableRow<unknown>) =>
             navigateToPersonDetails(event, item as TableRow<Personendatensatz>)
