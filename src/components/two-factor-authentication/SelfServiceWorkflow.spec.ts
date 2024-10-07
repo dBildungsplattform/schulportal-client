@@ -56,6 +56,9 @@ describe('set up two-factor authentication', () => {
     await document.querySelector('[data-testid="self-service-token-init-error-text"]');
     expect(document.querySelector('[data-testid="self-service-token-init-error-text"]')).not.toBeNull();
 
+    await document.querySelector('[data-testid="proceed-two-factor-authentication-dialog"]');
+    expect(document.querySelector('[data-testid="proceed-two-factor-authentication-dialog"]')).toBeNull();
+
     twoFactorAuthenticationStore.errorCode = '';
     proceedButton?.click();
     twoFactorAuthenticationStore.errorCode = 'error';
