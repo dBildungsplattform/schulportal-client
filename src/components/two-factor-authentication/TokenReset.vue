@@ -39,6 +39,7 @@
     isActive.value = false;
     errorThrown.value = false;
     isTokenResetRequested.value = false;
+    twoFactorAuthenticationStore.hasToken = null;
     emits('dialogClosed');
   }
 
