@@ -191,11 +191,10 @@
   });
 
   watch(
-    () => personStore.currentPerson,
-    async () => {
-      if (!personStore.currentPerson?.person.isLocked) return;
-      if (!personStore.currentPerson.person.lockInfo) return;
-      await organisationStore.getLockingOrganisationById(personStore.currentPerson.person.lockInfo.lock_locked_from);
+    () => personStore.currentPerson?.person,
+    async (person: Person | undefined) => {
+      if (!(person && person.isLocked && person.lockInfo)) return;
+      await organisationStore.getLockingOrganisationById(person.lockInfo.lock_locked_from);
     },
   );
 
