@@ -348,7 +348,8 @@
         "NUR_KLASSE_UNTER_SCHULE": "Die Klasse muss einer Schule zugeordnet werden.",
         "ORGANISATION_SPECIFICATION_ERROR": "Die Schule konnte nicht angelegt werden.",
         "SCHULE_KENNUNG_EINDEUTIG": "Die Dienststellennummer existiert bereits.",
-        "SCHULE_UNTER_TRAEGER": "Eine Schule darf nicht einer anderen Schule zugeordnet werden."
+        "SCHULE_UNTER_TRAEGER": "Eine Schule darf nicht einer anderen Schule zugeordnet werden.",
+        "SCHULTRAEGER_ERROR": "Mögliche Schulträger konnten nicht geladen werden."
       },
       "management": "Schulverwaltung",
       "publicSchule": "Öffentliche Schule",
