@@ -1910,18 +1910,6 @@ export type Personenstatus = typeof Personenstatus[keyof typeof Personenstatus];
  */
 export interface PersonenuebersichtBodyParams {
     /**
-     * The offset of the paginated list.
-     * @type {number}
-     * @memberof PersonenuebersichtBodyParams
-     */
-    'offset'?: number;
-    /**
-     * The requested limit for the page size.
-     * @type {number}
-     * @memberof PersonenuebersichtBodyParams
-     */
-    'limit'?: number;
-    /**
      * An array of IDs for the persons.
      * @type {Array<string>}
      * @memberof PersonenuebersichtBodyParams
