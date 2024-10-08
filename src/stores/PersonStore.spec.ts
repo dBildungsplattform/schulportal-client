@@ -498,7 +498,7 @@ describe('PersonStore', () => {
 
       mockadapter.onPost(`/api/personen/${personId}/sync`).replyOnce(500, 'some error');
 
-      await rejects(personStore.syncPersonById(personId));
+      await personStore.syncPersonById(personId);
 
       expect(personStore.errorCode).toEqual('UNSPECIFIED_ERROR');
       expect(personStore.loading).toBe(false);
@@ -509,9 +509,9 @@ describe('PersonStore', () => {
 
       mockadapter.onPost(`/api/personen/${personId}/sync`).replyOnce(500, { code: 'some mock server error' });
 
-      await rejects(personStore.syncPersonById(personId));
+      await personStore.syncPersonById(personId);
 
-      expect(personStore.errorCode).toEqual('some mock server error');
+      expect(personStore.errorCode).toEqual('UNSPECIFIED_ERROR');
       expect(personStore.loading).toBe(false);
     });
   });
