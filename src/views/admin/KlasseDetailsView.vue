@@ -72,8 +72,10 @@
 
   function isFormDirty(): boolean {
     // Only check for dirtiness if the form is in edit mode
+    // Only check if klassenname is dirty, because selectedSchule is readonly
     if (!isEditActive.value) return false;
-    else return isFieldDirty('selectedSchule') || isFieldDirty('selectedKlassenname');
+    else if (selectedKlassenname.value === organisationStore.currentKlasse?.name) return false;
+    else return isFieldDirty('selectedKlassenname');
   }
 
   let blockedNext: () => void = () => {};
@@ -256,7 +258,7 @@
                       :klassenname="organisationStore.currentKlasse?.name || ''"
                       :klassenId="organisationStore.currentKlasse?.id || ''"
                       ref="klasse-delete"
-                      :schulname="selectedSchule"
+                      :schulname="selectedSchule || ''"
                       :useIconActivator="false"
                       @onDeleteKlasse="deleteKlasseById(currentOrganisationId)"
                     >
