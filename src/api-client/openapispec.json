@@ -4536,6 +4536,7 @@
                 "required": [
                     "familienname",
                     "vorname",
+                    "lastModified",
                     "revision"
                 ]
             },

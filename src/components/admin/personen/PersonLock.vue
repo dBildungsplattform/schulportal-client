@@ -1,12 +1,12 @@
 <script setup lang="ts">
-  import { computed, onBeforeMount, ref, type ComputedRef, type Ref } from 'vue';
-  import { type Composer, useI18n } from 'vue-i18n';
-  import { type Personendatensatz, usePersonStore, type PersonStore } from '@/stores/PersonStore';
-  import { useDisplay } from 'vuetify';
-  import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
-  import { type Zuordnung } from '@/stores/PersonenkontextStore';
   import SpshTooltip from '@/components/admin/SpshTooltip.vue';
+  import LayoutCard from '@/components/cards/LayoutCard.vue';
+  import { type Organisation } from '@/stores/OrganisationStore';
+  import { type Personendatensatz } from '@/stores/PersonStore';
+  import type { TranslatedObject } from '@/types';
+  import { computed, ref, watch, type ComputedRef, type Ref } from 'vue';
+  import { useI18n, type Composer } from 'vue-i18n';
+  import { useDisplay } from 'vuetify';
 
   const { t }: Composer = useI18n({ useScope: 'global' });
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
@@ -15,82 +15,70 @@
     errorCode: string;
     person: Personendatensatz;
     adminId: string;
+    formatOrganisationName: (org: Organisation) => string;
+    intersectingOrganisations: Set<Organisation>;
     disabled: boolean;
   };
-
-  const personStore: PersonStore = usePersonStore();
-  const organisationStore: OrganisationStore = useOrganisationStore();
-  const schulen: Ref<Array<{ value: string; title: string }>> = ref([]);
-  const selectedSchule: Ref<string | null> = ref(null);
   type Emits = {
     (event: 'onLockUser', id: string, lock: boolean, schule: string): void;
   };
-
   const props: Props = defineProps<Props>();
   const emit: Emits = defineEmits<Emits>();
+
+  const organisations: Ref<Array<TranslatedObject>> = computed(() => {
+    return [...props.intersectingOrganisations].map((organisation: Organisation) => {
+      const organisationDisplayName: string = props.formatOrganisationName(organisation);
+      return {
+        value: organisationDisplayName,
+        title: organisationDisplayName,
+      };
+    });
+  });
+  const selectedOrganisation: Ref<string | null> = ref(null);
   const errorMessage: ComputedRef<string> = computed(() => {
-    let errorCode: string = '';
-    if (errorCode === '') errorCode = props.errorCode;
-    if (errorCode === '') errorCode = personStore.errorCode;
-    if (errorCode === '') errorCode = organisationStore.errorCode;
-    if (!errorCode) return '';
-    let message: string = t(`errors.${errorCode}`);
-    if (message === '')
-      message = !props.person.person.isLocked ? t('person.lockUserError') : t('person.unlockUserError');
-    return message;
+    if (!props.errorCode) return '';
+    return !props.person.person.isLocked ? t('person.lockError') : t('person.unlockError');
   });
   const hasSingleSelection: ComputedRef<boolean> = computed(() => {
-    return schulen.value.length <= 1;
+    return organisations.value.length <= 1;
+  });
+  const selectedOrganisationId: ComputedRef<string | null> = computed(() => {
+    if (!selectedOrganisation.value) return null;
+    const organisation: Organisation | undefined = Array.from(props.intersectingOrganisations).find(
+      (org: Organisation) => props.formatOrganisationName(org) === selectedOrganisation.value,
+    );
+    return organisation ? organisation.id : null;
   });
 
   function closeLockPersonDialog(isActive: Ref<boolean>): void {
     isActive.value = false;
   }
-  function handleOnLockUser(id: string, isActive: Ref<boolean>): void {
-    if (selectedSchule.value) {
-      emit('onLockUser', id, !props.person.person.isLocked, selectedSchule.value);
-      closeLockPersonDialog(isActive);
-    }
+
+  function handleOnLockUser(isActive: Ref<boolean>): void {
+    const lockingOrgId: string | null | undefined = props.person.person.isLocked
+      ? props.person.person.lockInfo?.lock_locked_from
+      : selectedOrganisationId.value;
+    if (!lockingOrgId) return;
+    emit('onLockUser', props.person.person.id, !props.person.person.isLocked, lockingOrgId);
+    closeLockPersonDialog(isActive);
   }
 
-  function handleChangeSchule(value: string): void {
-    selectedSchule.value = value;
+  function handleChangeOrganisation(value: string): void {
+    selectedOrganisation.value = value;
   }
 
-  async function getAssignedOrganisationIds(id: string): Promise<Zuordnung['sskId'][]> {
-    await personStore.getPersonenuebersichtById(id);
-    return (personStore.personenuebersicht?.zuordnungen || []).map(({ sskId }: Zuordnung) => sskId);
-  }
-
-  async function getOrganisationIntersection(): Promise<Set<Organisation>> {
-    const adminAssignedOrganisationIds: Zuordnung['sskId'][] = await getAssignedOrganisationIds(props.adminId);
-    const userAssignedOrganisationIds: Zuordnung['sskId'][] = await getAssignedOrganisationIds(props.person.person.id);
-
-    await organisationStore.getParentOrganisationsByIds(userAssignedOrganisationIds);
-    const userParentOrganisationen: Organisation[] = organisationStore.parentOrganisationen;
-    return new Set<Organisation>(
-      userParentOrganisationen.filter((userOrg: Organisation) =>
-        adminAssignedOrganisationIds.find((sskId: Zuordnung['sskId']) => userOrg.id === sskId),
-      ),
-    );
-  }
-
-  onBeforeMount(async () => {
-    const intersectingOrganisations: Set<Organisation> = await getOrganisationIntersection();
-    schulen.value = [...intersectingOrganisations].map((organisation: Organisation) => {
-      const v: string = `${organisation.kennung ?? ''} (${organisation.name})`;
-      return {
-        value: v,
-        title: v,
-      };
-    });
-    if (schulen.value.length === 1) {
-      selectedSchule.value = schulen.value[0]?.value ?? null;
-    }
-  });
+  watch(
+    organisations,
+    (newOrganisations: Array<TranslatedObject>) => {
+      if (newOrganisations.length === 1) {
+        selectedOrganisation.value = organisations.value[0]?.value ?? null;
+      }
+    },
+    { immediate: true },
+  );
 </script>
 
-<template v-if="schulen.length > 0">
+<template v-if="organisations.length > 0">
   <v-dialog persistent>
     <template v-slot:activator="{ props }">
       <v-col
@@ -120,6 +108,7 @@
 
     <template v-slot:default="{ isActive }">
       <LayoutCard
+        data-testid="person-lock-card"
         :closable="true"
         :header="!person.person.isLocked ? $t('person.lockUser') : $t('person.unlockUser')"
         @onCloseClicked="closeLockPersonDialog(isActive)"
@@ -165,14 +154,14 @@
                   :hide-details="hasSingleSelection"
                   :class="[
                     { 'filter-dropdown': hasSingleSelection },
-                    { selected: selectedSchule },
+                    { selected: selectedOrganisation },
                     { 'align-center': true },
                   ]"
                   data-testid="schule-select"
                   density="compact"
                   id="schule-select"
-                  :items="schulen"
-                  @update:modelValue="handleChangeSchule"
+                  :items="organisations"
+                  @update:modelValue="handleChangeOrganisation"
                   item-value="value"
                   item-text="title"
                   :no-data-text="$t('noDataFound')"
@@ -180,7 +169,7 @@
                   ref="schule-select"
                   required="true"
                   variant="outlined"
-                  v-model="selectedSchule"
+                  v-model="selectedOrganisation"
                 ></v-select>
               </v-col>
             </v-row>
@@ -211,7 +200,7 @@
                   @click.stop="closeLockPersonDialog(isActive)"
                   data-testid="close-lock-person-dialog-button"
                 >
-                  {{ !selectedSchule ? $t('close') : $t('cancel') }}
+                  {{ !selectedOrganisation ? $t('close') : $t('cancel') }}
                 </v-btn>
               </v-col>
               <v-col
@@ -222,8 +211,8 @@
                 <v-btn
                   :block="mdAndDown"
                   class="primary button"
-                  :disabled="!selectedSchule"
-                  @click.stop="handleOnLockUser(props.person.person.id, isActive)"
+                  :disabled="!props.person.person.isLocked && !selectedOrganisation"
+                  @click.stop="handleOnLockUser(isActive)"
                   data-testid="lock-user-button"
                 >
                   {{ !props.person.person.isLocked ? $t('person.lockUser') : $t('person.unlockUser') }}

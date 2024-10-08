@@ -197,6 +197,85 @@ describe('OrganisationStore', () => {
     });
   });
 
+  describe('getLockingOrganisationById', () => {
+    it('should load the locking Organisation and update state', async () => {
+      const mockResponse: Organisation[] = [
+        {
+          id: '1',
+          kennung: 'Org1',
+          name: 'Organisation 1',
+          namensergaenzung: 'Ergänzung',
+          kuerzel: 'O1',
+          typ: OrganisationsTyp.Schule,
+          administriertVon: '1',
+        },
+      ];
+
+      mockadapter.onGet('/api/organisationen/1').replyOnce(200, mockResponse);
+      const promise: Promise<void> = organisationStore.getLockingOrganisationById('1');
+      await promise;
+      expect(organisationStore.lockingOrganisation).toEqual(mockResponse);
+      expect(organisationStore.loading).toBe(false);
+    });
+
+    it('uses parentOrganisationen, if possible', async () => {
+      const mockResponse: Organisation[] = [
+        {
+          id: '1',
+          kennung: 'Org1',
+          name: 'Organisation 1',
+          namensergaenzung: 'Ergänzung',
+          kuerzel: 'O1',
+          typ: OrganisationsTyp.Schule,
+          administriertVon: '1',
+        },
+      ];
+      organisationStore.parentOrganisationen = mockResponse;
+      const promise: Promise<void> = organisationStore.getLockingOrganisationById('1');
+      await promise;
+      expect(organisationStore.lockingOrganisation).toEqual(mockResponse[0]);
+      expect(organisationStore.loading).toBe(false);
+    });
+
+    it('uses allOrganisationen, if possible', async () => {
+      const mockResponse: Organisation[] = [
+        {
+          id: '1',
+          kennung: 'Org1',
+          name: 'Organisation 1',
+          namensergaenzung: 'Ergänzung',
+          kuerzel: 'O1',
+          typ: OrganisationsTyp.Schule,
+          administriertVon: '1',
+        },
+      ];
+      organisationStore.allOrganisationen = mockResponse;
+      const promise: Promise<void> = organisationStore.getLockingOrganisationById('1');
+      await promise;
+      expect(organisationStore.lockingOrganisation).toEqual(mockResponse[0]);
+      expect(organisationStore.loading).toBe(false);
+    });
+
+    it('should handle string error', async () => {
+      mockadapter.onGet('/api/organisationen/1').replyOnce(500, 'some mock server error');
+      const promise: Promise<void> = organisationStore.getLockingOrganisationById('1');
+      await promise;
+      expect(organisationStore.lockingOrganisation).toEqual(null);
+      expect(organisationStore.errorCode).toEqual('UNSPECIFIED_ERROR');
+      expect(organisationStore.loading).toBe(false);
+    });
+
+    it('should handle error code', async () => {
+      mockadapter.onGet('/api/organisationen/1').replyOnce(500, { code: 'some mock server error' });
+      const promise: Promise<void> = organisationStore.getLockingOrganisationById('1');
+      expect(organisationStore.loading).toBe(true);
+      await promise;
+      expect(organisationStore.lockingOrganisation).toEqual(null);
+      expect(organisationStore.errorCode).toEqual('some mock server error');
+      expect(organisationStore.loading).toBe(false);
+    });
+  });
+
   describe('getParentOrganisationsByIds', () => {
     const mockOrganisationen: Organisation[] = [
       {
@@ -224,9 +303,9 @@ describe('OrganisationStore', () => {
 
     it('should handle string error', async () => {
       mockadapter.onPost('/api/organisationen/parents-by-ids').replyOnce(500, 'some mock server error');
-      const getParentOrganisationsByIdPromise: Promise<Organisation[]> =
+      const getParentOrganisationsByIdPromise: Promise<void> =
         organisationStore.getParentOrganisationsByIds(requestIds);
-      await rejects(getParentOrganisationsByIdPromise);
+      await getParentOrganisationsByIdPromise;
       expect(organisationStore.parentOrganisationen).toEqual([]);
       expect(organisationStore.errorCode).toEqual('UNSPECIFIED_ERROR');
       expect(organisationStore.loading).toBe(false);
@@ -234,10 +313,10 @@ describe('OrganisationStore', () => {
 
     it('should handle error code', async () => {
       mockadapter.onPost('/api/organisationen/parents-by-ids').replyOnce(500, { code: 'some mock server error' });
-      const getParentOrganisationsByIdPromise: Promise<Organisation[]> =
+      const getParentOrganisationsByIdPromise: Promise<void> =
         organisationStore.getParentOrganisationsByIds(requestIds);
       expect(organisationStore.loading).toBe(true);
-      await rejects(getParentOrganisationsByIdPromise);
+      await getParentOrganisationsByIdPromise;
       expect(organisationStore.parentOrganisationen).toEqual([]);
       expect(organisationStore.errorCode).toEqual('some mock server error');
       expect(organisationStore.loading).toBe(false);
