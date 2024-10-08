@@ -80,12 +80,54 @@
     };
   }
 
+  // Create a map that holds all Schulen with their id, kennung and name
+  async function fetchSchuleMap(): Promise<Map<string, string>> {
+    const administriertVonSet: Set<string> = new Set(
+      organisationStore.allKlassen
+        .map((klasse: Organisation) => klasse.administriertVon)
+        .filter((admin: string | null | undefined): admin is string => admin !== null && admin !== undefined),
+    );
+
+    await organisationStore.getAllOrganisationen({
+      includeTyp: OrganisationsTyp.Schule,
+      limit: 25,
+      systemrechte: ['SCHULEN_VERWALTEN'],
+      organisationIds: Array.from(administriertVonSet),
+    });
+
+    return new Map(
+      organisationStore.allSchulen.map((org: Organisation) => [org.id, `${org.kennung} (${org.name.trim()})`]),
+    );
+  }
+
+  // Create a map that holds all Schulen with their id, kennung and name
+  async function fetchSchuleMapSelected(): Promise<Map<string, string>> {
+    const administriertVonSet: Set<string> = new Set(
+      organisationStore.klassen
+        .map((klasse: Organisation) => klasse.administriertVon)
+        .filter((admin: string | null | undefined): admin is string => admin !== null && admin !== undefined),
+    );
+
+    await organisationStore.getAllOrganisationen({
+      includeTyp: OrganisationsTyp.Schule,
+      limit: 25,
+      systemrechte: ['SCHULEN_VERWALTEN'],
+      organisationIds: Array.from(administriertVonSet),
+    });
+
+    return new Map(
+      organisationStore.allSchulen.map((org: Organisation) => [org.id, `${org.kennung} (${org.name.trim()})`]),
+    );
+  }
+
   async function fetchKlassenBySelectedSchuleId(schuleId: string | null): Promise<void> {
     // Fetch Klassen related to the selected Schule
     await organisationStore.getKlassenByOrganisationId(schuleId || '', {
       offset: (searchFilterStore.klassenPage - 1) * searchFilterStore.klassenPerPage,
       limit: searchFilterStore.klassenPerPage,
     });
+
+    schuleMap.value = await fetchSchuleMapSelected();
 
     // Update the klassenOptions for the dropdown
     klassenOptions.value = organisationStore.klassen.map((org: Organisation) => ({
@@ -113,6 +155,8 @@
         systemrechte: ['KLASSEN_VERWALTEN'],
       });
 
+      schuleMap.value = await fetchSchuleMap();
+
       finalKlassen.value = organisationStore.allKlassen.map((klasse: Organisation) => ({
         ...klasse,
         ...getSchuleDetails(klasse),
@@ -127,6 +171,7 @@
     }
 
     searchFilterStore.klassenPerPage = limit || 1;
+
     await organisationStore.getAllOrganisationen({
       offset: (searchFilterStore.klassenPage - 1) * searchFilterStore.klassenPerPage,
       limit: searchFilterStore.klassenPerPage,
@@ -134,22 +179,12 @@
       systemrechte: ['KLASSEN_VERWALTEN'],
     });
 
+    schuleMap.value = await fetchSchuleMap();
+
     finalKlassen.value = organisationStore.allKlassen.map((klasse: Organisation) => ({
       ...klasse,
       ...getSchuleDetails(klasse),
     }));
-  }
-
-  // Create a map that holds all Schulen with their id, kennung and name
-  async function fetchSchuleMap(): Promise<Map<string, string>> {
-    await organisationStore.getAllOrganisationen({
-      includeTyp: OrganisationsTyp.Schule,
-      limit: 25,
-      systemrechte: ['KLASSEN_VERWALTEN'],
-    });
-    return new Map(
-      organisationStore.allSchulen.map((org: Organisation) => [org.id, `${org.kennung} (${org.name.trim()})`]),
-    );
   }
 
   async function updateSelectedSchule(newValue: string | null): Promise<void> {
