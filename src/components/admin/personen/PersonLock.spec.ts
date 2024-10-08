@@ -1,53 +1,32 @@
-import { expect, test } from 'vitest';
-import { VueWrapper, mount } from '@vue/test-utils';
-import { createTestingPinia } from '@pinia/testing';
+import { OrganisationsTyp, type Organisation } from '@/stores/OrganisationStore';
+import { type Person, type Personendatensatz } from '@/stores/PersonStore';
+import { mount, VueWrapper } from '@vue/test-utils';
+import { expect, test, type Mock } from 'vitest';
+import { nextTick } from 'vue';
 import PersonLock from './PersonLock.vue';
-import { usePersonStore, type Person, type Personendatensatz, type PersonStore } from '@/stores/PersonStore';
-import {
-  OrganisationsTyp,
-  useOrganisationStore,
-  type Organisation,
-  type OrganisationStore,
-} from '@/stores/OrganisationStore';
-import {
-  RollenMerkmal,
-  type DBiamPersonenuebersichtResponse,
-  type DBiamPersonenzuordnungResponse,
-} from '@/api-client/generated/api';
 
 let wrapper: VueWrapper | null = null;
-let personStore: PersonStore | null = null;
-let organisationStore: OrganisationStore | null = null;
 
-const zuordnung: DBiamPersonenzuordnungResponse = {
-  sskId: 'sskId',
-  rolleId: 'rolleId',
-  sskName: 'sskName',
-  sskDstNr: 'sskDstNr',
-  rolle: 'rolle',
-  administriertVon: 'administriertVon',
-  typ: OrganisationsTyp.Schule,
-  editable: false,
-  merkmale: RollenMerkmal.KopersPflicht,
-  befristung: 'befristung',
-};
-const parentOrganisation: Organisation = {
-  id: zuordnung.sskId,
-  kennung: zuordnung.sskDstNr,
-  name: zuordnung.sskName,
-  namensergaenzung: null,
-  kuerzel: undefined,
-  typ: zuordnung.typ,
-  administriertVon: null,
-};
-const personenuebersicht: DBiamPersonenuebersichtResponse = {
-  personId: 'id',
-  vorname: 'firstname',
-  nachname: 'lastname',
-  benutzername: 'flastname',
-  lastModifiedZuordnungen: null,
-  zuordnungen: [zuordnung],
-};
+const parentOrganisationen: Array<Organisation> = [
+  {
+    id: '1',
+    kennung: '1',
+    name: 'Peter-Pille-Palle-Schule',
+    namensergaenzung: null,
+    kuerzel: undefined,
+    typ: OrganisationsTyp.Schule,
+    administriertVon: null,
+  },
+  {
+    id: '2',
+    kennung: '2',
+    name: 'Sarah-Sanddorn-Schule',
+    namensergaenzung: null,
+    kuerzel: undefined,
+    typ: OrganisationsTyp.Schule,
+    administriertVon: null,
+  },
+];
 
 function getPersonendatensatz(locked: boolean): Personendatensatz {
   const person: Person = {
@@ -63,15 +42,33 @@ function getPersonendatensatz(locked: boolean): Personendatensatz {
     lastModified: '2024-05-22',
     lockInfo: locked
       ? {
-          lock_locked_from: 'Amanda Admin',
+          lock_locked_from: 'lockingOrgId',
           lock_timestamp: Date.now().toString(),
         }
       : null,
   };
   return { person };
 }
+
 async function openDialog(): Promise<void> {
   wrapper?.get('[data-testid="open-lock-dialog-icon"]').trigger('click');
+  await nextTick();
+}
+
+function getInfoText(): Element | null {
+  return document.querySelector('[data-testid="lock-user-info-text"]');
+}
+
+function getSelectElement(): HTMLDivElement | null {
+  return document.querySelector('[data-testid="schule-select"]');
+}
+
+function getLockButton(): HTMLButtonElement | null {
+  return document.querySelector('[data-testid="lock-user-button"]');
+}
+
+function getErrorText(): HTMLSpanElement | null {
+  return document.querySelector('[data-testid="error-text"]');
 }
 
 beforeEach(() => {
@@ -83,51 +80,154 @@ beforeEach(() => {
 });
 
 describe('Lock user', () => {
-  beforeEach(() => {
-    wrapper = mount(PersonLock, {
-      attachTo: document.getElementById('app') || '',
-      props: {
-        disabled: false,
-        errorCode: '',
-        person: getPersonendatensatz(false),
-        adminId: 'adminid',
-      },
-      global: {
-        components: {
-          PersonLock,
-        },
-        //plugins: [vuetify, createTestingPinia()],
-        plugins: [createTestingPinia()],
-      },
+  describe('with one organisation', () => {
+    const formatOrganisationName: Mock = vi.fn();
+    formatOrganisationName.mockImplementation((organisation: Organisation) => {
+      return organisation.kennung ? `${organisation.kennung} (${organisation.name})` : organisation.name;
     });
-    personStore = usePersonStore();
-    organisationStore = useOrganisationStore();
 
-    personStore.personenuebersicht = personenuebersicht;
-    organisationStore.parentOrganisationen = [parentOrganisation];
+    const person: Personendatensatz = getPersonendatensatz(false);
+    const intersectingOrganisation: Organisation = parentOrganisationen[0]!;
+
+    beforeEach(() => {
+      wrapper = mount(PersonLock, {
+        attachTo: document.getElementById('app') || '',
+        props: {
+          disabled: false,
+          errorCode: '',
+          person,
+          adminId: 'adminid',
+          formatOrganisationName,
+          intersectingOrganisations: new Set([intersectingOrganisation]),
+        },
+        global: {
+          components: {
+            PersonLock,
+          },
+        },
+      });
+    });
+
+    test('it opens the dialog', async () => {
+      expect(getInfoText()).toBeNull();
+
+      await openDialog();
+
+      expect(getInfoText()).not.toBeNull();
+      let selectDiv: HTMLDivElement | null = getSelectElement();
+      expect(selectDiv).not.toBeNull();
+
+      const button: HTMLButtonElement | null = getLockButton();
+      expect(button).not.toBeNull();
+      expect(button!.attributes.getNamedItem('disabled')?.value).toBeUndefined();
+
+      expect(formatOrganisationName).toHaveBeenCalledWith(intersectingOrganisation);
+
+      selectDiv = getSelectElement();
+      expect(selectDiv).not.toBeNull();
+
+      expect(selectDiv!.textContent).toContain(formatOrganisationName(intersectingOrganisation));
+    });
+
+    test('it triggers the lock function', async () => {
+      await openDialog();
+
+      const button: HTMLButtonElement | null = getLockButton();
+      expect(button).not.toBeNull();
+      button!.click();
+
+      const emitArgs: Array<unknown> | undefined = wrapper?.emitted()['onLockUser'];
+      expect(emitArgs).toBeDefined();
+      expect(emitArgs![0]).toStrictEqual([person.person.id, !person.person.isLocked, intersectingOrganisation.id]);
+    });
   });
 
-  test('it opens the dialog', async () => {
-    expect(document.querySelector('[data-testid="lock-user-info-text"]')).toBeNull();
+  describe('with two organisationen', () => {
+    const formatOrganisationName: Mock = vi.fn();
+    formatOrganisationName.mockImplementation((organisation: Organisation) => {
+      return organisation.kennung ? `${organisation.kennung} (${organisation.name})` : organisation.name;
+    });
 
-    await openDialog();
+    const person: Personendatensatz = getPersonendatensatz(false);
 
-    expect(document.querySelector('[data-testid="lock-user-info-text"]')).not.toBeNull();
-    expect(document.querySelector('[data-testid="schule-select"]')).not.toBeNull();
-    const button: HTMLElement = document.querySelector('[data-testid="lock-user-button"]') as HTMLElement;
-    expect(button).not.toBeNull();
+    beforeEach(() => {
+      wrapper = mount(PersonLock, {
+        attachTo: document.getElementById('app') || '',
+        props: {
+          disabled: false,
+          errorCode: '',
+          person,
+          adminId: 'adminid',
+          formatOrganisationName,
+          intersectingOrganisations: new Set(parentOrganisationen),
+        },
+        global: {
+          components: {
+            PersonLock,
+          },
+        },
+      });
+    });
+
+    test('it opens the dialog', async () => {
+      expect(getInfoText()).toBeNull();
+
+      await openDialog();
+
+      expect(getInfoText()).not.toBeNull();
+      const selectDiv: HTMLDivElement | null = getSelectElement();
+      expect(selectDiv).not.toBeNull();
+
+      const disabledButton: HTMLButtonElement | null = getLockButton();
+      expect(disabledButton).not.toBeNull();
+      expect(disabledButton!.attributes.getNamedItem('disabled')?.value).toBeDefined();
+
+      expect(formatOrganisationName).toHaveBeenCalledTimes(parentOrganisationen.length);
+
+      selectDiv!.click();
+      await nextTick();
+      // TODO: figure out a way to select an item
+
+      // parentOrganisationen.forEach((org: Organisation) => {
+      //   expect(document.body.textContent).toContain(formatOrganisationName(org));
+      // });
+
+      const enabledButton: HTMLButtonElement | null = getLockButton();
+      expect(enabledButton).not.toBeNull();
+      //expect(enabledButton!.attributes.getNamedItem('disabled')?.value).toBeUndefined();
+    });
+
+    test.skip('it triggers the lock function', async () => {
+      await openDialog();
+
+      // TODO: select item
+      // ...
+      const selectedOrganisationId: string = '...';
+      const button: HTMLButtonElement | null = getLockButton();
+      expect(button).not.toBeNull();
+      button!.click();
+
+      const emitArgs: Array<unknown> | undefined = wrapper?.emitted()['onLockUser'];
+      expect(emitArgs).toBeDefined();
+      expect(emitArgs![0]).toStrictEqual([person.person.id, !person.person.isLocked, selectedOrganisationId]);
+    });
   });
 });
 
 describe('Unlock user', () => {
+  const formatOrganisationName: Mock = vi.fn();
+  const person: Personendatensatz = getPersonendatensatz(true);
+
   beforeEach(() => {
     wrapper = mount(PersonLock, {
       attachTo: document.getElementById('app') || '',
       props: {
         disabled: false,
         errorCode: '',
-        person: getPersonendatensatz(true),
+        person,
         adminId: 'adminid',
+        formatOrganisationName,
+        intersectingOrganisations: new Set(parentOrganisationen.slice(0, 1)),
       },
       global: {
         components: {
@@ -138,25 +238,56 @@ describe('Unlock user', () => {
   });
 
   test('it opens the dialog', async () => {
+    expect(getInfoText()).toBeNull();
+
     await openDialog();
 
-    expect(document.querySelector('[data-testid="lock-user-info-text"]')).not.toBeNull();
-    expect(document.querySelector('[data-testid="schule-select"]')).toBeNull();
-    const button: HTMLElement = document.querySelector('[data-testid="lock-user-button"]') as HTMLElement;
+    expect(getInfoText()).not.toBeNull();
+    const selectElement: HTMLDivElement | null = getSelectElement();
+    expect(selectElement).toBeNull();
+
+    const button: HTMLButtonElement | null = getLockButton();
     expect(button).not.toBeNull();
+    expect(button!.attributes.getNamedItem('disabled')?.value).toBeUndefined();
+  });
+
+  test('it triggers the unlock function', async () => {
+    await openDialog();
+
+    const button: HTMLButtonElement | null = getLockButton();
+    expect(button).not.toBeNull();
+    button!.click();
+
+    await nextTick();
+
+    const emitArgs: Array<unknown> | undefined = wrapper?.emitted()['onLockUser'];
+    expect(emitArgs).toBeDefined();
+    expect(emitArgs![0]).toStrictEqual([
+      person.person.id,
+      !person.person.isLocked,
+      person.person.lockInfo?.lock_locked_from,
+    ]);
+    await nextTick();
   });
 });
 
-describe('Error handling', () => {
+describe.each([
+  ['locking', false],
+  ['unlocking', true],
+])('Error handling for %s', (_testTitle: string, locked: boolean) => {
   describe('if an error occurs', () => {
+    const formatOrganisationName: Mock = vi.fn();
+
     beforeEach(() => {
       wrapper = mount(PersonLock, {
         attachTo: document.getElementById('app') || '',
         props: {
           disabled: false,
           errorCode: 'TEST_ERROR',
-          person: getPersonendatensatz(true),
+          person: getPersonendatensatz(locked),
           adminId: 'adminid',
+          formatOrganisationName: formatOrganisationName,
+          intersectingOrganisations: new Set(parentOrganisationen.slice(0, 1)),
         },
         global: {
           components: {
@@ -169,20 +300,27 @@ describe('Error handling', () => {
     test('it displays an error message', async () => {
       await openDialog();
 
-      const errorText: HTMLElement = document.querySelector('[data-testid="error-text"]') as HTMLElement;
+      const errorText: HTMLSpanElement | null = getErrorText();
       expect(errorText).not.toBeNull();
+      expect(errorText?.textContent).toContain(
+        `Der Benutzer konnte nicht ${locked ? 'entsperrt' : 'gesperrt'} werden.`,
+      );
     });
   });
 
   describe('if no error occurs', () => {
+    const formatOrganisationName: Mock = vi.fn();
+
     beforeEach(() => {
       wrapper = mount(PersonLock, {
         attachTo: document.getElementById('app') || '',
         props: {
           disabled: false,
           errorCode: '',
-          person: getPersonendatensatz(true),
+          person: getPersonendatensatz(locked),
           adminId: 'adminid',
+          intersectingOrganisations: new Set(parentOrganisationen.slice(0, 1)),
+          formatOrganisationName: formatOrganisationName,
         },
         global: {
           components: {
@@ -195,7 +333,7 @@ describe('Error handling', () => {
     test('it displays no error message', async () => {
       await openDialog();
 
-      const errorText: HTMLElement = document.querySelector('[data-testid="error-text"]') as HTMLElement;
+      const errorText: HTMLSpanElement | null = getErrorText();
       expect(errorText).toBeNull();
     });
   });
