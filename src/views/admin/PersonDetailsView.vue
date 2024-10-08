@@ -1,10 +1,12 @@
 <script setup lang="ts">
+  import type { PersonenkontextRolleFieldsResponse } from '@/api-client/generated/api';
   import SpshTooltip from '@/components/admin/SpshTooltip.vue';
   import KlasseChange from '@/components/admin/klassen/KlasseChange.vue';
   import KopersInput from '@/components/admin/personen/KopersInput.vue';
   import PasswordReset from '@/components/admin/personen/PasswordReset.vue';
   import PersonDelete from '@/components/admin/personen/PersonDelete.vue';
   import PersonLock from '@/components/admin/personen/PersonLock.vue';
+  import PersonenInfoChange from '@/components/admin/personen/PersonenInfoChange.vue';
   import PersonenkontextCreate from '@/components/admin/personen/PersonenkontextCreate.vue';
   import PersonenkontextDelete from '@/components/admin/personen/PersonenkontextDelete.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
@@ -35,9 +37,9 @@
     useTwoFactorAuthentificationStore,
     type TwoFactorAuthentificationStore,
   } from '@/stores/TwoFactorAuthentificationStore';
-  import PersonenInfoChange from '@/components/admin/personen/PersonenInfoChange.vue';
-  import { getNextSchuljahresende, formatDateToISO, formatDate } from '@/utils/date';
+  import { type TranslatedObject } from '@/types.d';
   import { isBefristungspflichtRolle, useBefristungUtils, type BefristungUtilsType } from '@/utils/befristung';
+  import { formatDate, formatDateToISO, getNextSchuljahresende } from '@/utils/date';
   import {
     getPersonenkontextFieldDefinitions,
     getValidationSchema,
@@ -58,7 +60,6 @@
   } from 'vue-router';
   import { useDisplay } from 'vuetify';
   import { object, string, StringSchema, type AnyObject } from 'yup';
-  import type { TranslatedObject } from '@/types';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
@@ -152,37 +153,50 @@
     await personStore.deletePersonById(personId);
   }
 
-  function keyMapper(key: string): string {
-    switch (key) {
-      case LockKeys.LockedFrom:
-        return t('person.lockedBy');
-      case LockKeys.Timestamp:
-        return t('since');
-      default:
-        return key;
-    }
+  function getOrganisationDisplayName(organisation: Organisation): string {
+    return organisation.kennung ? `${organisation.kennung} (${organisation.name})` : organisation.name;
   }
 
-  function keyValueMapper(key: string, value: string): string {
-    if (key === LockKeys.Timestamp) {
-      return new Intl.DateTimeFormat('de-DE', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-      }).format(new Date(value));
-    }
-    return value;
-  }
-
+  // translate keys and format attributes for display
   const getLockInfo: ComputedRef<{ key: string; attribute: string }[]> = computed(() => {
     if (!personStore.currentPerson?.person.isLocked) return [];
+
     const { lockInfo }: Person = personStore.currentPerson.person;
     if (!lockInfo) return [];
-    return Object.entries(lockInfo).map(([key, value]: [string, string]) => ({
-      key: keyMapper(key),
-      attribute: keyValueMapper(key, value.toString()),
-    }));
+
+    return Object.entries(lockInfo).map(([key, attribute]: [string, string]) => {
+      switch (key) {
+        case LockKeys.LockedFrom:
+          return {
+            key: t('person.lockedBy'),
+            attribute: organisationStore.lockingOrganisation
+              ? getOrganisationDisplayName(organisationStore.lockingOrganisation)
+              : t('admin.organisation.unknownOrganisation'),
+          };
+
+        case LockKeys.Timestamp:
+          return {
+            key: t('since'),
+            attribute: new Intl.DateTimeFormat('de-DE', {
+              year: 'numeric',
+              month: '2-digit',
+              day: '2-digit',
+            }).format(new Date(attribute)),
+          };
+
+        default:
+          return { key, attribute };
+      }
+    });
   });
+
+  watch(
+    () => personStore.currentPerson?.person,
+    async (person: Person | undefined) => {
+      if (!(person && person.isLocked && person.lockInfo)) return;
+      await organisationStore.getLockingOrganisationById(person.lockInfo.lock_locked_from);
+    },
+  );
 
   let closeCannotDeleteDialog = (): void => {
     cannotDeleteDialogVisible.value = false;
@@ -364,9 +378,7 @@
   }
 
   const rollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = useRollen();
-
   const organisationen: ComputedRef<TranslatedObject[] | undefined> = useOrganisationen();
-
   const klassen: ComputedRef<TranslatedObject[] | undefined> = useKlassen();
 
   type ZuordnungCreationForm = {
@@ -845,8 +857,10 @@
 
   watch(
     () => personStore.personenuebersicht,
-    (newValue: PersonWithUebersicht | null) => {
+    async (newValue: PersonWithUebersicht | null) => {
       zuordnungenResult.value = computeZuordnungen(newValue);
+      const organisationIds: Array<string> = [...new Set(newValue?.zuordnungen.map((z: Zuordnung) => z.sskId))];
+      if (organisationIds.length > 0) await organisationStore.getParentOrganisationsByIds(organisationIds);
     },
     { immediate: true },
   );
@@ -931,6 +945,15 @@
   // Computed property to check if the second radio button should be disabled
   const isUnbefristetButtonDisabled: ComputedRef<boolean> = computed(() => {
     return isBefristungspflichtRolle(selectedRolle.value);
+  });
+
+  const intersectingOrganisations: ComputedRef<Set<Organisation>> = computed(() => {
+    const adminOrganisationIds: Set<string> = new Set(
+      authStore.currentUser?.personenkontexte?.map((pk: PersonenkontextRolleFieldsResponse) => pk.organisationsId),
+    );
+    return new Set<Organisation>(
+      organisationStore.parentOrganisationen.filter((userOrg: Organisation) => adminOrganisationIds.has(userOrg.id)),
+    );
   });
 
   const twoFactorAuthenticationConnectionError: ComputedRef<string> = computed(() => {
@@ -1923,7 +1946,7 @@
                 </v-row>
                 <v-row
                   class="mt-0"
-                  v-for="{ key, attribute } of getLockInfo"
+                  v-for="({ key, attribute }, index) of getLockInfo"
                   :key="key"
                   cols="10"
                 >
@@ -1931,7 +1954,12 @@
                     class="text-right"
                     cols="4"
                   >
-                    <span class="subtitle-2"> {{ key }}: </span>
+                    <span
+                      class="subtitle-2"
+                      :data-testid="`lock-info-${index}-key`"
+                    >
+                      {{ key }}:
+                    </span>
                   </v-col>
                   <v-col
                     cols="5"
@@ -1940,6 +1968,7 @@
                     <span
                       class="text-body"
                       :title="attribute"
+                      :data-testid="`lock-info-${index}-attribute`"
                     >
                       {{ attribute }}
                     </span>
@@ -1962,6 +1991,8 @@
                   :errorCode="personStore.errorCode"
                   :person="personStore.currentPerson"
                   :adminId="authStore.currentUser?.personId!"
+                  :formatOrganisationName="getOrganisationDisplayName"
+                  :intersectingOrganisations="intersectingOrganisations"
                   @onLockUser="onLockUser"
                 >
                 </PersonLock>

@@ -94,7 +94,8 @@
         "organisation": {
           "required": "Die Organisationsebene muss ausgewählt werden."
         }
-      }
+      },
+      "unknownOrganisation": "Unbekannte Organisation"
     },
     "person": {
       "addedSuccessfully": "{firstname} {lastname} wurde erfolgreich hinzugefügt.",
