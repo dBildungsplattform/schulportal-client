@@ -70,18 +70,31 @@ export default defineConfig({
         'src/main.ts',
       ],
       thresholds: {
-        'src/stores/**.ts': {
-          statements: 100,
-          functions: 100,
-          branches: 100,
-          lines: 100,
-        },
+        // TODO: activate thresholds for commented folders
         'src/components/**.vue': {
           statements: 80,
           functions: 80,
           branches: 80,
           lines: 80,
         },
+        // 'src/layouts/**.vue': {
+        //   statements: 80,
+        //   functions: 80,
+        //   branches: 80,
+        //   lines: 80,
+        // },
+        'src/stores/**.ts': {
+          statements: 100,
+          functions: 100,
+          branches: 100,
+          lines: 100,
+        },
+        // 'src/utils/**.ts': {
+        //   statements: 80,
+        //   functions: 80,
+        //   branches: 80,
+        //   lines: 80,
+        // },
         'src/views/**.vue': {
           statements: 80,
           functions: 80,

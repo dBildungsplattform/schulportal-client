@@ -4,6 +4,13 @@ import NotFoundView from './NotFoundView.vue';
 
 let wrapper: VueWrapper | null = null;
 
+beforeAll(() => {
+  Object.defineProperty(window, 'history', {
+    value: { back: vi.fn() },
+    writable: false,
+  });
+});
+
 beforeEach(() => {
   document.body.innerHTML = `
     <div>
@@ -13,7 +20,6 @@ beforeEach(() => {
 
   wrapper = mount(NotFoundView, {
     props: {
-      buttonAction: vi.fn(),
       buttonText: 'Back',
       closable: false,
       modelValue: true,
@@ -32,9 +38,10 @@ describe('NotFoundView', () => {
     expect(wrapper?.text()).toContain('Page not found');
   });
 
-  test('it shows the back button with the correct text', () => {
-    const button: DOMWrapper<HTMLButtonElement> | undefined = wrapper?.find('button');
+  test('it navigates back on button click', async () => {
+    const button: DOMWrapper<HTMLButtonElement> | undefined = wrapper?.find('[data-testid="alert-button"]');
     expect(button?.isVisible()).toBe(true);
-    expect(button?.text()).toBe('Back');
+    await button?.trigger('click');
+    expect(window.history.back).toHaveBeenCalled();
   });
 });
