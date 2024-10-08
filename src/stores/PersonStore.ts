@@ -10,12 +10,12 @@ import {
   type DbiamPersonenuebersichtApiInterface,
   type DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response,
   type DBiamPersonenuebersichtResponse,
-  type PersonByPersonalnummerBodyParams,
   type PersonenApiInterface,
   type PersonendatensatzResponse,
   type PersonenFrontendApiInterface,
   type PersonenuebersichtBodyParams,
   type PersonFrontendControllerFindPersons200Response,
+  type PersonMetadataBodyParams,
   type PersonResponse,
 } from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
@@ -123,6 +123,7 @@ type PersonState = {
   currentPerson: Personendatensatz | null;
   personenWithUebersicht: PersonenWithRolleAndZuordnung | null;
   personenuebersicht: DBiamPersonenuebersichtResponse | null;
+  patchedPerson: PersonendatensatzResponse | null;
   newPassword: string | null;
 };
 
@@ -144,7 +145,12 @@ type PersonActions = {
   lockPerson: (personId: string, lock: boolean, locked_from: string) => Promise<void>;
   syncPersonById: (personId: string) => Promise<void>;
   getPersonenuebersichtById: (personId: string) => Promise<void>;
-  changePersonInfoById: (personId: string, personalnummer: string) => Promise<void>;
+  changePersonMetadataById: (
+    personId: string,
+    vorname: string,
+    familienname: string,
+    personalnummer?: string,
+  ) => Promise<void>;
 };
 
 export type PersonStore = Store<'personStore', PersonState, PersonGetters, PersonActions>;
@@ -159,6 +165,7 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
       loading: false,
       totalPersons: 0,
       currentPerson: null,
+      patchedPerson: null,
       newPassword: null,
     };
   },
@@ -360,15 +367,27 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
       }
     },
 
-    async changePersonInfoById(personId: string, personalnummer: string): Promise<void> {
+    async changePersonMetadataById(
+      personId: string,
+      vorname: string,
+      familienname: string,
+      personalnummer?: string,
+    ): Promise<void> {
       this.loading = true;
       try {
-        const personByPersonalnummerBodyParams: PersonByPersonalnummerBodyParams = {
+        const personMetadataBodyParams: PersonMetadataBodyParams = {
+          vorname: vorname,
+          familienname: familienname,
           personalnummer: personalnummer,
           revision: this.currentPerson?.person.revision ?? '',
           lastModified: this.currentPerson?.person.lastModified ?? '',
         };
-        await personenApi.personControllerUpdatePersonalnummer(personId, personByPersonalnummerBodyParams);
+        const { data }: { data: PersonendatensatzResponse } = await personenApi.personControllerUpdateMetadata(
+          personId,
+          personMetadataBodyParams,
+        );
+
+        this.patchedPerson = data;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
