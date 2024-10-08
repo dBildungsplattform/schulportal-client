@@ -7,6 +7,7 @@ import {
   type DBiamPersonenuebersichtResponse,
   type PersonFrontendControllerFindPersons200Response,
   type PersonLockResponse,
+  type PersonMetadataBodyParams,
   type PersonendatensatzResponse,
 } from '@/api-client/generated';
 import { usePersonStore, type PersonStore, type Personendatensatz } from './PersonStore';
@@ -501,6 +502,101 @@ describe('PersonStore', () => {
       expect(personStore.loading).toBe(false);
       expect(personStore.totalPersons).toBe(0);
       expect(personStore.currentPerson).toBe(null);
+    });
+  });
+
+  describe('changePersonMetaDataById', () => {
+    it('should update person metadata and set patchedPerson', async () => {
+      const personId = '1234';
+      const vorname = 'Samuel';
+      const familienname = 'Vimes';
+      const personalnummer = '9876';
+
+      const mockCurrentPerson: Personendatensatz = {
+        person: {
+          id: personId,
+          name: {
+            familienname: 'Old',
+            vorname: 'Name',
+          },
+          revision: '1',
+          lastModified: '2099-01-01',
+          referrer: '6978',
+          personalnummer: personalnummer,
+          isLocked: false,
+          lockInfo: null,
+        },
+      };
+
+      personStore.currentPerson = mockCurrentPerson;
+
+      const mockResponse: PersonendatensatzResponse = {
+        person: {
+          id: personId,
+          name: {
+            familienname,
+            vorname,
+          },
+          personalnummer,
+          revision: '2',
+          lastModified: '2099-01-02',
+          referrer: '6978',
+          isLocked: false,
+          lockInfo: null,
+          mandant: '',
+          geburt: {},
+          stammorganisation: '',
+          geschlecht: '',
+          lokalisierung: '',
+          vertrauensstufe: Vertrauensstufe.Teil,
+          startpasswort: '',
+        },
+      };
+
+      const expectedBodyParams: PersonMetadataBodyParams = {
+        vorname,
+        familienname,
+        personalnummer,
+        revision: '1',
+        lastModified: '2099-01-01',
+      };
+
+      mockadapter.onPatch(`/api/personen/${personId}/metadata`).reply((config) => {
+        expect(JSON.parse(config.data)).toEqual(expectedBodyParams);
+        return [200, mockResponse];
+      });
+
+      await personStore.changePersonMetadataById(personId, vorname, familienname, personalnummer);
+
+      expect(personStore.loading).toBe(false);
+      expect(personStore.patchedPerson).toEqual(mockResponse);
+      expect(personStore.errorCode).toEqual('');
+    });
+
+    it('should handle error and set errorCode', async () => {
+      const personId: string = '1234';
+      const vorname: string = 'Samuel';
+      const familienname: string = 'Vimes';
+
+      mockadapter.onPatch(`/api/personen/${personId}/metadata`).reply(500, { i18nKey: 'ERROR_UPDATING_USER' });
+
+      await personStore.changePersonMetadataById(personId, vorname, familienname);
+
+      expect(personStore.loading).toBe(false);
+      expect(personStore.errorCode).toEqual('ERROR_UPDATING_USER');
+    });
+
+    it('should handle unknown error', async () => {
+      const personId: string = '1234';
+      const vorname: string = 'Samuel';
+      const familienname: string = 'Vimes';
+
+      mockadapter.onPatch(`/api/personen/${personId}/metadata`).reply(500, 'Unknown error');
+
+      await personStore.changePersonMetadataById(personId, vorname, familienname);
+
+      expect(personStore.loading).toBe(false);
+      expect(personStore.errorCode).toEqual('ERROR_LOADING_USER');
     });
   });
 });
