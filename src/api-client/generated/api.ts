@@ -1366,7 +1366,7 @@ export interface PersonMetadataBodyParams {
      * @type {string}
      * @memberof PersonMetadataBodyParams
      */
-    'lastModified'?: string;
+    'lastModified': string;
     /**
      * 
      * @type {string}
