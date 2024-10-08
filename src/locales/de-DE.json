@@ -183,6 +183,9 @@
       "resetPasswordConfirmation": "Sind Sie sicher, dass Sie das Passwort für {firstname} {lastname} zurücksetzen möchten?",
       "resetPasswordInformation": "Bitte teilen Sie dem Benutzer das temporäre Passwort mit. Nach dem Schließen des Dialogs wird es aus Sicherheitsgründen nicht mehr angezeigt.",
       "resetPassword": "Passwort zurücksetzen",
+      "syncPerson": "Neu synchronisieren",
+      "syncPersonConfirmation": "Der Benutzer wird an alle angeschlossenen Systeme neu übertragen und dort ggf. aktualisiert. Dies kann je nach System einige Zeit in Anspruch nehmen.",
+      "syncPersonSuccessMessage": "Die Synchronisation wurde gestartet.",
       "rules": {
         "vorname": {
           "matches": "Der Vorname enthält ungültige Zeichen.",
@@ -208,8 +211,9 @@
       },
       "errors": {
         "PERSONALNUMMER_NICHT_EINDEUTIG": "Die eingegebene KoPers.-Nr. ist bereits vergeben. Bitte korrigieren Sie Ihre Eingabe.",
+        "ERROR_LOADING_USER": "Es konnten keine Benutzerdaten geladen werden.",
         "PERSONALNUMMER_REQUIRED": "Die Änderungen wurden nicht gespeichert, da keine KoPers.-Nr. eingegeben wurde.",
-        "ERROR_LOADING_USER": "Es konnten keine Benutzerdaten geladen werden."
+        "PERSON_NOT_FOUND": "Der Benutzer wurde seit Ihrer letzten Änderung gelöscht und kann nicht mehr bearbeitet werden."
       },
       "showAll": "Alle Benutzer anzeigen",
       "startPassword": "Einstiegs-Passwort",

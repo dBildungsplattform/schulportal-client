@@ -798,6 +798,51 @@
                 ]
             }
         },
+        "/api/personen/{personId}/sync": {
+            "post": {
+                "operationId": "PersonController_syncPerson",
+                "parameters": [
+                    {
+                        "name": "personId",
+                        "required": true,
+                        "in": "path",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User will be synced."
+                    },
+                    "403": {
+                        "description": "Insufficient permissions to perform operation."
+                    },
+                    "404": {
+                        "description": "The person was not found."
+                    },
+                    "500": {
+                        "description": "An internal server error occurred."
+                    },
+                    "502": {
+                        "description": "A downstream server returned an error."
+                    }
+                },
+                "tags": [
+                    "personen"
+                ],
+                "security": [
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
         "/api/personen/{personId}/metadata": {
             "patch": {
                 "operationId": "PersonController_updateMetadata",

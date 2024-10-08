@@ -143,6 +143,7 @@ type PersonActions = {
   resetPassword: (personId: string) => Promise<void>;
   deletePersonById: (personId: string) => Promise<void>;
   lockPerson: (personId: string, lock: boolean, locked_from: string) => Promise<void>;
+  syncPersonById: (personId: string) => Promise<void>;
   getPersonenuebersichtById: (personId: string) => Promise<void>;
   changePersonMetadataById: (
     personId: string,
@@ -332,6 +333,19 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
           this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
         }
         return await Promise.reject(this.errorCode);
+      } finally {
+        this.loading = false;
+      }
+    },
+    async syncPersonById(personId: string) {
+      this.loading = true;
+      try {
+        await personenApi.personControllerSyncPerson(personId);
+      } catch (error: unknown) {
+        this.errorCode = 'UNSPECIFIED_ERROR';
+        if (isAxiosError(error)) {
+          this.errorCode = error.response?.data.i18nKey || 'UNSPECIFIED_ERROR';
+        }
       } finally {
         this.loading = false;
       }
