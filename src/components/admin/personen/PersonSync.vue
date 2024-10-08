@@ -133,7 +133,7 @@
               </v-col>
               <v-col>
                 <p data-testid="error-text">
-                  {{ props.errorCode }}
+                  {{ t(`errors.${props.errorCode}`) }}
                 </p>
               </v-col>
             </v-row>

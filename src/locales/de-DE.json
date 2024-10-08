@@ -207,7 +207,8 @@
       },
       "errors": {
         "PERSONALNUMMER_NICHT_EINDEUTIG": "Die eingegebene KoPers.-Nr. ist bereits vergeben. Bitte korrigieren Sie Ihre Eingabe.",
-        "ERROR_LOADING_USER": "Es konnten keine Benutzerdaten geladen werden."
+        "ERROR_LOADING_USER": "Es konnten keine Benutzerdaten geladen werden.",
+        "PERSON_NOT_FOUND": "Der Benutzer wurde seit Ihrer letzten Änderung gelöscht und kann nicht mehr bearbeitet werden."
       },
       "showAll": "Alle Benutzer anzeigen",
       "startPassword": "Einstiegs-Passwort",
