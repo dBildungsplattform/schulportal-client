@@ -1848,9 +1848,8 @@
                           "
                         >
                           {{
-                            $t('admin.person.twoFactorAuthentication.serial') +
-                            ': ' +
-                            twoFactorAuthentificationStore.serial
+                            `${$t('admin.person.twoFactorAuthentication.serial')}: 
+                          ${twoFactorAuthentificationStore.serial}`
                           }}
                         </p>
                       </template>
@@ -1919,7 +1918,7 @@
                 </v-col>
               </template>
             </v-row>
-          </v-container>         
+          </v-container>
         </template>
         <v-divider
           v-if="authStore.currentUser?.personId !== personStore.currentPerson?.person.id"

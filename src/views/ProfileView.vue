@@ -13,7 +13,7 @@
     useTwoFactorAuthentificationStore,
     type TwoFactorAuthentificationStore,
   } from '@/stores/TwoFactorAuthentificationStore';
-  import { computed, onBeforeMount, ref, watchEffect, type ComputedRef, type Ref } from 'vue';
+  import { computed, onBeforeMount, ref, watch, type ComputedRef, type Ref } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { useRoute, useRouter, type RouteLocationNormalizedLoaded, type Router } from 'vue-router';
 
@@ -47,7 +47,7 @@
   const twoFactorAuthenticationStore: TwoFactorAuthentificationStore = useTwoFactorAuthentificationStore();
 
   const windowOrigin: string = window.location.origin;
-  const loading2FA: Ref<boolean> = ref(false);  
+  const loading2FA: Ref<boolean> = ref(false);
 
   /**
    * Gruppiert eine Liste von Zuordnungen nach dem Wert der Eigenschaft 'sskDstNr'.
@@ -270,18 +270,25 @@
     window.location.href = url.toString();
   }
 
-  watchEffect(async () => {
-    const personId: string | undefined = personInfoStore.personInfo?.person.id;
-    if (!personId) return;
-    loading2FA.value = true;
+  interface WatchOptions {
+    immediate: boolean;
+  }
 
-    const twoFARequirementPromise: Promise<void> = twoFactorAuthenticationStore.get2FARequirement(personId);
-    const personUebersichtPromise: Promise<void> = personStore.getPersonenuebersichtById(personId);
-    const twoFAStatePromise: Promise<void> = twoFactorAuthenticationStore.get2FAState(personId);
+  watch(
+    () => personInfoStore.personInfo?.person.id,
+    async (personId: string | undefined) => {
+      if (!personId) return;
+      loading2FA.value = true;
 
-    await Promise.all([twoFARequirementPromise, personUebersichtPromise, twoFAStatePromise]);
-    loading2FA.value = false;
-  });
+      const twoFARequirementPromise: Promise<void> = twoFactorAuthenticationStore.get2FARequirement(personId);
+      const personUebersichtPromise: Promise<void> = personStore.getPersonenuebersichtById(personId);
+      const twoFAStatePromise: Promise<void> = twoFactorAuthenticationStore.get2FAState(personId);
+
+      await Promise.all([twoFARequirementPromise, personUebersichtPromise, twoFAStatePromise]);
+      loading2FA.value = false;
+    },
+    { immediate: true } as WatchOptions,
+  );
 
   onBeforeMount(async () => {
     await initializeStores();
@@ -655,7 +662,7 @@
                   icon="mdi-information-slab-circle-outline"
                   data-testid="school-admins-icon"
                 ></v-icon>
-                {{ schuleData.info + ' ' + schuleData.schulAdmins?.join(', ') }}
+                {{ `${schuleData.info} ${schuleData.schulAdmins?.join(', ') || ''}` }}
               </p>
             </v-col>
           </v-row>
