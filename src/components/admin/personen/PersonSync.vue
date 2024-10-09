@@ -1,16 +1,13 @@
 <script setup lang="ts">
-  import { computed, type ComputedRef, ref, type Ref } from 'vue';
-  import { type Personendatensatz } from '@/stores/PersonStore';
-  import { type Composer, useI18n } from 'vue-i18n';
-  import { useDisplay } from 'vuetify';
-  import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import { type Router, useRouter } from 'vue-router';
   import SpshTooltip from '@/components/admin/SpshTooltip.vue';
+  import LayoutCard from '@/components/cards/LayoutCard.vue';
+  import { type Personendatensatz } from '@/stores/PersonStore';
+  import { ref, type Ref } from 'vue';
+  import { useI18n, type Composer } from 'vue-i18n';
+  import { useDisplay } from 'vuetify';
 
   const { t }: Composer = useI18n({ useScope: 'global' });
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
-
-  const router: Router = useRouter();
 
   type Props = {
     disabled: boolean;
@@ -19,49 +16,26 @@
   };
 
   type Emits = {
-    (event: 'onDeletePerson', personId: string): void;
+    (event: 'onSyncPerson', personId: string): void;
   };
+
   const props: Props = defineProps<Props>();
   const emit: Emits = defineEmits<Emits>();
-  const errorMessage: Ref<string> = ref('');
+
   const successDialogVisible: Ref<boolean> = ref(false);
 
-  const deletePersonConfirmationMessage: ComputedRef<string> = computed(() => {
-    if (errorMessage.value || props.errorCode) {
-      return '';
-    }
-    let message: string = '';
-    message += `${t('admin.person.deletePersonConfirmation', {
-      firstname: props.person.person.name.vorname,
-      lastname: props.person.person.name.familienname,
-    })}`;
-    return message;
-  });
-
-  const deletePersonSuccessMessage: ComputedRef<string> = computed(() => {
-    if (errorMessage.value || props.errorCode) {
-      return '';
-    }
-    let message: string = '';
-    message += `${t('admin.person.deletePersonSuccessMessage', {
-      firstname: props.person.person.name.vorname,
-      lastname: props.person.person.name.familienname,
-    })}`;
-    return message;
-  });
-
-  async function closePasswordResetDialog(isActive: Ref<boolean>): Promise<void> {
+  async function closeSyncDialog(isActive: Ref<boolean>): Promise<void> {
     isActive.value = false;
   }
 
-  async function handlePersonDelete(personId: string): Promise<void> {
-    emit('onDeletePerson', personId);
+  async function closeDialogAndHandlePersonSync(isActive: Ref<boolean>, personId: string): Promise<void> {
+    emit('onSyncPerson', personId);
+    isActive.value = false;
     successDialogVisible.value = true;
   }
 
-  async function closeSuccessDialogAndPushToManagent(): Promise<void> {
+  async function closeSuccessDialog(): Promise<void> {
     successDialogVisible.value = false;
-    router.push({ name: 'person-management' });
   }
 </script>
 
@@ -73,17 +47,18 @@
     <LayoutCard
       v-if="successDialogVisible"
       :closable="false"
-      :header="$t('admin.person.deletePerson')"
+      :header="$t('admin.person.syncPerson')"
     >
       <v-card-text>
         <v-container>
           <v-row class="text-body bold px-md-16">
             <v-col
-              offset="3"
-              cols="10"
+              offset="2"
+              cols="8"
+              class="text-center"
             >
-              <span data-testid="person-delete-success-text">
-                {{ deletePersonSuccessMessage }}
+              <span data-testid="person-sync-success-text">
+                {{ t('admin.person.syncPersonSuccessMessage') }}
               </span>
             </v-col>
           </v-row>
@@ -99,8 +74,8 @@
             <v-btn
               :block="mdAndDown"
               class="primary"
-              @click.stop="closeSuccessDialogAndPushToManagent()"
-              data-testid="close-person-delete-success-dialog-button"
+              @click.stop="closeSuccessDialog()"
+              data-testid="close-person-sync-success-dialog-button"
             >
               {{ $t('close') }}
             </v-btn>
@@ -109,31 +84,27 @@
       </v-card-actions>
     </LayoutCard>
   </v-dialog>
-  <v-dialog
-    v-if="!successDialogVisible"
-    persistent
-  >
+  <v-dialog persistent>
     <template v-slot:activator="{ props }">
       <v-col
         cols="12"
         sm="6"
         md="auto"
-        class="pb-0"
       >
         <SpshTooltip
           :enabledCondition="!disabled"
           :disabledText="$t('person.finishEditFirst')"
-          :enabledText="$t('admin.person.deletePerson')"
+          :enabledText="$t('admin.person.syncPerson')"
           position="start"
         >
           <v-btn
-            class="secondary button"
-            data-testid="open-person-delete-dialog-icon"
+            class="primary"
+            data-testid="open-person-sync-dialog-icon"
             :disabled="disabled"
             v-bind="props"
             :block="mdAndDown"
           >
-            {{ $t('admin.person.deletePerson') }}
+            {{ $t('admin.person.syncPerson') }}
           </v-btn>
         </SpshTooltip>
       </v-col>
@@ -145,13 +116,13 @@
     >
       <LayoutCard
         :closable="true"
-        :header="$t('admin.person.deletePerson')"
-        @onCloseClicked="closePasswordResetDialog(isActive)"
+        :header="$t('admin.person.syncPerson')"
+        @onCloseClicked="closeSyncDialog(isActive)"
       >
         <v-card-text>
           <v-container>
             <v-row
-              v-if="errorMessage || errorCode"
+              v-if="props.errorCode"
               class="text-body text-error"
             >
               <v-col
@@ -162,17 +133,17 @@
               </v-col>
               <v-col>
                 <p data-testid="error-text">
-                  {{ errorMessage || errorCode }}
+                  {{ t(`errors.${props.errorCode}`) }}
                 </p>
               </v-col>
             </v-row>
             <v-row class="text-body bold">
               <v-col
                 offset="2"
-                cols="10"
+                cols="8"
               >
-                <span data-testid="person-delete-confirmation-text">
-                  {{ deletePersonConfirmationMessage }}
+                <span data-testid="person-sync-confirmation-text">
+                  {{ t('admin.person.syncPersonConfirmation') }}
                 </span>
               </v-col>
             </v-row>
@@ -188,8 +159,8 @@
               <v-btn
                 :block="mdAndDown"
                 class="secondary button"
-                @click.stop="closePasswordResetDialog(isActive)"
-                data-testid="close-person-delete-dialog-button"
+                @click.stop="closeSyncDialog(isActive)"
+                data-testid="close-person-sync-dialog-button"
               >
                 {{ $t('cancel') }}
               </v-btn>
@@ -202,10 +173,10 @@
               <v-btn
                 :block="mdAndDown"
                 class="primary button"
-                @click.stop="handlePersonDelete(person.person.id)"
-                data-testid="person-delete-button"
+                @click.stop="closeDialogAndHandlePersonSync(isActive, person.person.id)"
+                data-testid="person-sync-button"
               >
-                {{ $t('admin.person.deletePerson') }}
+                {{ $t('proceed') }}
               </v-btn>
             </v-col>
           </v-row>
