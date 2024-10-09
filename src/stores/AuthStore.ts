@@ -96,7 +96,7 @@ export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, 
         this.hasRollenverwaltungPermission = this.currentUserPermissions.includes('ROLLEN_VERWALTEN');
         this.hasSchulverwaltungPermission = this.currentUserPermissions.includes('SCHULEN_VERWALTEN');
         this.hasSchultraegerverwaltungPermission = this.currentUserPermissions.includes('SCHULTRAEGER_VERWALTEN');
-        this.hasPersonenSyncPermission = true; // TODO SPSH-1136
+        this.hasPersonenSyncPermission = this.currentUserPermissions.includes('PERSON_SYNCHRONISIEREN');
       } catch {
         // If user info can't be retrieved, consider the user unauthenticated.
         this.isAuthed = false;
