@@ -115,13 +115,11 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
     async addServiceProviderToRolle(rolleId: string, rolleServiceProviderQueryParams: RolleServiceProviderBodyParams) {
       this.loading = true;
       try {
-        const { data }: AxiosResponse<ServiceProviderResponse> = await rolleApi.rolleControllerAddServiceProviderById(
-          rolleId,
-          rolleServiceProviderQueryParams,
-        );
+        const { data }: AxiosResponse<Array<ServiceProviderResponse>> =
+          await rolleApi.rolleControllerUpdateServiceProvidersById(rolleId, rolleServiceProviderQueryParams);
         if (this.createdRolle) {
           this.createdRolle.serviceProviders = this.createdRolle.serviceProviders || [];
-          this.createdRolle.serviceProviders.push(data);
+          this.createdRolle.serviceProviders = [...data];
         }
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
