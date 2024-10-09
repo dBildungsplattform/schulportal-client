@@ -5174,7 +5174,8 @@
                     "SCHULEN_VERWALTEN",
                     "KLASSEN_VERWALTEN",
                     "SCHULTRAEGER_VERWALTEN",
-                    "MIGRATION_DURCHFUEHREN"
+                    "MIGRATION_DURCHFUEHREN",
+                    "PERSON_SYNCHRONISIEREN"
                 ]
             },
             "OrganisationByIdBodyParams": {
