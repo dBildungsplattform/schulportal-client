@@ -12,8 +12,10 @@ import {
   type OrganisationRootChildrenResponse,
 } from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
+import { useSearchFilterStore, type SearchFilterStore } from './SearchFilterStore';
 
 const organisationApi: OrganisationenApiInterface = OrganisationenApiFactory(undefined, '', axiosApiInstance);
+const searchFilterStore: SearchFilterStore = useSearchFilterStore();
 
 export type Organisation = {
   id: string;
@@ -204,7 +206,7 @@ export const useOrganisationStore: StoreDefinition<
       }
       const response: AxiosResponse<Organisation[]> = await organisationApi.organisationControllerFindOrganizations(
         undefined,
-        30,
+        searchFilterStore.klassenPerPage,
         undefined,
         undefined,
         undefined,
