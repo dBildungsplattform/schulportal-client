@@ -279,7 +279,7 @@
           "SCHULEN_VERWALTEN": "Darf Schulen verwalten",
           "KLASSEN_VERWALTEN": "Darf Klassen verwalten",
           "SCHULTRAEGER_VERWALTEN": "Darf Schulträger verwalten",
-          "PERSON_SYNCHRONISIEREN": "Darf Personen synchronisieren"
+          "PERSON_SYNCHRONISIEREN": "Darf Benutzer synchronisieren"
         },
         "rollenarten": {
           "LERN": "Lern",
