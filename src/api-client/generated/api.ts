@@ -2192,7 +2192,8 @@ export const RollenSystemRecht = {
     SchulenVerwalten: 'SCHULEN_VERWALTEN',
     KlassenVerwalten: 'KLASSEN_VERWALTEN',
     SchultraegerVerwalten: 'SCHULTRAEGER_VERWALTEN',
-    MigrationDurchfuehren: 'MIGRATION_DURCHFUEHREN'
+    MigrationDurchfuehren: 'MIGRATION_DURCHFUEHREN',
+    PersonSynchronisieren: 'PERSON_SYNCHRONISIEREN'
 } as const;
 
 export type RollenSystemRecht = typeof RollenSystemRecht[keyof typeof RollenSystemRecht];
