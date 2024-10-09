@@ -1,10 +1,12 @@
 <script setup lang="ts">
+  import type { PersonenkontextRolleFieldsResponse } from '@/api-client/generated/api';
   import SpshTooltip from '@/components/admin/SpshTooltip.vue';
   import KlasseChange from '@/components/admin/klassen/KlasseChange.vue';
   import KopersInput from '@/components/admin/personen/KopersInput.vue';
   import PasswordReset from '@/components/admin/personen/PasswordReset.vue';
   import PersonDelete from '@/components/admin/personen/PersonDelete.vue';
   import PersonLock from '@/components/admin/personen/PersonLock.vue';
+  import PersonSync from '@/components/admin/personen/PersonSync.vue';
   import PersonenkontextCreate from '@/components/admin/personen/PersonenkontextCreate.vue';
   import PersonenkontextDelete from '@/components/admin/personen/PersonenkontextDelete.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
@@ -41,9 +43,9 @@
     useTwoFactorAuthentificationStore,
     type TwoFactorAuthentificationStore,
   } from '@/stores/TwoFactorAuthentificationStore';
-  import PersonenInfoChange from '@/components/admin/personen/PersonenInfoChange.vue';
-  import { getNextSchuljahresende, formatDateToISO, formatDate } from '@/utils/date';
+  import PersonenMetadataChange from '@/components/admin/personen/PersonenMetadataChange.vue';
   import { isBefristungspflichtRolle, useBefristungUtils, type BefristungUtilsType } from '@/utils/befristung';
+  import { formatDate, formatDateToISO, getNextSchuljahresende } from '@/utils/date';
   import {
     getPersonenkontextFieldDefinitions,
     getValidationSchema,
@@ -65,6 +67,7 @@
   import { useDisplay } from 'vuetify';
   import { object, string, StringSchema, type AnyObject } from 'yup';
   import type { TranslatedObject } from '@/types';
+  import { DIN_91379A, NO_LEADING_TRAILING_SPACES } from '@/utils/validation';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
@@ -93,7 +96,7 @@
   const isZuordnungFormActive: Ref<boolean> = ref(false);
   const isChangeKlasseFormActive: Ref<boolean> = ref(false);
 
-  const isEditPersonInfoActive: Ref<boolean> = ref(false);
+  const isEditPersonMetadataActive: Ref<boolean> = ref(false);
 
   const pendingDeletion: Ref<boolean> = ref(false);
   const pendingCreation: Ref<boolean> = ref(false);
@@ -109,7 +112,8 @@
   const changeKlasseConfirmationDialogMessage: Ref<string> = ref('');
   const canCommit: Ref<boolean> = ref(false);
   const hasNoKopersNr: Ref<boolean | undefined> = ref(false);
-  const changePersonInfoSuccessVisible: Ref<boolean> = ref(false);
+  const changePersonMetadataSuccessVisible: Ref<boolean> = ref(false);
+  const changePersonMetadataSuccessMessage: Ref<string> = ref('');
 
   const showNoKopersNrConfirmationDialog: Ref<boolean> = ref(false);
 
@@ -158,37 +162,55 @@
     await personStore.deletePersonById(personId);
   }
 
-  function keyMapper(key: string): string {
-    switch (key) {
-      case LockKeys.LockedFrom:
-        return t('person.lockedBy');
-      case LockKeys.Timestamp:
-        return t('since');
-      default:
-        return key;
-    }
+  // Synchronizes the person with external systems
+  async function syncPerson(personId: string): Promise<void> {
+    await personStore.syncPersonById(personId);
   }
 
-  function keyValueMapper(key: string, value: string): string {
-    if (key === LockKeys.Timestamp) {
-      return new Intl.DateTimeFormat('de-DE', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-      }).format(new Date(value));
-    }
-    return value;
+  function getOrganisationDisplayName(organisation: Organisation): string {
+    return organisation.kennung ? `${organisation.kennung} (${organisation.name})` : organisation.name;
   }
 
+  // translate keys and format attributes for display
   const getLockInfo: ComputedRef<{ key: string; attribute: string }[]> = computed(() => {
     if (!personStore.currentPerson?.person.isLocked) return [];
+
     const { lockInfo }: Person = personStore.currentPerson.person;
     if (!lockInfo) return [];
-    return Object.entries(lockInfo).map(([key, value]: [string, string]) => ({
-      key: keyMapper(key),
-      attribute: keyValueMapper(key, value.toString()),
-    }));
+
+    return Object.entries(lockInfo).map(([key, attribute]: [string, string]) => {
+      switch (key) {
+        case LockKeys.LockedFrom:
+          return {
+            key: t('person.lockedBy'),
+            attribute: organisationStore.lockingOrganisation
+              ? getOrganisationDisplayName(organisationStore.lockingOrganisation)
+              : t('admin.organisation.unknownOrganisation'),
+          };
+
+        case LockKeys.Timestamp:
+          return {
+            key: t('since'),
+            attribute: new Intl.DateTimeFormat('de-DE', {
+              year: 'numeric',
+              month: '2-digit',
+              day: '2-digit',
+            }).format(new Date(attribute)),
+          };
+
+        default:
+          return { key, attribute };
+      }
+    });
   });
+
+  watch(
+    () => personStore.currentPerson?.person,
+    async (person: Person | undefined) => {
+      if (!(person && person.isLocked && person.lockInfo)) return;
+      await organisationStore.getLockingOrganisationById(person.lockInfo.lock_locked_from);
+    },
+  );
 
   let closeCannotDeleteDialog = (): void => {
     cannotDeleteDialogVisible.value = false;
@@ -214,8 +236,8 @@
     });
   };
 
-  let closeChangePersonInfoSuccessDialog = (): void => {
-    changePersonInfoSuccessVisible.value = false;
+  let closeChangePersonMetadataSuccessDialog = (): void => {
+    changePersonMetadataSuccessVisible.value = false;
     router.push(route).then(() => {
       router.go(0);
     });
@@ -370,9 +392,7 @@
   }
 
   const rollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = useRollen();
-
   const organisationen: ComputedRef<TranslatedObject[] | undefined> = useOrganisationen();
-
   const klassen: ComputedRef<TranslatedObject[] | undefined> = useKlassen();
 
   type ZuordnungCreationForm = {
@@ -389,8 +409,10 @@
     selectedNewKlasse: string;
   };
 
-  type ChangePersonInfoForm = {
-    selectedKopersNrPersonInfo: string;
+  type ChangePersonMetadata = {
+    selectedVorname: string;
+    selectedFamilienname: string;
+    selectedKopersNrMetadata: string;
   };
 
   // Define a method to check if the selected Rolle is of type "Lern"
@@ -448,10 +470,24 @@
     }),
   );
 
-  // Validation schema for the form for changing KopersNr
-  const changePersonInfoValidationSchema: TypedSchema = toTypedSchema(
+  // Validation schema for the form for changing person metadata
+  const changePersonMetadataValidationSchema: TypedSchema = toTypedSchema(
     object({
-      selectedKopersNrPersonInfo: string().required(t('admin.person.rules.kopersNr.required')),
+      selectedKopersNrMetadata: string().when([], {
+        is: () => personStore.currentPerson?.person.personalnummer,
+        then: (schema: StringSchema) => schema.required(t('admin.person.rules.kopersNr.required')),
+        otherwise: (schema: StringSchema) => schema.notRequired(),
+      }),
+      selectedVorname: string()
+        .matches(DIN_91379A, t('admin.person.rules.vorname.matches'))
+        .matches(NO_LEADING_TRAILING_SPACES, t('admin.person.rules.vorname.noLeadingTrailingSpaces'))
+        .min(2, t('admin.person.rules.vorname.min'))
+        .required(t('admin.person.rules.vorname.required')),
+      selectedFamilienname: string()
+        .matches(DIN_91379A, t('admin.person.rules.familienname.matches'))
+        .matches(NO_LEADING_TRAILING_SPACES, t('admin.person.rules.familienname.noLeadingTrailingSpaces'))
+        .min(2, t('admin.person.rules.familienname.min'))
+        .required(t('admin.person.rules.familienname.required')),
     }),
   );
 
@@ -494,13 +530,13 @@
 
   // eslint-disable-next-line @typescript-eslint/typedef
   const {
-    defineField: defineFieldChangePersonInfo,
-    handleSubmit: handleSubmitChangePersonInfo,
-    resetForm: resetFormChangePersonInfo,
-    isFieldDirty: isFieldDirtyChangePersonInfo,
-    setFieldValue: setFieldValueChangePersonInfo,
-  } = useForm<ChangePersonInfoForm>({
-    validationSchema: changePersonInfoValidationSchema,
+    defineField: defineFieldChangePersonMetadata,
+    handleSubmit: handleSubmitChangePersonMetadata,
+    resetForm: resetFormChangePersonMetadata,
+    isFieldDirty: isFieldDirtyChangePersonMetadata,
+    setFieldValue: setFieldValueChangePersonMetadata,
+  } = useForm<ChangePersonMetadata>({
+    validationSchema: changePersonMetadataValidationSchema,
   });
 
   // Change Klasse Form
@@ -514,10 +550,18 @@
   ] = defineFieldChangeKlasse('selectedNewKlasse', vuetifyConfig);
 
   // Change Person Info Form
-  const [selectedKopersNrPersonInfo, selectedKopersNrPersonInfoProps]: [
+  const [selectedVorname, selectedVornameProps]: [
+    Ref<string | undefined>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = defineFieldChangePersonMetadata('selectedVorname', vuetifyConfig);
+  const [selectedFamilienname, selectedFamiliennameProps]: [
+    Ref<string | undefined>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = defineFieldChangePersonMetadata('selectedFamilienname', vuetifyConfig);
+  const [selectedKopersNrMetadata, selectedKopersNrMetadataProps]: [
     Ref<string | undefined | null>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineFieldChangePersonInfo('selectedKopersNrPersonInfo', vuetifyConfig);
+  ] = defineFieldChangePersonMetadata('selectedKopersNrMetadata', vuetifyConfig);
 
   // Methods from utils that handle the Befristung events and sets up watchers
   const { handleBefristungUpdate, handleBefristungOptionUpdate, setupWatchers }: BefristungUtilsType =
@@ -851,8 +895,10 @@
 
   watch(
     () => personStore.personenuebersicht,
-    (newValue: PersonWithUebersicht | null) => {
+    async (newValue: PersonWithUebersicht | null) => {
       zuordnungenResult.value = computeZuordnungen(newValue);
+      const organisationIds: Array<string> = [...new Set(newValue?.zuordnungen.map((z: Zuordnung) => z.sskId))];
+      if (organisationIds.length > 0) await organisationStore.getParentOrganisationsByIds(organisationIds);
     },
     { immediate: true },
   );
@@ -866,35 +912,72 @@
   }
 
   // Triggers the template to start editing the person informations
-  const triggerPersonInfoEdit = (): void => {
-    isEditPersonInfoActive.value = true;
+  const triggerPersonMetadataEdit = (): void => {
+    isEditPersonMetadataActive.value = true;
     const personalnummer: string | null | undefined = personStore.currentPerson?.person.personalnummer;
-    setFieldValueChangePersonInfo('selectedKopersNrPersonInfo', personalnummer ?? '');
+    const vorname: string | undefined = personStore.currentPerson?.person.name.vorname;
+    const familienname: string | undefined = personStore.currentPerson?.person.name.familienname;
+
+    setFieldValueChangePersonMetadata('selectedKopersNrMetadata', personalnummer ?? '');
+    setFieldValueChangePersonMetadata('selectedVorname', vorname ?? '');
+    setFieldValueChangePersonMetadata('selectedFamilienname', familienname ?? '');
   };
 
-  const cancelEditPersonInfo = (): void => {
-    isEditPersonInfoActive.value = false;
-    resetFormChangePersonInfo();
+  const cancelEditPersonMetadata = (): void => {
+    isEditPersonMetadataActive.value = false;
+    resetFormChangePersonMetadata();
   };
 
-  // Handles the value emitted by PersonenInfoChange for the selectedKopersNr
+  // Handles the value emitted by PersonenMetadata for the selectedKopersNr
   function handleSelectedKopersNrUpdate(value: string | undefined | null): void {
-    selectedKopersNrPersonInfo.value = value;
+    selectedKopersNrMetadata.value = value;
+  }
+
+  // Handles the value emitted by PersonenMetadata for the selectedVorname
+  function handleSelectedVorname(value: string | undefined): void {
+    selectedVorname.value = value;
+  }
+
+  // Handles the value emitted by PersonenMetadata for the selectedFamilienname
+  function handleSelectedFamilienname(value: string | undefined): void {
+    selectedFamilienname.value = value;
   }
 
   // Submit the form for changing person informations (Vorname, Nachname, KopersNr.)
-  const onSubmitChangePersonInfo: (e?: Event) => Promise<Promise<void> | undefined> = handleSubmitChangePersonInfo(
-    async () => {
-      if (selectedKopersNrPersonInfo.value) {
-        await personStore.changePersonInfoById(currentPersonId, selectedKopersNrPersonInfo.value);
-        changePersonInfoSuccessVisible.value = !personStore.errorCode;
-        resetFormChangePersonInfo();
+  const onSubmitChangePersonMetadata: (e?: Event) => Promise<Promise<void> | undefined> =
+    handleSubmitChangePersonMetadata(async () => {
+      if (selectedKopersNrMetadata.value && selectedVorname.value && selectedFamilienname.value) {
+        if (selectedKopersNrMetadata.value === personStore.currentPerson?.person.personalnummer) {
+          await personStore.changePersonMetadataById(
+            currentPersonId,
+            selectedVorname.value,
+            selectedFamilienname.value,
+          );
+        } else {
+          await personStore.changePersonMetadataById(
+            currentPersonId,
+            selectedVorname.value,
+            selectedFamilienname.value,
+            selectedKopersNrMetadata.value,
+          );
+        }
+      } else if (!selectedKopersNrMetadata.value && selectedVorname.value && selectedFamilienname.value) {
+        await personStore.changePersonMetadataById(currentPersonId, selectedVorname.value, selectedFamilienname.value);
       }
-    },
-  );
+      // Success message changes depending on if the username changed or not.
+      if (personStore.currentPerson?.person.referrer !== personStore.patchedPerson?.person.referrer) {
+        changePersonMetadataSuccessMessage.value = t('admin.person.personalInfoSuccessDialogMessageWithUsername', {
+          username: personStore.patchedPerson?.person.referrer,
+        });
+      } else {
+        changePersonMetadataSuccessMessage.value = t('admin.person.personalInfoSuccessDialogMessage');
+      }
+      changePersonMetadataSuccessVisible.value = !personStore.errorCode;
+      resetFormChangePersonMetadata();
+    });
 
   function isFormDirty(): boolean {
-    return isFieldDirtyChangePersonInfo('selectedKopersNrPersonInfo');
+    return isFieldDirtyChangePersonMetadata('selectedKopersNrMetadata');
   }
 
   function handleConfirmUnsavedChanges(): void {
@@ -927,16 +1010,47 @@
 
   // Checks if the entered KopersNr is the same one that is already assigned to the user.
   // This is used to disable the save button in that case (To avoid errors).
-  const hasSameKopersNr: ComputedRef<boolean> = computed(() => {
-    if (selectedKopersNrPersonInfo.value === personStore.currentPerson?.person.personalnummer) {
+  const hasSameMetadata: ComputedRef<boolean> = computed(() => {
+    // Check if personalnummer does not exist and names are unchanged
+    const isPersonalnummerMissing: boolean = !personStore.currentPerson?.person.personalnummer;
+    const isFamiliennameUnchanged: boolean =
+      selectedFamilienname.value === personStore.currentPerson?.person.name.familienname;
+    const isVornameUnchanged: boolean = selectedVorname.value === personStore.currentPerson?.person.name.vorname;
+
+    // If personalnummer is missing but selectedKopersNr has a value, return false
+    if (isPersonalnummerMissing && selectedKopersNrMetadata.value) {
+      return false;
+    }
+
+    // If personalnummer doesn't exist and both names are unchanged, return true
+    if (isPersonalnummerMissing && isFamiliennameUnchanged && isVornameUnchanged) {
       return true;
     }
+
+    // Otherwise, return true only if all fields match exactly
+    if (
+      selectedKopersNrMetadata.value === personStore.currentPerson?.person.personalnummer &&
+      isFamiliennameUnchanged &&
+      isVornameUnchanged
+    ) {
+      return true;
+    }
+
     return false;
   });
 
   // Computed property to check if the second radio button should be disabled
   const isUnbefristetButtonDisabled: ComputedRef<boolean> = computed(() => {
     return isBefristungspflichtRolle(selectedRolle.value);
+  });
+
+  const intersectingOrganisations: ComputedRef<Set<Organisation>> = computed(() => {
+    const adminOrganisationIds: Set<string> = new Set(
+      authStore.currentUser?.personenkontexte?.map((pk: PersonenkontextRolleFieldsResponse) => pk.organisationsId),
+    );
+    return new Set<Organisation>(
+      organisationStore.parentOrganisationen.filter((userOrg: Organisation) => adminOrganisationIds.has(userOrg.id)),
+    );
   });
 
   const twoFactorAuthenticationConnectionError: ComputedRef<string> = computed(() => {
@@ -1036,7 +1150,7 @@
 
       <template v-if="!personStore.errorCode && !personenkontextStore.errorCode">
         <v-container class="personal-info">
-          <div v-if="personStore.currentPerson?.person && !isEditPersonInfoActive">
+          <div v-if="personStore.currentPerson?.person && !isEditPersonMetadataActive">
             <!-- Befristung -->
             <v-row class="ml-md-16">
               <v-col
@@ -1044,10 +1158,7 @@
                 md="auto"
                 class="mt-1 edit-container"
               >
-                <div
-                  v-if="hasKopersRolle"
-                  class="d-flex justify-sm-end"
-                >
+                <div class="d-flex justify-sm-end">
                   <v-col
                     cols="12"
                     sm="6"
@@ -1063,7 +1174,7 @@
                         :disabled="isEditActive"
                         class="primary ml-lg-8"
                         data-testid="zuordnung-edit-button"
-                        @Click="triggerPersonInfoEdit"
+                        @Click="triggerPersonMetadataEdit"
                         :block="mdAndDown"
                       >
                         {{ $t('edit') }}
@@ -1167,20 +1278,27 @@
             <v-progress-circular indeterminate></v-progress-circular>
           </div>
         </v-container>
-        <v-container v-if="isEditPersonInfoActive">
+        <v-container v-if="isEditPersonMetadataActive">
           <v-form
-            data-testid="person-info-form"
-            @submit="onSubmitChangePersonInfo"
+            data-testid="person-metadata-form"
+            @submit="onSubmitChangePersonMetadata"
           >
-            <PersonenInfoChange
+            <PersonenMetadataChange
               :confirmUnsavedChangesAction="handleConfirmUnsavedChanges"
-              :selectedKopersNrPersonInfoProps="selectedKopersNrPersonInfoProps"
-              :selectedKopersNrPersonInfo="personStore.currentPerson?.person.personalnummer"
+              :selectedVornameProps="selectedVornameProps"
+              :selectedVorname="personStore.currentPerson?.person.name.vorname"
+              :selectedFamiliennameProps="selectedFamiliennameProps"
+              :selectedFamilienname="personStore.currentPerson?.person.name.familienname"
+              :selectedKopersNrMetadataProps="selectedKopersNrMetadataProps"
+              :selectedKopersNrMetadata="personStore.currentPerson?.person.personalnummer"
               :showUnsavedChangesDialog="showUnsavedChangesDialog"
-              @update:selectedKopersNrPersonInfo="handleSelectedKopersNrUpdate"
+              :hasKopersRolle="hasKopersRolle"
+              @update:selectedKopersNrMetadata="handleSelectedKopersNrUpdate"
+              @update:selectedVorname="handleSelectedVorname"
+              @update:selectedFamilienname="handleSelectedFamilienname"
               @onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
-            ></PersonenInfoChange>
-            <v-row class="save-cancel-row ml-md-16 pt-5 justify-end">
+            ></PersonenMetadataChange>
+            <v-row class="save-cancel-row ml-md-16 pt-md-5 pt-12 justify-end">
               <v-col
                 class="cancel-col"
                 cols="12"
@@ -1190,7 +1308,7 @@
                 <v-btn
                   class="secondary small"
                   data-testid="person-info-edit-cancel"
-                  @click="cancelEditPersonInfo"
+                  @click="cancelEditPersonMetadata"
                   :block="mdAndDown"
                 >
                   {{ $t('cancel') }}
@@ -1202,16 +1320,15 @@
                 md="auto"
               >
                 <SpshTooltip
-                  :enabledCondition="!hasSameKopersNr"
-                  :disabledText="$t('person.changeKopersDisabledDescription')"
+                  :enabledCondition="!hasSameMetadata"
+                  :disabledText="$t('person.changePersonMetaDataDisabledDescription')"
                   :enabledText="$t('save')"
                   position="start"
                 >
                   <v-btn
                     class="primary small"
-                    :disabled="hasSameKopersNr"
+                    :disabled="hasSameMetadata"
                     data-testid="person-info-edit-save"
-                    @click="handleSaveClick"
                     :block="mdAndDown"
                     type="submit"
                   >
@@ -1242,7 +1359,7 @@
               <div class="d-flex justify-sm-end">
                 <PasswordReset
                   :errorCode="personStore.errorCode"
-                  :disabled="isEditActive || isEditPersonInfoActive"
+                  :disabled="isEditActive || isEditPersonMetadataActive"
                   :person="personStore.currentPerson"
                   @onClearPassword="password = ''"
                   @onResetPassword="resetPassword(currentPersonId)"
@@ -1284,7 +1401,7 @@
                   md="auto"
                 >
                   <SpshTooltip
-                    :enabledCondition="selectedZuordnungen.length === 0 && !isEditPersonInfoActive"
+                    :enabledCondition="selectedZuordnungen.length === 0 && !isEditPersonMetadataActive"
                     :disabledText="$t('person.finishEditFirst')"
                     :enabledText="$t('person.editZuordnungen')"
                     position="start"
@@ -1292,7 +1409,7 @@
                     <v-btn
                       class="primary ml-lg-8"
                       data-testid="zuordnung-edit-button"
-                      :disabled="isEditPersonInfoActive"
+                      :disabled="isEditPersonMetadataActive"
                       @Click="triggerEdit"
                       :block="mdAndDown"
                     >
@@ -1333,7 +1450,6 @@
             </v-col>
           </v-row>
         </v-container>
-
         <!-- Show this template if the edit button is triggered-->
         <v-container v-if="isEditActive">
           <template v-if="!isZuordnungFormActive && !isChangeKlasseFormActive">
@@ -1848,7 +1964,7 @@
                           "
                         >
                           {{
-                            `${$t('admin.person.twoFactorAuthentication.serial')}: 
+                            `${$t('admin.person.twoFactorAuthentication.serial')}:
                           ${twoFactorAuthentificationStore.serial}`
                           }}
                         </p>
@@ -1957,7 +2073,7 @@
                 </v-row>
                 <v-row
                   class="mt-0"
-                  v-for="{ key, attribute } of getLockInfo"
+                  v-for="({ key, attribute }, index) of getLockInfo"
                   :key="key"
                   cols="10"
                 >
@@ -1965,7 +2081,12 @@
                     class="text-right"
                     cols="4"
                   >
-                    <span class="subtitle-2"> {{ key }}: </span>
+                    <span
+                      class="subtitle-2"
+                      :data-testid="`lock-info-${index}-key`"
+                    >
+                      {{ key }}:
+                    </span>
                   </v-col>
                   <v-col
                     cols="5"
@@ -1974,6 +2095,7 @@
                     <span
                       class="text-body"
                       :title="attribute"
+                      :data-testid="`lock-info-${index}-attribute`"
                     >
                       {{ attribute }}
                     </span>
@@ -1992,10 +2114,12 @@
             >
               <div class="d-flex justify-sm-end">
                 <PersonLock
-                  :disabled="isEditActive || isEditPersonInfoActive"
+                  :disabled="isEditActive || isEditPersonMetadataActive"
                   :errorCode="personStore.errorCode"
                   :person="personStore.currentPerson"
                   :adminId="authStore.currentUser?.personId!"
+                  :formatOrganisationName="getOrganisationDisplayName"
+                  :intersectingOrganisations="intersectingOrganisations"
                   @onLockUser="onLockUser"
                 >
                 </PersonLock>
@@ -2003,12 +2127,23 @@
               <div class="d-flex justify-sm-end">
                 <template v-if="authStore.hasPersonenLoeschenPermission">
                   <PersonDelete
-                    :disabled="isEditActive || isEditPersonInfoActive"
+                    :disabled="isEditActive || isEditPersonMetadataActive"
                     :errorCode="personStore.errorCode"
                     :person="personStore.currentPerson"
                     @onDeletePerson="deletePerson(currentPersonId)"
                   >
                   </PersonDelete>
+                </template>
+              </div>
+              <div class="d-flex justify-sm-end">
+                <template v-if="authStore.hasPersonenSyncPermission">
+                  <PersonSync
+                    :disabled="isEditActive || isEditPersonMetadataActive"
+                    :errorCode="personStore.errorCode"
+                    :person="personStore.currentPerson"
+                    @onSyncPerson="syncPerson(currentPersonId)"
+                  >
+                  </PersonSync>
                 </template>
               </div>
             </v-col>
@@ -2145,14 +2280,14 @@
     </v-dialog>
     <!-- Success Dialog after changing the Person Infos-->
     <v-dialog
-      v-model="changePersonInfoSuccessVisible"
+      v-model="changePersonMetadataSuccessVisible"
       persistent
       max-width="600px"
     >
       <LayoutCard
         :closable="true"
         :header="$t('admin.person.personalInfo')"
-        @onCloseClicked="closeChangePersonInfoSuccessDialog"
+        @onCloseClicked="closeChangePersonMetadataSuccessDialog"
       >
         <v-card-text>
           <v-container>
@@ -2161,7 +2296,7 @@
                 offset="1"
                 cols="10"
               >
-                <span>{{ $t('admin.person.personalInfoSuccessDialogMessage') }}</span>
+                <span>{{ changePersonMetadataSuccessMessage }}</span>
               </v-col>
             </v-row>
           </v-container>
@@ -2176,7 +2311,7 @@
               <v-btn
                 :block="mdAndDown"
                 class="primary"
-                @click.stop="closeChangePersonInfoSuccessDialog"
+                @click.stop="closeChangePersonMetadataSuccessDialog"
               >
                 {{ $t('close') }}
               </v-btn>
@@ -2410,5 +2545,11 @@
     .cancel-col {
       margin-bottom: -15px;
     }
+  }
+
+  span {
+    white-space: pre;
+    /* text-wrap needs to be placed after white-space to overwrite wrapping behaviour */
+    text-wrap: pretty;
   }
 </style>
