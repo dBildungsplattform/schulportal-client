@@ -47,6 +47,7 @@ type AuthState = {
   hasRollenverwaltungPermission: boolean;
   hasSchulverwaltungPermission: boolean;
   hasSchultraegerverwaltungPermission: boolean;
+  hasPersonenSyncPermission: boolean;
   isAuthed: boolean;
   acr: StepUpLevel;
 };
@@ -72,6 +73,7 @@ export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, 
     hasRollenverwaltungPermission: false,
     hasSchulverwaltungPermission: false,
     hasSchultraegerverwaltungPermission: false,
+    hasPersonenSyncPermission: false,
     isAuthed: false,
     acr: StepUpLevel.NONE,
   }),
@@ -103,6 +105,7 @@ export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, 
         this.hasRollenverwaltungPermission = this.currentUserPermissions.includes('ROLLEN_VERWALTEN');
         this.hasSchulverwaltungPermission = this.currentUserPermissions.includes('SCHULEN_VERWALTEN');
         this.hasSchultraegerverwaltungPermission = this.currentUserPermissions.includes('SCHULTRAEGER_VERWALTEN');
+        this.hasPersonenSyncPermission = true; // TODO SPSH-1136
       } catch {
         // If user info can't be retrieved, consider the user unauthenticated.
         this.isAuthed = false;

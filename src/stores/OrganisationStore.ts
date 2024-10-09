@@ -9,6 +9,7 @@ import {
   type RollenSystemRecht,
   type OrganisationByNameBodyParams,
   type ParentOrganisationenResponse,
+  type OrganisationRootChildrenResponse,
 } from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
 
@@ -57,6 +58,7 @@ type OrganisationState = {
   updatedOrganisation: Organisation | null;
   createdKlasse: Organisation | null;
   createdSchule: Organisation | null;
+  lockingOrganisation: Organisation | null;
   totalKlassen: number;
   totalSchulen: number;
   totalPaginatedSchulen: number;
@@ -68,6 +70,7 @@ type OrganisationState = {
   loading: boolean;
   loadingKlassen: boolean;
   parentOrganisationen: Array<Organisation>;
+  schultraeger: Array<Organisation>;
 };
 
 export type OrganisationenFilter = {
@@ -87,7 +90,8 @@ type OrganisationActions = {
   getFilteredKlassen(filter?: OrganisationenFilter): Promise<void>;
   getKlassenByOrganisationId: (organisationId: string, filter?: OrganisationenFilter) => Promise<void>;
   getOrganisationById: (organisationId: string, organisationsTyp: OrganisationsTyp) => Promise<Organisation>;
-  getParentOrganisationsByIds: (organisationIds: string[]) => Promise<Organisation[]>;
+  getLockingOrganisationById: (organisationId: string) => Promise<void>;
+  getParentOrganisationsByIds: (organisationIds: string[]) => Promise<void>;
   createOrganisation: (
     kennung: string,
     name: string,
@@ -100,6 +104,7 @@ type OrganisationActions = {
   ) => Promise<Organisation>;
   deleteOrganisationById: (organisationId: string) => Promise<void>;
   updateOrganisationById: (organisationId: string, name: string) => Promise<void>;
+  getSchultraeger: () => Promise<void>;
 };
 
 export { OrganisationsTyp };
@@ -122,6 +127,7 @@ export const useOrganisationStore: StoreDefinition<
       updatedOrganisation: null,
       createdKlasse: null,
       createdSchule: null,
+      lockingOrganisation: null,
       totalKlassen: 0,
       totalSchulen: 0,
       totalPaginatedSchulen: 0,
@@ -133,6 +139,7 @@ export const useOrganisationStore: StoreDefinition<
       loading: false,
       loadingKlassen: false,
       parentOrganisationen: [],
+      schultraeger: [],
     };
   },
 
@@ -237,13 +244,36 @@ export const useOrganisationStore: StoreDefinition<
           await organisationApi.organisationControllerGetParentsByIds({ organisationIds: organisationIds });
         const { parents }: ParentOrganisationenResponse = response.data;
         this.parentOrganisationen = parents;
-        return parents;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
           this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
         }
-        return await Promise.reject(this.errorCode);
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async getLockingOrganisationById(organisationId: string) {
+      this.errorCode = '';
+      this.loading = true;
+      try {
+        let organisation: Organisation | undefined = this.parentOrganisationen.find(
+          (org: Organisation) => org.id === organisationId,
+        );
+        if (!organisation) organisation = this.allOrganisationen.find((org: Organisation) => org.id === organisationId);
+        if (organisation) {
+          this.lockingOrganisation = { ...organisation };
+        } else {
+          const { data }: { data: Organisation } =
+            await organisationApi.organisationControllerFindOrganisationById(organisationId);
+          this.lockingOrganisation = data;
+        }
+      } catch (error: unknown) {
+        this.errorCode = 'UNSPECIFIED_ERROR';
+        if (isAxiosError(error)) {
+          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
+        }
       } finally {
         this.loading = false;
       }
@@ -351,6 +381,19 @@ export const useOrganisationStore: StoreDefinition<
         }
       } finally {
         this.loading = false;
+      }
+    },
+
+    async getSchultraeger() {
+      try {
+        const response: AxiosResponse<OrganisationRootChildrenResponse> =
+          await organisationApi.organisationControllerGetRootChildren();
+        this.schultraeger = Object.values(response.data);
+      } catch (error: unknown) {
+        this.errorCode = 'UNSPECIFIED_ERROR';
+        if (isAxiosError(error)) {
+          this.errorCode = error.response?.data.i18nKey || 'SCHULTRAEGER_ERROR';
+        }
       }
     },
   },
