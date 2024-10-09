@@ -404,13 +404,7 @@
           :headline-test-id="'new-password-card'"
           :header="$t('login.password')"
         >
-          <v-row class="ma-3 d-flex align-content-center justify-center ga-4">
-            <v-icon
-              size="x-large"
-              class="w-100"
-              icon="mdi-key-alert-outline"
-              data-testid="password-icon"
-            ></v-icon>
+          <v-row class="ma-3 d-flex align-content-center justify-center ga-4">            
             <p
               class="w-100 text-center text-body"
               v-if="lastPasswordChangeDate"
@@ -514,11 +508,6 @@
             justify="center"
             class="ma-3 ga-4"
           >
-            <v-icon
-              size="x-large"
-              icon="mdi-shield-account-outline"
-              data-testid="two-factor-icon"
-            ></v-icon>
           </v-row>
           <v-row
             align="center"
