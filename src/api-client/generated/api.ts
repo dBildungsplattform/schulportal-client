@@ -751,7 +751,8 @@ export const DbiamRolleErrorI18nKeyEnum = {
     AddSystemrechtError: 'ADD_SYSTEMRECHT_ERROR',
     RolleHatPersonenkontexteError: 'ROLLE_HAT_PERSONENKONTEXTE_ERROR',
     UpdateMerkmaleError: 'UPDATE_MERKMALE_ERROR',
-    RollennameEnthaeltLeerzeichen: 'ROLLENNAME_ENTHAELT_LEERZEICHEN'
+    RollennameEnthaeltLeerzeichen: 'ROLLENNAME_ENTHAELT_LEERZEICHEN',
+    NewerVersionOfRolleAvailable: 'NEWER_VERSION_OF_ROLLE_AVAILABLE'
 } as const;
 
 export type DbiamRolleErrorI18nKeyEnum = typeof DbiamRolleErrorI18nKeyEnum[keyof typeof DbiamRolleErrorI18nKeyEnum];
@@ -2043,21 +2044,33 @@ export interface RolleResponse {
      * @memberof RolleResponse
      */
     'administeredBySchulstrukturknotenKennung': string | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof RolleResponse
+     */
+    'version': number;
 }
 
 
 /**
  * 
  * @export
- * @interface RolleServiceProviderQueryParams
+ * @interface RolleServiceProviderBodyParams
  */
-export interface RolleServiceProviderQueryParams {
+export interface RolleServiceProviderBodyParams {
     /**
      * An array of ids for the service providers.
      * @type {Array<string>}
-     * @memberof RolleServiceProviderQueryParams
+     * @memberof RolleServiceProviderBodyParams
      */
     'serviceProviderIds': Array<string>;
+    /**
+     * The version for the rolle.
+     * @type {number}
+     * @memberof RolleServiceProviderBodyParams
+     */
+    'version': number;
 }
 /**
  * 
@@ -2138,6 +2151,12 @@ export interface RolleWithServiceProvidersResponse {
      * @memberof RolleWithServiceProvidersResponse
      */
     'administeredBySchulstrukturknotenKennung': string | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof RolleWithServiceProvidersResponse
+     */
+    'version': number;
     /**
      * 
      * @type {Array<ServiceProviderIdNameResponse>}
@@ -2608,6 +2627,12 @@ export interface UpdateRolleBodyParams {
      * @memberof UpdateRolleBodyParams
      */
     'serviceProviderIds': Set<string>;
+    /**
+     * 
+     * @type {number}
+     * @memberof UpdateRolleBodyParams
+     */
+    'version': number;
 }
 /**
  * 
@@ -8413,15 +8438,15 @@ export const RolleApiAxiosParamCreator = function (configuration?: Configuration
          * Remove a service-provider from a rolle by id.
          * @summary 
          * @param {string} rolleId The id for the rolle.
-         * @param {Array<string>} serviceProviderIds An array of ids for the service providers.
+         * @param {RolleServiceProviderBodyParams} rolleServiceProviderBodyParams 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        rolleControllerRemoveServiceProviderById: async (rolleId: string, serviceProviderIds: Array<string>, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        rolleControllerRemoveServiceProviderById: async (rolleId: string, rolleServiceProviderBodyParams: RolleServiceProviderBodyParams, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'rolleId' is not null or undefined
             assertParamExists('rolleControllerRemoveServiceProviderById', 'rolleId', rolleId)
-            // verify required parameter 'serviceProviderIds' is not null or undefined
-            assertParamExists('rolleControllerRemoveServiceProviderById', 'serviceProviderIds', serviceProviderIds)
+            // verify required parameter 'rolleServiceProviderBodyParams' is not null or undefined
+            assertParamExists('rolleControllerRemoveServiceProviderById', 'rolleServiceProviderBodyParams', rolleServiceProviderBodyParams)
             const localVarPath = `/api/rolle/{rolleId}/serviceProviders`
                 .replace(`{${"rolleId"}}`, encodeURIComponent(String(rolleId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -8443,15 +8468,14 @@ export const RolleApiAxiosParamCreator = function (configuration?: Configuration
             // oauth required
             await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
 
-            if (serviceProviderIds) {
-                localVarQueryParameter['serviceProviderIds'] = serviceProviderIds;
-            }
-
 
     
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(rolleServiceProviderBodyParams, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -8510,15 +8534,15 @@ export const RolleApiAxiosParamCreator = function (configuration?: Configuration
          * Add a service-provider to a rolle by id.
          * @summary 
          * @param {string} rolleId The id for the rolle.
-         * @param {RolleServiceProviderQueryParams} rolleServiceProviderQueryParams 
+         * @param {RolleServiceProviderBodyParams} rolleServiceProviderBodyParams 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        rolleControllerUpdateServiceProvidersById: async (rolleId: string, rolleServiceProviderQueryParams: RolleServiceProviderQueryParams, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        rolleControllerUpdateServiceProvidersById: async (rolleId: string, rolleServiceProviderBodyParams: RolleServiceProviderBodyParams, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'rolleId' is not null or undefined
             assertParamExists('rolleControllerUpdateServiceProvidersById', 'rolleId', rolleId)
-            // verify required parameter 'rolleServiceProviderQueryParams' is not null or undefined
-            assertParamExists('rolleControllerUpdateServiceProvidersById', 'rolleServiceProviderQueryParams', rolleServiceProviderQueryParams)
+            // verify required parameter 'rolleServiceProviderBodyParams' is not null or undefined
+            assertParamExists('rolleControllerUpdateServiceProvidersById', 'rolleServiceProviderBodyParams', rolleServiceProviderBodyParams)
             const localVarPath = `/api/rolle/{rolleId}/serviceProviders`
                 .replace(`{${"rolleId"}}`, encodeURIComponent(String(rolleId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -8547,7 +8571,7 @@ export const RolleApiAxiosParamCreator = function (configuration?: Configuration
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(rolleServiceProviderQueryParams, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(rolleServiceProviderBodyParams, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -8637,12 +8661,12 @@ export const RolleApiFp = function(configuration?: Configuration) {
          * Remove a service-provider from a rolle by id.
          * @summary 
          * @param {string} rolleId The id for the rolle.
-         * @param {Array<string>} serviceProviderIds An array of ids for the service providers.
+         * @param {RolleServiceProviderBodyParams} rolleServiceProviderBodyParams 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async rolleControllerRemoveServiceProviderById(rolleId: string, serviceProviderIds: Array<string>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.rolleControllerRemoveServiceProviderById(rolleId, serviceProviderIds, options);
+        async rolleControllerRemoveServiceProviderById(rolleId: string, rolleServiceProviderBodyParams: RolleServiceProviderBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.rolleControllerRemoveServiceProviderById(rolleId, rolleServiceProviderBodyParams, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -8661,12 +8685,12 @@ export const RolleApiFp = function(configuration?: Configuration) {
          * Add a service-provider to a rolle by id.
          * @summary 
          * @param {string} rolleId The id for the rolle.
-         * @param {RolleServiceProviderQueryParams} rolleServiceProviderQueryParams 
+         * @param {RolleServiceProviderBodyParams} rolleServiceProviderBodyParams 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async rolleControllerUpdateServiceProvidersById(rolleId: string, rolleServiceProviderQueryParams: RolleServiceProviderQueryParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<ServiceProviderResponse>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.rolleControllerUpdateServiceProvidersById(rolleId, rolleServiceProviderQueryParams, options);
+        async rolleControllerUpdateServiceProvidersById(rolleId: string, rolleServiceProviderBodyParams: RolleServiceProviderBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<ServiceProviderResponse>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.rolleControllerUpdateServiceProvidersById(rolleId, rolleServiceProviderBodyParams, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -8746,12 +8770,12 @@ export const RolleApiFactory = function (configuration?: Configuration, basePath
          * Remove a service-provider from a rolle by id.
          * @summary 
          * @param {string} rolleId The id for the rolle.
-         * @param {Array<string>} serviceProviderIds An array of ids for the service providers.
+         * @param {RolleServiceProviderBodyParams} rolleServiceProviderBodyParams 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        rolleControllerRemoveServiceProviderById(rolleId: string, serviceProviderIds: Array<string>, options?: any): AxiosPromise<void> {
-            return localVarFp.rolleControllerRemoveServiceProviderById(rolleId, serviceProviderIds, options).then((request) => request(axios, basePath));
+        rolleControllerRemoveServiceProviderById(rolleId: string, rolleServiceProviderBodyParams: RolleServiceProviderBodyParams, options?: any): AxiosPromise<void> {
+            return localVarFp.rolleControllerRemoveServiceProviderById(rolleId, rolleServiceProviderBodyParams, options).then((request) => request(axios, basePath));
         },
         /**
          * Update rolle.
@@ -8768,12 +8792,12 @@ export const RolleApiFactory = function (configuration?: Configuration, basePath
          * Add a service-provider to a rolle by id.
          * @summary 
          * @param {string} rolleId The id for the rolle.
-         * @param {RolleServiceProviderQueryParams} rolleServiceProviderQueryParams 
+         * @param {RolleServiceProviderBodyParams} rolleServiceProviderBodyParams 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        rolleControllerUpdateServiceProvidersById(rolleId: string, rolleServiceProviderQueryParams: RolleServiceProviderQueryParams, options?: any): AxiosPromise<Array<ServiceProviderResponse>> {
-            return localVarFp.rolleControllerUpdateServiceProvidersById(rolleId, rolleServiceProviderQueryParams, options).then((request) => request(axios, basePath));
+        rolleControllerUpdateServiceProvidersById(rolleId: string, rolleServiceProviderBodyParams: RolleServiceProviderBodyParams, options?: any): AxiosPromise<Array<ServiceProviderResponse>> {
+            return localVarFp.rolleControllerUpdateServiceProvidersById(rolleId, rolleServiceProviderBodyParams, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -8851,12 +8875,12 @@ export interface RolleApiInterface {
      * Remove a service-provider from a rolle by id.
      * @summary 
      * @param {string} rolleId The id for the rolle.
-     * @param {Array<string>} serviceProviderIds An array of ids for the service providers.
+     * @param {RolleServiceProviderBodyParams} rolleServiceProviderBodyParams 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof RolleApiInterface
      */
-    rolleControllerRemoveServiceProviderById(rolleId: string, serviceProviderIds: Array<string>, options?: AxiosRequestConfig): AxiosPromise<void>;
+    rolleControllerRemoveServiceProviderById(rolleId: string, rolleServiceProviderBodyParams: RolleServiceProviderBodyParams, options?: AxiosRequestConfig): AxiosPromise<void>;
 
     /**
      * Update rolle.
@@ -8873,12 +8897,12 @@ export interface RolleApiInterface {
      * Add a service-provider to a rolle by id.
      * @summary 
      * @param {string} rolleId The id for the rolle.
-     * @param {RolleServiceProviderQueryParams} rolleServiceProviderQueryParams 
+     * @param {RolleServiceProviderBodyParams} rolleServiceProviderBodyParams 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof RolleApiInterface
      */
-    rolleControllerUpdateServiceProvidersById(rolleId: string, rolleServiceProviderQueryParams: RolleServiceProviderQueryParams, options?: AxiosRequestConfig): AxiosPromise<Array<ServiceProviderResponse>>;
+    rolleControllerUpdateServiceProvidersById(rolleId: string, rolleServiceProviderBodyParams: RolleServiceProviderBodyParams, options?: AxiosRequestConfig): AxiosPromise<Array<ServiceProviderResponse>>;
 
 }
 
@@ -8968,13 +8992,13 @@ export class RolleApi extends BaseAPI implements RolleApiInterface {
      * Remove a service-provider from a rolle by id.
      * @summary 
      * @param {string} rolleId The id for the rolle.
-     * @param {Array<string>} serviceProviderIds An array of ids for the service providers.
+     * @param {RolleServiceProviderBodyParams} rolleServiceProviderBodyParams 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof RolleApi
      */
-    public rolleControllerRemoveServiceProviderById(rolleId: string, serviceProviderIds: Array<string>, options?: AxiosRequestConfig) {
-        return RolleApiFp(this.configuration).rolleControllerRemoveServiceProviderById(rolleId, serviceProviderIds, options).then((request) => request(this.axios, this.basePath));
+    public rolleControllerRemoveServiceProviderById(rolleId: string, rolleServiceProviderBodyParams: RolleServiceProviderBodyParams, options?: AxiosRequestConfig) {
+        return RolleApiFp(this.configuration).rolleControllerRemoveServiceProviderById(rolleId, rolleServiceProviderBodyParams, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -8994,13 +9018,13 @@ export class RolleApi extends BaseAPI implements RolleApiInterface {
      * Add a service-provider to a rolle by id.
      * @summary 
      * @param {string} rolleId The id for the rolle.
-     * @param {RolleServiceProviderQueryParams} rolleServiceProviderQueryParams 
+     * @param {RolleServiceProviderBodyParams} rolleServiceProviderBodyParams 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof RolleApi
      */
-    public rolleControllerUpdateServiceProvidersById(rolleId: string, rolleServiceProviderQueryParams: RolleServiceProviderQueryParams, options?: AxiosRequestConfig) {
-        return RolleApiFp(this.configuration).rolleControllerUpdateServiceProvidersById(rolleId, rolleServiceProviderQueryParams, options).then((request) => request(this.axios, this.basePath));
+    public rolleControllerUpdateServiceProvidersById(rolleId: string, rolleServiceProviderBodyParams: RolleServiceProviderBodyParams, options?: AxiosRequestConfig) {
+        return RolleApiFp(this.configuration).rolleControllerUpdateServiceProvidersById(rolleId, rolleServiceProviderBodyParams, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

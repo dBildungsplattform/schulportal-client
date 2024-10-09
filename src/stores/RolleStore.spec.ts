@@ -43,6 +43,7 @@ describe('rolleStore', () => {
           id: '1',
           administeredBySchulstrukturknotenName: null,
           administeredBySchulstrukturknotenKennung: null,
+          version: 1,
         },
       ];
 
@@ -107,6 +108,7 @@ describe('rolleStore', () => {
           id: '1',
           administeredBySchulstrukturknotenName: 'Testschule-15',
           administeredBySchulstrukturknotenKennung: '1111115',
+          version: 1,
         },
       ];
 
@@ -139,7 +141,7 @@ describe('rolleStore', () => {
     });
   });
 
-  describe('addServiceProviderToRolle', () => {
+  describe('updateServiceProviderInRolle', () => {
     it('should add a service provider to a rolle', async () => {
       rolleStore.createdRolle = {
         id: '1',
@@ -148,6 +150,7 @@ describe('rolleStore', () => {
         name: 'Rolle 1',
         rollenart: 'LERN',
         systemrechte: new Set(),
+        version: 1,
       };
 
       const mockResponse: ServiceProvider[] = [
@@ -163,18 +166,24 @@ describe('rolleStore', () => {
       ];
 
       mockadapter.onPut('/api/rolle/1/serviceProviders').replyOnce(200, mockResponse, {});
-      const addServiceProviderToRollePromise: Promise<void> = rolleStore.updateServiceProviderInRolle('1', ['1234']);
+      const updateServiceProviderInRollePromise: Promise<void> = rolleStore.updateServiceProviderInRolle('1', {
+        serviceProviderIds: ['1234'],
+        version: 1,
+      });
       expect(rolleStore.loading).toBe(true);
-      await addServiceProviderToRollePromise;
+      await updateServiceProviderInRollePromise;
       expect(rolleStore.createdRolle.serviceProviders).toEqual(mockResponse);
       expect(rolleStore.loading).toBe(false);
     });
 
     it('should handle string error', async () => {
       mockadapter.onPut('/api/rolle/1/serviceProviders').replyOnce(500, 'some mock server error');
-      const addServiceProviderToRollePromise: Promise<void> = rolleStore.updateServiceProviderInRolle('1', ['1']);
+      const updateServiceProviderInRollePromise: Promise<void> = rolleStore.updateServiceProviderInRolle('1', {
+        serviceProviderIds: ['1'],
+        version: 1,
+      });
       expect(rolleStore.loading).toBe(true);
-      await addServiceProviderToRollePromise;
+      await updateServiceProviderInRollePromise;
       expect(rolleStore.errorCode).toEqual('UNSPECIFIED_ERROR');
       expect(rolleStore.allRollen).toEqual([]);
       expect(rolleStore.loading).toBe(false);
@@ -182,9 +191,12 @@ describe('rolleStore', () => {
 
     it('should handle error code', async () => {
       mockadapter.onPut('/api/rolle/1/serviceProviders').replyOnce(500, { code: 'some mock server error' });
-      const addServiceProviderToRollePromise: Promise<void> = rolleStore.updateServiceProviderInRolle('1', ['1']);
+      const updateServiceProviderInRollePromise: Promise<void> = rolleStore.updateServiceProviderInRolle('1', {
+        serviceProviderIds: ['1'],
+        version: 1,
+      });
       expect(rolleStore.loading).toBe(true);
-      await addServiceProviderToRollePromise;
+      await updateServiceProviderInRollePromise;
       expect(rolleStore.errorCode).toEqual('some mock server error');
       expect(rolleStore.allRollen).toEqual([]);
       expect(rolleStore.loading).toBe(false);
@@ -205,6 +217,7 @@ describe('rolleStore', () => {
           id: '1',
           administeredBySchulstrukturknotenName: null,
           administeredBySchulstrukturknotenKennung: null,
+          version: 1,
         },
       ];
 
@@ -250,6 +263,7 @@ describe('rolleStore', () => {
         serviceProviders: [{ id: 'sp1', name: 'ServiceProvider1' }],
         administeredBySchulstrukturknotenName: null,
         administeredBySchulstrukturknotenKennung: null,
+        version: 1,
       };
 
       mockadapter.onPut('/api/rolle/1').replyOnce(200, mockResponse);
@@ -259,6 +273,7 @@ describe('rolleStore', () => {
         ['KOPERS_PFLICHT'],
         ['ROLLEN_VERWALTEN'],
         ['sp1'],
+        2,
       );
       expect(rolleStore.loading).toBe(true);
       await updateRollePromise;
@@ -274,6 +289,7 @@ describe('rolleStore', () => {
         ['KOPERS_PFLICHT'],
         ['ROLLEN_VERWALTEN'],
         ['sp1'],
+        2,
       );
       expect(rolleStore.loading).toBe(true);
       await updateRollePromise;
@@ -290,6 +306,7 @@ describe('rolleStore', () => {
         ['KOPERS_PFLICHT'],
         ['ROLLEN_VERWALTEN'],
         ['sp1'],
+        2,
       );
       expect(rolleStore.loading).toBe(true);
       await updateRollePromise;

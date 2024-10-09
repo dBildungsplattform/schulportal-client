@@ -154,6 +154,7 @@
             selectedMerkmale.value || [],
             selectedSystemRechte.value || [],
             selectedServiceProviders.value || [],
+            rolleStore.currentRolle.version,
           );
         } catch {
           creationErrorText.value = t(`admin.rolle.errors.${rolleStore.errorCode}`);

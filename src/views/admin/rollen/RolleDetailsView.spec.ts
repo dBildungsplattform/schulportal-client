@@ -19,6 +19,7 @@ rolleStore.currentRolle = {
   merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RollenMerkmal>,
   systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
   id: '1',
+  version: 1,
 };
 
 rolleStore.updatedRolle = {
@@ -33,6 +34,7 @@ rolleStore.updatedRolle = {
   serviceProviders: [{ id: 'sp1', name: 'ServiceProvider1' }],
   administeredBySchulstrukturknotenName: 'Land SH',
   administeredBySchulstrukturknotenKennung: '',
+  version: 2,
 };
 
 beforeEach(async () => {
@@ -131,6 +133,7 @@ describe('RolleDetailsView', () => {
       serviceProviders: [{ id: 'sp1', name: 'ServiceProvider1' }],
       administeredBySchulstrukturknotenName: 'Land SH',
       administeredBySchulstrukturknotenKennung: '',
+      version: 2,
     };
     await nextTick();
 

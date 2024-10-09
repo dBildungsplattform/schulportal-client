@@ -5,6 +5,7 @@ import {
   RollenArt,
   RollenMerkmal,
   RollenSystemRecht,
+  type RolleServiceProviderBodyParams,
   type CreateRolleBodyParams,
   type RolleApiInterface,
   type RolleResponse,
@@ -29,7 +30,10 @@ type RolleState = {
 
 type RolleGetters = {};
 type RolleActions = {
-  updateServiceProviderInRolle: (rolleId: string, serviceProviders: Array<string>) => Promise<void>;
+  updateServiceProviderInRolle: (
+    rolleId: string,
+    rolleServiceProviderQueryParams: RolleServiceProviderBodyParams,
+  ) => Promise<void>;
   createRolle: (
     rollenName: string,
     administrationsebene: string,
@@ -45,6 +49,7 @@ type RolleActions = {
     merkmale: RollenMerkmal[],
     systemrechte: RollenSystemRecht[],
     serviceProviderIds: string[],
+    version: number,
   ) => Promise<void>;
   deleteRolleById: (rolleId: string) => Promise<void>;
 };
@@ -63,6 +68,7 @@ export type Rolle = {
   rollenart: RollenArt;
   systemrechte?: Set<RollenSystemRecht>;
   serviceProviders?: Array<ServiceProviderResponse>;
+  version: number;
 };
 
 export type RolleTableItem = {
@@ -106,11 +112,14 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
     };
   },
   actions: {
-    async updateServiceProviderInRolle(rolleId: string, serviceProviders: Array<string>) {
+    async updateServiceProviderInRolle(
+      rolleId: string,
+      rolleServiceProviderQueryParams: RolleServiceProviderBodyParams,
+    ) {
       this.loading = true;
       try {
         const { data }: AxiosResponse<ServiceProviderResponse[]> =
-          await rolleApi.rolleControllerUpdateServiceProvidersById(rolleId, { serviceProviderIds: serviceProviders });
+          await rolleApi.rolleControllerUpdateServiceProvidersById(rolleId, rolleServiceProviderQueryParams);
         if (this.createdRolle) {
           this.createdRolle.serviceProviders = data;
         }
@@ -195,12 +204,14 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
         this.loading = false;
       }
     },
+
     async updateRolle(
       rolleId: string,
       rollenName: string,
       merkmale: RollenMerkmal[],
       systemrechte: RollenSystemRecht[],
       serviceProviderIds: string[],
+      version: number,
     ): Promise<void> {
       this.loading = true;
       this.errorCode = '';
@@ -210,6 +221,7 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
           merkmale: merkmale as unknown as Set<RollenMerkmal>,
           systemrechte: systemrechte as unknown as Set<RollenSystemRecht>,
           serviceProviderIds: serviceProviderIds as unknown as Set<string>,
+          version: version,
         };
         const { data }: { data: RolleWithServiceProvidersResponse } = await rolleApi.rolleControllerUpdateRolle(
           rolleId,
@@ -225,6 +237,7 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
         this.loading = false;
       }
     },
+
     async deleteRolleById(rolleId: string): Promise<void> {
       this.loading = true;
       this.errorCode = '';
