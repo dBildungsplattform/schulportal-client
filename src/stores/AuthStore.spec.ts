@@ -50,6 +50,7 @@ describe('AuthStore', () => {
       expect(authStore.hasRollenverwaltungPermission).toBe(false);
       expect(authStore.hasSchulverwaltungPermission).toBe(false);
       expect(authStore.hasSchultraegerverwaltungPermission).toBe(false);
+      expect(authStore.hasPersonenSyncPermission).toBe(false);
       await initializeAuthStatus;
       expect(authStore.isAuthed).toBe(true);
       expect(authStore.currentUser).toEqual(mockInfo);
@@ -58,6 +59,7 @@ describe('AuthStore', () => {
       expect(authStore.hasRollenverwaltungPermission).toBe(true);
       expect(authStore.hasSchulverwaltungPermission).toBe(true);
       expect(authStore.hasSchultraegerverwaltungPermission).toBe(false);
+      expect(authStore.hasPersonenSyncPermission).toBe(true);
     });
 
     it('should not authenticate on server error', async () => {

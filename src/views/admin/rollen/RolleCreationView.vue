@@ -238,12 +238,12 @@
           systemrechteToSubmit,
         )
         .then(async (rolleResponse: RolleResponse) => {
-          selectedServiceProviders.value?.forEach(async (serviceProviderId: string) => {
-            await rolleStore.addServiceProviderToRolle(rolleResponse.id, {
-              serviceProviderId,
-              version: rolleResponse.version,
+          if (selectedServiceProviders.value && selectedServiceProviders.value.length > 0) {
+            await rolleStore.updateServiceProviderInRolle(rolleResponse.id, {
+              serviceProviderIds: selectedServiceProviders.value,
+              version: rolleStore.currentRolle?.version || 1,
             });
-          });
+          }
         });
       formContext.resetForm();
 

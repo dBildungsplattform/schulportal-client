@@ -75,28 +75,22 @@
 <template>
   <v-dialog persistent>
     <template v-slot:activator="{ props }">
-      <v-col
-        cols="12"
-        sm="6"
-        md="auto"
+      <SpshTooltip
+        :enabledCondition="!disabled"
+        :disabledText="$t('person.finishEditFirst')"
+        :enabledText="$t('admin.person.twoFactorAuthentication.tokenReset')"
+        position="start"
       >
-        <SpshTooltip
-          :enabledCondition="!disabled"
-          :disabledText="$t('person.finishEditFirst')"
-          :enabledText="$t('admin.person.twoFactorAuthentication.tokenReset')"
-          position="start"
+        <v-btn
+          class="primary"
+          data-testid="open-2FA-dialog-icon"
+          :block="mdAndDown"
+          :disabled="disabled"
+          v-bind="props"
         >
-          <v-btn
-            class="primary"
-            data-testid="open-2FA-dialog-icon"
-            :block="mdAndDown"
-            :disabled="disabled"
-            v-bind="props"
-          >
-            {{ t('admin.person.twoFactorAuthentication.tokenReset') }}
-          </v-btn>
-        </SpshTooltip>
-      </v-col>
+          {{ t('admin.person.twoFactorAuthentication.tokenReset') }}
+        </v-btn>
+      </SpshTooltip>
     </template>
 
     <template v-slot:default="{ isActive }">
@@ -175,7 +169,7 @@
   </v-dialog>
 </template>
 
-<style>
+<style scoped>
   .whiteSpace {
     white-space: pre-line;
   }

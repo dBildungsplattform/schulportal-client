@@ -94,7 +94,8 @@
         "organisation": {
           "required": "Die Organisationsebene muss ausgewählt werden."
         }
-      }
+      },
+      "unknownOrganisation": "Unbekannte Organisation"
     },
     "person": {
       "addedSuccessfully": "{firstname} {lastname} wurde erfolgreich hinzugefügt.",
@@ -176,10 +177,15 @@
       "loadingErrorTitle": "Fehler beim Laden des Benutzers",
       "management": "Benutzerverwaltung",
       "personalInfo": "Persönliche Informationen",
+      "personalInfoChangeNotice": "Namensänderungen haben unmittelbare Auswirkungen auf den Benutzernamen im Schulportal SH und auf die E-Mail-Adresse! \n\nWeitere Informationen finden Sie auf der Homepage der IQSH-Medienberatung.",
       "personalInfoSuccessDialogMessage": "Die Stammdaten wurden erfolgreich geändert.",
+      "personalInfoSuccessDialogMessageWithUsername": "Die Stammdaten wurden erfolgreich geändert.\n\nDas Passwort wurde nicht verändert und kann wie zuvor verwendet werden. \n\nBitte teilen Sie der betroffenen Person die Stammdatenänderung (Benutzername, Mail-Adresse) mit. \n\nDie neuen Daten können Sie in der Gesamtübersicht einsehen." ,
       "resetPasswordConfirmation": "Sind Sie sicher, dass Sie das Passwort für {firstname} {lastname} zurücksetzen möchten?",
       "resetPasswordInformation": "Bitte teilen Sie dem Benutzer das temporäre Passwort mit. Nach dem Schließen des Dialogs wird es aus Sicherheitsgründen nicht mehr angezeigt.",
       "resetPassword": "Passwort zurücksetzen",
+      "syncPerson": "Neu synchronisieren",
+      "syncPersonConfirmation": "Der Benutzer wird an alle angeschlossenen Systeme neu übertragen und dort ggf. aktualisiert. Dies kann je nach System einige Zeit in Anspruch nehmen.",
+      "syncPersonSuccessMessage": "Die Synchronisation wurde gestartet.",
       "rules": {
         "vorname": {
           "matches": "Der Vorname enthält ungültige Zeichen.",
@@ -200,11 +206,14 @@
       "title": {
         "ERROR_LOADING_USER": "Fehler beim Laden des Benutzers.",
         "PERSONALNUMMER_NICHT_EINDEUTIG": "KoPers.-Nr. nicht eindeutig.",
+        "PERSONALNUMMER_REQUIRED": "Personalnummer erforderlich.",
         "PERSON_NOT_FOUND": "Benutzer gelöscht."
       },
       "errors": {
         "PERSONALNUMMER_NICHT_EINDEUTIG": "Die eingegebene KoPers.-Nr. ist bereits vergeben. Bitte korrigieren Sie Ihre Eingabe.",
-        "ERROR_LOADING_USER": "Es konnten keine Benutzerdaten geladen werden."
+        "ERROR_LOADING_USER": "Es konnten keine Benutzerdaten geladen werden.",
+        "PERSONALNUMMER_REQUIRED": "Die Änderungen wurden nicht gespeichert, da keine KoPers.-Nr. eingegeben wurde.",
+        "PERSON_NOT_FOUND": "Der Benutzer wurde seit Ihrer letzten Änderung gelöscht und kann nicht mehr bearbeitet werden."
       },
       "showAll": "Alle Benutzer anzeigen",
       "startPassword": "Einstiegs-Passwort",
@@ -344,7 +353,8 @@
         "NUR_KLASSE_UNTER_SCHULE": "Die Klasse muss einer Schule zugeordnet werden.",
         "ORGANISATION_SPECIFICATION_ERROR": "Die Schule konnte nicht angelegt werden.",
         "SCHULE_KENNUNG_EINDEUTIG": "Die Dienststellennummer existiert bereits.",
-        "SCHULE_UNTER_TRAEGER": "Eine Schule darf nicht einer anderen Schule zugeordnet werden."
+        "SCHULE_UNTER_TRAEGER": "Eine Schule darf nicht einer anderen Schule zugeordnet werden.",
+        "SCHULTRAEGER_ERROR": "Mögliche Schulträger konnten nicht geladen werden."
       },
       "management": "Schulverwaltung",
       "publicSchule": "Öffentliche Schule",
@@ -451,7 +461,7 @@
     "changeRolleDescription": "Ändert die Rolle des Benutzers an der Schule ohne ihn zu entfernen.",
     "changeKlasseDescription": "Ändert die Klasse des Benutzers an der Schule.",
     "changeKlasseNotDisabledDescription": "Bitte wählen Sie eine neue Klasse aus.",
-    "changeKopersDisabledDescription": "Bitte geben Sie eine neue KoPers.-Nr. ein.",
+    "changePersonMetaDataDisabledDescription": "Bitte ändern Sie den Vornamen, den Nachnamen oder die KoPers.-Nr., um fortzufahren.",
     "chooseZuordnungFirst": "Wählen Sie bitte zuerst eine Schulzuordnung aus.",
     "chooseKlasseZuordnungFirst": "Wählen Sie bitte zunächst eine Schulzuordnung mit einer Klasse aus.",
     "deleteZuordnungConfirmation": "Wollen Sie die Schulzuordnung wirklich entfernen?",

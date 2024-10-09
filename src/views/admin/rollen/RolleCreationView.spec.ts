@@ -12,6 +12,11 @@ import {
   useRolleStore,
 } from '@/stores/RolleStore';
 import { type OrganisationStore, useOrganisationStore } from '@/stores/OrganisationStore';
+import {
+  ServiceProviderKategorie,
+  ServiceProviderTarget,
+  type ServiceProviderResponse,
+} from '@/api-client/generated/api';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
@@ -105,11 +110,6 @@ describe('RolleCreationView', () => {
   });
 
   test('it fills form and triggers submit', async () => {
-    const rollennameInput: VueWrapper | undefined = wrapper
-      ?.findComponent({ ref: 'rolle-creation-form' })
-      .findComponent({ ref: 'rollenname-input' });
-    expect(rollennameInput?.exists()).toBe(false);
-
     const orgSelect: VueWrapper | undefined = wrapper
       ?.findComponent({ ref: 'rolle-creation-form' })
       .findComponent({ ref: 'administrationsebene-select' });
@@ -121,7 +121,20 @@ describe('RolleCreationView', () => {
       .findComponent({ ref: 'rollenart-select' });
     rollenartSelect?.setValue('LERN');
     await nextTick();
-    await flushPromises();
+
+    const rollennameInput: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'rolle-creation-form' })
+      .findComponent({ ref: 'rollenname-input' });
+
+    expect(rollennameInput?.exists()).toBe(true);
+    await rollennameInput?.find('input').setValue('NewRolle');
+    await nextTick();
+
+    const providerSelect: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'rolle-creation-form' })
+      .findComponent({ ref: 'service-provider-select' });
+    providerSelect?.setValue(['1']);
+    await nextTick();
 
     expect(orgSelect?.text()).toEqual('9356494 (Albert-Emil-Hansebrot-Gymnasium)');
     expect(rollenartSelect?.text()).toEqual('Lern');
@@ -141,9 +154,108 @@ describe('RolleCreationView', () => {
       version: 1,
     };
 
+    expect(
+      wrapper
+        ?.findComponent({ ref: 'rolle-creation-form' })
+        .find('[data-testid="rolle-form-create-button"]')
+        .isVisible(),
+    ).toBe(true);
+
+    wrapper
+      ?.findComponent({ ref: 'rolle-creation-form' })
+      .findComponent({ ref: 'formwrapper' })
+      .find('[data-testid="rolle-form-create-button"]')
+      .trigger('click');
+    await nextTick();
+
+    await flushPromises();
+
+    rolleStore.createdRolle = mockRolle;
+    await nextTick();
+
+    expect(wrapper?.find('[data-testid="create-another-rolle-button"]').isVisible()).toBe(true);
+
+    wrapper?.find('[data-testid="create-another-rolle-button"]').trigger('click');
+    await nextTick();
+
+    expect(rolleStore.createdRolle).toBe(null);
+  });
+
+  test('It display the success template with no systemrechte nor merkmale', async () => {
+    const mockRolle: RolleResponse = {
+      administeredBySchulstrukturknoten: '1234',
+      rollenart: 'LEHR',
+      name: 'Lehrer',
+      // TODO: remove type casting when generator is fixed
+      merkmale: new Set<RollenMerkmal>(),
+      systemrechte: new Set<RollenSystemRecht>(),
+      createdAt: '2022',
+      updatedAt: '2022',
+      id: '1',
+      administeredBySchulstrukturknotenName: 'Land SH',
+      administeredBySchulstrukturknotenKennung: '',
+      version: 1,
+    };
+
+    rolleStore.createdRolle = mockRolle;
+    rolleStore.createdRolle.serviceProviders = [];
+    await nextTick();
+
+    expect(wrapper?.find('[data-testid="create-another-rolle-button"]').isVisible()).toBe(true);
+
+    wrapper?.find('[data-testid="create-another-rolle-button"]').trigger('click');
+    await nextTick();
+
+    expect(rolleStore.createdRolle).toBe(null);
+  });
+  test('it displays the success template with service providers', async () => {
+    const mockRolle: RolleResponse = {
+      administeredBySchulstrukturknoten: '1234',
+      rollenart: 'LEHR',
+      name: 'Lehrer',
+      // TODO: remove type casting when generator is fixed
+      merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RollenMerkmal>,
+      systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
+      createdAt: '2022',
+      updatedAt: '2022',
+      id: '1',
+      administeredBySchulstrukturknotenName: 'Land SH',
+      administeredBySchulstrukturknotenKennung: '',
+      version: 1,
+    };
+
     rolleStore.createdRolle = mockRolle;
 
-    wrapper?.find('[data-testid="rolle-form-create-button"]').trigger('click');
+    const testServiceProviders: Array<ServiceProviderResponse> = [
+      {
+        id: 'sp001',
+        name: 'Provider One',
+        target: ServiceProviderTarget.Email,
+        url: 'https://provider-one.com',
+        kategorie: ServiceProviderKategorie.Email,
+        hasLogo: true,
+        requires2fa: false,
+      },
+      {
+        id: 'sp002',
+        name: 'Provider Two',
+        target: ServiceProviderTarget.Email,
+        url: 'https://provider-three.com',
+        kategorie: ServiceProviderKategorie.Email,
+        hasLogo: false,
+        requires2fa: false,
+      },
+      {
+        id: 'sp003',
+        name: 'Provider Three',
+        target: ServiceProviderTarget.Email,
+        url: 'https://provider-three.com',
+        kategorie: ServiceProviderKategorie.Email,
+        hasLogo: true,
+        requires2fa: false,
+      },
+    ];
+    rolleStore.createdRolle.serviceProviders = testServiceProviders;
     await nextTick();
 
     expect(wrapper?.find('[data-testid="create-another-rolle-button"]').isVisible()).toBe(true);

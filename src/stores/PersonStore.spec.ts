@@ -7,6 +7,7 @@ import {
   type DBiamPersonenuebersichtResponse,
   type PersonFrontendControllerFindPersons200Response,
   type PersonLockResponse,
+  type PersonMetadataBodyParams,
   type PersonendatensatzResponse,
 } from '@/api-client/generated';
 import { usePersonStore, type PersonStore, type Personendatensatz } from './PersonStore';
@@ -317,10 +318,10 @@ describe('PersonStore', () => {
       const mockResponse: string = 'fakePassword';
 
       mockadapter.onPatch(`/api/personen/${userId}/password`).replyOnce(200, mockResponse);
-      const resetPasswordPromise: Promise<string> = personStore.resetPassword(userId);
+      const resetPasswordPromise: Promise<void> = personStore.resetPassword(userId);
       expect(personStore.loading).toBe(true);
-      const generatedPassword: string = await resetPasswordPromise;
-      expect(generatedPassword).toEqual(mockResponse);
+      await resetPasswordPromise;
+      expect(personStore.newPassword).toEqual(mockResponse);
       expect(personStore.loading).toBe(false);
     });
 
@@ -328,9 +329,9 @@ describe('PersonStore', () => {
       const userId: string = '2345';
 
       mockadapter.onPatch(`/api/personen/${userId}/password`).replyOnce(500, 'some error');
-      const resetPasswordPromise: Promise<string> = personStore.resetPassword(userId);
+      const resetPasswordPromise: Promise<void> = personStore.resetPassword(userId);
       expect(personStore.loading).toBe(true);
-      await rejects(resetPasswordPromise);
+      await resetPasswordPromise;
       expect(personStore.errorCode).toEqual('UNSPECIFIED_ERROR');
       expect(personStore.loading).toBe(false);
     });
@@ -339,9 +340,9 @@ describe('PersonStore', () => {
       const userId: string = '2345';
 
       mockadapter.onPatch(`/api/personen/${userId}/password`).replyOnce(500, { code: 'some mock server error' });
-      const resetPasswordPromise: Promise<string> = personStore.resetPassword(userId);
+      const resetPasswordPromise: Promise<void> = personStore.resetPassword(userId);
       expect(personStore.loading).toBe(true);
-      await rejects(resetPasswordPromise);
+      await resetPasswordPromise;
       expect(personStore.errorCode).toEqual('some mock server error');
       expect(personStore.loading).toBe(false);
     });
@@ -481,6 +482,41 @@ describe('PersonStore', () => {
     });
   });
 
+  describe('syncPersonById', () => {
+    it('should sync a person', async () => {
+      const personId: string = '1234';
+
+      mockadapter.onPost(`/api/personen/${personId}/sync`).replyOnce(200);
+
+      await personStore.syncPersonById(personId);
+
+      expect(personStore.loading).toBe(false);
+      expect(personStore.errorCode).toEqual('');
+    });
+
+    it('should handle string error', async () => {
+      const personId: string = '1234';
+
+      mockadapter.onPost(`/api/personen/${personId}/sync`).replyOnce(500, 'some error');
+
+      await personStore.syncPersonById(personId);
+
+      expect(personStore.errorCode).toEqual('UNSPECIFIED_ERROR');
+      expect(personStore.loading).toBe(false);
+    });
+
+    it('should handle error code', async () => {
+      const personId: string = '1234';
+
+      mockadapter.onPost(`/api/personen/${personId}/sync`).replyOnce(500, { code: 'some mock server error' });
+
+      await personStore.syncPersonById(personId);
+
+      expect(personStore.errorCode).toEqual('UNSPECIFIED_ERROR');
+      expect(personStore.loading).toBe(false);
+    });
+  });
+
   describe('resetState', () => {
     it('should reset state', () => {
       personStore.errorCode = 'some error';
@@ -501,6 +537,101 @@ describe('PersonStore', () => {
       expect(personStore.loading).toBe(false);
       expect(personStore.totalPersons).toBe(0);
       expect(personStore.currentPerson).toBe(null);
+    });
+  });
+
+  describe('changePersonMetaDataById', () => {
+    it('should update person metadata and set patchedPerson', async () => {
+      const personId = '1234';
+      const vorname = 'Samuel';
+      const familienname = 'Vimes';
+      const personalnummer = '9876';
+
+      const mockCurrentPerson: Personendatensatz = {
+        person: {
+          id: personId,
+          name: {
+            familienname: 'Old',
+            vorname: 'Name',
+          },
+          revision: '1',
+          lastModified: '2099-01-01',
+          referrer: '6978',
+          personalnummer: personalnummer,
+          isLocked: false,
+          lockInfo: null,
+        },
+      };
+
+      personStore.currentPerson = mockCurrentPerson;
+
+      const mockResponse: PersonendatensatzResponse = {
+        person: {
+          id: personId,
+          name: {
+            familienname,
+            vorname,
+          },
+          personalnummer,
+          revision: '2',
+          lastModified: '2099-01-02',
+          referrer: '6978',
+          isLocked: false,
+          lockInfo: null,
+          mandant: '',
+          geburt: {},
+          stammorganisation: '',
+          geschlecht: '',
+          lokalisierung: '',
+          vertrauensstufe: Vertrauensstufe.Teil,
+          startpasswort: '',
+        },
+      };
+
+      const expectedBodyParams: PersonMetadataBodyParams = {
+        vorname,
+        familienname,
+        personalnummer,
+        revision: '1',
+        lastModified: '2099-01-01',
+      };
+
+      mockadapter.onPatch(`/api/personen/${personId}/metadata`).reply((config) => {
+        expect(JSON.parse(config.data)).toEqual(expectedBodyParams);
+        return [200, mockResponse];
+      });
+
+      await personStore.changePersonMetadataById(personId, vorname, familienname, personalnummer);
+
+      expect(personStore.loading).toBe(false);
+      expect(personStore.patchedPerson).toEqual(mockResponse);
+      expect(personStore.errorCode).toEqual('');
+    });
+
+    it('should handle error and set errorCode', async () => {
+      const personId: string = '1234';
+      const vorname: string = 'Samuel';
+      const familienname: string = 'Vimes';
+
+      mockadapter.onPatch(`/api/personen/${personId}/metadata`).reply(500, { i18nKey: 'ERROR_UPDATING_USER' });
+
+      await personStore.changePersonMetadataById(personId, vorname, familienname);
+
+      expect(personStore.loading).toBe(false);
+      expect(personStore.errorCode).toEqual('ERROR_UPDATING_USER');
+    });
+
+    it('should handle unknown error', async () => {
+      const personId: string = '1234';
+      const vorname: string = 'Samuel';
+      const familienname: string = 'Vimes';
+
+      mockadapter.onPatch(`/api/personen/${personId}/metadata`).reply(500, 'Unknown error');
+
+      await personStore.changePersonMetadataById(personId, vorname, familienname);
+
+      expect(personStore.loading).toBe(false);
+      expect(personStore.errorCode).toEqual('ERROR_LOADING_USER');
     });
   });
 });

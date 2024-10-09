@@ -1,12 +1,7 @@
 // import { expect, test } from 'vitest';
 import routes from '@/router/routes';
 import { useAuthStore, type AuthStore, type UserInfo } from '@/stores/AuthStore';
-import {
-  OrganisationsTyp,
-  useOrganisationStore,
-  type Organisation,
-  type OrganisationStore,
-} from '@/stores/OrganisationStore';
+import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
 import {
   usePersonStore,
   type Personendatensatz,
@@ -180,7 +175,9 @@ organisationStore.klassen = [
   },
 ];
 
-organisationStore.getParentOrganisationsByIds = async (_organisationIds: string[]): Promise<Organisation[]> => [];
+organisationStore.getParentOrganisationsByIds = async (_organisationIds: string[]): Promise<void> => {
+  return;
+};
 
 authStore.currentUser = mockCurrentUser;
 personStore.currentPerson = mockPerson;
@@ -358,5 +355,50 @@ describe('PersonDetailsView', () => {
   //       merkmale: new Set<RollenMerkmal>(['BEFRISTUNG_PFLICHT']),
   //     },
   //   ]);
+  // });
+
+  // test('displays lockInfo if there is any', async () => {
+  //   expect(personStore.currentPerson).toBeDefined();
+  //   expect(wrapper).toBeDefined();
+  //   personStore.currentPerson!.person.isLocked = false;
+  //   await nextTick();
+
+  //   const activeStatusMessage: DOMWrapper<HTMLDivElement> = wrapper!.find('[data-testid="person-lock-info"]');
+  //   expect(activeStatusMessage.exists()).toBe(true);
+  //   expect(activeStatusMessage.text()).toContain('aktiv');
+  //   expect(wrapper!.find('[data-testid="lock-info-0-key"]').exists()).toBe(false);
+  //   expect(wrapper!.find('[data-testid="lock-info-0-attribute"]').exists()).toBe(false);
+  //   expect(wrapper!.find('[data-testid="lock-info-1-key"]').exists()).toBe(false);
+  //   expect(wrapper!.find('[data-testid="lock-info-1-attribute"]').exists()).toBe(false);
+
+  //   const lockInfo: Person['lockInfo'] = {
+  //     lock_locked_from: 'Lady Lock',
+  //     lock_timestamp: '2024-09-27T11:37:35.663Z',
+  //   };
+
+  //   personStore.currentPerson!.person.isLocked = true;
+  //   personStore.currentPerson!.person.lockInfo = lockInfo;
+  //   organisationStore.lockingOrganisation = {
+  //     id: '1234',
+  //     name: lockInfo.lock_locked_from,
+  //     typ: OrganisationsTyp.Schule,
+  //   };
+  //   await nextTick();
+
+  //   const lockInfoArray: Array<[string, string]> = [
+  //     ['Gesperrt durch:', lockInfo.lock_locked_from],
+  //     ['Seit:', '27.09.2024'],
+  //   ];
+
+  //   for (let index: number = 0; index < lockInfoArray.length; index++) {
+  //     const [keyValue, attributeValue]: [string, string] = lockInfoArray[index]!;
+  //     const keyElement: DOMWrapper<HTMLSpanElement> = wrapper!.find(`[data-testid="lock-info-${index}-key"]`);
+  //     const attributeElement: DOMWrapper<HTMLSpanElement> = wrapper!.find(
+  //       `[data-testid="lock-info-${index}-attribute"]`,
+  //     );
+  //     expect(keyElement.exists()).toBe(true);
+  //     expect(keyElement.text()).toContain(keyValue);
+  //     expect(attributeElement.text()).toContain(attributeValue);
+  //   }
   // });
 });
