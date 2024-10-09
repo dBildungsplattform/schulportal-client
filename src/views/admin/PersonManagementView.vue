@@ -204,6 +204,7 @@
     searchFilterStore.personenPerPage = 30;
     searchFilterStore.sortField = '';
     searchFilterStore.sortOrder = '';
+    searchFilterStore.currentSort = null;
     personStore.getAllPersons({
       offset: (searchFilterStore.personenPage - 1) * searchFilterStore.personenPerPage,
       limit: searchFilterStore.personenPerPage,
