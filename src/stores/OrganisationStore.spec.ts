@@ -106,10 +106,12 @@ describe('OrganisationStore', () => {
           namensergaenzung: 'Ergänzung',
           kuerzel: 'O1',
           typ: OrganisationsTyp.Klasse,
+          schuleDetails: '---',
         },
       ];
 
       mockadapter.onGet('/api/organisationen?offset=0&limit=30&typ=KLASSE').replyOnce(200, mockResponse);
+      mockadapter.onGet('/api/organisationen?limit=30&typ=SCHULE&systemrechte=SCHULEN_VERWALTEN').replyOnce(200, []);
       const getAllOrganisationenPromise: Promise<void> = organisationStore.getAllOrganisationen({
         offset: 0,
         limit: 30,
@@ -334,10 +336,14 @@ describe('OrganisationStore', () => {
           kuerzel: 'O1',
           typ: OrganisationsTyp.Klasse,
           administriertVon: '1',
+          schuleDetails: '---',
         },
       ];
 
       mockadapter.onGet('/api/organisationen/1/administriert').replyOnce(200, mockResponse);
+      mockadapter
+        .onGet('/api/organisationen?limit=30&typ=SCHULE&systemrechte=SCHULEN_VERWALTEN&organisationIds=1')
+        .replyOnce(200, []);
       const getAllKlassenByOrganisationId: Promise<void> = organisationStore.getKlassenByOrganisationId('1');
       await getAllKlassenByOrganisationId;
       expect(organisationStore.klassen).toEqual(mockResponse);
@@ -635,6 +641,27 @@ describe('OrganisationStore', () => {
       await updateOrganisationPromise;
       expect(organisationStore.schultraeger).toEqual([]);
       expect(organisationStore.errorCode).toEqual('GET_ERROR');
+    });
+  });
+
+  describe('fetchSchuleDetailsForKlassen', () => {
+    it('should fetch school details', async () => {
+      const mockKlassen = [
+        { id: '1', administriertVon: '101', name: 'Klasse 1', typ: OrganisationsTyp.Klasse, schuleDetails: '---' },
+      ];
+
+      // Set up initial state
+      organisationStore.allKlassen = [...mockKlassen];
+      organisationStore.klassen = [...mockKlassen];
+
+      mockadapter
+        .onGet('/api/organisationen?limit=30&typ=SCHULE&systemrechte=SCHULEN_VERWALTEN&organisationIds=101')
+        .replyOnce(200, []);
+
+      const fetchSchuleDetailsForKlassenPromise: Promise<void> = organisationStore.fetchSchuleDetailsForKlassen(false);
+      await fetchSchuleDetailsForKlassenPromise;
+      expect(organisationStore.klassen).toEqual(mockKlassen);
+      expect(organisationStore.loadingKlassen).toBe(false);
     });
   });
 });
