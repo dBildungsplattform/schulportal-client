@@ -29,6 +29,18 @@ const personenuebersichtApi: DbiamPersonenuebersichtApiInterface = DbiamPersonen
   axiosApiInstance,
 );
 
+export enum SortField {
+  Familienname = 'familienname',
+  Vorname = 'vorname',
+  Personalnummer = 'personalnummer',
+  Referrer = 'referrer',
+}
+
+export enum SortOrder {
+  Asc = 'asc',
+  Desc = 'desc',
+}
+
 export enum LockKeys {
   LockedFrom = 'lock_locked_from',
   Timestamp = 'lock_timestamp',
@@ -133,6 +145,8 @@ export type PersonFilter = {
   organisationIDs?: Array<string>;
   rolleIDs?: Array<string>;
   searchFilter?: string;
+  sortOrder?: SortOrder;
+  sortField?: SortField;
 };
 
 type PersonGetters = {};
@@ -188,6 +202,8 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
             filter.organisationIDs,
             filter.rolleIDs,
             filter.searchFilter,
+            filter.sortOrder,
+            filter.sortField,
           );
 
         // Store the fetched persons
