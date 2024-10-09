@@ -1962,24 +1962,6 @@ export interface RawPagedResponse {
 /**
  * 
  * @export
- * @enum {string}
- */
-
-export const Rolle = {
-    Lern: 'LERN',
-    Lehr: 'LEHR',
-    Extern: 'EXTERN',
-    Orgadmin: 'ORGADMIN',
-    Leit: 'LEIT',
-    Sysadmin: 'SYSADMIN'
-} as const;
-
-export type Rolle = typeof Rolle[keyof typeof Rolle];
-
-
-/**
- * 
- * @export
  * @interface RolleResponse
  */
 export interface RolleResponse {
@@ -5759,13 +5741,12 @@ export const PersonenApiAxiosParamCreator = function (configuration?: Configurat
          * @param {number} [limit] The requested limit for the page size.
          * @param {string} [personId2] 
          * @param {string} [referrer] 
-         * @param {Rolle} [rolle] 
          * @param {Personenstatus} [personenstatus] 
          * @param {Sichtfreigabe} [sichtfreigabe] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        personControllerFindPersonenkontexte: async (personId: string, offset?: number, limit?: number, personId2?: string, referrer?: string, rolle?: Rolle, personenstatus?: Personenstatus, sichtfreigabe?: Sichtfreigabe, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        personControllerFindPersonenkontexte: async (personId: string, offset?: number, limit?: number, personId2?: string, referrer?: string, personenstatus?: Personenstatus, sichtfreigabe?: Sichtfreigabe, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'personId' is not null or undefined
             assertParamExists('personControllerFindPersonenkontexte', 'personId', personId)
             const localVarPath = `/api/personen/{personId}/personenkontexte`
@@ -5803,10 +5784,6 @@ export const PersonenApiAxiosParamCreator = function (configuration?: Configurat
 
             if (referrer !== undefined) {
                 localVarQueryParameter['referrer'] = referrer;
-            }
-
-            if (rolle !== undefined) {
-                localVarQueryParameter['rolle'] = rolle;
             }
 
             if (personenstatus !== undefined) {
@@ -6192,14 +6169,13 @@ export const PersonenApiFp = function(configuration?: Configuration) {
          * @param {number} [limit] The requested limit for the page size.
          * @param {string} [personId2] 
          * @param {string} [referrer] 
-         * @param {Rolle} [rolle] 
          * @param {Personenstatus} [personenstatus] 
          * @param {Sichtfreigabe} [sichtfreigabe] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async personControllerFindPersonenkontexte(personId: string, offset?: number, limit?: number, personId2?: string, referrer?: string, rolle?: Rolle, personenstatus?: Personenstatus, sichtfreigabe?: Sichtfreigabe, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonControllerFindPersonenkontexte200Response>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.personControllerFindPersonenkontexte(personId, offset, limit, personId2, referrer, rolle, personenstatus, sichtfreigabe, options);
+        async personControllerFindPersonenkontexte(personId: string, offset?: number, limit?: number, personId2?: string, referrer?: string, personenstatus?: Personenstatus, sichtfreigabe?: Sichtfreigabe, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonControllerFindPersonenkontexte200Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.personControllerFindPersonenkontexte(personId, offset, limit, personId2, referrer, personenstatus, sichtfreigabe, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -6328,14 +6304,13 @@ export const PersonenApiFactory = function (configuration?: Configuration, baseP
          * @param {number} [limit] The requested limit for the page size.
          * @param {string} [personId2] 
          * @param {string} [referrer] 
-         * @param {Rolle} [rolle] 
          * @param {Personenstatus} [personenstatus] 
          * @param {Sichtfreigabe} [sichtfreigabe] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        personControllerFindPersonenkontexte(personId: string, offset?: number, limit?: number, personId2?: string, referrer?: string, rolle?: Rolle, personenstatus?: Personenstatus, sichtfreigabe?: Sichtfreigabe, options?: any): AxiosPromise<PersonControllerFindPersonenkontexte200Response> {
-            return localVarFp.personControllerFindPersonenkontexte(personId, offset, limit, personId2, referrer, rolle, personenstatus, sichtfreigabe, options).then((request) => request(axios, basePath));
+        personControllerFindPersonenkontexte(personId: string, offset?: number, limit?: number, personId2?: string, referrer?: string, personenstatus?: Personenstatus, sichtfreigabe?: Sichtfreigabe, options?: any): AxiosPromise<PersonControllerFindPersonenkontexte200Response> {
+            return localVarFp.personControllerFindPersonenkontexte(personId, offset, limit, personId2, referrer, personenstatus, sichtfreigabe, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -6456,14 +6431,13 @@ export interface PersonenApiInterface {
      * @param {number} [limit] The requested limit for the page size.
      * @param {string} [personId2] 
      * @param {string} [referrer] 
-     * @param {Rolle} [rolle] 
      * @param {Personenstatus} [personenstatus] 
      * @param {Sichtfreigabe} [sichtfreigabe] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PersonenApiInterface
      */
-    personControllerFindPersonenkontexte(personId: string, offset?: number, limit?: number, personId2?: string, referrer?: string, rolle?: Rolle, personenstatus?: Personenstatus, sichtfreigabe?: Sichtfreigabe, options?: AxiosRequestConfig): AxiosPromise<PersonControllerFindPersonenkontexte200Response>;
+    personControllerFindPersonenkontexte(personId: string, offset?: number, limit?: number, personId2?: string, referrer?: string, personenstatus?: Personenstatus, sichtfreigabe?: Sichtfreigabe, options?: AxiosRequestConfig): AxiosPromise<PersonControllerFindPersonenkontexte200Response>;
 
     /**
      * 
@@ -6592,15 +6566,14 @@ export class PersonenApi extends BaseAPI implements PersonenApiInterface {
      * @param {number} [limit] The requested limit for the page size.
      * @param {string} [personId2] 
      * @param {string} [referrer] 
-     * @param {Rolle} [rolle] 
      * @param {Personenstatus} [personenstatus] 
      * @param {Sichtfreigabe} [sichtfreigabe] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PersonenApi
      */
-    public personControllerFindPersonenkontexte(personId: string, offset?: number, limit?: number, personId2?: string, referrer?: string, rolle?: Rolle, personenstatus?: Personenstatus, sichtfreigabe?: Sichtfreigabe, options?: AxiosRequestConfig) {
-        return PersonenApiFp(this.configuration).personControllerFindPersonenkontexte(personId, offset, limit, personId2, referrer, rolle, personenstatus, sichtfreigabe, options).then((request) => request(this.axios, this.basePath));
+    public personControllerFindPersonenkontexte(personId: string, offset?: number, limit?: number, personId2?: string, referrer?: string, personenstatus?: Personenstatus, sichtfreigabe?: Sichtfreigabe, options?: AxiosRequestConfig) {
+        return PersonenApiFp(this.configuration).personControllerFindPersonenkontexte(personId, offset, limit, personId2, referrer, personenstatus, sichtfreigabe, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -7426,13 +7399,12 @@ export const PersonenkontexteApiAxiosParamCreator = function (configuration?: Co
          * @param {number} [limit] The requested limit for the page size.
          * @param {string} [personId] 
          * @param {string} [referrer] 
-         * @param {Rolle} [rolle] 
          * @param {Personenstatus} [personenstatus] 
          * @param {Sichtfreigabe} [sichtfreigabe] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        personenkontextControllerFindPersonenkontexte: async (offset?: number, limit?: number, personId?: string, referrer?: string, rolle?: Rolle, personenstatus?: Personenstatus, sichtfreigabe?: Sichtfreigabe, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        personenkontextControllerFindPersonenkontexte: async (offset?: number, limit?: number, personId?: string, referrer?: string, personenstatus?: Personenstatus, sichtfreigabe?: Sichtfreigabe, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/personenkontexte`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -7467,10 +7439,6 @@ export const PersonenkontexteApiAxiosParamCreator = function (configuration?: Co
 
             if (referrer !== undefined) {
                 localVarQueryParameter['referrer'] = referrer;
-            }
-
-            if (rolle !== undefined) {
-                localVarQueryParameter['rolle'] = rolle;
             }
 
             if (personenstatus !== undefined) {
@@ -7620,14 +7588,13 @@ export const PersonenkontexteApiFp = function(configuration?: Configuration) {
          * @param {number} [limit] The requested limit for the page size.
          * @param {string} [personId] 
          * @param {string} [referrer] 
-         * @param {Rolle} [rolle] 
          * @param {Personenstatus} [personenstatus] 
          * @param {Sichtfreigabe} [sichtfreigabe] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async personenkontextControllerFindPersonenkontexte(offset?: number, limit?: number, personId?: string, referrer?: string, rolle?: Rolle, personenstatus?: Personenstatus, sichtfreigabe?: Sichtfreigabe, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<PersonenkontextdatensatzResponse>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.personenkontextControllerFindPersonenkontexte(offset, limit, personId, referrer, rolle, personenstatus, sichtfreigabe, options);
+        async personenkontextControllerFindPersonenkontexte(offset?: number, limit?: number, personId?: string, referrer?: string, personenstatus?: Personenstatus, sichtfreigabe?: Sichtfreigabe, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<PersonenkontextdatensatzResponse>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.personenkontextControllerFindPersonenkontexte(offset, limit, personId, referrer, personenstatus, sichtfreigabe, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -7688,14 +7655,13 @@ export const PersonenkontexteApiFactory = function (configuration?: Configuratio
          * @param {number} [limit] The requested limit for the page size.
          * @param {string} [personId] 
          * @param {string} [referrer] 
-         * @param {Rolle} [rolle] 
          * @param {Personenstatus} [personenstatus] 
          * @param {Sichtfreigabe} [sichtfreigabe] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        personenkontextControllerFindPersonenkontexte(offset?: number, limit?: number, personId?: string, referrer?: string, rolle?: Rolle, personenstatus?: Personenstatus, sichtfreigabe?: Sichtfreigabe, options?: any): AxiosPromise<Array<PersonenkontextdatensatzResponse>> {
-            return localVarFp.personenkontextControllerFindPersonenkontexte(offset, limit, personId, referrer, rolle, personenstatus, sichtfreigabe, options).then((request) => request(axios, basePath));
+        personenkontextControllerFindPersonenkontexte(offset?: number, limit?: number, personId?: string, referrer?: string, personenstatus?: Personenstatus, sichtfreigabe?: Sichtfreigabe, options?: any): AxiosPromise<Array<PersonenkontextdatensatzResponse>> {
+            return localVarFp.personenkontextControllerFindPersonenkontexte(offset, limit, personId, referrer, personenstatus, sichtfreigabe, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -7752,14 +7718,13 @@ export interface PersonenkontexteApiInterface {
      * @param {number} [limit] The requested limit for the page size.
      * @param {string} [personId] 
      * @param {string} [referrer] 
-     * @param {Rolle} [rolle] 
      * @param {Personenstatus} [personenstatus] 
      * @param {Sichtfreigabe} [sichtfreigabe] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PersonenkontexteApiInterface
      */
-    personenkontextControllerFindPersonenkontexte(offset?: number, limit?: number, personId?: string, referrer?: string, rolle?: Rolle, personenstatus?: Personenstatus, sichtfreigabe?: Sichtfreigabe, options?: AxiosRequestConfig): AxiosPromise<Array<PersonenkontextdatensatzResponse>>;
+    personenkontextControllerFindPersonenkontexte(offset?: number, limit?: number, personId?: string, referrer?: string, personenstatus?: Personenstatus, sichtfreigabe?: Sichtfreigabe, options?: AxiosRequestConfig): AxiosPromise<Array<PersonenkontextdatensatzResponse>>;
 
     /**
      * 
@@ -7820,15 +7785,14 @@ export class PersonenkontexteApi extends BaseAPI implements PersonenkontexteApiI
      * @param {number} [limit] The requested limit for the page size.
      * @param {string} [personId] 
      * @param {string} [referrer] 
-     * @param {Rolle} [rolle] 
      * @param {Personenstatus} [personenstatus] 
      * @param {Sichtfreigabe} [sichtfreigabe] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PersonenkontexteApi
      */
-    public personenkontextControllerFindPersonenkontexte(offset?: number, limit?: number, personId?: string, referrer?: string, rolle?: Rolle, personenstatus?: Personenstatus, sichtfreigabe?: Sichtfreigabe, options?: AxiosRequestConfig) {
-        return PersonenkontexteApiFp(this.configuration).personenkontextControllerFindPersonenkontexte(offset, limit, personId, referrer, rolle, personenstatus, sichtfreigabe, options).then((request) => request(this.axios, this.basePath));
+    public personenkontextControllerFindPersonenkontexte(offset?: number, limit?: number, personId?: string, referrer?: string, personenstatus?: Personenstatus, sichtfreigabe?: Sichtfreigabe, options?: AxiosRequestConfig) {
+        return PersonenkontexteApiFp(this.configuration).personenkontextControllerFindPersonenkontexte(offset, limit, personId, referrer, personenstatus, sichtfreigabe, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

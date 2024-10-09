@@ -25,7 +25,7 @@ router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormal
     return false;
   }
 
-  if (to.meta['requiredStepUpLevel'] === StepUpLevel.GOLD) {
+  if (to.meta['requiredStepUpLevel'] === StepUpLevel.GOLD && authStore.acr !== StepUpLevel.GOLD) {
     const personId: string | null | undefined = authStore.currentUser?.personId;
     if (!personId) return false;
     const twoFactorAuthentificationStore: TwoFactorAuthentificationStore = useTwoFactorAuthentificationStore();
@@ -34,9 +34,7 @@ router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormal
       router.push(`/no-second-factor`);
       return false;
     }
-  }
 
-  if (to.meta['requiredStepUpLevel'] === StepUpLevel.GOLD && authStore.acr !== StepUpLevel.GOLD) {
     window.location.href = `/api/auth/login?redirectUrl=${to.fullPath}&requiredStepUpLevel=${StepUpLevel.GOLD}`;
   }
 
