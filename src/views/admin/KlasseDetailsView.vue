@@ -294,7 +294,7 @@
                 >
                   <v-btn
                     class="secondary"
-                    data-testid="klasse-edit-cancel"
+                    data-testid="klasse-edit-cancel-button"
                     @click="handleCancel"
                     :block="mdAndDown"
                   >
@@ -308,7 +308,7 @@
                 >
                   <v-btn
                     class="primary"
-                    data-testid="klasse-changes-save"
+                    data-testid="klasse-changes-save-button"
                     @Click="onSubmit"
                     :block="mdAndDown"
                   >
