@@ -586,7 +586,7 @@ export const DbiamPersonErrorI18nKeyEnum = {
     PersonNotFound: 'PERSON_NOT_FOUND',
     DownstreamUnreachable: 'DOWNSTREAM_UNREACHABLE',
     PersonalnummerRequired: 'PERSONALNUMMER_REQUIRED',
-    NewerVersionOfPersonalnummerAvailable: 'NEWER_VERSION_OF_PERSONALNUMMER_AVAILABLE',
+    NewerVersionOfPersonAvailable: 'NEWER_VERSION_OF_PERSON_AVAILABLE',
     PersonalnummerNichtEindeutig: 'PERSONALNUMMER_NICHT_EINDEUTIG'
 } as const;
 
@@ -1195,31 +1195,6 @@ export interface PersonBirthResponse {
 /**
  * 
  * @export
- * @interface PersonByPersonalnummerBodyParams
- */
-export interface PersonByPersonalnummerBodyParams {
-    /**
-     * 
-     * @type {string}
-     * @memberof PersonByPersonalnummerBodyParams
-     */
-    'personalnummer': string;
-    /**
-     * Date of the most recent changed Personalnummer
-     * @type {string}
-     * @memberof PersonByPersonalnummerBodyParams
-     */
-    'lastModified': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof PersonByPersonalnummerBodyParams
-     */
-    'revision': string;
-}
-/**
- * 
- * @export
  * @interface PersonControllerFindPersonenkontexte200Response
  */
 export interface PersonControllerFindPersonenkontexte200Response {
@@ -1361,6 +1336,43 @@ export interface PersonLockResponse {
      * @memberof PersonLockResponse
      */
     'message': string;
+}
+/**
+ * 
+ * @export
+ * @interface PersonMetadataBodyParams
+ */
+export interface PersonMetadataBodyParams {
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonMetadataBodyParams
+     */
+    'familienname': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonMetadataBodyParams
+     */
+    'vorname': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonMetadataBodyParams
+     */
+    'personalnummer'?: string;
+    /**
+     * Date of the most recent changed Personalnummer
+     * @type {string}
+     * @memberof PersonMetadataBodyParams
+     */
+    'lastModified': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonMetadataBodyParams
+     */
+    'revision': string;
 }
 /**
  * 
@@ -5988,6 +6000,94 @@ export const PersonenApiAxiosParamCreator = function (configuration?: Configurat
         },
         /**
          * 
+         * @param {string} personId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        personControllerSyncPerson: async (personId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'personId' is not null or undefined
+            assertParamExists('personControllerSyncPerson', 'personId', personId)
+            const localVarPath = `/api/personen/{personId}/sync`
+                .replace(`{${"personId"}}`, encodeURIComponent(String(personId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {string} personId The id for the account.
+         * @param {PersonMetadataBodyParams} personMetadataBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        personControllerUpdateMetadata: async (personId: string, personMetadataBodyParams: PersonMetadataBodyParams, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'personId' is not null or undefined
+            assertParamExists('personControllerUpdateMetadata', 'personId', personId)
+            // verify required parameter 'personMetadataBodyParams' is not null or undefined
+            assertParamExists('personControllerUpdateMetadata', 'personMetadataBodyParams', personMetadataBodyParams)
+            const localVarPath = `/api/personen/{personId}/metadata`
+                .replace(`{${"personId"}}`, encodeURIComponent(String(personId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(personMetadataBodyParams, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @param {string} personId The id for the account.
          * @param {UpdatePersonBodyParams} updatePersonBodyParams 
          * @param {*} [options] Override http request option.
@@ -6027,53 +6127,6 @@ export const PersonenApiAxiosParamCreator = function (configuration?: Configurat
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(updatePersonBodyParams, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @param {string} personId The id for the account.
-         * @param {PersonByPersonalnummerBodyParams} personByPersonalnummerBodyParams 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        personControllerUpdatePersonalnummer: async (personId: string, personByPersonalnummerBodyParams: PersonByPersonalnummerBodyParams, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'personId' is not null or undefined
-            assertParamExists('personControllerUpdatePersonalnummer', 'personId', personId)
-            // verify required parameter 'personByPersonalnummerBodyParams' is not null or undefined
-            assertParamExists('personControllerUpdatePersonalnummer', 'personByPersonalnummerBodyParams', personByPersonalnummerBodyParams)
-            const localVarPath = `/api/personen/{personId}/personalnummer`
-                .replace(`{${"personId"}}`, encodeURIComponent(String(personId)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication bearer required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            // authentication oauth2 required
-            // oauth required
-            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
-
-
-    
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(personByPersonalnummerBodyParams, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -6190,6 +6243,27 @@ export const PersonenApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @param {string} personId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async personControllerSyncPerson(personId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.personControllerSyncPerson(personId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @param {string} personId The id for the account.
+         * @param {PersonMetadataBodyParams} personMetadataBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async personControllerUpdateMetadata(personId: string, personMetadataBodyParams: PersonMetadataBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonendatensatzResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.personControllerUpdateMetadata(personId, personMetadataBodyParams, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
          * @param {string} personId The id for the account.
          * @param {UpdatePersonBodyParams} updatePersonBodyParams 
          * @param {*} [options] Override http request option.
@@ -6197,17 +6271,6 @@ export const PersonenApiFp = function(configuration?: Configuration) {
          */
         async personControllerUpdatePerson(personId: string, updatePersonBodyParams: UpdatePersonBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonendatensatzResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.personControllerUpdatePerson(personId, updatePersonBodyParams, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
-         * 
-         * @param {string} personId The id for the account.
-         * @param {PersonByPersonalnummerBodyParams} personByPersonalnummerBodyParams 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async personControllerUpdatePersonalnummer(personId: string, personByPersonalnummerBodyParams: PersonByPersonalnummerBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.personControllerUpdatePersonalnummer(personId, personByPersonalnummerBodyParams, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -6312,6 +6375,25 @@ export const PersonenApiFactory = function (configuration?: Configuration, baseP
         },
         /**
          * 
+         * @param {string} personId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        personControllerSyncPerson(personId: string, options?: any): AxiosPromise<void> {
+            return localVarFp.personControllerSyncPerson(personId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {string} personId The id for the account.
+         * @param {PersonMetadataBodyParams} personMetadataBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        personControllerUpdateMetadata(personId: string, personMetadataBodyParams: PersonMetadataBodyParams, options?: any): AxiosPromise<PersonendatensatzResponse> {
+            return localVarFp.personControllerUpdateMetadata(personId, personMetadataBodyParams, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @param {string} personId The id for the account.
          * @param {UpdatePersonBodyParams} updatePersonBodyParams 
          * @param {*} [options] Override http request option.
@@ -6319,16 +6401,6 @@ export const PersonenApiFactory = function (configuration?: Configuration, baseP
          */
         personControllerUpdatePerson(personId: string, updatePersonBodyParams: UpdatePersonBodyParams, options?: any): AxiosPromise<PersonendatensatzResponse> {
             return localVarFp.personControllerUpdatePerson(personId, updatePersonBodyParams, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @param {string} personId The id for the account.
-         * @param {PersonByPersonalnummerBodyParams} personByPersonalnummerBodyParams 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        personControllerUpdatePersonalnummer(personId: string, personByPersonalnummerBodyParams: PersonByPersonalnummerBodyParams, options?: any): AxiosPromise<void> {
-            return localVarFp.personControllerUpdatePersonalnummer(personId, personByPersonalnummerBodyParams, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -6431,6 +6503,25 @@ export interface PersonenApiInterface {
 
     /**
      * 
+     * @param {string} personId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PersonenApiInterface
+     */
+    personControllerSyncPerson(personId: string, options?: AxiosRequestConfig): AxiosPromise<void>;
+
+    /**
+     * 
+     * @param {string} personId The id for the account.
+     * @param {PersonMetadataBodyParams} personMetadataBodyParams 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PersonenApiInterface
+     */
+    personControllerUpdateMetadata(personId: string, personMetadataBodyParams: PersonMetadataBodyParams, options?: AxiosRequestConfig): AxiosPromise<PersonendatensatzResponse>;
+
+    /**
+     * 
      * @param {string} personId The id for the account.
      * @param {UpdatePersonBodyParams} updatePersonBodyParams 
      * @param {*} [options] Override http request option.
@@ -6438,16 +6529,6 @@ export interface PersonenApiInterface {
      * @memberof PersonenApiInterface
      */
     personControllerUpdatePerson(personId: string, updatePersonBodyParams: UpdatePersonBodyParams, options?: AxiosRequestConfig): AxiosPromise<PersonendatensatzResponse>;
-
-    /**
-     * 
-     * @param {string} personId The id for the account.
-     * @param {PersonByPersonalnummerBodyParams} personByPersonalnummerBodyParams 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof PersonenApiInterface
-     */
-    personControllerUpdatePersonalnummer(personId: string, personByPersonalnummerBodyParams: PersonByPersonalnummerBodyParams, options?: AxiosRequestConfig): AxiosPromise<void>;
 
 }
 
@@ -6566,6 +6647,29 @@ export class PersonenApi extends BaseAPI implements PersonenApiInterface {
 
     /**
      * 
+     * @param {string} personId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PersonenApi
+     */
+    public personControllerSyncPerson(personId: string, options?: AxiosRequestConfig) {
+        return PersonenApiFp(this.configuration).personControllerSyncPerson(personId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {string} personId The id for the account.
+     * @param {PersonMetadataBodyParams} personMetadataBodyParams 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PersonenApi
+     */
+    public personControllerUpdateMetadata(personId: string, personMetadataBodyParams: PersonMetadataBodyParams, options?: AxiosRequestConfig) {
+        return PersonenApiFp(this.configuration).personControllerUpdateMetadata(personId, personMetadataBodyParams, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
      * @param {string} personId The id for the account.
      * @param {UpdatePersonBodyParams} updatePersonBodyParams 
      * @param {*} [options] Override http request option.
@@ -6574,18 +6678,6 @@ export class PersonenApi extends BaseAPI implements PersonenApiInterface {
      */
     public personControllerUpdatePerson(personId: string, updatePersonBodyParams: UpdatePersonBodyParams, options?: AxiosRequestConfig) {
         return PersonenApiFp(this.configuration).personControllerUpdatePerson(personId, updatePersonBodyParams, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @param {string} personId The id for the account.
-     * @param {PersonByPersonalnummerBodyParams} personByPersonalnummerBodyParams 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof PersonenApi
-     */
-    public personControllerUpdatePersonalnummer(personId: string, personByPersonalnummerBodyParams: PersonByPersonalnummerBodyParams, options?: AxiosRequestConfig) {
-        return PersonenApiFp(this.configuration).personControllerUpdatePersonalnummer(personId, personByPersonalnummerBodyParams, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
