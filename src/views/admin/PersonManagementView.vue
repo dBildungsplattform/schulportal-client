@@ -52,6 +52,7 @@
   const selectedStatus: Ref<string | null> = ref(null);
   const searchFilter: Ref<string> = ref('');
 
+  const selectedRollenObjects: Ref<RolleResponse[]> = ref([]);
   const sortField: Ref<string | null> = ref(null);
   const sortOrder: Ref<SortOrder | null> = ref(null);
 
@@ -69,17 +70,18 @@
   );
 
   const organisationen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
-    return organisationStore.allOrganisationen
-      .map((org: Organisation) => ({
-        value: org.id,
-        // Only concatenate if the kennung is present (Should not be for LAND)
-        title: org.kennung ? `${org.kennung} (${org.name})` : org.name,
-      }))
-      .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
+    return organisationStore.allOrganisationen.map((org: Organisation) => ({
+      value: org.id,
+      // Only concatenate if the kennung is present (Should not be for LAND)
+      title: org.kennung ? `${org.kennung} (${org.name})` : org.name,
+    }));
   });
 
   const rollen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
-    return personenkontextStore.filteredRollen?.moeglicheRollen
+    const filteredRollen: RolleResponse[] = personenkontextStore.filteredRollen?.moeglicheRollen || [];
+    const uniqueRollen: RolleResponse[] = [...new Set([...filteredRollen, ...selectedRollenObjects.value])];
+
+    return uniqueRollen
       .map((rolle: RolleResponse) => ({
         value: rolle.id,
         title: rolle.name,
@@ -90,7 +92,6 @@
   const klassen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
     if (selectedOrganisation.value.length) {
       return organisationStore.klassen
-        .slice(0, 25)
         .map((org: Organisation) => ({
           value: org.id,
           title: org.name,
@@ -164,6 +165,17 @@
 
   async function setRolleFilter(newValue: Array<string>): Promise<void> {
     await searchFilterStore.setRolleFilter(newValue);
+    // Update selectedRollenObjects based on the new selection
+    selectedRollenObjects.value = newValue
+      .map((rolleId: string) => {
+        const existingRolle: RolleResponse | undefined = personenkontextStore.filteredRollen?.moeglicheRollen.find(
+          (r: RolleResponse) => r.id === rolleId,
+        );
+        return existingRolle;
+      })
+      .filter((rolle: RolleResponse | undefined): rolle is RolleResponse => rolle !== undefined);
+
+    await searchFilterStore.setRolleFilterWithObjects(newValue, selectedRollenObjects.value);
     applySearchAndFilters();
   }
 
@@ -246,13 +258,26 @@
     }, 500);
   }
 
-  function updateRollenSearch(searchValue: string): void {
-    /* cancel pending call */
+  async function updateRollenSearch(searchValue: string): Promise<void> {
     clearTimeout(timerId);
 
-    /* delay new call 500ms */
-    timerId = setTimeout(() => {
-      personenkontextStore.getPersonenkontextRolleWithFilter(searchValue, 25);
+    timerId = setTimeout(async () => {
+      await personenkontextStore.getPersonenkontextRolleWithFilter(searchValue, 25);
+
+      // If there are selected rollen not in the search results, add them to filteredRollen
+      const moeglicheRollen: RolleResponse[] = personenkontextStore.filteredRollen?.moeglicheRollen || [];
+      const missingRollen: RolleResponse[] = selectedRollenObjects.value.filter(
+        (rolle: RolleResponse) => !moeglicheRollen.some((r: RolleResponse) => r.id === rolle.id),
+      );
+
+      if (missingRollen.length > 0 && personenkontextStore.filteredRollen) {
+        personenkontextStore.filteredRollen = {
+          moeglicheRollen: [...moeglicheRollen, ...missingRollen],
+          total: personenkontextStore.filteredRollen.total + missingRollen.length,
+        };
+        // Update the total count of found Rollen.
+        personenkontextStore.totalFilteredRollen = personenkontextStore.totalFilteredRollen + missingRollen.length;
+      }
     }, 500);
   }
 
@@ -270,11 +295,14 @@
   }
 
   // Triggers sorting for the selected column
-  function handleTableSorting(update: { sortField: string | undefined; sortOrder: 'asc' | 'desc' }): void {
+  async function handleTableSorting(update: {
+    sortField: string | undefined;
+    sortOrder: 'asc' | 'desc';
+  }): Promise<void> {
     if (update.sortField) {
       sortField.value = mapKeyToBackend(update.sortField);
 
-      searchFilterStore.setCurrentSort({
+      await searchFilterStore.setCurrentSort({
         key: update.sortField,
         order: update.sortOrder,
       });
@@ -295,6 +323,7 @@
       selectedOrganisation.value = searchFilterStore.selectedOrganisationen || [];
       selectedRollen.value = searchFilterStore.selectedRollen || [];
       selectedKlassen.value = searchFilterStore.selectedKlassen || [];
+      selectedRollenObjects.value = searchFilterStore.selectedRollenObjects;
     }
 
     await organisationStore.getAllOrganisationen({

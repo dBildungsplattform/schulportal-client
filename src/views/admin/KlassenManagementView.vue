@@ -6,7 +6,6 @@
   import {
     OrganisationsTyp,
     useOrganisationStore,
-    type KlasseTableItem,
     type Organisation,
     type OrganisationStore,
   } from '@/stores/OrganisationStore';
@@ -51,17 +50,13 @@
 
   const selectedSchule: Ref<string | null> = ref(null);
   const selectedKlassen: Ref<Array<string>> = ref([]);
-  const finalKlassen: Ref<Array<KlasseTableItem>> = ref([]);
+  const finalKlassen: ComputedRef<Organisation[]> = computed(() => organisationStore.allKlassen);
   const klassenOptions: Ref<TranslatedObject[] | undefined> = ref([]);
 
   const searchInputSchulen: Ref<string> = ref('');
   const searchInputKlassen: Ref<string> = ref('');
   const hasAutoselectedSchule: Ref<boolean> = ref(false);
   const timerId: Ref<ReturnType<typeof setTimeout> | undefined> = ref<ReturnType<typeof setTimeout>>();
-
-  const schuleMap: Ref<
-    Map<string, string | null | undefined> & Omit<Map<string, string | null | undefined>, keyof Map<never, never>>
-  > = ref(new Map<string, string | null | undefined>());
 
   const schulen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
     return organisationStore.allSchulen
@@ -71,14 +66,6 @@
       }))
       .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
   });
-
-  // Retrieve the parent Schule from the Klasse using the map's key
-  function getSchuleDetails(klasse: Organisation): { schuleDetails: string } {
-    const schuleDetails: string | undefined = schuleMap.value.get(klasse.administriertVon || '') ?? '---';
-    return {
-      schuleDetails,
-    };
-  }
 
   async function fetchKlassenBySelectedSchuleId(schuleId: string | null): Promise<void> {
     // Fetch Klassen related to the selected Schule
@@ -93,11 +80,7 @@
       title: org.name,
     }));
 
-    // Update finalKlassen to show in the table
-    finalKlassen.value = organisationStore.klassen.map((klasse: Organisation) => ({
-      ...klasse,
-      ...getSchuleDetails(klasse),
-    }));
+    organisationStore.allKlassen = organisationStore.klassen;
   }
 
   async function getPaginatedKlassen(page: number): Promise<void> {
@@ -112,11 +95,6 @@
         includeTyp: OrganisationsTyp.Klasse,
         systemrechte: ['KLASSEN_VERWALTEN'],
       });
-
-      finalKlassen.value = organisationStore.allKlassen.map((klasse: Organisation) => ({
-        ...klasse,
-        ...getSchuleDetails(klasse),
-      }));
     }
   }
 
@@ -127,29 +105,13 @@
     }
 
     searchFilterStore.klassenPerPage = limit || 1;
+
     await organisationStore.getAllOrganisationen({
       offset: (searchFilterStore.klassenPage - 1) * searchFilterStore.klassenPerPage,
       limit: searchFilterStore.klassenPerPage,
       includeTyp: OrganisationsTyp.Klasse,
       systemrechte: ['KLASSEN_VERWALTEN'],
     });
-
-    finalKlassen.value = organisationStore.allKlassen.map((klasse: Organisation) => ({
-      ...klasse,
-      ...getSchuleDetails(klasse),
-    }));
-  }
-
-  // Create a map that holds all Schulen with their id, kennung and name
-  async function fetchSchuleMap(): Promise<Map<string, string>> {
-    await organisationStore.getAllOrganisationen({
-      includeTyp: OrganisationsTyp.Schule,
-      limit: 25,
-      systemrechte: ['KLASSEN_VERWALTEN'],
-    });
-    return new Map(
-      organisationStore.allSchulen.map((org: Organisation) => [org.id, `${org.kennung} (${org.name.trim()})`]),
-    );
   }
 
   async function updateSelectedSchule(newValue: string | null): Promise<void> {
@@ -165,7 +127,7 @@
       // Fetch all Klassen when no Schule is selected
       await organisationStore.getAllOrganisationen({
         offset: (searchFilterStore.klassenPage - 1) * searchFilterStore.klassenPerPage,
-        limit: searchFilterStore.klassenPerPage,
+        limit: 25,
         includeTyp: OrganisationsTyp.Klasse,
         systemrechte: ['KLASSEN_VERWALTEN'],
       });
@@ -173,30 +135,18 @@
         value: org.id,
         title: org.name,
       }));
-
-      // Update finalKlassen to include schuleKennung
-      finalKlassen.value = organisationStore.allKlassen.map((klasse: Organisation) => ({
-        ...klasse,
-        ...getSchuleDetails(klasse),
-      }));
     }
   }
 
   async function updateSelectedKlassen(newValue: string[]): Promise<void> {
     if (newValue.length > 0 && selectedSchule.value !== null) {
       // Filter finalKlassen to only include the selected Klassen
-      finalKlassen.value = organisationStore.klassen
-        .filter((klasse: Organisation) => newValue.includes(klasse.id))
-        .map((klasse: Organisation) => ({
-          ...klasse,
-          ...getSchuleDetails(klasse),
-        }));
+      organisationStore.allKlassen = organisationStore.klassen.filter((klasse: Organisation) =>
+        newValue.includes(klasse.id),
+      );
     } else if (selectedSchule.value !== null) {
       // If no Klassen are selected but a Schule is selected, show all Klassen for the selected Schule
-      finalKlassen.value = organisationStore.klassen.map((klasse: Organisation) => ({
-        ...klasse,
-        ...getSchuleDetails(klasse),
-      }));
+      organisationStore.allKlassen = organisationStore.klassen;
     } else {
       // If no Klassen and no Schule are selected, show all Klassen
       await organisationStore.getAllOrganisationen({
@@ -205,10 +155,6 @@
         includeTyp: OrganisationsTyp.Klasse,
         systemrechte: ['KLASSEN_VERWALTEN'],
       });
-      finalKlassen.value = organisationStore.allKlassen.map((klasse: Organisation) => ({
-        ...klasse,
-        ...getSchuleDetails(klasse),
-      }));
     }
   }
 
@@ -315,12 +261,8 @@
     // If the user has an autoselected Schule, do not reset it
     if (hasAutoselectedSchule.value && selectedSchule.value !== null) {
       // Fetch all Klassen for the selected Schule
-      organisationStore.getKlassenByOrganisationId(selectedSchule.value).then(() => {
-        finalKlassen.value = organisationStore.klassen.map((klasse: Organisation) => ({
-          ...klasse,
-          ...getSchuleDetails(klasse),
-        }));
-      });
+      organisationStore.getKlassenByOrganisationId(selectedSchule.value);
+      organisationStore.allKlassen = organisationStore.klassen;
     } else {
       // Clear search input for Schulen
       searchInputSchulen.value = '';
@@ -340,10 +282,6 @@
         includeTyp: OrganisationsTyp.Klasse,
         systemrechte: ['KLASSEN_VERWALTEN'],
       });
-      finalKlassen.value = organisationStore.allKlassen.map((klasse: Organisation) => ({
-        ...klasse,
-        ...getSchuleDetails(klasse),
-      }));
     }
   }
   // Checks the current logged in user's kontexte and compares that to the organisations in the DB.
@@ -355,10 +293,6 @@
         selectedSchule.value = organisationStore.allSchulen[0]?.id || null;
         if (selectedSchule.value) {
           await organisationStore.getKlassenByOrganisationId(selectedSchule.value);
-          finalKlassen.value = organisationStore.klassen.map((klasse: Organisation) => ({
-            ...klasse,
-            ...getSchuleDetails(klasse),
-          }));
           hasAutoselectedSchule.value = true;
         }
       } else {
@@ -383,7 +317,7 @@
     });
     await organisationStore.getAllOrganisationen({
       offset: (searchFilterStore.klassenPage - 1) * searchFilterStore.klassenPerPage,
-      limit: searchFilterStore.schulenPerPage,
+      limit: 25,
       includeTyp: OrganisationsTyp.Schule,
       systemrechte: ['SCHULEN_VERWALTEN'],
     });
@@ -392,18 +326,8 @@
       value: org.id,
       title: org.name,
     }));
-
-    // Fetch Schule map
-    schuleMap.value = await fetchSchuleMap();
-
     // Handle user context
     await handleUserContext();
-
-    // Update finalKlassen with Schule details
-    finalKlassen.value = organisationStore.allKlassen.map((klasse: Organisation) => ({
-      ...klasse,
-      ...getSchuleDetails(klasse),
-    }));
   });
 
   async function deleteKlasse(organisationId: string): Promise<void> {
