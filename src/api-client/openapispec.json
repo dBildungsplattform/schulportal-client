@@ -270,6 +270,36 @@
               "nullable": true,
               "type": "string"
             }
+          },
+          {
+            "name": "sortOrder",
+            "required": false,
+            "in": "query",
+            "description": "Order to sort by.",
+            "schema": {
+              "nullable": true,
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "sortField",
+            "required": false,
+            "in": "query",
+            "description": "Field to sort by.",
+            "schema": {
+              "nullable": true,
+              "enum": [
+                "familienname",
+                "vorname",
+                "personalnummer",
+                "referrer"
+              ],
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -1000,6 +1030,36 @@
             "description": "Search filter used to filter for Persons. It could be the vorname, familienname, referrer or the personalnummer.",
             "schema": {
               "nullable": true,
+              "type": "string"
+            }
+          },
+          {
+            "name": "sortOrder",
+            "required": false,
+            "in": "query",
+            "description": "Order to sort by.",
+            "schema": {
+              "nullable": true,
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "sortField",
+            "required": false,
+            "in": "query",
+            "description": "Field to sort by.",
+            "schema": {
+              "nullable": true,
+              "enum": [
+                "familienname",
+                "vorname",
+                "personalnummer",
+                "referrer"
+              ],
               "type": "string"
             }
           }
@@ -5098,7 +5158,8 @@
           "SCHULEN_VERWALTEN",
           "KLASSEN_VERWALTEN",
           "SCHULTRAEGER_VERWALTEN",
-          "MIGRATION_DURCHFUEHREN"
+          "MIGRATION_DURCHFUEHREN",
+          "PERSON_SYNCHRONISIEREN"
         ]
       },
       "OrganisationByIdBodyParams": {
@@ -5683,10 +5744,20 @@
           "befristung"
         ]
       },
+      "PersonenkontextMigrationRuntype": {
+        "type": "string",
+        "enum": [
+          "ITSLEARNING",
+          "STANDARD"
+        ]
+      },
       "DbiamPersonenkontextMigrationBodyParams": {
         "type": "object",
         "properties": {
           "personId": {
+            "type": "string"
+          },
+          "username": {
             "type": "string"
           },
           "organisationId": {
@@ -5701,12 +5772,16 @@
           },
           "email": {
             "type": "string"
+          },
+          "migrationRunType": {
+            "$ref": "#/components/schemas/PersonenkontextMigrationRuntype"
           }
         },
         "required": [
           "personId",
           "organisationId",
-          "rolleId"
+          "rolleId",
+          "migrationRunType"
         ]
       },
       "DbiamPersonenkontextError": {
