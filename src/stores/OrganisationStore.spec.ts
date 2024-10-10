@@ -646,7 +646,13 @@ describe('OrganisationStore', () => {
 
   describe('fetchSchuleDetailsForKlassen', () => {
     it('should fetch school details', async () => {
-      const mockKlassen = [
+      const mockKlassen: {
+        id: string;
+        administriertVon: string;
+        name: string;
+        typ: "KLASSE";
+        schuleDetails: string;
+    }[] = [
         { id: '1', administriertVon: '101', name: 'Klasse 1', typ: OrganisationsTyp.Klasse, schuleDetails: '---' },
       ];
 
