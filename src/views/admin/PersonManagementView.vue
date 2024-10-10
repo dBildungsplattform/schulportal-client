@@ -70,13 +70,11 @@
   );
 
   const organisationen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
-    return organisationStore.allOrganisationen
-      .map((org: Organisation) => ({
-        value: org.id,
-        // Only concatenate if the kennung is present (Should not be for LAND)
-        title: org.kennung ? `${org.kennung} (${org.name})` : org.name,
-      }))
-      .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
+    return organisationStore.allOrganisationen.map((org: Organisation) => ({
+      value: org.id,
+      // Only concatenate if the kennung is present (Should not be for LAND)
+      title: org.kennung ? `${org.kennung} (${org.name})` : org.name,
+    }));
   });
 
   const rollen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
@@ -176,6 +174,8 @@
         return existingRolle;
       })
       .filter((rolle: RolleResponse | undefined): rolle is RolleResponse => rolle !== undefined);
+
+    await searchFilterStore.setRolleFilterWithObjects(newValue, selectedRollenObjects.value);
     applySearchAndFilters();
   }
 
@@ -295,11 +295,14 @@
   }
 
   // Triggers sorting for the selected column
-  function handleTableSorting(update: { sortField: string | undefined; sortOrder: 'asc' | 'desc' }): void {
+  async function handleTableSorting(update: {
+    sortField: string | undefined;
+    sortOrder: 'asc' | 'desc';
+  }): Promise<void> {
     if (update.sortField) {
       sortField.value = mapKeyToBackend(update.sortField);
 
-      searchFilterStore.setCurrentSort({
+      await searchFilterStore.setCurrentSort({
         key: update.sortField,
         order: update.sortOrder,
       });
@@ -320,6 +323,7 @@
       selectedOrganisation.value = searchFilterStore.selectedOrganisationen || [];
       selectedRollen.value = searchFilterStore.selectedRollen || [];
       selectedKlassen.value = searchFilterStore.selectedKlassen || [];
+      selectedRollenObjects.value = searchFilterStore.selectedRollenObjects;
     }
 
     await organisationStore.getAllOrganisationen({
