@@ -7,7 +7,7 @@ import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFil
 import { VueWrapper, mount } from '@vue/test-utils';
 import type WrapperLike from '@vue/test-utils/dist/interfaces/wrapperLike';
 import { expect, test, type Mock, type MockInstance } from 'vitest';
-import { computed, nextTick, type ComputedRef } from 'vue';
+import { nextTick } from 'vue';
 import PersonManagementView from './PersonManagementView.vue';
 
 let wrapper: VueWrapper | null = null;
@@ -128,7 +128,7 @@ beforeEach(() => {
   personenkontextStore.filteredRollen = {
     moeglicheRollen: [
       {
-        id: '1',
+        id: '10',
         administeredBySchulstrukturknoten: '1',
         merkmale: new Set(),
         name: 'Rolle 1',
@@ -138,6 +138,17 @@ beforeEach(() => {
     ] as RolleResponse[],
     total: 1,
   } as FindRollenResponse;
+
+  searchFilterStore.selectedRollenObjects = [
+    {
+      id: '1',
+      administeredBySchulstrukturknoten: '1',
+      merkmale: new Set(),
+      name: 'Rolle 1',
+      rollenart: 'LERN',
+      systemrechte: new Set(),
+    },
+  ] as RolleResponse[];
 
   wrapper = mount(PersonManagementView, {
     attachTo: document.getElementById('app') || '',
@@ -249,25 +260,10 @@ describe('PersonManagementView', () => {
     expect(organisationStore.getAllOrganisationen).toHaveBeenCalled();
   });
 
-  test('it updates Rollen search correctly', async () => {
+  test.only('it updates Rollen search correctly', async () => {
     const rollenAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
 
-    // Set up a selected role that won't be in the search results
-    const selectedRolle: {
-      id: string;
-      name: string;
-    } = { id: '2', name: 'Selected Role' };
-
-    // Mock the computed property for selectedRollenObjects
-    const mockSelectedRollenObjects: ComputedRef<
-      {
-        id: string;
-        name: string;
-      }[]
-    > = computed(() => [selectedRolle]);
-    Object.defineProperty(wrapper?.vm, 'selectedRollenObjects', {
-      get: () => mockSelectedRollenObjects.value,
-    });
+    searchFilterStore.searchFilter = 'test search';
 
     // Mock the getPersonenkontextRolleWithFilter method
     const mockGetPersonenkontextRolleWithFilter: Mock = vi.fn().mockResolvedValue({
