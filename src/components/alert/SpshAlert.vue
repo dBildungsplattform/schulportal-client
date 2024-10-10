@@ -32,7 +32,7 @@
         :closable="closable"
         @click:close="closeAlert"
       >
-        <v-row>
+        <v-row class="v-alert__title">
           <v-col
             class="primary-text-color"
             cols="auto"
@@ -72,5 +72,27 @@
 <style scoped>
   .v-alert {
     border-width: 3px;
+
+    @media screen and (max-width: 680px) {
+      display: flex;
+      flex-direction: column;
+    }
+  }
+
+  @media screen and (max-width: 680px) {
+    ::v-deep .v-alert__prepend {
+      align-self: center;
+      padding-bottom: 8px;
+    }
+
+    ::v-deep .v-alert__content {
+      align-self: unset;
+      text-align: center !important;
+    }
+
+    .v-alert__title {
+      display: flex !important;
+      justify-content: center;
+    }
   }
 </style>

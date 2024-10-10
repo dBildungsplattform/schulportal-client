@@ -165,8 +165,8 @@ const routes: readonly RouteRecordRaw[] = [
   },
   {
     path: '/no-second-factor',
-    name: 'no second factor',
-    component: () => import('../views/NoSecondFactor.vue'),
+    name: 'no-second-factor',
+    component: () => import('../views/NoSecondFactorView.vue'),
   },
 ];
 
