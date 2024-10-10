@@ -189,4 +189,9 @@
   </v-dialog>
 </template>
 
-<style></style>
+<style scoped>
+  span {
+    white-space: pre;
+    text-wrap: pretty;
+  }
+</style>
