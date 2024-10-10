@@ -186,7 +186,7 @@
         testIdValue: 'userName-value',
       });
 
-    if (!hasKoPersMerkmal.value) return data;
+    if (!personInfoStore.personInfo.person.personalnummer && !hasKoPersMerkmal.value) return data;
     data.push({
       label: t('profile.koPersNummer'),
       labelAbbr: t('profile.koPersNummerAbbr'),
