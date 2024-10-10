@@ -270,9 +270,9 @@
     window.location.href = url.toString();
   }
 
-  interface WatchOptions {
+  type WatchOptions = {
     immediate: boolean;
-  }
+  };
 
   watch(
     () => personInfoStore.personInfo?.person.id,
@@ -404,7 +404,7 @@
           :headline-test-id="'new-password-card'"
           :header="$t('login.password')"
         >
-          <v-row class="ma-3 d-flex align-content-center justify-center ga-4">            
+          <v-row class="ma-3 d-flex align-content-center justify-center ga-4">
             <p
               class="w-100 text-center text-body"
               v-if="lastPasswordChangeDate"
