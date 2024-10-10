@@ -32,7 +32,7 @@ describe('AuthStore', () => {
           {
             organisationsId: '123456',
             rolle: {
-              systemrechte: ['ROLLEN_VERWALTEN', 'SCHULEN_VERWALTEN'],
+              systemrechte: ['ROLLEN_VERWALTEN', 'SCHULEN_VERWALTEN', 'PERSON_SYNCHRONISIEREN'],
               serviceProviderIds: ['789897798'],
             },
           },
