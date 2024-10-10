@@ -92,6 +92,7 @@
         const aggregatedRoles: string[] = zuordnungen.map((z: Zuordnung) => z.rolle);
         const uniqueRoles: string[] = [...new Set(aggregatedRoles)];
         const composedRoles: string = uniqueRoles.join(', ');
+        const befristungen: (string | undefined)[] = zuordnungen.map((z: Zuordnung) => z.befristung);
         const klasse: string | null =
           zuordnungen
             .filter((z: Zuordnung) => z.typ === OrganisationsTyp.Klasse)
@@ -102,6 +103,7 @@
         const composedZuordnung: Zuordnung = { ...zuordnungen[0], rolle: composedRoles };
         if (schule) composedZuordnung.sskName = schule;
         if (klasse) composedZuordnung.klasse = klasse;
+        composedZuordnung.befristung = [...new Set(befristungen)].at(0);
         composedZuordnungen.push(composedZuordnung);
       } else {
         composedZuordnungen.push(zuordnungen[0]);
@@ -150,6 +152,15 @@
           value: zuordnung.sskDstNr,
           testIdLabel: 'dienststellennummer-label-' + (index + 1),
           testIdValue: 'dienststellennummer-value-' + (index + 1),
+        });
+      }
+
+      if (zuordnung.befristung) {
+        tempSchulDaten.labelAndValues.push({
+          label: t('profile.befristung'),
+          value: new Date(zuordnung.befristung).toLocaleDateString('de-DE'),
+          testIdLabel: 'befristung-label-' + (index + 1),
+          testIdValue: 'befristung-value-' + (index + 1),
         });
       }
 
