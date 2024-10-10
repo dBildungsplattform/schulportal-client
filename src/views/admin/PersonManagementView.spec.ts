@@ -139,17 +139,6 @@ beforeEach(() => {
     total: 1,
   } as FindRollenResponse;
 
-  searchFilterStore.selectedRollenObjects = [
-    {
-      id: '1',
-      administeredBySchulstrukturknoten: '1',
-      merkmale: new Set(),
-      name: 'Rolle 1',
-      rollenart: 'LERN',
-      systemrechte: new Set(),
-    },
-  ] as RolleResponse[];
-
   wrapper = mount(PersonManagementView, {
     attachTo: document.getElementById('app') || '',
     global: {
@@ -240,7 +229,7 @@ describe('PersonManagementView', () => {
     await rolleAutocomplete?.setValue(['1']);
     await nextTick();
 
-    expect(rolleAutocomplete?.text()).toEqual('Rolle 1');
+    expect(rolleAutocomplete?.text()).toEqual('1');
 
     const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
     await klasseAutocomplete?.setValue(['123456']);
@@ -261,6 +250,17 @@ describe('PersonManagementView', () => {
   });
 
   test('it updates Rollen search correctly', async () => {
+    searchFilterStore.selectedRollenObjects = [
+      {
+        id: '1',
+        administeredBySchulstrukturknoten: '1',
+        merkmale: new Set(),
+        name: 'Rolle 1',
+        rollenart: 'LERN',
+        systemrechte: new Set(),
+      },
+    ] as RolleResponse[];
+
     const rollenAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
 
     searchFilterStore.searchFilter = 'test search';
