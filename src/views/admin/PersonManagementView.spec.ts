@@ -6,7 +6,7 @@ import { useRolleStore, type RolleResponse, type RolleStore, type RollenMerkmal 
 import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
 import { VueWrapper, mount } from '@vue/test-utils';
 import type WrapperLike from '@vue/test-utils/dist/interfaces/wrapperLike';
-import { expect, test, type MockInstance } from 'vitest';
+import { expect, test, type Mock, type MockInstance } from 'vitest';
 import { nextTick } from 'vue';
 import PersonManagementView from './PersonManagementView.vue';
 
@@ -16,6 +16,7 @@ let personStore: PersonStore;
 let personenkontextStore: PersonenkontextStore;
 let rolleStore: RolleStore;
 let searchFilterStore: SearchFilterStore;
+vi.useFakeTimers();
 
 beforeEach(() => {
   document.body.innerHTML = `
@@ -251,11 +252,28 @@ describe('PersonManagementView', () => {
   test('it updates Rollen search correctly', async () => {
     const rollenAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
 
-    await rollenAutocomplete?.setValue(['1']);
-    await nextTick();
+    // Mock the getPersonenkontextRolleWithFilter method
+    const mockGetPersonenkontextRolleWithFilter: Mock = vi.fn().mockResolvedValue({
+      moeglicheRollen: [{ id: '1', name: 'Test Rolle' }],
+      total: 1,
+    });
+    personenkontextStore.getPersonenkontextRolleWithFilter = mockGetPersonenkontextRolleWithFilter;
 
-    await rollenAutocomplete?.vm.$emit('update:search', ['1']);
-    await nextTick();
-    expect(personenkontextStore.getPersonenkontextRolleWithFilter).toHaveBeenCalled();
+    // Trigger the search
+    await rollenAutocomplete?.setValue(['name']);
+    await rollenAutocomplete?.vm.$emit('update:search', 'name');
+
+    // Fast-forward timers
+    vi.runAllTimers();
+
+    // Wait for all promises to resolve
+    await vi.runAllTicks();
+
+    // Assert that the method was called
+    expect(mockGetPersonenkontextRolleWithFilter).toHaveBeenCalledWith('name', 25);
+
+    // Add more assertions here to check the state after the search
+    expect(personenkontextStore.filteredRollen).toBeDefined();
+    expect(personenkontextStore.filteredRollen?.moeglicheRollen).toHaveLength(1);
   });
 });
