@@ -319,7 +319,7 @@
 
   const alertButtonTextKopers: ComputedRef<string> = computed(() => {
     return personStore.errorCode === 'PERSONALNUMMER_NICHT_EINDEUTIG'
-      ? t('admin.person.backToForm')
+      ? t('admin.person.backToInput')
       : t('nav.backToList');
   });
 
