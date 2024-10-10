@@ -247,4 +247,15 @@ describe('PersonManagementView', () => {
     await nextTick();
     expect(organisationStore.getAllOrganisationen).toHaveBeenCalled();
   });
+
+  test('it updates Rollen search correctly', async () => {
+    const rollenAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
+
+    await rollenAutocomplete?.setValue(['1']);
+    await nextTick();
+
+    await rollenAutocomplete?.vm.$emit('update:search', ['1']);
+    await nextTick();
+    expect(personenkontextStore.getPersonenkontextRolleWithFilter).toHaveBeenCalled();
+  });
 });
