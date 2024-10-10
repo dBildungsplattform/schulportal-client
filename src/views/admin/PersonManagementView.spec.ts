@@ -260,7 +260,7 @@ describe('PersonManagementView', () => {
     expect(organisationStore.getAllOrganisationen).toHaveBeenCalled();
   });
 
-  test.only('it updates Rollen search correctly', async () => {
+  test('it updates Rollen search correctly', async () => {
     const rollenAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
 
     searchFilterStore.searchFilter = 'test search';
