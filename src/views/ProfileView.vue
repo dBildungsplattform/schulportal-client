@@ -25,7 +25,7 @@
   type LabelValue = {
     label: string;
     labelAbbr?: string;
-    value: string;
+    value: string | null;
     type?: ItemType;
     testIdLabel: string;
     testIdValue: string;
@@ -186,7 +186,7 @@
         testIdValue: 'userName-value',
       });
 
-    if (!(personInfoStore.personInfo.person.personalnummer && hasKoPersMerkmal.value)) return data;
+    if (!hasKoPersMerkmal.value) return data;
     data.push({
       label: t('profile.koPersNummer'),
       labelAbbr: t('profile.koPersNummerAbbr'),
