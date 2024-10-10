@@ -52,6 +52,8 @@
   const selectedStatus: Ref<string | null> = ref(null);
   const searchFilter: Ref<string> = ref('');
 
+  const selectedRollenObjects: Ref<RolleResponse[]> = ref([]);
+
   const filterOrSearchActive: Ref<boolean> = computed(
     () =>
       (!hasAutoSelectedOrganisation.value && selectedOrganisation.value.length > 0) ||
@@ -74,8 +76,10 @@
   });
 
   const rollen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
-    return personenkontextStore.filteredRollen?.moeglicheRollen
-      .slice(0, 25)
+    const filteredRollen: RolleResponse[] = personenkontextStore.filteredRollen?.moeglicheRollen || [];
+    const uniqueRollen: RolleResponse[] = [...new Set([...filteredRollen, ...selectedRollenObjects.value])];
+
+    return uniqueRollen
       .map((rolle: RolleResponse) => ({
         value: rolle.id,
         title: rolle.name,
@@ -86,7 +90,6 @@
   const klassen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
     if (selectedOrganisation.value.length) {
       return organisationStore.klassen
-        .slice(0, 25)
         .map((org: Organisation) => ({
           value: org.id,
           title: org.name,
@@ -158,6 +161,15 @@
 
   async function setRolleFilter(newValue: Array<string>): Promise<void> {
     await searchFilterStore.setRolleFilter(newValue);
+    // Update selectedRollenObjects based on the new selection
+    selectedRollenObjects.value = newValue
+      .map((rolleId: string) => {
+        const existingRolle: RolleResponse | undefined = personenkontextStore.filteredRollen?.moeglicheRollen.find(
+          (r: RolleResponse) => r.id === rolleId,
+        );
+        return existingRolle;
+      })
+      .filter((rolle: RolleResponse | undefined): rolle is RolleResponse => rolle !== undefined);
     applySearchAndFilters();
   }
 
@@ -234,13 +246,26 @@
     }, 500);
   }
 
-  function updateRollenSearch(searchValue: string): void {
-    /* cancel pending call */
+  async function updateRollenSearch(searchValue: string): Promise<void> {
     clearTimeout(timerId);
 
-    /* delay new call 500ms */
-    timerId = setTimeout(() => {
-      personenkontextStore.getPersonenkontextRolleWithFilter(searchValue, 25);
+    timerId = setTimeout(async () => {
+      await personenkontextStore.getPersonenkontextRolleWithFilter(searchValue, 25);
+
+      // If there are selected rollen not in the search results, add them to filteredRollen
+      const moeglicheRollen: RolleResponse[] = personenkontextStore.filteredRollen?.moeglicheRollen || [];
+      const missingRollen: RolleResponse[] = selectedRollenObjects.value.filter(
+        (rolle: RolleResponse) => !moeglicheRollen.some((r: RolleResponse) => r.id === rolle.id),
+      );
+
+      if (missingRollen.length > 0 && personenkontextStore.filteredRollen) {
+        personenkontextStore.filteredRollen = {
+          moeglicheRollen: [...moeglicheRollen, ...missingRollen],
+          total: personenkontextStore.filteredRollen.total + missingRollen.length,
+        };
+        // Update the total count of found Rollen.
+        personenkontextStore.totalFilteredRollen = personenkontextStore.totalFilteredRollen + missingRollen.length;
+      }
     }, 500);
   }
 
