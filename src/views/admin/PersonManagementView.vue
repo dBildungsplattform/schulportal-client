@@ -240,7 +240,7 @@
 
     /* delay new call 500ms */
     timerId = setTimeout(() => {
-      personenkontextStore.getPersonenkontextRolleWithFilter(searchValue);
+      personenkontextStore.getPersonenkontextRolleWithFilter(searchValue, 25);
     }, 500);
   }
 
@@ -259,7 +259,7 @@
     });
 
     await getPaginatedPersonen(searchFilterStore.personenPage);
-    await personenkontextStore.getPersonenkontextRolleWithFilter('');
+    await personenkontextStore.getPersonenkontextRolleWithFilter('', 25);
 
     autoSelectOrganisation();
   });
