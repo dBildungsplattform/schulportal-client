@@ -189,6 +189,7 @@
     searchFieldComponent.value.searchFilter = '';
     searchFilterStore.setKlasseFilter([]);
     searchFilterStore.setRolleFilter([]);
+    searchFilterStore.setSearchFilter('');
     /* do not reset orgas if orga was autoselected */
     if (!hasAutoSelectedOrganisation.value) {
       selectedOrganisation.value = [];
