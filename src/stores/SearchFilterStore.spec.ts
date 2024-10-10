@@ -1,3 +1,4 @@
+import type { RolleResponse } from './RolleStore';
 import { useSearchFilterStore, type SearchFilterStore } from './SearchFilterStore';
 import { setActivePinia, createPinia } from 'pinia';
 
@@ -12,6 +13,7 @@ describe('SearchFilterStore', () => {
     expect(searchFilterStore.selectedKlassen).toEqual([]);
     expect(searchFilterStore.selectedRollen).toEqual([]);
     expect(searchFilterStore.selectedOrganisationen).toEqual([]);
+    expect(searchFilterStore.selectedRollenObjects).toEqual([]);
     expect(searchFilterStore.searchFilter).toEqual('');
   });
 
@@ -31,5 +33,28 @@ describe('SearchFilterStore', () => {
     // it sets the searchFilter
     searchFilterStore.setSearchFilter('search');
     expect(searchFilterStore.searchFilter).toEqual('search');
+
+    // it sets the selectedRolleFilterWithObjects
+    searchFilterStore.setRolleFilterWithObjects(['5'], [
+      {
+        id: '10',
+        administeredBySchulstrukturknoten: '1',
+        merkmale: new Set(),
+        name: 'Rolle 1',
+        rollenart: 'LERN',
+        systemrechte: new Set(),
+      },
+    ] as RolleResponse[]);
+
+    expect(searchFilterStore.selectedRollenObjects).toEqual([
+      {
+        id: '10',
+        administeredBySchulstrukturknoten: '1',
+        merkmale: new Set(),
+        name: 'Rolle 1',
+        rollenart: 'LERN',
+        systemrechte: new Set(),
+      },
+    ]);
   });
 });
