@@ -2,6 +2,8 @@
   import { ref, type Ref } from 'vue';
   import { type Composer, useI18n } from 'vue-i18n';
 
+  import SpshTooltip from '@/components/admin/SpshTooltip.vue';
+
   type Props = {
     password: string;
   };
@@ -42,24 +44,38 @@
     variant="outlined"
   >
     <template v-slot:append-inner>
-      <v-icon
-        @click.stop="showPassword = !showPassword"
-        @keyup.enter="showPassword = !showPassword"
-        @keyup.space="showPassword = !showPassword"
-        data-testid="show-password-icon"
-        :icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-        tabindex="0"
-      ></v-icon>
+      <SpshTooltip
+        :enabledCondition="showPassword"
+        :disabledText="$t('hidePassword')"
+        :enabledText="$t('showPassword')"
+        position="start"
+      >
+        <v-icon
+          @click.stop="showPassword = !showPassword"
+          @keyup.enter="showPassword = !showPassword"
+          @keyup.space="showPassword = !showPassword"
+          data-testid="show-password-icon"
+          :icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+          tabindex="0"
+        ></v-icon>
+      </SpshTooltip>
     </template>
     <template v-slot:append>
-      <v-icon
-        @click.stop="copyToClipboard(password)"
-        @keyup.enter="copyToClipboard(password)"
-        @keyup.space="copyToClipboard(password)"
-        data-testid="copy-password-icon"
-        icon="mdi-content-copy"
-        tabindex="0"
-      ></v-icon>
+      <SpshTooltip
+        :enabledCondition="true"
+        :disabledText="$t('copyPassword')"
+        :enabledText="$t('copyPassword')"
+        position="start"
+      >
+        <v-icon
+          @click.stop="copyToClipboard(password)"
+          @keyup.enter="copyToClipboard(password)"
+          @keyup.space="copyToClipboard(password)"
+          data-testid="copy-password-icon"
+          icon="mdi-content-copy"
+          tabindex="0"
+        ></v-icon>
+      </SpshTooltip>
     </template>
   </v-text-field>
 </template>
