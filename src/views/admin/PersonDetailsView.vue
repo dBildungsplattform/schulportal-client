@@ -2037,15 +2037,11 @@
           </v-container>
         </template>
         <v-divider
-          v-if="authStore.currentUser?.personId !== personStore.currentPerson?.person.id"
           class="border-opacity-100 rounded my-6 mx-4"
           color="#E5EAEF"
           thickness="6"
         ></v-divider>
-        <v-container
-          class="person-lock"
-          v-if="authStore.currentUser?.personId !== personStore.currentPerson?.person.id"
-        >
+        <v-container class="person-lock">
           <v-row class="ml-md-16">
             <v-col data-testid="person-lock-info">
               <h3 class="subtitle-1">{{ $t('admin.person.status') }}</h3>
