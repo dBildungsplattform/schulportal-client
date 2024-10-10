@@ -12,8 +12,10 @@ import {
   type OrganisationRootChildrenResponse,
 } from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
+import { useSearchFilterStore, type SearchFilterStore } from './SearchFilterStore';
 
 const organisationApi: OrganisationenApiInterface = OrganisationenApiFactory(undefined, '', axiosApiInstance);
+const searchFilterStore: SearchFilterStore = useSearchFilterStore();
 
 export type Organisation = {
   id: string;
@@ -23,6 +25,7 @@ export type Organisation = {
   kuerzel?: string;
   typ: OrganisationsTyp;
   administriertVon?: string | null;
+  schuleDetails?: string;
 };
 
 export type KlasseTableItem = {
@@ -105,6 +108,7 @@ type OrganisationActions = {
   deleteOrganisationById: (organisationId: string) => Promise<void>;
   updateOrganisationById: (organisationId: string, name: string) => Promise<void>;
   getSchultraeger: () => Promise<void>;
+  fetchSchuleDetailsForKlassen: (filterActive: boolean) => Promise<void>;
 };
 
 export { OrganisationsTyp };
@@ -162,6 +166,7 @@ export const useOrganisationStore: StoreDefinition<
         if (filter?.includeTyp === OrganisationsTyp.Klasse) {
           this.allKlassen = response.data;
           this.totalKlassen = +response.headers['x-paging-total'];
+          await this.fetchSchuleDetailsForKlassen(false);
         } else if (filter?.includeTyp === OrganisationsTyp.Schule) {
           this.allSchulen = response.data;
           // The total number of all Schulen before applying pagination (To use in the Result table to show all Einträge)
@@ -182,6 +187,49 @@ export const useOrganisationStore: StoreDefinition<
       } finally {
         this.loading = false;
       }
+    },
+
+    async fetchSchuleDetailsForKlassen(filterActive: boolean): Promise<void> {
+      let administriertVonSet: Set<string> = new Set();
+      if (filterActive) {
+        administriertVonSet = new Set(
+          this.klassen
+            .map((klasse: Organisation) => klasse.administriertVon)
+            .filter((id: string | undefined | null): id is string => id !== null && id !== undefined),
+        );
+      } else {
+        administriertVonSet = new Set(
+          this.allKlassen
+            .map((klasse: Organisation) => klasse.administriertVon)
+            .filter((id: string | undefined | null): id is string => id !== null && id !== undefined),
+        );
+      }
+      const response: AxiosResponse<Organisation[]> = await organisationApi.organisationControllerFindOrganizations(
+        undefined,
+        searchFilterStore.klassenPerPage,
+        undefined,
+        undefined,
+        undefined,
+        OrganisationsTyp.Schule,
+        ['SCHULEN_VERWALTEN'],
+        undefined,
+        undefined,
+        Array.from(administriertVonSet),
+      );
+
+      const schulenMap: Map<string, string> = new Map(
+        response.data.map((org: Organisation) => [org.id, `${org.kennung} (${org.name.trim()})`]),
+      );
+
+      this.allKlassen = this.allKlassen.map((klasse: Organisation) => ({
+        ...klasse,
+        schuleDetails: schulenMap.get(klasse.administriertVon || '') || '---',
+      }));
+
+      this.klassen = this.klassen.map((klasse: Organisation) => ({
+        ...klasse,
+        schuleDetails: schulenMap.get(klasse.administriertVon || '') || '---',
+      }));
     },
 
     async getFilteredKlassen(filter?: OrganisationenFilter) {
@@ -296,6 +344,7 @@ export const useOrganisationStore: StoreDefinition<
         this.klassen = getFilteredKlassen;
         this.totalKlassen = +response.headers['x-paging-total'];
         this.totalPaginatedKlassen = +response.headers['x-paging-pageTotal'];
+        await this.fetchSchuleDetailsForKlassen(true);
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
