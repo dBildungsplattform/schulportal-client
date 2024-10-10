@@ -40,7 +40,7 @@
 </script>
 
 <template>
-  <div>
+  <div data-testid="personen-info-change">
     <KopersInput
       :hideCheckbox="true"
       :selectedKopersNr="selectedKopersNrPersonInfo"

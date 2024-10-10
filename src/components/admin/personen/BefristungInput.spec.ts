@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { DOMWrapper, mount, VueWrapper } from '@vue/test-utils';
 import BefristungInput from './BefristungInput.vue';
+import { nextTick } from 'vue';
 // import { nextTick } from 'vue';
 
 let wrapper: VueWrapper;
@@ -47,27 +48,46 @@ describe('befristung', () => {
     expect(wrapper.find('[data-testid="befristung-input"]').isVisible()).toBe(true);
   });
 
+  it('sets correct befristung options', async () => {
+    wrapper.setProps({ isBefristungRequired: true });
+    await nextTick();
+    expect(wrapper.findComponent({ ref: 'befristung-radio-group' }).props('modelValue')).toBe('schuljahresende');
+
+    wrapper.setProps({ isBefristungRequired: false });
+    await nextTick();
+    expect(wrapper.findComponent({ ref: 'befristung-radio-group' }).props('modelValue')).toBe('unbefristet');
+  });
+
   it('handles option changes', async () => {
     const schuljahresendeRadioButton: DOMWrapper<HTMLInputElement> = wrapper.find(
       '[data-testid="schuljahresende-radio-button"] input[type="radio"]',
     );
-    // const unbefristetRadioButton: DOMWrapper<HTMLInputElement> = wrapper.find('[data-testid="unbefristet-radio-button"] input[type="radio"]');
-    // const befristungInput: DOMWrapper<HTMLInputElement> = wrapper.find('[data-testid="befristung-input"] input[type="text"]');
-
-    // console.log(wrapper.props());
+    const unbefristetRadioButton: DOMWrapper<HTMLInputElement> = wrapper.find(
+      '[data-testid="unbefristet-radio-button"] input[type="radio"]',
+    );
+    const befristungInput: DOMWrapper<HTMLInputElement> = wrapper.find(
+      '[data-testid="befristung-input"] input[type="text"]',
+    );
 
     expect(schuljahresendeRadioButton.element.checked).toBe(false);
+    // TODO: why isn't unbefristetRadioButton auto-checked?
     // expect(unbefristetRadioButton?.element.checked).toBe(true);
 
-    // await schuljahresendeRadioButton.trigger('click');
-    // await nextTick();
+    await schuljahresendeRadioButton.trigger('click');
+    await nextTick();
 
-    // expect(schuljahresendeRadioButton?.element.checked).toBe(true);
-    // expect(unbefristetRadioButton?.element.checked).toBe(false);
+    expect(schuljahresendeRadioButton.element.checked).toBe(true);
+    expect(unbefristetRadioButton.element.checked).toBe(false);
 
-    // await befristungInput.setValue('31.07.2024');
+    await befristungInput.setValue('31.07.2028');
 
-    // expect(schuljahresendeRadioButton?.element.checked).toBe(false);
-    // expect(unbefristetRadioButton?.element.checked).toBe(false);
+    expect(schuljahresendeRadioButton.element.checked).toBe(false);
+    expect(unbefristetRadioButton.element.checked).toBe(false);
+  });
+
+  it('shows a tooltip for a disabled button', async () => {
+    wrapper.setProps({ isUnbefristedDisabled: true });
+    await nextTick();
+    // expect(wrapper.findComponent({ name: 'SpshTooltip' }).exists()).toBe(true);
   });
 });

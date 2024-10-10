@@ -4,7 +4,12 @@ import KlassenDetailsView from './KlasseDetailsView.vue';
 import { setActivePinia, createPinia } from 'pinia';
 import routes from '@/router/routes';
 import { type Router, createRouter, createWebHistory } from 'vue-router';
-import { OrganisationsTyp, useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
+import {
+  OrganisationsTyp,
+  useOrganisationStore,
+  type Organisation,
+  type OrganisationStore,
+} from '@/stores/OrganisationStore';
 import { nextTick } from 'vue';
 
 let wrapper: VueWrapper | null = null;

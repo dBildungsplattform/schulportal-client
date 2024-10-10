@@ -1,7 +1,6 @@
 <script setup lang="ts">
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   function goBack(): void {
-    console.log('********* goBack');
     window.history.back();
   }
 </script>

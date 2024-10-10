@@ -1,4 +1,4 @@
-import { expect, test } from 'vitest';
+import { expect, type MockInstance, test } from 'vitest';
 import { VueWrapper, mount } from '@vue/test-utils';
 import { nextTick } from 'vue';
 import PersonCreationView from './PersonCreationView.vue';
@@ -7,6 +7,7 @@ import routes from '@/router/routes';
 import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
 import { Vertrauensstufe, type DBiamPersonResponse } from '@/api-client/generated';
 import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
+import { type PersonStore, usePersonStore } from '@/stores/PersonStore';
 import {
   RollenMerkmal,
   RollenSystemRecht,
@@ -18,6 +19,7 @@ import {
 let wrapper: VueWrapper | null = null;
 let router: Router;
 
+const personStore: PersonStore = usePersonStore();
 const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
 const organisationStore: OrganisationStore = useOrganisationStore();
 const rolleStore: RolleStore = useRolleStore();
@@ -148,21 +150,30 @@ beforeEach(async () => {
 });
 
 describe('PersonCreationView', () => {
-  test('it renders the person creation form', () => {
+  test('it renders the person creation form and its child components', () => {
     expect(wrapper).toBeTruthy();
-    // expect(wrapper?.find('[data-testid="person-creation-form"]').isVisible()).toBe(true);
-  });
-
-  // TODO: how do we fix this test?
-  // We have to use shallowMount instead of mount and comment all tests to make sonar accept coverage.
-  // As soon as we use mount to write meaningful tests, sonar will complain about the coverage.
-
-  test('it renders all child components', () => {
+    expect(wrapper?.find('[data-testid="person-creation-form"]').isVisible()).toBe(true);
     expect(wrapper?.getComponent({ name: 'LayoutCard' })).toBeTruthy();
     expect(wrapper?.getComponent({ name: 'SpshAlert' })).toBeTruthy();
     expect(wrapper?.getComponent({ name: 'FormWrapper' })).toBeTruthy();
     expect(wrapper?.getComponent({ name: 'FormRow' })).toBeTruthy();
     expect(wrapper?.getComponent({ name: 'PersonenkontextCreate' })).toBeTruthy();
+  });
+
+  test('it renders an error', async () => {
+    personStore.errorCode = 'ERROR_ERROR';
+    await nextTick();
+    const push: MockInstance = vi.spyOn(router, 'push');
+    wrapper?.find('[data-testid="alert-button"]').trigger('click');
+    await nextTick();
+    expect(push).toHaveBeenCalledTimes(1);
+  });
+
+  test('it navigates back to personen table', async () => {
+    const push: MockInstance = vi.spyOn(router, 'push');
+    await wrapper?.find('[data-testid="close-layout-card-button"]').trigger('click');
+    expect(push).toHaveBeenCalledTimes(1);
+    expect(personenkontextStore.createdPersonWithKontext).toBe(null);
   });
 
   test('it fills form and triggers submit', async () => {
