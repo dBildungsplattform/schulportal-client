@@ -1048,23 +1048,22 @@
   });
 
   const twoFactorAuthenticationConnectionError: ComputedRef<string> = computed(() => {
-    if (
-      twoFactorAuthentificationStore.errorCode == '500' ||
-      twoFactorAuthentificationStore.errorCode == '502' ||
-      twoFactorAuthentificationStore.errorCode == '503' ||
-      twoFactorAuthentificationStore.errorCode == '504' ||
-      twoFactorAuthentificationStore.errorCode == 'UNSPECIFIED_ERROR'
-    ) {
-      return t('admin.person.twoFactorAuthentication.errors.connection');
+    // Early return if loading
+    if (twoFactorAuthentificationStore.loading) return '';
+
+    switch (twoFactorAuthentificationStore.errorCode) {
+      case 'TOKEN_STATE_ERROR':
+        return t('admin.person.twoFactorAuthentication.errors.tokenStateError');
+      case 'PI_UNAVAILABLE_ERROR':
+        return t('admin.person.twoFactorAuthentication.errors.connection');
+      default:
+        return '';
     }
-    return '';
   });
 
   onBeforeMount(async () => {
     personStore.resetState();
     twoFactorAuthentificationStore.resetState();
-
-    await twoFactorAuthentificationStore.get2FARequirement(currentPersonId);
 
     personenkontextStore.errorCode = '';
     await personStore.getPersonById(currentPersonId);
@@ -1074,6 +1073,7 @@
       (zuordnung: Zuordnung) => zuordnung.typ === OrganisationsTyp.Klasse,
     );
 
+    await twoFactorAuthentificationStore.get2FARequirement(currentPersonId);
     await twoFactorAuthentificationStore.get2FAState(currentPersonId);
   });
 
@@ -1362,7 +1362,7 @@
           thickness="6"
         ></v-divider>
         <!-- Two Factor Authentication -->
-        <template v-if="twoFactorAuthentificationStore.required && twoFactorAuthentificationStore.hasToken != null">
+        <template v-if="twoFactorAuthentificationStore.required && !twoFactorAuthentificationStore.loadingInitialState">
           <v-container>
             <v-row class="ml-md-16">
               <v-col v-if="personStore.loading">
@@ -1391,6 +1391,15 @@
                       <template v-if="twoFactorAuthenticationConnectionError">
                         <p>
                           {{ twoFactorAuthenticationConnectionError }}
+                          <span v-if="twoFactorAuthentificationStore.errorCode === 'TOKEN_STATE_ERROR'">
+                            <a
+                              :href="t('admin.person.twoFactorAuthentication.errors.iqshHelpdeskLink')"
+                              rel="noopener noreferrer"
+                              target="_blank"
+                              >{{ $t('admin.person.twoFactorAuthentication.errors.iqshHelpdesk') }}</a
+                            >
+                            .
+                          </span>
                         </p>
                       </template>
                       <template v-else-if="twoFactorAuthentificationStore.hasToken">
@@ -1415,7 +1424,10 @@
                       </template>
                     </v-col>
                   </v-row>
-                  <v-row class="text-body">
+                  <v-row
+                    class="text-body"
+                    v-if="!twoFactorAuthentificationStore.errorCode"
+                  >
                     <v-col
                       class="text-right"
                       cols="1"

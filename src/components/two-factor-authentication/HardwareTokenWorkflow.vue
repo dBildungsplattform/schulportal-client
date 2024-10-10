@@ -50,8 +50,13 @@
     errorThrown.value = true;
     if (axios.isAxiosError(error)) {
       if (error.response && error.response.data.i18nKey) {
+        let i18nKey: string = error.response.data.i18nKey;
+        if (i18nKey === 'PI_UNAVAILABLE_ERROR') {
+          i18nKey = 'HARDWARE_TOKEN_SERVICE_FEHLER';
+        }
+
         const message: string =
-          t('admin.person.twoFactorAuthentication.errors.' + error.response.data.i18nKey) ||
+          t('admin.person.twoFactorAuthentication.errors.' + i18nKey) ||
           t('admin.person.twoFactorAuthentication.errors.UNKNOWN_ERROR');
         dialogText.value = message;
       } else {
