@@ -50,7 +50,7 @@
     return message;
   });
 
-  async function closePasswordResetDialog(isActive: Ref<boolean>): Promise<void> {
+  async function closePersonDeleteDialog(isActive: Ref<boolean>): Promise<void> {
     isActive.value = false;
   }
 
@@ -59,7 +59,7 @@
     successDialogVisible.value = true;
   }
 
-  async function closeSuccessDialogAndPushToManagent(): Promise<void> {
+  async function closeSuccessDialogAndPushToManagement(): Promise<void> {
     successDialogVisible.value = false;
     router.push({ name: 'person-management' });
   }
@@ -99,7 +99,7 @@
             <v-btn
               :block="mdAndDown"
               class="primary"
-              @click.stop="closeSuccessDialogAndPushToManagent()"
+              @click.stop="closeSuccessDialogAndPushToManagement()"
               data-testid="close-person-delete-success-dialog-button"
             >
               {{ $t('close') }}
@@ -127,7 +127,7 @@
         >
           <v-btn
             class="secondary button"
-            data-testid="open-person-delete-dialog-icon"
+            data-testid="open-person-delete-dialog-button"
             :disabled="disabled"
             v-bind="props"
             :block="mdAndDown"
@@ -145,7 +145,7 @@
       <LayoutCard
         :closable="true"
         :header="$t('admin.person.deletePerson')"
-        @onCloseClicked="closePasswordResetDialog(isActive)"
+        @onCloseClicked="closePersonDeleteDialog(isActive)"
       >
         <v-card-text>
           <v-container>
@@ -187,7 +187,7 @@
               <v-btn
                 :block="mdAndDown"
                 class="secondary button"
-                @click.stop="closePasswordResetDialog(isActive)"
+                @click.stop="closePersonDeleteDialog(isActive)"
                 data-testid="close-person-delete-dialog-button"
               >
                 {{ $t('cancel') }}

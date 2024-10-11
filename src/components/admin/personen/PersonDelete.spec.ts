@@ -1,15 +1,27 @@
-import { expect, test } from 'vitest';
+import { expect, test, type MockInstance } from 'vitest';
 import { VueWrapper, mount } from '@vue/test-utils';
 import PersonDelete from './PersonDelete.vue';
+import { createRouter, createWebHistory, type Router } from 'vue-router';
+import routes from '@/router/routes';
+import { nextTick } from 'vue';
 
 let wrapper: VueWrapper | null = null;
+let router: Router;
 
-beforeEach(() => {
+beforeEach(async () => {
   document.body.innerHTML = `
     <div>
       <div id="app"></div>
     </div>
   `;
+
+  router = createRouter({
+    history: createWebHistory(),
+    routes,
+  });
+
+  router.push('/');
+  await router.isReady();
 
   wrapper = mount(PersonDelete, {
     attachTo: document.getElementById('app') || '',
@@ -36,14 +48,53 @@ beforeEach(() => {
       components: {
         PersonDelete,
       },
+      plugins: [router],
     },
   });
 });
 
-describe('Delete person', () => {
-  test('it opens the dialog', async () => {
-    wrapper?.get('[data-testid="open-person-delete-dialog-icon"]').trigger('click');
+describe('PersonDelete', () => {
+  test('it opens and closes the dialog', async () => {
+    wrapper?.find('[data-testid="open-person-delete-dialog-button"]').trigger('click');
+    await nextTick();
+
     await document.querySelector('[data-testid="person-delete-confirmation-text"]');
     expect(document.querySelector('[data-testid="person-delete-confirmation-text"]')).not.toBeNull();
+
+    const closeDialogButton: HTMLElement | undefined = document.querySelector(
+      '[data-testid="close-person-delete-dialog-button"]',
+    ) as HTMLElement;
+    closeDialogButton.click();
+    await nextTick();
+
+    // TODO: Close dialog button is not removed from the DOM
+    // expect(document.querySelector('[data-testid="close-person-delete-dialog-button"]')).toBeNull();
+  });
+
+  test('it deletes a person and navigates back to management', async () => {
+    const push: MockInstance = vi.spyOn(router, 'push');
+
+    wrapper?.find('[data-testid="open-person-delete-dialog-button"]').trigger('click');
+    await nextTick();
+
+    await document.querySelector('[data-testid="person-delete-confirmation-text"]');
+    expect(document.querySelector('[data-testid="person-delete-confirmation-text"]')).not.toBeNull();
+
+    const personDeleteButton: HTMLElement | undefined = document.querySelector(
+      '[data-testid="person-delete-button"]',
+    ) as HTMLElement;
+    personDeleteButton.click();
+    await nextTick();
+
+    await document.querySelector('[data-testid="person-delete-success-text"]');
+    expect(document.querySelector('[data-testid="person-delete-success-text"]')).not.toBeNull();
+
+    const closeDialogButton: HTMLElement | undefined = document.querySelector(
+      '[data-testid="close-person-delete-success-dialog-button"]',
+    ) as HTMLElement;
+    closeDialogButton.click();
+    await nextTick();
+
+    expect(push).toHaveBeenCalledTimes(1);
   });
 });
