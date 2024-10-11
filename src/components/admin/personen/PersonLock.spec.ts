@@ -264,11 +264,7 @@ describe('Unlock user', () => {
 
     const emitArgs: Array<unknown> | undefined = wrapper?.emitted()['onLockUser'];
     expect(emitArgs).toBeDefined();
-    expect(emitArgs![0]).toStrictEqual([
-      person.person.id,
-      !person.person.isLocked,
-      person.person.lockInfo?.lock_locked_from,
-    ]);
+    expect(emitArgs![0]).toStrictEqual([person.person.id, !person.person.isLocked, person.person.userLock?.locked_by]);
     await nextTick();
   });
 });
