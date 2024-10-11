@@ -18,6 +18,8 @@
   const { t }: Composer = useI18n({ useScope: 'global' });
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
+  const dialogIsActive = ref(false);
+
   type Props = {
     errorCode: string;
     person: Personendatensatz;
@@ -98,10 +100,11 @@
     formContext.resetField('selectedBefristung');
   }
 
-  function closeLockPersonDialog(isActive: Ref<boolean>): void {
+  function closeLockPersonDialog(): void {
     resetBefristungFields();
-    isActive.value = false;
+    dialogIsActive.value = false;
   }
+
   // async function handleOnLockUser(isActive: Ref<boolean>): Promise<void> {
   //   const lockingOrgId: string | null | undefined = props.person.person.isLocked
   //     ? props.person.person.userLock?.locked_by
@@ -112,14 +115,14 @@
   //   closeLockPersonDialog(isActive);
   // }
 
-  const handleOnLockUser: (e?: Event | undefined) => Promise<void | undefined> = formContext.handleSubmit(() => {
+  const handleOnLockUser = formContext.handleSubmit((values) => {
     const lockingOrgId: string | null | undefined = props.person.person.isLocked
       ? props.person.person.userLock?.locked_by
       : selectedOrganisationId.value;
     if (!lockingOrgId) return;
-    let dateISO: string | undefined = formatDateToISO(selectedBefristung.value);
+    let dateISO: string | undefined = formatDateToISO(values.selectedBefristung);
     emit('onLockUser', props.person.person.id, !props.person.person.isLocked, lockingOrgId, dateISO);
-    closeLockPersonDialog(isActive);
+    closeLockPersonDialog();
   });
 
   function handleChangeOrganisation(value: string): void {
@@ -149,7 +152,10 @@
 </script>
 
 <template v-if="organisations.length > 0">
-  <v-dialog persistent>
+  <v-dialog
+    persistent
+    v-model="dialogIsActive"
+  >
     <template v-slot:activator="{ props }">
       <v-col
         cols="12"
@@ -176,150 +182,148 @@
       </v-col>
     </template>
 
-    <template v-slot:default="{ isActive }">
-      <LayoutCard
-        data-testid="person-lock-card"
-        :closable="true"
-        :header="!person.person.isLocked ? $t('person.lockUser') : $t('person.unlockUser')"
-        @onCloseClicked="closeLockPersonDialog(isActive)"
-      >
-        <v-container>
-          <v-card-text>
-            <v-row
-              v-if="errorMessage"
-              class="text-body text-error"
+    <LayoutCard
+      data-testid="person-lock-card"
+      :closable="true"
+      :header="!person.person.isLocked ? $t('person.lockUser') : $t('person.unlockUser')"
+      @onCloseClicked="closeLockPersonDialog"
+    >
+      <v-container>
+        <v-card-text>
+          <v-row
+            v-if="errorMessage"
+            class="text-body text-error"
+          >
+            <v-col
+              class="text-right"
+              cols="1"
             >
-              <v-col
-                class="text-right"
-                cols="1"
-              >
-                <v-icon icon="mdi-alert"></v-icon>
-              </v-col>
-              <v-col>
-                <p data-testid="error-text">
-                  {{ errorMessage }}
-                </p>
-              </v-col>
-            </v-row>
-            <v-row
-              v-if="!props.person.person.isLocked"
-              class="align-center justify-center w-full"
+              <v-icon icon="mdi-alert"></v-icon>
+            </v-col>
+            <v-col>
+              <p data-testid="error-text">
+                {{ errorMessage }}
+              </p>
+            </v-col>
+          </v-row>
+          <v-row
+            v-if="!props.person.person.isLocked"
+            class="align-center justify-center w-full"
+          >
+            <v-col
+              cols="12"
+              sm="6"
+              md="2"
+              class="text-sm-center text-body"
             >
-              <v-col
-                cols="12"
-                sm="6"
-                md="2"
-                class="text-sm-center text-body"
-              >
-                <label for="schule-select">{{ $t('person.lockedBy') + ':' }}</label>
-              </v-col>
-              <v-col
-                cols="12"
-                sm="6"
-                md="6"
-              >
-                <v-select
-                  :clearable="!hasSingleSelection"
-                  :disabled="hasSingleSelection"
-                  :hide-details="hasSingleSelection"
-                  :class="[
-                    { 'filter-dropdown': hasSingleSelection },
-                    { selected: selectedOrganisation },
-                    { 'align-center': true },
-                  ]"
-                  data-testid="schule-select"
-                  density="compact"
-                  id="schule-select"
-                  :items="organisations"
-                  @update:modelValue="handleChangeOrganisation"
-                  item-value="value"
-                  item-text="title"
-                  :no-data-text="$t('noDataFound')"
-                  :placeholder="$t('person.lockedBy')"
-                  ref="schule-select"
-                  required="true"
-                  variant="outlined"
-                  v-model="selectedOrganisation"
-                ></v-select>
-              </v-col>
-            </v-row>
-            <v-row
-              class="justify-center w-full"
-              v-if="!props.person.person.isLocked"
+              <label for="schule-select">{{ $t('person.lockedBy') + ':' }}</label>
+            </v-col>
+            <v-col
+              cols="12"
+              sm="6"
+              md="6"
             >
-              <v-col
+              <v-select
+                :clearable="!hasSingleSelection"
+                :disabled="hasSingleSelection"
+                :hide-details="hasSingleSelection"
+                :class="[
+                  { 'filter-dropdown': hasSingleSelection },
+                  { selected: selectedOrganisation },
+                  { 'align-center': true },
+                ]"
+                data-testid="schule-select"
+                density="compact"
+                id="schule-select"
+                :items="organisations"
+                @update:modelValue="handleChangeOrganisation"
+                item-value="value"
+                item-text="title"
+                :no-data-text="$t('noDataFound')"
+                :placeholder="$t('person.lockedBy')"
+                ref="schule-select"
+                required="true"
+                variant="outlined"
+                v-model="selectedOrganisation"
+              ></v-select>
+            </v-col>
+          </v-row>
+          <v-row
+            class="justify-center w-full"
+            v-if="!props.person.person.isLocked"
+          >
+            <v-col
+              class="text-body"
+              cols="12"
+              sm="6"
+              md="2"
+            >
+              Dauer der Sperre
+            </v-col>
+            <v-col
+              cols="12"
+              sm="6"
+              md="6"
+              class="text-sm-center text-body"
+            >
+              <PersonLockInput
+                v-model:befristung="selectedBefristung"
+                v-bind:befristung-props="selectedBefristungProps"
+                :is-unbefristet="isUnbefristet"
+                @update:befristung="handleBefristungChange"
+                @handleSelectedRadioButtonChange="selectedRadionButtonChange"
+              >
+              </PersonLockInput>
+            </v-col>
+          </v-row>
+          <v-row class="text-body bold px-md-16">
+            <v-col cols="1">
+              <v-icon icon="mdi-information-slab-circle-outline"></v-icon>
+            </v-col>
+            <v-col cols="11">
+              <span
+                data-testid="lock-user-info-text"
                 class="text-body"
-                cols="12"
-                sm="6"
-                md="2"
               >
-                Dauer der Sperre
-              </v-col>
-              <v-col
-                cols="12"
-                sm="6"
-                md="6"
-                class="text-sm-center text-body"
+                {{ !person.person.isLocked ? $t('person.lockUserInfoText') : $t('person.unLockUserInfoText') }}
+              </span>
+            </v-col>
+          </v-row>
+        </v-card-text>
+        <v-card-actions class="justify-center">
+          <v-row class="justify-center">
+            <v-col
+              cols="12"
+              sm="6"
+              md="4"
+            >
+              <v-btn
+                :block="mdAndDown"
+                class="secondary button"
+                @click.stop="closeLockPersonDialog"
+                data-testid="close-lock-person-dialog-button"
               >
-                <PersonLockInput
-                  v-model:befristung="selectedBefristung"
-                  v-bind:befristung-props="selectedBefristungProps"
-                  :is-unbefristet="isUnbefristet"
-                  @update:befristung="handleBefristungChange"
-                  @handleSelectedRadioButtonChange="selectedRadionButtonChange"
-                >
-                </PersonLockInput>
-              </v-col>
-            </v-row>
-            <v-row class="text-body bold px-md-16">
-              <v-col cols="1">
-                <v-icon icon="mdi-information-slab-circle-outline"></v-icon>
-              </v-col>
-              <v-col cols="11">
-                <span
-                  data-testid="lock-user-info-text"
-                  class="text-body"
-                >
-                  {{ !person.person.isLocked ? $t('person.lockUserInfoText') : $t('person.unLockUserInfoText') }}
-                </span>
-              </v-col>
-            </v-row>
-          </v-card-text>
-          <v-card-actions class="justify-center">
-            <v-row class="justify-center">
-              <v-col
-                cols="12"
-                sm="6"
-                md="4"
+                {{ !selectedOrganisation ? $t('close') : $t('cancel') }}
+              </v-btn>
+            </v-col>
+            <v-col
+              cols="12"
+              sm="6"
+              md="4"
+            >
+              <v-btn
+                :block="mdAndDown"
+                class="primary button"
+                :disabled="!props.person.person.isLocked && !selectedOrganisation"
+                @click.stop="handleOnLockUser"
+                data-testid="lock-user-button"
               >
-                <v-btn
-                  :block="mdAndDown"
-                  class="secondary button"
-                  @click.stop="closeLockPersonDialog(isActive)"
-                  data-testid="close-lock-person-dialog-button"
-                >
-                  {{ !selectedOrganisation ? $t('close') : $t('cancel') }}
-                </v-btn>
-              </v-col>
-              <v-col
-                cols="12"
-                sm="6"
-                md="4"
-              >
-                <v-btn
-                  :block="mdAndDown"
-                  class="primary button"
-                  :disabled="!props.person.person.isLocked && !selectedOrganisation"
-                  @click.stop="onSubmit()"
-                  data-testid="lock-user-button"
-                >
-                  {{ !props.person.person.isLocked ? $t('person.lockUser') : $t('person.unlockUser') }}
-                </v-btn>
-              </v-col>
-            </v-row>
-          </v-card-actions>
-        </v-container>
-      </LayoutCard>
-    </template>
+                {{ !props.person.person.isLocked ? $t('person.lockUser') : $t('person.unlockUser') }}
+              </v-btn>
+            </v-col>
+          </v-row>
+        </v-card-actions>
+      </v-container>
+    </LayoutCard>
   </v-dialog>
 </template>
