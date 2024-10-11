@@ -134,18 +134,14 @@
     password.value = personStore.newPassword || '';
   }
 
-  async function onLockUser(
-    personId: string,
-    lock: boolean,
-    lockedBy: string,
-    date: string | undefined,
-  ): Promise<void> {
+  async function onLockUser(lockedBy: string, date: string | undefined): Promise<void> {
+    if (!personStore.currentPerson) return;
     let bodyParams: LockUserBodyParams = {
-      lock: lock,
+      lock: !personStore.currentPerson.person.isLocked,
       locked_by: lockedBy,
       locked_until: date,
     };
-    await personStore.lockPerson(personId, bodyParams);
+    await personStore.lockPerson(personStore.currentPerson.person.id, bodyParams);
   }
 
   const handleAlertClose = (): void => {

@@ -18,7 +18,7 @@
   const { t }: Composer = useI18n({ useScope: 'global' });
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
-  const dialogIsActive = ref(false);
+  const dialogIsActive: Ref<boolean> = ref(false);
 
   type Props = {
     errorCode: string;
@@ -65,7 +65,7 @@
   ] = formContext.defineField('selectedBefristung', vuetifyConfig);
 
   type Emits = {
-    (event: 'onLockUser', id: string, lock: boolean, schule: string, date: string | undefined): void;
+    (event: 'onLockUser', schule: string, date: string | undefined): void;
   };
   const props: Props = defineProps<Props>();
   const emit: Emits = defineEmits<Emits>();
@@ -105,24 +105,17 @@
     dialogIsActive.value = false;
   }
 
-  // async function handleOnLockUser(isActive: Ref<boolean>): Promise<void> {
-  //   const lockingOrgId: string | null | undefined = props.person.person.isLocked
-  //     ? props.person.person.userLock?.locked_by
-  //     : selectedOrganisationId.value;
-  //   if (!lockingOrgId) return;
-  //   let dateISO: string | undefined = formatDateToISO(selectedBefristung.value);
-  //   emit('onLockUser', props.person.person.id, !props.person.person.isLocked, lockingOrgId, dateISO);
-  //   closeLockPersonDialog(isActive);
-  // }
-
-  const handleOnLockUser = formContext.handleSubmit((values) => {
+  async function handleOnLockUser(): Promise<void> {
     const lockingOrgId: string | null | undefined = props.person.person.isLocked
       ? props.person.person.userLock?.locked_by
       : selectedOrganisationId.value;
     if (!lockingOrgId) return;
-    let dateISO: string | undefined = formatDateToISO(values.selectedBefristung);
-    emit('onLockUser', props.person.person.id, !props.person.person.isLocked, lockingOrgId, dateISO);
+    let dateISO: string | undefined = formatDateToISO(selectedBefristung.value);
+    emit('onLockUser', lockingOrgId, dateISO);
     closeLockPersonDialog();
+  }
+  const onSubmit: (e?: Event | undefined) => Promise<void | undefined> = formContext.handleSubmit(() => {
+    handleOnLockUser();
   });
 
   function handleChangeOrganisation(value: string): void {
@@ -135,8 +128,7 @@
   const selectedRadionButtonChange = (value: boolean): void => {
     isUnbefristet.value = value;
     if (isUnbefristet.value) {
-      selectedBefristungProps.value.error = false;
-      selectedBefristungProps.value['error-messages'] = [];
+      formContext.resetField('selectedBefristung');
     }
   };
 
@@ -258,7 +250,7 @@
               sm="6"
               md="2"
             >
-              Dauer der Sperre
+              {{ $t('person.lockTime') }}
             </v-col>
             <v-col
               cols="12"
@@ -315,7 +307,7 @@
                 :block="mdAndDown"
                 class="primary button"
                 :disabled="!props.person.person.isLocked && !selectedOrganisation"
-                @click.stop="handleOnLockUser"
+                @click.stop="onSubmit"
                 data-testid="lock-user-button"
               >
                 {{ !props.person.person.isLocked ? $t('person.lockUser') : $t('person.unlockUser') }}

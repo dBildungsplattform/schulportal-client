@@ -12,8 +12,8 @@
   };
 
   enum RadioButtonSelect {
-    FIRST_OPTION = 'UNBEFRISTET',
-    SECOND_OPTION = 'BEFRISTET',
+    UNBEFRISTET = 'UNBEFRISTET',
+    BEFRISTET = 'BEFRISTET',
   }
 
   const props: BefristungProps = defineProps<BefristungProps>();
@@ -29,7 +29,7 @@
   }>();
 
   const localBefristung: Ref<string | undefined> = ref(props.befristung);
-  const selectedRadioButton: Ref<string> = ref(RadioButtonSelect.FIRST_OPTION);
+  const selectedRadioButton: Ref<string> = ref(RadioButtonSelect.UNBEFRISTET);
 
   const handleBefristungChange = (value: string | undefined): void => {
     localBefristung.value = value;
@@ -37,10 +37,10 @@
   };
 
   watch(selectedRadioButton, (newVal: string) => {
-    if (newVal === RadioButtonSelect.FIRST_OPTION) {
+    if (newVal === RadioButtonSelect.UNBEFRISTET) {
       emit('handleSelectedRadioButtonChange', true);
       localBefristung.value = '';
-    } else if (newVal === RadioButtonSelect.SECOND_OPTION) {
+    } else if (newVal === RadioButtonSelect.BEFRISTET) {
       emit('handleSelectedRadioButtonChange', false);
     }
   });
@@ -66,13 +66,13 @@
           <v-radio
             data-testid="unbefristet-radio-button"
             :label="$t('admin.befristung.unlimited')"
-            :value="RadioButtonSelect.FIRST_OPTION"
+            :value="RadioButtonSelect.UNBEFRISTET"
             :color="'primary'"
           ></v-radio>
           <v-radio
             data-testid="befristet-radio-button"
             :label="$t('admin.befristung.limited')"
-            :value="RadioButtonSelect.SECOND_OPTION"
+            :value="RadioButtonSelect.BEFRISTET"
             :color="'primary'"
           ></v-radio>
         </v-radio-group>
@@ -84,7 +84,7 @@
         class="text-sm-center text-body"
       >
         <v-text-field
-          v-if="!(selectedRadioButton === RadioButtonSelect.FIRST_OPTION)"
+          v-if="!(selectedRadioButton === RadioButtonSelect.BEFRISTET)"
           density="compact"
           variant="outlined"
           data-testid="befristung-input"
