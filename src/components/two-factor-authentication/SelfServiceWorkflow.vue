@@ -27,7 +27,7 @@
   const dialogHeader: ComputedRef<string> = computed(() => {
     switch (workflowStep.value) {
       case TwoFactorSteps.Start:
-        return t('admin.person.twoFactorAuthentication.setUpLong');
+        return t('admin.person.twoFactorAuthentication.setUpShort');
       case TwoFactorSteps.QRCode:
         return t('admin.person.twoFactorAuthentication.softwareTokenOption');
       case TwoFactorSteps.Verify:
@@ -94,26 +94,24 @@
 <template>
   <v-dialog persistent>
     <template v-slot:activator="{ props }">
-      <v-col
-        cols="12"
-        sm="6"
-        md="auto"
-      >
-        <SpshTooltip
-          :enabled-condition="true"
-          :enabledText="$t('admin.person.twoFactorAuthentication.setUpShort')"
-          position="start"
-        >
-          <v-btn
-            class="primary"
-            data-testid="open-2FA-self-service-dialog-icon"
-            :block="mdAndDown"
-            v-bind="props"
+      <v-row class="d-flex align-center justify-center">
+        <v-col class="d-flex justify-center">
+          <SpshTooltip
+            :enabled-condition="true"
+            :enabledText="$t('admin.person.twoFactorAuthentication.setUpShort')"
+            position="start"
           >
-            {{ $t('admin.person.twoFactorAuthentication.setUpShort') }}
-          </v-btn>
-        </SpshTooltip>
-      </v-col>
+            <v-btn
+              class="primary"
+              data-testid="open-2FA-self-service-dialog-icon"
+              :block="mdAndDown"
+              v-bind="props"
+            >
+              {{ $t('admin.person.twoFactorAuthentication.setUpShort') }}
+            </v-btn>
+          </SpshTooltip>
+        </v-col>
+      </v-row>
     </template>
 
     <template v-slot:default="{ isActive }">
@@ -268,4 +266,3 @@
     </template>
   </v-dialog>
 </template>
-<style></style>
