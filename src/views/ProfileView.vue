@@ -447,13 +447,13 @@
                       </v-col>
                     </v-container>
                   </v-card-text>
-
-                  <v-card-actions class="justify-center">
-                    <v-row class="justify-center">
+                  <v-card-actions class="d-flex justify-center">
+                    <v-row class="d-flex justify-center align-center">
                       <v-col
                         cols="12"
                         sm="6"
                         md="4"
+                        class="d-flex justify-center"
                       >
                         <v-btn
                           class="secondary button"
@@ -467,6 +467,7 @@
                         cols="12"
                         sm="6"
                         md="4"
+                        class="d-flex justify-center"
                       >
                         <v-btn
                           @click.stop="navigateToPasswordChange()"
@@ -502,13 +503,6 @@
           :headline-test-id="'two-factor-card'"
           :header="$t('profile.twoFactorAuth')"
         >
-          <v-row
-            v-if="twoFactorAuthenticationStore.hasToken === false"
-            align="center"
-            justify="center"
-            class="ma-3 ga-4"
-          >
-          </v-row>
           <v-row
             align="center"
             justify="center"
@@ -715,3 +709,9 @@
     </v-dialog>
   </template>
 </template>
+
+<style scoped>
+  * {
+    white-space: normal !important;
+  }
+</style>
