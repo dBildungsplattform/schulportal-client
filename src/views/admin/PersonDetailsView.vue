@@ -183,15 +183,15 @@
   }
 
   // translate keys and format attributes for display
-  const getLockInfo: ComputedRef<{ key: string; attribute: string }[]> = computed(() => {
+  const getuserLock: ComputedRef<{ key: string; attribute: string }[]> = computed(() => {
     if (!personStore.currentPerson?.person.isLocked) return [];
 
-    const { lockInfo }: Person = personStore.currentPerson.person;
-    if (!lockInfo) return [];
+    const { userLock }: Person = personStore.currentPerson.person;
+    if (!userLock) return [];
 
-    return Object.entries(lockInfo).map(([key, attribute]: [string, string]) => {
+    return Object.entries(userLock).map(([key, attribute]: [string, string]) => {
       switch (key) {
-        case LockKeys.LockedFrom:
+        case LockKeys.LockedBy:
           return {
             key: t('person.lockedBy'),
             attribute: organisationStore.lockingOrganisation
@@ -199,10 +199,18 @@
               : t('admin.organisation.unknownOrganisation'),
           };
 
-        case LockKeys.Timestamp:
-        case LockKeys.LockUntil:
+        case LockKeys.CreatedAt:
           return {
             key: t('since'),
+            attribute: new Intl.DateTimeFormat('de-DE', {
+              year: 'numeric',
+              month: '2-digit',
+              day: '2-digit',
+            }).format(new Date(attribute)),
+          };
+        case LockKeys.LockedUntil:
+          return {
+            key: t('person.lockedUntil'),
             attribute: new Intl.DateTimeFormat('de-DE', {
               year: 'numeric',
               month: '2-digit',
@@ -219,8 +227,8 @@
   watch(
     () => personStore.currentPerson?.person,
     async (person: Person | undefined) => {
-      if (!(person && person.isLocked && person.lockInfo)) return;
-      await organisationStore.getLockingOrganisationById(person.lockInfo.lock_locked_from);
+      if (!(person && person.isLocked && person.userLock)) return;
+      await organisationStore.getLockingOrganisationById(person.userLock.locked_by);
     },
   );
 
@@ -2081,8 +2089,7 @@
                 </v-row>
                 <v-row
                   class="mt-0"
-                  v-for="{ key, attribute } of getUserLock"
-                  <!-- v-for="({ key, attribute }, index) of getLockInfo" -->
+                  v-for="({ key, attribute }, index) of getuserLock"
                   :key="key"
                   cols="10"
                 >

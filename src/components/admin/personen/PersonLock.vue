@@ -1,28 +1,19 @@
 <script setup lang="ts">
-  import SpshTooltip from '@/components/admin/SpshTooltip.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
-  import { type Zuordnung } from '@/stores/PersonenkontextStore';
   import SpshTooltip from '@/components/admin/SpshTooltip.vue';
-  import {
-    useForm,
-    type BaseFieldProps,
-    type FormContext,
-    type FormValidationResult,
-    type TypedSchema,
-  } from 'vee-validate';
+  import { useForm, type BaseFieldProps, type FormContext, type TypedSchema } from 'vee-validate';
   import { DDMMYYYY } from '@/utils/validation';
   import { notInPast } from '@/utils/validationPersonenkontext';
   import { toTypedSchema } from '@vee-validate/yup';
-  import { object, string } from 'yup';
+  import { object, string, StringSchema, type AnyObject } from 'yup';
   import PersonLockInput from './PersonLockInput.vue';
   import { formatDateToISO } from '@/utils/date';
-  import { type Organisation } from '@/stores/OrganisationStore';
   import { type Personendatensatz } from '@/stores/PersonStore';
   import type { TranslatedObject } from '@/types';
   import { computed, ref, watch, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
+  import type { Organisation } from '@/stores/OrganisationStore';
 
   const { t }: Composer = useI18n({ useScope: 'global' });
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
@@ -47,12 +38,18 @@
     },
   });
 
+  const isUnbefristet: Ref<boolean> = ref(true);
   const validationSchema: TypedSchema = toTypedSchema(
     object({
-      selectedBefristung: string()
-        .required(t('admin.befristung.rules.required'))
-        .matches(DDMMYYYY, t('admin.befristung.rules.format'))
-        .test('notInPast', t('admin.befristung.rules.pastDateNotAllowed'), notInPast),
+      selectedBefristung: string().when([], {
+        is: () => !isUnbefristet.value,
+        then: (schema: StringSchema<string | undefined, AnyObject, undefined, ''>) =>
+          schema
+            .required(t('admin.befristung.rules.required'))
+            .matches(DDMMYYYY, t('admin.befristung.rules.format'))
+            .test('notInPast', t('admin.befristung.rules.pastDateNotAllowed'), notInPast),
+        otherwise: (schema: StringSchema<string | undefined, AnyObject, undefined, ''>) => schema.notRequired(),
+      }),
     }),
   );
 
@@ -65,11 +62,6 @@
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = formContext.defineField('selectedBefristung', vuetifyConfig);
 
-  const personStore: PersonStore = usePersonStore();
-  const organisationStore: OrganisationStore = useOrganisationStore();
-  const schulen: Ref<Array<{ value: string; title: string }>> = ref([]);
-  const selectedSchule: Ref<string | null> = ref(null);
-  const isUnbefristet: Ref<boolean> = ref(true);
   type Emits = {
     (event: 'onLockUser', id: string, lock: boolean, schule: string, date: string | undefined): void;
   };
@@ -104,27 +96,31 @@
   function resetBefristungFields(): void {
     isUnbefristet.value = true;
     formContext.resetField('selectedBefristung');
-    selectedBefristungProps.value.error = false;
-    selectedBefristungProps.value['error-messages'] = [];
   }
 
   function closeLockPersonDialog(isActive: Ref<boolean>): void {
     resetBefristungFields();
     isActive.value = false;
   }
-  function handleOnLockUser(id: string, isActive: Ref<boolean>): void {
-    if (!isUnbefristet.value) {
-      let { valid }: FormValidationResult<PersonLockForm, PersonLockForm> = await formContext.validate();
-      if (!valid) return;
-    }
+  // async function handleOnLockUser(isActive: Ref<boolean>): Promise<void> {
+  //   const lockingOrgId: string | null | undefined = props.person.person.isLocked
+  //     ? props.person.person.userLock?.locked_by
+  //     : selectedOrganisationId.value;
+  //   if (!lockingOrgId) return;
+  //   let dateISO: string | undefined = formatDateToISO(selectedBefristung.value);
+  //   emit('onLockUser', props.person.person.id, !props.person.person.isLocked, lockingOrgId, dateISO);
+  //   closeLockPersonDialog(isActive);
+  // }
+
+  const handleOnLockUser: (e?: Event | undefined) => Promise<void | undefined> = formContext.handleSubmit(() => {
     const lockingOrgId: string | null | undefined = props.person.person.isLocked
-      ? props.person.person.lockInfo?.lock_locked_from
+      ? props.person.person.userLock?.locked_by
       : selectedOrganisationId.value;
     if (!lockingOrgId) return;
     let dateISO: string | undefined = formatDateToISO(selectedBefristung.value);
-    emit('onLockUser', props.person.person.id, !props.person.person.isLocked, lockingOrgId);
+    emit('onLockUser', props.person.person.id, !props.person.person.isLocked, lockingOrgId, dateISO);
     closeLockPersonDialog(isActive);
-  }
+  });
 
   function handleChangeOrganisation(value: string): void {
     selectedOrganisation.value = value;
@@ -314,7 +310,7 @@
                   :block="mdAndDown"
                   class="primary button"
                   :disabled="!props.person.person.isLocked && !selectedOrganisation"
-                  @click.stop="handleOnLockUser(isActive)"
+                  @click.stop="onSubmit()"
                   data-testid="lock-user-button"
                 >
                   {{ !props.person.person.isLocked ? $t('person.lockUser') : $t('person.unlockUser') }}

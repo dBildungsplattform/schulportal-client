@@ -180,7 +180,7 @@
       "personalInfo": "Persönliche Informationen",
       "personalInfoChangeNotice": "Namensänderungen haben unmittelbare Auswirkungen auf den Benutzernamen im Schulportal SH und auf die E-Mail-Adresse! \n\nWeitere Informationen finden Sie auf der Homepage der IQSH-Medienberatung.",
       "personalInfoSuccessDialogMessage": "Die Stammdaten wurden erfolgreich geändert.",
-      "personalInfoSuccessDialogMessageWithUsername": "Die Stammdaten wurden erfolgreich geändert.\n\nDas Passwort wurde nicht verändert und kann wie zuvor verwendet werden. \n\nBitte teilen Sie der betroffenen Person die Stammdatenänderung (Benutzername, Mail-Adresse) mit. \n\nDie neuen Daten können Sie in der Gesamtübersicht einsehen." ,
+      "personalInfoSuccessDialogMessageWithUsername": "Die Stammdaten wurden erfolgreich geändert.\n\nDas Passwort wurde nicht verändert und kann wie zuvor verwendet werden. \n\nBitte teilen Sie der betroffenen Person die Stammdatenänderung (Benutzername, Mail-Adresse) mit. \n\nDie neuen Daten können Sie in der Gesamtübersicht einsehen.",
       "resetPasswordConfirmation": "Sind Sie sicher, dass Sie das Passwort für {firstname} {lastname} zurücksetzen möchten?",
       "resetPasswordInformation": "Bitte teilen Sie dem Benutzer das temporäre Passwort mit. Nach dem Schließen des Dialogs wird es aus Sicherheitsgründen nicht mehr angezeigt.",
       "resetPassword": "Passwort zurücksetzen",

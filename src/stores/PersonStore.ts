@@ -11,7 +11,6 @@ import {
   type DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response,
   type DBiamPersonenuebersichtResponse,
   type LockUserBodyParams,
-  type PersonByPersonalnummerBodyParams,
   type PersonenApiInterface,
   type PersonendatensatzResponse,
   type PersonenFrontendApiInterface,
