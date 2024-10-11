@@ -251,6 +251,28 @@
               "nullable": true,
               "type": "string"
             }
+          },
+          {
+            "name": "sortOrder",
+            "required": false,
+            "in": "query",
+            "description": "Order to sort by.",
+            "schema": {
+              "nullable": true,
+              "enum": ["asc", "desc"],
+              "type": "string"
+            }
+          },
+          {
+            "name": "sortField",
+            "required": false,
+            "in": "query",
+            "description": "Field to sort by.",
+            "schema": {
+              "nullable": true,
+              "enum": ["familienname", "vorname", "personalnummer", "referrer"],
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -555,14 +577,6 @@
             }
           },
           {
-            "name": "rolle",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "$ref": "#/components/schemas/Rolle"
-            }
-          },
-          {
             "name": "personenstatus",
             "required": false,
             "in": "query",
@@ -745,9 +759,50 @@
         ]
       }
     },
-    "/api/personen/{personId}/personalnummer": {
+    "/api/personen/{personId}/sync": {
+      "post": {
+        "operationId": "PersonController_syncPerson",
+        "parameters": [
+          {
+            "name": "personId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User will be synced."
+          },
+          "403": {
+            "description": "Insufficient permissions to perform operation."
+          },
+          "404": {
+            "description": "The person was not found."
+          },
+          "500": {
+            "description": "An internal server error occurred."
+          },
+          "502": {
+            "description": "A downstream server returned an error."
+          }
+        },
+        "tags": ["personen"],
+        "security": [
+          {
+            "oauth2": ["openid"]
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/personen/{personId}/metadata": {
       "patch": {
-        "operationId": "PersonController_updatePersonalnummer",
+        "operationId": "PersonController_updateMetadata",
         "parameters": [
           {
             "name": "personId",
@@ -765,14 +820,21 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/PersonByPersonalnummerBodyParams"
+                "$ref": "#/components/schemas/PersonMetadataBodyParams"
               }
             }
           }
         },
         "responses": {
-          "204": {
-            "description": "The personalnummer was successfully updated."
+          "200": {
+            "description": "The metadata for user was successfully updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PersonendatensatzResponse"
+                }
+              }
+            }
           },
           "400": {
             "description": "Request has a wrong format.",
@@ -785,13 +847,13 @@
             }
           },
           "401": {
-            "description": "Not authorized to update the personalnummer."
+            "description": "Not authorized to update the metadata."
           },
           "403": {
-            "description": "Not permitted to update the personalnummer."
+            "description": "Not permitted to update the metadata."
           },
           "500": {
-            "description": "Internal server error while updating the personalnummer."
+            "description": "Internal server error while updating the metadata for user."
           }
         },
         "tags": ["personen"],
@@ -896,6 +958,28 @@
             "description": "Search filter used to filter for Persons. It could be the vorname, familienname, referrer or the personalnummer.",
             "schema": {
               "nullable": true,
+              "type": "string"
+            }
+          },
+          {
+            "name": "sortOrder",
+            "required": false,
+            "in": "query",
+            "description": "Order to sort by.",
+            "schema": {
+              "nullable": true,
+              "enum": ["asc", "desc"],
+              "type": "string"
+            }
+          },
+          {
+            "name": "sortField",
+            "required": false,
+            "in": "query",
+            "description": "Field to sort by.",
+            "schema": {
+              "nullable": true,
+              "enum": ["familienname", "vorname", "personalnummer", "referrer"],
               "type": "string"
             }
           }
@@ -1247,6 +1331,7 @@
             "name": "organisationIds",
             "required": false,
             "in": "query",
+            "description": "Liefert Organisationen mit den angegebenen IDs, selbst wenn andere Filterkriterien nicht zutreffen (ODER-verknüpft mit anderen Kriterien).",
             "schema": {
               "type": "array",
               "items": {
@@ -2790,14 +2875,6 @@
             }
           },
           {
-            "name": "rolle",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "$ref": "#/components/schemas/Rolle"
-            }
-          },
-          {
             "name": "personenstatus",
             "required": false,
             "in": "query",
@@ -4139,10 +4216,6 @@
           "revision"
         ]
       },
-      "Rolle": {
-        "type": "string",
-        "enum": ["LERN", "LEHR", "EXTERN", "ORGADMIN", "LEIT", "SYSADMIN"]
-      },
       "Personenstatus": {
         "type": "string",
         "enum": ["AKTIV"]
@@ -4216,9 +4289,15 @@
         },
         "required": ["message"]
       },
-      "PersonByPersonalnummerBodyParams": {
+      "PersonMetadataBodyParams": {
         "type": "object",
         "properties": {
+          "familienname": {
+            "type": "string"
+          },
+          "vorname": {
+            "type": "string"
+          },
           "personalnummer": {
             "type": "string"
           },
@@ -4231,7 +4310,7 @@
             "type": "string"
           }
         },
-        "required": ["personalnummer", "lastModified", "revision"]
+        "required": ["familienname", "vorname", "lastModified", "revision"]
       },
       "DbiamPersonError": {
         "type": "object",
@@ -4245,7 +4324,7 @@
               "PERSON_NOT_FOUND",
               "DOWNSTREAM_UNREACHABLE",
               "PERSONALNUMMER_REQUIRED",
-              "NEWER_VERSION_OF_PERSONALNUMMER_AVAILABLE",
+              "NEWER_VERSION_OF_PERSON_AVAILABLE",
               "PERSONALNUMMER_NICHT_EINDEUTIG"
             ]
           },
@@ -4707,7 +4786,8 @@
           "SCHULEN_VERWALTEN",
           "KLASSEN_VERWALTEN",
           "SCHULTRAEGER_VERWALTEN",
-          "MIGRATION_DURCHFUEHREN"
+          "MIGRATION_DURCHFUEHREN",
+          "PERSON_SYNCHRONISIEREN"
         ]
       },
       "OrganisationByIdBodyParams": {
@@ -5217,10 +5297,17 @@
         },
         "required": ["personId", "organisationId", "rolleId", "befristung"]
       },
+      "PersonenkontextMigrationRuntype": {
+        "type": "string",
+        "enum": ["ITSLEARNING", "STANDARD"]
+      },
       "DbiamPersonenkontextMigrationBodyParams": {
         "type": "object",
         "properties": {
           "personId": {
+            "type": "string"
+          },
+          "username": {
             "type": "string"
           },
           "organisationId": {
@@ -5235,9 +5322,12 @@
           },
           "email": {
             "type": "string"
+          },
+          "migrationRunType": {
+            "$ref": "#/components/schemas/PersonenkontextMigrationRuntype"
           }
         },
-        "required": ["personId", "organisationId", "rolleId"]
+        "required": ["personId", "organisationId", "rolleId", "migrationRunType"]
       },
       "DbiamPersonenkontextError": {
         "type": "object",
