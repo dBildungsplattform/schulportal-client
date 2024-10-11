@@ -503,13 +503,6 @@
           :header="$t('profile.twoFactorAuth')"
         >
           <v-row
-            v-if="twoFactorAuthenticationStore.hasToken === false"
-            align="center"
-            justify="center"
-            class="ma-3 ga-4"
-          >
-          </v-row>
-          <v-row
             align="center"
             justify="center"
             class="ma-3 text-body"
@@ -542,7 +535,8 @@
                   ></v-icon>
                 </v-col>
                 <v-col>
-                  <p data-testid="two-factor-info">
+                  <p data-testid="two-factor-info"
+                  style="white-space: normal">
                     <template v-if="twoFactorAuthError">
                       {{ twoFactorAuthError }}
                     </template>
