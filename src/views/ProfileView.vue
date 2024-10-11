@@ -403,6 +403,7 @@
           data-testid="password-card"
           :headline-test-id="'new-password-card'"
           :header="$t('login.password')"
+          class="pb-4"
         >
           <v-row class="ma-3 d-flex align-content-center justify-center ga-4">
             <p
@@ -411,7 +412,9 @@
             >
               {{ t('profile.lastPasswordChange', { date: lastPasswordChangeDate }) }}
             </p>
-            <div>
+          </v-row>
+          <v-row class="d-flex align-center justify-center">
+            <v-col class="d-flex justify-center">
               <v-btn
                 class="primary"
                 data-testid="open-change-password-dialog"
@@ -419,70 +422,70 @@
               >
                 {{ $t('profile.changePassword') }}
               </v-btn>
-              <v-dialog
-                v-model="isPasswordResetDialogActive"
-                persistent
-              >
-                <LayoutCard
-                  :closable="true"
-                  :header="$t('profile.changePassword')"
-                  @onCloseClicked="closeChangePasswordDialog()"
-                >
-                  <v-card-text>
-                    <v-container class="d-flex align-center">
-                      <v-col
-                        cols="auto"
-                        class="d-flex justify-center"
-                      >
-                        <v-icon
-                          class="mr-2"
-                          size="x-large"
-                          icon="mdi-information-slab-circle-outline"
-                        ></v-icon>
-                      </v-col>
-                      <v-col>
-                        <p class="text-body bold">
-                          {{ $t('profile.changePasswordInfo') }}
-                        </p>
-                      </v-col>
-                    </v-container>
-                  </v-card-text>
-                  <v-card-actions class="d-flex justify-center">
-                    <v-row class="d-flex justify-center align-center">
-                      <v-col
-                        cols="12"
-                        sm="6"
-                        md="4"
-                        class="d-flex justify-center"
-                      >
-                        <v-btn
-                          class="secondary button"
-                          @click.stop="closeChangePasswordDialog()"
-                          data-testid="close-change-password-dialog-button"
-                        >
-                          {{ $t('cancel') }}
-                        </v-btn>
-                      </v-col>
-                      <v-col
-                        cols="12"
-                        sm="6"
-                        md="4"
-                        class="d-flex justify-center"
-                      >
-                        <v-btn
-                          @click.stop="navigateToPasswordChange()"
-                          class="primary"
-                          data-testid="change-password-button"
-                        >
-                          {{ $t('profile.changePassword') }}
-                        </v-btn>
-                      </v-col>
-                    </v-row>
-                  </v-card-actions>
-                </LayoutCard>
-              </v-dialog>
-            </div>
+            </v-col>
           </v-row>
+          <v-dialog
+            v-model="isPasswordResetDialogActive"
+            persistent
+          >
+            <LayoutCard
+              :closable="true"
+              :header="$t('profile.changePassword')"
+              @onCloseClicked="closeChangePasswordDialog()"
+            >
+              <v-card-text>
+                <v-container class="d-flex align-center">
+                  <v-col
+                    cols="1"
+                    class="d-flex justify-center"
+                  >
+                    <v-icon
+                      class="mr-2"
+                      size="x-large"
+                      icon="mdi-information-slab-circle-outline"
+                    ></v-icon>
+                  </v-col>
+                  <v-col>
+                    <p class="text-body bold">
+                      {{ $t('profile.changePasswordInfo') }}
+                    </p>
+                  </v-col>
+                </v-container>
+              </v-card-text>
+              <v-card-actions class="d-flex justify-center">
+                <v-row class="d-flex justify-center align-center">
+                  <v-col
+                    cols="12"
+                    sm="6"
+                    md="4"
+                    class="d-flex justify-center"
+                  >
+                    <v-btn
+                      class="secondary button w-100"
+                      @click.stop="closeChangePasswordDialog()"
+                      data-testid="close-change-password-dialog-button"
+                    >
+                      {{ $t('cancel') }}
+                    </v-btn>
+                  </v-col>
+                  <v-col
+                    cols="12"
+                    sm="6"
+                    md="4"
+                    class="d-flex justify-center"
+                  >
+                    <v-btn
+                      @click.stop="navigateToPasswordChange()"
+                      class="primary w-100"
+                      data-testid="change-password-button"
+                    >
+                      {{ $t('profile.changePassword') }}
+                    </v-btn>
+                  </v-col>
+                </v-row>
+              </v-card-actions>
+            </LayoutCard>
+          </v-dialog>
         </LayoutCard>
         <template v-if="loading2FA">
           <v-row
