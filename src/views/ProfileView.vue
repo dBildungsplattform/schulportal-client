@@ -447,13 +447,13 @@
                       </v-col>
                     </v-container>
                   </v-card-text>
-
-                  <v-card-actions class="justify-center">
-                    <v-row class="justify-center">
+                  <v-card-actions class="d-flex justify-center">
+                    <v-row class="d-flex justify-center align-center">
                       <v-col
                         cols="12"
                         sm="6"
                         md="4"
+                        class="d-flex justify-center"
                       >
                         <v-btn
                           class="secondary button"
@@ -467,6 +467,7 @@
                         cols="12"
                         sm="6"
                         md="4"
+                        class="d-flex justify-center"
                       >
                         <v-btn
                           @click.stop="navigateToPasswordChange()"
@@ -535,8 +536,7 @@
                   ></v-icon>
                 </v-col>
                 <v-col>
-                  <p data-testid="two-factor-info"
-                  style="white-space: normal">
+                  <p data-testid="two-factor-info">
                     <template v-if="twoFactorAuthError">
                       {{ twoFactorAuthError }}
                     </template>
@@ -709,3 +709,9 @@
     </v-dialog>
   </template>
 </template>
+
+<style scoped>
+  * {
+    white-space: normal !important;
+  }
+</style>
