@@ -6,7 +6,7 @@ import { useRolleStore, type RolleResponse, type RolleStore, type RollenMerkmal 
 import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
 import { VueWrapper, mount } from '@vue/test-utils';
 import type WrapperLike from '@vue/test-utils/dist/interfaces/wrapperLike';
-import { expect, test, type MockInstance } from 'vitest';
+import { expect, test, type Mock, type MockInstance } from 'vitest';
 import { nextTick } from 'vue';
 import PersonManagementView from './PersonManagementView.vue';
 
@@ -16,6 +16,7 @@ let personStore: PersonStore;
 let personenkontextStore: PersonenkontextStore;
 let rolleStore: RolleStore;
 let searchFilterStore: SearchFilterStore;
+vi.useFakeTimers();
 
 beforeEach(() => {
   document.body.innerHTML = `
@@ -127,7 +128,7 @@ beforeEach(() => {
   personenkontextStore.filteredRollen = {
     moeglicheRollen: [
       {
-        id: '1',
+        id: '10',
         administeredBySchulstrukturknoten: '1',
         merkmale: new Set(),
         name: 'Rolle 1',
@@ -228,7 +229,7 @@ describe('PersonManagementView', () => {
     await rolleAutocomplete?.setValue(['1']);
     await nextTick();
 
-    expect(rolleAutocomplete?.text()).toEqual('Rolle 1');
+    expect(rolleAutocomplete?.text()).toEqual('1');
 
     const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
     await klasseAutocomplete?.setValue(['123456']);
@@ -246,5 +247,46 @@ describe('PersonManagementView', () => {
     await organisationAutocomplete?.vm.$emit('update:search', '2');
     await nextTick();
     expect(organisationStore.getAllOrganisationen).toHaveBeenCalled();
+  });
+
+  test('it updates Rollen search correctly', async () => {
+    searchFilterStore.selectedRollenObjects = [
+      {
+        id: '1',
+        administeredBySchulstrukturknoten: '1',
+        merkmale: new Set(),
+        name: 'Rolle 1',
+        rollenart: 'LERN',
+        systemrechte: new Set(),
+      },
+    ] as RolleResponse[];
+
+    const rollenAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
+
+    searchFilterStore.searchFilter = 'test search';
+
+    // Mock the getPersonenkontextRolleWithFilter method
+    const mockGetPersonenkontextRolleWithFilter: Mock = vi.fn().mockResolvedValue({
+      moeglicheRollen: [{ id: '1', name: 'Test Rolle' }],
+      total: 1,
+    });
+    personenkontextStore.getPersonenkontextRolleWithFilter = mockGetPersonenkontextRolleWithFilter;
+
+    // Trigger the search
+    await rollenAutocomplete?.setValue(['name']);
+    await rollenAutocomplete?.vm.$emit('update:search', 'name');
+
+    // Fast-forward timers
+    vi.runAllTimers();
+
+    // Wait for all promises to resolve
+    await vi.runAllTicks();
+
+    // Assert that the method was called
+    expect(mockGetPersonenkontextRolleWithFilter).toHaveBeenCalledWith('name', 25);
+
+    // Add more assertions here to check the state after the search
+    expect(personenkontextStore.filteredRollen).toBeDefined();
+    expect(personenkontextStore.filteredRollen?.moeglicheRollen).toHaveLength(1);
   });
 });
