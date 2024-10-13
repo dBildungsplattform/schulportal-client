@@ -472,6 +472,7 @@
     "emailStatusDisabled": "deaktiviert",
     "emailStatusFailed": "fehlerhaft",
     "emailStatusUnknown": "Unbekannter Status",
+    "emailStatusActiveHover": "Das E-Mail-Konto ist aktiviert.",
     "emailStatusRequestedHover": "Das E-Mail-Konto wird zur Zeit angelegt. Dies kann einige Zeit in Anspruch nehmen. Bitte öffnen Sie die Gesamtübersicht zu einem späteren Zeitpunkt erneut, um die E-Mail-Adresse einzusehen.",
     "emailStatusDisabledHover": "Das E-Mail-Konto wurde deaktiviert.",
     "emailStatusFailedHover": "Bei Erstellung des E-Mail-Kontos ist ein Fehler aufgetreten. Bitte eröffnen Sie eine Fehlermeldung im Help-Desk System.",

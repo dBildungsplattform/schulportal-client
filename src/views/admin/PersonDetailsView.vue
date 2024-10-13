@@ -1077,7 +1077,7 @@
       case EmailStatus.Enabled:
         return {
           text: personStore.currentPerson.person.email.address,
-          tooltip: '',
+          tooltip: t('person.emailStatusActiveHover'),
         };
       case EmailStatus.Requested:
         return {
