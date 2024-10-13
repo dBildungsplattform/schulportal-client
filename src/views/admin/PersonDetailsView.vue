@@ -24,6 +24,7 @@
     type OrganisationStore,
   } from '@/stores/OrganisationStore';
   import {
+    EmailStatus,
     LockKeys,
     usePersonStore,
     type Person,
@@ -123,6 +124,7 @@
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
   let blockedNext: () => void = () => {};
   const calculatedBefristung: Ref<string | undefined> = ref('');
+  const loading: Ref<boolean> = ref(true);
 
   function navigateToPersonTable(): void {
     router.push({ name: 'person-management' });
@@ -1065,7 +1067,40 @@
     }
     return '';
   });
-  const loading: Ref<boolean> = ref(true);
+
+  // Computed property to define what will be shown in the field Email depending on the returned status.
+  const emailStatusText: ComputedRef<{
+    text: string;
+    tooltip: string;
+  }> = computed(() => {
+    switch (personStore.currentPerson?.person.email?.status) {
+      case EmailStatus.Enabled:
+        return {
+          text: personStore.currentPerson.person.email.address,
+          tooltip: '',
+        };
+      case EmailStatus.Requested:
+        return {
+          text: t('person.emailStatusRequested'),
+          tooltip: t('person.emailStatusRequestedHover'),
+        };
+      case EmailStatus.Disabled:
+        return {
+          text: t('person.emailStatusDisabled'),
+          tooltip: t('person.emailStatusDisabledHover'),
+        };
+      case EmailStatus.Failed:
+        return {
+          text: t('person.emailStatusFailed'),
+          tooltip: t('person.emailStatusFailedHover'),
+        };
+      default:
+        return {
+          text: t('person.emailStatusUnknown'),
+          tooltip: t('person.emailStatusUnknownHover'),
+        };
+    }
+  });
 
   onBeforeMount(async () => {
     personStore.resetState();
@@ -1271,6 +1306,42 @@
                 >
                   {{ personStore.currentPerson.person.personalnummer ?? $t('missing') }}
                 </span>
+              </v-col>
+            </v-row>
+            <!-- Email -->
+            <v-row
+              v-if="emailStatusText.text !== $t('person.emailStatusUnknown')"
+              class="mt-0"
+            >
+              <v-col cols="1"></v-col>
+              <v-col
+                class="text-right"
+                md="2"
+                sm="3"
+                cols="5"
+              >
+                <span class="subtitle-2"> {{ $t('person.email') }}: </span>
+              </v-col>
+              <v-col
+                cols="auto"
+                data-testid="person-email"
+              >
+                <SpshTooltip
+                  :enabledCondition="!!personStore.currentPerson.person.email"
+                  :disabledText="$t('person.changePersonMetaDataDisabledDescription')"
+                  :enabledText="emailStatusText.tooltip"
+                  position="bottom"
+                >
+                  <v-icon
+                    aria-hidden="true"
+                    class="mr-2"
+                    icon="mdi-alert-circle-outline"
+                    size="small"
+                  ></v-icon>
+                  <span class="text-body">
+                    {{ emailStatusText.text }}
+                  </span>
+                </SpshTooltip>
               </v-col>
             </v-row>
           </div>

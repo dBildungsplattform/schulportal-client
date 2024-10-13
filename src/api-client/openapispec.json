@@ -624,14 +624,6 @@
                         }
                     },
                     {
-                        "name": "rolle",
-                        "required": false,
-                        "in": "query",
-                        "schema": {
-                            "$ref": "#/components/schemas/Rolle"
-                        }
-                    },
-                    {
                         "name": "personenstatus",
                         "required": false,
                         "in": "query",
@@ -1443,6 +1435,7 @@
                         "name": "organisationIds",
                         "required": false,
                         "in": "query",
+                        "description": "Liefert Organisationen mit den angegebenen IDs, selbst wenn andere Filterkriterien nicht zutreffen (ODER-verknüpft mit anderen Kriterien).",
                         "schema": {
                             "type": "array",
                             "items": {
@@ -3094,14 +3087,6 @@
                         }
                     },
                     {
-                        "name": "rolle",
-                        "required": false,
-                        "in": "query",
-                        "schema": {
-                            "$ref": "#/components/schemas/Rolle"
-                        }
-                    },
-                    {
                         "name": "personenstatus",
                         "required": false,
                         "in": "query",
@@ -4308,6 +4293,30 @@
                     "VOLL"
                 ]
             },
+            "EmailAddressStatus": {
+                "type": "string",
+                "enum": [
+                    "ENABLED",
+                    "DISABLED",
+                    "REQUESTED",
+                    "FAILED"
+                ]
+            },
+            "PersonEmailResponse": {
+                "type": "object",
+                "properties": {
+                    "status": {
+                        "$ref": "#/components/schemas/EmailAddressStatus"
+                    },
+                    "address": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "status",
+                    "address"
+                ]
+            },
             "PersonResponse": {
                 "type": "object",
                 "properties": {
@@ -4371,6 +4380,15 @@
                         "format": "date-time",
                         "type": "string",
                         "description": "Date of the most recent changes for the person"
+                    },
+                    "email": {
+                        "nullable": true,
+                        "description": "Contains status and address. Returns email-address verified by OX (enabled) if available, otherwise returns most recently updated one (no prioritized status)",
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/PersonEmailResponse"
+                            }
+                        ]
                     }
                 },
                 "required": [
@@ -4388,7 +4406,8 @@
                     "personalnummer",
                     "isLocked",
                     "lockInfo",
-                    "lastModified"
+                    "lastModified",
+                    "email"
                 ]
             },
             "PersonendatensatzResponse": {
@@ -4518,17 +4537,6 @@
                     "sichtfreigabe",
                     "loeschung",
                     "revision"
-                ]
-            },
-            "Rolle": {
-                "type": "string",
-                "enum": [
-                    "LERN",
-                    "LEHR",
-                    "EXTERN",
-                    "ORGADMIN",
-                    "LEIT",
-                    "SYSADMIN"
                 ]
             },
             "Personenstatus": {
@@ -5760,10 +5768,20 @@
                     "befristung"
                 ]
             },
+            "PersonenkontextMigrationRuntype": {
+                "type": "string",
+                "enum": [
+                    "ITSLEARNING",
+                    "STANDARD"
+                ]
+            },
             "DbiamPersonenkontextMigrationBodyParams": {
                 "type": "object",
                 "properties": {
                     "personId": {
+                        "type": "string"
+                    },
+                    "username": {
                         "type": "string"
                     },
                     "organisationId": {
@@ -5778,12 +5796,16 @@
                     },
                     "email": {
                         "type": "string"
+                    },
+                    "migrationRunType": {
+                        "$ref": "#/components/schemas/PersonenkontextMigrationRuntype"
                     }
                 },
                 "required": [
                     "personId",
                     "organisationId",
-                    "rolleId"
+                    "rolleId",
+                    "migrationRunType"
                 ]
             },
             "DbiamPersonenkontextError": {
