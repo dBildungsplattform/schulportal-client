@@ -58,7 +58,7 @@
       </v-row>
       <v-row class="justify-center">
         <v-img
-          class="printableContent image-width"
+          class="printable-content image-width"
           :src="qrCodeImageBase64"
           max-width="250"
           data-testid="software-token-dialog-qr-code"
@@ -122,11 +122,11 @@
     body * {
       visibility: hidden;
     }
-    .printableContent,
-    .printableContent * {
+    .printable-content,
+    .printable-content * {
       visibility: visible;
     }
-    .printableContent {
+    .printable-content {
       position: absolute;
       left: 0;
       top: 0;
