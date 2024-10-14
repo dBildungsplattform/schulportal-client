@@ -280,6 +280,7 @@
       );
       if (missingOrgas.length > 0) {
         organisationStore.allOrganisationen = [...orgas, ...missingOrgas];
+        organisationStore.totalOrganisationen = organisationStore.totalOrganisationen - missingOrgas.length;
       }
     }, 500);
   }

@@ -1430,6 +1430,18 @@
                                 "type": "string"
                             }
                         }
+                    },
+                    {
+                        "name": "organisationIds",
+                        "required": false,
+                        "in": "query",
+                        "description": "Liefert Organisationen mit den angegebenen IDs, selbst wenn andere Filterkriterien nicht zutreffen (ODER-verknüpft mit anderen Kriterien).",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
                     }
                 ],
                 "responses": {
