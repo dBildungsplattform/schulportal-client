@@ -38,11 +38,11 @@ describe('TwoFactorAuthentificationStore', () => {
 
       mockadapter.onGet(`/api/2fa-token/state?personId=${personId}`).replyOnce(200, mockResponse);
       const get2FAStatePromise: Promise<void> = twoFactorAuthenticationStore.get2FAState(personId);
-      expect(twoFactorAuthenticationStore.loadingInitialState).toBe(true);
+      expect(twoFactorAuthenticationStore.loading).toBe(true);
       await get2FAStatePromise;
       expect(twoFactorAuthenticationStore.hasToken).toEqual(mockResponse.hasToken);
       expect(twoFactorAuthenticationStore.tokenKind).toEqual(mockResponse.tokenKind);
-      expect(twoFactorAuthenticationStore.loadingInitialState).toBe(false);
+      expect(twoFactorAuthenticationStore.loading).toBe(false);
     });
 
     it('should get 2FA state without token', async () => {
@@ -55,11 +55,11 @@ describe('TwoFactorAuthentificationStore', () => {
 
       mockadapter.onGet(`/api/2fa-token/state?personId=${personId}`).replyOnce(200, mockResponse);
       const get2FAStatePromise: Promise<void> = twoFactorAuthenticationStore.get2FAState(personId);
-      expect(twoFactorAuthenticationStore.loadingInitialState).toBe(true);
+      expect(twoFactorAuthenticationStore.loading).toBe(true);
       await get2FAStatePromise;
       expect(twoFactorAuthenticationStore.hasToken).toEqual(mockResponse.hasToken);
       expect(twoFactorAuthenticationStore.tokenKind).toEqual(null);
-      expect(twoFactorAuthenticationStore.loadingInitialState).toBe(false);
+      expect(twoFactorAuthenticationStore.loading).toBe(false);
     });
 
     it('unknown tokenkind maps to null', async () => {
@@ -72,11 +72,11 @@ describe('TwoFactorAuthentificationStore', () => {
 
       mockadapter.onGet(`/api/2fa-token/state?personId=${personId}`).replyOnce(200, mockResponse);
       const get2FAStatePromise: Promise<void> = twoFactorAuthenticationStore.get2FAState(personId);
-      expect(twoFactorAuthenticationStore.loadingInitialState).toBe(true);
+      expect(twoFactorAuthenticationStore.loading).toBe(true);
       await get2FAStatePromise;
       expect(twoFactorAuthenticationStore.hasToken).toEqual(mockResponse.hasToken);
       expect(twoFactorAuthenticationStore.tokenKind).toEqual(null);
-      expect(twoFactorAuthenticationStore.loadingInitialState).toBe(false);
+      expect(twoFactorAuthenticationStore.loading).toBe(false);
     });
 
     it('should handle string error', async () => {
@@ -84,10 +84,10 @@ describe('TwoFactorAuthentificationStore', () => {
 
       mockadapter.onGet(`/api/2fa-token/state?personId=${personId}`).replyOnce(500, 'some error');
       const get2FAStatePromise: Promise<void> = twoFactorAuthenticationStore.get2FAState(personId);
-      expect(twoFactorAuthenticationStore.loadingInitialState).toBe(true);
+      expect(twoFactorAuthenticationStore.loading).toBe(true);
       await get2FAStatePromise;
       expect(twoFactorAuthenticationStore.errorCode).toEqual('TOKEN_STATE_ERROR');
-      expect(twoFactorAuthenticationStore.loadingInitialState).toBe(false);
+      expect(twoFactorAuthenticationStore.loading).toBe(false);
     });
 
     it('should handle error code', async () => {
@@ -97,10 +97,10 @@ describe('TwoFactorAuthentificationStore', () => {
         .onGet(`/api/2fa-token/state?personId=${personId}`)
         .replyOnce(500, { i18nKey: 'some mock server error' });
       const get2FAStatePromise: Promise<void> = twoFactorAuthenticationStore.get2FAState(personId);
-      expect(twoFactorAuthenticationStore.loadingInitialState).toBe(true);
+      expect(twoFactorAuthenticationStore.loading).toBe(true);
       await get2FAStatePromise;
       expect(twoFactorAuthenticationStore.errorCode).toEqual('some mock server error');
-      expect(twoFactorAuthenticationStore.loadingInitialState).toBe(false);
+      expect(twoFactorAuthenticationStore.loading).toBe(false);
     });
   });
 
@@ -115,11 +115,11 @@ describe('TwoFactorAuthentificationStore', () => {
       mockadapter.onGet(url).replyOnce(200, mockResponse);
 
       const get2FAStatePromise: Promise<void> = twoFactorAuthenticationStore.get2FARequirement(personId);
-      expect(twoFactorAuthenticationStore.loadingInitialState).toBe(true);
+      expect(twoFactorAuthenticationStore.loading).toBe(true);
       await get2FAStatePromise;
 
       expect(twoFactorAuthenticationStore.required).toEqual(mockResponse.required);
-      expect(twoFactorAuthenticationStore.loadingInitialState).toBe(false);
+      expect(twoFactorAuthenticationStore.loading).toBe(false);
     });
 
     it('should handle string error', async () => {
@@ -127,10 +127,10 @@ describe('TwoFactorAuthentificationStore', () => {
 
       const get2FAStatePromise: Promise<void> = twoFactorAuthenticationStore.get2FARequirement(personId);
 
-      expect(twoFactorAuthenticationStore.loadingInitialState).toBe(true);
+      expect(twoFactorAuthenticationStore.loading).toBe(true);
       await get2FAStatePromise;
       expect(twoFactorAuthenticationStore.errorCode).toEqual('UNSPECIFIED_ERROR');
-      expect(twoFactorAuthenticationStore.loadingInitialState).toBe(false);
+      expect(twoFactorAuthenticationStore.loading).toBe(false);
     });
 
     it('should handle error code', async () => {
@@ -138,10 +138,10 @@ describe('TwoFactorAuthentificationStore', () => {
 
       const get2FAStatePromise: Promise<void> = twoFactorAuthenticationStore.get2FARequirement(personId);
 
-      expect(twoFactorAuthenticationStore.loadingInitialState).toBe(true);
+      expect(twoFactorAuthenticationStore.loading).toBe(true);
       await get2FAStatePromise;
       expect(twoFactorAuthenticationStore.errorCode).toEqual('some mock server error');
-      expect(twoFactorAuthenticationStore.loadingInitialState).toBe(false);
+      expect(twoFactorAuthenticationStore.loading).toBe(false);
     });
   });
 
