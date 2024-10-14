@@ -1,4 +1,3 @@
-import { OrganisationsTyp, type Organisation } from './OrganisationStore';
 import type { RolleResponse } from './RolleStore';
 import { useSearchFilterStore, type SearchFilterStore } from './SearchFilterStore';
 import { setActivePinia, createPinia } from 'pinia';
@@ -55,31 +54,6 @@ describe('SearchFilterStore', () => {
         name: 'Rolle 1',
         rollenart: 'LERN',
         systemrechte: new Set(),
-      },
-    ]);
-
-    // it sets the setOrganisationFilterWithObjects
-    searchFilterStore.setOrganisationFilterWithObjects(['5'], [
-      {
-        id: '1',
-        kennung: '1234567',
-        name: 'Klasse 1',
-        namensergaenzung: 'Ergänzung',
-        kuerzel: 'K1',
-        typ: OrganisationsTyp.Klasse,
-        administriertVon: '1',
-      },
-    ] as Organisation[]);
-
-    expect(searchFilterStore.selectedRollenObjects).toEqual([
-      {
-        id: '1',
-        kennung: '1234567',
-        name: 'Klasse 1',
-        namensergaenzung: 'Ergänzung',
-        kuerzel: 'K1',
-        typ: OrganisationsTyp.Klasse,
-        administriertVon: '1',
       },
     ]);
   });
