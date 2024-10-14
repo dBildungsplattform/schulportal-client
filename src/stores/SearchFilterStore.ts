@@ -1,4 +1,5 @@
 import { defineStore, type Store, type StoreDefinition } from 'pinia';
+import type { RolleResponse } from './RolleStore';
 
 type SearchFilterState = {
   klassenPage: number;
@@ -12,14 +13,22 @@ type SearchFilterState = {
   searchFilter: string | null;
   selectedKlassen: Array<string> | null;
   selectedRollen: Array<string> | null;
+  selectedRollenObjects: RolleResponse[];
   selectedOrganisationen: Array<string> | null;
+  sortField: string | null;
+  sortOrder: string | null;
+  currentSort: { key: string; order: 'asc' | 'desc' } | null;
 };
 
 type SearchFilterActions = {
   setKlasseFilter: (selectedKlassen: Array<string> | null) => Promise<void>;
   setRolleFilter: (selectedRollen: Array<string> | null) => Promise<void>;
+  setRolleFilterWithObjects: (selectedRollen: Array<string> | null, rollenObjects: RolleResponse[]) => Promise<void>;
   setOrganisationFilter: (selectedOrganisationen: Array<string> | null) => Promise<void>;
   setSearchFilter: (searchFilter: string | null) => Promise<void>;
+  setSortField: (sortField: string | null) => Promise<void>;
+  setSortOrder: (sortOrder: string | null) => Promise<void>;
+  setCurrentSort: (currentSort: { key: string; order: 'asc' | 'desc' } | null) => Promise<void>;
 };
 
 type SearchFilterGetters = {};
@@ -45,7 +54,11 @@ export const useSearchFilterStore: StoreDefinition<
     searchFilter: '',
     selectedKlassen: [],
     selectedRollen: [],
+    selectedRollenObjects: [],
     selectedOrganisationen: [],
+    sortField: '',
+    sortOrder: '',
+    currentSort: null,
   }),
   actions: {
     async setKlasseFilter(selectedKlassen: Array<string> | null) {
@@ -62,6 +75,23 @@ export const useSearchFilterStore: StoreDefinition<
 
     async setSearchFilter(searchFilter: string | null) {
       this.searchFilter = searchFilter;
+    },
+
+    async setSortField(sortField: string | null) {
+      this.sortField = sortField;
+    },
+
+    async setSortOrder(sortOrder: string | null) {
+      this.sortOrder = sortOrder;
+    },
+
+    async setCurrentSort(currentSort: { key: string; order: 'asc' | 'desc' } | null) {
+      this.currentSort = currentSort;
+    },
+
+    async setRolleFilterWithObjects(selectedRollen: Array<string> | null, rollenObjects: RolleResponse[]) {
+      this.selectedRollen = selectedRollen;
+      this.selectedRollenObjects = rollenObjects;
     },
   },
 });

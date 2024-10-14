@@ -43,8 +43,8 @@
       "deleteKlasseSuccessMessage": "Die Klasse {klassenname} an der Schule {schulname} wurde erfolgreich gelöscht.",
       "edit": "Klasse bearbeiten",
       "title": {
-        "KLASSENNAME_AN_SCHULE_EINDEUTIG": "Fehler bei Änderung der Klasse.",
-        "ORGANISATION_IST_BEREITS_ZUGEWIESEN_ERROR": "Fehler beim Löschen."
+        "KLASSENNAME_AN_SCHULE_EINDEUTIG": "Fehler bei Änderung der Klasse",
+        "ORGANISATION_IST_BEREITS_ZUGEWIESEN_ERROR": "Fehler beim Löschen"
       },
       "errors": {
         "KLASSE_ERROR": "Die Klasse konnte nicht geändert werden.",
@@ -101,7 +101,7 @@
       "addedSuccessfully": "{firstname} {lastname} wurde erfolgreich hinzugefügt.",
       "addNew": "Neuen Benutzer hinzufügen",
       "backToCreatePerson": "Zurück zur Benutzeranlage",
-      "backToForm": "Zurück zur Form",
+      "backToInput": "Zurück zur Eingabe",
       "changePassword": "Passwort ändern",
       "twoFactorAuthentication": {
         "setUpShort": "2FA einrichten",
@@ -204,10 +204,10 @@
         }
       },
       "title": {
-        "ERROR_LOADING_USER": "Fehler beim Laden des Benutzers.",
-        "PERSONALNUMMER_NICHT_EINDEUTIG": "KoPers.-Nr. nicht eindeutig.",
-        "PERSONALNUMMER_REQUIRED": "Personalnummer erforderlich.",
-        "PERSON_NOT_FOUND": "Benutzer gelöscht."
+        "ERROR_LOADING_USER": "Fehler beim Laden des Benutzers",
+        "PERSONALNUMMER_NICHT_EINDEUTIG": "KoPers.-Nr. nicht eindeutig",
+        "PERSONALNUMMER_REQUIRED": "Personalnummer erforderlich",
+        "PERSON_NOT_FOUND": "Benutzer gelöscht"
       },
       "errors": {
         "PERSONALNUMMER_NICHT_EINDEUTIG": "Die eingegebene KoPers.-Nr. ist bereits vergeben. Bitte korrigieren Sie Ihre Eingabe.",
@@ -222,11 +222,11 @@
     "personenkontext": {
       "creationErrorText": "Bei der Zuordnung des Personenkontextes ist ein Fehler aufgetreten. Bitte prüfen Sie die Zuordnungen am Benutzer.",
       "title": {
-        "COUNT_MISMATCHING": "Geänderte Daten.",
-        "NEWER_VERSION_OF_PERSONENKONTEXTE_AVAILABLE": "Geänderte Daten.",
+        "COUNT_MISMATCHING": "Geänderte Daten",
+        "NEWER_VERSION_OF_PERSONENKONTEXTE_AVAILABLE": "Geänderte Daten",
         "PERSONALNUMMER_NICHT_EINDEUTIG": "KoPers.-Nr. nicht eindeutig",
-        "PERSONENKONTEXTE_UPDATE_ERROR": "Geänderte Daten.",
-        "PERSON_NOT_FOUND": "Benutzer gelöscht."
+        "PERSONENKONTEXTE_UPDATE_ERROR": "Geänderte Daten",
+        "PERSON_NOT_FOUND": "Benutzer gelöscht"
       },
       "errors": {
         "COUNT_MISMATCHING": "Der Benutzer wurde zwischenzeitlich durch einen anderen Administrator bearbeitet. Bitte aktualisieren Sie die Daten und versuchen Sie es erneut.",
@@ -263,11 +263,11 @@
         "UPDATE_MERKMALE_ERROR": "Die gewünschte Bearbeitung kann nicht ausgeführt werden, da die Rolle noch Benutzern zugeordnet ist. Nehmen Sie bitte zunächst alle Zuordnungen zurück."
       },
       "title": {
-        "NEWER_VERSION_OF_ROLLE_AVAILABLE": "Die Rolle konnte nicht bearbeitet werden.",
-        "ROLLE_ERROR": "Fehler bei Erstellung der Rolle.",
-        "ROLLE_HAT_PERSONENKONTEXTE_ERROR": "Löschen nicht möglich.",
-        "ROLLE_UPDATE_ERROR": "Die Rolle konnte nicht bearbeitet werden.",
-        "UPDATE_MERKMALE_ERROR": "Die gewünschte Bearbeitung kann nicht ausgeführt werden, da die Rolle noch Benutzern zugeordnet ist. Nehmen Sie bitte zunächst alle Zuordnungen zurück."
+        "NEWER_VERSION_OF_ROLLE_AVAILABLE": "Die Rolle konnte nicht bearbeitet werden",
+        "ROLLE_ERROR": "Fehler bei Erstellung der Rolle",
+        "ROLLE_HAT_PERSONENKONTEXTE_ERROR": "Löschen nicht möglich",
+        "ROLLE_UPDATE_ERROR": "Die Rolle konnte nicht bearbeitet werden",
+        "UPDATE_MERKMALE_ERROR": "Die gewünschte Bearbeitung kann nicht ausgeführt werden, da die Rolle noch Benutzern zugeordnet ist. Nehmen Sie bitte zunächst alle Zuordnungen zurück"
       },
       "isAllowedToManageRollen": "Darf Rollen verwalten",
       "loadingErrorText": "Es konnten keine Rollendaten geladen werden.",
@@ -280,7 +280,8 @@
           "PERSONEN_VERWALTEN": "Darf Benutzer verwalten",
           "SCHULEN_VERWALTEN": "Darf Schulen verwalten",
           "KLASSEN_VERWALTEN": "Darf Klassen verwalten",
-          "SCHULTRAEGER_VERWALTEN": "Darf Schulträger verwalten"
+          "SCHULTRAEGER_VERWALTEN": "Darf Schulträger verwalten",
+          "PERSON_SYNCHRONISIEREN": "Darf Benutzer synchronisieren"
         },
         "rollenarten": {
           "LERN": "Lern",
@@ -405,7 +406,7 @@
     "NOT_FOUND": "Die aufgerufene Seite wurde nicht gefunden.",
     "UNKNOWN_USER": {
       "title": "Unbekannter Benutzer",
-      "text": "Der Benutzer ist im Schulportal SH nicht bekannt."
+      "text": "Der Benutzer ist im Schulportal SH nicht bekannt"
     }
   },
   "footer": {
