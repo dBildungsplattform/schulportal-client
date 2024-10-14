@@ -1,6 +1,5 @@
 import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import type { RolleResponse } from './RolleStore';
-import type { Organisation } from './OrganisationStore';
 
 type SearchFilterState = {
   klassenPage: number;
@@ -16,7 +15,6 @@ type SearchFilterState = {
   selectedRollen: Array<string> | null;
   selectedRollenObjects: RolleResponse[];
   selectedOrganisationen: Array<string> | null;
-  selectedOrganisationObjects: Organisation[];
   sortField: string | null;
   sortOrder: string | null;
   currentSort: { key: string; order: 'asc' | 'desc' } | null;
@@ -26,10 +24,6 @@ type SearchFilterActions = {
   setKlasseFilter: (selectedKlassen: Array<string> | null) => Promise<void>;
   setRolleFilter: (selectedRollen: Array<string> | null) => Promise<void>;
   setRolleFilterWithObjects: (selectedRollen: Array<string> | null, rollenObjects: RolleResponse[]) => Promise<void>;
-  setOrganisationFilterWithObjects: (
-    selectedOrganisation: Array<string> | null,
-    organisationObjects: Organisation[],
-  ) => Promise<void>;
   setOrganisationFilter: (selectedOrganisationen: Array<string> | null) => Promise<void>;
   setSearchFilter: (searchFilter: string | null) => Promise<void>;
   setSortField: (sortField: string | null) => Promise<void>;
@@ -62,7 +56,6 @@ export const useSearchFilterStore: StoreDefinition<
     selectedRollen: [],
     selectedRollenObjects: [],
     selectedOrganisationen: [],
-    selectedOrganisationObjects: [],
     sortField: '',
     sortOrder: '',
     currentSort: null,
@@ -99,14 +92,6 @@ export const useSearchFilterStore: StoreDefinition<
     async setRolleFilterWithObjects(selectedRollen: Array<string> | null, rollenObjects: RolleResponse[]) {
       this.selectedRollen = selectedRollen;
       this.selectedRollenObjects = rollenObjects;
-    },
-
-    async setOrganisationFilterWithObjects(
-      selectedOrganisationen: Array<string> | null,
-      organisationObjects: Organisation[],
-    ) {
-      this.selectedOrganisationen = selectedOrganisationen;
-      this.selectedOrganisationObjects = organisationObjects;
     },
   },
 });
