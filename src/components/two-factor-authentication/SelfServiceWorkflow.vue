@@ -254,8 +254,8 @@
                 :block="mdAndDown"
                 :class="
                   !twoFactorStore.errorCode || workflowStep == TwoFactorSteps.Verify
-                    ? 'secondary button'
-                    : 'primary button'
+                    ? 'secondary'
+                    : 'primary'
                 "
                 @click.stop="close2FADialog(isActive)"
                 data-testid="close-two-factor-authentication-dialog"
