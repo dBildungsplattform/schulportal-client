@@ -36,7 +36,7 @@ describe('PersonenkontextDelete', () => {
     expect(document.querySelector('[data-testid="zuordnung-delete-confirmation-text"]')).not.toBeNull();
 
     const closeDialogButton: HTMLElement | undefined = document.querySelector(
-      '[data-testid="close-person-delete-dialog-button"]',
+      '[data-testid="close-zuordnung-delete-dialog-button"]',
     ) as HTMLElement;
     closeDialogButton.click();
     await nextTick();
