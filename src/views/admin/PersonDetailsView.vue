@@ -1913,9 +1913,7 @@
             thickness="6"
           ></v-divider>
         </template>
-        <template
-          v-else-if="twoFactorAuthentificationStore.required && twoFactorAuthentificationStore.hasToken != null"
-        >
+        <template v-else-if="twoFactorAuthentificationStore.required">
           <v-divider
             class="border-opacity-100 rounded my-6 mx-4"
             color="#E5EAEF"
@@ -1949,6 +1947,15 @@
                       <template v-if="twoFactorAuthenticationConnectionError">
                         <p>
                           {{ twoFactorAuthenticationConnectionError }}
+                          <span v-if="twoFactorAuthentificationStore.errorCode === 'TOKEN_STATE_ERROR'">
+                            <a
+                              :href="t('admin.person.twoFactorAuthentication.errors.iqshHelpdeskLink')"
+                              rel="noopener noreferrer"
+                              target="_blank"
+                              >{{ $t('admin.person.twoFactorAuthentication.errors.iqshHelpdesk') }}</a
+                            >
+                            .
+                          </span>
                         </p>
                       </template>
                       <template v-else-if="twoFactorAuthentificationStore.hasToken">
@@ -1972,7 +1979,10 @@
                       </template>
                     </v-col>
                   </v-row>
-                  <v-row class="text-body">
+                  <v-row
+                    v-if="!twoFactorAuthenticationConnectionError"
+                    class="text-body"
+                  >
                     <v-col
                       class="text-right"
                       cols="1"
