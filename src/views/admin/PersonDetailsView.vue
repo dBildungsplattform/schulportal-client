@@ -1548,7 +1548,7 @@
                     >
                   </span>
                 </template>
-                <!-- Template  to show when the change Klasse is pending -->
+                <!-- Template to show when the change Klasse is pending -->
                 <template v-else-if="pendingChangeKlasse">
                   <div class="d-flex flex-column">
                     <span
