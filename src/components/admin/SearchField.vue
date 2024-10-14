@@ -48,6 +48,7 @@
     md="3"
   >
     <v-text-field
+      autocomplete="off"
       class="search-field"
       clearable
       data-testid="search-filter-input"
