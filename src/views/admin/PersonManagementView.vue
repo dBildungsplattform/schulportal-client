@@ -52,6 +52,7 @@
   const selectedStatus: Ref<string | null> = ref(null);
   const searchFilter: Ref<string> = ref('');
 
+  const selectedOrganisationObjects: Ref<Organisation[]> = ref([]);
   const selectedRollenObjects: Ref<RolleResponse[]> = ref([]);
   const sortField: Ref<string | null> = ref(null);
   const sortOrder: Ref<SortOrder | null> = ref(null);
@@ -70,7 +71,10 @@
   );
 
   const organisationen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
-    return organisationStore.allOrganisationen.map((org: Organisation) => ({
+    const orgas: Organisation[] = organisationStore.allOrganisationen;
+    const uniqueOrgas: Organisation[] = [...new Set([...orgas, ...selectedOrganisationObjects.value])];
+
+    return uniqueOrgas.map((org: Organisation) => ({
       value: org.id,
       // Only concatenate if the kennung is present (Should not be for LAND)
       title: org.kennung ? `${org.kennung} (${org.name})` : org.name,
@@ -181,6 +185,19 @@
 
   async function setOrganisationFilter(newValue: Array<string>): Promise<void> {
     await searchFilterStore.setOrganisationFilter(newValue);
+
+    // Update selectedOrganisationObjects based on the new selection
+    selectedOrganisationObjects.value = newValue
+      .map((orgaId: string) => {
+        const existingOrga: Organisation | undefined = organisationStore.allOrganisationen.find(
+          (o: Organisation) => o.id === orgaId,
+        );
+        return existingOrga;
+      })
+      .filter((organisation: Organisation | undefined): organisation is Organisation => organisation !== undefined);
+
+    await searchFilterStore.setOrganisationFilterWithObjects(newValue, selectedOrganisationObjects.value);
+    await searchFilterStore.setRolleFilterWithObjects(newValue, selectedRollenObjects.value);
     await searchFilterStore.setKlasseFilter([]);
     selectedKlassen.value = [];
     if (selectedOrganisation.value.length) {
@@ -242,19 +259,28 @@
     }, 500);
   }
 
-  function updateOrganisationSearch(searchValue: string): void {
+  async function updateOrganisationSearch(searchValue: string): Promise<void> {
     /* cancel pending call */
     clearTimeout(timerId);
 
     /* delay new call 500ms */
-    timerId = setTimeout(() => {
-      organisationStore.getAllOrganisationen({
+    timerId = setTimeout(async () => {
+      await organisationStore.getAllOrganisationen({
         searchString: searchValue,
         excludeTyp: [OrganisationsTyp.Klasse],
         limit: 25,
         systemrechte: ['PERSONEN_VERWALTEN'],
         organisationIds: selectedOrganisation.value,
       });
+
+      // If there are selected orgas not in the search results, add them to result
+      const orgas: Organisation[] = organisationStore.allOrganisationen;
+      const missingOrgas: Organisation[] = selectedOrganisationObjects.value.filter(
+        (orga: Organisation) => !orgas.some((o: Organisation) => o.id === orga.id),
+      );
+      if (missingOrgas.length > 0) {
+        organisationStore.allOrganisationen = [...orgas, ...missingOrgas];
+      }
     }, 500);
   }
 
@@ -324,6 +350,7 @@
       selectedRollen.value = searchFilterStore.selectedRollen || [];
       selectedKlassen.value = searchFilterStore.selectedKlassen || [];
       selectedRollenObjects.value = searchFilterStore.selectedRollenObjects;
+      selectedOrganisationObjects.value = searchFilterStore.selectedOrganisationObjects;
     }
 
     await organisationStore.getAllOrganisationen({

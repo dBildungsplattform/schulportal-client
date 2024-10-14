@@ -624,14 +624,6 @@
                         }
                     },
                     {
-                        "name": "rolle",
-                        "required": false,
-                        "in": "query",
-                        "schema": {
-                            "$ref": "#/components/schemas/Rolle"
-                        }
-                    },
-                    {
                         "name": "personenstatus",
                         "required": false,
                         "in": "query",
@@ -1430,17 +1422,6 @@
                     },
                     {
                         "name": "administriertVon",
-                        "required": false,
-                        "in": "query",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    {
-                        "name": "organisationIds",
                         "required": false,
                         "in": "query",
                         "schema": {
@@ -3094,14 +3075,6 @@
                         }
                     },
                     {
-                        "name": "rolle",
-                        "required": false,
-                        "in": "query",
-                        "schema": {
-                            "$ref": "#/components/schemas/Rolle"
-                        }
-                    },
-                    {
                         "name": "personenstatus",
                         "required": false,
                         "in": "query",
@@ -4520,17 +4493,6 @@
                     "revision"
                 ]
             },
-            "Rolle": {
-                "type": "string",
-                "enum": [
-                    "LERN",
-                    "LEHR",
-                    "EXTERN",
-                    "ORGADMIN",
-                    "LEIT",
-                    "SYSADMIN"
-                ]
-            },
             "Personenstatus": {
                 "type": "string",
                 "enum": [
@@ -5760,10 +5722,20 @@
                     "befristung"
                 ]
             },
+            "PersonenkontextMigrationRuntype": {
+                "type": "string",
+                "enum": [
+                    "ITSLEARNING",
+                    "STANDARD"
+                ]
+            },
             "DbiamPersonenkontextMigrationBodyParams": {
                 "type": "object",
                 "properties": {
                     "personId": {
+                        "type": "string"
+                    },
+                    "username": {
                         "type": "string"
                     },
                     "organisationId": {
@@ -5778,12 +5750,16 @@
                     },
                     "email": {
                         "type": "string"
+                    },
+                    "migrationRunType": {
+                        "$ref": "#/components/schemas/PersonenkontextMigrationRuntype"
                     }
                 },
                 "required": [
                     "personId",
                     "organisationId",
-                    "rolleId"
+                    "rolleId",
+                    "migrationRunType"
                 ]
             },
             "DbiamPersonenkontextError": {
