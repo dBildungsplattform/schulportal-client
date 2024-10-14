@@ -13,6 +13,7 @@ import { RollenMerkmal, RollenSystemRecht } from '@/stores/RolleStore';
 import { shallowMount, VueWrapper } from '@vue/test-utils';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import PersonDetailsView from './PersonDetailsView.vue';
+import { EmailAddressStatus } from '@/api-client/generated';
 // import { nextTick, type ComputedRef, type DefineComponent } from 'vue';
 // import type { TranslatedRolleWithAttrs } from '@/composables/useRollen';
 
@@ -37,6 +38,10 @@ const mockPerson: Personendatensatz = {
     lockInfo: null,
     revision: '1',
     lastModified: '2024-05-22',
+    email: {
+      address: 'email',
+      status: EmailAddressStatus.Enabled,
+    },
   },
 };
 
