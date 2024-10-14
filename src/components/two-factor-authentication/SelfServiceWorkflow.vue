@@ -175,7 +175,7 @@
                 class="justify-center"
               >
                 <v-img
-                  class="printableContent image-width"
+                  class="printable-content image-width"
                   :src="twoFactorStore.qrCode"
                   max-width="250"
                   data-testid="software-token-dialog-qr-code"
