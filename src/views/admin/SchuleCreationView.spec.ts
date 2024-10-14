@@ -4,7 +4,7 @@ import SchuleCreationView from './SchuleCreationView.vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import routes from '@/router/routes';
 import { nextTick } from 'vue';
-import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
+import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
 import type { OrganisationResponse } from '@/api-client/generated';
 
 let wrapper: VueWrapper | null = null;
@@ -19,6 +19,26 @@ beforeEach(async () => {
   `;
 
   organisationStore = useOrganisationStore();
+  organisationStore.schultraeger = [
+    {
+      id: '2',
+      name: 'Öffentliche Schulen',
+      namensergaenzung: 'Ergänzung',
+      kennung: null,
+      kuerzel: '',
+      typ: OrganisationsTyp.Land,
+      administriertVon: '1',
+    },
+    {
+      id: '3',
+      name: 'Ersatzschulen Schulen',
+      namensergaenzung: 'Ergänzung',
+      kennung: null,
+      kuerzel: '',
+      typ: OrganisationsTyp.Land,
+      administriertVon: '1',
+    },
+  ];
 
   router = createRouter({
     history: createWebHistory(),

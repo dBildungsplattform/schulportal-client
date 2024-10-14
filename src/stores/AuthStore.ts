@@ -41,6 +41,7 @@ type AuthState = {
   hasRollenverwaltungPermission: boolean;
   hasSchulverwaltungPermission: boolean;
   hasSchultraegerverwaltungPermission: boolean;
+  hasPersonenSyncPermission: boolean;
   isAuthed: boolean;
 };
 
@@ -65,6 +66,7 @@ export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, 
     hasRollenverwaltungPermission: false,
     hasSchulverwaltungPermission: false,
     hasSchultraegerverwaltungPermission: false,
+    hasPersonenSyncPermission: false,
     isAuthed: false,
   }),
   actions: {
@@ -96,6 +98,7 @@ export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, 
           this.hasRollenverwaltungPermission = this.currentUserPermissions.includes('ROLLEN_VERWALTEN');
           this.hasSchulverwaltungPermission = this.currentUserPermissions.includes('SCHULEN_VERWALTEN');
           this.hasSchultraegerverwaltungPermission = this.currentUserPermissions.includes('SCHULTRAEGER_VERWALTEN');
+          this.hasPersonenSyncPermission = this.currentUserPermissions.includes('PERSON_SYNCHRONISIEREN');
         } else {
           throw new Error('User info could not be retrieved.');
         }
