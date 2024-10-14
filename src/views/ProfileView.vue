@@ -505,7 +505,7 @@
           </v-row>
         </template>
         <LayoutCard
-          v-if="twoFactorAuthenticationStore.required"
+          v-else-if="twoFactorAuthenticationStore.required"
           :headline-test-id="'two-factor-card'"
           :header="$t('profile.twoFactorAuth')"
         >
