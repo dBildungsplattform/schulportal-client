@@ -536,7 +536,8 @@
     "success": "Erfolg",
     "errorMessage": "Es ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut.",
     "successFullPasswordChange": "Ihr Passwort wurde erfolgreich geändert.",
-    "errorPasswordChange": "Ihr Passwort konnte nicht geändert werden. Bitte versuchen Sie es später erneut."
+    "errorPasswordChange": "Ihr Passwort konnte nicht geändert werden. Bitte versuchen Sie es später erneut.",
+    "limitedUntil": "Befristet bis"
   },
   "save": "Speichern",
   "since": "Seit",
