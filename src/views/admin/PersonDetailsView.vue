@@ -2036,12 +2036,12 @@
               </template>
             </v-row>
           </v-container>
+          <v-divider
+            class="border-opacity-100 rounded my-6 mx-4"
+            color="#E5EAEF"
+            thickness="6"
+          ></v-divider>
         </template>
-        <v-divider
-          class="border-opacity-100 rounded my-6 mx-4"
-          color="#E5EAEF"
-          thickness="6"
-        ></v-divider>
         <v-container class="person-lock">
           <v-row class="ml-md-16">
             <v-col data-testid="person-lock-info">
