@@ -172,6 +172,12 @@ export interface CreateOrganisationBodyParams {
      * @memberof CreateOrganisationBodyParams
      */
     'traegerschaft'?: TraegerschaftTyp;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateOrganisationBodyParams
+     */
+    'emailAdress'?: string;
 }
 
 
@@ -554,7 +560,8 @@ export const DbiamOrganisationErrorI18nKeyEnum = {
     OrganisationIstBereitsZugewiesenError: 'ORGANISATION_IST_BEREITS_ZUGEWIESEN_ERROR',
     NameRequiredForKlasse: 'NAME_REQUIRED_FOR_KLASSE',
     NameEnthaeltLeerzeichen: 'NAME_ENTHAELT_LEERZEICHEN',
-    KennungEnthaeltLeerzeichen: 'KENNUNG_ENTHAELT_LEERZEICHEN'
+    KennungEnthaeltLeerzeichen: 'KENNUNG_ENTHAELT_LEERZEICHEN',
+    EmailAdressOnOrganisationTyp: 'EMAIL_ADRESS_ON_ORGANISATION_TYP'
 } as const;
 
 export type DbiamOrganisationErrorI18nKeyEnum = typeof DbiamOrganisationErrorI18nKeyEnum[keyof typeof DbiamOrganisationErrorI18nKeyEnum];
@@ -880,7 +887,13 @@ export interface LockUserBodyParams {
      * @type {string}
      * @memberof LockUserBodyParams
      */
-    'locked_from': string;
+    'locked_by': string;
+    /**
+     * Required if Befristung is set
+     * @type {string}
+     * @memberof LockUserBodyParams
+     */
+    'locked_until'?: string;
 }
 /**
  * 
@@ -1609,10 +1622,10 @@ export interface PersonResponse {
     'isLocked': boolean | null;
     /**
      * 
-     * @type {object}
+     * @type {UserLockParams}
      * @memberof PersonResponse
      */
-    'lockInfo': object | null;
+    'userLock': UserLockParams | null;
     /**
      * Date of the most recent changes for the person
      * @type {string}
@@ -2542,6 +2555,12 @@ export interface UpdateOrganisationBodyParams {
      * @memberof UpdateOrganisationBodyParams
      */
     'traegerschaft'?: TraegerschaftTyp;
+    /**
+     * 
+     * @type {string}
+     * @memberof UpdateOrganisationBodyParams
+     */
+    'emailAdress'?: string;
 }
 
 
@@ -2644,6 +2663,37 @@ export interface UpdateRolleBodyParams {
      * @memberof UpdateRolleBodyParams
      */
     'version': number;
+}
+/**
+ * 
+ * @export
+ * @interface UserLockParams
+ */
+export interface UserLockParams {
+    /**
+     * 
+     * @type {string}
+     * @memberof UserLockParams
+     */
+    'personId': string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserLockParams
+     */
+    'locked_by': string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserLockParams
+     */
+    'locked_until': string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserLockParams
+     */
+    'created_at': string | null;
 }
 /**
  * 
@@ -4358,7 +4408,7 @@ export const OrganisationenApiAxiosParamCreator = function (configuration?: Conf
          * @param {Array<RollenSystemRecht>} [systemrechte] 
          * @param {Array<OrganisationsTyp>} [excludeTyp] 
          * @param {Array<string>} [administriertVon] 
-         * @param {Array<string>} [organisationIds] 
+         * @param {Array<string>} [organisationIds] Liefert Organisationen mit den angegebenen IDs, selbst wenn andere Filterkriterien nicht zutreffen (ODER-verknüpft mit anderen Kriterien).
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -4816,7 +4866,7 @@ export const OrganisationenApiFp = function(configuration?: Configuration) {
          * @param {Array<RollenSystemRecht>} [systemrechte] 
          * @param {Array<OrganisationsTyp>} [excludeTyp] 
          * @param {Array<string>} [administriertVon] 
-         * @param {Array<string>} [organisationIds] 
+         * @param {Array<string>} [organisationIds] Liefert Organisationen mit den angegebenen IDs, selbst wenn andere Filterkriterien nicht zutreffen (ODER-verknüpft mit anderen Kriterien).
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -4966,7 +5016,7 @@ export const OrganisationenApiFactory = function (configuration?: Configuration,
          * @param {Array<RollenSystemRecht>} [systemrechte] 
          * @param {Array<OrganisationsTyp>} [excludeTyp] 
          * @param {Array<string>} [administriertVon] 
-         * @param {Array<string>} [organisationIds] 
+         * @param {Array<string>} [organisationIds] Liefert Organisationen mit den angegebenen IDs, selbst wenn andere Filterkriterien nicht zutreffen (ODER-verknüpft mit anderen Kriterien).
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -5107,7 +5157,7 @@ export interface OrganisationenApiInterface {
      * @param {Array<RollenSystemRecht>} [systemrechte] 
      * @param {Array<OrganisationsTyp>} [excludeTyp] 
      * @param {Array<string>} [administriertVon] 
-     * @param {Array<string>} [organisationIds] 
+     * @param {Array<string>} [organisationIds] Liefert Organisationen mit den angegebenen IDs, selbst wenn andere Filterkriterien nicht zutreffen (ODER-verknüpft mit anderen Kriterien).
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrganisationenApiInterface
@@ -5258,7 +5308,7 @@ export class OrganisationenApi extends BaseAPI implements OrganisationenApiInter
      * @param {Array<RollenSystemRecht>} [systemrechte] 
      * @param {Array<OrganisationsTyp>} [excludeTyp] 
      * @param {Array<string>} [administriertVon] 
-     * @param {Array<string>} [organisationIds] 
+     * @param {Array<string>} [organisationIds] Liefert Organisationen mit den angegebenen IDs, selbst wenn andere Filterkriterien nicht zutreffen (ODER-verknüpft mit anderen Kriterien).
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrganisationenApi
