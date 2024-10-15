@@ -172,6 +172,12 @@ export interface CreateOrganisationBodyParams {
      * @memberof CreateOrganisationBodyParams
      */
     'traegerschaft'?: TraegerschaftTyp;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateOrganisationBodyParams
+     */
+    'emailAdress'?: string;
 }
 
 
@@ -554,7 +560,8 @@ export const DbiamOrganisationErrorI18nKeyEnum = {
     OrganisationIstBereitsZugewiesenError: 'ORGANISATION_IST_BEREITS_ZUGEWIESEN_ERROR',
     NameRequiredForKlasse: 'NAME_REQUIRED_FOR_KLASSE',
     NameEnthaeltLeerzeichen: 'NAME_ENTHAELT_LEERZEICHEN',
-    KennungEnthaeltLeerzeichen: 'KENNUNG_ENTHAELT_LEERZEICHEN'
+    KennungEnthaeltLeerzeichen: 'KENNUNG_ENTHAELT_LEERZEICHEN',
+    EmailAdressOnOrganisationTyp: 'EMAIL_ADRESS_ON_ORGANISATION_TYP'
 } as const;
 
 export type DbiamOrganisationErrorI18nKeyEnum = typeof DbiamOrganisationErrorI18nKeyEnum[keyof typeof DbiamOrganisationErrorI18nKeyEnum];
@@ -2548,6 +2555,12 @@ export interface UpdateOrganisationBodyParams {
      * @memberof UpdateOrganisationBodyParams
      */
     'traegerschaft'?: TraegerschaftTyp;
+    /**
+     * 
+     * @type {string}
+     * @memberof UpdateOrganisationBodyParams
+     */
+    'emailAdress'?: string;
 }
 
 
