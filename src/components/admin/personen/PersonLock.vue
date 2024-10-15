@@ -110,23 +110,8 @@
       ? props.person.person.userLock?.locked_by
       : selectedOrganisationId.value;
     if (!lockingOrgId) return;
-    let date: string | undefined = formatDateToISO(selectedBefristung.value);
-    if (date) {
-      // Parse the UTC date
-      const utcDate: Date = new Date(date);
-
-      // Subtract one day. The reason to substract it here is because when the UTC time from the backend gets converted back to the local german date here, it shows the next day
-      // It's logical since we send the date in the first place as "31-07-2024 22H" UTC TIME which is "01-08-2024" 00H of the next day in MESZ (summer german time)
-      // but the user obviously doesn't want to know that.
-      if (utcDate.getTimezoneOffset() >= -120) {
-        // Check if the timezone offset is 2 hours (indicating MESZ)
-        // Subtract one day if in summer time (MESZ)
-        utcDate.setDate(utcDate.getDate() - 1);
-      }
-      date = utcDate.toLocaleDateString('de-DE');
-    }
-
-    emit('onLockUser', lockingOrgId, date);
+    let dateISO: string | undefined = formatDateToISO(selectedBefristung.value);
+    emit('onLockUser', lockingOrgId, dateISO);
     closeLockPersonDialog();
   }
   const onSubmit: (e?: Event | undefined) => Promise<void | undefined> = formContext.handleSubmit(() => {

@@ -84,7 +84,7 @@
         class="text-sm-center text-body"
       >
         <v-text-field
-          v-if="!(selectedRadioButton === RadioButtonSelect.BEFRISTET)"
+          v-if="!(selectedRadioButton === RadioButtonSelect.UNBEFRISTET)"
           density="compact"
           variant="outlined"
           data-testid="befristung-input"
