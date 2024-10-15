@@ -94,9 +94,8 @@ export const useTwoFactorAuthentificationStore: StoreDefinition<
         }
         this.serial = twoFactorState.serial;
       } catch (error: unknown) {
-        this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
+          this.errorCode = error.response?.data.i18nKey || 'TOKEN_STATE_ERROR';
         }
       } finally {
         this.loading = false;
@@ -134,9 +133,8 @@ export const useTwoFactorAuthentificationStore: StoreDefinition<
 
         this.qrCode = qrCodeImageBase64;
       } catch (error: unknown) {
-        this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
+          this.errorCode = error.response?.data.i18nKey || 'SOFTWARE_TOKEN_INITIALIZATION_ERROR';
         }
       } finally {
         this.loading = false;

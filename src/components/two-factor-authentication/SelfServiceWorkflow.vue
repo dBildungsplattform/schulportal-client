@@ -149,35 +149,47 @@
             </v-row>
           </v-container>
           <v-container v-if="workflowStep === TwoFactorSteps.QRCode">
-            <v-row class="text-body bold px-md-16">
-              <div class="v-col">
-                <p class="text-body">
-                  {{ $t('admin.person.twoFactorAuthentication.pleaseScan') }}
-                </p>
-              </div>
-            </v-row>
-            <v-row
-              v-if="twoFactorStore.qrCode.length === 0"
-              class="justify-center"
-            >
-              <v-progress-circular
-                size="250"
-                width="250"
-                indeterminate
+            <v-container v-if="!twoFactorStore.errorCode">
+              <v-row class="text-body bold px-md-16">
+                <div class="v-col">
+                  <p class="text-body">
+                    {{ $t('admin.person.twoFactorAuthentication.pleaseScan') }}
+                  </p>
+                </div>
+              </v-row>
+              <v-row
+                v-if="twoFactorStore.qrCode.length === 0"
+                class="justify-center"
               >
-              </v-progress-circular>
-            </v-row>
-            <v-row
-              v-if="twoFactorStore.qrCode.length > 0"
-              class="justify-center"
-            >
-              <v-img
-                class="printableContent image-width"
-                :src="twoFactorStore.qrCode"
-                max-width="250"
-                data-testid="software-token-dialog-qr-code"
-              />
-            </v-row>
+                <v-progress-circular
+                  size="250"
+                  width="250"
+                  indeterminate
+                >
+                </v-progress-circular>
+              </v-row>
+              <v-row
+                v-if="twoFactorStore.qrCode.length > 0"
+                class="justify-center"
+              >
+                <v-img
+                  class="printable-content image-width"
+                  :src="twoFactorStore.qrCode"
+                  max-width="250"
+                  data-testid="software-token-dialog-qr-code"
+                />
+              </v-row>
+            </v-container>
+            <v-container v-else>
+              <v-row>
+                <p
+                  class="text-body bold"
+                  data-testid="self-service-token-init-error-text"
+                >
+                  {{ $t('admin.person.twoFactorAuthentication.errors.selfServiceTokenInitError') }}
+                </p>
+              </v-row>
+            </v-container>
           </v-container>
           <v-container
             v-if="workflowStep === TwoFactorSteps.Verify"
@@ -223,6 +235,7 @@
                 <v-row
                   v-if="errorMessage.length === 0"
                   class="text-body bold justify-center"
+                  data-testid="self-service-token-verify-error-text"
                 >
                   <p class="justify-center">{{ $t('admin.person.twoFactorAuthentication.otp') }}</p>
                 </v-row>
@@ -239,7 +252,11 @@
             >
               <v-btn
                 :block="mdAndDown"
-                class="secondary button"
+                :class="
+                  !twoFactorStore.errorCode || workflowStep == TwoFactorSteps.Verify
+                    ? 'secondary'
+                    : 'primary'
+                "
                 @click.stop="close2FADialog(isActive)"
                 data-testid="close-two-factor-authentication-dialog"
               >
@@ -250,6 +267,7 @@
               cols="12"
               sm="6"
               md="4"
+              v-if="!twoFactorStore.errorCode || workflowStep == TwoFactorSteps.Verify"
             >
               <v-btn
                 :block="mdAndDown"

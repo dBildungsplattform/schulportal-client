@@ -1054,16 +1054,17 @@
   });
 
   const twoFactorAuthenticationConnectionError: ComputedRef<string> = computed(() => {
-    if (
-      twoFactorAuthentificationStore.errorCode == '500' ||
-      twoFactorAuthentificationStore.errorCode == '502' ||
-      twoFactorAuthentificationStore.errorCode == '503' ||
-      twoFactorAuthentificationStore.errorCode == '504' ||
-      twoFactorAuthentificationStore.errorCode == 'UNSPECIFIED_ERROR'
-    ) {
-      return t('admin.person.twoFactorAuthentication.errors.connection');
+    // Early return if loading
+    if (twoFactorAuthentificationStore.loading) return '';
+
+    switch (twoFactorAuthentificationStore.errorCode) {
+      case 'TOKEN_STATE_ERROR':
+        return t('admin.person.twoFactorAuthentication.errors.tokenStateError');
+      case 'PI_UNAVAILABLE_ERROR':
+        return t('admin.person.twoFactorAuthentication.errors.connection');
+      default:
+        return '';
     }
-    return '';
   });
   const loading: Ref<boolean> = ref(true);
 
@@ -1912,9 +1913,7 @@
             thickness="6"
           ></v-divider>
         </template>
-        <template
-          v-else-if="twoFactorAuthentificationStore.required && twoFactorAuthentificationStore.hasToken != null"
-        >
+        <template v-else-if="twoFactorAuthentificationStore.required">
           <v-divider
             class="border-opacity-100 rounded my-6 mx-4"
             color="#E5EAEF"
@@ -1948,6 +1947,15 @@
                       <template v-if="twoFactorAuthenticationConnectionError">
                         <p>
                           {{ twoFactorAuthenticationConnectionError }}
+                          <span v-if="twoFactorAuthentificationStore.errorCode === 'TOKEN_STATE_ERROR'">
+                            <a
+                              :href="t('admin.person.twoFactorAuthentication.errors.iqshHelpdeskLink')"
+                              rel="noopener noreferrer"
+                              target="_blank"
+                              >{{ $t('admin.person.twoFactorAuthentication.errors.iqshHelpdesk') }}</a
+                            >
+                            .
+                          </span>
                         </p>
                       </template>
                       <template v-else-if="twoFactorAuthentificationStore.hasToken">
@@ -1971,7 +1979,10 @@
                       </template>
                     </v-col>
                   </v-row>
-                  <v-row class="text-body">
+                  <v-row
+                    v-if="!twoFactorAuthenticationConnectionError"
+                    class="text-body"
+                  >
                     <v-col
                       class="text-right"
                       cols="1"
@@ -2035,12 +2046,12 @@
               </template>
             </v-row>
           </v-container>
+          <v-divider
+            class="border-opacity-100 rounded my-6 mx-4"
+            color="#E5EAEF"
+            thickness="6"
+          ></v-divider>
         </template>
-        <v-divider
-          class="border-opacity-100 rounded my-6 mx-4"
-          color="#E5EAEF"
-          thickness="6"
-        ></v-divider>
         <v-container class="person-lock">
           <v-row class="ml-md-16">
             <v-col data-testid="person-lock-info">

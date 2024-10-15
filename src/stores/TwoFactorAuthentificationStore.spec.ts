@@ -86,14 +86,16 @@ describe('TwoFactorAuthentificationStore', () => {
       const get2FAStatePromise: Promise<void> = twoFactorAuthenticationStore.get2FAState(personId);
       expect(twoFactorAuthenticationStore.loading).toBe(true);
       await get2FAStatePromise;
-      expect(twoFactorAuthenticationStore.errorCode).toEqual('UNSPECIFIED_ERROR');
+      expect(twoFactorAuthenticationStore.errorCode).toEqual('TOKEN_STATE_ERROR');
       expect(twoFactorAuthenticationStore.loading).toBe(false);
     });
 
     it('should handle error code', async () => {
       const personId: string = 'testUser';
 
-      mockadapter.onGet(`/api/2fa-token/state?personId=${personId}`).replyOnce(500, { code: 'some mock server error' });
+      mockadapter
+        .onGet(`/api/2fa-token/state?personId=${personId}`)
+        .replyOnce(500, { i18nKey: 'some mock server error' });
       const get2FAStatePromise: Promise<void> = twoFactorAuthenticationStore.get2FAState(personId);
       expect(twoFactorAuthenticationStore.loading).toBe(true);
       await get2FAStatePromise;
@@ -163,14 +165,14 @@ describe('TwoFactorAuthentificationStore', () => {
       const get2FASoftwareQRCodePromise: Promise<void> = twoFactorAuthenticationStore.get2FASoftwareQRCode(personId);
       expect(twoFactorAuthenticationStore.loading).toBe(true);
       await get2FASoftwareQRCodePromise;
-      expect(twoFactorAuthenticationStore.errorCode).toEqual('UNSPECIFIED_ERROR');
+      expect(twoFactorAuthenticationStore.errorCode).toEqual('SOFTWARE_TOKEN_INITIALIZATION_ERROR');
       expect(twoFactorAuthenticationStore.loading).toBe(false);
     });
 
     it('should handle error code', async () => {
       const personId: string = 'testUser';
 
-      mockadapter.onPost(`/api/2fa-token/init`).replyOnce(500, { code: 'some mock server error' });
+      mockadapter.onPost(`/api/2fa-token/init`).replyOnce(500, { i18nKey: 'some mock server error' });
       const get2FASoftwareQRCodePromise: Promise<void> = twoFactorAuthenticationStore.get2FASoftwareQRCode(personId);
       expect(twoFactorAuthenticationStore.loading).toBe(true);
       await get2FASoftwareQRCodePromise;
