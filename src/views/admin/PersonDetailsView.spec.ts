@@ -219,7 +219,6 @@ describe('PersonDetailsView', () => {
     // expect(wrapper?.find('[data-testid="person-vorname"]').text()).toBe('John');
     // expect(wrapper?.find('[data-testid="person-familienname"]').text()).toBe('Orton');
     // expect(wrapper?.find('[data-testid="person-username"]').text()).toBe('jorton');
-    // expect(wrapper?.find('[data-testid="person-username"]').text()).toBe('jorton');
     // expect(wrapper?.find('[data-testid="person-email"]').text()).toBe('email@email.com');
     // expect(wrapper?.getComponent({ name: 'PasswordReset' })).toBeTruthy();
   });
