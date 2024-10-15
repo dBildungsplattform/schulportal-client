@@ -166,7 +166,7 @@
                 :block="mdAndDown"
                 class="secondary button"
                 @click="printPassword"
-                data-testid="password-reset-button"
+                data-testid="password-print-button"
               >
                 {{ $t('admin.person.printPassword') }}
               </v-btn>
