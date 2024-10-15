@@ -1,7 +1,7 @@
 import { expect, test, type MockInstance, vi, describe, beforeEach } from 'vitest';
 import { VueWrapper, mount } from '@vue/test-utils';
 import KlasseCreationView from './KlasseCreationView.vue';
-import { createRouter, createWebHistory, type NavigationFailure, type RouteLocationRaw, type Router } from 'vue-router';
+import { createRouter, createWebHistory, type Router } from 'vue-router';
 import routes from '@/router/routes';
 import { nextTick } from 'vue';
 import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
@@ -77,10 +77,7 @@ describe('KlasseCreationView', () => {
   });
 
   test('it navigates back to klassen table', async () => {
-    const push: MockInstance<[to: RouteLocationRaw], Promise<void | NavigationFailure | undefined>> = vi.spyOn(
-      router,
-      'push',
-    );
+    const push: MockInstance = vi.spyOn(router, 'push');
     await wrapper?.find('[data-testid="close-layout-card-button"]').trigger('click');
     expect(push).toHaveBeenCalledTimes(1);
   });
