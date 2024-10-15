@@ -9,7 +9,7 @@ import {
   type RolleWithServiceProvidersResponse,
 } from '@/stores/RolleStore';
 import { nextTick } from 'vue';
-import { createRouter, createWebHistory, type NavigationFailure, type RouteLocationRaw, type Router } from 'vue-router';
+import { createRouter, createWebHistory, type Router } from 'vue-router';
 import routes from '@/router/routes';
 import type WrapperLike from '@vue/test-utils/dist/interfaces/wrapperLike';
 
@@ -124,10 +124,7 @@ describe('RolleManagementView', () => {
   });
 
   test('it routes to rolle details page', async () => {
-    const push: MockInstance<[to: RouteLocationRaw], Promise<void | NavigationFailure | undefined>> = vi.spyOn(
-      router,
-      'push',
-    );
+    const push: MockInstance = vi.spyOn(router, 'push');
 
     await wrapper?.find('.v-data-table__tr').trigger('click');
     await nextTick();
