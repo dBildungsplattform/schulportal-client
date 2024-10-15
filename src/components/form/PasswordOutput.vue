@@ -46,8 +46,8 @@
     <template v-slot:append-inner>
       <SpshTooltip
         :enabledCondition="showPassword"
-        :disabledText="$t('hidePassword')"
-        :enabledText="$t('showPassword')"
+        :disabledText="$t('showPassword')"
+        :enabledText="$t('hidePassword')"
         position="start"
       >
         <v-icon

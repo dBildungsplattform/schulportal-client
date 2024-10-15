@@ -46,14 +46,18 @@
   }
 
   const printPassword = (): void => {
-    const printWindow: WindowProxy | null = window.open('', '', 'height=700, width=900');
+    const printWindow: WindowProxy | null = window.open(
+      `${t('person.password')}`,
+      `${t('person.password')}`,
+      'height=700, width=900',
+    );
     if (printWindow) {
       printWindow.document.open();
       // Print only the password, CSS styling to remove any header/footer information from printed page
       printWindow.document.write(`
           <html>
           <head>
-            <title>Passwort</title>
+            <title>${t('person.password')}</title>
             <style>
                 @media print {
                   @page {
@@ -193,7 +197,7 @@
                 @click.stop="closePasswordResetDialog(isActive)"
                 data-testid="close-password-reset-dialog-button"
               >
-                {{ $t('cancel') }}
+                {{ $t('close') }}
               </v-btn>
               <v-btn
                 v-else
