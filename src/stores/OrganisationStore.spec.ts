@@ -676,7 +676,13 @@ describe('OrganisationStore', () => {
         typ: 'KLASSE';
         schuleDetails: string;
       }[] = [
-        { id: '1', administriertVon: '101', name: 'Klasse 1', typ: OrganisationsTyp.Klasse, schuleDetails: '---' },
+        {
+          id: '1',
+          administriertVon: '101',
+          name: 'Klasse 1',
+          typ: OrganisationsTyp.Klasse,
+          schuleDetails: '123456 (Schule 1)',
+        },
       ];
 
       // Set up initial state
@@ -685,11 +691,22 @@ describe('OrganisationStore', () => {
 
       mockadapter
         .onGet('/api/organisationen?limit=30&typ=SCHULE&systemrechte=SCHULEN_VERWALTEN&organisationIds=101')
-        .replyOnce(200, []);
+        .replyOnce(200, [
+          {
+            id: '101',
+            kennung: '123456',
+            name: 'Schule 1',
+            namensergaenzung: 'Ergänzung',
+            kuerzel: 'O1',
+            typ: OrganisationsTyp.Schule,
+            administriertVon: '1',
+          },
+        ]);
 
       const fetchSchuleDetailsForKlassenPromise: Promise<void> = organisationStore.fetchSchuleDetailsForKlassen(false);
       await fetchSchuleDetailsForKlassenPromise;
       expect(organisationStore.klassen).toEqual(mockKlassen);
+      expect(organisationStore.allKlassen[0]?.schuleDetails).toBe('123456 (Schule 1)');
       expect(organisationStore.loadingKlassen).toBe(false);
     });
   });
