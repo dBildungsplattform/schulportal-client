@@ -660,19 +660,33 @@
     () => !pendingCreation.value && !pendingDeletion.value && !pendingChangeKlasse.value,
   );
 
+  // Helper function to determine the existing RollenArt
+  function getExistingRollenArt(zuordnungen: Zuordnung[]): RollenArt | undefined {
+    const rollenIds: string[] = zuordnungen.map((zuordnung: Zuordnung) => zuordnung.rolleId);
+    const existingRollen: TranslatedRolleWithAttrs[] | undefined = rollen.value?.filter(
+      (rolle: TranslatedRolleWithAttrs) => rollenIds.includes(rolle.value),
+    );
+
+    if (existingRollen && existingRollen.length > 0) {
+      return existingRollen[0]?.rollenart;
+    }
+
+    return undefined;
+  }
+
   // Filter out the Rollen based on the user's existing Zuordnungen and selected organization
-  const filteredRollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = computed(() => {
+  const filteredRollen: ComputedRef = computed(() => {
     const existingZuordnungen: Zuordnung[] | undefined = personStore.personenuebersicht?.zuordnungen;
 
-    // If no existing Zuordnungen then just show all roles
+    // If no existing Zuordnungen then show all roles
     if (!existingZuordnungen || existingZuordnungen.length === 0) {
       return rollen.value;
     }
 
     const selectedOrgaId: string | undefined = selectedOrganisation.value;
 
-    // Determine if the user already has any LERN roles
-    const hasLernRolle: boolean = existingZuordnungen.some((zuordnung: Zuordnung) => isLernRolle(zuordnung.rolleId));
+    // Determine the existing RollenArt from Zuordnungen
+    const existingRollenArt: RollenArt | undefined = getExistingRollenArt(existingZuordnungen);
 
     // Filter out Rollen that the user already has in the selected organization
     return rollen.value?.filter((rolle: TranslatedRolleWithAttrs) => {
@@ -681,14 +695,13 @@
         (zuordnung: Zuordnung) => zuordnung.rolleId === rolle.value && zuordnung.sskId === selectedOrgaId,
       );
 
-      // If the user has any LERN roles, only allow LERN roles to be selected
-      if (hasLernRolle) {
-        // Allow LERN roles in other organizations, but filter them out for the selected organization
-        return !alreadyHasRolleInSelectedOrga && rolle.rollenart === RollenArt.Lern;
+      // If there's an existing RollenArt, only allow roles of that type
+      if (existingRollenArt) {
+        return !alreadyHasRolleInSelectedOrga && rolle.rollenart === existingRollenArt;
       }
 
-      // If the user doesn't have any LERN roles, allow any role that hasn't been assigned yet in the selected organization besides LERN.
-      return !alreadyHasRolleInSelectedOrga && rolle.rollenart !== RollenArt.Lern;
+      // If there's no existing RollenArt, allow any role that hasn't been assigned yet in the selected organization
+      return !alreadyHasRolleInSelectedOrga;
     });
   });
 
