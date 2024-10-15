@@ -143,6 +143,7 @@ personenkontextStore.workflowStepResponse = {
       systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
       administeredBySchulstrukturknotenName: 'Land SH',
       administeredBySchulstrukturknotenKennung: '',
+      version: 1,
     },
     {
       id: '1',
@@ -155,6 +156,7 @@ personenkontextStore.workflowStepResponse = {
       systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
       administeredBySchulstrukturknotenName: 'Land SH',
       administeredBySchulstrukturknotenKennung: '',
+      version: 1,
     },
   ],
   selectedOrganisation: 'string',
