@@ -239,7 +239,10 @@
         )
         .then(async (rolleResponse: RolleResponse) => {
           if (selectedServiceProviders.value && selectedServiceProviders.value.length > 0) {
-            await rolleStore.updateServiceProviderInRolle(rolleResponse.id, selectedServiceProviders.value);
+            await rolleStore.updateServiceProviderInRolle(rolleResponse.id, {
+              serviceProviderIds: selectedServiceProviders.value,
+              version: rolleStore.currentRolle?.version || 1,
+            });
           }
         });
       formContext.resetForm();
