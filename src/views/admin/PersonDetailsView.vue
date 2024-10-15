@@ -304,10 +304,6 @@
       };
     }
   };
-  async function navigateBackToKopersForm(): Promise<void> {
-    personStore.errorCode = '';
-    personenkontextStore.errorCode = '';
-  }
 
   const alertButtonText: ComputedRef<string> = computed(() => {
     return personenkontextStore.errorCode === 'PERSON_NOT_FOUND' ? t('nav.backToList') : t('refreshData');
@@ -321,12 +317,6 @@
     return personStore.errorCode === 'PERSONALNUMMER_NICHT_EINDEUTIG'
       ? t('admin.person.backToInput')
       : t('nav.backToList');
-  });
-
-  const alertButtonActionKopers: ComputedRef<() => void> = computed(() => {
-    return personStore.errorCode === 'PERSONALNUMMER_NICHT_EINDEUTIG'
-      ? navigateBackToKopersForm
-      : navigateToPersonTable;
   });
 
   function getSskName(sskDstNr: string | undefined, sskName: string): string {
@@ -572,6 +562,25 @@
       calculatedBefristung,
       selectedRolle,
     });
+
+  async function navigateBackToKopersForm(): Promise<void> {
+    const personalnummer: string | null | undefined = personStore.currentPerson?.person.personalnummer;
+    const vorname: string | undefined = personStore.currentPerson?.person.name.vorname;
+    const familienname: string | undefined = personStore.currentPerson?.person.name.familienname;
+
+    // Set the initial values of the person in the form again when navigating back to it after an error in the first submit.
+    setFieldValueChangePersonMetadata('selectedKopersNrMetadata', personalnummer ?? '');
+    setFieldValueChangePersonMetadata('selectedVorname', vorname ?? '');
+    setFieldValueChangePersonMetadata('selectedFamilienname', familienname ?? '');
+    personStore.errorCode = '';
+    personenkontextStore.errorCode = '';
+  }
+
+  const alertButtonActionKopers: ComputedRef<() => void> = computed(() => {
+    return personStore.errorCode === 'PERSONALNUMMER_NICHT_EINDEUTIG'
+      ? navigateBackToKopersForm
+      : navigateToPersonTable;
+  });
 
   // Triggers the template to start editing
   const triggerEdit = (): void => {
