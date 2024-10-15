@@ -42,7 +42,7 @@ beforeEach(async () => {
 });
 
 describe('KlasseDelete', () => {
-  test('it opens and closes the dialog', async () => {
+  test('it opens and closes the dialog via buttons', async () => {
     wrapper?.setProps({ useIconActivator: false });
     wrapper?.find('[data-testid="open-klasse-delete-dialog-button"]').trigger('click');
     await nextTick();
@@ -59,7 +59,7 @@ describe('KlasseDelete', () => {
     expect(document.querySelector('[data-testid="close-klasse-delete-dialog-button"]')).toBeNull();
   });
 
-  test('it opens the dialog with the icon activator', async () => {
+  test('it opens the dialog via icon activator and closes via layout card', async () => {
     wrapper?.setProps({ useIconActivator: true });
     await nextTick();
 
@@ -68,6 +68,11 @@ describe('KlasseDelete', () => {
 
     await document.querySelector('[data-testid="klasse-delete-confirmation-text"]');
     expect(document.querySelector('[data-testid="klasse-delete-confirmation-text"]')).not.toBeNull();
+
+    const closeDialogButton: HTMLElement = (await document.querySelector(
+      '[data-testid="close-layout-card-button"]',
+    )) as HTMLElement;
+    closeDialogButton.click();
   });
 
   test('it deletes a klasse and navigates back to management', async () => {
