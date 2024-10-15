@@ -4,6 +4,7 @@ import { mount, VueWrapper } from '@vue/test-utils';
 import { expect, test, type Mock } from 'vitest';
 import { nextTick } from 'vue';
 import PersonLock from './PersonLock.vue';
+import { EmailAddressStatus } from '@/api-client/generated';
 
 let wrapper: VueWrapper | null = null;
 
@@ -46,6 +47,10 @@ function getPersonendatensatz(locked: boolean): Personendatensatz {
           lock_timestamp: Date.now().toString(),
         }
       : null,
+    email: {
+      address: 'email',
+      status: EmailAddressStatus.Requested,
+    },
   };
   return { person };
 }

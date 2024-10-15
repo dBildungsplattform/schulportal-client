@@ -1,4 +1,4 @@
-import type { FindRollenResponse } from '@/api-client/generated/api';
+import { EmailAddressStatus, type FindRollenResponse } from '@/api-client/generated/api';
 import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
 import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
 import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
@@ -101,6 +101,10 @@ beforeEach(() => {
         lockInfo: null,
         revision: '1',
         lastModified: '2024-05-22',
+        email: {
+          address: 'email',
+          status: EmailAddressStatus.Requested,
+        },
       },
     },
     {
@@ -119,6 +123,10 @@ beforeEach(() => {
         lockInfo: null,
         revision: '1',
         lastModified: '2024-05-22',
+        email: {
+          address: 'email',
+          status: EmailAddressStatus.Requested,
+        },
       },
     },
   ];

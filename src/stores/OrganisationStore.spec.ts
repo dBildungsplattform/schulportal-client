@@ -650,9 +650,9 @@ describe('OrganisationStore', () => {
         id: string;
         administriertVon: string;
         name: string;
-        typ: "KLASSE";
+        typ: 'KLASSE';
         schuleDetails: string;
-    }[] = [
+      }[] = [
         { id: '1', administriertVon: '101', name: 'Klasse 1', typ: OrganisationsTyp.Klasse, schuleDetails: '---' },
       ];
 

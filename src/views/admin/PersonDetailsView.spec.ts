@@ -13,6 +13,7 @@ import { RollenMerkmal, RollenSystemRecht } from '@/stores/RolleStore';
 import { shallowMount, VueWrapper } from '@vue/test-utils';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import PersonDetailsView from './PersonDetailsView.vue';
+import { EmailAddressStatus } from '@/api-client/generated';
 // import { nextTick, type ComputedRef, type DefineComponent } from 'vue';
 // import type { TranslatedRolleWithAttrs } from '@/composables/useRollen';
 
@@ -37,6 +38,10 @@ const mockPerson: Personendatensatz = {
     lockInfo: null,
     revision: '1',
     lastModified: '2024-05-22',
+    email: {
+      address: 'email@email.com',
+      status: EmailAddressStatus.Enabled,
+    },
   },
 };
 
@@ -214,7 +219,7 @@ describe('PersonDetailsView', () => {
     // expect(wrapper?.find('[data-testid="person-vorname"]').text()).toBe('John');
     // expect(wrapper?.find('[data-testid="person-familienname"]').text()).toBe('Orton');
     // expect(wrapper?.find('[data-testid="person-username"]').text()).toBe('jorton');
-    // expect(wrapper?.find('[data-testid="person-zuordnung-1"]').text()).toBe('123456 (Testschule Birmingham): SuS 9a');
+    // expect(wrapper?.find('[data-testid="person-email"]').text()).toBe('email@email.com');
     // expect(wrapper?.getComponent({ name: 'PasswordReset' })).toBeTruthy();
   });
 
