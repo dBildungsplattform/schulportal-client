@@ -13,6 +13,9 @@ beforeEach(() => {
 
   wrapper = mount(SearchField, {
     attachTo: document.getElementById('app') || '',
+    props: {
+      hoverText: 'search',
+    },
     global: {
       components: {
         SearchField,
@@ -22,7 +25,13 @@ beforeEach(() => {
 });
 
 describe('SearchField', () => {
-  test.skip('it renders the search field', () => {
+  test('it renders the search field', () => {
     expect(wrapper?.find('[data-testid="apply-search-filter-button"]').isVisible()).toBe(true);
+  });
+
+  test('it sets filter value', () => {
+    wrapper?.find('[data-testid="search-filter-input"] input').setValue('test');
+    wrapper?.find('[data-testid="apply-search-filter-button"]').trigger('click');
+    expect(wrapper?.emitted('onApplySearchFilter')).toBeTruthy();
   });
 });

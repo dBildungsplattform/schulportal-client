@@ -1,5 +1,5 @@
 import { expect, test, type MockInstance } from 'vitest';
-import { mount, VueWrapper } from '@vue/test-utils';
+import { flushPromises, mount, VueWrapper } from '@vue/test-utils';
 import KlassenManagementView from './KlassenManagementView.vue';
 import { nextTick } from 'vue';
 import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
@@ -25,7 +25,7 @@ beforeEach(() => {
       administriertVon: '1',
     },
     {
-      id: '1',
+      id: '2',
       name: '9b',
       kennung: '9356494-9b',
       namensergaenzung: 'Klasse',
@@ -96,10 +96,11 @@ beforeEach(() => {
 });
 
 describe('KlassenManagementView', () => {
-  test('it renders klasse management view', () => {
+  test('it renders klasse management view', async () => {
     expect(wrapper?.getComponent({ name: 'ResultTable' })).toBeTruthy();
     expect(wrapper?.find('[data-testid="klasse-table"]').isVisible()).toBe(true);
-    // expect(wrapper?.findAll('.v-data-table__tr').length).toBe(2); // broken from main branch
+    await flushPromises();
+    expect(wrapper?.findAll('.v-data-table__tr').length).toBe(2);
   });
 
   test('it reloads data after changing page', async () => {

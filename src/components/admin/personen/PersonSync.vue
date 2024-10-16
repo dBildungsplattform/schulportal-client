@@ -99,7 +99,7 @@
         >
           <v-btn
             class="primary"
-            data-testid="open-person-sync-dialog-icon"
+            data-testid="open-person-sync-dialog-button"
             :disabled="disabled"
             v-bind="props"
             :block="mdAndDown"

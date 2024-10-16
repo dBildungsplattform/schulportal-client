@@ -2,12 +2,12 @@ import { expect, test } from 'vitest';
 import { VueWrapper, mount } from '@vue/test-utils';
 import { VApp } from 'vuetify/components';
 import { h } from 'vue';
-import TheHeader from './TheHeader.vue';
+import TheFooter from './TheFooter.vue';
+import { createRouter, createWebHistory, type Router } from 'vue-router';
+import routes from '@/router/routes';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
-import { createRouter, createWebHistory, type Router } from 'vue-router';
-import routes from '@/router/routes';
 
 beforeEach(async () => {
   document.body.innerHTML = `
@@ -28,18 +28,18 @@ beforeEach(async () => {
     attachTo: document.getElementById('app') || '',
     global: {
       components: {
-        TheHeader,
+        TheFooter,
       },
       plugins: [router],
     },
     slots: {
-      default: h(TheHeader),
+      default: h(TheFooter),
     },
   });
 });
 
-describe('TheHeader', () => {
-  test('it renders the header', () => {
-    expect(wrapper?.find('[data-testid="header"]').isVisible()).toBe(true);
+describe('TheFooter', () => {
+  test('it renders the footer', () => {
+    expect(wrapper?.find('[data-testid="footer"]').isVisible()).toBe(true);
   });
 });
