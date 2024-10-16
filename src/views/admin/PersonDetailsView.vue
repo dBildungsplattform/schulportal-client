@@ -463,11 +463,13 @@
   // Validation schema for the form for changing person metadata
   const changePersonMetadataValidationSchema: TypedSchema = toTypedSchema(
     object({
-      selectedKopersNrMetadata: string().when([], {
-        is: () => personStore.currentPerson?.person.personalnummer,
-        then: (schema: StringSchema) => schema.required(t('admin.person.rules.kopersNr.required')),
-        otherwise: (schema: StringSchema) => schema.notRequired(),
-      }),
+      selectedKopersNrMetadata: string()
+        .matches(NO_LEADING_TRAILING_SPACES, t('admin.person.rules.kopersNr.noLeadingTrailingSpaces'))
+        .when([], {
+          is: () => personStore.currentPerson?.person.personalnummer,
+          then: (schema: StringSchema) => schema.required(t('admin.person.rules.kopersNr.required')),
+          otherwise: (schema: StringSchema) => schema.notRequired(),
+        }),
       selectedVorname: string()
         .matches(DIN_91379A, t('admin.person.rules.vorname.matches'))
         .matches(NO_LEADING_TRAILING_SPACES, t('admin.person.rules.vorname.noLeadingTrailingSpaces'))
