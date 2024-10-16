@@ -107,6 +107,28 @@ describe('set up two-factor authentication', () => {
     expect(twoFactorAuthenticationStore.verify2FAToken).toHaveBeenCalled();
   });
 
+  test('test verify error message', async () => {
+    wrapper?.get('[data-testid="open-2FA-self-service-dialog-icon"]').trigger('click');
+    await nextTick();
+
+    const proceedButton: HTMLElement | undefined = document.querySelectorAll<HTMLElement>(
+      '[data-testid="proceed-two-factor-authentication-dialog"]',
+    )[0];
+
+    proceedButton?.click();
+    await nextTick();
+
+    proceedButton?.click();
+    await nextTick();
+
+    proceedButton?.click();
+    twoFactorAuthenticationStore.errorCode = 'error';
+    await nextTick();
+
+    await document.querySelector('[data-testid="self-service-otp-error-text"]');
+    expect(document.querySelector('[data-testid="self-service-otp-error-text"]')).not.toBeNull();
+  });
+
   test('closes the dialog when close button is clicked', async () => {
     wrapper?.get('[data-testid="open-2FA-self-service-dialog-icon"]').trigger('click');
     await nextTick();
