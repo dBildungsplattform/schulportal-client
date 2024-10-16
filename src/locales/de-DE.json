@@ -200,7 +200,8 @@
           "required": "Der Familienname ist erforderlich."
         },
         "kopersNr": {
-          "required": "Die KoPers.-Nr. ist erforderlich."
+          "required": "Die KoPers.-Nr. ist erforderlich.",
+          "noLeadingTrailingSpaces": "Die Kopers.-Nr. darf nicht mit Leerzeichen beginnen oder enden."
         }
       },
       "title": {
