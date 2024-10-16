@@ -41,6 +41,11 @@ router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormal
           return true;
         }
         return { path: 'not-found' };
+      case 'personenimport':
+        if (authStore.hasImportPermission) {
+          return true;
+        }
+        return { path: 'not-found' };
       case 'klassenverwaltung':
         if (authStore.hasKlassenverwaltungPermission) {
           return true;

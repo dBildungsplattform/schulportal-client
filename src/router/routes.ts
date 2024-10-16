@@ -41,6 +41,16 @@ const routes: readonly RouteRecordRaw[] = [
     },
   },
   {
+    path: '/admin/personen/import',
+    name: 'person-import',
+    component: () => import('../views/admin/PersonImportView.vue'),
+    meta: {
+      layout: 'AdminLayout',
+      requiresAuth: true,
+      requiresPermission: 'personenimport',
+    },
+  },
+  {
     path: '/admin/klassen',
     name: 'klasse-management',
     component: () => import('../views/admin/KlassenManagementView.vue'),
