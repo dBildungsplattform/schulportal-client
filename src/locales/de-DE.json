@@ -131,7 +131,7 @@
         "errors": {
           "SERIENNUMMER_NICHT_GEFUNDEN": "Die eingegebene Seriennummer konnte leider nicht gefunden werden. Vergewissern Sie sich bitte, dass Sie eine korrekte Seriennummer eingegeben haben.",
           "SERIENNUMMER_IN_VERWENDUNG": "Die eingegebene Seriennummer gehört zu einem Token, der bereits einem Benutzer zugeordnet ist. Bitte überprüfen Sie Ihre Eingaben und versuchen Sie es erneut.",
-          "OTP_NICHT_GUELTIG": "Ungültiges Einmalpasswort. Bitte versuchen Sie es erneut.",
+          "OTP_NICHT_GUELTIG": "Ungültiges Einmalpasswort. Bitte versuchen Sie es erneut oder wenden Sie sich an Ihre schulischen Administratorinnen oder Administratoren.",
           "HARDWARE_TOKEN_SERVICE_FEHLER": "Leider konnte ihr Hardware-Token aus technischen Gründen nicht aktiviert werden. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut. Falls das Problem bestehen bleibt, stellen Sie bitte eine Anfrage über den IQSH Helpdesk.--Link: https://www.secure-lernnetz.de/helpdesk/",
           "UNKNOWN_ERROR": "Ein unbekannter Fehler ist aufgetreten.",
           "TOKEN_RESET_ERROR": "Leider konnten wir Ihren Token aufgrund von technischen Problemen nicht zurücksetzen. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut. Falls das Problem bestehen bleibt, stellen Sie bitte eine Anfrage über den IQSH Helpdesk.  Link: https://www.secure-lernnetz.de/helpdesk/",
@@ -519,7 +519,7 @@
     "setNewPassword": "Neues Passwort setzen",
     "twoFactorAuth": "Zwei-Faktor-Authentifizierung",
     "setupTwoFactorAuth": "2-FA einrichten",
-    "infoAboutChangeabilityFromPersonalData": "Persönliche Daten sind nur durch Ihre schulischen Admins veränderbar",
+    "infoAboutChangeabilityFromPersonalData": "Persönliche Daten sind nur durch Ihre schulischen Admins veränderbar.",
     "yourSchuleAdminsAre": "Ihre schulischen Admins sind:",
     "koPersNummer": "Personalnummer",
     "koPersNummerAbbr": "KoPers.-Nr.",
