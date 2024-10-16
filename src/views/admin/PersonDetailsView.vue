@@ -1338,7 +1338,7 @@
                     icon="mdi-alert-circle-outline"
                     size="small"
                   ></v-icon>
-                  <span class="text-body">
+                  <span data-testid="person-email-text" class="text-body">
                     {{ emailStatusText.text }}
                   </span>
                 </SpshTooltip>
