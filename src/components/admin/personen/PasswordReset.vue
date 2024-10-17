@@ -58,22 +58,7 @@
           <html>
           <head>
             <title>${t('person.password')}</title>
-            <style>
-                @media print {
-                  @page {
-                    size: auto;
-                    margin: 0mm;
-                  }
-                  body {
-                    margin: 0;
-                  }
-                }
-                p { 
-                  font-size: 30px;
-                  text-align: center;
-                  line-height: 300px;
-                }
-            </style>
+            <link rel="stylesheet" href="./../../../styles/print.css">
           </head>
           <body>
               <p>${props.password}</p>
