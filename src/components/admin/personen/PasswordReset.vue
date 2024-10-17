@@ -44,6 +44,38 @@
     isActive.value = false;
     emit('onClearPassword');
   }
+
+  const printPassword = (): void => {
+    const printWindow: WindowProxy | null = window.open(
+      `${t('person.password')}`,
+      `${t('person.password')}`,
+      'height=700, width=900',
+    );
+    if (printWindow) {
+      printWindow.document.open();
+      // Print only the password, CSS styling to remove any header/footer information from printed page
+      printWindow.document.write(`
+          <html>
+          <head>
+            <title>${t('person.password')}</title>
+            <link rel="stylesheet" href="./../../../styles/print.css">
+          </head>
+          <body>
+              <p>${props.password}</p>
+          </body>
+          </html>
+      `);
+      printWindow.document.close();
+      printWindow.onafterprint = (): void => {
+        printWindow.close();
+      };
+      printWindow.print();
+      if (navigator.userAgent.includes('Firefox')) {
+        // Since Firefox does not seem to pick up "onafterprint" event
+        printWindow.close();
+      }
+    }
+  };
 </script>
 
 <template>
@@ -119,12 +151,23 @@
               md="4"
             >
               <v-btn
+                v-if="!!password"
                 :block="mdAndDown"
                 class="secondary button"
-                @click.stop="closePasswordResetDialog(isActive)"
-                data-testid="close-password-reset-dialog-button"
+                @click="printPassword"
+                data-testid="password-print-button"
               >
-                {{ !!password ? $t('close') : $t('cancel') }}
+                {{ $t('admin.person.printPassword') }}
+              </v-btn>
+              <v-btn
+                v-else
+                :block="mdAndDown"
+                class="primary button"
+                @click.stop="$emit('onResetPassword', person.person.id)"
+                data-testid="password-reset-button"
+                :disabled="!!password"
+              >
+                {{ $t('admin.person.resetPassword') }}
               </v-btn>
             </v-col>
             <v-col
@@ -133,13 +176,22 @@
               md="4"
             >
               <v-btn
+                v-if="!!password"
                 :block="mdAndDown"
                 class="primary button"
-                @click.stop="$emit('onResetPassword', person.person.id)"
-                data-testid="password-reset-button"
-                :disabled="!!password"
+                @click.stop="closePasswordResetDialog(isActive)"
+                data-testid="close-password-reset-dialog-button"
               >
-                {{ $t('admin.person.resetPassword') }}
+                {{ $t('close') }}
+              </v-btn>
+              <v-btn
+                v-else
+                :block="mdAndDown"
+                class="secondary button"
+                @click.stop="closePasswordResetDialog(isActive)"
+                data-testid="close-password-reset-dialog-button"
+              >
+                {{ $t('close') }}
               </v-btn>
             </v-col>
           </v-row>
