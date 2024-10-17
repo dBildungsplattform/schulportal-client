@@ -2,7 +2,7 @@ import { expect, test, type MockInstance } from 'vitest';
 import { nextTick } from 'vue';
 import { flushPromises, mount, VueWrapper } from '@vue/test-utils';
 import RolleCreationView from './RolleCreationView.vue';
-import { createRouter, createWebHistory, type NavigationFailure, type RouteLocationRaw, type Router } from 'vue-router';
+import { createRouter, createWebHistory, type Router } from 'vue-router';
 import routes from '@/router/routes';
 import {
   RollenMerkmal,
@@ -90,20 +90,14 @@ describe('RolleCreationView', () => {
   test('it renders an error', async () => {
     rolleStore.errorCode = 'ERROR_ERROR';
     await nextTick();
-    const push: MockInstance<[to: RouteLocationRaw], Promise<void | NavigationFailure | undefined>> = vi.spyOn(
-      router,
-      'push',
-    );
+    const push: MockInstance = vi.spyOn(router, 'push');
     wrapper?.find('[data-testid="alert-button"]').trigger('click');
     await nextTick();
     expect(push).toHaveBeenCalledTimes(1);
   });
 
   test('it closes the view and navigates back to rolle table', async () => {
-    const push: MockInstance<[to: RouteLocationRaw], Promise<void | NavigationFailure | undefined>> = vi.spyOn(
-      router,
-      'push',
-    );
+    const push: MockInstance = vi.spyOn(router, 'push');
     wrapper?.find('[data-testid="close-layout-card-button"]').trigger('click');
     await nextTick();
     expect(push).toHaveBeenCalledTimes(1);
@@ -151,6 +145,7 @@ describe('RolleCreationView', () => {
       id: '1',
       administeredBySchulstrukturknotenName: 'Land SH',
       administeredBySchulstrukturknotenKennung: '',
+      version: 1,
     };
 
     expect(
@@ -193,6 +188,7 @@ describe('RolleCreationView', () => {
       id: '1',
       administeredBySchulstrukturknotenName: 'Land SH',
       administeredBySchulstrukturknotenKennung: '',
+      version: 1,
     };
 
     rolleStore.createdRolle = mockRolle;
@@ -219,6 +215,7 @@ describe('RolleCreationView', () => {
       id: '1',
       administeredBySchulstrukturknotenName: 'Land SH',
       administeredBySchulstrukturknotenKennung: '',
+      version: 1,
     };
 
     rolleStore.createdRolle = mockRolle;
