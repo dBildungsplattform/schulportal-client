@@ -69,7 +69,7 @@
                   }
                 }
                 p { 
-                  font-size: 30;
+                  font-size: 30px;
                   text-align: center;
                   line-height: 300px;
                 }
