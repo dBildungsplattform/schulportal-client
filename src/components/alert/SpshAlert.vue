@@ -32,7 +32,7 @@
         :closable="closable"
         @click:close="closeAlert"
       >
-        <v-row>
+        <v-row class="v-alert__title">
           <v-col
             class="primary-text-color"
             cols="auto"
@@ -46,13 +46,14 @@
             cols="auto"
           >
             <span data-testid="alert-text">{{ text }}</span>
+            <slot name="text"></slot>
           </v-col>
         </v-row>
-        <v-row
-          v-if="showButton"
-          justify="center"
-        >
-          <v-col cols="auto">
+        <v-row justify="center">
+          <v-col
+            v-if="showButton"
+            cols="auto"
+          >
             <v-btn
               class="primary"
               @click="buttonAction"
@@ -61,6 +62,7 @@
               {{ buttonText }}
             </v-btn>
           </v-col>
+          <slot name="button"></slot>
         </v-row>
       </v-alert>
     </v-slide-y-transition>

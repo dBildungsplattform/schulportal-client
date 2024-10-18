@@ -1,3 +1,4 @@
+import { StepUpLevel } from '@/stores/AuthStore';
 import type { RouteRecordRaw } from 'vue-router';
 
 const routes: readonly RouteRecordRaw[] = [
@@ -8,6 +9,7 @@ const routes: readonly RouteRecordRaw[] = [
     meta: {
       layout: 'DefaultLayout',
       requiresAuth: false,
+      requiredStepUpLevel: StepUpLevel.NONE,
     },
   },
   {
@@ -17,6 +19,7 @@ const routes: readonly RouteRecordRaw[] = [
     meta: {
       layout: 'AdminLayout',
       requiresAuth: true,
+      requiredStepUpLevel: StepUpLevel.GOLD,
       requiresPermission: 'personenverwaltung',
     },
   },
@@ -27,6 +30,7 @@ const routes: readonly RouteRecordRaw[] = [
     meta: {
       layout: 'AdminLayout',
       requiresAuth: true,
+      requiredStepUpLevel: StepUpLevel.GOLD,
       requiresPermission: 'personenverwaltung',
     },
   },
@@ -37,6 +41,7 @@ const routes: readonly RouteRecordRaw[] = [
     meta: {
       layout: 'AdminLayout',
       requiresAuth: true,
+      requiredStepUpLevel: StepUpLevel.GOLD,
       requiresPermission: 'personenverwaltung',
     },
   },
@@ -47,6 +52,7 @@ const routes: readonly RouteRecordRaw[] = [
     meta: {
       requiresAuth: true,
       layout: 'AdminLayout',
+      requiredStepUpLevel: StepUpLevel.GOLD,
       requiresPermission: 'klassenverwaltung',
     },
   },
@@ -57,6 +63,7 @@ const routes: readonly RouteRecordRaw[] = [
     meta: {
       layout: 'AdminLayout',
       requiresAuth: true,
+      requiredStepUpLevel: StepUpLevel.GOLD,
       requiresPermission: 'klassenverwaltung',
     },
   },
@@ -67,6 +74,7 @@ const routes: readonly RouteRecordRaw[] = [
     meta: {
       layout: 'AdminLayout',
       requiresAuth: true,
+      requiredStepUpLevel: StepUpLevel.GOLD,
       requiresPermission: 'klassenverwaltung',
     },
   },
@@ -77,6 +85,7 @@ const routes: readonly RouteRecordRaw[] = [
     meta: {
       layout: 'AdminLayout',
       requiresAuth: true,
+      requiredStepUpLevel: StepUpLevel.GOLD,
       requiresPermission: 'rollenverwaltung',
     },
   },
@@ -87,6 +96,7 @@ const routes: readonly RouteRecordRaw[] = [
     meta: {
       layout: 'AdminLayout',
       requiresAuth: true,
+      requiredStepUpLevel: StepUpLevel.GOLD,
       requiresPermission: 'rollenverwaltung',
     },
   },
@@ -97,6 +107,7 @@ const routes: readonly RouteRecordRaw[] = [
     meta: {
       layout: 'AdminLayout',
       requiresAuth: true,
+      requiredStepUpLevel: StepUpLevel.GOLD,
       requiresPermission: 'rollenverwaltung',
     },
   },
@@ -107,6 +118,7 @@ const routes: readonly RouteRecordRaw[] = [
     meta: {
       layout: 'AdminLayout',
       requiresAuth: true,
+      requiredStepUpLevel: StepUpLevel.GOLD,
       requiresPermission: 'schulverwaltung',
     },
   },
@@ -117,6 +129,7 @@ const routes: readonly RouteRecordRaw[] = [
     meta: {
       layout: 'AdminLayout',
       requiresAuth: true,
+      requiredStepUpLevel: StepUpLevel.GOLD,
       requiresPermission: 'schulverwaltung',
     },
   },
@@ -127,6 +140,7 @@ const routes: readonly RouteRecordRaw[] = [
     meta: {
       layout: 'DefaultLayout',
       requiresAuth: true,
+      requiredStepUpLevel: StepUpLevel.SILVER,
     },
   },
   {
@@ -141,12 +155,18 @@ const routes: readonly RouteRecordRaw[] = [
     meta: {
       layout: 'DefaultLayout',
       requiresAuth: true,
+      requiredStepUpLevel: StepUpLevel.SILVER,
     },
   },
   {
     path: '/:pathMatch(.*)*',
     name: 'not-found',
     component: () => import('../views/NotFoundView.vue'),
+  },
+  {
+    path: '/no-second-factor',
+    name: 'no-second-factor',
+    component: () => import('../views/NoSecondFactorView.vue'),
   },
 ];
 
