@@ -371,6 +371,7 @@
           "required": "Der Schulname muss angegeben werden."
         }
       },
+      "selectSchule": "Schule auswählen",
       "selectSchuleFirst": "Bitte erst eine Schule auswählen.",
       "schule": "Schule",
       "schulenFound": "{count} Schule gefunden | {count} Schulen gefunden",

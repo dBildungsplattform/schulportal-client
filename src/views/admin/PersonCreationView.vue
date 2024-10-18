@@ -423,7 +423,9 @@
 
       <!-- The form to create a new Person  -->
       <template
-        v-if="!personenkontextStore.createdPersonWithKontext && !personStore.errorCode && !personenkontextStore.errorCode"
+        v-if="
+          !personenkontextStore.createdPersonWithKontext && !personStore.errorCode && !personenkontextStore.errorCode
+        "
       >
         <FormWrapper
           :canCommit="canCommit"
@@ -525,7 +527,9 @@
 
       <!-- Result template on success after submit  -->
       <template
-        v-if="personenkontextStore.createdPersonWithKontext && !personStore.errorCode && !personenkontextStore.errorCode"
+        v-if="
+          personenkontextStore.createdPersonWithKontext && !personStore.errorCode && !personenkontextStore.errorCode
+        "
       >
         <v-container>
           <v-row justify="center">
