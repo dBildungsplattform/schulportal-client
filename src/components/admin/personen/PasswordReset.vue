@@ -60,7 +60,7 @@
           <html>
           <head>
             <title>${t('person.password')}</title>
-            <style nonce=${cspNonce}>
+            <style nonce="${cspNonce}">
               @media print {
                 @page {
                   size: auto;
@@ -80,6 +80,7 @@
           </head>
           <body>
               <p>${props.password}</p>
+              <p>${cspNonce}</p>
           </body>
           </html>
       `);
