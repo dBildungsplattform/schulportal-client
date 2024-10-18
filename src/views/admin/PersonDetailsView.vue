@@ -304,10 +304,6 @@
       };
     }
   };
-  async function navigateBackToKopersForm(): Promise<void> {
-    personStore.errorCode = '';
-    personenkontextStore.errorCode = '';
-  }
 
   const alertButtonText: ComputedRef<string> = computed(() => {
     return personenkontextStore.errorCode === 'PERSON_NOT_FOUND' ? t('nav.backToList') : t('refreshData');
@@ -321,12 +317,6 @@
     return personStore.errorCode === 'PERSONALNUMMER_NICHT_EINDEUTIG'
       ? t('admin.person.backToInput')
       : t('nav.backToList');
-  });
-
-  const alertButtonActionKopers: ComputedRef<() => void> = computed(() => {
-    return personStore.errorCode === 'PERSONALNUMMER_NICHT_EINDEUTIG'
-      ? navigateBackToKopersForm
-      : navigateToPersonTable;
   });
 
   function getSskName(sskDstNr: string | undefined, sskName: string): string {
@@ -473,11 +463,13 @@
   // Validation schema for the form for changing person metadata
   const changePersonMetadataValidationSchema: TypedSchema = toTypedSchema(
     object({
-      selectedKopersNrMetadata: string().when([], {
-        is: () => personStore.currentPerson?.person.personalnummer,
-        then: (schema: StringSchema) => schema.required(t('admin.person.rules.kopersNr.required')),
-        otherwise: (schema: StringSchema) => schema.notRequired(),
-      }),
+      selectedKopersNrMetadata: string()
+        .matches(NO_LEADING_TRAILING_SPACES, t('admin.person.rules.kopersNr.noLeadingTrailingSpaces'))
+        .when([], {
+          is: () => personStore.currentPerson?.person.personalnummer,
+          then: (schema: StringSchema) => schema.required(t('admin.person.rules.kopersNr.required')),
+          otherwise: (schema: StringSchema) => schema.notRequired(),
+        }),
       selectedVorname: string()
         .matches(DIN_91379A, t('admin.person.rules.vorname.matches'))
         .matches(NO_LEADING_TRAILING_SPACES, t('admin.person.rules.vorname.noLeadingTrailingSpaces'))
@@ -572,6 +564,25 @@
       calculatedBefristung,
       selectedRolle,
     });
+
+  async function navigateBackToKopersForm(): Promise<void> {
+    const personalnummer: string | null | undefined = personStore.currentPerson?.person.personalnummer;
+    const vorname: string | undefined = personStore.currentPerson?.person.name.vorname;
+    const familienname: string | undefined = personStore.currentPerson?.person.name.familienname;
+
+    // Set the initial values of the person in the form again when navigating back to it after an error in the first submit.
+    setFieldValueChangePersonMetadata('selectedKopersNrMetadata', personalnummer ?? '');
+    setFieldValueChangePersonMetadata('selectedVorname', vorname ?? '');
+    setFieldValueChangePersonMetadata('selectedFamilienname', familienname ?? '');
+    personStore.errorCode = '';
+    personenkontextStore.errorCode = '';
+  }
+
+  const alertButtonActionKopers: ComputedRef<() => void> = computed(() => {
+    return personStore.errorCode === 'PERSONALNUMMER_NICHT_EINDEUTIG'
+      ? navigateBackToKopersForm
+      : navigateToPersonTable;
+  });
 
   // Triggers the template to start editing
   const triggerEdit = (): void => {
@@ -964,14 +975,7 @@
       } else if (!selectedKopersNrMetadata.value && selectedVorname.value && selectedFamilienname.value) {
         await personStore.changePersonMetadataById(currentPersonId, selectedVorname.value, selectedFamilienname.value);
       }
-      // Success message changes depending on if the username changed or not.
-      if (personStore.currentPerson?.person.referrer !== personStore.patchedPerson?.person.referrer) {
-        changePersonMetadataSuccessMessage.value = t('admin.person.personalInfoSuccessDialogMessageWithUsername', {
-          username: personStore.patchedPerson?.person.referrer,
-        });
-      } else {
-        changePersonMetadataSuccessMessage.value = t('admin.person.personalInfoSuccessDialogMessage');
-      }
+      changePersonMetadataSuccessMessage.value = t('admin.person.personalInfoSuccessDialogMessageWithUsername',);
       changePersonMetadataSuccessVisible.value = !personStore.errorCode;
       resetFormChangePersonMetadata();
     });

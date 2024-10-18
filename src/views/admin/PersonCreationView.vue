@@ -99,11 +99,13 @@
         then: (schema: StringSchema<string | undefined, AnyObject, undefined, ''>) =>
           schema.required(t('admin.klasse.rules.klasse.required')),
       }),
-      selectedKopersNr: string().when('selectedRolle', {
-        is: (selectedRolleId: string) => isKopersRolle(selectedRolleId) && !hasNoKopersNr.value,
-        then: (schema: StringSchema<string | undefined, AnyObject, undefined, ''>) =>
-          schema.required(t('admin.person.rules.kopersNr.required')),
-      }),
+      selectedKopersNr: string()
+        .matches(NO_LEADING_TRAILING_SPACES, t('admin.person.rules.kopersNr.noLeadingTrailingSpaces'))
+        .when('selectedRolle', {
+          is: (selectedRolleId: string) => isKopersRolle(selectedRolleId) && !hasNoKopersNr.value,
+          then: (schema: StringSchema<string | undefined, AnyObject, undefined, ''>) =>
+            schema.required(t('admin.person.rules.kopersNr.required')),
+        }),
       selectedBefristung: string()
         .matches(DDMMYYYY, t('admin.befristung.rules.format'))
         .test('notInPast', t('admin.befristung.rules.pastDateNotAllowed'), notInPast)
