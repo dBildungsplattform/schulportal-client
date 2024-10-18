@@ -54,7 +54,6 @@
       `${t('person.password')}`,
       'height=700, width=900',
     );
-    console.log(`Nonce defined in printPassword, it is ${cspNonce}`);
     if (printWindow) {
       printWindow.document.open();
       printWindow.document.write(`
@@ -81,8 +80,6 @@
           </head>
           <body>
               <p>${props.password}</p>
-              <p>${cspNonce}</p>
-              <p>test</p>
           </body>
           </html>
       `);
