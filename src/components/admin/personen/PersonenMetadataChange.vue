@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { useI18n } from 'vue-i18n';
+  import { useI18n, type Composer } from 'vue-i18n';
   import type { BaseFieldProps } from 'vee-validate';
   import KopersInput from '@/components/admin/personen/KopersInput.vue';
   import { type Ref, type WritableComputedRef, computed, ref } from 'vue';
@@ -7,7 +7,7 @@
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import FormRow from '@/components/form/FormRow.vue';
 
-  useI18n({ useScope: 'global' });
+  const { t }: Composer = useI18n({ useScope: 'global' });
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
@@ -57,7 +57,17 @@
     },
   });
 
-  const iqshHomepageUrl: Ref<string> = ref('https://medienberatung.iqsh.de/schulportal-sh.html');
+  type IQSHLink = {
+    text: string;
+    href: string;
+    external: boolean;
+  };
+
+  const link: Ref<IQSHLink> = ref({
+    text: t('admin.person.homePageIQSH'),
+    href: 'https://medienberatung.iqsh.de/schulportal-sh.html',
+    external: true,
+  });
 </script>
 
 <template>
@@ -77,10 +87,10 @@
           <span> {{ $t('admin.person.personalInfoChangeNotice') }} </span>
           <span>
             <a
-              :href="iqshHomepageUrl"
-              target="_blank"
+              :href="link.href"
+              :target="link.external ? '_blank' : '_self'"
             >
-              {{ $t('admin.person.homePageIQSH') }}</a
+              {{ link.text }}</a
             >.
           </span>
         </span>
