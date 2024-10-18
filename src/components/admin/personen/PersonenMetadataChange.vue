@@ -72,7 +72,15 @@
             icon="mdi-alert-circle-outline"
             size="small"
           ></v-icon>
-          <span v-html="$t('admin.person.personalInfoChangeNotice')"></span>
+          <span> {{ $t('admin.person.personalInfoChangeNotice') }} </span>
+          <span>
+            <a
+              :href="'https://medienberatung.iqsh.de/schulportal-sh.html'"
+              target="_blank"
+            >
+              {{ $t('admin.person.homePageIQSH') }}</a
+            >.
+          </span>
         </span>
       </v-col>
       <v-col
