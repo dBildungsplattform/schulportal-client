@@ -2627,7 +2627,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/RolleServiceProviderQueryParams"
+                                "$ref": "#/components/schemas/RolleServiceProviderBodyParams"
                             }
                         }
                     }
@@ -2687,21 +2687,18 @@
                             "nullable": false,
                             "type": "string"
                         }
-                    },
-                    {
-                        "name": "serviceProviderIds",
-                        "required": true,
-                        "in": "query",
-                        "description": "An array of ids for the service providers.",
-                        "schema": {
-                            "nullable": false,
-                            "type": "array",
-                            "items": {
-                                "type": "string"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RolleServiceProviderBodyParams"
                             }
                         }
                     }
-                ],
+                },
                 "responses": {
                     "200": {
                         "description": "Removing service-provider finished successfully."
@@ -4017,6 +4014,169 @@
                     }
                 ]
             }
+        },
+        "/api/cron/kopers-lock": {
+            "put": {
+                "operationId": "CronController_KoPersUserLock",
+                "parameters": [],
+                "responses": {
+                    "201": {
+                        "description": "User were successfully locked.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "boolean"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "User are not given or not found"
+                    },
+                    "401": {
+                        "description": "Not authorized to lock user."
+                    },
+                    "403": {
+                        "description": "Insufficient permissions to lock user."
+                    },
+                    "404": {
+                        "description": "Insufficient permissions to lock user."
+                    },
+                    "500": {
+                        "description": "Internal server error while trying to lock user."
+                    }
+                },
+                "tags": [
+                    "cron"
+                ],
+                "security": [
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
+        "/api/import/upload": {
+            "post": {
+                "operationId": "ImportController_uploadFile",
+                "parameters": [],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DbiamPersonenkontextImportBodyParams"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Returns an import upload response object.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ImportUploadResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "The CSV file was not valid."
+                    },
+                    "401": {
+                        "description": "Not authorized to import data with a CSV file."
+                    },
+                    "403": {
+                        "description": "Insufficient permissions to import data with a CSV file."
+                    },
+                    "500": {
+                        "description": "Internal server error while importing data with a CSV file."
+                    }
+                },
+                "tags": [
+                    "import"
+                ],
+                "security": [
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
+        "/api/import/execute": {
+            "post": {
+                "operationId": "ImportController_executeImport",
+                "parameters": [],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ImportvorgangByIdBodyParams"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Import transaction was executed successfully. The text file can be downloaded",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "format": "binary"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Something went wrong with the found import transaction.",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DbiamImportError"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Not authorized to execute the import transaction."
+                    },
+                    "403": {
+                        "description": "Insufficient permissions to execute the import transaction."
+                    },
+                    "404": {
+                        "description": "The import transaction does not exist."
+                    },
+                    "500": {
+                        "description": "Internal server error while executing the import transaction."
+                    }
+                },
+                "tags": [
+                    "import"
+                ],
+                "security": [
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
         }
     },
     "info": {
@@ -5012,6 +5172,9 @@
                     },
                     "traegerschaft": {
                         "$ref": "#/components/schemas/TraegerschaftTyp"
+                    },
+                    "emailAdress": {
+                        "type": "string"
                     }
                 },
                 "required": [
@@ -5081,7 +5244,8 @@
                             "ORGANISATION_IST_BEREITS_ZUGEWIESEN_ERROR",
                             "NAME_REQUIRED_FOR_KLASSE",
                             "NAME_ENTHAELT_LEERZEICHEN",
-                            "KENNUNG_ENTHAELT_LEERZEICHEN"
+                            "KENNUNG_ENTHAELT_LEERZEICHEN",
+                            "EMAIL_ADRESS_ON_ORGANISATION_TYP"
                         ]
                     },
                     "code": {
@@ -5121,6 +5285,9 @@
                     },
                     "traegerschaft": {
                         "$ref": "#/components/schemas/TraegerschaftTyp"
+                    },
+                    "emailAdress": {
+                        "type": "string"
                     }
                 },
                 "required": [
@@ -5183,7 +5350,8 @@
                     "KLASSEN_VERWALTEN",
                     "SCHULTRAEGER_VERWALTEN",
                     "MIGRATION_DURCHFUEHREN",
-                    "PERSON_SYNCHRONISIEREN"
+                    "PERSON_SYNCHRONISIEREN",
+                    "IMPORT_DURCHFUEHREN"
                 ]
             },
             "OrganisationByIdBodyParams": {
@@ -5319,6 +5487,9 @@
                         "type": "string",
                         "nullable": true
                     },
+                    "version": {
+                        "type": "number"
+                    },
                     "serviceProviders": {
                         "type": "array",
                         "items": {
@@ -5337,6 +5508,7 @@
                     "systemrechte",
                     "administeredBySchulstrukturknotenName",
                     "administeredBySchulstrukturknotenKennung",
+                    "version",
                     "serviceProviders"
                 ]
             },
@@ -5419,6 +5591,9 @@
                     "administeredBySchulstrukturknotenKennung": {
                         "type": "string",
                         "nullable": true
+                    },
+                    "version": {
+                        "type": "number"
                     }
                 },
                 "required": [
@@ -5431,7 +5606,8 @@
                     "merkmale",
                     "systemrechte",
                     "administeredBySchulstrukturknotenName",
-                    "administeredBySchulstrukturknotenKennung"
+                    "administeredBySchulstrukturknotenKennung",
+                    "version"
                 ]
             },
             "AddSystemrechtBodyParams": {
@@ -5459,7 +5635,7 @@
                     "serviceProviderIds"
                 ]
             },
-            "RolleServiceProviderQueryParams": {
+            "RolleServiceProviderBodyParams": {
                 "type": "object",
                 "properties": {
                     "serviceProviderIds": {
@@ -5469,10 +5645,15 @@
                         "items": {
                             "type": "string"
                         }
+                    },
+                    "version": {
+                        "type": "number",
+                        "description": "The version for the rolle."
                     }
                 },
                 "required": [
-                    "serviceProviderIds"
+                    "serviceProviderIds",
+                    "version"
                 ]
             },
             "ServiceProviderTarget": {
@@ -5555,13 +5736,17 @@
                         "items": {
                             "type": "string"
                         }
+                    },
+                    "version": {
+                        "type": "number"
                     }
                 },
                 "required": [
                     "name",
                     "merkmale",
                     "systemrechte",
-                    "serviceProviderIds"
+                    "serviceProviderIds",
+                    "version"
                 ]
             },
             "DbiamRolleError": {
@@ -5574,7 +5759,8 @@
                             "ADD_SYSTEMRECHT_ERROR",
                             "ROLLE_HAT_PERSONENKONTEXTE_ERROR",
                             "UPDATE_MERKMALE_ERROR",
-                            "ROLLENNAME_ENTHAELT_LEERZEICHEN"
+                            "ROLLENNAME_ENTHAELT_LEERZEICHEN",
+                            "NEWER_VERSION_OF_ROLLE_AVAILABLE"
                         ]
                     },
                     "code": {
@@ -6175,6 +6361,86 @@
                 },
                 "required": [
                     "required"
+                ]
+            },
+            "DbiamPersonenkontextImportBodyParams": {
+                "type": "object",
+                "properties": {
+                    "organisationId": {
+                        "type": "string"
+                    },
+                    "rolleId": {
+                        "type": "string"
+                    },
+                    "file": {
+                        "type": "string",
+                        "format": "binary"
+                    }
+                },
+                "required": [
+                    "organisationId",
+                    "rolleId",
+                    "file"
+                ]
+            },
+            "ImportUploadResponse": {
+                "type": "object",
+                "properties": {
+                    "importvorgangId": {
+                        "type": "string",
+                        "description": "The import transaction number. it will be needed to execute the import and download the result"
+                    },
+                    "isValid": {
+                        "type": "boolean",
+                        "description": "It states if the import transaction contain errors."
+                    }
+                },
+                "required": [
+                    "importvorgangId",
+                    "isValid"
+                ]
+            },
+            "ImportvorgangByIdBodyParams": {
+                "type": "object",
+                "properties": {
+                    "importvorgangId": {
+                        "type": "string",
+                        "description": "The id of an import transaction",
+                        "nullable": false
+                    },
+                    "organisationId": {
+                        "type": "string"
+                    },
+                    "rolleId": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "importvorgangId",
+                    "organisationId",
+                    "rolleId"
+                ]
+            },
+            "DbiamImportError": {
+                "type": "object",
+                "properties": {
+                    "i18nKey": {
+                        "type": "string",
+                        "enum": [
+                            "IMPORT_ERROR",
+                            "CSV_PARSING_ERROR",
+                            "CSV_FILE_EMPTY_ERROR",
+                            "IMPORT_TEXT_FILE_CREATION_ERROR"
+                        ]
+                    },
+                    "code": {
+                        "type": "number",
+                        "description": "Corresponds to HTTP Status code like 200, 404, 500"
+                    }
+                },
+                "required": [
+                    "i18nKey",
+                    "code"
                 ]
             }
         }
