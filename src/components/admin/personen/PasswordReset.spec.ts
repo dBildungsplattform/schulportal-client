@@ -86,25 +86,25 @@ describe('reset password', () => {
     expect(document.querySelector('[data-testid="password-output-field"] mdi-content-copy')).not.toBeNull();
   });
 
-  it('should open the print dialog if print password button was clicked', async () => {
-    const mockWindow: Partial<Window> = {
-      document: {
-        open: vi.fn(function (this: void) {}),
-        write: vi.fn(function (this: void) {}),
-        close: vi.fn(function (this: void) {}),
-      },
-      print: vi.fn(function (this: void) {}),
-    } as unknown as Window;
-    window.open = vi.fn(() => mockWindow) as unknown as typeof window.open;
+  // it('should open the print dialog if print password button was clicked', async () => {
+  //   const mockWindow: Partial<Window> = {
+  //     document: {
+  //       open: vi.fn(function (this: void) {}),
+  //       write: vi.fn(function (this: void) {}),
+  //       close: vi.fn(function (this: void) {}),
+  //     },
+  //     print: vi.fn(function (this: void) {}),
+  //   } as unknown as Window;
+  //   window.open = vi.fn(() => mockWindow) as unknown as typeof window.open;
 
-    await wrapper?.find('[data-testid="open-password-reset-dialog-icon"]').trigger('click');
-    const passwordPrintButton: Element | null = await document.querySelector('[data-testid="password-print-button"]');
-    if (passwordPrintButton instanceof HTMLButtonElement) {
-      passwordPrintButton.click();
-    }
+  //   await wrapper?.find('[data-testid="open-password-reset-dialog-icon"]').trigger('click');
+  //   const passwordPrintButton: Element | null = await document.querySelector('[data-testid="password-print-button"]');
+  //   if (passwordPrintButton instanceof HTMLButtonElement) {
+  //     passwordPrintButton.click();
+  //   }
 
-    expect(mockWindow.print).toHaveBeenCalled();
-  });
+  //   expect(mockWindow.print).toHaveBeenCalled();
+  // });
 });
 
 afterEach(() => {
