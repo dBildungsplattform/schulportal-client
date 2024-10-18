@@ -45,9 +45,6 @@
     emit('onClearPassword');
   }
 
-  // Used to enable <style> in printPassword, otherwise blocked by CSP
-  declare var cspNonce: string;
-
   const printPassword = (): void => {
     const printWindow: WindowProxy | null = window.open(
       `${t('person.password')}`,
@@ -60,7 +57,7 @@
           <html>
           <head>
             <title>${t('person.password')}</title>
-            <style nonce=${cspNonce}>
+            <style nonce="CSPN0NCEPLAC3H0LDER">
               @media print {
                 @page {
                   size: auto;
