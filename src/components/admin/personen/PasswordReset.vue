@@ -45,6 +45,9 @@
     emit('onClearPassword');
   }
 
+  // Used to enable <style> in printPassword, otherwise blocked by CSP
+  declare var cspNonce: string;
+
   const printPassword = (): void => {
     const printWindow: WindowProxy | null = window.open(
       `${t('person.password')}`,
@@ -53,12 +56,27 @@
     );
     if (printWindow) {
       printWindow.document.open();
-      // Print only the password, CSS styling to remove any header/footer information from printed page
       printWindow.document.write(`
           <html>
           <head>
             <title>${t('person.password')}</title>
-            <link rel="stylesheet" href="./../../../styles/print.css">
+            <style nonce=${cspNonce}>
+              @media print {
+                @page {
+                  size: auto;
+                  margin: 0mm;
+                }
+                body {
+                  margin: 0;
+                }
+              }
+              p { 
+                font-size: 30;
+                font-size: 30px;
+                text-align: center;
+                line-height: 300px;
+              }
+            </style>
           </head>
           <body>
               <p>${props.password}</p>
