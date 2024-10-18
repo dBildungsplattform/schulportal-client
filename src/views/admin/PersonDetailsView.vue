@@ -975,14 +975,7 @@
       } else if (!selectedKopersNrMetadata.value && selectedVorname.value && selectedFamilienname.value) {
         await personStore.changePersonMetadataById(currentPersonId, selectedVorname.value, selectedFamilienname.value);
       }
-      // Success message changes depending on if the username changed or not.
-      if (personStore.currentPerson?.person.referrer !== personStore.patchedPerson?.person.referrer) {
-        changePersonMetadataSuccessMessage.value = t('admin.person.personalInfoSuccessDialogMessageWithUsername', {
-          username: personStore.patchedPerson?.person.referrer,
-        });
-      } else {
-        changePersonMetadataSuccessMessage.value = t('admin.person.personalInfoSuccessDialogMessage');
-      }
+      changePersonMetadataSuccessMessage.value = t('admin.person.personalInfoSuccessDialogMessageWithUsername',);
       changePersonMetadataSuccessVisible.value = !personStore.errorCode;
       resetFormChangePersonMetadata();
     });

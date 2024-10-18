@@ -72,7 +72,7 @@
             icon="mdi-alert-circle-outline"
             size="small"
           ></v-icon>
-          {{ $t('admin.person.personalInfoChangeNotice') }}
+          <span v-html="$t('admin.person.personalInfoChangeNotice')"></span>
         </span>
       </v-col>
       <v-col
