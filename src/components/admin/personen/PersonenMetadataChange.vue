@@ -56,6 +56,8 @@
       emits('onShowDialogChange', newValue);
     },
   });
+
+  const iqshHomepageUrl: Ref<string> = ref('https://medienberatung.iqsh.de/schulportal-sh.html');
 </script>
 
 <template>
@@ -75,7 +77,7 @@
           <span> {{ $t('admin.person.personalInfoChangeNotice') }} </span>
           <span>
             <a
-              :href="'https://medienberatung.iqsh.de/schulportal-sh.html'"
+              :href="iqshHomepageUrl"
               target="_blank"
             >
               {{ $t('admin.person.homePageIQSH') }}</a
