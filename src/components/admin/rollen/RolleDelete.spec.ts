@@ -23,6 +23,7 @@ beforeEach(() => {
         name: 'Rolle 1',
         rollenart: 'LERN',
         systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
+        version: 1,
       },
     },
     global: {

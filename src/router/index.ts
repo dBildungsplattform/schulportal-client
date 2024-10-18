@@ -8,6 +8,17 @@ import routes from './routes';
 const router: Router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
+  scrollBehavior(
+    _from: RouteLocationNormalized,
+    _to: RouteLocationNormalized,
+    savedPosition: { left?: number; top?: number } | null,
+  ) {
+    if (savedPosition) {
+      return savedPosition;
+    } else {
+      return { top: 0 };
+    }
+  },
 });
 
 router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormalized) => {
