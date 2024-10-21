@@ -224,9 +224,11 @@ describe('PersonDetailsView', () => {
   test('it renders details for a locked person', async () => {
     const date: string = '01.01.2024';
     const datetime: string = `${date} 12:34:00`;
-    const lockInfo: Person['lockInfo'] = {
-      lock_locked_from: 'test',
-      lock_timestamp: datetime,
+    const userLock: Person['userLock'] = {
+      personId: '1234',
+      locked_by: 'test',
+      locked_until: datetime,
+      created_at: datetime,
     };
 
     // Mock the current person in the store
@@ -240,7 +242,7 @@ describe('PersonDetailsView', () => {
         referrer: '6978',
         personalnummer: '9183756',
         isLocked: true,
-        lockInfo,
+        userLock,
         revision: '1',
         lastModified: '2024-12-22',
       },
@@ -252,7 +254,7 @@ describe('PersonDetailsView', () => {
 
     // Check if the element exists and has the correct text content
     expect(vornameElement?.text()).toBe('Samuel');
-    expect(lockInfoContainer?.html()).toContain(lockInfo.lock_locked_from);
+    expect(lockInfoContainer?.html()).toContain(userLock.locked_by);
     expect(lockInfoContainer?.html()).toContain(date);
   });
 
@@ -355,23 +357,25 @@ describe('PersonDetailsView', () => {
     expect(wrapper!.find('[data-testid="lock-info-1-key"]').exists()).toBe(false);
     expect(wrapper!.find('[data-testid="lock-info-1-attribute"]').exists()).toBe(false);
 
-    const lockInfo: Person['lockInfo'] = {
-      lock_locked_from: 'Lady Lock',
-      lock_timestamp: '2024-09-27T11:37:35.663Z',
+    const userLock: Person['userLock'] = {
+      locked_by: 'Lady Lock',
+      created_at: '2024-09-27T11:37:35.663Z',
+      personId: '1234',
+      locked_until: '2024-09-27T11:37:35.663Z',
     };
 
     personStore.currentPerson!.person.isLocked = true;
-    personStore.currentPerson!.person.lockInfo = lockInfo;
+    personStore.currentPerson!.person.userLock = userLock;
     organisationStore.lockingOrganisation = {
       id: '1234',
-      name: lockInfo.lock_locked_from,
+      name: userLock.locked_by,
       typ: OrganisationsTyp.Schule,
     };
     await nextTick();
 
     const lockInfoArray: Array<[string, string]> = [
-      ['Gesperrt durch:', lockInfo.lock_locked_from],
-      ['Seit:', '27.09.2024'],
+      ['Gesperrt durch:', userLock.locked_by],
+      ['Seit:', userLock.created_at],
     ];
 
     for (let index: number = 0; index < lockInfoArray.length; index++) {

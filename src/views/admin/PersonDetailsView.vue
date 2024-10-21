@@ -25,7 +25,9 @@
   } from '@/stores/OrganisationStore';
   import {
     LockKeys,
+    parseUserLock,
     usePersonStore,
+    UserLock,
     type Person,
     type Personendatensatz,
     type PersonStore,
@@ -185,6 +187,9 @@
     const { userLock }: Person = personStore.currentPerson.person;
     if (!userLock) return [];
 
+    const parsedUserLock: UserLock | null = parseUserLock(userLock);
+    if (!parsedUserLock) return [];
+
     return Object.entries(userLock).map(([key, attribute]: [string, string]) => {
       switch (key) {
         case LockKeys.LockedBy:
@@ -198,20 +203,12 @@
         case LockKeys.CreatedAt:
           return {
             key: t('since'),
-            attribute: new Intl.DateTimeFormat('de-DE', {
-              year: 'numeric',
-              month: '2-digit',
-              day: '2-digit',
-            }).format(new Date(attribute)),
+            attribute: parsedUserLock.created_at,
           };
         case LockKeys.LockedUntil:
           return {
             key: t('person.lockedUntil'),
-            attribute: new Intl.DateTimeFormat('de-DE', {
-              year: 'numeric',
-              month: '2-digit',
-              day: '2-digit',
-            }).format(new Date(attribute)),
+            attribute: parsedUserLock.locked_until,
           };
 
         default:

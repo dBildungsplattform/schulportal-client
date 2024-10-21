@@ -10,7 +10,7 @@ import {
   type PersonMetadataBodyParams,
   type PersonendatensatzResponse,
 } from '@/api-client/generated';
-import { usePersonStore, type PersonStore, type Personendatensatz } from './PersonStore';
+import { parseUserLock, usePersonStore, type PersonStore, type Personendatensatz } from './PersonStore';
 import ApiService from '@/services/ApiService';
 import MockAdapter from 'axios-mock-adapter';
 import { setActivePinia, createPinia } from 'pinia';
@@ -46,7 +46,7 @@ function getMockLockedPersonendatensatz(): Personendatensatz {
       referrer: '6978',
       personalnummer: '9183756',
       isLocked: true,
-      lockInfo: { lock_locked_from: 'admin', lock_timestamp: '2024-12-22' },
+      userLock: { locked_by: 'admin', locked_until: '2024-12-23', personId: '123456', created_at: '2024-12-22' },
       revision: '1',
       lastModified: '2024-12-22',
     },
@@ -122,7 +122,7 @@ describe('PersonStore', () => {
             referrer: 'jjohnson',
             personalnummer: '1234567',
             isLocked: false,
-            lockInfo: null,
+            userLock: null,
             revision: '1',
             lastModified: '2024-12-22',
           },
@@ -137,7 +137,7 @@ describe('PersonStore', () => {
             referrer: 'rcena',
             personalnummer: null,
             isLocked: false,
-            lockInfo: null,
+            userLock: null,
             revision: '1',
             lastModified: '2024-12-22',
           },
@@ -152,7 +152,7 @@ describe('PersonStore', () => {
             referrer: 'dorton',
             personalnummer: null,
             isLocked: false,
-            lockInfo: null,
+            userLock: null,
             revision: '1',
             lastModified: '2024-12-22',
           },
@@ -167,7 +167,7 @@ describe('PersonStore', () => {
             referrer: 'hmardy',
             personalnummer: null,
             isLocked: false,
-            lockInfo: null,
+            userLock: null,
             revision: '1',
             lastModified: '2024-12-22',
           },
@@ -182,7 +182,7 @@ describe('PersonStore', () => {
             referrer: 'hjardy',
             personalnummer: null,
             isLocked: false,
-            lockInfo: null,
+            userLock: null,
             revision: '1',
             lastModified: '2024-12-22',
           },
@@ -736,30 +736,39 @@ describe('PersonStore', () => {
     it('should successfully lock the person and update state', async () => {
       const personId: string = '123456';
       const lock: boolean = true;
-      const lockedFrom: string = 'admin';
+      const lockedBy: string = 'admin';
       personStore.currentPerson = getMockPersonendatensatz();
       const mockResponse = { message: 'User has been successfully locked.' };
       const mockPersonResponse: PersonendatensatzResponse = getMockLockedPersonendatensatzResponse();
       mockadapter.onPut(`/api/personen/${personId}/lock-user`).replyOnce(200, mockResponse);
       mockadapter.onGet(`/api/personen/${personId}`).replyOnce(200, mockPersonResponse);
 
-      const lockPersonPromise: Promise<void> = personStore.lockPerson(personId, lock, lockedFrom);
+      const lockPersonPromise: Promise<void> = personStore.lockPerson(personId, {
+        lock: lock,
+        locked_by: lockedBy,
+        locked_until: '2024-12-10',
+      });
       expect(personStore.loading).toBe(true);
       await lockPersonPromise;
       expect(personStore.loading).toBe(false);
       expect(personStore.errorCode).toBe('');
       expect(personStore.currentPerson.person.id).toBe(mockPersonResponse.person.id);
       expect(personStore.currentPerson.person.isLocked).toBe(mockPersonResponse.person.isLocked);
-      expect(personStore.currentPerson.person.lockInfo).toEqual(mockPersonResponse.person.lockInfo);
+      expect(mockPersonResponse.person.userLock).not.toBeNull();
+      expect(personStore.currentPerson.person.userLock).toEqual(parseUserLock(mockPersonResponse.person.userLock!));
       expect(personStore.currentPerson.person.lastModified).toBe(mockPersonResponse.person.lastModified);
     });
 
     it('should handle error when locking a person fails with string error', async () => {
       const personId: string = '123456';
       const lock: boolean = true;
-      const lockedFrom: string = 'admin';
+      const lockedBy: string = 'admin';
       mockadapter.onPut(`/api/personen/${personId}/lock-user`).replyOnce(500, 'mock server error');
-      const lockPersonPromise: Promise<void> = personStore.lockPerson(personId, lock, lockedFrom);
+      const lockPersonPromise: Promise<void> = personStore.lockPerson(personId, {
+        lock: lock,
+        locked_by: lockedBy,
+        locked_until: undefined,
+      });
       expect(personStore.loading).toBe(true);
       await expect(lockPersonPromise).rejects.toEqual('UNSPECIFIED_ERROR');
       expect(personStore.loading).toBe(false);
@@ -769,9 +778,13 @@ describe('PersonStore', () => {
     it('should handle error when locking a person fails with error code', async () => {
       const personId: string = '123456';
       const lock: boolean = true;
-      const lockedFrom: string = 'admin';
+      const lockedBy: string = 'admin';
       mockadapter.onPut(`/api/personen/${personId}/lock-user`).replyOnce(500, { code: 'LOCK_FAILED_ERROR' });
-      const lockPersonPromise: Promise<void> = personStore.lockPerson(personId, lock, lockedFrom);
+      const lockPersonPromise: Promise<void> = personStore.lockPerson(personId, {
+        lock: lock,
+        locked_by: lockedBy,
+        locked_until: undefined,
+      });
       expect(personStore.loading).toBe(true);
       await expect(lockPersonPromise).rejects.toEqual('LOCK_FAILED_ERROR');
       expect(personStore.loading).toBe(false);
@@ -798,7 +811,7 @@ describe('PersonStore', () => {
           referrer: '6978',
           personalnummer: personalnummer,
           isLocked: false,
-          lockInfo: null,
+          userLock: null,
         },
       };
 
@@ -816,7 +829,7 @@ describe('PersonStore', () => {
           lastModified: '2099-01-02',
           referrer: '6978',
           isLocked: false,
-          lockInfo: null,
+          userLock: null,
           mandant: '',
           geburt: {},
           stammorganisation: '',
