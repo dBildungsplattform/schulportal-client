@@ -47,7 +47,10 @@
 </script>
 
 <template>
-  <v-dialog persistent>
+  <v-dialog
+    persistent
+    ref="password-reset-dialog"
+  >
     <template v-slot:activator="{ props }">
       <v-col
         cols="12"

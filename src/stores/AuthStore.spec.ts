@@ -63,7 +63,7 @@ describe('AuthStore', () => {
     });
 
     it('should not authenticate on server error', async () => {
-      mockadapter.onGet('/api/auth/logininfo').replyOnce(500, 'some mock server error');
+      mockadapter.onGet('/api/auth/logininfo').replyOnce(401, 'unauthorized error');
       const initializeAuthStatus: Promise<void> = authStore.initializeAuthStatus();
       expect(authStore.isAuthed).toBe(false);
       await initializeAuthStatus;

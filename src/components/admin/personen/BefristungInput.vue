@@ -97,9 +97,10 @@
       >
         <v-radio-group
           data-testid="befristung-radio-group"
+          ref="befristung-radio-group"
+          @update:modelValue="handleBefristungOptionChange"
           v-model="localBefristungOption"
           v-bind="befristungOptionProps"
-          @update:modelValue="handleBefristungOptionChange"
         >
           <v-radio
             data-testid="schuljahresende-radio-button"
