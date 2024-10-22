@@ -154,7 +154,8 @@
         "enterOtp": "Bitte geben Sie das angezeigte Einmalpasswort ein, um die Einrichtung abzuschließen.",
         "invalidOtp": "Ungültiger Code. Bitte versuchen Sie es erneut.",
         "otp": "Einmalpasswort",
-        "SecondFactorNotSet": "Es wurde noch kein zweiter Faktor für Sie eingerichtet."
+        "SecondFactorNotSet": "Es wurde noch kein zweiter Faktor für Sie eingerichtet.",
+        "NoLongerNeedToken": "Dieser Benutzer hat keinen Zugriff mehr auf sicherheitskritische Bereiche und benötigt aktuell den eingerichteten Token nicht."
       },
       "copyPasswordError": "Passwort konnte nicht in die Zwischenablage kopiert werden",
       "copyPasswordSuccess": "Passwort in Zwischenablage kopiert",
@@ -178,8 +179,8 @@
       "management": "Benutzerverwaltung",
       "personalInfo": "Persönliche Informationen",
       "personalInfoChangeNotice": "Namensänderungen haben unmittelbare Auswirkungen auf den Benutzernamen im Schulportal SH und auf die E-Mail-Adresse! \n\nWeitere Informationen finden Sie auf der ",
-      "homePageIQSH":"Homepage der IQSH-Medienberatung",
-      "personalInfoSuccessDialogMessageWithUsername": "Die Stammdaten wurden erfolgreich geändert.\n\nDas Passwort wurde nicht verändert und kann wie zuvor verwendet werden. \n\nBitte teilen Sie der betroffenen Person die Stammdatenänderung (Benutzername, Mail-Adresse) mit. \n\nDie neuen Daten können Sie in der Gesamtübersicht einsehen." ,
+      "homePageIQSH": "Homepage der IQSH-Medienberatung",
+      "personalInfoSuccessDialogMessageWithUsername": "Die Stammdaten wurden erfolgreich geändert.\n\nDas Passwort wurde nicht verändert und kann wie zuvor verwendet werden. \n\nBitte teilen Sie der betroffenen Person die Stammdatenänderung (Benutzername, Mail-Adresse) mit. \n\nDie neuen Daten können Sie in der Gesamtübersicht einsehen.",
       "resetPasswordConfirmation": "Sind Sie sicher, dass Sie das Passwort für {firstname} {lastname} zurücksetzen möchten?",
       "resetPasswordInformation": "Bitte teilen Sie dem Benutzer das temporäre Passwort mit. Nach dem Schließen des Dialogs wird es aus Sicherheitsgründen nicht mehr angezeigt.",
       "resetPassword": "Passwort zurücksetzen",
