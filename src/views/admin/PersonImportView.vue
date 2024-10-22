@@ -12,12 +12,16 @@
   import { object, string } from 'yup';
   import { useI18n, type Composer } from 'vue-i18n';
   import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
+  import { type PersonStore, usePersonStore } from '@/stores/PersonStore';
+  import { useDisplay } from 'vuetify';
 
   const organisationStore: OrganisationStore = useOrganisationStore();
+  const personStore: PersonStore = usePersonStore();
   const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
 
   const router: Router = useRouter();
   const { t }: Composer = useI18n({ useScope: 'global' });
+  const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
   const rollen: ComputedRef<TranslatedObject[] | undefined> = useRollen();
   const schulen: ComputedRef<TranslatedObject[] | undefined> = useSchulen();
@@ -59,6 +63,8 @@
     Ref<string | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = formContext.defineField('selectedRolle', vuetifyConfig);
+
+  const selectedFiles: Ref<Array<File> | undefined> = ref();
 
   watch(selectedSchule, (newValue: string | undefined, oldValue: string | undefined) => {
     if (newValue && newValue !== oldValue) {
@@ -104,6 +110,18 @@
 
   function navigateToPersonTable(): void {
     router.push({ name: 'person-management' });
+  }
+
+  function uploadFile(): void {
+    if (selectedSchule.value === undefined || selectedRolle.value === undefined || selectedFiles.value === undefined) {
+      return;
+    }
+
+    personStore.uploadPersonenImportFile(
+      selectedSchule.value as string,
+      selectedRolle.value as string,
+      selectedFiles.value[0] as File,
+    );
   }
 
   onMounted(async () => {
@@ -166,7 +184,7 @@
             ></v-autocomplete>
           </FormRow>
 
-          <!-- Rollenauswahl -->
+          <!-- Rollenauswahl (currently limited to SuS) -->
           <FormRow
             :errorLabel="selectedRolleProps['error']"
             labelForId="rolle-select"
@@ -192,7 +210,35 @@
               v-model="selectedRolle"
             ></v-autocomplete>
           </FormRow>
+
+          <!-- File Upload -->
+          <FormRow
+            :errorLabel="''"
+            :isRequired="true"
+            labelForId="file-upload"
+            :label="$t('admin.import.uploadFile')"
+          >
+            <v-file-input
+              accept=".csv"
+              :label="$t('admin.import.selectFile')"
+              prepend-icon=""
+              prepend-inner-icon="mdi-paperclip"
+              variant="outlined"
+              v-model="selectedFiles"
+            ></v-file-input>
+          </FormRow>
+
+          <!-- Upload Button -->
+          <v-btn
+            :block="mdAndDown"
+            class="primary"
+            @click.stop="uploadFile()"
+            data-testid="upload-file-button"
+          >
+            {{ $t('admin.import.uploadFile') }}
+          </v-btn>
         </v-container>
+        {{ personStore.uploadResponse }}
       </v-container>
     </LayoutCard>
   </div>

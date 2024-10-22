@@ -23,9 +23,12 @@
       "limitedUntil": "befristet bis",
       "untilEndOfSchoolYear": "Bis Schuljahresende"
     },
-    "mandatoryFieldsNotice": "Mit * markierte Felder sind Pflichtangaben.",
     "followingDataCreated": "Folgende Daten wurden gespeichert:",
     "headline": "Administrationsbereich",
+    "import": {
+      "selectFile": "Datei auswählen",
+      "uploadFile": "Datei hochladen"
+    },
     "koPers": {
       "koPersNumber": "KoPers.-Nr.",
       "noKoPersNumber": "Keine KoPers.-Nr. vorhanden"
@@ -81,6 +84,7 @@
       },
       "showAll": "Alle Klassen anzeigen"
     },
+    "mandatoryFieldsNotice": "Mit * markierte Felder sind Pflichtangaben.",
     "organisation": {
       "assignOrganisation": "Organisationsebene zuordnen",
       "errors": {
