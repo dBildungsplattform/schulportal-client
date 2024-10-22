@@ -130,7 +130,7 @@
         "otpPlaceholder": "Einmalpasswort",
         "requiredSecondFactor": "Diese Aktion setzt eine Zwei-Faktor-Authentifizierung (2FA) voraus.",
         "noSecondFactorText": "Aktuell ist noch keine 2FA eingrichtet.",
-        "setUpInfo": "Sie können die Einrichtung der 2FA selbst über ein mobiles Endgerät durchführen. Alternativ wenden Sie sich bitte an ihre schulischen Admins.",
+        "setUpInfo": "Sie können die Einrichtung der 2FA selbst über ein mobiles Endgerät durchführen. Alternativ wenden Sie sich bitte an Ihre schulischen Admins.",
         "toSecondFactorSetup": "Zur 2FA Einrichtung",
         "errors": {
           "SERIENNUMMER_NICHT_GEFUNDEN": "Die eingegebene Seriennummer konnte leider nicht gefunden werden. Vergewissern Sie sich bitte, dass Sie eine korrekte Seriennummer eingegeben haben.",
