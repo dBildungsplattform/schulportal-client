@@ -401,4 +401,17 @@ describe('PersonDetailsView', () => {
   //     expect(attributeElement.text()).toContain(attributeValue);
   //   }
   // });
+
+  // TODO: This test is for SPSH-1090 and should be back in SPSH-1021
+  // test('it sets errorCode to PERSONALNUMMER_NICHT_EINDEUTIG and goes back to Form', async () => {
+  //   personStore.errorCode = 'PERSONALNUMMER_NICHT_EINDEUTIG';
+  //   await nextTick();
+
+  //   await wrapper?.find('[data-testid="alert-button"]').trigger('click');
+  //   const familienNameInput: DOMWrapper<Element> | undefined = await wrapper?.find(
+  //     '[data-testid="person-familienname"]',
+  //   );
+
+  //   expect(familienNameInput?.exists()).toBe(true);
+  // });
 });
