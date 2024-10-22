@@ -97,7 +97,9 @@ describe('KlassenDetailsView', () => {
     await wrapper?.find('[data-testid="klasse-edit-button"]').trigger('click');
     await nextTick();
 
-    const saveKlasseButton: DOMWrapper<HTMLInputElement> | undefined = wrapper?.find('[data-testid="klasse-changes-save-button"]');
+    const saveKlasseButton: DOMWrapper<HTMLInputElement> | undefined = wrapper?.find(
+      '[data-testid="klasse-changes-save-button"]',
+    );
     expect(saveKlasseButton?.isVisible()).toBe(true);
 
     await wrapper?.find('[data-testid="klasse-edit-cancel-button"]').trigger('click');
