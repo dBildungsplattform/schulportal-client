@@ -12,11 +12,11 @@
   import { object, string } from 'yup';
   import { useI18n, type Composer } from 'vue-i18n';
   import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
-  import { type PersonStore, usePersonStore } from '@/stores/PersonStore';
+  import { type ImportStore, useImportStore } from '@/stores/ImportStore';
   import { useDisplay } from 'vuetify';
 
   const organisationStore: OrganisationStore = useOrganisationStore();
-  const personStore: PersonStore = usePersonStore();
+  const importStore: ImportStore = useImportStore();
   const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
 
   const router: Router = useRouter();
@@ -117,7 +117,7 @@
       return;
     }
 
-    personStore.uploadPersonenImportFile(
+    importStore.uploadPersonenImportFile(
       selectedSchule.value as string,
       selectedRolle.value as string,
       selectedFiles.value[0] as File,
@@ -238,7 +238,7 @@
             {{ $t('admin.import.uploadFile') }}
           </v-btn>
         </v-container>
-        {{ personStore.uploadResponse }}
+        {{ importStore.uploadResponse }}
       </v-container>
     </LayoutCard>
   </div>

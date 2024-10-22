@@ -2,7 +2,6 @@ import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import { isAxiosError, type AxiosResponse } from 'axios';
 import {
   DbiamPersonenuebersichtApiFactory,
-  ImportApiFactory,
   OrganisationsTyp,
   PersonenApiFactory,
   PersonenFrontendApiFactory,
@@ -11,8 +10,6 @@ import {
   type DbiamPersonenuebersichtApiInterface,
   type DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response,
   type DBiamPersonenuebersichtResponse,
-  type ImportApiInterface,
-  type ImportUploadResponse,
   type PersonenApiInterface,
   type PersonendatensatzResponse,
   type PersonenFrontendApiInterface,
@@ -24,7 +21,6 @@ import {
 import axiosApiInstance from '@/services/ApiService';
 import { type DbiamPersonenkontextBodyParams, type Zuordnung } from './PersonenkontextStore';
 
-const importApi: ImportApiInterface = ImportApiFactory(undefined, '', axiosApiInstance);
 const personenApi: PersonenApiInterface = PersonenApiFactory(undefined, '', axiosApiInstance);
 const personenFrontendApi: PersonenFrontendApiInterface = PersonenFrontendApiFactory(undefined, '', axiosApiInstance);
 const personenuebersichtApi: DbiamPersonenuebersichtApiInterface = DbiamPersonenuebersichtApiFactory(
@@ -141,7 +137,6 @@ type PersonState = {
   personenuebersicht: DBiamPersonenuebersichtResponse | null;
   patchedPerson: PersonendatensatzResponse | null;
   newPassword: string | null;
-  uploadResponse: ImportUploadResponse | null;
 };
 
 export type PersonFilter = {
@@ -170,7 +165,6 @@ type PersonActions = {
     familienname: string,
     personalnummer?: string,
   ) => Promise<void>;
-  uploadPersonenImportFile: (organisationId: string, rolleId: string, file: File) => Promise<void>;
 };
 
 export type PersonStore = Store<'personStore', PersonState, PersonGetters, PersonActions>;
@@ -187,7 +181,6 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
       currentPerson: null,
       patchedPerson: null,
       newPassword: null,
-      uploadResponse: null,
     };
   },
   actions: {
@@ -411,26 +404,6 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
         );
 
         this.patchedPerson = data;
-      } catch (error: unknown) {
-        this.errorCode = 'UNSPECIFIED_ERROR';
-        if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.i18nKey || 'ERROR_LOADING_USER';
-        }
-      } finally {
-        this.loading = false;
-      }
-    },
-
-    async uploadPersonenImportFile(organisationId: string, rolleId: string, file: File): Promise<void> {
-      this.loading = true;
-      try {
-        const { data }: { data: ImportUploadResponse } = await importApi.importControllerUploadFile(
-          organisationId,
-          rolleId,
-          file,
-        );
-
-        this.uploadResponse = data;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
