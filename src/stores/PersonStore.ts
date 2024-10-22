@@ -409,7 +409,6 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
         if (isAxiosError(error)) {
           this.errorCode = error.response?.data.i18nKey || 'ERROR_LOADING_USER';
         }
-        return await Promise.reject(this.errorCode);
       } finally {
         this.loading = false;
       }

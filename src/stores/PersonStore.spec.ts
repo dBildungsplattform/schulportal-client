@@ -801,9 +801,7 @@ describe('PersonStore', () => {
 
       mockadapter.onPatch(`/api/personen/${personId}/metadata`).reply(500, { i18nKey: 'ERROR_UPDATING_USER' });
 
-      await expect(personStore.changePersonMetadataById(personId, vorname, familienname)).rejects.toEqual(
-        'ERROR_UPDATING_USER',
-      );
+      await personStore.changePersonMetadataById(personId, vorname, familienname)
 
       expect(personStore.loading).toBe(false);
       expect(personStore.errorCode).toEqual('ERROR_UPDATING_USER');
@@ -816,9 +814,7 @@ describe('PersonStore', () => {
 
       mockadapter.onPatch(`/api/personen/${personId}/metadata`).reply(500, 'Unknown error');
 
-      await expect(personStore.changePersonMetadataById(personId, vorname, familienname)).rejects.toEqual(
-        'ERROR_LOADING_USER',
-      );
+      await personStore.changePersonMetadataById(personId, vorname, familienname)
 
       expect(personStore.loading).toBe(false);
       expect(personStore.errorCode).toEqual('ERROR_LOADING_USER');

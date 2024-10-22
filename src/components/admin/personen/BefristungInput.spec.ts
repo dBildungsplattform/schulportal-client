@@ -2,7 +2,6 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { DOMWrapper, mount, VueWrapper } from '@vue/test-utils';
 import BefristungInput from './BefristungInput.vue';
 import { nextTick } from 'vue';
-// import { nextTick } from 'vue';
 
 let wrapper: VueWrapper;
 
@@ -83,11 +82,5 @@ describe('befristung', () => {
 
     expect(schuljahresendeRadioButton.element.checked).toBe(false);
     expect(unbefristetRadioButton.element.checked).toBe(false);
-  });
-
-  it('shows a tooltip for a disabled button', async () => {
-    wrapper.setProps({ isUnbefristedDisabled: true });
-    await nextTick();
-    // expect(wrapper.findComponent({ name: 'SpshTooltip' }).exists()).toBe(true);
   });
 });
