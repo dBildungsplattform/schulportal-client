@@ -27,7 +27,7 @@
     LockKeys,
     parseUserLock,
     usePersonStore,
-    UserLock,
+    type UserLock,
     type Person,
     type Personendatensatz,
     type PersonStore,

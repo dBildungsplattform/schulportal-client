@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { onBeforeMount, ref, watch, type Ref } from 'vue';
+  import { onBeforeMount, ref, type Ref } from 'vue';
   import { useI18n } from 'vue-i18n';
   import type { BaseFieldProps } from 'vee-validate';
 
@@ -36,14 +36,32 @@
     emit('update:befristung', value);
   };
 
-  watch(selectedRadioButton, (newVal: string) => {
-    if (newVal === RadioButtonSelect.UNBEFRISTET) {
-      emit('handleSelectedRadioButtonChange', true);
-      localBefristung.value = '';
-    } else if (newVal === RadioButtonSelect.BEFRISTET) {
-      emit('handleSelectedRadioButtonChange', false);
+  const handleRadiogroupChange = (newVal: RadioButtonSelect): void => {
+    switch (newVal) {
+      case RadioButtonSelect.BEFRISTET: {
+        emit('handleSelectedRadioButtonChange', false);
+        break;
+      }
+      case RadioButtonSelect.UNBEFRISTET: {
+        emit('handleSelectedRadioButtonChange', true);
+        localBefristung.value = '';
+        break;
+      }
     }
-  });
+  };
+
+  // watch(
+  //   selectedRadioButton,
+  //   (newVal: string) => {
+  //     if (newVal === RadioButtonSelect.UNBEFRISTET) {
+  //       emit('handleSelectedRadioButtonChange', true);
+  //       localBefristung.value = '';
+  //     } else if (newVal === RadioButtonSelect.BEFRISTET) {
+  //       emit('handleSelectedRadioButtonChange', false);
+  //     }
+  //   },
+  //   { immediate: true },
+  // );
 
   onBeforeMount(async () => {
     localBefristung.value = '';
@@ -62,6 +80,7 @@
         <v-radio-group
           data-testid="befristung-radio-group"
           v-model="selectedRadioButton"
+          @update:modelValue="handleRadiogroupChange"
         >
           <v-radio
             data-testid="unbefristet-radio-button"
@@ -84,7 +103,7 @@
         class="text-sm-center text-body"
       >
         <v-text-field
-          v-if="!(selectedRadioButton === RadioButtonSelect.UNBEFRISTET)"
+          v-if="selectedRadioButton === RadioButtonSelect.BEFRISTET"
           density="compact"
           variant="outlined"
           data-testid="befristung-input"
