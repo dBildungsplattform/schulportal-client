@@ -5328,6 +5328,7 @@
           "SCHULTRAEGER_VERWALTEN",
           "MIGRATION_DURCHFUEHREN",
           "PERSON_SYNCHRONISIEREN",
+          "CRON_DURCHFUEHREN",
           "IMPORT_DURCHFUEHREN"
         ]
       },
