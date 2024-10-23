@@ -4462,6 +4462,30 @@
           "VOLL"
         ]
       },
+      "EmailAddressStatus": {
+        "type": "string",
+        "enum": [
+          "ENABLED",
+          "DISABLED",
+          "REQUESTED",
+          "FAILED"
+        ]
+      },
+      "PersonEmailResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "$ref": "#/components/schemas/EmailAddressStatus"
+          },
+          "address": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "address"
+        ]
+      },
       "PersonResponse": {
         "type": "object",
         "properties": {
@@ -4525,6 +4549,15 @@
             "format": "date-time",
             "type": "string",
             "description": "Date of the most recent changes for the person"
+          },
+          "email": {
+            "nullable": true,
+            "description": "Contains status and address. Returns email-address verified by OX (enabled) if available, otherwise returns most recently updated one (no prioritized status)",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PersonEmailResponse"
+              }
+            ]
           }
         },
         "required": [
@@ -4542,7 +4575,8 @@
           "personalnummer",
           "isLocked",
           "lockInfo",
-          "lastModified"
+          "lastModified",
+          "email"
         ]
       },
       "PersonendatensatzResponse": {

@@ -848,6 +848,22 @@ export interface DeleteRevisionBodyParams {
 /**
  * 
  * @export
+ * @enum {string}
+ */
+
+export const EmailAddressStatus = {
+    Enabled: 'ENABLED',
+    Disabled: 'DISABLED',
+    Requested: 'REQUESTED',
+    Failed: 'FAILED'
+} as const;
+
+export type EmailAddressStatus = typeof EmailAddressStatus[keyof typeof EmailAddressStatus];
+
+
+/**
+ * 
+ * @export
  * @interface FindRollenResponse
  */
 export interface FindRollenResponse {
@@ -1334,6 +1350,27 @@ export interface PersonControllerFindPersonenkontexte200ResponseAllOf {
 /**
  * 
  * @export
+ * @interface PersonEmailResponse
+ */
+export interface PersonEmailResponse {
+    /**
+     * 
+     * @type {EmailAddressStatus}
+     * @memberof PersonEmailResponse
+     */
+    'status': EmailAddressStatus;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonEmailResponse
+     */
+    'address': string;
+}
+
+
+/**
+ * 
+ * @export
  * @interface PersonFrontendControllerFindPersons200Response
  */
 export interface PersonFrontendControllerFindPersons200Response {
@@ -1699,6 +1736,12 @@ export interface PersonResponse {
      * @memberof PersonResponse
      */
     'lastModified': string;
+    /**
+     * 
+     * @type {PersonResponseEmail}
+     * @memberof PersonResponse
+     */
+    'email': PersonResponseEmail | null;
 }
 
 
@@ -1780,6 +1823,27 @@ export interface PersonResponseAutomapper {
      * @memberof PersonResponseAutomapper
      */
     'personalnummer': string;
+}
+
+
+/**
+ * Contains status and address. Returns email-address verified by OX (enabled) if available, otherwise returns most recently updated one (no prioritized status)
+ * @export
+ * @interface PersonResponseEmail
+ */
+export interface PersonResponseEmail {
+    /**
+     * 
+     * @type {EmailAddressStatus}
+     * @memberof PersonResponseEmail
+     */
+    'status': EmailAddressStatus;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonResponseEmail
+     */
+    'address': string;
 }
 
 
