@@ -719,9 +719,10 @@
               cols="12"
               sm="6"
               md="4"
+              class="d-flex justify-center"
             >
               <v-btn
-                class="secondary button"
+                class="secondary button w-100"
                 @click.stop="closePasswordChangedDialogAndClearQuery()"
                 data-testid="close-password-changed-dialog-button"
               >
