@@ -1,11 +1,11 @@
 <script setup lang="ts">
-  import { useI18n } from 'vue-i18n';
+  import { useI18n, type Composer } from 'vue-i18n';
   import type { BaseFieldProps } from 'vee-validate';
   import KopersInput from '@/components/admin/personen/KopersInput.vue';
   import { type Ref, ref } from 'vue';
   import FormRow from '@/components/form/FormRow.vue';
 
-  useI18n({ useScope: 'global' });
+  const { t }: Composer = useI18n({ useScope: 'global' });
 
   type Props = {
     hasKopersRolle: boolean;
@@ -41,6 +41,18 @@
   function handSelectedFamilienname(value: string): void {
     emits('update:selectedFamilienname', value);
   }
+
+  type IQSHLink = {
+    text: string;
+    href: string;
+    external: boolean;
+  };
+
+  const link: Ref<IQSHLink> = ref({
+    text: t('admin.person.homePageIQSH'),
+    href: 'https://medienberatung.iqsh.de/schulportal-sh.html',
+    external: true,
+  });
 </script>
 
 <template>
@@ -57,7 +69,15 @@
             icon="mdi-alert-circle-outline"
             size="small"
           ></v-icon>
-          {{ $t('admin.person.personalInfoChangeNotice') }}
+          <span> {{ $t('admin.person.personalInfoChangeNotice') }} </span>
+          <span>
+            <a
+              :href="link.href"
+              :target="link.external ? '_blank' : '_self'"
+            >
+              {{ link.text }}</a
+            >.
+          </span>
         </span>
       </v-col>
       <v-col
