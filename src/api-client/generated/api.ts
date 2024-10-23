@@ -2373,6 +2373,7 @@ export const RollenSystemRecht = {
     SchultraegerVerwalten: 'SCHULTRAEGER_VERWALTEN',
     MigrationDurchfuehren: 'MIGRATION_DURCHFUEHREN',
     PersonSynchronisieren: 'PERSON_SYNCHRONISIEREN',
+    CronDurchfuehren: 'CRON_DURCHFUEHREN',
     ImportDurchfuehren: 'IMPORT_DURCHFUEHREN'
 } as const;
 

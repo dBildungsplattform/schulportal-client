@@ -36,7 +36,7 @@ function getMockPersonendatensatz(): Personendatensatz {
       email: {
         address: 'email',
         status: EmailAddressStatus.Requested,
-      }
+      },
     },
   };
 }
@@ -569,11 +569,11 @@ describe('PersonStore', () => {
           referrer: '6978',
           personalnummer: personalnummer,
           isLocked: false,
-          lockInfo: null,
+          userLock: null,
           email: {
             address: 'email',
             status: EmailAddressStatus.Requested,
-          }
+          },
         },
       };
 
@@ -591,7 +591,7 @@ describe('PersonStore', () => {
           lastModified: '2099-01-02',
           referrer: '6978',
           isLocked: false,
-          lockInfo: null,
+          userLock: null,
           mandant: '',
           geburt: {},
           stammorganisation: '',
@@ -602,7 +602,7 @@ describe('PersonStore', () => {
           email: {
             address: 'email',
             status: EmailAddressStatus.Requested,
-          }
+          },
         },
       };
 

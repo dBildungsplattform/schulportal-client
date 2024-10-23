@@ -1006,7 +1006,7 @@
       } else if (!selectedKopersNrMetadata.value && selectedVorname.value && selectedFamilienname.value) {
         await personStore.changePersonMetadataById(currentPersonId, selectedVorname.value, selectedFamilienname.value);
       }
-      changePersonMetadataSuccessMessage.value = t('admin.person.personalInfoSuccessDialogMessageWithUsername',);
+      changePersonMetadataSuccessMessage.value = t('admin.person.personalInfoSuccessDialogMessageWithUsername');
       changePersonMetadataSuccessVisible.value = !personStore.errorCode;
       resetFormChangePersonMetadata();
     });
@@ -1371,7 +1371,10 @@
                     icon="mdi-alert-circle-outline"
                     size="small"
                   ></v-icon>
-                  <span data-testid="person-email-text" class="text-body">
+                  <span
+                    data-testid="person-email-text"
+                    class="text-body"
+                  >
                     {{ emailStatusText.text }}
                   </span>
                 </SpshTooltip>
