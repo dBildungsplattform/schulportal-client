@@ -506,7 +506,7 @@
   });
 
   
-  const isFormDirtyZuordnungCreationForm: ComputedRef<boolean> = computed(() => getDirtyState(formContext));
+  const isZuordnungCreationFormDirty: ComputedRef<boolean> = computed(() => getDirtyState(formContext));
 
 
   const {
@@ -529,7 +529,7 @@
     defineField: defineFieldChangeKlasse,
     handleSubmit: handleSubmitChangeKlasse,
     resetForm: resetChangeKlasseForm,
-    isFieldDirty: isFieldDirtyChangeKlasse,
+    isFieldDirty: isChangeKlasseFieldDirty,
   } = useForm<ChangeKlasseForm>({
     validationSchema: changeKlasseValidationSchema,
   });
@@ -539,7 +539,7 @@
     defineField: defineFieldChangePersonMetadata,
     handleSubmit: handleSubmitChangePersonMetadata,
     resetForm: resetFormChangePersonMetadata,
-    isFieldDirty: isFieldDirtyChangePersonMetadata,
+    isFieldDirty: isChangePersonMetadataFieldDirty,
     setFieldValue: setFieldValueChangePersonMetadata,
   } = useForm<ChangePersonMetadata>({
     validationSchema: changePersonMetadataValidationSchema,
@@ -985,15 +985,15 @@
     // Checks for dirtiness depending on the active form
   function isFormDirty(): boolean {
     if(isEditPersonMetadataActive.value){
-    return isFieldDirtyChangePersonMetadata('selectedKopersNrMetadata') || isFieldDirtyChangePersonMetadata('selectedVorname') || 
-    isFieldDirtyChangePersonMetadata('selectedFamilienname');
+    return isChangePersonMetadataFieldDirty('selectedKopersNrMetadata') || isChangePersonMetadataFieldDirty('selectedVorname') || 
+    isChangePersonMetadataFieldDirty('selectedFamilienname');
   }
   else if (isChangeKlasseFormActive.value){
-    return isFieldDirtyChangeKlasse('selectedSchule') || isFieldDirtyChangeKlasse('selectedNewKlasse');
+    return isChangeKlasseFieldDirty('selectedSchule') || isChangeKlasseFieldDirty('selectedNewKlasse');
   }
 
   else if (isEditActive.value){
-    return isFormDirtyZuordnungCreationForm.value; 
+    return isZuordnungCreationFormDirty.value; 
   }
   return false;
   }
