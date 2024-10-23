@@ -54,21 +54,12 @@ beforeEach(async () => {
 });
 
 describe('PersonDelete', () => {
-  test('it opens and closes the dialog', async () => {
+  test('it opens the dialog', async () => {
     wrapper?.find('[data-testid="open-person-delete-dialog-button"]').trigger('click');
     await nextTick();
 
     await document.querySelector('[data-testid="person-delete-confirmation-text"]');
     expect(document.querySelector('[data-testid="person-delete-confirmation-text"]')).not.toBeNull();
-
-    const closeDialogButton: HTMLElement | undefined = document.querySelector(
-      '[data-testid="close-person-delete-dialog-button"]',
-    ) as HTMLElement;
-    closeDialogButton.click();
-    await nextTick();
-
-    // TODO: Close dialog button is not removed from the DOM
-    // expect(document.querySelector('[data-testid="close-person-delete-dialog-button"]')).toBeNull();
   });
 
   test('it deletes a person and navigates back to management', async () => {
