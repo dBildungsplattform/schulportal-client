@@ -37,7 +37,7 @@ const routes: readonly RouteRecordRaw[] = [
     meta: {
       layout: 'AdminLayout',
       requiresAuth: true,
-      requiresPermission: 'personenverwaltung',
+      requiresPermission: ['personenverwaltung', 'personenanlegen'],
     },
   },
   {

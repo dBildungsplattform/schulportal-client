@@ -42,6 +42,7 @@ type AuthState = {
   hasSchulverwaltungPermission: boolean;
   hasSchultraegerverwaltungPermission: boolean;
   hasPersonenSyncPermission: boolean;
+  hasPersonenAnlegenPermission: boolean;
   isAuthed: boolean;
 };
 
@@ -67,6 +68,7 @@ export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, 
     hasSchulverwaltungPermission: false,
     hasSchultraegerverwaltungPermission: false,
     hasPersonenSyncPermission: false,
+    hasPersonenAnlegenPermission: false,
     isAuthed: false,
   }),
   actions: {
@@ -97,6 +99,7 @@ export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, 
         this.hasSchulverwaltungPermission = this.currentUserPermissions.includes('SCHULEN_VERWALTEN');
         this.hasSchultraegerverwaltungPermission = this.currentUserPermissions.includes('SCHULTRAEGER_VERWALTEN');
         this.hasPersonenSyncPermission = this.currentUserPermissions.includes('PERSON_SYNCHRONISIEREN');
+        this.hasPersonenAnlegenPermission = this.currentUserPermissions.includes('PERSONEN_ANLEGEN');
       } catch {
         // If user info can't be retrieved, consider the user unauthenticated.
         this.isAuthed = false;

@@ -5351,7 +5351,9 @@
                     "SCHULTRAEGER_VERWALTEN",
                     "MIGRATION_DURCHFUEHREN",
                     "PERSON_SYNCHRONISIEREN",
-                    "IMPORT_DURCHFUEHREN"
+                    "CRON_DURCHFUEHREN",
+                    "IMPORT_DURCHFUEHREN",
+                    "PERSONEN_ANLEGEN"
                 ]
             },
             "OrganisationByIdBodyParams": {
