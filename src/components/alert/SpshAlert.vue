@@ -32,7 +32,7 @@
         :closable="closable"
         @click:close="closeAlert"
       >
-        <v-row class="v-alert__title">
+        <v-row>
           <v-col
             class="primary-text-color"
             cols="auto"
