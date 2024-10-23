@@ -342,11 +342,15 @@ describe('ProfileView', () => {
     if (!wrapper) return;
 
     expect(document.querySelector('[data-testid="two-factor-card"]')).not.toBeNull();
-    expect(wrapper.text()).not.toContain('Bitte wenden Sie sich bei Fragen und Problemen an ihre schulischen Admins.');
+    expect(wrapper.text()).not.toContain(
+      'Bitte wenden Sie sich bei Fragen und Problemen an Ihre schulischen Administratorinnen und Administratoren.',
+    );
 
     twoFactorAuthenticationStore.hasToken = true;
     await nextTick();
-    expect(wrapper.text()).toContain('Bitte wenden Sie sich bei Fragen und Problemen an ihre schulischen Admins.');
+    expect(wrapper.text()).toContain(
+      'Bitte wenden Sie sich bei Fragen und Problemen an Ihre schulischen Administratorinnen und Administratoren.',
+    );
   });
 
   test('it does not display 2FA section if not required', async () => {
