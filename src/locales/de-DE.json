@@ -26,6 +26,17 @@
     "followingDataCreated": "Folgende Daten wurden gespeichert:",
     "headline": "Administrationsbereich",
     "import": {
+      "rules": {
+        "files": {
+          "required": "Eine CSV-Datei muss ausgewählt werden."
+        },
+        "rolle": {
+          "required": "Eine Rolle muss ausgewählt werden."
+        },
+        "schule": {
+          "required": "Eine Schule muss ausgewählt werden."
+        }
+      },
       "selectFile": "Datei auswählen",
       "uploadFile": "Datei hochladen"
     },

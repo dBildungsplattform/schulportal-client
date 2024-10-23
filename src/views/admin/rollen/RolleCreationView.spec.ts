@@ -151,14 +151,14 @@ describe('RolleCreationView', () => {
     expect(
       wrapper
         ?.findComponent({ ref: 'rolle-creation-form' })
-        .find('[data-testid="rolle-form-create-button"]')
+        .find('[data-testid="rolle-form-submit-button"]')
         .isVisible(),
     ).toBe(true);
 
     wrapper
       ?.findComponent({ ref: 'rolle-creation-form' })
       .findComponent({ ref: 'formwrapper' })
-      .find('[data-testid="rolle-form-create-button"]')
+      .find('[data-testid="rolle-form-submit-button"]')
       .trigger('click');
     await nextTick();
 

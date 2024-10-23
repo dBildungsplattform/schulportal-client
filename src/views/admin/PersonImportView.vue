@@ -1,19 +1,20 @@
 <script setup lang="ts">
+  import FormWrapper from '@/components/form/FormWrapper.vue';
   import FormRow from '@/components/form/FormRow.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { useRouter, type Router } from 'vue-router';
-  import { useRollen } from '@/composables/useRollen';
+  import { useRollen, type TranslatedRolleWithAttrs } from '@/composables/useRollen';
   import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
   import { useSchulen } from '@/composables/useSchulen';
-  import { onMounted, ref, watch, type ComputedRef, type Ref } from 'vue';
+  import { computed, onMounted, ref, watch, type ComputedRef, type Ref } from 'vue';
   import type { TranslatedObject } from '@/types';
   import { useForm, type BaseFieldProps, type FormContext, type TypedSchema } from 'vee-validate';
   import { toTypedSchema } from '@vee-validate/yup';
-  import { object, string } from 'yup';
+  import { mixed, object, string } from 'yup';
   import { useI18n, type Composer } from 'vue-i18n';
   import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
   import { type ImportStore, useImportStore } from '@/stores/ImportStore';
-  import { useDisplay } from 'vuetify';
+  import { RollenArt } from '@/stores/RolleStore';
 
   const organisationStore: OrganisationStore = useOrganisationStore();
   const importStore: ImportStore = useImportStore();
@@ -21,18 +22,27 @@
 
   const router: Router = useRouter();
   const { t }: Composer = useI18n({ useScope: 'global' });
-  const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
-  const rollen: ComputedRef<TranslatedObject[] | undefined> = useRollen();
+  const allRollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = useRollen();
+  const lernRollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = computed(() => {
+    if (!allRollen.value) {
+      return [];
+    }
+
+    return allRollen.value.filter((rolle: TranslatedRolleWithAttrs) => {
+      return rolle.rollenart === RollenArt.Lern;
+    });
+  });
   const schulen: ComputedRef<TranslatedObject[] | undefined> = useSchulen();
   const searchInputSchule: Ref<string> = ref('');
-  const hasAutoselectedSchule: Ref<boolean> = ref(false);
 
   let timerId: ReturnType<typeof setTimeout>;
 
   const validationSchema: TypedSchema = toTypedSchema(
     object({
-      selectedSchule: string().required(t('admin.organisation.rules.organisation.required')),
+      selectedSchule: string().required(t('admin.import.rules.schule.required')),
+      selectedRolle: string().required(t('admin.import.rules.rolle.required')),
+      selectedFiles: mixed().required(t('admin.import.rules.files.required')),
     }),
   );
 
@@ -48,6 +58,7 @@
   type PersonImportForm = {
     selectedSchule: string;
     selectedRolle: string;
+    selectedFiles: Array<File>;
   };
 
   const formContext: FormContext<PersonImportForm, PersonImportForm> = useForm<PersonImportForm>({
@@ -64,15 +75,17 @@
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = formContext.defineField('selectedRolle', vuetifyConfig);
 
-  const selectedFiles: Ref<Array<File> | undefined> = ref();
+  const [selectedFiles, selectedFilesProps]: [
+    Ref<Array<File> | undefined>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = formContext.defineField('selectedFiles', vuetifyConfig);
 
   watch(selectedSchule, (newValue: string | undefined, oldValue: string | undefined) => {
     if (newValue && newValue !== oldValue) {
       // Fetch the roles after selecting the organization
       personenkontextStore.processWorkflowStep({
         organisationId: newValue,
-        limit: 25,
-        rolleName: 'SuS',
+        limit: 30,
       });
 
       // Reset the selectedRolle field only if oldValue was not undefined
@@ -124,6 +137,10 @@
     );
   }
 
+  const onSubmit: (e?: Event | undefined) => Promise<void | undefined> = formContext.handleSubmit(() => {
+    uploadFile();
+  });
+
   onMounted(async () => {
     await organisationStore.getAllOrganisationen({
       includeTyp: OrganisationsTyp.Schule,
@@ -150,96 +167,87 @@
       :padded="true"
       :showCloseText="true"
     >
-      <v-container class="px-3 px-sm-16">
-        <v-container class="px-lg-16">
-          <!-- Schulauswahl -->
-          <FormRow
-            :errorLabel="selectedSchuleProps['error']"
-            :isRequired="true"
-            labelForId="schule-select"
-            :label="$t('admin.schule.schule')"
-          >
-            <v-autocomplete
-              class="mb-5"
-              autocomplete="off"
-              :class="[{ 'filter-dropdown mb-4': hasAutoselectedSchule }, { selected: selectedSchule }]"
-              clearable
-              :click:clear="clearSelectedSchule"
-              data-testid="schule-select"
-              density="compact"
-              :disabled="hasAutoselectedSchule"
-              id="schule-select"
-              ref="schule-select"
-              hide-details
-              :items="schulen"
-              item-value="value"
-              item-text="title"
-              :no-data-text="$t('noDataFound')"
-              :placeholder="$t('admin.schule.selectSchule')"
-              required="true"
-              variant="outlined"
-              v-bind="selectedSchuleProps"
-              v-model="selectedSchule"
-              v-model:search="searchInputSchule"
-            ></v-autocomplete>
-          </FormRow>
+      <FormWrapper
+        :createButtonLabel="$t('admin.import.uploadFile')"
+        :discardButtonLabel="$t('nav.backToList')"
+        id="person-import-form"
+        :onDiscard="navigateToPersonTable"
+        :onSubmit="onSubmit"
+      >
+        <!-- Schulauswahl -->
+        <FormRow
+          :errorLabel="selectedSchuleProps['error']"
+          :isRequired="true"
+          labelForId="schule-select"
+          :label="$t('admin.schule.schule')"
+        >
+          <v-autocomplete
+            autocomplete="off"
+            clearable
+            @click:clear="clearSelectedSchule"
+            data-testid="schule-select"
+            density="compact"
+            id="schule-select"
+            ref="schule-select"
+            :items="schulen"
+            item-value="value"
+            item-text="title"
+            :no-data-text="$t('noDataFound')"
+            :placeholder="$t('admin.schule.selectSchule')"
+            required="true"
+            variant="outlined"
+            v-bind="selectedSchuleProps"
+            v-model="selectedSchule"
+            v-model:search="searchInputSchule"
+          ></v-autocomplete>
+        </FormRow>
 
-          <!-- Rollenauswahl (currently limited to SuS) -->
-          <FormRow
-            :errorLabel="selectedRolleProps['error']"
-            labelForId="rolle-select"
-            :isRequired="true"
-            :label="$t('admin.rolle.rolle')"
-          >
-            <v-autocomplete
-              autocomplete="off"
-              clearable
-              @clear="clearSelectedRolle"
-              data-testid="rolle-select"
-              density="compact"
-              id="rolle-select"
-              ref="rolle-select"
-              :items="rollen"
-              item-value="value"
-              item-text="title"
-              :no-data-text="$t('noDataFound')"
-              :placeholder="$t('admin.rolle.selectRolle')"
-              required="true"
-              variant="outlined"
-              v-bind="selectedRolleProps"
-              v-model="selectedRolle"
-            ></v-autocomplete>
-          </FormRow>
+        <!-- Rollenauswahl (currently limited to SuS) -->
+        <FormRow
+          :errorLabel="selectedRolleProps['error']"
+          labelForId="rolle-select"
+          :isRequired="true"
+          :label="$t('admin.rolle.rolle')"
+        >
+          <v-autocomplete
+            autocomplete="off"
+            clearable
+            @click:clear="clearSelectedRolle"
+            data-testid="rolle-select"
+            density="compact"
+            id="rolle-select"
+            ref="rolle-select"
+            :items="lernRollen"
+            item-value="value"
+            item-text="title"
+            :no-data-text="$t('noDataFound')"
+            :placeholder="$t('admin.rolle.selectRolle')"
+            required="true"
+            variant="outlined"
+            v-bind="selectedRolleProps"
+            v-model="selectedRolle"
+          ></v-autocomplete>
+        </FormRow>
 
-          <!-- File Upload -->
-          <FormRow
-            :errorLabel="''"
-            :isRequired="true"
-            labelForId="file-upload"
-            :label="$t('admin.import.uploadFile')"
-          >
-            <v-file-input
-              accept=".csv"
-              :label="$t('admin.import.selectFile')"
-              prepend-icon=""
-              prepend-inner-icon="mdi-paperclip"
-              variant="outlined"
-              v-model="selectedFiles"
-            ></v-file-input>
-          </FormRow>
-
-          <!-- Upload Button -->
-          <v-btn
-            :block="mdAndDown"
-            class="primary"
-            @click.stop="uploadFile()"
-            data-testid="upload-file-button"
-          >
-            {{ $t('admin.import.uploadFile') }}
-          </v-btn>
-        </v-container>
+        <!-- File Upload -->
+        <FormRow
+          :errorLabel="''"
+          :isRequired="true"
+          labelForId="file-upload"
+          :label="$t('admin.import.uploadFile')"
+        >
+          <v-file-input
+            accept=".csv"
+            :label="$t('admin.import.selectFile')"
+            prepend-icon=""
+            prepend-inner-icon="mdi-paperclip"
+            variant="outlined"
+            v-model="selectedFiles"
+            v-bind="selectedFilesProps"
+          ></v-file-input>
+        </FormRow>
         {{ importStore.uploadResponse }}
-      </v-container>
+      </FormWrapper>
     </LayoutCard>
   </div>
 </template>
