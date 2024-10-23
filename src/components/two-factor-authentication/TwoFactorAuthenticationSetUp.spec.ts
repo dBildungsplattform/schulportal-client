@@ -1,6 +1,7 @@
 import { VueWrapper, mount } from '@vue/test-utils';
 import TwoFactorAuthenticationSetUp from './TwoFactorAuthenticationSetUp.vue';
 import { nextTick } from 'vue';
+import { EmailAddressStatus } from '@/api-client/generated/api';
 
 let wrapper: VueWrapper | null = null;
 
@@ -29,6 +30,10 @@ beforeEach(() => {
           userLock: null,
           revision: '1',
           lastModified: '2024-05-22',
+          email: {
+            address: 'email',
+            status: EmailAddressStatus.Requested,
+          }
         },
       },
     },

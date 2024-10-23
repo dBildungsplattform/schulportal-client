@@ -30,6 +30,13 @@ const personenuebersichtApi: DbiamPersonenuebersichtApiInterface = DbiamPersonen
   axiosApiInstance,
 );
 
+export enum EmailStatus {
+  Enabled = 'ENABLED',
+  Disabled = 'DISABLED',
+  Requested = 'REQUESTED',
+  Failed = 'FAILED',
+}
+
 export enum SortField {
   Familienname = 'familienname',
   Vorname = 'vorname',
@@ -64,6 +71,7 @@ export type Person = {
   isLocked: PersonResponse['isLocked'];
   userLock: UserLock | null;
   lastModified: PersonResponse['lastModified'];
+  email: PersonResponse['email'];
 };
 
 type PersonenWithRolleAndZuordnung = {
@@ -148,6 +156,7 @@ export function mapPersonendatensatzResponseToPersonendatensatz(
     isLocked: response.person.isLocked,
     userLock: userLock,
     lastModified: response.person.lastModified,
+    email: response.person.email,
   };
   return { person };
 }

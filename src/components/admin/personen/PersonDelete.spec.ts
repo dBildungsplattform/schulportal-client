@@ -1,6 +1,7 @@
 import { expect, test } from 'vitest';
 import { VueWrapper, mount } from '@vue/test-utils';
 import PersonDelete from './PersonDelete.vue';
+import { EmailAddressStatus } from '@/api-client/generated';
 
 let wrapper: VueWrapper | null = null;
 
@@ -29,6 +30,10 @@ beforeEach(() => {
           userLock: null,
           revision: '1',
           lastModified: '2024-05-22',
+          email: {
+            address: 'email',
+            status: EmailAddressStatus.Requested,
+          }
         },
       },
     },

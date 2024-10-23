@@ -1,5 +1,6 @@
 import { mount } from '@vue/test-utils';
 import HardwareTokenWorkflow from './HardwareTokenWorkflow.vue';
+import { EmailAddressStatus } from '@/api-client/generated/api';
 
 beforeEach(() => {
   document.body.innerHTML = `
@@ -25,6 +26,10 @@ beforeEach(() => {
           userLock: null,
           revision: '1',
           lastModified: '2024-05-22',
+          email: {
+            address: 'email',
+            status: EmailAddressStatus.Requested,
+          }
         },
       },
     },

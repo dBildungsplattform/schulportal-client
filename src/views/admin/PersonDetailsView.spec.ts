@@ -10,9 +10,10 @@ import {
 } from '@/stores/PersonStore';
 import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
 import { RollenMerkmal, RollenSystemRecht } from '@/stores/RolleStore';
-import { shallowMount, VueWrapper } from '@vue/test-utils';
+import {  shallowMount, VueWrapper } from '@vue/test-utils';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import PersonDetailsView from './PersonDetailsView.vue';
+import { EmailAddressStatus } from '@/api-client/generated';
 // import { nextTick, type ComputedRef, type DefineComponent } from 'vue';
 // import type { TranslatedRolleWithAttrs } from '@/composables/useRollen';
 
@@ -37,6 +38,10 @@ const mockPerson: Personendatensatz = {
     userLock: null,
     revision: '1',
     lastModified: '2024-05-22',
+    email: {
+      address: 'email@email.com',
+      status: EmailAddressStatus.Enabled,
+    },
   },
 };
 
@@ -209,14 +214,37 @@ beforeEach(async () => {
   });
 });
 
+// TODO: This is for SPSH-806 and should be back in SPSH-1021 
+// const setCurrentPerson = (emailStatus: EmailAddressStatus): void => {
+//   personStore.currentPerson = {
+//     person: {
+//       id: '123456',
+//       name: {
+//         familienname: 'Vimes',
+//         vorname: 'Susan',
+//       },
+//       referrer: '6978',
+//       personalnummer: '9183756',
+//       isLocked: false,
+//       lockInfo: null,
+//       revision: '1',
+//       lastModified: '2024-12-22',
+//       email: {
+//         address: 'test@example.com',
+//         status: emailStatus,
+//       },
+//     },
+//   };
+// };
+
 describe('PersonDetailsView', () => {
   test('it renders the person details page and shows person data', async () => {
     expect(wrapper).toBeTruthy();
     // expect(wrapper?.find('[data-testid="person-details-card"]').isVisible()).toBe(true);
     // expect(wrapper?.find('[data-testid="person-vorname"]').text()).toBe('John');
-    // expect(wrapper?.find('[data-testid="person-familienname"]').text()).toBe('Orton');
+    //= expect(wrapper?.find('[data-testid="person-familienname"]').text()).toBe('Orton');
     // expect(wrapper?.find('[data-testid="person-username"]').text()).toBe('jorton');
-    // expect(wrapper?.find('[data-testid="person-zuordnung-1"]').text()).toBe('123456 (Testschule Birmingham): SuS 9a');
+    // expect(wrapper?.find('[data-testid="person-email"]').text()).toBe('email@email.com');
     // expect(wrapper?.getComponent({ name: 'PasswordReset' })).toBeTruthy();
   });
 
@@ -401,6 +429,51 @@ describe('PersonDetailsView', () => {
   //     expect(attributeElement.text()).toContain(attributeValue);
   //   }
   // });
+
+  // TODO: Those test cases cover SPSH-806 fully and should be functioning
+  // it('displays correct email status for Enabled', async () => {
+  //   setCurrentPerson(EmailAddressStatus.Enabled);
+
+  //   await nextTick();
+
+  //   const emailElement: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="person-email-text"]');
+  //   expect(emailElement?.text()).toBe('test@example.com');
+  // });
+
+  // it('displays correct email status for requested', async () => {
+  //   setCurrentPerson(EmailAddressStatus.Requested);
+
+  //   await nextTick();
+
+  //   const emailElement: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="person-email-text"]');
+  //   expect(emailElement?.text()).toBe('wird erzeugt');
+  // });
+
+  // it('displays correct email status for failed', async () => {
+  //   setCurrentPerson(EmailAddressStatus.Failed);
+
+  //   await nextTick();
+
+  //   const emailElement: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="person-email-text"]');
+  //   expect(emailElement?.text()).toBe('fehlerhaft');
+  // });
+
+  // it('displays correct email status for disabled', async () => {
+  //   setCurrentPerson(EmailAddressStatus.Disabled);
+
+  //   await nextTick();
+
+  //   const emailElement: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="person-email-text"]');
+  //   expect(emailElement?.text()).toBe('deaktiviert');
+  // });
+
+  // it('displays correct email status for unknown', async () => {
+  //   setCurrentPerson('UnknownStatus' as EmailAddressStatus);
+
+  //   await nextTick();
+
+  //   const emailElement: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="person-email-text"]');
+  //   expect(emailElement?.exists()).toBe(false);
 
   // TODO: This test is for SPSH-1090 and should be back in SPSH-1021
   // test('it sets errorCode to PERSONALNUMMER_NICHT_EINDEUTIG and goes back to Form', async () => {
