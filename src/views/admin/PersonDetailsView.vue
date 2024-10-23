@@ -24,6 +24,7 @@
     type OrganisationStore,
   } from '@/stores/OrganisationStore';
   import {
+    EmailStatus,
     LockKeys,
     usePersonStore,
     type Person,
@@ -123,6 +124,7 @@
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
   let blockedNext: () => void = () => {};
   const calculatedBefristung: Ref<string | undefined> = ref('');
+  const loading: Ref<boolean> = ref(true);
 
   function navigateToPersonTable(): void {
     router.push({ name: 'person-management' });
@@ -304,10 +306,6 @@
       };
     }
   };
-  async function navigateBackToKopersForm(): Promise<void> {
-    personStore.errorCode = '';
-    personenkontextStore.errorCode = '';
-  }
 
   const alertButtonText: ComputedRef<string> = computed(() => {
     return personenkontextStore.errorCode === 'PERSON_NOT_FOUND' ? t('nav.backToList') : t('refreshData');
@@ -321,12 +319,6 @@
     return personStore.errorCode === 'PERSONALNUMMER_NICHT_EINDEUTIG'
       ? t('admin.person.backToInput')
       : t('nav.backToList');
-  });
-
-  const alertButtonActionKopers: ComputedRef<() => void> = computed(() => {
-    return personStore.errorCode === 'PERSONALNUMMER_NICHT_EINDEUTIG'
-      ? navigateBackToKopersForm
-      : navigateToPersonTable;
   });
 
   function getSskName(sskDstNr: string | undefined, sskName: string): string {
@@ -473,11 +465,13 @@
   // Validation schema for the form for changing person metadata
   const changePersonMetadataValidationSchema: TypedSchema = toTypedSchema(
     object({
-      selectedKopersNrMetadata: string().when([], {
-        is: () => personStore.currentPerson?.person.personalnummer,
-        then: (schema: StringSchema) => schema.required(t('admin.person.rules.kopersNr.required')),
-        otherwise: (schema: StringSchema) => schema.notRequired(),
-      }),
+      selectedKopersNrMetadata: string()
+        .matches(NO_LEADING_TRAILING_SPACES, t('admin.person.rules.kopersNr.noLeadingTrailingSpaces'))
+        .when([], {
+          is: () => personStore.currentPerson?.person.personalnummer,
+          then: (schema: StringSchema) => schema.required(t('admin.person.rules.kopersNr.required')),
+          otherwise: (schema: StringSchema) => schema.notRequired(),
+        }),
       selectedVorname: string()
         .matches(DIN_91379A, t('admin.person.rules.vorname.matches'))
         .matches(NO_LEADING_TRAILING_SPACES, t('admin.person.rules.vorname.noLeadingTrailingSpaces'))
@@ -572,6 +566,25 @@
       calculatedBefristung,
       selectedRolle,
     });
+
+  async function navigateBackToKopersForm(): Promise<void> {
+    const personalnummer: string | null | undefined = personStore.currentPerson?.person.personalnummer;
+    const vorname: string | undefined = personStore.currentPerson?.person.name.vorname;
+    const familienname: string | undefined = personStore.currentPerson?.person.name.familienname;
+
+    // Set the initial values of the person in the form again when navigating back to it after an error in the first submit.
+    setFieldValueChangePersonMetadata('selectedKopersNrMetadata', personalnummer ?? '');
+    setFieldValueChangePersonMetadata('selectedVorname', vorname ?? '');
+    setFieldValueChangePersonMetadata('selectedFamilienname', familienname ?? '');
+    personStore.errorCode = '';
+    personenkontextStore.errorCode = '';
+  }
+
+  const alertButtonActionKopers: ComputedRef<() => void> = computed(() => {
+    return personStore.errorCode === 'PERSONALNUMMER_NICHT_EINDEUTIG'
+      ? navigateBackToKopersForm
+      : navigateToPersonTable;
+  });
 
   // Triggers the template to start editing
   const triggerEdit = (): void => {
@@ -977,14 +990,7 @@
       } else if (!selectedKopersNrMetadata.value && selectedVorname.value && selectedFamilienname.value) {
         await personStore.changePersonMetadataById(currentPersonId, selectedVorname.value, selectedFamilienname.value);
       }
-      // Success message changes depending on if the username changed or not.
-      if (personStore.currentPerson?.person.referrer !== personStore.patchedPerson?.person.referrer) {
-        changePersonMetadataSuccessMessage.value = t('admin.person.personalInfoSuccessDialogMessageWithUsername', {
-          username: personStore.patchedPerson?.person.referrer,
-        });
-      } else {
-        changePersonMetadataSuccessMessage.value = t('admin.person.personalInfoSuccessDialogMessage');
-      }
+      changePersonMetadataSuccessMessage.value = t('admin.person.personalInfoSuccessDialogMessageWithUsername',);
       changePersonMetadataSuccessVisible.value = !personStore.errorCode;
       resetFormChangePersonMetadata();
     });
@@ -1078,7 +1084,40 @@
     }
     return '';
   });
-  const loading: Ref<boolean> = ref(true);
+
+  // Computed property to define what will be shown in the field Email depending on the returned status.
+  const emailStatusText: ComputedRef<{
+    text: string;
+    tooltip: string;
+  }> = computed(() => {
+    switch (personStore.currentPerson?.person.email?.status) {
+      case EmailStatus.Enabled:
+        return {
+          text: personStore.currentPerson.person.email.address,
+          tooltip: t('person.emailStatusActiveHover'),
+        };
+      case EmailStatus.Requested:
+        return {
+          text: t('person.emailStatusRequested'),
+          tooltip: t('person.emailStatusRequestedHover'),
+        };
+      case EmailStatus.Disabled:
+        return {
+          text: t('person.emailStatusDisabled'),
+          tooltip: t('person.emailStatusDisabledHover'),
+        };
+      case EmailStatus.Failed:
+        return {
+          text: t('person.emailStatusFailed'),
+          tooltip: t('person.emailStatusFailedHover'),
+        };
+      default:
+        return {
+          text: t('person.emailStatusUnknown'),
+          tooltip: t('person.emailStatusUnknownHover'),
+        };
+    }
+  });
 
   onBeforeMount(async () => {
     personStore.resetState();
@@ -1284,6 +1323,42 @@
                 >
                   {{ personStore.currentPerson.person.personalnummer ?? $t('missing') }}
                 </span>
+              </v-col>
+            </v-row>
+            <!-- Email -->
+            <v-row
+              v-if="emailStatusText.text !== $t('person.emailStatusUnknown')"
+              class="mt-0"
+            >
+              <v-col cols="1"></v-col>
+              <v-col
+                class="text-right"
+                md="2"
+                sm="3"
+                cols="5"
+              >
+                <span class="subtitle-2"> {{ $t('person.email') }}: </span>
+              </v-col>
+              <v-col
+                cols="auto"
+                data-testid="person-email"
+              >
+                <SpshTooltip
+                  :enabledCondition="!!personStore.currentPerson.person.email"
+                  :disabledText="$t('person.changePersonMetaDataDisabledDescription')"
+                  :enabledText="emailStatusText.tooltip"
+                  position="bottom"
+                >
+                  <v-icon
+                    aria-hidden="true"
+                    class="mr-2"
+                    icon="mdi-alert-circle-outline"
+                    size="small"
+                  ></v-icon>
+                  <span data-testid="person-email-text" class="text-body">
+                    {{ emailStatusText.text }}
+                  </span>
+                </SpshTooltip>
               </v-col>
             </v-row>
           </div>
