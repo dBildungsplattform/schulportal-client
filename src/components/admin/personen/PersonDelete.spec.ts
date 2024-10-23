@@ -4,6 +4,7 @@ import PersonDelete from './PersonDelete.vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import routes from '@/router/routes';
 import { nextTick } from 'vue';
+import { EmailAddressStatus } from '@/api-client/generated';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
@@ -41,6 +42,10 @@ beforeEach(async () => {
           lockInfo: null,
           revision: '1',
           lastModified: '2024-05-22',
+          email: {
+            address: 'email',
+            status: EmailAddressStatus.Requested,
+          }
         },
       },
     },

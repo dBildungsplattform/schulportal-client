@@ -6,6 +6,7 @@ import {
   useTwoFactorAuthentificationStore,
   type TwoFactorAuthentificationStore,
 } from '@/stores/TwoFactorAuthentificationStore';
+import { EmailAddressStatus } from '@/api-client/generated/api';
 
 let wrapper: VueWrapper<InstanceType<typeof TwoFactorAuthenticationSetUp>> | null = null;
 let twoFactorAuthenticationStore: TwoFactorAuthentificationStore;
@@ -36,6 +37,10 @@ beforeEach(() => {
           lockInfo: null,
           revision: '1',
           lastModified: '2024-05-22',
+          email: {
+            address: 'email',
+            status: EmailAddressStatus.Requested,
+          }
         },
       },
     },

@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/typedef */
 import {
+  EmailAddressStatus,
   OrganisationsTyp,
   RollenMerkmal,
   Vertrauensstufe,
@@ -30,6 +31,10 @@ function getMockPersonendatensatz(): Personendatensatz {
       lockInfo: null,
       revision: '1',
       lastModified: '2024-12-22',
+      email: {
+        address: 'email',
+        status: EmailAddressStatus.Requested,
+      }
     },
   };
 }
@@ -746,6 +751,10 @@ describe('PersonStore', () => {
           personalnummer: personalnummer,
           isLocked: false,
           lockInfo: null,
+          email: {
+            address: 'email',
+            status: EmailAddressStatus.Requested,
+          }
         },
       };
 
@@ -771,6 +780,10 @@ describe('PersonStore', () => {
           lokalisierung: '',
           vertrauensstufe: Vertrauensstufe.Teil,
           startpasswort: '',
+          email: {
+            address: 'email',
+            status: EmailAddressStatus.Requested,
+          }
         },
       };
 

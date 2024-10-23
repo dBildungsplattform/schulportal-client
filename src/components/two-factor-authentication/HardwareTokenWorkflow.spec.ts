@@ -8,6 +8,8 @@ import { vi } from 'vitest';
 import type { Personendatensatz } from '@/stores/PersonStore';
 import { nextTick } from 'vue';
 import type { AxiosError } from 'axios';
+import { EmailAddressStatus } from '@/api-client/generated/api';
+
 vi.mock('vue-i18n', () => ({
   useI18n: (): { t: (key: string) => string } => ({
     t: (key: string) => key,
@@ -33,6 +35,10 @@ describe('HardwareTokenWorkflow.vue', () => {
         lockInfo: null,
         revision: '1',
         lastModified: '2024-12-22',
+        email: {
+          address: 'email',
+          status: EmailAddressStatus.Requested,
+        }
       },
     };
   }

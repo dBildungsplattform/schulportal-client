@@ -16,6 +16,7 @@ import { RollenArt, RollenMerkmal, RollenSystemRecht } from '@/stores/RolleStore
 import { nextTick, type ComputedRef, type DefineComponent } from 'vue';
 import type { TranslatedRolleWithAttrs } from '@/composables/useRollen';
 import PersonDetailsView from './PersonDetailsView.vue';
+import { EmailAddressStatus } from '@/api-client/generated';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
@@ -38,6 +39,10 @@ const mockPerson: Personendatensatz = {
     lockInfo: null,
     revision: '1',
     lastModified: '2024-05-22',
+    email: {
+      address: 'email@email.com',
+      status: EmailAddressStatus.Enabled,
+    },
   },
 };
 
@@ -210,6 +215,28 @@ beforeEach(async () => {
   });
 });
 
+const setCurrentPerson = (emailStatus: EmailAddressStatus): void => {
+  personStore.currentPerson = {
+    person: {
+      id: '123456',
+      name: {
+        familienname: 'Vimes',
+        vorname: 'Susan',
+      },
+      referrer: '6978',
+      personalnummer: '9183756',
+      isLocked: false,
+      lockInfo: null,
+      revision: '1',
+      lastModified: '2024-12-22',
+      email: {
+        address: 'test@example.com',
+        status: emailStatus,
+      },
+    },
+  };
+};
+
 describe('PersonDetailsView', () => {
   test('it renders the person details page and shows person data', async () => {
     expect(wrapper).toBeTruthy();
@@ -217,6 +244,7 @@ describe('PersonDetailsView', () => {
     expect(wrapper?.find('[data-testid="person-vorname"]').text()).toBe('John');
     expect(wrapper?.find('[data-testid="person-familienname"]').text()).toBe('Orton');
     expect(wrapper?.find('[data-testid="person-username"]').text()).toBe('jorton');
+    expect(wrapper?.find('[data-testid="person-email"]').text()).toBe('email@email.com');
     expect(wrapper?.find('[data-testid="person-zuordnung-1"]').text()).toBe('123456 (Testschule Birmingham): SuS 9a');
     expect(wrapper?.getComponent({ name: 'PasswordReset' })).toBeTruthy();
   });
@@ -243,6 +271,10 @@ describe('PersonDetailsView', () => {
         lockInfo,
         revision: '1',
         lastModified: '2024-12-22',
+        email: {
+          address: 'email',
+          status: EmailAddressStatus.Requested,
+        }
       },
     };
     await nextTick();
@@ -384,5 +416,62 @@ describe('PersonDetailsView', () => {
       expect(keyElement.text()).toContain(keyValue);
       expect(attributeElement.text()).toContain(attributeValue);
     }
+  });
+
+  it('displays correct email status for Enabled', async () => {
+    setCurrentPerson(EmailAddressStatus.Enabled);
+
+    await nextTick();
+
+    const emailElement: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="person-email-text"]');
+    expect(emailElement?.text()).toBe('test@example.com');
+  });
+
+  it('displays correct email status for requested', async () => {
+    setCurrentPerson(EmailAddressStatus.Requested);
+
+    await nextTick();
+
+    const emailElement: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="person-email-text"]');
+    expect(emailElement?.text()).toBe('wird erzeugt');
+  });
+
+  it('displays correct email status for failed', async () => {
+    setCurrentPerson(EmailAddressStatus.Failed);
+
+    await nextTick();
+
+    const emailElement: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="person-email-text"]');
+    expect(emailElement?.text()).toBe('fehlerhaft');
+  });
+
+  it('displays correct email status for disabled', async () => {
+    setCurrentPerson(EmailAddressStatus.Disabled);
+
+    await nextTick();
+
+    const emailElement: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="person-email-text"]');
+    expect(emailElement?.text()).toBe('deaktiviert');
+  });
+
+  it('displays correct email status for unknown', async () => {
+    setCurrentPerson('UnknownStatus' as EmailAddressStatus);
+
+    await nextTick();
+
+    const emailElement: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="person-email-text"]');
+    expect(emailElement?.exists()).toBe(false);
+  });
+
+  test('it sets errorCode to PERSONALNUMMER_NICHT_EINDEUTIG and goes back to Form', async () => {
+    personStore.errorCode = 'PERSONALNUMMER_NICHT_EINDEUTIG';
+    await nextTick();
+
+    await wrapper?.find('[data-testid="alert-button"]').trigger('click');
+    const familienNameInput: DOMWrapper<Element> | undefined = await wrapper?.find(
+      '[data-testid="person-familienname"]',
+    );
+
+    expect(familienNameInput?.exists()).toBe(true);
   });
 });
