@@ -8,6 +8,7 @@ import {
   type TwoFactorAuthentificationStore,
 } from '@/stores/TwoFactorAuthentificationStore';
 import type { Personendatensatz } from '@/stores/PersonStore';
+import { EmailAddressStatus } from '@/api-client/generated/api';
 
 vi.mock('vue-i18n', () => ({
   useI18n: (): { t: (key: string) => string } => ({
@@ -34,6 +35,10 @@ describe('TokenResetComponent', () => {
         lockInfo: null,
         revision: '1',
         lastModified: '2024-12-22',
+        email: {
+          address: 'email',
+          status: EmailAddressStatus.Requested,
+        },
       },
     };
   }

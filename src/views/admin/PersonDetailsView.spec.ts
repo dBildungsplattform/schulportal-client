@@ -274,7 +274,7 @@ describe('PersonDetailsView', () => {
         email: {
           address: 'email',
           status: EmailAddressStatus.Requested,
-        }
+        },
       },
     };
     await nextTick();

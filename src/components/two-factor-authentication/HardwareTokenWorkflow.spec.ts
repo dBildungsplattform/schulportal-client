@@ -38,7 +38,7 @@ describe('HardwareTokenWorkflow.vue', () => {
         email: {
           address: 'email',
           status: EmailAddressStatus.Requested,
-        }
+        },
       },
     };
   }

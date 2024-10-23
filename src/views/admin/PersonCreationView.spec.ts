@@ -15,6 +15,7 @@ import {
   type RolleStore,
   type RolleWithServiceProvidersResponse,
 } from '@/stores/RolleStore';
+import { EmailAddressStatus } from '@/api-client/generated/api';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
@@ -44,6 +45,10 @@ const mockCreatedPersonWithKontext: DBiamPersonResponse = {
     isLocked: false,
     lockInfo: null,
     lastModified: '2024-12-22',
+    email: {
+      address: 'email',
+      status: EmailAddressStatus.Requested,
+    },
   },
   dBiamPersonenkontextResponses: [
     {

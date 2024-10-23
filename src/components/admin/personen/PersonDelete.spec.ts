@@ -45,7 +45,7 @@ beforeEach(async () => {
           email: {
             address: 'email',
             status: EmailAddressStatus.Requested,
-          }
+          },
         },
       },
     },

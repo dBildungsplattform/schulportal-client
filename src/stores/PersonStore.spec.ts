@@ -34,7 +34,7 @@ function getMockPersonendatensatz(): Personendatensatz {
       email: {
         address: 'email',
         status: EmailAddressStatus.Requested,
-      }
+      },
     },
   };
 }
@@ -53,6 +53,10 @@ function getMockLockedPersonendatensatz(): Personendatensatz {
       lockInfo: { lock_locked_from: 'admin', lock_timestamp: '2024-12-22' },
       revision: '1',
       lastModified: '2024-12-22',
+      email: {
+        address: 'email',
+        status: EmailAddressStatus.Requested,
+      },
     },
   };
 }
@@ -754,7 +758,7 @@ describe('PersonStore', () => {
           email: {
             address: 'email',
             status: EmailAddressStatus.Requested,
-          }
+          },
         },
       };
 
@@ -783,7 +787,7 @@ describe('PersonStore', () => {
           email: {
             address: 'email',
             status: EmailAddressStatus.Requested,
-          }
+          },
         },
       };
 
