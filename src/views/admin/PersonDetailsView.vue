@@ -2055,8 +2055,8 @@
                           "
                         >
                           {{
-                            `${$t('admin.person.twoFactorAuthentication.serial')}:
-                          ${twoFactorAuthentificationStore.serial}`
+                            `${$t('admin.person.twoFactorAuthentication.serial')}: ` +
+                            `${twoFactorAuthentificationStore.serial}`
                           }}
                         </p>
                       </template>
