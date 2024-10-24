@@ -8,6 +8,12 @@ import {
 import axiosApiInstance from '@/services/ApiService';
 import type { UserinfoPersonenkontext } from './PersonenkontextStore';
 
+export enum StepUpLevel {
+  NONE = 'none',
+  SILVER = 'silver',
+  GOLD = 'gold',
+}
+
 export type UserInfo = {
   sub: string;
   name: string | null;
@@ -44,6 +50,7 @@ type AuthState = {
   hasPersonenSyncPermission: boolean;
   hasPersonenAnlegenPermission: boolean;
   isAuthed: boolean;
+  acr: StepUpLevel;
 };
 
 type AuthActions = {
@@ -70,6 +77,7 @@ export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, 
     hasPersonenSyncPermission: false,
     hasPersonenAnlegenPermission: false,
     isAuthed: false,
+    acr: StepUpLevel.NONE,
   }),
   actions: {
     async initializeAuthStatus() {
@@ -81,6 +89,7 @@ export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, 
 
         this.isAuthed = loginStatus >= 200 && loginStatus < 400;
         this.currentUser = data;
+        this.acr = data.acr as StepUpLevel;
 
         /* extract all system permissions from current user's personenkontexte */
         const personenkontexte: Array<UserinfoPersonenkontext> | null = this.currentUser.personenkontexte;

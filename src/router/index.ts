@@ -1,5 +1,9 @@
 import { createRouter, createWebHistory, type RouteLocationNormalized, type Router } from 'vue-router';
-import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
+import { StepUpLevel, useAuthStore, type AuthStore } from '@/stores/AuthStore';
+import {
+  useTwoFactorAuthentificationStore,
+  type TwoFactorAuthentificationStore,
+} from '@/stores/TwoFactorAuthentificationStore';
 import routes from './routes';
 
 type Permission =
@@ -27,9 +31,9 @@ const router: Router = createRouter({
 
 router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormalized) => {
   const authStore: AuthStore = useAuthStore();
-
   await authStore.initializeAuthStatus();
-  if (to.path != '/profile') sessionStorage.setItem('previousUrl', to.path);
+  if (to.path != '/profile' && to.path != '/no-second-factor') sessionStorage.setItem('previousUrl', to.path);
+
   // Redirect authenticated users trying to access the login page to the start page
   if (to.path === '/' && authStore.isAuthed) {
     return { path: '/start' };
@@ -38,6 +42,19 @@ router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormal
   if (to.meta['requiresAuth'] && !authStore.isAuthed) {
     window.location.href = `/api/auth/login?redirectUrl=${to.fullPath}`;
     return false;
+  }
+
+  if (to.meta['requiredStepUpLevel'] === StepUpLevel.GOLD && authStore.acr !== StepUpLevel.GOLD) {
+    const personId: string | null | undefined = authStore.currentUser?.personId;
+    if (!personId) return false;
+    const twoFactorAuthentificationStore: TwoFactorAuthentificationStore = useTwoFactorAuthentificationStore();
+    await twoFactorAuthentificationStore.get2FAState(personId);
+    if (!twoFactorAuthentificationStore.hasToken) {
+      router.push(`/no-second-factor`);
+      return false;
+    }
+
+    window.location.href = `/api/auth/login?redirectUrl=${to.fullPath}&requiredStepUpLevel=${StepUpLevel.GOLD}`;
   }
 
   if (to.meta['requiresPermission']) {
@@ -68,6 +85,7 @@ router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormal
     }
     return { path: 'not-found' };
   }
+
   return true;
 });
 

@@ -2930,6 +2930,12 @@ export interface UserinfoResponse {
      * @memberof UserinfoResponse
      */
     'personenkontexte': Array<PersonenkontextRolleFieldsResponse>;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserinfoResponse
+     */
+    'acr': string;
 }
 /**
  * 
