@@ -2096,13 +2096,13 @@
                       md="auto"
                     >
                       <SpshTooltip
-                        v-if="twoFactorAuthentificationStore.hasToken"
                         :enabledCondition="twoFactorAuthentificationStore.hasToken"
                         :disabledText="$t('person.finishEditFirst')"
                         :enabledText="$t('admin.person.twoFactorAuthentication.tokenReset')"
                         position="start"
                       >
                         <TokenReset
+                          v-if="twoFactorAuthentificationStore.hasToken"
                           :errorCode="twoFactorAuthentificationStore.errorCode"
                           :disabled="isEditActive"
                           :person="personStore.currentPerson"
@@ -2112,14 +2112,21 @@
                         >
                         </TokenReset>
                       </SpshTooltip>
+                      <SpshTooltip
+                        :enabledCondition="twoFactorAuthentificationStore.hasToken"
+                        :disabledText="$t('person.finishEditFirst')"
+                        :enabledText="$t('admin.person.twoFactorAuthentication.setUpShort')"
+                        position="start"
+                      >
                       <TwoFactorAuthenticationSetUp
-                        v-else
+                        v-if="!twoFactorAuthentificationStore.hasToken"
                         :errorCode="twoFactorAuthentificationStore.errorCode"
                         :disabled="isEditActive"
                         :person="personStore.currentPerson"
                         @dialogClosed="twoFactorAuthentificationStore.get2FAState(currentPersonId)"
                       >
                       </TwoFactorAuthenticationSetUp>
+                    </SpshTooltip>
                     </v-col>
                   </div>
                 </v-col>
