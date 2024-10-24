@@ -35,7 +35,7 @@ beforeEach(() => {
           email: {
             address: 'email',
             status: EmailAddressStatus.Requested,
-          }
+          },
         },
       },
     },
