@@ -2,14 +2,13 @@
   import { computed, nextTick, ref, type ComputedRef, type Ref } from 'vue';
   import { useDisplay } from 'vuetify';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import SpshTooltip from '@/components/admin/SpshTooltip.vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import {
     useTwoFactorAuthentificationStore,
     type TwoFactorAuthentificationStore,
   } from '@/stores/TwoFactorAuthentificationStore';
 
-  const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
+  const { xs }: { xs: Ref<boolean> } = useDisplay();
   const { t }: Composer = useI18n({ useScope: 'global' });
   const twoFactorStore: TwoFactorAuthentificationStore = useTwoFactorAuthentificationStore();
 
@@ -97,20 +96,14 @@
     <template v-slot:activator="{ props }">
       <v-row class="d-flex align-center justify-center">
         <v-col class="d-flex justify-center">
-          <SpshTooltip
-            :enabled-condition="true"
-            :enabledText="$t('admin.person.twoFactorAuthentication.setUpShort')"
-            position="start"
+          <v-btn
+            class="primary"
+            data-testid="open-2FA-self-service-dialog-icon"
+            v-bind="props"
+            :block="xs"
           >
-            <v-btn
-              class="primary"
-              data-testid="open-2FA-self-service-dialog-icon"
-              :block="mdAndDown"
-              v-bind="props"
-            >
-              {{ $t('admin.person.twoFactorAuthentication.setUpShort') }}
-            </v-btn>
-          </SpshTooltip>
+            {{ $t('admin.person.twoFactorAuthentication.setUpShort') }}
+          </v-btn>
         </v-col>
       </v-row>
     </template>
@@ -249,7 +242,7 @@
               md="4"
             >
               <v-btn
-                :block="mdAndDown"
+                :block="xs"
                 class="secondary button"
                 @click.stop="close2FADialog(isActive)"
                 data-testid="close-two-factor-authentication-dialog"
@@ -263,7 +256,7 @@
               md="4"
             >
               <v-btn
-                :block="mdAndDown"
+                :block="xs"
                 class="primary button"
                 @click.stop="proceedToNextWorkflowStep(isActive)"
                 data-testid="proceed-two-factor-authentication-dialog"
