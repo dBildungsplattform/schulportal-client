@@ -246,7 +246,6 @@ describe('ProfileView', () => {
     });
 
     await router.isReady();
-
     wrapper = mount(ProfileView, {
       attachTo: document.getElementById('app') || '',
       global: {
