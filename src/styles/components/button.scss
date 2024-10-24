@@ -55,24 +55,7 @@
 
   /* small screen */
   @media only screen and (max-width: 600px) {
-    font-size: $smallButtonFontSize;
-
-    &:hover,
-    &:focus {
-      animation: clickAnimation 1s ease forwards;
-    }
-  }
-
-  @keyframes clickAnimation {
-    0% {
-      transform: scale(1);
-    }
-    50% {
-      transform: $smallButtonTransformScale;
-    }
-    100% {
-      transform: scale(1);
-    }
+    font-size: $smallButtonFontSize;    
   }
 
   /* medium screen */

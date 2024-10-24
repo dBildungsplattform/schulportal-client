@@ -16,6 +16,7 @@
   import { computed, onBeforeMount, ref, watch, type ComputedRef, type Ref } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { useRoute, useRouter, type RouteLocationNormalizedLoaded, type Router } from 'vue-router';
+  import { useDisplay } from 'vuetify';
 
   const { t }: { t: Function } = useI18n();
 
@@ -37,6 +38,7 @@
     labelAndValues: LabelValue[];
   };
 
+  const { xs }: { xs: Ref<boolean> } = useDisplay();
   const route: RouteLocationNormalizedLoaded = useRoute();
   const router: Router = useRouter();
   const kcActionStatus: string | null = route.query['kc_action_status'] as string | null;
@@ -425,25 +427,34 @@
           data-testid="password-card"
           :headline-test-id="'new-password-card'"
           :header="$t('login.password')"
-          class="pb-4"
+          class="text-body"
         >
-          <v-row class="ma-3 d-flex align-content-center justify-center ga-4">
-            <p
-              class="w-100 text-center text-body"
-              v-if="lastPasswordChangeDate"
-            >
-              {{ t('profile.lastPasswordChange', { date: lastPasswordChangeDate }) }}
-            </p>
-          </v-row>
-          <v-row class="d-flex align-center justify-center">
-            <v-col class="d-flex justify-center">
-              <v-btn
-                class="primary"
-                data-testid="open-change-password-dialog"
-                @click="openChangePasswordDialog()"
-              >
-                {{ $t('profile.changePassword') }}
-              </v-btn>
+          <v-row
+            align="center"
+            justify="center"
+            class="ma-4 text-body"
+          >
+            <v-col class="text-center px-0">
+              <v-row>
+                <p
+                  class="w-100"
+                  v-if="lastPasswordChangeDate"
+                >
+                  {{ t('profile.lastPasswordChange', { date: lastPasswordChangeDate }) }}
+                </p>
+              </v-row>
+              <v-row class="d-flex align-center justify-center">
+                <v-col class="d-flex justify-center">
+                  <v-btn
+                    class="primary"
+                    data-testid="open-change-password-dialog"
+                    :block="xs"
+                    @click="openChangePasswordDialog()"
+                  >
+                    {{ $t('profile.changePassword') }}
+                  </v-btn>
+                </v-col>
+              </v-row>
             </v-col>
           </v-row>
           <v-dialog
@@ -531,14 +542,13 @@
           <v-row
             align="center"
             justify="center"
-            class="ma-3 text-body"
+            class="ma-4 text-body"
           >
             <v-col
-              :sm="twoFactorAuthenticationStore.hasToken === false ? 6 : null"
-              :md="twoFactorAuthenticationStore.hasToken === false ? 'auto' : null"
+              v-if="twoFactorAuthenticationStore.hasToken !== false"
               cols="12"
             >
-              <v-row :justify="twoFactorAuthenticationStore.hasToken === false ? 'center' : null">
+              <v-row>
                 <v-col
                   cols="1"
                   align-self="center"
@@ -550,37 +560,44 @@
                     icon="mdi-alert-outline"
                   ></v-icon>
                   <v-icon
-                    v-else-if="twoFactorAuthenticationStore.hasToken === false"
-                    color="warning"
-                    icon="mdi-alert-circle"
-                  ></v-icon>
-                  <v-icon
                     v-else-if="twoFactorAuthenticationStore.hasToken === true"
                     color="green"
                     icon="mdi-check-circle"
                   ></v-icon>
                 </v-col>
                 <v-col>
-                  <p data-testid="two-factor-info">
-                    <template v-if="twoFactorAuthError">
-                      {{ twoFactorAuthError }}
+                  <template v-if="twoFactorAuthError">
+                    {{ twoFactorAuthError }}
+                  </template>
+                  <template v-else-if="twoFactorAuthenticationStore.hasToken === true">
+                    <template v-if="twoFactorAuthenticationStore.tokenKind === TokenKind.software">
+                      {{ $t('admin.person.twoFactorAuthentication.softwareTokenIsSetUpSelfService') }}
                     </template>
-                    <template v-else-if="twoFactorAuthenticationStore.hasToken === false">
-                      {{ $t('admin.person.twoFactorAuthentication.SecondFactorNotSet') }}
+                    <template v-else-if="twoFactorAuthenticationStore.tokenKind === TokenKind.hardware">
+                      {{
+                        $t('admin.person.twoFactorAuthentication.hardwareTokenIsSetUpSelfService', {
+                          serialNumber: twoFactorAuthenticationStore.serial,
+                        })
+                      }}
                     </template>
-                    <template v-else-if="twoFactorAuthenticationStore.hasToken === true">
-                      <template v-if="twoFactorAuthenticationStore.tokenKind === TokenKind.software">
-                        {{ $t('admin.person.twoFactorAuthentication.softwareTokenIsSetUpSelfService') }}
-                      </template>
-                      <template v-else-if="twoFactorAuthenticationStore.tokenKind === TokenKind.hardware">
-                        {{
-                          $t('admin.person.twoFactorAuthentication.hardwareTokenIsSetUpSelfService', {
-                            serialNumber: twoFactorAuthenticationStore.serial,
-                          })
-                        }}
-                      </template>
-                    </template>
-                  </p>
+                  </template>
+                </v-col>
+              </v-row>
+            </v-col>
+            <v-col
+              cols="12"
+              v-else
+            >
+              <v-row justify="center">
+                <v-col
+                  align-self="center"
+                  class="text-center"
+                >
+                  <v-icon
+                    color="warning"
+                    icon="mdi-alert-circle"
+                  ></v-icon>
+                  {{ $t('admin.person.twoFactorAuthentication.SecondFactorNotSet') }}
                 </v-col>
               </v-row>
             </v-col>
@@ -588,10 +605,7 @@
               cols="12"
               v-if="!twoFactorAuthError"
             >
-              <v-row
-                align="center"
-                justify="center"
-              >
+              <v-row>
                 <template v-if="twoFactorAuthenticationStore.hasToken === false">
                   <SelfServiceWorkflow
                     :personId="personInfoStore.personInfo?.person.id ?? ''"
@@ -687,7 +701,7 @@
       <LayoutCard
         :closable="true"
         :header="$t('profile.changePassword')"
-        @onCloseClicked="closeChangePasswordDialog()"
+        @onCloseClicked="closePasswordChangedDialogAndClearQuery()"
       >
         <v-card-text>
           <v-container class="d-flex align-center">
@@ -712,23 +726,15 @@
             </v-col>
           </v-container>
         </v-card-text>
-
         <v-card-actions class="justify-center">
-          <v-row class="justify-center">
-            <v-col
-              cols="12"
-              sm="6"
-              md="4"
-            >
-              <v-btn
-                class="secondary button"
-                @click.stop="closePasswordChangedDialogAndClearQuery()"
-                data-testid="close-password-changed-dialog-button"
-              >
-                {{ $t('close') }}
-              </v-btn>
-            </v-col>
-          </v-row>
+          <v-btn
+            class="secondary button"
+            @click.stop="closePasswordChangedDialogAndClearQuery()"
+            data-testid="close-password-changed-dialog-button"
+            :block="xs"
+          >
+            {{ $t('close') }}
+          </v-btn>
         </v-card-actions>
       </LayoutCard>
     </v-dialog>
