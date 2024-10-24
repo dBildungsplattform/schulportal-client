@@ -129,6 +129,7 @@
         to="/admin/personen"
       ></v-list-item>
       <v-list-item
+        v-if="authStore.hasPersonenAnlegenPermission"
         class="menu-bar-sub-item caption"
         @click="closeMenuOnMobile"
         data-testid="person-creation-menu-item"

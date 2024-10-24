@@ -5,6 +5,14 @@ import {
   type TwoFactorAuthentificationStore,
 } from '@/stores/TwoFactorAuthentificationStore';
 import routes from './routes';
+
+type Permission =
+  | 'personenverwaltung'
+  | 'personenanlegen'
+  | 'klassenverwaltung'
+  | 'rollenverwaltung'
+  | 'schulverwaltung';
+
 const router: Router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
@@ -50,31 +58,32 @@ router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormal
   }
 
   if (to.meta['requiresPermission']) {
-    /* check if the user has person management permissions */
-    switch (to.meta['requiresPermission']) {
-      case 'personenverwaltung':
-        if (authStore.hasPersonenverwaltungPermission) {
-          return true;
-        }
-        return { path: 'not-found' };
-      case 'klassenverwaltung':
-        if (authStore.hasKlassenverwaltungPermission) {
-          return true;
-        }
-        return { path: 'not-found' };
-      case 'rollenverwaltung':
-        if (authStore.hasRollenverwaltungPermission) {
-          return true;
-        }
-        return { path: 'not-found' };
-      case 'schulverwaltung':
-        if (authStore.hasSchulverwaltungPermission) {
-          return true;
-        }
-        return { path: 'not-found' };
-      default:
-        return { path: 'not-found' };
+    const requiredPermissions: Permission[] = Array.isArray(to.meta['requiresPermission'])
+      ? to.meta['requiresPermission']
+      : [to.meta['requiresPermission']];
+
+    // Check if user has ALL required permissions
+    const hasAllPermissions: boolean = requiredPermissions.every((permission: Permission) => {
+      switch (permission) {
+        case 'personenverwaltung':
+          return authStore.hasPersonenverwaltungPermission;
+        case 'personenanlegen':
+          return authStore.hasPersonenAnlegenPermission;
+        case 'klassenverwaltung':
+          return authStore.hasKlassenverwaltungPermission;
+        case 'rollenverwaltung':
+          return authStore.hasRollenverwaltungPermission;
+        case 'schulverwaltung':
+          return authStore.hasSchulverwaltungPermission;
+        default:
+          return false;
+      }
+    });
+
+    if (hasAllPermissions) {
+      return true;
     }
+    return { path: 'not-found' };
   }
 
   return true;
