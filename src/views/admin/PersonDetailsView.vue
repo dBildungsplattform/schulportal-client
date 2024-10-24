@@ -206,15 +206,27 @@
               day: '2-digit',
             }).format(new Date(attribute)),
           };
-        case LockKeys.LockedUntil:
+        case LockKeys.LockedUntil: {
+          // Split the string and check the result length
+          const parts: string[] = attribute.split('.');
+          if (parts.length !== 3) {
+            throw new Error('Invalid date format');
+          }
+
+          const [day, month, year]: [string, string, string] = parts as [string, string, string];
+
+          // 'validDate' will be a Date object
+          const validDate: Date = new Date(`${year}-${month}-${day}`);
+
           return {
             key: t('person.lockedUntil'),
             attribute: new Intl.DateTimeFormat('de-DE', {
               year: 'numeric',
               month: '2-digit',
               day: '2-digit',
-            }).format(new Date(attribute)),
+            }).format(validDate),
           };
+        }
 
         default:
           return { key, attribute };

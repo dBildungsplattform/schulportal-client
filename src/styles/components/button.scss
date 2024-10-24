@@ -1,4 +1,5 @@
 .v-btn {
+  width: $buttonWidth;
   .v-btn__content {
     font-weight: bold;
   }
@@ -20,7 +21,6 @@
   }
 
   &.primary {
-    width: $buttonWidth;
     background: $primaryButtonBackgroundColor;
     border: $primaryButtonBorderSize solid $primaryButtonBorderColor;
     color: $primaryButtonColor;
@@ -58,7 +58,6 @@
   }
 
   &.secondary {
-    width: $buttonWidth;
     background: $secondaryButtonBackgroundColor;
     border: $secondaryButtonBorderSize solid $secondaryButtonBorderColor;
     color: $secondaryButtonColor;
