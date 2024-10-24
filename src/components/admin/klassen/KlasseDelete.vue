@@ -189,7 +189,7 @@
                 :block="mdAndDown"
                 class="secondary button"
                 @click.stop="closeKlasseDeleteDialog(isActive)"
-                data-testid="close-klasse-delete-dialog-button"
+                data-testid="cancel-klasse-delete-dialog-button"
               >
                 {{ $t('cancel') }}
               </v-btn>
