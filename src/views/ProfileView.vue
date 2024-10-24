@@ -545,7 +545,7 @@
             class="ma-4 text-body"
           >
             <v-col
-              v-if="twoFactorAuthenticationStore.hasToken !== false"
+              v-if="twoFactorAuthenticationStore.hasToken || twoFactorAuthError"
               cols="12"
             >
               <v-row>
@@ -565,7 +565,7 @@
                     icon="mdi-check-circle"
                   ></v-icon>
                 </v-col>
-                <v-col>
+                <v-col data-testid="two-factor-info">
                   <template v-if="twoFactorAuthError">
                     {{ twoFactorAuthError }}
                   </template>
@@ -592,6 +592,7 @@
                 <v-col
                   align-self="center"
                   class="text-center"
+                  data-testid="two-factor-info"
                 >
                   <v-icon
                     color="warning"
