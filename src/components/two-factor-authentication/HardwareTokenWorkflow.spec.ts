@@ -23,7 +23,7 @@ beforeEach(() => {
           referrer: 'atest',
           personalnummer: '1234',
           isLocked: false,
-          lockInfo: null,
+          userLock: null,
           revision: '1',
           lastModified: '2024-05-22',
           email: {

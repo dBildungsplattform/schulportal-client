@@ -976,7 +976,13 @@ export interface LockUserBodyParams {
      * @type {string}
      * @memberof LockUserBodyParams
      */
-    'locked_from': string;
+    'locked_by': string;
+    /**
+     * Required if Befristung is set
+     * @type {string}
+     * @memberof LockUserBodyParams
+     */
+    'locked_until'?: string;
 }
 /**
  * 
@@ -1726,10 +1732,10 @@ export interface PersonResponse {
     'isLocked': boolean | null;
     /**
      * 
-     * @type {object}
+     * @type {UserLockParams}
      * @memberof PersonResponse
      */
-    'lockInfo': object | null;
+    'userLock': UserLockParams | null;
     /**
      * Date of the most recent changes for the person
      * @type {string}
@@ -2796,6 +2802,37 @@ export interface UpdateRolleBodyParams {
      * @memberof UpdateRolleBodyParams
      */
     'version': number;
+}
+/**
+ * 
+ * @export
+ * @interface UserLockParams
+ */
+export interface UserLockParams {
+    /**
+     * 
+     * @type {string}
+     * @memberof UserLockParams
+     */
+    'personId': string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserLockParams
+     */
+    'locked_by': string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserLockParams
+     */
+    'locked_until': string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserLockParams
+     */
+    'created_at': string | null;
 }
 /**
  * 
