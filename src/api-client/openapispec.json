@@ -2138,7 +2138,8 @@
           "personenkontexte": {
             "type": "array",
             "items": { "$ref": "#/components/schemas/PersonenkontextRolleFieldsResponse" }
-          }
+          },
+          "acr": { "type": "string", "nullable": false }
         },
         "required": [
           "sub",
@@ -2161,7 +2162,8 @@
           "phone_number",
           "updated_at",
           "password_updated_at",
-          "personenkontexte"
+          "personenkontexte",
+          "acr"
         ]
       },
       "CreatePersonMigrationBodyParams": {
