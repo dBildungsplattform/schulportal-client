@@ -35,7 +35,7 @@ function getMockPersonendatensatz(): Personendatensatz {
       email: {
         address: 'email',
         status: EmailAddressStatus.Requested,
-      }
+      },
     },
   };
 }
@@ -568,7 +568,7 @@ describe('PersonStore', () => {
           email: {
             address: 'email',
             status: EmailAddressStatus.Requested,
-          }
+          },
         },
       };
 
@@ -597,7 +597,7 @@ describe('PersonStore', () => {
           email: {
             address: 'email',
             status: EmailAddressStatus.Requested,
-          }
+          },
         },
       };
 

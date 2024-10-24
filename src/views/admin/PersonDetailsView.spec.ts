@@ -10,7 +10,7 @@ import {
 } from '@/stores/PersonStore';
 import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
 import { RollenMerkmal, RollenSystemRecht } from '@/stores/RolleStore';
-import {  shallowMount, VueWrapper } from '@vue/test-utils';
+import { shallowMount, VueWrapper } from '@vue/test-utils';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import PersonDetailsView from './PersonDetailsView.vue';
 import { EmailAddressStatus } from '@/api-client/generated';
@@ -214,7 +214,7 @@ beforeEach(async () => {
   });
 });
 
-// TODO: This is for SPSH-806 and should be back in SPSH-1021 
+// TODO: This is for SPSH-806 and should be back in SPSH-1021
 // const setCurrentPerson = (emailStatus: EmailAddressStatus): void => {
 //   personStore.currentPerson = {
 //     person: {
