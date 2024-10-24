@@ -1,6 +1,7 @@
 import { expect, test } from 'vitest';
 import { VueWrapper, mount } from '@vue/test-utils';
 import PasswordReset from './PasswordReset.vue';
+import { EmailAddressStatus } from '@/api-client/generated/api';
 // import { VDialog } from 'vuetify/lib/components/index.mjs'
 
 let wrapper: VueWrapper | null = null;
@@ -31,6 +32,10 @@ beforeEach(() => {
           lockInfo: null,
           revision: '1',
           lastModified: '2024-05-22',
+          email: {
+            address: 'email',
+            status: EmailAddressStatus.Requested,
+          },
         },
       },
     },

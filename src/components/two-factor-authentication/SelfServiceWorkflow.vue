@@ -55,6 +55,7 @@
     twoFactorStore.qrCode = '';
     twoFactorStore.errorCode = '';
     workflowStep.value = TwoFactorSteps.Start;
+    errorMessage.value = '';
   }
 
   async function resetErrorMessage(): Promise<void> {
