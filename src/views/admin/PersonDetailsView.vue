@@ -2004,7 +2004,10 @@
           ></v-divider>
         </template>
         <template
-          v-else-if="twoFactorAuthentificationStore.required && twoFactorAuthentificationStore.hasToken != null"
+          v-else-if="
+            (twoFactorAuthentificationStore.required && twoFactorAuthentificationStore.hasToken != null) ||
+            twoFactorAuthentificationStore.hasToken === true
+          "
         >
           <v-divider
             class="border-opacity-100 rounded my-6 mx-4"
@@ -2074,7 +2077,10 @@
                       </v-icon>
                     </v-col>
                     <div class="v-col">
-                      <p v-if="twoFactorAuthentificationStore.hasToken">
+                      <p v-if="twoFactorAuthentificationStore.hasToken && !twoFactorAuthentificationStore.required">
+                        {{ $t('admin.person.twoFactorAuthentication.NoLongerNeedToken') }}
+                      </p>
+                      <p v-else-if="twoFactorAuthentificationStore.hasToken">
                         {{ $t('admin.person.twoFactorAuthentication.resetInfo') }}
                       </p>
                       <p v-if="!twoFactorAuthentificationStore.hasToken">
