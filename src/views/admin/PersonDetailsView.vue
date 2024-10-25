@@ -199,7 +199,7 @@
 
         case LockKeys.CreatedAt:
           return {
-            key: t('since'),
+            key: t('person.lockedSince'),
             attribute: new Intl.DateTimeFormat('de-DE', {
               year: 'numeric',
               month: '2-digit',
