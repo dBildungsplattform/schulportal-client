@@ -1001,7 +1001,7 @@
       resetFormChangePersonMetadata();
     });
 
-    // Checks for dirtiness depending on the active form
+  // Checks for dirtiness depending on the active form
   function isFormDirty(): boolean {
     if(isEditPersonMetadataActive.value){
     return isChangePersonMetadataFieldDirty('selectedKopersNrMetadata') || isChangePersonMetadataFieldDirty('selectedVorname') || 
@@ -1243,7 +1243,7 @@
                       <v-btn
                         :disabled="isEditActive"
                         class="primary ml-lg-8"
-                        data-testid="zuordnung-edit-button"
+                        data-testid="metadata-edit-button"
                         @Click="triggerPersonMetadataEdit"
                         :block="mdAndDown"
                       >
@@ -1393,6 +1393,7 @@
             @submit="onSubmitChangePersonMetadata"
           >
             <PersonenMetadataChange
+              ref="person-metadata-change"
               :selectedVornameProps="selectedVornameProps"
               :selectedVorname="personStore.currentPerson?.person.name.vorname"
               :selectedFamiliennameProps="selectedFamiliennameProps"
