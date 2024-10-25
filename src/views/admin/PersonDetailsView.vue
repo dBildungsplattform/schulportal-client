@@ -1575,7 +1575,7 @@
               </v-col>
               <v-col
                 cols="12"
-                v-for="zuordnung in getZuordnungen?.filter((zuordnung) => zuordnung.editable)"
+                v-for="zuordnung in getZuordnungen?.filter((zuordnung: Zuordnung) => zuordnung.editable)"
                 :key="zuordnung.sskId"
                 :data-testid="`person-zuordnung-${zuordnung.sskId}`"
                 :title="zuordnung.sskName"
@@ -1651,7 +1651,7 @@
                     >
                   </span>
                 </template>
-                <!-- Template  to show when the change Klasse is pending -->
+                <!-- Template to show when the change Klasse is pending -->
                 <template v-else-if="pendingChangeKlasse">
                   <div class="d-flex flex-column">
                     <span
@@ -1717,7 +1717,9 @@
                     :errorCode="personStore.errorCode"
                     :person="personStore.currentPerson"
                     :disabled="selectedZuordnungen.length === 0"
-                    :zuordnungCount="zuordnungenResult?.filter((zuordnung) => zuordnung.editable).length ?? 0"
+                    :zuordnungCount="
+                      zuordnungenResult?.filter((zuordnung: Zuordnung) => zuordnung.editable).length ?? 0
+                    "
                     @onDeletePersonenkontext="prepareDeletion"
                   >
                   </PersonenkontextDelete>
