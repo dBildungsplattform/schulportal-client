@@ -84,6 +84,7 @@
 
   function cancelCheck(): void {
     if (twoFactoreAuthentificationStore.errorCode) {
+      twoFactoreAuthentificationStore.errorCode = '';
       dialogText.value = '';
       hardwareTokenIsAssigned.value = false;
       selectedOtp.value = '';

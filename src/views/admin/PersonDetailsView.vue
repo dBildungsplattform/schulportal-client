@@ -1940,7 +1940,7 @@
                       <v-icon
                         color="warning"
                         icon="mdi-alert-outline"
-                        v-else-if="twoFactorAuthentificationStore.errorCode"
+                        v-else-if="twoFactorAuthenticationConnectionError"
                       ></v-icon>
                     </v-col>
                     <v-col>
@@ -1955,7 +1955,7 @@
                             {{ $t('admin.person.twoFactorAuthentication.errors.connection') }}
                           </p>
                         </v-row>
-                        <v-row v-else-if="twoFactorAuthentificationStore.errorCode">
+                        <v-row v-else-if="twoFactorAuthentificationStore.errorCode === 'TOKEN_STATE_ERROR'">
                           <p
                             class="text-body"
                             data-testid="token-state-error-text"
