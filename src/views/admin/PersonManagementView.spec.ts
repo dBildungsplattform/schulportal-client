@@ -173,6 +173,7 @@ describe('PersonManagementView', () => {
   test('it renders person management table', () => {
     expect(wrapper?.getComponent({ name: 'ResultTable' })).toBeTruthy();
     expect(wrapper?.find('[data-testid="person-table"]').isVisible()).toBe(true);
+    expect(wrapper?.findAll('.v-data-table__tr').length).toBe(2);
   });
 
   test('it reloads data after changing page', async () => {
