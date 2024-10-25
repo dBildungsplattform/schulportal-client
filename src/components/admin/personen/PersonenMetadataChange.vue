@@ -74,8 +74,10 @@
   <div>
     <v-row>
       <v-col
-        md="5"
-        class="pl-md-14"
+      md="5"
+  xs="12"
+  cols="12"
+  class="pl-md-14"
       >
         <span class="text-body bold">
           <v-icon
@@ -96,8 +98,10 @@
         </span>
       </v-col>
       <v-col
-        md="7"
-        class="pr-md-14"
+      md="7"
+  xs="12"
+  cols="12"
+  class="pr-md-14"
       >
         <!-- Vorname -->
         <FormRow
@@ -211,7 +215,7 @@
 
 <style scoped>
   span {
-    white-space: pre;
+    white-space: normal;
     text-wrap: pretty;
   }
 </style>

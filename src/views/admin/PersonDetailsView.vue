@@ -1391,7 +1391,7 @@
             ></PersonenMetadataChange>
             <v-row class="save-cancel-row ml-md-16 pt-md-5 pt-12 justify-end">
               <v-col
-                class="cancel-col"
+                class="cancel-col px-5"
                 cols="12"
                 sm="6"
                 md="auto"
@@ -1409,6 +1409,7 @@
                 cols="12"
                 sm="6"
                 md="auto"
+                class="px-5"
               >
                 <SpshTooltip
                   :enabledCondition="!hasSameMetadata"
