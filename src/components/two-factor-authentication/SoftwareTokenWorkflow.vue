@@ -3,7 +3,7 @@
     type TwoFactorAuthentificationStore,
     useTwoFactorAuthentificationStore,
   } from '@/stores/TwoFactorAuthentificationStore';
-  import { computed, defineEmits, onMounted, type ComputedRef, type Ref } from 'vue';
+  import { defineEmits, onMounted, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
 
@@ -27,14 +27,6 @@
   };
 
   defineProps<Props>();
-
-  const twoFactorAuthError: ComputedRef<string> = computed(() => {
-    if (twoFactorStore.errorCode === 'SOFTWARE_TOKEN_INITIALIZATION_ERROR') {
-      return t('admin.person.twoFactorAuthentication.errors.softwareTokenInitError');
-    }
-    // Default return, no error
-    return '';
-  });
 
   onMounted(() => {
     emits('updateHeader', t('admin.person.twoFactorAuthentication.softwareTokenOption'));
@@ -71,14 +63,18 @@
           class="text-body bold"
           data-testid="software-token-dialog-error-text"
         >
-          {{ twoFactorAuthError }}
-          <a
-            :href="t('admin.person.twoFactorAuthentication.errors.iqshHelpdeskLink')"
-            rel="noopener noreferrer"
-            target="_blank"
-            >{{ $t('admin.person.twoFactorAuthentication.errors.iqshHelpdesk') }}</a
+          <i18n-t
+            keypath="admin.person.twoFactorAuthentication.errors.softwareTokenInitError"
+            for="admin.person.twoFactorAuthentication.errors.iqshHelpdesk"
+            tag="label"
           >
-          .
+            <a
+              :href="$t('admin.person.twoFactorAuthentication.errors.iqshHelpdeskLink')"
+              rel="noopener noreferrer"
+              target="_blank"
+              >{{ $t('admin.person.twoFactorAuthentication.errors.iqshHelpdesk') }}</a
+            >
+          </i18n-t>
         </p>
       </v-row>
     </v-container>

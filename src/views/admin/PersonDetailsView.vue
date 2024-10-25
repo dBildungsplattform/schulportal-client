@@ -1940,23 +1940,40 @@
                       <v-icon
                         color="warning"
                         icon="mdi-alert-outline"
-                        v-else-if="twoFactorAuthenticationConnectionError"
+                        v-else-if="twoFactorAuthentificationStore.errorCode"
                       ></v-icon>
                     </v-col>
                     <v-col>
-                      <template v-if="twoFactorAuthenticationConnectionError">
-                        <p>
-                          {{ twoFactorAuthenticationConnectionError }}
-                          <span v-if="twoFactorAuthentificationStore.errorCode === 'TOKEN_STATE_ERROR'">
-                            <a
-                              :href="t('admin.person.twoFactorAuthentication.errors.iqshHelpdeskLink')"
-                              rel="noopener noreferrer"
-                              target="_blank"
-                              >{{ $t('admin.person.twoFactorAuthentication.errors.iqshHelpdesk') }}</a
+                      <template
+                        v-if="twoFactorAuthentificationStore.errorCode && !twoFactorAuthentificationStore.loading"
+                      >
+                        <v-row v-if="twoFactorAuthentificationStore.errorCode === 'PI_UNAVAILABLE_ERROR'">
+                          <p
+                            class="text-body"
+                            data-testid="token-state-error-text"
+                          >
+                            {{ $t('admin.person.twoFactorAuthentication.errors.connection') }}
+                          </p>
+                        </v-row>
+                        <v-row v-else-if="twoFactorAuthentificationStore.errorCode">
+                          <p
+                            class="text-body"
+                            data-testid="token-state-error-text"
+                          >
+                            <i18n-t
+                              keypath="admin.person.twoFactorAuthentication.errors.tokenStateError"
+                              for="admin.person.twoFactorAuthentication.errors.iqshHelpdesk"
+                              tag="label"
                             >
-                            .
-                          </span>
-                        </p>
+                              <a
+                                :href="$t('admin.person.twoFactorAuthentication.errors.iqshHelpdeskLink')"
+                                rel="noopener noreferrer"
+                                target="_blank"
+                                >{{ $t('admin.person.twoFactorAuthentication.errors.iqshHelpdesk') }}</a
+                              >
+                            </i18n-t>
+                          </p>
+                        </v-row>
                       </template>
                       <template v-else-if="twoFactorAuthentificationStore.hasToken">
                         <p v-if="twoFactorAuthentificationStore.tokenKind === TokenKind.software">

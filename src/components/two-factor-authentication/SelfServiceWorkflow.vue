@@ -252,11 +252,7 @@
             >
               <v-btn
                 :block="mdAndDown"
-                :class="
-                  !twoFactorStore.errorCode || workflowStep == TwoFactorSteps.Verify
-                    ? 'secondary'
-                    : 'primary'
-                "
+                :class="!twoFactorStore.errorCode || workflowStep == TwoFactorSteps.Verify ? 'secondary' : 'primary'"
                 @click.stop="close2FADialog(isActive)"
                 data-testid="close-two-factor-authentication-dialog"
               >
