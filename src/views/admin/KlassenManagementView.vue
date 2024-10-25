@@ -42,9 +42,6 @@
     },
   ];
 
-  const bla: TableHeaders = [...headers];
-  console.log(bla);
-
   const selectedSchule: Ref<string | null> = ref(null);
   const selectedKlassen: Ref<Array<string>> = ref([]);
   const finalKlassen: ComputedRef<Organisation[]> = computed(() => organisationStore.allKlassen);
