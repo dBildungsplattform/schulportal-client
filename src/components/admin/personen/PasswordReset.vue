@@ -45,9 +45,6 @@
     emit('onClearPassword');
   }
 
-  // Used to enable <style> in printPassword, otherwise blocked by CSP
-  declare var cspNonce: string;
-
   const printPassword = (): void => {
     const printWindow: WindowProxy | null = window.open(
       `${t('person.password')}`,
