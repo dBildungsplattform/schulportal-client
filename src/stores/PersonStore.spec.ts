@@ -51,7 +51,7 @@ function getMockLockedPersonendatensatz(): Personendatensatz {
       referrer: '6978',
       personalnummer: '9183756',
       isLocked: true,
-      userLock: { locked_by: 'admin', locked_until: '2024-12-22' },
+      userLock: { personId: '123456', locked_by: 'admin', locked_until: '', created_at: '2024-12-22' },
       revision: '1',
       lastModified: '2024-12-22',
       email: {

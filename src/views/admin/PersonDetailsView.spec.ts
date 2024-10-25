@@ -5,11 +5,11 @@ import routes from '@/router/routes';
 import { useAuthStore, type AuthStore, type UserInfo } from '@/stores/AuthStore';
 import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
 import {
-  type Person,
   usePersonStore,
   type Personendatensatz,
   type PersonStore,
   type PersonWithUebersicht,
+  type UserLock,
 } from '@/stores/PersonStore';
 import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
 import { RollenArt, RollenMerkmal, RollenSystemRecht } from '@/stores/RolleStore';
@@ -36,7 +36,7 @@ const mockPerson: Personendatensatz = {
     referrer: 'jorton',
     personalnummer: '263578',
     isLocked: false,
-    lockInfo: null,
+    userLock: null,
     revision: '1',
     lastModified: '2024-05-22',
     email: {
@@ -226,7 +226,7 @@ const setCurrentPerson = (emailStatus: EmailAddressStatus): void => {
       referrer: '6978',
       personalnummer: '9183756',
       isLocked: false,
-      lockInfo: null,
+      userLock: null,
       revision: '1',
       lastModified: '2024-12-22',
       email: {
@@ -252,9 +252,11 @@ describe('PersonDetailsView', () => {
   test('it renders details for a locked person', async () => {
     const date: string = '01.01.2024';
     const datetime: string = `${date} 12:34:00`;
-    const lockInfo: Person['lockInfo'] = {
-      lock_locked_from: 'test',
-      lock_timestamp: datetime,
+    const userLock: UserLock = {
+      personId: '1234',
+      locked_by: 'test',
+      created_at: datetime,
+      locked_until: datetime,
     };
 
     // Mock the current person in the store
@@ -268,7 +270,7 @@ describe('PersonDetailsView', () => {
         referrer: '6978',
         personalnummer: '9183756',
         isLocked: true,
-        lockInfo,
+        userLock,
         revision: '1',
         lastModified: '2024-12-22',
         email: {
@@ -284,7 +286,7 @@ describe('PersonDetailsView', () => {
 
     // Check if the element exists and has the correct text content
     expect(vornameElement?.text()).toBe('Samuel');
-    expect(lockInfoContainer?.html()).toContain(lockInfo.lock_locked_from);
+    expect(lockInfoContainer?.html()).toContain(userLock.locked_by);
     expect(lockInfoContainer?.html()).toContain(date);
   });
 
@@ -387,22 +389,26 @@ describe('PersonDetailsView', () => {
     expect(wrapper!.find('[data-testid="lock-info-1-key"]').exists()).toBe(false);
     expect(wrapper!.find('[data-testid="lock-info-1-attribute"]').exists()).toBe(false);
 
-    const lockInfo: Person['lockInfo'] = {
-      lock_locked_from: 'Lady Lock',
-      lock_timestamp: '2024-09-27T11:37:35.663Z',
+    const date: string = '01.01.2024';
+    const datetime: string = `${date} 12:34:00`;
+    const userLock: UserLock = {
+      personId: '1234',
+      locked_by: 'Lady Lock',
+      created_at: datetime,
+      locked_until: datetime,
     };
 
     personStore.currentPerson!.person.isLocked = true;
-    personStore.currentPerson!.person.lockInfo = lockInfo;
+    personStore.currentPerson!.person.userLock = userLock;
     organisationStore.lockingOrganisation = {
       id: '1234',
-      name: lockInfo.lock_locked_from,
+      name: userLock.locked_by,
       typ: OrganisationsTyp.Schule,
     };
     await nextTick();
 
     const lockInfoArray: Array<[string, string]> = [
-      ['Gesperrt durch:', lockInfo.lock_locked_from],
+      ['Gesperrt durch:', userLock.locked_by],
       ['Seit:', '27.09.2024'],
     ];
 

@@ -119,7 +119,9 @@ export function parseUserLock(unparsed: object): UserLock | null {
   if (LockKeys.LockedBy in unparsed) {
     result.locked_by = '' + unparsed[LockKeys.LockedBy];
   }
-
+  if (LockKeys.CreatedAt in unparsed) {
+    result.created_at = '' + unparsed[LockKeys.CreatedAt];
+  }
   if (LockKeys.LockedUntil in unparsed) {
     result.locked_until = '' + unparsed[LockKeys.LockedUntil];
     // Parse the UTC date
@@ -134,10 +136,6 @@ export function parseUserLock(unparsed: object): UserLock | null {
       utcDate.setDate(utcDate.getDate() - 1);
     }
     result.locked_until = utcDate.toLocaleDateString('de-DE');
-  }
-
-  if (LockKeys.CreatedAt in unparsed) {
-    result.created_at = '' + unparsed[LockKeys.CreatedAt];
   }
 
   return Object.keys(result).length > 0 ? (result as UserLock) : null;
