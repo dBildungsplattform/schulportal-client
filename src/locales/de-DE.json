@@ -26,6 +26,15 @@
     "followingDataCreated": "Folgende Daten wurden gespeichert:",
     "headline": "Administrationsbereich",
     "import": {
+      "backToUpload": "Andere Datei hochladen",
+      "errors": {
+        "followingDataInvalid": "Die folgenden Datensätze sind ungültig:",
+        "IMPORT_DATA_ITEM_KLASSE_IS_TOO_SHORT": "Klasse fehlt",
+        "IMPORT_DATA_ITEM_KLASSE_NOT_FOUND": "Klasse an der ausgewählten Schule nicht gefunden",
+        "IMPORT_DATA_ITEM_NACHNAME_IS_TOO_SHORT": "Nachname fehlt",
+        "IMPORT_DATA_ITEM_VORNAME_IS_TOO_SHORT": "Vorname fehlt"
+      },
+      "executeImport": "Import durchführen",
       "rules": {
         "files": {
           "required": "Eine CSV-Datei muss ausgewählt werden."
@@ -39,6 +48,8 @@
       },
       "selectOrDropFile": "Datei auswählen oder ablegen",
       "uploadedSuccessfully": "Die Datei wurde erfolgreich hochgeladen. Sie können den Import nun durchführen.",
+      "uploadErrorText": "Die Datei konnte nicht hochgeladen werden. Bitte versuchen Sie es mit einer anderen Datei.",
+      "uploadErrorTitle": "Fehler beim Upload",
       "uploadFile": "Datei hochladen"
     },
     "koPers": {

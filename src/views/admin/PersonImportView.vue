@@ -15,6 +15,7 @@
   import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
   import { type ImportStore, useImportStore } from '@/stores/ImportStore';
   import { RollenArt } from '@/stores/RolleStore';
+  import SpshAlert from '@/components/alert/SpshAlert.vue';
 
   const organisationStore: OrganisationStore = useOrganisationStore();
   const importStore: ImportStore = useImportStore();
@@ -137,6 +138,15 @@
     );
   }
 
+  function resetUpload(): void {
+    importStore.errorCode = null;
+    importStore.uploadResponse = null;
+  }
+
+  function executeImport(): void {
+    // Execute the import
+  }
+
   const onSubmit: (e?: Event | undefined) => Promise<void | undefined> = formContext.handleSubmit(() => {
     uploadFile();
   });
@@ -167,8 +177,20 @@
       :padded="true"
       :showCloseText="true"
     >
+      <!-- Error Message Display for error messages from the personStore -->
+      <SpshAlert
+        :model-value="!!importStore.errorCode"
+        :title="$t('admin.import.uploadErrorTitle')"
+        :type="'error'"
+        :closable="false"
+        :showButton="true"
+        :buttonText="$t('admin.import.backToUpload')"
+        :buttonAction="resetUpload"
+        :text="$t('admin.import.uploadErrorText')"
+      />
+
       <!-- Success template -->
-      <template v-if="importStore.uploadResponse?.isValid">
+      <template v-if="importStore.uploadResponse?.isValid && !importStore.errorCode">
         <v-container>
           <v-row justify="center">
             <v-col
@@ -191,12 +213,33 @@
               </v-icon>
             </v-col>
           </v-row>
+          {{ importStore.uploadResponse }}
+          <v-row justify="center">
+            <v-col cols="auto">
+              <v-btn
+                class="secondary"
+                @click="resetUpload()"
+                data-testid="back-to-upload-button"
+              >
+                {{ $t('admin.import.backToUpload') }}
+              </v-btn>
+            </v-col>
+            <v-col cols="auto">
+              <v-btn
+                class="primary"
+                @click="executeImport()"
+                data-testid="execute-import-button"
+              >
+                {{ $t('admin.import.executeImport') }}
+              </v-btn>
+            </v-col>
+          </v-row>
         </v-container>
       </template>
 
       <!-- Upload form -->
       <FormWrapper
-        v-if="!importStore.uploadResponse?.isValid"
+        v-if="!importStore.uploadResponse?.isValid && !importStore.errorCode"
         :createButtonLabel="$t('admin.import.uploadFile')"
         :discardButtonLabel="$t('nav.backToList')"
         id="person-import-form"
@@ -275,6 +318,54 @@
             v-bind="selectedFilesProps"
           ></v-file-input>
         </FormRow>
+        
+        <!-- Invalid data template -->
+        <template v-if="importStore.uploadResponse?.totalInvalidImportDataItems">
+          <v-alert
+            class="border-md mt-4"
+            type="error"
+            variant="outlined"
+          >
+            <v-row>
+              <v-col
+                class="primary-text-color"
+                cols="auto"
+              >
+                <strong data-testid="import-errors-title">{{ $t("admin.import.errors.followingDataInvalid") }}</strong>
+              </v-col>
+            </v-row>
+            <v-row v-for="invalidItem in importStore.uploadResponse.invalidImportDataItems">
+              <v-col
+                class="primary-text-color"
+                cols="3"
+              >
+                <span data-testid="invalid-item-nachname">{{ invalidItem.nachname }}</span>
+              </v-col>
+              <v-col
+                class="primary-text-color"
+                cols="3"
+              >
+                <span data-testid="invalid-item-vorname">{{ invalidItem.vorname }}</span>
+              </v-col>
+              <v-col
+                class="primary-text-color"
+                cols="1"
+              >
+                <span data-testid="invalid-item-klasse">{{ invalidItem.klasse }}</span>
+              </v-col>
+              <v-col
+                class="primary-text-color"
+                cols="5"
+              >
+                <span
+                  v-for="(error, index) in invalidItem.validationErrors"
+                  data-testid="invalid-item-errors">
+                  {{ $t(`admin.import.errors.${error}`) }}{{ index < invalidItem.validationErrors.length -1 ? ", " : "" }}
+                </span>
+              </v-col>
+            </v-row>
+          </v-alert>
+        </template>
       </FormWrapper>
     </LayoutCard>
   </div>
