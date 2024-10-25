@@ -31,7 +31,7 @@
   let timerId: ReturnType<typeof setTimeout>;
   const hasAutoSelectedOrganisation: Ref<boolean> = ref(false);
 
-  type ReadonlyHeaders = InstanceType<typeof VDataTableServer>['headers'];
+  type ReadonlyHeaders = VDataTableServer['headers'];
   const headers: ReadonlyHeaders = [
     { title: t('person.lastName'), key: 'person.name.familienname', align: 'start' },
     { title: t('person.firstName'), key: 'person.name.vorname', align: 'start' },

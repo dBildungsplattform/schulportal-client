@@ -7,16 +7,9 @@
   import { onMounted } from 'vue';
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
 
+  type Headers = VDataTableServer['headers'];
+
   const searchFilterStore: SearchFilterStore = useSearchFilterStore();
-
-  type ReadonlyHeaders = InstanceType<typeof VDataTableServer>['headers'];
-
-  // Mutable headers
-  type ReadonlyHeadersMutable = VDataTableServer['$props']['headers'];
-  type UnwrapReadonlyArray<A> = A extends Readonly<Array<infer I>> ? I : never;
-  type ReadonlyDataTableHeader = UnwrapReadonlyArray<ReadonlyHeadersMutable>;
-  type DeepMutable<T> = { -readonly [P in keyof T]: DeepMutable<T[P]> };
-  type Headers = DeepMutable<ReadonlyDataTableHeader>;
 
   export type TableItem = Record<string, unknown>;
   export type TableRow<T> = {
@@ -26,7 +19,7 @@
   type Props = {
     currentPage?: number;
     disableRowClick?: boolean;
-    headers: ReadonlyHeaders | Headers;
+    headers: Headers;
     items: TableItem[];
     itemsPerPage: number;
     itemValuePath: string;
@@ -84,12 +77,9 @@
   onMounted(() => {
     // If the sortField in the store has a value then we don't trigger this logic. This logic should only be triggered when the table was first opened without any changes to sorting.
     if (searchFilterStore.sortField === '') {
-      const headers: Headers[] = props.headers as Headers[];
-      const firstHeader: Headers = headers[0] as Headers;
-
-      if (firstHeader.key) {
+      if (props.headers && props.headers[0]?.key) {
         emit('onTableUpdate', {
-          sortField: firstHeader.key as string,
+          sortField: props.headers[0]?.key,
           sortOrder: SortOrder.Asc,
         });
       }
