@@ -52,8 +52,8 @@ export enum SortOrder {
 export enum LockKeys {
   PersonId = 'personId',
   LockedBy = 'locked_by',
-  LockedUntil = 'locked_until',
   CreatedAt = 'created_at',
+  LockedUntil = 'locked_until',
 }
 export type UserLock = {
   personId: string;
