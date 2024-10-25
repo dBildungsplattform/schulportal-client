@@ -58,8 +58,8 @@ export enum LockKeys {
 export type UserLock = {
   personId: string;
   locked_by: string;
-  locked_until: string;
   created_at: string;
+  locked_until: string;
 };
 
 export type Person = {
