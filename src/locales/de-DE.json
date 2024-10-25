@@ -37,7 +37,8 @@
           "required": "Eine Schule muss ausgewählt werden."
         }
       },
-      "selectFile": "Datei auswählen",
+      "selectOrDropFile": "Datei auswählen oder ablegen",
+      "uploadedSuccessfully": "Die Datei wurde erfolgreich hochgeladen. Sie können den Import nun durchführen.",
       "uploadFile": "Datei hochladen"
     },
     "koPers": {

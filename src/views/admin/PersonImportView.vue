@@ -167,7 +167,36 @@
       :padded="true"
       :showCloseText="true"
     >
+      <!-- Success template -->
+      <template v-if="importStore.uploadResponse?.isValid">
+        <v-container>
+          <v-row justify="center">
+            <v-col
+              class="subtitle-1"
+              cols="auto"
+            >
+              <span data-testid="person-import-success-text">
+                {{ $t('admin.import.uploadedSuccessfully') }}
+              </span>
+            </v-col>
+          </v-row>
+          <v-row justify="center">
+            <v-col cols="auto">
+              <v-icon
+                aria-hidden="true"
+                color="#1EAE9C"
+                icon="mdi-check-circle"
+                small
+              >
+              </v-icon>
+            </v-col>
+          </v-row>
+        </v-container>
+      </template>
+
+      <!-- Upload form -->
       <FormWrapper
+        v-if="!importStore.uploadResponse?.isValid"
         :createButtonLabel="$t('admin.import.uploadFile')"
         :discardButtonLabel="$t('nav.backToList')"
         id="person-import-form"
@@ -238,7 +267,7 @@
         >
           <v-file-input
             accept=".csv"
-            :label="$t('admin.import.selectFile')"
+            :label="$t('admin.import.selectOrDropFile')"
             prepend-icon=""
             prepend-inner-icon="mdi-paperclip"
             variant="outlined"
@@ -246,7 +275,6 @@
             v-bind="selectedFilesProps"
           ></v-file-input>
         </FormRow>
-        {{ importStore.uploadResponse }}
       </FormWrapper>
     </LayoutCard>
   </div>
