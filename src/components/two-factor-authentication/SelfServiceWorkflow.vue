@@ -2,14 +2,13 @@
   import { computed, nextTick, ref, type ComputedRef, type Ref } from 'vue';
   import { useDisplay } from 'vuetify';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import SpshTooltip from '@/components/admin/SpshTooltip.vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import {
     useTwoFactorAuthentificationStore,
     type TwoFactorAuthentificationStore,
   } from '@/stores/TwoFactorAuthentificationStore';
 
-  const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
+  const { xs }: { xs: Ref<boolean> } = useDisplay();
   const { t }: Composer = useI18n({ useScope: 'global' });
   const twoFactorStore: TwoFactorAuthentificationStore = useTwoFactorAuthentificationStore();
 
@@ -56,6 +55,7 @@
     twoFactorStore.qrCode = '';
     twoFactorStore.errorCode = '';
     workflowStep.value = TwoFactorSteps.Start;
+    errorMessage.value = '';
   }
 
   async function resetErrorMessage(): Promise<void> {
@@ -96,20 +96,14 @@
     <template v-slot:activator="{ props }">
       <v-row class="d-flex align-center justify-center">
         <v-col class="d-flex justify-center">
-          <SpshTooltip
-            :enabled-condition="true"
-            :enabledText="$t('admin.person.twoFactorAuthentication.setUpShort')"
-            position="start"
+          <v-btn
+            class="primary"
+            data-testid="open-2FA-self-service-dialog-icon"
+            v-bind="props"
+            :block="xs"
           >
-            <v-btn
-              class="primary"
-              data-testid="open-2FA-self-service-dialog-icon"
-              :block="mdAndDown"
-              v-bind="props"
-            >
-              {{ $t('admin.person.twoFactorAuthentication.setUpShort') }}
-            </v-btn>
-          </SpshTooltip>
+            {{ $t('admin.person.twoFactorAuthentication.setUpShort') }}
+          </v-btn>
         </v-col>
       </v-row>
     </template>
@@ -151,7 +145,10 @@
           <v-container v-if="workflowStep === TwoFactorSteps.QRCode">
             <v-row class="text-body bold px-md-16">
               <div class="v-col">
-                <p class="text-body">
+                <p
+                  class="text-body"
+                  data-testid="self-service-dialog-qr-info-text"
+                >
                   {{ $t('admin.person.twoFactorAuthentication.pleaseScan') }}
                 </p>
               </div>
@@ -164,6 +161,7 @@
                 size="250"
                 width="250"
                 indeterminate
+                data-testid="software-token-dialog-progress-bar"
               >
               </v-progress-circular>
             </v-row>
@@ -209,6 +207,7 @@
                     :error="errorMessage.length > 0"
                     @input="resetErrorMessage()"
                     @keydown.enter="proceedToNextWorkflowStep(isActive)"
+                    data-testid="self-service-otp-input"
                   >
                   </v-otp-input>
                 </v-row>
@@ -217,7 +216,12 @@
                   v-if="errorMessage.length > 0"
                   class="text-body bold justify-center text-error"
                 >
-                  <p class="justify-center">{{ errorMessage }}</p>
+                  <p
+                    class="justify-center"
+                    data-testid="self-service-otp-error-text"
+                  >
+                    {{ errorMessage }}
+                  </p>
                 </v-row>
 
                 <v-row
@@ -238,7 +242,7 @@
               md="4"
             >
               <v-btn
-                :block="mdAndDown"
+                :block="xs"
                 class="secondary button"
                 @click.stop="close2FADialog(isActive)"
                 data-testid="close-two-factor-authentication-dialog"
@@ -252,7 +256,7 @@
               md="4"
             >
               <v-btn
-                :block="mdAndDown"
+                :block="xs"
                 class="primary button"
                 @click.stop="proceedToNextWorkflowStep(isActive)"
                 data-testid="proceed-two-factor-authentication-dialog"
