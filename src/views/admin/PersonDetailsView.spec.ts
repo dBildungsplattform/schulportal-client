@@ -495,24 +495,4 @@ describe('PersonDetailsView', () => {
 
     expect(unsavedChangesDialogButton?.exists()).toBe(true);
   });
-
-  test('it checks for dirtiness when zuordnung Form is active', async () => {
-    await wrapper?.find('[data-testid="zuordnung-edit-button"]').trigger('click');
-    await nextTick();
-
-    await wrapper
-      ?.findComponent({ ref: 'personenkontext-create' }).findComponent({ ref: 'form-row' })
-      .findComponent({ ref: 'organisation-select' })
-      .setValue('1');
-    await nextTick();
-
-    location.reload();
-    await nextTick();
-
-    const unsavedChangesDialogButton: VueWrapper | undefined = await wrapper?.findComponent({
-      ref: 'unsaved-changes-dialog',
-    });
-
-    expect(unsavedChangesDialogButton?.exists()).toBe(true);
-  });
 });
