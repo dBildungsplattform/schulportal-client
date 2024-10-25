@@ -8,6 +8,7 @@ import {
   type DBiamPersonenuebersichtResponse,
   type LockUserBodyParams,
   type PersonFrontendControllerFindPersons200Response,
+  type PersonLockResponse,
   type PersonMetadataBodyParams,
   type PersonendatensatzResponse,
 } from '@/api-client/generated';
@@ -36,45 +37,6 @@ function getMockPersonendatensatz(): Personendatensatz {
         address: 'email',
         status: EmailAddressStatus.Requested,
       },
-    },
-  };
-}
-
-function getMockLockedPersonendatensatz(): Personendatensatz {
-  return {
-    person: {
-      id: '123456',
-      name: {
-        familienname: 'Vimes',
-        vorname: 'Susan',
-      },
-      referrer: '6978',
-      personalnummer: '9183756',
-      isLocked: true,
-      userLock: { personId: '123456', locked_by: 'admin', locked_until: '', created_at: '2024-12-22' },
-      revision: '1',
-      lastModified: '2024-12-22',
-      email: {
-        address: 'email',
-        status: EmailAddressStatus.Requested,
-      },
-    },
-  };
-}
-
-function getMockLockedPersonendatensatzResponse(): PersonendatensatzResponse {
-  return {
-    person: {
-      ...getMockLockedPersonendatensatz().person,
-      mandant: '',
-      geburt: {},
-      stammorganisation: '',
-      geschlecht: '',
-      lokalisierung: '',
-      vertrauensstufe: Vertrauensstufe.Teil,
-      revision: '1',
-      startpasswort: '',
-      lastModified: '2024-12-22',
     },
   };
 }
