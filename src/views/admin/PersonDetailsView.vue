@@ -2113,7 +2113,7 @@
                         </TokenReset>
                       </SpshTooltip>
                       <SpshTooltip
-                        :enabledCondition="twoFactorAuthentificationStore.hasToken"
+                        :enabledCondition="!twoFactorAuthentificationStore.hasToken"
                         :disabledText="$t('person.finishEditFirst')"
                         :enabledText="$t('admin.person.twoFactorAuthentication.setUpShort')"
                         position="start"
