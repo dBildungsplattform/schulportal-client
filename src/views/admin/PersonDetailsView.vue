@@ -2637,7 +2637,7 @@
   }
 
   span {
-    white-space: pre;
+    white-space: normal;
     text-wrap: pretty;
   }
 </style>
