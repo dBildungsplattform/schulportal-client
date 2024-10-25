@@ -5,6 +5,7 @@ import routes from '@/router/routes';
 import { useAuthStore, type AuthStore, type UserInfo } from '@/stores/AuthStore';
 import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
 import {
+  parseUserLock,
   usePersonStore,
   type Personendatensatz,
   type PersonStore,
@@ -389,17 +390,21 @@ describe('PersonDetailsView', () => {
     expect(wrapper!.find('[data-testid="lock-info-1-key"]').exists()).toBe(false);
     expect(wrapper!.find('[data-testid="lock-info-1-attribute"]').exists()).toBe(false);
 
-    const date: string = '01.01.2024';
-    const datetime: string = `${date} 12:34:00`;
+    const date: string = new Date().toUTCString();
+    const formattedDate: string = new Date(date).toLocaleDateString('de-DE', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    });
     const userLock: UserLock = {
       personId: '1234',
       locked_by: 'Lady Lock',
-      created_at: datetime,
-      locked_until: datetime,
+      created_at: date,
+      locked_until: date,
     };
 
     personStore.currentPerson!.person.isLocked = true;
-    personStore.currentPerson!.person.userLock = userLock;
+    personStore.currentPerson!.person.userLock = parseUserLock(userLock);
     organisationStore.lockingOrganisation = {
       id: '1234',
       name: userLock.locked_by,
@@ -409,7 +414,7 @@ describe('PersonDetailsView', () => {
 
     const lockInfoArray: Array<[string, string]> = [
       ['Gesperrt durch:', userLock.locked_by],
-      ['Seit:', '27.09.2024'],
+      ['Seit:', formattedDate],
     ];
 
     for (let index: number = 0; index < lockInfoArray.length; index++) {
