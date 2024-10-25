@@ -57,7 +57,8 @@
     if (printWindow) {
       printWindow.document.open();
       printWindow.document.write(`
-          <html>
+          <!DOCTYPE html>
+          <html lang="de">
           <head>
             <title>${t('person.password')}</title>
             <style nonce="${cspNonce}">
