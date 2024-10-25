@@ -74,34 +74,41 @@
   <div>
     <v-row>
       <v-col
-      md="5"
-  xs="12"
-  cols="12"
-  class="pl-md-14"
+        md="5"
+        xs="12"
+        cols="12"
+        class="pl-md-14"
       >
         <span class="text-body bold">
-          <v-icon
-            aria-hidden="true"
-            class="mr-2"
-            icon="mdi-alert-circle-outline"
-            size="small"
-          ></v-icon>
-          <span> {{ $t('admin.person.personalInfoChangeNotice') }} </span>
-          <span>
-            <a
-              :href="link.href"
-              :target="link.external ? '_blank' : '_self'"
-            >
-              {{ link.text }}</a
-            >.
-          </span>
+          <div>
+            <v-icon
+              aria-hidden="true"
+              class="mr-2"
+              icon="mdi-alert-circle-outline"
+              size="small"
+            ></v-icon>
+            <span> {{ $t('admin.person.personalInfoChangeNotice') }} </span>
+          </div>
+          <div class="mt-4">
+            <p>
+              {{ $t('admin.person.personalInfoChangeNotice2') }}
+              <span>
+                <a
+                  :href="link.href"
+                  :target="link.external ? '_blank' : '_self'"
+                >
+                  {{ link.text }}</a
+                >.
+              </span>
+            </p>
+          </div>
         </span>
       </v-col>
       <v-col
-      md="7"
-  xs="12"
-  cols="12"
-  class="pr-md-14"
+        md="7"
+        xs="12"
+        cols="12"
+        class="pr-md-14"
       >
         <!-- Vorname -->
         <FormRow
