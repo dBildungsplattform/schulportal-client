@@ -318,7 +318,7 @@
             v-bind="selectedFilesProps"
           ></v-file-input>
         </FormRow>
-        
+
         <!-- Invalid data template -->
         <template v-if="importStore.uploadResponse?.totalInvalidImportDataItems">
           <v-alert
@@ -331,10 +331,13 @@
                 class="primary-text-color"
                 cols="auto"
               >
-                <strong data-testid="import-errors-title">{{ $t("admin.import.errors.followingDataInvalid") }}</strong>
+                <strong data-testid="import-errors-title">{{ $t('admin.import.errors.followingDataInvalid') }}</strong>
               </v-col>
             </v-row>
-            <v-row v-for="invalidItem in importStore.uploadResponse.invalidImportDataItems">
+            <v-row
+              v-for="(invalidItem, index) in importStore.uploadResponse.invalidImportDataItems"
+              :key="index"
+            >
               <v-col
                 class="primary-text-color"
                 cols="3"
@@ -359,8 +362,11 @@
               >
                 <span
                   v-for="(error, index) in invalidItem.validationErrors"
-                  data-testid="invalid-item-errors">
-                  {{ $t(`admin.import.errors.${error}`) }}{{ index < invalidItem.validationErrors.length -1 ? ", " : "" }}
+                  :key="index"
+                  data-testid="invalid-item-errors"
+                >
+                  {{ $t(`admin.import.errors.${error}`)
+                  }}{{ index < invalidItem.validationErrors.length - 1 ? ', ' : '' }}
                 </span>
               </v-col>
             </v-row>
