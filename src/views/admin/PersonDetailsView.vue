@@ -2104,7 +2104,7 @@
                         <TokenReset
                           v-if="twoFactorAuthentificationStore.hasToken"
                           :errorCode="twoFactorAuthentificationStore.errorCode"
-                          :disabled="isEditActive"
+                          :disabled="isEditActive || isEditPersonMetadataActive"
                           :person="personStore.currentPerson"
                           :tokenType="twoFactorAuthentificationStore.tokenKind"
                           :personId="currentPersonId"
@@ -2121,7 +2121,7 @@
                       <TwoFactorAuthenticationSetUp
                         v-if="!twoFactorAuthentificationStore.hasToken"
                         :errorCode="twoFactorAuthentificationStore.errorCode"
-                        :disabled="isEditActive"
+                        :disabled="isEditActive || isEditPersonMetadataActive"
                         :person="personStore.currentPerson"
                         @dialogClosed="twoFactorAuthentificationStore.get2FAState(currentPersonId)"
                       >
