@@ -224,7 +224,7 @@ describe('TwoFactorAuthentificationStore', () => {
       const resetTokenPromise: Promise<void> = twoFactorAuthenticationStore.resetToken(referrer);
       expect(twoFactorAuthenticationStore.loading).toBe(true);
       await resetTokenPromise;
-      expect(twoFactorAuthenticationStore.errorCode).toEqual('UNSPECIFIED_ERROR');
+      expect(twoFactorAuthenticationStore.errorCode).toEqual('TOKEN_RESET_ERROR');
       expect(twoFactorAuthenticationStore.loading).toBe(false);
     });
 

@@ -136,7 +136,7 @@ describe('TokenResetComponent', () => {
     await resetButtonWrapper.trigger('click');
     await nextTick();
     await nextTick();
-    const dialogText: Element | null = document.querySelector('[data-testid="dialog-text"]');
+    const dialogText: Element | null = document.querySelector('[data-testid="token-reset-dialog-error-text"]');
     expect(dialogText).not.toBeNull();
   });
 

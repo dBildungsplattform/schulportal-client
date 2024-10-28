@@ -130,6 +130,10 @@ describe('set up two-factor authentication', () => {
 
     await nextTick();
 
+    proceedButton?.click();
+    twoFactorAuthenticationStore.errorCode = 'error';
+    await nextTick();
+
     await document.querySelector('[data-testid="self-service-otp-error-text"]');
     expect(document.querySelector('[data-testid="self-service-otp-error-text"]')).not.toBeNull();
   });
