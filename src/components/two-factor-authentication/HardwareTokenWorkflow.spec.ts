@@ -32,7 +32,7 @@ describe('HardwareTokenWorkflow.vue', () => {
         referrer: '6978',
         personalnummer: '9183756',
         isLocked: false,
-        lockInfo: null,
+        userLock: null,
         revision: '1',
         lastModified: '2024-12-22',
         email: {
