@@ -667,7 +667,7 @@ describe('OrganisationStore', () => {
       const updateOrganisationPromise: Promise<void> = organisationStore.updateOrganisationById(
         '1',
         'Updated Organisation 1',
-      )
+      );
 
       await updateOrganisationPromise;
       expect(organisationStore.updatedOrganisation).toEqual(null);
