@@ -35,7 +35,7 @@ beforeEach(() => {
           referrer: 'atest',
           personalnummer: null,
           isLocked: null,
-          lockInfo: null,
+          userLock: null,
           revision: '1',
           lastModified: '2024-05-22',
           email: {
@@ -131,6 +131,21 @@ describe('reset password', () => {
     }
 
     expect(mockWindow.print).toHaveBeenCalled();
+  });
+
+  test('it closes the password reset dialog when the close button is clicked', async () => {
+    // Arrange: Open the dialog
+    await wrapper?.get('[data-testid="open-password-reset-dialog-icon"]').trigger('click');
+
+    // Act: Click the close button
+    const closeButton: HTMLElement | undefined = document.querySelector(
+      '[data-testid="close-password-reset-dialog-button"]',
+    ) as HTMLElement;
+    closeButton.click();
+    await nextTick();
+
+    // Assert: Check that the dialog has been closed
+    expect(wrapper?.emitted('onClearPassword')).toBeTruthy();
   });
 });
 
