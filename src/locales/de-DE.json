@@ -502,6 +502,7 @@
     "lastName": "Nachname",
     "userIsLocked": "Dieser Benutzer ist gesperrt.",
     "userIsUnlocked": "Dieser Benutzer ist aktiv.",
+    "lockTime": "Dauer der Sperre",
     "lockUser": "Benutzer sperren",
     "lockUserInfoText": "Für die Dauer der Sperre hat der Benutzer keinen Zugriff mehr auf das Schulportal SH und die daran angeschlossenen Dienste.",
     "lockedBy": "Gesperrt durch",
