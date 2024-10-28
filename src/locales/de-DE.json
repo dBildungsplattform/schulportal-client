@@ -44,14 +44,16 @@
       "edit": "Klasse bearbeiten",
       "title": {
         "KLASSENNAME_AN_SCHULE_EINDEUTIG": "Fehler bei Änderung der Klasse",
-        "ORGANISATION_IST_BEREITS_ZUGEWIESEN_ERROR": "Fehler beim Löschen"
+        "ORGANISATION_IST_BEREITS_ZUGEWIESEN_ERROR": "Fehler beim Löschen",
+        "NEWER_VERSION_ORGANISATION": "Geänderte Daten"
       },
       "errors": {
         "KLASSE_ERROR": "Die Klasse konnte nicht geändert werden.",
         "KLASSE_NUR_VON_SCHULE_ADMINISTRIERT": "Klassen dürfen nur von einer Schule administriert werden.",
         "KLASSENNAME_AN_SCHULE_EINDEUTIG": "Der Klassenname existiert bereits an dieser Schule.",
         "ORGANISATION_SPECIFICATION_ERROR": "Die Klasse konnte nicht angelegt werden.",
-        "ORGANISATION_IST_BEREITS_ZUGEWIESEN_ERROR": "Die Klasse kann nicht gelöscht werden, da noch Benutzer zugeordnet sind."
+        "ORGANISATION_IST_BEREITS_ZUGEWIESEN_ERROR": "Die Klasse kann nicht gelöscht werden, da noch Benutzer zugeordnet sind.",
+        "NEWER_VERSION_ORGANISATION": "Die Klasse wurde zwischenzeitlich durch einen anderen Administrator bearbeitet. Bitte aktualisieren Sie die Daten und versuchen Sie es erneut."
       },
       "enterKlassenname": "Klassenname eingeben",
       "klasse": "Klasse",
