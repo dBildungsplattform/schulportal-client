@@ -651,6 +651,29 @@ describe('OrganisationStore', () => {
       expect(organisationStore.errorCode).toEqual('UPDATE_ERROR');
       expect(organisationStore.loading).toBe(false);
     });
+    it('should throw error when organisation version is not found', async () => {
+      // Set currentKlasse to null to trigger the error
+      organisationStore.currentKlasse = {
+        id: '2',
+        kennung: 'Org2',
+        name: 'Organisation 2',
+        namensergaenzung: 'Ergänzung',
+        kuerzel: 'O2',
+        typ: OrganisationsTyp.Klasse,
+        administriertVon: '1',
+        version: undefined,
+      };
+
+      const updateOrganisationPromise: Promise<void> = organisationStore.updateOrganisationById(
+        '1',
+        'Updated Organisation 1',
+      )
+
+      await updateOrganisationPromise;
+      expect(organisationStore.updatedOrganisation).toEqual(null);
+      expect(organisationStore.errorCode).toEqual('UNSPECIFIED_ERROR');
+      expect(organisationStore.loading).toBe(false);
+    });
   });
   describe('loadSchultraeger', () => {
     it('should update the schultraeger', async () => {
