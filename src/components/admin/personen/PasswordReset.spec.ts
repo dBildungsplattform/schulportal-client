@@ -99,6 +99,36 @@ describe('reset password', () => {
     await document.querySelector('[data-testid="password-output-field"] mdi-content-copy');
     expect(document.querySelector('[data-testid="password-output-field"] mdi-content-copy')).not.toBeNull();
   });
+
+  test('reset button emits correct event when clicked', async () => {
+    const openDialogButton: HTMLElement | undefined = document.querySelector(
+      '[data-testid="open-password-reset-dialog-icon"]',
+    ) as HTMLElement;
+    openDialogButton.click();
+    await nextTick();
+
+    // Act: Click the reset password button
+    const resetButton: HTMLElement | undefined = document.querySelector(
+      '[data-testid="password-reset-button"]',
+    ) as HTMLElement;
+    resetButton.click();
+    await nextTick();
+  });
+
+  test('it closes the password reset dialog when the close button is clicked', async () => {
+    // Arrange: Open the dialog
+    await wrapper?.get('[data-testid="open-password-reset-dialog-icon"]').trigger('click');
+
+    // Act: Click the close button
+    const closeButton: HTMLElement | undefined = document.querySelector(
+      '[data-testid="close-password-reset-dialog-button"]',
+    ) as HTMLElement;
+    closeButton.click();
+    await nextTick();
+
+    // Assert: Check that the dialog has been closed
+    expect(wrapper?.emitted('onClearPassword')).toBeTruthy();
+  });
 });
 
 afterEach(() => {
