@@ -414,7 +414,7 @@ describe('PersonDetailsView', () => {
 
     const lockInfoArray: Array<[string, string]> = [
       ['Gesperrt durch:', userLock.locked_by],
-      ['Seit:', formattedDate],
+      ['Gesperrt seit:', formattedDate],
     ];
 
     for (let index: number = 0; index < lockInfoArray.length; index++) {
