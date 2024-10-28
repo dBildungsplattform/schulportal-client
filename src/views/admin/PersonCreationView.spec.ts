@@ -43,7 +43,7 @@ const mockCreatedPersonWithKontext: DBiamPersonResponse = {
     revision: '',
     startpasswort: '',
     isLocked: false,
-    lockInfo: null,
+    userLock: null,
     lastModified: '2024-12-22',
     email: {
       address: 'email',
