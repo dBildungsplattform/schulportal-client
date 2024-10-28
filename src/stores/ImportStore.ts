@@ -8,7 +8,8 @@ const importApi: ImportApiInterface = ImportApiFactory(undefined, '', axiosApiIn
 type ImportState = {
   errorCode: string | null;
   importedData: File | null;
-  loading: boolean;
+  importIsLoading: boolean;
+  uploadIsLoading: boolean;
   uploadResponse: ImportUploadResponse | null;
 };
 
@@ -27,7 +28,8 @@ export const useImportStore: StoreDefinition<'importStore', ImportState, ImportG
     return {
       errorCode: null,
       importedData: null,
-      loading: false,
+      importIsLoading: false,
+      uploadIsLoading: false,
       uploadResponse: null,
     };
   },
@@ -37,7 +39,7 @@ export const useImportStore: StoreDefinition<'importStore', ImportState, ImportG
     },
 
     async importPersonen(importvorgangId: string, organisationId: string, rolleId: string): Promise<void> {
-      this.loading = true;
+      this.importIsLoading = true;
       try {
         const { data }: { data: File } = await importApi.importControllerExecuteImport({
           importvorgangId,
@@ -49,15 +51,15 @@ export const useImportStore: StoreDefinition<'importStore', ImportState, ImportG
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.i18nKey || 'ERROR_UPLOADING_FILE';
+          this.errorCode = error.response?.data.i18nKey || 'ERROR_IMPORTING_FILE';
         }
       } finally {
-        this.loading = false;
+        this.importIsLoading = false;
       }
     },
 
     async uploadPersonenImportFile(organisationId: string, rolleId: string, file: File): Promise<void> {
-      this.loading = true;
+      this.uploadIsLoading = true;
       try {
         const { data }: { data: ImportUploadResponse } = await importApi.importControllerUploadFile(
           organisationId,
@@ -72,7 +74,7 @@ export const useImportStore: StoreDefinition<'importStore', ImportState, ImportG
           this.errorCode = error.response?.data.i18nKey || 'ERROR_UPLOADING_FILE';
         }
       } finally {
-        this.loading = false;
+        this.uploadIsLoading = false;
       }
     },
   },

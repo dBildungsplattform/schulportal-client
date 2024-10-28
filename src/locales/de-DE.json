@@ -29,6 +29,8 @@
       "backToUpload": "Andere Datei hochladen",
       "downloadFile": "Datei herunterladen",
       "errors": {
+        "ERROR_IMPORTING_FILE": "Die Daten konnten nicht importiert werden. Bitte versuchen Sie es erneut.",
+        "ERROR_UPLOADING_FILE": "Die Datei konnte nicht hochgeladen werden. Bitte versuchen Sie es mit einer anderen Datei.",
         "followingDataInvalid": "Die folgenden Datensätze sind ungültig:",
         "IMPORT_DATA_ITEM_KLASSE_IS_TOO_SHORT": "Klasse fehlt",
         "IMPORT_DATA_ITEM_KLASSE_NOT_FOUND": "Klasse an der ausgewählten Schule nicht gefunden",
@@ -53,7 +55,6 @@
       },
       "selectOrDropFile": "Datei auswählen oder ablegen",
       "uploadedSuccessfully": "Die Datei wurde erfolgreich hochgeladen. {items} Datensätze stehen zum Import bereit.",
-      "uploadErrorText": "Die Datei konnte nicht hochgeladen werden. Bitte versuchen Sie es mit einer anderen Datei.",
       "uploadErrorTitle": "Fehler beim Upload",
       "uploadFile": "Datei hochladen"
     },

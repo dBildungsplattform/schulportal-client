@@ -114,6 +114,9 @@
     }, 500);
   });
 
+  const showUploadSuccessTemplate: ComputedRef<boolean> = computed(() => {
+    return importStore.uploadResponse?.isValid as boolean && !importStore.importedData && !importStore.importIsLoading && !importStore.importIsLoading && !importStore.errorCode  });
+
   function clearSelectedRolle(): void {
     selectedRolle.value = undefined;
   }
@@ -200,11 +203,11 @@
         :showButton="true"
         :buttonText="$t('admin.import.backToUpload')"
         :buttonAction="resetUpload"
-        :text="$t('admin.import.uploadErrorText')"
+        :text="$t(`admin.import.errors.${importStore.errorCode}`)"
       />
 
       <!-- Upload success template -->
-      <template v-if="importStore.uploadResponse?.isValid && !importStore.importedData && !importStore.errorCode">
+      <template v-if="showUploadSuccessTemplate">
         <v-container>
           <v-row justify="center">
             <v-col cols="auto">
@@ -224,7 +227,7 @@
             >
               <span data-testid="person-upload-success-text">
                 {{
-                  $t('admin.import.uploadedSuccessfully', { items: importStore.uploadResponse.totalImportDataItems })
+                  $t('admin.import.uploadedSuccessfully', { items: importStore.uploadResponse?.totalImportDataItems })
                 }}
               </span>
             </v-col>
@@ -253,7 +256,7 @@
       </template>
 
       <!-- Import success template -->
-      <template v-if="importStore.importedData && !importStore.errorCode">
+      <template v-if="importStore.importedData && !importStore.importIsLoading && !importStore.errorCode">
         <v-container>
           <v-row justify="center">
             <v-col cols="auto">
@@ -298,6 +301,22 @@
           </v-row>
         </v-container>
       </template>
+
+      <!-- Import loading template -->
+       <template v-if="importStore.importIsLoading && !importStore.errorCode">
+        <v-container>
+          <v-row
+            justify="center"
+          >
+            <v-col cols="auto">
+              <v-progress-circular
+                indeterminate
+                size="64"
+              ></v-progress-circular>
+            </v-col>
+          </v-row>
+        </v-container>
+       </template>
 
       <!-- Upload form -->
       <FormWrapper
