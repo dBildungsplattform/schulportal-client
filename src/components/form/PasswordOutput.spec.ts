@@ -4,7 +4,7 @@ import PasswordOutput from './PasswordOutput.vue';
 
 let wrapper: VueWrapper | null = null;
 
-const writeText: Mock<[], Promise<void>> = vi.fn(async () => {});
+const writeText: Mock = vi.fn(async () => {});
 
 Object.assign(navigator, {
   clipboard: {

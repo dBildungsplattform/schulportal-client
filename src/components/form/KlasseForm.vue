@@ -123,7 +123,7 @@
     </FormRow>
 
     <!-- Klassenname eingeben -->
-    <v-row>
+    <v-row class="mt-8">
       <h3 class="headline-3">2. {{ $t('admin.klasse.enterKlassenname') }}</h3>
     </v-row>
     <FormRow

@@ -24,6 +24,7 @@
     type OrganisationStore,
   } from '@/stores/OrganisationStore';
   import {
+    EmailStatus,
     LockKeys,
     usePersonStore,
     type Person,
@@ -123,6 +124,7 @@
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
   let blockedNext: () => void = () => {};
   const calculatedBefristung: Ref<string | undefined> = ref('');
+  const loading: Ref<boolean> = ref(true);
 
   function navigateToPersonTable(): void {
     router.push({ name: 'person-management' });
@@ -304,10 +306,6 @@
       };
     }
   };
-  async function navigateBackToKopersForm(): Promise<void> {
-    personStore.errorCode = '';
-    personenkontextStore.errorCode = '';
-  }
 
   const alertButtonText: ComputedRef<string> = computed(() => {
     return personenkontextStore.errorCode === 'PERSON_NOT_FOUND' ? t('nav.backToList') : t('refreshData');
@@ -321,12 +319,6 @@
     return personStore.errorCode === 'PERSONALNUMMER_NICHT_EINDEUTIG'
       ? t('admin.person.backToInput')
       : t('nav.backToList');
-  });
-
-  const alertButtonActionKopers: ComputedRef<() => void> = computed(() => {
-    return personStore.errorCode === 'PERSONALNUMMER_NICHT_EINDEUTIG'
-      ? navigateBackToKopersForm
-      : navigateToPersonTable;
   });
 
   function getSskName(sskDstNr: string | undefined, sskName: string): string {
@@ -473,11 +465,13 @@
   // Validation schema for the form for changing person metadata
   const changePersonMetadataValidationSchema: TypedSchema = toTypedSchema(
     object({
-      selectedKopersNrMetadata: string().when([], {
-        is: () => personStore.currentPerson?.person.personalnummer,
-        then: (schema: StringSchema) => schema.required(t('admin.person.rules.kopersNr.required')),
-        otherwise: (schema: StringSchema) => schema.notRequired(),
-      }),
+      selectedKopersNrMetadata: string()
+        .matches(NO_LEADING_TRAILING_SPACES, t('admin.person.rules.kopersNr.noLeadingTrailingSpaces'))
+        .when([], {
+          is: () => personStore.currentPerson?.person.personalnummer,
+          then: (schema: StringSchema) => schema.required(t('admin.person.rules.kopersNr.required')),
+          otherwise: (schema: StringSchema) => schema.notRequired(),
+        }),
       selectedVorname: string()
         .matches(DIN_91379A, t('admin.person.rules.vorname.matches'))
         .matches(NO_LEADING_TRAILING_SPACES, t('admin.person.rules.vorname.noLeadingTrailingSpaces'))
@@ -573,6 +567,25 @@
       selectedRolle,
     });
 
+  async function navigateBackToKopersForm(): Promise<void> {
+    const personalnummer: string | null | undefined = personStore.currentPerson?.person.personalnummer;
+    const vorname: string | undefined = personStore.currentPerson?.person.name.vorname;
+    const familienname: string | undefined = personStore.currentPerson?.person.name.familienname;
+
+    // Set the initial values of the person in the form again when navigating back to it after an error in the first submit.
+    setFieldValueChangePersonMetadata('selectedKopersNrMetadata', personalnummer ?? '');
+    setFieldValueChangePersonMetadata('selectedVorname', vorname ?? '');
+    setFieldValueChangePersonMetadata('selectedFamilienname', familienname ?? '');
+    personStore.errorCode = '';
+    personenkontextStore.errorCode = '';
+  }
+
+  const alertButtonActionKopers: ComputedRef<() => void> = computed(() => {
+    return personStore.errorCode === 'PERSONALNUMMER_NICHT_EINDEUTIG'
+      ? navigateBackToKopersForm
+      : navigateToPersonTable;
+  });
+
   // Triggers the template to start editing
   const triggerEdit = (): void => {
     isEditActive.value = true;
@@ -660,19 +673,33 @@
     () => !pendingCreation.value && !pendingDeletion.value && !pendingChangeKlasse.value,
   );
 
+  // Helper function to determine the existing RollenArt
+  function getExistingRollenArt(zuordnungen: Zuordnung[]): RollenArt | undefined {
+    const rollenIds: string[] = zuordnungen.map((zuordnung: Zuordnung) => zuordnung.rolleId);
+    const existingRollen: TranslatedRolleWithAttrs[] | undefined = rollen.value?.filter(
+      (rolle: TranslatedRolleWithAttrs) => rollenIds.includes(rolle.value),
+    );
+
+    if (existingRollen && existingRollen.length > 0) {
+      return existingRollen[0]?.rollenart;
+    }
+
+    return undefined;
+  }
+
   // Filter out the Rollen based on the user's existing Zuordnungen and selected organization
-  const filteredRollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = computed(() => {
+  const filteredRollen: ComputedRef = computed(() => {
     const existingZuordnungen: Zuordnung[] | undefined = personStore.personenuebersicht?.zuordnungen;
 
-    // If no existing Zuordnungen then just show all roles
+    // If no existing Zuordnungen then show all roles
     if (!existingZuordnungen || existingZuordnungen.length === 0) {
       return rollen.value;
     }
 
     const selectedOrgaId: string | undefined = selectedOrganisation.value;
 
-    // Determine if the user already has any LERN roles
-    const hasLernRolle: boolean = existingZuordnungen.some((zuordnung: Zuordnung) => isLernRolle(zuordnung.rolleId));
+    // Determine the existing RollenArt from Zuordnungen
+    const existingRollenArt: RollenArt | undefined = getExistingRollenArt(existingZuordnungen);
 
     // Filter out Rollen that the user already has in the selected organization
     return rollen.value?.filter((rolle: TranslatedRolleWithAttrs) => {
@@ -681,14 +708,13 @@
         (zuordnung: Zuordnung) => zuordnung.rolleId === rolle.value && zuordnung.sskId === selectedOrgaId,
       );
 
-      // If the user has any LERN roles, only allow LERN roles to be selected
-      if (hasLernRolle) {
-        // Allow LERN roles in other organizations, but filter them out for the selected organization
-        return !alreadyHasRolleInSelectedOrga && rolle.rollenart === RollenArt.Lern;
+      // If there's an existing RollenArt, only allow roles of that type
+      if (existingRollenArt) {
+        return !alreadyHasRolleInSelectedOrga && rolle.rollenart === existingRollenArt;
       }
 
-      // If the user doesn't have any LERN roles, allow any role that hasn't been assigned yet in the selected organization besides LERN.
-      return !alreadyHasRolleInSelectedOrga && rolle.rollenart !== RollenArt.Lern;
+      // If there's no existing RollenArt, allow any role that hasn't been assigned yet in the selected organization
+      return !alreadyHasRolleInSelectedOrga;
     });
   });
 
@@ -964,14 +990,7 @@
       } else if (!selectedKopersNrMetadata.value && selectedVorname.value && selectedFamilienname.value) {
         await personStore.changePersonMetadataById(currentPersonId, selectedVorname.value, selectedFamilienname.value);
       }
-      // Success message changes depending on if the username changed or not.
-      if (personStore.currentPerson?.person.referrer !== personStore.patchedPerson?.person.referrer) {
-        changePersonMetadataSuccessMessage.value = t('admin.person.personalInfoSuccessDialogMessageWithUsername', {
-          username: personStore.patchedPerson?.person.referrer,
-        });
-      } else {
-        changePersonMetadataSuccessMessage.value = t('admin.person.personalInfoSuccessDialogMessage');
-      }
+      changePersonMetadataSuccessMessage.value = t('admin.person.personalInfoSuccessDialogMessageWithUsername');
       changePersonMetadataSuccessVisible.value = !personStore.errorCode;
       resetFormChangePersonMetadata();
     });
@@ -1066,7 +1085,40 @@
         return '';
     }
   });
-  const loading: Ref<boolean> = ref(true);
+
+  // Computed property to define what will be shown in the field Email depending on the returned status.
+  const emailStatusText: ComputedRef<{
+    text: string;
+    tooltip: string;
+  }> = computed(() => {
+    switch (personStore.currentPerson?.person.email?.status) {
+      case EmailStatus.Enabled:
+        return {
+          text: personStore.currentPerson.person.email.address,
+          tooltip: t('person.emailStatusActiveHover'),
+        };
+      case EmailStatus.Requested:
+        return {
+          text: t('person.emailStatusRequested'),
+          tooltip: t('person.emailStatusRequestedHover'),
+        };
+      case EmailStatus.Disabled:
+        return {
+          text: t('person.emailStatusDisabled'),
+          tooltip: t('person.emailStatusDisabledHover'),
+        };
+      case EmailStatus.Failed:
+        return {
+          text: t('person.emailStatusFailed'),
+          tooltip: t('person.emailStatusFailedHover'),
+        };
+      default:
+        return {
+          text: t('person.emailStatusUnknown'),
+          tooltip: t('person.emailStatusUnknownHover'),
+        };
+    }
+  });
 
   onBeforeMount(async () => {
     personStore.resetState();
@@ -1274,6 +1326,45 @@
                 </span>
               </v-col>
             </v-row>
+            <!-- Email -->
+            <v-row
+              v-if="emailStatusText.text !== $t('person.emailStatusUnknown')"
+              class="mt-0"
+            >
+              <v-col cols="1"></v-col>
+              <v-col
+                class="text-right"
+                md="2"
+                sm="3"
+                cols="5"
+              >
+                <span class="subtitle-2"> {{ $t('person.email') }}: </span>
+              </v-col>
+              <v-col
+                cols="auto"
+                data-testid="person-email"
+              >
+                <SpshTooltip
+                  :enabledCondition="!!personStore.currentPerson.person.email"
+                  :disabledText="$t('person.changePersonMetaDataDisabledDescription')"
+                  :enabledText="emailStatusText.tooltip"
+                  position="bottom"
+                >
+                  <v-icon
+                    aria-hidden="true"
+                    class="mr-2"
+                    icon="mdi-alert-circle-outline"
+                    size="small"
+                  ></v-icon>
+                  <span
+                    data-testid="person-email-text"
+                    class="text-body"
+                  >
+                    {{ emailStatusText.text }}
+                  </span>
+                </SpshTooltip>
+              </v-col>
+            </v-row>
           </div>
           <div v-else-if="personStore.loading">
             <v-progress-circular indeterminate></v-progress-circular>
@@ -1301,7 +1392,7 @@
             ></PersonenMetadataChange>
             <v-row class="save-cancel-row ml-md-16 pt-md-5 pt-12 justify-end">
               <v-col
-                class="cancel-col"
+                class="cancel-col px-5"
                 cols="12"
                 sm="6"
                 md="auto"
@@ -1319,6 +1410,7 @@
                 cols="12"
                 sm="6"
                 md="auto"
+                class="px-5"
               >
                 <SpshTooltip
                   :enabledCondition="!hasSameMetadata"
@@ -1473,7 +1565,7 @@
               </v-col>
               <v-col
                 cols="12"
-                v-for="zuordnung in getZuordnungen?.filter((zuordnung) => zuordnung.editable)"
+                v-for="zuordnung in getZuordnungen?.filter((zuordnung: Zuordnung) => zuordnung.editable)"
                 :key="zuordnung.sskId"
                 :data-testid="`person-zuordnung-${zuordnung.sskId}`"
                 :title="zuordnung.sskName"
@@ -1549,7 +1641,7 @@
                     >
                   </span>
                 </template>
-                <!-- Template  to show when the change Klasse is pending -->
+                <!-- Template to show when the change Klasse is pending -->
                 <template v-else-if="pendingChangeKlasse">
                   <div class="d-flex flex-column">
                     <span
@@ -1615,7 +1707,9 @@
                     :errorCode="personStore.errorCode"
                     :person="personStore.currentPerson"
                     :disabled="selectedZuordnungen.length === 0"
-                    :zuordnungCount="zuordnungenResult?.filter((zuordnung) => zuordnung.editable).length ?? 0"
+                    :zuordnungCount="
+                      zuordnungenResult?.filter((zuordnung: Zuordnung) => zuordnung.editable).length ?? 0
+                    "
                     @onDeletePersonenkontext="prepareDeletion"
                   >
                   </PersonenkontextDelete>
@@ -1989,8 +2083,8 @@
                           "
                         >
                           {{
-                            `${$t('admin.person.twoFactorAuthentication.serial')}:
-                          ${twoFactorAuthentificationStore.serial}`
+                            `${$t('admin.person.twoFactorAuthentication.serial')}: ` +
+                            `${twoFactorAuthentificationStore.serial}`
                           }}
                         </p>
                       </template>
@@ -2572,7 +2666,7 @@
   }
 
   span {
-    white-space: pre;
+    white-space: normal;
     text-wrap: pretty;
   }
 </style>

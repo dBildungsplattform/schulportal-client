@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { useI18n } from 'vue-i18n';
+  import { useI18n, type Composer } from 'vue-i18n';
   import type { BaseFieldProps } from 'vee-validate';
   import KopersInput from '@/components/admin/personen/KopersInput.vue';
   import { type Ref, type WritableComputedRef, computed, ref } from 'vue';
@@ -7,7 +7,7 @@
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import FormRow from '@/components/form/FormRow.vue';
 
-  useI18n({ useScope: 'global' });
+  const { t }: Composer = useI18n({ useScope: 'global' });
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
@@ -56,6 +56,18 @@
       emits('onShowDialogChange', newValue);
     },
   });
+
+  type IQSHLink = {
+    text: string;
+    href: string;
+    external: boolean;
+  };
+
+  const link: Ref<IQSHLink> = ref({
+    text: t('admin.person.homePageIQSH'),
+    href: 'https://medienberatung.iqsh.de/schulportal-sh.html',
+    external: true,
+  });
 </script>
 
 <template>
@@ -63,20 +75,39 @@
     <v-row>
       <v-col
         md="5"
+        xs="12"
+        cols="12"
         class="pl-md-14"
       >
         <span class="text-body bold">
-          <v-icon
-            aria-hidden="true"
-            class="mr-2"
-            icon="mdi-alert-circle-outline"
-            size="small"
-          ></v-icon>
-          {{ $t('admin.person.personalInfoChangeNotice') }}
+          <div>
+            <v-icon
+              aria-hidden="true"
+              class="mr-2"
+              icon="mdi-alert-circle-outline"
+              size="small"
+            ></v-icon>
+            <span> {{ $t('admin.person.personalInfoChangeNotice') }} </span>
+          </div>
+          <div class="mt-4">
+            <p>
+              {{ $t('admin.person.personalInfoChangeNotice2') }}
+              <span>
+                <a
+                  :href="link.href"
+                  :target="link.external ? '_blank' : '_self'"
+                >
+                  {{ link.text }}</a
+                >.
+              </span>
+            </p>
+          </div>
         </span>
       </v-col>
       <v-col
         md="7"
+        xs="12"
+        cols="12"
         class="pr-md-14"
       >
         <!-- Vorname -->
@@ -191,7 +222,7 @@
 
 <style scoped>
   span {
-    white-space: pre;
+    white-space: normal;
     text-wrap: pretty;
   }
 </style>

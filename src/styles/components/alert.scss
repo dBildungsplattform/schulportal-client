@@ -1,0 +1,19 @@
+@media screen and (max-width: 680px) {
+  .v-alert {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .v-alert__prepend {
+    align-self: center !important;
+    padding-bottom: 8px !important;
+  }
+  .v-alert__content {
+    align-self: unset !important;
+    text-align: center !important;
+  }
+  .v-alert__title {
+    display: flex !important;
+    justify-content: center !important;
+  }
+}

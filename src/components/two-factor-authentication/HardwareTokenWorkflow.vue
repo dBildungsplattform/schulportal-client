@@ -166,7 +166,7 @@
       :confirmUnsavedChangesAction="handleConfirmUnsavedChanges"
       :createButtonLabel="$t('admin.person.twoFactorAuthentication.setUp')"
       :discardButtonLabel="$t('cancel')"
-      id="schule-creation-form"
+      id="hardware-token-input"
       :onDiscard="cancelCheck"
       @onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value ?? false)"
       :centerButtons="true"
@@ -181,7 +181,7 @@
       >
         <v-text-field
           clearable
-          data-testid="hardware-token-input"
+          data-testid="hardware-token-input-serial"
           density="compact"
           :disabled="false"
           id="hardware-token-input"
@@ -201,7 +201,7 @@
       >
         <v-text-field
           clearable
-          data-testid="hardware-token-input"
+          data-testid="hardware-token-input-otp"
           density="compact"
           :disabled="false"
           id="hardware-token-input"
