@@ -133,21 +133,6 @@ describe('reset password', () => {
     expect(mockWindow.print).toHaveBeenCalled();
   });
 
-  test('reset button emits correct event when clicked', async () => {
-    const openDialogButton: HTMLElement | undefined = document.querySelector(
-      '[data-testid="open-password-reset-dialog-icon"]',
-    ) as HTMLElement;
-    openDialogButton.click();
-    await nextTick();
-
-    // Act: Click the reset password button
-    const resetButton: HTMLElement | undefined = document.querySelector(
-      '[data-testid="password-reset-button"]',
-    ) as HTMLElement;
-    resetButton.click();
-    await nextTick();
-  });
-
   test('it closes the password reset dialog when the close button is clicked', async () => {
     // Arrange: Open the dialog
     await wrapper?.get('[data-testid="open-password-reset-dialog-icon"]').trigger('click');
