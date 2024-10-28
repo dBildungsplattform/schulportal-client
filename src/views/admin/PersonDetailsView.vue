@@ -2044,7 +2044,7 @@
                         <v-row v-if="twoFactorAuthentificationStore.errorCode === 'PI_UNAVAILABLE_ERROR'">
                           <p
                             class="text-body"
-                            data-testid="token-state-error-text"
+                            data-testid="connection-error-text"
                           >
                             {{ $t('admin.person.twoFactorAuthentication.errors.connection') }}
                           </p>
