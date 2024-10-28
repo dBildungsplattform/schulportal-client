@@ -27,6 +27,7 @@
     "headline": "Administrationsbereich",
     "import": {
       "backToUpload": "Andere Datei hochladen",
+      "downloadFile": "Datei herunterladen",
       "errors": {
         "followingDataInvalid": "Die folgenden Datensätze sind ungültig:",
         "IMPORT_DATA_ITEM_KLASSE_IS_TOO_SHORT": "Klasse fehlt",
@@ -35,6 +36,10 @@
         "IMPORT_DATA_ITEM_VORNAME_IS_TOO_SHORT": "Vorname fehlt"
       },
       "executeImport": "Import durchführen",
+      "fileName": {
+        "person": "Benutzerdaten"
+      },
+      "importedSuccessfully": "Die Daten wurden erfolgreich importiert. Die importierten Daten stehen zum Download bereit.",
       "rules": {
         "files": {
           "required": "Eine CSV-Datei muss ausgewählt werden."
@@ -47,7 +52,7 @@
         }
       },
       "selectOrDropFile": "Datei auswählen oder ablegen",
-      "uploadedSuccessfully": "Die Datei wurde erfolgreich hochgeladen. Sie können den Import nun durchführen.",
+      "uploadedSuccessfully": "Die Datei wurde erfolgreich hochgeladen. {items} Datensätze stehen zum Import bereit.",
       "uploadErrorText": "Die Datei konnte nicht hochgeladen werden. Bitte versuchen Sie es mit einer anderen Datei.",
       "uploadErrorTitle": "Fehler beim Upload",
       "uploadFile": "Datei hochladen"

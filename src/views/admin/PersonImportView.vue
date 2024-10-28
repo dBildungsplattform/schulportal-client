@@ -144,7 +144,21 @@
   }
 
   function executeImport(): void {
-    // Execute the import
+    importStore.importPersonen(
+      importStore.uploadResponse?.importvorgangId as string,
+      selectedSchule.value as string,
+      selectedRolle.value as string,
+    );
+  }
+
+  function downloadFile(): void {
+    const blob: Blob = new Blob([importStore.importedData as File], { type: 'text/plain' });
+    const url: string = window.URL.createObjectURL(blob);
+    const link: HTMLAnchorElement = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `${t('admin.import.fileName.person')}.txt`);
+    document.body.appendChild(link);
+    link.click();
   }
 
   const onSubmit: (e?: Event | undefined) => Promise<void | undefined> = formContext.handleSubmit(() => {
@@ -189,19 +203,9 @@
         :text="$t('admin.import.uploadErrorText')"
       />
 
-      <!-- Success template -->
-      <template v-if="importStore.uploadResponse?.isValid && !importStore.errorCode">
+      <!-- Upload success template -->
+      <template v-if="importStore.uploadResponse?.isValid && !importStore.importedData && !importStore.errorCode">
         <v-container>
-          <v-row justify="center">
-            <v-col
-              class="subtitle-1"
-              cols="auto"
-            >
-              <span data-testid="person-import-success-text">
-                {{ $t('admin.import.uploadedSuccessfully') }}
-              </span>
-            </v-col>
-          </v-row>
           <v-row justify="center">
             <v-col cols="auto">
               <v-icon
@@ -213,7 +217,18 @@
               </v-icon>
             </v-col>
           </v-row>
-          {{ importStore.uploadResponse }}
+          <v-row justify="center">
+            <v-col
+              class="subtitle-1"
+              cols="auto"
+            >
+              <span data-testid="person-upload-success-text">
+                {{
+                  $t('admin.import.uploadedSuccessfully', { items: importStore.uploadResponse.totalImportDataItems })
+                }}
+              </span>
+            </v-col>
+          </v-row>
           <v-row justify="center">
             <v-col cols="auto">
               <v-btn
@@ -231,6 +246,53 @@
                 data-testid="execute-import-button"
               >
                 {{ $t('admin.import.executeImport') }}
+              </v-btn>
+            </v-col>
+          </v-row>
+        </v-container>
+      </template>
+
+      <!-- Import success template -->
+      <template v-if="importStore.importedData && !importStore.errorCode">
+        <v-container>
+          <v-row justify="center">
+            <v-col cols="auto">
+              <v-icon
+                aria-hidden="true"
+                color="#1EAE9C"
+                icon="mdi-check-circle"
+                small
+              >
+              </v-icon>
+            </v-col>
+          </v-row>
+          <v-row justify="center">
+            <v-col
+              class="subtitle-1"
+              cols="auto"
+            >
+              <span data-testid="person-import-success-text">
+                {{ $t('admin.import.importedSuccessfully') }}
+              </span>
+            </v-col>
+          </v-row>
+          <v-row justify="center">
+            <v-col cols="auto">
+              <v-btn
+                class="secondary"
+                @click="resetUpload()"
+                data-testid="back-to-upload-button"
+              >
+                {{ $t('admin.import.backToUpload') }}
+              </v-btn>
+            </v-col>
+            <v-col cols="auto">
+              <v-btn
+                class="primary"
+                @click="downloadFile()"
+                data-testid="download-file-button"
+              >
+                {{ $t('admin.import.downloadFile') }}
               </v-btn>
             </v-col>
           </v-row>

@@ -7,6 +7,7 @@ const importApi: ImportApiInterface = ImportApiFactory(undefined, '', axiosApiIn
 
 type ImportState = {
   errorCode: string | null;
+  importedData: File | null;
   loading: boolean;
   uploadResponse: ImportUploadResponse | null;
 };
@@ -14,6 +15,7 @@ type ImportState = {
 type ImportGetters = {};
 type ImportActions = {
   resetState: () => void;
+  importPersonen: (importVorgangId: string, organisationId: string, rolleId: string) => Promise<void>;
   uploadPersonenImportFile: (organisationId: string, rolleId: string, file: File) => Promise<void>;
 };
 
@@ -24,6 +26,7 @@ export const useImportStore: StoreDefinition<'importStore', ImportState, ImportG
   state: (): ImportState => {
     return {
       errorCode: null,
+      importedData: null,
       loading: false,
       uploadResponse: null,
     };
@@ -31,6 +34,26 @@ export const useImportStore: StoreDefinition<'importStore', ImportState, ImportG
   actions: {
     resetState() {
       this.$reset();
+    },
+
+    async importPersonen(importvorgangId: string, organisationId: string, rolleId: string): Promise<void> {
+      this.loading = true;
+      try {
+        const { data }: { data: File } = await importApi.importControllerExecuteImport({
+          importvorgangId,
+          organisationId,
+          rolleId,
+        });
+
+        this.importedData = data;
+      } catch (error: unknown) {
+        this.errorCode = 'UNSPECIFIED_ERROR';
+        if (isAxiosError(error)) {
+          this.errorCode = error.response?.data.i18nKey || 'ERROR_UPLOADING_FILE';
+        }
+      } finally {
+        this.loading = false;
+      }
     },
 
     async uploadPersonenImportFile(organisationId: string, rolleId: string, file: File): Promise<void> {
