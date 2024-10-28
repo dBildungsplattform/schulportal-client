@@ -581,7 +581,20 @@ describe('OrganisationStore', () => {
         kuerzel: 'O1',
         typ: OrganisationsTyp.Schule,
         administriertVon: '1',
+        version: 1,
       };
+
+     organisationStore.currentKlasse = 
+        {
+          id: '2',
+          kennung: 'Org2',
+          name: 'Organisation 2',
+          namensergaenzung: 'Ergänzung',
+          kuerzel: 'O2',
+          typ: OrganisationsTyp.Klasse,
+          administriertVon: '1',
+          version: 1,
+        },
 
       mockadapter.onPatch('/api/organisationen/1/name').replyOnce(200, mockResponse);
       const updateOrganisationPromise: Promise<void> = organisationStore.updateOrganisationById(
@@ -595,6 +608,19 @@ describe('OrganisationStore', () => {
     });
 
     it('should handle string error', async () => {
+
+      organisationStore.currentKlasse = 
+      {
+        id: '2',
+        kennung: 'Org2',
+        name: 'Organisation 2',
+        namensergaenzung: 'Ergänzung',
+        kuerzel: 'O2',
+        typ: OrganisationsTyp.Klasse,
+        administriertVon: '1',
+        version: 1,
+      },
+
       mockadapter.onPatch('/api/organisationen/1/name').replyOnce(500, 'some mock server error');
       const updateOrganisationPromise: Promise<void> = organisationStore.updateOrganisationById(
         '1',
@@ -608,6 +634,19 @@ describe('OrganisationStore', () => {
     });
 
     it('should handle error code', async () => {
+
+      organisationStore.currentKlasse = 
+      {
+        id: '2',
+        kennung: 'Org2',
+        name: 'Organisation 2',
+        namensergaenzung: 'Ergänzung',
+        kuerzel: 'O2',
+        typ: OrganisationsTyp.Klasse,
+        administriertVon: '1',
+        version: 1,
+      },
+
       mockadapter.onPatch('/api/organisationen/1/name').replyOnce(500, { i18nKey: 'UPDATE_ERROR' });
       const updateOrganisationPromise: Promise<void> = organisationStore.updateOrganisationById(
         '1',
