@@ -115,7 +115,14 @@
   });
 
   const showUploadSuccessTemplate: ComputedRef<boolean> = computed(() => {
-    return importStore.uploadResponse?.isValid as boolean && !importStore.importedData && !importStore.importIsLoading && !importStore.importIsLoading && !importStore.errorCode  });
+    return (
+      (importStore.uploadResponse?.isValid as boolean) &&
+      !importStore.importedData &&
+      !importStore.uploadIsLoading &&
+      !importStore.importIsLoading &&
+      !importStore.errorCode
+    );
+  });
 
   function clearSelectedRolle(): void {
     selectedRolle.value = undefined;
@@ -303,11 +310,9 @@
       </template>
 
       <!-- Import loading template -->
-       <template v-if="importStore.importIsLoading && !importStore.errorCode">
+      <template v-if="importStore.importIsLoading && !importStore.errorCode">
         <v-container>
-          <v-row
-            justify="center"
-          >
+          <v-row justify="center">
             <v-col cols="auto">
               <v-progress-circular
                 indeterminate
@@ -316,7 +321,7 @@
             </v-col>
           </v-row>
         </v-container>
-       </template>
+      </template>
 
       <!-- Upload form -->
       <FormWrapper
