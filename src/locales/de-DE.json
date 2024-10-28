@@ -188,6 +188,7 @@
       "resetPasswordConfirmation": "Sind Sie sicher, dass Sie das Passwort für {firstname} {lastname} zurücksetzen möchten?",
       "resetPasswordInformation": "Bitte teilen Sie dem Benutzer das temporäre Passwort mit. Nach dem Schließen des Dialogs wird es aus Sicherheitsgründen nicht mehr angezeigt.",
       "resetPassword": "Passwort zurücksetzen",
+      "printPassword": "Passwort drucken",
       "syncPerson": "Neu synchronisieren",
       "syncPersonConfirmation": "Der Benutzer wird an alle angeschlossenen Systeme neu übertragen und dort ggf. aktualisiert. Dies kann je nach System einige Zeit in Anspruch nehmen.",
       "syncPersonSuccessMessage": "Die Synchronisation wurde gestartet.",
@@ -405,6 +406,9 @@
   "close": "Schließen",
   "edit": "Bearbeiten",
   "print": "Drucken",
+  "showPassword": "Passwort anzeigen",
+  "hidePassword": "Passwort verbergen",
+  "copyPassword": "Passwort kopieren",
   "errors": {
     "KEYCLOAK_CLIENT_ERROR": "Die Anmeldung ist momentan nicht möglich.",
     "UNSPECIFIED_ERROR": "Es ist ein Fehler aufgetreten.",
