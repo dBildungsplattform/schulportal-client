@@ -126,6 +126,14 @@ describe('HardwareTokenWorkflow.vue', () => {
     await nextTick();
   });
 
+  test('check if error close button works', async () => {
+    twoFactorAuthenticationStore.errorCode = 'error';
+    await nextTick();
+
+    wrapper?.find('[data-testid="close-two-way-authentification-dialog-button"]').trigger('click');
+    await nextTick();
+  });
+
   test('check for error messages', async () => {
     twoFactorAuthenticationStore.errorCode = 'HARDWARE_TOKEN_SERVICE_FEHLER';
     await nextTick();
