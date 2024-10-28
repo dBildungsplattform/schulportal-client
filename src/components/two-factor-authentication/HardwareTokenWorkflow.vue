@@ -150,9 +150,10 @@
       userId: props.person.person.id,
     };
     await twoFactoreAuthentificationStore.assignHardwareToken(assignHardwareTokenBodyParams);
-    dialogText.value = t('admin.person.twoFactorAuthentication.hardwareTokenSetUpSuccess');
-    resetForm();
-
+    if (!twoFactoreAuthentificationStore.errorCode) {
+      dialogText.value = t('admin.person.twoFactorAuthentication.hardwareTokenSetUpSuccess');
+      resetForm();
+    }
     hardwareTokenIsAssigned.value = true;
   }
   const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = handleSubmit(async () => {
@@ -215,7 +216,7 @@
       </FormRow>
     </FormWrapper>
   </v-container>
-  <v-container v-if="hardwareTokenIsAssigned">
+  <v-container>
     <v-row v-if="twoFactoreAuthentificationStore.errorCode === 'HARDWARE_TOKEN_SERVICE_FEHLER'">
       <p
         class="text-body bold"
@@ -244,7 +245,7 @@
       </p></v-row
     >
     <v-row
-      v-else
+      v-else-if="hardwareTokenIsAssigned"
       class="justify-center text-body bold"
       >{{ dialogText }}</v-row
     >
