@@ -22,11 +22,11 @@
   const errorMessage: Ref<string> = ref('');
   const successDialogVisible: Ref<boolean> = ref(false);
 
-  async function closePasswordResetDialog(isActive: Ref<boolean>): Promise<void> {
+  async function closeZuordnungDeleteDialog(isActive: Ref<boolean>): Promise<void> {
     isActive.value = false;
   }
 
-  async function handlePersonenKontextDelete(): Promise<void> {
+  async function handleZuordnungDelete(): Promise<void> {
     emit('onDeletePersonenkontext');
   }
 </script>
@@ -45,7 +45,7 @@
       >
         <v-btn
           class="primary"
-          data-testid="open-zuordnung-delete-dialog-icon"
+          data-testid="open-zuordnung-delete-dialog-button"
           :disabled="disabled"
           :block="mdAndDown"
           v-bind="props"
@@ -62,7 +62,7 @@
       <LayoutCard
         :closable="true"
         :header="$t('person.editZuordnungen')"
-        @onCloseClicked="closePasswordResetDialog(isActive)"
+        @onCloseClicked="closeZuordnungDeleteDialog(isActive)"
       >
         <v-card-text>
           <v-container>
@@ -114,8 +114,8 @@
               <v-btn
                 :block="mdAndDown"
                 class="secondary button"
-                @click.stop="closePasswordResetDialog(isActive)"
-                data-testid="close-person-delete-dialog-button"
+                @click.stop="closeZuordnungDeleteDialog(isActive)"
+                data-testid="close-zuordnung-delete-dialog-button"
               >
                 {{ $t('no') }}
               </v-btn>
@@ -128,8 +128,8 @@
               <v-btn
                 :block="mdAndDown"
                 class="primary button"
-                @click.stop="handlePersonenKontextDelete()"
-                data-testid="person-delete-button"
+                @click.stop="handleZuordnungDelete()"
+                data-testid="zuordnung-delete-button"
               >
                 {{ $t('yes') }}
               </v-btn>

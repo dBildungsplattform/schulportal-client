@@ -128,10 +128,14 @@
         "currentOtp": "Einmalpasswort",
         "serial": "Seriennummer",
         "otpPlaceholder": "Einmalpasswort",
+        "requiredSecondFactor": "Diese Aktion setzt eine Zwei-Faktor-Authentifizierung (2FA) voraus.",
+        "noSecondFactorText": "Aktuell ist noch keine 2FA eingrichtet.",
+        "setUpInfo": "Sie können die Einrichtung der 2FA selbst über ein mobiles Endgerät durchführen. Alternativ wenden Sie sich bitte an Ihre schulischen Admins.",
+        "toSecondFactorSetup": "Zur 2FA Einrichtung",
         "errors": {
           "SERIENNUMMER_NICHT_GEFUNDEN": "Die eingegebene Seriennummer konnte leider nicht gefunden werden. Vergewissern Sie sich bitte, dass Sie eine korrekte Seriennummer eingegeben haben.",
           "SERIENNUMMER_IN_VERWENDUNG": "Die eingegebene Seriennummer gehört zu einem Token, der bereits einem Benutzer zugeordnet ist. Bitte überprüfen Sie Ihre Eingaben und versuchen Sie es erneut.",
-          "OTP_NICHT_GUELTIG": "Ungültiges Einmalpasswort. Bitte versuchen Sie es erneut.",
+          "OTP_NICHT_GUELTIG": "Ungültiges Einmalpasswort. Bitte versuchen Sie es erneut oder wenden Sie sich an Ihre schulischen Administratorinnen oder Administratoren.",
           "HARDWARE_TOKEN_SERVICE_FEHLER": "Leider konnte ihr Hardware-Token aus technischen Gründen nicht aktiviert werden. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut. Falls das Problem bestehen bleibt, stellen Sie bitte eine Anfrage über den IQSH Helpdesk.--Link: https://www.secure-lernnetz.de/helpdesk/",
           "UNKNOWN_ERROR": "Ein unbekannter Fehler ist aufgetreten.",
           "TOKEN_RESET_ERROR": "Leider konnten wir Ihren Token aufgrund von technischen Problemen nicht zurücksetzen. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut. Falls das Problem bestehen bleibt, stellen Sie bitte eine Anfrage über den IQSH Helpdesk.  Link: https://www.secure-lernnetz.de/helpdesk/",
@@ -147,9 +151,9 @@
         "tokenResetSuccessSoftware": "Token wurde erfolgreich zurückgesetzt. Der Benutzer kann sich nun selbstständig einen neuen QR-Code erzeugen.",
         "tokenResetSuccessHardware": "Token wurde erfolgreich zurückgesetzt. Der Hardware-Token kann nun neu zugeordnet werden.",
         "tokenResetSuccessTokenLost": "Token wurde erfolgreich zurückgesetzt und gesperrt.",
-        "questionsProblems": "Bitte wenden Sie sich bei Fragen und Problemen an ihre schulischen Admins.",
+        "questionsProblems": "Bitte wenden Sie sich bei Fragen und Problemen an Ihre schulischen Admins.",
         "qrCodeInfo": "Im Folgenden wird ein QR-Code generiert, mit dem Sie auf Ihrem Endgerät eine Zwei-Faktor-Authentifizierung einrichten können.",
-        "softwareOnDevice": "Bitte stellen Sie vor dem Fortfahren sicher, dass eine entsprechende Software auf Ihrem Endgerät installiert ist. Für Ihr Lehrkräfte-Endgerät finden Sie entsprechend genehmigte Anwendungen im Software-Hub.",
+        "softwareOnDevice": "Bitte stellen Sie vor dem Fortfahren sicher, dass eine entsprechende App auf Ihrem Endgerät installiert ist. Für Ihr Lehrkräfte-Endgerät finden Sie entsprechend genehmigte Anwendungen im Software-Hub.",
         "pleaseScan": "Bitte scannen Sie den QR-Code mit Ihrer 2FA-App (z.B. FreeOTP).",
         "enterOtp": "Bitte geben Sie das angezeigte Einmalpasswort ein, um die Einrichtung abzuschließen.",
         "invalidOtp": "Ungültiger Code. Bitte versuchen Sie es erneut.",
@@ -177,8 +181,9 @@
       "loadingErrorTitle": "Fehler beim Laden des Benutzers",
       "management": "Benutzerverwaltung",
       "personalInfo": "Persönliche Informationen",
-      "personalInfoChangeNotice": "Namensänderungen haben unmittelbare Auswirkungen auf den Benutzernamen im Schulportal SH und auf die E-Mail-Adresse! \n\nWeitere Informationen finden Sie auf der Homepage der IQSH-Medienberatung.",
-      "personalInfoSuccessDialogMessage": "Die Stammdaten wurden erfolgreich geändert.",
+      "personalInfoChangeNotice": "Namensänderungen haben unmittelbare Auswirkungen auf den Benutzernamen im Schulportal SH und auf die E-Mail-Adresse!",
+      "personalInfoChangeNotice2": "Weitere Informationen finden Sie auf der ",
+      "homePageIQSH":"Homepage der IQSH-Medienberatung",
       "personalInfoSuccessDialogMessageWithUsername": "Die Stammdaten wurden erfolgreich geändert.\n\nDas Passwort wurde nicht verändert und kann wie zuvor verwendet werden. \n\nBitte teilen Sie der betroffenen Person die Stammdatenänderung (Benutzername, Mail-Adresse) mit. \n\nDie neuen Daten können Sie in der Gesamtübersicht einsehen." ,
       "resetPasswordConfirmation": "Sind Sie sicher, dass Sie das Passwort für {firstname} {lastname} zurücksetzen möchten?",
       "resetPasswordInformation": "Bitte teilen Sie dem Benutzer das temporäre Passwort mit. Nach dem Schließen des Dialogs wird es aus Sicherheitsgründen nicht mehr angezeigt.",
@@ -201,7 +206,8 @@
           "required": "Der Familienname ist erforderlich."
         },
         "kopersNr": {
-          "required": "Die KoPers.-Nr. ist erforderlich."
+          "required": "Die KoPers.-Nr. ist erforderlich.",
+          "noLeadingTrailingSpaces": "Die Kopers.-Nr. darf nicht mit Leerzeichen beginnen oder enden."
         }
       },
       "title": {
@@ -268,7 +274,7 @@
         "ROLLE_ERROR": "Fehler bei Erstellung der Rolle",
         "ROLLE_HAT_PERSONENKONTEXTE_ERROR": "Löschen nicht möglich",
         "ROLLE_UPDATE_ERROR": "Die Rolle konnte nicht bearbeitet werden",
-        "UPDATE_MERKMALE_ERROR": "Die gewünschte Bearbeitung kann nicht ausgeführt werden, da die Rolle noch Benutzern zugeordnet ist. Nehmen Sie bitte zunächst alle Zuordnungen zurück"
+        "UPDATE_MERKMALE_ERROR": "Die Merkmale konnten nicht bearbeitet werden"
       },
       "isAllowedToManageRollen": "Darf Rollen verwalten",
       "loadingErrorText": "Es konnten keine Rollendaten geladen werden.",
@@ -474,6 +480,15 @@
     "deleteZuordnungSuccess": "Die Schulzuordnung wurde erfolgreich entfernt.",
     "editZuordnungen": "Schulzuordnungen bearbeiten",
     "email": "E-Mail",
+    "emailStatusRequested": "wird erzeugt",
+    "emailStatusDisabled": "deaktiviert",
+    "emailStatusFailed": "fehlerhaft",
+    "emailStatusUnknown": "unbekannt",
+    "emailStatusActiveHover": "Das E-Mail-Konto ist aktiviert.",
+    "emailStatusRequestedHover": "Das E-Mail-Konto wird zur Zeit angelegt. Dies kann einige Zeit in Anspruch nehmen. Bitte öffnen Sie die Gesamtübersicht zu einem späteren Zeitpunkt erneut, um die E-Mail-Adresse einzusehen.",
+    "emailStatusDisabledHover": "Das E-Mail-Konto wurde deaktiviert.",
+    "emailStatusFailedHover": "Bei Erstellung des E-Mail-Kontos ist ein Fehler aufgetreten. Bitte eröffnen Sie eine Fehlermeldung im Help-Desk System.",
+    "emailStatusUnknownHover": "Der Status der E-Mail-Adresse ist unbekannt.",
     "enterFirstName": "Vorname eingeben",
     "enterKopersNr": "KoPers.-Nr. eingeben",
     "enterLastName": "Nachname eingeben",
@@ -523,7 +538,7 @@
     "setNewPassword": "Neues Passwort setzen",
     "twoFactorAuth": "Zwei-Faktor-Authentifizierung",
     "setupTwoFactorAuth": "2-FA einrichten",
-    "infoAboutChangeabilityFromPersonalData": "Persönliche Daten sind nur durch Ihre schulischen Admins veränderbar",
+    "infoAboutChangeabilityFromPersonalData": "Persönliche Daten sind nur durch Ihre schulischen Admins veränderbar.",
     "yourSchuleAdminsAre": "Ihre schulischen Admins sind:",
     "koPersNummer": "Personalnummer",
     "koPersNummerAbbr": "KoPers.-Nr.",
