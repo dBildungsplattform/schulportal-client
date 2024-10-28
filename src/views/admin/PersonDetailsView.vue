@@ -2099,7 +2099,7 @@
                       md="auto"
                     >
                       <SpshTooltip
-                        :enabledCondition="twoFactorAuthentificationStore.hasToken"
+                        :enabledCondition="!isEditActive && !isEditPersonMetadataActive"
                         :disabledText="$t('person.finishEditFirst')"
                         :enabledText="$t('admin.person.twoFactorAuthentication.tokenReset')"
                         position="start"
@@ -2116,7 +2116,7 @@
                         </TokenReset>
                       </SpshTooltip>
                       <SpshTooltip
-                        :enabledCondition="!twoFactorAuthentificationStore.hasToken"
+                        :enabledCondition="!isEditActive && !isEditPersonMetadataActive"
                         :disabledText="$t('person.finishEditFirst')"
                         :enabledText="$t('admin.person.twoFactorAuthentication.setUpShort')"
                         position="start"
