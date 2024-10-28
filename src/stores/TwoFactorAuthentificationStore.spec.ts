@@ -203,6 +203,27 @@ describe('TwoFactorAuthentificationStore', () => {
       await assignTokenPromise;
       expect(twoFactorAuthenticationStore.loading).toBe(false);
     });
+
+    it('should handle string error', async () => {
+      mockadapter.onPost(`/api/2fa-token/assign/hardwareToken`).replyOnce(500, 'some error');
+      const assignTokenPromise: Promise<void> = twoFactorAuthenticationStore.assignHardwareToken(bodyParams);
+      expect(twoFactorAuthenticationStore.loading).toBe(true);
+      await assignTokenPromise;
+      expect(twoFactorAuthenticationStore.errorCode).toEqual('HARDWARE_TOKEN_SERVICE_FEHLER');
+      expect(twoFactorAuthenticationStore.loading).toBe(false);
+    });
+
+    it('should map error code', async () => {
+      mockadapter
+        .onPost(`/api/2fa-token/assign/hardwareToken`)
+        .replyOnce(500, { code: 'some mock server error', i18nKey: 'PI_UNAVAILABLE_ERROR' });
+      const assignTokenPromise: Promise<void> = twoFactorAuthenticationStore.assignHardwareToken(bodyParams);
+
+      expect(twoFactorAuthenticationStore.loading).toBe(true);
+      await assignTokenPromise;
+      expect(twoFactorAuthenticationStore.errorCode).toEqual('HARDWARE_TOKEN_SERVICE_FEHLER');
+      expect(twoFactorAuthenticationStore.loading).toBe(false);
+    });
   });
 
   describe('resetToken', () => {
