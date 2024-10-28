@@ -68,6 +68,7 @@
   } from 'vue-router';
   import { useDisplay } from 'vuetify';
   import { object, string, StringSchema, type AnyObject } from 'yup';
+  import type { LockUserBodyParams } from '@/api-client/generated';
   import type { TranslatedObject } from '@/types';
   import { DIN_91379A, NO_LEADING_TRAILING_SPACES } from '@/utils/validation';
 
@@ -136,8 +137,14 @@
     password.value = personStore.newPassword || '';
   }
 
-  function onLockUser(personId: string, lock: boolean, organisation: string): void {
-    personStore.lockPerson(personId, lock, organisation);
+  async function onLockUser(lockedBy: string, date: string | undefined): Promise<void> {
+    if (!personStore.currentPerson) return;
+    let bodyParams: LockUserBodyParams = {
+      lock: !personStore.currentPerson.person.isLocked,
+      locked_by: lockedBy,
+      locked_until: date,
+    };
+    await personStore.lockPerson(personStore.currentPerson.person.id, bodyParams);
   }
 
   const handleAlertClose = (): void => {
@@ -175,15 +182,15 @@
   }
 
   // translate keys and format attributes for display
-  const getLockInfo: ComputedRef<{ key: string; attribute: string }[]> = computed(() => {
+  const getuserLock: ComputedRef<{ key: string; attribute: string }[]> = computed(() => {
     if (!personStore.currentPerson?.person.isLocked) return [];
 
-    const { lockInfo }: Person = personStore.currentPerson.person;
-    if (!lockInfo) return [];
+    const { userLock }: Person = personStore.currentPerson.person;
+    if (!userLock) return [];
 
-    return Object.entries(lockInfo).map(([key, attribute]: [string, string]) => {
+    return Object.entries(userLock).map(([key, attribute]: [string, string]) => {
       switch (key) {
-        case LockKeys.LockedFrom:
+        case LockKeys.LockedBy:
           return {
             key: t('person.lockedBy'),
             attribute: organisationStore.lockingOrganisation
@@ -191,14 +198,19 @@
               : t('admin.organisation.unknownOrganisation'),
           };
 
-        case LockKeys.Timestamp:
+        case LockKeys.CreatedAt:
           return {
-            key: t('since'),
+            key: t('person.lockedSince'),
             attribute: new Intl.DateTimeFormat('de-DE', {
               year: 'numeric',
               month: '2-digit',
               day: '2-digit',
             }).format(new Date(attribute)),
+          };
+        case LockKeys.LockedUntil:
+          return {
+            key: t('person.lockedUntil'),
+            attribute,
           };
 
         default:
@@ -210,8 +222,8 @@
   watch(
     () => personStore.currentPerson?.person,
     async (person: Person | undefined) => {
-      if (!(person && person.isLocked && person.lockInfo)) return;
-      await organisationStore.getLockingOrganisationById(person.lockInfo.lock_locked_from);
+      if (!(person && person.isLocked && person.userLock)) return;
+      await organisationStore.getLockingOrganisationById(person.userLock.locked_by);
     },
   );
 
@@ -1407,7 +1419,7 @@
             ></PersonenMetadataChange>
             <v-row class="save-cancel-row ml-md-16 pt-md-5 pt-12 justify-end">
               <v-col
-                class="cancel-col"
+                class="cancel-col px-5"
                 cols="12"
                 sm="6"
                 md="auto"
@@ -1425,6 +1437,7 @@
                 cols="12"
                 sm="6"
                 md="auto"
+                class="px-5"
               >
                 <SpshTooltip
                   :enabledCondition="!hasSameMetadata"
@@ -2073,8 +2086,8 @@
                           "
                         >
                           {{
-                            `${$t('admin.person.twoFactorAuthentication.serial')}:
-                          ${twoFactorAuthentificationStore.serial}`
+                            `${$t('admin.person.twoFactorAuthentication.serial')}: ` +
+                            `${twoFactorAuthentificationStore.serial}`
                           }}
                         </p>
                       </template>
@@ -2114,15 +2127,15 @@
                       md="auto"
                     >
                       <SpshTooltip
-                        v-if="twoFactorAuthentificationStore.hasToken"
-                        :enabledCondition="twoFactorAuthentificationStore.hasToken"
+                        :enabledCondition="!isEditActive && !isEditPersonMetadataActive"
                         :disabledText="$t('person.finishEditFirst')"
                         :enabledText="$t('admin.person.twoFactorAuthentication.tokenReset')"
                         position="start"
                       >
                         <TokenReset
+                          v-if="twoFactorAuthentificationStore.hasToken"
                           :errorCode="twoFactorAuthentificationStore.errorCode"
-                          :disabled="isEditActive"
+                          :disabled="isEditActive || isEditPersonMetadataActive"
                           :person="personStore.currentPerson"
                           :tokenType="twoFactorAuthentificationStore.tokenKind"
                           :personId="currentPersonId"
@@ -2130,14 +2143,21 @@
                         >
                         </TokenReset>
                       </SpshTooltip>
+                      <SpshTooltip
+                        :enabledCondition="!isEditActive && !isEditPersonMetadataActive"
+                        :disabledText="$t('person.finishEditFirst')"
+                        :enabledText="$t('admin.person.twoFactorAuthentication.setUpShort')"
+                        position="start"
+                      >
                       <TwoFactorAuthenticationSetUp
-                        v-else
+                        v-if="!twoFactorAuthentificationStore.hasToken"
                         :errorCode="twoFactorAuthentificationStore.errorCode"
-                        :disabled="isEditActive"
+                        :disabled="isEditActive || isEditPersonMetadataActive"
                         :person="personStore.currentPerson"
                         @dialogClosed="twoFactorAuthentificationStore.get2FAState(currentPersonId)"
                       >
                       </TwoFactorAuthenticationSetUp>
+                    </SpshTooltip>
                     </v-col>
                   </div>
                 </v-col>
@@ -2178,7 +2198,7 @@
                 </v-row>
                 <v-row
                   class="mt-0"
-                  v-for="({ key, attribute }, index) of getLockInfo"
+                  v-for="({ key, attribute }, index) of getuserLock"
                   :key="key"
                   cols="10"
                 >
@@ -2708,7 +2728,7 @@
   }
 
   span {
-    white-space: pre;
+    white-space: normal;
     text-wrap: pretty;
   }
 </style>
