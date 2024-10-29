@@ -71,7 +71,7 @@ jobs:
     permissions:
       packages: read
       security-events: write
-    uses: dBildungsplattform/dbp-github-workflows/.github/workflows/check-trivy.yaml@5
+    uses: dBildungsplattform/dbp-github-workflows/.github/workflows/check-trivy.yaml@7
     with:
       image_ref: 'ghcr.io/${{ github.repository_owner }}/schulportal-client:latest'
       fail_on_vulnerabilites: false
@@ -102,7 +102,7 @@ jobs:
             echo "SELECT_IMAGE_TAG_GENERATION=ticket_from_branch" >> "$GITHUB_OUTPUT"
           fi
   release_helm:
-    uses: dBildungsplattform/dbp-github-workflows/.github/workflows/chart-release.yaml@5
+    uses: dBildungsplattform/dbp-github-workflows/.github/workflows/chart-release.yaml@7
 
     needs:
       - select_helm_version_generation_and_image_tag_generation
