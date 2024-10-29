@@ -147,7 +147,11 @@
 
   onMounted(async () => {
     organisationStore.createdSchule = null;
-    organisationStore.getSchultraeger();
+    await organisationStore.getSchultraeger();
+
+    if (schultraegerList.value && schultraegerList.value.length > 0) {
+      selectedSchulform.value = schultraegerList.value[0]?.id ?? '';
+    }
     /* listen for browser changes and prevent them when form is dirty */
     window.addEventListener('beforeunload', preventNavigation);
   });

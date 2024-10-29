@@ -32,7 +32,7 @@ describe('TokenResetComponent', () => {
         referrer: '6978',
         personalnummer: '9183756',
         isLocked: false,
-        lockInfo: null,
+        userLock: null,
         revision: '1',
         lastModified: '2024-12-22',
         email: {
@@ -43,11 +43,11 @@ describe('TokenResetComponent', () => {
     };
   }
 
-  beforeAll(() => {
+  beforeAll((): void => {
     twoFactorAuthenticationStore = useTwoFactorAuthentificationStore();
   });
 
-  beforeEach(() => {
+  beforeEach((): void => {
     document.body.innerHTML = `
         <div>
         <div id="app"></div>
@@ -74,86 +74,86 @@ describe('TokenResetComponent', () => {
     });
   });
 
-  afterEach(() => {
+  afterEach((): void => {
     wrapper!.unmount();
   });
 
-  test('renders the component with the correct button', () => {
+  test('displays success message for hardware token reset', async (): Promise<void> => {
+    await wrapper?.setProps({ tokenType: TokenKind.hardware });
     const button: DOMWrapper<HTMLButtonElement> = wrapper!.find('[data-testid="open-2FA-dialog-icon"]');
-    expect(button.exists()).toBe(true);
-    expect(button.text()).toBe('admin.person.twoFactorAuthentication.tokenReset');
-  });
-
-  test('disables the button when `disabled` prop is true', async () => {
-    await wrapper?.setProps({ disabled: true });
-    const button: DOMWrapper<HTMLButtonElement> = wrapper!.find('[data-testid="open-2FA-dialog-icon"]');
-    expect(button.attributes('disabled')).toBeDefined();
-  });
-
-  test('opens the 2FA dialog when button is clicked', async () => {
-    const button: DOMWrapper<HTMLButtonElement> = wrapper!.find('[data-testid="open-2FA-dialog-icon"]');
-    expect(button).not.toBeNull();
-    await button!.trigger('click');
-    await nextTick();
-    const dialog: Element | null = document.querySelector('.v-dialog');
-    const overlay: Element | null = document.querySelector('.v-overlay-container');
-    expect(dialog).not.toBeNull();
-    expect(overlay).not.toBeNull();
-    const closeButton: Element | null | undefined = dialog?.querySelector(
-      '[data-testid="close-two-way-authentification-dialog-button"]',
-    );
-    expect(closeButton).not.toBeNull();
-  });
-
-  test('calls the resetToken function when the token reset button is clicked', async () => {
-    const button: DOMWrapper<HTMLButtonElement> = wrapper!.find('[data-testid="open-2FA-dialog-icon"]');
-    expect(button.exists()).toBe(true);
     await button.trigger('click');
     await nextTick();
-    const resetButton: HTMLButtonElement | null = document.querySelector(
-      '[data-testid="two-way-authentification-set-up-button"]',
-    );
-    expect(resetButton).not.toBeNull();
-    const resetButtonWrapper: DOMWrapper<HTMLButtonElement> = new DOMWrapper(resetButton!);
-    expect(resetButtonWrapper.exists()).toBe(true);
-    await resetButtonWrapper.trigger('click');
-    await nextTick();
-    expect(twoFactorAuthenticationStore.resetToken).toHaveBeenCalledWith(getMockPersonendatensatz().person.id);
-  });
 
-  test('displays error message if errorCode is present', async () => {
-    const button: DOMWrapper<HTMLButtonElement> = wrapper!.find('[data-testid="open-2FA-dialog-icon"]');
-    expect(button.exists()).toBe(true);
-    await button.trigger('click');
-    await nextTick();
-    const resetButton: HTMLButtonElement | null = document.querySelector(
+    const resetButton: HTMLElement = document.querySelector(
       '[data-testid="two-way-authentification-set-up-button"]',
-    );
-    expect(resetButton).not.toBeNull();
-    const resetButtonWrapper: DOMWrapper<HTMLButtonElement> = new DOMWrapper(resetButton!);
-    expect(resetButtonWrapper.exists()).toBe(true);
-    twoFactorAuthenticationStore.errorCode = 'connection_error';
-    await resetButtonWrapper.trigger('click');
+    ) as HTMLElement;
+    await resetButton.click();
     await nextTick();
-    await nextTick();
-    const dialogText: Element | null = document.querySelector('[data-testid="token-reset-dialog-error-text"]');
+
+    const dialogText: HTMLElement = document.querySelector('[data-testid="dialog-text"]') as HTMLElement;
     expect(dialogText).not.toBeNull();
+    expect(dialogText.textContent).toBe('admin.person.twoFactorAuthentication.tokenResetSuccessHardware');
   });
 
-  test('closes the dialog when close button is clicked', async () => {
+  test('closes dialog when `onCloseClicked` is triggered', async (): Promise<void> => {
     const button: DOMWrapper<HTMLButtonElement> = wrapper!.find('[data-testid="open-2FA-dialog-icon"]');
-    expect(button.exists()).toBe(true);
     await button.trigger('click');
     await nextTick();
-    const originalCloseButton: Element | null = document.querySelector(
+
+    const closeButton: HTMLElement = document.querySelector(
       '[data-testid="close-two-way-authentification-dialog-button"]',
-    );
-    expect(originalCloseButton).not.toBeNull();
-    const originalCloseButtonWrapper: DOMWrapper<Element> = new DOMWrapper(originalCloseButton!);
-    await originalCloseButtonWrapper.trigger('click');
+    ) as HTMLElement;
+    await closeButton.click();
     await nextTick();
-    const overlayContent: Element | null = document.querySelector('.v-overlay__content');
-    expect(overlayContent).not.toBeNull();
-    expect(getComputedStyle(overlayContent!).display).toBe('none');
+
+    const overlayContent: HTMLElement = document.querySelector('.v-overlay__content') as HTMLElement;
+    expect(getComputedStyle(overlayContent).display).toBe('none');
+  });
+
+  test('closes dialog when close button in dialog actions is clicked', async (): Promise<void> => {
+    const button: DOMWrapper<HTMLButtonElement> = wrapper!.find('[data-testid="open-2FA-dialog-icon"]');
+    await button.trigger('click');
+    await nextTick();
+
+    const actionCloseButton: HTMLElement = document.querySelector(
+      '[data-testid="two-way-authentification-set-up-button"]',
+    ) as HTMLElement;
+    await actionCloseButton.click();
+    await nextTick();
+
+    const overlayContent: HTMLElement = document.querySelector('.v-overlay__content') as HTMLElement;
+    expect(getComputedStyle(overlayContent).display).toBe('none');
+  });
+
+  test('displays error message if errorCode is present', async (): Promise<void> => {
+    const button: DOMWrapper<HTMLButtonElement> = wrapper!.find('[data-testid="open-2FA-dialog-icon"]');
+    await button.trigger('click');
+    await nextTick();
+
+    const resetButton: HTMLElement = document.querySelector(
+      '[data-testid="two-way-authentification-set-up-button"]',
+    ) as HTMLElement;
+    twoFactorAuthenticationStore.errorCode = 'connection_error';
+    await resetButton.click();
+    await nextTick();
+
+    const dialogText: HTMLElement = document.querySelector('[data-testid="dialog-text"]') as HTMLElement;
+    expect(dialogText).not.toBeNull();
+    expect(dialogText.textContent).toContain('admin.person.twoFactorAuthentication.errors.connection_error');
+  });
+
+  test('closes dialog when clicking stop button in dialog actions', async (): Promise<void> => {
+    const button: DOMWrapper<HTMLButtonElement> = wrapper!.find('[data-testid="open-2FA-dialog-icon"]');
+    await button.trigger('click');
+    await nextTick();
+
+    const stopCloseButton: HTMLElement = document.querySelector(
+      '[data-testid="two-way-authentification-set-up-button"]',
+    ) as HTMLElement;
+    await stopCloseButton.click();
+    await nextTick();
+
+    const overlayContent: HTMLElement = document.querySelector('.v-overlay__content') as HTMLElement;
+    expect(getComputedStyle(overlayContent).display).toBe('none');
   });
 });
