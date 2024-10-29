@@ -177,7 +177,7 @@
       :confirmUnsavedChangesAction="handleConfirmUnsavedChanges"
       :createButtonLabel="$t('admin.person.twoFactorAuthentication.setUp')"
       :discardButtonLabel="$t('cancel')"
-      id="hardware-token-input"
+      id="hardware-token-form"
       :onDiscard="cancelCheck"
       @onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value ?? false)"
       :centerButtons="true"
@@ -192,12 +192,12 @@
       >
         <v-text-field
           clearable
-          data-testid="hardware-token-input-serial"
+          data-testid="hardware-token-serial-input"
           density="compact"
           :disabled="false"
-          id="hardware-token-input"
+          id="hardware-token-serial-input"
           :placeholder="t('admin.person.twoFactorAuthentication.serial')"
-          ref="hardware-token-input"
+          ref="hardware-token-serial-input"
           required="true"
           variant="outlined"
           v-model="selectedSeriennummer"
@@ -212,12 +212,12 @@
       >
         <v-text-field
           clearable
-          data-testid="hardware-token-input-otp"
+          data-testid="hardware-token-otp-input"
           density="compact"
           :disabled="false"
-          id="hardware-token-input"
+          id="hardware-token-otp-input"
           :placeholder="t('admin.person.twoFactorAuthentication.otpPlaceholder')"
-          ref="hardware-token-input"
+          ref="hardware-token-otp-input"
           required="true"
           variant="outlined"
           v-model="selectedOtp"
