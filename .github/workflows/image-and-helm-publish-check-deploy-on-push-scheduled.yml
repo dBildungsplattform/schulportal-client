@@ -119,7 +119,7 @@ jobs:
     needs:
       - branch_meta
       - create_branch_identifier
-      - release_helm
+      - wait_for_helm_chart_to_get_published
       - build_image_on_push
     uses: dBildungsplattform/spsh-app-deploy/.github/workflows/deploy.yml@5
     with:
