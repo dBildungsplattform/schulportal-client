@@ -98,7 +98,7 @@ beforeEach(() => {
         referrer: '123',
         personalnummer: '46465',
         isLocked: false,
-        lockInfo: null,
+        userLock: null,
         revision: '1',
         lastModified: '2024-05-22',
         email: {
@@ -120,7 +120,7 @@ beforeEach(() => {
         referrer: '1234',
         personalnummer: '46471',
         isLocked: false,
-        lockInfo: null,
+        userLock: null,
         revision: '1',
         lastModified: '2024-05-22',
         email: {
