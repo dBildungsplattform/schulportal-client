@@ -15,8 +15,7 @@ type ImportState = {
 
 type ImportGetters = {};
 type ImportActions = {
-  resetState: () => void;
-  importPersonen: (importVorgangId: string, organisationId: string, rolleId: string) => Promise<void>;
+  executePersonenImport: (importVorgangId: string, organisationId: string, rolleId: string) => Promise<void>;
   uploadPersonenImportFile: (organisationId: string, rolleId: string, file: File) => Promise<void>;
 };
 
@@ -34,11 +33,7 @@ export const useImportStore: StoreDefinition<'importStore', ImportState, ImportG
     };
   },
   actions: {
-    resetState() {
-      this.$reset();
-    },
-
-    async importPersonen(importvorgangId: string, organisationId: string, rolleId: string): Promise<void> {
+    async executePersonenImport(importvorgangId: string, organisationId: string, rolleId: string): Promise<void> {
       this.importIsLoading = true;
       try {
         const { data }: { data: File } = await importApi.importControllerExecuteImport({

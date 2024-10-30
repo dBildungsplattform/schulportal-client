@@ -154,7 +154,7 @@
   }
 
   function executeImport(): void {
-    importStore.importPersonen(
+    importStore.executePersonenImport(
       importStore.uploadResponse?.importvorgangId as string,
       selectedSchule.value as string,
       selectedRolle.value as string,
