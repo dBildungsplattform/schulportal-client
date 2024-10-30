@@ -217,7 +217,7 @@
                   class="text-body bold justify-center text-error"
                 >
                   <p
-                    class="justify-center"
+                    class="justify-center text-center"
                     data-testid="self-service-otp-error-text"
                   >
                     {{ errorMessage }}
