@@ -5397,6 +5397,9 @@
                     },
                     "traegerschaft": {
                         "$ref": "#/components/schemas/TraegerschaftTyp"
+                    },
+                    "version": {
+                        "type": "number"
                     }
                 },
                 "required": [
@@ -5407,7 +5410,8 @@
                     "namensergaenzung",
                     "kuerzel",
                     "typ",
-                    "traegerschaft"
+                    "traegerschaft",
+                    "version"
                 ]
             },
             "DbiamOrganisationError": {

@@ -1134,6 +1134,12 @@ export interface OrganisationResponse {
      * @memberof OrganisationResponse
      */
     'traegerschaft': TraegerschaftTyp;
+    /**
+     * 
+     * @type {number}
+     * @memberof OrganisationResponse
+     */
+    'version': number;
 }
 
 
