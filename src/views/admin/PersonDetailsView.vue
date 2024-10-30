@@ -2421,7 +2421,7 @@
                 offset="1"
                 cols="10"
               >
-                <span>{{ changePersonMetadataSuccessMessage }}</span>
+                <span class="metadata-success-message">{{ changePersonMetadataSuccessMessage }}</span>
               </v-col>
             </v-row>
           </v-container>
@@ -2727,8 +2727,14 @@
     }
   }
 
+
   span {
     white-space: normal;
+    text-wrap: pretty;
+  }
+
+  .metadata-success-message {
+    white-space: pre;
     text-wrap: pretty;
   }
 </style>
