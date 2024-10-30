@@ -1,15 +1,13 @@
-import { describe, it, expect, beforeEach, vi, type Mock } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { mount, VueWrapper } from '@vue/test-utils';
 import PersonenMetadataChange from './PersonenMetadataChange.vue';
 
 describe('PersonenMetadataChange', () => {
   let wrapper: VueWrapper;
-  const mockConfirmUnsavedChangesAction: Mock = vi.fn();
 
   beforeEach(() => {
     wrapper = mount(PersonenMetadataChange, {
       props: {
-        confirmUnsavedChangesAction: mockConfirmUnsavedChangesAction,
         hasKopersRolle: true,
         selectedKopersNrMetadataProps: {
           error: false,
@@ -35,7 +33,6 @@ describe('PersonenMetadataChange', () => {
           onInput: () => vi.fn(),
         },
         selectedFamilienname: 'Doe',
-        showUnsavedChangesDialog: false,
       },
       global: {
         mocks: {
