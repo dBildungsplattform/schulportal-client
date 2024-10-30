@@ -396,6 +396,7 @@
         >
           <v-file-input
             accept=".csv"
+            data-testid="file-input"
             :label="$t('admin.import.selectOrDropFile')"
             prepend-icon=""
             prepend-inner-icon="mdi-paperclip"
