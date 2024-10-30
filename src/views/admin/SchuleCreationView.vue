@@ -24,6 +24,8 @@
   import FormWrapper from '@/components/form/FormWrapper.vue';
   import FormRow from '@/components/form/FormRow.vue';
 
+  const initialSchulFormCache: Ref<string> = ref('');
+
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
   const { t }: Composer = useI18n({ useScope: 'global' });
@@ -114,7 +116,13 @@
         selectedSchulform.value,
         selectedSchulform.value,
       );
-      resetForm();
+      resetForm({
+        values: {
+          selectedSchulform: initialSchulFormCache.value,
+          selectedDienststellennummer: '',
+          selectedSchulname: '',
+        },
+      });
     }
   });
 
@@ -147,7 +155,13 @@
 
   onMounted(async () => {
     organisationStore.createdSchule = null;
-    organisationStore.getSchultraeger();
+    await organisationStore.getSchultraeger();
+
+    if (schultraegerList.value && schultraegerList.value.length > 0) {
+      const defaultSchulform: string = schultraegerList.value[0]?.id ?? '';
+      selectedSchulform.value = defaultSchulform;
+      initialSchulFormCache.value = defaultSchulform;
+    }
     /* listen for browser changes and prevent them when form is dirty */
     window.addEventListener('beforeunload', preventNavigation);
   });
