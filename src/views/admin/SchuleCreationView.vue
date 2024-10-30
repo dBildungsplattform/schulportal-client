@@ -120,6 +120,7 @@
       const currentSchulform: string = JSON.parse(JSON.stringify(selectedSchulform.value));
       resetForm();
       selectedSchulform.value = currentSchulform;
+      preservedSchulform.value = currentSchulform;
     }
   });
 
