@@ -54,7 +54,7 @@
         "KLASSENNAME_AN_SCHULE_EINDEUTIG": "Der Klassenname existiert bereits an dieser Schule.",
         "ORGANISATION_SPECIFICATION_ERROR": "Die Klasse konnte nicht angelegt werden.",
         "ORGANISATION_IST_BEREITS_ZUGEWIESEN_ERROR": "Die Klasse kann nicht gelöscht werden, da noch Benutzer zugeordnet sind.",
-        "NEWER_VERSION_ORGANISATION": "Die Klasse wurde zwischenzeitlich durch eine andere Administratorin oder andere Administrator bearbeitet. Bitte aktualisieren Sie die Daten und versuchen Sie es erneut."
+        "NEWER_VERSION_ORGANISATION": "Die Klasse wurde zwischenzeitlich von einer anderen Administratorin oder einem anderen Administrator bearbeitet. Bitte aktualisieren Sie die Daten und versuchen Sie es erneut."
       },
       "enterKlassenname": "Klassenname eingeben",
       "klasse": "Klasse",
