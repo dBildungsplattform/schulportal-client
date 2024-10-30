@@ -255,6 +255,7 @@
     </v-row>
     <!-- Organisation zuordnen -->
     <FormRow
+      ref="form-row"
       :errorLabel="selectedOrganisationProps['error']"
       :isRequired="true"
       labelForId="organisation-select"
