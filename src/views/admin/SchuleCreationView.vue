@@ -116,11 +116,13 @@
         selectedSchulform.value,
         selectedSchulform.value,
       );
-      // Cache the initialSchulform
-      const currentSchulform: string = JSON.parse(JSON.stringify(selectedSchulform.value));
-      resetForm();
-      selectedSchulform.value = currentSchulform;
-      preservedSchulform.value = currentSchulform;
+      resetForm({
+        values: {
+          selectedSchulform: initialSchulFormCache.value,
+          selectedDienststellennummer: '',
+          selectedSchulname: '',
+        },
+      });
     }
   });
 
