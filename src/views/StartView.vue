@@ -10,36 +10,32 @@
 
   const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
 
+  function filterSortProviders(providers: ServiceProvider[], kategorie: ServiceProviderKategorie): ServiceProvider[] {
+    return providers
+      .filter((provider: ServiceProvider) => provider.kategorie === kategorie)
+      .sort((a: ServiceProvider, b: ServiceProvider) => a.name.localeCompare(b.name));
+  }
+
   // Filter service providers by category "EMAIL"
-  const emailServiceProviders: ComputedRef<ServiceProvider[]> = computed(() => {
-    return serviceProviderStore.availableServiceProviders.filter(
-      (provider: ServiceProvider) => provider.kategorie === ServiceProviderKategorie.Email,
-    );
-  });
+  const emailServiceProviders: ComputedRef<ServiceProvider[]> = computed(() =>
+    filterSortProviders(serviceProviderStore.availableServiceProviders, ServiceProviderKategorie.Email),
+  );
   // Filter service providers by category "UNTERRICHT"
-  const classServiceProviders: ComputedRef<ServiceProvider[]> = computed(() => {
-    return serviceProviderStore.availableServiceProviders.filter(
-      (provider: ServiceProvider) => provider.kategorie === ServiceProviderKategorie.Unterricht,
-    );
-  });
+  const classServiceProviders: ComputedRef<ServiceProvider[]> = computed(() =>
+    filterSortProviders(serviceProviderStore.availableServiceProviders, ServiceProviderKategorie.Unterricht),
+  );
   // Filter service providers by category "VERWALTUNG"
-  const administrationServiceProviders: ComputedRef<ServiceProvider[]> = computed(() => {
-    return serviceProviderStore.availableServiceProviders.filter(
-      (provider: ServiceProvider) => provider.kategorie === ServiceProviderKategorie.Verwaltung,
-    );
-  });
+  const administrationServiceProviders: ComputedRef<ServiceProvider[]> = computed(() =>
+    filterSortProviders(serviceProviderStore.availableServiceProviders, ServiceProviderKategorie.Verwaltung),
+  );
   // Filter service providers by category "HINWEISE"
-  const hintsServiceProviders: ComputedRef<ServiceProvider[]> = computed(() => {
-    return serviceProviderStore.availableServiceProviders.filter(
-      (provider: ServiceProvider) => provider.kategorie === ServiceProviderKategorie.Hinweise,
-    );
-  });
+  const hintsServiceProviders: ComputedRef<ServiceProvider[]> = computed(() =>
+    filterSortProviders(serviceProviderStore.availableServiceProviders, ServiceProviderKategorie.Hinweise),
+  );
   // Filter service providers by category "ANGEBOTE"
-  const schoolOfferingsServiceProviders: ComputedRef<ServiceProvider[]> = computed(() => {
-    return serviceProviderStore.availableServiceProviders.filter(
-      (provider: ServiceProvider) => provider.kategorie === ServiceProviderKategorie.Angebote,
-    );
-  });
+  const schoolOfferingsServiceProviders: ComputedRef<ServiceProvider[]> = computed(() =>
+    filterSortProviders(serviceProviderStore.availableServiceProviders, ServiceProviderKategorie.Angebote),
+  );
 
   onMounted(async () => {
     await serviceProviderStore.getAvailableServiceProviders();
