@@ -2002,7 +2002,7 @@
     },
     "/api/cron/kopers-lock": {
       "put": {
-        "operationId": "CronController_KoPersUserLock",
+        "operationId": "CronController_koPersUserLock",
         "parameters": [],
         "responses": {
           "201": {
@@ -2014,6 +2014,44 @@
           "403": { "description": "Insufficient permissions to lock user." },
           "404": { "description": "Insufficient permissions to lock user." },
           "500": { "description": "Internal server error while trying to lock user." }
+        },
+        "tags": ["cron"],
+        "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
+      }
+    },
+    "/api/cron/kontext-expired": {
+      "put": {
+        "operationId": "CronController_removePersonenKontexteWithExpiredBefristungFromUsers",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "Personenkontexte were successfully removed from users.",
+            "content": { "application/json": { "schema": { "type": "boolean" } } }
+          },
+          "400": { "description": "Personenkontexte are not given or not found." },
+          "401": { "description": "Not authorized to remove personenkontexte from users." },
+          "403": { "description": "Insufficient permissions to remove personenkontexte from users." },
+          "404": { "description": "Insufficient permissions to remove personenkontexte from users." },
+          "500": { "description": "Internal server error while trying to remove personenkontexte from users." }
+        },
+        "tags": ["cron"],
+        "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
+      }
+    },
+    "/api/cron/person-without-org": {
+      "put": {
+        "operationId": "CronController_personWithoutOrgDelete",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "User were successfully removed.",
+            "content": { "application/json": { "schema": { "type": "boolean" } } }
+          },
+          "400": { "description": "User are not given or not found" },
+          "401": { "description": "Not authorized to remove user." },
+          "403": { "description": "Insufficient permissions to delete user." },
+          "404": { "description": "Insufficient permissions to delete user." },
+          "500": { "description": "Internal server error while trying to remove user." }
         },
         "tags": ["cron"],
         "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
@@ -2204,10 +2242,11 @@
         "properties": {
           "personId": { "type": "string", "nullable": true },
           "locked_by": { "type": "string", "nullable": true },
+          "created_at": { "type": "string", "nullable": true },
           "locked_until": { "type": "string", "nullable": true },
-          "created_at": { "type": "string", "nullable": true }
+          "lock_occasion": { "type": "string", "nullable": true }
         },
-        "required": ["personId", "locked_by", "locked_until", "created_at"]
+        "required": ["personId", "locked_by", "created_at", "locked_until", "lock_occasion"]
       },
       "EmailAddressStatus": { "type": "string", "enum": ["ENABLED", "DISABLED", "REQUESTED", "FAILED"] },
       "PersonEmailResponse": {

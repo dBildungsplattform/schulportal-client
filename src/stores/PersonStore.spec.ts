@@ -12,7 +12,7 @@ import {
   type PersonMetadataBodyParams,
   type PersonendatensatzResponse,
 } from '@/api-client/generated';
-import { usePersonStore, type PersonStore, type Personendatensatz } from './PersonStore';
+import { PersonLockOccasion, usePersonStore, type PersonStore, type Personendatensatz } from './PersonStore';
 import ApiService from '@/services/ApiService';
 import MockAdapter from 'axios-mock-adapter';
 import { setActivePinia, createPinia } from 'pinia';
@@ -54,6 +54,13 @@ function getMockPersonendatensatzResponse(): PersonendatensatzResponse {
       revision: '1',
       startpasswort: '',
       lastModified: '2024-12-22',
+      userLock: {
+        personId: '1',
+        created_at: new Date().toISOString(),
+        lock_occasion: PersonLockOccasion.MANUELL_GESPERRT,
+        locked_by: 'ME',
+        locked_until: new Date().toISOString(),
+      },
     },
   };
 }

@@ -2826,13 +2826,19 @@ export interface UserLockParams {
      * @type {string}
      * @memberof UserLockParams
      */
+    'created_at': string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserLockParams
+     */
     'locked_until': string | null;
     /**
      * 
      * @type {string}
      * @memberof UserLockParams
      */
-    'created_at': string | null;
+    'lock_occasion': string | null;
 }
 /**
  * 
@@ -3943,6 +3949,80 @@ export const CronApiAxiosParamCreator = function (configuration?: Configuration)
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        cronControllerPersonWithoutOrgDelete: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/cron/person-without-org`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        cronControllerRemovePersonenKontexteWithExpiredBefristungFromUsers: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/cron/kontext-expired`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -3960,6 +4040,24 @@ export const CronApiFp = function(configuration?: Configuration) {
          */
         async cronControllerKoPersUserLock(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<boolean>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.cronControllerKoPersUserLock(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async cronControllerPersonWithoutOrgDelete(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<boolean>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.cronControllerPersonWithoutOrgDelete(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async cronControllerRemovePersonenKontexteWithExpiredBefristungFromUsers(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<boolean>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.cronControllerRemovePersonenKontexteWithExpiredBefristungFromUsers(options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -3980,6 +4078,22 @@ export const CronApiFactory = function (configuration?: Configuration, basePath?
         cronControllerKoPersUserLock(options?: any): AxiosPromise<boolean> {
             return localVarFp.cronControllerKoPersUserLock(options).then((request) => request(axios, basePath));
         },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        cronControllerPersonWithoutOrgDelete(options?: any): AxiosPromise<boolean> {
+            return localVarFp.cronControllerPersonWithoutOrgDelete(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        cronControllerRemovePersonenKontexteWithExpiredBefristungFromUsers(options?: any): AxiosPromise<boolean> {
+            return localVarFp.cronControllerRemovePersonenKontexteWithExpiredBefristungFromUsers(options).then((request) => request(axios, basePath));
+        },
     };
 };
 
@@ -3996,6 +4110,22 @@ export interface CronApiInterface {
      * @memberof CronApiInterface
      */
     cronControllerKoPersUserLock(options?: AxiosRequestConfig): AxiosPromise<boolean>;
+
+    /**
+     * 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CronApiInterface
+     */
+    cronControllerPersonWithoutOrgDelete(options?: AxiosRequestConfig): AxiosPromise<boolean>;
+
+    /**
+     * 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CronApiInterface
+     */
+    cronControllerRemovePersonenKontexteWithExpiredBefristungFromUsers(options?: AxiosRequestConfig): AxiosPromise<boolean>;
 
 }
 
@@ -4014,6 +4144,26 @@ export class CronApi extends BaseAPI implements CronApiInterface {
      */
     public cronControllerKoPersUserLock(options?: AxiosRequestConfig) {
         return CronApiFp(this.configuration).cronControllerKoPersUserLock(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CronApi
+     */
+    public cronControllerPersonWithoutOrgDelete(options?: AxiosRequestConfig) {
+        return CronApiFp(this.configuration).cronControllerPersonWithoutOrgDelete(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CronApi
+     */
+    public cronControllerRemovePersonenKontexteWithExpiredBefristungFromUsers(options?: AxiosRequestConfig) {
+        return CronApiFp(this.configuration).cronControllerRemovePersonenKontexteWithExpiredBefristungFromUsers(options).then((request) => request(this.axios, this.basePath));
     }
 }
 

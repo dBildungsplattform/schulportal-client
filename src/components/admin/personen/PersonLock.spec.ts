@@ -42,12 +42,15 @@ function getPersonendatensatz(locked: boolean): Personendatensatz {
     revision: '1',
     lastModified: '2024-05-22',
     userLock: locked
-      ? {
-          personId: '123',
-          locked_by: 'Amanda Admin',
-          locked_until: Date.now().toString(),
-          created_at: Date.now().toString(),
-        }
+      ? [
+          {
+            personId: '123',
+            locked_by: 'Amanda Admin',
+            locked_until: Date.now().toString(),
+            lock_occasion: 'MANUELL_GESPERRT',
+            created_at: Date.now().toString(),
+          },
+        ]
       : null,
     email: {
       address: 'email',

@@ -253,12 +253,15 @@ describe('PersonDetailsView', () => {
   test('it renders details for a locked person', async () => {
     const date: string = '01.01.2024';
     const datetime: string = `${date} 12:34:00`;
-    const userLock: UserLock = {
-      personId: '1234',
-      locked_by: 'test',
-      created_at: datetime,
-      locked_until: datetime,
-    };
+    const userLock: UserLock[] = [
+      {
+        personId: '1234',
+        locked_by: 'test',
+        created_at: datetime,
+        lock_occasion: 'MANUELL_GESPERRT',
+        locked_until: datetime,
+      },
+    ];
 
     // Mock the current person in the store
     personStore.currentPerson = {
@@ -287,7 +290,7 @@ describe('PersonDetailsView', () => {
 
     // Check if the element exists and has the correct text content
     expect(vornameElement?.text()).toBe('Samuel');
-    expect(lockInfoContainer?.html()).toContain(userLock.locked_by);
+    expect(lockInfoContainer?.html()).toContain(userLock[0]!.locked_by);
     expect(lockInfoContainer?.html()).toContain(date);
   });
 
@@ -396,24 +399,27 @@ describe('PersonDetailsView', () => {
       month: '2-digit',
       year: 'numeric',
     });
-    const userLock: UserLock = {
-      personId: '1234',
-      locked_by: 'Lady Lock',
-      created_at: date,
-      locked_until: date,
-    };
+    const userLock: UserLock[] = [
+      {
+        personId: '1234',
+        locked_by: 'Lady Lock',
+        created_at: date,
+        lock_occasion: 'MANUELL_GESPERRT',
+        locked_until: date,
+      },
+    ];
 
     personStore.currentPerson!.person.isLocked = true;
     personStore.currentPerson!.person.userLock = parseUserLock(userLock);
     organisationStore.lockingOrganisation = {
       id: '1234',
-      name: userLock.locked_by,
+      name: userLock[0]!.locked_by,
       typ: OrganisationsTyp.Schule,
     };
     await nextTick();
 
     const lockInfoArray: Array<[string, string]> = [
-      ['Gesperrt durch:', userLock.locked_by],
+      ['Gesperrt durch:', userLock[0]!.locked_by],
       ['Gesperrt seit:', formattedDate],
     ];
 

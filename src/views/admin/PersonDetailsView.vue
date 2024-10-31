@@ -26,11 +26,13 @@
   import {
     EmailStatus,
     LockKeys,
+    PersonLockOccasion,
     usePersonStore,
     type Person,
     type Personendatensatz,
     type PersonStore,
     type PersonWithUebersicht,
+    type UserLock,
   } from '@/stores/PersonStore';
   import {
     usePersonenkontextStore,
@@ -180,49 +182,81 @@
     return organisation.kennung ? `${organisation.kennung} (${organisation.name})` : organisation.name;
   }
 
-  // translate keys and format attributes for display
-  const getuserLock: ComputedRef<{ key: string; attribute: string }[]> = computed(() => {
-    if (!personStore.currentPerson?.person.isLocked) return [];
+  function getSpecifiedUserLock(lockOccasion: PersonLockOccasion): UserLock | undefined {
+    if (!personStore.currentPerson) return undefined;
 
     const { userLock }: Person = personStore.currentPerson.person;
-    if (!userLock) return [];
+    if (!userLock) return undefined;
 
-    return Object.entries(userLock).map(([key, attribute]: [string, string]) => {
-      switch (key) {
-        case LockKeys.LockedBy:
-          return {
-            key: t('person.lockedBy'),
-            attribute: organisationStore.lockingOrganisation
-              ? getOrganisationDisplayName(organisationStore.lockingOrganisation)
-              : t('admin.organisation.unknownOrganisation'),
-          };
+    // Find the manualLock entry if it exists
+    const specifiedLock: UserLock | undefined = userLock.find(
+      (lock: UserLock) => lock[LockKeys.LockOccasion] === lockOccasion,
+    );
 
-        case LockKeys.CreatedAt:
-          return {
-            key: t('person.lockedSince'),
-            attribute: new Intl.DateTimeFormat('de-DE', {
-              year: 'numeric',
-              month: '2-digit',
-              day: '2-digit',
-            }).format(new Date(attribute)),
-          };
-        case LockKeys.LockedUntil:
-          return {
-            key: t('person.lockedUntil'),
-            attribute,
-          };
+    return specifiedLock;
+  }
 
-        default:
-          return { key, attribute };
-      }
-    });
+  const getKopersUserLock: ComputedRef<{ text: string }[]> = computed(() => {
+    const kopersUserLock: UserLock | undefined = getSpecifiedUserLock(PersonLockOccasion.KOPERS_GESPERRT);
+    if (!kopersUserLock) return [];
+    return [
+      {
+        text: t('person.kopersLock'),
+      },
+    ];
+  });
+
+  const getManualUserLock: ComputedRef<{ key: string; attribute: string }[]> = computed(() => {
+    const manualLock: UserLock | undefined = getSpecifiedUserLock(PersonLockOccasion.MANUELL_GESPERRT);
+    if (!manualLock) return [];
+    return Object.entries(manualLock)
+      .filter(([key]: [string, string]) => key !== LockKeys.LockOccasion)
+      .map(([key, attribute]: [string, string]) => {
+        switch (key) {
+          case LockKeys.LockedBy:
+            return {
+              key: t('person.lockedBy'),
+              attribute: organisationStore.lockingOrganisation
+                ? getOrganisationDisplayName(organisationStore.lockingOrganisation)
+                : t('admin.organisation.unknownOrganisation'),
+            };
+
+          case LockKeys.CreatedAt:
+            return {
+              key: t('person.lockedSince'),
+              attribute: new Intl.DateTimeFormat('de-DE', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+              }).format(new Date(attribute)),
+            };
+
+          case LockKeys.LockedUntil:
+            return {
+              key: t('person.lockedUntil'),
+              attribute,
+            };
+
+          default:
+            return {
+              key,
+              attribute,
+            };
+        }
+      })
+      .filter(Boolean); // Remove undefined entries
   });
 
   watch(
     () => personStore.currentPerson?.person,
     async (person: Person | undefined) => {
       if (!(person && person.isLocked && person.userLock)) return;
-      await organisationStore.getLockingOrganisationById(person.userLock.locked_by);
+      const manualLock: UserLock | undefined = person.userLock.find(
+        (lock: UserLock) => lock.lock_occasion === PersonLockOccasion.MANUELL_GESPERRT,
+      );
+      if (manualLock) {
+        await organisationStore.getLockingOrganisationById(manualLock.locked_by);
+      }
     },
   );
 
@@ -2158,7 +2192,11 @@
                     cols="1"
                   >
                     <v-icon
-                      v-if="personStore.currentPerson?.person.isLocked"
+                      v-if="
+                        personStore.currentPerson?.person.userLock?.some(
+                          (lock) => lock.lock_occasion === PersonLockOccasion.MANUELL_GESPERRT,
+                        )
+                      "
                       icon="mdi-lock"
                       color="red"
                     ></v-icon>
@@ -2166,7 +2204,7 @@
                   <v-col cols="10">
                     <span>
                       {{
-                        personStore.currentPerson?.person.isLocked
+                        personStore.currentPerson?.person.userLock
                           ? t('person.userIsLocked')
                           : t('person.userIsUnlocked')
                       }}
@@ -2175,7 +2213,7 @@
                 </v-row>
                 <v-row
                   class="mt-0"
-                  v-for="({ key, attribute }, index) of getuserLock"
+                  v-for="({ key, attribute }, index) of getManualUserLock"
                   :key="key"
                   cols="10"
                 >
@@ -2200,6 +2238,20 @@
                       :data-testid="`lock-info-${index}-attribute`"
                     >
                       {{ attribute }}
+                    </span>
+                  </v-col>
+                </v-row>
+                <v-row v-if="getKopersUserLock.length">
+                  <v-col
+                    v-for="(item, index) in getKopersUserLock"
+                    :key="index"
+                    cols="10"
+                  >
+                    <span
+                      class="text-body"
+                      :data-testid="`lock-info-${index}-attribute`"
+                    >
+                      {{ item.text }}
                     </span>
                   </v-col>
                 </v-row>
