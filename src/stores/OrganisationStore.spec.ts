@@ -687,6 +687,7 @@ describe('OrganisationStore', () => {
           traegerschaft: '01',
           typ: OrganisationsTyp.Land,
           administriertVon: '1',
+          version: 1,
         },
         ersatz: {
           id: '3',
@@ -697,6 +698,7 @@ describe('OrganisationStore', () => {
           traegerschaft: '01',
           typ: OrganisationsTyp.Land,
           administriertVon: '1',
+          version: 1,
         },
       };
 
