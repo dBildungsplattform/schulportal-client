@@ -5,7 +5,7 @@
 
   type Props = {
     schulen?: Array<{ value: string; title: string }>;
-    klassen: Array<{ value: string; title: string }> | undefined;
+    klassen?: Array<{ value: string; title: string }>;
     readonly?: boolean;
     selectedSchuleProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     selectedNewKlasseProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
@@ -19,8 +19,9 @@
   const selectedNewKlasse: ModelRef<unknown, string> = defineModel('selectedNewKlasse');
 </script>
 
-<template data-test-id="klasse-change-form">
+<template>
   <v-form
+    data-testid="klasse-change-form"
     id="klasse-change-form"
     :onSubmit="onSubmit"
   >

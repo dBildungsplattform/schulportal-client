@@ -1,20 +1,23 @@
-// import { expect, test } from 'vitest';
+import { expect, type MockInstance, test } from 'vitest';
+import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
+import { createRouter, createWebHistory, type Router } from 'vue-router';
 import routes from '@/router/routes';
 import { useAuthStore, type AuthStore, type UserInfo } from '@/stores/AuthStore';
 import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
 import {
+  parseUserLock,
   usePersonStore,
   type Personendatensatz,
   type PersonStore,
   type PersonWithUebersicht,
+  type UserLock,
 } from '@/stores/PersonStore';
 import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
-import { RollenMerkmal, RollenSystemRecht } from '@/stores/RolleStore';
-import { shallowMount, VueWrapper } from '@vue/test-utils';
-import { createRouter, createWebHistory, type Router } from 'vue-router';
+import { RollenArt, RollenMerkmal, RollenSystemRecht } from '@/stores/RolleStore';
+import { nextTick, type ComputedRef, type DefineComponent } from 'vue';
+import type { TranslatedRolleWithAttrs } from '@/composables/useRollen';
 import PersonDetailsView from './PersonDetailsView.vue';
-// import { nextTick, type ComputedRef, type DefineComponent } from 'vue';
-// import type { TranslatedRolleWithAttrs } from '@/composables/useRollen';
+import { EmailAddressStatus } from '@/api-client/generated';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
@@ -32,11 +35,15 @@ const mockPerson: Personendatensatz = {
       vorname: 'John',
     },
     referrer: 'jorton',
-    personalnummer: null,
-    isLocked: null,
-    lockInfo: null,
+    personalnummer: '263578',
+    isLocked: false,
+    userLock: null,
     revision: '1',
     lastModified: '2024-05-22',
+    email: {
+      address: 'email@email.com',
+      status: EmailAddressStatus.Enabled,
+    },
   },
 };
 
@@ -89,7 +96,7 @@ const mockPersonenuebersicht: PersonWithUebersicht = {
       administriertVon: '2',
       editable: true,
       merkmale: [] as unknown as RollenMerkmal,
-      befristung: '2024-05-06',
+      befristung: '',
     },
     {
       sskId: '3',
@@ -101,7 +108,7 @@ const mockPersonenuebersicht: PersonWithUebersicht = {
       administriertVon: '2',
       editable: true,
       merkmale: [] as unknown as RollenMerkmal,
-      befristung: '2024-05-06',
+      befristung: '',
     },
     {
       sskId: '2',
@@ -113,7 +120,7 @@ const mockPersonenuebersicht: PersonWithUebersicht = {
       administriertVon: '1',
       editable: true,
       merkmale: [] as unknown as RollenMerkmal,
-      befristung: '2024-05-06',
+      befristung: '',
     },
   ],
 };
@@ -198,7 +205,7 @@ beforeEach(async () => {
   router.push('/');
   await router.isReady();
 
-  wrapper = shallowMount(PersonDetailsView, {
+  wrapper = mount(PersonDetailsView, {
     attachTo: document.getElementById('app') || '',
     global: {
       components: {
@@ -209,66 +216,94 @@ beforeEach(async () => {
   });
 });
 
+const setCurrentPerson = (emailStatus: EmailAddressStatus): void => {
+  personStore.currentPerson = {
+    person: {
+      id: '123456',
+      name: {
+        familienname: 'Vimes',
+        vorname: 'Susan',
+      },
+      referrer: '6978',
+      personalnummer: '9183756',
+      isLocked: false,
+      userLock: null,
+      revision: '1',
+      lastModified: '2024-12-22',
+      email: {
+        address: 'test@example.com',
+        status: emailStatus,
+      },
+    },
+  };
+};
+
 describe('PersonDetailsView', () => {
   test('it renders the person details page and shows person data', async () => {
     expect(wrapper).toBeTruthy();
-    // expect(wrapper?.find('[data-testid="person-details-card"]').isVisible()).toBe(true);
-    // expect(wrapper?.find('[data-testid="person-vorname"]').text()).toBe('John');
-    // expect(wrapper?.find('[data-testid="person-familienname"]').text()).toBe('Orton');
-    // expect(wrapper?.find('[data-testid="person-username"]').text()).toBe('jorton');
-    // expect(wrapper?.find('[data-testid="person-zuordnung-1"]').text()).toBe('123456 (Testschule Birmingham): SuS 9a');
-    // expect(wrapper?.getComponent({ name: 'PasswordReset' })).toBeTruthy();
+    expect(wrapper?.find('[data-testid="person-details-card"]').isVisible()).toBe(true);
+    expect(wrapper?.find('[data-testid="person-vorname"]').text()).toBe('John');
+    expect(wrapper?.find('[data-testid="person-familienname"]').text()).toBe('Orton');
+    expect(wrapper?.find('[data-testid="person-username"]').text()).toBe('jorton');
+    expect(wrapper?.find('[data-testid="person-email"]').text()).toBe('email@email.com');
+    expect(wrapper?.find('[data-testid="person-zuordnung-1"]').text()).toBe('123456 (Testschule Birmingham): SuS 9a');
+    expect(wrapper?.getComponent({ name: 'PasswordReset' })).toBeTruthy();
   });
 
-  // test('Renders details for the current person', async () => {
-  //   const date: string = '01.01.2024';
-  //   const datetime: string = `${date} 12:34:00`;
-  //   const lockInfo: Person['lockInfo'] = {
-  //     lock_locked_from: 'test',
-  //     lock_timestamp: datetime,
-  //   };
-  //   // Mock the current person in the store
-  //   personStore.currentPerson = mapPersonendatensatzResponseToPersonendatensatz({
-  //     person: {
-  //       id: '1234',
-  //       name: {
-  //         familienname: 'Vimes',
-  //         vorname: 'Samuel',
-  //       },
-  //       isLocked: true,
-  //       lockInfo,
-  //     },
-  //   } as PersonendatensatzResponse);
+  test('it renders details for a locked person', async () => {
+    const date: string = '01.01.2024';
+    const datetime: string = `${date} 12:34:00`;
+    const userLock: UserLock = {
+      personId: '1234',
+      locked_by: 'test',
+      created_at: datetime,
+      locked_until: datetime,
+    };
 
-  //   const vornameElement: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="person-vorname"]');
-  //   const lockInfoContainer: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="person-lock-info"]');
+    // Mock the current person in the store
+    personStore.currentPerson = {
+      person: {
+        id: '1234',
+        name: {
+          familienname: 'Vimes',
+          vorname: 'Samuel',
+        },
+        referrer: '6978',
+        personalnummer: '9183756',
+        isLocked: true,
+        userLock,
+        revision: '1',
+        lastModified: '2024-12-22',
+        email: {
+          address: 'email',
+          status: EmailAddressStatus.Requested,
+        },
+      },
+    };
+    await nextTick();
 
-  //   // Check if the element exists and has the correct text content
-  //   expect(vornameElement?.text()).toBe('Samuel');
-  //   expect(lockInfoContainer?.html()).toContain(lockInfo.lock_locked_from);
-  //   expect(lockInfoContainer?.html()).toContain(date);
-  // });
+    const vornameElement: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="person-vorname"]');
+    const lockInfoContainer: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="person-lock-info"]');
 
-  // TODO: how do we fix this test?
-  // We have to use shallowMount instead of mount and comment all tests to make sonar accept coverage.
-  // As soon as we use mount to write meaningful tests, sonar will complain about the coverage.
+    // Check if the element exists and has the correct text content
+    expect(vornameElement?.text()).toBe('Samuel');
+    expect(lockInfoContainer?.html()).toContain(userLock.locked_by);
+    expect(lockInfoContainer?.html()).toContain(date);
+  });
 
-  // test('it navigates back to user table', async () => {
-  //   const push: MockInstance<[to: RouteLocationRaw], Promise<void | NavigationFailure | undefined>> = vi.spyOn(
-  //     router,
-  //     'push',
-  //   );
-  //   await wrapper?.find('[data-testid="close-layout-card-button"]').trigger('click');
-  //   expect(push).toHaveBeenCalledTimes(1);
-  // });
+  test('it navigates back to user table', async () => {
+    const push: MockInstance = vi.spyOn(router, 'push');
+    await wrapper?.find('[data-testid="close-layout-card-button"]').trigger('click');
+    expect(push).toHaveBeenCalledTimes(1);
+  });
 
-  // test('it shows an error if error code exists', async () => {
-  //   personStore.errorCode = 'UNSPECIFIED_ERROR';
-  //   await nextTick();
+  test('it shows an error if error code exists', async () => {
+    personStore.errorCode = 'ERROR_LOADING_USER';
+    await nextTick();
 
-  //   expect(wrapper?.find('[data-testid="alert-title"]').text()).toBe('Fehler beim Laden des Benutzers');
-  //   personStore.errorCode = '';
-  // });
+    expect(wrapper?.find('[data-testid="alert-title"]').text()).toBe('Fehler beim Laden des Benutzers');
+    personStore.errorCode = '';
+  });
 
   // test('It cancels editing', async () => {
   //   await wrapper?.find('[data-testid="zuordnung-edit-button"]').trigger('click');
@@ -286,6 +321,8 @@ describe('PersonDetailsView', () => {
   //   // Trigger edit mode
   //   await wrapper?.find('[data-testid="zuordnung-edit-button"]').trigger('click');
   //   await nextTick();
+  //   console.log('******')
+  //   console.log(wrapper?.find('[data-testid="checkbox-zuordnung-1"').html());
 
   //   // Find the first checkbox
   //   const firstCheckbox: VueWrapper | undefined = wrapper?.findComponent({ ref: 'checkbox-zuordnung-1' });
@@ -314,104 +351,159 @@ describe('PersonDetailsView', () => {
 
   //   expect(klasseChangeFormComponent?.exists()).toBe(true);
   // });
-  // test('Renders details for the current person', async () => {
-  //   // Mock the current person in the store
-  //   personStore.currentPerson = {
-  //     person: {
-  //       id: '1234',
-  //       name: {
-  //         familienname: 'Vimes',
-  //         vorname: 'Samuel',
-  //       },
-  //     },
-  //   } as PersonendatensatzResponse;
 
-  //   await nextTick();
+  test('filteredRollen returns correct roles based on person context and selection', async () => {
+    interface PersonDetailsViewType extends DefineComponent {
+      filteredRollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined>;
+    }
+    const vm: PersonDetailsViewType = wrapper?.vm as unknown as PersonDetailsViewType;
+    const filteredRollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = vm.filteredRollen;
 
-  //   const vornameElement: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="person-vorname"]');
+    // Verify that filteredRollen contains only roles that are not already assigned and filtered correctly
+    expect(filteredRollen).toEqual([
+      {
+        value: '54321',
+        title: 'string',
+        rollenart: RollenArt.Lern,
+        merkmale: new Set<RollenMerkmal>(['BEFRISTUNG_PFLICHT']),
+      },
+      {
+        value: '1',
+        title: 'SuS',
+        rollenart: RollenArt.Lern,
+        merkmale: new Set<RollenMerkmal>(['BEFRISTUNG_PFLICHT']),
+      },
+    ]);
+  });
 
-  //   // Check if the element exists and has the correct text content
-  //   expect(vornameElement?.text()).toBe('Samuel');
-  // });
-  // test('filteredRollen returns correct roles based on person context and selection', async () => {
-  //   interface PersonDetailsViewType extends DefineComponent {
-  //     filteredRollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined>;
-  //   }
-  //   const vm: PersonDetailsViewType = wrapper?.vm as unknown as PersonDetailsViewType;
-  //   const filteredRollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = vm.filteredRollen;
+  test('it displays lockInfo if there is any', async () => {
+    expect(personStore.currentPerson).toBeDefined();
+    expect(wrapper).toBeDefined();
+    personStore.currentPerson!.person.isLocked = false;
+    await nextTick();
 
-  //   // Verify that filteredRollen contains only roles that are not already assigned and filtered correctly
-  //   expect(filteredRollen).toEqual([
-  //     {
-  //       value: '54321',
-  //       title: 'string',
-  //       rollenart: RollenArt.Lern,
-  //       merkmale: new Set<RollenMerkmal>(['BEFRISTUNG_PFLICHT']),
-  //     },
-  //     {
-  //       value: '1',
-  //       title: 'SuS',
-  //       rollenart: RollenArt.Lern,
-  //       merkmale: new Set<RollenMerkmal>(['BEFRISTUNG_PFLICHT']),
-  //     },
-  //   ]);
-  // });
+    const activeStatusMessage: DOMWrapper<HTMLDivElement> = wrapper!.find('[data-testid="person-lock-info"]');
+    expect(activeStatusMessage.exists()).toBe(true);
+    expect(activeStatusMessage.text()).toContain('aktiv');
+    expect(wrapper!.find('[data-testid="lock-info-0-key"]').exists()).toBe(false);
+    expect(wrapper!.find('[data-testid="lock-info-0-attribute"]').exists()).toBe(false);
+    expect(wrapper!.find('[data-testid="lock-info-1-key"]').exists()).toBe(false);
+    expect(wrapper!.find('[data-testid="lock-info-1-attribute"]').exists()).toBe(false);
 
-  // test('displays lockInfo if there is any', async () => {
-  //   expect(personStore.currentPerson).toBeDefined();
-  //   expect(wrapper).toBeDefined();
-  //   personStore.currentPerson!.person.isLocked = false;
-  //   await nextTick();
+    const date: string = new Date().toUTCString();
+    const formattedDate: string = new Date(date).toLocaleDateString('de-DE', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    });
+    const userLock: UserLock = {
+      personId: '1234',
+      locked_by: 'Lady Lock',
+      created_at: date,
+      locked_until: date,
+    };
 
-  //   const activeStatusMessage: DOMWrapper<HTMLDivElement> = wrapper!.find('[data-testid="person-lock-info"]');
-  //   expect(activeStatusMessage.exists()).toBe(true);
-  //   expect(activeStatusMessage.text()).toContain('aktiv');
-  //   expect(wrapper!.find('[data-testid="lock-info-0-key"]').exists()).toBe(false);
-  //   expect(wrapper!.find('[data-testid="lock-info-0-attribute"]').exists()).toBe(false);
-  //   expect(wrapper!.find('[data-testid="lock-info-1-key"]').exists()).toBe(false);
-  //   expect(wrapper!.find('[data-testid="lock-info-1-attribute"]').exists()).toBe(false);
+    personStore.currentPerson!.person.isLocked = true;
+    personStore.currentPerson!.person.userLock = parseUserLock(userLock);
+    organisationStore.lockingOrganisation = {
+      id: '1234',
+      name: userLock.locked_by,
+      typ: OrganisationsTyp.Schule,
+    };
+    await nextTick();
 
-  //   const lockInfo: Person['lockInfo'] = {
-  //     lock_locked_from: 'Lady Lock',
-  //     lock_timestamp: '2024-09-27T11:37:35.663Z',
-  //   };
+    const lockInfoArray: Array<[string, string]> = [
+      ['Gesperrt durch:', userLock.locked_by],
+      ['Gesperrt seit:', formattedDate],
+    ];
 
-  //   personStore.currentPerson!.person.isLocked = true;
-  //   personStore.currentPerson!.person.lockInfo = lockInfo;
-  //   organisationStore.lockingOrganisation = {
-  //     id: '1234',
-  //     name: lockInfo.lock_locked_from,
-  //     typ: OrganisationsTyp.Schule,
-  //   };
-  //   await nextTick();
+    for (let index: number = 0; index < lockInfoArray.length; index++) {
+      const [keyValue, attributeValue]: [string, string] = lockInfoArray[index]!;
+      const keyElement: DOMWrapper<HTMLSpanElement> = wrapper!.find(`[data-testid="lock-info-${index}-key"]`);
+      const attributeElement: DOMWrapper<HTMLSpanElement> = wrapper!.find(
+        `[data-testid="lock-info-${index}-attribute"]`,
+      );
+      expect(keyElement.exists()).toBe(true);
+      expect(keyElement.text()).toContain(keyValue);
+      expect(attributeElement.text()).toContain(attributeValue);
+    }
+  });
 
-  //   const lockInfoArray: Array<[string, string]> = [
-  //     ['Gesperrt durch:', lockInfo.lock_locked_from],
-  //     ['Seit:', '27.09.2024'],
-  //   ];
+  it('displays correct email status for Enabled', async () => {
+    setCurrentPerson(EmailAddressStatus.Enabled);
 
-  //   for (let index: number = 0; index < lockInfoArray.length; index++) {
-  //     const [keyValue, attributeValue]: [string, string] = lockInfoArray[index]!;
-  //     const keyElement: DOMWrapper<HTMLSpanElement> = wrapper!.find(`[data-testid="lock-info-${index}-key"]`);
-  //     const attributeElement: DOMWrapper<HTMLSpanElement> = wrapper!.find(
-  //       `[data-testid="lock-info-${index}-attribute"]`,
-  //     );
-  //     expect(keyElement.exists()).toBe(true);
-  //     expect(keyElement.text()).toContain(keyValue);
-  //     expect(attributeElement.text()).toContain(attributeValue);
-  //   }
-  // });
+    await nextTick();
 
-  // TODO: This test is for SPSH-1090 and should be back in SPSH-1021
-  // test('it sets errorCode to PERSONALNUMMER_NICHT_EINDEUTIG and goes back to Form', async () => {
-  //   personStore.errorCode = 'PERSONALNUMMER_NICHT_EINDEUTIG';
-  //   await nextTick();
+    const emailElement: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="person-email-text"]');
+    expect(emailElement?.text()).toBe('test@example.com');
+  });
 
-  //   await wrapper?.find('[data-testid="alert-button"]').trigger('click');
-  //   const familienNameInput: DOMWrapper<Element> | undefined = await wrapper?.find(
-  //     '[data-testid="person-familienname"]',
-  //   );
+  it('displays correct email status for requested', async () => {
+    setCurrentPerson(EmailAddressStatus.Requested);
 
-  //   expect(familienNameInput?.exists()).toBe(true);
-  // });
+    await nextTick();
+
+    const emailElement: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="person-email-text"]');
+    expect(emailElement?.text()).toBe('wird erzeugt');
+  });
+
+  it('displays correct email status for failed', async () => {
+    setCurrentPerson(EmailAddressStatus.Failed);
+
+    await nextTick();
+
+    const emailElement: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="person-email-text"]');
+    expect(emailElement?.text()).toBe('fehlerhaft');
+  });
+
+  it('displays correct email status for disabled', async () => {
+    setCurrentPerson(EmailAddressStatus.Disabled);
+
+    await nextTick();
+
+    const emailElement: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="person-email-text"]');
+    expect(emailElement?.text()).toBe('deaktiviert');
+  });
+
+  it('displays correct email status for unknown', async () => {
+    setCurrentPerson('UnknownStatus' as EmailAddressStatus);
+
+    await nextTick();
+
+    const emailElement: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="person-email-text"]');
+    expect(emailElement?.exists()).toBe(false);
+  });
+
+  test('it sets errorCode to PERSONALNUMMER_NICHT_EINDEUTIG and goes back to Form', async () => {
+    personStore.errorCode = 'PERSONALNUMMER_NICHT_EINDEUTIG';
+    await nextTick();
+
+    await wrapper?.find('[data-testid="alert-button"]').trigger('click');
+    const familienNameInput: DOMWrapper<Element> | undefined = await wrapper?.find(
+      '[data-testid="person-familienname"]',
+    );
+
+    expect(familienNameInput?.exists()).toBe(true);
+  });
+
+  test('it checks for dirtiness when metadata Form is active', async () => {
+    await wrapper?.find('[data-testid="metadata-edit-button"]').trigger('click');
+    await nextTick();
+
+    await wrapper
+      ?.findComponent({ ref: 'person-metadata-change' })
+      .findComponent({ ref: 'vorname-input' })
+      .setValue('test');
+    await nextTick();
+
+    location.reload();
+
+    await nextTick();
+
+    const unsavedChangesDialogButton: VueWrapper | undefined = await wrapper?.findComponent({
+      ref: 'unsaved-changes-dialog',
+    });
+
+    expect(unsavedChangesDialogButton?.exists()).toBe(true);
+  });
 });

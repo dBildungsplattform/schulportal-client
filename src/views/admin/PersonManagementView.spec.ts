@@ -1,4 +1,4 @@
-import type { FindRollenResponse } from '@/api-client/generated/api';
+import { EmailAddressStatus, type FindRollenResponse } from '@/api-client/generated/api';
 import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
 import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
 import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
@@ -98,9 +98,13 @@ beforeEach(() => {
         referrer: '123',
         personalnummer: '46465',
         isLocked: false,
-        lockInfo: null,
+        userLock: null,
         revision: '1',
         lastModified: '2024-05-22',
+        email: {
+          address: 'email',
+          status: EmailAddressStatus.Requested,
+        },
       },
     },
     {
@@ -116,9 +120,13 @@ beforeEach(() => {
         referrer: '1234',
         personalnummer: '46471',
         isLocked: false,
-        lockInfo: null,
+        userLock: null,
         revision: '1',
         lastModified: '2024-05-22',
+        email: {
+          address: 'email',
+          status: EmailAddressStatus.Requested,
+        },
       },
     },
   ];
@@ -165,6 +173,7 @@ describe('PersonManagementView', () => {
   test('it renders person management table', () => {
     expect(wrapper?.getComponent({ name: 'ResultTable' })).toBeTruthy();
     expect(wrapper?.find('[data-testid="person-table"]').isVisible()).toBe(true);
+    expect(wrapper?.findAll('.v-data-table__tr').length).toBe(2);
   });
 
   test('it reloads data after changing page', async () => {
