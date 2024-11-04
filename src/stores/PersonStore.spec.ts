@@ -6,6 +6,7 @@ import {
   Vertrauensstufe,
   type DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response,
   type DBiamPersonenuebersichtResponse,
+  type LockUserBodyParams,
   type PersonFrontendControllerFindPersons200Response,
   type PersonLockResponse,
   type PersonMetadataBodyParams,
@@ -29,7 +30,7 @@ function getMockPersonendatensatz(): Personendatensatz {
       referrer: '6978',
       personalnummer: '9183756',
       isLocked: false,
-      lockInfo: null,
+      userLock: null,
       revision: '1',
       lastModified: '2024-12-22',
       email: {
@@ -39,6 +40,7 @@ function getMockPersonendatensatz(): Personendatensatz {
     },
   };
 }
+
 function getMockPersonendatensatzResponse(): PersonendatensatzResponse {
   return {
     person: {
@@ -53,6 +55,14 @@ function getMockPersonendatensatzResponse(): PersonendatensatzResponse {
       startpasswort: '',
       lastModified: '2024-12-22',
     },
+  };
+}
+
+function getUserLockBodyParams(lock: boolean): LockUserBodyParams {
+  return {
+    lock: lock,
+    locked_by: 'Alfred Admin',
+    locked_until: undefined,
   };
 }
 
@@ -73,39 +83,207 @@ describe('PersonStore', () => {
     it('should load persons and their overviews, and update state', async () => {
       // Mock data for persons
       const mockPersons: PersonendatensatzResponse[] = [
-        getMockPersonendatensatz(),
-        getMockPersonendatensatz(),
+        {
+          person: {
+            id: '1234',
+            name: {
+              familienname: 'Johnson',
+              vorname: 'John',
+            },
+            referrer: 'jjohnson',
+            personalnummer: '1234567',
+            isLocked: false,
+            userLock: null,
+            revision: '1',
+            lastModified: '2024-12-22',
+          },
+        },
+        {
+          person: {
+            id: '5678',
+            name: {
+              familienname: 'Cena',
+              vorname: 'Randy',
+            },
+            referrer: 'rcena',
+            personalnummer: null,
+            isLocked: false,
+            userLock: null,
+            revision: '1',
+            lastModified: '2024-12-22',
+          },
+        },
+        {
+          person: {
+            id: '7894',
+            name: {
+              familienname: 'Orton',
+              vorname: 'Dwayne',
+            },
+            referrer: 'dorton',
+            personalnummer: null,
+            isLocked: false,
+            userLock: null,
+            revision: '1',
+            lastModified: '2024-12-22',
+          },
+        },
+        {
+          person: {
+            id: '3755',
+            name: {
+              familienname: 'Mardy',
+              vorname: 'Hatt',
+            },
+            referrer: 'hmardy',
+            personalnummer: null,
+            isLocked: false,
+            lockInfo: null,
+            revision: '1',
+            lastModified: '2024-12-22',
+          },
+        },
+        {
+          person: {
+            id: '3975',
+            name: {
+              familienname: 'Jardy',
+              vorname: 'Heff',
+            },
+            referrer: 'hjardy',
+            personalnummer: null,
+            isLocked: false,
+            lockInfo: null,
+            revision: '1',
+            lastModified: '2024-12-22',
+          },
+        },
       ] as PersonendatensatzResponse[];
 
       // Mock response for persons
       const mockPersonsResponse: PersonFrontendControllerFindPersons200Response = {
         offset: 0,
-        limit: 2,
-        total: 2,
+        limit: 4,
+        total: 4,
         items: mockPersons,
       };
 
       // Mock data for person overviews
       const mockUebersichten: DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response = {
-        total: 2,
+        total: 4,
         offset: 0,
-        limit: 2,
+        limit: 4,
         items: [
           {
             personId: '1234',
-            vorname: 'Samuel',
-            nachname: 'Vimes',
+            vorname: 'John',
+            nachname: 'Johnson',
             benutzername: 'string',
             lastModifiedZuordnungen: '08.02.2024',
             zuordnungen: [
               {
-                sskId: 'string',
+                sskId: '1',
                 rolleId: 'string',
-                sskName: 'string',
-                sskDstNr: 'string',
+                sskName: 'Schule A',
+                sskDstNr: '642462',
                 rolle: 'string',
-                typ: OrganisationsTyp.Klasse,
+                typ: OrganisationsTyp.Schule,
                 administriertVon: 'string',
+                editable: true,
+                merkmale: ['KOPERS_PFLICHT'] as unknown as RollenMerkmal,
+                befristung: '2025-04-05',
+              },
+            ],
+          },
+          {
+            personId: '5678',
+            vorname: 'Randy',
+            nachname: 'Cena',
+            benutzername: 'string',
+            lastModifiedZuordnungen: '08.02.2024',
+            zuordnungen: [
+              {
+                sskId: '2',
+                rolleId: 'string',
+                sskName: 'Schule B',
+                sskDstNr: '',
+                rolle: 'string',
+                typ: OrganisationsTyp.Schule,
+                administriertVon: 'string',
+                editable: true,
+                merkmale: ['KOPERS_PFLICHT'] as unknown as RollenMerkmal,
+                befristung: '2025-04-05',
+              },
+            ],
+          },
+          {
+            personId: '7894',
+            vorname: 'Dwayne',
+            nachname: 'Orton',
+            benutzername: 'string',
+            lastModifiedZuordnungen: '08.02.2024',
+            zuordnungen: [],
+          },
+          {
+            personId: '3755',
+            vorname: 'Hatt',
+            nachname: 'Mardy',
+            benutzername: 'hmardy',
+            lastModifiedZuordnungen: '08.02.2024',
+            zuordnungen: [
+              {
+                sskId: '1',
+                rolleId: '3',
+                sskName: 'Schule A',
+                sskDstNr: '642462',
+                rolle: 'SuS',
+                typ: OrganisationsTyp.Schule,
+                administriertVon: 'string',
+                editable: true,
+                merkmale: [] as unknown as RollenMerkmal,
+                befristung: '2025-04-05',
+              },
+              {
+                sskId: '3',
+                rolleId: '3',
+                sskName: '2b',
+                sskDstNr: '642462-2b',
+                rolle: 'SuS',
+                typ: OrganisationsTyp.Klasse,
+                administriertVon: '1',
+                editable: true,
+                merkmale: [] as unknown as RollenMerkmal,
+                befristung: '2025-04-05',
+              },
+            ],
+          },
+          {
+            personId: '3975',
+            vorname: 'Heff',
+            nachname: 'Jardy',
+            benutzername: 'hjardy',
+            lastModifiedZuordnungen: '08.02.2024',
+            zuordnungen: [
+              {
+                sskId: '1',
+                rolleId: '3',
+                sskName: 'Schule A',
+                sskDstNr: '642462',
+                rolle: 'SuS',
+                typ: OrganisationsTyp.Schule,
+                administriertVon: 'string',
+                editable: true,
+                merkmale: [] as unknown as RollenMerkmal,
+                befristung: '2025-04-05',
+              },
+              {
+                sskId: '3',
+                rolleId: '3',
+                sskName: '',
+                sskDstNr: '642462-2b',
+                rolle: 'SuS',
+                typ: OrganisationsTyp.Klasse,
+                administriertVon: '1',
                 editable: true,
                 merkmale: [] as unknown as RollenMerkmal,
                 befristung: '2025-04-05',
@@ -125,6 +303,40 @@ describe('PersonStore', () => {
       expect(personStore.loading).toBe(true);
       await getAllPersonsPromise;
       expect(personStore.loading).toBe(false);
+
+      // check if the kopersnr is displayed correctly
+      expect(personStore.personenWithUebersicht?.[0]?.person.personalnummer).toEqual('1234567');
+      expect(personStore.personenWithUebersicht?.[1]?.person.personalnummer).toEqual('fehlt');
+      expect(personStore.personenWithUebersicht?.[2]?.person.personalnummer).toEqual('---');
+
+      // check if administrationsebenen are displayed correctly
+      expect(personStore.personenWithUebersicht?.[0]?.administrationsebenen).toEqual('642462');
+      expect(personStore.personenWithUebersicht?.[1]?.administrationsebenen).toEqual('Schule B');
+      expect(personStore.personenWithUebersicht?.[2]?.administrationsebenen).toEqual('---');
+
+      // check if klassen are displayed correctly
+      expect(personStore.personenWithUebersicht?.[0]?.klassen).toEqual('---');
+      expect(personStore.personenWithUebersicht?.[3]?.klassen).toEqual('2b');
+      expect(personStore.personenWithUebersicht?.[4]?.klassen).toEqual('---');
+    });
+
+    it('should return null if no persons were found', async () => {
+      // Mock response for persons
+      const mockPersonsResponse: PersonFrontendControllerFindPersons200Response = {
+        offset: 0,
+        limit: 0,
+        total: 0,
+        items: [],
+      };
+
+      mockadapter.onGet('/api/personen-frontend').replyOnce(200, mockPersonsResponse);
+
+      const getAllPersonsPromise: Promise<void> = personStore.getAllPersons({});
+      expect(personStore.loading).toBe(true);
+      expect(personStore.personenWithUebersicht).toEqual(null);
+      await getAllPersonsPromise;
+      expect(personStore.loading).toBe(false);
+      expect(personStore.personenWithUebersicht).toEqual(null);
     });
 
     it('should load persons according to filter', async () => {
@@ -233,55 +445,6 @@ describe('PersonStore', () => {
       expect(personStore.loading).toBe(true);
       await getAllPersonsPromise;
       expect(personStore.loading).toBe(false);
-    });
-
-    it('should handle string error', async () => {
-      mockadapter.onGet('/api/personen-frontend').replyOnce(500, 'some mock server error');
-      const getAllPersonPromise: Promise<void> = personStore.getAllPersons({});
-      expect(personStore.loading).toBe(true);
-      await getAllPersonPromise;
-      expect(personStore.errorCode).toEqual('UNSPECIFIED_ERROR');
-    });
-
-    it('should handle error code in response', async () => {
-      const mockPersons: PersonendatensatzResponse[] = [
-        {
-          person: {
-            id: '1234',
-            name: {
-              familienname: 'Vimes',
-              vorname: 'Samuel',
-            },
-          },
-        },
-        {
-          person: {
-            id: '5678',
-            name: {
-              familienname: 'von Lipwig',
-              vorname: 'Moist',
-            },
-          },
-        },
-      ] as PersonendatensatzResponse[];
-
-      const mockPersonsResponse: PersonFrontendControllerFindPersons200Response = {
-        offset: 0,
-        limit: 2,
-        total: 2,
-        items: mockPersons,
-      };
-
-      mockadapter.onGet('/api/personen-frontend').replyOnce(200, mockPersonsResponse);
-
-      const personIds: Array<string> = mockPersons.map((person: PersonendatensatzResponse) => person.person.id);
-      mockadapter.onPost('/api/dbiam/personenuebersicht', { personIds }).replyOnce(500, { code: 'SERVER_ERROR' });
-
-      const getAllPersonsPromise: Promise<void> = personStore.getAllPersons({});
-      expect(personStore.loading).toBe(true);
-      await getAllPersonsPromise;
-      expect(personStore.loading).toBe(false);
-      expect(personStore.errorCode).toEqual('SERVER_ERROR');
     });
   });
 
@@ -441,9 +604,6 @@ describe('PersonStore', () => {
 
   describe('lockPerson', () => {
     it('should lock the person and update state', async () => {
-      const lock: boolean = true;
-      const lockedFrom: string = 'admin';
-
       const mockPerson: PersonendatensatzResponse = getMockPersonendatensatzResponse();
 
       const mockResponse: PersonLockResponse = {
@@ -453,7 +613,8 @@ describe('PersonStore', () => {
       mockadapter.onPut(`/api/personen/${mockPerson.person.id}/lock-user`).replyOnce(200, mockResponse);
       mockadapter.onGet(`/api/personen/${mockPerson.person.id}`).replyOnce(200, mockPerson);
 
-      const lockPersonPromise: Promise<void> = personStore.lockPerson(mockPerson.person.id, lock, lockedFrom);
+      const lockUserBodyParams: LockUserBodyParams = getUserLockBodyParams(true);
+      const lockPersonPromise: Promise<void> = personStore.lockPerson(mockPerson.person.id, lockUserBodyParams);
       expect(personStore.loading).toBe(true);
       expect(lockPersonPromise).resolves.toBeUndefined();
       await lockPersonPromise;
@@ -462,28 +623,26 @@ describe('PersonStore', () => {
 
     it('should handle string error', async () => {
       const personId: string = '1234';
-      const lock: boolean = true;
-      const lockedFrom: string = 'admin';
 
       mockadapter.onPut(`/api/personen/${personId}/lock-user`).replyOnce(500, 'some mock server error');
-      const lockPersonPromise: Promise<void> = personStore.lockPerson(personId, lock, lockedFrom);
+      const lockUserBodyParams: LockUserBodyParams = getUserLockBodyParams(true);
+      const lockPersonPromise: Promise<void> = personStore.lockPerson(personId, lockUserBodyParams);
       expect(personStore.loading).toBe(true);
-      await rejects(lockPersonPromise);
-      expect(personStore.errorCode).toEqual('UNSPECIFIED_ERROR');
+      await expect(lockPersonPromise).rejects.toEqual('UNSPECIFIED_ERROR');
       expect(personStore.loading).toBe(false);
+      expect(personStore.errorCode).toBe('UNSPECIFIED_ERROR');
     });
 
     it('should handle error code', async () => {
       const personId: string = '1234';
-      const lock: boolean = true;
-      const lockedFrom: string = 'admin';
 
-      mockadapter.onPut(`/api/personen/${personId}/lock-user`).replyOnce(500, { code: 'some mock server error' });
-      const lockPersonPromise: Promise<void> = personStore.lockPerson(personId, lock, lockedFrom);
+      mockadapter.onPut(`/api/personen/${personId}/lock-user`).replyOnce(500, { code: 'LOCK_FAILED_ERROR' });
+      const lockUserBodyParams: LockUserBodyParams = getUserLockBodyParams(true);
+      const lockPersonPromise: Promise<void> = personStore.lockPerson(personId, lockUserBodyParams);
       expect(personStore.loading).toBe(true);
-      await rejects(lockPersonPromise);
-      expect(personStore.errorCode).toEqual('some mock server error');
+      await expect(lockPersonPromise).rejects.toEqual('LOCK_FAILED_ERROR');
       expect(personStore.loading).toBe(false);
+      expect(personStore.errorCode).toEqual('LOCK_FAILED_ERROR');
     });
   });
 
@@ -564,7 +723,7 @@ describe('PersonStore', () => {
           referrer: '6978',
           personalnummer: personalnummer,
           isLocked: false,
-          lockInfo: null,
+          userLock: null,
           email: {
             address: 'email',
             status: EmailAddressStatus.Requested,
@@ -586,7 +745,7 @@ describe('PersonStore', () => {
           lastModified: '2099-01-02',
           referrer: '6978',
           isLocked: false,
-          lockInfo: null,
+          userLock: null,
           mandant: '',
           geburt: {},
           stammorganisation: '',

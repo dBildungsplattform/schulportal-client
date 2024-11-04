@@ -87,28 +87,33 @@ export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, 
             validateStatus: null,
           });
 
-        this.isAuthed = loginStatus >= 200 && loginStatus < 400;
-        this.currentUser = data;
-        this.acr = data.acr as StepUpLevel;
+        if (loginStatus >= 200 && loginStatus < 400) {
+          this.isAuthed = true;
+          this.currentUser = data;
+          this.acr = data.acr as StepUpLevel;
 
-        /* extract all system permissions from current user's personenkontexte */
-        const personenkontexte: Array<UserinfoPersonenkontext> | null = this.currentUser.personenkontexte;
-        personenkontexte?.forEach((personenkontext: UserinfoPersonenkontext) => {
-          personenkontext.rolle.systemrechte.forEach((systemrecht: string) => {
-            /* push unique permissions only */
-            if (this.currentUserPermissions.indexOf(systemrecht) === -1) this.currentUserPermissions.push(systemrecht);
+          /* extract all system permissions from current user's personenkontexte */
+          const personenkontexte: Array<UserinfoPersonenkontext> | null = this.currentUser.personenkontexte;
+          personenkontexte?.forEach((personenkontext: UserinfoPersonenkontext) => {
+            personenkontext.rolle.systemrechte.forEach((systemrecht: string) => {
+              /* push unique permissions only */
+              if (this.currentUserPermissions.indexOf(systemrecht) === -1)
+                this.currentUserPermissions.push(systemrecht);
+            });
           });
-        });
 
-        /* set permission aliases for easier global access */
-        this.hasKlassenverwaltungPermission = this.currentUserPermissions.includes('KLASSEN_VERWALTEN');
-        this.hasPersonenverwaltungPermission = this.currentUserPermissions.includes('PERSONEN_VERWALTEN');
-        this.hasPersonenLoeschenPermission = this.currentUserPermissions.includes('PERSONEN_SOFORT_LOESCHEN');
-        this.hasRollenverwaltungPermission = this.currentUserPermissions.includes('ROLLEN_VERWALTEN');
-        this.hasSchulverwaltungPermission = this.currentUserPermissions.includes('SCHULEN_VERWALTEN');
-        this.hasSchultraegerverwaltungPermission = this.currentUserPermissions.includes('SCHULTRAEGER_VERWALTEN');
-        this.hasPersonenSyncPermission = this.currentUserPermissions.includes('PERSON_SYNCHRONISIEREN');
-        this.hasPersonenAnlegenPermission = this.currentUserPermissions.includes('PERSONEN_ANLEGEN');
+          /* set permission aliases for easier global access */
+          this.hasKlassenverwaltungPermission = this.currentUserPermissions.includes('KLASSEN_VERWALTEN');
+          this.hasPersonenverwaltungPermission = this.currentUserPermissions.includes('PERSONEN_VERWALTEN');
+          this.hasPersonenLoeschenPermission = this.currentUserPermissions.includes('PERSONEN_SOFORT_LOESCHEN');
+          this.hasRollenverwaltungPermission = this.currentUserPermissions.includes('ROLLEN_VERWALTEN');
+          this.hasSchulverwaltungPermission = this.currentUserPermissions.includes('SCHULEN_VERWALTEN');
+          this.hasSchultraegerverwaltungPermission = this.currentUserPermissions.includes('SCHULTRAEGER_VERWALTEN');
+          this.hasPersonenSyncPermission = this.currentUserPermissions.includes('PERSON_SYNCHRONISIEREN');
+          this.hasPersonenAnlegenPermission = this.currentUserPermissions.includes('PERSONEN_ANLEGEN');
+        } else {
+          throw new Error('User info could not be retrieved.');
+        }
       } catch {
         // If user info can't be retrieved, consider the user unauthenticated.
         this.isAuthed = false;

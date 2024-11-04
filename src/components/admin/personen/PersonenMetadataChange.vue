@@ -2,19 +2,13 @@
   import { useI18n, type Composer } from 'vue-i18n';
   import type { BaseFieldProps } from 'vee-validate';
   import KopersInput from '@/components/admin/personen/KopersInput.vue';
-  import { type Ref, type WritableComputedRef, computed, ref } from 'vue';
-  import { useDisplay } from 'vuetify';
-  import LayoutCard from '@/components/cards/LayoutCard.vue';
+  import { type Ref, ref } from 'vue';
   import FormRow from '@/components/form/FormRow.vue';
 
   const { t }: Composer = useI18n({ useScope: 'global' });
 
-  const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
-
   type Props = {
-    confirmUnsavedChangesAction: () => void;
     hasKopersRolle: boolean;
-    showUnsavedChangesDialog?: boolean;
     selectedKopersNrMetadataProps: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     selectedKopersNrMetadata: string | null | undefined;
     selectedVornameProps: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
@@ -48,15 +42,6 @@
     emits('update:selectedFamilienname', value);
   }
 
-  const showDialogValue: WritableComputedRef<boolean | undefined> = computed({
-    get() {
-      return props.showUnsavedChangesDialog;
-    },
-    set(newValue: boolean | undefined) {
-      emits('onShowDialogChange', newValue);
-    },
-  });
-
   type IQSHLink = {
     text: string;
     href: string;
@@ -75,28 +60,39 @@
     <v-row>
       <v-col
         md="5"
+        xs="12"
+        cols="12"
         class="pl-md-14"
       >
         <span class="text-body bold">
-          <v-icon
-            aria-hidden="true"
-            class="mr-2"
-            icon="mdi-alert-circle-outline"
-            size="small"
-          ></v-icon>
-          <span> {{ $t('admin.person.personalInfoChangeNotice') }} </span>
-          <span>
-            <a
-              :href="link.href"
-              :target="link.external ? '_blank' : '_self'"
-            >
-              {{ link.text }}</a
-            >.
-          </span>
+          <div>
+            <v-icon
+              aria-hidden="true"
+              class="mr-2"
+              icon="mdi-alert-circle-outline"
+              size="small"
+            ></v-icon>
+            <span> {{ $t('admin.person.personalInfoChangeNotice') }} </span>
+          </div>
+          <div class="mt-4">
+            <p>
+              {{ $t('admin.person.personalInfoChangeNotice2') }}
+              <span>
+                <a
+                  :href="link.href"
+                  :target="link.external ? '_blank' : '_self'"
+                >
+                  {{ link.text }}</a
+                >.
+              </span>
+            </p>
+          </div>
         </span>
       </v-col>
       <v-col
         md="7"
+        xs="12"
+        cols="12"
         class="pr-md-14"
       >
         <!-- Vorname -->
@@ -154,64 +150,11 @@
       </v-col>
     </v-row>
   </div>
-  <!-- Warning dialog for unsaved changes -->
-  <v-dialog
-    data-testid="unsaved-changes-dialog"
-    ref="unsaved-changes-dialog"
-    persistent
-    v-model="showDialogValue"
-  >
-    <LayoutCard :header="$t('unsavedChanges.title')">
-      <v-card-text>
-        <v-container>
-          <v-row class="text-body bold px-md-16">
-            <v-col>
-              <p data-testid="unsaved-changes-warning-text">
-                {{ $t('unsavedChanges.message') }}
-              </p>
-            </v-col>
-          </v-row>
-        </v-container>
-      </v-card-text>
-      <v-card-actions class="justify-center">
-        <v-row class="justify-center">
-          <v-col
-            cols="12"
-            sm="6"
-            md="auto"
-          >
-            <v-btn
-              @click.stop="confirmUnsavedChangesAction"
-              class="secondary button"
-              data-testid="confirm-unsaved-changes-button"
-              :block="mdAndDown"
-            >
-              {{ $t('yes') }}
-            </v-btn>
-          </v-col>
-          <v-col
-            cols="12"
-            sm="6"
-            md="auto"
-          >
-            <v-btn
-              @click.stop="showDialogValue = false"
-              class="primary button"
-              data-testid="close-unsaved-changes-dialog-button"
-              :block="mdAndDown"
-            >
-              {{ $t('no') }}
-            </v-btn>
-          </v-col>
-        </v-row>
-      </v-card-actions>
-    </LayoutCard>
-  </v-dialog>
 </template>
 
 <style scoped>
   span {
-    white-space: pre;
+    white-space: normal;
     text-wrap: pretty;
   }
 </style>

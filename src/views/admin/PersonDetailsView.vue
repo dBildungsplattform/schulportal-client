@@ -48,6 +48,7 @@
   import { isBefristungspflichtRolle, useBefristungUtils, type BefristungUtilsType } from '@/utils/befristung';
   import { formatDate, formatDateToISO, getNextSchuljahresende } from '@/utils/date';
   import {
+    getDirtyState,
     getPersonenkontextFieldDefinitions,
     getValidationSchema,
     type PersonenkontextFieldDefinitions,
@@ -67,6 +68,7 @@
   } from 'vue-router';
   import { useDisplay } from 'vuetify';
   import { object, string, StringSchema, type AnyObject } from 'yup';
+  import type { LockUserBodyParams } from '@/api-client/generated';
   import type { TranslatedObject } from '@/types';
   import { DIN_91379A, NO_LEADING_TRAILING_SPACES } from '@/utils/validation';
 
@@ -135,8 +137,14 @@
     password.value = personStore.newPassword || '';
   }
 
-  function onLockUser(personId: string, lock: boolean, organisation: string): void {
-    personStore.lockPerson(personId, lock, organisation);
+  async function onLockUser(lockedBy: string, date: string | undefined): Promise<void> {
+    if (!personStore.currentPerson) return;
+    let bodyParams: LockUserBodyParams = {
+      lock: !personStore.currentPerson.person.isLocked,
+      locked_by: lockedBy,
+      locked_until: date,
+    };
+    await personStore.lockPerson(personStore.currentPerson.person.id, bodyParams);
   }
 
   const handleAlertClose = (): void => {
@@ -174,15 +182,15 @@
   }
 
   // translate keys and format attributes for display
-  const getLockInfo: ComputedRef<{ key: string; attribute: string }[]> = computed(() => {
+  const getuserLock: ComputedRef<{ key: string; attribute: string }[]> = computed(() => {
     if (!personStore.currentPerson?.person.isLocked) return [];
 
-    const { lockInfo }: Person = personStore.currentPerson.person;
-    if (!lockInfo) return [];
+    const { userLock }: Person = personStore.currentPerson.person;
+    if (!userLock) return [];
 
-    return Object.entries(lockInfo).map(([key, attribute]: [string, string]) => {
+    return Object.entries(userLock).map(([key, attribute]: [string, string]) => {
       switch (key) {
-        case LockKeys.LockedFrom:
+        case LockKeys.LockedBy:
           return {
             key: t('person.lockedBy'),
             attribute: organisationStore.lockingOrganisation
@@ -190,14 +198,19 @@
               : t('admin.organisation.unknownOrganisation'),
           };
 
-        case LockKeys.Timestamp:
+        case LockKeys.CreatedAt:
           return {
-            key: t('since'),
+            key: t('person.lockedSince'),
             attribute: new Intl.DateTimeFormat('de-DE', {
               year: 'numeric',
               month: '2-digit',
               day: '2-digit',
             }).format(new Date(attribute)),
+          };
+        case LockKeys.LockedUntil:
+          return {
+            key: t('person.lockedUntil'),
+            attribute,
           };
 
         default:
@@ -209,8 +222,8 @@
   watch(
     () => personStore.currentPerson?.person,
     async (person: Person | undefined) => {
-      if (!(person && person.isLocked && person.lockInfo)) return;
-      await organisationStore.getLockingOrganisationById(person.lockInfo.lock_locked_from);
+      if (!(person && person.isLocked && person.userLock)) return;
+      await organisationStore.getLockingOrganisationById(person.userLock.locked_by);
     },
   );
 
@@ -498,6 +511,10 @@
     validationSchema: getValidationSchema(t, hasNoKopersNr, hasKopersNummer),
   });
 
+  
+  const isZuordnungCreationFormDirty: ComputedRef<boolean> = computed(() => getDirtyState(formContext));
+
+
   const {
     selectedRolle,
     selectedRolleProps,
@@ -518,6 +535,7 @@
     defineField: defineFieldChangeKlasse,
     handleSubmit: handleSubmitChangeKlasse,
     resetForm: resetChangeKlasseForm,
+    isFieldDirty: isChangeKlasseFieldDirty,
   } = useForm<ChangeKlasseForm>({
     validationSchema: changeKlasseValidationSchema,
   });
@@ -527,7 +545,7 @@
     defineField: defineFieldChangePersonMetadata,
     handleSubmit: handleSubmitChangePersonMetadata,
     resetForm: resetFormChangePersonMetadata,
-    isFieldDirty: isFieldDirtyChangePersonMetadata,
+    isFieldDirty: isChangePersonMetadataFieldDirty,
     setFieldValue: setFieldValueChangePersonMetadata,
   } = useForm<ChangePersonMetadata>({
     validationSchema: changePersonMetadataValidationSchema,
@@ -995,8 +1013,20 @@
       resetFormChangePersonMetadata();
     });
 
+  // Checks for dirtiness depending on the active form
   function isFormDirty(): boolean {
-    return isFieldDirtyChangePersonMetadata('selectedKopersNrMetadata');
+    if(isEditPersonMetadataActive.value){
+    return isChangePersonMetadataFieldDirty('selectedKopersNrMetadata') || isChangePersonMetadataFieldDirty('selectedVorname') || 
+    isChangePersonMetadataFieldDirty('selectedFamilienname');
+  }
+  else if (isChangeKlasseFormActive.value){
+    return isChangeKlasseFieldDirty('selectedSchule') || isChangeKlasseFieldDirty('selectedNewKlasse');
+  }
+
+  else if (isEditActive.value){
+    return isZuordnungCreationFormDirty.value; 
+  }
+  return false;
   }
 
   function handleConfirmUnsavedChanges(): void {
@@ -1225,7 +1255,7 @@
                       <v-btn
                         :disabled="isEditActive"
                         class="primary ml-lg-8"
-                        data-testid="zuordnung-edit-button"
+                        data-testid="metadata-edit-button"
                         @Click="triggerPersonMetadataEdit"
                         :block="mdAndDown"
                       >
@@ -1375,23 +1405,21 @@
             @submit="onSubmitChangePersonMetadata"
           >
             <PersonenMetadataChange
-              :confirmUnsavedChangesAction="handleConfirmUnsavedChanges"
+              ref="person-metadata-change"
               :selectedVornameProps="selectedVornameProps"
               :selectedVorname="personStore.currentPerson?.person.name.vorname"
               :selectedFamiliennameProps="selectedFamiliennameProps"
               :selectedFamilienname="personStore.currentPerson?.person.name.familienname"
               :selectedKopersNrMetadataProps="selectedKopersNrMetadataProps"
               :selectedKopersNrMetadata="personStore.currentPerson?.person.personalnummer"
-              :showUnsavedChangesDialog="showUnsavedChangesDialog"
               :hasKopersRolle="hasKopersRolle"
               @update:selectedKopersNrMetadata="handleSelectedKopersNrUpdate"
               @update:selectedVorname="handleSelectedVorname"
               @update:selectedFamilienname="handleSelectedFamilienname"
-              @onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
             ></PersonenMetadataChange>
             <v-row class="save-cancel-row ml-md-16 pt-md-5 pt-12 justify-end">
               <v-col
-                class="cancel-col"
+                class="cancel-col px-5"
                 cols="12"
                 sm="6"
                 md="auto"
@@ -1409,6 +1437,7 @@
                 cols="12"
                 sm="6"
                 md="auto"
+                class="px-5"
               >
                 <SpshTooltip
                   :enabledCondition="!hasSameMetadata"
@@ -1563,7 +1592,7 @@
               </v-col>
               <v-col
                 cols="12"
-                v-for="zuordnung in getZuordnungen?.filter((zuordnung) => zuordnung.editable)"
+                v-for="zuordnung in getZuordnungen?.filter((zuordnung: Zuordnung) => zuordnung.editable)"
                 :key="zuordnung.sskId"
                 :data-testid="`person-zuordnung-${zuordnung.sskId}`"
                 :title="zuordnung.sskName"
@@ -1639,7 +1668,7 @@
                     >
                   </span>
                 </template>
-                <!-- Template  to show when the change Klasse is pending -->
+                <!-- Template to show when the change Klasse is pending -->
                 <template v-else-if="pendingChangeKlasse">
                   <div class="d-flex flex-column">
                     <span
@@ -1705,7 +1734,9 @@
                     :errorCode="personStore.errorCode"
                     :person="personStore.currentPerson"
                     :disabled="selectedZuordnungen.length === 0"
-                    :zuordnungCount="zuordnungenResult?.filter((zuordnung) => zuordnung.editable).length ?? 0"
+                    :zuordnungCount="
+                      zuordnungenResult?.filter((zuordnung: Zuordnung) => zuordnung.editable).length ?? 0
+                    "
                     @onDeletePersonenkontext="prepareDeletion"
                   >
                   </PersonenkontextDelete>
@@ -2055,8 +2086,8 @@
                           "
                         >
                           {{
-                            `${$t('admin.person.twoFactorAuthentication.serial')}:
-                          ${twoFactorAuthentificationStore.serial}`
+                            `${$t('admin.person.twoFactorAuthentication.serial')}: ` +
+                            `${twoFactorAuthentificationStore.serial}`
                           }}
                         </p>
                       </template>
@@ -2096,15 +2127,15 @@
                       md="auto"
                     >
                       <SpshTooltip
-                        v-if="twoFactorAuthentificationStore.hasToken"
-                        :enabledCondition="twoFactorAuthentificationStore.hasToken"
+                        :enabledCondition="!isEditActive && !isEditPersonMetadataActive"
                         :disabledText="$t('person.finishEditFirst')"
                         :enabledText="$t('admin.person.twoFactorAuthentication.tokenReset')"
                         position="start"
                       >
                         <TokenReset
+                          v-if="twoFactorAuthentificationStore.hasToken"
                           :errorCode="twoFactorAuthentificationStore.errorCode"
-                          :disabled="isEditActive"
+                          :disabled="isEditActive || isEditPersonMetadataActive"
                           :person="personStore.currentPerson"
                           :tokenType="twoFactorAuthentificationStore.tokenKind"
                           :personId="currentPersonId"
@@ -2112,14 +2143,21 @@
                         >
                         </TokenReset>
                       </SpshTooltip>
+                      <SpshTooltip
+                        :enabledCondition="!isEditActive && !isEditPersonMetadataActive"
+                        :disabledText="$t('person.finishEditFirst')"
+                        :enabledText="$t('admin.person.twoFactorAuthentication.setUpShort')"
+                        position="start"
+                      >
                       <TwoFactorAuthenticationSetUp
-                        v-else
+                        v-if="!twoFactorAuthentificationStore.hasToken"
                         :errorCode="twoFactorAuthentificationStore.errorCode"
-                        :disabled="isEditActive"
+                        :disabled="isEditActive || isEditPersonMetadataActive"
                         :person="personStore.currentPerson"
                         @dialogClosed="twoFactorAuthentificationStore.get2FAState(currentPersonId)"
                       >
                       </TwoFactorAuthenticationSetUp>
+                    </SpshTooltip>
                     </v-col>
                   </div>
                 </v-col>
@@ -2160,7 +2198,7 @@
                 </v-row>
                 <v-row
                   class="mt-0"
-                  v-for="({ key, attribute }, index) of getLockInfo"
+                  v-for="({ key, attribute }, index) of getuserLock"
                   :key="key"
                   cols="10"
                 >
@@ -2620,6 +2658,61 @@
         </v-card-actions>
       </LayoutCard>
     </v-dialog>
+
+      <!-- Warning dialog for unsaved changes -->
+  <v-dialog
+    data-testid="unsaved-changes-dialog"
+    ref="unsaved-changes-dialog"
+    persistent
+    v-model="showUnsavedChangesDialog"
+  >
+    <LayoutCard :header="$t('unsavedChanges.title')">
+      <v-card-text>
+        <v-container>
+          <v-row class="text-body bold px-md-16">
+            <v-col>
+              <p data-testid="unsaved-changes-warning-text">
+                {{ $t('unsavedChanges.message') }}
+              </p>
+            </v-col>
+          </v-row>
+        </v-container>
+      </v-card-text>
+      <v-card-actions class="justify-center">
+        <v-row class="justify-center">
+          <v-col
+            cols="12"
+            sm="6"
+            md="auto"
+          >
+            <v-btn
+              @click.stop="handleConfirmUnsavedChanges"
+              class="secondary button"
+              data-testid="confirm-unsaved-changes-button"
+              :block="mdAndDown"
+            >
+              {{ $t('yes') }}
+            </v-btn>
+          </v-col>
+          <v-col
+            cols="12"
+            sm="6"
+            md="auto"
+          >
+            <v-btn
+              @click.stop="showUnsavedChangesDialog = false"
+              class="primary button"
+              data-testid="close-unsaved-changes-dialog-button"
+              :block="mdAndDown"
+            >
+              {{ $t('no') }}
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-card-actions>
+    </LayoutCard>
+  </v-dialog>
+    
   </div>
 </template>
 
@@ -2635,7 +2728,7 @@
   }
 
   span {
-    white-space: pre;
+    white-space: normal;
     text-wrap: pretty;
   }
 </style>
