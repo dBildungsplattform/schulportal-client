@@ -44,6 +44,7 @@ authStore.currentUser = {
 };
 
 authStore.hasPersonenverwaltungPermission = true;
+authStore.hasImportPermission = true;
 authStore.hasKlassenverwaltungPermission = true;
 authStore.hasRollenverwaltungPermission = true;
 authStore.hasSchulverwaltungPermission = true;
@@ -90,6 +91,7 @@ describe('MenuBar', () => {
     expect(wrapper?.find('[data-testid="person-management-title"]').isVisible()).toBe(true);
     expect(wrapper?.find('[data-testid="person-management-menu-item"]').isVisible()).toBe(true);
     expect(wrapper?.find('[data-testid="person-creation-menu-item"]').isVisible()).toBe(true);
+    expect(wrapper?.find('[data-testid="person-import-menu-item"]').isVisible()).toBe(true);
 
     expect(wrapper?.find('[data-testid="klasse-management-title"]').isVisible()).toBe(true);
     expect(wrapper?.find('[data-testid="klassen-management-menu-item"]').isVisible()).toBe(true);
@@ -112,7 +114,19 @@ describe('MenuBar', () => {
     await wrapper?.find('[data-testid="person-management-menu-item"]').trigger('click');
     await nextTick();
 
-    expect(push).toHaveBeenCalledTimes(1);
+    await wrapper?.find('[data-testid="person-import-menu-item"]').trigger('click');
+    await nextTick();
+
+    await wrapper?.find('[data-testid="klassen-management-menu-item"]').trigger('click');
+    await nextTick();
+
+    await wrapper?.find('[data-testid="rollen-management-menu-item"]').trigger('click');
+    await nextTick();
+
+    await wrapper?.find('[data-testid="schule-management-menu-item"]').trigger('click');
+    await nextTick();
+
+    expect(push).toHaveBeenCalledTimes(4);
   });
 
   // TODO: can we rely on vuetify's mobile breakpoint in tests?
