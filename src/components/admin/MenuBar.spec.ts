@@ -126,7 +126,7 @@ describe('MenuBar', () => {
     await wrapper?.find('[data-testid="schule-management-menu-item"]').trigger('click');
     await nextTick();
 
-    expect(push).toHaveBeenCalledTimes(4);
+    expect(push).toHaveBeenCalledTimes(5);
   });
 
   // TODO: can we rely on vuetify's mobile breakpoint in tests?
