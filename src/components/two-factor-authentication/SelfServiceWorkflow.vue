@@ -76,6 +76,10 @@
         });
         break;
       case TwoFactorSteps.Verify:
+        if (otp.value.length !== 6) {
+          errorMessage.value = t('admin.person.twoFactorAuthentication.otpNotSelected');
+          return;
+        }
         await twoFactorStore.verify2FAToken(props.personId, otp.value);
 
         if (twoFactorStore.errorCode !== '') {
