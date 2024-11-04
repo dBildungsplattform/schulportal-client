@@ -48,6 +48,7 @@
   import { isBefristungspflichtRolle, useBefristungUtils, type BefristungUtilsType } from '@/utils/befristung';
   import { formatDate, formatDateToISO, getNextSchuljahresende } from '@/utils/date';
   import {
+    getDirtyState,
     getPersonenkontextFieldDefinitions,
     getValidationSchema,
     type PersonenkontextFieldDefinitions,
@@ -510,6 +511,10 @@
     validationSchema: getValidationSchema(t, hasNoKopersNr, hasKopersNummer),
   });
 
+  
+  const isZuordnungCreationFormDirty: ComputedRef<boolean> = computed(() => getDirtyState(formContext));
+
+
   const {
     selectedRolle,
     selectedRolleProps,
@@ -530,6 +535,7 @@
     defineField: defineFieldChangeKlasse,
     handleSubmit: handleSubmitChangeKlasse,
     resetForm: resetChangeKlasseForm,
+    isFieldDirty: isChangeKlasseFieldDirty,
   } = useForm<ChangeKlasseForm>({
     validationSchema: changeKlasseValidationSchema,
   });
@@ -539,7 +545,7 @@
     defineField: defineFieldChangePersonMetadata,
     handleSubmit: handleSubmitChangePersonMetadata,
     resetForm: resetFormChangePersonMetadata,
-    isFieldDirty: isFieldDirtyChangePersonMetadata,
+    isFieldDirty: isChangePersonMetadataFieldDirty,
     setFieldValue: setFieldValueChangePersonMetadata,
   } = useForm<ChangePersonMetadata>({
     validationSchema: changePersonMetadataValidationSchema,
@@ -1007,8 +1013,20 @@
       resetFormChangePersonMetadata();
     });
 
+  // Checks for dirtiness depending on the active form
   function isFormDirty(): boolean {
-    return isFieldDirtyChangePersonMetadata('selectedKopersNrMetadata');
+    if(isEditPersonMetadataActive.value){
+    return isChangePersonMetadataFieldDirty('selectedKopersNrMetadata') || isChangePersonMetadataFieldDirty('selectedVorname') || 
+    isChangePersonMetadataFieldDirty('selectedFamilienname');
+  }
+  else if (isChangeKlasseFormActive.value){
+    return isChangeKlasseFieldDirty('selectedSchule') || isChangeKlasseFieldDirty('selectedNewKlasse');
+  }
+
+  else if (isEditActive.value){
+    return isZuordnungCreationFormDirty.value; 
+  }
+  return false;
   }
 
   function handleConfirmUnsavedChanges(): void {
@@ -1233,7 +1251,7 @@
                       <v-btn
                         :disabled="isEditActive"
                         class="primary ml-lg-8"
-                        data-testid="zuordnung-edit-button"
+                        data-testid="metadata-edit-button"
                         @Click="triggerPersonMetadataEdit"
                         :block="mdAndDown"
                       >
@@ -1383,19 +1401,17 @@
             @submit="onSubmitChangePersonMetadata"
           >
             <PersonenMetadataChange
-              :confirmUnsavedChangesAction="handleConfirmUnsavedChanges"
+              ref="person-metadata-change"
               :selectedVornameProps="selectedVornameProps"
               :selectedVorname="personStore.currentPerson?.person.name.vorname"
               :selectedFamiliennameProps="selectedFamiliennameProps"
               :selectedFamilienname="personStore.currentPerson?.person.name.familienname"
               :selectedKopersNrMetadataProps="selectedKopersNrMetadataProps"
               :selectedKopersNrMetadata="personStore.currentPerson?.person.personalnummer"
-              :showUnsavedChangesDialog="showUnsavedChangesDialog"
               :hasKopersRolle="hasKopersRolle"
               @update:selectedKopersNrMetadata="handleSelectedKopersNrUpdate"
               @update:selectedVorname="handleSelectedVorname"
               @update:selectedFamilienname="handleSelectedFamilienname"
-              @onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
             ></PersonenMetadataChange>
             <v-row class="save-cancel-row ml-md-16 pt-md-5 pt-12 justify-end">
               <v-col
@@ -2638,6 +2654,61 @@
         </v-card-actions>
       </LayoutCard>
     </v-dialog>
+
+      <!-- Warning dialog for unsaved changes -->
+  <v-dialog
+    data-testid="unsaved-changes-dialog"
+    ref="unsaved-changes-dialog"
+    persistent
+    v-model="showUnsavedChangesDialog"
+  >
+    <LayoutCard :header="$t('unsavedChanges.title')">
+      <v-card-text>
+        <v-container>
+          <v-row class="text-body bold px-md-16">
+            <v-col>
+              <p data-testid="unsaved-changes-warning-text">
+                {{ $t('unsavedChanges.message') }}
+              </p>
+            </v-col>
+          </v-row>
+        </v-container>
+      </v-card-text>
+      <v-card-actions class="justify-center">
+        <v-row class="justify-center">
+          <v-col
+            cols="12"
+            sm="6"
+            md="auto"
+          >
+            <v-btn
+              @click.stop="handleConfirmUnsavedChanges"
+              class="secondary button"
+              data-testid="confirm-unsaved-changes-button"
+              :block="mdAndDown"
+            >
+              {{ $t('yes') }}
+            </v-btn>
+          </v-col>
+          <v-col
+            cols="12"
+            sm="6"
+            md="auto"
+          >
+            <v-btn
+              @click.stop="showUnsavedChangesDialog = false"
+              class="primary button"
+              data-testid="close-unsaved-changes-dialog-button"
+              :block="mdAndDown"
+            >
+              {{ $t('no') }}
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-card-actions>
+    </LayoutCard>
+  </v-dialog>
+    
   </div>
 </template>
 
