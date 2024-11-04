@@ -156,9 +156,27 @@
         class="pb-0"
       >
         <SpshTooltip
+          v-if="!person.person.isLocked"
           :enabledCondition="!disabled"
           :disabledText="$t('person.finishEditFirst')"
           :enabledText="$t('person.lockUser')"
+          position="start"
+        >
+          <v-btn
+            class="primary"
+            data-testid="open-lock-dialog-icon"
+            :disabled="disabled"
+            :block="mdAndDown"
+            v-bind="props"
+          >
+            {{ !person.person.isLocked ? $t('person.lockUser') : $t('person.unlockUser') }}
+          </v-btn>
+        </SpshTooltip>
+        <SpshTooltip
+          v-else
+          :enabledCondition="!disabled"
+          :disabledText="$t('person.finishEditFirst')"
+          :enabledText="$t('person.unlockUser')"
           position="start"
         >
           <v-btn
