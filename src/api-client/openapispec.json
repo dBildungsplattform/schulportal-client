@@ -2108,6 +2108,33 @@
         "tags": ["import"],
         "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
       }
+    },
+    "/api/import/{importvorgangId}": {
+      "delete": {
+        "operationId": "ImportController_deleteImportTransaction",
+        "summary": "",
+        "description": "Delete a role by id.",
+        "parameters": [
+          {
+            "name": "importvorgangId",
+            "required": true,
+            "in": "path",
+            "description": "The id of an import transaction",
+            "schema": { "nullable": false, "type": "string" }
+          }
+        ],
+        "responses": {
+          "204": { "description": "Import transaction was deleted successfully." },
+          "400": {
+            "description": "Something went wrong with the found import transaction.",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DbiamImportError" } } }
+          },
+          "401": { "description": "Not authorized to delete the import transaction." },
+          "404": { "description": "The import transaction that should be deleted does not exist." }
+        },
+        "tags": ["import"],
+        "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
+      }
     }
   },
   "info": {
@@ -2276,7 +2303,7 @@
           },
           "personalnummer": { "type": "string", "nullable": true },
           "isLocked": { "type": "boolean", "nullable": true },
-          "userLock": { "nullable": true, "allOf": [{ "$ref": "#/components/schemas/UserLockParams" }] },
+          "userLock": { "nullable": true, "type": "array", "items": { "$ref": "#/components/schemas/UserLockParams" } },
           "lastModified": {
             "format": "date-time",
             "type": "string",
@@ -3205,6 +3232,16 @@
         },
         "required": ["organisationId", "rolleId", "file"]
       },
+      "ImportDataItemResponse": {
+        "type": "object",
+        "properties": {
+          "nachname": { "type": "string" },
+          "vorname": { "type": "string" },
+          "klasse": { "type": "string", "nullable": true },
+          "validationErrors": { "type": "array", "items": { "type": "string" } }
+        },
+        "required": ["nachname", "vorname", "klasse", "validationErrors"]
+      },
       "ImportUploadResponse": {
         "type": "object",
         "properties": {
@@ -3212,9 +3249,27 @@
             "type": "string",
             "description": "The import transaction number. it will be needed to execute the import and download the result"
           },
-          "isValid": { "type": "boolean", "description": "It states if the import transaction contain errors." }
+          "isValid": { "type": "boolean", "description": "It states if the import transaction contain errors." },
+          "totalImportDataItems": {
+            "type": "number",
+            "description": "The total number of data items in the CSV file."
+          },
+          "totalInvalidImportDataItems": {
+            "type": "number",
+            "description": "The total number of data items in the CSV file that are invalid."
+          },
+          "invalidImportDataItems": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/ImportDataItemResponse" }
+          }
         },
-        "required": ["importvorgangId", "isValid"]
+        "required": [
+          "importvorgangId",
+          "isValid",
+          "totalImportDataItems",
+          "totalInvalidImportDataItems",
+          "invalidImportDataItems"
+        ]
       },
       "ImportvorgangByIdBodyParams": {
         "type": "object",
@@ -3230,7 +3285,13 @@
         "properties": {
           "i18nKey": {
             "type": "string",
-            "enum": ["IMPORT_ERROR", "CSV_PARSING_ERROR", "CSV_FILE_EMPTY_ERROR", "IMPORT_TEXT_FILE_CREATION_ERROR"]
+            "enum": [
+              "IMPORT_ERROR",
+              "CSV_PARSING_ERROR",
+              "CSV_FILE_EMPTY_ERROR",
+              "IMPORT_TEXT_FILE_CREATION_ERROR",
+              "IMPORT_NUR_LERN_AN_SCHULE_ERROR"
+            ]
           },
           "code": { "type": "number", "description": "Corresponds to HTTP Status code like 200, 404, 500" }
         },

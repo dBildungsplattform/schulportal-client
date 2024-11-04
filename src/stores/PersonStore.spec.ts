@@ -54,13 +54,22 @@ function getMockPersonendatensatzResponse(): PersonendatensatzResponse {
       revision: '1',
       startpasswort: '',
       lastModified: '2024-12-22',
-      userLock: {
-        personId: '1',
-        created_at: new Date().toISOString(),
-        lock_occasion: PersonLockOccasion.MANUELL_GESPERRT,
-        locked_by: 'ME',
-        locked_until: new Date().toISOString(),
-      },
+      userLock: [
+        {
+          personId: '1',
+          created_at: new Date().toISOString(),
+          lock_occasion: PersonLockOccasion.MANUELL_GESPERRT as PersonLockOccasion,
+          locked_by: 'ME',
+          locked_until: new Date().toISOString(),
+        },
+        {
+          personId: '2',
+          created_at: new Date().toISOString(),
+          lock_occasion: PersonLockOccasion.KOPERS_GESPERRT as PersonLockOccasion,
+          locked_by: 'Cron',
+          locked_until: new Date().toISOString(),
+        },
+      ],
     },
   };
 }

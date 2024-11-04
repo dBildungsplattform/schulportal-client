@@ -165,9 +165,7 @@ export function parseUserLock(unparsedArray: object[]): UserLock[] {
 export function mapPersonendatensatzResponseToPersonendatensatz(
   response: PersonendatensatzResponse,
 ): Personendatensatz {
-  const userLock: UserLock[] | null = parseUserLock(
-    Array.isArray(response.person.userLock) ? response.person.userLock : [],
-  );
+  const userLock: UserLock[] | null = parseUserLock(response.person.userLock ? response.person.userLock : []);
   const person: Person = {
     id: response.person.id,
     name: response.person.name,
