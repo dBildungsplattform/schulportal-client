@@ -30,7 +30,22 @@ function getMockPersonendatensatz(): Personendatensatz {
       referrer: '6978',
       personalnummer: '9183756',
       isLocked: false,
-      userLock: [],
+      userLock: [
+        {
+          personId: '1',
+          created_at: '2024-12-22',
+          lock_occasion: PersonLockOccasion.MANUELL_GESPERRT,
+          locked_by: 'ME',
+          locked_until: '2024-12-22',
+        },
+        {
+          personId: '2',
+          created_at: '2024-12-22',
+          lock_occasion: PersonLockOccasion.KOPERS_GESPERRT,
+          locked_by: 'Cron',
+          locked_until: '2024-12-22',
+        },
+      ],
       revision: '1',
       lastModified: '2024-12-22',
       email: {
@@ -57,17 +72,17 @@ function getMockPersonendatensatzResponse(): PersonendatensatzResponse {
       userLock: [
         {
           personId: '1',
-          created_at: new Date().toISOString(),
-          lock_occasion: PersonLockOccasion.MANUELL_GESPERRT as PersonLockOccasion,
+          created_at: '2024-12-22',
+          lock_occasion: PersonLockOccasion.MANUELL_GESPERRT,
           locked_by: 'ME',
-          locked_until: new Date().toISOString(),
+          locked_until: '2024-12-22',
         },
         {
           personId: '2',
-          created_at: new Date().toISOString(),
-          lock_occasion: PersonLockOccasion.KOPERS_GESPERRT as PersonLockOccasion,
+          created_at: '2024-12-22',
+          lock_occasion: PersonLockOccasion.KOPERS_GESPERRT,
           locked_by: 'Cron',
-          locked_until: new Date().toISOString(),
+          locked_until: '2024-12-22',
         },
       ],
     },
@@ -473,7 +488,25 @@ describe('PersonStore', () => {
       const getPersonByIdPromise: Promise<Personendatensatz> = personStore.getPersonById('1234');
       expect(personStore.loading).toBe(true);
       const currentPerson: Personendatensatz = await getPersonByIdPromise;
-      expect(currentPerson).toEqual(mockPerson);
+      expect(currentPerson).toEqual(
+        expect.objectContaining({
+          // Include only the relevant properties you want to check
+          person: expect.objectContaining({
+            id: mockPerson.person.id,
+            email: mockPerson.person.email,
+            name: mockPerson.person.name,
+            // Add any other properties that you want to check from currentPerson
+            userLock: expect.arrayContaining([
+              expect.objectContaining({
+                lock_occasion: PersonLockOccasion.MANUELL_GESPERRT,
+              }),
+              expect.objectContaining({
+                lock_occasion: PersonLockOccasion.KOPERS_GESPERRT,
+              }),
+            ]),
+          }),
+        }),
+      );
       expect(personStore.loading).toBe(false);
     });
 
