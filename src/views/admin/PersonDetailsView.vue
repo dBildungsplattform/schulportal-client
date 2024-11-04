@@ -141,8 +141,13 @@
 
   async function onLockUser(lockedBy: string, date: string | undefined): Promise<void> {
     if (!personStore.currentPerson) return;
+    const isManuallyLocked: boolean =
+      personStore.currentPerson.person.userLock?.some(
+        (lock: UserLock) => lock.lock_occasion === PersonLockOccasion.MANUELL_GESPERRT,
+      ) ?? false; // Default to false if userLock is undefined
+
     let bodyParams: LockUserBodyParams = {
-      lock: !personStore.currentPerson.person.isLocked,
+      lock: !isManuallyLocked,
       locked_by: lockedBy,
       locked_until: date,
     };
@@ -545,9 +550,7 @@
     validationSchema: getValidationSchema(t, hasNoKopersNr, hasKopersNummer),
   });
 
-  
   const isZuordnungCreationFormDirty: ComputedRef<boolean> = computed(() => getDirtyState(formContext));
-
 
   const {
     selectedRolle,
@@ -1049,18 +1052,18 @@
 
   // Checks for dirtiness depending on the active form
   function isFormDirty(): boolean {
-    if(isEditPersonMetadataActive.value){
-    return isChangePersonMetadataFieldDirty('selectedKopersNrMetadata') || isChangePersonMetadataFieldDirty('selectedVorname') || 
-    isChangePersonMetadataFieldDirty('selectedFamilienname');
-  }
-  else if (isChangeKlasseFormActive.value){
-    return isChangeKlasseFieldDirty('selectedSchule') || isChangeKlasseFieldDirty('selectedNewKlasse');
-  }
-
-  else if (isEditActive.value){
-    return isZuordnungCreationFormDirty.value; 
-  }
-  return false;
+    if (isEditPersonMetadataActive.value) {
+      return (
+        isChangePersonMetadataFieldDirty('selectedKopersNrMetadata') ||
+        isChangePersonMetadataFieldDirty('selectedVorname') ||
+        isChangePersonMetadataFieldDirty('selectedFamilienname')
+      );
+    } else if (isChangeKlasseFormActive.value) {
+      return isChangeKlasseFieldDirty('selectedSchule') || isChangeKlasseFieldDirty('selectedNewKlasse');
+    } else if (isEditActive.value) {
+      return isZuordnungCreationFormDirty.value;
+    }
+    return false;
   }
 
   function handleConfirmUnsavedChanges(): void {
@@ -2183,15 +2186,15 @@
                         :enabledText="$t('admin.person.twoFactorAuthentication.setUpShort')"
                         position="start"
                       >
-                      <TwoFactorAuthenticationSetUp
-                        v-if="!twoFactorAuthentificationStore.hasToken"
-                        :errorCode="twoFactorAuthentificationStore.errorCode"
-                        :disabled="isEditActive || isEditPersonMetadataActive"
-                        :person="personStore.currentPerson"
-                        @dialogClosed="twoFactorAuthentificationStore.get2FAState(currentPersonId)"
-                      >
-                      </TwoFactorAuthenticationSetUp>
-                    </SpshTooltip>
+                        <TwoFactorAuthenticationSetUp
+                          v-if="!twoFactorAuthentificationStore.hasToken"
+                          :errorCode="twoFactorAuthentificationStore.errorCode"
+                          :disabled="isEditActive || isEditPersonMetadataActive"
+                          :person="personStore.currentPerson"
+                          @dialogClosed="twoFactorAuthentificationStore.get2FAState(currentPersonId)"
+                        >
+                        </TwoFactorAuthenticationSetUp>
+                      </SpshTooltip>
                     </v-col>
                   </div>
                 </v-col>
@@ -2216,9 +2219,8 @@
                   >
                     <v-icon
                       v-if="
-                        personStore.currentPerson?.person.userLock?.some(
-                          (lock) => lock.lock_occasion === PersonLockOccasion.MANUELL_GESPERRT,
-                        )
+                        personStore.currentPerson?.person.userLock &&
+                        personStore.currentPerson.person.userLock?.length > 0
                       "
                       icon="mdi-lock"
                       color="red"
@@ -2227,7 +2229,8 @@
                   <v-col cols="10">
                     <span>
                       {{
-                        personStore.currentPerson?.person.userLock
+                        personStore.currentPerson?.person.userLock &&
+                        personStore.currentPerson.person.userLock?.length > 0
                           ? t('person.userIsLocked')
                           : t('person.userIsUnlocked')
                       }}
@@ -2264,11 +2267,22 @@
                     </span>
                   </v-col>
                 </v-row>
-                <v-row v-if="getKopersUserLock.length">
+                <v-row
+                  v-if="getKopersUserLock.length"
+                  cols="10"
+                >
+                  <v-col cols="1">
+                    <v-icon
+                      aria-hidden="true"
+                      class="mr-2"
+                      icon="mdi-alert-circle-outline"
+                      size="small"
+                    ></v-icon>
+                  </v-col>
                   <v-col
                     v-for="(item, index) in getKopersUserLock"
                     :key="index"
-                    cols="10"
+                    cols="9"
                   >
                     <span
                       class="text-body"
@@ -2711,60 +2725,59 @@
       </LayoutCard>
     </v-dialog>
 
-      <!-- Warning dialog for unsaved changes -->
-  <v-dialog
-    data-testid="unsaved-changes-dialog"
-    ref="unsaved-changes-dialog"
-    persistent
-    v-model="showUnsavedChangesDialog"
-  >
-    <LayoutCard :header="$t('unsavedChanges.title')">
-      <v-card-text>
-        <v-container>
-          <v-row class="text-body bold px-md-16">
-            <v-col>
-              <p data-testid="unsaved-changes-warning-text">
-                {{ $t('unsavedChanges.message') }}
-              </p>
+    <!-- Warning dialog for unsaved changes -->
+    <v-dialog
+      data-testid="unsaved-changes-dialog"
+      ref="unsaved-changes-dialog"
+      persistent
+      v-model="showUnsavedChangesDialog"
+    >
+      <LayoutCard :header="$t('unsavedChanges.title')">
+        <v-card-text>
+          <v-container>
+            <v-row class="text-body bold px-md-16">
+              <v-col>
+                <p data-testid="unsaved-changes-warning-text">
+                  {{ $t('unsavedChanges.message') }}
+                </p>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card-text>
+        <v-card-actions class="justify-center">
+          <v-row class="justify-center">
+            <v-col
+              cols="12"
+              sm="6"
+              md="auto"
+            >
+              <v-btn
+                @click.stop="handleConfirmUnsavedChanges"
+                class="secondary button"
+                data-testid="confirm-unsaved-changes-button"
+                :block="mdAndDown"
+              >
+                {{ $t('yes') }}
+              </v-btn>
+            </v-col>
+            <v-col
+              cols="12"
+              sm="6"
+              md="auto"
+            >
+              <v-btn
+                @click.stop="showUnsavedChangesDialog = false"
+                class="primary button"
+                data-testid="close-unsaved-changes-dialog-button"
+                :block="mdAndDown"
+              >
+                {{ $t('no') }}
+              </v-btn>
             </v-col>
           </v-row>
-        </v-container>
-      </v-card-text>
-      <v-card-actions class="justify-center">
-        <v-row class="justify-center">
-          <v-col
-            cols="12"
-            sm="6"
-            md="auto"
-          >
-            <v-btn
-              @click.stop="handleConfirmUnsavedChanges"
-              class="secondary button"
-              data-testid="confirm-unsaved-changes-button"
-              :block="mdAndDown"
-            >
-              {{ $t('yes') }}
-            </v-btn>
-          </v-col>
-          <v-col
-            cols="12"
-            sm="6"
-            md="auto"
-          >
-            <v-btn
-              @click.stop="showUnsavedChangesDialog = false"
-              class="primary button"
-              data-testid="close-unsaved-changes-dialog-button"
-              :block="mdAndDown"
-            >
-              {{ $t('no') }}
-            </v-btn>
-          </v-col>
-        </v-row>
-      </v-card-actions>
-    </LayoutCard>
-  </v-dialog>
-    
+        </v-card-actions>
+      </LayoutCard>
+    </v-dialog>
   </div>
 </template>
 

@@ -30,7 +30,7 @@ function getMockPersonendatensatz(): Personendatensatz {
       referrer: '6978',
       personalnummer: '9183756',
       isLocked: false,
-      userLock: null,
+      userLock: [],
       revision: '1',
       lastModified: '2024-12-22',
       email: {

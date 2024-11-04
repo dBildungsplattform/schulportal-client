@@ -382,7 +382,7 @@ describe('PersonDetailsView', () => {
   test('it displays lockInfo if there is any', async () => {
     expect(personStore.currentPerson).toBeDefined();
     expect(wrapper).toBeDefined();
-    personStore.currentPerson!.person.isLocked = false;
+    personStore.currentPerson!.person.userLock = [];
     await nextTick();
 
     const activeStatusMessage: DOMWrapper<HTMLDivElement> = wrapper!.find('[data-testid="person-lock-info"]');

@@ -509,7 +509,7 @@
     "lockedSince": "Gesperrt seit",
     "lockedUntil": "Gesperrt bis",
     "unlockUser": "Benutzer entsperren",
-    "kopersLock": "Dieser Benutzer wurde aufgrund einer fehlenden KoPers.-Nr. gesperrt. Bitte tragen Sie eine gültige KoPers.-Nr. nach. Eine manuelle Entsperrung ist nicht möglich.",
+    "kopersLock": "Dieser Benutzer wurde aufgrund einer fehlenden KoPers.-Nr. gesperrt. Bitte tragen Sie eine gültige KoPers.-Nr. nach. Diese Sperre kann nicht auf anderem Wege aufgehoben werden.",
     "unLockUserInfoText": "Ich bestätige, dass ich mit der sperrenden Stelle geklärt habe, dass die Sperre aufgehoben werden darf.",
     "lockError": "Der Benutzer konnte nicht gesperrt werden.",
     "unlockError": "Der Benutzer konnte nicht entsperrt werden.",
