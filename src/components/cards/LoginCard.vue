@@ -1,7 +1,19 @@
 <script setup lang="ts">
+  import { parseISO, isWithinInterval } from 'date-fns';
+  import { computed, type ComputedRef } from 'vue';
   import { type RouteLocationNormalizedLoaded, useRoute } from 'vue-router';
 
   const route: RouteLocationNormalizedLoaded = useRoute();
+
+  // Define the maintenance date range
+  const isMaintenancePeriod: ComputedRef<boolean> = computed(() => {
+    const today: Date = new Date();
+    const startDate: Date = parseISO('2024-12-07');
+    const endDate: Date = parseISO('2024-12-08');
+
+    // Check if today falls within the maintenance period
+    return isWithinInterval(today, { start: startDate, end: endDate });
+  });
 </script>
 
 <template>
@@ -42,7 +54,50 @@
         </h1>
       </v-col>
     </v-row>
+    <!-- Maintenance notice -->
+    <div v-if="isMaintenancePeriod">
+      <v-row
+        class="mb-7"
+        justify="center"
+        no-gutters
+      >
+        <v-col class="text-center">
+          <h1
+            class="headline-2 text-red"
+            data-testid="landing-maintenance-title"
+          >
+            {{ $t('login.maintenanceNoticeTitle') }}
+          </h1>
+        </v-col>
+      </v-row>
 
+      <v-row
+        class="mb-7"
+        justify="center"
+        no-gutters
+      >
+        <v-col class="text-center">
+          <h1
+            class="text-body"
+            data-testid="landing-maintenance-text"
+          >
+            {{ $t('login.maintenanceNoticeText') }}
+          </h1>
+        </v-col>
+      </v-row>
+
+      <v-row
+        class="mb-7"
+        justify="center"
+        no-gutters
+      >
+        <v-col class="text-center">
+          <h1 class="subtitle-2">
+            {{ $t('login.doNotLogin') }}
+          </h1>
+        </v-col>
+      </v-row>
+    </div>
     <!-- Login Button -->
     <v-row justify="center">
       <v-col
