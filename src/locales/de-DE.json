@@ -318,6 +318,7 @@
       "management": "Rollenverwaltung",
       "mappingFrontBackEnd": {
         "systemrechte": {
+          "IMPORT_DURCHFUEHREN": "Darf Import durchführen",
           "ROLLEN_VERWALTEN": "Darf Rollen verwalten",
           "PERSONEN_SOFORT_LOESCHEN": "Darf Benutzer sofort löschen",
           "PERSONEN_VERWALTEN": "Darf Benutzer verwalten",

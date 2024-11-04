@@ -2,7 +2,13 @@
   import FormWrapper from '@/components/form/FormWrapper.vue';
   import FormRow from '@/components/form/FormRow.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import { useRouter, type Router } from 'vue-router';
+  import {
+    onBeforeRouteLeave,
+    useRouter,
+    type NavigationGuardNext,
+    type RouteLocationNormalized,
+    type Router,
+  } from 'vue-router';
   import { useRollen, type TranslatedRolleWithAttrs } from '@/composables/useRollen';
   import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
   import { useSchulen } from '@/composables/useSchulen';
@@ -175,12 +181,18 @@
     uploadFile();
   });
 
+  onBeforeRouteLeave((_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
+    importStore.uploadResponse = null;
+    next();
+  });
+
   onMounted(async () => {
     await organisationStore.getAllOrganisationen({
       includeTyp: OrganisationsTyp.Schule,
       systemrechte: ['PERSONEN_VERWALTEN', 'IMPORT_DURCHFUEHREN'],
       limit: 30,
     });
+    importStore.uploadResponse = null;
     organisationStore.errorCode = '';
   });
 </script>

@@ -139,7 +139,7 @@
       <v-list-item
         v-if="authStore.hasImportPermission"
         class="menu-bar-sub-item caption"
-        @click="closeMenuOnMobile"
+        @click="handleMenuItemClick('/admin/personen/import')"
         data-testid="person-import-menu-item"
         prepend-icon="mdi-file-upload-outline"
         :title="$t('admin.person.import')"
