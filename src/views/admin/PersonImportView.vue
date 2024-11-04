@@ -154,9 +154,10 @@
     );
   }
 
-  function resetUpload(): void {
+  function backToUpload(): void {
     importStore.errorCode = null;
     importStore.uploadResponse = null;
+    importStore.importedData = null;
   }
 
   function executeImport(): void {
@@ -221,7 +222,7 @@
         :closable="false"
         :showButton="true"
         :buttonText="$t('admin.import.backToUpload')"
-        :buttonAction="resetUpload"
+        :buttonAction="backToUpload"
         :text="$t(`admin.import.errors.${importStore.errorCode}`)"
       />
 
@@ -255,7 +256,7 @@
             <v-col cols="auto">
               <v-btn
                 class="secondary"
-                @click="resetUpload()"
+                @click="backToUpload()"
                 data-testid="back-to-upload-button"
               >
                 {{ $t('admin.import.backToUpload') }}
@@ -302,7 +303,7 @@
             <v-col cols="auto">
               <v-btn
                 class="secondary"
-                @click="resetUpload()"
+                @click="backToUpload()"
                 data-testid="back-to-upload-button"
               >
                 {{ $t('admin.import.backToUpload') }}
@@ -327,6 +328,7 @@
           <v-row justify="center">
             <v-col cols="auto">
               <v-progress-circular
+                data-testid="import-progress-spinner"
                 indeterminate
                 size="64"
               ></v-progress-circular>

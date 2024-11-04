@@ -12,8 +12,12 @@ import {
   type RolleWithServiceProvidersResponse,
 } from '@/stores/RolleStore';
 import type { ImportUploadResponse } from '@/api-client/generated';
+import { createRouter, createWebHistory, type Router } from 'vue-router';
+import routes from '@/router/routes';
 
 let wrapper: VueWrapper | null = null;
+let router: Router;
+
 const importStore: ImportStore = useImportStore();
 const organisationStore: OrganisationStore = useOrganisationStore();
 const rolleStore: RolleStore = useRolleStore();
@@ -84,12 +88,20 @@ rolleStore.allRollen = [
   },
 ] as RolleWithServiceProvidersResponse[];
 
-beforeEach(() => {
+beforeEach(async () => {
   document.body.innerHTML = `
     <div>
       <div id="app"></div>
     </div>
   `;
+
+  router = createRouter({
+    history: createWebHistory(),
+    routes,
+  });
+
+  router.push('/');
+  await router.isReady();
 
   wrapper = mount(PersonImportView, {
     attachTo: document.getElementById('app') || '',
@@ -97,13 +109,9 @@ beforeEach(() => {
       components: {
         PersonImportView,
       },
-      mocks: {
-        route: {
-          fullPath: 'full/path',
-        },
-      },
     },
   });
+
   vi.resetAllMocks();
 });
 
@@ -122,9 +130,10 @@ describe('PersonImportView', () => {
 
     wrapper?.find('[data-testid="schule-select"] .v-field__clearable').trigger('click');
     wrapper?.find('[data-testid="rolle-select"] .v-field__clearable').trigger('click');
+    await nextTick();
   });
 
-  test('it uploads a file and resets form', async () => {
+  test('it uploads a file', async () => {
     const mockFile: File = new File([''], 'personen.csv', { type: 'text/csv' });
     const fileInput: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="file-input"] input');
 
@@ -145,11 +154,44 @@ describe('PersonImportView', () => {
     await nextTick();
 
     expect(importStore.uploadResponse).toStrictEqual(uploadResponse);
+    expect(wrapper?.find('[data-testid="person-upload-success-text"]').isVisible()).toBe(true);
+    expect(wrapper?.find('[data-testid="execute-import-button"]').isVisible()).toBe(true);
   });
 
-  test('it navigates to person management', async () => {});
+  test('it executes the import and returns to form', async () => {
+    const mockFile: File = new File([''], 'personen.csv', { type: 'text/csv' });
+    const fileInput: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="file-input"] input');
 
-  test('it executes the import', async () => {});
+    Object.defineProperty(fileInput?.element, 'files', {
+      value: [mockFile],
+    });
+    await nextTick();
+
+    const uploadResponse: ImportUploadResponse = (importStore.uploadResponse = {
+      importvorgangId: '1234567890',
+      isValid: true,
+      totalImportDataItems: 2,
+      totalInvalidImportDataItems: 0,
+      invalidImportDataItems: [],
+    });
+
+    wrapper?.find('[data-testid="person-import-form-submit-button"]').trigger('click');
+    await nextTick();
+
+    expect(importStore.uploadResponse).toStrictEqual(uploadResponse);
+    expect(wrapper?.find('[data-testid="person-upload-success-text"]').isVisible()).toBe(true);
+
+    importStore.importedData = new File([''], 'personen.txt', { type: 'text/plain' });
+
+    wrapper?.find('[data-testid="execute-import-button"]').trigger('click');
+    await nextTick();
+
+    wrapper?.find('[data-testid="back-to-upload-button"]').trigger('click');
+    await nextTick();
+
+    expect(importStore.importedData).toBeNull();
+    expect(importStore.uploadResponse).toBeNull();
+  });
 
   test('it downloads an imported file', async () => {
     global.URL.createObjectURL = vi.fn();
