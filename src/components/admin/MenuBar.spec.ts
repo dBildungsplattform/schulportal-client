@@ -48,6 +48,7 @@ authStore.hasKlassenverwaltungPermission = true;
 authStore.hasRollenverwaltungPermission = true;
 authStore.hasSchulverwaltungPermission = true;
 authStore.hasSchultraegerverwaltungPermission = true;
+authStore.hasPersonenAnlegenPermission = true;
 
 beforeEach(async () => {
   document.body.innerHTML = `
