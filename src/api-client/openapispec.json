@@ -4017,7 +4017,7 @@
         },
         "/api/cron/kopers-lock": {
             "put": {
-                "operationId": "CronController_KoPersUserLock",
+                "operationId": "CronController_koPersUserLock",
                 "parameters": [],
                 "responses": {
                     "201": {
@@ -4044,6 +4044,98 @@
                     },
                     "500": {
                         "description": "Internal server error while trying to lock user."
+                    }
+                },
+                "tags": [
+                    "cron"
+                ],
+                "security": [
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
+        "/api/cron/kontext-expired": {
+            "put": {
+                "operationId": "CronController_removePersonenKontexteWithExpiredBefristungFromUsers",
+                "parameters": [],
+                "responses": {
+                    "201": {
+                        "description": "Personenkontexte were successfully removed from users.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "boolean"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Personenkontexte are not given or not found."
+                    },
+                    "401": {
+                        "description": "Not authorized to remove personenkontexte from users."
+                    },
+                    "403": {
+                        "description": "Insufficient permissions to remove personenkontexte from users."
+                    },
+                    "404": {
+                        "description": "Insufficient permissions to remove personenkontexte from users."
+                    },
+                    "500": {
+                        "description": "Internal server error while trying to remove personenkontexte from users."
+                    }
+                },
+                "tags": [
+                    "cron"
+                ],
+                "security": [
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
+        "/api/cron/person-without-org": {
+            "put": {
+                "operationId": "CronController_personWithoutOrgDelete",
+                "parameters": [],
+                "responses": {
+                    "201": {
+                        "description": "User were successfully removed.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "boolean"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "User are not given or not found"
+                    },
+                    "401": {
+                        "description": "Not authorized to remove user."
+                    },
+                    "403": {
+                        "description": "Insufficient permissions to delete user."
+                    },
+                    "404": {
+                        "description": "Insufficient permissions to delete user."
+                    },
+                    "500": {
+                        "description": "Internal server error while trying to remove user."
                     }
                 },
                 "tags": [
@@ -4161,6 +4253,59 @@
                     },
                     "500": {
                         "description": "Internal server error while executing the import transaction."
+                    }
+                },
+                "tags": [
+                    "import"
+                ],
+                "security": [
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
+        "/api/import/{importvorgangId}": {
+            "delete": {
+                "operationId": "ImportController_deleteImportTransaction",
+                "summary": "",
+                "description": "Delete a role by id.",
+                "parameters": [
+                    {
+                        "name": "importvorgangId",
+                        "required": true,
+                        "in": "path",
+                        "description": "The id of an import transaction",
+                        "schema": {
+                            "nullable": false,
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Import transaction was deleted successfully."
+                    },
+                    "400": {
+                        "description": "Something went wrong with the found import transaction.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DbiamImportError"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Not authorized to delete the import transaction."
+                    },
+                    "404": {
+                        "description": "The import transaction that should be deleted does not exist."
                     }
                 },
                 "tags": [
@@ -4458,6 +4603,33 @@
                     "VOLL"
                 ]
             },
+            "UserLockParams": {
+                "type": "object",
+                "properties": {
+                    "personId": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "locked_by": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "locked_until": {
+                        "type": "string",
+                        "nullable": true
+                    }
+                },
+                "required": [
+                    "personId",
+                    "locked_by",
+                    "created_at",
+                    "locked_until"
+                ]
+            },
             "EmailAddressStatus": {
                 "type": "string",
                 "enum": [
@@ -4537,9 +4709,13 @@
                         "type": "boolean",
                         "nullable": true
                     },
-                    "lockInfo": {
-                        "type": "object",
-                        "nullable": true
+                    "userLock": {
+                        "nullable": true,
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/UserLockParams"
+                            }
+                        ]
                     },
                     "lastModified": {
                         "format": "date-time",
@@ -4570,7 +4746,7 @@
                     "startpasswort",
                     "personalnummer",
                     "isLocked",
-                    "lockInfo",
+                    "userLock",
                     "lastModified",
                     "email"
                 ]
@@ -4769,14 +4945,19 @@
                         "type": "boolean",
                         "nullable": false
                     },
-                    "locked_from": {
+                    "locked_by": {
                         "type": "string",
                         "nullable": false
+                    },
+                    "locked_until": {
+                        "format": "date-time",
+                        "type": "string",
+                        "description": "Required if Befristung is set"
                     }
                 },
                 "required": [
                     "lock",
-                    "locked_from"
+                    "locked_by"
                 ]
             },
             "PersonLockResponse": {
@@ -5357,8 +5538,8 @@
                     "MIGRATION_DURCHFUEHREN",
                     "PERSON_SYNCHRONISIEREN",
                     "CRON_DURCHFUEHREN",
-                    "IMPORT_DURCHFUEHREN",
-                    "PERSONEN_ANLEGEN"
+                    "PERSONEN_ANLEGEN",
+                    "IMPORT_DURCHFUEHREN"
                 ]
             },
             "OrganisationByIdBodyParams": {
@@ -6390,6 +6571,33 @@
                     "file"
                 ]
             },
+            "ImportDataItemResponse": {
+                "type": "object",
+                "properties": {
+                    "nachname": {
+                        "type": "string"
+                    },
+                    "vorname": {
+                        "type": "string"
+                    },
+                    "klasse": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "validationErrors": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "required": [
+                    "nachname",
+                    "vorname",
+                    "klasse",
+                    "validationErrors"
+                ]
+            },
             "ImportUploadResponse": {
                 "type": "object",
                 "properties": {
@@ -6400,11 +6608,28 @@
                     "isValid": {
                         "type": "boolean",
                         "description": "It states if the import transaction contain errors."
+                    },
+                    "totalImportDataItems": {
+                        "type": "number",
+                        "description": "The total number of data items in the CSV file."
+                    },
+                    "totalInvalidImportDataItems": {
+                        "type": "number",
+                        "description": "The total number of data items in the CSV file that are invalid."
+                    },
+                    "invalidImportDataItems": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ImportDataItemResponse"
+                        }
                     }
                 },
                 "required": [
                     "importvorgangId",
-                    "isValid"
+                    "isValid",
+                    "totalImportDataItems",
+                    "totalInvalidImportDataItems",
+                    "invalidImportDataItems"
                 ]
             },
             "ImportvorgangByIdBodyParams": {
@@ -6437,7 +6662,8 @@
                             "IMPORT_ERROR",
                             "CSV_PARSING_ERROR",
                             "CSV_FILE_EMPTY_ERROR",
-                            "IMPORT_TEXT_FILE_CREATION_ERROR"
+                            "IMPORT_TEXT_FILE_CREATION_ERROR",
+                            "IMPORT_NUR_LERN_AN_SCHULE_ERROR"
                         ]
                     },
                     "code": {
