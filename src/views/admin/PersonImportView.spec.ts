@@ -152,6 +152,7 @@ describe('PersonImportView', () => {
   test('it executes the import', async () => {});
 
   test('it downloads an imported file', async () => {
+    global.URL.createObjectURL = vi.fn();
     importStore.importedData = new File([''], 'personen.txt', { type: 'text/plain' });
     await nextTick();
 
