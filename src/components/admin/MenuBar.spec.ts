@@ -120,7 +120,7 @@ describe('MenuBar', () => {
     await wrapper?.find('[data-testid="klassen-management-menu-item"]').trigger('click');
     await nextTick();
 
-    await wrapper?.find('[data-testid="rollen-management-menu-item"]').trigger('click');
+    await wrapper?.find('[data-testid="rolle-management-menu-item"]').trigger('click');
     await nextTick();
 
     await wrapper?.find('[data-testid="schule-management-menu-item"]').trigger('click');
