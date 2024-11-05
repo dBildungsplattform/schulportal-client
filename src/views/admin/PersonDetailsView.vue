@@ -1482,7 +1482,11 @@
                 </PasswordReset>
               </div>
             </v-col>
-            <v-col v-else-if="personStore.loading"> <v-progress-circular indeterminate></v-progress-circular></v-col
+            <v-col v-else-if="personStore.loading">
+              <v-progress-circular
+                data-testid="loading-spinner"
+                indeterminate
+              ></v-progress-circular></v-col
           ></v-row>
         </v-container>
         <v-divider
@@ -1550,7 +1554,12 @@
               <span class="text-body">
                 {{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
                 {{ zuordnung.klasse }}
-                <span v-if="zuordnung.befristung"> ({{ formatDate(zuordnung.befristung, t) }})</span>
+                <span
+                  v-if="zuordnung.befristung"
+                  data-testid="zuordnung-befristung-text"
+                >
+                  ({{ formatDate(zuordnung.befristung, t) }})</span
+                >
               </span>
             </v-col>
           </v-row>
