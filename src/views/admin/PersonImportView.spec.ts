@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest';
-import { DOMWrapper, mount, VueWrapper } from '@vue/test-utils';
+import { DOMWrapper, flushPromises, mount, VueWrapper } from '@vue/test-utils';
 import PersonImportView from './PersonImportView.vue';
 import { nextTick } from 'vue';
 import { useImportStore, type ImportStore } from '@/stores/ImportStore';
@@ -158,6 +158,37 @@ describe('PersonImportView', () => {
     expect(wrapper?.find('[data-testid="execute-import-button"]').isVisible()).toBe(true);
   });
 
+  test('it shows invalid data', async () => {
+    const uploadResponse: ImportUploadResponse = (importStore.uploadResponse = {
+      importvorgangId: '1234567890',
+      isValid: false,
+      totalImportDataItems: 2,
+      totalInvalidImportDataItems: 2,
+      invalidImportDataItems: [
+        {
+          nachname: '',
+          vorname: 'Maria',
+          klasse: '1a',
+          validationErrors: ['IMPORT_DATA_ITEM_NACHNAME_IS_TOO_SHORT'],
+        },
+        {
+          nachname: 'Meier',
+          vorname: '',
+          klasse: '2b',
+          validationErrors: ['IMPORT_DATA_ITEM_VORNAME_IS_TOO_SHORT', 'IMPORT_DATA_ITEM_KLASSE_NOT_FOUND'],
+        },
+      ],
+    });
+
+    wrapper?.find('[data-testid="person-import-form-submit-button"]').trigger('click');
+    await nextTick();
+
+    expect(importStore.uploadResponse).toStrictEqual(uploadResponse);
+
+    const invalidDataItems: DOMWrapper<Element>[] | undefined = wrapper?.findAll('[data-testid^="invalid-item-row"]');
+    expect(invalidDataItems?.length).toBe(2);
+  });
+
   test('it executes the import and returns to form', async () => {
     const mockFile: File = new File([''], 'personen.csv', { type: 'text/csv' });
     const fileInput: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="file-input"] input');
@@ -200,5 +231,13 @@ describe('PersonImportView', () => {
 
     const downloadButton: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="download-file-button"]');
     downloadButton?.trigger('click');
+  });
+
+  test('it shows loading spinner', async () => {
+    importStore.importIsLoading = true;
+    importStore.errorCode = null;
+    await flushPromises();
+
+    expect(wrapper?.find('[data-testid="import-progress-spinner"]').isVisible()).toBe(true);
   });
 });

@@ -424,6 +424,7 @@
         <template v-if="importStore.uploadResponse?.totalInvalidImportDataItems">
           <v-alert
             class="border-md mt-4"
+            data-testid="invalid-import-data-alert"
             type="error"
             variant="outlined"
           >
@@ -438,6 +439,7 @@
             <v-row
               v-for="(invalidItem, index) in importStore.uploadResponse.invalidImportDataItems"
               :key="index"
+              :data-testid="`invalid-item-row-${index + 1}`"
             >
               <v-col
                 class="primary-text-color"

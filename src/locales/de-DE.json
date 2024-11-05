@@ -35,7 +35,9 @@
         "followingDataInvalid": "Die folgenden Datensätze sind ungültig:",
         "IMPORT_DATA_ITEM_KLASSE_IS_TOO_SHORT": "Klasse fehlt",
         "IMPORT_DATA_ITEM_KLASSE_NOT_FOUND": "Klasse an der ausgewählten Schule nicht gefunden",
+        "IMPORT_DATA_ITEM_NACHNAME_IS_INVALID": "Nachname enthält ungültige Zeichen",
         "IMPORT_DATA_ITEM_NACHNAME_IS_TOO_SHORT": "Nachname fehlt",
+        "IMPORT_DATA_ITEM_VORNAME_IS_INVALID": "Vorname enthält ungültige Zeichen",
         "IMPORT_DATA_ITEM_VORNAME_IS_TOO_SHORT": "Vorname fehlt"
       },
       "executeImport": "Import durchführen",
