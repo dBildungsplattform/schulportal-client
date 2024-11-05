@@ -170,7 +170,7 @@
       "creationErrorTitle": "Fehler beim Anlegen des Benutzers.",
       "deletePerson": "Benutzer löschen",
       "deletePersonConfirmation": "Wollen Sie den Benutzer {firstname} {lastname} sofort und endgültig löschen?",
-      "deletePersonSuccessMessage": "{firstname} {lastname} wurde erfolgreich gelöscht",
+      "deletePersonSuccessMessage": "{firstname} {lastname} wurde erfolgreich gelöscht.",
       "discard": "Benutzer verwerfen",
       "disableUser": "Benutzer sperren",
       "edit": "Benutzer bearbeiten",
