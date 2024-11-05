@@ -130,6 +130,14 @@
   const calculatedBefristung: Ref<string | undefined> = ref('');
   const loading: Ref<boolean> = ref(true);
 
+  const isManuallyLocked: ComputedRef<boolean> = computed<boolean>(() => {
+    return (
+      personStore.currentPerson!.person.userLock?.some(
+        (lock: UserLock) => lock.lock_occasion === PersonLockOccasion.MANUELL_GESPERRT,
+      ) ?? false // Default to false if userLock is undefined
+    );
+  });
+
   function navigateToPersonTable(): void {
     router.push({ name: 'person-management' });
   }
@@ -141,13 +149,9 @@
 
   async function onLockUser(lockedBy: string, date: string | undefined): Promise<void> {
     if (!personStore.currentPerson) return;
-    const isManuallyLocked: boolean =
-      personStore.currentPerson.person.userLock?.some(
-        (lock: UserLock) => lock.lock_occasion === PersonLockOccasion.MANUELL_GESPERRT,
-      ) ?? false; // Default to false if userLock is undefined
 
     let bodyParams: LockUserBodyParams = {
-      lock: !isManuallyLocked,
+      lock: !isManuallyLocked.value,
       locked_by: lockedBy,
       locked_until: date,
     };
