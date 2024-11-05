@@ -164,7 +164,7 @@
         >
           <v-btn
             class="primary"
-            data-testid="open-lock-dialog-icon"
+            data-testid="open-lock-dialog-button"
             :disabled="disabled"
             :block="mdAndDown"
             v-bind="props"
@@ -181,7 +181,7 @@
         >
           <v-btn
             class="primary"
-            data-testid="open-lock-dialog-icon"
+            data-testid="open-lock-dialog-button"
             :disabled="disabled"
             :block="mdAndDown"
             v-bind="props"
