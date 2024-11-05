@@ -2437,7 +2437,6 @@ export const RollenSystemRecht = {
     MigrationDurchfuehren: 'MIGRATION_DURCHFUEHREN',
     PersonSynchronisieren: 'PERSON_SYNCHRONISIEREN',
     CronDurchfuehren: 'CRON_DURCHFUEHREN',
-    PersonenAnlegen: 'PERSONEN_ANLEGEN',
     ImportDurchfuehren: 'IMPORT_DURCHFUEHREN'
 } as const;
 
