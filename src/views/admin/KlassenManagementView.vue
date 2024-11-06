@@ -106,12 +106,16 @@
 
     searchFilterStore.klassenPerPage = limit || 1;
 
-    await organisationStore.getAllOrganisationen({
-      offset: (searchFilterStore.klassenPage - 1) * searchFilterStore.klassenPerPage,
-      limit: searchFilterStore.klassenPerPage,
-      includeTyp: OrganisationsTyp.Klasse,
-      systemrechte: ['KLASSEN_VERWALTEN'],
-    });
+    if (selectedSchule.value) {
+      fetchKlassenBySelectedSchuleId(selectedSchule.value);
+    } else {
+      await organisationStore.getAllOrganisationen({
+        offset: (searchFilterStore.klassenPage - 1) * searchFilterStore.klassenPerPage,
+        limit: searchFilterStore.klassenPerPage,
+        includeTyp: OrganisationsTyp.Klasse,
+        systemrechte: ['KLASSEN_VERWALTEN'],
+      });
+    }
   }
 
   async function updateSelectedSchule(newValue: string | null): Promise<void> {
