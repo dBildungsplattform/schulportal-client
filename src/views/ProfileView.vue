@@ -441,11 +441,11 @@
                         <strong> {{ $t('person.email') }}: </strong>
                       </td>
                       <td>
-                        <v-row class="ma-0">
-                          <span data-testid="person-email-text">{{ emailStatus.text }}</span>
+                        <v-row no-gutters>
                           <SpshTooltip
-                            v-if="!emailStatus.tooltip"
-                            enabledText="emailStatus.tooltip"
+                            v-if="!!emailStatus.tooltip"
+                            enabledCondition
+                            :enabledText="emailStatus.tooltip"
                             position="bottom"
                           >
                             <v-icon
@@ -455,6 +455,7 @@
                               size="small"
                             ></v-icon>
                           </SpshTooltip>
+                          <span data-testid="person-email-text">{{ emailStatus.text }}</span>
                         </v-row>
                       </td>
                     </tr>
