@@ -244,7 +244,11 @@
           case LockKeys.LockedUntil:
             return {
               key: t('person.lockedUntil'),
-              attribute,
+              attribute: new Intl.DateTimeFormat('de-DE', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+              }).format(new Date(attribute)),
             };
 
           default:
