@@ -2708,6 +2708,7 @@
           "MIGRATION_DURCHFUEHREN",
           "PERSON_SYNCHRONISIEREN",
           "CRON_DURCHFUEHREN",
+          "PERSONEN_ANLEGEN",
           "IMPORT_DURCHFUEHREN"
         ]
       },
