@@ -1,5 +1,5 @@
 import { OrganisationsTyp, type Organisation } from '@/stores/OrganisationStore';
-import { type Person, type Personendatensatz } from '@/stores/PersonStore';
+import { usePersonStore, type Person, type Personendatensatz, type PersonStore } from '@/stores/PersonStore';
 import { mount, VueWrapper } from '@vue/test-utils';
 import { expect, test, type Mock } from 'vitest';
 import { nextTick } from 'vue';
@@ -8,6 +8,7 @@ import { EmailAddressStatus } from '@/api-client/generated';
 
 let wrapper: VueWrapper | null = null;
 
+const personStore: PersonStore = usePersonStore();
 const parentOrganisationen: Array<Organisation> = [
   {
     id: '1',
@@ -97,6 +98,7 @@ describe('Lock user', () => {
     });
 
     const person: Personendatensatz = getPersonendatensatz(false);
+    personStore.currentPerson = person;
     const intersectingOrganisation: Organisation = parentOrganisationen[0]!;
 
     beforeEach(() => {
@@ -162,6 +164,7 @@ describe('Lock user', () => {
     });
 
     const person: Personendatensatz = getPersonendatensatz(false);
+    personStore.currentPerson = person;
 
     beforeEach(() => {
       wrapper = mount(PersonLock, {
@@ -231,6 +234,7 @@ describe('Lock user', () => {
 describe('Unlock user', () => {
   const formatOrganisationName: Mock = vi.fn();
   const person: Personendatensatz = getPersonendatensatz(true);
+  personStore.currentPerson = person;
 
   beforeEach(() => {
     wrapper = mount(PersonLock, {
