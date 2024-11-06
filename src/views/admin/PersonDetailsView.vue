@@ -511,9 +511,7 @@
     validationSchema: getValidationSchema(t, hasNoKopersNr, hasKopersNummer),
   });
 
-  
   const isZuordnungCreationFormDirty: ComputedRef<boolean> = computed(() => getDirtyState(formContext));
-
 
   const {
     selectedRolle,
@@ -1015,18 +1013,18 @@
 
   // Checks for dirtiness depending on the active form
   function isFormDirty(): boolean {
-    if(isEditPersonMetadataActive.value){
-    return isChangePersonMetadataFieldDirty('selectedKopersNrMetadata') || isChangePersonMetadataFieldDirty('selectedVorname') || 
-    isChangePersonMetadataFieldDirty('selectedFamilienname');
-  }
-  else if (isChangeKlasseFormActive.value){
-    return isChangeKlasseFieldDirty('selectedSchule') || isChangeKlasseFieldDirty('selectedNewKlasse');
-  }
-
-  else if (isEditActive.value){
-    return isZuordnungCreationFormDirty.value; 
-  }
-  return false;
+    if (isEditPersonMetadataActive.value) {
+      return (
+        isChangePersonMetadataFieldDirty('selectedKopersNrMetadata') ||
+        isChangePersonMetadataFieldDirty('selectedVorname') ||
+        isChangePersonMetadataFieldDirty('selectedFamilienname')
+      );
+    } else if (isChangeKlasseFormActive.value) {
+      return isChangeKlasseFieldDirty('selectedSchule') || isChangeKlasseFieldDirty('selectedNewKlasse');
+    } else if (isEditActive.value) {
+      return isZuordnungCreationFormDirty.value;
+    }
+    return false;
   }
 
   function handleConfirmUnsavedChanges(): void {
@@ -2029,11 +2027,6 @@
               <v-col> <v-progress-circular indeterminate></v-progress-circular></v-col>
             </v-row>
           </v-container>
-          <v-divider
-            class="border-opacity-100 rounded my-6 mx-4"
-            color="#E5EAEF"
-            thickness="6"
-          ></v-divider>
         </template>
         <template v-else-if="twoFactorAuthentificationStore.required">
           <v-divider
@@ -2177,27 +2170,27 @@
                         :enabledText="$t('admin.person.twoFactorAuthentication.setUpShort')"
                         position="start"
                       >
-                      <TwoFactorAuthenticationSetUp
-                        v-if="!twoFactorAuthentificationStore.hasToken"
-                        :errorCode="twoFactorAuthentificationStore.errorCode"
-                        :disabled="isEditActive || isEditPersonMetadataActive"
-                        :person="personStore.currentPerson"
-                        @dialogClosed="twoFactorAuthentificationStore.get2FAState(currentPersonId)"
-                      >
-                      </TwoFactorAuthenticationSetUp>
-                    </SpshTooltip>
+                        <TwoFactorAuthenticationSetUp
+                          v-if="!twoFactorAuthentificationStore.hasToken"
+                          :errorCode="twoFactorAuthentificationStore.errorCode"
+                          :disabled="isEditActive || isEditPersonMetadataActive"
+                          :person="personStore.currentPerson"
+                          @dialogClosed="twoFactorAuthentificationStore.get2FAState(currentPersonId)"
+                        >
+                        </TwoFactorAuthenticationSetUp>
+                      </SpshTooltip>
                     </v-col>
                   </div>
                 </v-col>
               </template>
             </v-row>
           </v-container>
-          <v-divider
-            class="border-opacity-100 rounded my-6 mx-4"
-            color="#E5EAEF"
-            thickness="6"
-          ></v-divider>
         </template>
+        <v-divider
+          class="border-opacity-100 rounded my-6 mx-4"
+          color="#E5EAEF"
+          thickness="6"
+        ></v-divider>
         <v-container class="person-lock">
           <v-row class="ml-md-16">
             <v-col data-testid="person-lock-info">
@@ -2687,60 +2680,59 @@
       </LayoutCard>
     </v-dialog>
 
-      <!-- Warning dialog for unsaved changes -->
-  <v-dialog
-    data-testid="unsaved-changes-dialog"
-    ref="unsaved-changes-dialog"
-    persistent
-    v-model="showUnsavedChangesDialog"
-  >
-    <LayoutCard :header="$t('unsavedChanges.title')">
-      <v-card-text>
-        <v-container>
-          <v-row class="text-body bold px-md-16">
-            <v-col>
-              <p data-testid="unsaved-changes-warning-text">
-                {{ $t('unsavedChanges.message') }}
-              </p>
+    <!-- Warning dialog for unsaved changes -->
+    <v-dialog
+      data-testid="unsaved-changes-dialog"
+      ref="unsaved-changes-dialog"
+      persistent
+      v-model="showUnsavedChangesDialog"
+    >
+      <LayoutCard :header="$t('unsavedChanges.title')">
+        <v-card-text>
+          <v-container>
+            <v-row class="text-body bold px-md-16">
+              <v-col>
+                <p data-testid="unsaved-changes-warning-text">
+                  {{ $t('unsavedChanges.message') }}
+                </p>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card-text>
+        <v-card-actions class="justify-center">
+          <v-row class="justify-center">
+            <v-col
+              cols="12"
+              sm="6"
+              md="auto"
+            >
+              <v-btn
+                @click.stop="handleConfirmUnsavedChanges"
+                class="secondary button"
+                data-testid="confirm-unsaved-changes-button"
+                :block="mdAndDown"
+              >
+                {{ $t('yes') }}
+              </v-btn>
+            </v-col>
+            <v-col
+              cols="12"
+              sm="6"
+              md="auto"
+            >
+              <v-btn
+                @click.stop="showUnsavedChangesDialog = false"
+                class="primary button"
+                data-testid="close-unsaved-changes-dialog-button"
+                :block="mdAndDown"
+              >
+                {{ $t('no') }}
+              </v-btn>
             </v-col>
           </v-row>
-        </v-container>
-      </v-card-text>
-      <v-card-actions class="justify-center">
-        <v-row class="justify-center">
-          <v-col
-            cols="12"
-            sm="6"
-            md="auto"
-          >
-            <v-btn
-              @click.stop="handleConfirmUnsavedChanges"
-              class="secondary button"
-              data-testid="confirm-unsaved-changes-button"
-              :block="mdAndDown"
-            >
-              {{ $t('yes') }}
-            </v-btn>
-          </v-col>
-          <v-col
-            cols="12"
-            sm="6"
-            md="auto"
-          >
-            <v-btn
-              @click.stop="showUnsavedChangesDialog = false"
-              class="primary button"
-              data-testid="close-unsaved-changes-dialog-button"
-              :block="mdAndDown"
-            >
-              {{ $t('no') }}
-            </v-btn>
-          </v-col>
-        </v-row>
-      </v-card-actions>
-    </LayoutCard>
-  </v-dialog>
-    
+        </v-card-actions>
+      </LayoutCard>
+    </v-dialog>
   </div>
 </template>
 
