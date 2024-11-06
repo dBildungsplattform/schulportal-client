@@ -5,6 +5,7 @@ import { expect, test, type Mock } from 'vitest';
 import { nextTick } from 'vue';
 import PersonLock from './PersonLock.vue';
 import { EmailAddressStatus } from '@/api-client/generated';
+import PersonDetailsView from '@/views/admin/PersonDetailsView.vue';
 
 let wrapper: VueWrapper | null = null;
 
@@ -250,6 +251,7 @@ describe('Unlock user', () => {
       global: {
         components: {
           PersonLock,
+          PersonDetailsView,
         },
       },
     });
