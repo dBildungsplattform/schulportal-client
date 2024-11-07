@@ -58,7 +58,7 @@ function getPersonendatensatz(locked: boolean): Personendatensatz {
 }
 
 async function openDialog(): Promise<void> {
-  wrapper?.get('[data-testid="open-lock-dialog-icon"]').trigger('click');
+  wrapper?.get('[data-testid="open-lock-dialog-button"]').trigger('click');
   await nextTick();
 }
 

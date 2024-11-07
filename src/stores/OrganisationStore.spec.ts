@@ -111,7 +111,7 @@ describe('OrganisationStore', () => {
       ];
 
       mockadapter.onGet('/api/organisationen?offset=0&limit=30&typ=KLASSE').replyOnce(200, mockResponse);
-      mockadapter.onGet('/api/organisationen?limit=30&typ=SCHULE&systemrechte=SCHULEN_VERWALTEN').replyOnce(200, []);
+      mockadapter.onGet('/api/organisationen?limit=30&typ=SCHULE&systemrechte=KLASSEN_VERWALTEN').replyOnce(200, []);
       const getAllOrganisationenPromise: Promise<void> = organisationStore.getAllOrganisationen({
         offset: 0,
         limit: 30,
@@ -365,7 +365,7 @@ describe('OrganisationStore', () => {
 
       mockadapter.onGet('/api/organisationen/1/administriert').replyOnce(200, mockResponse);
       mockadapter
-        .onGet('/api/organisationen?limit=30&typ=SCHULE&systemrechte=SCHULEN_VERWALTEN&organisationIds=1')
+        .onGet('/api/organisationen?limit=30&typ=SCHULE&systemrechte=KLASSEN_VERWALTEN&organisationIds=1')
         .replyOnce(200, []);
       const getAllKlassenByOrganisationId: Promise<void> = organisationStore.getKlassenByOrganisationId('1');
       await getAllKlassenByOrganisationId;
@@ -690,7 +690,7 @@ describe('OrganisationStore', () => {
       organisationStore.klassen = [...mockKlassen];
 
       mockadapter
-        .onGet('/api/organisationen?limit=30&typ=SCHULE&systemrechte=SCHULEN_VERWALTEN&organisationIds=101')
+        .onGet('/api/organisationen?limit=30&typ=SCHULE&systemrechte=KLASSEN_VERWALTEN&organisationIds=101')
         .replyOnce(200, [
           {
             id: '101',

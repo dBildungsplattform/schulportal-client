@@ -1756,6 +1756,7 @@
                       {{ $t('person.addZuordnung') }}
                     </v-btn>
                   </SpshTooltip>
+                  <!-- This will stay commented until the buttons are actually functionable 
                   <SpshTooltip
                     :enabledCondition="selectedZuordnungen.length > 0"
                     :disabledText="$t('person.chooseZuordnungFirst')"
@@ -1786,6 +1787,7 @@
                       {{ $t('person.modifyBefristung') }}
                     </v-btn>
                   </SpshTooltip>
+                  -->
                   <SpshTooltip
                     v-if="hasKlassenZuordnung"
                     :enabledCondition="canChangeKlasse"
