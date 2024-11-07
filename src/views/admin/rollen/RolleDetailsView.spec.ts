@@ -143,4 +143,22 @@ describe('RolleDetailsView', () => {
       'Die Rolle wurde erfolgreich geändert.',
     );
   });
+
+  test('displays error message correctly', async () => {
+    // Test case 1: ROLLE_UPDATE_ERROR
+    rolleStore.errorCode = 'ROLLE_UPDATE_ERROR';
+    await nextTick();
+
+    const spshAlertWrapper: VueWrapper | undefined = wrapper?.findComponent({ name: 'SpshAlert' });
+    expect(spshAlertWrapper?.props()).toMatchObject({
+      title: 'Die Rolle konnte nicht bearbeitet werden',
+    });
+    // Test case 2: NEWER_VERSION_OF_ROLLE_AVAILABLE
+    rolleStore.errorCode = 'NEWER_VERSION_OF_ROLLE_AVAILABLE';
+    await nextTick();
+
+    expect(spshAlertWrapper?.props()).toMatchObject({
+      title: 'Geänderte Daten',
+    });
+  });
 });
