@@ -8,7 +8,7 @@
   // Define the maintenance date range
   const isMaintenancePeriod: ComputedRef<boolean> = computed(() => {
     const today: Date = new Date();
-    const startDate: Date = parseISO('2024-11-07T00:00:00');
+    const startDate: Date = parseISO('2024-12-07T00:00:00');
     const endDate: Date = parseISO('2024-12-08T00:00:00');
 
     // Check if today falls within the maintenance period
