@@ -49,6 +49,7 @@ authStore.hasKlassenverwaltungPermission = true;
 authStore.hasRollenverwaltungPermission = true;
 authStore.hasSchulverwaltungPermission = true;
 authStore.hasSchultraegerverwaltungPermission = true;
+authStore.hasPersonenAnlegenPermission = true;
 
 beforeEach(async () => {
   document.body.innerHTML = `
@@ -106,6 +107,14 @@ describe('MenuBar', () => {
     expect(wrapper?.find('[data-testid="schule-creation-menu-item"]').isVisible()).toBe(true);
 
     expect(wrapper?.find('[data-testid="schultraeger-management-title"]').isVisible()).toBe(true);
+  });
+
+  test('hides elements when permissions are false', async () => {
+    // Reset permissions to false
+    authStore.hasPersonenAnlegenPermission = false;
+    await nextTick();
+
+    expect(wrapper?.find('[data-testid="person-creation-menu-item"]').exists()).toBe(false);
   });
 
   test('it handles menu item click', async () => {
