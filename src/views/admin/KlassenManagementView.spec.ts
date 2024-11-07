@@ -271,7 +271,7 @@ describe('KlassenManagementView', () => {
     expect(spy).toHaveBeenCalledWith({
       searchString: 'New School',
       includeTyp: OrganisationsTyp.Schule,
-      limit: 30,
+      limit: 25,
       systemrechte: ['KLASSEN_VERWALTEN'],
     });
   });
@@ -291,7 +291,7 @@ describe('KlassenManagementView', () => {
     expect(spy).toHaveBeenCalledWith({
       searchString: '23',
       includeTyp: OrganisationsTyp.Schule,
-      limit: 30,
+      limit: 25,
       systemrechte: ['KLASSEN_VERWALTEN'],
     });
   });

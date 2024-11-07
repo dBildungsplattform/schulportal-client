@@ -131,7 +131,7 @@
       // Fetch all Klassen when no Schule is selected
       await organisationStore.getAllOrganisationen({
         offset: (searchFilterStore.klassenPage - 1) * searchFilterStore.klassenPerPage,
-        limit: 30,
+        limit: 25,
         includeTyp: OrganisationsTyp.Klasse,
         systemrechte: ['KLASSEN_VERWALTEN'],
       });
@@ -181,7 +181,7 @@
         // Fetch Schulen matching the search string when it has 3 or more characters
         await organisationStore.getAllOrganisationen({
           includeTyp: OrganisationsTyp.Schule,
-          limit: 30,
+          limit: 25,
           systemrechte: ['KLASSEN_VERWALTEN'],
         });
       }, 500);
@@ -192,7 +192,7 @@
         await organisationStore.getAllOrganisationen({
           searchString: newValue,
           includeTyp: OrganisationsTyp.Schule,
-          limit: 30,
+          limit: 25,
           systemrechte: ['KLASSEN_VERWALTEN'],
         });
       }, 500);
@@ -202,7 +202,7 @@
         await organisationStore.getAllOrganisationen({
           searchString: newValue,
           includeTyp: OrganisationsTyp.Schule,
-          limit: 30,
+          limit: 25,
           systemrechte: ['KLASSEN_VERWALTEN'],
         });
       }, 500);
@@ -277,7 +277,7 @@
       // Refetch all data
       await organisationStore.getAllOrganisationen({
         includeTyp: OrganisationsTyp.Schule,
-        limit: 30,
+        limit: 25,
         systemrechte: ['KLASSEN_VERWALTEN'],
       });
       await organisationStore.getAllOrganisationen({
@@ -321,7 +321,7 @@
     });
     await organisationStore.getAllOrganisationen({
       offset: (searchFilterStore.klassenPage - 1) * searchFilterStore.klassenPerPage,
-      limit: 30,
+      limit: 25,
       includeTyp: OrganisationsTyp.Schule,
       systemrechte: ['KLASSEN_VERWALTEN'],
     });
