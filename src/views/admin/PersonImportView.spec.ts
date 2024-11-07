@@ -217,7 +217,7 @@ describe('PersonImportView', () => {
     wrapper?.find('[data-testid="execute-import-button"]').trigger('click');
     await nextTick();
 
-    wrapper?.find('[data-testid="back-to-upload-button"]').trigger('click');
+    wrapper?.find('[data-testid="another-import-button"]').trigger('click');
     await nextTick();
 
     expect(importStore.importedData).toBeNull();
