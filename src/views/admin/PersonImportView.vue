@@ -453,7 +453,9 @@
             <v-row
               v-for="(invalidItem, index) in importStore.uploadResponse.invalidImportDataItems"
               :key="index"
+              class="invalid-items"
               :data-testid="`invalid-item-row-${index + 1}`"
+              dense
             >
               <v-col
                 class="primary-text-color"
@@ -493,3 +495,9 @@
     </LayoutCard>
   </div>
 </template>
+
+<style lang="scss" scoped>
+  .invalid-items {
+    font-size: 16px;
+  }
+</style>
