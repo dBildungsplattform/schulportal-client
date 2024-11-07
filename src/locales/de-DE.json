@@ -27,8 +27,9 @@
     "followingDataCreated": "Folgende Daten wurden gespeichert:",
     "headline": "Administrationsbereich",
     "import": {
+      "anotherImport": "Weiteren Import durchführen",
       "backToUpload": "Andere Datei hochladen",
-      "downloadFile": "Datei herunterladen",
+      "downloadUserdata": "Benutzerdaten herunterladen",
       "errors": {
         "ERROR_IMPORTING_FILE": "Die Daten konnten nicht importiert werden. Bitte versuchen Sie es erneut.",
         "ERROR_UPLOADING_FILE": "Die Datei konnte nicht hochgeladen werden. Bitte versuchen Sie es mit einer anderen Datei.",

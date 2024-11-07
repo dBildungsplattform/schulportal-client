@@ -103,6 +103,8 @@
       // If the organization is cleared, reset selectedRolle
       selectedRolle.value = undefined;
     }
+
+    importStore.uploadResponse = null;
   });
 
   watch(searchInputSchule, (newValue: string | undefined, _oldValue: string | undefined) => {
@@ -152,6 +154,12 @@
       selectedRolle.value as string,
       selectedFiles.value[0] as File,
     );
+  }
+
+  function anotherImport(): void {
+    importStore.uploadResponse = null;
+    importStore.importedData = null;
+    formContext.resetForm();
   }
 
   function backToUpload(): void {
@@ -303,10 +311,10 @@
             <v-col cols="auto">
               <v-btn
                 class="secondary"
-                @click="backToUpload()"
-                data-testid="back-to-upload-button"
+                @click="anotherImport()"
+                data-testid="another-import-button"
               >
-                {{ $t('admin.import.backToUpload') }}
+                {{ $t('admin.import.anotherImport') }}
               </v-btn>
             </v-col>
             <v-col cols="auto">
@@ -315,7 +323,7 @@
                 @click="downloadFile()"
                 data-testid="download-file-button"
               >
-                {{ $t('admin.import.downloadFile') }}
+                {{ $t('admin.import.downloadUserdata') }}
               </v-btn>
             </v-col>
           </v-row>
