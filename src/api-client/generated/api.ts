@@ -549,7 +549,8 @@ export const DbiamImportErrorI18nKeyEnum = {
     ImportError: 'IMPORT_ERROR',
     CsvParsingError: 'CSV_PARSING_ERROR',
     CsvFileEmptyError: 'CSV_FILE_EMPTY_ERROR',
-    ImportTextFileCreationError: 'IMPORT_TEXT_FILE_CREATION_ERROR'
+    ImportTextFileCreationError: 'IMPORT_TEXT_FILE_CREATION_ERROR',
+    ImportNurLernAnSchuleError: 'IMPORT_NUR_LERN_AN_SCHULE_ERROR'
 } as const;
 
 export type DbiamImportErrorI18nKeyEnum = typeof DbiamImportErrorI18nKeyEnum[keyof typeof DbiamImportErrorI18nKeyEnum];
@@ -918,6 +919,37 @@ export type Geschlecht = typeof Geschlecht[keyof typeof Geschlecht];
 /**
  * 
  * @export
+ * @interface ImportDataItemResponse
+ */
+export interface ImportDataItemResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof ImportDataItemResponse
+     */
+    'nachname': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ImportDataItemResponse
+     */
+    'vorname': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ImportDataItemResponse
+     */
+    'klasse': string | null;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof ImportDataItemResponse
+     */
+    'validationErrors': Array<string>;
+}
+/**
+ * 
+ * @export
  * @interface ImportUploadResponse
  */
 export interface ImportUploadResponse {
@@ -933,6 +965,24 @@ export interface ImportUploadResponse {
      * @memberof ImportUploadResponse
      */
     'isValid': boolean;
+    /**
+     * The total number of data items in the CSV file.
+     * @type {number}
+     * @memberof ImportUploadResponse
+     */
+    'totalImportDataItems': number;
+    /**
+     * The total number of data items in the CSV file that are invalid.
+     * @type {number}
+     * @memberof ImportUploadResponse
+     */
+    'totalInvalidImportDataItems': number;
+    /**
+     * 
+     * @type {Array<ImportDataItemResponse>}
+     * @memberof ImportUploadResponse
+     */
+    'invalidImportDataItems': Array<ImportDataItemResponse>;
 }
 /**
  * 
@@ -2374,6 +2424,7 @@ export const RollenSystemRecht = {
     MigrationDurchfuehren: 'MIGRATION_DURCHFUEHREN',
     PersonSynchronisieren: 'PERSON_SYNCHRONISIEREN',
     CronDurchfuehren: 'CRON_DURCHFUEHREN',
+    PersonenAnlegen: 'PERSONEN_ANLEGEN',
     ImportDurchfuehren: 'IMPORT_DURCHFUEHREN'
 } as const;
 
@@ -2826,13 +2877,13 @@ export interface UserLockParams {
      * @type {string}
      * @memberof UserLockParams
      */
-    'locked_until': string | null;
+    'created_at': string | null;
     /**
      * 
      * @type {string}
      * @memberof UserLockParams
      */
-    'created_at': string | null;
+    'locked_until': string | null;
 }
 /**
  * 
@@ -3943,6 +3994,80 @@ export const CronApiAxiosParamCreator = function (configuration?: Configuration)
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        cronControllerPersonWithoutOrgDelete: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/cron/person-without-org`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        cronControllerRemovePersonenKontexteWithExpiredBefristungFromUsers: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/cron/kontext-expired`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -3960,6 +4085,24 @@ export const CronApiFp = function(configuration?: Configuration) {
          */
         async cronControllerKoPersUserLock(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<boolean>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.cronControllerKoPersUserLock(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async cronControllerPersonWithoutOrgDelete(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<boolean>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.cronControllerPersonWithoutOrgDelete(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async cronControllerRemovePersonenKontexteWithExpiredBefristungFromUsers(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<boolean>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.cronControllerRemovePersonenKontexteWithExpiredBefristungFromUsers(options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -3980,6 +4123,22 @@ export const CronApiFactory = function (configuration?: Configuration, basePath?
         cronControllerKoPersUserLock(options?: any): AxiosPromise<boolean> {
             return localVarFp.cronControllerKoPersUserLock(options).then((request) => request(axios, basePath));
         },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        cronControllerPersonWithoutOrgDelete(options?: any): AxiosPromise<boolean> {
+            return localVarFp.cronControllerPersonWithoutOrgDelete(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        cronControllerRemovePersonenKontexteWithExpiredBefristungFromUsers(options?: any): AxiosPromise<boolean> {
+            return localVarFp.cronControllerRemovePersonenKontexteWithExpiredBefristungFromUsers(options).then((request) => request(axios, basePath));
+        },
     };
 };
 
@@ -3996,6 +4155,22 @@ export interface CronApiInterface {
      * @memberof CronApiInterface
      */
     cronControllerKoPersUserLock(options?: AxiosRequestConfig): AxiosPromise<boolean>;
+
+    /**
+     * 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CronApiInterface
+     */
+    cronControllerPersonWithoutOrgDelete(options?: AxiosRequestConfig): AxiosPromise<boolean>;
+
+    /**
+     * 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CronApiInterface
+     */
+    cronControllerRemovePersonenKontexteWithExpiredBefristungFromUsers(options?: AxiosRequestConfig): AxiosPromise<boolean>;
 
 }
 
@@ -4014,6 +4189,26 @@ export class CronApi extends BaseAPI implements CronApiInterface {
      */
     public cronControllerKoPersUserLock(options?: AxiosRequestConfig) {
         return CronApiFp(this.configuration).cronControllerKoPersUserLock(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CronApi
+     */
+    public cronControllerPersonWithoutOrgDelete(options?: AxiosRequestConfig) {
+        return CronApiFp(this.configuration).cronControllerPersonWithoutOrgDelete(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CronApi
+     */
+    public cronControllerRemovePersonenKontexteWithExpiredBefristungFromUsers(options?: AxiosRequestConfig) {
+        return CronApiFp(this.configuration).cronControllerRemovePersonenKontexteWithExpiredBefristungFromUsers(options).then((request) => request(this.axios, this.basePath));
     }
 }
 
@@ -4441,6 +4636,48 @@ export class DbiamPersonenuebersichtApi extends BaseAPI implements DbiamPersonen
 export const ImportApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
+         * Delete a role by id.
+         * @summary 
+         * @param {string} importvorgangId The id of an import transaction
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        importControllerDeleteImportTransaction: async (importvorgangId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'importvorgangId' is not null or undefined
+            assertParamExists('importControllerDeleteImportTransaction', 'importvorgangId', importvorgangId)
+            const localVarPath = `/api/import/{importvorgangId}`
+                .replace(`{${"importvorgangId"}}`, encodeURIComponent(String(importvorgangId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 
          * @param {ImportvorgangByIdBodyParams} importvorgangByIdBodyParams 
          * @param {*} [options] Override http request option.
@@ -4556,6 +4793,17 @@ export const ImportApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = ImportApiAxiosParamCreator(configuration)
     return {
         /**
+         * Delete a role by id.
+         * @summary 
+         * @param {string} importvorgangId The id of an import transaction
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async importControllerDeleteImportTransaction(importvorgangId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.importControllerDeleteImportTransaction(importvorgangId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
          * 
          * @param {ImportvorgangByIdBodyParams} importvorgangByIdBodyParams 
          * @param {*} [options] Override http request option.
@@ -4588,6 +4836,16 @@ export const ImportApiFactory = function (configuration?: Configuration, basePat
     const localVarFp = ImportApiFp(configuration)
     return {
         /**
+         * Delete a role by id.
+         * @summary 
+         * @param {string} importvorgangId The id of an import transaction
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        importControllerDeleteImportTransaction(importvorgangId: string, options?: any): AxiosPromise<void> {
+            return localVarFp.importControllerDeleteImportTransaction(importvorgangId, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 
          * @param {ImportvorgangByIdBodyParams} importvorgangByIdBodyParams 
          * @param {*} [options] Override http request option.
@@ -4617,6 +4875,16 @@ export const ImportApiFactory = function (configuration?: Configuration, basePat
  */
 export interface ImportApiInterface {
     /**
+     * Delete a role by id.
+     * @summary 
+     * @param {string} importvorgangId The id of an import transaction
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ImportApiInterface
+     */
+    importControllerDeleteImportTransaction(importvorgangId: string, options?: AxiosRequestConfig): AxiosPromise<void>;
+
+    /**
      * 
      * @param {ImportvorgangByIdBodyParams} importvorgangByIdBodyParams 
      * @param {*} [options] Override http request option.
@@ -4645,6 +4913,18 @@ export interface ImportApiInterface {
  * @extends {BaseAPI}
  */
 export class ImportApi extends BaseAPI implements ImportApiInterface {
+    /**
+     * Delete a role by id.
+     * @summary 
+     * @param {string} importvorgangId The id of an import transaction
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ImportApi
+     */
+    public importControllerDeleteImportTransaction(importvorgangId: string, options?: AxiosRequestConfig) {
+        return ImportApiFp(this.configuration).importControllerDeleteImportTransaction(importvorgangId, options).then((request) => request(this.axios, this.basePath));
+    }
+
     /**
      * 
      * @param {ImportvorgangByIdBodyParams} importvorgangByIdBodyParams 
