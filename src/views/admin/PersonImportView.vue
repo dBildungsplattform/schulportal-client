@@ -107,6 +107,12 @@
     importStore.uploadResponse = null;
   });
 
+  watch(selectedFiles, (newValue: File[] | undefined, oldValue: File[] | undefined) => {
+    if (newValue && newValue[0] !== oldValue?.[0]) {
+      importStore.uploadResponse = null;
+    }
+  });
+
   watch(searchInputSchule, (newValue: string | undefined, _oldValue: string | undefined) => {
     /* cancel pending call */
     clearTimeout(timerId);
