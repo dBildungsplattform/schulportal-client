@@ -172,7 +172,7 @@
       "creationErrorTitle": "Fehler beim Anlegen des Benutzers.",
       "deletePerson": "Benutzer löschen",
       "deletePersonConfirmation": "Wollen Sie den Benutzer {firstname} {lastname} sofort und endgültig löschen?",
-      "deletePersonSuccessMessage": "{firstname} {lastname} wurde erfolgreich gelöscht",
+      "deletePersonSuccessMessage": "{firstname} {lastname} wurde erfolgreich gelöscht.",
       "discard": "Benutzer verwerfen",
       "disableUser": "Benutzer sperren",
       "edit": "Benutzer bearbeiten",
@@ -438,6 +438,9 @@
     "button": "Anmelden",
     "forgotPassword": "Passwort vergessen? \n Wenden Sie sich bitte an Ihre schulischen Administratorinnen und Administratoren.",
     "header": "Anmeldung im Schulportal SH",
+    "maintenanceNoticeTitle": "Achtung Wartungsarbeiten!",
+    "maintenanceNoticeText": "Am 7.12. und 8.12.2024 werden ganztägig Wartungsarbeiten am Schulportal SH ausgeführt.",
+    "doNotLogin": "Bitte melden Sie sich nicht an!",
     "password": "Passwort",
     "username": "Benutzername"
   },
