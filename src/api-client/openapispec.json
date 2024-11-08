@@ -2622,9 +2622,20 @@
           "namensergaenzung": { "type": "string", "nullable": true },
           "kuerzel": { "type": "string" },
           "typ": { "$ref": "#/components/schemas/OrganisationsTyp" },
-          "traegerschaft": { "$ref": "#/components/schemas/TraegerschaftTyp" }
+          "traegerschaft": { "$ref": "#/components/schemas/TraegerschaftTyp" },
+          "version": { "type": "number" }
         },
-        "required": ["id", "administriertVon", "kennung", "name", "namensergaenzung", "kuerzel", "typ", "traegerschaft"]
+        "required": [
+          "id",
+          "administriertVon",
+          "kennung",
+          "name",
+          "namensergaenzung",
+          "kuerzel",
+          "typ",
+          "traegerschaft",
+          "version"
+        ]
       },
       "DbiamOrganisationError": {
         "type": "object",
@@ -2647,7 +2658,8 @@
               "NAME_REQUIRED_FOR_KLASSE",
               "NAME_ENTHAELT_LEERZEICHEN",
               "KENNUNG_ENTHAELT_LEERZEICHEN",
-              "EMAIL_ADRESS_ON_ORGANISATION_TYP"
+              "EMAIL_ADRESS_ON_ORGANISATION_TYP",
+              "NEWER_VERSION_ORGANISATION"
             ]
           },
           "code": { "type": "number", "description": "Corresponds to HTTP Status code like 200, 404, 500" }
@@ -2721,8 +2733,11 @@
       },
       "OrganisationByNameBodyParams": {
         "type": "object",
-        "properties": { "name": { "type": "string" } },
-        "required": ["name"]
+        "properties": {
+          "name": { "type": "string" },
+          "version": { "type": "number", "description": "The version for the organisation." }
+        },
+        "required": ["name", "version"]
       },
       "OrganisationResponseLegacy": {
         "type": "object",
