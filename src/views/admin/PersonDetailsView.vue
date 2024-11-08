@@ -1111,16 +1111,17 @@
   });
 
   const twoFactorAuthenticationConnectionError: ComputedRef<string> = computed(() => {
-    if (
-      twoFactorAuthentificationStore.errorCode == '500' ||
-      twoFactorAuthentificationStore.errorCode == '502' ||
-      twoFactorAuthentificationStore.errorCode == '503' ||
-      twoFactorAuthentificationStore.errorCode == '504' ||
-      twoFactorAuthentificationStore.errorCode == 'UNSPECIFIED_ERROR'
-    ) {
-      return t('admin.person.twoFactorAuthentication.errors.connection');
+    // Early return if loading
+    if (twoFactorAuthentificationStore.loading) return '';
+
+    switch (twoFactorAuthentificationStore.errorCode) {
+      case 'TOKEN_STATE_ERROR':
+        return t('admin.person.twoFactorAuthentication.errors.tokenStateError');
+      case 'PI_UNAVAILABLE_ERROR':
+        return t('admin.person.twoFactorAuthentication.errors.connection');
+      default:
+        return '';
     }
-    return '';
   });
 
   // Computed property to define what will be shown in the field Email depending on the returned status.
@@ -2038,15 +2039,8 @@
               <v-col> <v-progress-circular indeterminate></v-progress-circular></v-col>
             </v-row>
           </v-container>
-          <v-divider
-            class="border-opacity-100 rounded my-6 mx-4"
-            color="#E5EAEF"
-            thickness="6"
-          ></v-divider>
         </template>
-        <template
-          v-else-if="twoFactorAuthentificationStore.required && twoFactorAuthentificationStore.hasToken != null"
-        >
+        <template v-else-if="twoFactorAuthentificationStore.required">
           <v-divider
             class="border-opacity-100 rounded my-6 mx-4"
             color="#E5EAEF"
@@ -2060,7 +2054,7 @@
               <template v-else>
                 <v-col>
                   <h3 class="subtitle-1">{{ $t('admin.person.twoFactorAuthentication.header') }}</h3>
-                  <v-row class="mt-4 text-body">
+                  <v-row class="mt-4 mr-lg-13 text-body">
                     <v-col
                       class="text-right"
                       cols="1"
@@ -2077,10 +2071,36 @@
                       ></v-icon>
                     </v-col>
                     <v-col>
-                      <template v-if="twoFactorAuthenticationConnectionError">
-                        <p>
-                          {{ twoFactorAuthenticationConnectionError }}
-                        </p>
+                      <template
+                        v-if="twoFactorAuthentificationStore.errorCode && !twoFactorAuthentificationStore.loading"
+                      >
+                        <v-row v-if="twoFactorAuthentificationStore.errorCode === 'PI_UNAVAILABLE_ERROR'">
+                          <p
+                            class="text-body"
+                            data-testid="connection-error-text"
+                          >
+                            {{ $t('admin.person.twoFactorAuthentication.errors.connection') }}
+                          </p>
+                        </v-row>
+                        <v-row v-else-if="twoFactorAuthentificationStore.errorCode === 'TOKEN_STATE_ERROR'">
+                          <p
+                            class="text-body"
+                            data-testid="token-state-error-text"
+                          >
+                            <i18n-t
+                              keypath="admin.person.twoFactorAuthentication.errors.tokenStateError"
+                              for="admin.person.twoFactorAuthentication.errors.iqshHelpdesk"
+                              tag="label"
+                            >
+                              <a
+                                :href="$t('admin.person.twoFactorAuthentication.errors.iqshHelpdeskLink')"
+                                rel="noopener noreferrer"
+                                target="_blank"
+                                >{{ $t('admin.person.twoFactorAuthentication.errors.iqshHelpdesk') }}</a
+                              >
+                            </i18n-t>
+                          </p>
+                        </v-row>
                       </template>
                       <template v-else-if="twoFactorAuthentificationStore.hasToken">
                         <p v-if="twoFactorAuthentificationStore.tokenKind === TokenKind.software">
@@ -2103,7 +2123,10 @@
                       </template>
                     </v-col>
                   </v-row>
-                  <v-row class="text-body">
+                  <v-row
+                    v-if="!twoFactorAuthenticationConnectionError"
+                    class="text-body"
+                  >
                     <v-col
                       class="text-right"
                       cols="1"
