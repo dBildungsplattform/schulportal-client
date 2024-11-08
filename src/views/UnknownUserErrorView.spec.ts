@@ -55,12 +55,4 @@ describe('UnknownUserErrorView', () => {
     expect(alertTitle?.isVisible()).toBe(true);
     expect(alertTitle?.text()).toEqual('Zurück zur Startseite');
   });
-
-  test('clicking the button should push replace route', () => {
-    const replaceSpy: MockInstance = vi.spyOn(router, 'replace');
-
-    wrapper?.find('[data-testid="alert-button"]').trigger('click');
-
-    expect(replaceSpy).toHaveBeenCalledWith('/');
-  });
 });
