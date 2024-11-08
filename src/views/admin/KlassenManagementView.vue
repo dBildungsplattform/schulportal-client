@@ -182,7 +182,7 @@
         await organisationStore.getAllOrganisationen({
           includeTyp: OrganisationsTyp.Schule,
           limit: 25,
-          systemrechte: ['SCHULEN_VERWALTEN'],
+          systemrechte: ['KLASSEN_VERWALTEN'],
         });
       }, 500);
     } else if (newValue && newValue !== selectedOrganisationTitle.value) {
@@ -193,7 +193,7 @@
           searchString: newValue,
           includeTyp: OrganisationsTyp.Schule,
           limit: 25,
-          systemrechte: ['SCHULEN_VERWALTEN'],
+          systemrechte: ['KLASSEN_VERWALTEN'],
         });
       }, 500);
     } else if (newValue === '' && selectedSchule.value) {
@@ -203,7 +203,7 @@
           searchString: newValue,
           includeTyp: OrganisationsTyp.Schule,
           limit: 25,
-          systemrechte: ['SCHULEN_VERWALTEN'],
+          systemrechte: ['KLASSEN_VERWALTEN'],
         });
       }, 500);
     }
@@ -323,7 +323,7 @@
       offset: (searchFilterStore.klassenPage - 1) * searchFilterStore.klassenPerPage,
       limit: 25,
       includeTyp: OrganisationsTyp.Schule,
-      systemrechte: ['SCHULEN_VERWALTEN'],
+      systemrechte: ['KLASSEN_VERWALTEN'],
     });
     // Initialize klassenOptions with all classes
     klassenOptions.value = organisationStore.allKlassen.map((org: Organisation) => ({

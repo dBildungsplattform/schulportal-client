@@ -272,7 +272,7 @@ describe('KlassenManagementView', () => {
       searchString: 'New School',
       includeTyp: OrganisationsTyp.Schule,
       limit: 25,
-      systemrechte: ['SCHULEN_VERWALTEN'],
+      systemrechte: ['KLASSEN_VERWALTEN'],
     });
   });
 
@@ -292,7 +292,7 @@ describe('KlassenManagementView', () => {
       searchString: '23',
       includeTyp: OrganisationsTyp.Schule,
       limit: 25,
-      systemrechte: ['SCHULEN_VERWALTEN'],
+      systemrechte: ['KLASSEN_VERWALTEN'],
     });
   });
 });
