@@ -47,6 +47,7 @@ describe('PersonInfoStore', () => {
           lokalisierung: null,
           vertrauensstufe: 'KEIN',
           revision: '',
+          dienststellen: [],
         },
         pid: '',
         personenkontexte: [],
