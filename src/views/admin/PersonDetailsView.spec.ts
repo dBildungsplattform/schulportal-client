@@ -6,6 +6,7 @@ import { useAuthStore, type AuthStore, type UserInfo } from '@/stores/AuthStore'
 import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
 import {
   parseUserLock,
+  PersonLockOccasion,
   usePersonStore,
   type Personendatensatz,
   type PersonStore,
@@ -258,7 +259,7 @@ describe('PersonDetailsView', () => {
         personId: '1234',
         locked_by: 'test',
         created_at: datetime,
-        lock_occasion: 'MANUELL_GESPERRT',
+        lock_occasion: PersonLockOccasion.MANUELL_GESPERRT,
         locked_until: datetime,
       },
     ];
@@ -404,7 +405,7 @@ describe('PersonDetailsView', () => {
         personId: '1234',
         locked_by: 'Lady Lock',
         created_at: date,
-        lock_occasion: 'MANUELL_GESPERRT',
+        lock_occasion: PersonLockOccasion.MANUELL_GESPERRT,
         locked_until: date,
       },
     ];

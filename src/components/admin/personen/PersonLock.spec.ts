@@ -1,5 +1,5 @@
 import { OrganisationsTyp, type Organisation } from '@/stores/OrganisationStore';
-import { type Person, type Personendatensatz } from '@/stores/PersonStore';
+import { PersonLockOccasion, type Person, type Personendatensatz } from '@/stores/PersonStore';
 import { mount, VueWrapper } from '@vue/test-utils';
 import { expect, test, type Mock } from 'vitest';
 import { nextTick } from 'vue';
@@ -48,7 +48,7 @@ function getPersonendatensatz(locked: boolean): Personendatensatz {
             personId: '123',
             locked_by: 'Amanda Admin',
             locked_until: Date.now().toString(),
-            lock_occasion: 'MANUELL_GESPERRT',
+            lock_occasion: PersonLockOccasion.MANUELL_GESPERRT,
             created_at: Date.now().toString(),
           },
         ]

@@ -49,13 +49,18 @@ export enum SortOrder {
   Desc = 'desc',
 }
 
+export enum PersonLockOccasion {
+  MANUELL_GESPERRT = 'MANUELL_GESPERRT',
+  KOPERS_GESPERRT = 'KOPERS_GESPERRT',
+}
+
 export enum LockKeys {
   PersonId = 'personId',
   LockedBy = 'locked_by',
   CreatedAt = 'created_at',
   LockedUntil = 'locked_until',
   LockOccasion = 'lock_occasion',
-  MANUELL_GESPERRT = 'MANUELL_GESPERRT',
+  MANUELL_GESPERRT = PersonLockOccasion.MANUELL_GESPERRT,
 }
 export type UserLock = {
   personId: string;
@@ -115,11 +120,6 @@ export type PersonTableItem = {
 
 export type CreatePersonBodyParams = DbiamCreatePersonWithPersonenkontexteBodyParams;
 export type CreatedPersonenkontext = DbiamPersonenkontextBodyParams;
-
-export enum PersonLockOccasion {
-  MANUELL_GESPERRT = 'MANUELL_GESPERRT',
-  KOPERS_GESPERRT = 'KOPERS_GESPERRT',
-}
 
 export function parseUserLock(unparsedArray: object[]): UserLock[] {
   const parsedLocks: UserLock[] = [];
