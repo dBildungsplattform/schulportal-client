@@ -5397,6 +5397,9 @@
                     },
                     "traegerschaft": {
                         "$ref": "#/components/schemas/TraegerschaftTyp"
+                    },
+                    "version": {
+                        "type": "number"
                     }
                 },
                 "required": [
@@ -5407,7 +5410,8 @@
                     "namensergaenzung",
                     "kuerzel",
                     "typ",
-                    "traegerschaft"
+                    "traegerschaft",
+                    "version"
                 ]
             },
             "DbiamOrganisationError": {
@@ -5431,7 +5435,8 @@
                             "NAME_REQUIRED_FOR_KLASSE",
                             "NAME_ENTHAELT_LEERZEICHEN",
                             "KENNUNG_ENTHAELT_LEERZEICHEN",
-                            "EMAIL_ADRESS_ON_ORGANISATION_TYP"
+                            "EMAIL_ADRESS_ON_ORGANISATION_TYP",
+                            "NEWER_VERSION_ORGANISATION"
                         ]
                     },
                     "code": {
@@ -5560,10 +5565,15 @@
                 "properties": {
                     "name": {
                         "type": "string"
+                    },
+                    "version": {
+                        "type": "number",
+                        "description": "The version for the organisation."
                     }
                 },
                 "required": [
-                    "name"
+                    "name",
+                    "version"
                 ]
             },
             "OrganisationResponseLegacy": {
