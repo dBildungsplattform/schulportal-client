@@ -167,7 +167,8 @@
         "enterOtp": "Bitte geben Sie das angezeigte Einmalpasswort ein, um die Einrichtung abzuschließen.",
         "invalidOtp": "Ungültiger Code. Bitte versuchen Sie es erneut.",
         "otp": "Einmalpasswort",
-        "SecondFactorNotSet": "Es wurde noch kein zweiter Faktor für Sie eingerichtet."
+        "SecondFactorNotSet": "Es wurde noch kein zweiter Faktor für Sie eingerichtet.",
+        "NoLongerNeedToken": "Dieser Benutzer hat keinen Zugriff mehr auf sicherheitskritische Bereiche und benötigt aktuell den eingerichteten Token nicht."
       },
       "copyPasswordError": "Passwort konnte nicht in die Zwischenablage kopiert werden",
       "copyPasswordSuccess": "Passwort in Zwischenablage kopiert",

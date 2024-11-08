@@ -602,15 +602,15 @@
   }
 
   const alertButtonActionKopers: ComputedRef<() => void> = computed(() => {
-  switch (personStore.errorCode) {
-    case 'PERSONALNUMMER_NICHT_EINDEUTIG':
-      return navigateBackToKopersForm;
-    case 'NEWER_VERSION_OF_PERSON_AVAILABLE':
-      return () => router.go(0);
-    default:
-      return navigateToPersonTable;
-  }
-});
+    switch (personStore.errorCode) {
+      case 'PERSONALNUMMER_NICHT_EINDEUTIG':
+        return navigateBackToKopersForm;
+      case 'NEWER_VERSION_OF_PERSON_AVAILABLE':
+        return () => router.go(0);
+      default:
+        return navigateToPersonTable;
+    }
+  });
 
   // Triggers the template to start editing
   const triggerEdit = (): void => {
@@ -2040,7 +2040,9 @@
             </v-row>
           </v-container>
         </template>
-        <template v-else-if="twoFactorAuthentificationStore.required">
+        <template
+          v-else-if="twoFactorAuthentificationStore.required || twoFactorAuthentificationStore.hasToken === true"
+        >
           <v-divider
             class="border-opacity-100 rounded my-6 mx-4"
             color="#E5EAEF"
@@ -2138,7 +2140,10 @@
                       </v-icon>
                     </v-col>
                     <div class="v-col">
-                      <p v-if="twoFactorAuthentificationStore.hasToken">
+                      <p v-if="twoFactorAuthentificationStore.hasToken && !twoFactorAuthentificationStore.required">
+                        {{ $t('admin.person.twoFactorAuthentication.NoLongerNeedToken') }}
+                      </p>
+                      <p v-else-if="twoFactorAuthentificationStore.hasToken">
                         {{ $t('admin.person.twoFactorAuthentication.resetInfo') }}
                       </p>
                       <p v-if="!twoFactorAuthentificationStore.hasToken">
