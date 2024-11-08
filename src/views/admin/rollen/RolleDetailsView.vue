@@ -290,6 +290,17 @@
     window.addEventListener('beforeunload', preventNavigation);
   });
 
+  const alertButtonText: ComputedRef<string> = computed(() => {
+    return rolleStore.errorCode === 'NEWER_VERSION_OF_ROLLE_AVAILABLE' ? t('refreshData') : t('nav.backToList');
+  });
+
+  const alertButtonAction: ComputedRef<() => void> = computed(() => {
+    return rolleStore.errorCode === 'NEWER_VERSION_OF_ROLLE_AVAILABLE'
+      ? (): void => router.go(0)
+      : navigateToRolleTable;
+  });
+
+
   onBeforeRouteLeave((_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
     if (isFormDirty.value) {
       showUnsavedChangesDialog.value = true;
@@ -342,8 +353,8 @@
             : $t(`admin.rolle.errors.${rolleStore.errorCode}`)
         "
         :showButton="true"
-        :buttonText="$t('nav.backToList')"
-        :buttonAction="handleAlertClose"
+        :buttonText="alertButtonText"
+        :buttonAction="alertButtonAction"
         @update:modelValue="handleAlertClose"
       />
 
