@@ -329,9 +329,14 @@
   });
 
   const alertButtonTextKopers: ComputedRef<string> = computed(() => {
-    return personStore.errorCode === 'PERSONALNUMMER_NICHT_EINDEUTIG'
-      ? t('admin.person.backToInput')
-      : t('nav.backToList');
+    switch (personStore.errorCode) {
+      case 'PERSONALNUMMER_NICHT_EINDEUTIG':
+        return t('admin.person.backToInput');
+      case 'NEWER_VERSION_OF_PERSON_AVAILABLE':
+        return t('refreshData');
+      default:
+        return t('nav.backToList');
+    }
   });
 
   function getSskName(sskDstNr: string | undefined, sskName: string): string {
@@ -597,10 +602,15 @@
   }
 
   const alertButtonActionKopers: ComputedRef<() => void> = computed(() => {
-    return personStore.errorCode === 'PERSONALNUMMER_NICHT_EINDEUTIG'
-      ? navigateBackToKopersForm
-      : navigateToPersonTable;
-  });
+  switch (personStore.errorCode) {
+    case 'PERSONALNUMMER_NICHT_EINDEUTIG':
+      return navigateBackToKopersForm;
+    case 'NEWER_VERSION_OF_PERSON_AVAILABLE':
+      return () => router.go(0);
+    default:
+      return navigateToPersonTable;
+  }
+});
 
   // Triggers the template to start editing
   const triggerEdit = (): void => {
@@ -2421,7 +2431,7 @@
                 offset="1"
                 cols="10"
               >
-                <span>{{ changePersonMetadataSuccessMessage }}</span>
+                <span class="metadata-success-message">{{ changePersonMetadataSuccessMessage }}</span>
               </v-col>
             </v-row>
           </v-container>
@@ -2728,6 +2738,11 @@
 
   span {
     white-space: normal;
+    text-wrap: pretty;
+  }
+
+  .metadata-success-message {
+    white-space: pre;
     text-wrap: pretty;
   }
 </style>

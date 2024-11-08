@@ -45,14 +45,16 @@
       "edit": "Klasse bearbeiten",
       "title": {
         "KLASSENNAME_AN_SCHULE_EINDEUTIG": "Fehler bei Änderung der Klasse",
-        "ORGANISATION_IST_BEREITS_ZUGEWIESEN_ERROR": "Fehler beim Löschen"
+        "ORGANISATION_IST_BEREITS_ZUGEWIESEN_ERROR": "Fehler beim Löschen",
+        "NEWER_VERSION_ORGANISATION": "Geänderte Daten"
       },
       "errors": {
         "KLASSE_ERROR": "Die Klasse konnte nicht geändert werden.",
         "KLASSE_NUR_VON_SCHULE_ADMINISTRIERT": "Klassen dürfen nur von einer Schule administriert werden.",
         "KLASSENNAME_AN_SCHULE_EINDEUTIG": "Der Klassenname existiert bereits an dieser Schule.",
         "ORGANISATION_SPECIFICATION_ERROR": "Die Klasse konnte nicht angelegt werden.",
-        "ORGANISATION_IST_BEREITS_ZUGEWIESEN_ERROR": "Die Klasse kann nicht gelöscht werden, da noch Benutzer zugeordnet sind."
+        "ORGANISATION_IST_BEREITS_ZUGEWIESEN_ERROR": "Die Klasse kann nicht gelöscht werden, da noch Benutzer zugeordnet sind.",
+        "NEWER_VERSION_ORGANISATION": "Die Klasse wurde zwischenzeitlich von einer anderen Administratorin oder einem anderen Administrator bearbeitet. Bitte aktualisieren Sie die Daten und versuchen Sie es erneut."
       },
       "enterKlassenname": "Klassenname eingeben",
       "klasse": "Klasse",
@@ -215,13 +217,15 @@
         "ERROR_LOADING_USER": "Fehler beim Laden des Benutzers",
         "PERSONALNUMMER_NICHT_EINDEUTIG": "KoPers.-Nr. nicht eindeutig",
         "PERSONALNUMMER_REQUIRED": "Personalnummer erforderlich",
-        "PERSON_NOT_FOUND": "Benutzer gelöscht"
+        "PERSON_NOT_FOUND": "Benutzer gelöscht",
+        "NEWER_VERSION_OF_PERSON_AVAILABLE": "Geänderte Daten"
       },
       "errors": {
         "PERSONALNUMMER_NICHT_EINDEUTIG": "Die eingegebene KoPers.-Nr. ist bereits vergeben. Bitte korrigieren Sie Ihre Eingabe.",
         "ERROR_LOADING_USER": "Es konnten keine Benutzerdaten geladen werden.",
         "PERSONALNUMMER_REQUIRED": "Die Änderungen wurden nicht gespeichert, da keine KoPers.-Nr. eingegeben wurde.",
-        "PERSON_NOT_FOUND": "Der Benutzer wurde seit Ihrer letzten Änderung gelöscht und kann nicht mehr bearbeitet werden."
+        "PERSON_NOT_FOUND": "Der Benutzer wurde seit Ihrer letzten Änderung gelöscht und kann nicht mehr bearbeitet werden.",
+        "NEWER_VERSION_OF_PERSON_AVAILABLE": "Der Benutzer wurde zwischenzeitlich von einer anderen Administratorin oder einem anderen Administrator bearbeitet. Bitte aktualisieren Sie die Daten und versuchen Sie es erneut."
       },
       "showAll": "Alle Benutzer anzeigen",
       "startPassword": "Einstiegs-Passwort",
@@ -265,13 +269,13 @@
       "enterRollenname": "Rollenname eingeben",
       "errors": {
         "ADD_SYSTEMRECHT_ERROR": "Das Systemrecht konnte nicht hinzugefügt werden.",
-        "NEWER_VERSION_OF_ROLLE_AVAILABLE": "Die Änderungen wurden nicht gespeichert, da die Rolle in der Zwischenzeit geändert wurde.",
+        "NEWER_VERSION_OF_ROLLE_AVAILABLE": "Die Rolle wurde zwischenzeitlich von einer anderen Administratorin oder einem anderen Administrator bearbeitet. Bitte aktualisieren Sie die Daten und versuchen Sie es erneut.",
         "ROLLE_ERROR": "Die Rolle konnte nicht angelegt werden.",
         "ROLLE_HAT_PERSONENKONTEXTE_ERROR": "Die Rolle kann nicht gelöscht werden, da die sie noch Benutzern zugeordnet ist. Nehmen Sie bitte zunächst alle Zuordnungen zurück.",
         "UPDATE_MERKMALE_ERROR": "Die gewünschte Bearbeitung kann nicht ausgeführt werden, da die Rolle noch Benutzern zugeordnet ist. Nehmen Sie bitte zunächst alle Zuordnungen zurück."
       },
       "title": {
-        "NEWER_VERSION_OF_ROLLE_AVAILABLE": "Die Rolle konnte nicht bearbeitet werden",
+        "NEWER_VERSION_OF_ROLLE_AVAILABLE": "Geänderte Daten",
         "ROLLE_ERROR": "Fehler bei Erstellung der Rolle",
         "ROLLE_HAT_PERSONENKONTEXTE_ERROR": "Löschen nicht möglich",
         "ROLLE_UPDATE_ERROR": "Die Rolle konnte nicht bearbeitet werden",
