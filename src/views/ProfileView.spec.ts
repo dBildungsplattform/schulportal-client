@@ -362,7 +362,7 @@ describe('ProfileView', () => {
   });
 
   test('it displays 2FA connection error', async () => {
-    twoFactorAuthenticationStore.errorCode = 'something';
+    twoFactorAuthenticationStore.errorCode = 'PI_UNAVAILABLE_ERROR';
     await nextTick();
     if (!wrapper) return;
     const twoFactorCard: DOMWrapper<Element> = wrapper.find('[data-testid="two-factor-info"]');
