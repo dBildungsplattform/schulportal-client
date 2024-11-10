@@ -15,7 +15,7 @@
   import type { TranslatedRolleWithAttrs } from '@/composables/useRollen';
   import BefristungInput from '@/components/admin/personen/BefristungInput.vue';
   import type { BefristungProps } from '@/components/admin/personen/BefristungInput.vue';
-import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
+  import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
 
   useI18n({ useScope: 'global' });
 
@@ -35,7 +35,6 @@ import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
     organisationen: TranslatedObject[] | undefined;
     rollen: TranslatedRolleWithAttrs[] | undefined;
     klassen: TranslatedObject[] | undefined;
-    zuordnungen: Zuordnung[] | undefined;
     selectedOrganisationProps: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     selectedRolleProps: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     selectedKlasseProps: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
