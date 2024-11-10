@@ -85,29 +85,30 @@
   }
 
   // Watcher for selectedOrganisation to fetch roles and classes
-  watch(selectedOrganisation, (newValue: string | undefined, oldValue: string | undefined) => {
+  watch(selectedOrganisation, async (newValue: string | undefined, oldValue: string | undefined) => {
     if (newValue && newValue !== oldValue) {
       // Fetch the roles after selecting the organization
-      personenkontextStore.processWorkflowStep({
+      await personenkontextStore.processWorkflowStep({
         organisationId: newValue,
         limit: 25,
       });
 
       // Fetch all classes for the selected organization without any filter
-      organisationStore.getKlassenByOrganisationId(newValue);
+      await organisationStore.getKlassenByOrganisationId(newValue);
 
       // Check for Klasse preselection
       const klassenZuordnungen: Zuordnung[] | undefined = personStore.personenuebersicht?.zuordnungen.filter(
-        (zuordnung: Zuordnung) => zuordnung.typ === OrganisationsTyp.Klasse,
+        (zuordnung: Zuordnung) => zuordnung.typ === OrganisationsTyp.Klasse && zuordnung.administriertVon === newValue,
       );
 
       if (klassenZuordnungen && klassenZuordnungen.length > 0) {
-        // Check if all Zuordnungen have the selected organisation as parent
-        const allFromSelectedOrg: boolean = klassenZuordnungen.every(
-          (zuordnung: Zuordnung) => zuordnung.administriertVon === newValue,
+        // Check if all Zuordnungen of type Klasse have the same SSKID.
+        // We only preselect when there's a clear, unambiguous single Klasse association for the selected Orga.
+        const sameSSK: boolean = klassenZuordnungen.every(
+          (zuordnung: Zuordnung) => zuordnung.sskId === klassenZuordnungen[0]?.sskId,
         );
 
-        if (allFromSelectedOrg) {
+        if (sameSSK) {
           const klasse: Organisation | undefined = organisationStore.klassen.find(
             (k: Organisation) => k.id === klassenZuordnungen[0]?.sskId,
           );
