@@ -3,18 +3,25 @@
   import { RollenArt } from '@/stores/RolleStore';
   import { useI18n } from 'vue-i18n';
   import FormRow from '@/components/form/FormRow.vue';
-  import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
-  import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
+  import { usePersonenkontextStore, type PersonenkontextStore, type Zuordnung } from '@/stores/PersonenkontextStore';
+  import {
+    OrganisationsTyp,
+    useOrganisationStore,
+    type Organisation,
+    type OrganisationStore,
+  } from '@/stores/OrganisationStore';
   import { type TranslatedObject } from '@/types.d';
   import type { BaseFieldProps } from 'vee-validate';
   import type { TranslatedRolleWithAttrs } from '@/composables/useRollen';
   import BefristungInput from '@/components/admin/personen/BefristungInput.vue';
   import type { BefristungProps } from '@/components/admin/personen/BefristungInput.vue';
+import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
 
   useI18n({ useScope: 'global' });
 
   const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
   const organisationStore: OrganisationStore = useOrganisationStore();
+  const personStore: PersonStore = usePersonStore();
 
   const timerId: Ref<ReturnType<typeof setTimeout> | undefined> = ref<ReturnType<typeof setTimeout>>();
   const canCommit: Ref<boolean> = ref(false);
@@ -28,6 +35,7 @@
     organisationen: TranslatedObject[] | undefined;
     rollen: TranslatedRolleWithAttrs[] | undefined;
     klassen: TranslatedObject[] | undefined;
+    zuordnungen: Zuordnung[] | undefined;
     selectedOrganisationProps: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     selectedRolleProps: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     selectedKlasseProps: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
@@ -89,6 +97,26 @@
       // Fetch all classes for the selected organization without any filter
       organisationStore.getKlassenByOrganisationId(newValue);
 
+      // Check for Klasse preselection
+      const klassenZuordnungen: Zuordnung[] | undefined = personStore.personenuebersicht?.zuordnungen.filter(
+        (zuordnung: Zuordnung) => zuordnung.typ === OrganisationsTyp.Klasse,
+      );
+
+      if (klassenZuordnungen && klassenZuordnungen.length > 0) {
+        // Check if all Zuordnungen have the selected organisation as parent
+        const allFromSelectedOrg: boolean = klassenZuordnungen.every(
+          (zuordnung: Zuordnung) => zuordnung.administriertVon === newValue,
+        );
+
+        if (allFromSelectedOrg) {
+          const klasse: Organisation | undefined = organisationStore.klassen.find(
+            (k: Organisation) => k.id === klassenZuordnungen[0]?.sskId,
+          );
+
+          selectedKlasse.value = klasse?.id;
+          emits('update:selectedKlasse', klasse?.id);
+        }
+      }
       // Reset the selectedRolle field only if oldValue was not undefined
       if (oldValue !== undefined) {
         selectedRolle.value = undefined;
