@@ -490,6 +490,10 @@ describe('PersonStore', () => {
       const currentPerson: Personendatensatz = await getPersonByIdPromise;
       mockPerson.person.userLock!.forEach((lock) => {
         const lockDate = new Date(lock.locked_until);
+        // Adjust date for MESZ (German summer time) if necessary
+        if (lockDate.getTimezoneOffset() >= -120) {
+          lockDate.setDate(lockDate.getDate() - 1);
+        }
         const createdAt = new Date(lock.created_at);
         lock.locked_until = lockDate.toLocaleDateString('de-DE');
         lock.created_at = createdAt.toLocaleDateString('de-DE');
