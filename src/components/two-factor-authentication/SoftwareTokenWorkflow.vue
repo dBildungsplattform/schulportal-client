@@ -1,9 +1,14 @@
 <script setup lang="ts">
+  import {
+    type TwoFactorAuthentificationStore,
+    useTwoFactorAuthentificationStore,
+  } from '@/stores/TwoFactorAuthentificationStore';
   import { defineEmits, onMounted, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
+  const twoFactorStore: TwoFactorAuthentificationStore = useTwoFactorAuthentificationStore();
 
   type Emits = {
     (event: 'updateHeader', header: string): void;
@@ -34,7 +39,7 @@
 
 <template>
   <v-card-text>
-    <v-container>
+    <v-container v-if="!twoFactorStore.errorCode">
       <v-row>
         <p
           class="text-body"
@@ -45,11 +50,32 @@
       </v-row>
       <v-row class="justify-center">
         <v-img
-          class="printableContent image-width"
+          class="printable-content image-width"
           :src="qrCodeImageBase64"
           max-width="250"
           data-testid="software-token-dialog-qr-code"
         />
+      </v-row>
+    </v-container>
+    <v-container v-else>
+      <v-row>
+        <p
+          class="text-body bold"
+          data-testid="software-token-dialog-error-text"
+        >
+          <i18n-t
+            keypath="admin.person.twoFactorAuthentication.errors.softwareTokenInitError"
+            for="admin.person.twoFactorAuthentication.errors.iqshHelpdesk"
+            tag="label"
+          >
+            <a
+              :href="$t('admin.person.twoFactorAuthentication.errors.iqshHelpdeskLink')"
+              rel="noopener noreferrer"
+              target="_blank"
+              >{{ $t('admin.person.twoFactorAuthentication.errors.iqshHelpdesk') }}</a
+            >
+          </i18n-t>
+        </p>
       </v-row>
     </v-container>
   </v-card-text>
@@ -59,6 +85,7 @@
         cols="12"
         sm="6"
         md="4"
+        v-if="!twoFactorStore.errorCode"
       >
         <v-btn
           class="primary button"
@@ -91,11 +118,11 @@
     body * {
       visibility: hidden;
     }
-    .printableContent,
-    .printableContent * {
+    .printable-content,
+    .printable-content * {
       visibility: visible;
     }
-    .printableContent {
+    .printable-content {
       position: absolute;
       left: 0;
       top: 0;

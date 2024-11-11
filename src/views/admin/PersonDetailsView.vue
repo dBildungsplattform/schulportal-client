@@ -26,11 +26,13 @@
   import {
     EmailStatus,
     LockKeys,
+    PersonLockOccasion,
     usePersonStore,
     type Person,
     type Personendatensatz,
     type PersonStore,
     type PersonWithUebersicht,
+    type UserLock,
   } from '@/stores/PersonStore';
   import {
     usePersonenkontextStore,
@@ -128,6 +130,14 @@
   const calculatedBefristung: Ref<string | undefined> = ref('');
   const loading: Ref<boolean> = ref(true);
 
+  const isManuallyLocked: ComputedRef<boolean> = computed<boolean>(() => {
+    return (
+      personStore.currentPerson!.person.userLock?.some(
+        (lock: UserLock) => lock.lock_occasion === PersonLockOccasion.MANUELL_GESPERRT,
+      ) ?? false // Default to false if userLock is undefined
+    );
+  });
+
   function navigateToPersonTable(): void {
     router.push({ name: 'person-management' });
   }
@@ -139,8 +149,9 @@
 
   async function onLockUser(lockedBy: string, date: string | undefined): Promise<void> {
     if (!personStore.currentPerson) return;
+
     let bodyParams: LockUserBodyParams = {
-      lock: !personStore.currentPerson.person.isLocked,
+      lock: !isManuallyLocked.value,
       locked_by: lockedBy,
       locked_until: date,
     };
@@ -181,49 +192,77 @@
     return organisation.kennung ? `${organisation.kennung} (${organisation.name})` : organisation.name;
   }
 
-  // translate keys and format attributes for display
-  const getuserLock: ComputedRef<{ key: string; attribute: string }[]> = computed(() => {
-    if (!personStore.currentPerson?.person.isLocked) return [];
+  function getSpecifiedUserLock(lockOccasion: PersonLockOccasion): UserLock | undefined {
+    if (!personStore.currentPerson) return undefined;
 
     const { userLock }: Person = personStore.currentPerson.person;
-    if (!userLock) return [];
+    if (!userLock) return undefined;
 
-    return Object.entries(userLock).map(([key, attribute]: [string, string]) => {
-      switch (key) {
-        case LockKeys.LockedBy:
-          return {
-            key: t('person.lockedBy'),
-            attribute: organisationStore.lockingOrganisation
-              ? getOrganisationDisplayName(organisationStore.lockingOrganisation)
-              : t('admin.organisation.unknownOrganisation'),
-          };
+    // Find the manualLock entry if it exists
+    const specifiedLock: UserLock | undefined = userLock.find(
+      (lock: UserLock) => lock[LockKeys.LockOccasion] === lockOccasion,
+    );
 
-        case LockKeys.CreatedAt:
-          return {
-            key: t('person.lockedSince'),
-            attribute: new Intl.DateTimeFormat('de-DE', {
-              year: 'numeric',
-              month: '2-digit',
-              day: '2-digit',
-            }).format(new Date(attribute)),
-          };
-        case LockKeys.LockedUntil:
-          return {
-            key: t('person.lockedUntil'),
-            attribute,
-          };
+    return specifiedLock;
+  }
 
-        default:
-          return { key, attribute };
-      }
-    });
+  const getKopersUserLock: ComputedRef<{ text: string }[]> = computed(() => {
+    const kopersUserLock: UserLock | undefined = getSpecifiedUserLock(PersonLockOccasion.KOPERS_GESPERRT);
+    if (!kopersUserLock) return [];
+    return [
+      {
+        text: t('person.kopersLock'),
+      },
+    ];
+  });
+
+  const getManualUserLock: ComputedRef<{ key: string; attribute: string }[]> = computed(() => {
+    const manualLock: UserLock | undefined = getSpecifiedUserLock(PersonLockOccasion.MANUELL_GESPERRT);
+    if (!manualLock) return [];
+    return Object.entries(manualLock)
+      .filter(([key]: [string, string]) => key !== LockKeys.LockOccasion)
+      .map(([key, attribute]: [string, string]) => {
+        switch (key) {
+          case LockKeys.LockedBy:
+            return {
+              key: t('person.lockedBy'),
+              attribute: organisationStore.lockingOrganisation
+                ? getOrganisationDisplayName(organisationStore.lockingOrganisation)
+                : t('admin.organisation.unknownOrganisation'),
+            };
+
+          case LockKeys.CreatedAt:
+            return {
+              key: t('person.lockedSince'),
+              attribute,
+            };
+
+          case LockKeys.LockedUntil:
+            return {
+              key: t('person.lockedUntil'),
+              attribute,
+            };
+
+          default:
+            return {
+              key,
+              attribute,
+            };
+        }
+      })
+      .filter(Boolean); // Remove undefined entries
   });
 
   watch(
     () => personStore.currentPerson?.person,
     async (person: Person | undefined) => {
       if (!(person && person.isLocked && person.userLock)) return;
-      await organisationStore.getLockingOrganisationById(person.userLock.locked_by);
+      const manualLock: UserLock | undefined = person.userLock.find(
+        (lock: UserLock) => lock.lock_occasion === PersonLockOccasion.MANUELL_GESPERRT,
+      );
+      if (manualLock) {
+        await organisationStore.getLockingOrganisationById(manualLock.locked_by);
+      }
     },
   );
 
@@ -329,9 +368,14 @@
   });
 
   const alertButtonTextKopers: ComputedRef<string> = computed(() => {
-    return personStore.errorCode === 'PERSONALNUMMER_NICHT_EINDEUTIG'
-      ? t('admin.person.backToInput')
-      : t('nav.backToList');
+    switch (personStore.errorCode) {
+      case 'PERSONALNUMMER_NICHT_EINDEUTIG':
+        return t('admin.person.backToInput');
+      case 'NEWER_VERSION_OF_PERSON_AVAILABLE':
+        return t('refreshData');
+      default:
+        return t('nav.backToList');
+    }
   });
 
   function getSskName(sskDstNr: string | undefined, sskName: string): string {
@@ -597,9 +641,14 @@
   }
 
   const alertButtonActionKopers: ComputedRef<() => void> = computed(() => {
-    return personStore.errorCode === 'PERSONALNUMMER_NICHT_EINDEUTIG'
-      ? navigateBackToKopersForm
-      : navigateToPersonTable;
+    switch (personStore.errorCode) {
+      case 'PERSONALNUMMER_NICHT_EINDEUTIG':
+        return navigateBackToKopersForm;
+      case 'NEWER_VERSION_OF_PERSON_AVAILABLE':
+        return () => router.go(0);
+      default:
+        return navigateToPersonTable;
+    }
   });
 
   // Triggers the template to start editing
@@ -1101,16 +1150,17 @@
   });
 
   const twoFactorAuthenticationConnectionError: ComputedRef<string> = computed(() => {
-    if (
-      twoFactorAuthentificationStore.errorCode == '500' ||
-      twoFactorAuthentificationStore.errorCode == '502' ||
-      twoFactorAuthentificationStore.errorCode == '503' ||
-      twoFactorAuthentificationStore.errorCode == '504' ||
-      twoFactorAuthentificationStore.errorCode == 'UNSPECIFIED_ERROR'
-    ) {
-      return t('admin.person.twoFactorAuthentication.errors.connection');
+    // Early return if loading
+    if (twoFactorAuthentificationStore.loading) return '';
+
+    switch (twoFactorAuthentificationStore.errorCode) {
+      case 'TOKEN_STATE_ERROR':
+        return t('admin.person.twoFactorAuthentication.errors.tokenStateError');
+      case 'PI_UNAVAILABLE_ERROR':
+        return t('admin.person.twoFactorAuthentication.errors.connection');
+      default:
+        return '';
     }
-    return '';
   });
 
   // Computed property to define what will be shown in the field Email depending on the returned status.
@@ -2028,14 +2078,9 @@
               <v-col> <v-progress-circular indeterminate></v-progress-circular></v-col>
             </v-row>
           </v-container>
-          <v-divider
-            class="border-opacity-100 rounded my-6 mx-4"
-            color="#E5EAEF"
-            thickness="6"
-          ></v-divider>
         </template>
         <template
-          v-else-if="twoFactorAuthentificationStore.required && twoFactorAuthentificationStore.hasToken != null"
+          v-else-if="twoFactorAuthentificationStore.required || twoFactorAuthentificationStore.hasToken === true"
         >
           <v-divider
             class="border-opacity-100 rounded my-6 mx-4"
@@ -2050,7 +2095,7 @@
               <template v-else>
                 <v-col>
                   <h3 class="subtitle-1">{{ $t('admin.person.twoFactorAuthentication.header') }}</h3>
-                  <v-row class="mt-4 text-body">
+                  <v-row class="mt-4 mr-lg-13 text-body">
                     <v-col
                       class="text-right"
                       cols="1"
@@ -2067,10 +2112,36 @@
                       ></v-icon>
                     </v-col>
                     <v-col>
-                      <template v-if="twoFactorAuthenticationConnectionError">
-                        <p>
-                          {{ twoFactorAuthenticationConnectionError }}
-                        </p>
+                      <template
+                        v-if="twoFactorAuthentificationStore.errorCode && !twoFactorAuthentificationStore.loading"
+                      >
+                        <v-row v-if="twoFactorAuthentificationStore.errorCode === 'PI_UNAVAILABLE_ERROR'">
+                          <p
+                            class="text-body"
+                            data-testid="connection-error-text"
+                          >
+                            {{ $t('admin.person.twoFactorAuthentication.errors.connection') }}
+                          </p>
+                        </v-row>
+                        <v-row v-else-if="twoFactorAuthentificationStore.errorCode === 'TOKEN_STATE_ERROR'">
+                          <p
+                            class="text-body"
+                            data-testid="token-state-error-text"
+                          >
+                            <i18n-t
+                              keypath="admin.person.twoFactorAuthentication.errors.tokenStateError"
+                              for="admin.person.twoFactorAuthentication.errors.iqshHelpdesk"
+                              tag="label"
+                            >
+                              <a
+                                :href="$t('admin.person.twoFactorAuthentication.errors.iqshHelpdeskLink')"
+                                rel="noopener noreferrer"
+                                target="_blank"
+                                >{{ $t('admin.person.twoFactorAuthentication.errors.iqshHelpdesk') }}</a
+                              >
+                            </i18n-t>
+                          </p>
+                        </v-row>
                       </template>
                       <template v-else-if="twoFactorAuthentificationStore.hasToken">
                         <p v-if="twoFactorAuthentificationStore.tokenKind === TokenKind.software">
@@ -2093,7 +2164,10 @@
                       </template>
                     </v-col>
                   </v-row>
-                  <v-row class="text-body">
+                  <v-row
+                    v-if="!twoFactorAuthenticationConnectionError"
+                    class="text-body"
+                  >
                     <v-col
                       class="text-right"
                       cols="1"
@@ -2105,7 +2179,10 @@
                       </v-icon>
                     </v-col>
                     <div class="v-col">
-                      <p v-if="twoFactorAuthentificationStore.hasToken">
+                      <p v-if="twoFactorAuthentificationStore.hasToken && !twoFactorAuthentificationStore.required">
+                        {{ $t('admin.person.twoFactorAuthentication.NoLongerNeedToken') }}
+                      </p>
+                      <p v-else-if="twoFactorAuthentificationStore.hasToken">
                         {{ $t('admin.person.twoFactorAuthentication.resetInfo') }}
                       </p>
                       <p v-if="!twoFactorAuthentificationStore.hasToken">
@@ -2181,7 +2258,10 @@
                     cols="1"
                   >
                     <v-icon
-                      v-if="personStore.currentPerson?.person.isLocked"
+                      v-if="
+                        personStore.currentPerson?.person.userLock &&
+                        personStore.currentPerson.person.userLock?.length > 0
+                      "
                       icon="mdi-lock"
                       color="red"
                     ></v-icon>
@@ -2189,7 +2269,8 @@
                   <v-col cols="10">
                     <span>
                       {{
-                        personStore.currentPerson?.person.isLocked
+                        personStore.currentPerson?.person.userLock &&
+                        personStore.currentPerson.person.userLock?.length > 0
                           ? t('person.userIsLocked')
                           : t('person.userIsUnlocked')
                       }}
@@ -2198,7 +2279,7 @@
                 </v-row>
                 <v-row
                   class="mt-0"
-                  v-for="({ key, attribute }, index) of getuserLock"
+                  v-for="({ key, attribute }, index) of getManualUserLock"
                   :key="key"
                   cols="10"
                 >
@@ -2223,6 +2304,31 @@
                       :data-testid="`lock-info-${index}-attribute`"
                     >
                       {{ attribute }}
+                    </span>
+                  </v-col>
+                </v-row>
+                <v-row
+                  v-if="getKopersUserLock.length"
+                  cols="10"
+                >
+                  <v-col cols="1">
+                    <v-icon
+                      aria-hidden="true"
+                      class="mr-2"
+                      icon="mdi-alert-circle-outline"
+                      size="small"
+                    ></v-icon>
+                  </v-col>
+                  <v-col
+                    v-for="(item, index) in getKopersUserLock"
+                    :key="index"
+                    cols="9"
+                  >
+                    <span
+                      class="text-body"
+                      :data-testid="`lock-info-${index}-attribute`"
+                    >
+                      {{ item.text }}
                     </span>
                   </v-col>
                 </v-row>
@@ -2421,7 +2527,7 @@
                 offset="1"
                 cols="10"
               >
-                <span>{{ changePersonMetadataSuccessMessage }}</span>
+                <span class="metadata-success-message">{{ changePersonMetadataSuccessMessage }}</span>
               </v-col>
             </v-row>
           </v-container>
@@ -2728,6 +2834,11 @@
 
   span {
     white-space: normal;
+    text-wrap: pretty;
+  }
+
+  .metadata-success-message {
+    white-space: pre;
     text-wrap: pretty;
   }
 </style>

@@ -137,9 +137,10 @@ describe('TokenResetComponent', () => {
     await resetButton.click();
     await nextTick();
 
-    const dialogText: HTMLElement = document.querySelector('[data-testid="dialog-text"]') as HTMLElement;
-    expect(dialogText).not.toBeNull();
-    expect(dialogText.textContent).toContain('admin.person.twoFactorAuthentication.errors.connection_error');
+    const errorDialogText: HTMLElement = document.querySelector(
+      '[data-testid="token-reset-dialog-error-text"]',
+    ) as HTMLElement;
+    expect(errorDialogText).not.toBeNull();
   });
 
   test('closes dialog when clicking stop button in dialog actions', async (): Promise<void> => {
