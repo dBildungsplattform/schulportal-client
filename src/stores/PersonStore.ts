@@ -21,6 +21,7 @@ import {
 } from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
 import { type DbiamPersonenkontextBodyParams, type Zuordnung } from './PersonenkontextStore';
+import { formatDateDiggitsToGermanDate } from '@/utils/date';
 
 const personenApi: PersonenApiInterface = PersonenApiFactory(undefined, '', axiosApiInstance);
 const personenFrontendApi: PersonenFrontendApiInterface = PersonenFrontendApiFactory(undefined, '', axiosApiInstance);
@@ -49,17 +50,25 @@ export enum SortOrder {
   Desc = 'desc',
 }
 
+export enum PersonLockOccasion {
+  MANUELL_GESPERRT = 'MANUELL_GESPERRT',
+  KOPERS_GESPERRT = 'KOPERS_GESPERRT',
+}
+
 export enum LockKeys {
   PersonId = 'personId',
   LockedBy = 'locked_by',
   CreatedAt = 'created_at',
   LockedUntil = 'locked_until',
+  LockOccasion = 'lock_occasion',
+  MANUELL_GESPERRT = PersonLockOccasion.MANUELL_GESPERRT,
 }
 export type UserLock = {
   personId: string;
   locked_by: string;
   created_at: string;
   locked_until: string;
+  lock_occasion: string;
 };
 
 export type Person = {
@@ -69,7 +78,7 @@ export type Person = {
   revision: PersonResponse['revision'];
   personalnummer: PersonResponse['personalnummer'];
   isLocked: PersonResponse['isLocked'];
-  userLock: UserLock | null;
+  userLock: UserLock[] | null;
   lastModified: PersonResponse['lastModified'];
   email: PersonResponse['email'];
 };
@@ -113,38 +122,52 @@ export type PersonTableItem = {
 export type CreatePersonBodyParams = DbiamCreatePersonWithPersonenkontexteBodyParams;
 export type CreatedPersonenkontext = DbiamPersonenkontextBodyParams;
 
-export function parseUserLock(unparsed: object): UserLock | null {
-  const result: Partial<UserLock> = {};
+export function parseUserLock(unparsedArray: object[]): UserLock[] {
+  const parsedLocks: UserLock[] = [];
 
-  if (LockKeys.LockedBy in unparsed) {
-    result.locked_by = '' + unparsed[LockKeys.LockedBy];
-  }
-  if (LockKeys.CreatedAt in unparsed) {
-    result.created_at = '' + unparsed[LockKeys.CreatedAt];
-  }
-  if (LockKeys.LockedUntil in unparsed) {
-    result.locked_until = '' + unparsed[LockKeys.LockedUntil];
-    // Parse the UTC date
-    const utcDate: Date = new Date(result.locked_until);
+  for (const unparsed of unparsedArray) {
+    const result: Partial<UserLock> = {};
 
-    // Subtract one day. The reason to substract it here is because when the UTC time from the backend gets converted back to the local german date here, it shows the next day
-    // It's logical since we send the date in the first place as "31-07-2024 22H" UTC TIME which is "01-08-2024" 00H of the next day in MESZ (summer german time)
-    // but the user obviously doesn't want to know that.
-    if (utcDate.getTimezoneOffset() >= -120) {
-      // Check if the timezone offset is 2 hours (indicating MESZ)
-      // Subtract one day if in summer time (MESZ)
-      utcDate.setDate(utcDate.getDate() - 1);
+    if (LockKeys.LockOccasion in unparsed && unparsed[LockKeys.LockOccasion] == PersonLockOccasion.MANUELL_GESPERRT) {
+      // Process "MANUELL_GESPERRT" entries
+      if (LockKeys.LockedBy in unparsed) {
+        result.locked_by = '' + unparsed[LockKeys.LockedBy];
+      }
+      if (LockKeys.CreatedAt in unparsed) {
+        result.created_at = '' + unparsed[LockKeys.CreatedAt];
+        result.created_at = formatDateDiggitsToGermanDate(new Date(result.created_at));
+      }
+      if (LockKeys.LockedUntil in unparsed) {
+        result.locked_until = '' + unparsed[LockKeys.LockedUntil];
+        // Parse the UTC date
+        const utcDate: Date = new Date(result.locked_until);
+
+        // Adjust date for MESZ (German summer time) if necessary
+        if (utcDate.getTimezoneOffset() >= -120) {
+          utcDate.setDate(utcDate.getDate() - 1);
+        }
+        result.locked_until = formatDateDiggitsToGermanDate(utcDate);
+      }
+      result.lock_occasion = '' + unparsed[LockKeys.LockOccasion];
+    } else if (
+      LockKeys.LockOccasion in unparsed &&
+      unparsed[LockKeys.LockOccasion] == PersonLockOccasion.KOPERS_GESPERRT
+    ) {
+      result.lock_occasion = '' + unparsed[LockKeys.LockOccasion];
     }
-    result.locked_until = utcDate.toLocaleDateString('de-DE');
+
+    if (Object.keys(result).length > 0) {
+      parsedLocks.push(result as UserLock);
+    }
   }
 
-  return Object.keys(result).length > 0 ? (result as UserLock) : null;
+  return parsedLocks;
 }
 
 export function mapPersonendatensatzResponseToPersonendatensatz(
   response: PersonendatensatzResponse,
 ): Personendatensatz {
-  const userLock: UserLock | null = parseUserLock(response.person.userLock ?? {});
+  const userLock: UserLock[] | null = parseUserLock(response.person.userLock ? response.person.userLock : []);
   const person: Person = {
     id: response.person.id,
     name: response.person.name,
