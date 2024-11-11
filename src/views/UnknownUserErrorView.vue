@@ -14,7 +14,7 @@
     :type="'warning'"
     :closable="false"
     :showButton="true"
-    :buttonText="$t('nav.backToStart')"
+    :buttonText="$t('nav.logout')"
     :buttonAction="logout"
     :text="$t('errors.UNKNOWN_USER.text')"
   />

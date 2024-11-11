@@ -53,6 +53,6 @@ describe('UnknownUserErrorView', () => {
     const alertTitle: WrapperLike | undefined = wrapper?.find('[data-testid="alert-button"]');
 
     expect(alertTitle?.isVisible()).toBe(true);
-    expect(alertTitle?.text()).toEqual('Zurück zur Startseite');
+    expect(alertTitle?.text()).toEqual('Abmelden');
   });
 });
