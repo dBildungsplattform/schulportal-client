@@ -16,7 +16,7 @@
   import type { TranslatedObject } from '@/types';
   import { useForm, type BaseFieldProps, type FormContext, type TypedSchema } from 'vee-validate';
   import { toTypedSchema } from '@vee-validate/yup';
-  import { mixed, object, string } from 'yup';
+  import { array, mixed, object, string } from 'yup';
   import { useI18n, type Composer } from 'vue-i18n';
   import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
   import { type ImportStore, useImportStore } from '@/stores/ImportStore';
@@ -49,7 +49,7 @@
     object({
       selectedSchule: string().required(t('admin.import.rules.schule.required')),
       selectedRolle: string().required(t('admin.import.rules.rolle.required')),
-      selectedFiles: mixed().required(t('admin.import.rules.files.required')),
+      selectedFiles: array().of(mixed()).length(1, t('admin.import.rules.files.required')),
     }),
   );
 
@@ -153,7 +153,7 @@
   }
 
   function uploadFile(): void {
-    if (selectedSchule.value === undefined || selectedRolle.value === undefined || selectedFiles.value === undefined) {
+    if (selectedSchule.value === undefined || selectedRolle.value === undefined || !selectedFiles.value?.length) {
       return;
     }
 
