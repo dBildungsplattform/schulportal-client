@@ -147,6 +147,8 @@
   }
 
   function navigateToPersonTable(): void {
+    importStore.uploadResponse = null;
+    importStore.importedData = null;
     router.push({ name: 'person-management' });
   }
 
@@ -198,6 +200,7 @@
 
   onBeforeRouteLeave((_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
     importStore.uploadResponse = null;
+    importStore.importedData = null;
     next();
   });
 
@@ -208,6 +211,7 @@
       limit: 30,
     });
     importStore.uploadResponse = null;
+    importStore.importedData = null;
     organisationStore.errorCode = '';
   });
 </script>

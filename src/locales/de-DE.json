@@ -31,6 +31,7 @@
       "backToUpload": "Andere Datei hochladen",
       "downloadUserdata": "Benutzerdaten herunterladen",
       "errors": {
+        "CSV_PARSING_ERROR": "Die Datei konnte nicht gelesen werden. Bitte überprüfen Sie das Format.",
         "ERROR_IMPORTING_FILE": "Die Daten konnten nicht importiert werden. Bitte versuchen Sie es erneut.",
         "ERROR_UPLOADING_FILE": "Die Datei konnte nicht hochgeladen werden. Bitte versuchen Sie es mit einer anderen Datei.",
         "followingDataInvalid": "Die folgenden Datensätze sind ungültig:",
