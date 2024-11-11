@@ -107,18 +107,27 @@ describe('set up two-factor authentication', () => {
     expect(twoFactorAuthenticationStore.verify2FAToken).toHaveBeenCalled();
   });
 
-  test('test verify error message', async () => {
+  test('check for error messages', async () => {
     wrapper?.get('[data-testid="open-2FA-self-service-dialog-icon"]').trigger('click');
     await nextTick();
 
     const proceedButton: HTMLElement | undefined = document.querySelectorAll<HTMLElement>(
       '[data-testid="proceed-two-factor-authentication-dialog"]',
     )[0];
-
     proceedButton?.click();
+    twoFactorAuthenticationStore.errorCode = 'error';
     await nextTick();
 
+    await document.querySelector('[data-testid="self-service-token-init-error-text"]');
+    expect(document.querySelector('[data-testid="self-service-token-init-error-text"]')).not.toBeNull();
+
+    await document.querySelector('[data-testid="proceed-two-factor-authentication-dialog"]');
+    expect(document.querySelector('[data-testid="proceed-two-factor-authentication-dialog"]')).toBeNull();
+
+    twoFactorAuthenticationStore.errorCode = '';
     proceedButton?.click();
+    twoFactorAuthenticationStore.errorCode = 'error';
+
     await nextTick();
 
     proceedButton?.click();

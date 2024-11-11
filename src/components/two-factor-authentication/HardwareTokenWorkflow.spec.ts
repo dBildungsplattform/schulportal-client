@@ -7,7 +7,6 @@ import {
 import { vi } from 'vitest';
 import type { Personendatensatz } from '@/stores/PersonStore';
 import { nextTick } from 'vue';
-import type { AxiosError } from 'axios';
 import { EmailAddressStatus } from '@/api-client/generated/api';
 
 vi.mock('vue-i18n', () => ({
@@ -66,19 +65,6 @@ describe('HardwareTokenWorkflow.vue', () => {
         },
       },
     });
-  });
-
-  wrapper = mount(HardwareTokenWorkflow, {
-    props: {
-      errorCode: '',
-      person: getMockPersonendatensatz(),
-    },
-    attachTo: document.getElementById('app') || '',
-    global: {
-      components: {
-        HardwareTokenWorkflow,
-      },
-    },
   });
 
   beforeAll(() => {
@@ -140,59 +126,29 @@ describe('HardwareTokenWorkflow.vue', () => {
     await nextTick();
   });
 
-  test('it triggers handleApiError on API error', async () => {
-    // Mock the error response
-    const errorResponse: AxiosError = {
-      isAxiosError: true,
-      response: {
-        data: {
-          i18nKey: 'some_error_key',
-        },
-      },
-      // Add necessary AxiosError properties (you can leave others as any if not needed)
-      config: {},
-      request: {},
-      toJSON: () => ({}),
-    } as AxiosError;
-    // Mock the assignHardwareToken to throw an error
-    vi.spyOn(twoFactorAuthenticationStore, 'assignHardwareToken').mockRejectedValueOnce(errorResponse);
-
-    // Fill in valid inputs
-    const serialWrapper: HTMLElement = document.querySelector(
-      '[data-testid="hardware-token-input-serial"]',
-    ) as HTMLElement;
-    const serialInput: HTMLInputElement | null = serialWrapper.querySelector('input');
-    const otpWrapper: HTMLElement = document.querySelector('[data-testid="hardware-token-input-otp"]') as HTMLElement;
-    const otpInput: HTMLInputElement | null = otpWrapper.querySelector('input');
-
-    if (serialInput && otpInput) {
-      serialInput.value = '123456';
-      otpInput.value = '789012';
-
-      serialInput.dispatchEvent(new Event('input'));
-      otpInput.dispatchEvent(new Event('input'));
-    }
-
-    await wrapper?.find('[data-testid="hardware-token-input-create-button"]').trigger('click');
+  test('check if error close button works', async () => {
+    twoFactorAuthenticationStore.errorCode = 'error';
     await nextTick();
 
-    const errorResponse2: AxiosError = {
-      isAxiosError: true,
-      response: {
-        data: {
-          i18nKey: null,
-        },
-      },
-      // Add necessary AxiosError properties (you can leave others as any if not needed)
-      config: {},
-      request: {},
-      toJSON: () => ({}),
-    } as AxiosError;
-    // Mock the assignHardwareToken to throw an error
-    vi.spyOn(twoFactorAuthenticationStore, 'assignHardwareToken').mockRejectedValueOnce(errorResponse2);
-
-    await wrapper?.find('[data-testid="hardware-token-input-create-button"]').trigger('click');
+    wrapper?.find('[data-testid="close-two-way-authentification-dialog-button"]').trigger('click');
     await nextTick();
+  });
+
+  test('check for error messages', async () => {
+    twoFactorAuthenticationStore.errorCode = 'HARDWARE_TOKEN_SERVICE_FEHLER';
+    await nextTick();
+
+    await document.querySelector('[data-testid="hardware-token-dialog-error-text"]');
+    expect(document.querySelector('[data-testid="hardware-token-dialog-error-text"]')).not.toBeNull();
+
+    await document.querySelector('[data-testid="close-two-way-authentification-dialog-button"]');
+    expect(document.querySelector('[data-testid="close-two-way-authentification-dialog-button"]')).not.toBeNull();
+
+    twoFactorAuthenticationStore.errorCode = 'error';
+    await nextTick();
+
+    await document.querySelector('[data-testid="hardware-token-dialog-error-text"]');
+    expect(document.querySelector('[data-testid="hardware-token-dialog-error-text"]')).not.toBeNull();
   });
 
   // // New test for triggering cancelCheck
