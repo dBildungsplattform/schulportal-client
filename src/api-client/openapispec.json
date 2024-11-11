@@ -4621,13 +4621,18 @@
           "locked_until": {
             "type": "string",
             "nullable": true
+          },
+          "lock_occasion": {
+            "type": "string",
+            "nullable": true
           }
         },
         "required": [
           "personId",
           "locked_by",
           "created_at",
-          "locked_until"
+          "locked_until",
+          "lock_occasion"
         ]
       },
       "EmailAddressStatus": {
@@ -4711,11 +4716,10 @@
           },
           "userLock": {
             "nullable": true,
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/UserLockParams"
-              }
-            ]
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserLockParams"
+            }
           },
           "lastModified": {
             "format": "date-time",

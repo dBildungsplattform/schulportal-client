@@ -1801,10 +1801,10 @@ export interface PersonResponse {
     'isLocked': boolean | null;
     /**
      * 
-     * @type {UserLockParams}
+     * @type {Array<UserLockParams>}
      * @memberof PersonResponse
      */
-    'userLock': UserLockParams | null;
+    'userLock': Array<UserLockParams> | null;
     /**
      * Date of the most recent changes for the person
      * @type {string}
@@ -2903,6 +2903,12 @@ export interface UserLockParams {
      * @memberof UserLockParams
      */
     'locked_until': string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserLockParams
+     */
+    'lock_occasion': string | null;
 }
 /**
  * 
