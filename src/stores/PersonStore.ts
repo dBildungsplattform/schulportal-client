@@ -146,7 +146,6 @@ export function parseUserLock(unparsedArray: object[]): UserLock[] {
         if (utcDate.getTimezoneOffset() >= -120) {
           utcDate.setDate(utcDate.getDate() - 1);
         }
-        result.locked_until = utcDate.toLocaleDateString('de-DE');
         result.locked_until = formatDateDiggitsToGermanDate(new Date(result.locked_until));
       }
       result.lock_occasion = '' + unparsed[LockKeys.LockOccasion];
