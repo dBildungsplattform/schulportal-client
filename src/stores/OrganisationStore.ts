@@ -26,6 +26,7 @@ export type Organisation = {
   typ: OrganisationsTyp;
   administriertVon?: string | null;
   schuleDetails?: string;
+  version?: number;
 };
 
 export type KlasseTableItem = {
@@ -211,7 +212,7 @@ export const useOrganisationStore: StoreDefinition<
         undefined,
         undefined,
         OrganisationsTyp.Schule,
-        ['SCHULEN_VERWALTEN'],
+        ['KLASSEN_VERWALTEN'],
         undefined,
         undefined,
         Array.from(administriertVonSet),
@@ -401,8 +402,12 @@ export const useOrganisationStore: StoreDefinition<
       this.errorCode = '';
       this.loading = true;
       try {
+        if (!this.currentKlasse?.version) {
+          throw new Error('Organisation version not found');
+        }
         const organisationByNameBodyParams: OrganisationByNameBodyParams = {
           name: name,
+          version: this.currentKlasse.version,
         };
         const { data }: { data: Organisation } = await organisationApi.organisationControllerUpdateOrganisationName(
           organisationId,

@@ -591,7 +591,8 @@ export const DbiamOrganisationErrorI18nKeyEnum = {
     NameRequiredForKlasse: 'NAME_REQUIRED_FOR_KLASSE',
     NameEnthaeltLeerzeichen: 'NAME_ENTHAELT_LEERZEICHEN',
     KennungEnthaeltLeerzeichen: 'KENNUNG_ENTHAELT_LEERZEICHEN',
-    EmailAdressOnOrganisationTyp: 'EMAIL_ADRESS_ON_ORGANISATION_TYP'
+    EmailAdressOnOrganisationTyp: 'EMAIL_ADRESS_ON_ORGANISATION_TYP',
+    NewerVersionOrganisation: 'NEWER_VERSION_ORGANISATION'
 } as const;
 
 export type DbiamOrganisationErrorI18nKeyEnum = typeof DbiamOrganisationErrorI18nKeyEnum[keyof typeof DbiamOrganisationErrorI18nKeyEnum];
@@ -1072,6 +1073,12 @@ export interface OrganisationByNameBodyParams {
      * @memberof OrganisationByNameBodyParams
      */
     'name': string;
+    /**
+     * The version for the organisation.
+     * @type {number}
+     * @memberof OrganisationByNameBodyParams
+     */
+    'version': number;
 }
 /**
  * 
@@ -1127,6 +1134,12 @@ export interface OrganisationResponse {
      * @memberof OrganisationResponse
      */
     'traegerschaft': TraegerschaftTyp;
+    /**
+     * 
+     * @type {number}
+     * @memberof OrganisationResponse
+     */
+    'version': number;
 }
 
 

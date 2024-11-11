@@ -52,20 +52,20 @@
   const loading2FA: Ref<boolean> = ref(false);
 
   /**
-   * Gruppiert eine Liste von Zuordnungen nach dem Wert der Eigenschaft 'sskDstNr'.
+   * Gruppiert eine Liste von Zuordnungen nach dem Wert der Eigenschaft 'sskId'.
    *
    * Diese Funktion nimmt ein Array von Zuordnungen entgegen und organisiert diese
-   * in einer Map, wobei der Schlüssel der Wert der Eigenschaft 'sskDstNr' ist
+   * in einer Map, wobei der Schlüssel der Wert der Eigenschaft 'sskId' ist
    * und der Wert ein Array von Zuordnungen mit diesem Schlüssel.
    *
    * @param zuordnungen - Ein Array von Zuordnungen, die gruppiert werden sollen.
-   * @returns Eine Map, in der jeder Schlüssel ein Wert von 'sskDstNr' ist und
+   * @returns Eine Map, in der jeder Schlüssel ein Wert von 'sskId' ist und
    *          jeder Wert ein Array von Zuordnungen mit diesem Schlüssel.
    */
   function groupZuordnungen(zuordnungen: Zuordnung[]): Map<string, Zuordnung[]> {
     const groupedZuordnungen: Map<string, Zuordnung[]> = new Map();
     for (const zuordnung of zuordnungen) {
-      const key: string = zuordnung.sskDstNr ?? zuordnung.sskId;
+      const key: string = zuordnung.sskId;
       if (groupedZuordnungen.has(key)) {
         groupedZuordnungen.get(key)?.push(zuordnung);
       } else {
@@ -263,7 +263,7 @@
         (z: Zuordnung) =>
           ({
             ...z,
-            sskDstNr: z.sskDstNr?.split('-')[0], // die Klasse wird durch einen Bindestrich an die Schulnummer angehangen. Um nach der Schule zu gruppieren, wird nur die Schulnummer verwendet.
+            sskId: z.typ === OrganisationsTyp.Klasse ? z.administriertVon : z.sskId, // Nutze die ID der Schule, wenn es sich um eine Klasse handelt
           }) as Zuordnung,
       ),
     );
@@ -287,12 +287,15 @@
   const twoFactorAuthError: ComputedRef<string> = computed(() => {
     // Early return if loading
     if (twoFactorAuthenticationStore.loading) return '';
-    const ignoredErrorCodes: string[] = ['SOFTWARE_TOKEN_VERIFICATION_ERROR', 'OTP_NICHT_GUELTIG'];
-    if (twoFactorAuthenticationStore.errorCode && !ignoredErrorCodes.includes(twoFactorAuthenticationStore.errorCode)) {
-      return t('admin.person.twoFactorAuthentication.errors.connection');
+
+    switch (twoFactorAuthenticationStore.errorCode) {
+      case 'TOKEN_STATE_ERROR':
+        return t('admin.person.twoFactorAuthentication.errors.tokenStateSelfServiceError');
+      case 'PI_UNAVAILABLE_ERROR':
+        return t('admin.person.twoFactorAuthentication.errors.connection');
+      default:
+        return '';
     }
-    // Default return, no error
-    return '';
   });
 
   function handleGoToPreviousPage(): void {
@@ -591,7 +594,7 @@
           </v-row>
         </template>
         <LayoutCard
-          v-if="twoFactorAuthenticationStore.required && twoFactorAuthenticationStore.hasToken != null"
+          v-else-if="twoFactorAuthenticationStore.required"
           :headline-test-id="'two-factor-card'"
           :header="$t('profile.twoFactorAuth')"
         >

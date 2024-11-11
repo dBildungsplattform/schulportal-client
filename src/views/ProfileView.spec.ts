@@ -117,13 +117,12 @@ const mockLehrerUebersicht: PersonWithUebersicht = {
   lastModifiedZuordnungen: '2021-09-01T12:00:00Z',
   zuordnungen: [
     {
-      klasse: '10A',
       sskId: '1',
       rolleId: '1',
       sskName: 'Muster-Schule',
       sskDstNr: '123456',
       rolle: 'Lehrer',
-      administriertVon: 'Admin',
+      administriertVon: 'root-sh',
       typ: OrganisationsTyp.Schule,
       editable: true,
       merkmale: ['KOPERS_PFLICHT'] as unknown as RollenMerkmal,
@@ -145,19 +144,19 @@ const mockLehrerUebersichtWith2Zuordnungen: PersonWithUebersicht = {
       sskName: 'Muster-Schule',
       sskDstNr: '123456',
       rolle: 'Lehrer',
-      administriertVon: 'Admin',
+      administriertVon: 'root-sh',
       typ: OrganisationsTyp.Schule,
       editable: true,
       merkmale: ['KOPERS_PFLICHT'] as unknown as RollenMerkmal,
       befristung: '2024-05-06',
     },
     {
-      sskId: '1',
+      sskId: '2',
       rolleId: '1',
       sskName: 'Anders-Sonderlich-Schule',
       sskDstNr: '789101112',
       rolle: 'Lehrer',
-      administriertVon: 'Admin',
+      administriertVon: 'root-sh',
       typ: OrganisationsTyp.Schule,
       editable: true,
       merkmale: ['KOPERS_PFLICHT'] as unknown as RollenMerkmal,
@@ -179,7 +178,7 @@ const mockSchuelerUebersicht: PersonWithUebersicht = {
       sskName: 'Astrid-Lindgren-Schule',
       sskDstNr: '123456',
       rolle: 'SuS',
-      administriertVon: 'Admin',
+      administriertVon: 'root-sh',
       typ: OrganisationsTyp.Schule,
       editable: true,
       merkmale: [] as unknown as RollenMerkmal,
@@ -192,7 +191,7 @@ const mockSchuelerUebersicht: PersonWithUebersicht = {
       sskName: '9A',
       sskDstNr: '123456-9A',
       rolle: 'SuS',
-      administriertVon: 'Admin',
+      administriertVon: '1',
       typ: OrganisationsTyp.Klasse,
       editable: true,
       merkmale: [] as unknown as RollenMerkmal,
@@ -366,7 +365,7 @@ describe('ProfileView', () => {
   });
 
   test('it displays 2FA connection error', async () => {
-    twoFactorAuthenticationStore.errorCode = 'something';
+    twoFactorAuthenticationStore.errorCode = 'PI_UNAVAILABLE_ERROR';
     await nextTick();
     if (!wrapper) return;
     const twoFactorCard: DOMWrapper<Element> = wrapper.find('[data-testid="two-factor-info"]');

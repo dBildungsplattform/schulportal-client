@@ -329,9 +329,14 @@
   });
 
   const alertButtonTextKopers: ComputedRef<string> = computed(() => {
-    return personStore.errorCode === 'PERSONALNUMMER_NICHT_EINDEUTIG'
-      ? t('admin.person.backToInput')
-      : t('nav.backToList');
+    switch (personStore.errorCode) {
+      case 'PERSONALNUMMER_NICHT_EINDEUTIG':
+        return t('admin.person.backToInput');
+      case 'NEWER_VERSION_OF_PERSON_AVAILABLE':
+        return t('refreshData');
+      default:
+        return t('nav.backToList');
+    }
   });
 
   function getSskName(sskDstNr: string | undefined, sskName: string): string {
@@ -511,9 +516,7 @@
     validationSchema: getValidationSchema(t, hasNoKopersNr, hasKopersNummer),
   });
 
-  
   const isZuordnungCreationFormDirty: ComputedRef<boolean> = computed(() => getDirtyState(formContext));
-
 
   const {
     selectedRolle,
@@ -599,9 +602,14 @@
   }
 
   const alertButtonActionKopers: ComputedRef<() => void> = computed(() => {
-    return personStore.errorCode === 'PERSONALNUMMER_NICHT_EINDEUTIG'
-      ? navigateBackToKopersForm
-      : navigateToPersonTable;
+    switch (personStore.errorCode) {
+      case 'PERSONALNUMMER_NICHT_EINDEUTIG':
+        return navigateBackToKopersForm;
+      case 'NEWER_VERSION_OF_PERSON_AVAILABLE':
+        return () => router.go(0);
+      default:
+        return navigateToPersonTable;
+    }
   });
 
   // Triggers the template to start editing
@@ -1015,18 +1023,18 @@
 
   // Checks for dirtiness depending on the active form
   function isFormDirty(): boolean {
-    if(isEditPersonMetadataActive.value){
-    return isChangePersonMetadataFieldDirty('selectedKopersNrMetadata') || isChangePersonMetadataFieldDirty('selectedVorname') || 
-    isChangePersonMetadataFieldDirty('selectedFamilienname');
-  }
-  else if (isChangeKlasseFormActive.value){
-    return isChangeKlasseFieldDirty('selectedSchule') || isChangeKlasseFieldDirty('selectedNewKlasse');
-  }
-
-  else if (isEditActive.value){
-    return isZuordnungCreationFormDirty.value; 
-  }
-  return false;
+    if (isEditPersonMetadataActive.value) {
+      return (
+        isChangePersonMetadataFieldDirty('selectedKopersNrMetadata') ||
+        isChangePersonMetadataFieldDirty('selectedVorname') ||
+        isChangePersonMetadataFieldDirty('selectedFamilienname')
+      );
+    } else if (isChangeKlasseFormActive.value) {
+      return isChangeKlasseFieldDirty('selectedSchule') || isChangeKlasseFieldDirty('selectedNewKlasse');
+    } else if (isEditActive.value) {
+      return isZuordnungCreationFormDirty.value;
+    }
+    return false;
   }
 
   function handleConfirmUnsavedChanges(): void {
@@ -1103,16 +1111,17 @@
   });
 
   const twoFactorAuthenticationConnectionError: ComputedRef<string> = computed(() => {
-    if (
-      twoFactorAuthentificationStore.errorCode == '500' ||
-      twoFactorAuthentificationStore.errorCode == '502' ||
-      twoFactorAuthentificationStore.errorCode == '503' ||
-      twoFactorAuthentificationStore.errorCode == '504' ||
-      twoFactorAuthentificationStore.errorCode == 'UNSPECIFIED_ERROR'
-    ) {
-      return t('admin.person.twoFactorAuthentication.errors.connection');
+    // Early return if loading
+    if (twoFactorAuthentificationStore.loading) return '';
+
+    switch (twoFactorAuthentificationStore.errorCode) {
+      case 'TOKEN_STATE_ERROR':
+        return t('admin.person.twoFactorAuthentication.errors.tokenStateError');
+      case 'PI_UNAVAILABLE_ERROR':
+        return t('admin.person.twoFactorAuthentication.errors.connection');
+      default:
+        return '';
     }
-    return '';
   });
 
   // Computed property to define what will be shown in the field Email depending on the returned status.
@@ -2030,14 +2039,9 @@
               <v-col> <v-progress-circular indeterminate></v-progress-circular></v-col>
             </v-row>
           </v-container>
-          <v-divider
-            class="border-opacity-100 rounded my-6 mx-4"
-            color="#E5EAEF"
-            thickness="6"
-          ></v-divider>
         </template>
         <template
-          v-else-if="twoFactorAuthentificationStore.required && twoFactorAuthentificationStore.hasToken != null"
+          v-else-if="twoFactorAuthentificationStore.required || twoFactorAuthentificationStore.hasToken === true"
         >
           <v-divider
             class="border-opacity-100 rounded my-6 mx-4"
@@ -2052,7 +2056,7 @@
               <template v-else>
                 <v-col>
                   <h3 class="subtitle-1">{{ $t('admin.person.twoFactorAuthentication.header') }}</h3>
-                  <v-row class="mt-4 text-body">
+                  <v-row class="mt-4 mr-lg-13 text-body">
                     <v-col
                       class="text-right"
                       cols="1"
@@ -2069,10 +2073,36 @@
                       ></v-icon>
                     </v-col>
                     <v-col>
-                      <template v-if="twoFactorAuthenticationConnectionError">
-                        <p>
-                          {{ twoFactorAuthenticationConnectionError }}
-                        </p>
+                      <template
+                        v-if="twoFactorAuthentificationStore.errorCode && !twoFactorAuthentificationStore.loading"
+                      >
+                        <v-row v-if="twoFactorAuthentificationStore.errorCode === 'PI_UNAVAILABLE_ERROR'">
+                          <p
+                            class="text-body"
+                            data-testid="connection-error-text"
+                          >
+                            {{ $t('admin.person.twoFactorAuthentication.errors.connection') }}
+                          </p>
+                        </v-row>
+                        <v-row v-else-if="twoFactorAuthentificationStore.errorCode === 'TOKEN_STATE_ERROR'">
+                          <p
+                            class="text-body"
+                            data-testid="token-state-error-text"
+                          >
+                            <i18n-t
+                              keypath="admin.person.twoFactorAuthentication.errors.tokenStateError"
+                              for="admin.person.twoFactorAuthentication.errors.iqshHelpdesk"
+                              tag="label"
+                            >
+                              <a
+                                :href="$t('admin.person.twoFactorAuthentication.errors.iqshHelpdeskLink')"
+                                rel="noopener noreferrer"
+                                target="_blank"
+                                >{{ $t('admin.person.twoFactorAuthentication.errors.iqshHelpdesk') }}</a
+                              >
+                            </i18n-t>
+                          </p>
+                        </v-row>
                       </template>
                       <template v-else-if="twoFactorAuthentificationStore.hasToken">
                         <p v-if="twoFactorAuthentificationStore.tokenKind === TokenKind.software">
@@ -2095,7 +2125,10 @@
                       </template>
                     </v-col>
                   </v-row>
-                  <v-row class="text-body">
+                  <v-row
+                    v-if="!twoFactorAuthenticationConnectionError"
+                    class="text-body"
+                  >
                     <v-col
                       class="text-right"
                       cols="1"
@@ -2107,7 +2140,10 @@
                       </v-icon>
                     </v-col>
                     <div class="v-col">
-                      <p v-if="twoFactorAuthentificationStore.hasToken">
+                      <p v-if="twoFactorAuthentificationStore.hasToken && !twoFactorAuthentificationStore.required">
+                        {{ $t('admin.person.twoFactorAuthentication.NoLongerNeedToken') }}
+                      </p>
+                      <p v-else-if="twoFactorAuthentificationStore.hasToken">
                         {{ $t('admin.person.twoFactorAuthentication.resetInfo') }}
                       </p>
                       <p v-if="!twoFactorAuthentificationStore.hasToken">
@@ -2151,15 +2187,15 @@
                         :enabledText="$t('admin.person.twoFactorAuthentication.setUpShort')"
                         position="start"
                       >
-                      <TwoFactorAuthenticationSetUp
-                        v-if="!twoFactorAuthentificationStore.hasToken"
-                        :errorCode="twoFactorAuthentificationStore.errorCode"
-                        :disabled="isEditActive || isEditPersonMetadataActive"
-                        :person="personStore.currentPerson"
-                        @dialogClosed="twoFactorAuthentificationStore.get2FAState(currentPersonId)"
-                      >
-                      </TwoFactorAuthenticationSetUp>
-                    </SpshTooltip>
+                        <TwoFactorAuthenticationSetUp
+                          v-if="!twoFactorAuthentificationStore.hasToken"
+                          :errorCode="twoFactorAuthentificationStore.errorCode"
+                          :disabled="isEditActive || isEditPersonMetadataActive"
+                          :person="personStore.currentPerson"
+                          @dialogClosed="twoFactorAuthentificationStore.get2FAState(currentPersonId)"
+                        >
+                        </TwoFactorAuthenticationSetUp>
+                      </SpshTooltip>
                     </v-col>
                   </div>
                 </v-col>
@@ -2423,7 +2459,7 @@
                 offset="1"
                 cols="10"
               >
-                <span>{{ changePersonMetadataSuccessMessage }}</span>
+                <span class="metadata-success-message">{{ changePersonMetadataSuccessMessage }}</span>
               </v-col>
             </v-row>
           </v-container>
@@ -2661,60 +2697,59 @@
       </LayoutCard>
     </v-dialog>
 
-      <!-- Warning dialog for unsaved changes -->
-  <v-dialog
-    data-testid="unsaved-changes-dialog"
-    ref="unsaved-changes-dialog"
-    persistent
-    v-model="showUnsavedChangesDialog"
-  >
-    <LayoutCard :header="$t('unsavedChanges.title')">
-      <v-card-text>
-        <v-container>
-          <v-row class="text-body bold px-md-16">
-            <v-col>
-              <p data-testid="unsaved-changes-warning-text">
-                {{ $t('unsavedChanges.message') }}
-              </p>
+    <!-- Warning dialog for unsaved changes -->
+    <v-dialog
+      data-testid="unsaved-changes-dialog"
+      ref="unsaved-changes-dialog"
+      persistent
+      v-model="showUnsavedChangesDialog"
+    >
+      <LayoutCard :header="$t('unsavedChanges.title')">
+        <v-card-text>
+          <v-container>
+            <v-row class="text-body bold px-md-16">
+              <v-col>
+                <p data-testid="unsaved-changes-warning-text">
+                  {{ $t('unsavedChanges.message') }}
+                </p>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card-text>
+        <v-card-actions class="justify-center">
+          <v-row class="justify-center">
+            <v-col
+              cols="12"
+              sm="6"
+              md="auto"
+            >
+              <v-btn
+                @click.stop="handleConfirmUnsavedChanges"
+                class="secondary button"
+                data-testid="confirm-unsaved-changes-button"
+                :block="mdAndDown"
+              >
+                {{ $t('yes') }}
+              </v-btn>
+            </v-col>
+            <v-col
+              cols="12"
+              sm="6"
+              md="auto"
+            >
+              <v-btn
+                @click.stop="showUnsavedChangesDialog = false"
+                class="primary button"
+                data-testid="close-unsaved-changes-dialog-button"
+                :block="mdAndDown"
+              >
+                {{ $t('no') }}
+              </v-btn>
             </v-col>
           </v-row>
-        </v-container>
-      </v-card-text>
-      <v-card-actions class="justify-center">
-        <v-row class="justify-center">
-          <v-col
-            cols="12"
-            sm="6"
-            md="auto"
-          >
-            <v-btn
-              @click.stop="handleConfirmUnsavedChanges"
-              class="secondary button"
-              data-testid="confirm-unsaved-changes-button"
-              :block="mdAndDown"
-            >
-              {{ $t('yes') }}
-            </v-btn>
-          </v-col>
-          <v-col
-            cols="12"
-            sm="6"
-            md="auto"
-          >
-            <v-btn
-              @click.stop="showUnsavedChangesDialog = false"
-              class="primary button"
-              data-testid="close-unsaved-changes-dialog-button"
-              :block="mdAndDown"
-            >
-              {{ $t('no') }}
-            </v-btn>
-          </v-col>
-        </v-row>
-      </v-card-actions>
-    </LayoutCard>
-  </v-dialog>
-    
+        </v-card-actions>
+      </LayoutCard>
+    </v-dialog>
   </div>
 </template>
 
@@ -2731,6 +2766,11 @@
 
   span {
     white-space: normal;
+    text-wrap: pretty;
+  }
+
+  .metadata-success-message {
+    white-space: pre;
     text-wrap: pretty;
   }
 </style>
