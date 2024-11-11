@@ -279,6 +279,7 @@
         "NEWER_VERSION_OF_ROLLE_AVAILABLE": "Die Rolle wurde zwischenzeitlich von einer anderen Administratorin oder einem anderen Administrator bearbeitet. Bitte aktualisieren Sie die Daten und versuchen Sie es erneut.",
         "ROLLE_ERROR": "Die Rolle konnte nicht angelegt werden.",
         "ROLLE_HAT_PERSONENKONTEXTE_ERROR": "Die Rolle kann nicht gelöscht werden, da die sie noch Benutzern zugeordnet ist. Nehmen Sie bitte zunächst alle Zuordnungen zurück.",
+        "ROLLE_NAME_UNIQUE_ON_SSK": "Der Rollenname ist bereits vergeben. Bitte korrigieren Sie Ihre Eingabe.",
         "UPDATE_MERKMALE_ERROR": "Die gewünschte Bearbeitung kann nicht ausgeführt werden, da die Rolle noch Benutzern zugeordnet ist. Nehmen Sie bitte zunächst alle Zuordnungen zurück."
       },
       "title": {
@@ -286,6 +287,7 @@
         "ROLLE_ERROR": "Fehler bei Erstellung der Rolle",
         "ROLLE_HAT_PERSONENKONTEXTE_ERROR": "Löschen nicht möglich",
         "ROLLE_UPDATE_ERROR": "Die Rolle konnte nicht bearbeitet werden",
+        "ROLLE_NAME_UNIQUE_ON_SSK": "Der Rollenname ist nicht eindeutig",
         "UPDATE_MERKMALE_ERROR": "Die Merkmale konnten nicht bearbeitet werden"
       },
       "isAllowedToManageRollen": "Darf Rollen verwalten",
