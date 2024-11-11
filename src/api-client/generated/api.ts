@@ -1524,6 +1524,12 @@ export interface PersonInfoResponse {
      * @memberof PersonInfoResponse
      */
     'gruppen': Array<string>;
+    /**
+     * 
+     * @type {PersonResponseEmail}
+     * @memberof PersonInfoResponse
+     */
+    'email': PersonResponseEmail | null;
 }
 /**
  * 
