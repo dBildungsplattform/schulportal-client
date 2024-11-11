@@ -19,6 +19,10 @@ import { nextTick, type ComputedRef, type DefineComponent } from 'vue';
 import type { TranslatedRolleWithAttrs } from '@/composables/useRollen';
 import PersonDetailsView from './PersonDetailsView.vue';
 import { EmailAddressStatus } from '@/api-client/generated';
+import {
+  useTwoFactorAuthentificationStore,
+  type TwoFactorAuthentificationStore,
+} from '@/stores/TwoFactorAuthentificationStore';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
@@ -27,6 +31,7 @@ const authStore: AuthStore = useAuthStore();
 const organisationStore: OrganisationStore = useOrganisationStore();
 const personStore: PersonStore = usePersonStore();
 const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
+const twoFactorAuthenticationStore: TwoFactorAuthentificationStore = useTwoFactorAuthentificationStore();
 
 const mockPerson: Personendatensatz = {
   person: {
@@ -512,5 +517,24 @@ describe('PersonDetailsView', () => {
     });
 
     expect(unsavedChangesDialogButton?.exists()).toBe(true);
+  });
+
+  describe('error messages', () => {
+    test('check 2fa connection error', async () => {
+      twoFactorAuthenticationStore.loading = false;
+      twoFactorAuthenticationStore.required = true;
+      twoFactorAuthenticationStore.errorCode = 'PI_UNAVAILABLE_ERROR';
+      await nextTick();
+
+      expect(wrapper?.find('[data-testid="connection-error-text"]').isVisible()).toBe(true);
+    });
+    test('check 2fa state error', async () => {
+      twoFactorAuthenticationStore.loading = false;
+      twoFactorAuthenticationStore.required = true;
+      twoFactorAuthenticationStore.errorCode = 'TOKEN_STATE_ERROR';
+      await nextTick();
+
+      expect(wrapper?.find('[data-testid="token-state-error-text"]').isVisible()).toBe(true);
+    });
   });
 });
