@@ -234,21 +234,13 @@
           case LockKeys.CreatedAt:
             return {
               key: t('person.lockedSince'),
-              attribute: new Intl.DateTimeFormat('de-DE', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-              }).format(new Date(attribute)),
+              attribute,
             };
 
           case LockKeys.LockedUntil:
             return {
               key: t('person.lockedUntil'),
-              attribute: new Intl.DateTimeFormat('de-DE', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-              }).format(new Date(attribute)),
+              attribute,
             };
 
           default:
