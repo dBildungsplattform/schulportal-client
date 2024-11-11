@@ -1,7 +1,7 @@
 import routes from '@/router/routes';
 import { VueWrapper, mount } from '@vue/test-utils';
 import type WrapperLike from '@vue/test-utils/dist/interfaces/wrapperLike';
-import { expect, test, type MockInstance } from 'vitest';
+import { expect, test } from 'vitest';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import UnknownUserErrorView from './UnknownUserErrorView.vue';
 
