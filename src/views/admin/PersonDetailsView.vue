@@ -264,7 +264,6 @@
     isZuordnungFormActive.value = true;
   };
 
-  // This will send the updated list of Zuordnungen to the Backend WITHOUT the selected Zuordnungen.
   const confirmDeletion = async (): Promise<void> => {
     // Check if the current user is trying to delete their own Zuordnungen
     if (authStore.currentUser?.personId === currentPersonId) {
@@ -272,27 +271,40 @@
       return;
     }
 
-    // The remaining Zuordnungen that were not selected
+    // The remaining Zuordnungen that were not selected for deletion
     const remainingZuordnungen: Zuordnung[] | undefined = zuordnungenResult.value?.filter(
       (zuordnung: Zuordnung) => !selectedZuordnungen.value.includes(zuordnung),
     );
 
-    // Extract Zuordnungen of type "Klasse"
+    // Get all Klassen Zuordnungen
     const klassenZuordnungen: Zuordnung[] | undefined = personStore.personenuebersicht?.zuordnungen.filter(
       (zuordnung: Zuordnung) => zuordnung.typ === OrganisationsTyp.Klasse,
     );
 
-    // Filter out Klassen where administriertVon is equal to any selectedZuordnungen.sskId so the Klasse is also deleted alongside the Schule.
-    // Otherwise the Zuordnung to the Schule will be deleted but the one to the Klasse will remain.
-    const filteredKlassenZuordnungen: Zuordnung[] | undefined = klassenZuordnungen?.filter(
-      (klasseZuordnung: Zuordnung) =>
-        !selectedZuordnungen.value.some(
-          (selectedZuordnung: Zuordnung) => selectedZuordnung.sskId === klasseZuordnung.administriertVon,
-        ),
-    );
+    // Create a map of Schule to Klasse relationships to keep the Klassen that are not supposed to be deleted
+    const schuleToKlasseMap: Map<string, Zuordnung[]> = new Map<string, Zuordnung[]>();
 
-    // Combine remaining Zuordnungen and filtered Klassen Zuordnungen
-    const combinedZuordnungen: Zuordnung[] | undefined = remainingZuordnungen?.concat(filteredKlassenZuordnungen || []);
+    klassenZuordnungen?.forEach((klasseZuordnung: Zuordnung) => {
+      const schuleId: string = klasseZuordnung.administriertVon;
+      if (!schuleToKlasseMap.has(schuleId)) {
+        schuleToKlasseMap.set(schuleId, []);
+      }
+      schuleToKlasseMap.get(schuleId)?.push(klasseZuordnung);
+    });
+
+    // Find Klassen that should be kept
+    const klassenToKeep: Zuordnung[] = [];
+
+    // For each remaining Zuordnung that is a Schule, keep its associated Klassen
+    remainingZuordnungen?.forEach((zuordnung: Zuordnung) => {
+      const associatedKlassen: Zuordnung[] = schuleToKlasseMap.get(zuordnung.sskId) || [];
+      klassenToKeep.push(...associatedKlassen);
+    });
+
+    // Combine remaining Zuordnungen with Klassen that should be kept
+    const combinedZuordnungen: Zuordnung[] | undefined = remainingZuordnungen?.concat(klassenToKeep);
+
+    // Update the personenkontexte with the filtered list
     await personenkontextStore.updatePersonenkontexte(combinedZuordnungen, currentPersonId);
     zuordnungenResult.value = combinedZuordnungen;
     selectedZuordnungen.value = [];
