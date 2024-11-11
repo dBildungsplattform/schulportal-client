@@ -237,18 +237,18 @@
         };
       case EmailStatus.Requested:
         return {
-          text: t('person.emailStatusRequested'),
-          tooltip: t('person.emailStatusRequestedHover'),
+          text: t('profile.emailStatusRequested'),
+          tooltip: t('profile.emailStatusRequestedHover'),
         };
       case EmailStatus.Disabled:
         return {
-          text: t('person.emailStatusDisabled'),
-          tooltip: t('person.emailStatusDisabledHover'),
+          text: t('profile.emailStatusDisabled'),
+          tooltip: t('profile.emailStatusDisabledHover'),
         };
       case EmailStatus.Failed:
         return {
-          text: t('person.emailStatusFailed'),
-          tooltip: t('person.emailStatusFailedHover'),
+          text: t('profile.emailStatusFailed'),
+          tooltip: t('profile.emailStatusFailedHover'),
         };
       default:
         return undefined;
@@ -441,7 +441,7 @@
                     </tr>
                     <tr v-if="!!emailStatus">
                       <td>
-                        <strong> {{ $t('person.email') }}: </strong>
+                        <strong> {{ $t('profile.email') }}: </strong>
                       </td>
                       <td>
                         <v-row no-gutters>
