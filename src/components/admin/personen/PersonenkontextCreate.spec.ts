@@ -4,12 +4,14 @@ import PersonenkontextCreate from './PersonenkontextCreate.vue';
 import { nextTick } from 'vue';
 import { RollenArt, RollenMerkmal, RollenSystemRecht } from '@/api-client/generated';
 import { type PersonenkontextStore, usePersonenkontextStore } from '@/stores/PersonenkontextStore';
-import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
+import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
 import type { BefristungProps } from './BefristungInput.vue';
+import { usePersonStore, type PersonStore, type PersonWithUebersicht } from '@/stores/PersonStore';
 
 let wrapper: VueWrapper | null = null;
 let personenkontextStore: PersonenkontextStore;
 let organisationStore: OrganisationStore;
+const personStore: PersonStore = usePersonStore();
 beforeEach(() => {
   document.body.innerHTML = `
     <div>
@@ -150,6 +152,54 @@ beforeEach(() => {
     selectedRolle: null,
     canCommit: true,
   };
+
+  const mockPersonenuebersicht: PersonWithUebersicht = {
+    personId: '1',
+    vorname: 'John',
+    nachname: 'Orton',
+    benutzername: 'jorton',
+    lastModifiedZuordnungen: Date.now().toLocaleString(),
+    zuordnungen: [
+      {
+        sskId: '1',
+        rolleId: '1',
+        sskName: 'Testschule Birmingham',
+        sskDstNr: '123456',
+        rolle: 'SuS',
+        typ: OrganisationsTyp.Schule,
+        administriertVon: '2',
+        editable: true,
+        merkmale: [] as unknown as RollenMerkmal,
+        befristung: '',
+      },
+      {
+        sskId: '3',
+        rolleId: '4',
+        sskName: 'Testschule London',
+        sskDstNr: '123459',
+        rolle: 'SuS',
+        typ: OrganisationsTyp.Schule,
+        administriertVon: '2',
+        editable: true,
+        merkmale: [] as unknown as RollenMerkmal,
+        befristung: '',
+      },
+      {
+        sskId: '2',
+        rolleId: '1',
+        sskName: '9a',
+        sskDstNr: '123459',
+        rolle: 'SuS',
+        typ: OrganisationsTyp.Klasse,
+        administriertVon: '01',
+        editable: true,
+        merkmale: [] as unknown as RollenMerkmal,
+        befristung: '',
+      },
+    ],
+  };
+
+  personStore.personenuebersicht = mockPersonenuebersicht;
 });
 
 describe('PersonenkontextCreate', () => {
@@ -372,5 +422,14 @@ describe('PersonenkontextCreate', () => {
     await nextTick();
 
     expect(klassenAutocomplete?.text()).toBeFalsy();
+  });
+
+  test('Preselect the Klasse if the existing Zuordnungen have a Klasse', async () => {
+    const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
+    await organisationAutocomplete?.setValue('01');
+    await nextTick();
+
+    // Verify that the klasse ID is emitted
+    expect(wrapper?.emitted('update:selectedKlasse')).toBeTruthy();
   });
 });
