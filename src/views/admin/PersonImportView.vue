@@ -52,7 +52,10 @@
     object({
       selectedSchule: string().required(t('admin.import.rules.schule.required')),
       selectedRolle: string().required(t('admin.import.rules.rolle.required')),
-      selectedFiles: array().of(mixed()).length(1, t('admin.import.rules.files.required')),
+      selectedFiles: array()
+        .of(mixed())
+        .required(t('admin.import.rules.files.required'))
+        .length(1, t('admin.import.rules.files.required')),
     }),
   );
 
