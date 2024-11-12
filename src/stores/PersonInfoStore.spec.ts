@@ -52,6 +52,7 @@ describe('PersonInfoStore', () => {
         pid: '',
         personenkontexte: [],
         gruppen: [],
+        email: null,
       };
 
       mockadapter.onGet('/api/person-info').replyOnce(200, mockPersonInfo);

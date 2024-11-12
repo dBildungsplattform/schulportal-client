@@ -1,10 +1,11 @@
 import { OrganisationsTyp, type Organisation } from '@/stores/OrganisationStore';
-import { type Person, type Personendatensatz } from '@/stores/PersonStore';
+import { PersonLockOccasion, type Person, type Personendatensatz } from '@/stores/PersonStore';
 import { mount, VueWrapper } from '@vue/test-utils';
 import { expect, test, type Mock } from 'vitest';
 import { nextTick } from 'vue';
 import PersonLock from './PersonLock.vue';
 import { EmailAddressStatus } from '@/api-client/generated';
+import PersonDetailsView from '@/views/admin/PersonDetailsView.vue';
 
 let wrapper: VueWrapper | null = null;
 
@@ -42,12 +43,15 @@ function getPersonendatensatz(locked: boolean): Personendatensatz {
     revision: '1',
     lastModified: '2024-05-22',
     userLock: locked
-      ? {
-          personId: '123',
-          locked_by: 'Amanda Admin',
-          locked_until: Date.now().toString(),
-          created_at: Date.now().toString(),
-        }
+      ? [
+          {
+            personId: '123',
+            locked_by: 'Amanda Admin',
+            locked_until: Date.now().toString(),
+            lock_occasion: PersonLockOccasion.MANUELL_GESPERRT,
+            created_at: Date.now().toString(),
+          },
+        ]
       : null,
     email: {
       address: 'email',
@@ -243,6 +247,7 @@ describe('Unlock user', () => {
       global: {
         components: {
           PersonLock,
+          PersonDetailsView,
         },
       },
     });

@@ -591,7 +591,8 @@ export const DbiamOrganisationErrorI18nKeyEnum = {
     NameRequiredForKlasse: 'NAME_REQUIRED_FOR_KLASSE',
     NameEnthaeltLeerzeichen: 'NAME_ENTHAELT_LEERZEICHEN',
     KennungEnthaeltLeerzeichen: 'KENNUNG_ENTHAELT_LEERZEICHEN',
-    EmailAdressOnOrganisationTyp: 'EMAIL_ADRESS_ON_ORGANISATION_TYP'
+    EmailAdressOnOrganisationTyp: 'EMAIL_ADRESS_ON_ORGANISATION_TYP',
+    NewerVersionOrganisation: 'NEWER_VERSION_ORGANISATION'
 } as const;
 
 export type DbiamOrganisationErrorI18nKeyEnum = typeof DbiamOrganisationErrorI18nKeyEnum[keyof typeof DbiamOrganisationErrorI18nKeyEnum];
@@ -1072,6 +1073,12 @@ export interface OrganisationByNameBodyParams {
      * @memberof OrganisationByNameBodyParams
      */
     'name': string;
+    /**
+     * The version for the organisation.
+     * @type {number}
+     * @memberof OrganisationByNameBodyParams
+     */
+    'version': number;
 }
 /**
  * 
@@ -1127,6 +1134,12 @@ export interface OrganisationResponse {
      * @memberof OrganisationResponse
      */
     'traegerschaft': TraegerschaftTyp;
+    /**
+     * 
+     * @type {number}
+     * @memberof OrganisationResponse
+     */
+    'version': number;
 }
 
 
@@ -1517,6 +1530,12 @@ export interface PersonInfoResponse {
      * @memberof PersonInfoResponse
      */
     'gruppen': Array<string>;
+    /**
+     * 
+     * @type {PersonResponseEmail}
+     * @memberof PersonInfoResponse
+     */
+    'email': PersonResponseEmail | null;
 }
 /**
  * 
@@ -1788,10 +1807,10 @@ export interface PersonResponse {
     'isLocked': boolean | null;
     /**
      * 
-     * @type {UserLockParams}
+     * @type {Array<UserLockParams>}
      * @memberof PersonResponse
      */
-    'userLock': UserLockParams | null;
+    'userLock': Array<UserLockParams> | null;
     /**
      * Date of the most recent changes for the person
      * @type {string}
@@ -2896,6 +2915,12 @@ export interface UserLockParams {
      * @memberof UserLockParams
      */
     'locked_until': string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserLockParams
+     */
+    'lock_occasion': string | null;
 }
 /**
  * 
