@@ -103,7 +103,7 @@
       // Fetch rollen after selecting the organization
       await personenkontextStore.processWorkflowStep({
         organisationId: newValue,
-        limit: 30,
+        limit: 25,
       });
 
       // Reset the selectedRolle field only if oldValue was not undefined
@@ -136,7 +136,7 @@
     timerId = setTimeout(() => {
       personenkontextStore.processWorkflowStep({
         organisationName: newValue,
-        limit: 30,
+        limit: 25,
       });
     }, 500);
   });
@@ -228,7 +228,7 @@
   });
 
   onMounted(async () => {
-    await personenkontextStore.processWorkflowStep({ limit: 30 });
+    await personenkontextStore.processWorkflowStep({ limit: 25 });
     importStore.uploadResponse = null;
     importStore.importedData = null;
     organisationStore.errorCode = '';
