@@ -4,7 +4,6 @@ import KlasseChange from './KlasseChange.vue';
 import { nextTick } from 'vue';
 
 let wrapper: VueWrapper | null = null;
-
 const schulen: Array<{ value: string; title: string }> = [
   {
     value: '1',
@@ -54,7 +53,7 @@ beforeEach(() => {
         onChange: () => vi.fn(),
         onInput: () => vi.fn(),
       },
-      isEditActive: false,
+      isEditActive: true,
       onSubmit: () => vi.fn(),
     },
     global: {
@@ -80,5 +79,32 @@ describe('KlasseChange', () => {
 
     await wrapper?.find('[data-testid="klasse-change-form"]').trigger('submit');
     expect(wrapper?.emitted('submit')).toBeTruthy();
+  });
+
+  test('Do nothing with Klassen if the orga was reset', async () => {
+    const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
+    await organisationAutocomplete?.setValue('1');
+    await nextTick();
+
+    const klassenAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
+    await klassenAutocomplete?.vm.$emit('update:search', '');
+    await nextTick();
+
+    await organisationAutocomplete?.setValue(undefined);
+    await nextTick();
+
+    expect(klassenAutocomplete?.text()).toBeFalsy();
+  });
+
+  test('Trigger Klassen search if the klasse was set', async () => {
+    const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
+    await organisationAutocomplete?.setValue('1');
+    await nextTick();
+
+    const klassenAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
+    await klassenAutocomplete?.setValue('1');
+    await nextTick();
+
+    expect(klassenAutocomplete?.text()).toBeTruthy();
   });
 });
