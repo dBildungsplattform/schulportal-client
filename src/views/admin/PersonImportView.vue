@@ -18,6 +18,7 @@
   import { toTypedSchema } from '@vee-validate/yup';
   import { array, mixed, object, string } from 'yup';
   import { useI18n, type Composer } from 'vue-i18n';
+  import { useDisplay } from 'vuetify';
   import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
   import { type ImportStore, useImportStore } from '@/stores/ImportStore';
   import { RollenArt } from '@/stores/RolleStore';
@@ -29,6 +30,8 @@
 
   const router: Router = useRouter();
   const { t }: Composer = useI18n({ useScope: 'global' });
+  const { smAndDown }: { smAndDown: Ref<boolean> } = useDisplay();
+  const confirmationDialogVisible: Ref<boolean> = ref(false);
 
   const allRollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = useRollen();
   const lernRollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = computed(() => {
@@ -122,7 +125,7 @@
       organisationStore.getAllOrganisationen({
         searchString: newValue,
         excludeTyp: [OrganisationsTyp.Klasse],
-        limit: 30,
+        limit: 25,
         systemrechte: ['PERSONEN_VERWALTEN', 'IMPORT_DURCHFUEHREN'],
       });
     }, 500);
@@ -176,7 +179,17 @@
     importStore.importedData = null;
   }
 
+  function cancelImport(): void {
+    backToUpload();
+    confirmationDialogVisible.value = false;
+  }
+
+  function openConfirmationDialog(): void {
+    confirmationDialogVisible.value = true;
+  }
+
   function executeImport(): void {
+    confirmationDialogVisible.value = false;
     importStore.executePersonenImport(
       importStore.uploadResponse?.importvorgangId as string,
       selectedSchule.value as string,
@@ -283,8 +296,8 @@
             <v-col cols="auto">
               <v-btn
                 class="primary"
-                @click="executeImport()"
-                data-testid="execute-import-button"
+                @click="openConfirmationDialog()"
+                data-testid="open-confirmation-dialog-button"
               >
                 {{ $t('admin.import.executeImport') }}
               </v-btn>
@@ -498,6 +511,63 @@
       </FormWrapper>
     </LayoutCard>
   </div>
+  <v-dialog
+    v-model="confirmationDialogVisible"
+    persistent
+  >
+    <LayoutCard
+      v-if="confirmationDialogVisible"
+      :closable="false"
+      :header="$t('admin.person.import')"
+    >
+      <v-card-text>
+        <v-container>
+          <v-row class="text-body bold ml-2">
+            <v-col
+              offset="1"
+              cols="10"
+            >
+              <span data-testid="person-import-confirmation-text">
+                {{ $t('admin.import.confirmationText') }}
+              </span>
+            </v-col>
+          </v-row>
+        </v-container>
+      </v-card-text>
+      <v-card-actions class="justify-center">
+        <v-row class="justify-center">
+          <v-col
+            cols="12"
+            sm="6"
+            md="4"
+          >
+            <v-btn
+              :block="smAndDown"
+              class="secondary"
+              @click="cancelImport()"
+              data-testid="cancel-import-button"
+            >
+              {{ $t('cancel') }}
+            </v-btn>
+          </v-col>
+          <v-col
+            cols="12"
+            sm="6"
+            md="4"
+          >
+            <v-btn
+              :block="smAndDown"
+              class="primary"
+              @click="executeImport()"
+              data-testid="execute-import-button"
+            >
+              {{ $t('admin.import.executeImport') }}
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-card-actions>
+    </LayoutCard>
+  </v-dialog>
 </template>
 
 <style lang="scss" scoped>

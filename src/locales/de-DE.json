@@ -29,6 +29,7 @@
     "import": {
       "anotherImport": "Weiteren Import durchführen",
       "backToUpload": "Andere Datei hochladen",
+      "confirmationText": "Achtung, diese Aktion kann nicht rückgängig gemacht werden. Möchten Sie den Import wirklich durchführen?",
       "downloadUserdata": "Benutzerdaten herunterladen",
       "errors": {
         "CSV_PARSING_ERROR": "Die Datei konnte nicht gelesen werden. Bitte überprüfen Sie das Format.",

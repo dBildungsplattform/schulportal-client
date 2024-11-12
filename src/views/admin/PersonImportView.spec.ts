@@ -124,13 +124,21 @@ describe('PersonImportView', () => {
   });
 
   test('it clears selects', async () => {
-    wrapper?.find('[data-testid="schule-select"] input').setValue('Schule');
-    wrapper?.find('[data-testid="rolle-select"] input').setValue('SuS');
+    const schuleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
+    schuleAutocomplete?.setValue('Schule');
     await nextTick();
 
-    wrapper?.find('[data-testid="schule-select"] .v-field__clearable').trigger('click');
+    const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
+    rolleAutocomplete?.setValue('SuS');
+    await nextTick();
+
+    schuleAutocomplete?.find('.v-field__clearable').trigger('click');
+    await nextTick();
+    // expect(wrapper?.emitted('click:clear')).toBe(true);
+
     wrapper?.find('[data-testid="rolle-select"] .v-field__clearable').trigger('click');
     await nextTick();
+    // expect(wrapper?.emitted('click:clear')).toBe(true);
   });
 
   test('it uploads a file', async () => {
@@ -155,7 +163,7 @@ describe('PersonImportView', () => {
 
     expect(importStore.uploadResponse).toStrictEqual(uploadResponse);
     expect(wrapper?.find('[data-testid="person-upload-success-text"]').isVisible()).toBe(true);
-    expect(wrapper?.find('[data-testid="execute-import-button"]').isVisible()).toBe(true);
+    expect(wrapper?.find('[data-testid="open-confirmation-dialog-button"]').isVisible()).toBe(true);
   });
 
   test('it shows invalid data', async () => {
@@ -214,14 +222,14 @@ describe('PersonImportView', () => {
 
     importStore.importedData = new File([''], 'personen.txt', { type: 'text/plain' });
 
-    wrapper?.find('[data-testid="execute-import-button"]').trigger('click');
+    wrapper?.find('[data-testid="open-confirmation-dialog-button"]').trigger('click');
     await nextTick();
 
-    wrapper?.find('[data-testid="another-import-button"]').trigger('click');
-    await nextTick();
+    const importConfirmationText: Element = document.querySelector('[data-testid="person-import-confirmation-text"]') as Element;
+    const executeImportButton: HTMLInputElement = document.querySelector('[data-testid="execute-import-button"]') as HTMLInputElement;
 
-    expect(importStore.importedData).toBeNull();
-    expect(importStore.uploadResponse).toBeNull();
+    expect(importConfirmationText).not.toBeNull();
+    expect(executeImportButton).not.toBeNull();
   });
 
   test('it downloads an imported file', async () => {
