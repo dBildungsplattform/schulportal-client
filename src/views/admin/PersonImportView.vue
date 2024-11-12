@@ -127,7 +127,7 @@
     timerId = setTimeout(() => {
       organisationStore.getAllOrganisationen({
         searchString: newValue,
-        excludeTyp: [OrganisationsTyp.Klasse],
+        includeTyp: OrganisationsTyp.Schule,
         limit: 25,
         systemrechte: ['PERSONEN_VERWALTEN', 'IMPORT_DURCHFUEHREN'],
       });
