@@ -201,7 +201,6 @@
     if (!organisationId) {
       return;
     }
-    // If searchValue is empty, fetch all roles for the organisationId
     if (searchValue === '' && !selectedKlasse.value) {
       timerId.value = setTimeout(() => {
         organisationStore.getKlassenByOrganisationId(organisationId, { searchString: searchValue });
