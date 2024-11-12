@@ -143,6 +143,16 @@
     }
   }
 
+  const alertButtonText: ComputedRef<string> = computed(() => {
+    return organisationStore.errorCode === 'NEWER_VERSION_ORGANISATION' ? t('refreshData') : t('nav.backToList');
+  });
+
+  const alertButtonAction: ComputedRef<() => void> = computed(() => {
+    return organisationStore.errorCode === 'NEWER_VERSION_ORGANISATION'
+      ? (): void => router.go(0)
+      : navigateToKlasseManagement;
+  });
+
   onBeforeMount(async () => {
     organisationStore.errorCode = '';
     // Retrieves the Klasse using the Id in the route since that's all we have
@@ -210,8 +220,8 @@
             : $t(`admin.klasse.errors.${organisationStore.errorCode}`)
         "
         :showButton="true"
-        :buttonText="$t('nav.backToList')"
-        :buttonAction="handleAlertClose"
+        :buttonText="alertButtonText"
+        :buttonAction="alertButtonAction"
         @update:modelValue="handleAlertClose"
       />
 

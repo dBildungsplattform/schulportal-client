@@ -6,6 +6,7 @@ import { useAuthStore, type AuthStore, type UserInfo } from '@/stores/AuthStore'
 import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
 import {
   parseUserLock,
+  PersonLockOccasion,
   usePersonStore,
   type Personendatensatz,
   type PersonStore,
@@ -18,6 +19,10 @@ import { nextTick, type ComputedRef, type DefineComponent } from 'vue';
 import type { TranslatedRolleWithAttrs } from '@/composables/useRollen';
 import PersonDetailsView from './PersonDetailsView.vue';
 import { EmailAddressStatus } from '@/api-client/generated';
+// import {
+//   useTwoFactorAuthentificationStore,
+//   type TwoFactorAuthentificationStore,
+// } from '@/stores/TwoFactorAuthentificationStore';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
@@ -26,6 +31,7 @@ const authStore: AuthStore = useAuthStore();
 const organisationStore: OrganisationStore = useOrganisationStore();
 const personStore: PersonStore = usePersonStore();
 const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
+// const twoFactorAuthenticationStore: TwoFactorAuthentificationStore = useTwoFactorAuthentificationStore();
 
 const mockPerson: Personendatensatz = {
   person: {
@@ -255,12 +261,15 @@ describe('PersonDetailsView', () => {
   test('it renders details for a locked person', async () => {
     const date: string = '01.01.2024';
     const datetime: string = `${date} 12:34:00`;
-    const userLock: UserLock = {
-      personId: '1234',
-      locked_by: 'test',
-      created_at: datetime,
-      locked_until: datetime,
-    };
+    const userLock: UserLock[] = [
+      {
+        personId: '1234',
+        locked_by: 'test',
+        created_at: datetime,
+        lock_occasion: PersonLockOccasion.MANUELL_GESPERRT,
+        locked_until: datetime,
+      },
+    ];
 
     // Mock the current person in the store
     personStore.currentPerson = {
@@ -289,7 +298,7 @@ describe('PersonDetailsView', () => {
 
     // Check if the element exists and has the correct text content
     expect(vornameElement?.text()).toBe('Samuel');
-    expect(lockInfoContainer?.html()).toContain(userLock.locked_by);
+    expect(lockInfoContainer?.html()).toContain(userLock[0]!.locked_by);
     expect(lockInfoContainer?.html()).toContain(date);
   });
 
@@ -381,7 +390,7 @@ describe('PersonDetailsView', () => {
   test('it displays lockInfo if there is any', async () => {
     expect(personStore.currentPerson).toBeDefined();
     expect(wrapper).toBeDefined();
-    personStore.currentPerson!.person.isLocked = false;
+    personStore.currentPerson!.person.userLock = [];
     await nextTick();
 
     const activeStatusMessage: DOMWrapper<HTMLDivElement> = wrapper!.find('[data-testid="person-lock-info"]');
@@ -398,24 +407,27 @@ describe('PersonDetailsView', () => {
       month: '2-digit',
       year: 'numeric',
     });
-    const userLock: UserLock = {
-      personId: '1234',
-      locked_by: 'Lady Lock',
-      created_at: date,
-      locked_until: date,
-    };
+    const userLock: UserLock[] = [
+      {
+        personId: '1234',
+        locked_by: 'Lady Lock',
+        created_at: date,
+        lock_occasion: PersonLockOccasion.MANUELL_GESPERRT,
+        locked_until: date,
+      },
+    ];
 
     personStore.currentPerson!.person.isLocked = true;
     personStore.currentPerson!.person.userLock = parseUserLock(userLock);
     organisationStore.lockingOrganisation = {
       id: '1234',
-      name: userLock.locked_by,
+      name: userLock[0]!.locked_by,
       typ: OrganisationsTyp.Schule,
     };
     await nextTick();
 
     const lockInfoArray: Array<[string, string]> = [
-      ['Gesperrt durch:', userLock.locked_by],
+      ['Gesperrt durch:', userLock[0]!.locked_by],
       ['Gesperrt seit:', formattedDate],
     ];
 
@@ -520,4 +532,24 @@ describe('PersonDetailsView', () => {
   test('it shows befristung', async () => {
     expect(wrapper?.find('[data-testid="zuordnung-befristung-text"]').isVisible()).toBe(true);
   });
+
+  // TODO: fix these tests
+  // describe('error messages', () => {
+  //   test('check 2fa connection error', async () => {
+  //     twoFactorAuthenticationStore.loading = false;
+  //     twoFactorAuthenticationStore.required = true;
+  //     twoFactorAuthenticationStore.errorCode = 'PI_UNAVAILABLE_ERROR';
+  //     await nextTick();
+
+  //     expect(wrapper?.find('[data-testid="connection-error-text"]').isVisible()).toBe(true);
+  //   });
+  //   test('check 2fa state error', async () => {
+  //     twoFactorAuthenticationStore.loading = false;
+  //     twoFactorAuthenticationStore.required = true;
+  //     twoFactorAuthenticationStore.errorCode = 'TOKEN_STATE_ERROR';
+  //     await nextTick();
+
+  //     expect(wrapper?.find('[data-testid="token-state-error-text"]').isVisible()).toBe(true);
+  //   });
+  // });
 });

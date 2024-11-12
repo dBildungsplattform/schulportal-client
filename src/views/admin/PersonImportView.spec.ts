@@ -225,8 +225,12 @@ describe('PersonImportView', () => {
     wrapper?.find('[data-testid="open-confirmation-dialog-button"]').trigger('click');
     await nextTick();
 
-    const importConfirmationText: Element = document.querySelector('[data-testid="person-import-confirmation-text"]') as Element;
-    const executeImportButton: HTMLInputElement = document.querySelector('[data-testid="execute-import-button"]') as HTMLInputElement;
+    const importConfirmationText: Element = document.querySelector(
+      '[data-testid="person-import-confirmation-text"]',
+    ) as Element;
+    const executeImportButton: HTMLInputElement = document.querySelector(
+      '[data-testid="execute-import-button"]',
+    ) as HTMLInputElement;
 
     expect(importConfirmationText).not.toBeNull();
     expect(executeImportButton).not.toBeNull();
