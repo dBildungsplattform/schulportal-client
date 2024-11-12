@@ -19,7 +19,7 @@
   import { array, mixed, object, string } from 'yup';
   import { useI18n, type Composer } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
-  import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
+  import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
   import { type ImportStore, useImportStore } from '@/stores/ImportStore';
   import { RollenArt } from '@/stores/RolleStore';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
@@ -93,10 +93,15 @@
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = formContext.defineField('selectedFiles', vuetifyConfig);
 
-  watch(selectedSchule, (newValue: string | undefined, oldValue: string | undefined) => {
+  // Computed property to get the title of the selected schule
+  const selectedSchuleTitle: ComputedRef<string | undefined> = computed(() => {
+    return schulen.value?.find((org: TranslatedObject) => org.value === selectedSchule.value)?.title;
+  });
+
+  watch(selectedSchule, async (newValue: string | undefined, oldValue: string | undefined) => {
     if (newValue && newValue !== oldValue) {
-      // Fetch the roles after selecting the organization
-      personenkontextStore.processWorkflowStep({
+      // Fetch rollen after selecting the organization
+      await personenkontextStore.processWorkflowStep({
         organisationId: newValue,
         limit: 30,
       });
@@ -120,16 +125,18 @@
   });
 
   watch(searchInputSchule, (newValue: string | undefined, _oldValue: string | undefined) => {
+    if (!newValue || newValue === selectedSchuleTitle.value) {
+      return;
+    }
+
     /* cancel pending call */
     clearTimeout(timerId);
 
     /* delay new call 500ms */
     timerId = setTimeout(() => {
-      organisationStore.getAllOrganisationen({
-        searchString: newValue,
-        includeTyp: OrganisationsTyp.Schule,
-        limit: 25,
-        systemrechte: ['PERSONEN_VERWALTEN', 'IMPORT_DURCHFUEHREN'],
+      personenkontextStore.processWorkflowStep({
+        organisationName: newValue,
+        limit: 30,
       });
     }, 500);
   });
@@ -221,11 +228,7 @@
   });
 
   onMounted(async () => {
-    await organisationStore.getAllOrganisationen({
-      includeTyp: OrganisationsTyp.Schule,
-      systemrechte: ['PERSONEN_VERWALTEN', 'IMPORT_DURCHFUEHREN'],
-      limit: 30,
-    });
+    await personenkontextStore.processWorkflowStep({ limit: 30 });
     importStore.uploadResponse = null;
     importStore.importedData = null;
     organisationStore.errorCode = '';
