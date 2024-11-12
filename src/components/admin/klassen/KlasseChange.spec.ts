@@ -4,6 +4,9 @@ import KlasseChange from './KlasseChange.vue';
 import { nextTick } from 'vue';
 
 let wrapper: VueWrapper | null = null;
+const organisationStore = {
+  getKlassenByOrganisationId: vi.fn(),
+};
 const schulen: Array<{ value: string; title: string }> = [
   {
     value: '1',
@@ -27,6 +30,7 @@ const klassen: Array<{ value: string; title: string }> = [
 ];
 
 beforeEach(() => {
+  vi.useFakeTimers();
   document.body.innerHTML = `
     <div>
       <div id="app"></div>
@@ -62,6 +66,11 @@ beforeEach(() => {
       },
     },
   });
+});
+
+afterEach(() => {
+  vi.clearAllTimers();
+  vi.clearAllMocks();
 });
 
 describe('KlasseChange', () => {
@@ -106,5 +115,25 @@ describe('KlasseChange', () => {
     await nextTick();
 
     expect(klassenAutocomplete?.text()).toBeTruthy();
+  });
+
+  test('should not call getKlassenByOrganisationId when no organisation is selected', async () => {
+    const klassenAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
+    await klassenAutocomplete?.vm.$emit('update:search', 'test');
+    vi.advanceTimersByTime(500);
+    await nextTick();
+
+    expect(organisationStore.getKlassenByOrganisationId).not.toHaveBeenCalled();
+  });
+  test('should not search when search value matches selected class title', async () => {
+    const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
+    await organisationAutocomplete?.setValue('1');
+
+    const klassenAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
+    await klassenAutocomplete?.setValue('1'); // Select Klasse 1
+    await klassenAutocomplete?.vm.$emit('update:search', 'Klasse 1'); // Search with same title
+
+    vi.advanceTimersByTime(500);
+    expect(organisationStore.getKlassenByOrganisationId).not.toHaveBeenCalled();
   });
 });
