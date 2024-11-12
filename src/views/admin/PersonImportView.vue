@@ -440,7 +440,7 @@
 
         <!-- File Upload -->
         <FormRow
-          :errorLabel="''"
+          :errorLabel="selectedFilesProps['error']"
           :isRequired="true"
           labelForId="file-upload"
           :label="$t('admin.import.uploadFile')"
