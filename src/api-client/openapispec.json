@@ -4487,7 +4487,11 @@
           "organisation": {
             "$ref": "#/components/schemas/CreatedPersonenkontextOrganisation"
           },
-          "roleName": {
+          "rollenart": {
+            "type": "string",
+            "nullable": true
+          },
+          "rollenname": {
             "type": "string",
             "nullable": true
           },
@@ -4523,7 +4527,8 @@
           "referrer",
           "mandant",
           "organisation",
-          "roleName",
+          "rollenart",
+          "rollenname",
           "personenstatus",
           "jahrgangsstufe",
           "sichtfreigabe",
@@ -4885,6 +4890,13 @@
           "personalnummer": {
             "type": "string",
             "nullable": true
+          },
+          "dienststellen": {
+            "nullable": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         },
         "required": [
@@ -4898,7 +4910,8 @@
           "lokalisierung",
           "vertrauensstufe",
           "revision",
-          "personalnummer"
+          "personalnummer",
+          "dienststellen"
         ]
       },
       "PersonInfoResponse": {
