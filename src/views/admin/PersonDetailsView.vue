@@ -26,11 +26,13 @@
   import {
     EmailStatus,
     LockKeys,
+    PersonLockOccasion,
     usePersonStore,
     type Person,
     type Personendatensatz,
     type PersonStore,
     type PersonWithUebersicht,
+    type UserLock,
   } from '@/stores/PersonStore';
   import {
     usePersonenkontextStore,
@@ -128,6 +130,14 @@
   const calculatedBefristung: Ref<string | undefined> = ref('');
   const loading: Ref<boolean> = ref(true);
 
+  const isManuallyLocked: ComputedRef<boolean> = computed<boolean>(() => {
+    return (
+      personStore.currentPerson!.person.userLock?.some(
+        (lock: UserLock) => lock.lock_occasion === PersonLockOccasion.MANUELL_GESPERRT,
+      ) ?? false // Default to false if userLock is undefined
+    );
+  });
+
   function navigateToPersonTable(): void {
     router.push({ name: 'person-management' });
   }
@@ -139,8 +149,9 @@
 
   async function onLockUser(lockedBy: string, date: string | undefined): Promise<void> {
     if (!personStore.currentPerson) return;
+
     let bodyParams: LockUserBodyParams = {
-      lock: !personStore.currentPerson.person.isLocked,
+      lock: !isManuallyLocked.value,
       locked_by: lockedBy,
       locked_until: date,
     };
@@ -181,49 +192,77 @@
     return organisation.kennung ? `${organisation.kennung} (${organisation.name})` : organisation.name;
   }
 
-  // translate keys and format attributes for display
-  const getuserLock: ComputedRef<{ key: string; attribute: string }[]> = computed(() => {
-    if (!personStore.currentPerson?.person.isLocked) return [];
+  function getSpecifiedUserLock(lockOccasion: PersonLockOccasion): UserLock | undefined {
+    if (!personStore.currentPerson) return undefined;
 
     const { userLock }: Person = personStore.currentPerson.person;
-    if (!userLock) return [];
+    if (!userLock) return undefined;
 
-    return Object.entries(userLock).map(([key, attribute]: [string, string]) => {
-      switch (key) {
-        case LockKeys.LockedBy:
-          return {
-            key: t('person.lockedBy'),
-            attribute: organisationStore.lockingOrganisation
-              ? getOrganisationDisplayName(organisationStore.lockingOrganisation)
-              : t('admin.organisation.unknownOrganisation'),
-          };
+    // Find the manualLock entry if it exists
+    const specifiedLock: UserLock | undefined = userLock.find(
+      (lock: UserLock) => lock[LockKeys.LockOccasion] === lockOccasion,
+    );
 
-        case LockKeys.CreatedAt:
-          return {
-            key: t('person.lockedSince'),
-            attribute: new Intl.DateTimeFormat('de-DE', {
-              year: 'numeric',
-              month: '2-digit',
-              day: '2-digit',
-            }).format(new Date(attribute)),
-          };
-        case LockKeys.LockedUntil:
-          return {
-            key: t('person.lockedUntil'),
-            attribute,
-          };
+    return specifiedLock;
+  }
 
-        default:
-          return { key, attribute };
-      }
-    });
+  const getKopersUserLock: ComputedRef<{ text: string }[]> = computed(() => {
+    const kopersUserLock: UserLock | undefined = getSpecifiedUserLock(PersonLockOccasion.KOPERS_GESPERRT);
+    if (!kopersUserLock) return [];
+    return [
+      {
+        text: t('person.kopersLock'),
+      },
+    ];
+  });
+
+  const getManualUserLock: ComputedRef<{ key: string; attribute: string }[]> = computed(() => {
+    const manualLock: UserLock | undefined = getSpecifiedUserLock(PersonLockOccasion.MANUELL_GESPERRT);
+    if (!manualLock) return [];
+    return Object.entries(manualLock)
+      .filter(([key]: [string, string]) => key !== LockKeys.LockOccasion)
+      .map(([key, attribute]: [string, string]) => {
+        switch (key) {
+          case LockKeys.LockedBy:
+            return {
+              key: t('person.lockedBy'),
+              attribute: organisationStore.lockingOrganisation
+                ? getOrganisationDisplayName(organisationStore.lockingOrganisation)
+                : t('admin.organisation.unknownOrganisation'),
+            };
+
+          case LockKeys.CreatedAt:
+            return {
+              key: t('person.lockedSince'),
+              attribute,
+            };
+
+          case LockKeys.LockedUntil:
+            return {
+              key: t('person.lockedUntil'),
+              attribute,
+            };
+
+          default:
+            return {
+              key,
+              attribute,
+            };
+        }
+      })
+      .filter(Boolean); // Remove undefined entries
   });
 
   watch(
     () => personStore.currentPerson?.person,
     async (person: Person | undefined) => {
       if (!(person && person.isLocked && person.userLock)) return;
-      await organisationStore.getLockingOrganisationById(person.userLock.locked_by);
+      const manualLock: UserLock | undefined = person.userLock.find(
+        (lock: UserLock) => lock.lock_occasion === PersonLockOccasion.MANUELL_GESPERRT,
+      );
+      if (manualLock) {
+        await organisationStore.getLockingOrganisationById(manualLock.locked_by);
+      }
     },
   );
 
@@ -264,7 +303,6 @@
     isZuordnungFormActive.value = true;
   };
 
-  // This will send the updated list of Zuordnungen to the Backend WITHOUT the selected Zuordnungen.
   const confirmDeletion = async (): Promise<void> => {
     // Check if the current user is trying to delete their own Zuordnungen
     if (authStore.currentUser?.personId === currentPersonId) {
@@ -272,27 +310,40 @@
       return;
     }
 
-    // The remaining Zuordnungen that were not selected
+    // The remaining Zuordnungen that were not selected for deletion
     const remainingZuordnungen: Zuordnung[] | undefined = zuordnungenResult.value?.filter(
       (zuordnung: Zuordnung) => !selectedZuordnungen.value.includes(zuordnung),
     );
 
-    // Extract Zuordnungen of type "Klasse"
+    // Get all Klassen Zuordnungen
     const klassenZuordnungen: Zuordnung[] | undefined = personStore.personenuebersicht?.zuordnungen.filter(
       (zuordnung: Zuordnung) => zuordnung.typ === OrganisationsTyp.Klasse,
     );
 
-    // Filter out Klassen where administriertVon is equal to any selectedZuordnungen.sskId so the Klasse is also deleted alongside the Schule.
-    // Otherwise the Zuordnung to the Schule will be deleted but the one to the Klasse will remain.
-    const filteredKlassenZuordnungen: Zuordnung[] | undefined = klassenZuordnungen?.filter(
-      (klasseZuordnung: Zuordnung) =>
-        !selectedZuordnungen.value.some(
-          (selectedZuordnung: Zuordnung) => selectedZuordnung.sskId === klasseZuordnung.administriertVon,
-        ),
-    );
+    // Create a map of Schule to Klasse relationships to keep the Klassen that are not supposed to be deleted
+    const schuleToKlasseMap: Map<string, Zuordnung[]> = new Map<string, Zuordnung[]>();
 
-    // Combine remaining Zuordnungen and filtered Klassen Zuordnungen
-    const combinedZuordnungen: Zuordnung[] | undefined = remainingZuordnungen?.concat(filteredKlassenZuordnungen || []);
+    klassenZuordnungen?.forEach((klasseZuordnung: Zuordnung) => {
+      const schuleId: string = klasseZuordnung.administriertVon;
+      if (!schuleToKlasseMap.has(schuleId)) {
+        schuleToKlasseMap.set(schuleId, []);
+      }
+      schuleToKlasseMap.get(schuleId)?.push(klasseZuordnung);
+    });
+
+    // Find Klassen that should be kept
+    const klassenToKeep: Zuordnung[] = [];
+
+    // For each remaining Zuordnung that is a Schule, keep its associated Klassen
+    remainingZuordnungen?.forEach((zuordnung: Zuordnung) => {
+      const associatedKlassen: Zuordnung[] = schuleToKlasseMap.get(zuordnung.sskId) || [];
+      klassenToKeep.push(...associatedKlassen);
+    });
+
+    // Combine remaining Zuordnungen with Klassen that should be kept
+    const combinedZuordnungen: Zuordnung[] | undefined = remainingZuordnungen?.concat(klassenToKeep);
+
+    // Update the personenkontexte with the filtered list
     await personenkontextStore.updatePersonenkontexte(combinedZuordnungen, currentPersonId);
     zuordnungenResult.value = combinedZuordnungen;
     selectedZuordnungen.value = [];
@@ -2219,7 +2270,10 @@
                     cols="1"
                   >
                     <v-icon
-                      v-if="personStore.currentPerson?.person.isLocked"
+                      v-if="
+                        personStore.currentPerson?.person.userLock &&
+                        personStore.currentPerson.person.userLock?.length > 0
+                      "
                       icon="mdi-lock"
                       color="red"
                     ></v-icon>
@@ -2227,7 +2281,8 @@
                   <v-col cols="10">
                     <span>
                       {{
-                        personStore.currentPerson?.person.isLocked
+                        personStore.currentPerson?.person.userLock &&
+                        personStore.currentPerson.person.userLock?.length > 0
                           ? t('person.userIsLocked')
                           : t('person.userIsUnlocked')
                       }}
@@ -2236,7 +2291,7 @@
                 </v-row>
                 <v-row
                   class="mt-0"
-                  v-for="({ key, attribute }, index) of getuserLock"
+                  v-for="({ key, attribute }, index) of getManualUserLock"
                   :key="key"
                   cols="10"
                 >
@@ -2261,6 +2316,31 @@
                       :data-testid="`lock-info-${index}-attribute`"
                     >
                       {{ attribute }}
+                    </span>
+                  </v-col>
+                </v-row>
+                <v-row
+                  v-if="getKopersUserLock.length"
+                  cols="10"
+                >
+                  <v-col cols="1">
+                    <v-icon
+                      aria-hidden="true"
+                      class="mr-2"
+                      icon="mdi-alert-circle-outline"
+                      size="small"
+                    ></v-icon>
+                  </v-col>
+                  <v-col
+                    v-for="(item, index) in getKopersUserLock"
+                    :key="index"
+                    cols="9"
+                  >
+                    <span
+                      class="text-body"
+                      :data-testid="`lock-info-${index}-attribute`"
+                    >
+                      {{ item.text }}
                     </span>
                   </v-col>
                 </v-row>
