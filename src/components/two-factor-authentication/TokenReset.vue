@@ -14,7 +14,6 @@
   const { t }: Composer = useI18n({ useScope: 'global' });
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
   const isTokenResetRequested: Ref<boolean> = ref(false);
-  const errorThrown: Ref<boolean> = ref(false);
   const twoFactorAuthenticationStore: TwoFactorAuthentificationStore = useTwoFactorAuthentificationStore();
   const dialogText: Ref<string> = ref('');
   const dialogHeader: Ref<string> = ref(t('admin.person.twoFactorAuthentication.tokenReset'));
@@ -37,17 +36,13 @@
   const props: Props = defineProps<Props>();
   async function closeTokenResetDialog(isActive: Ref<boolean>): Promise<void> {
     isActive.value = false;
-    errorThrown.value = false;
     isTokenResetRequested.value = false;
+    twoFactorAuthenticationStore.hasToken = null;
     emits('dialogClosed');
   }
 
   function createDialogueText(): void {
     if (twoFactorAuthenticationStore.errorCode !== '') {
-      const message: string = t(
-        'admin.person.twoFactorAuthentication.errors.' + twoFactorAuthenticationStore.errorCode,
-      );
-      dialogText.value = message;
       dialogHeader.value =
         props.tokenType === TokenKind.hardware
           ? t('admin.person.twoFactorAuthentication.tokenResetHardwareErrorHeader')
@@ -68,7 +63,6 @@
     } finally {
       createDialogueText();
       isTokenResetRequested.value = true;
-      twoFactorAuthenticationStore.errorCode = '';
     }
   }
 </script>
@@ -108,10 +102,35 @@
             </v-row>
           </v-container>
           <v-container v-if="isTokenResetRequested">
-            <v-row class="text-body px-md-16 bold">
-              <v-col class="whiteSpace">
+            <v-row
+              v-if="!twoFactorAuthenticationStore.errorCode"
+              class="text-body px-md-16 bold"
+            >
+              <v-col
+                data-testid="dialog-text"
+                class="whiteSpace"
+              >
                 {{ dialogText }}
               </v-col>
+            </v-row>
+            <v-row v-else>
+              <p
+                class="text-body bold"
+                data-testid="token-reset-dialog-error-text"
+              >
+                <i18n-t
+                  keypath="admin.person.twoFactorAuthentication.errors.TOKEN_RESET_ERROR"
+                  for="admin.person.twoFactorAuthentication.errors.iqshHelpdesk"
+                  tag="label"
+                >
+                  <a
+                    :href="$t('admin.person.twoFactorAuthentication.errors.iqshHelpdeskLink')"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                    >{{ $t('admin.person.twoFactorAuthentication.errors.iqshHelpdesk') }}</a
+                  >
+                </i18n-t>
+              </p>
             </v-row>
           </v-container>
         </v-card-text>

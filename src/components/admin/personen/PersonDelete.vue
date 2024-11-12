@@ -50,7 +50,7 @@
     return message;
   });
 
-  async function closePasswordResetDialog(isActive: Ref<boolean>): Promise<void> {
+  async function closePersonDeleteDialog(isActive: Ref<boolean>): Promise<void> {
     isActive.value = false;
   }
 
@@ -59,7 +59,7 @@
     successDialogVisible.value = true;
   }
 
-  async function closeSuccessDialogAndPushToManagent(): Promise<void> {
+  async function closeSuccessDialogAndPushToManagement(): Promise<void> {
     successDialogVisible.value = false;
     router.push({ name: 'person-management' });
   }
@@ -77,9 +77,9 @@
     >
       <v-card-text>
         <v-container>
-          <v-row class="text-body bold px-md-16">
+          <v-row class="text-body text-center bold px-md-16">
             <v-col
-              offset="3"
+              offset="1"
               cols="10"
             >
               <span data-testid="person-delete-success-text">
@@ -99,7 +99,7 @@
             <v-btn
               :block="mdAndDown"
               class="primary"
-              @click.stop="closeSuccessDialogAndPushToManagent()"
+              @click.stop="closeSuccessDialogAndPushToManagement()"
               data-testid="close-person-delete-success-dialog-button"
             >
               {{ $t('close') }}
@@ -128,7 +128,7 @@
         >
           <v-btn
             class="secondary button"
-            data-testid="open-person-delete-dialog-icon"
+            data-testid="open-person-delete-dialog-button"
             :disabled="disabled"
             v-bind="props"
             :block="mdAndDown"
@@ -146,7 +146,7 @@
       <LayoutCard
         :closable="true"
         :header="$t('admin.person.deletePerson')"
-        @onCloseClicked="closePasswordResetDialog(isActive)"
+        @onCloseClicked="closePersonDeleteDialog(isActive)"
       >
         <v-card-text>
           <v-container>
@@ -166,9 +166,9 @@
                 </p>
               </v-col>
             </v-row>
-            <v-row class="text-body bold">
+            <v-row class="text-body text-center bold">
               <v-col
-                offset="2"
+              offset="1"
                 cols="10"
               >
                 <span data-testid="person-delete-confirmation-text">
@@ -188,7 +188,7 @@
               <v-btn
                 :block="mdAndDown"
                 class="secondary button"
-                @click.stop="closePasswordResetDialog(isActive)"
+                @click.stop="closePersonDeleteDialog(isActive)"
                 data-testid="close-person-delete-dialog-button"
               >
                 {{ $t('cancel') }}

@@ -8,6 +8,12 @@ import {
 import axiosApiInstance from '@/services/ApiService';
 import type { UserinfoPersonenkontext } from './PersonenkontextStore';
 
+export enum StepUpLevel {
+  NONE = 'none',
+  SILVER = 'silver',
+  GOLD = 'gold',
+}
+
 export type UserInfo = {
   sub: string;
   name: string | null;
@@ -42,7 +48,9 @@ type AuthState = {
   hasSchulverwaltungPermission: boolean;
   hasSchultraegerverwaltungPermission: boolean;
   hasPersonenSyncPermission: boolean;
+  hasPersonenAnlegenPermission: boolean;
   isAuthed: boolean;
+  acr: StepUpLevel;
 };
 
 type AuthActions = {
@@ -67,7 +75,9 @@ export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, 
     hasSchulverwaltungPermission: false,
     hasSchultraegerverwaltungPermission: false,
     hasPersonenSyncPermission: false,
+    hasPersonenAnlegenPermission: false,
     isAuthed: false,
+    acr: StepUpLevel.NONE,
   }),
   actions: {
     async initializeAuthStatus() {
@@ -77,26 +87,33 @@ export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, 
             validateStatus: null,
           });
 
-        this.isAuthed = loginStatus >= 200 && loginStatus < 400;
-        this.currentUser = data;
+        if (loginStatus >= 200 && loginStatus < 400) {
+          this.isAuthed = true;
+          this.currentUser = data;
+          this.acr = data.acr as StepUpLevel;
 
-        /* extract all system permissions from current user's personenkontexte */
-        const personenkontexte: Array<UserinfoPersonenkontext> | null = this.currentUser.personenkontexte;
-        personenkontexte?.forEach((personenkontext: UserinfoPersonenkontext) => {
-          personenkontext.rolle.systemrechte.forEach((systemrecht: string) => {
-            /* push unique permissions only */
-            if (this.currentUserPermissions.indexOf(systemrecht) === -1) this.currentUserPermissions.push(systemrecht);
+          /* extract all system permissions from current user's personenkontexte */
+          const personenkontexte: Array<UserinfoPersonenkontext> | null = this.currentUser.personenkontexte;
+          personenkontexte?.forEach((personenkontext: UserinfoPersonenkontext) => {
+            personenkontext.rolle.systemrechte.forEach((systemrecht: string) => {
+              /* push unique permissions only */
+              if (this.currentUserPermissions.indexOf(systemrecht) === -1)
+                this.currentUserPermissions.push(systemrecht);
+            });
           });
-        });
 
-        /* set permission aliases for easier global access */
-        this.hasKlassenverwaltungPermission = this.currentUserPermissions.includes('KLASSEN_VERWALTEN');
-        this.hasPersonenverwaltungPermission = this.currentUserPermissions.includes('PERSONEN_VERWALTEN');
-        this.hasPersonenLoeschenPermission = this.currentUserPermissions.includes('PERSONEN_SOFORT_LOESCHEN');
-        this.hasRollenverwaltungPermission = this.currentUserPermissions.includes('ROLLEN_VERWALTEN');
-        this.hasSchulverwaltungPermission = this.currentUserPermissions.includes('SCHULEN_VERWALTEN');
-        this.hasSchultraegerverwaltungPermission = this.currentUserPermissions.includes('SCHULTRAEGER_VERWALTEN');
-        this.hasPersonenSyncPermission = this.currentUserPermissions.includes('PERSON_SYNCHRONISIEREN');
+          /* set permission aliases for easier global access */
+          this.hasKlassenverwaltungPermission = this.currentUserPermissions.includes('KLASSEN_VERWALTEN');
+          this.hasPersonenverwaltungPermission = this.currentUserPermissions.includes('PERSONEN_VERWALTEN');
+          this.hasPersonenLoeschenPermission = this.currentUserPermissions.includes('PERSONEN_SOFORT_LOESCHEN');
+          this.hasRollenverwaltungPermission = this.currentUserPermissions.includes('ROLLEN_VERWALTEN');
+          this.hasSchulverwaltungPermission = this.currentUserPermissions.includes('SCHULEN_VERWALTEN');
+          this.hasSchultraegerverwaltungPermission = this.currentUserPermissions.includes('SCHULTRAEGER_VERWALTEN');
+          this.hasPersonenSyncPermission = this.currentUserPermissions.includes('PERSON_SYNCHRONISIEREN');
+          this.hasPersonenAnlegenPermission = this.currentUserPermissions.includes('PERSONEN_ANLEGEN');
+        } else {
+          throw new Error('User info could not be retrieved.');
+        }
       } catch {
         // If user info can't be retrieved, consider the user unauthenticated.
         this.isAuthed = false;

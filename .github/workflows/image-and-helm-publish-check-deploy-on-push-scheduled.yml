@@ -1,14 +1,14 @@
 # Scan & Publish image and helm chart on push, deployment on push, delete deployment on branch deletion, scheduled trivy scanner
-name: "Dev Pipeline"
+name: 'Dev Pipeline'
 
 # All triggers have to be in one file, so that the trivy results can be compared to identify introduced vulnerabilities
 # See DBP-340
 on:
   push:
     branches:
-      - "*"
+      - '*'
   schedule:
-    - cron:  '0 2 * * *'
+    - cron: '0 2 * * *'
   delete:
 
 concurrency:
@@ -17,7 +17,7 @@ concurrency:
 
 jobs:
   codeql_analyze:
-    name: "CodeQL"
+    name: 'CodeQL'
     if: ${{ github.event_name == 'push' }}
     uses: dBildungsplattform/dbp-github-workflows/.github/workflows/check-codeql.yaml@5
     permissions:
@@ -26,7 +26,7 @@ jobs:
       security-events: write
 
   nest_lint:
-    name: "Linting"
+    name: 'Linting'
     if: ${{ github.event_name == 'push' }}
     uses: dBildungsplattform/dbp-github-workflows/.github/workflows/check-nest-lint.yaml@5
     with:
@@ -35,7 +35,7 @@ jobs:
       contents: read
 
   tests_and_sonarcloud:
-    name: "Tests and Sonarcloud"
+    name: 'Tests and Sonarcloud'
     if: ${{ github.event_name == 'push' }}
     uses: dBildungsplattform/dbp-github-workflows/.github/workflows/check-nest-test-sonarcloud.yaml@5
     with:
@@ -45,37 +45,21 @@ jobs:
     secrets: inherit
 
   build_image_on_push:
-    name: "Publish image and scan with trivy"
+    name: 'Publish image and scan with trivy'
     if: ${{ github.event_name == 'push' }}
-    needs:
-      - codeql_analyze
-      - nest_lint
-      - tests_and_sonarcloud
     permissions:
       packages: write
       security-events: write
       contents: read
     uses: dBildungsplattform/dbp-github-workflows/.github/workflows/image-publish-trivy.yaml@7
     with:
-      image_name: "schulportal-client"
+      image_name: 'schulportal-client'
       run_trivy_scan: true
       image_tag_generation: ${{ github.ref_name == 'main' && 'commit_hash' || 'ticket_from_branch' }}
       add_latest_tag: ${{ github.ref_name == 'main' }}
-      container_registry: "ghcr.io"
+      container_registry: 'ghcr.io'
       fail_on_vulnerabilites: true
-      report_location: "Dockerfile"
-
-  scheduled_trivy_scan:
-    name: "Scheduled trivy scan of latest image"
-    if: ${{ github.event_name == 'schedule' }}
-    permissions:
-      packages: read
-      security-events: write
-    uses: dBildungsplattform/dbp-github-workflows/.github/workflows/check-trivy.yaml@5
-    with:
-      image_ref: 'ghcr.io/${{ github.repository_owner }}/schulportal-client:latest'
-      fail_on_vulnerabilites: false
-      report_location: "Dockerfile"
+      report_location: 'Dockerfile'
 
   scan_helm:
     uses: dBildungsplattform/dbp-github-workflows/.github/workflows/check-helm-kics.yaml@5
@@ -84,10 +68,8 @@ jobs:
 
   select_helm_version_generation_and_image_tag_generation:
     if: ${{ github.event_name == 'push' && !startsWith(github.ref_name,'dependabot/') }}
-    needs: 
-      - scan_helm
     runs-on: ubuntu-latest
-    outputs: 
+    outputs:
       SELECT_HELM_VERION_GENERATION: ${{ steps.select_generation.outputs.SELECT_HELM_VERION_GENERATION }}
       SELECT_IMAGE_TAG_GENERATION: ${{ steps.select_generation.outputs.SELECT_IMAGE_TAG_GENERATION }}
     steps:
@@ -101,35 +83,43 @@ jobs:
             echo "SELECT_HELM_VERION_GENERATION=ticket_from_branch_timestamp" >> "$GITHUB_OUTPUT"
             echo "SELECT_IMAGE_TAG_GENERATION=ticket_from_branch" >> "$GITHUB_OUTPUT"
           fi
-  release_helm:
-    uses: dBildungsplattform/dbp-github-workflows/.github/workflows/chart-release.yaml@5
 
-    needs: 
+  release_helm:
+    uses: dBildungsplattform/dbp-github-workflows/.github/workflows/chart-release.yaml@7
+    needs:
       - select_helm_version_generation_and_image_tag_generation
     secrets: inherit
     with:
       chart_name: schulportal-client
       image_tag_generation: ${{ needs.select_helm_version_generation_and_image_tag_generation.outputs.SELECT_IMAGE_TAG_GENERATION  }}
       helm_chart_version_generation: ${{ needs.select_helm_version_generation_and_image_tag_generation.outputs.SELECT_HELM_VERION_GENERATION  }}
-  
+
+  wait_for_helm_chart_to_get_published:
+    needs:
+      - release_helm
+    runs-on: ubuntu-latest
+    steps:
+      - shell: bash
+        run: sleep 1m 
+
   branch_meta:
     if: ${{ github.event_name == 'push' && !startsWith(github.ref_name,'dependabot/') }}
     uses: dBildungsplattform/spsh-app-deploy/.github/workflows/get-branch-meta.yml@3
 
   create_branch_identifier:
     if: ${{ github.event_name == 'push' && !startsWith(github.ref_name,'dependabot/') }}
-    needs: 
+    needs:
       - branch_meta
     uses: dBildungsplattform/spsh-app-deploy/.github/workflows/deploy-branch-to-namespace.yml@3
     with:
       branch: ${{ needs.branch_meta.outputs.branch }}
 
   deploy:
-    if: ${{ github.event_name == 'push' && !startsWith(github.ref_name,'dependabot/') && (success() || failure()) }}
+    if: ${{ github.event_name == 'push' && !startsWith(github.ref_name,'dependabot/') }}
     needs:
       - branch_meta
       - create_branch_identifier
-      - release_helm
+      - wait_for_helm_chart_to_get_published
       - build_image_on_push
     uses: dBildungsplattform/spsh-app-deploy/.github/workflows/deploy.yml@5
     with:
@@ -140,6 +130,7 @@ jobs:
       namespace: ${{ needs.create_branch_identifier.outputs.namespace_from_branch }}
     secrets: inherit
 
+  # On Delete
   create_branch_identifier_for_deletion:
     if: ${{ github.event_name == 'delete' && github.event.ref_type == 'branch' }}
     uses: dBildungsplattform/spsh-app-deploy/.github/workflows/deploy-branch-to-namespace.yml@3
@@ -163,4 +154,17 @@ jobs:
       - create_branch_identifier_for_deletion
     runs-on: ubuntu-latest
     steps:
-      - run: echo "Deletion of namespace" ${{ needs.create_branch_identifier_for_deletion.outputs.namespace_from_branch }} "done" 
+      - run: echo "Deletion of namespace" ${{ needs.create_branch_identifier_for_deletion.outputs.namespace_from_branch }} "done"
+  
+  # Scheduled
+  scheduled_trivy_scan:
+    name: 'Scheduled trivy scan of latest image'
+    if: ${{ github.event_name == 'schedule' }}
+    permissions:
+      packages: read
+      security-events: write
+    uses: dBildungsplattform/dbp-github-workflows/.github/workflows/check-trivy.yaml@7
+    with:
+      image_ref: 'ghcr.io/${{ github.repository_owner }}/schulportal-client:latest'
+      fail_on_vulnerabilites: false
+      report_location: 'Dockerfile'

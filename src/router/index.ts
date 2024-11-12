@@ -1,6 +1,17 @@
 import { createRouter, createWebHistory, type RouteLocationNormalized, type Router } from 'vue-router';
-import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
+import { StepUpLevel, useAuthStore, type AuthStore } from '@/stores/AuthStore';
+import {
+  useTwoFactorAuthentificationStore,
+  type TwoFactorAuthentificationStore,
+} from '@/stores/TwoFactorAuthentificationStore';
 import routes from './routes';
+
+type Permission =
+  | 'personenverwaltung'
+  | 'personenanlegen'
+  | 'klassenverwaltung'
+  | 'rollenverwaltung'
+  | 'schulverwaltung';
 
 const router: Router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -20,9 +31,9 @@ const router: Router = createRouter({
 
 router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormalized) => {
   const authStore: AuthStore = useAuthStore();
-
   await authStore.initializeAuthStatus();
-  if (to.path != '/profile') sessionStorage.setItem('previousUrl', to.path);
+  if (to.path != '/profile' && to.path != '/no-second-factor') sessionStorage.setItem('previousUrl', to.path);
+
   // Redirect authenticated users trying to access the login page to the start page
   if (to.path === '/' && authStore.isAuthed) {
     return { path: '/start' };
@@ -33,33 +44,48 @@ router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormal
     return false;
   }
 
-  if (to.meta['requiresPermission']) {
-    /* check if the user has person management permissions */
-    switch (to.meta['requiresPermission']) {
-      case 'personenverwaltung':
-        if (authStore.hasPersonenverwaltungPermission) {
-          return true;
-        }
-        return { path: 'not-found' };
-      case 'klassenverwaltung':
-        if (authStore.hasKlassenverwaltungPermission) {
-          return true;
-        }
-        return { path: 'not-found' };
-      case 'rollenverwaltung':
-        if (authStore.hasRollenverwaltungPermission) {
-          return true;
-        }
-        return { path: 'not-found' };
-      case 'schulverwaltung':
-        if (authStore.hasSchulverwaltungPermission) {
-          return true;
-        }
-        return { path: 'not-found' };
-      default:
-        return { path: 'not-found' };
+  if (to.meta['requiredStepUpLevel'] === StepUpLevel.GOLD && authStore.acr !== StepUpLevel.GOLD) {
+    const personId: string | null | undefined = authStore.currentUser?.personId;
+    if (!personId) return false;
+    const twoFactorAuthentificationStore: TwoFactorAuthentificationStore = useTwoFactorAuthentificationStore();
+    await twoFactorAuthentificationStore.get2FAState(personId);
+    if (!twoFactorAuthentificationStore.hasToken) {
+      router.push(`/no-second-factor`);
+      return false;
     }
+
+    window.location.href = `/api/auth/login?redirectUrl=${to.fullPath}&requiredStepUpLevel=${StepUpLevel.GOLD}`;
   }
+
+  if (to.meta['requiresPermission']) {
+    const requiredPermissions: Permission[] = Array.isArray(to.meta['requiresPermission'])
+      ? to.meta['requiresPermission']
+      : [to.meta['requiresPermission']];
+
+    // Check if user has ALL required permissions
+    const hasAllPermissions: boolean = requiredPermissions.every((permission: Permission) => {
+      switch (permission) {
+        case 'personenverwaltung':
+          return authStore.hasPersonenverwaltungPermission;
+        case 'personenanlegen':
+          return authStore.hasPersonenAnlegenPermission;
+        case 'klassenverwaltung':
+          return authStore.hasKlassenverwaltungPermission;
+        case 'rollenverwaltung':
+          return authStore.hasRollenverwaltungPermission;
+        case 'schulverwaltung':
+          return authStore.hasSchulverwaltungPermission;
+        default:
+          return false;
+      }
+    });
+
+    if (hasAllPermissions) {
+      return true;
+    }
+    return { path: 'not-found' };
+  }
+
   return true;
 });
 

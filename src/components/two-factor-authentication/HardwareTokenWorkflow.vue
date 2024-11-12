@@ -1,7 +1,6 @@
 <script setup lang="ts">
   import FormRow from '@/components/form/FormRow.vue';
   import { onMounted, onUnmounted, ref, type Ref } from 'vue';
-  import axios from 'axios';
   import { useI18n, type Composer } from 'vue-i18n';
   import type { AssignHardwareTokenBodyParams } from '@/api-client/generated';
   import { object, string } from 'yup';
@@ -15,11 +14,11 @@
   } from '@/stores/TwoFactorAuthentificationStore';
   import { useDisplay } from 'vuetify';
   import type { Personendatensatz } from '@/stores/PersonStore';
+  import { watch } from 'vue';
 
   const { t }: Composer = useI18n({ useScope: 'global' });
   const dialogText: Ref<string> = ref('');
   const hardwareTokenIsAssigned: Ref<boolean> = ref(false);
-  const errorThrown: Ref<boolean> = ref(false);
   const twoFactoreAuthentificationStore: TwoFactorAuthentificationStore = useTwoFactorAuthentificationStore();
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
@@ -45,20 +44,6 @@
   };
 
   const props: Props = defineProps<Props>();
-
-  function handleApiError(error: unknown): void {
-    errorThrown.value = true;
-    if (axios.isAxiosError(error)) {
-      if (error.response && error.response.data.i18nKey) {
-        const message: string =
-          t('admin.person.twoFactorAuthentication.errors.' + error.response.data.i18nKey) ||
-          t('admin.person.twoFactorAuthentication.errors.UNKNOWN_ERROR');
-        dialogText.value = message;
-      } else {
-        dialogText.value = t('admin.person.twoFactorAuthentication.errors.UNKNOWN_ERROR');
-      }
-    }
-  }
 
   const validationSchema: TypedSchema = toTypedSchema(
     object({
@@ -98,10 +83,10 @@
   ] = defineField('selectedOtp', vuetifyConfig);
 
   function cancelCheck(): void {
-    if (errorThrown.value) {
+    if (twoFactoreAuthentificationStore.errorCode) {
+      twoFactoreAuthentificationStore.errorCode = '';
       dialogText.value = '';
       hardwareTokenIsAssigned.value = false;
-      errorThrown.value = false;
       selectedOtp.value = '';
       selectedOtpProps.value.error = false;
       selectedOtpProps.value['error-messages'] = [];
@@ -147,24 +132,29 @@
     window.removeEventListener('beforeunload', preventNavigation);
   });
 
+  watch(
+    () => twoFactoreAuthentificationStore.errorCode,
+    (newValue: string) => {
+      if (newValue) {
+        emits('updateHeader', t('admin.person.twoFactorAuthentication.hardwareTokenSetUpFailure'));
+      }
+    },
+  );
+
   async function assignHardwareToken(): Promise<void> {
     if (!props.person.person.referrer) return;
-    try {
-      const assignHardwareTokenBodyParams: AssignHardwareTokenBodyParams = {
-        serial: selectedSeriennummer.value,
-        otp: selectedOtp.value,
-        referrer: props.person.person.referrer,
-        userId: props.person.person.id,
-      };
-      await twoFactoreAuthentificationStore.assignHardwareToken(assignHardwareTokenBodyParams);
+    const assignHardwareTokenBodyParams: AssignHardwareTokenBodyParams = {
+      serial: selectedSeriennummer.value,
+      otp: selectedOtp.value,
+      referrer: props.person.person.referrer,
+      userId: props.person.person.id,
+    };
+    await twoFactoreAuthentificationStore.assignHardwareToken(assignHardwareTokenBodyParams);
+    if (!twoFactoreAuthentificationStore.errorCode) {
       dialogText.value = t('admin.person.twoFactorAuthentication.hardwareTokenSetUpSuccess');
       resetForm();
-    } catch (error) {
-      emits('updateHeader', t('admin.person.twoFactorAuthentication.hardwareTokenSetUpFailure'));
-      handleApiError(error);
-    } finally {
-      hardwareTokenIsAssigned.value = true;
     }
+    hardwareTokenIsAssigned.value = true;
   }
   const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = handleSubmit(async () => {
     assignHardwareToken();
@@ -177,7 +167,7 @@
       :confirmUnsavedChangesAction="handleConfirmUnsavedChanges"
       :createButtonLabel="$t('admin.person.twoFactorAuthentication.setUp')"
       :discardButtonLabel="$t('cancel')"
-      id="schule-creation-form"
+      id="hardware-token-input"
       :onDiscard="cancelCheck"
       @onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value ?? false)"
       :centerButtons="true"
@@ -192,7 +182,7 @@
       >
         <v-text-field
           clearable
-          data-testid="hardware-token-input"
+          data-testid="hardware-token-input-serial"
           density="compact"
           :disabled="false"
           id="hardware-token-input"
@@ -212,7 +202,7 @@
       >
         <v-text-field
           clearable
-          data-testid="hardware-token-input"
+          data-testid="hardware-token-input-otp"
           density="compact"
           :disabled="false"
           id="hardware-token-input"
@@ -226,12 +216,43 @@
       </FormRow>
     </FormWrapper>
   </v-container>
-  <v-container v-if="hardwareTokenIsAssigned">
-    <v-row class="justify-center text-body bold">{{ dialogText }}</v-row>
+  <v-container>
+    <v-row v-if="twoFactoreAuthentificationStore.errorCode === 'HARDWARE_TOKEN_SERVICE_FEHLER'">
+      <p
+        class="text-body bold"
+        data-testid="hardware-token-dialog-error-text"
+      >
+        <i18n-t
+          keypath="admin.person.twoFactorAuthentication.errors.HARDWARE_TOKEN_SERVICE_FEHLER"
+          for="admin.person.twoFactorAuthentication.errors.iqshHelpdesk"
+          tag="label"
+        >
+          <a
+            :href="$t('admin.person.twoFactorAuthentication.errors.iqshHelpdeskLink')"
+            rel="noopener noreferrer"
+            target="_blank"
+            >{{ $t('admin.person.twoFactorAuthentication.errors.iqshHelpdesk') }}</a
+          >
+        </i18n-t>
+      </p>
+    </v-row>
+    <v-row v-else-if="twoFactoreAuthentificationStore.errorCode">
+      <p
+        class="text-body bold"
+        data-testid="hardware-token-dialog-error-text"
+      >
+        {{ $t('admin.person.twoFactorAuthentication.errors.' + twoFactoreAuthentificationStore.errorCode) }}
+      </p></v-row
+    >
+    <v-row
+      v-else-if="hardwareTokenIsAssigned"
+      class="justify-center text-body bold"
+      >{{ dialogText }}</v-row
+    >
   </v-container>
   <v-card-actions
     class="justify-center"
-    v-if="errorThrown || hardwareTokenIsAssigned"
+    v-if="twoFactoreAuthentificationStore.errorCode || hardwareTokenIsAssigned"
   >
     <v-row class="justify-center">
       <v-col

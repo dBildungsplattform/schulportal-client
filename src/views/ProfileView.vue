@@ -6,7 +6,7 @@
   import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
   import { OrganisationsTyp } from '@/stores/OrganisationStore';
   import { usePersonInfoStore, type PersonInfoStore } from '@/stores/PersonInfoStore';
-  import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
+  import { EmailStatus, usePersonStore, type PersonStore } from '@/stores/PersonStore';
   import { type Zuordnung } from '@/stores/PersonenkontextStore';
   import {
     TokenKind,
@@ -16,6 +16,7 @@
   import { computed, onBeforeMount, ref, watch, type ComputedRef, type Ref } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { useRoute, useRouter, type RouteLocationNormalizedLoaded, type Router } from 'vue-router';
+  import { useDisplay } from 'vuetify';
 
   const { t }: { t: Function } = useI18n();
 
@@ -37,6 +38,7 @@
     labelAndValues: LabelValue[];
   };
 
+  const { xs }: { xs: Ref<boolean> } = useDisplay();
   const route: RouteLocationNormalizedLoaded = useRoute();
   const router: Router = useRouter();
   const kcActionStatus: string | null = route.query['kc_action_status'] as string | null;
@@ -50,20 +52,20 @@
   const loading2FA: Ref<boolean> = ref(false);
 
   /**
-   * Gruppiert eine Liste von Zuordnungen nach dem Wert der Eigenschaft 'sskDstNr'.
+   * Gruppiert eine Liste von Zuordnungen nach dem Wert der Eigenschaft 'sskId'.
    *
    * Diese Funktion nimmt ein Array von Zuordnungen entgegen und organisiert diese
-   * in einer Map, wobei der Schlüssel der Wert der Eigenschaft 'sskDstNr' ist
+   * in einer Map, wobei der Schlüssel der Wert der Eigenschaft 'sskId' ist
    * und der Wert ein Array von Zuordnungen mit diesem Schlüssel.
    *
    * @param zuordnungen - Ein Array von Zuordnungen, die gruppiert werden sollen.
-   * @returns Eine Map, in der jeder Schlüssel ein Wert von 'sskDstNr' ist und
+   * @returns Eine Map, in der jeder Schlüssel ein Wert von 'sskId' ist und
    *          jeder Wert ein Array von Zuordnungen mit diesem Schlüssel.
    */
   function groupZuordnungen(zuordnungen: Zuordnung[]): Map<string, Zuordnung[]> {
     const groupedZuordnungen: Map<string, Zuordnung[]> = new Map();
     for (const zuordnung of zuordnungen) {
-      const key: string = zuordnung.sskDstNr ?? zuordnung.sskId;
+      const key: string = zuordnung.sskId;
       if (groupedZuordnungen.has(key)) {
         groupedZuordnungen.get(key)?.push(zuordnung);
       } else {
@@ -220,6 +222,39 @@
     return data;
   });
 
+  // Computed property to define what will be shown in the field Email depending on the returned status.
+  const emailStatus: ComputedRef<
+    | {
+        text: string;
+        tooltip?: string;
+      }
+    | undefined
+  > = computed(() => {
+    switch (personInfoStore.personInfo?.email?.status) {
+      case EmailStatus.Enabled:
+        return {
+          text: personInfoStore.personInfo.email.address,
+        };
+      case EmailStatus.Requested:
+        return {
+          text: t('profile.emailStatusRequested'),
+          tooltip: t('profile.emailStatusRequestedHover'),
+        };
+      case EmailStatus.Disabled:
+        return {
+          text: t('profile.emailStatusDisabled'),
+          tooltip: t('profile.emailStatusDisabledHover'),
+        };
+      case EmailStatus.Failed:
+        return {
+          text: t('profile.emailStatusFailed'),
+          tooltip: t('profile.emailStatusFailedHover'),
+        };
+      default:
+        return undefined;
+    }
+  });
+
   const schulDaten: ComputedRef<SchulDaten[]> = computed(() => {
     if (!personStore.personenuebersicht) return [];
     const personenZuordnungen: Zuordnung[] = personStore.personenuebersicht.zuordnungen;
@@ -228,7 +263,7 @@
         (z: Zuordnung) =>
           ({
             ...z,
-            sskDstNr: z.sskDstNr?.split('-')[0], // die Klasse wird durch einen Bindestrich an die Schulnummer angehangen. Um nach der Schule zu gruppieren, wird nur die Schulnummer verwendet.
+            sskId: z.typ === OrganisationsTyp.Klasse ? z.administriertVon : z.sskId, // Nutze die ID der Schule, wenn es sich um eine Klasse handelt
           }) as Zuordnung,
       ),
     );
@@ -252,12 +287,15 @@
   const twoFactorAuthError: ComputedRef<string> = computed(() => {
     // Early return if loading
     if (twoFactorAuthenticationStore.loading) return '';
-    const ignoredErrorCodes: string[] = ['SOFTWARE_TOKEN_VERIFICATION_ERROR', 'OTP_NICHT_GUELTIG'];
-    if (twoFactorAuthenticationStore.errorCode && !ignoredErrorCodes.includes(twoFactorAuthenticationStore.errorCode)) {
-      return t('admin.person.twoFactorAuthentication.errors.connection');
+
+    switch (twoFactorAuthenticationStore.errorCode) {
+      case 'TOKEN_STATE_ERROR':
+        return t('admin.person.twoFactorAuthentication.errors.tokenStateSelfServiceError');
+      case 'PI_UNAVAILABLE_ERROR':
+        return t('admin.person.twoFactorAuthentication.errors.connection');
+      default:
+        return '';
     }
-    // Default return, no error
-    return '';
   });
 
   function handleGoToPreviousPage(): void {
@@ -401,6 +439,29 @@
                         {{ item.value }}
                       </td>
                     </tr>
+                    <tr v-if="!!emailStatus">
+                      <td>
+                        <strong> {{ $t('profile.email') }}: </strong>
+                      </td>
+                      <td>
+                        <v-row no-gutters>
+                          <SpshTooltip
+                            v-if="!!emailStatus.tooltip"
+                            enabledCondition
+                            :enabledText="emailStatus.tooltip"
+                            position="bottom"
+                          >
+                            <v-icon
+                              aria-hidden="true"
+                              class="mr-2"
+                              icon="mdi-alert-circle-outline"
+                              size="small"
+                            ></v-icon>
+                          </SpshTooltip>
+                          <span data-testid="person-email-text">{{ emailStatus.text }}</span>
+                        </v-row>
+                      </td>
+                    </tr>
                   </tbody>
                 </template>
               </v-table>
@@ -425,25 +486,34 @@
           data-testid="password-card"
           :headline-test-id="'new-password-card'"
           :header="$t('login.password')"
-          class="pb-4"
+          class="text-body"
         >
-          <v-row class="ma-3 d-flex align-content-center justify-center ga-4">
-            <p
-              class="w-100 text-center text-body"
-              v-if="lastPasswordChangeDate"
-            >
-              {{ t('profile.lastPasswordChange', { date: lastPasswordChangeDate }) }}
-            </p>
-          </v-row>
-          <v-row class="d-flex align-center justify-center">
-            <v-col class="d-flex justify-center">
-              <v-btn
-                class="primary"
-                data-testid="open-change-password-dialog"
-                @click="openChangePasswordDialog()"
-              >
-                {{ $t('profile.changePassword') }}
-              </v-btn>
+          <v-row
+            align="center"
+            justify="center"
+            class="ma-4 text-body"
+          >
+            <v-col class="text-center px-0">
+              <v-row>
+                <p
+                  class="w-100"
+                  v-if="lastPasswordChangeDate"
+                >
+                  {{ t('profile.lastPasswordChange', { date: lastPasswordChangeDate }) }}
+                </p>
+              </v-row>
+              <v-row class="d-flex align-center justify-center">
+                <v-col class="d-flex justify-center">
+                  <v-btn
+                    class="primary"
+                    data-testid="open-change-password-dialog"
+                    :block="xs"
+                    @click="openChangePasswordDialog()"
+                  >
+                    {{ $t('profile.changePassword') }}
+                  </v-btn>
+                </v-col>
+              </v-row>
             </v-col>
           </v-row>
           <v-dialog
@@ -524,21 +594,20 @@
           </v-row>
         </template>
         <LayoutCard
-          v-if="twoFactorAuthenticationStore.required && twoFactorAuthenticationStore.hasToken != null"
+          v-else-if="twoFactorAuthenticationStore.required"
           :headline-test-id="'two-factor-card'"
           :header="$t('profile.twoFactorAuth')"
         >
           <v-row
             align="center"
             justify="center"
-            class="ma-3 text-body"
+            class="ma-4 text-body"
           >
             <v-col
-              :sm="twoFactorAuthenticationStore.hasToken === false ? 6 : null"
-              :md="twoFactorAuthenticationStore.hasToken === false ? 'auto' : null"
+              v-if="twoFactorAuthenticationStore.hasToken || twoFactorAuthError"
               cols="12"
             >
-              <v-row :justify="twoFactorAuthenticationStore.hasToken === false ? 'center' : null">
+              <v-row>
                 <v-col
                   cols="1"
                   align-self="center"
@@ -550,37 +619,45 @@
                     icon="mdi-alert-outline"
                   ></v-icon>
                   <v-icon
-                    v-else-if="twoFactorAuthenticationStore.hasToken === false"
-                    color="warning"
-                    icon="mdi-alert-circle"
-                  ></v-icon>
-                  <v-icon
                     v-else-if="twoFactorAuthenticationStore.hasToken === true"
                     color="green"
                     icon="mdi-check-circle"
                   ></v-icon>
                 </v-col>
-                <v-col>
-                  <p data-testid="two-factor-info">
-                    <template v-if="twoFactorAuthError">
-                      {{ twoFactorAuthError }}
+                <v-col data-testid="two-factor-info">
+                  <template v-if="twoFactorAuthError">
+                    {{ twoFactorAuthError }}
+                  </template>
+                  <template v-else-if="twoFactorAuthenticationStore.hasToken === true">
+                    <template v-if="twoFactorAuthenticationStore.tokenKind === TokenKind.software">
+                      {{ $t('admin.person.twoFactorAuthentication.softwareTokenIsSetUpSelfService') }}
                     </template>
-                    <template v-else-if="twoFactorAuthenticationStore.hasToken === false">
-                      {{ $t('admin.person.twoFactorAuthentication.SecondFactorNotSet') }}
+                    <template v-else-if="twoFactorAuthenticationStore.tokenKind === TokenKind.hardware">
+                      {{
+                        $t('admin.person.twoFactorAuthentication.hardwareTokenIsSetUpSelfService', {
+                          serialNumber: twoFactorAuthenticationStore.serial,
+                        })
+                      }}
                     </template>
-                    <template v-else-if="twoFactorAuthenticationStore.hasToken === true">
-                      <template v-if="twoFactorAuthenticationStore.tokenKind === TokenKind.software">
-                        {{ $t('admin.person.twoFactorAuthentication.softwareTokenIsSetUpSelfService') }}
-                      </template>
-                      <template v-else-if="twoFactorAuthenticationStore.tokenKind === TokenKind.hardware">
-                        {{
-                          $t('admin.person.twoFactorAuthentication.hardwareTokenIsSetUpSelfService', {
-                            serialNumber: twoFactorAuthenticationStore.serial,
-                          })
-                        }}
-                      </template>
-                    </template>
-                  </p>
+                  </template>
+                </v-col>
+              </v-row>
+            </v-col>
+            <v-col
+              cols="12"
+              v-else
+            >
+              <v-row justify="center">
+                <v-col
+                  align-self="center"
+                  class="text-center"
+                  data-testid="two-factor-info"
+                >
+                  <v-icon
+                    color="warning"
+                    icon="mdi-alert-circle"
+                  ></v-icon>
+                  {{ $t('admin.person.twoFactorAuthentication.SecondFactorNotSet') }}
                 </v-col>
               </v-row>
             </v-col>
@@ -588,10 +665,7 @@
               cols="12"
               v-if="!twoFactorAuthError"
             >
-              <v-row
-                align="center"
-                justify="center"
-              >
+              <v-row>
                 <template v-if="twoFactorAuthenticationStore.hasToken === false">
                   <SelfServiceWorkflow
                     :personId="personInfoStore.personInfo?.person.id ?? ''"
@@ -687,7 +761,7 @@
       <LayoutCard
         :closable="true"
         :header="$t('profile.changePassword')"
-        @onCloseClicked="closeChangePasswordDialog()"
+        @onCloseClicked="closePasswordChangedDialogAndClearQuery()"
       >
         <v-card-text>
           <v-container class="d-flex align-center">
@@ -712,23 +786,15 @@
             </v-col>
           </v-container>
         </v-card-text>
-
         <v-card-actions class="justify-center">
-          <v-row class="justify-center">
-            <v-col
-              cols="12"
-              sm="6"
-              md="4"
-            >
-              <v-btn
-                class="secondary button"
-                @click.stop="closePasswordChangedDialogAndClearQuery()"
-                data-testid="close-password-changed-dialog-button"
-              >
-                {{ $t('close') }}
-              </v-btn>
-            </v-col>
-          </v-row>
+          <v-btn
+            class="secondary button"
+            @click.stop="closePasswordChangedDialogAndClearQuery()"
+            data-testid="close-password-changed-dialog-button"
+            :block="xs"
+          >
+            {{ $t('close') }}
+          </v-btn>
         </v-card-actions>
       </LayoutCard>
     </v-dialog>

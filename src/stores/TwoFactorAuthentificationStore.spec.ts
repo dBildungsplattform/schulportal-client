@@ -86,14 +86,16 @@ describe('TwoFactorAuthentificationStore', () => {
       const get2FAStatePromise: Promise<void> = twoFactorAuthenticationStore.get2FAState(personId);
       expect(twoFactorAuthenticationStore.loading).toBe(true);
       await get2FAStatePromise;
-      expect(twoFactorAuthenticationStore.errorCode).toEqual('UNSPECIFIED_ERROR');
+      expect(twoFactorAuthenticationStore.errorCode).toEqual('TOKEN_STATE_ERROR');
       expect(twoFactorAuthenticationStore.loading).toBe(false);
     });
 
     it('should handle error code', async () => {
       const personId: string = 'testUser';
 
-      mockadapter.onGet(`/api/2fa-token/state?personId=${personId}`).replyOnce(500, { code: 'some mock server error' });
+      mockadapter
+        .onGet(`/api/2fa-token/state?personId=${personId}`)
+        .replyOnce(500, { i18nKey: 'some mock server error' });
       const get2FAStatePromise: Promise<void> = twoFactorAuthenticationStore.get2FAState(personId);
       expect(twoFactorAuthenticationStore.loading).toBe(true);
       await get2FAStatePromise;
@@ -163,14 +165,14 @@ describe('TwoFactorAuthentificationStore', () => {
       const get2FASoftwareQRCodePromise: Promise<void> = twoFactorAuthenticationStore.get2FASoftwareQRCode(personId);
       expect(twoFactorAuthenticationStore.loading).toBe(true);
       await get2FASoftwareQRCodePromise;
-      expect(twoFactorAuthenticationStore.errorCode).toEqual('UNSPECIFIED_ERROR');
+      expect(twoFactorAuthenticationStore.errorCode).toEqual('SOFTWARE_TOKEN_INITIALIZATION_ERROR');
       expect(twoFactorAuthenticationStore.loading).toBe(false);
     });
 
     it('should handle error code', async () => {
       const personId: string = 'testUser';
 
-      mockadapter.onPost(`/api/2fa-token/init`).replyOnce(500, { code: 'some mock server error' });
+      mockadapter.onPost(`/api/2fa-token/init`).replyOnce(500, { i18nKey: 'some mock server error' });
       const get2FASoftwareQRCodePromise: Promise<void> = twoFactorAuthenticationStore.get2FASoftwareQRCode(personId);
       expect(twoFactorAuthenticationStore.loading).toBe(true);
       await get2FASoftwareQRCodePromise;
@@ -201,6 +203,27 @@ describe('TwoFactorAuthentificationStore', () => {
       await assignTokenPromise;
       expect(twoFactorAuthenticationStore.loading).toBe(false);
     });
+
+    it('should handle string error', async () => {
+      mockadapter.onPost(`/api/2fa-token/assign/hardwareToken`).replyOnce(500, 'some error');
+      const assignTokenPromise: Promise<void> = twoFactorAuthenticationStore.assignHardwareToken(bodyParams);
+      expect(twoFactorAuthenticationStore.loading).toBe(true);
+      await assignTokenPromise;
+      expect(twoFactorAuthenticationStore.errorCode).toEqual('HARDWARE_TOKEN_SERVICE_FEHLER');
+      expect(twoFactorAuthenticationStore.loading).toBe(false);
+    });
+
+    it('should map error code', async () => {
+      mockadapter
+        .onPost(`/api/2fa-token/assign/hardwareToken`)
+        .replyOnce(500, { code: 'some mock server error', i18nKey: 'PI_UNAVAILABLE_ERROR' });
+      const assignTokenPromise: Promise<void> = twoFactorAuthenticationStore.assignHardwareToken(bodyParams);
+
+      expect(twoFactorAuthenticationStore.loading).toBe(true);
+      await assignTokenPromise;
+      expect(twoFactorAuthenticationStore.errorCode).toEqual('HARDWARE_TOKEN_SERVICE_FEHLER');
+      expect(twoFactorAuthenticationStore.loading).toBe(false);
+    });
   });
 
   describe('resetToken', () => {
@@ -212,6 +235,30 @@ describe('TwoFactorAuthentificationStore', () => {
       const resetTokenPromise: Promise<void> = twoFactorAuthenticationStore.resetToken(referrer);
       expect(twoFactorAuthenticationStore.loading).toBe(true);
       await resetTokenPromise;
+      expect(twoFactorAuthenticationStore.loading).toBe(false);
+    });
+
+    it('should handle string error', async () => {
+      const referrer: string = 'testReferrer';
+
+      mockadapter.onPut(`/api/2fa-token/reset?personId=${referrer}`).replyOnce(500, 'some error');
+      const resetTokenPromise: Promise<void> = twoFactorAuthenticationStore.resetToken(referrer);
+      expect(twoFactorAuthenticationStore.loading).toBe(true);
+      await resetTokenPromise;
+      expect(twoFactorAuthenticationStore.errorCode).toEqual('TOKEN_RESET_ERROR');
+      expect(twoFactorAuthenticationStore.loading).toBe(false);
+    });
+
+    it('should handle error code', async () => {
+      const referrer: string = 'testReferrer';
+
+      mockadapter
+        .onPut(`/api/2fa-token/reset?personId=${referrer}`)
+        .replyOnce(500, { code: 'some mock server error', i18nKey: 'RESET_TOKEN_ERROR' });
+      const resetTokenPromise: Promise<void> = twoFactorAuthenticationStore.resetToken(referrer);
+      expect(twoFactorAuthenticationStore.loading).toBe(true);
+      await resetTokenPromise;
+      expect(twoFactorAuthenticationStore.errorCode).toEqual('RESET_TOKEN_ERROR');
       expect(twoFactorAuthenticationStore.loading).toBe(false);
     });
   });

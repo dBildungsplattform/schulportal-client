@@ -72,8 +72,10 @@
 
   function isFormDirty(): boolean {
     // Only check for dirtiness if the form is in edit mode
+    // Only check if klassenname is dirty, because selectedSchule is readonly
     if (!isEditActive.value) return false;
-    else return isFieldDirty('selectedSchule') || isFieldDirty('selectedKlassenname');
+    else if (selectedKlassenname.value === organisationStore.currentKlasse?.name) return false;
+    else return isFieldDirty('selectedKlassenname');
   }
 
   let blockedNext: () => void = () => {};
@@ -140,6 +142,16 @@
       creationErrorTitle.value = t(`admin.rolle.title.${organisationStore.errorCode}`);
     }
   }
+
+  const alertButtonText: ComputedRef<string> = computed(() => {
+    return organisationStore.errorCode === 'NEWER_VERSION_ORGANISATION' ? t('refreshData') : t('nav.backToList');
+  });
+
+  const alertButtonAction: ComputedRef<() => void> = computed(() => {
+    return organisationStore.errorCode === 'NEWER_VERSION_ORGANISATION'
+      ? (): void => router.go(0)
+      : navigateToKlasseManagement;
+  });
 
   onBeforeMount(async () => {
     organisationStore.errorCode = '';
@@ -212,8 +224,8 @@
             : $t(`admin.klasse.errors.${organisationStore.errorCode}`)
         "
         :showButton="true"
-        :buttonText="$t('nav.backToList')"
-        :buttonAction="handleAlertClose"
+        :buttonText="alertButtonText"
+        :buttonAction="alertButtonAction"
         @update:modelValue="handleAlertClose"
       />
 
@@ -256,7 +268,7 @@
                       :klassenname="organisationStore.currentKlasse?.name || ''"
                       :klassenId="organisationStore.currentKlasse?.id || ''"
                       ref="klasse-delete"
-                      :schulname="selectedSchule"
+                      :schulname="selectedSchule || ''"
                       :useIconActivator="false"
                       @onDeleteKlasse="deleteKlasseById(currentOrganisationId)"
                     >
@@ -292,7 +304,7 @@
                 >
                   <v-btn
                     class="secondary"
-                    data-testid="klasse-edit-cancel"
+                    data-testid="klasse-edit-cancel-button"
                     @click="handleCancel"
                     :block="mdAndDown"
                   >
@@ -306,7 +318,7 @@
                 >
                   <v-btn
                     class="primary"
-                    data-testid="klasse-changes-save"
+                    data-testid="klasse-changes-save-button"
                     @Click="onSubmit"
                     :block="mdAndDown"
                   >

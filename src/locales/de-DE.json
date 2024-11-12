@@ -18,6 +18,7 @@
       },
       "selectBefristung": "Befristung auswählen",
       "unlimited": "Unbefristet",
+      "limited": "Befristet",
       "unlimitedSuccessTemplate": "unbefristet",
       "unlimitedInactive": "Diese Option kann für Rollen mit Befristungspflicht nicht ausgewählt werden.",
       "limitedUntil": "befristet bis",
@@ -44,14 +45,16 @@
       "edit": "Klasse bearbeiten",
       "title": {
         "KLASSENNAME_AN_SCHULE_EINDEUTIG": "Fehler bei Änderung der Klasse",
-        "ORGANISATION_IST_BEREITS_ZUGEWIESEN_ERROR": "Fehler beim Löschen"
+        "ORGANISATION_IST_BEREITS_ZUGEWIESEN_ERROR": "Fehler beim Löschen",
+        "NEWER_VERSION_ORGANISATION": "Geänderte Daten"
       },
       "errors": {
         "KLASSE_ERROR": "Die Klasse konnte nicht geändert werden.",
         "KLASSE_NUR_VON_SCHULE_ADMINISTRIERT": "Klassen dürfen nur von einer Schule administriert werden.",
         "KLASSENNAME_AN_SCHULE_EINDEUTIG": "Der Klassenname existiert bereits an dieser Schule.",
         "ORGANISATION_SPECIFICATION_ERROR": "Die Klasse konnte nicht angelegt werden.",
-        "ORGANISATION_IST_BEREITS_ZUGEWIESEN_ERROR": "Die Klasse kann nicht gelöscht werden, da noch Benutzer zugeordnet sind."
+        "ORGANISATION_IST_BEREITS_ZUGEWIESEN_ERROR": "Die Klasse kann nicht gelöscht werden, da noch Benutzer zugeordnet sind.",
+        "NEWER_VERSION_ORGANISATION": "Die Klasse wurde zwischenzeitlich von einer anderen Administratorin oder einem anderen Administrator bearbeitet. Bitte aktualisieren Sie die Daten und versuchen Sie es erneut."
       },
       "enterKlassenname": "Klassenname eingeben",
       "klasse": "Klasse",
@@ -116,7 +119,7 @@
         "softwareTokenIsSetUp": "Für diesen Benutzer ist aktuell ein Software-Token eingerichtet.",
         "softwareTokenIsSetUpSelfService": "Für diesen Account ist aktuell eine 2FA über ein Software-Token eingerichtet (Authentifizierung über Endgerät).",
         "hardwareTokenIsSetUpSelfService": "Aktuell ist eine 2FA über ein Hardware-Token eingerichtet. \nSeriennummer: {serialNumber}",
-        "resetInfo": "Um einen neuen Token einzurichten, muss der aktuelle Token durch die schulischen Admins zurückgesetzt werden.",
+        "resetInfo": "Um einen neuen Token einzurichten, muss der aktuelle Token durch die schulischen Administratorinnen und Administratoren zurückgesetzt werden.",
         "tokenReset": "Token zurücksetzen",
         "hardwareTokenIsSetUp": "Für diesen Benutzer ist aktuell ein Hardware-Token eingerichtet.",
         "hardwareTokenSetUpSuccess": "Token wurde erfolgreich zugeordnet.",
@@ -128,16 +131,26 @@
         "currentOtp": "Einmalpasswort",
         "serial": "Seriennummer",
         "otpPlaceholder": "Einmalpasswort",
+        "requiredSecondFactor": "Diese Aktion setzt eine Zwei-Faktor-Authentifizierung (2FA) voraus.",
+        "noSecondFactorText": "Aktuell ist noch keine 2FA eingrichtet.",
+        "setUpInfo": "Sie können die Einrichtung der 2FA selbst über ein mobiles Endgerät durchführen. Alternativ wenden Sie sich bitte an Ihre schulischen Admins.",
+        "toSecondFactorSetup": "Zur 2FA Einrichtung",
         "errors": {
           "SERIENNUMMER_NICHT_GEFUNDEN": "Die eingegebene Seriennummer konnte leider nicht gefunden werden. Vergewissern Sie sich bitte, dass Sie eine korrekte Seriennummer eingegeben haben.",
-          "SERIENNUMMER_IN_VERWENDUNG": "Die eingegebene Seriennummer gehört zu einem Token, der bereits einem Benutzer zugeordnet ist. Bitte überprüfen Sie Ihre Eingaben und versuchen Sie es erneut.",
-          "OTP_NICHT_GUELTIG": "Ungültiges Einmalpasswort. Bitte versuchen Sie es erneut.",
-          "HARDWARE_TOKEN_SERVICE_FEHLER": "Leider konnte ihr Hardware-Token aus technischen Gründen nicht aktiviert werden. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut. Falls das Problem bestehen bleibt, stellen Sie bitte eine Anfrage über den IQSH Helpdesk.--Link: https://www.secure-lernnetz.de/helpdesk/",
+          "SERIENNUMMER_IN_VERWENDUNG": "Die eingegebene Seriennummer ist bereits einem anderen Benutzer zugeordnet. Bitte überprüfen Sie Ihre Eingabe und versuchen Sie es erneut.",
+          "OTP_NICHT_GUELTIG": "Ungültiges Einmalpasswort. Bitte versuchen Sie es erneut oder wenden Sie sich an Ihre schulischen Administratorinnen und Administratoren.",
+          "HARDWARE_TOKEN_SERVICE_FEHLER": "Leider konnte aus technischen Gründen kein Hardware-Token zugeordnet werden. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut. Sollte das Problem weiterhin bestehen, geben Sie dazu bitte ein Ticket über den {0} auf.",
           "UNKNOWN_ERROR": "Ein unbekannter Fehler ist aufgetreten.",
-          "TOKEN_RESET_ERROR": "Leider konnten wir Ihren Token aufgrund von technischen Problemen nicht zurücksetzen. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut. Falls das Problem bestehen bleibt, stellen Sie bitte eine Anfrage über den IQSH Helpdesk.  Link: https://www.secure-lernnetz.de/helpdesk/",
+          "TOKEN_RESET_ERROR": "Leider konnte der Token aus technischen Gründen nicht zurückgesetzt werden. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut. Sollte das Problem weiterhin bestehen, geben Sie dazu bitte ein Ticket über den {0} auf.",
           "500": "Ein unbekannter Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
           "SOFTWARE_TOKEN_VERIFICATION_ERROR": "Beim Verifizieren Ihres Tokens ist leider ein Problem aufgetreten.",
-          "connection": "Der Server für die Zwei-Faktor-Authentifizierung kann aktuell nicht erreicht werden. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut."
+          "connection": "Der Server für die Zwei-Faktor-Authentifizierung kann aktuell nicht erreicht werden. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut.",
+          "softwareTokenInitError": "Leider konnte aus technischen Gründen kein QR-Code erzeugt werden. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut. Sollte das Problem weiterhin bestehen, geben Sie dazu bitte ein Ticket über den {0} auf.",
+          "iqshHelpdesk": "Helpdesk des IQSH",
+          "iqshHelpdeskLink": "https://www.secure-lernnetz.de/helpdesk/",
+          "selfServiceTokenInitError": "Leider konnte aus technischen Gründen kein QR-Code erzeugt werden. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut. Sollte das Problem weiterhin bestehen, wenden Sie sich bitte an Ihre schulischen Administratorinnen und Administratoren.",
+          "tokenStateError": "Der 2FA Status des Benutzers konnte nicht ermittelt werden. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut. Sollte das Problem weiterhin bestehen, geben Sie dazu bitte ein Ticket über den {0} auf.",
+          "tokenStateSelfServiceError": "Der 2FA Status des Benutzers konnte nicht ermittelt werden. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut. Sollte das Problem weiterhin bestehen, wenden Sie sich bitte an Ihre schulischen Administratorinnen und Administratoren."
         },
         "tokenResetHardwareErrorHeader": "Fehler beim Zurücksetzen des Hardware-Tokens",
         "tokenResetSoftwareErrorHeader": "Fehler beim Zurücksetzen des Software-Tokens",
@@ -147,14 +160,15 @@
         "tokenResetSuccessSoftware": "Token wurde erfolgreich zurückgesetzt. Der Benutzer kann sich nun selbstständig einen neuen QR-Code erzeugen.",
         "tokenResetSuccessHardware": "Token wurde erfolgreich zurückgesetzt. Der Hardware-Token kann nun neu zugeordnet werden.",
         "tokenResetSuccessTokenLost": "Token wurde erfolgreich zurückgesetzt und gesperrt.",
-        "questionsProblems": "Bitte wenden Sie sich bei Fragen und Problemen an ihre schulischen Admins.",
+        "questionsProblems": "Bitte wenden Sie sich bei Fragen und Problemen an Ihre schulischen Administratorinnen und Administratoren.",
         "qrCodeInfo": "Im Folgenden wird ein QR-Code generiert, mit dem Sie auf Ihrem Endgerät eine Zwei-Faktor-Authentifizierung einrichten können.",
-        "softwareOnDevice": "Bitte stellen Sie vor dem Fortfahren sicher, dass eine entsprechende Software auf Ihrem Endgerät installiert ist. Für Ihr Lehrkräfte-Endgerät finden Sie entsprechend genehmigte Anwendungen im Software-Hub.",
+        "softwareOnDevice": "Bitte stellen Sie vor dem Fortfahren sicher, dass eine entsprechende App auf Ihrem Endgerät installiert ist. Für Ihr Lehrkräfte-Endgerät finden Sie entsprechend genehmigte Anwendungen im Software-Hub.",
         "pleaseScan": "Bitte scannen Sie den QR-Code mit Ihrer 2FA-App (z.B. FreeOTP).",
         "enterOtp": "Bitte geben Sie das angezeigte Einmalpasswort ein, um die Einrichtung abzuschließen.",
         "invalidOtp": "Ungültiger Code. Bitte versuchen Sie es erneut.",
         "otp": "Einmalpasswort",
-        "SecondFactorNotSet": "Es wurde noch kein zweiter Faktor für Sie eingerichtet."
+        "SecondFactorNotSet": "Es wurde noch kein zweiter Faktor für Sie eingerichtet.",
+        "NoLongerNeedToken": "Dieser Benutzer hat keinen Zugriff mehr auf sicherheitskritische Bereiche und benötigt aktuell den eingerichteten Token nicht."
       },
       "copyPasswordError": "Passwort konnte nicht in die Zwischenablage kopiert werden",
       "copyPasswordSuccess": "Passwort in Zwischenablage kopiert",
@@ -165,7 +179,7 @@
       "creationErrorTitle": "Fehler beim Anlegen des Benutzers.",
       "deletePerson": "Benutzer löschen",
       "deletePersonConfirmation": "Wollen Sie den Benutzer {firstname} {lastname} sofort und endgültig löschen?",
-      "deletePersonSuccessMessage": "{firstname} {lastname} wurde erfolgreich gelöscht",
+      "deletePersonSuccessMessage": "{firstname} {lastname} wurde erfolgreich gelöscht.",
       "discard": "Benutzer verwerfen",
       "disableUser": "Benutzer sperren",
       "edit": "Benutzer bearbeiten",
@@ -177,12 +191,14 @@
       "loadingErrorTitle": "Fehler beim Laden des Benutzers",
       "management": "Benutzerverwaltung",
       "personalInfo": "Persönliche Informationen",
-      "personalInfoChangeNotice": "Namensänderungen haben unmittelbare Auswirkungen auf den Benutzernamen im Schulportal SH und auf die E-Mail-Adresse! \n\nWeitere Informationen finden Sie auf der Homepage der IQSH-Medienberatung.",
-      "personalInfoSuccessDialogMessage": "Die Stammdaten wurden erfolgreich geändert.",
-      "personalInfoSuccessDialogMessageWithUsername": "Die Stammdaten wurden erfolgreich geändert.\n\nDas Passwort wurde nicht verändert und kann wie zuvor verwendet werden. \n\nBitte teilen Sie der betroffenen Person die Stammdatenänderung (Benutzername, Mail-Adresse) mit. \n\nDie neuen Daten können Sie in der Gesamtübersicht einsehen." ,
+      "personalInfoChangeNotice": "Namensänderungen haben unmittelbare Auswirkungen auf den Benutzernamen im Schulportal SH und auf die E-Mail-Adresse!",
+      "personalInfoChangeNotice2": "Weitere Informationen finden Sie auf der ",
+      "homePageIQSH": "Homepage der IQSH-Medienberatung",
+      "personalInfoSuccessDialogMessageWithUsername": "Die Stammdaten wurden erfolgreich geändert.\n\nDas Passwort wurde nicht verändert und kann wie zuvor verwendet werden. \n\nBitte teilen Sie der betroffenen Person die Stammdatenänderung (Benutzername, Mail-Adresse) mit. \n\nDie neuen Daten können Sie in der Gesamtübersicht einsehen.",
       "resetPasswordConfirmation": "Sind Sie sicher, dass Sie das Passwort für {firstname} {lastname} zurücksetzen möchten?",
       "resetPasswordInformation": "Bitte teilen Sie dem Benutzer das temporäre Passwort mit. Nach dem Schließen des Dialogs wird es aus Sicherheitsgründen nicht mehr angezeigt.",
       "resetPassword": "Passwort zurücksetzen",
+      "printPassword": "Passwort drucken",
       "syncPerson": "Neu synchronisieren",
       "syncPersonConfirmation": "Der Benutzer wird an alle angeschlossenen Systeme neu übertragen und dort ggf. aktualisiert. Dies kann je nach System einige Zeit in Anspruch nehmen.",
       "syncPersonSuccessMessage": "Die Synchronisation wurde gestartet.",
@@ -200,20 +216,23 @@
           "required": "Der Familienname ist erforderlich."
         },
         "kopersNr": {
-          "required": "Die KoPers.-Nr. ist erforderlich."
+          "required": "Die KoPers.-Nr. ist erforderlich.",
+          "noLeadingTrailingSpaces": "Die Kopers.-Nr. darf nicht mit Leerzeichen beginnen oder enden."
         }
       },
       "title": {
         "ERROR_LOADING_USER": "Fehler beim Laden des Benutzers",
         "PERSONALNUMMER_NICHT_EINDEUTIG": "KoPers.-Nr. nicht eindeutig",
         "PERSONALNUMMER_REQUIRED": "Personalnummer erforderlich",
-        "PERSON_NOT_FOUND": "Benutzer gelöscht"
+        "PERSON_NOT_FOUND": "Benutzer gelöscht",
+        "NEWER_VERSION_OF_PERSON_AVAILABLE": "Geänderte Daten"
       },
       "errors": {
         "PERSONALNUMMER_NICHT_EINDEUTIG": "Die eingegebene KoPers.-Nr. ist bereits vergeben. Bitte korrigieren Sie Ihre Eingabe.",
         "ERROR_LOADING_USER": "Es konnten keine Benutzerdaten geladen werden.",
         "PERSONALNUMMER_REQUIRED": "Die Änderungen wurden nicht gespeichert, da keine KoPers.-Nr. eingegeben wurde.",
-        "PERSON_NOT_FOUND": "Der Benutzer wurde seit Ihrer letzten Änderung gelöscht und kann nicht mehr bearbeitet werden."
+        "PERSON_NOT_FOUND": "Der Benutzer wurde seit Ihrer letzten Änderung gelöscht und kann nicht mehr bearbeitet werden.",
+        "NEWER_VERSION_OF_PERSON_AVAILABLE": "Der Benutzer wurde zwischenzeitlich von einer anderen Administratorin oder einem anderen Administrator bearbeitet. Bitte aktualisieren Sie die Daten und versuchen Sie es erneut."
       },
       "showAll": "Alle Benutzer anzeigen",
       "startPassword": "Einstiegs-Passwort",
@@ -229,8 +248,8 @@
         "PERSON_NOT_FOUND": "Benutzer gelöscht"
       },
       "errors": {
-        "COUNT_MISMATCHING": "Der Benutzer wurde zwischenzeitlich durch einen anderen Administrator bearbeitet. Bitte aktualisieren Sie die Daten und versuchen Sie es erneut.",
-        "NEWER_VERSION_OF_PERSONENKONTEXTE_AVAILABLE": "Der Benutzer wurde zwischenzeitlich durch einen anderen Administrator bearbeitet. Bitte aktualisieren Sie die Daten und versuchen Sie es erneut.",
+        "COUNT_MISMATCHING": "Der Benutzer wurde zwischenzeitlich von einer anderen Administratorin oder einem anderen Administrator bearbeitet. Bitte aktualisieren Sie die Daten und versuchen Sie es erneut.",
+        "NEWER_VERSION_OF_PERSONENKONTEXTE_AVAILABLE": "Der Benutzer wurde zwischenzeitlich von einer anderen Administratorin oder einem anderen Administrator bearbeitet. Bitte aktualisieren Sie die Daten und versuchen Sie es erneut.",
         "GLEICHE_ROLLE_AN_KLASSE_WIE_SCHULE": "Mindestens eine Rolle des Benutzers ist an der Schule nicht bekannt.",
         "NUR_LEHR_UND_LERN_AN_KLASSE": "Nur Schüler dürfen einer Klasse zugeordnet werden.",
         "PERSONALNUMMER_NICHT_EINDEUTIG": "Die eingegebene KoPers.-Nr. ist bereits vergeben. Bitte korrigieren Sie Ihre Eingabe.",
@@ -257,17 +276,17 @@
       "enterRollenname": "Rollenname eingeben",
       "errors": {
         "ADD_SYSTEMRECHT_ERROR": "Das Systemrecht konnte nicht hinzugefügt werden.",
-        "NEWER_VERSION_OF_ROLLE_AVAILABLE": "Die Änderungen wurden nicht gespeichert, da die Rolle in der Zwischenzeit geändert wurde.",
+        "NEWER_VERSION_OF_ROLLE_AVAILABLE": "Die Rolle wurde zwischenzeitlich von einer anderen Administratorin oder einem anderen Administrator bearbeitet. Bitte aktualisieren Sie die Daten und versuchen Sie es erneut.",
         "ROLLE_ERROR": "Die Rolle konnte nicht angelegt werden.",
         "ROLLE_HAT_PERSONENKONTEXTE_ERROR": "Die Rolle kann nicht gelöscht werden, da die sie noch Benutzern zugeordnet ist. Nehmen Sie bitte zunächst alle Zuordnungen zurück.",
         "UPDATE_MERKMALE_ERROR": "Die gewünschte Bearbeitung kann nicht ausgeführt werden, da die Rolle noch Benutzern zugeordnet ist. Nehmen Sie bitte zunächst alle Zuordnungen zurück."
       },
       "title": {
-        "NEWER_VERSION_OF_ROLLE_AVAILABLE": "Die Rolle konnte nicht bearbeitet werden",
+        "NEWER_VERSION_OF_ROLLE_AVAILABLE": "Geänderte Daten",
         "ROLLE_ERROR": "Fehler bei Erstellung der Rolle",
         "ROLLE_HAT_PERSONENKONTEXTE_ERROR": "Löschen nicht möglich",
         "ROLLE_UPDATE_ERROR": "Die Rolle konnte nicht bearbeitet werden",
-        "UPDATE_MERKMALE_ERROR": "Die gewünschte Bearbeitung kann nicht ausgeführt werden, da die Rolle noch Benutzern zugeordnet ist. Nehmen Sie bitte zunächst alle Zuordnungen zurück"
+        "UPDATE_MERKMALE_ERROR": "Die Merkmale konnten nicht bearbeitet werden"
       },
       "isAllowedToManageRollen": "Darf Rollen verwalten",
       "loadingErrorText": "Es konnten keine Rollendaten geladen werden.",
@@ -281,7 +300,8 @@
           "SCHULEN_VERWALTEN": "Darf Schulen verwalten",
           "KLASSEN_VERWALTEN": "Darf Klassen verwalten",
           "SCHULTRAEGER_VERWALTEN": "Darf Schulträger verwalten",
-          "PERSON_SYNCHRONISIEREN": "Darf Benutzer synchronisieren"
+          "PERSON_SYNCHRONISIEREN": "Darf Benutzer synchronisieren",
+          "PERSONEN_ANLEGEN": "Darf Benutzer anlegen"
         },
         "rollenarten": {
           "LERN": "Lern",
@@ -399,6 +419,9 @@
   "close": "Schließen",
   "edit": "Bearbeiten",
   "print": "Drucken",
+  "showPassword": "Passwort anzeigen",
+  "hidePassword": "Passwort verbergen",
+  "copyPassword": "Passwort kopieren",
   "errors": {
     "KEYCLOAK_CLIENT_ERROR": "Die Anmeldung ist momentan nicht möglich.",
     "UNSPECIFIED_ERROR": "Es ist ein Fehler aufgetreten.",
@@ -422,6 +445,9 @@
     "button": "Anmelden",
     "forgotPassword": "Passwort vergessen? \n Wenden Sie sich bitte an Ihre schulischen Administratorinnen und Administratoren.",
     "header": "Anmeldung im Schulportal SH",
+    "maintenanceNoticeTitle": "Achtung Wartungsarbeiten!",
+    "maintenanceNoticeText": "Am 7.12. und 8.12.2024 werden ganztägig Wartungsarbeiten am Schulportal SH ausgeführt.",
+    "doNotLogin": "Bitte melden Sie sich nicht an!",
     "password": "Passwort",
     "username": "Benutzername"
   },
@@ -470,6 +496,15 @@
     "deleteZuordnungSuccess": "Die Schulzuordnung wurde erfolgreich entfernt.",
     "editZuordnungen": "Schulzuordnungen bearbeiten",
     "email": "E-Mail",
+    "emailStatusRequested": "wird erzeugt",
+    "emailStatusDisabled": "deaktiviert",
+    "emailStatusFailed": "fehlerhaft",
+    "emailStatusUnknown": "unbekannt",
+    "emailStatusActiveHover": "Das E-Mail-Konto ist aktiviert.",
+    "emailStatusRequestedHover": "Das E-Mail-Konto wird zur Zeit angelegt. Dies kann einige Zeit in Anspruch nehmen. Bitte öffnen Sie die Gesamtübersicht zu einem späteren Zeitpunkt erneut, um die E-Mail-Adresse einzusehen.",
+    "emailStatusDisabledHover": "Das E-Mail-Konto wurde deaktiviert.",
+    "emailStatusFailedHover": "Bei der Erstellung des E-Mail-Kontos ist ein Fehler aufgetreten. Bitte eröffnen Sie eine Fehlermeldung im Help-Desk System.",
+    "emailStatusUnknownHover": "Der Status der E-Mail-Adresse ist unbekannt.",
     "enterFirstName": "Vorname eingeben",
     "enterKopersNr": "KoPers.-Nr. eingeben",
     "enterLastName": "Nachname eingeben",
@@ -482,10 +517,14 @@
     "lastName": "Nachname",
     "userIsLocked": "Dieser Benutzer ist gesperrt.",
     "userIsUnlocked": "Dieser Benutzer ist aktiv.",
+    "lockTime": "Dauer der Sperre",
     "lockUser": "Benutzer sperren",
     "lockUserInfoText": "Für die Dauer der Sperre hat der Benutzer keinen Zugriff mehr auf das Schulportal SH und die daran angeschlossenen Dienste.",
     "lockedBy": "Gesperrt durch",
+    "lockedSince": "Gesperrt seit",
+    "lockedUntil": "Gesperrt bis",
     "unlockUser": "Benutzer entsperren",
+    "kopersLock": "Dieser Benutzer wurde aufgrund einer fehlenden KoPers.-Nr. gesperrt. Bitte tragen Sie eine gültige KoPers.-Nr. nach. Diese Sperre kann nicht auf anderem Wege aufgehoben werden.",
     "unLockUserInfoText": "Ich bestätige, dass ich mit der sperrenden Stelle geklärt habe, dass die Sperre aufgehoben werden darf.",
     "lockError": "Der Benutzer konnte nicht gesperrt werden.",
     "unlockError": "Der Benutzer konnte nicht entsperrt werden.",
@@ -508,6 +547,13 @@
   "profile": {
     "personalData": "Persönliche Daten",
     "fullName": "Vor- und Nachname",
+    "email": "E-Mail",
+    "emailStatusRequested": "wird erzeugt",
+    "emailStatusDisabled": "deaktiviert",
+    "emailStatusFailed": "fehlerhaft",
+    "emailStatusRequestedHover": "Das E-Mail-Konto wird zur Zeit angelegt. Dies kann einige Zeit in Anspruch nehmen. Bitte öffnen Sie Ihr Profil zu einem späteren Zeitpunkt erneut, um die E-Mail-Adresse einzusehen.",
+    "emailStatusDisabledHover": "Das E-Mail-Konto wurde deaktiviert.",
+    "emailStatusFailedHover": "Bei der Erstellung des E-Mail-Kontos ist ein Fehler aufgetreten. Bitte eröffnen Sie eine Fehlermeldung im Help-Desk System.",
     "schule": "Schule",
     "dienstStellenNummer": "Dienststellennummer",
     "dienstStellenNummerAbbr": "DStNr.",
@@ -519,11 +565,11 @@
     "setNewPassword": "Neues Passwort setzen",
     "twoFactorAuth": "Zwei-Faktor-Authentifizierung",
     "setupTwoFactorAuth": "2-FA einrichten",
-    "infoAboutChangeabilityFromPersonalData": "Persönliche Daten sind nur durch Ihre schulischen Admins veränderbar",
-    "yourSchuleAdminsAre": "Ihre schulischen Admins sind:",
+    "infoAboutChangeabilityFromPersonalData": "Persönliche Daten sind nur durch Ihre schulischen Administratorinnen und Administratoren veränderbar.",
+    "yourSchuleAdminsAre": "Ihre schulischen Administratorinnen und Administratoren sind:",
     "koPersNummer": "Personalnummer",
     "koPersNummerAbbr": "KoPers.-Nr.",
-    "koPersNummerMissing": "Bitte beachten Sie, dass Ihr Benutzerkonto ohne KoPers.-Nr. nur für einen Übergangszeitraum gültig ist und danach gesperrt wird! Lassen Sie die KoPers.-Nr. bitte durch Ihre schulischen Admins nachtragen, sobald diese Ihnen vorliegt.",
+    "koPersNummerMissing": "Bitte beachten Sie, dass Ihr Benutzerkonto ohne KoPers.-Nr. nur für einen Übergangszeitraum gültig ist und danach gesperrt wird! Lassen Sie die KoPers.-Nr. bitte durch Ihre schulischen Administratorinnen und Administratoren nachtragen, sobald diese Ihnen vorliegt.",
     "klasse": "Klasse",
     "error": "Fehler",
     "success": "Erfolg",

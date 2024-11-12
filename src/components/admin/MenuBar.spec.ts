@@ -1,10 +1,15 @@
-import { expect, test } from 'vitest';
+import { expect, test, type MockInstance } from 'vitest';
 import { VueWrapper, mount } from '@vue/test-utils';
+import { h, nextTick } from 'vue';
+import { createRouter, createWebHistory, type Router } from 'vue-router';
+import routes from '@/router/routes';
+import { VApp } from 'vuetify/components';
 import MenuBar from './MenuBar.vue';
 import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
-const authStore: AuthStore = useAuthStore();
 
 let wrapper: VueWrapper | null = null;
+let router: Router;
+const authStore: AuthStore = useAuthStore();
 
 authStore.currentUser = {
   middle_name: null,
@@ -38,40 +43,85 @@ authStore.currentUser = {
   password_updated_at: null,
 };
 
-beforeEach(() => {
+authStore.hasPersonenverwaltungPermission = true;
+authStore.hasKlassenverwaltungPermission = true;
+authStore.hasRollenverwaltungPermission = true;
+authStore.hasSchulverwaltungPermission = true;
+authStore.hasSchultraegerverwaltungPermission = true;
+authStore.hasPersonenAnlegenPermission = true;
+
+beforeEach(async () => {
   document.body.innerHTML = `
     <div>
       <div id="app"></div>
     </div>
   `;
 
-  wrapper = mount(MenuBar, {
+  router = createRouter({
+    history: createWebHistory(),
+    routes,
+  });
+
+  router.push('/admin/personen');
+  await router.isReady();
+
+  wrapper = mount(VApp, {
     attachTo: document.getElementById('app') || '',
     global: {
       components: {
         MenuBar,
       },
+      plugins: [router],
+    },
+    slots: {
+      default: h(MenuBar),
     },
   });
 });
 
-// We are currently skipping these tests, because rendering the navigation drawer fails due to a missing
-// vuetify layout that needs to be injected and cannot be provided inside the test environment.
-// Providing it manually is hacky, since the needed layout cannot be imported from vuetify.
-// Hopefully this will be fixed in an upcoming vuetify release.
-
 describe('MenuBar', () => {
-  test.skip('it renders the menu bar', () => {
+  test('it renders the menu bar', () => {
     expect(wrapper?.find('[data-testid="menu-bar-title"]').isVisible()).toBe(true);
   });
 
-  test.skip('it renders rolle and schule management links', () => {
+  test('it renders all available menu links', () => {
     expect(wrapper?.find('[data-testid="menu-bar-title"]').isVisible()).toBe(true);
+    expect(wrapper?.find('[data-testid="back-to-start-link"]').isVisible()).toBe(true);
+
+    expect(wrapper?.find('[data-testid="person-management-title"]').isVisible()).toBe(true);
+    expect(wrapper?.find('[data-testid="person-management-menu-item"]').isVisible()).toBe(true);
+    expect(wrapper?.find('[data-testid="person-creation-menu-item"]').isVisible()).toBe(true);
+
+    expect(wrapper?.find('[data-testid="klasse-management-title"]').isVisible()).toBe(true);
+    expect(wrapper?.find('[data-testid="klassen-management-menu-item"]').isVisible()).toBe(true);
+    expect(wrapper?.find('[data-testid="klasse-creation-menu-item"]').isVisible()).toBe(true);
+
     expect(wrapper?.find('[data-testid="rolle-management-title"]').isVisible()).toBe(true);
+    expect(wrapper?.find('[data-testid="rolle-management-menu-item"]').isVisible()).toBe(true);
     expect(wrapper?.find('[data-testid="rolle-creation-menu-item"]').isVisible()).toBe(true);
+
     expect(wrapper?.find('[data-testid="schule-management-title"]').isVisible()).toBe(true);
     expect(wrapper?.find('[data-testid="schule-management-menu-item"]').isVisible()).toBe(true);
     expect(wrapper?.find('[data-testid="schule-creation-menu-item"]').isVisible()).toBe(true);
+
+    expect(wrapper?.find('[data-testid="schultraeger-management-title"]').isVisible()).toBe(true);
+  });
+
+  test('hides elements when permissions are false', async () => {
+    // Reset permissions to false
+    authStore.hasPersonenAnlegenPermission = false;
+    await nextTick();
+
+    expect(wrapper?.find('[data-testid="person-creation-menu-item"]').exists()).toBe(false);
+  });
+
+  test('it handles menu item click', async () => {
+    const push: MockInstance = vi.spyOn(router, 'push');
+
+    await wrapper?.find('[data-testid="person-management-menu-item"]').trigger('click');
+    await nextTick();
+
+    expect(push).toHaveBeenCalledTimes(1);
   });
 
   // TODO: can we rely on vuetify's mobile breakpoint in tests?
