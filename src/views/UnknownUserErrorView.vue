@@ -1,11 +1,9 @@
 <script setup lang="ts">
   import SpshAlert from '@/components/alert/SpshAlert.vue';
-  import { useRouter, type Router } from 'vue-router';
 
-  const router: Router = useRouter();
-
-  function backToStart(): void {
-    router.replace('/');
+  function logout(): void {
+    const url: URL = new URL(window.origin + '/api/auth/logout');
+    window.location.href = url.toString();
   }
 </script>
 
@@ -16,8 +14,8 @@
     :type="'warning'"
     :closable="false"
     :showButton="true"
-    :buttonText="$t('nav.backToStart')"
-    :buttonAction="backToStart"
+    :buttonText="$t('nav.logout')"
+    :buttonAction="logout"
     :text="$t('errors.UNKNOWN_USER.text')"
   />
 </template>
