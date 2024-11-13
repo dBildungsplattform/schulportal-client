@@ -41,6 +41,11 @@
       href: '/impressum_datenschutzerklaerung.html#accessibility',
       external: true,
     },
+    {
+      text: t('footer.status'),
+      href: import.meta.env['VITE_APP_STATUS_URL']!,
+      external: true,
+    },
   ]);
 
   const sponsors: Ref<Sponsor[]> = ref([

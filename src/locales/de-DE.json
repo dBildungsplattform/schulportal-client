@@ -437,7 +437,8 @@
     "contact": "Kontakt",
     "help": "Hilfe",
     "legalNotice": "Impressum",
-    "privacyPolicy": "Datenschutzerklärung"
+    "privacyPolicy": "Datenschutzerklärung",
+    "status": "Systemstatus"
   },
   "itemsPerPage": "Einträge pro Seite",
   "landingTitle": "Willkommen im Schulportal SH.",
