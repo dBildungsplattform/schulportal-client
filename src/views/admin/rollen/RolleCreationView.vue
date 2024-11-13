@@ -184,6 +184,7 @@
     await organisationStore.getAllOrganisationen({
       systemrechte: ['ROLLEN_VERWALTEN'],
       excludeTyp: [OrganisationsTyp.Klasse],
+      limit: 25,
     });
     await serviceProviderStore.getAllServiceProviders();
 

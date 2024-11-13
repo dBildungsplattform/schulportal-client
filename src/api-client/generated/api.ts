@@ -1331,6 +1331,12 @@ export interface Person {
      * @memberof Person
      */
     'personalnummer': string | null;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof Person
+     */
+    'dienststellen': Array<string> | null;
 }
 
 
@@ -2003,7 +2009,13 @@ export interface PersonenkontextResponse {
      * @type {string}
      * @memberof PersonenkontextResponse
      */
-    'roleName': string | null;
+    'rollenart': string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonenkontextResponse
+     */
+    'rollenname': string | null;
     /**
      * 
      * @type {string}
