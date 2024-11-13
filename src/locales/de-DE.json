@@ -59,8 +59,9 @@
           "required": "Eine Schule muss ausgewählt werden."
         }
       },
+      "recordsReadyForImport": "{count} Datensatz steht zum Import bereit. | {count} Datensätze stehen zum Import bereit.",
       "selectOrDropFile": "Datei auswählen oder ablegen",
-      "uploadedSuccessfully": "Die Datei wurde erfolgreich hochgeladen. {items} Datensätze stehen zum Import bereit.",
+      "uploadedSuccessfully": "Die Datei wurde erfolgreich hochgeladen.",
       "uploadErrorTitle": "Fehler beim Upload",
       "uploadFile": "Datei hochladen"
     },

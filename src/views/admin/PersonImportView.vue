@@ -151,6 +151,10 @@
     );
   });
 
+  const totalImportItems: ComputedRef<number> = computed(() => {
+    return importStore.uploadResponse?.totalImportDataItems as number;
+  });
+
   function clearSelectedRolle(): void {
     selectedRolle.value = undefined;
   }
@@ -315,9 +319,8 @@
               cols="auto"
             >
               <span data-testid="person-upload-success-text">
-                {{
-                  $t('admin.import.uploadedSuccessfully', { items: importStore.uploadResponse?.totalImportDataItems })
-                }}
+                {{ $t('admin.import.uploadedSuccessfully') }}
+                {{ $t('admin.import.recordsReadyForImport', { count: totalImportItems }) }}
               </span>
             </v-col>
           </v-row>
