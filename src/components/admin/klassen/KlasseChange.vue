@@ -24,7 +24,7 @@
 
   const timerId: Ref<ReturnType<typeof setTimeout> | undefined> = ref<ReturnType<typeof setTimeout>>();
 
-  // Computed property to get the title of the selected class
+  // Computed property to get the title of the selected klasse
   const selectedKlasseTitle: ComputedRef<string | undefined> = computed(() => {
     return props.klassen?.find((klasse: TranslatedObject | undefined) => klasse?.value === selectedNewKlasse.value)
       ?.title;
