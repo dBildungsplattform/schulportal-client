@@ -6,5 +6,5 @@ metadata:
   labels:
     {{- include "common.labels" . | nindent 4 }}
 data:
-  STATUS_URL: "{{ .Values.status.url }}"
+  VITE_APP_STATUS_URL: "{{ .Values.status.url }}"
   
