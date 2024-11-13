@@ -12,7 +12,7 @@
   import { useRollen, type TranslatedRolleWithAttrs } from '@/composables/useRollen';
   import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
   import { useSchulen } from '@/composables/useSchulen';
-  import { computed, onMounted, ref, watch, type ComputedRef, type Ref } from 'vue';
+  import { computed, onMounted, onUnmounted, ref, watch, type ComputedRef, type Ref } from 'vue';
   import type { TranslatedObject } from '@/types';
   import { useForm, type BaseFieldProps, type FormContext, type TypedSchema } from 'vee-validate';
   import { toTypedSchema } from '@vee-validate/yup';
@@ -221,10 +221,36 @@
     uploadFile();
   });
 
+  function isFormDirty(): boolean {
+    return (
+      formContext.isFieldDirty('selectedSchule') ||
+      formContext.isFieldDirty('selectedRolle') ||
+      formContext.isFieldDirty('selectedFiles')
+    );
+  }
+  const showUnsavedChangesDialog: Ref<boolean> = ref(false);
+  let blockedNext: () => void = () => {};
+
+  function handleConfirmUnsavedChanges(): void {
+    blockedNext();
+  }
+
+  function preventNavigation(event: BeforeUnloadEvent): void {
+    if (!isFormDirty()) return;
+    event.preventDefault();
+    /* Chrome requires returnValue to be set. */
+    event.returnValue = '';
+  }
+
   onBeforeRouteLeave((_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
-    importStore.uploadResponse = null;
-    importStore.importedData = null;
-    next();
+    if (isFormDirty()) {
+      showUnsavedChangesDialog.value = true;
+      blockedNext = next;
+    } else {
+      importStore.uploadResponse = null;
+      importStore.importedData = null;
+      next();
+    }
   });
 
   onMounted(async () => {
@@ -232,6 +258,12 @@
     importStore.uploadResponse = null;
     importStore.importedData = null;
     organisationStore.errorCode = '';
+    /* listen for browser changes and prevent them when form is dirty */
+    window.addEventListener('beforeunload', preventNavigation);
+  });
+
+  onUnmounted(() => {
+    window.removeEventListener('beforeunload', preventNavigation);
   });
 </script>
 
@@ -377,11 +409,14 @@
       <!-- Upload form -->
       <FormWrapper
         v-if="!importStore.uploadResponse?.isValid && !importStore.errorCode"
+        :confirmUnsavedChangesAction="handleConfirmUnsavedChanges"
         :createButtonLabel="$t('admin.import.uploadFile')"
         :discardButtonLabel="$t('nav.backToList')"
         id="person-import-form"
         :onDiscard="navigateToPersonTable"
         :onSubmit="onSubmit"
+        @onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
+        :showUnsavedChangesDialog="showUnsavedChangesDialog"
       >
         <!-- Schulauswahl -->
         <FormRow
