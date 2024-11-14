@@ -248,9 +248,10 @@
         includeTyp: OrganisationsTyp.Klasse,
         systemrechte: ['KLASSEN_VERWALTEN'],
       });
-    } else if (selectedSchule.value !== null) {
+    } else if (searchValue === '' && selectedSchule.value !== null) {
       // Fetch all Klassen for the selected Schule when the search string is cleared
       await organisationStore.getAllOrganisationen({
+        searchString: searchValue,
         offset: (searchFilterStore.klassenPage - 1) * searchFilterStore.klassenPerPage,
         limit: searchFilterStore.klassenPerPage,
         administriertVon: [selectedSchule.value],
