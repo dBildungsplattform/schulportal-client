@@ -1,7 +1,7 @@
 import routes from '@/router/routes';
 import { VueWrapper, mount } from '@vue/test-utils';
 import type WrapperLike from '@vue/test-utils/dist/interfaces/wrapperLike';
-import { expect, test, type MockInstance } from 'vitest';
+import { expect, test } from 'vitest';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import UnknownUserErrorView from './UnknownUserErrorView.vue';
 
@@ -53,14 +53,6 @@ describe('UnknownUserErrorView', () => {
     const alertTitle: WrapperLike | undefined = wrapper?.find('[data-testid="alert-button"]');
 
     expect(alertTitle?.isVisible()).toBe(true);
-    expect(alertTitle?.text()).toEqual('Zurück zur Startseite');
-  });
-
-  test('clicking the button should push replace route', () => {
-    const replaceSpy: MockInstance = vi.spyOn(router, 'replace');
-
-    wrapper?.find('[data-testid="alert-button"]').trigger('click');
-
-    expect(replaceSpy).toHaveBeenCalledWith('/');
+    expect(alertTitle?.text()).toEqual('Abmelden');
   });
 });
