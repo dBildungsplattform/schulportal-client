@@ -1246,16 +1246,12 @@
 
 <template>
   <div class="admin">
-    <v-row>
-      <v-col cols="12">
-        <h1
-          class="text-center headline-1"
-          data-testid="admin-headline"
-        >
-          {{ $t('admin.headline') }}
-        </h1>
-      </v-col>
-    </v-row>
+    <h1
+      class="text-center headline"
+      data-testid="admin-headline"
+    >
+      {{ $t('admin.headline') }}
+    </h1>
     <LayoutCard
       :closable="true"
       data-testid="person-details-card"
@@ -1548,7 +1544,11 @@
                 </PasswordReset>
               </div>
             </v-col>
-            <v-col v-else-if="personStore.loading"> <v-progress-circular indeterminate></v-progress-circular></v-col
+            <v-col v-else-if="personStore.loading">
+              <v-progress-circular
+                data-testid="loading-spinner"
+                indeterminate
+              ></v-progress-circular></v-col
           ></v-row>
         </v-container>
         <v-divider
@@ -1616,7 +1616,12 @@
               <span class="text-body">
                 {{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
                 {{ zuordnung.klasse }}
-                <span v-if="zuordnung.befristung"> ({{ formatDate(zuordnung.befristung, t) }})</span>
+                <span
+                  v-if="zuordnung.befristung"
+                  data-testid="zuordnung-befristung-text"
+                >
+                  ({{ formatDate(zuordnung.befristung, t) }})</span
+                >
               </span>
             </v-col>
           </v-row>
@@ -2192,7 +2197,7 @@
                     </v-col>
                     <div class="v-col">
                       <p v-if="twoFactorAuthentificationStore.hasToken && !twoFactorAuthentificationStore.required">
-                        {{ $t('admin.person.twoFactorAuthentication.NoLongerNeedToken') }}
+                        {{ $t('admin.person.twoFactorAuthentication.noLongerNeedToken') }}
                       </p>
                       <p v-else-if="twoFactorAuthentificationStore.hasToken">
                         {{ $t('admin.person.twoFactorAuthentication.resetInfo') }}
