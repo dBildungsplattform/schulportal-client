@@ -120,6 +120,13 @@
 
   async function applySearchAndFilters(): Promise<void> {
     await fetchKlassenBySelectedSchuleId(searchFilterStore.selectedSchuleForKlassen);
+
+    const klassenCopy: Organisation[] = JSON.parse(JSON.stringify(organisationStore.klassen));
+
+    // In the table show only the Klassen that are selected
+    organisationStore.allKlassen = klassenCopy.filter((klasse: Organisation) =>
+      searchFilterStore.selectedKlassenForKlassen?.includes(klasse.id),
+    );
   }
 
   async function updateSelectedSchule(newValue: string | null): Promise<void> {
@@ -340,12 +347,12 @@
         includeTyp: OrganisationsTyp.Schule,
         systemrechte: ['KLASSEN_VERWALTEN'],
       });
+      // Initialize klassenOptions with all Klassen
+      klassenOptions.value = organisationStore.allKlassen.map((org: Organisation) => ({
+        value: org.id,
+        title: org.name,
+      }));
     }
-    // Initialize klassenOptions with all classes
-    klassenOptions.value = organisationStore.allKlassen.map((org: Organisation) => ({
-      value: org.id,
-      title: org.name,
-    }));
     // Handle user context
     await handleUserContext();
   });
