@@ -550,7 +550,8 @@ export const DbiamImportErrorI18nKeyEnum = {
     CsvParsingError: 'CSV_PARSING_ERROR',
     CsvFileEmptyError: 'CSV_FILE_EMPTY_ERROR',
     ImportTextFileCreationError: 'IMPORT_TEXT_FILE_CREATION_ERROR',
-    ImportNurLernAnSchuleError: 'IMPORT_NUR_LERN_AN_SCHULE_ERROR'
+    ImportNurLernAnSchuleError: 'IMPORT_NUR_LERN_AN_SCHULE_ERROR',
+    CsvFileInvalidHeaderError: 'CSV_FILE_INVALID_HEADER_ERROR'
 } as const;
 
 export type DbiamImportErrorI18nKeyEnum = typeof DbiamImportErrorI18nKeyEnum[keyof typeof DbiamImportErrorI18nKeyEnum];

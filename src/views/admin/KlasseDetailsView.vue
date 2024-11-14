@@ -183,16 +183,12 @@
 
 <template>
   <div class="admin">
-    <v-row>
-      <v-col cols="12">
-        <h1
-          class="text-center headline-1"
-          data-testid="admin-headline"
-        >
-          {{ $t('admin.headline') }}
-        </h1>
-      </v-col>
-    </v-row>
+    <h1
+      class="text-center headline"
+      data-testid="admin-headline"
+    >
+      {{ $t('admin.headline') }}
+    </h1>
     <LayoutCard
       :closable="true"
       data-testid="klasse-details-card"

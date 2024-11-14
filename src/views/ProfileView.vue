@@ -657,7 +657,7 @@
                     color="warning"
                     icon="mdi-alert-circle"
                   ></v-icon>
-                  {{ $t('admin.person.twoFactorAuthentication.SecondFactorNotSet') }}
+                  {{ $t('admin.person.twoFactorAuthentication.secondFactorNotSet') }}
                 </v-col>
               </v-row>
             </v-col>
