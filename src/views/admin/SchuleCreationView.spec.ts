@@ -106,7 +106,7 @@ describe('SchuleCreationView', () => {
 
     organisationStore.createdSchule = mockSchule;
 
-    wrapper?.find('[data-testid="schule-creation-form-create-button"]').trigger('click');
+    wrapper?.find('[data-testid="schule-creation-form-submit-button"]').trigger('click');
     await nextTick();
 
     expect(wrapper?.find('[data-testid="create-another-schule-button"]').isVisible()).toBe(true);

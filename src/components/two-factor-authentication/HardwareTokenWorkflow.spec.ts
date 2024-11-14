@@ -82,15 +82,15 @@ describe('HardwareTokenWorkflow.vue', () => {
   });
 
   test('it renders the form fields', async () => {
-    const serialInput: Element | null = document.querySelector('[data-testid="hardware-token-input-serial"]');
-    const otpInput: Element | null = document.querySelector('[data-testid="hardware-token-input-otp"]');
+    const serialInput: Element | null = document.querySelector('[data-testid="hardware-token-serial-input"]');
+    const otpInput: Element | null = document.querySelector('[data-testid="hardware-token-otp-input"]');
 
     expect(serialInput).not.toBeNull();
     expect(otpInput).not.toBeNull();
   });
 
   test('it shows validation errors if fields are empty', async () => {
-    wrapper?.find('[data-testid="hardware-token-input-create-button"]').trigger('click');
+    wrapper?.find('[data-testid="hardware-token-form-submit-button"]').trigger('click');
     await nextTick();
 
     await document.querySelectorAll('.v-messages__message').forEach((error: Element) => {
@@ -100,11 +100,11 @@ describe('HardwareTokenWorkflow.vue', () => {
 
   test('it submits the form with valid input', async () => {
     const serialWrapper: HTMLElement = document.querySelector(
-      '[data-testid="hardware-token-input-serial"]',
+      '[data-testid="hardware-token-serial-input"]',
     ) as HTMLElement;
     const serialInput: HTMLInputElement | null = serialWrapper.querySelector('input');
 
-    const otpWrapper: HTMLElement = document.querySelector('[data-testid="hardware-token-input-otp"]') as HTMLElement;
+    const otpWrapper: HTMLElement = document.querySelector('[data-testid="hardware-token-otp-input"]') as HTMLElement;
     const otpInput: HTMLInputElement | null = otpWrapper.querySelector('input');
 
     expect(serialInput).not.toBeNull();
@@ -118,11 +118,11 @@ describe('HardwareTokenWorkflow.vue', () => {
       otpInput.dispatchEvent(new Event('input'));
     }
 
-    wrapper?.find('[data-testid="hardware-token-input-create-button"]').trigger('click');
+    wrapper?.find('[data-testid="hardware-token-form-submit-button"]').trigger('click');
   });
 
   test('it handles cancel action correctly', async () => {
-    wrapper?.find('[data-testid="hardware-token-input-discard-button"]').trigger('click');
+    wrapper?.find('[data-testid="hardware-token-form-discard-button"]').trigger('click');
     await nextTick();
   });
 
@@ -154,7 +154,7 @@ describe('HardwareTokenWorkflow.vue', () => {
   // // New test for triggering cancelCheck
   // test('it calls cancelCheck method when discard button is clicked', async () => {
   //   // Assuming cancelCheck method resets the error and dialogText
-  //   wrapper?.find('[data-testid="hardware-token-input-discard-button"]').trigger('click');
+  //   wrapper?.find('[data-testid="hardware-token-form-discard-button"]').trigger('click');
   //   await nextTick();
 
   //   expect(wrapper?.vm.$data.hardwareTokenIsAssigned).toBe(false);
