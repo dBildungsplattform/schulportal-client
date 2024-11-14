@@ -550,7 +550,8 @@ export const DbiamImportErrorI18nKeyEnum = {
     CsvParsingError: 'CSV_PARSING_ERROR',
     CsvFileEmptyError: 'CSV_FILE_EMPTY_ERROR',
     ImportTextFileCreationError: 'IMPORT_TEXT_FILE_CREATION_ERROR',
-    ImportNurLernAnSchuleError: 'IMPORT_NUR_LERN_AN_SCHULE_ERROR'
+    ImportNurLernAnSchuleError: 'IMPORT_NUR_LERN_AN_SCHULE_ERROR',
+    CsvFileInvalidHeaderError: 'CSV_FILE_INVALID_HEADER_ERROR'
 } as const;
 
 export type DbiamImportErrorI18nKeyEnum = typeof DbiamImportErrorI18nKeyEnum[keyof typeof DbiamImportErrorI18nKeyEnum];
@@ -1331,6 +1332,12 @@ export interface Person {
      * @memberof Person
      */
     'personalnummer': string | null;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof Person
+     */
+    'dienststellen': Array<string> | null;
 }
 
 
@@ -1524,6 +1531,12 @@ export interface PersonInfoResponse {
      * @memberof PersonInfoResponse
      */
     'gruppen': Array<string>;
+    /**
+     * 
+     * @type {PersonResponseEmail}
+     * @memberof PersonInfoResponse
+     */
+    'email': PersonResponseEmail | null;
 }
 /**
  * 
@@ -1795,10 +1808,10 @@ export interface PersonResponse {
     'isLocked': boolean | null;
     /**
      * 
-     * @type {UserLockParams}
+     * @type {Array<UserLockParams>}
      * @memberof PersonResponse
      */
-    'userLock': UserLockParams | null;
+    'userLock': Array<UserLockParams> | null;
     /**
      * Date of the most recent changes for the person
      * @type {string}
@@ -1997,7 +2010,13 @@ export interface PersonenkontextResponse {
      * @type {string}
      * @memberof PersonenkontextResponse
      */
-    'roleName': string | null;
+    'rollenart': string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonenkontextResponse
+     */
+    'rollenname': string | null;
     /**
      * 
      * @type {string}
@@ -2897,6 +2916,12 @@ export interface UserLockParams {
      * @memberof UserLockParams
      */
     'locked_until': string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserLockParams
+     */
+    'lock_occasion': string | null;
 }
 /**
  * 

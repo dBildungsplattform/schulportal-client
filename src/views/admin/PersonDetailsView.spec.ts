@@ -1,11 +1,12 @@
 import { expect, type MockInstance, test } from 'vitest';
-import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
+import { DOMWrapper, VueWrapper, flushPromises, mount } from '@vue/test-utils';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import routes from '@/router/routes';
 import { useAuthStore, type AuthStore, type UserInfo } from '@/stores/AuthStore';
 import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
 import {
   parseUserLock,
+  PersonLockOccasion,
   usePersonStore,
   type Personendatensatz,
   type PersonStore,
@@ -101,7 +102,7 @@ const mockPersonenuebersicht: PersonWithUebersicht = {
       administriertVon: '2',
       editable: true,
       merkmale: [] as unknown as RollenMerkmal,
-      befristung: '',
+      befristung: '2099-08-12',
     },
     {
       sskId: '3',
@@ -251,19 +252,24 @@ describe('PersonDetailsView', () => {
     expect(wrapper?.find('[data-testid="person-familienname"]').text()).toBe('Orton');
     expect(wrapper?.find('[data-testid="person-username"]').text()).toBe('jorton');
     expect(wrapper?.find('[data-testid="person-email"]').text()).toBe('email@email.com');
-    expect(wrapper?.find('[data-testid="person-zuordnung-1"]').text()).toBe('123456 (Testschule Birmingham): SuS 9a');
+    expect(wrapper?.find('[data-testid="person-zuordnung-1"]').text()).toBe(
+      '123456 (Testschule Birmingham): SuS 9a  (befristet bis 11.08.2099)',
+    );
     expect(wrapper?.getComponent({ name: 'PasswordReset' })).toBeTruthy();
   });
 
   test('it renders details for a locked person', async () => {
     const date: string = '01.01.2024';
     const datetime: string = `${date} 12:34:00`;
-    const userLock: UserLock = {
-      personId: '1234',
-      locked_by: 'test',
-      created_at: datetime,
-      locked_until: datetime,
-    };
+    const userLock: UserLock[] = [
+      {
+        personId: '1234',
+        locked_by: 'test',
+        created_at: datetime,
+        lock_occasion: PersonLockOccasion.MANUELL_GESPERRT,
+        locked_until: datetime,
+      },
+    ];
 
     // Mock the current person in the store
     personStore.currentPerson = {
@@ -292,7 +298,7 @@ describe('PersonDetailsView', () => {
 
     // Check if the element exists and has the correct text content
     expect(vornameElement?.text()).toBe('Samuel');
-    expect(lockInfoContainer?.html()).toContain(userLock.locked_by);
+    expect(lockInfoContainer?.html()).toContain(userLock[0]!.locked_by);
     expect(lockInfoContainer?.html()).toContain(date);
   });
 
@@ -384,7 +390,7 @@ describe('PersonDetailsView', () => {
   test('it displays lockInfo if there is any', async () => {
     expect(personStore.currentPerson).toBeDefined();
     expect(wrapper).toBeDefined();
-    personStore.currentPerson!.person.isLocked = false;
+    personStore.currentPerson!.person.userLock = [];
     await nextTick();
 
     const activeStatusMessage: DOMWrapper<HTMLDivElement> = wrapper!.find('[data-testid="person-lock-info"]');
@@ -401,24 +407,27 @@ describe('PersonDetailsView', () => {
       month: '2-digit',
       year: 'numeric',
     });
-    const userLock: UserLock = {
-      personId: '1234',
-      locked_by: 'Lady Lock',
-      created_at: date,
-      locked_until: date,
-    };
+    const userLock: UserLock[] = [
+      {
+        personId: '1234',
+        locked_by: 'Lady Lock',
+        created_at: date,
+        lock_occasion: PersonLockOccasion.MANUELL_GESPERRT,
+        locked_until: date,
+      },
+    ];
 
     personStore.currentPerson!.person.isLocked = true;
     personStore.currentPerson!.person.userLock = parseUserLock(userLock);
     organisationStore.lockingOrganisation = {
       id: '1234',
-      name: userLock.locked_by,
+      name: userLock[0]!.locked_by,
       typ: OrganisationsTyp.Schule,
     };
     await nextTick();
 
     const lockInfoArray: Array<[string, string]> = [
-      ['Gesperrt durch:', userLock.locked_by],
+      ['Gesperrt durch:', userLock[0]!.locked_by],
       ['Gesperrt seit:', formattedDate],
     ];
 
@@ -529,5 +538,17 @@ describe('PersonDetailsView', () => {
 
       expect(wrapper?.find('[data-testid="token-state-error-text"]').isVisible()).toBe(true);
     });
+  });
+
+  test('it shows loading spinner', async () => {
+    personStore.loading = true;
+    personStore.currentPerson = null;
+    await flushPromises();
+
+    expect(wrapper?.find('[data-testid="loading-spinner"]').isVisible()).toBe(true);
+  });
+
+  test('it shows befristung', async () => {
+    expect(wrapper?.find('[data-testid="zuordnung-befristung-text"]').isVisible()).toBe(true);
   });
 });

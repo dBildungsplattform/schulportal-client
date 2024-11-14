@@ -13,6 +13,7 @@ import { nextTick } from 'vue';
 import { createMemoryHistory, createRouter, useRoute, type Router } from 'vue-router';
 import ProfileView from './ProfileView.vue';
 import type { Zuordnung } from '@/stores/PersonenkontextStore';
+import { EmailAddressStatus } from '@/api-client/generated';
 
 let wrapper: VueWrapper | null = null;
 let personInfoStore: PersonInfoStore;
@@ -45,10 +46,12 @@ const mockLehrer: PersonInfoResponse = {
     lokalisierung: null,
     vertrauensstufe: 'KEIN',
     revision: '',
+    dienststellen: [],
   },
   pid: '',
   personenkontexte: [],
   gruppen: [],
+  email: null,
 };
 
 const mockSchueler: PersonInfoResponse = {
@@ -75,10 +78,12 @@ const mockSchueler: PersonInfoResponse = {
     lokalisierung: null,
     vertrauensstufe: 'KEIN',
     revision: '',
+    dienststellen: [],
   },
   pid: '',
   personenkontexte: [],
   gruppen: [],
+  email: null,
 };
 
 const passwordUpdatedAt: Date = new Date(2024, 9, 9);
@@ -370,5 +375,69 @@ describe('ProfileView', () => {
       'Der Server für die Zwei-Faktor-Authentifizierung kann aktuell nicht erreicht werden. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut.',
     );
     expect(document.querySelector('[data-testid="open-2FA-self-service-dialog-icon"]')).toBeNull();
+  });
+
+  describe('email', () => {
+    test('displays correct email status for enabled', async () => {
+      personInfoStore.personInfo = mockLehrer;
+      personInfoStore.personInfo.email = {
+        address: 'test@example.com',
+        status: EmailAddressStatus.Enabled,
+      };
+
+      await nextTick();
+
+      const emailElement: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="person-email-text"]');
+      expect(emailElement?.text()).toBe('test@example.com');
+    });
+
+    test('displays correct email status for requested', async () => {
+      personInfoStore.personInfo = mockLehrer;
+      personInfoStore.personInfo.email = {
+        address: 'test@example.com',
+        status: EmailAddressStatus.Requested,
+      };
+
+      await nextTick();
+
+      const emailElement: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="person-email-text"]');
+      expect(emailElement?.text()).toBe('wird erzeugt');
+    });
+
+    test('displays correct email status for disabled', async () => {
+      personInfoStore.personInfo = mockLehrer;
+      personInfoStore.personInfo.email = {
+        address: 'test@example.com',
+        status: EmailAddressStatus.Disabled,
+      };
+
+      await nextTick();
+
+      const emailElement: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="person-email-text"]');
+      expect(emailElement?.text()).toBe('deaktiviert');
+    });
+
+    test('displays correct email status for failed', async () => {
+      personInfoStore.personInfo = mockLehrer;
+      personInfoStore.personInfo.email = {
+        address: 'test@example.com',
+        status: EmailAddressStatus.Failed,
+      };
+
+      await nextTick();
+
+      const emailElement: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="person-email-text"]');
+      expect(emailElement?.text()).toBe('fehlerhaft');
+    });
+
+    test('hides email when its not set', async () => {
+      personInfoStore.personInfo = mockLehrer;
+      personInfoStore.personInfo.email = null;
+
+      await nextTick();
+
+      const emailElement: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="person-email-text"]');
+      expect(emailElement?.exists()).toBe(false);
+    });
   });
 });

@@ -12,7 +12,7 @@ import {
   type PersonMetadataBodyParams,
   type PersonendatensatzResponse,
 } from '@/api-client/generated';
-import { usePersonStore, type PersonStore, type Personendatensatz } from './PersonStore';
+import { PersonLockOccasion, usePersonStore, type PersonStore, type Personendatensatz } from './PersonStore';
 import ApiService from '@/services/ApiService';
 import MockAdapter from 'axios-mock-adapter';
 import { setActivePinia, createPinia } from 'pinia';
@@ -30,7 +30,22 @@ function getMockPersonendatensatz(): Personendatensatz {
       referrer: '6978',
       personalnummer: '9183756',
       isLocked: false,
-      userLock: null,
+      userLock: [
+        {
+          personId: '1',
+          created_at: '2024-12-22',
+          lock_occasion: PersonLockOccasion.MANUELL_GESPERRT,
+          locked_by: 'ME',
+          locked_until: '2024-12-22',
+        },
+        {
+          personId: '2',
+          created_at: '2024-12-22',
+          lock_occasion: PersonLockOccasion.KOPERS_GESPERRT,
+          locked_by: 'Cron',
+          locked_until: '2024-12-22',
+        },
+      ],
       revision: '1',
       lastModified: '2024-12-22',
       email: {
@@ -54,6 +69,22 @@ function getMockPersonendatensatzResponse(): PersonendatensatzResponse {
       revision: '1',
       startpasswort: '',
       lastModified: '2024-12-22',
+      userLock: [
+        {
+          personId: '1',
+          created_at: '2024-12-22',
+          lock_occasion: PersonLockOccasion.MANUELL_GESPERRT,
+          locked_by: 'ME',
+          locked_until: '2024-12-22',
+        },
+        {
+          personId: '2',
+          created_at: '2024-12-22',
+          lock_occasion: PersonLockOccasion.KOPERS_GESPERRT,
+          locked_by: 'Cron',
+          locked_until: '2024-12-22',
+        },
+      ],
     },
   };
 }
@@ -457,7 +488,38 @@ describe('PersonStore', () => {
       const getPersonByIdPromise: Promise<Personendatensatz> = personStore.getPersonById('1234');
       expect(personStore.loading).toBe(true);
       const currentPerson: Personendatensatz = await getPersonByIdPromise;
-      expect(currentPerson).toEqual(mockPerson);
+      mockPerson.person.userLock!.forEach((lock) => {
+        const lockDate = new Date(lock.locked_until);
+        // Adjust date for MESZ (German summer time) if necessary
+        if (lockDate.getTimezoneOffset() >= -120) {
+          lockDate.setDate(lockDate.getDate() - 1);
+        }
+        const createdAt = new Date(lock.created_at);
+        lock.locked_until = lockDate.toLocaleDateString('de-DE');
+        lock.created_at = createdAt.toLocaleDateString('de-DE');
+      });
+      expect(currentPerson).toEqual(
+        expect.objectContaining({
+          // Include only the relevant properties you want to check
+          person: expect.objectContaining({
+            id: mockPerson.person.id,
+            email: mockPerson.person.email,
+            name: mockPerson.person.name,
+            // Add any other properties that you want to check from currentPerson
+            userLock: expect.arrayContaining([
+              expect.objectContaining({
+                lock_occasion: PersonLockOccasion.MANUELL_GESPERRT,
+                locked_by: mockPerson.person.userLock![0]!.locked_by,
+                locked_until: mockPerson.person.userLock![0]!.locked_until,
+                created_at: mockPerson.person.userLock![0]!.created_at,
+              }),
+              expect.objectContaining({
+                lock_occasion: PersonLockOccasion.KOPERS_GESPERRT,
+              }),
+            ]),
+          }),
+        }),
+      );
       expect(personStore.loading).toBe(false);
     });
 

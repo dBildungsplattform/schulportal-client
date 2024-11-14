@@ -173,6 +173,12 @@
 
 <template>
   <div class="admin">
+    <h1
+      class="text-center headline"
+      data-testid="admin-headline"
+    >
+      {{ $t('admin.headline') }}
+    </h1>
     <LayoutCard
       :closable="true"
       @onCloseClicked="navigateToSchuleManagement"
