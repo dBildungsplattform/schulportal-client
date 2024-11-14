@@ -43,7 +43,7 @@
     },
     {
       text: t('footer.status'),
-      href: import.meta.env['VITE_APP_STATUS_URL'] ?? process.env['VITE_APP_STATUS_URL'],
+      href: import.meta.env['VITE_APP_STATUS_URL'] ?? process.env['VUE_APP_STATUS_URL'],
       external: true,
     },
   ]);
