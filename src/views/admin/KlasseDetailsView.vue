@@ -333,7 +333,7 @@
       <template v-if="organisationStore.updatedOrganisation && !organisationStore.errorCode">
         <SuccessTemplate
           :backButtonTestId="'back-to-details-button'"
-          :backButtonText="$t('nav.backToDetails')"
+          :backButtonText="$t('nav.backToList')"
           :createAnotherButtonText="$t('admin.klasse.createAnother')"
           :createdData="[
             { label: $t('admin.schule.schule'), value: translatedSchulname || '', testId: 'created-klasse-schule' },
@@ -344,7 +344,7 @@
             },
           ]"
           :followingDataCreated="$t('admin.followingDataCreated')"
-          @onNavigateBack="router.go(0)"
+          @onNavigateBack="navigateToKlasseManagement"
           :showCreateAnotherButton="false"
           :successMessage="$t('admin.klasse.klasseUpdatedSuccessfully')"
         />
