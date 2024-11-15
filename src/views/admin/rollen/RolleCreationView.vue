@@ -101,11 +101,17 @@
   }
 
   async function navigateBackToRolleForm(): Promise<void> {
-    await router.push({ name: 'create-rolle' });
-    rolleStore.errorCode = '';
+    if (rolleStore.errorCode === 'REQUIRED_STEP_UP_LEVEL_NOT_MET') {
+      formContext.resetForm();
+      window.location.reload();
+    } else {
+      rolleStore.errorCode = '';
+      await router.push({ path: '/admin/rollen/new' });
+    }
   }
 
   async function navigateToRolleManagement(): Promise<void> {
+    formContext.resetForm();
     await router.push({ name: 'rolle-management' });
     rolleStore.createdRolle = null;
   }
@@ -173,6 +179,7 @@
   );
 
   function preventNavigation(event: BeforeUnloadEvent): void {
+    if (rolleStore.errorCode) formContext.resetForm();
     if (!isFormDirty.value) return;
     event.preventDefault();
     /* Chrome requires returnValue to be set. */

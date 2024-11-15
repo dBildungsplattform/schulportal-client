@@ -270,8 +270,16 @@
   }
 
   async function navigateToPersonTable(): Promise<void> {
-    await router.push({ name: 'person-management' });
-    personenkontextStore.createdPersonWithKontext = null;
+    if (
+      personStore.errorCode === 'REQUIRED_STEP_UP_LEVEL_NOT_MET' ||
+      personenkontextStore.errorCode === 'REQUIRED_STEP_UP_LEVEL_NOT_MET'
+    ) {
+      formContext.resetForm();
+      window.location.reload();
+    } else {
+      await router.push({ name: 'person-management' });
+      personenkontextStore.createdPersonWithKontext = null;
+    }
   }
 
   function handleFieldReset(field: string): void {
@@ -330,9 +338,17 @@
   });
 
   async function navigateBackToPersonForm(): Promise<void> {
-    await router.push({ name: 'create-person' });
-    personStore.errorCode = '';
-    personenkontextStore.errorCode = '';
+    if (
+      personStore.errorCode === 'REQUIRED_STEP_UP_LEVEL_NOT_MET' ||
+      personenkontextStore.errorCode === 'REQUIRED_STEP_UP_LEVEL_NOT_MET'
+    ) {
+      formContext.resetForm();
+      window.location.reload();
+    } else {
+      personStore.errorCode = '';
+      personenkontextStore.errorCode = '';
+      await router.push({ name: 'create-person' });
+    }
   }
 
   const handleCreateAnotherPerson = (): void => {

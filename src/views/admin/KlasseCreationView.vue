@@ -105,8 +105,13 @@
   };
 
   async function navigateBackToKlasseForm(): Promise<void> {
-    organisationStore.errorCode = '';
-    await router.push({ name: 'create-klasse' });
+    if (organisationStore.errorCode === 'REQUIRED_STEP_UP_LEVEL_NOT_MET') {
+      resetForm();
+      window.location.reload();
+    } else {
+      organisationStore.errorCode = '';
+      await router.push({ name: 'create-klasse' });
+    }
   }
 
   async function navigateToKlasseManagement(): Promise<void> {

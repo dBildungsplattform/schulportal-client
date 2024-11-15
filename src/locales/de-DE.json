@@ -249,7 +249,8 @@
         "NEWER_VERSION_OF_PERSONENKONTEXTE_AVAILABLE": "Geänderte Daten",
         "PERSONALNUMMER_NICHT_EINDEUTIG": "KoPers.-Nr. nicht eindeutig",
         "PERSONENKONTEXTE_UPDATE_ERROR": "Geänderte Daten",
-        "PERSON_NOT_FOUND": "Benutzer gelöscht"
+        "PERSON_NOT_FOUND": "Benutzer gelöscht",
+        "REQUIRED_STEP_UP_LEVEL_NOT_MET":"Zwei-Faktor-Authentifizierung (2FA) erforderlich"
       },
       "errors": {
         "COUNT_MISMATCHING": "Der Benutzer wurde zwischenzeitlich von einer anderen Administratorin oder einem anderen Administrator bearbeitet. Bitte aktualisieren Sie die Daten und versuchen Sie es erneut.",
@@ -259,7 +260,8 @@
         "PERSONALNUMMER_NICHT_EINDEUTIG": "Die eingegebene KoPers.-Nr. ist bereits vergeben. Bitte korrigieren Sie Ihre Eingabe.",
         "PERSONENKONTEXT_SPECIFICATION_ERROR": "Die Zuordnung konnte nicht angelegt werden.",
         "PERSONENKONTEXTE_UPDATE_ERROR": "Die Zuordnung konnte nicht aktualisiert werden. Bitte versuchen Sie es später erneut.",
-        "PERSON_NOT_FOUND": "Der Benutzer wurde seit Ihrer letzten Änderung gelöscht und kann nicht mehr bearbeitet werden."
+        "PERSON_NOT_FOUND": "Der Benutzer wurde seit Ihrer letzten Änderung gelöscht und kann nicht mehr bearbeitet werden.",
+        "REQUIRED_STEP_UP_LEVEL_NOT_MET":"Die letzte Aktion konnte nicht ausgeführt werden. Aufgrund von längerer Inaktivität ist eine erneute Authentifizierung mit einem zweiten Faktor erforderlich. Um fortzufahren, klicken Sie bitte auf „Zurück zur Ergebnisliste“ oder „Schließen“. Sie werden anschließend zur Eingabe Ihres zweiten Faktors aufgefordert."
       }
     },
     "rolle": {
