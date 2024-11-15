@@ -137,8 +137,13 @@
   }
 
   async function navigateToSchuleManagement(): Promise<void> {
-    await router.push({ name: 'schule-management' });
-    organisationStore.createdSchule = null;
+    if (organisationStore.errorCode === 'REQUIRED_STEP_UP_LEVEL_NOT_MET') {
+      resetForm();
+      window.location.reload();
+    } else {
+      await router.push({ name: 'schule-management' });
+      organisationStore.createdSchule = null;
+    }
   }
 
   async function navigateBackToSchuleForm(): Promise<void> {
