@@ -1,5 +1,5 @@
 import { expect, type MockInstance, test } from 'vitest';
-import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
+import { DOMWrapper, VueWrapper, flushPromises, mount } from '@vue/test-utils';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import routes from '@/router/routes';
 import { useAuthStore, type AuthStore, type UserInfo } from '@/stores/AuthStore';
@@ -102,7 +102,7 @@ const mockPersonenuebersicht: PersonWithUebersicht = {
       administriertVon: '2',
       editable: true,
       merkmale: [] as unknown as RollenMerkmal,
-      befristung: '',
+      befristung: '2099-08-12',
     },
     {
       sskId: '3',
@@ -252,7 +252,9 @@ describe('PersonDetailsView', () => {
     expect(wrapper?.find('[data-testid="person-familienname"]').text()).toBe('Orton');
     expect(wrapper?.find('[data-testid="person-username"]').text()).toBe('jorton');
     expect(wrapper?.find('[data-testid="person-email"]').text()).toBe('email@email.com');
-    expect(wrapper?.find('[data-testid="person-zuordnung-1"]').text()).toBe('123456 (Testschule Birmingham): SuS 9a');
+    expect(wrapper?.find('[data-testid="person-zuordnung-1"]').text()).toBe(
+      '123456 (Testschule Birmingham): SuS 9a  (befristet bis 11.08.2099)',
+    );
     expect(wrapper?.getComponent({ name: 'PasswordReset' })).toBeTruthy();
   });
 
@@ -536,5 +538,17 @@ describe('PersonDetailsView', () => {
 
       expect(wrapper?.find('[data-testid="token-state-error-text"]').isVisible()).toBe(true);
     });
+  });
+
+  test('it shows loading spinner', async () => {
+    personStore.loading = true;
+    personStore.currentPerson = null;
+    await flushPromises();
+
+    expect(wrapper?.find('[data-testid="loading-spinner"]').isVisible()).toBe(true);
+  });
+
+  test('it shows befristung', async () => {
+    expect(wrapper?.find('[data-testid="zuordnung-befristung-text"]').isVisible()).toBe(true);
   });
 });

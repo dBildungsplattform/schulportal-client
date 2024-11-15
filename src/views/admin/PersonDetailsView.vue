@@ -673,10 +673,25 @@
 
   // Triggers the template to change the Klasse. Also pre-select the Schule and Klasse.
   const triggerChangeKlasse = async (): Promise<void> => {
-    // Get the Klasse from the parent
+    // Get the Klasse from the parent using the parent's ID and the klasse name
     if (selectedZuordnungen.value[0]?.sskId) {
-      await organisationStore.getKlassenByOrganisationId(selectedZuordnungen.value[0]?.sskId);
-    }
+  await organisationStore.getAllOrganisationen({
+    administriertVon: [selectedZuordnungen.value[0]?.sskId],
+    includeTyp: OrganisationsTyp.Klasse,
+    systemrechte: ['KLASSEN_VERWALTEN'],
+  });
+  
+  await organisationStore.getKlassenByOrganisationId(
+    selectedZuordnungen.value[0]?.sskId, 
+    {searchString: selectedZuordnungen.value[0].klasse}
+  );
+  
+  // Combine arrays and remove duplicates based on id
+  const combined = [...organisationStore.klassen, ...organisationStore.allKlassen];
+  organisationStore.klassen = Array.from(
+    new Map(combined.map(item => [item.id, item])).values()
+  );
+}
     // Auto select the new Schule
     selectedSchule.value = selectedZuordnungen.value[0]?.sskId;
     // Retrieves the new Klasse from the selected Zuordnung
@@ -1246,16 +1261,12 @@
 
 <template>
   <div class="admin">
-    <v-row>
-      <v-col cols="12">
-        <h1
-          class="text-center headline-1"
-          data-testid="admin-headline"
-        >
-          {{ $t('admin.headline') }}
-        </h1>
-      </v-col>
-    </v-row>
+    <h1
+      class="text-center headline"
+      data-testid="admin-headline"
+    >
+      {{ $t('admin.headline') }}
+    </h1>
     <LayoutCard
       :closable="true"
       data-testid="person-details-card"
@@ -1548,7 +1559,11 @@
                 </PasswordReset>
               </div>
             </v-col>
-            <v-col v-else-if="personStore.loading"> <v-progress-circular indeterminate></v-progress-circular></v-col
+            <v-col v-else-if="personStore.loading">
+              <v-progress-circular
+                data-testid="loading-spinner"
+                indeterminate
+              ></v-progress-circular></v-col
           ></v-row>
         </v-container>
         <v-divider
@@ -1616,7 +1631,12 @@
               <span class="text-body">
                 {{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
                 {{ zuordnung.klasse }}
-                <span v-if="zuordnung.befristung"> ({{ formatDate(zuordnung.befristung, t) }})</span>
+                <span
+                  v-if="zuordnung.befristung"
+                  data-testid="zuordnung-befristung-text"
+                >
+                  ({{ formatDate(zuordnung.befristung, t) }})</span
+                >
               </span>
             </v-col>
           </v-row>
@@ -2192,7 +2212,7 @@
                     </v-col>
                     <div class="v-col">
                       <p v-if="twoFactorAuthentificationStore.hasToken && !twoFactorAuthentificationStore.required">
-                        {{ $t('admin.person.twoFactorAuthentication.NoLongerNeedToken') }}
+                        {{ $t('admin.person.twoFactorAuthentication.noLongerNeedToken') }}
                       </p>
                       <p v-else-if="twoFactorAuthentificationStore.hasToken">
                         {{ $t('admin.person.twoFactorAuthentication.resetInfo') }}

@@ -24,9 +24,48 @@
       "limitedUntil": "befristet bis",
       "untilEndOfSchoolYear": "Bis Schuljahresende"
     },
-    "mandatoryFieldsNotice": "Mit * markierte Felder sind Pflichtangaben.",
     "followingDataCreated": "Folgende Daten wurden gespeichert:",
     "headline": "Administrationsbereich",
+    "import": {
+      "anotherImport": "Weiteren Import durchführen",
+      "backToUpload": "Andere Datei hochladen",
+      "confirmationText": "Achtung, diese Aktion kann nicht rückgängig gemacht werden. Möchten Sie den Import wirklich durchführen?",
+      "downloadUserdata": "Benutzerdaten herunterladen",
+      "errors": {
+        "CSV_PARSING_ERROR": "Die Datei konnte nicht gelesen werden. Bitte überprüfen Sie das Format.",
+        "ERROR_IMPORTING_FILE": "Die Daten konnten nicht importiert werden. Bitte versuchen Sie es erneut.",
+        "ERROR_UPLOADING_FILE": "Die Datei konnte nicht hochgeladen werden. Bitte versuchen Sie es mit einer anderen Datei.",
+        "followingDataInvalid": "Die folgenden Datensätze sind ungültig:",
+        "IMPORT_DATA_ITEM_KLASSE_IS_TOO_SHORT": "Klasse fehlt",
+        "IMPORT_DATA_ITEM_KLASSE_NOT_FOUND": "Klasse an der ausgewählten Schule nicht gefunden",
+        "IMPORT_DATA_ITEM_NACHNAME_IS_INVALID": "Nachname enthält ungültige Zeichen",
+        "IMPORT_DATA_ITEM_NACHNAME_IS_TOO_SHORT": "Nachname fehlt",
+        "IMPORT_DATA_ITEM_VORNAME_IS_INVALID": "Vorname enthält ungültige Zeichen",
+        "IMPORT_DATA_ITEM_VORNAME_IS_TOO_SHORT": "Vorname fehlt",
+        "CSV_FILE_INVALID_HEADER_ERROR": "Die Datei konnte nicht gelesen werden. Bitte überprüfen Sie die Spaltenüberschriften."
+      },
+      "executeImport": "Import durchführen",
+      "fileName": {
+        "person": "Benutzerdaten"
+      },
+      "importedSuccessfully": "Die Daten wurden erfolgreich importiert. Die importierten Daten stehen zum Download bereit.",
+      "rules": {
+        "files": {
+          "required": "Eine CSV-Datei muss ausgewählt werden."
+        },
+        "rolle": {
+          "required": "Eine Rolle muss ausgewählt werden."
+        },
+        "schule": {
+          "required": "Eine Schule muss ausgewählt werden."
+        }
+      },
+      "recordsReadyForImport": "{count} Datensatz steht zum Import bereit. | {count} Datensätze stehen zum Import bereit.",
+      "selectOrDropFile": "Datei auswählen oder ablegen",
+      "uploadedSuccessfully": "Die Datei wurde erfolgreich hochgeladen.",
+      "uploadErrorTitle": "Fehler beim Upload",
+      "uploadFile": "Datei hochladen"
+    },
     "koPers": {
       "koPersNumber": "KoPers.-Nr.",
       "noKoPersNumber": "Keine KoPers.-Nr. vorhanden"
@@ -84,6 +123,7 @@
       },
       "showAll": "Alle Klassen anzeigen"
     },
+    "mandatoryFieldsNotice": "Mit * markierte Felder sind Pflichtangaben.",
     "organisation": {
       "assignOrganisation": "Organisationsebene zuordnen",
       "errors": {
@@ -106,6 +146,70 @@
       "backToCreatePerson": "Zurück zur Benutzeranlage",
       "backToInput": "Zurück zur Eingabe",
       "changePassword": "Passwort ändern",
+      "copyPasswordError": "Passwort konnte nicht in die Zwischenablage kopiert werden",
+      "copyPasswordSuccess": "Passwort in Zwischenablage kopiert",
+      "create": "Benutzer anlegen",
+      "createAnother": "Weiteren Benutzer anlegen",
+      "createNew": "Neue Benutzer anlegen",
+      "creationErrorText": "",
+      "creationErrorTitle": "Fehler beim Anlegen des Benutzers",
+      "deletePerson": "Benutzer löschen",
+      "deletePersonConfirmation": "Wollen Sie den Benutzer {firstname} {lastname} sofort und endgültig löschen?",
+      "deletePersonSuccessMessage": "{firstname} {lastname} wurde erfolgreich gelöscht.",
+      "discard": "Benutzer verwerfen",
+      "disableUser": "Benutzer sperren",
+      "edit": "Benutzer bearbeiten",
+      "editPersonalInfo": "Persönliche Informationen bearbeiten",
+      "errors": {
+        "PERSONALNUMMER_NICHT_EINDEUTIG": "Die eingegebene KoPers.-Nr. ist bereits vergeben. Bitte korrigieren Sie Ihre Eingabe.",
+        "ERROR_LOADING_USER": "Es konnten keine Benutzerdaten geladen werden.",
+        "PERSONALNUMMER_REQUIRED": "Die Änderungen wurden nicht gespeichert, da keine KoPers.-Nr. eingegeben wurde.",
+        "PERSON_NOT_FOUND": "Der Benutzer wurde seit Ihrer letzten Änderung gelöscht und kann nicht mehr bearbeitet werden."
+      },
+      "generatedPassword": "Generiertes Passwort",
+      "homePageIQSH":"Homepage der IQSH-Medienberatung",
+      "import": "Benutzer importieren",
+      "loadingErrorText": "Es konnten keine Benutzerdaten geladen werden.",
+      "loadingErrorTitle": "Fehler beim Laden des Benutzers",
+      "management": "Benutzerverwaltung",
+      "noKopersNr": "KoPers.-Nr. nicht vorhanden",
+      "noKopersNrConfirmationDialogMessage": "Bitte beachten Sie, dass ein Benutzerkonto ohne KoPers.-Nr. nach 8 Wochen automatisch gesperrt wird. Tragen Sie daher die KoPers.-Nr. bitte in der Gesamtübersicht des Benutzers nach, sobald diese Ihnen vorliegt.",
+      "personalInfo": "Persönliche Informationen",
+      "personalInfoChangeNotice": "Namensänderungen haben unmittelbare Auswirkungen auf den Benutzernamen im Schulportal SH und auf die E-Mail-Adresse! \n\nWeitere Informationen finden Sie auf der Homepage der IQSH-Medienberatung.",
+      "personalInfoChangeNotice2": "Weitere Informationen finden Sie auf der ",
+      "personalInfoSuccessDialogMessage": "Die Stammdaten wurden erfolgreich geändert.",
+      "personalInfoSuccessDialogMessageWithUsername": "Die Stammdaten wurden erfolgreich geändert.\n\nDas Passwort wurde nicht verändert und kann wie zuvor verwendet werden. \n\nBitte teilen Sie der betroffenen Person die Stammdatenänderung (Benutzername, Mail-Adresse) mit. \n\nDie neuen Daten können Sie in der Gesamtübersicht einsehen." ,
+      "printPassword": "Passwort drucken",
+      "resetPasswordConfirmation": "Sind Sie sicher, dass Sie das Passwort für {firstname} {lastname} zurücksetzen möchten?",
+      "resetPasswordInformation": "Bitte teilen Sie dem Benutzer das temporäre Passwort mit. Nach dem Schließen des Dialogs wird es aus Sicherheitsgründen nicht mehr angezeigt.",
+      "resetPassword": "Passwort zurücksetzen",
+      "rules": {
+        "vorname": {
+          "matches": "Der Vorname enthält ungültige Zeichen.",
+          "noLeadingTrailingSpaces": "Der Vorname darf nicht mit Leerzeichen beginnen oder enden.",
+          "min": "Der Vorname muss mindestens 2 Zeichen lang sein.",
+          "required": "Der Vorname ist erforderlich."
+        },
+        "familienname": {
+          "matches": "Der Familienname enthält ungültige Zeichen.",
+          "noLeadingTrailingSpaces": "Der Familienname darf nicht mit Leerzeichen beginnen oder enden.",
+          "min": "Der Familienname muss mindestens 2 Zeichen lang sein.",
+          "required": "Der Familienname ist erforderlich."
+        },
+        "kopersNr": {
+          "required": "Die KoPers.-Nr. ist erforderlich.",
+          "noLeadingTrailingSpaces": "Die Kopers.-Nr. darf nicht mit Leerzeichen beginnen oder enden."
+        }
+      },
+      "syncPerson": "Neu synchronisieren",
+      "syncPersonConfirmation": "Der Benutzer wird an alle angeschlossenen Systeme neu übertragen und dort ggf. aktualisiert. Dies kann je nach System einige Zeit in Anspruch nehmen.",
+      "syncPersonSuccessMessage": "Die Synchronisation wurde gestartet.",
+      "title": {
+        "ERROR_LOADING_USER": "Fehler beim Laden des Benutzers",
+        "PERSONALNUMMER_NICHT_EINDEUTIG": "KoPers.-Nr. nicht eindeutig",
+        "PERSONALNUMMER_REQUIRED": "Personalnummer erforderlich",
+        "PERSON_NOT_FOUND": "Benutzer gelöscht"
+      },
       "twoFactorAuthentication": {
         "setUpShort": "2FA einrichten",
         "setUpLong": "Zwei-Faktor-Authentifizierung einrichten",
@@ -167,72 +271,8 @@
         "enterOtp": "Bitte geben Sie das angezeigte Einmalpasswort ein, um die Einrichtung abzuschließen.",
         "invalidOtp": "Ungültiger Code. Bitte versuchen Sie es erneut.",
         "otp": "Einmalpasswort",
-        "SecondFactorNotSet": "Es wurde noch kein zweiter Faktor für Sie eingerichtet.",
-        "NoLongerNeedToken": "Dieser Benutzer hat keinen Zugriff mehr auf sicherheitskritische Bereiche und benötigt aktuell den eingerichteten Token nicht."
-      },
-      "copyPasswordError": "Passwort konnte nicht in die Zwischenablage kopiert werden",
-      "copyPasswordSuccess": "Passwort in Zwischenablage kopiert",
-      "create": "Benutzer anlegen",
-      "createAnother": "Weiteren Benutzer anlegen",
-      "createNew": "Neue Benutzer anlegen",
-      "creationErrorText": "",
-      "creationErrorTitle": "Fehler beim Anlegen des Benutzers.",
-      "deletePerson": "Benutzer löschen",
-      "deletePersonConfirmation": "Wollen Sie den Benutzer {firstname} {lastname} sofort und endgültig löschen?",
-      "deletePersonSuccessMessage": "{firstname} {lastname} wurde erfolgreich gelöscht.",
-      "discard": "Benutzer verwerfen",
-      "disableUser": "Benutzer sperren",
-      "edit": "Benutzer bearbeiten",
-      "editPersonalInfo": "Persönliche Informationen bearbeiten",
-      "generatedPassword": "Generiertes Passwort",
-      "noKopersNr": "KoPers.-Nr. nicht vorhanden",
-      "noKopersNrConfirmationDialogMessage": "Bitte beachten Sie, dass ein Benutzerkonto ohne KoPers.-Nr. nach 8 Wochen automatisch gesperrt wird. Tragen Sie daher die KoPers.-Nr. bitte in der Gesamtübersicht des Benutzers nach, sobald diese Ihnen vorliegt.",
-      "loadingErrorText": "Es konnten keine Benutzerdaten geladen werden.",
-      "loadingErrorTitle": "Fehler beim Laden des Benutzers",
-      "management": "Benutzerverwaltung",
-      "personalInfo": "Persönliche Informationen",
-      "personalInfoChangeNotice": "Namensänderungen haben unmittelbare Auswirkungen auf den Benutzernamen im Schulportal SH und auf die E-Mail-Adresse!",
-      "personalInfoChangeNotice2": "Weitere Informationen finden Sie auf der ",
-      "homePageIQSH": "Homepage der IQSH-Medienberatung",
-      "personalInfoSuccessDialogMessageWithUsername": "Die Stammdaten wurden erfolgreich geändert.\n\nDas Passwort wurde nicht verändert und kann wie zuvor verwendet werden. \n\nBitte teilen Sie der betroffenen Person die Stammdatenänderung (Benutzername, Mail-Adresse) mit. \n\nDie neuen Daten können Sie in der Gesamtübersicht einsehen.",
-      "resetPasswordConfirmation": "Sind Sie sicher, dass Sie das Passwort für {firstname} {lastname} zurücksetzen möchten?",
-      "resetPasswordInformation": "Bitte teilen Sie dem Benutzer das temporäre Passwort mit. Nach dem Schließen des Dialogs wird es aus Sicherheitsgründen nicht mehr angezeigt.",
-      "resetPassword": "Passwort zurücksetzen",
-      "printPassword": "Passwort drucken",
-      "syncPerson": "Neu synchronisieren",
-      "syncPersonConfirmation": "Der Benutzer wird an alle angeschlossenen Systeme neu übertragen und dort ggf. aktualisiert. Dies kann je nach System einige Zeit in Anspruch nehmen.",
-      "syncPersonSuccessMessage": "Die Synchronisation wurde gestartet.",
-      "rules": {
-        "vorname": {
-          "matches": "Der Vorname enthält ungültige Zeichen.",
-          "noLeadingTrailingSpaces": "Der Vorname darf nicht mit Leerzeichen beginnen oder enden.",
-          "min": "Der Vorname muss mindestens 2 Zeichen lang sein.",
-          "required": "Der Vorname ist erforderlich."
-        },
-        "familienname": {
-          "matches": "Der Familienname enthält ungültige Zeichen.",
-          "noLeadingTrailingSpaces": "Der Familienname darf nicht mit Leerzeichen beginnen oder enden.",
-          "min": "Der Familienname muss mindestens 2 Zeichen lang sein.",
-          "required": "Der Familienname ist erforderlich."
-        },
-        "kopersNr": {
-          "required": "Die KoPers.-Nr. ist erforderlich.",
-          "noLeadingTrailingSpaces": "Die Kopers.-Nr. darf nicht mit Leerzeichen beginnen oder enden."
-        }
-      },
-      "title": {
-        "ERROR_LOADING_USER": "Fehler beim Laden des Benutzers",
-        "PERSONALNUMMER_NICHT_EINDEUTIG": "KoPers.-Nr. nicht eindeutig",
-        "PERSONALNUMMER_REQUIRED": "Personalnummer erforderlich",
-        "PERSON_NOT_FOUND": "Benutzer gelöscht",
-        "NEWER_VERSION_OF_PERSON_AVAILABLE": "Geänderte Daten"
-      },
-      "errors": {
-        "PERSONALNUMMER_NICHT_EINDEUTIG": "Die eingegebene KoPers.-Nr. ist bereits vergeben. Bitte korrigieren Sie Ihre Eingabe.",
-        "ERROR_LOADING_USER": "Es konnten keine Benutzerdaten geladen werden.",
-        "PERSONALNUMMER_REQUIRED": "Die Änderungen wurden nicht gespeichert, da keine KoPers.-Nr. eingegeben wurde.",
-        "PERSON_NOT_FOUND": "Der Benutzer wurde seit Ihrer letzten Änderung gelöscht und kann nicht mehr bearbeitet werden.",
-        "NEWER_VERSION_OF_PERSON_AVAILABLE": "Der Benutzer wurde zwischenzeitlich von einer anderen Administratorin oder einem anderen Administrator bearbeitet. Bitte aktualisieren Sie die Daten und versuchen Sie es erneut."
+        "secondFactorNotSet": "Es wurde noch kein zweiter Faktor für Sie eingerichtet.",
+        "noLongerNeedToken": "Dieser Benutzer hat keinen Zugriff mehr auf sicherheitskritische Bereiche und benötigt aktuell den eingerichteten Token nicht."
       },
       "showAll": "Alle Benutzer anzeigen",
       "startPassword": "Einstiegs-Passwort",
@@ -279,6 +319,7 @@
         "NEWER_VERSION_OF_ROLLE_AVAILABLE": "Die Rolle wurde zwischenzeitlich von einer anderen Administratorin oder einem anderen Administrator bearbeitet. Bitte aktualisieren Sie die Daten und versuchen Sie es erneut.",
         "ROLLE_ERROR": "Die Rolle konnte nicht angelegt werden.",
         "ROLLE_HAT_PERSONENKONTEXTE_ERROR": "Die Rolle kann nicht gelöscht werden, da die sie noch Benutzern zugeordnet ist. Nehmen Sie bitte zunächst alle Zuordnungen zurück.",
+        "ROLLE_NAME_UNIQUE_ON_SSK": "Der Rollenname ist bereits vergeben. Bitte korrigieren Sie Ihre Eingabe.",
         "UPDATE_MERKMALE_ERROR": "Die gewünschte Bearbeitung kann nicht ausgeführt werden, da die Rolle noch Benutzern zugeordnet ist. Nehmen Sie bitte zunächst alle Zuordnungen zurück."
       },
       "title": {
@@ -286,6 +327,7 @@
         "ROLLE_ERROR": "Fehler bei Erstellung der Rolle",
         "ROLLE_HAT_PERSONENKONTEXTE_ERROR": "Löschen nicht möglich",
         "ROLLE_UPDATE_ERROR": "Die Rolle konnte nicht bearbeitet werden",
+        "ROLLE_NAME_UNIQUE_ON_SSK": "Der Rollenname ist nicht eindeutig",
         "UPDATE_MERKMALE_ERROR": "Die Merkmale konnten nicht bearbeitet werden"
       },
       "isAllowedToManageRollen": "Darf Rollen verwalten",
@@ -294,6 +336,7 @@
       "management": "Rollenverwaltung",
       "mappingFrontBackEnd": {
         "systemrechte": {
+          "IMPORT_DURCHFUEHREN": "Darf Import durchführen",
           "ROLLEN_VERWALTEN": "Darf Rollen verwalten",
           "PERSONEN_SOFORT_LOESCHEN": "Darf Benutzer sofort löschen",
           "PERSONEN_VERWALTEN": "Darf Benutzer verwalten",
@@ -390,6 +433,7 @@
           "required": "Der Schulname muss angegeben werden."
         }
       },
+      "selectSchule": "Schule auswählen",
       "selectSchuleFirst": "Bitte erst eine Schule auswählen.",
       "schule": "Schule",
       "schulenFound": "{count} Schule gefunden | {count} Schulen gefunden",
@@ -513,32 +557,32 @@
     "firstAndLastName": "Vor- und Nachname",
     "finishEditFirst": "Bitte beenden Sie zunächst Ihre aktuelle Bearbeitung.",
     "klasse": "Klasse",
+    "kopersLock": "Dieser Benutzer wurde aufgrund einer fehlenden KoPers.-Nr. gesperrt. Bitte tragen Sie eine gültige KoPers.-Nr. nach. Diese Sperre kann nicht auf anderem Wege aufgehoben werden.",
     "kopersNr": "KoPers.-Nr.",
     "lastName": "Nachname",
-    "userIsLocked": "Dieser Benutzer ist gesperrt.",
-    "userIsUnlocked": "Dieser Benutzer ist aktiv.",
-    "lockTime": "Dauer der Sperre",
     "lockUser": "Benutzer sperren",
     "lockUserInfoText": "Für die Dauer der Sperre hat der Benutzer keinen Zugriff mehr auf das Schulportal SH und die daran angeschlossenen Dienste.",
     "lockedBy": "Gesperrt durch",
     "lockedSince": "Gesperrt seit",
     "lockedUntil": "Gesperrt bis",
-    "unlockUser": "Benutzer entsperren",
-    "kopersLock": "Dieser Benutzer wurde aufgrund einer fehlenden KoPers.-Nr. gesperrt. Bitte tragen Sie eine gültige KoPers.-Nr. nach. Diese Sperre kann nicht auf anderem Wege aufgehoben werden.",
-    "unLockUserInfoText": "Ich bestätige, dass ich mit der sperrenden Stelle geklärt habe, dass die Sperre aufgehoben werden darf.",
     "lockError": "Der Benutzer konnte nicht gesperrt werden.",
-    "unlockError": "Der Benutzer konnte nicht entsperrt werden.",
+    "lockTime": "Dauer der Sperre",
     "modifyBefristung": "Befristung bearbeiten",
     "modifyBefristungDescription": "Ändert die Befristung der Zuordnung des Benutzers zu dieser Schule.",
     "noChangesToSave": "Es liegen keine zu speichernden Änderungen vor.",
     "noZuordnungenFound": "Keine Schulzuordnungen gefunden.",
     "password": "Passwort",
-    "twoFactorAuthenticationSetUpHeader": "Zwei-Faktor-Authentifizierung (2FA)",
     "removeZuordnung": "Schulzuordnung entfernen",
     "removeZuordnungDescription": "Entfernt den Benutzer von der Schule.",
     "rolle": "Rolle",
-    "userName": "Benutzername",
     "saveChanges": "Änderungen speichern",
+    "twoFactorAuthenticationSetUpHeader": "Zwei-Faktor-Authentifizierung (2FA)",
+    "unlockError": "Der Benutzer konnte nicht entsperrt werden.",
+    "unlockUser": "Benutzer entsperren",
+    "unLockUserInfoText": "Ich bestätige, dass ich mit der sperrenden Stelle geklärt habe, dass die Sperre aufgehoben werden darf.",
+    "userIsLocked": "Dieser Benutzer ist gesperrt.",
+    "userIsUnlocked": "Dieser Benutzer ist aktiv.",
+    "userName": "Benutzername",
     "willBeCreated": "wird hinzugefügt",
     "willBeRemoved": "wird entfernt",
     "zuordnungen": "Schulzuordnung(en)",
