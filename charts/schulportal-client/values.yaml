@@ -55,9 +55,3 @@ autoscaling:
   minReplicas: 1
   maxReplicas: 5
   targetCPUUtilizationPercentage: 60
-
-status:
-  # set here the value for dev, for staging add this status: block in here: 
-  # https://github.com/dBildungsplattform/spsh-app-release/blob/main/config/helm-charts/staging/schulportal-client/values.yml
-  # for prod here: https://github.com/dBildungsplattform/spsh-app-release/blob/main/config/helm-charts/prod/schulportal-client/values.yml
-  url: "https://status.dev.spsh.dbildungsplattform.de/"
