@@ -1,0 +1,35 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: db
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+    volumes:
+      - ./src/db:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+
+  keycloak:
+    image: ghcr.io/dbildungsplattform/dbildungs-iam-keycloak:latest
+    container_name: dbildungs-iam-client-keycloak
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      DB_VENDOR: postgres
+      DB_ADDR: db
+      DB_DATABASE: db
+      DB_USER: admin
+      DB_PASSWORD: admin
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    networks:
+      - dbildungs-iam-client-network
+
+networks:
+  dbildungs-iam-client-network:
+    driver: bridge
