@@ -109,9 +109,9 @@
     event.returnValue = '';
   }
 
-  function navigateToKlasseManagement(): void {
+  async function navigateToKlasseManagement(): Promise<void> {
+    await router.push({ name: 'klasse-management' });
     organisationStore.updatedOrganisation = null;
-    router.push({ name: 'klasse-management' });
   }
 
   const handleAlertClose = (): void => {
@@ -148,6 +148,7 @@
 
   onBeforeMount(async () => {
     organisationStore.errorCode = '';
+    organisationStore.updatedOrganisation = null;
     // Retrieves the Klasse using the Id in the route since that's all we have
     await organisationStore.getOrganisationById(currentOrganisationId, OrganisationsTyp.Klasse);
     // Retrieves the parent Organisation of the Klasse using the same endpoint but with a different parameter
