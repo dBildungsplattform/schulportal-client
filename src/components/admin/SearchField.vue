@@ -28,10 +28,10 @@
 
   async function applySearchFilter(): Promise<void> {
     if (searchFilter.value !== null) {
-      await searchFilterStore.setSearchFilter(searchFilter.value.trim());
+      await searchFilterStore.setSearchFilterForPersonen(searchFilter.value.trim());
       emit('onApplySearchFilter', searchFilter.value.trim());
     } else {
-      await searchFilterStore.setSearchFilter(searchFilter.value);
+      await searchFilterStore.setSearchFilterForPersonen(searchFilter.value);
       emit('onApplySearchFilter', '');
     }
   }
