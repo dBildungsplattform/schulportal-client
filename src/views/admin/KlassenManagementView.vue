@@ -123,10 +123,12 @@
 
     const klassenCopy: Organisation[] = JSON.parse(JSON.stringify(organisationStore.klassen));
 
-    // In the table show only the Klassen that are selected
-    organisationStore.allKlassen = klassenCopy.filter((klasse: Organisation) =>
-      searchFilterStore.selectedKlassenForKlassen?.includes(klasse.id),
-    );
+    if (searchFilterStore.selectedKlassenForKlassen?.length && searchFilterStore.selectedKlassenForKlassen.length > 0) {
+      // In the table show only the Klassen that are selected
+      organisationStore.allKlassen = klassenCopy.filter((klasse: Organisation) =>
+        searchFilterStore.selectedKlassenForKlassen?.includes(klasse.id),
+      );
+    }
   }
 
   async function updateSelectedSchule(newValue: string | null): Promise<void> {
