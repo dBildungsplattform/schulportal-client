@@ -110,9 +110,9 @@
     event.returnValue = '';
   }
 
-  function navigateToKlasseManagement(): void {
+  async function navigateToKlasseManagement(): Promise<void> {
+    await router.push({ name: 'klasse-management' });
     organisationStore.updatedOrganisation = null;
-    router.push({ name: 'klasse-management' });
   }
 
   const handleAlertClose = (): void => {
@@ -181,6 +181,7 @@
       next();
     }
     organisationStore.errorCode = '';
+    organisationStore.updatedOrganisation = null;
   });
 
   onUnmounted(() => {
