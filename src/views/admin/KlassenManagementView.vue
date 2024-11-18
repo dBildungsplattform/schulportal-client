@@ -25,28 +25,22 @@
 
   const router: Router = useRouter();
 
-  type ReadonlyHeaders = VDataTableServer['$props']['headers'];
-  type UnwrapReadonlyArray<A> = A extends Readonly<Array<infer I>> ? I : never;
-  type ReadonlyDataTableHeader = UnwrapReadonlyArray<ReadonlyHeaders>;
-
-  // Utility type to make headers mutable
-  type DeepMutable<T> = { -readonly [P in keyof T]: DeepMutable<T[P]> };
-  type DataTableHeader = DeepMutable<ReadonlyDataTableHeader>;
+  type TableHeaders = VDataTableServer['headers'];
 
   // Define headers as a mutable array
-  const headers: Ref<DataTableHeader[]> = ref([
+  let headers: TableHeaders = [
     {
       title: t('admin.klasse.klasse'),
       key: 'name',
       align: 'start',
-    } as DataTableHeader,
+    },
     {
       title: t('action'),
       key: 'actions',
       align: 'center',
       sortable: false,
-    } as DataTableHeader,
-  ]);
+    },
+  ];
 
   const selectedSchule: Ref<string | null> = ref(null);
   const selectedKlassen: Ref<Array<string>> = ref([]);
@@ -299,12 +293,15 @@
           await organisationStore.getKlassenByOrganisationId(selectedSchule.value);
           hasAutoselectedSchule.value = true;
         }
-      } else {
-        headers.value.unshift({
-          title: t('admin.schule.dienststellennummer'),
-          key: 'schuleDetails',
-          align: 'start',
-        } as DataTableHeader);
+      } else if (headers){
+        headers = [
+          {
+            title: t('admin.schule.dienststellennummer'),
+            key: 'schuleDetails',
+            align: 'start',
+          },
+          ...headers
+        ];
       }
     }
   }
