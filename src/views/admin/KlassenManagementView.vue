@@ -39,12 +39,14 @@
       title: t('admin.klasse.klasse'),
       key: 'name',
       align: 'start',
+      width: '250px',
     } as DataTableHeader,
     {
       title: t('action'),
       key: 'actions',
       align: 'center',
       sortable: false,
+      width: '250px',
     } as DataTableHeader,
   ]);
 
@@ -304,6 +306,7 @@
           title: t('admin.schule.dienststellennummer'),
           key: 'schuleDetails',
           align: 'start',
+          width: '350px',
         } as DataTableHeader);
       }
     }
