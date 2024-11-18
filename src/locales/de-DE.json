@@ -164,7 +164,8 @@
         "PERSONALNUMMER_NICHT_EINDEUTIG": "Die eingegebene KoPers.-Nr. ist bereits vergeben. Bitte korrigieren Sie Ihre Eingabe.",
         "ERROR_LOADING_USER": "Es konnten keine Benutzerdaten geladen werden.",
         "PERSONALNUMMER_REQUIRED": "Die Änderungen wurden nicht gespeichert, da keine KoPers.-Nr. eingegeben wurde.",
-        "PERSON_NOT_FOUND": "Der Benutzer wurde seit Ihrer letzten Änderung gelöscht und kann nicht mehr bearbeitet werden."
+        "PERSON_NOT_FOUND": "Der Benutzer wurde seit Ihrer letzten Änderung gelöscht und kann nicht mehr bearbeitet werden.",
+        "NEWER_VERSION_OF_PERSON_AVAILABLE": "Der Benutzer wurde zwischenzeitlich von einer anderen Administratorin oder einem anderen Administrator bearbeitet. Bitte aktualisieren Sie die Daten und versuchen Sie es erneut."
       },
       "generatedPassword": "Generiertes Passwort",
       "homePageIQSH":"Homepage der IQSH-Medienberatung",
@@ -208,7 +209,8 @@
         "ERROR_LOADING_USER": "Fehler beim Laden des Benutzers",
         "PERSONALNUMMER_NICHT_EINDEUTIG": "KoPers.-Nr. nicht eindeutig",
         "PERSONALNUMMER_REQUIRED": "Personalnummer erforderlich",
-        "PERSON_NOT_FOUND": "Benutzer gelöscht"
+        "PERSON_NOT_FOUND": "Benutzer gelöscht",
+        "NEWER_VERSION_OF_PERSON_AVAILABLE": "Geänderte Daten"
       },
       "twoFactorAuthentication": {
         "setUpShort": "2FA einrichten",
