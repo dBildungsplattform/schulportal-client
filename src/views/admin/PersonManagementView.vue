@@ -159,12 +159,12 @@
   }
 
   async function setKlasseFilter(newValue: Array<string>): Promise<void> {
-    await searchFilterStore.setKlasseFilter(newValue);
+    await searchFilterStore.setKlasseFilterForPersonen(newValue);
     applySearchAndFilters();
   }
 
   async function setRolleFilter(newValue: Array<string>): Promise<void> {
-    await searchFilterStore.setRolleFilter(newValue);
+    await searchFilterStore.setRolleFilterForPersonen(newValue);
     // Update selectedRollenObjects based on the new selection
     selectedRollenObjects.value = newValue
       .map((rolleId: string) => {
@@ -175,13 +175,13 @@
       })
       .filter((rolle: RolleResponse | undefined): rolle is RolleResponse => rolle !== undefined);
 
-    await searchFilterStore.setRolleFilterWithObjects(newValue, selectedRollenObjects.value);
+    await searchFilterStore.setRolleFilterWithObjectsForPersonen(newValue, selectedRollenObjects.value);
     applySearchAndFilters();
   }
 
   async function setOrganisationFilter(newValue: Array<string>): Promise<void> {
-    await searchFilterStore.setOrganisationFilter(newValue);
-    await searchFilterStore.setKlasseFilter([]);
+    await searchFilterStore.setOrganisationFilterForPersonen(newValue);
+    await searchFilterStore.setKlasseFilterForPersonen([]);
     selectedKlassen.value = [];
     if (selectedOrganisation.value.length) {
       await organisationStore.getFilteredKlassen({
@@ -199,13 +199,13 @@
   function resetSearchAndFilter(): void {
     searchFilter.value = '';
     searchFieldComponent.value.searchFilter = '';
-    searchFilterStore.setKlasseFilter([]);
-    searchFilterStore.setRolleFilter([]);
-    searchFilterStore.setSearchFilter('');
+    searchFilterStore.setKlasseFilterForPersonen([]);
+    searchFilterStore.setRolleFilterForPersonen([]);
+    searchFilterStore.setSearchFilterForPersonen('');
     /* do not reset orgas if orga was autoselected */
     if (!hasAutoSelectedOrganisation.value) {
       selectedOrganisation.value = [];
-      searchFilterStore.setOrganisationFilter([]);
+      searchFilterStore.setOrganisationFilterForPersonen([]);
     }
     searchInputOrganisationen.value = '';
     searchInputRollen.value = '';
@@ -302,7 +302,7 @@
     if (update.sortField) {
       sortField.value = mapKeyToBackend(update.sortField);
 
-      await searchFilterStore.setCurrentSort({
+      await searchFilterStore.setCurrentSortForPersonen({
         key: update.sortField,
         order: update.sortOrder,
       });
@@ -311,8 +311,8 @@
     sortOrder.value = update.sortOrder as SortOrder;
 
     // Save the sorting values in the store
-    searchFilterStore.setSortField(sortField.value);
-    searchFilterStore.setSortOrder(sortOrder.value);
+    searchFilterStore.setSortFieldForPersonen(sortField.value);
+    searchFilterStore.setSortOrderForPersonen(sortOrder.value);
 
     // Fetch the sorted data
     getPaginatedPersonen(searchFilterStore.personenPage);
