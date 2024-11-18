@@ -174,7 +174,6 @@
       next();
     }
     organisationStore.errorCode = '';
-    organisationStore.updatedOrganisation = null;
   });
 
   onUnmounted(() => {
