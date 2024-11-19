@@ -164,8 +164,6 @@
   }
 
   function navigateToPersonTable(): void {
-    importStore.uploadResponse = null;
-    importStore.importedData = null;
     router.push({ name: 'person-management' });
   }
 
@@ -299,54 +297,6 @@
         :text="$t(`admin.import.errors.${importStore.errorCode}`)"
       />
 
-      <!-- Upload success template -->
-      <template v-if="showUploadSuccessTemplate">
-        <v-container>
-          <v-row justify="center">
-            <v-col cols="auto">
-              <v-icon
-                aria-hidden="true"
-                color="#1EAE9C"
-                icon="mdi-check-circle"
-                small
-              >
-              </v-icon>
-            </v-col>
-          </v-row>
-          <v-row justify="center">
-            <v-col
-              class="subtitle-1"
-              cols="auto"
-            >
-              <span data-testid="person-upload-success-text">
-                {{ $t('admin.import.uploadedSuccessfully') }}
-                {{ $t('admin.import.recordsReadyForImport', { count: totalImportItems }) }}
-              </span>
-            </v-col>
-          </v-row>
-          <v-row justify="center">
-            <v-col cols="auto">
-              <v-btn
-                class="secondary"
-                @click="backToUpload()"
-                data-testid="back-to-upload-button"
-              >
-                {{ $t('admin.import.backToUpload') }}
-              </v-btn>
-            </v-col>
-            <v-col cols="auto">
-              <v-btn
-                class="primary"
-                @click="openConfirmationDialog()"
-                data-testid="open-confirmation-dialog-button"
-              >
-                {{ $t('admin.import.executeImport') }}
-              </v-btn>
-            </v-col>
-          </v-row>
-        </v-container>
-      </template>
-
       <!-- Import success template -->
       <template v-if="importStore.importedData && !importStore.importIsLoading && !importStore.errorCode">
         <v-container>
@@ -411,89 +361,141 @@
 
       <!-- Upload form -->
       <FormWrapper
-        v-if="!importStore.uploadResponse?.isValid && !importStore.errorCode"
+        v-if="!importStore.errorCode"
         :confirmUnsavedChangesAction="handleConfirmUnsavedChanges"
         :createButtonLabel="$t('admin.import.uploadFile')"
         :discardButtonLabel="$t('nav.backToList')"
+        :hideActions="showUploadSuccessTemplate"
         id="person-import-form"
         :onDiscard="navigateToPersonTable"
         :onSubmit="onSubmit"
         @onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
         :showUnsavedChangesDialog="showUnsavedChangesDialog"
       >
-        <!-- Schulauswahl -->
-        <FormRow
-          :errorLabel="selectedSchuleProps['error']"
-          :isRequired="true"
-          labelForId="schule-select"
-          :label="$t('admin.schule.schule')"
-        >
-          <v-autocomplete
-            autocomplete="off"
-            clearable
-            @click:clear="clearSelectedSchule"
-            data-testid="schule-select"
-            density="compact"
-            id="schule-select"
-            ref="schule-select"
-            :items="schulen"
-            item-value="value"
-            item-text="title"
-            :no-data-text="$t('noDataFound')"
-            :placeholder="$t('admin.schule.selectSchule')"
-            required="true"
-            variant="outlined"
-            v-bind="selectedSchuleProps"
-            v-model="selectedSchule"
-            v-model:search="searchInputSchule"
-          ></v-autocomplete>
-        </FormRow>
+        <!-- Upload success template -->
+        <template v-if="showUploadSuccessTemplate">
+          <v-container>
+            <v-row justify="center">
+              <v-col cols="auto">
+                <v-icon
+                  aria-hidden="true"
+                  color="#1EAE9C"
+                  icon="mdi-check-circle"
+                  small
+                >
+                </v-icon>
+              </v-col>
+            </v-row>
+            <v-row justify="center">
+              <v-col
+                class="subtitle-1"
+                cols="auto"
+              >
+                <span data-testid="person-upload-success-text">
+                  {{ $t('admin.import.uploadedSuccessfully') }}
+                  {{ $t('admin.import.recordsReadyForImport', { count: totalImportItems }) }}
+                </span>
+              </v-col>
+            </v-row>
+            <v-row justify="center">
+              <v-col cols="auto">
+                <v-btn
+                  class="secondary"
+                  @click="backToUpload()"
+                  data-testid="back-to-upload-button"
+                >
+                  {{ $t('admin.import.backToUpload') }}
+                </v-btn>
+              </v-col>
+              <v-col cols="auto">
+                <v-btn
+                  class="primary"
+                  @click="openConfirmationDialog()"
+                  data-testid="open-confirmation-dialog-button"
+                >
+                  {{ $t('admin.import.executeImport') }}
+                </v-btn>
+              </v-col>
+            </v-row>
+          </v-container>
+        </template>
 
-        <!-- Rollenauswahl (currently limited to SuS) -->
-        <FormRow
-          :errorLabel="selectedRolleProps['error']"
-          labelForId="rolle-select"
-          :isRequired="true"
-          :label="$t('admin.rolle.rolle')"
-        >
-          <v-autocomplete
-            autocomplete="off"
-            clearable
-            @click:clear="clearSelectedRolle"
-            data-testid="rolle-select"
-            density="compact"
-            id="rolle-select"
-            ref="rolle-select"
-            :items="lernRollen"
-            item-value="value"
-            item-text="title"
-            :no-data-text="$t('noDataFound')"
-            :placeholder="$t('admin.rolle.selectRolle')"
-            required="true"
-            variant="outlined"
-            v-bind="selectedRolleProps"
-            v-model="selectedRolle"
-          ></v-autocomplete>
-        </FormRow>
+        <!-- Actual form -->
+        <template v-if="!showUploadSuccessTemplate">
+          <!-- Schulauswahl -->
+          <FormRow
+            :errorLabel="selectedSchuleProps['error']"
+            :isRequired="true"
+            labelForId="schule-select"
+            :label="$t('admin.schule.schule')"
+          >
+            <v-autocomplete
+              autocomplete="off"
+              clearable
+              @click:clear="clearSelectedSchule"
+              data-testid="schule-select"
+              density="compact"
+              id="schule-select"
+              ref="schule-select"
+              :items="schulen"
+              item-value="value"
+              item-text="title"
+              :no-data-text="$t('noDataFound')"
+              :placeholder="$t('admin.schule.selectSchule')"
+              required="true"
+              variant="outlined"
+              v-bind="selectedSchuleProps"
+              v-model="selectedSchule"
+              v-model:search="searchInputSchule"
+            ></v-autocomplete>
+          </FormRow>
 
-        <!-- File Upload -->
-        <FormRow
-          :errorLabel="selectedFilesProps['error']"
-          :isRequired="true"
-          labelForId="file-upload"
-          :label="$t('admin.import.uploadFile')"
-        >
-          <v-file-input
-            accept=".csv"
-            data-testid="file-input"
-            :label="$t('admin.import.selectOrDropFile')"
-            prepend-icon=""
-            prepend-inner-icon="mdi-paperclip"
-            variant="outlined"
-            v-model="selectedFiles"
-            v-bind="selectedFilesProps"
-          ></v-file-input>
-        </FormRow>
+          <!-- Rollenauswahl (currently limited to SuS) -->
+          <FormRow
+            :errorLabel="selectedRolleProps['error']"
+            labelForId="rolle-select"
+            :isRequired="true"
+            :label="$t('admin.rolle.rolle')"
+          >
+            <v-autocomplete
+              autocomplete="off"
+              clearable
+              @click:clear="clearSelectedRolle"
+              data-testid="rolle-select"
+              density="compact"
+              id="rolle-select"
+              ref="rolle-select"
+              :items="lernRollen"
+              item-value="value"
+              item-text="title"
+              :no-data-text="$t('noDataFound')"
+              :placeholder="$t('admin.rolle.selectRolle')"
+              required="true"
+              variant="outlined"
+              v-bind="selectedRolleProps"
+              v-model="selectedRolle"
+            ></v-autocomplete>
+          </FormRow>
+
+          <!-- File Upload -->
+          <FormRow
+            :errorLabel="selectedFilesProps['error']"
+            :isRequired="true"
+            labelForId="file-upload"
+            :label="$t('admin.import.uploadFile')"
+          >
+            <v-file-input
+              accept=".csv"
+              data-testid="file-input"
+              :label="$t('admin.import.selectOrDropFile')"
+              prepend-icon=""
+              prepend-inner-icon="mdi-paperclip"
+              variant="outlined"
+              v-model="selectedFiles"
+              v-bind="selectedFilesProps"
+            ></v-file-input>
+          </FormRow>
+        </template>
 
         <!-- Invalid data template -->
         <template v-if="importStore.uploadResponse?.totalInvalidImportDataItems">
