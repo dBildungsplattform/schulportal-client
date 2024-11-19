@@ -221,4 +221,10 @@ describe('PersonCreationView', () => {
 
     expect(wrapper?.find('[data-testid="person-success-text"]').isVisible()).toBe(true);
   });
+
+  test('shows error message if REQUIRED_STEP_UP_LEVEL_NOT_MET error is present', async () => {
+    personenkontextStore.errorCode = 'REQUIRED_STEP_UP_LEVEL_NOT_MET';
+    await nextTick();
+    expect(wrapper?.find('[data-testid="alert-title"]').isVisible()).toBe(true);
+  });
 });

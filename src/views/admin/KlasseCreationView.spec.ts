@@ -260,4 +260,10 @@ describe('KlasseCreationView', () => {
 
     expect(organisationAutocomplete?.text()).toEqual('1133');
   });
+
+  test('shows error message if REQUIRED_STEP_UP_LEVEL_NOT_MET error is present', async () => {
+    organisationStore.errorCode = 'REQUIRED_STEP_UP_LEVEL_NOT_MET';
+    await nextTick();
+    expect(wrapper?.find('[data-testid="alert-title"]').isVisible()).toBe(true);
+  });
 });
