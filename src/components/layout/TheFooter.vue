@@ -112,7 +112,7 @@
         >
           <a
             v-for="link in footerLinks"
-            class="primary"
+            class="primary footer-link"
             :key="link.text"
             :href="link.href"
             rel="noopener noreferrer"
@@ -209,6 +209,10 @@
   .footer-links-col {
     display: flex;
     align-items: flex-end; /* Aligns the links to the start of the flex container */
+  }
+
+  .footer-link {
+    margin-right: 30px;
   }
 
   .sponsor-logos-col {
