@@ -32,7 +32,7 @@ describe('AuthStore', () => {
           {
             organisationsId: '123456',
             rolle: {
-              systemrechte: ['ROLLEN_VERWALTEN', 'SCHULEN_VERWALTEN', 'PERSON_SYNCHRONISIEREN'],
+              systemrechte: ['ROLLEN_VERWALTEN', 'SCHULEN_VERWALTEN', 'IMPORT_DURCHFUEHREN', 'PERSON_SYNCHRONISIEREN'],
               serviceProviderIds: ['789897798'],
             },
           },
@@ -51,6 +51,7 @@ describe('AuthStore', () => {
       expect(authStore.hasSchulverwaltungPermission).toBe(false);
       expect(authStore.hasSchultraegerverwaltungPermission).toBe(false);
       expect(authStore.hasPersonenSyncPermission).toBe(false);
+      expect(authStore.hasImportPermission).toBe(false);
       await initializeAuthStatus;
       expect(authStore.isAuthed).toBe(true);
       expect(authStore.currentUser).toEqual(mockInfo);
@@ -60,6 +61,7 @@ describe('AuthStore', () => {
       expect(authStore.hasSchulverwaltungPermission).toBe(true);
       expect(authStore.hasSchultraegerverwaltungPermission).toBe(false);
       expect(authStore.hasPersonenSyncPermission).toBe(true);
+      expect(authStore.hasImportPermission).toBe(true);
     });
 
     it('should not authenticate on server error', async () => {

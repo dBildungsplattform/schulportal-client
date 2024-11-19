@@ -7,9 +7,10 @@ import {
 import routes from './routes';
 
 type Permission =
-  | 'personenverwaltung'
-  | 'personenanlegen'
   | 'klassenverwaltung'
+  | 'personenanlegen'
+  | 'personenimport'
+  | 'personenverwaltung'
   | 'rollenverwaltung'
   | 'schulverwaltung';
 
@@ -69,6 +70,8 @@ router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormal
           return authStore.hasPersonenverwaltungPermission;
         case 'personenanlegen':
           return authStore.hasPersonenAnlegenPermission;
+        case 'personenimport':
+          return authStore.hasImportPermission;
         case 'klassenverwaltung':
           return authStore.hasKlassenverwaltungPermission;
         case 'rollenverwaltung':
