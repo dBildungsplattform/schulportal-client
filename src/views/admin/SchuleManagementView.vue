@@ -127,7 +127,7 @@
           <ItsLearningSetup
             :errorCode="organisationStore.errorCode"
             :schulname="item.name"
-            :schuleId="item.id"
+            :schulId="item.id"
             :itslearningEnabled="item.itslearningEnabled"
             @onActivateItslearning="toggleItsLearningStatus(item.id)"
           ></ItsLearningSetup>
