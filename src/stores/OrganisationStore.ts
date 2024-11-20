@@ -27,6 +27,7 @@ export type Organisation = {
   administriertVon?: string | null;
   schuleDetails?: string;
   version?: number;
+  itslearningEnabled?: boolean;
 };
 
 export type KlasseTableItem = {
@@ -110,6 +111,7 @@ type OrganisationActions = {
   updateOrganisationById: (organisationId: string, name: string) => Promise<void>;
   getSchultraeger: () => Promise<void>;
   fetchSchuleDetailsForKlassen: (filterActive: boolean) => Promise<void>;
+  setItsLearningForSchule: (organisationId: string) => Promise<void>
 };
 
 export { OrganisationsTyp };
@@ -450,5 +452,20 @@ export const useOrganisationStore: StoreDefinition<
         }
       }
     },
+
+    async setItsLearningForSchule(organisationId: string){
+      this.errorCode = '';
+      this.loading = true;
+      try {
+        await organisationApi.organisationControllerEnableForitslearning(organisationId);
+      } catch (error: unknown) {
+        this.errorCode = 'UNSPECIFIED_ERROR';
+        if (isAxiosError(error)) {
+          this.errorCode = error.response?.data.i18nKey || 'ORGANISATION_SPECIFICATION_ERROR';
+        }
+      } finally {
+        this.loading = false;
+      }
+    }
   },
 });

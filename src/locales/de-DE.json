@@ -422,6 +422,13 @@
         "SCHULE_UNTER_TRAEGER": "Eine Schule darf nicht einer anderen Schule zugeordnet werden.",
         "SCHULTRAEGER_ERROR": "Mögliche Schulträger konnten nicht geladen werden."
       },
+      "activateInItsLearning": "Itslearning freischalten",
+      "itsLearning": "itsLearning",
+      "retransmit": "Erneut übertragen",
+      "retransmitSchuleConfirmationMessage": "Wollen Sie die Daten der Schule {schulname} erneut an itsLearning übertragen?",
+      "activateSchuleConfirmationMessage": "Wollen Sie die Daten der Schule {schulname} an its Learning übertragen?",
+      "activateSchuleSuccessMessage": "Die Schule {schulname} wird in itslearning angelegt.",
+      "enableNow": "Jetzt freischalten",
       "management": "Schulverwaltung",
       "publicSchule": "Öffentliche Schule",
       "rules": {

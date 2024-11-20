@@ -6,6 +6,7 @@
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
   import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
   import { type SearchFilterStore, useSearchFilterStore } from '@/stores/SearchFilterStore';
+  import ItsLearningSetup from '@/components/admin/schulen/itsLearningSetup.vue';
 
   const organisationStore: OrganisationStore = useOrganisationStore();
   const searchFilterStore: SearchFilterStore = useSearchFilterStore();
@@ -20,6 +21,7 @@
       align: 'start',
     },
     { title: t('admin.schule.schulname'), key: 'name', align: 'start' },
+    { title: t('admin.schule.itsLearning'), key: 'itslearning', sortable: false, align: 'start' },
   ];
 
   function getPaginatedSchulen(page: number): void {
@@ -45,6 +47,10 @@
       includeTyp: OrganisationsTyp.Schule,
       systemrechte: ['SCHULEN_VERWALTEN'],
     });
+  }
+
+  async function toggleItsLearningStatus(organisationId: string): Promise<void> {
+    await organisationStore.setItsLearningForSchule(organisationId);
   }
 
   onMounted(async () => {
@@ -87,8 +93,17 @@
           >
             {{ item.name }}
           </div>
-        </template></ResultTable
-      >
+        </template>
+        <template v-slot:[`item.itslearning`]="{ item }">
+          <ItsLearningSetup
+            :errorCode="organisationStore.errorCode"
+            :schulname="item.name"
+            :schuleId="item.id"
+            :itslearningEnabled="item.itslearningEnabled"
+            @onActivateItslearning="toggleItsLearningStatus(item.id)"
+          ></ItsLearningSetup>
+        </template>
+      </ResultTable>
     </LayoutCard>
   </div>
 </template>
