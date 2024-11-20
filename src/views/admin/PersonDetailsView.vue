@@ -686,8 +686,8 @@
       });
 
       // Combine arrays and remove duplicates based on id
-      const combined = [...organisationStore.klassen, ...organisationStore.allKlassen];
-      organisationStore.klassen = Array.from(new Map(combined.map((item) => [item.id, item])).values());
+      const combined: (Organisation | Organisation)[] = [...organisationStore.klassen, ...organisationStore.allKlassen];
+      organisationStore.klassen = Array.from(new Map(combined.map((item: Organisation) => [item.id, item])).values());
     }
     // Auto select the new Schule
     selectedSchule.value = selectedZuordnungen.value[0]?.sskId;

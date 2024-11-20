@@ -785,7 +785,7 @@ describe('OrganisationStore', () => {
 
       mockadapter.onPut('/api/organisationen/1/enable-for-its-learning').replyOnce(200, mockResponse);
 
-      const promise = organisationStore.setItsLearningForSchule('1');
+      const promise: Promise<void> = organisationStore.setItsLearningForSchule('1');
       expect(organisationStore.loading).toBe(true);
       await promise;
 
@@ -797,7 +797,7 @@ describe('OrganisationStore', () => {
     it('should handle a generic error and set UNSPECIFIED_ERROR', async () => {
       mockadapter.onPut('/api/organisationen/1/enable-for-its-learning').networkErrorOnce();
 
-      const promise = organisationStore.setItsLearningForSchule('1');
+      const promise: Promise<void> = organisationStore.setItsLearningForSchule('1');
       expect(organisationStore.loading).toBe(true);
       await promise;
 
@@ -809,7 +809,7 @@ describe('OrganisationStore', () => {
     it('should handle Axios-specific error with i18nKey or default error code', async () => {
       mockadapter.onPut('/api/organisationen/1/enable-for-its-learning').replyOnce(500, { i18nKey: 'ENABLE_ERROR' });
 
-      const promise = organisationStore.setItsLearningForSchule('1');
+      const promise: Promise<void> = organisationStore.setItsLearningForSchule('1');
       expect(organisationStore.loading).toBe(true);
       await promise;
 
