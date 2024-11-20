@@ -107,21 +107,21 @@
   async function navigateBackToKlasseForm(): Promise<void> {
     if (organisationStore.errorCode === 'REQUIRED_STEP_UP_LEVEL_NOT_MET') {
       resetForm();
-      window.location.reload();
-    } else {
-      organisationStore.errorCode = '';
-      await router.push({ name: 'create-klasse' });
     }
+    organisationStore.errorCode = '';
+    await router.push({ name: 'create-klasse' }).then(() => {
+      router.go(0);
+    });
   }
 
   async function navigateToKlasseManagement(): Promise<void> {
     if (organisationStore.errorCode === 'REQUIRED_STEP_UP_LEVEL_NOT_MET') {
       resetForm();
-      window.location.reload();
-    } else {
-      await router.push({ name: 'klasse-management' });
-      organisationStore.createdKlasse = null;
     }
+    organisationStore.createdKlasse = null;
+    await router.push({ name: 'klasse-management' }).then(() => {
+      router.go(0);
+    });
   }
 
   function handleConfirmUnsavedChanges(): void {
