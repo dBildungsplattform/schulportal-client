@@ -191,6 +191,7 @@
     await organisationStore.getAllOrganisationen({
       systemrechte: ['ROLLEN_VERWALTEN'],
       excludeTyp: [OrganisationsTyp.Klasse],
+      limit: 25,
     });
     await serviceProviderStore.getAllServiceProviders();
 
@@ -214,7 +215,7 @@
     });
 
     Object.values(RollenSystemRecht).forEach((enumValue: RollenSystemRecht) => {
-      if (enumValue !== RollenSystemRecht.MigrationDurchfuehren) {
+      if (enumValue !== RollenSystemRecht.MigrationDurchfuehren && enumValue !== RollenSystemRecht.CronDurchfuehren) {
         const i18nPath: string = `admin.rolle.mappingFrontBackEnd.systemrechte.${enumValue}`;
         translatedSystemrechte.value.push({
           value: enumValue,
@@ -266,6 +267,12 @@
 
 <template>
   <div class="admin">
+    <h1
+      class="text-center headline"
+      data-testid="admin-headline"
+    >
+      {{ $t('admin.headline') }}
+    </h1>
     <LayoutCard
       :closable="true"
       @onCloseClicked="navigateToRolleManagement"

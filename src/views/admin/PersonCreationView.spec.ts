@@ -204,7 +204,7 @@ describe('PersonCreationView', () => {
 
     personenkontextStore.createdPersonWithKontext = mockCreatedPersonWithKontext;
 
-    wrapper?.find('[data-testid="person-creation-form-create-button"]').trigger('click');
+    wrapper?.find('[data-testid="person-creation-form-submit-button"]').trigger('click');
     await nextTick();
 
     expect(wrapper?.find('[data-testid="create-another-person-button"]').isVisible()).toBe(true);

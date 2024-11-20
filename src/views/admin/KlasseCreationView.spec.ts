@@ -107,7 +107,7 @@ describe('KlasseCreationView', () => {
 
     organisationStore.createdKlasse = mockKlasse;
 
-    wrapper?.find('[data-testid="klasse-form-create-button"]').trigger('click');
+    wrapper?.find('[data-testid="klasse-form-submit-button"]').trigger('click');
     await nextTick();
 
     expect(wrapper?.find('[data-testid="create-another-klasse-button"]').isVisible()).toBe(true);

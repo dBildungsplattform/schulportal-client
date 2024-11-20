@@ -41,14 +41,15 @@ export type UserInfo = {
 type AuthState = {
   currentUser: UserInfo | null;
   currentUserPermissions: Array<string>;
+  hasImportPermission: boolean;
   hasKlassenverwaltungPermission: boolean;
-  hasPersonenverwaltungPermission: boolean;
+  hasPersonenAnlegenPermission: boolean;
   hasPersonenLoeschenPermission: boolean;
+  hasPersonenSyncPermission: boolean;
+  hasPersonenverwaltungPermission: boolean;
   hasRollenverwaltungPermission: boolean;
   hasSchulverwaltungPermission: boolean;
   hasSchultraegerverwaltungPermission: boolean;
-  hasPersonenSyncPermission: boolean;
-  hasPersonenAnlegenPermission: boolean;
   isAuthed: boolean;
   acr: StepUpLevel;
 };
@@ -68,14 +69,15 @@ export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, 
   state: (): AuthState => ({
     currentUser: null,
     currentUserPermissions: [],
+    hasImportPermission: false,
     hasKlassenverwaltungPermission: false,
-    hasPersonenverwaltungPermission: false,
+    hasPersonenAnlegenPermission: false,
     hasPersonenLoeschenPermission: false,
+    hasPersonenSyncPermission: false,
+    hasPersonenverwaltungPermission: false,
     hasRollenverwaltungPermission: false,
     hasSchulverwaltungPermission: false,
     hasSchultraegerverwaltungPermission: false,
-    hasPersonenSyncPermission: false,
-    hasPersonenAnlegenPermission: false,
     isAuthed: false,
     acr: StepUpLevel.NONE,
   }),
@@ -103,14 +105,15 @@ export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, 
           });
 
           /* set permission aliases for easier global access */
+          this.hasImportPermission = this.currentUserPermissions.includes('IMPORT_DURCHFUEHREN');
           this.hasKlassenverwaltungPermission = this.currentUserPermissions.includes('KLASSEN_VERWALTEN');
-          this.hasPersonenverwaltungPermission = this.currentUserPermissions.includes('PERSONEN_VERWALTEN');
+          this.hasPersonenAnlegenPermission = this.currentUserPermissions.includes('PERSONEN_ANLEGEN');
           this.hasPersonenLoeschenPermission = this.currentUserPermissions.includes('PERSONEN_SOFORT_LOESCHEN');
+          this.hasPersonenSyncPermission = this.currentUserPermissions.includes('PERSON_SYNCHRONISIEREN');
+          this.hasPersonenverwaltungPermission = this.currentUserPermissions.includes('PERSONEN_VERWALTEN');
           this.hasRollenverwaltungPermission = this.currentUserPermissions.includes('ROLLEN_VERWALTEN');
           this.hasSchulverwaltungPermission = this.currentUserPermissions.includes('SCHULEN_VERWALTEN');
           this.hasSchultraegerverwaltungPermission = this.currentUserPermissions.includes('SCHULTRAEGER_VERWALTEN');
-          this.hasPersonenSyncPermission = this.currentUserPermissions.includes('PERSON_SYNCHRONISIEREN');
-          this.hasPersonenAnlegenPermission = this.currentUserPermissions.includes('PERSONEN_ANLEGEN');
         } else {
           throw new Error('User info could not be retrieved.');
         }
