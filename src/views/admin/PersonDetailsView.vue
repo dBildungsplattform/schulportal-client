@@ -519,19 +519,18 @@
   });
 
   watch(
-  () => selectedZuordnungen.value[0], // Watch the first selected Zuordnung
-  (newValue) => {
-    if (newValue) {
-      const organisationId: string | undefined = newValue.sskId;
-      const rolleId: string | undefined = newValue.rolleId;
+    () => selectedZuordnungen.value[0], // Watch the first selected Zuordnung
+    (newValue: Zuordnung | undefined) => {
+      if (newValue) {
+        const organisationId: string | undefined = newValue.sskId;
+        const rolleId: string | undefined = newValue.rolleId;
 
-      // Trigger the API call
-      personenkontextStore.processWorkflowStep({ organisationId, rolleId, limit: 25 });
-    }
-  },
-  { immediate: true } // Run on initialization if there's already a selected Zuordnung
-);
-
+        // Trigger the API call
+        personenkontextStore.processWorkflowStep({ organisationId, rolleId, limit: 25 });
+      }
+    },
+    { immediate: true }, // Run on initialization if there's already a selected Zuordnung
+  );
 
   // Validation schema for the form for changing the Klasse (Versetzen)
   const changeKlasseValidationSchema: TypedSchema = toTypedSchema(
@@ -688,23 +687,20 @@
   const triggerChangeKlasse = async (): Promise<void> => {
     // Get the Klasse from the parent using the parent's ID and the klasse name
     if (selectedZuordnungen.value[0]?.sskId) {
-  await organisationStore.getAllOrganisationen({
-    administriertVon: [selectedZuordnungen.value[0]?.sskId],
-    includeTyp: OrganisationsTyp.Klasse,
-    systemrechte: ['KLASSEN_VERWALTEN'],
-  });
-  
-  await organisationStore.getKlassenByOrganisationId(
-    selectedZuordnungen.value[0]?.sskId, 
-    {searchString: selectedZuordnungen.value[0].klasse}
-  );
-  
-  // Combine arrays and remove duplicates based on id
-  const combined = [...organisationStore.klassen, ...organisationStore.allKlassen];
-  organisationStore.klassen = Array.from(
-    new Map(combined.map(item => [item.id, item])).values()
-  );
-}
+      await organisationStore.getAllOrganisationen({
+        administriertVon: [selectedZuordnungen.value[0]?.sskId],
+        includeTyp: OrganisationsTyp.Klasse,
+        systemrechte: ['KLASSEN_VERWALTEN'],
+      });
+
+      await organisationStore.getKlassenByOrganisationId(selectedZuordnungen.value[0]?.sskId, {
+        searchString: selectedZuordnungen.value[0].klasse,
+      });
+
+      // Combine arrays and remove duplicates based on id
+      const combined = [...organisationStore.klassen, ...organisationStore.allKlassen];
+      organisationStore.klassen = Array.from(new Map(combined.map((item) => [item.id, item])).values());
+    }
     // Auto select the new Schule
     selectedSchule.value = selectedZuordnungen.value[0]?.sskId;
     // Retrieves the new Klasse from the selected Zuordnung
