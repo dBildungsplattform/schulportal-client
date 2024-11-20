@@ -267,28 +267,17 @@
       {{ $t('admin.headline') }}
     </h1>
     <LayoutCard
-      :closable="true"
+      :closable="!rolleStore.errorCode"
       @onCloseClicked="navigateToRolleManagement"
       :header="$t('admin.rolle.addNew')"
       :padded="true"
       :showCloseText="true"
     >
-      <!-- Error Message Display if error on submit -->
-      <SpshAlert
-        :model-value="!!rolleStore.errorCode"
-        :title="t('admin.rolle.rolleCreateErrorTitle')"
-        :type="'error'"
-        :closable="false"
-        :text="rolleStore.errorCode ? $t(`admin.rolle.errors.${rolleStore.errorCode}`) : ''"
-        :showButton="true"
-        :buttonText="$t('admin.rolle.backToCreateRolle')"
-        :buttonAction="navigateBackToRolleForm"
-      />
-
       <!-- The form to create a new Rolle -->
-      <template v-if="!rolleStore.createdRolle && !rolleStore.errorCode">
+      <template v-if="!rolleStore.createdRolle">
         <RolleForm
           :administrationsebenen="administrationsebenen"
+          :errorCode="rolleStore.errorCode"
           :onHandleConfirmUnsavedChanges="handleConfirmUnsavedChanges"
           :onHandleDiscard="navigateToRolleManagement"
           :onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
@@ -312,7 +301,20 @@
           :translatedRollenarten="translatedRollenarten"
           :translatedMerkmale="translatedMerkmale"
           :translatedSystemrechte="translatedSystemrechte"
-        ></RolleForm>
+        >
+          <!-- Error Message Display if error on submit -->
+          <!-- To trigger unsaved changes dialog the alert has to be inside the form wrapper -->
+          <SpshAlert
+            :model-value="!!rolleStore.errorCode"
+            :title="t('admin.rolle.rolleCreateErrorTitle')"
+            :type="'error'"
+            :closable="false"
+            :text="rolleStore.errorCode ? $t(`admin.rolle.errors.${rolleStore.errorCode}`) : ''"
+            :showButton="true"
+            :buttonText="$t('admin.rolle.backToCreateRolle')"
+            :buttonAction="navigateBackToRolleForm"
+          />
+        </RolleForm>
       </template>
 
       <!-- Result template on success after submit  -->

@@ -155,27 +155,16 @@
       {{ $t('admin.headline') }}
     </h1>
     <LayoutCard
-      :closable="true"
+      :closable="!organisationStore.errorCode"
       @onCloseClicked="navigateToKlasseManagement"
       :header="$t('admin.klasse.addNew')"
       :padded="true"
       :showCloseText="true"
     >
-      <!-- Error Message Display if error on submit -->
-      <SpshAlert
-        :model-value="!!organisationStore.errorCode"
-        :title="$t('admin.klasse.klasseCreateErrorTitle')"
-        :type="'error'"
-        :closable="false"
-        :text="organisationStore.errorCode ? $t(`admin.klasse.errors.${organisationStore.errorCode}`) : ''"
-        :showButton="true"
-        :buttonText="$t('admin.klasse.backToCreateKlasse')"
-        :buttonAction="navigateBackToKlasseForm"
-      />
-
       <!-- The form to create a new Klasse -->
-      <template v-if="!organisationStore.createdKlasse && !organisationStore.errorCode">
+      <template v-if="!organisationStore.createdKlasse">
         <KlasseForm
+          :errorCode="organisationStore.errorCode"
           :schulen="schulen"
           :isEditActive="true"
           :readonly="false"
@@ -189,7 +178,19 @@
           ref="klasse-creation-form"
           v-model:selectedSchule="selectedSchule"
           v-model:selectedKlassenname="selectedKlassenname"
-        />
+        >
+          <!-- Error Message Display if error on submit -->
+          <SpshAlert
+            :model-value="!!organisationStore.errorCode"
+            :title="$t('admin.klasse.klasseCreateErrorTitle')"
+            :type="'error'"
+            :closable="false"
+            :text="organisationStore.errorCode ? $t(`admin.klasse.errors.${organisationStore.errorCode}`) : ''"
+            :showButton="true"
+            :buttonText="$t('admin.klasse.backToCreateKlasse')"
+            :buttonAction="navigateBackToKlasseForm"
+          />
+        </KlasseForm>
       </template>
 
       <!-- Result template on success after submit -->
