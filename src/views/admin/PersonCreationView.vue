@@ -275,11 +275,12 @@
       personenkontextStore.errorCode === 'REQUIRED_STEP_UP_LEVEL_NOT_MET'
     ) {
       formContext.resetForm();
-      window.location.reload();
     } else {
-      await router.push({ name: 'person-management' });
       personenkontextStore.createdPersonWithKontext = null;
     }
+    await router.push({ name: 'person-management' }).then(() => {
+      router.go(0);
+    });
   }
 
   function handleFieldReset(field: string): void {
@@ -343,16 +344,12 @@
       personenkontextStore.errorCode === 'REQUIRED_STEP_UP_LEVEL_NOT_MET'
     ) {
       formContext.resetForm();
-      personStore.errorCode = '';
-      personenkontextStore.errorCode = '';
-      await router.push({ name: 'create-person' }).then(() => {
-        router.go(0);
-      });
-    } else {
-      personStore.errorCode = '';
-      personenkontextStore.errorCode = '';
-      await router.push({ name: 'create-person' });
     }
+    personStore.errorCode = '';
+    personenkontextStore.errorCode = '';
+    await router.push({ name: 'create-person' }).then(() => {
+      router.go(0);
+    });
   }
 
   const handleCreateAnotherPerson = (): void => {
