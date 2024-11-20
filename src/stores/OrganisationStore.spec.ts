@@ -688,6 +688,7 @@ describe('OrganisationStore', () => {
           typ: OrganisationsTyp.Land,
           administriertVon: '1',
           version: 1,
+          itslearningEnabled: true,
         },
         ersatz: {
           id: '3',
@@ -699,6 +700,7 @@ describe('OrganisationStore', () => {
           typ: OrganisationsTyp.Land,
           administriertVon: '1',
           version: 1,
+          itslearningEnabled: true,
         },
       };
 
@@ -765,6 +767,57 @@ describe('OrganisationStore', () => {
       expect(organisationStore.klassen).toEqual(mockKlassen);
       expect(organisationStore.allKlassen[0]?.schuleDetails).toBe('123456 (Schule 1)');
       expect(organisationStore.loadingKlassen).toBe(false);
+    });
+  });
+
+  describe('setItsLearningForSchule', () => {
+    it('should successfully activate itslearning for an organisation and update state', async () => {
+      const mockResponse: Organisation = {
+        id: '1',
+        kennung: 'Org1',
+        name: 'Organisation 1',
+        namensergaenzung: 'Ergänzung',
+        kuerzel: 'O1',
+        typ: OrganisationsTyp.Schule,
+        administriertVon: '1',
+        itslearningEnabled: true,
+      };
+  
+      mockadapter.onPut('/api/organisationen/1/enable-for-its-learning').replyOnce(200, mockResponse);
+  
+      const promise = organisationStore.setItsLearningForSchule('1');
+      expect(organisationStore.loading).toBe(true);
+      await promise;
+  
+      expect(organisationStore.activatedItslearningOrganisation).toEqual(mockResponse);
+      expect(organisationStore.errorCode).toBe('');
+      expect(organisationStore.loading).toBe(false);
+    });
+  
+    it('should handle a generic error and set UNSPECIFIED_ERROR', async () => {
+      mockadapter.onPut('/api/organisationen/1/enable-for-its-learning').networkErrorOnce();
+  
+      const promise = organisationStore.setItsLearningForSchule('1');
+      expect(organisationStore.loading).toBe(true);
+      await promise;
+  
+      expect(organisationStore.activatedItslearningOrganisation).toBeNull();
+      expect(organisationStore.errorCode).toBe('ORGANISATION_SPECIFICATION_ERROR');
+      expect(organisationStore.loading).toBe(false);
+    });
+  
+    it('should handle Axios-specific error with i18nKey or default error code', async () => {
+      mockadapter
+        .onPut('/api/organisationen/1/enable-for-its-learning')
+        .replyOnce(500, { i18nKey: 'ENABLE_ERROR' });
+  
+      const promise = organisationStore.setItsLearningForSchule('1');
+      expect(organisationStore.loading).toBe(true);
+      await promise;
+  
+      expect(organisationStore.activatedItslearningOrganisation).toBeNull();
+      expect(organisationStore.errorCode).toBe('ENABLE_ERROR');
+      expect(organisationStore.loading).toBe(false);
     });
   });
 });

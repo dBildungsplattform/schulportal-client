@@ -7,9 +7,13 @@
   import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
   import { type SearchFilterStore, useSearchFilterStore } from '@/stores/SearchFilterStore';
   import ItsLearningSetup from '@/components/admin/schulen/itsLearningSetup.vue';
+  import SpshAlert from '@/components/alert/SpshAlert.vue';
+  import { useRouter, type Router } from 'vue-router';
 
   const organisationStore: OrganisationStore = useOrganisationStore();
   const searchFilterStore: SearchFilterStore = useSearchFilterStore();
+
+  const router: Router = useRouter();
 
   const { t }: Composer = useI18n({ useScope: 'global' });
 
@@ -53,6 +57,11 @@
     await organisationStore.setItsLearningForSchule(organisationId);
   }
 
+  const handleAlertClose = (): void => {
+    organisationStore.errorCode = '';
+    router.go(0);
+  };
+
   onMounted(async () => {
     await organisationStore.getAllOrganisationen({
       offset: (searchFilterStore.schulenPage - 1) * searchFilterStore.schulenPerPage,
@@ -72,6 +81,26 @@
       {{ $t('admin.headline') }}
     </h1>
     <LayoutCard :header="$t('admin.schule.management')">
+      <!-- Error Message Display -->
+      <SpshAlert
+        :model-value="!!organisationStore.errorCode"
+        :title="
+          organisationStore.errorCode === 'UNSPECIFIED_ERROR'
+            ? $t('admin.schule.loadingErrorTitle')
+            : $t(`admin.schule.title.${organisationStore.errorCode}`)
+        "
+        :type="'error'"
+        :closable="false"
+        :text="
+          organisationStore.errorCode === 'UNSPECIFIED_ERROR'
+            ? $t('admin.schule.loadingErrorText')
+            : $t(`admin.schule.errors.${organisationStore.errorCode}`)
+        "
+        :showButton="true"
+        :buttonText="$t('nav.backToList')"
+        :buttonAction="handleAlertClose"
+        @update:modelValue="handleAlertClose"
+      />
       <ResultTable
         :currentPage="searchFilterStore.schulenPage"
         data-testid="schule-table"

@@ -13,7 +13,7 @@
   type Props = {
     errorCode: string;
     schulname: string;
-    schuleId: string;
+    schulId: string;
     itslearningEnabled: boolean;
   };
 
@@ -209,7 +209,7 @@
                 :block="mdAndDown"
                 class="secondary button"
                 @click.stop="closeActivateSchuleDialog(isActive)"
-                data-testid="cancel-klasse-delete-dialog-button"
+                data-testid="cancel-schule-activate-in-itslearning-dialog-button"
               >
                 {{ $t('cancel') }}
               </v-btn>
@@ -222,7 +222,7 @@
               <v-btn
                 :block="mdAndDown"
                 class="primary button"
-                @click.stop="handleSchuleToItsLearning(props.schuleId)"
+                @click.stop="handleSchuleToItsLearning(props.schulId)"
                 data-testid="schule-itslearning-sync-button"
               >
                 {{ $t('admin.schule.activateInItsLearning') }}

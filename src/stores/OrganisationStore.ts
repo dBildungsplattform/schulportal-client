@@ -76,6 +76,7 @@ type OrganisationState = {
   loadingKlassen: boolean;
   parentOrganisationen: Array<Organisation>;
   schultraeger: Array<Organisation>;
+  activatedItslearningOrganisation: Organisation | null;
 };
 
 export type OrganisationenFilter = {
@@ -111,7 +112,7 @@ type OrganisationActions = {
   updateOrganisationById: (organisationId: string, name: string) => Promise<void>;
   getSchultraeger: () => Promise<void>;
   fetchSchuleDetailsForKlassen: (filterActive: boolean) => Promise<void>;
-  setItsLearningForSchule: (organisationId: string) => Promise<void>
+  setItsLearningForSchule: (organisationId: string) => Promise<void>;
 };
 
 export { OrganisationsTyp };
@@ -147,6 +148,7 @@ export const useOrganisationStore: StoreDefinition<
       loadingKlassen: false,
       parentOrganisationen: [],
       schultraeger: [],
+      activatedItslearningOrganisation: null,
     };
   },
 
@@ -453,11 +455,13 @@ export const useOrganisationStore: StoreDefinition<
       }
     },
 
-    async setItsLearningForSchule(organisationId: string){
+    async setItsLearningForSchule(organisationId: string): Promise<void> {
       this.errorCode = '';
       this.loading = true;
       try {
-        await organisationApi.organisationControllerEnableForitslearning(organisationId);
+        const { data }: { data: Organisation } =
+          await organisationApi.organisationControllerEnableForitslearning(organisationId);
+        this.activatedItslearningOrganisation = data;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
@@ -466,6 +470,6 @@ export const useOrganisationStore: StoreDefinition<
       } finally {
         this.loading = false;
       }
-    }
+    },
   },
 });
