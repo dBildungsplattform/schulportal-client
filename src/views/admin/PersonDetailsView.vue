@@ -686,7 +686,7 @@
       });
 
       // Combine arrays and remove duplicates based on id
-      const combined: (Organisation | Organisation)[] = [...organisationStore.klassen, ...organisationStore.allKlassen];
+      const combined: Organisation[] = [...organisationStore.klassen, ...organisationStore.allKlassen];
       organisationStore.klassen = Array.from(new Map(combined.map((item: Organisation) => [item.id, item])).values());
     }
     // Auto select the new Schule

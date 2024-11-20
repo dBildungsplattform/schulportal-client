@@ -432,9 +432,9 @@
       },
       "loadingErrorText": "Es konnten keine Schuldaten geladen werden.",
       "loadingErrorTitle": "Fehler beim Laden der Schulen",
-      "itsLearning": "itsLearning",
+      "itsLearningStatus": "itslearning-Status",
       "retransmit": "Erneut übertragen",
-      "retransmitSchuleConfirmationMessage": "Wollen Sie die Daten der Schule {schulname} erneut an itsLearning übertragen?",
+      "retransmitSchuleConfirmationMessage": "Wollen Sie die Daten der Schule {schulname} erneut an itslearning übertragen?",
       "management": "Schulverwaltung",
       "publicSchule": "Öffentliche Schule",
       "rules": {
