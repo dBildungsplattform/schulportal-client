@@ -25,7 +25,7 @@
       align: 'start',
     },
     { title: t('admin.schule.schulname'), key: 'name', align: 'start' },
-    { title: t('admin.schule.itsLearning'), key: 'itslearning', sortable: false, align: 'start' },
+    { title: t('admin.schule.itsLearningStatus'), key: 'itslearning', sortable: false, align: 'start' },
   ];
 
   function getPaginatedSchulen(page: number): void {
