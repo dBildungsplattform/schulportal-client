@@ -343,7 +343,11 @@
       personenkontextStore.errorCode === 'REQUIRED_STEP_UP_LEVEL_NOT_MET'
     ) {
       formContext.resetForm();
-      window.location.reload();
+      personStore.errorCode = '';
+      personenkontextStore.errorCode = '';
+      await router.push({ name: 'create-person' }).then(() => {
+        router.go(0);
+      });
     } else {
       personStore.errorCode = '';
       personenkontextStore.errorCode = '';

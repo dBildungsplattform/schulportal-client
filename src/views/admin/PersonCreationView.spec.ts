@@ -226,5 +226,7 @@ describe('PersonCreationView', () => {
     personenkontextStore.errorCode = 'REQUIRED_STEP_UP_LEVEL_NOT_MET';
     await nextTick();
     expect(wrapper?.find('[data-testid="alert-title"]').isVisible()).toBe(true);
+    wrapper?.find('[data-testid="alert-button"]').trigger('click');
+    await nextTick();
   });
 });
