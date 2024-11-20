@@ -97,7 +97,7 @@
               cols="10"
               class="text-center"
             >
-              <span data-testid="klasse-delete-success-text">
+              <span data-testid="activate-schule-sync-itslearning-success-text">
                 {{ activateItsLearningSuccessMessage }}
               </span>
             </v-col>

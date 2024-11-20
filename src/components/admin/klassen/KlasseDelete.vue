@@ -83,9 +83,9 @@
     >
       <v-card-text>
         <v-container>
-          <v-row class="text-body bold px-md-16">
+          <v-row class="text-body bold justify-center">
             <v-col
-              offset="1"
+              class="text-center"
               cols="10"
             >
               <span data-testid="klasse-delete-success-text">
@@ -166,9 +166,9 @@
                 </p>
               </v-col>
             </v-row>
-            <v-row class="text-body bold ml-2">
+            <v-row class="text-body bold justify-center">
               <v-col
-                offset="1"
+                class="text-center"
                 cols="10"
               >
                 <span data-testid="klasse-delete-confirmation-text">

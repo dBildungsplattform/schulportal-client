@@ -54,6 +54,6 @@ describe('itsLearningSetup', () => {
     cancelDeleteButton?.click();
     await nextTick();
 
-    expect(document.querySelector('[data-testid="cancel-schule-activate-in-itslearning-dialog-button"]')).toBeNull();
+    expect(document.querySelector('[data-testid="close-schule-sync-itslearning-dialog-button"]')).toBeNull();
   });
 });
