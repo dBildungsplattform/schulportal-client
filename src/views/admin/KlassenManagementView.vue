@@ -374,7 +374,7 @@
 
   onBeforeRouteLeave(async () => {
     organisationStore.errorCode = '';
-  })
+  });
 </script>
 
 <template>
