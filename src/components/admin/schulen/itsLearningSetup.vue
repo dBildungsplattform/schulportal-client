@@ -130,7 +130,7 @@
   >
     <template v-slot:activator="{ props }">
       <v-icon
-        class="ml-6"
+        class="ml-10"
         v-if="itslearningEnabled"
         :title="$t('admin.schule.retransmit')"
         data-testid="open-schule-itslearning-resync-dialog-icon"
@@ -140,7 +140,7 @@
       >
       </v-icon>
       <v-icon
-        class="ml-6"
+        class="ml-10"
         v-else
         :title="$t('admin.schule.enableNow')"
         data-testid="open-schule-itslearning-sync-dialog-icon"
