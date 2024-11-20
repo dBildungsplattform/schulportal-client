@@ -365,7 +365,7 @@
         :confirmUnsavedChangesAction="handleConfirmUnsavedChanges"
         :createButtonLabel="$t('admin.import.uploadFile')"
         :discardButtonLabel="$t('nav.backToList')"
-        :hideActions="showUploadSuccessTemplate"
+        :hideActions="showUploadSuccessTemplate || !!importStore.importedData"
         id="person-import-form"
         :onDiscard="navigateToPersonTable"
         :onSubmit="onSubmit"
@@ -421,7 +421,7 @@
         </template>
 
         <!-- Actual form -->
-        <template v-if="!showUploadSuccessTemplate">
+        <template v-if="!showUploadSuccessTemplate && !importStore.importedData">
           <!-- Schulauswahl -->
           <FormRow
             :errorLabel="selectedSchuleProps['error']"
