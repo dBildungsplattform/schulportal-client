@@ -8,7 +8,7 @@
   import { type SearchFilterStore, useSearchFilterStore } from '@/stores/SearchFilterStore';
   import ItsLearningSetup from '@/components/admin/schulen/itsLearningSetup.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
-  import { useRouter, type Router } from 'vue-router';
+  import { onBeforeRouteLeave, useRouter, type Router } from 'vue-router';
 
   const organisationStore: OrganisationStore = useOrganisationStore();
   const searchFilterStore: SearchFilterStore = useSearchFilterStore();
@@ -70,6 +70,10 @@
       systemrechte: ['SCHULEN_VERWALTEN'],
     });
   });
+
+  onBeforeRouteLeave(async () => {
+    organisationStore.errorCode = '';
+  })
 </script>
 
 <template>
@@ -101,38 +105,40 @@
         :buttonAction="handleAlertClose"
         @update:modelValue="handleAlertClose"
       />
-      <ResultTable
-        :currentPage="searchFilterStore.schulenPage"
-        data-testid="schule-table"
-        :items="organisationStore.allSchulen || []"
-        :loading="organisationStore.loading"
-        :headers="headers"
-        item-value-path="id"
-        :disableRowClick="true"
-        @onItemsPerPageUpdate="getPaginatedSchulenWithLimit"
-        @onPageUpdate="getPaginatedSchulen"
-        ref="result-table"
-        :totalItems="organisationStore.totalSchulen"
-        :itemsPerPage="searchFilterStore.schulenPerPage"
-      >
-        <template v-slot:[`item.name`]="{ item }">
-          <div
-            class="ellipsis-wrapper"
-            :title="item.name"
-          >
-            {{ item.name }}
-          </div>
-        </template>
-        <template v-slot:[`item.itslearning`]="{ item }">
-          <ItsLearningSetup
-            :errorCode="organisationStore.errorCode"
-            :schulname="item.name"
-            :schulId="item.id"
-            :itslearningEnabled="item.itslearningEnabled"
-            @onActivateItslearning="toggleItsLearningStatus(item.id)"
-          ></ItsLearningSetup>
-        </template>
-      </ResultTable>
+      <template v-if="!organisationStore.errorCode">
+        <ResultTable
+          :currentPage="searchFilterStore.schulenPage"
+          data-testid="schule-table"
+          :items="organisationStore.allSchulen || []"
+          :loading="organisationStore.loading"
+          :headers="headers"
+          item-value-path="id"
+          :disableRowClick="true"
+          @onItemsPerPageUpdate="getPaginatedSchulenWithLimit"
+          @onPageUpdate="getPaginatedSchulen"
+          ref="result-table"
+          :totalItems="organisationStore.totalSchulen"
+          :itemsPerPage="searchFilterStore.schulenPerPage"
+        >
+          <template v-slot:[`item.name`]="{ item }">
+            <div
+              class="ellipsis-wrapper"
+              :title="item.name"
+            >
+              {{ item.name }}
+            </div>
+          </template>
+          <template v-slot:[`item.itslearning`]="{ item }">
+            <ItsLearningSetup
+              :errorCode="organisationStore.errorCode"
+              :schulname="item.name"
+              :schulId="item.id"
+              :itslearningEnabled="item.itslearningEnabled"
+              @onActivateItslearning="toggleItsLearningStatus(item.id)"
+            ></ItsLearningSetup>
+          </template>
+        </ResultTable>
+      </template>
     </LayoutCard>
   </div>
 </template>

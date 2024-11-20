@@ -14,7 +14,7 @@
   import type { UserinfoPersonenkontext } from '@/stores/PersonenkontextStore';
   import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
   import { type TranslatedObject } from '@/types.d';
-  import { useRouter, type Router } from 'vue-router';
+  import { onBeforeRouteLeave, useRouter, type Router } from 'vue-router';
   import KlasseDelete from '@/components/admin/klassen/KlasseDelete.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
 
@@ -371,6 +371,10 @@
     organisationStore.errorCode = '';
     router.go(0);
   };
+
+  onBeforeRouteLeave(async () => {
+    organisationStore.errorCode = '';
+  })
 </script>
 
 <template>
