@@ -139,21 +139,21 @@
   async function navigateToSchuleManagement(): Promise<void> {
     if (organisationStore.errorCode === 'REQUIRED_STEP_UP_LEVEL_NOT_MET') {
       resetForm();
-      window.location.reload();
-    } else {
-      await router.push({ name: 'schule-management' });
-      organisationStore.createdSchule = null;
     }
+    organisationStore.createdSchule = null;
+    await router.push({ name: 'schule-management' }).then(() => {
+      router.go(0);
+    });
   }
 
   async function navigateBackToSchuleForm(): Promise<void> {
     if (organisationStore.errorCode === 'REQUIRED_STEP_UP_LEVEL_NOT_MET') {
       resetForm();
-      window.location.reload();
-    } else {
-      organisationStore.errorCode = '';
-      await router.push({ name: 'create-schule' });
     }
+    organisationStore.errorCode = '';
+    await router.push({ name: 'create-schule' }).then(() => {
+      router.go(0);
+    });
   }
 
   function preventNavigation(event: BeforeUnloadEvent): void {
