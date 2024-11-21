@@ -13,6 +13,7 @@ import { nextTick } from 'vue';
 import { createMemoryHistory, createRouter, useRoute, type Router } from 'vue-router';
 import ProfileView from './ProfileView.vue';
 import type { Zuordnung } from '@/stores/PersonenkontextStore';
+import { EmailAddressStatus } from '@/api-client/generated';
 
 let wrapper: VueWrapper | null = null;
 let personInfoStore: PersonInfoStore;
@@ -45,10 +46,12 @@ const mockLehrer: PersonInfoResponse = {
     lokalisierung: null,
     vertrauensstufe: 'KEIN',
     revision: '',
+    dienststellen: [],
   },
   pid: '',
   personenkontexte: [],
   gruppen: [],
+  email: null,
 };
 
 const mockSchueler: PersonInfoResponse = {
@@ -75,10 +78,12 @@ const mockSchueler: PersonInfoResponse = {
     lokalisierung: null,
     vertrauensstufe: 'KEIN',
     revision: '',
+    dienststellen: [],
   },
   pid: '',
   personenkontexte: [],
   gruppen: [],
+  email: null,
 };
 
 const passwordUpdatedAt: Date = new Date(2024, 9, 9);
@@ -114,13 +119,12 @@ const mockLehrerUebersicht: PersonWithUebersicht = {
   lastModifiedZuordnungen: '2021-09-01T12:00:00Z',
   zuordnungen: [
     {
-      klasse: '10A',
       sskId: '1',
       rolleId: '1',
       sskName: 'Muster-Schule',
       sskDstNr: '123456',
       rolle: 'Lehrer',
-      administriertVon: 'Admin',
+      administriertVon: 'root-sh',
       typ: OrganisationsTyp.Schule,
       editable: true,
       merkmale: ['KOPERS_PFLICHT'] as unknown as RollenMerkmal,
@@ -142,19 +146,19 @@ const mockLehrerUebersichtWith2Zuordnungen: PersonWithUebersicht = {
       sskName: 'Muster-Schule',
       sskDstNr: '123456',
       rolle: 'Lehrer',
-      administriertVon: 'Admin',
+      administriertVon: 'root-sh',
       typ: OrganisationsTyp.Schule,
       editable: true,
       merkmale: ['KOPERS_PFLICHT'] as unknown as RollenMerkmal,
       befristung: '2024-05-06',
     },
     {
-      sskId: '1',
+      sskId: '2',
       rolleId: '1',
       sskName: 'Anders-Sonderlich-Schule',
       sskDstNr: '789101112',
       rolle: 'Lehrer',
-      administriertVon: 'Admin',
+      administriertVon: 'root-sh',
       typ: OrganisationsTyp.Schule,
       editable: true,
       merkmale: ['KOPERS_PFLICHT'] as unknown as RollenMerkmal,
@@ -176,7 +180,7 @@ const mockSchuelerUebersicht: PersonWithUebersicht = {
       sskName: 'Astrid-Lindgren-Schule',
       sskDstNr: '123456',
       rolle: 'SuS',
-      administriertVon: 'Admin',
+      administriertVon: 'root-sh',
       typ: OrganisationsTyp.Schule,
       editable: true,
       merkmale: [] as unknown as RollenMerkmal,
@@ -189,7 +193,7 @@ const mockSchuelerUebersicht: PersonWithUebersicht = {
       sskName: '9A',
       sskDstNr: '123456-9A',
       rolle: 'SuS',
-      administriertVon: 'Admin',
+      administriertVon: '1',
       typ: OrganisationsTyp.Klasse,
       editable: true,
       merkmale: [] as unknown as RollenMerkmal,
@@ -363,7 +367,7 @@ describe('ProfileView', () => {
   });
 
   test('it displays 2FA connection error', async () => {
-    twoFactorAuthenticationStore.errorCode = 'something';
+    twoFactorAuthenticationStore.errorCode = 'PI_UNAVAILABLE_ERROR';
     await nextTick();
     if (!wrapper) return;
     const twoFactorCard: DOMWrapper<Element> = wrapper.find('[data-testid="two-factor-info"]');
@@ -371,5 +375,69 @@ describe('ProfileView', () => {
       'Der Server für die Zwei-Faktor-Authentifizierung kann aktuell nicht erreicht werden. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut.',
     );
     expect(document.querySelector('[data-testid="open-2FA-self-service-dialog-icon"]')).toBeNull();
+  });
+
+  describe('email', () => {
+    test('displays correct email status for enabled', async () => {
+      personInfoStore.personInfo = mockLehrer;
+      personInfoStore.personInfo.email = {
+        address: 'test@example.com',
+        status: EmailAddressStatus.Enabled,
+      };
+
+      await nextTick();
+
+      const emailElement: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="person-email-text"]');
+      expect(emailElement?.text()).toBe('test@example.com');
+    });
+
+    test('displays correct email status for requested', async () => {
+      personInfoStore.personInfo = mockLehrer;
+      personInfoStore.personInfo.email = {
+        address: 'test@example.com',
+        status: EmailAddressStatus.Requested,
+      };
+
+      await nextTick();
+
+      const emailElement: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="person-email-text"]');
+      expect(emailElement?.text()).toBe('wird erzeugt');
+    });
+
+    test('displays correct email status for disabled', async () => {
+      personInfoStore.personInfo = mockLehrer;
+      personInfoStore.personInfo.email = {
+        address: 'test@example.com',
+        status: EmailAddressStatus.Disabled,
+      };
+
+      await nextTick();
+
+      const emailElement: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="person-email-text"]');
+      expect(emailElement?.text()).toBe('deaktiviert');
+    });
+
+    test('displays correct email status for failed', async () => {
+      personInfoStore.personInfo = mockLehrer;
+      personInfoStore.personInfo.email = {
+        address: 'test@example.com',
+        status: EmailAddressStatus.Failed,
+      };
+
+      await nextTick();
+
+      const emailElement: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="person-email-text"]');
+      expect(emailElement?.text()).toBe('fehlerhaft');
+    });
+
+    test('hides email when its not set', async () => {
+      personInfoStore.personInfo = mockLehrer;
+      personInfoStore.personInfo.email = null;
+
+      await nextTick();
+
+      const emailElement: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="person-email-text"]');
+      expect(emailElement?.exists()).toBe(false);
+    });
   });
 });

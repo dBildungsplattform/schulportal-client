@@ -5,7 +5,7 @@
 
   // Define the type for the props
   type Props = {
-    confirmUnsavedChangesAction: () => void;
+    confirmUnsavedChangesAction?: () => void;
     canCommit?: boolean;
     createButtonLabel: string;
     discardButtonLabel: string;
@@ -46,7 +46,10 @@
     @submit.prevent="onSubmit"
   >
     <v-container class="px-3 px-sm-16">
-      <v-row class="align-center flex-nowrap mx-auto py-6">
+      <v-row
+        v-if="!hideActions"
+        class="align-center flex-nowrap mx-auto py-6"
+      >
         <v-icon
           aria-hidden="true"
           class="mr-2"
@@ -95,7 +98,7 @@
         <v-btn
           :block="mdAndDown"
           class="primary"
-          :data-testid="`${id}-create-button`"
+          :data-testid="`${id}-submit-button`"
           :disabled="!canCommit"
           type="submit"
           >{{ createButtonLabel }}</v-btn

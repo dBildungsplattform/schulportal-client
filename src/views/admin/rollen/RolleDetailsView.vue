@@ -260,7 +260,7 @@
     });
 
     Object.values(RollenSystemRecht).forEach((enumValue: RollenSystemRecht) => {
-      if (enumValue !== RollenSystemRecht.MigrationDurchfuehren) {
+      if (enumValue !== RollenSystemRecht.MigrationDurchfuehren && enumValue !== RollenSystemRecht.CronDurchfuehren) {
         const i18nPath: string = `admin.rolle.mappingFrontBackEnd.systemrechte.${enumValue}`;
         allSystemrechte.value.push({
           value: enumValue,
@@ -290,6 +290,16 @@
     window.addEventListener('beforeunload', preventNavigation);
   });
 
+  const alertButtonText: ComputedRef<string> = computed(() => {
+    return rolleStore.errorCode === 'NEWER_VERSION_OF_ROLLE_AVAILABLE' ? t('refreshData') : t('nav.backToList');
+  });
+
+  const alertButtonAction: ComputedRef<() => void> = computed(() => {
+    return rolleStore.errorCode === 'NEWER_VERSION_OF_ROLLE_AVAILABLE'
+      ? (): void => router.go(0)
+      : navigateToRolleTable;
+  });
+
   onBeforeRouteLeave((_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
     if (isFormDirty.value) {
       showUnsavedChangesDialog.value = true;
@@ -308,16 +318,12 @@
 
 <template>
   <div class="admin">
-    <v-row>
-      <v-col cols="12">
-        <h1
-          class="text-center headline-1"
-          data-testid="admin-headline"
-        >
-          {{ $t('admin.headline') }}
-        </h1>
-      </v-col>
-    </v-row>
+    <h1
+      class="text-center headline"
+      data-testid="admin-headline"
+    >
+      {{ $t('admin.headline') }}
+    </h1>
     <LayoutCard
       :closable="true"
       data-testid="rolle-details-card"
@@ -342,8 +348,8 @@
             : $t(`admin.rolle.errors.${rolleStore.errorCode}`)
         "
         :showButton="true"
-        :buttonText="$t('nav.backToList')"
-        :buttonAction="handleAlertClose"
+        :buttonText="alertButtonText"
+        :buttonAction="alertButtonAction"
         @update:modelValue="handleAlertClose"
       />
 

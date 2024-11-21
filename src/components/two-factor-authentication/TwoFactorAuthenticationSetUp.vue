@@ -42,6 +42,7 @@
       twoFactorAuthentificationStore.qrCode = '';
       twoFactorAuthentificationStore.hasToken = null;
       twoFactorAuthentificationStore.tokenKind = null;
+      twoFactorAuthentificationStore.errorCode = '';
     }
 
     isActive.value = false;

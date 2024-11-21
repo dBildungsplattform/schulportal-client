@@ -39,12 +39,14 @@
       title: t('admin.klasse.klasse'),
       key: 'name',
       align: 'start',
+      width: '250px',
     } as DataTableHeader,
     {
       title: t('action'),
       key: 'actions',
       align: 'center',
       sortable: false,
+      width: '250px',
     } as DataTableHeader,
   ]);
 
@@ -106,15 +108,33 @@
 
     searchFilterStore.klassenPerPage = limit || 1;
 
-    await organisationStore.getAllOrganisationen({
-      offset: (searchFilterStore.klassenPage - 1) * searchFilterStore.klassenPerPage,
-      limit: searchFilterStore.klassenPerPage,
-      includeTyp: OrganisationsTyp.Klasse,
-      systemrechte: ['KLASSEN_VERWALTEN'],
-    });
+    if (selectedSchule.value) {
+      fetchKlassenBySelectedSchuleId(selectedSchule.value);
+    } else {
+      await organisationStore.getAllOrganisationen({
+        offset: (searchFilterStore.klassenPage - 1) * searchFilterStore.klassenPerPage,
+        limit: searchFilterStore.klassenPerPage,
+        includeTyp: OrganisationsTyp.Klasse,
+        systemrechte: ['KLASSEN_VERWALTEN'],
+      });
+    }
+  }
+
+  async function applySearchAndFilters(): Promise<void> {
+    await fetchKlassenBySelectedSchuleId(searchFilterStore.selectedSchuleForKlassen);
+
+    const klassenCopy: Organisation[] = JSON.parse(JSON.stringify(organisationStore.klassen));
+
+    if (searchFilterStore.selectedKlassenForKlassen?.length && searchFilterStore.selectedKlassenForKlassen.length > 0) {
+      // In the table show only the Klassen that are selected
+      organisationStore.allKlassen = klassenCopy.filter((klasse: Organisation) =>
+        searchFilterStore.selectedKlassenForKlassen?.includes(klasse.id),
+      );
+    }
   }
 
   async function updateSelectedSchule(newValue: string | null): Promise<void> {
+    await searchFilterStore.setSchuleFilterForKlassen(newValue);
     if (newValue !== null) {
       selectedKlassen.value = [];
       fetchKlassenBySelectedSchuleId(newValue);
@@ -139,6 +159,7 @@
   }
 
   async function updateSelectedKlassen(newValue: string[]): Promise<void> {
+    await searchFilterStore.setKlasseFilterForKlassen(newValue);
     if (newValue.length > 0 && selectedSchule.value !== null) {
       // Filter finalKlassen to only include the selected Klassen
       organisationStore.allKlassen = organisationStore.klassen.filter((klasse: Organisation) =>
@@ -178,7 +199,7 @@
         await organisationStore.getAllOrganisationen({
           includeTyp: OrganisationsTyp.Schule,
           limit: 25,
-          systemrechte: ['SCHULEN_VERWALTEN'],
+          systemrechte: ['KLASSEN_VERWALTEN'],
         });
       }, 500);
     } else if (newValue && newValue !== selectedOrganisationTitle.value) {
@@ -189,7 +210,7 @@
           searchString: newValue,
           includeTyp: OrganisationsTyp.Schule,
           limit: 25,
-          systemrechte: ['SCHULEN_VERWALTEN'],
+          systemrechte: ['KLASSEN_VERWALTEN'],
         });
       }, 500);
     } else if (newValue === '' && selectedSchule.value) {
@@ -199,7 +220,7 @@
           searchString: newValue,
           includeTyp: OrganisationsTyp.Schule,
           limit: 25,
-          systemrechte: ['SCHULEN_VERWALTEN'],
+          systemrechte: ['KLASSEN_VERWALTEN'],
         });
       }, 500);
     }
@@ -231,9 +252,10 @@
         includeTyp: OrganisationsTyp.Klasse,
         systemrechte: ['KLASSEN_VERWALTEN'],
       });
-    } else if (selectedSchule.value !== null) {
+    } else if (searchValue === '' && selectedSchule.value !== null) {
       // Fetch all Klassen for the selected Schule when the search string is cleared
       await organisationStore.getAllOrganisationen({
+        searchString: searchValue,
         offset: (searchFilterStore.klassenPage - 1) * searchFilterStore.klassenPerPage,
         limit: searchFilterStore.klassenPerPage,
         administriertVon: [selectedSchule.value],
@@ -257,6 +279,9 @@
     searchInputKlassen.value = '';
     // Clear selected Klassen
     selectedKlassen.value = [];
+    // Clear the store
+    searchFilterStore.setSchuleFilterForKlassen(null);
+    searchFilterStore.setKlasseFilterForKlassen([]);
 
     // If the user has an autoselected Schule, do not reset it
     if (hasAutoselectedSchule.value && selectedSchule.value !== null) {
@@ -289,7 +314,7 @@
   async function handleUserContext(): Promise<void> {
     const personenkontexte: Array<UserinfoPersonenkontext> | null = authStore.currentUser?.personenkontexte || [];
     if (personenkontexte.length > 0) {
-      if (organisationStore.allSchulen.length === 1) {
+      if (organisationStore.allSchulen.length === 1 && !searchFilterStore.selectedSchuleForKlassen) {
         selectedSchule.value = organisationStore.allSchulen[0]?.id || null;
         if (selectedSchule.value) {
           await organisationStore.getKlassenByOrganisationId(selectedSchule.value);
@@ -300,6 +325,7 @@
           title: t('admin.schule.dienststellennummer'),
           key: 'schuleDetails',
           align: 'start',
+          width: '350px',
         } as DataTableHeader);
       }
     }
@@ -309,23 +335,30 @@
     router.push({ name: 'klasse-details', params: { id: item.id } });
   }
   onMounted(async () => {
-    await organisationStore.getAllOrganisationen({
-      offset: (searchFilterStore.klassenPage - 1) * searchFilterStore.klassenPerPage,
-      limit: searchFilterStore.klassenPerPage,
-      includeTyp: OrganisationsTyp.Klasse,
-      systemrechte: ['KLASSEN_VERWALTEN'],
-    });
-    await organisationStore.getAllOrganisationen({
-      offset: (searchFilterStore.klassenPage - 1) * searchFilterStore.klassenPerPage,
-      limit: 25,
-      includeTyp: OrganisationsTyp.Schule,
-      systemrechte: ['SCHULEN_VERWALTEN'],
-    });
-    // Initialize klassenOptions with all classes
-    klassenOptions.value = organisationStore.allKlassen.map((org: Organisation) => ({
-      value: org.id,
-      title: org.name,
-    }));
+    // If the store holds a Schule already then use it
+    if (searchFilterStore.selectedSchuleForKlassen) {
+      selectedSchule.value = searchFilterStore.selectedSchuleForKlassen;
+      selectedKlassen.value = searchFilterStore.selectedKlassenForKlassen || [];
+      await applySearchAndFilters();
+    } else {
+      await organisationStore.getAllOrganisationen({
+        offset: (searchFilterStore.klassenPage - 1) * searchFilterStore.klassenPerPage,
+        limit: searchFilterStore.klassenPerPage,
+        includeTyp: OrganisationsTyp.Klasse,
+        systemrechte: ['KLASSEN_VERWALTEN'],
+      });
+      await organisationStore.getAllOrganisationen({
+        offset: (searchFilterStore.klassenPage - 1) * searchFilterStore.klassenPerPage,
+        limit: 25,
+        includeTyp: OrganisationsTyp.Schule,
+        systemrechte: ['KLASSEN_VERWALTEN'],
+      });
+      // Initialize klassenOptions with all Klassen
+      klassenOptions.value = organisationStore.allKlassen.map((org: Organisation) => ({
+        value: org.id,
+        title: org.name,
+      }));
+    }
     // Handle user context
     await handleUserContext();
   });

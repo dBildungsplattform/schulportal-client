@@ -111,7 +111,7 @@ describe('OrganisationStore', () => {
       ];
 
       mockadapter.onGet('/api/organisationen?offset=0&limit=30&typ=KLASSE').replyOnce(200, mockResponse);
-      mockadapter.onGet('/api/organisationen?limit=30&typ=SCHULE&systemrechte=SCHULEN_VERWALTEN').replyOnce(200, []);
+      mockadapter.onGet('/api/organisationen?limit=30&typ=SCHULE&systemrechte=KLASSEN_VERWALTEN').replyOnce(200, []);
       const getAllOrganisationenPromise: Promise<void> = organisationStore.getAllOrganisationen({
         offset: 0,
         limit: 30,
@@ -598,6 +598,18 @@ describe('OrganisationStore', () => {
         kuerzel: 'O1',
         typ: OrganisationsTyp.Schule,
         administriertVon: '1',
+        version: 1,
+      };
+
+      organisationStore.currentKlasse = {
+        id: '2',
+        kennung: 'Org2',
+        name: 'Organisation 2',
+        namensergaenzung: 'Ergänzung',
+        kuerzel: 'O2',
+        typ: OrganisationsTyp.Klasse,
+        administriertVon: '1',
+        version: 1,
       };
 
       mockadapter.onPatch('/api/organisationen/1/name').replyOnce(200, mockResponse);
@@ -612,6 +624,16 @@ describe('OrganisationStore', () => {
     });
 
     it('should handle string error', async () => {
+      organisationStore.currentKlasse = {
+        id: '2',
+        kennung: 'Org2',
+        name: 'Organisation 2',
+        namensergaenzung: 'Ergänzung',
+        kuerzel: 'O2',
+        typ: OrganisationsTyp.Klasse,
+        administriertVon: '1',
+        version: 1,
+      };
       mockadapter.onPatch('/api/organisationen/1/name').replyOnce(500, 'some mock server error');
       const updateOrganisationPromise: Promise<void> = organisationStore.updateOrganisationById(
         '1',
@@ -625,6 +647,16 @@ describe('OrganisationStore', () => {
     });
 
     it('should handle error code', async () => {
+      organisationStore.currentKlasse = {
+        id: '2',
+        kennung: 'Org2',
+        name: 'Organisation 2',
+        namensergaenzung: 'Ergänzung',
+        kuerzel: 'O2',
+        typ: OrganisationsTyp.Klasse,
+        administriertVon: '1',
+        version: 1,
+      };
       mockadapter.onPatch('/api/organisationen/1/name').replyOnce(500, { i18nKey: 'UPDATE_ERROR' });
       const updateOrganisationPromise: Promise<void> = organisationStore.updateOrganisationById(
         '1',
@@ -634,6 +666,29 @@ describe('OrganisationStore', () => {
       await updateOrganisationPromise;
       expect(organisationStore.updatedOrganisation).toEqual(null);
       expect(organisationStore.errorCode).toEqual('UPDATE_ERROR');
+      expect(organisationStore.loading).toBe(false);
+    });
+    it('should throw error when organisation version is not found', async () => {
+      // Set currentKlasse to null to trigger the error
+      organisationStore.currentKlasse = {
+        id: '2',
+        kennung: 'Org2',
+        name: 'Organisation 2',
+        namensergaenzung: 'Ergänzung',
+        kuerzel: 'O2',
+        typ: OrganisationsTyp.Klasse,
+        administriertVon: '1',
+        version: undefined,
+      };
+
+      const updateOrganisationPromise: Promise<void> = organisationStore.updateOrganisationById(
+        '1',
+        'Updated Organisation 1',
+      );
+
+      await updateOrganisationPromise;
+      expect(organisationStore.updatedOrganisation).toEqual(null);
+      expect(organisationStore.errorCode).toEqual('UNSPECIFIED_ERROR');
       expect(organisationStore.loading).toBe(false);
     });
   });
@@ -649,6 +704,7 @@ describe('OrganisationStore', () => {
           traegerschaft: '01',
           typ: OrganisationsTyp.Land,
           administriertVon: '1',
+          version: 1,
         },
         ersatz: {
           id: '3',
@@ -659,6 +715,7 @@ describe('OrganisationStore', () => {
           traegerschaft: '01',
           typ: OrganisationsTyp.Land,
           administriertVon: '1',
+          version: 1,
         },
       };
 
@@ -707,7 +764,7 @@ describe('OrganisationStore', () => {
       organisationStore.klassen = [...mockKlassen];
 
       mockadapter
-        .onGet('/api/organisationen?limit=30&typ=SCHULE&systemrechte=SCHULEN_VERWALTEN&organisationIds=101')
+        .onGet('/api/organisationen?limit=30&typ=SCHULE&systemrechte=KLASSEN_VERWALTEN&organisationIds=101')
         .replyOnce(200, [
           {
             id: '101',

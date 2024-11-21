@@ -19,6 +19,7 @@
   import SuccessTemplate from '@/components/admin/klassen/SuccessTemplate.vue';
   import KlasseDelete from '@/components/admin/klassen/KlasseDelete.vue';
   import { getValidationSchema, getVuetifyConfig } from '@/utils/validationKlasse';
+  import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
 
   const route: RouteLocationNormalizedLoaded = useRoute();
   const router: Router = useRouter();
@@ -27,12 +28,10 @@
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
   const organisationStore: OrganisationStore = useOrganisationStore();
+  const searchFilterStore: SearchFilterStore = useSearchFilterStore();
 
   const currentOrganisationId: string = route.params['id'] as string;
   const isEditActive: Ref<boolean> = ref(false);
-
-  const creationErrorText: Ref<string> = ref('');
-  const creationErrorTitle: Ref<string> = ref('');
 
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
 
@@ -110,9 +109,9 @@
     event.returnValue = '';
   }
 
-  function navigateToKlasseManagement(): void {
+  async function navigateToKlasseManagement(): Promise<void> {
+    await router.push({ name: 'klasse-management' });
     organisationStore.updatedOrganisation = null;
-    router.push({ name: 'klasse-management' });
   }
 
   const handleAlertClose = (): void => {
@@ -123,28 +122,33 @@
   const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = handleSubmit(async () => {
     if (selectedSchule.value && selectedKlassenname.value) {
       if (organisationStore.currentOrganisation) {
-        try {
-          await organisationStore.updateOrganisationById(currentOrganisationId, selectedKlassenname.value);
-        } catch {
-          creationErrorText.value = t(`admin.klasse.errors.${organisationStore.errorCode}`);
-          creationErrorTitle.value = t(`admin.klasse.title.${organisationStore.errorCode}`);
-        }
+        await organisationStore.updateOrganisationById(currentOrganisationId, selectedKlassenname.value);
       }
       resetForm();
     }
   });
 
   async function deleteKlasseById(organisationId: string): Promise<void> {
-    try {
-      await organisationStore.deleteOrganisationById(organisationId);
-    } catch {
-      creationErrorText.value = t(`admin.rolle.errors.${organisationStore.errorCode}`);
-      creationErrorTitle.value = t(`admin.rolle.title.${organisationStore.errorCode}`);
+    await organisationStore.deleteOrganisationById(organisationId);
+    // If the deleted Klasse was used for the Klassen filter then reset the filter for Klassen
+    if (searchFilterStore.selectedKlassenForKlassen?.includes(organisationId)) {
+      searchFilterStore.selectedKlassenForKlassen = [];
     }
   }
 
+  const alertButtonText: ComputedRef<string> = computed(() => {
+    return organisationStore.errorCode === 'NEWER_VERSION_ORGANISATION' ? t('refreshData') : t('nav.backToList');
+  });
+
+  const alertButtonAction: ComputedRef<() => void> = computed(() => {
+    return organisationStore.errorCode === 'NEWER_VERSION_ORGANISATION'
+      ? (): void => router.go(0)
+      : navigateToKlasseManagement;
+  });
+
   onBeforeMount(async () => {
     organisationStore.errorCode = '';
+    organisationStore.updatedOrganisation = null;
     // Retrieves the Klasse using the Id in the route since that's all we have
     await organisationStore.getOrganisationById(currentOrganisationId, OrganisationsTyp.Klasse);
     // Retrieves the parent Organisation of the Klasse using the same endpoint but with a different parameter
@@ -180,16 +184,12 @@
 
 <template>
   <div class="admin">
-    <v-row>
-      <v-col cols="12">
-        <h1
-          class="text-center headline-1"
-          data-testid="admin-headline"
-        >
-          {{ $t('admin.headline') }}
-        </h1>
-      </v-col>
-    </v-row>
+    <h1
+      class="text-center headline"
+      data-testid="admin-headline"
+    >
+      {{ $t('admin.headline') }}
+    </h1>
     <LayoutCard
       :closable="true"
       data-testid="klasse-details-card"
@@ -214,8 +214,8 @@
             : $t(`admin.klasse.errors.${organisationStore.errorCode}`)
         "
         :showButton="true"
-        :buttonText="$t('nav.backToList')"
-        :buttonAction="handleAlertClose"
+        :buttonText="alertButtonText"
+        :buttonAction="alertButtonAction"
         @update:modelValue="handleAlertClose"
       />
 
@@ -327,7 +327,7 @@
       <template v-if="organisationStore.updatedOrganisation && !organisationStore.errorCode">
         <SuccessTemplate
           :backButtonTestId="'back-to-details-button'"
-          :backButtonText="$t('nav.backToDetails')"
+          :backButtonText="$t('nav.backToList')"
           :createAnotherButtonText="$t('admin.klasse.createAnother')"
           :createdData="[
             { label: $t('admin.schule.schule'), value: translatedSchulname || '', testId: 'created-klasse-schule' },
@@ -338,7 +338,7 @@
             },
           ]"
           :followingDataCreated="$t('admin.followingDataCreated')"
-          @onNavigateBack="router.go(0)"
+          @onNavigateBack="navigateToKlasseManagement"
           :showCreateAnotherButton="false"
           :successMessage="$t('admin.klasse.klasseUpdatedSuccessfully')"
         />
