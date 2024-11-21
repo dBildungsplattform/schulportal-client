@@ -2510,6 +2510,7 @@ export interface ServiceProviderIdNameResponse {
 export const ServiceProviderKategorie = {
     Email: 'EMAIL',
     Unterricht: 'UNTERRICHT',
+    Verwaltung: 'VERWALTUNG',
     Hinweise: 'HINWEISE',
     Angebote: 'ANGEBOTE'
 } as const;
