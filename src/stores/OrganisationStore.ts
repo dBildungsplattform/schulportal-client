@@ -212,7 +212,7 @@ export const useOrganisationStore: StoreDefinition<
         undefined,
         undefined,
         OrganisationsTyp.Schule,
-        ['KLASSEN_VERWALTEN'],
+        ['SCHULEN_VERWALTEN'],
         undefined,
         undefined,
         Array.from(administriertVonSet),
