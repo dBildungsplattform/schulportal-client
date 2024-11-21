@@ -401,7 +401,7 @@
     "searchResultTable": "Ergebnisliste durchsuchen",
     "schule": {
       "activateInItsLearning": "itslearning freischalten",
-      "activateSchuleConfirmationMessage": "Wollen Sie die Daten der Schule {schulname} an its Learning übertragen?",
+      "activateSchuleConfirmationMessage": "Wollen Sie die Daten der Schule {schulname} an itslearning übertragen?",
       "activateSchuleSuccessMessage": "Die Schule {schulname} wird in itslearning angelegt.",
       "addNew": "Neue Schule hinzufügen",
       "administratingSchultraeger": "Verwaltender Schulträger",
