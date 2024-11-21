@@ -117,6 +117,7 @@
         "klassenname": {
           "matches": "Der Klassenname darf keine ungültigen Zeichen beinhalten.",
           "noLeadingTrailingSpaces": "Der Klassenname darf nicht mit Leerzeichen beginnen oder enden.",
+          "mustContainLetterOrNumber": "Der Klassenname muss mindestens einen Buchstaben oder eine Zahl enthalten.",
           "required": "Der Klassenname muss angegeben werden."
         },
         "schule": {
