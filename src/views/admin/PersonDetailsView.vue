@@ -509,16 +509,28 @@
   const canChangeKlasse: ComputedRef<boolean> = computed(() => {
     const hasOneSelectedZuordnung: boolean = selectedZuordnungen.value.length === 1;
 
-    const organisationId: string | undefined = selectedZuordnungen.value[0]?.sskId;
     const rolleId: string | undefined = selectedZuordnungen.value[0]?.rolleId;
 
-    personenkontextStore.processWorkflowStep({ organisationId: organisationId, rolleId: rolleId, limit: 25 });
     // Check if rolleId exists and if it's of type LERN
     if (rolleId && isLernRolle(rolleId) && hasOneSelectedZuordnung) {
       return true;
     }
     return false;
   });
+
+  watch(
+    () => selectedZuordnungen.value[0], // Watch the first selected Zuordnung
+    (newValue: Zuordnung | undefined) => {
+      if (newValue) {
+        const organisationId: string | undefined = newValue.sskId;
+        const rolleId: string | undefined = newValue.rolleId;
+
+        // Trigger the API call
+        personenkontextStore.processWorkflowStep({ organisationId, rolleId, limit: 25 });
+      }
+    },
+    { immediate: true }, // Run on initialization if there's already a selected Zuordnung
+  );
 
   // Validation schema for the form for changing the Klasse (Versetzen)
   const changeKlasseValidationSchema: TypedSchema = toTypedSchema(
