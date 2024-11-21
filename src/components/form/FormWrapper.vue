@@ -46,7 +46,10 @@
     @submit.prevent="onSubmit"
   >
     <v-container class="px-3 px-sm-16">
-      <v-row class="align-center flex-nowrap mx-auto py-6">
+      <v-row
+        v-if="!hideActions"
+        class="align-center flex-nowrap mx-auto py-6"
+      >
         <v-icon
           aria-hidden="true"
           class="mr-2"
