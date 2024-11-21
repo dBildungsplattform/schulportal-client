@@ -225,7 +225,7 @@
                 @click.stop="handleSchuleToItsLearning(props.schulId)"
                 data-testid="schule-itslearning-sync-button"
               >
-                {{ $t('admin.schule.activateInItsLearning') }}
+                {{ itslearningEnabled ? $t('admin.schule.retransmit') : $t('admin.schule.activateInItsLearning') }}
               </v-btn>
             </v-col>
           </v-row>
