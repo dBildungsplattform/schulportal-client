@@ -212,7 +212,7 @@ export const useOrganisationStore: StoreDefinition<
         undefined,
         undefined,
         OrganisationsTyp.Schule,
-        ['KLASSEN_VERWALTEN'],
+        ['SCHULEN_VERWALTEN'],
         undefined,
         undefined,
         Array.from(administriertVonSet),
@@ -332,13 +332,17 @@ export const useOrganisationStore: StoreDefinition<
       this.errorCode = '';
       this.loadingKlassen = true;
       try {
-        const response: AxiosResponse<Organisation[]> =
-          await organisationApi.organisationControllerGetAdministrierteOrganisationen(
-            organisationId,
-            filter?.offset,
-            filter?.limit,
-            filter?.searchString,
-          );
+        const response: AxiosResponse<Organisation[]> = await organisationApi.organisationControllerFindOrganizations(
+          filter?.offset,
+          filter?.limit,
+          undefined,
+          undefined,
+          filter?.searchString,
+          OrganisationsTyp.Klasse,
+          [],
+          undefined,
+          [organisationId],
+        );
         const getFilteredKlassen: Organisation[] = response.data.filter(
           (orga: Organisation) => orga.typ === OrganisationsTyp.Klasse,
         );
