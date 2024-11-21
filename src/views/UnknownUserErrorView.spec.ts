@@ -46,7 +46,7 @@ describe('UnknownUserErrorView', () => {
     const alertTitle: WrapperLike | undefined = wrapper?.find('[data-testid="alert-text"]');
 
     expect(alertTitle?.isVisible()).toBe(true);
-    expect(alertTitle?.text()).toEqual('Der Benutzer ist im Schulportal SH nicht bekannt');
+    expect(alertTitle?.text()).toEqual('Der Benutzer ist im ErWIn Portal nicht bekannt');
   });
 
   test('it renders the return button', () => {

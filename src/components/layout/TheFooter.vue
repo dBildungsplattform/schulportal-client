@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import { type ComputedRef, ref, type Ref } from 'vue';
-  import SH_LOGO from '@/assets/logos/landesdachmarke_01_KORR.svg';
-  import DIGITAL_PAKT_LOGO from '@/assets/logos/digitalPakt.svg';
+  import BMBF_LOGO from '@/assets/logos/erwin_logos/BMBF_Logo.svg';
+  import ERWIN_LOGO_SMALL from '@/assets/logos/erwin_logos/Logo-ErWIn-Portal-dunkel.svg';
   import { type Composer, useI18n } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
 
@@ -45,14 +45,14 @@
 
   const sponsors: Ref<Sponsor[]> = ref([
     {
-      src: DIGITAL_PAKT_LOGO,
-      alt: 'Logo DigitalPakt Schule',
-      href: 'https://www.digitalpaktschule.de/de/schleswig-holstein-1800.html',
+      src: ERWIN_LOGO_SMALL,
+      alt: 'ErWIn Portal',
+      href: 'https://www.google.de',
     },
     {
-      src: SH_LOGO,
-      alt: 'Logo Schleswig-Holstein',
-      href: 'https://www.schleswig-holstein.de/DE/landesportal/landesportal_node.html',
+      src: BMBF_LOGO,
+      alt: 'BMBF',
+      href: 'https://www.bmbf.de/bmbf/de/home/home_node.html',
     },
   ]);
 

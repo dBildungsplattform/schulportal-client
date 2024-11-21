@@ -175,7 +175,7 @@
       "noKopersNr": "KoPers.-Nr. nicht vorhanden",
       "noKopersNrConfirmationDialogMessage": "Bitte beachten Sie, dass ein Benutzerkonto ohne KoPers.-Nr. nach 8 Wochen automatisch gesperrt wird. Tragen Sie daher die KoPers.-Nr. bitte in der Gesamtübersicht des Benutzers nach, sobald diese Ihnen vorliegt.",
       "personalInfo": "Persönliche Informationen",
-      "personalInfoChangeNotice": "Namensänderungen haben unmittelbare Auswirkungen auf den Benutzernamen im Schulportal SH und auf die E-Mail-Adresse! \n\nWeitere Informationen finden Sie auf der Homepage der IQSH-Medienberatung.",
+      "personalInfoChangeNotice": "Namensänderungen haben unmittelbare Auswirkungen auf den Benutzernamen im ErWIn Portal und auf die E-Mail-Adresse! \n\nWeitere Informationen finden Sie auf der Homepage der IQSH-Medienberatung.",
       "personalInfoChangeNotice2": "Weitere Informationen finden Sie auf der ",
       "personalInfoSuccessDialogMessage": "Die Stammdaten wurden erfolgreich geändert.",
       "personalInfoSuccessDialogMessageWithUsername": "Die Stammdaten wurden erfolgreich geändert.\n\nDas Passwort wurde nicht verändert und kann wie zuvor verwendet werden. \n\nBitte teilen Sie der betroffenen Person die Stammdatenänderung (Benutzername, Mail-Adresse) mit. \n\nDie neuen Daten können Sie in der Gesamtübersicht einsehen." ,
@@ -473,7 +473,7 @@
     "NOT_FOUND": "Die aufgerufene Seite wurde nicht gefunden.",
     "UNKNOWN_USER": {
       "title": "Unbekannter Benutzer",
-      "text": "Der Benutzer ist im Schulportal SH nicht bekannt"
+      "text": "Der Benutzer ist im ErWIn Portal nicht bekannt"
     }
   },
   "footer": {
@@ -484,13 +484,13 @@
     "privacyPolicy": "Datenschutzerklärung"
   },
   "itemsPerPage": "Einträge pro Seite",
-  "landingTitle": "Willkommen im Schulportal SH.",
+  "landingTitle": "Willkommen im ErWIn Portal.",
   "login": {
-    "button": "Anmelden Test",
+    "button": "Anmelden",
     "forgotPassword": "Passwort vergessen? \n Wenden Sie sich bitte an Ihre schulischen Administratorinnen und Administratoren.",
-    "header": "Anmeldung im Schulportal SH",
+    "header": "Anmeldung im ErWIn Portal",
     "maintenanceNoticeTitle": "Achtung Wartungsarbeiten!",
-    "maintenanceNoticeText": "Am 7.12. und 8.12.2024 werden ganztägig Wartungsarbeiten am Schulportal SH ausgeführt.",
+    "maintenanceNoticeText": "Am 7.12. und 8.12.2024 werden ganztägig Wartungsarbeiten am ErWIn Portal ausgeführt.",
     "doNotLogin": "Bitte melden Sie sich nicht an!",
     "password": "Passwort",
     "username": "Benutzername"
@@ -561,7 +561,7 @@
     "kopersNr": "KoPers.-Nr.",
     "lastName": "Nachname",
     "lockUser": "Benutzer sperren",
-    "lockUserInfoText": "Für die Dauer der Sperre hat der Benutzer keinen Zugriff mehr auf das Schulportal SH und die daran angeschlossenen Dienste.",
+    "lockUserInfoText": "Für die Dauer der Sperre hat der Benutzer keinen Zugriff mehr auf das ErWIn Portal und die daran angeschlossenen Dienste.",
     "lockedBy": "Gesperrt durch",
     "lockedSince": "Gesperrt seit",
     "lockedUntil": "Gesperrt bis",
