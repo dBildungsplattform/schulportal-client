@@ -13,8 +13,8 @@ export const getValidationSchema = (t: (key: string) => string): TypedSchema<Val
     object({
       selectedSchule: string().required(t('admin.klasse.rules.schule.required')),
       selectedKlassenname: string()
-        .matches(HAS_LETTER_OR_NUMBER, t('admin.klasse.rules.klassenname.mustContainLetterOrNumber')) // Specific error for no letters/numbers
         .matches(DIN_91379A_EXT, t('admin.klasse.rules.klassenname.matches')) // Generic validation for class name format
+        .matches(HAS_LETTER_OR_NUMBER, t('admin.klasse.rules.klassenname.mustContainLetterOrNumber')) // Specific error for no letters/numbers
         .matches(NO_LEADING_TRAILING_SPACES, t('admin.klasse.rules.klassenname.noLeadingTrailingSpaces')) // Error for leading/trailing spaces
         .required(t('admin.klasse.rules.klassenname.required')), // Error for empty value
     }),
