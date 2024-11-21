@@ -33,7 +33,7 @@
           aria-hidden="true"
           alt="Logo Schulportal"
           class="logo"
-          src="@/assets/logos/Schulportal_SH_Wort_Bildmarke_RGB_Anwendung_HG_Weiss.svg"
+          src="@/assets/logos/erwin_logos/Logo-ErWIn-Portal-dunkel.svg"
           width="540"
         />
       </v-col>
