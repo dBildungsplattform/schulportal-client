@@ -307,7 +307,6 @@
     } else {
       next();
     }
-    rolleStore.errorCode = '';
     rolleStore.createdRolle = null;
   });
 
