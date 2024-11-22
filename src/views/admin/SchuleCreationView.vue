@@ -109,8 +109,8 @@
       await organisationStore.createOrganisation(
         selectedDienststellennummer.value,
         selectedSchulname.value,
-        ' ',
-        ' ',
+        undefined,
+        undefined,
         OrganisationsTyp.Schule,
         undefined,
         selectedSchulform.value,
