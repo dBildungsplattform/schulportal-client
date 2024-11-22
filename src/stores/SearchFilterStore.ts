@@ -20,6 +20,7 @@ type SearchFilterState = {
   currentSort: { key: string; order: 'asc' | 'desc' } | null;
   selectedSchuleForKlassen: string | null;
   selectedKlassenForKlassen: Array<string> | null;
+  selectedSchulenForSchulen: Array<string> | null;
 };
 
 type SearchFilterActions = {
@@ -36,6 +37,7 @@ type SearchFilterActions = {
   setCurrentSortForPersonen: (currentSort: { key: string; order: 'asc' | 'desc' } | null) => Promise<void>;
   setSchuleFilterForKlassen: (selectedSchuleForKlassen: string | null) => Promise<void>;
   setKlasseFilterForKlassen: (selectedKlassenForKlassen: Array<string> | null) => Promise<void>;
+  setSchuleFilterForSchulen: (selectedSchulenForSchulen: Array<string> | null) => Promise<void>;
 };
 
 type SearchFilterGetters = {};
@@ -68,6 +70,7 @@ export const useSearchFilterStore: StoreDefinition<
     currentSort: null,
     selectedSchuleForKlassen: null,
     selectedKlassenForKlassen: [],
+    selectedSchulenForSchulen: [],
   }),
   actions: {
     async setKlasseFilterForPersonen(selectedKlassen: Array<string> | null) {
@@ -109,6 +112,10 @@ export const useSearchFilterStore: StoreDefinition<
 
     async setKlasseFilterForKlassen(selectedKlassenForKlassen: Array<string> | null) {
       this.selectedKlassenForKlassen = selectedKlassenForKlassen;
+    },
+
+    async setSchuleFilterForSchulen(selectedSchulenForSchulen: Array<string> | null) {
+      this.selectedSchulenForSchulen = selectedSchulenForSchulen;
     },
   },
 });
