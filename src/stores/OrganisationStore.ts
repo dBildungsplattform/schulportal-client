@@ -27,6 +27,7 @@ export type Organisation = {
   administriertVon?: string | null;
   schuleDetails?: string;
   version?: number;
+  itslearningEnabled?: boolean;
 };
 
 export type KlasseTableItem = {
@@ -75,6 +76,7 @@ type OrganisationState = {
   loadingKlassen: boolean;
   parentOrganisationen: Array<Organisation>;
   schultraeger: Array<Organisation>;
+  activatedItslearningOrganisation: Organisation | null;
 };
 
 export type OrganisationenFilter = {
@@ -110,6 +112,7 @@ type OrganisationActions = {
   updateOrganisationById: (organisationId: string, name: string) => Promise<void>;
   getSchultraeger: () => Promise<void>;
   fetchSchuleDetailsForKlassen: (filterActive: boolean) => Promise<void>;
+  setItsLearningForSchule: (organisationId: string) => Promise<void>;
 };
 
 export { OrganisationsTyp };
@@ -145,6 +148,7 @@ export const useOrganisationStore: StoreDefinition<
       loadingKlassen: false,
       parentOrganisationen: [],
       schultraeger: [],
+      activatedItslearningOrganisation: null,
     };
   },
 
@@ -212,7 +216,7 @@ export const useOrganisationStore: StoreDefinition<
         undefined,
         undefined,
         OrganisationsTyp.Schule,
-        ['KLASSEN_VERWALTEN'],
+        ['SCHULEN_VERWALTEN'],
         undefined,
         undefined,
         Array.from(administriertVonSet),
@@ -332,13 +336,17 @@ export const useOrganisationStore: StoreDefinition<
       this.errorCode = '';
       this.loadingKlassen = true;
       try {
-        const response: AxiosResponse<Organisation[]> =
-          await organisationApi.organisationControllerGetAdministrierteOrganisationen(
-            organisationId,
-            filter?.offset,
-            filter?.limit,
-            filter?.searchString,
-          );
+        const response: AxiosResponse<Organisation[]> = await organisationApi.organisationControllerFindOrganizations(
+          filter?.offset,
+          filter?.limit,
+          undefined,
+          undefined,
+          filter?.searchString,
+          OrganisationsTyp.Klasse,
+          [],
+          undefined,
+          [organisationId],
+        );
         const getFilteredKlassen: Organisation[] = response.data.filter(
           (orga: Organisation) => orga.typ === OrganisationsTyp.Klasse,
         );
@@ -448,6 +456,23 @@ export const useOrganisationStore: StoreDefinition<
         if (isAxiosError(error)) {
           this.errorCode = error.response?.data.i18nKey || 'SCHULTRAEGER_ERROR';
         }
+      }
+    },
+
+    async setItsLearningForSchule(organisationId: string): Promise<void> {
+      this.errorCode = '';
+      this.loading = true;
+      try {
+        const { data }: { data: Organisation } =
+          await organisationApi.organisationControllerEnableForitslearning(organisationId);
+        this.activatedItslearningOrganisation = data;
+      } catch (error: unknown) {
+        this.errorCode = 'UNSPECIFIED_ERROR';
+        if (isAxiosError(error)) {
+          this.errorCode = error.response?.data.i18nKey || 'ORGANISATION_SPECIFICATION_ERROR';
+        }
+      } finally {
+        this.loading = false;
       }
     },
   },
