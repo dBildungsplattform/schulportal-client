@@ -120,10 +120,10 @@
 
   const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = handleSubmit(async () => {
     await organisationStore.createOrganisation(
-      '',
+      null,
       selectedKlassenname.value,
-      '',
-      '',
+      null,
+      null,
       OrganisationsTyp.Klasse,
       undefined,
       selectedSchule.value,
