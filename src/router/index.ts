@@ -5,7 +5,6 @@ import {
   type TwoFactorAuthentificationStore,
 } from '@/stores/TwoFactorAuthentificationStore';
 import routes from './routes';
-
 type Permission =
   | 'klassenverwaltung'
   | 'personenanlegen'
@@ -30,10 +29,26 @@ const router: Router = createRouter({
   },
 });
 
+function handleGoToPreviousPage(): void {
+  const previousUrl: string | null = sessionStorage.getItem('previousUrl');
+  router.push(previousUrl ?? '/start');
+}
+
 router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormalized) => {
   const authStore: AuthStore = useAuthStore();
   await authStore.initializeAuthStatus();
   if (to.path != '/profile' && to.path != '/no-second-factor') sessionStorage.setItem('previousUrl', to.path);
+
+  if (to.path === '/no-second-factor') {
+    const personId: string | null | undefined = authStore.currentUser?.personId;
+    if (!personId) return false;
+    const twoFactorAuthentificationStore: TwoFactorAuthentificationStore = useTwoFactorAuthentificationStore();
+    await twoFactorAuthentificationStore.get2FAState(personId);
+    if (twoFactorAuthentificationStore.hasToken) {
+      handleGoToPreviousPage();
+      return false;
+    }
+  }
 
   // Redirect authenticated users trying to access the login page to the start page
   if (to.path === '/' && authStore.isAuthed) {
@@ -56,6 +71,7 @@ router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormal
     }
 
     window.location.href = `/api/auth/login?redirectUrl=${to.fullPath}&requiredStepUpLevel=${StepUpLevel.GOLD}`;
+    return false;
   }
 
   if (to.meta['requiresPermission']) {

@@ -39,6 +39,7 @@ beforeEach(async () => {
       administriertVon: '1',
     },
   ];
+  organisationStore.errorCode = '';
 
   router = createRouter({
     history: createWebHistory(),
@@ -93,7 +94,6 @@ describe('SchuleCreationView', () => {
     const schulnameInput: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schulname-input' });
     await schulnameInput?.setValue('Random Schulname Gymnasium');
     await nextTick();
-
     const mockSchule: OrganisationResponse = {
       id: '9876',
       name: 'Random Schulname Gymnasium',
@@ -120,7 +120,22 @@ describe('SchuleCreationView', () => {
   test('it shows error message', async () => {
     organisationStore.errorCode = 'NAME_REQUIRED_FOR_SCHULE';
     await nextTick();
-
     expect(wrapper?.find('[data-testid="alert-title"]').isVisible()).toBe(true);
+  });
+
+  test('shows error message if REQUIRED_STEP_UP_LEVEL_NOT_MET error is present and click close button', async () => {
+    organisationStore.errorCode = 'REQUIRED_STEP_UP_LEVEL_NOT_MET';
+    await nextTick();
+    expect(wrapper?.find('[data-testid="alert-title"]').isVisible()).toBe(true);
+    wrapper?.find('[data-testid="alert-button"]').trigger('click');
+    await nextTick();
+  });
+
+  test('shows error message if REQUIRED_STEP_UP_LEVEL_NOT_MET error is present and click x button', async () => {
+    organisationStore.errorCode = 'REQUIRED_STEP_UP_LEVEL_NOT_MET';
+    await nextTick();
+    expect(wrapper?.find('[data-testid="alert-title"]').isVisible()).toBe(true);
+    wrapper?.find('[data-testid="close-layout-card-button"]').trigger('click');
+    await nextTick();
   });
 });

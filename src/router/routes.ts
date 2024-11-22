@@ -41,6 +41,7 @@ const routes: readonly RouteRecordRaw[] = [
     meta: {
       layout: 'AdminLayout',
       requiresAuth: true,
+      requiredStepUpLevel: StepUpLevel.GOLD,
       requiresPermission: ['personenverwaltung', 'personenanlegen'],
     },
   },
