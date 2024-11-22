@@ -71,6 +71,7 @@ router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormal
     }
 
     window.location.href = `/api/auth/login?redirectUrl=${to.fullPath}&requiredStepUpLevel=${StepUpLevel.GOLD}`;
+    return false;
   }
 
   if (to.meta['requiresPermission']) {
