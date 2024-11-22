@@ -103,10 +103,13 @@
   async function navigateBackToRolleForm(): Promise<void> {
     if (rolleStore.errorCode === 'REQUIRED_STEP_UP_LEVEL_NOT_MET') {
       formContext.resetForm();
+      await router.push({ name: 'create-rolle' }).then(() => {
+        router.go(0);
+      });
+    } else {
+      rolleStore.errorCode = '';
+      await router.push({ name: 'create-rolle' });
     }
-    await router.push({ path: '/admin/rollen/new' }).then(() => {
-      router.go(0);
-    });
   }
 
   async function navigateToRolleManagement(): Promise<void> {

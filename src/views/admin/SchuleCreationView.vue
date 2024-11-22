@@ -149,10 +149,13 @@
   async function navigateBackToSchuleForm(): Promise<void> {
     if (organisationStore.errorCode === 'REQUIRED_STEP_UP_LEVEL_NOT_MET') {
       resetForm();
+      await router.push({ name: 'create-schule' }).then(() => {
+        router.go(0);
+      });
+    } else {
+      organisationStore.errorCode = '';
+      await router.push({ name: 'create-schule' });
     }
-    await router.push({ name: 'create-schule' }).then(() => {
-      router.go(0);
-    });
   }
 
   function preventNavigation(event: BeforeUnloadEvent): void {

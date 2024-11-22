@@ -344,10 +344,14 @@
       personenkontextStore.errorCode === 'REQUIRED_STEP_UP_LEVEL_NOT_MET'
     ) {
       formContext.resetForm();
+      await router.push({ name: 'create-person' }).then(() => {
+        router.go(0);
+      });
+    } else {
+      personenkontextStore.errorCode = '';
+      personStore.errorCode = '';
+      await router.push({ name: 'create-person' });
     }
-    await router.push({ name: 'create-person' }).then(() => {
-      router.go(0);
-    });
   }
 
   const handleCreateAnotherPerson = (): void => {
