@@ -345,8 +345,6 @@
     ) {
       formContext.resetForm();
     }
-    personStore.errorCode = '';
-    personenkontextStore.errorCode = '';
     await router.push({ name: 'create-person' }).then(() => {
       router.go(0);
     });

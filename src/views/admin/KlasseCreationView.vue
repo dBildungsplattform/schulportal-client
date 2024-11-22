@@ -108,7 +108,6 @@
     if (organisationStore.errorCode === 'REQUIRED_STEP_UP_LEVEL_NOT_MET') {
       resetForm();
     }
-    organisationStore.errorCode = '';
     await router.push({ name: 'create-klasse' }).then(() => {
       router.go(0);
     });

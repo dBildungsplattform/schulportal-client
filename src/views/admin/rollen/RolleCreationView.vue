@@ -104,7 +104,6 @@
     if (rolleStore.errorCode === 'REQUIRED_STEP_UP_LEVEL_NOT_MET') {
       formContext.resetForm();
     }
-    rolleStore.errorCode = '';
     await router.push({ path: '/admin/rollen/new' }).then(() => {
       router.go(0);
     });
@@ -112,7 +111,9 @@
 
   async function navigateToRolleManagement(): Promise<void> {
     formContext.resetForm();
-    await router.push({ name: 'rolle-management' });
+    await router.push({ name: 'rolle-management' }).then(() => {
+      router.go(0);
+    });
     rolleStore.createdRolle = null;
   }
 
