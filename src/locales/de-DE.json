@@ -83,8 +83,10 @@
       "deleteKlasseSuccessMessage": "Die Klasse {klassenname} an der Schule {schulname} wurde erfolgreich gelöscht.",
       "edit": "Klasse bearbeiten",
       "title": {
+        "KLASSE_ERROR": "Fehler bei Änderung der Klasse.",
         "KLASSENNAME_AN_SCHULE_EINDEUTIG": "Fehler bei Änderung der Klasse",
         "ORGANISATION_IST_BEREITS_ZUGEWIESEN_ERROR": "Fehler beim Löschen",
+        "ORGANISATION_SPECIFICATION_ERROR": "Fehler bei Anlage der Klasse.",
         "NEWER_VERSION_ORGANISATION": "Geänderte Daten"
       },
       "errors": {
@@ -399,9 +401,13 @@
     },
     "searchResultTable": "Ergebnisliste durchsuchen",
     "schule": {
+      "activateInItsLearning": "itslearning freischalten",
+      "activateSchuleConfirmationMessage": "Wollen Sie die Daten der Schule {schulname} an itslearning übertragen?",
+      "activateSchuleSuccessMessage": "Die Schule {schulname} wird in itslearning angelegt.",
       "addNew": "Neue Schule hinzufügen",
       "administratingSchultraeger": "Verwaltender Schulträger",
       "all": "Alle Schulen",
+      "enableNow": "Jetzt freischalten",
       "ersatzschule": "Ersatzschule",
       "assignAdministratingSchultraeger": "Verwaltenden Schulträger zuordnen",
       "assignSchulform": "Schulform zuordnen",
@@ -414,15 +420,23 @@
       "dienststellennummer": "Dienststellennummer",
       "enterDienststellennummer": "Dienststellennummer eingeben",
       "enterSchulname": "Schulname eingeben",
+      "title": {
+        "ORGANISATION_SPECIFICATION_ERROR": "Fehler bei Anlage der Schule."
+      },
       "errors": {
         "KENNUNG_REQUIRED_FOR_SCHULE": "Die Angabe einer Dienststellennummer ist erforderlich.",
         "NAME_REQUIRED_FOR_SCHULE": "Die Angabe eines Namens ist erforderlich.",
         "NUR_KLASSE_UNTER_SCHULE": "Die Klasse muss einer Schule zugeordnet werden.",
-        "ORGANISATION_SPECIFICATION_ERROR": "Die Schule konnte nicht angelegt werden.",
+        "ORGANISATION_SPECIFICATION_ERROR": "Die Schule konnte in itslearning nicht angelegt werden.",
         "SCHULE_KENNUNG_EINDEUTIG": "Die Dienststellennummer existiert bereits.",
         "SCHULE_UNTER_TRAEGER": "Eine Schule darf nicht einer anderen Schule zugeordnet werden.",
         "SCHULTRAEGER_ERROR": "Mögliche Schulträger konnten nicht geladen werden."
       },
+      "loadingErrorText": "Es konnten keine Schuldaten geladen werden.",
+      "loadingErrorTitle": "Fehler beim Laden der Schulen",
+      "itsLearningStatus": "itslearning-Status",
+      "retransmit": "Erneut übertragen",
+      "retransmitSchuleConfirmationMessage": "Wollen Sie die Daten der Schule {schulname} erneut an itslearning übertragen?",
       "management": "Schulverwaltung",
       "publicSchule": "Öffentliche Schule",
       "rules": {
