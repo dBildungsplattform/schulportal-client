@@ -99,10 +99,10 @@ type OrganisationActions = {
   getLockingOrganisationById: (organisationId: string) => Promise<void>;
   getParentOrganisationsByIds: (organisationIds: string[]) => Promise<void>;
   createOrganisation: (
-    kennung: string,
+    kennung: string | undefined,
     name: string,
-    namensergaenzung: string,
-    kuerzel: string,
+    namensergaenzung: string | undefined,
+    kuerzel: string | undefined,
     typ: OrganisationsTyp,
     traegerschaft?: TraegerschaftTyp,
     administriertVon?: string,
@@ -366,10 +366,10 @@ export const useOrganisationStore: StoreDefinition<
     },
 
     async createOrganisation(
-      kennung: string,
+      kennung: string | undefined,
       name: string,
-      namensergaenzung: string,
-      kuerzel: string,
+      namensergaenzung: string | undefined,
+      kuerzel: string | undefined,
       typ: OrganisationsTyp,
       traegerschaft?: TraegerschaftTyp,
       administriertVon?: string,
