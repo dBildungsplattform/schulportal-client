@@ -2168,7 +2168,7 @@
               <template v-else>
                 <v-col>
                   <h3 class="subtitle-1">{{ $t('admin.person.twoFactorAuthentication.header') }}</h3>
-                  <v-row class="mt-4 mr-lg-13 text-body">
+                  <v-row class="mt-4 text-body">
                     <v-col
                       class="text-right"
                       cols="1"
