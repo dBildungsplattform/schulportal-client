@@ -331,7 +331,7 @@
       :padded="true"
       :showCloseText="true"
     >
-      <template v-if="!rolleStore.updatedRolle && !rolleStore.errorCode">
+      <template v-if="!rolleStore.updatedRolle">
         <v-container>
           <div v-if="rolleStore.currentRolle">
             <RolleForm

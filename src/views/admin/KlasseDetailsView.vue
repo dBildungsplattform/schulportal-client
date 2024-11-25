@@ -197,7 +197,7 @@
       :padded="true"
       :showCloseText="true"
     >
-      <template v-if="!organisationStore.updatedOrganisation && !organisationStore.errorCode">
+      <template v-if="!organisationStore.updatedOrganisation">
         <v-container>
           <div v-if="organisationStore.currentOrganisation">
             <KlasseForm
