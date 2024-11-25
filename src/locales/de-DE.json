@@ -165,7 +165,8 @@
         "ERROR_LOADING_USER": "Es konnten keine Benutzerdaten geladen werden.",
         "PERSONALNUMMER_REQUIRED": "Die Änderungen wurden nicht gespeichert, da keine KoPers.-Nr. eingegeben wurde.",
         "PERSON_NOT_FOUND": "Der Benutzer wurde seit Ihrer letzten Änderung gelöscht und kann nicht mehr bearbeitet werden.",
-        "NEWER_VERSION_OF_PERSON_AVAILABLE": "Der Benutzer wurde zwischenzeitlich von einer anderen Administratorin oder einem anderen Administrator bearbeitet. Bitte aktualisieren Sie die Daten und versuchen Sie es erneut."
+        "NEWER_VERSION_OF_PERSON_AVAILABLE": "Der Benutzer wurde zwischenzeitlich von einer anderen Administratorin oder einem anderen Administrator bearbeitet. Bitte aktualisieren Sie die Daten und versuchen Sie es erneut.",
+        "UNSPECIFIED_ERROR": "Es ist ein technischer Fehler aufgetreten. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut."
       },
       "generatedPassword": "Generiertes Passwort",
       "homePageIQSH":"Homepage der IQSH-Medienberatung",
