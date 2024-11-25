@@ -14,7 +14,7 @@
   import type { UserinfoPersonenkontext } from '@/stores/PersonenkontextStore';
   import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
   import { type TranslatedObject } from '@/types.d';
-  import { useRouter, type Router } from 'vue-router';
+  import { onBeforeRouteLeave, useRouter, type Router } from 'vue-router';
   import KlasseDelete from '@/components/admin/klassen/KlasseDelete.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
 
@@ -314,7 +314,7 @@
   async function handleUserContext(): Promise<void> {
     const personenkontexte: Array<UserinfoPersonenkontext> | null = authStore.currentUser?.personenkontexte || [];
     if (personenkontexte.length > 0) {
-      if (organisationStore.allSchulen.length === 1) {
+      if (organisationStore.allSchulen.length === 1 && !searchFilterStore.selectedSchuleForKlassen) {
         selectedSchule.value = organisationStore.allSchulen[0]?.id || null;
         if (selectedSchule.value) {
           await organisationStore.getKlassenByOrganisationId(selectedSchule.value);
@@ -371,6 +371,10 @@
     organisationStore.errorCode = '';
     router.go(0);
   };
+
+  onBeforeRouteLeave(async () => {
+    organisationStore.errorCode = '';
+  });
 </script>
 
 <template>
