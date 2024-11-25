@@ -20,7 +20,7 @@
     selectedKlassennameProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     showUnsavedChangesDialog?: boolean;
     isEditActive?: boolean;
-    isLoading?: boolean;
+    isLoading: boolean;
     onHandleConfirmUnsavedChanges: () => void;
     onHandleDiscard: () => void;
     onShowDialogChange: (value?: boolean) => void;

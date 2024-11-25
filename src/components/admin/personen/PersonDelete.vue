@@ -205,6 +205,7 @@
                 class="primary button"
                 @click.stop="handlePersonDelete(person.person.id)"
                 data-testid="person-delete-button"
+                :disabled="isLoading"
               >
                 {{ $t('admin.person.deletePerson') }}
               </v-btn>
