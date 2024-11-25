@@ -76,7 +76,7 @@
         <!-- Sponsor Logos -->
         <v-col
           cols="12"
-          lg="7"
+          lg="6"
           order-lg="2"
           class="sponsor-logos-col justify-end"
         >
@@ -106,7 +106,7 @@
         <!-- Footer Links -->
         <v-col
           cols="12"
-          lg="5"
+          lg="6"
           order-lg="1"
           class="footer-links-col justify-space-between"
         >
