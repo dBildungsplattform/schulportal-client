@@ -2062,7 +2062,7 @@
                 >
                   <v-btn
                     :block="mdAndDown"
-                    :disabled="!canCommit || !personenkontextStore.loading"
+                    :disabled="!canCommit || personenkontextStore.loading"
                     class="primary"
                     data-testid="zuordnung-creation-submit-button"
                     type="submit"
@@ -2130,7 +2130,7 @@
                       :block="mdAndDown"
                       class="primary"
                       data-testid="klasse-change-submit-button"
-                      :disabled="isSubmitDisabled || !organisationStore.loading"
+                      :disabled="isSubmitDisabled || organisationStore.loading"
                       type="submit"
                       >{{ $t('transfer') }}</v-btn
                     >
