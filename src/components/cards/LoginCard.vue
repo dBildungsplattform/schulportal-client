@@ -31,7 +31,7 @@
       <v-col class="text-center">
         <img
           aria-hidden="true"
-          alt="Logo Schulportal"
+          alt="Logo ErWIn Portal"
           class="logo"
           src="@/assets/logos/erwin_logos/Logo-ErWIn-Portal-dunkel.svg"
           width="540"
