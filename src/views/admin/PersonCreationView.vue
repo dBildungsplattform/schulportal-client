@@ -454,6 +454,7 @@
           :createButtonLabel="$t('admin.person.create')"
           :discardButtonLabel="$t('admin.person.discard')"
           id="person-creation-form"
+          :isLoading="personStore.loading"
           :onDiscard="navigateToPersonTable"
           @onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
           :onSubmit="onSubmit"

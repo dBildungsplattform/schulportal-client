@@ -13,6 +13,7 @@
     disabled: boolean;
     errorCode: string;
     person: Personendatensatz;
+    isLoading: boolean;
   };
 
   type Emits = {
@@ -175,6 +176,7 @@
                 class="primary button"
                 @click.stop="closeDialogAndHandlePersonSync(isActive, person.person.id)"
                 data-testid="person-sync-button"
+                :disabled="!isLoading"
               >
                 {{ $t('proceed') }}
               </v-btn>

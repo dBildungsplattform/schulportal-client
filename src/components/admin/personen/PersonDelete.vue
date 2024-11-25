@@ -16,6 +16,7 @@
     disabled: boolean;
     errorCode: string;
     person: Personendatensatz;
+    isLoading: boolean;
   };
 
   type Emits = {

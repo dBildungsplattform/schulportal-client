@@ -31,6 +31,7 @@
     disabled: boolean;
     person: Personendatensatz;
     tokenType: TokenKind | null;
+    isLoading: boolean;
   };
 
   const props: Props = defineProps<Props>();
@@ -162,6 +163,7 @@
                 :block="mdAndDown"
                 class="primary button"
                 data-testid="two-way-authentification-set-up-button"
+                :disabled="!isLoading"
               >
                 {{ $t('admin.person.twoFactorAuthentication.tokenResetButton') }}
               </v-btn>

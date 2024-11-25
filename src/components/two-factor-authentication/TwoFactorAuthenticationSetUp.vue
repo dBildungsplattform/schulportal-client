@@ -32,6 +32,7 @@
     errorCode: string;
     disabled: boolean;
     person: Personendatensatz;
+    isLoading: boolean;
   };
 
   const props: Props = defineProps<Props>();
@@ -184,6 +185,7 @@
                 class="primary button"
                 @click.stop="requestSoftwareToken()"
                 data-testid="proceed-two-factor-authentication-dialog-button"
+                :disabled="!isLoading"
               >
                 {{ $t('proceed') }}
               </v-btn>

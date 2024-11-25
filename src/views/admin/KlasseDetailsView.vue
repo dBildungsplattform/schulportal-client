@@ -223,6 +223,7 @@
           <div v-if="organisationStore.currentOrganisation">
             <KlasseForm
               :isEditActive="isEditActive"
+              :isLoading="organisationStore.loading"
               :readonly="true"
               :selectedSchuleProps="selectedSchuleProps"
               :selectedKlassennameProps="selectedKlassennameProps"
@@ -258,6 +259,7 @@
                       :klassenId="organisationStore.currentKlasse?.id || ''"
                       ref="klasse-delete"
                       :schulname="selectedSchule || ''"
+                      :isLoading="organisationStore.loading"
                       :useIconActivator="false"
                       @onDeleteKlasse="deleteKlasseById(currentOrganisationId)"
                     >

@@ -367,6 +367,7 @@
         :discardButtonLabel="$t('nav.backToList')"
         :hideActions="showUploadSuccessTemplate || !!importStore.importedData || importStore.importIsLoading"
         id="person-import-form"
+        :isLoading="importStore.importIsLoading"
         :onDiscard="navigateToPersonTable"
         :onSubmit="onSubmit"
         @onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
@@ -606,6 +607,7 @@
               class="primary"
               @click="executeImport()"
               data-testid="execute-import-button"
+              :disabled="!importStore.importIsLoading"
             >
               {{ $t('admin.import.executeImport') }}
             </v-btn>
