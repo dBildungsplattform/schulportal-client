@@ -164,7 +164,7 @@
                 class="primary button"
                 @click.stop="handleRolleDelete(rolle.id)"
                 data-testid="rolle-delete-button"
-                :disabled="!isLoading"
+                :disabled="isLoading"
               >
                 {{ $t('admin.rolle.deleteRolle') }}
               </v-btn>

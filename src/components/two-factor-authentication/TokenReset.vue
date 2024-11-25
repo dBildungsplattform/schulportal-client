@@ -163,7 +163,7 @@
                 :block="mdAndDown"
                 class="primary button"
                 data-testid="two-way-authentification-set-up-button"
-                :disabled="!isLoading"
+                :disabled="isLoading"
               >
                 {{ $t('admin.person.twoFactorAuthentication.tokenResetButton') }}
               </v-btn>

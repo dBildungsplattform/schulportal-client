@@ -100,7 +100,7 @@
           :block="mdAndDown"
           class="primary"
           :data-testid="`${id}-submit-button`"
-          :disabled="!canCommit || !isLoading"
+          :disabled="!canCommit || isLoading"
           type="submit"
           >{{ createButtonLabel }}</v-btn
         >

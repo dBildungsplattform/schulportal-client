@@ -185,7 +185,7 @@
                 class="primary button"
                 @click.stop="requestSoftwareToken()"
                 data-testid="proceed-two-factor-authentication-dialog-button"
-                :disabled="!isLoading"
+                :disabled="isLoading"
               >
                 {{ $t('proceed') }}
               </v-btn>

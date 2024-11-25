@@ -205,7 +205,7 @@
                 class="primary button"
                 @click.stop="handleKlasseDelete(klassenId)"
                 data-testid="klasse-delete-button"
-                :disabled="!isLoading"
+                :disabled="isLoading"
               >
                 {{ $t('admin.klasse.deleteKlasse') }}
               </v-btn>
