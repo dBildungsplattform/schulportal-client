@@ -198,27 +198,6 @@
       :padded="true"
       :showCloseText="true"
     >
-      <!-- Error Message Display -->
-      <SpshAlert
-        :model-value="!!organisationStore.errorCode"
-        :title="
-          organisationStore.errorCode === 'UNSPECIFIED_ERROR'
-            ? $t('admin.klasse.loadingErrorTitle')
-            : $t(`admin.klasse.title.${organisationStore.errorCode}`)
-        "
-        :type="'error'"
-        :closable="false"
-        :text="
-          organisationStore.errorCode === 'UNSPECIFIED_ERROR'
-            ? $t('admin.klasse.loadingErrorText')
-            : $t(`admin.klasse.errors.${organisationStore.errorCode}`)
-        "
-        :showButton="true"
-        :buttonText="alertButtonText"
-        :buttonAction="alertButtonAction"
-        @update:modelValue="handleAlertClose"
-      />
-
       <template v-if="!organisationStore.updatedOrganisation && !organisationStore.errorCode">
         <v-container>
           <div v-if="organisationStore.currentOrganisation">
@@ -235,7 +214,28 @@
               ref="klasse-creation-form"
               v-model:selectedSchule="selectedSchule"
               v-model:selectedKlassenname="selectedKlassenname"
-            />
+            >
+              <!-- Error Message Display -->
+              <SpshAlert
+                :model-value="!!organisationStore.errorCode"
+                :title="
+                  organisationStore.errorCode === 'UNSPECIFIED_ERROR'
+                    ? $t('admin.klasse.loadingErrorTitle')
+                    : $t(`admin.klasse.title.${organisationStore.errorCode}`)
+                "
+                :type="'error'"
+                :closable="false"
+                :text="
+                  organisationStore.errorCode === 'UNSPECIFIED_ERROR'
+                    ? $t('admin.klasse.loadingErrorText')
+                    : $t(`admin.klasse.errors.${organisationStore.errorCode}`)
+                "
+                :showButton="true"
+                :buttonText="alertButtonText"
+                :buttonAction="alertButtonAction"
+                @update:modelValue="handleAlertClose"
+              />
+            </KlasseForm>
             <v-divider
               v-if="isEditActive"
               class="border-opacity-100 rounded"
