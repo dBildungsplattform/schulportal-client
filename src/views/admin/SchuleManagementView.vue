@@ -1,12 +1,12 @@
 <script setup lang="ts">
-  import { computed, onMounted, ref, type ComputedRef, type Ref } from 'vue';
+  import { onMounted, ref, type Ref } from 'vue';
   import ResultTable from '@/components/admin/ResultTable.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { type Composer, useI18n } from 'vue-i18n';
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
   import { OrganisationsTyp, useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
   import { type SearchFilterStore, useSearchFilterStore } from '@/stores/SearchFilterStore';
-import type { TranslatedObject } from '@/types';
+  import SearchField from '@/components/admin/SearchField.vue';
 
   const organisationStore: OrganisationStore = useOrganisationStore();
   const searchFilterStore: SearchFilterStore = useSearchFilterStore();
@@ -23,19 +23,8 @@ import type { TranslatedObject } from '@/types';
     { title: t('admin.schule.schulname'), key: 'name', align: 'start' },
   ];
 
-  const selectedSchulen: Ref<Array<string> | null> = ref(null);
-  const searchInputSchulen: Ref<string> = ref('');
-
   const allSchulen: Ref<Array<Organisation>> = ref([]);
-
-  const translatedSchulen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
-    return allSchulen.value
-      .map((org: Organisation) => ({
-        value: org.id,
-        title: `${org.kennung} (${org.name.trim()})`,
-      }))
-      .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
-  });
+  const searchFilter: Ref<string> = ref('');
 
   async function fetchSchulen() {
     await organisationStore.getAllOrganisationen({
@@ -43,9 +32,8 @@ import type { TranslatedObject } from '@/types';
       limit: searchFilterStore.schulenPerPage,
       includeTyp: OrganisationsTyp.Schule,
       systemrechte: ['SCHULEN_VERWALTEN'],
-      organisationIds: searchFilterStore.selectedSchulenForSchulen || undefined,
+      searchString: searchFilterStore.searchFilter || '',
     });
-
   }
 
   function getPaginatedSchulen(page: number): void {
@@ -63,17 +51,10 @@ import type { TranslatedObject } from '@/types';
     fetchSchulen();
   }
 
-  async function updateSelectedSchulen(newValue: Array<string>): Promise<void> {
-    if (newValue.length === 0) {
-      await searchFilterStore.setSchuleFilterForSchulen(null);
-      searchFilterStore.schulenPerPage = 30;
-      fetchSchulen();
-      return;
-    }
-    await searchFilterStore.setSchuleFilterForSchulen(newValue);
-    searchFilterStore.schulenPerPage = newValue.length;
+  const handleSearchFilter = (filter: string): void => {
+    searchFilter.value = filter;
     fetchSchulen();
-  }  
+  };
 
   onMounted(async () => {
     await fetchSchulen();
@@ -95,54 +76,11 @@ import type { TranslatedObject } from '@/types';
         class="ma-3"
         justify="end"
       >
-        <v-col
-          md="3"
-          cols="12"
-          class="py-md-0"
-        >
-          <v-autocomplete
-            autocomplete="off"
-            class="filter-dropdown"
-            :class="{ selected: selectedSchulen }"
-            clearable
-            data-testid="schule-select"
-            density="compact"
-            hide-details
-            id="schule-select"
-            :items="translatedSchulen"
-            item-value="value"
-            item-text="title"
-            multiple
-            :no-data-text="$t('noDataFound')"
-            :placeholder="$t('admin.schule.schule')"
-            ref="schule-select"
-            required="true"
-            variant="outlined"
-            @update:modelValue="updateSelectedSchulen"
-            v-model="selectedSchulen"
-            v-model:search="searchInputSchulen"
-          >
-            <template v-slot:prepend-item>
-              <v-list-item>
-                <v-progress-circular
-                  indeterminate
-                  v-if="organisationStore.loading"
-                ></v-progress-circular>
-                <span
-                  v-else
-                  class="filter-header"
-                  >{{
-                    $t(
-                      'admin.schule.schulenFound',
-                      { count: organisationStore.totalPaginatedSchulen },
-                      organisationStore.totalPaginatedSchulen,
-                    )
-                  }}</span
-                >
-              </v-list-item>
-            </template>
-          </v-autocomplete>
-        </v-col>
+        <SearchField
+          :hover-text="$t('admin.schule.schulnameDienststellennummer')"
+          @onApplySearchFilter="handleSearchFilter"
+          ref="searchFieldComponent"
+        ></SearchField>
       </v-row>
       <ResultTable
         :currentPage="searchFilterStore.schulenPage"
