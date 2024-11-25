@@ -4,7 +4,12 @@
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { type Composer, useI18n } from 'vue-i18n';
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
-  import { OrganisationsTyp, useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
+  import {
+    OrganisationsTyp,
+    useOrganisationStore,
+    type Organisation,
+    type OrganisationStore,
+  } from '@/stores/OrganisationStore';
   import { type SearchFilterStore, useSearchFilterStore } from '@/stores/SearchFilterStore';
   import SearchField from '@/components/admin/SearchField.vue';
 
@@ -26,7 +31,7 @@
   const allSchulen: Ref<Array<Organisation>> = ref([]);
   const searchFilter: Ref<string> = ref('');
 
-  async function fetchSchulen() {
+  async function fetchSchulen(): Promise<void> {
     await organisationStore.getAllOrganisationen({
       offset: (searchFilterStore.schulenPage - 1) * searchFilterStore.schulenPerPage,
       limit: searchFilterStore.schulenPerPage,
