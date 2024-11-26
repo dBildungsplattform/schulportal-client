@@ -272,7 +272,7 @@ describe('PersonManagementView', () => {
 
     const rollenAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
 
-    searchFilterStore.searchFilter = 'test search';
+    searchFilterStore.searchFilterPersonen = 'test search';
 
     // Mock the getPersonenkontextRolleWithFilter method
     const mockGetPersonenkontextRolleWithFilter: Mock = vi.fn().mockResolvedValue({
