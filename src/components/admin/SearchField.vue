@@ -1,12 +1,10 @@
 <script setup lang="ts">
   import { onBeforeMount, ref, type Ref } from 'vue';
   import { useI18n } from 'vue-i18n';
-  import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
 
   useI18n({ useScope: 'global' });
 
-  const searchFilterStore: SearchFilterStore = useSearchFilterStore();
-  const searchFilter: Ref<string | null> = ref(searchFilterStore.searchFilterPersonen);
+  const searchFilter: Ref<string | null> = ref('');
 
   type Emits = {
     (event: 'onApplySearchFilter', searchFilter: string): void;
