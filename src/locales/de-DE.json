@@ -467,6 +467,7 @@
       "schulenFound": "{count} Schule gefunden | {count} Schulen gefunden",
       "schulenSelected": "{count} Schulen ausgewählt",
       "schulname": "Schulname",
+      "schulnameDienststellennummer": "Schulname/Dienststellennummer",
       "schulform": "Schulform",
       "schuleCreateErrorTitle": "Fehler beim Anlegen der Schule",
       "schuleAddedSuccessfully": "Die Schule wurde erfolgreich hinzugefügt.",

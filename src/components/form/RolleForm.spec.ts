@@ -14,6 +14,7 @@ beforeEach(() => {
   wrapper = mount(RolleForm, {
     attachTo: document.getElementById('app') || '',
     props: {
+      isLoading: false,
       onHandleConfirmUnsavedChanges: () => '',
       onHandleDiscard: () => '',
       onShowDialogChange: (value: boolean | undefined) => value,

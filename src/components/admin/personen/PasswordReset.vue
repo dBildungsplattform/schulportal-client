@@ -15,6 +15,7 @@
     disabled: boolean;
     person: Personendatensatz;
     password: string;
+    isLoading: boolean;
   };
 
   type Emits = {
@@ -185,7 +186,7 @@
                 class="primary button"
                 @click.stop="$emit('onResetPassword', person.person.id)"
                 data-testid="password-reset-button"
-                :disabled="!!password"
+                :disabled="!!password || isLoading"
               >
                 {{ $t('admin.person.resetPassword') }}
               </v-btn>
