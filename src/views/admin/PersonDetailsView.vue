@@ -1559,7 +1559,7 @@
                 >
                   <v-btn
                     class="primary small"
-                    :disabled="hasSameMetadata"
+                    :disabled="hasSameMetadata || personStore.loading"
                     data-testid="person-info-edit-save"
                     :block="mdAndDown"
                     type="submit"
