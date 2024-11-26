@@ -62,7 +62,7 @@
       selectedRollen.value.length > 0 ||
       !!searchFilterStore.selectedOrganisationen?.length ||
       !!searchFilterStore.selectedRollen?.length ||
-      !!searchFilterStore.searchFilter ||
+      !!searchFilterStore.searchFilterPersonen ||
       !!searchFilterStore.sortField ||
       !!searchFilterStore.sortOrder ||
       selectedKlassen.value.length > 0 ||
@@ -110,7 +110,7 @@
       limit: searchFilterStore.personenPerPage,
       organisationIDs: selectedKlassen.value.length ? selectedKlassen.value : selectedOrganisation.value,
       rolleIDs: searchFilterStore.selectedRollen || selectedRollen.value,
-      searchFilter: searchFilterStore.searchFilter || searchFilter.value,
+      searchFilter: searchFilterStore.searchFilterPersonen || searchFilter.value,
       sortField: searchFilterStore.sortField as SortField,
       sortOrder: searchFilterStore.sortOrder as SortOrder,
     });
@@ -128,7 +128,7 @@
       limit: searchFilterStore.personenPerPage,
       organisationIDs: searchFilterStore.selectedOrganisationen || selectedOrganisation.value,
       rolleIDs: searchFilterStore.selectedRollen || selectedRollen.value,
-      searchFilter: searchFilterStore.searchFilter || searchFilter.value,
+      searchFilter: searchFilterStore.searchFilterPersonen || searchFilter.value,
     });
   }
 
@@ -154,7 +154,7 @@
         ? searchFilterStore.selectedKlassen
         : searchFilterStore.selectedOrganisationen || [],
       rolleIDs: searchFilterStore.selectedRollen || [],
-      searchFilter: searchFilterStore.searchFilter || '',
+      searchFilter: searchFilterStore.searchFilterPersonen || '',
     });
   }
 

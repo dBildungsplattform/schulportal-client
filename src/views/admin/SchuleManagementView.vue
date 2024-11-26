@@ -43,7 +43,7 @@
       limit: searchFilterStore.schulenPerPage,
       includeTyp: OrganisationsTyp.Schule,
       systemrechte: ['SCHULEN_VERWALTEN'],
-      searchString: searchFilterStore.searchFilter || '',
+      searchString: searchFilterStore.searchFilterPersonen || '',
     });
   }
 

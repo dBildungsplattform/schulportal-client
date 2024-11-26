@@ -6,7 +6,7 @@
   useI18n({ useScope: 'global' });
 
   const searchFilterStore: SearchFilterStore = useSearchFilterStore();
-  const searchFilter: Ref<string | null> = ref(searchFilterStore.searchFilter);
+  const searchFilter: Ref<string | null> = ref(searchFilterStore.searchFilterPersonen);
 
   type Emits = {
     (event: 'onApplySearchFilter', searchFilter: string): void;
@@ -35,7 +35,7 @@
   }
 
   onBeforeMount(() => {
-    searchFilter.value = searchFilterStore.searchFilter ?? '';
+    searchFilter.value = searchFilterStore.searchFilterPersonen ?? '';
     applySearchFilter(); // Apply the filter if the searchFilter is not an empty string
   });
 </script>

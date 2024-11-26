@@ -10,7 +10,8 @@ type SearchFilterState = {
   rollenPerPage: number;
   schulenPage: number;
   schulenPerPage: number;
-  searchFilter: string | null;
+  searchFilterPersonen: string | null;
+  searchFilterSchulen: string | null;
   selectedKlassen: Array<string> | null;
   selectedRollen: Array<string> | null;
   selectedRollenObjects: RolleResponse[];
@@ -59,7 +60,8 @@ export const useSearchFilterStore: StoreDefinition<
     rollenPerPage: 30,
     schulenPage: 1,
     schulenPerPage: 30,
-    searchFilter: '',
+    searchFilterPersonen: '',
+    searchFilterSchulen: '',
     selectedKlassen: [],
     selectedRollen: [],
     selectedRollenObjects: [],
@@ -84,11 +86,11 @@ export const useSearchFilterStore: StoreDefinition<
     },
 
     async setSearchFilterForPersonen(searchFilter: string | null) {
-      this.searchFilter = searchFilter || '';
+      this.searchFilterPersonen = searchFilter || '';
     },
 
-    async setSearchFilterForSchulen(searchFilter: string | null) {
-      this.searchFilter = searchFilter || '';
+    async setSearchFilterForSchulen(searchFilterSchulen: string | null) {
+      this.searchFilterSchulen = searchFilterSchulen || '';
     },
 
     async setSortFieldForPersonen(sortField: string | null) {
