@@ -62,10 +62,11 @@
     fetchSchulen();
   }
 
-  const handleSearchFilter = (filter: string): void => {
+  async function handleSearchFilter(filter: string): Promise<void> {
+    await searchFilterStore.setSearchFilterForSchulen(filter);
     searchFilter.value = filter;
     fetchSchulen();
-  };
+  }
 
   async function toggleItsLearningStatus(organisationId: string): Promise<void> {
     await organisationStore.setItsLearningForSchule(organisationId);
@@ -154,7 +155,7 @@
               :errorCode="organisationStore.errorCode"
               :schulname="item.name"
               :schulId="item.id"
-              :itslearningEnabled="item.itslearningEnabled"
+              :itslearningEnabled="item.itslearningEnabled || false"
               @onActivateItslearning="toggleItsLearningStatus(item.id)"
             ></ItsLearningSetup>
           </template>
