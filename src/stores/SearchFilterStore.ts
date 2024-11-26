@@ -31,6 +31,7 @@ type SearchFilterActions = {
   ) => Promise<void>;
   setOrganisationFilterForPersonen: (selectedOrganisationen: Array<string> | null) => Promise<void>;
   setSearchFilterForPersonen: (searchFilter: string | null) => Promise<void>;
+  setSearchFilterForSchulen: (searchFilter: string | null) => Promise<void>;
   setSortFieldForPersonen: (sortField: string | null) => Promise<void>;
   setSortOrderForPersonen: (sortOrder: string | null) => Promise<void>;
   setCurrentSortForPersonen: (currentSort: { key: string; order: 'asc' | 'desc' } | null) => Promise<void>;
@@ -83,7 +84,11 @@ export const useSearchFilterStore: StoreDefinition<
     },
 
     async setSearchFilterForPersonen(searchFilter: string | null) {
-      this.searchFilter = searchFilter;
+      this.searchFilter = searchFilter || '';
+    },
+
+    async setSearchFilterForSchulen(searchFilter: string | null) {
+      this.searchFilter = searchFilter || '';
     },
 
     async setSortFieldForPersonen(sortField: string | null) {

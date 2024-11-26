@@ -31,8 +31,12 @@ describe('SearchFilterStore', () => {
     searchFilterStore.setOrganisationFilterForPersonen(['10', '20']);
     expect(searchFilterStore.selectedOrganisationen).toEqual(['10', '20']);
 
-    // it sets the searchFilter
+    // it sets the searchFilter for personen
     searchFilterStore.setSearchFilterForPersonen('search');
+    expect(searchFilterStore.searchFilter).toEqual('search');
+
+    // it sets the searchFilter for schulen
+    searchFilterStore.setSearchFilterForSchulen('search');
     expect(searchFilterStore.searchFilter).toEqual('search');
 
     // it sets sortOrder

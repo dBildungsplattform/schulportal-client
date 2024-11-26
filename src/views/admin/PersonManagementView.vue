@@ -227,10 +227,11 @@
     });
   }
 
-  const handleSearchFilter = (filter: string): void => {
+  async function handleSearchFilter(filter: string): Promise<void> {
+    await searchFilterStore.setSearchFilterForPersonen(filter);
     searchFilter.value = filter;
     applySearchAndFilters();
-  };
+  }
 
   function updateKlassenSearch(searchValue: string): void {
     /* cancel pending call */
