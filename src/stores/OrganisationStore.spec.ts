@@ -112,7 +112,7 @@ describe('OrganisationStore', () => {
 
       mockadapter.onGet('/api/organisationen?offset=0&limit=30&typ=KLASSE').replyOnce(200, mockResponse);
       mockadapter.onGet('/api/organisationen?limit=30&typ=SCHULE&systemrechte=SCHULEN_VERWALTEN').replyOnce(200, []);
-      const getAllOrganisationenPromise: Promise<void> = organisationStore.getAllOrganisationen({
+      const getAllOrganisationenPromise: void = await organisationStore.getAllOrganisationen({
         offset: 0,
         limit: 30,
         includeTyp: OrganisationsTyp.Klasse,

@@ -22,6 +22,7 @@ beforeEach(() => {
   wrapper = mount(TwoFactorAuthenticationSetUp, {
     attachTo: document.getElementById('app') || '',
     props: {
+      isLoading: false,
       disabled: false,
       errorCode: '',
       person: {

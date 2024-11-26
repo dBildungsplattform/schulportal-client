@@ -27,6 +27,7 @@ beforeEach(async () => {
   wrapper = mount(RolleDelete, {
     attachTo: document.getElementById('app') || '',
     props: {
+      isLoading: false,
       errorCode: '',
       rolle: {
         id: '1',

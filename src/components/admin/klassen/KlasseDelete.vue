@@ -14,6 +14,7 @@
     klassenname: string;
     klassenId: string;
     schulname: string;
+    isLoading: boolean;
     useIconActivator: boolean;
   };
 
@@ -204,6 +205,7 @@
                 class="primary button"
                 @click.stop="handleKlasseDelete(klassenId)"
                 data-testid="klasse-delete-button"
+                :disabled="isLoading"
               >
                 {{ $t('admin.klasse.deleteKlasse') }}
               </v-btn>
