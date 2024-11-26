@@ -85,8 +85,8 @@ export const useSearchFilterStore: StoreDefinition<
       this.selectedOrganisationen = selectedOrganisationen;
     },
 
-    async setSearchFilterForPersonen(searchFilter: string | null) {
-      this.searchFilterPersonen = searchFilter || '';
+    async setSearchFilterForPersonen(searchFilterPersonen: string | null) {
+      this.searchFilterPersonen = searchFilterPersonen || '';
     },
 
     async setSearchFilterForSchulen(searchFilterSchulen: string | null) {
