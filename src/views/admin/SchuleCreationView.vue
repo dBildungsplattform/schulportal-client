@@ -217,6 +217,7 @@
           :createButtonLabel="$t('admin.schule.create')"
           :discardButtonLabel="$t('admin.schule.discard')"
           id="schule-creation-form"
+          :isLoading="organisationStore.loading"
           :onDiscard="navigateToSchuleManagement"
           @onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
           :onSubmit="onSubmit"

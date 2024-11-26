@@ -64,6 +64,7 @@ describe('TokenResetComponent', () => {
         disabled: false,
         person: getMockPersonendatensatz(),
         tokenType: TokenKind.software,
+        isLoading: false,
       },
       attachTo: document.getElementById('app') || '',
       global: {
