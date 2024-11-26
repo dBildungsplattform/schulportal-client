@@ -312,6 +312,7 @@
                     data-testid="klasse-changes-save-button"
                     @Click="onSubmit"
                     :block="mdAndDown"
+                    :disabled="organisationStore.loading"
                   >
                     {{ $t('save') }}
                   </v-btn>

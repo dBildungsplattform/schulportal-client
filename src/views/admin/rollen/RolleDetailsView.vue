@@ -453,6 +453,7 @@
                     data-testid="rolle-changes-save"
                     @Click="onSubmit"
                     :block="mdAndDown"
+                    :disabled="rolleStore.loading"
                   >
                     {{ $t('save') }}
                   </v-btn>
