@@ -123,7 +123,8 @@
           justify="end"
         >
           <SearchField
-            :hover-text="$t('admin.schule.schulnameDienststellennummer')"
+            :initialValue="searchFilterStore.searchFilterSchulen ?? ''"
+            :hoverText="$t('admin.schule.schulnameDienststellennummer')"
             @onApplySearchFilter="handleSearchFilter"
             ref="searchFieldComponent"
           ></SearchField>

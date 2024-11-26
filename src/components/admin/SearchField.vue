@@ -14,6 +14,7 @@
 
   type Props = {
     hoverText: string;
+    initialValue: string;
   };
 
   const emit: Emits = defineEmits<{
@@ -35,7 +36,7 @@
   }
 
   onBeforeMount(() => {
-    searchFilter.value = searchFilterStore.searchFilterPersonen ?? '';
+    searchFilter.value = props.initialValue;
     applySearchFilter(); // Apply the filter if the searchFilter is not an empty string
   });
 </script>

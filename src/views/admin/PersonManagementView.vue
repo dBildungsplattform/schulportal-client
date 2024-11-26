@@ -589,7 +589,8 @@
         justify="end"
       >
         <SearchField
-          :hover-text="$t('person.firstNameLastNameReferrerKopersNr')"
+          :initialValue="searchFilterStore.searchFilterPersonen ?? ''"
+          :hoverText="$t('person.firstNameLastNameReferrerKopersNr')"
           @onApplySearchFilter="handleSearchFilter"
           ref="searchFieldComponent"
         ></SearchField>
