@@ -14,6 +14,7 @@ beforeEach(() => {
   wrapper = mount(FormWrapper, {
     attachTo: document.getElementById('app') || '',
     props: {
+      isLoading: false,
       id: 'test-form-wrapper',
       canCommit: true,
       confirmUnsavedChangesAction: () => vi.fn(),
