@@ -43,7 +43,7 @@
       limit: searchFilterStore.schulenPerPage,
       includeTyp: OrganisationsTyp.Schule,
       systemrechte: ['SCHULEN_VERWALTEN'],
-      searchString: searchFilterStore.searchFilter || '',
+      searchString: searchFilterStore.searchFilterSchulen || '',
     });
   }
 
@@ -123,7 +123,8 @@
           justify="end"
         >
           <SearchField
-            :hover-text="$t('admin.schule.schulnameDienststellennummer')"
+            :initialValue="searchFilterStore.searchFilterSchulen ?? ''"
+            :hoverText="$t('admin.schule.schulnameDienststellennummer')"
             @onApplySearchFilter="handleSearchFilter"
             ref="searchFieldComponent"
           ></SearchField>
