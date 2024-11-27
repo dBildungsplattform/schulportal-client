@@ -571,6 +571,7 @@
               :klassenId="item.id"
               :schulname="item.schuleDetails"
               :useIconActivator="true"
+              :isLoading="organisationStore.loading"
               @onDeleteKlasse="deleteKlasse(item.id)"
             ></KlasseDelete>
           </template>
