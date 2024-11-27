@@ -64,7 +64,7 @@
       const row: HTMLTableRowElement | null = target.closest('tr');
 
       if (row) {
-        // Find the corresponding item for this row
+        // Find the corresponding item for this row.
         const rowIndex: number = Array.from(row.parentElement!.children).indexOf(row);
         const item: TableItem | undefined = props.items[rowIndex];
 
