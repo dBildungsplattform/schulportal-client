@@ -23,6 +23,7 @@
   import { type ImportStore, useImportStore } from '@/stores/ImportStore';
   import { RollenArt } from '@/stores/RolleStore';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
+  import jschardet from 'jschardet';
 
   const organisationStore: OrganisationStore = useOrganisationStore();
   const importStore: ImportStore = useImportStore();
@@ -172,11 +173,27 @@
       return;
     }
 
-    importStore.uploadPersonenImportFile(
-      selectedSchule.value as string,
-      selectedRolle.value as string,
-      selectedFiles.value[0] as File,
-    );
+    // detect encoding of the file
+    const fileReader = new FileReader();
+    let newFile: File | undefined = undefined;
+    const originalFileName: string = selectedFiles.value?.[0]?.name || 'import.csv';
+
+    fileReader.onload = () => {
+      newFile = new File([fileReader.result as string], originalFileName, { type: 'text/csv' });
+
+      if (!newFile) {
+        return;
+      }
+
+      // upload the file
+      importStore.uploadPersonenImportFile(
+        selectedSchule.value as string,
+        selectedRolle.value as string,
+        newFile as unknown as File,
+      );
+    }
+
+    fileReader.readAsText(selectedFiles.value[0] as File, 'UTF-8');
   }
 
   function anotherImport(): void {
