@@ -211,7 +211,8 @@
         "PERSONALNUMMER_NICHT_EINDEUTIG": "KoPers.-Nr. nicht eindeutig",
         "PERSONALNUMMER_REQUIRED": "Personalnummer erforderlich",
         "PERSON_NOT_FOUND": "Benutzer gelöscht",
-        "NEWER_VERSION_OF_PERSON_AVAILABLE": "Geänderte Daten"
+        "NEWER_VERSION_OF_PERSON_AVAILABLE": "Geänderte Daten",
+        "UNSPECIFIED_ERROR": "Technischer Fehler"
       },
       "twoFactorAuthentication": {
         "setUpShort": "2FA einrichten",
