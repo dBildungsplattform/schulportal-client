@@ -14,6 +14,7 @@ beforeEach(() => {
   wrapper = mount(SearchField, {
     attachTo: document.getElementById('app') || '',
     props: {
+      initialValue: '',
       hoverText: 'search',
     },
     global: {

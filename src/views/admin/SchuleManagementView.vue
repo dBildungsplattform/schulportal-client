@@ -1,11 +1,17 @@
 <script setup lang="ts">
-  import { onMounted } from 'vue';
+  import { onMounted, ref, type Ref } from 'vue';
   import ResultTable from '@/components/admin/ResultTable.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { type Composer, useI18n } from 'vue-i18n';
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
-  import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
+  import {
+    OrganisationsTyp,
+    useOrganisationStore,
+    type Organisation,
+    type OrganisationStore,
+  } from '@/stores/OrganisationStore';
   import { type SearchFilterStore, useSearchFilterStore } from '@/stores/SearchFilterStore';
+  import SearchField from '@/components/admin/SearchField.vue';
   import ItsLearningSetup from '@/components/admin/schulen/itsLearningSetup.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import { onBeforeRouteLeave, useRouter, type Router } from 'vue-router';
@@ -28,14 +34,22 @@
     { title: t('admin.schule.itsLearningStatus'), key: 'itslearning', sortable: false, align: 'start' },
   ];
 
-  function getPaginatedSchulen(page: number): void {
-    searchFilterStore.schulenPage = page;
-    organisationStore.getAllOrganisationen({
+  const allSchulen: Ref<Array<Organisation>> = ref([]);
+  const searchFilter: Ref<string> = ref('');
+
+  async function fetchSchulen(): Promise<void> {
+    await organisationStore.getAllOrganisationen({
       offset: (searchFilterStore.schulenPage - 1) * searchFilterStore.schulenPerPage,
       limit: searchFilterStore.schulenPerPage,
       includeTyp: OrganisationsTyp.Schule,
       systemrechte: ['SCHULEN_VERWALTEN'],
+      searchString: searchFilterStore.searchFilterSchulen || '',
     });
+  }
+
+  function getPaginatedSchulen(page: number): void {
+    searchFilterStore.schulenPage = page;
+    fetchSchulen();
   }
 
   function getPaginatedSchulenWithLimit(limit: number): void {
@@ -45,12 +59,13 @@
     }
 
     searchFilterStore.schulenPerPage = limit;
-    organisationStore.getAllOrganisationen({
-      offset: (searchFilterStore.schulenPage - 1) * searchFilterStore.schulenPerPage,
-      limit: searchFilterStore.schulenPerPage,
-      includeTyp: OrganisationsTyp.Schule,
-      systemrechte: ['SCHULEN_VERWALTEN'],
-    });
+    fetchSchulen();
+  }
+
+  async function handleSearchFilter(filter: string): Promise<void> {
+    await searchFilterStore.setSearchFilterForSchulen(filter);
+    searchFilter.value = filter;
+    fetchSchulen();
   }
 
   async function toggleItsLearningStatus(organisationId: string): Promise<void> {
@@ -63,12 +78,8 @@
   };
 
   onMounted(async () => {
-    await organisationStore.getAllOrganisationen({
-      offset: (searchFilterStore.schulenPage - 1) * searchFilterStore.schulenPerPage,
-      limit: searchFilterStore.schulenPerPage,
-      includeTyp: OrganisationsTyp.Schule,
-      systemrechte: ['SCHULEN_VERWALTEN'],
-    });
+    await fetchSchulen();
+    allSchulen.value = organisationStore.allSchulen;
   });
 
   onBeforeRouteLeave(async () => {
@@ -106,6 +117,18 @@
         @update:modelValue="handleAlertClose"
       />
       <template v-if="!organisationStore.errorCode">
+        <v-row
+          align="center"
+          class="ma-3"
+          justify="end"
+        >
+          <SearchField
+            :initialValue="searchFilterStore.searchFilterSchulen ?? ''"
+            :hoverText="$t('admin.schule.schulnameDienststellennummer')"
+            @onApplySearchFilter="handleSearchFilter"
+            ref="searchFieldComponent"
+          ></SearchField>
+        </v-row>
         <ResultTable
           :currentPage="searchFilterStore.schulenPage"
           data-testid="schule-table"
@@ -133,7 +156,7 @@
               :errorCode="organisationStore.errorCode"
               :schulname="item.name"
               :schulId="item.id"
-              :itslearningEnabled="item.itslearningEnabled"
+              :itslearningEnabled="item.itslearningEnabled || false"
               @onActivateItslearning="toggleItsLearningStatus(item.id)"
             ></ItsLearningSetup>
           </template>

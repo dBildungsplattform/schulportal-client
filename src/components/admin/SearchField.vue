@@ -1,12 +1,10 @@
 <script setup lang="ts">
   import { onBeforeMount, ref, type Ref } from 'vue';
   import { useI18n } from 'vue-i18n';
-  import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
 
   useI18n({ useScope: 'global' });
 
-  const searchFilterStore: SearchFilterStore = useSearchFilterStore();
-  const searchFilter: Ref<string | null> = ref(searchFilterStore.searchFilter);
+  const searchFilter: Ref<string | null> = ref('');
 
   type Emits = {
     (event: 'onApplySearchFilter', searchFilter: string): void;
@@ -14,6 +12,7 @@
 
   type Props = {
     hoverText: string;
+    initialValue: string;
   };
 
   const emit: Emits = defineEmits<{
@@ -28,16 +27,14 @@
 
   async function applySearchFilter(): Promise<void> {
     if (searchFilter.value !== null) {
-      await searchFilterStore.setSearchFilterForPersonen(searchFilter.value.trim());
       emit('onApplySearchFilter', searchFilter.value.trim());
     } else {
-      await searchFilterStore.setSearchFilterForPersonen(searchFilter.value);
       emit('onApplySearchFilter', '');
     }
   }
 
   onBeforeMount(() => {
-    searchFilter.value = searchFilterStore.searchFilter ?? '';
+    searchFilter.value = props.initialValue;
     applySearchFilter(); // Apply the filter if the searchFilter is not an empty string
   });
 </script>
