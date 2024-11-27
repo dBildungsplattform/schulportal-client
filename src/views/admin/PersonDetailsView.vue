@@ -1316,7 +1316,10 @@
       :padded="true"
       :showCloseText="true"
     >
-      <v-container class="px-3 px-sm-16">
+      <v-container
+        v-if="!!personStore.errorCode || !!personenkontextStore.errorCode"
+        class="px-3 px-sm-16"
+      >
         <v-container class="px-lg-16">
           <!-- Error Message Display if the personStore throws any kind of error (Not being able to load the person) -->
           <SpshAlert
