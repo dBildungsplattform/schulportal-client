@@ -1125,7 +1125,6 @@
       }
       changePersonMetadataSuccessMessage.value = t('admin.person.personalInfoSuccessDialogMessageWithUsername');
       changePersonMetadataSuccessVisible.value = !personStore.errorCode;
-      resetFormChangePersonMetadata();
     });
 
   // Checks for dirtiness depending on the active form
@@ -1309,7 +1308,7 @@
       {{ $t('admin.headline') }}
     </h1>
     <LayoutCard
-      :closable="true"
+      :closable="!personStore.errorCode && !personenkontextStore.errorCode"
       data-testid="person-details-card"
       :header="$t('admin.person.edit')"
       @onCloseClicked="navigateToPersonTable"
