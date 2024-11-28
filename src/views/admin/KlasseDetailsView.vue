@@ -83,6 +83,7 @@
     isEditActive.value = false;
     showUnsavedChangesDialog.value = false;
     blockedNext();
+    organisationStore.errorCode = '';
   }
 
   function activateEditing(): void {

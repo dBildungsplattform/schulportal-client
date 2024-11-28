@@ -98,6 +98,7 @@
 
   function handleConfirmUnsavedChanges(): void {
     blockedNext();
+    rolleStore.errorCode = '';
   }
 
   async function navigateBackToRolleForm(): Promise<void> {

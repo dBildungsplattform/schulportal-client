@@ -142,6 +142,7 @@
     isEditActive.value = false;
     showUnsavedChangesDialog.value = false;
     blockedNext();
+    rolleStore.errorCode = '';
   }
 
   const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = formContext.handleSubmit(async () => {

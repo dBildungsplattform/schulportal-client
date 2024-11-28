@@ -371,6 +371,8 @@
 
   function handleConfirmUnsavedChanges(): void {
     blockedNext();
+    personStore.errorCode = '';
+    personenkontextStore.errorCode = '';
   }
 
   function preventNavigation(event: BeforeUnloadEvent): void {

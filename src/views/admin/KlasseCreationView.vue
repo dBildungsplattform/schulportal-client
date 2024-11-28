@@ -130,6 +130,7 @@
 
   function handleConfirmUnsavedChanges(): void {
     blockedNext();
+    organisationStore.errorCode = '';
   }
 
   const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = handleSubmit(async () => {

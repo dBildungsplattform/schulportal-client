@@ -134,6 +134,7 @@
 
   function handleConfirmUnsavedChanges(): void {
     blockedNext();
+    organisationStore.errorCode = '';
   }
 
   async function navigateToSchuleManagement(): Promise<void> {
