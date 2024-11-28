@@ -341,6 +341,7 @@
               :onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
               :onSubmit="onSubmit"
               :isEditActive="isEditActive"
+              :isLoading="rolleStore.loading"
               :readonly="true"
               ref="rolle-form"
               v-model:selectedAdministrationsebene="selectedAdministrationsebene"
@@ -401,6 +402,7 @@
                     <RolleDelete
                       :errorCode="rolleStore.errorCode"
                       :rolle="rolleStore.currentRolle"
+                      :isLoading="rolleStore.loading"
                       @onDeleteRolle="deleteRolle(currentRolleId)"
                     >
                     </RolleDelete>
@@ -452,6 +454,7 @@
                     data-testid="rolle-changes-save"
                     @Click="onSubmit"
                     :block="mdAndDown"
+                    :disabled="rolleStore.loading"
                   >
                     {{ $t('save') }}
                   </v-btn>

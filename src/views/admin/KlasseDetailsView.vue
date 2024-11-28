@@ -208,6 +208,7 @@
             <KlasseForm
               :errorCode="organisationStore.errorCode"
               :isEditActive="isEditActive"
+              :isLoading="organisationStore.loading"
               :readonly="true"
               :selectedSchuleProps="selectedSchuleProps"
               :selectedKlassennameProps="selectedKlassennameProps"
@@ -264,6 +265,7 @@
                       :klassenId="organisationStore.currentKlasse?.id || ''"
                       ref="klasse-delete"
                       :schulname="selectedSchule || ''"
+                      :isLoading="organisationStore.loading"
                       :useIconActivator="false"
                       @onDeleteKlasse="deleteKlasseById(currentOrganisationId)"
                     >
@@ -316,6 +318,7 @@
                     data-testid="klasse-changes-save-button"
                     @Click="onSubmit"
                     :block="mdAndDown"
+                    :disabled="organisationStore.loading"
                   >
                     {{ $t('save') }}
                   </v-btn>

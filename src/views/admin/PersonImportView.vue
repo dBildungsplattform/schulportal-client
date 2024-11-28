@@ -337,6 +337,7 @@
                 class="primary"
                 @click="downloadFile()"
                 data-testid="download-file-button"
+                :disabled="importStore.importIsLoading"
               >
                 {{ $t('admin.import.downloadUserdata') }}
               </v-btn>
@@ -368,6 +369,7 @@
         :discardButtonLabel="$t('nav.backToList')"
         :hideActions="showUploadSuccessTemplate || !!importStore.importedData || importStore.importIsLoading"
         id="person-import-form"
+        :isLoading="importStore.uploadIsLoading"
         :onDiscard="navigateToPersonTable"
         :onSubmit="onSubmit"
         @onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
@@ -607,6 +609,7 @@
               class="primary"
               @click="executeImport()"
               data-testid="execute-import-button"
+              :disabled="importStore.importIsLoading"
             >
               {{ $t('admin.import.executeImport') }}
             </v-btn>

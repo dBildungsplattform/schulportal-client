@@ -15,6 +15,7 @@
     disabled: boolean;
     person: Personendatensatz;
     password: string;
+    isLoading: boolean;
   };
 
   type Emits = {
@@ -36,6 +37,8 @@
         firstname: props.person.person.name.vorname,
         lastname: props.person.person.name.familienname,
       })}`;
+    } else {
+      message = `${t('admin.person.resetPasswordSuccessMessage')}\n\n` + message;
     }
     return message;
   });
@@ -154,7 +157,7 @@
                 </p>
               </v-col>
             </v-row>
-            <v-row>
+            <v-row class="px-md-16">
               <v-col cols="12">
                 <PasswordOutput :password="password"></PasswordOutput>
               </v-col>
@@ -183,7 +186,7 @@
                 class="primary button"
                 @click.stop="$emit('onResetPassword', person.person.id)"
                 data-testid="password-reset-button"
-                :disabled="!!password"
+                :disabled="!!password || isLoading"
               >
                 {{ $t('admin.person.resetPassword') }}
               </v-btn>

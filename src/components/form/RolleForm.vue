@@ -22,6 +22,7 @@
     translatedMerkmale?: TranslatedObject[];
     translatedSystemrechte?: TranslatedObject[];
     isEditActive?: boolean;
+    isLoading: boolean;
     onHandleConfirmUnsavedChanges: () => void;
     onHandleDiscard: () => void;
     onShowDialogChange: (value?: boolean) => void;
@@ -47,6 +48,7 @@
     :discardButtonLabel="$t('admin.rolle.discard')"
     :hideActions="readonly || !!props.errorCode"
     id="rolle-form"
+    :isLoading="isLoading"
     :onDiscard="onHandleDiscard"
     @onShowDialogChange="onShowDialogChange"
     :onSubmit="onSubmit"

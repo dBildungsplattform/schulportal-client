@@ -188,9 +188,10 @@
       "personalInfoSuccessDialogMessage": "Die Stammdaten wurden erfolgreich geändert.",
       "personalInfoSuccessDialogMessageWithUsername": "Die Stammdaten wurden erfolgreich geändert.\n\nDas Passwort wurde nicht verändert und kann wie zuvor verwendet werden. \n\nBitte teilen Sie der betroffenen Person die Stammdatenänderung (Benutzername, Mail-Adresse) mit. \n\nDie neuen Daten können Sie in der Gesamtübersicht einsehen." ,
       "printPassword": "Passwort drucken",
+      "resetPassword": "Passwort zurücksetzen",
       "resetPasswordConfirmation": "Sind Sie sicher, dass Sie das Passwort für {firstname} {lastname} zurücksetzen möchten?",
       "resetPasswordInformation": "Bitte teilen Sie dem Benutzer das temporäre Passwort mit. Nach dem Schließen des Dialogs wird es aus Sicherheitsgründen nicht mehr angezeigt.",
-      "resetPassword": "Passwort zurücksetzen",
+      "resetPasswordSuccessMessage": "Das Passwort wurde erfolgreich zurückgesetzt.",
       "rules": {
         "vorname": {
           "matches": "Der Vorname enthält ungültige Zeichen.",
@@ -467,6 +468,7 @@
       "schulenFound": "{count} Schule gefunden | {count} Schulen gefunden",
       "schulenSelected": "{count} Schulen ausgewählt",
       "schulname": "Schulname",
+      "schulnameDienststellennummer": "Schulname/Dienststellennummer",
       "schulform": "Schulform",
       "schuleCreateErrorTitle": "Fehler beim Anlegen der Schule",
       "schuleAddedSuccessfully": "Die Schule wurde erfolgreich hinzugefügt.",

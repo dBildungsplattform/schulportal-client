@@ -429,6 +429,7 @@
           :discardButtonLabel="$t('admin.person.discard')"
           :hideActions="!!personenkontextStore.errorCode || !!personStore.errorCode"
           id="person-creation-form"
+          :isLoading="personenkontextStore.loading"
           :onDiscard="navigateToPersonTable"
           @onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
           :onSubmit="onSubmit"
