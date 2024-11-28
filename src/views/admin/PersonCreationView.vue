@@ -371,6 +371,8 @@
 
   function handleConfirmUnsavedChanges(): void {
     blockedNext();
+    personStore.errorCode = '';
+    personenkontextStore.errorCode = '';
   }
 
   function preventNavigation(event: BeforeUnloadEvent): void {
@@ -412,47 +414,20 @@
       {{ $t('admin.headline') }}
     </h1>
     <LayoutCard
-      :closable="true"
+      :closable="!personenkontextStore.errorCode && !personStore.errorCode"
       :header="$t('admin.person.addNew')"
       @onCloseClicked="navigateToPersonTable"
       :padded="true"
       :showCloseText="true"
     >
-      <!-- Error Message Display for error messages from the personStore -->
-      <SpshAlert
-        :model-value="!!personStore.errorCode"
-        :title="$t('admin.person.creationErrorTitle')"
-        :type="'error'"
-        :closable="false"
-        :showButton="true"
-        :buttonText="$t('admin.person.backToCreatePerson')"
-        :buttonAction="navigateBackToPersonForm"
-        :text="creationErrorText"
-      />
-
-      <!-- Error Message Display for error messages from the personenkontextStore -->
-      <SpshAlert
-        :model-value="!!personenkontextStore.errorCode"
-        :type="'error'"
-        :closable="false"
-        :text="t(`admin.personenkontext.errors.${personenkontextStore.errorCode}`)"
-        :showButton="true"
-        :buttonText="$t('admin.person.backToCreatePerson')"
-        :buttonAction="navigateBackToPersonForm"
-        :title="t(`admin.personenkontext.title.${personenkontextStore.errorCode}`)"
-      />
-
       <!-- The form to create a new Person  -->
-      <template
-        v-if="
-          !personenkontextStore.createdPersonWithKontext && !personStore.errorCode && !personenkontextStore.errorCode
-        "
-      >
+      <template v-if="!personenkontextStore.createdPersonWithKontext">
         <FormWrapper
           :canCommit="canCommit"
           :confirmUnsavedChangesAction="handleConfirmUnsavedChanges"
           :createButtonLabel="$t('admin.person.create')"
           :discardButtonLabel="$t('admin.person.discard')"
+          :hideActions="!!personenkontextStore.errorCode || !!personStore.errorCode"
           id="person-creation-form"
           :isLoading="personenkontextStore.loading"
           :onDiscard="navigateToPersonTable"
@@ -460,90 +435,116 @@
           :onSubmit="onSubmit"
           :showUnsavedChangesDialog="showUnsavedChangesDialog"
         >
-          <!-- Organisation, Rolle, Klasse zuordnen -->
-          <PersonenkontextCreate
-            :showHeadline="true"
-            :organisationen="organisationen"
-            ref="personenkontext-create"
-            :rollen="rollen"
-            :klassen="klassen"
-            :selectedOrganisationProps="selectedOrganisationProps"
-            :selectedRolleProps="selectedRolleProps"
-            :selectedKlasseProps="selectedKlasseProps"
-            :befristungInputProps="{
-              befristungProps: selectedBefristungProps,
-              befristungOptionProps: selectedBefristungOptionProps,
-              isUnbefristetDisabled: isUnbefristetButtonDisabled,
-              isBefristungRequired: isBefristungspflichtRolle(selectedRolle),
-              nextSchuljahresende: getNextSchuljahresende(),
-              befristung: selectedBefristung,
-              befristungOption: selectedBefristungOption,
-            }"
-            v-model:selectedOrganisation="selectedOrganisation"
-            v-model:selectedRolle="selectedRolle"
-            v-model:selectedKlasse="selectedKlasse"
-            @update:selectedOrganisation="(value?: string) => (selectedOrganisation = value)"
-            @update:selectedRolle="(value?: string) => (selectedRolle = value)"
-            @update:selectedKlasse="(value?: string) => (selectedKlasse = value)"
-            @update:canCommit="canCommit = $event"
-            @update:befristung="handleBefristungUpdate"
-            @update:calculatedBefristungOption="handleBefristungOptionUpdate"
-            @fieldReset="handleFieldReset"
+          <!-- Error Message Display for error messages from the personenkontextStore -->
+          <SpshAlert
+            :model-value="!!personenkontextStore.errorCode"
+            :type="'error'"
+            :closable="false"
+            :text="t(`admin.personenkontext.errors.${personenkontextStore.errorCode}`)"
+            :showButton="true"
+            :buttonText="$t('admin.person.backToCreatePerson')"
+            :buttonAction="navigateBackToPersonForm"
+            :title="t(`admin.personenkontext.title.${personenkontextStore.errorCode}`)"
           />
-          <div v-if="selectedOrganisation">
-            <v-row>
-              <h3 class="headline-3">4. {{ $t('admin.person.personalInfo') }}</h3>
-            </v-row>
-            <!-- Vorname -->
-            <FormRow
-              :errorLabel="selectedVornameProps['error']"
-              labelForId="vorname-input"
-              :isRequired="true"
-              :label="$t('person.firstName')"
-            >
-              <v-text-field
-                clearable
-                data-testid="vorname-input"
-                density="compact"
-                id="vorname-input"
-                ref="vorname-input"
-                :placeholder="$t('person.enterFirstName')"
-                required="true"
-                variant="outlined"
-                v-bind="selectedVornameProps"
-                v-model="selectedVorname"
-              ></v-text-field>
-            </FormRow>
 
-            <!-- Nachname -->
-            <FormRow
-              :errorLabel="selectedFamiliennameProps['error']"
-              labelForId="familienname-input"
-              :isRequired="true"
-              :label="$t('person.lastName')"
-            >
-              <v-text-field
-                clearable
-                data-testid="familienname-input"
-                density="compact"
-                id="familienname-input"
-                ref="familienname-input"
-                :placeholder="$t('person.enterLastName')"
-                required="true"
-                variant="outlined"
-                v-bind="selectedFamiliennameProps"
-                v-model="selectedFamilienname"
-              ></v-text-field>
-            </FormRow>
-            <KopersInput
-              v-if="isKopersRolle(selectedRolle) && selectedOrganisation"
-              :hasNoKopersNr="hasNoKopersNr"
-              v-model:selectedKopersNr="selectedKopersNr"
-              :selectedKopersNrProps="selectedKopersNrProps"
-              @update:selectedKopersNr="(value?: string | null) => (selectedKopersNr = value)"
-              @update:hasNoKopersNr="(value: boolean | undefined) => (hasNoKopersNr = value)"
-            ></KopersInput>
-          </div>
+          <!-- Error Message Display for error messages from the personStore -->
+          <SpshAlert
+            :model-value="!!personStore.errorCode"
+            :title="$t('admin.person.creationErrorTitle')"
+            :type="'error'"
+            :closable="false"
+            :showButton="true"
+            :buttonText="$t('admin.person.backToCreatePerson')"
+            :buttonAction="navigateBackToPersonForm"
+            :text="creationErrorText"
+          />
+
+          <template v-if="!personenkontextStore.errorCode && !personStore.errorCode">
+            <!-- Organisation, Rolle, Klasse zuordnen -->
+            <PersonenkontextCreate
+              :showHeadline="true"
+              :organisationen="organisationen"
+              ref="personenkontext-create"
+              :rollen="rollen"
+              :klassen="klassen"
+              :selectedOrganisationProps="selectedOrganisationProps"
+              :selectedRolleProps="selectedRolleProps"
+              :selectedKlasseProps="selectedKlasseProps"
+              :befristungInputProps="{
+                befristungProps: selectedBefristungProps,
+                befristungOptionProps: selectedBefristungOptionProps,
+                isUnbefristetDisabled: isUnbefristetButtonDisabled,
+                isBefristungRequired: isBefristungspflichtRolle(selectedRolle),
+                nextSchuljahresende: getNextSchuljahresende(),
+                befristung: selectedBefristung,
+                befristungOption: selectedBefristungOption,
+              }"
+              v-model:selectedOrganisation="selectedOrganisation"
+              v-model:selectedRolle="selectedRolle"
+              v-model:selectedKlasse="selectedKlasse"
+              @update:selectedOrganisation="(value?: string) => (selectedOrganisation = value)"
+              @update:selectedRolle="(value?: string) => (selectedRolle = value)"
+              @update:selectedKlasse="(value?: string) => (selectedKlasse = value)"
+              @update:canCommit="canCommit = $event"
+              @update:befristung="handleBefristungUpdate"
+              @update:calculatedBefristungOption="handleBefristungOptionUpdate"
+              @fieldReset="handleFieldReset"
+            />
+            <div v-if="selectedOrganisation">
+              <v-row>
+                <h3 class="headline-3">4. {{ $t('admin.person.personalInfo') }}</h3>
+              </v-row>
+              <!-- Vorname -->
+              <FormRow
+                :errorLabel="selectedVornameProps['error']"
+                labelForId="vorname-input"
+                :isRequired="true"
+                :label="$t('person.firstName')"
+              >
+                <v-text-field
+                  clearable
+                  data-testid="vorname-input"
+                  density="compact"
+                  id="vorname-input"
+                  ref="vorname-input"
+                  :placeholder="$t('person.enterFirstName')"
+                  required="true"
+                  variant="outlined"
+                  v-bind="selectedVornameProps"
+                  v-model="selectedVorname"
+                ></v-text-field>
+              </FormRow>
+
+              <!-- Nachname -->
+              <FormRow
+                :errorLabel="selectedFamiliennameProps['error']"
+                labelForId="familienname-input"
+                :isRequired="true"
+                :label="$t('person.lastName')"
+              >
+                <v-text-field
+                  clearable
+                  data-testid="familienname-input"
+                  density="compact"
+                  id="familienname-input"
+                  ref="familienname-input"
+                  :placeholder="$t('person.enterLastName')"
+                  required="true"
+                  variant="outlined"
+                  v-bind="selectedFamiliennameProps"
+                  v-model="selectedFamilienname"
+                ></v-text-field>
+              </FormRow>
+              <KopersInput
+                v-if="isKopersRolle(selectedRolle) && selectedOrganisation"
+                :hasNoKopersNr="hasNoKopersNr"
+                v-model:selectedKopersNr="selectedKopersNr"
+                :selectedKopersNrProps="selectedKopersNrProps"
+                @update:selectedKopersNr="(value?: string | null) => (selectedKopersNr = value)"
+                @update:hasNoKopersNr="(value: boolean | undefined) => (hasNoKopersNr = value)"
+              ></KopersInput>
+            </div>
+          </template>
         </FormWrapper>
       </template>
 
