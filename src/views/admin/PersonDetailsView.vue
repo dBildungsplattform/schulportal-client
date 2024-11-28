@@ -1566,7 +1566,7 @@
                 >
                   <v-btn
                     class="primary small"
-                    :disabled="hasSameMetadata"
+                    :disabled="hasSameMetadata || personStore.loading"
                     data-testid="person-info-edit-save"
                     :block="mdAndDown"
                     type="submit"
@@ -1603,6 +1603,7 @@
                   @onClearPassword="password = ''"
                   @onResetPassword="resetPassword(currentPersonId)"
                   :password="password"
+                  :isLoading="personStore.loading"
                 >
                 </PasswordReset>
               </div>
@@ -1984,7 +1985,7 @@
                     data-testid="zuordnung-changes-save"
                     @click="handleSaveClick"
                     :block="mdAndDown"
-                    :disabled="isSaveButtonDisabled"
+                    :disabled="isSaveButtonDisabled || personenkontextStore.loading"
                   >
                     {{ $t('save') }}
                   </v-btn>
@@ -2068,7 +2069,7 @@
                 >
                   <v-btn
                     :block="mdAndDown"
-                    :disabled="!canCommit"
+                    :disabled="!canCommit || personenkontextStore.loading"
                     class="primary"
                     data-testid="zuordnung-creation-submit-button"
                     type="submit"
@@ -2136,7 +2137,7 @@
                       :block="mdAndDown"
                       class="primary"
                       data-testid="klasse-change-submit-button"
-                      :disabled="isSubmitDisabled"
+                      :disabled="isSubmitDisabled || organisationStore.loading"
                       type="submit"
                       >{{ $t('transfer') }}</v-btn
                     >
@@ -2297,6 +2298,7 @@
                           :tokenType="twoFactorAuthentificationStore.tokenKind"
                           :personId="currentPersonId"
                           @dialogClosed="twoFactorAuthentificationStore.get2FAState(currentPersonId)"
+                          :isLoading="twoFactorAuthentificationStore.loading"
                         >
                         </TokenReset>
                       </SpshTooltip>
@@ -2312,6 +2314,7 @@
                           :disabled="isEditActive || isEditPersonMetadataActive"
                           :person="personStore.currentPerson"
                           @dialogClosed="twoFactorAuthentificationStore.get2FAState(currentPersonId)"
+                          :isLoading="twoFactorAuthentificationStore.loading"
                         >
                         </TwoFactorAuthenticationSetUp>
                       </SpshTooltip>
@@ -2442,6 +2445,7 @@
                     :errorCode="personStore.errorCode"
                     :person="personStore.currentPerson"
                     @onDeletePerson="deletePerson(currentPersonId)"
+                    :isLoading="personStore.loading"
                   >
                   </PersonDelete>
                 </template>
@@ -2453,6 +2457,7 @@
                     :errorCode="personStore.errorCode"
                     :person="personStore.currentPerson"
                     @onSyncPerson="syncPerson(currentPersonId)"
+                    :isLoading="personStore.loading"
                   >
                   </PersonSync>
                 </template>

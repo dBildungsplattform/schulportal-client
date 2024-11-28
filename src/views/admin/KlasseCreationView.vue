@@ -181,6 +181,7 @@
           :errorCode="organisationStore.errorCode"
           :schulen="schulen"
           :isEditActive="true"
+          :isLoading="organisationStore.loading"
           :readonly="false"
           :selectedSchuleProps="selectedSchuleProps"
           :selectedKlassennameProps="selectedKlassennameProps"

@@ -21,6 +21,7 @@
     selectedKlassennameProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     showUnsavedChangesDialog?: boolean;
     isEditActive?: boolean;
+    isLoading: boolean;
     onHandleConfirmUnsavedChanges: () => void;
     onHandleDiscard: () => void;
     onShowDialogChange: (value?: boolean) => void;
@@ -85,6 +86,7 @@
     :discardButtonLabel="$t('admin.klasse.discard')"
     :hideActions="readonly || !!props.errorCode"
     id="klasse-form"
+    :isLoading="isLoading"
     :onDiscard="onHandleDiscard"
     @onShowDialogChange="onShowDialogChange"
     :onSubmit="onSubmit"

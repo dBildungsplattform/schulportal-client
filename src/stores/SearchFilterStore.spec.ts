@@ -15,7 +15,7 @@ describe('SearchFilterStore', () => {
     expect(searchFilterStore.selectedRollen).toEqual([]);
     expect(searchFilterStore.selectedOrganisationen).toEqual([]);
     expect(searchFilterStore.selectedRollenObjects).toEqual([]);
-    expect(searchFilterStore.searchFilter).toEqual('');
+    expect(searchFilterStore.searchFilterPersonen).toEqual('');
   });
 
   it('should change the state', async () => {
@@ -31,9 +31,13 @@ describe('SearchFilterStore', () => {
     searchFilterStore.setOrganisationFilterForPersonen(['10', '20']);
     expect(searchFilterStore.selectedOrganisationen).toEqual(['10', '20']);
 
-    // it sets the searchFilter
+    // it sets the searchFilter for personen
     searchFilterStore.setSearchFilterForPersonen('search');
-    expect(searchFilterStore.searchFilter).toEqual('search');
+    expect(searchFilterStore.searchFilterPersonen).toEqual('search');
+
+    // it sets the searchFilter for schulen
+    searchFilterStore.setSearchFilterForSchulen('search');
+    expect(searchFilterStore.searchFilterPersonen).toEqual('search');
 
     // it sets sortOrder
     searchFilterStore.setSortOrderForPersonen('desc');

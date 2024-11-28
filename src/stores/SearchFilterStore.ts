@@ -10,7 +10,8 @@ type SearchFilterState = {
   rollenPerPage: number;
   schulenPage: number;
   schulenPerPage: number;
-  searchFilter: string | null;
+  searchFilterPersonen: string | null;
+  searchFilterSchulen: string | null;
   selectedKlassen: Array<string> | null;
   selectedRollen: Array<string> | null;
   selectedRollenObjects: RolleResponse[];
@@ -31,6 +32,7 @@ type SearchFilterActions = {
   ) => Promise<void>;
   setOrganisationFilterForPersonen: (selectedOrganisationen: Array<string> | null) => Promise<void>;
   setSearchFilterForPersonen: (searchFilter: string | null) => Promise<void>;
+  setSearchFilterForSchulen: (searchFilter: string | null) => Promise<void>;
   setSortFieldForPersonen: (sortField: string | null) => Promise<void>;
   setSortOrderForPersonen: (sortOrder: string | null) => Promise<void>;
   setCurrentSortForPersonen: (currentSort: { key: string; order: 'asc' | 'desc' } | null) => Promise<void>;
@@ -58,7 +60,8 @@ export const useSearchFilterStore: StoreDefinition<
     rollenPerPage: 30,
     schulenPage: 1,
     schulenPerPage: 30,
-    searchFilter: '',
+    searchFilterPersonen: '',
+    searchFilterSchulen: '',
     selectedKlassen: [],
     selectedRollen: [],
     selectedRollenObjects: [],
@@ -82,8 +85,12 @@ export const useSearchFilterStore: StoreDefinition<
       this.selectedOrganisationen = selectedOrganisationen;
     },
 
-    async setSearchFilterForPersonen(searchFilter: string | null) {
-      this.searchFilter = searchFilter;
+    async setSearchFilterForPersonen(searchFilterPersonen: string | null) {
+      this.searchFilterPersonen = searchFilterPersonen || '';
+    },
+
+    async setSearchFilterForSchulen(searchFilterSchulen: string | null) {
+      this.searchFilterSchulen = searchFilterSchulen || '';
     },
 
     async setSortFieldForPersonen(sortField: string | null) {

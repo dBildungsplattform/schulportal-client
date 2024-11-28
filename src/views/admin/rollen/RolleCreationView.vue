@@ -294,6 +294,7 @@
           :onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
           :onSubmit="onSubmit"
           :isEditActive="true"
+          :isLoading="rolleStore.loading"
           ref="rolle-creation-form"
           v-model:selectedAdministrationsebene="selectedAdministrationsebene"
           :selectedAdministrationsebeneProps="selectedAdministrationsebeneProps"
