@@ -14,6 +14,7 @@
   const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
 
   type Props = {
+    errorCode?: string;
     schulen?: Array<{ value: string; title: string }>;
     readonly?: boolean;
     selectedSchuleProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
@@ -83,7 +84,7 @@
     :confirmUnsavedChangesAction="onHandleConfirmUnsavedChanges"
     :createButtonLabel="$t('admin.klasse.create')"
     :discardButtonLabel="$t('admin.klasse.discard')"
-    :hideActions="readonly"
+    :hideActions="readonly || !!props.errorCode"
     id="klasse-form"
     :isLoading="isLoading"
     :onDiscard="onHandleDiscard"
@@ -91,63 +92,68 @@
     :onSubmit="onSubmit"
     :showUnsavedChangesDialog="showUnsavedChangesDialog"
   >
-    <!-- Schule zuordnen -->
-    <v-row>
-      <h3 class="headline-3">1. {{ $t('admin.schule.assignSchule') }}</h3>
-    </v-row>
-    <FormRow
-      :errorLabel="selectedSchuleProps?.error || ''"
-      labelForId="schule-select"
-      :isRequired="true"
-      :label="$t('admin.schule.schule')"
-    >
-      <v-autocomplete
-        autocomplete="off"
-        :class="[{ 'filter-dropdown mb-4': hasAutoselectedSchule }, { selected: selectedSchule }]"
-        clearable
-        data-testid="schule-select"
-        density="compact"
-        :disabled="hasAutoselectedSchule || readonly"
-        id="schule-select"
-        :items="schulen"
-        item-value="value"
-        item-text="title"
-        :no-data-text="$t('noDataFound')"
-        :placeholder="$t('admin.schule.assignSchule')"
-        ref="schule-select"
-        required="true"
-        variant="outlined"
-        v-bind="selectedSchuleProps"
-        v-model="selectedSchule"
-        v-model:search="searchInputSchule"
-        hide-details
-      ></v-autocomplete>
-    </FormRow>
+    <!-- Slot for SPSH alerts -->
+    <slot />
 
-    <!-- Klassenname eingeben -->
-    <v-row class="mt-8">
-      <h3 class="headline-3">2. {{ $t('admin.klasse.enterKlassenname') }}</h3>
-    </v-row>
-    <FormRow
-      :errorLabel="selectedKlassennameProps?.error || ''"
-      labelForId="klassenname-input"
-      :isRequired="true"
-      :label="$t('admin.klasse.klassenname')"
-    >
-      <v-text-field
-        clearable
-        data-testid="klassenname-input"
-        density="compact"
-        :disabled="!isEditActive"
-        id="klassenname-input"
-        :placeholder="$t('admin.klasse.enterKlassenname')"
-        ref="klassenname-input"
-        required="true"
-        variant="outlined"
-        v-bind="selectedKlassennameProps"
-        v-model="selectedKlassenname"
-      ></v-text-field>
-    </FormRow>
+    <template v-if="!props.errorCode">
+      <!-- Schule zuordnen -->
+      <v-row>
+        <h3 class="headline-3">1. {{ $t('admin.schule.assignSchule') }}</h3>
+      </v-row>
+      <FormRow
+        :errorLabel="selectedSchuleProps?.error || ''"
+        labelForId="schule-select"
+        :isRequired="true"
+        :label="$t('admin.schule.schule')"
+      >
+        <v-autocomplete
+          autocomplete="off"
+          :class="[{ 'filter-dropdown mb-4': hasAutoselectedSchule }, { selected: selectedSchule }]"
+          clearable
+          data-testid="schule-select"
+          density="compact"
+          :disabled="hasAutoselectedSchule || readonly"
+          id="schule-select"
+          :items="schulen"
+          item-value="value"
+          item-text="title"
+          :no-data-text="$t('noDataFound')"
+          :placeholder="$t('admin.schule.assignSchule')"
+          ref="schule-select"
+          required="true"
+          variant="outlined"
+          v-bind="selectedSchuleProps"
+          v-model="selectedSchule"
+          v-model:search="searchInputSchule"
+          hide-details
+        ></v-autocomplete>
+      </FormRow>
+
+      <!-- Klassenname eingeben -->
+      <v-row class="mt-8">
+        <h3 class="headline-3">2. {{ $t('admin.klasse.enterKlassenname') }}</h3>
+      </v-row>
+      <FormRow
+        :errorLabel="selectedKlassennameProps?.error || ''"
+        labelForId="klassenname-input"
+        :isRequired="true"
+        :label="$t('admin.klasse.klassenname')"
+      >
+        <v-text-field
+          clearable
+          data-testid="klassenname-input"
+          density="compact"
+          :disabled="!isEditActive"
+          id="klassenname-input"
+          :placeholder="$t('admin.klasse.enterKlassenname')"
+          ref="klassenname-input"
+          required="true"
+          variant="outlined"
+          v-bind="selectedKlassennameProps"
+          v-model="selectedKlassenname"
+        ></v-text-field>
+      </FormRow>
+    </template>
   </FormWrapper>
 </template>
 

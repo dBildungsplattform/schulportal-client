@@ -70,7 +70,7 @@ beforeEach(async () => {
 });
 
 describe('RolleDetailsView', () => {
-  test('it renders the role details view', () => {
+  test('it renders the rolle details view', () => {
     expect(wrapper?.find('[data-testid="rolle-details-card"]').isVisible()).toBe(true);
   });
 
@@ -145,6 +145,9 @@ describe('RolleDetailsView', () => {
   });
 
   test('displays error message correctly', async () => {
+    // We have to reset updatedRolle to null to trigger the error message
+    rolleStore.updatedRolle = null;
+
     // Test case 1: ROLLE_UPDATE_ERROR
     rolleStore.errorCode = 'ROLLE_UPDATE_ERROR';
     await nextTick();
@@ -160,5 +163,7 @@ describe('RolleDetailsView', () => {
     expect(spshAlertWrapper?.props()).toMatchObject({
       title: 'Geänderte Daten',
     });
+    // reset errorCode after test
+    rolleStore.errorCode = '';
   });
 });
