@@ -325,10 +325,11 @@
 
     klassenZuordnungen?.forEach((klasseZuordnung: Zuordnung) => {
       const schuleId: string = klasseZuordnung.administriertVon;
-      if (!schuleToKlasseMap.has(schuleId)) {
-        schuleToKlasseMap.set(schuleId, []);
+      const klasse: string = klasseZuordnung.sskName;
+      if (!schuleToKlasseMap.has(schuleId + klasse)) {
+        schuleToKlasseMap.set(schuleId + klasse, []);
       }
-      schuleToKlasseMap.get(schuleId)?.push(klasseZuordnung);
+      schuleToKlasseMap.get(schuleId + klasse)?.push(klasseZuordnung);
     });
 
     // Find Klassen that should be kept
@@ -336,7 +337,7 @@
 
     // For each remaining Zuordnung that is a Schule, keep its associated Klassen
     remainingZuordnungen?.forEach((zuordnung: Zuordnung) => {
-      const associatedKlassen: Zuordnung[] = schuleToKlasseMap.get(zuordnung.sskId) || [];
+      const associatedKlassen: Zuordnung[] = schuleToKlasseMap.get(zuordnung.sskId + zuordnung.klasse) || [];
       klassenToKeep.push(...associatedKlassen);
     });
 
@@ -345,7 +346,7 @@
 
     // Update the personenkontexte with the filtered list
     await personenkontextStore.updatePersonenkontexte(combinedZuordnungen, currentPersonId);
-    zuordnungenResult.value = combinedZuordnungen;
+    zuordnungenResult.value = remainingZuordnungen;
     selectedZuordnungen.value = [];
 
     // Filter out Zuordnungen with editable === false
@@ -1000,10 +1001,11 @@
 
       klassenZuordnungen?.forEach((klasseZuordnung: Zuordnung) => {
         const schuleId: string = klasseZuordnung.administriertVon;
-        if (!schuleToKlasseMap.has(schuleId)) {
-          schuleToKlasseMap.set(schuleId, []);
+        const klasse: string = klasseZuordnung.sskName;
+        if (!schuleToKlasseMap.has(schuleId + klasse)) {
+          schuleToKlasseMap.set(schuleId + klasse, []);
         }
-        schuleToKlasseMap.get(schuleId)?.push(klasseZuordnung);
+        schuleToKlasseMap.get(schuleId + klasse)?.push(klasseZuordnung);
       });
 
       // Find Klassen that should be kept
