@@ -326,10 +326,11 @@
     klassenZuordnungen?.forEach((klasseZuordnung: Zuordnung) => {
       const schuleId: string = klasseZuordnung.administriertVon;
       const klasse: string = klasseZuordnung.sskName;
-      if (!schuleToKlasseMap.has(schuleId + klasse)) {
-        schuleToKlasseMap.set(schuleId + klasse, []);
+      const rolle: string = klasseZuordnung.rolle;
+      if (!schuleToKlasseMap.has(schuleId + klasse + rolle)) {
+        schuleToKlasseMap.set(schuleId + klasse + rolle, []);
       }
-      schuleToKlasseMap.get(schuleId + klasse)?.push(klasseZuordnung);
+      schuleToKlasseMap.get(schuleId + klasse + rolle)?.push(klasseZuordnung);
     });
 
     // Find Klassen that should be kept
@@ -337,7 +338,8 @@
 
     // For each remaining Zuordnung that is a Schule, keep its associated Klassen
     remainingZuordnungen?.forEach((zuordnung: Zuordnung) => {
-      const associatedKlassen: Zuordnung[] = schuleToKlasseMap.get(zuordnung.sskId + zuordnung.klasse) || [];
+      const associatedKlassen: Zuordnung[] =
+        schuleToKlasseMap.get(zuordnung.sskId + zuordnung.klasse + zuordnung.rolle) || [];
       klassenToKeep.push(...associatedKlassen);
     });
 
@@ -1002,10 +1004,11 @@
       klassenZuordnungen?.forEach((klasseZuordnung: Zuordnung) => {
         const schuleId: string = klasseZuordnung.administriertVon;
         const klasse: string = klasseZuordnung.sskName;
-        if (!schuleToKlasseMap.has(schuleId + klasse)) {
-          schuleToKlasseMap.set(schuleId + klasse, []);
+        const rolle: string = klasseZuordnung.rolleId;
+        if (!schuleToKlasseMap.has(schuleId + klasse + rolle)) {
+          schuleToKlasseMap.set(schuleId + klasse + rolle, []);
         }
-        schuleToKlasseMap.get(schuleId + klasse)?.push(klasseZuordnung);
+        schuleToKlasseMap.get(schuleId + klasse + rolle)?.push(klasseZuordnung);
       });
 
       // Find Klassen that should be kept
@@ -1013,7 +1016,8 @@
 
       // For each remaining Zuordnung that is a Schule, keep its associated Klassen
       remainingZuordnungen?.forEach((zuordnung: Zuordnung) => {
-        const associatedKlassen: Zuordnung[] = schuleToKlasseMap.get(zuordnung.sskId) || [];
+        const associatedKlassen: Zuordnung[] =
+          schuleToKlasseMap.get(zuordnung.sskId + zuordnung.klasse + zuordnung.rolleId) || [];
         klassenToKeep.push(...associatedKlassen);
       });
 
