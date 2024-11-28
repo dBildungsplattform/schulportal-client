@@ -147,7 +147,11 @@
     password.value = personStore.newPassword || '';
   }
 
-  async function onLockUser(lockedBy: string, date: string | undefined, isExistingLockToBeEdited: boolean): Promise<void> {
+  async function onLockUser(
+    lockedBy: string,
+    date: string | undefined,
+    isExistingLockToBeEdited: boolean,
+  ): Promise<void> {
     if (!personStore.currentPerson) return;
 
     let lock: boolean;
