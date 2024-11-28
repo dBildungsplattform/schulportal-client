@@ -1125,6 +1125,9 @@
       }
       changePersonMetadataSuccessMessage.value = t('admin.person.personalInfoSuccessDialogMessageWithUsername');
       changePersonMetadataSuccessVisible.value = !personStore.errorCode;
+      if (!personStore.errorCode) {
+        resetFormChangePersonMetadata();
+      }
     });
 
   // Checks for dirtiness depending on the active form
