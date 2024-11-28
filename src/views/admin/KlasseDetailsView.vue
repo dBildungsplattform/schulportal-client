@@ -137,11 +137,15 @@
   }
 
   const alertButtonText: ComputedRef<string> = computed(() => {
-    return organisationStore.errorCode === 'NEWER_VERSION_ORGANISATION' ? t('refreshData') : t('nav.backToList');
+    return organisationStore.errorCode === 'NEWER_VERSION_ORGANISATION'
+      ? t('refreshData')
+      : isEditActive.value
+        ? t('admin.klasse.backToEditKlasse')
+        : t('nav.backToList');
   });
 
   const alertButtonAction: ComputedRef<() => void> = computed(() => {
-    return organisationStore.errorCode === 'NEWER_VERSION_ORGANISATION'
+    return organisationStore.errorCode === 'NEWER_VERSION_ORGANISATION' || isEditActive.value
       ? (): void => router.go(0)
       : navigateToKlasseManagement;
   });
@@ -190,7 +194,7 @@
       {{ $t('admin.headline') }}
     </h1>
     <LayoutCard
-      :closable="true"
+      :closable="!organisationStore.errorCode"
       data-testid="klasse-details-card"
       :header="$t('admin.klasse.edit')"
       @onCloseClicked="navigateToKlasseManagement"
@@ -201,6 +205,7 @@
         <v-container>
           <div v-if="organisationStore.currentOrganisation">
             <KlasseForm
+              :errorCode="organisationStore.errorCode"
               :isEditActive="isEditActive"
               :readonly="true"
               :selectedSchuleProps="selectedSchuleProps"
@@ -236,13 +241,13 @@
               />
             </KlasseForm>
             <v-divider
-              v-if="isEditActive"
+              v-if="isEditActive && !organisationStore.errorCode"
               class="border-opacity-100 rounded"
               color="#E5EAEF"
               thickness="5px"
             ></v-divider>
             <div
-              v-if="!isEditActive"
+              v-if="!isEditActive && !organisationStore.errorCode"
               class="d-flex justify-sm-end"
             >
               <v-row class="pt-3 px-2 justify-end">
@@ -281,7 +286,7 @@
               </v-row>
             </div>
             <div
-              v-else
+              v-else-if="!organisationStore.errorCode"
               class="d-flex justify-end"
             >
               <v-row class="pt-3 px-2 save-cancel-row justify-end">
