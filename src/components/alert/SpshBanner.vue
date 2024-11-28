@@ -47,6 +47,7 @@
       >
         <v-icon
           class="close-icon"
+          data-testid="banner-close-icon"
           @click="dismissBanner(id)"
           icon="mdi-close"
         ></v-icon>
