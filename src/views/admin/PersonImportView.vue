@@ -23,7 +23,7 @@
   import { type ImportStore, useImportStore } from '@/stores/ImportStore';
   import { RollenArt } from '@/stores/RolleStore';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
-  import jschardet from 'jschardet';
+  import jschardet, { type IDetectedMap } from 'jschardet';
 
   const organisationStore: OrganisationStore = useOrganisationStore();
   const importStore: ImportStore = useImportStore();
@@ -168,7 +168,7 @@
     router.push({ name: 'person-management' });
   }
 
-  function uploadFile(): void {
+  async function uploadFile(): Promise<void> {
     if (selectedSchule.value === undefined || selectedRolle.value === undefined || !selectedFiles.value?.length) {
       return;
     }
@@ -179,17 +179,26 @@
     const originalFileName: string = selectedFiles.value?.[0]?.name || 'import.csv';
 
     fileReader.onload = () => {
-      newFile = new File([fileReader.result as string], originalFileName, { type: 'text/csv' });
+      const readEncoding: string = jschardet.detect(fileReader.result as Buffer).encoding;
+      const blob = new Blob(["\uFEFF" + fileReader.result as string], { type: 'text/csv;charset=utf-8' });
+      newFile = new File([blob], originalFileName, { type: 'text/csv;charset=utf-8' });
+      console.log(readEncoding);
+      console.log(fileReader.result);
+      console.log(newFile);
 
       if (!newFile) {
         return;
       }
+      
+      console.log(selectedFiles.value![0]);
+      selectedFiles.value![0] = newFile;
+      console.log(selectedFiles.value![0]);
 
       // upload the file
       importStore.uploadPersonenImportFile(
         selectedSchule.value as string,
         selectedRolle.value as string,
-        newFile as unknown as File,
+        selectedFiles.value![0] as File,
       );
     }
 
