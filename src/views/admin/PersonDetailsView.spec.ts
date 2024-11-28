@@ -103,6 +103,7 @@ const mockPersonenuebersicht: PersonWithUebersicht = {
       editable: true,
       merkmale: [] as unknown as RollenMerkmal,
       befristung: '2099-08-12',
+      admins: ['test'],
     },
     {
       sskId: '3',
@@ -115,6 +116,7 @@ const mockPersonenuebersicht: PersonWithUebersicht = {
       editable: true,
       merkmale: [] as unknown as RollenMerkmal,
       befristung: '',
+      admins: ['test'],
     },
     {
       sskId: '2',
@@ -127,6 +129,7 @@ const mockPersonenuebersicht: PersonWithUebersicht = {
       editable: true,
       merkmale: [] as unknown as RollenMerkmal,
       befristung: '',
+      admins: ['test'],
     },
   ],
 };
