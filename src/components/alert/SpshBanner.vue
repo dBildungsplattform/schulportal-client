@@ -24,6 +24,7 @@
 </script>
 <template>
   <v-alert
+    :data-testid="id + '-banner'"
     class="mb-2"
     :model-value="visible"
     :color="type"
