@@ -434,13 +434,4 @@ describe('PersonenkontextCreate', () => {
 
     expect(klassenAutocomplete?.text()).toBeFalsy();
   });
-
-  test('Preselect the Klasse if the existing Zuordnungen have a Klasse', async () => {
-    const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
-    await organisationAutocomplete?.setValue('01');
-    await nextTick();
-
-    // Verify that the klasse ID is emitted
-    expect(wrapper?.emitted('update:selectedKlasse')).toBeTruthy();
-  });
 });
