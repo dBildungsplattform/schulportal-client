@@ -2659,9 +2659,9 @@
       >
         <v-card-text>
           <v-container>
-            <v-row class="text-body bold px-md-16">
+            <v-row class="text-body bold justify-center">
               <v-col
-                offset="1"
+              class="text-center"
                 cols="10"
               >
                 <span>{{ createZuordnungConfirmationDialogMessage }}</span>
