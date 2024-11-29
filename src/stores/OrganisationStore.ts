@@ -347,10 +347,8 @@ export const useOrganisationStore: StoreDefinition<
           undefined,
           [organisationId],
         );
-        const getFilteredKlassen: Organisation[] = response.data.filter(
-          (orga: Organisation) => orga.typ === OrganisationsTyp.Klasse,
-        );
-        this.klassen = getFilteredKlassen;
+
+        this.klassen = response.data;
         this.totalKlassen = +response.headers['x-paging-total'];
         this.totalPaginatedKlassen = +response.headers['x-paging-pageTotal'];
         await this.fetchSchuleDetailsForKlassen(true);
