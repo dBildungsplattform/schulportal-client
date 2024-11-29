@@ -694,10 +694,12 @@
         administriertVon: [selectedZuordnungen.value[0]?.sskId],
         includeTyp: OrganisationsTyp.Klasse,
         systemrechte: ['KLASSEN_VERWALTEN'],
+        limit: 25
       });
 
       await organisationStore.getKlassenByOrganisationId(selectedZuordnungen.value[0]?.sskId, {
         searchString: selectedZuordnungen.value[0].klasse,
+        limit: 25,
       });
 
       // Combine arrays and remove duplicates based on id

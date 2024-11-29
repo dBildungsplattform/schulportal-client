@@ -93,10 +93,10 @@
         limit: 25,
       });
 
-      // Fetch all classes for the selected organization without any filter
+      // Fetch all Klassen for the selected organization without any filter
       await organisationStore.getKlassenByOrganisationId(newValue);
 
-      // Check for Klasse preselection
+      // Check that all the Klassen associated with the selectedOrga have the same Klasse for the same person.
       const klassenZuordnungen: Zuordnung[] | undefined = personStore.personenuebersicht?.zuordnungen.filter(
         (zuordnung: Zuordnung) => zuordnung.typ === OrganisationsTyp.Klasse && zuordnung.administriertVon === newValue,
       );
@@ -112,9 +112,16 @@
           const klasse: Organisation | undefined = organisationStore.klassen.find(
             (k: Organisation) => k.id === klassenZuordnungen[0]?.sskId,
           );
-
-          selectedKlasse.value = klasse?.id;
-          emits('update:selectedKlasse', klasse?.id);
+          // If the klasse was found then add it to the 25 Klassen in the dropdown and preselect it
+          if (klasse) {
+            selectedKlasse.value = klasse.id;
+            // Another request to limit the Klassen because beforehand we made the same request with no limit to check all possible Klassen
+            await organisationStore.getKlassenByOrganisationId(newValue, { limit: 25 });
+            // Push the preselected Klasse to the array of klassen (dropdown) if its not there already (this is necessary if the Klasse isn't part of the initial 25)
+            if (!organisationStore.klassen.some((k: Organisation) => k.id === klasse.id)) {
+              organisationStore.klassen.push(klasse);
+            }
+          }
         }
       }
       // Reset the selectedRolle field only if oldValue was not undefined
