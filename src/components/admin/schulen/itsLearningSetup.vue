@@ -9,17 +9,16 @@
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
   const router: Router = useRouter();
+
   type Props = {
     errorCode: string;
-    klassenname: string;
-    klassenId: string;
     schulname: string;
-    isLoading: boolean;
-    useIconActivator: boolean;
+    schulId: string;
+    itslearningEnabled: boolean;
   };
 
   type Emits = {
-    (event: 'onDeleteKlasse', klasseId: string): void;
+    (event: 'onActivateItslearning', schuleId: string): void;
   };
 
   const props: Props = defineProps<Props>();
@@ -29,43 +28,52 @@
   const errorMessage: Ref<string> = ref('');
   const successDialogVisible: Ref<boolean> = ref(false);
 
-  async function closeKlasseDeleteDialog(isActive: Ref<boolean>): Promise<void> {
+  async function closeActivateSchuleDialog(isActive: Ref<boolean>): Promise<void> {
     isActive.value = false;
   }
 
-  async function handleKlasseDelete(klasseId: string): Promise<void> {
-    emit('onDeleteKlasse', klasseId);
+  async function handleSchuleToItsLearning(schuleId: string): Promise<void> {
+    emit('onActivateItslearning', schuleId);
     successDialogVisible.value = true;
   }
 
   async function closeSuccessDialogAndPushToManagement(): Promise<void> {
     successDialogVisible.value = false;
-    if (router.currentRoute.value.name === 'klasse-management') {
+    if (router.currentRoute.value.name === 'schule-management') {
       router.go(0);
     } else {
-      router.push({ name: 'klasse-management' });
+      router.push({ name: 'schule-management' });
     }
   }
 
-  const deleteKlasseConfirmationMessage: ComputedRef<string> = computed(() => {
+  const activateSchuleItsLearningConfirmationMessage: ComputedRef<string> = computed(() => {
     if (errorMessage.value || props.errorCode) {
       return '';
     }
     let message: string = '';
-    message += `${t('admin.klasse.deleteKlasseConfirmation', {
-      klassenname: props.klassenname,
+    message += `${t('admin.schule.activateSchuleConfirmationMessage', {
       schulname: props.schulname,
     })}`;
     return message;
   });
 
-  const deleteKlasseSuccessMessage: ComputedRef<string> = computed(() => {
+  const retransmitSchuleConfirmationMessage: ComputedRef<string> = computed(() => {
     if (errorMessage.value || props.errorCode) {
       return '';
     }
     let message: string = '';
-    message += `${t('admin.klasse.deleteKlasseSuccessMessage', {
-      klassenname: props.klassenname,
+    message += `${t('admin.schule.retransmitSchuleConfirmationMessage', {
+      schulname: props.schulname,
+    })}`;
+    return message;
+  });
+
+  const activateItsLearningSuccessMessage: ComputedRef<string> = computed(() => {
+    if (errorMessage.value || props.errorCode) {
+      return '';
+    }
+    let message: string = '';
+    message += `${t('admin.schule.activateSchuleSuccessMessage', {
       schulname: props.schulname,
     })}`;
     return message;
@@ -80,17 +88,17 @@
     <LayoutCard
       v-if="successDialogVisible"
       :closable="false"
-      :header="$t('admin.klasse.deleteKlasse')"
+      :header="$t('admin.schule.activateInItsLearning')"
     >
       <v-card-text>
         <v-container>
           <v-row class="text-body bold justify-center">
             <v-col
-              class="text-center"
               cols="10"
+              class="text-center"
             >
-              <span data-testid="klasse-delete-success-text">
-                {{ deleteKlasseSuccessMessage }}
+              <span data-testid="activate-schule-sync-itslearning-success-text">
+                {{ activateItsLearningSuccessMessage }}
               </span>
             </v-col>
           </v-row>
@@ -107,7 +115,7 @@
               :block="mdAndDown"
               class="primary"
               @click.stop="closeSuccessDialogAndPushToManagement()"
-              data-testid="close-klasse-delete-success-dialog-button"
+              data-testid="close-schule-sync-itslearning-dialog-button"
             >
               {{ $t('close') }}
             </v-btn>
@@ -121,20 +129,22 @@
     persistent
   >
     <template v-slot:activator="{ props }">
-      <v-btn
-        v-if="!useIconActivator"
-        class="secondary button"
-        data-testid="open-klasse-delete-dialog-button"
-        v-bind="props"
-        :block="mdAndDown"
-      >
-        {{ $t('admin.klasse.deleteKlasse') }}
-      </v-btn>
       <v-icon
+        class="ml-10"
+        v-if="itslearningEnabled"
+        :title="$t('admin.schule.retransmit')"
+        data-testid="open-schule-itslearning-resync-dialog-icon"
+        icon="mdi-reload"
+        size="small"
+        v-bind="props"
+      >
+      </v-icon>
+      <v-icon
+        class="ml-10"
         v-else
-        :title="$t('admin.klasse.deleteKlasse')"
-        data-testid="open-klasse-delete-dialog-icon"
-        icon="mdi-delete"
+        :title="$t('admin.schule.enableNow')"
+        data-testid="open-schule-itslearning-sync-dialog-icon"
+        icon="mdi-power"
         size="small"
         v-bind="props"
       ></v-icon>
@@ -146,8 +156,8 @@
     >
       <LayoutCard
         :closable="true"
-        :header="$t('admin.klasse.deleteKlasse')"
-        @onCloseClicked="closeKlasseDeleteDialog(isActive)"
+        :header="$t('admin.schule.activateInItsLearning')"
+        @onCloseClicked="closeActivateSchuleDialog(isActive)"
       >
         <v-card-text>
           <v-container>
@@ -169,11 +179,20 @@
             </v-row>
             <v-row class="text-body bold justify-center">
               <v-col
-                class="text-center"
                 cols="10"
+                class="text-center"
               >
-                <span data-testid="klasse-delete-confirmation-text">
-                  {{ deleteKlasseConfirmationMessage }}
+                <span
+                  v-if="props.itslearningEnabled"
+                  data-testid="schule-retransmit-in-itslearning-confirmation-text"
+                >
+                  {{ retransmitSchuleConfirmationMessage }}
+                </span>
+                <span
+                  v-else
+                  data-testid="schule-activate-in-itslearning-confirmation-text"
+                >
+                  {{ activateSchuleItsLearningConfirmationMessage }}
                 </span>
               </v-col>
             </v-row>
@@ -189,8 +208,8 @@
               <v-btn
                 :block="mdAndDown"
                 class="secondary button"
-                @click.stop="closeKlasseDeleteDialog(isActive)"
-                data-testid="cancel-klasse-delete-dialog-button"
+                @click.stop="closeActivateSchuleDialog(isActive)"
+                data-testid="cancel-schule-activate-in-itslearning-dialog-button"
               >
                 {{ $t('cancel') }}
               </v-btn>
@@ -203,11 +222,10 @@
               <v-btn
                 :block="mdAndDown"
                 class="primary button"
-                @click.stop="handleKlasseDelete(klassenId)"
-                data-testid="klasse-delete-button"
-                :disabled="isLoading"
+                @click.stop="handleSchuleToItsLearning(props.schulId)"
+                data-testid="schule-itslearning-sync-button"
               >
-                {{ $t('admin.klasse.deleteKlasse') }}
+                {{ itslearningEnabled ? $t('admin.schule.retransmit') : $t('admin.schule.activateInItsLearning') }}
               </v-btn>
             </v-col>
           </v-row>

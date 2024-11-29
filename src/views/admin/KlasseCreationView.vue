@@ -105,13 +105,27 @@
   };
 
   async function navigateBackToKlasseForm(): Promise<void> {
-    organisationStore.errorCode = '';
-    await router.push({ name: 'create-klasse' });
+    if (organisationStore.errorCode === 'REQUIRED_STEP_UP_LEVEL_NOT_MET') {
+      resetForm();
+      await router.push({ name: 'create-klasse' }).then(() => {
+        router.go(0);
+      });
+    } else {
+      organisationStore.errorCode = '';
+      await router.push({ name: 'create-klasse' });
+    }
   }
 
   async function navigateToKlasseManagement(): Promise<void> {
-    await router.push({ name: 'klasse-management' });
-    organisationStore.createdKlasse = null;
+    if (organisationStore.errorCode === 'REQUIRED_STEP_UP_LEVEL_NOT_MET') {
+      resetForm();
+      await router.push({ name: 'create-klasse' }).then(() => {
+        router.go(0);
+      });
+    } else {
+      organisationStore.errorCode = '';
+      await router.push({ name: 'klasse-management' });
+    }
   }
 
   function handleConfirmUnsavedChanges(): void {
@@ -120,10 +134,10 @@
 
   const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = handleSubmit(async () => {
     await organisationStore.createOrganisation(
-      '',
+      undefined,
       selectedKlassenname.value,
-      '',
-      '',
+      undefined,
+      undefined,
       OrganisationsTyp.Klasse,
       undefined,
       selectedSchule.value,
@@ -178,6 +192,7 @@
         <KlasseForm
           :schulen="schulen"
           :isEditActive="true"
+          :isLoading="organisationStore.loading"
           :readonly="false"
           :selectedSchuleProps="selectedSchuleProps"
           :selectedKlassennameProps="selectedKlassennameProps"

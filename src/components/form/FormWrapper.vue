@@ -11,6 +11,7 @@
     discardButtonLabel: string;
     hideActions?: boolean;
     id: string;
+    isLoading?: boolean;
     onDiscard: () => void;
     onSubmit: () => void;
     showUnsavedChangesDialog?: boolean;
@@ -99,7 +100,7 @@
           :block="mdAndDown"
           class="primary"
           :data-testid="`${id}-submit-button`"
-          :disabled="!canCommit"
+          :disabled="!canCommit || isLoading"
           type="submit"
           >{{ createButtonLabel }}</v-btn
         >

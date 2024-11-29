@@ -16,6 +16,7 @@ beforeEach(() => {
   wrapper = mount(PersonSync, {
     attachTo: document.getElementById('app') || '',
     props: {
+      isLoading: false,
       disabled: false,
       errorCode: '',
       person: {

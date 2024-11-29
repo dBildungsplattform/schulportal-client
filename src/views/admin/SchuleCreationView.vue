@@ -109,8 +109,8 @@
       await organisationStore.createOrganisation(
         selectedDienststellennummer.value,
         selectedSchulname.value,
-        ' ',
-        ' ',
+        undefined,
+        undefined,
         OrganisationsTyp.Schule,
         undefined,
         selectedSchulform.value,
@@ -137,13 +137,25 @@
   }
 
   async function navigateToSchuleManagement(): Promise<void> {
-    await router.push({ name: 'schule-management' });
+    if (organisationStore.errorCode === 'REQUIRED_STEP_UP_LEVEL_NOT_MET') {
+      resetForm();
+    }
     organisationStore.createdSchule = null;
+    await router.push({ name: 'schule-management' }).then(() => {
+      router.go(0);
+    });
   }
 
   async function navigateBackToSchuleForm(): Promise<void> {
-    await router.push({ name: 'create-schule' });
-    organisationStore.errorCode = '';
+    if (organisationStore.errorCode === 'REQUIRED_STEP_UP_LEVEL_NOT_MET') {
+      resetForm();
+      await router.push({ name: 'create-schule' }).then(() => {
+        router.go(0);
+      });
+    } else {
+      organisationStore.errorCode = '';
+      await router.push({ name: 'create-schule' });
+    }
   }
 
   function preventNavigation(event: BeforeUnloadEvent): void {
@@ -205,6 +217,7 @@
           :createButtonLabel="$t('admin.schule.create')"
           :discardButtonLabel="$t('admin.schule.discard')"
           id="schule-creation-form"
+          :isLoading="organisationStore.loading"
           :onDiscard="navigateToSchuleManagement"
           @onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
           :onSubmit="onSubmit"

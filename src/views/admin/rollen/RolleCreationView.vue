@@ -101,12 +101,22 @@
   }
 
   async function navigateBackToRolleForm(): Promise<void> {
-    await router.push({ name: 'create-rolle' });
-    rolleStore.errorCode = '';
+    if (rolleStore.errorCode === 'REQUIRED_STEP_UP_LEVEL_NOT_MET') {
+      formContext.resetForm();
+      await router.push({ name: 'create-rolle' }).then(() => {
+        router.go(0);
+      });
+    } else {
+      rolleStore.errorCode = '';
+      await router.push({ name: 'create-rolle' });
+    }
   }
 
   async function navigateToRolleManagement(): Promise<void> {
-    await router.push({ name: 'rolle-management' });
+    formContext.resetForm();
+    await router.push({ name: 'rolle-management' }).then(() => {
+      router.go(0);
+    });
     rolleStore.createdRolle = null;
   }
 
@@ -173,6 +183,7 @@
   );
 
   function preventNavigation(event: BeforeUnloadEvent): void {
+    if (rolleStore.errorCode) formContext.resetForm();
     if (!isFormDirty.value) return;
     event.preventDefault();
     /* Chrome requires returnValue to be set. */
@@ -294,6 +305,7 @@
           :onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
           :onSubmit="onSubmit"
           :isEditActive="true"
+          :isLoading="rolleStore.loading"
           ref="rolle-creation-form"
           v-model:selectedAdministrationsebene="selectedAdministrationsebene"
           :selectedAdministrationsebeneProps="selectedAdministrationsebeneProps"

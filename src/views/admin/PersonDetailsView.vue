@@ -698,8 +698,8 @@
       });
 
       // Combine arrays and remove duplicates based on id
-      const combined = [...organisationStore.klassen, ...organisationStore.allKlassen];
-      organisationStore.klassen = Array.from(new Map(combined.map((item) => [item.id, item])).values());
+      const combined: Organisation[] = [...organisationStore.klassen, ...organisationStore.allKlassen];
+      organisationStore.klassen = Array.from(new Map(combined.map((item: Organisation) => [item.id, item])).values());
     }
     // Auto select the new Schule
     selectedSchule.value = selectedZuordnungen.value[0]?.sskId;
@@ -962,6 +962,11 @@
       (k: Organisation) => k.id === selectedNewKlasse.value,
     );
 
+    // The remaining Zuordnungen that were not selected for deletion
+    const remainingZuordnungen: Zuordnung[] | undefined = zuordnungenResult.value?.filter(
+      (zuordnung: Zuordnung) => !selectedZuordnungen.value.includes(zuordnung),
+    );
+
     if (organisation) {
       // Used to build the Zuordnung of type Schule and keep track of it (Only use it in the template)
       // This is basically the old Zuordnung in the Schule but since it is already available in ZuordnungenResult we won't be adding this to the finalZuordnungen
@@ -984,6 +989,33 @@
       if (zuordnungenResult.value) {
         finalZuordnungen.value = zuordnungenResult.value;
       }
+
+      // Get all Klassen Zuordnungen
+      const klassenZuordnungen: Zuordnung[] | undefined = personStore.personenuebersicht?.zuordnungen.filter(
+        (zuordnung: Zuordnung) => zuordnung.typ === OrganisationsTyp.Klasse,
+      );
+
+      // Create a map of Schule to Klasse relationships to keep the Klassen that are not supposed to be deleted
+      const schuleToKlasseMap: Map<string, Zuordnung[]> = new Map<string, Zuordnung[]>();
+
+      klassenZuordnungen?.forEach((klasseZuordnung: Zuordnung) => {
+        const schuleId: string = klasseZuordnung.administriertVon;
+        if (!schuleToKlasseMap.has(schuleId)) {
+          schuleToKlasseMap.set(schuleId, []);
+        }
+        schuleToKlasseMap.get(schuleId)?.push(klasseZuordnung);
+      });
+
+      // Find Klassen that should be kept
+      const klassenToKeep: Zuordnung[] = [];
+
+      // For each remaining Zuordnung that is a Schule, keep its associated Klassen
+      remainingZuordnungen?.forEach((zuordnung: Zuordnung) => {
+        const associatedKlassen: Zuordnung[] = schuleToKlasseMap.get(zuordnung.sskId) || [];
+        klassenToKeep.push(...associatedKlassen);
+      });
+
+      finalZuordnungen.value = [...finalZuordnungen.value, ...klassenToKeep];
 
       // Add the new Klasse Zuordnung
       if (newKlasse) {
@@ -1527,7 +1559,7 @@
                 >
                   <v-btn
                     class="primary small"
-                    :disabled="hasSameMetadata"
+                    :disabled="hasSameMetadata || personStore.loading"
                     data-testid="person-info-edit-save"
                     :block="mdAndDown"
                     type="submit"
@@ -1564,6 +1596,7 @@
                   @onClearPassword="password = ''"
                   @onResetPassword="resetPassword(currentPersonId)"
                   :password="password"
+                  :isLoading="personStore.loading"
                 >
                 </PasswordReset>
               </div>
@@ -1945,7 +1978,7 @@
                     data-testid="zuordnung-changes-save"
                     @click="handleSaveClick"
                     :block="mdAndDown"
-                    :disabled="isSaveButtonDisabled"
+                    :disabled="isSaveButtonDisabled || personenkontextStore.loading"
                   >
                     {{ $t('save') }}
                   </v-btn>
@@ -2029,7 +2062,7 @@
                 >
                   <v-btn
                     :block="mdAndDown"
-                    :disabled="!canCommit"
+                    :disabled="!canCommit || personenkontextStore.loading"
                     class="primary"
                     data-testid="zuordnung-creation-submit-button"
                     type="submit"
@@ -2097,7 +2130,7 @@
                       :block="mdAndDown"
                       class="primary"
                       data-testid="klasse-change-submit-button"
-                      :disabled="isSubmitDisabled"
+                      :disabled="isSubmitDisabled || organisationStore.loading"
                       type="submit"
                       >{{ $t('transfer') }}</v-btn
                     >
@@ -2258,6 +2291,7 @@
                           :tokenType="twoFactorAuthentificationStore.tokenKind"
                           :personId="currentPersonId"
                           @dialogClosed="twoFactorAuthentificationStore.get2FAState(currentPersonId)"
+                          :isLoading="twoFactorAuthentificationStore.loading"
                         >
                         </TokenReset>
                       </SpshTooltip>
@@ -2273,6 +2307,7 @@
                           :disabled="isEditActive || isEditPersonMetadataActive"
                           :person="personStore.currentPerson"
                           @dialogClosed="twoFactorAuthentificationStore.get2FAState(currentPersonId)"
+                          :isLoading="twoFactorAuthentificationStore.loading"
                         >
                         </TwoFactorAuthenticationSetUp>
                       </SpshTooltip>
@@ -2403,6 +2438,7 @@
                     :errorCode="personStore.errorCode"
                     :person="personStore.currentPerson"
                     @onDeletePerson="deletePerson(currentPersonId)"
+                    :isLoading="personStore.loading"
                   >
                   </PersonDelete>
                 </template>
@@ -2414,6 +2450,7 @@
                     :errorCode="personStore.errorCode"
                     :person="personStore.currentPerson"
                     @onSyncPerson="syncPerson(currentPersonId)"
+                    :isLoading="personStore.loading"
                   >
                   </PersonSync>
                 </template>
