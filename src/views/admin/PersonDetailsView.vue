@@ -1131,7 +1131,9 @@
       }
       changePersonMetadataSuccessMessage.value = t('admin.person.personalInfoSuccessDialogMessageWithUsername');
       changePersonMetadataSuccessVisible.value = !personStore.errorCode;
-      resetFormChangePersonMetadata();
+      if (!personStore.errorCode) {
+        resetFormChangePersonMetadata();
+      }
     });
 
   // Checks for dirtiness depending on the active form
@@ -1315,38 +1317,45 @@
       {{ $t('admin.headline') }}
     </h1>
     <LayoutCard
-      :closable="true"
+      :closable="!personStore.errorCode && !personenkontextStore.errorCode"
       data-testid="person-details-card"
       :header="$t('admin.person.edit')"
       @onCloseClicked="navigateToPersonTable"
       :padded="true"
       :showCloseText="true"
     >
-      <!-- Error Message Display if the personStore throws any kind of error (Not being able to load the person) -->
-      <SpshAlert
-        :model-value="!!personStore.errorCode"
-        :type="'error'"
-        :closable="false"
-        :text="$t(`admin.person.errors.${personStore.errorCode}`)"
-        :showButton="true"
-        :buttonText="alertButtonTextKopers"
-        :buttonAction="alertButtonActionKopers"
-        :title="$t(`admin.person.title.${personStore.errorCode}`)"
-        @update:modelValue="handleAlertClose"
-      />
+      <v-container
+        v-if="!!personStore.errorCode || !!personenkontextStore.errorCode"
+        class="px-3 px-sm-16"
+      >
+        <v-container class="px-lg-16">
+          <!-- Error Message Display if the personStore throws any kind of error (Not being able to load the person) -->
+          <SpshAlert
+            :model-value="!!personStore.errorCode"
+            :type="'error'"
+            :closable="false"
+            :text="$t(`admin.person.errors.${personStore.errorCode}`)"
+            :showButton="true"
+            :buttonText="alertButtonTextKopers"
+            :buttonAction="alertButtonActionKopers"
+            :title="$t(`admin.person.title.${personStore.errorCode}`)"
+            @update:modelValue="handleAlertClose"
+          />
 
-      <!-- Error Message Display if the personenkontextStore throws any kind of error (Not being able to load the kontext) -->
-      <SpshAlert
-        :model-value="!!personenkontextStore.errorCode"
-        :type="'error'"
-        :closable="false"
-        :text="creationErrorText"
-        :showButton="true"
-        :buttonText="alertButtonText"
-        :buttonAction="alertButtonAction"
-        :title="creationErrorTitle"
-        @update:modelValue="handleAlertClose"
-      />
+          <!-- Error Message Display if the personenkontextStore throws any kind of error (Not being able to load the kontext) -->
+          <SpshAlert
+            :model-value="!!personenkontextStore.errorCode"
+            :type="'error'"
+            :closable="false"
+            :text="creationErrorText"
+            :showButton="true"
+            :buttonText="alertButtonText"
+            :buttonAction="alertButtonAction"
+            :title="creationErrorTitle"
+            @update:modelValue="handleAlertClose"
+          />
+        </v-container>
+      </v-container>
 
       <template v-if="!personStore.errorCode && !personenkontextStore.errorCode">
         <v-container class="personal-info">
@@ -2175,7 +2184,7 @@
               <template v-else>
                 <v-col>
                   <h3 class="subtitle-1">{{ $t('admin.person.twoFactorAuthentication.header') }}</h3>
-                  <v-row class="mt-4 mr-lg-13 text-body">
+                  <v-row class="mt-4 text-body">
                     <v-col
                       class="text-right"
                       cols="1"
