@@ -200,6 +200,17 @@ beforeEach(() => {
   };
 
   personStore.personenuebersicht = mockPersonenuebersicht;
+  organisationStore.klassen = [
+    {
+      id: '2',
+      name: '11b',
+      kennung: '9356494-11b',
+      namensergaenzung: 'Klasse',
+      kuerzel: '11b',
+      typ: OrganisationsTyp.Klasse,
+      administriertVon: '1',
+    },
+  ];
 });
 
 describe('PersonenkontextCreate', () => {

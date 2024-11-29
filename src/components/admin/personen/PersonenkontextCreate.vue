@@ -115,6 +115,7 @@
           // If the klasse was found then add it to the 25 Klassen in the dropdown and preselect it
           if (klasse) {
             selectedKlasse.value = klasse.id;
+            emits('update:selectedKlasse', newValue);
             // Another request to limit the Klassen because beforehand we made the same request with no limit to check all possible Klassen
             await organisationStore.getKlassenByOrganisationId(newValue, { limit: 25 });
             // Push the preselected Klasse to the array of klassen (dropdown) if its not there already (this is necessary if the Klasse isn't part of the initial 25)
