@@ -109,6 +109,7 @@ export type PersonWithUebersicht =
         editable: boolean;
         merkmale: RollenMerkmal;
         befristung: string;
+        admins: string[];
       }[];
     }
   | undefined;
