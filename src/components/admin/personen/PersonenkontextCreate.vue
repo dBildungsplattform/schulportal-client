@@ -93,8 +93,8 @@
         limit: 25,
       });
 
-      // Fetch all Klassen for the selected organization without any filter
-      await organisationStore.getKlassenByOrganisationId(newValue);
+      // Fetch all Klassen for the selected organization
+      await organisationStore.getKlassenByOrganisationId(newValue, { limit: 25 });
 
       // Check that all the Klassen associated with the selectedOrga have the same Klasse for the same person.
       const klassenZuordnungen: Zuordnung[] | undefined = personStore.personenuebersicht?.zuordnungen.filter(
@@ -109,6 +109,7 @@
         );
 
         if (sameSSK) {
+          await organisationStore.getKlassenByOrganisationId(newValue);
           const klasse: Organisation | undefined = organisationStore.klassen.find(
             (k: Organisation) => k.id === klassenZuordnungen[0]?.sskId,
           );
@@ -239,14 +240,14 @@
     }
     if (searchValue === '' && !selectedKlasse.value) {
       timerId.value = setTimeout(() => {
-        organisationStore.getKlassenByOrganisationId(organisationId, { searchString: searchValue });
+        organisationStore.getKlassenByOrganisationId(organisationId, { searchString: searchValue, limit: 25 });
       }, 500);
     } else if (searchValue && searchValue !== selectedKlasseTitle.value) {
       /* cancel pending call */
       clearTimeout(timerId.value);
       /* delay new call 500ms */
       timerId.value = setTimeout(() => {
-        organisationStore.getKlassenByOrganisationId(organisationId, { searchString: searchValue });
+        organisationStore.getKlassenByOrganisationId(organisationId, { searchString: searchValue, limit: 25 });
       }, 500);
     }
   }

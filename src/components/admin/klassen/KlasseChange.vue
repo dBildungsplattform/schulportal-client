@@ -32,7 +32,7 @@
 
   watch(selectedNewKlasse, (newValue: string | undefined) => {
     if (!selectedNewKlasse.value) {
-      organisationStore.getKlassenByOrganisationId(selectedSchule.value as string, { limit: 25});
+      organisationStore.getKlassenByOrganisationId(selectedSchule.value as string, { limit: 25 });
     }
     selectedNewKlasse.value = newValue;
   });
