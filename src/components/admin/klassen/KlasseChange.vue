@@ -32,7 +32,7 @@
 
   watch(selectedNewKlasse, (newValue: string | undefined) => {
     if (!selectedNewKlasse.value) {
-      organisationStore.getKlassenByOrganisationId(selectedSchule.value as string);
+      organisationStore.getKlassenByOrganisationId(selectedSchule.value as string, { limit: 25 });
     }
     selectedNewKlasse.value = newValue;
   });
@@ -46,14 +46,14 @@
     }
     if (searchValue === '' && !selectedNewKlasse.value) {
       timerId.value = setTimeout(() => {
-        organisationStore.getKlassenByOrganisationId(organisationId, { searchString: searchValue });
+        organisationStore.getKlassenByOrganisationId(organisationId, { searchString: searchValue, limit: 25 });
       }, 500);
     } else if (searchValue && searchValue !== selectedKlasseTitle.value) {
       /* cancel pending call */
       clearTimeout(timerId.value);
       /* delay new call 500ms */
       timerId.value = setTimeout(() => {
-        organisationStore.getKlassenByOrganisationId(organisationId, { searchString: searchValue });
+        organisationStore.getKlassenByOrganisationId(organisationId, { searchString: searchValue, limit: 25 });
       }, 500);
     }
   }
