@@ -325,10 +325,12 @@
 
     klassenZuordnungen?.forEach((klasseZuordnung: Zuordnung) => {
       const schuleId: string = klasseZuordnung.administriertVon;
-      if (!schuleToKlasseMap.has(schuleId)) {
-        schuleToKlasseMap.set(schuleId, []);
+      const klasse: string = klasseZuordnung.sskName;
+      const rolle: string = klasseZuordnung.rolle;
+      if (!schuleToKlasseMap.has(schuleId + klasse + rolle)) {
+        schuleToKlasseMap.set(schuleId + klasse + rolle, []);
       }
-      schuleToKlasseMap.get(schuleId)?.push(klasseZuordnung);
+      schuleToKlasseMap.get(schuleId + klasse + rolle)?.push(klasseZuordnung);
     });
 
     // Find Klassen that should be kept
@@ -336,7 +338,8 @@
 
     // For each remaining Zuordnung that is a Schule, keep its associated Klassen
     remainingZuordnungen?.forEach((zuordnung: Zuordnung) => {
-      const associatedKlassen: Zuordnung[] = schuleToKlasseMap.get(zuordnung.sskId) || [];
+      const associatedKlassen: Zuordnung[] =
+        schuleToKlasseMap.get(zuordnung.sskId + zuordnung.klasse + zuordnung.rolle) || [];
       klassenToKeep.push(...associatedKlassen);
     });
 
@@ -345,7 +348,7 @@
 
     // Update the personenkontexte with the filtered list
     await personenkontextStore.updatePersonenkontexte(combinedZuordnungen, currentPersonId);
-    zuordnungenResult.value = combinedZuordnungen;
+    zuordnungenResult.value = remainingZuordnungen;
     selectedZuordnungen.value = [];
 
     // Filter out Zuordnungen with editable === false
@@ -691,10 +694,12 @@
         administriertVon: [selectedZuordnungen.value[0]?.sskId],
         includeTyp: OrganisationsTyp.Klasse,
         systemrechte: ['KLASSEN_VERWALTEN'],
+        limit: 25
       });
 
       await organisationStore.getKlassenByOrganisationId(selectedZuordnungen.value[0]?.sskId, {
         searchString: selectedZuordnungen.value[0].klasse,
+        limit: 25,
       });
 
       // Combine arrays and remove duplicates based on id
@@ -1000,10 +1005,12 @@
 
       klassenZuordnungen?.forEach((klasseZuordnung: Zuordnung) => {
         const schuleId: string = klasseZuordnung.administriertVon;
-        if (!schuleToKlasseMap.has(schuleId)) {
-          schuleToKlasseMap.set(schuleId, []);
+        const klasse: string = klasseZuordnung.sskName;
+        const rolle: string = klasseZuordnung.rolleId;
+        if (!schuleToKlasseMap.has(schuleId + klasse + rolle)) {
+          schuleToKlasseMap.set(schuleId + klasse + rolle, []);
         }
-        schuleToKlasseMap.get(schuleId)?.push(klasseZuordnung);
+        schuleToKlasseMap.get(schuleId + klasse + rolle)?.push(klasseZuordnung);
       });
 
       // Find Klassen that should be kept
@@ -1011,7 +1018,8 @@
 
       // For each remaining Zuordnung that is a Schule, keep its associated Klassen
       remainingZuordnungen?.forEach((zuordnung: Zuordnung) => {
-        const associatedKlassen: Zuordnung[] = schuleToKlasseMap.get(zuordnung.sskId) || [];
+        const associatedKlassen: Zuordnung[] =
+          schuleToKlasseMap.get(zuordnung.sskId + zuordnung.klasse + zuordnung.rolleId) || [];
         klassenToKeep.push(...associatedKlassen);
       });
 
@@ -2651,9 +2659,9 @@
       >
         <v-card-text>
           <v-container>
-            <v-row class="text-body bold px-md-16">
+            <v-row class="text-body bold justify-center">
               <v-col
-                offset="1"
+              class="text-center"
                 cols="10"
               >
                 <span>{{ createZuordnungConfirmationDialogMessage }}</span>

@@ -252,7 +252,7 @@
         includeTyp: OrganisationsTyp.Klasse,
         systemrechte: ['KLASSEN_VERWALTEN'],
       });
-    } else if (searchValue === '' && selectedSchule.value !== null) {
+    } else if (searchValue === '' && selectedSchule.value !== null && selectedKlassen.value.length === 0) {
       // Fetch all Klassen for the selected Schule when the search string is cleared
       await organisationStore.getAllOrganisationen({
         searchString: searchValue,
@@ -262,7 +262,7 @@
         includeTyp: OrganisationsTyp.Klasse,
         systemrechte: ['KLASSEN_VERWALTEN'],
       });
-    }
+    } 
   }
 
   // Checks if the filter is active or not
@@ -286,7 +286,7 @@
     // If the user has an autoselected Schule, do not reset it
     if (hasAutoselectedSchule.value && selectedSchule.value !== null) {
       // Fetch all Klassen for the selected Schule
-      organisationStore.getKlassenByOrganisationId(selectedSchule.value);
+      organisationStore.getKlassenByOrganisationId(selectedSchule.value, { limit: 25 });
       organisationStore.allKlassen = organisationStore.klassen;
     } else {
       // Clear search input for Schulen
