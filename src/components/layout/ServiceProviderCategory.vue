@@ -5,9 +5,14 @@
 
   const authStore: AuthStore = useAuthStore();
 
-  defineProps<{
+  const props: {
     categoryTitle: string;
     serviceProviders: Array<ServiceProvider>;
+    hasToken: boolean;
+  } = defineProps<{
+    categoryTitle: string;
+    serviceProviders: Array<ServiceProvider>;
+    hasToken: boolean;
   }>();
 
   function getInternalServiceProviderUrl(target: string): string {
@@ -26,6 +31,17 @@
       }
     }
     return '';
+  }
+
+  function getNextUrl(serviceProvider: ServiceProvider): string {
+    if (serviceProvider.target === 'URL') {
+      if (serviceProvider.requires2fa && !props.hasToken) {
+        return '/no-second-factor';
+      } else {
+        return serviceProvider.url;
+      }
+    }
+    return getInternalServiceProviderUrl(serviceProvider.target);
   }
 </script>
 
@@ -50,11 +66,7 @@
         lg="4"
       >
         <ServiceProviderCard
-          :href="
-            serviceProvider.target === 'URL'
-              ? serviceProvider.url
-              : getInternalServiceProviderUrl(serviceProvider.target)
-          "
+          :href="getNextUrl(serviceProvider)"
           :newTab="serviceProvider.target === 'URL'"
           :testId="`service-provider-card-${serviceProvider.id}`"
           :title="serviceProvider.name"
