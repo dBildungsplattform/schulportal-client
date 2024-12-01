@@ -71,17 +71,20 @@
 
   async function fetchKlassenBySelectedSchuleId(schuleId: string | null): Promise<void> {
     // Fetch Klassen related to the selected Schule
-    await organisationStore.getKlassenByOrganisationId(schuleId || '', {
+    await organisationStore.getKlassenByOrganisationId({
       offset: (searchFilterStore.klassenPage - 1) * searchFilterStore.klassenPerPage,
       limit: searchFilterStore.klassenPerPage,
+      administriertVon: [schuleId || ''],
+      organisationIds: searchFilterStore.selectedKlassenForKlassen || [],
     });
 
-    // Update the klassenOptions for the dropdown
+    // Update the klassenOptions for the dropdown with the Klassen found before
     klassenOptions.value = organisationStore.klassen.map((org: Organisation) => ({
       value: org.id,
       title: org.name,
     }));
 
+    // Update the allKlassen with the same Klassen which is basically the table.
     organisationStore.allKlassen = organisationStore.klassen;
   }
 
@@ -161,10 +164,23 @@
   async function updateSelectedKlassen(newValue: string[]): Promise<void> {
     await searchFilterStore.setKlasseFilterForKlassen(newValue);
     if (newValue.length > 0 && selectedSchule.value !== null) {
-      // Filter finalKlassen to only include the selected Klassen
+      await organisationStore.getKlassenByOrganisationId({
+        offset: (searchFilterStore.klassenPage - 1) * searchFilterStore.klassenPerPage,
+        limit: searchFilterStore.klassenPerPage,
+        includeTyp: OrganisationsTyp.Klasse,
+        systemrechte: ['KLASSEN_VERWALTEN'],
+        administriertVon: [selectedSchule.value],
+        organisationIds: newValue,
+      });
+      // Filter finalKlassen (table) to only include the selected Klassen
       organisationStore.allKlassen = organisationStore.klassen.filter((klasse: Organisation) =>
         newValue.includes(klasse.id),
       );
+      // The dropdown for Klassen is also updated to show the selectedKlassen on top of the ones already there. (The call to getKlassenByOrganisationId before this will take care of that)
+      klassenOptions.value = organisationStore.klassen.map((org: Organisation) => ({
+        value: org.id,
+        title: org.name,
+      }));
     } else if (selectedSchule.value !== null) {
       // If no Klassen are selected but a Schule is selected, show all Klassen for the selected Schule
       organisationStore.allKlassen = organisationStore.klassen;
@@ -236,7 +252,22 @@
         searchString: searchValue,
         includeTyp: OrganisationsTyp.Klasse,
         systemrechte: ['KLASSEN_VERWALTEN'],
+        organisationIds: selectedKlassen.value,
       });
+      // Here we need to update the dropdown again because there is a searchString present
+      klassenOptions.value = organisationStore.allKlassen.map((org: Organisation) => ({
+        value: org.id,
+        title: org.name,
+      }));
+      // The total number of Klassen found should be updated because getAllOrganisationen with a organisationIds parameter returns the correct number of Klassen but with the already selected Klassen on top of it so we need to remove them.
+      // Only subtract the selected Klassen if they are actually in the new search results
+      const selectedKlassenIds: Set<string> = new Set(selectedKlassen.value.map((klasseId: string) => klasseId));
+      const filteredOptions: TranslatedObject[] = klassenOptions.value.filter(
+        (klasseId: TranslatedObject) => !selectedKlassenIds.has(klasseId.value),
+      );
+
+      // Set totalKlassen to the number of new (non-selected) results
+      organisationStore.totalKlassen = filteredOptions.length;
     } else if (searchValue.length >= 1 && selectedSchule.value === null) {
       await organisationStore.getAllOrganisationen({
         offset: (searchFilterStore.klassenPage - 1) * searchFilterStore.klassenPerPage,
@@ -262,7 +293,12 @@
         includeTyp: OrganisationsTyp.Klasse,
         systemrechte: ['KLASSEN_VERWALTEN'],
       });
-    } 
+      // Here we need to update the dropdown again but with an empty searchstring
+      klassenOptions.value = organisationStore.allKlassen.map((org: Organisation) => ({
+        value: org.id,
+        title: org.name,
+      }));
+    }
   }
 
   // Checks if the filter is active or not
@@ -286,7 +322,7 @@
     // If the user has an autoselected Schule, do not reset it
     if (hasAutoselectedSchule.value && selectedSchule.value !== null) {
       // Fetch all Klassen for the selected Schule
-      organisationStore.getKlassenByOrganisationId(selectedSchule.value, { limit: 25 });
+      organisationStore.getKlassenByOrganisationId({ limit: 25, administriertVon: [selectedSchule.value] });
       organisationStore.allKlassen = organisationStore.klassen;
     } else {
       // Clear search input for Schulen
@@ -317,7 +353,7 @@
       if (organisationStore.allSchulen.length === 1 && !searchFilterStore.selectedSchuleForKlassen) {
         selectedSchule.value = organisationStore.allSchulen[0]?.id || null;
         if (selectedSchule.value) {
-          await organisationStore.getKlassenByOrganisationId(selectedSchule.value);
+          await organisationStore.getKlassenByOrganisationId({ administriertVon: [selectedSchule.value] });
           hasAutoselectedSchule.value = true;
         }
       } else {
