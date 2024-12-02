@@ -4,6 +4,7 @@
   import { type ServiceProvider } from '@/stores/ServiceProviderStore';
 
   const authStore: AuthStore = useAuthStore();
+  const NO_SECOND_FACTOR: string = '/no-second-factor';
 
   const props: {
     categoryTitle: string;
@@ -33,16 +34,15 @@
     return '';
   }
 
-  function getNextUrl(serviceProvider: ServiceProvider): string {
+  function computeUrlAndTab(serviceProvider: ServiceProvider): { url: string; newTab: boolean } {
     if (serviceProvider.target === 'URL') {
-      // for development purposes its necessary to disable the 2fa check with && authStore.acr !== StepUpLevel.GOLD
       if (serviceProvider.requires2fa && !props.hasToken && authStore.acr !== StepUpLevel.GOLD) {
-        return '/no-second-factor';
+        return { url: NO_SECOND_FACTOR, newTab: false };
       } else {
-        return serviceProvider.url;
+        return { url: serviceProvider.url, newTab: true };
       }
     }
-    return getInternalServiceProviderUrl(serviceProvider.target);
+    return { url: getInternalServiceProviderUrl(serviceProvider.target), newTab: false };
   }
 </script>
 
@@ -67,8 +67,8 @@
         lg="4"
       >
         <ServiceProviderCard
-          :href="getNextUrl(serviceProvider)"
-          :newTab="serviceProvider.target === 'URL'"
+          :href="computeUrlAndTab(serviceProvider).url"
+          :newTab="computeUrlAndTab(serviceProvider).newTab"
           :testId="`service-provider-card-${serviceProvider.id}`"
           :title="serviceProvider.name"
           :logoUrl="serviceProvider.logoUrl"
