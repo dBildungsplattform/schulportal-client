@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import ServiceProviderCard from '@/components/cards/ServiceProviderCard.vue';
-  import { type AuthStore, useAuthStore } from '@/stores/AuthStore';
+  import { type AuthStore, StepUpLevel, useAuthStore } from '@/stores/AuthStore';
   import { type ServiceProvider } from '@/stores/ServiceProviderStore';
 
   const authStore: AuthStore = useAuthStore();
@@ -35,7 +35,8 @@
 
   function getNextUrl(serviceProvider: ServiceProvider): string {
     if (serviceProvider.target === 'URL') {
-      if (serviceProvider.requires2fa && !props.hasToken) {
+      // for development purposes its necessary to disable the 2fa check with && authStore.acr !== StepUpLevel.GOLD
+      if (serviceProvider.requires2fa && !props.hasToken && authStore.acr !== StepUpLevel.GOLD) {
         return '/no-second-factor';
       } else {
         return serviceProvider.url;
