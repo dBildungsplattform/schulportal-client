@@ -72,7 +72,7 @@ describe('ServiceProviderCategory.vue', () => {
       href: '/no-second-factor',
       title: 'Service A',
       logoUrl: '/logo-a.png',
-      newTab: true,
+      newTab: false,
     });
 
     expect(cards[1]!.props()).toMatchObject({
