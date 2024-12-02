@@ -58,7 +58,11 @@
   const searchInputSchulen: Ref<string> = ref('');
   const searchInputKlassen: Ref<string> = ref('');
   const hasAutoselectedSchule: Ref<boolean> = ref(false);
+
   const timerId: Ref<ReturnType<typeof setTimeout> | undefined> = ref<ReturnType<typeof setTimeout>>();
+
+  // Variable to track the number of Klassen found depending on the search. The variable totalKlasse in the store controls the table paging and can't be used here correctly.
+  let totalKlassen: number = 0;
 
   const schulen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
     return organisationStore.allSchulen
@@ -78,14 +82,20 @@
       organisationIds: searchFilterStore.selectedKlassenForKlassen || [],
     });
 
+    if (selectedKlassen.value.length > 0) {
+      // Filter finalKlassen (table) to only include the selected Klassen even when we change the page.
+      organisationStore.allKlassen = organisationStore.klassen.filter((klasse: Organisation) =>
+        selectedKlassen.value.includes(klasse.id),
+      );
+    } else {
+      organisationStore.allKlassen = organisationStore.klassen;
+    }
     // Update the klassenOptions for the dropdown with the Klassen found before
     klassenOptions.value = organisationStore.klassen.map((org: Organisation) => ({
       value: org.id,
       title: org.name,
     }));
-
-    // Update the allKlassen with the same Klassen which is basically the table.
-    organisationStore.allKlassen = organisationStore.klassen;
+    totalKlassen = klassenOptions.value.length;
   }
 
   async function getPaginatedKlassen(page: number): Promise<void> {
@@ -145,7 +155,7 @@
       // Reset selectedKlassen and klassenOptions when Schule is unselected
       selectedKlassen.value = [];
       klassenOptions.value = [];
-      organisationStore.totalKlassen = 0;
+      totalKlassen = 0;
 
       // Fetch all Klassen when no Schule is selected
       await organisationStore.getAllOrganisationen({
@@ -159,6 +169,7 @@
         title: org.name,
       }));
     }
+    totalKlassen = organisationStore.allKlassen.length;
   }
 
   async function updateSelectedKlassen(newValue: string[]): Promise<void> {
@@ -181,6 +192,7 @@
         value: org.id,
         title: org.name,
       }));
+      totalKlassen = organisationStore.klassen.length;
     } else if (selectedSchule.value !== null) {
       // If no Klassen are selected but a Schule is selected, show all Klassen for the selected Schule
       organisationStore.allKlassen = organisationStore.klassen;
@@ -267,7 +279,7 @@
       );
 
       // Set totalKlassen to the number of new (non-selected) results
-      organisationStore.totalKlassen = filteredOptions.length;
+      totalKlassen = filteredOptions.length;
     } else if (searchValue.length >= 1 && selectedSchule.value === null) {
       await organisationStore.getAllOrganisationen({
         offset: (searchFilterStore.klassenPage - 1) * searchFilterStore.klassenPerPage,
@@ -298,6 +310,28 @@
         value: org.id,
         title: org.name,
       }));
+      totalKlassen = klassenOptions.value.length;
+    } else if (searchValue === '' && selectedSchule.value !== null && selectedKlassen.value.length !== 0) {
+      // Fetch all Klassen for the selected Schule when the search string is cleared
+      await organisationStore.getAllOrganisationen({
+        searchString: searchValue,
+        offset: (searchFilterStore.klassenPage - 1) * searchFilterStore.klassenPerPage,
+        limit: searchFilterStore.klassenPerPage,
+        administriertVon: [selectedSchule.value],
+        includeTyp: OrganisationsTyp.Klasse,
+        systemrechte: ['KLASSEN_VERWALTEN'],
+        organisationIds: selectedKlassen.value,
+      });
+      // Here we need to update the dropdown again but with an empty searchstring and already selected Klassen
+      klassenOptions.value = organisationStore.allKlassen.map((org: Organisation) => ({
+        value: org.id,
+        title: org.name,
+      }));
+      // The table should only show the selected Klassen
+      organisationStore.allKlassen = organisationStore.allKlassen.filter((klasse: Organisation) =>
+        selectedKlassen.value.includes(klasse.id),
+      );
+      totalKlassen = klassenOptions.value.length;
     }
   }
 
@@ -558,13 +592,7 @@
                         <span
                           v-else
                           class="filter-header"
-                          >{{
-                            $t(
-                              'admin.klasse.klassenFound',
-                              { count: organisationStore.totalKlassen },
-                              organisationStore.totalKlassen,
-                            )
-                          }}</span
+                          >{{ $t('admin.klasse.klassenFound', { count: totalKlassen }, totalKlassen) }}</span
                         >
                       </v-list-item>
                     </template>
