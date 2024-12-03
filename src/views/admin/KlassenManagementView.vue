@@ -271,15 +271,26 @@
         value: org.id,
         title: org.name,
       }));
-      // The total number of Klassen found should be updated because getAllOrganisationen with a organisationIds parameter returns the correct number of Klassen but with the already selected Klassen on top of it so we need to remove them.
-      // Only subtract the selected Klassen if they are actually in the new search results
+      // Extract the selected Klassen IDs into a Set for efficient lookup
       const selectedKlassenIds: Set<string> = new Set(selectedKlassen.value.map((klasseId: string) => klasseId));
-      const filteredOptions: TranslatedObject[] = klassenOptions.value.filter(
-        (klasseId: TranslatedObject) => !selectedKlassenIds.has(klasseId.value),
+
+      // Filter the options to get only those matching the search results
+      const searchMatchedOptions: TranslatedObject[] = klassenOptions.value.filter((klasseOption: TranslatedObject) =>
+        klasseOption.title.includes(searchValue),
       );
 
-      // Set totalKlassen to the number of new (non-selected) results
-      totalKlassen = filteredOptions.length;
+      // Count the selected Klassen that match the search results
+      const matchedSelectedKlassen: TranslatedObject[] = searchMatchedOptions.filter((klasseOption: TranslatedObject) =>
+        selectedKlassenIds.has(klasseOption.value),
+      );
+
+      // Count only the search-matched Klassen that are not in the selected list
+      const filteredOptions: TranslatedObject[] = searchMatchedOptions.filter(
+        (klasseOption: TranslatedObject) => !selectedKlassenIds.has(klasseOption.value),
+      );
+
+      // Calculate the total Klassen by summing up unique matches
+      totalKlassen = filteredOptions.length + matchedSelectedKlassen.length;
     } else if (searchValue.length >= 1 && selectedSchule.value === null) {
       await organisationStore.getAllOrganisationen({
         offset: (searchFilterStore.klassenPage - 1) * searchFilterStore.klassenPerPage,
@@ -331,6 +342,7 @@
       organisationStore.allKlassen = organisationStore.allKlassen.filter((klasse: Organisation) =>
         selectedKlassen.value.includes(klasse.id),
       );
+      // The number of Klassen comes from the number of klassen from the dropdown
       totalKlassen = klassenOptions.value.length;
     }
   }
