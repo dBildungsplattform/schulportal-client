@@ -52,7 +52,16 @@
 
   const selectedSchule: Ref<string | null> = ref(null);
   const selectedKlassen: Ref<Array<string>> = ref([]);
-  const finalKlassen: ComputedRef<Organisation[]> = computed(() => organisationStore.allKlassen);
+  const finalKlassen: ComputedRef<Organisation[]> = computed(() => {
+    // If there are selected Klassen, filter the allKlassen to show only those
+    if (selectedKlassen.value.length > 0) {
+      return organisationStore.allKlassen.filter((klasse: Organisation) => selectedKlassen.value.includes(klasse.id));
+    }
+
+    // Otherwise, return allKlassen as is
+    return organisationStore.allKlassen;
+  });
+
   const klassenOptions: Ref<TranslatedObject[] | undefined> = ref([]);
 
   const searchInputSchulen: Ref<string> = ref('');
@@ -343,10 +352,6 @@
         value: org.id,
         title: org.name,
       }));
-      // The table should only show the selected Klassen
-      organisationStore.allKlassen = organisationStore.allKlassen.filter((klasse: Organisation) =>
-        selectedKlassen.value.includes(klasse.id),
-      );
       // The number of Klassen comes from the number of klassen from the dropdown
       totalKlassen = klassenOptions.value.length;
     }
