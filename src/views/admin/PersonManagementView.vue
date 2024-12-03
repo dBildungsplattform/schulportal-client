@@ -253,7 +253,30 @@
             title: org.name,
           }))
           .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
-        totalKlassen = klassenOptions.value.length;
+
+        // Extract the selected Klassen IDs into a Set for efficient lookup
+        const selectedKlassenIds: Set<string> = new Set(selectedKlassen.value.map((klasseId: string) => klasseId));
+
+        // Normalize the search value to lowercase
+        const normalizedSearchValue: string = searchValue.toLowerCase();
+
+        // Filter the options to get only those matching the search results (case-insensitive)
+        const searchMatchedOptions: TranslatedObject[] = klassenOptions.value.filter((klasseOption: TranslatedObject) =>
+          klasseOption.title.toLowerCase().includes(normalizedSearchValue),
+        );
+
+        // Count the selected Klassen that match the search results
+        const matchedSelectedKlassen: TranslatedObject[] = searchMatchedOptions.filter(
+          (klasseOption: TranslatedObject) => selectedKlassenIds.has(klasseOption.value),
+        );
+
+        // Count only the search-matched Klassen that are not in the selected list
+        const filteredOptions: TranslatedObject[] = searchMatchedOptions.filter(
+          (klasseOption: TranslatedObject) => !selectedKlassenIds.has(klasseOption.value),
+        );
+
+        // Calculate the total Klassen by summing up unique matches
+        totalKlassen = filteredOptions.length + matchedSelectedKlassen.length;
       }
     }, 500);
   }
