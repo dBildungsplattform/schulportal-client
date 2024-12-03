@@ -766,7 +766,7 @@ describe('OrganisationStore', () => {
       organisationStore.klassen = [...mockKlassen];
 
       mockadapter
-        .onGet('/api/organisationen?limit=30&typ=SCHULE&systemrechte=SCHULEN_VERWALTEN&organisationIds=101')
+        .onGet('/api/organisationen?limit=30&typ=SCHULE&systemrechte=KLASSEN_VERWALTEN&organisationIds=101')
         .replyOnce(200, [
           {
             id: '101',
