@@ -190,27 +190,6 @@
             {{ !person.person.isLocked ? $t('person.lockUser') : $t('person.unlockUser') }}
           </v-btn>
         </SpshTooltip>
-        <!-- <SpshTooltip
-          v-else
-          :enabledCondition="!disabled"
-          :disabledText="$t('person.finishEditFirst')"
-          :enabledText="$t('person.unlockUser')"
-          position="start"
-        >
-          <v-btn
-            class="primary"
-            data-testid="open-lock-dialog-button"
-            :disabled="disabled"
-            :block="mdAndDown"
-            v-bind="props"
-          >
-            {{
-              person.person.userLock?.some((lock) => lock.lock_occasion === PersonLockOccasion.MANUELL_GESPERRT)
-                ? $t('person.unlockUser')
-                : $t('person.lockUser')
-            }}
-          </v-btn>
-        </SpshTooltip> -->
         <SpshTooltip
           v-else
           :enabledCondition="!disabled"
@@ -411,14 +390,6 @@
                 @click.stop="onSubmit"
                 data-testid="lock-user-button"
               >
-                <!-- {{
-                  props.person.person.userLock?.some(
-                    (lock) => lock.lock_occasion === PersonLockOccasion.MANUELL_GESPERRT,
-                  )
-                    // ? $t('admin.person.editLock')
-                    ? "Nur wenn Sperre bearbeiten"
-                    : $t('person.lockUser')
-                }} -->
                 {{ $t('person.lockUser') }}
               </v-btn>
             </v-col>
