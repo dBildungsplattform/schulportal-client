@@ -238,30 +238,22 @@
 
     /* delay new call 500ms */
     timerId = setTimeout(async () => {
-      // Extract the selected Klassen IDs into a Set for efficient lookup
-      const selectedKlassenIds: Set<string> = new Set(selectedKlassen.value.map((klasseId: string) => klasseId));
-
-      // save selected klassen before fetching new klassen
-      const translatedSelectedKlassen: Array<TranslatedObject> = klassenOptions.value?.filter(
-        (klasse: TranslatedObject) => selectedKlassenIds.has(klasse.value),
-      ) as TranslatedObject[];
-
-      // fetch new klassen based on search value
+      // fetch new klassen based on search value and include selected klassen
       await organisationStore.getFilteredKlassen({
         searchString: searchValue,
         administriertVon: selectedOrganisation.value,
+        organisationIds: selectedKlassen.value,
       });
 
       // set values for klassen dropdown
       if (selectedOrganisation.value.length) {
-        klassenOptions.value = translatedSelectedKlassen.concat(
-          organisationStore.klassen
-            .map((org: Organisation) => ({
-              value: org.id,
-              title: org.name,
-            }))
-            .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title)));
-            totalKlassen = klassenOptions.value.length;
+        klassenOptions.value = organisationStore.klassen
+          .map((org: Organisation) => ({
+            value: org.id,
+            title: org.name,
+          }))
+          .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
+        totalKlassen = klassenOptions.value.length;
       }
     }, 500);
   }
@@ -556,13 +548,7 @@
                       <span
                         v-else
                         class="filter-header"
-                        >{{
-                          $t(
-                            'admin.klasse.klassenFound',
-                            { count: organisationStore.totalKlassen },
-                            totalKlassen,
-                          )
-                        }}</span
+                        >{{ $t('admin.klasse.klassenFound', { count: totalKlassen }, totalKlassen) }}</span
                       >
                     </v-list-item>
                   </template>
