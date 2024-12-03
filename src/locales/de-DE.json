@@ -249,7 +249,7 @@
         "serial": "Seriennummer",
         "otpPlaceholder": "Einmalpasswort",
         "requiredSecondFactor": "Diese Aktion setzt eine Zwei-Faktor-Authentifizierung (2FA) voraus.",
-        "noSecondFactorText": "Aktuell ist noch keine 2FA eingrichtet.",
+        "noSecondFactorText": "Aktuell ist noch keine 2FA eingerichtet.",
         "setUpInfo": "Sie können die Einrichtung der 2FA selbst über ein mobiles Endgerät durchführen. Alternativ wenden Sie sich bitte an Ihre schulischen Administratorinnen und Administratoren.",
         "toSecondFactorSetup": "Zur 2FA Einrichtung",
         "errors": {
