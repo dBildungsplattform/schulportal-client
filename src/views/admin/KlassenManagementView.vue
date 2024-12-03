@@ -150,11 +150,14 @@
     await searchFilterStore.setSchuleFilterForKlassen(newValue);
     if (newValue !== null) {
       selectedKlassen.value = [];
-      fetchKlassenBySelectedSchuleId(newValue);
+      organisationStore.allKlassen = [];
+      await fetchKlassenBySelectedSchuleId(newValue);
     } else {
       // Reset selectedKlassen and klassenOptions when Schule is unselected
       selectedKlassen.value = [];
       klassenOptions.value = [];
+      organisationStore.allKlassen = [];
+      searchFilterStore.selectedKlassenForKlassen = [];
       totalKlassen = 0;
 
       // Fetch all Klassen when no Schule is selected
