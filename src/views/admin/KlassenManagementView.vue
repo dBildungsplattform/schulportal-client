@@ -195,7 +195,6 @@
         value: org.id,
         title: org.name,
       }));
-      totalKlassen = organisationStore.klassen.length;
     } else if (selectedSchule.value !== null) {
       // If no Klassen are selected but a Schule is selected, show all Klassen for the selected Schule
       organisationStore.allKlassen = organisationStore.klassen;
@@ -277,9 +276,12 @@
       // Extract the selected Klassen IDs into a Set for efficient lookup
       const selectedKlassenIds: Set<string> = new Set(selectedKlassen.value.map((klasseId: string) => klasseId));
 
-      // Filter the options to get only those matching the search results
+      // Normalize the search value to lowercase
+      const normalizedSearchValue: string = searchValue.toLowerCase();
+
+      // Filter the options to get only those matching the search results (case-insensitive)
       const searchMatchedOptions: TranslatedObject[] = klassenOptions.value.filter((klasseOption: TranslatedObject) =>
-        klasseOption.title.includes(searchValue),
+        klasseOption.title.toLowerCase().includes(normalizedSearchValue),
       );
 
       // Count the selected Klassen that match the search results
