@@ -46,6 +46,9 @@
   const searchInputRollen: Ref<string> = ref('');
   const searchInputOrganisationen: Ref<string> = ref('');
 
+  const klassenOptions: Ref<TranslatedObject[] | undefined> = ref([]);
+  // Variable to track the number of Klassen found depending on the search. The variable totalKlasse in the store controls the table paging and can't be used here correctly.
+  let totalKlassen: number = 0;
   const selectedKlassen: Ref<Array<string>> = ref([]);
   const selectedRollen: Ref<Array<string>> = ref([]);
   const selectedOrganisation: Ref<Array<string>> = ref([]);
@@ -87,18 +90,6 @@
         title: rolle.name,
       }))
       .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
-  });
-
-  const klassen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
-    if (selectedOrganisation.value.length) {
-      return organisationStore.klassen
-        .map((org: Organisation) => ({
-          value: org.id,
-          title: org.name,
-        }))
-        .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
-    }
-    return [];
   });
 
   const statuses: Array<string> = ['Aktiv', 'Inaktiv'];
@@ -188,6 +179,14 @@
         administriertVon: selectedOrganisation.value,
         searchString: searchInputKlassen.value,
       });
+      // set values for klassen dropdown
+      klassenOptions.value = organisationStore.klassen
+        .map((org: Organisation) => ({
+          value: org.id,
+          title: org.name,
+        }))
+        .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
+      totalKlassen = klassenOptions.value.length;
     }
     applySearchAndFilters();
   }
@@ -238,8 +237,32 @@
     clearTimeout(timerId);
 
     /* delay new call 500ms */
-    timerId = setTimeout(() => {
-      organisationStore.getFilteredKlassen({ searchString: searchValue, administriertVon: selectedOrganisation.value });
+    timerId = setTimeout(async () => {
+      // Extract the selected Klassen IDs into a Set for efficient lookup
+      const selectedKlassenIds: Set<string> = new Set(selectedKlassen.value.map((klasseId: string) => klasseId));
+
+      // save selected klassen before fetching new klassen
+      const translatedSelectedKlassen: Array<TranslatedObject> = klassenOptions.value?.filter(
+        (klasse: TranslatedObject) => selectedKlassenIds.has(klasse.value),
+      ) as TranslatedObject[];
+
+      // fetch new klassen based on search value
+      await organisationStore.getFilteredKlassen({
+        searchString: searchValue,
+        administriertVon: selectedOrganisation.value,
+      });
+
+      // set values for klassen dropdown
+      if (selectedOrganisation.value.length) {
+        klassenOptions.value = translatedSelectedKlassen.concat(
+          organisationStore.klassen
+            .map((org: Organisation) => ({
+              value: org.id,
+              title: org.name,
+            }))
+            .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title)));
+            totalKlassen = klassenOptions.value.length;
+      }
     }, 500);
   }
 
@@ -510,7 +533,7 @@
                   :disabled="!selectedOrganisation.length"
                   hide-details
                   id="klasse-select"
-                  :items="klassen"
+                  :items="klassenOptions"
                   item-value="value"
                   item-text="title"
                   multiple
@@ -536,8 +559,8 @@
                         >{{
                           $t(
                             'admin.klasse.klassenFound',
-                            { count: organisationStore.totalPaginatedKlassen },
-                            organisationStore.totalPaginatedKlassen,
+                            { count: organisationStore.totalKlassen },
+                            totalKlassen,
                           )
                         }}</span
                       >
