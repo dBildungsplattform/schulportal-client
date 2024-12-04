@@ -11,7 +11,7 @@ image:
 restartPolicy: Always
 
 frontendHostname: ""
-frontend2ndHostname: "test"
+frontend2ndHostname: "test.og"
 
 containerSecurityContext:
   enabled: true
