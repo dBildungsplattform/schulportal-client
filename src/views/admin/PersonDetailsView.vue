@@ -694,7 +694,7 @@
         administriertVon: [selectedZuordnungen.value[0]?.sskId],
         includeTyp: OrganisationsTyp.Klasse,
         systemrechte: ['KLASSEN_VERWALTEN'],
-        limit: 25
+        limit: 25,
       });
 
       await organisationStore.getKlassenByOrganisationId(selectedZuordnungen.value[0]?.sskId, {
@@ -2661,7 +2661,7 @@
           <v-container>
             <v-row class="text-body bold justify-center">
               <v-col
-              class="text-center"
+                class="text-center"
                 cols="10"
               >
                 <span>{{ createZuordnungConfirmationDialogMessage }}</span>
