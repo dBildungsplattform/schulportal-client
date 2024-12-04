@@ -14,7 +14,7 @@ spec:
   ingressClassName: {{ .Values.ingress.ingressClassName }}
   rules:
     - host: {{.Values.frontendHostname}}
-      http:
+      https:
         paths:
           - path: {{ .Values.ingress.path }}
             pathType: {{ .Values.ingress.pathType }}
