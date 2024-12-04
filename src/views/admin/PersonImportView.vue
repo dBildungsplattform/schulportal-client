@@ -23,7 +23,6 @@
   import { type ImportStore, useImportStore } from '@/stores/ImportStore';
   import { RollenArt } from '@/stores/RolleStore';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
-  import jschardet, { type IDetectedMap } from 'jschardet';
 
   const organisationStore: OrganisationStore = useOrganisationStore();
   const importStore: ImportStore = useImportStore();
@@ -169,72 +168,75 @@
   }
 
   function convertToUTF8(buffer: ArrayBuffer): string {
-    // First, try to decode as UTF-8
-    const utf8Decoder = new TextDecoder('utf-8', { fatal: false });
-    const utf8Text = utf8Decoder.decode(buffer);
+    // Try decoding as UTF-8 first
+    const utf8Decoder: TextDecoder = new TextDecoder('utf-8', { fatal: false });
+    const utf8Text: string = utf8Decoder.decode(buffer);
 
-    // Check if the file is already valid UTF-8
+    // If decoding as UTF-8 doesn't result in invalid characters
     if (utf8Text && !utf8Text.includes('�')) {
       return utf8Text;
     }
 
-    // If not valid UTF-8, convert from Windows-1252
-    const windows1252Decoder = new TextDecoder('windows-1252');
-    const originalText = windows1252Decoder.decode(buffer);
+    // Try other encodings (Windows-1252, ISO-8859-1, etc.)
+    const encodingsToTry: string[] = ['windows-1252', 'iso-8859-1', 'utf-16', 'utf-16le', 'utf-16be'];
 
-    // Create a UTF-8 encoder
-    const encoder = new TextEncoder();
+    for (const encoding of encodingsToTry) {
+      try {
+        const decoder: TextDecoder = new TextDecoder(encoding, { fatal: true });
+        const decodedText: string = decoder.decode(buffer);
+        // If it successfully decodes without errors, return the decoded text
+        return decodedText;
+      } catch (e) {
+        // If the decoding fails, continue with the next encoding
+        continue;
+      }
+    }
 
-    // Convert the decoded text to a UTF-8 encoded array buffer
-    const utf8Buffer = encoder.encode(originalText);
-
-    // Convert back to a string (now guaranteed to be UTF-8)
-    return new TextDecoder('utf-8').decode(utf8Buffer);
+    // If all decoding attempts fail, return a fallback (perhaps empty string or an error message)
+    throw new Error('Unable to decode file using known encodings.');
   }
 
+  // Reads the file and converts it to UTF-8
   function readFileAsUTF8(file: File): Promise<string> {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
+    return new Promise((resolve: (value: string | PromiseLike<string>) => void, reject: (reason?: unknown) => void) => {
+      const reader: FileReader = new FileReader();
 
-      reader.onload = (event) => {
+      reader.onload = (event: ProgressEvent<FileReader>): void => {
         try {
-          // Convert from Windows-1252 to UTF-8
-          const utf8Text = convertToUTF8(event.target?.result as ArrayBuffer);
+          // Convert from unknown encoding to UTF-8
+          const utf8Text: string = convertToUTF8(event.target?.result as ArrayBuffer);
           resolve(utf8Text);
         } catch (error) {
           reject(error);
         }
       };
 
-      reader.onerror = (error) => reject(error);
+      reader.onerror = (error: ProgressEvent<FileReader>): void => reject(error);
 
       // Read the file as ArrayBuffer
       reader.readAsArrayBuffer(file);
     });
   }
+
   async function uploadFile(): Promise<void> {
     if (selectedSchule.value === undefined || selectedRolle.value === undefined || !selectedFiles.value?.length) {
       return;
     }
 
-    const originalFile = selectedFiles.value[0] as File;
+    const originalFile: File = selectedFiles.value[0] as File;
 
-    try {
-      // Read the file content and convert to UTF-8
-      const fileText = await readFileAsUTF8(originalFile);
+    // Read the file content and convert to UTF-8
+    const fileText: string = await readFileAsUTF8(originalFile);
 
-      // Create a new File object with UTF-8 encoded content
-      const utf8Blob = new Blob(['\uFEFF' + fileText], { type: 'text/csv;charset=utf-8' });
-      const utf8File = new File([utf8Blob], originalFile.name, { type: 'text/csv;charset=utf-8' });
+    // Create a new File object with UTF-8 encoded content
+    const utf8Blob: Blob = new Blob(['\uFEFF' + fileText], { type: 'text/csv;charset=utf-8' });
+    const utf8File: File = new File([utf8Blob], originalFile.name, { type: 'text/csv;charset=utf-8' });
 
-      // Update selected files with the UTF-8 version
-      selectedFiles.value![0] = utf8File;
+    // Update selected files with the UTF-8 version
+    selectedFiles.value![0] = utf8File;
 
-      // Perform the upload with the UTF-8 encoded file
-      importStore.uploadPersonenImportFile(selectedSchule.value as string, selectedRolle.value as string, utf8File);
-    } catch (error) {
-      console.error('File encoding conversion error:', error);
-    }
+    // Perform the upload with the UTF-8 encoded file
+    importStore.uploadPersonenImportFile(selectedSchule.value as string, selectedRolle.value as string, utf8File);
   }
 
   function anotherImport(): void {
