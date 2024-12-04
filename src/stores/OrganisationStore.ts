@@ -250,6 +250,7 @@ export const useOrganisationStore: StoreDefinition<
           filter?.systemrechte,
           filter?.excludeTyp,
           filter?.administriertVon,
+          filter?.organisationIds,
         );
         this.klassen = response.data;
         this.totalKlassen = +response.headers['x-paging-total'];
