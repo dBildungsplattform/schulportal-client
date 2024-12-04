@@ -11,7 +11,7 @@ image:
 restartPolicy: Always
 
 frontendHostname: ""
-frontend2ndHostname: "test.og"
+frontend2ndHostname: "dbp.mcpovel.de"
 
 containerSecurityContext:
   enabled: true
