@@ -52,13 +52,26 @@
 
   const selectedSchule: Ref<string | null> = ref(null);
   const selectedKlassen: Ref<Array<string>> = ref([]);
-  const finalKlassen: ComputedRef<Organisation[]> = computed(() => organisationStore.allKlassen);
+  const finalKlassen: ComputedRef<Organisation[]> = computed(() => {
+    // If there are selected Klassen, filter the allKlassen to show only those
+    if (selectedKlassen.value.length > 0) {
+      return organisationStore.allKlassen.filter((klasse: Organisation) => selectedKlassen.value.includes(klasse.id));
+    }
+
+    // Otherwise, return allKlassen as is
+    return organisationStore.allKlassen;
+  });
+
   const klassenOptions: Ref<TranslatedObject[] | undefined> = ref([]);
 
   const searchInputSchulen: Ref<string> = ref('');
   const searchInputKlassen: Ref<string> = ref('');
   const hasAutoselectedSchule: Ref<boolean> = ref(false);
+
   const timerId: Ref<ReturnType<typeof setTimeout> | undefined> = ref<ReturnType<typeof setTimeout>>();
+
+  // Variable to track the number of Klassen found depending on the search. The variable totalKlasse in the store controls the table paging and can't be used here correctly.
+  let totalKlassen: number = 0;
 
   const schulen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
     return organisationStore.allSchulen
@@ -71,18 +84,27 @@
 
   async function fetchKlassenBySelectedSchuleId(schuleId: string | null): Promise<void> {
     // Fetch Klassen related to the selected Schule
-    await organisationStore.getKlassenByOrganisationId(schuleId || '', {
+    await organisationStore.getKlassenByOrganisationId({
       offset: (searchFilterStore.klassenPage - 1) * searchFilterStore.klassenPerPage,
       limit: searchFilterStore.klassenPerPage,
+      administriertVon: [schuleId || ''],
+      organisationIds: searchFilterStore.selectedKlassenForKlassen || [],
     });
 
-    // Update the klassenOptions for the dropdown
+    if (selectedKlassen.value.length > 0) {
+      // Filter finalKlassen (table) to only include the selected Klassen even when we change the page.
+      organisationStore.allKlassen = organisationStore.klassen.filter((klasse: Organisation) =>
+        selectedKlassen.value.includes(klasse.id),
+      );
+    } else {
+      organisationStore.allKlassen = organisationStore.klassen;
+    }
+    // Update the klassenOptions for the dropdown with the Klassen found before
     klassenOptions.value = organisationStore.klassen.map((org: Organisation) => ({
       value: org.id,
       title: org.name,
     }));
-
-    organisationStore.allKlassen = organisationStore.klassen;
+    totalKlassen = klassenOptions.value.length;
   }
 
   async function getPaginatedKlassen(page: number): Promise<void> {
@@ -137,12 +159,15 @@
     await searchFilterStore.setSchuleFilterForKlassen(newValue);
     if (newValue !== null) {
       selectedKlassen.value = [];
-      fetchKlassenBySelectedSchuleId(newValue);
+      organisationStore.allKlassen = [];
+      await fetchKlassenBySelectedSchuleId(newValue);
     } else {
       // Reset selectedKlassen and klassenOptions when Schule is unselected
       selectedKlassen.value = [];
       klassenOptions.value = [];
-      organisationStore.totalKlassen = 0;
+      organisationStore.allKlassen = [];
+      searchFilterStore.selectedKlassenForKlassen = [];
+      totalKlassen = 0;
 
       // Fetch all Klassen when no Schule is selected
       await organisationStore.getAllOrganisationen({
@@ -156,15 +181,29 @@
         title: org.name,
       }));
     }
+    totalKlassen = organisationStore.allKlassen.length;
   }
 
   async function updateSelectedKlassen(newValue: string[]): Promise<void> {
     await searchFilterStore.setKlasseFilterForKlassen(newValue);
     if (newValue.length > 0 && selectedSchule.value !== null) {
-      // Filter finalKlassen to only include the selected Klassen
+      await organisationStore.getKlassenByOrganisationId({
+        offset: (searchFilterStore.klassenPage - 1) * searchFilterStore.klassenPerPage,
+        limit: searchFilterStore.klassenPerPage,
+        includeTyp: OrganisationsTyp.Klasse,
+        systemrechte: ['KLASSEN_VERWALTEN'],
+        administriertVon: [selectedSchule.value],
+        organisationIds: newValue,
+      });
+      // Filter finalKlassen (table) to only include the selected Klassen
       organisationStore.allKlassen = organisationStore.klassen.filter((klasse: Organisation) =>
         newValue.includes(klasse.id),
       );
+      // The dropdown for Klassen is also updated to show the selectedKlassen on top of the ones already there. (The call to getKlassenByOrganisationId before this will take care of that)
+      klassenOptions.value = organisationStore.klassen.map((org: Organisation) => ({
+        value: org.id,
+        title: org.name,
+      }));
     } else if (selectedSchule.value !== null) {
       // If no Klassen are selected but a Schule is selected, show all Klassen for the selected Schule
       organisationStore.allKlassen = organisationStore.klassen;
@@ -236,7 +275,36 @@
         searchString: searchValue,
         includeTyp: OrganisationsTyp.Klasse,
         systemrechte: ['KLASSEN_VERWALTEN'],
+        organisationIds: selectedKlassen.value,
       });
+      // Here we need to update the dropdown again because there is a searchString present
+      klassenOptions.value = organisationStore.allKlassen.map((org: Organisation) => ({
+        value: org.id,
+        title: org.name,
+      }));
+      // Extract the selected Klassen IDs into a Set for efficient lookup
+      const selectedKlassenIds: Set<string> = new Set(selectedKlassen.value.map((klasseId: string) => klasseId));
+
+      // Normalize the search value to lowercase
+      const normalizedSearchValue: string = searchValue.toLowerCase();
+
+      // Filter the options to get only those matching the search results (case-insensitive)
+      const searchMatchedOptions: TranslatedObject[] = klassenOptions.value.filter((klasseOption: TranslatedObject) =>
+        klasseOption.title.toLowerCase().includes(normalizedSearchValue),
+      );
+
+      // Count the selected Klassen that match the search results
+      const matchedSelectedKlassen: TranslatedObject[] = searchMatchedOptions.filter((klasseOption: TranslatedObject) =>
+        selectedKlassenIds.has(klasseOption.value),
+      );
+
+      // Count only the search-matched Klassen that are not in the selected list
+      const filteredOptions: TranslatedObject[] = searchMatchedOptions.filter(
+        (klasseOption: TranslatedObject) => !selectedKlassenIds.has(klasseOption.value),
+      );
+
+      // Calculate the total Klassen by summing up unique matches
+      totalKlassen = filteredOptions.length + matchedSelectedKlassen.length;
     } else if (searchValue.length >= 1 && selectedSchule.value === null) {
       await organisationStore.getAllOrganisationen({
         offset: (searchFilterStore.klassenPage - 1) * searchFilterStore.klassenPerPage,
@@ -262,6 +330,30 @@
         includeTyp: OrganisationsTyp.Klasse,
         systemrechte: ['KLASSEN_VERWALTEN'],
       });
+      // Here we need to update the dropdown again but with an empty searchstring
+      klassenOptions.value = organisationStore.allKlassen.map((org: Organisation) => ({
+        value: org.id,
+        title: org.name,
+      }));
+      totalKlassen = klassenOptions.value.length;
+    } else if (searchValue === '' && selectedSchule.value !== null && selectedKlassen.value.length !== 0) {
+      // Fetch all Klassen for the selected Schule when the search string is cleared
+      await organisationStore.getAllOrganisationen({
+        searchString: searchValue,
+        offset: (searchFilterStore.klassenPage - 1) * searchFilterStore.klassenPerPage,
+        limit: searchFilterStore.klassenPerPage,
+        administriertVon: [selectedSchule.value],
+        includeTyp: OrganisationsTyp.Klasse,
+        systemrechte: ['KLASSEN_VERWALTEN'],
+        organisationIds: selectedKlassen.value,
+      });
+      // Here we need to update the dropdown again but with an empty searchstring and already selected Klassen
+      klassenOptions.value = organisationStore.allKlassen.map((org: Organisation) => ({
+        value: org.id,
+        title: org.name,
+      }));
+      // The number of Klassen comes from the number of klassen from the dropdown
+      totalKlassen = klassenOptions.value.length;
     }
   }
 
@@ -286,7 +378,7 @@
     // If the user has an autoselected Schule, do not reset it
     if (hasAutoselectedSchule.value && selectedSchule.value !== null) {
       // Fetch all Klassen for the selected Schule
-      organisationStore.getKlassenByOrganisationId(selectedSchule.value, { limit: 25 });
+      organisationStore.getKlassenByOrganisationId({ limit: 25, administriertVon: [selectedSchule.value] });
       organisationStore.allKlassen = organisationStore.klassen;
     } else {
       // Clear search input for Schulen
@@ -317,7 +409,7 @@
       if (organisationStore.allSchulen.length === 1 && !searchFilterStore.selectedSchuleForKlassen) {
         selectedSchule.value = organisationStore.allSchulen[0]?.id || null;
         if (selectedSchule.value) {
-          await organisationStore.getKlassenByOrganisationId(selectedSchule.value);
+          await organisationStore.getKlassenByOrganisationId({ administriertVon: [selectedSchule.value] });
           hasAutoselectedSchule.value = true;
         }
       } else {
@@ -522,13 +614,7 @@
                         <span
                           v-else
                           class="filter-header"
-                          >{{
-                            $t(
-                              'admin.klasse.klassenFound',
-                              { count: organisationStore.totalKlassen },
-                              organisationStore.totalKlassen,
-                            )
-                          }}</span
+                          >{{ $t('admin.klasse.klassenFound', { count: totalKlassen }, totalKlassen) }}</span
                         >
                       </v-list-item>
                     </template>

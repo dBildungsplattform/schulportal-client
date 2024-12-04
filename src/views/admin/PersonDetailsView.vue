@@ -697,9 +697,10 @@
         limit: 25,
       });
 
-      await organisationStore.getKlassenByOrganisationId(selectedZuordnungen.value[0]?.sskId, {
+      await organisationStore.getKlassenByOrganisationId({
         searchString: selectedZuordnungen.value[0].klasse,
         limit: 25,
+        administriertVon: [selectedZuordnungen.value[0]?.sskId],
       });
 
       // Combine arrays and remove duplicates based on id
