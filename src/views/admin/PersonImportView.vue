@@ -168,41 +168,73 @@
     router.push({ name: 'person-management' });
   }
 
+  function convertToUTF8(buffer: ArrayBuffer): string {
+    // First, try to decode as UTF-8
+    const utf8Decoder = new TextDecoder('utf-8', { fatal: false });
+    const utf8Text = utf8Decoder.decode(buffer);
+
+    // Check if the file is already valid UTF-8
+    if (utf8Text && !utf8Text.includes('�')) {
+      return utf8Text;
+    }
+
+    // If not valid UTF-8, convert from Windows-1252
+    const windows1252Decoder = new TextDecoder('windows-1252');
+    const originalText = windows1252Decoder.decode(buffer);
+
+    // Create a UTF-8 encoder
+    const encoder = new TextEncoder();
+
+    // Convert the decoded text to a UTF-8 encoded array buffer
+    const utf8Buffer = encoder.encode(originalText);
+
+    // Convert back to a string (now guaranteed to be UTF-8)
+    return new TextDecoder('utf-8').decode(utf8Buffer);
+  }
+
+  function readFileAsUTF8(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+
+      reader.onload = (event) => {
+        try {
+          // Convert from Windows-1252 to UTF-8
+          const utf8Text = convertToUTF8(event.target?.result as ArrayBuffer);
+          resolve(utf8Text);
+        } catch (error) {
+          reject(error);
+        }
+      };
+
+      reader.onerror = (error) => reject(error);
+
+      // Read the file as ArrayBuffer
+      reader.readAsArrayBuffer(file);
+    });
+  }
   async function uploadFile(): Promise<void> {
     if (selectedSchule.value === undefined || selectedRolle.value === undefined || !selectedFiles.value?.length) {
       return;
     }
 
-    // detect encoding of the file
-    const fileReader = new FileReader();
-    let newFile: File | undefined = undefined;
-    const originalFileName: string = selectedFiles.value?.[0]?.name || 'import.csv';
+    const originalFile = selectedFiles.value[0] as File;
 
-    fileReader.onload = () => {
-      const readEncoding: string = jschardet.detect(fileReader.result as Buffer).encoding;
-      const blob = new Blob(["\uFEFF" + fileReader.result as string], { type: 'text/csv;charset=utf-8' });
-      newFile = new File([blob], originalFileName, { type: 'text/csv;charset=utf-8' });
-      console.log(readEncoding);
-      console.log(fileReader.result);
-      console.log(newFile);
+    try {
+      // Read the file content and convert to UTF-8
+      const fileText = await readFileAsUTF8(originalFile);
 
-      if (!newFile) {
-        return;
-      }
-      
-      console.log(selectedFiles.value![0]);
-      selectedFiles.value![0] = newFile;
-      console.log(selectedFiles.value![0]);
+      // Create a new File object with UTF-8 encoded content
+      const utf8Blob = new Blob(['\uFEFF' + fileText], { type: 'text/csv;charset=utf-8' });
+      const utf8File = new File([utf8Blob], originalFile.name, { type: 'text/csv;charset=utf-8' });
 
-      // upload the file
-      importStore.uploadPersonenImportFile(
-        selectedSchule.value as string,
-        selectedRolle.value as string,
-        selectedFiles.value![0] as File,
-      );
+      // Update selected files with the UTF-8 version
+      selectedFiles.value![0] = utf8File;
+
+      // Perform the upload with the UTF-8 encoded file
+      importStore.uploadPersonenImportFile(selectedSchule.value as string, selectedRolle.value as string, utf8File);
+    } catch (error) {
+      console.error('File encoding conversion error:', error);
     }
-
-    fileReader.readAsText(selectedFiles.value[0] as File, 'UTF-8');
   }
 
   function anotherImport(): void {
