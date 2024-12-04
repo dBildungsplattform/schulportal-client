@@ -262,7 +262,7 @@
         includeTyp: OrganisationsTyp.Klasse,
         systemrechte: ['KLASSEN_VERWALTEN'],
       });
-    } 
+    }
   }
 
   // Checks if the filter is active or not
