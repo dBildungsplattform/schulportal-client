@@ -146,6 +146,12 @@
   }
 
   function applySearchAndFilters(): void {
+    // THe dropdown should be updated as well here alongside the count
+    klassenOptions.value = organisationStore.klassen.map((org: Organisation) => ({
+      value: org.id,
+      title: org.name,
+    }));
+    totalKlassen = klassenOptions.value.length;
     personStore.getAllPersons({
       offset: (searchFilterStore.personenPage - 1) * searchFilterStore.personenPerPage,
       limit: searchFilterStore.personenPerPage,
@@ -371,6 +377,8 @@
       selectedRollen.value = searchFilterStore.selectedRollen || [];
       selectedKlassen.value = searchFilterStore.selectedKlassen || [];
       selectedRollenObjects.value = searchFilterStore.selectedRollenObjects;
+      // We should apply the search filter if the store for it holds a value, otherwise the values will show as UUIDs...
+      await applySearchAndFilters();
     }
 
     await organisationStore.getAllOrganisationen({
