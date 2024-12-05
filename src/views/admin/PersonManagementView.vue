@@ -133,6 +133,14 @@
           administriertVon: selectedOrganisation.value,
           searchString: searchInputKlassen.value,
         });
+        // Dropdown wasn't updated. Ideally it should be automatically updated once the selectedOrganisation holds a value.
+        klassenOptions.value = organisationStore.klassen
+          .map((org: Organisation) => ({
+            value: org.id,
+            title: org.name,
+          }))
+          .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
+        totalKlassen = klassenOptions.value.length;
       }
     }
   }

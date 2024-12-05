@@ -411,6 +411,7 @@
         if (selectedSchule.value) {
           await organisationStore.getKlassenByOrganisationId({ administriertVon: [selectedSchule.value] });
           hasAutoselectedSchule.value = true;
+          totalKlassen = klassenOptions.value?.length;
         }
       } else {
         headers.value.unshift({
