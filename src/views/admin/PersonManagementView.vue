@@ -145,7 +145,11 @@
     }
   }
 
-  function applySearchAndFilters(): void {
+  async function applySearchAndFilters(): Promise<void> {
+    await organisationStore.getFilteredKlassen({
+      administriertVon: selectedOrganisation.value,
+      searchString: searchInputKlassen.value,
+    });
     // THe dropdown should be updated as well here alongside the count
     klassenOptions.value = organisationStore.klassen.map((org: Organisation) => ({
       value: org.id,
