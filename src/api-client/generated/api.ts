@@ -868,6 +868,25 @@ export type EmailAddressStatus = typeof EmailAddressStatus[keyof typeof EmailAdd
 /**
  * 
  * @export
+ * @interface FeatureFlagResponse
+ */
+export interface FeatureFlagResponse {
+    /**
+     * 
+     * @type {boolean}
+     * @memberof FeatureFlagResponse
+     */
+    'rolleBearbeitenEnabled': boolean;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof FeatureFlagResponse
+     */
+    'befristungBearbeitenEnabled': boolean;
+}
+/**
+ * 
+ * @export
  * @interface FindRollenResponse
  */
 export interface FindRollenResponse {
@@ -3992,6 +4011,116 @@ export class Class2FAApi extends BaseAPI implements Class2FAApiInterface {
      */
     public privacyIdeaAdministrationControllerVerifyToken(tokenVerifyBodyParams: TokenVerifyBodyParams, options?: AxiosRequestConfig) {
         return Class2FAApiFp(this.configuration).privacyIdeaAdministrationControllerVerifyToken(tokenVerifyBodyParams, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+/**
+ * ConfigApi - axios parameter creator
+ * @export
+ */
+export const ConfigApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        configControllerGetFeatureFlags: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/config`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * ConfigApi - functional programming interface
+ * @export
+ */
+export const ConfigApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = ConfigApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async configControllerGetFeatureFlags(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<FeatureFlagResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.configControllerGetFeatureFlags(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+    }
+};
+
+/**
+ * ConfigApi - factory interface
+ * @export
+ */
+export const ConfigApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = ConfigApiFp(configuration)
+    return {
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        configControllerGetFeatureFlags(options?: any): AxiosPromise<FeatureFlagResponse> {
+            return localVarFp.configControllerGetFeatureFlags(options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * ConfigApi - interface
+ * @export
+ * @interface ConfigApi
+ */
+export interface ConfigApiInterface {
+    /**
+     * 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ConfigApiInterface
+     */
+    configControllerGetFeatureFlags(options?: AxiosRequestConfig): AxiosPromise<FeatureFlagResponse>;
+
+}
+
+/**
+ * ConfigApi - object-oriented interface
+ * @export
+ * @class ConfigApi
+ * @extends {BaseAPI}
+ */
+export class ConfigApi extends BaseAPI implements ConfigApiInterface {
+    /**
+     * 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ConfigApi
+     */
+    public configControllerGetFeatureFlags(options?: AxiosRequestConfig) {
+        return ConfigApiFp(this.configuration).configControllerGetFeatureFlags(options).then((request) => request(this.axios, this.basePath));
     }
 }
 
@@ -10081,6 +10210,116 @@ export class RolleApi extends BaseAPI implements RolleApiInterface {
      */
     public rolleControllerUpdateServiceProvidersById(rolleId: string, rolleServiceProviderBodyParams: RolleServiceProviderBodyParams, options?: AxiosRequestConfig) {
         return RolleApiFp(this.configuration).rolleControllerUpdateServiceProvidersById(rolleId, rolleServiceProviderBodyParams, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+/**
+ * StatusApi - axios parameter creator
+ * @export
+ */
+export const StatusApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        statusControllerGetStatus: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/status`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * StatusApi - functional programming interface
+ * @export
+ */
+export const StatusApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = StatusApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async statusControllerGetStatus(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.statusControllerGetStatus(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+    }
+};
+
+/**
+ * StatusApi - factory interface
+ * @export
+ */
+export const StatusApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = StatusApiFp(configuration)
+    return {
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        statusControllerGetStatus(options?: any): AxiosPromise<void> {
+            return localVarFp.statusControllerGetStatus(options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * StatusApi - interface
+ * @export
+ * @interface StatusApi
+ */
+export interface StatusApiInterface {
+    /**
+     * 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof StatusApiInterface
+     */
+    statusControllerGetStatus(options?: AxiosRequestConfig): AxiosPromise<void>;
+
+}
+
+/**
+ * StatusApi - object-oriented interface
+ * @export
+ * @class StatusApi
+ * @extends {BaseAPI}
+ */
+export class StatusApi extends BaseAPI implements StatusApiInterface {
+    /**
+     * 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof StatusApi
+     */
+    public statusControllerGetStatus(options?: AxiosRequestConfig) {
+        return StatusApiFp(this.configuration).statusControllerGetStatus(options).then((request) => request(this.axios, this.basePath));
     }
 }
 
