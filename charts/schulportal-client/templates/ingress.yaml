@@ -11,9 +11,12 @@ metadata:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
+  tls:
+    - hosts:
+        - {{ .Values.frontendHostname }}
   ingressClassName: {{ .Values.ingress.ingressClassName }}
   rules:
-    - host: {{.Values.frontendHostname}}
+    - host: {{ .Values.frontendHostname }}
       http:
         paths:
           - path: {{ .Values.ingress.path }}
