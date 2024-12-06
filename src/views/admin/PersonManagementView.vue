@@ -46,6 +46,9 @@
   const searchInputRollen: Ref<string> = ref('');
   const searchInputOrganisationen: Ref<string> = ref('');
 
+  const klassenOptions: Ref<TranslatedObject[] | undefined> = ref([]);
+  // Variable to track the number of Klassen found depending on the search. The variable totalKlasse in the store controls the table paging and can't be used here correctly.
+  let totalKlassen: number = 0;
   const selectedKlassen: Ref<Array<string>> = ref([]);
   const selectedRollen: Ref<Array<string>> = ref([]);
   const selectedOrganisation: Ref<Array<string>> = ref([]);
@@ -89,18 +92,6 @@
       .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
   });
 
-  const klassen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
-    if (selectedOrganisation.value.length) {
-      return organisationStore.klassen
-        .map((org: Organisation) => ({
-          value: org.id,
-          title: org.name,
-        }))
-        .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
-    }
-    return [];
-  });
-
   const statuses: Array<string> = ['Aktiv', 'Inaktiv'];
 
   async function getPaginatedPersonen(page: number): Promise<void> {
@@ -142,11 +133,29 @@
           administriertVon: selectedOrganisation.value,
           searchString: searchInputKlassen.value,
         });
+        // Dropdown wasn't updated. Ideally it should be automatically updated once the selectedOrganisation holds a value.
+        klassenOptions.value = organisationStore.klassen
+          .map((org: Organisation) => ({
+            value: org.id,
+            title: org.name,
+          }))
+          .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
+        totalKlassen = klassenOptions.value.length;
       }
     }
   }
 
-  function applySearchAndFilters(): void {
+  async function applySearchAndFilters(): Promise<void> {
+    await organisationStore.getFilteredKlassen({
+      administriertVon: selectedOrganisation.value,
+      searchString: searchInputKlassen.value,
+    });
+    // THe dropdown should be updated as well here alongside the count
+    klassenOptions.value = organisationStore.klassen.map((org: Organisation) => ({
+      value: org.id,
+      title: org.name,
+    }));
+    totalKlassen = klassenOptions.value.length;
     personStore.getAllPersons({
       offset: (searchFilterStore.personenPage - 1) * searchFilterStore.personenPerPage,
       limit: searchFilterStore.personenPerPage,
@@ -188,6 +197,14 @@
         administriertVon: selectedOrganisation.value,
         searchString: searchInputKlassen.value,
       });
+      // set values for klassen dropdown
+      klassenOptions.value = organisationStore.klassen
+        .map((org: Organisation) => ({
+          value: org.id,
+          title: org.name,
+        }))
+        .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
+      totalKlassen = klassenOptions.value.length;
     }
     applySearchAndFilters();
   }
@@ -238,8 +255,47 @@
     clearTimeout(timerId);
 
     /* delay new call 500ms */
-    timerId = setTimeout(() => {
-      organisationStore.getFilteredKlassen({ searchString: searchValue, administriertVon: selectedOrganisation.value });
+    timerId = setTimeout(async () => {
+      // fetch new klassen based on search value and include selected klassen
+      await organisationStore.getFilteredKlassen({
+        searchString: searchValue,
+        administriertVon: selectedOrganisation.value,
+        organisationIds: selectedKlassen.value,
+      });
+
+      // set values for klassen dropdown
+      if (selectedOrganisation.value.length) {
+        klassenOptions.value = organisationStore.klassen
+          .map((org: Organisation) => ({
+            value: org.id,
+            title: org.name,
+          }))
+          .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
+
+        // Extract the selected Klassen IDs into a Set for efficient lookup
+        const selectedKlassenIds: Set<string> = new Set(selectedKlassen.value.map((klasseId: string) => klasseId));
+
+        // Normalize the search value to lowercase
+        const normalizedSearchValue: string = searchValue.toLowerCase();
+
+        // Filter the options to get only those matching the search results (case-insensitive)
+        const searchMatchedOptions: TranslatedObject[] = klassenOptions.value.filter((klasseOption: TranslatedObject) =>
+          klasseOption.title.toLowerCase().includes(normalizedSearchValue),
+        );
+
+        // Count the selected Klassen that match the search results
+        const matchedSelectedKlassen: TranslatedObject[] = searchMatchedOptions.filter(
+          (klasseOption: TranslatedObject) => selectedKlassenIds.has(klasseOption.value),
+        );
+
+        // Count only the search-matched Klassen that are not in the selected list
+        const filteredOptions: TranslatedObject[] = searchMatchedOptions.filter(
+          (klasseOption: TranslatedObject) => !selectedKlassenIds.has(klasseOption.value),
+        );
+
+        // Calculate the total Klassen by summing up unique matches
+        totalKlassen = filteredOptions.length + matchedSelectedKlassen.length;
+      }
     }, 500);
   }
 
@@ -325,6 +381,8 @@
       selectedRollen.value = searchFilterStore.selectedRollen || [];
       selectedKlassen.value = searchFilterStore.selectedKlassen || [];
       selectedRollenObjects.value = searchFilterStore.selectedRollenObjects;
+      // We should apply the search filter if the store for it holds a value, otherwise the values will show as UUIDs...
+      await applySearchAndFilters();
     }
 
     await organisationStore.getAllOrganisationen({
@@ -510,7 +568,7 @@
                   :disabled="!selectedOrganisation.length"
                   hide-details
                   id="klasse-select"
-                  :items="klassen"
+                  :items="klassenOptions"
                   item-value="value"
                   item-text="title"
                   multiple
@@ -533,13 +591,7 @@
                       <span
                         v-else
                         class="filter-header"
-                        >{{
-                          $t(
-                            'admin.klasse.klassenFound',
-                            { count: organisationStore.totalPaginatedKlassen },
-                            organisationStore.totalPaginatedKlassen,
-                          )
-                        }}</span
+                        >{{ $t('admin.klasse.klassenFound', { count: totalKlassen }, totalKlassen) }}</span
                       >
                     </v-list-item>
                   </template>

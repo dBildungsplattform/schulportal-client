@@ -94,6 +94,8 @@ describe('RolleCreationView', () => {
     wrapper?.find('[data-testid="alert-button"]').trigger('click');
     await nextTick();
     expect(push).toHaveBeenCalledTimes(1);
+    // reset errorCode after test
+    rolleStore.errorCode = '';
   });
 
   test('it closes the view and navigates back to rolle table', async () => {
