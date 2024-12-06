@@ -844,6 +844,29 @@
     return selectedNewKlasseTitle.value === selectedZuordnungen.value[0]?.klasse;
   });
 
+  // Computed property to get the password reset dialog text
+  const passwordResetDialogText: ComputedRef<string> = computed(() => {
+    let message: string = t('admin.person.resetPasswordInformation');
+    if (!password.value) {
+      message += `\n\n${t('admin.person.resetPasswordConfirmation', {
+        firstname: personStore.currentPerson?.person.name.vorname,
+        lastname: personStore.currentPerson?.person.name.familienname,
+      })}`;
+    } else {
+      message = `${t('admin.person.resetPasswordSuccessMessage')}\n\n` + message;
+    }
+    return message;
+  });
+
+  // Computed property to get the device password dialog text
+  const devicePasswordDialogText: ComputedRef<string> = computed(() => {
+    let message: string = t('admin.person.devicePassword.dialogText');
+    if (password.value) {
+      message = `${t('admin.person.resetPasswordSuccessMessage')}\n\n` + message;
+    }
+    return message;
+  });
+
   const onSubmitChangeKlasse: (e?: Event | undefined) => Promise<void | undefined> = handleSubmitChangeKlasse(() => {
     changeKlasseConfirmationDialogMessage.value = t('person.changeKlasseConfirmation', {
       oldKlasse: selectedZuordnungen.value[0]?.klasse,
@@ -1607,13 +1630,16 @@
             >
               <div class="d-flex justify-sm-end">
                 <PasswordReset
-                  :errorCode="personStore.errorCode"
+                  :buttonText="$t('admin.person.changePassword')"
+                  :dialogHeader="$t('admin.person.resetPassword')"
+                  :dialogText="passwordResetDialogText"
                   :disabled="isEditActive || isEditPersonMetadataActive"
+                  :errorCode="personStore.errorCode"
+                  :isLoading="personStore.loading"
                   :person="personStore.currentPerson"
                   @onClearPassword="password = ''"
                   @onResetPassword="resetPassword(currentPersonId)"
                   :password="password"
-                  :isLoading="personStore.loading"
                 >
                 </PasswordReset>
               </div>
@@ -2340,7 +2366,7 @@
           color="#E5EAEF"
           thickness="6"
         ></v-divider>
-        <v-container class="person-lock">
+        <v-container data-testid="person-lock">
           <v-row class="ml-md-16">
             <v-col data-testid="person-lock-info">
               <h3 class="subtitle-1">{{ $t('admin.person.status') }}</h3>
@@ -2474,6 +2500,62 @@
               </div>
             </v-col>
             <v-col v-else-if="personStore.loading"> <v-progress-circular indeterminate></v-progress-circular></v-col>
+          </v-row> </v-container
+        ><v-divider
+          class="border-opacity-100 rounded my-6 mx-4"
+          color="#E5EAEF"
+          thickness="6"
+        ></v-divider>
+        <v-container data-testid="device-password">
+          <v-row class="ml-md-16">
+            <v-col data-testid="device-password-info">
+              <h3 class="subtitle-1">{{ $t('admin.person.devicePassword.header') }}</h3>
+              <template v-if="!personStore.loading">
+                <v-row class="mt-4 text-body">
+                  <v-col
+                    class="text-right"
+                    cols="1"
+                  >
+                    <v-icon
+                      class="mb-2"
+                      icon="mdi-information"
+                    >
+                    </v-icon>
+                  </v-col>
+                  <div class="v-col">
+                    <p>
+                      {{ $t('admin.person.devicePassword.infoText') }}
+                    </p>
+                  </div>
+                </v-row>
+              </template>
+              <template v-else-if="personStore.loading">
+                <v-col> <v-progress-circular indeterminate></v-progress-circular></v-col>
+              </template>
+            </v-col>
+            <v-col
+              data-testid="device-password-actions"
+              class="mr-lg-13"
+              cols="12"
+              md="auto"
+              v-if="personStore.currentPerson"
+            >
+              <div class="d-flex justify-sm-end">
+                <PasswordReset
+                  :buttonText="$t('admin.person.devicePassword.createPassword')"
+                  :dialogHeader="$t('admin.person.devicePassword.createDevicePassword')"
+                  :dialogText="devicePasswordDialogText"
+                  :disabled="isEditActive || isEditPersonMetadataActive"
+                  :errorCode="personStore.errorCode"
+                  :isLoading="personStore.loading"
+                  :person="personStore.currentPerson"
+                  @onClearPassword="password = ''"
+                  @onResetPassword="resetPassword(currentPersonId)"
+                  :password="password"
+                >
+                </PasswordReset>
+              </div>
+            </v-col>
           </v-row>
         </v-container>
       </template>
