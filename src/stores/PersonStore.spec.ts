@@ -578,6 +578,42 @@ describe('PersonStore', () => {
     });
   });
 
+  describe('resetDevicePassword', () => {
+    it('should reset and return device password', async () => {
+      const userId: string = '2345';
+      const mockResponse: string = 'fakePassword';
+
+      mockadapter.onPatch(`/api/personen/${userId}/uem-password`).replyOnce(200, mockResponse);
+      const resetDevicePasswordPromise: Promise<void> = personStore.resetDevicePassword(userId);
+      expect(personStore.loading).toBe(true);
+      await resetDevicePasswordPromise;
+      expect(personStore.newPassword).toEqual(mockResponse);
+      expect(personStore.loading).toBe(false);
+    });
+
+    it('should handle string error', async () => {
+      const userId: string = '2345';
+
+      mockadapter.onPatch(`/api/personen/${userId}/uem-password`).replyOnce(500, 'some error');
+      const resetDevicePasswordPromise: Promise<void> = personStore.resetDevicePassword(userId);
+      expect(personStore.loading).toBe(true);
+      await resetDevicePasswordPromise;
+      expect(personStore.errorCode).toEqual('UNSPECIFIED_ERROR');
+      expect(personStore.loading).toBe(false);
+    });
+
+    it('should handle error code', async () => {
+      const userId: string = '2345';
+
+      mockadapter.onPatch(`/api/personen/${userId}/uem-password`).replyOnce(500, { code: 'some mock server error' });
+      const resetDevicePasswordPromise: Promise<void> = personStore.resetDevicePassword(userId);
+      expect(personStore.loading).toBe(true);
+      await resetDevicePasswordPromise;
+      expect(personStore.errorCode).toEqual('some mock server error');
+      expect(personStore.loading).toBe(false);
+    });
+  });
+
   describe('deletePersonById', () => {
     it('should delete a person and update state', async () => {
       const personId: string = '1234';

@@ -147,6 +147,11 @@
     password.value = personStore.newPassword || '';
   }
 
+  async function resetDevicePassword(personId: string): Promise<void> {
+    await personStore.resetDevicePassword(personId);
+    password.value = personStore.newDevicePassword || '';
+  }
+
   async function onLockUser(lockedBy: string, date: string | undefined): Promise<void> {
     if (!personStore.currentPerson) return;
 
@@ -2506,6 +2511,7 @@
           color="#E5EAEF"
           thickness="6"
         ></v-divider>
+        <!-- reset device password -->
         <v-container data-testid="device-password">
           <v-row class="ml-md-16">
             <v-col data-testid="device-password-info">
@@ -2550,7 +2556,7 @@
                   :isLoading="personStore.loading"
                   :person="personStore.currentPerson"
                   @onClearPassword="password = ''"
-                  @onResetPassword="resetPassword(currentPersonId)"
+                  @onResetPassword="resetDevicePassword(currentPersonId)"
                   :password="password"
                 >
                 </PasswordReset>
