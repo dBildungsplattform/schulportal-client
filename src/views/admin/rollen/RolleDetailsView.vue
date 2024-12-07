@@ -142,6 +142,7 @@
     isEditActive.value = false;
     showUnsavedChangesDialog.value = false;
     blockedNext();
+    rolleStore.errorCode = '';
   }
 
   const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = formContext.handleSubmit(async () => {
@@ -331,28 +332,7 @@
       :padded="true"
       :showCloseText="true"
     >
-      <!-- Error Message Display -->
-      <SpshAlert
-        :model-value="!!rolleStore.errorCode"
-        :title="
-          organisationStore.errorCode === 'UNSPECIFIED_ERROR'
-            ? $t('admin.rolle.loadingErrorTitle')
-            : $t(`admin.rolle.title.${rolleStore.errorCode}`)
-        "
-        :type="'error'"
-        :closable="false"
-        :text="
-          rolleStore.errorCode === 'UNSPECIFIED_ERROR'
-            ? $t('admin.rolle.loadingErrorText')
-            : $t(`admin.rolle.errors.${rolleStore.errorCode}`)
-        "
-        :showButton="true"
-        :buttonText="alertButtonText"
-        :buttonAction="alertButtonAction"
-        @update:modelValue="handleAlertClose"
-      />
-
-      <template v-if="!rolleStore.updatedRolle && !rolleStore.errorCode">
+      <template v-if="!rolleStore.updatedRolle">
         <v-container>
           <div v-if="rolleStore.currentRolle">
             <RolleForm
@@ -380,7 +360,28 @@
               :translatedMerkmale="allMerkmale"
               :translatedSystemrechte="allSystemrechte"
               :showUnsavedChangesDialog="showUnsavedChangesDialog"
-            ></RolleForm>
+            >
+              <!-- Error Message Display -->
+              <SpshAlert
+                :model-value="!!rolleStore.errorCode"
+                :title="
+                  organisationStore.errorCode === 'UNSPECIFIED_ERROR'
+                    ? $t('admin.rolle.loadingErrorTitle')
+                    : $t(`admin.rolle.title.${rolleStore.errorCode}`)
+                "
+                :type="'error'"
+                :closable="false"
+                :text="
+                  rolleStore.errorCode === 'UNSPECIFIED_ERROR'
+                    ? $t('admin.rolle.loadingErrorText')
+                    : $t(`admin.rolle.errors.${rolleStore.errorCode}`)
+                "
+                :showButton="true"
+                :buttonText="alertButtonText"
+                :buttonAction="alertButtonAction"
+                @update:modelValue="handleAlertClose"
+              />
+            </RolleForm>
             <v-divider
               v-if="isEditActive"
               class="border-opacity-100 rounded"

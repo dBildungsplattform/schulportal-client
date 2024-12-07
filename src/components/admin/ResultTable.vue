@@ -4,7 +4,7 @@
    */
   import { SortOrder } from '@/stores/PersonStore';
   import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
-  import { onMounted } from 'vue';
+  import { onMounted, onUnmounted } from 'vue';
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
 
   const searchFilterStore: SearchFilterStore = useSearchFilterStore();
@@ -45,6 +45,39 @@
   };
 
   const emit: Emits = defineEmits<Emits>();
+
+  function handleKeyDown(event: KeyboardEvent): void {
+    // Check if the pressed key is Enter
+    if (event.key === 'Enter') {
+      const target: HTMLElement = event.target as HTMLElement;
+
+      // Check if the target or its closest parent is a header checkbox, if so then we shouldn't trigger anything when "Enter" is pressed as it's not a table row.
+      const isHeaderCheckbox: boolean =
+        target.closest('thead')?.querySelector('input[type="checkbox"]') === target ||
+        target.querySelector('input[type="checkbox"]') !== null;
+
+      // If it's a header checkbox, do nothing
+      if (isHeaderCheckbox) {
+        return;
+      }
+
+      const row: HTMLTableRowElement | null = target.closest('tr');
+
+      if (row) {
+        // Find the corresponding item for this row.
+        const rowIndex: number = Array.from(row.parentElement!.children).indexOf(row);
+        const item: TableItem | undefined = props.items[rowIndex];
+
+        if (item) {
+          // Prevent default Enter key behavior
+          event.preventDefault();
+
+          // Emit the same event as handleRowClick
+          emit('onHandleRowClick', event as unknown as PointerEvent, { item });
+        }
+      }
+    }
+  }
 
   function handleRowClick(event: PointerEvent, item: TableRow<unknown>): void {
     if (!props.disableRowClick) {
@@ -94,6 +127,11 @@
         });
       }
     }
+    window.addEventListener('keydown', handleKeyDown);
+  });
+
+  onUnmounted(() => {
+    window.removeEventListener('keydown', handleKeyDown);
   });
 </script>
 

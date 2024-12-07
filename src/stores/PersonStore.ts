@@ -189,14 +189,15 @@ export type Personendatensatz = {
 export type { PersonendatensatzResponse };
 
 type PersonState = {
+  currentPerson: Personendatensatz | null;
   errorCode: string;
   loading: boolean;
-  totalPersons: number;
-  currentPerson: Personendatensatz | null;
-  personenWithUebersicht: PersonenWithRolleAndZuordnung | null;
-  personenuebersicht: DBiamPersonenuebersichtResponse | null;
-  patchedPerson: PersonendatensatzResponse | null;
+  newDevicePassword: string | null;
   newPassword: string | null;
+  patchedPerson: PersonendatensatzResponse | null;
+  personenuebersicht: DBiamPersonenuebersichtResponse | null;
+  personenWithUebersicht: PersonenWithRolleAndZuordnung | null;
+  totalPersons: number;
 };
 
 export type PersonFilter = {
@@ -215,6 +216,7 @@ type PersonActions = {
   getAllPersons: (filter: PersonFilter) => Promise<void>;
   getPersonById: (personId: string) => Promise<Personendatensatz>;
   resetPassword: (personId: string) => Promise<void>;
+  resetDevicePassword: (personId: string) => Promise<void>;
   deletePersonById: (personId: string) => Promise<void>;
   lockPerson: (personId: string, bodyParams: LockUserBodyParams) => Promise<void>;
   syncPersonById: (personId: string) => Promise<void>;
@@ -233,14 +235,15 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
   id: 'personStore',
   state: (): PersonState => {
     return {
-      personenWithUebersicht: null,
-      personenuebersicht: null,
+      currentPerson: null,
       errorCode: '',
       loading: false,
-      totalPersons: 0,
-      currentPerson: null,
-      patchedPerson: null,
+      newDevicePassword: null,
       newPassword: null,
+      patchedPerson: null,
+      personenuebersicht: null,
+      personenWithUebersicht: null,
+      totalPersons: 0,
     };
   },
   actions: {
@@ -381,6 +384,22 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
         this.loading = false;
       }
     },
+
+    async resetDevicePassword(personId: string): Promise<void> {
+      this.loading = true;
+      try {
+        const { data }: { data: string } = await personenApi.personControllerResetUEMPasswordByPersonId(personId);
+        this.newDevicePassword = data;
+      } catch (error: unknown) {
+        this.errorCode = 'UNSPECIFIED_ERROR';
+        if (isAxiosError(error)) {
+          this.errorCode = error.response?.data.i18nKey || 'UNSPECIFIED_ERROR';
+        }
+      } finally {
+        this.loading = false;
+      }
+    },
+
     async deletePersonById(personId: string) {
       this.loading = true;
       try {
@@ -395,6 +414,7 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
         this.loading = false;
       }
     },
+
     async lockPerson(personId: string, bodyParams: LockUserBodyParams): Promise<void> {
       this.loading = true;
       try {
@@ -410,6 +430,7 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
         this.loading = false;
       }
     },
+
     async syncPersonById(personId: string) {
       this.loading = true;
       try {

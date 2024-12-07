@@ -147,6 +147,11 @@
     password.value = personStore.newPassword || '';
   }
 
+  async function resetDevicePassword(personId: string): Promise<void> {
+    await personStore.resetDevicePassword(personId);
+    password.value = personStore.newDevicePassword || '';
+  }
+
   async function onLockUser(lockedBy: string, date: string | undefined): Promise<void> {
     if (!personStore.currentPerson) return;
 
@@ -325,10 +330,12 @@
 
     klassenZuordnungen?.forEach((klasseZuordnung: Zuordnung) => {
       const schuleId: string = klasseZuordnung.administriertVon;
-      if (!schuleToKlasseMap.has(schuleId)) {
-        schuleToKlasseMap.set(schuleId, []);
+      const klasse: string = klasseZuordnung.sskName;
+      const rolle: string = klasseZuordnung.rolle;
+      if (!schuleToKlasseMap.has(schuleId + klasse + rolle)) {
+        schuleToKlasseMap.set(schuleId + klasse + rolle, []);
       }
-      schuleToKlasseMap.get(schuleId)?.push(klasseZuordnung);
+      schuleToKlasseMap.get(schuleId + klasse + rolle)?.push(klasseZuordnung);
     });
 
     // Find Klassen that should be kept
@@ -336,7 +343,8 @@
 
     // For each remaining Zuordnung that is a Schule, keep its associated Klassen
     remainingZuordnungen?.forEach((zuordnung: Zuordnung) => {
-      const associatedKlassen: Zuordnung[] = schuleToKlasseMap.get(zuordnung.sskId) || [];
+      const associatedKlassen: Zuordnung[] =
+        schuleToKlasseMap.get(zuordnung.sskId + zuordnung.klasse + zuordnung.rolle) || [];
       klassenToKeep.push(...associatedKlassen);
     });
 
@@ -345,7 +353,7 @@
 
     // Update the personenkontexte with the filtered list
     await personenkontextStore.updatePersonenkontexte(combinedZuordnungen, currentPersonId);
-    zuordnungenResult.value = combinedZuordnungen;
+    zuordnungenResult.value = remainingZuordnungen;
     selectedZuordnungen.value = [];
 
     // Filter out Zuordnungen with editable === false
@@ -691,10 +699,12 @@
         administriertVon: [selectedZuordnungen.value[0]?.sskId],
         includeTyp: OrganisationsTyp.Klasse,
         systemrechte: ['KLASSEN_VERWALTEN'],
+        limit: 25,
       });
 
       await organisationStore.getKlassenByOrganisationId(selectedZuordnungen.value[0]?.sskId, {
         searchString: selectedZuordnungen.value[0].klasse,
+        limit: 25,
       });
 
       // Combine arrays and remove duplicates based on id
@@ -837,6 +847,29 @@
   // Computed property to get the title of the selected new klasse
   const isSubmitDisabled: ComputedRef<boolean> = computed(() => {
     return selectedNewKlasseTitle.value === selectedZuordnungen.value[0]?.klasse;
+  });
+
+  // Computed property to get the password reset dialog text
+  const passwordResetDialogText: ComputedRef<string> = computed(() => {
+    let message: string = t('admin.person.resetPasswordInformation');
+    if (!password.value) {
+      message += `\n\n${t('admin.person.resetPasswordConfirmation', {
+        firstname: personStore.currentPerson?.person.name.vorname,
+        lastname: personStore.currentPerson?.person.name.familienname,
+      })}`;
+    } else {
+      message = `${t('admin.person.resetPasswordSuccessMessage')}\n\n` + message;
+    }
+    return message;
+  });
+
+  // Computed property to get the device password dialog text
+  const devicePasswordDialogText: ComputedRef<string> = computed(() => {
+    let message: string = t('admin.person.devicePassword.dialogText');
+    if (password.value) {
+      message = `${t('admin.person.resetPasswordSuccessMessage')}\n\n` + message;
+    }
+    return message;
   });
 
   const onSubmitChangeKlasse: (e?: Event | undefined) => Promise<void | undefined> = handleSubmitChangeKlasse(() => {
@@ -1000,10 +1033,12 @@
 
       klassenZuordnungen?.forEach((klasseZuordnung: Zuordnung) => {
         const schuleId: string = klasseZuordnung.administriertVon;
-        if (!schuleToKlasseMap.has(schuleId)) {
-          schuleToKlasseMap.set(schuleId, []);
+        const klasse: string = klasseZuordnung.sskName;
+        const rolle: string = klasseZuordnung.rolleId;
+        if (!schuleToKlasseMap.has(schuleId + klasse + rolle)) {
+          schuleToKlasseMap.set(schuleId + klasse + rolle, []);
         }
-        schuleToKlasseMap.get(schuleId)?.push(klasseZuordnung);
+        schuleToKlasseMap.get(schuleId + klasse + rolle)?.push(klasseZuordnung);
       });
 
       // Find Klassen that should be kept
@@ -1011,7 +1046,8 @@
 
       // For each remaining Zuordnung that is a Schule, keep its associated Klassen
       remainingZuordnungen?.forEach((zuordnung: Zuordnung) => {
-        const associatedKlassen: Zuordnung[] = schuleToKlasseMap.get(zuordnung.sskId) || [];
+        const associatedKlassen: Zuordnung[] =
+          schuleToKlasseMap.get(zuordnung.sskId + zuordnung.klasse + zuordnung.rolleId) || [];
         klassenToKeep.push(...associatedKlassen);
       });
 
@@ -1125,7 +1161,9 @@
       }
       changePersonMetadataSuccessMessage.value = t('admin.person.personalInfoSuccessDialogMessageWithUsername');
       changePersonMetadataSuccessVisible.value = !personStore.errorCode;
-      resetFormChangePersonMetadata();
+      if (!personStore.errorCode) {
+        resetFormChangePersonMetadata();
+      }
     });
 
   // Checks for dirtiness depending on the active form
@@ -1309,38 +1347,45 @@
       {{ $t('admin.headline') }}
     </h1>
     <LayoutCard
-      :closable="true"
+      :closable="!personStore.errorCode && !personenkontextStore.errorCode"
       data-testid="person-details-card"
       :header="$t('admin.person.edit')"
       @onCloseClicked="navigateToPersonTable"
       :padded="true"
       :showCloseText="true"
     >
-      <!-- Error Message Display if the personStore throws any kind of error (Not being able to load the person) -->
-      <SpshAlert
-        :model-value="!!personStore.errorCode"
-        :type="'error'"
-        :closable="false"
-        :text="$t(`admin.person.errors.${personStore.errorCode}`)"
-        :showButton="true"
-        :buttonText="alertButtonTextKopers"
-        :buttonAction="alertButtonActionKopers"
-        :title="$t(`admin.person.title.${personStore.errorCode}`)"
-        @update:modelValue="handleAlertClose"
-      />
+      <v-container
+        v-if="!!personStore.errorCode || !!personenkontextStore.errorCode"
+        class="px-3 px-sm-16"
+      >
+        <v-container class="px-lg-16">
+          <!-- Error Message Display if the personStore throws any kind of error (Not being able to load the person) -->
+          <SpshAlert
+            :model-value="!!personStore.errorCode"
+            :type="'error'"
+            :closable="false"
+            :text="$t(`admin.person.errors.${personStore.errorCode}`)"
+            :showButton="true"
+            :buttonText="alertButtonTextKopers"
+            :buttonAction="alertButtonActionKopers"
+            :title="$t(`admin.person.title.${personStore.errorCode}`)"
+            @update:modelValue="handleAlertClose"
+          />
 
-      <!-- Error Message Display if the personenkontextStore throws any kind of error (Not being able to load the kontext) -->
-      <SpshAlert
-        :model-value="!!personenkontextStore.errorCode"
-        :type="'error'"
-        :closable="false"
-        :text="creationErrorText"
-        :showButton="true"
-        :buttonText="alertButtonText"
-        :buttonAction="alertButtonAction"
-        :title="creationErrorTitle"
-        @update:modelValue="handleAlertClose"
-      />
+          <!-- Error Message Display if the personenkontextStore throws any kind of error (Not being able to load the kontext) -->
+          <SpshAlert
+            :model-value="!!personenkontextStore.errorCode"
+            :type="'error'"
+            :closable="false"
+            :text="creationErrorText"
+            :showButton="true"
+            :buttonText="alertButtonText"
+            :buttonAction="alertButtonAction"
+            :title="creationErrorTitle"
+            @update:modelValue="handleAlertClose"
+          />
+        </v-container>
+      </v-container>
 
       <template v-if="!personStore.errorCode && !personenkontextStore.errorCode">
         <v-container class="personal-info">
@@ -1590,13 +1635,16 @@
             >
               <div class="d-flex justify-sm-end">
                 <PasswordReset
-                  :errorCode="personStore.errorCode"
+                  :buttonText="$t('admin.person.changePassword')"
+                  :dialogHeader="$t('admin.person.resetPassword')"
+                  :dialogText="passwordResetDialogText"
                   :disabled="isEditActive || isEditPersonMetadataActive"
+                  :errorCode="personStore.errorCode"
+                  :isLoading="personStore.loading"
                   :person="personStore.currentPerson"
                   @onClearPassword="password = ''"
                   @onResetPassword="resetPassword(currentPersonId)"
                   :password="password"
-                  :isLoading="personStore.loading"
                 >
                 </PasswordReset>
               </div>
@@ -2169,7 +2217,7 @@
               <template v-else>
                 <v-col>
                   <h3 class="subtitle-1">{{ $t('admin.person.twoFactorAuthentication.header') }}</h3>
-                  <v-row class="mt-4 mr-lg-13 text-body">
+                  <v-row class="mt-4 text-body">
                     <v-col
                       class="text-right"
                       cols="1"
@@ -2323,7 +2371,7 @@
           color="#E5EAEF"
           thickness="6"
         ></v-divider>
-        <v-container class="person-lock">
+        <v-container data-testid="person-lock">
           <v-row class="ml-md-16">
             <v-col data-testid="person-lock-info">
               <h3 class="subtitle-1">{{ $t('admin.person.status') }}</h3>
@@ -2457,6 +2505,63 @@
               </div>
             </v-col>
             <v-col v-else-if="personStore.loading"> <v-progress-circular indeterminate></v-progress-circular></v-col>
+          </v-row> </v-container
+        ><v-divider
+          class="border-opacity-100 rounded my-6 mx-4"
+          color="#E5EAEF"
+          thickness="6"
+        ></v-divider>
+        <!-- reset device password -->
+        <v-container data-testid="device-password">
+          <v-row class="ml-md-16">
+            <v-col data-testid="device-password-info">
+              <h3 class="subtitle-1">{{ $t('admin.person.devicePassword.header') }}</h3>
+              <template v-if="!personStore.loading">
+                <v-row class="mt-4 text-body">
+                  <v-col
+                    class="text-right"
+                    cols="1"
+                  >
+                    <v-icon
+                      class="mb-2"
+                      icon="mdi-information"
+                    >
+                    </v-icon>
+                  </v-col>
+                  <div class="v-col">
+                    <p>
+                      {{ $t('admin.person.devicePassword.infoText') }}
+                    </p>
+                  </div>
+                </v-row>
+              </template>
+              <template v-else-if="personStore.loading">
+                <v-col> <v-progress-circular indeterminate></v-progress-circular></v-col>
+              </template>
+            </v-col>
+            <v-col
+              data-testid="device-password-actions"
+              class="mr-lg-13"
+              cols="12"
+              md="auto"
+              v-if="personStore.currentPerson"
+            >
+              <div class="d-flex justify-sm-end">
+                <PasswordReset
+                  :buttonText="$t('admin.person.devicePassword.createPassword')"
+                  :dialogHeader="$t('admin.person.devicePassword.createDevicePassword')"
+                  :dialogText="devicePasswordDialogText"
+                  :disabled="isEditActive || isEditPersonMetadataActive"
+                  :errorCode="personStore.errorCode"
+                  :isLoading="personStore.loading"
+                  :person="personStore.currentPerson"
+                  @onClearPassword="password = ''"
+                  @onResetPassword="resetDevicePassword(currentPersonId)"
+                  :password="password"
+                >
+                </PasswordReset>
+              </div>
+            </v-col>
           </v-row>
         </v-container>
       </template>
@@ -2642,9 +2747,9 @@
       >
         <v-card-text>
           <v-container>
-            <v-row class="text-body bold px-md-16">
+            <v-row class="text-body bold justify-center">
               <v-col
-                offset="1"
+                class="text-center"
                 cols="10"
               >
                 <span>{{ createZuordnungConfirmationDialogMessage }}</span>

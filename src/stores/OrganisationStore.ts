@@ -216,7 +216,7 @@ export const useOrganisationStore: StoreDefinition<
         undefined,
         undefined,
         OrganisationsTyp.Schule,
-        ['SCHULEN_VERWALTEN'],
+        ['KLASSEN_VERWALTEN'],
         undefined,
         undefined,
         Array.from(administriertVonSet),
@@ -250,6 +250,7 @@ export const useOrganisationStore: StoreDefinition<
           filter?.systemrechte,
           filter?.excludeTyp,
           filter?.administriertVon,
+          filter?.organisationIds,
         );
         this.klassen = response.data;
         this.totalKlassen = +response.headers['x-paging-total'];
@@ -347,10 +348,8 @@ export const useOrganisationStore: StoreDefinition<
           undefined,
           [organisationId],
         );
-        const getFilteredKlassen: Organisation[] = response.data.filter(
-          (orga: Organisation) => orga.typ === OrganisationsTyp.Klasse,
-        );
-        this.klassen = getFilteredKlassen;
+
+        this.klassen = response.data;
         this.totalKlassen = +response.headers['x-paging-total'];
         this.totalPaginatedKlassen = +response.headers['x-paging-pageTotal'];
         await this.fetchSchuleDetailsForKlassen(true);
