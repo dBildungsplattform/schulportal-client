@@ -1,9 +1,9 @@
 <script setup lang="ts">
   import SpshAlert from '@/components/alert/SpshAlert.vue';
-  function goBack(): void {
-    window.history.back();
-  }
 
+  function goToStart(): void {
+    window.location.href = '/start';
+  }
   function toSecondFactorSetup(): void {
     window.location.href = '/profile';
   }
@@ -11,7 +11,7 @@
 
 <template>
   <SpshAlert
-    :buttonAction="goBack"
+    :buttonAction="goToStart"
     :buttonText="$t('nav.back')"
     :closable="false"
     :modelValue="true"
