@@ -1,4 +1,4 @@
-import { addDays, parse } from 'date-fns';
+import { addDays, isBefore, isValid, parse } from 'date-fns';
 
 /**
  * Calculates the next 31st of July (End of school year)
@@ -70,4 +70,34 @@ export function formatDate(dateString: string | undefined, t: (key: string) => s
 
   // Return the translated string followed by the formatted date
   return `${t('admin.befristung.limitedUntil')} ${formatDateDiggitsToGermanDate(date)}`;
+}
+
+/**
+ * Validates if the given date is not in the past.
+ *
+ * @param {string | undefined} value - The date string in the format `dd.MM.yyyy` to validate. 
+ *                                      If the value is undefined, the function returns true.
+ * @returns {boolean} Returns `true` if the date is today or in the future, 
+ *                    and `false` if it is in the past.
+ */
+export function notInPast(value: string | undefined): boolean {
+  if (!value) return true;
+
+  const parsedDate: Date = parse(value, 'dd.MM.yyyy', new Date());
+  return !isBefore(parsedDate, new Date());
+}
+
+/**
+ * Validates if the given date string is in a valid format and represents a real date.
+ *
+ * @param {string | undefined} value - The date string in the format `dd.MM.yyyy` to validate. 
+ *                                      If the value is undefined, the function returns true.
+ * @returns {boolean} Returns `true` if the date string is valid and represents a real date, 
+ *                    and `false` otherwise.
+ */
+export function isValidDate(value: string | undefined): boolean {
+  if (!value) return true;
+
+  const parsedDate: Date = parse(value, 'dd.MM.yyyy', new Date());
+  return isValid(parsedDate);
 }
