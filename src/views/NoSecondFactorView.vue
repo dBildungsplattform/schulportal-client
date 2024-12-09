@@ -12,7 +12,7 @@
 <template>
   <SpshAlert
     :buttonAction="goToStart"
-    :buttonText="$t('nav.back')"
+    :buttonText="$t('nav.backToStart')"
     :closable="false"
     :modelValue="true"
     :showButton="true"
