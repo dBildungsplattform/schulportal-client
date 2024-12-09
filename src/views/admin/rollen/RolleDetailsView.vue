@@ -261,7 +261,11 @@
     });
 
     Object.values(RollenSystemRecht).forEach((enumValue: RollenSystemRecht) => {
-      if (enumValue !== RollenSystemRecht.MigrationDurchfuehren && enumValue !== RollenSystemRecht.CronDurchfuehren) {
+      if (
+        enumValue !== RollenSystemRecht.MigrationDurchfuehren &&
+        enumValue !== RollenSystemRecht.CronDurchfuehren &&
+        enumValue !== RollenSystemRecht.PersonenLesen
+      ) {
         const i18nPath: string = `admin.rolle.mappingFrontBackEnd.systemrechte.${enumValue}`;
         allSystemrechte.value.push({
           value: enumValue,
