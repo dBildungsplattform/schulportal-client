@@ -162,6 +162,6 @@ describe('KlasseChange', () => {
     await klassenAutocomplete?.setValue(undefined);
     await nextTick();
 
-    expect(organisationStore.getKlassenByOrganisationId).toHaveBeenCalledWith('1');
+    expect(organisationStore.getKlassenByOrganisationId).toHaveBeenCalledWith({ limit: 25, administriertVon: ['1'] });
   });
 });

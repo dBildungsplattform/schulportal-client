@@ -165,5 +165,7 @@ describe('KlassenDetailsView', () => {
     expect(spshAlertWrapper?.props()).toMatchObject({
       title: 'Geänderte Daten',
     });
+    // reset errorCode after test
+    organisationStore.errorCode = '';
   });
 });

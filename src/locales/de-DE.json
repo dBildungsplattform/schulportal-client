@@ -74,6 +74,7 @@
       "addNew": "Neue Klasse hinzufügen",
       "assignKlasse": "Klasse zuordnen",
       "backToCreateKlasse": "Zurück zur Klassenanlage",
+      "backToEditKlasse": "Zurück zur Klassenbearbeitung",
       "create": "Klasse anlegen",
       "createAnother": "Weitere Klasse anlegen",
       "createNew": "Neue Klasse anlegen",
@@ -188,9 +189,10 @@
       "personalInfoSuccessDialogMessage": "Die Stammdaten wurden erfolgreich geändert.",
       "personalInfoSuccessDialogMessageWithUsername": "Die Stammdaten wurden erfolgreich geändert.\n\nDas Passwort wurde nicht verändert und kann wie zuvor verwendet werden. \n\nBitte teilen Sie der betroffenen Person die Stammdatenänderung (Benutzername, Mail-Adresse) mit. \n\nDie neuen Daten können Sie in der Gesamtübersicht einsehen." ,
       "printPassword": "Passwort drucken",
+      "resetPassword": "Passwort zurücksetzen",
       "resetPasswordConfirmation": "Sind Sie sicher, dass Sie das Passwort für {firstname} {lastname} zurücksetzen möchten?",
       "resetPasswordInformation": "Bitte teilen Sie dem Benutzer das temporäre Passwort mit. Nach dem Schließen des Dialogs wird es aus Sicherheitsgründen nicht mehr angezeigt.",
-      "resetPassword": "Passwort zurücksetzen",
+      "resetPasswordSuccessMessage": "Das Passwort wurde erfolgreich zurückgesetzt.",
       "rules": {
         "vorname": {
           "matches": "Der Vorname enthält ungültige Zeichen.",
@@ -247,7 +249,7 @@
         "serial": "Seriennummer",
         "otpPlaceholder": "Einmalpasswort",
         "requiredSecondFactor": "Diese Aktion setzt eine Zwei-Faktor-Authentifizierung (2FA) voraus.",
-        "noSecondFactorText": "Aktuell ist noch keine 2FA eingrichtet.",
+        "noSecondFactorText": "Aktuell ist noch keine 2FA eingerichtet.",
         "setUpInfo": "Sie können die Einrichtung der 2FA selbst über ein mobiles Endgerät durchführen. Alternativ wenden Sie sich bitte an Ihre schulischen Administratorinnen und Administratoren.",
         "toSecondFactorSetup": "Zur 2FA Einrichtung",
         "errors": {
