@@ -513,6 +513,15 @@
     );
   });
 
+  // Used to show device password block
+  const hasLehrRolle: ComputedRef<boolean> = computed(() => {
+    return (
+      !!zuordnungenResult.value?.find((zuordnung: Zuordnung) => {
+        return zuordnung.rollenArt === RollenArt.Lehr;
+      }) || false
+    );
+  });
+
   // Check if the button to change the Klasse should be active or not. Activate only if there is 1 selected Zuordnung and if it is of type LERN.
   const canChangeKlasse: ComputedRef<boolean> = computed(() => {
     const hasOneSelectedZuordnung: boolean = selectedZuordnungen.value.length === 1;
@@ -2507,12 +2516,16 @@
             <v-col v-else-if="personStore.loading"> <v-progress-circular indeterminate></v-progress-circular></v-col>
           </v-row> </v-container
         ><v-divider
+          v-if="hasLehrRolle"
           class="border-opacity-100 rounded my-6 mx-4"
           color="#E5EAEF"
           thickness="6"
         ></v-divider>
         <!-- reset device password -->
-        <v-container data-testid="device-password">
+        <v-container
+          v-if="hasLehrRolle"
+          data-testid="device-password"
+        >
           <v-row class="ml-md-16">
             <v-col data-testid="device-password-info">
               <h3 class="subtitle-1">{{ $t('admin.person.devicePassword.header') }}</h3>

@@ -5,6 +5,7 @@ import {
   OrganisationsTyp,
   PersonenApiFactory,
   PersonenFrontendApiFactory,
+  RollenArt,
   RollenMerkmal,
   type DbiamCreatePersonWithPersonenkontexteBodyParams,
   type DbiamPersonenuebersichtApiInterface,
@@ -104,6 +105,7 @@ export type PersonWithUebersicht =
         sskName: string;
         sskDstNr: string;
         rolle: string;
+        rollenArt: RollenArt;
         administriertVon: string;
         typ: OrganisationsTyp;
         editable: boolean;
