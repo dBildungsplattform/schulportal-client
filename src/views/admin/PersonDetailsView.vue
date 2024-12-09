@@ -73,7 +73,7 @@
   import type { LockUserBodyParams } from '@/api-client/generated';
   import type { TranslatedObject } from '@/types';
   import { DIN_91379A, NO_LEADING_TRAILING_SPACES } from '@/utils/validation';
-import { useConfigStore, type ConfigStore } from '@/stores/ConfigStore';
+  import { useConfigStore, type ConfigStore } from '@/stores/ConfigStore';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
@@ -1882,39 +1882,39 @@ import { useConfigStore, type ConfigStore } from '@/stores/ConfigStore';
                     </v-btn>
                   </SpshTooltip>
                   <template v-if="configStore.configData?.rolleBearbeitenEnabled">
-                  <SpshTooltip
-                    :enabledCondition="selectedZuordnungen.length > 0"
-                    :disabledText="$t('person.chooseZuordnungFirst')"
-                    :enabledText="$t('person.changeRolleDescription')"
-                    position="start"
-                  >
-                    <v-btn
-                      class="primary mt-2"
-                      data-testid="rolle-change-button"
-                      :disabled="selectedZuordnungen.length === 0"
-                      :block="mdAndDown"
+                    <SpshTooltip
+                      :enabledCondition="selectedZuordnungen.length > 0"
+                      :disabledText="$t('person.chooseZuordnungFirst')"
+                      :enabledText="$t('person.changeRolleDescription')"
+                      position="start"
                     >
-                      {{ $t('person.changeRolle') }}
-                    </v-btn>
-                  </SpshTooltip>
-                </template>
-                <template v-if="configStore.configData?.befristungBearbeitenEnabled">
-                  <SpshTooltip
-                    :enabledCondition="selectedZuordnungen.length > 0"
-                    :disabledText="$t('person.chooseZuordnungFirst')"
-                    :enabledText="$t('person.modifyBefristungDescription')"
-                    position="start"
-                  >
-                    <v-btn
-                      class="primary mt-2"
-                      data-testid="befristung-change-button"
-                      :disabled="selectedZuordnungen.length === 0"
-                      :block="mdAndDown"
+                      <v-btn
+                        class="primary mt-2"
+                        data-testid="rolle-change-button"
+                        :disabled="selectedZuordnungen.length === 0"
+                        :block="mdAndDown"
+                      >
+                        {{ $t('person.changeRolle') }}
+                      </v-btn>
+                    </SpshTooltip>
+                  </template>
+                  <template v-if="configStore.configData?.befristungBearbeitenEnabled">
+                    <SpshTooltip
+                      :enabledCondition="selectedZuordnungen.length > 0"
+                      :disabledText="$t('person.chooseZuordnungFirst')"
+                      :enabledText="$t('person.modifyBefristungDescription')"
+                      position="start"
                     >
-                      {{ $t('person.modifyBefristung') }}
-                    </v-btn>
-                  </SpshTooltip>
-                </template>
+                      <v-btn
+                        class="primary mt-2"
+                        data-testid="befristung-change-button"
+                        :disabled="selectedZuordnungen.length === 0"
+                        :block="mdAndDown"
+                      >
+                        {{ $t('person.modifyBefristung') }}
+                      </v-btn>
+                    </SpshTooltip>
+                  </template>
                   <SpshTooltip
                     v-if="hasKlassenZuordnung"
                     :enabledCondition="canChangeKlasse"
