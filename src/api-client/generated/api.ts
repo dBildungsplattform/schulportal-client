@@ -438,6 +438,12 @@ export interface DBiamPersonenzuordnungResponse {
     'rolle': string;
     /**
      * 
+     * @type {RollenArt}
+     * @memberof DBiamPersonenzuordnungResponse
+     */
+    'rollenArt': RollenArt;
+    /**
+     * 
      * @type {string}
      * @memberof DBiamPersonenzuordnungResponse
      */
