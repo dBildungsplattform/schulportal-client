@@ -37,6 +37,8 @@
         firstname: props.person.person.name.vorname,
         lastname: props.person.person.name.familienname,
       })}`;
+    } else {
+      message = `${t('admin.person.resetPasswordSuccessMessage')}\n\n` + message;
     }
     return message;
   });
@@ -155,7 +157,7 @@
                 </p>
               </v-col>
             </v-row>
-            <v-row>
+            <v-row class="px-md-16">
               <v-col cols="12">
                 <PasswordOutput :password="password"></PasswordOutput>
               </v-col>
