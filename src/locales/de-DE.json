@@ -165,9 +165,9 @@
       "devicePassword": {
         "createDevicePassword": "Inbetriebnahme-Passwort erzeugen",
         "createPassword": "Passwort erzeugen",
-        "dialogText": "Bitte teilen Sie dem Benutzer das Passwort mit. Nach dem Schließen des Dialogs wird das Passwort nicht mehr angezeigt. Der Benutzer benötigt dieses Passwort ausschließlich zur erstmaligen Anmeldung mit seinem neuen Endgerät.",
-        "header": "Inbetriebnahme-Passwort",
-        "infoText": "Dieses Passwort wird vom Benutzer einmalig zur Eingabe im UEM-System beim ersten Start seines neuen Endgeräts benötigt oder wenn das Gerät zurückgesetzt wurde!"
+        "dialogText": "Bitte teilen Sie dem Benutzer das Passwort mit. Nach dem Schließen des Dialogs wird das Passwort nicht mehr angezeigt. Der Benutzer benötigt dieses Passwort ausschließlich zur erstmaligen Anmeldung an seinem neuen LK-Endgerät.",
+        "header": "Inbetriebnahme-Passwort für LK-Endgerät",
+        "infoText": "Dieses Passwort wird vom Benutzer einmalig zur Eingabe beim ersten Start seines neuen Lehrkräfte-Endgerätes benötigt oder wenn das Gerät zurückgesetzt wurde!"
       },
       "discard": "Benutzer verwerfen",
       "disableUser": "Benutzer sperren",
