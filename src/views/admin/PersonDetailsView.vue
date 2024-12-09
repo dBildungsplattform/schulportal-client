@@ -936,6 +936,8 @@
         sskName: organisation.name,
         rolle:
           rollen.value?.find((rolle: TranslatedRolleWithAttrs) => rolle.value === selectedRolle.value)?.title || '',
+        rollenArt: rollen.value?.find((rolle: TranslatedRolleWithAttrs) => rolle.value === selectedRolle.value)
+          ?.rollenart as RollenArt,
         administriertVon: organisation.administriertVon ?? '',
         editable: true,
         merkmale: [] as unknown as RollenMerkmal,
@@ -956,6 +958,8 @@
           sskName: klasse.name,
           rolle:
             rollen.value?.find((rolle: TranslatedRolleWithAttrs) => rolle.value === selectedRolle.value)?.title || '',
+          rollenArt: rollen.value?.find((rolle: TranslatedRolleWithAttrs) => rolle.value === selectedRolle.value)
+            ?.rollenart as RollenArt,
           administriertVon: klasse.administriertVon ?? '',
           editable: true,
           typ: OrganisationsTyp.Klasse,
@@ -973,6 +977,7 @@
             sskDstNr: existingKlasse.sskDstNr,
             sskName: existingKlasse.sskName,
             rolle: existingKlasse.rolle,
+            rollenArt: existingKlasse.rollenArt,
             administriertVon: existingKlasse.administriertVon,
             editable: true,
             merkmale: [] as unknown as RollenMerkmal,
@@ -1022,6 +1027,8 @@
         rolle:
           rollen.value?.find((rolle: TranslatedRolleWithAttrs) => rolle.value === selectedZuordnungen.value[0]?.rolleId)
             ?.title || '',
+        rollenArt: rollen.value?.find((rolle: TranslatedRolleWithAttrs) => rolle.value === selectedRolle.value)
+          ?.rollenart as RollenArt,
         administriertVon: organisation.administriertVon ?? '',
         editable: true,
         merkmale: [] as unknown as RollenMerkmal,
@@ -1073,6 +1080,8 @@
             rollen.value?.find(
               (rolle: TranslatedRolleWithAttrs) => rolle.value === selectedZuordnungen.value[0]?.rolleId,
             )?.title || '',
+          rollenArt: rollen.value?.find((rolle: TranslatedRolleWithAttrs) => rolle.value === selectedRolle.value)
+            ?.rollenart as RollenArt,
           administriertVon: newKlasse.administriertVon ?? '',
           editable: true,
           merkmale: [] as unknown as RollenMerkmal,
