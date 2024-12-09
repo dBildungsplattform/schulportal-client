@@ -583,11 +583,11 @@ describe('PersonStore', () => {
       const userId: string = '2345';
       const mockResponse: string = 'fakePassword';
 
-      mockadapter.onPatch(`/api/personen/${userId}/uem-password`).replyOnce(200, mockResponse);
+      mockadapter.onPatch(`/api/personen/${userId}/uem-password`).replyOnce(202, mockResponse);
       const resetDevicePasswordPromise: Promise<void> = personStore.resetDevicePassword(userId);
       expect(personStore.loading).toBe(true);
       await resetDevicePasswordPromise;
-      expect(personStore.newPassword).toEqual(mockResponse);
+      expect(personStore.newDevicePassword).toEqual(mockResponse);
       expect(personStore.loading).toBe(false);
     });
 
@@ -605,11 +605,11 @@ describe('PersonStore', () => {
     it('should handle error code', async () => {
       const userId: string = '2345';
 
-      mockadapter.onPatch(`/api/personen/${userId}/uem-password`).replyOnce(500, { code: 'some mock server error' });
+      mockadapter.onPatch(`/api/personen/${userId}/uem-password`).replyOnce(500, { i18nKey: 'SOME_MOCK_ERROR' });
       const resetDevicePasswordPromise: Promise<void> = personStore.resetDevicePassword(userId);
       expect(personStore.loading).toBe(true);
       await resetDevicePasswordPromise;
-      expect(personStore.errorCode).toEqual('some mock server error');
+      expect(personStore.errorCode).toEqual('SOME_MOCK_ERROR');
       expect(personStore.loading).toBe(false);
     });
   });
