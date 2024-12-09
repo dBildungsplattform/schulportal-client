@@ -13,7 +13,7 @@ type ConfigState = {
 
 type ConfigGetters = {};
 type ConfigActions = {
-  getConfig: () => Promise<void>;
+  getFeatureFlags: () => Promise<void>;
 };
 
 export type ConfigStore = Store<'configStore', ConfigState, ConfigGetters, ConfigActions>;
@@ -28,7 +28,7 @@ export const useConfigStore: StoreDefinition<'configStore', ConfigState, ConfigG
     };
   },
   actions: {
-    async getConfig(): Promise<void> {
+    async getFeatureFlags(): Promise<void> {
       this.loading = true;
       try {
         const response: AxiosResponse<FeatureFlagResponse> = await configApi.configControllerGetFeatureFlags();
