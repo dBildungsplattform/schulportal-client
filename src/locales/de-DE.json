@@ -165,6 +165,7 @@
       "devicePassword": {
         "createDevicePassword": "Inbetriebnahme-Passwort erzeugen",
         "createPassword": "Passwort erzeugen",
+        "createPasswordSuccessMessage": "Das Passwort wurde erfolgreich erzeugt.",
         "dialogText": "Bitte teilen Sie dem Benutzer das Passwort mit. Nach dem Schließen des Dialogs wird das Passwort nicht mehr angezeigt. Der Benutzer benötigt dieses Passwort ausschließlich zur erstmaligen Anmeldung an seinem neuen LK-Endgerät.",
         "header": "Inbetriebnahme-Passwort für LK-Endgerät",
         "infoText": "Dieses Passwort wird vom Benutzer einmalig zur Eingabe beim ersten Start seines neuen Lehrkräfte-Endgerätes benötigt oder wenn das Gerät zurückgesetzt wurde!"

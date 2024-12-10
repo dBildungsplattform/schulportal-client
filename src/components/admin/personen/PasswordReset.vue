@@ -12,6 +12,7 @@
 
   type Props = {
     buttonText: string;
+    confirmButtonText: string;
     dialogHeader: string;
     dialogText: string;
     disabled: boolean;
@@ -175,7 +176,7 @@
                 data-testid="password-reset-button"
                 :disabled="!!password || isLoading"
               >
-                {{ $t('admin.person.resetPassword') }}
+                {{ confirmButtonText }}
               </v-btn>
             </v-col>
             <v-col

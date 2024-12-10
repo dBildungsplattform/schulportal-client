@@ -878,7 +878,7 @@
   const devicePasswordDialogText: ComputedRef<string> = computed(() => {
     let message: string = t('admin.person.devicePassword.dialogText');
     if (devicePassword.value) {
-      message = `${t('admin.person.resetPasswordSuccessMessage')}\n\n` + message;
+      message = `${t('admin.person.createPasswordSuccessMessage')}\n\n` + message;
     }
     return message;
   });
@@ -1656,6 +1656,7 @@
               <div class="d-flex justify-sm-end">
                 <PasswordReset
                   :buttonText="$t('admin.person.changePassword')"
+                  :confirmButtonText="$t('admin.person.resetPassword')"
                   :dialogHeader="$t('admin.person.resetPassword')"
                   :dialogText="passwordResetDialogText"
                   :disabled="isEditActive || isEditPersonMetadataActive"
@@ -2573,6 +2574,7 @@
               <div class="d-flex justify-sm-end">
                 <PasswordReset
                   :buttonText="$t('admin.person.devicePassword.createPassword')"
+                  :confirmButtonText="$t('admin.person.devicePassword.createPassword')"
                   :dialogHeader="$t('admin.person.devicePassword.createDevicePassword')"
                   :dialogText="devicePasswordDialogText"
                   :disabled="isEditActive || isEditPersonMetadataActive"
