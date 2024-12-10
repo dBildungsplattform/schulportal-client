@@ -40,6 +40,7 @@
   } from '@/utils/validationRolle';
   import SuccessTemplate from '@/components/admin/rollen/SuccessTemplate.vue';
   import { type TranslatedObject } from '@/types.d';
+  import { hideSystemrecht } from '@/utils/systemrechte';
 
   const rolleStore: RolleStore = useRolleStore();
   const organisationStore: OrganisationStore = useOrganisationStore();
@@ -220,11 +221,7 @@
     });
 
     Object.values(RollenSystemRecht).forEach((enumValue: RollenSystemRecht) => {
-      if (
-        enumValue !== RollenSystemRecht.MigrationDurchfuehren &&
-        enumValue !== RollenSystemRecht.CronDurchfuehren &&
-        enumValue !== RollenSystemRecht.PersonenLesen
-      ) {
+      if (!hideSystemrecht(enumValue)) {
         const i18nPath: string = `admin.rolle.mappingFrontBackEnd.systemrechte.${enumValue}`;
         translatedSystemrechte.value.push({
           value: enumValue,
