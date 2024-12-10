@@ -86,6 +86,11 @@
 
   // Watcher for selectedOrganisation to fetch roles and classes
   watch(selectedOrganisation, async (newValue: string | undefined, oldValue: string | undefined) => {
+    // Reset the selectedRolle field only if oldValue was not undefined
+    if (oldValue !== undefined) {
+      selectedRolle.value = undefined;
+      emits('fieldReset', 'selectedRolle');
+    }
     if (newValue && newValue !== oldValue) {
       // Fetch the roles after selecting the organization
       await personenkontextStore.processWorkflowStep({
@@ -125,11 +130,6 @@
             }
           }
         }
-      }
-      // Reset the selectedRolle field only if oldValue was not undefined
-      if (oldValue !== undefined) {
-        selectedRolle.value = undefined;
-        emits('fieldReset', 'selectedRolle');
       }
     } else if (!newValue) {
       // If the organization is cleared, reset selectedRolle and selectedKlasse
