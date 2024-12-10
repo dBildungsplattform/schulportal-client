@@ -23,7 +23,7 @@
     { text: t('footer.contact'), href: 'https://www.secure-lernnetz.de/helpdesk/', external: true },
     {
       text: t('footer.help'),
-      href: 'https://medienberatung.iqsh.de/schulportal-sh.html',
+      href: 'https://medienberatung.iqsh.de/paedagogischer-helpdesk.html',
       external: true,
     },
     {
