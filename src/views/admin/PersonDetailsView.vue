@@ -1659,7 +1659,6 @@
                   :disabled="isEditActive || isEditPersonMetadataActive"
                   :errorCode="personStore.errorCode"
                   :isLoading="personStore.loading"
-                  :person="personStore.currentPerson"
                   @onClearPassword="password = ''"
                   @onResetPassword="resetPassword(currentPersonId)"
                   :password="password"
@@ -2552,7 +2551,7 @@
                   </v-col>
                   <div class="v-col">
                     <p>
-                      {{ $t('admin.person.devicePassword.infoText') }}
+                      {{ $t('admin.person.devicePassword.infoTextPersonDetails') }}
                     </p>
                   </div>
                 </v-row>
@@ -2576,7 +2575,6 @@
                   :disabled="isEditActive || isEditPersonMetadataActive"
                   :errorCode="personStore.errorCode"
                   :isLoading="personStore.loading"
-                  :person="personStore.currentPerson"
                   @onClearPassword="password = ''"
                   @onResetPassword="resetDevicePassword(currentPersonId)"
                   :password="password"

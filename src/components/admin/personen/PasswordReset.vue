@@ -1,6 +1,5 @@
 <script setup lang="ts">
   import { ref, type Ref } from 'vue';
-  import { type Personendatensatz } from '@/stores/PersonStore';
   import { type Composer, useI18n } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
@@ -14,16 +13,15 @@
     buttonText: string;
     dialogHeader: string;
     dialogText: string;
-    disabled: boolean;
+    disabled?: boolean;
     errorCode: string;
     isLoading: boolean;
     password: string;
-    person: Personendatensatz;
   };
 
   type Emits = {
     (event: 'onClearPassword'): void;
-    (event: 'onResetPassword', id: string): void;
+    (event: 'onResetPassword'): void;
   };
 
   const props: Props = defineProps<Props>();
@@ -171,7 +169,7 @@
                 v-else
                 :block="mdAndDown"
                 class="primary button"
-                @click.stop="$emit('onResetPassword', person.person.id)"
+                @click.stop="$emit('onResetPassword')"
                 data-testid="password-reset-button"
                 :disabled="!!password || isLoading"
               >
