@@ -295,6 +295,7 @@
 
   function handleConfirmUnsavedChanges(): void {
     blockedNext();
+    importStore.errorCode = '';
   }
 
   function preventNavigation(event: BeforeUnloadEvent): void {
