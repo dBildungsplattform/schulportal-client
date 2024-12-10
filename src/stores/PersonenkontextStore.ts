@@ -21,6 +21,7 @@ import {
   type PersonAdministrationApiInterface,
   PersonAdministrationApiFactory,
   RollenMerkmal,
+  RollenArt,
 } from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
 import { usePersonStore, type PersonStore } from './PersonStore';
@@ -50,6 +51,7 @@ export type Zuordnung = {
   sskName: string;
   sskDstNr?: string;
   rolle: string;
+  rollenArt: RollenArt;
   administriertVon: string;
   typ: OrganisationsTyp;
   editable: boolean;
