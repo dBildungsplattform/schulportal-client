@@ -23,6 +23,7 @@ beforeEach(() => {
     attachTo: document.getElementById('app') || '',
     props: {
       isLoading: false,
+      confirmButtonText: 'Confirm button text',
       dialogHeader: 'Dialog header',
       dialogText: 'Dialog text',
       disabled: false,

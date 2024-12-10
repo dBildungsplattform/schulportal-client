@@ -208,7 +208,7 @@
   const devicePasswordDialogText: ComputedRef<string> = computed(() => {
     let message: string = t('admin.person.devicePassword.dialogText');
     if (devicePassword.value) {
-      message = `${t('admin.person.resetPasswordSuccessMessage')}\n\n` + message;
+      message = `${t('admin.person.resetPasswordSuccessMessage')}\n\n${t('admin.person.devicePassword.dialogSuccessTextProfile')}`;
     }
     return message;
   });
@@ -737,6 +737,7 @@
               <v-row class="d-flex align-center justify-center">
                 <PasswordReset
                   :buttonText="$t('admin.person.devicePassword.createPassword')"
+                  :confirmButtonText="$t('admin.person.devicePassword.createPassword')"
                   :dialogHeader="$t('admin.person.devicePassword.createDevicePassword')"
                   :dialogText="devicePasswordDialogText"
                   :errorCode="personStore.errorCode"
@@ -748,12 +749,20 @@
                 </PasswordReset>
               </v-row>
               <v-row class="d-flex align-center justify-center">
-                <v-col class="">
-                  <p
-                    class=""
+                <v-col
+                  class="text-right"
+                  cols="1"
+                >
+                  <v-icon
+                    class="mb-2"
+                    icon="mdi-information"
                   >
+                  </v-icon>
+                </v-col>
+                <v-col class="text-left">
+                  <b class="white-space-pre-wrap">
                     {{ $t('admin.person.devicePassword.infoTextProfile') }}
-                  </p>
+                  </b>
                 </v-col>
               </v-row>
             </v-col>

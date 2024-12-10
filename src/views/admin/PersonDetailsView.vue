@@ -1654,6 +1654,7 @@
               <div class="d-flex justify-sm-end">
                 <PasswordReset
                   :buttonText="$t('admin.person.changePassword')"
+                  :confirmButtonText="$t('admin.person.resetPassword')"
                   :dialogHeader="$t('admin.person.resetPassword')"
                   :dialogText="passwordResetDialogText"
                   :disabled="isEditActive || isEditPersonMetadataActive"
@@ -2549,11 +2550,11 @@
                     >
                     </v-icon>
                   </v-col>
-                  <div class="v-col">
+                  <v-col>
                     <p>
                       {{ $t('admin.person.devicePassword.infoTextPersonDetails') }}
                     </p>
-                  </div>
+                  </v-col>
                 </v-row>
               </template>
               <template v-else-if="personStore.loading">
@@ -2570,6 +2571,7 @@
               <div class="d-flex justify-sm-end">
                 <PasswordReset
                   :buttonText="$t('admin.person.devicePassword.createPassword')"
+                  :confirmButtonText="$t('admin.person.devicePassword.createPassword')"
                   :dialogHeader="$t('admin.person.devicePassword.createDevicePassword')"
                   :dialogText="devicePasswordDialogText"
                   :disabled="isEditActive || isEditPersonMetadataActive"
