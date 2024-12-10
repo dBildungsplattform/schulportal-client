@@ -55,7 +55,7 @@
         <a
           class="secondary"
           data-testid="help-button"
-          href="https://medienberatung.iqsh.de/schulportal-sh.html"
+          href="https://medienberatung.iqsh.de/paedagogischer-helpdesk.html"
           rel="noopener noreferrer"
           target="_blank"
         >
