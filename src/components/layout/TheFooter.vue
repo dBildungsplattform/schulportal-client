@@ -43,7 +43,7 @@
     },
     {
       text: t('footer.status'),
-      href: 'api/status',
+      href: '/api/status',
       external: true,
     },
   ]);
