@@ -87,6 +87,7 @@
   const organisationStore: OrganisationStore = useOrganisationStore();
   const twoFactorAuthentificationStore: TwoFactorAuthentificationStore = useTwoFactorAuthentificationStore();
 
+  const devicePassword: Ref<string> = ref('');
   const password: Ref<string> = ref('');
 
   const zuordnungenResult: Ref<Zuordnung[] | undefined> = ref<Zuordnung[] | undefined>(undefined);
@@ -149,7 +150,7 @@
 
   async function resetDevicePassword(personId: string): Promise<void> {
     await personStore.resetDevicePassword(personId);
-    password.value = personStore.newDevicePassword || '';
+    devicePassword.value = personStore.newDevicePassword || '';
   }
 
   async function onLockUser(lockedBy: string, date: string | undefined): Promise<void> {
@@ -875,7 +876,7 @@
   // Computed property to get the device password dialog text
   const devicePasswordDialogText: ComputedRef<string> = computed(() => {
     let message: string = t('admin.person.devicePassword.dialogText');
-    if (password.value) {
+    if (devicePassword.value) {
       message = `${t('admin.person.resetPasswordSuccessMessage')}\n\n` + message;
     }
     return message;
@@ -2551,9 +2552,9 @@
                     </v-icon>
                   </v-col>
                   <div class="v-col">
-                    <p>
+                    <b>
                       {{ $t('admin.person.devicePassword.infoText') }}
-                    </p>
+                    </b>
                   </div>
                 </v-row>
               </template>
@@ -2577,9 +2578,9 @@
                   :errorCode="personStore.errorCode"
                   :isLoading="personStore.loading"
                   :person="personStore.currentPerson"
-                  @onClearPassword="password = ''"
+                  @onClearPassword="devicePassword = ''"
                   @onResetPassword="resetDevicePassword(currentPersonId)"
-                  :password="password"
+                  :password="devicePassword"
                 >
                 </PasswordReset>
               </div>
