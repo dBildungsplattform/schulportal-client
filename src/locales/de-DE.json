@@ -171,7 +171,8 @@
         "PERSONALNUMMER_REQUIRED": "Die Änderungen wurden nicht gespeichert, da keine KoPers.-Nr. eingegeben wurde.",
         "PERSON_NOT_FOUND": "Der Benutzer wurde seit Ihrer letzten Änderung gelöscht und kann nicht mehr bearbeitet werden.",
         "NEWER_VERSION_OF_PERSON_AVAILABLE": "Der Benutzer wurde zwischenzeitlich von einer anderen Administratorin oder einem anderen Administrator bearbeitet. Bitte aktualisieren Sie die Daten und versuchen Sie es erneut.",
-        "REQUIRED_STEP_UP_LEVEL_NOT_MET": "Die letzte Aktion konnte nicht ausgeführt werden. Aufgrund von längerer Inaktivität ist eine erneute Authentifizierung mit einem zweiten Faktor erforderlich. Um fortzufahren, klicken Sie bitte auf „Zurück zur Ergebnisliste“ oder „Schließen“. Sie werden anschließend zur Eingabe Ihres zweiten Faktors aufgefordert."
+        "REQUIRED_STEP_UP_LEVEL_NOT_MET": "Die letzte Aktion konnte nicht ausgeführt werden. Aufgrund von längerer Inaktivität ist eine erneute Authentifizierung mit einem zweiten Faktor erforderlich. Um fortzufahren, klicken Sie bitte auf „Zurück zur Ergebnisliste“ oder „Schließen“. Sie werden anschließend zur Eingabe Ihres zweiten Faktors aufgefordert.",
+        "UNSPECIFIED_ERROR": "Leider ist ein technischer Fehler aufgetreten. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut."
       },
       "generatedPassword": "Generiertes Passwort",
       "homePageIQSH":"Homepage der IQSH-Medienberatung",
@@ -217,7 +218,8 @@
         "PERSONALNUMMER_REQUIRED": "Personalnummer erforderlich",
         "PERSON_NOT_FOUND": "Benutzer gelöscht",
         "NEWER_VERSION_OF_PERSON_AVAILABLE": "Geänderte Daten",
-        "REQUIRED_STEP_UP_LEVEL_NOT_MET": "Zwei-Faktor-Authentifizierung (2FA) erforderlich"
+        "REQUIRED_STEP_UP_LEVEL_NOT_MET": "Zwei-Faktor-Authentifizierung (2FA) erforderlich",
+        "UNSPECIFIED_ERROR": "Technischer Fehler"
       },
       "twoFactorAuthentication": {
         "setUpShort": "2FA einrichten",
@@ -466,6 +468,7 @@
       "schulenFound": "{count} Schule gefunden | {count} Schulen gefunden",
       "schulenSelected": "{count} Schulen ausgewählt",
       "schulname": "Schulname",
+      "schulnameDienststellennummer": "Schulname/Dienststellennummer",
       "schulform": "Schulform",
       "schuleCreateErrorTitle": "Fehler beim Anlegen der Schule",
       "schuleAddedSuccessfully": "Die Schule wurde erfolgreich hinzugefügt.",
