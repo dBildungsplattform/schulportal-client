@@ -1,6 +1,5 @@
 <script setup lang="ts">
-  import { computed, type ComputedRef, ref, type Ref } from 'vue';
-  import { type Personendatensatz } from '@/stores/PersonStore';
+  import { ref, type Ref } from 'vue';
   import { type Composer, useI18n } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
@@ -11,37 +10,24 @@
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
   type Props = {
+    buttonText: string;
+    confirmButtonText: string;
+    dialogHeader: string;
+    dialogText: string;
+    disabled?: boolean;
     errorCode: string;
-    disabled: boolean;
-    person: Personendatensatz;
-    password: string;
     isLoading: boolean;
+    password: string;
   };
 
   type Emits = {
     (event: 'onClearPassword'): void;
-    (event: 'onResetPassword', id: string): void;
+    (event: 'onResetPassword'): void;
   };
 
   const props: Props = defineProps<Props>();
   const emit: Emits = defineEmits<Emits>();
   const errorMessage: Ref<string> = ref('');
-
-  const resetPasswordInformationMessage: ComputedRef<string> = computed(() => {
-    if (errorMessage.value || props.errorCode) {
-      return '';
-    }
-    let message: string = t('admin.person.resetPasswordInformation');
-    if (!props.password) {
-      message += `\n\n${t('admin.person.resetPasswordConfirmation', {
-        firstname: props.person.person.name.vorname,
-        lastname: props.person.person.name.familienname,
-      })}`;
-    } else {
-      message = `${t('admin.person.resetPasswordSuccessMessage')}\n\n` + message;
-    }
-    return message;
-  });
 
   async function closePasswordResetDialog(isActive: Ref<boolean>): Promise<void> {
     isActive.value = false;
@@ -110,17 +96,17 @@
         <SpshTooltip
           :enabledCondition="!disabled"
           :disabledText="$t('person.finishEditFirst')"
-          :enabledText="$t('admin.person.changePassword')"
+          :enabledText="buttonText"
           position="start"
         >
           <v-btn
             class="primary"
-            data-testid="open-password-reset-dialog-icon"
+            data-testid="open-password-reset-dialog-button"
             :block="mdAndDown"
             :disabled="disabled"
             v-bind="props"
           >
-            {{ $t('admin.person.changePassword') }}
+            {{ buttonText }}
           </v-btn>
         </SpshTooltip>
       </v-col>
@@ -129,7 +115,7 @@
     <template v-slot:default="{ isActive }">
       <LayoutCard
         :closable="true"
-        :header="$t('admin.person.resetPassword')"
+        :header="dialogHeader"
         @onCloseClicked="closePasswordResetDialog(isActive)"
       >
         <v-card-text>
@@ -153,7 +139,7 @@
             <v-row class="text-body bold px-md-16">
               <v-col>
                 <p data-testid="password-reset-info-text">
-                  {{ resetPasswordInformationMessage }}
+                  {{ dialogText }}
                 </p>
               </v-col>
             </v-row>
@@ -184,11 +170,11 @@
                 v-else
                 :block="mdAndDown"
                 class="primary button"
-                @click.stop="$emit('onResetPassword', person.person.id)"
+                @click.stop="$emit('onResetPassword')"
                 data-testid="password-reset-button"
                 :disabled="!!password || isLoading"
               >
-                {{ $t('admin.person.resetPassword') }}
+                {{ confirmButtonText }}
               </v-btn>
             </v-col>
             <v-col
