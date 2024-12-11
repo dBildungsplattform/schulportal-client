@@ -878,7 +878,7 @@
   const devicePasswordDialogText: ComputedRef<string> = computed(() => {
     let message: string = t('admin.person.devicePassword.dialogText');
     if (devicePassword.value) {
-      message = `${t('admin.person.createPasswordSuccessMessage')}\n\n` + message;
+      message = `${t('admin.person.devicePassword.createPasswordSuccessMessage')}\n\n` + message;
     }
     return message;
   });
