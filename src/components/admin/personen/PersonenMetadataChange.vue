@@ -50,7 +50,7 @@
 
   const link: Ref<IQSHLink> = ref({
     text: t('admin.person.homePageIQSH'),
-    href: 'https://medienberatung.iqsh.de/paedagogischer-helpdesk.html',
+    href: 'https://medienberatung.iqsh.de/schulportal-sh.html',
     external: true,
   });
 </script>
