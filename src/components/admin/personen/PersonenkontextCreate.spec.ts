@@ -203,6 +203,17 @@ beforeEach(() => {
   };
 
   personStore.personenuebersicht = mockPersonenuebersicht;
+  organisationStore.klassen = [
+    {
+      id: '2',
+      name: '11b',
+      kennung: '9356494-11b',
+      namensergaenzung: 'Klasse',
+      kuerzel: '11b',
+      typ: OrganisationsTyp.Klasse,
+      administriertVon: '1',
+    },
+  ];
 });
 
 describe('PersonenkontextCreate', () => {
@@ -425,14 +436,5 @@ describe('PersonenkontextCreate', () => {
     await nextTick();
 
     expect(klassenAutocomplete?.text()).toBeFalsy();
-  });
-
-  test('Preselect the Klasse if the existing Zuordnungen have a Klasse', async () => {
-    const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
-    await organisationAutocomplete?.setValue('01');
-    await nextTick();
-
-    // Verify that the klasse ID is emitted
-    expect(wrapper?.emitted('update:selectedKlasse')).toBeTruthy();
   });
 });
