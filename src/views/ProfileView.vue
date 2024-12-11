@@ -206,9 +206,17 @@
 
   // Computed property to get the device password dialog text
   const devicePasswordDialogText: ComputedRef<string> = computed(() => {
-    let message: string = t('admin.person.devicePassword.dialogText');
+    let message: string = t('admin.person.devicePassword.dialogTextProfile');
     if (devicePassword.value) {
-      message = `${t('admin.person.resetPasswordSuccessMessage')}\n\n${t('admin.person.devicePassword.dialogSuccessTextProfile')}`;
+      message = `${t('admin.person.resetPasswordSuccessMessage')}\n\n${t('admin.person.devicePassword.dialogTextProfile')}`;
+    }
+    return message;
+  });
+
+  const devicePasswordErrorMessage: ComputedRef<string> = computed(() => {
+    let message: string = '';
+    if (personStore.errorCode) {
+      message = t('admin.person.devicePassword.errorMessage');
     }
     return message;
   });
@@ -741,6 +749,7 @@
                   :dialogHeader="$t('admin.person.devicePassword.createDevicePassword')"
                   :dialogText="devicePasswordDialogText"
                   :errorCode="personStore.errorCode"
+                  :errorMessage="devicePasswordErrorMessage"
                   :isLoading="personStore.loading"
                   @onClearPassword="devicePassword = ''"
                   @onResetPassword="resetDevicePassword(personInfoStore.personInfo?.person.id as string)"
@@ -748,7 +757,7 @@
                 >
                 </PasswordReset>
               </v-row>
-              <v-row class="d-flex align-center justify-center">
+              <v-row class="d-flex justify-center">
                 <v-col
                   class="text-right"
                   cols="1"

@@ -167,8 +167,10 @@
         "createDevicePassword": "Inbetriebnahme-Passwort erzeugen",
         "createPassword": "Passwort erzeugen",
         "createPasswordSuccessMessage": "Das Passwort wurde erfolgreich erzeugt.",
-        "dialogText": "Bitte teilen Sie dem Benutzer das Passwort mit. Nach dem Schließen des Dialogs wird das Passwort nicht mehr angezeigt. Der Benutzer benötigt dieses Passwort ausschließlich zur erstmaligen Anmeldung an seinem neuen LK-Endgerät.",
         "dialogSuccessTextProfile": "Bitte notieren Sie sich das Passwort oder drucken Sie es aus. Nach dem Schließen des Dialogs wird das Passwort nicht mehr angezeigt. Sie benötigen dieses Passwort ausschließlich zur erstmaligen Anmeldung an Ihrem neuen LK-Endgerät.",
+        "dialogText": "Bitte teilen Sie dem Benutzer das Passwort mit. Nach dem Schließen des Dialogs wird das Passwort nicht mehr angezeigt. Der Benutzer benötigt dieses Passwort ausschließlich zur erstmaligen Anmeldung an seinem neuen LK-Endgerät.",
+        "dialogTextProfile": "Bitte notieren Sie sich das Passwort oder drucken Sie es aus. Nach dem Schließen des Dialogs wird das Passwort nicht mehr angezeigt. Sie benötigen dieses Passwort ausschließlich zur erstmaligen Anmeldung an Ihrem neuen LK-Endgerät.",
+        "errorMessage": "Bei der Erzeugung des Passwortes ist ein Fehler aufgetreten. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut oder informieren Sie Ihre schulischen Administratorinnen und Administratoren!",
         "header": "Inbetriebnahme-Passwort für LK-Endgerät",
         "infoTextPersonDetails": "Dieses Passwort wird vom Benutzer einmalig zur Eingabe beim ersten Start seines neuen Lehrkräfte-Endgerätes benötigt oder wenn das Gerät zurückgesetzt wurde!",
         "infoTextProfile": "Sie benötigen dieses Passwort ausschließlich zur einmaligen Eingabe beim ersten Start Ihres neuen LK-Endgerätes oder wenn das Gerät zurückgesetzt wurde! \n \n Bei Fragen wenden Sie sich bitte an Ihre schulischen Administratorinnen und Administratoren."
