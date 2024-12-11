@@ -14,7 +14,8 @@
       "rules": {
         "required": "Die Befristung muss eingegeben werden.",
         "format": "Die Befristung muss im Format TT.MM.JJJJ. eingegeben werden.",
-        "pastDateNotAllowed": "Das eingegebene Datum darf nicht in der Vergangenheit liegen."
+        "pastDateNotAllowed": "Das eingegebene Datum darf nicht in der Vergangenheit liegen.",
+        "invalidDateNotAllowed": "Bitte geben Sie ein gültiges Datum ein."
       },
       "selectBefristung": "Befristung auswählen",
       "unlimited": "Unbefristet",
