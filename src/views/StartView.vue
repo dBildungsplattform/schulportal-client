@@ -7,13 +7,17 @@
   } from '@/stores/ServiceProviderStore';
   import { computed, onBeforeMount, onMounted, ref, type ComputedRef, type Ref } from 'vue';
   import ServiceProviderCategory from '@/components/layout/ServiceProviderCategory.vue';
+  import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
+  import {
+    useTwoFactorAuthentificationStore,
+    type TwoFactorAuthentificationStore,
+  } from '@/stores/TwoFactorAuthentificationStore';
   import SpshBanner from '@/components/alert/SpshBanner.vue';
   import { useI18n } from 'vue-i18n';
   import { usePersonInfoStore, type PersonInfoStore } from '@/stores/PersonInfoStore';
   import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
   import type { DBiamPersonenzuordnungResponse, PersonTimeLimitInfoResponse } from '@/api-client/generated';
   import { RollenMerkmal } from '@/stores/RolleStore';
-  import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
   import { formatDateDiggitsToGermanDate } from '@/utils/date';
 
   const { t }: { t: Function } = useI18n();
@@ -28,6 +32,7 @@
   const personInfoStore: PersonInfoStore = usePersonInfoStore();
   const personStore: PersonStore = usePersonStore();
   const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
+  const twoFactorAuthentificationStore: TwoFactorAuthentificationStore = useTwoFactorAuthentificationStore();
   const authStore: AuthStore = useAuthStore();
 
   function filterSortProviders(providers: ServiceProvider[], kategorie: ServiceProviderKategorie): ServiceProvider[] {
@@ -56,6 +61,10 @@
   const schoolOfferingsServiceProviders: ComputedRef<ServiceProvider[]> = computed(() =>
     filterSortProviders(serviceProviderStore.availableServiceProviders, ServiceProviderKategorie.Angebote),
   );
+
+  function getHasToken(): boolean {
+    return twoFactorAuthentificationStore.hasToken ?? false;
+  }
 
   const hasKoPersMerkmal: ComputedRef<boolean> = computed(() => {
     return (
@@ -101,6 +110,9 @@
   let alerts: Ref<Alert[]> = ref([]);
 
   onMounted(async () => {
+    await authStore.initializeAuthStatus();
+    const personId: string | null | undefined = authStore.currentUser?.personId;
+    if (personId) await twoFactorAuthentificationStore.get2FAState(personId);
     await serviceProviderStore.getAvailableServiceProviders();
     for (const provider of serviceProviderStore.availableServiceProviders) {
       if (provider.hasLogo) {
@@ -196,26 +208,31 @@
       <ServiceProviderCategory
         :categoryTitle="$t('start.categories.workEmail')"
         :serviceProviders="emailServiceProviders"
+        :hasToken="getHasToken()"
       ></ServiceProviderCategory>
       <!-- Categorie 2: Class -->
       <ServiceProviderCategory
         :categoryTitle="$t('start.categories.class')"
         :serviceProviders="classServiceProviders"
+        :hasToken="getHasToken()"
       ></ServiceProviderCategory>
       <!-- Categorie 3: Administration -->
       <ServiceProviderCategory
         :categoryTitle="$t('start.categories.administration')"
         :serviceProviders="administrationServiceProviders"
+        :hasToken="getHasToken()"
       ></ServiceProviderCategory>
       <!-- Categorie 4: Hints -->
       <ServiceProviderCategory
         :categoryTitle="$t('start.categories.hints')"
         :serviceProviders="hintsServiceProviders"
+        :hasToken="getHasToken()"
       ></ServiceProviderCategory>
       <!-- Categorie 5: School Offerings -->
       <ServiceProviderCategory
         :categoryTitle="$t('start.categories.schoolOfferings')"
         :serviceProviders="schoolOfferingsServiceProviders"
+        :hasToken="getHasToken()"
       ></ServiceProviderCategory>
     </template>
   </v-card>
