@@ -6,7 +6,7 @@ import { useForm, type BaseFieldProps, type TypedSchema } from 'vee-validate';
 import { isBefristungspflichtRolle } from './befristung';
 import { useRollen, type TranslatedRolleWithAttrs } from '@/composables/useRollen';
 import { RollenArt, RollenMerkmal } from '@/stores/RolleStore';
-import { isBefore, isValid, parse } from 'date-fns';
+import { notInPast } from './date';
 
 // Define the form validation schema for the Personenkontext
 export type ZuordnungCreationForm = {
@@ -26,14 +26,6 @@ export function isLernRolle(selectedRolleId: string): boolean {
   );
   return !!rolle && rolle.rollenart === RollenArt.Lern;
 }
-
-// Custom validation function to check if the date is in the past
-export const notInPast = (value: string | undefined): boolean => {
-  if (!value) return true;
-
-  const parsedDate: Date = parse(value, 'dd.MM.yyyy', new Date());
-  return isValid(parsedDate) && !isBefore(parsedDate, new Date());
-};
 
 // Define the field properties for Personenkontext
 export type PersonenkontextFieldDefinitions = {
