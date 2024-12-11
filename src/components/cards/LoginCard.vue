@@ -20,8 +20,8 @@
   // Define the date range for the "What's new" box
   const showWhatsNew: ComputedRef<boolean> = computed(() => {
     const today: Date = new Date();
-    const startDate: Date = parseISO('2024-12-12T18:00:00');
-    const endDate: Date = parseISO('2024-12-17T23:59:59');
+    const startDate: Date = parseISO('2024-12-12T17:00:00');
+    const endDate: Date = parseISO('2024-12-20T18:00:00');
 
     // Check if today falls within the interval
     return isWithinInterval(today, { start: startDate, end: endDate });
@@ -34,8 +34,8 @@
   };
 
   const link: Ref<IQSHLink> = ref({
-    text: t('helpdeskIQSH'),
-    href: 'https://medienberatung.iqsh.de/paedagogischer-helpdesk.html',
+    text: t('IQSHMedienberatung'),
+    href: 'https://medienberatung.iqsh.de/schulportal-sh.html',
     external: true,
   });
 </script>

@@ -516,7 +516,7 @@
     "privacyPolicy": "Datenschutzerklärung",
     "status": "Systemstatus"
   },
-  "helpdeskIQSH": "IQSH-Helpdesk",
+  "IQSHMedienberatung": "IQSH-Medienberatung",
   "itemsPerPage": "Einträge pro Seite",
   "landingTitle": "Willkommen im Schulportal SH.",
   "login": {
@@ -678,7 +678,7 @@
     "title": "Änderungen vorgenommen"
   },
   "whatsNew": {
-    "moreInformation": "Weitere Informationen zu den neuen Funktionen finden Sie im",
+    "moreInformation": "Weitere Informationen zu den neuen Funktionen finden Sie auf der Seite der",
     "title": "Was ist neu?",
     "updateInformationForVersion": "Update-Informationen zur Version {version}"
   },
