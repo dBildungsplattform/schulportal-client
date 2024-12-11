@@ -87,6 +87,7 @@
   const organisationStore: OrganisationStore = useOrganisationStore();
   const twoFactorAuthentificationStore: TwoFactorAuthentificationStore = useTwoFactorAuthentificationStore();
 
+  const devicePassword: Ref<string> = ref('');
   const password: Ref<string> = ref('');
 
   const zuordnungenResult: Ref<Zuordnung[] | undefined> = ref<Zuordnung[] | undefined>(undefined);
@@ -149,7 +150,7 @@
 
   async function resetDevicePassword(personId: string): Promise<void> {
     await personStore.resetDevicePassword(personId);
-    password.value = personStore.newDevicePassword || '';
+    devicePassword.value = personStore.newDevicePassword || '';
   }
 
   async function onLockUser(lockedBy: string, date: string | undefined): Promise<void> {
@@ -876,8 +877,8 @@
   // Computed property to get the device password dialog text
   const devicePasswordDialogText: ComputedRef<string> = computed(() => {
     let message: string = t('admin.person.devicePassword.dialogText');
-    if (password.value) {
-      message = `${t('admin.person.resetPasswordSuccessMessage')}\n\n` + message;
+    if (devicePassword.value) {
+      message = `${t('admin.person.devicePassword.createPasswordSuccessMessage')}\n\n` + message;
     }
     return message;
   });
@@ -2580,7 +2581,7 @@
                   :isLoading="personStore.loading"
                   @onClearPassword="password = ''"
                   @onResetPassword="resetDevicePassword(currentPersonId)"
-                  :password="password"
+                  :password="devicePassword"
                 >
                 </PasswordReset>
               </div>

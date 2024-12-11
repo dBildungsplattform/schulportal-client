@@ -438,12 +438,6 @@ export interface DBiamPersonenzuordnungResponse {
     'rolle': string;
     /**
      * 
-     * @type {RollenArt}
-     * @memberof DBiamPersonenzuordnungResponse
-     */
-    'rollenArt': RollenArt;
-    /**
-     * 
      * @type {string}
      * @memberof DBiamPersonenzuordnungResponse
      */
@@ -632,8 +626,7 @@ export const DbiamPersonErrorI18nKeyEnum = {
     DownstreamUnreachable: 'DOWNSTREAM_UNREACHABLE',
     PersonalnummerRequired: 'PERSONALNUMMER_REQUIRED',
     NewerVersionOfPersonAvailable: 'NEWER_VERSION_OF_PERSON_AVAILABLE',
-    PersonalnummerNichtEindeutig: 'PERSONALNUMMER_NICHT_EINDEUTIG',
-    PersonPasswordModificationError: 'PERSON_PASSWORD_MODIFICATION_ERROR'
+    PersonalnummerNichtEindeutig: 'PERSONALNUMMER_NICHT_EINDEUTIG'
 } as const;
 
 export type DbiamPersonErrorI18nKeyEnum = typeof DbiamPersonErrorI18nKeyEnum[keyof typeof DbiamPersonErrorI18nKeyEnum];
@@ -7185,47 +7178,6 @@ export const PersonenApiAxiosParamCreator = function (configuration?: Configurat
         },
         /**
          * 
-         * @param {string} personId The id for the account.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        personControllerResetUEMPasswordByPersonId: async (personId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'personId' is not null or undefined
-            assertParamExists('personControllerResetUEMPasswordByPersonId', 'personId', personId)
-            const localVarPath = `/api/personen/{personId}/uem-password`
-                .replace(`{${"personId"}}`, encodeURIComponent(String(personId)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication bearer required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            // authentication oauth2 required
-            // oauth required
-            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
          * @param {string} personId 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -7470,16 +7422,6 @@ export const PersonenApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
-         * @param {string} personId The id for the account.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async personControllerResetUEMPasswordByPersonId(personId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.personControllerResetUEMPasswordByPersonId(personId, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
-         * 
          * @param {string} personId 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -7613,15 +7555,6 @@ export const PersonenApiFactory = function (configuration?: Configuration, baseP
         },
         /**
          * 
-         * @param {string} personId The id for the account.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        personControllerResetUEMPasswordByPersonId(personId: string, options?: any): AxiosPromise<string> {
-            return localVarFp.personControllerResetUEMPasswordByPersonId(personId, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
          * @param {string} personId 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -7748,15 +7681,6 @@ export interface PersonenApiInterface {
      * @memberof PersonenApiInterface
      */
     personControllerResetPasswordByPersonId(personId: string, options?: AxiosRequestConfig): AxiosPromise<string>;
-
-    /**
-     * 
-     * @param {string} personId The id for the account.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof PersonenApiInterface
-     */
-    personControllerResetUEMPasswordByPersonId(personId: string, options?: AxiosRequestConfig): AxiosPromise<string>;
 
     /**
      * 
@@ -7901,17 +7825,6 @@ export class PersonenApi extends BaseAPI implements PersonenApiInterface {
      */
     public personControllerResetPasswordByPersonId(personId: string, options?: AxiosRequestConfig) {
         return PersonenApiFp(this.configuration).personControllerResetPasswordByPersonId(personId, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @param {string} personId The id for the account.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof PersonenApi
-     */
-    public personControllerResetUEMPasswordByPersonId(personId: string, options?: AxiosRequestConfig) {
-        return PersonenApiFp(this.configuration).personControllerResetUEMPasswordByPersonId(personId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
