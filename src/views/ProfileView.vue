@@ -769,9 +769,9 @@
                   </v-icon>
                 </v-col>
                 <v-col class="text-left">
-                  <b class="white-space-pre-wrap">
+                  <p class="white-space-pre-wrap">
                     {{ $t('admin.person.devicePassword.infoTextProfile') }}
-                  </b>
+                  </p>
                 </v-col>
               </v-row>
             </v-col>
