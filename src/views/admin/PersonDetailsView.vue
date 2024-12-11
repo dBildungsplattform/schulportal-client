@@ -2554,9 +2554,9 @@
                     </v-icon>
                   </v-col>
                   <div class="v-col">
-                    <b>
+                    <p>
                       {{ $t('admin.person.devicePassword.infoText') }}
-                    </b>
+                    </p>
                   </div>
                 </v-row>
               </template>
