@@ -516,6 +516,7 @@
     "privacyPolicy": "Datenschutzerklärung",
     "status": "Systemstatus"
   },
+  "helpdeskIQSH": "IQSH-Helpdesk",
   "itemsPerPage": "Einträge pro Seite",
   "landingTitle": "Willkommen im Schulportal SH.",
   "login": {
@@ -676,7 +677,12 @@
     "message": "Sie haben nicht gespeicherte Änderungen vorgenommen. Wollen Sie die Seite trotzdem verlassen?",
     "title": "Änderungen vorgenommen"
   },
-  "yes": "Ja",
+  "whatsNew": {
+    "moreInformation": "Weitere Informationen zu den neuen Funktionen finden Sie im",
+    "title": "Was ist neu?",
+    "updateInformationForVersion": "Update-Informationen zur Version {version}"
+  },
   "willBeCreated": "wird hinzugefügt",
-  "willBeRemoved": "wird entfernt"
+  "willBeRemoved": "wird entfernt",
+  "yes": "Ja"
 }

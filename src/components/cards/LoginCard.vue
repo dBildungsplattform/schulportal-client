@@ -1,9 +1,11 @@
 <script setup lang="ts">
   import { parseISO, isWithinInterval } from 'date-fns';
-  import { computed, type ComputedRef } from 'vue';
+  import { computed, type ComputedRef, type Ref, ref } from 'vue';
   import { type RouteLocationNormalizedLoaded, useRoute } from 'vue-router';
+  import { useI18n, type Composer } from 'vue-i18n';
 
   const route: RouteLocationNormalizedLoaded = useRoute();
+  const { t }: Composer = useI18n({ useScope: 'global' });
 
   // Define the maintenance date range
   const isMaintenancePeriod: ComputedRef<boolean> = computed(() => {
@@ -13,6 +15,28 @@
 
     // Check if today falls within the maintenance period
     return isWithinInterval(today, { start: startDate, end: endDate });
+  });
+
+  // Define the date range for the "What's new" box
+  const showWhatsNew: ComputedRef<boolean> = computed(() => {
+    const today: Date = new Date();
+    const startDate: Date = parseISO('2024-12-12T18:00:00');
+    const endDate: Date = parseISO('2024-12-17T23:59:59');
+
+    // Check if today falls within the interval
+    return isWithinInterval(today, { start: startDate, end: endDate });
+  });
+
+  type IQSHLink = {
+    text: string;
+    href: string;
+    external: boolean;
+  };
+
+  const link: Ref<IQSHLink> = ref({
+    text: t('helpdeskIQSH'),
+    href: 'https://medienberatung.iqsh.de/paedagogischer-helpdesk.html',
+    external: true,
   });
 </script>
 
@@ -118,6 +142,63 @@
         </v-btn>
       </v-col>
     </v-row>
+    <!-- What's new -->
+    <div
+      v-if="showWhatsNew"
+      class="mt-10 primary-border"
+    >
+      <v-row
+        class="text-body-2"
+        justify="center"
+        no-gutters
+      >
+        <v-col cols="12">
+          <h1
+            class="subtitle-2"
+            data-testid="whats-new-title"
+          >
+            {{ $t('whatsNew.updateInformationForVersion', { version: '1.2 (12.12.2024)' }) }}
+          </h1>
+        </v-col>
+        <v-col
+          cols="12"
+          class="mt-3"
+        >
+          <p>
+            {{ $t('whatsNew.title') }}
+          </p>
+        </v-col>
+        <v-col
+          cols="12"
+          class="mt-3"
+        >
+          <ul>
+            <li class="ml-5">
+              Die Eingabe des zweiten Faktors im Dialog kann nun auch per Copy & Paste erfolgen, auf mobilen Endgeräten
+              wird die Tastatur auf Zahleneingabe voreingestellt.
+            </li>
+            <li class="ml-5 mt-3">
+              Inbetriebnahme-Passworte für LK-Endgeräte können über das Profil des Benutzers (Self-Service) oder durch
+              schulische Administratorinnen oder Administratoren selbstständig erzeugt werden.
+            </li>
+          </ul>
+        </v-col>
+        <v-col
+          cols="12"
+          class="mt-3"
+        >
+          <p>
+            {{ $t('whatsNew.moreInformation') }}
+            <a
+              :href="link.href"
+              :target="link.external ? '_blank' : '_self'"
+            >
+              {{ link.text }} </a
+            >.
+          </p>
+        </v-col>
+      </v-row>
+    </div>
   </v-card>
 </template>
 
