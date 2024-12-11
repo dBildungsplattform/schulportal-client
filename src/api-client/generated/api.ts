@@ -633,7 +633,7 @@ export const DbiamPersonErrorI18nKeyEnum = {
     PersonalnummerRequired: 'PERSONALNUMMER_REQUIRED',
     NewerVersionOfPersonAvailable: 'NEWER_VERSION_OF_PERSON_AVAILABLE',
     PersonalnummerNichtEindeutig: 'PERSONALNUMMER_NICHT_EINDEUTIG',
-    PersonPasswordModificationError: 'PERSON_PASSWORD_MODIFICATION_ERROR'
+    PersonUemPasswordModificationError: 'PERSON_UEM_PASSWORD_MODIFICATION_ERROR'
 } as const;
 
 export type DbiamPersonErrorI18nKeyEnum = typeof DbiamPersonErrorI18nKeyEnum[keyof typeof DbiamPersonErrorI18nKeyEnum];
