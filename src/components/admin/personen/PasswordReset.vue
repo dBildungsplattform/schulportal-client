@@ -1,6 +1,5 @@
 <script setup lang="ts">
-  import { ref, type Ref } from 'vue';
-  import { type Personendatensatz } from '@/stores/PersonStore';
+  import { type Ref } from 'vue';
   import { type Composer, useI18n } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
@@ -15,22 +14,21 @@
     confirmButtonText: string;
     dialogHeader: string;
     dialogText: string;
-    disabled: boolean;
+    disabled?: boolean;
     errorCode: string;
+    errorMessage?: string;
     isLoading: boolean;
     password: string;
-    person: Personendatensatz;
     testId: string;
   };
 
   type Emits = {
     (event: 'onClearPassword'): void;
-    (event: 'onResetPassword', id: string): void;
+    (event: 'onResetPassword'): void;
   };
 
   const props: Props = defineProps<Props>();
   const emit: Emits = defineEmits<Emits>();
-  const errorMessage: Ref<string> = ref('');
 
   async function closePasswordResetDialog(isActive: Ref<boolean>): Promise<void> {
     isActive.value = false;
@@ -139,7 +137,10 @@
                 </p>
               </v-col>
             </v-row>
-            <v-row class="text-body bold px-md-16">
+            <v-row
+              class="text-body bold px-md-16"
+              v-if="!errorMessage && !errorCode"
+            >
               <v-col>
                 <p data-testid="password-reset-info-text">
                   {{ dialogText }}
@@ -156,6 +157,7 @@
         <v-card-actions class="justify-center">
           <v-row class="justify-center">
             <v-col
+              v-if="!errorMessage"
               cols="12"
               sm="6"
               md="4"
@@ -173,7 +175,7 @@
                 v-else
                 :block="mdAndDown"
                 class="primary button"
-                @click.stop="$emit('onResetPassword', person.person.id)"
+                @click.stop="$emit('onResetPassword')"
                 data-testid="password-reset-button"
                 :disabled="!!password || isLoading"
               >

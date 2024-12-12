@@ -1662,11 +1662,10 @@
                   :disabled="isEditActive || isEditPersonMetadataActive"
                   :errorCode="personStore.errorCode"
                   :isLoading="personStore.loading"
-                  :person="personStore.currentPerson"
                   @onClearPassword="password = ''"
                   @onResetPassword="resetPassword(currentPersonId)"
                   :password="password"
-                  :testId="'password-reset'" 
+                  :testId="'password-reset'"
                 >
                 </PasswordReset>
               </div>
@@ -2554,11 +2553,11 @@
                     >
                     </v-icon>
                   </v-col>
-                  <div class="v-col">
+                  <v-col>
                     <p>
-                      {{ $t('admin.person.devicePassword.infoText') }}
+                      {{ $t('admin.person.devicePassword.infoTextPersonDetails') }}
                     </p>
-                  </div>
+                  </v-col>
                 </v-row>
               </template>
               <template v-else-if="personStore.loading">
@@ -2581,8 +2580,7 @@
                   :disabled="isEditActive || isEditPersonMetadataActive"
                   :errorCode="personStore.errorCode"
                   :isLoading="personStore.loading"
-                  :person="personStore.currentPerson"
-                  @onClearPassword="devicePassword = ''"
+                  @onClearPassword="password = ''"
                   @onResetPassword="resetDevicePassword(currentPersonId)"
                   :password="devicePassword"
                   :testId="'device-password'"
