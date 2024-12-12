@@ -173,7 +173,7 @@
         "errorMessage": "Bei der Erzeugung des Passwortes ist ein Fehler aufgetreten. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut oder informieren Sie Ihre schulischen Administratorinnen und Administratoren!",
         "header": "Inbetriebnahme-Passwort für LK-Endgerät",
         "infoTextPersonDetails": "Dieses Passwort wird vom Benutzer einmalig zur Eingabe beim ersten Start seines neuen Lehrkräfte-Endgerätes benötigt oder wenn das Gerät zurückgesetzt wurde!",
-        "infoTextProfile": "Sie benötigen dieses Passwort ausschließlich zur einmaligen Eingabe beim ersten Start Ihres neuen LK-Endgerätes oder wenn das Gerät zurückgesetzt wurde! \n \n Bei Fragen wenden Sie sich bitte an Ihre schulischen Administratorinnen und Administratoren."
+        "infoTextProfile": "Sie benötigen dieses Passwort ausschließlich zur einmaligen Eingabe beim ersten Start Ihres neuen LK-Endgerätes oder wenn das Gerät zurückgesetzt wurde!\n\nBei Fragen wenden Sie sich bitte an Ihre schulischen Administratorinnen und Administratoren."
       },
       "discard": "Benutzer verwerfen",
       "disableUser": "Benutzer sperren",
