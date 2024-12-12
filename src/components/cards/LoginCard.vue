@@ -157,7 +157,7 @@
             class="subtitle-2"
             data-testid="whats-new-title"
           >
-            {{ $t('whatsNew.updateInformationForVersion', { version: '1.2 (12.12.2024)' }) }}
+            {{ $t('whatsNew.updateInformationForVersion', { version: '1.1 (16.12.2024)' }) }}
           </h1>
         </v-col>
         <v-col
