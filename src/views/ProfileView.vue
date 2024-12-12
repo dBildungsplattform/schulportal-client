@@ -736,15 +736,15 @@
               </v-table>
               <p
                 class="pt-4 text-center text-body-1 text-medium-emphasis"
-                data-testid="info-text-with-icon"
+                data-testid="schuladmins-info-text-with-icon"
                 style="white-space: normal"
               >
                 <v-icon
                   class="mr-2"
                   icon="mdi-information-slab-circle-outline"
-                  data-testid="info-icon"
+                  data-testid="schuladmins-info-icon"
                 ></v-icon>
-                <span data-testid="info-text">
+                <span data-testid="schulAdmins-info-text">
                   {{ `${schuleData.info} ${schuleData.schulAdmins?.join(', ') || ''}` }}
                 </span>
               </p>
