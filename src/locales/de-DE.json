@@ -167,7 +167,6 @@
         "createDevicePassword": "Inbetriebnahme-Passwort erzeugen",
         "createPassword": "Passwort erzeugen",
         "createPasswordSuccessMessage": "Das Passwort wurde erfolgreich erzeugt.",
-        "dialogSuccessTextProfile": "Bitte notieren Sie sich das Passwort oder drucken Sie es aus. Nach dem Schließen des Dialogs wird das Passwort nicht mehr angezeigt. Sie benötigen dieses Passwort ausschließlich zur erstmaligen Anmeldung an Ihrem neuen LK-Endgerät.",
         "dialogText": "Bitte teilen Sie dem Benutzer das Passwort mit. Nach dem Schließen des Dialogs wird das Passwort nicht mehr angezeigt. Der Benutzer benötigt dieses Passwort ausschließlich zur erstmaligen Anmeldung an seinem neuen LK-Endgerät.",
         "dialogTextProfile": "Bitte notieren Sie sich das Passwort oder drucken Sie es aus. Nach dem Schließen des Dialogs wird das Passwort nicht mehr angezeigt. Sie benötigen dieses Passwort ausschließlich zur erstmaligen Anmeldung an Ihrem neuen LK-Endgerät.",
         "errorMessage": "Bei der Erzeugung des Passwortes ist ein Fehler aufgetreten. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut oder informieren Sie Ihre schulischen Administratorinnen und Administratoren!",
@@ -531,6 +530,7 @@
     "privacyPolicy": "Datenschutzerklärung",
     "status": "Systemstatus"
   },
+  "IQSHMedienberatung": "IQSH-Medienberatung",
   "itemsPerPage": "Einträge pro Seite",
   "landingTitle": "Willkommen im Schulportal SH.",
   "login": {
@@ -691,7 +691,12 @@
     "message": "Sie haben nicht gespeicherte Änderungen vorgenommen. Wollen Sie die Seite trotzdem verlassen?",
     "title": "Änderungen vorgenommen"
   },
-  "yes": "Ja",
+  "whatsNew": {
+    "moreInformation": "Weitere Informationen zu den neuen Funktionen finden Sie auf der Seite der",
+    "title": "Was ist neu?",
+    "updateInformationForVersion": "Update-Informationen zur Version {version}"
+  },
   "willBeCreated": "wird hinzugefügt",
-  "willBeRemoved": "wird entfernt"
+  "willBeRemoved": "wird entfernt",
+  "yes": "Ja"
 }

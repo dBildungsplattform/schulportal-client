@@ -754,6 +754,7 @@
                   @onClearPassword="devicePassword = ''"
                   @onResetPassword="resetDevicePassword(personInfoStore.personInfo?.person.id as string)"
                   :password="devicePassword"
+                  :testId="'device-password'"
                 >
                 </PasswordReset>
               </v-row>

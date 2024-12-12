@@ -19,6 +19,7 @@
     errorMessage?: string;
     isLoading: boolean;
     password: string;
+    testId: string;
   };
 
   type Emits = {
@@ -101,7 +102,7 @@
         >
           <v-btn
             class="primary"
-            data-testid="open-password-reset-dialog-button"
+            :data-testid="`open-${testId}-dialog-button`"
             :block="mdAndDown"
             :disabled="disabled"
             v-bind="props"

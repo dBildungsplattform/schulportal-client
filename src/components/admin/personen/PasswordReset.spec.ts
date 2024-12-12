@@ -22,6 +22,7 @@ beforeEach(() => {
   wrapper = mount(PasswordReset, {
     attachTo: document.getElementById('app') || '',
     props: {
+      testId: 'password-reset',
       isLoading: false,
       confirmButtonText: 'Confirm button text',
       dialogHeader: 'Dialog header',
