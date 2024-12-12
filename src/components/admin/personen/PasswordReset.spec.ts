@@ -22,8 +22,13 @@ beforeEach(() => {
   wrapper = mount(PasswordReset, {
     attachTo: document.getElementById('app') || '',
     props: {
+      testId: 'password-reset',
       isLoading: false,
+      confirmButtonText: 'Confirm button text',
+      dialogHeader: 'Dialog header',
+      dialogText: 'Dialog text',
       disabled: false,
+      buttonText: 'Button text',
       errorCode: '',
       password: 'qwertzuiop',
       person: {
@@ -56,7 +61,7 @@ beforeEach(() => {
 
 describe('reset password', () => {
   test('it opens and closes the dialog', async () => {
-    wrapper?.get('[data-testid="open-password-reset-dialog-icon"]').trigger('click');
+    wrapper?.get('[data-testid="open-password-reset-dialog-button"]').trigger('click');
     await nextTick();
 
     await document.querySelector('[data-testid="password-reset-info-text"]');
@@ -81,7 +86,7 @@ describe('reset password', () => {
 
   test('reset button emits correct event', async () => {
     await wrapper?.setProps({ password: '' });
-    wrapper?.get('[data-testid="open-password-reset-dialog-icon"]').trigger('click');
+    wrapper?.get('[data-testid="open-password-reset-dialog-button"]').trigger('click');
     await nextTick();
     await document.querySelector('[data-testid="password-reset-button"]');
     expect(document.querySelector('[data-testid="password-reset-button"]')).not.toBeNull();
@@ -95,21 +100,21 @@ describe('reset password', () => {
   });
 
   it('should render the print button if password was reset', async () => {
-    wrapper?.get('[data-testid="open-password-reset-dialog-icon"]').trigger('click');
+    wrapper?.get('[data-testid="open-password-reset-dialog-button"]').trigger('click');
     await document.querySelector('[data-testid="password-print-button"]');
     expect(document.querySelector('[data-testid="password-print-button"]')).not.toBeNull();
   });
 
   // skip because v-dialog does not work in test env. see lines 42-47
   test.skip('it shows and hides password', async () => {
-    wrapper?.get('[data-testid="open-password-reset-dialog-icon"]').trigger('click');
+    wrapper?.get('[data-testid="open-password-reset-dialog-button"]').trigger('click');
     await document.querySelector('[data-testid="password-output-field"] mdi-eye');
     expect(document.querySelector('[data-testid="password-output-field"] mdi-eye')).not.toBeNull();
   });
 
   // skip because v-dialog does not work in test env. see lines 42-47
   test.skip('it copies password to clipboard', async () => {
-    wrapper?.get('[data-testid="open-password-reset-dialog-icon"]').trigger('click');
+    wrapper?.get('[data-testid="open-password-reset-dialog-button"]').trigger('click');
     await document.querySelector('[data-testid="password-output-field"] mdi-content-copy');
     expect(document.querySelector('[data-testid="password-output-field"] mdi-content-copy')).not.toBeNull();
   });
@@ -125,7 +130,7 @@ describe('reset password', () => {
     } as unknown as Window;
     window.open = vi.fn(() => mockWindow) as unknown as typeof window.open;
 
-    await wrapper?.find('[data-testid="open-password-reset-dialog-icon"]').trigger('click');
+    await wrapper?.find('[data-testid="open-password-reset-dialog-button"]').trigger('click');
     const passwordPrintButton: Element | null = await document.querySelector('[data-testid="password-print-button"]');
     if (passwordPrintButton instanceof HTMLButtonElement) {
       passwordPrintButton.click();
@@ -136,7 +141,7 @@ describe('reset password', () => {
 
   test('it closes the password reset dialog when the close button is clicked', async () => {
     // Arrange: Open the dialog
-    await wrapper?.get('[data-testid="open-password-reset-dialog-icon"]').trigger('click');
+    await wrapper?.get('[data-testid="open-password-reset-dialog-button"]').trigger('click');
 
     // Act: Click the close button
     const closeButton: HTMLElement | undefined = document.querySelector(
