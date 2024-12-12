@@ -104,7 +104,7 @@
         >
           <v-btn
             class="primary"
-            :data-testid="`${testId}-dialog-button`"
+            :data-testid="`open-${testId}-dialog-button`"
             :block="mdAndDown"
             :disabled="disabled"
             v-bind="props"
