@@ -1,5 +1,6 @@
 <script setup lang="ts">
   import { computed, onMounted, ref, watch, type ComputedRef, type Ref } from 'vue';
+  import ResultTable, { type TableRow } from '@/components/admin/ResultTable.vue';
   import { type Composer, useI18n } from 'vue-i18n';
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
   import {
@@ -8,11 +9,14 @@
     type Organisation,
     type OrganisationStore,
   } from '@/stores/OrganisationStore';
+  import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
   import type { UserinfoPersonenkontext } from '@/stores/PersonenkontextStore';
   import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
   import { type TranslatedObject } from '@/types.d';
   import { onBeforeRouteLeave, useRouter, type Router } from 'vue-router';
+  import KlasseDelete from '@/components/admin/klassen/KlasseDelete.vue';
+  import SpshAlert from '@/components/alert/SpshAlert.vue';
 
   const authStore: AuthStore = useAuthStore();
   const organisationStore: OrganisationStore = useOrganisationStore();
@@ -70,6 +74,22 @@
         title: `${org.kennung} (${org.name.trim()})`,
       }))
       .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
+  });
+  const errorTitle: ComputedRef<string> = computed(() => {
+    if (!organisationStore.errorCode) {
+      return '';
+    }
+    return organisationStore.errorCode === 'UNSPECIFIED_ERROR'
+      ? t('admin.klasse.loadingErrorTitle')
+      : t(`admin.klasse.title.${organisationStore.errorCode}`);
+  });
+  const errorText: ComputedRef<string> = computed(() => {
+    if (!organisationStore.errorCode) {
+      return '';
+    }
+    return organisationStore.errorCode === 'UNSPECIFIED_ERROR'
+      ? t('admin.klasse.loadingErrorText')
+      : t(`admin.klasse.errors.${organisationStore.errorCode}`);
   });
 
   async function fetchKlassenBySelectedSchuleId(schuleId: string | null): Promise<void> {
@@ -475,18 +495,10 @@
       <!-- Error Message Display -->
       <SpshAlert
         :model-value="!!organisationStore.errorCode"
-        :title="
-          organisationStore.errorCode === 'UNSPECIFIED_ERROR'
-            ? $t('admin.klasse.loadingErrorTitle')
-            : $t(`admin.klasse.title.${organisationStore.errorCode}`)
-        "
+        :title="errorTitle"
         :type="'error'"
         :closable="false"
-        :text="
-          organisationStore.errorCode === 'UNSPECIFIED_ERROR'
-            ? $t('admin.klasse.loadingErrorText')
-            : $t(`admin.klasse.errors.${organisationStore.errorCode}`)
-        "
+        :text="errorText"
         :showButton="true"
         :buttonText="$t('nav.backToList')"
         :buttonAction="handleAlertClose"

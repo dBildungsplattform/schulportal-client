@@ -136,7 +136,7 @@
     :items-length="totalItems"
     :items-per-page="itemsPerPage"
     :items-per-page-options="[30, 50, 100, 300]"
-    :items-per-page-text="$t('itemsPerPage')"
+    :items-per-page-text="'itemsPerPage'"
     :item-value="itemValuePath"
     :page="currentPage"
     ref="v-data-table-server"
@@ -147,7 +147,7 @@
     @update:options="onUpdateOptions"
     @update:page="(page: number) => $emit('onPageUpdate', page)"
     @update:itemsPerPage="(limit: number) => $emit('onItemsPerPageUpdate', limit)"
-    :no-data-text="$t('noDataFound')"
+    :no-data-text="'noDataFound'"
   >
     <template
       v-for="(_, name) in $slots as unknown as Readonly<Slots>"
