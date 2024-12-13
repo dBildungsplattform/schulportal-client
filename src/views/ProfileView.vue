@@ -738,7 +738,7 @@
                 class="pt-4 text-center text-body-1 text-medium-emphasis"
                 data-testid="schuladmins-info-text-with-icon"
                 style="white-space: normal"
-                v-if="schuleData.schulAdmins.length > 0"
+                v-if="schuleData.schulAdmins && schuleData.schulAdmins.length > 0"
               >
                 <v-icon
                   class="mr-2"
