@@ -129,12 +129,22 @@
         to="/admin/personen"
       ></v-list-item>
       <v-list-item
+        v-if="authStore.hasPersonenAnlegenPermission"
         class="menu-bar-sub-item caption"
         @click="closeMenuOnMobile"
         data-testid="person-creation-menu-item"
         prepend-icon="mdi-plus-circle-outline"
         :title="$t('admin.person.createNew')"
         to="/admin/personen/new"
+      ></v-list-item>
+      <v-list-item
+        v-if="authStore.hasImportPermission"
+        class="menu-bar-sub-item caption"
+        @click="handleMenuItemClick('/admin/personen/import')"
+        data-testid="person-import-menu-item"
+        prepend-icon="mdi-file-upload-outline"
+        :title="$t('admin.person.import')"
+        to="/admin/personen/import"
       ></v-list-item>
     </div>
 

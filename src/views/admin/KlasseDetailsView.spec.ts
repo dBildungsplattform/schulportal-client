@@ -148,4 +148,24 @@ describe('KlassenDetailsView', () => {
 
     expect(push).toHaveBeenCalledTimes(1);
   });
+
+  test('displays error message correctly', async () => {
+    // Test case 1: UNSPECIFIED ERROR
+    organisationStore.errorCode = 'UNSPECIFIED_ERROR';
+    await nextTick();
+
+    const spshAlertWrapper: VueWrapper | undefined = wrapper?.findComponent({ name: 'SpshAlert' });
+    expect(spshAlertWrapper?.props()).toMatchObject({
+      title: 'Fehler beim Laden der Klassen',
+    });
+    // Test case 2: NEWER_VERSION_ORGANISATION
+    organisationStore.errorCode = 'NEWER_VERSION_ORGANISATION';
+    await nextTick();
+
+    expect(spshAlertWrapper?.props()).toMatchObject({
+      title: 'Geänderte Daten',
+    });
+    // reset errorCode after test
+    organisationStore.errorCode = '';
+  });
 });

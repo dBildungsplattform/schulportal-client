@@ -109,8 +109,8 @@
       await organisationStore.createOrganisation(
         selectedDienststellennummer.value,
         selectedSchulname.value,
-        ' ',
-        ' ',
+        undefined,
+        undefined,
         OrganisationsTyp.Schule,
         undefined,
         selectedSchulform.value,
@@ -134,16 +134,29 @@
 
   function handleConfirmUnsavedChanges(): void {
     blockedNext();
+    organisationStore.errorCode = '';
   }
 
   async function navigateToSchuleManagement(): Promise<void> {
-    await router.push({ name: 'schule-management' });
+    if (organisationStore.errorCode === 'REQUIRED_STEP_UP_LEVEL_NOT_MET') {
+      resetForm();
+    }
     organisationStore.createdSchule = null;
+    await router.push({ name: 'schule-management' }).then(() => {
+      router.go(0);
+    });
   }
 
   async function navigateBackToSchuleForm(): Promise<void> {
-    await router.push({ name: 'create-schule' });
-    organisationStore.errorCode = '';
+    if (organisationStore.errorCode === 'REQUIRED_STEP_UP_LEVEL_NOT_MET') {
+      resetForm();
+      await router.push({ name: 'create-schule' }).then(() => {
+        router.go(0);
+      });
+    } else {
+      organisationStore.errorCode = '';
+      await router.push({ name: 'create-schule' });
+    }
   }
 
   function preventNavigation(event: BeforeUnloadEvent): void {
@@ -155,6 +168,7 @@
 
   onMounted(async () => {
     organisationStore.createdSchule = null;
+    organisationStore.errorCode = '';
     await organisationStore.getSchultraeger();
 
     if (schultraegerList.value && schultraegerList.value.length > 0) {
@@ -173,116 +187,127 @@
 
 <template>
   <div class="admin">
+    <h1
+      class="text-center headline"
+      data-testid="admin-headline"
+    >
+      {{ $t('admin.headline') }}
+    </h1>
     <LayoutCard
-      :closable="true"
+      :closable="!organisationStore.errorCode"
       @onCloseClicked="navigateToSchuleManagement"
       :header="$t('admin.schule.addNew')"
       :padded="true"
       :showCloseText="true"
     >
-      <!-- Error Message Display if error on submit -->
-      <SpshAlert
-        :model-value="!!organisationStore.errorCode"
-        :title="$t('admin.schule.schuleCreateErrorTitle')"
-        :type="'error'"
-        :closable="false"
-        :text="organisationStore.errorCode ? $t(`admin.schule.errors.${organisationStore.errorCode}`) : ''"
-        :showButton="true"
-        :buttonText="$t('admin.schule.backToCreateSchule')"
-        :buttonAction="navigateBackToSchuleForm"
-        buttonClass="primary"
-      />
       <!-- The form to create a new school (No created school yet and no errorCode) -->
-      <template v-if="!organisationStore.createdSchule && !organisationStore.errorCode">
+      <template v-if="!organisationStore.createdSchule">
         <FormWrapper
           :confirmUnsavedChangesAction="handleConfirmUnsavedChanges"
           :createButtonLabel="$t('admin.schule.create')"
           :discardButtonLabel="$t('admin.schule.discard')"
+          :hideActions="!!organisationStore.errorCode"
           id="schule-creation-form"
+          :isLoading="organisationStore.loading"
           :onDiscard="navigateToSchuleManagement"
           @onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
           :onSubmit="onSubmit"
           :showUnsavedChangesDialog="showUnsavedChangesDialog"
         >
-          <!-- Select school type. For now not bound to anything and just a UI element -->
-          <v-row>
-            <v-col>
-              <h3 class="headline-3">1. {{ $t('admin.schule.assignSchulform') }}</h3>
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col
-              cols="4"
-              class="d-none d-md-flex"
-            ></v-col>
-            <v-radio-group
-              inline
-              v-model="selectedSchulform"
-              data-testid="schulform-radio-group"
-            >
-              <v-col
-                v-for="(schultraeger, index) in schultraegerList"
-                :key="schultraeger.id"
-                offset-md="1"
-                cols="12"
-                sm="5"
-                class="pb-0"
-              >
-                <v-radio
-                  :label="schultraeger.name"
-                  :value="schultraeger.id"
-                  :data-testid="'schulform-radio-button-' + index"
-                ></v-radio>
+          <!-- Error Message Display if error on submit -->
+          <SpshAlert
+            :model-value="!!organisationStore.errorCode"
+            :title="$t('admin.schule.schuleCreateErrorTitle')"
+            :type="'error'"
+            :closable="false"
+            :text="organisationStore.errorCode ? $t(`admin.schule.errors.${organisationStore.errorCode}`) : ''"
+            :showButton="true"
+            :buttonText="$t('admin.schule.backToCreateSchule')"
+            :buttonAction="navigateBackToSchuleForm"
+            buttonClass="primary"
+          />
+
+          <template v-if="!organisationStore.errorCode">
+            <!-- Select school type. For now not bound to anything and just a UI element -->
+            <v-row>
+              <v-col>
+                <h3 class="headline-3">1. {{ $t('admin.schule.assignSchulform') }}</h3>
               </v-col>
-            </v-radio-group>
-          </v-row>
-          <!-- Enter service number -->
-          <v-row>
-            <v-col>
-              <h3 class="headline-3">2. {{ $t('admin.schule.enterDienststellennummer') }}</h3>
-            </v-col>
-          </v-row>
-          <FormRow
-            :errorLabel="selectedDienststellennummerProps['error']"
-            labelForId="dienststellennummer-input"
-            :isRequired="true"
-            :label="$t('admin.schule.dienststellennummer')"
-          >
-            <v-text-field
-              clearable
-              data-testid="dienststellennummer-input"
-              v-bind="selectedDienststellennummerProps"
-              v-model="selectedDienststellennummer"
-              :placeholder="$t('admin.schule.dienststellennummer')"
-              ref="dienststellennummer-input"
-              variant="outlined"
-              density="compact"
-            ></v-text-field>
-          </FormRow>
-          <!-- select school name -->
-          <v-row>
-            <v-col>
-              <h3 class="headline-3">3. {{ $t('admin.schule.enterSchulname') }}</h3>
-            </v-col>
-          </v-row>
-          <FormRow
-            :errorLabel="selectedSchulnameProps['error']"
-            labelForId="schulname-input"
-            :isRequired="true"
-            :label="$t('admin.schule.schulname')"
-          >
-            <v-text-field
-              clearable
-              data-testid="schulname-input"
-              v-bind="selectedSchulnameProps"
-              v-model="selectedSchulname"
-              :placeholder="$t('admin.schule.schulname')"
-              ref="schulname-input"
-              variant="outlined"
-              density="compact"
-              required
-            ></v-text-field>
-          </FormRow>
+            </v-row>
+            <v-row>
+              <v-col
+                cols="4"
+                class="d-none d-md-flex"
+              ></v-col>
+              <v-radio-group
+                inline
+                v-model="selectedSchulform"
+                data-testid="schulform-radio-group"
+              >
+                <v-col
+                  v-for="(schultraeger, index) in schultraegerList"
+                  :key="schultraeger.id"
+                  offset-md="1"
+                  cols="12"
+                  sm="5"
+                  class="pb-0"
+                >
+                  <v-radio
+                    :label="schultraeger.name"
+                    :value="schultraeger.id"
+                    :data-testid="'schulform-radio-button-' + index"
+                  ></v-radio>
+                </v-col>
+              </v-radio-group>
+            </v-row>
+            <!-- Enter service number -->
+            <v-row>
+              <v-col>
+                <h3 class="headline-3">2. {{ $t('admin.schule.enterDienststellennummer') }}</h3>
+              </v-col>
+            </v-row>
+            <FormRow
+              :errorLabel="selectedDienststellennummerProps['error']"
+              labelForId="dienststellennummer-input"
+              :isRequired="true"
+              :label="$t('admin.schule.dienststellennummer')"
+            >
+              <v-text-field
+                clearable
+                data-testid="dienststellennummer-input"
+                v-bind="selectedDienststellennummerProps"
+                v-model="selectedDienststellennummer"
+                :placeholder="$t('admin.schule.dienststellennummer')"
+                ref="dienststellennummer-input"
+                variant="outlined"
+                density="compact"
+              ></v-text-field>
+            </FormRow>
+            <!-- select school name -->
+            <v-row>
+              <v-col>
+                <h3 class="headline-3">3. {{ $t('admin.schule.enterSchulname') }}</h3>
+              </v-col>
+            </v-row>
+            <FormRow
+              :errorLabel="selectedSchulnameProps['error']"
+              labelForId="schulname-input"
+              :isRequired="true"
+              :label="$t('admin.schule.schulname')"
+            >
+              <v-text-field
+                clearable
+                data-testid="schulname-input"
+                v-bind="selectedSchulnameProps"
+                v-model="selectedSchulname"
+                :placeholder="$t('admin.schule.schulname')"
+                ref="schulname-input"
+                variant="outlined"
+                density="compact"
+                required
+              ></v-text-field>
+            </FormRow>
+          </template>
         </FormWrapper>
       </template>
       <!-- Result template on success after submit (Present value in createdSchule and no errorCode)  -->

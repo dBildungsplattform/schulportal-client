@@ -7,41 +7,51 @@
   } from '@/stores/ServiceProviderStore';
   import { computed, onMounted, type ComputedRef } from 'vue';
   import ServiceProviderCategory from '@/components/layout/ServiceProviderCategory.vue';
+  import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
+  import {
+    useTwoFactorAuthentificationStore,
+    type TwoFactorAuthentificationStore,
+  } from '@/stores/TwoFactorAuthentificationStore';
 
   const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
+  const twoFactorAuthentificationStore: TwoFactorAuthentificationStore = useTwoFactorAuthentificationStore();
+  const authStore: AuthStore = useAuthStore();
+
+  function filterSortProviders(providers: ServiceProvider[], kategorie: ServiceProviderKategorie): ServiceProvider[] {
+    return providers
+      .filter((provider: ServiceProvider) => provider.kategorie === kategorie)
+      .sort((a: ServiceProvider, b: ServiceProvider) => a.name.localeCompare(b.name));
+  }
 
   // Filter service providers by category "EMAIL"
-  const emailServiceProviders: ComputedRef<ServiceProvider[]> = computed(() => {
-    return serviceProviderStore.availableServiceProviders.filter(
-      (provider: ServiceProvider) => provider.kategorie === ServiceProviderKategorie.Email,
-    );
-  });
+  const emailServiceProviders: ComputedRef<ServiceProvider[]> = computed(() =>
+    filterSortProviders(serviceProviderStore.availableServiceProviders, ServiceProviderKategorie.Email),
+  );
   // Filter service providers by category "UNTERRICHT"
-  const classServiceProviders: ComputedRef<ServiceProvider[]> = computed(() => {
-    return serviceProviderStore.availableServiceProviders.filter(
-      (provider: ServiceProvider) => provider.kategorie === ServiceProviderKategorie.Unterricht,
-    );
-  });
+  const classServiceProviders: ComputedRef<ServiceProvider[]> = computed(() =>
+    filterSortProviders(serviceProviderStore.availableServiceProviders, ServiceProviderKategorie.Unterricht),
+  );
   // Filter service providers by category "VERWALTUNG"
-  const administrationServiceProviders: ComputedRef<ServiceProvider[]> = computed(() => {
-    return serviceProviderStore.availableServiceProviders.filter(
-      (provider: ServiceProvider) => provider.kategorie === ServiceProviderKategorie.Verwaltung,
-    );
-  });
+  const administrationServiceProviders: ComputedRef<ServiceProvider[]> = computed(() =>
+    filterSortProviders(serviceProviderStore.availableServiceProviders, ServiceProviderKategorie.Verwaltung),
+  );
   // Filter service providers by category "HINWEISE"
-  const hintsServiceProviders: ComputedRef<ServiceProvider[]> = computed(() => {
-    return serviceProviderStore.availableServiceProviders.filter(
-      (provider: ServiceProvider) => provider.kategorie === ServiceProviderKategorie.Hinweise,
-    );
-  });
+  const hintsServiceProviders: ComputedRef<ServiceProvider[]> = computed(() =>
+    filterSortProviders(serviceProviderStore.availableServiceProviders, ServiceProviderKategorie.Hinweise),
+  );
   // Filter service providers by category "ANGEBOTE"
-  const schoolOfferingsServiceProviders: ComputedRef<ServiceProvider[]> = computed(() => {
-    return serviceProviderStore.availableServiceProviders.filter(
-      (provider: ServiceProvider) => provider.kategorie === ServiceProviderKategorie.Angebote,
-    );
-  });
+  const schoolOfferingsServiceProviders: ComputedRef<ServiceProvider[]> = computed(() =>
+    filterSortProviders(serviceProviderStore.availableServiceProviders, ServiceProviderKategorie.Angebote),
+  );
+
+  function getHasToken(): boolean {
+    return twoFactorAuthentificationStore.hasToken ?? false;
+  }
 
   onMounted(async () => {
+    await authStore.initializeAuthStatus();
+    const personId: string | null | undefined = authStore.currentUser?.personId;
+    if (personId) await twoFactorAuthentificationStore.get2FAState(personId);
     await serviceProviderStore.getAvailableServiceProviders();
     for (const provider of serviceProviderStore.availableServiceProviders) {
       if (provider.hasLogo) {
@@ -102,26 +112,31 @@
       <ServiceProviderCategory
         :categoryTitle="$t('start.categories.workEmail')"
         :serviceProviders="emailServiceProviders"
+        :hasToken="getHasToken()"
       ></ServiceProviderCategory>
       <!-- Categorie 2: Class -->
       <ServiceProviderCategory
         :categoryTitle="$t('start.categories.class')"
         :serviceProviders="classServiceProviders"
+        :hasToken="getHasToken()"
       ></ServiceProviderCategory>
       <!-- Categorie 3: Administration -->
       <ServiceProviderCategory
         :categoryTitle="$t('start.categories.administration')"
         :serviceProviders="administrationServiceProviders"
+        :hasToken="getHasToken()"
       ></ServiceProviderCategory>
       <!-- Categorie 4: Hints -->
       <ServiceProviderCategory
         :categoryTitle="$t('start.categories.hints')"
         :serviceProviders="hintsServiceProviders"
+        :hasToken="getHasToken()"
       ></ServiceProviderCategory>
       <!-- Categorie 5: School Offerings -->
       <ServiceProviderCategory
         :categoryTitle="$t('start.categories.schoolOfferings')"
         :serviceProviders="schoolOfferingsServiceProviders"
+        :hasToken="getHasToken()"
       ></ServiceProviderCategory>
     </template>
   </v-card>

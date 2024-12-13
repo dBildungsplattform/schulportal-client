@@ -105,25 +105,40 @@
   };
 
   async function navigateBackToKlasseForm(): Promise<void> {
-    organisationStore.errorCode = '';
-    await router.push({ name: 'create-klasse' });
+    if (organisationStore.errorCode === 'REQUIRED_STEP_UP_LEVEL_NOT_MET') {
+      resetForm();
+      await router.push({ name: 'create-klasse' }).then(() => {
+        router.go(0);
+      });
+    } else {
+      organisationStore.errorCode = '';
+      await router.push({ name: 'create-klasse' });
+    }
   }
 
   async function navigateToKlasseManagement(): Promise<void> {
-    await router.push({ name: 'klasse-management' });
-    organisationStore.createdKlasse = null;
+    if (organisationStore.errorCode === 'REQUIRED_STEP_UP_LEVEL_NOT_MET') {
+      resetForm();
+      await router.push({ name: 'create-klasse' }).then(() => {
+        router.go(0);
+      });
+    } else {
+      organisationStore.errorCode = '';
+      await router.push({ name: 'klasse-management' });
+    }
   }
 
   function handleConfirmUnsavedChanges(): void {
     blockedNext();
+    organisationStore.errorCode = '';
   }
 
   const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = handleSubmit(async () => {
     await organisationStore.createOrganisation(
-      '',
+      undefined,
       selectedKlassenname.value,
-      '',
-      '',
+      undefined,
+      undefined,
       OrganisationsTyp.Klasse,
       undefined,
       selectedSchule.value,
@@ -148,30 +163,26 @@
 
 <template>
   <div class="admin">
+    <h1
+      class="text-center headline"
+      data-testid="admin-headline"
+    >
+      {{ $t('admin.headline') }}
+    </h1>
     <LayoutCard
-      :closable="true"
+      :closable="!organisationStore.errorCode"
       @onCloseClicked="navigateToKlasseManagement"
       :header="$t('admin.klasse.addNew')"
       :padded="true"
       :showCloseText="true"
     >
-      <!-- Error Message Display if error on submit -->
-      <SpshAlert
-        :model-value="!!organisationStore.errorCode"
-        :title="$t('admin.klasse.klasseCreateErrorTitle')"
-        :type="'error'"
-        :closable="false"
-        :text="organisationStore.errorCode ? $t(`admin.klasse.errors.${organisationStore.errorCode}`) : ''"
-        :showButton="true"
-        :buttonText="$t('admin.klasse.backToCreateKlasse')"
-        :buttonAction="navigateBackToKlasseForm"
-      />
-
       <!-- The form to create a new Klasse -->
-      <template v-if="!organisationStore.createdKlasse && !organisationStore.errorCode">
+      <template v-if="!organisationStore.createdKlasse">
         <KlasseForm
+          :errorCode="organisationStore.errorCode"
           :schulen="schulen"
           :isEditActive="true"
+          :isLoading="organisationStore.loading"
           :readonly="false"
           :selectedSchuleProps="selectedSchuleProps"
           :selectedKlassennameProps="selectedKlassennameProps"
@@ -183,7 +194,19 @@
           ref="klasse-creation-form"
           v-model:selectedSchule="selectedSchule"
           v-model:selectedKlassenname="selectedKlassenname"
-        />
+        >
+          <!-- Error Message Display if error on submit -->
+          <SpshAlert
+            :model-value="!!organisationStore.errorCode"
+            :title="$t('admin.klasse.klasseCreateErrorTitle')"
+            :type="'error'"
+            :closable="false"
+            :text="organisationStore.errorCode ? $t(`admin.klasse.errors.${organisationStore.errorCode}`) : ''"
+            :showButton="true"
+            :buttonText="$t('admin.klasse.backToCreateKlasse')"
+            :buttonAction="navigateBackToKlasseForm"
+          />
+        </KlasseForm>
       </template>
 
       <!-- Result template on success after submit -->

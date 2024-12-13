@@ -26,6 +26,8 @@ export type Organisation = {
   typ: OrganisationsTyp;
   administriertVon?: string | null;
   schuleDetails?: string;
+  version?: number;
+  itslearningEnabled?: boolean;
 };
 
 export type KlasseTableItem = {
@@ -74,6 +76,7 @@ type OrganisationState = {
   loadingKlassen: boolean;
   parentOrganisationen: Array<Organisation>;
   schultraeger: Array<Organisation>;
+  activatedItslearningOrganisation: Organisation | null;
 };
 
 export type OrganisationenFilter = {
@@ -91,15 +94,15 @@ type OrganisationGetters = {};
 type OrganisationActions = {
   getAllOrganisationen: (filter?: OrganisationenFilter) => Promise<void>;
   getFilteredKlassen(filter?: OrganisationenFilter): Promise<void>;
-  getKlassenByOrganisationId: (organisationId: string, filter?: OrganisationenFilter) => Promise<void>;
+  getKlassenByOrganisationId: (filter?: OrganisationenFilter) => Promise<void>;
   getOrganisationById: (organisationId: string, organisationsTyp: OrganisationsTyp) => Promise<Organisation>;
   getLockingOrganisationById: (organisationId: string) => Promise<void>;
   getParentOrganisationsByIds: (organisationIds: string[]) => Promise<void>;
   createOrganisation: (
-    kennung: string,
+    kennung: string | undefined,
     name: string,
-    namensergaenzung: string,
-    kuerzel: string,
+    namensergaenzung: string | undefined,
+    kuerzel: string | undefined,
     typ: OrganisationsTyp,
     traegerschaft?: TraegerschaftTyp,
     administriertVon?: string,
@@ -109,6 +112,7 @@ type OrganisationActions = {
   updateOrganisationById: (organisationId: string, name: string) => Promise<void>;
   getSchultraeger: () => Promise<void>;
   fetchSchuleDetailsForKlassen: (filterActive: boolean) => Promise<void>;
+  setItsLearningForSchule: (organisationId: string) => Promise<void>;
 };
 
 export { OrganisationsTyp };
@@ -144,6 +148,7 @@ export const useOrganisationStore: StoreDefinition<
       loadingKlassen: false,
       parentOrganisationen: [],
       schultraeger: [],
+      activatedItslearningOrganisation: null,
     };
   },
 
@@ -211,7 +216,7 @@ export const useOrganisationStore: StoreDefinition<
         undefined,
         undefined,
         OrganisationsTyp.Schule,
-        ['SCHULEN_VERWALTEN'],
+        ['KLASSEN_VERWALTEN'],
         undefined,
         undefined,
         Array.from(administriertVonSet),
@@ -245,6 +250,7 @@ export const useOrganisationStore: StoreDefinition<
           filter?.systemrechte,
           filter?.excludeTyp,
           filter?.administriertVon,
+          filter?.organisationIds,
         );
         this.klassen = response.data;
         this.totalKlassen = +response.headers['x-paging-total'];
@@ -327,21 +333,24 @@ export const useOrganisationStore: StoreDefinition<
       }
     },
 
-    async getKlassenByOrganisationId(organisationId: string, filter?: OrganisationenFilter) {
+    async getKlassenByOrganisationId(filter?: OrganisationenFilter) {
       this.errorCode = '';
       this.loadingKlassen = true;
       try {
-        const response: AxiosResponse<Organisation[]> =
-          await organisationApi.organisationControllerGetAdministrierteOrganisationen(
-            organisationId,
-            filter?.offset,
-            filter?.limit,
-            filter?.searchString,
-          );
-        const getFilteredKlassen: Organisation[] = response.data.filter(
-          (orga: Organisation) => orga.typ === OrganisationsTyp.Klasse,
+        const response: AxiosResponse<Organisation[]> = await organisationApi.organisationControllerFindOrganizations(
+          filter?.offset,
+          filter?.limit,
+          undefined,
+          undefined,
+          filter?.searchString,
+          OrganisationsTyp.Klasse,
+          [],
+          undefined,
+          filter?.administriertVon,
+          filter?.organisationIds,
         );
-        this.klassen = getFilteredKlassen;
+
+        this.klassen = response.data;
         this.totalKlassen = +response.headers['x-paging-total'];
         this.totalPaginatedKlassen = +response.headers['x-paging-pageTotal'];
         await this.fetchSchuleDetailsForKlassen(true);
@@ -357,10 +366,10 @@ export const useOrganisationStore: StoreDefinition<
     },
 
     async createOrganisation(
-      kennung: string,
+      kennung: string | undefined,
       name: string,
-      namensergaenzung: string,
-      kuerzel: string,
+      namensergaenzung: string | undefined,
+      kuerzel: string | undefined,
       typ: OrganisationsTyp,
       traegerschaft?: TraegerschaftTyp,
       administriertVon?: string,
@@ -401,8 +410,12 @@ export const useOrganisationStore: StoreDefinition<
       this.errorCode = '';
       this.loading = true;
       try {
+        if (!this.currentKlasse?.version) {
+          throw new Error('Organisation version not found');
+        }
         const organisationByNameBodyParams: OrganisationByNameBodyParams = {
           name: name,
+          version: this.currentKlasse.version,
         };
         const { data }: { data: Organisation } = await organisationApi.organisationControllerUpdateOrganisationName(
           organisationId,
@@ -443,6 +456,23 @@ export const useOrganisationStore: StoreDefinition<
         if (isAxiosError(error)) {
           this.errorCode = error.response?.data.i18nKey || 'SCHULTRAEGER_ERROR';
         }
+      }
+    },
+
+    async setItsLearningForSchule(organisationId: string): Promise<void> {
+      this.errorCode = '';
+      this.loading = true;
+      try {
+        const { data }: { data: Organisation } =
+          await organisationApi.organisationControllerEnableForitslearning(organisationId);
+        this.activatedItslearningOrganisation = data;
+      } catch (error: unknown) {
+        this.errorCode = 'UNSPECIFIED_ERROR';
+        if (isAxiosError(error)) {
+          this.errorCode = error.response?.data.i18nKey || 'ORGANISATION_SPECIFICATION_ERROR';
+        }
+      } finally {
+        this.loading = false;
       }
     },
   },

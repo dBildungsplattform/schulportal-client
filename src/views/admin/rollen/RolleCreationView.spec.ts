@@ -94,6 +94,8 @@ describe('RolleCreationView', () => {
     wrapper?.find('[data-testid="alert-button"]').trigger('click');
     await nextTick();
     expect(push).toHaveBeenCalledTimes(1);
+    // reset errorCode after test
+    rolleStore.errorCode = '';
   });
 
   test('it closes the view and navigates back to rolle table', async () => {
@@ -151,14 +153,14 @@ describe('RolleCreationView', () => {
     expect(
       wrapper
         ?.findComponent({ ref: 'rolle-creation-form' })
-        .find('[data-testid="rolle-form-create-button"]')
+        .find('[data-testid="rolle-form-submit-button"]')
         .isVisible(),
     ).toBe(true);
 
     wrapper
       ?.findComponent({ ref: 'rolle-creation-form' })
       .findComponent({ ref: 'form-wrapper' })
-      .find('[data-testid="rolle-form-create-button"]')
+      .find('[data-testid="rolle-form-submit-button"]')
       .trigger('click');
     await nextTick();
 
@@ -259,5 +261,13 @@ describe('RolleCreationView', () => {
     await nextTick();
 
     expect(rolleStore.createdRolle).toBe(null);
+  });
+
+  test('shows error message if REQUIRED_STEP_UP_LEVEL_NOT_MET error is present and click close button', async () => {
+    rolleStore.errorCode = 'REQUIRED_STEP_UP_LEVEL_NOT_MET';
+    await nextTick();
+    expect(wrapper?.find('[data-testid="alert-title"]').isVisible()).toBe(true);
+    wrapper?.find('[data-testid="alert-button"]').trigger('click');
+    await nextTick();
   });
 });

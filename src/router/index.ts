@@ -5,6 +5,14 @@ import {
   type TwoFactorAuthentificationStore,
 } from '@/stores/TwoFactorAuthentificationStore';
 import routes from './routes';
+type Permission =
+  | 'klassenverwaltung'
+  | 'personenanlegen'
+  | 'personenimport'
+  | 'personenverwaltung'
+  | 'rollenverwaltung'
+  | 'schulverwaltung';
+
 const router: Router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
@@ -21,10 +29,26 @@ const router: Router = createRouter({
   },
 });
 
+function handleGoToPreviousPage(): void {
+  const previousUrl: string | null = sessionStorage.getItem('previousUrl');
+  router.push(previousUrl ?? '/start');
+}
+
 router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormalized) => {
   const authStore: AuthStore = useAuthStore();
   await authStore.initializeAuthStatus();
   if (to.path != '/profile' && to.path != '/no-second-factor') sessionStorage.setItem('previousUrl', to.path);
+
+  if (to.path === '/no-second-factor') {
+    const personId: string | null | undefined = authStore.currentUser?.personId;
+    if (!personId) return false;
+    const twoFactorAuthentificationStore: TwoFactorAuthentificationStore = useTwoFactorAuthentificationStore();
+    await twoFactorAuthentificationStore.get2FAState(personId);
+    if (twoFactorAuthentificationStore.hasToken) {
+      handleGoToPreviousPage();
+      return false;
+    }
+  }
 
   // Redirect authenticated users trying to access the login page to the start page
   if (to.path === '/' && authStore.isAuthed) {
@@ -47,34 +71,38 @@ router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormal
     }
 
     window.location.href = `/api/auth/login?redirectUrl=${to.fullPath}&requiredStepUpLevel=${StepUpLevel.GOLD}`;
+    return false;
   }
 
   if (to.meta['requiresPermission']) {
-    /* check if the user has person management permissions */
-    switch (to.meta['requiresPermission']) {
-      case 'personenverwaltung':
-        if (authStore.hasPersonenverwaltungPermission) {
-          return true;
-        }
-        return { path: 'not-found' };
-      case 'klassenverwaltung':
-        if (authStore.hasKlassenverwaltungPermission) {
-          return true;
-        }
-        return { path: 'not-found' };
-      case 'rollenverwaltung':
-        if (authStore.hasRollenverwaltungPermission) {
-          return true;
-        }
-        return { path: 'not-found' };
-      case 'schulverwaltung':
-        if (authStore.hasSchulverwaltungPermission) {
-          return true;
-        }
-        return { path: 'not-found' };
-      default:
-        return { path: 'not-found' };
+    const requiredPermissions: Permission[] = Array.isArray(to.meta['requiresPermission'])
+      ? to.meta['requiresPermission']
+      : [to.meta['requiresPermission']];
+
+    // Check if user has ALL required permissions
+    const hasAllPermissions: boolean = requiredPermissions.every((permission: Permission) => {
+      switch (permission) {
+        case 'personenverwaltung':
+          return authStore.hasPersonenverwaltungPermission;
+        case 'personenanlegen':
+          return authStore.hasPersonenAnlegenPermission;
+        case 'personenimport':
+          return authStore.hasImportPermission;
+        case 'klassenverwaltung':
+          return authStore.hasKlassenverwaltungPermission;
+        case 'rollenverwaltung':
+          return authStore.hasRollenverwaltungPermission;
+        case 'schulverwaltung':
+          return authStore.hasSchulverwaltungPermission;
+        default:
+          return false;
+      }
+    });
+
+    if (hasAllPermissions) {
+      return true;
     }
+    return { path: 'not-found' };
   }
 
   return true;

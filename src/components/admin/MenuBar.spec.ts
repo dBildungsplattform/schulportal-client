@@ -44,10 +44,12 @@ authStore.currentUser = {
 };
 
 authStore.hasPersonenverwaltungPermission = true;
+authStore.hasImportPermission = true;
 authStore.hasKlassenverwaltungPermission = true;
 authStore.hasRollenverwaltungPermission = true;
 authStore.hasSchulverwaltungPermission = true;
 authStore.hasSchultraegerverwaltungPermission = true;
+authStore.hasPersonenAnlegenPermission = true;
 
 beforeEach(async () => {
   document.body.innerHTML = `
@@ -90,6 +92,7 @@ describe('MenuBar', () => {
     expect(wrapper?.find('[data-testid="person-management-title"]').isVisible()).toBe(true);
     expect(wrapper?.find('[data-testid="person-management-menu-item"]').isVisible()).toBe(true);
     expect(wrapper?.find('[data-testid="person-creation-menu-item"]').isVisible()).toBe(true);
+    expect(wrapper?.find('[data-testid="person-import-menu-item"]').isVisible()).toBe(true);
 
     expect(wrapper?.find('[data-testid="klasse-management-title"]').isVisible()).toBe(true);
     expect(wrapper?.find('[data-testid="klassen-management-menu-item"]').isVisible()).toBe(true);
@@ -106,13 +109,33 @@ describe('MenuBar', () => {
     expect(wrapper?.find('[data-testid="schultraeger-management-title"]').isVisible()).toBe(true);
   });
 
+  test('hides elements when permissions are false', async () => {
+    // Reset permissions to false
+    authStore.hasPersonenAnlegenPermission = false;
+    await nextTick();
+
+    expect(wrapper?.find('[data-testid="person-creation-menu-item"]').exists()).toBe(false);
+  });
+
   test('it handles menu item click', async () => {
     const push: MockInstance = vi.spyOn(router, 'push');
 
     await wrapper?.find('[data-testid="person-management-menu-item"]').trigger('click');
     await nextTick();
 
-    expect(push).toHaveBeenCalledTimes(1);
+    await wrapper?.find('[data-testid="person-import-menu-item"]').trigger('click');
+    await nextTick();
+
+    await wrapper?.find('[data-testid="klassen-management-menu-item"]').trigger('click');
+    await nextTick();
+
+    await wrapper?.find('[data-testid="rolle-management-menu-item"]').trigger('click');
+    await nextTick();
+
+    await wrapper?.find('[data-testid="schule-management-menu-item"]').trigger('click');
+    await nextTick();
+
+    expect(push).toHaveBeenCalledTimes(5);
   });
 
   // TODO: can we rely on vuetify's mobile breakpoint in tests?

@@ -204,7 +204,7 @@ describe('PersonCreationView', () => {
 
     personenkontextStore.createdPersonWithKontext = mockCreatedPersonWithKontext;
 
-    wrapper?.find('[data-testid="person-creation-form-create-button"]').trigger('click');
+    wrapper?.find('[data-testid="person-creation-form-submit-button"]').trigger('click');
     await nextTick();
 
     expect(wrapper?.find('[data-testid="create-another-person-button"]').isVisible()).toBe(true);
@@ -220,5 +220,13 @@ describe('PersonCreationView', () => {
     await nextTick();
 
     expect(wrapper?.find('[data-testid="person-success-text"]').isVisible()).toBe(true);
+  });
+
+  test('shows error message if REQUIRED_STEP_UP_LEVEL_NOT_MET error is present and click close button', async () => {
+    personenkontextStore.errorCode = 'REQUIRED_STEP_UP_LEVEL_NOT_MET';
+    await nextTick();
+    expect(wrapper?.find('[data-testid="alert-title"]').isVisible()).toBe(true);
+    wrapper?.find('[data-testid="alert-button"]').trigger('click');
+    await nextTick();
   });
 });

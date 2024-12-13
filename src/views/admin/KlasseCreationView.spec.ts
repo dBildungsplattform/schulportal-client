@@ -107,7 +107,7 @@ describe('KlasseCreationView', () => {
 
     organisationStore.createdKlasse = mockKlasse;
 
-    wrapper?.find('[data-testid="klasse-form-create-button"]').trigger('click');
+    wrapper?.find('[data-testid="klasse-form-submit-button"]').trigger('click');
     await nextTick();
 
     expect(wrapper?.find('[data-testid="create-another-klasse-button"]').isVisible()).toBe(true);
@@ -259,5 +259,13 @@ describe('KlasseCreationView', () => {
     await nextTick();
 
     expect(organisationAutocomplete?.text()).toEqual('1133');
+  });
+
+  test('shows error message if REQUIRED_STEP_UP_LEVEL_NOT_MET error is present and click close button', async () => {
+    organisationStore.errorCode = 'REQUIRED_STEP_UP_LEVEL_NOT_MET';
+    await nextTick();
+    expect(wrapper?.find('[data-testid="alert-title"]').isVisible()).toBe(true);
+    wrapper?.find('[data-testid="alert-button"]').trigger('click');
+    await nextTick();
   });
 });

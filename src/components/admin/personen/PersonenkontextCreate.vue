@@ -3,18 +3,25 @@
   import { RollenArt } from '@/stores/RolleStore';
   import { useI18n } from 'vue-i18n';
   import FormRow from '@/components/form/FormRow.vue';
-  import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
-  import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
+  import { usePersonenkontextStore, type PersonenkontextStore, type Zuordnung } from '@/stores/PersonenkontextStore';
+  import {
+    OrganisationsTyp,
+    useOrganisationStore,
+    type Organisation,
+    type OrganisationStore,
+  } from '@/stores/OrganisationStore';
   import { type TranslatedObject } from '@/types.d';
   import type { BaseFieldProps } from 'vee-validate';
   import type { TranslatedRolleWithAttrs } from '@/composables/useRollen';
   import BefristungInput from '@/components/admin/personen/BefristungInput.vue';
   import type { BefristungProps } from '@/components/admin/personen/BefristungInput.vue';
+  import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
 
   useI18n({ useScope: 'global' });
 
   const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
   const organisationStore: OrganisationStore = useOrganisationStore();
+  const personStore: PersonStore = usePersonStore();
 
   const timerId: Ref<ReturnType<typeof setTimeout> | undefined> = ref<ReturnType<typeof setTimeout>>();
   const canCommit: Ref<boolean> = ref(false);
@@ -78,17 +85,47 @@
   }
 
   // Watcher for selectedOrganisation to fetch roles and classes
-  watch(selectedOrganisation, (newValue: string | undefined, oldValue: string | undefined) => {
+  watch(selectedOrganisation, async (newValue: string | undefined, oldValue: string | undefined) => {
     if (newValue && newValue !== oldValue) {
       // Fetch the roles after selecting the organization
-      personenkontextStore.processWorkflowStep({
+      await personenkontextStore.processWorkflowStep({
         organisationId: newValue,
         limit: 25,
       });
 
-      // Fetch all classes for the selected organization without any filter
-      organisationStore.getKlassenByOrganisationId(newValue);
+      // Fetch all Klassen for the selected organization
+      await organisationStore.getKlassenByOrganisationId({ limit: 25, administriertVon: [newValue] });
 
+      // Check that all the Klassen associated with the selectedOrga have the same Klasse for the same person.
+      const klassenZuordnungen: Zuordnung[] | undefined = personStore.personenuebersicht?.zuordnungen.filter(
+        (zuordnung: Zuordnung) => zuordnung.typ === OrganisationsTyp.Klasse && zuordnung.administriertVon === newValue,
+      );
+
+      if (klassenZuordnungen && klassenZuordnungen.length > 0) {
+        // Check if all Zuordnungen of type Klasse have the same SSKID.
+        // We only preselect when there's a clear, unambiguous single Klasse association for the selected Orga.
+        const sameSSK: boolean = klassenZuordnungen.every(
+          (zuordnung: Zuordnung) => zuordnung.sskId === klassenZuordnungen[0]?.sskId,
+        );
+
+        if (sameSSK) {
+          await organisationStore.getKlassenByOrganisationId({ administriertVon: [newValue] });
+          const klasse: Organisation | undefined = organisationStore.klassen.find(
+            (k: Organisation) => k.id === klassenZuordnungen[0]?.sskId,
+          );
+          // If the klasse was found then add it to the 25 Klassen in the dropdown and preselect it
+          if (klasse) {
+            selectedKlasse.value = klasse.id;
+            emits('update:selectedKlasse', newValue);
+            // Another request to limit the Klassen because beforehand we made the same request with no limit to check all possible Klassen
+            await organisationStore.getKlassenByOrganisationId({ limit: 25, administriertVon: [newValue] });
+            // Push the preselected Klasse to the array of klassen (dropdown) if its not there already (this is necessary if the Klasse isn't part of the initial 25)
+            if (!organisationStore.klassen.some((k: Organisation) => k.id === klasse.id)) {
+              organisationStore.klassen.push(klasse);
+            }
+          }
+        }
+      }
       // Reset the selectedRolle field only if oldValue was not undefined
       if (oldValue !== undefined) {
         selectedRolle.value = undefined;
@@ -201,17 +238,24 @@
     if (!organisationId) {
       return;
     }
-    // If searchValue is empty, fetch all roles for the organisationId
     if (searchValue === '' && !selectedKlasse.value) {
       timerId.value = setTimeout(() => {
-        organisationStore.getKlassenByOrganisationId(organisationId, { searchString: searchValue });
+        organisationStore.getKlassenByOrganisationId({
+          searchString: searchValue,
+          limit: 25,
+          administriertVon: [organisationId],
+        });
       }, 500);
     } else if (searchValue && searchValue !== selectedKlasseTitle.value) {
       /* cancel pending call */
       clearTimeout(timerId.value);
       /* delay new call 500ms */
       timerId.value = setTimeout(() => {
-        organisationStore.getKlassenByOrganisationId(organisationId, { searchString: searchValue });
+        organisationStore.getKlassenByOrganisationId({
+          searchString: searchValue,
+          limit: 25,
+          administriertVon: [organisationId],
+        });
       }, 500);
     }
   }

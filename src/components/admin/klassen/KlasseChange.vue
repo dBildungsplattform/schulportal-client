@@ -1,7 +1,11 @@
 <script setup lang="ts">
-  import { defineProps, type ModelRef } from 'vue';
+  import { computed, defineProps, ref, watch, type ComputedRef, type ModelRef, type Ref } from 'vue';
   import { type BaseFieldProps } from 'vee-validate';
   import FormRow from '@/components/form/FormRow.vue';
+  import { type OrganisationStore, useOrganisationStore } from '@/stores/OrganisationStore';
+  import type { TranslatedObject } from '@/types';
+
+  const organisationStore: OrganisationStore = useOrganisationStore();
 
   type Props = {
     schulen?: Array<{ value: string; title: string }>;
@@ -13,10 +17,54 @@
     onSubmit: () => void;
   };
 
-  defineProps<Props>();
+  const props: Props = defineProps<Props>();
 
-  const selectedSchule: ModelRef<unknown, string> = defineModel('selectedSchule');
-  const selectedNewKlasse: ModelRef<unknown, string> = defineModel('selectedNewKlasse');
+  const selectedSchule: ModelRef<string | undefined, string> = defineModel('selectedSchule');
+  const selectedNewKlasse: ModelRef<string | undefined, string> = defineModel('selectedNewKlasse');
+
+  const timerId: Ref<ReturnType<typeof setTimeout> | undefined> = ref<ReturnType<typeof setTimeout>>();
+
+  // Computed property to get the title of the selected klasse
+  const selectedKlasseTitle: ComputedRef<string | undefined> = computed(() => {
+    return props.klassen?.find((klasse: TranslatedObject | undefined) => klasse?.value === selectedNewKlasse.value)
+      ?.title;
+  });
+
+  watch(selectedNewKlasse, (newValue: string | undefined) => {
+    if (!selectedNewKlasse.value) {
+      organisationStore.getKlassenByOrganisationId({ limit: 25, administriertVon: [selectedSchule.value as string] });
+    }
+    selectedNewKlasse.value = newValue;
+  });
+
+  function updateKlassenSearch(searchValue: string): void {
+    clearTimeout(timerId.value);
+    const organisationId: string | undefined = selectedSchule.value;
+
+    if (!organisationId) {
+      return;
+    }
+    if (searchValue === '' && !selectedNewKlasse.value) {
+      timerId.value = setTimeout(() => {
+        organisationStore.getKlassenByOrganisationId({
+          searchString: searchValue,
+          limit: 25,
+          administriertVon: [organisationId],
+        });
+      }, 500);
+    } else if (searchValue && searchValue !== selectedKlasseTitle.value) {
+      /* cancel pending call */
+      clearTimeout(timerId.value);
+      /* delay new call 500ms */
+      timerId.value = setTimeout(() => {
+        organisationStore.getKlassenByOrganisationId({
+          searchString: searchValue,
+          limit: 25,
+          administriertVon: [organisationId],
+        });
+      }, 500);
+    }
+  }
 </script>
 
 <template>
@@ -75,6 +123,7 @@
         ref="klasse-select"
         required="true"
         variant="outlined"
+        @update:search="updateKlassenSearch"
         v-bind="selectedNewKlasseProps"
         v-model="selectedNewKlasse"
       ></v-autocomplete>

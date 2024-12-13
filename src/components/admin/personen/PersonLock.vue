@@ -8,7 +8,7 @@
   import { object, string, StringSchema, type AnyObject } from 'yup';
   import PersonLockInput from './PersonLockInput.vue';
   import { formatDateToISO } from '@/utils/date';
-  import { type Personendatensatz } from '@/stores/PersonStore';
+  import { PersonLockOccasion, type Personendatensatz, type UserLock } from '@/stores/PersonStore';
   import type { TranslatedObject } from '@/types';
   import { computed, ref, watch, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
@@ -82,7 +82,11 @@
   const selectedOrganisation: Ref<string | null> = ref(null);
   const errorMessage: ComputedRef<string> = computed(() => {
     if (!props.errorCode) return '';
-    return !props.person.person.isLocked ? t('person.lockError') : t('person.unlockError');
+    return !props.person.person.userLock?.some(
+      (lock: UserLock) => lock.lock_occasion === PersonLockOccasion.MANUELL_GESPERRT,
+    )
+      ? t('person.lockError')
+      : t('person.unlockError');
   });
   const hasSingleSelection: ComputedRef<boolean> = computed(() => {
     return organisations.value.length <= 1;
@@ -106,14 +110,24 @@
   }
 
   async function handleOnLockUser(): Promise<void> {
-    const lockingOrgId: string | null | undefined = props.person.person.isLocked
-      ? props.person.person.userLock?.locked_by
-      : selectedOrganisationId.value;
+    // Find the "MANUELL_GESPERRT" lock if it exists
+    const manualLock: UserLock | null =
+      props.person.person.userLock?.find(
+        (lock: UserLock) => lock.lock_occasion === PersonLockOccasion.MANUELL_GESPERRT,
+      ) ?? null;
+
+    // Use the locked_by ID from "MANUELL_GESPERRT" if person is locked, otherwise use selectedOrganisationId
+    const lockingOrgId: string | null = manualLock ? manualLock.locked_by : selectedOrganisationId.value;
+
     if (!lockingOrgId) return;
-    let dateISO: string | undefined = formatDateToISO(selectedBefristung.value);
+
+    // Format date if provided
+    const dateISO: string | undefined = formatDateToISO(selectedBefristung.value);
+
     emit('onLockUser', lockingOrgId, dateISO);
     closeLockPersonDialog();
   }
+
   const onSubmit: (e?: Event | undefined) => Promise<void | undefined> = formContext.handleSubmit(() => {
     handleOnLockUser();
   });
@@ -156,6 +170,7 @@
         class="pb-0"
       >
         <SpshTooltip
+          v-if="!person.person.isLocked"
           :enabledCondition="!disabled"
           :disabledText="$t('person.finishEditFirst')"
           :enabledText="$t('person.lockUser')"
@@ -163,12 +178,33 @@
         >
           <v-btn
             class="primary"
-            data-testid="open-lock-dialog-icon"
+            data-testid="open-lock-dialog-button"
             :disabled="disabled"
             :block="mdAndDown"
             v-bind="props"
           >
             {{ !person.person.isLocked ? $t('person.lockUser') : $t('person.unlockUser') }}
+          </v-btn>
+        </SpshTooltip>
+        <SpshTooltip
+          v-else
+          :enabledCondition="!disabled"
+          :disabledText="$t('person.finishEditFirst')"
+          :enabledText="$t('person.unlockUser')"
+          position="start"
+        >
+          <v-btn
+            class="primary"
+            data-testid="open-lock-dialog-button"
+            :disabled="disabled"
+            :block="mdAndDown"
+            v-bind="props"
+          >
+            {{
+              person.person.userLock?.some((lock) => lock.lock_occasion === PersonLockOccasion.MANUELL_GESPERRT)
+                ? $t('person.unlockUser')
+                : $t('person.lockUser')
+            }}
           </v-btn>
         </SpshTooltip>
       </v-col>
@@ -177,7 +213,11 @@
     <LayoutCard
       data-testid="person-lock-card"
       :closable="true"
-      :header="!person.person.isLocked ? $t('person.lockUser') : $t('person.unlockUser')"
+      :header="
+        !props.person.person.userLock?.some((lock) => lock.lock_occasion === PersonLockOccasion.MANUELL_GESPERRT)
+          ? $t('person.lockUser')
+          : $t('person.unlockUser')
+      "
       @onCloseClicked="closeLockPersonDialog"
     >
       <v-container>
@@ -199,7 +239,9 @@
             </v-col>
           </v-row>
           <v-row
-            v-if="!props.person.person.isLocked"
+            v-if="
+              !props.person.person.userLock?.some((lock) => lock.lock_occasion === PersonLockOccasion.MANUELL_GESPERRT)
+            "
             class="align-center justify-center w-full"
           >
             <v-col
@@ -242,7 +284,9 @@
           </v-row>
           <v-row
             class="justify-center w-full"
-            v-if="!props.person.person.isLocked"
+            v-if="
+              !props.person.person.userLock?.some((lock) => lock.lock_occasion === PersonLockOccasion.MANUELL_GESPERRT)
+            "
           >
             <v-col
               class="text-body"
@@ -277,7 +321,13 @@
                 data-testid="lock-user-info-text"
                 class="text-body"
               >
-                {{ !person.person.isLocked ? $t('person.lockUserInfoText') : $t('person.unLockUserInfoText') }}
+                {{
+                  !props.person.person.userLock?.some(
+                    (lock) => lock.lock_occasion === PersonLockOccasion.MANUELL_GESPERRT,
+                  )
+                    ? $t('person.lockUserInfoText')
+                    : $t('person.unLockUserInfoText')
+                }}
               </span>
             </v-col>
           </v-row>
@@ -306,11 +356,21 @@
               <v-btn
                 :block="mdAndDown"
                 class="primary button"
-                :disabled="!props.person.person.isLocked && !selectedOrganisation"
+                :disabled="
+                  !props.person.person.userLock?.some(
+                    (lock) => lock.lock_occasion === PersonLockOccasion.MANUELL_GESPERRT,
+                  ) && !selectedOrganisation
+                "
                 @click.stop="onSubmit"
                 data-testid="lock-user-button"
               >
-                {{ !props.person.person.isLocked ? $t('person.lockUser') : $t('person.unlockUser') }}
+                {{
+                  props.person.person.userLock?.some(
+                    (lock) => lock.lock_occasion === PersonLockOccasion.MANUELL_GESPERRT,
+                  )
+                    ? $t('person.unlockUser')
+                    : $t('person.lockUser')
+                }}
               </v-btn>
             </v-col>
           </v-row>

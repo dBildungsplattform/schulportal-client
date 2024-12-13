@@ -98,15 +98,26 @@
 
   function handleConfirmUnsavedChanges(): void {
     blockedNext();
-  }
-
-  async function navigateBackToRolleForm(): Promise<void> {
-    await router.push({ name: 'create-rolle' });
     rolleStore.errorCode = '';
   }
 
+  async function navigateBackToRolleForm(): Promise<void> {
+    if (rolleStore.errorCode === 'REQUIRED_STEP_UP_LEVEL_NOT_MET') {
+      formContext.resetForm();
+      await router.push({ name: 'create-rolle' }).then(() => {
+        router.go(0);
+      });
+    } else {
+      rolleStore.errorCode = '';
+      await router.push({ name: 'create-rolle' });
+    }
+  }
+
   async function navigateToRolleManagement(): Promise<void> {
-    await router.push({ name: 'rolle-management' });
+    formContext.resetForm();
+    await router.push({ name: 'rolle-management' }).then(() => {
+      router.go(0);
+    });
     rolleStore.createdRolle = null;
   }
 
@@ -173,6 +184,7 @@
   );
 
   function preventNavigation(event: BeforeUnloadEvent): void {
+    if (rolleStore.errorCode) formContext.resetForm();
     if (!isFormDirty.value) return;
     event.preventDefault();
     /* Chrome requires returnValue to be set. */
@@ -184,6 +196,7 @@
     await organisationStore.getAllOrganisationen({
       systemrechte: ['ROLLEN_VERWALTEN'],
       excludeTyp: [OrganisationsTyp.Klasse],
+      limit: 25,
     });
     await serviceProviderStore.getAllServiceProviders();
 
@@ -207,7 +220,7 @@
     });
 
     Object.values(RollenSystemRecht).forEach((enumValue: RollenSystemRecht) => {
-      if (enumValue !== RollenSystemRecht.MigrationDurchfuehren) {
+      if (enumValue !== RollenSystemRecht.MigrationDurchfuehren && enumValue !== RollenSystemRecht.CronDurchfuehren) {
         const i18nPath: string = `admin.rolle.mappingFrontBackEnd.systemrechte.${enumValue}`;
         translatedSystemrechte.value.push({
           value: enumValue,
@@ -259,34 +272,30 @@
 
 <template>
   <div class="admin">
+    <h1
+      class="text-center headline"
+      data-testid="admin-headline"
+    >
+      {{ $t('admin.headline') }}
+    </h1>
     <LayoutCard
-      :closable="true"
+      :closable="!rolleStore.errorCode"
       @onCloseClicked="navigateToRolleManagement"
       :header="$t('admin.rolle.addNew')"
       :padded="true"
       :showCloseText="true"
     >
-      <!-- Error Message Display if error on submit -->
-      <SpshAlert
-        :model-value="!!rolleStore.errorCode"
-        :title="t('admin.rolle.rolleCreateErrorTitle')"
-        :type="'error'"
-        :closable="false"
-        :text="rolleStore.errorCode ? $t(`admin.rolle.errors.${rolleStore.errorCode}`) : ''"
-        :showButton="true"
-        :buttonText="$t('admin.rolle.backToCreateRolle')"
-        :buttonAction="navigateBackToRolleForm"
-      />
-
       <!-- The form to create a new Rolle -->
-      <template v-if="!rolleStore.createdRolle && !rolleStore.errorCode">
+      <template v-if="!rolleStore.createdRolle">
         <RolleForm
           :administrationsebenen="administrationsebenen"
+          :errorCode="rolleStore.errorCode"
           :onHandleConfirmUnsavedChanges="handleConfirmUnsavedChanges"
           :onHandleDiscard="navigateToRolleManagement"
           :onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
           :onSubmit="onSubmit"
           :isEditActive="true"
+          :isLoading="rolleStore.loading"
           ref="rolle-creation-form"
           v-model:selectedAdministrationsebene="selectedAdministrationsebene"
           :selectedAdministrationsebeneProps="selectedAdministrationsebeneProps"
@@ -305,7 +314,20 @@
           :translatedRollenarten="translatedRollenarten"
           :translatedMerkmale="translatedMerkmale"
           :translatedSystemrechte="translatedSystemrechte"
-        ></RolleForm>
+        >
+          <!-- Error Message Display if error on submit -->
+          <!-- To trigger unsaved changes dialog the alert has to be inside the form wrapper -->
+          <SpshAlert
+            :model-value="!!rolleStore.errorCode"
+            :title="t('admin.rolle.rolleCreateErrorTitle')"
+            :type="'error'"
+            :closable="false"
+            :text="rolleStore.errorCode ? $t(`admin.rolle.errors.${rolleStore.errorCode}`) : ''"
+            :showButton="true"
+            :buttonText="$t('admin.rolle.backToCreateRolle')"
+            :buttonAction="navigateBackToRolleForm"
+          />
+        </RolleForm>
       </template>
 
       <!-- Result template on success after submit  -->

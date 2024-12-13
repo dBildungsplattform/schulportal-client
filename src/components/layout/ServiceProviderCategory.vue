@@ -1,13 +1,19 @@
 <script setup lang="ts">
   import ServiceProviderCard from '@/components/cards/ServiceProviderCard.vue';
-  import { type AuthStore, useAuthStore } from '@/stores/AuthStore';
+  import { type AuthStore, StepUpLevel, useAuthStore } from '@/stores/AuthStore';
   import { type ServiceProvider } from '@/stores/ServiceProviderStore';
 
   const authStore: AuthStore = useAuthStore();
+  const NO_SECOND_FACTOR: string = '/no-second-factor';
 
-  defineProps<{
+  const props: {
     categoryTitle: string;
     serviceProviders: Array<ServiceProvider>;
+    hasToken: boolean;
+  } = defineProps<{
+    categoryTitle: string;
+    serviceProviders: Array<ServiceProvider>;
+    hasToken: boolean;
   }>();
 
   function getInternalServiceProviderUrl(target: string): string {
@@ -26,6 +32,17 @@
       }
     }
     return '';
+  }
+
+  function computeUrlAndTab(serviceProvider: ServiceProvider): { url: string; newTab: boolean } {
+    if (serviceProvider.target === 'URL') {
+      if (serviceProvider.requires2fa && !props.hasToken && authStore.acr !== StepUpLevel.GOLD) {
+        return { url: NO_SECOND_FACTOR, newTab: false };
+      } else {
+        return { url: serviceProvider.url, newTab: true };
+      }
+    }
+    return { url: getInternalServiceProviderUrl(serviceProvider.target), newTab: false };
   }
 </script>
 
@@ -50,12 +67,8 @@
         lg="4"
       >
         <ServiceProviderCard
-          :href="
-            serviceProvider.target === 'URL'
-              ? serviceProvider.url
-              : getInternalServiceProviderUrl(serviceProvider.target)
-          "
-          :newTab="serviceProvider.target === 'URL'"
+          :href="computeUrlAndTab(serviceProvider).url"
+          :newTab="computeUrlAndTab(serviceProvider).newTab"
           :testId="`service-provider-card-${serviceProvider.id}`"
           :title="serviceProvider.name"
           :logoUrl="serviceProvider.logoUrl"

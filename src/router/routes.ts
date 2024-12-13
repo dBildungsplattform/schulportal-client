@@ -42,7 +42,17 @@ const routes: readonly RouteRecordRaw[] = [
       layout: 'AdminLayout',
       requiresAuth: true,
       requiredStepUpLevel: StepUpLevel.GOLD,
-      requiresPermission: 'personenverwaltung',
+      requiresPermission: ['personenverwaltung', 'personenanlegen'],
+    },
+  },
+  {
+    path: '/admin/personen/import',
+    name: 'person-import',
+    component: () => import('../views/admin/PersonImportView.vue'),
+    meta: {
+      layout: 'AdminLayout',
+      requiresAuth: true,
+      requiresPermission: 'personenimport',
     },
   },
   {

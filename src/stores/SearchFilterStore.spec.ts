@@ -15,40 +15,44 @@ describe('SearchFilterStore', () => {
     expect(searchFilterStore.selectedRollen).toEqual([]);
     expect(searchFilterStore.selectedOrganisationen).toEqual([]);
     expect(searchFilterStore.selectedRollenObjects).toEqual([]);
-    expect(searchFilterStore.searchFilter).toEqual('');
+    expect(searchFilterStore.searchFilterPersonen).toEqual('');
   });
 
   it('should change the state', async () => {
     // it sets the selectedKlassen
-    searchFilterStore.setKlasseFilter(['1', '2']);
+    searchFilterStore.setKlasseFilterForPersonen(['1', '2']);
     expect(searchFilterStore.selectedKlassen).toEqual(['1', '2']);
 
     // it sets the selectedRollen
-    searchFilterStore.setRolleFilter(['5', '8']);
+    searchFilterStore.setRolleFilterForPersonen(['5', '8']);
     expect(searchFilterStore.selectedRollen).toEqual(['5', '8']);
 
     // it sets the selectedOrganisationen
-    searchFilterStore.setOrganisationFilter(['10', '20']);
+    searchFilterStore.setOrganisationFilterForPersonen(['10', '20']);
     expect(searchFilterStore.selectedOrganisationen).toEqual(['10', '20']);
 
-    // it sets the searchFilter
-    searchFilterStore.setSearchFilter('search');
-    expect(searchFilterStore.searchFilter).toEqual('search');
+    // it sets the searchFilter for personen
+    searchFilterStore.setSearchFilterForPersonen('search');
+    expect(searchFilterStore.searchFilterPersonen).toEqual('search');
+
+    // it sets the searchFilter for schulen
+    searchFilterStore.setSearchFilterForSchulen('search');
+    expect(searchFilterStore.searchFilterPersonen).toEqual('search');
 
     // it sets sortOrder
-    searchFilterStore.setSortOrder('desc');
+    searchFilterStore.setSortOrderForPersonen('desc');
     expect(searchFilterStore.sortOrder).toEqual('desc');
 
     // it sets sortField
-    searchFilterStore.setSortField(SortField.Vorname);
+    searchFilterStore.setSortFieldForPersonen(SortField.Vorname);
     expect(searchFilterStore.sortField).toEqual(SortField.Vorname);
 
     // it sets currentSort
-    searchFilterStore.setCurrentSort({ key: SortField.Vorname, order: 'desc' });
+    searchFilterStore.setCurrentSortForPersonen({ key: SortField.Vorname, order: 'desc' });
     expect(searchFilterStore.currentSort).toEqual({ key: SortField.Vorname, order: 'desc' });
 
     // it sets the selectedRolleFilterWithObjects
-    searchFilterStore.setRolleFilterWithObjects(['5'], [
+    searchFilterStore.setRolleFilterWithObjectsForPersonen(['5'], [
       {
         id: '10',
         administeredBySchulstrukturknoten: '1',
@@ -69,5 +73,13 @@ describe('SearchFilterStore', () => {
         systemrechte: new Set(),
       },
     ]);
+
+    // it sets the selectedSchuleForKlassen
+    searchFilterStore.setSchuleFilterForKlassen('10');
+    expect(searchFilterStore.selectedSchuleForKlassen).toEqual('10');
+
+    // it sets the selectedKlassenForKlassen
+    searchFilterStore.setKlasseFilterForKlassen(['10', '20']);
+    expect(searchFilterStore.selectedKlassenForKlassen).toEqual(['10', '20']);
   });
 });

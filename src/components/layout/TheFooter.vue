@@ -29,17 +29,22 @@
     {
       text: t('footer.legalNotice'),
       href: '/impressum_datenschutzerklaerung.html',
-      external: false,
+      external: true,
     },
     {
       text: t('footer.privacyPolicy'),
       href: '/impressum_datenschutzerklaerung.html#privacy_policy',
-      external: false,
+      external: true,
     },
     {
       text: t('footer.accessibility'),
       href: '/impressum_datenschutzerklaerung.html#accessibility',
-      external: false,
+      external: true,
+    },
+    {
+      text: t('footer.status'),
+      href: 'api/status',
+      external: true,
     },
   ]);
 
@@ -71,7 +76,7 @@
         <!-- Sponsor Logos -->
         <v-col
           cols="12"
-          lg="7"
+          lg="5"
           order-lg="2"
           class="sponsor-logos-col justify-end"
         >
@@ -101,13 +106,13 @@
         <!-- Footer Links -->
         <v-col
           cols="12"
-          lg="5"
+          lg="7"
           order-lg="1"
           class="footer-links-col justify-space-between"
         >
           <a
             v-for="link in footerLinks"
-            class="primary"
+            class="primary footer-link"
             :key="link.text"
             :href="link.href"
             rel="noopener noreferrer"
@@ -204,6 +209,10 @@
   .footer-links-col {
     display: flex;
     align-items: flex-end; /* Aligns the links to the start of the flex container */
+  }
+
+  .footer-link {
+    margin-right: 30px;
   }
 
   .sponsor-logos-col {
