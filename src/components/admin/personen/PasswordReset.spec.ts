@@ -30,6 +30,7 @@ beforeEach(() => {
       disabled: false,
       buttonText: 'Button text',
       errorCode: '',
+      errorMessage: '',
       password: 'qwertzuiop',
       person: {
         person: {
