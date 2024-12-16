@@ -238,7 +238,7 @@ describe('PersonImportView', () => {
 
   test('it downloads an imported file', async () => {
     global.URL.createObjectURL = vi.fn();
-    importStore.importedData = new File([''], 'personen.txt', { type: 'text/plain' });
+    importStore.importProgress = 100;
     await nextTick();
 
     const downloadButton: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="download-file-button"]');
@@ -250,6 +250,6 @@ describe('PersonImportView', () => {
     importStore.errorCode = null;
     await flushPromises();
 
-    expect(wrapper?.find('[data-testid="import-progress-spinner"]').isVisible()).toBe(true);
+    expect(wrapper?.find('[data-testid="import-progress-bar"]').isVisible()).toBe(true);
   });
 });

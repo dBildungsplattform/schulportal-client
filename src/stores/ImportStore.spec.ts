@@ -102,7 +102,6 @@ describe('ImportStore', () => {
       const executePersonenImportPromise: Promise<void> = importStore.executePersonenImport(importvorgangId);
       await executePersonenImportPromise;
 
-      expect(importStore.importedData).toEqual(mockResponse);
       expect(importStore.importIsLoading).toBe(false);
     });
 

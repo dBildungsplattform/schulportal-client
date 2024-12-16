@@ -89,7 +89,7 @@
         const kopersDeadline: string = lockInfo.deadline!;
         const kopersDeadlineDate: Date = new Date(kopersDeadline);
         alerts.push({
-          id: lockInfo.occasion ?? '',
+          id: lockInfo.occasion,
           message: t('banner.kopers', { date: formatDateDiggitsToGermanDate(kopersDeadlineDate) }),
           visible: true,
           type: getUrgencyType(kopersDeadlineDate),
