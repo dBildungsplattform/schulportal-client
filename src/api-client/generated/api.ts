@@ -7185,6 +7185,43 @@ export const PersonenApiAxiosParamCreator = function (configuration?: Configurat
         },
         /**
          * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        personControllerResetUEMPassword: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/personen/uem-password`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @param {string} personId The id for the account.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -7470,6 +7507,15 @@ export const PersonenApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async personControllerResetUEMPassword(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.personControllerResetUEMPassword(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
          * @param {string} personId The id for the account.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -7613,6 +7659,14 @@ export const PersonenApiFactory = function (configuration?: Configuration, baseP
         },
         /**
          * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        personControllerResetUEMPassword(options?: any): AxiosPromise<string> {
+            return localVarFp.personControllerResetUEMPassword(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @param {string} personId The id for the account.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -7748,6 +7802,14 @@ export interface PersonenApiInterface {
      * @memberof PersonenApiInterface
      */
     personControllerResetPasswordByPersonId(personId: string, options?: AxiosRequestConfig): AxiosPromise<string>;
+
+    /**
+     * 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PersonenApiInterface
+     */
+    personControllerResetUEMPassword(options?: AxiosRequestConfig): AxiosPromise<string>;
 
     /**
      * 
@@ -7901,6 +7963,16 @@ export class PersonenApi extends BaseAPI implements PersonenApiInterface {
      */
     public personControllerResetPasswordByPersonId(personId: string, options?: AxiosRequestConfig) {
         return PersonenApiFp(this.configuration).personControllerResetPasswordByPersonId(personId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PersonenApi
+     */
+    public personControllerResetUEMPassword(options?: AxiosRequestConfig) {
+        return PersonenApiFp(this.configuration).personControllerResetUEMPassword(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

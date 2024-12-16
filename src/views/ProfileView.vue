@@ -221,8 +221,8 @@
     return message;
   });
 
-  async function resetDevicePassword(personId: string): Promise<void> {
-    await personStore.resetDevicePassword(personId);
+  async function resetDevicePassword(): Promise<void> {
+    await personStore.resetDevicePassword();
     devicePassword.value = personStore.newDevicePassword || '';
   }
 
