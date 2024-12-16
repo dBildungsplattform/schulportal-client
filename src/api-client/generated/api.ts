@@ -2023,21 +2023,13 @@ export interface PersonTimeLimitInfoResponse {
      * @type {string}
      * @memberof PersonTimeLimitInfoResponse
      */
-<<<<<<< HEAD
     'occasion': string;
-=======
-    'occasion': string | null;
->>>>>>> 9d954144a4f640073f7ab29807b037468f8479e1
     /**
      * 
      * @type {string}
      * @memberof PersonTimeLimitInfoResponse
      */
-<<<<<<< HEAD
     'deadline': string;
-=======
-    'deadline': string | null;
->>>>>>> 9d954144a4f640073f7ab29807b037468f8479e1
 }
 /**
  * 
