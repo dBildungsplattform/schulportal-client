@@ -586,12 +586,23 @@ describe('PersonStore', () => {
   });
 
   describe('resetDevicePassword', () => {
-    it('should reset and return device password', async () => {
+    it('should reset and return device password when given a personId', async () => {
       const userId: string = '2345';
       const mockResponse: string = 'fakePassword';
 
       mockadapter.onPatch(`/api/personen/${userId}/uem-password`).replyOnce(202, mockResponse);
       const resetDevicePasswordPromise: Promise<void> = personStore.resetDevicePassword(userId);
+      expect(personStore.loading).toBe(true);
+      await resetDevicePasswordPromise;
+      expect(personStore.newDevicePassword).toEqual(mockResponse);
+      expect(personStore.loading).toBe(false);
+    });
+
+    it('should reset and return device password without a personId', async () => {
+      const mockResponse: string = 'fakePassword';
+
+      mockadapter.onPatch(`/api/personen/uem-password`).replyOnce(202, mockResponse);
+      const resetDevicePasswordPromise: Promise<void> = personStore.resetDevicePassword();
       expect(personStore.loading).toBe(true);
       await resetDevicePasswordPromise;
       expect(personStore.newDevicePassword).toEqual(mockResponse);
