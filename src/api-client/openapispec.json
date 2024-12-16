@@ -4807,6 +4807,21 @@
                     "rolle"
                 ]
             },
+            "PersonTimeLimitInfoResponse": {
+                "type": "object",
+                "properties": {
+                    "occasion": {
+                        "type": "string"
+                    },
+                    "deadline": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "occasion",
+                    "deadline"
+                ]
+            },
             "UserinfoResponse": {
                 "type": "object",
                 "properties": {
@@ -4898,6 +4913,12 @@
                     "acr": {
                         "type": "string",
                         "nullable": false
+                    },
+                    "timeLimits": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PersonTimeLimitInfoResponse"
+                        }
                     }
                 },
                 "required": [
@@ -4922,7 +4943,8 @@
                     "updated_at",
                     "password_updated_at",
                     "personenkontexte",
-                    "acr"
+                    "acr",
+                    "timeLimits"
                 ]
             },
             "CreatePersonMigrationBodyParams": {
