@@ -752,7 +752,7 @@
                   :errorMessage="devicePasswordErrorMessage"
                   :isLoading="personStore.loading"
                   @onClearPassword="devicePassword = ''"
-                  @onResetPassword="resetDevicePassword(personInfoStore.personInfo?.person.id as string)"
+                  @onResetPassword="resetDevicePassword()"
                   :password="devicePassword"
                   :testId="'device-password'"
                 >
