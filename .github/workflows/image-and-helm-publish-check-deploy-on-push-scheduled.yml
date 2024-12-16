@@ -53,7 +53,7 @@ jobs:
       packages: write
       security-events: write
       contents: read
-    uses: dBildungsplattform/dbp-github-workflows/.github/workflows/image-publish-trivy.yaml@DBP-1179-spsh-image-tag-generation # todo: change to new version
+    uses: dBildungsplattform/dbp-github-workflows/.github/workflows/image-publish-trivy.yaml@7
     with:
       image_name: 'schulportal-client'
       run_trivy_scan: true
