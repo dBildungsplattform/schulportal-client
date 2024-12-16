@@ -98,14 +98,8 @@ describe('ImportStore', () => {
       mockadapter.onPost('/api/import/execute').replyOnce(200, mockResponse);
 
       const importvorgangId: string = '123';
-      const organisationId: string = '123';
-      const rolleId: string = '456';
 
-      const executePersonenImportPromise: Promise<void> = importStore.executePersonenImport(
-        importvorgangId,
-        organisationId,
-        rolleId,
-      );
+      const executePersonenImportPromise: Promise<void> = importStore.executePersonenImport(importvorgangId);
       await executePersonenImportPromise;
 
       expect(importStore.importedData).toEqual(mockResponse);
@@ -116,14 +110,8 @@ describe('ImportStore', () => {
       mockadapter.onPost('/api/import/execute').replyOnce(500, 'some mock server error');
 
       const importvorgangId: string = '123';
-      const organisationId: string = '123';
-      const rolleId: string = '456';
 
-      const executePersonenImportPromise: Promise<void> = importStore.executePersonenImport(
-        importvorgangId,
-        organisationId,
-        rolleId,
-      );
+      const executePersonenImportPromise: Promise<void> = importStore.executePersonenImport(importvorgangId);
 
       expect(importStore.importIsLoading).toBe(true);
       await executePersonenImportPromise;
@@ -136,14 +124,7 @@ describe('ImportStore', () => {
       mockadapter.onPost('/api/import/execute').replyOnce(500, { code: 'ERROR_IMPORTING_FILE' });
 
       const importvorgangId: string = '123';
-      const organisationId: string = '123';
-      const rolleId: string = '456';
-
-      const executePersonenImportPromise: Promise<void> = importStore.executePersonenImport(
-        importvorgangId,
-        organisationId,
-        rolleId,
-      );
+      const executePersonenImportPromise: Promise<void> = importStore.executePersonenImport(importvorgangId);
 
       expect(importStore.importIsLoading).toBe(true);
       await executePersonenImportPromise;
