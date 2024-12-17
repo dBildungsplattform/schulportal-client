@@ -13,6 +13,12 @@ describe('ImportStore', () => {
     importStore = useImportStore();
 
     vi.useFakeTimers();
+    // Mock setInterval and clearInterval to control timing
+    vi.spyOn(global, 'setInterval');
+    vi.spyOn(global, 'clearInterval');
+
+    // Reset the store state
+    importStore.$reset();
   });
 
   afterEach(() => {
@@ -255,6 +261,29 @@ describe('ImportStore', () => {
 
         expect(importStore.errorCode).toEqual('UNSPECIFIED_ERROR');
         expect(importStore.importProgress).toEqual(0);
+      });
+    });
+
+    describe('ImportStore stopImportStatusPolling', () => {
+      it('should clear interval and delete pollingInterval when interval exists', () => {
+        // Simulate an existing interval
+        const mockInterval: NodeJS.Timeout = setInterval(() => {}, 1000);
+        importStore.pollingInterval = mockInterval;
+
+
+        importStore.stopImportStatusPolling();
+
+        expect(vi.mocked(clearInterval)).toHaveBeenCalledWith(mockInterval);
+        expect(importStore.pollingInterval).toBeUndefined();
+      });
+
+      it('should do nothing when no polling interval exists', () => {
+        // Ensure no interval is set
+        importStore.pollingInterval = undefined;
+
+        importStore.stopImportStatusPolling();
+
+        expect(vi.mocked(clearInterval)).not.toHaveBeenCalled();
       });
     });
   });
