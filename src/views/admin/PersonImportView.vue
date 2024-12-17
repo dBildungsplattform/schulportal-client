@@ -167,16 +167,76 @@
     router.push({ name: 'person-management' });
   }
 
-  function uploadFile(): void {
+  function convertToUTF8(buffer: ArrayBuffer): string {
+    // Try decoding as UTF-8 first
+    const utf8Decoder: TextDecoder = new TextDecoder('utf-8', { fatal: false });
+    const utf8Text: string = utf8Decoder.decode(buffer);
+
+    // If decoding as UTF-8 doesn't result in invalid characters
+    if (utf8Text && !utf8Text.includes('�')) {
+      return utf8Text;
+    }
+
+    // Try other encodings (Windows-1252, ISO-8859-1, etc.)
+    const encodingsToTry: string[] = ['windows-1252', 'iso-8859-1', 'utf-16', 'utf-16le', 'utf-16be'];
+
+    for (const encoding of encodingsToTry) {
+      try {
+        const decoder: TextDecoder = new TextDecoder(encoding, { fatal: true });
+        const decodedText: string = decoder.decode(buffer);
+        // If it successfully decodes without errors, return the decoded text
+        return decodedText;
+      } catch (e) {
+        // If the decoding fails, continue with the next encoding
+        continue;
+      }
+    }
+
+    // If all decoding attempts fail, return a fallback (perhaps empty string or an error message)
+    throw new Error('Unable to decode file using known encodings.');
+  }
+
+  // Reads the file and converts it to UTF-8
+  function readFileAsUTF8(file: File): Promise<string> {
+    return new Promise((resolve: (value: string | PromiseLike<string>) => void, reject: (reason?: unknown) => void) => {
+      const reader: FileReader = new FileReader();
+
+      reader.onload = (event: ProgressEvent<FileReader>): void => {
+        try {
+          // Convert from unknown encoding to UTF-8
+          const utf8Text: string = convertToUTF8(event.target?.result as ArrayBuffer);
+          resolve(utf8Text);
+        } catch (error) {
+          reject(error);
+        }
+      };
+
+      reader.onerror = (error: ProgressEvent<FileReader>): void => reject(error);
+
+      // Read the file as ArrayBuffer
+      reader.readAsArrayBuffer(file);
+    });
+  }
+
+  async function uploadFile(): Promise<void> {
     if (selectedSchule.value === undefined || selectedRolle.value === undefined || !selectedFiles.value?.length) {
       return;
     }
 
-    importStore.uploadPersonenImportFile(
-      selectedSchule.value as string,
-      selectedRolle.value as string,
-      selectedFiles.value[0] as File,
-    );
+    const originalFile: File = selectedFiles.value[0] as File;
+
+    // Read the file content and convert to UTF-8
+    const fileText: string = await readFileAsUTF8(originalFile);
+
+    // Create a new File object with UTF-8 encoded content
+    const utf8Blob: Blob = new Blob(['\uFEFF' + fileText], { type: 'text/csv;charset=utf-8' });
+    const utf8File: File = new File([utf8Blob], originalFile.name, { type: 'text/csv;charset=utf-8' });
+
+    // Update selected files with the UTF-8 version
+    selectedFiles.value![0] = utf8File;
+
+    // Perform the upload with the UTF-8 encoded file
+    importStore.uploadPersonenImportFile(selectedSchule.value as string, selectedRolle.value as string, utf8File);
   }
 
   function anotherImport(): void {
@@ -235,6 +295,7 @@
 
   function handleConfirmUnsavedChanges(): void {
     blockedNext();
+    importStore.errorCode = '';
   }
 
   function preventNavigation(event: BeforeUnloadEvent): void {

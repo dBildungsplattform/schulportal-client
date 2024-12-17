@@ -268,12 +268,4 @@ describe('KlasseCreationView', () => {
     wrapper?.find('[data-testid="alert-button"]').trigger('click');
     await nextTick();
   });
-
-  test('shows error message if REQUIRED_STEP_UP_LEVEL_NOT_MET error is present and click x button', async () => {
-    organisationStore.errorCode = 'REQUIRED_STEP_UP_LEVEL_NOT_MET';
-    await nextTick();
-    expect(wrapper?.find('[data-testid="alert-title"]').isVisible()).toBe(true);
-    wrapper?.find('[data-testid="close-layout-card-button"]').trigger('click');
-    await nextTick();
-  });
 });

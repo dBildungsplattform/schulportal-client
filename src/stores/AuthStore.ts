@@ -2,6 +2,7 @@ import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import {
   AuthApiFactory,
   type AuthApiInterface,
+  type PersonTimeLimitInfoResponse,
   type PersonenkontextRolleFieldsResponse,
   type UserinfoResponse,
 } from '../api-client/generated/api';
@@ -52,6 +53,7 @@ type AuthState = {
   hasSchultraegerverwaltungPermission: boolean;
   isAuthed: boolean;
   acr: StepUpLevel;
+  timeLimitInfos: PersonTimeLimitInfoResponse[];
 };
 
 type AuthActions = {
@@ -80,6 +82,7 @@ export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, 
     hasSchultraegerverwaltungPermission: false,
     isAuthed: false,
     acr: StepUpLevel.NONE,
+    timeLimitInfos: [],
   }),
   actions: {
     async initializeAuthStatus() {
@@ -93,6 +96,7 @@ export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, 
           this.isAuthed = true;
           this.currentUser = data;
           this.acr = data.acr as StepUpLevel;
+          this.timeLimitInfos = data.timeLimits;
 
           /* extract all system permissions from current user's personenkontexte */
           const personenkontexte: Array<UserinfoPersonenkontext> | null = this.currentUser.personenkontexte;
