@@ -245,8 +245,8 @@ describe('PersonImportView', () => {
     downloadButton?.trigger('click');
   });
 
-  test('it shows loading spinner', async () => {
-    importStore.importIsLoading = true;
+  test('it shows loading bar', async () => {
+    importStore.importProgress = 5;
     importStore.errorCode = null;
     await flushPromises();
 
