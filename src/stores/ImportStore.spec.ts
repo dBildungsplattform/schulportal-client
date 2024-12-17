@@ -90,46 +90,83 @@ describe('ImportStore', () => {
       expect(importStore.uploadIsLoading).toBe(false);
     });
 
-    it('should import personen', async () => {
-      expect(importStore.importIsLoading).toBe(false);
+    describe('import personen', () => {
+      it('should import personen', async () => {
+        expect(importStore.importIsLoading).toBe(false);
 
-      const mockResponse: File = new File([''], 'personen.txt', { type: 'text/plain' });
+        const mockResponse: File = new File([''], 'personen.txt', { type: 'text/plain' });
 
-      mockadapter.onPost('/api/import/execute').replyOnce(200, mockResponse);
+        mockadapter.onPost('/api/import/execute').replyOnce(200, mockResponse);
 
-      const importvorgangId: string = '123';
+        const importvorgangId: string = '123';
 
-      const executePersonenImportPromise: Promise<void> = importStore.executePersonenImport(importvorgangId);
-      await executePersonenImportPromise;
+        const executePersonenImportPromise: Promise<void> = importStore.executePersonenImport(importvorgangId);
+        await executePersonenImportPromise;
 
-      expect(importStore.importIsLoading).toBe(false);
+        expect(importStore.importIsLoading).toBe(false);
+      });
+
+      it('should handle string error while importing personen', async () => {
+        mockadapter.onPost('/api/import/execute').replyOnce(500, 'some mock server error');
+
+        const importvorgangId: string = '123';
+
+        const executePersonenImportPromise: Promise<void> = importStore.executePersonenImport(importvorgangId);
+
+        expect(importStore.importIsLoading).toBe(true);
+        await executePersonenImportPromise;
+        expect(importStore.errorCode).toEqual('ERROR_IMPORTING_FILE');
+        expect(importStore.importIsLoading).toBe(false);
+      });
+
+      it('should handle error code while importing personen', async () => {
+        mockadapter.onPost('/api/import/execute').replyOnce(500, { code: 'ERROR_IMPORTING_FILE' });
+
+        const importvorgangId: string = '123';
+        const executePersonenImportPromise: Promise<void> = importStore.executePersonenImport(importvorgangId);
+
+        expect(importStore.importIsLoading).toBe(true);
+        await executePersonenImportPromise;
+        expect(importStore.errorCode).toEqual('ERROR_IMPORTING_FILE');
+        expect(importStore.importIsLoading).toBe(false);
+      });
     });
 
-    it('should handle string error while importing personen', async () => {
-      mockadapter.onPost('/api/import/execute').replyOnce(500, 'some mock server error');
+    describe('downloadPersonenImportFile', () => {
+      it('should download personenFile', async () => {
 
-      const importvorgangId: string = '123';
+        const mockResponse: File = new File([''], 'personen.txt', { type: 'text/plain' });
 
-      const executePersonenImportPromise: Promise<void> = importStore.executePersonenImport(importvorgangId);
+        mockadapter.onGet('/api/import/123/download').replyOnce(200, mockResponse);
 
-      expect(importStore.importIsLoading).toBe(true);
-      await executePersonenImportPromise;
-      expect(importStore.importedData).toEqual(null);
-      expect(importStore.errorCode).toEqual('ERROR_IMPORTING_FILE');
-      expect(importStore.importIsLoading).toBe(false);
-    });
+        const importvorgangId: string = '123';
 
-    it('should handle error code while importing personen', async () => {
-      mockadapter.onPost('/api/import/execute').replyOnce(500, { code: 'ERROR_IMPORTING_FILE' });
+        await importStore.downloadPersonenImportFile(importvorgangId);
 
-      const importvorgangId: string = '123';
-      const executePersonenImportPromise: Promise<void> = importStore.executePersonenImport(importvorgangId);
+        expect(importStore.importedData).toEqual(mockResponse);
+      });
 
-      expect(importStore.importIsLoading).toBe(true);
-      await executePersonenImportPromise;
-      expect(importStore.importedData).toEqual(null);
-      expect(importStore.errorCode).toEqual('ERROR_IMPORTING_FILE');
-      expect(importStore.importIsLoading).toBe(false);
+      it('should handle string error while importing personen', async () => {
+        mockadapter.onGet('/api/import/123/download').replyOnce(500, 'some mock server error');
+
+        const importvorgangId: string = '123';
+
+        await importStore.downloadPersonenImportFile(importvorgangId);
+
+        expect(importStore.importedData).toEqual(null);
+        expect(importStore.errorCode).toEqual('ERROR_IMPORTING_FILE');
+      });
+
+      it('should handle error code while importing personen', async () => {
+        mockadapter.onGet('/api/import/123/download').replyOnce(500, { code: 'ERROR_IMPORTING_FILE' });
+
+        const importvorgangId: string = '123';
+
+        await importStore.downloadPersonenImportFile(importvorgangId);
+
+        expect(importStore.importedData).toEqual(null);
+        expect(importStore.errorCode).toEqual('ERROR_IMPORTING_FILE');
+      });
     });
   });
 });
