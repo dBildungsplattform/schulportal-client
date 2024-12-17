@@ -83,6 +83,7 @@ export const useImportStore: StoreDefinition<'importStore', ImportState, ImportG
           // Calculate progress (simple linear progression)
           const elapsedTime: number = Date.now() - startTime;
           const progressCurve: number = 1 - Math.exp(-elapsedTime / (MAX_POLLING_TIME / 6));
+          // The fake progress bar will never reach 100% unless the status is Finished. For large imports the bar will cap at 95% and poll from there until it's finished
           this.importProgress =
             this.importStatus === ImportStatus.Finished
               ? 100
