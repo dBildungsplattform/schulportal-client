@@ -193,6 +193,42 @@ describe('ImportStore', () => {
         expect(importStore.importProgress).toEqual(100);
       });
 
+      it('should not poll for FAILED and should throw ERROR_IMPORTING_FILE', async () => {
+        const importvorgangId: string = '123';
+
+        mockadapter.onGet(`/api/import/${importvorgangId}/status`).replyOnce(200, { status: ImportStatus.Failed });
+
+        const pollingPromise: Promise<void> = importStore.startImportStatusPolling(importvorgangId);
+
+        // Fast forward timer to trigger first poll
+        vi.advanceTimersByTime(30000);
+        await Promise.resolve(); // Allow async actions to settle
+
+        await pollingPromise;
+
+        expect(importStore.errorCode).toEqual('ERROR_IMPORTING_FILE');
+        expect(importStore.importStatus).toEqual(ImportStatus.Failed);
+        expect(importStore.importProgress).toEqual(0);
+      });
+
+      it('should not poll for INVALID and should throw ERROR_UPLOADING_FILE', async () => {
+        const importvorgangId: string = '123';
+
+        mockadapter.onGet(`/api/import/${importvorgangId}/status`).replyOnce(200, { status: ImportStatus.Invalid });
+
+        const pollingPromise: Promise<void> = importStore.startImportStatusPolling(importvorgangId);
+
+        // Fast forward timer to trigger first poll
+        vi.advanceTimersByTime(30000);
+        await Promise.resolve(); // Allow async actions to settle
+
+        await pollingPromise;
+
+        expect(importStore.errorCode).toEqual('ERROR_UPLOADING_FILE');
+        expect(importStore.importStatus).toEqual(ImportStatus.Invalid);
+        expect(importStore.importProgress).toEqual(0);
+      });
+
       it('should stop polling after timeout', async () => {
         const importvorgangId: string = '123';
 
