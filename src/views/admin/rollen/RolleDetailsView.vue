@@ -337,6 +337,7 @@
         <v-container>
           <div v-if="rolleStore.currentRolle">
             <RolleForm
+              :errorCode="rolleStore.errorCode"
               :onHandleConfirmUnsavedChanges="handleConfirmUnsavedChanges"
               :onHandleDiscard="navigateToRolleTable"
               :onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
@@ -401,6 +402,7 @@
                 >
                   <div class="d-flex justify-sm-end">
                     <RolleDelete
+                      v-if="!rolleStore.errorCode"
                       :errorCode="rolleStore.errorCode"
                       :rolle="rolleStore.currentRolle"
                       :isLoading="rolleStore.loading"
@@ -415,6 +417,7 @@
                   md="auto"
                 >
                   <v-btn
+                    v-if="!rolleStore.errorCode"
                     class="primary"
                     data-testid="rolle-edit-button"
                     @Click="activateEditing"
