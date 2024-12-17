@@ -2,7 +2,7 @@ import { useImportStore, type ImportStore } from './ImportStore';
 import { setActivePinia, createPinia } from 'pinia';
 import ApiService from '@/services/ApiService';
 import MockAdapter from 'axios-mock-adapter';
-import type { ImportUploadResponse } from '@/api-client/generated';
+import { ImportStatus, type ImportUploadResponse } from '@/api-client/generated';
 
 const mockadapter: MockAdapter = new MockAdapter(ApiService);
 
@@ -11,6 +11,13 @@ describe('ImportStore', () => {
   beforeEach(() => {
     setActivePinia(createPinia());
     importStore = useImportStore();
+
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.clearAllTimers();
+    vi.restoreAllMocks();
   });
 
   it('should initalize state correctly', () => {
@@ -134,7 +141,6 @@ describe('ImportStore', () => {
 
     describe('downloadPersonenImportFile', () => {
       it('should download personenFile', async () => {
-
         const mockResponse: File = new File([''], 'personen.txt', { type: 'text/plain' });
 
         mockadapter.onGet('/api/import/123/download').replyOnce(200, mockResponse);
@@ -166,6 +172,40 @@ describe('ImportStore', () => {
 
         expect(importStore.importedData).toEqual(null);
         expect(importStore.errorCode).toEqual('ERROR_IMPORTING_FILE');
+      });
+    });
+
+    describe('downloadPersonenImportFile', () => {
+      it('should poll and update status to finished', async () => {
+        const importvorgangId: string = '123';
+
+        mockadapter.onGet(`/api/import/${importvorgangId}/status`).replyOnce(200, { status: ImportStatus.Finished });
+
+        const pollingPromise: Promise<void> = importStore.startImportStatusPolling(importvorgangId);
+
+        // Fast forward timer to trigger first poll
+        vi.advanceTimersByTime(30000);
+        await Promise.resolve(); // Allow async actions to settle
+
+        await pollingPromise;
+
+        expect(importStore.importStatus).toEqual(ImportStatus.Finished);
+        expect(importStore.importProgress).toEqual(100);
+      });
+
+      it('should stop polling after timeout', async () => {
+        const importvorgangId: string = '123';
+
+        mockadapter.onGet(`/api/import/${importvorgangId}/status`).reply(200, { status: ImportStatus.Inprogress });
+
+        const pollingPromise: Promise<void> = importStore.startImportStatusPolling(importvorgangId);
+
+        // Fast forward timer to exceed max polling time (5 minutes)
+        vi.advanceTimersByTime(5 * 60 * 1000 + 1);
+        await pollingPromise;
+
+        expect(importStore.errorCode).toEqual('IMPORT_TIMEOUT');
+        expect(importStore.importProgress).toEqual(0);
       });
     });
   });
