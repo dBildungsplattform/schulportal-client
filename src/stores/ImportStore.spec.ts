@@ -207,6 +207,19 @@ describe('ImportStore', () => {
         expect(importStore.errorCode).toEqual('IMPORT_TIMEOUT');
         expect(importStore.importProgress).toEqual(0);
       });
+
+      it('should not poll if there is an error', async () => {
+        const importvorgangId: string = '123';
+
+        mockadapter.onGet(`/api/import/${importvorgangId}/status`).reply(500);
+
+        const pollingPromise: Promise<void> = importStore.startImportStatusPolling(importvorgangId);
+
+        await pollingPromise;
+
+        expect(importStore.errorCode).toEqual('UNSPECIFIED_ERROR');
+        expect(importStore.importProgress).toEqual(0);
+      });
     });
   });
 });
