@@ -336,6 +336,7 @@
     await personenkontextStore.processWorkflowStep({ limit: 25 });
     importStore.uploadResponse = null;
     importStore.importedData = null;
+    importStore.importProgress = 0;
     organisationStore.errorCode = '';
     /* listen for browser changes and prevent them when form is dirty */
     window.addEventListener('beforeunload', preventNavigation);
@@ -451,7 +452,7 @@
                 striped
               >
                 <template v-slot:default="{ value }">
-                  <strong>{{ Math.ceil(value) }}%</strong>
+                  <strong class="text-white">{{ Math.ceil(value) }}%</strong>
                 </template>
               </v-progress-linear>
             </v-col>

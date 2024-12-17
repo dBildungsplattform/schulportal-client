@@ -12,8 +12,7 @@ import axiosApiInstance from '@/services/ApiService';
 const importApi: ImportApiInterface = ImportApiFactory(undefined, '', axiosApiInstance);
 
 // Maximum polling duration (5 minutes)
-const MAX_POLLING_TIME: number = 5 * 60 * 1000; // 5 minutes in milliseconds
-const POLLING_INTERVAL: number = 5000; // 5 seconds between polls
+const MAX_POLLING_TIME: number = 5 * 60 * 1000;
 
 export type ImportState = {
   errorCode: string | null;
@@ -72,35 +71,45 @@ export const useImportStore: StoreDefinition<'importStore', ImportState, ImportG
 
       const startTime: number = Date.now();
 
+      // Dynamically calculate polling interval: 100ms per item, min 1s (Small imports), max 10s (Medium to large imports)
+      // This ensures faster polling for small imports and prevents overwhelming the server for large imports
+      const totalItems: number = this.uploadResponse?.totalImportDataItems || 1;
+      const dynamicPollingInterval: number = Math.max(1000, Math.min(10000, Math.floor(totalItems * 100)));
+
       const pollStatus = async (): Promise<void> => {
         try {
           await this.getPersonenImportStatus(importvorgangId);
 
           // Calculate progress (simple linear progression)
           const elapsedTime: number = Date.now() - startTime;
-          this.importProgress = Math.min(100, (elapsedTime / MAX_POLLING_TIME) * 1000);
+          const progressCurve: number = 1 - Math.exp(-elapsedTime / (MAX_POLLING_TIME / 6));
+          this.importProgress =
+            this.importStatus === ImportStatus.Finished
+              ? 100
+              : Math.max(1, Math.min(95, Math.floor(progressCurve * 100)));
 
           // Stop polling on final states
-          if (
-            this.importStatus === ImportStatus.Finished ||
-            this.importStatus === ImportStatus.Failed ||
-            this.importStatus === ImportStatus.Invalid
-          ) {
-            this.stopImportStatusPolling();
-
-            if (this.importStatus === ImportStatus.Failed) {
+          switch (this.importStatus) {
+            case ImportStatus.Finished:
+              this.stopImportStatusPolling();
+              this.importProgress = 100;
+              break;
+            case ImportStatus.Failed:
+              this.stopImportStatusPolling();
               this.errorCode = 'ERROR_IMPORTING_FILE';
               this.importProgress = 0;
-            } else if (this.importStatus === ImportStatus.Invalid) {
+              break;
+            case ImportStatus.Invalid:
+              this.stopImportStatusPolling();
               this.errorCode = 'ERROR_UPLOADING_FILE';
               this.importProgress = 0;
-            } else {
-              this.importProgress = 100;
-            }
-            return;
+              break;
+            default:
+              // Continue polling if not in a final state
+              break;
           }
 
-          // Stop polling if max time exceeded
+          // Stop polling if max time of 5 minutes is exceeded
           if (elapsedTime >= MAX_POLLING_TIME) {
             this.stopImportStatusPolling();
             this.errorCode = 'IMPORT_TIMEOUT';
@@ -112,11 +121,12 @@ export const useImportStore: StoreDefinition<'importStore', ImportState, ImportG
           this.importProgress = 0;
         }
       };
+
       // Initial immediate call
       await pollStatus();
 
-      // Start periodic polling
-      this.pollingInterval = setInterval(pollStatus, POLLING_INTERVAL);
+      // Start periodic polling with dynamic interval
+      this.pollingInterval = setInterval(pollStatus, dynamicPollingInterval);
     },
 
     stopImportStatusPolling(): void {
