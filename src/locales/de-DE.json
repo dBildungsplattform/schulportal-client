@@ -698,7 +698,7 @@
   },
   "willBeCreated": "wird hinzugefügt",
   "willBeRemoved": "wird entfernt",
-  "yes": "Ja"
+  "yes": "Ja",
   "banner": {
     "hint": "Hinweis: ",
     "kopers": "Die Verwendung dieses Benutzerkontos setzt eine KoPers.-Nr. voraus. Bitte kontaktieren Sie Ihre schulischen Administratorinnen und Administratoren, um eine KoPers.-Nr. eintragen zu lassen. Andernfalls wird Ihr Zugang zum {date} automatisch gesperrt."
