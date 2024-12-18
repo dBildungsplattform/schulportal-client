@@ -376,7 +376,7 @@
       />
 
       <!-- Import success template -->
-      <template v-if="importStore.importStatus === 100 && !importStore.importIsLoading && !importStore.errorCode">
+      <template v-if="importStore.importProgress === 100 && !importStore.importIsLoading && !importStore.errorCode">
         <v-container>
           <v-row justify="center">
             <v-col cols="auto">
