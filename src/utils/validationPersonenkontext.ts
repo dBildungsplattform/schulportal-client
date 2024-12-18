@@ -6,7 +6,7 @@ import { useForm, type BaseFieldProps, type TypedSchema } from 'vee-validate';
 import { isBefristungspflichtRolle } from './befristung';
 import { useRollen, type TranslatedRolleWithAttrs } from '@/composables/useRollen';
 import { RollenArt, RollenMerkmal } from '@/stores/RolleStore';
-import { notInPast } from './date';
+import { isValidDate, notInPast } from './date';
 
 // Define the form validation schema for the Personenkontext
 export type ZuordnungCreationForm = {
@@ -86,8 +86,9 @@ export const getValidationSchema = (
               : schema.required(t('admin.person.rules.kopersNr.required')), // KopersNr is required if "I don't have one" is not checked
         }),
       selectedBefristung: string()
-        .matches(DDMMYYYY, t('admin.befristung.rules.format')) // Ensure the date matches the DDMMYYYY format
         .test('notInPast', t('admin.befristung.rules.pastDateNotAllowed'), notInPast) // Custom rule to prevent past dates
+        .test('isValidDate', t('admin.befristung.rules.invalidDateNotAllowed'), isValidDate)
+        .matches(DDMMYYYY, t('admin.befristung.rules.format')) // Ensure the date matches the DDMMYYYY format
         .when(['selectedRolle', 'selectedBefristungOption'], {
           is: (selectedRolleId: string, selectedBefristungOption: string | undefined) =>
             isBefristungspflichtRolle(selectedRolleId) && selectedBefristungOption === undefined, // Conditional required
