@@ -79,23 +79,29 @@
     return error ? 'error' : 'warning';
   }
 
+  function addAlert(alerts: Alert[], occasion: string, messageKey: string): void {
+    const lockInfo: PersonTimeLimitInfoResponse | undefined = authStore.timeLimitInfos.find(
+      (info: PersonTimeLimitInfoResponse) => info.occasion === occasion,
+    );
+    if (lockInfo) {
+      const deadlineDate: Date = new Date(lockInfo.deadline!);
+      alerts.push({
+        id: lockInfo.occasion,
+        message: t(messageKey, { date: formatDateDiggitsToGermanDate(deadlineDate) }),
+        visible: true,
+        type: getUrgencyType(deadlineDate),
+      });
+    }
+  }
+
   function getBannerAlerts(): Alert[] {
     const alerts: Alert[] = [];
 
-    if (!personInfoStore.personInfo?.person.personalnummer && hasKoPersMerkmal.value == true) {
-      const lockInfo: PersonTimeLimitInfoResponse | undefined =
-        authStore.timeLimitInfos.find((info: PersonTimeLimitInfoResponse) => info.occasion === 'KOPERS') ?? undefined;
-      if (lockInfo) {
-        const kopersDeadline: string = lockInfo.deadline!;
-        const kopersDeadlineDate: Date = new Date(kopersDeadline);
-        alerts.push({
-          id: lockInfo.occasion ?? '',
-          message: t('banner.kopers', { date: formatDateDiggitsToGermanDate(kopersDeadlineDate) }),
-          visible: true,
-          type: getUrgencyType(kopersDeadlineDate),
-        });
-      }
+    if (!personInfoStore.personInfo?.person.personalnummer && hasKoPersMerkmal.value) {
+      addAlert(alerts, 'KOPERS', 'banner.kopers');
     }
+
+    addAlert(alerts, 'NO_KONTEXTE', 'banner.noKontexte');
 
     return alerts;
   }
