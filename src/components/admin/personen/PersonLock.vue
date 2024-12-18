@@ -47,9 +47,9 @@
         then: (schema: StringSchema<string | undefined, AnyObject, undefined, ''>) =>
           schema
             .required(t('admin.befristung.rules.required'))
-            .matches(DDMMYYYY, t('admin.befristung.rules.format'))
             .test('notInPast', t('admin.befristung.rules.pastDateNotAllowed'), notInPast)
-            .test('isValidDate', t('admin.befristung.rules.invalidDateNotAllowed'), isValidDate),
+            .test('isValidDate', t('admin.befristung.rules.invalidDateNotAllowed'), isValidDate)
+            .matches(DDMMYYYY, t('admin.befristung.rules.format')),
         otherwise: (schema: StringSchema<string | undefined, AnyObject, undefined, ''>) => schema.notRequired(),
       }),
     }),
