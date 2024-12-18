@@ -23,6 +23,7 @@
   import { type ImportStore, useImportStore } from '@/stores/ImportStore';
   import { RollenArt } from '@/stores/RolleStore';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
+  import { ImportStatus } from '@/api-client/generated';
 
   const organisationStore: OrganisationStore = useOrganisationStore();
   const importStore: ImportStore = useImportStore();
@@ -376,7 +377,11 @@
       />
 
       <!-- Import success template -->
-      <template v-if="importStore.importProgress === 100 && !importStore.importIsLoading && !importStore.errorCode">
+      <template
+        v-if="
+          importStore.importStatus === ImportStatus.Finished && !importStore.importIsLoading && !importStore.errorCode
+        "
+      >
         <v-container>
           <v-row justify="center">
             <v-col cols="auto">
