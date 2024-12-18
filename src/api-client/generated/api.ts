@@ -1958,6 +1958,25 @@ export interface PersonResponseEmail {
 /**
  * 
  * @export
+ * @interface PersonTimeLimitInfoResponse
+ */
+export interface PersonTimeLimitInfoResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonTimeLimitInfoResponse
+     */
+    'occasion': string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonTimeLimitInfoResponse
+     */
+    'deadline': string | null;
+}
+/**
+ * 
+ * @export
  * @interface PersonendatensatzResponse
  */
 export interface PersonendatensatzResponse {
@@ -3087,6 +3106,12 @@ export interface UserinfoResponse {
      * @memberof UserinfoResponse
      */
     'acr': string;
+    /**
+     * 
+     * @type {Array<PersonTimeLimitInfoResponse>}
+     * @memberof UserinfoResponse
+     */
+    'timeLimits': Array<PersonTimeLimitInfoResponse>;
 }
 /**
  * 

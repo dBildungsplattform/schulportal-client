@@ -4278,6 +4278,52 @@
                 ]
             }
         },
+        "/api/cron/vidis-angebote": {
+            "put": {
+                "operationId": "CronController_updateServiceProvidersForVidisAngebote",
+                "parameters": [],
+                "responses": {
+                    "201": {
+                        "description": "VIDIS Angebote were successfully updated.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "boolean"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "VIDIS Angebote were not successfully updated."
+                    },
+                    "401": {
+                        "description": "Not authorized to update VIDIS Angebote."
+                    },
+                    "403": {
+                        "description": "Insufficient permissions to update VIDIS Angebote."
+                    },
+                    "404": {
+                        "description": "Insufficient permissions to update VIDIS Angebote."
+                    },
+                    "500": {
+                        "description": "Internal server error while trying to update VIDIS Angebote."
+                    }
+                },
+                "tags": [
+                    "cron"
+                ],
+                "security": [
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
         "/api/import/upload": {
             "post": {
                 "operationId": "ImportController_uploadFile",
@@ -4346,16 +4392,8 @@
                     }
                 },
                 "responses": {
-                    "200": {
-                        "description": "Import transaction was executed successfully. The text file can be downloaded",
-                        "content": {
-                            "text/plain": {
-                                "schema": {
-                                    "type": "string",
-                                    "format": "binary"
-                                }
-                            }
-                        }
+                    "204": {
+                        "description": "The execution of the import transaction was initiated successfully."
                     },
                     "400": {
                         "description": "Something went wrong with the found import transaction.",
@@ -4445,6 +4483,248 @@
                     {
                         "bearer": []
                     }
+                ]
+            }
+        },
+        "/api/import/history": {
+            "get": {
+                "operationId": "ImportController_findImportTransactions",
+                "summary": "",
+                "description": "Get the history of import.",
+                "parameters": [
+                    {
+                        "name": "offset",
+                        "required": false,
+                        "in": "query",
+                        "description": "The offset of the paginated list.",
+                        "schema": {
+                            "type": "number"
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "required": false,
+                        "in": "query",
+                        "description": "The requested limit for the page size.",
+                        "schema": {
+                            "type": "number"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "required": false,
+                        "in": "query",
+                        "schema": {
+                            "$ref": "#/components/schemas/ImportStatus"
+                        }
+                    },
+                    {
+                        "name": "rolleIds",
+                        "required": false,
+                        "in": "query",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    {
+                        "name": "organisationIds",
+                        "required": false,
+                        "in": "query",
+                        "description": "Liefert Importvorgänge mit den angegebenen IDs, selbst wenn andere Filterkriterien nicht zutreffen (ODER-verknüpft mit anderen Kriterien).",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The import transactions were successfully returned",
+                        "headers": {
+                            "X-Paging-Offset": {
+                                "description": "The offset of the first item from the list. List starts with index 0."
+                            },
+                            "X-Paging-Limit": {
+                                "description": "The maximum amount of items returned in one request."
+                            },
+                            "X-Paging-Total": {
+                                "description": "The total amount of items in the list."
+                            },
+                            "X-Paging-pageTotal": {
+                                "description": "The total amount of items in the paginated list."
+                            }
+                        },
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ImportVorgangResponse"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Not authorized to get import transactions."
+                    },
+                    "403": {
+                        "description": "Insufficient permissions to get import transactions."
+                    },
+                    "500": {
+                        "description": "Internal server error while getting import transactions."
+                    }
+                },
+                "tags": [
+                    "import"
+                ],
+                "security": [
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
+        "/api/import/{importvorgangId}/download": {
+            "get": {
+                "operationId": "ImportController_downloadFile",
+                "parameters": [
+                    {
+                        "name": "importvorgangId",
+                        "required": true,
+                        "in": "path",
+                        "description": "The id of an import transaction",
+                        "schema": {
+                            "nullable": false,
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The import result file was generated and downloaded successfully.",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "format": "binary"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Something went wrong with the found import transaction.",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DbiamImportError"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Not authorized to download the import result."
+                    },
+                    "403": {
+                        "description": "Insufficient permissions to download the import result."
+                    },
+                    "404": {
+                        "description": "The import transaction does not exist."
+                    },
+                    "500": {
+                        "description": "Internal server error while generating the import result file."
+                    }
+                },
+                "tags": [
+                    "import"
+                ],
+                "security": [
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
+        "/api/import/{importvorgangId}/status": {
+            "get": {
+                "operationId": "ImportController_getImportStatus",
+                "summary": "",
+                "description": "Get status for the import transaction by id.",
+                "parameters": [
+                    {
+                        "name": "importvorgangId",
+                        "required": true,
+                        "in": "path",
+                        "description": "The id of an import transaction",
+                        "schema": {
+                            "nullable": false,
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The status for the import transaction was successfully returned.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ImportVorgangStatusResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Not authorized to get the status for the import transaction by id."
+                    },
+                    "403": {
+                        "description": "Insufficient permission to get status for the import transaction by id."
+                    },
+                    "500": {
+                        "description": "Internal server error while getting status for the import transaction by id."
+                    }
+                },
+                "tags": [
+                    "import"
+                ],
+                "security": [
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
+        "/metrics": {
+            "get": {
+                "operationId": "MetricsController_getMetrics",
+                "summary": "Get Prometheus metrics",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "Prometheus metrics."
+                    }
+                },
+                "tags": [
+                    "Metrics"
                 ]
             }
         },
@@ -4551,6 +4831,21 @@
                     "rolle"
                 ]
             },
+            "PersonTimeLimitInfoResponse": {
+                "type": "object",
+                "properties": {
+                    "occasion": {
+                        "type": "string"
+                    },
+                    "deadline": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "occasion",
+                    "deadline"
+                ]
+            },
             "UserinfoResponse": {
                 "type": "object",
                 "properties": {
@@ -4642,6 +4937,12 @@
                     "acr": {
                         "type": "string",
                         "nullable": false
+                    },
+                    "timeLimits": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PersonTimeLimitInfoResponse"
+                        }
                     }
                 },
                 "required": [
@@ -4666,7 +4967,8 @@
                     "updated_at",
                     "password_updated_at",
                     "personenkontexte",
-                    "acr"
+                    "acr",
+                    "timeLimits"
                 ]
             },
             "CreatePersonMigrationBodyParams": {
@@ -6844,18 +7146,10 @@
                         "type": "string",
                         "description": "The id of an import transaction",
                         "nullable": false
-                    },
-                    "organisationId": {
-                        "type": "string"
-                    },
-                    "rolleId": {
-                        "type": "string"
                     }
                 },
                 "required": [
-                    "importvorgangId",
-                    "organisationId",
-                    "rolleId"
+                    "importvorgangId"
                 ]
             },
             "DbiamImportError": {
@@ -6869,7 +7163,9 @@
                             "CSV_FILE_EMPTY_ERROR",
                             "IMPORT_TEXT_FILE_CREATION_ERROR",
                             "IMPORT_NUR_LERN_AN_SCHULE_ERROR",
-                            "CSV_FILE_INVALID_HEADER_ERROR"
+                            "CSV_FILE_INVALID_HEADER_ERROR",
+                            "IMPORT_MAX_USERS_LIMIT_ERROR",
+                            "CSV_FILE_NO_USERS_ERROR"
                         ]
                     },
                     "code": {
@@ -6880,6 +7176,67 @@
                 "required": [
                     "i18nKey",
                     "code"
+                ]
+            },
+            "ImportStatus": {
+                "type": "string",
+                "enum": [
+                    "CANCELLED",
+                    "COMPLETED",
+                    "FAILED",
+                    "FINISHED",
+                    "INPROGRESS",
+                    "INVALID",
+                    "STARTED",
+                    "VALID"
+                ]
+            },
+            "ImportVorgangResponse": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "createdAt": {
+                        "format": "date-time",
+                        "type": "string"
+                    },
+                    "updatedAt": {
+                        "format": "date-time",
+                        "type": "string"
+                    },
+                    "rollenname": {
+                        "type": "string"
+                    },
+                    "organisationsname": {
+                        "type": "string"
+                    },
+                    "dataItemCount": {
+                        "type": "number"
+                    },
+                    "status": {
+                        "$ref": "#/components/schemas/ImportStatus"
+                    }
+                },
+                "required": [
+                    "id",
+                    "createdAt",
+                    "updatedAt",
+                    "rollenname",
+                    "organisationsname",
+                    "dataItemCount",
+                    "status"
+                ]
+            },
+            "ImportVorgangStatusResponse": {
+                "type": "object",
+                "properties": {
+                    "status": {
+                        "$ref": "#/components/schemas/ImportStatus"
+                    }
+                },
+                "required": [
+                    "status"
                 ]
             },
             "FeatureFlagResponse": {
