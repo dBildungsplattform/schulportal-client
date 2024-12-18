@@ -98,9 +98,9 @@
             schema.required(t('admin.person.rules.kopersNr.required')),
         }),
       selectedBefristung: string()
-        .matches(DDMMYYYY, t('admin.befristung.rules.format'))
         .test('notInPast', t('admin.befristung.rules.pastDateNotAllowed'), notInPast)
         .test('isValidDate', t('admin.befristung.rules.invalidDateNotAllowed'), isValidDate)
+        .matches(DDMMYYYY, t('admin.befristung.rules.format'))
         .when(['selectedRolle', 'selectedBefristungOption'], {
           is: (selectedRolleId: string, selectedBefristungOption: string | undefined) =>
             isBefristungspflichtRolle(selectedRolleId) && selectedBefristungOption === undefined,
