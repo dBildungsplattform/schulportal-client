@@ -551,7 +551,9 @@ export const DbiamImportErrorI18nKeyEnum = {
     CsvFileEmptyError: 'CSV_FILE_EMPTY_ERROR',
     ImportTextFileCreationError: 'IMPORT_TEXT_FILE_CREATION_ERROR',
     ImportNurLernAnSchuleError: 'IMPORT_NUR_LERN_AN_SCHULE_ERROR',
-    CsvFileInvalidHeaderError: 'CSV_FILE_INVALID_HEADER_ERROR'
+    CsvFileInvalidHeaderError: 'CSV_FILE_INVALID_HEADER_ERROR',
+    ImportMaxUsersLimitError: 'IMPORT_MAX_USERS_LIMIT_ERROR',
+    CsvFileNoUsersError: 'CSV_FILE_NO_USERS_ERROR'
 } as const;
 
 export type DbiamImportErrorI18nKeyEnum = typeof DbiamImportErrorI18nKeyEnum[keyof typeof DbiamImportErrorI18nKeyEnum];
@@ -972,6 +974,26 @@ export interface ImportDataItemResponse {
 /**
  * 
  * @export
+ * @enum {string}
+ */
+
+export const ImportStatus = {
+    Cancelled: 'CANCELLED',
+    Completed: 'COMPLETED',
+    Failed: 'FAILED',
+    Finished: 'FINISHED',
+    Inprogress: 'INPROGRESS',
+    Invalid: 'INVALID',
+    Started: 'STARTED',
+    Valid: 'VALID'
+} as const;
+
+export type ImportStatus = typeof ImportStatus[keyof typeof ImportStatus];
+
+
+/**
+ * 
+ * @export
  * @interface ImportUploadResponse
  */
 export interface ImportUploadResponse {
@@ -1009,6 +1031,72 @@ export interface ImportUploadResponse {
 /**
  * 
  * @export
+ * @interface ImportVorgangResponse
+ */
+export interface ImportVorgangResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof ImportVorgangResponse
+     */
+    'id': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ImportVorgangResponse
+     */
+    'createdAt': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ImportVorgangResponse
+     */
+    'updatedAt': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ImportVorgangResponse
+     */
+    'rollenname': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ImportVorgangResponse
+     */
+    'organisationsname': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof ImportVorgangResponse
+     */
+    'dataItemCount': number;
+    /**
+     * 
+     * @type {ImportStatus}
+     * @memberof ImportVorgangResponse
+     */
+    'status': ImportStatus;
+}
+
+
+/**
+ * 
+ * @export
+ * @interface ImportVorgangStatusResponse
+ */
+export interface ImportVorgangStatusResponse {
+    /**
+     * 
+     * @type {ImportStatus}
+     * @memberof ImportVorgangStatusResponse
+     */
+    'status': ImportStatus;
+}
+
+
+/**
+ * 
+ * @export
  * @interface ImportvorgangByIdBodyParams
  */
 export interface ImportvorgangByIdBodyParams {
@@ -1018,18 +1106,6 @@ export interface ImportvorgangByIdBodyParams {
      * @memberof ImportvorgangByIdBodyParams
      */
     'importvorgangId': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ImportvorgangByIdBodyParams
-     */
-    'organisationId': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ImportvorgangByIdBodyParams
-     */
-    'rolleId': string;
 }
 /**
  * 
@@ -1966,13 +2042,13 @@ export interface PersonTimeLimitInfoResponse {
      * @type {string}
      * @memberof PersonTimeLimitInfoResponse
      */
-    'occasion': string | null;
+    'occasion': string;
     /**
      * 
      * @type {string}
      * @memberof PersonTimeLimitInfoResponse
      */
-    'deadline': string | null;
+    'deadline': string;
 }
 /**
  * 
@@ -4304,6 +4380,43 @@ export const CronApiAxiosParamCreator = function (configuration?: Configuration)
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        cronControllerUpdateServiceProvidersForVidisAngebote: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/cron/vidis-angebote`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -4350,6 +4463,15 @@ export const CronApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.cronControllerUnlockUsersWithExpiredLocks(options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async cronControllerUpdateServiceProvidersForVidisAngebote(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<boolean>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.cronControllerUpdateServiceProvidersForVidisAngebote(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
     }
 };
 
@@ -4392,6 +4514,14 @@ export const CronApiFactory = function (configuration?: Configuration, basePath?
         cronControllerUnlockUsersWithExpiredLocks(options?: any): AxiosPromise<boolean> {
             return localVarFp.cronControllerUnlockUsersWithExpiredLocks(options).then((request) => request(axios, basePath));
         },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        cronControllerUpdateServiceProvidersForVidisAngebote(options?: any): AxiosPromise<boolean> {
+            return localVarFp.cronControllerUpdateServiceProvidersForVidisAngebote(options).then((request) => request(axios, basePath));
+        },
     };
 };
 
@@ -4432,6 +4562,14 @@ export interface CronApiInterface {
      * @memberof CronApiInterface
      */
     cronControllerUnlockUsersWithExpiredLocks(options?: AxiosRequestConfig): AxiosPromise<boolean>;
+
+    /**
+     * 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CronApiInterface
+     */
+    cronControllerUpdateServiceProvidersForVidisAngebote(options?: AxiosRequestConfig): AxiosPromise<boolean>;
 
 }
 
@@ -4480,6 +4618,16 @@ export class CronApi extends BaseAPI implements CronApiInterface {
      */
     public cronControllerUnlockUsersWithExpiredLocks(options?: AxiosRequestConfig) {
         return CronApiFp(this.configuration).cronControllerUnlockUsersWithExpiredLocks(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CronApi
+     */
+    public cronControllerUpdateServiceProvidersForVidisAngebote(options?: AxiosRequestConfig) {
+        return CronApiFp(this.configuration).cronControllerUpdateServiceProvidersForVidisAngebote(options).then((request) => request(this.axios, this.basePath));
     }
 }
 
@@ -4950,6 +5098,47 @@ export const ImportApiAxiosParamCreator = function (configuration?: Configuratio
         },
         /**
          * 
+         * @param {string} importvorgangId The id of an import transaction
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        importControllerDownloadFile: async (importvorgangId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'importvorgangId' is not null or undefined
+            assertParamExists('importControllerDownloadFile', 'importvorgangId', importvorgangId)
+            const localVarPath = `/api/import/{importvorgangId}/download`
+                .replace(`{${"importvorgangId"}}`, encodeURIComponent(String(importvorgangId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @param {ImportvorgangByIdBodyParams} importvorgangByIdBodyParams 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -4985,6 +5174,111 @@ export const ImportApiAxiosParamCreator = function (configuration?: Configuratio
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(importvorgangByIdBodyParams, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Get the history of import.
+         * @summary 
+         * @param {number} [offset] The offset of the paginated list.
+         * @param {number} [limit] The requested limit for the page size.
+         * @param {ImportStatus} [status] 
+         * @param {Array<string>} [rolleIds] 
+         * @param {Array<string>} [organisationIds] Liefert Importvorgänge mit den angegebenen IDs, selbst wenn andere Filterkriterien nicht zutreffen (ODER-verknüpft mit anderen Kriterien).
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        importControllerFindImportTransactions: async (offset?: number, limit?: number, status?: ImportStatus, rolleIds?: Array<string>, organisationIds?: Array<string>, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/import/history`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+            if (offset !== undefined) {
+                localVarQueryParameter['offset'] = offset;
+            }
+
+            if (limit !== undefined) {
+                localVarQueryParameter['limit'] = limit;
+            }
+
+            if (status !== undefined) {
+                localVarQueryParameter['status'] = status;
+            }
+
+            if (rolleIds) {
+                localVarQueryParameter['rolleIds'] = rolleIds;
+            }
+
+            if (organisationIds) {
+                localVarQueryParameter['organisationIds'] = organisationIds;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Get status for the import transaction by id.
+         * @summary 
+         * @param {string} importvorgangId The id of an import transaction
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        importControllerGetImportStatus: async (importvorgangId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'importvorgangId' is not null or undefined
+            assertParamExists('importControllerGetImportStatus', 'importvorgangId', importvorgangId)
+            const localVarPath = `/api/import/{importvorgangId}/status`
+                .replace(`{${"importvorgangId"}}`, encodeURIComponent(String(importvorgangId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -5076,12 +5370,48 @@ export const ImportApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @param {string} importvorgangId The id of an import transaction
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async importControllerDownloadFile(importvorgangId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<File>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.importControllerDownloadFile(importvorgangId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
          * @param {ImportvorgangByIdBodyParams} importvorgangByIdBodyParams 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async importControllerExecuteImport(importvorgangByIdBodyParams: ImportvorgangByIdBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<File>> {
+        async importControllerExecuteImport(importvorgangByIdBodyParams: ImportvorgangByIdBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.importControllerExecuteImport(importvorgangByIdBodyParams, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * Get the history of import.
+         * @summary 
+         * @param {number} [offset] The offset of the paginated list.
+         * @param {number} [limit] The requested limit for the page size.
+         * @param {ImportStatus} [status] 
+         * @param {Array<string>} [rolleIds] 
+         * @param {Array<string>} [organisationIds] Liefert Importvorgänge mit den angegebenen IDs, selbst wenn andere Filterkriterien nicht zutreffen (ODER-verknüpft mit anderen Kriterien).
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async importControllerFindImportTransactions(offset?: number, limit?: number, status?: ImportStatus, rolleIds?: Array<string>, organisationIds?: Array<string>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<ImportVorgangResponse>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.importControllerFindImportTransactions(offset, limit, status, rolleIds, organisationIds, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * Get status for the import transaction by id.
+         * @summary 
+         * @param {string} importvorgangId The id of an import transaction
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async importControllerGetImportStatus(importvorgangId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ImportVorgangStatusResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.importControllerGetImportStatus(importvorgangId, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -5118,12 +5448,45 @@ export const ImportApiFactory = function (configuration?: Configuration, basePat
         },
         /**
          * 
+         * @param {string} importvorgangId The id of an import transaction
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        importControllerDownloadFile(importvorgangId: string, options?: any): AxiosPromise<File> {
+            return localVarFp.importControllerDownloadFile(importvorgangId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @param {ImportvorgangByIdBodyParams} importvorgangByIdBodyParams 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        importControllerExecuteImport(importvorgangByIdBodyParams: ImportvorgangByIdBodyParams, options?: any): AxiosPromise<File> {
+        importControllerExecuteImport(importvorgangByIdBodyParams: ImportvorgangByIdBodyParams, options?: any): AxiosPromise<void> {
             return localVarFp.importControllerExecuteImport(importvorgangByIdBodyParams, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Get the history of import.
+         * @summary 
+         * @param {number} [offset] The offset of the paginated list.
+         * @param {number} [limit] The requested limit for the page size.
+         * @param {ImportStatus} [status] 
+         * @param {Array<string>} [rolleIds] 
+         * @param {Array<string>} [organisationIds] Liefert Importvorgänge mit den angegebenen IDs, selbst wenn andere Filterkriterien nicht zutreffen (ODER-verknüpft mit anderen Kriterien).
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        importControllerFindImportTransactions(offset?: number, limit?: number, status?: ImportStatus, rolleIds?: Array<string>, organisationIds?: Array<string>, options?: any): AxiosPromise<Array<ImportVorgangResponse>> {
+            return localVarFp.importControllerFindImportTransactions(offset, limit, status, rolleIds, organisationIds, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Get status for the import transaction by id.
+         * @summary 
+         * @param {string} importvorgangId The id of an import transaction
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        importControllerGetImportStatus(importvorgangId: string, options?: any): AxiosPromise<ImportVorgangStatusResponse> {
+            return localVarFp.importControllerGetImportStatus(importvorgangId, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -5157,12 +5520,45 @@ export interface ImportApiInterface {
 
     /**
      * 
+     * @param {string} importvorgangId The id of an import transaction
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ImportApiInterface
+     */
+    importControllerDownloadFile(importvorgangId: string, options?: AxiosRequestConfig): AxiosPromise<File>;
+
+    /**
+     * 
      * @param {ImportvorgangByIdBodyParams} importvorgangByIdBodyParams 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ImportApiInterface
      */
-    importControllerExecuteImport(importvorgangByIdBodyParams: ImportvorgangByIdBodyParams, options?: AxiosRequestConfig): AxiosPromise<File>;
+    importControllerExecuteImport(importvorgangByIdBodyParams: ImportvorgangByIdBodyParams, options?: AxiosRequestConfig): AxiosPromise<void>;
+
+    /**
+     * Get the history of import.
+     * @summary 
+     * @param {number} [offset] The offset of the paginated list.
+     * @param {number} [limit] The requested limit for the page size.
+     * @param {ImportStatus} [status] 
+     * @param {Array<string>} [rolleIds] 
+     * @param {Array<string>} [organisationIds] Liefert Importvorgänge mit den angegebenen IDs, selbst wenn andere Filterkriterien nicht zutreffen (ODER-verknüpft mit anderen Kriterien).
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ImportApiInterface
+     */
+    importControllerFindImportTransactions(offset?: number, limit?: number, status?: ImportStatus, rolleIds?: Array<string>, organisationIds?: Array<string>, options?: AxiosRequestConfig): AxiosPromise<Array<ImportVorgangResponse>>;
+
+    /**
+     * Get status for the import transaction by id.
+     * @summary 
+     * @param {string} importvorgangId The id of an import transaction
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ImportApiInterface
+     */
+    importControllerGetImportStatus(importvorgangId: string, options?: AxiosRequestConfig): AxiosPromise<ImportVorgangStatusResponse>;
 
     /**
      * 
@@ -5198,6 +5594,17 @@ export class ImportApi extends BaseAPI implements ImportApiInterface {
 
     /**
      * 
+     * @param {string} importvorgangId The id of an import transaction
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ImportApi
+     */
+    public importControllerDownloadFile(importvorgangId: string, options?: AxiosRequestConfig) {
+        return ImportApiFp(this.configuration).importControllerDownloadFile(importvorgangId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
      * @param {ImportvorgangByIdBodyParams} importvorgangByIdBodyParams 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -5205,6 +5612,34 @@ export class ImportApi extends BaseAPI implements ImportApiInterface {
      */
     public importControllerExecuteImport(importvorgangByIdBodyParams: ImportvorgangByIdBodyParams, options?: AxiosRequestConfig) {
         return ImportApiFp(this.configuration).importControllerExecuteImport(importvorgangByIdBodyParams, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Get the history of import.
+     * @summary 
+     * @param {number} [offset] The offset of the paginated list.
+     * @param {number} [limit] The requested limit for the page size.
+     * @param {ImportStatus} [status] 
+     * @param {Array<string>} [rolleIds] 
+     * @param {Array<string>} [organisationIds] Liefert Importvorgänge mit den angegebenen IDs, selbst wenn andere Filterkriterien nicht zutreffen (ODER-verknüpft mit anderen Kriterien).
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ImportApi
+     */
+    public importControllerFindImportTransactions(offset?: number, limit?: number, status?: ImportStatus, rolleIds?: Array<string>, organisationIds?: Array<string>, options?: AxiosRequestConfig) {
+        return ImportApiFp(this.configuration).importControllerFindImportTransactions(offset, limit, status, rolleIds, organisationIds, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Get status for the import transaction by id.
+     * @summary 
+     * @param {string} importvorgangId The id of an import transaction
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ImportApi
+     */
+    public importControllerGetImportStatus(importvorgangId: string, options?: AxiosRequestConfig) {
+        return ImportApiFp(this.configuration).importControllerGetImportStatus(importvorgangId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -5218,6 +5653,121 @@ export class ImportApi extends BaseAPI implements ImportApiInterface {
      */
     public importControllerUploadFile(organisationId: string, rolleId: string, file: File, options?: AxiosRequestConfig) {
         return ImportApiFp(this.configuration).importControllerUploadFile(organisationId, rolleId, file, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+/**
+ * MetricsApi - axios parameter creator
+ * @export
+ */
+export const MetricsApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * 
+         * @summary Get Prometheus metrics
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        metricsControllerGetMetrics: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/metrics`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * MetricsApi - functional programming interface
+ * @export
+ */
+export const MetricsApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = MetricsApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * 
+         * @summary Get Prometheus metrics
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async metricsControllerGetMetrics(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.metricsControllerGetMetrics(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+    }
+};
+
+/**
+ * MetricsApi - factory interface
+ * @export
+ */
+export const MetricsApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = MetricsApiFp(configuration)
+    return {
+        /**
+         * 
+         * @summary Get Prometheus metrics
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        metricsControllerGetMetrics(options?: any): AxiosPromise<void> {
+            return localVarFp.metricsControllerGetMetrics(options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * MetricsApi - interface
+ * @export
+ * @interface MetricsApi
+ */
+export interface MetricsApiInterface {
+    /**
+     * 
+     * @summary Get Prometheus metrics
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof MetricsApiInterface
+     */
+    metricsControllerGetMetrics(options?: AxiosRequestConfig): AxiosPromise<void>;
+
+}
+
+/**
+ * MetricsApi - object-oriented interface
+ * @export
+ * @class MetricsApi
+ * @extends {BaseAPI}
+ */
+export class MetricsApi extends BaseAPI implements MetricsApiInterface {
+    /**
+     * 
+     * @summary Get Prometheus metrics
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof MetricsApi
+     */
+    public metricsControllerGetMetrics(options?: AxiosRequestConfig) {
+        return MetricsApiFp(this.configuration).metricsControllerGetMetrics(options).then((request) => request(this.axios, this.basePath));
     }
 }
 
