@@ -189,7 +189,7 @@
         "UNSPECIFIED_ERROR": "Leider ist ein technischer Fehler aufgetreten. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut."
       },
       "generatedPassword": "Generiertes Passwort",
-      "homePageIQSH":"Homepage der IQSH-Medienberatung",
+      "homePageIQSH": "Homepage der IQSH-Medienberatung",
       "import": "Benutzer importieren",
       "loadingErrorText": "Es konnten keine Benutzerdaten geladen werden.",
       "loadingErrorTitle": "Fehler beim Laden des Benutzers",
@@ -200,7 +200,7 @@
       "personalInfoChangeNotice": "Namensänderungen haben unmittelbare Auswirkungen auf den Benutzernamen im Schulportal SH und auf die E-Mail-Adresse! \n\nWeitere Informationen finden Sie auf der Homepage der IQSH-Medienberatung.",
       "personalInfoChangeNotice2": "Weitere Informationen finden Sie auf der ",
       "personalInfoSuccessDialogMessage": "Die Stammdaten wurden erfolgreich geändert.",
-      "personalInfoSuccessDialogMessageWithUsername": "Die Stammdaten wurden erfolgreich geändert.\n\nDas Passwort wurde nicht verändert und kann wie zuvor verwendet werden. \n\nBitte teilen Sie der betroffenen Person die Stammdatenänderung (Benutzername, Mail-Adresse) mit. \n\nDie neuen Daten können Sie in der Gesamtübersicht einsehen." ,
+      "personalInfoSuccessDialogMessageWithUsername": "Die Stammdaten wurden erfolgreich geändert.\n\nDas Passwort wurde nicht verändert und kann wie zuvor verwendet werden. \n\nBitte teilen Sie der betroffenen Person die Stammdatenänderung (Benutzername, Mail-Adresse) mit. \n\nDie neuen Daten können Sie in der Gesamtübersicht einsehen.",
       "printPassword": "Passwort drucken",
       "resetPassword": "Passwort zurücksetzen",
       "resetPasswordConfirmation": "Sind Sie sicher, dass Sie das Passwort für {firstname} {lastname} zurücksetzen möchten?",
@@ -312,7 +312,7 @@
         "NEWER_VERSION_OF_PERSONENKONTEXTE_AVAILABLE": "Geänderte Daten",
         "PERSONALNUMMER_NICHT_EINDEUTIG": "KoPers.-Nr. nicht eindeutig",
         "PERSONENKONTEXTE_UPDATE_ERROR": "Geänderte Daten",
-        "PERSON_NOT_FOUND": "Benutzer gelöscht"        ,
+        "PERSON_NOT_FOUND": "Benutzer gelöscht",
         "REQUIRED_STEP_UP_LEVEL_NOT_MET": "Zwei-Faktor-Authentifizierung (2FA) erforderlich"
       },
       "errors": {
@@ -699,4 +699,8 @@
   "willBeCreated": "wird hinzugefügt",
   "willBeRemoved": "wird entfernt",
   "yes": "Ja"
+  "banner": {
+    "hint": "Hinweis: ",
+    "kopers": "Die Verwendung dieses Benutzerkontos setzt eine KoPers.-Nr. voraus. Bitte kontaktieren Sie Ihre schulischen Administratorinnen und Administratoren, um eine KoPers.-Nr. eintragen zu lassen. Andernfalls wird Ihr Zugang zum {date} automatisch gesperrt."
+  }
 }
