@@ -11,7 +11,7 @@ import {
   RollenSystemRecht,
   type RolleWithServiceProvidersResponse,
 } from '@/stores/RolleStore';
-import { ImportStatus, type ImportUploadResponse } from '@/api-client/generated';
+import type { ImportUploadResponse } from '@/api-client/generated';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import routes from '@/router/routes';
 
@@ -238,7 +238,7 @@ describe('PersonImportView', () => {
 
   test('it downloads an imported file', async () => {
     global.URL.createObjectURL = vi.fn();
-    importStore.importStatus = ImportStatus.Finished;
+    importStore.importProgress = 100;
     await nextTick();
 
     const downloadButton: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="download-file-button"]');
