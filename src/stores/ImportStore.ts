@@ -79,7 +79,7 @@ export const useImportStore: StoreDefinition<'importStore', ImportState, ImportG
           if (this.uploadResponse?.totalImportDataItems) {
             // Calculate progress as a percentage of imported items
             const progressPercentage: number = this.importStatus?.totalDataItemImported
-              ? Math.floor((this.importStatus.totalDataItemImported / this.uploadResponse.totalImportDataItems) * 100)
+              ? Math.floor((this.importStatus.totalDataItemImported / this.importStatus.dataItemCount) * 100)
               : 0;
 
             this.importProgress =
