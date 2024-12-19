@@ -1,7 +1,8 @@
 <script setup lang="ts">
-  import { RollenMerkmal, type DBiamPersonenzuordnungResponse } from '@/api-client/generated/api';
+  import { RollenArt, RollenMerkmal, type DBiamPersonenzuordnungResponse } from '@/api-client/generated/api';
   import SpshTooltip from '@/components/admin/SpshTooltip.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
+  import PasswordReset from '@/components/admin/personen/PasswordReset.vue';
   import SelfServiceWorkflow from '@/components/two-factor-authentication/SelfServiceWorkflow.vue';
   import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
   import { OrganisationsTyp } from '@/stores/OrganisationStore';
@@ -50,6 +51,8 @@
 
   const windowOrigin: string = window.location.origin;
   const loading2FA: Ref<boolean> = ref(false);
+
+  const devicePassword: Ref<string> = ref('');
 
   /**
    * Gruppiert eine Liste von Zuordnungen nach dem Wert der Eigenschaft 'sskId'.
@@ -191,6 +194,37 @@
       }) !== undefined
     );
   });
+
+  // Used to show device password block
+  const hasLehrRolle: ComputedRef<boolean> = computed(() => {
+    return (
+      !!personStore.personenuebersicht?.zuordnungen.find((zuordnung: Zuordnung) => {
+        return zuordnung.rollenArt === RollenArt.Lehr;
+      }) || false
+    );
+  });
+
+  // Computed property to get the device password dialog text
+  const devicePasswordDialogText: ComputedRef<string> = computed(() => {
+    let message: string = t('admin.person.devicePassword.dialogTextProfile');
+    if (devicePassword.value) {
+      message = `${t('admin.person.resetPasswordSuccessMessage')}\n\n${t('admin.person.devicePassword.dialogTextProfile')}`;
+    }
+    return message;
+  });
+
+  const devicePasswordErrorMessage: ComputedRef<string> = computed(() => {
+    let message: string = '';
+    if (personStore.errorCode) {
+      message = t('admin.person.devicePassword.errorMessage');
+    }
+    return message;
+  });
+
+  async function resetDevicePassword(personId: string): Promise<void> {
+    await personStore.resetDevicePassword(personId);
+    devicePassword.value = personStore.newDevicePassword || '';
+  }
 
   const personalData: ComputedRef<LabelValue[]> = computed(() => {
     const data: LabelValue[] = [];
@@ -691,6 +725,55 @@
                     </p>
                   </v-col>
                 </template>
+              </v-row>
+            </v-col>
+          </v-row>
+        </LayoutCard>
+        <LayoutCard
+          v-if="hasLehrRolle"
+          data-testid="reset-device-password-card"
+          :headline-test-id="'reset-device-password-card'"
+          :header="$t('admin.person.devicePassword.header')"
+          class="text-body"
+        >
+          <v-row
+            align="center"
+            justify="center"
+            class="ma-4 text-body"
+          >
+            <v-col class="text-center px-0">
+              <v-row class="d-flex align-center justify-center">
+                <PasswordReset
+                  :buttonText="$t('admin.person.devicePassword.createPassword')"
+                  :confirmButtonText="$t('admin.person.devicePassword.createPassword')"
+                  :dialogHeader="$t('admin.person.devicePassword.createDevicePassword')"
+                  :dialogText="devicePasswordDialogText"
+                  :errorCode="personStore.errorCode"
+                  :errorMessage="devicePasswordErrorMessage"
+                  :isLoading="personStore.loading"
+                  @onClearPassword="devicePassword = ''"
+                  @onResetPassword="resetDevicePassword(personInfoStore.personInfo?.person.id as string)"
+                  :password="devicePassword"
+                  :testId="'device-password'"
+                >
+                </PasswordReset>
+              </v-row>
+              <v-row class="d-flex justify-center">
+                <v-col
+                  class="text-right"
+                  cols="1"
+                >
+                  <v-icon
+                    class="mb-2"
+                    icon="mdi-information"
+                  >
+                  </v-icon>
+                </v-col>
+                <v-col class="text-left">
+                  <p class="white-space-pre-wrap">
+                    {{ $t('admin.person.devicePassword.infoTextProfile') }}
+                  </p>
+                </v-col>
               </v-row>
             </v-col>
           </v-row>

@@ -98,6 +98,7 @@ const mockPersonenuebersicht: PersonWithUebersicht = {
       sskName: 'Testschule Birmingham',
       sskDstNr: '123456',
       rolle: 'SuS',
+      rollenArt: RollenArt.Lern,
       typ: OrganisationsTyp.Schule,
       administriertVon: '2',
       editable: true,
@@ -111,6 +112,7 @@ const mockPersonenuebersicht: PersonWithUebersicht = {
       sskName: 'Testschule London',
       sskDstNr: '123459',
       rolle: 'SuS',
+      rollenArt: RollenArt.Lern,
       typ: OrganisationsTyp.Schule,
       administriertVon: '2',
       editable: true,
@@ -124,12 +126,36 @@ const mockPersonenuebersicht: PersonWithUebersicht = {
       sskName: '9a',
       sskDstNr: '123459',
       rolle: 'SuS',
+      rollenArt: RollenArt.Lern,
       typ: OrganisationsTyp.Klasse,
       administriertVon: '1',
       editable: true,
       merkmale: [] as unknown as RollenMerkmal,
       befristung: '',
       admins: ['test'],
+    },
+  ],
+};
+
+const mockPersonenuebersichtLehr: PersonWithUebersicht = {
+  personId: '22',
+  vorname: 'Randy',
+  nachname: 'Cena',
+  benutzername: 'rcena',
+  lastModifiedZuordnungen: Date.now().toLocaleString(),
+  zuordnungen: [
+    {
+      sskId: '1',
+      rolleId: '1',
+      sskName: 'Testschule Birmingham',
+      sskDstNr: '123456',
+      rolle: 'Lehrkraft',
+      rollenArt: RollenArt.Lehr,
+      typ: OrganisationsTyp.Schule,
+      administriertVon: '2',
+      editable: true,
+      merkmale: [] as unknown as RollenMerkmal,
+      befristung: '2099-08-12',
     },
   ],
 };
@@ -553,5 +579,14 @@ describe('PersonDetailsView', () => {
 
   test('it shows befristung', async () => {
     expect(wrapper?.find('[data-testid="zuordnung-befristung-text"]').isVisible()).toBe(true);
+  });
+
+  test('it shows device password template for rollenart lehr', async () => {
+    personStore.personenuebersicht = mockPersonenuebersichtLehr;
+    await nextTick();
+    expect(wrapper?.find('[data-testid="device-password-info"]').isVisible()).toBe(true);
+
+    // reset personenuebersicht
+    personStore.personenuebersicht = mockPersonenuebersicht;
   });
 });

@@ -13,7 +13,7 @@ import { nextTick } from 'vue';
 import { createMemoryHistory, createRouter, useRoute, type Router } from 'vue-router';
 import ProfileView from './ProfileView.vue';
 import type { Zuordnung } from '@/stores/PersonenkontextStore';
-import { EmailAddressStatus } from '@/api-client/generated';
+import { EmailAddressStatus, RollenArt } from '@/api-client/generated';
 
 let wrapper: VueWrapper | null = null;
 let personInfoStore: PersonInfoStore;
@@ -124,6 +124,7 @@ const mockLehrerUebersicht: PersonWithUebersicht = {
       sskName: 'Muster-Schule',
       sskDstNr: '123456',
       rolle: 'Lehrer',
+      rollenArt: RollenArt.Lern,
       administriertVon: 'root-sh',
       typ: OrganisationsTyp.Schule,
       editable: true,
@@ -147,6 +148,7 @@ const mockLehrerUebersichtWith2Zuordnungen: PersonWithUebersicht = {
       sskName: 'Muster-Schule',
       sskDstNr: '123456',
       rolle: 'Lehrer',
+      rollenArt: RollenArt.Lern,
       administriertVon: 'root-sh',
       typ: OrganisationsTyp.Schule,
       editable: true,
@@ -160,6 +162,7 @@ const mockLehrerUebersichtWith2Zuordnungen: PersonWithUebersicht = {
       sskName: 'Anders-Sonderlich-Schule',
       sskDstNr: '789101112',
       rolle: 'Lehrer',
+      rollenArt: RollenArt.Lern,
       administriertVon: 'root-sh',
       typ: OrganisationsTyp.Schule,
       editable: true,
@@ -183,6 +186,7 @@ const mockSchuelerUebersicht: PersonWithUebersicht = {
       sskName: 'Astrid-Lindgren-Schule',
       sskDstNr: '123456',
       rolle: 'SuS',
+      rollenArt: RollenArt.Lern,
       administriertVon: 'root-sh',
       typ: OrganisationsTyp.Schule,
       editable: true,
@@ -197,6 +201,7 @@ const mockSchuelerUebersicht: PersonWithUebersicht = {
       sskName: '9A',
       sskDstNr: '123456-9A',
       rolle: 'SuS',
+      rollenArt: RollenArt.Lern,
       administriertVon: '1',
       typ: OrganisationsTyp.Klasse,
       editable: true,
