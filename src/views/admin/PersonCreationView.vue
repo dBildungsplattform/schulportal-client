@@ -33,8 +33,7 @@
   import KopersInput from '@/components/admin/personen/KopersInput.vue';
   import PersonenkontextCreate from '@/components/admin/personen/PersonenkontextCreate.vue';
   import { type TranslatedObject } from '@/types.d';
-  import { parse, isValid, isBefore } from 'date-fns';
-  import { getNextSchuljahresende, formatDateToISO } from '@/utils/date';
+  import { getNextSchuljahresende, formatDateToISO, notInPast, isValidDate } from '@/utils/date';
   import { isBefristungspflichtRolle, useBefristungUtils, type BefristungUtilsType } from '@/utils/befristung';
 
   const router: Router = useRouter();
@@ -72,14 +71,6 @@
     return !!rolle && rolle.rollenart === RollenArt.Lern;
   }
 
-  // Custom validation function to check if the date is in the past
-  const notInPast = (value: string | undefined): boolean => {
-    if (!value) return true;
-
-    const parsedDate: Date = parse(value, 'dd.MM.yyyy', new Date());
-    return isValid(parsedDate) && !isBefore(parsedDate, new Date());
-  };
-
   const validationSchema: TypedSchema = toTypedSchema(
     object({
       selectedRolle: string().required(t('admin.rolle.rules.rolle.required')),
@@ -107,8 +98,9 @@
             schema.required(t('admin.person.rules.kopersNr.required')),
         }),
       selectedBefristung: string()
-        .matches(DDMMYYYY, t('admin.befristung.rules.format'))
         .test('notInPast', t('admin.befristung.rules.pastDateNotAllowed'), notInPast)
+        .test('isValidDate', t('admin.befristung.rules.invalidDateNotAllowed'), isValidDate)
+        .matches(DDMMYYYY, t('admin.befristung.rules.format'))
         .when(['selectedRolle', 'selectedBefristungOption'], {
           is: (selectedRolleId: string, selectedBefristungOption: string | undefined) =>
             isBefristungspflichtRolle(selectedRolleId) && selectedBefristungOption === undefined,
