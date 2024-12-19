@@ -38,6 +38,7 @@
   import RolleDelete from '@/components/admin/rollen/RolleDelete.vue';
   import { type TranslatedObject } from '@/types.d';
   import SuccessTemplate from '@/components/admin/rollen/SuccessTemplate.vue';
+  import { isHiddenSystemrecht } from '@/utils/systemrechte';
 
   const route: RouteLocationNormalizedLoaded = useRoute();
   const router: Router = useRouter();
@@ -261,7 +262,7 @@
     });
 
     Object.values(RollenSystemRecht).forEach((enumValue: RollenSystemRecht) => {
-      if (enumValue !== RollenSystemRecht.MigrationDurchfuehren && enumValue !== RollenSystemRecht.CronDurchfuehren) {
+      if (!isHiddenSystemrecht(enumValue)) {
         const i18nPath: string = `admin.rolle.mappingFrontBackEnd.systemrechte.${enumValue}`;
         allSystemrechte.value.push({
           value: enumValue,
@@ -336,6 +337,7 @@
         <v-container>
           <div v-if="rolleStore.currentRolle">
             <RolleForm
+              :errorCode="rolleStore.errorCode"
               :onHandleConfirmUnsavedChanges="handleConfirmUnsavedChanges"
               :onHandleDiscard="navigateToRolleTable"
               :onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
@@ -400,6 +402,7 @@
                 >
                   <div class="d-flex justify-sm-end">
                     <RolleDelete
+                      v-if="!rolleStore.errorCode"
                       :errorCode="rolleStore.errorCode"
                       :rolle="rolleStore.currentRolle"
                       :isLoading="rolleStore.loading"
@@ -414,6 +417,7 @@
                   md="auto"
                 >
                   <v-btn
+                    v-if="!rolleStore.errorCode"
                     class="primary"
                     data-testid="rolle-edit-button"
                     @Click="activateEditing"

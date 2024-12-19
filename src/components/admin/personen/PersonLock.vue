@@ -3,11 +3,10 @@
   import SpshTooltip from '@/components/admin/SpshTooltip.vue';
   import { useForm, type BaseFieldProps, type FormContext, type TypedSchema } from 'vee-validate';
   import { DDMMYYYY } from '@/utils/validation';
-  import { notInPast } from '@/utils/validationPersonenkontext';
   import { toTypedSchema } from '@vee-validate/yup';
   import { object, string, StringSchema, type AnyObject } from 'yup';
   import PersonLockInput from './PersonLockInput.vue';
-  import { formatDateToISO } from '@/utils/date';
+  import { formatDateToISO, isValidDate, notInPast } from '@/utils/date';
   import { PersonLockOccasion, type Personendatensatz, type UserLock } from '@/stores/PersonStore';
   import type { TranslatedObject } from '@/types';
   import { computed, ref, watch, type ComputedRef, type Ref } from 'vue';
@@ -48,8 +47,9 @@
         then: (schema: StringSchema<string | undefined, AnyObject, undefined, ''>) =>
           schema
             .required(t('admin.befristung.rules.required'))
-            .matches(DDMMYYYY, t('admin.befristung.rules.format'))
-            .test('notInPast', t('admin.befristung.rules.pastDateNotAllowed'), notInPast),
+            .test('notInPast', t('admin.befristung.rules.pastDateNotAllowed'), notInPast)
+            .test('isValidDate', t('admin.befristung.rules.invalidDateNotAllowed'), isValidDate)
+            .matches(DDMMYYYY, t('admin.befristung.rules.format')),
         otherwise: (schema: StringSchema<string | undefined, AnyObject, undefined, ''>) => schema.notRequired(),
       }),
     }),
