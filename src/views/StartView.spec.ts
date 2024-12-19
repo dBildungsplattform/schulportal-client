@@ -11,7 +11,7 @@ import { nextTick } from 'vue';
 import StartView from './StartView.vue';
 import { type PersonStore, usePersonStore, type PersonWithUebersicht } from '@/stores/PersonStore';
 import { usePersonInfoStore, type PersonInfoResponse, type PersonInfoStore } from '@/stores/PersonInfoStore';
-import { OrganisationsTyp, RollenMerkmal } from '@/api-client/generated/api';
+import { OrganisationsTyp, RollenArt, RollenMerkmal } from '@/api-client/generated/api';
 
 let wrapper: VueWrapper | null = null;
 let authStore: AuthStore;
@@ -90,6 +90,7 @@ const mockPersonenUebersicht: PersonWithUebersicht = {
       editable: true,
       merkmale: ['KOPERS_PFLICHT'] as unknown as RollenMerkmal,
       befristung: '2024-05-06',
+      rollenArt: RollenArt.Lehr,
     },
     {
       sskId: '2',
@@ -102,6 +103,7 @@ const mockPersonenUebersicht: PersonWithUebersicht = {
       editable: true,
       merkmale: ['KOPERS_PFLICHT'] as unknown as RollenMerkmal,
       befristung: '2024-05-06',
+      rollenArt: RollenArt.Lehr,
     },
   ],
 };
