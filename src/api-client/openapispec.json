@@ -936,6 +936,54 @@
                 ]
             }
         },
+        "/api/personen/{personId}/uem-password": {
+            "patch": {
+                "operationId": "PersonController_resetUEMPasswordByPersonId",
+                "parameters": [
+                    {
+                        "name": "personId",
+                        "required": true,
+                        "in": "path",
+                        "description": "The id for the account.",
+                        "schema": {
+                            "nullable": false,
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "202": {
+                        "description": "UEM-password for person was successfully reset.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "The person does not exist or insufficient permissions to update person."
+                    },
+                    "500": {
+                        "description": "Internal server error."
+                    }
+                },
+                "tags": [
+                    "personen"
+                ],
+                "security": [
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
         "/api/personen-frontend": {
             "get": {
                 "operationId": "PersonFrontendController_findPersons",
@@ -5462,7 +5510,8 @@
                             "DOWNSTREAM_UNREACHABLE",
                             "PERSONALNUMMER_REQUIRED",
                             "NEWER_VERSION_OF_PERSON_AVAILABLE",
-                            "PERSONALNUMMER_NICHT_EINDEUTIG"
+                            "PERSONALNUMMER_NICHT_EINDEUTIG",
+                            "PERSON_UEM_PASSWORD_MODIFICATION_ERROR"
                         ]
                     },
                     "code": {
@@ -5473,6 +5522,17 @@
                 "required": [
                     "i18nKey",
                     "code"
+                ]
+            },
+            "RollenArt": {
+                "type": "string",
+                "enum": [
+                    "LERN",
+                    "LEHR",
+                    "EXTERN",
+                    "ORGADMIN",
+                    "LEIT",
+                    "SYSADMIN"
                 ]
             },
             "OrganisationsTyp": {
@@ -5513,6 +5573,10 @@
                     "rolle": {
                         "type": "string"
                     },
+                    "rollenArt": {
+                        "nullable": false,
+                        "$ref": "#/components/schemas/RollenArt"
+                    },
                     "administriertVon": {
                         "type": "string"
                     },
@@ -5538,6 +5602,7 @@
                     "sskName",
                     "sskDstNr",
                     "rolle",
+                    "rollenArt",
                     "administriertVon",
                     "typ",
                     "editable",
@@ -6016,7 +6081,8 @@
                     "PERSON_SYNCHRONISIEREN",
                     "CRON_DURCHFUEHREN",
                     "PERSONEN_ANLEGEN",
-                    "IMPORT_DURCHFUEHREN"
+                    "IMPORT_DURCHFUEHREN",
+                    "PERSONEN_LESEN"
                 ]
             },
             "OrganisationByIdBodyParams": {
@@ -6084,17 +6150,6 @@
                     "namensergaenzung",
                     "kuerzel",
                     "typ"
-                ]
-            },
-            "RollenArt": {
-                "type": "string",
-                "enum": [
-                    "LERN",
-                    "LEHR",
-                    "EXTERN",
-                    "ORGADMIN",
-                    "LEIT",
-                    "SYSADMIN"
                 ]
             },
             "ServiceProviderIdNameResponse": {
