@@ -262,7 +262,7 @@ describe('ImportStore', () => {
         const pollingPromise: Promise<void> = importStore.startImportStatusPolling(importvorgangId);
 
         // Fast forward timer to exceed max polling time (5 minutes)
-        vi.advanceTimersByTime(5 * 60 * 1000 + 1);
+        vi.advanceTimersByTime(60 * 60 * 1000 + 1);
         await pollingPromise;
 
         expect(importStore.errorCode).toEqual('IMPORT_TIMEOUT');
