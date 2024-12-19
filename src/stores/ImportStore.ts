@@ -11,8 +11,8 @@ import axiosApiInstance from '@/services/ApiService';
 
 const importApi: ImportApiInterface = ImportApiFactory(undefined, '', axiosApiInstance);
 
-// Maximum polling duration (5 minutes)
-const MAX_POLLING_TIME: number = 5 * 60 * 1000;
+// 1 hour polling time at maximum
+const MAX_POLLING_TIME: number = 60 * 60 * 1000;
 
 export type ImportState = {
   errorCode: string | null;
