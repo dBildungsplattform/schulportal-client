@@ -111,7 +111,6 @@ export type PersonWithUebersicht =
         editable: boolean;
         merkmale: RollenMerkmal;
         befristung: string;
-        rollenArt: RollenArt;
       }[];
     }
   | undefined;
