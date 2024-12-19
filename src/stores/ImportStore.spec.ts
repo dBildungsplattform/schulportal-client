@@ -195,7 +195,7 @@ describe('ImportStore', () => {
 
         await pollingPromise;
 
-        expect(importStore.importStatus).toEqual(ImportStatus.Finished);
+        expect(importStore.importStatus?.status).toEqual(ImportStatus.Finished);
         expect(importStore.importProgress).toEqual(100);
       });
 
@@ -213,7 +213,7 @@ describe('ImportStore', () => {
         await pollingPromise;
 
         expect(importStore.errorCode).toEqual('ERROR_IMPORTING_FILE');
-        expect(importStore.importStatus).toEqual(ImportStatus.Failed);
+        expect(importStore.importStatus?.status).toEqual(ImportStatus.Failed);
         expect(importStore.importProgress).toEqual(0);
       });
 
@@ -231,7 +231,7 @@ describe('ImportStore', () => {
         await pollingPromise;
 
         expect(importStore.errorCode).toEqual('ERROR_UPLOADING_FILE');
-        expect(importStore.importStatus).toEqual(ImportStatus.Invalid);
+        expect(importStore.importStatus?.status).toEqual(ImportStatus.Invalid);
         expect(importStore.importProgress).toEqual(0);
       });
 
