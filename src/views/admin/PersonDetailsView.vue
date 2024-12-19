@@ -275,32 +275,30 @@
   let closeCannotDeleteDialog = (): void => {
     cannotDeleteDialogVisible.value = false;
   };
+
   let closeCreateSuccessDialog = (): void => {
+    personStore.getPersonenuebersichtById(currentPersonId);
     createSuccessDialogVisible.value = false;
-    router.push(route).then(() => {
-      router.go(0);
-    });
+    isEditActive.value = false;
   };
 
   let closeDeleteSuccessDialog = (): void => {
+    personStore.getPersonenuebersichtById(currentPersonId);
+    isEditActive.value = false;
     deleteSuccessDialogVisible.value = false;
-    router.push(route).then(() => {
-      router.go(0);
-    });
+    pendingDeletion.value = false;
   };
 
   let closeChangeKlasseSuccessDialog = (): void => {
+    personStore.getPersonenuebersichtById(currentPersonId);
     changeKlasseSuccessDialogVisible.value = false;
-    router.push(route).then(() => {
-      router.go(0);
-    });
+    isEditActive.value = false;
   };
 
   let closeChangePersonMetadataSuccessDialog = (): void => {
+    personStore.getPersonById(currentPersonId);
     changePersonMetadataSuccessVisible.value = false;
-    router.push(route).then(() => {
-      router.go(0);
-    });
+    isEditPersonMetadataActive.value = false;
   };
 
   // Triggers the template to add a new Zuordnung
@@ -372,10 +370,9 @@
       };
     } else {
       closeDeleteSuccessDialog = (): void => {
+        personStore.getPersonenuebersichtById(currentPersonId);
         deleteSuccessDialogVisible.value = false;
-        router.push(route).then(() => {
-          router.go(0);
-        });
+        isEditActive.value = false;
       };
     }
   };
