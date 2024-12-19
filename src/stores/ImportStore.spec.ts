@@ -195,8 +195,27 @@ describe('ImportStore', () => {
 
         await pollingPromise;
 
-        expect(importStore.importStatus).toEqual(ImportStatus.Finished);
+        expect(importStore.importStatus?.status).toEqual(ImportStatus.Finished);
         expect(importStore.importProgress).toEqual(100);
+      });
+
+      it('should poll and update progress bar to 50%', async () => {
+        const importvorgangId: string = '123';
+
+        mockadapter
+          .onGet(`/api/import/${importvorgangId}/status`)
+          .replyOnce(200, { status: ImportStatus.Inprogress, dataItemCount: 10, totalDataItemImported: 5 });
+
+        const pollingPromise: Promise<void> = importStore.startImportStatusPolling(importvorgangId);
+
+        // Fast forward timer to trigger first poll
+        vi.advanceTimersByTime(30000);
+        await Promise.resolve(); // Allow async actions to settle
+
+        await pollingPromise;
+
+        expect(importStore.importStatus?.status).toEqual(ImportStatus.Inprogress);
+        expect(importStore.importProgress).toEqual(50);
       });
 
       it('should not poll for FAILED and should throw ERROR_IMPORTING_FILE', async () => {
@@ -213,7 +232,7 @@ describe('ImportStore', () => {
         await pollingPromise;
 
         expect(importStore.errorCode).toEqual('ERROR_IMPORTING_FILE');
-        expect(importStore.importStatus).toEqual(ImportStatus.Failed);
+        expect(importStore.importStatus?.status).toEqual(ImportStatus.Failed);
         expect(importStore.importProgress).toEqual(0);
       });
 
@@ -231,7 +250,7 @@ describe('ImportStore', () => {
         await pollingPromise;
 
         expect(importStore.errorCode).toEqual('ERROR_UPLOADING_FILE');
-        expect(importStore.importStatus).toEqual(ImportStatus.Invalid);
+        expect(importStore.importStatus?.status).toEqual(ImportStatus.Invalid);
         expect(importStore.importProgress).toEqual(0);
       });
 
@@ -242,8 +261,8 @@ describe('ImportStore', () => {
 
         const pollingPromise: Promise<void> = importStore.startImportStatusPolling(importvorgangId);
 
-        // Fast forward timer to exceed max polling time (5 minutes)
-        vi.advanceTimersByTime(5 * 60 * 1000 + 1);
+        // Fast forward timer to exceed max polling time (60 minutes)
+        vi.advanceTimersByTime(60 * 60 * 1000 + 1);
         await pollingPromise;
 
         expect(importStore.errorCode).toEqual('IMPORT_TIMEOUT');
@@ -269,7 +288,6 @@ describe('ImportStore', () => {
         // Simulate an existing interval
         const mockInterval: NodeJS.Timeout = setInterval(() => {}, 1000);
         importStore.pollingInterval = mockInterval;
-
 
         importStore.stopImportStatusPolling();
 
