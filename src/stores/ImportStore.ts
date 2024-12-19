@@ -76,14 +76,14 @@ export const useImportStore: StoreDefinition<'importStore', ImportState, ImportG
           await this.getPersonenImportStatus(importvorgangId);
 
           // Calculate real progress based on imported items
-          if (this.uploadResponse?.totalImportDataItems) {
+          if (this.importStatus?.dataItemCount) {
             // Calculate progress as a percentage of imported items
-            const progressPercentage: number = this.importStatus?.totalDataItemImported
+            const progressPercentage: number = this.importStatus.totalDataItemImported
               ? Math.floor((this.importStatus.totalDataItemImported / this.importStatus.dataItemCount) * 100)
               : 0;
 
             this.importProgress =
-              this.importStatus?.status === ImportStatus.Finished ? 100 : Math.max(1, progressPercentage);
+              this.importStatus.status === ImportStatus.Finished ? 100 : Math.max(1, progressPercentage);
           }
 
           // Stop polling on final states

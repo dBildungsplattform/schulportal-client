@@ -199,6 +199,25 @@ describe('ImportStore', () => {
         expect(importStore.importProgress).toEqual(100);
       });
 
+      it('should poll and update progress bar to 50%', async () => {
+        const importvorgangId: string = '123';
+
+        mockadapter
+          .onGet(`/api/import/${importvorgangId}/status`)
+          .replyOnce(200, { status: ImportStatus.Inprogress, dataItemCount: 10, totalDataItemImported: 5 });
+
+        const pollingPromise: Promise<void> = importStore.startImportStatusPolling(importvorgangId);
+
+        // Fast forward timer to trigger first poll
+        vi.advanceTimersByTime(30000);
+        await Promise.resolve(); // Allow async actions to settle
+
+        await pollingPromise;
+
+        expect(importStore.importStatus?.status).toEqual(ImportStatus.Inprogress);
+        expect(importStore.importProgress).toEqual(50);
+      });
+
       it('should not poll for FAILED and should throw ERROR_IMPORTING_FILE', async () => {
         const importvorgangId: string = '123';
 
@@ -261,25 +280,6 @@ describe('ImportStore', () => {
 
         expect(importStore.errorCode).toEqual('UNSPECIFIED_ERROR');
         expect(importStore.importProgress).toEqual(0);
-      });
-
-      it('should poll and update status and importedDataItems', async () => {
-        const importvorgangId: string = '123';
-
-        mockadapter
-          .onGet(`/api/import/${importvorgangId}/status`)
-          .replyOnce(200, { status: ImportStatus.Inprogress, dataItemCount: 10, totalDataItemImported: 5 });
-
-        const pollingPromise: Promise<void> = importStore.startImportStatusPolling(importvorgangId);
-
-        // Fast forward timer to trigger first poll
-        vi.advanceTimersByTime(30000);
-        await Promise.resolve(); // Allow async actions to settle
-
-        await pollingPromise;
-
-        expect(importStore.importStatus?.status).toEqual(ImportStatus.Finished);
-        expect(importStore.importProgress).toEqual(100);
       });
     });
 
