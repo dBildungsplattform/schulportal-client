@@ -13,7 +13,7 @@ import { nextTick } from 'vue';
 import { createMemoryHistory, createRouter, useRoute, type Router } from 'vue-router';
 import ProfileView from './ProfileView.vue';
 import type { Zuordnung } from '@/stores/PersonenkontextStore';
-import { EmailAddressStatus } from '@/api-client/generated';
+import { EmailAddressStatus, RollenArt } from '@/api-client/generated';
 
 let wrapper: VueWrapper | null = null;
 let personInfoStore: PersonInfoStore;
@@ -129,6 +129,7 @@ const mockLehrerUebersicht: PersonWithUebersicht = {
       editable: true,
       merkmale: ['KOPERS_PFLICHT'] as unknown as RollenMerkmal,
       befristung: '2024-05-06',
+      rollenArt: RollenArt.Lehr,
     },
   ],
 };
@@ -151,6 +152,7 @@ const mockLehrerUebersichtWith2Zuordnungen: PersonWithUebersicht = {
       editable: true,
       merkmale: ['KOPERS_PFLICHT'] as unknown as RollenMerkmal,
       befristung: '2024-05-06',
+      rollenArt: RollenArt.Lehr,
     },
     {
       sskId: '2',
@@ -163,6 +165,7 @@ const mockLehrerUebersichtWith2Zuordnungen: PersonWithUebersicht = {
       editable: true,
       merkmale: ['KOPERS_PFLICHT'] as unknown as RollenMerkmal,
       befristung: '2024-05-06',
+      rollenArt: RollenArt.Lehr,
     },
   ],
 };
@@ -185,6 +188,7 @@ const mockSchuelerUebersicht: PersonWithUebersicht = {
       editable: true,
       merkmale: [] as unknown as RollenMerkmal,
       befristung: '2024-05-06',
+      rollenArt: RollenArt.Lehr,
     },
     {
       klasse: '9A',
@@ -198,6 +202,7 @@ const mockSchuelerUebersicht: PersonWithUebersicht = {
       editable: true,
       merkmale: [] as unknown as RollenMerkmal,
       befristung: '2024-05-06',
+      rollenArt: RollenArt.Lehr,
     },
   ],
 };

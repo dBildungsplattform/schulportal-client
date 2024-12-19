@@ -5,6 +5,7 @@ import {
   OrganisationsTyp,
   PersonenApiFactory,
   PersonenFrontendApiFactory,
+  RollenArt,
   RollenMerkmal,
   type DbiamCreatePersonWithPersonenkontexteBodyParams,
   type DbiamPersonenuebersichtApiInterface,
@@ -109,6 +110,7 @@ export type PersonWithUebersicht =
         editable: boolean;
         merkmale: RollenMerkmal;
         befristung: string;
+        rollenArt: RollenArt;
       }[];
     }
   | undefined;
