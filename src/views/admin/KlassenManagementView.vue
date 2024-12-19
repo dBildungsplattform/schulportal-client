@@ -25,30 +25,24 @@
 
   const router: Router = useRouter();
 
-  type ReadonlyHeaders = VDataTableServer['$props']['headers'];
-  type UnwrapReadonlyArray<A> = A extends Readonly<Array<infer I>> ? I : never;
-  type ReadonlyDataTableHeader = UnwrapReadonlyArray<ReadonlyHeaders>;
-
-  // Utility type to make headers mutable
-  type DeepMutable<T> = { -readonly [P in keyof T]: DeepMutable<T[P]> };
-  type DataTableHeader = DeepMutable<ReadonlyDataTableHeader>;
+  type TableHeaders = VDataTableServer['headers'];
 
   // Define headers as a mutable array
-  const headers: Ref<DataTableHeader[]> = ref([
+  let headers: TableHeaders = [
     {
       title: t('admin.klasse.klasse'),
       key: 'name',
       align: 'start',
       width: '250px',
-    } as DataTableHeader,
+    },
     {
       title: t('action'),
       key: 'actions',
       align: 'center',
       sortable: false,
       width: '250px',
-    } as DataTableHeader,
-  ]);
+    },
+  ];
 
   const selectedSchule: Ref<string | null> = ref(null);
   const selectedKlassen: Ref<Array<string>> = ref([]);
@@ -80,6 +74,22 @@
         title: `${org.kennung} (${org.name.trim()})`,
       }))
       .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
+  });
+  const errorTitle: ComputedRef<string> = computed(() => {
+    if (!organisationStore.errorCode) {
+      return '';
+    }
+    return organisationStore.errorCode === 'UNSPECIFIED_ERROR'
+      ? t('admin.klasse.loadingErrorTitle')
+      : t(`admin.klasse.title.${organisationStore.errorCode}`);
+  });
+  const errorText: ComputedRef<string> = computed(() => {
+    if (!organisationStore.errorCode) {
+      return '';
+    }
+    return organisationStore.errorCode === 'UNSPECIFIED_ERROR'
+      ? t('admin.klasse.loadingErrorText')
+      : t(`admin.klasse.errors.${organisationStore.errorCode}`);
   });
 
   async function fetchKlassenBySelectedSchuleId(schuleId: string | null): Promise<void> {
@@ -413,13 +423,16 @@
           hasAutoselectedSchule.value = true;
           totalKlassen = klassenOptions.value?.length || 0;
         }
-      } else {
-        headers.value.unshift({
-          title: t('admin.schule.dienststellennummer'),
-          key: 'schuleDetails',
-          align: 'start',
-          width: '350px',
-        } as DataTableHeader);
+      } else if (headers) {
+        headers = [
+          {
+            title: t('admin.schule.dienststellennummer'),
+            key: 'schuleDetails',
+            align: 'start',
+            width: '350px',
+          },
+          ...headers,
+        ];
       }
     }
   }
@@ -482,18 +495,10 @@
       <!-- Error Message Display -->
       <SpshAlert
         :model-value="!!organisationStore.errorCode"
-        :title="
-          organisationStore.errorCode === 'UNSPECIFIED_ERROR'
-            ? $t('admin.klasse.loadingErrorTitle')
-            : $t(`admin.klasse.title.${organisationStore.errorCode}`)
-        "
+        :title="errorTitle"
         :type="'error'"
         :closable="false"
-        :text="
-          organisationStore.errorCode === 'UNSPECIFIED_ERROR'
-            ? $t('admin.klasse.loadingErrorText')
-            : $t(`admin.klasse.errors.${organisationStore.errorCode}`)
-        "
+        :text="errorText"
         :showButton="true"
         :buttonText="$t('nav.backToList')"
         :buttonAction="handleAlertClose"
