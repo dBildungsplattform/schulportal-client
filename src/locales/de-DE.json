@@ -27,6 +27,7 @@
     "followingDataCreated": "Folgende Daten wurden gespeichert:",
     "headline": "Administrationsbereich",
     "import": {
+      "doNotCloseNotice": "Bitte den Browser während eines laufenden Importvorgangs nicht schließen!",
       "anotherImport": "Weiteren Import durchführen",
       "backToUpload": "Andere Datei hochladen",
       "confirmationText": "Achtung, diese Aktion kann nicht rückgängig gemacht werden. Möchten Sie den Import wirklich durchführen?",
@@ -42,6 +43,7 @@
         "IMPORT_DATA_ITEM_NACHNAME_IS_TOO_SHORT": "Nachname fehlt",
         "IMPORT_DATA_ITEM_VORNAME_IS_INVALID": "Vorname enthält ungültige Zeichen",
         "IMPORT_DATA_ITEM_VORNAME_IS_TOO_SHORT": "Vorname fehlt",
+        "IMPORT_MAX_USERS_LIMIT_ERROR": "Die Datei enthält mehr als 2000 Benutzer. Bitte reduzieren Sie die Anzahl der Benutzer in der Datei auf maximal 2000 und versuchen Sie den Import erneut.",
         "CSV_FILE_INVALID_HEADER_ERROR": "Die Datei konnte nicht gelesen werden. Bitte überprüfen Sie die Spaltenüberschriften."
       },
       "executeImport": "Import durchführen",
