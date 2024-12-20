@@ -172,6 +172,7 @@ beforeEach(() => {
         editable: true,
         merkmale: [] as unknown as RollenMerkmal,
         befristung: '',
+        admins: ['test'],
       },
       {
         sskId: '3',
@@ -185,6 +186,7 @@ beforeEach(() => {
         editable: true,
         merkmale: [] as unknown as RollenMerkmal,
         befristung: '',
+        admins: ['test'],
       },
       {
         sskId: '2',
@@ -198,6 +200,7 @@ beforeEach(() => {
         editable: true,
         merkmale: [] as unknown as RollenMerkmal,
         befristung: '',
+        admins: ['test'],
       },
     ],
   };

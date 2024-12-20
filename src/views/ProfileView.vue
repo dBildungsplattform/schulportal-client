@@ -135,7 +135,7 @@
       const tempSchulDaten: SchulDaten = {
         title: zuordnung.sskName,
         info: t('profile.yourSchuleAdminsAre'),
-        schulAdmins: [], // Hierfuer muss ein API-Endpunkt implementiert werden
+        schulAdmins: zuordnung.admins,
         labelAndValues: [
           {
             label: t('profile.schule'),
@@ -818,16 +818,19 @@
                 </template>
               </v-table>
               <p
-                class="pt-4 text-center text-body-1"
+                class="pt-4 text-center text-body-1 text-medium-emphasis"
+                data-testid="schuladmins-info-text-with-icon"
+                style="white-space: normal"
                 v-if="schuleData.schulAdmins && schuleData.schulAdmins.length > 0"
-                data-testid="school-admins-${index}"
               >
                 <v-icon
                   class="mr-2"
                   icon="mdi-information-slab-circle-outline"
-                  data-testid="school-admins-icon"
+                  data-testid="schuladmins-info-icon"
                 ></v-icon>
-                {{ `${schuleData.info} ${schuleData.schulAdmins?.join(', ') || ''}` }}
+                <span data-testid="schulAdmins-info-text">
+                  {{ `${schuleData.info} ${schuleData.schulAdmins?.join(', ') || ''}` }}
+                </span>
               </p>
             </v-col>
           </v-row>
