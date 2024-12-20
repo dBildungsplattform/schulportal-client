@@ -18,6 +18,7 @@
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
   const dialogIsActive: Ref<boolean> = ref(false);
+  const isEditMode: Ref<boolean> = ref(false);
 
   type Props = {
     errorCode: string;
@@ -65,7 +66,7 @@
   ] = formContext.defineField('selectedBefristung', vuetifyConfig);
 
   type Emits = {
-    (event: 'onLockUser', schule: string, date: string | undefined): void;
+    (event: 'onLockUser', schule: string, date: string | undefined, isExistingLockToBeEdited: boolean): void;
   };
   const props: Props = defineProps<Props>();
   const emit: Emits = defineEmits<Emits>();
@@ -99,6 +100,14 @@
     return organisation ? organisation.id : null;
   });
 
+  const isManuallyLocked: ComputedRef<boolean> = computed<boolean>(() => {
+    return (
+      props.person.person.userLock?.some(
+        (lock: UserLock) => lock.lock_occasion === PersonLockOccasion.MANUELL_GESPERRT,
+      ) ?? false // Default to false if userLock is undefined;
+    );
+  });
+
   function resetBefristungFields(): void {
     isUnbefristet.value = true;
     formContext.resetField('selectedBefristung');
@@ -107,6 +116,7 @@
   function closeLockPersonDialog(): void {
     resetBefristungFields();
     dialogIsActive.value = false;
+    isEditMode.value = false;
   }
 
   async function handleOnLockUser(): Promise<void> {
@@ -124,7 +134,9 @@
     // Format date if provided
     const dateISO: string | undefined = formatDateToISO(selectedBefristung.value);
 
-    emit('onLockUser', lockingOrgId, dateISO);
+    const isExistingLockToBeEdited: boolean = isEditMode.value;
+
+    emit('onLockUser', lockingOrgId, dateISO, isExistingLockToBeEdited);
     closeLockPersonDialog();
   }
 
@@ -190,7 +202,7 @@
           v-else
           :enabledCondition="!disabled"
           :disabledText="$t('person.finishEditFirst')"
-          :enabledText="$t('person.unlockUser')"
+          :enabledText="$t('admin.person.editLock')"
           position="start"
         >
           <v-btn
@@ -202,22 +214,18 @@
           >
             {{
               person.person.userLock?.some((lock) => lock.lock_occasion === PersonLockOccasion.MANUELL_GESPERRT)
-                ? $t('person.unlockUser')
+                ? $t('admin.person.editLock')
                 : $t('person.lockUser')
             }}
           </v-btn>
         </SpshTooltip>
       </v-col>
     </template>
-
+    <!-- Benutzer sperren Dialog -->
     <LayoutCard
       data-testid="person-lock-card"
       :closable="true"
-      :header="
-        !props.person.person.userLock?.some((lock) => lock.lock_occasion === PersonLockOccasion.MANUELL_GESPERRT)
-          ? $t('person.lockUser')
-          : $t('person.unlockUser')
-      "
+      :header="!isManuallyLocked ? $t('person.lockUser') : $t('admin.person.editLock')"
       @onCloseClicked="closeLockPersonDialog"
     >
       <v-container>
@@ -239,9 +247,7 @@
             </v-col>
           </v-row>
           <v-row
-            v-if="
-              !props.person.person.userLock?.some((lock) => lock.lock_occasion === PersonLockOccasion.MANUELL_GESPERRT)
-            "
+            v-if="!isManuallyLocked || isManuallyLocked && isEditMode"
             class="align-center justify-center w-full"
           >
             <v-col
@@ -259,10 +265,10 @@
             >
               <v-select
                 :clearable="!hasSingleSelection"
-                :disabled="hasSingleSelection"
-                :hide-details="hasSingleSelection"
+                :disabled="hasSingleSelection || isManuallyLocked"
+                :hide-details="hasSingleSelection || isManuallyLocked"
                 :class="[
-                  { 'filter-dropdown': hasSingleSelection },
+                  { 'filter-dropdown': hasSingleSelection || isManuallyLocked },
                   { selected: selectedOrganisation },
                   { 'align-center': true },
                 ]"
@@ -284,9 +290,7 @@
           </v-row>
           <v-row
             class="justify-center w-full"
-            v-if="
-              !props.person.person.userLock?.some((lock) => lock.lock_occasion === PersonLockOccasion.MANUELL_GESPERRT)
-            "
+            v-if="!isManuallyLocked || isManuallyLocked && isEditMode"
           >
             <v-col
               class="text-body"
@@ -322,9 +326,7 @@
                 class="text-body"
               >
                 {{
-                  !props.person.person.userLock?.some(
-                    (lock) => lock.lock_occasion === PersonLockOccasion.MANUELL_GESPERRT,
-                  )
+                  !isManuallyLocked || isManuallyLocked && isEditMode
                     ? $t('person.lockUserInfoText')
                     : $t('person.unLockUserInfoText')
                 }}
@@ -354,6 +356,7 @@
               md="4"
             >
               <v-btn
+                v-if="isManuallyLocked && !isEditMode"
                 :block="mdAndDown"
                 class="primary button"
                 :disabled="
@@ -361,16 +364,36 @@
                     (lock) => lock.lock_occasion === PersonLockOccasion.MANUELL_GESPERRT,
                   ) && !selectedOrganisation
                 "
+                @click.stop="isEditMode = true"
+                data-testid="lock-user-button"
+              >
+                {{ $t('admin.person.editLock') }}
+              </v-btn>
+              <v-btn
+                v-if="!isManuallyLocked || isManuallyLocked && isEditMode"
+                :block="mdAndDown"
+                class="primary button"
+                :disabled="!isManuallyLocked && !selectedOrganisation"
                 @click.stop="onSubmit"
                 data-testid="lock-user-button"
               >
-                {{
-                  props.person.person.userLock?.some(
-                    (lock) => lock.lock_occasion === PersonLockOccasion.MANUELL_GESPERRT,
-                  )
-                    ? $t('person.unlockUser')
-                    : $t('person.lockUser')
-                }}
+                {{ $t('person.lockUser') }}
+              </v-btn>
+            </v-col>
+            <v-col
+              v-if="isManuallyLocked && !isEditMode"
+              cols="12"
+              sm="6"
+              md="4"
+            >
+              <v-btn
+                :block="mdAndDown"
+                class="primary button"
+                :disabled="!isManuallyLocked && !selectedOrganisation"
+                @click.stop="onSubmit"
+                data-testid="lock-user-button"
+              >
+                {{ isManuallyLocked ? $t('admin.person.removeLock') : $t('person.lockUser') }}
               </v-btn>
             </v-col>
           </v-row>
