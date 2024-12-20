@@ -57,6 +57,7 @@ export type Zuordnung = {
   editable: boolean;
   merkmale: RollenMerkmal;
   befristung?: string;
+  admins?: string[];
 };
 
 export type WorkflowFilter = {
