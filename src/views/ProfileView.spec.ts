@@ -130,6 +130,7 @@ const mockLehrerUebersicht: PersonWithUebersicht = {
       editable: true,
       merkmale: ['KOPERS_PFLICHT'] as unknown as RollenMerkmal,
       befristung: '2024-05-06',
+      admins: ['test'],
     },
   ],
 };
@@ -153,6 +154,7 @@ const mockLehrerUebersichtWith2Zuordnungen: PersonWithUebersicht = {
       editable: true,
       merkmale: ['KOPERS_PFLICHT'] as unknown as RollenMerkmal,
       befristung: '2024-05-06',
+      admins: ['test'],
     },
     {
       sskId: '2',
@@ -166,6 +168,7 @@ const mockLehrerUebersichtWith2Zuordnungen: PersonWithUebersicht = {
       editable: true,
       merkmale: ['KOPERS_PFLICHT'] as unknown as RollenMerkmal,
       befristung: '2024-05-06',
+      admins: ['test'],
     },
   ],
 };
@@ -189,6 +192,7 @@ const mockSchuelerUebersicht: PersonWithUebersicht = {
       editable: true,
       merkmale: [] as unknown as RollenMerkmal,
       befristung: '2024-05-06',
+      admins: ['test'],
     },
     {
       klasse: '9A',
@@ -203,6 +207,7 @@ const mockSchuelerUebersicht: PersonWithUebersicht = {
       editable: true,
       merkmale: [] as unknown as RollenMerkmal,
       befristung: '2024-05-06',
+      admins: ['test'],
     },
   ],
 };
