@@ -38,6 +38,7 @@
   import RolleDelete from '@/components/admin/rollen/RolleDelete.vue';
   import { type TranslatedObject } from '@/types.d';
   import SuccessTemplate from '@/components/admin/rollen/SuccessTemplate.vue';
+  import { isHiddenSystemrecht } from '@/utils/systemrechte';
 
   const route: RouteLocationNormalizedLoaded = useRoute();
   const router: Router = useRouter();
@@ -142,6 +143,7 @@
     isEditActive.value = false;
     showUnsavedChangesDialog.value = false;
     blockedNext();
+    rolleStore.errorCode = '';
   }
 
   const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = formContext.handleSubmit(async () => {
@@ -260,7 +262,7 @@
     });
 
     Object.values(RollenSystemRecht).forEach((enumValue: RollenSystemRecht) => {
-      if (enumValue !== RollenSystemRecht.MigrationDurchfuehren && enumValue !== RollenSystemRecht.CronDurchfuehren) {
+      if (!isHiddenSystemrecht(enumValue)) {
         const i18nPath: string = `admin.rolle.mappingFrontBackEnd.systemrechte.${enumValue}`;
         allSystemrechte.value.push({
           value: enumValue,
@@ -331,31 +333,11 @@
       :padded="true"
       :showCloseText="true"
     >
-      <!-- Error Message Display -->
-      <SpshAlert
-        :model-value="!!rolleStore.errorCode"
-        :title="
-          organisationStore.errorCode === 'UNSPECIFIED_ERROR'
-            ? $t('admin.rolle.loadingErrorTitle')
-            : $t(`admin.rolle.title.${rolleStore.errorCode}`)
-        "
-        :type="'error'"
-        :closable="false"
-        :text="
-          rolleStore.errorCode === 'UNSPECIFIED_ERROR'
-            ? $t('admin.rolle.loadingErrorText')
-            : $t(`admin.rolle.errors.${rolleStore.errorCode}`)
-        "
-        :showButton="true"
-        :buttonText="alertButtonText"
-        :buttonAction="alertButtonAction"
-        @update:modelValue="handleAlertClose"
-      />
-
-      <template v-if="!rolleStore.updatedRolle && !rolleStore.errorCode">
+      <template v-if="!rolleStore.updatedRolle">
         <v-container>
           <div v-if="rolleStore.currentRolle">
             <RolleForm
+              :errorCode="rolleStore.errorCode"
               :onHandleConfirmUnsavedChanges="handleConfirmUnsavedChanges"
               :onHandleDiscard="navigateToRolleTable"
               :onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
@@ -380,7 +362,28 @@
               :translatedMerkmale="allMerkmale"
               :translatedSystemrechte="allSystemrechte"
               :showUnsavedChangesDialog="showUnsavedChangesDialog"
-            ></RolleForm>
+            >
+              <!-- Error Message Display -->
+              <SpshAlert
+                :model-value="!!rolleStore.errorCode"
+                :title="
+                  organisationStore.errorCode === 'UNSPECIFIED_ERROR'
+                    ? $t('admin.rolle.loadingErrorTitle')
+                    : $t(`admin.rolle.title.${rolleStore.errorCode}`)
+                "
+                :type="'error'"
+                :closable="false"
+                :text="
+                  rolleStore.errorCode === 'UNSPECIFIED_ERROR'
+                    ? $t('admin.rolle.loadingErrorText')
+                    : $t(`admin.rolle.errors.${rolleStore.errorCode}`)
+                "
+                :showButton="true"
+                :buttonText="alertButtonText"
+                :buttonAction="alertButtonAction"
+                @update:modelValue="handleAlertClose"
+              />
+            </RolleForm>
             <v-divider
               v-if="isEditActive"
               class="border-opacity-100 rounded"
@@ -399,6 +402,7 @@
                 >
                   <div class="d-flex justify-sm-end">
                     <RolleDelete
+                      v-if="!rolleStore.errorCode"
                       :errorCode="rolleStore.errorCode"
                       :rolle="rolleStore.currentRolle"
                       :isLoading="rolleStore.loading"
@@ -413,6 +417,7 @@
                   md="auto"
                 >
                   <v-btn
+                    v-if="!rolleStore.errorCode"
                     class="primary"
                     data-testid="rolle-edit-button"
                     @Click="activateEditing"

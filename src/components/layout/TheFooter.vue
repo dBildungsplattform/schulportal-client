@@ -23,7 +23,7 @@
     { text: t('footer.contact'), href: 'https://www.secure-lernnetz.de/helpdesk/', external: true },
     {
       text: t('footer.help'),
-      href: 'https://medienberatung.iqsh.de/schulportal-sh.html',
+      href: 'https://medienberatung.iqsh.de/paedagogischer-helpdesk.html',
       external: true,
     },
     {
@@ -43,7 +43,7 @@
     },
     {
       text: t('footer.status'),
-      href: 'api/status',
+      href: '/api/status',
       external: true,
     },
   ]);
@@ -76,7 +76,7 @@
         <!-- Sponsor Logos -->
         <v-col
           cols="12"
-          lg="7"
+          lg="5"
           order-lg="2"
           class="sponsor-logos-col justify-end"
         >
@@ -106,7 +106,7 @@
         <!-- Footer Links -->
         <v-col
           cols="12"
-          lg="5"
+          lg="7"
           order-lg="1"
           class="footer-links-col justify-space-between"
         >

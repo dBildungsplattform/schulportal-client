@@ -147,7 +147,8 @@
       !importStore.importedData &&
       !importStore.uploadIsLoading &&
       !importStore.importIsLoading &&
-      !importStore.errorCode
+      !importStore.errorCode &&
+      importStore.importProgress === 0
     );
   });
 
@@ -164,24 +165,90 @@
   }
 
   function navigateToPersonTable(): void {
+    formContext.resetForm();
+    importStore.errorCode = null;
+    importStore.uploadResponse = null;
+    importStore.importedData = null;
+    importStore.importProgress = 0;
     router.push({ name: 'person-management' });
   }
 
-  function uploadFile(): void {
+  function convertToUTF8(buffer: ArrayBuffer): string {
+    // Try decoding as UTF-8 first
+    const utf8Decoder: TextDecoder = new TextDecoder('utf-8', { fatal: false });
+    const utf8Text: string = utf8Decoder.decode(buffer);
+
+    // If decoding as UTF-8 doesn't result in invalid characters
+    if (utf8Text && !utf8Text.includes('�')) {
+      return utf8Text;
+    }
+
+    // Try other encodings (Windows-1252, ISO-8859-1, etc.)
+    const encodingsToTry: string[] = ['windows-1252', 'iso-8859-1', 'utf-16', 'utf-16le', 'utf-16be'];
+
+    for (const encoding of encodingsToTry) {
+      try {
+        const decoder: TextDecoder = new TextDecoder(encoding, { fatal: true });
+        const decodedText: string = decoder.decode(buffer);
+        // If it successfully decodes without errors, return the decoded text
+        return decodedText;
+      } catch (e) {
+        // If the decoding fails, continue with the next encoding
+        continue;
+      }
+    }
+
+    // If all decoding attempts fail, return a fallback (perhaps empty string or an error message)
+    throw new Error('Unable to decode file using known encodings.');
+  }
+
+  // Reads the file and converts it to UTF-8
+  function readFileAsUTF8(file: File): Promise<string> {
+    return new Promise((resolve: (value: string | PromiseLike<string>) => void, reject: (reason?: unknown) => void) => {
+      const reader: FileReader = new FileReader();
+
+      reader.onload = (event: ProgressEvent<FileReader>): void => {
+        try {
+          // Convert from unknown encoding to UTF-8
+          const utf8Text: string = convertToUTF8(event.target?.result as ArrayBuffer);
+          resolve(utf8Text);
+        } catch (error) {
+          reject(error);
+        }
+      };
+
+      reader.onerror = (error: ProgressEvent<FileReader>): void => reject(error);
+
+      // Read the file as ArrayBuffer
+      reader.readAsArrayBuffer(file);
+    });
+  }
+
+  async function uploadFile(): Promise<void> {
     if (selectedSchule.value === undefined || selectedRolle.value === undefined || !selectedFiles.value?.length) {
       return;
     }
 
-    importStore.uploadPersonenImportFile(
-      selectedSchule.value as string,
-      selectedRolle.value as string,
-      selectedFiles.value[0] as File,
-    );
+    const originalFile: File = selectedFiles.value[0] as File;
+
+    // Read the file content and convert to UTF-8
+    const fileText: string = await readFileAsUTF8(originalFile);
+
+    // Create a new File object with UTF-8 encoded content
+    const utf8Blob: Blob = new Blob(['\uFEFF' + fileText], { type: 'text/csv;charset=utf-8' });
+    const utf8File: File = new File([utf8Blob], originalFile.name, { type: 'text/csv;charset=utf-8' });
+
+    // Update selected files with the UTF-8 version
+    selectedFiles.value![0] = utf8File;
+
+    // Perform the upload with the UTF-8 encoded file
+    importStore.uploadPersonenImportFile(selectedSchule.value as string, selectedRolle.value as string, utf8File);
   }
 
   function anotherImport(): void {
     importStore.uploadResponse = null;
     importStore.importedData = null;
+    importStore.importProgress = 0;
     formContext.resetForm();
   }
 
@@ -200,16 +267,25 @@
     confirmationDialogVisible.value = true;
   }
 
-  function executeImport(): void {
+  async function executeImport(): Promise<void> {
     confirmationDialogVisible.value = false;
-    importStore.executePersonenImport(
-      importStore.uploadResponse?.importvorgangId as string,
-      selectedSchule.value as string,
-      selectedRolle.value as string,
-    );
+    const importvorgangId: string = importStore.uploadResponse?.importvorgangId as string;
+
+    await importStore.executePersonenImport(importvorgangId);
+
+    // Only start polling if the execution was successful (no error)
+    if (!importStore.errorCode) {
+      importStore.startImportStatusPolling(importvorgangId);
+    }
   }
 
-  function downloadFile(): void {
+  async function downloadFile(): Promise<void> {
+    const importvorgangId: string = importStore.uploadResponse?.importvorgangId as string;
+
+    // If the file is already downloaded the endpoint autodestructs it so we can't make anothe request.
+    if (!importStore.importedData) {
+      await importStore.downloadPersonenImportFile(importvorgangId);
+    }
     const blob: Blob = new Blob([importStore.importedData as File], { type: 'text/plain' });
     const url: string = window.URL.createObjectURL(blob);
     const link: HTMLAnchorElement = document.createElement('a');
@@ -235,6 +311,7 @@
 
   function handleConfirmUnsavedChanges(): void {
     blockedNext();
+    importStore.errorCode = '';
   }
 
   function preventNavigation(event: BeforeUnloadEvent): void {
@@ -259,6 +336,7 @@
     await personenkontextStore.processWorkflowStep({ limit: 25 });
     importStore.uploadResponse = null;
     importStore.importedData = null;
+    importStore.importProgress = 0;
     organisationStore.errorCode = '';
     /* listen for browser changes and prevent them when form is dirty */
     window.addEventListener('beforeunload', preventNavigation);
@@ -298,7 +376,7 @@
       />
 
       <!-- Import success template -->
-      <template v-if="importStore.importedData && !importStore.importIsLoading && !importStore.errorCode">
+      <template v-if="importStore.importProgress === 100 && !importStore.importIsLoading && !importStore.errorCode">
         <v-container>
           <v-row justify="center">
             <v-col cols="auto">
@@ -346,15 +424,37 @@
       </template>
 
       <!-- Import loading template -->
-      <template v-if="importStore.importIsLoading && !importStore.errorCode">
+      <template v-if="importStore.importProgress > 0 && !importStore.errorCode">
         <v-container>
-          <v-row justify="center">
+          <v-row
+            v-if="importStore.importProgress > 0 && importStore.importProgress !== 100"
+            class="justify-center"
+          >
             <v-col cols="auto">
-              <v-progress-circular
-                data-testid="import-progress-spinner"
-                indeterminate
-                size="64"
-              ></v-progress-circular>
+              <v-icon
+                aria-hidden="true"
+                class="mr-2"
+                icon="mdi-alert-circle-outline"
+                size="small"
+              ></v-icon>
+              <span class="subtitle-2">
+                {{ $t('admin.import.doNotCloseNotice') }}
+              </span>
+            </v-col>
+          </v-row>
+          <v-row justify="center">
+            <v-col cols="12">
+              <v-progress-linear
+                data-testid="import-progress-bar"
+                :model-value="importStore.importProgress"
+                color="primary"
+                height="25"
+                striped
+              >
+                <template v-slot:default="{ value }">
+                  <strong class="text-white">{{ Math.ceil(value) }}%</strong>
+                </template>
+              </v-progress-linear>
             </v-col>
           </v-row>
         </v-container>
@@ -362,7 +462,7 @@
 
       <!-- Upload form -->
       <FormWrapper
-        v-if="!importStore.errorCode"
+        v-if="!importStore.errorCode && importStore.importProgress === 0"
         :confirmUnsavedChangesAction="handleConfirmUnsavedChanges"
         :createButtonLabel="$t('admin.import.uploadFile')"
         :discardButtonLabel="$t('nav.backToList')"
