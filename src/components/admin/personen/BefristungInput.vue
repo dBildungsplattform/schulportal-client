@@ -34,7 +34,7 @@
   const localBefristungOption: Ref<string | undefined> = ref<string | undefined>(props.befristungOption);
 
   // Handles any change related to the befristung radio buttons
-  function handleBefristungOptionChange(value: string | undefined): void {
+  function handleBefristungOptionChange(value: string | null): void {
     localBefristung.value = undefined;
     switch (value) {
       case BefristungOption.SCHULJAHRESENDE: {
