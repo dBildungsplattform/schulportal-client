@@ -265,10 +265,10 @@
             >
               <v-select
                 :clearable="!hasSingleSelection"
-                :disabled="hasSingleSelection"
-                :hide-details="hasSingleSelection"
+                :disabled="hasSingleSelection || isManuallyLocked"
+                :hide-details="hasSingleSelection || isManuallyLocked"
                 :class="[
-                  { 'filter-dropdown': hasSingleSelection },
+                  { 'filter-dropdown': hasSingleSelection || isManuallyLocked },
                   { selected: selectedOrganisation },
                   { 'align-center': true },
                 ]"
