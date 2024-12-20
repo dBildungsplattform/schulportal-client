@@ -19,6 +19,7 @@
 <template>
   <v-tooltip
     data-testid="tooltip"
+    :attach="true"
     :location="position"
     open-delay="500"
   >
