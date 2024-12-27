@@ -178,6 +178,8 @@
       },
       "discard": "Benutzer verwerfen",
       "disableUser": "Benutzer sperren",
+      "editLock": "Sperre bearbeiten",
+      "removeLock": "Sperre aufheben",
       "edit": "Benutzer bearbeiten",
       "editPersonalInfo": "Persönliche Informationen bearbeiten",
       "errors": {
