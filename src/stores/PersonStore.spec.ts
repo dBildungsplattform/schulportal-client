@@ -2,6 +2,7 @@
 import {
   EmailAddressStatus,
   OrganisationsTyp,
+  RollenArt,
   RollenMerkmal,
   Vertrauensstufe,
   type DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response,
@@ -218,11 +219,13 @@ describe('PersonStore', () => {
                 sskName: 'Schule A',
                 sskDstNr: '642462',
                 rolle: 'string',
+                rollenArt: RollenArt.Lern,
                 typ: OrganisationsTyp.Schule,
                 administriertVon: 'string',
                 editable: true,
                 merkmale: ['KOPERS_PFLICHT'] as unknown as RollenMerkmal,
                 befristung: '2025-04-05',
+                admins: ['test'],
               },
             ],
           },
@@ -239,11 +242,13 @@ describe('PersonStore', () => {
                 sskName: 'Schule B',
                 sskDstNr: '',
                 rolle: 'string',
+                rollenArt: RollenArt.Lern,
                 typ: OrganisationsTyp.Schule,
                 administriertVon: 'string',
                 editable: true,
                 merkmale: ['KOPERS_PFLICHT'] as unknown as RollenMerkmal,
                 befristung: '2025-04-05',
+                admins: ['test'],
               },
             ],
           },
@@ -268,11 +273,13 @@ describe('PersonStore', () => {
                 sskName: 'Schule A',
                 sskDstNr: '642462',
                 rolle: 'SuS',
+                rollenArt: RollenArt.Lern,
                 typ: OrganisationsTyp.Schule,
                 administriertVon: 'string',
                 editable: true,
                 merkmale: [] as unknown as RollenMerkmal,
                 befristung: '2025-04-05',
+                admins: ['test'],
               },
               {
                 sskId: '3',
@@ -280,11 +287,13 @@ describe('PersonStore', () => {
                 sskName: '2b',
                 sskDstNr: '642462-2b',
                 rolle: 'SuS',
+                rollenArt: RollenArt.Lern,
                 typ: OrganisationsTyp.Klasse,
                 administriertVon: '1',
                 editable: true,
                 merkmale: [] as unknown as RollenMerkmal,
                 befristung: '2025-04-05',
+                admins: ['test'],
               },
             ],
           },
@@ -301,11 +310,13 @@ describe('PersonStore', () => {
                 sskName: 'Schule A',
                 sskDstNr: '642462',
                 rolle: 'SuS',
+                rollenArt: RollenArt.Lern,
                 typ: OrganisationsTyp.Schule,
                 administriertVon: 'string',
                 editable: true,
                 merkmale: [] as unknown as RollenMerkmal,
                 befristung: '2025-04-05',
+                admins: ['test'],
               },
               {
                 sskId: '3',
@@ -313,11 +324,13 @@ describe('PersonStore', () => {
                 sskName: '',
                 sskDstNr: '642462-2b',
                 rolle: 'SuS',
+                rollenArt: RollenArt.Lern,
                 typ: OrganisationsTyp.Klasse,
                 administriertVon: '1',
                 editable: true,
                 merkmale: [] as unknown as RollenMerkmal,
                 befristung: '2025-04-05',
+                admins: ['test'],
               },
             ],
           },
@@ -578,6 +591,42 @@ describe('PersonStore', () => {
     });
   });
 
+  describe('resetDevicePassword', () => {
+    it('should reset and return device password', async () => {
+      const userId: string = '2345';
+      const mockResponse: string = 'fakePassword';
+
+      mockadapter.onPatch(`/api/personen/${userId}/uem-password`).replyOnce(202, mockResponse);
+      const resetDevicePasswordPromise: Promise<void> = personStore.resetDevicePassword(userId);
+      expect(personStore.loading).toBe(true);
+      await resetDevicePasswordPromise;
+      expect(personStore.newDevicePassword).toEqual(mockResponse);
+      expect(personStore.loading).toBe(false);
+    });
+
+    it('should handle string error', async () => {
+      const userId: string = '2345';
+
+      mockadapter.onPatch(`/api/personen/${userId}/uem-password`).replyOnce(500, 'some error');
+      const resetDevicePasswordPromise: Promise<void> = personStore.resetDevicePassword(userId);
+      expect(personStore.loading).toBe(true);
+      await resetDevicePasswordPromise;
+      expect(personStore.errorCode).toEqual('UNSPECIFIED_ERROR');
+      expect(personStore.loading).toBe(false);
+    });
+
+    it('should handle error code', async () => {
+      const userId: string = '2345';
+
+      mockadapter.onPatch(`/api/personen/${userId}/uem-password`).replyOnce(500, { i18nKey: 'SOME_MOCK_ERROR' });
+      const resetDevicePasswordPromise: Promise<void> = personStore.resetDevicePassword(userId);
+      expect(personStore.loading).toBe(true);
+      await resetDevicePasswordPromise;
+      expect(personStore.errorCode).toEqual('SOME_MOCK_ERROR');
+      expect(personStore.loading).toBe(false);
+    });
+  });
+
   describe('deletePersonById', () => {
     it('should delete a person and update state', async () => {
       const personId: string = '1234';
@@ -628,11 +677,13 @@ describe('PersonStore', () => {
             sskName: 'string',
             sskDstNr: 'string',
             rolle: 'string',
+            rollenArt: RollenArt.Lern,
             typ: OrganisationsTyp.Klasse,
             administriertVon: 'string',
             editable: true,
             merkmale: [] as unknown as RollenMerkmal,
             befristung: '2025-04-05',
+            admins: ['test'],
           },
         ],
       };

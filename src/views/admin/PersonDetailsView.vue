@@ -87,6 +87,7 @@
   const organisationStore: OrganisationStore = useOrganisationStore();
   const twoFactorAuthentificationStore: TwoFactorAuthentificationStore = useTwoFactorAuthentificationStore();
 
+  const devicePassword: Ref<string> = ref('');
   const password: Ref<string> = ref('');
 
   const zuordnungenResult: Ref<Zuordnung[] | undefined> = ref<Zuordnung[] | undefined>(undefined);
@@ -147,11 +148,24 @@
     password.value = personStore.newPassword || '';
   }
 
-  async function onLockUser(lockedBy: string, date: string | undefined): Promise<void> {
+  async function resetDevicePassword(personId: string): Promise<void> {
+    await personStore.resetDevicePassword(personId);
+    devicePassword.value = personStore.newDevicePassword || '';
+  }
+
+  async function onLockUser(
+    lockedBy: string,
+    date: string | undefined,
+    isExistingLockToBeEdited: boolean,
+  ): Promise<void> {
     if (!personStore.currentPerson) return;
 
+    let lock: boolean;
+    if (isExistingLockToBeEdited) lock = isManuallyLocked.value;
+    else lock = !isManuallyLocked.value;
+
     let bodyParams: LockUserBodyParams = {
-      lock: !isManuallyLocked.value,
+      lock: lock,
       locked_by: lockedBy,
       locked_until: date,
     };
@@ -269,7 +283,9 @@
   let closeCannotDeleteDialog = (): void => {
     cannotDeleteDialogVisible.value = false;
   };
+
   let closeCreateSuccessDialog = (): void => {
+    personStore.getPersonenuebersichtById(currentPersonId);
     createSuccessDialogVisible.value = false;
     isEditActive.value = false;
     pendingCreation.value = false;
@@ -278,6 +294,8 @@
   };
 
   let closeDeleteSuccessDialog = (): void => {
+    personStore.getPersonenuebersichtById(currentPersonId);
+    isEditActive.value = false;
     deleteSuccessDialogVisible.value = false;
     isEditActive.value = false;
     pendingDeletion.value = false;
@@ -285,6 +303,7 @@
   };
 
   let closeChangeKlasseSuccessDialog = (): void => {
+    personStore.getPersonenuebersichtById(currentPersonId);
     changeKlasseSuccessDialogVisible.value = false;
     isEditActive.value = false;
     pendingChangeKlasse.value = false;
@@ -292,6 +311,7 @@
   };
 
   let closeChangePersonMetadataSuccessDialog = (): void => {
+    personStore.getPersonById(currentPersonId);
     changePersonMetadataSuccessVisible.value = false;
     isEditPersonMetadataActive.value = false;
     personStore.getPersonById(currentPersonId);
@@ -366,10 +386,9 @@
       };
     } else {
       closeDeleteSuccessDialog = (): void => {
+        personStore.getPersonenuebersichtById(currentPersonId);
         deleteSuccessDialogVisible.value = false;
-        router.push(route).then(() => {
-          router.go(0);
-        });
+        isEditActive.value = false;
       };
     }
   };
@@ -504,6 +523,15 @@
     return (
       !!zuordnungenResult.value?.find((zuordnung: Zuordnung) => {
         return zuordnung.merkmale.includes(RollenMerkmal.KopersPflicht);
+      }) || false
+    );
+  });
+
+  // Used to show device password block
+  const hasLehrRolle: ComputedRef<boolean> = computed(() => {
+    return (
+      !!zuordnungenResult.value?.find((zuordnung: Zuordnung) => {
+        return zuordnung.rollenArt === RollenArt.Lehr;
       }) || false
     );
   });
@@ -845,6 +873,29 @@
     return selectedNewKlasseTitle.value === selectedZuordnungen.value[0]?.klasse;
   });
 
+  // Computed property to get the password reset dialog text
+  const passwordResetDialogText: ComputedRef<string> = computed(() => {
+    let message: string = t('admin.person.resetPasswordInformation');
+    if (!password.value) {
+      message += `\n\n${t('admin.person.resetPasswordConfirmation', {
+        firstname: personStore.currentPerson?.person.name.vorname,
+        lastname: personStore.currentPerson?.person.name.familienname,
+      })}`;
+    } else {
+      message = `${t('admin.person.resetPasswordSuccessMessage')}\n\n` + message;
+    }
+    return message;
+  });
+
+  // Computed property to get the device password dialog text
+  const devicePasswordDialogText: ComputedRef<string> = computed(() => {
+    let message: string = t('admin.person.devicePassword.dialogText');
+    if (devicePassword.value) {
+      message = `${t('admin.person.devicePassword.createPasswordSuccessMessage')}\n\n` + message;
+    }
+    return message;
+  });
+
   const onSubmitChangeKlasse: (e?: Event | undefined) => Promise<void | undefined> = handleSubmitChangeKlasse(() => {
     changeKlasseConfirmationDialogMessage.value = t('person.changeKlasseConfirmation', {
       oldKlasse: selectedZuordnungen.value[0]?.klasse,
@@ -900,6 +951,8 @@
         sskName: organisation.name,
         rolle:
           rollen.value?.find((rolle: TranslatedRolleWithAttrs) => rolle.value === selectedRolle.value)?.title || '',
+        rollenArt: rollen.value?.find((rolle: TranslatedRolleWithAttrs) => rolle.value === selectedRolle.value)
+          ?.rollenart as RollenArt,
         administriertVon: organisation.administriertVon ?? '',
         editable: true,
         merkmale: [] as unknown as RollenMerkmal,
@@ -920,6 +973,8 @@
           sskName: klasse.name,
           rolle:
             rollen.value?.find((rolle: TranslatedRolleWithAttrs) => rolle.value === selectedRolle.value)?.title || '',
+          rollenArt: rollen.value?.find((rolle: TranslatedRolleWithAttrs) => rolle.value === selectedRolle.value)
+            ?.rollenart as RollenArt,
           administriertVon: klasse.administriertVon ?? '',
           editable: true,
           typ: OrganisationsTyp.Klasse,
@@ -937,6 +992,7 @@
             sskDstNr: existingKlasse.sskDstNr,
             sskName: existingKlasse.sskName,
             rolle: existingKlasse.rolle,
+            rollenArt: existingKlasse.rollenArt,
             administriertVon: existingKlasse.administriertVon,
             editable: true,
             merkmale: [] as unknown as RollenMerkmal,
@@ -986,6 +1042,8 @@
         rolle:
           rollen.value?.find((rolle: TranslatedRolleWithAttrs) => rolle.value === selectedZuordnungen.value[0]?.rolleId)
             ?.title || '',
+        rollenArt: rollen.value?.find((rolle: TranslatedRolleWithAttrs) => rolle.value === selectedRolle.value)
+          ?.rollenart as RollenArt,
         administriertVon: organisation.administriertVon ?? '',
         editable: true,
         merkmale: [] as unknown as RollenMerkmal,
@@ -1037,6 +1095,8 @@
             rollen.value?.find(
               (rolle: TranslatedRolleWithAttrs) => rolle.value === selectedZuordnungen.value[0]?.rolleId,
             )?.title || '',
+          rollenArt: rollen.value?.find((rolle: TranslatedRolleWithAttrs) => rolle.value === selectedRolle.value)
+            ?.rollenart as RollenArt,
           administriertVon: newKlasse.administriertVon ?? '',
           editable: true,
           merkmale: [] as unknown as RollenMerkmal,
@@ -1608,13 +1668,17 @@
             >
               <div class="d-flex justify-sm-end">
                 <PasswordReset
-                  :errorCode="personStore.errorCode"
+                  :buttonText="$t('admin.person.changePassword')"
+                  :confirmButtonText="$t('admin.person.resetPassword')"
+                  :dialogHeader="$t('admin.person.resetPassword')"
+                  :dialogText="passwordResetDialogText"
                   :disabled="isEditActive || isEditPersonMetadataActive"
-                  :person="personStore.currentPerson"
+                  :errorCode="personStore.errorCode"
+                  :isLoading="personStore.loading"
                   @onClearPassword="password = ''"
                   @onResetPassword="resetPassword(currentPersonId)"
                   :password="password"
-                  :isLoading="personStore.loading"
+                  :testId="'password-reset'"
                 >
                 </PasswordReset>
               </div>
@@ -2341,7 +2405,7 @@
           color="#E5EAEF"
           thickness="6"
         ></v-divider>
-        <v-container class="person-lock">
+        <v-container data-testid="person-lock">
           <v-row class="ml-md-16">
             <v-col data-testid="person-lock-info">
               <h3 class="subtitle-1">{{ $t('admin.person.status') }}</h3>
@@ -2475,6 +2539,68 @@
               </div>
             </v-col>
             <v-col v-else-if="personStore.loading"> <v-progress-circular indeterminate></v-progress-circular></v-col>
+          </v-row> </v-container
+        ><v-divider
+          v-if="hasLehrRolle"
+          class="border-opacity-100 rounded my-6 mx-4"
+          color="#E5EAEF"
+          thickness="6"
+        ></v-divider>
+        <!-- reset device password -->
+        <v-container
+          v-if="hasLehrRolle"
+          data-testid="device-password"
+        >
+          <v-row class="ml-md-16">
+            <v-col data-testid="device-password-info">
+              <h3 class="subtitle-1">{{ $t('admin.person.devicePassword.header') }}</h3>
+              <template v-if="!personStore.loading">
+                <v-row class="mt-4 text-body">
+                  <v-col
+                    class="text-right"
+                    cols="1"
+                  >
+                    <v-icon
+                      class="mb-2"
+                      icon="mdi-information"
+                    >
+                    </v-icon>
+                  </v-col>
+                  <v-col>
+                    <p>
+                      {{ $t('admin.person.devicePassword.infoTextPersonDetails') }}
+                    </p>
+                  </v-col>
+                </v-row>
+              </template>
+              <template v-else-if="personStore.loading">
+                <v-col> <v-progress-circular indeterminate></v-progress-circular></v-col>
+              </template>
+            </v-col>
+            <v-col
+              data-testid="device-password-actions"
+              class="mr-lg-13"
+              cols="12"
+              md="auto"
+              v-if="personStore.currentPerson"
+            >
+              <div class="d-flex justify-sm-end">
+                <PasswordReset
+                  :buttonText="$t('admin.person.devicePassword.createPassword')"
+                  :confirmButtonText="$t('admin.person.devicePassword.createPassword')"
+                  :dialogHeader="$t('admin.person.devicePassword.createDevicePassword')"
+                  :dialogText="devicePasswordDialogText"
+                  :disabled="isEditActive || isEditPersonMetadataActive"
+                  :errorCode="personStore.errorCode"
+                  :isLoading="personStore.loading"
+                  @onClearPassword="password = ''"
+                  @onResetPassword="resetDevicePassword(currentPersonId)"
+                  :password="devicePassword"
+                  :testId="'device-password'"
+                >
+                </PasswordReset>
+              </div>
+            </v-col>
           </v-row>
         </v-container>
       </template>
