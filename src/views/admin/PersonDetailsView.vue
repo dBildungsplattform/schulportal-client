@@ -320,7 +320,7 @@
       (zuordnung: Zuordnung) => zuordnung.typ === OrganisationsTyp.Klasse,
     );
 
-    // Create a map of Schule to Klasse relationships to keep the Klassen that are not supposed to be deleted
+    // Create a map of Schule to Klasse relationships to keep the Klassen that are not supposed to be deleted.
     const schuleToKlasseMap: Map<string, Zuordnung[]> = new Map<string, Zuordnung[]>();
 
     klassenZuordnungen?.forEach((klasseZuordnung: Zuordnung) => {
