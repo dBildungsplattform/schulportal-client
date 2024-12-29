@@ -155,11 +155,19 @@
     devicePassword.value = personStore.newDevicePassword || '';
   }
 
-  async function onLockUser(lockedBy: string, date: string | undefined): Promise<void> {
+  async function onLockUser(
+    lockedBy: string,
+    date: string | undefined,
+    isExistingLockToBeEdited: boolean,
+  ): Promise<void> {
     if (!personStore.currentPerson) return;
 
+    let lock: boolean;
+    if (isExistingLockToBeEdited) lock = isManuallyLocked.value;
+    else lock = !isManuallyLocked.value;
+
     let bodyParams: LockUserBodyParams = {
-      lock: !isManuallyLocked.value,
+      lock: lock,
       locked_by: lockedBy,
       locked_until: date,
     };
