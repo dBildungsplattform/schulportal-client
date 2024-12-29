@@ -472,12 +472,6 @@ export interface DBiamPersonenzuordnungResponse {
      * @memberof DBiamPersonenzuordnungResponse
      */
     'merkmale': RollenMerkmal;
-    /**
-     * 
-     * @type {Array<string>}
-     * @memberof DBiamPersonenzuordnungResponse
-     */
-    'admins': Array<string>;
 }
 
 
