@@ -454,7 +454,12 @@
         :confirmUnsavedChangesAction="handleConfirmUnsavedChanges"
         :createButtonLabel="$t('admin.import.uploadFile')"
         :discardButtonLabel="$t('nav.backToList')"
-        :hideActions="showUploadSuccessTemplate || !!importStore.importedData || importStore.importIsLoading || !!importStore.errorCode"
+        :hideActions="
+          showUploadSuccessTemplate ||
+          !!importStore.importedData ||
+          importStore.importIsLoading ||
+          !!importStore.errorCode
+        "
         id="person-import-form"
         :isLoading="importStore.uploadIsLoading"
         :onDiscard="navigateToPersonTable"
@@ -464,7 +469,6 @@
       >
         <!-- Error Message Display for error messages from the ImportStore -->
         <SpshAlert
-
           :model-value="!!importStore.errorCode"
           :title="$t('admin.import.uploadErrorTitle')"
           :type="'error'"
@@ -523,7 +527,14 @@
         </template>
 
         <!-- Actual form -->
-        <template v-if="!showUploadSuccessTemplate && !importStore.importedData && !importStore.importIsLoading && !importStore.errorCode">
+        <template
+          v-if="
+            !showUploadSuccessTemplate &&
+            !importStore.importedData &&
+            !importStore.importIsLoading &&
+            !importStore.errorCode
+          "
+        >
           <!-- Schulauswahl -->
           <FormRow
             :errorLabel="selectedSchuleProps['error']"
