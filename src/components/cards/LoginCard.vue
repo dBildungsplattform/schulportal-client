@@ -174,12 +174,10 @@
         >
           <ul>
             <li class="ml-5">
-              Die Eingabe des zweiten Faktors im Dialog kann nun auch per Copy & Paste erfolgen, auf mobilen Endgeräten
-              wird die Tastatur auf Zahleneingabe voreingestellt.
+              {{ $t('login.secondFactorInput') }}
             </li>
             <li class="ml-5 mt-3">
-              Inbetriebnahme-Passworte für LK-Endgeräte können über das Profil des Benutzers (Self-Service) oder durch
-              schulische Administratorinnen oder Administratoren selbstständig erzeugt werden.
+              {{ $t('login.lkDevicePasswords') }}
             </li>
           </ul>
         </v-col>
