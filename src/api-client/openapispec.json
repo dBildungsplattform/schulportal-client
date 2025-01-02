@@ -7293,12 +7293,20 @@
             "ImportVorgangStatusResponse": {
                 "type": "object",
                 "properties": {
+                    "dataItemCount": {
+                        "type": "number"
+                    },
                     "status": {
                         "$ref": "#/components/schemas/ImportStatus"
+                    },
+                    "totalDataItemImported": {
+                        "type": "number"
                     }
                 },
                 "required": [
-                    "status"
+                    "dataItemCount",
+                    "status",
+                    "totalDataItemImported"
                 ]
             },
             "FeatureFlagResponse": {
