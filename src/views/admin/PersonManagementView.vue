@@ -66,8 +66,6 @@
       !!searchFilterStore.selectedOrganisationen?.length ||
       !!searchFilterStore.selectedRollen?.length ||
       !!searchFilterStore.searchFilterPersonen ||
-      !!searchFilterStore.sortField ||
-      !!searchFilterStore.sortOrder ||
       selectedKlassen.value.length > 0 ||
       !!selectedStatus.value,
   );
@@ -234,8 +232,6 @@
     selectedStatus.value = null;
     searchFilterStore.personenPage = 1;
     searchFilterStore.personenPerPage = 30;
-    searchFilterStore.sortField = '';
-    searchFilterStore.sortOrder = '';
     searchFilterStore.currentSort = null;
     personStore.getAllPersons({
       offset: (searchFilterStore.personenPage - 1) * searchFilterStore.personenPerPage,
