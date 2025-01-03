@@ -363,18 +363,6 @@
       :padded="true"
       :showCloseText="true"
     >
-      <!-- Error Message Display for error messages from the personStore -->
-      <SpshAlert
-        :model-value="!!importStore.errorCode"
-        :title="$t('admin.import.uploadErrorTitle')"
-        :type="'error'"
-        :closable="false"
-        :showButton="true"
-        :buttonText="$t('admin.import.backToUpload')"
-        :buttonAction="backToUpload"
-        :text="$t(`admin.import.errors.${importStore.errorCode}`)"
-      />
-
       <!-- Import success template -->
       <template v-if="importStore.importProgress === 100 && !importStore.importIsLoading && !importStore.errorCode">
         <v-container>
@@ -462,11 +450,16 @@
 
       <!-- Upload form -->
       <FormWrapper
-        v-if="!importStore.errorCode && importStore.importProgress === 0"
+        v-if="importStore.importProgress === 0"
         :confirmUnsavedChangesAction="handleConfirmUnsavedChanges"
         :createButtonLabel="$t('admin.import.uploadFile')"
         :discardButtonLabel="$t('nav.backToList')"
-        :hideActions="showUploadSuccessTemplate || !!importStore.importedData || importStore.importIsLoading"
+        :hideActions="
+          showUploadSuccessTemplate ||
+          !!importStore.importedData ||
+          importStore.importIsLoading ||
+          !!importStore.errorCode
+        "
         id="person-import-form"
         :isLoading="importStore.uploadIsLoading"
         :onDiscard="navigateToPersonTable"
@@ -474,6 +467,17 @@
         @onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
         :showUnsavedChangesDialog="showUnsavedChangesDialog"
       >
+        <!-- Error Message Display for error messages from the ImportStore -->
+        <SpshAlert
+          :model-value="!!importStore.errorCode"
+          :title="$t('admin.import.uploadErrorTitle')"
+          :type="'error'"
+          :closable="false"
+          :showButton="true"
+          :buttonText="$t('admin.import.backToUpload')"
+          :buttonAction="backToUpload"
+          :text="$t(`admin.import.errors.${importStore.errorCode}`)"
+        />
         <!-- Upload success template -->
         <template v-if="showUploadSuccessTemplate">
           <v-container>
@@ -523,7 +527,14 @@
         </template>
 
         <!-- Actual form -->
-        <template v-if="!showUploadSuccessTemplate && !importStore.importedData && !importStore.importIsLoading">
+        <template
+          v-if="
+            !showUploadSuccessTemplate &&
+            !importStore.importedData &&
+            !importStore.importIsLoading &&
+            !importStore.errorCode
+          "
+        >
           <!-- Schulauswahl -->
           <FormRow
             :errorLabel="selectedSchuleProps['error']"
