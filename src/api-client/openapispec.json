@@ -5594,6 +5594,12 @@
                     "merkmale": {
                         "nullable": true,
                         "$ref": "#/components/schemas/RollenMerkmal"
+                    },
+                    "admins": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
                     }
                 },
                 "required": [
@@ -5607,7 +5613,8 @@
                     "typ",
                     "editable",
                     "befristung",
-                    "merkmale"
+                    "merkmale",
+                    "admins"
                 ]
             },
             "DBiamPersonenuebersichtResponse": {
