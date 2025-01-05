@@ -178,6 +178,8 @@
       },
       "discard": "Benutzer verwerfen",
       "disableUser": "Benutzer sperren",
+      "editLock": "Sperre bearbeiten",
+      "removeLock": "Sperre aufheben",
       "edit": "Benutzer bearbeiten",
       "editPersonalInfo": "Persönliche Informationen bearbeiten",
       "errors": {
@@ -537,6 +539,10 @@
   "landingTitle": "Willkommen im Schulportal SH.",
   "login": {
     "button": "Anmelden",
+    "features": {
+      "secondFactorInput": "Die Eingabe des zweiten Faktors im Dialog kann nun auch per Copy & Paste erfolgen, auf mobilen Endgeräten wird die Tastatur auf Zahleneingabe voreingestellt.",
+      "lkDevicePasswords": "Inbetriebnahme-Passworte für LK-Endgeräte können über das Profil des Benutzers (Self-Service) oder durch schulische Administratorinnen oder Administratoren selbstständig erzeugt werden."
+    },
     "forgotPassword": "Passwort vergessen? \n Wenden Sie sich bitte an Ihre schulischen Administratorinnen und Administratoren.",
     "header": "Anmeldung im Schulportal SH",
     "maintenanceNoticeTitle": "Achtung Wartungsarbeiten!",

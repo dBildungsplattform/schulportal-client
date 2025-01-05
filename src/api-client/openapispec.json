@@ -4789,6 +4789,30 @@
                     "status"
                 ]
             }
+        },
+        "/api/config": {
+            "get": {
+                "operationId": "ConfigController_getFeatureFlags",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "The feature flag config was successfully returned.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/FeatureFlagResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error while getting the config."
+                    }
+                },
+                "tags": [
+                    "config"
+                ]
+            }
         }
     },
     "info": {
@@ -7283,6 +7307,21 @@
                     "dataItemCount",
                     "status",
                     "totalDataItemImported"
+                ]
+            },
+            "FeatureFlagResponse": {
+                "type": "object",
+                "properties": {
+                    "rolleBearbeitenEnabled": {
+                        "type": "boolean"
+                    },
+                    "befristungBearbeitenEnabled": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "rolleBearbeitenEnabled",
+                    "befristungBearbeitenEnabled"
                 ]
             }
         }
