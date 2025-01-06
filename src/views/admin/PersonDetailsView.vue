@@ -290,12 +290,13 @@
     personStore.getPersonenuebersichtById(currentPersonId);
     createSuccessDialogVisible.value = false;
     isEditActive.value = false;
+    pendingCreation.value = false;
   };
 
   let closeDeleteSuccessDialog = (): void => {
     personStore.getPersonenuebersichtById(currentPersonId);
-    isEditActive.value = false;
     deleteSuccessDialogVisible.value = false;
+    isEditActive.value = false;
     pendingDeletion.value = false;
   };
 
@@ -303,12 +304,14 @@
     personStore.getPersonenuebersichtById(currentPersonId);
     changeKlasseSuccessDialogVisible.value = false;
     isEditActive.value = false;
+    pendingChangeKlasse.value = false;
   };
 
   let closeChangePersonMetadataSuccessDialog = (): void => {
     personStore.getPersonById(currentPersonId);
     changePersonMetadataSuccessVisible.value = false;
     isEditPersonMetadataActive.value = false;
+    personStore.getPersonById(currentPersonId);
   };
 
   // Triggers the template to add a new Zuordnung
@@ -334,7 +337,7 @@
       (zuordnung: Zuordnung) => zuordnung.typ === OrganisationsTyp.Klasse,
     );
 
-    // Create a map of Schule to Klasse relationships to keep the Klassen that are not supposed to be deleted
+    // Create a map of Schule to Klasse relationships to keep the Klassen that are not supposed to be deleted.
     const schuleToKlasseMap: Map<string, Zuordnung[]> = new Map<string, Zuordnung[]>();
 
     klassenZuordnungen?.forEach((klasseZuordnung: Zuordnung) => {
@@ -379,11 +382,7 @@
         navigateToPersonTable();
       };
     } else {
-      closeDeleteSuccessDialog = (): void => {
-        personStore.getPersonenuebersichtById(currentPersonId);
-        deleteSuccessDialogVisible.value = false;
-        isEditActive.value = false;
-      };
+      closeDeleteSuccessDialog();
     }
   };
 
