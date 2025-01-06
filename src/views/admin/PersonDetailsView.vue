@@ -291,17 +291,13 @@
     createSuccessDialogVisible.value = false;
     isEditActive.value = false;
     pendingCreation.value = false;
-    personStore.getPersonenuebersichtById(currentPersonId);
-
   };
 
   let closeDeleteSuccessDialog = (): void => {
     personStore.getPersonenuebersichtById(currentPersonId);
-    isEditActive.value = false;
     deleteSuccessDialogVisible.value = false;
     isEditActive.value = false;
     pendingDeletion.value = false;
-    personStore.getPersonenuebersichtById(currentPersonId);
   };
 
   let closeChangeKlasseSuccessDialog = (): void => {
@@ -309,7 +305,6 @@
     changeKlasseSuccessDialogVisible.value = false;
     isEditActive.value = false;
     pendingChangeKlasse.value = false;
-    personStore.getPersonenuebersichtById(currentPersonId);
   };
 
   let closeChangePersonMetadataSuccessDialog = (): void => {
@@ -387,11 +382,7 @@
         navigateToPersonTable();
       };
     } else {
-      closeDeleteSuccessDialog = (): void => {
-        personStore.getPersonenuebersichtById(currentPersonId);
-        deleteSuccessDialogVisible.value = false;
-        isEditActive.value = false;
-      };
+      closeDeleteSuccessDialog();
     }
   };
 
