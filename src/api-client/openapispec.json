@@ -20,9 +20,7 @@
             "description": "Redirection to orchestrate OIDC flow."
           }
         },
-        "tags": [
-          "auth"
-        ]
+        "tags": ["auth"]
       }
     },
     "/api/auth/logout": {
@@ -38,14 +36,10 @@
             "description": "Internal server error while trying to log out."
           }
         },
-        "tags": [
-          "auth"
-        ],
+        "tags": ["auth"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -73,14 +67,10 @@
             "description": "User is not logged in."
           }
         },
-        "tags": [
-          "auth"
-        ],
+        "tags": ["auth"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -115,9 +105,7 @@
             "description": "Redirect to Keycloak password reset page."
           }
         },
-        "tags": [
-          "auth"
-        ]
+        "tags": ["auth"]
       }
     },
     "/api/personen": {
@@ -161,14 +149,10 @@
             "description": "Internal server error while creating the person."
           }
         },
-        "tags": [
-          "personen"
-        ],
+        "tags": ["personen"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -230,10 +214,7 @@
             "schema": {
               "nullable": true,
               "default": "nein",
-              "enum": [
-                "ja",
-                "nein"
-              ],
+              "enum": ["ja", "nein"],
               "type": "string"
             }
           },
@@ -278,10 +259,7 @@
             "description": "Order to sort by.",
             "schema": {
               "nullable": true,
-              "enum": [
-                "asc",
-                "desc"
-              ],
+              "enum": ["asc", "desc"],
               "type": "string"
             }
           },
@@ -292,12 +270,7 @@
             "description": "Field to sort by.",
             "schema": {
               "nullable": true,
-              "enum": [
-                "familienname",
-                "vorname",
-                "personalnummer",
-                "referrer"
-              ],
+              "enum": ["familienname", "vorname", "personalnummer", "referrer"],
               "type": "string"
             }
           }
@@ -340,14 +313,10 @@
             "description": "Internal server error while getting all persons."
           }
         },
-        "tags": [
-          "personen"
-        ],
+        "tags": ["personen"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -390,14 +359,10 @@
             "description": "An internal server error occurred."
           }
         },
-        "tags": [
-          "personen"
-        ],
+        "tags": ["personen"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -445,14 +410,10 @@
             "description": "Internal server error while getting the person."
           }
         },
-        "tags": [
-          "personen"
-        ],
+        "tags": ["personen"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -510,14 +471,10 @@
             "description": "An internal server error occurred."
           }
         },
-        "tags": [
-          "personen"
-        ],
+        "tags": ["personen"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -560,14 +517,10 @@
             "description": "Internal server error while creating the personenkontext."
           }
         },
-        "tags": [
-          "personen"
-        ],
+        "tags": ["personen"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -665,9 +618,7 @@
                       "$ref": "#/components/schemas/RawPagedResponse"
                     },
                     {
-                      "required": [
-                        "items"
-                      ],
+                      "required": ["items"],
                       "properties": {
                         "items": {
                           "type": "array",
@@ -695,14 +646,10 @@
             "description": "Internal server error while getting all personenkontexte."
           }
         },
-        "tags": [
-          "personen"
-        ],
+        "tags": ["personen"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -743,14 +690,10 @@
             "description": "Internal server error."
           }
         },
-        "tags": [
-          "personen"
-        ],
+        "tags": ["personen"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -805,14 +748,10 @@
             "description": "A downstream server returned an error."
           }
         },
-        "tags": [
-          "personen"
-        ],
+        "tags": ["personen"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -850,14 +789,10 @@
             "description": "A downstream server returned an error."
           }
         },
-        "tags": [
-          "personen"
-        ],
+        "tags": ["personen"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -921,14 +856,54 @@
             "description": "Internal server error while updating the metadata for user."
           }
         },
-        "tags": [
-          "personen"
-        ],
+        "tags": ["personen"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/personen/{personId}/uem-password": {
+      "patch": {
+        "operationId": "PersonController_resetUEMPasswordByPersonId",
+        "parameters": [
+          {
+            "name": "personId",
+            "required": true,
+            "in": "path",
+            "description": "The id for the account.",
+            "schema": {
+              "nullable": false,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "UEM-password for person was successfully reset.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The person does not exist or insufficient permissions to update person."
+          },
+          "500": {
+            "description": "Internal server error."
+          }
+        },
+        "tags": ["personen"],
+        "security": [
+          {
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -992,10 +967,7 @@
             "schema": {
               "nullable": true,
               "default": "nein",
-              "enum": [
-                "ja",
-                "nein"
-              ],
+              "enum": ["ja", "nein"],
               "type": "string"
             }
           },
@@ -1040,10 +1012,7 @@
             "description": "Order to sort by.",
             "schema": {
               "nullable": true,
-              "enum": [
-                "asc",
-                "desc"
-              ],
+              "enum": ["asc", "desc"],
               "type": "string"
             }
           },
@@ -1054,12 +1023,7 @@
             "description": "Field to sort by.",
             "schema": {
               "nullable": true,
-              "enum": [
-                "familienname",
-                "vorname",
-                "personalnummer",
-                "referrer"
-              ],
+              "enum": ["familienname", "vorname", "personalnummer", "referrer"],
               "type": "string"
             }
           }
@@ -1075,9 +1039,7 @@
                       "$ref": "#/components/schemas/RawPagedResponse"
                     },
                     {
-                      "required": [
-                        "items"
-                      ],
+                      "required": ["items"],
                       "properties": {
                         "items": {
                           "type": "array",
@@ -1102,14 +1064,10 @@
             "description": "Internal server error while getting all persons."
           }
         },
-        "tags": [
-          "personen-frontend"
-        ],
+        "tags": ["personen-frontend"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -1156,9 +1114,7 @@
                       "$ref": "#/components/schemas/RawPagedResponse"
                     },
                     {
-                      "required": [
-                        "items"
-                      ],
+                      "required": ["items"],
                       "properties": {
                         "items": {
                           "type": "array",
@@ -1183,14 +1139,10 @@
             "description": "Internal server error while getting personenuebersichten."
           }
         },
-        "tags": [
-          "dbiam-personenuebersicht"
-        ],
+        "tags": ["dbiam-personenuebersicht"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -1233,14 +1185,10 @@
             "description": "Internal server error while getting personenuebersicht."
           }
         },
-        "tags": [
-          "dbiam-personenuebersicht"
-        ],
+        "tags": ["dbiam-personenuebersicht"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -1268,14 +1216,10 @@
             "description": "person is not logged in."
           }
         },
-        "tags": [
-          "person-info"
-        ],
+        "tags": ["person-info"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -1328,14 +1272,10 @@
             "description": "Internal server error while creating the organisation."
           }
         },
-        "tags": [
-          "organisationen"
-        ],
+        "tags": ["organisationen"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -1482,14 +1422,10 @@
             "description": "Internal server error while getting all organizations."
           }
         },
-        "tags": [
-          "organisationen"
-        ],
+        "tags": ["organisationen"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -1556,14 +1492,10 @@
             "description": "An internal server error occurred."
           }
         },
-        "tags": [
-          "organisationen"
-        ],
+        "tags": ["organisationen"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -1611,14 +1543,10 @@
             "description": "Internal server error while getting the organization."
           }
         },
-        "tags": [
-          "organisationen"
-        ],
+        "tags": ["organisationen"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -1654,14 +1582,10 @@
             "description": "Internal server error while getting the root organization."
           }
         },
-        "tags": [
-          "organisationen"
-        ],
+        "tags": ["organisationen"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -1694,14 +1618,10 @@
             "description": "Internal server error while getting the organization."
           }
         },
-        "tags": [
-          "organisationen"
-        ],
+        "tags": ["organisationen"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -1744,14 +1664,10 @@
             "description": "Internal server error while getting the organization."
           }
         },
-        "tags": [
-          "organisationen"
-        ],
+        "tags": ["organisationen"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -1839,14 +1755,10 @@
             "description": "Internal server error while getting all organizations."
           }
         },
-        "tags": [
-          "organisationen"
-        ],
+        "tags": ["organisationen"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -1901,14 +1813,10 @@
             "description": "Internal server error while modifying the organisation."
           }
         },
-        "tags": [
-          "organisationen"
-        ],
+        "tags": ["organisationen"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -1969,14 +1877,10 @@
             "description": "Internal server error while getting all organizations."
           }
         },
-        "tags": [
-          "organisationen"
-        ],
+        "tags": ["organisationen"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -2031,14 +1935,10 @@
             "description": "Internal server error while modifying the organisation."
           }
         },
-        "tags": [
-          "organisationen"
-        ],
+        "tags": ["organisationen"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -2084,14 +1984,10 @@
             "description": "The organisation that should be deleted does not exist."
           }
         },
-        "tags": [
-          "organisationen"
-        ],
+        "tags": ["organisationen"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -2169,14 +2065,10 @@
             "description": "Internal server error while modifying the organisation."
           }
         },
-        "tags": [
-          "organisationen"
-        ],
+        "tags": ["organisationen"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -2244,14 +2136,10 @@
             "description": "Internal server error while modifying the organisation."
           }
         },
-        "tags": [
-          "organisationen"
-        ],
+        "tags": ["organisationen"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -2332,14 +2220,10 @@
             "description": "Internal server error while getting all rollen."
           }
         },
-        "tags": [
-          "rolle"
-        ],
+        "tags": ["rolle"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -2392,14 +2276,10 @@
             "description": "Internal server error while creating the rolle."
           }
         },
-        "tags": [
-          "rolle"
-        ],
+        "tags": ["rolle"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -2445,14 +2325,10 @@
             "description": "Internal server error while getting rolle by id."
           }
         },
-        "tags": [
-          "rolle"
-        ],
+        "tags": ["rolle"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -2502,14 +2378,10 @@
             "description": "Internal server error while adding systemrecht to rolle."
           }
         },
-        "tags": [
-          "rolle"
-        ],
+        "tags": ["rolle"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -2573,14 +2445,10 @@
             "description": "Internal server error while updating the rolle."
           }
         },
-        "tags": [
-          "rolle"
-        ],
+        "tags": ["rolle"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -2624,14 +2492,10 @@
             "description": "The rolle that should be deleted does not exist."
           }
         },
-        "tags": [
-          "rolle"
-        ],
+        "tags": ["rolle"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -2674,14 +2538,10 @@
             "description": "The rolle does not exist."
           }
         },
-        "tags": [
-          "rolle"
-        ],
+        "tags": ["rolle"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -2741,14 +2601,10 @@
             "description": "Internal server error, the service-provider may could not be found after attaching to rolle."
           }
         },
-        "tags": [
-          "rolle"
-        ],
+        "tags": ["rolle"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -2792,14 +2648,10 @@
             "description": "The rolle or the service-provider that should be removed does not exist."
           }
         },
-        "tags": [
-          "rolle"
-        ],
+        "tags": ["rolle"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -2837,17 +2689,13 @@
             "description": "Internal server error while getting all service-providers."
           }
         },
-        "tags": [
-          "provider"
-        ],
+        "tags": ["provider"],
         "security": [
           {
             "bearer": []
           },
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           }
         ]
       }
@@ -2882,17 +2730,13 @@
             "description": "Internal server error while getting all service-providers."
           }
         },
-        "tags": [
-          "provider"
-        ],
+        "tags": ["provider"],
         "security": [
           {
             "bearer": []
           },
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           }
         ]
       }
@@ -2940,17 +2784,13 @@
             "description": "Internal server error while getting the logo."
           }
         },
-        "tags": [
-          "provider"
-        ],
+        "tags": ["provider"],
         "security": [
           {
             "bearer": []
           },
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           }
         ]
       }
@@ -2997,14 +2837,10 @@
             "description": "An internal server error occurred."
           }
         },
-        "tags": [
-          "personenkontexte"
-        ],
+        "tags": ["personenkontexte"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -3052,14 +2888,10 @@
             "description": "An internal server error occurred."
           }
         },
-        "tags": [
-          "personenkontexte"
-        ],
+        "tags": ["personenkontexte"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -3110,14 +2942,10 @@
             "description": "An internal server error occurred."
           }
         },
-        "tags": [
-          "personenkontexte"
-        ],
+        "tags": ["personenkontexte"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -3226,14 +3054,10 @@
             "description": "An internal server error occurred."
           }
         },
-        "tags": [
-          "personenkontexte"
-        ],
+        "tags": ["personenkontexte"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -3279,14 +3103,10 @@
             "description": "The systemrecht could not be found (does not exist as type of systemrecht)."
           }
         },
-        "tags": [
-          "personenkontexte"
-        ],
+        "tags": ["personenkontexte"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -3332,14 +3152,10 @@
             "description": "Internal server error while getting personenkontexte."
           }
         },
-        "tags": [
-          "dbiam-personenkontexte"
-        ],
+        "tags": ["dbiam-personenkontexte"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -3392,14 +3208,10 @@
             "description": "Internal server error while creating personenkontext."
           }
         },
-        "tags": [
-          "dbiam-personenkontexte"
-        ],
+        "tags": ["dbiam-personenkontexte"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -3483,14 +3295,10 @@
             "description": "Internal server error while getting data for personenkontext."
           }
         },
-        "tags": [
-          "personenkontext"
-        ],
+        "tags": ["personenkontext"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -3564,14 +3372,10 @@
             "description": "Internal server error while updating personenkontexte."
           }
         },
-        "tags": [
-          "personenkontext"
-        ],
+        "tags": ["personenkontext"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -3635,14 +3439,10 @@
             "description": "Internal server error while getting schulstrukturknoten for personenkontexte."
           }
         },
-        "tags": [
-          "personenkontext"
-        ],
+        "tags": ["personenkontext"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -3695,14 +3495,10 @@
             "description": "Internal server error while creating person with personenkontext."
           }
         },
-        "tags": [
-          "personenkontext"
-        ],
+        "tags": ["personenkontext"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -3756,14 +3552,10 @@
             "description": "Internal server error while getting rollen for the logged-in user."
           }
         },
-        "tags": [
-          "person-administration"
-        ],
+        "tags": ["person-administration"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -3812,14 +3604,10 @@
             "description": "Internal server error while creating a token."
           }
         },
-        "tags": [
-          "2FA"
-        ],
+        "tags": ["2FA"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -3867,14 +3655,10 @@
             "description": "Internal server error while retrieving token state."
           }
         },
-        "tags": [
-          "2FA"
-        ],
+        "tags": ["2FA"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -3922,14 +3706,10 @@
             "description": "Internal server error while reseting a token."
           }
         },
-        "tags": [
-          "2FA"
-        ],
+        "tags": ["2FA"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -3978,14 +3758,10 @@
             "description": "Internal server error while assigning a hardware token."
           }
         },
-        "tags": [
-          "2FA"
-        ],
+        "tags": ["2FA"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -4027,14 +3803,10 @@
             "description": "Internal server error while verifying a token."
           }
         },
-        "tags": [
-          "2FA"
-        ],
+        "tags": ["2FA"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -4082,14 +3854,10 @@
             "description": "Internal server error while getting requirement information."
           }
         },
-        "tags": [
-          "2FA"
-        ],
+        "tags": ["2FA"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -4128,14 +3896,10 @@
             "description": "Internal server error while trying to lock user."
           }
         },
-        "tags": [
-          "cron"
-        ],
+        "tags": ["cron"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -4174,14 +3938,10 @@
             "description": "Internal server error while trying to remove personenkontexte from users."
           }
         },
-        "tags": [
-          "cron"
-        ],
+        "tags": ["cron"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -4220,14 +3980,10 @@
             "description": "Internal server error while trying to remove user."
           }
         },
-        "tags": [
-          "cron"
-        ],
+        "tags": ["cron"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -4263,14 +4019,10 @@
             "description": "Internal server error while trying to unlock users."
           }
         },
-        "tags": [
-          "cron"
-        ],
+        "tags": ["cron"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -4309,14 +4061,10 @@
             "description": "Internal server error while trying to update VIDIS Angebote."
           }
         },
-        "tags": [
-          "cron"
-        ],
+        "tags": ["cron"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -4362,14 +4110,10 @@
             "description": "Internal server error while importing data with a CSV file."
           }
         },
-        "tags": [
-          "import"
-        ],
+        "tags": ["import"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -4418,14 +4162,10 @@
             "description": "Internal server error while executing the import transaction."
           }
         },
-        "tags": [
-          "import"
-        ],
+        "tags": ["import"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -4471,14 +4211,10 @@
             "description": "The import transaction that should be deleted does not exist."
           }
         },
-        "tags": [
-          "import"
-        ],
+        "tags": ["import"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -4580,14 +4316,10 @@
             "description": "Internal server error while getting import transactions."
           }
         },
-        "tags": [
-          "import"
-        ],
+        "tags": ["import"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -4645,14 +4377,10 @@
             "description": "Internal server error while generating the import result file."
           }
         },
-        "tags": [
-          "import"
-        ],
+        "tags": ["import"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -4698,14 +4426,10 @@
             "description": "Internal server error while getting status for the import transaction by id."
           }
         },
-        "tags": [
-          "import"
-        ],
+        "tags": ["import"],
         "security": [
           {
-            "oauth2": [
-              "openid"
-            ]
+            "oauth2": ["openid"]
           },
           {
             "bearer": []
@@ -4723,9 +4447,7 @@
             "description": "Prometheus metrics."
           }
         },
-        "tags": [
-          "Metrics"
-        ]
+        "tags": ["Metrics"]
       }
     },
     "/api/status": {
@@ -4737,9 +4459,29 @@
             "description": ""
           }
         },
-        "tags": [
-          "status"
-        ]
+        "tags": ["status"]
+      }
+    },
+    "/api/config": {
+      "get": {
+        "operationId": "ConfigController_getFeatureFlags",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The feature flag config was successfully returned.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeatureFlagResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error while getting the config."
+          }
+        },
+        "tags": ["config"]
       }
     }
   },
@@ -4747,9 +4489,7 @@
     "title": "dBildungs IAM",
     "description": "The dBildungs IAM server API description",
     "version": "1.0",
-    "contact": {
-
-    }
+    "contact": {}
   },
   "tags": [],
   "servers": [],
@@ -4762,9 +4502,7 @@
             "authorizationUrl": "http://localhost:8080/realms/SPSH/protocol/openid-connect/auth",
             "tokenUrl": "http://localhost:8080/realms/SPSH/protocol/openid-connect/token",
             "refreshUrl": "http://localhost:8080/realms/SPSH/protocol/openid-connect/token",
-            "scopes": {
-
-            }
+            "scopes": {}
           }
         }
       },
@@ -4791,10 +4529,7 @@
             }
           }
         },
-        "required": [
-          "systemrechte",
-          "serviceProviderIds"
-        ]
+        "required": ["systemrechte", "serviceProviderIds"]
       },
       "PersonenkontextRolleFieldsResponse": {
         "type": "object",
@@ -4806,10 +4541,7 @@
             "$ref": "#/components/schemas/RollenSystemRechtServiceProviderIDResponse"
           }
         },
-        "required": [
-          "organisationsId",
-          "rolle"
-        ]
+        "required": ["organisationsId", "rolle"]
       },
       "PersonTimeLimitInfoResponse": {
         "type": "object",
@@ -4821,10 +4553,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "occasion",
-          "deadline"
-        ]
+        "required": ["occasion", "deadline"]
       },
       "UserinfoResponse": {
         "type": "object",
@@ -4973,11 +4702,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "personId",
-          "familienname",
-          "vorname"
-        ]
+        "required": ["personId", "familienname", "vorname"]
       },
       "PersonNameParams": {
         "type": "object",
@@ -5022,10 +4747,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "familienname",
-          "vorname"
-        ]
+        "required": ["familienname", "vorname"]
       },
       "PersonBirthParams": {
         "type": "object",
@@ -5041,12 +4763,7 @@
       },
       "Vertrauensstufe": {
         "type": "string",
-        "enum": [
-          "KEIN",
-          "UNBE",
-          "TEIL",
-          "VOLL"
-        ]
+        "enum": ["KEIN", "UNBE", "TEIL", "VOLL"]
       },
       "UserLockParams": {
         "type": "object",
@@ -5072,22 +4789,11 @@
             "nullable": true
           }
         },
-        "required": [
-          "personId",
-          "locked_by",
-          "created_at",
-          "locked_until",
-          "lock_occasion"
-        ]
+        "required": ["personId", "locked_by", "created_at", "locked_until", "lock_occasion"]
       },
       "EmailAddressStatus": {
         "type": "string",
-        "enum": [
-          "ENABLED",
-          "DISABLED",
-          "REQUESTED",
-          "FAILED"
-        ]
+        "enum": ["ENABLED", "DISABLED", "REQUESTED", "FAILED"]
       },
       "PersonEmailResponse": {
         "type": "object",
@@ -5099,10 +4805,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "status",
-          "address"
-        ]
+        "required": ["status", "address"]
       },
       "PersonResponse": {
         "type": "object",
@@ -5207,9 +4910,7 @@
             "$ref": "#/components/schemas/PersonResponse"
           }
         },
-        "required": [
-          "person"
-        ]
+        "required": ["person"]
       },
       "RawPagedResponse": {
         "type": "object",
@@ -5230,18 +4931,11 @@
             }
           }
         },
-        "required": [
-          "total",
-          "offset",
-          "limit",
-          "items"
-        ]
+        "required": ["total", "offset", "limit", "items"]
       },
       "CreatedPersonenkontextOrganisation": {
         "type": "object",
-        "properties": {
-
-        }
+        "properties": {}
       },
       "LoeschungResponse": {
         "type": "object",
@@ -5251,9 +4945,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "zeitpunkt"
-        ]
+        "required": ["zeitpunkt"]
       },
       "PersonenkontextResponse": {
         "type": "object",
@@ -5281,33 +4973,17 @@
           },
           "personenstatus": {
             "type": "string",
-            "enum": [
-              "AKTIV"
-            ],
+            "enum": ["AKTIV"],
             "nullable": true
           },
           "jahrgangsstufe": {
             "type": "string",
-            "enum": [
-              "01",
-              "02",
-              "03",
-              "04",
-              "05",
-              "06",
-              "07",
-              "08",
-              "09",
-              "10"
-            ],
+            "enum": ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10"],
             "nullable": true
           },
           "sichtfreigabe": {
             "type": "string",
-            "enum": [
-              "ja",
-              "nein"
-            ],
+            "enum": ["ja", "nein"],
             "nullable": true
           },
           "loeschung": {
@@ -5338,25 +5014,15 @@
       },
       "Personenstatus": {
         "type": "string",
-        "enum": [
-          "AKTIV"
-        ]
+        "enum": ["AKTIV"]
       },
       "Sichtfreigabe": {
         "type": "string",
-        "enum": [
-          "ja",
-          "nein"
-        ]
+        "enum": ["ja", "nein"]
       },
       "Geschlecht": {
         "type": "string",
-        "enum": [
-          "m",
-          "w",
-          "d",
-          "x"
-        ]
+        "enum": ["m", "w", "d", "x"]
       },
       "UpdatePersonBodyParams": {
         "type": "object",
@@ -5389,10 +5055,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "name",
-          "revision"
-        ]
+        "required": ["name", "revision"]
       },
       "LockUserBodyParams": {
         "type": "object",
@@ -5411,10 +5074,7 @@
             "description": "Required if Befristung is set"
           }
         },
-        "required": [
-          "lock",
-          "locked_by"
-        ]
+        "required": ["lock", "locked_by"]
       },
       "PersonLockResponse": {
         "type": "object",
@@ -5423,9 +5083,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "message"
-        ]
+        "required": ["message"]
       },
       "PersonMetadataBodyParams": {
         "type": "object",
@@ -5448,12 +5106,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "familienname",
-          "vorname",
-          "lastModified",
-          "revision"
-        ]
+        "required": ["familienname", "vorname", "lastModified", "revision"]
       },
       "DbiamPersonError": {
         "type": "object",
@@ -5468,7 +5121,8 @@
               "DOWNSTREAM_UNREACHABLE",
               "PERSONALNUMMER_REQUIRED",
               "NEWER_VERSION_OF_PERSON_AVAILABLE",
-              "PERSONALNUMMER_NICHT_EINDEUTIG"
+              "PERSONALNUMMER_NICHT_EINDEUTIG",
+              "PERSON_UEM_PASSWORD_MODIFICATION_ERROR"
             ]
           },
           "code": {
@@ -5476,10 +5130,11 @@
             "description": "Corresponds to HTTP Status code like 200, 404, 500"
           }
         },
-        "required": [
-          "i18nKey",
-          "code"
-        ]
+        "required": ["i18nKey", "code"]
+      },
+      "RollenArt": {
+        "type": "string",
+        "enum": ["LERN", "LEHR", "EXTERN", "ORGADMIN", "LEIT", "SYSADMIN"]
       },
       "OrganisationsTyp": {
         "type": "string",
@@ -5496,10 +5151,7 @@
       },
       "RollenMerkmal": {
         "type": "string",
-        "enum": [
-          "BEFRISTUNG_PFLICHT",
-          "KOPERS_PFLICHT"
-        ]
+        "enum": ["BEFRISTUNG_PFLICHT", "KOPERS_PFLICHT"]
       },
       "DBiamPersonenzuordnungResponse": {
         "type": "object",
@@ -5519,6 +5171,10 @@
           "rolle": {
             "type": "string"
           },
+          "rollenArt": {
+            "nullable": false,
+            "$ref": "#/components/schemas/RollenArt"
+          },
           "administriertVon": {
             "type": "string"
           },
@@ -5536,6 +5192,12 @@
           "merkmale": {
             "nullable": true,
             "$ref": "#/components/schemas/RollenMerkmal"
+          },
+          "admins": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         },
         "required": [
@@ -5544,11 +5206,13 @@
           "sskName",
           "sskDstNr",
           "rolle",
+          "rollenArt",
           "administriertVon",
           "typ",
           "editable",
           "befristung",
-          "merkmale"
+          "merkmale",
+          "admins"
         ]
       },
       "DBiamPersonenuebersichtResponse": {
@@ -5579,14 +5243,7 @@
             }
           }
         },
-        "required": [
-          "personId",
-          "vorname",
-          "nachname",
-          "benutzername",
-          "lastModifiedZuordnungen",
-          "zuordnungen"
-        ]
+        "required": ["personId", "vorname", "nachname", "benutzername", "lastModifiedZuordnungen", "zuordnungen"]
       },
       "PersonenuebersichtBodyParams": {
         "type": "object",
@@ -5599,9 +5256,7 @@
             }
           }
         },
-        "required": [
-          "personIds"
-        ]
+        "required": ["personIds"]
       },
       "PersonNameResponse": {
         "type": "object",
@@ -5680,10 +5335,7 @@
             "nullable": true
           }
         },
-        "required": [
-          "datum",
-          "geburtsort"
-        ]
+        "required": ["datum", "geburtsort"]
       },
       "Person": {
         "type": "object",
@@ -5786,24 +5438,11 @@
             ]
           }
         },
-        "required": [
-          "pid",
-          "person",
-          "personenkontexte",
-          "gruppen",
-          "email"
-        ]
+        "required": ["pid", "person", "personenkontexte", "gruppen", "email"]
       },
       "TraegerschaftTyp": {
         "type": "string",
-        "enum": [
-          "01",
-          "02",
-          "03",
-          "04",
-          "05",
-          "06"
-        ]
+        "enum": ["01", "02", "03", "04", "05", "06"]
       },
       "CreateOrganisationBodyParams": {
         "type": "object",
@@ -5837,10 +5476,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "name",
-          "typ"
-        ]
+        "required": ["name", "typ"]
       },
       "OrganisationResponse": {
         "type": "object",
@@ -5922,10 +5558,7 @@
             "description": "Corresponds to HTTP Status code like 200, 404, 500"
           }
         },
-        "required": [
-          "i18nKey",
-          "code"
-        ]
+        "required": ["i18nKey", "code"]
       },
       "UpdateOrganisationBodyParams": {
         "type": "object",
@@ -5959,10 +5592,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "name",
-          "typ"
-        ]
+        "required": ["name", "typ"]
       },
       "OrganisationRootChildrenResponse": {
         "type": "object",
@@ -5974,10 +5604,7 @@
             "$ref": "#/components/schemas/OrganisationResponse"
           }
         },
-        "required": [
-          "oeffentlich",
-          "ersatz"
-        ]
+        "required": ["oeffentlich", "ersatz"]
       },
       "ParentOrganisationsByIdsBodyParams": {
         "type": "object",
@@ -5991,9 +5618,7 @@
             }
           }
         },
-        "required": [
-          "organisationIds"
-        ]
+        "required": ["organisationIds"]
       },
       "ParentOrganisationenResponse": {
         "type": "object",
@@ -6005,9 +5630,7 @@
             }
           }
         },
-        "required": [
-          "parents"
-        ]
+        "required": ["parents"]
       },
       "RollenSystemRecht": {
         "type": "string",
@@ -6022,7 +5645,8 @@
           "PERSON_SYNCHRONISIEREN",
           "CRON_DURCHFUEHREN",
           "PERSONEN_ANLEGEN",
-          "IMPORT_DURCHFUEHREN"
+          "IMPORT_DURCHFUEHREN",
+          "PERSONEN_LESEN"
         ]
       },
       "OrganisationByIdBodyParams": {
@@ -6034,9 +5658,7 @@
             "nullable": false
           }
         },
-        "required": [
-          "organisationId"
-        ]
+        "required": ["organisationId"]
       },
       "OrganisationByNameBodyParams": {
         "type": "object",
@@ -6049,10 +5671,7 @@
             "description": "The version for the organisation."
           }
         },
-        "required": [
-          "name",
-          "version"
-        ]
+        "required": ["name", "version"]
       },
       "OrganisationResponseLegacy": {
         "type": "object",
@@ -6082,26 +5701,7 @@
             "$ref": "#/components/schemas/OrganisationsTyp"
           }
         },
-        "required": [
-          "id",
-          "administriertVon",
-          "kennung",
-          "name",
-          "namensergaenzung",
-          "kuerzel",
-          "typ"
-        ]
-      },
-      "RollenArt": {
-        "type": "string",
-        "enum": [
-          "LERN",
-          "LEHR",
-          "EXTERN",
-          "ORGADMIN",
-          "LEIT",
-          "SYSADMIN"
-        ]
+        "required": ["id", "administriertVon", "kennung", "name", "namensergaenzung", "kuerzel", "typ"]
       },
       "ServiceProviderIdNameResponse": {
         "type": "object",
@@ -6113,10 +5713,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id",
-          "name"
-        ]
+        "required": ["id", "name"]
       },
       "RolleWithServiceProvidersResponse": {
         "type": "object",
@@ -6215,13 +5812,7 @@
             }
           }
         },
-        "required": [
-          "name",
-          "administeredBySchulstrukturknoten",
-          "rollenart",
-          "merkmale",
-          "systemrechte"
-        ]
+        "required": ["name", "administeredBySchulstrukturknoten", "rollenart", "merkmale", "systemrechte"]
       },
       "RolleResponse": {
         "type": "object",
@@ -6306,10 +5897,7 @@
             "description": "Corresponds to HTTP Status code like 200, 404, 500"
           }
         },
-        "required": [
-          "i18nKey",
-          "code"
-        ]
+        "required": ["i18nKey", "code"]
       },
       "AddSystemrechtBodyParams": {
         "type": "object",
@@ -6318,9 +5906,7 @@
             "$ref": "#/components/schemas/RollenSystemRecht"
           }
         },
-        "required": [
-          "systemRecht"
-        ]
+        "required": ["systemRecht"]
       },
       "RolleServiceProviderResponse": {
         "type": "object",
@@ -6332,9 +5918,7 @@
             }
           }
         },
-        "required": [
-          "serviceProviderIds"
-        ]
+        "required": ["serviceProviderIds"]
       },
       "RolleServiceProviderBodyParams": {
         "type": "object",
@@ -6352,28 +5936,15 @@
             "description": "The version for the rolle."
           }
         },
-        "required": [
-          "serviceProviderIds",
-          "version"
-        ]
+        "required": ["serviceProviderIds", "version"]
       },
       "ServiceProviderTarget": {
         "type": "string",
-        "enum": [
-          "URL",
-          "EMAIL",
-          "SCHULPORTAL_ADMINISTRATION"
-        ]
+        "enum": ["URL", "EMAIL", "SCHULPORTAL_ADMINISTRATION"]
       },
       "ServiceProviderKategorie": {
         "type": "string",
-        "enum": [
-          "EMAIL",
-          "UNTERRICHT",
-          "VERWALTUNG",
-          "HINWEISE",
-          "ANGEBOTE"
-        ]
+        "enum": ["EMAIL", "UNTERRICHT", "VERWALTUNG", "HINWEISE", "ANGEBOTE"]
       },
       "ServiceProviderResponse": {
         "type": "object",
@@ -6401,15 +5972,7 @@
             "type": "boolean"
           }
         },
-        "required": [
-          "id",
-          "name",
-          "target",
-          "url",
-          "kategorie",
-          "hasLogo",
-          "requires2fa"
-        ]
+        "required": ["id", "name", "target", "url", "kategorie", "hasLogo", "requires2fa"]
       },
       "UpdateRolleBodyParams": {
         "type": "object",
@@ -6442,13 +6005,7 @@
             "type": "number"
           }
         },
-        "required": [
-          "name",
-          "merkmale",
-          "systemrechte",
-          "serviceProviderIds",
-          "version"
-        ]
+        "required": ["name", "merkmale", "systemrechte", "serviceProviderIds", "version"]
       },
       "PersonResponseAutomapper": {
         "type": "object",
@@ -6519,10 +6076,7 @@
             }
           }
         },
-        "required": [
-          "person",
-          "personenkontexte"
-        ]
+        "required": ["person", "personenkontexte"]
       },
       "PersonIdResponse": {
         "type": "object",
@@ -6531,9 +6085,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id"
-        ]
+        "required": ["id"]
       },
       "PersonenkontextdatensatzResponse": {
         "type": "object",
@@ -6548,10 +6100,7 @@
             }
           }
         },
-        "required": [
-          "person",
-          "personenkontexte"
-        ]
+        "required": ["person", "personenkontexte"]
       },
       "SystemrechtResponse": {
         "type": "object",
@@ -6604,9 +6153,7 @@
             "nullable": false
           }
         },
-        "required": [
-          "revision"
-        ]
+        "required": ["revision"]
       },
       "DBiamPersonenkontextResponse": {
         "type": "object",
@@ -6624,19 +6171,11 @@
             "type": "string"
           }
         },
-        "required": [
-          "personId",
-          "organisationId",
-          "rolleId",
-          "befristung"
-        ]
+        "required": ["personId", "organisationId", "rolleId", "befristung"]
       },
       "PersonenkontextMigrationRuntype": {
         "type": "string",
-        "enum": [
-          "ITSLEARNING",
-          "STANDARD"
-        ]
+        "enum": ["ITSLEARNING", "STANDARD"]
       },
       "DbiamPersonenkontextMigrationBodyParams": {
         "type": "object",
@@ -6664,12 +6203,7 @@
             "$ref": "#/components/schemas/PersonenkontextMigrationRuntype"
           }
         },
-        "required": [
-          "personId",
-          "organisationId",
-          "rolleId",
-          "migrationRunType"
-        ]
+        "required": ["personId", "organisationId", "rolleId", "migrationRunType"]
       },
       "DbiamPersonenkontextError": {
         "type": "object",
@@ -6691,10 +6225,7 @@
             "description": "Corresponds to HTTP Status code like 200, 404, 500"
           }
         },
-        "required": [
-          "i18nKey",
-          "code"
-        ]
+        "required": ["i18nKey", "code"]
       },
       "PersonenkontextWorkflowResponse": {
         "type": "object",
@@ -6728,13 +6259,7 @@
             "description": "Indicates whether the commit action can be performed."
           }
         },
-        "required": [
-          "organisations",
-          "rollen",
-          "selectedOrganisation",
-          "selectedRolle",
-          "canCommit"
-        ]
+        "required": ["organisations", "rollen", "selectedOrganisation", "selectedRolle", "canCommit"]
       },
       "DbiamPersonenkontextBodyParams": {
         "type": "object",
@@ -6753,11 +6278,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "personId",
-          "organisationId",
-          "rolleId"
-        ]
+        "required": ["personId", "organisationId", "rolleId"]
       },
       "DbiamUpdatePersonenkontexteBodyParams": {
         "type": "object",
@@ -6781,10 +6302,7 @@
             }
           }
         },
-        "required": [
-          "count",
-          "personenkontexte"
-        ]
+        "required": ["count", "personenkontexte"]
       },
       "PersonenkontexteUpdateResponse": {
         "type": "object",
@@ -6796,9 +6314,7 @@
             }
           }
         },
-        "required": [
-          "dBiamPersonenkontextResponses"
-        ]
+        "required": ["dBiamPersonenkontextResponses"]
       },
       "DbiamPersonenkontexteUpdateError": {
         "type": "object",
@@ -6822,10 +6338,7 @@
             "description": "Corresponds to HTTP Status code like 200, 404, 500"
           }
         },
-        "required": [
-          "i18nKey",
-          "code"
-        ]
+        "required": ["i18nKey", "code"]
       },
       "FindSchulstrukturknotenResponse": {
         "type": "object",
@@ -6840,10 +6353,7 @@
             "type": "number"
           }
         },
-        "required": [
-          "moeglicheSsks",
-          "total"
-        ]
+        "required": ["moeglicheSsks", "total"]
       },
       "DbiamCreatePersonenkontextBodyParams": {
         "type": "object",
@@ -6855,10 +6365,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "organisationId",
-          "rolleId"
-        ]
+        "required": ["organisationId", "rolleId"]
       },
       "DbiamCreatePersonWithPersonenkontexteBodyParams": {
         "type": "object",
@@ -6884,11 +6391,7 @@
             }
           }
         },
-        "required": [
-          "familienname",
-          "vorname",
-          "createPersonenkontexte"
-        ]
+        "required": ["familienname", "vorname", "createPersonenkontexte"]
       },
       "DBiamPersonResponse": {
         "type": "object",
@@ -6903,10 +6406,7 @@
             }
           }
         },
-        "required": [
-          "person",
-          "dBiamPersonenkontextResponses"
-        ]
+        "required": ["person", "dBiamPersonenkontextResponses"]
       },
       "FindRollenResponse": {
         "type": "object",
@@ -6921,10 +6421,7 @@
             "type": "number"
           }
         },
-        "required": [
-          "moeglicheRollen",
-          "total"
-        ]
+        "required": ["moeglicheRollen", "total"]
       },
       "TokenInitBodyParams": {
         "type": "object",
@@ -6933,9 +6430,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "personId"
-        ]
+        "required": ["personId"]
       },
       "TokenStateResponse": {
         "type": "object",
@@ -6950,11 +6445,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "hasToken",
-          "tokenKind",
-          "serial"
-        ]
+        "required": ["hasToken", "tokenKind", "serial"]
       },
       "AssignHardwareTokenBodyParams": {
         "type": "object",
@@ -6972,12 +6463,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "serial",
-          "otp",
-          "referrer",
-          "userId"
-        ]
+        "required": ["serial", "otp", "referrer", "userId"]
       },
       "AssignHardwareTokenResponse": {
         "type": "object",
@@ -7004,15 +6490,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id",
-          "jsonrpc",
-          "time",
-          "version",
-          "versionnumber",
-          "signature",
-          "dialogText"
-        ]
+        "required": ["id", "jsonrpc", "time", "version", "versionnumber", "signature", "dialogText"]
       },
       "TokenVerifyBodyParams": {
         "type": "object",
@@ -7024,10 +6502,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "personId",
-          "otp"
-        ]
+        "required": ["personId", "otp"]
       },
       "TokenRequiredResponse": {
         "type": "object",
@@ -7036,9 +6511,7 @@
             "type": "boolean"
           }
         },
-        "required": [
-          "required"
-        ]
+        "required": ["required"]
       },
       "DbiamPersonenkontextImportBodyParams": {
         "type": "object",
@@ -7054,11 +6527,7 @@
             "format": "binary"
           }
         },
-        "required": [
-          "organisationId",
-          "rolleId",
-          "file"
-        ]
+        "required": ["organisationId", "rolleId", "file"]
       },
       "ImportDataItemResponse": {
         "type": "object",
@@ -7080,12 +6549,7 @@
             }
           }
         },
-        "required": [
-          "nachname",
-          "vorname",
-          "klasse",
-          "validationErrors"
-        ]
+        "required": ["nachname", "vorname", "klasse", "validationErrors"]
       },
       "ImportUploadResponse": {
         "type": "object",
@@ -7130,9 +6594,7 @@
             "nullable": false
           }
         },
-        "required": [
-          "importvorgangId"
-        ]
+        "required": ["importvorgangId"]
       },
       "DbiamImportError": {
         "type": "object",
@@ -7155,23 +6617,11 @@
             "description": "Corresponds to HTTP Status code like 200, 404, 500"
           }
         },
-        "required": [
-          "i18nKey",
-          "code"
-        ]
+        "required": ["i18nKey", "code"]
       },
       "ImportStatus": {
         "type": "string",
-        "enum": [
-          "CANCELLED",
-          "COMPLETED",
-          "FAILED",
-          "FINISHED",
-          "INPROGRESS",
-          "INVALID",
-          "STARTED",
-          "VALID"
-        ]
+        "enum": ["CANCELLED", "COMPLETED", "FAILED", "FINISHED", "INPROGRESS", "INVALID", "STARTED", "VALID"]
       },
       "ImportVorgangResponse": {
         "type": "object",
@@ -7200,15 +6650,7 @@
             "$ref": "#/components/schemas/ImportStatus"
           }
         },
-        "required": [
-          "id",
-          "createdAt",
-          "updatedAt",
-          "rollenname",
-          "organisationsname",
-          "dataItemCount",
-          "status"
-        ]
+        "required": ["id", "createdAt", "updatedAt", "rollenname", "organisationsname", "dataItemCount", "status"]
       },
       "ImportVorgangStatusResponse": {
         "type": "object",
@@ -7217,9 +6659,19 @@
             "$ref": "#/components/schemas/ImportStatus"
           }
         },
-        "required": [
-          "status"
-        ]
+        "required": ["status"]
+      },
+      "FeatureFlagResponse": {
+        "type": "object",
+        "properties": {
+          "rolleBearbeitenEnabled": {
+            "type": "boolean"
+          },
+          "befristungBearbeitenEnabled": {
+            "type": "boolean"
+          }
+        },
+        "required": ["rolleBearbeitenEnabled", "befristungBearbeitenEnabled"]
       }
     }
   }
