@@ -5,14 +5,32 @@
     type ServiceProvider,
     type ServiceProviderStore,
   } from '@/stores/ServiceProviderStore';
-  import { computed, onMounted, type ComputedRef } from 'vue';
+  import { computed, onBeforeMount, onMounted, ref, type ComputedRef, type Ref } from 'vue';
   import ServiceProviderCategory from '@/components/layout/ServiceProviderCategory.vue';
   import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
   import {
     useTwoFactorAuthentificationStore,
     type TwoFactorAuthentificationStore,
   } from '@/stores/TwoFactorAuthentificationStore';
+  import SpshBanner from '@/components/alert/SpshBanner.vue';
+  import { useI18n } from 'vue-i18n';
+  import { usePersonInfoStore, type PersonInfoStore } from '@/stores/PersonInfoStore';
+  import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
+  import type { DBiamPersonenzuordnungResponse, PersonTimeLimitInfoResponse } from '@/api-client/generated';
+  import { RollenMerkmal } from '@/stores/RolleStore';
+  import { formatDateDiggitsToGermanDate } from '@/utils/date';
 
+  const { t }: { t: Function } = useI18n();
+
+  export type Alert = {
+    id: string;
+    message: string;
+    visible: boolean;
+    type: 'error' | 'warning';
+  };
+
+  const personInfoStore: PersonInfoStore = usePersonInfoStore();
+  const personStore: PersonStore = usePersonStore();
   const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
   const twoFactorAuthentificationStore: TwoFactorAuthentificationStore = useTwoFactorAuthentificationStore();
   const authStore: AuthStore = useAuthStore();
@@ -48,6 +66,49 @@
     return twoFactorAuthentificationStore.hasToken ?? false;
   }
 
+  const hasKoPersMerkmal: ComputedRef<boolean> = computed(() => {
+    return (
+      personStore.personenuebersicht?.zuordnungen.find((zuordnung: DBiamPersonenzuordnungResponse) => {
+        return zuordnung.merkmale.includes(RollenMerkmal.KopersPflicht);
+      }) !== undefined
+    );
+  });
+
+  function getUrgencyType(date: Date): 'error' | 'warning' {
+    const error: boolean = date.valueOf() < new Date().valueOf() + 14 * 24 * 60 * 60 * 1000;
+    return error ? 'error' : 'warning';
+  }
+
+  function getBannerAlerts(): Alert[] {
+    const alerts: Alert[] = [];
+
+    if (!personInfoStore.personInfo?.person.personalnummer && hasKoPersMerkmal.value == true) {
+      const lockInfo: PersonTimeLimitInfoResponse | undefined =
+        authStore.timeLimitInfos.find((info: PersonTimeLimitInfoResponse) => info.occasion === 'KOPERS') ?? undefined;
+      if (lockInfo) {
+        const kopersDeadline: string = lockInfo.deadline!;
+        const kopersDeadlineDate: Date = new Date(kopersDeadline);
+        alerts.push({
+          id: lockInfo.occasion,
+          message: t('banner.kopers', { date: formatDateDiggitsToGermanDate(kopersDeadlineDate) }),
+          visible: true,
+          type: getUrgencyType(kopersDeadlineDate),
+        });
+      }
+    }
+
+    return alerts;
+  }
+
+  async function initializeStores(): Promise<void> {
+    await authStore.initializeAuthStatus();
+    await personInfoStore.initPersonInfo();
+    await personStore.getPersonenuebersichtById(personInfoStore.personInfo?.person.id ?? '');
+  }
+
+  const closedAlerts: Ref<Set<string>> = ref(new Set());
+  let alerts: Ref<Alert[]> = ref([]);
+
   onMounted(async () => {
     await authStore.initializeAuthStatus();
     const personId: string | null | undefined = authStore.currentUser?.personId;
@@ -61,6 +122,26 @@
     }
     sessionStorage.setItem('previousUrl', window.location.pathname + window.location.search);
   });
+
+  onBeforeMount(async () => {
+    await initializeStores();
+    alerts.value = getBannerAlerts();
+    const closedAlertsStr: string | null = sessionStorage.getItem('closedAlerts');
+    if (closedAlertsStr) {
+      closedAlerts.value = new Set(JSON.parse(closedAlertsStr));
+      alerts.value.forEach((alert: Alert) => {
+        if (closedAlerts.value.has(alert.id.toString())) {
+          alert.visible = false;
+        }
+      });
+    }
+  });
+
+  const dismissBannerForSession = (id: string): void => {
+    alerts.value.find((alert: Alert) => alert.id === id)!.visible = false;
+    closedAlerts.value.add(id);
+    sessionStorage.setItem('closedAlerts', JSON.stringify(Array.from(closedAlerts.value)));
+  };
 </script>
 
 <template>
@@ -78,6 +159,21 @@
         </h2>
       </v-col>
     </v-row>
+
+    <v-row class="flex-nowrap mb-1 mt-1 justify-center">
+      <v-col cols="12">
+        <SpshBanner
+          v-bind:key="alert.id"
+          v-for="alert in alerts"
+          :id="alert.id.toString()"
+          :visible="alert.visible"
+          :text="alert.message"
+          :type="alert.type"
+          @dismiss-banner="dismissBannerForSession"
+        ></SpshBanner>
+      </v-col>
+    </v-row>
+
     <v-divider
       class="border-opacity-100 rounded"
       color="#1EAE9C"

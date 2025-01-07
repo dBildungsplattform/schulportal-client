@@ -147,7 +147,8 @@
       !importStore.importedData &&
       !importStore.uploadIsLoading &&
       !importStore.importIsLoading &&
-      !importStore.errorCode
+      !importStore.errorCode &&
+      importStore.importProgress === 0
     );
   });
 
@@ -164,6 +165,11 @@
   }
 
   function navigateToPersonTable(): void {
+    formContext.resetForm();
+    importStore.errorCode = null;
+    importStore.uploadResponse = null;
+    importStore.importedData = null;
+    importStore.importProgress = 0;
     router.push({ name: 'person-management' });
   }
 
@@ -242,6 +248,7 @@
   function anotherImport(): void {
     importStore.uploadResponse = null;
     importStore.importedData = null;
+    importStore.importProgress = 0;
     formContext.resetForm();
   }
 
@@ -260,16 +267,25 @@
     confirmationDialogVisible.value = true;
   }
 
-  function executeImport(): void {
+  async function executeImport(): Promise<void> {
     confirmationDialogVisible.value = false;
-    importStore.executePersonenImport(
-      importStore.uploadResponse?.importvorgangId as string,
-      selectedSchule.value as string,
-      selectedRolle.value as string,
-    );
+    const importvorgangId: string = importStore.uploadResponse?.importvorgangId as string;
+
+    await importStore.executePersonenImport(importvorgangId);
+
+    // Only start polling if the execution was successful (no error)
+    if (!importStore.errorCode) {
+      importStore.startImportStatusPolling(importvorgangId);
+    }
   }
 
-  function downloadFile(): void {
+  async function downloadFile(): Promise<void> {
+    const importvorgangId: string = importStore.uploadResponse?.importvorgangId as string;
+
+    // If the file is already downloaded the endpoint autodestructs it so we can't make anothe request.
+    if (!importStore.importedData) {
+      await importStore.downloadPersonenImportFile(importvorgangId);
+    }
     const blob: Blob = new Blob([importStore.importedData as File], { type: 'text/plain' });
     const url: string = window.URL.createObjectURL(blob);
     const link: HTMLAnchorElement = document.createElement('a');
@@ -320,6 +336,7 @@
     await personenkontextStore.processWorkflowStep({ limit: 25 });
     importStore.uploadResponse = null;
     importStore.importedData = null;
+    importStore.importProgress = 0;
     organisationStore.errorCode = '';
     /* listen for browser changes and prevent them when form is dirty */
     window.addEventListener('beforeunload', preventNavigation);
@@ -346,20 +363,8 @@
       :padded="true"
       :showCloseText="true"
     >
-      <!-- Error Message Display for error messages from the personStore -->
-      <SpshAlert
-        :model-value="!!importStore.errorCode"
-        :title="$t('admin.import.uploadErrorTitle')"
-        :type="'error'"
-        :closable="false"
-        :showButton="true"
-        :buttonText="$t('admin.import.backToUpload')"
-        :buttonAction="backToUpload"
-        :text="$t(`admin.import.errors.${importStore.errorCode}`)"
-      />
-
       <!-- Import success template -->
-      <template v-if="importStore.importedData && !importStore.importIsLoading && !importStore.errorCode">
+      <template v-if="importStore.importProgress === 100 && !importStore.importIsLoading && !importStore.errorCode">
         <v-container>
           <v-row justify="center">
             <v-col cols="auto">
@@ -407,15 +412,37 @@
       </template>
 
       <!-- Import loading template -->
-      <template v-if="importStore.importIsLoading && !importStore.errorCode">
+      <template v-if="importStore.importProgress > 0 && !importStore.errorCode">
         <v-container>
-          <v-row justify="center">
+          <v-row
+            v-if="importStore.importProgress > 0 && importStore.importProgress !== 100"
+            class="justify-center"
+          >
             <v-col cols="auto">
-              <v-progress-circular
-                data-testid="import-progress-spinner"
-                indeterminate
-                size="64"
-              ></v-progress-circular>
+              <v-icon
+                aria-hidden="true"
+                class="mr-2"
+                icon="mdi-alert-circle-outline"
+                size="small"
+              ></v-icon>
+              <span class="subtitle-2">
+                {{ $t('admin.import.doNotCloseNotice') }}
+              </span>
+            </v-col>
+          </v-row>
+          <v-row justify="center">
+            <v-col cols="12">
+              <v-progress-linear
+                data-testid="import-progress-bar"
+                :model-value="importStore.importProgress"
+                color="primary"
+                height="25"
+                striped
+              >
+                <template v-slot:default="{ value }">
+                  <strong class="text-white">{{ Math.ceil(value) }}%</strong>
+                </template>
+              </v-progress-linear>
             </v-col>
           </v-row>
         </v-container>
@@ -423,11 +450,16 @@
 
       <!-- Upload form -->
       <FormWrapper
-        v-if="!importStore.errorCode"
+        v-if="importStore.importProgress === 0"
         :confirmUnsavedChangesAction="handleConfirmUnsavedChanges"
         :createButtonLabel="$t('admin.import.uploadFile')"
         :discardButtonLabel="$t('nav.backToList')"
-        :hideActions="showUploadSuccessTemplate || !!importStore.importedData || importStore.importIsLoading"
+        :hideActions="
+          showUploadSuccessTemplate ||
+          !!importStore.importedData ||
+          importStore.importIsLoading ||
+          !!importStore.errorCode
+        "
         id="person-import-form"
         :isLoading="importStore.uploadIsLoading"
         :onDiscard="navigateToPersonTable"
@@ -435,6 +467,17 @@
         @onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
         :showUnsavedChangesDialog="showUnsavedChangesDialog"
       >
+        <!-- Error Message Display for error messages from the ImportStore -->
+        <SpshAlert
+          :model-value="!!importStore.errorCode"
+          :title="$t('admin.import.uploadErrorTitle')"
+          :type="'error'"
+          :closable="false"
+          :showButton="true"
+          :buttonText="$t('admin.import.backToUpload')"
+          :buttonAction="backToUpload"
+          :text="$t(`admin.import.errors.${importStore.errorCode}`)"
+        />
         <!-- Upload success template -->
         <template v-if="showUploadSuccessTemplate">
           <v-container>
@@ -484,7 +527,14 @@
         </template>
 
         <!-- Actual form -->
-        <template v-if="!showUploadSuccessTemplate && !importStore.importedData && !importStore.importIsLoading">
+        <template
+          v-if="
+            !showUploadSuccessTemplate &&
+            !importStore.importedData &&
+            !importStore.importIsLoading &&
+            !importStore.errorCode
+          "
+        >
           <!-- Schulauswahl -->
           <FormRow
             :errorLabel="selectedSchuleProps['error']"

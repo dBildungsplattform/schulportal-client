@@ -28,6 +28,7 @@
     "followingDataCreated": "Folgende Daten wurden gespeichert:",
     "headline": "Administrationsbereich",
     "import": {
+      "doNotCloseNotice": "Bitte den Browser während eines laufenden Importvorgangs nicht schließen!",
       "anotherImport": "Weiteren Import durchführen",
       "backToUpload": "Andere Datei hochladen",
       "confirmationText": "Achtung, diese Aktion kann nicht rückgängig gemacht werden. Möchten Sie den Import wirklich durchführen?",
@@ -43,6 +44,7 @@
         "IMPORT_DATA_ITEM_NACHNAME_IS_TOO_SHORT": "Nachname fehlt",
         "IMPORT_DATA_ITEM_VORNAME_IS_INVALID": "Vorname enthält ungültige Zeichen",
         "IMPORT_DATA_ITEM_VORNAME_IS_TOO_SHORT": "Vorname fehlt",
+        "IMPORT_MAX_USERS_LIMIT_ERROR": "Die Datei enthält mehr als 2000 Benutzer. Bitte reduzieren Sie die Anzahl der Benutzer in der Datei auf maximal 2000 und versuchen Sie den Import erneut.",
         "CSV_FILE_INVALID_HEADER_ERROR": "Die Datei konnte nicht gelesen werden. Bitte überprüfen Sie die Spaltenüberschriften."
       },
       "executeImport": "Import durchführen",
@@ -176,6 +178,8 @@
       },
       "discard": "Benutzer verwerfen",
       "disableUser": "Benutzer sperren",
+      "editLock": "Sperre bearbeiten",
+      "removeLock": "Sperre aufheben",
       "edit": "Benutzer bearbeiten",
       "editPersonalInfo": "Persönliche Informationen bearbeiten",
       "errors": {
@@ -183,7 +187,7 @@
         "ERROR_LOADING_USER": "Es konnten keine Benutzerdaten geladen werden.",
         "PERSONALNUMMER_REQUIRED": "Die Änderungen wurden nicht gespeichert, da keine KoPers.-Nr. eingegeben wurde.",
         "PERSON_NOT_FOUND": "Der Benutzer wurde seit Ihrer letzten Änderung gelöscht und kann nicht mehr bearbeitet werden.",
-        "PERSON_UEM_PASSWORD_MODIFICATION_ERROR": "Das Passwort konnte nicht erzeugt werden. Bitte versuchen es später erneut.",
+        "PERSON_UEM_PASSWORD_MODIFICATION_ERROR": "Das Passwort konnte nicht erzeugt werden. Bitte versuchen Sie es später erneut.",
         "NEWER_VERSION_OF_PERSON_AVAILABLE": "Der Benutzer wurde zwischenzeitlich von einer anderen Administratorin oder einem anderen Administrator bearbeitet. Bitte aktualisieren Sie die Daten und versuchen Sie es erneut.",
         "REQUIRED_STEP_UP_LEVEL_NOT_MET": "Die letzte Aktion konnte nicht ausgeführt werden. Aufgrund von längerer Inaktivität ist eine erneute Authentifizierung mit einem zweiten Faktor erforderlich. Um fortzufahren, klicken Sie bitte auf „Zurück zur Ergebnisliste“ oder „Schließen“. Sie werden anschließend zur Eingabe Ihres zweiten Faktors aufgefordert.",
         "UNSPECIFIED_ERROR": "Leider ist ein technischer Fehler aufgetreten. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut."
@@ -535,6 +539,10 @@
   "landingTitle": "Willkommen im Schulportal SH.",
   "login": {
     "button": "Anmelden",
+    "features": {
+      "secondFactorInput": "Die Eingabe des zweiten Faktors im Dialog kann nun auch per Copy & Paste erfolgen, auf mobilen Endgeräten wird die Tastatur auf Zahleneingabe voreingestellt.",
+      "lkDevicePasswords": "Inbetriebnahme-Passworte für LK-Endgeräte können über das Profil des Benutzers (Self-Service) oder durch schulische Administratorinnen oder Administratoren selbstständig erzeugt werden."
+    },
     "forgotPassword": "Passwort vergessen? \n Wenden Sie sich bitte an Ihre schulischen Administratorinnen und Administratoren.",
     "header": "Anmeldung im Schulportal SH",
     "maintenanceNoticeTitle": "Achtung Wartungsarbeiten!",
@@ -698,5 +706,9 @@
   },
   "willBeCreated": "wird hinzugefügt",
   "willBeRemoved": "wird entfernt",
-  "yes": "Ja"
+  "yes": "Ja",
+  "banner": {
+    "hint": "Hinweis: ",
+    "kopers": "Die Verwendung dieses Benutzerkontos setzt eine KoPers.-Nr. voraus. Bitte kontaktieren Sie Ihre schulischen Administratorinnen und Administratoren, um eine KoPers.-Nr. eintragen zu lassen. Andernfalls wird Ihr Zugang zum {date} automatisch gesperrt."
+  }
 }
