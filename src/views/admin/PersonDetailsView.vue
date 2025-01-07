@@ -2717,7 +2717,7 @@
               <v-btn
                 :block="mdAndDown"
                 class="primary"
-                @click.stop="closeCreateSuccessDialog"
+                @click.stop="closeChangeKlasseSuccessDialog"
               >
                 {{ $t('close') }}
               </v-btn>
