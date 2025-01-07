@@ -4,6 +4,7 @@ import {
   ImportApiFactory,
   ImportStatus,
   type ImportApiInterface,
+  type ImportResultResponse,
   type ImportUploadResponse,
   type ImportVorgangStatusResponse,
 } from '../api-client/generated/api';
@@ -14,9 +15,15 @@ const importApi: ImportApiInterface = ImportApiFactory(undefined, '', axiosApiIn
 // 1 hour polling time at maximum
 const MAX_POLLING_TIME: number = 60 * 60 * 1000;
 
+export enum ImportDataItemStatus {
+  FAILED = 'FAILED',
+  SUCCESS = 'SUCCESS',
+  PENDING = 'PENDING',
+}
+
 export type ImportState = {
   errorCode: string | null;
-  importedData: File | null;
+  importResponse: ImportResultResponse | null;
   importIsLoading: boolean;
   uploadIsLoading: boolean;
   uploadResponse: ImportUploadResponse | null;
@@ -32,7 +39,7 @@ type ImportActions = {
   getPersonenImportStatus: (importVorgangId: string) => Promise<void>;
   startImportStatusPolling: (importvorgangId: string) => Promise<void>;
   stopImportStatusPolling: () => void;
-  downloadPersonenImportFile: (importVorgangId: string) => Promise<void>;
+  getImportedPersons: (importVorgangId: string) => Promise<void>;
 };
 
 export type ImportStore = Store<'importStore', ImportState, ImportGetters, ImportActions>;
@@ -42,7 +49,7 @@ export const useImportStore: StoreDefinition<'importStore', ImportState, ImportG
   state: (): ImportState => {
     return {
       errorCode: null,
-      importedData: null,
+      importResponse: null,
       importIsLoading: false,
       uploadIsLoading: false,
       uploadResponse: null,
@@ -51,11 +58,12 @@ export const useImportStore: StoreDefinition<'importStore', ImportState, ImportG
     };
   },
   actions: {
-    async downloadPersonenImportFile(importvorgangId: string): Promise<void> {
+    async getImportedPersons(importvorgangId: string): Promise<void> {
       try {
-        const { data }: { data: File } = await importApi.importControllerDownloadFile(importvorgangId);
+        const { data }: { data: ImportResultResponse } =
+          await importApi.importControllerGetImportedUsers(importvorgangId);
 
-        this.importedData = data;
+        this.importResponse = data;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {

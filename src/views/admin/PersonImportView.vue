@@ -20,9 +20,10 @@
   import { useI18n, type Composer } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
   import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
-  import { type ImportStore, useImportStore } from '@/stores/ImportStore';
+  import { ImportDataItemStatus, type ImportStore, useImportStore } from '@/stores/ImportStore';
   import { RollenArt } from '@/stores/RolleStore';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
+  import type { ImportedUserResponse, ImportResultResponse } from '@/api-client/generated';
 
   const organisationStore: OrganisationStore = useOrganisationStore();
   const importStore: ImportStore = useImportStore();
@@ -144,7 +145,7 @@
   const showUploadSuccessTemplate: ComputedRef<boolean> = computed(() => {
     return (
       (importStore.uploadResponse?.isValid as boolean) &&
-      !importStore.importedData &&
+      !importStore.importResponse &&
       !importStore.uploadIsLoading &&
       !importStore.importIsLoading &&
       !importStore.errorCode &&
@@ -168,7 +169,7 @@
     formContext.resetForm();
     importStore.errorCode = null;
     importStore.uploadResponse = null;
-    importStore.importedData = null;
+    importStore.importResponse = null;
     importStore.importProgress = 0;
     router.push({ name: 'person-management' });
   }
@@ -247,7 +248,7 @@
 
   function anotherImport(): void {
     importStore.uploadResponse = null;
-    importStore.importedData = null;
+    importStore.importResponse = null;
     importStore.importProgress = 0;
     formContext.resetForm();
   }
@@ -255,7 +256,7 @@
   function backToUpload(): void {
     importStore.errorCode = null;
     importStore.uploadResponse = null;
-    importStore.importedData = null;
+    importStore.importResponse = null;
   }
 
   function cancelImport(): void {
@@ -279,20 +280,46 @@
     }
   }
 
-  async function downloadFile(): Promise<void> {
+  async function createAndTriggerDownload(): Promise<void> {
     const importvorgangId: string = importStore.uploadResponse?.importvorgangId as string;
+    await importStore.getImportedPersons(importvorgangId);
+    const importResponse: ImportResultResponse | null = importStore.importResponse;
 
-    // If the file is already downloaded the endpoint autodestructs it so we can't make anothe request.
-    if (!importStore.importedData) {
-      await importStore.downloadPersonenImportFile(importvorgangId);
+    if (!importResponse) {
+      return;
     }
-    const blob: Blob = new Blob([importStore.importedData as File], { type: 'text/plain' });
+
+    if (!importResponse.importvorgandId || !importResponse.rollenname || !importResponse.organisationsname) {
+      return;
+    }
+
+    // Filter users with successful status
+    const successfullyImportedUsers: ImportedUserResponse[] = importResponse.importedUsers.filter(
+      (user: ImportedUserResponse) => user.status === ImportDataItemStatus.SUCCESS,
+    );
+
+    // Construct the file content
+    let fileContent: string = `Schule: ${importResponse.organisationsname} - Rolle: ${importResponse.rollenname}`;
+    fileContent += '\n\nKlasse - Vorname - Nachname - Benutzername - Passwort';
+
+    for (const user of successfullyImportedUsers) {
+      fileContent += `\n${user.klasse} - ${user.vorname} - ${user.nachname} - ${user.benutzername} - ${user.startpasswort}`;
+    }
+
+    // Create a Blob from the file content
+    const blob: Blob = new Blob([fileContent], { type: 'text/plain' });
     const url: string = window.URL.createObjectURL(blob);
+
+    // Create and trigger the download link
     const link: HTMLAnchorElement = document.createElement('a');
     link.href = url;
     link.setAttribute('download', `${t('admin.import.fileName.person')}.txt`);
     document.body.appendChild(link);
     link.click();
+    link.remove();
+
+    // Revoke the URL to free up resources
+    window.URL.revokeObjectURL(url);
   }
 
   const onSubmit: (e?: Event | undefined) => Promise<void | undefined> = formContext.handleSubmit(() => {
@@ -327,7 +354,7 @@
       blockedNext = next;
     } else {
       importStore.uploadResponse = null;
-      importStore.importedData = null;
+      importStore.importResponse = null;
       next();
     }
   });
@@ -335,7 +362,7 @@
   onMounted(async () => {
     await personenkontextStore.processWorkflowStep({ limit: 25 });
     importStore.uploadResponse = null;
-    importStore.importedData = null;
+    importStore.importResponse = null;
     importStore.importProgress = 0;
     organisationStore.errorCode = '';
     /* listen for browser changes and prevent them when form is dirty */
@@ -400,7 +427,7 @@
             <v-col cols="auto">
               <v-btn
                 class="primary"
-                @click="downloadFile()"
+                @click="createAndTriggerDownload()"
                 data-testid="download-file-button"
                 :disabled="importStore.importIsLoading"
               >
@@ -456,7 +483,7 @@
         :discardButtonLabel="$t('nav.backToList')"
         :hideActions="
           showUploadSuccessTemplate ||
-          !!importStore.importedData ||
+          !!importStore.importResponse ||
           importStore.importIsLoading ||
           !!importStore.errorCode
         "
@@ -530,7 +557,7 @@
         <template
           v-if="
             !showUploadSuccessTemplate &&
-            !importStore.importedData &&
+            !importStore.importResponse &&
             !importStore.importIsLoading &&
             !importStore.errorCode
           "

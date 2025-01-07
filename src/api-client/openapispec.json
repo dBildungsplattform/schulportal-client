@@ -4646,6 +4646,9 @@
         "/api/import/{importvorgangId}/download": {
             "get": {
                 "operationId": "ImportController_downloadFile",
+                "summary": "",
+                "deprecated": true,
+                "description": "Download the import result file by importvorgangId as text file is deprecated, please use the  GET/api/import/importedUsers.",
                 "parameters": [
                     {
                         "name": "importvorgangId",
@@ -4744,6 +4747,91 @@
                     },
                     "500": {
                         "description": "Internal server error while getting status for the import transaction by id."
+                    }
+                },
+                "tags": [
+                    "import"
+                ],
+                "security": [
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
+        "/api/import/importedUsers": {
+            "get": {
+                "operationId": "ImportController_getImportedUsers",
+                "summary": "",
+                "description": "Get the list of imported users. The maximum limit is 100. After receiving all the imported users, please use the DELETE endpoint to remove imported data.",
+                "parameters": [
+                    {
+                        "name": "offset",
+                        "required": false,
+                        "in": "query",
+                        "description": "The offset of the paginated list.",
+                        "schema": {
+                            "type": "number"
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "required": false,
+                        "in": "query",
+                        "description": "The requested limit for the page size.",
+                        "schema": {
+                            "type": "number"
+                        }
+                    },
+                    {
+                        "name": "importvorgangId",
+                        "required": true,
+                        "in": "query",
+                        "description": "Liefert importierte Nutzerdaten für die angegebene ID, selbst wenn andere Filterkriterien nicht zutreffen (ODER-verknüpft mit anderen Kriterien).",
+                        "schema": {
+                            "nullable": false,
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The list of imported users was successfully returned.",
+                        "headers": {
+                            "X-Paging-Offset": {
+                                "description": "The offset of the first item from the list. List starts with index 0."
+                            },
+                            "X-Paging-Limit": {
+                                "description": "The maximum amount of items returned in one request."
+                            },
+                            "X-Paging-Total": {
+                                "description": "The total amount of items in the list."
+                            },
+                            "X-Paging-pageTotal": {
+                                "description": "The total amount of items in the paginated list."
+                            }
+                        },
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ImportResultResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Not authorized to get the list of imported users."
+                    },
+                    "403": {
+                        "description": "Insufficient permissions to get list of imported users."
+                    },
+                    "500": {
+                        "description": "Internal server error while getting list of imported users."
                     }
                 },
                 "tags": [
@@ -7227,7 +7315,8 @@
                             "IMPORT_NUR_LERN_AN_SCHULE_ERROR",
                             "CSV_FILE_INVALID_HEADER_ERROR",
                             "IMPORT_MAX_USERS_LIMIT_ERROR",
-                            "CSV_FILE_NO_USERS_ERROR"
+                            "CSV_FILE_NO_USERS_ERROR",
+                            "IMPORT_RESULT_QUERY_LIMIT_ERROR"
                         ]
                     },
                     "code": {
@@ -7307,6 +7396,72 @@
                     "dataItemCount",
                     "status",
                     "totalDataItemImported"
+                ]
+            },
+            "ImportDataItemStatus": {
+                "type": "string",
+                "enum": [
+                    "FAILED",
+                    "SUCCESS",
+                    "PENDING"
+                ]
+            },
+            "ImportedUserResponse": {
+                "type": "object",
+                "properties": {
+                    "klasse": {
+                        "type": "string"
+                    },
+                    "vorname": {
+                        "type": "string"
+                    },
+                    "nachname": {
+                        "type": "string"
+                    },
+                    "benutzername": {
+                        "type": "string"
+                    },
+                    "startpasswort": {
+                        "type": "string",
+                        "description": "Initiales Benutzerpasswort, muss nach der ersten Anmeldung geändert werden"
+                    },
+                    "status": {
+                        "$ref": "#/components/schemas/ImportDataItemStatus"
+                    }
+                },
+                "required": [
+                    "klasse",
+                    "vorname",
+                    "nachname",
+                    "benutzername",
+                    "startpasswort",
+                    "status"
+                ]
+            },
+            "ImportResultResponse": {
+                "type": "object",
+                "properties": {
+                    "importvorgandId": {
+                        "type": "string"
+                    },
+                    "rollenname": {
+                        "type": "string"
+                    },
+                    "organisationsname": {
+                        "type": "string"
+                    },
+                    "importedUsers": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ImportedUserResponse"
+                        }
+                    }
+                },
+                "required": [
+                    "importvorgandId",
+                    "rollenname",
+                    "organisationsname",
+                    "importedUsers"
                 ]
             },
             "FeatureFlagResponse": {

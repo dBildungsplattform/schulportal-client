@@ -565,7 +565,8 @@ export const DbiamImportErrorI18nKeyEnum = {
     ImportNurLernAnSchuleError: 'IMPORT_NUR_LERN_AN_SCHULE_ERROR',
     CsvFileInvalidHeaderError: 'CSV_FILE_INVALID_HEADER_ERROR',
     ImportMaxUsersLimitError: 'IMPORT_MAX_USERS_LIMIT_ERROR',
-    CsvFileNoUsersError: 'CSV_FILE_NO_USERS_ERROR'
+    CsvFileNoUsersError: 'CSV_FILE_NO_USERS_ERROR',
+    ImportResultQueryLimitError: 'IMPORT_RESULT_QUERY_LIMIT_ERROR'
 } as const;
 
 export type DbiamImportErrorI18nKeyEnum = typeof DbiamImportErrorI18nKeyEnum[keyof typeof DbiamImportErrorI18nKeyEnum];
@@ -990,6 +991,52 @@ export interface ImportDataItemResponse {
  * @enum {string}
  */
 
+export const ImportDataItemStatus = {
+    Failed: 'FAILED',
+    Success: 'SUCCESS',
+    Pending: 'PENDING'
+} as const;
+
+export type ImportDataItemStatus = typeof ImportDataItemStatus[keyof typeof ImportDataItemStatus];
+
+
+/**
+ * 
+ * @export
+ * @interface ImportResultResponse
+ */
+export interface ImportResultResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof ImportResultResponse
+     */
+    'importvorgandId': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ImportResultResponse
+     */
+    'rollenname': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ImportResultResponse
+     */
+    'organisationsname': string;
+    /**
+     * 
+     * @type {Array<ImportedUserResponse>}
+     * @memberof ImportResultResponse
+     */
+    'importedUsers': Array<ImportedUserResponse>;
+}
+/**
+ * 
+ * @export
+ * @enum {string}
+ */
+
 export const ImportStatus = {
     Cancelled: 'CANCELLED',
     Completed: 'COMPLETED',
@@ -1116,6 +1163,51 @@ export interface ImportVorgangStatusResponse {
      * @memberof ImportVorgangStatusResponse
      */
     'totalDataItemImported': number;
+}
+
+
+/**
+ * 
+ * @export
+ * @interface ImportedUserResponse
+ */
+export interface ImportedUserResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof ImportedUserResponse
+     */
+    'klasse': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ImportedUserResponse
+     */
+    'vorname': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ImportedUserResponse
+     */
+    'nachname': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ImportedUserResponse
+     */
+    'benutzername': string;
+    /**
+     * Initiales Benutzerpasswort, muss nach der ersten Anmeldung geändert werden
+     * @type {string}
+     * @memberof ImportedUserResponse
+     */
+    'startpasswort': string;
+    /**
+     * 
+     * @type {ImportDataItemStatus}
+     * @memberof ImportedUserResponse
+     */
+    'status': ImportDataItemStatus;
 }
 
 
@@ -5123,9 +5215,11 @@ export const ImportApiAxiosParamCreator = function (configuration?: Configuratio
             };
         },
         /**
-         * 
+         * Download the import result file by importvorgangId as text file is deprecated, please use the  GET/api/import/importedUsers.
+         * @summary 
          * @param {string} importvorgangId The id of an import transaction
          * @param {*} [options] Override http request option.
+         * @deprecated
          * @throws {RequiredError}
          */
         importControllerDownloadFile: async (importvorgangId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
@@ -5312,6 +5406,61 @@ export const ImportApiAxiosParamCreator = function (configuration?: Configuratio
             };
         },
         /**
+         * Get the list of imported users. The maximum limit is 100. After receiving all the imported users, please use the DELETE endpoint to remove imported data.
+         * @summary 
+         * @param {string} importvorgangId Liefert importierte Nutzerdaten für die angegebene ID, selbst wenn andere Filterkriterien nicht zutreffen (ODER-verknüpft mit anderen Kriterien).
+         * @param {number} [offset] The offset of the paginated list.
+         * @param {number} [limit] The requested limit for the page size.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        importControllerGetImportedUsers: async (importvorgangId: string, offset?: number, limit?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'importvorgangId' is not null or undefined
+            assertParamExists('importControllerGetImportedUsers', 'importvorgangId', importvorgangId)
+            const localVarPath = `/api/import/importedUsers`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+            if (offset !== undefined) {
+                localVarQueryParameter['offset'] = offset;
+            }
+
+            if (limit !== undefined) {
+                localVarQueryParameter['limit'] = limit;
+            }
+
+            if (importvorgangId !== undefined) {
+                localVarQueryParameter['importvorgangId'] = importvorgangId;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 
          * @param {string} organisationId 
          * @param {string} rolleId 
@@ -5395,9 +5544,11 @@ export const ImportApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * 
+         * Download the import result file by importvorgangId as text file is deprecated, please use the  GET/api/import/importedUsers.
+         * @summary 
          * @param {string} importvorgangId The id of an import transaction
          * @param {*} [options] Override http request option.
+         * @deprecated
          * @throws {RequiredError}
          */
         async importControllerDownloadFile(importvorgangId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<File>> {
@@ -5441,6 +5592,19 @@ export const ImportApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
+         * Get the list of imported users. The maximum limit is 100. After receiving all the imported users, please use the DELETE endpoint to remove imported data.
+         * @summary 
+         * @param {string} importvorgangId Liefert importierte Nutzerdaten für die angegebene ID, selbst wenn andere Filterkriterien nicht zutreffen (ODER-verknüpft mit anderen Kriterien).
+         * @param {number} [offset] The offset of the paginated list.
+         * @param {number} [limit] The requested limit for the page size.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async importControllerGetImportedUsers(importvorgangId: string, offset?: number, limit?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ImportResultResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.importControllerGetImportedUsers(importvorgangId, offset, limit, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
          * 
          * @param {string} organisationId 
          * @param {string} rolleId 
@@ -5473,9 +5637,11 @@ export const ImportApiFactory = function (configuration?: Configuration, basePat
             return localVarFp.importControllerDeleteImportTransaction(importvorgangId, options).then((request) => request(axios, basePath));
         },
         /**
-         * 
+         * Download the import result file by importvorgangId as text file is deprecated, please use the  GET/api/import/importedUsers.
+         * @summary 
          * @param {string} importvorgangId The id of an import transaction
          * @param {*} [options] Override http request option.
+         * @deprecated
          * @throws {RequiredError}
          */
         importControllerDownloadFile(importvorgangId: string, options?: any): AxiosPromise<File> {
@@ -5515,6 +5681,18 @@ export const ImportApiFactory = function (configuration?: Configuration, basePat
             return localVarFp.importControllerGetImportStatus(importvorgangId, options).then((request) => request(axios, basePath));
         },
         /**
+         * Get the list of imported users. The maximum limit is 100. After receiving all the imported users, please use the DELETE endpoint to remove imported data.
+         * @summary 
+         * @param {string} importvorgangId Liefert importierte Nutzerdaten für die angegebene ID, selbst wenn andere Filterkriterien nicht zutreffen (ODER-verknüpft mit anderen Kriterien).
+         * @param {number} [offset] The offset of the paginated list.
+         * @param {number} [limit] The requested limit for the page size.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        importControllerGetImportedUsers(importvorgangId: string, offset?: number, limit?: number, options?: any): AxiosPromise<ImportResultResponse> {
+            return localVarFp.importControllerGetImportedUsers(importvorgangId, offset, limit, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 
          * @param {string} organisationId 
          * @param {string} rolleId 
@@ -5545,9 +5723,11 @@ export interface ImportApiInterface {
     importControllerDeleteImportTransaction(importvorgangId: string, options?: AxiosRequestConfig): AxiosPromise<void>;
 
     /**
-     * 
+     * Download the import result file by importvorgangId as text file is deprecated, please use the  GET/api/import/importedUsers.
+     * @summary 
      * @param {string} importvorgangId The id of an import transaction
      * @param {*} [options] Override http request option.
+     * @deprecated
      * @throws {RequiredError}
      * @memberof ImportApiInterface
      */
@@ -5587,6 +5767,18 @@ export interface ImportApiInterface {
     importControllerGetImportStatus(importvorgangId: string, options?: AxiosRequestConfig): AxiosPromise<ImportVorgangStatusResponse>;
 
     /**
+     * Get the list of imported users. The maximum limit is 100. After receiving all the imported users, please use the DELETE endpoint to remove imported data.
+     * @summary 
+     * @param {string} importvorgangId Liefert importierte Nutzerdaten für die angegebene ID, selbst wenn andere Filterkriterien nicht zutreffen (ODER-verknüpft mit anderen Kriterien).
+     * @param {number} [offset] The offset of the paginated list.
+     * @param {number} [limit] The requested limit for the page size.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ImportApiInterface
+     */
+    importControllerGetImportedUsers(importvorgangId: string, offset?: number, limit?: number, options?: AxiosRequestConfig): AxiosPromise<ImportResultResponse>;
+
+    /**
      * 
      * @param {string} organisationId 
      * @param {string} rolleId 
@@ -5619,9 +5811,11 @@ export class ImportApi extends BaseAPI implements ImportApiInterface {
     }
 
     /**
-     * 
+     * Download the import result file by importvorgangId as text file is deprecated, please use the  GET/api/import/importedUsers.
+     * @summary 
      * @param {string} importvorgangId The id of an import transaction
      * @param {*} [options] Override http request option.
+     * @deprecated
      * @throws {RequiredError}
      * @memberof ImportApi
      */
@@ -5666,6 +5860,20 @@ export class ImportApi extends BaseAPI implements ImportApiInterface {
      */
     public importControllerGetImportStatus(importvorgangId: string, options?: AxiosRequestConfig) {
         return ImportApiFp(this.configuration).importControllerGetImportStatus(importvorgangId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Get the list of imported users. The maximum limit is 100. After receiving all the imported users, please use the DELETE endpoint to remove imported data.
+     * @summary 
+     * @param {string} importvorgangId Liefert importierte Nutzerdaten für die angegebene ID, selbst wenn andere Filterkriterien nicht zutreffen (ODER-verknüpft mit anderen Kriterien).
+     * @param {number} [offset] The offset of the paginated list.
+     * @param {number} [limit] The requested limit for the page size.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ImportApi
+     */
+    public importControllerGetImportedUsers(importvorgangId: string, offset?: number, limit?: number, options?: AxiosRequestConfig) {
+        return ImportApiFp(this.configuration).importControllerGetImportedUsers(importvorgangId, offset, limit, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
