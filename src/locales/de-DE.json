@@ -14,7 +14,8 @@
       "rules": {
         "required": "Die Befristung muss eingegeben werden.",
         "format": "Die Befristung muss im Format TT.MM.JJJJ. eingegeben werden.",
-        "pastDateNotAllowed": "Das eingegebene Datum darf nicht in der Vergangenheit liegen."
+        "pastDateNotAllowed": "Das eingegebene Datum darf nicht in der Vergangenheit liegen.",
+        "invalidDateNotAllowed": "Bitte geben Sie ein gültiges Datum ein."
       },
       "selectBefristung": "Befristung auswählen",
       "unlimited": "Unbefristet",
@@ -27,6 +28,7 @@
     "followingDataCreated": "Folgende Daten wurden gespeichert:",
     "headline": "Administrationsbereich",
     "import": {
+      "doNotCloseNotice": "Bitte den Browser während eines laufenden Importvorgangs nicht schließen!",
       "anotherImport": "Weiteren Import durchführen",
       "backToUpload": "Andere Datei hochladen",
       "confirmationText": "Achtung, diese Aktion kann nicht rückgängig gemacht werden. Möchten Sie den Import wirklich durchführen?",
@@ -42,6 +44,7 @@
         "IMPORT_DATA_ITEM_NACHNAME_IS_TOO_SHORT": "Nachname fehlt",
         "IMPORT_DATA_ITEM_VORNAME_IS_INVALID": "Vorname enthält ungültige Zeichen",
         "IMPORT_DATA_ITEM_VORNAME_IS_TOO_SHORT": "Vorname fehlt",
+        "IMPORT_MAX_USERS_LIMIT_ERROR": "Die Datei enthält mehr als 2000 Benutzer. Bitte reduzieren Sie die Anzahl der Benutzer in der Datei auf maximal 2000 und versuchen Sie den Import erneut.",
         "CSV_FILE_INVALID_HEADER_ERROR": "Die Datei konnte nicht gelesen werden. Bitte überprüfen Sie die Spaltenüberschriften."
       },
       "executeImport": "Import durchführen",
@@ -162,8 +165,21 @@
       "deletePerson": "Benutzer löschen",
       "deletePersonConfirmation": "Wollen Sie den Benutzer {firstname} {lastname} sofort und endgültig löschen?",
       "deletePersonSuccessMessage": "{firstname} {lastname} wurde erfolgreich gelöscht.",
+      "devicePassword": {
+        "createDevicePassword": "Inbetriebnahme-Passwort erzeugen",
+        "createPassword": "Passwort erzeugen",
+        "createPasswordSuccessMessage": "Das Passwort wurde erfolgreich erzeugt.",
+        "dialogText": "Bitte teilen Sie dem Benutzer das Passwort mit. Nach dem Schließen des Dialogs wird das Passwort nicht mehr angezeigt. Der Benutzer benötigt dieses Passwort ausschließlich zur erstmaligen Anmeldung an seinem neuen LK-Endgerät.",
+        "dialogTextProfile": "Bitte notieren Sie sich das Passwort oder drucken Sie es aus. Nach dem Schließen des Dialogs wird das Passwort nicht mehr angezeigt. Sie benötigen dieses Passwort ausschließlich zur erstmaligen Anmeldung an Ihrem neuen LK-Endgerät.",
+        "errorMessage": "Bei der Erzeugung des Passwortes ist ein Fehler aufgetreten. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut oder informieren Sie Ihre schulischen Administratorinnen und Administratoren!",
+        "header": "Inbetriebnahme-Passwort für LK-Endgerät",
+        "infoTextPersonDetails": "Dieses Passwort wird vom Benutzer einmalig zur Eingabe beim ersten Start seines neuen Lehrkräfte-Endgerätes benötigt oder wenn das Gerät zurückgesetzt wurde!",
+        "infoTextProfile": "Sie benötigen dieses Passwort ausschließlich zur einmaligen Eingabe beim ersten Start Ihres neuen LK-Endgerätes oder wenn das Gerät zurückgesetzt wurde!\n\nBei Fragen wenden Sie sich bitte an Ihre schulischen Administratorinnen und Administratoren."
+      },
       "discard": "Benutzer verwerfen",
       "disableUser": "Benutzer sperren",
+      "editLock": "Sperre bearbeiten",
+      "removeLock": "Sperre aufheben",
       "edit": "Benutzer bearbeiten",
       "editPersonalInfo": "Persönliche Informationen bearbeiten",
       "errors": {
@@ -171,6 +187,7 @@
         "ERROR_LOADING_USER": "Es konnten keine Benutzerdaten geladen werden.",
         "PERSONALNUMMER_REQUIRED": "Die Änderungen wurden nicht gespeichert, da keine KoPers.-Nr. eingegeben wurde.",
         "PERSON_NOT_FOUND": "Der Benutzer wurde seit Ihrer letzten Änderung gelöscht und kann nicht mehr bearbeitet werden.",
+        "PERSON_UEM_PASSWORD_MODIFICATION_ERROR": "Das Passwort konnte nicht erzeugt werden. Bitte versuchen Sie es später erneut.",
         "NEWER_VERSION_OF_PERSON_AVAILABLE": "Der Benutzer wurde zwischenzeitlich von einer anderen Administratorin oder einem anderen Administrator bearbeitet. Bitte aktualisieren Sie die Daten und versuchen Sie es erneut.",
         "REQUIRED_STEP_UP_LEVEL_NOT_MET": "Die letzte Aktion konnte nicht ausgeführt werden. Aufgrund von längerer Inaktivität ist eine erneute Authentifizierung mit einem zweiten Faktor erforderlich. Um fortzufahren, klicken Sie bitte auf „Zurück zur Ergebnisliste“ oder „Schließen“. Sie werden anschließend zur Eingabe Ihres zweiten Faktors aufgefordert.",
         "UNSPECIFIED_ERROR": "Leider ist ein technischer Fehler aufgetreten. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut."
@@ -219,6 +236,7 @@
         "PERSONALNUMMER_NICHT_EINDEUTIG": "KoPers.-Nr. nicht eindeutig",
         "PERSONALNUMMER_REQUIRED": "Personalnummer erforderlich",
         "PERSON_NOT_FOUND": "Benutzer gelöscht",
+        "PERSON_UEM_PASSWORD_MODIFICATION_ERROR": "Fehler beim Erzeugen des Passworts",
         "NEWER_VERSION_OF_PERSON_AVAILABLE": "Geänderte Daten",
         "REQUIRED_STEP_UP_LEVEL_NOT_MET": "Zwei-Faktor-Authentifizierung (2FA) erforderlich",
         "UNSPECIFIED_ERROR": "Technischer Fehler"
@@ -516,10 +534,15 @@
     "privacyPolicy": "Datenschutzerklärung",
     "status": "Systemstatus"
   },
+  "IQSHMedienberatung": "IQSH-Medienberatung",
   "itemsPerPage": "Einträge pro Seite",
   "landingTitle": "Willkommen im Schulportal SH.",
   "login": {
     "button": "Anmelden",
+    "features": {
+      "secondFactorInput": "Die Eingabe des zweiten Faktors im Dialog kann nun auch per Copy & Paste erfolgen, auf mobilen Endgeräten wird die Tastatur auf Zahleneingabe voreingestellt.",
+      "lkDevicePasswords": "Inbetriebnahme-Passworte für LK-Endgeräte können über das Profil des Benutzers (Self-Service) oder durch schulische Administratorinnen oder Administratoren selbstständig erzeugt werden."
+    },
     "forgotPassword": "Passwort vergessen? \n Wenden Sie sich bitte an Ihre schulischen Administratorinnen und Administratoren.",
     "header": "Anmeldung im Schulportal SH",
     "maintenanceNoticeTitle": "Achtung Wartungsarbeiten!",
@@ -676,9 +699,14 @@
     "message": "Sie haben nicht gespeicherte Änderungen vorgenommen. Wollen Sie die Seite trotzdem verlassen?",
     "title": "Änderungen vorgenommen"
   },
-  "yes": "Ja",
+  "whatsNew": {
+    "moreInformation": "Weitere Informationen zu den neuen Funktionen finden Sie auf der Seite der",
+    "title": "Was ist neu?",
+    "updateInformationForVersion": "Update-Informationen zur Version {version}"
+  },
   "willBeCreated": "wird hinzugefügt",
   "willBeRemoved": "wird entfernt",
+  "yes": "Ja",
   "banner": {
     "hint": "Hinweis: ",
     "kopers": "Die Verwendung dieses Benutzerkontos setzt eine KoPers.-Nr. voraus. Bitte kontaktieren Sie Ihre schulischen Administratorinnen und Administratoren, um eine KoPers.-Nr. eintragen zu lassen. Andernfalls wird Ihr Zugang zum {date} automatisch gesperrt."

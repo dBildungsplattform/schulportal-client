@@ -1,4 +1,4 @@
-import { EmailAddressStatus, type FindRollenResponse } from '@/api-client/generated/api';
+import { EmailAddressStatus, RollenArt, type FindRollenResponse } from '@/api-client/generated/api';
 import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
 import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
 import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
@@ -73,11 +73,13 @@ beforeEach(() => {
             sskName: 'string',
             sskDstNr: 'string',
             rolle: 'string',
+            rollenArt: RollenArt.Lern,
             typ: OrganisationsTyp.Klasse,
             administriertVon: 'string',
             editable: true,
             merkmale: [] as unknown as RollenMerkmal,
             befristung: '2024-05-06',
+            admins: ['test'],
           },
         ],
       },

@@ -89,6 +89,12 @@ label.v-label {
   margin-bottom: -15px;
 }
 
+.primary-border {
+  border: 2px solid $primaryColor;
+  border-radius: 4px;
+  padding: 16px;
+}
+
 @media only screen and (max-width: 960px) {
   .button-container {
     align-items: start;
