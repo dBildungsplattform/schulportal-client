@@ -782,6 +782,7 @@
   async function confirmChangeKlasse(): Promise<void> {
     await personenkontextStore.updatePersonenkontexte(finalZuordnungen.value, currentPersonId);
     changeKlasseSuccessDialogVisible.value = !personenkontextStore.errorCode;
+    selectedZuordnungen.value = [];
     resetChangeKlasseForm();
   }
 
