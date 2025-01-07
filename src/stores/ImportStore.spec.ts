@@ -28,7 +28,7 @@ describe('ImportStore', () => {
 
   it('should initalize state correctly', () => {
     expect(importStore.errorCode).toBeNull();
-    expect(importStore.importedData).toBeNull();
+    expect(importStore.importResponse).toBeNull();
     expect(importStore.importIsLoading).toBeFalsy();
     expect(importStore.uploadIsLoading).toBeFalsy();
     expect(importStore.uploadResponse).toBeNull();
@@ -145,43 +145,7 @@ describe('ImportStore', () => {
       });
     });
 
-    describe('downloadPersonenImportFile', () => {
-      it('should download personenFile', async () => {
-        const mockResponse: File = new File([''], 'personen.txt', { type: 'text/plain' });
-
-        mockadapter.onGet('/api/import/123/download').replyOnce(200, mockResponse);
-
-        const importvorgangId: string = '123';
-
-        await importStore.downloadPersonenImportFile(importvorgangId);
-
-        expect(importStore.importedData).toEqual(mockResponse);
-      });
-
-      it('should handle string error while importing personen', async () => {
-        mockadapter.onGet('/api/import/123/download').replyOnce(500, 'some mock server error');
-
-        const importvorgangId: string = '123';
-
-        await importStore.downloadPersonenImportFile(importvorgangId);
-
-        expect(importStore.importedData).toEqual(null);
-        expect(importStore.errorCode).toEqual('ERROR_IMPORTING_FILE');
-      });
-
-      it('should handle error code while importing personen', async () => {
-        mockadapter.onGet('/api/import/123/download').replyOnce(500, { code: 'ERROR_IMPORTING_FILE' });
-
-        const importvorgangId: string = '123';
-
-        await importStore.downloadPersonenImportFile(importvorgangId);
-
-        expect(importStore.importedData).toEqual(null);
-        expect(importStore.errorCode).toEqual('ERROR_IMPORTING_FILE');
-      });
-    });
-
-    describe('downloadPersonenImportFile', () => {
+    describe('startImportStatusPolling', () => {
       it('should poll and update status to finished', async () => {
         const importvorgangId: string = '123';
 
