@@ -270,7 +270,6 @@ describe('ImportStore', () => {
         const mockInterval: NodeJS.Timeout = setInterval(() => {}, 1000);
         importStore.pollingInterval = mockInterval;
 
-
         importStore.stopImportStatusPolling();
 
         expect(vi.mocked(clearInterval)).toHaveBeenCalledWith(mockInterval);

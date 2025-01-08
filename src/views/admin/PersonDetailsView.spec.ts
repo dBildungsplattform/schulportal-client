@@ -156,7 +156,7 @@ const mockPersonenuebersichtLehr: PersonWithUebersicht = {
       editable: true,
       merkmale: [] as unknown as RollenMerkmal,
       befristung: '2099-08-12',
-      admins: []
+      admins: [],
     },
   ],
 };
