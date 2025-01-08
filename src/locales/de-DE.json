@@ -48,6 +48,7 @@
         "CSV_FILE_INVALID_HEADER_ERROR": "Die Datei konnte nicht gelesen werden. Bitte überprüfen Sie die Spaltenüberschriften."
       },
       "executeImport": "Import durchführen",
+      "failedToImportUsersNotice": "Die folgenden Benutzer konnten nicht importiert werden. Bitte überprüfen Sie die Daten:",
       "fileName": {
         "person": "Benutzerdaten"
       },
@@ -65,6 +66,7 @@
       },
       "recordsReadyForImport": "{count} Datensatz steht zum Import bereit. | {count} Datensätze stehen zum Import bereit.",
       "selectOrDropFile": "Datei auswählen oder ablegen",
+      "successfullyImportedUsersNotice": "Die folgenden Benutzer wurden erfoglreich importiert:",
       "uploadedSuccessfully": "Die Datei wurde erfolgreich hochgeladen.",
       "uploadErrorTitle": "Fehler beim Upload",
       "uploadFile": "Datei hochladen"

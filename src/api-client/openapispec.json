@@ -7455,13 +7455,23 @@
                         "items": {
                             "$ref": "#/components/schemas/ImportedUserResponse"
                         }
+                    },
+                    "total": {
+                        "type": "number",
+                        "description": "Total number of imported users"
+                    },
+                    "pageTotal": {
+                        "type": "number",
+                        "description": "Number of users on this page"
                     }
                 },
                 "required": [
                     "importvorgandId",
                     "rollenname",
                     "organisationsname",
-                    "importedUsers"
+                    "importedUsers",
+                    "total",
+                    "pageTotal"
                 ]
             },
             "FeatureFlagResponse": {

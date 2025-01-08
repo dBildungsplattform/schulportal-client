@@ -1030,6 +1030,18 @@ export interface ImportResultResponse {
      * @memberof ImportResultResponse
      */
     'importedUsers': Array<ImportedUserResponse>;
+    /**
+     * Total number of imported users
+     * @type {number}
+     * @memberof ImportResultResponse
+     */
+    'total': number;
+    /**
+     * Number of users on this page
+     * @type {number}
+     * @memberof ImportResultResponse
+     */
+    'pageTotal': number;
 }
 /**
  * 

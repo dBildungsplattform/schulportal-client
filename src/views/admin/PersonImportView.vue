@@ -32,6 +32,7 @@
   const router: Router = useRouter();
   const { t }: Composer = useI18n({ useScope: 'global' });
   const { smAndDown }: { smAndDown: Ref<boolean> } = useDisplay();
+
   const confirmationDialogVisible: Ref<boolean> = ref(false);
 
   const allRollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = useRollen();
@@ -280,30 +281,51 @@
     }
   }
 
-  async function createAndTriggerDownload(): Promise<void> {
+  async function fetchImportedUsers(page: number): Promise<void> {
     const importvorgangId: string = importStore.uploadResponse?.importvorgangId as string;
-    await importStore.getImportedPersons(importvorgangId);
+    const offset: number = (page - 1) * importStore.importedUsersPerPage;
+    // Limit is set to 100
+    const limit: number = importStore.importedUsersPerPage;
+
+    await importStore.getImportedPersons(importvorgangId, offset, limit);
+  }
+
+  async function createAndTriggerDownload(): Promise<void> {
     const importResponse: ImportResultResponse | null = importStore.importResponse;
 
-    if (!importResponse) {
-      return;
-    }
+    if (!importResponse) return;
 
     if (!importResponse.importvorgandId || !importResponse.rollenname || !importResponse.organisationsname) {
       return;
     }
 
-    // Filter users with successful status
+    // Separate successful and failed users
     const successfullyImportedUsers: ImportedUserResponse[] = importResponse.importedUsers.filter(
       (user: ImportedUserResponse) => user.status === ImportDataItemStatus.SUCCESS,
     );
 
-    // Construct the file content
-    let fileContent: string = `Schule: ${importResponse.organisationsname} - Rolle: ${importResponse.rollenname}`;
-    fileContent += '\n\nKlasse - Vorname - Nachname - Benutzername - Passwort';
+    const failedImportedUsers: ImportedUserResponse[] = importResponse.importedUsers.filter(
+      (user: ImportedUserResponse) => user.status === ImportDataItemStatus.FAILED,
+    );
 
+    // Construct file content
+    let fileContent: string = `Schule: ${importResponse.organisationsname} - Rolle: ${importResponse.rollenname}`;
+    fileContent += `\n\n${t('admin.import.successfullyImportedUsersNotice')}\n\n`;
+    fileContent += 'Klasse - Vorname - Nachname - Benutzername - Passwort\n';
+
+    // Add successful users to the file content
     for (const user of successfullyImportedUsers) {
-      fileContent += `\n${user.klasse} - ${user.vorname} - ${user.nachname} - ${user.benutzername} - ${user.startpasswort}`;
+      fileContent += `${user.klasse} - ${user.vorname} - ${user.nachname} - ${user.benutzername} - ${user.startpasswort}\n`;
+    }
+
+    // Add a section for failed users
+    if (failedImportedUsers.length > 0) {
+      fileContent += `\n\n${t('admin.import.failedToImportUsersNotice')}\n\n`;
+      fileContent += 'Klasse - Vorname - Nachname - Benutzername\n';
+
+      for (const user of failedImportedUsers) {
+        fileContent += `${user.klasse} - ${user.vorname} - ${user.nachname} - ${user.benutzername}\n`;
+      }
     }
 
     // Create a Blob from the file content
@@ -434,6 +456,13 @@
                 {{ $t('admin.import.downloadUserdata') }}
               </v-btn>
             </v-col>
+          </v-row>
+          <v-row justify="center">
+            <v-pagination
+              v-model="importStore.importedUsersPage"
+              :length="Math.ceil(importStore.importResponse?.total / importStore.importResponse?.pageTotal)"
+              @update:modelValue="fetchImportedUsers"
+            ></v-pagination>
           </v-row>
         </v-container>
       </template>

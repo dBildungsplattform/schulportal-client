@@ -30,6 +30,8 @@ export type ImportState = {
   importStatus: ImportVorgangStatusResponse | null;
   importProgress: number;
   pollingInterval?: ReturnType<typeof setInterval>;
+  importedUsersPerPage: number;
+  importedUsersPage: number;
 };
 
 type ImportGetters = {};
@@ -39,7 +41,7 @@ type ImportActions = {
   getPersonenImportStatus: (importVorgangId: string) => Promise<void>;
   startImportStatusPolling: (importvorgangId: string) => Promise<void>;
   stopImportStatusPolling: () => void;
-  getImportedPersons: (importVorgangId: string) => Promise<void>;
+  getImportedPersons: (importVorgangId: string, offset?: number, limit?: number) => Promise<void>;
 };
 
 export type ImportStore = Store<'importStore', ImportState, ImportGetters, ImportActions>;
@@ -55,13 +57,18 @@ export const useImportStore: StoreDefinition<'importStore', ImportState, ImportG
       uploadResponse: null,
       importStatus: null,
       importProgress: 0,
+      importedUsersPerPage: 100,
+      importedUsersPage: 1,
     };
   },
   actions: {
-    async getImportedPersons(importvorgangId: string): Promise<void> {
+    async getImportedPersons(importvorgangId: string, offset?: number, limit?: number): Promise<void> {
       try {
-        const { data }: { data: ImportResultResponse } =
-          await importApi.importControllerGetImportedUsers(importvorgangId);
+        const { data }: { data: ImportResultResponse } = await importApi.importControllerGetImportedUsers(
+          importvorgangId,
+          offset,
+          limit,
+        );
 
         this.importResponse = data;
       } catch (error: unknown) {
@@ -99,6 +106,7 @@ export const useImportStore: StoreDefinition<'importStore', ImportState, ImportG
             case ImportStatus.Finished:
               this.stopImportStatusPolling();
               this.importProgress = 100;
+              await this.getImportedPersons(importvorgangId, 0, 100);
               break;
             case ImportStatus.Failed:
               this.stopImportStatusPolling();
