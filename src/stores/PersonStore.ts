@@ -219,7 +219,7 @@ type PersonActions = {
   getAllPersons: (filter: PersonFilter) => Promise<void>;
   getPersonById: (personId: string) => Promise<Personendatensatz>;
   resetPassword: (personId: string) => Promise<void>;
-  resetDevicePassword: (personId: string) => Promise<void>;
+  resetDevicePassword: (personId?: string) => Promise<void>;
   deletePersonById: (personId: string) => Promise<void>;
   lockPerson: (personId: string, bodyParams: LockUserBodyParams) => Promise<void>;
   syncPersonById: (personId: string) => Promise<void>;
@@ -388,10 +388,12 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
       }
     },
 
-    async resetDevicePassword(personId: string): Promise<void> {
+    async resetDevicePassword(personId?: string): Promise<void> {
       this.loading = true;
       try {
-        const { data }: { data: string } = await personenApi.personControllerResetUEMPasswordByPersonId(personId);
+        let data: string;
+        if (personId) data = (await personenApi.personControllerResetUEMPasswordByPersonId(personId)).data;
+        else data = (await personenApi.personControllerResetUEMPassword()).data;
         this.newDevicePassword = data;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';

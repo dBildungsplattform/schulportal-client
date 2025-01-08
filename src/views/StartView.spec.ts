@@ -91,7 +91,7 @@ const mockPersonenUebersicht: PersonWithUebersicht = {
       merkmale: ['KOPERS_PFLICHT'] as unknown as RollenMerkmal,
       befristung: '2024-05-06',
       rollenArt: RollenArt.Lehr,
-      admins: []
+      admins: [],
     },
     {
       sskId: '2',
@@ -105,7 +105,7 @@ const mockPersonenUebersicht: PersonWithUebersicht = {
       merkmale: ['KOPERS_PFLICHT'] as unknown as RollenMerkmal,
       befristung: '2024-05-06',
       rollenArt: RollenArt.Lehr,
-      admins: []
+      admins: [],
     },
   ],
 };

@@ -247,7 +247,7 @@
             </v-col>
           </v-row>
           <v-row
-            v-if="!isManuallyLocked || isManuallyLocked && isEditMode"
+            v-if="!isManuallyLocked || (isManuallyLocked && isEditMode)"
             class="align-center justify-center w-full"
           >
             <v-col
@@ -290,7 +290,7 @@
           </v-row>
           <v-row
             class="justify-center w-full"
-            v-if="!isManuallyLocked || isManuallyLocked && isEditMode"
+            v-if="!isManuallyLocked || (isManuallyLocked && isEditMode)"
           >
             <v-col
               class="text-body"
@@ -326,7 +326,7 @@
                 class="text-body"
               >
                 {{
-                  !isManuallyLocked || isManuallyLocked && isEditMode
+                  !isManuallyLocked || (isManuallyLocked && isEditMode)
                     ? $t('person.lockUserInfoText')
                     : $t('person.unLockUserInfoText')
                 }}
@@ -370,7 +370,7 @@
                 {{ $t('admin.person.editLock') }}
               </v-btn>
               <v-btn
-                v-if="!isManuallyLocked || isManuallyLocked && isEditMode"
+                v-if="!isManuallyLocked || (isManuallyLocked && isEditMode)"
                 :block="mdAndDown"
                 class="primary button"
                 :disabled="!isManuallyLocked && !selectedOrganisation"
