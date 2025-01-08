@@ -460,8 +460,9 @@
           <v-row justify="center">
             <v-pagination
               v-model="importStore.importedUsersPage"
-              :length="Math.ceil(importStore.importResponse?.total / importStore.importResponse?.pageTotal)"
+              :length="Math.ceil(importStore.importResponse?.total || 0) / (importStore.importResponse?.pageTotal || 1)"
               @update:modelValue="fetchImportedUsers"
+              :total-visible="20"
             ></v-pagination>
           </v-row>
         </v-container>
