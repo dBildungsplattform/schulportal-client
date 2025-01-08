@@ -782,6 +782,7 @@
   async function confirmChangeKlasse(): Promise<void> {
     await personenkontextStore.updatePersonenkontexte(finalZuordnungen.value, currentPersonId);
     changeKlasseSuccessDialogVisible.value = !personenkontextStore.errorCode;
+    selectedZuordnungen.value = [];
     resetChangeKlasseForm();
   }
 
@@ -2717,7 +2718,7 @@
               <v-btn
                 :block="mdAndDown"
                 class="primary"
-                @click.stop="closeCreateSuccessDialog"
+                @click.stop="closeChangeKlasseSuccessDialog"
               >
                 {{ $t('close') }}
               </v-btn>
