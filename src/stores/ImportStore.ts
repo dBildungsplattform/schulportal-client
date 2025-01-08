@@ -57,7 +57,7 @@ export const useImportStore: StoreDefinition<'importStore', ImportState, ImportG
       uploadResponse: null,
       importStatus: null,
       importProgress: 0,
-      importedUsersPerPage: 10,
+      importedUsersPerPage: 100,
       importedUsersPage: 1,
     };
   },
@@ -106,7 +106,7 @@ export const useImportStore: StoreDefinition<'importStore', ImportState, ImportG
             case ImportStatus.Finished:
               this.stopImportStatusPolling();
               this.importProgress = 100;
-              await this.getImportedPersons(importvorgangId, 0, 10);
+              await this.getImportedPersons(importvorgangId, 0, 100);
               break;
             case ImportStatus.Failed:
               this.stopImportStatusPolling();
