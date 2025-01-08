@@ -220,8 +220,6 @@ describe('PersonImportView', () => {
     expect(importStore.uploadResponse).toStrictEqual(uploadResponse);
     expect(wrapper?.find('[data-testid="person-upload-success-text"]').isVisible()).toBe(true);
 
-    importStore.importResponse = new File([''], 'personen.txt', { type: 'text/plain' });
-
     wrapper?.find('[data-testid="open-confirmation-dialog-button"]').trigger('click');
     await nextTick();
 

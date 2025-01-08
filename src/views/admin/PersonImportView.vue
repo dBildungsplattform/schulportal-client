@@ -451,7 +451,7 @@
                 class="primary"
                 @click="createAndTriggerDownload()"
                 data-testid="download-file-button"
-                :disabled="importStore.importIsLoading"
+                :disabled="importStore.importIsLoading || importStore.retrievalIsLoading"
               >
                 {{ $t('admin.import.downloadUserdata') }}
               </v-btn>

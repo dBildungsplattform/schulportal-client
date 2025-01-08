@@ -2,7 +2,7 @@ import { useImportStore, type ImportStore } from './ImportStore';
 import { setActivePinia, createPinia } from 'pinia';
 import ApiService from '@/services/ApiService';
 import MockAdapter from 'axios-mock-adapter';
-import { ImportStatus, type ImportUploadResponse } from '@/api-client/generated';
+import { ImportStatus, type ImportResultResponse, type ImportUploadResponse } from '@/api-client/generated';
 
 const mockadapter: MockAdapter = new MockAdapter(ApiService);
 
@@ -150,6 +150,9 @@ describe('ImportStore', () => {
         const importvorgangId: string = '123';
 
         mockadapter.onGet(`/api/import/${importvorgangId}/status`).replyOnce(200, { status: ImportStatus.Finished });
+        mockadapter
+          .onGet(`/api/import/importedUsers?offset=0&limit=100&importvorgangId=${importvorgangId}`)
+          .replyOnce(200, []);
 
         const pollingPromise: Promise<void> = importStore.startImportStatusPolling(importvorgangId);
 
@@ -266,6 +269,86 @@ describe('ImportStore', () => {
         importStore.stopImportStatusPolling();
 
         expect(vi.mocked(clearInterval)).not.toHaveBeenCalled();
+      });
+    });
+
+    describe('Get imported users', () => {
+      it('should successfully retrieve imported persons', async () => {
+        const importvorgangId: string = '8b7c40dd-c842-4f66-807d-6bd8c7cd5b54';
+
+        const mockResponse: ImportResultResponse = {
+          importvorgandId: importvorgangId,
+          rollenname: 'itslearning-Schulbegleitung',
+          organisationsname: 'Carl-Orff-Schule',
+          importedUsers: [
+            {
+              klasse: '9a',
+              vorname: 'Max',
+              nachname: 'Mstermann',
+              benutzername: 'mmstermann117',
+              startpasswort: 'pK0!V%m&',
+              status: 'SUCCESS',
+            },
+            {
+              klasse: '9a',
+              vorname: 'Maria',
+              nachname: 'Mler',
+              benutzername: 'mmler2288',
+              startpasswort: 'qA0$z?gv',
+              status: 'SUCCESS',
+            },
+          ],
+          total: 5,
+          pageTotal: 5,
+        };
+
+        mockadapter
+          .onGet(`/api/import/importedUsers?offset=0&limit=5&importvorgangId=${importvorgangId}`)
+          .reply(200, mockResponse);
+
+        await importStore.getImportedPersons(importvorgangId, 0, 5);
+
+        expect(importStore.importResponse).toEqual(mockResponse);
+        expect(importStore.retrievalIsLoading).toBe(false);
+        expect(importStore.errorCode).toBeNull();
+      });
+
+      it('should handle an error response and set the correct error code', async () => {
+        const importvorgangId: string = '8b7c40dd-c842-4f66-807d-6bd8c7cd5b54';
+
+        mockadapter
+          .onGet(`/api/import/importedUsers?offset=0&limit=5&importvorgangId=${importvorgangId}`)
+          .reply(500, { i18nKey: 'ERROR_IMPORTING_FILE' });
+
+        await importStore.getImportedPersons(importvorgangId, 0, 5);
+
+        // Assert the result
+        expect(importStore.importResponse).toBeNull();
+        expect(importStore.retrievalIsLoading).toBe(false);
+        expect(importStore.errorCode).toBe('ERROR_IMPORTING_FILE');
+      });
+
+      it('should handle an empty response', async () => {
+        const importvorgangId: string = '8b7c40dd-c842-4f66-807d-6bd8c7cd5b54';
+
+        const mockResponse: ImportResultResponse = {
+          importvorgandId: importvorgangId,
+          rollenname: 'itslearning-Schulbegleitung',
+          organisationsname: 'Carl-Orff-Schule',
+          importedUsers: [],
+          total: 0,
+          pageTotal: 0,
+        };
+
+        mockadapter
+          .onGet(`/api/import/importedUsers?offset=0&limit=5&importvorgangId=${importvorgangId}`)
+          .reply(200, mockResponse);
+
+        await importStore.getImportedPersons(importvorgangId, 0, 5);
+
+        expect(importStore.importResponse).toEqual(mockResponse);
+        expect(importStore.retrievalIsLoading).toBe(false);
+        expect(importStore.errorCode).toBeNull();
       });
     });
   });

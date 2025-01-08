@@ -26,6 +26,7 @@ export type ImportState = {
   importResponse: ImportResultResponse | null;
   importIsLoading: boolean;
   uploadIsLoading: boolean;
+  retrievalIsLoading: boolean;
   uploadResponse: ImportUploadResponse | null;
   importStatus: ImportVorgangStatusResponse | null;
   importProgress: number;
@@ -53,6 +54,7 @@ export const useImportStore: StoreDefinition<'importStore', ImportState, ImportG
       errorCode: null,
       importResponse: null,
       importIsLoading: false,
+      retrievalIsLoading: false,
       uploadIsLoading: false,
       uploadResponse: null,
       importStatus: null,
@@ -63,6 +65,7 @@ export const useImportStore: StoreDefinition<'importStore', ImportState, ImportG
   },
   actions: {
     async getImportedPersons(importvorgangId: string, offset?: number, limit?: number): Promise<void> {
+      this.retrievalIsLoading = true;
       try {
         const { data }: { data: ImportResultResponse } = await importApi.importControllerGetImportedUsers(
           importvorgangId,
@@ -76,6 +79,8 @@ export const useImportStore: StoreDefinition<'importStore', ImportState, ImportG
         if (isAxiosError(error)) {
           this.errorCode = error.response?.data.i18nKey || 'ERROR_IMPORTING_FILE';
         }
+      } finally {
+        this.retrievalIsLoading = false;
       }
     },
 
