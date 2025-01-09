@@ -916,6 +916,7 @@
 
   const confirmDialogAddition = async (): Promise<void> => {
     createZuordnungConfirmationDialogVisible.value = false;
+    hasNoKopersNr.value = false;
     const organisation: Organisation | undefined = personenkontextStore.workflowStepResponse?.organisations.find(
       (orga: Organisation) => orga.id === selectedOrganisation.value,
     );
