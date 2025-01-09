@@ -73,6 +73,7 @@
     width="320"
   >
     <v-btn
+      v-if="menuDrawer"
       :aria-label="$t('nav.closeMobileMenu')"
       class="hidden-lg-and-up primary menu-bar-close-button"
       @click.stop="menuDrawer = !menuDrawer"
