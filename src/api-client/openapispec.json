@@ -911,6 +911,39 @@
         ]
       }
     },
+    "/api/personen/uem-password": {
+      "patch": {
+        "operationId": "PersonController_resetUEMPassword",
+        "parameters": [],
+        "responses": {
+          "202": {
+            "description": "UEM-password for person was successfully reset.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The person does not exist or insufficient permissions to update person."
+          },
+          "500": {
+            "description": "Internal server error."
+          }
+        },
+        "tags": ["personen"],
+        "security": [
+          {
+            "oauth2": ["openid"]
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/personen-frontend": {
       "get": {
         "operationId": "PersonFrontendController_findPersons",
