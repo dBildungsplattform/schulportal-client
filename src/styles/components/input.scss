@@ -1,5 +1,7 @@
+@use "../variables";
+
 .v-input {
   .v-input__control {
-    border-color: $primaryColor;
+    border-color: variables.$primaryColor;
   }
 }

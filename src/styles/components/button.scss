@@ -1,3 +1,5 @@
+@use "../variables";
+
 .v-btn {
   width: 340px;
 
@@ -22,30 +24,30 @@
   }
 
   &.primary {
-    background: $primaryButtonBackgroundColor;
-    border: $primaryButtonBorderSize solid $primaryButtonBorderColor;
-    color: $primaryButtonColor;
-    transition: $primaryButtonTransition;
-    transform-origin: $primaryButtontransformOrigin;
+    background: variables.$primaryButtonBackgroundColor;
+    border: variables.$primaryButtonBorderSize solid variables.$primaryButtonBorderColor;
+    color: variables.$primaryButtonColor;
+    transition: variables.$primaryButtonTransition;
+    transform-origin: variables.$primaryButtontransformOrigin;
 
     &:focus,
     &:hover {
-      background: $primaryButtonHoverBackgroundColor;
+      background: variables.$primaryButtonHoverBackgroundColor;
     }
 
     &:active {
-      color: $primaryButtonColor;
+      color: variables.$primaryButtonColor;
     }
   }
 
   &.secondary {
-    background: $secondaryButtonBackgroundColor;
-    border: $secondaryButtonBorderSize solid $secondaryButtonBorderColor;
-    color: $secondaryButtonColor;
+    background: variables.$secondaryButtonBackgroundColor;
+    border: variables.$secondaryButtonBorderSize solid variables.$secondaryButtonBorderColor;
+    color: variables.$secondaryButtonColor;
 
     &:focus,
     &:hover {
-      border: $secondaryButtonHoverBorderSize solid $secondaryButtonBorderColor;
+      border: variables.$secondaryButtonHoverBorderSize solid variables.$secondaryButtonBorderColor;
     }
   }
 
@@ -55,16 +57,16 @@
 
   /* small screen */
   @media only screen and (max-width: 600px) {
-    font-size: $smallButtonFontSize;    
+    font-size: variables.$smallButtonFontSize;    
   }
 
   /* medium screen */
   @media only screen and (min-width: 601px) and (max-width: 1280px) {
-    font-size: $mediumButtonFontSize;
+    font-size: variables.$mediumButtonFontSize;
   }
 
   /* big screen */
   @media only screen and (min-width: 1281px) {
-    font-size: $bigButtonFontSize;
+    font-size: variables.$bigButtonFontSize;
   }
 }

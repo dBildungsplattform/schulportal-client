@@ -1,14 +1,16 @@
+@use "../variables";
+
 a {
   text-decoration: none;
 
   &.primary,
   &.primary:active {
-    color: $primaryColor;
+    color: variables.$primaryColor;
   }
 
   &.secondary,
   &.secondary:active {
-    color: $white;
+    color: variables.$white;
   }
 
   &:focus,

@@ -1,7 +1,9 @@
+@use "../variables";
+
 .menu-bar {
-  background-color: $menuBarBackgroundColor;
+  background-color: variables.$menuBarBackgroundColor;
   box-shadow: 0px 3px 6px #001e4940;
-  color: $bodyFontColor;
+  color: variables.$bodyFontColor;
   margin-top: 10px;
 
   .v-list-item {
@@ -13,7 +15,7 @@
     }
 
     &.v-list-item--active {
-      background-color: $menuBarActiveItemColor;
+      background-color: variables.$menuBarActiveItemColor;
       .v-list-item-title {
         font-weight: bold;
       }
@@ -48,7 +50,7 @@
   }
 
   .v-divider {
-    color: $primaryColor;
+    color: variables.$primaryColor;
     opacity: 1;
   }
 

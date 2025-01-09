@@ -1,3 +1,5 @@
+@use "../variables";
+
 .result-table {
   margin-top: 10px;
 
@@ -6,7 +8,7 @@
   }
 
   .v-data-table__thead {
-    background-color: $lightGrey;
+    background-color: variables.$lightGrey;
     font-size: 15px;
     padding-bottom: 10px;
     padding-top: 15px;
@@ -26,7 +28,7 @@
       padding-top: 13px;
     }
     .v-data-table__td {
-      border-bottom: 1px solid $lightGrey;
+      border-bottom: 1px solid variables.$lightGrey;
     }
   }
 
