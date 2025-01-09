@@ -13,7 +13,7 @@
   import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
   import type { UserinfoPersonenkontext } from '@/stores/PersonenkontextStore';
   import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
-  import { type TranslatedObject } from '@/types.d';
+  import { type Mutable, type TranslatedObject } from '@/types.d';
   import { onBeforeRouteLeave, useRouter, type Router } from 'vue-router';
   import KlasseDelete from '@/components/admin/klassen/KlasseDelete.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
@@ -28,7 +28,7 @@
   type TableHeaders = VDataTableServer['headers'];
 
   // Define headers as a mutable array
-  let headers: TableHeaders = [
+  let headers: Ref<Mutable<TableHeaders>> = ref([
     {
       title: t('admin.klasse.klasse'),
       key: 'name',
@@ -42,7 +42,7 @@
       sortable: false,
       width: '250px',
     },
-  ];
+  ]);
 
   const selectedSchule: Ref<string | null> = ref(null);
   const selectedKlassen: Ref<Array<string>> = ref([]);
@@ -414,7 +414,7 @@
   // Checks the current logged in user's kontexte and compares that to the organisations in the DB.
   // If the user has exactly 1 matching organisation then the Schule will be autoselectd for him.
   async function handleUserContext(): Promise<void> {
-    const personenkontexte: Array<UserinfoPersonenkontext> | null = authStore.currentUser?.personenkontexte || [];
+    const personenkontexte: Array<UserinfoPersonenkontext> = authStore.currentUser?.personenkontexte || [];
     if (personenkontexte.length > 0) {
       if (organisationStore.allSchulen.length === 1 && !searchFilterStore.selectedSchuleForKlassen) {
         selectedSchule.value = organisationStore.allSchulen[0]?.id || null;
@@ -423,15 +423,15 @@
           hasAutoselectedSchule.value = true;
           totalKlassen = klassenOptions.value?.length || 0;
         }
-      } else if (headers) {
-        headers = [
+      } else if (headers.value) {
+        headers.value = [
           {
             title: t('admin.schule.dienststellennummer'),
             key: 'schuleDetails',
             align: 'start',
             width: '350px',
           },
-          ...headers,
+          ...headers.value,
         ];
       }
     }
