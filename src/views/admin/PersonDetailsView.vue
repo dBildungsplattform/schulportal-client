@@ -776,6 +776,7 @@
     }
     createSuccessDialogVisible.value = !personenkontextStore.errorCode;
     formContext.resetForm();
+    personStore.getPersonById(currentPersonId);
   }
 
   // This will send the updated list of Zuordnungen to the Backend with the selected Zuordnung but with the new Klasse.
@@ -916,6 +917,7 @@
 
   const confirmDialogAddition = async (): Promise<void> => {
     createZuordnungConfirmationDialogVisible.value = false;
+    hasNoKopersNr.value = false;
     const organisation: Organisation | undefined = personenkontextStore.workflowStepResponse?.organisations.find(
       (orga: Organisation) => orga.id === selectedOrganisation.value,
     );
