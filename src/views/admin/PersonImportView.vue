@@ -375,6 +375,11 @@
       showUnsavedChangesDialog.value = true;
       blockedNext = next;
     } else {
+      // Delete the Imported items once the user leaves the page
+      if (importStore.importResponse) {
+        const importvorgangId: string = importStore.uploadResponse?.importvorgangId as string;
+        importStore.deleteImportVorgangById(importvorgangId);
+      }
       importStore.uploadResponse = null;
       importStore.importResponse = null;
       next();

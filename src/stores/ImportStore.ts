@@ -43,6 +43,7 @@ type ImportActions = {
   startImportStatusPolling: (importvorgangId: string) => Promise<void>;
   stopImportStatusPolling: () => void;
   getImportedPersons: (importVorgangId: string, offset?: number, limit?: number) => Promise<void>;
+  deleteImportVorgangById: (importVorgangId: string) => Promise<void>;
 };
 
 export type ImportStore = Store<'importStore', ImportState, ImportGetters, ImportActions>;
@@ -81,6 +82,17 @@ export const useImportStore: StoreDefinition<'importStore', ImportState, ImportG
         }
       } finally {
         this.retrievalIsLoading = false;
+      }
+    },
+
+    async deleteImportVorgangById(importvorgangId: string): Promise<void> {
+      try {
+        await importApi.importControllerDeleteImportTransaction(importvorgangId);
+      } catch (error: unknown) {
+        this.errorCode = 'UNSPECIFIED_ERROR';
+        if (isAxiosError(error)) {
+          this.errorCode = error.response?.data.i18nKey || 'ERROR_IMPORTING_FILE';
+        }
       }
     },
 
