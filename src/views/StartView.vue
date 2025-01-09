@@ -18,7 +18,7 @@
   import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
   import type { DBiamPersonenzuordnungResponse, PersonTimeLimitInfoResponse } from '@/api-client/generated';
   import { RollenMerkmal } from '@/stores/RolleStore';
-  import { formatDateDiggitsToGermanDate } from '@/utils/date';
+  import { adjustDateForTimezoneAndFormat } from '@/utils/date';
 
   const { t }: { t: Function } = useI18n();
 
@@ -80,18 +80,24 @@
   }
 
   function addAlert(alerts: Alert[], occasion: string, messageKey: string): void {
-    const lockInfo: PersonTimeLimitInfoResponse | undefined = authStore.timeLimitInfos.find(
+    const lockInfos: PersonTimeLimitInfoResponse[] = authStore.timeLimitInfos.filter(
       (info: PersonTimeLimitInfoResponse) => info.occasion === occasion,
     );
-    if (lockInfo) {
-      const deadlineDate: Date = new Date(lockInfo.deadline!);
-      alerts.push({
-        id: lockInfo.occasion,
-        message: t(messageKey, { date: formatDateDiggitsToGermanDate(deadlineDate) }),
-        visible: true,
-        type: getUrgencyType(deadlineDate),
+    lockInfos.forEach((lockInfo: PersonTimeLimitInfoResponse) => {
+      const message: string = t(messageKey, {
+        date: adjustDateForTimezoneAndFormat(lockInfo.deadline!),
+        ...(occasion === 'PERSONENKONTEXT_EXPIRES' && { schule: lockInfo.school }),
       });
-    }
+
+      const id: string = lockInfo.school ? `${lockInfo.occasion}_${lockInfo.school}` : lockInfo.occasion;
+
+      alerts.push({
+        id: id,
+        message: message,
+        visible: true,
+        type: getUrgencyType(new Date(lockInfo.deadline!)),
+      });
+    });
   }
 
   function getBannerAlerts(): Alert[] {
@@ -102,6 +108,7 @@
     }
 
     addAlert(alerts, 'NO_KONTEXTE', 'banner.noKontexte');
+    addAlert(alerts, 'PERSONENKONTEXT_EXPIRES', 'banner.kontextExpires');
 
     return alerts;
   }

@@ -4551,9 +4551,13 @@
           },
           "deadline": {
             "type": "string"
+          },
+          "school": {
+            "type": "string",
+            "nullable": true
           }
         },
-        "required": ["occasion", "deadline"]
+        "required": ["occasion", "deadline", "school"]
       },
       "UserinfoResponse": {
         "type": "object",

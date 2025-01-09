@@ -2062,6 +2062,12 @@ export interface PersonTimeLimitInfoResponse {
      * @memberof PersonTimeLimitInfoResponse
      */
     'deadline': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonTimeLimitInfoResponse
+     */
+    'school': string | null;
 }
 /**
  * 
