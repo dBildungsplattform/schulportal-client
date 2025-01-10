@@ -1100,10 +1100,22 @@ export interface ImportVorgangResponse {
 export interface ImportVorgangStatusResponse {
     /**
      * 
+     * @type {number}
+     * @memberof ImportVorgangStatusResponse
+     */
+    'dataItemCount': number;
+    /**
+     * 
      * @type {ImportStatus}
      * @memberof ImportVorgangStatusResponse
      */
     'status': ImportStatus;
+    /**
+     * 
+     * @type {number}
+     * @memberof ImportVorgangStatusResponse
+     */
+    'totalDataItemImported': number;
 }
 
 
