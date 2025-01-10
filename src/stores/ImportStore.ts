@@ -12,8 +12,8 @@ import axiosApiInstance from '@/services/ApiService';
 
 const importApi: ImportApiInterface = ImportApiFactory(undefined, '', axiosApiInstance);
 
-// 1 hour polling time at maximum
-const MAX_POLLING_TIME: number = 60 * 60 * 1000;
+// 2 hours polling time at maximum
+const MAX_POLLING_TIME: number = 120 * 60 * 1000;
 
 export enum ImportDataItemStatus {
   FAILED = 'FAILED',
