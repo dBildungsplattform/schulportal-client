@@ -91,7 +91,7 @@ const mockPersonenUebersicht: PersonWithUebersicht = {
       merkmale: ['KOPERS_PFLICHT'] as unknown as RollenMerkmal,
       befristung: '2024-05-06',
       rollenArt: RollenArt.Lehr,
-      admins: []
+      admins: [],
     },
     {
       sskId: '2',
@@ -105,7 +105,7 @@ const mockPersonenUebersicht: PersonWithUebersicht = {
       merkmale: ['KOPERS_PFLICHT'] as unknown as RollenMerkmal,
       befristung: '2024-05-06',
       rollenArt: RollenArt.Lehr,
-      admins: []
+      admins: [],
     },
   ],
 };
@@ -138,6 +138,7 @@ beforeEach(() => {
     {
       occasion: 'KOPERS',
       deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+      school: null,
     },
   ];
 
