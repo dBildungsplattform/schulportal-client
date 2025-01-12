@@ -322,7 +322,6 @@ describe('ImportStore', () => {
 
         await importStore.getImportedPersons(importvorgangId, 0, 5);
 
-        // Assert the result
         expect(importStore.importResponse).toBeNull();
         expect(importStore.retrievalIsLoading).toBe(false);
         expect(importStore.errorCode).toBe('ERROR_IMPORTING_FILE');
@@ -349,6 +348,40 @@ describe('ImportStore', () => {
         expect(importStore.importResponse).toEqual(mockResponse);
         expect(importStore.retrievalIsLoading).toBe(false);
         expect(importStore.errorCode).toBeNull();
+      });
+    });
+
+    describe('Delete import vorgang by ID', () => {
+      it('should successfully delete the import transaction', async () => {
+        const importvorgangId: string = '8b7c40dd-c842-4f66-807d-6bd8c7cd5b54';
+
+        mockadapter.onDelete(`/api/import/${importvorgangId}`).reply(204);
+
+        await importStore.deleteImportVorgangById(importvorgangId);
+
+        expect(importStore.errorCode).toBeNull();
+      });
+
+      it('should handle an error response and set the specific error code', async () => {
+        const importvorgangId: string = '8b7c40dd-c842-4f66-807d-6bd8c7cd5b54';
+
+        mockadapter
+          .onDelete(`/api/import/${importvorgangId}`)
+          .reply(500, { i18nKey: 'ERROR_DELETING_IMPORT_TRANSACTION' });
+
+        await importStore.deleteImportVorgangById(importvorgangId);
+
+        expect(importStore.errorCode).toBe('ERROR_DELETING_IMPORT_TRANSACTION');
+      });
+
+      it('should handle an error response and set the fallback error code', async () => {
+        const importvorgangId: string = '8b7c40dd-c842-4f66-807d-6bd8c7cd5b54';
+
+        mockadapter.onDelete(`/api/import/${importvorgangId}`).reply(500, { i18nKey: 'ERROR_IMPORTING_FILE' });
+
+        await importStore.deleteImportVorgangById(importvorgangId);
+
+        expect(importStore.errorCode).toBe('ERROR_IMPORTING_FILE');
       });
     });
   });
