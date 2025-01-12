@@ -239,7 +239,7 @@ describe('PersonImportView', () => {
     importStore.importProgress = 100;
     await nextTick();
 
-    const downloadButton: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="download-file-button"]');
+    const downloadButton: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="download-all-files-button"]');
     downloadButton?.trigger('click');
   });
 
