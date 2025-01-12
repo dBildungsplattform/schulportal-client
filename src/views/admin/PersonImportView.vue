@@ -48,6 +48,12 @@
   const schulen: ComputedRef<TranslatedObject[] | undefined> = useSchulen();
   const searchInputSchule: Ref<string> = ref('');
 
+  const totalPages: ComputedRef<number[]> = computed(() => {
+    const totalUsers: number = importStore.importResponse?.total || 0;
+    const itemsPerPage: number = importStore.importedUsersPerPage;
+    return Array.from({ length: Math.ceil(totalUsers / itemsPerPage) }, (_, index: number) => index * itemsPerPage);
+  });
+
   let timerId: ReturnType<typeof setTimeout>;
 
   const validationSchema: TypedSchema = toTypedSchema(
@@ -281,16 +287,7 @@
     }
   }
 
-  async function fetchImportedUsers(page: number): Promise<void> {
-    const importvorgangId: string = importStore.uploadResponse?.importvorgangId as string;
-    const offset: number = (page - 1) * importStore.importedUsersPerPage;
-    // Limit is set to 100
-    const limit: number = importStore.importedUsersPerPage;
-
-    await importStore.getImportedPersons(importvorgangId, offset, limit);
-  }
-
-  async function createAndTriggerDownload(): Promise<void> {
+  async function createAndTriggerDownload(index: number): Promise<void> {
     const importResponse: ImportResultResponse | null = importStore.importResponse;
 
     if (!importResponse) return;
@@ -335,13 +332,41 @@
     // Create and trigger the download link
     const link: HTMLAnchorElement = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', `${t('admin.import.fileName.person')}.txt`);
+    const fileName: string = `${t('person.passwords')}-${index + 1}.txt`;
+    link.setAttribute('download', fileName);
     document.body.appendChild(link);
     link.click();
     link.remove();
 
     // Revoke the URL to free up resources
     window.URL.revokeObjectURL(url);
+  }
+
+  async function downloadAllFiles(): Promise<void> {
+    const totalUsers: number = importStore.importResponse?.total || 0;
+    const itemsPerPage: number = importStore.importedUsersPerPage;
+    const totalPagesNumber: number = Math.floor(totalUsers / itemsPerPage);
+
+    // Loops through the number of total pages (in case of 1000 users then 10 pages) and makes a request for each PageS
+    for (let pageIndex: number = 0; pageIndex < totalPagesNumber; pageIndex++) {
+      const offset: number = pageIndex * itemsPerPage;
+
+      // Fetch users for the current offset
+      await importStore.getImportedPersons(importStore.uploadResponse?.importvorgangId as string, offset, itemsPerPage);
+
+      // Generate and trigger the download for this batch
+      createAndTriggerDownload(pageIndex);
+    }
+  }
+
+  async function handleUserDownload(offset: number, index: number): Promise<void> {
+    const limit: number = importStore.importedUsersPerPage;
+
+    // Fetch users for the specific range
+    await importStore.getImportedPersons(importStore.uploadResponse?.importvorgangId as string, offset, limit);
+
+    // Generate the file for the fetched users
+    createAndTriggerDownload(index);
   }
 
   const onSubmit: (e?: Event | undefined) => Promise<void | undefined> = formContext.handleSubmit(() => {
@@ -454,21 +479,29 @@
             <v-col cols="auto">
               <v-btn
                 class="primary"
-                @click="createAndTriggerDownload()"
-                data-testid="download-file-button"
+                @click="downloadAllFiles()"
+                data-testid="download-all-files-button"
                 :disabled="importStore.importIsLoading || importStore.retrievalIsLoading"
               >
-                {{ $t('admin.import.downloadUserdata') }}
+                {{ $t('admin.import.downloadAllUserData') }}
               </v-btn>
             </v-col>
           </v-row>
           <v-row justify="center">
-            <v-pagination
-              v-model="importStore.importedUsersPage"
-              :length="Math.ceil(importStore.importResponse?.total || 0) / (importStore.importResponse?.pageTotal || 1)"
-              @update:modelValue="fetchImportedUsers"
-              :total-visible="20"
-            ></v-pagination>
+            <v-col
+              cols="auto"
+              v-for="(offset, index) in totalPages"
+              :key="index"
+            >
+              <v-btn
+                :block="smAndDown"
+                class="primary"
+                @click="handleUserDownload(offset, index)"
+                :data-testid="`download-button-${index}`"
+              >
+                {{ `${$t('person.passwords')}-${index + 1}.txt` }}
+              </v-btn>
+            </v-col>
           </v-row>
         </v-container>
       </template>
@@ -499,7 +532,6 @@
                 :model-value="importStore.importProgress"
                 color="primary"
                 height="25"
-                striped
               >
                 <template v-slot:default="{ value }">
                   <strong class="text-white">{{ Math.ceil(value) }}%</strong>

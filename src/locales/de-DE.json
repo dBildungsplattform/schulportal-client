@@ -33,6 +33,7 @@
       "backToUpload": "Andere Datei hochladen",
       "confirmationText": "Achtung, diese Aktion kann nicht rückgängig gemacht werden. Möchten Sie den Import wirklich durchführen?",
       "downloadUserdata": "Benutzerdaten herunterladen",
+      "downloadAllUserData": "Alle Benutzerdaten herunterladen",
       "errors": {
         "CSV_PARSING_ERROR": "Die Datei konnte nicht gelesen werden. Bitte überprüfen Sie das Format.",
         "ERROR_IMPORTING_FILE": "Die Daten konnten nicht importiert werden. Bitte versuchen Sie es erneut.",
@@ -630,6 +631,7 @@
     "noChangesToSave": "Es liegen keine zu speichernden Änderungen vor.",
     "noZuordnungenFound": "Keine Schulzuordnungen gefunden.",
     "password": "Passwort",
+    "passwords": "Passwörter",
     "removeZuordnung": "Schulzuordnung entfernen",
     "removeZuordnungDescription": "Entfernt den Benutzer von der Schule.",
     "rolle": "Rolle",
