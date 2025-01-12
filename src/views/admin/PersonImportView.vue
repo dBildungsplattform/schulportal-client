@@ -501,6 +501,7 @@
                 class="primary"
                 @click="handleUserDownload(offset, index)"
                 :data-testid="`download-button-${index}`"
+                :disabled="importStore.importIsLoading || importStore.retrievalIsLoading"
               >
                 {{ `${$t('person.passwords')}-${index + 1}.txt` }}
               </v-btn>
