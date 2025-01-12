@@ -51,7 +51,10 @@
   const totalPages: ComputedRef<number[]> = computed(() => {
     const totalUsers: number = importStore.importResponse?.total || 0;
     const itemsPerPage: number = importStore.importedUsersPerPage;
-    return Array.from({ length: Math.ceil(totalUsers / itemsPerPage) }, (_, index: number) => index * itemsPerPage);
+    return Array.from(
+      { length: Math.ceil(totalUsers / itemsPerPage) },
+      (_: unknown, index: number) => index * itemsPerPage,
+    );
   });
 
   let timerId: ReturnType<typeof setTimeout>;
