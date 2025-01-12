@@ -313,12 +313,26 @@ describe('ImportStore', () => {
         expect(importStore.errorCode).toBeNull();
       });
 
-      it('should handle an error response and set the correct error code', async () => {
+      it('should handle an i18nkey error response and set the correct error code', async () => {
         const importvorgangId: string = '8b7c40dd-c842-4f66-807d-6bd8c7cd5b54';
 
         mockadapter
           .onGet(`/api/import/importedUsers?offset=0&limit=5&importvorgangId=${importvorgangId}`)
           .reply(500, { i18nKey: 'ERROR_IMPORTING_FILE' });
+
+        await importStore.getImportedPersons(importvorgangId, 0, 5);
+
+        expect(importStore.importResponse).toBeNull();
+        expect(importStore.retrievalIsLoading).toBe(false);
+        expect(importStore.errorCode).toBe('ERROR_IMPORTING_FILE');
+      });
+
+      it('should handle an error response and set the correct error code', async () => {
+        const importvorgangId: string = '8b7c40dd-c842-4f66-807d-6bd8c7cd5b54';
+
+        mockadapter
+          .onGet(`/api/import/importedUsers?offset=0&limit=5&importvorgangId=${importvorgangId}`)
+          .reply(500, 'error');
 
         await importStore.getImportedPersons(importvorgangId, 0, 5);
 
@@ -377,7 +391,7 @@ describe('ImportStore', () => {
       it('should handle an error response and set the fallback error code', async () => {
         const importvorgangId: string = '8b7c40dd-c842-4f66-807d-6bd8c7cd5b54';
 
-        mockadapter.onDelete(`/api/import/${importvorgangId}`).reply(500, { i18nKey: 'ERROR_IMPORTING_FILE' });
+        mockadapter.onDelete(`/api/import/${importvorgangId}`).reply(500, 'error');
 
         await importStore.deleteImportVorgangById(importvorgangId);
 
