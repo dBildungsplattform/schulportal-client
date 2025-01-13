@@ -101,10 +101,6 @@
         :serviceProviders="classServiceProviders"
       ></ServiceProviderCategory>
       <!-- Categorie 3: Administration -->
-      <ServiceProviderCategory
-        :categoryTitle="$t('start.categories.administration')"
-        :serviceProviders="administrationServiceProviders"
-      ></ServiceProviderCategory>
       <!-- Categorie 4: Hints -->
       <ServiceProviderCategory
         :categoryTitle="$t('start.categories.hints')"
