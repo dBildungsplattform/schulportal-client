@@ -67,7 +67,7 @@
       },
       "recordsReadyForImport": "{count} Datensatz steht zum Import bereit. | {count} Datensätze stehen zum Import bereit.",
       "selectOrDropFile": "Datei auswählen oder ablegen",
-      "successfullyImportedUsersNotice": "Die folgenden Benutzer wurden erfoglreich importiert:",
+      "successfullyImportedUsersNotice": "Die folgenden Benutzer wurden erfolgreich importiert:",
       "uploadedSuccessfully": "Die Datei wurde erfolgreich hochgeladen.",
       "uploadErrorTitle": "Fehler beim Upload",
       "uploadFile": "Datei hochladen"
