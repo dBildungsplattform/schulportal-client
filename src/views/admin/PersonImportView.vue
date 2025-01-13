@@ -287,63 +287,66 @@
     // Only start polling if the execution was successful (no error)
     if (!importStore.errorCode) {
       importStore.startImportStatusPolling(importvorgangId);
-      formContext.resetForm();
     }
   }
 
   async function createAndTriggerDownload(index: number): Promise<void> {
-    const importResponse: ImportResultResponse | null = importStore.importResponse;
+    try {
+      const importResponse: ImportResultResponse | null = importStore.importResponse;
 
-    if (!importResponse) return;
+      if (!importResponse) return;
 
-    if (!importResponse.importvorgandId || !importResponse.rollenname || !importResponse.organisationsname) {
-      return;
-    }
-
-    // Separate successful and failed users
-    const successfullyImportedUsers: ImportedUserResponse[] = importResponse.importedUsers.filter(
-      (user: ImportedUserResponse) => user.status === ImportDataItemStatus.SUCCESS,
-    );
-
-    const failedImportedUsers: ImportedUserResponse[] = importResponse.importedUsers.filter(
-      (user: ImportedUserResponse) => user.status === ImportDataItemStatus.FAILED,
-    );
-
-    // Construct file content
-    let fileContent: string = `Schule: ${importResponse.organisationsname} - Rolle: ${importResponse.rollenname}`;
-    fileContent += `\n\n${t('admin.import.successfullyImportedUsersNotice')}\n\n`;
-    fileContent += 'Klasse - Vorname - Nachname - Benutzername - Passwort\n';
-
-    // Add successful users to the file content
-    for (const user of successfullyImportedUsers) {
-      fileContent += `${user.klasse} - ${user.vorname} - ${user.nachname} - ${user.benutzername} - ${user.startpasswort}\n`;
-    }
-
-    // Add a section for failed users
-    if (failedImportedUsers.length > 0) {
-      fileContent += `\n\n${t('admin.import.failedToImportUsersNotice')}\n\n`;
-      fileContent += 'Klasse - Vorname - Nachname - Benutzername\n';
-
-      for (const user of failedImportedUsers) {
-        fileContent += `${user.klasse} - ${user.vorname} - ${user.nachname} - ${user.benutzername}\n`;
+      if (!importResponse.importvorgandId || !importResponse.rollenname || !importResponse.organisationsname) {
+        return;
       }
+
+      // Separate successful and failed users
+      const successfullyImportedUsers: ImportedUserResponse[] = importResponse.importedUsers.filter(
+        (user: ImportedUserResponse) => user.status === ImportDataItemStatus.SUCCESS,
+      );
+
+      const failedImportedUsers: ImportedUserResponse[] = importResponse.importedUsers.filter(
+        (user: ImportedUserResponse) => user.status === ImportDataItemStatus.FAILED,
+      );
+
+      // Construct file content
+      let fileContent: string = `Schule: ${importResponse.organisationsname} - Rolle: ${importResponse.rollenname}`;
+      fileContent += `\n\n${t('admin.import.successfullyImportedUsersNotice')}\n\n`;
+      fileContent += 'Klasse - Vorname - Nachname - Benutzername - Passwort\n';
+
+      // Add successful users to the file content
+      for (const user of successfullyImportedUsers) {
+        fileContent += `${user.klasse} - ${user.vorname} - ${user.nachname} - ${user.benutzername} - ${user.startpasswort}\n`;
+      }
+
+      // Add a section for failed users
+      if (failedImportedUsers.length > 0) {
+        fileContent += `\n\n${t('admin.import.failedToImportUsersNotice')}\n\n`;
+        fileContent += 'Klasse - Vorname - Nachname - Benutzername\n';
+
+        for (const user of failedImportedUsers) {
+          fileContent += `${user.klasse} - ${user.vorname} - ${user.nachname} - ${user.benutzername}\n`;
+        }
+      }
+
+      // Create a Blob from the file content
+      const blob: Blob = new Blob([fileContent], { type: 'text/plain' });
+      const url: string = window.URL.createObjectURL(blob);
+
+      // Create and trigger the download link
+      const link: HTMLAnchorElement = document.createElement('a');
+      link.href = url;
+      const fileName: string = `${t('person.passwords')}-${index + 1}.txt`;
+      link.setAttribute('download', fileName);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+
+      // Revoke the URL to free up resources
+      window.URL.revokeObjectURL(url);
+    } catch (error: unknown) {
+      importStore.errorCode = 'ERROR_IMPORTING_FILE';
     }
-
-    // Create a Blob from the file content
-    const blob: Blob = new Blob([fileContent], { type: 'text/plain' });
-    const url: string = window.URL.createObjectURL(blob);
-
-    // Create and trigger the download link
-    const link: HTMLAnchorElement = document.createElement('a');
-    link.href = url;
-    const fileName: string = `${t('person.passwords')}-${index + 1}.txt`;
-    link.setAttribute('download', fileName);
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-
-    // Revoke the URL to free up resources
-    window.URL.revokeObjectURL(url);
   }
 
   async function downloadAllFiles(): Promise<void> {
