@@ -352,9 +352,10 @@
   async function downloadAllFiles(): Promise<void> {
     const totalUsers: number = importStore.importResponse?.total || 0;
     const itemsPerPage: number = importStore.importedUsersPerPage;
-    const totalPagesNumber: number = Math.floor(totalUsers / itemsPerPage);
+    // Ensures at least 1 page
+    const totalPagesNumber: number = Math.max(Math.floor(totalUsers / itemsPerPage), 1);
 
-    // Loops through the number of total pages (in case of 1000 users then 10 pages) and makes a request for each PageS
+    // Loop through the number of pages, or handle the case where there's only one page of data
     for (let pageIndex: number = 0; pageIndex < totalPagesNumber; pageIndex++) {
       const offset: number = pageIndex * itemsPerPage;
 
