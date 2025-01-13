@@ -234,12 +234,21 @@ describe('PersonImportView', () => {
     expect(executeImportButton).not.toBeNull();
   });
 
-  test('it downloads an imported file', async () => {
+  test('it downloads an imported file through the download all button', async () => {
     global.URL.createObjectURL = vi.fn();
     importStore.importProgress = 100;
     await nextTick();
 
     const downloadButton: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="download-all-files-button"]');
+    downloadButton?.trigger('click');
+  });
+
+  test('it downloads an imported file through the single button download for the first 100', async () => {
+    global.URL.createObjectURL = vi.fn();
+    importStore.importProgress = 100;
+    await nextTick();
+
+    const downloadButton: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="download-button-1"]');
     downloadButton?.trigger('click');
   });
 
