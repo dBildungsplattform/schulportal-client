@@ -287,6 +287,7 @@
     // Only start polling if the execution was successful (no error)
     if (!importStore.errorCode) {
       importStore.startImportStatusPolling(importvorgangId);
+      formContext.resetForm();
     }
   }
 
