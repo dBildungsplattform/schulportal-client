@@ -14,9 +14,9 @@ export default defineConfig({
   css: {
     preprocessorOptions: {
       sass: {
-        api: 'modern-compiler'
-      }
-    }
+        api: 'modern-compiler',
+      },
+    },
   },
   define: {
     /* disable hydration mismatch details in production build */
