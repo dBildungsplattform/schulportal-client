@@ -486,7 +486,7 @@
                 data-testid="download-all-files-button"
                 :disabled="importStore.importIsLoading || importStore.retrievalIsLoading"
               >
-                {{ $t('admin.import.downloadAllUserData') }}
+                {{ $t('admin.import.downloadAllFiles') }}
               </v-btn>
             </v-col>
           </v-row>
