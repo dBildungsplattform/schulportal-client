@@ -58,6 +58,7 @@ describe('rolleStore', () => {
       expect(rolleStore.loading).toBe(true);
       await createRollePromise;
       expect(rolleStore.createdRolle).toEqual([...mockResponse]);
+      expect(rolleStore.currentRolle).toEqual([...mockResponse]);
       expect(rolleStore.loading).toBe(false);
     });
 
