@@ -1,4 +1,4 @@
-@use "../variables";
+@use '../variables';
 
 label[disabled='true'] {
   color: variables.$disabledLabelColor;

@@ -1,4 +1,4 @@
-@use "../variables";
+@use '../variables';
 
 .v-btn {
   width: 340px;
@@ -57,7 +57,7 @@
 
   /* small screen */
   @media only screen and (max-width: 600px) {
-    font-size: variables.$smallButtonFontSize;    
+    font-size: variables.$smallButtonFontSize;
   }
 
   /* medium screen */
