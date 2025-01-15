@@ -206,6 +206,7 @@ describe('KlassenManagementView', () => {
 
     expect(organisationAutocomplete?.text()).toEqual('9356494-9a (orga)');
   });
+
   it('should fetch all Klassen when search string is empty and no Schule is selected', async () => {
     const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
 
@@ -227,6 +228,7 @@ describe('KlassenManagementView', () => {
 
     expect(organisationStore.getAllOrganisationen).toHaveBeenCalled();
   });
+
   test('it does nothing if oldValue equals selectedOrganisationTitle', async () => {
     const schuleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
 
@@ -295,4 +297,24 @@ describe('KlassenManagementView', () => {
       systemrechte: ['KLASSEN_VERWALTEN'],
     });
   });
+
+  test.each([
+    ["UNSPECIFIED_ERROR",
+      "Fehler beim Laden der Klassen",
+      "Es konnten keine Klassendaten geladen werden.",
+      ],
+    ["KLASSE_ERROR", 
+        "Fehler bei Änderung der Klasse.",
+        "Die Klasse konnte nicht geändert werden.",
+      ],
+  ])('if there is an error, it displays correct text for %s', async (errorCode: string, expectedTitle: string, expectedText: string) => {
+    organisationStore.errorCode = errorCode;
+    await nextTick();
+
+    const actualTitle: string | undefined = wrapper?.find("[data-testid=alert-title]").text();
+    const actualText: string | undefined = wrapper?.find("[data-testid=alert-text]").text();
+
+    expect(actualTitle).toBe(expectedTitle);
+    expect(actualText).toBe(expectedText);
+  })
 });

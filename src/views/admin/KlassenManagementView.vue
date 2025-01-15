@@ -75,6 +75,7 @@
       }))
       .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
   });
+
   const errorTitle: ComputedRef<string> = computed(() => {
     if (!organisationStore.errorCode) {
       return '';
@@ -83,6 +84,7 @@
       ? t('admin.klasse.loadingErrorTitle')
       : t(`admin.klasse.title.${organisationStore.errorCode}`);
   });
+
   const errorText: ComputedRef<string> = computed(() => {
     if (!organisationStore.errorCode) {
       return '';
