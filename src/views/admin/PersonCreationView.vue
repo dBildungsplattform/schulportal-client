@@ -675,7 +675,7 @@
               <v-btn
                 class="secondary"
                 @click.stop="navigateToPersonDetails"
-                data-testid="back-to-details-button"
+                data-testid="to-details-button"
                 :block="mdAndDown"
               >
                 {{ $t('nav.toDetails') }}
