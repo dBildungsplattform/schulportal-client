@@ -4,9 +4,28 @@ import KlassenManagementView from './KlassenManagementView.vue';
 import { nextTick } from 'vue';
 import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
 import type WrapperLike from '@vue/test-utils/dist/interfaces/wrapperLike';
+import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
+
+function mountComponent(): VueWrapper {
+return mount(KlassenManagementView, {
+    attachTo: document.getElementById('app') || '',
+    global: {
+      components: {
+        KlassenManagementView,
+      },
+      mocks: {
+        route: {
+          fullPath: 'full/path',
+        },
+      },
+    },
+  });
+}
 
 let wrapper: VueWrapper | null = null;
 const organisationStore: OrganisationStore = useOrganisationStore();
+const authStore: AuthStore = useAuthStore();
+
 beforeEach(() => {
   document.body.innerHTML = `
     <div>
@@ -79,19 +98,40 @@ beforeEach(() => {
 
   organisationStore.totalKlassen = 2;
 
-  wrapper = mount(KlassenManagementView, {
-    attachTo: document.getElementById('app') || '',
-    global: {
-      components: {
-        KlassenManagementView,
-      },
-      mocks: {
-        route: {
-          fullPath: 'full/path',
-        },
+  authStore.currentUser = {
+  middle_name: null,
+  nickname: null,
+  profile: null,
+  picture: null,
+  website: null,
+  gender: null,
+  birthdate: null,
+  zoneinfo: null,
+  locale: null,
+  phone_number: null,
+  updated_at: null,
+  personId: '2',
+  email: 'albert@test.de',
+  email_verified: true,
+  family_name: 'Test',
+  given_name: 'Albert',
+  name: 'Albert Test',
+  preferred_username: 'albert',
+  sub: 'c71be903-d0ec-4207-b653-40c114680b63',
+  personenkontexte: [
+    {
+      organisationsId: '123456',
+      rolle: {
+        systemrechte: ['ROLLEN_VERWALTEN', 'SCHULEN_VERWALTEN'],
+        serviceProviderIds: ['789897798'],
       },
     },
-  });
+  ],
+  password_updated_at: null,
+};
+
+
+  wrapper = mountComponent();
   vi.resetAllMocks();
 });
 
@@ -101,6 +141,31 @@ describe('KlassenManagementView', () => {
     expect(wrapper?.find('[data-testid="klasse-table"]').isVisible()).toBe(true);
     await flushPromises();
     expect(wrapper?.findAll('.v-data-table__tr').length).toBe(2);
+    await nextTick();
+
+    const tableHeadersText: string | undefined = wrapper?.find('.v-data-table__thead').text();
+    const elements = wrapper?.findAll('.v-data-table__th')
+    expect(elements?.length).toBe(4);
+    expect(tableHeadersText).toContain("Dienststellennummer");
+    expect(tableHeadersText).toContain("Klasse");
+    expect(tableHeadersText).toContain("Aktion");
+  });
+
+  test('it does not render extra table headers, if unnecessary', async () => {
+    authStore.currentUser = null;
+    wrapper = mountComponent();
+    expect(wrapper.getComponent({ name: 'ResultTable' })).toBeTruthy();
+    expect(wrapper.find('[data-testid="klasse-table"]').isVisible()).toBe(true);
+    await flushPromises();
+    expect(wrapper.findAll('.v-data-table__tr').length).toBe(2);
+    await nextTick();
+
+    const tableHeadersText: string | undefined = wrapper.find('.v-data-table__thead').text();
+    const elements = wrapper.findAll('.v-data-table__th')
+    expect(elements?.length).toBe(3);
+    expect(tableHeadersText).not.toContain("Dienststellennummer");
+    expect(tableHeadersText).toContain("Klasse");
+    expect(tableHeadersText).toContain("Aktion");
   });
 
   test('it reloads data after changing page', async () => {
