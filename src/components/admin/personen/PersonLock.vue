@@ -167,6 +167,22 @@
     },
     { immediate: true },
   );
+
+watch(dialogIsActive, (newDialogIsActive: boolean) => {
+  if (!newDialogIsActive) {
+    resetBefristungFields();
+    return;
+  }
+
+  const manualLock: UserLock | null = props.person.person.userLock?.find(
+    (lock: UserLock) => lock.lock_occasion === PersonLockOccasion.MANUELL_GESPERRT
+  )  ?? null;;
+
+  if (manualLock) {
+    isUnbefristet.value = !manualLock.locked_until;
+    selectedBefristung.value = manualLock.locked_until;
+  }
+});
 </script>
 
 <template v-if="organisations.length > 0">
@@ -247,7 +263,7 @@
             </v-col>
           </v-row>
           <v-row
-            v-if="!isManuallyLocked || isManuallyLocked && isEditMode"
+            v-if="!isManuallyLocked || (isManuallyLocked && isEditMode)"
             class="align-center justify-center w-full"
           >
             <v-col
@@ -290,7 +306,7 @@
           </v-row>
           <v-row
             class="justify-center w-full"
-            v-if="!isManuallyLocked || isManuallyLocked && isEditMode"
+            v-if="!isManuallyLocked || (isManuallyLocked && isEditMode)"
           >
             <v-col
               class="text-body"
@@ -308,8 +324,8 @@
             >
               <PersonLockInput
                 v-model:befristung="selectedBefristung"
-                v-bind:befristung-props="selectedBefristungProps"
-                :is-unbefristet="isUnbefristet"
+                v-bind:befristungProps="selectedBefristungProps"
+                :isUnbefristet="isUnbefristet"
                 @update:befristung="handleBefristungChange"
                 @handleSelectedRadioButtonChange="selectedRadionButtonChange"
               >
@@ -326,7 +342,7 @@
                 class="text-body"
               >
                 {{
-                  !isManuallyLocked || isManuallyLocked && isEditMode
+                  !isManuallyLocked || (isManuallyLocked && isEditMode)
                     ? $t('person.lockUserInfoText')
                     : $t('person.unLockUserInfoText')
                 }}
@@ -370,7 +386,7 @@
                 {{ $t('admin.person.editLock') }}
               </v-btn>
               <v-btn
-                v-if="!isManuallyLocked || isManuallyLocked && isEditMode"
+                v-if="!isManuallyLocked || (isManuallyLocked && isEditMode)"
                 :block="mdAndDown"
                 class="primary button"
                 :disabled="!isManuallyLocked && !selectedOrganisation"

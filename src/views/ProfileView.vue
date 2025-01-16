@@ -211,8 +211,8 @@
     return message;
   });
 
-  async function resetDevicePassword(personId: string): Promise<void> {
-    await personStore.resetDevicePassword(personId);
+  async function resetDevicePassword(): Promise<void> {
+    await personStore.resetDevicePassword();
     devicePassword.value = personStore.newDevicePassword || '';
   }
 
@@ -742,7 +742,7 @@
                   :errorMessage="devicePasswordErrorMessage"
                   :isLoading="personStore.loading"
                   @onClearPassword="devicePassword = ''"
-                  @onResetPassword="resetDevicePassword(personInfoStore.personInfo?.person.id as string)"
+                  @onResetPassword="resetDevicePassword()"
                   :password="devicePassword"
                   :testId="'device-password'"
                 >

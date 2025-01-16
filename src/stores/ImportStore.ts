@@ -11,8 +11,8 @@ import axiosApiInstance from '@/services/ApiService';
 
 const importApi: ImportApiInterface = ImportApiFactory(undefined, '', axiosApiInstance);
 
-// Maximum polling duration (5 minutes)
-const MAX_POLLING_TIME: number = 5 * 60 * 1000;
+// 1 hour polling time at maximum
+const MAX_POLLING_TIME: number = 60 * 60 * 1000;
 
 export type ImportState = {
   errorCode: string | null;
@@ -20,7 +20,7 @@ export type ImportState = {
   importIsLoading: boolean;
   uploadIsLoading: boolean;
   uploadResponse: ImportUploadResponse | null;
-  importStatus: ImportStatus | null;
+  importStatus: ImportVorgangStatusResponse | null;
   importProgress: number;
   pollingInterval?: ReturnType<typeof setInterval>;
 };
@@ -71,26 +71,23 @@ export const useImportStore: StoreDefinition<'importStore', ImportState, ImportG
 
       const startTime: number = Date.now();
 
-      // Dynamically calculate polling interval: 100ms per item, min 1s (Small imports), max 10s (Medium to large imports)
-      // This ensures faster polling for small imports and prevents overwhelming the server for large imports
-      const totalItems: number = this.uploadResponse?.totalImportDataItems || 1;
-      const dynamicPollingInterval: number = Math.max(1000, Math.min(10000, Math.floor(totalItems * 100)));
-
       const pollStatus = async (): Promise<void> => {
         try {
           await this.getPersonenImportStatus(importvorgangId);
 
-          // Calculate progress (simple linear progression)
-          const elapsedTime: number = Date.now() - startTime;
-          const progressCurve: number = 1 - Math.exp(-elapsedTime / (MAX_POLLING_TIME / 6));
-          // The fake progress bar will never reach 100% unless the status is Finished. For large imports the bar will cap at 95% and poll from there until it's finished
-          this.importProgress =
-            this.importStatus === ImportStatus.Finished
-              ? 100
-              : Math.max(1, Math.min(95, Math.floor(progressCurve * 100)));
+          // Calculate real progress based on imported items
+          if (this.importStatus?.dataItemCount) {
+            // Calculate progress as a percentage of imported items
+            const progressPercentage: number = this.importStatus.totalDataItemImported
+              ? Math.floor((this.importStatus.totalDataItemImported / this.importStatus.dataItemCount) * 100)
+              : 0;
+
+            this.importProgress =
+              this.importStatus.status === ImportStatus.Finished ? 100 : Math.max(1, progressPercentage);
+          }
 
           // Stop polling on final states
-          switch (this.importStatus) {
+          switch (this.importStatus?.status) {
             case ImportStatus.Finished:
               this.stopImportStatusPolling();
               this.importProgress = 100;
@@ -111,6 +108,7 @@ export const useImportStore: StoreDefinition<'importStore', ImportState, ImportG
           }
 
           // Stop polling if max time of 5 minutes is exceeded
+          const elapsedTime: number = Date.now() - startTime;
           if (elapsedTime >= MAX_POLLING_TIME) {
             this.stopImportStatusPolling();
             this.errorCode = 'IMPORT_TIMEOUT';
@@ -127,6 +125,8 @@ export const useImportStore: StoreDefinition<'importStore', ImportState, ImportG
       await pollStatus();
 
       // Start periodic polling with dynamic interval
+      const totalItems: number = this.uploadResponse?.totalImportDataItems || 1;
+      const dynamicPollingInterval: number = Math.max(1000, Math.min(10000, Math.floor(totalItems * 100)));
       this.pollingInterval = setInterval(pollStatus, dynamicPollingInterval);
     },
 
@@ -142,7 +142,7 @@ export const useImportStore: StoreDefinition<'importStore', ImportState, ImportG
         const { data }: { data: ImportVorgangStatusResponse } =
           await importApi.importControllerGetImportStatus(importvorgangId);
 
-        this.importStatus = data.status;
+        this.importStatus = data;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
