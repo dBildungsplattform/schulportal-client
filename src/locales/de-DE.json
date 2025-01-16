@@ -635,7 +635,7 @@
     "twoFactorAuthenticationSetUpHeader": "Zwei-Faktor-Authentifizierung (2FA)",
     "unlockError": "Der Benutzer konnte nicht entsperrt werden.",
     "unlockUser": "Benutzer entsperren",
-    "unLockUserInfoText": "Ich bestätige, dass ich mit der sperrenden Stelle geklärt habe, dass die Sperre aufgehoben werden darf.",
+    "unLockUserInfoText": "Ich bestätige, dass ich mit der sperrenden Stelle geklärt habe, dass die Sperre bearbeitet oder aufgehoben werden darf.",
     "userIsLocked": "Dieser Benutzer ist gesperrt.",
     "userIsUnlocked": "Dieser Benutzer ist aktiv.",
     "userName": "Benutzername",
