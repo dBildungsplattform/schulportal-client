@@ -2068,6 +2068,12 @@ export interface PersonTimeLimitInfoResponse {
      * @memberof PersonTimeLimitInfoResponse
      */
     'school': string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonTimeLimitInfoResponse
+     */
+    'rolle': string | null;
 }
 /**
  * 

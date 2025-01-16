@@ -4555,9 +4555,13 @@
           "school": {
             "type": "string",
             "nullable": true
+          },
+          "rolle": {
+            "type": "string",
+            "nullable": true
           }
         },
-        "required": ["occasion", "deadline", "school"]
+        "required": ["occasion", "deadline", "school", "rolle"]
       },
       "UserinfoResponse": {
         "type": "object",
