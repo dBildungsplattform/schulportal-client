@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { onBeforeMount, ref, watch, type Ref } from 'vue';
+  import { ref, watch, type Ref } from 'vue';
   import { useI18n } from 'vue-i18n';
   import type { BaseFieldProps } from 'vee-validate';
 
@@ -29,7 +29,9 @@
   }>();
 
   const localBefristung: Ref<string | undefined> = ref(props.befristung);
-  const selectedRadioButton: Ref<string> = ref(RadioButtonSelect.UNBEFRISTET);
+  const selectedRadioButton: Ref<string> = ref(
+    props.befristung ? RadioButtonSelect.BEFRISTET : RadioButtonSelect.UNBEFRISTET,
+  );
 
   const handleBefristungChange = (value: string | undefined): void => {
     localBefristung.value = value;
@@ -43,10 +45,6 @@
     } else if (newVal === RadioButtonSelect.BEFRISTET) {
       emit('handleSelectedRadioButtonChange', false);
     }
-  });
-
-  onBeforeMount(async () => {
-    localBefristung.value = '';
   });
 </script>
 

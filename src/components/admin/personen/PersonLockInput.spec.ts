@@ -44,6 +44,45 @@ describe('PersonLockInput', () => {
     const radioGroup: DOMWrapper<HTMLInputElement> = wrapper.find('[data-testid="befristung-radio-group"]');
     expect(radioGroup.isVisible()).toBe(true);
 
+    expect(befristetRadioButton.element.checked).toBe(true);
+    expect(unbefristetRadioButton.element.checked).toBe(false);
+
+    await unbefristetRadioButton.trigger('click');
+    await nextTick();
+
+    expect(befristetRadioButton.element.checked).toBe(false);
+    expect(unbefristetRadioButton.element.checked).toBe(true);
+
+    //TODO: DomWrapper empty, and watcher not called even though Radio-Buttons value changes -> Why?
+  });
+
+  it('handles no befristung and isUnbefristet = true', async () => {
+    wrapper = mount(PersonLockInput, {
+      props: {
+        befristungProps: {
+          error: false,
+          'error-messages': [],
+          onBlur: () => vi.fn(),
+          onChange: () => vi.fn(),
+          onInput: () => vi.fn(),
+        },
+        befristung: '',
+        isUnbefristet: true,
+      },
+      global: {
+        mocks: {
+          $t: (key: string) => key, // Mock translation function
+        },
+      },
+    });
+
+    const befristetRadioButton: DOMWrapper<HTMLInputElement> = wrapper.find(
+      '[data-testid="befristet-radio-button"] input[type="radio"]',
+    );
+    const unbefristetRadioButton: DOMWrapper<HTMLInputElement> = wrapper.find(
+      '[data-testid="unbefristet-radio-button"] input[type="radio"]',
+    );
+
     expect(befristetRadioButton.element.checked).toBe(false);
     expect(unbefristetRadioButton.element.checked).toBe(true);
 
