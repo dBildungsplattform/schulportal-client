@@ -558,6 +558,7 @@
   "nav": {
     "admin": "Schulportal-Administration",
     "backToDetails": "Zurück zur Gesamtübersicht",
+    "toDetails": "Zur Gesamtübersicht",
     "backToList": "Zurück zur Ergebnisliste",
     "back": "Zurück",
     "backToStart": "Zurück zur Startseite",

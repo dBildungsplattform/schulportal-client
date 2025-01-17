@@ -222,6 +222,16 @@ describe('PersonCreationView', () => {
     expect(wrapper?.find('[data-testid="person-success-text"]').isVisible()).toBe(true);
   });
 
+  test('it navigates to person details when clicking on btn in success template', async () => {
+    personenkontextStore.createdPersonWithKontext = mockCreatedPersonWithKontext;
+    await nextTick();
+    expect(wrapper?.find('[data-testid="to-details-button"]').isVisible()).toBe(true);
+    const push: MockInstance = vi.spyOn(router, 'push');
+    wrapper?.find('[data-testid="to-details-button"]').trigger('click');
+    await nextTick();
+    expect(push).toHaveBeenCalledWith({ name: 'person-details', params: { id: '1' } });
+  });
+
   test('shows error message if REQUIRED_STEP_UP_LEVEL_NOT_MET error is present and click close button', async () => {
     personenkontextStore.errorCode = 'REQUIRED_STEP_UP_LEVEL_NOT_MET';
     await nextTick();
