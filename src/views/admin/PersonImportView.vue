@@ -20,10 +20,9 @@
   import { useI18n, type Composer } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
   import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
-  import { ImportDataItemStatus, type ImportStore, useImportStore } from '@/stores/ImportStore';
+  import { ImportDataItemStatus, type ImportedUserResponse, type ImportResultResponse, type ImportStore, useImportStore } from '@/stores/ImportStore';
   import { RollenArt } from '@/stores/RolleStore';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
-  import type { ImportedUserResponse, ImportResultResponse } from '@/api-client/generated';
 
   const organisationStore: OrganisationStore = useOrganisationStore();
   const importStore: ImportStore = useImportStore();

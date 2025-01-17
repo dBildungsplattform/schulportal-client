@@ -4,6 +4,7 @@ import {
   ImportApiFactory,
   ImportStatus,
   type ImportApiInterface,
+  type ImportedUserResponse,
   type ImportResultResponse,
   type ImportUploadResponse,
   type ImportVorgangStatusResponse,
@@ -20,6 +21,8 @@ export enum ImportDataItemStatus {
   SUCCESS = 'SUCCESS',
   PENDING = 'PENDING',
 }
+
+export type { ImportResultResponse, ImportedUserResponse};
 
 export type ImportState = {
   errorCode: string | null;
