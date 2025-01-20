@@ -52,8 +52,7 @@
     object({
       selectedSchule: string().required(t('admin.import.rules.schule.required')),
       selectedRolle: string().required(t('admin.import.rules.rolle.required')),
-      selectedFiles: mixed()
-        .required(t('admin.import.rules.files.required'))
+      selectedFiles: mixed().required(t('admin.import.rules.files.required')),
     }),
   );
 

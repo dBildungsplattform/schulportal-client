@@ -1,4 +1,4 @@
-import { expect, test } from 'vitest';
+import { expect, test, type Mock } from 'vitest';
 import { DOMWrapper, flushPromises, mount, VueWrapper } from '@vue/test-utils';
 import PersonImportView from './PersonImportView.vue';
 import { nextTick } from 'vue';
@@ -132,7 +132,7 @@ describe('PersonImportView', () => {
 
     await wrapper?.find('[data-testid="person-import-form-submit-button"]').trigger('click');
     // wait for transition to happen
-    await vi.waitUntil(() => (wrapper?.find('#schule-select-messages')?.text().length ?? 0) > 0);
+    await vi.waitUntil(() => (wrapper?.find('#schule-select-messages').text().length ?? 0) > 0);
 
     expect(wrapper?.find('#schule-select-messages').text()).toContain('Eine Schule muss ausgewählt werden.');
     expect(wrapper?.find('#rolle-select-messages').text()).toContain('Eine Rolle muss ausgewählt werden.');
@@ -333,8 +333,8 @@ describe('PersonImportView', () => {
     expect(fileInput?.text()).toBe('');
   });
 
-  test.each([['utf-8']])('it reads files with %s encoding', async (encoding: string) => {
-    const totalImportDataItems = 1234;
+  test.each([['utf-8']])('it reads files with %s encoding', async (_encoding: string) => {
+    const totalImportDataItems: number = 1234;
     const schuleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
     const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
     const fileInput: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="file-input"] input');
@@ -346,7 +346,7 @@ describe('PersonImportView', () => {
     });
     await fileInput?.trigger('change');
     await nextTick();
-    const mockFunction = vi.fn(async () => {
+    const mockFunction: Mock = vi.fn(async () => {
       importStore.importedData = null;
       importStore.uploadIsLoading = false;
       importStore.importIsLoading = false;
