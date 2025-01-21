@@ -63,7 +63,7 @@ export const useImportStore: StoreDefinition<'importStore', ImportState, ImportG
       uploadResponse: null,
       importStatus: null,
       importProgress: 0,
-      importedUsersPerPage: 400,
+      importedUsersPerPage: 300,
       importedUsersPage: 1,
     };
   },
