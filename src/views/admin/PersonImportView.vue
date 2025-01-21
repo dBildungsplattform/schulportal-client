@@ -435,7 +435,7 @@
             <v-col cols="12">
               <v-progress-linear
                 data-testid="import-progress-bar"
-                :model-value="importStore.importProgress"
+                :modelValue="importStore.importProgress"
                 color="primary"
                 height="25"
                 striped

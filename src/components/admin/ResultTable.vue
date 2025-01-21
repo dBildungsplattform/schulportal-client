@@ -4,10 +4,12 @@
    */
   import { SortOrder } from '@/stores/PersonStore';
   import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
-  import { onMounted, onUnmounted } from 'vue';
+  import { onMounted, onUnmounted, ref, type Ref } from 'vue';
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
 
   const searchFilterStore: SearchFilterStore = useSearchFilterStore();
+
+  const selectedItems: Ref<TableItem[]> = ref<TableItem[]>([]);
 
   type ReadonlyHeaders = InstanceType<typeof VDataTableServer>['headers'];
 
@@ -18,7 +20,8 @@
   type DeepMutable<T> = { -readonly [P in keyof T]: DeepMutable<T[P]> };
   type Headers = DeepMutable<ReadonlyDataTableHeader>;
 
-  export type TableItem = Record<string, unknown>;
+  export type TableItem = Record<string, unknown> & { id?: string };
+
   export type TableRow<T> = {
     item: T;
   };
@@ -42,6 +45,7 @@
     (event: 'onTableUpdate', options: { sortField: string | undefined; sortOrder: 'asc' | 'desc' }): void;
     (event: 'onItemsPerPageUpdate', limit: number): void;
     (event: 'onPageUpdate', page: number): void;
+    (event: 'update:selectedRows', selectedRows: TableItem[]): void;
   };
 
   const emit: Emits = defineEmits<Emits>();
@@ -113,6 +117,12 @@
     }
   }
 
+  // Emits an event with the selected Rows. (Could emit the ID here but its better to emit the whole row in case we need this method for other features)
+  function emitSelectedRows(): void {
+    const selectedRows: TableItem[] = selectedItems.value;
+    emit('update:selectedRows', selectedRows);
+  }
+
   // On Mount we emit an event to the parent to sort the table by first column and ASC.
   onMounted(() => {
     // If the sortField in the store has a value then we don't trigger this logic. This logic should only be triggered when the table was first opened without any changes to sorting.
@@ -154,9 +164,11 @@
     :showCurrentPage="true"
     show-select
     :sort-by="currentSort ? [currentSort] : []"
+    v-model="selectedItems"
     @update:options="onUpdateOptions"
     @update:page="(page: number) => $emit('onPageUpdate', page)"
     @update:itemsPerPage="(limit: number) => $emit('onItemsPerPageUpdate', limit)"
+    @update:modelValue="emitSelectedRows"
     :no-data-text="$t('noDataFound')"
   >
     <template

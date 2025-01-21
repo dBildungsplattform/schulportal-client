@@ -9,7 +9,9 @@
   import { object, string } from 'yup';
   import PersonenkontextCreate from '@/components/admin/personen/PersonenkontextCreate.vue';
   import type { TranslatedRolleWithAttrs } from '@/composables/useRollen';
-  import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
+  import { usePersonenkontextStore, type PersonenkontextStore, type Zuordnung } from '@/stores/PersonenkontextStore';
+  import { OrganisationsTyp, type Organisation } from '@/stores/OrganisationStore';
+  import type { RollenArt, RollenMerkmal } from '@/stores/RolleStore';
 
   const { t }: Composer = useI18n({ useScope: 'global' });
 
@@ -19,16 +21,22 @@
 
   const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
 
+  const progress: Ref<number> = ref<number>(0);
+
+  const successMessage: Ref<string> = ref<string>('');
+
   type Props = {
     errorCode: string;
     organisationen: TranslatedObject[] | undefined;
     rollen: TranslatedRolleWithAttrs[] | undefined;
     isLoading: boolean;
     isDialogVisible: boolean;
+    personIDs: string[];
   };
 
   type Emits = {
     (event: 'update:isDialogVisible', isDialogVisible: boolean): void;
+    (event: 'update:getUebersichte'): void;
   };
 
   const props: Props = defineProps<Props>();
@@ -91,6 +99,55 @@
       selectedRolle.value = undefined;
     }
   }
+
+  // Creates a new Personenkontext for an array of Person IDs. For each processed ID the progress bar will increment according to the total number of items to process
+  async function handleModifyRolle(personIDs: string[]): Promise<void> {
+    const organisation: Organisation | undefined = personenkontextStore.workflowStepResponse?.organisations.find(
+      (orga: Organisation) => orga.id === selectedOrganisation.value,
+    );
+
+    if (organisation) {
+      const baseZuordnung: Zuordnung = {
+        sskId: organisation.id,
+        rolleId: selectedRolle.value ?? '',
+        klasse: undefined,
+        sskDstNr: organisation.kennung ?? '',
+        sskName: organisation.name,
+        rolle:
+          props.rollen?.find((rolle: TranslatedRolleWithAttrs) => rolle.value === selectedRolle.value)?.title || '',
+        rollenArt: props.rollen?.find((rolle: TranslatedRolleWithAttrs) => rolle.value === selectedRolle.value)
+          ?.rollenart as RollenArt,
+        administriertVon: organisation.administriertVon ?? '',
+        editable: true,
+        merkmale: [] as unknown as RollenMerkmal,
+        typ: OrganisationsTyp.Schule,
+        befristung: undefined,
+      };
+
+      successMessage.value = '';
+      progress.value = 0; // Reset progress bar to 0 at the start
+
+      for (let i: number = 0; i < personIDs.length; i++) {
+        const personId: string = personIDs[i] as string;
+
+        const newZuordnung: Zuordnung = { ...baseZuordnung };
+
+        // Await the processing of each ID
+        await personenkontextStore.updatePersonenkontexte([newZuordnung], personId);
+
+        // Update progress for each item processed
+        progress.value = Math.ceil(((i + 1) / personIDs.length) * 100);
+
+        // Only show success message after all items have been processed
+        if (i === personIDs.length - 1) {
+          successMessage.value = t('admin.rolle.rollenAssignedSuccessfully');
+        }
+      }
+    }
+
+    // Send an event to PersonManagement to fetch the updated Uebersichte (otherwise we will receive a version error from the backend)
+    emit('update:getUebersichte');
+  }
 </script>
 
 <template>
@@ -104,9 +161,12 @@
       @onCloseClicked="closeModifyRolleDeleteDialog()"
     >
       <v-container>
+        <!-- Form Component -->
         <PersonenkontextCreate
+          v-if="progress < 100"
           ref="personenkontext-create"
           :showHeadline="false"
+          :isModifyRolleDialog="showModifyRolleDialog"
           :organisationen="organisationen"
           :rollen="rollen"
           :selectedOrganisationProps="selectedOrganisationProps"
@@ -118,9 +178,45 @@
           @update:canCommit="canCommit = $event"
           @fieldReset="handleFieldReset"
         />
+
+        <!-- Progress Bar -->
+        <div
+          v-if="progress > 0"
+          class="mt-4"
+        >
+          <v-row justify="center">
+            <v-col cols="auto">
+              <v-icon
+                small
+                color="#1EAE9C"
+                icon="mdi-check-circle"
+              ></v-icon>
+            </v-col>
+          </v-row>
+          <p
+            v-if="successMessage"
+            class="mt-2 text-center"
+          >
+            {{ successMessage }}
+          </p>
+          <v-progress-linear
+            class="mt-5"
+            :modelValue="progress"
+            color="primary"
+            height="25"
+          >
+            <template v-slot:default="{ value }">
+              <strong class="text-white">{{ Math.ceil(value) }}%</strong>
+            </template>
+          </v-progress-linear>
+        </div>
       </v-container>
+
       <v-card-actions class="justify-center">
-        <v-row class="py-3 px-2 justify-center">
+        <v-row
+          v-if="progress < 100"
+          class="py-3 px-2 justify-center"
+        >
           <v-spacer class="hidden-sm-and-down"></v-spacer>
           <v-col
             cols="12"
@@ -132,8 +228,9 @@
               class="secondary"
               @Click="closeModifyRolleDeleteDialog"
               data-testid="rolle-modify-discard-button"
-              >{{ $t('cancel') }}</v-btn
             >
+              {{ $t('cancel') }}
+            </v-btn>
           </v-col>
           <v-col
             cols="12"
@@ -144,10 +241,31 @@
               :block="mdAndDown"
               :disabled="!canCommit || personenkontextStore.loading"
               class="primary"
+              @click="handleModifyRolle(props.personIDs)"
               data-testid="rolle-modify-submit-button"
               type="submit"
-              >{{ $t('person.addZuordnung') }}</v-btn
             >
+              {{ $t('person.addZuordnung') }}
+            </v-btn>
+          </v-col>
+        </v-row>
+        <v-row
+          v-if="progress === 100"
+          class="py-3 px-2 justify-center"
+        >
+          <v-col
+            cols="12"
+            sm="6"
+            md="auto"
+          >
+            <v-btn
+              :block="mdAndDown"
+              class="primary"
+              @Click="closeModifyRolleDeleteDialog"
+              data-testid="rolle-modify-close-button"
+            >
+              {{ $t('close') }}
+            </v-btn>
           </v-col>
         </v-row>
       </v-card-actions>

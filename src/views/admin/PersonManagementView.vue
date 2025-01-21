@@ -14,7 +14,7 @@
   import { useRolleStore, type RolleStore, type RolleResponse, RollenArt } from '@/stores/RolleStore';
   import { type SearchFilterStore, useSearchFilterStore } from '@/stores/SearchFilterStore';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import ResultTable, { type TableRow } from '@/components/admin/ResultTable.vue';
+  import ResultTable, { type TableItem, type TableRow } from '@/components/admin/ResultTable.vue';
   import SearchField from '@/components/admin/SearchField.vue';
   import { type TranslatedObject } from '@/types.d';
   import { useOrganisationen } from '@/composables/useOrganisationen';
@@ -33,6 +33,8 @@
 
   let timerId: ReturnType<typeof setTimeout>;
   const hasAutoSelectedOrganisation: Ref<boolean> = ref(false);
+
+  const selectedPersonIds: Ref<string[]> = ref<string[]>([]);
 
   type ReadonlyHeaders = InstanceType<typeof VDataTableServer>['headers'];
   const headers: ReadonlyHeaders = [
@@ -420,6 +422,11 @@
     selectedOption.value = null;
   };
 
+  function handleSelectedRows(selectedItems: TableItem[]): void {
+    // Directly assign the selected IDs to selectedPersonIds since the emitted tableItems are always IDs of the specific rows
+    selectedPersonIds.value = selectedItems as unknown as string[];
+  }
+
   onMounted(async () => {
     personenkontextStore.processWorkflowStep({
       limit: 25,
@@ -695,6 +702,7 @@
             clearable
             data-testid="benutzer-edit-select"
             density="compact"
+            :disabled="selectedPersonIds.length === 0"
             id="benutzer-edit-select"
             :items="actions"
             item-value="value"
@@ -714,7 +722,9 @@
             :isLoading="personenkontextStore.loading"
             :isDialogVisible="rolleModifiyDialogVisible"
             :errorCode="personenkontextStore.errorCode"
+            :personIDs="selectedPersonIds"
             @update:isDialogVisible="handleDialog($event)"
+            @update:getUebersichte="getPaginatedPersonen(searchFilterStore.personenPage)"
           >
           </RolleModify>
         </v-col>
@@ -741,6 +751,7 @@
         @onItemsPerPageUpdate="getPaginatedPersonenWithLimit"
         @onPageUpdate="getPaginatedPersonen"
         @onTableUpdate="handleTableSorting"
+        @update:selectedRows="handleSelectedRows"
         :totalItems="personStore.totalPersons"
         item-value-path="person.id"
         ><template v-slot:[`item.rollen`]="{ item }">

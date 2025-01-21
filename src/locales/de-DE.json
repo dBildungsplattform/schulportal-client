@@ -407,6 +407,7 @@
       "rollenSelected": "{count} Rollen ausgewählt",
       "rolleAddedSuccessfully": "Die Rolle wurde erfolgreich hinzugefügt.",
       "rolleUpdatedSuccessfully": "Die Rolle wurde erfolgreich geändert.",
+      "rollenAssignedSuccessfully": "Die Rollen wurden erfolgreich zugeordnet.",
       "rules": {
         "rolle": {
           "required": "Die Rolle muss ausgewählt werden."
