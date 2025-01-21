@@ -74,6 +74,7 @@
   import type { TranslatedObject } from '@/types';
   import { DIN_91379A, NO_LEADING_TRAILING_SPACES } from '@/utils/validation';
   import { useConfigStore, type ConfigStore } from '@/stores/ConfigStore';
+  import { isKopersRolle } from '@/utils/validationPersonenkontext';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
@@ -497,14 +498,6 @@
       (r: TranslatedRolleWithAttrs) => r.value === selectedRolleId,
     );
     return !!rolle && rolle.rollenart === RollenArt.Lern;
-  }
-
-  // Used for the form
-  function isKopersRolle(selectedRolleId: string | undefined): boolean {
-    const rolle: TranslatedRolleWithAttrs | undefined = rollen.value?.find(
-      (r: TranslatedRolleWithAttrs) => r.value === selectedRolleId,
-    );
-    return !!rolle && !!rolle.merkmale && rolle.merkmale.has(RollenMerkmal.KopersPflicht);
   }
 
   const hasKopersNummer: ComputedRef<boolean> = computed(() => {

@@ -105,6 +105,51 @@ describe('RolleCreationView', () => {
     expect(push).toHaveBeenCalledTimes(1);
   });
 
+  test('it fills form and triggers dirty warning', async () => {
+    const orgSelect: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'rolle-creation-form' })
+      .findComponent({ ref: 'administrationsebene-select' });
+    await orgSelect?.setValue('1');
+    await nextTick();
+
+    const rollenartSelect: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'rolle-creation-form' })
+      .findComponent({ ref: 'rollenart-select' });
+    rollenartSelect?.setValue('LERN');
+    await nextTick();
+
+    const rollennameInput: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'rolle-creation-form' })
+      .findComponent({ ref: 'rollenname-input' });
+
+    expect(rollennameInput?.exists()).toBe(true);
+    await rollennameInput?.find('input').setValue('NewRolle');
+    await nextTick();
+
+    const merkmaleSelect: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'rolle-creation-form' })
+      .findComponent({ ref: 'merkmale-select' });
+    merkmaleSelect?.setValue(['1']);
+    await nextTick();
+
+    const providerSelect: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'rolle-creation-form' })
+      .findComponent({ ref: 'service-provider-select' });
+    providerSelect?.setValue(['1']);
+    await nextTick();
+
+    const systemrechteSelect: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'rolle-creation-form' })
+      .findComponent({ ref: 'systemrechte-select' });
+    systemrechteSelect?.setValue(['1']);
+    await nextTick();
+
+    wrapper?.find('[data-testid="close-layout-card-button"]').trigger('click');
+    await nextTick();
+
+    await document.querySelector('[data-testid="confirm-unsaved-changes-button"]');
+  });
+
   test('it fills form and triggers submit', async () => {
     const orgSelect: VueWrapper | undefined = wrapper
       ?.findComponent({ ref: 'rolle-creation-form' })

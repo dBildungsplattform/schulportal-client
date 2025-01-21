@@ -85,6 +85,7 @@
         variant="outlined"
         placeholder="TT.MM.JJJJ"
         color="primary"
+        ref="befristung-input"
         @update:modelValue="handleBefristungChange"
       ></v-text-field>
     </FormRow>

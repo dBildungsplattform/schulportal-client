@@ -46,7 +46,7 @@ export type PersonenkontextFieldDefinitions = {
 type Schema = StringSchema<string | undefined, AnyObject, undefined, ''>;
 
 // Used for the form
-function isKopersRolle(selectedRolleId: string | undefined): boolean {
+export function isKopersRolle(selectedRolleId: string | undefined): boolean {
   const rolle: TranslatedRolleWithAttrs | undefined = rollen.value?.find(
     (r: TranslatedRolleWithAttrs) => r.value === selectedRolleId,
   );

@@ -194,6 +194,13 @@ describe('PersonCreationView', () => {
     await rolleSelect?.setValue('1');
     await nextTick();
 
+    const befristungInput: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'personenkontext-create' })
+      .findComponent({ ref: 'befristung' })
+      .findComponent({ ref: 'befristung-input' });
+    await befristungInput?.setValue('12.08.2099');
+    await nextTick();
+
     const vornameInput: VueWrapper | undefined = wrapper?.findComponent({ ref: 'vorname-input' });
     await vornameInput?.setValue('Randy');
     await nextTick();

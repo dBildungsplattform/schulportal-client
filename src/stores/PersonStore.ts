@@ -23,7 +23,7 @@ import {
 } from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
 import { type DbiamPersonenkontextBodyParams, type Zuordnung } from './PersonenkontextStore';
-import { formatDateDiggitsToGermanDate } from '@/utils/date';
+import { formatDateDigitsToGermanDate } from '@/utils/date';
 
 const personenApi: PersonenApiInterface = PersonenApiFactory(undefined, '', axiosApiInstance);
 const personenFrontendApi: PersonenFrontendApiInterface = PersonenFrontendApiFactory(undefined, '', axiosApiInstance);
@@ -139,7 +139,7 @@ export function parseUserLock(unparsedArray: object[]): UserLock[] {
       }
       if (LockKeys.CreatedAt in unparsed) {
         result.created_at = '' + unparsed[LockKeys.CreatedAt];
-        result.created_at = formatDateDiggitsToGermanDate(new Date(result.created_at));
+        result.created_at = formatDateDigitsToGermanDate(new Date(result.created_at));
       }
       if (LockKeys.LockedUntil in unparsed) {
         result.locked_until = '' + unparsed[LockKeys.LockedUntil];
@@ -150,7 +150,7 @@ export function parseUserLock(unparsedArray: object[]): UserLock[] {
         if (utcDate.getTimezoneOffset() >= -120) {
           utcDate.setDate(utcDate.getDate() - 1);
         }
-        result.locked_until = formatDateDiggitsToGermanDate(utcDate);
+        result.locked_until = formatDateDigitsToGermanDate(utcDate);
       }
       result.lock_occasion = '' + unparsed[LockKeys.LockOccasion];
     } else if (

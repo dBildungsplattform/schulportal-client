@@ -401,6 +401,7 @@
         :nextSchuljahresende="befristungInputProps.nextSchuljahresende"
         :befristung="befristungInputProps.befristung"
         :befristungOption="befristungInputProps.befristungOption"
+        ref="befristung"
         @update:befristung="handleBefristungChange"
         @update:calculatedBefristungOption="handleCalculatedBefristungOptionChange"
       />

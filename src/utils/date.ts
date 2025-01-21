@@ -47,7 +47,7 @@ export function formatDateToISO(date: string | undefined): string | undefined {
  * @param {Date} dateString
  * @returns {string} The translated string followed by the formatted date in German format (dd.MM.yyyy).
  */
-export function formatDateDiggitsToGermanDate(date: Date): string {
+export function formatDateDigitsToGermanDate(date: Date): string {
   return new Intl.DateTimeFormat('de-DE', {
     year: 'numeric',
     month: '2-digit',
@@ -69,7 +69,7 @@ export function formatDate(dateString: string | undefined, t: (key: string) => s
   date.setDate(date.getDate() - 1);
 
   // Return the translated string followed by the formatted date
-  return `${t('admin.befristung.limitedUntil')} ${formatDateDiggitsToGermanDate(date)}`;
+  return `${t('admin.befristung.limitedUntil')} ${formatDateDigitsToGermanDate(date)}`;
 }
 
 /**

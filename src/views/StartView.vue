@@ -18,7 +18,7 @@
   import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
   import type { DBiamPersonenzuordnungResponse, PersonTimeLimitInfoResponse } from '@/api-client/generated';
   import { RollenMerkmal } from '@/stores/RolleStore';
-  import { formatDateDiggitsToGermanDate } from '@/utils/date';
+  import { formatDateDigitsToGermanDate } from '@/utils/date';
 
   const { t }: { t: Function } = useI18n();
 
@@ -90,7 +90,7 @@
         const kopersDeadlineDate: Date = new Date(kopersDeadline);
         alerts.push({
           id: lockInfo.occasion,
-          message: t('banner.kopers', { date: formatDateDiggitsToGermanDate(kopersDeadlineDate) }),
+          message: t('banner.kopers', { date: formatDateDigitsToGermanDate(kopersDeadlineDate) }),
           visible: true,
           type: getUrgencyType(kopersDeadlineDate),
         });
