@@ -540,7 +540,7 @@
                 <v-col class="d-flex justify-center">
                   <v-btn
                     class="primary"
-                    data-testid="open-change-password-dialog"
+                    data-testid="open-change-password-dialog-button"
                     :block="xs"
                     @click="openChangePasswordDialog()"
                   >

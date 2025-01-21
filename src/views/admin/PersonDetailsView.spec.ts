@@ -584,8 +584,27 @@ describe('PersonDetailsView', () => {
 
   test('it shows device password template for rollenart lehr', async () => {
     personStore.personenuebersicht = mockPersonenuebersichtLehr;
+    setCurrentPerson(EmailAddressStatus.Enabled);
     await nextTick();
-    expect(wrapper?.find('[data-testid="device-password-info"]').isVisible()).toBe(true);
+    if (!wrapper) return;
+
+    expect(wrapper.find('[data-testid="device-password-info"]').isVisible()).toBe(true);
+
+    const devicePasswordChangeButton: DOMWrapper<Element> = wrapper
+      .findComponent({ ref: 'device-password-reset' })
+      .find('[data-testid="open-device-password-dialog-button"]');
+    devicePasswordChangeButton.trigger('click');
+    await nextTick();
+
+    expect(document.querySelector('[data-testid="password-reset-info-text"]')).not.toBeNull();
+
+    const resetPasswordButton: HTMLElement = (await document.querySelector(
+      '[data-testid="password-reset-button"]',
+    )) as HTMLElement;
+
+    expect(resetPasswordButton).not.toBeNull();
+    resetPasswordButton.click();
+    await nextTick();
 
     // reset personenuebersicht
     personStore.personenuebersicht = mockPersonenuebersicht;

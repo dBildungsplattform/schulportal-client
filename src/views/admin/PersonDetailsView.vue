@@ -1667,6 +1667,7 @@
                   @onClearPassword="password = ''"
                   @onResetPassword="resetPassword(currentPersonId)"
                   :password="password"
+                  ref="password-reset"
                   :testId="'password-reset'"
                 >
                 </PasswordReset>
@@ -2587,6 +2588,7 @@
                   @onClearPassword="password = ''"
                   @onResetPassword="resetDevicePassword(currentPersonId)"
                   :password="devicePassword"
+                  ref="device-password-reset"
                   :testId="'device-password'"
                 >
                 </PasswordReset>
