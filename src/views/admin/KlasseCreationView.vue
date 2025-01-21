@@ -1,32 +1,30 @@
 <script setup lang="ts">
-  import { ref, type ComputedRef, type Ref, computed, onMounted, onUnmounted } from 'vue';
-  import {
-    type Router,
-    useRouter,
-    onBeforeRouteLeave,
-    type RouteLocationNormalized,
-    type NavigationGuardNext,
-  } from 'vue-router';
-  import { type Composer, useI18n } from 'vue-i18n';
-  import { useForm, type TypedSchema, type BaseFieldProps } from 'vee-validate';
-  import {
-    useOrganisationStore,
-    type OrganisationStore,
-    OrganisationsTyp,
-    type Organisation,
-  } from '@/stores/OrganisationStore';
-  import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import SpshAlert from '@/components/alert/SpshAlert.vue';
-  import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
-  import { type TranslatedObject } from '@/types.d';
-  import KlasseForm from '@/components/form/KlasseForm.vue';
   import SuccessTemplate from '@/components/admin/klassen/SuccessTemplate.vue';
+  import SpshAlert from '@/components/alert/SpshAlert.vue';
+  import LayoutCard from '@/components/cards/LayoutCard.vue';
+  import KlasseForm from '@/components/form/KlasseForm.vue';
+  import {
+    OrganisationsTyp,
+    useOrganisationStore,
+    type Organisation,
+    type OrganisationStore,
+  } from '@/stores/OrganisationStore';
+  import { type TranslatedObject } from '@/types.d';
   import { getValidationSchema, getVuetifyConfig } from '@/utils/validationKlasse';
+  import { useForm, type BaseFieldProps, type TypedSchema } from 'vee-validate';
+  import { computed, onMounted, onUnmounted, ref, type ComputedRef, type Ref } from 'vue';
+  import { useI18n, type Composer } from 'vue-i18n';
+  import {
+    onBeforeRouteLeave,
+    useRouter,
+    type NavigationGuardNext,
+    type RouteLocationNormalized,
+    type Router,
+  } from 'vue-router';
 
   const { t }: Composer = useI18n({ useScope: 'global' });
   const router: Router = useRouter();
   const organisationStore: OrganisationStore = useOrganisationStore();
-  const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
 
   const hasAutoselectedSchule: Ref<boolean> = ref(false);
 
@@ -56,9 +54,8 @@
   ] = defineField('selectedKlassenname', vuetifyConfig);
 
   const schulen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
-    return personenkontextStore.workflowStepResponse?.organisations
+    return organisationStore.allSchulen
       .slice(0, 25)
-      .filter((org: Organisation) => org.typ === OrganisationsTyp.Schule)
       .map((org: Organisation) => ({
         value: org.id,
         title: org.kennung ? `${org.kennung} (${org.name.trim()})` : org.name,
@@ -99,8 +96,7 @@
   const handleCreateAnotherKlasse = async (): Promise<void> => {
     resetForm();
     organisationStore.createdKlasse = null;
-    personenkontextStore.workflowStepResponse = null;
-    await personenkontextStore.processWorkflowStep({ limit: 25 });
+    await organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Schule, limit: 25 });
     router.push({ name: 'create-klasse' });
   };
 
@@ -148,7 +144,7 @@
   });
 
   onMounted(async () => {
-    await personenkontextStore.processWorkflowStep({ limit: 25 });
+    await organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Schule, limit: 25 });
     organisationStore.createdKlasse = null;
     organisationStore.errorCode = '';
     /* listen for browser changes and prevent them when form is dirty */
@@ -156,7 +152,6 @@
   });
 
   onUnmounted(() => {
-    personenkontextStore.workflowStepResponse = null;
     window.removeEventListener('beforeunload', preventNavigation);
   });
 </script>
