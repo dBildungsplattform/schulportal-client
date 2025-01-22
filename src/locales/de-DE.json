@@ -379,7 +379,8 @@
           "KLASSEN_VERWALTEN": "Darf Klassen verwalten",
           "SCHULTRAEGER_VERWALTEN": "Darf Schulträger verwalten",
           "PERSON_SYNCHRONISIEREN": "Darf Benutzer synchronisieren",
-          "PERSONEN_ANLEGEN": "Darf Benutzer anlegen"
+          "PERSONEN_ANLEGEN": "Darf Benutzer anlegen",
+          "BULK_VERWALTEN": "Darf Benutzer mehrfach bearbeiten"
         },
         "rollenarten": {
           "LERN": "Lern",

@@ -11,7 +11,7 @@
   } from '@/stores/OrganisationStore';
   import { SortField, SortOrder, usePersonStore, type PersonStore, type Personendatensatz } from '@/stores/PersonStore';
   import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
-  import { useRolleStore, type RolleStore, type RolleResponse, RollenArt } from '@/stores/RolleStore';
+  import { useRolleStore, type RolleStore, type RolleResponse, RollenArt, RollenMerkmal } from '@/stores/RolleStore';
   import { type SearchFilterStore, useSearchFilterStore } from '@/stores/SearchFilterStore';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import ResultTable, { type TableItem, type TableRow } from '@/components/admin/ResultTable.vue';
@@ -20,6 +20,7 @@
   import { useOrganisationen } from '@/composables/useOrganisationen';
   import { type TranslatedRolleWithAttrs, useRollen } from '@/composables/useRollen';
   import RolleModify from '@/components/admin/rollen/RolleModify.vue';
+import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
 
   const searchFieldComponent: Ref = ref();
 
@@ -66,6 +67,8 @@
 
   const rolleModifiyDialogVisible: Ref<boolean> = ref(false);
   const selectedOption: Ref<string | null> = ref(null);
+
+  const authStore: AuthStore = useAuthStore();
 
   type ActionTypes = {
     [key: string]: string;
@@ -119,8 +122,12 @@
 
   const rollenForOption: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = useRollen();
 
+  // Only Rollen from type LEHR and without any Befristungspflicht wil be offered for now
   const lehrRollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = computed(() => {
-    return rollenForOption.value?.filter((rolle: TranslatedRolleWithAttrs) => rolle.rollenart === RollenArt.Lehr);
+    return rollenForOption.value?.filter(
+      (rolle: TranslatedRolleWithAttrs) =>
+        rolle.rollenart === RollenArt.Lehr && !rolle.merkmale?.has(RollenMerkmal.BefristungPflicht),
+    );
   });
 
   const statuses: Array<string> = ['Aktiv', 'Inaktiv'];
@@ -699,6 +706,7 @@
           cols="12"
         >
           <v-select
+            v-if="authStore.hasPersonenBulkPermission"
             clearable
             data-testid="benutzer-edit-select"
             density="compact"

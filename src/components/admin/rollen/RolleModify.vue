@@ -132,7 +132,7 @@
 
       for (let i: number = 0; i < personIDs.length; i++) {
         const personId: string = personIDs[i] as string;
-  
+
         const newZuordnung: Zuordnung = { ...baseZuordnung };
 
         // Fetch the Zuordnungen for this specific user (To send alongside the new one)
@@ -159,6 +159,11 @@
 
     // Send an event to PersonManagement to fetch the updated Uebersichte (otherwise we will receive a version error from the backend)
     emit('update:getUebersichte');
+
+    // If the Admin assigns a person a false Rolle like Schuladmin a Lehrkraft Rolle we want to ignore the error
+    if (personenkontextStore.errorCode === 'INVALID_PERSONENKONTEXT_FOR_PERSON_WITH_ROLLENART_LERN') {
+      personenkontextStore.errorCode = '';
+    }
   }
 </script>
 
@@ -211,6 +216,23 @@
           >
             {{ successMessage }}
           </p>
+          <v-row
+            v-if="progress < 100"
+            align="center"
+            justify="center"
+          >
+            <v-col cols="auto">
+              <v-icon
+                aria-hidden="true"
+                class="mr-2"
+                icon="mdi-alert-circle-outline"
+                size="small"
+              ></v-icon>
+              <span class="subtitle-2">
+                {{ $t('admin.import.doNotCloseNotice') }}
+              </span>
+            </v-col>
+          </v-row>
           <v-progress-linear
             class="mt-5"
             :modelValue="progress"
