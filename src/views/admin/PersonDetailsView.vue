@@ -53,7 +53,7 @@
     useBefristungUtils,
     type BefristungUtilsType,
   } from '@/utils/befristung';
-  import { formatDate, formatDateDiggitsToGermanDate, formatDateToISO, getNextSchuljahresende } from '@/utils/date';
+  import { adjustDateForTimezoneAndFormat, formatDate, formatDateToISO, getNextSchuljahresende } from '@/utils/date';
   import {
     getBefristungSchema,
     getDirtyState,
@@ -722,7 +722,6 @@
   const {
     handleBefristungUpdate: handleChangeBefristungUpdate,
     handleBefristungOptionUpdate: handleChangeBefristungOptionUpdate,
-    setupWatchers: setupChangeBefristungWatchers,
   }: BefristungUtilsType = useBefristungUtils({
     formContext: changeBefristungFormContext,
     selectedBefristung: selectedChangeBefristung,
@@ -802,9 +801,7 @@
       selectedChangeBefristungOption.value = BefristungOption.UNBEFRISTET;
       return;
     }
-    const date: Date = new Date(selectedZuordnungen.value[0]?.befristung);
-    date.setDate(date.getDate() - 1);
-    const formatted: string = formatDateDiggitsToGermanDate(date);
+    const formatted: string = adjustDateForTimezoneAndFormat(selectedZuordnungen.value[0]?.befristung);
     const nextSchuljahresende: string = getNextSchuljahresende();
     if (formatted == nextSchuljahresende) {
       selectedChangeBefristungOption.value = BefristungOption.SCHULJAHRESENDE;
@@ -1008,8 +1005,7 @@
       const oldBefristung: string | undefined = selectedZuordnungen.value[0]?.befristung;
       let oldBefristungdFormatted: string;
       if (oldBefristung) {
-        const oldBefristungDate: Date = new Date(oldBefristung);
-        oldBefristungdFormatted = formatDateDiggitsToGermanDate(oldBefristungDate);
+        oldBefristungdFormatted = adjustDateForTimezoneAndFormat(oldBefristung);
       }
       changeBefristungConfirmationDialogMessage.value = t('person.changeBefristungConfirmation', {
         oldBefristung: oldBefristung ? oldBefristungdFormatted! : t('admin.befristung.unlimited'),
@@ -1360,7 +1356,6 @@
   });
 
   setupWatchers();
-  setupChangeBefristungWatchers();
 
   watch(hasNoKopersNr, async (newValue: boolean | undefined) => {
     if (newValue) {
