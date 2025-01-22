@@ -20,7 +20,7 @@
   type DeepMutable<T> = { -readonly [P in keyof T]: DeepMutable<T[P]> };
   type Headers = DeepMutable<ReadonlyDataTableHeader>;
 
-  export type TableItem = Record<string, unknown> & { id?: string };
+  export type TableItem = Record<string, unknown>;
 
   export type TableRow<T> = {
     item: T;

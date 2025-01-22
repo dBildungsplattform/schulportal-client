@@ -20,7 +20,7 @@
   import { useOrganisationen } from '@/composables/useOrganisationen';
   import { type TranslatedRolleWithAttrs, useRollen } from '@/composables/useRollen';
   import RolleModify from '@/components/admin/rollen/RolleModify.vue';
-import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
+  import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
 
   const searchFieldComponent: Ref = ref();
 
@@ -70,18 +70,19 @@ import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
 
   const authStore: AuthStore = useAuthStore();
 
-  type ActionTypes = {
-    [key: string]: string;
+  // Define an enum for action types (Other pairs will be added here for each new bulk feature)
+  enum ActionTypes {
+    MODIFY_ROLLE = 'MODIFY_ROLLE',
+  }
+
+  // Define i18n values for action types to act as a title/value in the v-select
+  const actionTypeTitles: Record<ActionTypes, string> = {
+    [ActionTypes.MODIFY_ROLLE]: t('admin.rolle.edit'),
   };
 
-  // Define action types with i18n values (Other options will be added here in the future)
-  const actionTypes: ActionTypes = {
-    MODIFY_ROLLE: t('admin.rolle.edit'),
-  };
-
-  // Computed property for generating options dynamically
+  // Computed property for generating options dynamically for v-selects
   const actions: ComputedRef<TranslatedObject[]> = computed(() => {
-    return Object.entries(actionTypes).map(([key, value]: [string, string]) => ({
+    return Object.entries(actionTypeTitles).map(([key, value]: [string, string]) => ({
       value: key,
       title: value,
     }));
@@ -413,11 +414,12 @@ import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
     getPaginatedPersonen(searchFilterStore.personenPage);
   }
 
+  // Handle the selected action
   const handleOption = (newValue: string | null): void => {
     if (!newValue) return;
 
     switch (newValue) {
-      case 'MODIFY_ROLLE':
+      case ActionTypes.MODIFY_ROLLE:
         rolleModifiyDialogVisible.value = true;
         break;
     }
@@ -430,7 +432,7 @@ import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
   };
 
   function handleSelectedRows(selectedItems: TableItem[]): void {
-    // Directly assign the selected IDs to selectedPersonIds since the emitted tableItems are always IDs of the specific rows
+    // Directly assign the selected items to selectedPersonIds since the emitted tableItems are always IDs of the specific rows
     selectedPersonIds.value = selectedItems as unknown as string[];
   }
 
