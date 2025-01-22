@@ -5162,11 +5162,21 @@
                     },
                     "deadline": {
                         "type": "string"
+                    },
+                    "school": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "rolle": {
+                        "type": "string",
+                        "nullable": true
                     }
                 },
                 "required": [
                     "occasion",
-                    "deadline"
+                    "deadline",
+                    "school",
+                    "rolle"
                 ]
             },
             "UserinfoResponse": {
