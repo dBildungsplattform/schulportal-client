@@ -18,6 +18,7 @@
   import { useI18n } from 'vue-i18n';
   import { useRoute, useRouter, type RouteLocationNormalizedLoaded, type Router } from 'vue-router';
   import { useDisplay } from 'vuetify';
+  import { adjustDateForTimezoneAndFormat } from '@/utils/date';
 
   const { t }: { t: Function } = useI18n();
 
@@ -118,17 +119,6 @@
     return composedZuordnungen;
   }
 
-  function translatedBefristung(befristung: string | undefined): string {
-    if (!befristung) return '';
-    const utcDate: Date = new Date(befristung);
-    if (utcDate.getTimezoneOffset() >= -120) {
-      // Check if the timezone offset is 2 hours (indicating MESZ)
-      // Subtract one day if in summer time (MESZ)
-      utcDate.setDate(utcDate.getDate() - 1);
-    }
-    return utcDate.toLocaleDateString('de-DE');
-  }
-
   function createZuordnungsSchuleDaten(zuordnungen: Zuordnung[]): SchulDaten[] {
     const result: SchulDaten[] = [];
     for (const [index, zuordnung] of zuordnungen.entries()) {
@@ -175,7 +165,7 @@
       if (zuordnung.befristung) {
         tempSchulDaten.labelAndValues.push({
           label: t('profile.limitedUntil'),
-          value: translatedBefristung(zuordnung.befristung),
+          value: adjustDateForTimezoneAndFormat(zuordnung.befristung),
           testIdLabel: 'befristung-label-' + (index + 1),
           testIdValue: 'befristung-value-' + (index + 1),
         });
