@@ -93,6 +93,7 @@
   ] = formContext.defineField('selectedRolle', getVuetifyConfig);
 
   async function closeModifyRolleDeleteDialog(): Promise<void> {
+    progress.value = 0;
     showModifyRolleDialog.value = false;
     emit('update:isDialogVisible', false);
   }
@@ -180,7 +181,7 @@
       <v-container>
         <!-- Form Component -->
         <PersonenkontextCreate
-          v-if="progress < 100"
+          v-if="progress === 0"
           ref="personenkontext-create"
           :showHeadline="false"
           :isModifyRolleDialog="showModifyRolleDialog"
@@ -201,21 +202,20 @@
           v-if="progress > 0"
           class="mt-4"
         >
-          <v-row justify="center">
-            <v-col cols="auto">
-              <v-icon
-                small
-                color="#1EAE9C"
-                icon="mdi-check-circle"
-              ></v-icon>
-            </v-col>
-          </v-row>
-          <p
-            v-if="successMessage"
-            class="mt-2 text-center"
-          >
-            {{ successMessage }}
-          </p>
+          <v-container v-if="successMessage">
+            <v-row justify="center">
+              <v-col cols="auto">
+                <v-icon
+                  small
+                  color="#1EAE9C"
+                  icon="mdi-check-circle"
+                ></v-icon>
+              </v-col>
+            </v-row>
+            <p class="mt-2 text-center">
+              {{ successMessage }}
+            </p>
+          </v-container>
           <v-row
             v-if="progress < 100"
             align="center"
@@ -248,7 +248,7 @@
 
       <v-card-actions class="justify-center">
         <v-row
-          v-if="progress < 100"
+          v-if="progress === 0"
           class="py-3 px-2 justify-center"
         >
           <v-spacer class="hidden-sm-and-down"></v-spacer>
