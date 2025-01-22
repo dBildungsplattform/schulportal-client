@@ -53,6 +53,41 @@
                 ]
             }
         },
+        "/api/auth/externaldata": {
+            "get": {
+                "operationId": "AuthenticationController_getExternalData",
+                "summary": "External Data about logged in user.",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "Returns external Data about the logged in user.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserExeternalDataResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "User is not logged in."
+                    }
+                },
+                "tags": [
+                    "auth"
+                ],
+                "security": [
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
         "/api/auth/logininfo": {
             "get": {
                 "operationId": "AuthenticationController_info",
@@ -4880,6 +4915,121 @@
             }
         },
         "schemas": {
+            "UserExeternalDataResponseOx": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "id"
+                ]
+            },
+            "UserExeternalDataResponseItslearning": {
+                "type": "object",
+                "properties": {
+                    "personId": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "personId"
+                ]
+            },
+            "UserExeternalDataResponseVidis": {
+                "type": "object",
+                "properties": {
+                    "dienststellenNummern": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "required": [
+                    "dienststellenNummern"
+                ]
+            },
+            "UserExeternalDataResponseOpshPk": {
+                "type": "object",
+                "properties": {
+                    "rollenArt": {
+                        "type": "string"
+                    },
+                    "dstNr": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "rollenArt",
+                    "dstNr"
+                ]
+            },
+            "UserExeternalDataResponseOpsh": {
+                "type": "object",
+                "properties": {
+                    "vorname": {
+                        "type": "string"
+                    },
+                    "nachname": {
+                        "type": "string"
+                    },
+                    "personenkontexte": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/UserExeternalDataResponseOpshPk"
+                        }
+                    },
+                    "emailAdresse": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "vorname",
+                    "nachname",
+                    "personenkontexte",
+                    "emailAdresse"
+                ]
+            },
+            "UserExeternalDataResponseOnlineDateiablage": {
+                "type": "object",
+                "properties": {
+                    "personId": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "personId"
+                ]
+            },
+            "UserExeternalDataResponse": {
+                "type": "object",
+                "properties": {
+                    "ox": {
+                        "$ref": "#/components/schemas/UserExeternalDataResponseOx"
+                    },
+                    "itslearning": {
+                        "$ref": "#/components/schemas/UserExeternalDataResponseItslearning"
+                    },
+                    "vidis": {
+                        "$ref": "#/components/schemas/UserExeternalDataResponseVidis"
+                    },
+                    "opsh": {
+                        "$ref": "#/components/schemas/UserExeternalDataResponseOpsh"
+                    },
+                    "onlineDateiablage": {
+                        "$ref": "#/components/schemas/UserExeternalDataResponseOnlineDateiablage"
+                    }
+                },
+                "required": [
+                    "ox",
+                    "itslearning",
+                    "vidis",
+                    "opsh",
+                    "onlineDateiablage"
+                ]
+            },
             "RollenSystemRechtServiceProviderIDResponse": {
                 "type": "object",
                 "properties": {
@@ -4924,11 +5074,21 @@
                     },
                     "deadline": {
                         "type": "string"
+                    },
+                    "school": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "rolle": {
+                        "type": "string",
+                        "nullable": true
                     }
                 },
                 "required": [
                     "occasion",
-                    "deadline"
+                    "deadline",
+                    "school",
+                    "rolle"
                 ]
             },
             "UserinfoResponse": {

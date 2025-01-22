@@ -2074,6 +2074,18 @@ export interface PersonTimeLimitInfoResponse {
      * @memberof PersonTimeLimitInfoResponse
      */
     'deadline': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonTimeLimitInfoResponse
+     */
+    'school': string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonTimeLimitInfoResponse
+     */
+    'rolle': string | null;
 }
 /**
  * 
@@ -3037,6 +3049,145 @@ export interface UpdateRolleBodyParams {
 /**
  * 
  * @export
+ * @interface UserExeternalDataResponse
+ */
+export interface UserExeternalDataResponse {
+    /**
+     * 
+     * @type {UserExeternalDataResponseOx}
+     * @memberof UserExeternalDataResponse
+     */
+    'ox': UserExeternalDataResponseOx;
+    /**
+     * 
+     * @type {UserExeternalDataResponseItslearning}
+     * @memberof UserExeternalDataResponse
+     */
+    'itslearning': UserExeternalDataResponseItslearning;
+    /**
+     * 
+     * @type {UserExeternalDataResponseVidis}
+     * @memberof UserExeternalDataResponse
+     */
+    'vidis': UserExeternalDataResponseVidis;
+    /**
+     * 
+     * @type {UserExeternalDataResponseOpsh}
+     * @memberof UserExeternalDataResponse
+     */
+    'opsh': UserExeternalDataResponseOpsh;
+    /**
+     * 
+     * @type {UserExeternalDataResponseOnlineDateiablage}
+     * @memberof UserExeternalDataResponse
+     */
+    'onlineDateiablage': UserExeternalDataResponseOnlineDateiablage;
+}
+/**
+ * 
+ * @export
+ * @interface UserExeternalDataResponseItslearning
+ */
+export interface UserExeternalDataResponseItslearning {
+    /**
+     * 
+     * @type {string}
+     * @memberof UserExeternalDataResponseItslearning
+     */
+    'personId': string;
+}
+/**
+ * 
+ * @export
+ * @interface UserExeternalDataResponseOnlineDateiablage
+ */
+export interface UserExeternalDataResponseOnlineDateiablage {
+    /**
+     * 
+     * @type {string}
+     * @memberof UserExeternalDataResponseOnlineDateiablage
+     */
+    'personId': string;
+}
+/**
+ * 
+ * @export
+ * @interface UserExeternalDataResponseOpsh
+ */
+export interface UserExeternalDataResponseOpsh {
+    /**
+     * 
+     * @type {string}
+     * @memberof UserExeternalDataResponseOpsh
+     */
+    'vorname': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserExeternalDataResponseOpsh
+     */
+    'nachname': string;
+    /**
+     * 
+     * @type {Array<UserExeternalDataResponseOpshPk>}
+     * @memberof UserExeternalDataResponseOpsh
+     */
+    'personenkontexte': Array<UserExeternalDataResponseOpshPk>;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserExeternalDataResponseOpsh
+     */
+    'emailAdresse': string;
+}
+/**
+ * 
+ * @export
+ * @interface UserExeternalDataResponseOpshPk
+ */
+export interface UserExeternalDataResponseOpshPk {
+    /**
+     * 
+     * @type {string}
+     * @memberof UserExeternalDataResponseOpshPk
+     */
+    'rollenArt': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserExeternalDataResponseOpshPk
+     */
+    'dstNr': string;
+}
+/**
+ * 
+ * @export
+ * @interface UserExeternalDataResponseOx
+ */
+export interface UserExeternalDataResponseOx {
+    /**
+     * 
+     * @type {string}
+     * @memberof UserExeternalDataResponseOx
+     */
+    'id': string;
+}
+/**
+ * 
+ * @export
+ * @interface UserExeternalDataResponseVidis
+ */
+export interface UserExeternalDataResponseVidis {
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof UserExeternalDataResponseVidis
+     */
+    'dienststellenNummern': Array<string>;
+}
+/**
+ * 
+ * @export
  * @interface UserLockParams
  */
 export interface UserLockParams {
@@ -3241,6 +3392,44 @@ export const AuthApiAxiosParamCreator = function (configuration?: Configuration)
     return {
         /**
          * 
+         * @summary External Data about logged in user.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        authenticationControllerGetExternalData: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/auth/externaldata`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary Info about logged in user.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -3406,6 +3595,16 @@ export const AuthApiFp = function(configuration?: Configuration) {
     return {
         /**
          * 
+         * @summary External Data about logged in user.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async authenticationControllerGetExternalData(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UserExeternalDataResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.authenticationControllerGetExternalData(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
          * @summary Info about logged in user.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -3459,6 +3658,15 @@ export const AuthApiFactory = function (configuration?: Configuration, basePath?
     return {
         /**
          * 
+         * @summary External Data about logged in user.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        authenticationControllerGetExternalData(options?: any): AxiosPromise<UserExeternalDataResponse> {
+            return localVarFp.authenticationControllerGetExternalData(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary Info about logged in user.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -3507,6 +3715,15 @@ export const AuthApiFactory = function (configuration?: Configuration, basePath?
 export interface AuthApiInterface {
     /**
      * 
+     * @summary External Data about logged in user.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AuthApiInterface
+     */
+    authenticationControllerGetExternalData(options?: AxiosRequestConfig): AxiosPromise<UserExeternalDataResponse>;
+
+    /**
+     * 
      * @summary Info about logged in user.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -3553,6 +3770,17 @@ export interface AuthApiInterface {
  * @extends {BaseAPI}
  */
 export class AuthApi extends BaseAPI implements AuthApiInterface {
+    /**
+     * 
+     * @summary External Data about logged in user.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AuthApi
+     */
+    public authenticationControllerGetExternalData(options?: AxiosRequestConfig) {
+        return AuthApiFp(this.configuration).authenticationControllerGetExternalData(options).then((request) => request(this.axios, this.basePath));
+    }
+
     /**
      * 
      * @summary Info about logged in user.
