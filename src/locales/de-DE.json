@@ -642,7 +642,10 @@
     "willBeCreated": "wird hinzugefügt",
     "willBeRemoved": "wird entfernt",
     "zuordnungen": "Schulzuordnung(en)",
-    "zuordnung": "Schulzuordnung"
+    "zuordnung": "Schulzuordnung",
+    "changeBefristung": "Befristung ändern",
+    "changeBefristungConfirmation": "Möchten Sie die Befristung wirklich von {oldBefristung} in {newBefristung} ändern?",
+    "changeBefristungSuccess": "Die Befristung wurde erfolgreich geändert."
   },
   "profile": {
     "personalData": "Persönliche Daten",
