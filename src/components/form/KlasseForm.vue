@@ -1,15 +1,16 @@
 <script setup lang="ts">
-  import { computed, defineProps, ref, watch, type ComputedRef, type ModelRef, type Ref } from 'vue';
-  import { type BaseFieldProps } from 'vee-validate';
-  import FormWrapper from '@/components/form/FormWrapper.vue';
   import FormRow from '@/components/form/FormRow.vue';
-  import type { TranslatedObject } from '@/types';
+  import FormWrapper from '@/components/form/FormWrapper.vue';
   import {
     OrganisationsTyp,
     useOrganisationStore,
     type OrganisationenFilter,
     type OrganisationStore,
   } from '@/stores/OrganisationStore';
+  import { RollenSystemRecht } from '@/stores/RolleStore';
+  import type { TranslatedObject } from '@/types';
+  import { type BaseFieldProps } from 'vee-validate';
+  import { computed, defineProps, ref, watch, type ComputedRef, type ModelRef, type Ref } from 'vue';
 
   const hasAutoselectedSchule: Ref<boolean> = ref(false);
   const searchInputSchule: Ref<string> = ref('');
@@ -62,6 +63,7 @@
 
     const organisationFilter: OrganisationenFilter = {
       includeTyp: OrganisationsTyp.Schule,
+      systemrechte: [RollenSystemRecht.KlassenVerwalten],
       limit: 25,
     };
     if (newValue) {

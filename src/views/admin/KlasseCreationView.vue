@@ -9,6 +9,7 @@
     type Organisation,
     type OrganisationStore,
   } from '@/stores/OrganisationStore';
+  import { RollenSystemRecht } from '@/stores/RolleStore';
   import { type TranslatedObject } from '@/types.d';
   import { getValidationSchema, getVuetifyConfig } from '@/utils/validationKlasse';
   import { useForm, type BaseFieldProps, type TypedSchema } from 'vee-validate';
@@ -144,7 +145,11 @@
   });
 
   onMounted(async () => {
-    await organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Schule, limit: 25 });
+    await organisationStore.getAllOrganisationen({
+      includeTyp: OrganisationsTyp.Schule,
+      systemrechte: [RollenSystemRecht.KlassenVerwalten],
+      limit: 25,
+    });
     organisationStore.createdKlasse = null;
     organisationStore.errorCode = '';
     /* listen for browser changes and prevent them when form is dirty */
