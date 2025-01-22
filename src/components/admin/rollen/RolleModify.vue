@@ -12,6 +12,7 @@
   import { usePersonenkontextStore, type PersonenkontextStore, type Zuordnung } from '@/stores/PersonenkontextStore';
   import { OrganisationsTyp, type Organisation } from '@/stores/OrganisationStore';
   import type { RollenArt, RollenMerkmal } from '@/stores/RolleStore';
+  import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
 
   const { t }: Composer = useI18n({ useScope: 'global' });
 
@@ -20,6 +21,8 @@
   const canCommit: Ref<boolean> = ref(false);
 
   const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
+
+  const personStore: PersonStore = usePersonStore();
 
   const progress: Ref<number> = ref<number>(0);
 
@@ -129,11 +132,20 @@
 
       for (let i: number = 0; i < personIDs.length; i++) {
         const personId: string = personIDs[i] as string;
-
+  
         const newZuordnung: Zuordnung = { ...baseZuordnung };
 
+        // Fetch the Zuordnungen for this specific user (To send alongside the new one)
+        await personStore.getPersonenuebersichtById(personId);
+
+        // Extract the current Zuordnungen for this person
+        const finalZuordnungen: Zuordnung[] = personStore.personenuebersicht?.zuordnungen || [];
+
+        // Combine the new Zuordnung with the existing ones
+        const combinedZuordnungen: Zuordnung[] = [...finalZuordnungen, newZuordnung];
+
         // Await the processing of each ID
-        await personenkontextStore.updatePersonenkontexte([newZuordnung], personId);
+        await personenkontextStore.updatePersonenkontexte(combinedZuordnungen, personId);
 
         // Update progress for each item processed
         progress.value = Math.ceil(((i + 1) / personIDs.length) * 100);
