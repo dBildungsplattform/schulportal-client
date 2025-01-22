@@ -556,6 +556,7 @@
   "nav": {
     "admin": "Schulportal-Administration",
     "backToDetails": "Zurück zur Gesamtübersicht",
+    "toDetails": "Zur Gesamtübersicht",
     "backToList": "Zurück zur Ergebnisliste",
     "back": "Zurück",
     "backToStart": "Zurück zur Startseite",
@@ -636,7 +637,7 @@
     "twoFactorAuthenticationSetUpHeader": "Zwei-Faktor-Authentifizierung (2FA)",
     "unlockError": "Der Benutzer konnte nicht entsperrt werden.",
     "unlockUser": "Benutzer entsperren",
-    "unLockUserInfoText": "Ich bestätige, dass ich mit der sperrenden Stelle geklärt habe, dass die Sperre aufgehoben werden darf.",
+    "unLockUserInfoText": "Ich bestätige, dass ich mit der sperrenden Stelle geklärt habe, dass die Sperre bearbeitet oder aufgehoben werden darf.",
     "userIsLocked": "Dieser Benutzer ist gesperrt.",
     "userIsUnlocked": "Dieser Benutzer ist aktiv.",
     "userName": "Benutzername",
@@ -710,6 +711,7 @@
   "yes": "Ja",
   "banner": {
     "hint": "Hinweis: ",
-    "kopers": "Die Verwendung dieses Benutzerkontos setzt eine KoPers.-Nr. voraus. Bitte kontaktieren Sie Ihre schulischen Administratorinnen und Administratoren, um eine KoPers.-Nr. eintragen zu lassen. Andernfalls wird Ihr Zugang zum {date} automatisch gesperrt."
+    "kopers": "Die Verwendung dieses Benutzerkontos setzt eine KoPers.-Nr. voraus. Bitte kontaktieren Sie Ihre schulischen Administratorinnen und Administratoren, um eine KoPers.-Nr. eintragen zu lassen. Andernfalls wird Ihr Zugang zum {date} automatisch gesperrt.",
+    "noKontexte": "Dieses Benutzerkonto ist aktuell keiner Schule zugeordnet. Ohne Schulzuordnung sind ein großer Teil der Funktionalitäten des Schulportal SH nicht verfügbar. Sollten Sie weiterhin an einer Schule in Schleswig-Holstein tätig sein, wenden Sie sich an Ihre Schulleitung. Ist dieses Konto auch weiterhin keiner Schule zugeordnet, wird es zum {date} gelöscht."
   }
 }

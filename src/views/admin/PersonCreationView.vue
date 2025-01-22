@@ -269,6 +269,13 @@
     });
   }
 
+  async function navigateToPersonDetails(): Promise<void> {
+    await router.push({
+      name: 'person-details',
+      params: { id: personenkontextStore.createdPersonWithKontext?.person.id },
+    });
+  }
+
   function handleFieldReset(field: string): void {
     if (field === 'selectedRolle') {
       selectedRolle.value = undefined;
@@ -654,6 +661,20 @@
             thickness="6"
           ></v-divider>
           <v-row justify="end">
+            <v-col
+              cols="12"
+              sm="6"
+              md="auto"
+            >
+              <v-btn
+                class="secondary"
+                @click.stop="navigateToPersonDetails"
+                data-testid="to-details-button"
+                :block="mdAndDown"
+              >
+                {{ $t('nav.toDetails') }}
+              </v-btn>
+            </v-col>
             <v-col
               cols="12"
               sm="6"

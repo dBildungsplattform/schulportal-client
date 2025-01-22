@@ -33,7 +33,7 @@
       class="align-center"
       justify="space-between"
     >
-      <v-col class="text-center mr-8">
+      <v-col class="text-center mr-8 primary-text-color">
         <span class="text-body bold">{{ $t('banner.hint') }} </span>
         <span
           class="text-body"
@@ -44,7 +44,7 @@
       </v-col>
       <v-col
         cols="auto"
-        class="text-center"
+        class="text-center primary-text-color"
       >
         <v-icon
           class="close-icon"
