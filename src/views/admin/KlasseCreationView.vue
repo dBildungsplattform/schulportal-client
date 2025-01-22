@@ -96,8 +96,7 @@
 
   const handleCreateAnotherKlasse = async (): Promise<void> => {
     resetForm();
-    organisationStore.createdKlasse = null;
-    await organisationStore.getAllOrganisationen({ includeTyp: OrganisationsTyp.Schule, limit: 25 });
+    await initStores();
     router.push({ name: 'create-klasse' });
   };
 
@@ -144,7 +143,7 @@
     resetForm();
   });
 
-  onMounted(async () => {
+  async function initStores() {
     await organisationStore.getAllOrganisationen({
       includeTyp: OrganisationsTyp.Schule,
       systemrechte: [RollenSystemRecht.KlassenVerwalten],
@@ -152,6 +151,10 @@
     });
     organisationStore.createdKlasse = null;
     organisationStore.errorCode = '';
+  }
+
+  onMounted(async () => {
+    await initStores();
     /* listen for browser changes and prevent them when form is dirty */
     window.addEventListener('beforeunload', preventNavigation);
   });
