@@ -598,7 +598,7 @@ describe('PersonDetailsView', () => {
     personStore.personenuebersicht = mockPersonenuebersicht;
   });
 
-  describe.only('change befristung', () => {
+  describe('change befristung', () => {
     test('it shows befristung change form', async () => {
       await wrapper?.find('[data-testid="zuordnung-edit-button"]').trigger('click');
       await nextTick();
