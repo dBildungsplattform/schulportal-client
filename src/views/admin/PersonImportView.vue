@@ -20,7 +20,12 @@
   import { useI18n, type Composer } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
   import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
-  import { ImportDataItemStatus, type ImportedUserResponse, type ImportResultResponse, type ImportStore, useImportStore } from '@/stores/ImportStore';
+  import {
+    ImportDataItemStatus,
+    type ImportedUserResponse,
+    type ImportStore,
+    useImportStore,
+  } from '@/stores/ImportStore';
   import { RollenArt } from '@/stores/RolleStore';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
 
@@ -46,15 +51,6 @@
   });
   const schulen: ComputedRef<TranslatedObject[] | undefined> = useSchulen();
   const searchInputSchule: Ref<string> = ref('');
-
-  const totalPages: ComputedRef<number[]> = computed(() => {
-    const totalUsers: number = importStore.importResponse?.total || 0;
-    const itemsPerPage: number = importStore.importedUsersPerPage;
-    return Array.from(
-      { length: Math.ceil(totalUsers / itemsPerPage) },
-      (_: unknown, index: number) => index * itemsPerPage,
-    );
-  });
 
   let timerId: ReturnType<typeof setTimeout>;
 
@@ -289,91 +285,68 @@
     }
   }
 
-  async function createAndTriggerDownload(index: number): Promise<void> {
-    try {
-      const importResponse: ImportResultResponse | null = importStore.importResponse;
+  function downloadFileContent(fileContent: string): void {
+    const blob: Blob = new Blob([fileContent], { type: 'text/plain' });
+    const url: string = window.URL.createObjectURL(blob);
 
-      if (!importResponse) return;
+    const link: HTMLAnchorElement = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `${t('person.passwords')}.txt`);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
 
-      if (!importResponse.importvorgandId || !importResponse.rollenname || !importResponse.organisationsname) {
-        return;
-      }
+    window.URL.revokeObjectURL(url);
+  }
 
-      // Separate successful and failed users
-      const successfullyImportedUsers: ImportedUserResponse[] = importResponse.importedUsers.filter(
-        (user: ImportedUserResponse) => user.status === ImportDataItemStatus.SUCCESS,
-      );
+  function createFileContentFromUsers(users: ImportedUserResponse[]): string {
+    const successfulUsers: ImportedUserResponse[] = users.filter(
+      (user: ImportedUserResponse) => user.status === ImportDataItemStatus.SUCCESS,
+    );
+    const failedUsers: ImportedUserResponse[] = users.filter((user) => user.status === ImportDataItemStatus.FAILED);
 
-      const failedImportedUsers: ImportedUserResponse[] = importResponse.importedUsers.filter(
-        (user: ImportedUserResponse) => user.status === ImportDataItemStatus.FAILED,
-      );
+    let fileContent: string = `Schule: ${importStore.importResponse?.organisationsname} - Rolle: ${importStore.importResponse?.rollenname}`;
+    fileContent += `\n\n${t('admin.import.successfullyImportedUsersNotice')}\n\n`;
+    fileContent += 'Klasse - Vorname - Nachname - Benutzername - Passwort\n';
 
-      // Construct file content
-      let fileContent: string = `Schule: ${importResponse.organisationsname} - Rolle: ${importResponse.rollenname}`;
-      fileContent += `\n\n${t('admin.import.successfullyImportedUsersNotice')}\n\n`;
-      fileContent += 'Klasse - Vorname - Nachname - Benutzername - Passwort\n';
+    successfulUsers.forEach((user: ImportedUserResponse) => {
+      fileContent += `${user.klasse} - ${user.vorname} - ${user.nachname} - ${user.benutzername} - ${user.startpasswort}\n`;
+    });
 
-      // Add successful users to the file content
-      for (const user of successfullyImportedUsers) {
-        fileContent += `${user.klasse} - ${user.vorname} - ${user.nachname} - ${user.benutzername} - ${user.startpasswort}\n`;
-      }
+    if (failedUsers.length > 0) {
+      fileContent += `\n\n${t('admin.import.failedToImportUsersNotice')}\n\n`;
+      fileContent += 'Klasse - Vorname - Nachname - Benutzername\n';
 
-      // Add a section for failed users
-      if (failedImportedUsers.length > 0) {
-        fileContent += `\n\n${t('admin.import.failedToImportUsersNotice')}\n\n`;
-        fileContent += 'Klasse - Vorname - Nachname - Benutzername\n';
-
-        for (const user of failedImportedUsers) {
-          fileContent += `${user.klasse} - ${user.vorname} - ${user.nachname} - ${user.benutzername}\n`;
-        }
-      }
-
-      // Create a Blob from the file content
-      const blob: Blob = new Blob([fileContent], { type: 'text/plain' });
-      const url: string = window.URL.createObjectURL(blob);
-
-      // Create and trigger the download link
-      const link: HTMLAnchorElement = document.createElement('a');
-      link.href = url;
-      const fileName: string = `${t('person.passwords')}-${index + 1}.txt`;
-      link.setAttribute('download', fileName);
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-
-      // Revoke the URL to free up resources
-      window.URL.revokeObjectURL(url);
-    } catch (error: unknown) {
-      importStore.errorCode = 'ERROR_IMPORTING_FILE';
+      failedUsers.forEach((user: ImportedUserResponse) => {
+        fileContent += `${user.klasse} - ${user.vorname} - ${user.nachname} - ${user.benutzername}\n`;
+      });
     }
+
+    return fileContent;
   }
 
   async function downloadAllFiles(): Promise<void> {
     const totalUsers: number = importStore.importResponse?.total || 0;
     const itemsPerPage: number = importStore.importedUsersPerPage;
-    // Ensures at least 1 page
-    const totalPagesNumber: number = Math.max(Math.floor(totalUsers / itemsPerPage), 1);
+    const totalPagesNumber: number = Math.ceil(totalUsers / itemsPerPage);
 
-    // Loop through the number of pages, or handle the case where there's only one page of data
+    // Collect all imported users
+    let allImportedUsers: ImportedUserResponse[] = [];
+
+    // Fetch users for each page
     for (let pageIndex: number = 0; pageIndex < totalPagesNumber; pageIndex++) {
       const offset: number = pageIndex * itemsPerPage;
 
       // Fetch users for the current offset
       await importStore.getImportedPersons(importStore.uploadResponse?.importvorgangId as string, offset, itemsPerPage);
 
-      // Generate and trigger the download for this batch
-      createAndTriggerDownload(pageIndex);
+      // Accumulate imported users
+      allImportedUsers = allImportedUsers.concat(importStore.importResponse?.importedUsers || []);
     }
-  }
 
-  async function handleUserDownload(offset: number, index: number): Promise<void> {
-    const limit: number = importStore.importedUsersPerPage;
-
-    // Fetch users for the specific range
-    await importStore.getImportedPersons(importStore.uploadResponse?.importvorgangId as string, offset, limit);
-
-    // Generate the file for the fetched users
-    createAndTriggerDownload(index);
+    // Create a single file with all users
+    const fileContent: string = createFileContentFromUsers(allImportedUsers);
+    downloadFileContent(fileContent);
   }
 
   const onSubmit: (e?: Event | undefined) => Promise<void | undefined> = formContext.handleSubmit(() => {
@@ -491,23 +464,6 @@
                 :disabled="importStore.importIsLoading || importStore.retrievalIsLoading"
               >
                 {{ $t('admin.import.downloadAllFiles') }}
-              </v-btn>
-            </v-col>
-          </v-row>
-          <v-row justify="center">
-            <v-col
-              cols="auto"
-              v-for="(offset, index) in totalPages"
-              :key="index"
-            >
-              <v-btn
-                :block="smAndDown"
-                class="primary"
-                @click="handleUserDownload(offset, index)"
-                :data-testid="`download-button-${index}`"
-                :disabled="importStore.importIsLoading || importStore.retrievalIsLoading"
-              >
-                {{ `${$t('person.passwords')}-${index + 1}.txt` }}
               </v-btn>
             </v-col>
           </v-row>
