@@ -23,6 +23,7 @@ import {
   useTwoFactorAuthentificationStore,
   type TwoFactorAuthentificationStore,
 } from '@/stores/TwoFactorAuthentificationStore';
+import { useConfigStore, type ConfigStore } from '@/stores/ConfigStore';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
@@ -32,6 +33,7 @@ const organisationStore: OrganisationStore = useOrganisationStore();
 const personStore: PersonStore = usePersonStore();
 const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
 const twoFactorAuthenticationStore: TwoFactorAuthentificationStore = useTwoFactorAuthentificationStore();
+const configStore: ConfigStore = useConfigStore();
 
 const mockPerson: Personendatensatz = {
   person: {
@@ -250,6 +252,11 @@ beforeEach(async () => {
       plugins: [router],
     },
   });
+
+  configStore.configData = {
+    befristungBearbeitenEnabled: true,
+    rolleBearbeitenEnabled: true,
+  };
 });
 
 const setCurrentPerson = (emailStatus: EmailAddressStatus): void => {
@@ -589,5 +596,56 @@ describe('PersonDetailsView', () => {
 
     // reset personenuebersicht
     personStore.personenuebersicht = mockPersonenuebersicht;
+  });
+
+  describe.only('change befristung', () => {
+    test('it shows befristung change form', async () => {
+      await wrapper?.find('[data-testid="zuordnung-edit-button"]').trigger('click');
+      await nextTick();
+
+      const checkbox: DOMWrapper<HTMLInputElement> | undefined = wrapper?.find(
+        '[data-testid="person-zuordnung-1"] input[type="checkbox"]',
+      );
+      await checkbox?.setValue(!checkbox.element.checked);
+      await nextTick();
+
+      await wrapper?.find('[data-testid="befristung-change-button"]').trigger('click');
+      await nextTick();
+
+      expect(wrapper?.find('[data-testid="change-befristung-form"]').isVisible()).toBe(true);
+    });
+
+    test('it doesnt show button if config is disabled', async () => {
+      configStore.configData = {
+        befristungBearbeitenEnabled: false,
+        rolleBearbeitenEnabled: true,
+      };
+      await wrapper?.find('[data-testid="zuordnung-edit-button"]').trigger('click');
+      await nextTick();
+
+      expect(wrapper?.find('[data-testid="befristung-change-button"]').exists()).toBe(false);
+    });
+
+    test('button only active if one zuordnung is selected', async () => {
+      await wrapper?.find('[data-testid="zuordnung-edit-button"]').trigger('click');
+      await nextTick();
+      expect(wrapper?.find('[data-testid="befristung-change-button"]').attributes('disabled')).toBeDefined();
+
+      const checkbox1: DOMWrapper<HTMLInputElement> | undefined = wrapper?.find(
+        '[data-testid="person-zuordnung-1"] input[type="checkbox"]',
+      );
+      await checkbox1?.setValue(true);
+      await nextTick();
+
+      expect(wrapper?.find('[data-testid="befristung-change-button"]').attributes('disabled')).toBeUndefined();
+
+      const checkbox2: DOMWrapper<HTMLInputElement> | undefined = wrapper?.find(
+        '[data-testid="person-zuordnung-3"] input[type="checkbox"]',
+      );
+      await checkbox2?.setValue(true);
+      await nextTick();
+
+      expect(wrapper?.find('[data-testid="befristung-change-button"]').attributes('disabled')).toBeDefined();
+    });
   });
 });
