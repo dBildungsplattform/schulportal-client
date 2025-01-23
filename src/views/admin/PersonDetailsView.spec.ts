@@ -283,7 +283,7 @@ describe('PersonDetailsView', () => {
     expect(wrapper?.find('[data-testid="person-username"]').text()).toBe('jorton');
     expect(wrapper?.find('[data-testid="person-email"]').text()).toBe('email@email.com');
     expect(wrapper?.find('[data-testid="person-zuordnung-1"]').text()).toBe(
-      '123456 (Testschule Birmingham): SuS 9a  (befristet bis 11.08.2099)',
+      '123456 (Testschule Birmingham): SuS 9a  (befristet bis 12.08.2099)',
     );
     expect(wrapper?.getComponent({ name: 'PasswordReset' })).toBeTruthy();
   });
