@@ -165,6 +165,62 @@ describe('PersonCreationView', () => {
     expect(wrapper?.getComponent({ name: 'PersonenkontextCreate' })).toBeTruthy();
   });
 
+  it('emits update:calculatedBefristungOption event with a value', async () => {
+    const organisationSelect: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'personenkontext-create' })
+      .findComponent({ ref: 'organisation-select' });
+    await organisationSelect?.setValue('9876');
+    await nextTick();
+
+    const rolleSelect: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'personenkontext-create' })
+      .findComponent({ ref: 'rolle-select' });
+    await rolleSelect?.setValue('1');
+    await nextTick();
+
+    // Get the BefristungInput component
+    const personenkontextCreate: VueWrapper | undefined = wrapper?.findComponent({ name: 'PersonenkontextCreate' });
+
+    // Emit the event from the child component
+    await personenkontextCreate?.vm.$emit('update:calculatedBefristungOption', 'someOption');
+
+    // Assert that the parent component emitted the event
+    expect(
+      wrapper?.findComponent({ ref: 'personenkontext-create' }).emitted('update:calculatedBefristungOption'),
+    ).toBeTruthy();
+    expect(
+      wrapper?.findComponent({ ref: 'personenkontext-create' }).emitted('update:calculatedBefristungOption')![0],
+    ).toEqual(['someOption']);
+  });
+
+  it('emits update:calculatedBefristungOption event with no value', async () => {
+    const organisationSelect: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'personenkontext-create' })
+      .findComponent({ ref: 'organisation-select' });
+    await organisationSelect?.setValue('9876');
+    await nextTick();
+
+    const rolleSelect: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'personenkontext-create' })
+      .findComponent({ ref: 'rolle-select' });
+    await rolleSelect?.setValue('1');
+    await nextTick();
+
+    // Get the BefristungInput component
+    const personenkontextCreate: VueWrapper | undefined = wrapper?.findComponent({ name: 'PersonenkontextCreate' });
+
+    // Emit the event from the child component
+    await personenkontextCreate?.vm.$emit('update:calculatedBefristungOption', undefined);
+
+    // Assert that the parent component emitted the event
+    expect(
+      wrapper?.findComponent({ ref: 'personenkontext-create' }).emitted('update:calculatedBefristungOption'),
+    ).toBeTruthy();
+    expect(
+      wrapper?.findComponent({ ref: 'personenkontext-create' }).emitted('update:calculatedBefristungOption')![0],
+    ).toEqual([undefined]);
+  });
+
   test('it renders an error', async () => {
     personStore.errorCode = 'ERROR_ERROR';
     await nextTick();
