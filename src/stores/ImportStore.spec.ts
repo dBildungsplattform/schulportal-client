@@ -1,4 +1,4 @@
-import { useImportStore, type ImportStore } from './ImportStore';
+import { ImportDataItemStatus, useImportStore, type ImportStore } from './ImportStore';
 import { setActivePinia, createPinia } from 'pinia';
 import ApiService from '@/services/ApiService';
 import MockAdapter from 'axios-mock-adapter';
@@ -287,7 +287,7 @@ describe('ImportStore', () => {
               nachname: 'Mstermann',
               benutzername: 'mmstermann117',
               startpasswort: 'pK0!V%m&',
-              status: 'SUCCESS',
+              status: ImportDataItemStatus.SUCCESS,
             },
             {
               klasse: '9a',
@@ -295,7 +295,7 @@ describe('ImportStore', () => {
               nachname: 'Mler',
               benutzername: 'mmler2288',
               startpasswort: 'qA0$z?gv',
-              status: 'SUCCESS',
+              status: ImportDataItemStatus.SUCCESS,
             },
           ],
           total: 5,
