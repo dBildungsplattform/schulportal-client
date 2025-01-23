@@ -21,6 +21,7 @@ export type BefristungUtilsType = {
   handleBefristungUpdate: (value: string | undefined) => void;
   handleBefristungOptionUpdate: (value: string | undefined) => void;
   setupWatchers: () => void;
+  setupRolleWatcher: () => void; // Export the new function
 };
 
 const rollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = useRollen();
@@ -59,6 +60,23 @@ export function useBefristungUtils(props: {
     selectedBefristungOption.value = BefristungOption.SCHULJAHRESENDE;
   };
 
+  // Function to set an initial value for the radio buttons depending on the selected Rolle
+  const setupRolleWatcher = (): void => {
+    watch(
+      selectedRolle,
+      (newValue: string | undefined) => {
+        if (isBefristungspflichtRolle(newValue)) {
+          selectedBefristungOption.value = BefristungOption.SCHULJAHRESENDE;
+          calculatedBefristung.value = getNextSchuljahresende();
+        } else {
+          selectedBefristungOption.value = BefristungOption.UNBEFRISTET;
+          calculatedBefristung.value = undefined;
+        }
+      },
+      { immediate: true },
+    );
+  };
+
   // Setup the watchers
   const setupWatchers = (): void => {
     const createWatcher = <T>(
@@ -81,22 +99,12 @@ export function useBefristungUtils(props: {
         formContext.resetField('selectedBefristung');
       }
     });
-
-    // Watcher to set an initial value for the radio buttons depending on the selected Rolle
-    createWatcher(selectedRolle, (newValue: string | undefined) => {
-      if (isBefristungspflichtRolle(newValue)) {
-        selectedBefristungOption.value = BefristungOption.SCHULJAHRESENDE;
-        calculatedBefristung.value = getNextSchuljahresende();
-      } else {
-        selectedBefristungOption.value = BefristungOption.UNBEFRISTET;
-        calculatedBefristung.value = undefined;
-      }
-    });
   };
 
   return {
     handleBefristungUpdate,
     handleBefristungOptionUpdate,
     setupWatchers,
+    setupRolleWatcher,
   };
 }

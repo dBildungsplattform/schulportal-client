@@ -710,18 +710,23 @@
   ] = changeBefristungFormContext.defineField('selectedBefristungOption', vuetifyConfig);
 
   // Methods from utils that handle the Befristung events and sets up watchers
-  const { handleBefristungUpdate, handleBefristungOptionUpdate, setupWatchers }: BefristungUtilsType =
-    useBefristungUtils({
-      formContext,
-      selectedBefristung,
-      selectedBefristungOption,
-      calculatedBefristung,
-      selectedRolle,
-    });
+  const {
+    handleBefristungUpdate,
+    handleBefristungOptionUpdate,
+    setupWatchers,
+    setupRolleWatcher,
+  }: BefristungUtilsType = useBefristungUtils({
+    formContext,
+    selectedBefristung,
+    selectedBefristungOption,
+    calculatedBefristung,
+    selectedRolle,
+  });
 
   const {
     handleBefristungUpdate: handleChangeBefristungUpdate,
     handleBefristungOptionUpdate: handleChangeBefristungOptionUpdate,
+    setupWatchers: setupChangeBefristungWatchers,
   }: BefristungUtilsType = useBefristungUtils({
     formContext: changeBefristungFormContext,
     selectedBefristung: selectedChangeBefristung,
@@ -1356,6 +1361,8 @@
   });
 
   setupWatchers();
+  setupRolleWatcher();
+  setupChangeBefristungWatchers();
 
   watch(hasNoKopersNr, async (newValue: boolean | undefined) => {
     if (newValue) {
@@ -3039,6 +3046,7 @@
               <v-btn
                 :block="mdAndDown"
                 class="primary"
+                data-testid="change-befristung-success-close"
                 @click.stop="closeChangeBefristungSuccessDialog"
               >
                 {{ $t('close') }}
@@ -3233,6 +3241,7 @@
               <v-btn
                 :block="mdAndDown"
                 class="primary"
+                data-testid="confirm-change-befristung-button"
                 @click.stop="confirmDialogChangeBefristung"
               >
                 {{ $t('yes') }}
