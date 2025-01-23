@@ -24,6 +24,7 @@ import {
   type TwoFactorAuthentificationStore,
 } from '@/stores/TwoFactorAuthentificationStore';
 import { useConfigStore, type ConfigStore } from '@/stores/ConfigStore';
+import { adjustDateForTimezoneAndFormat } from '@/utils/date';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
@@ -86,7 +87,7 @@ const mockCurrentUser: UserInfo = {
   ],
   password_updated_at: null,
 };
-
+const befristung: string = '2099-08-12';
 const mockPersonenuebersicht: PersonWithUebersicht = {
   personId: '1',
   vorname: 'John',
@@ -157,7 +158,7 @@ const mockPersonenuebersichtLehr: PersonWithUebersicht = {
       administriertVon: '2',
       editable: true,
       merkmale: [] as unknown as RollenMerkmal,
-      befristung: '2099-08-12',
+      befristung: befristung,
       admins: [],
     },
   ],
@@ -290,7 +291,7 @@ describe('PersonDetailsView', () => {
     expect(wrapper?.find('[data-testid="person-username"]').text()).toBe('jorton');
     expect(wrapper?.find('[data-testid="person-email"]').text()).toBe('email@email.com');
     expect(wrapper?.find('[data-testid="person-zuordnung-1"]').text()).toBe(
-      '123456 (Testschule Birmingham): SuS 9a  (befristet bis 12.08.2099)',
+      `123456 (Testschule Birmingham): SuS 9a  (befristet bis ${adjustDateForTimezoneAndFormat(befristung)})`,
     );
     expect(wrapper?.getComponent({ name: 'PasswordReset' })).toBeTruthy();
   });
