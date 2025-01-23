@@ -239,42 +239,7 @@ describe('PersonImportView', () => {
     importStore.importProgress = 100;
     await nextTick();
 
-    const downloadButton: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="download-all-files-button"]');
-    downloadButton?.trigger('click');
-  });
-
-  test('it downloads an imported file through the single button download for the first 100', async () => {
-    importStore.importResponse = {
-      importvorgandId: '1',
-      rollenname: 'itslearning-Schulbegleitung',
-      organisationsname: 'Carl-Orff-Schule',
-      importedUsers: [
-        {
-          klasse: '9a',
-          vorname: 'Max',
-          nachname: 'Mstermann',
-          benutzername: 'mmstermann117',
-          startpasswort: 'pK0!V%m&',
-          status: 'SUCCESS',
-        },
-        {
-          klasse: '9a',
-          vorname: 'Maria',
-          nachname: 'Mler',
-          benutzername: 'mmler2288',
-          startpasswort: 'qA0$z?gv',
-          status: 'SUCCESS',
-        },
-      ],
-      total: 100,
-      pageTotal: 100,
-    };
-
-    global.URL.createObjectURL = vi.fn();
-    importStore.importProgress = 100;
-    await nextTick();
-
-    const downloadButton: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="download-button-0"]');
+    const downloadButton: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="download-all-data-button"]');
     downloadButton?.trigger('click');
   });
 

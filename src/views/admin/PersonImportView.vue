@@ -39,6 +39,8 @@
 
   const confirmationDialogVisible: Ref<boolean> = ref(false);
 
+  const isDownloadingFile: Ref<boolean> = ref(false);
+
   const allRollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = useRollen();
   const lernRollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = computed(() => {
     if (!allRollen.value) {
@@ -303,7 +305,9 @@
     const successfulUsers: ImportedUserResponse[] = users.filter(
       (user: ImportedUserResponse) => user.status === ImportDataItemStatus.SUCCESS,
     );
-    const failedUsers: ImportedUserResponse[] = users.filter((user) => user.status === ImportDataItemStatus.FAILED);
+    const failedUsers: ImportedUserResponse[] = users.filter(
+      (user: ImportedUserResponse) => user.status === ImportDataItemStatus.FAILED,
+    );
 
     let fileContent: string = `Schule: ${importStore.importResponse?.organisationsname} - Rolle: ${importStore.importResponse?.rollenname}`;
     fileContent += `\n\n${t('admin.import.successfullyImportedUsersNotice')}\n\n`;
@@ -326,27 +330,35 @@
   }
 
   async function downloadAllFiles(): Promise<void> {
-    const totalUsers: number = importStore.importResponse?.total || 0;
-    const itemsPerPage: number = importStore.importedUsersPerPage;
-    const totalPagesNumber: number = Math.ceil(totalUsers / itemsPerPage);
+    isDownloadingFile.value = true;
+    try {
+      const totalUsers: number = importStore.importResponse?.total || 0;
+      const itemsPerPage: number = importStore.importedUsersPerPage;
+      const totalPagesNumber: number = Math.ceil(totalUsers / itemsPerPage);
 
-    // Collect all imported users
-    let allImportedUsers: ImportedUserResponse[] = [];
+      let allImportedUsers: ImportedUserResponse[] = [];
 
-    // Fetch users for each page
-    for (let pageIndex: number = 0; pageIndex < totalPagesNumber; pageIndex++) {
-      const offset: number = pageIndex * itemsPerPage;
+      // Fetch users for each page
+      for (let pageIndex: number = 0; pageIndex < totalPagesNumber; pageIndex++) {
+        const offset: number = pageIndex * itemsPerPage;
 
-      // Fetch users for the current offset
-      await importStore.getImportedPersons(importStore.uploadResponse?.importvorgangId as string, offset, itemsPerPage);
+        await importStore.getImportedPersons(
+          importStore.uploadResponse?.importvorgangId as string,
+          offset,
+          itemsPerPage,
+        );
 
-      // Accumulate imported users
-      allImportedUsers = allImportedUsers.concat(importStore.importResponse?.importedUsers || []);
+        allImportedUsers = allImportedUsers.concat(importStore.importResponse?.importedUsers || []);
+      }
+
+      // Create and download single file with all users
+      const fileContent: string = createFileContentFromUsers(allImportedUsers);
+      downloadFileContent(fileContent);
+    } catch (error) {
+      importStore.errorCode = 'ERROR_IMPORTING_FILE';
+    } finally {
+      isDownloadingFile.value = false;
     }
-
-    // Create a single file with all users
-    const fileContent: string = createFileContentFromUsers(allImportedUsers);
-    downloadFileContent(fileContent);
   }
 
   const onSubmit: (e?: Event | undefined) => Promise<void | undefined> = formContext.handleSubmit(() => {
@@ -423,7 +435,14 @@
       :showCloseText="true"
     >
       <!-- Import success template -->
-      <template v-if="importStore.importProgress === 100 && !importStore.importIsLoading && !importStore.errorCode">
+      <template
+        v-if="
+          importStore.importProgress === 100 &&
+          !importStore.importIsLoading &&
+          !isDownloadingFile &&
+          !importStore.errorCode
+        "
+      >
         <v-container>
           <v-row justify="center">
             <v-col cols="auto">
@@ -460,15 +479,41 @@
               <v-btn
                 class="primary"
                 @click="downloadAllFiles()"
-                data-testid="download-all-files-button"
+                data-testid="download-all-data-button"
                 :disabled="importStore.importIsLoading || importStore.retrievalIsLoading"
               >
-                {{ $t('admin.import.downloadAllFiles') }}
+                {{ $t('admin.import.downloadUserdata') }}
               </v-btn>
             </v-col>
           </v-row>
         </v-container>
       </template>
+
+      <v-template v-else-if="isDownloadingFile">
+        <v-container>
+          <v-row class="justify-center">
+            <v-col cols="auto">
+              <v-icon
+                aria-hidden="true"
+                class="mr-2"
+                icon="mdi-alert-circle-outline"
+                size="small"
+              ></v-icon>
+              <span class="subtitle-2">
+                {{ $t('admin.import.doNotCloseNoticeDownload') }}
+              </span>
+            </v-col>
+          </v-row>
+          <v-row justify="center">
+            <v-col cols="auto">
+              <v-progress-circular
+                data-testid="loading-spinner"
+                indeterminate
+              ></v-progress-circular
+            ></v-col>
+          </v-row>
+        </v-container>
+      </v-template>
 
       <!-- Import loading template -->
       <template v-if="importStore.importProgress > 0 && !importStore.errorCode">
@@ -485,7 +530,7 @@
                 size="small"
               ></v-icon>
               <span class="subtitle-2">
-                {{ $t('admin.import.doNotCloseNotice') }}
+                {{ $t('admin.import.doNotCloseNoticeImport') }}
               </span>
             </v-col>
           </v-row>
