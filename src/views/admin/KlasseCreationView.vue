@@ -85,6 +85,16 @@
     event.returnValue = '';
   }
 
+  async function initStores(): Promise<void> {
+    await organisationStore.getAllOrganisationen({
+      includeTyp: OrganisationsTyp.Schule,
+      systemrechte: [RollenSystemRecht.KlassenVerwalten],
+      limit: 25,
+    });
+    organisationStore.createdKlasse = null;
+    organisationStore.errorCode = '';
+  }
+
   onBeforeRouteLeave((_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
     if (isFormDirty()) {
       showUnsavedChangesDialog.value = true;
@@ -142,16 +152,6 @@
     );
     resetForm();
   });
-
-  async function initStores() {
-    await organisationStore.getAllOrganisationen({
-      includeTyp: OrganisationsTyp.Schule,
-      systemrechte: [RollenSystemRecht.KlassenVerwalten],
-      limit: 25,
-    });
-    organisationStore.createdKlasse = null;
-    organisationStore.errorCode = '';
-  }
 
   onMounted(async () => {
     await initStores();
