@@ -738,6 +738,15 @@
           >
           </RolleModify>
         </v-col>
+        <!-- Display the number of selected checkboxes -->
+        <v-col
+          v-if="selectedPersonIds.length > 0"
+          cols="12"
+          md="4"
+          class="mt-md-5 mt-n10"
+        >
+          <p class="text-body">{{ selectedPersonIds.length }} {{ $t('selected') }}</p>
+        </v-col>
         <v-spacer></v-spacer>
         <SearchField
           :initialValue="searchFilterStore.searchFilterPersonen ?? ''"

@@ -682,6 +682,7 @@
     "limitedUntil": "Befristet bis"
   },
   "save": "Speichern",
+  "selected": "ausgewählt",
   "since": "Seit",
   "refreshData": "Daten aktualisieren",
   "resetFilter": "Filter zurücksetzen",

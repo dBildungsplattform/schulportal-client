@@ -43,7 +43,7 @@
       return rolle.rollenart === RollenArt.Lern;
     });
   });
-  
+
   const schulen: ComputedRef<TranslatedObject[] | undefined> = useSchulen();
   const searchInputSchule: Ref<string> = ref('');
 
