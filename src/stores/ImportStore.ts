@@ -17,9 +17,9 @@ const importApi: ImportApiInterface = ImportApiFactory(undefined, '', axiosApiIn
 const MAX_POLLING_TIME: number = 120 * 60 * 1000;
 
 export enum ImportDataItemStatus {
-  FAILED = 'FAILED',
-  SUCCESS = 'SUCCESS',
-  PENDING = 'PENDING',
+  Failed = 'FAILED',
+  Success = 'SUCCESS',
+  Pending = 'PENDING',
 }
 
 export type { ImportResultResponse, ImportedUserResponse};

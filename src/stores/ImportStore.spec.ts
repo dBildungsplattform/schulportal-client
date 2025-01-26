@@ -287,7 +287,7 @@ describe('ImportStore', () => {
               nachname: 'Mstermann',
               benutzername: 'mmstermann117',
               startpasswort: 'pK0!V%m&',
-              status: ImportDataItemStatus.SUCCESS,
+              status: ImportDataItemStatus.Success,
             },
             {
               klasse: '9a',
@@ -295,7 +295,7 @@ describe('ImportStore', () => {
               nachname: 'Mler',
               benutzername: 'mmler2288',
               startpasswort: 'qA0$z?gv',
-              status: ImportDataItemStatus.SUCCESS,
+              status: ImportDataItemStatus.Success,
             },
           ],
           total: 5,

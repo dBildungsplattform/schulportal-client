@@ -303,10 +303,10 @@
 
   function createFileContentFromUsers(users: ImportedUserResponse[]): string {
     const successfulUsers: ImportedUserResponse[] = users.filter(
-      (user: ImportedUserResponse) => user.status === ImportDataItemStatus.SUCCESS,
+      (user: ImportedUserResponse) => user.status === ImportDataItemStatus.Success,
     );
     const failedUsers: ImportedUserResponse[] = users.filter(
-      (user: ImportedUserResponse) => user.status === ImportDataItemStatus.FAILED,
+      (user: ImportedUserResponse) => user.status === ImportDataItemStatus.Failed,
     );
 
     let fileContent: string = `Schule: ${importStore.importResponse?.organisationsname} - Rolle: ${importStore.importResponse?.rollenname}`;
@@ -340,7 +340,7 @@
 
       for (let pageIndex: number = 0; pageIndex < totalPagesNumber; pageIndex++) {
         const offset: number = pageIndex * itemsPerPage;
-        await new Promise((resolve: (value: unknown) => void) => setTimeout(resolve, pageIndex * 500));
+        await new Promise((resolve: (value: unknown) => void) => setTimeout(resolve, pageIndex * 600));
 
         await importStore.getImportedPersons(
           importStore.uploadResponse?.importvorgangId as string,
