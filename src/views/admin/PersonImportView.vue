@@ -1,3 +1,4 @@
+<!-- eslint-disable @typescript-eslint/no-loop-func -->
 <script setup lang="ts">
   import FormWrapper from '@/components/form/FormWrapper.vue';
   import FormRow from '@/components/form/FormRow.vue';
@@ -340,32 +341,46 @@
       const itemsPerPage: number = importStore.importedUsersPerPage;
       const totalPagesNumber: number = Math.ceil(totalUsers / itemsPerPage);
 
-      let allImportedUsers: ImportedUserResponse[] = [];
+      let fileContent: string = ''; // Store the file content progressively
 
-      // Fetch users for each page
-      for (let pageIndex: number = 0; pageIndex < totalPagesNumber; pageIndex++) {
-        const offset: number = pageIndex * itemsPerPage;
+      for (let chunkStart: number = 0; chunkStart < totalPagesNumber; chunkStart += 5) {
+        // Array to store users fetched in this batch
+        let chunkImportedUsers: ImportedUserResponse[] = [];
 
-        try {
-          await importStore.getImportedPersons(
-            importStore.uploadResponse?.importvorgangId as string,
-            offset,
-            itemsPerPage,
-          );
+        // Send 5 requests concurrently to fetch 500 users
+        const promises: Promise<void>[] = [];
+        for (let i: number = 0; i < 5; i++) {
+          const pageIndex: number = chunkStart + i;
+          if (pageIndex >= totalPagesNumber) break; // Stop if we're out of pages
 
-          allImportedUsers = allImportedUsers.concat(importStore.importResponse?.importedUsers || []);
-        } catch (error) {
-          console.error(`Failed to fetch page ${pageIndex}:`, error);
+          const offset: number = pageIndex * itemsPerPage;
+          const fetchPromise: Promise<void> = importStore
+            .getImportedPersons(importStore.uploadResponse?.importvorgangId as string, offset, itemsPerPage)
+            .then((): void => {
+              // Merge the results into the chunk array
+              chunkImportedUsers = chunkImportedUsers.concat(importStore.importResponse?.importedUsers || []);
+            })
+            .catch((error: unknown) => {
+              console.error(`Failed to fetch page ${pageIndex}:`, error);
+            });
+
+          promises.push(fetchPromise);
         }
 
-        // Add a delay of 300ms between requests
+        // Wait for all 5 requests to complete
+        await Promise.all(promises);
+
+        // Create file content for the chunk and append it
+        fileContent += createFileContentFromUsers(chunkImportedUsers);
+
+        // Add a small delay before processing the next chunk
         await delay(300);
       }
 
-      // Create and download single file with all users
-      const fileContent: string = createFileContentFromUsers(allImportedUsers);
+      // Download the complete file
       downloadFileContent(fileContent);
     } catch (error) {
+      console.error('Error downloading files:', error);
       importStore.errorCode = 'ERROR_IMPORTING_FILE';
     } finally {
       isDownloadingFile.value = false;
