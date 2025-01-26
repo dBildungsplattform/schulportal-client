@@ -339,21 +339,16 @@
       let allImportedUsers: ImportedUserResponse[] = [];
 
       for (let pageIndex: number = 0; pageIndex < totalPagesNumber; pageIndex++) {
-        try {
-          const offset: number = pageIndex * itemsPerPage;
-          await new Promise((resolve) => setTimeout(resolve, pageIndex * 500)); // Increasing delay
+        const offset: number = pageIndex * itemsPerPage;
+        await new Promise((resolve: (value: unknown) => void) => setTimeout(resolve, pageIndex * 500));
 
-          await importStore.getImportedPersons(
-            importStore.uploadResponse?.importvorgangId as string,
-            offset,
-            itemsPerPage,
-          );
+        await importStore.getImportedPersons(
+          importStore.uploadResponse?.importvorgangId as string,
+          offset,
+          itemsPerPage,
+        );
 
-          allImportedUsers = allImportedUsers.concat(importStore.importResponse?.importedUsers || []);
-        } catch (pageError) {
-          console.error(`Error fetching page ${pageIndex}:`, pageError);
-          // Optional: implement retry logic or skip problematic pages
-        }
+        allImportedUsers = allImportedUsers.concat(importStore.importResponse?.importedUsers || []);
       }
 
       const fileContent: string = createFileContentFromUsers(allImportedUsers);
