@@ -346,13 +346,17 @@
       for (let pageIndex: number = 0; pageIndex < totalPagesNumber; pageIndex++) {
         const offset: number = pageIndex * itemsPerPage;
 
-        await importStore.getImportedPersons(
-          importStore.uploadResponse?.importvorgangId as string,
-          offset,
-          itemsPerPage,
-        );
+        try {
+          await importStore.getImportedPersons(
+            importStore.uploadResponse?.importvorgangId as string,
+            offset,
+            itemsPerPage,
+          );
 
-        allImportedUsers = allImportedUsers.concat(importStore.importResponse?.importedUsers || []);
+          allImportedUsers = allImportedUsers.concat(importStore.importResponse?.importedUsers || []);
+        } catch (error) {
+          console.error(`Failed to fetch page ${pageIndex}:`, error);
+        }
 
         // Add a delay of 300ms between requests
         await delay(300);
