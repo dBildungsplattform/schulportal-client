@@ -329,6 +329,10 @@
     return fileContent;
   }
 
+  function delay(ms: number): Promise<void> {
+    return new Promise((resolve: (value: void | PromiseLike<void>) => void) => setTimeout(resolve, ms));
+  }
+
   async function downloadAllFiles(): Promise<void> {
     isDownloadingFile.value = true;
     try {
@@ -349,6 +353,9 @@
         );
 
         allImportedUsers = allImportedUsers.concat(importStore.importResponse?.importedUsers || []);
+
+        // Add a delay of 300ms between requests
+        await delay(300);
       }
 
       // Create and download single file with all users
