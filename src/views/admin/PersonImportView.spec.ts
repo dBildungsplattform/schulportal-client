@@ -360,9 +360,9 @@ describe('PersonImportView', () => {
     const fileInput: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="file-input"] input');
 
     // Create mock file with specific encoding
-    const fileContent: Uint8Array<ArrayBuffer> | 'test' =
+    const fileContent: ArrayBuffer | 'test' =
       encoding === 'windows-1252'
-        ? new Uint8Array([0xc4, 0xd6, 0xdc]) // ÄÖÜ in Windows-1252
+        ? new Uint8Array([0xc4, 0xd6, 0xdc]).buffer // ÄÖÜ in Windows-1252
         : 'test';
     const mockFile: File = new File([fileContent], 'personen.csv', {
       type: 'text/csv',
