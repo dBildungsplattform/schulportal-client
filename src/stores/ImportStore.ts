@@ -22,7 +22,7 @@ export enum ImportDataItemStatus {
   Pending = 'PENDING',
 }
 
-export type { ImportResultResponse, ImportedUserResponse};
+export type { ImportResultResponse, ImportedUserResponse };
 
 export type ImportState = {
   errorCode: string | null;

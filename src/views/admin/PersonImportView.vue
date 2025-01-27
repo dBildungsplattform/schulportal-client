@@ -293,7 +293,7 @@
 
     const link: HTMLAnchorElement = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', `${t('person.passwords')}.txt`);
+    link.setAttribute('download', `${t('admin.import.fileName.person')}.txt`);
     document.body.appendChild(link);
     link.click();
     link.remove();
@@ -365,11 +365,15 @@
   });
 
   function isFormDirty(): boolean {
-    return (
-      formContext.isFieldDirty('selectedSchule') ||
-      formContext.isFieldDirty('selectedRolle') ||
-      formContext.isFieldDirty('selectedFiles')
-    );
+    // Form dirtiness check only if the import was not executed yet
+    if (importStore.importProgress === 0) {
+      return (
+        formContext.isFieldDirty('selectedSchule') ||
+        formContext.isFieldDirty('selectedRolle') ||
+        formContext.isFieldDirty('selectedFiles')
+      );
+    }
+    return false;
   }
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
   let blockedNext: () => void = () => {};
@@ -533,7 +537,7 @@
               </span>
             </v-col>
           </v-row>
-          <v-row justify="center">
+          <v-row justify="center mb-n10">
             <v-col cols="12">
               <v-progress-linear
                 data-testid="import-progress-bar"
@@ -552,11 +556,11 @@
 
       <!-- Upload form -->
       <FormWrapper
-        v-if="importStore.importProgress === 0"
         :confirmUnsavedChangesAction="handleConfirmUnsavedChanges"
         :createButtonLabel="$t('admin.import.uploadFile')"
         :discardButtonLabel="$t('nav.backToList')"
         :hideActions="
+          importStore.importProgress > 0 ||
           showUploadSuccessTemplate ||
           !!importStore.importResponse ||
           importStore.importIsLoading ||
@@ -631,6 +635,7 @@
         <!-- Actual form -->
         <template
           v-if="
+            importStore.importProgress === 0 &&
             !showUploadSuccessTemplate &&
             !importStore.importResponse &&
             !importStore.importIsLoading &&
@@ -784,10 +789,7 @@
       <v-card-text>
         <v-container>
           <v-row class="text-body bold ml-2">
-            <v-col
-              offset="1"
-              cols="10"
-            >
+            <v-col class="text-center">
               <span data-testid="person-import-confirmation-text">
                 {{ $t('admin.import.confirmationText') }}
               </span>

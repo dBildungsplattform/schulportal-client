@@ -118,8 +118,8 @@
     <LayoutCard :header="$t('unsavedChanges.title')">
       <v-card-text>
         <v-container>
-          <v-row class="text-body bold px-md-16">
-            <v-col>
+          <v-row class="text-body bold justify-center">
+            <v-col class="text-center">
               <p data-testid="unsaved-changes-warning-text">
                 {{ $t('unsavedChanges.message') }}
               </p>
