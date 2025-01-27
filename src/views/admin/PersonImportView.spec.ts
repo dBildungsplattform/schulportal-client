@@ -350,19 +350,36 @@ describe('PersonImportView', () => {
     expect(fileInput?.text()).toBe('');
   });
 
-  test.each([['utf-8']])('it reads files with %s encoding', async (_encoding: string) => {
+  test.each([['utf-8'], ['windows-1252']])('it reads files with %s encoding', async (encoding: string) => {
+    // Setup test constants
     const totalImportDataItems: number = 1234;
+
+    // Find components
     const schuleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
     const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
     const fileInput: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="file-input"] input');
-    const mockFile: File = new File(['test'], 'personen.csv', { type: 'text/csv' });
+
+    // Create mock file with specific encoding
+    const fileContent: Uint8Array<ArrayBuffer> | 'test' =
+      encoding === 'windows-1252'
+        ? new Uint8Array([0xc4, 0xd6, 0xdc]) // ÄÖÜ in Windows-1252
+        : 'test';
+    const mockFile: File = new File([fileContent], 'personen.csv', {
+      type: 'text/csv',
+    });
+
+    // Set form values
     schuleAutocomplete?.setValue('Schule');
     rolleAutocomplete?.setValue('SuS');
     Object.defineProperty(fileInput?.element, 'files', {
       value: [mockFile],
     });
+
+    // Trigger file input change
     await fileInput?.trigger('change');
     await nextTick();
+
+    // Mock the upload function
     const mockFunction: Mock = vi.fn(async () => {
       importStore.importResponse = null;
       importStore.uploadIsLoading = false;
@@ -379,9 +396,15 @@ describe('PersonImportView', () => {
       };
     });
     importStore.uploadPersonenImportFile = mockFunction;
+
+    // Submit form
     await wrapper?.find('[data-testid="person-import-form-submit-button"]').trigger('click');
+
+    // Wait for and verify mock function call
     await vi.waitUntil(() => mockFunction.mock.calls.length > 0);
     expect(mockFunction).toHaveBeenCalledOnce();
+
+    // Verify success message
     await vi.waitUntil(() => wrapper?.find('[data-testid="person-upload-success-text"]').exists());
     expect(wrapper?.find('[data-testid="person-upload-success-text"]').text()).toContain('erfolgreich');
     expect(wrapper?.find('[data-testid="person-upload-success-text"]').text()).toContain(

@@ -354,7 +354,8 @@
       const fileContent: string = createFileContentFromUsers(allImportedUsers);
       downloadFileContent(fileContent);
     } catch (error) {
-      importStore.errorCode = 'ERROR_IMPORTING_FILE';
+      // While downloading the file, it could happen that some users can't be downloaded even though they were imported successfully... In that case it makes sense to ignore errors and just go forward with the other users for better usability.
+      importStore.errorCode = '';
     } finally {
       isDownloadingFile.value = false;
     }
