@@ -297,6 +297,59 @@ describe('PersonImportView', () => {
     expect(push).toHaveBeenCalledTimes(1);
   });
 
+  test('it resets the form for another upload', async () => {
+    const schuleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
+    const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
+    const fileInput: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="file-input"] input');
+    const mockFile: File = new File([''], 'personen.csv', { type: 'text/csv' });
+
+    importStore.importProgress = 100;
+    schuleAutocomplete?.setValue('Schule');
+    rolleAutocomplete?.setValue('SuS');
+    Object.defineProperty(fileInput?.element, 'files', {
+      value: [mockFile],
+    });
+    await nextTick();
+
+    const anotherImportButton: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="another-import-button"]');
+    anotherImportButton?.trigger('click');
+    await nextTick();
+
+    expect(schuleAutocomplete?.text()).toBe('');
+    expect(rolleAutocomplete?.text()).toBe('');
+    expect(fileInput?.text()).toBe('');
+  });
+
+  test('it resets the store and navigates when discarding', async () => {
+    const schuleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
+    const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
+    const fileInput: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="file-input"] input');
+    const mockFile: File = new File([''], 'personen.csv', { type: 'text/csv' });
+
+    importStore.errorCode = 'dummy';
+    importStore.uploadResponse = {} as ImportStore['uploadResponse'];
+    importStore.importProgress = 100;
+    schuleAutocomplete?.setValue('Schule');
+    rolleAutocomplete?.setValue('SuS');
+    Object.defineProperty(fileInput?.element, 'files', {
+      value: [mockFile],
+    });
+    await nextTick();
+
+    const closeDialogButton: DOMWrapper<Element> | undefined = wrapper?.find(
+      '[data-testid="close-layout-card-button"]',
+    );
+    closeDialogButton?.trigger('click');
+    await nextTick();
+
+    expect(importStore.errorCode).toBeNull();
+    expect(importStore.uploadResponse).toBeNull();
+    expect(importStore.importProgress).toBe(0);
+    expect(schuleAutocomplete?.text()).toBe('');
+    expect(rolleAutocomplete?.text()).toBe('');
+    expect(fileInput?.text()).toBe('');
+  });
+
   test.each([['utf-8']])('it reads files with %s encoding', async (_encoding: string) => {
     const totalImportDataItems: number = 1234;
     const schuleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
