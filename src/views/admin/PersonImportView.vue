@@ -537,7 +537,7 @@
               </span>
             </v-col>
           </v-row>
-          <v-row justify="center mb-n10">
+          <v-row justify="center">
             <v-col cols="12">
               <v-progress-linear
                 data-testid="import-progress-bar"
@@ -556,11 +556,11 @@
 
       <!-- Upload form -->
       <FormWrapper
+        v-if="importStore.importProgress === 0"
         :confirmUnsavedChangesAction="handleConfirmUnsavedChanges"
         :createButtonLabel="$t('admin.import.uploadFile')"
         :discardButtonLabel="$t('nav.backToList')"
         :hideActions="
-          importStore.importProgress > 0 ||
           showUploadSuccessTemplate ||
           !!importStore.importResponse ||
           importStore.importIsLoading ||
@@ -634,9 +634,7 @@
 
         <!-- Actual form -->
         <template
-          v-if="
-            importStore.importProgress === 0 &&
-            !showUploadSuccessTemplate &&
+          v-if="!showUploadSuccessTemplate &&
             !importStore.importResponse &&
             !importStore.importIsLoading &&
             !importStore.errorCode
