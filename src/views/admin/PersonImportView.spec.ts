@@ -1,4 +1,4 @@
-import { expect, test, type MockInstance } from 'vitest';
+import { expect, test, type Mock, type MockInstance } from 'vitest';
 import { DOMWrapper, flushPromises, mount, VueWrapper } from '@vue/test-utils';
 import PersonImportView from './PersonImportView.vue';
 import { nextTick } from 'vue';
@@ -295,5 +295,44 @@ describe('PersonImportView', () => {
       .trigger('click');
 
     expect(push).toHaveBeenCalledTimes(1);
+  });
+
+  test.each([['utf-8']])('it reads files with %s encoding', async (_encoding: string) => {
+    const totalImportDataItems: number = 1234;
+    const schuleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
+    const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
+    const fileInput: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="file-input"] input');
+    const mockFile: File = new File(['test'], 'personen.csv', { type: 'text/csv' });
+    schuleAutocomplete?.setValue('Schule');
+    rolleAutocomplete?.setValue('SuS');
+    Object.defineProperty(fileInput?.element, 'files', {
+      value: [mockFile],
+    });
+    await fileInput?.trigger('change');
+    await nextTick();
+    const mockFunction: Mock = vi.fn(async () => {
+      importStore.importResponse = null;
+      importStore.uploadIsLoading = false;
+      importStore.importIsLoading = false;
+      importStore.errorCode = null;
+      importStore.importProgress = 0;
+      await nextTick();
+      importStore.uploadResponse = {
+        isValid: true,
+        importvorgangId: '7561564',
+        totalImportDataItems,
+        totalInvalidImportDataItems: 0,
+        invalidImportDataItems: [],
+      };
+    });
+    importStore.uploadPersonenImportFile = mockFunction;
+    await wrapper?.find('[data-testid="person-import-form-submit-button"]').trigger('click');
+    await vi.waitUntil(() => mockFunction.mock.calls.length > 0);
+    expect(mockFunction).toHaveBeenCalledOnce();
+    await vi.waitUntil(() => wrapper?.find('[data-testid="person-upload-success-text"]').exists());
+    expect(wrapper?.find('[data-testid="person-upload-success-text"]').text()).toContain('erfolgreich');
+    expect(wrapper?.find('[data-testid="person-upload-success-text"]').text()).toContain(
+      totalImportDataItems.toString(),
+    );
   });
 });
