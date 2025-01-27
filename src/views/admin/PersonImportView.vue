@@ -333,7 +333,7 @@
   async function downloadAllFiles(): Promise<void> {
     isDownloadingFile.value = true;
     try {
-      const totalUsers: number = importStore.importResponse?.total || 0;
+      const totalUsers: number = importStore.importResponse?.total as number;
       const itemsPerPage: number = importStore.importedUsersPerPage;
       const totalPagesNumber: number = Math.ceil(totalUsers / itemsPerPage);
 

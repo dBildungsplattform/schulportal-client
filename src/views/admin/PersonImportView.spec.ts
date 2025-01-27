@@ -142,6 +142,20 @@ describe('PersonImportView', () => {
     // expect(wrapper?.emitted('click:clear')).toBe(true);
   });
 
+  test('it shows validation messages', async () => {
+    expect(wrapper?.find('#schule-select-messages').text()).toBe('');
+    expect(wrapper?.find('#rolle-select-messages').text()).toBe('');
+    expect(wrapper?.find('[data-testid="file-input"]').text()).not.toContain('Eine CSV-Datei muss ausgewählt werden.');
+
+    await wrapper?.find('[data-testid="person-import-form-submit-button"]').trigger('click');
+    // wait for transition to happen
+    await vi.waitUntil(() => (wrapper?.find('#schule-select-messages').text().length ?? 0) > 0);
+
+    expect(wrapper?.find('#schule-select-messages').text()).toContain('Eine Schule muss ausgewählt werden.');
+    expect(wrapper?.find('#rolle-select-messages').text()).toContain('Eine Rolle muss ausgewählt werden.');
+    expect(wrapper?.find('[data-testid="file-input"]').text()).toContain('Eine CSV-Datei muss ausgewählt werden.');
+  });
+
   test('it uploads a file', async () => {
     const mockFile: File = new File([''], 'personen.csv', { type: 'text/csv' });
     const fileInput: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="file-input"] input');
