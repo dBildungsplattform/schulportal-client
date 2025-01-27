@@ -1,4 +1,4 @@
-import { expect, test } from 'vitest';
+import { expect, test, type MockInstance } from 'vitest';
 import { DOMWrapper, flushPromises, mount, VueWrapper } from '@vue/test-utils';
 import PersonImportView from './PersonImportView.vue';
 import { nextTick } from 'vue';
@@ -109,6 +109,7 @@ beforeEach(async () => {
       components: {
         PersonImportView,
       },
+      plugins: [router],
     },
   });
 
@@ -283,5 +284,16 @@ describe('PersonImportView', () => {
     await flushPromises();
 
     expect(wrapper?.find('[data-testid="import-progress-bar"]').isVisible()).toBe(true);
+  });
+
+  test('it closes the layout card and navigates to person-management', async () => {
+    const push: MockInstance = vi.spyOn(router, 'push');
+
+    wrapper
+      ?.findComponent({ name: 'FormWrapper' })
+      .find('[data-testid="person-import-form-discard-button"')
+      .trigger('click');
+
+    expect(push).toHaveBeenCalledTimes(1);
   });
 });
