@@ -254,6 +254,7 @@
   }
 
   function anotherImport(): void {
+    importStore.errorCode = '';
     importStore.uploadResponse = null;
     importStore.importResponse = null;
     importStore.importProgress = 0;
