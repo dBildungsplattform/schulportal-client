@@ -302,7 +302,6 @@
   }
 
   function createFileContentFromUsers(users: ImportedUserResponse[]): string {
-
     const successfulUsers: ImportedUserResponse[] = users.filter(
       (user: ImportedUserResponse) => user.status === ImportDataItemStatus.Success,
     );
@@ -440,14 +439,7 @@
       :showCloseText="true"
     >
       <!-- Import success template -->
-      <template
-        v-if="
-          importStore.importProgress === 100 &&
-          !importStore.importIsLoading &&
-          !isDownloadingFile &&
-          !importStore.errorCode
-        "
-      >
+      <template v-if="importStore.importProgress === 100 && !importStore.importIsLoading && !isDownloadingFile">
         <v-container>
           <v-row justify="center">
             <v-col cols="auto">
@@ -636,7 +628,8 @@
 
         <!-- Actual form -->
         <template
-          v-if="!showUploadSuccessTemplate &&
+          v-if="
+            !showUploadSuccessTemplate &&
             !importStore.importResponse &&
             !importStore.importIsLoading &&
             !importStore.errorCode
