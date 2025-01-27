@@ -871,6 +871,7 @@
     changeBefristungSuccessDialogVisible.value = !personenkontextStore.errorCode;
     selectedZuordnungen.value = [];
     changeBefristungFormContext.resetForm();
+    formContext.resetForm();
   }
 
   // The save button will act according to what kind of pending action we have.
