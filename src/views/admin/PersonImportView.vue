@@ -302,6 +302,7 @@
   }
 
   function createFileContentFromUsers(users: ImportedUserResponse[]): string {
+
     const successfulUsers: ImportedUserResponse[] = users.filter(
       (user: ImportedUserResponse) => user.status === ImportDataItemStatus.Success,
     );

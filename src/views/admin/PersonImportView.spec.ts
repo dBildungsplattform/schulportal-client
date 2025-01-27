@@ -278,6 +278,68 @@ describe('PersonImportView', () => {
     downloadButton?.trigger('click');
   });
 
+  test('it downloads an imported file with only successful users through the download all button', async () => {
+    importStore.importResponse = {
+      importvorgandId: '1',
+      rollenname: 'itslearning-Schulbegleitung',
+      organisationsname: 'Carl-Orff-Schule',
+      importedUsers: [
+        {
+          klasse: '9a',
+          vorname: 'Max',
+          nachname: 'Mstermann',
+          benutzername: 'mmstermann117',
+          startpasswort: 'pK0!V%m&',
+          status: ImportDataItemStatus.Success,
+        },
+        {
+          klasse: '9a',
+          vorname: 'Maria',
+          nachname: 'Mler',
+          benutzername: 'mmler2288',
+          startpasswort: 'qA0$z?gv',
+          status: ImportDataItemStatus.Success,
+        },
+      ],
+      total: 5,
+      pageTotal: 5,
+    };
+
+    global.URL.createObjectURL = vi.fn();
+    importStore.importProgress = 100;
+    await nextTick();
+
+    const downloadButton: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="download-all-data-button"]');
+    downloadButton?.trigger('click');
+  });
+
+  test('it downloads an imported file with only failed users through the download all button', async () => {
+    importStore.importResponse = {
+      importvorgandId: '1',
+      rollenname: 'itslearning-Schulbegleitung',
+      organisationsname: 'Carl-Orff-Schule',
+      importedUsers: [
+        {
+          klasse: '9a',
+          vorname: 'Youssef',
+          nachname: 'fessouf',
+          benutzername: 'mmler2388',
+          startpasswort: 'qA0$z?gx',
+          status: ImportDataItemStatus.Failed,
+        },
+      ],
+      total: 5,
+      pageTotal: 5,
+    };
+
+    global.URL.createObjectURL = vi.fn();
+    importStore.importProgress = 100;
+    await nextTick();
+
+    const downloadButton: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="download-all-data-button"]');
+    downloadButton?.trigger('click');
+  });
+
   test('it shows loading bar', async () => {
     importStore.importProgress = 5;
     importStore.errorCode = null;
