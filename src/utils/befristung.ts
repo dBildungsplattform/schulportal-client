@@ -21,7 +21,7 @@ export type BefristungUtilsType = {
   handleBefristungUpdate: (value: string | undefined) => void;
   handleBefristungOptionUpdate: (value: string | undefined) => void;
   setupWatchers: () => void;
-  setupRolleWatcher: () => void; // Export the new function
+  setupRolleWatcher: () => void;
 };
 
 const rollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = useRollen();
