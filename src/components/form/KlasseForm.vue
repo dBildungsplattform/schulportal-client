@@ -56,7 +56,7 @@
   });
 
   // Watcher to detect when the search input for Organisationen is triggered.
-  watch(searchInputSchule, async (newValue: string, _oldValue: string) => {
+  watch(searchInputSchule, async (newValue: string | undefined) => {
     clearTimeout(timerId.value);
     isSearching = !!newValue;
     if (newValue !== '' && newValue === selectedSchuleTitle.value) return;
