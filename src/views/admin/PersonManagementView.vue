@@ -37,7 +37,7 @@
 
   const selectedPersonIds: Ref<string[]> = ref<string[]>([]);
 
-  type ReadonlyHeaders = InstanceType<typeof VDataTableServer>['headers'];
+  type ReadonlyHeaders = VDataTableServer['headers'];
   const headers: ReadonlyHeaders = [
     { title: t('person.lastName'), key: 'person.name.familienname', align: 'start' },
     { title: t('person.firstName'), key: 'person.name.vorname', align: 'start' },
