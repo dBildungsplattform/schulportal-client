@@ -93,8 +93,8 @@ organisationStore.allOrganisationen = [
 rolleStore.allRollen = [
   {
     administeredBySchulstrukturknoten: '1234',
-    rollenart: 'LEHR',
-    name: 'Lehrer',
+    rollenart: 'LERN',
+    name: 'SuS',
     // TODO: remove type casting when generator is fixed
     merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RollenMerkmal>,
     systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
@@ -241,7 +241,7 @@ describe('PersonCreationView', () => {
     personenkontextStore.workflowStepResponse = {
       organisations: [
         {
-          id: 'string',
+          id: '9876',
           kennung: '',
           name: 'Organisation1',
           namensergaenzung: 'string',
@@ -253,7 +253,7 @@ describe('PersonCreationView', () => {
       rollen: [
         {
           administeredBySchulstrukturknoten: '1234',
-          rollenart: 'LEIT',
+          rollenart: 'LERN',
           name: 'SuS',
           merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RollenMerkmal>,
           systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
@@ -270,8 +270,6 @@ describe('PersonCreationView', () => {
       canCommit: true,
     };
 
-    personenkontextStore.createPersonWithKontexte = vi.fn();
-
     const organisationSelect: VueWrapper | undefined = wrapper
       ?.findComponent({ ref: 'personenkontext-create' })
       .findComponent({ ref: 'organisation-select' });
@@ -282,6 +280,12 @@ describe('PersonCreationView', () => {
       ?.findComponent({ ref: 'personenkontext-create' })
       .findComponent({ ref: 'rolle-select' });
     await rolleSelect?.setValue('1');
+    await nextTick();
+
+    const klasseSelect: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'personenkontext-create' })
+      .findComponent({ ref: 'klasse-select' });
+    await klasseSelect?.setValue('9a');
     await nextTick();
 
     const befristungInput: VueWrapper | undefined = wrapper
