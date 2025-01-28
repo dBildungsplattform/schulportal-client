@@ -330,7 +330,7 @@
     return fileContent;
   }
 
-  async function downloadAllFiles(): Promise<void> {
+  async function downloadFile(): Promise<void> {
     isDownloadingFile.value = true;
     try {
       const totalUsers: number = importStore.importResponse?.total as number;
@@ -355,7 +355,8 @@
       const fileContent: string = createFileContentFromUsers(allImportedUsers);
       downloadFileContent(fileContent);
     } catch (error) {
-      // While downloading the file, it could happen that some users can't be downloaded even though they were imported successfully... In that case it makes sense to ignore errors and just go forward with the other users for better usability.
+      // While downloading the file, it could happen that some users can't be downloaded even though they were imported successfully...
+      // In that case it makes sense to ignore errors and just go forward with the other users for better usability.
       importStore.errorCode = '';
     } finally {
       isDownloadingFile.value = false;
@@ -467,7 +468,7 @@
             <v-col cols="auto">
               <v-btn
                 class="secondary"
-                @click="anotherImport()"
+                @click="anotherImport"
                 data-testid="another-import-button"
               >
                 {{ $t('admin.import.anotherImport') }}
@@ -476,7 +477,7 @@
             <v-col cols="auto">
               <v-btn
                 class="primary"
-                @click="downloadAllFiles()"
+                @click="downloadFile"
                 data-testid="download-all-data-button"
                 :disabled="importStore.importIsLoading || importStore.retrievalIsLoading"
               >
@@ -608,7 +609,7 @@
               <v-col cols="auto">
                 <v-btn
                   class="secondary"
-                  @click="backToUpload()"
+                  @click="backToUpload"
                   data-testid="back-to-upload-button"
                 >
                   {{ $t('admin.import.backToUpload') }}
@@ -617,7 +618,7 @@
               <v-col cols="auto">
                 <v-btn
                   class="primary"
-                  @click="openConfirmationDialog()"
+                  @click="openConfirmationDialog"
                   data-testid="open-confirmation-dialog-button"
                 >
                   {{ $t('admin.import.executeImport') }}
