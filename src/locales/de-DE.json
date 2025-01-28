@@ -28,7 +28,8 @@
     "followingDataCreated": "Folgende Daten wurden gespeichert:",
     "headline": "Administrationsbereich",
     "import": {
-      "doNotCloseNotice": "Bitte den Browser während eines laufenden Importvorgangs nicht schließen!",
+      "doNotCloseNoticeDownload": "Bitte den Browser während des Herunterladens nicht schließen!",
+      "doNotCloseNoticeImport": "Bitte den Browser während eines laufenden Importvorgangs nicht schließen!",
       "anotherImport": "Weiteren Import durchführen",
       "backToUpload": "Andere Datei hochladen",
       "confirmationText": "Achtung, diese Aktion kann nicht rückgängig gemacht werden. Möchten Sie den Import wirklich durchführen?",
@@ -48,6 +49,7 @@
         "CSV_FILE_INVALID_HEADER_ERROR": "Die Datei konnte nicht gelesen werden. Bitte überprüfen Sie die Spaltenüberschriften."
       },
       "executeImport": "Import durchführen",
+      "failedToImportUsersNotice": "Die folgenden Benutzer konnten nicht importiert werden. Bitte überprüfen Sie die Daten:",
       "fileName": {
         "person": "Benutzerdaten"
       },
@@ -65,6 +67,7 @@
       },
       "recordsReadyForImport": "{count} Datensatz steht zum Import bereit. | {count} Datensätze stehen zum Import bereit.",
       "selectOrDropFile": "Datei auswählen oder ablegen",
+      "successfullyImportedUsersNotice": "Die folgenden Benutzer wurden erfolgreich importiert:",
       "uploadedSuccessfully": "Die Datei wurde erfolgreich hochgeladen.",
       "uploadErrorTitle": "Fehler beim Upload",
       "uploadFile": "Datei hochladen"
@@ -630,6 +633,7 @@
     "noChangesToSave": "Es liegen keine zu speichernden Änderungen vor.",
     "noZuordnungenFound": "Keine Schulzuordnungen gefunden.",
     "password": "Passwort",
+    "passwords": "Passwörter",
     "removeZuordnung": "Schulzuordnung entfernen",
     "removeZuordnungDescription": "Entfernt den Benutzer von der Schule.",
     "rolle": "Rolle",
@@ -712,6 +716,7 @@
   "banner": {
     "hint": "Hinweis: ",
     "kopers": "Die Verwendung dieses Benutzerkontos setzt eine KoPers.-Nr. voraus. Bitte kontaktieren Sie Ihre schulischen Administratorinnen und Administratoren, um eine KoPers.-Nr. eintragen zu lassen. Andernfalls wird Ihr Zugang zum {date} automatisch gesperrt.",
-    "noKontexte": "Dieses Benutzerkonto ist aktuell keiner Schule zugeordnet. Ohne Schulzuordnung sind ein großer Teil der Funktionalitäten des Schulportal SH nicht verfügbar. Sollten Sie weiterhin an einer Schule in Schleswig-Holstein tätig sein, wenden Sie sich an Ihre Schulleitung. Ist dieses Konto auch weiterhin keiner Schule zugeordnet, wird es zum {date} gelöscht."
+    "noKontexte": "Dieses Benutzerkonto ist aktuell keiner Schule zugeordnet. Ohne Schulzuordnung sind ein großer Teil der Funktionalitäten des Schulportal SH nicht verfügbar. Sollten Sie weiterhin an einer Schule in Schleswig-Holstein tätig sein, wenden Sie sich an Ihre Schulleitung. Ist dieses Konto auch weiterhin keiner Schule zugeordnet, wird es zum {date} gelöscht.",
+    "kontextExpires": "Die Zuordnung dieses Benutzerkontos zu der Schule \"{schule}\" mit der Rolle \"{rolle}\" ist bis zum {date} befristet. Sollte dies nicht zutreffen, wenden Sie sich bitte an Ihre Schulleitung. Nach Ende der Zuordnung sind Funktionalitäten, die im Bezug zu dieser Schule und Rolle stehen, nicht mehr verfügbar."
   }
 }

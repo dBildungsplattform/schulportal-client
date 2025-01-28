@@ -4,6 +4,8 @@ import {
   ImportApiFactory,
   ImportStatus,
   type ImportApiInterface,
+  type ImportedUserResponse,
+  type ImportResultResponse,
   type ImportUploadResponse,
   type ImportVorgangStatusResponse,
 } from '../api-client/generated/api';
@@ -11,18 +13,29 @@ import axiosApiInstance from '@/services/ApiService';
 
 const importApi: ImportApiInterface = ImportApiFactory(undefined, '', axiosApiInstance);
 
-// 1 hour polling time at maximum
-const MAX_POLLING_TIME: number = 60 * 60 * 1000;
+// 2 hours polling time at maximum
+const MAX_POLLING_TIME: number = 120 * 60 * 1000;
+
+export enum ImportDataItemStatus {
+  Failed = 'FAILED',
+  Success = 'SUCCESS',
+  Pending = 'PENDING',
+}
+
+export type { ImportResultResponse, ImportedUserResponse };
 
 export type ImportState = {
   errorCode: string | null;
-  importedData: File | null;
+  importResponse: ImportResultResponse | null;
   importIsLoading: boolean;
   uploadIsLoading: boolean;
+  retrievalIsLoading: boolean;
   uploadResponse: ImportUploadResponse | null;
   importStatus: ImportVorgangStatusResponse | null;
   importProgress: number;
   pollingInterval?: ReturnType<typeof setInterval>;
+  importedUsersPerPage: number;
+  importedUsersPage: number;
 };
 
 type ImportGetters = {};
@@ -32,7 +45,8 @@ type ImportActions = {
   getPersonenImportStatus: (importVorgangId: string) => Promise<void>;
   startImportStatusPolling: (importvorgangId: string) => Promise<void>;
   stopImportStatusPolling: () => void;
-  downloadPersonenImportFile: (importVorgangId: string) => Promise<void>;
+  getImportedPersons: (importVorgangId: string, offset?: number, limit?: number) => Promise<void>;
+  deleteImportVorgangById: (importVorgangId: string) => Promise<void>;
 };
 
 export type ImportStore = Store<'importStore', ImportState, ImportGetters, ImportActions>;
@@ -42,20 +56,41 @@ export const useImportStore: StoreDefinition<'importStore', ImportState, ImportG
   state: (): ImportState => {
     return {
       errorCode: null,
-      importedData: null,
+      importResponse: null,
       importIsLoading: false,
+      retrievalIsLoading: false,
       uploadIsLoading: false,
       uploadResponse: null,
       importStatus: null,
       importProgress: 0,
+      importedUsersPerPage: 100,
+      importedUsersPage: 1,
     };
   },
   actions: {
-    async downloadPersonenImportFile(importvorgangId: string): Promise<void> {
+    async getImportedPersons(importvorgangId: string, offset?: number, limit?: number): Promise<void> {
+      this.retrievalIsLoading = true;
       try {
-        const { data }: { data: File } = await importApi.importControllerDownloadFile(importvorgangId);
+        const { data }: { data: ImportResultResponse } = await importApi.importControllerGetImportedUsers(
+          importvorgangId,
+          offset,
+          limit,
+        );
 
-        this.importedData = data;
+        this.importResponse = data;
+      } catch (error: unknown) {
+        this.errorCode = 'UNSPECIFIED_ERROR';
+        if (isAxiosError(error)) {
+          this.errorCode = error.response?.data.i18nKey || 'ERROR_IMPORTING_FILE';
+        }
+      } finally {
+        this.retrievalIsLoading = false;
+      }
+    },
+
+    async deleteImportVorgangById(importvorgangId: string): Promise<void> {
+      try {
+        await importApi.importControllerDeleteImportTransaction(importvorgangId);
       } catch (error: unknown) {
         this.errorCode = getResponseErrorCode(error, 'ERROR_IMPORTING_FILE');
       }
@@ -88,6 +123,7 @@ export const useImportStore: StoreDefinition<'importStore', ImportState, ImportG
             case ImportStatus.Finished:
               this.stopImportStatusPolling();
               this.importProgress = 100;
+              await this.getImportedPersons(importvorgangId, 0, 100);
               break;
             case ImportStatus.Failed:
               this.stopImportStatusPolling();
