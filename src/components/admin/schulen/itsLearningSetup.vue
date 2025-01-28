@@ -25,7 +25,6 @@
 
   const emit: Emits = defineEmits<Emits>();
 
-  const errorMessage: Ref<string> = ref('');
   const successDialogVisible: Ref<boolean> = ref(false);
 
   async function closeActivateSchuleDialog(isActive: Ref<boolean>): Promise<void> {
@@ -47,7 +46,7 @@
   }
 
   const activateSchuleItsLearningConfirmationMessage: ComputedRef<string> = computed(() => {
-    if (errorMessage.value || props.errorCode) {
+    if (props.errorCode) {
       return '';
     }
     let message: string = '';
@@ -58,7 +57,7 @@
   });
 
   const retransmitSchuleConfirmationMessage: ComputedRef<string> = computed(() => {
-    if (errorMessage.value || props.errorCode) {
+    if (props.errorCode) {
       return '';
     }
     let message: string = '';
@@ -69,7 +68,7 @@
   });
 
   const activateItsLearningSuccessMessage: ComputedRef<string> = computed(() => {
-    if (errorMessage.value || props.errorCode) {
+    if (props.errorCode) {
       return '';
     }
     let message: string = '';
@@ -162,7 +161,7 @@
         <v-card-text>
           <v-container>
             <v-row
-              v-if="errorMessage || errorCode"
+              v-if="errorCode"
               class="text-body text-error"
             >
               <v-col
@@ -173,7 +172,7 @@
               </v-col>
               <v-col>
                 <p data-testid="error-text">
-                  {{ errorMessage || errorCode }}
+                  {{ errorCode }}
                 </p>
               </v-col>
             </v-row>
