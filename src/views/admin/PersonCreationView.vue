@@ -530,6 +530,7 @@
               </FormRow>
               <KopersInput
                 v-if="isKopersRolle(selectedRolle) && selectedOrganisation"
+                ref="kopers-input"
                 :hasNoKopersNr="hasNoKopersNr"
                 v-model:selectedKopersNr="selectedKopersNr"
                 :selectedKopersNrProps="selectedKopersNrProps"
