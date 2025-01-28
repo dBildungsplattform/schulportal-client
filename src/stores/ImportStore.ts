@@ -79,10 +79,7 @@ export const useImportStore: StoreDefinition<'importStore', ImportState, ImportG
 
         this.importResponse = data;
       } catch (error: unknown) {
-        this.errorCode = 'UNSPECIFIED_ERROR';
-        if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.i18nKey || 'ERROR_IMPORTING_FILE';
-        }
+        this.errorCode = getResponseErrorCode(error, 'ERROR_IMPORTING_FILE');
       } finally {
         this.retrievalIsLoading = false;
       }
