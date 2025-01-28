@@ -261,7 +261,7 @@
             <v-btn
               :block="mdAndDown"
               class="secondary"
-              @Click="closeModifyRolleDeleteDialog"
+              @click="closeModifyRolleDeleteDialog"
               data-testid="rolle-modify-discard-button"
             >
               {{ $t('cancel') }}
@@ -296,7 +296,7 @@
             <v-btn
               :block="mdAndDown"
               class="primary"
-              @Click="closeModifyRolleDeleteDialog"
+              @click="closeModifyRolleDeleteDialog"
               data-testid="rolle-modify-close-button"
             >
               {{ $t('close') }}

@@ -41,7 +41,7 @@ beforeEach(() => {
     },
     global: {
       components: {
-        PersonDelete: PersonSync,
+        PersonSync: PersonSync,
       },
     },
   });
