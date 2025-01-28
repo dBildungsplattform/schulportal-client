@@ -13,7 +13,7 @@
   import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
   import type { UserinfoPersonenkontext } from '@/stores/PersonenkontextStore';
   import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
-  import { type TranslatedObject } from '@/types.d';
+  import { type Mutable, type TranslatedObject } from '@/types.d';
   import { onBeforeRouteLeave, useRouter, type Router } from 'vue-router';
   import KlasseDelete from '@/components/admin/klassen/KlasseDelete.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
@@ -25,29 +25,23 @@
 
   const router: Router = useRouter();
 
-  type ReadonlyHeaders = VDataTableServer['$props']['headers'];
-  type UnwrapReadonlyArray<A> = A extends Readonly<Array<infer I>> ? I : never;
-  type ReadonlyDataTableHeader = UnwrapReadonlyArray<ReadonlyHeaders>;
-
-  // Utility type to make headers mutable
-  type DeepMutable<T> = { -readonly [P in keyof T]: DeepMutable<T[P]> };
-  type DataTableHeader = DeepMutable<ReadonlyDataTableHeader>;
+  type TableHeaders = VDataTableServer['headers'];
 
   // Define headers as a mutable array
-  const headers: Ref<DataTableHeader[]> = ref([
+  let headers: Ref<Mutable<TableHeaders>> = ref([
     {
       title: t('admin.klasse.klasse'),
       key: 'name',
       align: 'start',
       width: '250px',
-    } as DataTableHeader,
+    },
     {
       title: t('action'),
       key: 'actions',
       align: 'center',
       sortable: false,
       width: '250px',
-    } as DataTableHeader,
+    },
   ]);
 
   const selectedSchule: Ref<string | null> = ref(null);
@@ -80,6 +74,24 @@
         title: `${org.kennung} (${org.name.trim()})`,
       }))
       .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
+  });
+
+  const errorTitle: ComputedRef<string> = computed(() => {
+    if (!organisationStore.errorCode) {
+      return '';
+    }
+    return organisationStore.errorCode === 'UNSPECIFIED_ERROR'
+      ? t('admin.klasse.loadingErrorTitle')
+      : t(`admin.klasse.title.${organisationStore.errorCode}`);
+  });
+
+  const errorText: ComputedRef<string> = computed(() => {
+    if (!organisationStore.errorCode) {
+      return '';
+    }
+    return organisationStore.errorCode === 'UNSPECIFIED_ERROR'
+      ? t('admin.klasse.loadingErrorText')
+      : t(`admin.klasse.errors.${organisationStore.errorCode}`);
   });
 
   async function fetchKlassenBySelectedSchuleId(schuleId: string | null): Promise<void> {
@@ -404,7 +416,7 @@
   // Checks the current logged in user's kontexte and compares that to the organisations in the DB.
   // If the user has exactly 1 matching organisation then the Schule will be autoselectd for him.
   async function handleUserContext(): Promise<void> {
-    const personenkontexte: Array<UserinfoPersonenkontext> | null = authStore.currentUser?.personenkontexte || [];
+    const personenkontexte: Array<UserinfoPersonenkontext> = authStore.currentUser?.personenkontexte || [];
     if (personenkontexte.length > 0) {
       if (organisationStore.allSchulen.length === 1 && !searchFilterStore.selectedSchuleForKlassen) {
         selectedSchule.value = organisationStore.allSchulen[0]?.id || null;
@@ -413,13 +425,16 @@
           hasAutoselectedSchule.value = true;
           totalKlassen = klassenOptions.value?.length || 0;
         }
-      } else {
-        headers.value.unshift({
-          title: t('admin.schule.dienststellennummer'),
-          key: 'schuleDetails',
-          align: 'start',
-          width: '350px',
-        } as DataTableHeader);
+      } else if (headers.value) {
+        headers.value = [
+          {
+            title: t('admin.schule.dienststellennummer'),
+            key: 'schuleDetails',
+            align: 'start',
+            width: '350px',
+          },
+          ...headers.value,
+        ];
       }
     }
   }
@@ -482,18 +497,10 @@
       <!-- Error Message Display -->
       <SpshAlert
         :model-value="!!organisationStore.errorCode"
-        :title="
-          organisationStore.errorCode === 'UNSPECIFIED_ERROR'
-            ? $t('admin.klasse.loadingErrorTitle')
-            : $t(`admin.klasse.title.${organisationStore.errorCode}`)
-        "
+        :title="errorTitle"
         :type="'error'"
         :closable="false"
-        :text="
-          organisationStore.errorCode === 'UNSPECIFIED_ERROR'
-            ? $t('admin.klasse.loadingErrorText')
-            : $t(`admin.klasse.errors.${organisationStore.errorCode}`)
-        "
+        :text="errorText"
         :showButton="true"
         :buttonText="$t('nav.backToList')"
         :buttonAction="handleAlertClose"

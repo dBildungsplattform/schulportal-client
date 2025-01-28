@@ -1,8 +1,8 @@
-import { ImportDataItemStatus, useImportStore, type ImportStore } from './ImportStore';
-import { setActivePinia, createPinia } from 'pinia';
+import { ImportStatus, type ImportResultResponse, type ImportUploadResponse } from '@/api-client/generated';
 import ApiService from '@/services/ApiService';
 import MockAdapter from 'axios-mock-adapter';
-import { ImportStatus, type ImportResultResponse, type ImportUploadResponse } from '@/api-client/generated';
+import { createPinia, setActivePinia } from 'pinia';
+import { ImportDataItemStatus, useImportStore, type ImportStore } from './ImportStore';
 
 const mockadapter: MockAdapter = new MockAdapter(ApiService);
 

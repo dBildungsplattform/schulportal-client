@@ -1,9 +1,11 @@
+@use '../variables';
+
 label[disabled='true'] {
-  color: $disabledLabelColor;
+  color: variables.$disabledLabelColor;
 }
 
 label[error='true'] {
-  color: $labelErrorColor;
+  color: variables.$labelErrorColor;
 }
 
 label[required='true']:after {
