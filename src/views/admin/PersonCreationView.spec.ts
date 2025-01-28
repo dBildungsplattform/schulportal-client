@@ -1,5 +1,5 @@
 import { expect, type MockInstance, test } from 'vitest';
-import { VueWrapper, mount } from '@vue/test-utils';
+import { VueWrapper, flushPromises, mount } from '@vue/test-utils';
 import { nextTick } from 'vue';
 import PersonCreationView from './PersonCreationView.vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
@@ -67,7 +67,7 @@ organisationStore.allOrganisationen = [
     kennung: '9356494',
     namensergaenzung: 'Schule',
     kuerzel: 'rsg',
-    typ: 'SCHULE',
+    typ: 'LAND',
     administriertVon: '1234',
   },
   {
@@ -238,6 +238,40 @@ describe('PersonCreationView', () => {
   });
 
   test('it fills form and triggers submit', async () => {
+    personenkontextStore.workflowStepResponse = {
+      organisations: [
+        {
+          id: 'string',
+          kennung: '',
+          name: 'Organisation1',
+          namensergaenzung: 'string',
+          kuerzel: 'string',
+          typ: 'TRAEGER',
+          administriertVon: '1',
+        },
+      ],
+      rollen: [
+        {
+          administeredBySchulstrukturknoten: '1234',
+          rollenart: 'LEIT',
+          name: 'SuS',
+          merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RollenMerkmal>,
+          systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
+          createdAt: '2022',
+          updatedAt: '2022',
+          id: '1',
+          administeredBySchulstrukturknotenName: 'Land SH',
+          administeredBySchulstrukturknotenKennung: '',
+          version: 1,
+        },
+      ],
+      selectedOrganisation: null,
+      selectedRolle: null,
+      canCommit: true,
+    };
+
+    personenkontextStore.createPersonWithKontexte = vi.fn();
+
     const organisationSelect: VueWrapper | undefined = wrapper
       ?.findComponent({ ref: 'personenkontext-create' })
       .findComponent({ ref: 'organisation-select' });
@@ -265,22 +299,29 @@ describe('PersonCreationView', () => {
     await nachnameInput?.setValue('Cena');
     await nextTick();
 
-    personenkontextStore.createdPersonWithKontext = mockCreatedPersonWithKontext;
+    const kopersInput: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'kopers-input' })
+      .findComponent({ ref: 'kopersnr-input' });
+    await kopersInput?.setValue('23234');
+    await nextTick();
 
     wrapper?.find('[data-testid="person-creation-form-submit-button"]').trigger('click');
     await nextTick();
+    await flushPromises();
+
+    // Form is resetting after submit so orga should be undefined
+    expect(organisationSelect?.vm.$data).toStrictEqual({});
+  });
+
+  test('it renders success template and navigates back to form', async () => {
+    personenkontextStore.createdPersonWithKontext = mockCreatedPersonWithKontext;
+    await nextTick();
+
+    expect(wrapper?.find('[data-testid="person-success-text"]').isVisible()).toBe(true);
 
     expect(wrapper?.find('[data-testid="create-another-person-button"]').isVisible()).toBe(true);
 
     wrapper?.find('[data-testid="create-another-person-button"]').trigger('click');
-    await nextTick();
-
-    expect(personenkontextStore.createdPersonWithKontext).toBe(null);
-  });
-
-  test('it renders success template', async () => {
-    personenkontextStore.createdPersonWithKontext = mockCreatedPersonWithKontext;
-    await nextTick();
 
     expect(wrapper?.find('[data-testid="person-success-text"]').isVisible()).toBe(true);
   });
