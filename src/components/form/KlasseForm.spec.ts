@@ -5,7 +5,7 @@ import {
   type OrganisationenFilter,
 } from '@/stores/OrganisationStore';
 import { RollenSystemRecht } from '@/stores/RolleStore';
-import { TranslatedObject } from '@/types.d';
+import { type TranslatedObject } from '@/types.d';
 import { VueWrapper, mount } from '@vue/test-utils';
 import { expect, test, type Mock } from 'vitest';
 import { nextTick } from 'vue';
