@@ -25,6 +25,7 @@
       "limitedUntil": "befristet bis",
       "untilEndOfSchoolYear": "Bis Schuljahresende"
     },
+    "doNotCloseNoticeOperation": "Bitte den Browser während der Bearbeitung nicht schließen!",
     "followingDataCreated": "Folgende Daten wurden gespeichert:",
     "headline": "Administrationsbereich",
     "import": {

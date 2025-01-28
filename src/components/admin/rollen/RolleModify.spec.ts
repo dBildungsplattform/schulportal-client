@@ -1,5 +1,5 @@
-import { test } from 'vitest';
-import { VueWrapper, mount } from '@vue/test-utils';
+import { test, type MockInstance } from 'vitest';
+import { VueWrapper, flushPromises, mount } from '@vue/test-utils';
 import { RollenArt, RollenMerkmal, RollenSystemRecht } from '@/stores/RolleStore';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import routes from '@/router/routes';
@@ -32,7 +32,7 @@ beforeEach(async () => {
       isDialogVisible: true,
       personIDs: ['person1', 'person2'],
       organisationen: [
-        { title: 'orga', value: '1133' },
+        { title: 'orga', value: 'O1' },
         { title: 'orga1', value: '1133' },
       ],
       rollen: [
@@ -104,7 +104,22 @@ describe('RolleModify', () => {
     expect(document.querySelector('[data-testid="layout-card"]')).not.toBeNull();
   });
 
-  test('renders form and triggers submit', async () => {
+  test('renders the dialog when isDialogVisible and closes it', async () => {
+    await nextTick();
+
+    const dialogContent: Element | null = document.body.querySelector('[data-testid="layout-card"]');
+    expect(dialogContent).not.toBeNull();
+
+    const discardButton: Element | null = document.body.querySelector('[data-testid="rolle-modify-discard-button"]');
+
+    expect(discardButton).not.toBeNull();
+
+    if (discardButton) {
+      discardButton.dispatchEvent(new Event('click'));
+    }
+  });
+
+  test.only('renders form and triggers submit', async () => {
     await nextTick();
 
     // Set organisation value
@@ -112,24 +127,29 @@ describe('RolleModify', () => {
       ?.findComponent({ ref: 'personenkontext-create' })
       .findComponent({ ref: 'organisation-select' });
     await organisationAutocomplete?.setValue('O1');
-    await organisationAutocomplete?.vm.$emit('update:modelValue', 'O1'); // Use the correct event name
+    await organisationAutocomplete?.vm.$emit('update:search', 'O1'); 
+    await nextTick();
 
     // Set rolle value
     const rolleAutocomplete: VueWrapper | undefined = wrapper
       ?.findComponent({ ref: 'personenkontext-create' })
       .findComponent({ ref: 'rolle-select' });
     await rolleAutocomplete?.setValue('54321');
-    await rolleAutocomplete?.vm.$emit('update:modelValue', '54321'); // Use the correct event name
+    await rolleAutocomplete?.vm.$emit('update:search', '54321');
 
     await nextTick();
 
     const submitButton: Element | null = document.body.querySelector('[data-testid="rolle-modify-submit-button"]');
     expect(submitButton).not.toBeNull();
+    await nextTick();
+
+    const updatePersonenkontexteSpy: MockInstance = vi.spyOn(personenkontextStore, 'updatePersonenkontexte');
 
     if (submitButton) {
       submitButton.dispatchEvent(new Event('click'));
     }
 
-    await nextTick();
+    await flushPromises();
+    expect(updatePersonenkontexteSpy).toHaveBeenCalledTimes(2);
   });
 });

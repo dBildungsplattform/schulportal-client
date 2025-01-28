@@ -230,7 +230,7 @@
                 size="small"
               ></v-icon>
               <span class="subtitle-2">
-                {{ $t('admin.import.doNotCloseNotice') }}
+                {{ $t('admin.doNotCloseNoticeOperation') }}
               </span>
             </v-col>
           </v-row>
