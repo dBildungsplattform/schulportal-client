@@ -12,7 +12,7 @@ let router: Router;
 const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
 beforeEach(async () => {
   // Create a container for the app and append it to the document body
-  const appContainer = document.createElement('div');
+  const appContainer: HTMLDivElement = document.createElement('div');
   appContainer.id = 'app';
   document.body.appendChild(appContainer);
 
@@ -25,7 +25,7 @@ beforeEach(async () => {
   await router.isReady();
 
   wrapper = mount(RolleModify, {
-    attachTo: appContainer, // Attach to the app container
+    attachTo: appContainer,
     props: {
       isLoading: false,
       errorCode: '',
@@ -107,22 +107,29 @@ describe('RolleModify', () => {
   test('renders form and triggers submit', async () => {
     await nextTick();
 
+    // Set organisation value
     const organisationAutocomplete: VueWrapper | undefined = wrapper
       ?.findComponent({ ref: 'personenkontext-create' })
       .findComponent({ ref: 'organisation-select' });
     await organisationAutocomplete?.setValue('O1');
+    await organisationAutocomplete?.vm.$emit('update:modelValue', 'O1'); // Use the correct event name
 
+    // Set rolle value
     const rolleAutocomplete: VueWrapper | undefined = wrapper
       ?.findComponent({ ref: 'personenkontext-create' })
       .findComponent({ ref: 'rolle-select' });
     await rolleAutocomplete?.setValue('54321');
+    await rolleAutocomplete?.vm.$emit('update:modelValue', '54321'); // Use the correct event name
+
+    await nextTick();
 
     const submitButton: Element | null = document.body.querySelector('[data-testid="rolle-modify-submit-button"]');
-
     expect(submitButton).not.toBeNull();
 
     if (submitButton) {
       submitButton.dispatchEvent(new Event('click'));
     }
+
+    await nextTick();
   });
 });
