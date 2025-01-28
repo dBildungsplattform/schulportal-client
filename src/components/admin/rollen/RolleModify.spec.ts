@@ -122,7 +122,7 @@ describe('RolleModify', () => {
   });
 
   test('renders the dialog when isDialogVisible is true', async () => {
-    await nextTick(); // Wait for the DOM to update
+    await nextTick();
 
     // Find the teleported content in the document body
     const dialogContent: Element | null = document.body.querySelector('[data-testid="layout-card"]');
