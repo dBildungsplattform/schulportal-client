@@ -1,3 +1,5 @@
+@use 'variables';
+
 .headline-1,
 .headline-2,
 .headline-3,
@@ -36,62 +38,62 @@ div {
 @media only screen and (max-width: 600px) {
   // @media #{map-get($display-breakpoints, 'xs')} {
   body {
-    font-size: $smallBodyFontSize;
+    font-size: variables.$smallBodyFontSize;
   }
 
   .body-2 {
-    font-size: $smallBody2FontSize;
+    font-size: variables.$smallBody2FontSize;
 
     .v-list-item-title {
-      font-size: $smallBody2FontSize;
+      font-size: variables.$smallBody2FontSize;
     }
   }
 
   .caption {
-    font-size: $smallCaptionFontSize;
+    font-size: variables.$smallCaptionFontSize;
 
     .v-list-item-title {
-      font-size: $smallCaptionFontSize;
+      font-size: variables.$smallCaptionFontSize;
     }
   }
 
   .headline-1 {
-    font-size: $smallHeadline1FontSize;
+    font-size: variables.$smallHeadline1FontSize;
 
     .v-list-item-title {
-      font-size: $smallHeadline1FontSize;
+      font-size: variables.$smallHeadline1FontSize;
     }
   }
 
   .headline-2 {
-    font-size: $smallHeadline2FontSize;
+    font-size: variables.$smallHeadline2FontSize;
 
     .v-list-item-title {
-      font-size: $smallHeadline2FontSize;
+      font-size: variables.$smallHeadline2FontSize;
     }
   }
 
   .headline-3 {
-    font-size: $smallHeadline3FontSize;
+    font-size: variables.$smallHeadline3FontSize;
 
     .v-list-item-title {
-      font-size: $smallHeadline3FontSize;
+      font-size: variables.$smallHeadline3FontSize;
     }
   }
 
   .subtitle-1 {
-    font-size: $smallSubtitle1FontSize;
+    font-size: variables.$smallSubtitle1FontSize;
 
     .v-list-item-title {
-      font-size: $smallSubtitle1FontSize;
+      font-size: variables.$smallSubtitle1FontSize;
     }
   }
 
   .subtitle-2 {
-    font-size: $smallSubtitle2FontSize;
+    font-size: variables.$smallSubtitle2FontSize;
 
     .v-list-item-title {
-      font-size: $smallSubtitle2FontSize;
+      font-size: variables.$smallSubtitle2FontSize;
     }
   }
 }
@@ -100,62 +102,62 @@ div {
 @media only screen and (min-width: 601px) and (max-width: 1280px) {
   // @media #{map-get($display-breakpoints, 'sm-and-up')} {
   body {
-    font-size: $mediumBodyFontSize;
+    font-size: variables.$mediumBodyFontSize;
   }
 
   .body-2 {
-    font-size: $mediumBody2FontSize;
+    font-size: variables.$mediumBody2FontSize;
 
     .v-list-item-title {
-      font-size: $mediumBody2FontSize;
+      font-size: variables.$mediumBody2FontSize;
     }
   }
 
   .caption {
-    font-size: $mediumCaptionFontSize;
+    font-size: variables.$mediumCaptionFontSize;
 
     .v-list-item-title {
-      font-size: $mediumCaptionFontSize;
+      font-size: variables.$mediumCaptionFontSize;
     }
   }
 
   .headline-1 {
-    font-size: $mediumHeadline1FontSize;
+    font-size: variables.$mediumHeadline1FontSize;
 
     .v-list-item-title {
-      font-size: $mediumHeadline1FontSize;
+      font-size: variables.$mediumHeadline1FontSize;
     }
   }
 
   .headline-2 {
-    font-size: $mediumHeadline2FontSize;
+    font-size: variables.$mediumHeadline2FontSize;
 
     .v-list-item-title {
-      font-size: $mediumHeadline2FontSize;
+      font-size: variables.$mediumHeadline2FontSize;
     }
   }
 
   .headline-3 {
-    font-size: $mediumHeadline3FontSize;
+    font-size: variables.$mediumHeadline3FontSize;
 
     .v-list-item-title {
-      font-size: $mediumHeadline3FontSize;
+      font-size: variables.$mediumHeadline3FontSize;
     }
   }
 
   .subtitle-1 {
-    font-size: $mediumSubtitle1FontSize;
+    font-size: variables.$mediumSubtitle1FontSize;
 
     .v-list-item-title {
-      font-size: $mediumSubtitle1FontSize;
+      font-size: variables.$mediumSubtitle1FontSize;
     }
   }
 
   .subtitle-2 {
-    font-size: $mediumSubtitle2FontSize;
+    font-size: variables.$mediumSubtitle2FontSize;
 
     .v-list-item-title {
-      font-size: $mediumSubtitle2FontSize;
+      font-size: variables.$mediumSubtitle2FontSize;
     }
   }
 }
@@ -165,62 +167,62 @@ div {
   // @media #{map-get($display-breakpoints, 'lg-and-up')} {
 
   body {
-    font-size: $bigBodyFontSize;
+    font-size: variables.$bigBodyFontSize;
   }
 
   .body-2 {
-    font-size: $bigBody2FontSize;
+    font-size: variables.$bigBody2FontSize;
 
     .v-list-item-title {
-      font-size: $bigBody2FontSize;
+      font-size: variables.$bigBody2FontSize;
     }
   }
 
   .caption {
-    font-size: $bigCaptionFontSize;
+    font-size: variables.$bigCaptionFontSize;
 
     .v-list-item-title {
-      font-size: $bigCaptionFontSize;
+      font-size: variables.$bigCaptionFontSize;
     }
   }
 
   .headline-1 {
-    font-size: $bigHeadline1FontSize;
+    font-size: variables.$bigHeadline1FontSize;
 
     .v-list-item-title {
-      font-size: $bigHeadline1FontSize;
+      font-size: variables.$bigHeadline1FontSize;
     }
   }
 
   .headline-2 {
-    font-size: $bigHeadline2FontSize;
+    font-size: variables.$bigHeadline2FontSize;
 
     .v-list-item-title {
-      font-size: $bigHeadline2FontSize;
+      font-size: variables.$bigHeadline2FontSize;
     }
   }
 
   .headline-3 {
-    font-size: $bigHeadline3FontSize;
+    font-size: variables.$bigHeadline3FontSize;
 
     .v-list-item-title {
-      font-size: $bigHeadline3FontSize;
+      font-size: variables.$bigHeadline3FontSize;
     }
   }
 
   .subtitle-1 {
-    font-size: $bigSubtitle1FontSize;
+    font-size: variables.$bigSubtitle1FontSize;
 
     .v-list-item-title {
-      font-size: $bigSubtitle1FontSize;
+      font-size: variables.$bigSubtitle1FontSize;
     }
   }
 
   .subtitle-2 {
-    font-size: $bigSubtitle2FontSize;
+    font-size: variables.$bigSubtitle2FontSize;
 
     .v-list-item-title {
-      font-size: $bigSubtitle2FontSize;
+      font-size: variables.$bigSubtitle2FontSize;
     }
   }
 }
