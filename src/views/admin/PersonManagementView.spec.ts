@@ -1,4 +1,4 @@
-import { EmailAddressStatus, RollenArt, type FindRollenResponse } from '@/api-client/generated/api';
+import { EmailAddressStatus, RollenArt, RollenSystemRecht, type FindRollenResponse } from '@/api-client/generated/api';
 import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
 import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
 import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
@@ -148,6 +148,28 @@ beforeEach(() => {
     ] as RolleResponse[],
     total: 1,
   } as FindRollenResponse;
+
+  personenkontextStore.workflowStepResponse = {
+    rollen: [
+      {
+        administeredBySchulstrukturknoten: '1234',
+        rollenart: 'LEHR',
+        name: 'SuS',
+        merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RollenMerkmal>,
+        systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
+        createdAt: '2022',
+        updatedAt: '2022',
+        id: '54321',
+        administeredBySchulstrukturknotenName: 'Land SH',
+        administeredBySchulstrukturknotenKennung: '',
+        version: 1,
+      },
+    ],
+    organisations: [],
+    selectedOrganisation: null,
+    selectedRolle: null,
+    canCommit: true,
+  };
 
   wrapper = mount(PersonManagementView, {
     attachTo: document.getElementById('app') || '',
