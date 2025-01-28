@@ -16,7 +16,7 @@
   import type { TranslatedObject } from '@/types';
   import { useForm, type BaseFieldProps, type FormContext, type TypedSchema } from 'vee-validate';
   import { toTypedSchema } from '@vee-validate/yup';
-  import { array, mixed, object, string } from 'yup';
+  import { mixed, object, string } from 'yup';
   import { useI18n, type Composer } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
   import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
@@ -60,10 +60,7 @@
     object({
       selectedSchule: string().required(t('admin.import.rules.schule.required')),
       selectedRolle: string().required(t('admin.import.rules.rolle.required')),
-      selectedFiles: array()
-        .of(mixed())
-        .required(t('admin.import.rules.files.required'))
-        .length(1, t('admin.import.rules.files.required')),
+      selectedFiles: mixed().required(t('admin.import.rules.files.required')),
     }),
   );
 
@@ -96,8 +93,8 @@
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = formContext.defineField('selectedRolle', vuetifyConfig);
 
-  const [selectedFiles, selectedFilesProps]: [
-    Ref<Array<File> | undefined>,
+  const [selectedFile, selectedFilesProps]: [
+    Ref<File | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = formContext.defineField('selectedFiles', vuetifyConfig);
 
@@ -126,8 +123,8 @@
     importStore.uploadResponse = null;
   });
 
-  watch(selectedFiles, (newValue: File[] | undefined, oldValue: File[] | undefined) => {
-    if (newValue && newValue[0] !== oldValue?.[0]) {
+  watch(selectedFile, (newValue: File | undefined, oldValue: File | undefined) => {
+    if (newValue && newValue !== oldValue) {
       importStore.uploadResponse = null;
     }
   });
@@ -233,11 +230,11 @@
   }
 
   async function uploadFile(): Promise<void> {
-    if (selectedSchule.value === undefined || selectedRolle.value === undefined || !selectedFiles.value?.length) {
+    if (selectedSchule.value === undefined || selectedRolle.value === undefined || selectedFile.value === undefined) {
       return;
     }
 
-    const originalFile: File = selectedFiles.value[0] as File;
+    const originalFile: File = selectedFile.value;
 
     // Read the file content and convert to UTF-8
     const fileText: string = await readFileAsUTF8(originalFile);
@@ -247,10 +244,9 @@
     const utf8File: File = new File([utf8Blob], originalFile.name, { type: 'text/csv;charset=utf-8' });
 
     // Update selected files with the UTF-8 version
-    selectedFiles.value![0] = utf8File;
-
+    selectedFile.value = utf8File;
     // Perform the upload with the UTF-8 encoded file
-    importStore.uploadPersonenImportFile(selectedSchule.value as string, selectedRolle.value as string, utf8File);
+    await importStore.uploadPersonenImportFile(selectedSchule.value as string, selectedRolle.value as string, utf8File);
   }
 
   function anotherImport(): void {
@@ -706,7 +702,7 @@
               prepend-icon=""
               prepend-inner-icon="mdi-paperclip"
               variant="outlined"
-              v-model="selectedFiles"
+              v-model="selectedFile"
               v-bind="selectedFilesProps"
             ></v-file-input>
           </FormRow>

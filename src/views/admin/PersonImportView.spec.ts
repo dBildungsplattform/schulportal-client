@@ -1,19 +1,19 @@
-import { expect, test, type Mock, type MockInstance } from 'vitest';
-import { DOMWrapper, flushPromises, mount, VueWrapper } from '@vue/test-utils';
-import PersonImportView from './PersonImportView.vue';
-import { nextTick } from 'vue';
+import { ImportDataItemStatus, type ImportUploadResponse } from '@/api-client/generated';
+import routes from '@/router/routes';
 import { useImportStore, type ImportStore } from '@/stores/ImportStore';
 import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
 import {
-  type RolleStore,
-  useRolleStore,
   RollenMerkmal,
   RollenSystemRecht,
+  useRolleStore,
+  type RolleStore,
   type RolleWithServiceProvidersResponse,
 } from '@/stores/RolleStore';
-import { ImportDataItemStatus, type ImportUploadResponse } from '@/api-client/generated';
+import { DOMWrapper, flushPromises, mount, VueWrapper } from '@vue/test-utils';
+import { expect, test, type Mock, type MockInstance } from 'vitest';
+import { nextTick } from 'vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
-import routes from '@/router/routes';
+import PersonImportView from './PersonImportView.vue';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
@@ -113,6 +113,7 @@ beforeEach(async () => {
     },
   });
 
+  importStore.$reset();
   vi.resetAllMocks();
 });
 
@@ -122,6 +123,20 @@ describe('PersonImportView', () => {
     expect(wrapper?.find('[data-testid="schule-select"]').isVisible()).toBe(true);
     expect(wrapper?.find('[data-testid="rolle-select"]').isVisible()).toBe(true);
     expect(wrapper?.find('[data-testid="file-input"]').isVisible()).toBe(true);
+  });
+
+  test('it shows validation messages', async () => {
+    expect(wrapper?.find('#schule-select-messages').text()).toBe('');
+    expect(wrapper?.find('#rolle-select-messages').text()).toBe('');
+    expect(wrapper?.find('[data-testid="file-input"]').text()).not.toContain('Eine CSV-Datei muss ausgewählt werden.');
+
+    await wrapper?.find('[data-testid="person-import-form-submit-button"]').trigger('click');
+    // wait for transition to happen
+    await vi.waitUntil(() => (wrapper?.find('#schule-select-messages').text().length ?? 0) > 0);
+
+    expect(wrapper?.find('#schule-select-messages').text()).toContain('Eine Schule muss ausgewählt werden.');
+    expect(wrapper?.find('#rolle-select-messages').text()).toContain('Eine Rolle muss ausgewählt werden.');
+    expect(wrapper?.find('[data-testid="file-input"]').text()).toContain('Eine CSV-Datei muss ausgewählt werden.');
   });
 
   test('it clears selects', async () => {
@@ -215,6 +230,8 @@ describe('PersonImportView', () => {
   test('it executes the import and returns to form', async () => {
     const mockFile: File = new File([''], 'personen.csv', { type: 'text/csv' });
     const fileInput: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="file-input"] input');
+    importStore.executePersonenImport = vi.fn();
+    importStore.startImportStatusPolling = vi.fn();
 
     Object.defineProperty(fileInput?.element, 'files', {
       value: [mockFile],
@@ -247,6 +264,13 @@ describe('PersonImportView', () => {
 
     expect(importConfirmationText).not.toBeNull();
     expect(executeImportButton).not.toBeNull();
+
+    executeImportButton.click();
+    await nextTick();
+
+    expect(importStore.executePersonenImport).toHaveBeenCalledOnce();
+    expect(importStore.startImportStatusPolling).toHaveBeenCalledOnce();
+    expect(document.querySelector('[data-testid="person-import-confirmation-text"]')).toBeNull();
   });
 
   test('it downloads an imported file through the download all button', async () => {
