@@ -117,15 +117,8 @@
   }
 
   async function navigateToKlasseManagement(): Promise<void> {
-    if (organisationStore.errorCode === 'REQUIRED_STEP_UP_LEVEL_NOT_MET') {
-      resetForm();
-      await router.push({ name: 'create-klasse' }).then(() => {
-        router.go(0);
-      });
-    } else {
-      organisationStore.errorCode = '';
-      await router.push({ name: 'klasse-management' });
-    }
+    organisationStore.errorCode = '';
+    await router.push({ name: 'klasse-management' });
   }
 
   function handleConfirmUnsavedChanges(): void {
