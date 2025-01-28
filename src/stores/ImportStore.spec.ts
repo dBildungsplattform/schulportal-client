@@ -1,8 +1,8 @@
-import { useImportStore, type ImportStore } from './ImportStore';
+import { ImportDataItemStatus, useImportStore, type ImportStore } from './ImportStore';
 import { setActivePinia, createPinia } from 'pinia';
 import ApiService from '@/services/ApiService';
 import MockAdapter from 'axios-mock-adapter';
-import { ImportStatus, type ImportUploadResponse } from '@/api-client/generated';
+import { ImportStatus, type ImportResultResponse, type ImportUploadResponse } from '@/api-client/generated';
 
 const mockadapter: MockAdapter = new MockAdapter(ApiService);
 
@@ -28,7 +28,7 @@ describe('ImportStore', () => {
 
   it('should initalize state correctly', () => {
     expect(importStore.errorCode).toBeNull();
-    expect(importStore.importedData).toBeNull();
+    expect(importStore.importResponse).toBeNull();
     expect(importStore.importIsLoading).toBeFalsy();
     expect(importStore.uploadIsLoading).toBeFalsy();
     expect(importStore.uploadResponse).toBeNull();
@@ -145,47 +145,14 @@ describe('ImportStore', () => {
       });
     });
 
-    describe('downloadPersonenImportFile', () => {
-      it('should download personenFile', async () => {
-        const mockResponse: File = new File([''], 'personen.txt', { type: 'text/plain' });
-
-        mockadapter.onGet('/api/import/123/download').replyOnce(200, mockResponse);
-
-        const importvorgangId: string = '123';
-
-        await importStore.downloadPersonenImportFile(importvorgangId);
-
-        expect(importStore.importedData).toEqual(mockResponse);
-      });
-
-      it('should handle string error while importing personen', async () => {
-        mockadapter.onGet('/api/import/123/download').replyOnce(500, 'some mock server error');
-
-        const importvorgangId: string = '123';
-
-        await importStore.downloadPersonenImportFile(importvorgangId);
-
-        expect(importStore.importedData).toEqual(null);
-        expect(importStore.errorCode).toEqual('ERROR_IMPORTING_FILE');
-      });
-
-      it('should handle error code while importing personen', async () => {
-        mockadapter.onGet('/api/import/123/download').replyOnce(500, { code: 'ERROR_IMPORTING_FILE' });
-
-        const importvorgangId: string = '123';
-
-        await importStore.downloadPersonenImportFile(importvorgangId);
-
-        expect(importStore.importedData).toEqual(null);
-        expect(importStore.errorCode).toEqual('ERROR_IMPORTING_FILE');
-      });
-    });
-
-    describe('downloadPersonenImportFile', () => {
+    describe('startImportStatusPolling', () => {
       it('should poll and update status to finished', async () => {
         const importvorgangId: string = '123';
 
         mockadapter.onGet(`/api/import/${importvorgangId}/status`).replyOnce(200, { status: ImportStatus.Finished });
+        mockadapter
+          .onGet(`/api/import/importedUsers?offset=0&limit=100&importvorgangId=${importvorgangId}`)
+          .replyOnce(200, []);
 
         const pollingPromise: Promise<void> = importStore.startImportStatusPolling(importvorgangId);
 
@@ -261,8 +228,8 @@ describe('ImportStore', () => {
 
         const pollingPromise: Promise<void> = importStore.startImportStatusPolling(importvorgangId);
 
-        // Fast forward timer to exceed max polling time (60 minutes)
-        vi.advanceTimersByTime(60 * 60 * 1000 + 1);
+        // Fast forward timer to exceed max polling time (120 minutes)
+        vi.advanceTimersByTime(120 * 60 * 1000 + 1);
         await pollingPromise;
 
         expect(importStore.errorCode).toEqual('IMPORT_TIMEOUT');
@@ -302,6 +269,133 @@ describe('ImportStore', () => {
         importStore.stopImportStatusPolling();
 
         expect(vi.mocked(clearInterval)).not.toHaveBeenCalled();
+      });
+    });
+
+    describe('Get imported users', () => {
+      it('should successfully retrieve imported persons', async () => {
+        const importvorgangId: string = '8b7c40dd-c842-4f66-807d-6bd8c7cd5b54';
+
+        const mockResponse: ImportResultResponse = {
+          importvorgandId: importvorgangId,
+          rollenname: 'itslearning-Schulbegleitung',
+          organisationsname: 'Carl-Orff-Schule',
+          importedUsers: [
+            {
+              klasse: '9a',
+              vorname: 'Max',
+              nachname: 'Mstermann',
+              benutzername: 'mmstermann117',
+              startpasswort: 'pK0!V%m&',
+              status: ImportDataItemStatus.Success,
+            },
+            {
+              klasse: '9a',
+              vorname: 'Maria',
+              nachname: 'Mler',
+              benutzername: 'mmler2288',
+              startpasswort: 'qA0$z?gv',
+              status: ImportDataItemStatus.Success,
+            },
+          ],
+          total: 5,
+          pageTotal: 5,
+        };
+
+        mockadapter
+          .onGet(`/api/import/importedUsers?offset=0&limit=5&importvorgangId=${importvorgangId}`)
+          .reply(200, mockResponse);
+
+        await importStore.getImportedPersons(importvorgangId, 0, 5);
+
+        expect(importStore.importResponse).toEqual(mockResponse);
+        expect(importStore.retrievalIsLoading).toBe(false);
+        expect(importStore.errorCode).toBeNull();
+      });
+
+      it('should handle an i18nkey error response and set the correct error code', async () => {
+        const importvorgangId: string = '8b7c40dd-c842-4f66-807d-6bd8c7cd5b54';
+
+        mockadapter
+          .onGet(`/api/import/importedUsers?offset=0&limit=5&importvorgangId=${importvorgangId}`)
+          .reply(500, { i18nKey: 'ERROR_IMPORTING_FILE' });
+
+        await importStore.getImportedPersons(importvorgangId, 0, 5);
+
+        expect(importStore.importResponse).toBeNull();
+        expect(importStore.retrievalIsLoading).toBe(false);
+        expect(importStore.errorCode).toBe('ERROR_IMPORTING_FILE');
+      });
+
+      it('should handle an error response and set the correct error code', async () => {
+        const importvorgangId: string = '8b7c40dd-c842-4f66-807d-6bd8c7cd5b54';
+
+        mockadapter
+          .onGet(`/api/import/importedUsers?offset=0&limit=5&importvorgangId=${importvorgangId}`)
+          .reply(500, 'error');
+
+        await importStore.getImportedPersons(importvorgangId, 0, 5);
+
+        expect(importStore.importResponse).toBeNull();
+        expect(importStore.retrievalIsLoading).toBe(false);
+        expect(importStore.errorCode).toBe('ERROR_IMPORTING_FILE');
+      });
+
+      it('should handle an empty response', async () => {
+        const importvorgangId: string = '8b7c40dd-c842-4f66-807d-6bd8c7cd5b54';
+
+        const mockResponse: ImportResultResponse = {
+          importvorgandId: importvorgangId,
+          rollenname: 'itslearning-Schulbegleitung',
+          organisationsname: 'Carl-Orff-Schule',
+          importedUsers: [],
+          total: 0,
+          pageTotal: 0,
+        };
+
+        mockadapter
+          .onGet(`/api/import/importedUsers?offset=0&limit=5&importvorgangId=${importvorgangId}`)
+          .reply(200, mockResponse);
+
+        await importStore.getImportedPersons(importvorgangId, 0, 5);
+
+        expect(importStore.importResponse).toEqual(mockResponse);
+        expect(importStore.retrievalIsLoading).toBe(false);
+        expect(importStore.errorCode).toBeNull();
+      });
+    });
+
+    describe('Delete import vorgang by ID', () => {
+      it('should successfully delete the import transaction', async () => {
+        const importvorgangId: string = '8b7c40dd-c842-4f66-807d-6bd8c7cd5b54';
+
+        mockadapter.onDelete(`/api/import/${importvorgangId}`).reply(204);
+
+        await importStore.deleteImportVorgangById(importvorgangId);
+
+        expect(importStore.errorCode).toBeNull();
+      });
+
+      it('should handle an error response and set the specific error code', async () => {
+        const importvorgangId: string = '8b7c40dd-c842-4f66-807d-6bd8c7cd5b54';
+
+        mockadapter
+          .onDelete(`/api/import/${importvorgangId}`)
+          .reply(500, { i18nKey: 'ERROR_DELETING_IMPORT_TRANSACTION' });
+
+        await importStore.deleteImportVorgangById(importvorgangId);
+
+        expect(importStore.errorCode).toBe('ERROR_DELETING_IMPORT_TRANSACTION');
+      });
+
+      it('should handle an error response and set the fallback error code', async () => {
+        const importvorgangId: string = '8b7c40dd-c842-4f66-807d-6bd8c7cd5b54';
+
+        mockadapter.onDelete(`/api/import/${importvorgangId}`).reply(500, 'error');
+
+        await importStore.deleteImportVorgangById(importvorgangId);
+
+        expect(importStore.errorCode).toBe('ERROR_IMPORTING_FILE');
       });
     });
   });

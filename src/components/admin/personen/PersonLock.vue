@@ -168,21 +168,22 @@
     { immediate: true },
   );
 
-watch(dialogIsActive, (newDialogIsActive: boolean) => {
-  if (!newDialogIsActive) {
-    resetBefristungFields();
-    return;
-  }
+  watch(dialogIsActive, (newDialogIsActive: boolean) => {
+    if (!newDialogIsActive) {
+      resetBefristungFields();
+      return;
+    }
 
-  const manualLock: UserLock | null = props.person.person.userLock?.find(
-    (lock: UserLock) => lock.lock_occasion === PersonLockOccasion.MANUELL_GESPERRT
-  )  ?? null;;
+    const manualLock: UserLock | null =
+      props.person.person.userLock?.find(
+        (lock: UserLock) => lock.lock_occasion === PersonLockOccasion.MANUELL_GESPERRT,
+      ) ?? null;
 
-  if (manualLock) {
-    isUnbefristet.value = !manualLock.locked_until;
-    selectedBefristung.value = manualLock.locked_until;
-  }
-});
+    if (manualLock) {
+      isUnbefristet.value = !manualLock.locked_until;
+      selectedBefristung.value = manualLock.locked_until;
+    }
+  });
 </script>
 
 <template v-if="organisations.length > 0">
