@@ -1,6 +1,6 @@
 import type { OrganisationResponse } from '@/api-client/generated';
 import routes from '@/router/routes';
-import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
+import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
 import { VueWrapper, mount } from '@vue/test-utils';
 import { beforeEach, describe, expect, test, vi, type MockInstance } from 'vitest';
 import { nextTick } from 'vue';
