@@ -5,20 +5,16 @@ import {
   type OrganisationenFilter,
 } from '@/stores/OrganisationStore';
 import { RollenSystemRecht } from '@/stores/RolleStore';
+import { TranslatedObject } from '@/types.d';
 import { VueWrapper, mount } from '@vue/test-utils';
 import { expect, test, type Mock } from 'vitest';
 import { nextTick } from 'vue';
 import KlasseForm from './KlasseForm.vue';
 
-type AutoCompleteOption = {
-  value: string;
-  title: string;
-};
-
 let wrapper: VueWrapper | null = null;
 const organisationStore: OrganisationStore = useOrganisationStore();
 
-const schulen: Array<AutoCompleteOption> = [
+const schulen: Array<TranslatedObject> = [
   {
     title: 'Albert-Gymnasium',
     value: '9356495',
@@ -63,7 +59,7 @@ describe('KlasseForm', () => {
   });
 });
 
-describe('searchInput', () => {
+describe('Schule searchInput', () => {
   const defaultFilter: OrganisationenFilter = {
     includeTyp: OrganisationsTyp.Schule,
     systemrechte: [RollenSystemRecht.KlassenVerwalten],
@@ -78,7 +74,7 @@ describe('searchInput', () => {
   });
 
   describe('when schule is autoselected', async () => {
-    const schule: AutoCompleteOption = schulen[0]!;
+    const schule: TranslatedObject = schulen[0]!;
     beforeEach(async () => {
       wrapper!.setProps({
         schulen: [schule],
@@ -110,7 +106,7 @@ describe('searchInput', () => {
   });
 
   describe('when schule is selected', async () => {
-    const schule: AutoCompleteOption = schulen[0]!;
+    const schule: TranslatedObject = schulen[0]!;
     beforeEach(async () => {
       wrapper!.setProps({
         selectedSchule: schule.value,
