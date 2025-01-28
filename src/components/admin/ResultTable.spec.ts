@@ -115,7 +115,7 @@ describe('Row Index and Item Retrieval', () => {
 
     // Optional: Check for specific no data text if needed
     if (rows.length === 1) {
-      expect(rows[0]?.text()).toContain(noDataText || 'Keine Daten gefunden.');
+      expect(rows[0]?.text()).toContain(noDataText || 'noDataFound');
     }
   });
 });
