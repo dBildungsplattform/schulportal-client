@@ -1947,6 +1947,12 @@
                         <span class="text-body">
                           {{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
                           {{ zuordnung.klasse }}
+                          <span
+                            v-if="zuordnung.befristung"
+                            data-testid="zuordnung-befristung-text"
+                          >
+                            ({{ formatDate(zuordnung.befristung, t) }})</span
+                          >
                         </span>
                       </template>
                     </v-checkbox>
