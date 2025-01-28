@@ -20,7 +20,12 @@
   import { useI18n, type Composer } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
   import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
-  import { type ImportStore, useImportStore } from '@/stores/ImportStore';
+  import {
+    ImportDataItemStatus,
+    type ImportedUserResponse,
+    type ImportStore,
+    useImportStore,
+  } from '@/stores/ImportStore';
   import { RollenArt } from '@/stores/RolleStore';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
 
@@ -31,7 +36,10 @@
   const router: Router = useRouter();
   const { t }: Composer = useI18n({ useScope: 'global' });
   const { smAndDown }: { smAndDown: Ref<boolean> } = useDisplay();
+
   const confirmationDialogVisible: Ref<boolean> = ref(false);
+
+  const isDownloadingFile: Ref<boolean> = ref(false);
 
   const allRollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = useRollen();
   const lernRollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = computed(() => {
@@ -141,7 +149,7 @@
   const showUploadSuccessTemplate: ComputedRef<boolean> = computed(() => {
     return (
       (importStore.uploadResponse?.isValid as boolean) &&
-      !importStore.importedData &&
+      !importStore.importResponse &&
       !importStore.uploadIsLoading &&
       !importStore.importIsLoading &&
       !importStore.errorCode &&
@@ -165,7 +173,7 @@
     formContext.resetForm();
     importStore.errorCode = null;
     importStore.uploadResponse = null;
-    importStore.importedData = null;
+    importStore.importResponse = null;
     importStore.importProgress = 0;
     router.push({ name: 'person-management' });
   }
@@ -242,8 +250,9 @@
   }
 
   function anotherImport(): void {
+    importStore.errorCode = '';
     importStore.uploadResponse = null;
-    importStore.importedData = null;
+    importStore.importResponse = null;
     importStore.importProgress = 0;
     formContext.resetForm();
   }
@@ -251,7 +260,7 @@
   function backToUpload(): void {
     importStore.errorCode = null;
     importStore.uploadResponse = null;
-    importStore.importedData = null;
+    importStore.importResponse = null;
   }
 
   function cancelImport(): void {
@@ -275,20 +284,79 @@
     }
   }
 
-  async function downloadFile(): Promise<void> {
-    const importvorgangId: string = importStore.uploadResponse?.importvorgangId as string;
-
-    // If the file is already downloaded the endpoint autodestructs it so we can't make anothe request.
-    if (!importStore.importedData) {
-      await importStore.downloadPersonenImportFile(importvorgangId);
-    }
-    const blob: Blob = new Blob([importStore.importedData as File], { type: 'text/plain' });
+  function downloadFileContent(fileContent: string): void {
+    const blob: Blob = new Blob([fileContent], { type: 'text/plain' });
     const url: string = window.URL.createObjectURL(blob);
+
     const link: HTMLAnchorElement = document.createElement('a');
     link.href = url;
     link.setAttribute('download', `${t('admin.import.fileName.person')}.txt`);
     document.body.appendChild(link);
     link.click();
+    link.remove();
+
+    window.URL.revokeObjectURL(url);
+  }
+
+  function createFileContentFromUsers(users: ImportedUserResponse[]): string {
+    const successfulUsers: ImportedUserResponse[] = users.filter(
+      (user: ImportedUserResponse) => user.status === ImportDataItemStatus.Success,
+    );
+    const failedUsers: ImportedUserResponse[] = users.filter(
+      (user: ImportedUserResponse) => user.status === ImportDataItemStatus.Failed,
+    );
+
+    let fileContent: string = `Schule: ${importStore.importResponse?.organisationsname} - Rolle: ${importStore.importResponse?.rollenname}`;
+    fileContent += `\n\n${t('admin.import.successfullyImportedUsersNotice')}\n\n`;
+    fileContent += 'Klasse - Vorname - Nachname - Benutzername - Passwort\n';
+
+    successfulUsers.forEach((user: ImportedUserResponse) => {
+      fileContent += `${user.klasse} - ${user.vorname} - ${user.nachname} - ${user.benutzername} - ${user.startpasswort}\n`;
+    });
+
+    if (failedUsers.length > 0) {
+      fileContent += `\n\n${t('admin.import.failedToImportUsersNotice')}\n\n`;
+      fileContent += 'Klasse - Vorname - Nachname - Benutzername\n';
+
+      failedUsers.forEach((user: ImportedUserResponse) => {
+        fileContent += `${user.klasse} - ${user.vorname} - ${user.nachname} - ${user.benutzername}\n`;
+      });
+    }
+
+    return fileContent;
+  }
+
+  async function downloadFile(): Promise<void> {
+    isDownloadingFile.value = true;
+    try {
+      const totalUsers: number = importStore.importResponse?.total as number;
+      const itemsPerPage: number = importStore.importedUsersPerPage;
+      const totalPagesNumber: number = Math.ceil(totalUsers / itemsPerPage);
+
+      let allImportedUsers: ImportedUserResponse[] = [];
+
+      for (let pageIndex: number = 0; pageIndex < totalPagesNumber; pageIndex++) {
+        const offset: number = pageIndex * itemsPerPage;
+        await new Promise((resolve: (value: unknown) => void) => setTimeout(resolve, pageIndex * 600));
+
+        await importStore.getImportedPersons(
+          importStore.uploadResponse?.importvorgangId as string,
+          offset,
+          itemsPerPage,
+        );
+
+        allImportedUsers = allImportedUsers.concat(importStore.importResponse?.importedUsers || []);
+      }
+
+      const fileContent: string = createFileContentFromUsers(allImportedUsers);
+      downloadFileContent(fileContent);
+    } catch (error) {
+      // While downloading the file, it could happen that some users can't be downloaded even though they were imported successfully...
+      // In that case it makes sense to ignore errors and just go forward with the other users for better usability.
+      importStore.errorCode = '';
+    } finally {
+      isDownloadingFile.value = false;
+    }
   }
 
   const onSubmit: (e?: Event | undefined) => Promise<void | undefined> = formContext.handleSubmit(() => {
@@ -296,11 +364,15 @@
   });
 
   function isFormDirty(): boolean {
-    return (
-      formContext.isFieldDirty('selectedSchule') ||
-      formContext.isFieldDirty('selectedRolle') ||
-      formContext.isFieldDirty('selectedFiles')
-    );
+    // Form dirtiness check only if the import was not executed yet
+    if (importStore.importProgress === 0) {
+      return (
+        formContext.isFieldDirty('selectedSchule') ||
+        formContext.isFieldDirty('selectedRolle') ||
+        formContext.isFieldDirty('selectedFiles')
+      );
+    }
+    return false;
   }
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
   let blockedNext: () => void = () => {};
@@ -322,8 +394,13 @@
       showUnsavedChangesDialog.value = true;
       blockedNext = next;
     } else {
+      // Delete the Imported items once the user leaves the page
+      if (importStore.importResponse) {
+        const importvorgangId: string = importStore.uploadResponse?.importvorgangId as string;
+        importStore.deleteImportVorgangById(importvorgangId);
+      }
       importStore.uploadResponse = null;
-      importStore.importedData = null;
+      importStore.importResponse = null;
       next();
     }
   });
@@ -331,7 +408,7 @@
   onMounted(async () => {
     await personenkontextStore.processWorkflowStep({ limit: 25 });
     importStore.uploadResponse = null;
-    importStore.importedData = null;
+    importStore.importResponse = null;
     importStore.importProgress = 0;
     organisationStore.errorCode = '';
     /* listen for browser changes and prevent them when form is dirty */
@@ -360,7 +437,7 @@
       :showCloseText="true"
     >
       <!-- Import success template -->
-      <template v-if="importStore.importProgress === 100 && !importStore.importIsLoading && !importStore.errorCode">
+      <template v-if="importStore.importProgress === 100 && !importStore.importIsLoading && !isDownloadingFile">
         <v-container>
           <v-row justify="center">
             <v-col cols="auto">
@@ -387,7 +464,7 @@
             <v-col cols="auto">
               <v-btn
                 class="secondary"
-                @click="anotherImport()"
+                @click="anotherImport"
                 data-testid="another-import-button"
               >
                 {{ $t('admin.import.anotherImport') }}
@@ -396,9 +473,9 @@
             <v-col cols="auto">
               <v-btn
                 class="primary"
-                @click="downloadFile()"
-                data-testid="download-file-button"
-                :disabled="importStore.importIsLoading"
+                @click="downloadFile"
+                data-testid="download-all-data-button"
+                :disabled="importStore.importIsLoading || importStore.retrievalIsLoading"
               >
                 {{ $t('admin.import.downloadUserdata') }}
               </v-btn>
@@ -406,6 +483,32 @@
           </v-row>
         </v-container>
       </template>
+
+      <v-template v-else-if="isDownloadingFile">
+        <v-container>
+          <v-row class="justify-center">
+            <v-col cols="auto">
+              <v-icon
+                aria-hidden="true"
+                class="mr-2"
+                icon="mdi-alert-circle-outline"
+                size="small"
+              ></v-icon>
+              <span class="subtitle-2">
+                {{ $t('admin.import.doNotCloseNoticeDownload') }}
+              </span>
+            </v-col>
+          </v-row>
+          <v-row justify="center">
+            <v-col cols="auto">
+              <v-progress-circular
+                data-testid="loading-spinner"
+                indeterminate
+              ></v-progress-circular
+            ></v-col>
+          </v-row>
+        </v-container>
+      </v-template>
 
       <!-- Import loading template -->
       <template v-if="importStore.importProgress > 0 && !importStore.errorCode">
@@ -422,7 +525,7 @@
                 size="small"
               ></v-icon>
               <span class="subtitle-2">
-                {{ $t('admin.import.doNotCloseNotice') }}
+                {{ $t('admin.import.doNotCloseNoticeImport') }}
               </span>
             </v-col>
           </v-row>
@@ -433,7 +536,6 @@
                 :model-value="importStore.importProgress"
                 color="primary"
                 height="25"
-                striped
               >
                 <template v-slot:default="{ value }">
                   <strong class="text-white">{{ Math.ceil(value) }}%</strong>
@@ -452,7 +554,7 @@
         :discardButtonLabel="$t('nav.backToList')"
         :hideActions="
           showUploadSuccessTemplate ||
-          !!importStore.importedData ||
+          !!importStore.importResponse ||
           importStore.importIsLoading ||
           !!importStore.errorCode
         "
@@ -503,7 +605,7 @@
               <v-col cols="auto">
                 <v-btn
                   class="secondary"
-                  @click="backToUpload()"
+                  @click="backToUpload"
                   data-testid="back-to-upload-button"
                 >
                   {{ $t('admin.import.backToUpload') }}
@@ -512,7 +614,7 @@
               <v-col cols="auto">
                 <v-btn
                   class="primary"
-                  @click="openConfirmationDialog()"
+                  @click="openConfirmationDialog"
                   data-testid="open-confirmation-dialog-button"
                 >
                   {{ $t('admin.import.executeImport') }}
@@ -526,7 +628,7 @@
         <template
           v-if="
             !showUploadSuccessTemplate &&
-            !importStore.importedData &&
+            !importStore.importResponse &&
             !importStore.importIsLoading &&
             !importStore.errorCode
           "
@@ -678,10 +780,7 @@
       <v-card-text>
         <v-container>
           <v-row class="text-body bold ml-2">
-            <v-col
-              offset="1"
-              cols="10"
-            >
+            <v-col class="text-center">
               <span data-testid="person-import-confirmation-text">
                 {{ $t('admin.import.confirmationText') }}
               </span>

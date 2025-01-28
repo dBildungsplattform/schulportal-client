@@ -1,19 +1,19 @@
-import { expect, test, type Mock } from 'vitest';
-import { DOMWrapper, flushPromises, mount, VueWrapper } from '@vue/test-utils';
-import PersonImportView from './PersonImportView.vue';
-import { nextTick } from 'vue';
+import { ImportDataItemStatus, type ImportUploadResponse } from '@/api-client/generated';
+import routes from '@/router/routes';
 import { useImportStore, type ImportStore } from '@/stores/ImportStore';
 import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
 import {
-  type RolleStore,
-  useRolleStore,
   RollenMerkmal,
   RollenSystemRecht,
+  useRolleStore,
+  type RolleStore,
   type RolleWithServiceProvidersResponse,
 } from '@/stores/RolleStore';
-import type { ImportUploadResponse } from '@/api-client/generated';
+import { DOMWrapper, flushPromises, mount, VueWrapper } from '@vue/test-utils';
+import { expect, test, type Mock, type MockInstance } from 'vitest';
+import { nextTick } from 'vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
-import routes from '@/router/routes';
+import PersonImportView from './PersonImportView.vue';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
@@ -157,6 +157,20 @@ describe('PersonImportView', () => {
     // expect(wrapper?.emitted('click:clear')).toBe(true);
   });
 
+  test('it shows validation messages', async () => {
+    expect(wrapper?.find('#schule-select-messages').text()).toBe('');
+    expect(wrapper?.find('#rolle-select-messages').text()).toBe('');
+    expect(wrapper?.find('[data-testid="file-input"]').text()).not.toContain('Eine CSV-Datei muss ausgewählt werden.');
+
+    await wrapper?.find('[data-testid="person-import-form-submit-button"]').trigger('click');
+    // wait for transition to happen
+    await vi.waitUntil(() => (wrapper?.find('#schule-select-messages').text().length ?? 0) > 0);
+
+    expect(wrapper?.find('#schule-select-messages').text()).toContain('Eine Schule muss ausgewählt werden.');
+    expect(wrapper?.find('#rolle-select-messages').text()).toContain('Eine Rolle muss ausgewählt werden.');
+    expect(wrapper?.find('[data-testid="file-input"]').text()).toContain('Eine CSV-Datei muss ausgewählt werden.');
+  });
+
   test('it uploads a file', async () => {
     const mockFile: File = new File([''], 'personen.csv', { type: 'text/csv' });
     const fileInput: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="file-input"] input');
@@ -238,8 +252,6 @@ describe('PersonImportView', () => {
     expect(importStore.uploadResponse).toStrictEqual(uploadResponse);
     expect(wrapper?.find('[data-testid="person-upload-success-text"]').isVisible()).toBe(true);
 
-    importStore.importedData = new File([''], 'personen.txt', { type: 'text/plain' });
-
     wrapper?.find('[data-testid="open-confirmation-dialog-button"]').trigger('click');
     await nextTick();
 
@@ -261,12 +273,108 @@ describe('PersonImportView', () => {
     expect(document.querySelector('[data-testid="person-import-confirmation-text"]')).toBeNull();
   });
 
-  test('it downloads an imported file', async () => {
+  test('it downloads an imported file through the download all button', async () => {
+    importStore.importResponse = {
+      importvorgandId: '1',
+      rollenname: 'itslearning-Schulbegleitung',
+      organisationsname: 'Carl-Orff-Schule',
+      importedUsers: [
+        {
+          klasse: '9a',
+          vorname: 'Max',
+          nachname: 'Mstermann',
+          benutzername: 'mmstermann117',
+          startpasswort: 'pK0!V%m&',
+          status: ImportDataItemStatus.Success,
+        },
+        {
+          klasse: '9a',
+          vorname: 'Maria',
+          nachname: 'Mler',
+          benutzername: 'mmler2288',
+          startpasswort: 'qA0$z?gv',
+          status: ImportDataItemStatus.Success,
+        },
+        {
+          klasse: '9a',
+          vorname: 'Youssef',
+          nachname: 'fessouf',
+          benutzername: 'mmler2388',
+          startpasswort: 'qA0$z?gx',
+          status: ImportDataItemStatus.Failed,
+        },
+      ],
+      total: 5,
+      pageTotal: 5,
+    };
+
     global.URL.createObjectURL = vi.fn();
     importStore.importProgress = 100;
     await nextTick();
 
-    const downloadButton: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="download-file-button"]');
+    const downloadButton: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="download-all-data-button"]');
+    downloadButton?.trigger('click');
+  });
+
+  test('it downloads an imported file with only successful users through the download all button', async () => {
+    importStore.importResponse = {
+      importvorgandId: '1',
+      rollenname: 'itslearning-Schulbegleitung',
+      organisationsname: 'Carl-Orff-Schule',
+      importedUsers: [
+        {
+          klasse: '9a',
+          vorname: 'Max',
+          nachname: 'Mstermann',
+          benutzername: 'mmstermann117',
+          startpasswort: 'pK0!V%m&',
+          status: ImportDataItemStatus.Success,
+        },
+        {
+          klasse: '9a',
+          vorname: 'Maria',
+          nachname: 'Mler',
+          benutzername: 'mmler2288',
+          startpasswort: 'qA0$z?gv',
+          status: ImportDataItemStatus.Success,
+        },
+      ],
+      total: 5,
+      pageTotal: 5,
+    };
+
+    global.URL.createObjectURL = vi.fn();
+    importStore.importProgress = 100;
+    await nextTick();
+
+    const downloadButton: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="download-all-data-button"]');
+    downloadButton?.trigger('click');
+  });
+
+  test('it downloads an imported file with only failed users through the download all button', async () => {
+    importStore.importResponse = {
+      importvorgandId: '1',
+      rollenname: 'itslearning-Schulbegleitung',
+      organisationsname: 'Carl-Orff-Schule',
+      importedUsers: [
+        {
+          klasse: '9a',
+          vorname: 'Youssef',
+          nachname: 'fessouf',
+          benutzername: 'mmler2388',
+          startpasswort: 'qA0$z?gx',
+          status: ImportDataItemStatus.Failed,
+        },
+      ],
+      total: 5,
+      pageTotal: 5,
+    };
+
+    global.URL.createObjectURL = vi.fn();
+    importStore.importProgress = 100;
+    await nextTick();
+
+    const downloadButton: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="download-all-data-button"]');
     downloadButton?.trigger('click');
   });
 
@@ -276,6 +384,17 @@ describe('PersonImportView', () => {
     await flushPromises();
 
     expect(wrapper?.find('[data-testid="import-progress-bar"]').isVisible()).toBe(true);
+  });
+
+  test('it closes the layout card and navigates to person-management', async () => {
+    const push: MockInstance = vi.spyOn(router, 'push');
+
+    wrapper
+      ?.findComponent({ name: 'FormWrapper' })
+      .find('[data-testid="person-import-form-discard-button"')
+      .trigger('click');
+
+    expect(push).toHaveBeenCalledTimes(1);
   });
 
   test('it resets the form for another upload', async () => {
@@ -309,7 +428,6 @@ describe('PersonImportView', () => {
 
     importStore.errorCode = 'dummy';
     importStore.uploadResponse = {} as ImportStore['uploadResponse'];
-    importStore.importedData = {} as ImportStore['importedData'];
     importStore.importProgress = 100;
     schuleAutocomplete?.setValue('Schule');
     rolleAutocomplete?.setValue('SuS');
@@ -326,28 +444,44 @@ describe('PersonImportView', () => {
 
     expect(importStore.errorCode).toBeNull();
     expect(importStore.uploadResponse).toBeNull();
-    expect(importStore.importedData).toBeNull();
     expect(importStore.importProgress).toBe(0);
     expect(schuleAutocomplete?.text()).toBe('');
     expect(rolleAutocomplete?.text()).toBe('');
     expect(fileInput?.text()).toBe('');
   });
 
-  test.each([['utf-8']])('it reads files with %s encoding', async (_encoding: string) => {
+  test.each([['utf-8'], ['windows-1252']])('it reads files with %s encoding', async (encoding: string) => {
+    // Setup test constants
     const totalImportDataItems: number = 1234;
+
+    // Find components
     const schuleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
     const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
     const fileInput: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="file-input"] input');
-    const mockFile: File = new File(['test'], 'personen.csv', { type: 'text/csv' });
+
+    // Create mock file with specific encoding
+    const fileContent: ArrayBuffer | 'test' =
+      encoding === 'windows-1252'
+        ? new Uint8Array([0xc4, 0xd6, 0xdc]).buffer // ÄÖÜ in Windows-1252
+        : 'test';
+    const mockFile: File = new File([fileContent], 'personen.csv', {
+      type: 'text/csv',
+    });
+
+    // Set form values
     schuleAutocomplete?.setValue('Schule');
     rolleAutocomplete?.setValue('SuS');
     Object.defineProperty(fileInput?.element, 'files', {
       value: [mockFile],
     });
+
+    // Trigger file input change
     await fileInput?.trigger('change');
     await nextTick();
+
+    // Mock the upload function
     const mockFunction: Mock = vi.fn(async () => {
-      importStore.importedData = null;
+      importStore.importResponse = null;
       importStore.uploadIsLoading = false;
       importStore.importIsLoading = false;
       importStore.errorCode = null;
@@ -362,9 +496,15 @@ describe('PersonImportView', () => {
       };
     });
     importStore.uploadPersonenImportFile = mockFunction;
+
+    // Submit form
     await wrapper?.find('[data-testid="person-import-form-submit-button"]').trigger('click');
+
+    // Wait for and verify mock function call
     await vi.waitUntil(() => mockFunction.mock.calls.length > 0);
     expect(mockFunction).toHaveBeenCalledOnce();
+
+    // Verify success message
     await vi.waitUntil(() => wrapper?.find('[data-testid="person-upload-success-text"]').exists());
     expect(wrapper?.find('[data-testid="person-upload-success-text"]').text()).toContain('erfolgreich');
     expect(wrapper?.find('[data-testid="person-upload-success-text"]').text()).toContain(
