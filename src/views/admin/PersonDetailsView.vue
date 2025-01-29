@@ -2654,10 +2654,7 @@
         <v-card-text>
           <v-container>
             <v-row class="text-body bold px-md-16">
-              <v-col
-                offset="1"
-                cols="10"
-              >
+              <v-col class="text-center">
                 <span>{{ $t('person.addZuordnungSuccess') }}</span>
               </v-col>
             </v-row>
@@ -2673,6 +2670,7 @@
               <v-btn
                 :block="mdAndDown"
                 class="primary"
+                data-testId="close-zuordnung-create-success-button"
                 @click.stop="closeCreateSuccessDialog"
               >
                 {{ $t('close') }}
@@ -2799,6 +2797,7 @@
               <v-btn
                 :block="mdAndDown"
                 class="primary"
+                data-testid="confirm-zuordnung-dialog-addition"
                 @click.stop="confirmDialogAddition"
               >
                 {{ $t('yes') }}
