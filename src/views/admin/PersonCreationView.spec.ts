@@ -317,6 +317,91 @@ describe('PersonCreationView', () => {
     expect(organisationSelect?.vm.$data).toStrictEqual({});
   });
 
+  test('it fills form, triggers submit and then show success template', async () => {
+    personenkontextStore.workflowStepResponse = {
+      organisations: [
+        {
+          id: '9876',
+          kennung: '',
+          name: 'Organisation1',
+          namensergaenzung: 'string',
+          kuerzel: 'string',
+          typ: 'TRAEGER',
+          administriertVon: '1',
+        },
+      ],
+      rollen: [
+        {
+          administeredBySchulstrukturknoten: '1234',
+          rollenart: 'LERN',
+          name: 'SuS',
+          merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RollenMerkmal>,
+          systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
+          createdAt: '2022',
+          updatedAt: '2022',
+          id: '1',
+          administeredBySchulstrukturknotenName: 'Land SH',
+          administeredBySchulstrukturknotenKennung: '',
+          version: 1,
+        },
+      ],
+      selectedOrganisation: null,
+      selectedRolle: null,
+      canCommit: true,
+    };
+
+    const organisationSelect: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'personenkontext-create' })
+      .findComponent({ ref: 'organisation-select' });
+    await organisationSelect?.setValue('9876');
+    await nextTick();
+
+    const rolleSelect: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'personenkontext-create' })
+      .findComponent({ ref: 'rolle-select' });
+    await rolleSelect?.setValue('1');
+    await nextTick();
+
+    const klasseSelect: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'personenkontext-create' })
+      .findComponent({ ref: 'klasse-select' });
+    await klasseSelect?.setValue('9a');
+    await nextTick();
+
+    const befristungInput: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'personenkontext-create' })
+      .findComponent({ ref: 'befristung' })
+      .findComponent({ ref: 'befristung-input' });
+    await befristungInput?.setValue('12.08.2099');
+    await nextTick();
+
+    const vornameInput: VueWrapper | undefined = wrapper?.findComponent({ ref: 'vorname-input' });
+    await vornameInput?.setValue('Randy');
+    await nextTick();
+
+    const nachnameInput: VueWrapper | undefined = wrapper?.findComponent({ ref: 'familienname-input' });
+    await nachnameInput?.setValue('Cena');
+    await nextTick();
+
+    const kopersInput: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'kopers-input' })
+      .findComponent({ ref: 'kopersnr-input' });
+    await kopersInput?.setValue('23234');
+    await nextTick();
+
+    wrapper?.find('[data-testid="person-creation-form-submit-button"]').trigger('click');
+    await nextTick();
+    await flushPromises();
+
+    // Form is resetting after submit so orga should be undefined
+    expect(organisationSelect?.vm.$data).toStrictEqual({});
+
+    personenkontextStore.createdPersonWithKontext = mockCreatedPersonWithKontext;
+
+    await nextTick();
+    expect(wrapper?.find('[data-testid="person-success-text"]').isVisible()).toBe(true);
+  });
+
   test('it renders success template and navigates back to form', async () => {
     personenkontextStore.createdPersonWithKontext = mockCreatedPersonWithKontext;
     await nextTick();
