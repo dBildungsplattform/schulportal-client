@@ -222,6 +222,95 @@ describe('RolleCreationView', () => {
     expect(rolleStore.createdRolle).toBe(null);
   });
 
+  test('it fills form and triggers submit and uses correct Rolle to add serviceproviders', async () => {
+    const orgSelect: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'rolle-creation-form' })
+      .findComponent({ ref: 'administrationsebene-select' });
+    await orgSelect?.setValue('1');
+    await nextTick();
+
+    const rollenartSelect: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'rolle-creation-form' })
+      .findComponent({ ref: 'rollenart-select' });
+    rollenartSelect?.setValue('LERN');
+    await nextTick();
+
+    const rollennameInput: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'rolle-creation-form' })
+      .findComponent({ ref: 'rollenname-input' });
+
+    expect(rollennameInput?.exists()).toBe(true);
+    await rollennameInput?.find('input').setValue('NewRolle');
+    await nextTick();
+
+    const providerSelect: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'rolle-creation-form' })
+      .findComponent({ ref: 'service-provider-select' });
+    providerSelect?.setValue(['1']);
+    await nextTick();
+
+    expect(orgSelect?.text()).toEqual('9356494 (Albert-Emil-Hansebrot-Gymnasium)');
+    expect(rollenartSelect?.text()).toEqual('Lern');
+    const oldmockRolle: RolleResponse = {
+      administeredBySchulstrukturknoten: '1234',
+      rollenart: 'LEHR',
+      name: 'Lehrer',
+      // TODO: remove type casting when generator is fixed
+      merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RollenMerkmal>,
+      systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
+      createdAt: '2022',
+      updatedAt: '2022',
+      id: '1',
+      administeredBySchulstrukturknotenName: 'Land SH',
+      administeredBySchulstrukturknotenKennung: '',
+      version: 5,
+    };
+    rolleStore.createdRolle = oldmockRolle;
+
+    const mockRolle: RolleResponse = {
+      administeredBySchulstrukturknoten: '1234',
+      rollenart: 'LEHR',
+      name: 'Lehrer',
+      // TODO: remove type casting when generator is fixed
+      merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RollenMerkmal>,
+      systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
+      createdAt: '2022',
+      updatedAt: '2022',
+      id: '2',
+      administeredBySchulstrukturknotenName: 'Land SH',
+      administeredBySchulstrukturknotenKennung: '',
+      version: 1,
+    };
+    vi.spyOn(rolleStore, 'createRolle').mockResolvedValue(mockRolle);
+
+    expect(
+      wrapper
+        ?.findComponent({ ref: 'rolle-creation-form' })
+        .find('[data-testid="rolle-form-submit-button"]')
+        .isVisible(),
+    ).toBe(true);
+
+    wrapper
+      ?.findComponent({ ref: 'rolle-creation-form' })
+      .findComponent({ ref: 'form-wrapper' })
+      .find('[data-testid="rolle-form-submit-button"]')
+      .trigger('click');
+    await nextTick();
+
+    await flushPromises();
+    await flushPromises();
+
+    expect(rolleStore.createRolle).toHaveBeenCalled();
+    expect(rolleStore.updateServiceProviderInRolle).toHaveBeenCalledWith(mockRolle.id, {
+      serviceProviderIds: ['1'],
+      version: mockRolle.version,
+    });
+    expect(rolleStore.updateServiceProviderInRolle).not.toHaveBeenCalledWith(oldmockRolle.id, {
+      serviceProviderIds: ['1'],
+      version: oldmockRolle.version,
+    });
+  });
+
   test('It display the success template with no systemrechte nor merkmale', async () => {
     const mockRolle: RolleResponse = {
       administeredBySchulstrukturknoten: '1234',
