@@ -176,7 +176,7 @@
     <LayoutCard
       data-testid="layout-card"
       :closable="true"
-      :header="$t('admin.rolle.edit')"
+      :header="$t('admin.rolle.assignRolle')"
       @onCloseClicked="closeModifyRolleDeleteDialog()"
     >
       <v-container>
@@ -280,7 +280,7 @@
               data-testid="rolle-modify-submit-button"
               type="submit"
             >
-              {{ $t('person.addZuordnung') }}
+              {{ $t('admin.rolle.assignRolle') }}
             </v-btn>
           </v-col>
         </v-row>

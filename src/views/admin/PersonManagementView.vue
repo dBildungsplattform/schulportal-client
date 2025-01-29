@@ -21,6 +21,7 @@
   import { type TranslatedRolleWithAttrs, useRollen } from '@/composables/useRollen';
   import RolleModify from '@/components/admin/rollen/RolleModify.vue';
   import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
+  import SpshTooltip from '@/components/admin/SpshTooltip.vue';
 
   const searchFieldComponent: Ref = ref();
 
@@ -77,7 +78,7 @@
 
   // Define i18n values for action types to act as a title/value in the v-select
   const actionTypeTitles: Record<ActionTypes, string> = {
-    [ActionTypes.MODIFY_ROLLE]: t('admin.rolle.edit'),
+    [ActionTypes.MODIFY_ROLLE]: t('admin.rolle.assignRolle'),
   };
 
   // Computed property for generating options dynamically for v-selects
@@ -707,24 +708,30 @@
           md="3"
           cols="12"
         >
-          <v-select
-            v-if="authStore.hasPersonenBulkPermission"
-            clearable
-            data-testid="benutzer-edit-select"
-            density="compact"
-            :disabled="selectedPersonIds.length === 0"
-            id="benutzer-edit-select"
-            :items="actions"
-            item-value="value"
-            item-text="title"
-            :no-data-text="$t('noDataFound')"
-            :placeholder="$t('edit')"
-            ref="benutzer-edit-select"
-            required="true"
-            variant="outlined"
-            v-model="selectedOption"
-            @update:modelValue="handleOption"
-          ></v-select>
+          <SpshTooltip
+            :enabledCondition="selectedPersonIds.length > 0"
+            :disabledText="$t('admin.person.choosePersonFirt')"
+            position="bottom"
+          >
+            <v-select
+              v-if="authStore.hasPersonenBulkPermission"
+              clearable
+              data-testid="benutzer-edit-select"
+              density="compact"
+              :disabled="selectedPersonIds.length === 0"
+              id="benutzer-edit-select"
+              :items="actions"
+              item-value="value"
+              item-text="title"
+              :no-data-text="$t('noDataFound')"
+              :placeholder="$t('edit')"
+              ref="benutzer-edit-select"
+              required="true"
+              variant="outlined"
+              v-model="selectedOption"
+              @update:modelValue="handleOption"
+            ></v-select>
+          </SpshTooltip>
           <RolleModify
             v-if="rolleModifiyDialogVisible"
             :organisationen="organisationenForOption"
@@ -740,7 +747,7 @@
         </v-col>
         <!-- Display the number of selected checkboxes -->
         <v-col
-          v-if="selectedPersonIds.length > 0"
+          v-if="authStore.hasPersonenBulkPermission && selectedPersonIds.length > 0"
           cols="12"
           md="4"
           class="mt-md-5 mt-n10"

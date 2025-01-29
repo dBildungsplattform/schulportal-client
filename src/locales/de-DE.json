@@ -161,6 +161,7 @@
       "changePassword": "Passwort ändern",
       "copyPasswordError": "Passwort konnte nicht in die Zwischenablage kopiert werden",
       "copyPasswordSuccess": "Passwort in Zwischenablage kopiert",
+      "choosePersonFirt": "Wählen Sie bitte zuerst einen Benutzer aus.",
       "create": "Benutzer anlegen",
       "createAnother": "Weiteren Benutzer anlegen",
       "createNew": "Neue Benutzer anlegen",
@@ -384,7 +385,7 @@
           "SCHULTRAEGER_VERWALTEN": "Darf Schulträger verwalten",
           "PERSON_SYNCHRONISIEREN": "Darf Benutzer synchronisieren",
           "PERSONEN_ANLEGEN": "Darf Benutzer anlegen",
-          "BULK_VERWALTEN": "Darf Benutzer mehrfach bearbeiten"
+          "BULK_VERWALTEN": "Darf Mehrfachbearbeitung ausführen"
         },
         "rollenarten": {
           "LERN": "Lern",

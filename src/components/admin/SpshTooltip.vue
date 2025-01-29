@@ -1,18 +1,19 @@
 <script setup lang="ts">
-  defineProps({
-    enabledCondition: {
-      type: Boolean,
-    },
-    disabledText: {
-      type: String,
-    },
-    enabledText: {
-      type: String,
-    },
-    position: {
-      type: String as () => 'start' | 'end' | 'top' | 'bottom',
-      default: 'top',
-    },
+  import { computed, type ComputedRef } from 'vue';
+
+  type Props = {
+    enabledCondition: boolean;
+    disabledText: string;
+    enabledText?: string;
+    position?: 'start' | 'end' | 'top' | 'bottom';
+  };
+
+  const props: Props = withDefaults(defineProps<Props>(), {
+    position: 'top',
+  });
+
+  const tooltipText: ComputedRef<string | undefined> = computed(() => {
+    return props.enabledCondition ? props.enabledText : props.disabledText;
   });
 </script>
 
@@ -20,6 +21,7 @@
   <v-tooltip
     data-testid="tooltip"
     :location="position"
+    :disabled="!tooltipText"
     open-delay="500"
   >
     <template v-slot:activator="{ props: tooltipProps }">
@@ -27,8 +29,11 @@
         <slot />
       </div>
     </template>
-    <span data-testid="tooltip-text">{{ enabledCondition ? enabledText : disabledText }}</span>
+    <span
+      v-if="tooltipText"
+      data-testid="tooltip-text"
+    >
+      {{ tooltipText }}
+    </span>
   </v-tooltip>
 </template>
-
-<style></style>
