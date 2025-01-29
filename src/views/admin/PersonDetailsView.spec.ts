@@ -103,7 +103,7 @@ const mockPersonenuebersicht: PersonWithUebersicht = {
       administriertVon: '2',
       editable: true,
       merkmale: [] as unknown as RollenMerkmal,
-      befristung: '2099-08-12',
+      befristung: '2099-08-12T22:00:00.000Z',
       admins: ['test'],
     },
     {
@@ -155,7 +155,7 @@ const mockPersonenuebersichtLehr: PersonWithUebersicht = {
       administriertVon: '2',
       editable: true,
       merkmale: [] as unknown as RollenMerkmal,
-      befristung: '2099-08-12',
+      befristung: '2099-08-12T22:00:00.000Z',
       admins: [],
     },
   ],
