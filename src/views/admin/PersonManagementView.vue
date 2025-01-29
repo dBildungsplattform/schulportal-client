@@ -725,7 +725,7 @@
               item-text="title"
               :no-data-text="$t('noDataFound')"
               :placeholder="$t('edit')"
-              ref="benutzer-edit-select"
+              ref="benutzer-bulk-edit-select"
               required="true"
               variant="outlined"
               v-model="selectedOption"
@@ -733,6 +733,7 @@
             ></v-select>
           </SpshTooltip>
           <RolleModify
+            ref="rolle-modify"
             v-if="rolleModifiyDialogVisible"
             :organisationen="organisationenForOption"
             :rollen="lehrRollen"
