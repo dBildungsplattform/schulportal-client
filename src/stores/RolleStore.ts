@@ -153,6 +153,7 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
         };
         const { data }: { data: RolleResponse } = await rolleApi.rolleControllerCreateRolle(createRolleBodyParams);
         this.createdRolle = data;
+        this.currentRolle = data;
         return data;
       } catch (error: unknown) {
         /* if an unknown error occurs, set to UNSPECIFIED */
