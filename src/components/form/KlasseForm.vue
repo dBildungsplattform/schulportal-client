@@ -1,17 +1,23 @@
 <script setup lang="ts">
-  import { computed, defineProps, ref, watch, type ComputedRef, type ModelRef, type Ref } from 'vue';
-  import { type BaseFieldProps } from 'vee-validate';
-  import FormWrapper from '@/components/form/FormWrapper.vue';
   import FormRow from '@/components/form/FormRow.vue';
+  import FormWrapper from '@/components/form/FormWrapper.vue';
+  import {
+    OrganisationsTyp,
+    useOrganisationStore,
+    type OrganisationenFilter,
+    type OrganisationStore,
+  } from '@/stores/OrganisationStore';
+  import { RollenSystemRecht } from '@/stores/RolleStore';
   import type { TranslatedObject } from '@/types';
-  import { type PersonenkontextStore, usePersonenkontextStore } from '@/stores/PersonenkontextStore';
+  import { type BaseFieldProps } from 'vee-validate';
+  import { computed, defineProps, ref, watch, type ComputedRef, type ModelRef, type Ref } from 'vue';
 
   const hasAutoselectedSchule: Ref<boolean> = ref(false);
   const searchInputSchule: Ref<string> = ref('');
   const timerId: Ref<ReturnType<typeof setTimeout> | undefined> = ref<ReturnType<typeof setTimeout>>();
   let isSearching: boolean = false;
 
-  const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
+  const organisationStore: OrganisationStore = useOrganisationStore();
 
   type Props = {
     errorCode?: string;
@@ -30,7 +36,7 @@
 
   const props: Props = defineProps<Props>();
 
-  const selectedSchule: ModelRef<string | undefined, string> = defineModel('selectedSchule');
+  const selectedSchuleId: ModelRef<string | undefined, string> = defineModel('selectedSchule');
   const selectedKlassenname: ModelRef<string | undefined, string> = defineModel('selectedKlassenname');
 
   // Watcher for schulen to auto-select if there is only one
@@ -39,43 +45,37 @@
     (newSchulen: TranslatedObject[] | undefined) => {
       if (!isSearching && newSchulen && newSchulen.length === 1) {
         hasAutoselectedSchule.value = true;
-        selectedSchule.value = newSchulen[0]?.value || '';
+        selectedSchuleId.value = newSchulen[0]?.value || '';
       }
     },
     { immediate: true },
   );
 
   const selectedSchuleTitle: ComputedRef<string> = computed(() => {
-    return props.schulen?.find((schule: TranslatedObject) => schule.value === selectedSchule.value)?.title || '';
+    return props.schulen?.find((schule: TranslatedObject) => schule.value === selectedSchuleId.value)?.title || '';
   });
 
   // Watcher to detect when the search input for Organisationen is triggered.
-  watch(searchInputSchule, async (newValue: string, oldValue: string) => {
+  watch(searchInputSchule, async (newValue: string | undefined) => {
     clearTimeout(timerId.value);
     isSearching = !!newValue;
-    if (oldValue === selectedSchuleTitle.value) return;
+    if (newValue !== '' && newValue === selectedSchuleTitle.value) return;
 
-    if (newValue === '' && !selectedSchule.value) {
-      timerId.value = setTimeout(async () => {
-        await personenkontextStore.processWorkflowStep({
-          limit: 25,
-        });
-      }, 500);
-    } else if (newValue && newValue !== selectedSchuleTitle.value) {
-      timerId.value = setTimeout(async () => {
-        await personenkontextStore.processWorkflowStep({
-          organisationName: newValue,
-          limit: 25,
-        });
-      }, 500);
-    } else if (newValue === '' && selectedSchule.value) {
-      timerId.value = setTimeout(async () => {
-        await personenkontextStore.processWorkflowStep({
-          organisationId: selectedSchule.value,
-          limit: 25,
-        });
-      }, 500);
+    const organisationFilter: OrganisationenFilter = {
+      includeTyp: OrganisationsTyp.Schule,
+      systemrechte: [RollenSystemRecht.KlassenVerwalten],
+      limit: 25,
+    };
+    if (newValue) {
+      organisationFilter.searchString = newValue;
     }
+    if (selectedSchuleId.value) {
+      organisationFilter.organisationIds = [selectedSchuleId.value];
+    }
+
+    timerId.value = setTimeout(async () => {
+      await organisationStore.getAllOrganisationen(organisationFilter);
+    }, 500);
   });
 </script>
 
@@ -108,7 +108,7 @@
       >
         <v-autocomplete
           autocomplete="off"
-          :class="[{ 'filter-dropdown mb-4': hasAutoselectedSchule }, { selected: selectedSchule }]"
+          :class="[{ 'filter-dropdown mb-4': hasAutoselectedSchule }, { selected: selectedSchuleId }]"
           clearable
           data-testid="schule-select"
           density="compact"
@@ -123,7 +123,7 @@
           required="true"
           variant="outlined"
           v-bind="selectedSchuleProps"
-          v-model="selectedSchule"
+          v-model="selectedSchuleId"
           v-model:search="searchInputSchule"
           hide-details
         ></v-autocomplete>
