@@ -2,8 +2,8 @@
   import { computed, type ComputedRef } from 'vue';
 
   type Props = {
-    enabledCondition: boolean;
-    disabledText: string;
+    disabledText?: string;
+    enabledCondition?: boolean;
     enabledText?: string;
     position?: 'start' | 'end' | 'top' | 'bottom';
   };
