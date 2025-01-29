@@ -11,6 +11,16 @@ export default defineConfig({
     // Disable inlining of assets
     assetsInlineLimit: 0,
   },
+  css: {
+    preprocessorOptions: {
+      scss: {
+        api: 'modern-compiler',
+      },
+      sass: {
+        api: 'modern-compiler',
+      },
+    },
+  },
   define: {
     /* disable hydration mismatch details in production build */
     __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: 'false',
