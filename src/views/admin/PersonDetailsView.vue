@@ -1014,8 +1014,8 @@
         oldBefristungdFormatted = adjustDateForTimezoneAndFormat(oldBefristung);
       }
       changeBefristungConfirmationDialogMessage.value = t('person.changeBefristungConfirmation', {
-        oldBefristung: oldBefristung ? oldBefristungdFormatted! : t('admin.befristung.unlimited'),
-        newBefristung: befristungDate || t('admin.befristung.unlimited'),
+        oldBefristung: oldBefristung ? oldBefristungdFormatted! : t('admin.befristung.unlimitedLower'),
+        newBefristung: befristungDate || t('admin.befristung.unlimitedLower'),
       });
       changeBefristungConfirmationDialogVisible.value = true;
     });
