@@ -1469,6 +1469,15 @@
     );
   });
 
+  const differentDateSelected: ComputedRef<boolean> = computed(() => {
+    const newBefristungDate: string | undefined = selectedChangeBefristung.value ?? calculatedBefristung.value;
+    const currentBefristungDate: string | undefined = selectedZuordnungen.value[0]?.befristung
+      ? adjustDateForTimezoneAndFormat(selectedZuordnungen.value[0]?.befristung)
+      : undefined;
+
+    return currentBefristungDate !== newBefristungDate;
+  });
+
   onBeforeMount(async () => {
     personStore.resetState();
     twoFactorAuthentificationStore.resetState();
@@ -2456,13 +2465,21 @@
                   sm="6"
                   md="auto"
                 >
-                  <v-btn
-                    :block="mdAndDown"
-                    class="primary"
-                    data-testid="change-befristung-submit-button"
-                    type="submit"
-                    >{{ $t('person.changeBefristung') }}</v-btn
+                  <SpshTooltip
+                    :enabledCondition="differentDateSelected"
+                    :disabledText="$t('person.changeBefristungDisabledDescription')"
+                    :enabledText="$t('person.changeBefristung')"
+                    position="start"
                   >
+                    <v-btn
+                      :block="mdAndDown"
+                      :disabled="!differentDateSelected"
+                      class="primary"
+                      data-testid="change-befristung-submit-button"
+                      type="submit"
+                      >{{ $t('person.changeBefristung') }}</v-btn
+                    >
+                  </SpshTooltip>
                 </v-col>
               </v-row>
             </v-form>
