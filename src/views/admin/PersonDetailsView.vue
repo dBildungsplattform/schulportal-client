@@ -806,13 +806,13 @@
       selectedChangeBefristungOption.value = BefristungOption.UNBEFRISTET;
       return;
     }
-    const formatted: string = adjustDateForTimezoneAndFormat(selectedZuordnungen.value[0]?.befristung);
+    const germanDate: string = adjustDateForTimezoneAndFormat(selectedZuordnungen.value[0]?.befristung);
     const nextSchuljahresende: string = getNextSchuljahresende();
-    if (formatted == nextSchuljahresende) {
+    if (germanDate == nextSchuljahresende) {
       selectedChangeBefristungOption.value = BefristungOption.SCHULJAHRESENDE;
       return;
     }
-    selectedChangeBefristung.value = formatted;
+    selectedChangeBefristung.value = germanDate;
   };
 
   // Cancels editing
@@ -1227,8 +1227,7 @@
       editable: true,
     };
 
-    finalZuordnungen.value = zuordnungenResult.value ?? [];
-    finalZuordnungen.value = finalZuordnungen.value
+    finalZuordnungen.value = (zuordnungenResult.value ?? [])
       .map((zuordnung: Zuordnung | undefined) => (zuordnung === currentZuordnung ? newZuordnung.value : zuordnung))
       .filter((zuordnung: Zuordnung | undefined): zuordnung is Zuordnung => zuordnung !== undefined);
 
@@ -1464,7 +1463,7 @@
     }
   });
 
-  const isNotPending: ComputedRef<boolean> = computed(() => {
+  const isActionNotPending: ComputedRef<boolean> = computed(() => {
     return (
       !pendingCreation.value && !pendingDeletion.value && !pendingChangeKlasse.value && !pendingChangeBefristung.value
     );
@@ -1580,7 +1579,7 @@
                         :disabled="isEditActive"
                         class="primary ml-lg-8"
                         data-testid="metadata-edit-button"
-                        @Click="triggerPersonMetadataEdit"
+                        @click="triggerPersonMetadataEdit"
                         :block="mdAndDown"
                       >
                         {{ $t('edit') }}
@@ -1863,7 +1862,7 @@
                       class="primary ml-lg-8"
                       data-testid="zuordnung-edit-button"
                       :disabled="isEditPersonMetadataActive"
-                      @Click="triggerEdit"
+                      @click="triggerEdit"
                       :block="mdAndDown"
                     >
                       {{ $t('edit') }}
@@ -1913,7 +1912,7 @@
           <template v-if="!isZuordnungFormActive && !isChangeKlasseFormActive && !isChangeBefristungActive">
             <v-row class="ml-md-16">
               <v-col
-                v-if="isNotPending"
+                v-if="isActionNotPending"
                 cols="12"
                 sm="auto"
               >
@@ -1936,7 +1935,7 @@
                 :title="zuordnung.sskName"
                 class="py-0 d-flex align-items-center"
               >
-                <template v-if="isNotPending">
+                <template v-if="isActionNotPending">
                   <div class="checkbox-div">
                     <v-checkbox
                       :ref="`checkbox-zuordnung-${zuordnung.sskId}`"
@@ -2119,7 +2118,7 @@
               </v-col>
               <v-spacer></v-spacer>
               <v-col
-                v-if="isNotPending"
+                v-if="isActionNotPending"
                 class="button-container"
                 cols="12"
                 md="auto"
@@ -2148,7 +2147,7 @@
                   >
                     <v-btn
                       class="primary mt-2"
-                      @Click="triggerAddZuordnung"
+                      @click="triggerAddZuordnung"
                       data-testid="zuordnung-create-button"
                       :disabled="selectedZuordnungen.length > 0"
                       :block="mdAndDown"
@@ -2183,7 +2182,7 @@
                     >
                       <v-btn
                         class="primary mt-2"
-                        @Click="triggerChangeBefristung"
+                        @click="triggerChangeBefristung"
                         data-testid="befristung-change-button"
                         :disabled="selectedZuordnungen.length !== 1"
                         :block="mdAndDown"
@@ -2201,7 +2200,7 @@
                   >
                     <v-btn
                       class="primary mt-2"
-                      @Click="triggerChangeKlasse"
+                      @click="triggerChangeKlasse"
                       data-testid="klasse-change-button"
                       :disabled="!canChangeKlasse"
                       :block="mdAndDown"
@@ -2331,7 +2330,7 @@
                   <v-btn
                     :block="mdAndDown"
                     class="secondary"
-                    @Click="cancelEdit"
+                    @click="cancelEdit"
                     data-testid="zuordnung-creation-discard-button"
                     >{{ $t('cancel') }}</v-btn
                   >
@@ -2391,7 +2390,7 @@
                   <v-btn
                     :block="mdAndDown"
                     class="secondary"
-                    @Click="cancelEdit"
+                    @click="cancelEdit"
                     data-testid="klasse-change-discard-button"
                     >{{ $t('cancel') }}</v-btn
                   >
@@ -2447,7 +2446,7 @@
                   <v-btn
                     :block="mdAndDown"
                     class="secondary"
-                    @Click="cancelEdit"
+                    @click="cancelEdit"
                     data-testid="change-befristung-discard-button"
                     >{{ $t('cancel') }}</v-btn
                   >
