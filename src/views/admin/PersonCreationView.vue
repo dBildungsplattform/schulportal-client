@@ -233,7 +233,7 @@
     const ISOFormattedDate: string | undefined = schuleZuordnungFromCreatedKontext.value?.befristung;
 
     if (!ISOFormattedDate) {
-      return t('admin.befristung.unlimitedSuccessTemplate');
+      return t('admin.befristung.unlimitedLower');
     }
 
     // Parse the UTC date

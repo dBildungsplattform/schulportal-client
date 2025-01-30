@@ -21,7 +21,6 @@
       "unlimited": "Unbefristet",
       "unlimitedLower": "unbefristet",
       "limited": "Befristet",
-      "unlimitedSuccessTemplate": "unbefristet",
       "unlimitedInactive": "Diese Option kann für Rollen mit Befristungspflicht nicht ausgewählt werden.",
       "limitedUntil": "befristet bis",
       "untilEndOfSchoolYear": "Bis Schuljahresende"
