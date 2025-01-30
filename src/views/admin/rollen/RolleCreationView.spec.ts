@@ -1,27 +1,45 @@
-import { expect, test, type MockInstance } from 'vitest';
-import { nextTick } from 'vue';
-import { flushPromises, mount, VueWrapper } from '@vue/test-utils';
-import RolleCreationView from './RolleCreationView.vue';
-import { createRouter, createWebHistory, type Router } from 'vue-router';
-import routes from '@/router/routes';
-import {
-  RollenMerkmal,
-  RollenSystemRecht,
-  type RolleResponse,
-  type RolleStore,
-  useRolleStore,
-} from '@/stores/RolleStore';
-import { type OrganisationStore, useOrganisationStore } from '@/stores/OrganisationStore';
 import {
   ServiceProviderKategorie,
   ServiceProviderTarget,
   type ServiceProviderResponse,
 } from '@/api-client/generated/api';
+import routes from '@/router/routes';
+import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
+import {
+  RollenMerkmal,
+  RollenSystemRecht,
+  useRolleStore,
+  type RolleResponse,
+  type RolleStore,
+} from '@/stores/RolleStore';
+import { flushPromises, mount, VueWrapper } from '@vue/test-utils';
+import type Module from 'module';
+import { expect, test, type Mock, type MockInstance } from 'vitest';
+import { nextTick } from 'vue';
+import {
+  createRouter,
+  createWebHistory,
+  type NavigationGuardNext,
+  type RouteLocationNormalized,
+  type Router,
+} from 'vue-router';
+import RolleCreationView from './RolleCreationView.vue';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
 const rolleStore: RolleStore = useRolleStore();
 const organisationStore: OrganisationStore = useOrganisationStore();
+
+type OnBeforeRouteLeaveCallback = (
+  _to: RouteLocationNormalized,
+  _from: RouteLocationNormalized,
+  _next: NavigationGuardNext,
+) => void;
+let { cb }: { cb: OnBeforeRouteLeaveCallback } = vi.hoisted(() => {
+  return {
+    cb: (_to: RouteLocationNormalized, _from: RouteLocationNormalized, _next: NavigationGuardNext): void => {},
+  };
+});
 
 organisationStore.allOrganisationen = [
   {
@@ -44,10 +62,100 @@ organisationStore.allOrganisationen = [
   },
 ];
 
+function mountComponent(): VueWrapper {
+  return mount(RolleCreationView, {
+    attachTo: document.getElementById('app') || '',
+    global: {
+      components: {
+        RolleCreationView,
+      },
+      plugins: [router],
+    },
+  });
+}
+
+type FormFields = {
+  organisation: string;
+  rollenart: string;
+  rollenname: string;
+  merkmale: Array<string>;
+  provider: Array<string>;
+  systemrechte: Array<string>;
+};
+type FormSelectors = {
+  orgSelect: VueWrapper;
+  rollenartSelect: VueWrapper;
+  rollennameInput: VueWrapper;
+  merkmaleSelect: VueWrapper;
+  providerSelect: VueWrapper;
+  systemrechteSelect: VueWrapper;
+};
+async function fillForm(args: Partial<FormFields>): Promise<Partial<FormSelectors>> {
+  const { organisation, rollenart, rollenname, merkmale, provider, systemrechte }: Partial<FormFields> = args;
+  const selectors: Partial<FormSelectors> = {};
+  if (organisation) {
+    const orgSelect: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'rolle-creation-form' })
+      .findComponent({ ref: 'administrationsebene-select' });
+    await orgSelect?.setValue(organisation);
+    await nextTick();
+    selectors.orgSelect = orgSelect;
+  }
+
+  if (rollenart) {
+    const rollenartSelect: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'rolle-creation-form' })
+      .findComponent({ ref: 'rollenart-select' });
+    rollenartSelect?.setValue(rollenart);
+    await nextTick();
+    selectors.rollenartSelect = rollenartSelect;
+  }
+
+  if (rollenname) {
+    const rollennameInput: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'rolle-creation-form' })
+      .findComponent({ ref: 'rollenname-input' });
+    expect(rollennameInput?.exists()).toBe(true);
+    await rollennameInput?.find('input').setValue(rollenname);
+    await nextTick();
+    selectors.rollennameInput = rollennameInput;
+  }
+
+  if (merkmale) {
+    const merkmaleSelect: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'rolle-creation-form' })
+      .findComponent({ ref: 'merkmale-select' });
+    merkmaleSelect?.setValue(merkmale);
+    await nextTick();
+    selectors.merkmaleSelect = merkmaleSelect;
+  }
+
+  if (provider) {
+    const providerSelect: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'rolle-creation-form' })
+      .findComponent({ ref: 'service-provider-select' });
+    providerSelect?.setValue(provider);
+    await nextTick();
+    selectors.providerSelect = providerSelect;
+  }
+
+  if (systemrechte) {
+    const systemrechteSelect: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'rolle-creation-form' })
+      .findComponent({ ref: 'systemrechte-select' });
+    systemrechteSelect?.setValue(systemrechte);
+    await nextTick();
+    selectors.systemrechteSelect = systemrechteSelect;
+  }
+  return selectors;
+}
+
 beforeEach(async () => {
   document.body.innerHTML = `
     <div>
-      <div id="app"></div>
+      <router-view>
+        <div id="app"></div>
+      </router-view>
     </div>
   `;
 
@@ -59,15 +167,8 @@ beforeEach(async () => {
   router.push('/');
   await router.isReady();
 
-  wrapper = mount(RolleCreationView, {
-    attachTo: document.getElementById('app') || '',
-    global: {
-      components: {
-        RolleCreationView,
-      },
-      plugins: [router],
-    },
-  });
+  wrapper = mountComponent();
+  rolleStore.errorCode = '';
 });
 
 afterEach(() => {
@@ -94,8 +195,6 @@ describe('RolleCreationView', () => {
     wrapper?.find('[data-testid="alert-button"]').trigger('click');
     await nextTick();
     expect(push).toHaveBeenCalledTimes(1);
-    // reset errorCode after test
-    rolleStore.errorCode = '';
   });
 
   test('it closes the view and navigates back to rolle table', async () => {
@@ -106,43 +205,14 @@ describe('RolleCreationView', () => {
   });
 
   test('it fills form and triggers dirty warning', async () => {
-    const orgSelect: VueWrapper | undefined = wrapper
-      ?.findComponent({ ref: 'rolle-creation-form' })
-      .findComponent({ ref: 'administrationsebene-select' });
-    await orgSelect?.setValue('1');
-    await nextTick();
-
-    const rollenartSelect: VueWrapper | undefined = wrapper
-      ?.findComponent({ ref: 'rolle-creation-form' })
-      .findComponent({ ref: 'rollenart-select' });
-    rollenartSelect?.setValue('LERN');
-    await nextTick();
-
-    const rollennameInput: VueWrapper | undefined = wrapper
-      ?.findComponent({ ref: 'rolle-creation-form' })
-      .findComponent({ ref: 'rollenname-input' });
-
-    expect(rollennameInput?.exists()).toBe(true);
-    await rollennameInput?.find('input').setValue('NewRolle');
-    await nextTick();
-
-    const merkmaleSelect: VueWrapper | undefined = wrapper
-      ?.findComponent({ ref: 'rolle-creation-form' })
-      .findComponent({ ref: 'merkmale-select' });
-    merkmaleSelect?.setValue(['1']);
-    await nextTick();
-
-    const providerSelect: VueWrapper | undefined = wrapper
-      ?.findComponent({ ref: 'rolle-creation-form' })
-      .findComponent({ ref: 'service-provider-select' });
-    providerSelect?.setValue(['1']);
-    await nextTick();
-
-    const systemrechteSelect: VueWrapper | undefined = wrapper
-      ?.findComponent({ ref: 'rolle-creation-form' })
-      .findComponent({ ref: 'systemrechte-select' });
-    systemrechteSelect?.setValue(['1']);
-    await nextTick();
+    await fillForm({
+      organisation: '1',
+      rollenart: 'LERN',
+      rollenname: 'NewRolle',
+      merkmale: ['1'],
+      provider: ['1'],
+      systemrechte: ['1'],
+    });
 
     wrapper?.find('[data-testid="close-layout-card-button"]').trigger('click');
     await nextTick();
@@ -151,31 +221,12 @@ describe('RolleCreationView', () => {
   });
 
   test('it fills form and triggers submit', async () => {
-    const orgSelect: VueWrapper | undefined = wrapper
-      ?.findComponent({ ref: 'rolle-creation-form' })
-      .findComponent({ ref: 'administrationsebene-select' });
-    await orgSelect?.setValue('1');
-    await nextTick();
-
-    const rollenartSelect: VueWrapper | undefined = wrapper
-      ?.findComponent({ ref: 'rolle-creation-form' })
-      .findComponent({ ref: 'rollenart-select' });
-    rollenartSelect?.setValue('LERN');
-    await nextTick();
-
-    const rollennameInput: VueWrapper | undefined = wrapper
-      ?.findComponent({ ref: 'rolle-creation-form' })
-      .findComponent({ ref: 'rollenname-input' });
-
-    expect(rollennameInput?.exists()).toBe(true);
-    await rollennameInput?.find('input').setValue('NewRolle');
-    await nextTick();
-
-    const providerSelect: VueWrapper | undefined = wrapper
-      ?.findComponent({ ref: 'rolle-creation-form' })
-      .findComponent({ ref: 'service-provider-select' });
-    providerSelect?.setValue(['1']);
-    await nextTick();
+    const { orgSelect, rollenartSelect }: Partial<FormSelectors> = await fillForm({
+      organisation: '1',
+      rollenart: 'LERN',
+      rollenname: 'NewRolle',
+      provider: ['1'],
+    });
 
     expect(orgSelect?.text()).toEqual('9356494 (Albert-Emil-Hansebrot-Gymnasium)');
     expect(rollenartSelect?.text()).toEqual('Lern');
@@ -223,31 +274,12 @@ describe('RolleCreationView', () => {
   });
 
   test('it fills form and triggers submit and uses correct Rolle to add serviceproviders', async () => {
-    const orgSelect: VueWrapper | undefined = wrapper
-      ?.findComponent({ ref: 'rolle-creation-form' })
-      .findComponent({ ref: 'administrationsebene-select' });
-    await orgSelect?.setValue('1');
-    await nextTick();
-
-    const rollenartSelect: VueWrapper | undefined = wrapper
-      ?.findComponent({ ref: 'rolle-creation-form' })
-      .findComponent({ ref: 'rollenart-select' });
-    rollenartSelect?.setValue('LERN');
-    await nextTick();
-
-    const rollennameInput: VueWrapper | undefined = wrapper
-      ?.findComponent({ ref: 'rolle-creation-form' })
-      .findComponent({ ref: 'rollenname-input' });
-
-    expect(rollennameInput?.exists()).toBe(true);
-    await rollennameInput?.find('input').setValue('NewRolle');
-    await nextTick();
-
-    const providerSelect: VueWrapper | undefined = wrapper
-      ?.findComponent({ ref: 'rolle-creation-form' })
-      .findComponent({ ref: 'service-provider-select' });
-    providerSelect?.setValue(['1']);
-    await nextTick();
+    const { orgSelect, rollenartSelect }: Partial<FormSelectors> = await fillForm({
+      organisation: '1',
+      rollenart: 'LERN',
+      rollenname: 'NewRolle',
+      provider: ['1'],
+    });
 
     expect(orgSelect?.text()).toEqual('9356494 (Albert-Emil-Hansebrot-Gymnasium)');
     expect(rollenartSelect?.text()).toEqual('Lern');
@@ -403,5 +435,51 @@ describe('RolleCreationView', () => {
     expect(wrapper?.find('[data-testid="alert-title"]').isVisible()).toBe(true);
     wrapper?.find('[data-testid="alert-button"]').trigger('click');
     await nextTick();
+  });
+
+  describe('navigation interception', () => {
+    afterEach(() => {
+      vi.unmock('vue-router');
+    });
+    test('triggers, if form is dirty', async () => {
+      const expectedCallsToNext: number = 0;
+      vi.mock('vue-router', async (importOriginal: () => Promise<Module>) => {
+        const mod: Module = await importOriginal();
+        return {
+          ...mod,
+          onBeforeRouteLeave: vi.fn((cbfn: OnBeforeRouteLeaveCallback) => {
+            cb = cbfn;
+          }),
+        };
+      });
+      wrapper = mountComponent();
+      await fillForm({
+        organisation: '1',
+        rollenart: 'LERN',
+        rollenname: 'NewRolle',
+        provider: ['1'],
+      });
+
+      const spy: Mock = vi.fn();
+      cb({} as RouteLocationNormalized, {} as RouteLocationNormalized, spy);
+      expect(spy).toHaveBeenCalledTimes(expectedCallsToNext);
+    });
+
+    test('does not trigger, if form is not dirty', async () => {
+      const expectedCallsToNext: number = 1;
+      vi.mock('vue-router', async (importOriginal: () => Promise<Module>) => {
+        const mod: Module = await importOriginal();
+        return {
+          ...mod,
+          onBeforeRouteLeave: vi.fn((cbfn: OnBeforeRouteLeaveCallback) => {
+            cb = cbfn;
+          }),
+        };
+      });
+      wrapper = mountComponent();
+      const spy: Mock = vi.fn();
+      cb({} as RouteLocationNormalized, {} as RouteLocationNormalized, spy);
+      expect(spy).toHaveBeenCalledTimes(expectedCallsToNext);
+    });
   });
 });
