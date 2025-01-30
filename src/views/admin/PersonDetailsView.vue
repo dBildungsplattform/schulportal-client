@@ -2439,7 +2439,7 @@
                 ref="befristung"
                 :befristungProps="selectedChangeBefristungProps"
                 :befristungOptionProps="selectedChangeBefristungOptionProps"
-                :isUnbefristetDisabled="isUnbefristetButtonDisabled"
+                :isUnbefristetDisabled="isBefristungspflichtRolle(changeBefristungRolle)"
                 :isBefristungRequired="isBefristungspflichtRolle(changeBefristungRolle)"
                 :nextSchuljahresende="getNextSchuljahresende()"
                 :befristung="selectedChangeBefristung"
