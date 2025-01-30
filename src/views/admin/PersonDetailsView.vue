@@ -47,12 +47,7 @@
     type TwoFactorAuthentificationStore,
   } from '@/stores/TwoFactorAuthentificationStore';
   import PersonenMetadataChange from '@/components/admin/personen/PersonenMetadataChange.vue';
-  import {
-    BefristungOption,
-    isBefristungspflichtRolle,
-    useBefristungUtils,
-    type BefristungUtilsType,
-  } from '@/utils/befristung';
+  import { isBefristungspflichtRolle, useBefristungUtils, type BefristungUtilsType } from '@/utils/befristung';
   import { adjustDateForTimezoneAndFormat, formatDate, formatDateToISO, getNextSchuljahresende } from '@/utils/date';
   import {
     getBefristungSchema,
@@ -519,6 +514,7 @@
   type ChangeBefristungForm = {
     selectedBefristung: Date;
     selectedBefristungOption: string;
+    selectedRolle: string;
   };
 
   // Define a method to check if the selected Rolle is of type "Lern"
@@ -671,9 +667,10 @@
     validationSchema: changePersonMetadataValidationSchema,
   });
 
-  const changeBefristungFormContext: FormContext<ChangeBefristungForm, ChangeBefristungForm> = useForm({
-    validationSchema: getBefristungSchema(t),
-  });
+  const changeBefristungFormContext: FormContext<ChangeBefristungForm, ChangeBefristungForm> =
+    useForm<ChangeBefristungForm>({
+      validationSchema: getBefristungSchema(t),
+    });
 
   // Change Klasse Form
   const [selectedSchule, selectedSchuleProps]: [
@@ -708,6 +705,10 @@
     Ref<string | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = changeBefristungFormContext.defineField('selectedBefristungOption', vuetifyConfig);
+  const [changeBefristungRolle]: [
+    Ref<string | undefined>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = changeBefristungFormContext.defineField('selectedRolle', vuetifyConfig);
 
   // Methods from utils that handle the Befristung events and sets up watchers
   const {
@@ -732,7 +733,7 @@
     selectedBefristung: selectedChangeBefristung,
     selectedBefristungOption: selectedChangeBefristungOption,
     calculatedBefristung,
-    selectedRolle,
+    selectedRolle: changeBefristungRolle,
   });
 
   async function navigateBackToKopersForm(): Promise<void> {
@@ -800,16 +801,16 @@
   };
 
   const triggerChangeBefristung = (): void => {
-    selectedRolle.value = selectedZuordnungen.value[0]?.rolleId;
+    changeBefristungRolle.value = selectedZuordnungen.value[0]?.rolleId;
     isChangeBefristungActive.value = true;
     if (!selectedZuordnungen.value[0]?.befristung) {
-      selectedChangeBefristungOption.value = BefristungOption.UNBEFRISTET;
+      handleChangeBefristungOptionUpdate(undefined);
       return;
     }
     const germanDate: string = adjustDateForTimezoneAndFormat(selectedZuordnungen.value[0]?.befristung);
     const nextSchuljahresende: string = getNextSchuljahresende();
     if (germanDate == nextSchuljahresende) {
-      selectedChangeBefristungOption.value = BefristungOption.SCHULJAHRESENDE;
+      handleChangeBefristungOptionUpdate(nextSchuljahresende);
       return;
     }
     selectedChangeBefristung.value = germanDate;
@@ -2435,10 +2436,11 @@
               @submit="onSubmitChangeBefristung"
             >
               <BefristungInput
+                ref="befristung"
                 :befristungProps="selectedChangeBefristungProps"
                 :befristungOptionProps="selectedChangeBefristungOptionProps"
                 :isUnbefristetDisabled="isUnbefristetButtonDisabled"
-                :isBefristungRequired="isBefristungspflichtRolle(selectedRolle)"
+                :isBefristungRequired="isBefristungspflichtRolle(changeBefristungRolle)"
                 :nextSchuljahresende="getNextSchuljahresende()"
                 :befristung="selectedChangeBefristung"
                 :befristungOption="selectedChangeBefristungOption"

@@ -56,6 +56,7 @@ export function useBefristungUtils(props: {
     calculatedBefristung.value = value;
     if (!value) {
       selectedBefristungOption.value = BefristungOption.UNBEFRISTET;
+      return;
     }
     selectedBefristungOption.value = BefristungOption.SCHULJAHRESENDE;
   };
