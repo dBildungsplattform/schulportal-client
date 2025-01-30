@@ -15,17 +15,13 @@
   import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
 
   const { t }: Composer = useI18n({ useScope: 'global' });
-
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
-  const canCommit: Ref<boolean> = ref(false);
-
   const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
-
   const personStore: PersonStore = usePersonStore();
 
   const progress: Ref<number> = ref<number>(0);
-
+  const canCommit: Ref<boolean> = ref(false);
   const successMessage: Ref<string> = ref<string>('');
 
   type Props = {
@@ -39,7 +35,7 @@
 
   type Emits = {
     (event: 'update:isDialogVisible', isDialogVisible: boolean): void;
-    (event: 'update:getUebersichte'): void;
+    (event: 'update:reloadData'): void;
   };
 
   const props: Props = defineProps<Props>();
@@ -140,10 +136,10 @@
         await personStore.getPersonenuebersichtById(personId);
 
         // Extract the current Zuordnungen for this person
-        const finalZuordnungen: Zuordnung[] = personStore.personenuebersicht?.zuordnungen || [];
+        const currentZuordnungen: Zuordnung[] = personStore.personenuebersicht?.zuordnungen || [];
 
         // Combine the new Zuordnung with the existing ones
-        const combinedZuordnungen: Zuordnung[] = [...finalZuordnungen, newZuordnung];
+        const combinedZuordnungen: Zuordnung[] = [...currentZuordnungen, newZuordnung];
 
         // Await the processing of each ID
         await personenkontextStore.updatePersonenkontexte(combinedZuordnungen, personId);
@@ -159,7 +155,7 @@
     }
 
     // Send an event to PersonManagement to fetch the updated Uebersichte (otherwise we will receive a version error from the backend when trying to access the GÜ)
-    emit('update:getUebersichte');
+    emit('update:reloadData');
 
     // If the Admin assigns a person a false Rolle like to Schuladmin a Lehrkraft Rolle we want to ignore the error because it's a bulk operation
     if (personenkontextStore.errorCode === 'INVALID_PERSONENKONTEXT_FOR_PERSON_WITH_ROLLENART_LERN') {
@@ -230,7 +226,7 @@
                 size="small"
               ></v-icon>
               <span class="subtitle-2">
-                {{ $t('admin.doNotCloseNoticeOperation') }}
+                {{ $t('admin.doNotCloseBrowserNotice') }}
               </span>
             </v-col>
           </v-row>

@@ -120,13 +120,13 @@
       .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
   });
 
-  const organisationenForOption: ComputedRef<TranslatedObject[] | undefined> = useOrganisationen();
+  const organisationenForForm: ComputedRef<TranslatedObject[] | undefined> = useOrganisationen();
 
-  const rollenForOption: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = useRollen();
+  const rollenForForm: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = useRollen();
 
   // Only Rollen from type LEHR and without any Befristungspflicht wil be offered for now
   const lehrRollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = computed(() => {
-    return rollenForOption.value?.filter(
+    return rollenForForm.value?.filter(
       (rolle: TranslatedRolleWithAttrs) =>
         rolle.rollenart === RollenArt.Lehr && !rolle.merkmale?.has(RollenMerkmal.BefristungPflicht),
     );
@@ -711,7 +711,7 @@
           <SpshTooltip
             :enabledCondition="selectedPersonIds.length > 0"
             :disabledText="$t('admin.person.choosePersonFirt')"
-            position="bottom"
+            position="top"
           >
             <v-select
               v-if="authStore.hasPersonenBulkPermission"
@@ -735,14 +735,14 @@
           <RolleModify
             ref="rolle-modify"
             v-if="rolleModifiyDialogVisible"
-            :organisationen="organisationenForOption"
+            :organisationen="organisationenForForm"
             :rollen="lehrRollen"
             :isLoading="personenkontextStore.loading"
             :isDialogVisible="rolleModifiyDialogVisible"
             :errorCode="personenkontextStore.errorCode"
             :personIDs="selectedPersonIds"
             @update:isDialogVisible="handleDialog($event)"
-            @update:getUebersichte="getPaginatedPersonen(searchFilterStore.personenPage)"
+            @update:reloadData="getPaginatedPersonen(searchFilterStore.personenPage)"
           >
           </RolleModify>
         </v-col>

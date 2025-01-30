@@ -25,7 +25,7 @@
       "limitedUntil": "befristet bis",
       "untilEndOfSchoolYear": "Bis Schuljahresende"
     },
-    "doNotCloseNoticeOperation": "Bitte den Browser während der Bearbeitung nicht schließen!",
+    "doNotCloseBrowserNotice": "Bitte den Browser während der Bearbeitung nicht schließen!",
     "followingDataCreated": "Folgende Daten wurden gespeichert:",
     "headline": "Administrationsbereich",
     "import": {
@@ -161,7 +161,7 @@
       "changePassword": "Passwort ändern",
       "copyPasswordError": "Passwort konnte nicht in die Zwischenablage kopiert werden",
       "copyPasswordSuccess": "Passwort in Zwischenablage kopiert",
-      "choosePersonFirt": "Wählen Sie bitte zuerst einen Benutzer aus.",
+      "choosePersonFirt": "Bitte erst einen Benutzer auswählen.",
       "create": "Benutzer anlegen",
       "createAnother": "Weiteren Benutzer anlegen",
       "createNew": "Neue Benutzer anlegen",
