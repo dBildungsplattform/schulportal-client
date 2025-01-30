@@ -35,11 +35,17 @@ type OnBeforeRouteLeaveCallback = (
   _from: RouteLocationNormalized,
   _next: NavigationGuardNext,
 ) => void;
-let { cb }: { cb: OnBeforeRouteLeaveCallback } = vi.hoisted(() => {
-  return {
-    cb: (_to: RouteLocationNormalized, _from: RouteLocationNormalized, _next: NavigationGuardNext): void => {},
-  };
-});
+let { storedBeforeRouteLeaveCallback }: { storedBeforeRouteLeaveCallback: OnBeforeRouteLeaveCallback } = vi.hoisted(
+  () => {
+    return {
+      storedBeforeRouteLeaveCallback: (
+        _to: RouteLocationNormalized,
+        _from: RouteLocationNormalized,
+        _next: NavigationGuardNext,
+      ): void => {},
+    };
+  },
+);
 
 organisationStore.allOrganisationen = [
   {
@@ -447,8 +453,8 @@ describe('RolleCreationView', () => {
         const mod: Module = await importOriginal();
         return {
           ...mod,
-          onBeforeRouteLeave: vi.fn((cbfn: OnBeforeRouteLeaveCallback) => {
-            cb = cbfn;
+          onBeforeRouteLeave: vi.fn((actualCallback: OnBeforeRouteLeaveCallback) => {
+            storedBeforeRouteLeaveCallback = actualCallback;
           }),
         };
       });
@@ -461,8 +467,14 @@ describe('RolleCreationView', () => {
       });
 
       const spy: Mock = vi.fn();
-      cb({} as RouteLocationNormalized, {} as RouteLocationNormalized, spy);
+      storedBeforeRouteLeaveCallback({} as RouteLocationNormalized, {} as RouteLocationNormalized, spy);
       expect(spy).toHaveBeenCalledTimes(expectedCallsToNext);
+      await nextTick();
+
+      const confirmButton: Element | null = document.querySelector('[data-testid="confirm-unsaved-changes-button"]');
+      expect(confirmButton).not.toBeNull();
+      confirmButton!.dispatchEvent(new Event('click'));
+      expect(spy).toHaveBeenCalledOnce();
     });
 
     test('does not trigger, if form is not dirty', async () => {
@@ -471,15 +483,34 @@ describe('RolleCreationView', () => {
         const mod: Module = await importOriginal();
         return {
           ...mod,
-          onBeforeRouteLeave: vi.fn((cbfn: OnBeforeRouteLeaveCallback) => {
-            cb = cbfn;
+          onBeforeRouteLeave: vi.fn((actualCallback: OnBeforeRouteLeaveCallback) => {
+            storedBeforeRouteLeaveCallback = actualCallback;
           }),
         };
       });
       wrapper = mountComponent();
       const spy: Mock = vi.fn();
-      cb({} as RouteLocationNormalized, {} as RouteLocationNormalized, spy);
+      storedBeforeRouteLeaveCallback({} as RouteLocationNormalized, {} as RouteLocationNormalized, spy);
       expect(spy).toHaveBeenCalledTimes(expectedCallsToNext);
+    });
+  });
+
+  describe.each([[true], [false]])('when form is dirty:%s', async (isFormDirty: boolean) => {
+    beforeEach(async () => {
+      if (isFormDirty)
+        await fillForm({
+          organisation: '1',
+          rollenart: 'LERN',
+          rollenname: 'NewRolle',
+          provider: ['1'],
+        });
+    });
+    test('it handles unloading', async () => {
+      const event: Event = new Event('beforeunload');
+      const spy: MockInstance = vi.spyOn(event, 'preventDefault');
+      window.dispatchEvent(event);
+      if (isFormDirty) expect(spy).toHaveBeenCalledOnce();
+      else expect(spy).not.toHaveBeenCalledOnce();
     });
   });
 });
