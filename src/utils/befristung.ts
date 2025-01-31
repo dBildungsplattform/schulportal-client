@@ -21,6 +21,7 @@ export type BefristungUtilsType = {
   handleBefristungUpdate: (value: string | undefined) => void;
   handleBefristungOptionUpdate: (value: string | undefined) => void;
   setupWatchers: () => void;
+  setupRolleWatcher: () => void;
 };
 
 const rollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = useRollen();
@@ -55,8 +56,26 @@ export function useBefristungUtils(props: {
     calculatedBefristung.value = value;
     if (!value) {
       selectedBefristungOption.value = BefristungOption.UNBEFRISTET;
+      return;
     }
     selectedBefristungOption.value = BefristungOption.SCHULJAHRESENDE;
+  };
+
+  // Function to set an initial value for the radio buttons depending on the selected Rolle
+  const setupRolleWatcher = (): void => {
+    watch(
+      selectedRolle,
+      (newValue: string | undefined) => {
+        if (isBefristungspflichtRolle(newValue)) {
+          selectedBefristungOption.value = BefristungOption.SCHULJAHRESENDE;
+          calculatedBefristung.value = getNextSchuljahresende();
+        } else {
+          selectedBefristungOption.value = BefristungOption.UNBEFRISTET;
+          calculatedBefristung.value = undefined;
+        }
+      },
+      { immediate: true },
+    );
   };
 
   // Setup the watchers
@@ -81,22 +100,12 @@ export function useBefristungUtils(props: {
         formContext.resetField('selectedBefristung');
       }
     });
-
-    // Watcher to set an initial value for the radio buttons depending on the selected Rolle
-    createWatcher(selectedRolle, (newValue: string | undefined) => {
-      if (isBefristungspflichtRolle(newValue)) {
-        selectedBefristungOption.value = BefristungOption.SCHULJAHRESENDE;
-        calculatedBefristung.value = getNextSchuljahresende();
-      } else {
-        selectedBefristungOption.value = BefristungOption.UNBEFRISTET;
-        calculatedBefristung.value = undefined;
-      }
-    });
   };
 
   return {
     handleBefristungUpdate,
     handleBefristungOptionUpdate,
     setupWatchers,
+    setupRolleWatcher,
   };
 }

@@ -167,16 +167,21 @@
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = formContext.defineField('selectedBefristungOption', vuetifyConfig);
 
-  const { handleBefristungUpdate, handleBefristungOptionUpdate, setupWatchers }: BefristungUtilsType =
-    useBefristungUtils({
-      formContext,
-      selectedBefristung,
-      selectedBefristungOption,
-      calculatedBefristung,
-      selectedRolle,
-    });
+  const {
+    handleBefristungUpdate,
+    handleBefristungOptionUpdate,
+    setupWatchers,
+    setupRolleWatcher,
+  }: BefristungUtilsType = useBefristungUtils({
+    formContext,
+    selectedBefristung,
+    selectedBefristungOption,
+    calculatedBefristung,
+    selectedRolle,
+  });
 
   setupWatchers();
+  setupRolleWatcher();
 
   const organisationen: ComputedRef<TranslatedObject[] | undefined> = useOrganisationen();
 
@@ -228,7 +233,7 @@
     const ISOFormattedDate: string | undefined = schuleZuordnungFromCreatedKontext.value?.befristung;
 
     if (!ISOFormattedDate) {
-      return t('admin.befristung.unlimitedSuccessTemplate');
+      return t('admin.befristung.unlimitedLower');
     }
 
     // Parse the UTC date

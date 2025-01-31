@@ -48,8 +48,9 @@
   } from '@/stores/TwoFactorAuthentificationStore';
   import PersonenMetadataChange from '@/components/admin/personen/PersonenMetadataChange.vue';
   import { isBefristungspflichtRolle, useBefristungUtils, type BefristungUtilsType } from '@/utils/befristung';
-  import { formatDate, formatDateToISO, getNextSchuljahresende } from '@/utils/date';
+  import { adjustDateForTimezoneAndFormat, formatDate, formatDateToISO, getNextSchuljahresende } from '@/utils/date';
   import {
+    getBefristungSchema,
     getDirtyState,
     getPersonenkontextFieldDefinitions,
     getValidationSchema,
@@ -74,6 +75,7 @@
   import type { TranslatedObject } from '@/types';
   import { DIN_91379A, NO_LEADING_TRAILING_SPACES } from '@/utils/validation';
   import { useConfigStore, type ConfigStore } from '@/stores/ConfigStore';
+  import BefristungInput from '@/components/admin/personen/BefristungInput.vue';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
@@ -103,21 +105,26 @@
   const isEditActive: Ref<boolean> = ref(false);
   const isZuordnungFormActive: Ref<boolean> = ref(false);
   const isChangeKlasseFormActive: Ref<boolean> = ref(false);
+  const isChangeBefristungActive: Ref<boolean> = ref(false);
 
   const isEditPersonMetadataActive: Ref<boolean> = ref(false);
 
   const pendingDeletion: Ref<boolean> = ref(false);
   const pendingCreation: Ref<boolean> = ref(false);
   const pendingChangeKlasse: Ref<boolean> = ref(false);
+  const pendingChangeBefristung: Ref<boolean> = ref(false);
 
   const deleteSuccessDialogVisible: Ref<boolean> = ref(false);
   const createSuccessDialogVisible: Ref<boolean> = ref(false);
   const changeKlasseSuccessDialogVisible: Ref<boolean> = ref(false);
+  const changeBefristungSuccessDialogVisible: Ref<boolean> = ref(false);
   const cannotDeleteDialogVisible: Ref<boolean> = ref(false);
   const createZuordnungConfirmationDialogVisible: Ref<boolean> = ref(false);
   const changeKlasseConfirmationDialogVisible: Ref<boolean> = ref(false);
+  const changeBefristungConfirmationDialogVisible: Ref<boolean> = ref(false);
   const createZuordnungConfirmationDialogMessage: Ref<string> = ref('');
   const changeKlasseConfirmationDialogMessage: Ref<string> = ref('');
+  const changeBefristungConfirmationDialogMessage: Ref<string> = ref('');
   const canCommit: Ref<boolean> = ref(false);
   const hasNoKopersNr: Ref<boolean | undefined> = ref(false);
   const changePersonMetadataSuccessVisible: Ref<boolean> = ref(false);
@@ -192,6 +199,11 @@
   const prepareChangeKlasse = (): void => {
     pendingChangeKlasse.value = true;
     isChangeKlasseFormActive.value = false;
+  };
+
+  const prepareChangeBerfristung = (): void => {
+    pendingChangeBefristung.value = true;
+    isChangeBefristungActive.value = false;
   };
 
   // Deletes the person and all kontexte
@@ -312,6 +324,14 @@
     changePersonMetadataSuccessVisible.value = false;
     isEditPersonMetadataActive.value = false;
     personStore.getPersonById(currentPersonId);
+  };
+
+  let closeChangeBefristungSuccessDialog = (): void => {
+    personStore.getPersonenuebersichtById(currentPersonId);
+    changeBefristungSuccessDialogVisible.value = false;
+    isChangeBefristungActive.value = false;
+    pendingChangeBefristung.value = false;
+    isEditActive.value = false;
   };
 
   // Triggers the template to add a new Zuordnung
@@ -491,6 +511,12 @@
     selectedKopersNrMetadata: string;
   };
 
+  type ChangeBefristungForm = {
+    selectedBefristung: Date;
+    selectedBefristungOption: string;
+    selectedRolle: string;
+  };
+
   // Define a method to check if the selected Rolle is of type "Lern"
   function isLernRolle(selectedRolleId: string): boolean {
     const rolle: TranslatedRolleWithAttrs | undefined = rollen.value?.find(
@@ -641,6 +667,11 @@
     validationSchema: changePersonMetadataValidationSchema,
   });
 
+  const changeBefristungFormContext: FormContext<ChangeBefristungForm, ChangeBefristungForm> =
+    useForm<ChangeBefristungForm>({
+      validationSchema: getBefristungSchema(t),
+    });
+
   // Change Klasse Form
   const [selectedSchule, selectedSchuleProps]: [
     Ref<string | undefined>,
@@ -665,15 +696,45 @@
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineFieldChangePersonMetadata('selectedKopersNrMetadata', vuetifyConfig);
 
+  // Change Befristung Form
+  const [selectedChangeBefristung, selectedChangeBefristungProps]: [
+    Ref<string | undefined>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = changeBefristungFormContext.defineField('selectedBefristung', vuetifyConfig);
+  const [selectedChangeBefristungOption, selectedChangeBefristungOptionProps]: [
+    Ref<string | undefined>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = changeBefristungFormContext.defineField('selectedBefristungOption', vuetifyConfig);
+  const [changeBefristungRolle]: [
+    Ref<string | undefined>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = changeBefristungFormContext.defineField('selectedRolle', vuetifyConfig);
+
   // Methods from utils that handle the Befristung events and sets up watchers
-  const { handleBefristungUpdate, handleBefristungOptionUpdate, setupWatchers }: BefristungUtilsType =
-    useBefristungUtils({
-      formContext,
-      selectedBefristung,
-      selectedBefristungOption,
-      calculatedBefristung,
-      selectedRolle,
-    });
+  const {
+    handleBefristungUpdate,
+    handleBefristungOptionUpdate,
+    setupWatchers,
+    setupRolleWatcher,
+  }: BefristungUtilsType = useBefristungUtils({
+    formContext,
+    selectedBefristung,
+    selectedBefristungOption,
+    calculatedBefristung,
+    selectedRolle,
+  });
+
+  const {
+    handleBefristungUpdate: handleChangeBefristungUpdate,
+    handleBefristungOptionUpdate: handleChangeBefristungOptionUpdate,
+    setupWatchers: setupChangeBefristungWatchers,
+  }: BefristungUtilsType = useBefristungUtils({
+    formContext: changeBefristungFormContext,
+    selectedBefristung: selectedChangeBefristung,
+    selectedBefristungOption: selectedChangeBefristungOption,
+    calculatedBefristung,
+    selectedRolle: changeBefristungRolle,
+  });
 
   async function navigateBackToKopersForm(): Promise<void> {
     const personalnummer: string | null | undefined = personStore.currentPerson?.person.personalnummer;
@@ -739,6 +800,22 @@
     isChangeKlasseFormActive.value = true;
   };
 
+  const triggerChangeBefristung = (): void => {
+    changeBefristungRolle.value = selectedZuordnungen.value[0]?.rolleId;
+    isChangeBefristungActive.value = true;
+    if (!selectedZuordnungen.value[0]?.befristung) {
+      handleChangeBefristungOptionUpdate(undefined);
+      return;
+    }
+    const germanDate: string = adjustDateForTimezoneAndFormat(selectedZuordnungen.value[0]?.befristung);
+    const nextSchuljahresende: string = getNextSchuljahresende();
+    if (germanDate == nextSchuljahresende) {
+      handleChangeBefristungOptionUpdate(nextSchuljahresende);
+      return;
+    }
+    selectedChangeBefristung.value = germanDate;
+  };
+
   // Cancels editing
   const cancelEdit = (): void => {
     isEditActive.value = false;
@@ -748,8 +825,11 @@
     selectedZuordnungen.value = [];
     isZuordnungFormActive.value = false;
     isChangeKlasseFormActive.value = false;
+    isChangeBefristungActive.value = false;
+    pendingChangeBefristung.value = false;
     formContext.resetForm();
     resetChangeKlasseForm();
+    changeBefristungFormContext.resetForm();
     zuordnungenResult.value = originalZuordnungenResult.value
       ? JSON.parse(JSON.stringify(originalZuordnungenResult.value))
       : undefined;
@@ -787,6 +867,14 @@
     resetChangeKlasseForm();
   }
 
+  async function confirmChangeBefristung(): Promise<void> {
+    await personenkontextStore.updatePersonenkontexte(finalZuordnungen.value, currentPersonId);
+    changeBefristungSuccessDialogVisible.value = !personenkontextStore.errorCode;
+    selectedZuordnungen.value = [];
+    changeBefristungFormContext.resetForm();
+    formContext.resetForm();
+  }
+
   // The save button will act according to what kind of pending action we have.
   const handleSaveClick = (): void => {
     if (pendingCreation.value) {
@@ -795,12 +883,15 @@
       confirmDeletion();
     } else if (pendingChangeKlasse.value) {
       confirmChangeKlasse();
+    } else if (pendingChangeBefristung.value) {
+      confirmChangeBefristung();
     }
   };
 
   // The save button is always disabled if there is no pending creation, deletion nor changeKlasse.
   const isSaveButtonDisabled: ComputedRef<boolean> = computed(
-    () => !pendingCreation.value && !pendingDeletion.value && !pendingChangeKlasse.value,
+    () =>
+      !pendingCreation.value && !pendingDeletion.value && !pendingChangeKlasse.value && !pendingChangeBefristung.value,
   );
 
   // Helper function to determine the existing RollenArt
@@ -914,6 +1005,21 @@
       createZuordnungConfirmationDialogVisible.value = true;
     }
   });
+
+  const onSubmitChangeBefristung: (e?: Event | undefined) => Promise<void | undefined> =
+    changeBefristungFormContext.handleSubmit(() => {
+      const befristungDate: string | undefined = selectedChangeBefristung.value ?? calculatedBefristung.value;
+      const oldBefristung: string | undefined = selectedZuordnungen.value[0]?.befristung;
+      let oldBefristungdFormatted: string;
+      if (oldBefristung) {
+        oldBefristungdFormatted = adjustDateForTimezoneAndFormat(oldBefristung);
+      }
+      changeBefristungConfirmationDialogMessage.value = t('person.changeBefristungConfirmation', {
+        oldBefristung: oldBefristung ? oldBefristungdFormatted! : t('admin.befristung.unlimitedLower'),
+        newBefristung: befristungDate || t('admin.befristung.unlimitedLower'),
+      });
+      changeBefristungConfirmationDialogVisible.value = true;
+    });
 
   const confirmDialogAddition = async (): Promise<void> => {
     createZuordnungConfirmationDialogVisible.value = false;
@@ -1109,12 +1215,36 @@
     prepareChangeKlasse();
   };
 
+  const confirmDialogChangeBefristung = async (): Promise<void> => {
+    changeBefristungConfirmationDialogVisible.value = false;
+
+    const befristungDate: string | undefined = selectedChangeBefristung.value ?? calculatedBefristung.value;
+
+    // copy zuordnung from old one and update befristung
+    const currentZuordnung: Zuordnung = selectedZuordnungen.value[0]!;
+    newZuordnung.value = {
+      ...currentZuordnung,
+      befristung: befristungDate ? formatDateToISO(befristungDate) : undefined,
+      editable: true,
+    };
+
+    finalZuordnungen.value = (zuordnungenResult.value ?? [])
+      .map((zuordnung: Zuordnung | undefined) => (zuordnung === currentZuordnung ? newZuordnung.value : zuordnung))
+      .filter((zuordnung: Zuordnung | undefined): zuordnung is Zuordnung => zuordnung !== undefined);
+
+    prepareChangeBerfristung();
+  };
+
   const cancelAddition = (): void => {
     createZuordnungConfirmationDialogVisible.value = false;
   };
 
   const cancelChangeKlasse = (): void => {
     changeKlasseConfirmationDialogVisible.value = false;
+  };
+
+  const cancelChangeBefristung = (): void => {
+    changeBefristungConfirmationDialogVisible.value = false;
   };
 
   watch(
@@ -1232,6 +1362,8 @@
   });
 
   setupWatchers();
+  setupRolleWatcher();
+  setupChangeBefristungWatchers();
 
   watch(hasNoKopersNr, async (newValue: boolean | undefined) => {
     if (newValue) {
@@ -1330,6 +1462,21 @@
           tooltip: t('person.emailStatusUnknownHover'),
         };
     }
+  });
+
+  const isActionNotPending: ComputedRef<boolean> = computed(() => {
+    return (
+      !pendingCreation.value && !pendingDeletion.value && !pendingChangeKlasse.value && !pendingChangeBefristung.value
+    );
+  });
+
+  const differentDateSelected: ComputedRef<boolean> = computed(() => {
+    const newBefristungDate: string | undefined = selectedChangeBefristung.value ?? calculatedBefristung.value;
+    const currentBefristungDate: string | undefined = selectedZuordnungen.value[0]?.befristung
+      ? adjustDateForTimezoneAndFormat(selectedZuordnungen.value[0]?.befristung)
+      : undefined;
+
+    return currentBefristungDate !== newBefristungDate;
   });
 
   onBeforeMount(async () => {
@@ -1442,7 +1589,7 @@
                         :disabled="isEditActive"
                         class="primary ml-lg-8"
                         data-testid="metadata-edit-button"
-                        @Click="triggerPersonMetadataEdit"
+                        @click="triggerPersonMetadataEdit"
                         :block="mdAndDown"
                       >
                         {{ $t('edit') }}
@@ -1725,7 +1872,7 @@
                       class="primary ml-lg-8"
                       data-testid="zuordnung-edit-button"
                       :disabled="isEditPersonMetadataActive"
-                      @Click="triggerEdit"
+                      @click="triggerEdit"
                       :block="mdAndDown"
                     >
                       {{ $t('edit') }}
@@ -1772,10 +1919,10 @@
         </v-container>
         <!-- Show this template if the edit button is triggered-->
         <v-container v-if="isEditActive">
-          <template v-if="!isZuordnungFormActive && !isChangeKlasseFormActive">
+          <template v-if="!isZuordnungFormActive && !isChangeKlasseFormActive && !isChangeBefristungActive">
             <v-row class="ml-md-16">
               <v-col
-                v-if="!pendingDeletion && !pendingCreation && !pendingChangeKlasse"
+                v-if="isActionNotPending"
                 cols="12"
                 sm="auto"
               >
@@ -1784,7 +1931,7 @@
             </v-row>
             <v-row class="ml-md-16 mb-12">
               <v-col
-                v-if="pendingDeletion || pendingCreation || pendingChangeKlasse"
+                v-if="pendingDeletion || pendingCreation || pendingChangeKlasse || pendingChangeBefristung"
                 cols="12"
                 sm="auto"
               >
@@ -1798,7 +1945,7 @@
                 :title="zuordnung.sskName"
                 class="py-0 d-flex align-items-center"
               >
-                <template v-if="!pendingDeletion && !pendingCreation && !pendingChangeKlasse">
+                <template v-if="isActionNotPending">
                   <div class="checkbox-div">
                     <v-checkbox
                       :ref="`checkbox-zuordnung-${zuordnung.sskId}`"
@@ -1809,6 +1956,12 @@
                         <span class="text-body">
                           {{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
                           {{ zuordnung.klasse }}
+                          <span
+                            v-if="zuordnung.befristung"
+                            data-testid="zuordnung-befristung-text"
+                          >
+                            ({{ formatDate(zuordnung.befristung, t) }})</span
+                          >
                         </span>
                       </template>
                     </v-checkbox>
@@ -1916,10 +2069,66 @@
                     </span>
                   </div>
                 </template>
+                <!-- Template to show when the change Befristung is pending -->
+                <template v-else-if="pendingChangeBefristung">
+                  <div class="d-flex flex-column">
+                    <span
+                      class="text-body my-3 ml-5"
+                      :class="{
+                        'text-red': selectedZuordnungen.includes(zuordnung),
+                      }"
+                    >
+                      {{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
+                      {{ zuordnung.klasse }}
+                      <span
+                        v-if="selectedZuordnungen.includes(zuordnung)"
+                        class="text-body text-red"
+                      >
+                        ({{
+                          zuordnung?.befristung
+                            ? `${formatDate(zuordnung.befristung, t)}`
+                            : $t('admin.befristung.unlimited')
+                        }})
+                      </span>
+                    </span>
+
+                    <span
+                      v-if="
+                        newZuordnung &&
+                        zuordnung.sskId === newZuordnung.sskId &&
+                        zuordnung.rolleId === newZuordnung.rolleId
+                      "
+                      class="text-body my-3 ml-5"
+                      :class="{
+                        'text-green':
+                          newZuordnung &&
+                          zuordnung.sskId === newZuordnung.sskId &&
+                          zuordnung.rolleId === newZuordnung.rolleId,
+                      }"
+                    >
+                      {{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
+                      {{ newZuordnung?.klasse }}
+                      <span
+                        v-if="
+                          newZuordnung &&
+                          zuordnung.sskId === newZuordnung.sskId &&
+                          zuordnung.rolleId === newZuordnung.rolleId
+                        "
+                        class="text-body text-green"
+                      >
+                        ({{
+                          newZuordnung?.befristung
+                            ? `${formatDate(newZuordnung.befristung, t)}`
+                            : $t('admin.befristung.unlimited')
+                        }})
+                      </span>
+                    </span>
+                  </div>
+                </template>
               </v-col>
               <v-spacer></v-spacer>
               <v-col
-                v-if="!pendingDeletion && !pendingCreation && !pendingChangeKlasse"
+                v-if="isActionNotPending"
                 class="button-container"
                 cols="12"
                 md="auto"
@@ -1948,7 +2157,7 @@
                   >
                     <v-btn
                       class="primary mt-2"
-                      @Click="triggerAddZuordnung"
+                      @click="triggerAddZuordnung"
                       data-testid="zuordnung-create-button"
                       :disabled="selectedZuordnungen.length > 0"
                       :block="mdAndDown"
@@ -1983,8 +2192,9 @@
                     >
                       <v-btn
                         class="primary mt-2"
+                        @click="triggerChangeBefristung"
                         data-testid="befristung-change-button"
-                        :disabled="selectedZuordnungen.length === 0"
+                        :disabled="selectedZuordnungen.length !== 1"
                         :block="mdAndDown"
                       >
                         {{ $t('person.modifyBefristung') }}
@@ -2000,7 +2210,7 @@
                   >
                     <v-btn
                       class="primary mt-2"
-                      @Click="triggerChangeKlasse"
+                      @click="triggerChangeKlasse"
                       data-testid="klasse-change-button"
                       :disabled="!canChangeKlasse"
                       :block="mdAndDown"
@@ -2130,7 +2340,7 @@
                   <v-btn
                     :block="mdAndDown"
                     class="secondary"
-                    @Click="cancelEdit"
+                    @click="cancelEdit"
                     data-testid="zuordnung-creation-discard-button"
                     >{{ $t('cancel') }}</v-btn
                   >
@@ -2190,7 +2400,7 @@
                   <v-btn
                     :block="mdAndDown"
                     class="secondary"
-                    @Click="cancelEdit"
+                    @click="cancelEdit"
                     data-testid="klasse-change-discard-button"
                     >{{ $t('cancel') }}</v-btn
                   >
@@ -2213,6 +2423,63 @@
                       :disabled="isSubmitDisabled || organisationStore.loading"
                       type="submit"
                       >{{ $t('transfer') }}</v-btn
+                    >
+                  </SpshTooltip>
+                </v-col>
+              </v-row>
+            </v-form>
+          </template>
+          <!-- Form to change Befristung-->
+          <template v-if="isChangeBefristungActive && !pendingChangeBefristung">
+            <v-form
+              data-testid="change-befristung-form"
+              @submit="onSubmitChangeBefristung"
+            >
+              <BefristungInput
+                ref="befristung"
+                :befristungProps="selectedChangeBefristungProps"
+                :befristungOptionProps="selectedChangeBefristungOptionProps"
+                :isUnbefristetDisabled="isBefristungspflichtRolle(changeBefristungRolle)"
+                :isBefristungRequired="isBefristungspflichtRolle(changeBefristungRolle)"
+                :nextSchuljahresende="getNextSchuljahresende()"
+                :befristung="selectedChangeBefristung"
+                :befristungOption="selectedChangeBefristungOption"
+                @update:befristung="handleChangeBefristungUpdate"
+                @update:calculatedBefristungOption="handleChangeBefristungOptionUpdate"
+              />
+              <v-row class="py-3 px-2 justify-center">
+                <v-spacer class="hidden-sm-and-down"></v-spacer>
+                <v-col
+                  cols="12"
+                  sm="6"
+                  md="auto"
+                >
+                  <v-btn
+                    :block="mdAndDown"
+                    class="secondary"
+                    @click="cancelEdit"
+                    data-testid="change-befristung-discard-button"
+                    >{{ $t('cancel') }}</v-btn
+                  >
+                </v-col>
+                <v-col
+                  cols="12"
+                  sm="6"
+                  md="auto"
+                >
+                  <SpshTooltip
+                    :enabledCondition="differentDateSelected"
+                    :disabledText="$t('person.changeBefristungDisabledDescription')"
+                    :enabledText="$t('person.changeBefristung')"
+                    position="start"
+                  >
+                    <v-btn
+                      :block="mdAndDown"
+                      :disabled="!differentDateSelected"
+                      class="primary"
+                      data-testid="change-befristung-submit-button"
+                      type="submit"
+                      >{{ $t('person.changeBefristung') }}</v-btn
                     >
                   </SpshTooltip>
                 </v-col>
@@ -2771,6 +3038,49 @@
         </v-card-actions>
       </LayoutCard>
     </v-dialog>
+    <!-- Success Dialog after changing Befristung-->
+    <v-dialog
+      v-model="changeBefristungSuccessDialogVisible"
+      persistent
+      max-width="600px"
+    >
+      <LayoutCard
+        :closable="true"
+        :header="$t('person.changeBefristung')"
+        @onCloseClicked="closeChangeBefristungSuccessDialog"
+      >
+        <v-card-text>
+          <v-container>
+            <v-row class="text-body bold justify-center">
+              <v-col
+                class="text-center"
+                cols="10"
+              >
+                <span>{{ $t('person.changeBefristungSuccess') }}</span>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card-text>
+        <v-card-actions class="justify-center">
+          <v-row class="justify-center">
+            <v-col
+              cols="12"
+              sm="6"
+              md="4"
+            >
+              <v-btn
+                :block="mdAndDown"
+                class="primary"
+                data-testid="change-befristung-success-close"
+                @click.stop="closeChangeBefristungSuccessDialog"
+              >
+                {{ $t('close') }}
+              </v-btn>
+            </v-col>
+          </v-row>
+        </v-card-actions>
+      </LayoutCard>
+    </v-dialog>
     <!-- Confirmation Dialog after filling the form and adding the Zuordnung-->
     <v-dialog
       v-model="createZuordnungConfirmationDialogVisible"
@@ -2917,6 +3227,62 @@
                 @click.stop="closeCannotDeleteDialog"
               >
                 {{ $t('close') }}
+              </v-btn>
+            </v-col>
+          </v-row>
+        </v-card-actions>
+      </LayoutCard>
+    </v-dialog>
+    <!-- Confirmation Dialog after filling the form to change Befristung -->
+    <v-dialog
+      v-model="changeBefristungConfirmationDialogVisible"
+      persistent
+      max-width="600px"
+    >
+      <LayoutCard
+        :closable="true"
+        :header="$t('person.editZuordnungen')"
+        @onCloseClicked="cancelChangeBefristung"
+      >
+        <v-card-text>
+          <v-container>
+            <v-row class="text-body bold justify-center">
+              <v-col
+                class="text-center"
+                cols="10"
+              >
+                <span>{{ changeBefristungConfirmationDialogMessage }}</span>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card-text>
+        <v-card-actions class="justify-center">
+          <v-row class="justify-center">
+            <v-col
+              cols="12"
+              sm="6"
+              md="4"
+            >
+              <v-btn
+                :block="mdAndDown"
+                class="primary"
+                data-testid="confirm-change-befristung-button"
+                @click.stop="confirmDialogChangeBefristung"
+              >
+                {{ $t('yes') }}
+              </v-btn>
+            </v-col>
+            <v-col
+              cols="12"
+              sm="6"
+              md="4"
+            >
+              <v-btn
+                :block="mdAndDown"
+                class="secondary"
+                @click.stop="cancelChangeBefristung"
+              >
+                {{ $t('no') }}
               </v-btn>
             </v-col>
           </v-row>

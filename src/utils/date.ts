@@ -15,7 +15,11 @@ export function getNextSchuljahresende(): string {
   }
 
   // Otherwise, return July 31st of this year
-  return july31stThisYear.toLocaleDateString('de-DE');
+  return july31stThisYear.toLocaleDateString('de-DE', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  });
 }
 
 /**
