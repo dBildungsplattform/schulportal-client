@@ -54,8 +54,8 @@
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedKlassenname', vuetifyConfig);
 
-  const schulen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
-    return organisationStore.allSchulen
+  const filteredSchulen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
+    return organisationStore.filteredSchulen
       .slice(0, 25)
       .map((org: Organisation) => ({
         value: org.id,
@@ -66,7 +66,7 @@
 
   const translatedSchulname: ComputedRef<string> = computed(
     () =>
-      schulen.value?.find(
+      filteredSchulen.value?.find(
         (schule: TranslatedObject) => schule.value === organisationStore.createdKlasse?.administriertVon,
       )?.title || '',
   );
@@ -86,11 +86,15 @@
   }
 
   async function initStores(): Promise<void> {
-    await organisationStore.getAllOrganisationen({
-      includeTyp: OrganisationsTyp.Schule,
-      systemrechte: [RollenSystemRecht.KlassenVerwalten],
-      limit: 25,
-    });
+    await Promise.all([
+      // make sure we can actually determine if autoselection is required
+      organisationStore.getAllOrganisationen({ limit: 25, includeTyp: OrganisationsTyp.Schule }),
+      organisationStore.getFilteredSchulen({
+        includeTyp: OrganisationsTyp.Schule,
+        systemrechte: [RollenSystemRecht.KlassenVerwalten],
+        limit: 25,
+      }),
+    ]);
     organisationStore.createdKlasse = null;
     organisationStore.errorCode = '';
   }
@@ -183,9 +187,9 @@
       <template v-if="!organisationStore.createdKlasse">
         <KlasseForm
           :errorCode="organisationStore.errorCode"
-          :schulen="schulen"
+          :schulen="filteredSchulen"
           :isEditActive="true"
-          :isLoading="organisationStore.loading"
+          :isLoading="organisationStore.loadingSchulen"
           :readonly="false"
           :selectedSchuleProps="selectedSchuleProps"
           :selectedKlassennameProps="selectedKlassennameProps"

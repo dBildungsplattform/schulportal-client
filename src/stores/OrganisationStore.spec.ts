@@ -565,6 +565,60 @@ describe('OrganisationStore', () => {
         expect(organisationStore.loadingKlassen).toBe(false);
       });
     });
+
+    describe('getFilteredSchulen', () => {
+      it('should get all schulen with search string', async () => {
+        const mockResponse: Organisation[] = [
+          {
+            id: '1',
+            kennung: '1234567',
+            name: 'Astrid-Lindgren-Schule',
+            typ: OrganisationsTyp.Schule,
+          },
+        ];
+
+        mockadapter
+          .onGet('/api/organisationen?limit=25&searchString=astrid&typ=SCHULE')
+          .replyOnce(200, mockResponse, { 'x-paging-total': '1' });
+        const getFilteredSchulenPromise: Promise<void> = organisationStore.getFilteredSchulen({
+          searchString: 'astrid',
+        });
+
+        expect(organisationStore.loadingSchulen).toBe(true);
+        await getFilteredSchulenPromise;
+        expect(organisationStore.filteredSchulen).toEqual(mockResponse);
+        expect(organisationStore.loadingSchulen).toBe(false);
+      });
+
+      it('should handle string error', async () => {
+        mockadapter
+          .onGet('/api/organisationen?limit=25&searchString=astrid&typ=SCHULE')
+          .replyOnce(500, 'some mock server error');
+        const getFilteredSchulenPromise: Promise<void> = organisationStore.getFilteredSchulen({
+          searchString: 'astrid',
+        });
+
+        expect(organisationStore.loadingSchulen).toBe(true);
+        await rejects(getFilteredSchulenPromise);
+        expect(organisationStore.errorCode).toEqual('UNSPECIFIED_ERROR');
+        expect(organisationStore.loadingSchulen).toBe(false);
+      });
+
+      it('should handle error code', async () => {
+        mockadapter
+          .onGet('/api/organisationen?limit=25&searchString=astrid&typ=SCHULE')
+          .replyOnce(500, { code: 'some mock server error' });
+        const getFilteredSchulenPromise: Promise<void> = organisationStore.getFilteredSchulen({
+          searchString: 'astrid',
+        });
+
+        expect(organisationStore.loadingSchulen).toBe(true);
+        await rejects(getFilteredSchulenPromise);
+        expect(organisationStore.errorCode).toEqual('some mock server error');
+        expect(organisationStore.loadingSchulen).toBe(false);
+      });
+    });
+
     describe('deleteOrganisationById', () => {
       it('should delete organisation and update state', async () => {
         mockadapter.onDelete('/api/organisationen/1/klasse').replyOnce(200);

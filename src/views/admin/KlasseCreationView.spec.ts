@@ -111,7 +111,7 @@ describe('KlasseCreationView', () => {
     expect(wrapper?.find('[data-testid="create-another-klasse-button"]').isVisible()).toBe(true);
 
     wrapper?.find('[data-testid="create-another-klasse-button"]').trigger('click');
-    await nextTick();
+    await vi.waitUntil(() => organisationStore.createdKlasse === null);
 
     expect(organisationStore.createdKlasse).toBe(null);
   });

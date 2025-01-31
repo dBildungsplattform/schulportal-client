@@ -12,10 +12,8 @@
   import { type BaseFieldProps } from 'vee-validate';
   import { computed, defineProps, ref, watch, type ComputedRef, type ModelRef, type Ref } from 'vue';
 
-  const hasAutoselectedSchule: Ref<boolean> = ref(false);
   const searchInputSchule: Ref<string> = ref('');
   const timerId: Ref<ReturnType<typeof setTimeout> | undefined> = ref<ReturnType<typeof setTimeout>>();
-  let isSearching: boolean = false;
 
   const organisationStore: OrganisationStore = useOrganisationStore();
 
@@ -35,30 +33,22 @@
   };
 
   const props: Props = defineProps<Props>();
-
+  const hasAutoselectedSchule: Ref<boolean> = computed(() => organisationStore.allSchulen.length === 1);
   const selectedSchuleId: ModelRef<string | undefined, string> = defineModel('selectedSchule');
-  const selectedKlassenname: ModelRef<string | undefined, string> = defineModel('selectedKlassenname');
-
-  // Watcher for schulen to auto-select if there is only one
-  watch(
-    () => props.schulen,
-    (newSchulen: TranslatedObject[] | undefined) => {
-      if (!isSearching && newSchulen && newSchulen.length === 1) {
-        hasAutoselectedSchule.value = true;
-        selectedSchuleId.value = newSchulen[0]?.value || '';
-      }
-    },
-    { immediate: true },
-  );
-
   const selectedSchuleTitle: ComputedRef<string> = computed(() => {
     return props.schulen?.find((schule: TranslatedObject) => schule.value === selectedSchuleId.value)?.title || '';
+  });
+  const selectedKlassenname: ModelRef<string | undefined, string> = defineModel('selectedKlassenname');
+
+  // Watcher to auto-select if there is only one schule
+  watch(hasAutoselectedSchule, (newValue: boolean) => {
+    selectedSchuleId.value = newValue ? organisationStore.allSchulen[0]?.id : undefined;
   });
 
   // Watcher to detect when the search input for Organisationen is triggered.
   watch(searchInputSchule, async (newValue: string | undefined) => {
     clearTimeout(timerId.value);
-    isSearching = !!newValue;
+    if (hasAutoselectedSchule.value) return;
     if (newValue !== '' && newValue === selectedSchuleTitle.value) return;
 
     const organisationFilter: OrganisationenFilter = {
@@ -74,7 +64,7 @@
     }
 
     timerId.value = setTimeout(async () => {
-      await organisationStore.getAllOrganisationen(organisationFilter);
+      await organisationStore.getFilteredSchulen(organisationFilter);
     }, 500);
   });
 </script>
