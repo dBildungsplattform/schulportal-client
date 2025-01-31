@@ -24,7 +24,7 @@ import {
   type TwoFactorAuthentificationStore,
 } from '@/stores/TwoFactorAuthentificationStore';
 import { useConfigStore, type ConfigStore } from '@/stores/ConfigStore';
-import { adjustDateForTimezoneAndFormat } from '@/utils/date';
+import { adjustDateForTimezoneAndFormat, getNextSchuljahresende } from '@/utils/date';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
@@ -87,7 +87,7 @@ const mockCurrentUser: UserInfo = {
   ],
   password_updated_at: null,
 };
-const befristung: string = '2099-08-12';
+const befristung: string = '12.08.2099';
 const mockPersonenuebersicht: PersonWithUebersicht = {
   personId: '1',
   vorname: 'John',
@@ -106,7 +106,7 @@ const mockPersonenuebersicht: PersonWithUebersicht = {
       administriertVon: '2',
       editable: true,
       merkmale: [] as unknown as RollenMerkmal,
-      befristung: '2099-08-12',
+      befristung: befristung,
       admins: ['test'],
     },
     {
@@ -258,6 +258,9 @@ beforeEach(async () => {
     befristungBearbeitenEnabled: true,
     rolleBearbeitenEnabled: true,
   };
+
+  // reset personenuebersicht
+  personStore.personenuebersicht = mockPersonenuebersicht;
 });
 
 const setCurrentPerson = (emailStatus: EmailAddressStatus): void => {
@@ -649,67 +652,89 @@ describe('PersonDetailsView', () => {
       expect(wrapper?.find('[data-testid="befristung-change-button"]').attributes('disabled')).toBeDefined();
     });
 
-    test('renders form to change befristung and triggers submit', async () => {
-      await wrapper?.find('[data-testid="zuordnung-edit-button"]').trigger('click');
-      await nextTick();
-      expect(wrapper?.find('[data-testid="befristung-change-button"]').attributes('disabled')).toBeDefined();
+    test.each([
+      ['12.08.2099', undefined],
+      [undefined, 'unbefristet'],
+      [undefined, 'schuljahresende'],
+    ])(
+      'renders form to change befristung with %s %s and triggers submit',
+      async (existingBefristung: string | undefined, existingBefristungOption: string | undefined) => {
+        personStore.personenuebersicht = mockPersonenuebersicht;
+        if (personStore.personenuebersicht.zuordnungen[0]) {
+          if (existingBefristung) {
+            personStore.personenuebersicht.zuordnungen[0].befristung = existingBefristung;
+          } else if (existingBefristungOption) {
+            personStore.personenuebersicht.zuordnungen[0].befristung =
+              existingBefristungOption === 'schuljahresende' ? getNextSchuljahresende() : '';
+          }
+        }
 
-      const checkbox1: DOMWrapper<HTMLInputElement> | undefined = wrapper?.find(
-        '[data-testid="person-zuordnung-1"] input[type="checkbox"]',
-      );
-      await checkbox1?.setValue(true);
-      await nextTick();
+        await wrapper?.find('[data-testid="zuordnung-edit-button"]').trigger('click');
+        await nextTick();
+        expect(wrapper?.find('[data-testid="befristung-change-button"]').attributes('disabled')).toBeDefined();
 
-      await wrapper?.find('[data-testid="befristung-change-button"]').trigger('click');
+        const checkbox1: DOMWrapper<HTMLInputElement> | undefined = wrapper?.find(
+          '[data-testid="person-zuordnung-1"] input[type="checkbox"]',
+        );
+        await checkbox1?.setValue(true);
+        await nextTick();
 
-      const befristungInput: VueWrapper | undefined = wrapper
-        ?.findComponent({ ref: 'befristung' })
-        .findComponent({ ref: 'befristung-input' });
-      await befristungInput?.setValue('13.08.2099');
-      await nextTick();
+        await wrapper?.find('[data-testid="befristung-change-button"]').trigger('click');
 
-      const submitButton: Element | null = document.body.querySelector(
-        '[data-testid="change-befristung-submit-button"]',
-      );
-      expect(submitButton).not.toBeNull();
-      await nextTick();
-      await flushPromises();
+        const befristungInput: VueWrapper | undefined = wrapper
+          ?.findComponent({ ref: 'befristung' })
+          .findComponent({ ref: 'befristung-input' });
+        await befristungInput?.setValue('13.08.2099');
+        await nextTick();
 
-      if (submitButton) {
-        submitButton.dispatchEvent(new Event('click'));
-      }
-      await wrapper?.find('[data-testid="change-befristung-submit-button"]').trigger('click');
-      await flushPromises();
+        const submitButton: Element | null = document.body.querySelector(
+          '[data-testid="change-befristung-submit-button"]',
+        );
+        expect(submitButton).not.toBeNull();
+        await nextTick();
+        await flushPromises();
 
-      const confirmDialogButton: Element | null = document.body.querySelector(
-        '[data-testid="confirm-change-befristung-button"]',
-      );
-      expect(confirmDialogButton).not.toBeNull();
+        if (submitButton) {
+          submitButton.dispatchEvent(new Event('click'));
+        }
+        await wrapper?.find('[data-testid="change-befristung-submit-button"]').trigger('click');
+        await flushPromises();
 
-      if (confirmDialogButton) {
-        confirmDialogButton.dispatchEvent(new Event('click'));
-      }
-      await flushPromises();
+        const confirmDialogButton: Element | null = document.body.querySelector(
+          '[data-testid="confirm-change-befristung-button"]',
+        );
+        expect(confirmDialogButton).not.toBeNull();
 
-      const saveButton: Element | null = document.body.querySelector('[data-testid="zuordnung-changes-save"]');
-      expect(saveButton).not.toBeNull();
+        if (confirmDialogButton) {
+          confirmDialogButton.dispatchEvent(new Event('click'));
+        }
+        await flushPromises();
 
-      if (saveButton) {
-        saveButton.dispatchEvent(new Event('click'));
-      }
-      await flushPromises();
+        const saveButton: Element | null = document.body.querySelector('[data-testid="zuordnung-changes-save"]');
+        expect(saveButton).not.toBeNull();
 
-      const closeSuccessButton: Element | null = document.body.querySelector(
-        '[data-testid="change-befristung-success-close"]',
-      );
-      expect(closeSuccessButton).not.toBeNull();
+        if (saveButton) {
+          saveButton.dispatchEvent(new Event('click'));
+        }
+        await flushPromises();
 
-      if (closeSuccessButton) {
-        closeSuccessButton.dispatchEvent(new Event('click'));
-      }
-      await flushPromises();
+        const closeSuccessButton: Element | null = document.body.querySelector(
+          '[data-testid="change-befristung-success-close"]',
+        );
+        expect(closeSuccessButton).not.toBeNull();
 
-      expect(wrapper?.find('[data-testid="zuordnung-edit-button"]').isVisible()).toBe(true);
-    });
+        if (closeSuccessButton) {
+          closeSuccessButton.dispatchEvent(new Event('click'));
+        }
+        await flushPromises();
+
+        expect(wrapper?.find('[data-testid="zuordnung-edit-button"]').isVisible()).toBe(true);
+
+        // reset everything
+        authStore.currentUser = mockCurrentUser;
+        personStore.currentPerson = mockPerson;
+        personStore.personenuebersicht = mockPersonenuebersicht;
+      },
+    );
   });
 });
