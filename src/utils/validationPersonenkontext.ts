@@ -17,6 +17,11 @@ export type ZuordnungCreationForm = {
   selectedBefristungOption: string;
 };
 
+export type ChangeBefristungForm = {
+  selectedBefristung: Date;
+  selectedBefristungOption: string;
+};
+
 const rollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = useRollen();
 
 // Define a method to check if the selected Rolle is of type "Lern"
@@ -53,6 +58,17 @@ function isKopersRolle(selectedRolleId: string | undefined): boolean {
   return !!rolle && !!rolle.merkmale && rolle.merkmale.has(RollenMerkmal.KopersPflicht);
 }
 
+const bestfristungSchema = (t: (key: string) => string): StringSchema =>
+  string()
+    .test('notInPast', t('admin.befristung.rules.pastDateNotAllowed'), notInPast) // Custom rule to prevent past dates
+    .test('isValidDate', t('admin.befristung.rules.invalidDateNotAllowed'), isValidDate)
+    .matches(DDMMYYYY, t('admin.befristung.rules.format')) // Ensure the date matches the DDMMYYYY format
+    .when(['selectedRolle', 'selectedBefristungOption'], {
+      is: (selectedRolleId: string, selectedBefristungOption: string | undefined) =>
+        isBefristungspflichtRolle(selectedRolleId) && selectedBefristungOption === undefined, // Conditional required
+      then: (schema: Schema) => schema.required(t('admin.befristung.rules.required')),
+    });
+
 // Define the validation schema for Personenkontext form fields
 export const getValidationSchema = (
   t: (key: string) => string,
@@ -85,15 +101,15 @@ export const getValidationSchema = (
               ? schema // If the user checked "I don't have one" checkbox, KopersNr is not required
               : schema.required(t('admin.person.rules.kopersNr.required')), // KopersNr is required if "I don't have one" is not checked
         }),
-      selectedBefristung: string()
-        .test('notInPast', t('admin.befristung.rules.pastDateNotAllowed'), notInPast) // Custom rule to prevent past dates
-        .test('isValidDate', t('admin.befristung.rules.invalidDateNotAllowed'), isValidDate)
-        .matches(DDMMYYYY, t('admin.befristung.rules.format')) // Ensure the date matches the DDMMYYYY format
-        .when(['selectedRolle', 'selectedBefristungOption'], {
-          is: (selectedRolleId: string, selectedBefristungOption: string | undefined) =>
-            isBefristungspflichtRolle(selectedRolleId) && selectedBefristungOption === undefined, // Conditional required
-          then: (schema: Schema) => schema.required(t('admin.befristung.rules.required')),
-        }),
+      selectedBefristung: bestfristungSchema(t),
+    }),
+  );
+};
+
+export const getBefristungSchema = (t: (key: string) => string): TypedSchema<ChangeBefristungForm> => {
+  return toTypedSchema(
+    object({
+      selectedBefristung: bestfristungSchema(t),
     }),
   );
 };

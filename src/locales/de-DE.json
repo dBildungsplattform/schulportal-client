@@ -19,8 +19,8 @@
       },
       "selectBefristung": "Befristung auswählen",
       "unlimited": "Unbefristet",
+      "unlimitedLower": "unbefristet",
       "limited": "Befristet",
-      "unlimitedSuccessTemplate": "unbefristet",
       "unlimitedInactive": "Diese Option kann für Rollen mit Befristungspflicht nicht ausgewählt werden.",
       "limitedUntil": "befristet bis",
       "untilEndOfSchoolYear": "Bis Schuljahresende"
@@ -651,7 +651,11 @@
     "willBeCreated": "wird hinzugefügt",
     "willBeRemoved": "wird entfernt",
     "zuordnungen": "Schulzuordnung(en)",
-    "zuordnung": "Schulzuordnung"
+    "zuordnung": "Schulzuordnung",
+    "changeBefristung": "Befristung ändern",
+    "changeBefristungConfirmation": "Möchten Sie die Befristung wirklich von {oldBefristung} in {newBefristung} ändern?",
+    "changeBefristungSuccess": "Die Befristung wurde erfolgreich geändert.",
+    "changeBefristungDisabledDescription": "Bitte wählen Sie eine neue Befristung aus."
   },
   "profile": {
     "personalData": "Persönliche Daten",
