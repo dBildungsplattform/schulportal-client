@@ -82,7 +82,10 @@
           v-if="progress > 0"
           class="mt-4"
         >
-          <v-container v-if="successMessage">
+          <v-container
+            v-if="successMessage"
+            data-testid="person-delete-success-text"
+          >
             <v-row justify="center">
               <v-col cols="auto">
                 <v-icon
