@@ -710,7 +710,7 @@
         >
           <SpshTooltip
             :enabledCondition="selectedPersonIds.length > 0"
-            :disabledText="$t('admin.person.choosePersonFirt')"
+            :disabledText="$t('admin.person.choosePersonFirst')"
             position="top"
           >
             <v-select
@@ -742,7 +742,7 @@
             :errorCode="personenkontextStore.errorCode"
             :personIDs="selectedPersonIds"
             @update:isDialogVisible="handleDialog($event)"
-            @update:reloadData="getPaginatedPersonen(searchFilterStore.personenPage)"
+            @update:getUebersichten="getPaginatedPersonen(searchFilterStore.personenPage)"
           >
           </RolleModify>
         </v-col>

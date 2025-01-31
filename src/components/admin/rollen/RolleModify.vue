@@ -35,7 +35,7 @@
 
   type Emits = {
     (event: 'update:isDialogVisible', isDialogVisible: boolean): void;
-    (event: 'update:reloadData'): void;
+    (event: 'update:getUebersichten'): void;
   };
 
   const props: Props = defineProps<Props>();
@@ -155,7 +155,7 @@
     }
 
     // Send an event to PersonManagement to fetch the updated Uebersichte (otherwise we will receive a version error from the backend when trying to access the GÜ)
-    emit('update:reloadData');
+    emit('update:getUebersichten');
 
     // If the Admin assigns a person a false Rolle like to Schuladmin a Lehrkraft Rolle we want to ignore the error because it's a bulk operation
     if (personenkontextStore.errorCode === 'INVALID_PERSONENKONTEXT_FOR_PERSON_WITH_ROLLENART_LERN') {
