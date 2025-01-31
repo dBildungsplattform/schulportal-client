@@ -22,6 +22,7 @@
   import RolleModify from '@/components/admin/rollen/RolleModify.vue';
   import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
   import SpshTooltip from '@/components/admin/SpshTooltip.vue';
+  import PersonBulkDelete from '@/components/admin/personen/PersonBulkDelete.vue';
 
   const searchFieldComponent: Ref = ref();
 
@@ -67,6 +68,8 @@
   const sortOrder: Ref<SortOrder | null> = ref(null);
 
   const rolleModifiyDialogVisible: Ref<boolean> = ref(false);
+  const benutzerDeleteDialogVisible: Ref<boolean> = ref(false);
+
   const selectedOption: Ref<string | null> = ref(null);
 
   const authStore: AuthStore = useAuthStore();
@@ -74,12 +77,17 @@
   // Define an enum for action types (Other pairs will be added here for each new bulk feature)
   enum ActionTypes {
     MODIFY_ROLLE = 'MODIFY_ROLLE',
+    DELETE_PERSON = 'DELETE_PERSON',
   }
 
   // Define i18n values for action types to act as a title/value in the v-select
-  const actionTypeTitles: Record<ActionTypes, string> = {
+  const actionTypeTitles: Partial<Record<ActionTypes, string>> = {
     [ActionTypes.MODIFY_ROLLE]: t('admin.rolle.assignRolle'),
   };
+
+  if (authStore.hasPersonenLoeschenPermission) {
+    actionTypeTitles[ActionTypes.DELETE_PERSON] = t('admin.person.deletePerson');
+  }
 
   // Computed property for generating options dynamically for v-selects
   const actions: ComputedRef<TranslatedObject[]> = computed(() => {
@@ -423,6 +431,9 @@
       case ActionTypes.MODIFY_ROLLE:
         rolleModifiyDialogVisible.value = true;
         break;
+      case ActionTypes.DELETE_PERSON:
+        benutzerDeleteDialogVisible.value = true;
+        break;
     }
   };
 
@@ -430,6 +441,13 @@
   const handleDialog = (isDialogVisible: boolean): void => {
     rolleModifiyDialogVisible.value = isDialogVisible;
     selectedOption.value = null;
+  };
+
+  const handleBulkDeleteDialog = (isDialogVisible: boolean): void => {
+    benutzerDeleteDialogVisible.value = isDialogVisible;
+    selectedOption.value = null;
+    selectedPersonIds.value = [];
+    getPaginatedPersonenWithLimit(searchFilterStore.personenPerPage);
   };
 
   function handleSelectedRows(selectedItems: TableItem[]): void {
@@ -745,6 +763,16 @@
             @update:getUebersichten="getPaginatedPersonen(searchFilterStore.personenPage)"
           >
           </RolleModify>
+          <PersonBulkDelete
+            ref="person-bulk-delete"
+            v-if="benutzerDeleteDialogVisible"
+            :error-code="personStore.errorCode"
+            :is-loading="personStore.loading"
+            :is-dialog-visible="benutzerDeleteDialogVisible"
+            :personIDs="selectedPersonIds"
+            @update:isDialogVisible="handleBulkDeleteDialog($event)"
+          >
+          </PersonBulkDelete>
         </v-col>
         <!-- Display the number of selected checkboxes -->
         <v-col
