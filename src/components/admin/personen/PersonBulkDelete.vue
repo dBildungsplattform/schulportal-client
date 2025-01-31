@@ -57,6 +57,7 @@
 
 <template>
   <v-dialog
+    ref="deletePersonBulkDialog"
     v-model="showDeletePersonDialog"
     persistent
   >
