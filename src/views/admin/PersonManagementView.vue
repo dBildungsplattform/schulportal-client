@@ -11,12 +11,17 @@
   } from '@/stores/OrganisationStore';
   import { SortField, SortOrder, usePersonStore, type PersonStore, type Personendatensatz } from '@/stores/PersonStore';
   import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
-  import { useRolleStore, type RolleStore, type RolleResponse } from '@/stores/RolleStore';
+  import { useRolleStore, type RolleStore, type RolleResponse, RollenArt, RollenMerkmal } from '@/stores/RolleStore';
   import { type SearchFilterStore, useSearchFilterStore } from '@/stores/SearchFilterStore';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import ResultTable, { type TableRow } from '@/components/admin/ResultTable.vue';
+  import ResultTable, { type TableItem, type TableRow } from '@/components/admin/ResultTable.vue';
   import SearchField from '@/components/admin/SearchField.vue';
   import { type TranslatedObject } from '@/types.d';
+  import { useOrganisationen } from '@/composables/useOrganisationen';
+  import { type TranslatedRolleWithAttrs, useRollen } from '@/composables/useRollen';
+  import RolleModify from '@/components/admin/rollen/RolleModify.vue';
+  import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
+  import SpshTooltip from '@/components/admin/SpshTooltip.vue';
 
   const searchFieldComponent: Ref = ref();
 
@@ -30,6 +35,8 @@
 
   let timerId: ReturnType<typeof setTimeout>;
   const hasAutoSelectedOrganisation: Ref<boolean> = ref(false);
+
+  const selectedPersonIds: Ref<string[]> = ref<string[]>([]);
 
   type ReadonlyHeaders = VDataTableServer['headers'];
   const headers: ReadonlyHeaders = [
@@ -58,6 +65,29 @@
   const selectedRollenObjects: Ref<RolleResponse[]> = ref([]);
   const sortField: Ref<string | null> = ref(null);
   const sortOrder: Ref<SortOrder | null> = ref(null);
+
+  const rolleModifiyDialogVisible: Ref<boolean> = ref(false);
+  const selectedOption: Ref<string | null> = ref(null);
+
+  const authStore: AuthStore = useAuthStore();
+
+  // Define an enum for action types (Other pairs will be added here for each new bulk feature)
+  enum ActionTypes {
+    MODIFY_ROLLE = 'MODIFY_ROLLE',
+  }
+
+  // Define i18n values for action types to act as a title/value in the v-select
+  const actionTypeTitles: Record<ActionTypes, string> = {
+    [ActionTypes.MODIFY_ROLLE]: t('admin.rolle.assignRolle'),
+  };
+
+  // Computed property for generating options dynamically for v-selects
+  const actions: ComputedRef<TranslatedObject[]> = computed(() => {
+    return Object.entries(actionTypeTitles).map(([key, value]: [string, string]) => ({
+      value: key,
+      title: value,
+    }));
+  });
 
   const filterOrSearchActive: Ref<boolean> = computed(
     () =>
@@ -88,6 +118,18 @@
         title: rolle.name,
       }))
       .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
+  });
+
+  const organisationenForForm: ComputedRef<TranslatedObject[] | undefined> = useOrganisationen();
+
+  const rollenForForm: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = useRollen();
+
+  // Only Rollen from type LEHR and without any Befristungspflicht wil be offered for now
+  const lehrRollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = computed(() => {
+    return rollenForForm.value?.filter(
+      (rolle: TranslatedRolleWithAttrs) =>
+        rolle.rollenart === RollenArt.Lehr && !rolle.merkmale?.has(RollenMerkmal.BefristungPflicht),
+    );
   });
 
   const statuses: Array<string> = ['Aktiv', 'Inaktiv'];
@@ -373,7 +415,32 @@
     getPaginatedPersonen(searchFilterStore.personenPage);
   }
 
+  // Handle the selected action
+  const handleOption = (newValue: string | null): void => {
+    if (!newValue) return;
+
+    switch (newValue) {
+      case ActionTypes.MODIFY_ROLLE:
+        rolleModifiyDialogVisible.value = true;
+        break;
+    }
+  };
+
+  // Handles the event when closing the dialog
+  const handleDialog = (isDialogVisible: boolean): void => {
+    rolleModifiyDialogVisible.value = isDialogVisible;
+    selectedOption.value = null;
+  };
+
+  function handleSelectedRows(selectedItems: TableItem[]): void {
+    // Directly assign the selected items to selectedPersonIds since the emitted tableItems are always IDs of the specific rows
+    selectedPersonIds.value = selectedItems as unknown as string[];
+  }
+
   onMounted(async () => {
+    personenkontextStore.processWorkflowStep({
+      limit: 25,
+    });
     if (filterOrSearchActive.value) {
       selectedOrganisation.value = searchFilterStore.selectedOrganisationen || [];
       selectedRollen.value = searchFilterStore.selectedRollen || [];
@@ -634,10 +701,61 @@
         </v-col>
       </v-row>
       <v-row
-        align="center"
-        class="ma-3"
-        justify="end"
+        class="ma-3 mb-n4"
+        justify="start"
       >
+        <v-col
+          md="3"
+          cols="12"
+        >
+          <SpshTooltip
+            :enabledCondition="selectedPersonIds.length > 0"
+            :disabledText="$t('admin.person.choosePersonFirst')"
+            position="top"
+          >
+            <v-select
+              v-if="authStore.hasPersonenBulkPermission"
+              clearable
+              data-testid="benutzer-edit-select"
+              density="compact"
+              :disabled="selectedPersonIds.length === 0"
+              id="benutzer-edit-select"
+              :items="actions"
+              item-value="value"
+              item-text="title"
+              :no-data-text="$t('noDataFound')"
+              :placeholder="$t('edit')"
+              ref="benutzer-bulk-edit-select"
+              required="true"
+              variant="outlined"
+              v-model="selectedOption"
+              @update:modelValue="handleOption"
+            ></v-select>
+          </SpshTooltip>
+          <RolleModify
+            ref="rolle-modify"
+            v-if="rolleModifiyDialogVisible"
+            :organisationen="organisationenForForm"
+            :rollen="lehrRollen"
+            :isLoading="personenkontextStore.loading"
+            :isDialogVisible="rolleModifiyDialogVisible"
+            :errorCode="personenkontextStore.errorCode"
+            :personIDs="selectedPersonIds"
+            @update:isDialogVisible="handleDialog($event)"
+            @update:getUebersichten="getPaginatedPersonen(searchFilterStore.personenPage)"
+          >
+          </RolleModify>
+        </v-col>
+        <!-- Display the number of selected checkboxes -->
+        <v-col
+          v-if="authStore.hasPersonenBulkPermission && selectedPersonIds.length > 0"
+          cols="12"
+          md="4"
+          class="mt-md-5 mt-n10"
+        >
+          <p class="text-body">{{ selectedPersonIds.length }} {{ $t('selected') }}</p>
+        </v-col>
+        <v-spacer></v-spacer>
         <SearchField
           :initialValue="searchFilterStore.searchFilterPersonen ?? ''"
           :hoverText="$t('person.firstNameLastNameReferrerKopersNr')"
@@ -660,6 +778,7 @@
         @onItemsPerPageUpdate="getPaginatedPersonenWithLimit"
         @onPageUpdate="getPaginatedPersonen"
         @onTableUpdate="handleTableSorting"
+        @update:selectedRows="handleSelectedRows"
         :totalItems="personStore.totalPersons"
         item-value-path="person.id"
         ><template v-slot:[`item.rollen`]="{ item }">

@@ -34,15 +34,16 @@
   type Props = {
     organisationen: TranslatedObject[] | undefined;
     rollen: TranslatedRolleWithAttrs[] | undefined;
-    klassen: TranslatedObject[] | undefined;
+    klassen?: TranslatedObject[] | undefined;
     selectedOrganisationProps: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     selectedRolleProps: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
-    selectedKlasseProps: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
+    selectedKlasseProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     selectedOrganisation: string | undefined;
     selectedRolle: string | undefined;
-    selectedKlasse?: string | undefined;
     showHeadline: boolean;
-    befristungInputProps: BefristungProps;
+    selectedKlasse?: string | undefined;
+    isModifyRolleDialog?: boolean;
+    befristungInputProps?: BefristungProps;
   };
 
   const props: Props = defineProps<Props>();
@@ -365,7 +366,7 @@
       <!-- Klasse zuordnen -->
       <FormRow
         v-if="isLernRolle(selectedRolle) && selectedOrganisation"
-        :errorLabel="selectedKlasseProps['error']"
+        :errorLabel="selectedKlasseProps?.['error'] || false"
         :isRequired="true"
         labelForId="klasse-select"
         :label="$t('admin.klasse.klasse')"
@@ -393,14 +394,14 @@
         <h3 class="headline-3">3. {{ $t('admin.befristung.assignBefristung') }}</h3>
       </v-row>
       <BefristungInput
-        v-if="selectedOrganisation && selectedRolle"
-        :befristungProps="befristungInputProps.befristungProps"
-        :befristungOptionProps="befristungInputProps.befristungOptionProps"
-        :isUnbefristetDisabled="befristungInputProps.isUnbefristetDisabled"
-        :isBefristungRequired="befristungInputProps.isBefristungRequired"
-        :nextSchuljahresende="befristungInputProps.nextSchuljahresende"
-        :befristung="befristungInputProps.befristung"
-        :befristungOption="befristungInputProps.befristungOption"
+        v-if="selectedOrganisation && selectedRolle && !isModifyRolleDialog"
+        :befristungProps="befristungInputProps?.befristungProps"
+        :befristungOptionProps="befristungInputProps?.befristungOptionProps"
+        :isUnbefristetDisabled="befristungInputProps?.isUnbefristetDisabled"
+        :isBefristungRequired="befristungInputProps?.isBefristungRequired"
+        :nextSchuljahresende="befristungInputProps?.nextSchuljahresende"
+        :befristung="befristungInputProps?.befristung"
+        :befristungOption="befristungInputProps?.befristungOption"
         @update:befristung="handleBefristungChange"
         @update:calculatedBefristungOption="handleCalculatedBefristungOptionChange"
       />

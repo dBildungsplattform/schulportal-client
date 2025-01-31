@@ -26,4 +26,9 @@
       max-width: 1200px;
     }
   }
+  @media (max-width: 1279px) {
+    .v-container {
+      margin-bottom: 350px;
+    }
+  }
 </style>
