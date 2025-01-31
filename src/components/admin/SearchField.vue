@@ -60,7 +60,10 @@
       v-model="searchFilter"
     ></v-text-field>
   </v-col>
-  <v-col md="2">
+  <v-col
+    md="2"
+    cols="6"
+  >
     <v-btn
       block
       class="primary search button"
