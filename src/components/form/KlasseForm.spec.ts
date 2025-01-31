@@ -8,7 +8,7 @@ import {
 import { RollenSystemRecht } from '@/stores/RolleStore';
 import { type TranslatedObject } from '@/types.d';
 import { VueWrapper, mount } from '@vue/test-utils';
-import { expect, test, type Mock, type MockInstance } from 'vitest';
+import { expect, test, type MockInstance } from 'vitest';
 import { nextTick } from 'vue';
 import KlasseForm from './KlasseForm.vue';
 
