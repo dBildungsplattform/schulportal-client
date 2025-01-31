@@ -25,6 +25,7 @@
       "limitedUntil": "befristet bis",
       "untilEndOfSchoolYear": "Bis Schuljahresende"
     },
+    "doNotCloseBrowserNotice": "Bitte den Browser während der Bearbeitung nicht schließen!",
     "followingDataCreated": "Folgende Daten wurden gespeichert:",
     "headline": "Administrationsbereich",
     "import": {
@@ -160,6 +161,7 @@
       "changePassword": "Passwort ändern",
       "copyPasswordError": "Passwort konnte nicht in die Zwischenablage kopiert werden",
       "copyPasswordSuccess": "Passwort in Zwischenablage kopiert",
+      "choosePersonFirst": "Bitte erst einen Benutzer auswählen.",
       "create": "Benutzer anlegen",
       "createAnother": "Weiteren Benutzer anlegen",
       "createNew": "Neue Benutzer anlegen",
@@ -382,7 +384,8 @@
           "KLASSEN_VERWALTEN": "Darf Klassen verwalten",
           "SCHULTRAEGER_VERWALTEN": "Darf Schulträger verwalten",
           "PERSON_SYNCHRONISIEREN": "Darf Benutzer synchronisieren",
-          "PERSONEN_ANLEGEN": "Darf Benutzer anlegen"
+          "PERSONEN_ANLEGEN": "Darf Benutzer anlegen",
+          "BULK_VERWALTEN": "Darf Mehrfachbearbeitung ausführen"
         },
         "rollenarten": {
           "LERN": "Lern",
@@ -410,6 +413,7 @@
       "rollenSelected": "{count} Rollen ausgewählt",
       "rolleAddedSuccessfully": "Die Rolle wurde erfolgreich hinzugefügt.",
       "rolleUpdatedSuccessfully": "Die Rolle wurde erfolgreich geändert.",
+      "rollenAssignedSuccessfully": "Die Rollen wurden erfolgreich zugeordnet.",
       "rules": {
         "rolle": {
           "required": "Die Rolle muss ausgewählt werden."
@@ -684,6 +688,7 @@
     "limitedUntil": "Befristet bis"
   },
   "save": "Speichern",
+  "selected": "ausgewählt",
   "since": "Seit",
   "refreshData": "Daten aktualisieren",
   "resetFilter": "Filter zurücksetzen",

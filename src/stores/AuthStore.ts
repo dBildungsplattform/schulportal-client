@@ -51,6 +51,7 @@ type AuthState = {
   hasRollenverwaltungPermission: boolean;
   hasSchulverwaltungPermission: boolean;
   hasSchultraegerverwaltungPermission: boolean;
+  hasPersonenBulkPermission: boolean;
   isAuthed: boolean;
   acr: StepUpLevel;
   timeLimitInfos: PersonTimeLimitInfoResponse[];
@@ -80,6 +81,7 @@ export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, 
     hasRollenverwaltungPermission: false,
     hasSchulverwaltungPermission: false,
     hasSchultraegerverwaltungPermission: false,
+    hasPersonenBulkPermission: false,
     isAuthed: false,
     acr: StepUpLevel.NONE,
     timeLimitInfos: [],
@@ -118,6 +120,7 @@ export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, 
           this.hasRollenverwaltungPermission = this.currentUserPermissions.includes('ROLLEN_VERWALTEN');
           this.hasSchulverwaltungPermission = this.currentUserPermissions.includes('SCHULEN_VERWALTEN');
           this.hasSchultraegerverwaltungPermission = this.currentUserPermissions.includes('SCHULTRAEGER_VERWALTEN');
+          this.hasPersonenBulkPermission = this.currentUserPermissions.includes('BULK_VERWALTEN');
         } else {
           throw new Error('User info could not be retrieved.');
         }
