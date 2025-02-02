@@ -90,6 +90,7 @@ describe('Row Index and Item Retrieval', () => {
       expect(calculatedIndex).toBe(index);
     });
   });
+
   test('handles empty items array', () => {
     // Remount with empty items
     wrapper = mount(ResultTable, {
@@ -117,5 +118,20 @@ describe('Row Index and Item Retrieval', () => {
     if (rows.length === 1) {
       expect(rows[0]?.text()).toContain(noDataText || 'noDataFound');
     }
+  });
+
+  test('emits update:selectedRows event with selected items', async () => {
+    const selectedItems: {
+      id: number;
+      name: string;
+    }[] = [
+      { id: 1, name: 'Alice' },
+      { id: 2, name: 'Bob' },
+    ];
+    const table: VueWrapper | undefined = wrapper?.findComponent({ ref: 'v-data-table-server' });
+    await table?.vm.$emit('update:modelValue', selectedItems);
+
+    expect(wrapper?.emitted('update:selectedRows')).toBeTruthy();
+    expect(wrapper?.emitted('update:selectedRows')?.[0]).toEqual([selectedItems]);
   });
 });

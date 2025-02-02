@@ -10,11 +10,11 @@
   useI18n();
 
   export type BefristungProps = {
-    befristungProps: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
-    befristungOptionProps: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
-    isUnbefristetDisabled: boolean;
-    isBefristungRequired: boolean;
-    nextSchuljahresende: string;
+    befristungProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
+    befristungOptionProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
+    isUnbefristetDisabled?: boolean;
+    isBefristungRequired?: boolean;
+    nextSchuljahresende?: string;
     befristung: string | undefined;
     befristungOption: string | undefined;
   };
@@ -60,7 +60,7 @@
   // If the befristung is required then autoselect Schuljahresende, otherwise Unbefristet
   watch(
     () => props.isBefristungRequired,
-    (newValue: boolean) => {
+    (newValue: boolean | undefined) => {
       if (newValue) {
         localBefristungOption.value = BefristungOption.SCHULJAHRESENDE;
       } else {
@@ -85,6 +85,7 @@
         variant="outlined"
         placeholder="TT.MM.JJJJ"
         color="primary"
+        ref="befristung-input"
         @update:modelValue="handleBefristungChange"
       ></v-text-field>
     </FormRow>

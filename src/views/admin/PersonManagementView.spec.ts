@@ -1,14 +1,15 @@
-import { EmailAddressStatus, RollenArt, type FindRollenResponse } from '@/api-client/generated/api';
+import { EmailAddressStatus, RollenArt, RollenSystemRecht, type FindRollenResponse } from '@/api-client/generated/api';
 import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
 import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
 import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
 import { useRolleStore, type RolleResponse, type RolleStore, type RollenMerkmal } from '@/stores/RolleStore';
 import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
-import { VueWrapper, mount } from '@vue/test-utils';
+import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
 import type WrapperLike from '@vue/test-utils/dist/interfaces/wrapperLike';
 import { expect, test, type Mock, type MockInstance } from 'vitest';
 import { nextTick } from 'vue';
 import PersonManagementView from './PersonManagementView.vue';
+import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
 
 let wrapper: VueWrapper | null = null;
 let organisationStore: OrganisationStore;
@@ -16,6 +17,7 @@ let personStore: PersonStore;
 let personenkontextStore: PersonenkontextStore;
 let rolleStore: RolleStore;
 let searchFilterStore: SearchFilterStore;
+let authStore: AuthStore;
 vi.useFakeTimers();
 
 beforeEach(() => {
@@ -30,6 +32,9 @@ beforeEach(() => {
   personenkontextStore = usePersonenkontextStore();
   rolleStore = useRolleStore();
   searchFilterStore = useSearchFilterStore();
+  authStore = useAuthStore();
+
+  authStore.hasPersonenBulkPermission = true;
 
   organisationStore.klassen = [
     {
@@ -148,6 +153,28 @@ beforeEach(() => {
     ] as RolleResponse[],
     total: 1,
   } as FindRollenResponse;
+
+  personenkontextStore.workflowStepResponse = {
+    rollen: [
+      {
+        administeredBySchulstrukturknoten: '1234',
+        rollenart: 'LEHR',
+        name: 'SuS',
+        merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RollenMerkmal>,
+        systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
+        createdAt: '2022',
+        updatedAt: '2022',
+        id: '54321',
+        administeredBySchulstrukturknotenName: 'Land SH',
+        administeredBySchulstrukturknotenKennung: '',
+        version: 1,
+      },
+    ],
+    organisations: [],
+    selectedOrganisation: null,
+    selectedRolle: null,
+    canCommit: true,
+  };
 
   wrapper = mount(PersonManagementView, {
     attachTo: document.getElementById('app') || '',
@@ -299,5 +326,25 @@ describe('PersonManagementView', () => {
     // Add more assertions here to check the state after the search
     expect(personenkontextStore.filteredRollen).toBeDefined();
     expect(personenkontextStore.filteredRollen?.moeglicheRollen).toHaveLength(1);
+  });
+
+  test('it checks a checkbox in the table, selects the Rolle zuordnen option and triggers dialog', async () => {
+    // Find the first checkbox in the table
+    const checkbox: DOMWrapper<Element> | undefined = wrapper?.find(
+      '[data-testid="person-table"] .v-selection-control',
+    );
+
+    // Initial state check (optional)
+    expect(checkbox?.classes()).not.toContain('v-selection-control--selected');
+
+    // Trigger the checkbox click
+    await checkbox?.trigger('click');
+    await nextTick();
+
+    const benutzerEditSelect: VueWrapper | undefined = wrapper?.findComponent({ ref: 'benutzer-bulk-edit-select' });
+    benutzerEditSelect?.setValue('MODIFY_ROLLE');
+    await nextTick();
+
+    expect(wrapper?.findComponent({ ref: 'personenkontext-create' }));
   });
 });
