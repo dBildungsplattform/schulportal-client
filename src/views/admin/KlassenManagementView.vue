@@ -663,7 +663,7 @@
               :errorCode="organisationStore.errorCode"
               :klassenname="item.name"
               :klassenId="item.id"
-              :schulname="item.schuleDetails"
+              :schulname="item.schuleDetails || ''"
               :useIconActivator="true"
               :isLoading="organisationStore.loading"
               @onDeleteKlasse="deleteKlasse(item.id)"

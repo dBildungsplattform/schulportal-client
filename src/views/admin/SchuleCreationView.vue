@@ -138,9 +138,6 @@
   }
 
   async function navigateToSchuleManagement(): Promise<void> {
-    if (organisationStore.errorCode === 'REQUIRED_STEP_UP_LEVEL_NOT_MET') {
-      resetForm();
-    }
     organisationStore.createdSchule = null;
     await router.push({ name: 'schule-management' }).then(() => {
       router.go(0);
@@ -212,6 +209,7 @@
           :onDiscard="navigateToSchuleManagement"
           @onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
           :onSubmit="onSubmit"
+          ref="schule-creation-form"
           :showUnsavedChangesDialog="showUnsavedChangesDialog"
         >
           <!-- Error Message Display if error on submit -->
