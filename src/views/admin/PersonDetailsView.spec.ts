@@ -686,7 +686,7 @@ describe('PersonDetailsView', () => {
 
     const befristungInput: VueWrapper | undefined = wrapper
       ?.findComponent({ ref: 'personenkontext-create' })
-      .findComponent({ ref: 'befristung' })
+      .findComponent({ ref: 'befristung-input-wrapper' })
       .findComponent({ ref: 'befristung-input' });
     await befristungInput?.setValue('12.08.2099');
     await nextTick();
@@ -824,7 +824,7 @@ describe('PersonDetailsView', () => {
         await wrapper?.find('[data-testid="befristung-change-button"]').trigger('click');
 
         const befristungInput: VueWrapper | undefined = wrapper
-          ?.findComponent({ ref: 'befristung' })
+          ?.findComponent({ ref: 'befristung-input-wrapper' })
           .findComponent({ ref: 'befristung-input' });
         await befristungInput?.setValue('13.08.2099');
         await nextTick();

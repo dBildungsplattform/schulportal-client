@@ -2430,7 +2430,7 @@
               @submit="onSubmitChangeBefristung"
             >
               <BefristungInput
-                ref="befristung"
+                ref="befristung-input-wrapper"
                 :befristungProps="selectedChangeBefristungProps"
                 :befristungOptionProps="selectedChangeBefristungOptionProps"
                 :isUnbefristetDisabled="isBefristungspflichtRolle(changeBefristungRolle)"

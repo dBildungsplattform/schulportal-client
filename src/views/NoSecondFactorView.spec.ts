@@ -50,8 +50,8 @@ describe('SpshAlert Component', () => {
   });
 
   test('it triggers goBack action when back button is clicked', async () => {
-    const button: WrapperLike | undefined = wrapper?.find('[data-testid="alert-button"]');
-    await button?.trigger('click');
+    const alertButton: WrapperLike | undefined = wrapper?.find('[data-testid="alert-button"]');
+    await alertButton?.trigger('click');
     await nextTick();
 
     expect(window.location.href).toBe('/start');
