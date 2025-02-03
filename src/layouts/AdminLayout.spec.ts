@@ -18,16 +18,16 @@ beforeEach(() => {
         AdminLayout,
       },
     },
+    slots: {
+      default: 'Main Content',
+    },
   });
 });
 
-// We are currently skipping these tests, because rendering fails due to a missing
-// vuetify layout that needs to be injected and cannot be provided inside the test environment.
-// Providing it manually is hacky, since the needed layout cannot be imported from vuetify.
-// Hopefully this will be fixed in an upcoming vuetify release.
-
+// TODO: we have to use v-layout as wrapper in AdminLayout.vue, which breaks the layout
+//       we have to fix the broken layout before we can increase the coverage threshold for layouts
 describe('AdminLayout', () => {
-  test.skip('it renders the footer on the admin layout', () => {
-    expect(wrapper?.find('[data-testid="footer"]').isVisible()).toBe(true);
+  test.skip('it renders the slot content inside the admin layout', () => {
+    expect(wrapper?.html()).toContain('Main Content');
   });
 });

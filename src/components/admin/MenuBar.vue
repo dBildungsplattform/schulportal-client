@@ -1,10 +1,11 @@
 <script setup lang="ts">
-  import router from '@/router';
   import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
-  import { type Ref, ref, type ComputedRef } from 'vue';
-  import { onMounted } from 'vue';
+  import { onMounted, ref, type ComputedRef, type Ref } from 'vue';
+  import { useRoute, useRouter, type RouteLocationNormalizedLoaded, type Router } from 'vue-router';
   import { useDisplay } from 'vuetify';
 
+  const router: Router = useRouter();
+  const route: RouteLocationNormalizedLoaded = useRoute();
   const authStore: AuthStore = useAuthStore();
 
   const menuDrawer: Ref<boolean> = ref(true);
@@ -16,15 +17,15 @@
     }
   }
 
-  function handleMenuItemClick(route: string): void {
-    if (router.currentRoute.value.path === route) {
+  function handleMenuItemClick(nextRoute: string): void {
+    if (route.path === nextRoute) {
       // If current route is the same as the route we're navigating to,
       // force a refresh by pushing the same route again
-      router.push(route).then(() => {
+      router.push(nextRoute).then(() => {
         router.go(0);
       });
     } else {
-      router.push(route);
+      router.push(nextRoute);
     }
     closeMenuOnMobile();
   }

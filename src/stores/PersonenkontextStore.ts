@@ -1,5 +1,5 @@
 import { defineStore, type Store, type StoreDefinition } from 'pinia';
-import { isAxiosError } from 'axios';
+import { getResponseErrorCode } from '@/utils/errorHandlers';
 import {
   PersonenkontexteApiFactory,
   type FindRollenResponse,
@@ -150,10 +150,7 @@ export const usePersonenkontextStore: StoreDefinition<
           await personenKontexteApi.personenkontextControllerHatSystemRecht(personId, systemRecht);
         return data;
       } catch (error: unknown) {
-        this.errorCode = 'UNSPECIFIED_ERROR';
-        if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
-        }
+        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
         return await Promise.reject(this.errorCode);
       } finally {
         this.loading = false;
@@ -174,10 +171,7 @@ export const usePersonenkontextStore: StoreDefinition<
         this.workflowStepResponse = data;
         return data;
       } catch (error: unknown) {
-        this.errorCode = 'UNSPECIFIED_ERROR';
-        if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
-        }
+        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
         return await Promise.reject(this.errorCode);
       } finally {
         this.loading = false;
@@ -192,10 +186,7 @@ export const usePersonenkontextStore: StoreDefinition<
         this.filteredRollen = data;
         this.totalFilteredRollen = this.filteredRollen.total;
       } catch (error: unknown) {
-        this.errorCode = 'UNSPECIFIED_ERROR';
-        if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
-        }
+        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
         return await Promise.reject(this.errorCode);
       } finally {
         this.loading = false;
@@ -213,10 +204,7 @@ export const usePersonenkontextStore: StoreDefinition<
           );
         this.filteredOrganisationen = data;
       } catch (error: unknown) {
-        this.errorCode = 'UNSPECIFIED_ERROR';
-        if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
-        }
+        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
         return await Promise.reject(this.errorCode);
       } finally {
         this.loading = false;
@@ -246,10 +234,7 @@ export const usePersonenkontextStore: StoreDefinition<
           await personenKontextApi.dbiamPersonenkontextWorkflowControllerCommit(personId, updateParams, personalnummer);
         this.updatedPersonenkontexte = data;
       } catch (error: unknown) {
-        this.errorCode = 'UNSPECIFIED_ERROR';
-        if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.i18nKey || 'PERSONENKONTEXTE_UPDATE_ERROR';
-        }
+        this.errorCode = getResponseErrorCode(error, 'PERSONENKONTEXTE_UPDATE_ERROR');
       } finally {
         this.loading = false;
       }
@@ -264,10 +249,7 @@ export const usePersonenkontextStore: StoreDefinition<
         this.createdPersonWithKontext = data;
         return data;
       } catch (error: unknown) {
-        this.errorCode = 'UNSPECIFIED_ERROR';
-        if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.i18nKey || 'UNSPECIFIED_ERROR';
-        }
+        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
         return await Promise.reject(this.errorCode);
       } finally {
         this.loading = false;

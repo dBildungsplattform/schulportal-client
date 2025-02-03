@@ -221,7 +221,7 @@ describe('TwoFactorAuthentificationStore', () => {
 
       expect(twoFactorAuthenticationStore.loading).toBe(true);
       await assignTokenPromise;
-      expect(twoFactorAuthenticationStore.errorCode).toEqual('HARDWARE_TOKEN_SERVICE_FEHLER');
+      expect(twoFactorAuthenticationStore.errorCode).toEqual('PI_UNAVAILABLE_ERROR');
       expect(twoFactorAuthenticationStore.loading).toBe(false);
     });
   });

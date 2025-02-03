@@ -1,5 +1,5 @@
 import { defineStore, type Store, type StoreDefinition } from 'pinia';
-import { isAxiosError } from 'axios';
+import { getResponseErrorCode } from '@/utils/errorHandlers';
 import { ProviderApiFactory, ServiceProviderKategorie, type ProviderApiInterface } from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
 
@@ -65,12 +65,9 @@ export const useServiceProviderStore: StoreDefinition<
         const { data }: { data: ServiceProvider[] } =
           await serviceProviderApi.providerControllerGetAllServiceProviders();
         this.allServiceProviders = data;
-        this.loading = false;
       } catch (error: unknown) {
-        this.errorCode = 'UNSPECIFIED_ERROR';
-        if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
-        }
+        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
+      } finally {
         this.loading = false;
       }
     },
@@ -81,12 +78,9 @@ export const useServiceProviderStore: StoreDefinition<
         const { data }: { data: ServiceProvider[] } =
           await serviceProviderApi.providerControllerGetAvailableServiceProviders();
         this.availableServiceProviders = data;
-        this.loading = false;
       } catch (error: unknown) {
-        this.errorCode = 'UNSPECIFIED_ERROR';
-        if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
-        }
+        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
+      } finally {
         this.loading = false;
       }
     },

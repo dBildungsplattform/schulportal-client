@@ -1,5 +1,6 @@
 import { defineStore, type Store, type StoreDefinition } from 'pinia';
-import { isAxiosError, type AxiosResponse } from 'axios';
+import { type AxiosResponse } from 'axios';
+import { getResponseErrorCode } from '@/utils/errorHandlers';
 import {
   RolleApiFactory,
   RollenArt,
@@ -124,10 +125,7 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
           this.createdRolle.serviceProviders = data;
         }
       } catch (error: unknown) {
-        this.errorCode = 'UNSPECIFIED_ERROR';
-        if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
-        }
+        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
       } finally {
         this.loading = false;
       }
@@ -156,11 +154,7 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
         this.currentRolle = data;
         return data;
       } catch (error: unknown) {
-        /* if an unknown error occurs, set to UNSPECIFIED */
-        this.errorCode = 'UNSPECIFIED_ERROR';
-        if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.i18nKey || 'ROLLE_ERROR';
-        }
+        this.errorCode = getResponseErrorCode(error, 'ROLLE_ERROR');
         return await Promise.reject(this.errorCode);
       } finally {
         this.loading = false;
@@ -178,10 +172,7 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
         this.allRollen = response.data;
         this.totalRollen = +response.headers['x-paging-total'];
       } catch (error: unknown) {
-        this.errorCode = 'UNSPECIFIED_ERROR';
-        if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
-        }
+        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
       } finally {
         this.loading = false;
       }
@@ -196,10 +187,7 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
         this.currentRolle = data;
         return data;
       } catch (error) {
-        this.errorCode = 'UNSPECIFIED_ERROR';
-        if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
-        }
+        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
         return await Promise.reject(this.errorCode);
       } finally {
         this.loading = false;
@@ -230,10 +218,7 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
         );
         this.updatedRolle = data;
       } catch (error) {
-        this.errorCode = 'UNSPECIFIED_ERROR';
-        if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.i18nKey || 'ROLLE_UPDATE_ERROR';
-        }
+        this.errorCode = getResponseErrorCode(error, 'ROLLE_UPDATE_ERROR');
       } finally {
         this.loading = false;
       }
@@ -245,10 +230,7 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
       try {
         await rolleApi.rolleControllerDeleteRolle(rolleId);
       } catch (error) {
-        this.errorCode = 'UNSPECIFIED_ERROR';
-        if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.i18nKey || 'ROLLE_ERROR';
-        }
+        this.errorCode = getResponseErrorCode(error, 'ROLLE_ERROR');
       } finally {
         this.loading = false;
       }

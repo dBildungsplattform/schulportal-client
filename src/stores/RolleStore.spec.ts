@@ -177,6 +177,32 @@ describe('rolleStore', () => {
       expect(rolleStore.loading).toBe(false);
     });
 
+    it('should do nothing if no created rolle exists', async () => {
+      rolleStore.createdRolle = null;
+
+      const mockResponse: ServiceProvider[] = [
+        {
+          id: '1234',
+          name: 'itslearning mock',
+          url: 'example.org/itslearning',
+          target: 'URL',
+          kategorie: 'EMAIL',
+          hasLogo: true,
+          requires2fa: true,
+        },
+      ];
+
+      mockadapter.onPut('/api/rolle/1/serviceProviders').replyOnce(200, mockResponse, {});
+      const updateServiceProviderInRollePromise: Promise<void> = rolleStore.updateServiceProviderInRolle('1', {
+        serviceProviderIds: ['1234'],
+        version: 1,
+      });
+      expect(rolleStore.loading).toBe(true);
+      await updateServiceProviderInRollePromise;
+      expect(rolleStore.createdRolle).toEqual(null);
+      expect(rolleStore.loading).toBe(false);
+    });
+
     it('should handle string error', async () => {
       mockadapter.onPut('/api/rolle/1/serviceProviders').replyOnce(500, 'some mock server error');
       const updateServiceProviderInRollePromise: Promise<void> = rolleStore.updateServiceProviderInRolle('1', {
@@ -311,7 +337,7 @@ describe('rolleStore', () => {
       );
       expect(rolleStore.loading).toBe(true);
       await updateRollePromise;
-      expect(rolleStore.errorCode).toEqual('ROLLE_UPDATE_ERROR');
+      expect(rolleStore.errorCode).toEqual('some mock server error');
       expect(rolleStore.updatedRolle).toEqual(null);
       expect(rolleStore.loading).toBe(false);
     });
@@ -339,7 +365,7 @@ describe('rolleStore', () => {
         const deleteRollePromise: Promise<void> = rolleStore.deleteRolleById('1');
         expect(rolleStore.loading).toBe(true);
         await deleteRollePromise;
-        expect(rolleStore.errorCode).toEqual('ROLLE_ERROR');
+        expect(rolleStore.errorCode).toEqual('some mock server error');
         expect(rolleStore.loading).toBe(false);
       });
     });

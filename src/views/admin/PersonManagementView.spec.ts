@@ -4,7 +4,7 @@ import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
 import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
 import { useRolleStore, type RolleResponse, type RolleStore, type RollenMerkmal } from '@/stores/RolleStore';
 import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
-import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
+import { DOMWrapper, VueWrapper, flushPromises, mount } from '@vue/test-utils';
 import type WrapperLike from '@vue/test-utils/dist/interfaces/wrapperLike';
 import { expect, test, type Mock, type MockInstance } from 'vitest';
 import { nextTick } from 'vue';
@@ -55,6 +55,15 @@ beforeEach(() => {
       kennung: '9356494',
       namensergaenzung: 'Schule',
       kuerzel: 'rsg',
+      typ: 'SCHULE',
+      administriertVon: '1',
+    },
+    {
+      id: '198',
+      name: 'Realschule Randomname',
+      kennung: '13465987',
+      namensergaenzung: 'Schule',
+      kuerzel: 'rsrn',
       typ: 'SCHULE',
       administriertVon: '1',
     },
@@ -205,6 +214,66 @@ describe('PersonManagementView', () => {
     expect(wrapper?.findAll('.v-data-table__tr').length).toBe(2);
   });
 
+  test('it renders person management table with active orga filter', () => {
+    searchFilterStore.selectedOrganisationen = ['9876'];
+    searchFilterStore.selectedRollen = null;
+    searchFilterStore.selectedKlassen = null;
+    expect(wrapper?.getComponent({ name: 'ResultTable' })).toBeTruthy();
+    expect(wrapper?.find('[data-testid="person-table"]').isVisible()).toBe(true);
+    expect(wrapper?.findAll('.v-data-table__tr').length).toBe(2);
+  });
+
+  test('it renders person management table with active rolle filter', () => {
+    searchFilterStore.selectedOrganisationen = null;
+    searchFilterStore.selectedRollen = ['10'];
+    searchFilterStore.selectedKlassen = null;
+    expect(wrapper?.getComponent({ name: 'ResultTable' })).toBeTruthy();
+    expect(wrapper?.find('[data-testid="person-table"]').isVisible()).toBe(true);
+    expect(wrapper?.findAll('.v-data-table__tr').length).toBe(2);
+  });
+
+  test('it autoselects orga if only one is available', async () => {
+    /* set all orgas to 1 */
+    organisationStore.allOrganisationen = [
+      {
+        id: '9876',
+        name: 'Random Schulname Gymnasium',
+        kennung: '9356494',
+        namensergaenzung: 'Schule',
+        kuerzel: 'rsg',
+        typ: 'SCHULE',
+        administriertVon: '1',
+      },
+    ];
+    await flushPromises();
+
+    const schuleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
+
+    expect(schuleAutocomplete?.text()).toContain('9356494 (Random Schulname Gymnasium)');
+
+    /* reset all orgas back to 2 */
+    organisationStore.allOrganisationen = [
+      {
+        id: '9876',
+        name: 'Random Schulname Gymnasium',
+        kennung: '9356494',
+        namensergaenzung: 'Schule',
+        kuerzel: 'rsg',
+        typ: 'SCHULE',
+        administriertVon: '1',
+      },
+      {
+        id: '198',
+        name: 'Realschule Randomname',
+        kennung: '13465987',
+        namensergaenzung: 'Schule',
+        kuerzel: 'rsrn',
+        typ: 'SCHULE',
+        administriertVon: '1',
+      },
+    ];
+  });
+
   test('it reloads data after changing page', async () => {
     const schuleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
     await schuleAutocomplete?.setValue(['9876']);
@@ -254,9 +323,14 @@ describe('PersonManagementView', () => {
     const component: WrapperLike | undefined = wrapper?.findComponent('.v-data-table-footer__items-per-page .v-select');
     await component?.setValue(50);
     expect(wrapper?.find('.v-data-table-footer__items-per-page').text()).toContain('50');
+
+    /* set a limit lower than total persons */
+    personStore.totalPersons = 100;
+    await component?.setValue(30);
+    expect(wrapper?.find('.v-data-table-footer__items-per-page').text()).toContain('30');
   });
 
-  test('it sets filters', async () => {
+  test('it sets and resets filters', async () => {
     const schuleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
     await schuleAutocomplete?.setValue(['9876']);
     await nextTick();
@@ -274,6 +348,13 @@ describe('PersonManagementView', () => {
     await nextTick();
 
     expect(klasseAutocomplete?.text()).toEqual('11b');
+
+    wrapper?.find('[data-testid="reset-filter-button"]').trigger('click');
+    await nextTick();
+
+    expect(schuleAutocomplete?.text()).toBe('');
+    expect(rolleAutocomplete?.text()).toBe('');
+    expect(klasseAutocomplete?.text()).toBe('');
   });
 
   test('it updates Organisation search correctly', async () => {

@@ -165,6 +165,7 @@
             multiple
             :no-data-text="$t('noDataFound')"
             :placeholder="isEditActive ? $t('admin.rolle.selectMerkmale') : '---'"
+            ref="merkmale-select"
             variant="outlined"
             v-bind="selectedMerkmaleProps"
             v-model="selectedMerkmale"
@@ -225,6 +226,7 @@
             multiple
             :no-data-text="$t('noDataFound')"
             :placeholder="isEditActive ? $t('admin.rolle.selectSystemrechte') : '---'"
+            ref="systemrechte-select"
             variant="outlined"
             v-bind="selectedSystemRechteProps"
             v-model="selectedSystemRechte"

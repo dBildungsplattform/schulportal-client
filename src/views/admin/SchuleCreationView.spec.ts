@@ -1,5 +1,5 @@
 import { expect, test, type MockInstance } from 'vitest';
-import { VueWrapper, mount } from '@vue/test-utils';
+import { VueWrapper, flushPromises, mount } from '@vue/test-utils';
 import SchuleCreationView from './SchuleCreationView.vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import routes from '@/router/routes';
@@ -106,8 +106,11 @@ describe('SchuleCreationView', () => {
 
     organisationStore.createdSchule = mockSchule;
 
-    wrapper?.find('[data-testid="schule-creation-form-submit-button"]').trigger('click');
-    await nextTick();
+    wrapper
+      ?.findComponent({ ref: 'schule-creation-form' })
+      .find('[data-testid="schule-creation-form-submit-button"]')
+      .trigger('click');
+    await flushPromises();
 
     expect(wrapper?.find('[data-testid="create-another-schule-button"]').isVisible()).toBe(true);
 
@@ -117,10 +120,29 @@ describe('SchuleCreationView', () => {
     expect(organisationStore.createdSchule).toBe(null);
   });
 
+  test('it fills form and navigates to trigger dirty prompt', async () => {
+    const dienststellennummerInput: VueWrapper | undefined = wrapper?.findComponent({
+      ref: 'dienststellennummer-input',
+    });
+    await dienststellennummerInput?.setValue('9356494');
+    await nextTick();
+
+    const schulnameInput: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schulname-input' });
+    await schulnameInput?.setValue('Random Schulname Gymnasium');
+    await nextTick();
+
+    wrapper?.find('[data-testid="close-layout-card-button"]').trigger('click');
+    await nextTick();
+
+    await document.querySelector('[data-testid="confirm-unsaved-changes-button"]');
+  });
+
   test('it shows error message', async () => {
     organisationStore.errorCode = 'NAME_REQUIRED_FOR_SCHULE';
     await nextTick();
     expect(wrapper?.find('[data-testid="alert-title"]').isVisible()).toBe(true);
+    wrapper?.find('[data-testid="alert-button"]').trigger('click');
+    await nextTick();
   });
 
   test('shows error message if REQUIRED_STEP_UP_LEVEL_NOT_MET error is present and click close button', async () => {

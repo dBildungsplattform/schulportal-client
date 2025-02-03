@@ -115,10 +115,10 @@
   }
 
   async function navigateToRolleManagement(): Promise<void> {
-    formContext.resetForm();
     await router.push({ name: 'rolle-management' }).then(() => {
       router.go(0);
     });
+    formContext.resetForm();
     rolleStore.createdRolle = null;
   }
 

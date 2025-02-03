@@ -1,5 +1,6 @@
 import { defineStore, type Store, type StoreDefinition } from 'pinia';
-import { isAxiosError, type AxiosResponse } from 'axios';
+import { type AxiosResponse } from 'axios';
+import { getResponseErrorCode } from '@/utils/errorHandlers';
 import {
   DbiamPersonenuebersichtApiFactory,
   OrganisationsTyp,
@@ -22,7 +23,7 @@ import {
 } from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
 import { type DbiamPersonenkontextBodyParams, type Zuordnung } from './PersonenkontextStore';
-import { formatDateDiggitsToGermanDate } from '@/utils/date';
+import { formatDateDigitsToGermanDate } from '@/utils/date';
 
 const personenApi: PersonenApiInterface = PersonenApiFactory(undefined, '', axiosApiInstance);
 const personenFrontendApi: PersonenFrontendApiInterface = PersonenFrontendApiFactory(undefined, '', axiosApiInstance);
@@ -138,7 +139,7 @@ export function parseUserLock(unparsedArray: object[]): UserLock[] {
       }
       if (LockKeys.CreatedAt in unparsed) {
         result.created_at = '' + unparsed[LockKeys.CreatedAt];
-        result.created_at = formatDateDiggitsToGermanDate(new Date(result.created_at));
+        result.created_at = formatDateDigitsToGermanDate(new Date(result.created_at));
       }
       if (LockKeys.LockedUntil in unparsed) {
         result.locked_until = '' + unparsed[LockKeys.LockedUntil];
@@ -149,7 +150,7 @@ export function parseUserLock(unparsedArray: object[]): UserLock[] {
         if (utcDate.getTimezoneOffset() >= -120) {
           utcDate.setDate(utcDate.getDate() - 1);
         }
-        result.locked_until = formatDateDiggitsToGermanDate(utcDate);
+        result.locked_until = formatDateDigitsToGermanDate(utcDate);
       }
       result.lock_occasion = '' + unparsed[LockKeys.LockOccasion];
     } else if (
@@ -345,10 +346,7 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
             };
           });
       } catch (error: unknown) {
-        this.errorCode = 'UNSPECIFIED_ERROR';
-        if (isAxiosError(error)) {
-          this.errorCode = error.response?.data?.code || 'UNSPECIFIED_ERROR';
-        }
+        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
       } finally {
         this.loading = false;
       }
@@ -363,10 +361,7 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
         this.currentPerson = mapPersonendatensatzResponseToPersonendatensatz(data);
         return this.currentPerson;
       } catch (error) {
-        this.errorCode = 'UNSPECIFIED_ERROR';
-        if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
-        }
+        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
         return await Promise.reject(this.errorCode);
       } finally {
         this.loading = false;
@@ -379,10 +374,7 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
         const { data }: { data: string } = await personenApi.personControllerResetPasswordByPersonId(personId);
         this.newPassword = data;
       } catch (error: unknown) {
-        this.errorCode = 'UNSPECIFIED_ERROR';
-        if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
-        }
+        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
       } finally {
         this.loading = false;
       }
@@ -396,10 +388,7 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
         else data = (await personenApi.personControllerResetUEMPassword()).data;
         this.newDevicePassword = data;
       } catch (error: unknown) {
-        this.errorCode = 'UNSPECIFIED_ERROR';
-        if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.i18nKey || 'UNSPECIFIED_ERROR';
-        }
+        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
       } finally {
         this.loading = false;
       }
@@ -410,10 +399,7 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
       try {
         await personenApi.personControllerDeletePersonById(personId);
       } catch (error: unknown) {
-        this.errorCode = 'UNSPECIFIED_ERROR';
-        if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
-        }
+        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
         return await Promise.reject(this.errorCode);
       } finally {
         this.loading = false;
@@ -426,10 +412,7 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
         await personenApi.personControllerLockPerson(personId, bodyParams);
         await this.getPersonById(personId);
       } catch (error: unknown) {
-        this.errorCode = 'UNSPECIFIED_ERROR';
-        if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
-        }
+        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
         return await Promise.reject(this.errorCode);
       } finally {
         this.loading = false;
@@ -441,10 +424,7 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
       try {
         await personenApi.personControllerSyncPerson(personId);
       } catch (error: unknown) {
-        this.errorCode = 'UNSPECIFIED_ERROR';
-        if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.i18nKey || 'UNSPECIFIED_ERROR';
-        }
+        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
       } finally {
         this.loading = false;
       }
@@ -457,10 +437,7 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
           await personenuebersichtApi.dBiamPersonenuebersichtControllerFindPersonenuebersichtenByPerson(personId);
         this.personenuebersicht = data;
       } catch (error: unknown) {
-        this.errorCode = 'UNSPECIFIED_ERROR';
-        if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
-        }
+        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
       } finally {
         this.loading = false;
       }
@@ -488,10 +465,7 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
 
         this.patchedPerson = data;
       } catch (error: unknown) {
-        this.errorCode = 'UNSPECIFIED_ERROR';
-        if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.i18nKey || 'ERROR_LOADING_USER';
-        }
+        this.errorCode = getResponseErrorCode(error, 'ERROR_LOADING_USER');
       } finally {
         this.loading = false;
       }
