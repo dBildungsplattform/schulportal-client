@@ -2720,7 +2720,8 @@ export const RollenSystemRecht = {
     CronDurchfuehren: 'CRON_DURCHFUEHREN',
     PersonenAnlegen: 'PERSONEN_ANLEGEN',
     ImportDurchfuehren: 'IMPORT_DURCHFUEHREN',
-    PersonenLesen: 'PERSONEN_LESEN'
+    PersonenLesen: 'PERSONEN_LESEN',
+    BulkVerwalten: 'BULK_VERWALTEN'
 } as const;
 
 export type RollenSystemRecht = typeof RollenSystemRecht[keyof typeof RollenSystemRecht];

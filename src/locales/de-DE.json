@@ -19,12 +19,13 @@
       },
       "selectBefristung": "Befristung auswählen",
       "unlimited": "Unbefristet",
+      "unlimitedLower": "unbefristet",
       "limited": "Befristet",
-      "unlimitedSuccessTemplate": "unbefristet",
       "unlimitedInactive": "Diese Option kann für Rollen mit Befristungspflicht nicht ausgewählt werden.",
       "limitedUntil": "befristet bis",
       "untilEndOfSchoolYear": "Bis Schuljahresende"
     },
+    "doNotCloseBrowserNotice": "Bitte den Browser während der Bearbeitung nicht schließen!",
     "followingDataCreated": "Folgende Daten wurden gespeichert:",
     "headline": "Administrationsbereich",
     "import": {
@@ -160,6 +161,7 @@
       "changePassword": "Passwort ändern",
       "copyPasswordError": "Passwort konnte nicht in die Zwischenablage kopiert werden",
       "copyPasswordSuccess": "Passwort in Zwischenablage kopiert",
+      "choosePersonFirst": "Bitte erst einen Benutzer auswählen.",
       "create": "Benutzer anlegen",
       "createAnother": "Weiteren Benutzer anlegen",
       "createNew": "Neue Benutzer anlegen",
@@ -383,7 +385,8 @@
           "KLASSEN_VERWALTEN": "Darf Klassen verwalten",
           "SCHULTRAEGER_VERWALTEN": "Darf Schulträger verwalten",
           "PERSON_SYNCHRONISIEREN": "Darf Benutzer synchronisieren",
-          "PERSONEN_ANLEGEN": "Darf Benutzer anlegen"
+          "PERSONEN_ANLEGEN": "Darf Benutzer anlegen",
+          "BULK_VERWALTEN": "Darf Mehrfachbearbeitung ausführen"
         },
         "rollenarten": {
           "LERN": "Lern",
@@ -411,6 +414,7 @@
       "rollenSelected": "{count} Rollen ausgewählt",
       "rolleAddedSuccessfully": "Die Rolle wurde erfolgreich hinzugefügt.",
       "rolleUpdatedSuccessfully": "Die Rolle wurde erfolgreich geändert.",
+      "rollenAssignedSuccessfully": "Die Rollen wurden erfolgreich zugeordnet.",
       "rules": {
         "rolle": {
           "required": "Die Rolle muss ausgewählt werden."
@@ -648,7 +652,11 @@
     "willBeCreated": "wird hinzugefügt",
     "willBeRemoved": "wird entfernt",
     "zuordnungen": "Schulzuordnung(en)",
-    "zuordnung": "Schulzuordnung"
+    "zuordnung": "Schulzuordnung",
+    "changeBefristung": "Befristung ändern",
+    "changeBefristungConfirmation": "Möchten Sie die Befristung wirklich von {oldBefristung} in {newBefristung} ändern?",
+    "changeBefristungSuccess": "Die Befristung wurde erfolgreich geändert.",
+    "changeBefristungDisabledDescription": "Bitte wählen Sie eine neue Befristung aus."
   },
   "profile": {
     "personalData": "Persönliche Daten",
@@ -685,6 +693,7 @@
     "limitedUntil": "Befristet bis"
   },
   "save": "Speichern",
+  "selected": "ausgewählt",
   "since": "Seit",
   "refreshData": "Daten aktualisieren",
   "resetFilter": "Filter zurücksetzen",
