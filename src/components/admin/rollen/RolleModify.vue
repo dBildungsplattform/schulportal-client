@@ -171,7 +171,7 @@
   >
     <LayoutCard
       data-testid="layout-card"
-      :closable="true"
+      :closable="false"
       :header="$t('admin.rolle.assignRolle')"
       @onCloseClicked="closeModifyRolleDeleteDialog()"
     >
