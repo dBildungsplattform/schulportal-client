@@ -80,13 +80,14 @@ export default defineConfig({
         'src/main.ts',
       ],
       thresholds: {
-        // TODO: activate thresholds for commented dirs
-        // 'src/**/**.*': {
-        //   statements: 100,
-        //   functions: 100,
-        //   branches: 100,
-        //   lines: 100,
-        // },
+        // TODO: reset thresholds to 100,
+        // so our base coverage will be at 100% and exceptions are defined below
+        'src/**/**.*': {
+          statements: 60,
+          functions: 60,
+          branches: 60,
+          lines: 60,
+        },
         // TODO: reset components threshold to 80 when thresholds can be reached
         'src/components/**/**.vue': {
           statements: 75,
@@ -94,31 +95,35 @@ export default defineConfig({
           branches: 75,
           lines: 75,
         },
-        // 'src/layouts/**/**.vue': {
-        //   statements: 80,
-        //   functions: 80,
-        //   branches: 80,
-        //   lines: 80,
-        // },
+        // TODO: reset thresholds to 80 and write tests for layouts
+        // TODO: before we can increase the coverage threshold for layouts, we have to fix the broken layout that result from fixing the tests
+        // for more info, see layout specs
+        'src/layouts/**/**.vue': {
+          statements: 0,
+          functions: 0,
+          branches: 80,
+          lines: 0,
+        },
+        // TODO: delete stores dir block from thresholds when first block is at 100
         'src/stores/**/**.ts': {
           statements: 100,
           functions: 100,
           // TODO: reset branches threshold to 100 when store error handler is implemented
-          // delete stores dir block from thresholds when first block is uncommented
           branches: 80,
           lines: 100,
         },
-        // 'src/utils/**/**.ts': {
-        //   statements: 80,
-        //   functions: 80,
-        //   branches: 80,
-        //   lines: 80,
-        // },
+        // TODO: reset thresholds to 80 and write tests for utils
+        'src/utils/**/**.ts': {
+          statements: 60,
+          functions: 60,
+          branches: 60,
+          lines: 60,
+        },
         'src/views/**/**.vue': {
           // TODO: reset thresholds to 80 and write tests for views
           statements: 60,
-          functions: 50,
-          branches: 45,
+          functions: 60,
+          branches: 60,
           lines: 60,
         },
       },

@@ -504,8 +504,9 @@
         >
           <v-btn
             class="px-0 reset-filter"
-            :disabled="!filterOrSearchActive"
             @click="resetSearchAndFilter()"
+            data-testid="reset-filter-button"
+            :disabled="!filterOrSearchActive"
             size="x-small"
             variant="text"
             width="auto"

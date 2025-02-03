@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import { usePersonStore, type CreatePersonBodyParams, type PersonStore } from '@/stores/PersonStore';
-  import { RollenArt, RollenMerkmal } from '@/stores/RolleStore';
+  import { RollenArt } from '@/stores/RolleStore';
   import { type ComputedRef, computed, onMounted, onUnmounted, type Ref, ref, watch } from 'vue';
   import {
     onBeforeRouteLeave,
@@ -35,6 +35,7 @@
   import { type TranslatedObject } from '@/types.d';
   import { getNextSchuljahresende, formatDateToISO, notInPast, isValidDate } from '@/utils/date';
   import { isBefristungspflichtRolle, useBefristungUtils, type BefristungUtilsType } from '@/utils/befristung';
+  import { isKopersRolle } from '@/utils/validationPersonenkontext';
 
   const router: Router = useRouter();
   const personStore: PersonStore = usePersonStore();
@@ -55,13 +56,6 @@
   const selectedOrgaCache: Ref<string | undefined> = ref(undefined);
   const selectedKlasseCache: Ref<string | undefined> = ref(undefined);
   const selectedRolleCache: Ref<string | undefined> = ref(undefined);
-
-  function isKopersRolle(selectedRolleId: string | undefined): boolean {
-    const rolle: TranslatedRolleWithAttrs | undefined = rollen.value?.find(
-      (r: TranslatedRolleWithAttrs) => r.value === selectedRolleId,
-    );
-    return !!rolle && !!rolle.merkmale && rolle.merkmale.has(RollenMerkmal.KopersPflicht);
-  }
 
   // Define a method to check if the selected Rolle is of type "Lern"
   function isLernRolle(selectedRolleId: string): boolean {
@@ -167,16 +161,21 @@
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = formContext.defineField('selectedBefristungOption', vuetifyConfig);
 
-  const { handleBefristungUpdate, handleBefristungOptionUpdate, setupWatchers }: BefristungUtilsType =
-    useBefristungUtils({
-      formContext,
-      selectedBefristung,
-      selectedBefristungOption,
-      calculatedBefristung,
-      selectedRolle,
-    });
+  const {
+    handleBefristungUpdate,
+    handleBefristungOptionUpdate,
+    setupWatchers,
+    setupRolleWatcher,
+  }: BefristungUtilsType = useBefristungUtils({
+    formContext,
+    selectedBefristung,
+    selectedBefristungOption,
+    calculatedBefristung,
+    selectedRolle,
+  });
 
   setupWatchers();
+  setupRolleWatcher();
 
   const organisationen: ComputedRef<TranslatedObject[] | undefined> = useOrganisationen();
 
@@ -228,7 +227,7 @@
     const ISOFormattedDate: string | undefined = schuleZuordnungFromCreatedKontext.value?.befristung;
 
     if (!ISOFormattedDate) {
-      return t('admin.befristung.unlimitedSuccessTemplate');
+      return t('admin.befristung.unlimitedLower');
     }
 
     // Parse the UTC date
@@ -536,6 +535,7 @@
               </FormRow>
               <KopersInput
                 v-if="isKopersRolle(selectedRolle) && selectedOrganisation"
+                ref="kopers-input"
                 :hasNoKopersNr="hasNoKopersNr"
                 v-model:selectedKopersNr="selectedKopersNr"
                 :selectedKopersNrProps="selectedKopersNrProps"

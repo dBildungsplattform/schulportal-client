@@ -445,9 +445,16 @@ describe('PersonStore', () => {
         items: mockPersons,
       };
       mockadapter.onGet('/api/personen-frontend').replyOnce(200, mockPersonsResponse, {});
+
+      const personIds: Array<string> = mockPersons.map((person: PersonendatensatzResponse) => person.person.id);
+      mockadapter
+        .onPost('/api/dbiam/personenuebersicht', { personIds })
+        .replyOnce(500, { code: 'some mock server error' });
+
       const getAllPersonsPromise: Promise<void> = personStore.getAllPersons({});
       expect(personStore.loading).toBe(true);
       await getAllPersonsPromise;
+      expect(personStore.errorCode).toEqual('some mock server error');
       expect(personStore.loading).toBe(false);
     });
 
@@ -483,11 +490,12 @@ describe('PersonStore', () => {
       mockadapter.onGet('/api/personen-frontend').replyOnce(200, mockPersonsResponse);
 
       const personIds: Array<string> = mockPersons.map((person: PersonendatensatzResponse) => person.person.id);
-      mockadapter.onPost('/api/dbiam/personenuebersicht', { personIds }).replyOnce(500, 'Some error occurred');
+      mockadapter.onPost('/api/dbiam/personenuebersicht', { personIds }).replyOnce(500, 'some mock server error');
 
       const getAllPersonsPromise: Promise<void> = personStore.getAllPersons({});
       expect(personStore.loading).toBe(true);
       await getAllPersonsPromise;
+      expect(personStore.errorCode).toEqual('UNSPECIFIED_ERROR');
       expect(personStore.loading).toBe(false);
     });
   });
@@ -800,7 +808,7 @@ describe('PersonStore', () => {
 
       await personStore.syncPersonById(personId);
 
-      expect(personStore.errorCode).toEqual('UNSPECIFIED_ERROR');
+      expect(personStore.errorCode).toEqual('some mock server error');
       expect(personStore.loading).toBe(false);
     });
   });

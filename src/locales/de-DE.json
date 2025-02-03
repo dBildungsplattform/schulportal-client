@@ -19,8 +19,8 @@
       },
       "selectBefristung": "Befristung auswählen",
       "unlimited": "Unbefristet",
+      "unlimitedLower": "unbefristet",
       "limited": "Befristet",
-      "unlimitedSuccessTemplate": "unbefristet",
       "unlimitedInactive": "Diese Option kann für Rollen mit Befristungspflicht nicht ausgewählt werden.",
       "limitedUntil": "befristet bis",
       "untilEndOfSchoolYear": "Bis Schuljahresende"
@@ -281,6 +281,7 @@
           "SERIENNUMMER_NICHT_GEFUNDEN": "Die eingegebene Seriennummer konnte leider nicht gefunden werden. Vergewissern Sie sich bitte, dass Sie eine korrekte Seriennummer eingegeben haben.",
           "SERIENNUMMER_IN_VERWENDUNG": "Die eingegebene Seriennummer ist bereits einem anderen Benutzer zugeordnet. Bitte überprüfen Sie Ihre Eingabe und versuchen Sie es erneut.",
           "OTP_NICHT_GUELTIG": "Ungültiges Einmalpasswort. Bitte versuchen Sie es erneut oder wenden Sie sich an Ihre schulischen Administratorinnen und Administratoren.",
+          "PI_UNAVAILABLE_ERROR": "Leider konnte aus technischen Gründen kein Hardware-Token zugeordnet werden. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut. Sollte das Problem weiterhin bestehen, geben Sie dazu bitte ein Ticket über den {0} auf.",
           "HARDWARE_TOKEN_SERVICE_FEHLER": "Leider konnte aus technischen Gründen kein Hardware-Token zugeordnet werden. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut. Sollte das Problem weiterhin bestehen, geben Sie dazu bitte ein Ticket über den {0} auf.",
           "UNKNOWN_ERROR": "Ein unbekannter Fehler ist aufgetreten.",
           "TOKEN_RESET_ERROR": "Leider konnte der Token aus technischen Gründen nicht zurückgesetzt werden. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut. Sollte das Problem weiterhin bestehen, geben Sie dazu bitte ein Ticket über den {0} auf.",
@@ -653,7 +654,11 @@
     "willBeCreated": "wird hinzugefügt",
     "willBeRemoved": "wird entfernt",
     "zuordnungen": "Schulzuordnung(en)",
-    "zuordnung": "Schulzuordnung"
+    "zuordnung": "Schulzuordnung",
+    "changeBefristung": "Befristung ändern",
+    "changeBefristungConfirmation": "Möchten Sie die Befristung wirklich von {oldBefristung} in {newBefristung} ändern?",
+    "changeBefristungSuccess": "Die Befristung wurde erfolgreich geändert.",
+    "changeBefristungDisabledDescription": "Bitte wählen Sie eine neue Befristung aus."
   },
   "profile": {
     "personalData": "Persönliche Daten",
