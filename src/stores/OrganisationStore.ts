@@ -57,7 +57,11 @@ export type SchuleTableItem = {
 type OrganisationState = {
   allOrganisationen: Array<Organisation>;
   allKlassen: Array<Organisation>;
-  filteredSchulen: Array<Organisation>;
+  filteredSchulen: {
+    total: number;
+    schulen: Array<Organisation>;
+    loading: boolean;
+  };
   allSchulen: Array<Organisation>;
   currentOrganisation: Organisation | null;
   currentKlasse: Organisation | null;
@@ -75,7 +79,6 @@ type OrganisationState = {
   errorCode: string;
   loading: boolean;
   loadingKlassen: boolean;
-  loadingSchulen: boolean;
   parentOrganisationen: Array<Organisation>;
   schultraeger: Array<Organisation>;
   activatedItslearningOrganisation: Organisation | null;
@@ -132,7 +135,11 @@ export const useOrganisationStore: StoreDefinition<
     return {
       allOrganisationen: [],
       allKlassen: [],
-      filteredSchulen: [],
+      filteredSchulen: {
+        total: 0,
+        schulen: [],
+        loading: false,
+      },
       allSchulen: [],
       currentOrganisation: null,
       currentKlasse: null,
@@ -150,7 +157,6 @@ export const useOrganisationStore: StoreDefinition<
       errorCode: '',
       loading: false,
       loadingKlassen: false,
-      loadingSchulen: false,
       parentOrganisationen: [],
       schultraeger: [],
       activatedItslearningOrganisation: null,
@@ -243,7 +249,7 @@ export const useOrganisationStore: StoreDefinition<
     },
 
     async getFilteredSchulen(filter?: OrganisationenFilter) {
-      this.loadingSchulen = true;
+      this.filteredSchulen.loading = true;
       try {
         const response: AxiosResponse<Organisation[]> = await organisationApi.organisationControllerFindOrganizations(
           undefined,
@@ -257,7 +263,8 @@ export const useOrganisationStore: StoreDefinition<
           filter?.administriertVon,
           filter?.organisationIds,
         );
-        this.filteredSchulen = response.data;
+        this.filteredSchulen.total = +response.headers['x-paging-total'];
+        this.filteredSchulen.schulen = response.data;
       } catch (error: unknown) {
         this.errorCode = 'UNSPECIFIED_ERROR';
         if (isAxiosError(error)) {
@@ -265,7 +272,7 @@ export const useOrganisationStore: StoreDefinition<
         }
         return await Promise.reject(this.errorCode);
       } finally {
-        this.loadingSchulen = false;
+        this.filteredSchulen.loading = false;
       }
     },
 

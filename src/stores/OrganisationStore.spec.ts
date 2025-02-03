@@ -584,10 +584,11 @@ describe('OrganisationStore', () => {
           searchString: 'astrid',
         });
 
-        expect(organisationStore.loadingSchulen).toBe(true);
+        expect(organisationStore.filteredSchulen.loading).toBe(true);
         await getFilteredSchulenPromise;
-        expect(organisationStore.filteredSchulen).toEqual(mockResponse);
-        expect(organisationStore.loadingSchulen).toBe(false);
+        expect(organisationStore.filteredSchulen.schulen).toEqual(mockResponse);
+        expect(organisationStore.filteredSchulen.total).toEqual(1);
+        expect(organisationStore.filteredSchulen.loading).toBe(false);
       });
 
       it('should handle string error', async () => {
@@ -598,10 +599,10 @@ describe('OrganisationStore', () => {
           searchString: 'astrid',
         });
 
-        expect(organisationStore.loadingSchulen).toBe(true);
+        expect(organisationStore.filteredSchulen.loading).toBe(true);
         await rejects(getFilteredSchulenPromise);
         expect(organisationStore.errorCode).toEqual('UNSPECIFIED_ERROR');
-        expect(organisationStore.loadingSchulen).toBe(false);
+        expect(organisationStore.filteredSchulen.loading).toBe(false);
       });
 
       it('should handle error code', async () => {
@@ -612,10 +613,10 @@ describe('OrganisationStore', () => {
           searchString: 'astrid',
         });
 
-        expect(organisationStore.loadingSchulen).toBe(true);
+        expect(organisationStore.filteredSchulen.loading).toBe(true);
         await rejects(getFilteredSchulenPromise);
         expect(organisationStore.errorCode).toEqual('some mock server error');
-        expect(organisationStore.loadingSchulen).toBe(false);
+        expect(organisationStore.filteredSchulen.loading).toBe(false);
       });
     });
 

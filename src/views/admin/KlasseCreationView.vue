@@ -55,7 +55,7 @@
   ] = defineField('selectedKlassenname', vuetifyConfig);
 
   const filteredSchulen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
-    return organisationStore.filteredSchulen
+    return organisationStore.filteredSchulen.schulen
       .slice(0, 25)
       .map((org: Organisation) => ({
         value: org.id,
@@ -189,7 +189,7 @@
           :errorCode="organisationStore.errorCode"
           :schulen="filteredSchulen"
           :isEditActive="true"
-          :isLoading="organisationStore.loadingSchulen"
+          :isLoading="organisationStore.filteredSchulen.loading"
           :readonly="false"
           :selectedSchuleProps="selectedSchuleProps"
           :selectedKlassennameProps="selectedKlassennameProps"
