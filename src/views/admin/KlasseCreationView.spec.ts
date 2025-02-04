@@ -1,7 +1,7 @@
 import type { OrganisationResponse } from '@/api-client/generated';
 import routes from '@/router/routes';
 import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
-import { VueWrapper, mount } from '@vue/test-utils';
+import { VueWrapper, flushPromises, mount } from '@vue/test-utils';
 import { beforeEach, describe, expect, test, vi, type MockInstance } from 'vitest';
 import { nextTick } from 'vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
@@ -111,7 +111,7 @@ describe('KlasseCreationView', () => {
     expect(wrapper?.find('[data-testid="create-another-klasse-button"]').isVisible()).toBe(true);
 
     wrapper?.find('[data-testid="create-another-klasse-button"]').trigger('click');
-    await vi.waitUntil(() => organisationStore.createdKlasse === null);
+    await flushPromises();
 
     expect(organisationStore.createdKlasse).toBe(null);
   });

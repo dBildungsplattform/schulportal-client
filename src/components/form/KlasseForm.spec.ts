@@ -97,7 +97,7 @@ describe('Schule searchInput', () => {
       expect(inputElement!.hasAttribute('disabled')).toBeTruthy();
     });
 
-    test('it disables autoselect if more schulen are loaded', async () => {
+    test('it enables input if more schulen are loaded', async () => {
       let inputElement: Element | null = document.querySelector('#schule-select');
       await nextTick();
       expect(inputElement).toBeDefined();
