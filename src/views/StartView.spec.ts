@@ -21,16 +21,25 @@ let personInfoStore: PersonInfoStore;
 
 const mockProviders: Array<ServiceProvider> = [
   {
-    id: '1',
+    id: '2',
     name: 'Spongebob Squarepants',
     target: 'URL',
     url: 'https://de.wikipedia.org/wiki/SpongeBob_Schwammkopf',
     kategorie: 'EMAIL',
     hasLogo: false,
-    requires2fa: true,
+    requires2fa: false,
   },
   {
-    id: '2',
+    id: '3',
+    name: 'Not Squarepants',
+    target: 'URL',
+    url: 'https://de.wikipedia.org/wiki/SpongeBob_Schwammkopf',
+    kategorie: 'EMAIL',
+    hasLogo: false,
+    requires2fa: false,
+  },
+  {
+    id: '1',
     name: 'Schulportal-Administration',
     target: 'SCHULPORTAL_ADMINISTRATION',
     url: '',
@@ -170,7 +179,7 @@ describe('StartView', () => {
     authStore.hasPersonenverwaltungPermission = true;
     await nextTick();
 
-    const adminCard: WrapperLike | undefined = wrapper?.findComponent('[data-testid="service-provider-card-2"]');
+    const adminCard: WrapperLike | undefined = wrapper?.findComponent('[data-testid="service-provider-card-1"]');
 
     expect(adminCard?.isVisible()).toBe(true);
     expect(adminCard?.attributes('href')).toEqual('/admin/personen');
@@ -180,7 +189,7 @@ describe('StartView', () => {
     authStore.hasSchulverwaltungPermission = true;
     await nextTick();
 
-    const adminCard: WrapperLike | undefined = wrapper?.findComponent('[data-testid="service-provider-card-2"]');
+    const adminCard: WrapperLike | undefined = wrapper?.findComponent('[data-testid="service-provider-card-1"]');
 
     expect(adminCard?.isVisible()).toBe(true);
     expect(adminCard?.attributes('href')).toEqual('/admin/schulen');
@@ -190,7 +199,7 @@ describe('StartView', () => {
     authStore.hasRollenverwaltungPermission = true;
     await nextTick();
 
-    const adminCard: WrapperLike | undefined = wrapper?.findComponent('[data-testid="service-provider-card-2"]');
+    const adminCard: WrapperLike | undefined = wrapper?.findComponent('[data-testid="service-provider-card-1"]');
 
     expect(adminCard?.isVisible()).toBe(true);
     expect(adminCard?.attributes('href')).toEqual('/admin/rollen');
@@ -200,7 +209,7 @@ describe('StartView', () => {
     authStore.hasKlassenverwaltungPermission = true;
     await nextTick();
 
-    const adminCard: WrapperLike | undefined = wrapper?.findComponent('[data-testid="service-provider-card-2"]');
+    const adminCard: WrapperLike | undefined = wrapper?.findComponent('[data-testid="service-provider-card-1"]');
 
     expect(adminCard?.isVisible()).toBe(true);
     expect(adminCard?.attributes('href')).toEqual('/admin/klassen');
@@ -222,5 +231,15 @@ describe('StartView', () => {
     banner?.find('[data-testid="banner-close-icon"]').trigger('click');
     await nextTick();
     expect(banner?.emitted('dismissBanner')).toBeTruthy();
+  });
+
+  test('filterSortProviders sorts service providers alphabetically', () => {
+    serviceProviderStore.availableServiceProviders = mockProviders;
+
+    expect(serviceProviderStore.availableServiceProviders.map((p) => p.name)).toEqual([
+      'Spongebob Squarepants',
+      'Not Squarepants',
+      'Schulportal-Administration',
+    ]);
   });
 });
