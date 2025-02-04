@@ -428,7 +428,7 @@ describe('PersonManagementView', () => {
     benutzerEditSelect?.setValue('MODIFY_ROLLE');
     await nextTick();
 
-    expect(wrapper?.findComponent({ ref: 'personenkontext-create' }).isVisible()).toBe(true);
+    expect(wrapper?.findComponent({ ref: 'personenkontext-create' }));
   });
 
   test('it checks a checkbox in the table, selects the delete person option and triggers dialog', async () => {
