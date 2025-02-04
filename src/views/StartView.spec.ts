@@ -236,7 +236,7 @@ describe('StartView', () => {
   test('filterSortProviders sorts service providers alphabetically', () => {
     serviceProviderStore.availableServiceProviders = mockProviders;
 
-    expect(serviceProviderStore.availableServiceProviders.map((p) => p.name)).toEqual([
+    expect(serviceProviderStore.availableServiceProviders.map((p: ServiceProvider) => p.name)).toEqual([
       'Spongebob Squarepants',
       'Not Squarepants',
       'Schulportal-Administration',
