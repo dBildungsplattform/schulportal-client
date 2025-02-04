@@ -41,9 +41,13 @@
   const selectedKlassenname: ModelRef<string | undefined, string> = defineModel('selectedKlassenname');
 
   // Watcher to auto-select if there is only one schule
-  watch(hasAutoselectedSchule, (newValue: boolean) => {
-    selectedSchuleId.value = newValue ? organisationStore.allSchulen[0]?.id : undefined;
-  });
+  watch(
+    hasAutoselectedSchule,
+    (newValue: boolean) => {
+      selectedSchuleId.value = newValue ? organisationStore.allSchulen[0]?.id : undefined;
+    },
+    { immediate: true },
+  );
 
   // Watcher to detect when the search input for Organisationen is triggered.
   watch(searchInputSchule, async (newValue: string | undefined) => {

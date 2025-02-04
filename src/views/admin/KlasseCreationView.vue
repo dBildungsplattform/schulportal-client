@@ -86,9 +86,15 @@
   }
 
   async function initStores(): Promise<void> {
+    // make sure we can determine if autoselection is required
+    organisationStore.allSchulen = [];
     await Promise.all([
-      // make sure we can actually determine if autoselection is required
-      organisationStore.getAllOrganisationen({ limit: 25, includeTyp: OrganisationsTyp.Schule }),
+      organisationStore.getAllOrganisationen({
+        limit: 2,
+        includeTyp: OrganisationsTyp.Schule,
+        systemrechte: [RollenSystemRecht.KlassenVerwalten],
+      }),
+      // initial options for autocomplete
       organisationStore.getFilteredSchulen({
         includeTyp: OrganisationsTyp.Schule,
         systemrechte: [RollenSystemRecht.KlassenVerwalten],
