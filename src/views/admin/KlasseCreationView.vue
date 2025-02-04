@@ -13,7 +13,7 @@
   import { type TranslatedObject } from '@/types.d';
   import { getValidationSchema, getVuetifyConfig } from '@/utils/validationKlasse';
   import { useForm, type BaseFieldProps, type TypedSchema } from 'vee-validate';
-  import { computed, onMounted, onUnmounted, ref, type ComputedRef, type Ref } from 'vue';
+  import { computed, onMounted, onUnmounted, ref, watch, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import {
     onBeforeRouteLeave,
@@ -27,7 +27,7 @@
   const router: Router = useRouter();
   const organisationStore: OrganisationStore = useOrganisationStore();
 
-  const hasAutoselectedSchule: Ref<boolean> = ref(false);
+  const hasAutoselectedSchule: ComputedRef<boolean> = computed(() => organisationStore.autoselectedSchule !== null);
 
   const validationSchema: TypedSchema = getValidationSchema(t);
 
@@ -151,6 +151,11 @@
       selectedSchule.value,
     );
     resetForm();
+  });
+
+  watch(organisationStore.schulenFilter.selectedItems, (newSelection: Array<Organisation>) => {
+    if (newSelection.length === 1) selectedSchule.value = newSelection[0]!.id;
+    else selectedSchule.value = '';
   });
 
   onMounted(async () => {

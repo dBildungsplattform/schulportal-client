@@ -1,21 +1,11 @@
 <script setup lang="ts">
   import FormRow from '@/components/form/FormRow.vue';
   import FormWrapper from '@/components/form/FormWrapper.vue';
-  import {
-    OrganisationsTyp,
-    useOrganisationStore,
-    type OrganisationenFilter,
-    type OrganisationStore,
-  } from '@/stores/OrganisationStore';
+  import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
   import { RollenSystemRecht } from '@/stores/RolleStore';
-  import type { TranslatedObject } from '@/types';
   import { type BaseFieldProps } from 'vee-validate';
-  import { computed, defineProps, ref, watch, type ComputedRef, type ModelRef, type Ref } from 'vue';
-
-  const hasAutoselectedSchule: Ref<boolean> = ref(false);
-  const searchInputSchule: Ref<string> = ref('');
-  const timerId: Ref<ReturnType<typeof setTimeout> | undefined> = ref<ReturnType<typeof setTimeout>>();
-  let isSearching: boolean = false;
+  import { defineProps, watch, type ModelRef } from 'vue';
+  import SchulenFilter from '../filter/SchulenFilter.vue';
 
   const organisationStore: OrganisationStore = useOrganisationStore();
 
@@ -39,44 +29,14 @@
   const selectedSchuleId: ModelRef<string | undefined, string> = defineModel('selectedSchule');
   const selectedKlassenname: ModelRef<string | undefined, string> = defineModel('selectedKlassenname');
 
-  // Watcher for schulen to auto-select if there is only one
   watch(
-    () => props.schulen,
-    (newSchulen: TranslatedObject[] | undefined) => {
-      if (!isSearching && newSchulen && newSchulen.length === 1) {
-        hasAutoselectedSchule.value = true;
-        selectedSchuleId.value = newSchulen[0]?.value || '';
+    () => organisationStore.schulenFilter.selectedItems,
+    (newSchulen: Array<Organisation>) => {
+      if (newSchulen.length === 1) {
+        selectedSchuleId.value = newSchulen[0]!.id;
       }
     },
-    { immediate: true },
   );
-
-  const selectedSchuleTitle: ComputedRef<string> = computed(() => {
-    return props.schulen?.find((schule: TranslatedObject) => schule.value === selectedSchuleId.value)?.title || '';
-  });
-
-  // Watcher to detect when the search input for Organisationen is triggered.
-  watch(searchInputSchule, async (newValue: string | undefined) => {
-    clearTimeout(timerId.value);
-    isSearching = !!newValue;
-    if (newValue !== '' && newValue === selectedSchuleTitle.value) return;
-
-    const organisationFilter: OrganisationenFilter = {
-      includeTyp: OrganisationsTyp.Schule,
-      systemrechte: [RollenSystemRecht.KlassenVerwalten],
-      limit: 25,
-    };
-    if (newValue) {
-      organisationFilter.searchString = newValue;
-    }
-    if (selectedSchuleId.value) {
-      organisationFilter.organisationIds = [selectedSchuleId.value];
-    }
-
-    timerId.value = setTimeout(async () => {
-      await organisationStore.getAllOrganisationen(organisationFilter);
-    }, 500);
-  });
 </script>
 
 <template data-test-id="klasse-form">
@@ -106,27 +66,12 @@
         :isRequired="true"
         :label="$t('admin.schule.schule')"
       >
-        <v-autocomplete
-          autocomplete="off"
-          :class="[{ 'filter-dropdown mb-4': hasAutoselectedSchule }, { selected: selectedSchuleId }]"
-          clearable
-          data-testid="schule-select"
-          density="compact"
-          :disabled="hasAutoselectedSchule || readonly"
-          id="schule-select"
-          :items="schulen"
-          item-value="value"
-          item-text="title"
-          :no-data-text="$t('noDataFound')"
-          :placeholder="$t('admin.schule.assignSchule')"
-          ref="schule-select"
-          required="true"
-          variant="outlined"
-          v-bind="selectedSchuleProps"
-          v-model="selectedSchuleId"
-          v-model:search="searchInputSchule"
-          hide-details
-        ></v-autocomplete>
+        <SchulenFilter
+          :multiple="false"
+          :readonly
+          :systemrechte-for-search="[RollenSystemRecht.KlassenVerwalten]"
+          :selected-schule-props="selectedSchuleProps"
+        ></SchulenFilter>
       </FormRow>
 
       <!-- Klassenname eingeben -->
