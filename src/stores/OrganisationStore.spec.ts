@@ -1,4 +1,4 @@
-import { OrganisationsTyp, type OrganisationRootChildrenResponse } from '@/api-client/generated';
+import { OrganisationsTyp, RollenSystemRecht, type OrganisationRootChildrenResponse } from '@/api-client/generated';
 import ApiService from '@/services/ApiService';
 import MockAdapter from 'axios-mock-adapter';
 import { setActivePinia, createPinia } from 'pinia';
@@ -567,6 +567,12 @@ describe('OrganisationStore', () => {
     });
 
     describe('getFilteredSchulen', () => {
+      const url: string = '/api/organisationen?limit=25&searchString=astrid&typ=SCHULE&systemrechte=KLASSEN_VERWALTEN';
+      const sut: OrganisationStore['getFilteredSchulen'] = () =>
+        organisationStore.getFilteredSchulen({
+          searchString: 'astrid',
+          systemrechte: [RollenSystemRecht.KlassenVerwalten],
+        });
       it('should get all schulen with search string', async () => {
         const mockResponse: Organisation[] = [
           {
@@ -577,12 +583,8 @@ describe('OrganisationStore', () => {
           },
         ];
 
-        mockadapter
-          .onGet('/api/organisationen?limit=25&searchString=astrid&typ=SCHULE')
-          .replyOnce(200, mockResponse, { 'x-paging-total': '1' });
-        const getFilteredSchulenPromise: Promise<void> = organisationStore.getFilteredSchulen({
-          searchString: 'astrid',
-        });
+        mockadapter.onGet(url).replyOnce(200, mockResponse, { 'x-paging-total': '1' });
+        const getFilteredSchulenPromise: Promise<void> = sut();
 
         expect(organisationStore.filteredSchulen.loading).toBe(true);
         await getFilteredSchulenPromise;
@@ -592,12 +594,8 @@ describe('OrganisationStore', () => {
       });
 
       it('should handle string error', async () => {
-        mockadapter
-          .onGet('/api/organisationen?limit=25&searchString=astrid&typ=SCHULE')
-          .replyOnce(500, 'some mock server error');
-        const getFilteredSchulenPromise: Promise<void> = organisationStore.getFilteredSchulen({
-          searchString: 'astrid',
-        });
+        mockadapter.onGet(url).replyOnce(500, 'some mock server error');
+        const getFilteredSchulenPromise: Promise<void> = sut();
 
         expect(organisationStore.filteredSchulen.loading).toBe(true);
         await rejects(getFilteredSchulenPromise);
@@ -606,17 +604,91 @@ describe('OrganisationStore', () => {
       });
 
       it('should handle error code', async () => {
-        mockadapter
-          .onGet('/api/organisationen?limit=25&searchString=astrid&typ=SCHULE')
-          .replyOnce(500, { code: 'some mock server error' });
-        const getFilteredSchulenPromise: Promise<void> = organisationStore.getFilteredSchulen({
-          searchString: 'astrid',
-        });
+        mockadapter.onGet(url).replyOnce(500, { code: 'some mock server error' });
+        const getFilteredSchulenPromise: Promise<void> = sut();
 
         expect(organisationStore.filteredSchulen.loading).toBe(true);
         await rejects(getFilteredSchulenPromise);
         expect(organisationStore.errorCode).toEqual('some mock server error');
         expect(organisationStore.filteredSchulen.loading).toBe(false);
+      });
+    });
+
+    describe('getAutoselectedSchule', () => {
+      const url: string = '/api/organisationen?limit=2&typ=SCHULE&systemrechte=KLASSEN_VERWALTEN';
+      const sut: OrganisationStore['getAutoselectedSchule'] = () => organisationStore.getAutoselectedSchule();
+      it('should get schule and set it', async () => {
+        const mockResponse: Organisation[] = [
+          {
+            id: '1',
+            kennung: '1234567',
+            name: 'Astrid-Lindgren-Schule',
+            typ: OrganisationsTyp.Schule,
+          },
+        ];
+
+        mockadapter.onGet(url).replyOnce(200, mockResponse, { 'x-paging-total': '1' });
+        const promise: Promise<void> = sut();
+
+        expect(organisationStore.loading).toBe(true);
+        await promise;
+        expect(organisationStore.autoselectedSchule).toEqual(mockResponse[0]!);
+        expect(organisationStore.loading).toBe(false);
+      });
+
+      it.each([
+        {
+          length: 2,
+          response: [
+            {
+              id: '1',
+              kennung: '1234567',
+              name: 'Astrid-Lindgren-Schule',
+              typ: OrganisationsTyp.Schule,
+            },
+            {
+              id: '2',
+              kennung: '2434571',
+              name: 'Hans-Christian-Andersen-Schule',
+              typ: OrganisationsTyp.Schule,
+            },
+          ],
+        },
+        {
+          length: 0,
+          response: [],
+        },
+      ])(
+        'should not autoselect if response has length $length',
+        async ({ length, response }: { length: number; response: Array<Organisation> }) => {
+          mockadapter.onGet(url).replyOnce(200, response, { 'x-paging-total': `${length}` });
+          const promise: Promise<void> = sut();
+
+          expect(organisationStore.loading).toBe(true);
+          await promise;
+          expect(organisationStore.autoselectedSchule).toEqual(null);
+          expect(organisationStore.loading).toBe(false);
+        },
+      );
+
+      it('should handle string error', async () => {
+        mockadapter.onGet(url).replyOnce(500, 'some mock server error');
+        const promise: Promise<void> = sut();
+
+        expect(organisationStore.loading).toBe(true);
+        await rejects(promise);
+        expect(organisationStore.errorCode).toEqual('UNSPECIFIED_ERROR');
+        expect(organisationStore.loading).toBe(false);
+      });
+
+      it('should handle error code', async () => {
+        mockadapter.onGet(url).replyOnce(500, { code: 'some mock server error' });
+        const promise: Promise<void> = sut();
+
+        expect(organisationStore.loading).toBe(true);
+        await rejects(promise);
+        expect(organisationStore.errorCode).toEqual('some mock server error');
+        expect(organisationStore.loading).toBe(false);
       });
     });
 

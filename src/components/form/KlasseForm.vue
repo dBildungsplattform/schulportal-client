@@ -4,6 +4,7 @@
   import {
     OrganisationsTyp,
     useOrganisationStore,
+    type Organisation,
     type OrganisationenFilter,
     type OrganisationStore,
   } from '@/stores/OrganisationStore';
@@ -33,7 +34,6 @@
   };
 
   const props: Props = defineProps<Props>();
-  const hasAutoselectedSchule: Ref<boolean> = computed(() => organisationStore.allSchulen.length === 1);
   const selectedSchuleId: ModelRef<string | undefined, string> = defineModel('selectedSchule');
   const selectedSchuleTitle: ComputedRef<string> = computed(() => {
     return props.schulen?.find((schule: TranslatedObject) => schule.value === selectedSchuleId.value)?.title || '';
@@ -42,9 +42,9 @@
 
   // Watcher to auto-select if there is only one schule
   watch(
-    hasAutoselectedSchule,
-    (newValue: boolean) => {
-      selectedSchuleId.value = newValue ? organisationStore.allSchulen[0]?.id : undefined;
+    () => organisationStore.autoselectedSchule,
+    (newValue: Organisation | null) => {
+      selectedSchuleId.value = newValue ? organisationStore.autoselectedSchule?.id : undefined;
     },
     { immediate: true },
   );
@@ -52,7 +52,7 @@
   // Watcher to detect when the search input for Organisationen is triggered.
   watch(searchInputSchule, async (newValue: string | undefined) => {
     clearTimeout(timerId.value);
-    if (hasAutoselectedSchule.value) return;
+    if (organisationStore.autoselectedSchule) return;
     if (newValue !== '' && newValue === selectedSchuleTitle.value) return;
 
     const organisationFilter: OrganisationenFilter = {
@@ -102,11 +102,11 @@
       >
         <v-autocomplete
           autocomplete="off"
-          :class="[{ 'filter-dropdown mb-4': hasAutoselectedSchule }, { selected: selectedSchuleId }]"
+          :class="[{ 'filter-dropdown mb-4': organisationStore.autoselectedSchule }, { selected: selectedSchuleId }]"
           clearable
           data-testid="schule-select"
           density="compact"
-          :disabled="hasAutoselectedSchule || readonly"
+          :disabled="!!organisationStore.autoselectedSchule || readonly"
           id="schule-select"
           :items="schulen"
           item-value="value"

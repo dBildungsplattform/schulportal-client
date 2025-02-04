@@ -82,7 +82,7 @@ describe('Schule searchInput', () => {
   describe('when schule is autoselected', async () => {
     const schule: TranslatedObject = translatedSchulen[0]!;
     beforeEach(async () => {
-      organisationStore.allSchulen = schulen.slice(0, 1);
+      organisationStore.autoselectedSchule = schulen[0]!;
       wrapper!.setProps({
         schulen: [schule],
       });
@@ -104,7 +104,7 @@ describe('Schule searchInput', () => {
       expect(inputElement!.hasAttribute('disabled')).toBeTruthy();
       expect(wrapper?.find('[data-testid="schule-select"]').text()).toContain(schule.title);
 
-      organisationStore.allSchulen = schulen.slice();
+      organisationStore.autoselectedSchule = null;
       await nextTick();
 
       inputElement = document.querySelector('#schule-select');
