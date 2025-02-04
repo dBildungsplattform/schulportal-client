@@ -34,16 +34,19 @@
   type Props = {
     organisationen: TranslatedObject[] | undefined;
     rollen: TranslatedRolleWithAttrs[] | undefined;
-    klassen?: TranslatedObject[] | undefined;
-    selectedOrganisationProps: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
-    selectedRolleProps: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
-    selectedKlasseProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     selectedOrganisation: string | undefined;
     selectedRolle: string | undefined;
     showHeadline: boolean;
+    selectedOrganisationProps: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
+    klassen?: TranslatedObject[] | undefined;
+    selectedRollen?: string[] | undefined;
     selectedKlasse?: string | undefined;
+    selectedKlasseProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
+    selectedRolleProps: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
+    selectedRollenProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     isModifyRolleDialog?: boolean;
     befristungInputProps?: BefristungProps;
+    allowMultipleRollen?: boolean;
   };
 
   const props: Props = defineProps<Props>();
@@ -61,6 +64,7 @@
 
   const selectedOrganisation: Ref<string | undefined> = ref(props.selectedOrganisation);
   const selectedRolle: Ref<string | undefined> = ref(props.selectedRolle);
+  const selectedRollen: Ref<string[] | undefined> = ref(props.selectedRollen || []);
   const selectedKlasse: Ref<string | undefined> = ref(props.selectedKlasse);
 
   // Computed property to get the title of the selected organisation

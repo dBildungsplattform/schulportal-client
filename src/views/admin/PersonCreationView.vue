@@ -464,8 +464,9 @@
           />
 
           <template v-if="!personenkontextStore.errorCode && !personStore.errorCode">
-            <!-- Organisation, Rolle, Klasse zuordnen -->
+            <!-- Organisation, Rolle, Klasse und Befristung zuordnen -->
             <PersonenkontextCreate
+              :allowMultipleRollen="true"
               :showHeadline="true"
               :organisationen="organisationen"
               ref="personenkontext-create"
@@ -486,9 +487,6 @@
               v-model:selectedOrganisation="selectedOrganisation"
               v-model:selectedRolle="selectedRolle"
               v-model:selectedKlasse="selectedKlasse"
-              @update:selectedOrganisation="(value?: string) => (selectedOrganisation = value)"
-              @update:selectedRolle="(value?: string) => (selectedRolle = value)"
-              @update:selectedKlasse="(value?: string) => (selectedKlasse = value)"
               @update:canCommit="canCommit = $event"
               @update:befristung="handleBefristungUpdate"
               @update:calculatedBefristungOption="handleBefristungOptionUpdate"
