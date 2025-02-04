@@ -27,7 +27,7 @@
   const router: Router = useRouter();
   const organisationStore: OrganisationStore = useOrganisationStore();
 
-  const hasAutoselectedSchule: Ref<boolean> = ref(false);
+  const hasAutoselectedSchule: ComputedRef<boolean> = computed(() => organisationStore.autoselectedSchule !== null);
 
   const validationSchema: TypedSchema = getValidationSchema(t);
 
