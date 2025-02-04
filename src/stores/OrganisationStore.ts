@@ -1,5 +1,6 @@
 import { defineStore, type Store, type StoreDefinition } from 'pinia';
-import { isAxiosError, type AxiosResponse } from 'axios';
+import { type AxiosResponse } from 'axios';
+import { getResponseErrorCode } from '@/utils/errorHandlers';
 import {
   OrganisationenApiFactory,
   OrganisationsTyp,
@@ -199,10 +200,7 @@ export const useOrganisationStore: StoreDefinition<
         }
         this.loading = false;
       } catch (error: unknown) {
-        this.errorCode = 'UNSPECIFIED_ERROR';
-        if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
-        }
+        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
       } finally {
         this.loading = false;
       }
@@ -223,6 +221,8 @@ export const useOrganisationStore: StoreDefinition<
             .filter((id: string | undefined | null): id is string => id !== null && id !== undefined),
         );
       }
+
+      // TO DO: do we need try-catch for this request?
       const response: AxiosResponse<Organisation[]> = await organisationApi.organisationControllerFindOrganizations(
         undefined,
         searchFilterStore.klassenPerPage,
@@ -325,10 +325,7 @@ export const useOrganisationStore: StoreDefinition<
         this.totalKlassen = +response.headers['x-paging-total'];
         this.totalPaginatedKlassen = +response.headers['x-paging-pagetotal'];
       } catch (error: unknown) {
-        this.errorCode = 'UNSPECIFIED_ERROR';
-        if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
-        }
+        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
         return await Promise.reject(this.errorCode);
       } finally {
         this.loadingKlassen = false;
@@ -349,10 +346,7 @@ export const useOrganisationStore: StoreDefinition<
 
         return data;
       } catch (error: unknown) {
-        this.errorCode = 'UNSPECIFIED_ERROR';
-        if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
-        }
+        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
         return await Promise.reject(this.errorCode);
       } finally {
         this.loading = false;
@@ -368,10 +362,7 @@ export const useOrganisationStore: StoreDefinition<
         const { parents }: ParentOrganisationenResponse = response.data;
         this.parentOrganisationen = parents;
       } catch (error: unknown) {
-        this.errorCode = 'UNSPECIFIED_ERROR';
-        if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
-        }
+        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
       } finally {
         this.loading = false;
       }
@@ -393,10 +384,7 @@ export const useOrganisationStore: StoreDefinition<
           this.lockingOrganisation = data;
         }
       } catch (error: unknown) {
-        this.errorCode = 'UNSPECIFIED_ERROR';
-        if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
-        }
+        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
       } finally {
         this.loading = false;
       }
@@ -424,10 +412,7 @@ export const useOrganisationStore: StoreDefinition<
         this.totalPaginatedKlassen = +response.headers['x-paging-pageTotal'];
         await this.fetchSchuleDetailsForKlassen(true);
       } catch (error: unknown) {
-        this.errorCode = 'UNSPECIFIED_ERROR';
-        if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
-        }
+        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
         return await Promise.reject(this.errorCode);
       } finally {
         this.loadingKlassen = false;
@@ -465,11 +450,7 @@ export const useOrganisationStore: StoreDefinition<
         }
         return data;
       } catch (error: unknown) {
-        /* if an unknown error occurs, set to UNSPECIFIED */
-        this.errorCode = 'UNSPECIFIED_ERROR';
-        if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.i18nKey || 'ORGANISATION_SPECIFICATION_ERROR';
-        }
+        this.errorCode = getResponseErrorCode(error, 'ORGANISATION_SPECIFICATION_ERROR');
         return await Promise.reject(this.errorCode);
       } finally {
         this.loading = false;
@@ -492,10 +473,7 @@ export const useOrganisationStore: StoreDefinition<
         );
         this.updatedOrganisation = data;
       } catch (error: unknown) {
-        this.errorCode = 'UNSPECIFIED_ERROR';
-        if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.i18nKey || 'KLASSE_ERROR';
-        }
+        this.errorCode = getResponseErrorCode(error, 'KLASSE_ERROR');
       } finally {
         this.loading = false;
       }
@@ -506,10 +484,7 @@ export const useOrganisationStore: StoreDefinition<
       try {
         await organisationApi.organisationControllerDeleteKlasse(organisationId);
       } catch (error: unknown) {
-        this.errorCode = 'UNSPECIFIED_ERROR';
-        if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.i18nKey || 'KLASSE_ERROR';
-        }
+        this.errorCode = getResponseErrorCode(error, 'KLASSE_ERROR');
       } finally {
         this.loading = false;
       }
@@ -521,10 +496,7 @@ export const useOrganisationStore: StoreDefinition<
           await organisationApi.organisationControllerGetRootChildren();
         this.schultraeger = Object.values(response.data);
       } catch (error: unknown) {
-        this.errorCode = 'UNSPECIFIED_ERROR';
-        if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.i18nKey || 'SCHULTRAEGER_ERROR';
-        }
+        this.errorCode = getResponseErrorCode(error, 'SCHULTRAEGER_ERROR');
       }
     },
 
@@ -536,10 +508,7 @@ export const useOrganisationStore: StoreDefinition<
           await organisationApi.organisationControllerEnableForitslearning(organisationId);
         this.activatedItslearningOrganisation = data;
       } catch (error: unknown) {
-        this.errorCode = 'UNSPECIFIED_ERROR';
-        if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.i18nKey || 'ORGANISATION_SPECIFICATION_ERROR';
-        }
+        this.errorCode = getResponseErrorCode(error, 'ORGANISATION_SPECIFICATION_ERROR');
       } finally {
         this.loading = false;
       }

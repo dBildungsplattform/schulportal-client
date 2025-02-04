@@ -167,7 +167,7 @@ const mockPersonenuebersichtLehr: PersonWithUebersicht = {
 personenkontextStore.workflowStepResponse = {
   organisations: [
     {
-      id: 'string',
+      id: 'O1',
       administriertVon: 'string',
       kennung: 'string',
       name: 'string',
@@ -218,6 +218,15 @@ organisationStore.klassen = [
     kuerzel: 'K1',
     typ: OrganisationsTyp.Klasse,
     administriertVon: '1',
+  },
+  {
+    id: '9a',
+    kennung: '1234567',
+    name: 'Klasse 2',
+    namensergaenzung: 'Ergänzung',
+    kuerzel: 'K1',
+    typ: OrganisationsTyp.Klasse,
+    administriertVon: 'O1',
   },
 ];
 
@@ -562,6 +571,18 @@ describe('PersonDetailsView', () => {
     expect(unsavedChangesDialogButton?.exists()).toBe(true);
   });
 
+  test('it cancels metadata form', async () => {
+    await wrapper?.find('[data-testid="metadata-edit-button"]').trigger('click');
+    await nextTick();
+
+    expect(wrapper?.find('[data-testid="vorname-input"]').isVisible()).toBe(true);
+
+    await wrapper?.find('[data-testid="person-info-edit-cancel"]').trigger('click');
+    await nextTick();
+
+    expect(wrapper?.find('[data-testid="metadata-edit-button"]').isVisible()).toBe(true);
+  });
+
   describe('error messages', () => {
     test('check 2fa connection error', async () => {
       twoFactorAuthenticationStore.loading = false;
@@ -595,11 +616,126 @@ describe('PersonDetailsView', () => {
 
   test('it shows device password template for rollenart lehr', async () => {
     personStore.personenuebersicht = mockPersonenuebersichtLehr;
+    setCurrentPerson(EmailAddressStatus.Enabled);
     await nextTick();
-    expect(wrapper?.find('[data-testid="device-password-info"]').isVisible()).toBe(true);
+    if (!wrapper) return;
+
+    expect(wrapper.find('[data-testid="device-password-info"]').isVisible()).toBe(true);
+
+    const devicePasswordChangeButton: DOMWrapper<Element> = wrapper
+      .findComponent({ ref: 'device-password-reset' })
+      .find('[data-testid="open-device-password-dialog-button"]');
+    devicePasswordChangeButton.trigger('click');
+    await nextTick();
+
+    expect(document.querySelector('[data-testid="password-reset-info-text"]')).not.toBeNull();
+
+    const resetPasswordButton: HTMLElement = (await document.querySelector(
+      '[data-testid="password-reset-button"]',
+    )) as HTMLElement;
+
+    expect(resetPasswordButton).not.toBeNull();
+    resetPasswordButton.click();
+    await nextTick();
 
     // reset personenuebersicht
     personStore.personenuebersicht = mockPersonenuebersicht;
+  });
+
+  test('renders form to add Zuordnung and triggers submit', async () => {
+    // No existing Zuordnungen for the user for easier testing
+    const mockPersonenuebersichtForAddZuordnung: PersonWithUebersicht = {
+      personId: '1',
+      vorname: 'John',
+      nachname: 'Orton',
+      benutzername: 'jorton',
+      lastModifiedZuordnungen: Date.now().toLocaleString(),
+      zuordnungen: [],
+    };
+    personStore.personenuebersicht = mockPersonenuebersichtForAddZuordnung;
+
+    wrapper?.find('[data-testid="zuordnung-edit-button"]').trigger('click');
+    await nextTick();
+
+    wrapper?.find('[data-testid="zuordnung-create-button"]').trigger('click');
+
+    await flushPromises();
+
+    // Set organisation value
+    const organisationAutocomplete: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'personenkontext-create' })
+      .findComponent({ ref: 'organisation-select' });
+    await organisationAutocomplete?.setValue('O1');
+    await organisationAutocomplete?.vm.$emit('update:search', 'O1');
+    await nextTick();
+
+    // Set rolle value
+    const rolleAutocomplete: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'personenkontext-create' })
+      .findComponent({ ref: 'rolle-select' });
+    await rolleAutocomplete?.setValue('54321');
+    await rolleAutocomplete?.vm.$emit('update:search', '54321');
+    await nextTick();
+    // Set klasse value
+    const klasseAutocomplete: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'personenkontext-create' })
+      .findComponent({ ref: 'klasse-select' });
+    await klasseAutocomplete?.setValue('9a');
+    await klasseAutocomplete?.vm.$emit('update:search', '9a');
+    await nextTick();
+
+    const befristungInput: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'personenkontext-create' })
+      .findComponent({ ref: 'befristung-input-wrapper' })
+      .findComponent({ ref: 'befristung-input' });
+    await befristungInput?.setValue('12.08.2099');
+    await nextTick();
+
+    await nextTick();
+
+    const submitButton: Element | null = document.body.querySelector(
+      '[data-testid="zuordnung-creation-submit-button"]',
+    );
+    expect(submitButton).not.toBeNull();
+    await nextTick();
+
+    if (submitButton) {
+      submitButton.dispatchEvent(new Event('click'));
+    }
+
+    wrapper?.find('[data-testid="zuordnung-creation-submit-button"]').trigger('click');
+
+    await flushPromises();
+
+    const confirmDialogButton: Element | null = document.body.querySelector(
+      '[data-testid="confirm-zuordnung-dialog-addition"]',
+    );
+    expect(confirmDialogButton).not.toBeNull();
+
+    if (confirmDialogButton) {
+      confirmDialogButton.dispatchEvent(new Event('click'));
+    }
+    await flushPromises();
+
+    const saveButton: Element | null = document.body.querySelector('[data-testid="zuordnung-changes-save"]');
+    expect(saveButton).not.toBeNull();
+
+    if (saveButton) {
+      saveButton.dispatchEvent(new Event('click'));
+    }
+    await flushPromises();
+
+    const closeSuccessButton: Element | null = document.body.querySelector(
+      '[data-testid="close-zuordnung-create-success-button"]',
+    );
+    expect(closeSuccessButton).not.toBeNull();
+
+    if (closeSuccessButton) {
+      closeSuccessButton.dispatchEvent(new Event('click'));
+    }
+    await flushPromises();
+
+    expect(wrapper?.find('[data-testid="zuordnung-edit-button"]').isVisible()).toBe(true);
   });
 
   describe('change befristung', () => {
@@ -628,6 +764,12 @@ describe('PersonDetailsView', () => {
       await nextTick();
 
       expect(wrapper?.find('[data-testid="befristung-change-button"]').exists()).toBe(false);
+
+      /* reset config data */
+      configStore.configData = {
+        befristungBearbeitenEnabled: true,
+        rolleBearbeitenEnabled: true,
+      };
     });
 
     test('button only active if one zuordnung is selected', async () => {
@@ -682,7 +824,7 @@ describe('PersonDetailsView', () => {
         await wrapper?.find('[data-testid="befristung-change-button"]').trigger('click');
 
         const befristungInput: VueWrapper | undefined = wrapper
-          ?.findComponent({ ref: 'befristung' })
+          ?.findComponent({ ref: 'befristung-input-wrapper' })
           .findComponent({ ref: 'befristung-input' });
         await befristungInput?.setValue('13.08.2099');
         await nextTick();

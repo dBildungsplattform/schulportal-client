@@ -64,6 +64,37 @@ describe('AuthStore', () => {
       expect(authStore.hasImportPermission).toBe(true);
     });
 
+    it('should save no system permissions if none are present', async () => {
+      const mockInfo: UserinfoResponse = {
+        email: 'albert@test.de',
+        email_verified: true,
+        family_name: 'Test',
+        given_name: 'Albert',
+        name: 'Albert Test',
+        preferred_username: 'albert',
+        sub: 'c71be903-d0ec-4207-b653-40c114680b63',
+        personenkontexte: [
+          {
+            organisationsId: '123456',
+            rolle: {
+              systemrechte: [''],
+              serviceProviderIds: ['789897798'],
+            },
+          },
+        ],
+      } as UserinfoResponse;
+
+      const mockResponse: UserinfoResponse = mockInfo;
+
+      mockadapter.onGet('/api/auth/logininfo').replyOnce(200, mockResponse);
+      const initializeAuthStatus: Promise<void> = authStore.initializeAuthStatus();
+      expect(authStore.isAuthed).toBe(false);
+      expect(authStore.currentUserPermissions).toEqual([]);
+      await initializeAuthStatus;
+      expect(authStore.isAuthed).toBe(true);
+      expect(authStore.currentUserPermissions).toEqual([]);
+    });
+
     it('should not authenticate on server error', async () => {
       mockadapter.onGet('/api/auth/logininfo').replyOnce(401, 'unauthorized error');
       const initializeAuthStatus: Promise<void> = authStore.initializeAuthStatus();
