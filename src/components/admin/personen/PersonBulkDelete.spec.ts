@@ -44,7 +44,7 @@ describe('PersonBulkDelete', () => {
   test('renders the dialog when isDialogVisible is true', async () => {
     await nextTick();
 
-    const dialogContent: Element | null = document.body.querySelector('[data-testid="layout-card"]');
+    const dialogContent: Element | null = document.body.querySelector('[data-testid="person-delete-layout-card"]');
     const discardButton: Element | null = document.body.querySelector('[data-testid="person-delete-discard-button"]');
     const submitButton: Element | null = document.body.querySelector('[data-testid="person-delete-submit-button"]');
 
@@ -78,7 +78,7 @@ describe('PersonBulkDelete', () => {
   test('closes dialog', async () => {
     await nextTick();
     const discardButton: Element | null = document.body.querySelector('[data-testid="person-delete-discard-button"]');
-    const dialogContent: Element | null = document.body.querySelector('[data-testid="layout-card"]');
+    const dialogContent: Element | null = document.body.querySelector('[data-testid="person-delete-layout-card"]');
 
     expect(discardButton).not.toBeNull();
     expect(dialogContent).not.toBeNull();
