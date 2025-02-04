@@ -181,9 +181,10 @@
           v-bind:key="alert.id"
           v-for="alert in alerts"
           :id="alert.id.toString()"
-          :visible="alert.visible"
+          ref="spsh-banner"
           :text="alert.message"
           :type="alert.type"
+          :visible="alert.visible"
           @dismiss-banner="dismissBannerForSession"
         ></SpshBanner>
       </v-col>

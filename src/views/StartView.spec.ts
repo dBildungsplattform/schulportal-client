@@ -206,11 +206,21 @@ describe('StartView', () => {
     expect(adminCard?.attributes('href')).toEqual('/admin/klassen');
   });
 
-  test('banner has correct color', async () => {
+  test('it displays correct banner color', async () => {
     await nextTick();
 
     const banner: WrapperLike | undefined = wrapper?.find('[data-testid="KOPERS-banner"]');
 
     expect(banner?.classes()).toContain('bg-error');
+  });
+
+  test('it dismisses the banner', async () => {
+    await nextTick();
+    const banner: VueWrapper | undefined = wrapper?.findComponent({ ref: 'spsh-banner' });
+
+    expect(banner?.find('[data-testid="banner-close-icon"]').isVisible()).toBe(true);
+    banner?.find('[data-testid="banner-close-icon"]').trigger('click');
+    await nextTick();
+    expect(banner?.emitted('dismissBanner')).toBeTruthy();
   });
 });
