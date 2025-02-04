@@ -428,7 +428,7 @@ describe('PersonManagementView', () => {
     benutzerEditSelect?.setValue('MODIFY_ROLLE');
     await nextTick();
 
-    expect(wrapper?.findComponent({ ref: 'personenkontext-create' }));
+    expect(wrapper?.findComponent({ ref: 'personenkontext-create' }).isVisible()).toBe(true);
   });
 
   test('it checks a checkbox in the table, selects the delete person option and triggers dialog', async () => {
@@ -454,9 +454,11 @@ describe('PersonManagementView', () => {
     expect(hasDeletePersonOption).toBe(true);
 
     benutzerEditSelect?.setValue('DELETE_PERSON');
+
+    benutzerEditSelect?.vm.$emit('input', 'DELETE_PERSON');
     await nextTick();
 
-    expect(wrapper?.findComponent({ ref: 'deletePersonBulkDialog' }));
+    expect(document.body.querySelector('[data-testid="person-delete-layout-card"]')).not.toBeNull();
   });
 
   test('person delete isnt shown if user has no permission', async () => {

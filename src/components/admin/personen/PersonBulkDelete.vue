@@ -20,9 +20,7 @@
     personIDs: string[];
   };
 
-  type Emits = {
-    (event: 'update:isDialogVisible', isDialogVisible: boolean): void;
-  };
+  type Emits = (event: 'update:isDialogVisible', isDialogVisible: boolean) => void;
 
   const props: Props = defineProps<Props>();
   const emit: Emits = defineEmits<Emits>();
@@ -62,7 +60,7 @@
     persistent
   >
     <LayoutCard
-      data-testid="layout-card"
+      data-testid="person-delete-layout-card"
       :closable="true"
       :header="$t('admin.person.deletePerson')"
       @onCloseClicked="closeDeltePersonDialog()"
