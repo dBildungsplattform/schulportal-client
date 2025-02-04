@@ -1,5 +1,5 @@
 import { defineStore, type Store, type StoreDefinition } from 'pinia';
-import { isAxiosError } from 'axios';
+import { getResponseErrorCode } from '@/utils/errorHandlers';
 import {
   ImportApiFactory,
   ImportStatus,
@@ -79,10 +79,7 @@ export const useImportStore: StoreDefinition<'importStore', ImportState, ImportG
 
         this.importResponse = data;
       } catch (error: unknown) {
-        this.errorCode = 'UNSPECIFIED_ERROR';
-        if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.i18nKey || 'ERROR_IMPORTING_FILE';
-        }
+        this.errorCode = getResponseErrorCode(error, 'ERROR_IMPORTING_FILE');
       } finally {
         this.retrievalIsLoading = false;
       }
@@ -92,10 +89,7 @@ export const useImportStore: StoreDefinition<'importStore', ImportState, ImportG
       try {
         await importApi.importControllerDeleteImportTransaction(importvorgangId);
       } catch (error: unknown) {
-        this.errorCode = 'UNSPECIFIED_ERROR';
-        if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.i18nKey || 'ERROR_IMPORTING_FILE';
-        }
+        this.errorCode = getResponseErrorCode(error, 'ERROR_IMPORTING_FILE');
       }
     },
 
@@ -180,10 +174,7 @@ export const useImportStore: StoreDefinition<'importStore', ImportState, ImportG
 
         this.importStatus = data;
       } catch (error: unknown) {
-        this.errorCode = 'UNSPECIFIED_ERROR';
-        if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.i18nKey || 'ERROR_IMPORTING_FILE';
-        }
+        this.errorCode = getResponseErrorCode(error, 'ERROR_IMPORTING_FILE');
       }
     },
 
@@ -194,10 +185,7 @@ export const useImportStore: StoreDefinition<'importStore', ImportState, ImportG
           importvorgangId,
         });
       } catch (error: unknown) {
-        this.errorCode = 'UNSPECIFIED_ERROR';
-        if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.i18nKey || 'ERROR_IMPORTING_FILE';
-        }
+        this.errorCode = getResponseErrorCode(error, 'ERROR_IMPORTING_FILE');
       } finally {
         this.importIsLoading = false;
       }
@@ -214,10 +202,7 @@ export const useImportStore: StoreDefinition<'importStore', ImportState, ImportG
 
         this.uploadResponse = data;
       } catch (error: unknown) {
-        this.errorCode = 'UNSPECIFIED_ERROR';
-        if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.i18nKey || 'ERROR_UPLOADING_FILE';
-        }
+        this.errorCode = getResponseErrorCode(error, 'ERROR_UPLOADING_FILE');
       } finally {
         this.uploadIsLoading = false;
       }

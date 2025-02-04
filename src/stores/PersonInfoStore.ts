@@ -1,5 +1,6 @@
 import { defineStore, type Store, type StoreDefinition } from 'pinia';
-import { isAxiosError, type AxiosResponse } from 'axios';
+import { type AxiosResponse } from 'axios';
+import { getResponseErrorCode, getResponseErrorMesage } from '@/utils/errorHandlers';
 import {
   PersonInfoApiFactory,
   type DbiamCreatePersonWithPersonenkontexteBodyParams,
@@ -64,10 +65,8 @@ export const usePersonInfoStore: StoreDefinition<
         const { data }: AxiosResponse<PersonInfoResponse> = await personenInfoApi.personInfoControllerInfo();
         this.personInfo = data;
       } catch (error) {
-        if (isAxiosError(error)) {
-          this.errorCode = error.response?.data?.code || '';
-          this.errorMessage = error.response?.data?.message || '';
-        }
+        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
+        this.errorMessage = getResponseErrorMesage(error);
       } finally {
         this.loading = false;
       }

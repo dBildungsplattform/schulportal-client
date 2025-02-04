@@ -4,6 +4,7 @@ import type WrapperLike from '@vue/test-utils/dist/interfaces/wrapperLike';
 import { expect, test } from 'vitest';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import UnknownUserErrorView from './UnknownUserErrorView.vue';
+import { nextTick } from 'vue';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
@@ -49,10 +50,13 @@ describe('UnknownUserErrorView', () => {
     expect(alertTitle?.text()).toEqual('Der Benutzer ist im Schulportal SH nicht bekannt');
   });
 
-  test('it renders the return button', () => {
-    const alertTitle: WrapperLike | undefined = wrapper?.find('[data-testid="alert-button"]');
+  test('it renders the logout button', async () => {
+    const logoutButton: WrapperLike | undefined = wrapper?.find('[data-testid="alert-button"]');
 
-    expect(alertTitle?.isVisible()).toBe(true);
-    expect(alertTitle?.text()).toEqual('Abmelden');
+    expect(logoutButton?.isVisible()).toBe(true);
+    expect(logoutButton?.text()).toEqual('Abmelden');
+
+    await logoutButton?.trigger('click');
+    await nextTick();
   });
 });
