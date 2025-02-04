@@ -11,7 +11,7 @@ import { nextTick } from 'vue';
 import StartView from './StartView.vue';
 import { type PersonStore, usePersonStore, type PersonWithUebersicht } from '@/stores/PersonStore';
 import { usePersonInfoStore, type PersonInfoResponse, type PersonInfoStore } from '@/stores/PersonInfoStore';
-import { OrganisationsTyp, RollenArt, RollenMerkmal } from '@/api-client/generated/api';
+import { OrganisationsTyp, RollenArt, RollenMerkmal, ServiceProviderKategorie } from '@/api-client/generated/api';
 
 let wrapper: VueWrapper | null = null;
 let authStore: AuthStore;
@@ -236,10 +236,18 @@ describe('StartView', () => {
   test('filterSortProviders sorts service providers alphabetically', () => {
     serviceProviderStore.availableServiceProviders = mockProviders;
 
-    expect(serviceProviderStore.availableServiceProviders.map((p: ServiceProvider) => p.name)).toEqual([
-      'Spongebob Squarepants',
+    interface StartViewComponent {
+      filterSortProviders: (providers: ServiceProvider[], kategorie: ServiceProviderKategorie) => ServiceProvider[];
+    }
+
+    const filteredSortProviders: ServiceProvider[] = (wrapper?.vm as unknown as StartViewComponent).filterSortProviders(
+      mockProviders,
+      ServiceProviderKategorie.Email,
+    );
+
+    expect(filteredSortProviders.map((p: ServiceProvider) => p.name)).toEqual([
       'Not Squarepants',
-      'Schulportal-Administration',
+      'Spongebob Squarepants',
     ]);
   });
 });
