@@ -269,10 +269,7 @@ export const useOrganisationStore: StoreDefinition<
         this.filteredSchulen.total = +response.headers['x-paging-total'];
         this.filteredSchulen.schulen = response.data;
       } catch (error: unknown) {
-        this.errorCode = 'UNSPECIFIED_ERROR';
-        if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
-        }
+        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
         return await Promise.reject(this.errorCode);
       } finally {
         this.filteredSchulen.loading = false;
@@ -296,10 +293,7 @@ export const useOrganisationStore: StoreDefinition<
         );
         this.autoselectedSchule = response.data.length === 1 ? (response.data[0] ?? null) : null;
       } catch (error: unknown) {
-        this.errorCode = 'UNSPECIFIED_ERROR';
-        if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.code || 'UNSPECIFIED_ERROR';
-        }
+        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
         return await Promise.reject(this.errorCode);
       } finally {
         this.loading = false;
