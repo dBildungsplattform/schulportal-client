@@ -134,57 +134,6 @@
 
   const statuses: Array<string> = ['Aktiv', 'Inaktiv'];
 
-  async function getPaginatedPersonen(page: number): Promise<void> {
-    searchFilterStore.personenPage = page;
-    await personStore.getAllPersons({
-      offset: (searchFilterStore.personenPage - 1) * searchFilterStore.personenPerPage,
-      limit: searchFilterStore.personenPerPage,
-      organisationIDs: selectedKlassen.value.length ? selectedKlassen.value : selectedOrganisation.value,
-      rolleIDs: searchFilterStore.selectedRollen || selectedRollen.value,
-      searchFilter: searchFilterStore.searchFilterPersonen || searchFilter.value,
-      sortField: searchFilterStore.sortField as SortField,
-      sortOrder: searchFilterStore.sortOrder as SortOrder,
-    });
-  }
-
-  async function getPaginatedPersonenWithLimit(limit: number): Promise<void> {
-    /* reset page to 1 if entries are equal to or less than selected limit */
-    if (personStore.totalPersons <= limit) {
-      searchFilterStore.personenPage = 1;
-    }
-
-    searchFilterStore.personenPerPage = limit;
-    await personStore.getAllPersons({
-      offset: (searchFilterStore.personenPage - 1) * searchFilterStore.personenPerPage,
-      limit: searchFilterStore.personenPerPage,
-      organisationIDs: searchFilterStore.selectedOrganisationen || selectedOrganisation.value,
-      rolleIDs: searchFilterStore.selectedRollen || selectedRollen.value,
-      searchFilter: searchFilterStore.searchFilterPersonen || searchFilter.value,
-    });
-  }
-
-  async function autoSelectOrganisation(): Promise<void> {
-    // Autoselect the Orga for the current user that only has 1 Orga assigned to him.
-    if (organisationStore.allOrganisationen.length === 1) {
-      selectedOrganisation.value = [organisationStore.allOrganisationen[0]?.id || ''];
-      hasAutoSelectedOrganisation.value = true;
-      if (selectedOrganisation.value.length) {
-        await organisationStore.getFilteredKlassen({
-          administriertVon: selectedOrganisation.value,
-          searchString: searchInputKlassen.value,
-        });
-        // Dropdown wasn't updated. Ideally it should be automatically updated once the selectedOrganisation holds a value.
-        klassenOptions.value = organisationStore.klassen
-          .map((org: Organisation) => ({
-            value: org.id,
-            title: org.name,
-          }))
-          .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
-        totalKlassen = klassenOptions.value.length;
-      }
-    }
-  }
-
   async function applySearchAndFilters(): Promise<void> {
     await organisationStore.getFilteredKlassen({
       administriertVon: selectedOrganisation.value,
@@ -207,6 +156,61 @@
       sortField: searchFilterStore.sortField as SortField,
       sortOrder: searchFilterStore.sortOrder as SortOrder,
     });
+  }
+
+  async function getPaginatedPersonen(page: number): Promise<void> {
+    searchFilterStore.personenPage = page;
+    await personStore.getAllPersons({
+      offset: (searchFilterStore.personenPage - 1) * searchFilterStore.personenPerPage,
+      limit: searchFilterStore.personenPerPage,
+      organisationIDs: selectedKlassen.value.length ? selectedKlassen.value : selectedOrganisation.value,
+      rolleIDs: searchFilterStore.selectedRollen || selectedRollen.value,
+      searchFilter: searchFilterStore.searchFilterPersonen || searchFilter.value,
+      sortField: searchFilterStore.sortField as SortField,
+      sortOrder: searchFilterStore.sortOrder as SortOrder,
+    });
+
+    await applySearchAndFilters();
+  }
+
+  async function getPaginatedPersonenWithLimit(limit: number): Promise<void> {
+    /* reset page to 1 if entries are equal to or less than selected limit */
+    if (personStore.totalPersons <= limit) {
+      searchFilterStore.personenPage = 1;
+    }
+
+    searchFilterStore.personenPerPage = limit;
+    await personStore.getAllPersons({
+      offset: (searchFilterStore.personenPage - 1) * searchFilterStore.personenPerPage,
+      limit: searchFilterStore.personenPerPage,
+      organisationIDs: searchFilterStore.selectedOrganisationen || selectedOrganisation.value,
+      rolleIDs: searchFilterStore.selectedRollen || selectedRollen.value,
+      searchFilter: searchFilterStore.searchFilterPersonen || searchFilter.value,
+    });
+
+    await applySearchAndFilters();
+  }
+
+  async function autoSelectOrganisation(): Promise<void> {
+    // Autoselect the Orga for the current user that only has 1 Orga assigned to him.
+    if (organisationStore.allOrganisationen.length === 1) {
+      selectedOrganisation.value = [organisationStore.allOrganisationen[0]?.id || ''];
+      hasAutoSelectedOrganisation.value = true;
+      if (selectedOrganisation.value.length) {
+        await organisationStore.getFilteredKlassen({
+          administriertVon: selectedOrganisation.value,
+          searchString: searchInputKlassen.value,
+        });
+        // Dropdown wasn't updated. Ideally it should be automatically updated once the selectedOrganisation holds a value.
+        klassenOptions.value = organisationStore.klassen
+          .map((org: Organisation) => ({
+            value: org.id,
+            title: org.name,
+          }))
+          .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
+        totalKlassen = klassenOptions.value.length;
+      }
+    }
   }
 
   async function setKlasseFilter(newValue: Array<string>): Promise<void> {
